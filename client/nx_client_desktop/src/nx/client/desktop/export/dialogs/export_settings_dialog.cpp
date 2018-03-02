@@ -408,7 +408,6 @@ void ExportSettingsDialog::updateSettingsWidgets()
         ui->exportLayoutSettingsPage->setLayoutReadOnly(d->exportLayoutPersistentSettings().readOnly);
         ui->exportMediaSettingsPage->setApplyFilters(mediaPersistentSettings.applyFilters);
         ui->timestampSettingsPage->setData(mediaPersistentSettings.timestampOverlay);
-        ui->timestampSettingsPage->setFormatEnabled(d->mediaSupportsUtc());
         ui->bookmarkSettingsPage->setData(mediaPersistentSettings.bookmarkOverlay);
         ui->imageSettingsPage->setData(mediaPersistentSettings.imageOverlay);
         ui->textSettingsPage->setData(mediaPersistentSettings.textOverlay);
@@ -532,6 +531,11 @@ void ExportSettingsDialog::updateWidgetsState()
     if (overlayOptionsAvailable == ui->transcodingButtonsWidget->isHidden())
     {
         ui->transcodingButtonsWidget->setHidden(!overlayOptionsAvailable);
+    }
+
+    if (settings.shouldExportOverlays())
+    {
+        ui->timestampSettingsPage->setFormatEnabled(d->mediaSupportsUtc());
     }
 
     // Update button state for used overlays.

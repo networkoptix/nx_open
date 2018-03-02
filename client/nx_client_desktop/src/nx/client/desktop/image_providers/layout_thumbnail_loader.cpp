@@ -148,16 +148,20 @@ struct LayoutThumbnailLoader::Private
         qreal rotation = qMod(item->rotation, 180.0);
         QRectF cellRect = item->outCellRect;
 
+        QSizeF dataSize = item->provider->sizeHint();
+
         // Aspect ratio is invalid when there is no image. No need to rotate in this case.
         if (qFuzzyIsNull(rotation) || !aspectRatio.isValid())
         {
-            const auto targetRect = aspectRatio.isValid()
-                ? QnGeometry::expanded(aspectRatio.toFloat(), cellRect, Qt::KeepAspectRatio)
-                : cellRect;
+            if (aspectRatio.isValid())
+                item->outRect = QnGeometry::expanded(
+                    aspectRatio.toFloat(), cellRect, Qt::KeepAspectRatio).toRect();
+            else
+                item->outRect = cellRect.toRect();
 
             QPainter painter(&outputImage);
-            paintPixmapSharp(&painter, specialPixmap(status, targetRect.size().toSize()),
-                targetRect.topLeft());
+            paintPixmapSharp(&painter, specialPixmap(status, item->outRect.size()),
+                item->outRect.topLeft());
         }
         else
         {
@@ -173,18 +177,19 @@ struct LayoutThumbnailLoader::Private
                 ar = 1.0 / ar;
 
             const auto cellCenter = cellRect.center();
-            const auto targetRect = QnGeometry::encloseRotatedGeometry(
-                cellRect, ar, rotation);
+            item->outRect = QnGeometry::encloseRotatedGeometry(
+                cellRect, ar, rotation).toRect();
 
             QPainter painter(&outputImage);
             painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
             painter.translate(cellRect.center());
             painter.rotate(rotation);
             painter.translate(-cellRect.center());
-            paintPixmapSharp(&painter, specialPixmap(status, targetRect.size().toSize()),
-                targetRect.topLeft());
+            paintPixmapSharp(&painter, specialPixmap(status, item->outRect.size()), 
+                item->outRect.topLeft());
         }
-        emit q->imageChanged(outputImage);
+
+        finalizeOutputImage();
     }
 
     void updateTileStatus(Qn::ThumbnailStatus status, const QnAspectRatio& aspectRatio,
@@ -208,12 +213,13 @@ struct LayoutThumbnailLoader::Private
                 break;
 
             case Qn::ThumbnailStatus::Invalid:
-                loaderIsComplete = true;
             case Qn::ThumbnailStatus::NoData:
+                // We try not to change status if we had already 'Loaded
                 if(item->status != Qn::ThumbnailStatus::Loaded)
                     drawStatusPixmap(status, aspectRatio, item);
                 else
                     item->status = status;
+                loaderIsComplete = true;
                 break;
             case Qn::ThumbnailStatus::Refreshing:
                 break;
@@ -233,7 +239,7 @@ struct LayoutThumbnailLoader::Private
         }
         else
         {
-            NX_WARNING(this, "LayoutThumbnailLoader::finalizeOutputImage() has empty contents rectangle");
+            NX_WARNING(this) "LayoutThumbnailLoader::finalizeOutputImage() has empty contents rectangle";
         }
     }
 
@@ -261,6 +267,9 @@ struct LayoutThumbnailLoader::Private
             const auto cellCenter = item->outCellRect.center();
             item->outRect = QnGeometry::encloseRotatedGeometry(
                 item->outCellRect, aspectRatio, item->rotation).toRect();
+
+            item->outRect = QnGeometry::aligned(
+                item->outRect.size(), item->outCellRect.toRect(), Qt::AlignCenter);
 
             QPainter painter(&outputImage);
             painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
@@ -331,17 +340,18 @@ struct LayoutThumbnailLoader::Private
         bool first = true;
         for (const ItemPtr& item : items)
         {
-            if (item->outRect.isEmpty())
+            auto rect = item->outCellRect.toRect();
+            if (rect.isEmpty())
                 continue;
 
             if (first)
             {
-                result = item->outRect;
+                result = rect;
                 first = false;
             }
             else
             {
-                result = result.united(item->outRect);
+                result = result.united(rect);
             }
         }
         return result;
@@ -366,6 +376,9 @@ struct LayoutThumbnailLoader::Private
     Qn::ThumbnailStatus status = Qn::ThumbnailStatus::Invalid;
     // Items to be loaded.
     QList<ItemPtr> items;
+
+
+    api::ImageRequest::RoundMethod roundMethod = api::ImageRequest::RoundMethod::precise;
 
     // We need this widgets to draw special states, like 'NoData'.
     QScopedPointer<QnAutoscaledPlainText> noDataWidget;
@@ -423,6 +436,11 @@ QColor LayoutThumbnailLoader::itemBackgroundColor() const
 void LayoutThumbnailLoader::setItemBackgroundColor(const QColor& value)
 {
     setPaletteColor(d->noDataWidget.data(), QPalette::Window, value);
+}
+
+void LayoutThumbnailLoader::setRequestRoundMethod(api::ImageRequest::RoundMethod roundMethod)
+{
+    d->roundMethod = roundMethod;
 }
 
 QColor LayoutThumbnailLoader::fontColor() const
@@ -594,6 +612,8 @@ void LayoutThumbnailLoader::doLoadAsync()
         request.msecSinceEpoch = d->msecSinceEpoch;
         request.size = thumbnailSize;
         request.rotation = 0;
+        // server still should provide most recent frame when we request request.msecSinceEpoch = -1
+        request.roundMethod = d->roundMethod;
         thumbnailItem->provider.reset(new ResourceThumbnailProvider(request));
 
         // We connect only to statusChanged event.

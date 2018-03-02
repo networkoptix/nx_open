@@ -19,7 +19,15 @@ RootTool::RootTool(const QString& toolPath):
 bool RootTool::mount(const QUrl& url, const QString& path)
 {
     QDir().mkdir(path);
-    return execute({"mount", "//" + url.host() + url.path(), path, url.userName(), url.password()});
+    std::vector<QString> args = {"mount", "//" + url.host() + url.path(), path};
+
+    if (!url.userName().isEmpty())
+        args.push_back(url.userName());
+
+    if (!url.password().isEmpty())
+        args.push_back(url.password());
+
+    return execute(args);
 }
 
 bool RootTool::remount(const QUrl& url, const QString& path)

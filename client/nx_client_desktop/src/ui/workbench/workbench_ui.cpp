@@ -356,6 +356,9 @@ bool QnWorkbenchUi::calculateTimelineVisible(QnResourceWidget* widget) const
     if (flags.testFlag(Qn::web_page))
         return false;
 
+    if (flags.testFlag(Qn::desktop_camera))
+        return false;
+
     return accessController()->hasGlobalPermission(Qn::GlobalViewArchivePermission)
         || !flags.testFlag(Qn::live);   /*< Show slider for local files. */
 }

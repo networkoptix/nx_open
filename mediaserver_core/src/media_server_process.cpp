@@ -3610,7 +3610,6 @@ void MediaServerProcess::configureApiRestrictions(nx_http::AuthMethodRestriction
     const auto webPrefix = lit("(/web)?(/proxy/[^/]*(/[^/]*)?)?");
     restrictions->allow(webPrefix + lit("/api/ping"), nx_http::AuthMethod::noAuth);
     restrictions->allow(webPrefix + lit("/api/camera_event.*"), nx_http::AuthMethod::noAuth);
-    restrictions->allow(webPrefix + lit("/api/showLog.*"), nx_http::AuthMethod::urlQueryParam);
     restrictions->allow(webPrefix + lit("/api/moduleInformation"), nx_http::AuthMethod::noAuth);
     restrictions->allow(webPrefix + lit("/api/gettime"), nx_http::AuthMethod::noAuth);
     restrictions->allow(webPrefix + lit("/api/getTimeZones"), nx_http::AuthMethod::noAuth);
@@ -3621,6 +3620,14 @@ void MediaServerProcess::configureApiRestrictions(nx_http::AuthMethodRestriction
     restrictions->allow(webPrefix + lit("/static/.*"), nx_http::AuthMethod::noAuth);
     restrictions->allow(lit("/crossdomain.xml"), nx_http::AuthMethod::noAuth);
     restrictions->allow(webPrefix + lit("/api/startLiteClient"), nx_http::AuthMethod::noAuth);
+
+    // For open in new browser window.
+    restrictions->allow(webPrefix + lit("/api/showLog.*"),
+        nx_http::AuthMethod::urlQueryParam | nx_http::AuthMethod::allowWithourCsrf);
+
+    // For inserting in HTML <img src="...">.
+    restrictions->allow(webPrefix + lit("/ec2/cameraThumbnail"),
+        nx_http::AuthMethod::allowWithourCsrf);
 
     // TODO: #3.1 Remove this method and use /api/installUpdate in client when offline cloud
     // authentication is implemented.

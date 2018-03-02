@@ -40,32 +40,6 @@
                 </RegistryKey>
             </Component>
 
-            <!-- Component, working with registry key, must have an explicit guid in uppercase. -->
-            <Component
-                Id="ClientConfiguration"
-                Guid="40AD61B3-6597-469F-BBA9-0AC6564613B4">
-                <!-- Component, working with registry key, must have a special tag for MSI validator. -->
-                <CreateFolder/>
-                <RegistryKey
-                    Root="HKCU"
-                    Key="Software\[Manufacturer]\$(var.clientInternalName)"
-                    Action="createAndRemoveOnUninstall">
-                </RegistryKey>
-            </Component>
-
-            <Component Id="ClientFirstTimeConfiguration">
-                <Condition>
-                NOT PREVIOUSVERSIONSINSTALLED
-                </Condition>
-
-                <RegistryKey Root="HKCU"
-                         Key="Software\[Manufacturer]\$(var.clientInternalName)"
-                         Action="createAndRemoveOnUninstall">
-                    <RegistryValue Type="string" Name="afterFirstRun" Value="false"/>
-                    <RegistryValue Type="string" Name="locale" Value="$(var.defaultTranslation)"/>
-                </RegistryKey>
-            </Component>
-
             <Directory Id="$(var.customization)ClientDir" Name="Client">
                 <Directory Id="$(var.customization)HelpDir" Name="help"/>
 
@@ -325,8 +299,6 @@
             <ComponentGroupRef Id="ClientBgComponent"/>
             <ComponentGroupRef Id="ClientQmlComponent"/>
             <ComponentGroupRef Id="ClientLibs"/>
-            <ComponentRef Id="ClientConfiguration" />
-            <ComponentRef Id="ClientFirstTimeConfiguration"/>
             <?if $(var.quicksync) = true ?>
             <ComponentGroupRef Id="ClientQuickSync"/>
             <?endif?>

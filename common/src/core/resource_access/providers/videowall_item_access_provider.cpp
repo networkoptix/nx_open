@@ -88,7 +88,7 @@ bool QnVideoWallItemAccessProvider::calculateAccess(const QnResourceAccessSubjec
         if (resource->hasFlags(Qn::layout))
             return layoutBelongsToVideoWall(resource);
 
-        if (!QnResourceAccessFilter::isShareableMedia(resource))
+        if (!QnResourceAccessFilter::isShareableViaVideowall(resource))
             return false;
 
         // TODO: #GDM here resource splitting may help a lot: take all videowalls before, then
@@ -123,7 +123,7 @@ bool QnVideoWallItemAccessProvider::calculateAccess(const QnResourceAccessSubjec
         return layout && m_itemAggregator->hasLayout(layout); /*< This method is called under mutex. */
     }
 
-    if (!QnResourceAccessFilter::isShareableMedia(resource))
+    if (!QnResourceAccessFilter::isShareableViaVideowall(resource))
         return false;
 
     return m_itemAggregator->hasItem(resource->getId());

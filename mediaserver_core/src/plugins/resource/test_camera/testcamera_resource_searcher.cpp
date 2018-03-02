@@ -6,6 +6,7 @@
 #include "utils/common/sleep.h"
 #include "utils/common/util.h"
 #include <plugins/resource/test_camera/testcamera_const.h>
+#include <nx/utils/log/log.h>
 
 static const qint64 SOCK_UPDATE_INTERVAL = 1000000ll * 60 * 5;
 
@@ -126,8 +127,7 @@ QnResourcePtr QnTestCameraResourceSearcher::createResource(const QnUuid &resourc
 
     if (resourceType.isNull())
     {
-        qDebug() << "No resource type for ID = " << resourceTypeId;
-
+        NX_WARNING(this, lm("No resource type for id: %1").arg(resourceTypeId));
         return result;
     }
 
@@ -140,9 +140,7 @@ QnResourcePtr QnTestCameraResourceSearcher::createResource(const QnUuid &resourc
     result = QnVirtualCameraResourcePtr( new QnTestCameraResource() );
     result->setTypeId(resourceTypeId);
 
-    qDebug() << "Create test camera resource. typeID:" << resourceTypeId.toString(); // << ", Parameters: " << parameters;
-    //result->deserialize(parameters);
-
+    NX_DEBUG(this, lm("Create test camera resource, type id: %1").arg(resourceTypeId));
     return result;
 
 }

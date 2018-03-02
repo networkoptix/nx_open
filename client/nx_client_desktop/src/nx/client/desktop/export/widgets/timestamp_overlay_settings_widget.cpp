@@ -77,13 +77,13 @@ void TimestampOverlaySettingsWidget::setData(const ExportTimestampOverlayPersist
 
 bool TimestampOverlaySettingsWidget::formatEnabled() const
 {
-    return !ui->formatComboBox->isHidden();
+    return ui->formatComboBox->isEnabled();
 }
 
 void TimestampOverlaySettingsWidget::setFormatEnabled(bool value)
 {
-    ui->formatLabel->setVisible(value);
-    ui->formatComboBox->setVisible(value);
+    ui->formatLabel->setEnabled(value);
+    ui->formatComboBox->setEnabled(value);
 }
 
 } // namespace desktop
