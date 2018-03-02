@@ -4,12 +4,15 @@
 #include <nx/vms/event/rule.h>
 #include <nx/vms/event/rule_manager.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <common/common_module.h>
 #include <client_core/client_core_module.h>
 #include <watchers/user_watcher.h>
 #include <utils/common/synctime.h>
+#include <utils/common/guarded_callback.h>
+#include <api/server_rest_connection.h>
 
 namespace {
 
@@ -222,6 +225,58 @@ void SoftwareTriggersWatcher::updateTriggerAvailability(const QnUuid& id, bool e
     description->enabled = enabled;
     if (emitSignal)
         emit triggerEnabledChanged(id);
+}
+
+bool SoftwareTriggersWatcher::activateTrigger(QnUuid& id)
+{
+    if (m_resourceId.isNull())
+        return false;
+
+    const auto accessManager = m_commonModule->resourceAccessManager();
+    const auto currentUser = m_commonModule->instance<QnUserWatcher>()->user();
+    if (!accessManager->hasGlobalPermission(currentUser, Qn::GlobalUserInputPermission))
+        return false;
+
+    if (m_idToHandle.contains(id))
+        return false;
+
+    const auto itData = m_data.find(id);
+    if (itData == m_data.end())
+        return false;
+
+    const auto callback =
+        [this](bool success, rest::Handle handle, const QnJsonRestResult& result)
+        {
+            const auto it = m_handleToId.find(handle);
+            if (it == m_handleToId.end())
+                return;
+
+            const auto id = it.value();
+            m_handleToId.erase(it);
+            m_idToHandle.remove(id);
+
+            success = success && result.error == QnRestResult::NoError;
+            emit triggerExecuted(id, success);
+        };
+
+    const auto triggerId = itData.value()->data.triggerId;
+    const auto connection = m_commonModule->currentServer()->restConnection();
+    const auto handle = connection->softwareTriggerCommand(
+        m_resourceId, triggerId, nx::vms::event::EventState::active,
+        QnGuardedCallback<decltype(callback)>(this, callback), QThread::currentThread());
+
+    m_handleToId.insert(handle, id);
+    m_idToHandle.insert(id, handle);
+    return true;
+}
+
+bool SoftwareTriggersWatcher::cancelTriggerAction(const QnUuid& id)
+{
+    if (!m_idToHandle.remove(id))
+        return false;
+
+    emit triggerExecuted(id, false);
+    return true;
 }
 
 } // namespace mobile

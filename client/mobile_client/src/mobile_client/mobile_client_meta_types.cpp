@@ -81,6 +81,9 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterType<nx::client::core::TwoWayAudioController>("com.networkoptix.qml",
         1, 0, "TwoWayAudioController");
 
+//    qmlRegisterUncreatableType<nx::client::mobile::SoftwareTriggersWatcher>(
+//        "Nx", 1, 0, "SoftwareTriggersWatcher");
+
     qmlRegisterType<nx::client::mobile::VoiceSpectrumItem>("com.networkoptix.qml", 1, 0, "VoiceSpectrumItem");
 
     /* NxMediaPlayer should not be used.

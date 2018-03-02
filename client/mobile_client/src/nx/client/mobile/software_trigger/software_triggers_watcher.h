@@ -40,12 +40,13 @@ public:
 
     void updateTriggersAvailability();
 
-
     bool triggerEnabled(const QnUuid& id) const;
     QString triggerIcon(const QnUuid& id) const;
     SoftwareTriggerData triggerData(const QnUuid& id) const;
 
 signals:
+    void triggerExecuted(const QnUuid& id, bool success);
+
     void resourceIdChanged();
 
     void triggerRemoved(const QnUuid& id);
@@ -55,6 +56,7 @@ signals:
         const QString& iconPath,
         bool triggerEnabled);
 
+    // TODO: add changed flags
     void triggerEnabledChanged(const QnUuid& id);
     void triggerIconChanged(const QnUuid& id);
     void triggerNameChanged(const QnUuid& id);
