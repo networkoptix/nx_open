@@ -18,19 +18,10 @@ TRACEBACK_ARTIFACT_TYPE = ArtifactType(name='core-traceback')
 
 
 class ServerFactory(object):
-    def __init__(self,
-                 reset_servers,
-                 artifact_factory,
-                 cloud_host,
-                 vagrant_vm_factory,
-                 physical_installation_ctl,
-                 mediaserver_deb,
-                 ca,
-                 ):
-        self._reset_servers = reset_servers
+    def __init__(self, artifact_factory, cloud_host, vm_factory, physical_installation_ctl, mediaserver_deb, ca):
         self._artifact_factory = artifact_factory
         self._cloud_host = cloud_host
-        self._vagrant_vm_factory = vagrant_vm_factory
+        self._vagrant_vm_factory = vm_factory
         self._physical_installation_ctl = physical_installation_ctl  # PhysicalInstallationCtl or None
         self._allocated_servers = []
         self._ca = ca

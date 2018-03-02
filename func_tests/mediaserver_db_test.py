@@ -41,12 +41,12 @@ def db_version(request):
 
 
 @pytest.fixture
-def one(server_factory, run_options, db_version):
-    return server('one', server_factory, run_options.bin_dir, db_version)
+def one(server_factory, bin_dir, db_version):
+    return server('one', server_factory, bin_dir, db_version)
 
 @pytest.fixture
-def two(server_factory, run_options, db_version):
-    return server('two', server_factory, run_options.bin_dir, db_version)
+def two(server_factory, bin_dir, db_version):
+    return server('two', server_factory, bin_dir, db_version)
 
 
 def server(name, server_factory, bin_dir, db_version):

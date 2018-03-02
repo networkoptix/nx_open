@@ -48,23 +48,23 @@ class RemotableVagrant(vagrant.Vagrant):
 class VagrantVMFactory(object):
     _vagrant_vms_cache_key = 'nx/vagrant_vms'
 
-    def __init__(self, cache, common_ssh_config, vm_host_hostname, options, config_factory):
-        self._common_ssh_config = common_ssh_config
+    def __init__(self, cache, ssh_config, vm_host, bin_dir, work_dir, config_factory):
+        self._ssh_config = ssh_config
         self._cache = cache
-        self._bin_dir = options.bin_dir
+        self._bin_dir = bin_dir
         self._config_factory = config_factory
-        self._vm_name_prefix = options.vm_name_prefix
-        self._vm_port_base = options.vm_port_base
-        if vm_host_hostname:
-            self.vm_host_hostname = vm_host_hostname
-            self._host_os_access = SshAccess(self._common_ssh_config.path, vm_host_hostname)
-            self._vagrant_dir = options.vm_host_work_dir / 'vagrant'
-            self._vagrant_private_key_path = options.work_dir / 'vagrant_insecure_private_key'
+        self._vm_name_prefix = vm_host.vm_name_prefix
+        self._vm_port_base = vm_host.vm_port_base
+        if vm_host.hostname:
+            self.vm_host_hostname = vm_host.hostname
+            self._host_os_access = SshAccess(self._ssh_config.path, vm_host.hostname)
+            self._vagrant_dir = vm_host.work_dir / 'vagrant'
+            self._vagrant_private_key_path = work_dir / 'vagrant_insecure_private_key'
             self._host_os_access.get_file('.vagrant.d/insecure_private_key', self._vagrant_private_key_path)
         else:
             self.vm_host_hostname = 'localhost'
             self._host_os_access = LocalAccess()
-            self._vagrant_dir = options.work_dir / 'vagrant'
+            self._vagrant_dir = work_dir / 'vagrant'
             self._vagrant_private_key_path = Path().home() / '.vagrant.d' / 'insecure_private_key'
         self._virtualbox_vm = VirtualboxManagement(self._host_os_access)
         self._vagrant_file_path = self._vagrant_dir / 'Vagrantfile'
@@ -92,7 +92,7 @@ class VagrantVMFactory(object):
         self._cache.set(self._vagrant_vms_cache_key, [vm.config.to_dict() for vm in self._vms.values()])
 
     def _make_vagrant_vm(self, config, is_running):
-        self._common_ssh_config.add_host(
+        self._ssh_config.add_host(
             self._host_os_access.hostname,
             alias=config.vagrant_name,
             port=config.ssh_forwarded_port,
@@ -102,7 +102,7 @@ class VagrantVMFactory(object):
             self._bin_dir,
             self._vagrant_dir,
             self._vagrant,
-            self._common_ssh_config.path,
+            self._ssh_config.path,
             self._host_os_access,
             config,
             is_running)
