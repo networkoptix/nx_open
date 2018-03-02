@@ -25,7 +25,7 @@ module.exports = {
 			filename: 'index.html',
 			inject: false
 		}),
-        new ExtractTextPlugin("styles/main.css"),
+        new ExtractTextPlugin("static/styles/main.css"),
         new CopyWebpackPlugin([
 			{
 				from: '',
@@ -51,12 +51,12 @@ module.exports = {
     	}),
         new webpack.optimize.CommonsChunkPlugin({
           	name: "commons",
-          	filename: "scripts/commons.js",
+          	filename: "static/scripts/commons.js",
 			minChunks: 2
       	})
 	],
 	output: {
-		filename: 'scripts/[name].js',
+		filename: 'static/scripts/[name].js',
 		path: path.resolve(__dirname, 'dist'),
 		publicPath: '/'
 	},
