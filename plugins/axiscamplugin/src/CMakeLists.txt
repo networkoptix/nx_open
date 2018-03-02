@@ -1,24 +1,19 @@
 cmake_minimum_required(VERSION 3.1)
 
-set(TARGET axiscamplugin)
+set(AXIS_TARGET axiscamplugin)
 
-project(${TARGET})
+project(${AXIS_TARGET})
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-include_directories(
-    "../../../include"
-)
+include_directories("../../../include")
 
 if(WINDOWS)
-    add_definitions(
-        -D_CRT_SECURE_NO_WARNINGS
-    )
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 endif()
 
-add_library( 
-    ${TARGET} SHARED 
+add_library( ${AXIS_TARGET} SHARED
         "axis_camera_manager.cpp"
         "axis_camera_manager.h"
         "axis_camera_plugin.cpp"
@@ -37,21 +32,14 @@ add_library(
 )
 
 find_package(Qt5Network REQUIRED)
-target_link_libraries(${TARGET} PUBLIC Qt5::Network)
-#find_package(Qt5 COMPONENTS Core Network REQUIRED)
-#target_link_libraries(${TARGET} PUBLIC Qt5::Core Qt5::Network)
+target_link_libraries(${AXIS_TARGET} PUBLIC Qt5::Network)
 
 if(WINDOWS)
-    target_link_libraries(
-        ${TARGET}
-        ws2_32
-    )
+    target_link_libraries(${AXIS_TARGET} ws2_32)
 endif()
 
-if(UNIX)
-    set_target_properties(
-        ${TARGET}
-            PROPERTIES
-            COMPILE_FLAGS "-std=c++11"
-    )
-endif()
+set_target_properties(${AXIS_TARGET} PROPERTIES
+    CXX_STANDARD 11
+    CXX_STANDARD_REQUIRED YES
+    CXX_EXTENSIONS NO
+)
