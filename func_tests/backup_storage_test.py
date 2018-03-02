@@ -81,7 +81,8 @@ def second_camera_backup_type(request):
 
 @pytest.fixture
 def server(server_factory, system_backup_type):
-    server = server_factory('server', start=False)
+    config_file_params = dict(minStorageSpace=1024*1024)  # 1M
+    server = server_factory('server', start=False, config_file_params=config_file_params)
     server.host.run_command(['rm', '-rfv', os.path.join(BACKUP_STORAGE_PATH, '*')])
     server.start_service()
     server.setup_local_system()
