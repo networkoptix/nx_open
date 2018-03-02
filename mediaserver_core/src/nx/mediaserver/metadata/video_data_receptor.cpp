@@ -65,7 +65,7 @@ using namespace nx::sdk::metadata;
             const int planeLineSize = frame->linesize[i];
             const int planeDataSize = (i == 0)
                 ? (planeLineSize * frame->height) //< Y plane has full resolution.
-                : (planeLineSize * frame->height / 4); //< Cb and Cr planes have half resolution.
+                : (planeLineSize * frame->height / 2); //< Cb and Cr planes have half resolution.
             data[i].resize(planeDataSize);
             if (planeDataSize > 0)
                 memcpy(&data[i].front(), frame->data[i], planeDataSize);

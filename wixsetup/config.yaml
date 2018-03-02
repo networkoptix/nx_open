@@ -1,49 +1,49 @@
-arch: '${arch}'
-wix_directory: '${wix_directory}/bin'
-qt_directory: '${qt.dir}'
-build_configuration: '${build.configuration}'
-installer_cultures: '${installer.cultures}'
-installer_language: '${installer.language}'
-distribution_output_dir: '${distribution_output_dir}'
+arch: 'x64'
+wix_directory: 'c:/develop/buildenv/packages/windows/wix-3.11/bin'
+qt_directory: 'c:/develop/buildenv/packages/windows-x64/qt-5.6.1-1'
+build_configuration: 'Release'
+installer_cultures: 'en-us'
+installer_language: 'en_US'
+distribution_output_dir: 'C:/develop/nx_vms/distrib'
 
 # Source directories
-bin_source_dir: '${bin_source_dir}'
-current_binary_dir: '${CMAKE_CURRENT_BINARY_DIR}'
-vox_source_dir: '${VoxSourceDir}'
-vcredist_directory: '${vcredist_directory}'
-client_qml_dir: '${client_qml_dir}'
-nxtool_qml_dir: '${nxtool_qml_dir}'
-help_directory: '${help_directory}'
-festival_vox_directory: '${festival_vox_directory}'
-fonts_directory: '${fonts_directory}'
-client_update_files_directory: '${client_update_files_directory}'
-server_update_files_directory: '${server_update_files_directory}'
+bin_source_dir: 'C:/develop/nx_vms/bin'
+current_binary_dir: 'C:/develop/nx_vms/wixsetup'
+vox_source_dir: 'C:/develop/nx_vms/bin/vox'
+vcredist_directory: 'c:/develop/buildenv/packages/windows-x64/vcredist-2015'
+client_qml_dir: 'C:/develop/nx_vms/wixsetup/client_qml'
+nxtool_qml_dir: 'C:/develop/nx_vms/wixsetup/nxtool_qml'
+help_directory: 'c:/develop/buildenv/packages/any/help-default-3.1'
+festival_vox_directory: 'c:/develop/buildenv/packages/any/festival-vox-2.4'
+fonts_directory: 'c:/develop/buildenv/packages/any/roboto-fonts'
+client_update_files_directory: 'C:/develop/nx_vms/wixsetup/client'
+server_update_files_directory: 'C:/develop/nx_vms/wixsetup/server'
 
 # Source binaries
-client_binary_name: '${product.name}'
-minilauncher_binary_name: '${minilauncher.binary.name}'
-launcher_version_file: '${launcher.version.file}'
+client_binary_name: 'HD Witness'
+minilauncher_binary_name: 'HD Witness Launcher.exe'
+launcher_version_file: 'launcher.version'
 
 # Signing section
 code_signing: {
-  enabled: ${codeSigning},
-  signtool_directory: '${signtool_directory}/bin',
-  certificate: '${certificates_path}/wixsetup/${sign.cer}',
-  sign_password: '${sign.password}',
-  sign_description: '${company.name} ${display.product.name}'
+  enabled: ON,
+  signtool_directory: 'c:/develop/buildenv/packages/windows/signtool/bin',
+  certificate: 'c:/develop/buildenv/packages/any/certificates-default/wixsetup/app.p12',
+  sign_password: 'qweasd123',
+  sign_description: 'Network Optix Nx Witness'
 }
 
 # Distrib names
-client_distribution_name: '${client_distribution_name}'
-client_update_distribution_name: '${client_update_distribution_name}'
-client_debug_distribution_name: '${client_debug_distribution_name}'
-server_distribution_name: '${server_distribution_name}'
-server_update_distribution_name: '${server_update_distribution_name}'
-server_debug_distribution_name: '${server_debug_distribution_name}'
-bundle_distribution_name: '${bundle_distribution_name}'
-servertool_distribution_name: '${servertool_distribution_name}'
-paxton_distribution_name: '${paxton_distribution_name}'
-libs_debug_distribution_name: '${libs_debug_distribution_name}'
-misc_debug_distribution_name: '${misc_debug_distribution_name}'
-cloud_debug_distribution_name: '${cloud_debug_distribution_name}'
-testcamera_distribution_name: '${testcamera_distribution_name}'
+client_distribution_name: 'nxwitness-client-4.0.0.0-win64-beta-test'
+client_update_distribution_name: 'nxwitness-client_update-4.0.0.0-win64-beta-test'
+client_debug_distribution_name: 'nxwitness-client_debug-4.0.0.0-win64-beta-test'
+server_distribution_name: 'nxwitness-server-4.0.0.0-win64-beta-test'
+server_update_distribution_name: 'nxwitness-server_update-4.0.0.0-win64-beta-test'
+server_debug_distribution_name: 'nxwitness-server_debug-4.0.0.0-win64-beta-test'
+bundle_distribution_name: 'nxwitness-bundle-4.0.0.0-win64-beta-test'
+servertool_distribution_name: 'nxwitness-servertool-4.0.0.0-win64-beta-test'
+paxton_distribution_name: 'nxwitness-paxton-4.0.0.0-win64-beta-test'
+libs_debug_distribution_name: 'nxwitness-libs_debug-4.0.0.0-win64-beta-test'
+misc_debug_distribution_name: 'nxwitness-misc_debug-4.0.0.0-win64-beta-test'
+cloud_debug_distribution_name: 'nxwitness-cloud_debug-4.0.0.0-win64-beta-test'
+testcamera_distribution_name: 'nxwitness-testcamera-4.0.0.0-win64-beta-test'
