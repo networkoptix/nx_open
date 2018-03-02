@@ -680,9 +680,6 @@ void EventRibbon::Private::doUpdateView()
 
     while (iter != m_tiles.end() && currentPosition < positionLimit)
     {
-        qDebug() << "UpdateView: process tile #" << (iter - m_tiles.cbegin()) << "of" << m_tiles.size();
-        qDebug() << *iter;
-
         const auto tile = *iter;
         m_positions[tile] = currentPosition;
         currentPosition += m_currentShifts.value(iter - m_tiles.cbegin());
