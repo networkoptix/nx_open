@@ -64,7 +64,8 @@ TEST_F(SystemCapabilities, cloud_merge_is_reported_when_appropriate)
 
 TEST_F(SystemCapabilities, cloud_merge_is_not_reported_for_old_protocol_version)
 {
-    setProtocolVersion(3040);
+    constexpr int kProtocolVersionWithoutCloudMerge = 3040;
+    setProtocolVersion(kProtocolVersionWithoutCloudMerge);
 
     givenOnlineSystem();
     assertCloudMergeCapabilityIsNotSet();
