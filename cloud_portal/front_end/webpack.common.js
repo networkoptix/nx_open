@@ -25,7 +25,7 @@ module.exports = {
 			filename: 'index.html',
 			inject: false
 		}),
-        new ExtractTextPlugin("static/styles/main.css"),
+        new ExtractTextPlugin("styles/main.css"),
         new CopyWebpackPlugin([
 			{
 				from: '',
@@ -56,7 +56,7 @@ module.exports = {
       	})
 	],
 	output: {
-		filename: 'static/scripts/[name].js',
+		filename: 'scripts/[name].js',
 		path: path.resolve(__dirname, 'dist'),
 		publicPath: '/'
 	},
