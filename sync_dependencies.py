@@ -21,7 +21,10 @@ def determine_package_versions():
         "festival": "2.4",
         "directx": "JUN2010",
         "cassandra": "2.7.0",
-        "doxygen": "1.8.14"
+        "doxygen": "1.8.14",
+        "gstreamer": "1.0",
+        "glib": "2.0",
+        "deepstream": "0.1"
     }
 
     if platform == "windows":
@@ -100,6 +103,9 @@ def sync_dependencies(syncher):
         sync("sysroot")
         sync("tegra_video")
         sync("jetpack")
+        sync("gstreamer")
+        sync("glib")
+        sync("deepstream")
 
     if platform in ("android", "windows") or box == "bpi":
         sync("openal")
@@ -152,8 +158,8 @@ def sync_dependencies(syncher):
                 sync("any/server-external-" + releaseVersion)
 
         if box in ("tx1", "edge1"):
-            sync("openldap")
-            sync("sasl2")
+            sync("tx1-arm/openldap")
+            sync("tx1-arm/sasl2")
 
     if platform == "windows":
         sync("windows/doxygen", path_variable="doxygen_directory")

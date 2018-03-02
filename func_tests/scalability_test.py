@@ -17,6 +17,7 @@ import server_api_data_generators as generator
 import test_utils.utils as utils
 import transaction_log
 from memory_usage_metrics import load_host_memory_usage
+from test_utils.api_shortcuts import get_server_id
 from test_utils.compare import compare_values
 from test_utils.server import MEDIASERVER_MERGE_TIMEOUT
 from test_utils.utils import GrowingSleep
@@ -71,7 +72,7 @@ def servers(metrics_saver, server_factory, lightweight_servers, config):
         synchronizeTimeWithInternet=utils.bool_to_str(False),
         ))
     start_time = utils.datetime_utc_now()
-    server_list = [server_factory.get('server_%04d' % (idx + 1),
+    server_list = [server_factory.create('server_%04d' % (idx + 1),
                            setup_settings=setup_settings,
                            rest_api_timeout=config.REST_API_TIMEOUT)
                        for idx in range(server_count)]
@@ -132,7 +133,7 @@ def create_test_data_on_server((config, server, index)):
         saveUser=resource_test.SeedResourceGenerator(generator.generate_user_data, index * config.USERS_PER_SERVER),
         saveStorage=resource_test.SeedResourceWithParentGenerator(generator.generate_storage_data, index * config.STORAGES_PER_SERVER),
         saveLayout=resource_test.LayoutGenerator(index * (config.USERS_PER_SERVER + 1)))
-    servers_with_guids = [(server, server.ecs_guid)]
+    servers_with_guids = [(server, get_server_id(server.rest_api))]
     users = create_resources_on_server_by_size(
         server, 'saveUser',  resource_generators, config.USERS_PER_SERVER)
     users.append(get_server_admin(server))
@@ -168,7 +169,7 @@ def get_response(server, method, api_object, api_method):
             log.error("%s call '%s/%s' error: %s", server, api_object, api_method, x)
     log.error('Retry count exceeded limit (%d) for %s call %s/%s; seems server is deadlocked, will make core dump.',
               CHECK_METHOD_RETRY_COUNT, server, api_object, api_method)
-    server.make_core_dump()
+    server.service.make_core_dump()
     raise  # reraise last exception
 
 def clean_transaction_log(json):
@@ -214,7 +215,7 @@ def make_dumps_and_fail(message, servers, merge_timeout, api_method, api_call_st
     log.info(full_message)
     log.info('killing servers for core dumps')
     for server in servers:
-        server.make_core_dump()
+        server.service.make_core_dump()
     pytest.fail(full_message)
 
 def wait_for_method_matched(artifact_factory, servers, method, api_object, api_method, start_time, merge_timeout):
@@ -294,7 +295,8 @@ def test_scalability(artifact_factory, metrics_saver, config, lightweight_server
         for server in servers:
             server.merge_systems(lightweight_servers[0], take_remote_settings=True)
     else:
-        servers[0].merge(servers[1:])
+        for server in servers[1:]:
+            servers[0].merge_systems(server)
 
     try:
         wait_for_data_merged(artifact_factory, lightweight_servers + servers, config.MERGE_TIMEOUT, start_time)
@@ -302,6 +304,6 @@ def test_scalability(artifact_factory, metrics_saver, config, lightweight_server
         metrics_saver.save('merge_duration', merge_duration)
         collect_additional_metrics(metrics_saver, servers, lightweight_servers)
     finally:
-        if servers[0].is_started():
-            servers[0].load_system_settings(log_settings=True)  # log final settings
+        if servers[0].is_online():
+            servers[0].rest_api.get('/api/systemSettings')  # log final settings
     assert utils.str_to_bool(servers[0].settings['autoDiscoveryEnabled']) == False

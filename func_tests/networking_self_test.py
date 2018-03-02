@@ -1,5 +1,3 @@
-from pprint import pprint
-
 import pytest
 import yaml
 from pathlib2 import Path

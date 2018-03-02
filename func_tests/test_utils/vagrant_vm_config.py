@@ -58,12 +58,7 @@ class VagrantVMConfig(object):
 
     @property
     def vagrant_name(self):
-        assert self.idx is not None  # must be assigned for vagrant_name
-        if self.name:
-            suffix = '-%s' % self.name
-        else:
-            suffix = ''
-        return 'vm-%d%s' % (self.idx, suffix)
+        return 'vm-%d' % self.idx
 
     @property
     def virtualbox_name(self):

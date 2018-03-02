@@ -7,41 +7,43 @@ import pytz
 import requests
 import requests.auth
 
+from test_utils.api_shortcuts import get_server_id
 from test_utils.server import TimePeriod
 from test_utils.utils import Wait
 
 log = logging.getLogger(__name__)
 
 
-@pytest.mark.quick
 @pytest.mark.parametrize(('layout_file', 'target_alias', 'proxy_alias'), [
-    # ('unrouted-merge_toward_proxy-request_proxy.yaml', 'first', 'second'),
-    # ('unrouted-merge_toward_proxy-request_sides.yaml', 'first', 'second'),
+    ('unrouted-merge_toward_proxy-request_proxy.yaml', 'first', 'second'),
+    ('unrouted-merge_toward_proxy-request_sides.yaml', 'first', 'second'),
     ('unrouted-merge_toward_sides-request_sides.yaml', 'first', 'second'),
-    # ('direct.yaml', 'first', 'second'),
-    # ('direct.yaml', 'second', 'first'),
-    # ('nat-merge_toward_inner.yaml', 'inner', 'outer'),
-    # ('nat-merge_toward_inner.yaml', 'outer', 'inner'),
+    ('direct-merge_toward_requested.yaml', 'first', 'second'),
+    ('direct-merge_toward_requested.yaml', 'second', 'first'),
+    ('nat-merge_toward_inner.yaml', 'inner', 'outer'),
+    ('nat-merge_toward_inner.yaml', 'outer', 'inner'),
     ])
 @pytest.mark.parametrize('api_endpoint', [
+    'api/moduleInformation',
     'ec2/getMediaServersEx',
-    # 'api/moduleInformation',
-    # 'ec2/testConnection',
-    # 'ec2/getStorages',
-    # 'ec2/getResourceParams',
-    # 'ec2/getCamerasEx',
-    # 'ec2/getUsers',
+    'ec2/testConnection',
+    'ec2/getStorages',
+    'ec2/getResourceParams',
+    'ec2/getCamerasEx',
+    'ec2/getUsers',
     ])
 def test_responses_are_equal(network, target_alias, proxy_alias, api_endpoint):
+    _, servers = network
     wait = Wait("until responses become equal")
+    target_guid = get_server_id(servers[target_alias].rest_api)
     while True:
         response_direct = requests.get(
-            network[target_alias].rest_api_url + api_endpoint,
-            auth=requests.auth.HTTPDigestAuth(network[target_alias].user, network[target_alias].password))
+            servers[target_alias].rest_api.url + api_endpoint,
+            auth=requests.auth.HTTPDigestAuth(servers[target_alias].rest_api.user, servers[target_alias].rest_api.password))
         response_via_proxy = requests.get(
-            network[proxy_alias].rest_api_url + api_endpoint,
-            auth=requests.auth.HTTPDigestAuth(network[proxy_alias].user, network[proxy_alias].password),
-            headers={'X-server-guid': network[target_alias].ecs_guid})
+            servers[proxy_alias].rest_api.url + api_endpoint,
+            auth=requests.auth.HTTPDigestAuth(servers[proxy_alias].rest_api.user, servers[proxy_alias].rest_api.password),
+            headers={'X-server-guid': target_guid})
         diff = datadiff.diff(
             response_via_proxy.json(), response_direct.json(),
             fromfile='via proxy', tofile='direct',
@@ -66,7 +68,8 @@ def assert_server_stream(server, camera, sample_media_file, stream_type, artifac
 # https://networkoptix.atlassian.net/wiki/spaces/SD/pages/23920653/Connection+behind+NAT#ConnectionbehindNAT-test_get_streams
 @pytest.mark.slow
 @pytest.mark.parametrize('layout_file', ['nat-merge_toward_inner.yaml'])
-def test_get_streams(artifact_factory, servers, camera, sample_media_file, stream_type):
+def test_get_streams(artifact_factory, network, camera, sample_media_file, stream_type):
+    _, servers = network
     servers['second'].add_camera(camera)
     start_time_1 = datetime(2017, 1, 27, tzinfo=pytz.utc)
     servers['first'].storage.save_media_sample(camera, start_time_1, sample_media_file)

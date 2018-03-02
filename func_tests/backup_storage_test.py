@@ -8,6 +8,7 @@ from pathlib2 import Path
 
 import server_api_data_generators as generator
 import test_utils.utils as utils
+from test_utils.api_shortcuts import get_server_id
 from test_utils.os_access import ProcessError
 
 log = logging.getLogger(__name__)
@@ -77,13 +78,12 @@ def second_camera_backup_type(request):
 
 @pytest.fixture
 def server(server_factory, system_backup_type):
-    server = server_factory.get('server', start=False)
+    server = server_factory.create('server', start=False)
     server.os_access.run_command(['rm', '-rfv', BACKUP_STORAGE_PATH])
     server.os_access.run_command(['mkdir', '-p', BACKUP_STORAGE_PATH])
-    server.start_service()
+    server.start()
     server.setup_local_system()
-    server.set_system_settings(
-        backupQualities=system_backup_type)
+    server.rest_api.api.systemSettings.GET(backupQualities=system_backup_type)
     add_backup_storage(server)
     change_and_assert_server_backup_type(server, 'BackupManual')
     return server
@@ -102,14 +102,15 @@ def wait_storage_ready(server, storage_guid):
 
 
 def change_and_assert_server_backup_type(server, expected_backup_type):
+    server_guid = get_server_id(server.rest_api)
     server.rest_api.ec2.saveMediaServerUserAttributes.POST(
-        serverId=server.ecs_guid, backupType='BackupManual',
+        serverId=server_guid, backupType='BackupManual',
         backupDaysOfTheWeek=BACKUP_EVERY_DAY,
         backupStart=0,  # start backup at 00:00:00
         backupDuration=BACKUP_DURATION_NOT_SET,
         backupBitrate=BACKUP_BITRATE_NOT_LIMITED)
     attributes = server.rest_api.ec2.getMediaServerUserAttributesList.GET(
-        id=server.ecs_guid)
+        id=server_guid)
     assert (expected_backup_type and
             attributes[0]['backupType'] == expected_backup_type)
 
@@ -119,7 +120,7 @@ def add_backup_storage(server):
     assert len(storages)
     backup_storage_data = generator.generate_storage_data(
         storage_id=1, isBackup=True,
-        parentId=server.ecs_guid,
+        parentId=get_server_id(server.rest_api),
         storageType='local',
         usedForWriting=True,
         url=str(BACKUP_STORAGE_PATH))
@@ -193,7 +194,7 @@ def assert_backup_equal_to_archive(server, camera, system_backup_type, backup_ne
 
 def test_backup_by_request(server, camera_factory, sample_media_file, system_backup_type, backup_new_camera,
                            second_camera_backup_type):
-    server.set_system_settings(
+    server.rest_api.api.systemSettings.GET(
         backupNewCamerasByDefault=backup_new_camera)
     start_time = datetime(2017, 3, 27, tzinfo=pytz.utc)
     camera_1 = add_camera(camera_factory, server, camera_id=1, backup_type=BACKUP_BOTH)
@@ -218,7 +219,7 @@ def test_backup_by_schedule(server, camera_factory, sample_media_file, system_ba
     server.storage.save_media_sample(camera, start_time_2, sample_media_file)
     server.rebuild_archive()
     server.rest_api.ec2.saveMediaServerUserAttributes.POST(
-        serverId=server.ecs_guid, backupType='BackupSchedule',
+        serverId=get_server_id(server.rest_api), backupType='BackupSchedule',
         backupDaysOfTheWeek=BACKUP_EVERY_DAY,
         backupStart=0,  # start backup at 00:00:00
         backupDuration=BACKUP_DURATION_NOT_SET,

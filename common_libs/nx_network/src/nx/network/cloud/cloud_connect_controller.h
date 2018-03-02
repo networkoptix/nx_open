@@ -30,7 +30,6 @@ struct NX_NETWORK_API Ini:
 {
     Ini();
 
-    NX_INI_STRING("", cloudHost, "Overridden Cloud Host");
     NX_INI_FLAG(0, disableCloudSockets, "Use plain TCP sockets instead of Cloud sockets");
 };
 

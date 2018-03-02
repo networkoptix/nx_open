@@ -187,6 +187,12 @@ class RestApi(object):
             raise RestApiError(self.server_name, response.request.url, error_code, response_data['errorString'])
         return response_data['reply']
 
+    def get(self, path, **kwargs):
+        return self.request('GET', path, **kwargs)
+
+    def post(self, path, data, **kwargs):
+        return self.request('GET', path, json=data, **kwargs)
+
     def request(self, method, path, raise_exception=True, new_connection=False, timeout=None, **kwargs):
         log.debug('%r: %s %s\n%s', self, method, path, json.dumps(kwargs, indent=4))
         try:

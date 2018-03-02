@@ -10,15 +10,15 @@ _logger = logging.getLogger(__name__)
 
 
 @pytest.fixture
-def temp_ca(run_options):
-    ca_self_test_dir = run_options.work_dir / 'ca_self_test'
+def temp_ca(work_dir):
+    ca_self_test_dir = work_dir / 'ca_self_test'
     shutil.rmtree(str(ca_self_test_dir), ignore_errors=True)
     return CA(ca_self_test_dir)
 
 
 @pytest.fixture
-def gen_dir(run_options):
-    path = run_options.work_dir / 'ca_self_test_gen'
+def gen_dir(work_dir):
+    path = work_dir / 'ca_self_test_gen'
     path.mkdir(parents=True, exist_ok=True)
     return path
 
@@ -45,8 +45,8 @@ def test_key_and_cert_match(key_and_cert_path):
 
 
 @pytest.fixture
-def real_ca(run_options):
-    return CA(run_options.work_dir / 'ca')
+def real_ca(work_dir):
+    return CA(work_dir / 'ca')
 
 
 def test_real_ca_cert_is_valid(real_ca):

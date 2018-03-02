@@ -59,17 +59,6 @@ class ProcessTimeoutError(subprocess.CalledProcessError):
         return 'ProcessTimeoutError(%s)' % self
 
 
-def log_output(name, output):
-    if not output:
-        return  # do not log ''; skip None also
-    if '\0' in output:
-        log.debug('\t--> %s: %s bytes binary', name, len(output))
-    elif len(output) > 200:
-        log.debug('\t--> %s: %r...', name, output[:200])
-    else:
-        log.debug('\t--> %s: %r',  name, output.rstrip('\r\n'))
-
-
 class SshAccessConfig(object):
 
     @classmethod

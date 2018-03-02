@@ -1,13 +1,13 @@
+import copy
 import json
 import logging
 import shutil
 import sys
-import copy
 from textwrap import dedent
 
 import click
 from flask import Flask, request, send_file
-from pathlib2 import Path, PurePath
+from pathlib2 import Path
 from werkzeug.exceptions import BadRequest, NotFound, SecurityError
 
 if sys.version_info[:2] == (2, 7):

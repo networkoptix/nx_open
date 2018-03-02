@@ -13,23 +13,22 @@ from pprint import pformat
 import pytest
 import pytz
 import requests.exceptions
-from netaddr.ip import IPNetwork, IPAddress
+from netaddr.ip import IPAddress, IPNetwork
 from pathlib2 import Path
 
-from test_utils.utils import wait_until, Wait
+from test_utils.api_shortcuts import get_local_system_id, get_server_id, get_settings
+from test_utils.utils import wait_until
 from .camera import Camera, SampleMediaFile, make_schedule_task
 from .cloud_host import CloudAccount
-from .os_access import OsAccess, LocalAccess
 from .media_stream import open_media_stream
-from .rest_api import HttpError, REST_API_PASSWORD, REST_API_USER, RestApi
-from .utils import RunningTime, datetime_utc_now, datetime_utc_to_timestamp, is_list_inst
+from .os_access import LocalAccess
+from .rest_api import HttpError, REST_API_PASSWORD, REST_API_USER
+from .utils import datetime_utc_now, datetime_utc_to_timestamp, is_list_inst
 from .vagrant_vm_config import MEDIASERVER_LISTEN_PORT
 
 DEFAULT_HTTP_SCHEMA = 'http'
 
 MEDIASERVER_STORAGE_PATH = 'var/data'
-
-MEDIASERVER_UNSETUP_LOCAL_SYSTEM_ID = '{00000000-0000-0000-0000-000000000000}'  # local system id for not set up server
 
 MEDIASERVER_CREDENTIALS_TIMEOUT = datetime.timedelta(minutes=5)
 MEDIASERVER_MERGE_TIMEOUT = MEDIASERVER_CREDENTIALS_TIMEOUT  # timeout for local system ids become the same
@@ -67,7 +66,7 @@ def generate_auth_key(method, user, password, nonce, realm):
 
 class ServerConfig(object):
 
-    def __init__(self, name, start=True, setup=True, leave_initial_cloud_host=False,
+    def __init__(self, name, setup=True, leave_initial_cloud_host=False,
                  vm=None, config_file_params=None, setup_settings=None, setup_cloud_account=None,
                  http_schema=None, rest_api_timeout=None):
         assert name, repr(name)
@@ -77,7 +76,6 @@ class ServerConfig(object):
         assert setup_cloud_account is None or isinstance(setup_cloud_account, CloudAccount), repr(setup_cloud_account)
         assert http_schema in [None, 'http', 'https'], repr(http_schema)
         self.name = name
-        self.start = start
         self.setup = setup  # setup as local system if setup_cloud_account is None, to cloud if it is set
         # By default, by Server's 'init' method  it's hardcoded cloud host will be patched/restored to the one
         # deduced from --cloud-group option. With leave_initial_cloud_host=True, this step will be skipped.
@@ -96,169 +94,47 @@ class ServerConfig(object):
 
 
 class Server(object):
-    """Mediaserver, same for physical and virtual machines."""
-    _st_started = object()
-    _st_stopped = object()
-    _st_starting = object()
+    """Mediaserver, same for physical and virtual machines"""
 
-    def __init__(
-            self,
-            name, os_access, service, installation, rest_api_url, ca, machine,
-            rest_api_timeout=None, internal_ip_port=None):
+    def __init__(self, name, service, installation, api, machine, port=None):
         assert name, repr(name)
-        assert isinstance(os_access, OsAccess), repr(os_access)
         self.title = name.upper()
         self.name = '%s-%s' % (name, str(uuid.uuid4())[-12:])
-        self.os_access = os_access
-        self._installation = installation
-        self._service = service
-        self.rest_api_url = rest_api_url
-        self._ca = ca
+        self.os_access = machine.os_access  # Deprecated.
+        self.installation = installation
+        self.service = service
         self.machine = machine
-        self.rest_api = RestApi(self.title, self.rest_api_url, timeout=rest_api_timeout, ca_cert=self._ca.cert_path)
-        self.settings = None
-        self.local_system_id = None
-        self.ecs_guid = None
-        self.internal_ip_port = internal_ip_port or MEDIASERVER_LISTEN_PORT
-        self.forwarded_port = None
-        self._state = None  # self._st_*
+        self.rest_api = api
+        self.internal_ip_port = port or MEDIASERVER_LISTEN_PORT
 
     def __repr__(self):
-        return 'Server(%s)' % self
+        return '<Server at %s>' % self.rest_api.url
 
-    def __str__(self):
-        return '%r@%s' % (self.name, self.rest_api_url)
-
-    @property
-    def user(self):
-        return self.rest_api.user
-
-    @property
-    def password(self):
-        return self.rest_api.password
-
-    @property
-    def dir(self):
-        return self._installation.dir
-
-    def init(self, must_start, reset, log_level=DEFAULT_SERVER_LOG_LEVEL, patch_set_cloud_host=None, config_file_params=None):
-        if self._state is None:
-            was_started = self._service.get_state()
-            self._state = self._st_starting if was_started else self._st_stopped
-        else:
-            was_started = self._state in [self._st_starting, self._st_started]
-        log.info('Service for %s %s started', self, was_started and 'WAS' or 'was NOT')
-        self._installation.cleanup_core_files()
-        if reset:
-            if was_started:
-                self.stop_service()
-            self._installation.cleanup_var_dir()
-            self._installation.put_key_and_cert(self._ca.generate_key_and_cert())
-            if patch_set_cloud_host:
-                self.patch_binary_set_cloud_host(patch_set_cloud_host)  # may be changed by previous tests...
-            self.reset_config(logLevel=log_level, tranLogLevel=log_level, **(config_file_params or {}))
-            if must_start:
-                self.start_service()
-        else:
-            log.warning('Server %s will NOT be reset', self)
-            self.ensure_service_status(must_start)
-        if self.is_started():
-            assert not reset or not self.is_system_set_up(), 'Failed to properly reinit server - it reported to be already set up'
-
-    def list_core_files(self):
-        return self._installation.list_core_files()
-
-    def is_started(self):
-        assert self._state is not None, 'server status is still unknown'
-        return self._state == self._st_started
-
-    def is_stopped(self):
-        assert self._state is not None, 'server status is still unknown'
-        return self._state == self._st_stopped
-
-    def start_service(self):
-        self.set_service_status(is_started=True)
-
-    def stop_service(self):
-        self.set_service_status(is_started=False)
-
-    def restart_service(self):
-        self.stop_service()
-        self.start_service()
-
-    def _bool2final_state(self, is_started):
-        if is_started:
-            return self._st_started
-        else:
-            return self._st_stopped
-
-    def set_service_status(self, is_started):
-        assert self._state != self._bool2final_state(is_started), (
-            'Service for %s is already %s' % (self, is_started and 'started' or 'stopped'))
-        if not (is_started and self._state == self._st_starting):
-            self._service.set_state(is_started)
-        self._state = self._st_starting if is_started else self._st_stopped
-        if is_started:
-            self.wait_for_server_become_online()
-            self._state = self._st_started
-            if is_started:
-                self.load_system_settings(log_settings=True)
-
-    def ensure_service_status(self, is_started):
-        if self._state != self._bool2final_state(is_started):
-            self.set_service_status(is_started)
-
-    def wait_for_server_become_online(self, timeout=MEDIASERVER_START_TIMEOUT, check_interval_sec=0.5):
-        start_time = datetime_utc_now()
-        while datetime_utc_now() < start_time + timeout:
-            response = self.is_server_online()
-            if response:
-                log.info('Server is online now.')
-                return response
-            else:
-                log.debug('Server is still offline...')
-                time.sleep(check_interval_sec)
-        else:
-            raise RuntimeError('Server %s has not went online in %s' % (self, timeout))
-
-    def is_server_online(self):
+    def is_online(self):
         try:
-            return self.rest_api.api.ping.GET(timeout=datetime.timedelta(seconds=10))
-        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError, requests.exceptions.SSLError) as e:
+            self.rest_api.get('/api/ping')
+        except requests.RequestException:
             return False
-
-    def get_log_file(self):
-        return self._installation.get_log_file()
-
-    def load_system_settings(self, log_settings=False):
-        log.debug('%s: Loading settings...', self)
-        self.settings = self.rest_api.api.systemSettings.GET()['settings']
-        if log_settings:
-            for name, value in self.settings.items():
-                log.debug('%s settings: %s = %r', self.title, name, value)
-        self.local_system_id = self.settings['localSystemId']
-        self.cloud_system_id = self.settings['cloudSystemID']
-        self.ecs_guid = self.rest_api.ec2.testConnection.GET()['ecsGuid']
-
-    def is_system_set_up(self):
-        return self.settings['localSystemId'] != MEDIASERVER_UNSETUP_LOCAL_SYSTEM_ID
-
-    def get_setup_type(self):
-        if not self.is_system_set_up():
-            return None  # not set up
-        if self.cloud_system_id:
-            return 'cloud'
         else:
-            return 'local'
+            return True
 
-    def reset(self):
-        was_started = self._service.is_running()
-        if was_started:
-            self.stop_service()
-        self._installation.cleanup_var_dir()
-        self._installation.put_key_and_cert(self._ca.generate_key_and_cert())
-        if was_started:
-            self.start_service()
+    def start(self, already_started_ok=False):
+        if self.service.is_running():
+            if not already_started_ok:
+                raise Exception("Already started")
+        else:
+            self.service.start()
+            wait_until(self.is_online)
+
+    def stop(self, already_stopped_ok=False):
+        if self.service.is_running():
+            self.service.stop()
+            wait_succeeded = wait_until(lambda: not self.service.is_running(), name="until stopped")
+            if not wait_succeeded:
+                raise Exception("Cannot wait for server to stop")
+        else:
+            if not already_stopped_ok:
+                raise Exception("Already stopped")
 
     def restart_via_api(self, timeout=MEDIASERVER_START_TIMEOUT):
         old_runtime_id = self.rest_api.api.moduleInformation.GET()['runtimeId']
@@ -289,72 +165,46 @@ class Server(object):
             log.info("Server restarted successfully, new runtime id is %s", new_runtime_id)
             break
 
-    def make_core_dump(self):
-        self._service.make_core_dump()
-        self._state = self._st_stopped
-
-    def get_time(self):
-        started_at = datetime.datetime.now(pytz.utc)
-        time_response = self.rest_api.ec2.getCurrentTime.GET()
-        received = datetime.datetime.fromtimestamp(float(time_response['value']) / 1000., pytz.utc)
-        return RunningTime(received, datetime.datetime.now(pytz.utc) - started_at)
-
-    def reset_config(self, **kw):
-        self._installation.reset_config(**kw)
-
-    def change_config(self, **kw):
-        self._installation.change_config(**kw)
-
     def patch_binary_set_cloud_host(self, new_host):
-        assert self.is_stopped(), 'Server %s must be stopped first for patching its binaries' % self
-        self._installation.patch_binary_set_cloud_host(new_host)
+        assert not self.service.is_running(), 'Server %s must be stopped first for patching its binaries' % self
+        self.installation.patch_binary_set_cloud_host(new_host)
         self.set_user_password(REST_API_USER, REST_API_PASSWORD)  # Must be reset to default ones
 
-    def set_system_settings(self, **kw):
-        self.rest_api.api.systemSettings.GET(**kw)
-        self.load_system_settings(log_settings=True)
-
     def setup_local_system(self, **kw):
+        log.info('Setting up server as local system %s:', self)
         self.rest_api.api.setupLocalSystem.POST(systemName=self.name, password=REST_API_PASSWORD, **kw)  # leave password unchanged
-        self.load_system_settings(log_settings=True)
 
     def setup_cloud_system(self, cloud_account, **kw):
         assert isinstance(cloud_account, CloudAccount), repr(cloud_account)
+        log.info('Setting up server as local system %s:', self)
         bind_info = cloud_account.bind_system(self.name)
         setup_response = self.rest_api.api.setupCloudSystem.POST(
             systemName=self.name,
             cloudAuthKey=bind_info.auth_key,
             cloudSystemID=bind_info.system_id,
-            cloudAccountName=cloud_account.user,
+            cloudAccountName=cloud_account.rest_api.user,
             timeout=datetime.timedelta(minutes=5),
             **kw)
         settings = setup_response['settings']
-        self.set_user_password(cloud_account.user, cloud_account.password)
-        self.load_system_settings(log_settings=True)
-        assert self.settings['systemName'] == self.name
+        self.set_user_password(cloud_account.rest_api.user, cloud_account.password)
+        assert get_settings(self.rest_api)['systemName'] == self.name
         return settings
 
     def detach_from_cloud(self, password):
         self.rest_api.api.detachFromCloud.POST(password=password)
         self.set_user_password(REST_API_USER, password)
 
-    def merge(self, other_server_list):
-        assert is_list_inst(other_server_list, Server), repr(other_server_list)
-        for server in other_server_list:
-            self.merge_systems(server)
+    def merge_systems(self, other, remote_network=IPNetwork('10.254.0.0/16'), take_remote_settings=False):
+        log.info('Merging servers: %s with local_system_id=%r and %s', self, other)
+        assert self.is_online() and other.is_online()
+        assert get_local_system_id(self.rest_api) != get_local_system_id(other.rest_api)  # Must not be merged yet.
 
-    def merge_systems(self, other_server, remote_network=IPNetwork('10.0.0.0/8'), take_remote_settings=False):
-        log.info('Merging servers: %s with local_system_id=%r and %s with local_system_id=%r',
-                 self, self.local_system_id, other_server, other_server.local_system_id)
-        assert self.is_started() and other_server.is_started()
-        assert self.local_system_id is not None and other_server is not None  # expected to be loaded already
-        assert self.local_system_id != other_server.local_system_id  # Must not be merged yet
+        realm, nonce = other.get_nonce()
 
-        realm, nonce = other_server.get_nonce()
         def make_key(method):
-            digest = generate_auth_key(method, other_server.user.lower(), other_server.password, nonce, realm)
-            return urllib.quote(base64.urlsafe_b64encode(':'.join([other_server.user.lower(), nonce, digest])))
-        interfaces = other_server.rest_api.api.iflist.GET()
+            digest = generate_auth_key(method, other.rest_api.user.lower(), other.rest_api.password, nonce, realm)
+            return urllib.quote(base64.urlsafe_b64encode(':'.join([other.rest_api.user.lower(), nonce, digest])))
+        interfaces = other.rest_api.api.iflist.GET()
         url = None
         for interface in interfaces:
             ip_address_to = IPAddress(interface['ipAddr'])
@@ -367,23 +217,15 @@ class Server(object):
             getKey=make_key('GET'), postKey=make_key('POST'),
             takeRemoteSettings=take_remote_settings, mergeOneServer=False)
         if take_remote_settings:
-            self.set_user_password(other_server.user, other_server.password)
+            self.set_user_password(other.rest_api.user, other.rest_api.password)
         else:
-            other_server.set_user_password(self.user, self.password)
-
-        wait = Wait("until servers are merged", timeout_sec=MEDIASERVER_MERGE_TIMEOUT.total_seconds())
-        while True:
-            self.load_system_settings()
-            other_server.load_system_settings()
-            if self.local_system_id == other_server.local_system_id:
-                break
-            if not wait.sleep_and_continue():
-                assert False, 'Servers are not merged'
+            other.set_user_password(self.rest_api.user, self.rest_api.password)
+        wait_until(lambda: get_local_system_id(self.rest_api) == get_local_system_id(other.rest_api))
 
     def set_user_password(self, user, password):
         log.debug('%s got user/password: %r/%r', self, user, password)
         self.rest_api.set_credentials(user, password)
-        if self.is_started():
+        if self.is_online():
             self._wait_for_credentials_accepted()
 
     # wait until existing server credentials become valid
@@ -400,29 +242,22 @@ class Server(object):
                     raise
             time.sleep(1)
         pytest.fail('Timed out in %s waiting for server %s to accept credentials: user=%r, password=%r'
-                    % (MEDIASERVER_CREDENTIALS_TIMEOUT, self, self.user, self.password))
+                    % (MEDIASERVER_CREDENTIALS_TIMEOUT, self, self.rest_api.user, self.rest_api.password))
 
     def get_nonce(self):
         response = self.rest_api.api.getNonce.GET()
         return response['realm'], response['nonce']
 
-    def change_system_id(self, new_guid):
-        old_local_system_id = self.local_system_id
-        self.rest_api.api.configure.GET(localSystemId=new_guid)
-        self.load_system_settings()
-        assert self.local_system_id != old_local_system_id
-        assert self.local_system_id == new_guid
-
     def add_camera(self, camera):
         assert not camera.id, 'Already added to a server with id %r' % camera.id
-        params = camera.get_info(parent_id=self.ecs_guid)
+        params = camera.get_info(parent_id=get_server_id(self.rest_api))
         result = self.rest_api.ec2.saveCamera.POST(**params)
         camera.id = result['id']
         return camera.id
 
     def set_camera_recording(self, camera, recording):
         assert camera, 'Camera %r is not yet registered on server' % camera
-        schedule_tasks=[make_schedule_task(day_of_week + 1) for day_of_week in range(7)]
+        schedule_tasks = [make_schedule_task(day_of_week + 1) for day_of_week in range(7)]
         self.rest_api.ec2.saveCameraUserAttributes.POST(
             cameraId=camera.id, scheduleEnabled=recording, scheduleTasks=schedule_tasks)
 
@@ -435,7 +270,7 @@ class Server(object):
     @property
     def storage(self):
         # GET /ec2/getStorages is not always possible: server sometimes is not started.
-        storage_path = self._installation.dir / MEDIASERVER_STORAGE_PATH
+        storage_path = self.installation.dir / MEDIASERVER_STORAGE_PATH
         return Storage(self.os_access, storage_path, self.os_access.get_timezone())
 
     def rebuild_archive(self):
@@ -460,7 +295,7 @@ class Server(object):
     def get_media_stream(self, stream_type, camera):
         assert stream_type in ['rtsp', 'webm', 'hls', 'direct-hls'], repr(stream_type)
         assert isinstance(camera, Camera), repr(camera)
-        return open_media_stream(self.rest_api_url, self.user, self.password, stream_type, camera.mac_addr)
+        return open_media_stream(self.rest_api.url, self.rest_api.user, self.rest_api.password, stream_type, camera.mac_addr)
 
 
 class Storage(object):
@@ -481,7 +316,7 @@ class Storage(object):
         contents = self._read_with_start_time_metadata(sample, unixtime_utc_ms)
 
         lowq_fpath = self._construct_fpath(camera_mac_addr, 'low_quality', start_time, unixtime_utc_ms, sample.duration)
-        hiq_fpath  = self._construct_fpath(camera_mac_addr, 'hi_quality',  start_time, unixtime_utc_ms, sample.duration)
+        hiq_fpath = self._construct_fpath(camera_mac_addr, 'hi_quality',  start_time, unixtime_utc_ms, sample.duration)
 
         log.info('Storing media sample %r to %r', sample.fpath, lowq_fpath)
         self.os_access.write_file(lowq_fpath, contents)
