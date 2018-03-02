@@ -52,6 +52,8 @@ public:
 
     virtual void clear() override;
 
+    static constexpr int kMaximumItemCount = 1000;
+
 protected:
     virtual rest::Handle requestPrefetch(qint64 fromMs, qint64 toMs) override;
     virtual bool commitPrefetch(qint64 earliestTimeToCommitMs, bool& fetchedAll) override;
@@ -86,6 +88,8 @@ private:
     void executePluginAction(const QnUuid& driverId,
         const api::AnalyticsManifestObjectAction& action,
         const analytics::storage::DetectedObject& object) const;
+
+    void constrainLength();
 
 private:
     AnalyticsSearchListModel* const q = nullptr;

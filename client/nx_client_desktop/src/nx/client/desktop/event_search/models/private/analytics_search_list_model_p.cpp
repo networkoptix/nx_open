@@ -442,15 +442,22 @@ void AnalyticsSearchListModel::Private::addNewlyReceivedObjects(
     if (added == 0)
         return;
 
-    ScopedInsertRows insertRows(q, 0, added - 1);
-    for (auto iter = data.rbegin(); iter != data.rend(); ++iter)
     {
-        if (iter->firstAppearanceTimeUsec != 0) //< If not marked to skip...
+        ScopedInsertRows insertRows(q, 0, added - 1);
+        for (auto iter = data.rbegin(); iter != data.rend(); ++iter)
+        {
+            if (iter->firstAppearanceTimeUsec == 0) //< Skip if marked.
+                continue;
+
+            m_objectIdToTimestampUs[iter->objectId] = iter->firstAppearanceTimeUsec;
             m_data.push_front(std::move(*iter));
+        }
+
+        m_latestTimeMs = duration_cast<milliseconds>(
+            microseconds(m_data.front().firstAppearanceTimeUsec)).count();
     }
 
-    m_latestTimeMs = duration_cast<milliseconds>(
-        microseconds(m_data.front().firstAppearanceTimeUsec)).count();
+    constrainLength();
 }
 
 rest::Handle AnalyticsSearchListModel::Private::getObjects(qint64 startMs, qint64 endMs,
@@ -528,14 +535,31 @@ void AnalyticsSearchListModel::Private::processMetadata(
     if (newObjects.empty())
         return;
 
-    ScopedInsertRows insertRows(q, 0, int(newObjects.size()) - 1);
+    {
+        ScopedInsertRows insertRows(q, 0, int(newObjects.size()) - 1);
 
-    for (const auto& newObject: newObjects)
-        m_objectIdToTimestampUs[newObject.objectId] = newObject.firstAppearanceTimeUsec;
+        for (const auto& newObject: newObjects)
+            m_objectIdToTimestampUs[newObject.objectId] = newObject.firstAppearanceTimeUsec;
 
-    m_data.insert(m_data.begin(),
-        std::make_move_iterator(newObjects.begin()),
-        std::make_move_iterator(newObjects.end()));
+        m_data.insert(m_data.begin(),
+            std::make_move_iterator(newObjects.begin()),
+            std::make_move_iterator(newObjects.end()));
+    }
+
+    constrainLength();
+}
+
+void AnalyticsSearchListModel::Private::constrainLength()
+{
+    if (m_data.size() <= kMaximumItemCount)
+        return;
+
+    ScopedRemoveRows removeRows(q, kMaximumItemCount, int(m_data.size()) - 1);
+
+    for (auto iter = m_data.cbegin() + kMaximumItemCount; iter != m_data.cend(); ++iter)
+        m_objectIdToTimestampUs.remove(iter->objectId);
+
+    m_data.resize(kMaximumItemCount);
 }
 
 void AnalyticsSearchListModel::Private::emitDataChangedIfNeeded()
