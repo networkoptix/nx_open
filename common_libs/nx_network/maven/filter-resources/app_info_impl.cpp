@@ -19,15 +19,6 @@ static const char* kCloudHostName = kCloudHostNameWithPrefix + sizeof("this_is_c
 
 QString AppInfo::defaultCloudHost()
 {
-#ifdef _DEBUG
-    if (SocketGlobals::isInitialized())
-    {
-        const QString overriddenHost = SocketGlobals::cloud().ini().cloudHost;
-        if (!overriddenHost.isEmpty())
-            return overriddenHost;
-    }
-#endif
-
     return QString::fromUtf8(kCloudHostName);
 }
 
