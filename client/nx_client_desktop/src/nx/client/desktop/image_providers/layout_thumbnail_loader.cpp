@@ -264,19 +264,33 @@ struct LayoutThumbnailLoader::Private
         }
         else
         {
-            const auto cellCenter = item->outCellRect.center();
-            item->outRect = QnGeometry::encloseRotatedGeometry(
-                item->outCellRect, aspectRatio, item->rotation).toRect();
-
-            item->outRect = QnGeometry::aligned(
-                item->outRect.size(), item->outCellRect.toRect(), Qt::AlignCenter);
-
             QPainter painter(&outputImage);
             painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+            // We will rotate around center of cell rectangle.
             painter.translate(item->outCellRect.center());
             painter.rotate(item->rotation);
-            painter.translate(-item->outCellRect.center());
-            painter.drawImage(item->outRect, tile, sourceRect);
+            // Now we should deal with fitting our image to cell rectangle
+            // First, we need the size of bounding box of rotate image.
+            // We will scale it to fit to cell rectangle.
+            QSizeF rotatedSize = painter.transform().mapRect(sourceRect).size();
+            // Determine upscaled size of this item on output image.
+            QSizeF scaledSize =
+                QnGeometry::expanded(rotatedSize, item->outCellRect.size(), Qt::KeepAspectRatio);
+            scaledSize =
+                QnGeometry::bounded(scaledSize, item->outCellRect.size(), Qt::KeepAspectRatio);
+            // That's the scale, we should apply to make source image fit.
+            qreal scale = QnGeometry::scaleFactor(rotatedSize, scaledSize, Qt::KeepAspectRatio);
+            painter.scale(scale, scale);
+            painter.translate(-sourceRect.width()*0.5, -sourceRect.height()*0.5);
+            // Now we should have a transform, that lands source image
+            // with proper alignment to bounds of the cell.
+            painter.drawImage(QPoint(0, 0), tile, sourceRect);
+            QRectF adjustedSrcRect(QPoint(0, 0), sourceRect.size());
+            // Transfomin' like a boss!
+            item->outRect = painter.transform().mapRect(adjustedSrcRect).toRect();
+
+            // Hint: the rect from QnGeometry:: encloseRotatedGeometry is not
+            // pixel-accurate bounding box. It will be cropped for rotations around 90degrees
         }
 
         finalizeOutputImage();
@@ -340,7 +354,7 @@ struct LayoutThumbnailLoader::Private
         bool first = true;
         for (const ItemPtr& item : items)
         {
-            auto rect = item->outCellRect.toRect();
+            auto rect = item->outRect;
             if (rect.isEmpty())
                 continue;
 

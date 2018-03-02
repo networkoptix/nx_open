@@ -32,8 +32,17 @@ bool RootTool::mount(const QUrl& url, const QString& path)
 
 bool RootTool::remount(const QUrl& url, const QString& path)
 {
-    unmount(path);
-    return mount(url, path);
+    bool result = unmount(path);
+    NX_VERBOSE(
+        this,
+        lm("[initOrUpdate, mount] root_tool unmount %1 result %2").args(path, result));
+
+    result = mount(url, path);
+    NX_VERBOSE(
+        this,
+        lm("[initOrUpdate, mount] root_tool mount %1 to %2 result %3").args(url, path, result));
+
+    return result;
 }
 
 bool RootTool::unmount(const QString& path)

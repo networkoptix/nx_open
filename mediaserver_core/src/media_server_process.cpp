@@ -3609,7 +3609,7 @@ const CmdLineArguments MediaServerProcess::cmdLineArguments() const
 void MediaServerProcess::configureApiRestrictions(nx_http::AuthMethodRestrictionList* restrictions)
 {
     // For "OPTIONS * RTSP/1.0"
-    restrictions->allow(lit("."), nx_http::AuthMethod::noAuth);
+    restrictions->allow(lit("\\*"), nx_http::AuthMethod::noAuth);
 
     const auto webPrefix = lit("(/web)?(/proxy/[^/]*(/[^/]*)?)?");
     restrictions->allow(webPrefix + lit("/api/ping"), nx_http::AuthMethod::noAuth);

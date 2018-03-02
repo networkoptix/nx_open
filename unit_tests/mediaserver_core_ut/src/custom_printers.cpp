@@ -1,7 +1,8 @@
 #include <iostream>
 #include <string>
 
-#include <QByteArray>
+#include <QtCore/QString>
+#include <QtCore/QByteArray>
 
 void PrintTo(const QByteArray& val, ::std::ostream* os)
 {

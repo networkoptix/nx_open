@@ -115,9 +115,9 @@ public:
         const HostAddress& address,
         const std::function<void(HaInfoIterator it, bool isSub)>& checker)
     {
-        resolveAndCheckState(address, std::bind2nd(checker, false));
+        resolveAndCheckState(address, [checker](auto it){return checker(it, false); });
         const HostAddress sub(address.toString().split('.')[1]);
-        resolveAndCheckState(sub, std::bind2nd(checker, true));
+        resolveAndCheckState(address, [checker](auto it){return checker(it, true); });
     }
 
 private:

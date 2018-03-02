@@ -191,13 +191,12 @@ void QnNetworkResource::setMediaPort( int newPort )
     m_mediaPort = newPort;
 }
 
-QString QnNetworkResource::toSearchString() const
+QStringList QnNetworkResource::searchFilters() const
 {
-    return base_type::toSearchString()
-        + L' ' + getMAC().toString()
-        + L' ' + getHostAddress()
-        + L' ' + lit("live")
-        ; // TODO: #Elric evil!
+    return base_type::searchFilters()
+        << getMAC().toString()
+        << getHostAddress()
+        << lit("live");
 }
 
 void QnNetworkResource::addNetworkStatus(NetworkStatus status)

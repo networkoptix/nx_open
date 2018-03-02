@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QString>
+
 namespace nx {
 namespace vms {
 namespace utils {

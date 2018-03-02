@@ -1,8 +1,6 @@
 #ifndef QN_INSTRUMENT_H
 #define QN_INSTRUMENT_H
 
-#include <functional> /* For std::unary_function. */
-
 #include <QtCore/QScopedPointer>
 #include <QtCore/QObject>
 #include <QtCore/QEvent> /* For QEvent::Type. */
@@ -57,22 +55,25 @@ class InstrumentEventDispatcher;
 class InstrumentItemCondition;
 
 namespace detail {
-    struct AlwaysTrue: public std::unary_function<QGraphicsItem *, bool> {
-        bool operator()(QGraphicsItem *) const {
-            return true;
-        }
-    };
 
-    template<class GraphicsItem, class Condition>
-    struct CompoundCondition: public std::unary_function<QGraphicsItem *, bool> {
-        CompoundCondition(const Condition &condition): condition(condition) {}
+struct AlwaysTrue{
+    bool operator()(QGraphicsItem *) const
+    {
+        return true;
+    }
+};
 
-        bool operator()(QGraphicsItem *item) const {
-            return condition(item) && dynamic_cast<GraphicsItem *>(item) != NULL;
-        }
+template<class GraphicsItem, class Condition>
+struct CompoundCondition
+{
+    CompoundCondition(const Condition &condition): condition(condition) {}
 
-        const Condition &condition;
-    };
+    bool operator()(QGraphicsItem *item) const {
+        return condition(item) && dynamic_cast<GraphicsItem *>(item) != NULL;
+    }
+
+    const Condition &condition;
+};
 
 } // namespace detail
 

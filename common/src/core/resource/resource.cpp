@@ -299,7 +299,12 @@ void QnResource::removeFlags(Qn::ResourceFlags flags)
 
 QString QnResource::toSearchString() const
 {
-    return getId().toSimpleString() + L' ' + getName();
+    return searchFilters().join(L' ');
+}
+
+QStringList QnResource::searchFilters() const
+{
+    return QStringList() << getId().toSimpleString() << getName();
 }
 
 QnResourcePtr QnResource::getParentResource() const
@@ -941,4 +946,3 @@ int QnResource::saveParamsAsync()
         return module->propertyDictionary()->saveParamsAsync(getId());
     return false;
 }
-

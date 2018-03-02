@@ -22,7 +22,8 @@
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-
+#include <common/common_module.h>
+#include <core/resource_management/resource_pool.h>
 using namespace nx::client::desktop::ui;
 
 namespace {
@@ -54,6 +55,7 @@ QnCameraExpertSettingsWidget::QnCameraExpertSettingsWidget(QWidget* parent):
     setWarningStyle(ui->settingsWarningLabel);
     setWarningStyle(ui->bitrateIncreaseWarningLabel);
     setWarningStyle(ui->generalWarningLabel);
+    setWarningStyle(ui->InvalidLogicalIdText);
 
     ui->settingsWarningLabel->setVisible(false);
     ui->bitrateIncreaseWarningLabel->setVisible(false);
@@ -99,6 +101,17 @@ QnCameraExpertSettingsWidget::QnCameraExpertSettingsWidget(QWidget* parent):
     connect(
         ui->comboBoxForcedMotionStream, QnComboboxCurrentIndexChanged,
         this, &QnCameraExpertSettingsWidget::at_dataChanged);
+
+    connect(
+        ui->logicalIdSpinBox, QnSpinboxIntValueChanged,
+        this, &QnCameraExpertSettingsWidget::at_dataChanged);
+    connect(
+        ui->resetLogicalIdButton, &QPushButton::clicked,
+        this, [this]() {ui->logicalIdSpinBox->setValue(0);});
+    connect(
+        ui->generateLogicalIdButton, &QPushButton::clicked,
+        this, &QnCameraExpertSettingsWidget::at_generateLogicalId);
+
 
     setHelpTopic(ui->secondStreamGroupBox, Qn::CameraSettings_SecondStream_Help);
     setHelpTopic(ui->settingsDisableControlCheckBox, Qn::CameraSettings_Expert_SettingsControl_Help);
@@ -327,6 +340,11 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
         ui->checkBoxDisableNativePtzPresets->setCheckState(Qt::PartiallyChecked);
     else
         ui->checkBoxDisableNativePtzPresets->setCheckState(Qt::Unchecked);
+
+    m_currentCameraId = cameras.front()->getId();
+    ui->logicalIdSpinBox->setValue(cameras.size() == 1
+        ? cameras.front()->getLogicalId().toInt() : 0);
+    ui->logicalIdGroupBox->setEnabled(cameras.size() == 1);
 }
 
 void QnCameraExpertSettingsWidget::submitToResources(const QnVirtualCameraResourceList& cameras)
@@ -390,6 +408,14 @@ void QnCameraExpertSettingsWidget::submitToResources(const QnVirtualCameraResour
                 Qn::DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME,
                 (disableNativePtz == Qt::Checked) ? lit("true") : QString());
         }
+
+        if (ui->logicalIdGroupBox->isEnabled())
+        {
+            if (ui->logicalIdSpinBox->value() > 0)
+                camera->setLogicalId(ui->logicalIdSpinBox->text());
+            else
+                camera->setLogicalId(QString());
+        }
     }
 }
 
@@ -410,8 +436,62 @@ bool QnCameraExpertSettingsWidget::isMdPolicyAllowedForCamera(const QnVirtualCam
         || (mdPolicy == QnMediaResource::edgeStreamValue() && hasRemoteArchive);
 }
 
+int QnCameraExpertSettingsWidget::generateFreeLogicalId() const
+{
+    auto cameras = commonModule()->resourcePool()->getAllCameras();
+    std::set<int> usedValues;
+    for (const auto& camera: cameras)
+    {
+        if (camera->getId() == m_currentCameraId)
+            continue;
+        const auto id = camera->getLogicalId().toInt();
+        if (id > 0)
+            usedValues.insert(id);
+    }
+
+    int previousValue = 0;
+    for (auto value: usedValues)
+    {
+        if (value > previousValue + 1)
+            break;
+        previousValue = value;
+    }
+    return previousValue + 1;
+}
+
+void QnCameraExpertSettingsWidget::at_generateLogicalId()
+{
+    ui->logicalIdSpinBox->setValue(generateFreeLogicalId());
+}
+
+void QnCameraExpertSettingsWidget::updateLogicalIdControls()
+{
+    auto duplicateCameras = commonModule()->resourcePool()->getAllCameras().filtered(
+        [this](const QnVirtualCameraResourcePtr camera)
+    {
+        return !camera->getLogicalId().isEmpty()
+            && camera->getLogicalId().toInt() == ui->logicalIdSpinBox->value()
+            && camera->getId() != m_currentCameraId;
+    });
+
+    QStringList cameraNames;
+    for (const auto& camera : duplicateCameras)
+        cameraNames << camera->getName();
+    const auto errorMessage = tr("This ID already used on camera %1", "", cameraNames.size())
+        .arg(lit("<b>%1</b>").arg(cameraNames.join(lit(", "))));
+
+    ui->InvalidLogicalIdText->setVisible(!duplicateCameras.isEmpty());
+    ui->InvalidLogicalIdText->setText(errorMessage);
+
+    if (duplicateCameras.isEmpty())
+        resetStyle(ui->logicalIdSpinBox);
+    else
+        setWarningStyle(ui->logicalIdSpinBox);
+}
+
 void QnCameraExpertSettingsWidget::at_dataChanged()
 {
+    updateLogicalIdControls();
     if (!m_updating)
         emit dataChanged();
 }
@@ -441,6 +521,7 @@ void QnCameraExpertSettingsWidget::at_restoreDefaultsButton_clicked()
     ui->checkBoxForceMotionDetection->setCheckState(Qt::Unchecked);
     ui->comboBoxForcedMotionStream->setCurrentIndex(0);
     ui->checkBoxDisableNativePtzPresets->setCheckState(Qt::Unchecked);
+    ui->logicalIdSpinBox->setValue(0);
 }
 
 void QnCameraExpertSettingsWidget::updateControlBlock()

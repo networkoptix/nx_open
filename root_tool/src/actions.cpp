@@ -1,8 +1,10 @@
+#include <pwd.h>
+#include <grp.h>
+#include <sys/stat.h>
+#include <iomanip>
+#include <unistd.h>
 #include "actions.h"
 
-#include <iomanip>
-
-#include <unistd.h>
 
 namespace nx {
 namespace root_tool {
@@ -59,11 +61,36 @@ static int execute(const std::string& command)
     return 0;
 }
 
-int mount(
-    Argument url,
-    Argument directory,
-    OptionalArgument optUsername,
-    OptionalArgument optPassword)
+enum class CheckOwnerResult
+{
+    real,
+    other,
+    failed,
+};
+
+static CheckOwnerResult checkCurrentOwner(Argument url)
+{
+    struct stat info;
+    if (stat(url.c_str(), &info))
+    {
+        fprintf(stderr, "[Check owner] stat() failed for %s\n", url.c_str());
+        return CheckOwnerResult::failed;
+    }
+
+    struct passwd* pw = getpwuid(info.st_uid);
+    if (!pw)
+    {
+        fprintf(stderr, "[Check owner] getpwuid failed for %s\n", url.c_str());
+        return CheckOwnerResult::failed;
+    }
+
+    if (pw->pw_uid == kRealUid && pw->pw_gid == kRealGid)
+        return CheckOwnerResult::real;
+
+    return CheckOwnerResult::other;
+}
+
+int mount(Argument url, Argument directory, OptionalArgument username, OptionalArgument password)
 {
     checkMountPermissions(directory);
     if (url.find("//") != 0)
@@ -80,12 +107,12 @@ int mount(
             return command.str();
         };
 
-    std::string password = optPassword ? *optPassword : "";
-    std::string username = optUsername ? *optUsername : "guest";
+    std::string passwordString = password ? *password : "";
+    std::string usernameString = username ? *username : "guest";
 
-    for (const auto& candidate: std::array<std::string, 2>{username, "WORKGROUP\\" + username})
+    for (const auto& candidate: {usernameString, "WORKGROUP\\" + usernameString})
     {
-        if (execute(makeCommandString(candidate, password)) == 0)
+        if (execute(makeCommandString(candidate, passwordString)) == 0)
             return 0;
     }
 
@@ -113,14 +140,36 @@ int touchFile(Argument filePath)
 {
     checkOwnerPermissions(filePath);
     execute("touch '" + filePath + "'"); //< TODO: use file open+close;
-    return changeOwner(filePath);
+
+    switch (checkCurrentOwner(filePath))
+    {
+        case CheckOwnerResult::real:
+            return 0;
+        case CheckOwnerResult::other:
+            return changeOwner(filePath);
+        case CheckOwnerResult::failed:
+            return -1;
+    }
+
+    return 0;
 }
 
 int makeDirectory(Argument directoryPath)
 {
     checkOwnerPermissions(directoryPath);
     execute("mkdir -p '" + directoryPath + "'"); //< TODO: use syscall
-    return changeOwner(directoryPath);
+
+    switch (checkCurrentOwner(directoryPath))
+    {
+        case CheckOwnerResult::real:
+            return 0;
+        case CheckOwnerResult::other:
+            return changeOwner(directoryPath);
+        case CheckOwnerResult::failed:
+            return -1;
+    }
+
+    return 0;
 }
 
 int install(Argument debPackage)

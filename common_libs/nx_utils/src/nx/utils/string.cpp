@@ -562,10 +562,7 @@ void serializeNameValuePairs(
     const QMap<QByteArray, QByteArray>& params,
     QByteArray* const dstBuffer)
 {
-    for (QMap<QByteArray, QByteArray>::const_iterator
-        it = params.begin();
-        it != params.end();
-        ++it)
+    for (auto it = params.cbegin(); it != params.cend(); ++it)
     {
         if (it != params.begin())
             dstBuffer->append(", ");

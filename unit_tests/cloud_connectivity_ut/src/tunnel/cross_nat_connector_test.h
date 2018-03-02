@@ -5,6 +5,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/cloud/tunnel/connector_factory.h>
+#include <nx/utils/std/optional.h>
 #include <libconnection_mediator/src/test_support/mediator_functional_test.h>
 
 namespace nx {
@@ -55,7 +56,7 @@ protected:
         ConnectResult* const connectResult);
 
 private:
-    boost::optional<CrossNatConnectorFactory::Function> m_oldFactoryFunc;
+    std::optional<CrossNatConnectorFactory::Function> m_oldFactoryFunc;
     nx::hpm::MediatorFunctionalTest m_mediator;
 };
 
