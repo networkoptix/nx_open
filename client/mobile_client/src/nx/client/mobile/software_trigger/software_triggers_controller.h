@@ -38,7 +38,7 @@ public:
     QString resourceId() const;
     void setResourceId(const QString& id);
 
-    Q_INVOKABLE bool activateTrigger(const QnUuid& id);
+    Q_INVOKABLE bool activateTrigger(const QnUuid& id, bool prolonged);
     Q_INVOKABLE void cancelTriggerAction(const QnUuid& id);
 
 signals:

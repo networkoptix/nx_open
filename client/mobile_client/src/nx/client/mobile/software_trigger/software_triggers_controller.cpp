@@ -49,7 +49,7 @@ void SoftwareTriggersController::setResourceId(const QString& id)
     emit resourceIdChanged();
 }
 
-bool SoftwareTriggersController::activateTrigger(const QnUuid& id)
+bool SoftwareTriggersController::activateTrigger(const QnUuid& id, bool prolonged)
 {
     if (m_resourceId.isNull() || id.isNull())
     {
@@ -90,8 +90,11 @@ bool SoftwareTriggersController::activateTrigger(const QnUuid& id)
         };
 
     const auto connection = m_commonModule->currentServer()->restConnection();
+    const auto state = prolonged
+        ? vms::event::EventState::active
+        : vms::event::EventState::undefined;
     const auto handle = connection->softwareTriggerCommand(
-        m_resourceId, rule->eventParams().inputPortId, nx::vms::event::EventState::active,
+        m_resourceId, rule->eventParams().inputPortId, state,
         QnGuardedCallback<decltype(callback)>(this, callback), QThread::currentThread());
 
     m_handleToId.insert(handle, id);

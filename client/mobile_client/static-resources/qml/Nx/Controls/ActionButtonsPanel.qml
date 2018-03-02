@@ -53,6 +53,7 @@ ButtonsPanel
                     d.modelDataAccessor.getData(index, "iconPath"))
                 break
             case ActionButtonsModel.SoftTriggerButton:
+                d.handleSoftwareTriggerClicked(index)
                 // TODO: temporary. Remove this
                 hintControl.showHint(
                     d.modelDataAccessor.getData(index, "hint"),
@@ -99,18 +100,19 @@ ButtonsPanel
 
             function handleSoftwareTriggerClicked(index)
             {
-                if (modelDataAccessor.getData("prolongedTrigger"))
+                if (modelDataAccessor.getData(index, "prolongedTrigger"))
                     return
 
-                triggersController.activateTrigger(d.modelDataAccessor.getData(index, "id"))
+                triggersController.activateTrigger(d.modelDataAccessor.getData(index, "id"), false)
             }
 
             function handleSoftwareTriggerPressed(index, pressed)
             {
-                if (!modelDataAccessor.getData("prolongedTrigger"))
+                if (!modelDataAccessor.getData(index, "prolongedTrigger") || !pressed)
                     return
 
-                triggersController.activateTrigger(d.modelDataAccessor.getData(index, "id"))
+                triggersController.activateTrigger(d.modelDataAccessor.getData(index, "id"), true)
+                // TODO: HANDLE RELEASE ACTION
             }
         }
 
