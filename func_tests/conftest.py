@@ -1,7 +1,6 @@
 import logging
 import os
 from collections import namedtuple
-from textwrap import dedent
 
 import pytest
 from netaddr import IPAddress
@@ -46,56 +45,49 @@ log = logging.getLogger(__name__)
 
 
 def pytest_addoption(parser):
-    log_levels = [logging.getLevelName(logging.DEBUG),
-                  logging.getLevelName(logging.INFO),
-                  logging.getLevelName(logging.WARNING),
-                  logging.getLevelName(logging.ERROR),
-                  logging.getLevelName(logging.CRITICAL)]
-    parser.addoption('--cloud-group', default=DEFAULT_CLOUD_GROUP,
-                     help='Cloud group; cloud host for it will be requested from ireg.hdw.mx;'
-                          ' default is %r' % DEFAULT_CLOUD_GROUP)
-    parser.addoption('--autotest-email-password',
-                     help='Password for accessing service account via IMAP protocol. '
-                          'Used for activation cloud accounts for different cloud groups and customizations.')
-    parser.addoption('--work-dir', default=DEFAULT_WORK_DIR, type=Path,
-                     help='working directory for tests: all generated files will be placed there')
-    parser.addoption('--bin-dir', type=Path,
-                     help='directory with binary files for tests:'
-                          ' debian distributive and media sample are expected there')
-    parser.addoption('--mediaserver-dist-path', type=Path, default=DEFAULT_MEDIASERVER_DIST_NAME,
-                     help='mediaserver package, relative to bin dir [%s]' % DEFAULT_MEDIASERVER_DIST_NAME)
-    parser.addoption('--media-sample-path', default=MEDIA_SAMPLE_PATH, type=Path,
-                     help='media sample file path, default is %s at binary directory' % MEDIA_SAMPLE_PATH)
-    parser.addoption('--media-stream-path', default=MEDIA_STREAM_PATH, type=Path,
-                     help='media sample test camera stream, relative to bin dir [%s]' % MEDIA_STREAM_PATH)
-    parser.addoption('--vm-name-prefix', default=DEFAULT_VIRTUALBOX_NAME_PREFIX,
-                     help='prefix for virtualenv machine names')
-    parser.addoption('--vm-port-base', type=int, default=DEFAULT_REST_API_FORWARDED_PORT_BASE,
-                     help='base REST API port forwarded to host')
-    parser.addoption('--vm-address', type=IPAddress,
-                     help='IP address virtual machines bind to.'
-                          ' Test camera discovery will answer only to this address if this option is specified.')
-    parser.addoption('--vm-host',
-                     help='hostname or IP address for host with VirtualBox,'
-                          ' used to start virtual machines (by default it is local host)')
-    parser.addoption('--vm-host-user', default=DEFAULT_VM_HOST_USER,
-                     help='User to use for ssh to login to VirtualBox host')
-    parser.addoption('--vm-host-key',
-                     help='Identity file to use for ssh to login to VirtualBox host')
-    parser.addoption('--vm-host-dir', default=DEFAULT_VM_HOST_DIR,
-                     help='Working directory at host with VirtualBox, used to store vagrant files')
-    parser.addoption('--max-log-width', default=DEFAULT_MAX_LOG_WIDTH, type=int,
-                     help='Change maximum log message width. Default is %d' % DEFAULT_MAX_LOG_WIDTH)
-    parser.addoption('--log-level', default=log_levels[0], type=str.upper,
-                     choices=log_levels,
-                     help='Change log level (%s). Default is %s' % (', '.join(log_levels), log_levels[0]))
-    parser.addoption('--tests-config-file', type=TestsConfig.from_yaml_file, nargs='*',
-                     help='Configuration file for tests, in yaml format.')
-    parser.addoption('--test-parameters', type=TestParameter.from_str, help=dedent('''
-                         Configuration parameters for a test, format: 
-                         --test-parameter=test.param1=value1,test.param2=value2
-                         ''').strip())
-    parser.addoption('--clean', '--reinstall', action='store_true')
+    parser.addoption('--cloud-group', default=DEFAULT_CLOUD_GROUP, help=(
+        'Cloud group; cloud host for it will be requested from ireg.hdw.mx; '
+        'default is %r' % DEFAULT_CLOUD_GROUP))
+    parser.addoption('--autotest-email-password', help=(
+        'Password for accessing service account via IMAP protocol. '
+        'Used for activation cloud accounts for different cloud groups and customizations.'))
+    parser.addoption('--work-dir', type=Path, default=DEFAULT_WORK_DIR, help=(
+        'working directory for tests: all generated files will be placed there'))
+    parser.addoption('--bin-dir', type=Path, help=(
+        'directory with binary files for tests: '
+        'debian distributive and media sample are expected there'))
+    parser.addoption('--mediaserver-dist-path', type=Path, default=DEFAULT_MEDIASERVER_DIST_NAME, help=(
+        'mediaserver package, relative to bin dir [%s]' % DEFAULT_MEDIASERVER_DIST_NAME))
+    parser.addoption('--media-sample-path', type=Path, default=MEDIA_SAMPLE_PATH, help=(
+        'media sample file path, default is %s at binary directory' % MEDIA_SAMPLE_PATH))
+    parser.addoption('--media-stream-path', type=Path, default=MEDIA_STREAM_PATH, help=(
+        'media sample test camera stream, relative to bin dir [%s]' % MEDIA_STREAM_PATH))
+    parser.addoption('--vm-name-prefix', default=DEFAULT_VIRTUALBOX_NAME_PREFIX, help=(
+        'prefix for virtualenv machine names'))
+    parser.addoption('--vm-port-base', type=int, default=DEFAULT_REST_API_FORWARDED_PORT_BASE, help=(
+        'base REST API port forwarded to host'))
+    parser.addoption('--vm-address', type=IPAddress, help=(
+        'IP address virtual machines bind to. '
+        'Test camera discovery will answer only to this address if this option is specified.'))
+    parser.addoption('--vm-host', help=(
+        'hostname or IP address for host with VirtualBox, '
+        'used to start virtual machines (by default it is local host)'))
+    parser.addoption('--vm-host-user', default=DEFAULT_VM_HOST_USER, help=(
+        'User to use for ssh to login to VirtualBox host'))
+    parser.addoption('--vm-host-key', help=(
+        'Identity file to use for ssh to login to VirtualBox host'))
+    parser.addoption('--vm-host-dir', default=DEFAULT_VM_HOST_DIR, help=(
+        'Working directory at host with VirtualBox, used to store vagrant files'))
+    parser.addoption('--max-log-width', default=DEFAULT_MAX_LOG_WIDTH, type=int, help=(
+        'Change maximum log message width. Default is %d' % DEFAULT_MAX_LOG_WIDTH))
+    parser.addoption(
+        '--log-level', type=str.upper, choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'], default='DEBUG',
+        help='choices: DEBUG (default), INFO, WARNING, ERROR, CRITICAL')
+    parser.addoption('--tests-config-file', type=TestsConfig.from_yaml_file, nargs='*', help=(
+        'Configuration file for tests, in yaml format.'))
+    parser.addoption('--test-parameters', type=TestParameter.from_str, help=(
+        'Configuration parameters for a test, format: --test-parameter=test.param1=value1,test.param2=value2'))
+    parser.addoption('--clean', '--reinstall', action='store_true', help='destroy VMs first')
 
 
 @pytest.fixture(scope='session')
