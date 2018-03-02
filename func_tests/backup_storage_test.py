@@ -166,7 +166,7 @@ def add_camera(camera_factory, server, camera_id, backup_type):
 def assert_path_does_not_exist(server, path):
     assert_message = "'%r': unexpected existen path '%s'" % (server, path)
     with pytest.raises(ProcessError, message=assert_message) as x_info:
-        server.host.run_command(['[ -e %s ]' % path])
+        server.host.run_command(['[', '-e', path, ']'])
     assert x_info.value.returncode == 1, assert_message
 
 
