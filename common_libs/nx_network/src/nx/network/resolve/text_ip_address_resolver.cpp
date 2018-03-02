@@ -19,7 +19,7 @@ SystemError::ErrorCode TextIpAddressResolver::resolve(
 
     IpV6WithScope ipV6WithScope = hostAddress.ipV6();
     if (!ipV6WithScope.first || !hostAddress.isPureIpV6())
-        return SystemError::hostUnreach;
+        return SystemError::hostUnreachable;
 
     resolvedAddresses->push_back({{ AddressEntry(
         AddressType::direct,

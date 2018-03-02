@@ -98,7 +98,7 @@ void ConnectorExecutor::reportNoSuitableConnectMethod()
             nx::utils::swapAndCall(
                 m_handler,
                 nx::hpm::api::NatTraversalResultCode::noSuitableMethod,
-                SystemError::hostUnreach,
+                SystemError::hostUnreachable,
                 nullptr);
         });
 }
