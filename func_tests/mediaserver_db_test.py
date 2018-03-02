@@ -53,10 +53,12 @@ def server(name, server_factory, bin_dir, db_version):
     server_config = SERVER_CONFIG[name]
     if db_version == '2.4':
         config_file_params = dict(guidIsHWID='no', serverGuid=server_config.SERVER_GUID)
-        server = server_factory.create(name, start=False, config_file_params=config_file_params)
+        server = server_factory.create(name, config_file_params=config_file_params)
+        server.stop()
         copy_database_file(server, bin_dir, server_config.DATABASE_FILE_V_2_4)
     else:
-        server = server_factory.create(name, start=False)
+        server = server_factory.create(name)
+        server.stop()
     server.start()
     system_settings = dict(autoDiscoveryEnabled=bool_to_str(False))
     server.setup_local_system(systemSettings=system_settings)

@@ -292,7 +292,6 @@ def cloud_account(cloud_account_factory):
 @pytest.fixture()
 def camera_factory(request, bin_dir, vm_address):
     stream_path = bin_dir / request.config.getoption('--media-stream-path'),
-    assert isinstance(stream_path, Path)
     assert stream_path.exists(), '%s is expected at %s' % (stream_path.name, stream_path.parent)
     factory = CameraFactory(vm_address, stream_path)
     yield factory
@@ -307,7 +306,6 @@ def camera(camera_factory):
 @pytest.fixture()
 def sample_media_file(request, bin_dir):
     path = bin_dir / request.config.getoption('--media-sample-path'),
-    assert isinstance(path, Path)
     assert path.exists(), '%s is expected at %s' % (path.name, path.parent)
     return SampleMediaFile(path)
 

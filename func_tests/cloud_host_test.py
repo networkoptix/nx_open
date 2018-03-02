@@ -23,7 +23,8 @@ def test_with_different_cloud_hosts_must_not_be_able_to_merge(server_factory, cl
     cloud_host_2 = 'cloud.non.existent'
 
     one = server_factory.create('one', setup=False, http_schema=http_schema)
-    two = server_factory.create('two', start=False, http_schema=http_schema)
+    two = server_factory.create('two', http_schema=http_schema)
+    two.stop()
 
     two.patch_binary_set_cloud_host(cloud_host_2)
     two.start()

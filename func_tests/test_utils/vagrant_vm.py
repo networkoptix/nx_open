@@ -20,17 +20,6 @@ log = logging.getLogger(__name__)
 TEST_UTILS_DIR = Path(__file__).parent.resolve()
 
 
-def log_output(name, output):
-    if not output:
-        return  # do not log ''; skip None also
-    if '\0' in output:
-        log.debug('\t--> %s: %s bytes binary', name, len(output))
-    elif len(output) > 200:
-        log.debug('\t--> %s: %r...', name, output[:200])
-    else:
-        log.debug('\t--> %s: %r', name, output.rstrip('\r\n'))
-
-
 class RemotableVagrant(vagrant.Vagrant):
     def __init__(self, host, root=None, quiet_stdout=True, quiet_stderr=True):
         vagrant.Vagrant.__init__(self, root, quiet_stdout, quiet_stderr)
@@ -177,8 +166,7 @@ class VagrantVMFactory(object):
 
 
 class VagrantVM(object):
-    def __init__(self, bin_dir, vagrant_dir, vagrant,
-                 _ssh_config_path, host_os_access, config, is_running):
+    def __init__(self, bin_dir, vagrant_dir, vagrant, _ssh_config_path, host_os_access, config, is_running):
         self._bin_dir = bin_dir
         self._vagrant_dir = vagrant_dir
         self._vagrant = vagrant
