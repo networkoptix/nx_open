@@ -12,16 +12,21 @@ ${CLOUD TEST REGISTER}                https://cloud-test.hdw.mx/register
 ${CLOUD STAGE}                        https://cloud-stage.hdw.mx
 ${ENV}                                ${CLOUD TEST}
 
-${BROWSER}                           Chrome
+${BROWSER}                            Chrome
 
-${LANGUAGE DROPDOWN}                 //footer//button[@uib-dropdown-toggle]
-${LANGUAGE TO SELECT}                //footer//span[@lang='${LANGUAGE}']/..
+${LANGUAGE DROPDOWN}                  //footer//button[@uib-dropdown-toggle]
+${LANGUAGE TO SELECT}                 //footer//span[@lang='${LANGUAGE}']/..
 
-${CYRILLIC TEXT}                     Кенгшщзх
-${SMILEY TEXT}                       ☠☿☂⊗⅓∠∩λ℘웃♞⊀☻★
-${GLYPH TEXT}                        您都可以享受源源不絕的好禮及優惠
-${SYMBOL TEXT}                       `~!@#$%^&*()_:";'{}[]+<>?,./\
-${TM TEXT}                           qweasdzxc123®™
+@{LANGUAGES LIST}                          en_US    en_GB    ru_RU           fr_FR   de_DE    es_ES   hu_HU  zh_CN  zh_TW  ja_JP   ko_KR  tr_TR  th_TH     nl_NL    he_IL  pl_PL  vi_VN
+@{LANGUAGES ACCOUNT TEXT LIST}             Account  Account  Учетная запись  Compte  Account  Cuenta  Fiók   帐户    帳號   アカウント  계정    Hesap  บัญชีผู้ใช้  Account  חשבון    Konto  Tài khoản
+
+
+
+${CYRILLIC TEXT}                      Кенгшщзх
+${SMILEY TEXT}                        ☠☿☂⊗⅓∠∩λ℘웃♞⊀☻★
+${GLYPH TEXT}                         您都可以享受源源不絕的好禮及優惠
+${SYMBOL TEXT}                        `~!@#$%^&*()_:";'{}[]+<>?,./\
+${TM TEXT}                            qweasdzxc123®™
 
 #Log In Elements
 ${LOG IN MODAL}                       //div[contains(@class, 'modal-content')]
@@ -138,6 +143,7 @@ ${EDIT PERMISSIONS HINT}              //form[@name='shareForm']//span[contains(@
 ${ACCOUNT EMAIL}                      //form[@name='accountForm']//input[@ng-model='account.email']
 ${ACCOUNT FIRST NAME}                 //form[@name='accountForm']//input[@ng-model='account.first_name']
 ${ACCOUNT LAST NAME}                  //form[@name='accountForm']//input[@ng-model='account.last_name']
+${ACCOUNT LANGUAGE DROPDOWN}          //form[@name='accountForm']//language-select//button
 ${ACCOUNT SAVE}                       //form[@name='accountForm']//button[@ng-click='checkForm()']
 ${ACCOUNT SUBSCRIBE CHECKBOX}         //form[@name='accountForm']//input[@ng-model='account.subscribe']
 

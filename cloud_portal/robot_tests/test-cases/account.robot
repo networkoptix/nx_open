@@ -12,7 +12,7 @@ ${LAST NAME IS REQUIRED}       //span[@ng-if='accountForm.lastName.$touched && a
 *** Keywords ***
 Verify In Account Page
     Location Should Be    ${url}/account
-    Wait Until Elements Are Visible    ${ACCOUNT EMAIL}    ${ACCOUNT FIRST NAME}    ${ACCOUNT LAST NAME}    ${ACCOUNT SAVE}    ${ACCOUNT SUBSCRIBE CHECKBOX}
+    Wait Until Elements Are Visible    ${ACCOUNT EMAIL}    ${ACCOUNT FIRST NAME}    ${ACCOUNT LAST NAME}    ${ACCOUNT SAVE}    ${ACCOUNT SUBSCRIBE CHECKBOX}    ${ACCOUNT LANGUAGE DROPDOWN}
 
 *** Test Cases ***
 Can access the account page from dropdown
@@ -205,4 +205,23 @@ Email field is un-editable
     Verify In Account Page
     ${read only}    Get Element Attribute    ${ACCOUNT EMAIL}    readOnly
     Should Be True    "${read only}"
+    Close Browser
+
+Langauge is changeable on the account page
+    Open Browser and go to URL    ${url}/account
+    Log In    ${EMAIL NOPERM}    ${password}    button=None
+    :FOR    ${lang}    ${account}   IN ZIP    ${LANGUAGES LIST}    ${LANGUAGES ACCOUNT TEXT LIST}
+    \  Verify In Account Page
+    \  Sleep    1
+    \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Click Button    ${ACCOUNT LANGUAGE DROPDOWN}
+    \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Wait Until Element Is Visible    //form[@name='accountForm']//a[@ng-click='changeLanguage(lang.language)']/span[@lang='${lang}']
+    \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Click Element    //form[@name='accountForm']//a[@ng-click='changeLanguage(lang.language)']/span[@lang='${lang}']
+    \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Click Button    ${ACCOUNT SAVE}
+    \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Wait Until Element Is Visible    //h1['${account}']
+    Sleep    1
+    Click Button    ${ACCOUNT LANGUAGE DROPDOWN}
+    Wait Until Element Is Visible    //form[@name='accountForm']//a[@ng-click='changeLanguage(lang.language)']/span[@lang='${LANGUAGE}']
+    Click Element    //form[@name='accountForm']//a[@ng-click='changeLanguage(lang.language)']/span[@lang='${LANGUAGE}']
+    Click Button    ${ACCOUNT SAVE}
+    Wait Until Element Is Visible    //h1['${ACCOUNT TEXT}']
     Close Browser
