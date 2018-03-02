@@ -30,6 +30,7 @@
         <?define ECRegPath="Software\${company.name}\${appserver.name}"?>
 
         <?define clientInternalName = "${client.name}"?>
+        <?define clientRegPath = "Software\${company.name}\${client.name}"?>
         <?define nxtoolName = "${nxtool.name}"?>
         <?define mediaserverName = "${mediaserver.name}"?>
         <?define productName = "${display.product.name}"?>

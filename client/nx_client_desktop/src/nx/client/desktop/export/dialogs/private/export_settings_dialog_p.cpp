@@ -219,7 +219,7 @@ void ExportSettingsDialog::Private::refreshMediaPreview()
         api::ResourceImageRequest request;
         request.resource = m_exportMediaSettings.mediaResource->toResourcePtr();
         request.msecSinceEpoch = m_exportMediaSettings.timePeriod.startTimeMs;
-        request.roundMethod = api::ImageRequest::RoundMethod::precise;
+        request.roundMethod = api::ImageRequest::RoundMethod::iFrameBefore;
         request.rotation = 0;
         request.aspectRatio = api::ImageRequest::AspectRatio::source;
 
@@ -331,6 +331,7 @@ void ExportSettingsDialog::Private::setLayout(const QnLayoutResourcePtr& layout,
 
     provider->setItemBackgroundColor(palette.color(QPalette::Window));
     provider->setFontColor(palette.color(QPalette::WindowText));
+    provider->setRequestRoundMethod(api::ResourceImageRequest::RoundMethod::iFrameBefore);
     provider->loadAsync();
 
     m_layoutPreviewProvider = std::move(provider);

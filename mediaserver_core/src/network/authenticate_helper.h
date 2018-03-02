@@ -78,7 +78,8 @@ public:
     QByteArray generateNonce(NonceProvider provider = NonceProvider::automatic) const;
 
     Qn::AuthResult doCookieAuthorization(
-        const QByteArray& method, const QByteArray& authData, const QByteArray& csrfToken,
+        const QByteArray& method, const QByteArray& authData,
+        const boost::optional<QByteArray>& csrfToken,
         nx_http::Response& responseHeaders, Qn::UserAccessData* accessRights);
 
     /*!

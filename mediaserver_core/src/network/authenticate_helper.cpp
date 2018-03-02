@@ -201,20 +201,16 @@ Qn::AuthResult QnAuthHelper::authenticate(
             if (usedAuthMethod)
                 *usedAuthMethod = nx_http::AuthMethod::cookie;
 
-            const auto csrfToken = nx_http::getHeaderValue(request.headers, Qn::CSRF_TOKEN_HEADER_NAME);
-            if (csrfToken.isEmpty())
-            {
-                result = Qn::Auth_InvalidCsrfToken;
-                NX_VERBOSE(this, lm("Missing CSRF token in %1").arg(request.requestLine));
-            }
-            else
-            {
-                result = doCookieAuthorization(
-                     request.requestLine.method, cookie, csrfToken, response, accessRights);
+            boost::optional<QByteArray> csrfToken;
+            if ((allowedAuthMethods & nx_http::AuthMethod::allowWithourCsrf) == 0)
+                csrfToken = nx_http::getHeaderValue(request.headers, Qn::CSRF_TOKEN_HEADER_NAME);
 
-                NX_DEBUG(this, lm("%1 with cookie (%2)").args(result, request.requestLine));
+            result = doCookieAuthorization(
+                request.requestLine.method, cookie, csrfToken, response, accessRights);
+
+            NX_VERBOSE(this, lm("%1 with cookie (%2)").args(result, request.requestLine));
+            if (result == Qn::Auth_OK)
                 return result;
-            }
         }
     }
 
@@ -551,7 +547,7 @@ Qn::AuthResult QnAuthHelper::doBasicAuth(
 Qn::AuthResult QnAuthHelper::doCookieAuthorization(
     const QByteArray& method,
     const QByteArray& authData,
-    const QByteArray& csrfToken,
+    const boost::optional<QByteArray>& csrfToken,
     nx_http::Response& responseHeaders,
     Qn::UserAccessData* accessRights)
 {
@@ -562,9 +558,12 @@ Qn::AuthResult QnAuthHelper::doCookieAuthorization(
     if (auth.isEmpty())
         return Qn::Auth_Forbidden;
 
-    const auto csrfParam = params.value(Qn::CSRF_TOKEN_COOKIE_NAME);
-    if (csrfParam.isEmpty() || csrfParam != csrfToken)
-        return Qn::Auth_InvalidCsrfToken;
+    if (csrfToken)
+    {
+        const auto csrfParam = params.value(Qn::CSRF_TOKEN_COOKIE_NAME);
+        if (csrfParam.isEmpty() || csrfParam != *csrfToken)
+            return Qn::Auth_InvalidCsrfToken;
+    }
 
     // TODO: Verify UUID and CSRF token against some cache as well.
     return authenticateByUrl(
