@@ -749,30 +749,34 @@ UINT __stdcall CleanClientRegistryKeys(MSIHANDLE hInstall)
     UINT er = ERROR_SUCCESS;
 
     hr = WcaInitialize(hInstall, "CleanClientRegistryKeys");
-    ExitOnFailure(hr, "Failed to initialize");
+    if (FAILED(hr))
+    {
+        WcaLogError(hr, "Failed to initialize");
+        return WcaFinalize(ERROR_INSTALL_FAILURE);
+    } 
 
     WcaLog(LOGMSG_STANDARD, "Initialized.");
 
     CAtlString registryPath = GetProperty(hInstall, L"CustomActionData");
 
-    int lastSlashPos = registryPath.ReverseFind(L'\\');
+    const int lastSlashPos = registryPath.ReverseFind(L'\\');
 
-    CAtlString keyParent = registryPath.Mid(0, lastSlashPos);
-    CAtlString keyName = registryPath.Mid(lastSlashPos + 1);
+    const CAtlString keyParent = registryPath.Mid(0, lastSlashPos);
+    const CAtlString keyName = registryPath.Mid(lastSlashPos + 1);
 
-    CRegKey RegKey;
-    if(RegKey.Open(HKEY_CURRENT_USER,
+    CRegKey regKey;
+    if(regKey.Open(HKEY_CURRENT_USER,
         keyParent,
         KEY_READ | KEY_WRITE | KEY_WOW64_64KEY) != ERROR_SUCCESS)
     {
         WcaLog(LOGMSG_STANDARD, "Couldn't open registry key: %S", (LPCWSTR)keyParent);
-        goto LExit;
+    }
+    else
+    {
+        regKey.RecurseDeleteKey(keyName);
+        regKey.Close();
     }
 
-    RegKey.RecurseDeleteKey(keyName);
-    RegKey.Close();
-
-LExit:
     er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
     return WcaFinalize(er);
 }
