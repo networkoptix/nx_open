@@ -4,6 +4,8 @@ import time
 
 import pytest
 
+from test_utils.api_shortcuts import get_server_id
+
 log = logging.getLogger(__name__)
 
 
@@ -21,7 +23,7 @@ def wait_for_and_check_camera_history(camera, server_list, expected_servers_orde
             assert len(response) == 1, repr(response)  # must contain exactly one record for one camera
             servers_order = [item['serverGuid'] for item in response[0]['items']]
             log.debug('Received camera history servers order: %s', servers_order)
-            if servers_order == [server.ecs_guid for server in expected_servers_order]:
+            if servers_order == [get_server_id(server.rest_api) for server in expected_servers_order]:
                 camera_history_responses.append(response)
                 continue
             if time.time() - t > HISTORY_WAIT_TIMEOUT_SEC:
@@ -58,9 +60,9 @@ def check_media_stream_transports(server):
 # https://networkoptix.atlassian.net/wiki/spaces/SD/pages/77234376/Camera+history+test
 @pytest.mark.testcam
 def test_camera_switching_should_be_represented_in_history(artifact_factory, server_factory, camera):
-    one = server_factory.get('one')
-    two = server_factory.get('two')
-    one.merge([two])
+    one = server_factory.create('one')
+    two = server_factory.create('two')
+    one.merge_systems(two)
 
     camera.start_streaming()
     camera.wait_until_discovered_by_server([one, two])

@@ -13,7 +13,7 @@ LWS_MERGE_TIMEOUT = datetime.timedelta(minutes=10)
 @pytest.mark.skipif(not os.environ.has_key('FRAMEWORK_TEST'), reason='Only for testing of testing framework itself')
 @pytest.mark.parametrize('iteration', range(2))
 def test_merge(server_factory, lightweight_servers_factory, iteration):
-    server = server_factory.get('full')
+    server = server_factory.create('full')
     lws_list = lightweight_servers_factory(10)
     log.info('Allocated %d lightweight servers', len(lws_list))
     lws_list[0].wait_until_synced(LWS_MERGE_TIMEOUT)
@@ -22,5 +22,5 @@ def test_merge(server_factory, lightweight_servers_factory, iteration):
 @pytest.mark.skipif(not os.environ.has_key('FRAMEWORK_TEST'), reason='Only for testing of testing framework itself')
 def test_coredump(lightweight_servers_factory):
     lws_list = lightweight_servers_factory(10)
-    lws_list[0].make_core_dump()
+    lws_list[0].service.make_core_dump()
 

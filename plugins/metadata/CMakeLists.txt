@@ -9,6 +9,10 @@ add_subdirectory(axis_metadata_plugin)
 
 add_subdirectory(vca_metadata_plugin)
 
+if (targetDevice STREQUAL "tx1")
+    add_subdirectory(deepstream_metadata_plugin)
+endif()
+
 if(withPluginStubs)
     add_subdirectory(stub_metadata_plugin)
 endif()
