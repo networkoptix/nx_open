@@ -17,8 +17,6 @@ ButtonsPanel
     signal twoWayAudioButtonPressed()
     signal twoWayAudioButtonReleased()
 
-    signal softTriggerButtonClicked() // TODO: add parameters and prolongetd studd
-
     ActionButtonsHintControl
     {
         id: hintControl
@@ -36,9 +34,9 @@ ButtonsPanel
     {
         var type = d.modelDataAccessor.getData(index, "type")
         if (type == ActionButtonsModel.TwoWayAudioButton)
-            d.handleTwoWayAudioPressed(pressed)
+            d.handleTwoWayAudioPressed(index, pressed)
         else if (type == ActionButtonsModel.SoftTriggerButton)
-            d.handleSoftwareTriggerPressed(pressed)
+            d.handleSoftwareTriggerPressed(index, pressed)
     }
 
     onButtonClicked:
@@ -50,13 +48,14 @@ ButtonsPanel
                 ptzButtonClicked()
                 break
             case ActionButtonsModel.TwoWayAudioButton:
-                hintControl.showHint("Press and hold to speak",
+                hintControl.showHint(
+                    d.modelDataAccessor.getData(index, "hint"),
                     d.modelDataAccessor.getData(index, "iconPath"))
                 break
             case ActionButtonsModel.SoftTriggerButton:
                 // TODO: temporary. Remove this
                 hintControl.showHint(
-                    d.modelDataAccessor.getData(index, "triggerName"),
+                    d.modelDataAccessor.getData(index, "hint"),
                     d.modelDataAccessor.getData(index, "iconPath"))
                 break
         }
@@ -77,7 +76,13 @@ ButtonsPanel
                     model: buttonModel
                 }
 
-            function handleTwoWayAudioPressed(pressed)
+            property SoftwareTriggersController triggersController:
+                SoftwareTriggersController
+                {
+                    resourceId: control.resourceId
+                }
+
+            function handleTwoWayAudioPressed(index, pressed)
             {
                 if (pressed)
                 {
@@ -92,9 +97,20 @@ ButtonsPanel
                 }
             }
 
-            function handleSoftwareTriggerPressed(pressed)
+            function handleSoftwareTriggerClicked(index)
             {
+                if (modelDataAccessor.getData("prolongedTrigger"))
+                    return
 
+                triggersController.activateTrigger(d.modelDataAccessor.getData(index, "id"))
+            }
+
+            function handleSoftwareTriggerPressed(index, pressed)
+            {
+                if (!modelDataAccessor.getData("prolongedTrigger"))
+                    return
+
+                triggersController.activateTrigger(d.modelDataAccessor.getData(index, "id"))
             }
         }
 

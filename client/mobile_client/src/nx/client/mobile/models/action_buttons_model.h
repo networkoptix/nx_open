@@ -4,6 +4,7 @@
 
 #include <nx/utils/uuid.h>
 #include <utils/common/connective.h>
+#include <nx/client/mobile/software_trigger/software_triggers_watcher.h>
 
 namespace nx {
 namespace client {
@@ -15,8 +16,6 @@ class TwoWayAudioAvailabilityWatcher;
 namespace mobile {
 
 class PtzAvailabilityWatcher;
-class SoftwareTriggersWatcher;
-class SoftwareTriggerData;
 
 // TODO: RENAME EVERYTHING. Refactor a bit.
 class ActionButtonsModel: public Connective<QAbstractListModel>
@@ -79,19 +78,18 @@ private:
 
     void addSoftwareTriggerButton(
         const QnUuid& id,
-        const SoftwareTriggerData& data,
         const QString& iconPath,
+        const QString& name,
+        bool prolonged,
         bool enabled);
 
     void removeSoftwareTriggerButton(const QnUuid& id);
 
-    void updateTriggerEnabled(const QnUuid& id);
-    void updateTriggerName(const QnUuid& id);
-    void updateTriggerIcon(const QnUuid& id);
-    void updateTriggerId(const QnUuid& id);
-    void updateTriggerProlonged(const QnUuid& id);
+    void updateTriggerFields(const QnUuid& id, SoftwareTriggersWatcher::TriggerFields fields);
 
     static QnUuid getSoftwareButtonId(const ButtonPtr& button);
+
+    static QString twoWayButtonHint();
 
 private:
     QnUuid m_resourceId;

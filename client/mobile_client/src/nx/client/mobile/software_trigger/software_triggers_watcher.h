@@ -20,20 +20,23 @@ class RuleManager;
 namespace client {
 namespace mobile {
 
-struct SoftwareTriggerData
-{
-    QString triggerId;
-    QString name;
-    bool prolonged = false;
-};
-
-// TODO: add check if resource is camera
 class SoftwareTriggersWatcher: public QObject
 {
     Q_OBJECT
     using base_type = QObject;
 
 public:
+    enum TriggerField
+    {
+        NoField         = 0,
+        EnabledField    = 0x1,
+        ProlongedField  = 0x2,
+        NameField       = 0x4,
+        IconField     = 0x8
+    };
+
+    Q_DECLARE_FLAGS(TriggerFields, TriggerField)
+
     SoftwareTriggersWatcher(QObject* parent = nullptr);
 
     void setResourceId(const QnUuid& resourceId);
@@ -41,27 +44,22 @@ public:
     void updateTriggersAvailability();
 
     bool triggerEnabled(const QnUuid& id) const;
+    bool prolongedTrigger(const QnUuid& id) const;
+    QString triggerName(const QnUuid& id) const;
     QString triggerIcon(const QnUuid& id) const;
-    SoftwareTriggerData triggerData(const QnUuid& id) const;
 
 signals:
-    void triggerExecuted(const QnUuid& id, bool success);
-
     void resourceIdChanged();
 
     void triggerRemoved(const QnUuid& id);
     void triggerAdded(
         const QnUuid& id,
-        const SoftwareTriggerData& triggerData,
         const QString& iconPath,
-        bool triggerEnabled);
+        const QString& name,
+        bool prolonged,
+        bool enabled);
 
-    // TODO: add changed flags
-    void triggerEnabledChanged(const QnUuid& id);
-    void triggerIconChanged(const QnUuid& id);
-    void triggerNameChanged(const QnUuid& id);
-    void triggerIdChanged(const QnUuid& id);
-    void triggerProlongedChanged(const QnUuid& id);
+    void triggerFieldsChanged(const QnUuid& id, TriggerFields fields);
 
 private:
     void updateTriggers();

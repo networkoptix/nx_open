@@ -37,6 +37,7 @@
 #include <nx/client/core/animation/kinetic_animation.h>
 #include <nx/client/mobile/resource/lite_client_layout_helper.h>
 #include <nx/client/mobile/models/action_buttons_model.h>
+#include <nx/client/mobile/software_trigger/software_triggers_controller.h>
 #include <nx/client/core/two_way_audio/two_way_audio_mode_controller.h>
 #include <nx/client/mobile/two_way_audio/voice_spectrum_item.h>
 
@@ -81,8 +82,8 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterType<nx::client::core::TwoWayAudioController>("com.networkoptix.qml",
         1, 0, "TwoWayAudioController");
 
-//    qmlRegisterUncreatableType<nx::client::mobile::SoftwareTriggersWatcher>(
-//        "Nx", 1, 0, "SoftwareTriggersWatcher");
+    qmlRegisterType<nx::client::mobile::SoftwareTriggersController>(
+        "Nx", 1, 0, "SoftwareTriggersController");
 
     qmlRegisterType<nx::client::mobile::VoiceSpectrumItem>("com.networkoptix.qml", 1, 0, "VoiceSpectrumItem");
 

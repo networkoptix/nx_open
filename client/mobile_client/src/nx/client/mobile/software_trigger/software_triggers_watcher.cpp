@@ -4,15 +4,12 @@
 #include <nx/vms/event/rule.h>
 #include <nx/vms/event/rule_manager.h>
 #include <core/resource/user_resource.h>
-#include <core/resource/media_server_resource.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <common/common_module.h>
 #include <client_core/client_core_module.h>
 #include <watchers/user_watcher.h>
 #include <utils/common/synctime.h>
-#include <utils/common/guarded_callback.h>
-#include <api/server_rest_connection.h>
 
 namespace {
 
@@ -56,8 +53,9 @@ namespace mobile {
 
 struct SoftwareTriggersWatcher::Description
 {
-    SoftwareTriggerData data;
     QString iconPath;
+    QString name;
+    bool prolonged = false;
     bool enabled = true;
 
     static SoftwareTriggersWatcher::DescriptionPtr create(const nx::vms::event::RulePtr& rule);
@@ -67,8 +65,9 @@ SoftwareTriggersWatcher::DescriptionPtr SoftwareTriggersWatcher::Description::cr
     const nx::vms::event::RulePtr& rule)
 {
     const auto params = rule->eventParams();
-    const SoftwareTriggerData data({params.inputPortId, params.caption, rule->isActionProlonged()});
-    return DescriptionPtr(new Description({data, extractIconPath(rule), true} /*TODO: add availability check*/));
+    const auto name = params.caption;
+    const bool prolonged = rule->isActionProlonged();
+    return DescriptionPtr(new Description({extractIconPath(rule), name, prolonged, true}));
 }
 
 //
@@ -98,14 +97,24 @@ void SoftwareTriggersWatcher::setResourceId(const QnUuid& resourceId)
     emit resourceIdChanged();
 }
 
-SoftwareTriggerData SoftwareTriggersWatcher::triggerData(const QnUuid& id) const
+QString SoftwareTriggersWatcher::triggerName(const QnUuid& id) const
 {
     const auto it = m_data.find(id);
     if (it != m_data.end())
-        return it.value()->data;
+        return it.value()->name;
 
     NX_EXPECT(false, "Invalid trigger id");
-    return SoftwareTriggerData();
+    return QString();
+}
+
+bool SoftwareTriggersWatcher::prolongedTrigger(const QnUuid& id) const
+{
+    const auto it = m_data.find(id);
+    if (it != m_data.end())
+        return it.value()->prolonged;
+
+    NX_EXPECT(false, "Invalid trigger id");
+    return false;
 }
 
 bool SoftwareTriggersWatcher::triggerEnabled(const QnUuid& id) const
@@ -167,7 +176,7 @@ void SoftwareTriggersWatcher::updateTriggerByRule(const nx::vms::event::RulePtr&
     updateTriggerAvailability(id, !createNewTrigger);
     updateTriggerData(id, !createNewTrigger);
     if (createNewTrigger)
-        emit triggerAdded(id, data->data, data->iconPath, data->enabled);
+        emit triggerAdded(id, data->iconPath, data->name, data->prolonged, data->enabled);
 }
 
 void SoftwareTriggersWatcher::updateTriggerData(const QnUuid& id, bool emiSignal)
@@ -178,32 +187,31 @@ void SoftwareTriggersWatcher::updateTriggerData(const QnUuid& id, bool emiSignal
     const auto it = m_data.find(id);
     if (it == m_data.end())
         return;
+    ///return vms::event::StringsHelper::getSoftwareTriggerName(softwareButton->data.name);
 
     const auto& currentData = it.value();
     const auto newData = Description::create(eventRuleManager->rule(id));
+    TriggerFields fields = NoField;
+
     if (newData->iconPath != currentData->iconPath)
     {
         currentData->iconPath = newData->iconPath;
-        emit triggerIconChanged(id);
+        fields |= IconField;
     }
 
-    if (newData->data.name != currentData->data.name)
+    if (newData->name != currentData->name)
     {
-        currentData->data.name = newData->data.name;
-        emit triggerNameChanged(id);
+        currentData->name = newData->name;
+        fields |= NameField;
     }
 
-    if (newData->data.triggerId != currentData->data.triggerId)
+    if (newData->prolonged != currentData->prolonged)
     {
-        currentData->data.triggerId = newData->data.triggerId;
-        emit triggerIdChanged(id);
+        currentData->prolonged = newData->prolonged;
+        fields |= ProlongedField;
     }
-
-    if (newData->data.prolonged != currentData->data.prolonged)
-    {
-        currentData->data.prolonged = newData->data.prolonged;
-        emit triggerProlongedChanged(id);
-    }
+    if (fields != NoField)
+        emit triggerFieldsChanged(id, fields);
 }
 
 void SoftwareTriggersWatcher::updateTriggerAvailability(const QnUuid& id, bool emitSignal)
@@ -224,59 +232,7 @@ void SoftwareTriggersWatcher::updateTriggerAvailability(const QnUuid& id, bool e
 
     description->enabled = enabled;
     if (emitSignal)
-        emit triggerEnabledChanged(id);
-}
-
-bool SoftwareTriggersWatcher::activateTrigger(QnUuid& id)
-{
-    if (m_resourceId.isNull())
-        return false;
-
-    const auto accessManager = m_commonModule->resourceAccessManager();
-    const auto currentUser = m_commonModule->instance<QnUserWatcher>()->user();
-    if (!accessManager->hasGlobalPermission(currentUser, Qn::GlobalUserInputPermission))
-        return false;
-
-    if (m_idToHandle.contains(id))
-        return false;
-
-    const auto itData = m_data.find(id);
-    if (itData == m_data.end())
-        return false;
-
-    const auto callback =
-        [this](bool success, rest::Handle handle, const QnJsonRestResult& result)
-        {
-            const auto it = m_handleToId.find(handle);
-            if (it == m_handleToId.end())
-                return;
-
-            const auto id = it.value();
-            m_handleToId.erase(it);
-            m_idToHandle.remove(id);
-
-            success = success && result.error == QnRestResult::NoError;
-            emit triggerExecuted(id, success);
-        };
-
-    const auto triggerId = itData.value()->data.triggerId;
-    const auto connection = m_commonModule->currentServer()->restConnection();
-    const auto handle = connection->softwareTriggerCommand(
-        m_resourceId, triggerId, nx::vms::event::EventState::active,
-        QnGuardedCallback<decltype(callback)>(this, callback), QThread::currentThread());
-
-    m_handleToId.insert(handle, id);
-    m_idToHandle.insert(id, handle);
-    return true;
-}
-
-bool SoftwareTriggersWatcher::cancelTriggerAction(const QnUuid& id)
-{
-    if (!m_idToHandle.remove(id))
-        return false;
-
-    emit triggerExecuted(id, false);
-    return true;
+        emit triggerFieldsChanged(id, EnabledField);
 }
 
 } // namespace mobile
