@@ -1,6 +1,7 @@
 #include "mobile_client_uri_handler.h"
 
 #include <nx/network/app_info.h>
+#include <nx/network/socket_global.h>
 #include <nx/vms/utils/system_uri.h>
 #include <watchers/cloud_status_watcher.h>
 
