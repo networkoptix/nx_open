@@ -750,9 +750,14 @@ void ManagerPool::putVideoFrame(
             }
         }
         if (dataPacket)
+        {
             manager->pushDataPacket(dataPacket);
+            dataPacket->releaseRef();
+        }
         else
+        {
             NX_VERBOSE(this) << lm("Video frame not sent to CameraManager.");
+        }
     }
 }
 
