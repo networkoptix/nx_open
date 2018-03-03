@@ -28,7 +28,6 @@ angular.module('nxCommon')
             },
 
             link: function (scope, element/*, attrs*/) {
-                var $element = $(element);
                 scope.$watch('ngSrc',function(){
                     element.addClass("hidden");
                 });
