@@ -70,7 +70,7 @@ QByteArray ConnectionProcessor::responseBody(Qn::SerializationFormat dataFormat)
     localPeer.systemId = commonModule()->globalSettings()->localSystemId();
 
     localPeer.peerType = Qn::PT_Server;
-    localPeer.cloudHost = nx::network::AppInfo::defaultCloudHost();
+    localPeer.cloudHost = nx::network::SocketGlobals::cloudHost();
     localPeer.identityTime = commonModule()->systemIdentityTime();
     localPeer.aliveUpdateIntervalMs = std::chrono::duration_cast<std::chrono::milliseconds>(
         commonModule()->globalSettings()->aliveUpdateInterval()).count();
@@ -126,13 +126,13 @@ bool ConnectionProcessor::isPeerCompatible(const ec2::ApiPeerDataEx& remotePeer)
     }
     if (remotePeer.peerType == Qn::PT_Server)
     {
-        if (nx::network::AppInfo::defaultCloudHost() != remotePeer.cloudHost)
+        if (nx::network::SocketGlobals::cloudHost() != remotePeer.cloudHost)
         {
             NX_LOG(this,
                 lm("Reject incoming P2P connection from peer %1 because they have different built in cloud host setting. "
                     "Local peer host: %2, remote peer host: %3")
                 .arg(d->socket->getForeignAddress().address.toString())
-                .arg(nx::network::AppInfo::defaultCloudHost())
+                .arg(nx::network::SocketGlobals::cloudHost())
                 .arg(remotePeer.cloudHost),
                 cl_logWARNING);
             return false;

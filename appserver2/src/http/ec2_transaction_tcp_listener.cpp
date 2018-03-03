@@ -12,6 +12,7 @@
 #include "common/common_module.h"
 #include "transaction/transaction_transport.h"
 #include <nx/network/http/custom_headers.h>
+#include <nx/network/socket_global.h>
 #include "audit/audit_manager.h"
 #include "settings.h"
 #include <core/resource/media_server_resource.h>
@@ -163,7 +164,7 @@ void QnTransactionTcpProcessor::run()
         nx_http::StringType::number(nx_ec::EC2_PROTO_VERSION)));
     d->response.headers.insert(nx_http::HttpHeader(
         Qn::EC2_CLOUD_HOST_HEADER_NAME,
-        nx::network::AppInfo::defaultCloudHost().toUtf8()));
+        nx::network::SocketGlobals::cloudHost().toUtf8()));
     d->response.headers.insert(nx_http::HttpHeader(
         Qn::EC2_SYSTEM_ID_HEADER_NAME,
         commonModule->globalSettings()->localSystemId().toByteArray()));
@@ -217,7 +218,7 @@ void QnTransactionTcpProcessor::run()
             nx_http::StringType::number(nx_ec::EC2_PROTO_VERSION)));
         d->response.headers.insert(nx_http::HttpHeader(
             Qn::EC2_CLOUD_HOST_HEADER_NAME,
-            nx::network::AppInfo::defaultCloudHost().toUtf8()));
+            nx::network::SocketGlobals::cloudHost().toUtf8()));
 
         d->response.headers.insert(nx_http::HttpHeader(
             Qn::EC2_SYSTEM_ID_HEADER_NAME,
