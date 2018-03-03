@@ -7,6 +7,7 @@ angular.module('cloudApp')
     account, $q, system, $poll, page, $timeout, systemsProvider) {
 
         var systemId = $routeParams.systemId;
+        $scope.debugMode = Config.allowDebugMode;
 
 
         account.requireLogin().then(function(account){
