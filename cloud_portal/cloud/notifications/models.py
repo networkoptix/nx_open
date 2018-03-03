@@ -74,12 +74,17 @@ class Message(models.Model):
         # TODO: initiate business-logic here
         from .tasks import send_email
 
-        if settings.USE_ASYNC_QUEUE:
-            if USE_SQS_FOR_CLOUD_NOTIFICATIONS and 'queue' in settings.NOTIFICATIONS_CONFIG[self.type]:
-                result = send_email.apply_async(args=[self.user_email, self.type, self.message, self.customization],
-                                                queue=settings.NOTIFICATIONS_CONFIG[self.type]['queue'])
-            else:
-                result = send_email.delay(self.user_email, self.type, self.message, self.customization)
+        if settings.USE_ASYNC_QUEUE and USE_SQS_FOR_CLOUD_NOTIFICATIONS:
+            queue_name = ""
+            if 'queue' in settings.NOTIFICATIONS_CONFIG[self.type]:
+                queue_name = settings.NOTIFICATIONS_CONFIG[self.type]['queue']
+
+            result = send_email.apply_async(args=[self.user_email,
+                                                  self.type,
+                                                  self.message,
+                                                  self.customization,
+                                                  queue_name],
+                                            queue=queue_name)
             self.task_id = result.task_id
         else:
             send_email(self.user_email, self.type, self.message, self.customization)

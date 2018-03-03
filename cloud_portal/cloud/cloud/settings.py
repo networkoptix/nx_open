@@ -281,10 +281,11 @@ BROKER_URL = os.getenv('QUEUE_BROKER_URL')
 BROKER_CONNECTION_MAX_RETRIES = 1
 if not BROKER_URL:
     BROKER_URL = 'sqs://AKIAIQVGGMML4WNBECRA:jmXYHNKOAL9gYYaxAVClgegzShjaPF27ycvBOV1s@'
-    BROKER_TRANSPORT_OPTIONS = {
-        'queue_name_prefix' : conf['queue_name'] + '-',
-        'region' : 'us-east-1'
-    }
+
+BROKER_TRANSPORT_OPTIONS = {
+    'queue_name_prefix' : conf['queue_name'] + '-',
+    'region' : 'us-east-1'
+}
 
 RESULT_PERSISTENT = True
 CELERY_RESULT_BACKEND = 'django-db'

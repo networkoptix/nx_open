@@ -7,7 +7,7 @@ Suite Teardown    Close All Browsers
 ${email}    ${EMAIL OWNER}
 ${email invalid}    aodehurgjaegir
 ${password}    ${BASE PASSWORD}
-${url}         ${CLOUD TEST}
+${url}         ${ENV}
 
 *** Test Cases ***
 can be opened in anonymous state
@@ -68,35 +68,6 @@ allows log in with existing email in uppercase
     Validate Log In
     Close Browser
 
-rejects log in with wrong password
-    Open Browser and go to URL    ${url}
-    Log In    ${email}    'arthahrtrthjsrtjy'
-    wait until element is visible    ${ALERT}
-    Close Browser
-
-rejects log in without password
-    Open Browser and go to URL    ${url}
-    Log In    ${email}    ${EMPTY}
-    ${class}    Get Element Attribute    ${PASSWORD INPUT}/..    class
-    Should Contain    ${class}    has-error
-    Close Browser
-
-rejects log in without both email and password
-    Open Browser and go to URL    ${url}
-    Log In    ${EMPTY}    ${EMPTY}
-    ${class}    Get Element Attribute    ${PASSWORD INPUT}/..    class
-    Should Contain    ${class}    has-error
-    ${class}    Get Element Attribute    ${EMAIL INPUT}/..    class
-    Should Contain    ${class}    has-error
-    Close Browser
-
-rejects log in with email in non-email format but with password
-    Open Browser and go to URL    ${url}
-    Log In    ${email invalid}    ${password}
-    ${class}    Get Element Attribute    ${EMAIL INPUT}/..    class
-    Should Contain    ${class}    has-error
-    Close Browser
-
 shows red outline if field is wrong/empty after blur
     Open Browser and go to URL    ${url}
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
@@ -149,6 +120,7 @@ passes email from email input to Restore password page, even without clicking 'L
     Close Browser
 
 redirects to /activate and shows non-activated user message when not activated; Resend activation button sends email
+    [tags]    email
     Open Browser and go to URL    ${url}/register
     ${random email}    get random email
     Register    'mark'    'hamill'    ${random email}    ${BASE PASSWORD}

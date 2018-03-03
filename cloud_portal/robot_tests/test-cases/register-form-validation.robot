@@ -5,7 +5,7 @@ Suite Teardown    Close All Browsers
 Test Template     Test Register Invalid
 
 *** Variables ***
-${url}    ${CLOUD TEST}
+${url}    ${ENV}
 ${existing email}              ${EMAIL VIEWER}
 ${no upper password}           adrhartjad
 ${7char password}              asdfghj

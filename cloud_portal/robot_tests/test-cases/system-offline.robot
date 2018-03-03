@@ -2,16 +2,18 @@
 Resource          ../resource.robot
 Resource          ../variables.robot
 Suite Teardown    Close All Browsers
+Force Tags        system
 
 *** Variables ***
 ${password}    ${BASE PASSWORD}
-${url}         ${CLOUD TEST}
+${url}         ${ENV}
 
 *** Keywords ***
 Log in to Autotests System
     [arguments]    ${email}
     Go To    ${url}/systems/${AUTOTESTS OFFLINE SYSTEM ID}
     Log In    ${email}    ${password}    None
+    Validate Log In
     Run Keyword If    '${email}' == '${EMAIL OWNER}'    Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
     Run Keyword If    '${email}' == '${EMAIL ADMIN}'    Wait Until Elements Are Visible    ${DISCONNECT FROM MY ACCOUNT}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
     Run Keyword Unless    '${email}' == '${EMAIL OWNER}' or '${email}' == '${EMAIL ADMIN}'    Wait Until Elements Are Visible    ${DISCONNECT FROM MY ACCOUNT}    ${OPEN IN NX BUTTON}
@@ -90,7 +92,6 @@ should open System page by link not authorized user, and show alert if logs in a
     Close Browser
 
 rename button opens dialog; cancel closes without rename; save renames system when offline
-    [tags]    not-ready
     Open Browser and go to URL    ${url}
     Log in to Autotests System    ${EMAIL OWNER}
     Wait Until Element Is Visible    ${RENAME SYSTEM}

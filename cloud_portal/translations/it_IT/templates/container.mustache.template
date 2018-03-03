@@ -68,7 +68,7 @@
                             <td class="right-border">
                                 <b>Sito Web</b> <br><a href="{{companyUrl}}">{{companyUrl}}</a>
                             </td>
-                        {{/sistema}}
+                        {{/system}}
                         <td class="left-border">
                             <b> Supporto </b> <br> <a href="{{supportLink}}">{{supportLinkText}}</a>
                         </td>

@@ -1,7 +1,7 @@
 'use strict';
 
 
-function NativePlayer(){
+window.NativePlayer = function(){
 
     // requestAnimationFrame polyfill
     this.init = function(element,readyHandler) {
@@ -9,7 +9,7 @@ function NativePlayer(){
         this.readyHandler = readyHandler;
         this.readyHandler(this);
     };
-}
+};
 
 NativePlayer.prototype.play = function(){
     this.video.play().catch(function(error){

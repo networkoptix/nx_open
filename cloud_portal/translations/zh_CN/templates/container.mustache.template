@@ -70,7 +70,7 @@
                                 <b>网站</b><br>
                                 <a href="{{companyUrl}}">{{companyUrl}}</a>
                             </td>
-                        {{/系统}}
+                        {{/system}}
                         <td class="left-border">
                             <b>支持</b><br>
                             <a href="{{supportLink}}">{{supportLinkText}}</a>
