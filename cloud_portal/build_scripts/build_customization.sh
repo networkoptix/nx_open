@@ -27,8 +27,13 @@ dir=../customizations/$CUSTOMIZATION/
 
     echo "Build statics"
     pushd ../front_end
-    npm run setBranding $CUSTOMIZATION
-    npm run build
+        npm run setBranding $CUSTOMIZATION
+        npm run build
+
+        # Save the repository info.
+        echo "Create version.txt" >&2
+        hg log -r . --repository "$DIR/../.." > dist/version.txt
+        cat dist/version.txt >&2
     popd
 
     echo "Move fonts"
