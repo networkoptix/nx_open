@@ -1202,7 +1202,8 @@ void QnResourceTreeModel::at_autoDiscoveryEnabledChanged()
 void QnResourceTreeModel::at_wearableManager_stateChanged(const WearableState& state)
 {
     QnResourcePtr resource = resourcePool()->getResourceById(state.cameraId);
-    NX_ASSERT(resource);
+    if (!resource)
+        return; //< Resource was removed while signal was in flight.
 
     auto node = ensureResourceNode(resource);
     node->update();
