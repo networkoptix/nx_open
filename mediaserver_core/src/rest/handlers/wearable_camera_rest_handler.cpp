@@ -229,7 +229,7 @@ int QnWearableCameraRestHandler::executeStatus(const QnRequestParams& params,
     reply.locked = info.locked;
     reply.consuming = uploader->isConsuming(cameraId);
     reply.userId = info.userId;
-    reply.progress = 0; // TODO: #wearable
+    reply.progress = uploader->state(cameraId).progress();
     result.setReply(reply);
 
     return nx_http::StatusCode::ok;
