@@ -74,7 +74,6 @@ private:
 
     ButtonList::const_iterator lowerBoundByTriggerButtonId(const QnUuid& ruleId) const;
 
-
     int triggerButtonInsertionIndexById(const QnUuid& id) const;
 
     void addSoftwareTriggerButton(

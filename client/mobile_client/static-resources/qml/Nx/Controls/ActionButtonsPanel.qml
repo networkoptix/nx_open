@@ -6,58 +6,65 @@ import com.networkoptix.qml 1.0
 
 import "private"
 
-ButtonsPanel
+Item
 {
     id: control
 
     property alias resourceId: buttonModel.resourceId
+    property alias contentWidth: panel.contentWidth
 
     signal ptzButtonClicked()
 
     signal twoWayAudioButtonPressed()
     signal twoWayAudioButtonReleased()
 
-    ActionButtonsHintControl
-    {
-        id: hintControl
+    implicitWidth: panel.implicitWidth
+    implicitHeight: panel.implicitHeight
 
-        x: parent.width - width
-        y: -(height + 4 + 4)
+    onResourceIdChanged:
+    {
+        hintControl.hide()
     }
 
-    onPressedChanged:
+    ButtonsPanel
     {
-        var type = d.modelDataAccessor.getData(index, "type")
-        if (type == ActionButtonsModel.TwoWayAudioButton)
-            d.handleTwoWayAudioPressed(index, pressed)
-        else if (type == ActionButtonsModel.SoftTriggerButton)
-            d.handleSoftwareTriggerPressed(index, pressed)
-    }
+        id: panel
 
-    onButtonClicked:
-    {
-        var type = d.modelDataAccessor.getData(index, "type")
-        switch(type)
+        anchors.fill: parent
+        onPressedChanged:
         {
-            case ActionButtonsModel.PtzButton:
-                ptzButtonClicked()
-                break
-            case ActionButtonsModel.TwoWayAudioButton:
-                hintControl.showHint(
-                    d.modelDataAccessor.getData(index, "hint"),
-                    d.modelDataAccessor.getData(index, "iconPath"))
-                break
-            case ActionButtonsModel.SoftTriggerButton:
-                d.handleSoftwareTriggerClicked(index)
-                break
+            var type = d.modelDataAccessor.getData(index, "type")
+            if (type == ActionButtonsModel.TwoWayAudioButton)
+                d.handleTwoWayAudioPressed(index, pressed)
+            else if (type == ActionButtonsModel.SoftTriggerButton)
+                d.handleSoftwareTriggerPressed(index, pressed)
         }
-    }
 
-    model:
-        ActionButtonsModel
+        onButtonClicked:
         {
-            id: buttonModel
+            var type = d.modelDataAccessor.getData(index, "type")
+            switch(type)
+            {
+                case ActionButtonsModel.PtzButton:
+                    ptzButtonClicked()
+                    break
+                case ActionButtonsModel.TwoWayAudioButton:
+                    hintControl.showHint(
+                        d.modelDataAccessor.getData(index, "hint"),
+                        d.modelDataAccessor.getData(index, "iconPath"))
+                    break
+                case ActionButtonsModel.SoftTriggerButton:
+                    d.handleSoftwareTriggerClicked(index)
+                    break
+            }
         }
+
+        model:
+            ActionButtonsModel
+            {
+                id: buttonModel
+            }
+    }
 
     readonly property QtObject d:
         QtObject
@@ -152,6 +159,14 @@ ButtonsPanel
                 }
             }
         }
+
+    ActionButtonsHintControl
+    {
+        id: hintControl
+
+        x: parent.width - width
+        y: -(height + 4 + 4)
+    }
 
     Component
     {

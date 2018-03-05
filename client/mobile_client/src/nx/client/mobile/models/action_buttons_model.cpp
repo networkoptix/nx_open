@@ -321,7 +321,6 @@ void ActionButtonsModel::addSoftwareTriggerButton(
     bool prolonged,
     bool enabled)
 {
-    const auto index = triggerButtonInsertionIndexById(id);
     insertButton(triggerButtonInsertionIndexById(id),
         SoftwareButton::create(id, iconPath, name, prolonged, enabled));
 }
