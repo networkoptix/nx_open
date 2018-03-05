@@ -157,7 +157,9 @@ def mediaserver_deb(request, bin_dir):
                 "Customization {!r} provided by --customization option "
                 "doesn't match customization {!r} from .deb file. "
                 "This option is maintained for backward compatibility, "
-                "either don't use it or make sure it matches .deb file.")
+                "either don't use it or make sure it matches .deb file.".format(
+                    customization_from_command_line,
+                    deb.customization))
     return deb
 
 
