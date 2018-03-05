@@ -49,6 +49,7 @@
 #include <client/self_updater.h>
 
 #include <nx/network/app_info.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/timer_manager.h>

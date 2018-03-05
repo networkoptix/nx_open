@@ -1,5 +1,3 @@
-#pragma once
-
 #include <nx/fusion/model_functions.h>
 #include "validate_result.h"
 

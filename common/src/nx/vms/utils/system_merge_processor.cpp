@@ -3,8 +3,10 @@
 #include <chrono>
 
 #include <nx/fusion/serialization/json.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/http/http_client.h>
+#include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 
 #include <api/global_settings.h>
@@ -223,7 +225,7 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::checkWhetherMergeIsPo
             "Local customization %1, cloud host %2, "
             "remote customization %3, cloud host %4, version %5")
             .arg(QnAppInfo::customizationName())
-            .arg(nx::network::AppInfo::defaultCloudHost())
+            .arg(nx::network::SocketGlobals::cloud().cloudHost())
             .arg(m_remoteModuleInformation.customization)
             .arg(m_remoteModuleInformation.cloudHost)
             .arg(m_remoteModuleInformation.version.toString()),

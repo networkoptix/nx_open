@@ -1,5 +1,6 @@
 #include "basic_cloud_module_url_fetcher.h"
 
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
 
 namespace nx {
@@ -39,7 +40,7 @@ VeryBasicCloudModuleUrlFetcher::VeryBasicCloudModuleUrlFetcher():
 {
 }
 
-void VeryBasicCloudModuleUrlFetcher::setModulesXmlUrl(QUrl url)
+void VeryBasicCloudModuleUrlFetcher::setModulesXmlUrl(nx::utils::Url url)
 {
     m_modulesXmlUrl = std::move(url);
 }

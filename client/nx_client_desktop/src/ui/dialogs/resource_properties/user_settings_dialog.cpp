@@ -3,6 +3,8 @@
 
 #include <QtWidgets/QPushButton>
 
+#include <nx/network/app_info.h>
+
 #include <client_core/connection_context_aware.h>
 
 #include <core/resource_management/resource_pool.h>

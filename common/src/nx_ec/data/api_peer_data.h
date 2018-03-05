@@ -5,6 +5,7 @@
 #include "nx/utils/latin1_array.h"
 #include <nx_ec/ec_proto_version.h>
 #include <nx/network/http/http_types.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
 
 namespace ec2 {

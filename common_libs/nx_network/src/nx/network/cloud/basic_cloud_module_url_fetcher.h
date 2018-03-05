@@ -157,9 +157,6 @@ protected:
 
         m_requestIsRunning = true;
 
-        if (m_modulesXmlUrl.isEmpty())
-            m_modulesXmlUrl = AppInfo::defaultCloudModulesXmlUrl();
-
         m_httpClient->doGet(
             m_modulesXmlUrl,
             std::bind(&BasicCloudModuleUrlFetcher::onHttpClientDone, this, _1));
