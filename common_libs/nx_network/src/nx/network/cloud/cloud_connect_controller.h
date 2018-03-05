@@ -6,8 +6,6 @@
 
 #include <QtCore/QString>
 
-#include <nx/kit/ini_config.h>
-
 namespace nx {
 
 namespace hpm { namespace api { class MediatorConnector; } }
@@ -27,14 +25,6 @@ namespace tcp { class ReverseConnectionPool; }
 
 struct NX_NETWORK_API CloudConnectControllerImpl;
 
-struct NX_NETWORK_API Ini:
-    nx::kit::IniConfig
-{
-    Ini();
-
-    NX_INI_FLAG(0, disableCloudSockets, "Use plain TCP sockets instead of Cloud sockets");
-};
-
 class NX_NETWORK_API CloudConnectController
 {
 public:
@@ -52,8 +42,6 @@ public:
     OutgoingTunnelPool& outgoingTunnelPool();
     CloudConnectSettings& settings();
     tcp::ReverseConnectionPool& tcpReversePool();
-
-    const Ini& ini() const;
 
     /**
      * Deletes all objects and creates them.
