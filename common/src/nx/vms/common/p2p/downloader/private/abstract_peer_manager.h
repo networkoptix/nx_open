@@ -61,7 +61,9 @@ public:
 
     using ValidateCallback = std::function<void(bool, rest::Handle)>;
     virtual rest::Handle validateFileInformation(
-        const FileInformation& fileInformation, ValidateCallback callback) = 0;
+        const QnUuid& peerId,
+        const FileInformation& fileInformation,
+        ValidateCallback callback) = 0;
 
     virtual void cancelRequest(const QnUuid& peerId, rest::Handle handle) = 0;
 };
