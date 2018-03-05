@@ -164,7 +164,7 @@ void QnTransactionTcpProcessor::run()
         nx::network::http::StringType::number(nx_ec::EC2_PROTO_VERSION)));
     d->response.headers.insert(nx::network::http::HttpHeader(
         Qn::EC2_CLOUD_HOST_HEADER_NAME,
-        nx::network::SocketGlobals::cloudHost().toUtf8()));
+        nx::network::SocketGlobals::cloud().cloudHost().toUtf8()));
     d->response.headers.insert(nx::network::http::HttpHeader(
         Qn::EC2_SYSTEM_ID_HEADER_NAME,
         commonModule->globalSettings()->localSystemId().toByteArray()));
@@ -218,7 +218,7 @@ void QnTransactionTcpProcessor::run()
             nx::network::http::StringType::number(nx_ec::EC2_PROTO_VERSION)));
         d->response.headers.insert(nx::network::http::HttpHeader(
             Qn::EC2_CLOUD_HOST_HEADER_NAME,
-            nx::network::SocketGlobals::cloudHost().toUtf8()));
+            nx::network::SocketGlobals::cloud().cloudHost().toUtf8()));
 
         d->response.headers.insert(nx::network::http::HttpHeader(
             Qn::EC2_SYSTEM_ID_HEADER_NAME,

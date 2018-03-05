@@ -793,7 +793,7 @@ ApiPeerDataEx MessageBus::localPeerEx() const
     result.instanceId = commonModule()->runningInstanceGUID();
     result.systemId = commonModule()->globalSettings()->localSystemId();
     result.peerType = m_localPeerType;
-    result.cloudHost = nx::network::SocketGlobals::cloudHost();
+    result.cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
     result.identityTime = commonModule()->systemIdentityTime();
     result.aliveUpdateIntervalMs = std::chrono::duration_cast<std::chrono::milliseconds>
         (commonModule()->globalSettings()->aliveUpdateInterval()).count();

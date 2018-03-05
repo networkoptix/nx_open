@@ -1,6 +1,7 @@
 #include "cloud_connect_controller.h"
 
 #include <nx/network/address_resolver.h>
+#include <nx/network/app_info.h>
 #include <nx/utils/argument_parser.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
@@ -19,6 +20,7 @@ namespace cloud {
 
 struct CloudConnectControllerImpl
 {
+    QString cloudHost;
     aio::AIOService* aioService;
     AddressResolver* addressResolver;
     hpm::api::MediatorConnector mediatorConnector;
@@ -29,9 +31,11 @@ struct CloudConnectControllerImpl
     Ini ini;
 
     CloudConnectControllerImpl(
+        const QString& customCloudHost,
         aio::AIOService* aioService,
         AddressResolver* addressResolver)
         :
+        cloudHost(!customCloudHost.isEmpty() ? customCloudHost : AppInfo::defaultCloudHostName()),
         aioService(aioService),
         addressResolver(addressResolver),
         addressPublisher(mediatorConnector.systemConnection()),
@@ -74,10 +78,12 @@ Ini::Ini():
 //-------------------------------------------------------------------------------------------------
 
 CloudConnectController::CloudConnectController(
+    const QString& customCloudHost,
     aio::AIOService* aioService,
     AddressResolver* addressResolver)
     :
-    m_impl(std::make_unique<CloudConnectControllerImpl>(aioService, addressResolver))
+    m_impl(std::make_unique<CloudConnectControllerImpl>(
+        customCloudHost, aioService, addressResolver))
 {
 }
 
@@ -89,6 +95,11 @@ void CloudConnectController::applyArguments(const utils::ArgumentParser& argumen
 {
     loadSettings(arguments);
     applySettings();
+}
+
+const QString& CloudConnectController::cloudHost() const
+{
+    return m_impl->cloudHost;
 }
 
 hpm::api::MediatorConnector& CloudConnectController::mediatorConnector()
@@ -123,13 +134,15 @@ const Ini& CloudConnectController::ini() const
 
 void CloudConnectController::reinitialize()
 {
+    auto cloudHost = m_impl->cloudHost;
     auto aioService = m_impl->aioService;
     auto addressResolver = m_impl->addressResolver;
     const auto ownPeerId = outgoingTunnelPool().ownPeerId();
 
     m_impl.reset();
 
-    m_impl = std::make_unique<CloudConnectControllerImpl>(aioService, addressResolver);
+    m_impl = std::make_unique<CloudConnectControllerImpl>(
+        cloudHost, aioService, addressResolver);
     applySettings();
     outgoingTunnelPool().setOwnPeerId(ownPeerId);
 }

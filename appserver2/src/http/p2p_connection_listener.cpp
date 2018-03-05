@@ -71,7 +71,7 @@ ec2::ApiPeerDataEx ConnectionProcessor::localPeer() const
     localPeer.systemId = commonModule()->globalSettings()->localSystemId();
 
     localPeer.peerType = Qn::PT_Server;
-    localPeer.cloudHost = nx::network::SocketGlobals::cloudHost();
+    localPeer.cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
     localPeer.identityTime = commonModule()->systemIdentityTime();
     localPeer.aliveUpdateIntervalMs = std::chrono::duration_cast<std::chrono::milliseconds>(
         commonModule()->globalSettings()->aliveUpdateInterval()).count();
@@ -121,13 +121,13 @@ bool ConnectionProcessor::isPeerCompatible(const ec2::ApiPeerDataEx& remotePeer)
     }
     if (remotePeer.peerType == Qn::PT_Server)
     {
-        if (nx::network::SocketGlobals::cloudHost() != remotePeer.cloudHost)
+        if (nx::network::SocketGlobals::cloud().cloudHost() != remotePeer.cloudHost)
         {
             NX_LOG(this,
                 lm("Reject incoming P2P connection from peer %1 because they have different built in cloud host setting. "
                     "Local peer host: %2, remote peer host: %3")
                 .arg(d->socket->getForeignAddress().address.toString())
-                .arg(nx::network::SocketGlobals::cloudHost())
+                .arg(nx::network::SocketGlobals::cloud().cloudHost())
                 .arg(remotePeer.cloudHost),
                 cl_logWARNING);
             return false;

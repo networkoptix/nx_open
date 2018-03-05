@@ -34,7 +34,7 @@ QnModuleInformation::QnModuleInformation():
     realm(nx::network::AppInfo::realm()),
     ecDbReadOnly(false),
     cloudSystemId(),
-    cloudHost(nx::network::SocketGlobals::cloudHost())
+    cloudHost(nx::network::SocketGlobals::cloud().cloudHost())
 {
 }
 

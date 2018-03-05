@@ -76,7 +76,7 @@ QString QnConnectionDiagnosticsHelper::getErrorDescription(
     {
         addRow(lit("Protocol: %1, Cloud: %2")
             .arg(QnAppInfo::ec2ProtoVersion())
-            .arg(nx::network::SocketGlobals::cloudHost()));
+            .arg(nx::network::SocketGlobals::cloud().cloudHost()));
     }
 
     addRow(tr("Server version: %1.").arg(connectionInfo.version.toString()));
@@ -303,7 +303,7 @@ QString QnConnectionDiagnosticsHelper::getDiffVersionFullExtras(
     {
         devModeText += L'\n' + lit("Client Protocol: %1").arg(QnAppInfo::ec2ProtoVersion());
         devModeText += L'\n' + lit("Server Protocol: %1").arg(serverInfo.nxClusterProtoVersion);
-        devModeText += L'\n' + lit("Client Cloud Host: %1").arg(nx::network::SocketGlobals::cloudHost());
+        devModeText += L'\n' + lit("Client Cloud Host: %1").arg(nx::network::SocketGlobals::cloud().cloudHost());
         devModeText += L'\n' + lit("Server Cloud Host: %1").arg(serverInfo.cloudHost);
     }
 

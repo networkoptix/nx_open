@@ -106,7 +106,7 @@ int runApplication(QtSingleApplication* application, const QnStartupParameters& 
             });
 
         QUrl url(nx::network::AppInfo::defaultCloudPortalUrl(
-            nx::network::SocketGlobals::cloudHost()));
+            nx::network::SocketGlobals::cloud().cloudHost()));
         url.setPath(lit("/api/utils/visitedKey"));
         qDebug() << "Sending Cloud Portal Confirmation to" << url.toString();
 

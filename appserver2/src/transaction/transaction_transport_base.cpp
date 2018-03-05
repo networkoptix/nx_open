@@ -1238,14 +1238,14 @@ void QnTransactionTransportBase::at_responseReceived(const nx::network::http::As
         }
 
         const QString remotePeerCloudHost = ec2CloudHostItr == client->response()->headers.end()
-            ? nx::network::SocketGlobals::cloudHost()
+            ? nx::network::SocketGlobals::cloud().cloudHost()
             : QString::fromUtf8(ec2CloudHostItr->second);
 
-        if (nx::network::SocketGlobals::cloudHost() != remotePeerCloudHost)
+        if (nx::network::SocketGlobals::cloud().cloudHost() != remotePeerCloudHost)
         {
             NX_LOG(lm("Cannot connect to server %1 because they have different built in cloud host setting. "
                 "Local peer host: %2, remote peer host: %3").
-                arg(client->url()).arg(nx::network::SocketGlobals::cloudHost()).arg(remotePeerCloudHost),
+                arg(client->url()).arg(nx::network::SocketGlobals::cloud().cloudHost()).arg(remotePeerCloudHost),
                 cl_logWARNING);
             cancelConnecting();
             return;

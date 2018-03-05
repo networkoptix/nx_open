@@ -78,7 +78,7 @@ void QnCrossdomainConnectionProcessor::run()
             lines.removeAt(i);
             const QString portalUrl =
                 QUrl(nx::network::AppInfo::defaultCloudModulesXmlUrl(
-                    nx::network::SocketGlobals::cloudHost())).host();
+                    nx::network::SocketGlobals::cloud().cloudHost())).host();
             if (!portalUrl.isEmpty())
                 lines.insert(i, pattern.replace(kCrossdomainPattern, portalUrl.toUtf8()));
         }

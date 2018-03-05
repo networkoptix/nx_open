@@ -35,7 +35,7 @@ CloudInstanceSelectionAttributeNameset::CloudInstanceSelectionAttributeNameset()
 //-------------------------------------------------------------------------------------------------
 
 VeryBasicCloudModuleUrlFetcher::VeryBasicCloudModuleUrlFetcher():
-    m_modulesXmlUrl(AppInfo::defaultCloudModulesXmlUrl(nx::network::SocketGlobals::cloudHost()))
+    m_modulesXmlUrl(AppInfo::defaultCloudModulesXmlUrl(nx::network::SocketGlobals::cloud().cloudHost()))
 {
 }
 

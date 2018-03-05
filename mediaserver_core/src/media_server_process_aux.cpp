@@ -222,7 +222,7 @@ public:
     virtual bool isCloudInstanceChanged() const override
     {
         return !qnGlobalSettings->cloudHost().isEmpty() &&
-                qnGlobalSettings->cloudHost() != nx::network::SocketGlobals::cloudHost();
+                qnGlobalSettings->cloudHost() != nx::network::SocketGlobals::cloud().cloudHost();
     }
 
     virtual bool isConnectedToCloud() const override

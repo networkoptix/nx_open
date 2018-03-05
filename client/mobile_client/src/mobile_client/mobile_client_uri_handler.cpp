@@ -60,7 +60,7 @@ void QnMobileClientUriHandler::handleUrl(const nx::utils::Url& url)
     }
 
     if (uri.protocol() != SystemUri::Protocol::Native
-        && uri.domain() != nx::network::SocketGlobals::cloudHost())
+        && uri.domain() != nx::network::SocketGlobals::cloud().cloudHost())
     {
         if (uri.scope() == SystemUri::Scope::Generic)
         {

@@ -156,7 +156,7 @@ struct ApiPeerDataEx: public ApiPeerData
     ApiPeerDataEx(const ApiPeerData& data) : ApiPeerData(data) {}
 
     QnUuid systemId;
-    QString cloudHost = nx::network::SocketGlobals::cloudHost();
+    QString cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
     qint64 identityTime = 0;
     int aliveUpdateIntervalMs = 0;
     int protoVersion = nx_ec::INITIAL_EC2_PROTO_VERSION;

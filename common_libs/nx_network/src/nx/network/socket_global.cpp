@@ -112,9 +112,8 @@ bool Ini::isHostDisabled(const HostAddress& host) const
 //-------------------------------------------------------------------------------------------------
 // SocketGlobals
 
-SocketGlobals::SocketGlobals(int initializationFlags, const QString& customCloudHost):
-    m_impl(std::make_unique<SocketGlobalsImpl>()),
-    m_cloudHost(!customCloudHost.isEmpty() ? customCloudHost : AppInfo::defaultCloudHostName())
+SocketGlobals::SocketGlobals(int initializationFlags):
+    m_impl(std::make_unique<SocketGlobalsImpl>())
 {
     m_impl->m_initializationFlags = initializationFlags;
     if (m_impl->m_initializationFlags & InitializationFlags::disableUdt)
@@ -160,11 +159,6 @@ int SocketGlobals::initializationFlags()
     return s_instance->m_impl->m_initializationFlags;
 }
 
-const QString& SocketGlobals::cloudHost()
-{
-    return s_instance->m_cloudHost;
-}
-
 void SocketGlobals::init(
     int initializationFlags,
     const QString& customCloudHost)
@@ -174,11 +168,11 @@ void SocketGlobals::init(
     if (++s_counter == 1) //< First in.
     {
         s_initState = InitState::inintializing; //< Allow creating Pollable(s) in constructor.
-        s_instance = new SocketGlobals(initializationFlags, customCloudHost);
+        s_instance = new SocketGlobals(initializationFlags);
 
         s_instance->initializeNetworking();
         // TODO: #ak Disable cloud based on m_initializationFlags.
-        s_instance->initializeCloudConnectivity();
+        s_instance->initializeCloudConnectivity(customCloudHost);
 
         s_initState = InitState::done;
 
@@ -267,9 +261,10 @@ void SocketGlobals::initializeNetworking()
     m_impl->m_debugIniReloadTimer = std::make_unique<aio::Timer>();
 }
 
-void SocketGlobals::initializeCloudConnectivity()
+void SocketGlobals::initializeCloudConnectivity(const QString& customCloudHost)
 {
     m_impl->cloudConnectController = std::make_unique<cloud::CloudConnectController>(
+        customCloudHost,
         &m_impl->m_aioServiceGuard.aioService(),
         m_impl->m_addressResolver.get());
 }

@@ -76,7 +76,7 @@ private:
     /**
      * @param initializationFlags Bitset of nx::network::InitializationFlags.
      */
-    SocketGlobals(int initializationFlags, const QString& customCloudHost);
+    SocketGlobals(int initializationFlags);
     ~SocketGlobals();
 
     SocketGlobals(const SocketGlobals&) = delete;
@@ -86,7 +86,7 @@ private:
 
     void initializeNetworking();
 
-    void initializeCloudConnectivity();
+    void initializeCloudConnectivity(const QString& customCloudHost);
     void deinitializeCloudConnectivity();
 };
 
