@@ -39,24 +39,20 @@ public:
     void setResourceId(const QString& id);
 
     Q_INVOKABLE bool activateTrigger(const QnUuid& id);
-    Q_INVOKABLE bool deactivateTrigger(const QnUuid& id);
-    Q_INVOKABLE void cancelTriggerAction(const QnUuid& id);
+    Q_INVOKABLE bool deactivateTrigger();
+    Q_INVOKABLE void cancelTriggerAction();
 
 signals:
     void resourceIdChanged();
 
     void triggerActivated(const QnUuid& id, bool success);
     void triggerDeactivated(const QnUuid& id);
+    void triggerCancelled(const QnUuid& id);
 
 private:
-    void cancelAllTriggers();
-
     bool setTriggerState(const QnUuid& id, vms::event::EventState state);
 
 private:
-    using IdToHandleHash = QHash<QnUuid, rest::Handle>;
-    using HandleToIdHash = QHash<rest::Handle, QnUuid>;
-
     QnCommonModule* const m_commonModule = nullptr;
     QnUserWatcher* const m_userWatcher = nullptr;
     QnResourceAccessManager* const m_accessManager = nullptr;
@@ -64,8 +60,8 @@ private:
 
 
     QnUuid m_resourceId;
-    IdToHandleHash m_idToHandle;
-    HandleToIdHash m_handleToId;
+    rest::Handle m_currentHandle;
+    QnUuid m_activeTriggerId;
 };
 
 } // namespace mobile

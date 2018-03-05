@@ -45,35 +45,64 @@ void SoftwareTriggersController::setResourceId(const QString& id)
     if (m_resourceId.isNull())
         NX_EXPECT(false, "Resource is not camera");
 
-    cancelAllTriggers();
+    cancelTriggerAction();
     emit resourceIdChanged();
 }
 
 bool SoftwareTriggersController::activateTrigger(const QnUuid& id)
 {
-    const auto rule = m_ruleManager->rule(id);
-    const auto state = rule->isActionProlonged()
-        ? vms::event::EventState::active
-        : vms::event::EventState::undefined;
-    return setTriggerState(id, state);
-}
-
-bool SoftwareTriggersController::deactivateTrigger(const QnUuid& id)
-{
-    const auto rule = m_ruleManager->rule(id);
-    if (!rule->isActionProlonged())
+    if (!m_activeTriggerId.isNull())
     {
-        NX_EXPECT(false, "Action is not prolonged");
+        NX_EXPECT(false, "Can't activate trigger while another in progress");
         return false;
     }
 
-    return setTriggerState(id, vms::event::EventState::inactive);
+    const auto rule = m_ruleManager->rule(id);
+    if (!rule)
+    {
+        NX_EXPECT(false, "Not rule for specified trigger");
+        return false;
+    }
+
+    m_activeTriggerId = id;
+    const auto state = rule->isActionProlonged()
+        ? vms::event::EventState::active
+        : vms::event::EventState::undefined;
+    const bool result = setTriggerState(id, state);
+    if (!result)
+        m_activeTriggerId = QnUuid();
+
+    return result;
 }
 
-void SoftwareTriggersController::cancelTriggerAction(const QnUuid& id)
+bool SoftwareTriggersController::deactivateTrigger()
 {
-    if (m_idToHandle.remove(id))
-        emit triggerDeactivated(id);
+    if (m_activeTriggerId.isNull())
+        return false; // May be when activation failed.
+
+    const auto rule = m_ruleManager->rule(m_activeTriggerId);
+    if (!rule || !rule->isActionProlonged())
+    {
+        NX_EXPECT(rule, "No rule for specified trigger");
+        NX_EXPECT(rule->isActionProlonged(), "Action is not prolonged");
+        return false;
+    }
+
+    return setTriggerState(m_activeTriggerId, vms::event::EventState::inactive);
+}
+
+void SoftwareTriggersController::cancelTriggerAction()
+{
+    if (m_activeTriggerId.isNull())
+        return;
+
+    const auto rule = m_ruleManager->rule(m_activeTriggerId);
+    if (rule && rule->isActionProlonged())
+        deactivateTrigger();
+
+    const auto currentTriggerId = m_activeTriggerId;
+    m_activeTriggerId = QnUuid();
+    emit triggerCancelled(currentTriggerId);
 }
 
 bool SoftwareTriggersController::setTriggerState(const QnUuid& id, vms::event::EventState state)
@@ -96,43 +125,34 @@ bool SoftwareTriggersController::setTriggerState(const QnUuid& id, vms::event::E
         return false;
     }
 
-    if (m_idToHandle.contains(id))
-    {
-        NX_EXPECT(false, "Trigger action is in progress");
-        return false;
-    }
-
     const auto callback =
-         [this, state](bool success, rest::Handle handle, const QnJsonRestResult& result)
+        [this, state](bool success, rest::Handle handle, const QnJsonRestResult& result)
         {
-            const auto it = m_handleToId.find(handle);
-            if (it == m_handleToId.end())
+            if (handle != m_currentHandle)
                 return;
 
-            const auto id = it.value();
-            m_handleToId.erase(it);
-            m_idToHandle.remove(id);
+            m_currentHandle = rest::Handle();
+            if (m_activeTriggerId.isNull())
+                return; // Action cancelled.
 
-            if (state == vms::event::EventState::inactive)
-                emit triggerDeactivated(id);
+            const auto currentId = m_activeTriggerId;
+            const bool inactiveState = state == nx::vms::event::EventState::inactive;
+            if (inactiveState || state == nx::vms::event::EventState::undefined)
+                m_activeTriggerId = QnUuid();
+
+            if (inactiveState)
+                triggerDeactivated(currentId);
             else
-                emit triggerActivated(id, success && result.error == QnRestResult::NoError);
+                triggerActivated(currentId, success && result.error == QnRestResult::NoError);
+
         };
 
     const auto connection = m_commonModule->currentServer()->restConnection();
-    const auto handle = connection->softwareTriggerCommand(
+    m_currentHandle = connection->softwareTriggerCommand(
         m_resourceId, rule->eventParams().inputPortId, state,
         QnGuardedCallback<decltype(callback)>(this, callback), QThread::currentThread());
 
-    m_handleToId.insert(handle, id);
-    m_idToHandle.insert(id, handle);
     return true;
-}
-
-void SoftwareTriggersController::cancelAllTriggers()
-{
-    for (const auto id: m_idToHandle.keys())
-        cancelTriggerAction(id);
 }
 
 } // namespace mobile

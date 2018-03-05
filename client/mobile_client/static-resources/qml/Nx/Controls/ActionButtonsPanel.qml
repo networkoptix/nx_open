@@ -25,11 +25,6 @@ ButtonsPanel
         y: -(height + 4 + 4)
     }
 
-    onResourceIdChanged:
-    {
-        //TODO: reset states of buttons
-    }
-
     onPressedChanged:
     {
         var type = d.modelDataAccessor.getData(index, "type")
@@ -85,7 +80,7 @@ ButtonsPanel
                         var prolonged = d.modelDataAccessor.getData(index, "prolongedTrigger")
 
                         if (!success)
-                            hintControl.showError(text)
+                            hintControl.showFailure(text, prolonged)
                         else if (!prolonged)
                             hintControl.showSuccess(text, false)
                     }
@@ -96,6 +91,11 @@ ButtonsPanel
                         var text = d.modelDataAccessor.getData(index, "hint")
                         if (d.modelDataAccessor.getData(index, "prolongedTrigger"))
                             hintControl.showSuccess(text, true)
+                    }
+
+                    onTriggerCancelled:
+                    {
+                        hintControl.hide()
                     }
                 }
 
@@ -128,7 +128,7 @@ ButtonsPanel
                 if (triggersController.activateTrigger(id))
                     hintControl.showPreloader(text)
                 else
-                    hintControl.showError(text, false)
+                    hintControl.showFailure(text, false)
             }
 
             function handleSoftwareTriggerPressed(index, pressed)
@@ -143,7 +143,7 @@ ButtonsPanel
                     if (triggersController.activateTrigger(id))
                         hintControl.showPreloader(text)
                     else
-                        hintControl.showError(text, d.modelDataAccessor.getData(index, "iconPath"))
+                        hintControl.showFailure(text, true)
                 }
                 else
                 {

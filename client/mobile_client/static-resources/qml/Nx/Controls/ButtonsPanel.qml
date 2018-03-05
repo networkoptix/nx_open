@@ -5,7 +5,7 @@ Item
     id: control
 
     property alias model: buttonRepeater.model
-    property int pressedStateFilterMs: 200
+    property int pressedStateFilterMs: 500
 
     signal buttonClicked(int index)
     signal pressedChanged(int index, bool pressed)
