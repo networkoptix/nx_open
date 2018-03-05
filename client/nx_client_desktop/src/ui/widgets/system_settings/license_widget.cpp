@@ -72,19 +72,23 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent) :
     setPaletteColor(ui->manualActivationTextWidget, QPalette::WindowText,
         ui->manualActivationTextWidget->palette().color(QPalette::Light));
 
-    QString emailUrl(QnAppInfo::licensingEmailAddress());
-    QnEmailAddress licensingEmail(emailUrl);
+    const QString licensingAddress(QnAppInfo::licensingEmailAddress());
+    const QnEmailAddress licensingEmail(licensingAddress);
     QString activationText;
     if (licensingEmail.isValid())
     {
-        const QString emailLink = makeMailHref(emailUrl, emailUrl);
+        const QString emailLink = makeMailHref(licensingAddress, licensingAddress);
         activationText =
             tr("Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.")
             .arg(emailLink);
     }
     else
     {
-        const QString siteLink = makeHref(emailUrl, emailUrl);
+        // Http links must be displayed on a separate string to avoid line break on "http://".
+        static const QString kLineBreak = lit("<br>");
+        const QString siteLink = kLineBreak
+            + makeHref(licensingAddress, licensingAddress)
+            + kLineBreak;
         activationText =
             tr("Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.")
             .arg(siteLink);

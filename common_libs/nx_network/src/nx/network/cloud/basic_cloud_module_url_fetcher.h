@@ -54,19 +54,34 @@ public:
 
 //-------------------------------------------------------------------------------------------------
 
+// TODO: #ak This class is an work around socket_global.h header dependency problem. Will be resolved in 4.0.
+class NX_NETWORK_API VeryBasicCloudModuleUrlFetcher:
+    public aio::BasicPollable
+{
+public:
+    VeryBasicCloudModuleUrlFetcher();
+
+    /**
+     * NOTE: Default value is taken from application settings.
+     */
+    void setModulesXmlUrl(QUrl url);
+
+protected:
+    QUrl m_modulesXmlUrl;
+};
+
 /**
  * Looks up online API url of a specified cloud module.
  */
 template<typename Handler>
 class BasicCloudModuleUrlFetcher:
-    public aio::BasicPollable
+    public VeryBasicCloudModuleUrlFetcher
 {
     using base_type = aio::BasicPollable;
 
 public:
     BasicCloudModuleUrlFetcher():
-        m_requestIsRunning(false),
-        m_modulesXmlUrl(AppInfo::defaultCloudModulesXmlUrl())
+        m_requestIsRunning(false)
     {
         // Preparing compatibility data.
         m_moduleToDefaultUrlScheme.emplace(kCloudDbModuleName, nx_http::kUrlSchemeName);
@@ -89,14 +104,6 @@ public:
         // We do not need mutex here since no one uses object anymore
         //    and internal events are delivered in same aio thread.
         m_httpClient.reset();
-    }
-
-    /**
-     * NOTE: Default value is taken from application settings.
-     */
-    void setModulesXmlUrl(QUrl url)
-    {
-        m_modulesXmlUrl = std::move(url);
     }
 
     void addAdditionalHttpHeaderForGetRequest(
@@ -192,7 +199,6 @@ private:
     const CloudInstanceSelectionAttributeNameset m_nameset;
     std::vector<Handler> m_resolveHandlers;
     bool m_requestIsRunning;
-    QUrl m_modulesXmlUrl;
     std::list<std::pair<nx::String, nx::String>> m_additionalHttpHeadersForGetRequest;
     std::map<QString, QString> m_moduleToDefaultUrlScheme;
 

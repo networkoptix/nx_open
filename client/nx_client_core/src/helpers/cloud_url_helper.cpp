@@ -67,7 +67,8 @@ QUrl QnCloudUrlHelper::viewSystemUrl() const
 
 QUrl QnCloudUrlHelper::makeUrl(const QString& path, bool auth) const
 {
-    SystemUri uri(nx::network::AppInfo::defaultCloudPortalUrl());
+    SystemUri uri(nx::network::AppInfo::defaultCloudPortalUrl(
+        nx::network::SocketGlobals::cloudHost()));
 
     if (auth)
     {

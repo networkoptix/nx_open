@@ -78,7 +78,7 @@ protected:
 
 TEST( TcpConnectionProcessor, sendAsyncData )
 {
-    QnStaticCommonModule staticCommon(Qn::PT_NotDefined, QString(), QString());
+    QnStaticCommonModule staticCommon;
 
     // TcpListener uses commonModule()->moduleGuid().
     QnCommonModule commonModule(false, nx::core::access::Mode::direct);

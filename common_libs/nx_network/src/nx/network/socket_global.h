@@ -69,7 +69,11 @@ public:
     static TcpReversePool& tcpReversePool() { return *s_instance->m_tcpReversePool; }
     static int initializationFlags() { return s_instance->m_initializationFlags; }
 
-    static void init(int initializationFlags = 0); /**< Should be called before any socket use */
+    static const QString& cloudHost();
+
+    static void init(
+        int initializationFlags = 0,
+        const QString& customCloudHost = QString()); /**< Should be called before any socket use */
     static void deinit(); /**< Should be called when sockets are not needed any more */
     static void verifyInitialization();
     static bool isInitialized();
@@ -98,7 +102,7 @@ private:
     /**
      * @param initializationFlags Bitset of nx::network::InitializationFlags.
      */
-    SocketGlobals(int initializationFlags);
+    SocketGlobals(int initializationFlags, const QString& customCloudHost);
     ~SocketGlobals();
     void setDebugIniReloadTimer();
 
@@ -150,6 +154,7 @@ private:
 
     QnMutex m_mutex;
     std::map<CustomInit, CustomDeinit> m_customInits;
+    QString m_cloudHost;
 
     void initializeCloudConnectivity();
 };

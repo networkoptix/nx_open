@@ -67,8 +67,9 @@ aio::AIOService& SocketGlobals::AioServiceGuard::aioService()
 //-------------------------------------------------------------------------------------------------
 // SocketGlobals
 
-SocketGlobals::SocketGlobals(int initializationFlags):
-    m_initializationFlags(initializationFlags)
+SocketGlobals::SocketGlobals(int initializationFlags, const QString& customCloudHost):
+    m_initializationFlags(initializationFlags),
+    m_cloudHost(!customCloudHost.isEmpty() ? customCloudHost : AppInfo::defaultCloudHostName())
 {
     if (m_initializationFlags & InitializationFlags::disableUdt)
         m_pollSetFactory.disableUdt();
@@ -103,13 +104,20 @@ SocketGlobals::~SocketGlobals()
     }
 }
 
-void SocketGlobals::init(int initializationFlags)
+const QString& SocketGlobals::cloudHost()
+{
+    return s_instance->m_cloudHost;
+}
+
+void SocketGlobals::init(
+    int initializationFlags,
+    const QString& customCloudHost)
 {
     QnMutexLocker lock(&s_mutex);
     if (++s_counter == 1) //< First in.
     {
         s_initState = InitState::inintializing; //< Allow creating Pollable(s) in constructor.
-        s_instance = new SocketGlobals(initializationFlags);
+        s_instance = new SocketGlobals(initializationFlags, customCloudHost);
 
         // TODO: #ak disable cloud based on m_initializationFlags.
         s_instance->initializeCloudConnectivity();
