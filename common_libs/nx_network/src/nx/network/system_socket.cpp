@@ -1763,7 +1763,7 @@ void UDPSocket::sendToAsync(
         if (!resolvedEndpoint.address.isIpAddress())
         {
             return post(std::bind(std::move(handler),
-                SystemError::addrNotAvailable,
+                SystemError::addressNotAvailable,
                 SocketAddress(),
                 (size_t)-1));
         }
