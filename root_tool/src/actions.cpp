@@ -115,7 +115,6 @@ int mount(Argument url, Argument directory, OptionalArgument username, OptionalA
     {
         try
         {
-            mountExceptionPtr = nullptr;
             if (execute(makeCommandString(candidate, passwordString)) == 0)
                 return 0;
         }
