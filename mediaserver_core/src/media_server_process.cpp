@@ -2909,7 +2909,7 @@ void MediaServerProcess::run()
         {
             if (settingsProxy->isCloudInstanceChanged())
                 qWarning() << "Cloud instance changed from" << globalSettings->cloudHost() <<
-                    "to" << nx::network::AppInfo::defaultCloudHost() << ". Server goes to the new state";
+                    "to" << nx::network::SocketGlobals::cloudHost() << ". Server goes to the new state";
 
             resetSystemState(cloudIntegrationManager->cloudManagerGroup().connectionManager);
         }
@@ -2933,7 +2933,7 @@ void MediaServerProcess::run()
 
             } while (errCode != ec2::ErrorCode::ok && !m_needStop);
         }
-        globalSettings->setCloudHost(nx::network::AppInfo::defaultCloudHost());
+        globalSettings->setCloudHost(nx::network::SocketGlobals::cloudHost());
         globalSettings->synchronizeNow();
     }
 

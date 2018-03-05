@@ -11,8 +11,11 @@
 #include <utils/common/scoped_value_rollback.h>
 
 namespace {
-const QString kApiDocPath = lit("/static/api.xml");
-const QString kApiDocFragment = lit("group_Server_API_method_createEvent");
+
+static const QString kDocumentationScheme = lit("http");
+static const QString kApiDocPath = lit("/static/api.xml");
+static const QString kApiDocFragment = lit("group_Server_API_method_createEvent");
+
 } // namespace
 
 QnCustomBusinessEventWidget::QnCustomBusinessEventWidget(QWidget* parent):
@@ -45,6 +48,7 @@ QnCustomBusinessEventWidget::QnCustomBusinessEventWidget(QWidget* parent):
                 return;
 
             nx::utils::Url targetUrl(server->getApiUrl());
+            targetUrl.setScheme(kDocumentationScheme);
             targetUrl.setPath(kApiDocPath);
             targetUrl.setFragment(kApiDocFragment);
             QDesktopServices::openUrl(targetUrl.toQUrl());

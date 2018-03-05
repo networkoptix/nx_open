@@ -112,8 +112,9 @@ bool Ini::isHostDisabled(const HostAddress& host) const
 //-------------------------------------------------------------------------------------------------
 // SocketGlobals
 
-SocketGlobals::SocketGlobals(int initializationFlags):
-    m_impl(std::make_unique<SocketGlobalsImpl>())
+SocketGlobals::SocketGlobals(int initializationFlags, const QString& customCloudHost):
+    m_impl(std::make_unique<SocketGlobalsImpl>()),
+    m_cloudHost(!customCloudHost.isEmpty() ? customCloudHost : AppInfo::defaultCloudHostName())
 {
     m_impl->m_initializationFlags = initializationFlags;
     if (m_impl->m_initializationFlags & InitializationFlags::disableUdt)
@@ -159,14 +160,21 @@ int SocketGlobals::initializationFlags()
     return s_instance->m_impl->m_initializationFlags;
 }
 
-void SocketGlobals::init(int initializationFlags)
+const QString& SocketGlobals::cloudHost()
+{
+    return s_instance->m_cloudHost;
+}
+
+void SocketGlobals::init(
+    int initializationFlags,
+    const QString& customCloudHost)
 {
     QnMutexLocker lock(&s_mutex);
 
     if (++s_counter == 1) //< First in.
     {
         s_initState = InitState::inintializing; //< Allow creating Pollable(s) in constructor.
-        s_instance = new SocketGlobals(initializationFlags);
+        s_instance = new SocketGlobals(initializationFlags, customCloudHost);
 
         s_instance->initializeNetworking();
         // TODO: #ak Disable cloud based on m_initializationFlags.

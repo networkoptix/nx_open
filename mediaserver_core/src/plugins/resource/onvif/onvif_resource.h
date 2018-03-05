@@ -67,13 +67,13 @@ struct OnvifResExtInfo
 
 struct QnOnvifServiceUrls
 {
-	QString deviceServiceUrl;
-	QString mediaServiceUrl;
-	QString ptzServiceUrl;
-	QString imagingServiceUrl;
-	QString anlyticsServiceUrl;
-	QString eventsServiceUrl;
-	QString thermalServiceUrl;
+    QString deviceServiceUrl;
+    QString mediaServiceUrl;
+    QString ptzServiceUrl;
+    QString imagingServiceUrl;
+    QString anlyticsServiceUrl;
+    QString eventsServiceUrl;
+    QString thermalServiceUrl;
 
 };
 
@@ -592,7 +592,7 @@ private:
     std::unique_ptr<QnOnvifMaintenanceProxy> m_maintenanceProxy;
     QElapsedTimer m_advSettingsLastUpdated;
     QnCameraAdvancedParamValueMap m_advancedParamsCache;
-	mutable QnOnvifServiceUrls m_serviceUrls;
+    mutable QnOnvifServiceUrls m_serviceUrls;
     mutable QnResourceVideoLayoutPtr m_videoLayout;
 
 protected:

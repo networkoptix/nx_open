@@ -1166,6 +1166,11 @@ CameraDiagnostics::Result HanwhaResource::initIo()
     return CameraDiagnostics::NoErrorResult();
 }
 
+static QString ptzCapabilityBits(Ptz::Capabilities capabilities)
+{
+    return QString::number(static_cast<int>(capabilities), 2);
+}
+
 CameraDiagnostics::Result HanwhaResource::initPtz()
 {
     removeProperty(Qn::DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME);
@@ -1178,14 +1183,23 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
         mainDescriptors,
         m_attributes,
         getChannel());
+    NX_VERBOSE(this, lm("%1: Supported PTZ capabilities direct: %2")
+        .args(getPhysicalId(), ptzCapabilityBits(m_ptzCapabilities)));
 
     if (isNvr() && m_isChannelConnectedViaSunapi)
     {
-        // We consider capability is true if it's supported both by a NVR and a camera.
-        m_ptzCapabilities &= calculateSupportedPtzCapabilities(
+        const auto pypassPtzCapabilities = calculateSupportedPtzCapabilities(
             kHanwhaCameraPtzCapabilityDescriptors,
             m_bypassDeviceAttributes,
             0); //< TODO: #dmishin is it correct for multichannel resources connected to a NVR?
+
+        NX_VERBOSE(this, lm("%1: Supported PTZ capabilities bypass: %2")
+            .args(getPhysicalId(), ptzCapabilityBits(pypassPtzCapabilities)));
+
+        // We consider capability is true if it's supported both by a NVR and a camera.
+        m_ptzCapabilities &= pypassPtzCapabilities;
+        NX_VERBOSE(this, lm("%1: Supported PTZ capabilities both: %2")
+            .args(getPhysicalId(), ptzCapabilityBits(m_ptzCapabilities)));
     }
 
     if ((m_ptzCapabilities & Ptz::AbsolutePtzCapabilities) == Ptz::AbsolutePtzCapabilities)
@@ -1204,6 +1218,8 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
     if (m_ptzTraits.contains(Ptz::ManualAutoFocusPtzTrait))
         m_ptzCapabilities |= Ptz::AuxilaryPtzCapability;
 
+    NX_DEBUG(this, lm("%1: Supported PTZ capabilities: %2")
+        .args(getPhysicalId(), ptzCapabilityBits(m_ptzCapabilities)));
     return CameraDiagnostics::NoErrorResult();
 }
 
@@ -1248,6 +1264,8 @@ CameraDiagnostics::Result HanwhaResource::initAlternativePtz()
         m_alternativePtzRanges[split.last()] = std::move(possibleValues);
     }
 
+    NX_VERBOSE(this, lm("%1: Supported PTZ capabilities alternative: %2")
+        .args(getPhysicalId(), ptzCapabilityBits(m_ptzCapabilities)));
     return CameraDiagnostics::NoErrorResult();
 }
 

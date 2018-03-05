@@ -6,6 +6,7 @@
 #include "connection_info.h"
 
 #include <nx/network/app_info.h>
+#include <nx/network/socket_global.h>
 
 #include <nx_ec/ec_proto_version.h>
 #include <utils/common/app_info.h>
@@ -15,7 +16,7 @@ QnConnectionInfo::QnConnectionInfo():
     nxClusterProtoVersion(nx_ec::INITIAL_EC2_PROTO_VERSION),
     ecDbReadOnly(false),
     newSystem(false),
-    cloudHost(nx::network::AppInfo::defaultCloudHost()),
+    cloudHost(nx::network::SocketGlobals::cloudHost()),
     p2pMode(false)
 {
 }

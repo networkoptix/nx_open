@@ -34,7 +34,7 @@ void PerformanceTest::detectLightMode()
     if (nx::utils::AppInfo::isLinux())
     {
         QString cpuName = QnPerformance::cpuName();
-        QRegExp poorCpuRegExp(lit("Intel\\(R\\) (Atom\\(TM\\)|Celeron\\(R\\)) CPU .*"));
+        QRegExp poorCpuRegExp(QLatin1String("Intel\\(R\\) (Atom\\(TM\\)|Celeron\\(R\\)) CPU .*"));
         poorCpu = poorCpuRegExp.exactMatch(cpuName);
         NX_LOG(lm("QnPerformanceTest: CPU: \"%1\" poor: %2").arg(cpuName).arg(poorCpu), cl_logINFO);
 

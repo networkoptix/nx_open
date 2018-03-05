@@ -289,7 +289,11 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     const auto brand = startupParams.isDevMode() ? QString() : QnAppInfo::productNameShort();
     const auto customization = startupParams.isDevMode() ? QString() : QnAppInfo::customizationName();
 
-    m_staticCommon.reset(new QnStaticCommonModule(clientPeerType, brand, customization));
+    m_staticCommon.reset(new QnStaticCommonModule(
+        clientPeerType,
+        brand,
+        customization,
+        QLatin1String(ini().cloudHost)));
 
     m_clientCoreModule.reset(new QnClientCoreModule());
 

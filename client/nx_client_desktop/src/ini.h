@@ -10,6 +10,7 @@ struct Ini: public nx::kit::IniConfig
 {
     Ini(): IniConfig("desktop_client.ini") {}
 
+    NX_INI_STRING("", cloudHost, "Overridden Cloud Host");
     NX_INI_FLAG(0, enableEntropixEnhancer, "Enable Entropix image enhancement controls.");
     NX_INI_STRING("http://96.64.226.250:8888/image",
         entropixEnhancerUrl, "URL of Entropix image enhancement API.");
