@@ -15,6 +15,19 @@ ListView
     implicitHeight: 48
 
     interactive: contentWidth > width
+
+    Image
+    {
+        source: lp("/images/bottom_panel_shadow_left.png")
+        anchors.left: parent.left
+    }
+
+    Image
+    {
+        source: lp("/images/bottom_panel_shadow_right.png")
+        anchors.right: parent.right
+    }
+
     delegate:
         IconButton
         {
