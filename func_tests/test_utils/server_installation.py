@@ -192,7 +192,7 @@ def install_mediaserver(os_access, mediaserver_deb, installation_root=DEFAULT_IN
             return found_installation
 
     customization = mediaserver_deb.customization
-    remote_path = PurePosixPath('/tmp') / 'func_tests' / customization.company_name / mediaserver_deb.path.name
+    remote_path = PurePosixPath('/tmp') / 'func_tests' / customization.company / mediaserver_deb.path.name
     os_access.mk_dir(remote_path.parent)
     os_access.put_file(mediaserver_deb.path, remote_path)
     # Commands and dependencies for Ubuntu 14.04 (ubuntu/trusty64 from Vagrant's Atlas).
@@ -214,7 +214,7 @@ def install_mediaserver(os_access, mediaserver_deb, installation_root=DEFAULT_IN
     installation = ServerInstallation(os_access, installation_root / customization.installation_subdir)
 
     assert installation.is_valid
-    service = UpstartService(os_access, customization.service_name)
+    service = UpstartService(os_access, customization.service)
     if not service.is_running():
         service.start()
     assert wait_until(lambda: _port_is_opened_on_server_machine(os_access, 7001))  # Opens after a while.

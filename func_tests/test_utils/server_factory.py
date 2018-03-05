@@ -45,7 +45,7 @@ class ServerFactory(object):
             api_url = '%s://%s:%d/' % (config.http_schema, vm_host_hostname, vm.config.rest_api_forwarded_port)
             server = Server(
                 name,
-                UpstartService(vm.os_access, self._mediaserver_deb.customization.service_name),
+                UpstartService(vm.os_access, self._mediaserver_deb.customization.service),
                 install_mediaserver(vm.os_access, self._mediaserver_deb),
                 RestApi(name, api_url, timeout=config.rest_api_timeout),
                 vm)

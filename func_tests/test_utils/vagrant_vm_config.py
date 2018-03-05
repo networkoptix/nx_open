@@ -9,9 +9,6 @@ SSH_PORT_OFFSET=2220
 
 class VagrantVMConfigFactory(object):
 
-    def __init__(self, customization_company_name):
-        self._customization_company_name = customization_company_name
-
     def __call__(self, name=None):
         return VagrantVMConfig(name)
 

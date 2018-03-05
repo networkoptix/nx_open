@@ -3,7 +3,6 @@
 import logging
 import uuid
 
-from test_utils.build_info import customization_from_company_name
 from test_utils.rest_api import RestApi
 from .os_access import SshAccessConfig
 from .server import Server
@@ -18,7 +17,6 @@ log = logging.getLogger(__name__)
 SERVER_CTL_TEMPLATE_PATH = 'server_ctl.sh.jinja2'
 SERVER_CONF_TEMPLATE_PATH = 'mediaserver.conf.jinja2'
 SERVER_PORT_BASE = 1700
-
 
 
 class PhysicalInstallationHostConfig(object):
@@ -64,8 +62,7 @@ class PhysicalInstallationCtl(object):
         assert is_list_inst(config_list, PhysicalInstallationHostConfig), repr(config_list)
         self.config_list = config_list
         self.installation_hosts = [
-            PhysicalInstallationHost.from_config(
-                config, deb_path, customization_from_company_name(customization_company_name), ca)
+            PhysicalInstallationHost.from_config(config, deb_path, customization_company_name, ca)
             for config in config_list]
         self._available_hosts = self.installation_hosts[:]
 
