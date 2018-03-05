@@ -62,9 +62,6 @@ cd %CUR_DIR_BAK%
 del /F /Q %TARGET_DIR%\sample\%PLUGIN_NAME%\Doxyfile
 
 
-goto End
-@rem rpi_cam compilation fails now
-
 @rem Copying rpi_cam plugin
 set PLUGIN_NAME=rpi_cam
 
@@ -85,5 +82,3 @@ cd %TARGET_DIR%\sample\%PLUGIN_NAME%\
 %environment%\bin\doxygen
 cd %CUR_DIR_BAK%
 del /F /Q %TARGET_DIR%\sample\%PLUGIN_NAME%\Doxyfile
-
-:End

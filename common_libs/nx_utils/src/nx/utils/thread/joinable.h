@@ -8,7 +8,7 @@
 
 
 //!Interface to wait for instance finishes its tasks before destruction
-class QN_EXPORT QnJoinable
+class NX_UTILS_API QnJoinable
 {
 public:
     virtual ~QnJoinable() {}

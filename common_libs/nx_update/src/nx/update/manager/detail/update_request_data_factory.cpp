@@ -1,5 +1,7 @@
-#include <nx/network/app_info.h>
 #include "update_request_data_factory.h"
+
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/socket_global.h>
 #include <utils/common/app_info.h>
 
 namespace nx {
@@ -14,7 +16,7 @@ update::info::UpdateFileRequestData UpdateFileRequestDataFactory::create()
         return s_factoryFunc();
 
     return update::info::UpdateFileRequestData(
-        nx::network::AppInfo::defaultCloudHost(),
+        nx::network::SocketGlobals::cloud().cloudHost(),
         QnAppInfo::customizationName(),
         QnSoftwareVersion(QnAppInfo::applicationVersion()),
         update::info::OsVersion(

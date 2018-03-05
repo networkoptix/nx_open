@@ -220,19 +220,11 @@ win* {
     QMAKE_LFLAGS += /MACHINE:${arch} /LARGEADDRESSAWARE
   }
 
-  !staticlib {
-    DEFINES += QN_EXPORT=Q_DECL_EXPORT
-  }
-  else {
-    DEFINES += QN_EXPORT=
-  }
-
   QMAKE_MOC_OPTIONS += -DQ_OS_WIN
 }
 
 ## BOTH LINUX AND MAC
 unix: {
-  DEFINES += QN_EXPORT=
   clang {
     QMAKE_CXXFLAGS += -Wno-c++14-extensions -Wno-inconsistent-missing-override
   } else {

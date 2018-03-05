@@ -24,6 +24,7 @@ private:
 };
 
 QnStorageResourceList getUnmountedStorages(const QnStorageResourceList& allServerStorages);
+bool isStorageUnmounted(const QnStorageResourcePtr& storage);
 
 class SystemNameProxy
 {

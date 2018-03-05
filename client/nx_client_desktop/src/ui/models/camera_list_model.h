@@ -24,13 +24,14 @@ public:
         FirmwareColumn,
         IpColumn,
         MacColumn,
+        LogicalIdColumn,
         ServerColumn,
         ColumnCount
     };
 
     QnCameraListModel(QObject *parent = NULL);
     virtual ~QnCameraListModel();
-    
+
     virtual QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
     virtual QModelIndex parent(const QModelIndex &child) const override;
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -50,14 +51,14 @@ private slots:
 
     void at_resource_parentIdChanged(const QnResourcePtr &resource);
     void at_resource_resourceChanged(const QnResourcePtr &resource);
-    
+
 
 private:
     bool cameraFits(const QnVirtualCameraResourcePtr &camera) const;
 
     QList<QnVirtualCameraResourcePtr> m_cameras;
     QnMediaServerResourcePtr m_server;
-    
+
 };
 
 #endif // __CAMERA_LIST_MODEL_H__

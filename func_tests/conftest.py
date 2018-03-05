@@ -26,7 +26,6 @@ from test_utils.vagrant_vm_config import VagrantVMConfigFactory
 JUNK_SHOP_PLUGIN_NAME = 'junk-shop-db-capture'
 
 DEFAULT_CLOUD_GROUP = 'test'
-DEFAULT_CUSTOMIZATION = 'default'
 
 DEFAULT_WORK_DIR = '/tmp/funtest'
 DEFAULT_MEDIASERVER_DIST_NAME = 'mediaserver.deb'  # in bin dir
@@ -56,6 +55,8 @@ def pytest_addoption(parser):
     parser.addoption('--bin-dir', type=Path, help=(
         'directory with binary files for tests: '
         'debian distributive and media sample are expected there'))
+    parser.addoption('--customization', default='default', help=(
+        "Manufacturer name or 'default'. Optional. Checked against customization from .deb file."))
     parser.addoption('--mediaserver-dist-path', type=Path, default=DEFAULT_MEDIASERVER_DIST_NAME, help=(
         'mediaserver package, relative to bin dir [%s]' % DEFAULT_MEDIASERVER_DIST_NAME))
     parser.addoption('--media-sample-path', type=Path, default=MEDIA_SAMPLE_PATH, help=(
@@ -148,7 +149,16 @@ def ca(work_dir):
 
 @pytest.fixture(scope='session')
 def mediaserver_deb(request, bin_dir):
-    return MediaserverDeb(bin_dir / request.config.getoption('--mediaserver-dist-path'))
+    deb = MediaserverDeb(bin_dir / request.config.getoption('--mediaserver-dist-path'))
+    customization_from_command_line = request.config.getoption('--customization')
+    if customization_from_command_line is not None:
+        if deb.customization.name != customization_from_command_line:
+            raise Exception(
+                "Customization {!r} provided by --customization option "
+                "doesn't match customization {!r} from .deb file. "
+                "This option is maintained for backward compatibility, "
+                "either don't use it or make sure it matches .deb file.")
+    return deb
 
 
 @pytest.fixture(scope='session', autouse=True)
@@ -201,13 +211,6 @@ def metrics_saver(junk_shop_repository):
     return MetricsSaver(db_capture_repository, current_test_run)
 
 
-@pytest.fixture(scope='session')
-def customization_company_name(mediaserver_deb):
-    company_name = mediaserver_deb.customization.company_name
-    log.info('Customization company name: %r', company_name)
-    return company_name
-
-
 @pytest.fixture(params=['http', 'https'])
 def http_schema(request):
     return request.param
@@ -221,13 +224,13 @@ def stream_type(request):
 @pytest.fixture()
 def cloud_host(request, mediaserver_deb):
     cloud_group = request.config.getoption('--cloud-group'),
-    return resolve_cloud_host_from_registry(cloud_group, mediaserver_deb.customization.company_name)
+    return resolve_cloud_host_from_registry(cloud_group, mediaserver_deb.customization.company)
 
 
 @pytest.fixture(scope='session')
-def session_vm_factory(request, vm_host, customization_company_name, ssh_config, bin_dir, work_dir):
+def session_vm_factory(request, vm_host, ssh_config, bin_dir, work_dir):
     """Create factory once per session, don't release VMs"""
-    config_factory = VagrantVMConfigFactory(customization_company_name)
+    config_factory = VagrantVMConfigFactory()
     factory = VagrantVMFactory(request.config.cache, ssh_config, vm_host, bin_dir, work_dir, config_factory)
     return factory
 
@@ -240,12 +243,12 @@ def vm_factory(session_vm_factory):
 
 
 @pytest.fixture(scope='session')
-def physical_installation_ctl(test_config, ca, mediaserver_deb, customization_company_name):
+def physical_installation_ctl(test_config, ca, mediaserver_deb):
     if not test_config:
         return None
     pic = PhysicalInstallationCtl(
         mediaserver_deb.path,
-        customization_company_name,
+        mediaserver_deb.customization.company,
         test_config.physical_installation_host_list,
         ca)
     return pic
@@ -278,7 +281,7 @@ def lightweight_servers_factory(bin_dir, ca, artifact_factory, physical_installa
 def cloud_account_factory(request, mediaserver_deb, cloud_host):
     return CloudAccountFactory(
         request.config.getoption('--cloud-group'),
-        mediaserver_deb.customization.company_name,
+        mediaserver_deb.customization.company,
         cloud_host,
         request.config.getoption('--autotest-email-password') or os.environ.get('AUTOTEST_EMAIL_PASSWORD'))
 

@@ -1,7 +1,5 @@
 #include <memory>
 
-#include <boost/optional.hpp>
-
 #include <gtest/gtest.h>
 
 #include <nx/network/cloud/tunnel/relay/api/relay_api_client.h>
@@ -9,6 +7,7 @@
 #include <nx/network/http/fusion_data_http_client.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/std/cpp14.h>
+#include <nx/utils/std/optional.h>
 #include <nx/utils/thread/sync_queue.h>
 #include <nx/utils/random.h>
 
@@ -284,7 +283,7 @@ private:
 
     std::unique_ptr<GetStatisticsHttpClient> m_httpClient;
     nx::utils::SyncQueue<nx::cloud::relay::Statistics> m_receivedStatistics;
-    boost::optional<StatisticsProviderFactory::Function> m_statisticsProviderFactoryBak;
+    std::optional<StatisticsProviderFactory::Function> m_statisticsProviderFactoryBak;
     Statistics m_expectedStatistics;
 
     std::unique_ptr<AbstractStatisticsProvider> createStatisticsProviderStub()

@@ -29,6 +29,7 @@ CameraThumbnailProvider::CameraThumbnailProvider(
 
     if (!request.camera || !request.camera->hasVideo(nullptr))
     {
+        // We will rise an event there. But client could not expect it before doLoadAsync call
         setStatus(Qn::ThumbnailStatus::NoData);
         return;
     }
@@ -39,12 +40,14 @@ CameraThumbnailProvider::CameraThumbnailProvider(
         {
             if (!data.isEmpty())
             {
+                NX_VERBOSE(this) << "CameraThumbnailProvider::imageDataLoadedInternal(" << m_request.camera->getName() << ") - got response with data";
                 const auto imageFormat = QnLexical::serialized(m_request.imageFormat).toUtf8();
                 m_image.loadFromData(data, imageFormat);
             }
             else if (nextStatus != Qn::ThumbnailStatus::NoData)
             {
-                NX_VERBOSE(this, "CameraThumbnailProvider::imageDataLoadedInternal - empty data but status not NoData!!!");
+                // We should not be here
+                NX_VERBOSE(this) << "CameraThumbnailProvider::imageDataLoadedInternal(" << m_request.camera->getName() << ") - empty data but status not NoData!";
             }
 
             emit imageChanged(m_image);
@@ -91,11 +94,13 @@ void CameraThumbnailProvider::doLoadAsync()
 
     if (!commonModule()->currentServer())
     {
+        NX_VERBOSE(this) << "CameraThumbnailProvider::doLoadAsync(" << m_request.camera->getName() << ") - no server is available. Returning early";
         emit imageDataLoadedInternal(QByteArray(), Qn::ThumbnailStatus::NoData);
         return;
     }
 
     QPointer<CameraThumbnailProvider> guard(this);
+    NX_VERBOSE(this) << "CameraThumbnailProvider::doLoadAsync(" << m_request.camera->getName() << ") - sending request to the server";
     auto handle = commonModule()->currentServer()->restConnection()->cameraThumbnailAsync(
         m_request,
         [this, guard] (bool success, rest::Handle /*id*/, const QByteArray& imageData)
@@ -104,6 +109,8 @@ void CameraThumbnailProvider::doLoadAsync()
                 return;
             Qn::ThumbnailStatus nextStatus =
                 success ? Qn::ThumbnailStatus::Loaded : Qn::ThumbnailStatus::NoData;
+            if (imageData.isEmpty())
+                nextStatus = Qn::ThumbnailStatus::NoData;
             emit imageDataLoadedInternal(imageData, nextStatus);
         });
 

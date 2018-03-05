@@ -86,7 +86,7 @@ namespace QnFusion {
 
     template<class Setter, class Class, class T>
     void invoke(const Setter &setter, Class &object, T &&value) {
-        setter(object, std::forward<T>(value));
+        (object.*setter)(std::forward<T>(value));
     }
 
     struct start_tag {};

@@ -1164,7 +1164,7 @@
         },
         {
             "keys": [
-                "VISTA|VK2-1080XVRDPTZF", "VISTA|VK2-HD20-SM"
+                "VISTA|VK2-1080XVRDPTZF", "VISTA|VK2-HD20-SM", "VISTA|VK2-HD30-PM"
             ],
             "ptzMapper": {
                 "fromCamera": {

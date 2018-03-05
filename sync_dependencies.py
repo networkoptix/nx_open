@@ -10,7 +10,7 @@ from vms_configuration import *
 def determine_package_versions():
     v = {
         "qt": "5.6.2",
-        "boost": "1.60.0",
+        "boost": "1.66.0",
         "openssl": "1.0.2e",
         "ffmpeg": "3.1.1",
         "sigar": "1.7",
@@ -143,8 +143,8 @@ def sync_dependencies(syncher):
         sync("libjpeg-turbo")
 
     if withMediaServer:
-        sync("any/nx_sdk-1.7.0")
-        sync("any/nx_storage_sdk-1.7.0")
+        sync("any/nx_sdk-1.7.1")
+        sync("any/nx_storage_sdk-1.7.1")
         sync("sigar")
 
         sync("any/apidoctool", path_variable="APIDOCTOOL_PATH")

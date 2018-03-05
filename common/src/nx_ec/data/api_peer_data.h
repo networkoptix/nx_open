@@ -4,8 +4,9 @@
 #include "api_data.h"
 #include "nx/utils/latin1_array.h"
 #include <nx_ec/ec_proto_version.h>
-#include <nx/network/app_info.h>
 #include <nx/network/http/http_types.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/socket_global.h>
 
 namespace ec2 {
 
@@ -155,7 +156,7 @@ struct ApiPeerDataEx: public ApiPeerData
     ApiPeerDataEx(): ApiPeerData() {}
 
     QnUuid systemId;
-    QString cloudHost = nx::network::AppInfo::defaultCloudHost();
+    QString cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
     qint64 identityTime = 0;
     int aliveUpdateIntervalMs = 0;
     int protoVersion = nx_ec::INITIAL_EC2_PROTO_VERSION;

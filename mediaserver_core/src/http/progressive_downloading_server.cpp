@@ -39,6 +39,7 @@
 #include "audit/audit_manager.h"
 #include <media_server/media_server_module.h>
 #include "rest/server/json_rest_result.h"
+#include <api/helpers/camera_id_helper.h>
 
 static const int CONNECTION_TIMEOUT = 1000 * 5;
 static const int MAX_QUEUE_SIZE = 30;
@@ -569,16 +570,8 @@ void QnProgressiveDownloadingConsumer::run()
             codecParams[it->first] = it->second;
         }
 
-        QnResourcePtr resource;
-        const QnUuid uuid = QnUuid::fromStringSafe(resId);
-        if (!uuid.isNull())
-            resource = resourcePool()->getResourceById(uuid);
-        if (!resource)
-            resource = resourcePool()->getResourceByUniqueId(resId);
-        if (!resource)
-            resource = resourcePool()->getResourceByMacAddress(resId);
-        if (!resource)
-            resource = resourcePool()->getResourceByUrl(resId);
+        QnResourcePtr resource = nx::camera_id_helper::findCameraByFlexibleId(
+            commonModule()->resourcePool(), resId);
         if (!resource)
         {
             d->response.messageBody = QByteArray("Resource with id ") + QByteArray(resId.toLatin1()) + QByteArray(" not found ");

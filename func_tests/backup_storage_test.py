@@ -14,7 +14,7 @@ from test_utils.os_access import ProcessError
 log = logging.getLogger(__name__)
 
 
-BACKUP_STORAGE_PATH = Path('/tmp/bstorage')
+BACKUP_STORAGE_PATH = Path('/mnt/disk2')
 BACKUP_STORAGE_READY_TIMEOUT_SEC = 60  # seconds
 BACKUP_SCHEDULE_TIMEOUT_SEC = 60       # seconds
 
@@ -78,14 +78,12 @@ def second_camera_backup_type(request):
 
 @pytest.fixture
 def server(server_factory, system_backup_type):
-    server = server_factory.create('server', start=False)
-    server.os_access.run_command(['rm', '-rfv', BACKUP_STORAGE_PATH])
-    server.os_access.run_command(['mkdir', '-p', BACKUP_STORAGE_PATH])
+    config_file_params = dict(minStorageSpace=1024*1024)  # 1M
+    server = server_factory.create('server', start=False, config_file_params=config_file_params)
+    server.os_access.run_command(['rm', '-rfv', os.path.join(BACKUP_STORAGE_PATH, '*')])
     server.start()
     server.setup_local_system()
     server.rest_api.api.systemSettings.GET(backupQualities=system_backup_type)
-    add_backup_storage(server)
-    change_and_assert_server_backup_type(server, 'BackupManual')
     return server
 
 
@@ -104,32 +102,27 @@ def wait_storage_ready(server, storage_guid):
 def change_and_assert_server_backup_type(server, expected_backup_type):
     server_guid = get_server_id(server.rest_api)
     server.rest_api.ec2.saveMediaServerUserAttributes.POST(
-        serverId=server_guid, backupType='BackupManual',
+        serverId=server_guid, 
+		backupType='BackupManual',
         backupDaysOfTheWeek=BACKUP_EVERY_DAY,
         backupStart=0,  # start backup at 00:00:00
         backupDuration=BACKUP_DURATION_NOT_SET,
-        backupBitrate=BACKUP_BITRATE_NOT_LIMITED)
-    attributes = server.rest_api.ec2.getMediaServerUserAttributesList.GET(
-        id=server_guid)
-    assert (expected_backup_type and
-            attributes[0]['backupType'] == expected_backup_type)
+        backupBitrate=BACKUP_BITRATE_NOT_LIMITED,
+        )
+    attributes = server.rest_api.ec2.getMediaServerUserAttributesList.GET(id=server_guid)
+    assert (expected_backup_type and attributes[0]['backupType'] == expected_backup_type)
 
 
 def add_backup_storage(server):
-    storages = server.rest_api.ec2.getStorages.GET()
-    assert len(storages)
-    backup_storage_data = generator.generate_storage_data(
-        storage_id=1, isBackup=True,
-        parentId=get_server_id(server.rest_api),
-        storageType='local',
-        usedForWriting=True,
-        url=str(BACKUP_STORAGE_PATH))
-    server.rest_api.ec2.saveStorage.POST(**backup_storage_data)
-    storages = server.rest_api.ec2.getStorages.GET()
-    backup_storage = [s for s in server.rest_api.ec2.getStorages.GET()
-                      if s['id'] == backup_storage_data['id']]
-    assert len(backup_storage) == 1
-    wait_storage_ready(server, backup_storage_data['id'])
+    storage_list = [s for s in server.rest_api.ec2.getStorages.GET()
+                    if str(BACKUP_STORAGE_PATH) in s['url'] and s['usedForWriting']]
+    assert len(storage_list) == 1, 'Server did not accept storage %r' % BACKUP_STORAGE_PATH
+    storage = storage_list[0]
+    storage['isBackup'] = True
+    server.rest_api.ec2.saveStorage.POST(**storage)
+    wait_storage_ready(server, storage['id'])
+    change_and_assert_server_backup_type(server, 'BackupManual')
+    return Path(storage['url'])
 
 
 def wait_backup_finish(server, expected_backup_time):
@@ -164,7 +157,7 @@ def add_camera(camera_factory, server, camera_id, backup_type):
 def assert_path_does_not_exist(server, path):
     assert_message = "'%r': unexpected existen path '%s'" % (server, path)
     with pytest.raises(ProcessError, message=assert_message) as x_info:
-        server.os_access.run_command(['[ -e %s ]' % path])
+        server.os_access.run_command(['[', '-e', path, ']'])
     assert x_info.value.returncode == 1, assert_message
 
 
@@ -172,10 +165,10 @@ def assert_paths_are_equal(server, path_1, path_2):
     server.os_access.run_command(['diff', '--recursive', '--report-identical-files', path_1, path_2])
 
 
-def assert_backup_equal_to_archive(server, camera, system_backup_type, backup_new_camera, camera_backup_type):
-    hi_quality_backup_path = BACKUP_STORAGE_PATH / HI_QUALITY_PATH / camera.mac_addr
+def assert_backup_equal_to_archive(server, backup_storage_path, camera, system_backup_type, backup_new_camera, camera_backup_type):
+    hi_quality_backup_path = backup_storage_path / HI_QUALITY_PATH /camera.mac_addr
     hi_quality_server_archive_path = server.storage.dir / HI_QUALITY_PATH / camera.mac_addr
-    low_quality_backup_path = BACKUP_STORAGE_PATH / LOW_QUALITY_PATH / camera.mac_addr
+    low_quality_backup_path = backup_storage_path / LOW_QUALITY_PATH / camera.mac_addr
     low_quality_server_archive_path = server.storage.dir / LOW_QUALITY_PATH / camera.mac_addr
     if ((camera_backup_type and camera_backup_type == BACKUP_DISABLED) or
             (not camera_backup_type and not backup_new_camera)):
@@ -194,6 +187,7 @@ def assert_backup_equal_to_archive(server, camera, system_backup_type, backup_ne
 
 def test_backup_by_request(server, camera_factory, sample_media_file, system_backup_type, backup_new_camera,
                            second_camera_backup_type):
+    backup_storage_path = add_backup_storage(server)
     server.rest_api.api.systemSettings.GET(
         backupNewCamerasByDefault=backup_new_camera)
     start_time = datetime(2017, 3, 27, tzinfo=pytz.utc)
@@ -205,13 +199,14 @@ def test_backup_by_request(server, camera_factory, sample_media_file, system_bac
     server.rest_api.api.backupControl.GET(action='start')
     expected_backup_time = start_time + sample_media_file.duration
     wait_backup_finish(server, expected_backup_time)
-    assert_backup_equal_to_archive(server, camera_1, system_backup_type, backup_new_camera,
-                                   camera_backup_type=BACKUP_BOTH)
-    assert_backup_equal_to_archive(server, camera_2, system_backup_type, backup_new_camera,
-                                   second_camera_backup_type)
+    assert_backup_equal_to_archive(
+        server, backup_storage_path, camera_1, system_backup_type, backup_new_camera, camera_backup_type=BACKUP_BOTH)
+    assert_backup_equal_to_archive(
+        server, backup_storage_path, camera_2, system_backup_type, backup_new_camera, second_camera_backup_type)
 
 
 def test_backup_by_schedule(server, camera_factory, sample_media_file, system_backup_type):
+    backup_storage_path = add_backup_storage(server)
     start_time_1 = datetime(2017, 3, 28, 9, 52, 16, tzinfo=pytz.utc)
     start_time_2 = start_time_1 + sample_media_file.duration*2
     camera = add_camera(camera_factory, server, camera_id=1, backup_type=BACKUP_LOW)
@@ -226,5 +221,5 @@ def test_backup_by_schedule(server, camera_factory, sample_media_file, system_ba
         backupBitrate=BACKUP_BITRATE_NOT_LIMITED)
     expected_backup_time = start_time_2 + sample_media_file.duration
     wait_backup_finish(server, expected_backup_time)
-    assert_backup_equal_to_archive(server, camera, system_backup_type,
-                                   backup_new_camera=False, camera_backup_type=BACKUP_BOTH)
+    assert_backup_equal_to_archive(
+        server, backup_storage_path, camera, system_backup_type, backup_new_camera=False, camera_backup_type=BACKUP_BOTH)
