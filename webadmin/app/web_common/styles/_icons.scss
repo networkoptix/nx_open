@@ -135,7 +135,7 @@
 
 .glyphicon-arrow-left{
   @include kill-glyphicon;
-  height: 14px;
+  height: 14px !important;
   background-position: -169px -50px;
 }
 
