@@ -1,6 +1,7 @@
 {
     "YOU HAVE NO SYSTEMS TEXT": "{{PRODUCT_NAME}} nem kapcsolódik egy rendszeréhez sem",
     "LOG OUT BUTTON TEXT": "Kijelentkezés",
+    "ACCOUNT SETTINGS BUTTON TEXT": "Fiókbeállítások",
     "RESET EMAIL SENT MESAGE TEXT": "Jelszóvisszaállítási teendők megadását e-mailen megküldtük",
     "CREATE ACCOUNT BUTTON TEXT": "Fiók létrehozása",
     "TERMS AND CONDITIONS LINK TEXT": "Terms and Conditions",
@@ -28,6 +29,8 @@
     "SHARE PERMISSIONS HINT VIEWER": "Élő videó megtekintése és rögzített visszajátszása",
     "SHARE PERMISSIONS HINT LIVE VIEWER": "Csak élőkép megtekintése",
     "SHARE PERMISSIONS HINT CUSTOM": "Egyéni engedélyek konfigurálásához használja a {{PRODUCT_NAME}} klienst",
+    "ACCOUNT TEXT": "Fiók",
+    "EDIT USER BUTTON TEXT": "Szerkeztés",
     "DELETE USER BUTTON TEXT": "Törlés",
     "DELETE USER CANCEL BUTTON TEXT": "Mégse",
     "OWNER TEXT": "Tulajdonos",

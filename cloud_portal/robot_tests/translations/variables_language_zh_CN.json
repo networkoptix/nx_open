@@ -1,6 +1,7 @@
 {
     "YOU HAVE NO SYSTEMS TEXT": "你有没有连接到 {{PRODUCT_NAME}} 的系统",
     "LOG OUT BUTTON TEXT": "退出登录",
+    "ACCOUNT SETTINGS BUTTON TEXT": "帐户设置",
     "RESET EMAIL SENT MESAGE TEXT": "密码重置命令发送电子邮件",
     "CREATE ACCOUNT BUTTON TEXT": "创建帐户",
     "TERMS AND CONDITIONS LINK TEXT": "Terms and Conditions",
@@ -28,6 +29,8 @@
     "SHARE PERMISSIONS HINT VIEWER": "可以查看实时视频和浏览存档",
     "SHARE PERMISSIONS HINT LIVE VIEWER": "只可以查看视频直播",
     "SHARE PERMISSIONS HINT CUSTOM": "使用 {{PRODUCT_NAME}} 客户端应用程序可以设置自定义权限",
+    "ACCOUNT TEXT": "帐户",
+    "EDIT USER BUTTON TEXT": "编辑",
     "DELETE USER BUTTON TEXT": "删除",
     "DELETE USER CANCEL BUTTON TEXT": "取消",
     "OWNER TEXT": "所有者",

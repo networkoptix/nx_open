@@ -1,6 +1,7 @@
 {
     "YOU HAVE NO SYSTEMS TEXT": "Nie masz systemów połączonych z {{PRODUCT_NAME}}",
     "LOG OUT BUTTON TEXT": "Wyloguj",
+    "ACCOUNT SETTINGS BUTTON TEXT": "Ustawienia konta",
     "RESET EMAIL SENT MESAGE TEXT": "Instrukcje resetowania hasła zostały wysyłane na adres e-mail",
     "CREATE ACCOUNT BUTTON TEXT": "Utwórz konto",
     "TERMS AND CONDITIONS LINK TEXT": "Terms and Conditions",
@@ -28,6 +29,8 @@
     "SHARE PERMISSIONS HINT VIEWER": "Podgląd wideo na żywo i przeglądanie archiwum",
     "SHARE PERMISSIONS HINT LIVE VIEWER": "Tylko podgląd wideo na żywo",
     "SHARE PERMISSIONS HINT CUSTOM": "Użyj aplikacji klienckiej {{PRODUCT_NAME}}, aby skonfigurować uprawnienia niestandardowe",
+    "ACCOUNT TEXT": "Konto",
+    "EDIT USER BUTTON TEXT": "Edytuj",
     "DELETE USER BUTTON TEXT": "Usuń",
     "DELETE USER CANCEL BUTTON TEXT": "Anuluj",
     "OWNER TEXT": "Właściciel",

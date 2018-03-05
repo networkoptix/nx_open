@@ -129,6 +129,7 @@ contains user emails and names
     Log in to Auto Tests System    ${EMAIL OWNER}
     Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL ADMIN}')]
     Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${ADMIN FIRST NAME} ${ADMIN LAST NAME}')]
+    Close Browser
 
 rename button opens dialog; cancel closes without rename; save renames system
     Open Browser and go to URL    ${url}

@@ -1,6 +1,7 @@
 {
     "YOU HAVE NO SYSTEMS TEXT": "אין לך מערכות המחוברות ל- {{PRODUCT_NAME}}",
     "LOG OUT BUTTON TEXT": "יציאה",
+    "ACCOUNT SETTINGS BUTTON TEXT": "הגדרות חשבון",
     "RESET EMAIL SENT MESAGE TEXT": "Password reset instructions are sent to Email",
     "CREATE ACCOUNT BUTTON TEXT": "צור חשבון",
     "TERMS AND CONDITIONS LINK TEXT": "Terms and Conditions",
@@ -28,6 +29,8 @@
     "SHARE PERMISSIONS HINT VIEWER": "ניתן להציג וידאו חי ולעיין בארכיון",
     "SHARE PERMISSIONS HINT LIVE VIEWER": "יכול לצפות רק בוידאו חי",
     "SHARE PERMISSIONS HINT CUSTOM": "השתמש ב {{PRODUCT_NAME}} כדי להגדיר הרשאות מותאמות אישית",
+    "ACCOUNT TEXT": "חשבון",
+    "EDIT USER BUTTON TEXT": "ערוך",
     "DELETE USER BUTTON TEXT": "מחק",
     "DELETE USER CANCEL BUTTON TEXT": "ביטול",
     "OWNER TEXT": "בעלים",

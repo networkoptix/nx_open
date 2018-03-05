@@ -1,6 +1,7 @@
 {
     "YOU HAVE NO SYSTEMS TEXT": "{{PRODUCT_NAME}} ile bağlı hiçbir Sisteminiz yok",
     "LOG OUT BUTTON TEXT": "Oturumu Kapat",
+    "ACCOUNT SETTINGS BUTTON TEXT": "Hesap Ayarları",
     "RESET EMAIL SENT MESAGE TEXT": "Password reset instructions are sent to Email",
     "CREATE ACCOUNT BUTTON TEXT": "Hesap oluştur",
     "TERMS AND CONDITIONS LINK TEXT": "Terms and Conditions",
@@ -28,6 +29,8 @@
     "SHARE PERMISSIONS HINT VIEWER": "Canlı video görüntüleyebilir ve arşive gözatabilir",
     "SHARE PERMISSIONS HINT LIVE VIEWER": "Sadece canlı vidyo izleyebilir",
     "SHARE PERMISSIONS HINT CUSTOM": "Özel izinler ayarlamak için {{PRODUCT_NAME}} İstemci uygulamasını kullanın",
+    "ACCOUNT TEXT": "Hesap",
+    "EDIT USER BUTTON TEXT": "Düzenle",
     "DELETE USER BUTTON TEXT": "Sil",
     "DELETE USER CANCEL BUTTON TEXT": "İptal",
     "OWNER TEXT": "Sahip",

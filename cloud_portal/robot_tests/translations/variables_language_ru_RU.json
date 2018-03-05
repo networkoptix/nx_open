@@ -1,6 +1,7 @@
 {
     "YOU HAVE NO SYSTEMS TEXT": "У вас нет систем, подключенных к {{PRODUCT_NAME}}",
     "LOG OUT BUTTON TEXT": "Выход",
+    "ACCOUNT SETTINGS BUTTON TEXT": "Настройки учетной записи",
     "RESET EMAIL SENT MESAGE TEXT": "Инструкции по сбросу пароля были высланы на Email",
     "CREATE ACCOUNT BUTTON TEXT": "Зарегистрироваться",
     "TERMS AND CONDITIONS LINK TEXT": "Условия и положения",
@@ -28,6 +29,8 @@
     "SHARE PERMISSIONS HINT VIEWER": "Может смотреть живое видео и архив",
     "SHARE PERMISSIONS HINT LIVE VIEWER": "Может смотреть только живое видео",
     "SHARE PERMISSIONS HINT CUSTOM": "Используйте клиентское приложение {{PRODUCT_NAME}} для настройки особых полномочий",
+    "ACCOUNT TEXT": "Учетная запись",
+    "EDIT USER BUTTON TEXT": "Правка",
     "DELETE USER BUTTON TEXT": "Удалить",
     "DELETE USER CANCEL BUTTON TEXT": "Отмена",
     "OWNER TEXT": "Владелец",
