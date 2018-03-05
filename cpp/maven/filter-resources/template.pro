@@ -24,7 +24,7 @@ CONFIG += object_parallel_to_source
 CONFIG += $$BUILDLIB $$LIBTYPE
 CONFIG -= flat
 CONFIG += no_private_qt_headers_warning
-CONFIG += c++17
+CONFIG += c++14
 DEFINES += USE_NX_HTTP __STDC_CONSTANT_MACROS ${global.defines}
 DEFINES += ${customization.defines}
 DEFINES += ${additional.defines}
@@ -228,7 +228,8 @@ unix: {
   clang {
     QMAKE_CXXFLAGS += -Wno-c++14-extensions -Wno-inconsistent-missing-override
   } else {
-    #QMAKE_CXXFLAGS += -std=c++1y
+    QMAKE_CXXFLAGS -= -std=c++11
+    QMAKE_CXXFLAGS -= -std=c++1y
   }
   QMAKE_CXXFLAGS += -Werror=enum-compare -Werror=reorder -Werror=delete-non-virtual-dtor -Werror=return-type -Werror=conversion-null -Wuninitialized
 
@@ -317,3 +318,7 @@ CONFIG(debug, debug|release) {
   include(dependencies.pri)
 }
 
+unix {
+  QMAKE_CXXFLAGS_CXX14 = -std=c++17
+  QMAKE_CXXFLAGS_GNUCXX14 = -std=c++17
+}
