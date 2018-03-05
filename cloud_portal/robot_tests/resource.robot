@@ -1,6 +1,6 @@
 *** Settings ***
 
-Library           Selenium2Library    screenshot_root_directory=\Screenshots    #run_on_failure=Failure Tasks
+Library           Selenium2Library    screenshot_root_directory=\Screenshots    run_on_failure=Failure Tasks
 Library           ImapLibrary
 Library           String
 Library           NoptixLibrary/
@@ -16,7 +16,7 @@ Open Browser and go to URL
     Go To    ${url}
 
 Check Language
-    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}/span[2]
+    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}
     Register Keyword To Run On Failure    NONE
     ${status}    ${value}=    Run Keyword And Ignore Error    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}/span[@lang='${LANGUAGE}']    2
     Register Keyword To Run On Failure    Failure Tasks

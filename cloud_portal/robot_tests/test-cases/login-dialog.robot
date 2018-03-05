@@ -21,8 +21,8 @@ can be closed after clicking on background
     Open Browser and Go To URL    ${url}
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
-    Wait Until Elements Are Visible    ${LOG IN MODAL}    //div[@uib-modal-backdrop='modal-backdrop']/..
-    Click Element    //div[@uib-modal-backdrop='modal-backdrop']/..
+    Wait Until Elements Are Visible    ${LOG IN MODAL}    //div[@uib-modal-backdrop='modal-backdrop']/..    ${LOG IN BUTTON}    ${EMAIL INPUT}    ${PASSWORD INPUT}
+    Click Element At Coordinates    //div[@uib-modal-backdrop='modal-backdrop']/..    10    10
     Wait Until Page Does Not Contain Element    ${LOG IN MODAL}
     Page Should Not Contain Element    ${LOG IN MODAL}
     Close Browser
