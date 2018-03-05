@@ -84,6 +84,12 @@ QnSecurityCamResourcePtr findCameraByFlexibleId(
         result = resourcePool->getNetResourceByPhysicalId(flexibleId);
     if (!result)
         result = resourcePool->getResourceByMacAddress(flexibleId);
+    if (!result)
+    {
+        auto resourceList = resourcePool->getResourcesByLogicalId(flexibleId);
+        if (!resourceList.isEmpty())
+            result = resourceList.front();
+    }
 
     // If the found resource is not a camera, return null.
     return result.dynamicCast<QnSecurityCamResource>();

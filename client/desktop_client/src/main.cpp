@@ -49,6 +49,8 @@
 #include <client/self_updater.h>
 
 #include <nx/network/app_info.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/timer_manager.h>
 
@@ -104,7 +106,8 @@ int runApplication(QtSingleApplication* application, const QnStartupParameters& 
                 manager->deleteLater();
             });
 
-        QUrl url(nx::network::AppInfo::defaultCloudPortalUrl());
+        QUrl url(nx::network::AppInfo::defaultCloudPortalUrl(
+            nx::network::SocketGlobals::cloud().cloudHost()));
         url.setPath(lit("/api/utils/visitedKey"));
         qDebug() << "Sending Cloud Portal Confirmation to" << url.toString();
 

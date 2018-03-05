@@ -438,6 +438,36 @@ TEST_F(QnCachedResourceAccessManagerTest, checkVideowallLockedLayout)
     checkPermissions(layout, desired, forbidden);
 }
 
+TEST_F(QnCachedResourceAccessManagerTest, checkPushMyScreenAsViewer)
+{
+    loginAs(Qn::GlobalControlVideoWallPermission | Qn::GlobalViewerPermissionSet);
+
+    auto camera = createCamera();
+    camera->addFlags(Qn::desktop_camera);
+    resourcePool()->addResource(camera);
+
+    // User cannot see anybody's else screen.
+    ASSERT_FALSE(hasPermission(m_currentUser, camera, Qn::ViewLivePermission));
+
+    auto videowall = addVideoWall();
+    auto layout = createLayout(Qn::remote, false, videowall->getId());
+
+    QnVideoWallItem vwitem;
+    vwitem.layout = layout->getId();
+    videowall->items()->addItem(vwitem);
+
+    QnLayoutItemData item;
+    item.resource.id = camera->getId();
+    item.resource.uniqueId = camera->getUniqueId();
+    layout->addItem(item);
+
+    resourcePool()->addResource(layout);
+
+    // Screen is available once it is added to videowall.
+    ASSERT_TRUE(hasPermission(m_currentUser, camera, Qn::ViewLivePermission));
+}
+
+
 /************************************************************************/
 /* Checking user access rights                                          */
 /************************************************************************/

@@ -19,6 +19,8 @@
 #ifndef EMAILADDRESS_H
 #define EMAILADDRESS_H
 
+#include <QtCore/QString>
+
 class EmailAddress
 {
 public:

@@ -64,6 +64,11 @@ QnStorageResourceList UnmountedLocalStoragesFilter::getUnmountedStorages(
     return result;
 }
 
+bool isStorageUnmounted(const QnStorageResourcePtr& storage)
+{
+    return getUnmountedStorages(QnStorageResourceList() << storage).contains(storage);
+}
+
 QnStorageResourceList getUnmountedStorages(const QnStorageResourceList& allServerStorages)
 {
     nx::mserver_aux::UnmountedLocalStoragesFilter unmountedLocalStoragesFilter(
@@ -77,7 +82,7 @@ QnStorageResourceList getUnmountedStorages(const QnStorageResourceList& allServe
         lm("Record folders: %1").container(mediaPathList));
 
     QnStorageResourceList filteredStorages;
-    for (const auto& storage : allServerStorages)
+    for (const auto& storage: allServerStorages)
     {
         if (!storage->isExternal())
             filteredStorages.push_back(storage);
@@ -217,7 +222,7 @@ public:
     virtual bool isCloudInstanceChanged() const override
     {
         return !qnGlobalSettings->cloudHost().isEmpty() &&
-                qnGlobalSettings->cloudHost() != nx::network::AppInfo::defaultCloudHost();
+                qnGlobalSettings->cloudHost() != nx::network::SocketGlobals::cloud().cloudHost();
     }
 
     virtual bool isConnectedToCloud() const override

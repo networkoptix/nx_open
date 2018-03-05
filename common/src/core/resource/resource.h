@@ -32,7 +32,7 @@ class QnInitResPool: public QThreadPool
 public:
 };
 
-class QN_EXPORT QnResource: public QObject, public QnFromThisToShared<QnResource>
+class QnResource: public QObject, public QnFromThisToShared<QnResource>
 {
     Q_OBJECT
     Q_FLAGS(Qn::ResourceFlags)
@@ -122,7 +122,8 @@ public:
     QnResourcePool *resourcePool() const;
     virtual void setResourcePool(QnResourcePool *resourcePool);
 
-    virtual QString toSearchString() const;
+    QString toSearchString() const;
+    virtual QStringList searchFilters() const;
 
 
     template<class Resource>

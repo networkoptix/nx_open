@@ -43,7 +43,7 @@ public:
     virtual ~IQnFile() {}
 };
 
-class QN_EXPORT QnFile
+class QnFile
 :
     public IQnFile,
     public std::enable_shared_from_this<QnFile>

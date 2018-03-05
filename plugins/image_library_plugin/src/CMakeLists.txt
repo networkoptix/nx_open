@@ -1,24 +1,16 @@
 cmake_minimum_required(VERSION 3.1)
 
-set(TARGET axiscamplugin)
+set(IMAGE_LIB_TARGET image_library_plugin)
 
-project(${TARGET})
+project(${IMAGE_LIB_TARGET})
 
-#set(CMAKE_AUTOMOC ON)
-#set(CMAKE_INCLUDE_CURRENT_DIR ON)
-
-include_directories(
-    "../../../include"
-)
+include_directories("../../../include")
 
 if(WINDOWS)
-    add_definitions(
-        -D_CRT_SECURE_NO_WARNINGS
-    )
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 endif()
 
-add_library( 
-    ${TARGET} SHARED 
+add_library(${IMAGE_LIB_TARGET} SHARED
         "archive_reader.cpp"
 		"archive_reader.h"
 		"camera_manager.cpp"
@@ -49,20 +41,12 @@ add_library(
 		"wildcard_match.h"
 )
 
-#find_package(Qt5Network REQUIRED)
-#target_link_libraries(${TARGET} PUBLIC Qt5::Network)
-
 if(WINDOWS)
-    target_link_libraries(
-        ${TARGET}
-        ws2_32
-    )
+    target_link_libraries(${IMAGE_LIB_TARGET} ws2_32)
 endif()
 
-if(UNIX)
-    set_target_properties(
-        ${TARGET}
-            PROPERTIES
-            COMPILE_FLAGS "-std=c++11"
-    )
-endif()
+set_target_properties(${IMAGE_LIB_TARGET} PROPERTIES
+    CXX_STANDARD 11
+    CXX_STANDARD_REQUIRED YES
+    CXX_EXTENSIONS NO
+)

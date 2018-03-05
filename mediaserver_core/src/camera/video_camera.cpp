@@ -584,6 +584,13 @@ std::unique_ptr<QnConstDataPacketQueue> QnVideoCamera::getFrameSequenceByTime(
                 return gopKeeper->getGopTillTime(time, channel);
             }
 
+            if (roundMethod == nx::api::ImageRequest::RoundMethod::iFrameBefore
+                && frame->timestamp > time)
+            {
+                // We got frame, that is after specified timestamp. We do not need this
+                return nullptr;
+            }
+
             auto queue = std::make_unique<QnConstDataPacketQueue>();
             queue->push(frame);
 

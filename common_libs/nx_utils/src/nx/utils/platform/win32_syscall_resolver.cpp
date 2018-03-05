@@ -9,6 +9,7 @@
 
 #include <Windows.h>
 
+#include <map>
 #include <memory>
 #include <mutex>
 
@@ -79,7 +80,7 @@ void* Win32FuncResolver::resolveFunction( const std::wstring& libName, const std
     {
         return funcAddr;
     }
-    
+
     funcAddr = GetProcAddress( libCtx.hLib, funcName.c_str() );
     return funcAddr;
 }

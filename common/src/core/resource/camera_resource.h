@@ -19,7 +19,7 @@ class CameraMediaStreams;
 class CameraBitrates;
 class CameraBitrateInfo;
 
-class QN_EXPORT QnVirtualCameraResource : public QnSecurityCamResource
+class QnVirtualCameraResource : public QnSecurityCamResource
 {
     Q_OBJECT
     Q_FLAGS(Qn::CameraCapabilities)
@@ -31,7 +31,7 @@ public:
 
     virtual QString getUniqueId() const override;
 
-    virtual QString toSearchString() const override;
+    virtual QStringList searchFilters() const override;
     void forceEnableAudio();
     void forceDisableAudio();
     bool isForcedAudioSupported() const;

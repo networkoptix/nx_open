@@ -4,6 +4,8 @@
 #include <memory>
 #include <string>
 
+#include <QtCore/QString>
+
 #include <nx/kit/ini_config.h>
 
 namespace nx {
@@ -37,12 +39,14 @@ class NX_NETWORK_API CloudConnectController
 {
 public:
     CloudConnectController(
+        const QString& customCloudHost,
         aio::AIOService* aioService,
         AddressResolver* addressResolver);
     ~CloudConnectController();
 
     void applyArguments(const utils::ArgumentParser& arguments);
 
+    const QString& cloudHost() const;
     hpm::api::MediatorConnector& mediatorConnector();
     MediatorAddressPublisher& addressPublisher();
     OutgoingTunnelPool& outgoingTunnelPool();

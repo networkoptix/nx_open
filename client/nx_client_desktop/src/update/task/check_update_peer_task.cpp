@@ -144,7 +144,7 @@ bool QnCheckForUpdatesPeerTask::checkCloudHost()
 
     /* Update is allowed if either target version has the same cloud host or
        there are no servers linked to the cloud in the system. */
-    if (m_cloudHost == nx::network::AppInfo::defaultCloudHost())
+    if (m_cloudHost == nx::network::SocketGlobals::cloud().cloudHost())
         return true;
 
     const bool isBoundToCloud = !qnGlobalSettings->cloudSystemId().isEmpty();
