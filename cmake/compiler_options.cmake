@@ -1,4 +1,4 @@
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -47,10 +47,6 @@ if(WINDOWS)
     )
 endif()
 
-if(UNIX)
-    add_definitions(-DQN_EXPORT=)
-endif()
-
 if(ANDROID OR IOS)
     remove_definitions(
         -DENABLE_SENDMAIL
@@ -92,9 +88,6 @@ if(WINDOWS)
     add_definitions(
         -DNOMINMAX=
         -DUNICODE)
-    set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS
-        $<$<STREQUAL:$<TARGET_PROPERTY:TYPE>,STATIC_LIBRARY>:QN_EXPORT=>
-        $<$<NOT:$<STREQUAL:$<TARGET_PROPERTY:TYPE>,STATIC_LIBRARY>>:QN_EXPORT=Q_DECL_EXPORT>)
 
     add_compile_options(
         /MP
@@ -104,6 +97,8 @@ if(WINDOWS)
         /wd4100
         /we4717
     )
+    add_definitions(-D_SILENCE_CXX17_OLD_ALLOCATOR_MEMBERS_DEPRECATION_WARNING)
+    add_definitions(-D_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING)
 
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         add_compile_options(/wd4250)

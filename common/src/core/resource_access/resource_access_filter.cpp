@@ -46,6 +46,12 @@ bool QnResourceAccessFilter::isShareable(Filter filter, const QnResourcePtr& res
     return false;
 }
 
+bool QnResourceAccessFilter::isShareableViaVideowall(const QnResourcePtr& resource)
+{
+    return resource->hasFlags(Qn::desktop_camera)
+        || isShareableMedia(resource);
+}
+
 bool QnResourceAccessFilter::isDroppable(const QnResourcePtr& resource)
 {
     NX_EXPECT(resource);

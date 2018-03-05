@@ -752,6 +752,10 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
 
         QnStorageResourceList smallStorages = getSmallStorages(m_mediaServer->getStorages());
         QnStorageResourceList storagesToRemove;
+        // We won't remove automatically storages which might have been unmounted because of their
+        // small size. This small size might be the result of the unmounting itself (just the size
+        // of the local drive where mount folder is located). User will be able to remove such
+        // storages by themselves.
         for (const auto& smallStorage: smallStorages)
         {
             bool isSmallStorageAmongstUnmounted = false;
@@ -3389,12 +3393,11 @@ const CmdLineArguments MediaServerProcess::cmdLineArguments() const
 void MediaServerProcess::configureApiRestrictions(nx::network::http::AuthMethodRestrictionList* restrictions)
 {
     // For "OPTIONS * RTSP/1.0"
-    restrictions->allow(lit("."), nx::network::http::AuthMethod::noAuth);
+    restrictions->allow(lit("\\*"), nx::network::http::AuthMethod::noAuth);
 
     const auto webPrefix = lit("(/web)?(/proxy/[^/]*(/[^/]*)?)?");
     restrictions->allow(webPrefix + lit("/api/ping"), nx::network::http::AuthMethod::noAuth);
     restrictions->allow(webPrefix + lit("/api/camera_event.*"), nx::network::http::AuthMethod::noAuth);
-    restrictions->allow(webPrefix + lit("/api/showLog.*"), nx::network::http::AuthMethod::urlQueryParam);
     restrictions->allow(webPrefix + lit("/api/moduleInformation"), nx::network::http::AuthMethod::noAuth);
     restrictions->allow(webPrefix + lit("/api/gettime"), nx::network::http::AuthMethod::noAuth);
     restrictions->allow(webPrefix + lit("/api/getTimeZones"), nx::network::http::AuthMethod::noAuth);
@@ -3405,6 +3408,14 @@ void MediaServerProcess::configureApiRestrictions(nx::network::http::AuthMethodR
     restrictions->allow(webPrefix + lit("/static/.*"), nx::network::http::AuthMethod::noAuth);
     restrictions->allow(lit("/crossdomain.xml"), nx::network::http::AuthMethod::noAuth);
     restrictions->allow(webPrefix + lit("/api/startLiteClient"), nx::network::http::AuthMethod::noAuth);
+
+    // For open in new browser window.
+    restrictions->allow(webPrefix + lit("/api/showLog.*"),
+        nx::network::http::AuthMethod::urlQueryParam | nx::network::http::AuthMethod::allowWithourCsrf);
+
+    // For inserting in HTML <img src="...">.
+    restrictions->allow(webPrefix + lit("/ec2/cameraThumbnail"),
+        nx::network::http::AuthMethod::allowWithourCsrf);
 
     // TODO: #3.1 Remove this method and use /api/installUpdate in client when offline cloud
     // authentication is implemented.

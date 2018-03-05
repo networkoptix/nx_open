@@ -65,8 +65,7 @@ int NX_NETWORK_API defaultPortForScheme(const StringType& scheme);
 /**
  * Comparator for case-insensitive comparison in STL associative containers.
  */
-struct NX_NETWORK_API ci_less:
-    std::binary_function<QByteArray, QByteArray, bool>
+struct NX_NETWORK_API ci_less
 {
     /** Case-independent (ci) compare_less binary function. */
     bool operator() (const QByteArray& c1, const QByteArray& c2) const

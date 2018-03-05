@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <QtCore/QString>
 
 namespace nx {
 namespace update {
