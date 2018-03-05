@@ -33,9 +33,7 @@ cp -f ../common_libs/nx_sdk/src/plugins/plugin_tools.h $TARGET_DIR/include/plugi
 cp -f ../common/src/plugins/camera_plugin.h $TARGET_DIR/include/plugins/
 cp -f ../common/src/plugins/camera_plugin_types.h $TARGET_DIR/include/plugins/
 
-#PLUGINS=(axiscamplugin image_library_plugin rpi_cam)
-#rpi_cam compilation fails now
-PLUGINS=(axiscamplugin image_library_plugin)
+PLUGINS=(axiscamplugin image_library_plugin rpi_cam)
 
 for (( i=0; i<${#PLUGINS[@]}; i++ ))
 do
