@@ -1,6 +1,6 @@
 #include "crc32.h"
 
-#if defined(Q_OS_MACX) || defined(Q_OS_ANDROID) || defined(Q_OS_IOS) || defined(__aarch64__)
+#if defined(__APPLE__) || defined(Q_OS_ANDROID) || defined(Q_OS_IOS) || defined(__aarch64__)
     #include <zlib.h>
 #else
     #include <QtZlib/zlib.h>
