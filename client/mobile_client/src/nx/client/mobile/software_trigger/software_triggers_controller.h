@@ -38,16 +38,20 @@ public:
     QString resourceId() const;
     void setResourceId(const QString& id);
 
-    Q_INVOKABLE bool activateTrigger(const QnUuid& id, bool prolonged);
+    Q_INVOKABLE bool activateTrigger(const QnUuid& id);
+    Q_INVOKABLE bool deactivateTrigger(const QnUuid& id);
     Q_INVOKABLE void cancelTriggerAction(const QnUuid& id);
 
 signals:
     void resourceIdChanged();
 
-    void triggerExecuted(const QnUuid& id, bool success);
+    void triggerActivated(const QnUuid& id, bool success);
+    void triggerDeactivated(const QnUuid& id);
 
 private:
     void cancelAllTriggers();
+
+    bool setTriggerState(const QnUuid& id, vms::event::EventState state);
 
 private:
     using IdToHandleHash = QHash<QnUuid, rest::Handle>;

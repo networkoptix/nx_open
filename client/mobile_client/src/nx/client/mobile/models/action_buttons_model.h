@@ -42,6 +42,8 @@ public:
     void setResourceId(const QString& resourceId);
     QString resourceId() const;
 
+    Q_INVOKABLE int rowById(const QnUuid& id) const;
+
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
     virtual QVariant data(const QModelIndex& index, int role) const override;
     virtual QHash<int, QByteArray> roleNames() const override;
@@ -72,7 +74,6 @@ private:
 
     ButtonList::const_iterator lowerBoundByTriggerButtonId(const QnUuid& ruleId) const;
 
-    int triggerButtonIndexById(const QnUuid& id) const;
 
     int triggerButtonInsertionIndexById(const QnUuid& id) const;
 

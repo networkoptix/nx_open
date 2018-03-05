@@ -54,10 +54,6 @@ ButtonsPanel
                 break
             case ActionButtonsModel.SoftTriggerButton:
                 d.handleSoftwareTriggerClicked(index)
-                // TODO: temporary. Remove this
-                hintControl.showHint(
-                    d.modelDataAccessor.getData(index, "hint"),
-                    d.modelDataAccessor.getData(index, "iconPath"))
                 break
         }
     }
@@ -81,6 +77,26 @@ ButtonsPanel
                 SoftwareTriggersController
                 {
                     resourceId: control.resourceId
+
+                    onTriggerActivated:
+                    {
+                        var index = buttonModel.rowById(id)
+                        var text = d.modelDataAccessor.getData(index, "hint")
+                        var prolonged = d.modelDataAccessor.getData(index, "prolongedTrigger")
+
+                        if (!success)
+                            hintControl.showError(text)
+                        else if (!prolonged)
+                            hintControl.showSuccess(text, false)
+                    }
+
+                    onTriggerDeactivated:
+                    {
+                        var index = buttonModel.rowById(id)
+                        var text = d.modelDataAccessor.getData(index, "hint")
+                        if (d.modelDataAccessor.getData(index, "prolongedTrigger"))
+                            hintControl.showSuccess(text, true)
+                    }
                 }
 
             function handleTwoWayAudioPressed(index, pressed)
@@ -100,19 +116,40 @@ ButtonsPanel
 
             function handleSoftwareTriggerClicked(index)
             {
+                var text = d.modelDataAccessor.getData(index, "hint")
                 if (modelDataAccessor.getData(index, "prolongedTrigger"))
+                {
+                    var hintText = qsTr("Press and hold to %1").arg(text)
+                    hintControl.showHint(hintText, d.modelDataAccessor.getData(index, "iconPath"))
                     return
+                }
 
-                triggersController.activateTrigger(d.modelDataAccessor.getData(index, "id"), false)
+                var id = d.modelDataAccessor.getData(index, "id")
+                if (triggersController.activateTrigger(id))
+                    hintControl.showPreloader(text)
+                else
+                    hintControl.showError(text, false)
             }
 
             function handleSoftwareTriggerPressed(index, pressed)
             {
-                if (!modelDataAccessor.getData(index, "prolongedTrigger") || !pressed)
+                if (!modelDataAccessor.getData(index, "prolongedTrigger"))
                     return
 
-                triggersController.activateTrigger(d.modelDataAccessor.getData(index, "id"), true)
-                // TODO: HANDLE RELEASE ACTION
+                var id = d.modelDataAccessor.getData(index, "id")
+                if (pressed)
+                {
+                    var text = d.modelDataAccessor.getData(index, "hint")
+                    if (triggersController.activateTrigger(id))
+                        hintControl.showPreloader(text)
+                    else
+                        hintControl.showError(text, d.modelDataAccessor.getData(index, "iconPath"))
+                }
+                else
+                {
+                    triggersController.deactivateTrigger(id)
+                    hintControl.hide()
+                }
             }
         }
 

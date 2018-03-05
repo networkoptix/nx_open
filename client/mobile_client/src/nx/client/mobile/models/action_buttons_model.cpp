@@ -171,7 +171,7 @@ ActionButtonsModel::ActionButtonsModel(QObject* parent):
     const auto emitDataChanged =
         [this](const QnUuid& id, int roleId)
         {
-            const auto row = triggerButtonIndexById(id);
+            const auto row = rowById(id);
             if (row < 0)
             {
                 NX_EXPECT(false, "Wrong trigger button id");
@@ -300,7 +300,7 @@ ActionButtonsModel::ButtonList::const_iterator ActionButtonsModel::lowerBoundByT
         SoftwareButton::fake(id), compareFunction);
 }
 
-int ActionButtonsModel::triggerButtonIndexById(const QnUuid& id) const
+int ActionButtonsModel::rowById(const QnUuid& id) const
 {
     const auto it = lowerBoundByTriggerButtonId(id);
     return it != m_buttons.end() && getSoftwareButtonId(*it) == id
@@ -328,7 +328,7 @@ void ActionButtonsModel::addSoftwareTriggerButton(
 
 void ActionButtonsModel::removeSoftwareTriggerButton(const QnUuid& id)
 {
-    removeButton(triggerButtonIndexById(id));
+    removeButton(rowById(id));
 }
 
 void ActionButtonsModel::updatePtzButtonVisibility()
@@ -413,7 +413,7 @@ void ActionButtonsModel::updateTriggerFields(
     if (fields == SoftwareTriggersWatcher::NoField)
         return;
 
-    const auto row = triggerButtonIndexById(id);
+    const auto row = rowById(id);
     if (row < 0)
     {
         NX_EXPECT(false, "Software button does not exist");

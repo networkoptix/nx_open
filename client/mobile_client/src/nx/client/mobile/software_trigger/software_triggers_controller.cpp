@@ -49,7 +49,34 @@ void SoftwareTriggersController::setResourceId(const QString& id)
     emit resourceIdChanged();
 }
 
-bool SoftwareTriggersController::activateTrigger(const QnUuid& id, bool prolonged)
+bool SoftwareTriggersController::activateTrigger(const QnUuid& id)
+{
+    const auto rule = m_ruleManager->rule(id);
+    const auto state = rule->isActionProlonged()
+        ? vms::event::EventState::active
+        : vms::event::EventState::undefined;
+    return setTriggerState(id, state);
+}
+
+bool SoftwareTriggersController::deactivateTrigger(const QnUuid& id)
+{
+    const auto rule = m_ruleManager->rule(id);
+    if (!rule->isActionProlonged())
+    {
+        NX_EXPECT(false, "Action is not prolonged");
+        return false;
+    }
+
+    return setTriggerState(id, vms::event::EventState::inactive);
+}
+
+void SoftwareTriggersController::cancelTriggerAction(const QnUuid& id)
+{
+    if (m_idToHandle.remove(id))
+        emit triggerDeactivated(id);
+}
+
+bool SoftwareTriggersController::setTriggerState(const QnUuid& id, vms::event::EventState state)
 {
     if (m_resourceId.isNull() || id.isNull())
     {
@@ -76,7 +103,7 @@ bool SoftwareTriggersController::activateTrigger(const QnUuid& id, bool prolonge
     }
 
     const auto callback =
-         [this](bool success, rest::Handle handle, const QnJsonRestResult& result)
+         [this, state](bool success, rest::Handle handle, const QnJsonRestResult& result)
         {
             const auto it = m_handleToId.find(handle);
             if (it == m_handleToId.end())
@@ -86,13 +113,13 @@ bool SoftwareTriggersController::activateTrigger(const QnUuid& id, bool prolonge
             m_handleToId.erase(it);
             m_idToHandle.remove(id);
 
-            emit triggerExecuted(id, success && result.error == QnRestResult::NoError);
+            if (state == vms::event::EventState::inactive)
+                emit triggerDeactivated(id);
+            else
+                emit triggerActivated(id, success && result.error == QnRestResult::NoError);
         };
 
     const auto connection = m_commonModule->currentServer()->restConnection();
-    const auto state = prolonged
-        ? vms::event::EventState::active
-        : vms::event::EventState::undefined;
     const auto handle = connection->softwareTriggerCommand(
         m_resourceId, rule->eventParams().inputPortId, state,
         QnGuardedCallback<decltype(callback)>(this, callback), QThread::currentThread());
@@ -100,12 +127,6 @@ bool SoftwareTriggersController::activateTrigger(const QnUuid& id, bool prolonge
     m_handleToId.insert(handle, id);
     m_idToHandle.insert(id, handle);
     return true;
-}
-
-void SoftwareTriggersController::cancelTriggerAction(const QnUuid& id)
-{
-    if (m_idToHandle.remove(id))
-        emit triggerExecuted(id, false);
 }
 
 void SoftwareTriggersController::cancelAllTriggers()
