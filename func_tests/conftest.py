@@ -122,12 +122,6 @@ def ssh_config(work_dir, vm_host):
     return config
 
 
-@pytest.fixture(scope='session', autouse=True)
-def clean(request, session_vm_factory):
-    if request.config.getoption('clean'):
-        session_vm_factory.destroy_all()
-
-
 @pytest.fixture(scope='session')
 def work_dir(request):
     work_dir = request.config.getoption('--work-dir').expanduser()
@@ -234,6 +228,8 @@ def session_vm_factory(request, vm_host, ssh_config, bin_dir, work_dir):
     """Create factory once per session, don't release VMs"""
     config_factory = VagrantVMConfigFactory()
     factory = VagrantVMFactory(request.config.cache, ssh_config, vm_host, bin_dir, work_dir, config_factory)
+    if request.config.getoption('clean'):
+        factory.destroy_all()
     return factory
 
 
