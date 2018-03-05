@@ -318,7 +318,7 @@ CONFIG(debug, debug|release) {
   include(dependencies.pri)
 }
 
-unix {
+linux {
   QMAKE_CXXFLAGS_CXX14 = -std=c++17
   QMAKE_CXXFLAGS_GNUCXX14 = -std=c++17
 }
