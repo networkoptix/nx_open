@@ -28,7 +28,6 @@ struct CloudConnectControllerImpl
     OutgoingTunnelPool outgoingTunnelPool;
     CloudConnectSettings settings;
     tcp::ReverseConnectionPool tcpReversePool;
-    Ini ini;
 
     CloudConnectControllerImpl(
         const QString& customCloudHost,
@@ -66,14 +65,6 @@ struct CloudConnectControllerImpl
         addressResolver->setCloudResolveEnabled(false);
     }
 };
-
-//-------------------------------------------------------------------------------------------------
-
-Ini::Ini():
-    IniConfig("nx_cloud_connect.ini")
-{
-    reload();
-}
 
 //-------------------------------------------------------------------------------------------------
 
@@ -125,11 +116,6 @@ CloudConnectSettings& CloudConnectController::settings()
 tcp::ReverseConnectionPool& CloudConnectController::tcpReversePool()
 {
     return m_impl->tcpReversePool;
-}
-
-const Ini& CloudConnectController::ini() const
-{
-    return m_impl->ini;
 }
 
 void CloudConnectController::reinitialize()
