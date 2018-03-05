@@ -122,6 +122,8 @@ struct QnLayoutSettingsDialog::Private
         return !loadedImageIsCropped;
     }
 
+    QnLayoutResourcePtr layout;
+
     DialogState state = NoImage;
 
     /** Path to the selected image (may be path in cache). */
@@ -253,6 +255,7 @@ void QnLayoutSettingsDialog::readFromResource(const QnLayoutResourcePtr& layout)
         });
 
     d->clear();
+    d->layout = layout;
     d->imageFilename = layout->backgroundImageFilename();
 
     if (!d->imageFilename.isEmpty())
@@ -617,8 +620,8 @@ void QnLayoutSettingsDialog::selectFile()
         return;
     }
 
-    /* Check if we were disconnected (server shut down) while the dialog was open. */
-    if (!context()->user())
+    // Check if we were disconnected (server shut down) while the dialog was open.
+    if (!d->layout->isFile() && !context()->user())
         return;
 
     d->clear();
