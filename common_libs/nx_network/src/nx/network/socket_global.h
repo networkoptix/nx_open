@@ -46,7 +46,6 @@ public:
     {
         Ini(): IniConfig("nx_network.ini") { reload(); }
 
-        NX_INI_FLAG(0, disableCloudSockets, "Use plain TCP sockets instead of Cloud sockets");
         NX_INI_STRING("", disableHosts, "Comma-separated list of forbidden IPs and domains");
 
         bool isHostDisabled(const HostAddress& address) const;
