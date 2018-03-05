@@ -109,12 +109,24 @@ int mount(Argument url, Argument directory, OptionalArgument username, OptionalA
 
     std::string passwordString = password ? *password : "";
     std::string usernameString = username ? *username : "guest";
+    std::exception_ptr mountExceptionPtr;
 
     for (const auto& candidate: {usernameString, "WORKGROUP\\" + usernameString})
     {
-        if (execute(makeCommandString(candidate, passwordString)) == 0)
-            return 0;
+        try
+        {
+            mountExceptionPtr = nullptr;
+            if (execute(makeCommandString(candidate, passwordString)) == 0)
+                return 0;
+        }
+        catch (const std::exception&)
+        {
+            mountExceptionPtr = std::current_exception();
+        }
     }
+
+    if (mountExceptionPtr)
+        std::rethrow_exception(mountExceptionPtr);
 
     return -1;
 }
