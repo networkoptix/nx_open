@@ -43,6 +43,15 @@ class CloudNotificationAdmin(admin.ModelAdmin):
         ("When and who sent the notification", {'fields': (('sent_by', 'convert_date'))})
     ]
 
+
+    def add_view(self, request, form_url='', extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['BROADCAST_NOTIFICATIONS_SUPERUSERS_ONLY'] = settings.BROADCAST_NOTIFICATIONS_SUPERUSERS_ONLY
+        return super(CloudNotificationAdmin, self).add_view(
+            request, form_url, extra_context=extra_context,
+        )
+
+
     def change_view(self, request, object_id, form_url='', extra_context=None):
         extra_context = extra_context or {}
         extra_context['BROADCAST_NOTIFICATIONS_SUPERUSERS_ONLY'] = settings.BROADCAST_NOTIFICATIONS_SUPERUSERS_ONLY
@@ -63,6 +72,7 @@ class CloudNotificationAdmin(admin.ModelAdmin):
     convert_date.short_description = "Sent date"
     convert_date.allow_tags = True
     convert_date.admin_order_field = "sent_date"
+
 
     def has_delete_permission(self, request, obj=None):
         self.request = request
