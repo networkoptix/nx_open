@@ -20,12 +20,14 @@ ListView
     {
         source: lp("/images/bottom_panel_shadow_left.png")
         anchors.left: parent.left
+        visible: interactive && visibleArea.xPosition > 0
     }
 
     Image
     {
         source: lp("/images/bottom_panel_shadow_right.png")
         anchors.right: parent.right
+        visible: interactive && (visibleArea.widthRatio + visibleArea.xPosition < 1)
     }
 
     delegate:
