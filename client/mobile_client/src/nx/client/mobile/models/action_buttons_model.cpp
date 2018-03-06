@@ -17,7 +17,6 @@ enum Roles
     iconPathRoleId,
     hintRoleId,
 
-
     // Software trigger roles
     prolongedTriggerRoleId,
 };
