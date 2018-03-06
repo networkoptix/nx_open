@@ -2,6 +2,10 @@
     background: #212A2F !important;
 }
 
+#changelist #toolbar form #searchbar{
+    height: 26px;
+}
+
 .dashboard-module h2{
     height: initial;
     font-size: initial;
