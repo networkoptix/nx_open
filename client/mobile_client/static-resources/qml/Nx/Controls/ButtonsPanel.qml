@@ -16,6 +16,24 @@ ListView
 
     interactive: contentWidth > width
 
+    onVisibleChanged:
+    {
+        if (visible && interactive)
+            showAnimation.start()
+    }
+
+    PropertyAnimation
+    {
+        id: showAnimation
+
+        duration: 300
+        easing.type: Easing.OutQuad
+        target: control
+        properties: "contentX"
+        from: -width - height
+        to: -width
+    }
+
     Image
     {
         source: lp("/images/bottom_panel_shadow_left.png")

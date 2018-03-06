@@ -347,7 +347,7 @@ Item
             id: navigationPanel
 
             readonly property real minimalWidth: width - (zoomButtonsRow.x + zoomButtonsRow.width)
-            readonly property bool showZoomControls: actionButtonsPanel.contentWidth <= minimalWidth
+            readonly property bool showZoomControls: actionButtonsPanel.contentWidth < minimalWidth
 
             width: parent.width
             height: 56
