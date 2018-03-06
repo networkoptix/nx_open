@@ -4,6 +4,8 @@
 
 #include <iostream>
 
+#include <nx/utils/log/log.h>
+
 namespace nx {
 namespace mediaserver {
 namespace plugins {
@@ -153,8 +155,9 @@ boost::optional<int> HanwhaBytestreamFilter::eventRegion(const QString& eventSou
 
 bool HanwhaBytestreamFilter::isEventActive(const QString& eventSourceState) const
 {
-    qDebug() << "eventSourceState" << eventSourceState << (eventSourceState.toLower() == kActive);
-    return eventSourceState == kActive;
+    bool isActive = (eventSourceState == kActive);
+    NX_VERBOSE(this, lm("eventSourceState = '%1' -> %2").args(eventSourceState, isActive));
+    return isActive;
 }
 
 Hanwha::EventItemType HanwhaBytestreamFilter::eventItemType(
