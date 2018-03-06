@@ -2796,6 +2796,18 @@ QnAbstractArchiveDelegate* HanwhaResource::createArchiveDelegate()
     return nullptr;
 }
 
+void HanwhaResource::setAnalyticsSupportedEvents(const nx::api::AnalyticsSupportedEvents& eventsList)
+{
+    nx::api::AnalyticsSupportedEvents externalEvents;
+    for (const auto& event: eventsList)
+    {
+        if (event != kHanwhaInputPortEventId)
+            externalEvents.push_back(event);
+    }
+
+    base_type::setAnalyticsSupportedEvents(externalEvents);
+}
+
 QnTimePeriodList HanwhaResource::getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int /*detailLevel*/)
 {
     if (!isNvr())
