@@ -61,9 +61,9 @@ void AddressResolver::resolveAsync(
 {
     if (hostName.isIpAddress())
     {
-        return handler(
-            SystemError::noError,
-            std::deque<AddressEntry>({{ AddressEntry(AddressType::direct, hostName) }}));
+        std::deque<AddressEntry> result;
+        result.push_back(AddressEntry(AddressType::direct, hostName));
+        return handler(SystemError::noError, std::move(result));
     }
 
     if (SocketGlobals::ini().isHostDisabled(hostName))
