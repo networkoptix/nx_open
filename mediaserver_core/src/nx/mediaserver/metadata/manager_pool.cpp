@@ -24,6 +24,7 @@
 #include <nx/api/analytics/device_manifest.h>
 #include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <nx/sdk/metadata/consuming_camera_manager.h>
+#include <nx/debugging/visual_metadata_debugger_factory.h>
 #include <core/dataconsumer/abstract_data_receptor.h>
 #include <nx/utils/log/log_main.h>
 #include <mediaserver_ini.h>
@@ -47,9 +48,12 @@ namespace metadata {
 
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
+using namespace nx::debugging;
 
 ManagerPool::ManagerPool(QnMediaServerModule* serverModule):
-    m_serverModule(serverModule)
+    m_serverModule(serverModule),
+    m_visualMetadataDebugger(
+        VisualMetadataDebuggerFactory::makeDebugger(DebuggerType::managerPool))
 {
 }
 
@@ -294,6 +298,7 @@ void ManagerPool::createCameraManagersForResourceUnsafe(const QnSecurityCamResou
             manager->queryInterface(IID_CameraManager)))
         {
             handler->registerDataReceptor(&context);
+            handler->setVisualDebugger(m_visualMetadataDebugger.get());
         }
 
         context.addManager(std::move(manager), std::move(handler), *pluginManifest);
@@ -711,6 +716,11 @@ void ManagerPool::putVideoFrame(
         compressedFrame ? "compressedFrame" : "/*compressedFrame*/ nullptr",
         uncompressedFrame ? "uncompressedFrame" : "/*uncompressedFrame*/ nullptr");
 
+    if (compressedFrame)
+        m_visualMetadataDebugger->push(compressedFrame);
+    else
+        m_visualMetadataDebugger->push(uncompressedFrame);
+
     QnMutexLocker lock(&m_contextMutex);
     for (auto& managerData: m_contexts[id].managers())
     {
@@ -749,6 +759,7 @@ void ManagerPool::putVideoFrame(
                     lm("Compressed frame requested but not received."));
             }
         }
+
         if (dataPacket)
         {
             manager->pushDataPacket(dataPacket);

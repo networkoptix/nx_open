@@ -114,33 +114,36 @@ void MetadataHandler::handleObjectsPacket(nxpt::ScopedRef<ObjectsMetadataPacket>
 
     if (m_dataReceptor)
         m_dataReceptor->putData(nx::common::metadata::toMetadataPacket(data));
+
+    if (m_visualDebugger)
+        m_visualDebugger->push(nx::common::metadata::toMetadataPacket(data));
 }
 
 void MetadataHandler::handleMetadataEvent(
     nxpt::ScopedRef<Event> eventData,
     qint64 timestampUsec)
 {
-auto eventState = nx::vms::event::EventState::undefined;
+    auto eventState = nx::vms::event::EventState::undefined;
 
-        const auto eventTypeId = nxpt::fromPluginGuidToQnUuid(eventData->typeId());
-        NX_VERBOSE(this) << __func__ << lm("(): typeId %1").args(eventTypeId);
+    const auto eventTypeId = nxpt::fromPluginGuidToQnUuid(eventData->typeId());
+    NX_VERBOSE(this) << __func__ << lm("(): typeId %1").args(eventTypeId);
 
-        auto descriptor = eventDescriptor(eventTypeId);
-        if (descriptor.flags.testFlag(nx::api::Analytics::EventTypeFlag::stateDependent))
+    auto descriptor = eventDescriptor(eventTypeId);
+    if (descriptor.flags.testFlag(nx::api::Analytics::EventTypeFlag::stateDependent))
+    {
+        eventState = eventData->isActive()
+            ? nx::vms::event::EventState::active
+            : nx::vms::event::EventState::inactive;
+
+        const bool isDublicate = eventState == nx::vms::event::EventState::inactive
+            && lastEventState(eventTypeId) == nx::vms::event::EventState::inactive;
+
+        if (isDublicate)
         {
-            eventState = eventData->isActive()
-                ? nx::vms::event::EventState::active
-                : nx::vms::event::EventState::inactive;
-
-            const bool isDublicate = eventState == nx::vms::event::EventState::inactive
-                && lastEventState(eventTypeId) == nx::vms::event::EventState::inactive;
-
-            if (isDublicate)
-            {
-                NX_VERBOSE(this) << __func__ << lm("(): Ignoring duplicate event");
-                return;
-            }
+            NX_VERBOSE(this) << __func__ << lm("(): Ignoring duplicate event");
+            return;
         }
+    }
 
     setLastEventState(eventTypeId, eventState);
 
@@ -181,6 +184,12 @@ void MetadataHandler::registerDataReceptor(QnAbstractDataReceptor* dataReceptor)
 void MetadataHandler::removeDataReceptor(QnAbstractDataReceptor* dataReceptor)
 {
     m_dataReceptor = nullptr;
+}
+
+void MetadataHandler::setVisualDebugger(
+    nx::debugging::AbstractVisualMetadataDebugger* visualDebugger)
+{
+    m_visualDebugger = visualDebugger;
 }
 
 nx::vms::event::EventState MetadataHandler::lastEventState(const QnUuid& eventId) const

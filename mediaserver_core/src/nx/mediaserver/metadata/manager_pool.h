@@ -8,6 +8,8 @@
 
 #include <boost/optional/optional.hpp>
 
+#include "resource_metadata_context.h"
+
 #include <nx/utils/log/log.h>
 #include <common/common_module_aware.h>
 #include <utils/common/connective.h>
@@ -20,9 +22,9 @@
 #include <nx/mediaserver/metadata/rule_holder.h>
 #include <nx/fusion/serialization/json.h>
 #include <core/dataconsumer/abstract_data_receptor.h>
-#include "resource_metadata_context.h"
 #include <nx/streaming/video_data_packet.h>
 #include <decoders/video/ffmpeg_video_decoder.h>
+#include <nx/debugging/abstract_visual_metadata_debugger.h>
 
 class QnMediaServerModule;
 class QnCompressedVideoData;
@@ -162,6 +164,7 @@ private:
     QnMutex m_contextMutex;
     bool m_compressedFrameWarningIssued = false;
     bool m_uncompressedFrameWarningIssued = false;
+    nx::debugging::VisualMetadataDebuggerPtr m_visualMetadataDebugger;
 };
 
 } // namespace metadata
