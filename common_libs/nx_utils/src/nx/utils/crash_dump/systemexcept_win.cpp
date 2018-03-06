@@ -44,18 +44,22 @@ typedef BOOL (WINAPI *pfMiniDumpWriteDump) (
 
 static void LegacyDump( HANDLE );
 
-static int GetBaseName( const char* name , DWORD len ) {
-    for( DWORD i = len-1 ; i >= 0 ; --i ) {
-        if( name[i] == '\\' || name[i] == '/' )
-            return i+1;
+static int GetBaseName(const char* name, DWORD len)
+{
+    do
+    {
+        --len;
+        if (name[len] == '\\' || name[len] == '/')
+            return len + 1;
     }
+    while (len > 0);
     return 0;
 }
 
 static bool GetProgramName( char* buffer ) {
     char sModuleName[MAX_SYMBOL_SIZE];
     DWORD dwLen = ::GetModuleFileNameA( NULL, sModuleName, MAX_SYMBOL_SIZE );
-    if( dwLen == MAX_SYMBOL_SIZE || dwLen < 0 )
+    if (dwLen == MAX_SYMBOL_SIZE)
         return false;
 
     int iBaseNamePos = GetBaseName( sModuleName , dwLen );
