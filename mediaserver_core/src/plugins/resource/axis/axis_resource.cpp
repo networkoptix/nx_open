@@ -644,42 +644,12 @@ CameraDiagnostics::Result QnPlAxisResource::initializeCameraDriver()
     return CameraDiagnostics::NoErrorResult();
 }
 
-QnPlAxisResource::AxisResolution QnPlAxisResource::getMaxResolution() const
-{
-    QnMutexLocker lock( &m_mutex );
-    return !m_resolutionList.isEmpty() ? m_resolutionList[0] : AxisResolution();
-}
-
 float QnPlAxisResource::getResolutionAspectRatio(const AxisResolution& resolution) const
 {
     if (!resolution.size.isEmpty())
         return resolution.size.width() / (float) resolution.size.height();
     else
         return 1.0;
-}
-
-
-QnPlAxisResource::AxisResolution QnPlAxisResource::getNearestResolution(const QSize& resolution, float aspectRatio) const
-{
-    QnMutexLocker lock( &m_mutex );
-
-    float requestSquare = resolution.width() * resolution.height();
-    int bestIndex = -1;
-    float bestMatchCoeff = (float)INT_MAX;
-    for (int i = 0; i < m_resolutionList.size(); ++ i)
-    {
-        float ar = getResolutionAspectRatio(m_resolutionList[i]);
-        if (aspectRatio != 0 && qAbs(ar-aspectRatio) > MAX_AR_EPS)
-            continue;
-        float square = m_resolutionList[i].size.width() * m_resolutionList[i].size.height();
-        float matchCoeff = qMax(requestSquare, square) / qMin(requestSquare, square);
-        if (matchCoeff < bestMatchCoeff)
-        {
-            bestIndex = i;
-            bestMatchCoeff = matchCoeff;
-        }
-    }
-    return bestIndex >= 0 ? m_resolutionList[bestIndex] : AxisResolution();
 }
 
 QRect QnPlAxisResource::getMotionWindow(int num) const
