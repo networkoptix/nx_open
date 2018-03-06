@@ -1,4 +1,6 @@
-#include "actions.h"
+#include <iostream>
+#include <assert.h>
+#include <nx/root_tool/actions.h>
 
 static int showHelp()
 {
@@ -25,65 +27,85 @@ static boost::optional<std::string> getOptionalArg(const char**& argv)
     return value;
 }
 
-static std::string getArg(const char**& argv, const char* error)
+static int reportErrorAndExit(const std::string& message)
 {
-    if (auto arg = getOptionalArg(argv))
-        return *arg;
+    std::cout << message;
+    return -1;
+}
 
-    throw std::invalid_argument(error);
+static int reportArgErrorAndExit(const std::string& command)
+{
+    if (command == "umount" || command == "unmount")
+        return reportErrorAndExit("<source> or <directory> is required");
+    else if (command == "chown")
+        return reportErrorAndExit("<file_or_directory_path> is required");
+    else if (command == "touch")
+        return reportErrorAndExit("<file_path> is required");
+    else if (command == "mkdir")
+        return reportErrorAndExit("<directory_path> is required");
+    else if (command == "install")
+        return reportErrorAndExit("<deb_package> is required");
+
+    assert(false);
+    return -1;
 }
 
 int main(int /*argc*/, const char** argv)
 {
-    try
+    if (argv == nullptr || *argv == nullptr)
+        return reportErrorAndExit("This program is not supposed to be used without argv.");
+
+    ++argv; //< Binary name.
+    const auto command = getOptionalArg(argv);
+    if (!command)
+        return reportErrorAndExit("command is required");
+
+    nx::root_tool::Actions actions;
+    if (!actions.setupIds())
+        return reportErrorAndExit(actions.lastError());
+
+    if (*command == "-h" || *command == "--help")
+        return showHelp();
+
+    if (*command == "mount")
     {
-        if (argv == nullptr || *argv == nullptr)
-            throw std::runtime_error("This program is not supposed to be used without argv.");
+        const auto url = getOptionalArg(argv);
+        if (!url)
+            return reportErrorAndExit("<url> is required");
 
-        ++argv; //< Binary name.
-        const auto command = getArg(argv, "command is required");
-        nx::root_tool::setupIds();
+        const auto directory = getOptionalArg(argv);
+        if (!directory)
+            return reportErrorAndExit("<directory> is required");
 
-        if (command == "-h" || command == "--help")
-            return showHelp();
+        const auto user = getOptionalArg(argv);
+        const auto password = getOptionalArg(argv);
 
-        if (command == "mount")
-        {
-            const auto url = getArg(argv, "<url> is required");
-            const auto directory = getArg(argv, "<directory> is required");
-            const auto user = getOptionalArg(argv);
-            const auto password = getOptionalArg(argv);
-            return nx::root_tool::mount(url, directory, user, password);
-        }
-
-        if (command == "umount" || command == "unmount")
-            return nx::root_tool::unmount(getArg(argv, "<source> or <directory> is required"));
-
-        if (command == "chown")
-            return nx::root_tool::changeOwner(getArg(argv, "<file_or_directory_path> is required"));
-
-        if (command == "touch")
-            return nx::root_tool::touchFile(getArg(argv, "<file_path> is required"));
-
-        if (command == "mkdir")
-            return nx::root_tool::makeDirectory(getArg(argv, "<directory_path> is required"));
-
-        if (command == "install")
-            return nx::root_tool::install(getArg(argv, "<deb_package> is required"));
-
-        if (command == "ids")
-            return nx::root_tool::showIds();
-
-        throw std::invalid_argument("Unknown command: " + command);
+        if (!actions.mount(*url, *directory, user, password))
+            return reportErrorAndExit(actions.lastError());
     }
-    catch (const std::invalid_argument& exception)
+
+    if (*command == "ids")
     {
-        std::cout << "Error: " << exception.what() << ", try --help" << std::endl;
-        return 1;
+        actions.showIds();
+        return 0;
     }
-    catch (const std::exception& exception)
+
+    const auto commandArg = getOptionalArg(argv);
+    if (!commandArg)
+        return reportArgErrorAndExit(*command);
+
+    if (((*command == "umount" || *command == "unmount") && !actions.unmount(*commandArg))
+        || (*command == "chown" && !actions.changeOwner(*commandArg))
+        || (*command == "touch" && !actions.touchFile(*commandArg))
+        || (*command == "mkdir" && !actions.makeDirectory(*commandArg))
+        || (*command == "install" && !actions.install(*commandArg)))
     {
-        std::cout << "Error: " << exception.what() << std::endl;
-        return 2;
+        return reportErrorAndExit(actions.lastError());
     }
+    else
+    {
+        return reportErrorAndExit("Unknown command: " + *command);
+    }
+
+    return 0;
 }
