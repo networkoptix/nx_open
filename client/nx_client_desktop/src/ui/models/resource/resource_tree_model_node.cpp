@@ -245,9 +245,11 @@ void QnResourceTreeModelNode::setResource(const QnResourcePtr& resource)
     {
         auto nodePtr = toSharedPointer();
         NX_EXPECT(!nodePtr.isNull());
-        manager()->removeResourceNode(nodePtr);
+        if (m_resource)
+            manager()->removeResourceNode(nodePtr);
         m_resource = resource;
-        manager()->addResourceNode(nodePtr);
+        if (resource)
+            manager()->addResourceNode(nodePtr);
     }
     else
     {
@@ -280,6 +282,7 @@ void QnResourceTreeModelNode::update()
                 m_flags = 0;
                 m_status = Qn::Online;
                 m_searchString = QString();
+                m_cameraExtraStatus = {};
             }
             else
             {
@@ -288,6 +291,7 @@ void QnResourceTreeModelNode::update()
                 m_status = m_resource->getStatus();
                 m_searchString = m_resource->toSearchString();
                 m_displayName = QnResourceDisplayInfo(m_resource).toString(Qn::RI_NameOnly);
+                m_cameraExtraStatus = calculateCameraExtraStatus();
             }
             break;
         }
