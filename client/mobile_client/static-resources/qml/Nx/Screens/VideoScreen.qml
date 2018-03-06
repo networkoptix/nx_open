@@ -66,8 +66,8 @@ PageBase
                 || videoScreenController.noVideoStreams
                 || videoScreenController.noLicenses)
             && !videoScreenController.mediaPlayer.playing)
-            || videoScreenController.isDefaultCameraPassword
-            || videoScreenController.isOldFirmware
+            || videoScreenController.hasDefaultCameraPassword
+            || videoScreenController.hasOldFirmware
 
         readonly property bool applicationActive: Qt.application.state === Qt.ApplicationActive
 

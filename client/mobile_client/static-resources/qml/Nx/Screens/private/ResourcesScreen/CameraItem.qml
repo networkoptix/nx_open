@@ -36,10 +36,10 @@ Control
         property bool offline: status == QnCameraListModel.Offline ||
                                status == QnCameraListModel.NotDefined ||
                                status == QnCameraListModel.Unauthorized ||
-                               isDefaultPassword || isOldFirmware
+                               hasDefaultPassword || hasOldFirmware
         property bool unauthorized: status == QnCameraListModel.Unauthorized
-        property bool isDefaultPassword: resourceHelper.isDefaultCameraPassword
-        property bool isOldFirmware: resourceHelper.isOldCameraFirmware
+        property bool hasDefaultPassword: resourceHelper.hasDefaultCameraPassword
+        property bool hasOldFirmware: resourceHelper.hasOldCameraFirmware
 
         // This property prevents video component re-creation while scrolling.
         property bool videoAllowed: false
@@ -163,7 +163,7 @@ Control
                     if (d.unauthorized)
                         return lp("/images/camera_locked.png")
 
-                    if (d.isDefaultPassword || d.isOldFirmware)
+                    if (d.hasDefaultPassword || d.hasOldFirmware)
                         return lp("/images/camera_alert.png")
 
                     return lp("/images/camera_offline.png")
@@ -181,9 +181,9 @@ Control
                 {
                     if (d.unauthorized)
                         return qsTr("Authentication required")
-                    if (d.isDefaultPassword)
+                    if (d.hasDefaultPassword)
                         return qsTr("Password required")
-                    if (d.isOldFirmware)
+                    if (d.hasOldFirmware)
                         return qsTr("Unsupported firmware version")
                     return qsTr("Offline")
                 }

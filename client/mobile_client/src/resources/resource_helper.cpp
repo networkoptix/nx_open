@@ -73,12 +73,12 @@ bool QnResourceHelper::hasCameraCapability(Qn::CameraCapability capability) cons
     return false;
 }
 
-bool QnResourceHelper::isDefaultCameraPassword() const
+bool QnResourceHelper::hasDefaultCameraPassword() const
 {
     return hasCameraCapability(Qn::isDefaultPasswordCapability);
 }
 
-bool QnResourceHelper::isOldCameraFirmware() const
+bool QnResourceHelper::hasOldCameraFirmware() const
 {
     return hasCameraCapability(Qn::isOldFirmwareCapability);
 }

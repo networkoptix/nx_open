@@ -11,9 +11,9 @@ class QnResourceHelper: public Connective<QObject>, public QnConnectionContextAw
     Q_PROPERTY(QString resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
     Q_PROPERTY(Qn::ResourceStatus resourceStatus READ resourceStatus NOTIFY resourceStatusChanged)
     Q_PROPERTY(QString resourceName READ resourceName NOTIFY resourceNameChanged)
-    Q_PROPERTY(bool isDefaultCameraPassword READ isDefaultCameraPassword
+    Q_PROPERTY(bool hasDefaultCameraPassword READ hasDefaultCameraPassword
         NOTIFY defaultCameraPasswordChanged)
-    Q_PROPERTY(bool isOldCameraFirmware READ isOldCameraFirmware
+    Q_PROPERTY(bool hasOldCameraFirmware READ hasOldCameraFirmware
         NOTIFY oldCameraFirmwareChanged)
     Q_ENUMS(Qn::ResourceStatus)
 
@@ -27,8 +27,8 @@ public:
 
     Qn::ResourceStatus resourceStatus() const;
     QString resourceName() const;
-    bool isDefaultCameraPassword() const;
-    bool isOldCameraFirmware() const;
+    bool hasDefaultCameraPassword() const;
+    bool hasOldCameraFirmware() const;
 
 signals:
     void resourceIdChanged();
