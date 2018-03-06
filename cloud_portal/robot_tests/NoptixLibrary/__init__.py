@@ -62,13 +62,13 @@ class NoptixLibrary(object):
         raise AssertionError(not_found)
 
 
-    def check_online_or_offline(self, elements):
+    def check_online_or_offline(self, elements, offlineText):
         for element in elements:
             try:
                 if element.find_element_by_xpath(".//button[@ng-click='checkForm()']"): 
                     print "online"
             except NoSuchElementException:
                 try:
-                    if element.find_element_by_xpath(".//span[contains(text(),'offline')]"):                    
+                    if element.find_element_by_xpath(".//span[contains(text(),'"+offlineText+"')]"):                    
                         print "offline"
                 except: raise NoSuchElementException

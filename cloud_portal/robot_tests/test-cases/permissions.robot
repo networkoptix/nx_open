@@ -142,6 +142,7 @@ Sharing works
 
 displays pencil and cross links for each user only on hover
     Open Browser and go to URL    ${url}
+    Maximize Browser Window
     Log in to Auto Tests System    ${email}
     Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
     Click Button    ${SHARE BUTTON SYSTEMS}
@@ -159,6 +160,7 @@ displays pencil and cross links for each user only on hover
 
 Edit permission works
     Open Browser and go to URL    ${url}
+    Maximize Browser Window
     Log in to Auto Tests System    ${email}
     Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
     Click Button    ${SHARE BUTTON SYSTEMS}

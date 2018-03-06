@@ -1,6 +1,7 @@
 {
     "YOU HAVE NO SYSTEMS TEXT": "คุณไม่มีระบบเชื่อมต่อกับ {{PRODUCT_NAME}}",
     "LOG OUT BUTTON TEXT": "ออกจากระบบ",
+    "ACCOUNT SETTINGS BUTTON TEXT": "การตั้งค่าบัญชี",
     "RESET EMAIL SENT MESAGE TEXT": "Password reset instructions are sent to Email",
     "CREATE ACCOUNT BUTTON TEXT": "สร้างบัญชี",
     "TERMS AND CONDITIONS LINK TEXT": "Terms and Conditions",
@@ -28,6 +29,8 @@
     "SHARE PERMISSIONS HINT VIEWER": "สามารถดูวิดีโอสดและเรียกดูไฟล์ที่เก็บได้",
     "SHARE PERMISSIONS HINT LIVE VIEWER": "สามารถดูวิดีโอสดได้เท่านั้น",
     "SHARE PERMISSIONS HINT CUSTOM": "ใช้แอ็พพลิเคชันไคลเอ็นต์ {{PRODUCT_NAME}} เพื่อตั้งค่าสิทธิ์ที่กำหนดเอง",
+    "ACCOUNT TEXT": "บัญชีผู้ใช้",
+    "EDIT USER BUTTON TEXT": "แก้ไข",
     "DELETE USER BUTTON TEXT": "ลบ",
     "DELETE USER CANCEL BUTTON TEXT": "ยกเลิก",
     "OWNER TEXT": "เจ้าของ",

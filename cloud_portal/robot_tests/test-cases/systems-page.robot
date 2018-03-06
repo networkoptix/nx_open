@@ -43,7 +43,7 @@ should show system's state for systems if they are offline. Otherwise - button O
     Validate Log In
     Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
     ${systems}    Get WebElements    //div[@ng-repeat='system in systems | filter:searchSystems as filtered']
-    Check Online Or Offline    ${systems}
+    Check Online Or Offline    ${systems}    ${AUTOTESTS OFFLINE TEXT}
     Close Browser
 
 should open system page (users list) when clicked on system

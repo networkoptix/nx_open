@@ -1,6 +1,7 @@
 {
     "YOU HAVE NO SYSTEMS TEXT": "您沒有任何系統連接到 {{PRODUCT_NAME}}",
     "LOG OUT BUTTON TEXT": "登出",
+    "ACCOUNT SETTINGS BUTTON TEXT": "帳號設定",
     "RESET EMAIL SENT MESAGE TEXT": "密碼重設說明已發送至電子郵件",
     "CREATE ACCOUNT BUTTON TEXT": "新建帳號",
     "TERMS AND CONDITIONS LINK TEXT": "Terms and Conditions",
@@ -28,6 +29,8 @@
     "SHARE PERMISSIONS HINT VIEWER": "可以瀏覽即時影像和回放錄影資料",
     "SHARE PERMISSIONS HINT LIVE VIEWER": "只能瀏覽即時影像",
     "SHARE PERMISSIONS HINT CUSTOM": "使用 {{PRODUCT_NAME}} 用戶端應用程式可以設置自訂權限",
+    "ACCOUNT TEXT": "帳號",
+    "EDIT USER BUTTON TEXT": "編輯",
     "DELETE USER BUTTON TEXT": "刪除",
     "DELETE USER CANCEL BUTTON TEXT": "取消",
     "OWNER TEXT": "擁有者",
