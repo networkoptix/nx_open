@@ -1,6 +1,6 @@
 const fsmv = require('fs-extra');
 const path = require('path');
-const copyCustomization = (color) => {
+const copySkin = (color) => {
 	var source = path.resolve(__dirname, '../skins', color, 'front_end/styles');
 	var dest = path.resolve(__dirname, 'app/styles/custom');
 	fsmv.copy(source, dest, {mkdirp:true}, error => error ? console.log(error) : null);
@@ -10,4 +10,4 @@ const copyCustomization = (color) => {
 	fsmv.copy(source, dest, {mkdirp:true}, error => error ? console.log(error) : null);
 }
 
-copyCustomization(process.argv[3] || 'blue');
+copySkin(process.argv[3] || 'blue');

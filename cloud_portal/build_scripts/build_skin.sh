@@ -27,9 +27,9 @@ dir=../skins/$SKIN
         npm run setSkin $SKIN
         npm run build
         # Save the repository info.
-        echo "Create version.txt" >&2
+        echo "Create version.txt"
         hg log -r . --repository "$DIR/../.." > dist/version.txt
-        cat dist/version.txt >&2
+        cat dist/version.txt
     popd
 
 
