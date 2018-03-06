@@ -26,7 +26,6 @@
     "WRONG PASSWORD"                       :    "Wrong password",
     "ACCOUNT DOES NOT EXIST"               :    "Account does not exist",
     "CANNOT SEND CONFIRMATION EMAIL"       :    "Cannot send confirmation Email:",
-    "CANNOT SAVE PASSWORD"                 :    "Cannot save password:",
     "CODE USED/INCORRECT"                  :    "Confirmation code is already used or incorrect",
 
     "SHARE PERMISSIONS HINT ADMIN"         :    "Unrestricted access including the ability to share",
@@ -53,13 +52,13 @@
 
     "DISCONNECT FORM HEADER TEXT"          :    "Disconnect System from {{PRODUCT_NAME}}?",
 
-    "FIRST NAME IS REQUIRED TEXT"          :    "First name is required",
-    "LAST NAME IS REQUIRED TEXT"           :    "Last name is required",
-    "EMAIL IS REQUIRED TEXT"               :    "Email is required",
-    "EMAIL ALREADY REGISTERED TEXT"        :    "This Email has been already registered in {{PRODUCT_NAME}}",
-    "EMAIL INVALID TEXT"                   :    "Please, enter a valid Email",
-    "PASSWORD IS REQUIRED TEXT"            :    "Password is required",
-    "PASSWORD SPECIAL CHARS TEXT"          :    "Use only latin letters, numbers and keyboard symbols, avoid leading and trailing spaces",
+    "FIRST NAME IS REQUIRED TEXT"          :    "First name is required.",
+    "LAST NAME IS REQUIRED TEXT"           :    "Last name is required.",
+    "EMAIL IS REQUIRED TEXT"               :    "Email is required.",
+    "EMAIL ALREADY REGISTERED TEXT"        :    "This Email has been already registered in {{PRODUCT_NAME}}.",
+    "EMAIL INVALID TEXT"                   :    "Please, enter a valid Email.",
+    "PASSWORD IS REQUIRED TEXT"            :    "Password is required.",
+    "PASSWORD SPECIAL CHARS TEXT"          :    "Use only latin letters, numbers and keyboard symbols, avoid leading and trailing spaces.",
     "PASSWORD TOO SHORT TEXT"              :    "Password must contain at least 8 characters",
     "PASSWORD TOO COMMON TEXT"             :    "This password is in top most popular passwords in the world"
 }
