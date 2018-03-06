@@ -17,7 +17,12 @@
 
     "version": "1.0",
     "data": [
-
+        {
+            "keys": [
+                "N8Fx-OLAH4|IP-Camera"
+            ],
+            "macFromMulticast": true
+        },
         {
             "keys": [
                 "Hanwha|PRN-4011"
