@@ -216,7 +216,7 @@ QnCloudStatusWatcher* QnMobileClientModule::cloudStatusWatcher() const
 
 void QnMobileClientModule::initDesktopCamera()
 {
-    /* Initialize desktop camera searcher. */
+    // Initialize desktop camera searcher.
     const auto commonModule = m_clientCoreModule->commonModule();
     const auto desktopSearcher = commonModule->store(new QnDesktopResourceSearcher(nullptr));
     const auto resourceDiscoveryManager = commonModule->resourceDiscoveryManager();

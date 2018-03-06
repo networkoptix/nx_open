@@ -7,8 +7,6 @@ import Nx.Media 1.0
 import Nx.Controls 1.0
 import com.networkoptix.qml 1.0
 
-import "../../../Controls"
-
 Item
 {
     id: videoNavigation

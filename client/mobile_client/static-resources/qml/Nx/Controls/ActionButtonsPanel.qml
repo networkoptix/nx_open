@@ -1,8 +1,7 @@
 import QtQuick 2.6
-import Nx 1.0
-import Nx.Core 1.0
 import Nx.Models 1.0
-import com.networkoptix.qml 1.0
+import nx.client.mobile 1.0
+import Nx 1.0
 
 import "private"
 
@@ -43,7 +42,7 @@ Item
         onButtonClicked:
         {
             var type = d.modelDataAccessor.getData(index, "type")
-            switch(type)
+            switch (type)
             {
                 case ActionButtonsModel.PtzButton:
                     ptzButtonClicked()
@@ -59,21 +58,13 @@ Item
             }
         }
 
-        model:
-            ActionButtonsModel
-            {
-                id: buttonModel
-            }
+        model: ActionButtonsModel { id: buttonModel }
     }
 
     readonly property QtObject d:
         QtObject
         {
-            property variant modelDataAccessor:
-                ModelDataAccessor
-                {
-                    model: buttonModel
-                }
+            property variant modelDataAccessor: ModelDataAccessor { model: buttonModel }
 
             property SoftwareTriggersController triggersController:
                 SoftwareTriggersController
@@ -160,7 +151,7 @@ Item
             }
         }
 
-    ActionButtonsHintControl
+    ActionButtonsHint
     {
         id: hintControl
 

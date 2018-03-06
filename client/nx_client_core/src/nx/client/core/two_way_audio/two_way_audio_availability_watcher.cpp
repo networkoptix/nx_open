@@ -83,7 +83,6 @@ void TwoWayAudioAvailabilityWatcher::setAvailable(bool value)
     emit availabilityChanged();
 }
 
-
 } // namespace core
 } // namespace client
 } // namespace nx

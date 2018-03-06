@@ -1,5 +1,7 @@
 #include "action_buttons_model.h"
 
+#include <QtQml/QtQml>
+
 #include <nx/client/mobile/ptz/ptz_availability_watcher.h>
 #include <nx/client/mobile/software_trigger/software_triggers_watcher.h>
 #include <nx/client/core/two_way_audio/two_way_audio_availability_watcher.h>
@@ -54,8 +56,8 @@ struct ActionButtonsModel::Button
     QString hint;
     bool enabled = true;
 
-    static ActionButtonsModel::ButtonPtr ptzButton();
-    static ActionButtonsModel::ButtonPtr twoWayAudioButton();
+    static ActionButtonsModel::ButtonPtr createPtzButton();
+    static ActionButtonsModel::ButtonPtr createTwoWayAudioButton();
 };
 
 ActionButtonsModel::Button::Button(
@@ -77,20 +79,20 @@ ActionButtonsModel::Button::~Button()
 {
 }
 
-ActionButtonsModel::ButtonPtr ActionButtonsModel::Button::ptzButton()
+ActionButtonsModel::ButtonPtr ActionButtonsModel::Button::createPtzButton()
 {
     return ButtonPtr(new Button(
-        QnUuid(), ActionButtonsModel::PtzButton, lit("images/ptz/ptz.png"), QString(), true));
+        QnUuid(), ActionButtonsModel::PtzButton, lit("qrc:///images/ptz/ptz.png"), QString(), true));
 }
 
-ActionButtonsModel::ButtonPtr ActionButtonsModel::Button::twoWayAudioButton()
+ActionButtonsModel::ButtonPtr ActionButtonsModel::Button::createTwoWayAudioButton()
 {
     return ButtonPtr(new Button(
-        QnUuid(), ActionButtonsModel::TwoWayAudioButton, lit("images/two_way_audio/mic.png"),
+        QnUuid(), ActionButtonsModel::TwoWayAudioButton, lit("qrc:///images/two_way_audio/mic.png"),
         ActionButtonsModel::twoWayButtonHint(), true));
 }
 
-//
+//-------------------------------------------------------------------------------------------------
 
 struct ActionButtonsModel::SoftwareButton: public ActionButtonsModel::Button
 {
@@ -188,6 +190,11 @@ ActionButtonsModel::ActionButtonsModel(QObject* parent):
 
 ActionButtonsModel::~ActionButtonsModel()
 {
+}
+
+void ActionButtonsModel::registerQmlType()
+{
+    qmlRegisterType<ActionButtonsModel>("nx.client.mobile", 1, 0, "ActionButtonsModel");
 }
 
 void ActionButtonsModel::setResourceId(const QString& resourceId)
@@ -340,7 +347,7 @@ void ActionButtonsModel::updatePtzButtonVisibility()
     if (visible)
         removeButton(0);
     else
-        insertButton(0, Button::ptzButton());
+        insertButton(0, Button::createPtzButton());
 }
 
 void ActionButtonsModel::updateTwoWayAudioButtonVisibility()
@@ -370,7 +377,7 @@ void ActionButtonsModel::updateTwoWayAudioButtonVisibility()
     else
     {
         const auto position = ptzButtonVisible() ? kMaxButtonPosition - 1 : 0;
-        insertButton(position, Button::twoWayAudioButton());
+        insertButton(position, Button::createTwoWayAudioButton());
     }
 }
 

@@ -21,6 +21,7 @@
 #include <nx/client/core/ui/frame_section.h>
 #include <nx/client/core/utils/geometry.h>
 #include <nx/client/core/utils/quick_item_mouse_tracker.h>
+#include <nx/client/core/two_way_audio/two_way_audio_mode_controller.h>
 
 namespace nx {
 namespace client {
@@ -85,6 +86,8 @@ void initializeMetaTypes()
         QLatin1String("Cannot create an instance of MediaServerResource."));
     qmlRegisterUncreatableType<QnLayoutResource>("Nx.Common", 1, 0, "LayoutResource",
         QLatin1String("Cannot create an instance of LayoutResource."));
+
+    nx::client::core::TwoWayAudioController::registerQmlType();
 }
 
 } // namespace core

@@ -4,7 +4,6 @@
 
 class QSGGeometry;
 class QSGGeometryNode;
-class QSGFlatColorMaterial;
 
 namespace nx {
 namespace client {
@@ -23,6 +22,8 @@ public:
     VoiceSpectrumItem(QQuickItem* parent = nullptr);
 
     virtual ~VoiceSpectrumItem() override;
+
+    static void registerQmlType();
 
     virtual QSGNode* updatePaintNode(
         QSGNode* node,
@@ -43,11 +44,10 @@ signals:
     void lineSpacingChanged();
 
 private:
-    void updateNodeGeometry();
-    void updateNodeMaterial();
-    void clearGeometryData();
+    void updateNodeGeometry(QSGGeometryNode* node);
+    void updateNodeMaterial(QSGGeometryNode* node);
 
-    QSGGeometryNode* getNode();
+    QSGGeometryNode* createNode();
 
 private:
     class VisualizerDataGenerator;
@@ -58,9 +58,7 @@ private:
     QColor m_color = Qt::red;
 
     int m_lastLinesCount = 0;
-    QSGFlatColorMaterial* m_material = nullptr;
-    QSGGeometryNode* m_node = nullptr;
-    QSGGeometry* m_geometry = nullptr;
+    bool m_updateMaterial = false;
 };
 
 } // namespace mobile

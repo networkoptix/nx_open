@@ -27,7 +27,7 @@ Rectangle
         loader.item.color = ColorTheme.brightText
 
         visualDataLoader.sourceComponent = imageComponent
-        visualDataLoader.item.source = lp(iconPath)
+        visualDataLoader.item.source = iconPath
 
         control.visible = true
     }
@@ -41,7 +41,7 @@ Rectangle
         loader.sourceComponent = component
 
         visualDataLoader.sourceComponent = imageComponent
-        visualDataLoader.item.source = lp(iconPath)
+        visualDataLoader.item.source = iconPath
 
         control.visible = true
     }
@@ -89,8 +89,8 @@ Rectangle
 
         visualDataLoader.sourceComponent = imageComponent
         visualDataLoader.item.source = success
-            ? lp("/images/soft_trigger/confirmation_success.png")
-            : lp("/images/soft_trigger/confirmation_failure.png")
+            ? "qrc:///images/soft_trigger/confirmation_success.png"
+            : "qrc:///images/soft_trigger/confirmation_failure.png"
 
         control.visible = true
     }
@@ -166,9 +166,7 @@ Rectangle
     {
         id: imageComponent
 
-        Image
-        {
-        }
+        Image {}
     }
 
     Component

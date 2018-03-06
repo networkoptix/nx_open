@@ -48,7 +48,7 @@ QnDesktopAudioOnlyDataProvider::AudioSourceInfo::~AudioSourceInfo()
         speexPreprocessState = 0;
     }
 
-    if(frameBuffer)
+    if (frameBuffer)
         qFreeAligned(frameBuffer);
 }
 
@@ -239,7 +239,10 @@ QAudioFormat QnDesktopAudioOnlyDataProvider::getAppropriateAudioFormat(
         || result.sampleType() != QAudioFormat::SignedInt)
     {
         if (errorString)
-            *errorString = tr("Sample format of input device %1 is not supported.");
+        {
+            *errorString =  tr("Sample format of input device %1 is not supported.")
+                .arg(deviceInfo.deviceName());
+        }
         result = QAudioFormat();
     }
     return result;

@@ -2,6 +2,8 @@
 
 #include <cmath>
 
+#include <QtQml/QtQml>
+
 #include <QtCore/QElapsedTimer>
 #include <QtQuick/QSGGeometryNode>
 #include <QtQuick/QSGFlatColorMaterial>
@@ -13,9 +15,19 @@ using VisualizerData = decltype(QnSpectrumData::data);
 
 namespace {
 
+void clearGeometryData(QSGGeometry* geometry)
+{
+    const auto vertexCount = geometry->vertexCount();
+    if (vertexCount)
+    {
+        const auto data = geometry->vertexDataAsPoint2D();
+        memset(data, 0, sizeof(QSGGeometry::Point2D) * vertexCount);
+    }
+}
+
 VisualizerData generateEmptyData(qint64 elapsedMs)
 {
-    /* Making slider move forth and back.. */
+    // Making slider move forth and back.
     const int size = QnVoiceSpectrumAnalyzer::bandsCount();
     const int maxIdx = size * 2 - 1;
 
@@ -50,7 +62,7 @@ void normalizeData(VisualizerData& source)
         return;
 
     const auto factor = kNormalizerIncreaseValue / maxValue;
-    for (auto &element: source)
+    for (auto& element: source)
         element *= factor;
 }
 
@@ -83,24 +95,21 @@ VisualizerData animateData(
     return result;
 }
 
-int toRange(int start, int finish, int value)
-{
-    return std::min(std::max(start, value), finish);
-}
+// Returns array with new size filled by source data.
 VisualizerData interpolate(const VisualizerData& source, int size)
 {
     if (source.isEmpty() || !size)
         return VisualizerData();
 
     VisualizerData data(size, 0.0);
-    const double increment = (double) source.count() / double(size);
+    const double increment = (double) source.count() / size;
     for (int index = 0; index != size; ++index)
     {
         const double rawIndexPart = increment * index;
         const double floorIndexPart = rawIndexPart - std::floor(rawIndexPart);
         const double ceilIndexPart = 1.0 - floorIndexPart;
-        const int floorIndex = toRange(0, source.count() - 1, std::floor(rawIndexPart));
-        const int ceilIndex = toRange(0, source.count() - 1, std::ceil(rawIndexPart));
+        const int floorIndex = qBound<int>(0, std::floor(rawIndexPart), source.count() - 1);
+        const int ceilIndex = qBound<int>(0, std::ceil(rawIndexPart), source.count() - 1);
         data[index] = source[floorIndex] * floorIndexPart + source[ceilIndex] * ceilIndexPart;
     }
     return data;
@@ -167,8 +176,11 @@ bool VoiceSpectrumItem::VisualizerDataGenerator::setHeight(int value)
 
 int VoiceSpectrumItem::VisualizerDataGenerator::linesCount() const
 {
-    NX_EXPECT(m_lineWidth + m_lineSpacing);
-    return m_width / (m_lineWidth + m_lineSpacing);
+    if (m_lineWidth + m_lineSpacing)
+        return m_width / (m_lineWidth + m_lineSpacing);
+
+    NX_EXPECT(false, "Wrong line paramaters");
+    return 0;
 }
 
 int VoiceSpectrumItem::VisualizerDataGenerator::lineWidth() const
@@ -214,60 +226,70 @@ VisualizerData VoiceSpectrumItem::VisualizerDataGenerator::getUpdatedData()
     return m_lastData;
 }
 
-//
+//-------------------------------------------------------------------------------------------------
 
 VoiceSpectrumItem::VoiceSpectrumItem(QQuickItem* parent):
     base_type(parent),
-    m_generator(new VisualizerDataGenerator()),
-    m_material(new QSGFlatColorMaterial())
+    m_generator(new VisualizerDataGenerator())
 {
     setFlag(QQuickItem::ItemHasContents);
 
-    connect(this, &VoiceSpectrumItem::colorChanged,
-        this, &VoiceSpectrumItem::updateNodeMaterial);
+    connect(this, &VoiceSpectrumItem::colorChanged, this,
+        [this]()
+        {
+            m_updateMaterial = true;
+            update();
+        });
 
     connect(this, &VoiceSpectrumItem::widthChanged,
-        this, &VoiceSpectrumItem::updateNodeGeometry);
+        this, &VoiceSpectrumItem::update);
     connect(this, &VoiceSpectrumItem::heightChanged,
-        this, &VoiceSpectrumItem::updateNodeGeometry);
-    connect(this, &VoiceSpectrumItem::geometryChanged,
-        this, &VoiceSpectrumItem::updateNodeGeometry);
+        this, &VoiceSpectrumItem::update);
     connect(this, &VoiceSpectrumItem::lineWidthChanged,
-        this, &VoiceSpectrumItem::updateNodeGeometry);
+        this, &VoiceSpectrumItem::update);
     connect(this, &VoiceSpectrumItem::lineSpacingChanged,
-        this, &VoiceSpectrumItem::updateNodeGeometry);
+        this, &VoiceSpectrumItem::update);
 }
 
 VoiceSpectrumItem::~VoiceSpectrumItem()
 {
 }
 
-QSGNode* VoiceSpectrumItem::updatePaintNode(
-    QSGNode* node,
-    UpdatePaintNodeData* updatePaintNodeData)
+void VoiceSpectrumItem::registerQmlType()
 {
-    const auto geometryNode = node
-        ? static_cast<QSGGeometryNode*>(node)
-        : getNode();
-
-    updateNodeGeometry();
-    return geometryNode;
+    qmlRegisterType<VoiceSpectrumItem>("nx.client.mobile", 1, 0, "VoiceSpectrumItem");
 }
 
-QSGGeometryNode* VoiceSpectrumItem::getNode()
+QSGNode* VoiceSpectrumItem::updatePaintNode(
+    QSGNode* node,
+    UpdatePaintNodeData* /*updatePaintNodeData*/)
 {
-    if (m_node)
-        return m_node;
+    if (!node)
+        return createNode();
 
-    m_node = new QSGGeometryNode();
-    m_node->setMaterial(m_material);
-    m_node->setFlag(QSGNode::OwnsGeometry);
-    m_node->setFlag(QSGNode::OwnsMaterial);
+    const auto geometryNode = static_cast<QSGGeometryNode*>(node);
+    updateNodeGeometry(geometryNode);
+    if (m_updateMaterial)
+    {
+        updateNodeMaterial(geometryNode);
+        m_updateMaterial = false;
+    }
 
-    updateNodeMaterial();
-    updateNodeGeometry();
+    return node;
+}
 
-    return m_node;
+QSGGeometryNode* VoiceSpectrumItem::createNode()
+{
+    QSGGeometryNode* node = new QSGGeometryNode();
+    const auto material = new QSGFlatColorMaterial();
+    node->setMaterial(material);
+    node->setFlag(QSGNode::OwnsGeometry);
+    node->setFlag(QSGNode::OwnsMaterial);
+
+    updateNodeMaterial(node);
+    updateNodeGeometry(node);
+
+    return node;
 }
 
 QColor VoiceSpectrumItem::color() const
@@ -306,30 +328,19 @@ void VoiceSpectrumItem::setLineSpacing(int value)
         emit lineSpacingChanged();
 }
 
-void VoiceSpectrumItem::clearGeometryData()
+void VoiceSpectrumItem::updateNodeGeometry(QSGGeometryNode* node)
 {
-    const int pointsCount = m_geometry ? m_geometry->vertexCount() : 0;
-    if (!pointsCount)
-        return;
-
-    const auto& data = m_geometry->vertexDataAsPoint2D();
-    for (int i = 0; i != pointsCount; ++i)
-        data[i].set(0, 0);
-}
-
-void VoiceSpectrumItem::updateNodeGeometry()
-{
-    const auto node = getNode();
     const auto currentLineWidth = m_generator->lineWidth();
-    if (m_generator->setWidth(width()))
+    auto geometry = node->geometry();
+    if (!geometry || m_generator->setWidth(width()))
     {
         const auto linesCount = m_generator->linesCount();
-        m_geometry = new QSGGeometry(QSGGeometry::defaultAttributes_Point2D(),  linesCount * 2);
-        m_geometry->setDrawingMode(GL_LINES);
-        m_geometry->setLineWidth(currentLineWidth);
-        clearGeometryData();
+        geometry = new QSGGeometry(QSGGeometry::defaultAttributes_Point2D(),  linesCount * 2);
+        geometry->setDrawingMode(GL_LINES);
+        geometry->setLineWidth(currentLineWidth);
+        clearGeometryData(geometry);
 
-        node->setGeometry(m_geometry);
+        node->setGeometry(geometry);
     }
 
     const int itemHeight = height();
@@ -346,39 +357,33 @@ void VoiceSpectrumItem::updateNodeGeometry()
     m_generator->setHeight(height());
 
     const auto data = m_generator->getUpdatedData();
-    if (m_geometry->vertexCount() != data.count() * 2)
+    if (geometry->vertexCount() != data.count() * 2)
     {
-        clearGeometryData();
+        clearGeometryData(geometry);
         return;
     }
 
     const auto currentLineSpacing = m_generator->lineSpacing();
     const auto lineBlockWidth = currentLineWidth + currentLineSpacing;
-    auto points = m_geometry->vertexDataAsPoint2D();
+    auto points = geometry->vertexDataAsPoint2D();
     for (int i = 0; i < data.count(); ++i)
     {
         const int x = lineBlockWidth * i;
         const int lineHeight = qMax<int>(2, data[i] * itemHeight);
-        const int startY = (itemHeight - lineHeight) / 2;
-        const int finishY = startY + lineHeight;
-        const int firstIndex = i * 2;
-        const int secondIndex = firstIndex + 1;
-        points[firstIndex].set(x, startY);
-        points[secondIndex].set(x, finishY);
+        const int top = (itemHeight - lineHeight) / 2;
+        const int bottom = top + lineHeight;
+        points[0].set(x, top);
+        points[1].set(x, bottom);
+        points += 2;
     }
 }
 
-void VoiceSpectrumItem::updateNodeMaterial()
+void VoiceSpectrumItem::updateNodeMaterial(QSGGeometryNode* node)
 {
-    const auto node = getNode();
-    if (!node->material())
-        node->setMaterial(m_material);
-
-    m_material->setColor(color());
-    getNode()->markDirty(QSGNode::DirtyMaterial);
-    update();
+    const auto colorMaterial = static_cast<QSGFlatColorMaterial*>(node->material());
+    colorMaterial->setColor(color());
+    node->markDirty(QSGNode::DirtyMaterial);
 }
-
 
 } // namespace mobile
 } // namespace client

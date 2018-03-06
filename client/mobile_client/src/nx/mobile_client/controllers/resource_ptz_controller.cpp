@@ -17,7 +17,6 @@ namespace client {
 namespace mobile {
 
 ResourcePtzController::ResourcePtzController(QObject* parent):
-    base_type(),
     m_availabilityWatcher(new PtzAvailabilityWatcher())
 {
     connect(this, &ResourcePtzController::resourceIdChanged, this,

@@ -11,7 +11,7 @@ namespace client {
 
 namespace core {
 class TwoWayAudioAvailabilityWatcher;
-} // core
+} // namespace core
 
 namespace mobile {
 
@@ -38,6 +38,8 @@ public:
 public:
     ActionButtonsModel(QObject* parent = nullptr);
     virtual ~ActionButtonsModel();
+
+    static void registerQmlType();
 
     void setResourceId(const QString& resourceId);
     QString resourceId() const;

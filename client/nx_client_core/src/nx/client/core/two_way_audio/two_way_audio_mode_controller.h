@@ -33,6 +33,8 @@ public:
 
     virtual ~TwoWayAudioController();
 
+    static void registerQmlType();
+
     Q_INVOKABLE bool start();
     Q_INVOKABLE void stop();
 

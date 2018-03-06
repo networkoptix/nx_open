@@ -1,5 +1,7 @@
 #include "two_way_audio_mode_controller.h"
 
+#include <QtQml/QtQml>
+
 #include <nx/utils/log/assert.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
@@ -9,6 +11,7 @@
 #include <api/server_rest_connection.h>
 #include <plugins/resource/desktop_camera/desktop_resource_base.h>
 #include <nx/client/core/two_way_audio/two_way_audio_availability_watcher.h>
+#include <utils/common/guarded_callback.h>
 
 namespace nx {
 namespace client {
@@ -16,7 +19,6 @@ namespace core {
 
 TwoWayAudioController::TwoWayAudioController(QObject* parent):
     base_type(parent),
-    QnConnectionContextAware(),
     m_availabilityWatcher(new TwoWayAudioAvailabilityWatcher())
 {
     connect(m_availabilityWatcher, &TwoWayAudioAvailabilityWatcher::availabilityChanged,
@@ -29,7 +31,6 @@ TwoWayAudioController::TwoWayAudioController(
     QObject* parent)
     :
     base_type(parent),
-    QnConnectionContextAware(),
     m_availabilityWatcher(new TwoWayAudioAvailabilityWatcher())
 {
     connect(m_availabilityWatcher, &TwoWayAudioAvailabilityWatcher::availabilityChanged,
@@ -43,6 +44,11 @@ TwoWayAudioController::TwoWayAudioController(
 TwoWayAudioController::~TwoWayAudioController()
 {
     stop();
+}
+
+void TwoWayAudioController::registerQmlType()
+{
+    qmlRegisterType<TwoWayAudioController>("nx.client.core", 1, 0, "TwoWayAudioController");
 }
 
 bool TwoWayAudioController::started() const
@@ -61,15 +67,17 @@ bool TwoWayAudioController::start()
         return false;
 
     setStarted(true); // Intermediate state.
-    const auto connection = server->restConnection();
-    m_startHandle = connection->twoWayAudioCommand(m_sourceId, m_camera->getId(), true,
-        [this, guard = QPointer<TwoWayAudioController>(this)]
-            (bool success, rest::Handle handle, const QnJsonRestResult& result)
+
+    const auto callback =
+        [this] (bool success, rest::Handle handle, const QnJsonRestResult& result)
         {
-            if (guard && handle == m_startHandle)
+            if (handle == m_startHandle)
                 setStarted(success && result.error == QnRestResult::NoError);
 
-        }, QThread::currentThread());
+        };
+    const auto connection = server->restConnection();
+    m_startHandle = connection->twoWayAudioCommand(m_sourceId, m_camera->getId(), true,
+        QnGuardedCallback<decltype(callback)>(this, callback), QThread::currentThread());
 
     return true;
 }

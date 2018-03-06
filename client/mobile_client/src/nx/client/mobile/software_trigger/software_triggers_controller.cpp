@@ -1,5 +1,7 @@
 #include "software_triggers_controller.h"
 
+#include <QtQml/QtQml>
+
 #include <watchers/user_watcher.h>
 #include <common/common_module.h>
 #include <client_core/client_core_module.h>
@@ -24,6 +26,11 @@ SoftwareTriggersController::SoftwareTriggersController(QObject* parent):
     m_accessManager(m_commonModule->resourceAccessManager()),
     m_ruleManager(m_commonModule->eventRuleManager())
 {
+}
+
+void SoftwareTriggersController::registerQmlType()
+{
+    qmlRegisterType<SoftwareTriggersController>("nx.client.mobile", 1, 0, "SoftwareTriggersController");
 }
 
 QString SoftwareTriggersController::resourceId() const

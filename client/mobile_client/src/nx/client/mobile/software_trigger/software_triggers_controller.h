@@ -35,6 +35,8 @@ class SoftwareTriggersController: public QObject
 public:
     SoftwareTriggersController(QObject* parent = nullptr);
 
+    static void registerQmlType();
+
     QString resourceId() const;
     void setResourceId(const QString& id);
 
