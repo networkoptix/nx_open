@@ -387,8 +387,6 @@ nx::mediaserver::resource::StreamCapabilityMap QnActiResource::getStreamCapabili
 {
     using namespace nx::mediaserver::resource;
 
-    QnMutexLocker lock(&m_mutex);
-
     const auto& resolutionList = m_resolutionList[(int)streamIndex];
 
     StreamCapabilityMap result;
@@ -560,7 +558,7 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
         return CameraDiagnostics::CameraInvalidParams(
             lit("Resolution list is empty"));
     }
-    m_resolutionList[(int) Qn::StreamIndex::primary] = availResolutions;
+    m_resolutionList[(int)Qn::StreamIndex::primary] = availResolutions;
 
     if (dualStreaming)
     {
@@ -607,14 +605,17 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
 
     auto fpsList = fpsString.split(';');
 
-    for (int i = 0; i < MAX_STREAMS && i < fpsList.size(); ++i)
     {
-        QList<QByteArray> fps = fpsList[i].split(',');
+        QnMutexLocker lock(&m_mutex);
+        for (int i = 0; i < MAX_STREAMS && i < fpsList.size(); ++i)
+        {
+            QList<QByteArray> fps = fpsList[i].split(',');
 
-        for (const QByteArray& data : fps)
-            m_availFps[i] << data.toInt();
+            for (const QByteArray& data : fps)
+                m_availFps[i] << data.toInt();
 
-        std::sort(m_availFps[i].begin(), m_availFps[i].end());
+            std::sort(m_availFps[i].begin(), m_availFps[i].end());
+        }
     }
     auto rtspPortString = makeActiRequest(lit("system"), lit("V2_PORT_RTSP"), status);
 
@@ -895,6 +896,7 @@ QSet<QString> QnActiResource::setApiParameters(const QnCameraAdvancedParamValueM
 
 int QnActiResource::getMaxFps() const
 {
+    QnMutexLocker lock(&m_mutex);
     return m_availFps[0].last();
 }
 

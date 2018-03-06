@@ -21,6 +21,7 @@
 #include <database/server_db.h>
 #include <recording/time_period.h>
 #include <audit/mserver_audit_manager.h>
+#include <nx/utils/elapsed_timer.h>
 
 class AuthReturnCodeTest:
     public ::testing::Test
@@ -191,9 +192,17 @@ public:
 
             if (expectedStatusCode == nx_http::StatusCode::unauthorized)
             {
-                QnTimePeriod period(0, std::numeric_limits<qint64>::max());
-                static_cast<QnMServerAuditManager*>(qnAuditManager)->flushRecords();
-                QnAuditRecordList outputData = qnServerDb->getAuditData(period, QnUuid());
+                QnTimePeriod period(0, QnTimePeriod::infiniteDuration());
+                QnAuditRecordList outputData;
+                static const std::chrono::seconds kMaxWaitTime(10);
+                nx::utils::ElapsedTimer timer;
+                timer.restart();
+                // Server send "Unauthorized" response before it write data to the auditLog.
+                do
+                {
+                    static_cast<QnMServerAuditManager*>(qnAuditManager)->flushRecords();
+                    outputData = qnServerDb->getAuditData(period, QnUuid());
+                } while (outputData.isEmpty() && timer.elapsed() < kMaxWaitTime);
                 ASSERT_TRUE(!outputData.isEmpty());
                 ASSERT_EQ(Qn::AuditRecordType::AR_UnauthorizedLogin, outputData.last().eventType);
             }

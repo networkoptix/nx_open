@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include <nx/utils/std/cpp14.h>
+#include <nx/utils/log/log.h>
 
 #if defined(__GNUC__) || defined(__clang__)
     #define NX_PRETTY_FUNCTION __PRETTY_FUNCTION__
@@ -66,7 +67,7 @@ void HanwhaMetadataMonitor::stopMonitoring()
         });
 
     promise.get_future().wait();
-    std::cout << "--------------" << NX_PRETTY_FUNCTION << std::endl;
+    NX_DEBUG(this, "Stopped");
 }
 
 void HanwhaMetadataMonitor::addHandler(const QString& handlerId, const Handler& handler)
@@ -112,7 +113,7 @@ void HanwhaMetadataMonitor::initMonitorUnsafe()
     if (!m_monitoringIsInProgress)
         return;
 
-    std::cout << "--------------" << NX_PRETTY_FUNCTION << std::endl;
+    NX_DEBUG(this, "Initialization");
     auto httpClient = nx_http::AsyncHttpClient::create();
     m_timer.cancelSync();
     httpClient->bindToAioThread(m_timer.getAioThread());

@@ -8,6 +8,7 @@
 
 #include <nx/sdk/metadata/common_event.h>
 #include <nx/sdk/metadata/common_event_metadata_packet.h>
+#include <nx/utils/log/log.h>
 
 namespace nx {
 namespace mediaserver {
@@ -60,11 +61,8 @@ Error HanwhaMetadataManager::startFetchingMetadata(
                     return;
 
                 auto event = new CommonEvent();
-                std::cout
-                    << "---------------- (Metadata manager handler) Got event: "
-                    << hanwhaEvent.caption.toStdString() << " "
-                    << hanwhaEvent.description.toStdString() << " "
-                    << "Channel " << m_channel << std::endl;
+                NX_VERBOSE(this, lm("Got event: %1 %2 on channel %3").args(
+                    hanwhaEvent.caption, hanwhaEvent.description, m_channel));
 
                 event->setEventTypeId(hanwhaEvent.typeId);
                 event->setCaption(hanwhaEvent.caption.toStdString());
