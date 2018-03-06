@@ -334,6 +334,55 @@ bool QnActiResource::isRtspAudioSupported(const QByteArray& platform, const QByt
     return false;
 }
 
+QString QnActiResource::formatResolutionStr(const QSize& resolution)
+{
+    return QString(QLatin1String("N%1x%2")).arg(resolution.width()).arg(resolution.height());
+}
+
+QString QnActiResource::bestPrimaryCodec() const
+{
+    return  m_availableEncoders.contains("H264") ? "H264" : "MJPEG";
+}
+
+CameraDiagnostics::Result QnActiResource::maxFpsForSecondaryResolution(
+    const QString& secondaryCodec,
+    const QSize& secondaryResolution,
+    int* outFps)
+{
+    CLHttpStatus status;
+    auto result = makeActiRequest(
+        lit("encoder"),
+        lit("FPS_CAP_QUERY_ALL=DUAL,%1,%2,%3,%4")
+        .arg(bestPrimaryCodec())
+        .arg(formatResolutionStr(m_resolutionList[0].last()))
+        .arg(secondaryCodec)
+        .arg(formatResolutionStr(secondaryResolution)),
+        status);
+    ;
+    if (status != CL_HTTP_SUCCESS)
+    {
+        return CameraDiagnostics::RequestFailedResult(
+            lit("FPS_CAP_QUERY_ALL"),
+            "Can't detect max fps for secondary stream");
+    }
+
+    QList<QByteArray> stringFps = result.split(';').last().split(',');
+    QList<int> fps;
+    for (const QByteArray& data: stringFps)
+        fps << data.toInt();
+    if (fps.isEmpty())
+    {
+        return CameraDiagnostics::RequestFailedResult(
+            lit("FPS_CAP_QUERY_ALL"),
+            lit("Empty fps list for resolution %1x%2")
+            .arg(secondaryResolution.width(), secondaryResolution.height()));
+    }
+    std::sort(fps.begin(), fps.end());
+    *outFps = fps.last();
+
+    return CameraDiagnostics::NoErrorResult();
+}
+
 nx::mediaserver::resource::StreamCapabilityMap QnActiResource::getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex)
 {
     using namespace nx::mediaserver::resource;
@@ -351,7 +400,11 @@ nx::mediaserver::resource::StreamCapabilityMap QnActiResource::getStreamCapabili
             StreamCapabilityKey key;
             key.codec = codec;
             key.resolution = resolution;
-            result.insert(key, nx::media::CameraStreamCapability());
+
+            nx::media::CameraStreamCapability capabilities;
+            if (streamIndex == Qn::StreamIndex::secondary)
+                capabilities.maxFps = m_maxSecondaryFps[resolution];
+            result.insert(key, capabilities);
         }
     }
     return result;
@@ -598,8 +651,29 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
     if (!serialNumber.isEmpty())
         setProperty(QnActiResourceSearcher::kSystemInfoProductionIdParamName, serialNumber);
 
+    auto result = detectMaxFpsForSecondaryCodec();
+    if (!result)
+        return result;
+
     saveParams();
 
+    return CameraDiagnostics::NoErrorResult();
+}
+
+CameraDiagnostics::Result QnActiResource::detectMaxFpsForSecondaryCodec()
+{
+    const auto& resolutionList = m_resolutionList[(int)Qn::StreamIndex::secondary];
+    for (const auto& codec: m_availableEncoders)
+    {
+        for (const auto& resolution: resolutionList)
+        {
+            int fps = 0;
+            auto result = maxFpsForSecondaryResolution(codec, resolution, &fps);
+            if (!result)
+                return result;
+            m_maxSecondaryFps.insert(resolution, fps);
+        }
+    }
     return CameraDiagnostics::NoErrorResult();
 }
 
@@ -1023,7 +1097,7 @@ QMap<QString, QnCameraAdvancedParameter> QnActiResource::getParamsMap(const QSet
  * Needed when user changes not all params in aggregate parameter.
  * Example: WB_GAIN=127,%WB_R_GAIN becomes WB_GAIN=127,245
  */
-QMap<QString, QString> QnActiResource::resolveQueries(QMap<QString, QnCameraAdvancedParamQueryInfo> &queries) const
+QMap<QString, QString> QnActiResource::resolveQueries(QMap<QString, CameraAdvancedParamQueryInfo> &queries) const
 {
     CLHttpStatus status;
     QMap<QString, QString> setQueries;
@@ -1116,7 +1190,7 @@ QMap<QString, QString> QnActiResource::buildSetParamsQueries(const QnCameraAdvan
 {
     QMap<QString, QString> paramToAgregate;
     QMap<QString, QString> paramToValue;
-    QMap<QString, QnCameraAdvancedParamQueryInfo> agregateToCmd;
+    QMap<QString, CameraAdvancedParamQueryInfo> agregateToCmd;
 
     for(const auto& val: values)
         paramToValue[val.id] = val.value;
@@ -1141,7 +1215,7 @@ QMap<QString, QString> QnActiResource::buildSetParamsQueries(const QnCameraAdvan
 
         paramToAgregate[id] = agregate;
 
-        QnCameraAdvancedParamQueryInfo info;
+        CameraAdvancedParamQueryInfo info;
         info.group = getParamGroup(paramsMap[id]);
         info.cmd = args;
         agregateToCmd[agregate] = info;

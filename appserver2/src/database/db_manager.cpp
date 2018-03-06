@@ -1996,7 +1996,8 @@ ErrorCode QnDbManager::insertOrReplaceCameraAttributes(const ApiCameraAttributes
             preferred_server_id,
             license_used,
             failover_priority,
-            backup_type
+            backup_type,
+            logical_id
         ) VALUES (
             :cameraId,
             :cameraName,
@@ -2013,7 +2014,8 @@ ErrorCode QnDbManager::insertOrReplaceCameraAttributes(const ApiCameraAttributes
             :preferredServerId,
             :licenseUsed,
             :failoverPriority,
-            :backupType
+            :backupType,
+            :logicalId
         ))sql");
 
     QnSql::bind(data, query.get());
@@ -3471,7 +3473,8 @@ ErrorCode QnDbManager::doQueryNoLock(
             preferred_server_id as preferredServerId,    \
             license_used as licenseUsed,                 \
             failover_priority as failoverPriority,       \
-            backup_type as backupType                    \
+            backup_type as backupType,                   \
+            logical_id as logicalId                      \
          FROM vms_camera_user_attributes \
          LEFT JOIN vms_resource r on r.guid = camera_guid \
          %3 \
@@ -3532,7 +3535,8 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiCameraDataExList& came
             cu.preferred_server_id as preferredServerId,       \
             cu.license_used as licenseUsed,                    \
             cu.failover_priority as failoverPriority,          \
-            cu.backup_type as backupType                       \
+            cu.backup_type as backupType,                      \
+            cu.logical_id as logicalId                         \
         FROM vms_resource r \
         LEFT JOIN vms_resource_status rs on rs.guid = r.guid \
         JOIN vms_camera c on c.resource_ptr_id = r.id \
@@ -4195,6 +4199,8 @@ ErrorCode QnDbManager::readApiFullInfoDataForMobileClient(
     if (userId != QnUserResource::kAdminGuid)
         DB_LOAD(QnUserResource::kAdminGuid, data->users);
 
+    // Event rules are required for software triggers.
+    DB_LOAD(QnUuid(), data->rules);
     DB_LOAD(nullptr, data->cameraHistory);
     DB_LOAD(QnUuid(), data->discoveryData);
     DB_LOAD(QnUuid(), data->allProperties);

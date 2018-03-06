@@ -14,8 +14,11 @@ bool operator==(const in6_addr& left, const in6_addr& right)
     return memcmp(&left, &right, sizeof(left)) == 0;
 }
 
-#ifndef _WIN32
-const in_addr in4addr_loopback{ htonl(INADDR_LOOPBACK) };
+#if !defined(_WIN32)
+#   if defined(__arm__)
+#       undef htonl
+#   endif
+    const in_addr in4addr_loopback{ htonl(INADDR_LOOPBACK) };
 #endif
 
 namespace nx {
@@ -35,11 +38,11 @@ bool socketCannotRecoverFromError(SystemError::ErrorCode sysErrorCode)
 // HostAddress
 
 HostAddress::HostAddress(
-    boost::optional<QString> addrStr,
+    boost::optional<QString> addressString,
     boost::optional<in_addr> ipV4,
     boost::optional<in6_addr> ipV6)
     :
-    m_string(std::move(addrStr)),
+    m_string(std::move(addressString)),
     m_ipV4(ipV4),
     m_ipV6(ipV6)
 {

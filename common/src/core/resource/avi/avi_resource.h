@@ -59,6 +59,7 @@ private:
     qint64 m_timeZoneOffset;
     QnAspectRatio m_imageAspectRatio;
     boost::optional<QnAviArchiveMetadata> m_aviMetadata;
+    mutable boost::optional<bool> m_hasVideo;
 };
 
 #endif // QN_AVI_RESOURCE_H

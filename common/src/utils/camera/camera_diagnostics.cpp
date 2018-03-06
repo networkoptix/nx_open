@@ -361,4 +361,16 @@ QString Result::toString(QnResourcePool* resourcePool) const
     return ErrorCode::toString(errorCode, resourcePool, QnVirtualCameraResourcePtr(), errorParams);
 }
 
+Qn::MediaStreamEvent Result::toMediaStreamEvent() const
+{
+    switch (errorCode)
+    {
+        case ErrorCode::tooManyOpenedConnections:
+            return Qn::MediaStreamEvent::TooManyOpenedConnectionsError;
+        default:
+            return Qn::MediaStreamEvent::NoEvent;
+    }
+}
+
+
 } // namespace CameraDiagnostics

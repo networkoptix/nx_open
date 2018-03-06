@@ -532,6 +532,14 @@ bool QnSecurityCamResource::isSharingLicenseInGroup() const
     return resType->hasParam(lit("canShareLicenseGroup"));
 }
 
+bool QnSecurityCamResource::isMultiSensorCamera() const
+{
+    return !getGroupId().isEmpty()
+        && !isDtsBased()
+        && !isAnalogEncoder()
+        && !isAnalog();
+}
+
 Qn::LicenseType QnSecurityCamResource::licenseType() const
 {
     return m_cachedLicenseType.get();
@@ -904,6 +912,19 @@ void QnSecurityCamResource::setVendor(const QString& value)
     SAFE(m_vendor = value)
 }
 
+QString QnSecurityCamResource::getLogicalId() const
+{
+    QnCameraUserAttributePool::ScopedLock userAttributesLock(userAttributesPool(), getId());
+    return (*userAttributesLock)->logicalId;
+}
+
+void QnSecurityCamResource::setLogicalId(const QString& value)
+{
+    NX_ASSERT(!getId().isNull());
+    QnCameraUserAttributePool::ScopedLock userAttributesLock(userAttributesPool(), getId());
+    (*userAttributesLock)->logicalId = value;
+}
+
 void QnSecurityCamResource::setMaxDays(int value)
 {
     NX_ASSERT(!getId().isNull());
@@ -1246,13 +1267,19 @@ bool QnSecurityCamResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &s
         return false;
 
     bool result = base_type::mergeResourcesIfNeeded(source);
+    if (getAuth() != camera->getAuth() && camera->isManuallyAdded())
+    {
+        setAuth(source->getAuth());
+        result = true;
+    }
 
     if (getGroupId() != camera->getGroupId())
     {
+        // Group ID can be changed for ONVIF resource because if we unauthorized,
+        // maxChannels is not accessible.
         setGroupId(camera->getGroupId());
-        result = true; // groupID can be changed for onvif resource because if not auth info, maxChannels is not accessible
+        result = true;
     }
-
     if (getGroupName().isEmpty() && getGroupName() != camera->getGroupName())
     {
         setGroupName(camera->getGroupName());
@@ -1269,12 +1296,6 @@ bool QnSecurityCamResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &s
         setVendor(camera->getVendor());
         result = true;
     }
-    if (getMAC() != camera->getMAC() && !camera->getMAC().isNull())
-    {
-        setMAC(camera->getMAC());
-        result = true;
-    }
-
 
     return result;
 }
@@ -1466,4 +1487,14 @@ bool QnSecurityCamResource::setCameraCredentialsSync(
     if (outErrorString)
         *outErrorString = lit("Operation is not permitted.");
     return false;
+}
+
+Qn::MediaStreamEvent QnSecurityCamResource::checkForErrors() const
+{
+    const auto capabilities = getCameraCapabilities();
+    if (capabilities.testFlag(Qn::isDefaultPasswordCapability))
+        return Qn::MediaStreamEvent::ForbiddentBecauseDefaultPasswordError;
+    if (capabilities.testFlag(Qn::isOldFirmwareCapability))
+        return Qn::MediaStreamEvent::oldFirmwareError;
+    return Qn::MediaStreamEvent::NoEvent;
 }

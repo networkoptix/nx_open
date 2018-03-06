@@ -9,7 +9,7 @@
  * @param animationState
  * @param debugEventsMode
  */
-function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleManager, animationState, debugSettings, pixelAspectRatio){
+window.TimelineCanvasRender = function(canvas, timelineConfig, recordsProvider, scaleManager, animationState, debugSettings, pixelAspectRatio){
 
     this.canvas = canvas;
     this.recordsProvider = recordsProvider;

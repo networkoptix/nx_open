@@ -81,7 +81,7 @@ void CameraAdvancedParamWidgetsManager::loadValues(const QnCameraAdvancedParamVa
     QMap<QString, QString> valuesToKeep;
 
     // Disconnect all watches to not trigger handler chains.
-    for (auto& connection: m_handlerChainConnections)
+    for (auto& connection : m_handlerChainConnections)
         disconnect(connection);
 
     // Set widget values and store initial values that should be kept.
@@ -98,20 +98,14 @@ void CameraAdvancedParamWidgetsManager::loadValues(const QnCameraAdvancedParamVa
             valuesToKeep[param.id] = param.value;
     }
 
-    // Run handler chains.
-    for (const auto& watch: m_handlerChains.keys())
-    {
-        const auto& handlerChains = m_handlerChains.value(watch);
-        for (auto& func: handlerChains)
-            func();
-    }
+    runAllHandlerChains();
 
     // Connect handler chains to watched values.
     m_handlerChainConnections.clear();
-    for (const auto& watch: m_handlerChains.keys())
+    for (const auto& watch : m_handlerChains.keys())
     {
         const auto& handlerChains = m_handlerChains.value(watch);
-        for (auto& func: handlerChains)
+        for (auto& func : handlerChains)
         {
             auto watchWidget = m_paramWidgetsById[watch];
             m_handlerChainConnections.push_back(
@@ -123,7 +117,7 @@ void CameraAdvancedParamWidgetsManager::loadValues(const QnCameraAdvancedParamVa
     }
 
     // Restore initial values for some widgets.
-    for (const auto& paramId: valuesToKeep.keys())
+    for (const auto& paramId : valuesToKeep.keys())
     {
         auto widget = m_paramWidgetsById.value(paramId);
         if (!widget)
@@ -132,7 +126,7 @@ void CameraAdvancedParamWidgetsManager::loadValues(const QnCameraAdvancedParamVa
         widget->setValue(valuesToKeep[paramId]);
     }
 
-    for (const QnCameraAdvancedParamValue &param: params)
+    for (const QnCameraAdvancedParamValue &param : params)
     {
         auto widget = m_paramWidgetsById[param.id];
         disconnect(
@@ -206,6 +200,8 @@ QWidget* CameraAdvancedParamWidgetsManager::createContentsPage(
 {
     auto page = createWidgetsForPage(name, params);
     setUpDependenciesForPage(params);
+    // Make initial call to handle default values.
+    runAllHandlerChains();
 
     return page;
 }
@@ -234,7 +230,7 @@ QWidget* CameraAdvancedParamWidgetsManager::createWidgetsForPage(
     auto gridLayout = new QGridLayout(scrollAreaWidgetContents);
     scrollArea->setWidget(scrollAreaWidgetContents);
 
-    for (const auto& param: params)
+    for (const auto& param : params)
     {
         m_parametersById[param.id] = param;
         auto widget = QnCameraAdvancedParamWidgetFactory::createWidget(param, scrollAreaWidgetContents);
@@ -319,6 +315,17 @@ void CameraAdvancedParamWidgetsManager::setUpDependenciesForPage(
     }
 }
 
+void CameraAdvancedParamWidgetsManager::runAllHandlerChains()
+{
+    // Run handler chains.
+    for (const auto& watch: m_handlerChains.keys())
+    {
+        const auto& handlerChains = m_handlerChains.value(watch);
+        for (auto& func: handlerChains)
+            func();
+    }
+}
+
 CameraAdvancedParamWidgetsManager::DependencyHandler
     CameraAdvancedParamWidgetsManager::makeDependencyHandler(
         const QnCameraAdvancedParameterDependency& dependency,
@@ -335,19 +342,19 @@ CameraAdvancedParamWidgetsManager::DependencyHandler
             bool allConditionsSatisfied = std::all_of(
                 dependency.conditions.cbegin(), dependency.conditions.cend(),
                 [this](const QnCameraAdvancedParameterCondition& condition)
-                {
-                    using ConditionType =
-                        QnCameraAdvancedParameterCondition::ConditionType;
+            {
+                using ConditionType =
+                    QnCameraAdvancedParameterCondition::ConditionType;
 
-                    if (condition.type == ConditionType::present)
-                        return m_paramWidgetsById.contains(condition.paramId);
+                if (condition.type == ConditionType::present)
+                    return m_paramWidgetsById.contains(condition.paramId);
 
-                    if (condition.type == ConditionType::notPresent)
-                        return !m_paramWidgetsById.contains(condition.paramId);
+                if (condition.type == ConditionType::notPresent)
+                    return !m_paramWidgetsById.contains(condition.paramId);
 
-                    auto widget = m_paramWidgetsById.value(condition.paramId);
-                    return widget && condition.checkValue(widget->value());
-                });
+                auto widget = m_paramWidgetsById.value(condition.paramId);
+                return widget && condition.checkValue(widget->value());
+            });
 
             // TODO: #dmishin move this somewhere.
             if (dependency.type == DependencyType::show)

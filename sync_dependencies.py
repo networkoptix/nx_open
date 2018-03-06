@@ -10,7 +10,7 @@ from vms_configuration import *
 def determine_package_versions():
     v = {
         "qt": "5.6.2",
-        "boost": "1.60.0",
+        "boost": "1.66.0",
         "openssl": "1.0.2e",
         "ffmpeg": "3.1.1",
         "sigar": "1.7",
@@ -21,7 +21,10 @@ def determine_package_versions():
         "festival": "2.4",
         "directx": "JUN2010",
         "cassandra": "2.7.0",
-        "doxygen": "1.8.14"
+        "doxygen": "1.8.14",
+        "gstreamer": "1.0",
+        "glib": "2.0",
+        "deepstream": "0.1"
     }
 
     if platform == "windows":
@@ -100,6 +103,9 @@ def sync_dependencies(syncher):
         sync("sysroot")
         sync("tegra_video")
         sync("jetpack")
+        sync("gstreamer")
+        sync("glib")
+        sync("deepstream")
 
     if platform in ("android", "windows") or box == "bpi":
         sync("openal")
@@ -137,8 +143,8 @@ def sync_dependencies(syncher):
         sync("libjpeg-turbo")
 
     if withMediaServer:
-        sync("any/nx_sdk-1.6.0")
-        sync("any/nx_storage_sdk-1.6.0")
+        sync("any/nx_sdk-1.7.1")
+        sync("any/nx_storage_sdk-1.7.1")
         sync("sigar")
 
         sync("any/apidoctool", path_variable="APIDOCTOOL_PATH")
@@ -149,11 +155,11 @@ def sync_dependencies(syncher):
             sync("any/server-external-" + customWebAdminVersion)
         else:
             if not sync("any/server-external-" + branch, optional=True):
-                sync("any/server-external-" + shortReleaseVersion)
+                sync("any/server-external-" + releaseVersion)
 
         if box in ("tx1", "edge1"):
-            sync("openldap")
-            sync("sasl2")
+            sync("tx1-arm/openldap")
+            sync("tx1-arm/sasl2")
 
     if platform == "windows":
         sync("windows/doxygen", path_variable="doxygen_directory")

@@ -56,7 +56,9 @@ public:
         ChunkCallback callback) override;
 
     virtual rest::Handle validateFileInformation(
-        const FileInformation& fileInformation, ValidateCallback callback) override;
+        const QnUuid& peerId,
+        const FileInformation& fileInformation,
+        ValidateCallback callback) override;
 
     virtual void cancelRequest(const QnUuid& peerId, rest::Handle handle) override;
 

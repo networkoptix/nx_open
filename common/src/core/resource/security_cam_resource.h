@@ -121,6 +121,8 @@ public:
      */
     bool isSharingLicenseInGroup() const;
 
+    bool isMultiSensorCamera() const;
+
 
     virtual Qn::StreamFpsSharingMethod streamFpsSharingMethod() const;
     void setStreamFpsSharingMethod(Qn::StreamFpsSharingMethod value);
@@ -203,6 +205,9 @@ public:
 
     QString getVendor() const;
     void setVendor(const QString &value);
+
+    QString getLogicalId() const;
+    void setLogicalId(const QString &value);
 
     bool isGroupPlayOnly() const;
 
@@ -294,6 +299,11 @@ public:
 
     // Allow getting multi video layout directly from a RTSP SDP info
     virtual bool allowRtspVideoLayout() const { return true; }
+
+    /**
+     * Return non zero media event error if camera resource has an issue.
+     */
+    Qn::MediaStreamEvent checkForErrors() const;
 
     bool isEnoughFpsToRunSecondStream(int currentFps) const;
     virtual nx::core::resource::AbstractRemoteArchiveManager* remoteArchiveManager();

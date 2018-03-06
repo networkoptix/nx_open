@@ -7,6 +7,7 @@
 
 #include <algorithm>
 #include <cstring>
+#include <cassert>
 
 #include <QtCore/QDateTime>
 #include <QtCore/QUrlQuery>
@@ -130,7 +131,7 @@ int AxisRelayIOManager::setRelayOutputState(
     if( httpClient.get( QUrl(cmd) ) != QNetworkReply::NoError )
         return nxcip::NX_NETWORK_ERROR;
     if( httpClient.statusCode() != SyncHttpClient::HTTP_OK )
-        return httpClient.statusCode() == SyncHttpClient::HTTP_NOT_AUTHORIZED ? nxcip::NX_NOT_AUTHORIZED : nxcip::NX_OTHER_ERROR; 
+        return httpClient.statusCode() == SyncHttpClient::HTTP_NOT_AUTHORIZED ? nxcip::NX_NOT_AUTHORIZED : nxcip::NX_OTHER_ERROR;
 
     return nxcip::NX_NO_ERROR;
 }
@@ -138,7 +139,7 @@ int AxisRelayIOManager::setRelayOutputState(
 int AxisRelayIOManager::startInputPortMonitoring()
 {
     //we can use QNetworkAccessManaget from owning thread only, so performing async call
-        //this method has surely been called not from thread, object belongs to, 
+        //this method has surely been called not from thread, object belongs to,
         //so performing asynchronous call and waiting for its completion
 
     int result = 0;
@@ -230,7 +231,7 @@ void AxisRelayIOManager::startInputPortMonitoringPriv( int asyncCallID )
             continue;   //port already monitored
         lk.unlock();
 
-        //it is safe to proceed futher with no lock because stopInputMonitoring can be only called from current thread 
+        //it is safe to proceed futher with no lock because stopInputMonitoring can be only called from current thread
             //and forgetHttpClient cannot be called before doGet call
 
         //requestUrl.setPath( QString::fromLatin1("/axis-cgi/io/port.cgi?monitor=%1").arg(it->second) );
@@ -252,7 +253,7 @@ void AxisRelayIOManager::startInputPortMonitoringPriv( int asyncCallID )
 
     QMutexLocker lk( &m_mutex );
     std::map<int, AsyncCallContext>::iterator asyncCallIter = m_awaitedAsyncCallIDs.find( asyncCallID );
-    NX_ASSERT( asyncCallIter != m_awaitedAsyncCallIDs.end() );
+    assert( asyncCallIter != m_awaitedAsyncCallIDs.end() );
     asyncCallIter->second.resultCode = nxcip::NX_NO_ERROR;
     asyncCallIter->second.done = true;
     m_cond.wakeAll();
@@ -275,7 +276,7 @@ void AxisRelayIOManager::stopInputPortMonitoringPriv( int asyncCallID )
     disconnect( AxisCameraPlugin::instance()->networkAccessManager(), SIGNAL(finished(QNetworkReply*)), this, SLOT(onConnectionFinished(QNetworkReply*)) );
 
     std::map<int, AsyncCallContext>::iterator asyncCallIter = m_awaitedAsyncCallIDs.find( asyncCallID );
-    NX_ASSERT( asyncCallIter != m_awaitedAsyncCallIDs.end() );
+    assert( asyncCallIter != m_awaitedAsyncCallIDs.end() );
     asyncCallIter->second.done = true;
     m_cond.wakeAll();
 }
@@ -283,7 +284,7 @@ void AxisRelayIOManager::stopInputPortMonitoringPriv( int asyncCallID )
 void AxisRelayIOManager::onMonitorDataAvailable()
 {
     QNetworkReply* reply = qobject_cast<QNetworkReply*>(QObject::sender());
-    NX_ASSERT( reply );
+    assert( reply );
 
     while( reply->canReadLine() )
     {

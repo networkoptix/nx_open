@@ -45,6 +45,8 @@ void QnResourceTreeModelNodeManager::primaryNodeAdded(QnResourceTreeModelNode* n
     {
         connect(camera, &QnVirtualCameraResource::statusFlagsChanged, node,
             [node]() { chainCall(node, &QnResourceTreeModelNode::updateCameraExtraStatus); });
+        connect(camera, &QnVirtualCameraResource::scheduleDisabledChanged, node,
+            [node]() { chainCall(node, &QnResourceTreeModelNode::updateCameraExtraStatus); });
         connect(camera, &QnVirtualCameraResource::capabilitiesChanged, node,
             [node]() { chainCall(node, &QnResourceTreeModelNode::updateResourceStatus); });
     }

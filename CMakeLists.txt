@@ -18,6 +18,7 @@ endif()
 
 set(CMAKE_BUILD_TYPE ${default_cmake_build_type} CACHE STRING
     "One of [Debug Release RelWithDebInfo MinSizeRel].")
+set(CMAKE_VS_PLATFORM_TOOLSET_HOST_ARCHITECTURE "x64" CACHE INTERNAL "")
 
 set(targetDevice "" CACHE STRING "Target device. For the list see cmake/toolchains.")
 set(box "none")

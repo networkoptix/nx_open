@@ -1,12 +1,12 @@
 import logging
-import tempfile
 
 import jinja2
 import vagrant
 import vagrant.compat
 from pathlib2 import Path
+from pylru import lrudecorator
 
-from test_utils.networking import NodeNetworking
+from test_utils.networking import NodeNetworking, reset_networking
 from test_utils.networking.linux import LinuxNodeNetworking
 from test_utils.networking.virtual_box import VirtualBoxNodeNetworking
 from test_utils.os_access import LocalAccess
@@ -18,17 +18,6 @@ from .virtualbox_management import VirtualboxManagement
 log = logging.getLogger(__name__)
 
 TEST_UTILS_DIR = Path(__file__).parent.resolve()
-
-
-def log_output(name, output):
-    if not output:
-        return  # do not log ''; skip None also
-    if '\0' in output:
-        log.debug('\t--> %s: %s bytes binary', name, len(output))
-    elif len(output) > 200:
-        log.debug('\t--> %s: %r...', name, output[:200])
-    else:
-        log.debug('\t--> %s: %r', name, output.rstrip('\r\n'))
 
 
 class RemotableVagrant(vagrant.Vagrant):
@@ -48,30 +37,30 @@ class RemotableVagrant(vagrant.Vagrant):
 class VagrantVMFactory(object):
     _vagrant_vms_cache_key = 'nx/vagrant_vms'
 
-    def __init__(self, cache, common_ssh_config, vm_host_hostname, options, config_factory):
-        self._common_ssh_config = common_ssh_config
+    def __init__(self, cache, ssh_config, vm_host, bin_dir, work_dir, config_factory):
+        self._ssh_config = ssh_config
         self._cache = cache
-        self._bin_dir = options.bin_dir
+        self._bin_dir = bin_dir
         self._config_factory = config_factory
-        self._vm_name_prefix = options.vm_name_prefix
-        self._vm_port_base = options.vm_port_base
-        if vm_host_hostname:
-            self.vm_host_hostname = vm_host_hostname
-            self._host_os_access = SshAccess(self._common_ssh_config.path, vm_host_hostname)
-            self._vagrant_dir = options.vm_host_work_dir / 'vagrant'
-            self._vagrant_private_key_path = options.work_dir / 'vagrant_insecure_private_key'
+        self._vm_name_prefix = vm_host.vm_name_prefix
+        self._vm_port_base = vm_host.vm_port_base
+        if vm_host.hostname:
+            self.vm_host_hostname = vm_host.hostname
+            self._host_os_access = SshAccess(self._ssh_config.path, vm_host.hostname)
+            self._vagrant_dir = vm_host.work_dir / 'vagrant'
+            self._vagrant_private_key_path = work_dir / 'vagrant_insecure_private_key'
             self._host_os_access.get_file('.vagrant.d/insecure_private_key', self._vagrant_private_key_path)
         else:
             self.vm_host_hostname = 'localhost'
             self._host_os_access = LocalAccess()
-            self._vagrant_dir = options.work_dir / 'vagrant'
+            self._vagrant_dir = work_dir / 'vagrant'
             self._vagrant_private_key_path = Path().home() / '.vagrant.d' / 'insecure_private_key'
         self._virtualbox_vm = VirtualboxManagement(self._host_os_access)
         self._vagrant_file_path = self._vagrant_dir / 'Vagrantfile'
-        self._existing_vm_list = set(self._virtualbox_vm.get_vms_list())
         self._vagrant = RemotableVagrant(
             self._host_os_access, root=str(self._vagrant_dir), quiet_stdout=False, quiet_stderr=False)
         self._vms = self._discover_existing_vms()  # VM name -> VagrantVM
+        self._allocated_vms = {}
         self._init_running_vms()
         if self._vms:
             self._last_vm_idx = max(vm.config.idx for vm in self._vms.values())
@@ -92,7 +81,7 @@ class VagrantVMFactory(object):
         self._cache.set(self._vagrant_vms_cache_key, [vm.config.to_dict() for vm in self._vms.values()])
 
     def _make_vagrant_vm(self, config, is_running):
-        self._common_ssh_config.add_host(
+        self._ssh_config.add_host(
             self._host_os_access.hostname,
             alias=config.vagrant_name,
             port=config.ssh_forwarded_port,
@@ -102,7 +91,7 @@ class VagrantVMFactory(object):
             self._bin_dir,
             self._vagrant_dir,
             self._vagrant,
-            self._common_ssh_config.path,
+            self._ssh_config.path,
             self._host_os_access,
             config,
             is_running)
@@ -119,33 +108,32 @@ class VagrantVMFactory(object):
         self._vms.clear()
         self._save_vms_config_to_cache()
         self._last_vm_idx = 0
-        self._existing_vm_list = set(self._virtualbox_vm.get_vms_list())
-
-    def __call__(self, *args, **kw):
-        config = self._config_factory(*args, **kw)
-        return self._allocate_vm(config)
+        self._write_vagrantfile([b.config for b in self._vms.values()])
 
     def release_all_vms(self):
         log.debug('Releasing all VMs: %s', ', '.join(vm.vagrant_name for vm in self._vms.values() if vm.is_allocated))
+        self.get.clear()
         for vm in self._vms.values():
             vm.is_allocated = False
 
-    def _allocate_vm(self, config):
-        vm = self._find_matching_vm(config)
-        if not vm:
-            vm = self._create_vm(config)
-        vm.is_allocated = True
-        if config.must_be_recreated and vm.is_running:
-            vm.destroy()
-            self._existing_vm_list.remove(vm.virtualbox_name)
-        if not vm.is_running and vm.virtualbox_name in self._existing_vm_list:
-            self._remove_vms(vm.virtualbox_name)
-        if not vm.is_running:
-            vm.start()
-            self._existing_vm_list.add(vm.virtualbox_name)
-            vm.init()
-        log.info('VM: %s', vm)
-        return vm
+    @lrudecorator(1000)
+    def get(self, name=None):
+        found_vm = None
+        for vm in self._vms.values():
+            if not vm.is_allocated and vm.is_running:
+                found_vm = vm
+                break
+        if found_vm is None:
+            for vm in self._vms.values():
+                if not vm.is_allocated:
+                    found_vm = vm
+                    break
+            if found_vm is None:
+                found_vm = self._create_vm(self._config_factory(name))
+            found_vm.start()
+        found_vm.init()
+        found_vm.is_allocated = True
+        return found_vm
 
     def _remove_vms(self, vms_name):
         log.info('Removing old vm %s...', vms_name)
@@ -166,21 +154,6 @@ class VagrantVMFactory(object):
         self._write_vagrantfile([b.config for b in self._vms.values()])
         return vm
 
-    def _find_matching_vm(self, config_template):
-        def find(pred=None):
-            for name, vm in sorted(self._vms.items(), key=lambda (name, vm): vm.config.idx):
-                if vm.is_allocated:
-                    continue
-                if config_template.must_be_recreated:
-                    return vm
-                if pred and not pred(vm):
-                    continue
-                return vm
-            return None
-
-        # first try running ones
-        return find(lambda vm: vm.is_running) or find()
-
     def _write_vagrantfile(self, vm_config_list):
         expanded_vms_config_list = [
             config.expand() for config in vm_config_list]
@@ -193,14 +166,13 @@ class VagrantVMFactory(object):
 
 
 class VagrantVM(object):
-    def __init__(self, bin_dir, vagrant_dir, vagrant,
-                 _ssh_config_path, host_os_access, config, is_running):
+    def __init__(self, bin_dir, vagrant_dir, vagrant, _ssh_config_path, host_os_access, config, is_running):
         self._bin_dir = bin_dir
         self._vagrant_dir = vagrant_dir
         self._vagrant = vagrant
         self.config = config
         self.host_os_access = host_os_access
-        self.guest_os_access = None  # Until VM is started.
+        self.os_access = None  # Until VM is started.
         self.timezone = None
         self.is_allocated = False
         self.is_running = is_running
@@ -234,18 +206,18 @@ class VagrantVM(object):
             else:
                 raise
         else:
-            self.guest_os_access = os_access
+            self.os_access = os_access
         self.networking = NodeNetworking(
-            LinuxNodeNetworking(self.guest_os_access),
+            LinuxNodeNetworking(self.os_access),
             VirtualBoxNodeNetworking(self.virtualbox_name))
-        self.networking.reset()
+        reset_networking(self)
 
     def start(self):
         assert not self.is_running
         log.info('Starting VM: %s...', self)
         self._vagrant.up(vm_name=self.vagrant_name)
-        self.guest_os_access = SshAccess(self._ssh_config_path, self.vagrant_name).become('root')
-        optimize_sshd(self.guest_os_access)
+        self.os_access = SshAccess(self._ssh_config_path, self.vagrant_name).become('root')
+        optimize_sshd(self.os_access)
         self.is_running = True
 
     def destroy(self):

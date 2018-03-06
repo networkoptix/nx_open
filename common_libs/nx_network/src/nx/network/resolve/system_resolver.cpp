@@ -134,7 +134,7 @@ SystemError::ErrorCode SystemResolver::resolveStatusToErrno(int status)
         case EAI_AGAIN:
             return SystemError::again;
         case EAI_MEMORY:
-            return SystemError::nomem;
+            return SystemError::noMemory;
 
 #if defined(__linux__)
         case EAI_SYSTEM:

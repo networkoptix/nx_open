@@ -3,7 +3,6 @@
 #include <core/resource/resource_fwd.h>
 
 #include <ui/dialogs/common/session_aware_dialog.h>
-#include <utils/common/aspect_ratio.h>
 
 namespace Ui { class LayoutSettingsDialog; }
 
@@ -17,24 +16,22 @@ class ServerImageCache;
 } // namespace client
 } // namespace nx
 
-class QnLayoutSettingsDialogPrivate;
-
-class QnLayoutSettingsDialog : public QnSessionAwareButtonBoxDialog
+class QnLayoutSettingsDialog: public QnSessionAwareButtonBoxDialog
 {
     Q_OBJECT
+    using base_type = QnSessionAwareButtonBoxDialog;
 
-    typedef QnSessionAwareButtonBoxDialog base_type;
 public:
-    explicit QnLayoutSettingsDialog(QWidget *parent);
-    ~QnLayoutSettingsDialog();
+    explicit QnLayoutSettingsDialog(QWidget* parent = nullptr);
+    virtual ~QnLayoutSettingsDialog() override;
 
-    void readFromResource(const QnLayoutResourcePtr &layout);
-    bool submitToResource(const QnLayoutResourcePtr &layout);
+    void readFromResource(const QnLayoutResourcePtr& layout);
+    bool submitToResource(const QnLayoutResourcePtr& layout);
 
     virtual void accept() override;
 
 protected:
-    virtual bool eventFilter(QObject *target, QEvent *event) override;
+    virtual bool eventFilter(QObject* target, QEvent* event) override;
 
 private slots:
     void at_clearButton_clicked();
@@ -55,9 +52,6 @@ private slots:
     void selectFile();
 
 private:
-    /** Aspect ratio of the current screen. */
-    QnAspectRatio screenAspectRatio() const;
-
     /**
      * Aspect ratio that is optimal for cells to best fit the current image.
      * Returns negative value if image is not available.
@@ -70,17 +64,16 @@ private:
      */
     bool cellsAreBestAspected() const;
 
-    bool hasChanges(const QnLayoutResourcePtr &layout);
+    bool hasChanges(const QnLayoutResourcePtr& layout);
 
     void loadPreview();
 
-    Q_DECLARE_PRIVATE(QnLayoutSettingsDialog)
-
 private:
+    struct Private;
     QScopedPointer<Ui::LayoutSettingsDialog> ui;
-    QnLayoutSettingsDialogPrivate *const d_ptr;
+    QScopedPointer<Private> d;
 
-    nx::client::desktop::ServerImageCache *m_cache;
+    nx::client::desktop::ServerImageCache* m_cache;
 
     bool m_isUpdating;
 };

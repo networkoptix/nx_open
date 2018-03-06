@@ -148,11 +148,9 @@ QString QnMediaServerResource::getName() const
     return QnResource::getName();
 }
 
-QString QnMediaServerResource::toSearchString() const
+QStringList QnMediaServerResource::searchFilters() const
 {
-    return base_type::toSearchString()
-        + L' '
-        + getUrl();
+    return base_type::searchFilters() << getUrl();
 }
 
 void QnMediaServerResource::setName( const QString& name )

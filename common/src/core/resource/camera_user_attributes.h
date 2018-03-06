@@ -43,6 +43,7 @@ public:
     QnMediaDewarpingParams  dewarpingParams;
     Qn::FailoverPriority    failoverPriority;
     Qn::CameraBackupQualities   backupQualities;
+    QString logicalId;
 
     QnCameraUserAttributes();
 

@@ -52,6 +52,7 @@
 #include "database/server_db.h"
 #include "common/common_globals.h"
 #include <media_server/media_server_module.h>
+#include <media_server_process_aux.h>
 
 //static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 //static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
@@ -397,12 +398,20 @@ public:
     TestStorageThread(QnStorageManager* owner): m_owner(owner) {}
     virtual void run() override
     {
+        for (const auto& storage: storagesToTest())
+        {
+            auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
+            if (fileStorage && !nx::mserver_aux::isStorageUnmounted(storage))
+                fileStorage->setMounted(true);
+        }
+
         for (const auto& storage : storagesToTest())
         {
             if (needToStop())
                 return;
 
-            Qn::ResourceStatus status = storage->initOrUpdate() == Qn::StorageInit_Ok ? Qn::Online : Qn::Offline;
+            Qn::ResourceStatus status =
+                storage->initOrUpdate() == Qn::StorageInit_Ok ? Qn::Online : Qn::Offline;
             if (storage->getStatus() != status)
                 m_owner->changeStorageStatus(storage, status);
 
@@ -493,10 +502,10 @@ QnStorageManager::QnStorageManager(
     connect(resourcePool(), &QnResourcePool::resourceAdded, this, &QnStorageManager::onNewResource, Qt::QueuedConnection);
     connect(resourcePool(), &QnResourcePool::resourceRemoved, this, &QnStorageManager::onDelResource, Qt::QueuedConnection);
 
-	connect(this, &QnStorageManager::rebuildFinished,
+    connect(this, &QnStorageManager::rebuildFinished,
         [this] (QnSystemHealth::MessageType message)
         {
-    		if (message == QnSystemHealth::ArchiveFastScanFinished ||
+            if (message == QnSystemHealth::ArchiveFastScanFinished ||
                 message == QnSystemHealth::ArchiveRebuildFinished)
             {
                 for (const auto& storage: getUsedWritableStorages())
@@ -509,7 +518,7 @@ QnStorageManager::QnStorageManager(
                     }
                 }
             }
-    	});
+        });
 
     if (m_role == QnServer::StoragePool::Backup)
     {
@@ -805,16 +814,16 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
     sqlDb = QSqlDatabase();
     QSqlDatabase::removeDatabase(connectionName);
 
-	QString depracatedFileName = fileName + lit("_deprecated");
-	if (!QFile::remove(depracatedFileName))
-		NX_LOG(lit("%1 Deprecated db file %2 found but remove failed. Remove it manually and restart server")
-			.arg(Q_FUNC_INFO)
-			.arg(depracatedFileName), cl_logWARNING);
+    QString depracatedFileName = fileName + lit("_deprecated");
+    if (!QFile::remove(depracatedFileName))
+        NX_LOG(lit("%1 Deprecated db file %2 found but remove failed. Remove it manually and restart server")
+            .arg(Q_FUNC_INFO)
+            .arg(depracatedFileName), cl_logWARNING);
 
     if (!QFile::rename(fileName, depracatedFileName))
-		NX_LOG(lit("%1 Rename failed for deprecated db file %2. Rename (remove) it manually and restart server")
-			.arg(Q_FUNC_INFO)
-			.arg(fileName), cl_logWARNING);
+        NX_LOG(lit("%1 Rename failed for deprecated db file %2. Rename (remove) it manually and restart server")
+            .arg(Q_FUNC_INFO)
+            .arg(fileName), cl_logWARNING);
 
 
     auto sdb = qnStorageDbPool->getSDB(storage);
@@ -1102,7 +1111,11 @@ void QnStorageManager::onNewResource(const QnResourcePtr &resource)
     QnStorageResourcePtr storage = qSharedPointerDynamicCast<QnStorageResource>(resource);
     if (storage && storage->getParentId() == commonModule()->moduleGUID())
     {
-		m_warnSended = false;
+        auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
+        if (fileStorage && nx::mserver_aux::isStorageUnmounted(fileStorage))
+            fileStorage->setMounted(false);
+
+        m_warnSended = false;
         connect(storage.data(), &QnStorageResource::isBackupChanged, this, &QnStorageManager::at_storageChanged);
         if (checkIfMyStorage(storage))
             addStorage(storage);
@@ -1113,7 +1126,7 @@ void QnStorageManager::onDelResource(const QnResourcePtr &resource)
 {
     QnStorageResourcePtr storage = qSharedPointerDynamicCast<QnStorageResource>(resource);
     if (storage && storage->getParentId() == commonModule()->moduleGUID() && checkIfMyStorage(storage)) {
-		m_warnSended = false;
+        m_warnSended = false;
         removeStorage(storage);
         qnStorageDbPool->removeSDB(storage);
     }
@@ -1745,8 +1758,6 @@ bool QnStorageManager::clearSpaceForFile(const QString& path, qint64 size)
 {
     NX_LOG(lit("Clearing %1 bytes for file \"%2\".").arg(size).arg(path), cl_logDEBUG2);
 
-    //size = 125939630080 + 1000 * 1000 * 1000;
-
     QStorageInfo volume(path);
     if (!volume.isValid())
         return false;
@@ -1754,23 +1765,14 @@ bool QnStorageManager::clearSpaceForFile(const QString& path, qint64 size)
     if (volume.bytesAvailable() > size)
         return true;
 
-    QString volumePath = QDir::cleanPath(volume.rootPath());
+    QnStorageResourcePtr storage = getStorageByVolume(volume.rootPath());
+    if (!storage)
+        return false;
 
-    QnMutexLocker locker(&m_clearSpaceMutex);
-    QSet<QnStorageResourcePtr> storages;
-    for (const QnStorageResourcePtr& storage : getClearableStorages())
-    {
-        QString storagePath = QDir::cleanPath(storage->getUrl());
+    if (storage->hasFlags(Qn::storage_fastscan))
+        return false;
 
-        if (storagePath.startsWith(volumePath))
-            storages << storage;
-    }
-
-    for (const QnStorageResourcePtr& storage : storages)
-        clearOldestSpace(storage, true, size);
-
-    volume = QStorageInfo(path);
-    return volume.bytesAvailable() > size;
+    return clearOldestSpace(storage, true, size);
 }
 
 bool QnStorageManager::canAddChunk(qint64 timeMs, qint64 size)
@@ -1785,7 +1787,7 @@ bool QnStorageManager::canAddChunk(qint64 timeMs, qint64 size)
     if (available > size)
         return true;
 
-    qint64 minTime = 0x7fffffffffffffffll;
+    qint64 minTime = std::numeric_limits<qint64>::max();
     DeviceFileCatalogPtr catalog;
     {
         QnMutexLocker lock(&m_mutexCatalog);
@@ -1796,7 +1798,7 @@ bool QnStorageManager::canAddChunk(qint64 timeMs, qint64 size)
     if (minTime > timeMs)
         return false;
 
-    return false;
+    return true;
 }
 
 void QnStorageManager::clearAnalyticsEvents(
@@ -2216,6 +2218,17 @@ QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages(
         {
             qint64 available = fileStorage->getTotalSpace() - fileStorage->getSpaceLimit();
             bigStorageThreshold = qMax(bigStorageThreshold, available);
+            NX_VERBOSE(
+                this,
+                lm("[ApiStorageSpace, Writable storages] candidate: %1, available: %2, threshold: %3")
+                    .args(fileStorage->getUrl(), available, bigStorageThreshold));
+        }
+        else
+        {
+            NX_VERBOSE(
+                this,
+                lm("[ApiStorageSpace, Writable storages] candidate: %1 is offline and thus neglected")
+                    .args(fileStorage->getUrl()));
         }
     }
     bigStorageThreshold /= BIG_STORAGE_THRESHOLD_COEFF;
@@ -2228,6 +2241,11 @@ QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages(
             qint64 available = fileStorage->getTotalSpace() - fileStorage->getSpaceLimit();
             if (available >= bigStorageThreshold)
                 result << fileStorage;
+
+            NX_VERBOSE(
+                this,
+                lm("[ApiStorageSpace, Writable storages] candidate: %1 size seems appropriate")
+                    .args(fileStorage->getUrl()));
         }
     }
 
@@ -2250,8 +2268,15 @@ QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages(
 
     if (totalNonSystemStoragesSpace > systemStorageSpace * kSystemStorageTreshold && !systemStorageItVec.empty())
     {
-        for (auto it : systemStorageItVec)
+        for (auto it: systemStorageItVec)
+        {
+            NX_VERBOSE(
+                this,
+                lm("[ApiStorageSpace, Writable storages] Removing system storage %1 out of candidates")
+                    .args((*it)->getUrl()));
+
             result.remove(*it);
+        }
     }
 
     return result;
@@ -2555,6 +2580,22 @@ QnStorageResourcePtr QnStorageManager::getStorageByUrlExact(const QString& stora
         if (storageUrl == root)
             return *itr;
     }
+    return QnStorageResourcePtr();
+}
+
+QnStorageResourcePtr QnStorageManager::getStorageByVolume(const QString& volumeRoot) const
+{
+    QnMutexLocker lock(&m_mutexStorages);
+
+    QnStorageResourcePtr ret;
+    for (const QnStorageResourcePtr& storage: m_storageRoots)
+    {
+        QStorageInfo info(storage->getUrl());
+
+        if (info.isValid() && QDir::cleanPath(info.rootPath()) == QDir::cleanPath(volumeRoot))
+            return storage;
+    }
+
     return QnStorageResourcePtr();
 }
 

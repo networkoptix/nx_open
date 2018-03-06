@@ -29,7 +29,9 @@ cp -f readme.txt $TARGET_DIR
 
 #Copying integration headers
 cp -f ../common_libs/nx_sdk/src/plugins/plugin_api.h $TARGET_DIR/include/plugins/
+cp -f ../common_libs/nx_sdk/src/plugins/plugin_tools.h $TARGET_DIR/include/plugins/
 cp -f ../common/src/plugins/camera_plugin.h $TARGET_DIR/include/plugins/
+cp -f ../common/src/plugins/camera_plugin_types.h $TARGET_DIR/include/plugins/
 
 PLUGINS=(axiscamplugin image_library_plugin rpi_cam)
 
@@ -39,10 +41,11 @@ do
 
     #Copying plugin
     mkdir -p $TARGET_DIR/sample/$pluginName/src
-    cp -f ../plugins/$pluginName/*.pro $TARGET_DIR/sample/$pluginName/
+    cp -f ../plugins/$pluginName/src/*.txt $TARGET_DIR/sample/$pluginName/src/
     cp -f ../plugins/$pluginName/src/*.h $TARGET_DIR/sample/$pluginName/src/
     cp -f ../plugins/$pluginName/src/*.cpp $TARGET_DIR/sample/$pluginName/src/
     cp -f ../plugins/$pluginName/Doxyfile $TARGET_DIR/sample/$pluginName/Doxyfile
+    cp -f ../plugins/$pluginName/readme.txt $TARGET_DIR/sample/$pluginName/readme.txt
 
     if [ $? -eq 0 ]
     then

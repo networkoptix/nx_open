@@ -30,7 +30,7 @@ def install_updates_server(os_access, python_path):
 
 @pytest.fixture
 def server(server_factory):
-    return server_factory('server')
+    return server_factory.create('server')
 
 
 def test_single_server(server):
@@ -38,6 +38,7 @@ def test_single_server(server):
     assert holds_long_enough(lambda: api.status.GET()['status'] in {'notAvailable', 'checking'})
     python_path = prepare_virtual_environment(server.os_access)
     install_updates_server(server.os_access, python_path)
-    server.change_config(checkForUpdateUrl=ROOT_URL)
-    server.restart_service()
+    server.stop(already_stopped_ok=True)
+    server.installation.change_config(checkForUpdateUrl=ROOT_URL)
+    server.start(already_started_ok=False)
     assert wait_until(lambda: api.status.GET()['status'] == 'available')

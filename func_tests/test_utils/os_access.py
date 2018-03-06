@@ -59,17 +59,6 @@ class ProcessTimeoutError(subprocess.CalledProcessError):
         return 'ProcessTimeoutError(%s)' % self
 
 
-def log_output(name, output):
-    if not output:
-        return  # do not log ''; skip None also
-    if '\0' in output:
-        log.debug('\t--> %s: %s bytes binary', name, len(output))
-    elif len(output) > 200:
-        log.debug('\t--> %s: %r...', name, output[:200])
-    else:
-        log.debug('\t--> %s: %r',  name, output.rstrip('\r\n'))
-
-
 class SshAccessConfig(object):
 
     @classmethod
@@ -187,7 +176,7 @@ class LocalAccess(OsAccess):
         stdout_buffer = []
         stderr_buffer = []
         stdout_thread = threading.Thread(target=self._read_thread, args=(log.debug, pipe.stdout, stdout_buffer, log_output))
-        stderr_thread = threading.Thread(target=self._read_thread, args=(log.error, pipe.stderr, stderr_buffer, True))
+        stderr_thread = threading.Thread(target=self._read_thread, args=(log.debug, pipe.stderr, stderr_buffer, True))
         stdout_thread.daemon = True
         stderr_thread.daemon = True
         stdout_thread.start()

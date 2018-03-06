@@ -159,7 +159,9 @@ int SocketGlobals::initializationFlags()
     return s_instance->m_impl->m_initializationFlags;
 }
 
-void SocketGlobals::init(int initializationFlags)
+void SocketGlobals::init(
+    int initializationFlags,
+    const QString& customCloudHost)
 {
     QnMutexLocker lock(&s_mutex);
 
@@ -170,7 +172,7 @@ void SocketGlobals::init(int initializationFlags)
 
         s_instance->initializeNetworking();
         // TODO: #ak Disable cloud based on m_initializationFlags.
-        s_instance->initializeCloudConnectivity();
+        s_instance->initializeCloudConnectivity(customCloudHost);
 
         s_initState = InitState::done;
 
@@ -259,9 +261,10 @@ void SocketGlobals::initializeNetworking()
     m_impl->m_debugIniReloadTimer = std::make_unique<aio::Timer>();
 }
 
-void SocketGlobals::initializeCloudConnectivity()
+void SocketGlobals::initializeCloudConnectivity(const QString& customCloudHost)
 {
     m_impl->cloudConnectController = std::make_unique<cloud::CloudConnectController>(
+        customCloudHost,
         &m_impl->m_aioServiceGuard.aioService(),
         m_impl->m_addressResolver.get());
 }

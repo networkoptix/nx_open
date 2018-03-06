@@ -5,7 +5,6 @@
 #include <nx/utils/time.h>
 
 #include "managers_types.h"
-#include "../ec2/connection_manager.h"
 
 namespace nx {
 namespace cdb {
@@ -65,15 +64,16 @@ void SystemHealthInfoProvider::getSystemHealthHistory(
 }
 
 void SystemHealthInfoProvider::onSystemStatusChanged(
-    std::string systemId, api::SystemHealth systemHealth)
+    const std::string& systemId,
+    ec2::SystemStatusDescriptor statusDescription)
 {
     using namespace std::placeholders;
 
-    NX_LOGX(lm("System %1 changed health state to %2")
-        .arg(systemId).arg(QnLexical::serialized(systemHealth)), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("System %1 changed health state to %2")
+        .args(systemId, QnLexical::serialized(statusDescription.health)));
 
     api::SystemHealthHistoryItem healthHistoryItem;
-    healthHistoryItem.state = systemHealth;
+    healthHistoryItem.state = statusDescription.health;
     healthHistoryItem.timestamp = nx::utils::utcTime();
 
     m_dbManager->executeUpdate(

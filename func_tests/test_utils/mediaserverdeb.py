@@ -8,12 +8,15 @@ from test_utils.build_info import customizations_from_paths, build_info_from_tex
 
 
 class MediaserverDeb(object):
+    class InvalidDeb(Exception):
+        pass
+
     def __init__(self, path, installation_root=PurePosixPath('/opt')):
         self.path = path.expanduser()
         try:
             deb_file = DebFile(str(self.path)).data.tgz()
         except ArError:
-            raise Exception("File {} is not a valid DEB package".format(self.path))
+            raise self.InvalidDeb("File {} is not a valid DEB package".format(self.path))
         tar_members = deb_file.getmembers()
         paths = [PurePosixPath('/', member.path) for member in tar_members]
         customizations = customizations_from_paths(paths, installation_root)
@@ -25,3 +28,5 @@ class MediaserverDeb(object):
         with closing(deb_file.extractfile('.' + str(build_info_path))) as build_info_file:  # Pathlib omits dot.
             build_info_data = build_info_file.read()
         self.build_info = build_info_from_text(build_info_data)
+        if self.build_info.customization != self.customization.name:
+            raise self.InvalidDeb("Customization detected from paths doesn't match customization from build_info.txt")

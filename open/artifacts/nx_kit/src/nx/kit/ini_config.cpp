@@ -42,6 +42,14 @@ static void skipWhitespace(const char** const pp)
         ++(*pp);
 }
 
+template<typename T>
+std::string defaultValueStrSimple(T&& value)
+{
+    std::ostringstream os;
+    os << std::forward<T>(value);
+    return os.str();
+}
+
 /**
  * @param outName Set to an empty string if the line is empty or comment.
  * @return Whether no errors occurred.
@@ -196,11 +204,63 @@ bool Param<int>::reload(const std::string* value, std::ostream* output)
 }
 
 template<>
+bool Param<float>::reload(const std::string* value, std::ostream* output)
+{
+    const float oldValue = *pValue;
+    *pValue = defaultValue;
+    const char* error = "";
+    if (value && !value->empty()) //< Existing but empty float values are treated as default.
+    {
+        // NOTE: std::stof() is missing on Android.
+        char* pEnd = nullptr;
+        errno = 0; //< Required before strtof().
+        const long v = std::strtof(value->c_str(), &pEnd);
+        if (errno == ERANGE || *pEnd != '\0')
+            error = " [invalid value]";
+        else
+            *pValue = (float) v;
+    }
+    printValueLine(output, *pValue, " = ", error, *pValue == defaultValue);
+    return oldValue != *pValue;
+}
+
+template<>
+bool Param<double>::reload(const std::string* value, std::ostream* output)
+{
+    const double oldValue = *pValue;
+    *pValue = defaultValue;
+    const char* error = "";
+    if (value && !value->empty()) //< Existing but empty double values are treated as default.
+    {
+        // NOTE: std::stof() is missing on Android.
+        char* pEnd = nullptr;
+        errno = 0; //< Required before strtod().
+        const long v = std::strtod(value->c_str(), &pEnd);
+        if (errno == ERANGE || *pEnd != '\0')
+            error = " [invalid value]";
+        else
+            *pValue = (double) v;
+    }
+    printValueLine(output, *pValue, " = ", error, *pValue == defaultValue);
+    return oldValue != *pValue;
+}
+
+template<>
 std::string Param<int>::defaultValueStr() const
 {
-    std::ostringstream os;
-    os << defaultValue;
-    return os.str();
+    return defaultValueStrSimple(defaultValue);
+}
+
+template<>
+std::string Param<float>::defaultValueStr() const
+{
+    return defaultValueStrSimple(defaultValue);
+}
+
+template<>
+std::string Param<double>::defaultValueStr() const
+{
+    return defaultValueStrSimple(defaultValue);
 }
 
 template<>
@@ -561,6 +621,20 @@ const char* IniConfig::regStringParam(
     const char* paramName, const char* description)
 {
     return d->regParam<const char*>(pValue, defaultValue, paramName, description);
+}
+
+float IniConfig::regFloatParam(
+    const float* pValue, float defaultValue,
+    const char* paramName, const char* description)
+{
+    return d->regParam<float>(pValue, defaultValue, paramName, description);
+}
+
+double IniConfig::regDoubleParam(
+    const double* pValue, double defaultValue,
+    const char* paramName, const char* description)
+{
+    return d->regParam<double>(pValue, defaultValue, paramName, description);
 }
 
 const char* IniConfig::iniFile() const

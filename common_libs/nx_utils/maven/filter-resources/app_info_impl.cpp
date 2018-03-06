@@ -1,5 +1,5 @@
 //
-// This file is generated. Go to pom.xml.
+// This file is generated.
 //
 #include "nx/utils/app_info.h"
 

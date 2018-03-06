@@ -12,6 +12,7 @@
 #include "../access_control/auth_types.h"
 #include "../dao/rdb/system_health_history_data_object.h"
 #include "../data/system_data.h"
+#include "../ec2/connection_manager.h"
 
 namespace nx {
 namespace cdb {
@@ -57,7 +58,9 @@ private:
     dao::rdb::SystemHealthHistoryDataObject m_systemHealthHistoryDataObject;
     nx::utils::SubscriptionId m_systemStatusChangedSubscriptionId;
 
-    void onSystemStatusChanged(std::string systemId, api::SystemHealth systemHealth);
+    void onSystemStatusChanged(
+        const std::string& systemId,
+        ec2::SystemStatusDescriptor statusDescription);
 };
 
 //-------------------------------------------------------------------------------------------------

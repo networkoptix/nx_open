@@ -8,7 +8,7 @@
 
 class QnTimePeriod;
 
-class QN_EXPORT QnTimePeriod
+class QnTimePeriod
 {
 public:
 

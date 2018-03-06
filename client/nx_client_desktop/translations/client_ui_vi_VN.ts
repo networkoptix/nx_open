@@ -173,11 +173,6 @@
     <name>ArchiveLengthWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
-      <source>Form</source>
-      <translation>Hình thức</translation>
-    </message>
-    <message>
-      <location/>
       <source>Fixed Archive Length</source>
       <translation>Cố định Archive Length</translation>
     </message>
@@ -300,7 +295,7 @@
     <message>
       <location/>
       <source>Mbit/s</source>
-      <translation>Mbit/s</translation>
+      <translation>Mbit / s</translation>
     </message>
     <message>
       <location/>
@@ -427,7 +422,7 @@
     <message>
       <location/>
       <source>Description</source>
-      <translation>Miêu tả</translation>
+      <translation>&amp;miêu tả</translation>
     </message>
     <message>
       <location/>
@@ -498,7 +493,7 @@
     <message>
       <location/>
       <source>At</source>
-      <translation>於</translation>
+      <translation>Tại camera</translation>
     </message>
   </context>
   <context>
@@ -526,7 +521,7 @@
     <message>
       <location/>
       <source>Test</source>
-      <translation>Thử</translation>
+      <translation>Kiểm tra</translation>
     </message>
   </context>
   <context>
@@ -832,7 +827,7 @@
     <message>
       <location/>
       <source>Pre-Recording</source>
-      <translation>Pre-recording</translation>
+      <translation>Trước khi ghi</translation>
     </message>
     <message>
       <location/>
@@ -877,7 +872,7 @@
     <message>
       <location/>
       <source>Panic Mode:</source>
-      <translation>Chế độ panic:</translation>
+      <translation>Chế độ pnic:</translation>
     </message>
     <message>
       <location/>
@@ -903,7 +898,7 @@
     <message>
       <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
       <source>Stay logged in</source>
-      <translation>Duy trì đăng nhập</translation>
+      <translation>Giữ trạng thái đăng nhập</translation>
     </message>
   </context>
   <context>
@@ -961,6 +956,14 @@
     </message>
   </context>
   <context>
+    <name>CustomSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/custom_settings/widgets/custom_settings_widget.ui"/>
+      <source>Category</source>
+      <translation>Loài</translation>
+    </message>
+  </context>
+  <context>
     <name>DatabaseManagementWidget</name>
     <message>
       <location filename="../src/ui/widgets/system_settings/database_management_widget.ui"/>
@@ -998,7 +1001,7 @@
     <message>
       <location/>
       <source>Event Rules...</source>
-      <translation>Quy tắc sự kiện...</translation>
+      <translation>Event Rules...</translation>
     </message>
   </context>
   <context>
@@ -1415,7 +1418,7 @@
     <message>
       <location/>
       <source>Server URL</source>
-      <translation>URL máy chủ</translation>
+      <translation>URL Máy chủ</translation>
     </message>
     <message>
       <location/>
@@ -1486,12 +1489,12 @@
     <message>
       <location/>
       <source>License Key:</source>
-      <translation>Key bản quyền:</translation>
+      <translation>Mã bản quyền:</translation>
     </message>
     <message>
       <location/>
       <source>Features</source>
-      <translation>Các tính năng</translation>
+      <translation>Tính năng</translation>
     </message>
     <message>
       <location/>
@@ -1585,7 +1588,7 @@
     <message>
       <location/>
       <source>Invalid License Key</source>
-      <translation>Key bản quyền Không hợp lệ</translation>
+      <translation>Khóa bản quyền không hợp lệ</translation>
     </message>
     <message>
       <location/>
@@ -1595,7 +1598,7 @@
     <message>
       <location/>
       <source>Hardware Id</source>
-      <translation>Id Phần cứng</translation>
+      <translation>Id phần cứng</translation>
     </message>
   </context>
   <context>
@@ -1639,7 +1642,7 @@
     <message>
       <location/>
       <source>Host</source>
-      <translation>Host</translation>
+      <translation>Máy chủ</translation>
     </message>
     <message>
       <location/>
@@ -1722,7 +1725,7 @@
     <message>
       <location/>
       <source>Tour cycle</source>
-      <translation>Chu kỳ Tour</translation>
+      <translation>Tour cycle</translation>
     </message>
   </context>
   <context>
@@ -1845,7 +1848,7 @@
     <message>
       <location/>
       <source>Events</source>
-      <translation>Những sự kiện</translation>
+      <translation>Sự kiện</translation>
     </message>
   </context>
   <context>
@@ -1916,7 +1919,7 @@
     <message>
       <location/>
       <source>Hotkey:</source>
-      <translation>Hotkeys:</translation>
+      <translation>Phím nóng:</translation>
     </message>
   </context>
   <context>
@@ -1997,7 +2000,7 @@
     <message>
       <location/>
       <source>Stay logged in</source>
-      <translation>Giữ trạng thái đăng nhập</translation>
+      <translation>Duy trì đăng nhập</translation>
     </message>
   </context>
   <context>
@@ -2578,7 +2581,7 @@
     <message>
       <location/>
       <source>Expert</source>
-      <translation>Xuất khẩu</translation>
+      <translation>Chế độ Expert</translation>
     </message>
     <message>
       <location/>
@@ -2664,11 +2667,6 @@
       <location/>
       <source>Reset</source>
       <translation>Thiết lập lại</translation>
-    </message>
-    <message>
-      <location/>
-      <source>TextLabel</source>
-      <translation type="unfinished">TextLabel</translation>
     </message>
     <message>
       <location/>
@@ -3047,7 +3045,7 @@ Click &quot;New role&quot; button to create one.</source>
     <message>
       <location filename="../src/ui/widgets/properties/user_settings_widget.ui"/>
       <source>User Type</source>
-      <translation>Kiểu người dùng</translation>
+      <translation>Nhóm người dùng</translation>
     </message>
     <message>
       <location/>
@@ -3064,11 +3062,6 @@ Click &quot;New role&quot; button to create one.</source>
     <name>WearableMotionWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
-      <source>Form</source>
-      <translation>Hình thức</translation>
-    </message>
-    <message>
-      <location/>
       <source>Motion Detection</source>
       <translation>Phát hiện chuyển động</translation>
     </message>
@@ -3087,11 +3080,6 @@ Click &quot;New role&quot; button to create one.</source>
     <name>WearableProgressWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
-      <source>Form</source>
-      <translation>Hình thức</translation>
-    </message>
-    <message>
-      <location/>
       <source>Cancel</source>
       <translation>Hủy bỏ</translation>
     </message>
@@ -3100,11 +3088,6 @@ Click &quot;New role&quot; button to create one.</source>
     <name>WearableUploadWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
-      <source>Form</source>
-      <translation>Hình thức</translation>
-    </message>
-    <message>
-      <location/>
       <source>Upload Video</source>
       <translation type="unfinished">Upload Video</translation>
     </message>

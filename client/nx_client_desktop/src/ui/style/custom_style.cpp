@@ -7,6 +7,7 @@
 #include <QtWidgets/QTabWidget>
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QGraphicsOpacityEffect>
+#include <QtWidgets/QApplication>
 
 #include <ui/style/generic_palette.h>
 #include <ui/style/nx_style.h>
@@ -24,6 +25,14 @@ void setWarningStyle(QWidget* widget, qreal disabledOpacity)
     auto palette = widget->palette();
     setWarningStyle(&palette, disabledOpacity);
     widget->setPalette(palette);
+}
+
+void resetStyle(QWidget* widget)
+{
+    const auto style = widget->style() ? widget->style() : qApp->style();
+    style->unpolish(widget);
+    widget->setPalette(QPalette());
+    style->polish(widget);
 }
 
 void setWarningStyle(QPalette* palette, qreal disabledOpacity)

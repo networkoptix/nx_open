@@ -35,6 +35,8 @@ set(mac_certificate_file_password "qweasd123")
 
 # Additional Features
 set(vmax false)
+set(enable_hanwha OFF)
+
 # if true, you can use --customization=<path> to specify customization
 set(dynamic.customization false)
 

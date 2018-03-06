@@ -18,4 +18,3 @@
 #include <boost/algorithm/cxx11/any_of.hpp>
 
 #include <nx/utils/literal.h>
-#include <nx/utils/deprecation.h>

@@ -5,8 +5,7 @@ angular.module('webadminApp')
         // Preload content into cache
         $http.get(Config.viewsDir + 'components/offline.html', {cache: $templateCache});
     }])
-    .controller('OfflineCtrl', ['$scope', '$modalInstance', '$interval', 'mediaserver',
-    function ($scope, $modalInstance, $interval, mediaserver) {
+    .controller('OfflineCtrl', ['$scope', '$interval', 'mediaserver', function ($scope, $interval, mediaserver) {
 
         function reload(){
             window.location.reload();

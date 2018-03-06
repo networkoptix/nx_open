@@ -233,35 +233,40 @@ bool QnServerStreamRecorder::canDropPackets() const
 
 bool QnServerStreamRecorder::cleanupQueue()
 {
-    if (!m_recordingContextVector.empty())
     {
-        size_t slowestStorageIndex;
-        int64_t slowestWriteTime = std::numeric_limits<int64_t>::min();
-
-        for (size_t i = 0; i < m_recordingContextVector.size(); ++i)
+        QnMutexLocker lock(&m_queueSizeMutex);
+        if (!m_recordingContextVector.empty())
         {
-            if (m_recordingContextVector[i].totalWriteTimeNs > slowestWriteTime)
-                slowestStorageIndex = i;
-        }
+            size_t slowestStorageIndex;
+            int64_t slowestWriteTime = std::numeric_limits<int64_t>::min();
 
-        emit storageFailure(
-            m_mediaServer,
-            qnSyncTime->currentUSecsSinceEpoch(),
-            nx::vms::event::EventReason::storageTooSlow,
-            m_recordingContextVector[slowestStorageIndex].storage
-            );
+            for (size_t i = 0; i < m_recordingContextVector.size(); ++i)
+            {
+                if (m_recordingContextVector[i].totalWriteTimeNs > slowestWriteTime)
+                    slowestStorageIndex = i;
+            }
+
+            const auto storage = m_recordingContextVector[slowestStorageIndex].storage;
+            lock.unlock();
+            emit storageFailure(
+                m_mediaServer,
+                qnSyncTime->currentUSecsSinceEpoch(),
+                nx::vms::event::EventReason::storageTooSlow,
+                storage);
+        }
     }
-    //emit storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), nx::vms::event::StorageTooSlowReason, m_storage);
 
     qWarning() << "HDD/SSD is slowing down recording for camera " << m_device->getUniqueId() << ". "<<m_dataQueue.size()<<" frames have been dropped!";
     markNeedKeyData();
 
-    QnMutexLocker lock( &m_queueSizeMutex );
-    QnAbstractDataPacketPtr data;
-    while (m_dataQueue.pop(data, 0))
     {
-        if (auto media = std::dynamic_pointer_cast<QnAbstractMediaData>(data))
-            addQueueSizeUnsafe(- (qint64) media->dataSize());
+        QnMutexLocker lock( &m_queueSizeMutex );
+        QnAbstractDataPacketPtr data;
+        while (m_dataQueue.pop(data, 0))
+        {
+            if (auto media = std::dynamic_pointer_cast<QnAbstractMediaData>(data))
+                addQueueSizeUnsafe(- (qint64) media->dataSize());
+        }
     }
 
     return true;
@@ -724,6 +729,7 @@ void QnServerStreamRecorder::getStoragesAndFileNames(QnAbstractMediaStreamDataPr
 {
     if (!m_fixedFileName)
     {
+        QnMutexLocker lock(&m_queueSizeMutex);
         QnNetworkResourcePtr netResource = qSharedPointerDynamicCast<QnNetworkResource>(m_device);
         NX_ASSERT(netResource != 0, Q_FUNC_INFO, "Only network resources can be used with storage manager!");
         m_recordingContextVector.clear();

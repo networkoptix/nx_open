@@ -3,7 +3,7 @@
 
 #include <core/resource/resource_fwd.h>
 
-class QN_EXPORT QnResourceConsumer
+class QnResourceConsumer
 {
 public:
     explicit QnResourceConsumer(const QnResourcePtr& resource);

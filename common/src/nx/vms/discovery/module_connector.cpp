@@ -288,7 +288,7 @@ ModuleConnector::Module::Priority
     if (m_id.isNull())
         return kDefault;
 
-    if (host == nx::network::HostAddress::localhost || host == lit("localhost"))
+    if (host == nx::network::HostAddress::localhost || host.toString().toLower() == lit("localhost"))
         return kLocalHost;
 
     if (host.isLocal())

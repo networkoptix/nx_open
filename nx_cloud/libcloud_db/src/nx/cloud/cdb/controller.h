@@ -17,6 +17,7 @@
 #include "managers/event_manager.h"
 #include "managers/maintenance_manager.h"
 #include "managers/system_health_info_provider.h"
+#include "managers/system_capabilities_info_provider.h"
 #include "managers/system_manager.h"
 #include "managers/system_merge_manager.h"
 #include "managers/temporary_account_password_manager.h"
@@ -74,6 +75,7 @@ private:
     std::unique_ptr<AbstractSystemHealthInfoProvider> m_systemHealthInfoProvider;
     nx::utils::StandaloneTimerManager m_timerManager;
     SystemManager m_systemManager;
+    SystemCapabilitiesProvider m_systemCapabilitiesProvider;
     VmsGateway m_vmsGateway;
     SystemMergeManager m_systemMergeManager;
     AuthenticationProvider m_authProvider;

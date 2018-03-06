@@ -53,18 +53,14 @@ QString QnVirtualCameraResource::getUniqueId() const
     return getPhysicalId();
 }
 
-QString QnVirtualCameraResource::toSearchString() const
+QStringList QnVirtualCameraResource::searchFilters() const
 {
-    QString result;
-    QTextStream(&result)
-        << QnNetworkResource::toSearchString()
-        << " "
+    return
+        QnNetworkResource::searchFilters()
         << getModel()
-        << " "
         << getFirmware()
-        << " "
-        << getVendor(); // TODO: #Elric evil!
-    return result;
+        << getVendor()
+        << getLogicalId();
 }
 
 bool QnVirtualCameraResource::isForcedAudioSupported() const {

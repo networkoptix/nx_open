@@ -176,6 +176,20 @@
         "default": "{{PRODUCT_NAME}} web 介面"
     },
     "common": {
+        "voiceCommands": {
+            "search": "find + [text for searchbar]",
+            "pause": "pause",
+            "help": "help | show commands",
+            "collapse all servers": "collapse all servers",
+            "collapse server": "collapse server + [server name]",
+            "play": "play",
+            "clear search": "clear search",
+            "live": "go to live | show me live",
+            "expand all servers": "expand all servers",
+            "stop listening": "stop listening",
+            "expand server": "expand server + [server name]",
+            "view": "view + [camera name]"
+        },
         "systemOffline": "系統處於離線狀態",
         "cameraLinks": {
             "copyToClipboard": "複製到剪貼簿",
@@ -186,9 +200,9 @@
             "transcoding": "轉碼",
             "copyActiveText": "已複製到剪貼簿"
         },
-        "searchCamPlaceholder": "搜尋",
+        "searchCamPlaceholder": "Search",
         "cameraStates": {
-            "noFormat": "此瀏覽器或設備不支援從此攝影機回放影像。",
+            "noFormat": "This browser does not support video playback from this camera.",
             "ieWin10": "請使用Microsoft Edge或Google Chrome瀏覽器。",
             "iosVideoTooLarge": "iOS不支援大於 fullHD (2MP：1920x1080) 的影像。",
             "unauthorized": "需要身份驗證",
@@ -199,7 +213,13 @@
             "error": "錯誤",
             "offline": "離線",
             "noData": "無資料",
-            "flashRequired": "要在 ARM 伺服器上播放影像, 請 <a href='https://get.adobe.com/flashplayer/' target='_blank'>安裝 Adobe Flash</a>."
+            "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing videos."
+        },
+        "chromeCastWarning": "Chromecast is resource intensive and may cause issues on your server.",
+        "resolution": {
+            "high": "High",
+            "auto": "Auto",
+            "low": "Low"
         }
     }
 }

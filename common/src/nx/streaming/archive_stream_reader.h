@@ -100,6 +100,8 @@ public:
     virtual void setErrorHandler(
         std::function<void(const QString& errorString)> handler) override;
     bool isOpened() const;
+
+    CameraDiagnostics::Result lastError() const;
 protected:
     virtual bool init();
 

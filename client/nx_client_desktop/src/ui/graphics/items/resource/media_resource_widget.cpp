@@ -419,7 +419,6 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     at_camDisplay_liveChanged();
     at_ptzButton_toggled(false);
     at_histogramButton_toggled(item->imageEnhancement().enabled);
-    updateButtonsVisibility();
     updateIconButton();
 
     updateTitleText();
@@ -447,6 +446,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     const bool canRotate = accessController()->hasPermissions(item->layout()->resource(),
         Qn::WritePermission);
     setOption(WindowRotationForbidden, !hasVideo() || !canRotate);
+    updateButtonsVisibility();
 }
 
 QnMediaResourceWidget::~QnMediaResourceWidget()
@@ -2224,7 +2224,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
             return Qn::IoModuleDisabledOverlay;
     }
 
-    if (d->display()->camDisplay()->lastMediaEvent() == Qn::MediaStreamEvent::TooManyOpenedConnections)
+    if (d->display()->camDisplay()->lastMediaEvent() == Qn::MediaStreamEvent::TooManyOpenedConnectionsError)
     {
         // Too many opened connections
         return Qn::TooManyOpenedConnectionsOverlay;
@@ -2245,8 +2245,15 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
         return Qn::EmptyOverlay;
     }
 
-    if (d->resource->hasFlags(Qn::local_video) && d->resource->getStatus() == Qn::Offline)
-        return Qn::NoDataOverlay;
+    if (d->resource->hasFlags(Qn::local_video))
+    {
+        if (d->resource->getStatus() == Qn::Offline)
+            return Qn::NoDataOverlay;
+
+        // Handle export from I/O modules.
+        if (!d->hasVideo)
+            return Qn::NoVideoDataOverlay;
+    }
 
     if (options().testFlag(DisplayActivity) && d->display()->isPaused())
     {

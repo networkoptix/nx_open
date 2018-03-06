@@ -160,6 +160,11 @@ bool PluginManager::loadNxPlugin(
     }
 
     QLibrary lib(filePath);
+    // Flag DeepBindHint forces plugin (the loaded side) to use its functions instead of the same
+    // named functions of server (the loading side). In Linux it is no so by default.
+    QLibrary::LoadHints hints = lib.loadHints();
+    hints |= QLibrary::DeepBindHint;
+    lib.setLoadHints(hints);
     if (!lib.load())
     {
         NX_ERROR(this) << lit("Failed to load %1: %2").arg(filePath).arg(lib.errorString());

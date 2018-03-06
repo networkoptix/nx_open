@@ -7,6 +7,7 @@ import pytest
 
 import server_api_data_generators as generator
 import transaction_log
+from test_utils.api_shortcuts import get_server_id
 from test_utils.server import MEDIASERVER_MERGE_TIMEOUT
 from test_utils.utils import SimpleNamespace, datetime_utc_now
 
@@ -64,12 +65,12 @@ class LayoutItemGenerator(SeedResourceGenerator):
 
     def set_resources(self, resources):
         for server, resource in resources:
-            self.__resources.setdefault(server.ecs_guid, []).append(
+            self.__resources.setdefault(get_server_id(server.rest_api), []).append(
                 generator.get_resource_id(resource))
 
     def get_resources_by_server(self, server):
         if server:
-            return self.__resources[server.ecs_guid]
+            return self.__resources[get_server_id(server.rest_api)]
         else:
             return list(
                 itertools.chain.from_iterable(self.__resources.values()))
@@ -116,10 +117,10 @@ def merge_schema(request):
 
 @pytest.fixture
 def env(server_factory, merge_schema):
-    one = server_factory('one')
-    two = server_factory('two')
+    one = server_factory.create('one')
+    two = server_factory.create('two')
     if merge_schema == 'merged':
-        one.merge([two])
+        one.merge_systems(two)
     return SimpleNamespace(
         one=one,
         two=two,
@@ -355,7 +356,7 @@ def test_mediaserver_data_synchronization(env):
 
 def test_storage_data_synchronization(env):
     servers = [env.servers[i % len(env.servers)] for i in range(env.test_size)]
-    server_with_guid_list = map(lambda s: (s, s.ecs_guid), servers)
+    server_with_guid_list = map(lambda s: (s, get_server_id(s.rest_api)), servers)
     storages = prepare_and_make_async_post_calls(env, 'saveStorage', server_with_guid_list)
     merge_system_if_unmerged(env)
     check_api_calls(

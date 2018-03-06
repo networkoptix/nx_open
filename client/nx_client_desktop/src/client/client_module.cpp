@@ -82,7 +82,7 @@
 #include <utils/common/command_line_parser.h>
 
 #include <utils/media/voice_spectrum_analyzer.h>
-#include <utils/performance_test.h>
+#include <nx/client/desktop/utils/performance_test.h>
 #include <watchers/server_interface_watcher.h>
 #include <nx/client/core/watchers/known_server_connections.h>
 #include <nx/client/desktop/utils/applauncher_guard.h>
@@ -289,7 +289,11 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     const auto brand = startupParams.isDevMode() ? QString() : QnAppInfo::productNameShort();
     const auto customization = startupParams.isDevMode() ? QString() : QnAppInfo::customizationName();
 
-    m_staticCommon.reset(new QnStaticCommonModule(clientPeerType, brand, customization));
+    m_staticCommon.reset(new QnStaticCommonModule(
+        clientPeerType,
+        brand,
+        customization,
+        QLatin1String(ini().cloudHost)));
 
     m_clientCoreModule.reset(new QnClientCoreModule());
 
@@ -435,15 +439,8 @@ void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
         qnRuntime->setLightModeOverride(Qn::LightModeVideoWall);
     }
 
-    // TODO: #GDM fix it
     /* Here the value from LightModeOverride will be copied to LightMode */
-#if !defined(__arm__) && !defined(__aarch64__)
-    QnPerformanceTest::detectLightMode();
-#else
-    // TODO: On NVidia TX1 this call leads to segfault in next QGLWidget
-    //       constructor call. Need to find the way to work it around.
-#endif
-
+    PerformanceTest::detectLightMode();
 
 #ifdef Q_OS_MACX
     if (mac_isSandboxed())

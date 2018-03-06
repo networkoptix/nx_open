@@ -1,7 +1,7 @@
-#ifndef QN_CAMERA_ADVANCED_PARAM
-#define QN_CAMERA_ADVANCED_PARAM
+#pragma once
 
 #include <functional>
+
 #include <QtCore/QHash>
 
 #include <core/resource/resource_fwd.h>
@@ -10,11 +10,11 @@
 
 struct QnCameraAdvancedParamValue
 {
-	QString id;
-	QString value;
+    QString id;
+    QString value;
 
     QnCameraAdvancedParamValue() = default;
-	QnCameraAdvancedParamValue(const QString &id, const QString &value);
+    QnCameraAdvancedParamValue(const QString &id, const QString &value);
     QString toString() const;
 };
 #define QnCameraAdvancedParamValue_Fields (id)(value)
@@ -33,12 +33,6 @@ public:
     QnCameraAdvancedParamValueList difference(const QnCameraAdvancedParamValueMap &other) const;
 
     bool differsFrom(const QnCameraAdvancedParamValueMap &other) const;
-};
-
-struct QnCameraAdvancedParamQueryInfo
-{
-    QString group;
-    QString cmd;
 };
 
 struct QnCameraAdvancedParameterCondition
@@ -133,10 +127,10 @@ struct QnCameraAdvancedParameter
     void setRange(int min, int max);
     void setRange(double min, double max);
 
-	static QString dataTypeToString(DataType value);
-	static DataType stringToDataType(const QString &value);
+    static QString dataTypeToString(DataType value);
+    static DataType stringToDataType(const QString &value);
 
-	static bool dataTypeHasValue(DataType value);
+    static bool dataTypeHasValue(DataType value);
 };
 
 QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParameter::DataType, (lexical))
@@ -214,10 +208,8 @@ struct QnCameraAdvancedParams
     (QnCameraAdvancedParameterOverload)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-	QnCameraAdvancedParameterTypes,
-	(json)(metatype)
-	)
+    QnCameraAdvancedParameterTypes,
+    (json)(metatype)
+)
 
 Q_DECLARE_METATYPE(QnCameraAdvancedParamValueList)
-
-#endif //QN_CAMERA_ADVANCED_PARAM

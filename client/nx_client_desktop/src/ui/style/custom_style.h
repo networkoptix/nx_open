@@ -13,6 +13,8 @@ void setWarningStyle(QWidget* widget, qreal disabledOpacity = 1.0);
 void setWarningStyle(QPalette* palette, qreal disabledOpacity = 1.0);
 QString setWarningStyleHtml(const QString& source);
 
+void resetStyle(QWidget* widget);
+
 void resetButtonStyle(QAbstractButton* button);
 void setAccentStyle(QAbstractButton* button);
 void setWarningButtonStyle(QAbstractButton* button);

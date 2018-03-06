@@ -9,11 +9,8 @@ SSH_PORT_OFFSET=2220
 
 class VagrantVMConfigFactory(object):
 
-    def __init__(self, customization_company_name):
-        self._customization_company_name = customization_company_name
-
-    def __call__(self, name=None, must_be_recreated=False):
-        return VagrantVMConfig(name, must_be_recreated)
+    def __call__(self, name=None):
+        return VagrantVMConfig(name)
 
 
 class VagrantVMConfig(object):
@@ -27,12 +24,11 @@ class VagrantVMConfig(object):
             vm_port_base=d['vm_port_base'],
             )
 
-    def __init__(self, name, must_be_recreated=False, idx=None, vm_name_prefix=None, vm_port_base=None):
+    def __init__(self, name, idx=None, vm_name_prefix=None, vm_port_base=None):
         self.name = name
         self.idx = idx
         self.vm_name_prefix = vm_name_prefix
         self.vm_port_base = vm_port_base
-        self.must_be_recreated = must_be_recreated  # this test requires fresh VM
         self.is_allocated = False
 
     def __str__(self):
@@ -59,12 +55,7 @@ class VagrantVMConfig(object):
 
     @property
     def vagrant_name(self):
-        assert self.idx is not None  # must be assigned for vagrant_name
-        if self.name:
-            suffix = '-%s' % self.name
-        else:
-            suffix = ''
-        return 'vm-%d%s' % (self.idx, suffix)
+        return 'vm-%d' % self.idx
 
     @property
     def virtualbox_name(self):

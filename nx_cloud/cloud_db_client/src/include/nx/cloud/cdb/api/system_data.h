@@ -4,6 +4,7 @@
 #include <chrono>
 #include <string>
 #include <vector>
+#include <map>
 
 #include <boost/optional.hpp>
 
@@ -215,6 +216,28 @@ enum class SystemHealth
     online
 };
 
+enum class MergeRole
+{
+    none,
+    /** System is the resulting system. */
+    master,
+    /** System is consumed in the process of the merge. */
+    slave,
+};
+
+class SystemMergeInfo
+{
+public:
+    MergeRole role = MergeRole::none;
+    std::chrono::system_clock::time_point startTime;
+    std::string anotherSystemId;
+};
+
+enum class SystemCapabilityFlag
+{
+    cloudMerge,
+};
+
 class SystemDataEx:
     public SystemData
 {
@@ -234,6 +257,8 @@ public:
      * @note Fact of login is reported by SystemManager::recordUserSessionStart()
      */
     std::chrono::system_clock::time_point lastLoginTime;
+    boost::optional<SystemMergeInfo> mergeInfo;
+    std::vector<SystemCapabilityFlag> capabilities;
 
     SystemDataEx():
         accessRole(SystemAccessRole::none),
@@ -262,7 +287,7 @@ class SystemHealthHistoryItem
 public:
     std::chrono::system_clock::time_point timestamp;
     SystemHealth state;
-    
+
     SystemHealthHistoryItem():
         state(SystemHealth::offline)
     {
