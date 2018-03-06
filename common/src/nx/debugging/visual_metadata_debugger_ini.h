@@ -14,6 +14,8 @@ struct VisualMetadataDebuggerIni : public nx::kit::IniConfig
     }
 
     NX_INI_FLAG(0, enableOutput, "Enable debug output.");
+
+    // Manager pool debugger settings
     NX_INI_FLAG(
         0,
         enableManagerPoolDebuggerInstance,
@@ -24,6 +26,17 @@ struct VisualMetadataDebuggerIni : public nx::kit::IniConfig
         managerPoolDebugOutputDirectory,
         "Directory for manager pool visual debugger instance ouput.");
 
+    NX_INI_INT(
+        100,
+        managerPoolDebuggerFrameCacheSize,
+        "Frame cache size of manager pool visual metadata debugger.");
+
+    NX_INI_INT(
+        100,
+        managerPoolDebuggerMetadataCacheSize,
+        "Metadata cache size of manager pool visual metadata debugger.");
+
+    // Archive stream reader debugger settings
     NX_INI_FLAG(
         0,
         enableArchiveStreamReaderDebuggerInstance,
@@ -34,6 +47,17 @@ struct VisualMetadataDebuggerIni : public nx::kit::IniConfig
         archiveStreamReaderDebugOutputDirectory,
         "Directory for archive stream reader visual debugger instance ouput.");
 
+    NX_INI_INT(
+        100,
+        managerPoolDebuggerFrameCacheSize,
+        "Frame cache size of archive stream reader visual metadata debugger.");
+
+    NX_INI_INT(
+        100,
+        managerPoolDebuggerMetadataCacheSize,
+        "Metadata cache size of archive stream reader visual metadata debugger.");
+
+    // Live connection debugger settings.
     NX_INI_FLAG(
         0,
         enableLiveConnectionDebuggerInstance,
@@ -41,8 +65,18 @@ struct VisualMetadataDebuggerIni : public nx::kit::IniConfig
 
     NX_INI_STRING(
         "",
-        managerPoolDebugOutputDirectory,
+        liveConnectionDebugOutputDirectory,
         "Directory for server side live coonnection visual debugger instance ouput.");
+
+    NX_INI_INT(
+        100,
+        liveConnectionDebuggerFrameCacheSize,
+        "Frame cache size of live connection visual metadata debugger.");
+
+    NX_INI_INT(
+        100,
+        liveConnectionDebuggerMetadataCacheSize,
+        "Metadata cache size of live connection visual metadata debugger.");
 };
 
 inline VisualMetadataDebuggerIni& visualDebuggerIni()
