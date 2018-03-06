@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('cms', '0013_emoji_datarecords'),
+        ('cms', 'emoji_datarecords'),
     ]
 
     operations = [
