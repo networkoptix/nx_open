@@ -3,6 +3,7 @@
 #include <memory>
 
 #include <QtCore/QSize>
+#include <QtCore/QMap>
 
 #include "abstract_resource_allocator.h"
 

@@ -63,7 +63,7 @@ void AddressResolver::resolveAsync(
     {
         return handler(
             SystemError::noError,
-            std::deque<AddressEntry>({{ AddressEntry(AddressType::direct, hostName) }}));
+            std::deque<AddressEntry>({ AddressEntry(AddressType::direct, hostName) }));
     }
 
     if (SocketGlobals::ini().isHostDisabled(hostName))
