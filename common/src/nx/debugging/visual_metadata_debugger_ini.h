@@ -49,12 +49,12 @@ struct VisualMetadataDebuggerIni : public nx::kit::IniConfig
 
     NX_INI_INT(
         100,
-        managerPoolDebuggerFrameCacheSize,
+        archiveStreamReaderDebuggerFrameCacheSize,
         "Frame cache size of archive stream reader visual metadata debugger.");
 
     NX_INI_INT(
         100,
-        managerPoolDebuggerMetadataCacheSize,
+        archiveStreamReaderDebuggerMetadataCacheSize,
         "Metadata cache size of archive stream reader visual metadata debugger.");
 
     // Live connection debugger settings.

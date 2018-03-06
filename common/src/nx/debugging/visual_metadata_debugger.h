@@ -5,11 +5,9 @@
 
 #include <QtGui/QImage>
 
-#include <nx/utils/thread/long_runnable.h>
-#include <nx/streaming/video_data_packet.h>
+#include <nx/debugging/abstract_visual_metadata_debugger.h>
 
-#include <utils/media/frame_info.h>
-#include <analytics/common/object_detection_metadata.h>
+#include <nx/utils/thread/long_runnable.h>
 #include <decoders/video/ffmpeg_video_decoder.h>
 
 namespace nx {
@@ -18,9 +16,10 @@ namespace debugging {
 using FrameTimestamp = int64_t;
 using MetadataTimestamp = int64_t;
 
-class VisualMetadataDebugger: public QnLongRunnable
+class VisualMetadataDebugger:
+    public AbstractVisualMetadataDebugger,
+    public QnLongRunnable
 {
-    Q_OBJECT;
 
 public:
     VisualMetadataDebugger(
@@ -29,18 +28,19 @@ public:
         int maxMetadataCacheSize);
 
 public:
-    void push(const QnCompressedVideoDataPtr& video);
-    void push(const nx::common::metadata::DetectionMetadataPacketPtr& detectionMetadata);
-    void push(const CLVideoDecoderOutputPtr& frame);
-    void push(const QnCompressedMetadataPtr& metadata);
+    virtual void push(const QnConstCompressedVideoDataPtr& video) override;
+    virtual void push(
+        const nx::common::metadata::DetectionMetadataPacketPtr& detectionMetadata) override;
+    virtual void push(const CLConstVideoDecoderOutputPtr& frame) override;
+    virtual void push(const QnConstCompressedMetadataPtr& metadata) override;
 
 protected:
     virtual void run() override;
 
 private:
-    CLVideoDecoderOutputPtr decode(const QnCompressedVideoDataPtr& video);
+    CLVideoDecoderOutputPtr decode(const QnConstCompressedVideoDataPtr& video);
 
-    void addFrameToCache(const CLVideoDecoderOutputPtr& frame);
+    void addFrameToCache(const CLConstVideoDecoderOutputPtr& frame);
     void addMetadataToCache(const nx::common::metadata::DetectionMetadataPacketPtr& metadata);
     std::pair<FrameTimestamp, MetadataTimestamp> makeOverlayedImages();
     void updateCache(
@@ -55,10 +55,10 @@ private:
 
 private:
     mutable QnMutex m_mutex;
-    std::queue<CLVideoDecoderOutputPtr> m_frameQueue;
+    std::queue<CLConstVideoDecoderOutputPtr> m_frameQueue;
     std::queue<nx::common::metadata::DetectionMetadataPacketPtr> m_metadataQueue;
 
-    std::map<FrameTimestamp, CLVideoDecoderOutputPtr> m_frameCache;
+    std::map<FrameTimestamp, CLConstVideoDecoderOutputPtr> m_frameCache;
     std::map<MetadataTimestamp, nx::common::metadata::DetectionMetadataPacketPtr> m_metadataCache;
 
     const int m_maxFrameCacheSize;

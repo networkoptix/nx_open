@@ -33,15 +33,16 @@ VisualMetadataDebugger::VisualMetadataDebugger(
     m_metadataDumpFileName(QDir(m_debuggerRootDir).filePath(kMetadataDumpFile)),
     m_errorFileName(QDir(m_debuggerRootDir).filePath(kErrorFile))
 {
+    start();
 }
 
-void VisualMetadataDebugger::push(const CLVideoDecoderOutputPtr& frame)
+void VisualMetadataDebugger::push(const CLConstVideoDecoderOutputPtr& frame)
 {
     QnMutexLocker lock(&m_mutex);
     m_frameQueue.push(frame);
 }
 
-void VisualMetadataDebugger::push(const QnCompressedMetadataPtr& metadata)
+void VisualMetadataDebugger::push(const QnConstCompressedMetadataPtr& metadata)
 {
     if (metadata->metadataType != MetadataType::ObjectDetection)
         return;
@@ -52,7 +53,7 @@ void VisualMetadataDebugger::push(const QnCompressedMetadataPtr& metadata)
         m_metadataQueue.push(detectionMetadata);
 }
 
-void VisualMetadataDebugger::push(const QnCompressedVideoDataPtr& video)
+void VisualMetadataDebugger::push(const QnConstCompressedVideoDataPtr& video)
 {
     auto decoded = decode(video);
     if (decoded)
@@ -73,7 +74,7 @@ void VisualMetadataDebugger::run()
 {
     while (!needToStop())
     {
-        CLVideoDecoderOutputPtr frame;
+        CLConstVideoDecoderOutputPtr frame;
         nx::common::metadata::DetectionMetadataPacketPtr detectionMetadata;
 
         {
@@ -99,8 +100,9 @@ void VisualMetadataDebugger::run()
 
         if (frame)
         {
+            qDebug() << "=======> Frame: " << frame->pkt_dts << frame->pkt_pts << frame->pts;
             auto image = frame->toImage();
-            image.save(QDir(m_rawImagesDir).filePath(QString::number(frame->pkt_pts) + lit(".jpg")));
+            image.save(QDir(m_rawImagesDir).filePath(QString::number(frame->pkt_dts) + lit(".jpg")));
             addFrameToCache(frame);
         }
 
@@ -122,7 +124,7 @@ void VisualMetadataDebugger::run()
     }
 }
 
-CLVideoDecoderOutputPtr VisualMetadataDebugger::decode(const QnCompressedVideoDataPtr& video)
+CLVideoDecoderOutputPtr VisualMetadataDebugger::decode(const QnConstCompressedVideoDataPtr& video)
 {
     if (!m_decoder && !(video->flags & AV_PKT_FLAG_KEY))
         return CLVideoDecoderOutputPtr{nullptr};
@@ -144,12 +146,12 @@ CLVideoDecoderOutputPtr VisualMetadataDebugger::decode(const QnCompressedVideoDa
     return decoded;
 }
 
-void VisualMetadataDebugger::addFrameToCache(const CLVideoDecoderOutputPtr& frame)
+void VisualMetadataDebugger::addFrameToCache(const CLConstVideoDecoderOutputPtr& frame)
 {
     while (m_frameCache.size() > m_maxFrameCacheSize)
         m_frameCache.erase(m_frameCache.begin());
 
-    m_frameCache[frame->pkt_pts] = frame;
+    m_frameCache[frame->pkt_dts] = frame;
 }
 
 void VisualMetadataDebugger::addMetadataToCache(
@@ -174,7 +176,7 @@ std::pair<FrameTimestamp, MetadataTimestamp> VisualMetadataDebugger::makeOverlay
         if (frameAfterMetadata == m_frameCache.cend())
             break; //< There are no frames that arrived after metadata.
 
-        CLVideoDecoderOutputPtr bestFrame = frameAfterMetadata->second;
+        CLConstVideoDecoderOutputPtr bestFrame = frameAfterMetadata->second;
         auto bestFrameTimestamp = frameAfterMetadata->first;
 
         if (frameAfterMetadata != m_frameCache.cbegin())
@@ -214,17 +216,23 @@ std::pair<FrameTimestamp, MetadataTimestamp> VisualMetadataDebugger::makeOverlay
 void VisualMetadataDebugger::updateCache(
     const std::pair<FrameTimestamp, MetadataTimestamp>& lastProcessedTimestamps)
 {
-    const auto lastFrameItr = m_frameCache.lower_bound(
-        lastProcessedTimestamps.first);
+    if (lastProcessedTimestamps.first != AV_NOPTS_VALUE)
+    {
+        const auto lastFrameItr = m_frameCache.lower_bound(
+            lastProcessedTimestamps.first);
 
-    NX_ASSERT(lastProcessedTimestamps.first == lastFrameItr->first);
-    m_frameCache.erase(m_frameCache.cbegin(), lastFrameItr);
+        NX_ASSERT(lastProcessedTimestamps.first == lastFrameItr->first);
+        m_frameCache.erase(m_frameCache.cbegin(), lastFrameItr);
+    }
 
-    const auto lastMetadataItr = m_metadataCache.lower_bound(
-        lastProcessedTimestamps.second);
+    if (lastProcessedTimestamps.second != AV_NOPTS_VALUE)
+    {
+        const auto lastMetadataItr = m_metadataCache.lower_bound(
+            lastProcessedTimestamps.second);
 
-    NX_ASSERT(lastProcessedTimestamps.second == lastMetadataItr->first);
-    m_metadataCache.erase(m_metadataCache.cbegin(), lastMetadataItr);
+        NX_ASSERT(lastProcessedTimestamps.second == lastMetadataItr->first);
+        m_metadataCache.erase(m_metadataCache.cbegin(), lastMetadataItr);
+    }
 }
 
 QByteArray VisualMetadataDebugger::makeMetadataString(
@@ -264,7 +272,9 @@ void VisualMetadataDebugger::drawMetadata(
 
     QPainter painter(inOutImage);
     painter.setBrush(Qt::NoBrush);
-    painter.setPen(Qt::red);
+    QPen pen(Qt::red);
+    pen.setWidth(7);
+    painter.setPen(pen);
 
     for (const auto& obj : detectionMetadata->objects)
     {
