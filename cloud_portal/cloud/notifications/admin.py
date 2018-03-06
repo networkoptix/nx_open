@@ -44,6 +44,7 @@ class CloudNotificationAdmin(admin.ModelAdmin):
         ("When and who sent the notification", {'fields': (('sent_by', 'convert_date'))})
     ]
 
+
     def add_view(self, request, form_url='', extra_context=None):
         extra_context = extra_context or {}
         extra_context['BROADCAST_NOTIFICATIONS_SUPERUSERS_ONLY'] = settings.BROADCAST_NOTIFICATIONS_SUPERUSERS_ONLY
@@ -51,12 +52,14 @@ class CloudNotificationAdmin(admin.ModelAdmin):
             request, form_url, extra_context=extra_context,
         )
 
+
     def change_view(self, request, object_id, form_url='', extra_context=None):
         extra_context = extra_context or {}
         extra_context['BROADCAST_NOTIFICATIONS_SUPERUSERS_ONLY'] = settings.BROADCAST_NOTIFICATIONS_SUPERUSERS_ONLY
         return super(CloudNotificationAdmin, self).change_view(
             request, object_id, form_url, extra_context=extra_context,
         )
+
 
     def convert_date(self, obj):
         session = self.request.session
@@ -91,7 +94,7 @@ class TaskResultAdmin(admin.ModelAdmin):
     readonly_fields = ('date_done', 'result', 'hidden', 'meta')
     list_filter = ('date_done', 'status')
     search_fields = ('date_done', 'meta', 'result', 'task_id')
-
+    actions = ['clean_old_tasks']
     fieldsets = (
         (None, {
             'fields': (
@@ -114,7 +117,16 @@ class TaskResultAdmin(admin.ModelAdmin):
         }),
     )
 
+
     class Meta:
         proxy = True
+
+
+    def clean_old_tasks(self, request, queryset):
+        from datetime import datetime, timedelta
+        cutoff_date = datetime.now() - timedelta(days=7)
+        TaskResult.objects.filter(date_done__lt=cutoff_date)
+
+    clean_old_tasks.short_description = "Remove tasks older than a week"
 
 admin.site.register(TaskResult, TaskResultAdmin)
