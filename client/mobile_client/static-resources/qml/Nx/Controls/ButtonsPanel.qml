@@ -1,79 +1,124 @@
 import QtQuick 2.6
 
-Item
+ListView
 {
     id: control
 
-    property alias model: buttonRepeater.model
-    property int pressedStateFilterMs: 200
+    property int pressedStateFilterMs: 500
 
     signal buttonClicked(int index)
     signal pressedChanged(int index, bool pressed)
 
-    width: rowItem.width
-    height: rowItem.height
+    clip: true
+    layoutDirection: Qt.RightToLeft
+    orientation: Qt.Horizontal
+    implicitHeight: 48
 
-    Row
+    interactive: contentWidth > width
+
+    onVisibleChanged:
     {
-        id: rowItem
-
-        anchors.right: parent.right
-        anchors.verticalCenter: parent.verticalCenter
-
-        layoutDirection: Qt.RightToLeft
-        Repeater
-        {
-            id: buttonRepeater
-
-            delegate:
-                IconButton
-                {
-                    id: button
-
-                    icon: lp(model.iconPath)
-
-                    anchors.verticalCenter: parent.verticalCenter
-
-                    property bool filteringPressing: false
-
-                    onClicked:
-                    {
-                        if (!filteringPressing)
-                        {
-                            pressedStateFilterTimer.stop()
-                            releasedStateFilterTimer.stop()
-                            control.buttonClicked(index)
-                        }
-                    }
-
-                    onPressedChanged:
-                    {
-                        if (pressed)
-                            pressedStateFilterTimer.restart()
-                        else
-                            releasedStateFilterTimer.restart();
-                    }
-
-                    Timer
-                    {
-                        id: pressedStateFilterTimer
-                        interval: control.pressedStateFilterMs
-                        onTriggered: finishStateProcessing(true)
-                    }
-
-                    Timer
-                    {
-                        id: releasedStateFilterTimer
-                        interval: control.pressedStateFilterMs
-                        onTriggered: finishStateProcessing(false)
-                    }
-
-                    function finishStateProcessing(value)
-                    {
-                        button.filteringPressing = value
-                        control.pressedChanged(index, value)
-                    }
-                }
-        }
+        if (visible && interactive)
+            showAnimation.start()
     }
+
+    PropertyAnimation
+    {
+        id: showAnimation
+
+        duration: 300
+        easing.type: Easing.OutQuad
+        target: control
+        properties: "contentX"
+        from: -width - height
+        to: -width
+    }
+
+    Image
+    {
+        source: lp("/images/bottom_panel_shadow_left.png")
+        anchors.left: parent.left
+        visible: interactive && visibleArea.xPosition > 0
+    }
+
+    Image
+    {
+        source: lp("/images/bottom_panel_shadow_right.png")
+        anchors.right: parent.right
+        visible: interactive && (visibleArea.widthRatio + visibleArea.xPosition < 1)
+    }
+
+    delegate:
+        IconButton
+        {
+            id: button
+
+            icon: lp(model.iconPath)
+
+            anchors.verticalCenter: parent.verticalCenter
+
+            Connections
+            {
+                target: control
+                onFlickingChanged:
+                {
+                    pressedStateFilterTimer.stop();
+                    releasedStateFilterTimer.stop()
+                }
+                onDraggingChanged:
+                {
+                    pressedStateFilterTimer.stop();
+                    releasedStateFilterTimer.stop()
+                }
+            }
+
+            property bool filteringPressing: false
+
+            onClicked:
+            {
+                if (!filteringPressing)
+                {
+                    pressedStateFilterTimer.stop()
+                    releasedStateFilterTimer.stop()
+                    control.buttonClicked(index)
+                }
+            }
+
+            onPressedChanged:
+            {
+                if (pressed)
+                {
+                    releasedStateFilterTimer.stop()
+                    pressedStateFilterTimer.restart()
+                }
+                else
+                {
+                    if (pressedStateFilterTimer.running)
+                        pressedStateFilterTimer.stop()
+                    else
+                        releasedStateFilterTimer.restart();
+                }
+            }
+
+            Timer
+            {
+                id: pressedStateFilterTimer
+                interval: control.pressedStateFilterMs
+                onTriggered: finishStateProcessing(true)
+            }
+
+            Timer
+            {
+                id: releasedStateFilterTimer
+                interval: control.pressedStateFilterMs
+                onTriggered: finishStateProcessing(false)
+            }
+
+            function finishStateProcessing(value)
+            {
+                button.filteringPressing = value
+                control.pressedChanged(index, value)
+            }
+        }
+
 }

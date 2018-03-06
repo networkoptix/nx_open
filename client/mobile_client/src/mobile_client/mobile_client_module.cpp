@@ -42,6 +42,7 @@
 #include <nx/network/socket_global.h>
 #include <nx/mobile_client/settings/migration_helper.h>
 #include <nx/mobile_client/settings/settings_migration.h>
+#include <nx/client/mobile/software_trigger/event_rules_watcher.h>
 #include <nx/client/core/watchers/known_server_connections.h>
 #include <nx/client/mobile/two_way_audio/server_audio_connection_watcher.h>
 #include <client_core/client_core_settings.h>
@@ -97,6 +98,7 @@ QnMobileClientModule::QnMobileClientModule(
     // TODO: #mshevchenko Remove when client_core_module is created.
     commonModule->store(translationManager);
 
+    commonModule->store(new nx::client::mobile::EventRulesWatcher());
     commonModule->store(new QnMobileClientSettings);
     settings::migrateSettings();
 

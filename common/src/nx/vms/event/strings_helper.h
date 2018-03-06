@@ -93,7 +93,7 @@ public:
     static QString needToSelectUserText();
 
     static QString defaultSoftwareTriggerName();
-    static QString getSoftwareTriggerName(const QString& id);
+    static QString getSoftwareTriggerName(const QString& name);
     static QString getSoftwareTriggerName(const EventParameters& params);
 
     QString getAnalyticsSdkEventName(const EventParameters& params,

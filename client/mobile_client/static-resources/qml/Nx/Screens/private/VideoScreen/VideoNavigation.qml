@@ -346,6 +346,9 @@ Item
         {
             id: navigationPanel
 
+            readonly property real minimalWidth: width - (zoomButtonsRow.x + zoomButtonsRow.width)
+            readonly property bool showZoomControls: actionButtonsPanel.contentWidth < minimalWidth
+
             width: parent.width
             height: 56
             anchors.top: timeline.bottom
@@ -370,7 +373,10 @@ Item
 
             Row
             {
+                id: zoomButtonsRow
+
                 anchors.centerIn: parent
+                visible: navigationPanel.showZoomControls
 
                 IconButton
                 {
@@ -411,10 +417,16 @@ Item
 
             ActionButtonsPanel
             {
+                id: actionButtonsPanel
+
                 resourceId: videoScreenController.resourceId
 
-                x: calendarButton.x + calendarButton.width + 4
-                width: parent.width - x - 4
+                anchors.left: navigationPanel.showZoomControls
+                    ? zoomButtonsRow.right
+                    : calendarButton.right
+                anchors.right: parent.right
+
+                width: parent.width - x
 
                 anchors.verticalCenter: parent.verticalCenter
                 visible: d.liveMode
