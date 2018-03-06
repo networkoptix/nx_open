@@ -1,6 +1,7 @@
 {
     "YOU HAVE NO SYSTEMS TEXT"             :    "You have no Systems connected to {{PRODUCT_NAME}}",
     "LOG OUT BUTTON TEXT"                  :    "Log Out",
+    "ACCOUNT SETTINGS BUTTON TEXT"         :    "Account Settings",
     "RESET EMAIL SENT MESAGE TEXT"         :    "Password reset instructions are sent to Email",
     "CREATE ACCOUNT BUTTON TEXT"           :    "Create Account",
     "TERMS AND CONDITIONS LINK TEXT"       :    "Terms and Conditions",
@@ -25,7 +26,6 @@
     "WRONG PASSWORD"                       :    "Wrong password",
     "ACCOUNT DOES NOT EXIST"               :    "Account does not exist",
     "CANNOT SEND CONFIRMATION EMAIL"       :    "Cannot send confirmation Email:",
-    "CANNOT SAVE PASSWORD"                 :    "Cannot save password:",
     "CODE USED/INCORRECT"                  :    "Confirmation code is already used or incorrect",
 
     "SHARE PERMISSIONS HINT ADMIN"         :    "Unrestricted access including the ability to share",
@@ -34,6 +34,9 @@
     "SHARE PERMISSIONS HINT LIVE VIEWER"   :    "Can only view live video",
     "SHARE PERMISSIONS HINT CUSTOM"        :    "Use the {{PRODUCT_NAME}} Client application to set up custom permissions",
 
+    "ACCOUNT TEXT"                         :    "Account",
+
+    "EDIT USER BUTTON TEXT"                :    "Edit",
     "DELETE USER BUTTON TEXT"              :    "Delete",
     "DELETE USER CANCEL BUTTON TEXT"       :    "Cancel",
 
@@ -49,13 +52,13 @@
 
     "DISCONNECT FORM HEADER TEXT"          :    "Disconnect System from {{PRODUCT_NAME}}?",
 
-    "FIRST NAME IS REQUIRED TEXT"          :    "First name is required",
-    "LAST NAME IS REQUIRED TEXT"           :    "Last name is required",
-    "EMAIL IS REQUIRED TEXT"               :    "Email is required",
-    "EMAIL ALREADY REGISTERED TEXT"        :    "This Email has been already registered in {{PRODUCT_NAME}}",
-    "EMAIL INVALID TEXT"                   :    "Please, enter a valid Email",
-    "PASSWORD IS REQUIRED TEXT"            :    "Password is required",
-    "PASSWORD SPECIAL CHARS TEXT"          :    "Use only latin letters, numbers and keyboard symbols, avoid leading and trailing spaces",
+    "FIRST NAME IS REQUIRED TEXT"          :    "First name is required.",
+    "LAST NAME IS REQUIRED TEXT"           :    "Last name is required.",
+    "EMAIL IS REQUIRED TEXT"               :    "Email is required.",
+    "EMAIL ALREADY REGISTERED TEXT"        :    "This Email has been already registered in {{PRODUCT_NAME}}.",
+    "EMAIL INVALID TEXT"                   :    "Please, enter a valid Email.",
+    "PASSWORD IS REQUIRED TEXT"            :    "Password is required.",
+    "PASSWORD SPECIAL CHARS TEXT"          :    "Use only latin letters, numbers and keyboard symbols, avoid leading and trailing spaces.",
     "PASSWORD TOO SHORT TEXT"              :    "Password must contain at least 8 characters",
     "PASSWORD TOO COMMON TEXT"             :    "This password is in top most popular passwords in the world"
 }

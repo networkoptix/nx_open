@@ -126,7 +126,8 @@ def cloud_notification_action(request):
         notification.sent_by = request.user
         notification.sent_date = timezone.now()
         notification.save()
-        send_to_all_users.delay(notification_id, message, force)
+        send_to_all_users.apply_async(args=[notification_id, message, force],
+                                      queue=settings.NOTIFICATIONS_CONFIG['cloud_notification']['queue'])
         messages.success(request._request, "Sending cloud notifications")
 
     else:
