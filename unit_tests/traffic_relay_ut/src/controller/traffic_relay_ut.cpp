@@ -220,7 +220,7 @@ protected:
             })->second;
         ASSERT_EQ(
             maxSessionCountPerServer,
-            (std::size_t)statistics.concurrentSessionToSameServerCountMaxPerHour);
+            statistics.concurrentSessionToSameServerCountMaxPerHour);
     }
 
 private:
