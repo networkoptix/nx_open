@@ -23,6 +23,7 @@ Item
     onResourceIdChanged:
     {
         hintControl.hide()
+        panel.forceAnimation()
     }
 
     ButtonsPanel

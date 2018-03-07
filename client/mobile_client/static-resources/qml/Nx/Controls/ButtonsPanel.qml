@@ -16,22 +16,30 @@ ListView
 
     interactive: d.allowInteractiveState && contentWidth > width
 
+    function forceAnimation() { showAnimation.restart() }
+
     onVisibleChanged:
     {
         if (visible && interactive)
-            showAnimation.start()
+            forceAnimation()
     }
 
-    PropertyAnimation
+    SequentialAnimation
     {
         id: showAnimation
 
-        duration: 300
-        easing.type: Easing.OutQuad
-        target: control
-        properties: "contentX"
-        from: -width - height
-        to: -width
+        ScriptAction { script: contentX = -width }
+
+        PropertyAnimation
+        {
+
+            duration: 300
+            easing.type: Easing.OutQuad
+            target: control
+            properties: "contentX"
+            from: -width - height
+            to: -width
+        }
     }
 
     Image
@@ -108,4 +116,5 @@ ListView
 
         property bool allowInteractiveState: true
     }
+
 }
