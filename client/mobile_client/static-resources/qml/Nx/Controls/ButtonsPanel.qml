@@ -14,7 +14,7 @@ ListView
     orientation: Qt.Horizontal
     implicitHeight: 48
 
-    interactive: contentWidth > width
+    interactive: d.allowInteractiveState && contentWidth > width
 
     onVisibleChanged:
     {
@@ -59,16 +59,9 @@ ListView
         Connections
         {
             target: control
-            onFlickingChanged:
-            {
-                pressedStateFilterTimer.stop();
-                releasedStateFilterTimer.stop()
-            }
-            onDraggingChanged:
-            {
-                pressedStateFilterTimer.stop();
-                releasedStateFilterTimer.stop()
-            }
+
+            onFlickingChanged: pressedStateFilterTimer.stop();
+            onDraggingChanged: pressedStateFilterTimer.stop();
         }
 
         property bool filteringPressing: false
@@ -78,26 +71,13 @@ ListView
             if (!filteringPressing)
             {
                 pressedStateFilterTimer.stop()
-                releasedStateFilterTimer.stop()
                 control.buttonClicked(index)
             }
         }
 
-        onPressedChanged:
-        {
-            if (pressed)
-            {
-                releasedStateFilterTimer.stop()
-                pressedStateFilterTimer.restart()
-            }
-            else
-            {
-                if (pressedStateFilterTimer.running)
-                    pressedStateFilterTimer.stop()
-                else
-                    releasedStateFilterTimer.restart();
-            }
-        }
+        onPressed: pressedStateFilterTimer.restart()
+        onReleased: handleButtonReleased()
+        onCanceled: handleButtonReleased()
 
         Timer
         {
@@ -106,17 +86,26 @@ ListView
             onTriggered: finishStateProcessing(true)
         }
 
-        Timer
+        function handleButtonReleased()
         {
-            id: releasedStateFilterTimer
-            interval: control.pressedStateFilterMs
-            onTriggered: finishStateProcessing(false)
+            if (pressedStateFilterTimer.running)
+                pressedStateFilterTimer.stop()
+            else
+                finishStateProcessing(false)
         }
 
         function finishStateProcessing(value)
         {
             button.filteringPressing = value
             control.pressedChanged(index, value)
+            d.allowInteractiveState = !value
         }
+    }
+
+    QtObject
+    {
+        id: d
+
+        property bool allowInteractiveState: true
     }
 }
