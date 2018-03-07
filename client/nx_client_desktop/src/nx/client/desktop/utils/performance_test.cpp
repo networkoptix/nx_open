@@ -71,7 +71,7 @@ void PerformanceTest::detectLightMode()
                 .arg(QnClientAppInfo::applicationDisplayName());
         extras += L'\n';
         extras += QCoreApplication::translate(
-            "QnPerformanceTest", "For full-featured mode, please use another computer");
+            "QnPerformanceTest", "For full-featured mode please use another computer");
 
         QnMessageBox::warning(nullptr, text, extras);
     }

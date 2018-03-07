@@ -2360,6 +2360,13 @@ to view more bookmarks</source>
         <source>Edge</source>
         <translation type="unfinished"></translation>
     </message>
+    <message numerus="yes">
+        <source>This ID already used on camera %1</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
 </context>
 <context>
     <name>QnCameraInputBusinessEventWidget</name>
@@ -2477,6 +2484,10 @@ to view more bookmarks</source>
     <message>
         <source>Server</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Logical ID</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4763,16 +4774,16 @@ to %1</source>
 <context>
     <name>QnPerformanceTest</name>
     <message>
-        <source>For full - featured mode, please use another computer</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>%1 can work in configuration mode only</source>
         <translation></translation>
     </message>
     <message>
         <source>Performance of this computer allows running %1 in configuration mode only.</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>For full-featured mode please use another computer</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
