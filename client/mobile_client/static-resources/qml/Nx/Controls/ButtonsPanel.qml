@@ -10,6 +10,7 @@ ListView
 
     signal buttonClicked(int index)
     signal pressedChanged(int index, bool pressed)
+    signal enabledChanged(int index, bool buttonEnabled)
 
     clip: true
     layoutDirection: Qt.RightToLeft
@@ -71,14 +72,16 @@ ListView
     {
         id: button
 
+        property bool buttonPressed: false
+
         icon: model.iconPath
+        enabled: model.enabled
         padding: 0
 
         anchors.verticalCenter: parent.verticalCenter
 
-        property bool buttonPressed: false
-
         onButtonPressedChanged: control.pressedChanged(index, buttonPressed)
+        onEnabledChanged: control.enabledChanged(index, enabled)
 
         Connections
         {

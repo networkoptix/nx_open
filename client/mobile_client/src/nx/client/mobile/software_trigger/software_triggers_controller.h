@@ -44,6 +44,7 @@ public:
     Q_INVOKABLE bool activateTrigger(const QnUuid& id);
     Q_INVOKABLE bool deactivateTrigger();
     Q_INVOKABLE void cancelTriggerAction();
+    Q_INVOKABLE QnUuid activeTriggerId() const;
 
 signals:
     void resourceIdChanged();

@@ -61,6 +61,11 @@ void SoftwareTriggersController::setResourceId(const QString& id)
     emit resourceIdChanged();
 }
 
+QnUuid SoftwareTriggersController::activeTriggerId() const
+{
+    return m_activeTriggerId;
+}
+
 bool SoftwareTriggersController::activateTrigger(const QnUuid& id)
 {
     if (!m_activeTriggerId.isNull())

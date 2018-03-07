@@ -68,6 +68,16 @@ Item
             }
         }
 
+        onEnabledChanged:
+        {
+            if (buttonEnabled)
+                return
+
+            var id = d.modelDataAccessor.getData(index, "id")
+            if (d.triggersController.activeTriggerId() == id)
+                d.triggersController.deactivateTrigger()
+        }
+
         model: ActionButtonsModel { id: buttonModel }
     }
 
