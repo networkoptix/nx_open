@@ -61,95 +61,96 @@ Item
         model: ActionButtonsModel { id: buttonModel }
     }
 
-    readonly property QtObject d:
-        QtObject
-        {
-            property variant modelDataAccessor: ModelDataAccessor { model: buttonModel }
+    QtObject
+    {
+        id: d
 
-            property SoftwareTriggersController triggersController:
-                SoftwareTriggersController
-                {
-                    resourceId: control.resourceId
+        property variant modelDataAccessor: ModelDataAccessor { model: buttonModel }
 
-                    onTriggerActivated:
-                    {
-                        var index = buttonModel.rowById(id)
-                        var text = d.modelDataAccessor.getData(index, "hint")
-                        var prolonged = d.modelDataAccessor.getData(index, "prolongedTrigger")
-
-                        if (!success)
-                            hintControl.showFailure(text, prolonged)
-                        else if (!prolonged)
-                            hintControl.showSuccess(text, false)
-                    }
-
-                    onTriggerDeactivated:
-                    {
-                        var index = buttonModel.rowById(id)
-                        var text = d.modelDataAccessor.getData(index, "hint")
-                        if (d.modelDataAccessor.getData(index, "prolongedTrigger"))
-                            hintControl.showSuccess(text, true)
-                    }
-
-                    onTriggerCancelled:
-                    {
-                        hintControl.hide()
-                    }
-                }
-
-            function handleTwoWayAudioPressed(index, pressed)
+        property SoftwareTriggersController triggersController:
+            SoftwareTriggersController
             {
-                if (pressed)
+                resourceId: control.resourceId
+
+                onTriggerActivated:
                 {
-                    control.twoWayAudioButtonPressed()
-                    hintControl.showCustomProcess(voiceVisualizerComponent,
-                        d.modelDataAccessor.getData(index, "iconPath"))
+                    var index = buttonModel.rowById(id)
+                    var text = d.modelDataAccessor.getData(index, "hint")
+                    var prolonged = d.modelDataAccessor.getData(index, "prolongedTrigger")
+
+                    if (!success)
+                        hintControl.showFailure(text, prolonged)
+                    else if (!prolonged)
+                        hintControl.showSuccess(text, false)
                 }
-                else
+
+                onTriggerDeactivated:
                 {
-                    control.twoWayAudioButtonReleased()
+                    var index = buttonModel.rowById(id)
+                    var text = d.modelDataAccessor.getData(index, "hint")
+                    if (d.modelDataAccessor.getData(index, "prolongedTrigger"))
+                        hintControl.showSuccess(text, true)
+                }
+
+                onTriggerCancelled:
+                {
                     hintControl.hide()
                 }
             }
 
-            function handleSoftwareTriggerClicked(index)
+        function handleTwoWayAudioPressed(index, pressed)
+        {
+            if (pressed)
+            {
+                control.twoWayAudioButtonPressed()
+                hintControl.showCustomProcess(voiceVisualizerComponent,
+                    d.modelDataAccessor.getData(index, "iconPath"))
+            }
+            else
+            {
+                control.twoWayAudioButtonReleased()
+                hintControl.hide()
+            }
+        }
+
+        function handleSoftwareTriggerClicked(index)
+        {
+            var text = d.modelDataAccessor.getData(index, "hint")
+            if (modelDataAccessor.getData(index, "prolongedTrigger"))
+            {
+                var hintText = qsTr("Press and hold to %1").arg(text)
+                hintControl.showHint(hintText, d.modelDataAccessor.getData(index, "iconPath"))
+                return
+            }
+
+            var id = d.modelDataAccessor.getData(index, "id")
+            if (triggersController.activateTrigger(id))
+                hintControl.showPreloader(text)
+            else
+                hintControl.showFailure(text, false)
+        }
+
+        function handleSoftwareTriggerPressed(index, pressed)
+        {
+            if (!modelDataAccessor.getData(index, "prolongedTrigger"))
+                return
+
+            var id = d.modelDataAccessor.getData(index, "id")
+            if (pressed)
             {
                 var text = d.modelDataAccessor.getData(index, "hint")
-                if (modelDataAccessor.getData(index, "prolongedTrigger"))
-                {
-                    var hintText = qsTr("Press and hold to %1").arg(text)
-                    hintControl.showHint(hintText, d.modelDataAccessor.getData(index, "iconPath"))
-                    return
-                }
-
-                var id = d.modelDataAccessor.getData(index, "id")
                 if (triggersController.activateTrigger(id))
                     hintControl.showPreloader(text)
                 else
-                    hintControl.showFailure(text, false)
+                    hintControl.showFailure(text, true)
             }
-
-            function handleSoftwareTriggerPressed(index, pressed)
+            else
             {
-                if (!modelDataAccessor.getData(index, "prolongedTrigger"))
-                    return
-
-                var id = d.modelDataAccessor.getData(index, "id")
-                if (pressed)
-                {
-                    var text = d.modelDataAccessor.getData(index, "hint")
-                    if (triggersController.activateTrigger(id))
-                        hintControl.showPreloader(text)
-                    else
-                        hintControl.showFailure(text, true)
-                }
-                else
-                {
-                    triggersController.deactivateTrigger(id)
-                    hintControl.hide()
-                }
+                triggersController.deactivateTrigger(id)
+                hintControl.hide()
             }
         }
+    }
 
     ActionButtonsHint
     {

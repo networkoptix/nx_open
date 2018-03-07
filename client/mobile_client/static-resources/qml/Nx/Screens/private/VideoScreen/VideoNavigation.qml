@@ -424,8 +424,6 @@ Item
                     : calendarButton.right
                 anchors.right: parent.right
 
-                width: parent.width - x
-
                 anchors.verticalCenter: parent.verticalCenter
                 visible: d.liveMode
 

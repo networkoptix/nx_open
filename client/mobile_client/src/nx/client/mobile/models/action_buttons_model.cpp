@@ -29,7 +29,6 @@ const QHash<int, QByteArray> kRoleNames = {
     {hintRoleId, "hint"},
 
     {prolongedTriggerRoleId, "prolongedTrigger"}};
-
 } // namespace
 
 namespace nx {

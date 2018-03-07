@@ -176,8 +176,9 @@ bool VoiceSpectrumItem::VisualizerDataGenerator::setHeight(int value)
 
 int VoiceSpectrumItem::VisualizerDataGenerator::linesCount() const
 {
-    if (m_lineWidth + m_lineSpacing)
-        return m_width / (m_lineWidth + m_lineSpacing);
+    const int totalLineWidth = m_lineWidth + m_lineSpacing;
+    if (totalLineWidth > 0)
+        return m_width / totalLineWidth;
 
     NX_EXPECT(false, "Wrong line paramaters");
     return 0;
@@ -351,7 +352,7 @@ void VoiceSpectrumItem::updateNodeGeometry(QSGGeometryNode* node)
         [this, node]()
         {
             node->markDirty(QSGNode::DirtyGeometry);
-            update();
+            update(); // We expect infinite update cycle in this item.
         });
 
     m_generator->setHeight(height());
