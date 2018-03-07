@@ -1027,11 +1027,11 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>Matroska</source>
-      <translation type="unfinished">Matroska</translation>
+      <translation>Matroska</translation>
     </message>
     <message>
       <source>MPEG-4 Part 14</source>
-      <translation type="unfinished">MPEG-4 Part 14</translation>
+      <translation>MPEG-4 Part 14</translation>
     </message>
     <message>
       <source>%1 Media File</source>
@@ -1193,7 +1193,7 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>Long</source>
-      <translation type="unfinished">Long</translation>
+      <translation>Long</translation>
     </message>
     <message numerus="yes">
       <source>Password must be no longer than %n characters.</source>
@@ -2246,7 +2246,7 @@ pour afficher plus de signets</translation>
     <name>QnCameraAnalyticsPolicy</name>
     <message>
       <source>Analytics is not available for %1</source>
-      <translation type="unfinished">Analytics is not available for %1</translation>
+      <translation>Analytique n’est pas disponible pour %1</translation>
     </message>
   </context>
   <context>
@@ -2366,7 +2366,7 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>Edge</source>
-      <translation type="unfinished">Edge</translation>
+      <translation>Edge</translation>
     </message>
   </context>
   <context>
@@ -2636,7 +2636,7 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>Mbit/s</source>
-      <translation type="unfinished">Mbit/s</translation>
+      <translation>Mbit/s</translation>
     </message>
     <message>
       <source>Less Settings</source>
@@ -7627,10 +7627,6 @@ to %1</source>
       <translation>Seuls les fichiers vidéo avec horodatage correct sont pris en charge.</translation>
     </message>
     <message>
-      <source>Not enough space on server storage</source>
-      <translation>Espace insuffisant sur le stockage du serveur</translation>
-    </message>
-    <message>
       <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
       <translation>Ne peut pas démarrer l'envoie car usager &quot;%1&quot; est en train d'envoyer des vidéos sur cette caméra.</translation>
     </message>
@@ -7697,17 +7693,6 @@ to %1</source>
       <source>No new files to upload in selected folder</source>
       <translation>Aucun nouveau fichier à envoyer dans le dossier sélectionné</translation>
     </message>
-    <message numerus="yes">
-      <source>Files size - %2</source>
-      <translation>
-        <numerusform>Taille fichiers - %2</numerusform>
-        <numerusform>Taille fichiers - %2</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Free space - %2</source>
-      <translation>Espace libre - %2</translation>
-    </message>
     <message>
       <source>%1 - has unsupported format.</source>
       <translation>%1 - a un format non supporté.</translation>
@@ -7724,9 +7709,60 @@ to %1</source>
       <source>%1 - covers period for which video is being uploaded.</source>
       <translation>%1 - couvre la période pour laquelle la vidéo est envoyer.</translation>
     </message>
+    <message numerus="yes">
+      <source>Selected files are too old</source>
+      <translation>
+        <numerusform>Les fichiers sélectionnés sont trop vieux</numerusform>
+        <numerusform>Les fichiers sélectionnés sont trop vieux</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation>
+        <numerusform>Le fichier sélectionné a été enregistré sur %1, mais seulement les fichiers enregistrés au cours des %n derniers jours peuvent être téléchargés. Vous pouvez le modifier dans les paramètres d'archivage de la caméra.</numerusform>
+        <numerusform>Le fichier sélectionné a été enregistré sur %1, mais seulement les fichiers enregistrés au cours des %n derniers jours peuvent être téléchargés. Vous pouvez le modifier dans les paramètres d'archivage de la caméra.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation>
+        <numerusform>Les fichiers sélectionnés ont été enregistrés entre %1 et %2, mais seulement les fichiers enregistrés au cours des %n derniers jours peuvent être téléchargés. Vous pouvez le modifier dans les paramètres d'archivage de la caméra.</numerusform>
+        <numerusform>Les fichiers sélectionnés ont été enregistrés entre %1 et %2, mais seulement les fichiers enregistrés au cours des %n derniers jours peuvent être téléchargés. Vous pouvez le modifier dans les paramètres d'archivage de la caméra.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Some footage may be deleted after uploading these files</source>
+      <translation>
+        <numerusform>Certaines séquences peuvent être supprimées après le téléchargement de ces fichiers</numerusform>
+        <numerusform>Certaines séquences peuvent être supprimées après le téléchargement de ces fichiers</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
+      <translation>
+        <numerusform>Il n'y a pas beaucoup d'espace libre sur le stockage du serveur. Certaines anciennes séquences peuvent être supprimées pour libérer de l'espace. Notez que si les fichiers sélectionnés sont les plus anciens sur le serveur, ils seront supprimés juste après leur téléchargement.</numerusform>
+        <numerusform>Il n'y a pas beaucoup d'espace libre sur le stockage du serveur. Certaines anciennes séquences peuvent être supprimées pour libérer de l'espace. Notez que si les fichiers sélectionnés sont les plus anciens sur le serveur, ils seront supprimés juste après leur téléchargement.</numerusform>
+      </translation>
+    </message>
     <message>
-      <source>%1 - does not fit on server storage.</source>
-      <translation>%1 - ne rentre pas sur le serveur de stockage.</translation>
+      <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
+      <translation>Pour éviter cela, vous pouvez ajouter du stockage supplémentaire. Vous pouvez également contrôler quelle séquence sera supprimé en premier en changeant l'heure d'archivage dans les paramètres de caméra.</translation>
+    </message>
+    <message>
+      <source>Upload anyway?</source>
+      <translation>Envoyer quand même?</translation>
+    </message>
+    <message>
+      <source>Could not finish upload to %1</source>
+      <translation>Impossible de terminer l'envoie vers %1</translation>
+    </message>
+    <message>
+      <source>Make sure there is enough space on server storage.</source>
+      <translation>Assurez-vous qu'il y a suffisamment d'espace sur le stockage du serveur.</translation>
+    </message>
+    <message>
+      <source>%1 - is older than allowed in camera archive settings.</source>
+      <translation>%1 - est plus ancien que les paramètres d'archivage de caméra autorisés.</translation>
     </message>
   </context>
   <context>
@@ -8048,7 +8084,7 @@ to %1</source>
     </message>
     <message>
       <source>Image</source>
-      <translation type="unfinished">Image</translation>
+      <translation>Image</translation>
     </message>
     <message>
       <source>Add Text</source>
@@ -8168,7 +8204,7 @@ to %1</source>
     <name>nx::client::desktop::TimestampOverlaySettingsWidget</name>
     <message>
       <source>Long</source>
-      <translation type="unfinished">Long</translation>
+      <translation>Long</translation>
     </message>
     <message>
       <source>Short</source>

@@ -7539,10 +7539,6 @@ to %1</source>
       <translation>正しいタイムスタンプを持つビデオファイルのみがサポートされます</translation>
     </message>
     <message>
-      <source>Not enough space on server storage</source>
-      <translation>サーバーストレージに十分なスペースがありません</translation>
-    </message>
-    <message>
       <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
       <translation>別のユーザー &quot;%1&quot; が現在このカメラに映像をアップロードしているため、アップロードを開始できませんでした</translation>
     </message>
@@ -7604,16 +7600,6 @@ to %1</source>
       <source>No new files to upload in selected folder</source>
       <translation>選択したフォルダにアップロードする新しいファイルがありません</translation>
     </message>
-    <message numerus="yes">
-      <source>Files size - %2</source>
-      <translation>
-        <numerusform>ファイルサイズ - %2</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Free space - %2</source>
-      <translation>空き容量 - %2</translation>
-    </message>
     <message>
       <source>%1 - has unsupported format.</source>
       <translation>%1 - サポートされていないフォーマット</translation>
@@ -7630,9 +7616,55 @@ to %1</source>
       <source>%1 - covers period for which video is being uploaded.</source>
       <translation>ファイル %1 は既にアップロードされているビデオの期間と重複します</translation>
     </message>
+    <message numerus="yes">
+      <source>Selected files are too old</source>
+      <translation>
+        <numerusform>選択したファイルは古すぎます</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation>
+        <numerusform>選択したファイルは %1に記録されましたが、最後の %n 日に録画されたファイルのみをアップロードできます。これはカメラのアーカイブ設定で変更できます</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation>
+        <numerusform>選択したファイルは %1 から %2の間で記録されましたが、最後の %n 日に記録されたファイルのみをアップロードできます。これはカメラのアーカイブ設定で変更できます</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Some footage may be deleted after uploading these files</source>
+      <translation>
+        <numerusform>これらのファイルをアップロードした後に一部の映像が削除されることがあります</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
+      <translation>
+        <numerusform>サーバーストレージには空き容量がほとんどありません。いくつかの古い映像は、空き容量を増やすために削除されることがあります。選択したファイルがサーバー上で最も古いファイルの場合は、アップロードされた直後に削除されます</numerusform>
+      </translation>
+    </message>
     <message>
-      <source>%1 - does not fit on server storage.</source>
-      <translation>%1 - サーバーストレージには適合しません</translation>
+      <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
+      <translation>これを防ぐために、追加のストレージを追加することができます。また、カメラ設定でアーカイブの保持時間を変更することで、最初に削除する映像を制御することもできます</translation>
+    </message>
+    <message>
+      <source>Upload anyway?</source>
+      <translation>アップロードを行いますか？</translation>
+    </message>
+    <message>
+      <source>Could not finish upload to %1</source>
+      <translation>%1へのアップロードを完了できませんでした</translation>
+    </message>
+    <message>
+      <source>Make sure there is enough space on server storage.</source>
+      <translation>サーバーストレージに十分なスペースがあることを確認してください</translation>
+    </message>
+    <message>
+      <source>%1 - is older than allowed in camera archive settings.</source>
+      <translation>%1 - カメラのアーカイブ設定より古いです</translation>
     </message>
   </context>
   <context>
