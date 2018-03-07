@@ -26,11 +26,20 @@ Item
         panel.forceAnimation()
     }
 
+    Image
+    {
+        id: line
+        source: "qrc:///images/bottom_panel_line.png"
+        visible: panel.scrollable
+    }
+
     ButtonsPanel
     {
         id: panel
 
-        anchors.fill: parent
+        x: line.visible ? 1 : 0
+        width: parent.width - x
+        height: parent.height
         onPressedChanged:
         {
             var type = d.modelDataAccessor.getData(index, "type")

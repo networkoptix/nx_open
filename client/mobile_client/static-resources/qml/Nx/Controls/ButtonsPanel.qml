@@ -6,6 +6,7 @@ ListView
 
     property int pressedStateFilterMs: 500
     property int emptyHeaderSize: 4
+    readonly property alias scrollable: d.prefferToBeInteractive
 
     signal buttonClicked(int index)
     signal pressedChanged(int index, bool pressed)
@@ -15,7 +16,7 @@ ListView
     orientation: Qt.Horizontal
     implicitHeight: 56
 
-    interactive: d.allowInteractiveState && contentWidth > width
+    interactive: d.allowInteractiveState && scrollable
 
     function forceAnimation() { showAnimation.restart() }
 
@@ -52,15 +53,14 @@ ListView
     Image
     {
         source: "qrc:///images/bottom_panel_shadow_left.png"
-        anchors.left: parent.left
-        visible: interactive && visibleArea.xPosition > 0
+        visible: d.prefferToBeInteractive && visibleArea.xPosition > 0
     }
 
     Image
     {
         source: "qrc:///images/bottom_panel_shadow_right.png"
         anchors.right: parent.right
-        visible: interactive && (visibleArea.widthRatio + visibleArea.xPosition < 1)
+        visible: d.prefferToBeInteractive && (visibleArea.widthRatio + visibleArea.xPosition < 1)
     }
 
     delegate: IconButton
@@ -133,5 +133,6 @@ ListView
         id: d
 
         property bool allowInteractiveState: true
+        property bool prefferToBeInteractive: contentWidth > width
     }
 }
