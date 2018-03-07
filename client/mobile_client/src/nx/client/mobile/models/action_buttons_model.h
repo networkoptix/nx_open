@@ -55,7 +55,6 @@ signals:
 
 private:
     struct Button;
-    struct SoftwareButton;
     using ButtonPtr = QSharedPointer<Button>;
     using ButtonList = QList<ButtonPtr>;
 
@@ -88,8 +87,6 @@ private:
     void removeSoftwareTriggerButton(const QnUuid& id);
 
     void updateTriggerFields(const QnUuid& id, SoftwareTriggersWatcher::TriggerFields fields);
-
-    static QnUuid getSoftwareButtonId(const ButtonPtr& button);
 
     static QString twoWayButtonHint();
 

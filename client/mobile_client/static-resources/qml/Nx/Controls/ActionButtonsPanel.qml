@@ -86,7 +86,7 @@ Item
                 {
                     var index = buttonModel.rowById(id)
                     var text = d.modelDataAccessor.getData(index, "hint")
-                    var prolonged = d.modelDataAccessor.getData(index, "prolongedTrigger")
+                    var prolonged = d.modelDataAccessor.getData(index, "allowLongPress")
 
                     if (!success)
                         hintControl.showFailure(text, prolonged)
@@ -98,7 +98,8 @@ Item
                 {
                     var index = buttonModel.rowById(id)
                     var text = d.modelDataAccessor.getData(index, "hint")
-                    if (d.modelDataAccessor.getData(index, "prolongedTrigger"))
+                    var prolonged = d.modelDataAccessor.getData(index, "allowLongPress")
+                    if (prolonged)
                         hintControl.showSuccess(text, true)
                 }
 
@@ -126,7 +127,8 @@ Item
         function handleSoftwareTriggerClicked(index)
         {
             var text = d.modelDataAccessor.getData(index, "hint")
-            if (modelDataAccessor.getData(index, "prolongedTrigger"))
+            var prolonged = d.modelDataAccessor.getData(index, "allowLongPress")
+            if (prolonged)
             {
                 var hintText = qsTr("Press and hold to %1").arg(text)
                 hintControl.showHint(hintText, d.modelDataAccessor.getData(index, "iconPath"))
@@ -142,7 +144,8 @@ Item
 
         function handleSoftwareTriggerPressed(index, pressed)
         {
-            if (!modelDataAccessor.getData(index, "prolongedTrigger"))
+            var prolonged = d.modelDataAccessor.getData(index, "allowLongPress")
+            if (!prolonged)
                 return
 
             var id = d.modelDataAccessor.getData(index, "id")

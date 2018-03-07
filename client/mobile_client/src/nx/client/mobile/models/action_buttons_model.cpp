@@ -13,22 +13,20 @@ enum Roles
 {
     idRoleId = Qt::UserRole,
     typeRoleId,
-    enabledRoleId,
     iconPathRoleId,
     hintRoleId,
-
-    // Software trigger roles
-    prolongedTriggerRoleId,
+    allowLongPressRoleId,
+    enabledRoleId
 };
 
 const QHash<int, QByteArray> kRoleNames = {
     {idRoleId, "id"},
     {typeRoleId, "type"},
-    {enabledRoleId, "enabled"},
     {iconPathRoleId, "iconPath"},
     {hintRoleId, "hint"},
+    {allowLongPressRoleId, "allowLongPress"},
+    {enabledRoleId, "enabled"}};
 
-    {prolongedTriggerRoleId, "prolongedTrigger"}};
 } // namespace
 
 namespace nx {
@@ -44,6 +42,7 @@ struct ActionButtonsModel::Button
         ActionButtonsModel::ButtonType type,
         const QString& iconPath,
         const QString& hint,
+        bool allowLongPress,
         bool enabled);
 
     virtual ~Button();
@@ -52,10 +51,18 @@ struct ActionButtonsModel::Button
     ActionButtonsModel::ButtonType type;
     QString iconPath;
     QString hint;
+    bool allowLongPress = false;
     bool enabled = true;
 
+    static ActionButtonsModel::ButtonPtr createFakeSoftButton(const QnUuid& id);
     static ActionButtonsModel::ButtonPtr createPtzButton();
     static ActionButtonsModel::ButtonPtr createTwoWayAudioButton();
+    static ActionButtonsModel::ButtonPtr createSoftwareTriggerButton(
+        const QnUuid& id,
+        const QString& iconPath,
+        const QString& name,
+        bool prolonged,
+        bool enabled);
 };
 
 ActionButtonsModel::Button::Button(
@@ -63,12 +70,14 @@ ActionButtonsModel::Button::Button(
     ActionButtonsModel::ButtonType type,
     const QString& iconPath,
     const QString& hint,
+    bool allowLongPress,
     bool enabled)
     :
     id(id),
     type(type),
     iconPath(iconPath),
     hint(hint),
+    allowLongPress(allowLongPress),
     enabled(enabled)
 {
 }
@@ -77,78 +86,41 @@ ActionButtonsModel::Button::~Button()
 {
 }
 
+ActionButtonsModel::ActionButtonsModel::ButtonPtr
+ActionButtonsModel::Button::createFakeSoftButton(const QnUuid& id)
+{
+    return ButtonPtr(new Button(id, ActionButtonsModel::SoftTriggerButton,
+        QString(), QString(), true, true));
+}
+
 ActionButtonsModel::ButtonPtr ActionButtonsModel::Button::createPtzButton()
 {
     return ButtonPtr(new Button(
-        QnUuid(), ActionButtonsModel::PtzButton, lit("qrc:///images/ptz/ptz.png"), QString(), true));
+        QnUuid(), ActionButtonsModel::PtzButton,
+        lit("qrc:///images/ptz/ptz.png"), QString(), false, true));
 }
 
 ActionButtonsModel::ButtonPtr ActionButtonsModel::Button::createTwoWayAudioButton()
 {
     return ButtonPtr(new Button(
-        QnUuid(), ActionButtonsModel::TwoWayAudioButton, lit("qrc:///images/two_way_audio/mic.png"),
-        ActionButtonsModel::twoWayButtonHint(), true));
+        QnUuid(), ActionButtonsModel::TwoWayAudioButton,
+        lit("qrc:///images/two_way_audio/mic.png"),
+        ActionButtonsModel::twoWayButtonHint(), true, true));
+}
+
+ActionButtonsModel::ButtonPtr ActionButtonsModel::Button::createSoftwareTriggerButton(
+    const QnUuid& id,
+    const QString& iconPath,
+    const QString& name,
+    bool prolonged,
+    bool enabled)
+{
+    return ButtonPtr(new Button(
+        id, ActionButtonsModel::SoftTriggerButton,
+        iconPath, name, prolonged, enabled));
 }
 
 //-------------------------------------------------------------------------------------------------
-
-struct ActionButtonsModel::SoftwareButton: public ActionButtonsModel::Button
-{
-    bool prolonged = false;
-
-    static ButtonPtr fake(const QnUuid& id);
-    static ButtonPtr create(
-        const QnUuid& id,
-        const QString& iconPath,
-        const QString& name,
-        bool prolonged,
-        bool enabled);
-
-private:
-    using base_type = ActionButtonsModel::Button;
-
-    SoftwareButton(const QnUuid& id);
-    SoftwareButton(
-        const QnUuid& id,
-        const QString& iconPath,
-        const QString& name,
-        bool prolonged,
-        bool enabled);
-};
-
-ActionButtonsModel::ButtonPtr ActionButtonsModel::SoftwareButton::create(
-    const QnUuid& id,
-    const QString& iconPath,
-    const QString& name,
-    bool prolonged,
-    bool enabled)
-{
-    return ButtonPtr(new SoftwareButton(id,iconPath, name, prolonged, enabled));
-}
-
-ActionButtonsModel::ButtonPtr ActionButtonsModel::SoftwareButton::fake(const QnUuid& id)
-{
-    return ButtonPtr(new SoftwareButton(id));
-}
-
-ActionButtonsModel::SoftwareButton::SoftwareButton(const QnUuid& id):
-    base_type(id, ActionButtonsModel::SoftTriggerButton, QString(), QString(), false)
-{
-}
-
-ActionButtonsModel::SoftwareButton::SoftwareButton(
-    const QnUuid& id,
-    const QString& iconPath,
-    const QString& name,
-    bool prolonged,
-    bool enabled)
-    :
-    base_type(id, ActionButtonsModel::SoftTriggerButton, iconPath, name, enabled),
-    prolonged(prolonged)
-{
-}
-
-//
 
 ActionButtonsModel::ActionButtonsModel(QObject* parent):
     base_type(parent),
@@ -229,29 +201,23 @@ QVariant ActionButtonsModel::data(const QModelIndex& index, int role) const
     }
 
     const auto& button = m_buttons.at(row);
-
     switch (role)
     {
         case idRoleId:
             return QVariant::fromValue(button->id);
         case typeRoleId:
             return button->type;
-        case enabledRoleId:
-            return button->enabled;
         case hintRoleId:
             return button->hint;
         case iconPathRoleId:
             return button->iconPath;
-    }
-
-    if (role != prolongedTriggerRoleId)
+        case allowLongPressRoleId:
+            return button->allowLongPress;
+        case enabledRoleId:
+            return button->enabled;
         return QVariant();
-
-    const auto softwareButton = button->type == SoftTriggerButton
-            ? static_cast<SoftwareButton*>(button.data())
-            : nullptr;
-
-    return softwareButton ? QVariant::fromValue(softwareButton->prolonged) : QVariant();
+    }
+    return QVariant();
 }
 
 QHash<int, QByteArray> ActionButtonsModel::roleNames() const
@@ -277,20 +243,14 @@ int ActionButtonsModel::softTriggerButtonStartIndex() const
     return it == m_buttons.end() ? m_buttons.size() : it - m_buttons.begin();
 }
 
-QnUuid ActionButtonsModel::getSoftwareButtonId(const ButtonPtr& button)
-{
-    const auto softwareButton = dynamic_cast<SoftwareButton*>(button.data());
-    return softwareButton ? softwareButton->id : QnUuid();
-}
-
 ActionButtonsModel::ButtonList::const_iterator ActionButtonsModel::lowerBoundByTriggerButtonId(
     const QnUuid& id) const
 {
     static const auto compareFunction =
         [](const ButtonPtr& left, const ButtonPtr& right)
         {
-            const auto leftRuleId = getSoftwareButtonId(left);
-            const auto rightRuleId = getSoftwareButtonId(right);
+            const auto leftRuleId = left->id;
+            const auto rightRuleId = right->id;
             if (leftRuleId.isNull() || rightRuleId.isNull())
             {
                 NX_EXPECT(false, "We expect each button to be software trigger");
@@ -302,13 +262,13 @@ ActionButtonsModel::ButtonList::const_iterator ActionButtonsModel::lowerBoundByT
     const auto startIndex = softTriggerButtonStartIndex();
     return std::lower_bound(
         m_buttons.begin() + startIndex, m_buttons.end(),
-        SoftwareButton::fake(id), compareFunction);
+        Button::createFakeSoftButton(id), compareFunction);
 }
 
 int ActionButtonsModel::rowById(const QnUuid& id) const
 {
     const auto it = lowerBoundByTriggerButtonId(id);
-    return it != m_buttons.end() && getSoftwareButtonId(*it) == id
+    return it != m_buttons.end() && (*it)->id == id
         ? it - m_buttons.begin()
         : -1;
 }
@@ -327,7 +287,7 @@ void ActionButtonsModel::addSoftwareTriggerButton(
     bool enabled)
 {
     insertButton(triggerButtonInsertionIndexById(id),
-        SoftwareButton::create(id, iconPath, name, prolonged, enabled));
+        Button::createSoftwareTriggerButton(id, iconPath, name, prolonged, enabled));
 }
 
 void ActionButtonsModel::removeSoftwareTriggerButton(const QnUuid& id)
@@ -424,7 +384,7 @@ void ActionButtonsModel::updateTriggerFields(
         return;
     }
 
-    const auto button = static_cast<SoftwareButton*>(m_buttons[row].data());
+    const auto button = m_buttons[row].data();
 
     QVector<int> changedDataIndicies;
     if (fields.testFlag(SoftwareTriggersWatcher::EnabledField)
@@ -435,10 +395,10 @@ void ActionButtonsModel::updateTriggerFields(
     }
 
     if (fields.testFlag(SoftwareTriggersWatcher::ProlongedField)
-        && button->prolonged != m_softwareTriggeresWatcher->prolongedTrigger(id))
+        && button->allowLongPress != m_softwareTriggeresWatcher->prolongedTrigger(id))
     {
-        button->prolonged = !button->prolonged;
-        changedDataIndicies << prolongedTriggerRoleId;
+        button->allowLongPress = !button->allowLongPress;
+        changedDataIndicies << allowLongPressRoleId;
     }
 
     if (fields.testFlag(SoftwareTriggersWatcher::NameField))

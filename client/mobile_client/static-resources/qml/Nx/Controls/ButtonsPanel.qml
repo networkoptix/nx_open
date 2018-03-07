@@ -95,12 +95,19 @@ ListView
             }
         }
 
-        onPressed: pressedStateFilterTimer.restart()
+        onPressed:
+        {
+            if (model.allowLongPress)
+                pressedStateFilterTimer.restart()
+            else
+                pressedStateFilterTimer.stop()
+        }
+
         onReleased: handleButtonReleased()
         onCanceled: handleButtonReleased()
 
         onPressedChanged:
-        {
+        {   
             if (!buttonPressed && pressedStateFilterTimer.running)
                 pressedStateFilterTimer.stop()
         }
