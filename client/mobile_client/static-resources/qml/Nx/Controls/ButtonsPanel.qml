@@ -18,7 +18,7 @@ ListView
 
     interactive: d.allowInteractiveState && scrollable
 
-    function forceAnimation() { showAnimation.restart() }
+    function forceAnimation() { delayedAnimationTimer.restart() }
 
     onVisibleChanged:
     {
@@ -26,21 +26,25 @@ ListView
             forceAnimation()
     }
 
-    SequentialAnimation
+    Timer
+    {
+        id: delayedAnimationTimer
+
+        interval: 30
+        onTriggered: showAnimation.restart()
+
+    }
+
+    PropertyAnimation
     {
         id: showAnimation
 
-        ScriptAction { script: contentX = -width + emptyHeaderSize}
-
-        PropertyAnimation
-        {
-            duration: 300
-            easing.type: Easing.OutQuad
-            target: control
-            properties: "contentX"
-            from: -width - height + emptyHeaderSize
-            to: -width + emptyHeaderSize
-        }
+        duration: 300
+        easing.type: Easing.OutQuad
+        target: control
+        properties: "contentX"
+        from: -width - height + emptyHeaderSize
+        to: -width + emptyHeaderSize
     }
 
     header: Item
