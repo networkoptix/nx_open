@@ -64,6 +64,10 @@ ListView
 
         anchors.verticalCenter: parent.verticalCenter
 
+        property bool buttonPressed: false
+
+        onButtonPressedChanged: control.pressedChanged(index, buttonPressed)
+
         Connections
         {
             target: control
@@ -87,6 +91,12 @@ ListView
         onReleased: handleButtonReleased()
         onCanceled: handleButtonReleased()
 
+        onPressedChanged:
+        {
+            if (!buttonPressed && pressedStateFilterTimer.running)
+                pressedStateFilterTimer.stop()
+        }
+
         Timer
         {
             id: pressedStateFilterTimer
@@ -105,7 +115,7 @@ ListView
         function finishStateProcessing(value)
         {
             button.filteringPressing = value
-            control.pressedChanged(index, value)
+            button.buttonPressed = value
             d.allowInteractiveState = !value
         }
     }
