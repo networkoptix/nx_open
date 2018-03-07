@@ -374,7 +374,7 @@ Item
                 id: zoomButtonsRow
 
                 anchors.centerIn: parent
-                visible: navigationPanel.showZoomControls
+                visible: navigationPanel.showZoomControls || !d.liveMode
 
                 IconButton
                 {
