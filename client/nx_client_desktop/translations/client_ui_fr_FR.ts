@@ -1686,17 +1686,17 @@
     <message>
       <location filename="../src/ui/dialogs/new_wearable_camera_dialog.ui"/>
       <source>New Wearable Camera...</source>
-      <translation type="unfinished">New Wearable Camera...</translation>
+      <translation>Nouvelle caméra portable ...</translation>
     </message>
     <message>
       <location/>
       <source>To server</source>
-      <translation type="unfinished">To server</translation>
+      <translation>Au serveur</translation>
     </message>
     <message>
       <location/>
       <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</translation>
+      <translation>&quot;Caméra Portablea&quot; est un stockage virtuel pour les fichiers vidéo, qui peut être envoyer sur n'importe quel serveur de votre système et accessible à tout utilisateur.</translation>
     </message>
   </context>
   <context>
@@ -2551,8 +2551,7 @@
       <location/>
       <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage.
 The oldest footage among all cameras on the server will be deleted first.</source>
-      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage.
-The oldest footage among all cameras on the server will be deleted first.</translation>
+      <translation>Les archives envoyées peuvent être supprimées automatiquement s'il n'y a pas d'espace libre sur un stockage de serveur. Les images les plus anciennes parmi toutes les caméras sur le serveur seront supprimées en premier.</translation>
     </message>
   </context>
   <context>
@@ -2897,7 +2896,7 @@ Cliquez &quot;Nouveau rôle&quot; pour en créer un.</translation>
     <message>
       <location/>
       <source>Detect motion in uploaded video</source>
-      <translation type="unfinished">Detect motion in uploaded video</translation>
+      <translation>Détecter mouvement dans la vidéo envoyé</translation>
     </message>
     <message>
       <location/>
@@ -2918,17 +2917,17 @@ Cliquez &quot;Nouveau rôle&quot; pour en créer un.</translation>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
       <source>Upload Video</source>
-      <translation type="unfinished">Upload Video</translation>
+      <translation>Envoyer Vidéo</translation>
     </message>
     <message>
       <location/>
       <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
+      <translation>Envoyer Fichier...</translation>
     </message>
     <message>
       <location/>
       <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
+      <translation>Envoyer Dossier...</translation>
     </message>
   </context>
   <context>
