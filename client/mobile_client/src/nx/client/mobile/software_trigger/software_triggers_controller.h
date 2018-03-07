@@ -34,6 +34,7 @@ class SoftwareTriggersController: public QObject
 
 public:
     SoftwareTriggersController(QObject* parent = nullptr);
+    virtual ~SoftwareTriggersController() override;
 
     static void registerQmlType();
 
@@ -52,7 +53,7 @@ signals:
     void triggerCancelled(const QnUuid& id);
 
 private:
-    bool setTriggerState(const QnUuid& id, vms::event::EventState state);
+    bool setTriggerState(QnUuid id, vms::event::EventState state);
 
 private:
     QnCommonModule* const m_commonModule = nullptr;
@@ -60,9 +61,7 @@ private:
     QnResourceAccessManager* const m_accessManager = nullptr;
     vms::event::RuleManager* const m_ruleManager = nullptr;
 
-
     QnUuid m_resourceId;
-    rest::Handle m_currentHandle;
     QnUuid m_activeTriggerId;
 };
 

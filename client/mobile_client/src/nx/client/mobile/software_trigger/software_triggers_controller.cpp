@@ -28,6 +28,11 @@ SoftwareTriggersController::SoftwareTriggersController(QObject* parent):
 {
 }
 
+SoftwareTriggersController::~SoftwareTriggersController()
+{
+    cancelTriggerAction();
+}
+
 void SoftwareTriggersController::registerQmlType()
 {
     qmlRegisterType<SoftwareTriggersController>("nx.client.mobile", 1, 0, "SoftwareTriggersController");
@@ -71,15 +76,10 @@ bool SoftwareTriggersController::activateTrigger(const QnUuid& id)
         return false;
     }
 
-    m_activeTriggerId = id;
     const auto state = rule->isActionProlonged()
         ? vms::event::EventState::active
         : vms::event::EventState::undefined;
-    const bool result = setTriggerState(id, state);
-    if (!result)
-        m_activeTriggerId = QnUuid();
-
-    return result;
+    return setTriggerState(id, state);
 }
 
 bool SoftwareTriggersController::deactivateTrigger()
@@ -112,7 +112,7 @@ void SoftwareTriggersController::cancelTriggerAction()
     emit triggerCancelled(currentTriggerId);
 }
 
-bool SoftwareTriggersController::setTriggerState(const QnUuid& id, vms::event::EventState state)
+bool SoftwareTriggersController::setTriggerState(QnUuid id, vms::event::EventState state)
 {
     if (m_resourceId.isNull() || id.isNull())
     {
@@ -132,30 +132,19 @@ bool SoftwareTriggersController::setTriggerState(const QnUuid& id, vms::event::E
         return false;
     }
 
+    m_activeTriggerId = state == vms::event::EventState::active ? id : QnUuid();
+
     const auto callback =
-        [this, state](bool success, rest::Handle handle, const QnJsonRestResult& result)
+        [this, state, id](bool success, rest::Handle /*handle*/, const QnJsonRestResult& result)
         {
-            if (handle != m_currentHandle)
-                return;
-
-            m_currentHandle = rest::Handle();
-            if (m_activeTriggerId.isNull())
-                return; // Action cancelled.
-
-            const auto currentId = m_activeTriggerId;
-            const bool inactiveState = state == nx::vms::event::EventState::inactive;
-            if (inactiveState || state == nx::vms::event::EventState::undefined)
-                m_activeTriggerId = QnUuid();
-
-            if (inactiveState)
-                triggerDeactivated(currentId);
+            if (state == nx::vms::event::EventState::inactive)
+                triggerDeactivated(id);
             else
-                triggerActivated(currentId, success && result.error == QnRestResult::NoError);
-
+                triggerActivated(id, success && result.error == QnRestResult::NoError);
         };
 
     const auto connection = m_commonModule->currentServer()->restConnection();
-    m_currentHandle = connection->softwareTriggerCommand(
+    connection->softwareTriggerCommand(
         m_resourceId, rule->eventParams().inputPortId, state,
         QnGuardedCallback<decltype(callback)>(this, callback), QThread::currentThread());
 
