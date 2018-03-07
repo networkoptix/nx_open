@@ -69,6 +69,11 @@ public:
             {std::move(clientConnection), std::move(serverConnection)});
     }
 
+    virtual RelaySessionStatistics getStatistics() const override
+    {
+        return RelaySessionStatistics();
+    }
+
     bool hasRelaySession(
         nx::network::AbstractStreamSocket* clientConnection,
         nx::network::AbstractStreamSocket* serverConnection,

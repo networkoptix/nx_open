@@ -5,10 +5,11 @@ Suite Teardown    Close All Browsers
 
 *** Variables ***
 ${password}    ${BASE PASSWORD}
-${url}         ${CLOUD TEST}
+${url}         ${ENV}
 
 *** Test Cases ***
 Register and Activate
+    [tags]    email
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
     Register    'mark'    'hamill'    ${email}    ${password}
@@ -18,6 +19,7 @@ Register and Activate
     Close Browser
 
 should show error if same link is used twice
+    [tags]    email
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
     Register    'mark'    'hamill'    ${email}    ${password}
@@ -29,6 +31,7 @@ should show error if same link is used twice
     Close Browser
 
 should save user data to user account correctly
+    [tags]    email
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${email}    ${password}
@@ -41,6 +44,7 @@ should save user data to user account correctly
     Close Browser
 
 should allow to enter more than 255 symbols in First and Last names and cut it to 255
+    [tags]    email
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
     Register    ${300CHARS}    ${300CHARS}    ${email}    ${password}
@@ -53,6 +57,7 @@ should allow to enter more than 255 symbols in First and Last names and cut it t
     Close Browser
 
 should trim leading and trailing spaces
+    [tags]    email
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
     Register    ${SPACE}mark${SPACE}    ${SPACE}hamill${SPACE}    ${email}    ${password}
@@ -69,6 +74,7 @@ should trim leading and trailing spaces
 #should display Open Nx Witness button after activation, if user is registered by link /register/?from=mobile
 
 link works and suggests to log out user, if he was logged in, buttons operate correctly
+    [tags]    email
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${email}    ${password}
@@ -90,6 +96,7 @@ link works and suggests to log out user, if he was logged in, buttons operate co
 #user message when not activated; Resend activation button sends email"
 #in login-dialog
 email can be sent again
+    [tags]    email
     Open Browser and go to URL    ${url}/register
     ${random email}    get random email
     Register    'mark'    'hamill'    ${random email}    ${BASE PASSWORD}

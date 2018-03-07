@@ -32,6 +32,12 @@ class NoptixLibrary(object):
     def get_random_email(self):
         return "noptixqa+" + str(time.time()) + "@gmail.com"
 
+    def get_many_random_emails(self, howMany):
+        emails = []
+        for x in xrange(0,int(howMany)):
+            emails.append(self.get_random_email())
+            time.sleep(.2)
+        return emails
 
     def get_random_symbol_email(self):
         return '''!#$%&'*+-/=?^_`{|}~''' + str(time.time()) + "@gmail.com"
@@ -56,13 +62,13 @@ class NoptixLibrary(object):
         raise AssertionError(not_found)
 
 
-    def check_online_or_offline(self, elements):
+    def check_online_or_offline(self, elements, offlineText):
         for element in elements:
             try:
                 if element.find_element_by_xpath(".//button[@ng-click='checkForm()']"): 
                     print "online"
             except NoSuchElementException:
                 try:
-                    if element.find_element_by_xpath(".//span[contains(text(),'offline')]"):                    
+                    if element.find_element_by_xpath(".//span[contains(text(),'"+offlineText+"')]"):                    
                         print "offline"
                 except: raise NoSuchElementException

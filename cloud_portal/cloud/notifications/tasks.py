@@ -9,6 +9,7 @@ from celery.exceptions import Ignore
 from django.conf import settings
 
 from api.models import Account
+from notifications import api
 
 import traceback
 import logging
@@ -32,12 +33,13 @@ def log_error(error, user_email, type, message, customization, attempt):
 
 
 @shared_task
-def send_email(user_email, type, message, customization, attempt=1):
+def send_email(user_email, type, message, customization, queue="", attempt=1):
     try:
         email_engine.send(user_email, type, message, customization)
     except Exception as error:
         if (isinstance(error, SMTPException) or isinstance(error, SSLError)) and attempt < settings.MAX_RETRIES:
-            send_email.delay(user_email, type, message, customization, attempt+1)
+            send_email.apply_async(args=[user_email, type, message, customization, queue, attempt+1],
+                                   queue=queue)
 
         log_error(error, user_email, type, message, customization, attempt)
 
@@ -46,12 +48,13 @@ def send_email(user_email, type, message, customization, attempt=1):
                                                        'type': type,
                                                        'message': message,
                                                        'customization': customization,
+                                                       'queue': queue,
                                                        'attempt': attempt,
                                                        })
         raise Ignore()
     else:
         return {'user_email': user_email, 'type': type, 'message': message,
-                'customization': customization, 'attempt': attempt}
+                'customization': customization, 'queue': queue, 'attempt': attempt}
 
 
 # For testing we dont want to send emails to everyone so we need to set
@@ -69,7 +72,7 @@ def send_to_all_users(notification_id, message, force=False):
 
     for user in users:
         message['full_name'] = user.get_full_name()
-        send_email.delay(user.email, 'cloud_notification', message, user.customization)
+        api.send(user.email, 'cloud_notification', message, user.customization)
 
     return {'notification_id': notification_id, 'subject': message['subject'], 'force': force}
 

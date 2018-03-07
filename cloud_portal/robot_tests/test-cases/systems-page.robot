@@ -2,10 +2,11 @@
 Resource          ../resource.robot
 Resource          ../variables.robot
 Suite Teardown    Close All Browsers
+Force Tags        system
 
 *** Variables ***
 ${password}    ${BASE PASSWORD}
-${url}         ${CLOUD TEST}
+${url}         ${ENV}
 
 *** Test Cases ***
 should show list of Systems
@@ -42,7 +43,7 @@ should show system's state for systems if they are offline. Otherwise - button O
     Validate Log In
     Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
     ${systems}    Get WebElements    //div[@ng-repeat='system in systems | filter:searchSystems as filtered']
-    Check Online Or Offline    ${systems}
+    Check Online Or Offline    ${systems}    ${AUTOTESTS OFFLINE TEXT}
     Close Browser
 
 should open system page (users list) when clicked on system

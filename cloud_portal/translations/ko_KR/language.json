@@ -1,9 +1,9 @@
 {
-  "language_name": "언어",
+  "language_name": "한국어",
   "productName": "{{PRODUCT_NAME}}",
   "clientProtocol": "{{CLIENT_PROTOCOL}}:",
   "dialogs": {
-    "okButton": "Ok",
+    "okButton": "승인",
     "cancelButton": "취소",
     "loginTitle": "{{PRODUCT_NAME}}에 로그인",
     "loginButton": "로그인",

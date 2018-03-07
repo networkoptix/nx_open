@@ -15,11 +15,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterField(
             model_name='datastructure',
-            name='label',
-            field=models.CharField(blank=True, max_length=1024),
-        ),
-        migrations.AlterField(
-            model_name='datastructure',
             name='meta_settings',
             field=jsonfield.fields.JSONField(blank=True, default={}),
         ),

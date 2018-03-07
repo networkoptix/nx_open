@@ -6,16 +6,27 @@ ${ALERT}                              //div[contains(@class, 'ng-toast')]//span[
 ${ALERT CLOSE}                        //div[contains(@class, 'ng-toast')]//span[@ng-bind-html='message.content']/../preceding-sibling::button[@ng-click='!message.dismissOnClick && dismiss()']
 
 ${LOCAL}                              https://localhost:9000/
-
 ${CLOUD TEST}                         https://cloud-test.hdw.mx
 ${CLOUD DEV}                          https://cloud-dev2.hdw.mx
 ${CLOUD TEST REGISTER}                https://cloud-test.hdw.mx/register
+${CLOUD STAGE}                        https://cloud-stage.hdw.mx
+${ENV}                                ${CLOUD TEST}
 
-${CYRILLIC TEXT}                     Кенгшщзх
-${SMILEY TEXT}                       ☠☿☂⊗⅓∠∩λ℘웃♞⊀☻★
-${GLYPH TEXT}                        您都可以享受源源不絕的好禮及優惠
-${SYMBOL TEXT}                       `~!@#$%^&*()_:";'{}[]+<>?,./\
-${TM TEXT}                           qweasdzxc123®™
+${BROWSER}                            Chrome
+
+${LANGUAGE DROPDOWN}                  //footer//button[@uib-dropdown-toggle]
+${LANGUAGE TO SELECT}                 //footer//span[@lang='${LANGUAGE}']/..
+
+@{LANGUAGES LIST}                          en_US    en_GB    ru_RU           fr_FR   de_DE    es_ES   hu_HU  zh_CN  zh_TW  ja_JP   ko_KR  tr_TR  th_TH     nl_NL    he_IL  pl_PL  vi_VN
+@{LANGUAGES ACCOUNT TEXT LIST}             Account  Account  Учетная запись  Compte  Account  Cuenta  Fiók   帐户    帳號   アカウント  계정    Hesap  บัญชีผู้ใช้  Account  חשבון    Konto  Tài khoản
+
+
+
+${CYRILLIC TEXT}                      Кенгшщзх
+${SMILEY TEXT}                        ☠☿☂⊗⅓∠∩λ℘웃♞⊀☻★
+${GLYPH TEXT}                         您都可以享受源源不絕的好禮及優惠
+${SYMBOL TEXT}                        `~!@#$%^&*()_:";'{}[]+<>?,./\
+${TM TEXT}                            qweasdzxc123®™
 
 #Log In Elements
 ${LOG IN MODAL}                       //div[contains(@class, 'modal-content')]
@@ -31,6 +42,7 @@ ${YOU HAVE NO SYSTEMS}                //span[contains(text(),'${YOU HAVE NO SYST
 
 ${ACCOUNT DROPDOWN}                   //li[contains(@class, 'collapse-first')]//a['uib-dropdown-toggle']
 ${LOG OUT BUTTON}                     //li[contains(@class, 'collapse-first')]//a[contains(text(), '${LOG OUT BUTTON TEXT}')]
+${ACCOUNT SETTINGS BUTTON}            //li[contains(@class, 'collapse-first')]//a[contains(text(), '${ACCOUNT SETTINGS BUTTON TEXT}')]
 ${SYSTEMS DROPDOWN}                   //li[contains(@class, 'collapse-second')]//a['uib-dropdown-toggle']
 ${ALL SYSTEMS}                        //li[contains(@class, 'collapse-second')]//a[@ng-href='/systems']
 ${AUTHORIZED BODY}                    //body[contains(@class, 'authorized')]
@@ -66,9 +78,8 @@ ${RESEND ACTIVATION LINK BUTTON}      //form[@name= 'reactivateAccount']//button
 ${EMAIL ALREADY REGISTERED}           //span[@ng-if="registerForm.registerEmail.$error.alreadyExists"]
 
 ${ACCOUNT CREATION SUCCESS}           //h1[@ng-if='(register.success || registerSuccess) && !activated']
-${ACTIVATION SUCCESS}                 //div[@ng-model-options="{ updateOn: 'blur' }"]//h1[@ng-if='activate.success' and contains(text(), '${ACCOUNT SUCCESSFULLY ACTIVATED TEXT}')]
-${SUCCESS LOG IN BUTTON}              //div[@ng-model-options="{ updateOn: 'blur' }"]//h1[@ng-if='activate.success' and contains(text(), '${ACCOUNT SUCCESSFULLY ACTIVATED TEXT}')]//a[@href='/login']
-
+${ACTIVATION SUCCESS}                 //h1[@ng-if='activate.success' and contains(text(), '${ACCOUNT SUCCESSFULLY ACTIVATED TEXT}')]
+${SUCCESS LOG IN BUTTON}              //div[@ng-model-options="{ updateOn: 'blur' }"]//h1[@ng-if='activate.success' and contains(text(), '${ACCOUNT SUCCESSFULLY ACTIVATED TEXT}')]/following-sibling::h1/a[@href="/login"]
 #In system settings
 ${FIRST USER OWNER}                   //table[@ng-if='system.users.length']/tbody/tr/td[3]/span[contains(text(),'${OWNER TEXT}')]
 ${DISCONNECT FROM NX}                 //button[@ng-click='disconnect()']
@@ -109,11 +120,11 @@ ${SHARE PERMISSIONS DROPDOWN}         //form[@name='shareForm']//select[@ng-mode
 ${SHARE BUTTON MODAL}                 //form[@name='shareForm']//button[@ng-click='checkForm()']
 ${SHARE CANCEL}                       //form[@name='shareForm']//button[@ng-click='close()']
 ${SHARE CLOSE}                        //div[@uib-modal-transclude]//div[@ng-if='settings.title']//button[@ng-click='close()']
-${SHARE PERMISSIONS ADMINISTRATOR}    //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='Administrator']
-${SHARE PERMISSIONS ADVANCED VIEWER}  //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='Advanced Viewer']
-${SHARE PERMISSIONS VIEWER}           //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='Viewer']
-${SHARE PERMISSIONS LIVE VIEWER}      //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='Live Viewer']
-${SHARE PERMISSIONS CUSTOM}           //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='Custom']
+${SHARE PERMISSIONS ADMINISTRATOR}    //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='${ADMIN TEXT}']
+${SHARE PERMISSIONS ADVANCED VIEWER}  //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='${ADV VIEWER TEXT}']
+${SHARE PERMISSIONS VIEWER}           //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='${VIEWER TEXT}']
+${SHARE PERMISSIONS LIVE VIEWER}      //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='${LIVE VIEWER TEXT}']
+${SHARE PERMISSIONS CUSTOM}           //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='${CUSTOM TEXT}']
 ${SHARE PERMISSIONS HINT}             //form[@name='shareForm']//span[contains(@class,'help-block')]
 
 ${EDIT PERMISSIONS EMAIL}             //form[@name='shareForm']//input[@ng-model='user.email']
@@ -132,7 +143,9 @@ ${EDIT PERMISSIONS HINT}              //form[@name='shareForm']//span[contains(@
 ${ACCOUNT EMAIL}                      //form[@name='accountForm']//input[@ng-model='account.email']
 ${ACCOUNT FIRST NAME}                 //form[@name='accountForm']//input[@ng-model='account.first_name']
 ${ACCOUNT LAST NAME}                  //form[@name='accountForm']//input[@ng-model='account.last_name']
+${ACCOUNT LANGUAGE DROPDOWN}          //form[@name='accountForm']//language-select//button
 ${ACCOUNT SAVE}                       //form[@name='accountForm']//button[@ng-click='checkForm()']
+${ACCOUNT SUBSCRIBE CHECKBOX}         //form[@name='accountForm']//input[@ng-model='account.subscribe']
 
 #Already logged in modal
 ${LOGGED IN CONTINUE BUTTON}          //div[@uib-modal-transclude]//button[@ng-click='ok()']
@@ -162,7 +175,7 @@ ${TEST FIRST NAME}                    testFirstName
 ${TEST LAST NAME}                     testLastName
 
 #Related to Auto Tests system
-${AUTO_TESTS SYSTEM ID}                     b4939b35-5b98-492b-a092-27fe8efeef38
+${AUTO_TESTS SYSTEM ID}                     97b27ae5-1d36-4ddf-8a1c-ab0f3e244e97
 ${AUTO TESTS TITLE}                   //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests')]
 ${AUTO TESTS USER}                    //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests')]/following-sibling::span[contains(@class,'user-name')]
 ${AUTO TESTS OPEN NX}                 //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests')]/..//button[@ng-click='checkForm()']
