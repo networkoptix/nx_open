@@ -125,7 +125,7 @@ class TaskResultAdmin(admin.ModelAdmin):
     def clean_old_tasks(self, request, queryset):
         from datetime import datetime, timedelta
         cutoff_date = datetime.now() - timedelta(days=7)
-        TaskResult.objects.filter(date_done__lt=cutoff_date)
+        TaskResult.objects.filter(date_done__lt=cutoff_date).delete()
 
     clean_old_tasks.short_description = "Remove tasks older than a week"
 
