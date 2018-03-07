@@ -5,6 +5,7 @@ ListView
     id: control
 
     property int pressedStateFilterMs: 500
+    property int emptyHeaderSize: 4
 
     signal buttonClicked(int index)
     signal pressedChanged(int index, bool pressed)
@@ -12,7 +13,7 @@ ListView
     clip: true
     layoutDirection: Qt.RightToLeft
     orientation: Qt.Horizontal
-    implicitHeight: 48
+    implicitHeight: 56
 
     interactive: d.allowInteractiveState && contentWidth > width
 
@@ -28,7 +29,7 @@ ListView
     {
         id: showAnimation
 
-        ScriptAction { script: contentX = -width }
+        ScriptAction { script: contentX = -width + emptyHeaderSize}
 
         PropertyAnimation
         {
@@ -36,9 +37,16 @@ ListView
             easing.type: Easing.OutQuad
             target: control
             properties: "contentX"
-            from: -width - height
-            to: -width
+            from: -width - height + emptyHeaderSize
+            to: -width + emptyHeaderSize
         }
+    }
+
+    header: Item
+    {
+        width: emptyHeaderSize
+        height: control.height
+        visible: emptyHeaderSize > 0
     }
 
     Image

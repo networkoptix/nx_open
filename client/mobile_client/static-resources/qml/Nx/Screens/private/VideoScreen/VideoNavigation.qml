@@ -423,6 +423,7 @@ Item
                     ? zoomButtonsRow.right
                     : calendarButton.right
                 anchors.right: parent.right
+                anchors.rightMargin: -4
 
                 anchors.verticalCenter: parent.verticalCenter
                 visible: d.liveMode
