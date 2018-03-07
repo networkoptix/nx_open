@@ -2336,6 +2336,12 @@ to view more bookmarks</source>
       <source>Edge</source>
       <translation>Cạnh</translation>
     </message>
+    <message numerus="yes">
+      <source>This ID already used on camera %1</source>
+      <translation type="unfinished">
+        <numerusform>This ID already used on camera %1</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnCameraInputBusinessEventWidget</name>
@@ -2449,6 +2455,10 @@ to view more bookmarks</source>
     <message>
       <source>Server</source>
       <translation>Máy chủ</translation>
+    </message>
+    <message>
+      <source>Logical ID</source>
+      <translation type="unfinished">Logical ID</translation>
     </message>
   </context>
   <context>
@@ -4707,16 +4717,16 @@ to %1</source>
   <context>
     <name>QnPerformanceTest</name>
     <message>
-      <source>For full - featured mode, please use another computer</source>
-      <translation>Để dùng với chế độ đầy đủ tính năng, hãy sử dụng một máy tính khác</translation>
-    </message>
-    <message>
       <source>%1 can work in configuration mode only</source>
       <translation>%1 chỉ có thể hoạt động ở chế độ cấu hình</translation>
     </message>
     <message>
       <source>Performance of this computer allows running %1 in configuration mode only.</source>
       <translation>Hiệu năng của máy tính này chỉ cho phép chạy %1 ở chế độ cấu hình.</translation>
+    </message>
+    <message>
+      <source>For full-featured mode please use another computer</source>
+      <translation type="unfinished">For full-featured mode please use another computer</translation>
     </message>
   </context>
   <context>

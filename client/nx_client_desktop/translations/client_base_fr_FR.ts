@@ -1011,7 +1011,7 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>Settings are not available for .NOV and .EXE files.</source>
-      <translation type="unfinished">Settings are not available for .NOV and .EXE files.</translation>
+      <translation>Paramètres non disponibles pour les fichiers .EXE et .NOV</translation>
     </message>
   </context>
   <context>
@@ -2246,7 +2246,7 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>No settings</source>
-      <translation type="unfinished">No settings</translation>
+      <translation>Aucun paramètre</translation>
     </message>
   </context>
   <context>
@@ -2358,6 +2358,13 @@ pour afficher plus de signets</translation>
     <message>
       <source>Edge</source>
       <translation>Edge</translation>
+    </message>
+    <message numerus="yes">
+      <source>This ID already used on camera %1</source>
+      <translation type="unfinished">
+        <numerusform>This ID already used on camera %1</numerusform>
+        <numerusform>This ID already used on camera %1</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -2476,6 +2483,10 @@ pour afficher plus de signets</translation>
     <message>
       <source>Server</source>
       <translation>Serveur</translation>
+    </message>
+    <message>
+      <source>Logical ID</source>
+      <translation type="unfinished">Logical ID</translation>
     </message>
   </context>
   <context>
@@ -2837,7 +2848,7 @@ to %1</source>
     </message>
     <message>
       <source>Account is not activated. Please check your email and follow provided instructions</source>
-      <translation type="unfinished">Account is not activated. Please check your email and follow provided instructions</translation>
+      <translation>Compte non activé. S.V.P. vérifiez votre courriel et suivez les instructions fournies</translation>
     </message>
   </context>
   <context>
@@ -4766,16 +4777,16 @@ to %1</source>
   <context>
     <name>QnPerformanceTest</name>
     <message>
-      <source>For full - featured mode, please use another computer</source>
-      <translation>Pour Tout - mode recommandé. S.V.P utiliser un autre PC</translation>
-    </message>
-    <message>
       <source>%1 can work in configuration mode only</source>
       <translation>%1 peut seulement fonctionner en mode de configuration</translation>
     </message>
     <message>
       <source>Performance of this computer allows running %1 in configuration mode only.</source>
       <translation>Performances de cet ordinateur permet seulement de lancer %1 en mode de configuration.</translation>
+    </message>
+    <message>
+      <source>For full-featured mode please use another computer</source>
+      <translation type="unfinished">For full-featured mode please use another computer</translation>
     </message>
   </context>
   <context>
@@ -6136,7 +6147,7 @@ to %1</source>
     </message>
     <message>
       <source>UNSUPPORTED FIRMWARE VERSION</source>
-      <translation type="unfinished">UNSUPPORTED FIRMWARE VERSION</translation>
+      <translation>VERSION DU FIRMWARE INCOMPATIBLE</translation>
     </message>
   </context>
   <context>
@@ -8240,7 +8251,7 @@ to %1</source>
     </message>
     <message>
       <source>Selected period cannot be exported for the current camera.</source>
-      <translation type="unfinished">Selected period cannot be exported for the current camera.</translation>
+      <translation>Période sélectionnée ne peut pas être exportée pour la caméra actuelle.</translation>
     </message>
   </context>
   <context>

@@ -78,11 +78,6 @@
       <translation>这些系统都采用了不同的 %1 URL。合并不是允许的。</translation>
     </message>
     <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>云系统只可以与非云合并。系统名称和密码取自云系统。</translation>
-    </message>
-    <message>
       <source>New System</source>
       <translation>新系统</translation>
     </message>
@@ -90,6 +85,10 @@
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
       <translation>发现的系统%1与当前系统不兼容。</translation>
+    </message>
+    <message>
+      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
+      <translation>云系统只可以与非云合并。系统名称和密码取自云系统。</translation>
     </message>
   </context>
   <context>

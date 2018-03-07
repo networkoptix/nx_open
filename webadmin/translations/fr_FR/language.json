@@ -87,6 +87,7 @@
         "maxRecordQueueSizeBytes": "Taille max file d'attente d'enregistrement (octets)",
         "maxRecordQueueSizeElements": "Taille max file d'attente d'enregistrement (éléments)",
         "maxRemoteArchiveSynchronizationThreads": "Threads max de synchronisation d'archives distantes",
+        "maxRtspConnectDurationSeconds": "Secondes de connexion RTSP max",
         "maxSceneItems": "Max éléments de scène (0 signifie par défaut)",
         "proxyConnectTimeoutSec": "Délai de connexion du proxy (secondes)",
         "rtpTimeoutMs": "Délai RTP (millisecondes)",
@@ -175,6 +176,20 @@
         "default": "{{PRODUCT_NAME}} interface web"
     },
     "common": {
+        "voiceCommands": {
+            "search": "find + [text for searchbar]",
+            "pause": "pause",
+            "help": "help | show commands",
+            "collapse all servers": "réduire tous les serveurs",
+            "collapse server": "collapse server + [server name]",
+            "play": "lecture",
+            "clear search": "effacer la recherche",
+            "live": "go to live | show me live",
+            "expand all servers": "développer tous les serveurs",
+            "stop listening": "arrêter l’écoute",
+            "expand server": "expand server + [server name]",
+            "view": "vue + [nom de la caméra]"
+        },
         "systemOffline": "System Hors ligne",
         "cameraLinks": {
             "copyToClipboard": "copier vers Presse-Papier",
@@ -185,9 +200,9 @@
             "transcoding": "Transcodage",
             "copyActiveText": "copié dans le presse-papiers"
         },
-        "searchCamPlaceholder": "recherche",
+        "searchCamPlaceholder": "Recherche",
         "cameraStates": {
-            "noFormat": "Ce navigateur ou le périphérique ne supporte pas la lecture vidéo de cette caméra.",
+            "noFormat": "Ce navigateur ne supporte pas la lecture vidéo de cette caméra.",
             "ieWin10": "S.V.P, utilisez les navigateurs Edge Microsoft ou Google Chrome.",
             "iosVideoTooLarge": "iOS ne supporte pas une vidéo supérieure à fullHD (2MP : 1920 x 1080).",
             "unauthorized": "Authentification requise",
@@ -198,7 +213,13 @@
             "error": "Erreur",
             "offline": "Hors ligne",
             "noData": "Aucune donnée",
-            "flashRequired": "S.V.P.<a href='https://get.adobe.com/flashplayer/' target='_blank'> installer Adobe Flash</a> pour la lecture vidéo à partir de serveurs ARM."
+            "flashRequired": "S.V.P.<a href='https://get.adobe.com/flashplayer/' target='_blank'> installer Adobe Flash</a> pour la lecture vidéo."
+        },
+        "chromeCastWarning": "Chromecast consommer beaucoup de ressources et peut provoquer des problèmes avec votre serveur.",
+        "resolution": {
+            "high": "Élevée",
+            "auto": "Auto",
+            "low": "Basse"
         }
     }
 }

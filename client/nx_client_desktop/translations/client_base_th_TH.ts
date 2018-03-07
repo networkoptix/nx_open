@@ -2335,6 +2335,12 @@ to view more bookmarks</source>
       <source>Edge</source>
       <translation>ขอบ</translation>
     </message>
+    <message numerus="yes">
+      <source>This ID already used on camera %1</source>
+      <translation type="unfinished">
+        <numerusform>This ID already used on camera %1</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnCameraInputBusinessEventWidget</name>
@@ -2448,6 +2454,10 @@ to view more bookmarks</source>
     <message>
       <source>Server</source>
       <translation>เซอร์ฟเวอร์</translation>
+    </message>
+    <message>
+      <source>Logical ID</source>
+      <translation type="unfinished">Logical ID</translation>
     </message>
   </context>
   <context>
@@ -4706,16 +4716,16 @@ to %1</source>
   <context>
     <name>QnPerformanceTest</name>
     <message>
-      <source>For full - featured mode, please use another computer</source>
-      <translation>สำหรับโหมดเต็มรูปแบบโปรดใช้คอมพิวเตอร์เครื่องอื่น</translation>
-    </message>
-    <message>
       <source>%1 can work in configuration mode only</source>
       <translation>%1 สามารถทำงานได้เฉพาะในโหมดกำหนดค่าเท่านั้น</translation>
     </message>
     <message>
       <source>Performance of this computer allows running %1 in configuration mode only.</source>
       <translation>ประสิทธิภาพของคอมพิวเตอร์เครื่องนี้ช่วยให้สามารถใช้งานโหมดการตั้งค่าได้ %1 เท่านั้น</translation>
+    </message>
+    <message>
+      <source>For full-featured mode please use another computer</source>
+      <translation type="unfinished">For full-featured mode please use another computer</translation>
     </message>
   </context>
   <context>

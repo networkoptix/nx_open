@@ -2358,6 +2358,13 @@ to view more bookmarks</source>
       <source>Edge</source>
       <translation>Uç</translation>
     </message>
+    <message numerus="yes">
+      <source>This ID already used on camera %1</source>
+      <translation type="unfinished">
+        <numerusform>This ID already used on camera %1</numerusform>
+        <numerusform>This ID already used on camera %1</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnCameraInputBusinessEventWidget</name>
@@ -2475,6 +2482,10 @@ to view more bookmarks</source>
     <message>
       <source>Server</source>
       <translation>Sunucu</translation>
+    </message>
+    <message>
+      <source>Logical ID</source>
+      <translation type="unfinished">Logical ID</translation>
     </message>
   </context>
   <context>
@@ -4761,16 +4772,16 @@ to %1</source>
   <context>
     <name>QnPerformanceTest</name>
     <message>
-      <source>For full - featured mode, please use another computer</source>
-      <translation>Tüm özellikler için lütfen başka bilgisayar kullanın</translation>
-    </message>
-    <message>
       <source>%1 can work in configuration mode only</source>
       <translation>%1 sadece yapılandırma modunda çalışabilir</translation>
     </message>
     <message>
       <source>Performance of this computer allows running %1 in configuration mode only.</source>
       <translation>Bu Bilgisayarın Performansı %1 'i Yalnızca Yapılandırma Modunda Çalıştırmaya İzin Veriyor.</translation>
+    </message>
+    <message>
+      <source>For full-featured mode please use another computer</source>
+      <translation type="unfinished">For full-featured mode please use another computer</translation>
     </message>
   </context>
   <context>
