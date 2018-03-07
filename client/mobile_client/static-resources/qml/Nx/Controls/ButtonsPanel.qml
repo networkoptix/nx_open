@@ -32,7 +32,6 @@ ListView
 
         PropertyAnimation
         {
-
             duration: 300
             easing.type: Easing.OutQuad
             target: control
@@ -116,5 +115,4 @@ ListView
 
         property bool allowInteractiveState: true
     }
-
 }
