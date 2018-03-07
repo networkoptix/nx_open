@@ -8,6 +8,8 @@
 
 #include <nx/cloud/relaying/statistics.h>
 
+#include "controller/traffic_relay.h"
+
 namespace nx {
 namespace cloud {
 
@@ -19,11 +21,12 @@ struct Statistics
 {
     relaying::Statistics relaying;
     nx::network::server::Statistics http;
+    controller::RelaySessionStatistics relaySessions;
 
     bool operator==(const Statistics& right) const;
 };
 
-#define Statistics_relay_controller_Fields (relaying)(http)
+#define Statistics_relay_controller_Fields (relaying)(http)(relaySessions)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Statistics),

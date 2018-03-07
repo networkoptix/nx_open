@@ -1,5 +1,6 @@
 #include "traffic_relay.h"
 
+#include <nx/fusion/model_functions.h>
 #include <nx/network/aio/aio_service.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
@@ -9,6 +10,13 @@ namespace nx {
 namespace cloud {
 namespace relay {
 namespace controller {
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (RelaySessionStatistics),
+    (json),
+    _controller_Fields)
+
+//-------------------------------------------------------------------------------------------------
 
 namespace {
 static constexpr auto kMaxSessionCountCalculationPeriod = std::chrono::hours(1);

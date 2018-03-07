@@ -5,6 +5,7 @@
 #include <memory>
 #include <string>
 
+#include <nx/fusion/model_functions_fwd.h>
 #include <nx/network/abstract_socket.h>
 #include <nx/network/aio/abstract_async_channel.h>
 #include <nx/network/aio/async_channel_bridge.h>
@@ -34,6 +35,17 @@ struct RelaySessionStatistics
     /** Sessions that were terminated during last hour are counted here. */
     int sessionDurationSecMaxPerLastHour = 0;
 };
+
+#define RelaySessionStatistics_controller_Fields \
+    (currentSessionCount) \
+    (concurrentSessionToSameServerCountMaxPerHour) \
+    (concurrentSessionToSameServerCountAveragePerHour) \
+    (sessionDurationSecAveragePerLastHour) \
+    (sessionDurationSecMaxPerLastHour)
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (RelaySessionStatistics),
+    (json))
 
 /**
  * NOTE: Not thread-safe.
