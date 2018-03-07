@@ -240,7 +240,7 @@ QAudioFormat QnDesktopAudioOnlyDataProvider::getAppropriateAudioFormat(
     {
         if (errorString)
         {
-            *errorString =  tr("Sample format of input device %1 is not supported.")
+            *errorString = tr("Sample format of input device %1 is not supported.")
                 .arg(deviceInfo.deviceName());
         }
         result = QAudioFormat();
