@@ -18,10 +18,10 @@ TRACEBACK_ARTIFACT_TYPE = ArtifactType(name='core-traceback')
 
 
 class ServerFactory(object):
-    def __init__(self, artifact_factory, cloud_host, vm_factory, physical_installation_ctl, mediaserver_deb, ca):
+    def __init__(self, artifact_factory, cloud_host, vm_pool, physical_installation_ctl, mediaserver_deb, ca):
         self._artifact_factory = artifact_factory
         self._cloud_host = cloud_host
-        self._vagrant_vm_factory = vm_factory
+        self._linux_vm_pool = vm_pool
         self._physical_installation_ctl = physical_installation_ctl  # PhysicalInstallationCtl or None
         self._allocated_servers = []
         self._ca = ca
@@ -40,9 +40,9 @@ class ServerFactory(object):
             if config.vm:
                 vm = config.vm
             else:
-                vm = self._vagrant_vm_factory.get(name)
-            vm_host_hostname = vm.host_os_access.hostname
-            api_url = '%s://%s:%d/' % (config.http_schema, vm_host_hostname, vm.config.rest_api_forwarded_port)
+                vm = self._linux_vm_pool.get(name)
+            hostname, port = vm.ports['tcp', 7001]
+            api_url = '%s://%s:%d/' % (config.http_schema, hostname, port)
             server = Server(
                 name,
                 UpstartService(vm.os_access, self._mediaserver_deb.customization.service),

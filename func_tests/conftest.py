@@ -17,11 +17,13 @@ from test_utils.mediaserverdeb import MediaserverDeb
 from test_utils.merging import merge_system
 from test_utils.metrics_saver import MetricsSaver
 from test_utils.networking import setup_networks
+from test_utils.os_access import LocalAccess
+from test_utils.serialize import load
 from test_utils.server_factory import ServerFactory
 from test_utils.server_physical_host import PhysicalInstallationCtl
+from test_utils.ssh.access_manager import SSHAccessManager
 from test_utils.ssh.config import SSHConfig
-from test_utils.vagrant_vm import VagrantVMFactory
-from test_utils.vagrant_vm_config import VagrantVMConfigFactory
+from test_utils.vm import Pool, Registry, VMConfiguration, VirtualBox
 
 JUNK_SHOP_PLUGIN_NAME = 'junk-shop-db-capture'
 
@@ -29,7 +31,6 @@ DEFAULT_CLOUD_GROUP = 'test'
 
 DEFAULT_WORK_DIR = '/tmp/funtest'
 DEFAULT_MEDIASERVER_DIST_NAME = 'mediaserver.deb'  # in bin dir
-DEFAULT_VIRTUALBOX_NAME_PREFIX = 'vagrant_func_tests-'  # Default Vagrant's prefix is "vagrant_".
 DEFAULT_REST_API_FORWARDED_PORT_BASE = 17000
 
 DEFAULT_VM_HOST_USER = 'root'
@@ -55,7 +56,7 @@ def pytest_addoption(parser):
     parser.addoption('--bin-dir', type=Path, help=(
         'directory with binary files for tests: '
         'debian distributive and media sample are expected there'))
-    parser.addoption('--customization', default='default', help=(
+    parser.addoption('--customization', help=(
         "Manufacturer name or 'default'. Optional. Checked against customization from .deb file."))
     parser.addoption('--mediaserver-dist-path', type=Path, default=DEFAULT_MEDIASERVER_DIST_NAME, help=(
         'mediaserver package, relative to bin dir [%s]' % DEFAULT_MEDIASERVER_DIST_NAME))
@@ -63,8 +64,8 @@ def pytest_addoption(parser):
         'media sample file path, default is %s at binary directory' % MEDIA_SAMPLE_PATH))
     parser.addoption('--media-stream-path', type=Path, default=MEDIA_STREAM_PATH, help=(
         'media sample test camera stream, relative to bin dir [%s]' % MEDIA_STREAM_PATH))
-    parser.addoption('--vm-name-prefix', default=DEFAULT_VIRTUALBOX_NAME_PREFIX, help=(
-        'prefix for virtualenv machine names'))
+    parser.addoption('--vm-name-prefix', help=(
+        'Deprecated. Left for backward compatibility. Ignored.'))
     parser.addoption('--vm-port-base', type=int, default=DEFAULT_REST_API_FORWARDED_PORT_BASE, help=(
         'base REST API port forwarded to host'))
     parser.addoption('--vm-address', type=IPAddress, help=(
@@ -224,20 +225,32 @@ def cloud_host(request, mediaserver_deb):
 
 
 @pytest.fixture(scope='session')
-def session_vm_factory(request, vm_host, ssh_config, bin_dir, work_dir):
-    """Create factory once per session, don't release VMs"""
-    config_factory = VagrantVMConfigFactory()
-    factory = VagrantVMFactory(request.config.cache, ssh_config, vm_host, bin_dir, work_dir, config_factory)
-    if request.config.getoption('clean'):
-        factory.destroy_all()
-    return factory
+def configuration():
+    return load(Path(__file__).with_name('configuration.yaml').read_text())
 
 
 @pytest.fixture()
-def vm_factory(session_vm_factory):
-    """Return same factory by release allocated VMs after each test"""
-    yield session_vm_factory
-    session_vm_factory.release_all_vms()
+def vm_pools(request, configuration, ssh_config):
+    # All objects here are initialized quickly.
+    # After pool has been closed, it's possible to reuse it, but, for simplicity, it's recreated.
+    host_os_access = LocalAccess()
+    registry = Registry(host_os_access, host_os_access.expand_path(configuration['vm_host']['registry']), 100)
+    access_manager = SSHAccessManager(ssh_config, 'root', Path(configuration['ssh']['private_key']).expanduser())
+    hypervisor = VirtualBox(host_os_access, configuration['vm_host']['address'])
+    pools = {
+        vm_type: Pool(VMConfiguration(vm_configuration_raw), registry, hypervisor, access_manager)
+        for vm_type, vm_configuration_raw
+        in configuration['vm_types'].items()}
+    if request.config.getoption('--clean'):
+        pools['linux'].destroy()
+    yield pools
+    for pool in pools.values():
+        pool.close()
+
+
+@pytest.fixture()
+def linux_vm_pool(vm_pools):
+    return vm_pools['linux']
 
 
 @pytest.fixture(scope='session')
@@ -253,11 +266,11 @@ def physical_installation_ctl(test_config, ca, mediaserver_deb):
 
 
 @pytest.fixture()
-def server_factory(mediaserver_deb, ca, artifact_factory, cloud_host, vm_factory, physical_installation_ctl):
+def server_factory(mediaserver_deb, ca, artifact_factory, cloud_host, vm_pools, physical_installation_ctl):
     server_factory = ServerFactory(
         artifact_factory,
         cloud_host,
-        vm_factory,
+        vm_pools['linux'],
         physical_installation_ctl,
         mediaserver_deb,
         ca,
@@ -312,9 +325,9 @@ def sample_media_file(request, bin_dir):
 
 
 @pytest.fixture()
-def network(vm_factory, server_factory, layout_file):
+def network(vm_pools, server_factory, layout_file):
     layout = get_layout(layout_file)
-    vms = setup_networks(vm_factory, layout.networks)
+    vms = setup_networks(vm_pools, layout.networks)
     servers = merge_system(server_factory, layout.mergers)
     return vms, servers
 

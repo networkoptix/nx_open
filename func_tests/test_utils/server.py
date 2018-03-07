@@ -24,7 +24,6 @@ from .media_stream import open_media_stream
 from .os_access import LocalAccess
 from .rest_api import HttpError, REST_API_PASSWORD, REST_API_USER
 from .utils import datetime_utc_now, datetime_utc_to_timestamp, is_list_inst
-from .vagrant_vm_config import MEDIASERVER_LISTEN_PORT
 
 DEFAULT_HTTP_SCHEMA = 'http'
 
@@ -105,7 +104,7 @@ class Server(object):
         self.service = service
         self.machine = machine
         self.rest_api = api
-        self.internal_ip_port = port or MEDIASERVER_LISTEN_PORT
+        self.internal_ip_port = port or 7001
 
     def __repr__(self):
         return '<Server at %s>' % self.rest_api.url

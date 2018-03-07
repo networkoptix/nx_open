@@ -11,7 +11,7 @@ def _get_vm_properties(vm_name):
 
 
 class VirtualBoxNodeNetworking(object):
-    _AVAILABLE_SLOTS = list(range(2, 8 + 1))
+    _AVAILABLE_SLOTS = [2, 3, 4]
 
     def __init__(self, vm_name):
         self._vm_name = vm_name
@@ -20,8 +20,12 @@ class VirtualBoxNodeNetworking(object):
         self.available_mac_addresses = [
             EUI(properties['macaddress{}'.format(slot)])
             for slot in self._AVAILABLE_SLOTS]
-        host_network = IPNetwork(properties['natnet1'])
-        self.host_ip_address = host_network.network + 2  # https://www.virtualbox.org/manual/ch09.html#changenat.
+        # See: https://www.virtualbox.org/manual/ch09.html#changenat
+        if properties['natnet1'] == 'nat':
+            host_network = IPNetwork('10.0.2.0/24')
+        else:
+            host_network = IPNetwork(properties['natnet1'])
+        self.host_ip_address = host_network.network + 2
 
     def unplug_all(self):
         for slot in self._AVAILABLE_SLOTS:
