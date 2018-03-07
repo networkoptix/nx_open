@@ -10,6 +10,7 @@
 #include <nx/utils/string.h>
 #include <nx/utils/test_support/test_pipeline.h>
 #include <nx/utils/thread/sync_queue.h>
+#include <nx/utils/time.h>
 
 #include <nx/cloud/relay/controller/traffic_relay.h>
 
@@ -177,6 +178,12 @@ TEST_F(TrafficRelay, relaying_is_stopped_with_either_connection_closure)
 class TrafficRelayStatistics:
     public TrafficRelay
 {
+public:
+    TrafficRelayStatistics():
+        m_timeShift(nx::utils::test::ClockType::steady)
+    {
+    }
+
 protected:
     void createMultipleSessions()
     {
@@ -197,6 +204,12 @@ protected:
         }
     }
 
+    void waitForSomeTime()
+    {
+        m_timeShift.applyRelativeShift(std::chrono::minutes(1));
+        m_minExpectedSessionDuration += std::chrono::minutes(1);
+    }
+
     void terminateAllSessions()
     {
         const int sessionCount = relaySessions().size();
@@ -209,9 +222,14 @@ protected:
 
     void assertStatisticsProvidedIsCorrect()
     {
+        using namespace std::chrono;
+
         const auto statistics = trafficRelay().getStatistics();
 
+        // Current session count.
         ASSERT_EQ(relaySessions().size(), (std::size_t)statistics.currentSessionCount);
+
+        // Max session count per server.
         const auto maxSessionCountPerServer = std::max_element(
             m_totalSessionCountByServer.begin(), m_totalSessionCountByServer.end(),
             [](const auto& left, const auto& right)
@@ -221,12 +239,19 @@ protected:
         ASSERT_EQ(
             maxSessionCountPerServer,
             statistics.concurrentSessionToSameServerCountMaxPerHour);
+
+        // sessionDurationSecMaxPerLastHour.
+        ASSERT_GE(
+            statistics.sessionDurationSecMaxPerLastHour,
+            duration_cast<seconds>(m_minExpectedSessionDuration).count());
     }
 
 private:
     int m_totalSessions = 0;
     std::vector<std::string> m_serverIds;
     std::map<std::string, int> m_totalSessionCountByServer;
+    nx::utils::test::ScopedTimeShift m_timeShift;
+    std::chrono::seconds m_minExpectedSessionDuration;
 
     void createMultipleSessions(const std::string& serverId, int count)
     {
@@ -256,6 +281,15 @@ TEST_F(TrafficRelayStatistics, closed_sessions_are_reflected_in_statistics)
 TEST_F(TrafficRelayStatistics, max_session_count_per_server)
 {
     createMultipleSessionsToDifferentServers();
+    terminateAllSessions();
+
+    assertStatisticsProvidedIsCorrect();
+}
+
+TEST_F(TrafficRelayStatistics, max_session_duration)
+{
+    createMultipleSessions();
+    waitForSomeTime();
     terminateAllSessions();
 
     assertStatisticsProvidedIsCorrect();

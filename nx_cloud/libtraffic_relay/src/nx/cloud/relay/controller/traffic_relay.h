@@ -56,7 +56,9 @@ public:
     TrafficRelayStatisticsCollector();
 
     void onSessionStarted(const std::string& id);
-    void onSessionStopped(const std::string& id);
+    void onSessionStopped(
+        const std::string& id,
+        const std::chrono::milliseconds duration);
 
     RelaySessionStatistics getStatistics() const;
 
@@ -64,6 +66,8 @@ private:
     int m_currentSessionCount = 0;
     std::map<std::string, int> m_serverIdToCurrentSessionCount;
     nx::utils::statistics::MaxValuePerPeriodCalculator<int> m_maxSessionCountPerPeriodCalculator;
+    nx::utils::statistics::MaxValuePerPeriodCalculator<std::chrono::seconds>
+        m_maxSessionDurationCalculator;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -98,6 +102,7 @@ private:
         std::unique_ptr<network::aio::AsyncChannelBridge> channelBridge;
         std::string clientPeerId;
         std::string serverPeerId;
+        std::chrono::steady_clock::time_point startTime;
     };
 
     std::list<RelaySession> m_relaySessions;
