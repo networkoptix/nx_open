@@ -211,6 +211,7 @@
     },
     {
       "name": "Cloud maintenance page (503)",
+      "old_name": "Service unavailable page (503)",
       "file_path": "static/503.html",
       "description": "This page is visible if Cloud service is unavailable",
       "url": "/503.html",
