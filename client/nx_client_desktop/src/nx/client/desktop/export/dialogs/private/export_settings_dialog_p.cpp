@@ -281,7 +281,7 @@ void ExportSettingsDialog::Private::setMediaResource(const QnMediaResourcePtr& m
     m_availableTranscodingSettings = settings;
     m_exportMediaSettings.mediaResource = media;
     if (!media->hasVideo())
-        m_exportMediaPersistentSettings.hasNoVideo = true;
+        m_exportMediaPersistentSettings.hasVideo = false;
 
     refreshMediaPreview();
     updateOverlays();

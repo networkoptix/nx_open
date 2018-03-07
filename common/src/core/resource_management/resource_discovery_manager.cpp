@@ -632,13 +632,13 @@ QnManualCameraInfo QnResourceDiscoveryManager::manualCameraInfo(const QnSecurity
     return info;
 }
 
-int QnResourceDiscoveryManager::registerManualCameras(const std::vector<QnManualCameraInfo>& cameras)
+QSet<QString> QnResourceDiscoveryManager::registerManualCameras(const std::vector<QnManualCameraInfo>& cameras)
 {
     QnMutexLocker lock(&m_searchersListMutex);
-    int addedCount = 0;
+    QSet<QString> registeredUniqueIds;
     for (const auto& camera: cameras)
     {
-        // This is important to use reverse order of searchers as ONVIF resource type fits both 
+        // This is important to use reverse order of searchers as ONVIF resource type fits both
         // ONVIF and FLEX searchers, while ONVIF is always last one.
         for (auto searcherIterator = m_searchersList.rbegin();
             searcherIterator != m_searchersList.rend();
@@ -653,11 +653,11 @@ int QnResourceDiscoveryManager::registerManualCameras(const std::vector<QnManual
 
             const auto iterator = m_manualCameraByUniqueId.insert(camera.uniqueId, camera);
             iterator.value().searcher = searcher;
-            ++addedCount;
+            registeredUniqueIds << camera.uniqueId;
             break;
         }
     }
-    return addedCount;
+    return registeredUniqueIds;
 }
 
 void QnResourceDiscoveryManager::at_resourceDeleted(const QnResourcePtr& resource)

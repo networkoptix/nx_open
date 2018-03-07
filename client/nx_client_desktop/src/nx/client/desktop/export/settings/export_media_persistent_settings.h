@@ -111,7 +111,7 @@ struct ExportMediaPersistentSettings
     bool applyFilters = false;
     QString fileFormat;
 
-    bool hasNoVideo = false;
+    bool hasVideo = true;
 
     int dimension = 1080; //< Smaller dimension of exported resolution.
 

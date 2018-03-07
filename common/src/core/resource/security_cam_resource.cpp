@@ -1267,11 +1267,6 @@ bool QnSecurityCamResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &s
         return false;
 
     bool result = base_type::mergeResourcesIfNeeded(source);
-    if (getAuth() != camera->getAuth() && camera->isManuallyAdded())
-    {
-        setAuth(source->getAuth());
-        result = true;
-    }
 
     if (getGroupId() != camera->getGroupId())
     {

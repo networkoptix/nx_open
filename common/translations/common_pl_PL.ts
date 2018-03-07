@@ -78,11 +78,6 @@
       <translation>Te systemy są zbudowane z różnych adresów URL %1. Operacja złączenia nie jest dozwolona.</translation>
     </message>
     <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>System w chmurze można złączyć tylko z systemem spoza chmury. Nazwa systemu i hasło zostaną pobrane z systemu w chmurze.</translation>
-    </message>
-    <message>
       <source>New System</source>
       <translation>Nowy system</translation>
     </message>
@@ -90,6 +85,10 @@
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
       <translation>Wykryty system %1 jest niezgodny z bieżącym systemem.</translation>
+    </message>
+    <message>
+      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
+      <translation>System w chmurze można złączyć tylko z systemem spoza chmury. Nazwa systemu i hasło zostaną pobrane z systemu w chmurze.</translation>
     </message>
   </context>
   <context>
