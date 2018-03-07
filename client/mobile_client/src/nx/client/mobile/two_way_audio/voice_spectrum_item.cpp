@@ -336,8 +336,8 @@ void VoiceSpectrumItem::updateNodeGeometry(QSGGeometryNode* node)
     if (!geometry || m_generator->setWidth(width()))
     {
         const auto linesCount = m_generator->linesCount();
-        geometry = new QSGGeometry(QSGGeometry::defaultAttributes_Point2D(),  linesCount * 2);
-        geometry->setDrawingMode(GL_LINES);
+        geometry = new QSGGeometry(QSGGeometry::defaultAttributes_Point2D(),  linesCount * 6);
+        geometry->setDrawingMode(GL_TRIANGLES);
         geometry->setLineWidth(currentLineWidth);
         clearGeometryData(geometry);
 
@@ -358,7 +358,7 @@ void VoiceSpectrumItem::updateNodeGeometry(QSGGeometryNode* node)
     m_generator->setHeight(height());
 
     const auto data = m_generator->getUpdatedData();
-    if (geometry->vertexCount() != data.count() * 2)
+    if (geometry->vertexCount() != data.count() * 6)
     {
         clearGeometryData(geometry);
         return;
@@ -369,13 +369,22 @@ void VoiceSpectrumItem::updateNodeGeometry(QSGGeometryNode* node)
     auto points = geometry->vertexDataAsPoint2D();
     for (int i = 0; i < data.count(); ++i)
     {
-        const int x = lineBlockWidth * i;
-        const int lineHeight = qMax<int>(2, data[i] * itemHeight);
-        const int top = (itemHeight - lineHeight) / 2;
-        const int bottom = top + lineHeight;
-        points[0].set(x, top);
-        points[1].set(x, bottom);
-        points += 2;
+        const float lineHeight = qMax<int>(2, data[i] * itemHeight);
+
+        const float left = lineBlockWidth * i;
+        const float top = (itemHeight - lineHeight) / 2;
+        const float bottom = top + lineHeight;
+        const float right = left + currentLineWidth;
+
+        points[0].set(left, top);
+        points[1].set(left, bottom);
+        points[2].set(right, bottom);
+
+        points[3].set(left, top);
+        points[4].set(right, bottom);
+        points[5].set(right, top);
+
+        points += 6;
     }
 }
 
