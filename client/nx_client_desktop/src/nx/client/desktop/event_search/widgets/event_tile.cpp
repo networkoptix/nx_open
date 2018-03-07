@@ -65,6 +65,7 @@ EventTile::EventTile(QWidget* parent):
     ui->wideHolder->setHidden(true);
     ui->footerLabel->setHidden(true);
 
+    ui->previewWidget->setAutoScaleDown(false);
     ui->previewWidget->setCropMode(AsyncImageWidget::CropMode::notHovered);
 
     ui->nameLabel->setForegroundRole(QPalette::Light);
