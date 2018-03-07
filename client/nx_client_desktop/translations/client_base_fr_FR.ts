@@ -855,19 +855,19 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>Wearable Camera...</source>
-      <translation type="unfinished">Wearable Camera...</translation>
+      <translation>Caméra portable ...</translation>
     </message>
     <message>
       <source>New Wearable Camera...</source>
-      <translation type="unfinished">New Wearable Camera...</translation>
+      <translation>Nouvelle caméra portable ...</translation>
     </message>
     <message>
       <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
+      <translation>Envoyer Fichier...</translation>
     </message>
     <message>
       <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
+      <translation>Envoyer Dossier...</translation>
     </message>
     <message>
       <source>Start Analytics...</source>
@@ -2743,11 +2743,11 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>Cannot edit properties for several wearable and non-wearable cameras.</source>
-      <translation type="unfinished">Cannot edit properties for several wearable and non-wearable cameras.</translation>
+      <translation>Ne peut pas modifier les propriétés de plusieurs caméras portables et non-portable.</translation>
     </message>
     <message>
       <source>Cannot edit properties for several wearable cameras.</source>
-      <translation type="unfinished">Cannot edit properties for several wearable cameras.</translation>
+      <translation>Ne peut pas modifier les propriétés de plusieurs caméras portables.</translation>
     </message>
   </context>
   <context>
@@ -4683,11 +4683,11 @@ to %1</source>
     <name>QnNewWearableCameraDialog</name>
     <message>
       <source>Wearable Camera</source>
-      <translation type="unfinished">Wearable Camera</translation>
+      <translation>Caméra portable</translation>
     </message>
     <message>
       <source>Wearable Camera %1</source>
-      <translation type="unfinished">Wearable Camera %1</translation>
+      <translation>Caméra portable %1</translation>
     </message>
     <message>
       <source>Name</source>
@@ -6161,7 +6161,7 @@ to %1</source>
     </message>
     <message>
       <source>NO LIVE STREAM</source>
-      <translation type="unfinished">NO LIVE STREAM</translation>
+      <translation>AUCUN FLUX EN DIRECT</translation>
     </message>
     <message>
       <source>TOO MANY CONNECTIONS</source>
@@ -6324,7 +6324,7 @@ to %1</source>
     </message>
     <message>
       <source>Recording was enabled on the USB storage</source>
-      <translation type="unfinished">Recording was enabled on the USB storage</translation>
+      <translation>Enregistrement a été activé sur le stockage USB</translation>
     </message>
   </context>
   <context>
@@ -7199,34 +7199,34 @@ to %1</source>
     <name>QnWearableProgressWidget</name>
     <message>
       <source>Uploading %1... %2	%p%</source>
-      <translation type="unfinished">Uploading %1... %2	%p%</translation>
+      <translation>Envoie %1... %2	%p%</translation>
     </message>
     <message>
       <source>Stop uploading?</source>
-      <translation type="unfinished">Stop uploading?</translation>
+      <translation>Arrêter l'envoie?</translation>
     </message>
     <message>
       <source>Already uploaded files will be kept.</source>
-      <translation type="unfinished">Already uploaded files will be kept.</translation>
+      <translation>Fichiers déjà envoyés seront conservés.</translation>
     </message>
     <message>
       <source>Finalizing %1... %2	%p%</source>
-      <translation type="unfinished">Finalizing %1... %2	%p%</translation>
+      <translation>Finalisation %1... %2	%p%</translation>
     </message>
     <message>
       <source>(%1 of %2)</source>
-      <translation type="unfinished">(%1 of %2)</translation>
+      <translation>(%1 sur %2)</translation>
     </message>
   </context>
   <context>
     <name>QnWearableUploadWidget</name>
     <message>
       <source>User &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation type="unfinished">User &quot;%1&quot; is currently uploading footage to this camera.</translation>
+      <translation>Usager &quot;%1&quot; est en train d'envoyer des vidéos sur cette caméra.</translation>
     </message>
     <message>
       <source>Another user is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Another user is currently uploading footage to this camera.</translation>
+      <translation>Un autre usager est en train d'envoyer des vidéos sur cette caméra.</translation>
     </message>
   </context>
   <context>
@@ -7616,117 +7616,117 @@ to %1</source>
     </message>
     <message>
       <source>Video (%1)</source>
-      <translation type="unfinished">Video (%1)</translation>
+      <translation>Vidéo (%1)</translation>
     </message>
     <message>
       <source>Open Wearable Camera Recordings...</source>
-      <translation type="unfinished">Open Wearable Camera Recordings...</translation>
+      <translation>Ouvrir les enregistrements de caméra portable ...</translation>
     </message>
     <message>
       <source>Only video files with correct timestamp are supported.</source>
-      <translation type="unfinished">Only video files with correct timestamp are supported.</translation>
+      <translation>Seuls les fichiers vidéo avec horodatage correct sont pris en charge.</translation>
     </message>
     <message>
       <source>Not enough space on server storage</source>
-      <translation type="unfinished">Not enough space on server storage</translation>
+      <translation>Espace insuffisant sur le stockage du serveur</translation>
     </message>
     <message>
       <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</translation>
+      <translation>Ne peut pas démarrer l'envoie car usager &quot;%1&quot; est en train d'envoyer des vidéos sur cette caméra.</translation>
     </message>
     <message>
       <source>Could not start upload as another user is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Could not start upload as another user is currently uploading footage to this camera.</translation>
+      <translation>Ne peut pas démarrer l'envoie car un autre usager est en train d'envoyer des vidéos sur cette caméra.</translation>
     </message>
     <message>
       <source>Failed to add wearable camera</source>
-      <translation type="unfinished">Failed to add wearable camera</translation>
+      <translation>Échec d'ajout de caméra portable</translation>
     </message>
     <message>
       <source>No video files found in selected folder</source>
-      <translation type="unfinished">No video files found in selected folder</translation>
+      <translation>Aucun fichier vidéo trouvé dans le dossier sélectionné</translation>
     </message>
     <message numerus="yes">
       <source>Selected file formats are not supported</source>
-      <translation type="unfinished">
-        <numerusform>Selected file formats are not supported</numerusform>
-        <numerusform>Selected file formats are not supported</numerusform>
+      <translation>
+        <numerusform>Formats de fichier sélectionnés ne sont pas pris en charge</numerusform>
+        <numerusform>Formats de fichier sélectionnés ne sont pas pris en charge</numerusform>
       </translation>
     </message>
     <message>
       <source>Use .MKV, .AVI, .MP4 or other video files.</source>
-      <translation type="unfinished">Use .MKV, .AVI, .MP4 or other video files.</translation>
+      <translation>Utiliser .MKV, .AVI, .MP4 ou autres fichiers vidéo.</translation>
     </message>
     <message numerus="yes">
       <source>Selected files do not have timestamps</source>
-      <translation type="unfinished">
-        <numerusform>Selected files do not have timestamps</numerusform>
-        <numerusform>Selected files do not have timestamps</numerusform>
+      <translation>
+        <numerusform>Fichiers sélectionnés n'ont pas d'horodatage</numerusform>
+        <numerusform>Fichiers sélectionnés n'ont pas d'horodatage</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos are already being uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+      <translation>
+        <numerusform>Fichiers sélectionnés couvrent les périodes pour lesquelles des vidéos sont en train d'envoyer</numerusform>
+        <numerusform>Fichiers sélectionnés couvrent les périodes pour lesquelles des vidéos sont en train d'envoyer</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Wearable Camera.</source>
-      <translation type="unfinished">
-        <numerusform>You can upload these files to a different instance of a Wearable Camera.</numerusform>
-        <numerusform>You can upload these files to a different instance of a Wearable Camera.</numerusform>
+      <translation>
+        <numerusform>Vous pouvez envoyer ces fichiers sur une instance différente d'une caméra portable.</numerusform>
+        <numerusform>Vous pouvez envoyer ces fichiers sur une instance différente d'une caméra portable.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos have already been uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+      <translation>
+        <numerusform>Fichiers sélectionnés couvrent les périodes pour lesquelles des vidéos sont déjà envoyer</numerusform>
+        <numerusform>Fichiers sélectionnés couvrent les périodes pour lesquelles des vidéos sont déjà envoyer</numerusform>
       </translation>
     </message>
     <message>
       <source>Selected files will not be uploaded</source>
-      <translation type="unfinished">Selected files will not be uploaded</translation>
+      <translation>Fichiers sélectionnés ne seront pas envoyés</translation>
     </message>
     <message>
       <source>Some files will not be uploaded</source>
-      <translation type="unfinished">Some files will not be uploaded</translation>
+      <translation>Certain fichiers ne seront pas envoyés</translation>
     </message>
     <message>
       <source>No new files to upload in selected folder</source>
-      <translation type="unfinished">No new files to upload in selected folder</translation>
+      <translation>Aucun nouveau fichier à envoyer dans le dossier sélectionné</translation>
     </message>
     <message numerus="yes">
       <source>Files size - %2</source>
-      <translation type="unfinished">
-        <numerusform>Files size - %2</numerusform>
-        <numerusform>Files size - %2</numerusform>
+      <translation>
+        <numerusform>Taille fichiers - %2</numerusform>
+        <numerusform>Taille fichiers - %2</numerusform>
       </translation>
     </message>
     <message>
       <source>Free space - %2</source>
-      <translation type="unfinished">Free space - %2</translation>
+      <translation>Espace libre - %2</translation>
     </message>
     <message>
       <source>%1 - has unsupported format.</source>
-      <translation type="unfinished">%1 - has unsupported format.</translation>
+      <translation>%1 - a un format non supporté.</translation>
     </message>
     <message>
       <source>%1 - does not have timestamp.</source>
-      <translation type="unfinished">%1 - does not have timestamp.</translation>
+      <translation>%1 - n'a pas d'horodatage.</translation>
     </message>
     <message>
       <source>%1 - covers period for which video has already been uploaded.</source>
-      <translation type="unfinished">%1 - covers period for which video has already been uploaded.</translation>
+      <translation>%1 - couvre la période pour laquelle la vidéo a déjà été envoyer.</translation>
     </message>
     <message>
       <source>%1 - covers period for which video is being uploaded.</source>
-      <translation type="unfinished">%1 - covers period for which video is being uploaded.</translation>
+      <translation>%1 - couvre la période pour laquelle la vidéo est envoyer.</translation>
     </message>
     <message>
       <source>%1 - does not fit on server storage.</source>
-      <translation type="unfinished">%1 - does not fit on server storage.</translation>
+      <translation>%1 - ne rentre pas sur le serveur de stockage.</translation>
     </message>
   </context>
   <context>
@@ -7919,7 +7919,7 @@ to %1</source>
     </message>
     <message>
       <source>Stop uploading?</source>
-      <translation type="unfinished">Stop uploading?</translation>
+      <translation>Arrêter l'envoie?</translation>
     </message>
     <message>
       <source>Stop</source>
@@ -7927,9 +7927,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Some video file(s) are still being uploaded to %n wearable cameras:</source>
-      <translation type="unfinished">
-        <numerusform>Some video file(s) are still being uploaded to %n wearable cameras:</numerusform>
-        <numerusform>Some video file(s) are still being uploaded to %n wearable cameras:</numerusform>
+      <translation>
+        <numerusform>Certains fichiers vidéo sont encore en envoie sur %n caméras portables:</numerusform>
+        <numerusform>Certains fichiers vidéo sont encore en envoie sur %n caméras portables:</numerusform>
       </translation>
     </message>
   </context>
@@ -8179,34 +8179,34 @@ to %1</source>
     <name>nx::client::desktop::UploadWorker</name>
     <message>
       <source>Could not open file &quot;%1&quot;</source>
-      <translation type="unfinished">Could not open file &quot;%1&quot;</translation>
+      <translation>Impossible d'ouvrir le fichier &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Could not calculate md5 for file &quot;%1&quot;</source>
-      <translation type="unfinished">Could not calculate md5 for file &quot;%1&quot;</translation>
+      <translation>Impossible de calculer md5 pour le fichier &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Could not create upload on the server side</source>
-      <translation type="unfinished">Could not create upload on the server side</translation>
+      <translation>Impossible de créer l'envoie côté serveur</translation>
     </message>
     <message>
       <source>Could not upload file chunk to the server</source>
-      <translation type="unfinished">Could not upload file chunk to the server</translation>
+      <translation>Impossible d"envoyer le fragment de fichier sur le serveur</translation>
     </message>
     <message>
       <source>Could not check uploaded file on the server</source>
-      <translation type="unfinished">Could not check uploaded file on the server</translation>
+      <translation>Impossible de vérifier le fichier envoyer sur le serveur</translation>
     </message>
     <message>
       <source>File was corrupted while being uploaded to the server</source>
-      <translation type="unfinished">File was corrupted while being uploaded to the server</translation>
+      <translation>Fichier a été corrompu pendant son envoie sur le serveur</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::WearableWorker</name>
     <message>
       <source>Failed to send request to the server.</source>
-      <translation type="unfinished">Failed to send request to the server.</translation>
+      <translation>Impossible d'envoyer la requête au serveur.</translation>
     </message>
   </context>
   <context>
@@ -8803,7 +8803,7 @@ to %1</source>
     </message>
     <message>
       <source>Wearable Cameras cannot be moved between servers</source>
-      <translation type="unfinished">Wearable Cameras cannot be moved between servers</translation>
+      <translation>Caméras portables ne peuvent pas être déplacées entre les serveurs</translation>
     </message>
     <message>
       <source>Failed to change password</source>
