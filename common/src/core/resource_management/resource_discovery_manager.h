@@ -120,7 +120,7 @@ public:
     void setReady(bool ready);
 
     /** Returns number of cameras that were sucessfully added. */
-    int registerManualCameras(const std::vector<QnManualCameraInfo>& cameras);
+    QSet<QString> registerManualCameras(const std::vector<QnManualCameraInfo>& cameras);
     bool isManuallyAdded(const QnSecurityCamResourcePtr& camera) const;
     QnManualCameraInfo manualCameraInfo(const QnSecurityCamResourcePtr& camera);
 
