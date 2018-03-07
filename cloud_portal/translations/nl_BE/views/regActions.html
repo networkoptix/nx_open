@@ -1,7 +1,7 @@
 <ng-include ng-if="!register.success && !registerSuccess && session.fromClient" src="$root.C.viewsDir + 'static/register-intro.html'"></ng-include>
 <div class="container auth-hidden">
     <h1 class="process-success" ng-if="(register.success || registerSuccess) && !activated">
-        Account is created. <br>Confirmation message is sent to <br>{{account.email}}
+        Account is aangemaakt. <br>Confirmation message is sent to <br>{{account.email}}
     </h1>
 
     <h1 class="process-success" ng-if="(register.success || registerSuccess) && activated">
@@ -9,7 +9,7 @@
     </h1>
 
     <form name="registerForm" class="form-horizontal" ng-if="!register.success && !registerSuccess" ng-init="setRegisterForm(this)" novalidate autocomplete="off">
-        <h1 ng-if="!session.fromClient">Accounts aanmaken</h1>
+        <h1 ng-if="!session.fromClient">Account aanmaken</h1>
 
         <!-- special hack to prevent autocompletion -->
         <input type="text" style="display:none">
@@ -24,7 +24,7 @@
  name="firstName" autocomplete="off" autofocus>
             </div>
             <div class="col-sm-4">
-                <span class="help-block" ng-if="registerForm.firstName.$touched && registerForm.firstName.$error.required">Voornaam is verplicht.</span>
+                <span class="help-block" ng-if="registerForm.firstName.$touched && registerForm.firstName.$error.required">Voornaam is verplicht</span>
             </div>
         </div>
         <div class="form-group" validate-field>
@@ -35,7 +35,7 @@
  name="lastName" autocomplete="off">
             </div>
             <div class="col-sm-4">
-                <span class="help-block" ng-if="registerForm.lastName.$touched && registerForm.lastName.$error.required">Achternaam is verplicht.</span>
+                <span class="help-block" ng-if="registerForm.lastName.$touched && registerForm.lastName.$error.required">Achternaam is verplicht</span>
             </div>
         </div>
         <div class="form-group" validate-field>
@@ -49,11 +49,11 @@
                        class="form-control" ng-model="account.email" readonly>
             </div>
             <div class="col-sm-4">
-                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">E-mail is vereist.</span></div>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">E-mail is vereist</span></div>
 
-                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">Gelieve een geldig e-mailadres in te vullen.</span></div>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">Gelieve een geldig e-mailadres in te vullen</span></div>
 
-                <div><span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">Deze e-mail is al geregistreerd in {{PRODUCT_NAME}}.</span></div>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">Deze e-mail is al geregistreerd in {{PRODUCT_NAME}}</span></div>
             </div>
         </div>
         <password-input ng-model="account.password" id="'registerPassword'" label="$root.L.regActions.passwordLabel"></password-input>
