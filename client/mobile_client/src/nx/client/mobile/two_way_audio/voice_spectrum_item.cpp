@@ -369,7 +369,7 @@ void VoiceSpectrumItem::updateNodeGeometry(QSGGeometryNode* node)
     auto points = geometry->vertexDataAsPoint2D();
     for (int i = 0; i < data.count(); ++i)
     {
-        const float lineHeight = qMax<int>(2, data[i] * itemHeight);
+        const float lineHeight = qMax<float>(2, data[i] * itemHeight);
 
         const float left = lineBlockWidth * i;
         const float top = (itemHeight - lineHeight) / 2;
