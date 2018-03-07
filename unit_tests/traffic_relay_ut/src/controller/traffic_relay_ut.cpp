@@ -199,7 +199,7 @@ protected:
 
     void terminateAllSessions()
     {
-        const auto sessionCount = relaySessions().size();
+        const int sessionCount = relaySessions().size();
         for (int i = 0; i < sessionCount; ++i)
         {
             whenEitherSocketIsClosed();

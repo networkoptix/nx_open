@@ -98,10 +98,10 @@ void TopValuePerPeriodCalculator<T, Comp>::removeExpiredStatistics()
 //-------------------------------------------------------------------------------------------------
 
 template<typename T> using MaxValuePerPeriodCalculator =
-    typename TopValuePerPeriodCalculator<T, std::greater<T>>;
+    TopValuePerPeriodCalculator<T, typename std::greater<T>>;
 
 template<typename T> using MinValuePerPeriodCalculator =
-    typename TopValuePerPeriodCalculator<T, std::less<T>>;
+    TopValuePerPeriodCalculator<T, typename std::less<T>>;
 
 } // namespace statistics
 } // namespace utils
