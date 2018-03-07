@@ -6,7 +6,7 @@ Suite Teardown    Close All Browsers
 *** Variables ***
 ${password}    ${BASE PASSWORD}
 ${email}       ${EMAIL VIEWER}
-${url}         ${CLOUD TEST}
+${url}         ${ENV}
 
 *** Keywords ***
 Log In To Change Password Page

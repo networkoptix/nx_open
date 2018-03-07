@@ -8,7 +8,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('cms', '0012_auto_20170802_1950'),
+        ('cms', '0013_datastructure_label'),
     ]
 
     operations = [

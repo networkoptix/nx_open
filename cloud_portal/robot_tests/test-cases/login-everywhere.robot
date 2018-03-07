@@ -7,7 +7,7 @@ Suite Teardown    Close All Browsers
 ${email}    ${EMAIL OWNER}
 ${email invalid}    aodehurgjaegir
 ${password}    ${BASE PASSWORD}
-${url}         ${CLOUD TEST}
+${url}         ${ENV}
 
 *** Keywords ***
 Check Log In
@@ -39,6 +39,7 @@ works at registration page after submit with alert error message
     Close Browser
 
 works at registration page on account activation success
+    [tags]    email
     Open Browser and go to URL    ${url}/register
     ${random email}    Get Random Email
     Register    mark    hamill    ${random email}    ${password}
@@ -47,6 +48,7 @@ works at registration page on account activation success
     Close Browser
 
 works at registration page on account activation error
+    [tags]    email
     ${random email}    Get Random Email
     Open Browser and go to URL    ${url}/register
     Register    'mark'    'hamill'    ${random email}    ${password}
@@ -82,6 +84,7 @@ works at restore password page with email input - after submit success
     Close Browser
 
 works at restore password page with password input - before submit
+    [tags]    email
     ${random email}    Get Random Email
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${random email}    ${password}
@@ -98,6 +101,7 @@ works at restore password page with password input - before submit
     Close Browser
 
 works at restore password page with password input - after submit error
+    [tags]    email
     ${random email}    Get Random Email
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${random email}    ${password}
@@ -117,6 +121,7 @@ works at restore password page with password input - after submit error
     Close Browser
 
 works at restore password page with password input - after submit success
+    [tags]    email
     ${random email}    Get Random Email
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${random email}    ${password}

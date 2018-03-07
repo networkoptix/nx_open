@@ -70,7 +70,7 @@
                                 <b>Website</b><br>
                                 <a href="{{companyUrl}}">{{companyUrl}}</a>
                             </td>
-                        {{/systeem}}
+                        {{/system}}
                         <td class="left-border">
                             <b>Ondersteuning</b><br>
                             <a href="{{supportLink}}">{{supportLinkText}}</a>

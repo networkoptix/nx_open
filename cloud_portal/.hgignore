@@ -9,6 +9,8 @@ front_end/.idea
 front_end/.sass-cache
 front_end/bower_components
 front_end/test/visual
+front_end/package-lock.json
+front_end/yarn.lock
 
 app/bower_components
 env
