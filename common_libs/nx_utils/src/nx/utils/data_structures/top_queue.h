@@ -17,7 +17,7 @@ public:
     using size_type = std::size_t;
 
     /** Running time - amortized O(1). */
-    void push(T val);
+    void push(const T& val);
     /**
      * @return Oldest element in the queue.
      */
@@ -34,6 +34,8 @@ public:
     size_type size() const;
 
 private:
+    // TODO: #ak Store "current top" as an reference to an existing element.
+    // This will decrease requirements to type T to movable instead of copyable.
     std::stack<std::pair<T /*value*/, T /*current top*/>> m_pushStack;
     std::stack<std::pair<T /*value*/, T /*current top*/>> m_popStack;
     Comp m_comp;
@@ -44,7 +46,7 @@ private:
 };
 
 template<typename T, typename Comp>
-void TopQueue<T, Comp>::push(T val)
+void TopQueue<T, Comp>::push(const T& val)
 {
     if (m_pushStack.empty())
     {

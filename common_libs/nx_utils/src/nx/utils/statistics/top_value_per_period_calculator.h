@@ -4,6 +4,7 @@
 #include <functional>
 
 #include <nx/utils/data_structures/top_queue.h>
+#include <nx/utils/time.h>
 
 namespace nx {
 namespace utils {
@@ -44,7 +45,8 @@ private:
         }
     };
 
-    std::chrono::milliseconds m_period;
+    std::chrono::milliseconds m_expirationPeriod;
+    std::chrono::milliseconds m_aggregationPeriod;
     typename nx::utils::TopQueue<ValueWithTimestamp, ValueWithTimestampComp> m_values;
 
     void removeExpiredStatistics();
@@ -54,7 +56,8 @@ template<typename T, typename Comp>
 TopValuePerPeriodCalculator<T, Comp>::TopValuePerPeriodCalculator(
     std::chrono::milliseconds period)
     :
-    m_period(period)
+    m_expirationPeriod(period),
+    m_aggregationPeriod(period / 100)
 {
 }
 
@@ -63,12 +66,15 @@ void TopValuePerPeriodCalculator<T, Comp>::add(T val)
 {
     removeExpiredStatistics();
 
+    const auto now = nx::utils::monotonicTime();
+
     if (m_values.empty() ||
-        Comp()(val, m_values.top().value))
+        Comp()(val, m_values.top().value) ||
+        now - m_values.top().timestamp > m_aggregationPeriod)
     {
         m_values.push(ValueWithTimestamp{
             std::move(val),
-            std::chrono::steady_clock::now()});
+            nx::utils::monotonicTime()});
     }
 }
 
@@ -86,10 +92,10 @@ T TopValuePerPeriodCalculator<T, Comp>::top(T defaultValue) const
 template<typename T, typename Comp>
 void TopValuePerPeriodCalculator<T, Comp>::removeExpiredStatistics()
 {
-    const auto now = std::chrono::steady_clock::now();
+    const auto now = nx::utils::monotonicTime();
 
     while (!m_values.empty() &&
-        now - m_values.front().timestamp > m_period)
+        now - m_values.front().timestamp > m_expirationPeriod)
     {
         m_values.pop();
     }
