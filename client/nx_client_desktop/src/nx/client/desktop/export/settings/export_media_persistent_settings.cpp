@@ -201,7 +201,7 @@ void ExportMediaPersistentSettings::setDimension(int newDimension)
 
 bool ExportMediaPersistentSettings::canExportOverlays() const
 {
-    return !areFiltersForced() && !this->hasNoVideo;
+    return !areFiltersForced() && hasVideo;
 }
 
 void ExportMediaPersistentSettings::updateRuntimeSettings(ExportMediaSettings& runtimeSettings) const
