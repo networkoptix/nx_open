@@ -62,7 +62,7 @@ def send_email(user_email, type, message, customization, queue="", attempt=1):
 @shared_task
 def send_to_all_users(notification_id, message, force=False):
     # if forced and not testing dont apply any filters to send to all users
-    users = Account.objects.exclude(activated_date=None)
+    users = Account.objects.exclude(activated_date=None, last_login=None)
 
     if not force:
         users = users.filter(subscribe=True)
