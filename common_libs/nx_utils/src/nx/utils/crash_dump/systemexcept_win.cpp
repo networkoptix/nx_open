@@ -58,8 +58,10 @@ static int GetBaseName(const char* name, DWORD len)
 
 static bool GetProgramName( char* buffer ) {
     char sModuleName[MAX_SYMBOL_SIZE];
+
+    // If the function fails, the return value is 0.
     DWORD dwLen = ::GetModuleFileNameA( NULL, sModuleName, MAX_SYMBOL_SIZE );
-    if (dwLen == MAX_SYMBOL_SIZE)
+    if (dwLen == MAX_SYMBOL_SIZE || dwLen == 0)
         return false;
 
     int iBaseNamePos = GetBaseName( sModuleName , dwLen );
