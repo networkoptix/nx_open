@@ -29,7 +29,7 @@
 
         <ul class="nav navbar-nav navbar-right auth-visible margin-right">
             <li ng-if="singleSystem" class="no-hover collapse-second hidden-collapse">
-                <a href=""><span class="glyphicon glyphicon-home"></span><span class="ellipsis"> {{activeSystem.name}} </span></a>
+                <a href=""><span class="glyphicon glyphicon-home"></span><span class="ellipsis">{{activeSystem.name}}</span></a>
             </li>
             <li class="vertical-bar" ng-if="systemCounter && !singleSystem"></li>
             <li uib-dropdown ng-if="systemCounter && !singleSystem" class="collapse-second">
@@ -50,7 +50,7 @@
             </li>
             <li class="vertical-bar"></li>
             <li uib-dropdown class="collapse-first">
-                <a uib-dropdown-toggle href=""><span class="glyphicon glyphicon-user"></span><span class="ellipsis"> {{account.email}} </span><span class="icon-caret"></span></a>
+                <a uib-dropdown-toggle href=""><span class="glyphicon glyphicon-user"></span><span class="ellipsis">{{account.email}}</span><span class="icon-caret"></span></a>
                 <ul uib-dropdown-menu>
                     <li class="hidden-expanded active"><a href="">{{account.email}}</a></li>
                     <li class="hidden-expanded nav-divider" role="separator"></li>
