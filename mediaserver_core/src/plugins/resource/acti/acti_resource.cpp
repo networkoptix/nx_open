@@ -558,7 +558,7 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
         return CameraDiagnostics::CameraInvalidParams(
             lit("Resolution list is empty"));
     }
-    m_resolutionList[(int)Qn::StreamIndex::primary] = availResolutions;
+    m_resolutionList[(int) Qn::StreamIndex::primary] = availResolutions;
 
     if (dualStreaming)
     {
