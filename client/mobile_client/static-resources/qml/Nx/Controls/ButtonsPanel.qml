@@ -60,6 +60,7 @@ ListView
         id: button
 
         icon: model.iconPath
+        padding: 0
 
         anchors.verticalCenter: parent.verticalCenter
 
