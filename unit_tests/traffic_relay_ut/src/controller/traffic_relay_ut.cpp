@@ -240,10 +240,19 @@ protected:
             maxSessionCountPerServer,
             statistics.concurrentSessionToSameServerCountMaxPerHour);
 
+        ASSERT_GT(statistics.concurrentSessionToSameServerCountAveragePerHour, 0);
+
         // sessionDurationSecMaxPerLastHour.
         ASSERT_GE(
             statistics.sessionDurationSecMaxPerLastHour,
             duration_cast<seconds>(m_minExpectedSessionDuration).count());
+
+        if (m_minExpectedSessionDuration > std::chrono::seconds::zero())
+        {
+            ASSERT_GE(
+                statistics.sessionDurationSecAveragePerLastHour,
+                duration_cast<seconds>(m_minExpectedSessionDuration).count());
+        }
     }
 
 private:
