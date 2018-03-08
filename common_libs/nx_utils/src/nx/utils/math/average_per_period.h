@@ -6,6 +6,14 @@ namespace nx {
 namespace utils {
 namespace math {
 
+namespace detail {
+
+template<typename T> struct LongType { using type = T; };
+template<> struct LongType<int> { using type = long long; };
+template<> struct LongType<unsigned int> { using type = unsigned long long; };
+
+} // namespace detail
+
 template<typename Value>
 class AveragePerPeriod
 {
@@ -30,12 +38,8 @@ public:
     }
 
 private:
-    template<typename T> struct LongType { using type = T; };
-    template<> struct LongType<int> { using type = long long; };
-    template<> struct LongType<unsigned int> { using type = unsigned long long; };
-
-    SumPerPeriod<typename LongType<Value>::type> m_cumulativeValuePerPeriod;
-    SumPerPeriod<typename LongType<Value>::type> m_valueCountPerPeriod;
+    SumPerPeriod<typename detail::LongType<Value>::type> m_cumulativeValuePerPeriod;
+    SumPerPeriod<typename detail::LongType<Value>::type> m_valueCountPerPeriod;
 };
 
 } // namespace math
