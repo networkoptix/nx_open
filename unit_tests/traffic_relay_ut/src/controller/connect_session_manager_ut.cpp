@@ -69,7 +69,7 @@ public:
             {std::move(clientConnection), std::move(serverConnection)});
     }
 
-    virtual RelaySessionStatistics getStatistics() const override
+    virtual RelaySessionStatistics statistics() const override
     {
         return RelaySessionStatistics();
     }

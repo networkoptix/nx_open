@@ -224,7 +224,7 @@ protected:
     {
         using namespace std::chrono;
 
-        const auto statistics = trafficRelay().getStatistics();
+        const auto statistics = trafficRelay().statistics();
 
         // Current session count.
         ASSERT_EQ(relaySessions().size(), (std::size_t)statistics.currentSessionCount);
