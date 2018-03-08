@@ -23,6 +23,15 @@ namespace {
 static constexpr auto kMaxSessionCountCalculationPeriod = std::chrono::hours(1);
 } // namespace
 
+bool RelaySessionStatistics::operator==(const RelaySessionStatistics& right) const
+{
+    return currentSessionCount == right.currentSessionCount
+        && concurrentSessionToSameServerCountMaxPerHour == right.concurrentSessionToSameServerCountMaxPerHour
+        && concurrentSessionToSameServerCountAveragePerHour == right.concurrentSessionToSameServerCountAveragePerHour
+        && sessionDurationSecAveragePerLastHour == right.sessionDurationSecAveragePerLastHour
+        && sessionDurationSecMaxPerLastHour == right.sessionDurationSecMaxPerLastHour;
+}
+
 TrafficRelayStatisticsCollector::TrafficRelayStatisticsCollector():
     m_maxSessionCountPerPeriodCalculator(kMaxSessionCountCalculationPeriod),
     m_maxSessionDurationCalculator(kMaxSessionCountCalculationPeriod)
@@ -58,7 +67,7 @@ void TrafficRelayStatisticsCollector::onSessionStopped(
     m_maxSessionDurationCalculator.add(duration_cast<seconds>(duration));
 }
 
-RelaySessionStatistics TrafficRelayStatisticsCollector::getStatistics() const
+RelaySessionStatistics TrafficRelayStatisticsCollector::statistics() const
 {
     RelaySessionStatistics result;
     result.currentSessionCount = m_currentSessionCount;
@@ -110,10 +119,10 @@ void TrafficRelay::startRelaying(
     m_statisticsCollector.onSessionStarted(m_relaySessions.back().serverPeerId);
 }
 
-RelaySessionStatistics TrafficRelay::getStatistics() const
+RelaySessionStatistics TrafficRelay::statistics() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_statisticsCollector.getStatistics();
+    return m_statisticsCollector.statistics();
 }
 
 void TrafficRelay::onRelaySessionFinished(
@@ -134,6 +143,24 @@ void TrafficRelay::onRelaySessionFinished(
         sessionIter->serverPeerId,
         duration_cast<seconds>(nx::utils::monotonicTime() - sessionIter->startTime));
     m_relaySessions.erase(sessionIter);
+}
+
+//-------------------------------------------------------------------------------------------------
+
+TrafficRelayFactory::TrafficRelayFactory():
+    base_type(std::bind(&TrafficRelayFactory::defaultFactoryFunction, this))
+{
+}
+
+TrafficRelayFactory& TrafficRelayFactory::instance()
+{
+    static TrafficRelayFactory staticInstance;
+    return staticInstance;
+}
+
+std::unique_ptr<AbstractTrafficRelay> TrafficRelayFactory::defaultFactoryFunction()
+{
+    return std::make_unique<TrafficRelay>();
 }
 
 } // namespace controller

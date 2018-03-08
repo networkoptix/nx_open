@@ -13,13 +13,14 @@ Controller::Controller(
     const conf::Settings& settings,
     Model* model)
     :
+    m_trafficRelay(controller::TrafficRelayFactory::instance().create()),
     m_connectSessionManager(
         controller::ConnectSessionManagerFactory::create(
             settings,
             &model->clientSessionPool(),
             &model->listeningPeerPool(),
             &model->remoteRelayPeerPool(),
-            &m_trafficRelay)),
+            m_trafficRelay.get())),
     m_listeningPeerManager(
         relaying::ListeningPeerManagerFactory::instance().create(
             settings.listeningPeer(), &model->listeningPeerPool())),
@@ -32,6 +33,11 @@ Controller::~Controller()
 {
     for (const auto& subscriptionId: m_listeningPeerPoolSubscriptions)
         m_model->listeningPeerPool().peerConnectedSubscription().removeSubscription(subscriptionId);
+}
+
+controller::AbstractTrafficRelay& Controller::trafficRelay()
+{
+    return *m_trafficRelay;
 }
 
 controller::AbstractConnectSessionManager& Controller::connectSessionManager()
@@ -47,7 +53,7 @@ relaying::AbstractListeningPeerManager& Controller::listeningPeerManager()
 bool Controller::discoverPublicAddress()
 {
     auto publicHostAddress = controller::PublicIpDiscoveryService::get();
-    if (!(bool) publicHostAddress)
+    if (!(bool)publicHostAddress)
         return false;
 
     network::SocketAddress publicSocketAddress(*publicHostAddress, m_settings->http().endpoints.front().port);

@@ -26,12 +26,16 @@ public:
     {
         const auto cumulativeValue = m_cumulativeValuePerPeriod.getSumPerLastPeriod();
         const auto valueCount = m_valueCountPerPeriod.getSumPerLastPeriod();
-        return valueCount == 0 ? 0 : cumulativeValue / valueCount;
+        return static_cast<Value>(valueCount == 0 ? 0 : cumulativeValue / valueCount);
     }
 
 private:
-    SumPerPeriod<Value> m_cumulativeValuePerPeriod;
-    SumPerPeriod<Value> m_valueCountPerPeriod;
+    template<typename T> struct LongType { using type = T; };
+    template<> struct LongType<int> { using type = long long; };
+    template<> struct LongType<unsigned int> { using type = unsigned long long; };
+
+    SumPerPeriod<typename LongType<Value>::type> m_cumulativeValuePerPeriod;
+    SumPerPeriod<typename LongType<Value>::type> m_valueCountPerPeriod;
 };
 
 } // namespace math
