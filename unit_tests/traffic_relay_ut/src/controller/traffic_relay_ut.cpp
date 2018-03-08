@@ -251,7 +251,7 @@ private:
     std::vector<std::string> m_serverIds;
     std::map<std::string, int> m_totalSessionCountByServer;
     nx::utils::test::ScopedTimeShift m_timeShift;
-    std::chrono::seconds m_minExpectedSessionDuration;
+    std::chrono::seconds m_minExpectedSessionDuration = std::chrono::seconds::zero();
 
     void createMultipleSessions(const std::string& serverId, int count)
     {
