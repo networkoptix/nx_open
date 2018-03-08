@@ -59,7 +59,8 @@ int RelayService::serviceMain(const utils::AbstractServiceSettings& abstractSett
 
     auto statisticsProvider = StatisticsProviderFactory::instance().create(
         model.listeningPeerPool(),
-        view.httpServer());
+        view.httpServer(),
+        controller.trafficRelay());
     view.registerStatisticsApiHandlers(*statisticsProvider);
 
     // TODO: #ak: process rights reduction should be done here.

@@ -9,8 +9,9 @@
 #include <nx/network/abstract_socket.h>
 #include <nx/network/aio/abstract_async_channel.h>
 #include <nx/network/aio/async_channel_bridge.h>
-#include <nx/utils/data_structures/top_queue.h>
+#include <nx/utils/basic_factory.h>
 #include <nx/utils/move_only_func.h>
+#include <nx/utils/math/average_per_period.h>
 #include <nx/utils/statistics/top_value_per_period_calculator.h>
 #include <nx/utils/thread/mutex.h>
 
@@ -34,6 +35,8 @@ struct RelaySessionStatistics
     int sessionDurationSecAveragePerLastHour = 0;
     /** Sessions that were terminated during last hour are counted here. */
     int sessionDurationSecMaxPerLastHour = 0;
+
+    bool operator==(const RelaySessionStatistics& right) const;
 };
 
 #define RelaySessionStatistics_controller_Fields \
@@ -60,14 +63,16 @@ public:
         const std::string& id,
         const std::chrono::milliseconds duration);
 
-    RelaySessionStatistics getStatistics() const;
+    RelaySessionStatistics statistics() const;
 
 private:
     int m_currentSessionCount = 0;
     std::map<std::string, int> m_serverIdToCurrentSessionCount;
     nx::utils::statistics::MaxValuePerPeriodCalculator<int> m_maxSessionCountPerPeriodCalculator;
+    nx::utils::math::AveragePerPeriod<int> m_averageSessionCountPerPeriodCalculator;
     nx::utils::statistics::MaxValuePerPeriodCalculator<std::chrono::seconds>
         m_maxSessionDurationCalculator;
+    nx::utils::math::AveragePerPeriod<int> m_averageSessionDurationCalculator;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -81,7 +86,7 @@ public:
         RelayConnectionData clientConnection,
         RelayConnectionData serverConnection) = 0;
 
-    virtual RelaySessionStatistics getStatistics() const = 0;
+    virtual RelaySessionStatistics statistics() const = 0;
 };
 
 class TrafficRelay:
@@ -94,7 +99,7 @@ public:
         RelayConnectionData clientConnection,
         RelayConnectionData serverConnection) override;
 
-    virtual RelaySessionStatistics getStatistics() const override;
+    virtual RelaySessionStatistics statistics() const override;
 
 private:
     struct RelaySession
@@ -111,6 +116,24 @@ private:
     TrafficRelayStatisticsCollector m_statisticsCollector;
 
     void onRelaySessionFinished(std::list<RelaySession>::iterator sessionIter);
+};
+
+//-------------------------------------------------------------------------------------------------
+
+using TrafficRelayFactoryFunc = std::unique_ptr<AbstractTrafficRelay>();
+
+class TrafficRelayFactory:
+    public nx::utils::BasicFactory<TrafficRelayFactoryFunc>
+{
+    using base_type = nx::utils::BasicFactory<TrafficRelayFactoryFunc>;
+
+public:
+    TrafficRelayFactory();
+
+    static TrafficRelayFactory& instance();
+
+private:
+    std::unique_ptr<AbstractTrafficRelay> defaultFactoryFunction();
 };
 
 } // namespace controller

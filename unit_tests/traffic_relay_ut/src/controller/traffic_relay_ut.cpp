@@ -224,7 +224,7 @@ protected:
     {
         using namespace std::chrono;
 
-        const auto statistics = trafficRelay().getStatistics();
+        const auto statistics = trafficRelay().statistics();
 
         // Current session count.
         ASSERT_EQ(relaySessions().size(), (std::size_t)statistics.currentSessionCount);
@@ -240,10 +240,19 @@ protected:
             maxSessionCountPerServer,
             statistics.concurrentSessionToSameServerCountMaxPerHour);
 
+        ASSERT_GT(statistics.concurrentSessionToSameServerCountAveragePerHour, 0);
+
         // sessionDurationSecMaxPerLastHour.
         ASSERT_GE(
             statistics.sessionDurationSecMaxPerLastHour,
             duration_cast<seconds>(m_minExpectedSessionDuration).count());
+
+        if (m_minExpectedSessionDuration > std::chrono::seconds::zero())
+        {
+            ASSERT_GE(
+                statistics.sessionDurationSecAveragePerLastHour,
+                duration_cast<seconds>(m_minExpectedSessionDuration).count());
+        }
     }
 
 private:
@@ -251,7 +260,7 @@ private:
     std::vector<std::string> m_serverIds;
     std::map<std::string, int> m_totalSessionCountByServer;
     nx::utils::test::ScopedTimeShift m_timeShift;
-    std::chrono::seconds m_minExpectedSessionDuration;
+    std::chrono::seconds m_minExpectedSessionDuration = std::chrono::seconds::zero();
 
     void createMultipleSessions(const std::string& serverId, int count)
     {

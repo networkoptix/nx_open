@@ -20,12 +20,23 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 //-------------------------------------------------------------------------------------------------
 
 namespace {
-static constexpr auto kMaxSessionCountCalculationPeriod = std::chrono::hours(1);
+static constexpr auto kSessionStatisticsAggregationPeriod = std::chrono::hours(1);
 } // namespace
 
+bool RelaySessionStatistics::operator==(const RelaySessionStatistics& right) const
+{
+    return currentSessionCount == right.currentSessionCount
+        && concurrentSessionToSameServerCountMaxPerHour == right.concurrentSessionToSameServerCountMaxPerHour
+        && concurrentSessionToSameServerCountAveragePerHour == right.concurrentSessionToSameServerCountAveragePerHour
+        && sessionDurationSecAveragePerLastHour == right.sessionDurationSecAveragePerLastHour
+        && sessionDurationSecMaxPerLastHour == right.sessionDurationSecMaxPerLastHour;
+}
+
 TrafficRelayStatisticsCollector::TrafficRelayStatisticsCollector():
-    m_maxSessionCountPerPeriodCalculator(kMaxSessionCountCalculationPeriod),
-    m_maxSessionDurationCalculator(kMaxSessionCountCalculationPeriod)
+    m_maxSessionCountPerPeriodCalculator(kSessionStatisticsAggregationPeriod),
+    m_averageSessionCountPerPeriodCalculator(kSessionStatisticsAggregationPeriod),
+    m_maxSessionDurationCalculator(kSessionStatisticsAggregationPeriod),
+    m_averageSessionDurationCalculator(kSessionStatisticsAggregationPeriod)
 {
 }
 
@@ -33,6 +44,8 @@ void TrafficRelayStatisticsCollector::onSessionStarted(const std::string& id)
 {
     int& currentSessionCount = m_serverIdToCurrentSessionCount[id];
     ++currentSessionCount;
+    m_averageSessionCountPerPeriodCalculator.add(currentSessionCount);
+
     ++m_currentSessionCount;
 
     m_maxSessionCountPerPeriodCalculator.add(currentSessionCount);
@@ -49,6 +62,7 @@ void TrafficRelayStatisticsCollector::onSessionStopped(
     if (it != m_serverIdToCurrentSessionCount.end())
     {
         --it->second;
+        m_averageSessionCountPerPeriodCalculator.add(it->second);
         if (it->second == 0)
             m_serverIdToCurrentSessionCount.erase(it);
     }
@@ -56,15 +70,22 @@ void TrafficRelayStatisticsCollector::onSessionStopped(
     --m_currentSessionCount;
 
     m_maxSessionDurationCalculator.add(duration_cast<seconds>(duration));
+    m_averageSessionDurationCalculator.add(duration_cast<seconds>(duration).count());
 }
 
-RelaySessionStatistics TrafficRelayStatisticsCollector::getStatistics() const
+RelaySessionStatistics TrafficRelayStatisticsCollector::statistics() const
 {
     RelaySessionStatistics result;
+
     result.currentSessionCount = m_currentSessionCount;
     result.concurrentSessionToSameServerCountMaxPerHour =
         m_maxSessionCountPerPeriodCalculator.top();
+    result.concurrentSessionToSameServerCountAveragePerHour =
+        m_averageSessionCountPerPeriodCalculator.getAveragePerLastPeriod();
     result.sessionDurationSecMaxPerLastHour = m_maxSessionDurationCalculator.top().count();
+    result.sessionDurationSecAveragePerLastHour =
+        m_averageSessionDurationCalculator.getAveragePerLastPeriod();
+
     return result;
 }
 
@@ -110,10 +131,10 @@ void TrafficRelay::startRelaying(
     m_statisticsCollector.onSessionStarted(m_relaySessions.back().serverPeerId);
 }
 
-RelaySessionStatistics TrafficRelay::getStatistics() const
+RelaySessionStatistics TrafficRelay::statistics() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_statisticsCollector.getStatistics();
+    return m_statisticsCollector.statistics();
 }
 
 void TrafficRelay::onRelaySessionFinished(
@@ -134,6 +155,24 @@ void TrafficRelay::onRelaySessionFinished(
         sessionIter->serverPeerId,
         duration_cast<seconds>(nx::utils::monotonicTime() - sessionIter->startTime));
     m_relaySessions.erase(sessionIter);
+}
+
+//-------------------------------------------------------------------------------------------------
+
+TrafficRelayFactory::TrafficRelayFactory():
+    base_type(std::bind(&TrafficRelayFactory::defaultFactoryFunction, this))
+{
+}
+
+TrafficRelayFactory& TrafficRelayFactory::instance()
+{
+    static TrafficRelayFactory staticInstance;
+    return staticInstance;
+}
+
+std::unique_ptr<AbstractTrafficRelay> TrafficRelayFactory::defaultFactoryFunction()
+{
+    return std::make_unique<TrafficRelay>();
 }
 
 } // namespace controller

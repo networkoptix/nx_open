@@ -18,6 +18,7 @@
 #include "connect_session_manager_mock.h"
 #include "listening_peer_manager_mock.h"
 #include "../basic_component_test.h"
+#include "../statistics_provider_ut.h"
 
 namespace nx {
 namespace cloud {
@@ -298,16 +299,9 @@ private:
     {
         Statistics statistics;
 
-        statistics.relaying.connectionsAcceptedPerMinute =
-            nx::utils::random::number<>(1, 20);
-        statistics.relaying.connectionCount = nx::utils::random::number<>(1, 20);
-        statistics.relaying.connectionsAveragePerServerCount = nx::utils::random::number<>(1, 20);
-        statistics.relaying.listeningServerCount = nx::utils::random::number<>(1, 20);
-
-        statistics.http.connectionCount = nx::utils::random::number<>(1, 20);
-        statistics.http.connectionsAcceptedPerMinute = nx::utils::random::number<>(1, 20);
-        statistics.http.requestsAveragePerConnection = nx::utils::random::number<>(1, 20);
-        statistics.http.requestsServedPerMinute = nx::utils::random::number<>(1, 20);
+        statistics.relaying = generateRelayingStatistics();
+        statistics.relaySessions = generateRelaySessionStatistics();
+        statistics.http = generateHttpServerStatistics();
 
         return statistics;
     }
