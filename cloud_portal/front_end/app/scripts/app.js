@@ -61,10 +61,10 @@ window.L = {};
                 // .hashPrefix('!');
 
                 var appState = {
-                        viewsDir: 'static/views/', //'static/lang_' + lang + '/views/';
-                        previewPath: '',
-                        viewsDirCommon: 'static/web_common/views/'
-                    };
+                    viewsDir: 'static/views/', //'static/lang_' + lang + '/views/';
+                    previewPath: '',
+                    viewsDirCommon: 'static/web_common/views/'
+                };
 
                 $.ajax({
                     // url: 'static/views/language.json',
@@ -311,6 +311,9 @@ window.L = {};
                                 title: ''/*languageServiceProvider.$get().lang.pageTitles.startPage*/,
                                 templateUrl: CONFIG.viewsDir + 'startPage.html',
                                 controller: 'StartPageCtrl'
+                            })
+                            .when('/bar', {
+                                templateUrl: ''
                             })
                             .otherwise({
                                 title: languageServiceProvider.$get().lang.pageTitles.pageNotFound,

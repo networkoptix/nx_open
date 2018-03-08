@@ -1,11 +1,12 @@
 const fs = require('fs');
 const webpack = require('webpack');
 const merge = require('webpack-merge');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const common = require('./webpack.common.js');
 
 module.exports = merge(common, {
-    devtool: 'inline-source-map',
+    devtool: 'cheap-module-eval-source-map',
     devServer:{
         contentBase: './dist',
         hot: true,
@@ -14,7 +15,7 @@ module.exports = merge(common, {
         proxy: [
             {
                 context: ['/api/', '/gateway/'],
-                target: 'http://cloud-test.hdw.mx:80',
+                target: 'http://cloud-test.hdw.mx:80'
 
             },
             {
@@ -27,15 +28,22 @@ module.exports = merge(common, {
         ],
         https:{
             key: fs.readFileSync('ssl_keys/server.key').toString(),
-            cert: fs.readFileSync('ssl_keys/server.crt').toString(),
+            cert: fs.readFileSync('ssl_keys/server.crt').toString()
         },
         historyApiFallback: {
-            index: '/',
-        },
+            index: '/'
+        }
     }
     ,
     plugins:[
         new webpack.HotModuleReplacementPlugin(),
-        new BundleAnalyzerPlugin({analyzerHost:'0.0.0.0', analyzerPort:9001})
+        // new BundleAnalyzerPlugin({analyzerHost:'0.0.0.0', analyzerPort:9001})
+
+        new CopyWebpackPlugin([
+            {
+                from: 'images',
+                to: 'static/images'
+            }
+        ])
     ]
 });
