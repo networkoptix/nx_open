@@ -11,6 +11,7 @@
 #include <nx/network/aio/async_channel_bridge.h>
 #include <nx/utils/basic_factory.h>
 #include <nx/utils/move_only_func.h>
+#include <nx/utils/math/average_per_period.h>
 #include <nx/utils/statistics/top_value_per_period_calculator.h>
 #include <nx/utils/thread/mutex.h>
 
@@ -68,8 +69,10 @@ private:
     int m_currentSessionCount = 0;
     std::map<std::string, int> m_serverIdToCurrentSessionCount;
     nx::utils::statistics::MaxValuePerPeriodCalculator<int> m_maxSessionCountPerPeriodCalculator;
+    nx::utils::math::AveragePerPeriod<int> m_averageSessionCountPerPeriodCalculator;
     nx::utils::statistics::MaxValuePerPeriodCalculator<std::chrono::seconds>
         m_maxSessionDurationCalculator;
+    nx::utils::math::AveragePerPeriod<int> m_averageSessionDurationCalculator;
 };
 
 //-------------------------------------------------------------------------------------------------
