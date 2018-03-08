@@ -4,8 +4,8 @@ from netaddr import IPNetwork
 def merge_system(server_factory, scheme):
     servers = {}
     for remote_alias, local_aliases in scheme.items():
-        for local_alias, merge_parameters in local_aliases.items():
-            servers[remote_alias] = server_factory.get(remote_alias)
+        servers[remote_alias] = server_factory.get(remote_alias)  # Create server but don't merge.
+        for local_alias, merge_parameters in (local_aliases or {}).items():
             servers[local_alias] = server_factory.get(local_alias)
             merge_kwargs = {}
             if merge_parameters is not None:

@@ -110,24 +110,16 @@ def resource_generators():
         saveLayout=LayoutGenerator())
 
 
-@pytest.fixture(params=['merged', 'unmerged'])
-def merge_schema(request):
-    return request.param
-
-
 @pytest.fixture
-def env(server_factory, merge_schema):
-    one = server_factory.create('one')
-    two = server_factory.create('two')
-    if merge_schema == 'merged':
-        one.merge_systems(two)
+def env(network, layout_file):
+    machines, servers = network
     return SimpleNamespace(
-        one=one,
-        two=two,
-        servers=[one, two],
+        one=servers['first'],
+        two=servers['second'],
+        servers=servers.values(),
         test_size=DEFAULT_TEST_SIZE,
         thread_number=DEFAULT_THREAD_NUMBER,
-        system_is_merged=merge_schema == 'merged',
+        system_is_merged='no_merge.yaml' not in layout_file,
         resource_generators=resource_generators(),
         )
 
@@ -282,7 +274,7 @@ def prepare_and_make_async_post_calls(env, api_method, sequence=None):
                                  prepare_call_list(env, api_method, sequence))
 
 
-@pytest.mark.parametrize('merge_schema', ['merged'])
+@pytest.mark.parametrize('layout_file', ['direct-merge_toward_requested.yaml'])
 def test_initial_merge(env):
     check_api_calls(
         env,
@@ -294,7 +286,7 @@ def test_initial_merge(env):
     check_transaction_log(env)
 
 
-@pytest.mark.parametrize('merge_schema', ['merged'])
+@pytest.mark.parametrize('layout_file', ['direct-merge_toward_requested.yaml'])
 def test_api_get_methods(env):
     test_api_get_methods = [
         ('GET', 'ec2', 'getResourceTypes'),
@@ -321,6 +313,7 @@ def test_api_get_methods(env):
             srv.rest_api.get_api_fn(method, api_object, api_method)()
 
 
+@pytest.mark.parametrize('layout_file', ['direct-merge_toward_requested.yaml', 'direct-no_merge.yaml'])
 def test_camera_data_synchronization(env):
     cameras = prepare_and_make_async_post_calls(env, 'saveCamera')
     prepare_and_make_async_post_calls(env, 'saveCameraUserAttributes', cameras)
@@ -333,6 +326,7 @@ def test_camera_data_synchronization(env):
     check_transaction_log(env)
 
 
+@pytest.mark.parametrize('layout_file', ['direct-merge_toward_requested.yaml', 'direct-no_merge.yaml'])
 def test_user_data_synchronization(env):
     prepare_and_make_async_post_calls(env, 'saveUser')
     merge_system_if_unmerged(env)
@@ -342,6 +336,7 @@ def test_user_data_synchronization(env):
     check_transaction_log(env)
 
 
+@pytest.mark.parametrize('layout_file', ['direct-merge_toward_requested.yaml', 'direct-no_merge.yaml'])
 def test_mediaserver_data_synchronization(env):
     servers = prepare_and_make_async_post_calls(env, 'saveMediaServer')
     prepare_and_make_async_post_calls(env, 'saveMediaServerUserAttributes', servers)
@@ -354,6 +349,7 @@ def test_mediaserver_data_synchronization(env):
     check_transaction_log(env)
 
 
+@pytest.mark.parametrize('layout_file', ['direct-merge_toward_requested.yaml', 'direct-no_merge.yaml'])
 def test_storage_data_synchronization(env):
     servers = [env.servers[i % len(env.servers)] for i in range(env.test_size)]
     server_with_guid_list = map(lambda s: (s, get_server_id(s.rest_api)), servers)
@@ -366,6 +362,7 @@ def test_storage_data_synchronization(env):
     check_transaction_log(env)
 
 
+@pytest.mark.parametrize('layout_file', ['direct-merge_toward_requested.yaml', 'direct-no_merge.yaml'])
 def test_resource_params_data_synchronization(env):
     cameras = prepare_and_make_async_post_calls(env, 'saveCamera')
     users = prepare_and_make_async_post_calls(env, 'saveUser')
@@ -380,6 +377,7 @@ def test_resource_params_data_synchronization(env):
     check_transaction_log(env)
 
 
+@pytest.mark.parametrize('layout_file', ['direct-merge_toward_requested.yaml', 'direct-no_merge.yaml'])
 def test_remove_resource_params_data_synchronization(env):
     cameras = prepare_and_make_async_post_calls(env, 'saveCamera')
     users = prepare_and_make_async_post_calls(env, 'saveUser')
@@ -395,6 +393,7 @@ def test_remove_resource_params_data_synchronization(env):
     check_transaction_log(env)
 
 
+@pytest.mark.parametrize('layout_file', ['direct-merge_toward_requested.yaml', 'direct-no_merge.yaml'])
 def test_layout_data_synchronization(env):
     admins = get_servers_admins(env)
     admins_seq = [admins[i % len(admins)] for i in range(env.test_size)]
@@ -420,7 +419,7 @@ def test_layout_data_synchronization(env):
     check_transaction_log(env)
 
 
-@pytest.mark.parametrize('merge_schema', ['merged'])
+@pytest.mark.parametrize('layout_file', ['direct-merge_toward_requested.yaml'])
 def test_resource_remove_update_conflict(env):
     cameras = prepare_and_make_async_post_calls(env, 'saveCamera')
     users = prepare_and_make_async_post_calls(env, 'saveUser')
