@@ -238,7 +238,7 @@ class MediaListener(object):
     def _thread_main(self, listen_socket):
         log.info('%s: thread started.', self)
         poll = select.poll()
-        poll.register(listen_socket, select.POLLIN | select.POLLERR)
+        poll.register(select.POLLIN | select.POLLERR, listen_socket, )
         while not self._stop_flag:
             events = poll.poll(100)  # timeout in milliseconds
             if not events:

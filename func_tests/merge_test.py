@@ -58,10 +58,10 @@ def check_admin_disabled(server):
 
 
 @pytest.fixture()
-def vms(vm_factory):
+def vms(vm_pools):
     path = Path(__file__).with_name('network_layouts') / 'direct-no_merge.yaml'
     layout = yaml.load(path.read_text())
-    vms = setup_networks(vm_factory, layout['networks'])
+    vms = setup_networks(vm_pools, layout['networks'])
     return vms
 
 

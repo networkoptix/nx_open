@@ -36,8 +36,8 @@ def args_from_env(env):
 
 
 class ProcessError(subprocess.CalledProcessError):
-    def __init__(self, return_code, args, output):
-        subprocess.CalledProcessError.__init__(self, return_code, _arg_list_to_str(args), output=output)
+    def __init__(self, return_code, command, output):
+        subprocess.CalledProcessError.__init__(self, return_code, command, output=output)
 
     def __str__(self):
         return 'Command "%s" returned non-zero exit status %d:\n%s' % (self.cmd, self.returncode, self.output)
@@ -59,11 +59,16 @@ class ProcessTimeoutError(subprocess.CalledProcessError):
         return 'ProcessTimeoutError(%s)' % self
 
 
+class FileNotFound(Exception):
+    def __init__(self, path):
+        super(FileNotFound, self).__init__("File {} not found".format(path))
+
+
 class SshAccessConfig(object):
 
     @classmethod
     def from_dict(cls, d):
-        assert isinstance(d, dict), 'ssh location should be dict: %r'  % d
+        assert isinstance(d, dict), 'ssh location should be dict: %r' % d
         assert 'host' in d, '"host" is required parameter for host location'
         return cls(
             name=d.get('name') or d['hostname'],
@@ -79,7 +84,7 @@ class SshAccessConfig(object):
         self.key_file_path = key_file_path
 
     def __repr__(self):
-        return '<os_access=%r user=%r key_file=%r>' % (self.hostname, self.user, self.key_file_path)
+        return '<_os_access=%r user=%r key_file=%r>' % (self.hostname, self.user, self.key_file_path)
 
 
 class OsAccess(object):
@@ -88,6 +93,10 @@ class OsAccess(object):
 
     @abc.abstractmethod
     def run_command(self, args, input=None, cwd=None, check_retcode=True, log_output=True, timeout=None, env=None):
+        pass
+
+    @abc.abstractmethod
+    def is_working(self):
         pass
 
     @abc.abstractmethod
@@ -121,6 +130,10 @@ class OsAccess(object):
     # create parent dirs as well
     @abc.abstractmethod
     def mk_dir(self, path):
+        pass
+
+    @abc.abstractmethod
+    def iter_dir(self, path):
         pass
 
     @abc.abstractmethod
@@ -158,21 +171,23 @@ class LocalAccess(OsAccess):
 
     def run_command(self, args, input=None, cwd=None, check_retcode=True, log_output=True, timeout=None, env=None):
         timeout = timeout or PROCESS_TIMEOUT
-        args = [str(arg) for arg in args]
+        if isinstance(args, str):
+            args = 'set -eux\n' + dedent(args).strip()
+            shell = True
+            logged_command_line = args
+        else:
+            args = [str(arg) for arg in args]
+            shell = False
+            logged_command_line = _arg_list_to_str(args)
         if input:
-            log.debug('executing: %s (with %d bytes input)', _arg_list_to_str(args), len(input))
+            log.debug('executing:\n%s (with %d bytes input)', logged_command_line, len(input))
             stdin = subprocess.PIPE
         else:
-            log.debug('executing: %s', _arg_list_to_str(args))
+            log.debug('executing:\n%s', logged_command_line)
             stdin = None
         pipe = subprocess.Popen(
-            args, cwd=cwd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            stdin=stdin,
-            close_fds=True,
-            env=env,
-            )
+            args, cwd=cwd and str(cwd), env=env and {k: str(v) for k, v in env.items()}, shell=shell,
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=stdin, close_fds=True)
         stdout_buffer = []
         stderr_buffer = []
         stdout_thread = threading.Thread(target=self._read_thread, args=(log.debug, pipe.stdout, stdout_buffer, log_output))
@@ -210,7 +225,7 @@ class LocalAccess(OsAccess):
             pipe.stderr.close()
         retcode = pipe.wait()
         if check_retcode and retcode:
-            raise ProcessError(retcode, args, output=''.join(stderr_buffer))
+            raise ProcessError(retcode, logged_command_line, output=''.join(stderr_buffer))
         return ''.join(stdout_buffer)
 
     def _read_thread(self, logger, f, buffer, log_lines):
@@ -231,8 +246,15 @@ class LocalAccess(OsAccess):
         else:
             return '.'
 
+    def is_working(self):
+        return True
+
+    @staticmethod
+    def home():
+        return Path.home()
+
     def file_exists(self, path):
-        return path.exists()
+        return Path(path).exists()
 
     def dir_exists(self, path):
         return path.is_dir()
@@ -248,10 +270,15 @@ class LocalAccess(OsAccess):
         shutil.copy2(str(from_path), str(to_path))
 
     def read_file(self, from_remote_path, ofs=None):
-        with from_remote_path.open('rb') as f:
-            if ofs:
-                f.seek(ofs)
-            return f.read()
+        try:
+            with from_remote_path.open('rb') as f:
+                if ofs:
+                    f.seek(ofs)
+                return f.read()
+        except IOError as e:
+            if e.errno == errno.ENOENT:
+                raise FileNotFound(from_remote_path)
+            raise
 
     def write_file(self, to_remote_path, contents):
         log.debug('writing %d bytes to %s', len(contents), to_remote_path)
@@ -268,7 +295,10 @@ class LocalAccess(OsAccess):
         return path.iterdir()
 
     def rm_tree(self, path, ignore_errors=False):
-        shutil.rmtree(str(path), ignore_errors=ignore_errors)
+        if path.is_file():
+            path.unlink()
+        else:
+            shutil.rmtree(str(path), ignore_errors=ignore_errors)
 
     def expand_path(self, path):
         return Path(path).expanduser().resolve()
@@ -280,7 +310,7 @@ class LocalAccess(OsAccess):
         return tzlocal.get_localzone()
 
 
-class SshAccess(OsAccess):
+class SSHAccess(OsAccess):
 
     def __init__(self, config_path, hostname, user=None):
         self.hostname = hostname
@@ -290,20 +320,6 @@ class SshAccess(OsAccess):
     def __repr__(self):
         args = ['ssh', '-F', self._config_path, self._user_and_hostname]
         return '<{} {}>'.format(self.__class__.__name__, _arg_list_to_str(args))
-
-    def become(self, user):
-        other_user_access = self.__class__(self._config_path, self.hostname, user=user)
-        if not other_user_access.works():
-            self.run_command(['sudo', 'cp', '-r', '/home/vagrant/.ssh', '~{}/'.format(user)])
-        assert other_user_access.works()
-        return other_user_access
-
-    def works(self):
-        try:
-            self.run_command([':'])
-        except ProcessError:
-            return False
-        return True
 
     def run_command(self, args, input=None, cwd=None, check_retcode=True, log_output=True, timeout=None, env=None):
         if isinstance(args, str):
@@ -324,6 +340,17 @@ class SshAccess(OsAccess):
             check_retcode=check_retcode,
             log_output=log_output,
             timeout=timeout)
+
+    def is_working(self):
+        try:
+            self.run_command([':'])
+        except ProcessError:
+            return False
+        return True
+
+    @staticmethod
+    def home():
+        return PurePosixPath('~')
 
     def file_exists(self, path):
         output = self.run_command(['[', '-f', path, ']', '&&', 'echo', 'yes', '||', 'echo', 'no']).strip()
@@ -347,11 +374,17 @@ class SshAccess(OsAccess):
         LocalAccess().run_command(['rsync', '-aL', '-e', _arg_list_to_str(ssh_args), source, destination])
 
     def read_file(self, from_remote_path, ofs=None):
-        if ofs:
-            assert type(ofs) is int, repr(ofs)
-            return self.run_command(['tail', '--bytes=+%d' % ofs, from_remote_path], log_output=False)
-        else:
-            return self.run_command(['cat', from_remote_path], log_output=False)
+        try:
+            if ofs:
+                assert type(ofs) is int, repr(ofs)
+                return self.run_command(['tail', '--bytes=+%d' % ofs, from_remote_path], log_output=False)
+            else:
+                return self.run_command(['cat', from_remote_path], log_output=False)
+        except ProcessError as e:
+            if e.returncode == 1:
+                if not self.file_exists(from_remote_path):
+                    raise FileNotFound(from_remote_path)
+            raise
 
     def write_file(self, to_remote_path, contents):
         to_remote_path = PurePosixPath(to_remote_path)
@@ -370,8 +403,8 @@ class SshAccess(OsAccess):
         self.run_command(['rm', '-r', path], check_retcode=not ignore_errors)
 
     def expand_path(self, path):
-        assert '*' not in path, repr(path)  # this function is only for expanding ~ and $VARs. for globs use expand_glob
-        return self.run_command(['echo', path]).strip()
+        assert '*' not in str(path), repr(path)  # Only expands user and env vars.
+        return PurePosixPath(self.run_command(['echo', path]).strip())
 
     def expand_glob(self, path_mask, for_shell=False):
         if not path_mask.is_absolute():

@@ -8,7 +8,7 @@ from pathlib2 import Path
 class SSHConfig(object):
     def __init__(self, path):
         self.path = path
-        self._connections_dir = Path('/tmp/func_tests')
+        self._connections_dir = Path('/tmp/func_tests/ssh_connections')
         self._connections_dir.mkdir(exist_ok=True)
 
     def reset(self):
@@ -24,18 +24,16 @@ class SSHConfig(object):
             ControlPath {connections_dir}/%r@%h:%p.ssh.sock
         ''').lstrip().format(connections_dir=self._connections_dir.resolve()))
 
-    def add_host(self, hostname, alias=None, port=None, user=None, key_path=None):
-        lines = []
-        if alias:
-            lines.append(u'Host {}'.format(alias))
-            lines.append(u'    HostName {}'.format(hostname))
-        else:
-            lines.append(u'Host {}'.format(hostname))
-        if port:  # No problem if empty string.
-            lines.append(u'    Port {}'.format(port))
-        if user:  # No problem if empty string.
-            lines.append(u'    User {}'.format(user))
-        if key_path:  # No problem if empty string.
-            lines.append(u'    IdentityFile {}'.format(key_path))
+    def add_host(self, hostname, aliases=None, port=None, user=None, key_path=None):
         with self.path.open('a') as config_file:
-            config_file.write('\n'.join(lines) + '\n')
+            if aliases:
+                config_file.write(u'Host {}\n'.format(' '.join(aliases)))
+                config_file.write(u'    HostName {}\n'.format(hostname))
+            else:
+                config_file.write(u'Host {}\n'.format(hostname))
+            if port and port != 22:  # No problem if empty string.
+                config_file.write(u'    Port {}\n'.format(port))
+            if user:  # No problem if empty string.
+                config_file.write(u'    User {}\n'.format(user))
+            if key_path:  # No problem if empty string.
+                config_file.write(u'    IdentityFile {}\n'.format(key_path))
