@@ -119,7 +119,13 @@ void View::registerApiHandlers()
         nx::network::http::Method::post,
         &m_controller->connectSessionManager());
 
-    // TODO: #ak Following handlers are here for compatibility with 3.1-beta. Remove after 3.1 release.
+    // Registering CONNECT handler
+    registerApiHandler<relaying::BeginListeningUsingConnectMethodHandler>(
+        nx::network::http::Method::connect,
+        &m_controller->listeningPeerManager());
+
+    // TODO: #ak Following handlers are here for compatibility with 3.1-beta.
+    // Keep until 3.2 release just for case.
     registerCompatibilityHandlers();
 }
 

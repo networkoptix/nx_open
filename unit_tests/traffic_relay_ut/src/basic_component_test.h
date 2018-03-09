@@ -17,6 +17,8 @@ class BasicComponentTest:
 public:
     BasicComponentTest(QString tmpDir = QString());
     ~BasicComponentTest();
+
+    nx::utils::Url basicUrl() const;
 };
 
 } // namespace test
