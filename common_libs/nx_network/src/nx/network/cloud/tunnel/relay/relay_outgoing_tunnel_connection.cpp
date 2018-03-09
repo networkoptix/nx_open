@@ -181,7 +181,7 @@ void OutgoingTunnelConnection::reportTunnelClosure(SystemError::ErrorCode reason
 
 void OutgoingTunnelConnection::onInactivityTimeout()
 {
-    if (m_usageCounter.unique())
+    if (m_usageCounter.use_count() == 1)
     {
         m_inactivityTimer.cancelSync();
         return reportTunnelClosure(SystemError::timedOut);
