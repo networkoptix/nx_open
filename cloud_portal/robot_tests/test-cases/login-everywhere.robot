@@ -70,7 +70,8 @@ works at restore password page with email input - after submit error
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${EMAIL UNREGISTERED}
     Click Button    ${RESET PASSWORD BUTTON}
-    Check For Alert Dismissable    ${CANNOT SEND CONFIRMATION EMAIL} ${ACCOUNT DOES NOT EXIST}
+    ${CANNOT SEND CONFIRMATION EMAIL ACCOUNT DOES NOT EXIST}    Catenate    ${CANNOT SEND CONFIRMATION EMAIL}${SPACE}${ACCOUNT DOES NOT EXIST}
+    Check For Alert Dismissable    ${CANNOT SEND CONFIRMATION EMAIL ACCOUNT DOES NOT EXIST}
     Check Log In
     Close Browser
 
@@ -89,7 +90,8 @@ works at restore password page with password input - before submit
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${random email}    ${password}
     ${link}    Get Activation Link    ${random email}
-    Go To    ${link}[1]
+    ${link}    Strip String    ${link}
+    Go To    ${link}
     Go To    ${url}/restore_password
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${random email}

@@ -59,7 +59,7 @@ Check box is checked when registering with it checked
     Go To    ${url}/account
     Verify In Account Page
     ${checked}    Get Element Attribute    ${ACCOUNT SUBSCRIBE CHECKBOX}    checked
-    Should Be True    ${checked}
+    Should Be True    "${checked}"
     Close Browser
 
 Check box is not checked when registering with it not checked
@@ -114,7 +114,7 @@ Checking check box and saving maintains that setting
     Open Browser and go to URL    ${url}/account
     Log In    ${random email}    ${password}    button=None
     ${checked}    Get Element Attribute    ${ACCOUNT SUBSCRIBE CHECKBOX}    checked
-    Should Be True    ${checked}
+    Should Be True    "${checked}"
     Close Browser
 
 Changing first name and saving maintains that setting
