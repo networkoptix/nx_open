@@ -1,8 +1,10 @@
 
+@import 'native-theme/_theme_palette';
 @import '_theme_palette';
 @import 'custom/_custom_palette';
 @import '_theme_variables';
-@import '~bootstrap-sass/assets/stylesheets/bootstrap';
+@import '~bootstrap/scss/bootstrap';
+//@import '~bootstrap-sass/assets/stylesheets/bootstrap';
 @import '_theme_override';
 @import '_header';
 
@@ -54,7 +56,7 @@ footer {
 
   .nav > li > a,
   .nav > li > span{
-    font-size: $font-size-small;
+    font-size: $font-size-sm;
     padding: 10px;
     color:  $light12;
     &:hover{
@@ -205,7 +207,7 @@ a.disabled {
     box-shadow: 0px 2px 2px 0px transparentize(dark(15),0.8);
 }
 
-@media (min-width: $screen-sm-min) {
+@include media-breakpoint-up(sm) {
   .hoverable .hover-visible {
     visibility: hidden;
   }
@@ -249,7 +251,7 @@ a.disabled {
 
   background-color: $body-bg;
   font-weight: lighter;
-  font-size: $font-size-h2;
+  font-size: $h2-font-size;
   display: table;
 
     .no-data-panel-body{
@@ -382,7 +384,7 @@ td{
     margin-bottom: 2px;
   }
   .user-name{
-    font-size: $font-size-h6;
+    font-size: $h6-font-size;
     line-height:16px;
     font-weight: bold;
     display: block;
@@ -399,7 +401,7 @@ td{
     border-radius: $border-radius-small;
 
     font-weight: normal;
-    font-size: $font-size-h6;
+    font-size: $h6-font-size;
   }
 }
 
@@ -413,7 +415,8 @@ td{
 .buttons-panel {
     padding-bottom: 15px;
 }
-@media (min-width: $screen-sm-min) {
+
+@include media-breakpoint-up(sm) {
   .buttons-panel {
     float: right;
     padding-top: 15px;
@@ -440,12 +443,12 @@ td{
 
   .alert {
     margin-bottom: 8px;
-
-    @media (max-width: $screen-sm-max) {
+    
+      @include media-breakpoint-down(sm) {
       min-width: 100%;
     }
-
-    @media (min-width: $screen-sm-min) {
+    
+      @include media-breakpoint-up(sm) {
       min-width: 600px;
     }
 
@@ -476,14 +479,12 @@ td{
   left:50%;
   transform: translateX(-50%);
   z-index:1100;
-
-
-
-  @media (max-width: $screen-sm-max) {
+    
+    @include media-breakpoint-down(sm) {
     min-width: 100%;
   }
-
-  @media (min-width: $screen-sm-min) {
+    
+    @include media-breakpoint-up(sm) {
     min-width: 600px;
   }
 
@@ -507,7 +508,7 @@ td{
   }
 }
 
-@media (min-width: $screen-sm-min) {
+@include media-breakpoint-up(sm) {
   // Automatically set modal's width for larger viewports
   .modal-dialog .alert-top {
     top: -74px;
@@ -663,8 +664,7 @@ h2.version-number{
     }
 }
 
-
-@media (min-width: $screen-md-min) {
+@include media-breakpoint-up(md) {
     .flex-md{
         display:flex;
         align-items:stretch;

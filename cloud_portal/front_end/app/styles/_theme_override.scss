@@ -42,11 +42,13 @@ h1>.label{
 
 .modal {
   &.fade .modal-dialog {
-    @include translate(0, -20px);
-    @include transition-transform(0.1s ease-out);
+    transform : translate(0, -20px);
+    transition: 0.1s ease-out;
   }
 
-  &.in .modal-dialog { @include translate(0, 0) }
+  &.in .modal-dialog {
+    transform : translate(0, 0);
+  }
 
   .modal-body{
     padding-top: 0;
@@ -93,7 +95,7 @@ h1>.label{
   }
 }
 
-@media (min-width: $screen-sm-min) {
+@include media-breakpoint-up(sm) {
   /* Automatically set modal's width for larger viewports */
   .modal-dialog {
     margin: 108px auto;
@@ -104,7 +106,7 @@ h1>.label{
   }
 }
 
-@media (min-width: $screen-sm-min) {
+@include media-breakpoint-up(sm) {
   .form-horizontal .help-block { /* Do not jump form when help block changes (help-block is to the right from the input) */
     position: absolute;
   }
@@ -204,7 +206,7 @@ select.form-control{
 
 
 .alert {
-  font-size: $font-size-h4;
+  font-size: $h4-font-size;
   padding-top: 8px;
   padding-bottom: 8px;
   @include box-shadow(0px 8px 4px 0px transparentize($light16, 0.9));

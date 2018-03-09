@@ -24,7 +24,7 @@ $header-collapsing-width-1: 1px;
     box-shadow: 0 6px 10px $light3;
 
     .navbar-brand{
-        font-size: $font-size-h3;
+        font-size: $h3-font-size;
         margin: 0 $horizontal-spacing !important;
 
         &>img{
@@ -43,7 +43,7 @@ $header-collapsing-width-1: 1px;
         margin:0;
         padding:0;
 
-        font-size: $font-size-large;
+        font-size: $font-size-lg;
 
         &.vertical-bar{
             border-right: 1px solid $common-border-color;

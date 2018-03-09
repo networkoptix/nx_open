@@ -313,7 +313,7 @@ window.L = {};
                                 controller: 'StartPageCtrl'
                             })
                             .when('/bar', {
-                                templateUrl: ''
+                                template: ''
                             })
                             .otherwise({
                                 title: languageServiceProvider.$get().lang.pageTitles.pageNotFound,
