@@ -40,10 +40,9 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::network::http::AuthType)
  * State is changed just before delivering event.
  * This class methods are not thread-safe.
  * NOTE: This class is a replacement for nx::network::http::AsyncHttpClient.
- *   As soon as it becomes ready, nx::network::http::AsyncHttpClient will be declared as deprecated.
  * WARNING: It is strongly recommended to listen for someMessageBodyAvailable() event and
  *   read current message body buffer with AsyncClient::fetchMessageBodyBuffer() call every time
- *   to avoid internal message body buffer to consume too much memory.
+ *   to avoid internal message body buffer consuming too much memory.
  */
 class NX_NETWORK_API AsyncClient:
     public nx::network::aio::BasicPollable
@@ -187,8 +186,17 @@ public:
         const StringType& protocolToUpgradeTo,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
 
-    void doRequest(nx::network::http::Method::ValueType method,
-        const nx::utils::Url &url);
+    void doConnect(
+        const nx::utils::Url& proxyUrl,
+        const StringType& targetHost);
+    void doConnect(
+        const nx::utils::Url& proxyUrl,
+        const StringType& targetHost,
+        nx::utils::MoveOnlyFunc<void()> completionHandler);
+
+    void doRequest(
+        nx::network::http::Method::ValueType method,
+        const nx::utils::Url& url);
     void doRequest(
         nx::network::http::Method::ValueType method,
         const nx::utils::Url& url,
