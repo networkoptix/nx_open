@@ -201,11 +201,12 @@ def restore_password(request):
                                       error_data={'new_password': error.detail})
 
         email = Account.extract_temp_credentials(code)[1]
-        account = Account.objects.get(email=email)
-        account.activated_date = timezone.now()
-        account.save()
-
         Account.restore_password(code, new_password)
+
+        account = Account.objects.get(email=email)
+        if not account.activated_date:
+            account.activated_date = timezone.now()
+            account.save()
     elif 'user_email' in request.data:
         user_email = request.data['user_email'].lower()
         Account.reset_password(user_email)
