@@ -206,6 +206,7 @@ public:
     static const StringType connect;
 
     static bool isMessageBodyAllowed(ValueType);
+    static bool isMessageBodyAllowedInResponse(ValueType);
 };
 
 /**

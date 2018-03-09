@@ -280,6 +280,11 @@ bool Method::isMessageBodyAllowed(ValueType method)
     return method != get && method != head && method != delete_ && method != connect;
 }
 
+bool Method::isMessageBodyAllowedInResponse(ValueType method)
+{
+    return method != connect;
+}
+
 //-------------------------------------------------------------------------------------------------
 // class MimeProtoVersion.
 

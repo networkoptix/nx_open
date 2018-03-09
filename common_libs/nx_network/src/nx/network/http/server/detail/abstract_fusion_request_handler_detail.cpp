@@ -14,7 +14,7 @@ void BaseFusionRequestHandler::requestCompleted(FusionRequestResult result)
 {
     std::unique_ptr<nx::network::http::AbstractMsgBodySource> outputMsgBody;
 
-    if (nx::network::http::Method::isMessageBodyAllowed(m_requestMethod) &&
+    if (nx::network::http::Method::isMessageBodyAllowedInResponse(m_requestMethod) &&
         nx::network::http::StatusCode::isMessageBodyAllowed(result.httpStatusCode()))
     {
         outputMsgBody = std::make_unique<nx::network::http::BufferSource>(
