@@ -97,30 +97,30 @@ TYPED_TEST_CASE_P(Relaying);
 
 TYPED_TEST_P(Relaying, server_socket_registers_itself_on_relay)
 {
-    assertServerIsListeningOnRelay();
+    this->assertServerIsListeningOnRelay();
 }
 
 TYPED_TEST_P(Relaying, connection_can_be_established)
 {
-    assertConnectionCanBeEstablished();
+    this->assertConnectionCanBeEstablished();
 }
 
 TYPED_TEST_P(Relaying, connecting_using_full_server_name)
 {
-    setRemotePeerName(cloudSystemCredentials().hostName());
-    assertConnectionCanBeEstablished();
+    this->setRemotePeerName(this->cloudSystemCredentials().hostName());
+    this->assertConnectionCanBeEstablished();
 }
 
 TYPED_TEST_P(Relaying, exchanging_fixed_data)
 {
-    startExchangingFixedData();
-    assertDataHasBeenExchangedCorrectly();
+    this->startExchangingFixedData();
+    this->assertDataHasBeenExchangedCorrectly();
 }
 
 TYPED_TEST_P(Relaying, multiple_connections)
 {
-    startMoreConnectionsThatAreFoundOnRelay();
-    assertDataHasBeenExchangedCorrectly();
+    this->startMoreConnectionsThatAreFoundOnRelay();
+    this->assertDataHasBeenExchangedCorrectly();
 }
 
 REGISTER_TYPED_TEST_CASE_P(
