@@ -1579,23 +1579,26 @@ QMap<QString, QString> QnPlAxisResource::executeParamsQueries(const QSet<QString
     CLHttpStatus status;
     isSuccessful = true;
 
-    CLSimpleHTTPClient httpClient(
-        getHostAddress(),
-        QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT),
-        getNetworkTimeout(),
-        getAuth());
-
     for (const auto& query: queries)
     {
         if (QnResource::isStopping())
             break;
 
-        status = httpClient.doGET(query);
-        if ( status == CL_HTTP_SUCCESS )
-        {
-            QByteArray body;
-            httpClient.readAll( body );
+        QUrl url = lit("http://%1:%2/%3")
+            .arg(getHostAddress())
+            .arg(QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT))
+            .arg(query);
+        url.setUserName(getAuth().user());
+        url.setPassword(getAuth().password());
 
+        int statusCode = nx_http::StatusCode::undefined;
+        QByteArray body;
+        SystemError::ErrorCode errorCode = nx_http::downloadFileSync(
+            url,
+            &statusCode,
+            &body);
+        if (statusCode == nx_http::StatusCode::ok)
+        {
             if (body.startsWith("OK"))
                 continue;
 

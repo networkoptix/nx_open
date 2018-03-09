@@ -13,6 +13,7 @@ module.exports = {
         login: 'scripts/entrypoint-login.js',
         webcommonApp: 'web_common/scripts/entrypoint-app.js',
         webcommonPartial: 'web_common/scripts/entrypoint-partial.js',
+        apiXsl: 'scripts/entrypoint-api-xsl.js',
     },
     plugins: [
         //Development plugins
@@ -37,6 +38,12 @@ module.exports = {
             template: 'login-template.html',
             filename: 'login.html',
             inject:false
+        }),
+        new HtmlWebpackPlugin({
+            chunks: ['commons', 'apiXsl'],
+            template: 'api.xsl',
+            filename: 'api.xsl',
+            inject: false
         }),
         new ExtractTextPlugin({filename: 'styles/[name].css'}),
         new CopyWebpackPlugin([

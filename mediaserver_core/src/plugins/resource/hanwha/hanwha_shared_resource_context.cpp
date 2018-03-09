@@ -13,19 +13,13 @@ namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
-static std::array<int, (int) HanwhaSessionType::count> kMaxConsumersForType =
-{
-    0,  //< undefined
-    10, //< live
-    3,  //< archive
-    1,  //< preview
-    1  //< fileExport
-};
-
 namespace {
 
 // Limited by NPM-9080VQ, it can only be opening 3 stream at the same time, while it has 4.
 static const int kMaxConcurrentRequestNumber = 3;
+
+static const int kNvrMaxLiveConnections = 10;
+static const int kNvrMaxArchiveConnections = 3;
 
 static const std::chrono::seconds kCacheUrlTimeout(10);
 static const std::chrono::seconds kCacheDataTimeout(30);
@@ -162,9 +156,12 @@ SessionContextPtr HanwhaSharedResourceContext::session(
     QnMutexLocker lock(&m_sessionMutex);
     cleanupUnsafe();
 
-    auto& sessionsByClientId = m_sessions[sessionType];
+    bool isLive = sessionType == HanwhaSessionType::live;
+
+    auto& sessionsByClientId = m_sessions[isLive];
+    const int maxConsumers = isLive ? kNvrMaxLiveConnections : kNvrMaxArchiveConnections;
     const bool sessionLimitExceeded = !sessionsByClientId.contains(clientId)
-        && sessionsByClientId.size() >= kMaxConsumersForType[(int)sessionType];
+        && sessionsByClientId.size() >= maxConsumers;
 
     if (sessionLimitExceeded)
         return SessionContextPtr();

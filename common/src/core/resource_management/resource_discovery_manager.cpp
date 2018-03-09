@@ -432,17 +432,15 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
             QElapsedTimer timer;
             timer.restart();
             QnResourceList lst = searcher->search();
-            NX_LOG(lit("Discovery----: searcher %1 took %2 ms to find new resources").
-                arg(searcher->manufacture()).
-                arg(timer.elapsed()), cl_logDEBUG1);
+            NX_DEBUG(this, lit("Searcher %1 took %2 ms to find %3 resources").
+                arg(searcher->manufacture())
+                .arg(timer.elapsed())
+                .arg(lst.size()));
 
             // resources can be searched by client in or server.
             // if this client in stand alone => lets add Qn::local
             // server does not care about flags
-            for( QnResourceList::iterator
-                it = lst.begin();
-                it != lst.end();
-                 )
+            for(QnResourceList::iterator it = lst.begin(); it != lst.end();)
             {
                 const QnSecurityCamResource* camRes = dynamic_cast<QnSecurityCamResource*>(it->data());
                 //checking, if found resource is reserved by some other searcher

@@ -401,7 +401,7 @@ bool ManagerPool::fetchMetadataForResource(const QnUuid& resourceId, QSet<QnUuid
     auto context = m_contexts.find(resourceId);
     if (context == m_contexts.cend())
     {
-        NX_ERROR(
+        NX_VERBOSE(
             this,
             lm("Could not find metadata context for resource %1")
                 .arg(resourceId));
