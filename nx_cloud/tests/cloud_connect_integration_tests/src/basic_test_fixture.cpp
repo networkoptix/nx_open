@@ -60,6 +60,8 @@ cf::future<std::string> MemoryRemoteRelayPeerPool::findRelayByDomain(
     return cf::make_ready_future<std::string>(std::move(redirectToEndpoint));
 }
 
+//-------------------------------------------------------------------------------------------------
+
 BasicTestFixture::BasicTestFixture(
     int relayCount,
     boost::optional<std::chrono::seconds> disconnectedPeerTimeout)

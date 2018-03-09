@@ -1,11 +1,14 @@
 #include "relay_api_client.h"
 
 #include <nx/fusion/model_functions.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/cloud/cloud_connect_settings.h>
 #include <nx/network/http/rest/http_rest_client.h>
+#include <nx/network/http/custom_headers.h>
+#include <nx/network/socket_global.h>
+#include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/type_utils.h>
-#include <nx/network/http/custom_headers.h>
-#include <nx/network/url/url_parse_helper.h>
 
 #include "relay_api_http_paths.h"
 
@@ -19,11 +22,14 @@ namespace api {
 
 static ClientFactory::CustomFactoryFunc factoryFunc;
 
-std::unique_ptr<Client> ClientFactory::create(const utils::Url &baseUrl)
+std::unique_ptr<Client> ClientFactory::create(const utils::Url& baseUrl)
 {
     if (factoryFunc)
         return factoryFunc(baseUrl);
-    return std::make_unique<ClientImpl>(baseUrl);
+    if (network::SocketGlobals::cloud().settings().useHttpConnectToListenOnRelay)
+        return std::make_unique<ClientImplUsingHttpConnect>(baseUrl);
+    else
+        return std::make_unique<ClientImpl>(baseUrl);
 }
 
 ClientFactory::CustomFactoryFunc
@@ -318,6 +324,65 @@ ResultCode ClientImpl::toResultCode(
     return fromHttpStatusCode(
         static_cast<nx::network::http::StatusCode::Value>(
             httpResponse->statusLine.statusCode));
+}
+
+//-------------------------------------------------------------------------------------------------
+
+ClientImplUsingHttpConnect::ClientImplUsingHttpConnect(
+    const nx::utils::Url& baseUrl)
+    :
+    base_type(baseUrl)
+{
+}
+
+void ClientImplUsingHttpConnect::beginListening(
+    const nx::String& peerName,
+    BeginListeningHandler completionHandler)
+{
+    post(
+        [this, peerName, completionHandler = std::move(completionHandler)]() mutable
+        {
+            auto httpClient = std::make_unique<network::http::AsyncClient>();
+            httpClient->bindToAioThread(getAioThread());
+            auto httpClientPtr = httpClient.get();
+            m_activeRequests.push_back(std::move(httpClient));
+            httpClientPtr->doConnect(
+                url(),
+                peerName,
+                [this, httpClientPtr, httpClientIter = std::prev(m_activeRequests.end()),
+                    completionHandler = std::move(completionHandler)]() mutable
+                {
+                    processBeginListeningResponse(
+                        httpClientIter,
+                        std::move(completionHandler));
+                });
+        });
+}
+
+void ClientImplUsingHttpConnect::processBeginListeningResponse(
+    std::list<std::unique_ptr<network::aio::BasicPollable>>::iterator httpClientIter,
+    BeginListeningHandler completionHandler)
+{
+    auto httpClient = nx::utils::static_unique_ptr_cast<network::http::AsyncClient>(
+        std::move(*httpClientIter));
+    m_activeRequests.erase(httpClientIter);
+
+    if (httpClient->failed() || !httpClient->response())
+        return completionHandler(ResultCode::networkError, BeginListeningResponse(), nullptr);
+
+    const auto resultCode = toResultCode(SystemError::noError, httpClient->response());
+    if (httpClient->response()->statusLine.statusCode != network::http::StatusCode::ok)
+    {
+        return completionHandler(
+            resultCode != ResultCode::ok ? resultCode : ResultCode::unknownError,
+            BeginListeningResponse(),
+            nullptr);
+    }
+
+    BeginListeningResponse response;
+    deserializeFromHeaders(httpClient->response()->headers, &response);
+
+    completionHandler(api::ResultCode::ok, std::move(response), httpClient->takeSocket());
 }
 
 } // namespace api

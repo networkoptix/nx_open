@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include <boost/optional.hpp>
 
 #include <QtCore/QString>
@@ -13,6 +15,18 @@ namespace cloud {
 class NX_NETWORK_API CloudConnectSettings
 {
 public:
+    std::string forcedMediatorUrl;
+    bool isUdpHpDisabled = false;
+    bool isOnlyCloudProxyEnabled = false;
+    bool useHttpConnectToListenOnRelay = false;
+
+    CloudConnectSettings() = default;
+    CloudConnectSettings(const CloudConnectSettings&);
+    CloudConnectSettings& operator=(const CloudConnectSettings&);
+
+    // TODO: #ak Change originatingHostAddressReplacement()
+    // to a regular field and make this class a structure.
+
     /**
      * @param hostAddress will be used by mediator instead of request source address.
      * This is needed when peer is placed in the same LAN as mediator (e.g., vms_gateway).
