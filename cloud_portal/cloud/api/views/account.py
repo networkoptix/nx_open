@@ -200,6 +200,11 @@ def restore_password(request):
             raise APIRequestException('Wrong new password', ErrorCodes.wrong_parameters,
                                       error_data={'new_password': error.detail})
 
+        email = Account.extract_temp_credentials(code)[1]
+        account = Account.objects.get(email=email)
+        account.activated_date = timezone.now()
+        account.save()
+
         Account.restore_password(code, new_password)
     elif 'user_email' in request.data:
         user_email = request.data['user_email'].lower()
