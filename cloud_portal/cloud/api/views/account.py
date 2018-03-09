@@ -70,6 +70,12 @@ def login(request):
         request.session.set_expiry(0)
 
     django.contrib.auth.login(request, user)
+
+    #If the user does not have an activated_date set it to the current time
+    if not user.activated_date:
+        user.activated_date = timezone.now()
+        user.save()
+
     request.session['login'] = email
     request.session['password'] = password
     if 'timezone' in request.data:
