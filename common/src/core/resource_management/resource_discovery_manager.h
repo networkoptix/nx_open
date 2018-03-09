@@ -25,10 +25,6 @@
 #include <common/common_module_aware.h>
 #include "resource_searcher.h"
 
-//#define DISCOVERY_DBG
-
-#if defined (DISCOVERY_DBG)
-#   define DLOG(...) NX_LOG(__VA_ARGS__, cl_logINFO)
 #   define NetResString(res) \
         QString::fromLatin1("Network resource url: %1, ip: %2, mac: %3, uniqueId: %4") \
             .arg(res->getUrl()) \
@@ -36,9 +32,6 @@
             .arg(res->getMAC().toString()) \
             .arg(res->getUniqueId())
 # define FL1(x) QString::fromLatin1(x)
-#else
-#   define DLOG(...)
-#endif
 
 
 class QnAbstractResourceSearcher;
