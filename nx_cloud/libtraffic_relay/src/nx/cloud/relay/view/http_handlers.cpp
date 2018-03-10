@@ -37,6 +37,9 @@ ConnectToPeerHandler::ConnectToPeerHandler(
         connectSessionManager,
         &controller::AbstractConnectSessionManager::connectToPeer)
 {
+    addResultCodeToHttpStatusConversion(
+        relay::api::ResultCode::ok,
+        nx::network::http::StatusCode::switchingProtocols);
 }
 
 controller::ConnectToPeerRequestEx ConnectToPeerHandler::prepareRequestData(

@@ -51,12 +51,6 @@ protected:
         m_apiResponse.push(resultCode);
     }
 
-    nx::utils::Url basicUrl() const
-    {
-        return nx::network::url::Builder().setScheme("http").setHost("127.0.0.1")
-            .setPort(moduleInstance()->httpEndpoints()[0].port).toUrl();
-    }
-
 private:
     controller::ConnectSessionManagerFactory::FactoryFunc m_connectionSessionManagerFactoryFuncBak;
     relaying::ListeningPeerManagerFactory::Function m_listeningPeerManagerFactoryFuncBak;

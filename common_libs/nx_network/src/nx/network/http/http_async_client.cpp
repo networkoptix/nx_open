@@ -6,6 +6,7 @@
 #include <nx/network/buffered_stream_socket.h>
 #include <nx/network/socket_factory.h>
 #include <nx/network/socket_global.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
@@ -272,6 +273,29 @@ void AsyncClient::doUpgrade(
     m_additionalHeaders.emplace("Content-Length", "0");
     composeRequest(method);
     initiateHttpMessageDelivery();
+}
+
+void AsyncClient::doConnect(
+    const nx::utils::Url& proxyUrl,
+    const StringType& targetHost)
+{
+    NX_ASSERT(proxyUrl.isValid());
+
+    resetDataBeforeNewRequest();
+    m_requestUrl = proxyUrl;
+    m_contentLocationUrl = proxyUrl;
+    composeRequest(Method::connect);
+    m_request.requestLine.url = nx::network::url::Builder().setPath(targetHost);
+    initiateHttpMessageDelivery();
+}
+
+void AsyncClient::doConnect(
+    const nx::utils::Url& proxyUrl,
+    const StringType& targetHost,
+    nx::utils::MoveOnlyFunc<void()> completionHandler)
+{
+    m_onDone = std::move(completionHandler);
+    doConnect(proxyUrl, targetHost);
 }
 
 void AsyncClient::doRequest(
