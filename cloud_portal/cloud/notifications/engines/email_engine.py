@@ -6,7 +6,6 @@ from email.MIMEImage import MIMEImage  # python 2
 from django.conf import settings
 import json
 import os
-from util.helpers import get_language_for_email
 from cms.models import customization_cache, check_update_cache
 from cms.controllers import filldata 
 from django.core.cache import cache, caches
@@ -44,8 +43,7 @@ def email_cache(customization_name, cache_type, value=None, force=None):
         return data[customization_name][cache_type]
 
 
-def send(email, msg_type, message, customization_name):
-    language_code = get_language_for_email(email, customization_name)
+def send(email, msg_type, message, language_code, customization_name):
 
     config = {
         'portal_url': customization_cache(customization_name, "portal_url")
