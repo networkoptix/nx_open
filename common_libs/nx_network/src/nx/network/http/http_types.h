@@ -203,8 +203,10 @@ public:
     static const StringType put;
     static const StringType delete_;
     static const StringType options;
+    static const StringType connect;
 
     static bool isMessageBodyAllowed(ValueType);
+    static bool isMessageBodyAllowedInResponse(ValueType);
 };
 
 /**

@@ -148,6 +148,7 @@ public:
         }
 
         if (result.errorClass != FusionRequestErrorClass::noError &&
+            nx::network::http::Method::isMessageBodyAllowedInResponse(m_requestMethod) &&
             nx::network::http::StatusCode::isMessageBodyAllowed(result.httpStatusCode()))
         {
             outputMsgBody = std::make_unique<nx::network::http::BufferSource>(
@@ -166,10 +167,15 @@ private:
         const Output& output,
         std::unique_ptr<nx::network::http::AbstractMsgBodySource>* outputMsgBody)
     {
-        if (nx::network::http::StatusCode::isMessageBodyAllowed(result.httpStatusCode()))
+        if (nx::network::http::Method::isMessageBodyAllowedInResponse(m_requestMethod) &&
+            nx::network::http::StatusCode::isMessageBodyAllowed(result.httpStatusCode()))
+        {
             return serializeOutputAsMessageBody(output, outputMsgBody);
+        }
         else
+        {
             return serializeToHeaders(&response()->headers, output);
+        }
     }
 
     bool serializeOutputAsMessageBody(
