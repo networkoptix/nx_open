@@ -5,14 +5,22 @@ from __future__ import unicode_literals
 from django.db import connection, migrations
 
 
-#UPDATE cloudportal.api_account db1 JOIN clouddb.account db2 JOIN clouddb.account_status db3
-#ON db1.email=db2.email AND db2.status_code=db3.code SET db1.activated_date=db1.created_date
-#WHERE db1.activated_date is null AND db3.description="Activated";
+"""UPDATE cloudportal.api_account db1
+   JOIN clouddb.account db2
+   JOIN clouddb.account_status db3
+   ON db1.email=db2.email AND db2.status_code=db3.code
+   SET db1.activated_date=db1.created_date
+   WHERE db1.activated_date is null AND db3.description="Activated";"""
 
 
 def updateActivatedDate(apps, schema_editor):
     with connection.cursor() as cursor:
-        cursor.execute('UPDATE cloudportal.api_account db1 JOIN clouddb.account db2 JOIN clouddb.account_status db3 ON db1.email=db2.email AND db2.status_code=db3.code SET db1.activated_date=db1.created_date WHERE db1.activated_date is NULL AND db3.description="activated";')
+        cursor.execute('''UPDATE cloudportal.api_account db1
+                          JOIN clouddb.account db2
+                          JOIN clouddb.account_status db3
+                          ON db1.email=db2.email AND db2.status_code=db3.code
+                          SET db1.activated_date=db1.created_date
+                          WHERE db1.activated_date is NULL AND db3.description="activated";''')
 
 
 class Migration(migrations.Migration):
