@@ -175,7 +175,7 @@ void WearableArchiveSynchronizationTask::createStreamRecorder(qint64 startTimeMs
 
     // Make sure we get recordingProgress notifications.
     // Adding 100ms at end just to feel safe. We don't want to drop packets.
-    m_recorder->setEofDateTime((startTimeMs + durationMs + 100) * 1000);
+    m_recorder->setProgressBounds(startTimeMs * 1000, (startTimeMs + durationMs + 100) * 1000);
 
     // Note that direct connection is OK here as we control the
     // lifetimes of all the objects involved.
