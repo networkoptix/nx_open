@@ -218,7 +218,8 @@ VisualizerData VoiceSpectrumItem::VisualizerDataGenerator::getUpdatedData()
     const auto timeDifferenceMs = currentTimestampMs - m_lastTimestampMs;
     m_lastTimestampMs = currentTimestampMs;
 
-    auto currentData = QnVoiceSpectrumAnalyzer::instance()->getSpectrumData().data;
+    auto currentData = interpolate(QnVoiceSpectrumAnalyzer::instance()->getSpectrumData().data,
+        linesCount());
     if (currentData.isEmpty())
         return generateEmptyData(currentTimestampMs);
 
