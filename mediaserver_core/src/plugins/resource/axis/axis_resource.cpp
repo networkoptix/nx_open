@@ -34,6 +34,8 @@
 
 using namespace std;
 
+namespace http = nx::network::http;
+
 const QString QnPlAxisResource::MANUFACTURE(lit("Axis"));
 
 namespace {
@@ -157,7 +159,7 @@ void QnPlAxisResource::checkIfOnlineAsync( std::function<void(bool)> completionH
     nx::utils::Url apiUrl;
     apiUrl.setScheme( lit("http") );
     apiUrl.setHost( getHostAddress() );
-    apiUrl.setPort( QUrl(getUrl()).port(nx::network::http::DEFAULT_HTTP_PORT) );
+    apiUrl.setPort( QUrl(getUrl()).port(http::DEFAULT_HTTP_PORT) );
 
     QAuthenticator auth = getAuth();
 
@@ -168,11 +170,11 @@ void QnPlAxisResource::checkIfOnlineAsync( std::function<void(bool)> completionH
 
     QString resourceMac = getMAC().toString();
     auto requestCompletionFunc = [resourceMac, completionHandler]
-        (SystemError::ErrorCode osErrorCode, int statusCode, nx::network::http::BufferType msgBody,
-        nx::network::http::HttpHeaders /*httpResponseHeaders*/) mutable
+        (SystemError::ErrorCode osErrorCode, int statusCode, http::BufferType msgBody,
+            http::HttpHeaders /*httpResponseHeaders*/) mutable
     {
         if( osErrorCode != SystemError::noError ||
-            statusCode != nx::network::http::StatusCode::ok )
+            statusCode != http::StatusCode::ok )
         {
             return completionHandler( false );
         }
@@ -185,9 +187,7 @@ void QnPlAxisResource::checkIfOnlineAsync( std::function<void(bool)> completionH
         completionHandler( macAddress == resourceMac.toLatin1() );
     };
 
-    nx::network::http::downloadFileAsync(
-        apiUrl,
-        requestCompletionFunc );
+    http::downloadFileAsync(apiUrl, requestCompletionFunc);
 }
 
 QString QnPlAxisResource::getDriverName() const
@@ -1584,20 +1584,21 @@ QMap<QString, QString> QnPlAxisResource::executeParamsQueries(const QSet<QString
         if (QnResource::isStopping())
             break;
 
-        QUrl url = lit("http://%1:%2/%3")
+        nx::utils::Url url = lit("http://%1:%2/%3")
             .arg(getHostAddress())
             .arg(QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT))
             .arg(query);
         url.setUserName(getAuth().user());
         url.setPassword(getAuth().password());
 
-        int statusCode = nx_http::StatusCode::undefined;
+        int statusCode = nx::network::http::StatusCode::undefined;
         QByteArray body;
-        SystemError::ErrorCode errorCode = nx_http::downloadFileSync(
+        SystemError::ErrorCode errorCode = nx::network::http::downloadFileSync(
             url,
             &statusCode,
             &body);
-        if (statusCode == nx_http::StatusCode::ok)
+
+        if (statusCode == nx::network::http::StatusCode::ok)
         {
             if (body.startsWith("OK"))
                 continue;

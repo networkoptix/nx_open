@@ -98,7 +98,7 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource( const QnUuid &resource
     // If third party driver returns MAC based physical ID then re-format MAC address string
     // to ensure it has same string format as build-in drivers.
     auto uuidStr = QString::fromUtf8(cameraInfo.uid).trimmed();
-    auto uuidMac = QnMacAddress(uuidStr);
+    auto uuidMac = nx::network::QnMacAddress(uuidStr);
     if (!uuidMac.isNull())
         uuidStr = uuidMac.toString();
     result->setPhysicalId(uuidStr);
