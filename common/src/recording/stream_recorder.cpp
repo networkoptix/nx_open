@@ -417,7 +417,7 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
         m_waitEOF = false;
     }
 
-    if (m_EofDateTime != qint64(AV_NOPTS_VALUE) && m_EofDateTime > m_startDateTime)
+    if (m_EofDateTime != qint64(AV_NOPTS_VALUE) && m_EofDateTime > m_BofDateTime)
     {
         const int progress =
             ((md->timestamp - m_BofDateTime) * 100LL) / (m_EofDateTime - m_BofDateTime);
