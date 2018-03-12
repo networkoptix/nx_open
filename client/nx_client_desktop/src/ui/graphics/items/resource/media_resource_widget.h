@@ -328,7 +328,7 @@ private:
     void initIconButton();
     void initStatusOverlayController();
 
-    SoftwareTrigger* createTriggerIfRelevant(const nx::vms::event::RulePtr& rule);
+    void createTriggerIfRelevant(const nx::vms::event::RulePtr& rule);
     bool isRelevantTriggerRule(const nx::vms::event::RulePtr& rule) const;
     void configureTriggerButton(QnSoftwareTriggerButton* button, const SoftwareTriggerInfo& info,
         std::function<void()> clientSideHandler = std::function<void()>());
@@ -342,6 +342,10 @@ private:
         bool enabledBySchedule);
 
     void getResourceStates();
+
+    using TriggerData = QPair<QnUuid, SoftwareTrigger>; //< ruleId -> softwareTrigger
+    using TriggerDataList = QList<TriggerData>;
+    TriggerDataList::iterator lowerBoundbyTriggerRuleId(const QnUuid& id);
 
 private:
     QScopedPointer<QnMediaResourceWidgetPrivate> d;
@@ -400,7 +404,7 @@ private:
 
     QnTwoWayAudioWidget* m_twoWayAudioWidget = nullptr;
 
-    QHash<QnUuid, SoftwareTrigger> m_softwareTriggers; //< ruleId -> softwareTrigger
+    TriggerDataList m_triggers;
 
     QScopedPointer<nx::client::desktop::EntropixImageEnhancer> m_entropixEnhancer;
     QImage m_entropixEnhancedImage;
