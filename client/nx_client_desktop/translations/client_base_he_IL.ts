@@ -1017,11 +1017,11 @@ to view more bookmarks</source>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
-      <translation type="unfinished">Audio Video Interleave</translation>
+      <translation>Audio Video Interleave</translation>
     </message>
     <message>
       <source>Matroska</source>
-      <translation type="unfinished">Matroska</translation>
+      <translation>Matroska</translation>
     </message>
     <message>
       <source>MPEG-4 Part 14</source>
@@ -2296,7 +2296,7 @@ to view more bookmarks</source>
     <name>QnCameraAnalyticsPolicy</name>
     <message>
       <source>Analytics is not available for %1</source>
-      <translation type="unfinished">Analytics is not available for %1</translation>
+      <translation>Analytics אינו זמין עבור %1</translation>
     </message>
   </context>
   <context>
@@ -2405,12 +2405,12 @@ to view more bookmarks</source>
       <translation>קצה</translation>
     </message>
     <message numerus="yes">
-      <source>This ID already used on camera %1</source>
+      <source>This Id is already used on the following %n cameras: %1</source>
       <translation type="unfinished">
-        <numerusform>This ID already used on camera %1</numerusform>
-        <numerusform>This ID already used on camera %1</numerusform>
-        <numerusform>This ID already used on camera %1</numerusform>
-        <numerusform>This ID already used on camera %1</numerusform>
+        <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
+        <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
+        <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
+        <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
       </translation>
     </message>
   </context>
@@ -2517,7 +2517,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Vendor</source>
-      <translation>ספק</translation>
+      <translation>ספק:</translation>
     </message>
     <message>
       <source>Model</source>
@@ -2525,7 +2525,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Firmware</source>
-      <translation>קושחה</translation>
+      <translation>קושחה:</translation>
     </message>
     <message>
       <source>IP/Name</source>
@@ -2540,8 +2540,8 @@ to view more bookmarks</source>
       <translation>שרת</translation>
     </message>
     <message>
-      <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <source>Logical Id</source>
+      <translation type="unfinished">Logical Id</translation>
     </message>
   </context>
   <context>
@@ -2579,7 +2579,7 @@ to view more bookmarks</source>
     <name>QnCameraMotionPolicy</name>
     <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation type="unfinished">Recording or motion detection is disabled for %1</translation>
+      <translation>ההקלטה או זיהוי התנועה כבויים עבור %1</translation>
     </message>
   </context>
   <context>
@@ -2604,10 +2604,6 @@ to view more bookmarks</source>
   <context>
     <name>QnCameraPasswordChangeDialog</name>
     <message>
-      <source>Password shouldn&apos;t be equal to camera&apos;s user name</source>
-      <translation>סיסמא לא יכולה&apos; להיות זהה לשם מצלמה&apos; או לשם משתמש</translation>
-    </message>
-    <message>
       <source>New Password</source>
       <translation>סיסמה חדשה</translation>
     </message>
@@ -2623,12 +2619,16 @@ to view more bookmarks</source>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
       <translation>הסיסמה תכיל לפחות 8 סימני מקלדת ותכיל סוגים שונים של תווים.</translation>
     </message>
+    <message>
+      <source>Password should not be equal to camera&apos;s user name</source>
+      <translation type="unfinished">Password should not be equal to camera&apos;s user name</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraRecordingPolicy</name>
     <message>
       <source>Recording is disabled for %1</source>
-      <translation type="unfinished">Recording is disabled for %1</translation>
+      <translation>ההקלטות כבויות עבור %1</translation>
     </message>
   </context>
   <context>
@@ -2695,7 +2695,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Mbit/s</source>
-      <translation type="unfinished">Mbit/s</translation>
+      <translation>Mbit/s</translation>
     </message>
     <message>
       <source>Less Settings</source>
@@ -3023,7 +3023,7 @@ to %1</source>
     </message>
     <message>
       <source>The username or password you have entered is incorrect. Please try again.</source>
-      <translation>שם המשתמש והסיסמה שהזנת שגויים, אנא נסה שנית.</translation>
+      <translation>שם המשתמש והסיסמא שהזנת שגויים, אנא נסה שנית.</translation>
     </message>
     <message>
       <source>Unable to connect to the server</source>
@@ -3260,14 +3260,9 @@ to %1</source>
       <source>Ask your system administrator to do it.</source>
       <translation>בקש ממנהל המערכת שלך לעשות זאת.</translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>Set Password</source>
-      <translation type="unfinished">
-        <numerusform>הגדר סיסמא</numerusform>
-        <numerusform>Set Password</numerusform>
-        <numerusform>Set Password</numerusform>
-        <numerusform>Set Password</numerusform>
-      </translation>
+      <translation type="unfinished">Set Password</translation>
     </message>
   </context>
   <context>
@@ -3352,7 +3347,7 @@ to %1</source>
     </message>
     <message>
       <source>Wrong Password</source>
-      <translation>סיסמה שגויה</translation>
+      <translation>סיסמא שגויה</translation>
     </message>
     <message>
       <source>Confirm Password</source>
@@ -3975,7 +3970,7 @@ to %1</source>
     </message>
     <message>
       <source>License Key</source>
-      <translation>מפתח רשיון</translation>
+      <translation>מפתח רשיון:</translation>
     </message>
     <message>
       <source>Features:</source>
@@ -7841,22 +7836,6 @@ to %1</source>
       <source>No new files to upload in selected folder</source>
       <translation type="unfinished">No new files to upload in selected folder</translation>
     </message>
-    <message>
-      <source>%1 - has unsupported format.</source>
-      <translation type="unfinished">%1 - has unsupported format.</translation>
-    </message>
-    <message>
-      <source>%1 - does not have timestamp.</source>
-      <translation type="unfinished">%1 - does not have timestamp.</translation>
-    </message>
-    <message>
-      <source>%1 - covers period for which video has already been uploaded.</source>
-      <translation type="unfinished">%1 - covers period for which video has already been uploaded.</translation>
-    </message>
-    <message>
-      <source>%1 - covers period for which video is being uploaded.</source>
-      <translation type="unfinished">%1 - covers period for which video is being uploaded.</translation>
-    </message>
     <message numerus="yes">
       <source>Selected files are too old</source>
       <translation type="unfinished">
@@ -7919,8 +7898,24 @@ to %1</source>
       <translation type="unfinished">Make sure there is enough space on server storage.</translation>
     </message>
     <message>
-      <source>%1 - is older than allowed in camera archive settings.</source>
-      <translation type="unfinished">%1 - is older than allowed in camera archive settings.</translation>
+      <source>%1 has unsupported format.</source>
+      <translation type="unfinished">%1 has unsupported format.</translation>
+    </message>
+    <message>
+      <source>%1 does not have timestamp.</source>
+      <translation type="unfinished">%1 does not have timestamp.</translation>
+    </message>
+    <message>
+      <source>%1 is older than allowed in camera archive settings.</source>
+      <translation type="unfinished">%1 is older than allowed in camera archive settings.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video has already been uploaded.</source>
+      <translation type="unfinished">%1 covers period for which video has already been uploaded.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video is being uploaded.</source>
+      <translation type="unfinished">%1 covers period for which video is being uploaded.</translation>
     </message>
   </context>
   <context>
@@ -8447,7 +8442,7 @@ to %1</source>
     <name>nx::client::desktop::WorkbenchAnalyticsController</name>
     <message>
       <source>%1 Analytics</source>
-      <translation type="unfinished">%1 Analytics</translation>
+      <translation>%1 Analytics</translation>
     </message>
   </context>
   <context>

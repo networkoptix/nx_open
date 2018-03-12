@@ -750,12 +750,7 @@
     <message>
       <location/>
       <source>PTZ</source>
-      <translation type="unfinished">PTZ</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>PTZ</translation>
     </message>
     <message>
       <location/>
@@ -769,8 +764,8 @@
     </message>
     <message>
       <location/>
-      <source>Invalid Logical Id label</source>
-      <translation type="unfinished">Invalid Logical Id label</translation>
+      <source>Logical Id</source>
+      <translation type="unfinished">Logical Id</translation>
     </message>
   </context>
   <context>
@@ -1808,8 +1803,8 @@
     </message>
     <message>
       <location/>
-      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</translation>
+      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
     </message>
   </context>
   <context>
@@ -3102,7 +3097,7 @@ Click &quot;New role&quot; button to create one.</source>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
       <source>Cancel</source>
-      <translation>Отмена</translation>
+      <translation>Отменить</translation>
     </message>
   </context>
   <context>

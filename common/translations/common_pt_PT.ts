@@ -103,7 +103,7 @@
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Server has been stopped.</source>
@@ -419,7 +419,7 @@
     </message>
     <message>
       <source>Video Wall</source>
-      <translation type="unfinished">Video Wall</translation>
+      <translation>Video Wall</translation>
     </message>
     <message>
       <source>I/O Module</source>
@@ -427,7 +427,7 @@
     </message>
     <message>
       <source>Start</source>
-      <translation>Começar</translation>
+      <translation>Start</translation>
     </message>
     <message>
       <source>Analog Encoder</source>
@@ -541,7 +541,7 @@
     </message>
     <message>
       <source>License is expired</source>
-      <translation type="unfinished">License is expired</translation>
+      <translation>License is expired</translation>
     </message>
     <message>
       <source>Invalid type</source>
@@ -568,7 +568,7 @@
     <name>QnLocalSystemDescription</name>
     <message>
       <source>New Server</source>
-      <translation type="unfinished">New Server</translation>
+      <translation>New Server</translation>
     </message>
   </context>
   <context>
@@ -802,7 +802,7 @@
     <name>QnTCPConnectionProcessor</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Not Found</source>
@@ -835,7 +835,7 @@
     <message>
       <source>s</source>
       <comment>Suffix for displaying seconds</comment>
-      <translation type="unfinished">s</translation>
+      <translation>s</translation>
     </message>
     <message>
       <source>m</source>
@@ -1054,7 +1054,7 @@
     <name>nx::vms::event::StringsHelper</name>
     <message>
       <source>Bookmark</source>
-      <translation type="unfinished">Bookmark</translation>
+      <translation>Bookmark</translation>
     </message>
     <message>
       <source>Panic recording</source>
@@ -1472,7 +1472,7 @@
     </message>
     <message>
       <source>Role</source>
-      <translation type="unfinished">Role</translation>
+      <translation>Role</translation>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
@@ -1494,7 +1494,7 @@
     </message>
     <message>
       <source>All Users</source>
-      <translation type="unfinished">All Users</translation>
+      <translation>All Users</translation>
     </message>
     <message>
       <source>Select at least one user</source>
@@ -1518,7 +1518,7 @@
     </message>
     <message>
       <source>Acknowledge</source>
-      <translation type="unfinished">Acknowledge</translation>
+      <translation>Acknowledge</translation>
     </message>
     <message>
       <source>Analytics Event</source>

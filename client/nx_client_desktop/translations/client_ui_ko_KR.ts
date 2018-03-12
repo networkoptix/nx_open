@@ -754,13 +754,8 @@
     </message>
     <message>
       <location/>
-      <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
-    </message>
-    <message>
-      <location/>
       <source>Generate</source>
-      <translation type="unfinished">Generate</translation>
+      <translation>생성</translation>
     </message>
     <message>
       <location/>
@@ -769,8 +764,8 @@
     </message>
     <message>
       <location/>
-      <source>Invalid Logical Id label</source>
-      <translation type="unfinished">Invalid Logical Id label</translation>
+      <source>Logical Id</source>
+      <translation>논리 Id</translation>
     </message>
   </context>
   <context>
@@ -1808,8 +1803,8 @@
     </message>
     <message>
       <location/>
-      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</translation>
+      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation>&quot;웨어러블 카메라&quot;는 서버에 업로드 및 사용자가 접근 할수 있는 가상저장소 입니다.</translation>
     </message>
   </context>
   <context>
@@ -3087,7 +3082,7 @@ Click &quot;New role&quot; button to create one.</source>
     <message>
       <location/>
       <source>Detect motion in uploaded video</source>
-      <translation type="unfinished">Detect motion in uploaded video</translation>
+      <translation>업로드 된 동영상의 움직임 감지</translation>
     </message>
     <message>
       <location/>

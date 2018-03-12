@@ -1021,7 +1021,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Matroska</source>
-      <translation type="unfinished">Matroska</translation>
+      <translation>Matroska</translation>
     </message>
     <message>
       <source>MPEG-4 Part 14</source>
@@ -1347,7 +1347,7 @@ to view more bookmarks</source>
     <name>QnAbstractPtzDialog</name>
     <message>
       <source>Loading...</source>
-      <translation>กำลังโหลด...</translation>
+      <translation>กำลังโหลด ...</translation>
     </message>
     <message>
       <source>Saving...</source>
@@ -2230,7 +2230,7 @@ to view more bookmarks</source>
     <name>QnCameraAnalyticsPolicy</name>
     <message>
       <source>Analytics is not available for %1</source>
-      <translation type="unfinished">Analytics is not available for %1</translation>
+      <translation>ไม่มีการวิเคราะห์สำหรับ %1</translation>
     </message>
   </context>
   <context>
@@ -2336,9 +2336,9 @@ to view more bookmarks</source>
       <translation>ขอบ</translation>
     </message>
     <message numerus="yes">
-      <source>This ID already used on camera %1</source>
+      <source>This Id is already used on the following %n cameras: %1</source>
       <translation type="unfinished">
-        <numerusform>This ID already used on camera %1</numerusform>
+        <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
       </translation>
     </message>
   </context>
@@ -2456,8 +2456,8 @@ to view more bookmarks</source>
       <translation>เซอร์ฟเวอร์</translation>
     </message>
     <message>
-      <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <source>Logical Id</source>
+      <translation type="unfinished">Logical Id</translation>
     </message>
   </context>
   <context>
@@ -2495,7 +2495,7 @@ to view more bookmarks</source>
     <name>QnCameraMotionPolicy</name>
     <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation type="unfinished">Recording or motion detection is disabled for %1</translation>
+      <translation>การตรวจสอบการบันทึกหรือการเคลื่อนไหวที่ถูกปิดใช้งานสำหรับ %1</translation>
     </message>
   </context>
   <context>
@@ -2517,10 +2517,6 @@ to view more bookmarks</source>
   <context>
     <name>QnCameraPasswordChangeDialog</name>
     <message>
-      <source>Password shouldn&apos;t be equal to camera&apos;s user name</source>
-      <translation>รหัสผ่าน shouldn&apos;t เท่ากับชื่อผู้ใช้ camera&apos;s</translation>
-    </message>
-    <message>
       <source>New Password</source>
       <translation>สร้างรหัสผ่านใหม่</translation>
     </message>
@@ -2536,12 +2532,16 @@ to view more bookmarks</source>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
       <translation>รหัสผ่านควรมีสัญลักษณ์น้อย 8 ยาว และประกอบด้วยอักขระที่แตกต่างกันไป</translation>
     </message>
+    <message>
+      <source>Password should not be equal to camera&apos;s user name</source>
+      <translation type="unfinished">Password should not be equal to camera&apos;s user name</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraRecordingPolicy</name>
     <message>
       <source>Recording is disabled for %1</source>
-      <translation type="unfinished">Recording is disabled for %1</translation>
+      <translation>การบันทึกถูกปิดไว้ สำหรับ %1</translation>
     </message>
   </context>
   <context>
@@ -3163,11 +3163,9 @@ to %1</source>
       <source>Ask your system administrator to do it.</source>
       <translation>ขอให้ผู้ดูแลระบบของคุณทำเช่นนั้น</translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>Set Password</source>
-      <translation>
-        <numerusform>ตั้งรหัสผ่าน</numerusform>
-      </translation>
+      <translation type="unfinished">Set Password</translation>
     </message>
   </context>
   <context>
@@ -3522,7 +3520,7 @@ to %1</source>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Select folder...</source>
-      <translation>เลือกโฟลเดอร์...</translation>
+      <translation>เลือกโฟลเดอร์ ...</translation>
     </message>
     <message>
       <source>Folder already added</source>
@@ -7572,22 +7570,6 @@ to %1</source>
       <source>No new files to upload in selected folder</source>
       <translation type="unfinished">No new files to upload in selected folder</translation>
     </message>
-    <message>
-      <source>%1 - has unsupported format.</source>
-      <translation type="unfinished">%1 - has unsupported format.</translation>
-    </message>
-    <message>
-      <source>%1 - does not have timestamp.</source>
-      <translation type="unfinished">%1 - does not have timestamp.</translation>
-    </message>
-    <message>
-      <source>%1 - covers period for which video has already been uploaded.</source>
-      <translation type="unfinished">%1 - covers period for which video has already been uploaded.</translation>
-    </message>
-    <message>
-      <source>%1 - covers period for which video is being uploaded.</source>
-      <translation type="unfinished">%1 - covers period for which video is being uploaded.</translation>
-    </message>
     <message numerus="yes">
       <source>Selected files are too old</source>
       <translation type="unfinished">
@@ -7635,8 +7617,24 @@ to %1</source>
       <translation type="unfinished">Make sure there is enough space on server storage.</translation>
     </message>
     <message>
-      <source>%1 - is older than allowed in camera archive settings.</source>
-      <translation type="unfinished">%1 - is older than allowed in camera archive settings.</translation>
+      <source>%1 has unsupported format.</source>
+      <translation type="unfinished">%1 has unsupported format.</translation>
+    </message>
+    <message>
+      <source>%1 does not have timestamp.</source>
+      <translation type="unfinished">%1 does not have timestamp.</translation>
+    </message>
+    <message>
+      <source>%1 is older than allowed in camera archive settings.</source>
+      <translation type="unfinished">%1 is older than allowed in camera archive settings.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video has already been uploaded.</source>
+      <translation type="unfinished">%1 covers period for which video has already been uploaded.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video is being uploaded.</source>
+      <translation type="unfinished">%1 covers period for which video is being uploaded.</translation>
     </message>
   </context>
   <context>
@@ -7986,7 +7984,7 @@ to %1</source>
     </message>
     <message>
       <source>Select folder...</source>
-      <translation>เลือกโฟลเดอร์...</translation>
+      <translation>เลือกโฟลเดอร์ ...</translation>
     </message>
   </context>
   <context>

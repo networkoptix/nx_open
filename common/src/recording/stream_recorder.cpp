@@ -135,6 +135,7 @@ QnStreamRecorder::QnStreamRecorder(const QnResourcePtr& dev):
     m_packetWrited(false),
     m_currentChunkLen(0),
     m_prebufferingUsec(0),
+    m_bofDateTimeUs(AV_NOPTS_VALUE),
     m_eofDateTimeUs(AV_NOPTS_VALUE),
     m_endOfData(false),
     m_lastProgress(-1),
@@ -416,10 +417,10 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
         m_waitEOF = false;
     }
 
-    if (m_eofDateTimeUs != qint64(AV_NOPTS_VALUE) && m_eofDateTimeUs > m_startDateTimeUs)
+    if (m_eofDateTimeUs != qint64(AV_NOPTS_VALUE) && m_eofDateTimeUs > m_bofDateTimeUs)
     {
         int progress =
-            ((md->timestamp - m_startDateTimeUs) * 100LL) / (m_eofDateTimeUs - m_startDateTimeUs);
+            ((md->timestamp - m_bofDateTimeUs) * 100LL) / (m_eofDateTimeUs - m_bofDateTimeUs);
 
         // That happens quite often.
         if (progress > 100)
@@ -427,7 +428,7 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
             progress = 100;
         }
 
-        if (progress != m_lastProgress)
+        if (progress != m_lastProgress && progress >= 0)
         {
             VERBOSE("progress");
             emit recordingProgress(progress);
@@ -1110,10 +1111,11 @@ QString QnStreamRecorder::fixedFileName() const
     return QString();
 }
 
-void QnStreamRecorder::setEofDateTime(qint64 value)
+void QnStreamRecorder::setProgressBounds(qint64 bof, qint64 eof)
 {
     m_endOfData = false;
-    m_eofDateTimeUs = value;
+    m_bofDateTimeUs = bof;
+    m_eofDateTimeUs = eof;
     m_lastProgress = -1;
 }
 

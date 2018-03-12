@@ -1152,7 +1152,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Password should contain different types of symbols.</source>
-      <translation type="unfinished">Password should contain different types of symbols.</translation>
+      <translation>La password dovrebbe contenere diversi tipi di simboli.</translation>
     </message>
     <message>
       <source>Short</source>
@@ -1172,7 +1172,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
-      <translation type="unfinished">Only latin letters, numbers and keyboard symbols are allowed.</translation>
+      <translation>Sono consentite solo lettere latine, numeri e simboli della tastiera.</translation>
     </message>
     <message numerus="yes">
       <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
@@ -1922,7 +1922,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>Sistema</translation>
     </message>
     <message>
       <source>Any Server</source>
@@ -2362,10 +2362,10 @@ to view more bookmarks</translation>
       <translation type="unfinished">Edge</translation>
     </message>
     <message numerus="yes">
-      <source>This ID already used on camera %1</source>
+      <source>This Id is already used on the following %n cameras: %1</source>
       <translation type="unfinished">
-        <numerusform>This ID already used on camera %1</numerusform>
-        <numerusform>This ID already used on camera %1</numerusform>
+        <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
+        <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
       </translation>
     </message>
   </context>
@@ -2484,11 +2484,11 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Server</source>
-      <translation type="unfinished">Server</translation>
+      <translation>Server</translation>
     </message>
     <message>
-      <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <source>Logical Id</source>
+      <translation type="unfinished">Logical Id</translation>
     </message>
   </context>
   <context>
@@ -2549,10 +2549,6 @@ to view more bookmarks</translation>
   <context>
     <name>QnCameraPasswordChangeDialog</name>
     <message>
-      <source>Password shouldn&apos;t be equal to camera&apos;s user name</source>
-      <translation type="unfinished">Password shouldn&apos;t be equal to camera&apos;s user name</translation>
-    </message>
-    <message>
       <source>New Password</source>
       <translation type="unfinished">New Password</translation>
     </message>
@@ -2567,6 +2563,10 @@ to view more bookmarks</translation>
     <message>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
       <translation type="unfinished">Password should be at least 8 symbols long and contain different types of characters.</translation>
+    </message>
+    <message>
+      <source>Password should not be equal to camera&apos;s user name</source>
+      <translation type="unfinished">Password should not be equal to camera&apos;s user name</translation>
     </message>
   </context>
   <context>
@@ -2888,7 +2888,7 @@ to %1</translation>
     </message>
     <message>
       <source>Create account</source>
-      <translation type="unfinished">Create account</translation>
+      <translation>Creare un account</translation>
     </message>
     <message>
       <source>Forgot password?</source>
@@ -3202,12 +3202,9 @@ to %1</translation>
       <source>Ask your system administrator to do it.</source>
       <translation type="unfinished">Ask your system administrator to do it.</translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>Set Password</source>
-      <translation type="unfinished">
-        <numerusform>Set Password</numerusform>
-        <numerusform>Set Password</numerusform>
-      </translation>
+      <translation type="unfinished">Set Password</translation>
     </message>
   </context>
   <context>
@@ -3304,7 +3301,7 @@ to %1</translation>
     </message>
     <message>
       <source>Disconnect</source>
-      <translation type="unfinished">Disconnect</translation>
+      <translation>Scollegamento</translation>
     </message>
     <message>
       <source>All cloud users will be deleted.</source>
@@ -3928,7 +3925,7 @@ to %1</translation>
     </message>
     <message>
       <source>Server</source>
-      <translation type="unfinished">Server</translation>
+      <translation>Server</translation>
     </message>
     <message>
       <source>Never</source>
@@ -3944,7 +3941,7 @@ to %1</translation>
     </message>
     <message>
       <source>Error</source>
-      <translation type="unfinished">Error</translation>
+      <translation>Errore</translation>
     </message>
     <message>
       <source>Server not found</source>
@@ -4368,7 +4365,7 @@ to %1</translation>
     </message>
     <message>
       <source>Create account</source>
-      <translation type="unfinished">Create account</translation>
+      <translation>Creare un account</translation>
     </message>
     <message>
       <source>Forgot password?</source>
@@ -5091,7 +5088,7 @@ to %1</translation>
     </message>
     <message>
       <source>Device</source>
-      <translation type="unfinished">Device</translation>
+      <translation>Dispositivo</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -5342,7 +5339,7 @@ to %1</translation>
     </message>
     <message>
       <source>Server</source>
-      <translation type="unfinished">Server</translation>
+      <translation>Server</translation>
     </message>
     <message>
       <source>Invalid URL</source>
@@ -5624,7 +5621,7 @@ to %1</translation>
     <name>QnServerUpdatesModel</name>
     <message>
       <source>Server</source>
-      <translation type="unfinished">Server</translation>
+      <translation>Server</translation>
     </message>
     <message>
       <source>Status</source>
@@ -6614,7 +6611,7 @@ to %1</translation>
     <name>QnTimeServerSelectionModel</name>
     <message>
       <source>Server</source>
-      <translation type="unfinished">Server</translation>
+      <translation>Server</translation>
     </message>
     <message>
       <source>Offset</source>
@@ -7669,22 +7666,6 @@ to %1</translation>
       <source>No new files to upload in selected folder</source>
       <translation type="unfinished">No new files to upload in selected folder</translation>
     </message>
-    <message>
-      <source>%1 - has unsupported format.</source>
-      <translation type="unfinished">%1 - has unsupported format.</translation>
-    </message>
-    <message>
-      <source>%1 - does not have timestamp.</source>
-      <translation type="unfinished">%1 - does not have timestamp.</translation>
-    </message>
-    <message>
-      <source>%1 - covers period for which video has already been uploaded.</source>
-      <translation type="unfinished">%1 - covers period for which video has already been uploaded.</translation>
-    </message>
-    <message>
-      <source>%1 - covers period for which video is being uploaded.</source>
-      <translation type="unfinished">%1 - covers period for which video is being uploaded.</translation>
-    </message>
     <message numerus="yes">
       <source>Selected files are too old</source>
       <translation type="unfinished">
@@ -7737,8 +7718,24 @@ to %1</translation>
       <translation type="unfinished">Make sure there is enough space on server storage.</translation>
     </message>
     <message>
-      <source>%1 - is older than allowed in camera archive settings.</source>
-      <translation type="unfinished">%1 - is older than allowed in camera archive settings.</translation>
+      <source>%1 has unsupported format.</source>
+      <translation type="unfinished">%1 has unsupported format.</translation>
+    </message>
+    <message>
+      <source>%1 does not have timestamp.</source>
+      <translation type="unfinished">%1 does not have timestamp.</translation>
+    </message>
+    <message>
+      <source>%1 is older than allowed in camera archive settings.</source>
+      <translation type="unfinished">%1 is older than allowed in camera archive settings.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video has already been uploaded.</source>
+      <translation type="unfinished">%1 covers period for which video has already been uploaded.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video is being uploaded.</source>
+      <translation type="unfinished">%1 covers period for which video is being uploaded.</translation>
     </message>
   </context>
   <context>
@@ -8122,7 +8119,7 @@ to %1</translation>
     </message>
     <message>
       <source>Error</source>
-      <translation type="unfinished">Error</translation>
+      <translation>Errore</translation>
     </message>
     <message>
       <source>Image cannot be loaded.</source>
@@ -8664,7 +8661,7 @@ to %1</translation>
     </message>
     <message>
       <source>Server</source>
-      <translation type="unfinished">Server</translation>
+      <translation>Server</translation>
     </message>
     <message>
       <source>Please update all components to the version %1</source>

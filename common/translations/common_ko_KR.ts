@@ -315,7 +315,7 @@
     </message>
     <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
-      <translation type="unfinished">Please update firmware. Minimal supported version is %1. Current version is %2</translation>
+      <translation>펌웨어를 업데이트하십시오. 최소 지원 버전은 %1입니다. 현재 버전은 %2입니다</translation>
     </message>
   </context>
   <context>

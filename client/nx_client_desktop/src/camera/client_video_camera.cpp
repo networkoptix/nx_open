@@ -237,7 +237,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
     }
 
     m_exportRecorder->clearUnprocessedData();
-    m_exportRecorder->setEofDateTime(endTimeUs);
+    m_exportRecorder->setProgressBounds(startTimeUs, endTimeUs);
 
     if (storage)
         m_exportRecorder->addRecordingContext(

@@ -2360,10 +2360,10 @@ pour afficher plus de signets</translation>
       <translation>Edge</translation>
     </message>
     <message numerus="yes">
-      <source>This ID already used on camera %1</source>
+      <source>This Id is already used on the following %n cameras: %1</source>
       <translation type="unfinished">
-        <numerusform>This ID already used on camera %1</numerusform>
-        <numerusform>This ID already used on camera %1</numerusform>
+        <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
+        <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
       </translation>
     </message>
   </context>
@@ -2485,8 +2485,8 @@ pour afficher plus de signets</translation>
       <translation>Serveur</translation>
     </message>
     <message>
-      <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <source>Logical Id</source>
+      <translation type="unfinished">Logical Id</translation>
     </message>
   </context>
   <context>
@@ -2524,7 +2524,7 @@ pour afficher plus de signets</translation>
     <name>QnCameraMotionPolicy</name>
     <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation type="unfinished">Recording or motion detection is disabled for %1</translation>
+      <translation>L'enreg. ou la détection de mouv. sont désactivés pour %1</translation>
     </message>
   </context>
   <context>
@@ -2547,10 +2547,6 @@ pour afficher plus de signets</translation>
   <context>
     <name>QnCameraPasswordChangeDialog</name>
     <message>
-      <source>Password shouldn&apos;t be equal to camera&apos;s user name</source>
-      <translation>Mot de passe ne peut être le nom d'utilisateur de la caméra</translation>
-    </message>
-    <message>
       <source>New Password</source>
       <translation>Nouveau mot de passe</translation>
     </message>
@@ -2566,12 +2562,16 @@ pour afficher plus de signets</translation>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
       <translation>Mot de passe doit comporter au moins 8 symboles et contenir différents types de caractères.</translation>
     </message>
+    <message>
+      <source>Password should not be equal to camera&apos;s user name</source>
+      <translation type="unfinished">Password should not be equal to camera&apos;s user name</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraRecordingPolicy</name>
     <message>
       <source>Recording is disabled for %1</source>
-      <translation type="unfinished">Recording is disabled for %1</translation>
+      <translation>L'enreg.est désactivé pour %1</translation>
     </message>
   </context>
   <context>
@@ -3200,12 +3200,9 @@ to %1</source>
       <source>Ask your system administrator to do it.</source>
       <translation>Demandez à votre administrateur système de le faire.</translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>Set Password</source>
-      <translation>
-        <numerusform>Définir mot de passe</numerusform>
-        <numerusform>Définir mot de passe</numerusform>
-      </translation>
+      <translation type="unfinished">Set Password</translation>
     </message>
   </context>
   <context>
@@ -4786,7 +4783,7 @@ to %1</source>
     </message>
     <message>
       <source>For full-featured mode please use another computer</source>
-      <translation type="unfinished">For full-featured mode please use another computer</translation>
+      <translation>Pour le mode complet, S.V.P. utilisez un autre ordinateur</translation>
     </message>
   </context>
   <context>
@@ -7667,22 +7664,6 @@ to %1</source>
       <source>No new files to upload in selected folder</source>
       <translation>Aucun nouveau fichier à envoyer dans le dossier sélectionné</translation>
     </message>
-    <message>
-      <source>%1 - has unsupported format.</source>
-      <translation>%1 - a un format non supporté.</translation>
-    </message>
-    <message>
-      <source>%1 - does not have timestamp.</source>
-      <translation>%1 - n'a pas d'horodatage.</translation>
-    </message>
-    <message>
-      <source>%1 - covers period for which video has already been uploaded.</source>
-      <translation>%1 - couvre la période pour laquelle la vidéo a déjà été envoyer.</translation>
-    </message>
-    <message>
-      <source>%1 - covers period for which video is being uploaded.</source>
-      <translation>%1 - couvre la période pour laquelle la vidéo est envoyer.</translation>
-    </message>
     <message numerus="yes">
       <source>Selected files are too old</source>
       <translation>
@@ -7735,8 +7716,24 @@ to %1</source>
       <translation>Assurez-vous qu'il y a suffisamment d'espace sur le stockage du serveur.</translation>
     </message>
     <message>
-      <source>%1 - is older than allowed in camera archive settings.</source>
-      <translation>%1 - est plus ancien que les paramètres d'archivage de caméra autorisés.</translation>
+      <source>%1 has unsupported format.</source>
+      <translation type="unfinished">%1 has unsupported format.</translation>
+    </message>
+    <message>
+      <source>%1 does not have timestamp.</source>
+      <translation type="unfinished">%1 does not have timestamp.</translation>
+    </message>
+    <message>
+      <source>%1 is older than allowed in camera archive settings.</source>
+      <translation type="unfinished">%1 is older than allowed in camera archive settings.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video has already been uploaded.</source>
+      <translation type="unfinished">%1 covers period for which video has already been uploaded.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video is being uploaded.</source>
+      <translation type="unfinished">%1 covers period for which video is being uploaded.</translation>
     </message>
   </context>
   <context>

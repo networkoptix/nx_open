@@ -13,6 +13,8 @@
 #include <QtCore/QStandardPaths>
 
 #include "nx/utils/app_info.h"
+#include <nx/utils/log/assert.h>
+
 #include "../platform/win32_syscall_resolver.h"
 
 #define MAX_SYMBOL_SIZE 1024
@@ -46,6 +48,10 @@ static void LegacyDump( HANDLE );
 
 static int GetBaseName(const char* name, DWORD len)
 {
+    NX_ASSERT(len > 0);
+    if (len == 0)
+        return 0;
+
     do
     {
         --len;

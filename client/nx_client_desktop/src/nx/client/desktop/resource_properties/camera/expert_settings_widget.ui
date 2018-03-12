@@ -74,8 +74,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>1058</width>
-        <height>681</height>
+        <width>1043</width>
+        <height>791</height>
        </rect>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="1,1">
@@ -153,7 +153,16 @@
              <item>
               <widget class="QWidget" name="secondStreamQualityWidget" native="true">
                <layout class="QVBoxLayout" name="verticalLayout_8">
-                <property name="margin">
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
                  <number>0</number>
                 </property>
                 <item>
@@ -339,7 +348,16 @@
              <item>
               <widget class="QWidget" name="horizontalWidget_3" native="true">
                <layout class="QHBoxLayout" name="horizontalLayout_8">
-                <property name="margin">
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
                  <number>0</number>
                 </property>
                </layout>
@@ -351,7 +369,7 @@
           <item>
            <widget class="QGroupBox" name="logicalIdGroupBox">
             <property name="title">
-             <string>Logical ID</string>
+             <string>Logical Id</string>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_11">
              <item>
@@ -393,14 +411,7 @@
               </layout>
              </item>
              <item>
-              <widget class="QLabel" name="InvalidLogicalIdText">
-               <property name="text">
-                <string>Invalid Logical Id label</string>
-               </property>
-               <property name="wordWrap">
-                <bool>true</bool>
-               </property>
-              </widget>
+              <widget class="QnWordWrappedLabel" name="logicalIdWarningLabel" native="true"/>
              </item>
             </layout>
            </widget>
@@ -451,6 +462,14 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QnWordWrappedLabel</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/word_wrapped_label.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>scrollArea</tabstop>
   <tabstop>settingsDisableControlCheckBox</tabstop>

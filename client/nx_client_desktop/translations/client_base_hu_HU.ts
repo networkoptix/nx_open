@@ -858,11 +858,11 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
+      <translation>Fájl feltöltése...</translation>
     </message>
     <message>
       <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
+      <translation>Mappa feltöltése...</translation>
     </message>
     <message>
       <source>Start Analytics...</source>
@@ -1011,7 +1011,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Settings are not available for .NOV and .EXE files.</source>
-      <translation type="unfinished">Settings are not available for .NOV and .EXE files.</translation>
+      <translation>A beállítások nem állnak rendelkezésre .NOV és .EXE fájlokhoz.</translation>
     </message>
   </context>
   <context>
@@ -1022,11 +1022,11 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Matroska</source>
-      <translation type="unfinished">Matroska</translation>
+      <translation>Matroska</translation>
     </message>
     <message>
       <source>MPEG-4 Part 14</source>
-      <translation type="unfinished">MPEG-4 Part 14</translation>
+      <translation>MPEG-4 Part 14</translation>
     </message>
     <message>
       <source>%1 Media File</source>
@@ -2253,7 +2253,7 @@ több könyvjelző megjelenítéséhez</translation>
     <name>QnCameraAnalyticsPolicy</name>
     <message>
       <source>Analytics is not available for %1</source>
-      <translation type="unfinished">Analytics is not available for %1</translation>
+      <translation>%1 esetében nem használható analitika</translation>
     </message>
   </context>
   <context>
@@ -2357,13 +2357,13 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Edge</source>
-      <translation type="unfinished">Edge</translation>
+      <translation>Edge</translation>
     </message>
     <message numerus="yes">
-      <source>This ID already used on camera %1</source>
+      <source>This Id is already used on the following %n cameras: %1</source>
       <translation type="unfinished">
-        <numerusform>This ID already used on camera %1</numerusform>
-        <numerusform>This ID already used on camera %1</numerusform>
+        <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
+        <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
       </translation>
     </message>
   </context>
@@ -2485,8 +2485,8 @@ több könyvjelző megjelenítéséhez</translation>
       <translation>Szerver</translation>
     </message>
     <message>
-      <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <source>Logical Id</source>
+      <translation type="unfinished">Logical Id</translation>
     </message>
   </context>
   <context>
@@ -2524,7 +2524,7 @@ több könyvjelző megjelenítéséhez</translation>
     <name>QnCameraMotionPolicy</name>
     <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation type="unfinished">Recording or motion detection is disabled for %1</translation>
+      <translation>Rögzítés vagy mozgásérzékelés kikapcsolva %1</translation>
     </message>
   </context>
   <context>
@@ -2547,10 +2547,6 @@ több könyvjelző megjelenítéséhez</translation>
   <context>
     <name>QnCameraPasswordChangeDialog</name>
     <message>
-      <source>Password shouldn&apos;t be equal to camera&apos;s user name</source>
-      <translation>A jelszón nem egyezhet meg a kamerák felhasználó nevével</translation>
-    </message>
-    <message>
       <source>New Password</source>
       <translation>Új Jelszó</translation>
     </message>
@@ -2566,12 +2562,16 @@ több könyvjelző megjelenítéséhez</translation>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
       <translation>A jelszónak legalább 8 szimbólumból kell állnia, és különböző karaktereket kell tartalmaznia.</translation>
     </message>
+    <message>
+      <source>Password should not be equal to camera&apos;s user name</source>
+      <translation type="unfinished">Password should not be equal to camera&apos;s user name</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraRecordingPolicy</name>
     <message>
       <source>Recording is disabled for %1</source>
-      <translation type="unfinished">Recording is disabled for %1</translation>
+      <translation>%1 rögzítése letiltva</translation>
     </message>
   </context>
   <context>
@@ -2638,7 +2638,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Mbit/s</source>
-      <translation type="unfinished">Mbit/s</translation>
+      <translation>Mbit/s</translation>
     </message>
     <message>
       <source>Less Settings</source>
@@ -3198,12 +3198,9 @@ to %1</source>
       <source>Ask your system administrator to do it.</source>
       <translation>Kérje a rendszergazda segítségét.</translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>Set Password</source>
-      <translation>
-        <numerusform>Jelszó beállítása</numerusform>
-        <numerusform>Jelszó beállítása</numerusform>
-      </translation>
+      <translation type="unfinished">Set Password</translation>
     </message>
   </context>
   <context>
@@ -7175,7 +7172,7 @@ to %1</source>
     </message>
     <message>
       <source>Stop uploading?</source>
-      <translation type="unfinished">Stop uploading?</translation>
+      <translation>Leállítja a feltöltés?</translation>
     </message>
     <message>
       <source>Already uploaded files will be kept.</source>
@@ -7183,7 +7180,7 @@ to %1</source>
     </message>
     <message>
       <source>Finalizing %1... %2	%p%</source>
-      <translation type="unfinished">Finalizing %1... %2	%p%</translation>
+      <translation>Befejezés %1... %2%p%</translation>
     </message>
     <message>
       <source>(%1 of %2)</source>
@@ -7665,22 +7662,6 @@ to %1</source>
       <source>No new files to upload in selected folder</source>
       <translation type="unfinished">No new files to upload in selected folder</translation>
     </message>
-    <message>
-      <source>%1 - has unsupported format.</source>
-      <translation type="unfinished">%1 - has unsupported format.</translation>
-    </message>
-    <message>
-      <source>%1 - does not have timestamp.</source>
-      <translation type="unfinished">%1 - does not have timestamp.</translation>
-    </message>
-    <message>
-      <source>%1 - covers period for which video has already been uploaded.</source>
-      <translation type="unfinished">%1 - covers period for which video has already been uploaded.</translation>
-    </message>
-    <message>
-      <source>%1 - covers period for which video is being uploaded.</source>
-      <translation type="unfinished">%1 - covers period for which video is being uploaded.</translation>
-    </message>
     <message numerus="yes">
       <source>Selected files are too old</source>
       <translation type="unfinished">
@@ -7733,8 +7714,24 @@ to %1</source>
       <translation type="unfinished">Make sure there is enough space on server storage.</translation>
     </message>
     <message>
-      <source>%1 - is older than allowed in camera archive settings.</source>
-      <translation type="unfinished">%1 - is older than allowed in camera archive settings.</translation>
+      <source>%1 has unsupported format.</source>
+      <translation type="unfinished">%1 has unsupported format.</translation>
+    </message>
+    <message>
+      <source>%1 does not have timestamp.</source>
+      <translation type="unfinished">%1 does not have timestamp.</translation>
+    </message>
+    <message>
+      <source>%1 is older than allowed in camera archive settings.</source>
+      <translation type="unfinished">%1 is older than allowed in camera archive settings.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video has already been uploaded.</source>
+      <translation type="unfinished">%1 covers period for which video has already been uploaded.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video is being uploaded.</source>
+      <translation type="unfinished">%1 covers period for which video is being uploaded.</translation>
     </message>
   </context>
   <context>
@@ -8249,7 +8246,7 @@ to %1</source>
     </message>
     <message>
       <source>Selected period cannot be exported for the current camera.</source>
-      <translation type="unfinished">Selected period cannot be exported for the current camera.</translation>
+      <translation>A kiválasztott időszak nem exportálható az aktuális kamera számára.</translation>
     </message>
   </context>
   <context>

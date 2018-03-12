@@ -81,7 +81,7 @@ public:
     QnResourcePtr getResource() const { return m_device; }
 
     QString fixedFileName() const;
-    void setEofDateTime(qint64 value);
+    void setProgressBounds(qint64 bof, qint64 eof);
 
     /*
     * Calc hash for writing file
@@ -214,6 +214,7 @@ private:
     int m_prebufferingUsec;
     QnUnsafeQueue<QnConstAbstractMediaDataPtr> m_prebuffer;
 
+    qint64 m_bofDateTimeUs;
     qint64 m_eofDateTimeUs;
     bool m_endOfData;
     int m_lastProgress;

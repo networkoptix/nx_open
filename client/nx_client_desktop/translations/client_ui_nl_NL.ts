@@ -166,7 +166,7 @@
     <message>
       <location/>
       <source>Event Type:</source>
-      <translation type="unfinished">Event Type:</translation>
+      <translation>Event Type:</translation>
     </message>
   </context>
   <context>
@@ -750,12 +750,7 @@
     <message>
       <location/>
       <source>PTZ</source>
-      <translation type="unfinished">PTZ</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>PTZ</translation>
     </message>
     <message>
       <location/>
@@ -769,8 +764,8 @@
     </message>
     <message>
       <location/>
-      <source>Invalid Logical Id label</source>
-      <translation type="unfinished">Invalid Logical Id label</translation>
+      <source>Logical Id</source>
+      <translation type="unfinished">Logical Id</translation>
     </message>
   </context>
   <context>
@@ -902,7 +897,7 @@
     <message>
       <location/>
       <source>Bitrate</source>
-      <translation type="unfinished">Bitrate</translation>
+      <translation>Bitrate</translation>
     </message>
   </context>
   <context>
@@ -1136,7 +1131,7 @@
     <message>
       <location/>
       <source>Multi Video</source>
-      <translation type="unfinished">Multi Video</translation>
+      <translation>Multi Video</translation>
     </message>
   </context>
   <context>
@@ -1808,8 +1803,8 @@
     </message>
     <message>
       <location/>
-      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</translation>
+      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
     </message>
   </context>
   <context>
@@ -2273,7 +2268,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/rapid_review_settings_widget.ui"/>
       <source>Rapid Review</source>
-      <translation type="unfinished">Rapid Review</translation>
+      <translation>Rapid Review</translation>
     </message>
     <message>
       <location/>

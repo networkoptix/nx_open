@@ -310,7 +310,7 @@
     <message>
       <location/>
       <source>Start</source>
-      <translation>Départ</translation>
+      <translation>Démarrer</translation>
     </message>
   </context>
   <context>
@@ -754,13 +754,8 @@
     </message>
     <message>
       <location/>
-      <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
-    </message>
-    <message>
-      <location/>
       <source>Generate</source>
-      <translation type="unfinished">Generate</translation>
+      <translation>Générer</translation>
     </message>
     <message>
       <location/>
@@ -769,8 +764,8 @@
     </message>
     <message>
       <location/>
-      <source>Invalid Logical Id label</source>
-      <translation type="unfinished">Invalid Logical Id label</translation>
+      <source>Logical Id</source>
+      <translation type="unfinished">Logical Id</translation>
     </message>
   </context>
   <context>
@@ -1438,7 +1433,7 @@
     <message>
       <location/>
       <source>Server URL</source>
-      <translation>URL Serveur</translation>
+      <translation>Serveur URL</translation>
     </message>
     <message>
       <location/>
@@ -1808,8 +1803,8 @@
     </message>
     <message>
       <location/>
-      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
-      <translation>&quot;Caméra Portablea&quot; est un stockage virtuel pour les fichiers vidéo, qui peut être envoyer sur n'importe quel serveur de votre système et accessible à tout utilisateur.</translation>
+      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
     </message>
   </context>
   <context>
