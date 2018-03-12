@@ -225,7 +225,7 @@ bool QnWorkbenchWearableHandler::fixFileUpload(
     if (upload->allHaveStatus(WearablePayload::UnsupportedFormat))
     {
         QnMessageBox::warning(mainWindow(),
-            tr("Selected file formats are not supported", 0, count),
+            tr("Selected file formats are not supported", "", count),
             tr("Use .MKV, .AVI, .MP4 or other video files."));
         return false;
     }
@@ -233,7 +233,7 @@ bool QnWorkbenchWearableHandler::fixFileUpload(
     if (upload->allHaveStatus(WearablePayload::NoTimestamp))
     {
         QnMessageBox::warning(mainWindow(),
-            tr("Selected files do not have timestamps", 0, count),
+            tr("Selected files do not have timestamps", "", count),
             tr("Only video files with correct timestamp are supported."));
         return false;
     }
@@ -248,7 +248,7 @@ bool QnWorkbenchWearableHandler::fixFileUpload(
             maxTime = std::max(maxTime, payload.local.period.endTimeMs());
         }
 
-        QString title = tr("Selected files are too old", 0, count);
+        QString title = tr("Selected files are too old", "", count);
 
         int days = camera->maxDays();
         QString extra;
@@ -257,7 +257,7 @@ bool QnWorkbenchWearableHandler::fixFileUpload(
             extra = tr(
                 "Selected file was recorded on %1, "
                 "but only files that were recorded in the last %n days can be uploaded. "
-                "You can change this in camera archive settings.", 0, days)
+                "You can change this in camera archive settings.", "", days)
                 .arg(QDateTime::fromMSecsSinceEpoch(minTime).toString(Qt::SystemLocaleShortDate));
         }
         else
@@ -265,7 +265,7 @@ bool QnWorkbenchWearableHandler::fixFileUpload(
             extra = tr(
                 "Selected files were recorded between %1 and %2, "
                 "but only files that were recorded in the last %n days can be uploaded. "
-                "You can change this in camera archive settings.", 0, days)
+                "You can change this in camera archive settings.", "", days)
                 .arg(QDateTime::fromMSecsSinceEpoch(minTime).toString(Qt::SystemLocaleShortDate))
                 .arg(QDateTime::fromMSecsSinceEpoch(maxTime).toString(Qt::SystemLocaleShortDate));
         }
@@ -277,16 +277,16 @@ bool QnWorkbenchWearableHandler::fixFileUpload(
     if (upload->allHaveStatus(WearablePayload::ChunksTakenByFileInQueue))
     {
         QnMessageBox::warning(mainWindow(),
-            tr("Selected files cover periods for which videos are already being uploaded", 0, count),
-            tr("You can upload these files to a different instance of a Wearable Camera.", 0, count));
+            tr("Selected files cover periods for which videos are already being uploaded", "", count),
+            tr("You can upload these files to a different instance of a Wearable Camera.", "", count));
         return false;
     }
 
     if (upload->allHaveStatus(WearablePayload::ChunksTakenOnServer))
     {
         QnMessageBox::warning(mainWindow(),
-            tr("Selected files cover periods for which videos have already been uploaded", 0, count),
-            tr("You can upload these files to a different instance of a Wearable Camera.", 0, count));
+            tr("Selected files cover periods for which videos have already been uploaded", "", count),
+            tr("You can upload these files to a different instance of a Wearable Camera.", "", count));
         return false;
     }
 

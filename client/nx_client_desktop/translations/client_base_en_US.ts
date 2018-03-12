@@ -2362,9 +2362,9 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
         <source>This Id is already used on the following %n cameras: %1</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>This Id is already used on the following camera: %1</numerusform>
+            <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
         </translation>
     </message>
 </context>
@@ -2548,10 +2548,6 @@ to view more bookmarks</source>
 <context>
     <name>QnCameraPasswordChangeDialog</name>
     <message>
-        <source>Password shouldn&apos;t be equal to camera&apos;s user name</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>New Password</source>
         <translation></translation>
     </message>
@@ -2565,6 +2561,10 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Password should be at least 8 symbols long and contain different types of characters.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Password should not be equal to camera&apos;s user name</source>
         <translation></translation>
     </message>
 </context>
@@ -3197,12 +3197,9 @@ to %1</source>
         <source>Ask your system administrator to do it.</source>
         <translation></translation>
     </message>
-    <message numerus="yes">
+    <message>
         <source>Set Password</source>
-        <translation>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -4497,8 +4494,8 @@ to %1</source>
     <message numerus="yes">
         <source>Set for all %n Cameras</source>
         <translation>
-            <numerusform>Set for the Camera</numerusform>
-            <numerusform>Set for all %n Cameras</numerusform>
+            <numerusform>Set for the camera</numerusform>
+            <numerusform>Set for all %n cameras</numerusform>
         </translation>
     </message>
 </context>
