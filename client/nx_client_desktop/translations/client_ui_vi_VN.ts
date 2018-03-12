@@ -394,7 +394,7 @@
     <message>
       <location/>
       <source>Area Width</source>
-      <translation>Kích thước hình ảnh</translation>
+      <translation>Chiều rộng diện tích</translation>
     </message>
     <message>
       <location/>
@@ -773,7 +773,7 @@
     <message>
       <location/>
       <source>PTZ</source>
-      <translation type="unfinished">PTZ</translation>
+      <translation>PTZ</translation>
     </message>
   </context>
   <context>
@@ -1093,7 +1093,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/export_media_settings_widget.ui"/>
       <source>Export Settings</source>
-      <translation>Xuất cài đặt</translation>
+      <translation>Lưu cầu hình cài đặt</translation>
     </message>
     <message>
       <location/>
@@ -1154,7 +1154,7 @@
     <message>
       <location/>
       <source>Export Settings</source>
-      <translation>Xuất cài đặt</translation>
+      <translation>Lưu cầu hình cài đặt</translation>
     </message>
     <message>
       <location/>

@@ -399,7 +399,7 @@
     <message>
       <location/>
       <source>Font Size</source>
-      <translation>Letter grootte</translation>
+      <translation>Tekstgrootte</translation>
     </message>
     <message>
       <location/>
@@ -2296,7 +2296,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/rapid_review_settings_widget.ui"/>
       <source>Rapid Review</source>
-      <translation>Rapid Review</translation>
+      <translation>Versnelde weergave</translation>
     </message>
     <message>
       <location/>
@@ -3003,7 +3003,7 @@ The oldest footage among all cameras on the server will be deleted first.</sourc
     <message>
       <location/>
       <source>Area Width</source>
-      <translation>Breedte van opmaakgebied</translation>
+      <translation>Breedte van het tekstvak</translation>
     </message>
   </context>
   <context>

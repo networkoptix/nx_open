@@ -1519,7 +1519,7 @@
     </message>
     <message>
       <source>Analytics Event</source>
-      <translation type="unfinished">Analytics Event</translation>
+      <translation>Analytics Event</translation>
     </message>
     <message>
       <source>%1 at %2</source>

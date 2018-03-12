@@ -2494,7 +2494,7 @@ to view more bookmarks</source>
     <name>QnCameraMotionPolicy</name>
     <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation>%1 の録画やモーション検知は無効になります</translation>
+      <translation>%1 の記録やモーション検知は無効になります</translation>
     </message>
   </context>
   <context>
@@ -2540,7 +2540,7 @@ to view more bookmarks</source>
     <name>QnCameraRecordingPolicy</name>
     <message>
       <source>Recording is disabled for %1</source>
-      <translation>%1 の録画を無効</translation>
+      <translation>%1 の記録を無効</translation>
     </message>
   </context>
   <context>

@@ -1644,7 +1644,7 @@
     <message>
       <source>%1 at %2</source>
       <comment>Analytics Event at some camera</comment>
-      <translation type="unfinished">%1 at %2</translation>
+      <translation>%1 at %2</translation>
     </message>
   </context>
   <context>
