@@ -755,12 +755,12 @@
     <message>
       <location/>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>ID logique</translation>
     </message>
     <message>
       <location/>
       <source>Generate</source>
-      <translation type="unfinished">Generate</translation>
+      <translation>Générer</translation>
     </message>
     <message>
       <location/>
@@ -770,7 +770,7 @@
     <message>
       <location/>
       <source>Invalid Logical Id label</source>
-      <translation type="unfinished">Invalid Logical Id label</translation>
+      <translation>Étiquette d'ID logique non valide</translation>
     </message>
   </context>
   <context>

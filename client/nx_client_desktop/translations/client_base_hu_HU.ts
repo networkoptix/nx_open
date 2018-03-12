@@ -1011,7 +1011,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Settings are not available for .NOV and .EXE files.</source>
-      <translation type="unfinished">Settings are not available for .NOV and .EXE files.</translation>
+      <translation>A beállítások nem állnak rendelkezésre .NOV és .EXE fájlokhoz.</translation>
     </message>
   </context>
   <context>
@@ -8249,7 +8249,7 @@ to %1</source>
     </message>
     <message>
       <source>Selected period cannot be exported for the current camera.</source>
-      <translation type="unfinished">Selected period cannot be exported for the current camera.</translation>
+      <translation>A kiválasztott időszak nem exportálható az aktuális kamera számára.</translation>
     </message>
   </context>
   <context>

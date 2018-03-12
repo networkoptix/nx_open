@@ -2361,9 +2361,9 @@ pour afficher plus de signets</translation>
     </message>
     <message numerus="yes">
       <source>This ID already used on camera %1</source>
-      <translation type="unfinished">
-        <numerusform>This ID already used on camera %1</numerusform>
-        <numerusform>This ID already used on camera %1</numerusform>
+      <translation>
+        <numerusform>Cet ID est déjà utilisé sur caméra %1</numerusform>
+        <numerusform>Cet ID est déjà utilisé sur caméra %1</numerusform>
       </translation>
     </message>
   </context>
@@ -2486,7 +2486,7 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>ID logique</translation>
     </message>
   </context>
   <context>
@@ -4786,7 +4786,7 @@ to %1</source>
     </message>
     <message>
       <source>For full-featured mode please use another computer</source>
-      <translation type="unfinished">For full-featured mode please use another computer</translation>
+      <translation>Pour le mode complet, S.V.P. utilisez un autre ordinateur</translation>
     </message>
   </context>
   <context>

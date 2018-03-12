@@ -1010,7 +1010,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Settings are not available for .NOV and .EXE files.</source>
-      <translation type="unfinished">Settings are not available for .NOV and .EXE files.</translation>
+      <translation>.NOV ve .EXE dosyaları için ayarlar kullanılamaz.</translation>
     </message>
   </context>
   <context>
@@ -2245,7 +2245,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>No settings</source>
-      <translation type="unfinished">No settings</translation>
+      <translation>Ayarlanmadı</translation>
     </message>
   </context>
   <context>
@@ -2361,7 +2361,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>This ID already used on camera %1</source>
       <translation type="unfinished">
-        <numerusform>This ID already used on camera %1</numerusform>
+        <numerusform>Bu kimlik, kamera %1'de zaten kullanılıyor</numerusform>
         <numerusform>This ID already used on camera %1</numerusform>
       </translation>
     </message>
@@ -2485,7 +2485,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>Mantıksal Kimlik</translation>
     </message>
   </context>
   <context>
@@ -2843,7 +2843,7 @@ to %1</source>
     </message>
     <message>
       <source>Account is not activated. Please check your email and follow provided instructions</source>
-      <translation type="unfinished">Account is not activated. Please check your email and follow provided instructions</translation>
+      <translation>Kullanıcı aktif değil. Lütfen e postanıza kontrol edin ve gönderilen yönergeleri izleyin</translation>
     </message>
   </context>
   <context>
@@ -4781,7 +4781,7 @@ to %1</source>
     </message>
     <message>
       <source>For full-featured mode please use another computer</source>
-      <translation type="unfinished">For full-featured mode please use another computer</translation>
+      <translation>Tüm özellikler için lütfen başka bilgisayar kullanın</translation>
     </message>
   </context>
   <context>
@@ -6141,7 +6141,7 @@ to %1</source>
     </message>
     <message>
       <source>UNSUPPORTED FIRMWARE VERSION</source>
-      <translation type="unfinished">UNSUPPORTED FIRMWARE VERSION</translation>
+      <translation>UYUMSUZ FİRMWARE SÜRÜMÜ</translation>
     </message>
   </context>
   <context>
@@ -8245,7 +8245,7 @@ to %1</source>
     </message>
     <message>
       <source>Selected period cannot be exported for the current camera.</source>
-      <translation type="unfinished">Selected period cannot be exported for the current camera.</translation>
+      <translation>Seçilen süre geçerli kamera için dışa aktarılamaz.</translation>
     </message>
   </context>
   <context>

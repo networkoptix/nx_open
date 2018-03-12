@@ -755,12 +755,12 @@
     <message>
       <location/>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>邏輯 ID</translation>
     </message>
     <message>
       <location/>
       <source>Generate</source>
-      <translation type="unfinished">Generate</translation>
+      <translation>產生</translation>
     </message>
     <message>
       <location/>
@@ -770,7 +770,7 @@
     <message>
       <location/>
       <source>Invalid Logical Id label</source>
-      <translation type="unfinished">Invalid Logical Id label</translation>
+      <translation>無效的邏輯 ID 標籤</translation>
     </message>
   </context>
   <context>

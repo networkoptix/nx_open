@@ -87,7 +87,7 @@
         "maxRecordQueueSizeBytes": "최대 기록 용량 (byte)",
         "maxRecordQueueSizeElements": "최대 기록 용량 (elements)",
         "maxRemoteArchiveSynchronizationThreads": "최대 원격 보관 동기화 스레드",
-        "maxRtspConnectDurationSeconds": "최대 Rtsp 연결 지속 시간",
+        "maxRtspConnectDurationSeconds": "최대 Rtsp 연결 지속 시간 (초)",
         "maxSceneItems": "최대 장면수(기본값 0)",
         "proxyConnectTimeoutSec": "프록시 연결 시간 초과 (초)",
         "rtpTimeoutMs": "RTP 휴식시간 (1/1000초)",
@@ -178,15 +178,15 @@
     "common": {
         "voiceCommands": {
             "search": "find + [text for searchbar]",
-            "pause": "pause",
+            "pause": "일시정지",
             "help": "help | show commands",
-            "collapse all servers": "collapse all servers",
+            "collapse all servers": "모든 서버 축소",
             "collapse server": "collapse server + [server name]",
-            "play": "play",
-            "clear search": "clear search",
+            "play": "재생",
+            "clear search": "검색창 지우기",
             "live": "go to live | show me live",
-            "expand all servers": "expand all servers",
-            "stop listening": "stop listening",
+            "expand all servers": "모든 서버 확장",
+            "stop listening": "듣기 중지",
             "expand server": "expand server + [server name]",
             "view": "view + [camera name]"
         },
@@ -200,9 +200,9 @@
             "transcoding": "트랜스코딩",
             "copyActiveText": "클립보드에 복사됨"
         },
-        "searchCamPlaceholder": "Search",
+        "searchCamPlaceholder": "검색",
         "cameraStates": {
-            "noFormat": "This browser does not support video playback from this camera.",
+            "noFormat": "이 브라우저는 현 카메라로 부터 비디오 재생을 지원하지 않습니다.",
             "ieWin10": "Microsoft Edge 또는 Google 크롬 브라우저를 사용하십시오.",
             "iosVideoTooLarge": "iOS는 fullHD (2MP: 1920x1080) 보다 큰 비디오를 지원하지 않습니다.",
             "unauthorized": "인증이 필요합니다",
@@ -213,13 +213,13 @@
             "error": "오류",
             "offline": "오프라인",
             "noData": "데이터 없음",
-            "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing videos."
+            "flashRequired": "동영상을 재생하기 위하여 <a href='https://get.adobe.com/flashplayer/' target='_blank'>어도비플래쉬</a>를 설치하십시오."
         },
-        "chromeCastWarning": "Chromecast is resource intensive and may cause issues on your server.",
+        "chromeCastWarning": "크롬캐스트는 많은 리소스가 요구되어 서버에 문제가 발생할 수 있습니다.",
         "resolution": {
-            "high": "High",
-            "auto": "Auto",
-            "low": "Low"
+            "high": "높은",
+            "auto": "자동",
+            "low": "낮은"
         }
     }
 }

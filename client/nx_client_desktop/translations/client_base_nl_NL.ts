@@ -1010,7 +1010,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Settings are not available for .NOV and .EXE files.</source>
-      <translation type="unfinished">Settings are not available for .NOV and .EXE files.</translation>
+      <translation>Instellingen zijn niet beschikbaar voor *.noc- en *.exe-bestanden.</translation>
     </message>
   </context>
   <context>
@@ -8246,7 +8246,7 @@ to %1</source>
     </message>
     <message>
       <source>Selected period cannot be exported for the current camera.</source>
-      <translation type="unfinished">Selected period cannot be exported for the current camera.</translation>
+      <translation>De geselecteerde periode kan niet worden geëxporteerd voor de huidige camera.</translation>
     </message>
   </context>
   <context>

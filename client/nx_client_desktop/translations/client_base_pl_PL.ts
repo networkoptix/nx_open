@@ -1010,7 +1010,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Settings are not available for .NOV and .EXE files.</source>
-      <translation type="unfinished">Settings are not available for .NOV and .EXE files.</translation>
+      <translation>Ustawienia nie są dostępne dla plików .NOV i EXE.</translation>
     </message>
   </context>
   <context>
@@ -2289,7 +2289,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>No settings</source>
-      <translation type="unfinished">No settings</translation>
+      <translation>Brak ustawień</translation>
     </message>
   </context>
   <context>
@@ -2406,11 +2406,11 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>This ID already used on camera %1</source>
-      <translation type="unfinished">
-        <numerusform>This ID already used on camera %1</numerusform>
-        <numerusform>This ID already used on camera %1</numerusform>
-        <numerusform>This ID already used on camera %1</numerusform>
-        <numerusform>This ID already used on camera %1</numerusform>
+      <translation>
+        <numerusform>Ten identyfikator jest już używany w kamerze %1</numerusform>
+        <numerusform>Ten identyfikator jest już używany w kamerach %1</numerusform>
+        <numerusform>Ten identyfikator jest już używany w kamerach %1</numerusform>
+        <numerusform>Ten identyfikator jest już używany w kamerach %1</numerusform>
       </translation>
     </message>
   </context>
@@ -2541,7 +2541,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>Identyfikator logiczny</translation>
     </message>
   </context>
   <context>
@@ -2907,7 +2907,7 @@ to %1</source>
     </message>
     <message>
       <source>Account is not activated. Please check your email and follow provided instructions</source>
-      <translation type="unfinished">Account is not activated. Please check your email and follow provided instructions</translation>
+      <translation>Konto nie zostało aktywowane. Proszę sprawdzić swój e-mail i postępować zgodnie z instrukcjami</translation>
     </message>
   </context>
   <context>
@@ -4893,7 +4893,7 @@ to %1</source>
     </message>
     <message>
       <source>For full-featured mode please use another computer</source>
-      <translation type="unfinished">For full-featured mode please use another computer</translation>
+      <translation>Aby korzystać z pełnego trybu ze wszystkimi funkcjami, proszę używać innego komputera</translation>
     </message>
   </context>
   <context>
@@ -6282,7 +6282,7 @@ to %1</source>
     </message>
     <message>
       <source>UNSUPPORTED FIRMWARE VERSION</source>
-      <translation type="unfinished">UNSUPPORTED FIRMWARE VERSION</translation>
+      <translation>NIEOBSŁUGIWANA WERSJA FIRMWARE</translation>
     </message>
   </context>
   <context>
@@ -8474,7 +8474,7 @@ to %1</source>
     </message>
     <message>
       <source>Selected period cannot be exported for the current camera.</source>
-      <translation type="unfinished">Selected period cannot be exported for the current camera.</translation>
+      <translation>Zaznaczonego okresu nie można wyeksportować dla bieżącej kamery.</translation>
     </message>
   </context>
   <context>

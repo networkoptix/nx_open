@@ -1010,7 +1010,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Settings are not available for .NOV and .EXE files.</source>
-      <translation>La configuración no está disponible para archivos .EXE.</translation>
+      <translation>La configuración no está disponible para los archivos .NOV y .EXE.</translation>
     </message>
   </context>
   <context>
@@ -2360,9 +2360,9 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>This ID already used on camera %1</source>
-      <translation type="unfinished">
-        <numerusform>This ID already used on camera %1</numerusform>
-        <numerusform>This ID already used on camera %1</numerusform>
+      <translation>
+        <numerusform>Este ID ya ha sido utilizado en cámara %1</numerusform>
+        <numerusform>Este ID ya ha sido utilizado en cámara %1</numerusform>
       </translation>
     </message>
   </context>
@@ -2485,7 +2485,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>ID Lógico</translation>
     </message>
   </context>
   <context>
@@ -4784,7 +4784,7 @@ a %1</translation>
     </message>
     <message>
       <source>For full-featured mode please use another computer</source>
-      <translation type="unfinished">For full-featured mode please use another computer</translation>
+      <translation>Para el modo con todas las funciones, usa otra computadora</translation>
     </message>
   </context>
   <context>

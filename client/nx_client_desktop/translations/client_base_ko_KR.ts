@@ -1010,7 +1010,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Settings are not available for .NOV and .EXE files.</source>
-      <translation type="unfinished">Settings are not available for .NOV and .EXE files.</translation>
+      <translation>.NOV 와 .EXE 파일에 대한 설정을 할 수 없습니다.</translation>
     </message>
   </context>
   <context>
@@ -2223,7 +2223,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>No settings</source>
-      <translation type="unfinished">No settings</translation>
+      <translation>설정 없음</translation>
     </message>
   </context>
   <context>
@@ -2337,8 +2337,8 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>This ID already used on camera %1</source>
-      <translation type="unfinished">
-        <numerusform>This ID already used on camera %1</numerusform>
+      <translation>
+        <numerusform>이 ID는 이미 %1 카메라에 사용되어 있습니다</numerusform>
       </translation>
     </message>
   </context>
@@ -2457,7 +2457,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>논리적 ID</translation>
     </message>
   </context>
   <context>
@@ -2811,7 +2811,7 @@ to %1</source>
     </message>
     <message>
       <source>Account is not activated. Please check your email and follow provided instructions</source>
-      <translation type="unfinished">Account is not activated. Please check your email and follow provided instructions</translation>
+      <translation>계정이 활성화 되었 있지 않습니다. 이메일을 확인하고 제공된 지침을 따르십시오.</translation>
     </message>
   </context>
   <context>
@@ -4725,7 +4725,7 @@ to %1</source>
     </message>
     <message>
       <source>For full-featured mode please use another computer</source>
-      <translation type="unfinished">For full-featured mode please use another computer</translation>
+      <translation>전체 기능 사용을 위해 다른 컴퓨터를 이용 하시기 바랍니다</translation>
     </message>
   </context>
   <context>
@@ -6072,7 +6072,7 @@ to %1</source>
     </message>
     <message>
       <source>UNSUPPORTED FIRMWARE VERSION</source>
-      <translation type="unfinished">UNSUPPORTED FIRMWARE VERSION</translation>
+      <translation>지원되지 않는 펌웨어 버전</translation>
     </message>
   </context>
   <context>
@@ -8132,7 +8132,7 @@ to %1</source>
     </message>
     <message>
       <source>Selected period cannot be exported for the current camera.</source>
-      <translation type="unfinished">Selected period cannot be exported for the current camera.</translation>
+      <translation>현재 카메라는 선택한 기간동안 영상을 추출 할수 없습니다.</translation>
     </message>
   </context>
   <context>

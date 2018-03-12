@@ -2360,9 +2360,9 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>This ID already used on camera %1</source>
-      <translation type="unfinished">
-        <numerusform>This ID already used on camera %1</numerusform>
-        <numerusform>This ID already used on camera %1</numerusform>
+      <translation>
+        <numerusform>Diese ID wird auf Kamera %1 bereits verwendet</numerusform>
+        <numerusform>Diese ID wird auf Kameras %1 bereits verwendet</numerusform>
       </translation>
     </message>
   </context>
@@ -2485,7 +2485,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>Logical-ID</translation>
     </message>
   </context>
   <context>
@@ -4781,7 +4781,7 @@ to %1</source>
     </message>
     <message>
       <source>For full-featured mode please use another computer</source>
-      <translation type="unfinished">For full-featured mode please use another computer</translation>
+      <translation>Nutzen Sie für den vollen Funktionsumfang bitte einen anderen Computer</translation>
     </message>
   </context>
   <context>

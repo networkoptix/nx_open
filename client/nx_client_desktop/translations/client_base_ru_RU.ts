@@ -4899,7 +4899,7 @@ to %1</source>
     </message>
     <message>
       <source>For full-featured mode please use another computer</source>
-      <translation type="unfinished">For full-featured mode please use another computer</translation>
+      <translation>Для полноценного режима используйте другой компьютер</translation>
     </message>
   </context>
   <context>

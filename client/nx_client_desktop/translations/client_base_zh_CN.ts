@@ -1011,7 +1011,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Settings are not available for .NOV and .EXE files.</source>
-      <translation type="unfinished">Settings are not available for .NOV and .EXE files.</translation>
+      <translation>设置不适用于.NOV和.EXE文件。</translation>
     </message>
   </context>
   <context>
@@ -2224,7 +2224,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>No settings</source>
-      <translation type="unfinished">No settings</translation>
+      <translation>无设置</translation>
     </message>
   </context>
   <context>
@@ -2338,8 +2338,8 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>This ID already used on camera %1</source>
-      <translation type="unfinished">
-        <numerusform>This ID already used on camera %1</numerusform>
+      <translation>
+        <numerusform>此 ID 已在相机 %1上使用</numerusform>
       </translation>
     </message>
   </context>
@@ -2458,7 +2458,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>逻辑 ID</translation>
     </message>
   </context>
   <context>
@@ -2812,7 +2812,7 @@ to %1</source>
     </message>
     <message>
       <source>Account is not activated. Please check your email and follow provided instructions</source>
-      <translation type="unfinished">Account is not activated. Please check your email and follow provided instructions</translation>
+      <translation>帐户无法激活。请检查您的电子邮件并遵循提供的说明操作</translation>
     </message>
   </context>
   <context>
@@ -4726,7 +4726,7 @@ to %1</source>
     </message>
     <message>
       <source>For full-featured mode please use another computer</source>
-      <translation type="unfinished">For full-featured mode please use another computer</translation>
+      <translation>若需启用全功能模式,请使用另外的服务器</translation>
     </message>
   </context>
   <context>
@@ -6073,7 +6073,7 @@ to %1</source>
     </message>
     <message>
       <source>UNSUPPORTED FIRMWARE VERSION</source>
-      <translation type="unfinished">UNSUPPORTED FIRMWARE VERSION</translation>
+      <translation>无支持的固件版本</translation>
     </message>
   </context>
   <context>
@@ -8133,7 +8133,7 @@ to %1</source>
     </message>
     <message>
       <source>Selected period cannot be exported for the current camera.</source>
-      <translation type="unfinished">Selected period cannot be exported for the current camera.</translation>
+      <translation>当前相机所选的时间段不能导出。</translation>
     </message>
   </context>
   <context>

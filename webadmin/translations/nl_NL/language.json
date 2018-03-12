@@ -87,7 +87,7 @@
         "maxRecordQueueSizeBytes": "Max record queue size (bytes)",
         "maxRecordQueueSizeElements": "Max record queue size (elements)",
         "maxRemoteArchiveSynchronizationThreads": "Max. externe archief synchronisatie",
-        "maxRtspConnectDurationSeconds": "Max Rtsp verbinding duur in seconden",
+        "maxRtspConnectDurationSeconds": "Max. Rtsp connect duur seconden",
         "maxSceneItems": "Max scene items (0 means default)",
         "proxyConnectTimeoutSec": "Proxy verbinding timeout (seconden)",
         "rtpTimeoutMs": "RTP timeout (milliseconden)",
@@ -178,11 +178,11 @@
     "common": {
         "voiceCommands": {
             "search": "find + [text for searchbar]",
-            "pause": "pause",
+            "pause": "pauseren",
             "help": "help | show commands",
             "collapse all servers": "collapse all servers",
             "collapse server": "collapse server + [server name]",
-            "play": "play",
+            "play": "afspelen",
             "clear search": "clear search",
             "live": "go to live | show me live",
             "expand all servers": "expand all servers",
@@ -192,7 +192,7 @@
         },
         "systemOffline": "Systeem Offline",
         "cameraLinks": {
-            "copyToClipboard": "kopieer naar klembord",
+            "copyToClipboard": "kopiëren naar klembord",
             "highStream": "Primaire stream",
             "copyDefaultText": "kopiëren",
             "unknown": "Unknown",
@@ -200,9 +200,9 @@
             "transcoding": "Transcoding",
             "copyActiveText": "gekopieerd naar het klembord"
         },
-        "searchCamPlaceholder": "Search",
+        "searchCamPlaceholder": "Zoeken",
         "cameraStates": {
-            "noFormat": "This browser does not support video playback from this camera.",
+            "noFormat": "Deze browser ondersteunt het afspelen van de beelden van deze camera niet.",
             "ieWin10": "Gebruik alsjeblieft de browsers Microsoft Edge of Google Chrome.",
             "iosVideoTooLarge": "iOS ondersteunt geen video die groter is dan FullHD (2MP: 1920x1080).",
             "unauthorized": "Authentication required",
@@ -213,13 +213,13 @@
             "error": "Error",
             "offline": "Offline",
             "noData": "Geen data",
-            "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing videos."
+            "flashRequired": "Gelieve <a href='https://get.adobe.com/flashplayer/' target='_blank'> Adobe Flash</a> te installeren voor het afspelen van video's."
         },
         "chromeCastWarning": "Chromecast is resource intensive and may cause issues on your server.",
         "resolution": {
-            "high": "High",
-            "auto": "Auto",
-            "low": "Low"
+            "high": "Hoog",
+            "auto": "Automatisch",
+            "low": "Lage"
         }
     }
 }
