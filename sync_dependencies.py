@@ -158,8 +158,8 @@ def sync_dependencies(syncher):
                 sync("any/server-external-" + releaseVersion)
 
         if box in ("tx1", "edge1"):
-            sync("tx1-arm/openldap")
-            sync("tx1-arm/sasl2")
+            sync("openldap")
+            sync("sasl2")
 
     if platform == "windows":
         sync("windows/doxygen", path_variable="doxygen_directory")
