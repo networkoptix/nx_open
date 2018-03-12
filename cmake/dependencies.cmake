@@ -172,7 +172,8 @@ function(get_dependencies)
     endif()
 
     if(haveDesktopClient OR haveMobileClient)
-        nx_rdep_add_package(any/roboto-fonts)
+        nx_rdep_add_package(any/roboto-fonts PATH_VARIABLE fonts_directory)
+        set(fonts_directory ${fonts_directory} PARENT_SCOPE)
     endif()
 
     if((haveServer OR haveDesktopClient) AND NOT box STREQUAL "edge1")
