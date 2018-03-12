@@ -1,5 +1,7 @@
 #include "workbench_wearable_handler.h"
 
+#include <QtCore/QStringBuilder>
+
 #include <QtWidgets/QAction>
 
 #include <nx/utils/string.h>
@@ -453,22 +455,23 @@ void QnWorkbenchWearableHandler::at_wearableManager_stateChanged(const WearableS
 
 QString QnWorkbenchWearableHandler::calculateExtendedErrorMessage(const WearablePayload& upload)
 {
-    QString fileName = QFileInfo(upload.path).fileName();
+    static const auto kNDash = QString::fromWCharArray(L"\x2013");
+    const QString fileName = QFileInfo(upload.path).fileName() % " " % kNDash;
 
     switch (upload.status)
     {
     case WearablePayload::Valid:
         return QString();
     case WearablePayload::UnsupportedFormat:
-        return tr("%1 - has unsupported format.").arg(fileName);
+        return tr("%1 has unsupported format.").arg(fileName);
     case WearablePayload::NoTimestamp:
-        return tr("%1 - does not have timestamp.").arg(fileName);
+        return tr("%1 does not have timestamp.").arg(fileName);
     case WearablePayload::FootagePastMaxDays:
-        return tr("%1 - is older than allowed in camera archive settings.").arg(fileName);
+        return tr("%1 is older than allowed in camera archive settings.").arg(fileName);
     case WearablePayload::ChunksTakenByFileInQueue:
-        return tr("%1 - covers period for which video has already been uploaded.").arg(fileName);
+        return tr("%1 covers period for which video has already been uploaded.").arg(fileName);
     case WearablePayload::ChunksTakenOnServer:
-        return tr("%1 - covers period for which video is being uploaded.").arg(fileName);
+        return tr("%1 covers period for which video is being uploaded.").arg(fileName);
     default:
         NX_ASSERT(false);
         return QString();

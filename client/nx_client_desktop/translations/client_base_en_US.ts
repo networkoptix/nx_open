@@ -2525,7 +2525,7 @@ to view more bookmarks</source>
     <name>QnCameraMotionPolicy</name>
     <message>
         <source>Recording or motion detection is disabled for %1</source>
-        <translation>Recording or motion detection is disabled on %1</translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -7660,22 +7660,6 @@ to %1</source>
         <source>No new files to upload in selected folder</source>
         <translation></translation>
     </message>
-    <message>
-        <source>%1 - has unsupported format.</source>
-        <translation>%1 — has unsupported format.</translation>
-    </message>
-    <message>
-        <source>%1 - does not have timestamp.</source>
-        <translation>%1 — does not have timestamp.</translation>
-    </message>
-    <message>
-        <source>%1 - covers period for which video has already been uploaded.</source>
-        <translation>%1 — covers period for which video has already been uploaded.</translation>
-    </message>
-    <message>
-        <source>%1 - covers period for which video is being uploaded.</source>
-        <translation>%1 — covers period for which video is being uploaded.</translation>
-    </message>
     <message numerus="yes">
         <source>Selected files are too old</source>
         <translation>
@@ -7728,8 +7712,24 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>%1 - is older than allowed in camera archive settings.</source>
-        <translation>%1 — is older than allowed in camera archive settings.</translation>
+        <source>%1 has unsupported format.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 does not have timestamp.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 is older than allowed in camera archive settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 covers period for which video has already been uploaded.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 covers period for which video is being uploaded.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
