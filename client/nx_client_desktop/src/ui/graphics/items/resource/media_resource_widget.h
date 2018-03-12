@@ -317,6 +317,7 @@ private:
 
     struct SoftwareTrigger
     {
+        QnUuid ruleId;
         SoftwareTriggerInfo info;
         QnUuid overlayItemId;
     };
@@ -343,8 +344,7 @@ private:
 
     void getResourceStates();
 
-    using TriggerData = QPair<QnUuid, SoftwareTrigger>; //< ruleId -> softwareTrigger
-    using TriggerDataList = QList<TriggerData>;
+    using TriggerDataList = QList<SoftwareTrigger>;
     TriggerDataList::iterator lowerBoundbyTriggerRuleId(const QnUuid& id);
 
 private:

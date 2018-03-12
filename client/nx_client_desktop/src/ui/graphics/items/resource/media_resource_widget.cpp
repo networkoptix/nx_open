@@ -650,12 +650,11 @@ void QnMediaResourceWidget::updateTriggerAvailability(const vms::event::RulePtr&
 {
     const auto ruleId = rule->id();
     const auto triggerIt = lowerBoundbyTriggerRuleId(ruleId);
-    if (triggerIt == m_triggers.end() || triggerIt->first == ruleId)
+    if (triggerIt == m_triggers.end() || triggerIt->ruleId == ruleId)
         return;
 
-    const auto& trigger = triggerIt->second;
     const auto button = qobject_cast<QnSoftwareTriggerButton*>(
-        m_triggersContainer->item(trigger.overlayItemId));
+        m_triggersContainer->item(triggerIt->overlayItemId));
 
     if (!button)
         return;
@@ -666,7 +665,7 @@ void QnMediaResourceWidget::updateTriggerAvailability(const vms::event::RulePtr&
     if (button->isEnabled() == buttonEnabled)
         return;
 
-    const auto info = trigger.info;
+    const auto info = triggerIt->info;
     if (!buttonEnabled)
     {
         const bool longPressed = info.prolonged &&
@@ -681,11 +680,8 @@ void QnMediaResourceWidget::updateTriggerAvailability(const vms::event::RulePtr&
 
 void QnMediaResourceWidget::updateTriggersAvailability()
 {
-    for (auto triggerData: m_triggers)
-    {
-        const auto ruleId = triggerData.first;
-        updateTriggerAvailability(commonModule()->eventRuleManager()->rule(ruleId));
-    }
+    for (auto data: m_triggers)
+        updateTriggerAvailability(commonModule()->eventRuleManager()->rule(data.ruleId));
 }
 
 void QnMediaResourceWidget::createButtons()
@@ -2697,7 +2693,7 @@ void QnMediaResourceWidget::createTriggerIfRelevant(
     const auto ruleId = rule->id();
     const auto it = lowerBoundbyTriggerRuleId(ruleId);
 
-    NX_ASSERT(it == m_triggers.end() || it->first != ruleId);
+    NX_ASSERT(it == m_triggers.end() || it->ruleId != ruleId);
 
     if (!isRelevantTriggerRule(rule))
         return;
@@ -2727,20 +2723,19 @@ void QnMediaResourceWidget::createTriggerIfRelevant(
 
     const int index = std::distance(m_triggers.begin(), it);
     const auto overlayItemId = m_triggersContainer->insertItem(index, button);
-    const auto data = TriggerData(ruleId, SoftwareTrigger({info, overlayItemId}));
-    m_triggers.insert(it, data);
+    m_triggers.insert(it, SoftwareTrigger{ruleId, info, overlayItemId});
 }
 
 QnMediaResourceWidget::TriggerDataList::iterator
     QnMediaResourceWidget::lowerBoundbyTriggerRuleId(const QnUuid& id)
 {
     static const auto compareFunction =
-        [](const TriggerData& left, const TriggerData& right)
+        [](const SoftwareTrigger& left, const SoftwareTrigger& right)
         {
-            return left.first > right.first; // Bottom in the thick client - right in the mobile.
+            return left.ruleId > right.ruleId; // Bottom in the thick client - right in the mobile.
         };
 
-    const auto idValue = TriggerData(id, SoftwareTrigger());
+    const auto idValue = SoftwareTrigger{id, SoftwareTriggerInfo(), QnUuid()};
     return std::lower_bound(m_triggers.begin(), m_triggers.end(), idValue, compareFunction);
 }
 
@@ -2904,7 +2899,7 @@ void QnMediaResourceWidget::resetTriggers()
 {
     /* Delete all buttons: */
     for (const auto& data: m_triggers)
-        m_triggersContainer->deleteItem(data.second.overlayItemId);
+        m_triggersContainer->deleteItem(data.overlayItemId);
 
     /* Clear triggers information: */
     m_triggers.clear();
@@ -2922,10 +2917,10 @@ void QnMediaResourceWidget::resetTriggers()
 void QnMediaResourceWidget::at_eventRuleRemoved(const QnUuid& id)
 {
     const auto it = lowerBoundbyTriggerRuleId(id);
-    if (it == m_triggers.end() || it->first != id)
+    if (it == m_triggers.end() || it->ruleId != id)
         return;
 
-    m_triggersContainer->deleteItem(it->second.overlayItemId);
+    m_triggersContainer->deleteItem(it->overlayItemId);
     m_triggers.erase(it);
 }
 
@@ -2941,7 +2936,7 @@ void QnMediaResourceWidget::at_eventRuleAddedOrUpdated(const vms::event::RulePtr
 {
     const auto ruleId = rule->id();
     const auto it = lowerBoundbyTriggerRuleId(ruleId);
-    if (it == m_triggers.end() || it->first != ruleId)
+    if (it == m_triggers.end() || it->ruleId != ruleId)
     {
         /* Create trigger if the rule is relevant: */
         createTriggerIfRelevant(rule);
