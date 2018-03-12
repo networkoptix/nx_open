@@ -81,37 +81,16 @@ bool CameraManager::pushCompressedVideoFrame(const CommonCompressedVideoPacket* 
 bool CameraManager::pushUncompressedVideoFrame(const CommonUncompressedVideoFrame* videoFrame)
 {
     NX_OUTPUT << __func__ << "() BEGIN: timestamp " << videoFrame->timestampUsec() << " us";
+
     m_lastVideoFrameTimestampUsec = videoFrame->timestampUsec();
 
-    if (videoFrame->planeCount() != 3)
-    {
-        NX_PRINT << __func__ << "() END -> false: videoFrame->planeCount() is "
-            << videoFrame->planeCount() << " instead of 3";
-        return false;
-    }
+    if (videoFrame->pixelFormat() == UncompressedVideoFrame::PixelFormat::bgra)
+        return checkRgbFrame(videoFrame);
 
-    const auto expectedPixelFormat = UncompressedVideoFrame::PixelFormat::yuv420;
-    if (videoFrame->pixelFormat() != expectedPixelFormat)
-    {
-        NX_PRINT << __func__ << "() END -> false: videoFrame->pixelFormat() is "
-            << (int) videoFrame->pixelFormat() << " instead of " << (int) expectedPixelFormat;
-        return false;
-    }
+    if (videoFrame->pixelFormat() == UncompressedVideoFrame::PixelFormat::yuv420)
+        return checkYuv420pFrame(videoFrame);
 
-    // Dump 8 bytes at offset 16 of the plane 0.
-    if (videoFrame->dataSize(0) < 44)
-    {
-        NX_PRINT << __func__ << "(): videoFrame->dataSize(0) == " << videoFrame->dataSize(0)
-            << ", which is suspiciously low";
-    }
-    else
-    {
-        // Hex dump some 8 bytes from raw pixel data.
-        NX_PRINT_HEX_DUMP("bytes 36..43", videoFrame->data(0) + 36, 8);
-    }
-
-    NX_OUTPUT << __func__ << "() END -> true";
-    return true;
+    return false;
 }
 
 bool CameraManager::pullMetadataPackets(std::vector<MetadataPacket*>* metadataPackets)
@@ -230,6 +209,7 @@ MetadataPacket* CameraManager::cookSomeObjects()
     commonObject->setBoundingBox(Rect((float) dt, (float) dt, 0.25F, 0.25F));
 
     auto objectPacket = new CommonObjectsMetadataPacket();
+
     objectPacket->setTimestampUsec(m_lastVideoFrameTimestampUsec);
     objectPacket->setDurationUsec(1000000LL * 10);
     objectPacket->addItem(commonObject);
@@ -241,6 +221,45 @@ int64_t CameraManager::usSinceEpoch() const
     using namespace std::chrono;
     return duration_cast<microseconds>(
         system_clock::now().time_since_epoch()).count();
+}
+
+bool CameraManager::checkYuv420pFrame(const sdk::metadata::CommonUncompressedVideoFrame* videoFrame) const
+{
+    if (videoFrame->planeCount() != 3)
+    {
+        NX_PRINT << __func__ << "() END -> false: videoFrame->planeCount() is "
+            << videoFrame->planeCount() << " instead of 3";
+        return false;
+    }
+
+    const auto expectedPixelFormat = UncompressedVideoFrame::PixelFormat::yuv420;
+    if (videoFrame->pixelFormat() != expectedPixelFormat)
+    {
+        NX_PRINT << __func__ << "() END -> false: videoFrame->pixelFormat() is "
+            << (int)videoFrame->pixelFormat() << " instead of " << (int)expectedPixelFormat;
+        return false;
+    }
+
+    // Dump 8 bytes at offset 16 of the plane 0.
+    if (videoFrame->dataSize(0) < 44)
+    {
+        NX_PRINT << __func__ << "(): videoFrame->dataSize(0) == " << videoFrame->dataSize(0)
+            << ", which is suspiciously low";
+    }
+    else
+    {
+        // Hex dump some 8 bytes from raw pixel data.
+        NX_PRINT_HEX_DUMP("bytes 36..43", videoFrame->data(0) + 36, 8);
+    }
+
+    NX_OUTPUT << __func__ << "() END -> true";
+}
+
+bool CameraManager::checkRgbFrame(const sdk::metadata::CommonUncompressedVideoFrame* videoFrame) const
+{
+    // TODO: #dmishin check BGRA frames somehow.
+    NX_OUTPUT << __func__ << "() END -> true";
+    return true;
 }
 
 } // namespace stub

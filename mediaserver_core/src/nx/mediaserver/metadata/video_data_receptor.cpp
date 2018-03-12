@@ -52,6 +52,7 @@ using namespace nx::sdk::metadata;
     }
 
     nx::sdk::metadata::UncompressedVideoFrame* uncompressedFrame;
+// TODO: #dmishin take needed pixel format from manifest
 #if 0
     uncompressedFrame = convertToYuv420pSdkFrame(frame, needDeepCopy);
 #else
@@ -122,6 +123,8 @@ using namespace nx::sdk::metadata;
 
     const auto packet = new CommonUncompressedVideoFrame(
         bgraFrame->pkt_dts, bgraFrame->width, bgraFrame->height);
+
+    packet->setPixelFormat(UncompressedVideoFrame::PixelFormat::bgra);
 
     // TODO: #dmishin do not perform deep copy always
     std::vector<std::vector<char>> data(kPlaneCount);

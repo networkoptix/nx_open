@@ -44,6 +44,9 @@ private:
 
     int64_t usSinceEpoch() const;
 
+    bool checkYuv420pFrame(const sdk::metadata::CommonUncompressedVideoFrame* videoFrame) const;
+    bool checkRgbFrame(const sdk::metadata::CommonUncompressedVideoFrame* videoFrame) const;
+
 private:
     std::unique_ptr<std::thread> m_thread;
     std::atomic<bool> m_stopping{false};
