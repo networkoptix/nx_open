@@ -33,7 +33,6 @@
 #include <utils/media/av_codec_helper.h>
 
 using namespace std;
-
 namespace http = nx::network::http;
 
 const QString QnPlAxisResource::MANUFACTURE(lit("Axis"));
@@ -1591,14 +1590,14 @@ QMap<QString, QString> QnPlAxisResource::executeParamsQueries(const QSet<QString
         url.setUserName(getAuth().user());
         url.setPassword(getAuth().password());
 
-        int statusCode = nx::network::http::StatusCode::undefined;
+        int statusCode = http::StatusCode::undefined;
         QByteArray body;
-        SystemError::ErrorCode errorCode = nx::network::http::downloadFileSync(
+        SystemError::ErrorCode errorCode = http::downloadFileSync(
             url,
             &statusCode,
             &body);
 
-        if (statusCode == nx::network::http::StatusCode::ok)
+        if (statusCode == http::StatusCode::ok)
         {
             if (body.startsWith("OK"))
                 continue;
