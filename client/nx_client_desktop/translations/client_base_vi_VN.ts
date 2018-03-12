@@ -1086,7 +1086,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Scroll Left</source>
-      <translation>Di chuyển sang trái</translation>
+      <translation>di chuyển sang trái</translation>
     </message>
     <message>
       <source>Scroll Up</source>
@@ -1094,7 +1094,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation>Di chuyển sang phải</translation>
+      <translation>di chuyển sang phải</translation>
     </message>
     <message>
       <source>Scroll Down</source>
@@ -2437,7 +2437,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Vendor</source>
-      <translation>Nhà cung cấp</translation>
+      <translation>Nhà cung cấp:</translation>
     </message>
     <message>
       <source>Model</source>

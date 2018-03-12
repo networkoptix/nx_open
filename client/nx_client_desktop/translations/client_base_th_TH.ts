@@ -1352,7 +1352,7 @@ to view more bookmarks</source>
     <name>QnAbstractPtzDialog</name>
     <message>
       <source>Loading...</source>
-      <translation>กำลังโหลด...</translation>
+      <translation>กำลังโหลด ...</translation>
     </message>
     <message>
       <source>Saving...</source>
@@ -3530,7 +3530,7 @@ to %1</source>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Select folder...</source>
-      <translation>เลือกโฟลเดอร์...</translation>
+      <translation>เลือกโฟลเดอร์ ...</translation>
     </message>
     <message>
       <source>Folder already added</source>

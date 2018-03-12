@@ -862,7 +862,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Upload File...</source>
-      <translation>ファイルをアップロード...</translation>
+      <translation>ファイルをアップロード</translation>
     </message>
     <message>
       <source>Upload Folder...</source>

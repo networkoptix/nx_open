@@ -2517,7 +2517,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Vendor</source>
-      <translation>ספק</translation>
+      <translation>ספק:</translation>
     </message>
     <message>
       <source>Model</source>
@@ -2525,7 +2525,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Firmware</source>
-      <translation>קושחה</translation>
+      <translation>קושחה:</translation>
     </message>
     <message>
       <source>IP/Name</source>
@@ -3028,7 +3028,7 @@ to %1</source>
     </message>
     <message>
       <source>The username or password you have entered is incorrect. Please try again.</source>
-      <translation>שם המשתמש והסיסמה שהזנת שגויים, אנא נסה שנית.</translation>
+      <translation>שם המשתמש והסיסמא שהזנת שגויים, אנא נסה שנית.</translation>
     </message>
     <message>
       <source>Unable to connect to the server</source>
@@ -3357,7 +3357,7 @@ to %1</source>
     </message>
     <message>
       <source>Wrong Password</source>
-      <translation>סיסמה שגויה</translation>
+      <translation>סיסמא שגויה</translation>
     </message>
     <message>
       <source>Confirm Password</source>
@@ -3980,7 +3980,7 @@ to %1</source>
     </message>
     <message>
       <source>License Key</source>
-      <translation>מפתח רשיון</translation>
+      <translation>מפתח רשיון:</translation>
     </message>
     <message>
       <source>Features:</source>

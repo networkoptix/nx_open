@@ -624,11 +624,11 @@
     </message>
     <message>
       <source>Device</source>
-      <translation type="unfinished">Device</translation>
+      <translation>Dispositivo</translation>
     </message>
     <message>
       <source>device</source>
-      <translation type="unfinished">device</translation>
+      <translation>dispositivo</translation>
     </message>
     <message numerus="yes">
       <source>%n I/O Module(s)</source>

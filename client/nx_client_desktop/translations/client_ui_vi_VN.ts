@@ -688,7 +688,7 @@
     <message>
       <location/>
       <source>Restore Defaults</source>
-      <translation>Khôi phục mặc định</translation>
+      <translation>khôi phục mặc định</translation>
     </message>
     <message>
       <location/>

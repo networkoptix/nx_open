@@ -26,7 +26,7 @@
     <message>
       <location/>
       <source>Support</source>
-      <translation type="unfinished">Support</translation>
+      <translation>Supporto</translation>
     </message>
     <message>
       <location/>
@@ -1499,7 +1499,7 @@
     <message>
       <location/>
       <source>Connection error</source>
-      <translation type="unfinished">Connection error</translation>
+      <translation>Errore di connessione</translation>
     </message>
     <message>
       <location/>
@@ -2775,7 +2775,7 @@ The oldest footage among all cameras on the server will be deleted first.</trans
     <message>
       <location filename="../src/ui/widgets/system_settings/smtp/smtp_test_connection_widget.ui"/>
       <source>Server:</source>
-      <translation type="unfinished">Server:</translation>
+      <translation>Server:</translation>
     </message>
     <message>
       <location/>

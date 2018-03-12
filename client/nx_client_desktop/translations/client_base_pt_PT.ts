@@ -2466,7 +2466,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Vendor</source>
-      <translation>Fabricante</translation>
+      <translation>Fabricante:</translation>
     </message>
     <message>
       <source>Model</source>
@@ -3908,7 +3908,7 @@ to %1</translation>
     </message>
     <message>
       <source>License Key</source>
-      <translation>Chave da Licença</translation>
+      <translation>Chave da Licença:</translation>
     </message>
     <message>
       <source>Features:</source>
@@ -4697,7 +4697,7 @@ to %1</translation>
     </message>
     <message>
       <source>Name cannot be empty</source>
-      <translation type="unfinished">Name cannot be empty</translation>
+      <translation>Name cannot be empty</translation>
     </message>
   </context>
   <context>

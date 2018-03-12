@@ -26,7 +26,7 @@
     <message>
       <location/>
       <source>Support</source>
-      <translation>Ondersteuning</translation>
+      <translation>Support</translation>
     </message>
     <message>
       <location/>
@@ -516,7 +516,7 @@
     <message>
       <location/>
       <source>Event Log...</source>
-      <translation>Gebeurtenissenlog...</translation>
+      <translation>Logboek...</translation>
     </message>
     <message>
       <location/>
@@ -1016,7 +1016,7 @@
     <message>
       <location/>
       <source>Event Rules...</source>
-      <translation>Event regels...</translation>
+      <translation>Gebeurtenisregels...</translation>
     </message>
   </context>
   <context>
@@ -1489,7 +1489,7 @@
     <message>
       <location filename="../src/ui/dialogs/ldap_users_dialog.ui"/>
       <source>Fetch Users from LDAP...</source>
-      <translation>Gebruikers ophalen via LDAP...</translation>
+      <translation>Gebruikers ophalen van LDAP...</translation>
     </message>
     <message>
       <location/>
@@ -2102,7 +2102,7 @@
     <message>
       <location/>
       <source>Add...</source>
-      <translation>Toevoegen...</translation>
+      <translation>Voeg toe...</translation>
     </message>
     <message>
       <location/>

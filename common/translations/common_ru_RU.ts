@@ -877,7 +877,7 @@
     <message>
       <source>M</source>
       <comment>Suffix for displaying months</comment>
-      <translation>М</translation>
+      <translation>M</translation>
     </message>
     <message>
       <source>y</source>
@@ -1551,7 +1551,7 @@
     </message>
     <message>
       <source>All Users</source>
-      <translation>Все пользователи</translation>
+      <translation>Всем пользователям</translation>
     </message>
     <message>
       <source>Select at least one user</source>

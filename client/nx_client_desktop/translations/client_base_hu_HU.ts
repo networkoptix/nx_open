@@ -863,11 +863,11 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
+      <translation>Fájl feltöltése...</translation>
     </message>
     <message>
       <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
+      <translation>Mappa feltöltése...</translation>
     </message>
     <message>
       <source>Start Analytics...</source>
@@ -7201,7 +7201,7 @@ to %1</source>
     </message>
     <message>
       <source>Stop uploading?</source>
-      <translation type="unfinished">Stop uploading?</translation>
+      <translation>Leállítja a feltöltés?</translation>
     </message>
     <message>
       <source>Already uploaded files will be kept.</source>
@@ -7209,7 +7209,7 @@ to %1</source>
     </message>
     <message>
       <source>Finalizing %1... %2	%p%</source>
-      <translation type="unfinished">Finalizing %1... %2	%p%</translation>
+      <translation>Befejezés %1... %2%p%</translation>
     </message>
     <message>
       <source>(%1 of %2)</source>

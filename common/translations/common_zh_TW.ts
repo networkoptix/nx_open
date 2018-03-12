@@ -990,7 +990,7 @@
     </message>
     <message>
       <source>Live Viewer</source>
-      <translation>即時影像瀏覽</translation>
+      <translation>即時影像瀏覽者</translation>
     </message>
     <message>
       <source>Custom Role</source>

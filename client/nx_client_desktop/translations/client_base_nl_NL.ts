@@ -862,11 +862,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
+      <translation>Upload bestand...</translation>
     </message>
     <message>
       <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
+      <translation>Upload map...</translation>
     </message>
     <message>
       <source>Start Analytics...</source>
@@ -2372,7 +2372,7 @@ to view more bookmarks</source>
     <name>QnCameraInputBusinessEventWidget</name>
     <message>
       <source>automatic</source>
-      <translation>automatisch</translation>
+      <translation>Automatisch</translation>
     </message>
   </context>
   <context>
@@ -7198,7 +7198,7 @@ to %1</source>
     </message>
     <message>
       <source>Stop uploading?</source>
-      <translation type="unfinished">Stop uploading?</translation>
+      <translation>Stoppen met uploaden?</translation>
     </message>
     <message>
       <source>Already uploaded files will be kept.</source>
@@ -7206,7 +7206,7 @@ to %1</source>
     </message>
     <message>
       <source>Finalizing %1... %2	%p%</source>
-      <translation type="unfinished">Finalizing %1... %2	%p%</translation>
+      <translation>Afronden %1... %2	%p%</translation>
     </message>
     <message>
       <source>(%1 of %2)</source>
