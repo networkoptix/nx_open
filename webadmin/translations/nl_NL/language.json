@@ -86,7 +86,7 @@
         "maxRecordQueueSizeBytes": "Max record queue size (bytes)",
         "maxRecordQueueSizeElements": "Max record queue size (elements)",
         "maxRemoteArchiveSynchronizationThreads": "Max. externe archief synchronisatie",
-        "maxRtspConnectDurationSeconds": "Max Rtsp verbinding duur in seconden",
+        "maxRtspConnectDurationSeconds": "Max. Rtsp connect duur seconden",
         "maxSceneItems": "Max. aantal scène-items",
         "proxyConnectTimeoutSec": "Proxy verbinding timeout (seconden)",
         "rtpTimeoutMs": "RTP timeout (milliseconden)",
@@ -177,7 +177,7 @@
     "common": {
         "systemOffline": "Systeem Offline",
         "cameraLinks": {
-            "copyToClipboard": "kopieer naar klembord",
+            "copyToClipboard": "kopiëren naar klembord",
             "highStream": "Primaire stream",
             "copyDefaultText": "kopiëren",
             "unknown": "Unknown",
@@ -185,9 +185,9 @@
             "transcoding": "Transcoding",
             "copyActiveText": "gekopieerd naar het klembord"
         },
-        "searchCamPlaceholder": "zoeken",
+        "searchCamPlaceholder": "search",
         "cameraStates": {
-            "noFormat": "Deze browser of apparaat ondersteunt geen videoweergave van deze camera.",
+            "noFormat": "Deze browser ondersteunt het afspelen van de beelden van deze camera niet.",
             "ieWin10": "Gebruik alsjeblieft de browsers Microsoft Edge of Google Chrome.",
             "iosVideoTooLarge": "iOS ondersteunt geen video die groter is dan FullHD (2MP: 1920x1080).",
             "unauthorized": "Authentication required",
@@ -198,7 +198,7 @@
             "error": "Error",
             "offline": "Offline",
             "noData": "Geen data",
-            "flashRequired": "<a href='https://get.adobe.com/flashplayer/' target='_blank'>installeer Adobe Flash</a> om video af te spelen van ARM-based servers."
+            "flashRequired": "Gelieve <a href='https://get.adobe.com/flashplayer/' target='_blank'> Adobe Flash</a> te installeren voor het afspelen van video's."
         }
     }
 }

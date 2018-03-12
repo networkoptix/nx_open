@@ -875,19 +875,19 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Wearable Camera...</source>
-      <translation type="unfinished">Wearable Camera...</translation>
+      <translation>穿戴式相机...</translation>
     </message>
     <message>
       <source>New Wearable Camera...</source>
-      <translation type="unfinished">New Wearable Camera...</translation>
+      <translation>新的穿戴式相机...</translation>
     </message>
     <message>
       <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
+      <translation>上传文件</translation>
     </message>
     <message>
       <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
+      <translation>上传文件夹...</translation>
     </message>
   </context>
   <context>
@@ -2561,11 +2561,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Cannot edit properties for several wearable and non-wearable cameras.</source>
-      <translation type="unfinished">Cannot edit properties for several wearable and non-wearable cameras.</translation>
+      <translation>无法编辑某些穿戴式和非穿戴式相机的属性。</translation>
     </message>
     <message>
       <source>Cannot edit properties for several wearable cameras.</source>
-      <translation type="unfinished">Cannot edit properties for several wearable cameras.</translation>
+      <translation>无法编辑某些穿戴式相机的属性。</translation>
     </message>
   </context>
   <context>
@@ -4475,11 +4475,11 @@ to %1</source>
     <name>QnNewWearableCameraDialog</name>
     <message>
       <source>Wearable Camera</source>
-      <translation type="unfinished">Wearable Camera</translation>
+      <translation>穿戴式相机...</translation>
     </message>
     <message>
       <source>Wearable Camera %1</source>
-      <translation type="unfinished">Wearable Camera %1</translation>
+      <translation>穿戴式相机 %1</translation>
     </message>
     <message>
       <source>Name</source>
@@ -4487,7 +4487,7 @@ to %1</source>
     </message>
     <message>
       <source>Name cannot be empty</source>
-      <translation type="unfinished">Name cannot be empty</translation>
+      <translation>名称不能为空。</translation>
     </message>
   </context>
   <context>
@@ -5934,7 +5934,7 @@ to %1</source>
     </message>
     <message>
       <source>NO LIVE STREAM</source>
-      <translation type="unfinished">NO LIVE STREAM</translation>
+      <translation>没有实时流</translation>
     </message>
   </context>
   <context>
@@ -6084,7 +6084,7 @@ to %1</source>
     </message>
     <message>
       <source>Recording was enabled on the USB storage</source>
-      <translation type="unfinished">Recording was enabled on the USB storage</translation>
+      <translation>在USB存储器上启用了录制</translation>
     </message>
   </context>
   <context>
@@ -6948,34 +6948,34 @@ to %1</source>
     <name>QnWearableProgressWidget</name>
     <message>
       <source>Uploading %1... %2	%p%</source>
-      <translation type="unfinished">Uploading %1... %2	%p%</translation>
+      <translation>上传 %1... %2	%p％</translation>
     </message>
     <message>
       <source>Stop uploading?</source>
-      <translation type="unfinished">Stop uploading?</translation>
+      <translation>停止上传？</translation>
     </message>
     <message>
       <source>Already uploaded files will be kept.</source>
-      <translation type="unfinished">Already uploaded files will be kept.</translation>
+      <translation>已经上传的文件将被保留。</translation>
     </message>
     <message>
       <source>Finalizing %1... %2	%p%</source>
-      <translation type="unfinished">Finalizing %1... %2	%p%</translation>
+      <translation>正在完成 %1... %2	%p％</translation>
     </message>
     <message>
       <source>(%1 of %2)</source>
-      <translation type="unfinished">(%1 of %2)</translation>
+      <translation>(%1 of %2)</translation>
     </message>
   </context>
   <context>
     <name>QnWearableUploadWidget</name>
     <message>
       <source>User &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation type="unfinished">User &quot;%1&quot; is currently uploading footage to this camera.</translation>
+      <translation>用户 &quot;%1&quot; 当前正在将档案上传到本相机。</translation>
     </message>
     <message>
       <source>Another user is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Another user is currently uploading footage to this camera.</translation>
+      <translation>另一位用户正在将档案上传到此相机。</translation>
     </message>
   </context>
   <context>
@@ -7530,111 +7530,143 @@ to %1</source>
     </message>
     <message>
       <source>Video (%1)</source>
-      <translation type="unfinished">Video (%1)</translation>
+      <translation>视频 (%1)</translation>
     </message>
     <message>
       <source>Open Wearable Camera Recordings...</source>
-      <translation type="unfinished">Open Wearable Camera Recordings...</translation>
+      <translation>打开穿戴式相机录像..。</translation>
     </message>
     <message>
       <source>Only video files with correct timestamp are supported.</source>
-      <translation type="unfinished">Only video files with correct timestamp are supported.</translation>
-    </message>
-    <message>
-      <source>Not enough space on server storage</source>
-      <translation type="unfinished">Not enough space on server storage</translation>
+      <translation>仅支持具有正确时间戳的视频文件。</translation>
     </message>
     <message>
       <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</translation>
+      <translation>用户 &quot;%1&quot; 正在将档案上传到本相机因此无法开始上传.</translation>
     </message>
     <message>
       <source>Could not start upload as another user is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Could not start upload as another user is currently uploading footage to this camera.</translation>
+      <translation>其它用户正在将档案上传到本相机因此无法开始上传.</translation>
     </message>
     <message>
       <source>Failed to add wearable camera</source>
-      <translation type="unfinished">Failed to add wearable camera</translation>
+      <translation>无法添加穿戴式相机</translation>
     </message>
     <message>
       <source>No video files found in selected folder</source>
-      <translation type="unfinished">No video files found in selected folder</translation>
+      <translation>在选定文件夹中找不到视频文件</translation>
     </message>
     <message numerus="yes">
       <source>Selected file formats are not supported</source>
-      <translation type="unfinished">
-        <numerusform>Selected file formats are not supported</numerusform>
+      <translation>
+        <numerusform>所选文件格式不受支持</numerusform>
       </translation>
     </message>
     <message>
       <source>Use .MKV, .AVI, .MP4 or other video files.</source>
-      <translation type="unfinished">Use .MKV, .AVI, .MP4 or other video files.</translation>
+      <translation>使用.MKV，.AVI，.MP4或其他视频文件。</translation>
     </message>
     <message numerus="yes">
       <source>Selected files do not have timestamps</source>
-      <translation type="unfinished">
-        <numerusform>Selected files do not have timestamps</numerusform>
+      <translation>
+        <numerusform>所选文件没有时间戳</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos are already being uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+      <translation>
+        <numerusform>选定的文件覆盖已经上传视频的时段</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Wearable Camera.</source>
-      <translation type="unfinished">
-        <numerusform>You can upload these files to a different instance of a Wearable Camera.</numerusform>
+      <translation>
+        <numerusform>您可以将这些文件上传到穿戴式相机的其它区。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos have already been uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+      <translation>
+        <numerusform>选定的文件覆盖已经上传视频的时段</numerusform>
       </translation>
     </message>
     <message>
       <source>Selected files will not be uploaded</source>
-      <translation type="unfinished">Selected files will not be uploaded</translation>
+      <translation>所选文件不会被上传</translation>
     </message>
     <message>
       <source>Some files will not be uploaded</source>
-      <translation type="unfinished">Some files will not be uploaded</translation>
+      <translation>有些文件不会被上传</translation>
     </message>
     <message>
       <source>No new files to upload in selected folder</source>
-      <translation type="unfinished">No new files to upload in selected folder</translation>
-    </message>
-    <message numerus="yes">
-      <source>Files size - %2</source>
-      <translation type="unfinished">
-        <numerusform>Files size - %2</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Free space - %2</source>
-      <translation type="unfinished">Free space - %2</translation>
+      <translation>未在选定文件夹中上载新文件</translation>
     </message>
     <message>
       <source>%1 - has unsupported format.</source>
-      <translation type="unfinished">%1 - has unsupported format.</translation>
+      <translation>%1 - 格式不受支持。</translation>
     </message>
     <message>
       <source>%1 - does not have timestamp.</source>
-      <translation type="unfinished">%1 - does not have timestamp.</translation>
+      <translation>%1 -没有时间戳。</translation>
     </message>
     <message>
       <source>%1 - covers period for which video has already been uploaded.</source>
-      <translation type="unfinished">%1 - covers period for which video has already been uploaded.</translation>
+      <translation>%1 - 涵盖已上传视频的时间段。</translation>
     </message>
     <message>
       <source>%1 - covers period for which video is being uploaded.</source>
-      <translation type="unfinished">%1 - covers period for which video is being uploaded.</translation>
+      <translation>%1 - 涵盖已上传视频的时间段。</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files are too old</source>
+      <translation>
+        <numerusform>所选文件太旧</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation>
+        <numerusform>所选文件记录在 %1上，但只能上载最近 %n 天内记录的文件。您可以在相机存档设置中更改此设置。</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation>
+        <numerusform>所选文件记录在 %1 和 %2之间，但只能上载最近 %n 天内记录的文件。您可以在相机存档设置中更改此设置。</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Some footage may be deleted after uploading these files</source>
+      <translation>
+        <numerusform>上传这些文件后可能会删除一些文件</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
+      <translation>
+        <numerusform>服务器存储上没有太多可用空间。一些旧镜头可能会被删除以释放空间。请注意，如果选定的文件碰巧是服务器上最旧的文件，它们将在上传后立即删除。</numerusform>
+      </translation>
     </message>
     <message>
-      <source>%1 - does not fit on server storage.</source>
-      <translation type="unfinished">%1 - does not fit on server storage.</translation>
+      <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
+      <translation>为了防止这种情况，您可以添加额外的存储。您还可以通过更改相机设置中的存档保留时间来控制首先删除哪些素材。</translation>
+    </message>
+    <message>
+      <source>Upload anyway?</source>
+      <translation>无论如何上传？</translation>
+    </message>
+    <message>
+      <source>Could not finish upload to %1</source>
+      <translation>无法完成上传到 %1</translation>
+    </message>
+    <message>
+      <source>Make sure there is enough space on server storage.</source>
+      <translation>确保服务器存储空间足够。</translation>
+    </message>
+    <message>
+      <source>%1 - is older than allowed in camera archive settings.</source>
+      <translation>%1 - 比相机存档设置中允许的时间早。</translation>
     </message>
   </context>
   <context>
@@ -7810,7 +7842,7 @@ to %1</source>
     </message>
     <message>
       <source>Stop uploading?</source>
-      <translation type="unfinished">Stop uploading?</translation>
+      <translation>停止上传？</translation>
     </message>
     <message>
       <source>Stop</source>
@@ -7818,8 +7850,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Some video file(s) are still being uploaded to %n wearable cameras:</source>
-      <translation type="unfinished">
-        <numerusform>Some video file(s) are still being uploaded to %n wearable cameras:</numerusform>
+      <translation>
+        <numerusform>某些视频文件仍在上传至 %n 穿戴式相机：</numerusform>
       </translation>
     </message>
   </context>
@@ -7863,34 +7895,34 @@ to %1</source>
     <name>nx::client::desktop::UploadWorker</name>
     <message>
       <source>Could not open file &quot;%1&quot;</source>
-      <translation type="unfinished">Could not open file &quot;%1&quot;</translation>
+      <translation>无法打开文件 &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Could not calculate md5 for file &quot;%1&quot;</source>
-      <translation type="unfinished">Could not calculate md5 for file &quot;%1&quot;</translation>
+      <translation>无法计算文件 &quot;%1&quot; 的 md5</translation>
     </message>
     <message>
       <source>Could not create upload on the server side</source>
-      <translation type="unfinished">Could not create upload on the server side</translation>
+      <translation>无法在服务器端创建上载</translation>
     </message>
     <message>
       <source>Could not upload file chunk to the server</source>
-      <translation type="unfinished">Could not upload file chunk to the server</translation>
+      <translation>无法将文件块上载到服务器</translation>
     </message>
     <message>
       <source>Could not check uploaded file on the server</source>
-      <translation type="unfinished">Could not check uploaded file on the server</translation>
+      <translation>无法检查服务器上的上传文件</translation>
     </message>
     <message>
       <source>File was corrupted while being uploaded to the server</source>
-      <translation type="unfinished">File was corrupted while being uploaded to the server</translation>
+      <translation>文件在上传到服务器时被损坏</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::WearableWorker</name>
     <message>
       <source>Failed to send request to the server.</source>
-      <translation type="unfinished">Failed to send request to the server.</translation>
+      <translation>无法将请求发送到服务器。</translation>
     </message>
   </context>
   <context>
@@ -8232,7 +8264,7 @@ to %1</source>
     </message>
     <message>
       <source>Wearable Cameras cannot be moved between servers</source>
-      <translation type="unfinished">Wearable Cameras cannot be moved between servers</translation>
+      <translation>穿戴式摄像机不能在服务器之间移动</translation>
     </message>
   </context>
   <context>

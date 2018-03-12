@@ -440,7 +440,7 @@
     </message>
     <message>
       <source>Edge Licenses</source>
-      <translation>edge licenc</translation>
+      <translation>Edge licencek</translation>
     </message>
     <message>
       <source>Vmax Licenses</source>

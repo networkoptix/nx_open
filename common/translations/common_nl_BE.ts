@@ -988,11 +988,11 @@
     </message>
     <message>
       <source>Advanced Viewer</source>
-      <translation>Geavanceerde Kijker</translation>
+      <translation>Geavanceerde Viewer</translation>
     </message>
     <message>
       <source>Viewer</source>
-      <translation>Kijker</translation>
+      <translation>Viewer</translation>
     </message>
     <message>
       <source>Live Viewer</source>

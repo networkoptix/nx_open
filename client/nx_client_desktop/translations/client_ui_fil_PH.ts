@@ -161,7 +161,7 @@
     <message>
       <location/>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <location/>
@@ -2892,7 +2892,7 @@ Click &quot;New role&quot; button to create one.</translation>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
       <source>Motion Detection</source>
-      <translation type="unfinished">Motion Detection</translation>
+      <translation>Motion Detection</translation>
     </message>
     <message>
       <location/>
@@ -2902,7 +2902,7 @@ Click &quot;New role&quot; button to create one.</translation>
     <message>
       <location/>
       <source>Sensitivity</source>
-      <translation type="unfinished">Sensitivity</translation>
+      <translation>Sensitivity</translation>
     </message>
   </context>
   <context>
@@ -2910,7 +2910,7 @@ Click &quot;New role&quot; button to create one.</translation>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Cancel</translation>
     </message>
   </context>
   <context>

@@ -494,7 +494,7 @@
       <translation type="unfinished">
         <numerusform>%2: %n jest wykorzystywana na %1.</numerusform>
         <numerusform>%2: %n są wykorzystywane na %1.</numerusform>
-        <numerusform>%n %2 are used out of %1.</numerusform>
+        <numerusform>%2: %n jest wykorzystywanych na %1.</numerusform>
         <numerusform>%2: %n jest wykorzystywanych na %1.</numerusform>
       </translation>
     </message>
@@ -503,7 +503,7 @@
       <translation type="unfinished">
         <numerusform>%2: %n zostanie wykorzystana na %1.</numerusform>
         <numerusform>%2: %n zostaną wykorzystane na %1.</numerusform>
-        <numerusform>%n %2 will be used out of %1.</numerusform>
+        <numerusform>%2: %n zostanie wykorzystanych na %1.</numerusform>
         <numerusform>%2: %n zostanie wykorzystanych na %1.</numerusform>
       </translation>
     </message>
@@ -512,7 +512,7 @@
       <translation type="unfinished">
         <numerusform>%1: aktywuj jeszcze %n.</numerusform>
         <numerusform>%1: aktywuj jeszcze %n.</numerusform>
-        <numerusform>Activate %n more %1.</numerusform>
+        <numerusform>%1: aktywuj jeszcze %n.</numerusform>
         <numerusform>%1: aktywuj jeszcze %n.</numerusform>
       </translation>
     </message>

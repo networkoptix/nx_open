@@ -161,7 +161,7 @@
     <message>
       <location/>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <location/>

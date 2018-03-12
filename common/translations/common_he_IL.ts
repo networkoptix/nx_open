@@ -80,7 +80,7 @@
     <message>
       <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>מערכת ענן מאפשרת למזג רק עם שאינה בענן. שם המערכת והסיסמה נלקחים מהמערכת שבענן.</translation>
+      <translation>מערכת ענן מאפשרת למזג רק עם שאינה בענן. שם המערכת והסיסמא נלקחים מהמערכת שבענן.</translation>
     </message>
     <message>
       <source>New System</source>

@@ -1,5 +1,5 @@
 {
-    "language_name": "언어",
+    "language_name": "한국어",
     "dialogs": {
         "okButton": "Ok",
         "openLink": "이 링크를 방문",
@@ -14,7 +14,7 @@
         "minLengthMessage": "비밀번호는 8자 이상이어야 합니다",
         "requiredMessage": "라틴 문자, 숫자 및 키보드 기호만 사용할 수 있습니다.",
         "weakMessage": "암호는 다양한 유형의 기호를 포함 해야 합니다.",
-        "strongMessage": "강력한 패스워드!",
+        "strongMessage": "강력한 암호!",
         "commonMessage": "이 비밀번호는 매우 흔한 비밀번호입니다."
     },
     "settings": {
@@ -74,7 +74,7 @@
         "emailFrom": "전자 우편에서",
         "emailSignature": "이메일 서명",
         "emailSupportEmail": "지원 이메일",
-        "enableEdgeRecording": "엣지 녹화 활성화",
+        "enableEdgeRecording": "오디오 녹음을 사용",
         "eventLogPeriodDays": "이벤트 로그 기간(일)",
         "ldapAdminDn": "LDAP 관리자 DN",
         "ldapSearchBase": "LDAP 검색 기준",
@@ -86,7 +86,7 @@
         "maxRecordQueueSizeBytes": "최대 기록 용량 (byte)",
         "maxRecordQueueSizeElements": "최대 기록 용량 (elements)",
         "maxRemoteArchiveSynchronizationThreads": "최대 원격 보관 동기화 스레드",
-        "maxRtspConnectDurationSeconds": "최대 Rtsp 연결 지속 시간",
+        "maxRtspConnectDurationSeconds": "최대 Rtsp 연결 지속 시간 (초)",
         "maxSceneItems": "최대 장면 항목",
         "proxyConnectTimeoutSec": "프록시 연결 시간 초과 (초)",
         "rtpTimeoutMs": "RTP 휴식시간 (1/1000초)",

@@ -252,7 +252,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Maximize</source>
-      <translation>Maximise</translation>
+      <translation>Maximize</translation>
     </message>
     <message>
       <source>Restore Down</source>
@@ -463,7 +463,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Maximize Item</source>
-      <translation>Maximise Item</translation>
+      <translation>Maximize Item</translation>
     </message>
     <message>
       <source>Restore Item</source>
@@ -783,7 +783,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Synchronize Streams</source>
-      <translation>Synchronise Streams</translation>
+      <translation>Synchronize Streams</translation>
     </message>
     <message>
       <source>Disable Stream Synchronization</source>
@@ -875,19 +875,19 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Wearable Camera...</source>
-      <translation type="unfinished">Wearable Camera...</translation>
+      <translation>Wearable Camera...</translation>
     </message>
     <message>
       <source>New Wearable Camera...</source>
-      <translation type="unfinished">New Wearable Camera...</translation>
+      <translation>New Wearable Camera...</translation>
     </message>
     <message>
       <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
+      <translation>Upload File...</translation>
     </message>
     <message>
       <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
+      <translation>Upload Folder...</translation>
     </message>
   </context>
   <context>
@@ -2591,11 +2591,11 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Cannot edit properties for several wearable and non-wearable cameras.</source>
-      <translation type="unfinished">Cannot edit properties for several wearable and non-wearable cameras.</translation>
+      <translation>Cannot edit properties for several wearable and non-wearable cameras.</translation>
     </message>
     <message>
       <source>Cannot edit properties for several wearable cameras.</source>
-      <translation type="unfinished">Cannot edit properties for several wearable cameras.</translation>
+      <translation>Cannot edit properties for several wearable cameras.</translation>
     </message>
   </context>
   <context>
@@ -3045,7 +3045,7 @@ to %1</translation>
     <name>QnDesktopAudioOnlyDataProvider</name>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>Could not initialise audio encoder.</translation>
+      <translation>Could not initialize audio encoder.</translation>
     </message>
     <message>
       <source>Sample format of input device %1 is not supported.</source>
@@ -4530,11 +4530,11 @@ to %1</translation>
     <name>QnNewWearableCameraDialog</name>
     <message>
       <source>Wearable Camera</source>
-      <translation type="unfinished">Wearable Camera</translation>
+      <translation>Wearable Camera</translation>
     </message>
     <message>
       <source>Wearable Camera %1</source>
-      <translation type="unfinished">Wearable Camera %1</translation>
+      <translation>Wearable Camera %1</translation>
     </message>
     <message>
       <source>Name</source>
@@ -6004,7 +6004,7 @@ to %1</translation>
     </message>
     <message>
       <source>NO LIVE STREAM</source>
-      <translation type="unfinished">NO LIVE STREAM</translation>
+      <translation>NO LIVE STREAM</translation>
     </message>
   </context>
   <context>
@@ -7026,34 +7026,34 @@ to %1</translation>
     <name>QnWearableProgressWidget</name>
     <message>
       <source>Uploading %1... %2	%p%</source>
-      <translation type="unfinished">Uploading %1... %2	%p%</translation>
+      <translation>Uploading %1... %2	%p%</translation>
     </message>
     <message>
       <source>Stop uploading?</source>
-      <translation type="unfinished">Stop uploading?</translation>
+      <translation>Stop uploading?</translation>
     </message>
     <message>
       <source>Already uploaded files will be kept.</source>
-      <translation type="unfinished">Already uploaded files will be kept.</translation>
+      <translation>Already uploaded files will be kept.</translation>
     </message>
     <message>
       <source>Finalizing %1... %2	%p%</source>
-      <translation type="unfinished">Finalizing %1... %2	%p%</translation>
+      <translation>Finalizing %1... %2	%p%</translation>
     </message>
     <message>
       <source>(%1 of %2)</source>
-      <translation type="unfinished">(%1 of %2)</translation>
+      <translation>(%1 of %2)</translation>
     </message>
   </context>
   <context>
     <name>QnWearableUploadWidget</name>
     <message>
       <source>User &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation type="unfinished">User &quot;%1&quot; is currently uploading footage to this camera.</translation>
+      <translation>User &quot;%1&quot; is currently uploading footage to this camera.</translation>
     </message>
     <message>
       <source>Another user is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Another user is currently uploading footage to this camera.</translation>
+      <translation>Another user is currently uploading footage to this camera.</translation>
     </message>
   </context>
   <context>
@@ -7416,7 +7416,7 @@ to %1</translation>
     <name>QnWorkbenchScreenRecordingHandler</name>
     <message>
       <source>Screen capturing subsystem is not initialized yet. Please try again later.</source>
-      <translation>Screen capturing subsystem is not initialised yet. Please try again later.</translation>
+      <translation>Screen capturing subsystem is not initialized yet. Please try again later.</translation>
     </message>
     <message>
       <source>Recording in %1...</source>
@@ -7614,35 +7614,31 @@ to %1</translation>
     </message>
     <message>
       <source>Video (%1)</source>
-      <translation type="unfinished">Video (%1)</translation>
+      <translation>Video (%1)</translation>
     </message>
     <message>
       <source>Open Wearable Camera Recordings...</source>
-      <translation type="unfinished">Open Wearable Camera Recordings...</translation>
+      <translation>Open Wearable Camera Recordings...</translation>
     </message>
     <message>
       <source>Only video files with correct timestamp are supported.</source>
-      <translation type="unfinished">Only video files with correct timestamp are supported.</translation>
-    </message>
-    <message>
-      <source>Not enough space on server storage</source>
-      <translation type="unfinished">Not enough space on server storage</translation>
+      <translation>Only video files with correct timestamp are supported.</translation>
     </message>
     <message>
       <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</translation>
+      <translation>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</translation>
     </message>
     <message>
       <source>Could not start upload as another user is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Could not start upload as another user is currently uploading footage to this camera.</translation>
+      <translation>Could not start upload as another user is currently uploading footage to this camera.</translation>
     </message>
     <message>
       <source>Failed to add wearable camera</source>
-      <translation type="unfinished">Failed to add wearable camera</translation>
+      <translation>Failed to add wearable camera</translation>
     </message>
     <message>
       <source>No video files found in selected folder</source>
-      <translation type="unfinished">No video files found in selected folder</translation>
+      <translation>No video files found in selected folder</translation>
     </message>
     <message numerus="yes">
       <source>Selected file formats are not supported</source>
@@ -7653,7 +7649,7 @@ to %1</translation>
     </message>
     <message>
       <source>Use .MKV, .AVI, .MP4 or other video files.</source>
-      <translation type="unfinished">Use .MKV, .AVI, .MP4 or other video files.</translation>
+      <translation>Use .MKV, .AVI, .MP4 or other video files.</translation>
     </message>
     <message numerus="yes">
       <source>Selected files do not have timestamps</source>
@@ -7685,46 +7681,86 @@ to %1</translation>
     </message>
     <message>
       <source>Selected files will not be uploaded</source>
-      <translation type="unfinished">Selected files will not be uploaded</translation>
+      <translation>Selected files will not be uploaded</translation>
     </message>
     <message>
       <source>Some files will not be uploaded</source>
-      <translation type="unfinished">Some files will not be uploaded</translation>
+      <translation>Some files will not be uploaded</translation>
     </message>
     <message>
       <source>No new files to upload in selected folder</source>
-      <translation type="unfinished">No new files to upload in selected folder</translation>
-    </message>
-    <message numerus="yes">
-      <source>Files size - %2</source>
-      <translation type="unfinished">
-        <numerusform>Files size - %2</numerusform>
-        <numerusform>Files size - %2</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Free space - %2</source>
-      <translation type="unfinished">Free space - %2</translation>
+      <translation>No new files to upload in selected folder</translation>
     </message>
     <message>
       <source>%1 - has unsupported format.</source>
-      <translation type="unfinished">%1 - has unsupported format.</translation>
+      <translation>%1 - has unsupported format.</translation>
     </message>
     <message>
       <source>%1 - does not have timestamp.</source>
-      <translation type="unfinished">%1 - does not have timestamp.</translation>
+      <translation>%1 - does not have timestamp.</translation>
     </message>
     <message>
       <source>%1 - covers period for which video has already been uploaded.</source>
-      <translation type="unfinished">%1 - covers period for which video has already been uploaded.</translation>
+      <translation>%1 - covers period for which video has already been uploaded.</translation>
     </message>
     <message>
       <source>%1 - covers period for which video is being uploaded.</source>
-      <translation type="unfinished">%1 - covers period for which video is being uploaded.</translation>
+      <translation>%1 - covers period for which video is being uploaded.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files are too old</source>
+      <translation type="unfinished">
+        <numerusform>Selected files are too old</numerusform>
+        <numerusform>Selected files are too old</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation type="unfinished">
+        <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+        <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation type="unfinished">
+        <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+        <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Some footage may be deleted after uploading these files</source>
+      <translation type="unfinished">
+        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
+      <translation type="unfinished">
+        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+      </translation>
     </message>
     <message>
-      <source>%1 - does not fit on server storage.</source>
-      <translation type="unfinished">%1 - does not fit on server storage.</translation>
+      <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
+      <translation>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</translation>
+    </message>
+    <message>
+      <source>Upload anyway?</source>
+      <translation>Upload anyway?</translation>
+    </message>
+    <message>
+      <source>Could not finish upload to %1</source>
+      <translation>Could not finish upload to %1</translation>
+    </message>
+    <message>
+      <source>Make sure there is enough space on server storage.</source>
+      <translation>Make sure there is enough space on server storage.</translation>
+    </message>
+    <message>
+      <source>%1 - is older than allowed in camera archive settings.</source>
+      <translation>%1 - is older than allowed in camera archive settings.</translation>
     </message>
   </context>
   <context>
@@ -7917,7 +7953,7 @@ to %1</translation>
     </message>
     <message>
       <source>Stop uploading?</source>
-      <translation type="unfinished">Stop uploading?</translation>
+      <translation>Stop uploading?</translation>
     </message>
     <message>
       <source>Stop</source>
@@ -7972,34 +8008,34 @@ to %1</translation>
     <name>nx::client::desktop::UploadWorker</name>
     <message>
       <source>Could not open file &quot;%1&quot;</source>
-      <translation type="unfinished">Could not open file &quot;%1&quot;</translation>
+      <translation>Could not open file &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Could not calculate md5 for file &quot;%1&quot;</source>
-      <translation type="unfinished">Could not calculate md5 for file &quot;%1&quot;</translation>
+      <translation>Could not calculate md5 for file &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Could not create upload on the server side</source>
-      <translation type="unfinished">Could not create upload on the server side</translation>
+      <translation>Could not create upload on the server side</translation>
     </message>
     <message>
       <source>Could not upload file chunk to the server</source>
-      <translation type="unfinished">Could not upload file chunk to the server</translation>
+      <translation>Could not upload file chunk to the server</translation>
     </message>
     <message>
       <source>Could not check uploaded file on the server</source>
-      <translation type="unfinished">Could not check uploaded file on the server</translation>
+      <translation>Could not check uploaded file on the server</translation>
     </message>
     <message>
       <source>File was corrupted while being uploaded to the server</source>
-      <translation type="unfinished">File was corrupted while being uploaded to the server</translation>
+      <translation>File was corrupted while being uploaded to the server</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::WearableWorker</name>
     <message>
       <source>Failed to send request to the server.</source>
-      <translation type="unfinished">Failed to send request to the server.</translation>
+      <translation>Failed to send request to the server.</translation>
     </message>
   </context>
   <context>
@@ -8348,7 +8384,7 @@ to %1</translation>
     </message>
     <message>
       <source>Wearable Cameras cannot be moved between servers</source>
-      <translation type="unfinished">Wearable Cameras cannot be moved between servers</translation>
+      <translation>Wearable Cameras cannot be moved between servers</translation>
     </message>
   </context>
   <context>
