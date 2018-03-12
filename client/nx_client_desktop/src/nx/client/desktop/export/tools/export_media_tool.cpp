@@ -109,7 +109,7 @@ struct ExportMediaTool::Private
         auto archiveReader = dynamic_cast<QnAbstractArchiveStreamReader*>(dataProvider.data());
 
         exportRecorder->clearUnprocessedData();
-        exportRecorder->setEofDateTime(endTimeUs);
+        exportRecorder->setProgressBounds(startTimeUs, endTimeUs);
         exportRecorder->addRecordingContext(settings.fileName.completeFileName());
 
         exportRecorder->setRole(StreamRecorderRole::fileExport);
