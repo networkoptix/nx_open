@@ -253,6 +253,8 @@ bool CameraManager::checkYuv420pFrame(const sdk::metadata::CommonUncompressedVid
     }
 
     NX_OUTPUT << __func__ << "() END -> true";
+
+    return true;
 }
 
 bool CameraManager::checkRgbFrame(const sdk::metadata::CommonUncompressedVideoFrame* videoFrame) const
