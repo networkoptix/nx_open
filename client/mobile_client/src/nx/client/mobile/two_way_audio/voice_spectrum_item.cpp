@@ -221,7 +221,7 @@ VisualizerData VoiceSpectrumItem::VisualizerDataGenerator::getUpdatedData()
     auto currentData = interpolate(QnVoiceSpectrumAnalyzer::instance()->getSpectrumData().data,
         linesCount());
     if (currentData.isEmpty())
-        return generateEmptyData(currentTimestampMs);
+        return interpolate(generateEmptyData(currentTimestampMs), linesCount());
 
     normalizeData(currentData);
     m_lastData = interpolate(animateData(m_lastData, currentData, timeDifferenceMs), linesCount());
