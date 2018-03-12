@@ -1,0 +1,8 @@
+#!/bin/bash
+set -euxo pipefail
+: ${1:?First argument is VM name}
+: ${2:?Second argument is remote username@hostname}
+test -e "$1.ova" || VBoxManage export "$1" -o "$1.ova"
+rsync --compress --progress "$1.ova" "$2:$1.ova"
+ssh "$2" VBoxManage import "$1.ova"
+ssh "$2" VBoxManage snapshot "$1" take 'template'
