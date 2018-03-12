@@ -6,7 +6,6 @@
 #include <nx/network/system_socket.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
 #include <nx/network/test_support/stream_socket_acceptance_tests.h>
-#include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/mutex.h>
 
 #include "sync_ssl_socket.h"
@@ -14,6 +13,7 @@
 namespace nx {
 namespace network {
 
+// TODO: #ak Uncomment and fix.
 #if 0
 namespace test {
 
@@ -25,7 +25,7 @@ class SslOverTcpServerSocket:
     using base_type = ssl::StreamServerSocket;
 
 public:
-    SslOverTcpServerSocket(int ipVersion):
+    SslOverTcpServerSocket(int ipVersion = AF_INET):
         base_type(
             std::make_unique<TCPServerSocket>(ipVersion),
             ssl::EncryptionUse::always)
@@ -380,41 +380,21 @@ private:
     }
 };
 
-//-------------------------------------------------------------------------------------------------
-// Asynchronous I/O
+// Verifies by using ClientSyncSslSocket class on one side.
 
-class SslSocketVerifySslIsActuallyUsedByAsyncIo:
-    public SslSocketVerifySslIsActuallyUsed
+TEST_F(SslSocketVerifySslIsActuallyUsed, ssl_used_by_async_io)
 {
-public:
-    SslSocketVerifySslIsActuallyUsedByAsyncIo()
-    {
-        switchToAsynchronousMode();
-    }
-};
+    switchToAsynchronousMode();
 
-TEST_F(SslSocketVerifySslIsActuallyUsedByAsyncIo, DISABLED_read_write)
-{
     givenEstablishedConnection();
     whenSentRandomData();
     thenSameDataHasBeenReceivedInResponse();
 }
 
-//-------------------------------------------------------------------------------------------------
-// Synchronous I/O
-
-class SslSocketVerifySslIsActuallyUsedBySyncIo:
-    public SslSocketVerifySslIsActuallyUsed
+TEST_F(SslSocketVerifySslIsActuallyUsed, ssl_used_by_sync_io)
 {
-public:
-    SslSocketVerifySslIsActuallyUsedBySyncIo()
-    {
-        switchToSynchronousMode();
-    }
-};
+    switchToSynchronousMode();
 
-TEST_F(SslSocketVerifySslIsActuallyUsedBySyncIo, DISABLED_read_write)
-{
     givenEstablishedConnection();
     whenSentRandomData();
     thenSameDataHasBeenReceivedInResponse();
@@ -449,7 +429,7 @@ protected:
     }
 };
 
-TEST_F(SslSocketSwitchIoMode, DISABLED_from_async_to_sync)
+TEST_F(SslSocketSwitchIoMode, from_async_to_sync)
 {
     givenEstablishedConnection();
 
@@ -458,7 +438,7 @@ TEST_F(SslSocketSwitchIoMode, DISABLED_from_async_to_sync)
     exchangeDataInSyncMode();
 }
 
-TEST_F(SslSocketSwitchIoMode, DISABLED_from_sync_to_async)
+TEST_F(SslSocketSwitchIoMode, from_sync_to_async)
 {
     givenEstablishedConnection();
 
