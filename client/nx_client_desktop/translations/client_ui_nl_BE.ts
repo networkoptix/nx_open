@@ -26,7 +26,7 @@
     <message>
       <location/>
       <source>Support</source>
-      <translation>Ondersteuning</translation>
+      <translation>Support</translation>
     </message>
     <message>
       <location/>
@@ -399,7 +399,7 @@
     <message>
       <location/>
       <source>Font Size</source>
-      <translation>Letter grootte</translation>
+      <translation>Tekstgrootte</translation>
     </message>
     <message>
       <location/>
@@ -516,7 +516,7 @@
     <message>
       <location/>
       <source>Event Log...</source>
-      <translation>Gebeurtenissenlog...</translation>
+      <translation>Logboek...</translation>
     </message>
     <message>
       <location/>
@@ -1021,7 +1021,7 @@
     <message>
       <location/>
       <source>Event Rules...</source>
-      <translation>Event regels...</translation>
+      <translation>Gebeurtenisregels...</translation>
     </message>
   </context>
   <context>
@@ -1466,7 +1466,7 @@
     <message>
       <location filename="../src/ui/dialogs/ldap_users_dialog.ui"/>
       <source>Fetch Users from LDAP...</source>
-      <translation>Gebruikers ophalen via LDAP...</translation>
+      <translation>Gebruikers ophalen van LDAP...</translation>
     </message>
     <message>
       <location/>
@@ -2079,7 +2079,7 @@
     <message>
       <location/>
       <source>Add...</source>
-      <translation>Toevoegen...</translation>
+      <translation>Voeg toe...</translation>
     </message>
     <message>
       <location/>
@@ -2273,7 +2273,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/rapid_review_settings_widget.ui"/>
       <source>Rapid Review</source>
-      <translation>Rapid Review</translation>
+      <translation>Versnelde weergave</translation>
     </message>
     <message>
       <location/>
@@ -2975,7 +2975,7 @@ The oldest footage among all cameras on the server will be deleted first.</sourc
     <message>
       <location/>
       <source>Area Width</source>
-      <translation>Breedte van opmaakgebied</translation>
+      <translation>Breedte van het tekstvak</translation>
     </message>
   </context>
   <context>

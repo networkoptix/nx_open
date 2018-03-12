@@ -1438,7 +1438,7 @@
     <message>
       <location/>
       <source>Server URL</source>
-      <translation>サーバーの URL</translation>
+      <translation>サーバー URL</translation>
     </message>
     <message>
       <location/>
@@ -3113,7 +3113,7 @@ Click &quot;New role&quot; button to create one.</source>
     <message>
       <location/>
       <source>Upload File...</source>
-      <translation>ファイルをアップロード</translation>
+      <translation>ファイルをアップロード...</translation>
     </message>
     <message>
       <location/>

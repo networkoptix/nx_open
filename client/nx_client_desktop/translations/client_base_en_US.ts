@@ -7681,58 +7681,58 @@ to %1</source>
     </message>
     <message numerus="yes">
         <source>Selected files are too old</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Selected file is too old</numerusform>
+            <numerusform>Selected files are too old</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Selected file was recorded on %1, but only files that were recorded in the last 24 hours can be uploaded. You can change this in camera archive settings.</numerusform>
+            <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last 24 hours can be uploaded. You can change this in camera archive settings.</numerusform>
+            <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Some footage may be deleted after uploading these files</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Some footage may be deleted after uploading this file</numerusform>
+            <numerusform>Some footage may be deleted after uploading these files</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected file happens to be the oldest on the server, it will be deleted right after being uploaded.</numerusform>
+            <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
         </translation>
     </message>
     <message>
         <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Upload anyway?</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Could not finish upload to %1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Make sure there is enough space on server storage.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>%1 - is older than allowed in camera archive settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 — is older than allowed in camera archive settings.</translation>
     </message>
 </context>
 <context>

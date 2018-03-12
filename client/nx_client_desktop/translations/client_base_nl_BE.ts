@@ -1923,7 +1923,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Any Server</source>
-      <translation>Een willekeurige server</translation>
+      <translation>Een willekeurige Server</translation>
     </message>
     <message>
       <source>Any Device</source>
@@ -2523,7 +2523,7 @@ to view more bookmarks</source>
     <name>QnCameraMotionPolicy</name>
     <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation type="unfinished">Recording or motion detection is disabled for %1</translation>
+      <translation>Opname of bewegingsdetectie is uitgeschakeld voor %1</translation>
     </message>
   </context>
   <context>
@@ -2570,7 +2570,7 @@ to view more bookmarks</source>
     <name>QnCameraRecordingPolicy</name>
     <message>
       <source>Recording is disabled for %1</source>
-      <translation type="unfinished">Recording is disabled for %1</translation>
+      <translation>Opname is uitgeschakeld voor %1</translation>
     </message>
   </context>
   <context>
@@ -3080,7 +3080,7 @@ to %1</source>
     <name>QnConnectionTestingDialog</name>
     <message>
       <source>Success</source>
-      <translation>Succes</translation>
+      <translation>Gelukt</translation>
     </message>
     <message>
       <source>Request timeout</source>
@@ -3863,7 +3863,7 @@ to %1</source>
     </message>
     <message>
       <source>Timed Out</source>
-      <translation>Time-out</translation>
+      <translation>Uitgesteld</translation>
     </message>
     <message>
       <source>Import Selected</source>
@@ -4136,7 +4136,7 @@ to %1</source>
     </message>
     <message>
       <source>Remove</source>
-      <translation>Verwijder</translation>
+      <translation>Verwijderen</translation>
     </message>
     <message>
       <source>Deactivate</source>
@@ -5278,7 +5278,7 @@ to %1</source>
     </message>
     <message>
       <source>All Cameras &amp; Resources</source>
-      <translation>Alle camera's &amp; apparaten</translation>
+      <translation>Alle camera's en apparaten</translation>
     </message>
     <message>
       <source>All Shared Layouts</source>
@@ -5286,7 +5286,7 @@ to %1</source>
     </message>
     <message>
       <source>Shared Layouts</source>
-      <translation>Gedeelde lay-outs</translation>
+      <translation>Gedeelde schermindelingen</translation>
     </message>
     <message>
       <source>Local Files</source>
@@ -6118,7 +6118,7 @@ to %1</source>
     </message>
     <message>
       <source>Activate License</source>
-      <translation>Activeer licentie</translation>
+      <translation>Licentie activeren</translation>
     </message>
     <message>
       <source>Please check authentication information</source>
@@ -6504,7 +6504,7 @@ to %1</source>
     </message>
     <message>
       <source>Connect</source>
-      <translation>Verbinden</translation>
+      <translation>Verbind</translation>
     </message>
     <message>
       <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
@@ -7180,7 +7180,7 @@ to %1</source>
     </message>
     <message>
       <source>Finalizing %1... %2	%p%</source>
-      <translation>Finaliseren %1... %2%p%</translation>
+      <translation>Afronden %1... %2	%p%</translation>
     </message>
     <message>
       <source>(%1 of %2)</source>
@@ -8025,7 +8025,7 @@ to %1</source>
     </message>
     <message>
       <source>Rapid Review</source>
-      <translation>Versnelde weergave</translation>
+      <translation>Rapid Review</translation>
     </message>
     <message>
       <source>Export Settings</source>
@@ -8184,11 +8184,11 @@ to %1</source>
     <name>nx::client::desktop::UploadWorker</name>
     <message>
       <source>Could not open file &quot;%1&quot;</source>
-      <translation>Kan bestand &quot;%1&quot; niet openen;</translation>
+      <translation>Kon bestand &quot;%1&quot; niet openen;</translation>
     </message>
     <message>
       <source>Could not calculate md5 for file &quot;%1&quot;</source>
-      <translation>Kan md5 voor bestand &quot;%1&quot; niet berekenen;</translation>
+      <translation>Kon md5 voor bestand &quot;%1&quot; niet berekenen.</translation>
     </message>
     <message>
       <source>Could not create upload on the server side</source>
@@ -8218,7 +8218,7 @@ to %1</source>
     <name>nx::client::desktop::WorkbenchAnalyticsController</name>
     <message>
       <source>%1 Analytics</source>
-      <translation>%1 Analyse</translation>
+      <translation>%1 Analytics</translation>
     </message>
   </context>
   <context>
@@ -8438,11 +8438,11 @@ to %1</source>
     </message>
     <message>
       <source>Stop Tour</source>
-      <translation>Stop tour</translation>
+      <translation>Stop Tour</translation>
     </message>
     <message>
       <source>Start Tour</source>
-      <translation>Start tour</translation>
+      <translation>Start Tour</translation>
     </message>
   </context>
   <context>

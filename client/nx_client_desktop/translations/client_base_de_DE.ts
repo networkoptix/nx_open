@@ -2523,7 +2523,7 @@ to view more bookmarks</source>
     <name>QnCameraMotionPolicy</name>
     <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation type="unfinished">Recording or motion detection is disabled for %1</translation>
+      <translation>Aufnahme oder Bewegungserkennung deaktiviert für %1</translation>
     </message>
   </context>
   <context>
@@ -2570,7 +2570,7 @@ to view more bookmarks</source>
     <name>QnCameraRecordingPolicy</name>
     <message>
       <source>Recording is disabled for %1</source>
-      <translation type="unfinished">Recording is disabled for %1</translation>
+      <translation>Aufnahmen deaktiviert für %1</translation>
     </message>
   </context>
   <context>

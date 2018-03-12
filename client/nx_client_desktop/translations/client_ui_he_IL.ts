@@ -394,7 +394,7 @@
     <message>
       <location/>
       <source>Area Width</source>
-      <translation>רוחב שטח</translation>
+      <translation>רוחב אזור</translation>
     </message>
     <message>
       <location/>
@@ -1771,7 +1771,7 @@
     <message>
       <location/>
       <source>Password:</source>
-      <translation>סיסמה:</translation>
+      <translation>סיסמא:</translation>
     </message>
     <message>
       <location/>
@@ -1994,7 +1994,7 @@
     <message>
       <location/>
       <source>Enter a valid username and password...</source>
-      <translation>הכנס שם משתמש וסיסמה תקינים...</translation>
+      <translation>הכנס שם משתמש וסיסמא תקינים...</translation>
     </message>
   </context>
   <context>
@@ -2061,7 +2061,7 @@
     <message>
       <location/>
       <source>The new System will have password and name from System:</source>
-      <translation>המערכת החדשה תקבל שם וסיסמה ממערכת:</translation>
+      <translation>המערכת החדשה תקבל שם וסיסמא ממערכת:</translation>
     </message>
   </context>
   <context>

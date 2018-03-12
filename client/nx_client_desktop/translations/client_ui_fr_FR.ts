@@ -310,7 +310,7 @@
     <message>
       <location/>
       <source>Start</source>
-      <translation>Départ</translation>
+      <translation>Démarrer</translation>
     </message>
   </context>
   <context>
@@ -1438,7 +1438,7 @@
     <message>
       <location/>
       <source>Server URL</source>
-      <translation>URL Serveur</translation>
+      <translation>Serveur URL</translation>
     </message>
     <message>
       <location/>

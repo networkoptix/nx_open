@@ -2464,7 +2464,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Vendor</source>
-      <translation>Fabricante</translation>
+      <translation>Fabricante:</translation>
     </message>
     <message>
       <source>Model</source>
@@ -2526,7 +2526,7 @@ to view more bookmarks</translation>
     <name>QnCameraMotionPolicy</name>
     <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation type="unfinished">Recording or motion detection is disabled for %1</translation>
+      <translation>A Gravação por detecção de movimento está desabilitada em %1</translation>
     </message>
   </context>
   <context>
@@ -2573,7 +2573,7 @@ to view more bookmarks</translation>
     <name>QnCameraRecordingPolicy</name>
     <message>
       <source>Recording is disabled for %1</source>
-      <translation type="unfinished">Recording is disabled for %1</translation>
+      <translation>Gravações desabilitadas para %1</translation>
     </message>
   </context>
   <context>
@@ -3901,7 +3901,7 @@ to %1</translation>
     </message>
     <message>
       <source>License Key</source>
-      <translation>Chave da Licença</translation>
+      <translation>Chave da Licença:</translation>
     </message>
     <message>
       <source>Features:</source>
@@ -4690,7 +4690,7 @@ to %1</translation>
     </message>
     <message>
       <source>Name cannot be empty</source>
-      <translation type="unfinished">Name cannot be empty</translation>
+      <translation>Name cannot be empty</translation>
     </message>
   </context>
   <context>
@@ -8048,7 +8048,7 @@ to %1</translation>
     </message>
     <message>
       <source>Timestamp</source>
-      <translation type="unfinished">Timestamp</translation>
+      <translation>Timestamp</translation>
     </message>
     <message>
       <source>Add Image</source>

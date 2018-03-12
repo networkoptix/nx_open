@@ -2524,7 +2524,7 @@ pour afficher plus de signets</translation>
     <name>QnCameraMotionPolicy</name>
     <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation type="unfinished">Recording or motion detection is disabled for %1</translation>
+      <translation>L'enreg. ou la détection de mouv. sont désactivés pour %1</translation>
     </message>
   </context>
   <context>
@@ -2571,7 +2571,7 @@ pour afficher plus de signets</translation>
     <name>QnCameraRecordingPolicy</name>
     <message>
       <source>Recording is disabled for %1</source>
-      <translation type="unfinished">Recording is disabled for %1</translation>
+      <translation>L'enreg.est désactivé pour %1</translation>
     </message>
   </context>
   <context>

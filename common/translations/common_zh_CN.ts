@@ -985,15 +985,15 @@
     </message>
     <message>
       <source>Advanced Viewer</source>
-      <translation>高级操作员</translation>
+      <translation>高级浏览者</translation>
     </message>
     <message>
       <source>Viewer</source>
-      <translation>操作员</translation>
+      <translation>浏览者</translation>
     </message>
     <message>
       <source>Live Viewer</source>
-      <translation>实时操作员</translation>
+      <translation>实时浏览者</translation>
     </message>
     <message>
       <source>Custom Role</source>

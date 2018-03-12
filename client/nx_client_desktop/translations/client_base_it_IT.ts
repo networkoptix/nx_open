@@ -1152,7 +1152,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Password should contain different types of symbols.</source>
-      <translation type="unfinished">Password should contain different types of symbols.</translation>
+      <translation>La password dovrebbe contenere diversi tipi di simboli.</translation>
     </message>
     <message>
       <source>Short</source>
@@ -1172,7 +1172,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
-      <translation type="unfinished">Only latin letters, numbers and keyboard symbols are allowed.</translation>
+      <translation>Sono consentite solo lettere latine, numeri e simboli della tastiera.</translation>
     </message>
     <message numerus="yes">
       <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
@@ -1922,7 +1922,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>Sistema</translation>
     </message>
     <message>
       <source>Any Server</source>
@@ -2484,7 +2484,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Server</source>
-      <translation type="unfinished">Server</translation>
+      <translation>Server</translation>
     </message>
     <message>
       <source>Logical ID</source>
@@ -2888,7 +2888,7 @@ to %1</translation>
     </message>
     <message>
       <source>Create account</source>
-      <translation type="unfinished">Create account</translation>
+      <translation>Creare un account</translation>
     </message>
     <message>
       <source>Forgot password?</source>
@@ -3304,7 +3304,7 @@ to %1</translation>
     </message>
     <message>
       <source>Disconnect</source>
-      <translation type="unfinished">Disconnect</translation>
+      <translation>Scollegamento</translation>
     </message>
     <message>
       <source>All cloud users will be deleted.</source>
@@ -3928,7 +3928,7 @@ to %1</translation>
     </message>
     <message>
       <source>Server</source>
-      <translation type="unfinished">Server</translation>
+      <translation>Server</translation>
     </message>
     <message>
       <source>Never</source>
@@ -3944,7 +3944,7 @@ to %1</translation>
     </message>
     <message>
       <source>Error</source>
-      <translation type="unfinished">Error</translation>
+      <translation>Errore</translation>
     </message>
     <message>
       <source>Server not found</source>
@@ -4368,7 +4368,7 @@ to %1</translation>
     </message>
     <message>
       <source>Create account</source>
-      <translation type="unfinished">Create account</translation>
+      <translation>Creare un account</translation>
     </message>
     <message>
       <source>Forgot password?</source>
@@ -5091,7 +5091,7 @@ to %1</translation>
     </message>
     <message>
       <source>Device</source>
-      <translation type="unfinished">Device</translation>
+      <translation>Dispositivo</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -5342,7 +5342,7 @@ to %1</translation>
     </message>
     <message>
       <source>Server</source>
-      <translation type="unfinished">Server</translation>
+      <translation>Server</translation>
     </message>
     <message>
       <source>Invalid URL</source>
@@ -5624,7 +5624,7 @@ to %1</translation>
     <name>QnServerUpdatesModel</name>
     <message>
       <source>Server</source>
-      <translation type="unfinished">Server</translation>
+      <translation>Server</translation>
     </message>
     <message>
       <source>Status</source>
@@ -6614,7 +6614,7 @@ to %1</translation>
     <name>QnTimeServerSelectionModel</name>
     <message>
       <source>Server</source>
-      <translation type="unfinished">Server</translation>
+      <translation>Server</translation>
     </message>
     <message>
       <source>Offset</source>
@@ -8122,7 +8122,7 @@ to %1</translation>
     </message>
     <message>
       <source>Error</source>
-      <translation type="unfinished">Error</translation>
+      <translation>Errore</translation>
     </message>
     <message>
       <source>Image cannot be loaded.</source>
@@ -8664,7 +8664,7 @@ to %1</translation>
     </message>
     <message>
       <source>Server</source>
-      <translation type="unfinished">Server</translation>
+      <translation>Server</translation>
     </message>
     <message>
       <source>Please update all components to the version %1</source>
