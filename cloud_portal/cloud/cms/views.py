@@ -206,8 +206,10 @@ def version(request, version_id=None):
         preview_link = generate_preview_link()
     version = ContentVersion.objects.get(id=version_id)
     contexts = get_records_for_version(version)
+    product = contexts.values()[0][0].data_structure.context.product
     return render(request, 'review_records.html', {'version': version,
                                                    'contexts': contexts,
+                                                   'product': product,
                                                    'preview_link': preview_link,
                                                    'user': request.user,
                                                    'has_permission': mysite.has_permission(request),

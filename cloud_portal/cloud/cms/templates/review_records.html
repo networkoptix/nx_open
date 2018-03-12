@@ -73,22 +73,30 @@
 </div>
 <form action="{% url 'version_action' version.id %}" method="post">
 	{% csrf_token %}
+	{% if not version.accepted_date or product.can_preview %}
 	<div class="submit-row">
 		{% if perms.cms.force_update and version.state == 'current' %}
 			<button class="btn btn-sm btn-danger pull-left" type="submit" name="Force Update">Force Update</button>
 		{% endif %}
-		{% if preview_link %}
+		{% if preview_link and product.can_preview %}
 			<button class='btn btn-sm btn-info' onClick="openPreview(event)">Open Preview</button>
 		{% endif %}
 		{% if not version.accepted_date %}
+			{% if product.can_preview %}
         	<button class="btn btn-sm btn-primary" type="submit" name="Preview">Generate Preview</button>
+			{% else %}
+			<button class="btn btn-sm btn-default">
+				<a href="{% url 'download_package' product.name %}"download>Download</a>
+			</button>
+			{% endif %}
 			{% if perms.cms.publish_version %}
         	<button class="btn btn-sm btn-danger" type="submit" name="Publish">Publish</button>
 			{% endif %}
 		{% endif %}
 	</div>
+	{% endif %}
 </form>
-{% if preview_link %}
+{% if preview_link and product.can_preview %}
 <script>
     function openPreview(event){
     	event.preventDefault();
