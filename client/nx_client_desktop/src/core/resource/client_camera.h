@@ -19,7 +19,7 @@ public:
 
     virtual Qn::ResourceFlags flags() const override;
 
-    static void setAuthToMultisensorCamera(
+    static void setAuthToCameraGroup(
         const QnVirtualCameraResourcePtr& camera,
         const QAuthenticator& authenticator);
 

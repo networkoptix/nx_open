@@ -532,6 +532,13 @@ bool QnSecurityCamResource::isSharingLicenseInGroup() const
     return resType->hasParam(lit("canShareLicenseGroup"));
 }
 
+bool QnSecurityCamResource::isNvr() const
+{
+    const auto result = isDtsBased();
+    NX_EXPECT(!result || !getGroupId().isEmpty());
+    return result;
+}
+
 bool QnSecurityCamResource::isMultiSensorCamera() const
 {
     return !getGroupId().isEmpty()
