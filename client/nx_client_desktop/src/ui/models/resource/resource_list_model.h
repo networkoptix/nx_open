@@ -56,6 +56,8 @@ public:
     bool hasStatus() const;
     void setHasStatus(bool value);
 
+    void setSinglePick(bool value);
+
     Options options() const;
     void setOptions(Options value);
 
@@ -76,6 +78,9 @@ public:
     using ColumnDataAccessor = std::function<QVariant(QnResourcePtr, int)>;
     void setCustomColumnAccessor(int column, ColumnDataAccessor dataAccessor);
 
+signals:
+    void selectionChanged();
+
 private slots:
     void at_resource_resourceChanged(const QnResourcePtr& resource);
 
@@ -87,6 +92,8 @@ private:
     bool m_hasCheckboxes = false;
     bool m_userCheckable = true;
     bool m_hasStatus = false;
+
+    bool m_singlePick = false;
     Options m_options;
     QnResourceList m_resources;
     QSet<QnUuid> m_checkedResources;
