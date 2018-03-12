@@ -141,6 +141,7 @@ QnStreamRecorder::QnStreamRecorder(const QnResourcePtr& dev):
     m_currentChunkLen(0),
     m_prebufferingUsec(0),
     m_EofDateTime(AV_NOPTS_VALUE),
+    m_BofDateTime(AV_NOPTS_VALUE),
     m_endOfData(false),
     m_lastProgress(-1),
     m_needCalcSignature(false),
