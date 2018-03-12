@@ -12,6 +12,11 @@ struct NxStreamingIniConfig: public nx::kit::IniConfig
 
     NX_INI_INT(0, unloopCameraPtsWithModulus,
         "If not 0, pts from camera is \"unlooped\" to be monotonous and close to \"now\".");
+
+    NX_INI_FLAG(
+        1,
+        enableTimeCorrection,
+        "Enables time correction if timestamp difference between subsequent frames is too small.");
 };
 
 inline NxStreamingIniConfig& nxStreamingIni()

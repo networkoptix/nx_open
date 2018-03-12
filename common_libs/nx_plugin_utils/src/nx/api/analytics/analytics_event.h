@@ -27,13 +27,13 @@ public:
      */
     struct EventType
     {
-        QnUuid eventTypeId;
+        QnUuid typeId;
         TranslatableString name;
         EventTypeFlags flags = EventTypeFlag::noFlags;
         bool isStateful() const noexcept { return flags.testFlag(EventTypeFlag::stateDependent); }
     };
 };
-#define AnalyticsEventType_Fields (eventTypeId)(name)(flags)
+#define AnalyticsEventType_Fields (typeId)(name)(flags)
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(Analytics::EventTypeFlags)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Analytics::EventTypeFlag)

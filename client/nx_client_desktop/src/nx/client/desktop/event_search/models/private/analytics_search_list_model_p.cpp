@@ -3,12 +3,14 @@
 #include <chrono>
 
 #include <QtGui/QPalette>
+#include <QtWidgets/QMenu>
 
 #include <analytics/common/object_detection_metadata.h>
 #include <api/server_rest_connection.h>
 #include <camera/resource_display.h>
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/camera_history.h>
 #include <core/resource/media_server_resource.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/helper.h>
@@ -22,6 +24,7 @@
 #include <utils/common/synctime.h>
 
 #include <nx/client/core/utils/human_readable.h>
+#include <nx/client/desktop/common/widgets/web_view_dialog.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/pending_operation.h>
 #include <nx/vms/event/analytics_helper.h>
@@ -194,6 +197,9 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
             return QVariant::fromValue(object.track.empty()
                 ? QRectF()
                 : object.track.front().boundingBox);
+
+        case Qn::ContextMenuRole:
+            return QVariant::fromValue(contextMenu(object));
 
         default:
             handled = false;
@@ -436,15 +442,22 @@ void AnalyticsSearchListModel::Private::addNewlyReceivedObjects(
     if (added == 0)
         return;
 
-    ScopedInsertRows insertRows(q, 0, added - 1);
-    for (auto iter = data.rbegin(); iter != data.rend(); ++iter)
     {
-        if (iter->firstAppearanceTimeUsec != 0) //< If not marked to skip...
+        ScopedInsertRows insertRows(q, 0, added - 1);
+        for (auto iter = data.rbegin(); iter != data.rend(); ++iter)
+        {
+            if (iter->firstAppearanceTimeUsec == 0) //< Skip if marked.
+                continue;
+
+            m_objectIdToTimestampUs[iter->objectId] = iter->firstAppearanceTimeUsec;
             m_data.push_front(std::move(*iter));
+        }
+
+        m_latestTimeMs = duration_cast<milliseconds>(
+            microseconds(m_data.front().firstAppearanceTimeUsec)).count();
     }
 
-    m_latestTimeMs = duration_cast<milliseconds>(
-        microseconds(m_data.front().firstAppearanceTimeUsec)).count();
+    constrainLength();
 }
 
 rest::Handle AnalyticsSearchListModel::Private::getObjects(qint64 startMs, qint64 endMs,
@@ -522,14 +535,31 @@ void AnalyticsSearchListModel::Private::processMetadata(
     if (newObjects.empty())
         return;
 
-    ScopedInsertRows insertRows(q, 0, int(newObjects.size()) - 1);
+    {
+        ScopedInsertRows insertRows(q, 0, int(newObjects.size()) - 1);
 
-    for (const auto& newObject: newObjects)
-        m_objectIdToTimestampUs[newObject.objectId] = newObject.firstAppearanceTimeUsec;
+        for (const auto& newObject: newObjects)
+            m_objectIdToTimestampUs[newObject.objectId] = newObject.firstAppearanceTimeUsec;
 
-    m_data.insert(m_data.begin(),
-        std::make_move_iterator(newObjects.begin()),
-        std::make_move_iterator(newObjects.end()));
+        m_data.insert(m_data.begin(),
+            std::make_move_iterator(newObjects.begin()),
+            std::make_move_iterator(newObjects.end()));
+    }
+
+    constrainLength();
+}
+
+void AnalyticsSearchListModel::Private::constrainLength()
+{
+    if (m_data.size() <= kMaximumItemCount)
+        return;
+
+    ScopedRemoveRows removeRows(q, kMaximumItemCount, int(m_data.size()) - 1);
+
+    for (auto iter = m_data.cbegin() + kMaximumItemCount; iter != m_data.cend(); ++iter)
+        m_objectIdToTimestampUs.remove(iter->objectId);
+
+    m_data.resize(kMaximumItemCount);
 }
 
 void AnalyticsSearchListModel::Private::emitDataChangedIfNeeded()
@@ -625,6 +655,86 @@ QString AnalyticsSearchListModel::Private::attributes(
 
     const auto color = QPalette().color(QPalette::WindowText);
     return kCss.arg(color.name()) + kTableTemplate.arg(rows);
+}
+
+QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(
+    const analytics::storage::DetectedObject& object) const
+{
+    if (!camera())
+        return QSharedPointer<QMenu>();
+
+    // TODO: #vkutin Is this a correct way of choosing servers for analytics actions?
+    auto servers = q->cameraHistoryPool()->getCameraFootageData(camera(), true);
+    servers.push_back(camera()->getParentServer());
+
+    const auto allActions = vms::event::AnalyticsHelper::availableActions(servers, object.objectTypeId);
+    if (allActions.isEmpty())
+        return QSharedPointer<QMenu>();
+
+    QSharedPointer<QMenu> menu(new QMenu());
+    for (const auto& driverActions: allActions)
+    {
+        if (!menu->isEmpty())
+            menu->addSeparator();
+
+        const auto& driverId = driverActions.driverId;
+        for (const auto& action: driverActions.actions)
+        {
+            const auto name = action.name.text(QString());
+            menu->addAction(name,
+                [this, action, object, driverId, guard = QPointer<const Private>(this)]()
+                {
+                    if (guard)
+                        executePluginAction(driverId, action, object);
+                });
+        }
+    }
+
+    return menu;
+}
+
+void AnalyticsSearchListModel::Private::executePluginAction(
+    const QnUuid& driverId,
+    const api::AnalyticsManifestObjectAction& action,
+    const analytics::storage::DetectedObject& object) const
+{
+    const auto server = q->commonModule()->currentServer();
+    NX_ASSERT(server && server->restConnection());
+    if (!server || !server->restConnection())
+        return;
+
+    const auto resultCallback =
+        [this, guard = QPointer<const Private>(this)]
+            (bool success, rest::Handle /*requestId*/, QnJsonRestResult result)
+        {
+            if (result.error != QnRestResult::NoError)
+            {
+                QnMessageBox::warning(q->mainWindowWidget(), tr("Failed to execute plugin action"),
+                    result.errorString);
+                return;
+            }
+
+            if (!success)
+                return;
+
+            const auto reply = result.deserialized<AnalyticsActionResult>();
+            if (!reply.messageToUser.isEmpty())
+            {
+                QnMessageBox::success(q->mainWindowWidget(), reply.messageToUser);
+            }
+
+            if (!reply.actionUrl.isEmpty())
+            {
+                WebViewDialog::showUrl(reply.actionUrl);
+            }
+        };
+
+    AnalyticsAction actionData;
+    actionData.driverId = driverId;
+    actionData.actionId = action.id;
+    actionData.objectId = object.objectId;
+
+    server->restConnection()->executeAnalyticsAction(actionData, resultCallback, thread());
 }
 
 qint64 AnalyticsSearchListModel::Private::startTimeMs(

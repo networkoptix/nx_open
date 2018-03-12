@@ -153,6 +153,11 @@ AnalyticsDriverManifest Plugin::fetchSupportedEvents(const CameraInfo& cameraInf
     return result;
 }
 
+void Plugin::executeAction(Action* /*action*/, Error* /*outError*/)
+{
+    // Do nothing.
+}
+
 } // axis
 } // namespace metadata
 } // namespace mediaserver_plugins

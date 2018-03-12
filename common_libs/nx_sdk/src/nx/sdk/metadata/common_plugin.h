@@ -40,8 +40,8 @@ protected:
 
     /**
      * Action handler. Called when some action defined by this plugin is triggered by Server.
-     * @param actionId Id of an action being triggered.
-     * @param object An object for which an action has been triggered.
+     * @param actionId Id of the action being triggered.
+     * @param objectId Id of a metadata object for which the action has been triggered.
      * @param params If the plugin manifest defines params for the action being triggered,
      *     contains their values after they are filled by the user via Client form. Otherwise,
      *     empty.
@@ -50,7 +50,7 @@ protected:
      */
     virtual void executeAction(
         const std::string& /*actionId*/,
-        const Object* /*object*/,
+        nxpl::NX_GUID /*objectId*/,
         const std::map<std::string, std::string>& /*params*/,
         std::string* /*outActionUrl*/,
         std::string* /*outMessageToUser*/,
@@ -72,6 +72,12 @@ public:
     virtual void setLocale(const char* locale) override;
     virtual void setDeclaredSettings(const nxpl::Setting* settings, int count) override;
     virtual const char* capabilitiesManifest(Error* error) const override;
+    virtual void executeAction(Action* action, Error* outError) override;
+
+private:
+    bool fillSettingsMap(
+        std::map<std::string, std::string>* map, const nxpl::Setting* settings, int count,
+        const char* func) const;
 
 private:
     bool m_enableOutput = false;

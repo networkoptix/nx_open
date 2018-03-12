@@ -58,6 +58,15 @@ public:
     }
 
 private:
+    static nx::sdk::metadata::UncompressedVideoFrame* convertToYuv420pSdkFrame(
+        CLConstVideoDecoderOutputPtr frame,
+        bool needDeepCopy);
+
+    static nx::sdk::metadata::UncompressedVideoFrame* convertToBgraSdkFrame(
+        CLConstVideoDecoderOutputPtr frame,
+        bool needDeepCopy);
+
+private:
     Callback m_callback;
     AcceptedFrameKind m_acceptedFrameKind = AcceptedFrameKind::compressed;
 };

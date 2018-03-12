@@ -39,11 +39,11 @@ std::string CameraManager::capabilitiesManifest()
     return R"json(
         {
             "supportedEventTypes": [
-                ")json" + kLineCrossingEventGuid + R"json(",
-                ")json" + kObjectInTheAreaEventGuid + R"json("
+                ")json" + nxpt::NxGuidHelper::toStdString(kLineCrossingEventGuid) + R"json(",
+                ")json" + nxpt::NxGuidHelper::toStdString(kObjectInTheAreaEventGuid) + R"json("
             ],
             "supportedObjectTypes": [
-                ")json" + kCarObjectGuid + R"json("
+                ")json" + nxpt::NxGuidHelper::toStdString(kCarObjectGuid) + R"json("
             ],
             "settings": {
                 "params": [
@@ -82,37 +82,16 @@ bool CameraManager::pushCompressedVideoFrame(const CommonCompressedVideoPacket* 
 bool CameraManager::pushUncompressedVideoFrame(const CommonUncompressedVideoFrame* videoFrame)
 {
     NX_OUTPUT << __func__ << "() BEGIN: timestamp " << videoFrame->timestampUsec() << " us";
+
     m_lastVideoFrameTimestampUsec = videoFrame->timestampUsec();
 
-    if (videoFrame->planeCount() != 3)
-    {
-        NX_PRINT << __func__ << "() END -> false: videoFrame->planeCount() is "
-            << videoFrame->planeCount() << " instead of 3";
-        return false;
-    }
+    if (videoFrame->pixelFormat() == UncompressedVideoFrame::PixelFormat::bgra)
+        return checkRgbFrame(videoFrame);
 
-    const auto expectedPixelFormat = UncompressedVideoFrame::PixelFormat::yuv420;
-    if (videoFrame->pixelFormat() != expectedPixelFormat)
-    {
-        NX_PRINT << __func__ << "() END -> false: videoFrame->pixelFormat() is "
-            << (int) videoFrame->pixelFormat() << " instead of " << (int) expectedPixelFormat;
-        return false;
-    }
+    if (videoFrame->pixelFormat() == UncompressedVideoFrame::PixelFormat::yuv420)
+        return checkYuv420pFrame(videoFrame);
 
-    // Dump 8 bytes at offset 16 of the plane 0.
-    if (videoFrame->dataSize(0) < 44)
-    {
-        NX_PRINT << __func__ << "(): videoFrame->dataSize(0) == " << videoFrame->dataSize(0)
-            << ", which is suspiciously low";
-    }
-    else
-    {
-        // Hex dump some 8 bytes from raw pixel data.
-        NX_PRINT_HEX_DUMP("bytes 36..43", videoFrame->data(0) + 36, 8);
-    }
-
-    NX_OUTPUT << __func__ << "() END -> true";
-    return true;
+    return false;
 }
 
 bool CameraManager::pullMetadataPackets(std::vector<MetadataPacket*>* metadataPackets)
@@ -188,7 +167,7 @@ MetadataPacket* CameraManager::cookSomeEvents()
     commonEvent->setDescription("Line crossing (description)");
     commonEvent->setAuxilaryData(R"json({ "auxilaryData": "someJson" })json");
     commonEvent->setIsActive(m_counter == 1);
-    commonEvent->setTypeId(nxpt::NxGuidHelper::fromRawData(m_eventTypeId.c_str()));
+    commonEvent->setTypeId(m_eventTypeId);
 
     auto eventPacket = new CommonEventsMetadataPacket();
     eventPacket->setTimestampUsec(usSinceEpoch());
@@ -215,11 +194,13 @@ MetadataPacket* CameraManager::cookSomeObjects()
     auto commonObject = new CommonObject();
 
     commonObject->setAuxilaryData(R"json({ "auxilaryData": "someJson2" })json");
-    commonObject->setTypeId(nxpt::NxGuidHelper::fromRawData(kCarObjectGuid.c_str()));
+    commonObject->setTypeId(kCarObjectGuid);
 
     // To be binary modified to be unique for each object.
-    nxpl::NX_GUID objectId = nxpt::NxGuidHelper::fromRawData(
-        "{B5294F25-4FE6-4647-B8D1-A0729F70F2D1}");
+    nxpl::NX_GUID objectId = {{
+        0xB5, 0x29, 0x4F, 0x25, 0x4F, 0xE6, 0x46, 0x47,
+        0xB8, 0xD1, 0xA0, 0x72, 0x9F, 0x70, 0xF2, 0xD1}};
+
     double dt = m_counterObjects++ / 32.0;
     double intPart;
     dt = modf(dt, &intPart) * 0.75;
@@ -229,6 +210,7 @@ MetadataPacket* CameraManager::cookSomeObjects()
     commonObject->setBoundingBox(Rect((float) dt, (float) dt, 0.25F, 0.25F));
 
     auto objectPacket = new CommonObjectsMetadataPacket();
+
     objectPacket->setTimestampUsec(m_lastVideoFrameTimestampUsec);
     objectPacket->setDurationUsec(1000000LL * 10);
     objectPacket->addItem(commonObject);
@@ -240,6 +222,45 @@ int64_t CameraManager::usSinceEpoch() const
     using namespace std::chrono;
     return duration_cast<microseconds>(
         system_clock::now().time_since_epoch()).count();
+}
+
+bool CameraManager::checkYuv420pFrame(const sdk::metadata::CommonUncompressedVideoFrame* videoFrame) const
+{
+    if (videoFrame->planeCount() != 3)
+    {
+        NX_PRINT << __func__ << "() END -> false: videoFrame->planeCount() is "
+            << videoFrame->planeCount() << " instead of 3";
+        return false;
+    }
+
+    const auto expectedPixelFormat = UncompressedVideoFrame::PixelFormat::yuv420;
+    if (videoFrame->pixelFormat() != expectedPixelFormat)
+    {
+        NX_PRINT << __func__ << "() END -> false: videoFrame->pixelFormat() is "
+            << (int)videoFrame->pixelFormat() << " instead of " << (int)expectedPixelFormat;
+        return false;
+    }
+
+    // Dump 8 bytes at offset 16 of the plane 0.
+    if (videoFrame->dataSize(0) < 44)
+    {
+        NX_PRINT << __func__ << "(): videoFrame->dataSize(0) == " << videoFrame->dataSize(0)
+            << ", which is suspiciously low";
+    }
+    else
+    {
+        // Hex dump some 8 bytes from raw pixel data.
+        NX_PRINT_HEX_DUMP("bytes 36..43", videoFrame->data(0) + 36, 8);
+    }
+
+    NX_OUTPUT << __func__ << "() END -> true";
+}
+
+bool CameraManager::checkRgbFrame(const sdk::metadata::CommonUncompressedVideoFrame* videoFrame) const
+{
+    // TODO: #dmishin check BGRA frames somehow.
+    NX_OUTPUT << __func__ << "() END -> true";
+    return true;
 }
 
 } // namespace stub

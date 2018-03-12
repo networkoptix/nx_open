@@ -50,6 +50,29 @@ nx::sdk::metadata::CommonEventsMetadataPacket* createCommonEventsMetadataPacket(
 
 } // namespace
 
+void ElapsedTimerThreadSafe::start()
+{
+    std::lock_guard<mutex_type> lock(m_mutex);
+    m_timer.start();
+}
+
+void ElapsedTimerThreadSafe::stop()
+{
+    std::lock_guard<mutex_type> lock(m_mutex);
+    m_timer.invalidate();
+}
+
+std::chrono::milliseconds ElapsedTimerThreadSafe::elapsedSinceStart() const
+{
+    std::shared_lock<mutex_type> lock(m_mutex);
+    return std::chrono::milliseconds(m_timer.isValid() ? m_timer.elapsed() : 0);
+}
+
+bool ElapsedTimerThreadSafe::hasExpiredSinceStart(std::chrono::milliseconds ms) const
+{
+    std::shared_lock<mutex_type> lock(m_mutex);
+    return m_timer.isValid() && m_timer.hasExpired(ms.count());
+}
 
 #if 0
 // Further methods may be useful, but their usage was excised out the code after refactoring
@@ -88,7 +111,7 @@ void axisHandler::processRequest(
 
     ElapsedEvents& m_events = m_monitor->eventsToCatch();
     const auto it = std::find_if(m_events.begin(), m_events.end(),
-        [&uuid](ElapsedEvent& event) { return event.type.eventTypeId == uuid; });
+        [&uuid](ElapsedEvent& event) { return event.type.typeId == uuid; });
     if (it != m_events.end())
     {
         m_monitor->sendEventStartedPacket(it->type);
@@ -157,7 +180,7 @@ void Monitor::addRules(const nx::network::SocketAddress& localAddress, nxpl::NX_
             std::string actionEventName = it->fullName().toStdString();
             std::replace(actionEventName.begin(), actionEventName.end(), '/', '.');
             std::replace(actionEventName.begin(), actionEventName.end(), ':', '_');
-            std::string message = std::string(it->eventTypeId.toSimpleString().toLatin1()) +
+            std::string message = std::string(it->typeId.toSimpleString().toLatin1()) +
                 std::string(".") + actionEventName;
 
             int actionId = cameraController.addActiveHttpNotificationAction(
@@ -310,3 +333,4 @@ void Monitor::onTimer()
 } // namespace metadata
 } // namespace mediaserver_plugins
 } // namespace nx
+

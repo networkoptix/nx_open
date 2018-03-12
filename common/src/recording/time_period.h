@@ -1,6 +1,7 @@
 #pragma once
 
 #include <chrono>
+#include <limits>
 
 #include <QtCore/QMetaType>
 
@@ -19,7 +20,7 @@ public:
     /**
      * Constructs a null time period.
      */
-    QnTimePeriod();
+    constexpr QnTimePeriod() = default;
 
     /**
      * Constructor.
@@ -27,12 +28,26 @@ public:
      * \param startTimeMs               Period's start time, normally in milliseconds since epoch.
      * \param durationMs                Period's duration, in milliseconds.
      */
-    QnTimePeriod(qint64 startTimeMs, qint64 durationMs);
-    QnTimePeriod(
-        const std::chrono::milliseconds& startTime,
-        const std::chrono::milliseconds& duration);
+    constexpr QnTimePeriod(qint64 startTimeMs, qint64 durationMs):
+        startTimeMs(startTimeMs),
+        durationMs(durationMs)
+    {
+    }
 
-    static QnTimePeriod fromInterval(qint64 startTimeMs, qint64 endTimeMs);
+    constexpr QnTimePeriod(
+        const std::chrono::milliseconds& startTime,
+        const std::chrono::milliseconds& duration)
+        :
+        QnTimePeriod(startTime.count(), duration.count())
+    {
+    }
+
+    static constexpr QnTimePeriod fromInterval(qint64 startTimeMs, qint64 endTimeMs)
+    {
+        return startTimeMs <= endTimeMs
+            ? QnTimePeriod(startTimeMs, endTimeMs - startTimeMs)
+            : QnTimePeriod(endTimeMs, startTimeMs - endTimeMs);
+    };
 
     QnTimePeriod& operator = (const QnTimePeriod &other);
 
@@ -81,12 +96,34 @@ public:
     /**
      * \returns                         Infinite duration constant value (-1).
      */
-    static qint64 infiniteDuration();
+    static constexpr qint64 infiniteDuration()
+    {
+        return -1;
+    };
+
+    /**
+    * \returns                         Maximal possible timestamp value.
+    */
+    static constexpr qint64 maxTimeValue()
+    {
+        return std::numeric_limits<qint64>::max();
+    };
+
+    /**
+    * \returns                         Minimal possible timestamp value (0).
+    */
+    static constexpr qint64 minTimeValue()
+    {
+        return 0;
+    };
 
     /**
     * \returns                          Returns infinite period starting from zero.
     */
-    static QnTimePeriod anytime();
+    static constexpr QnTimePeriod anytime()
+    {
+        return QnTimePeriod(minTimeValue(), infiniteDuration());
+    };
 
     /**
      * \returns distance from the nearest period edge to the time in ms. Returns zerro if timeMs inside period
@@ -116,21 +153,42 @@ public:
     void setDuration(std::chrono::milliseconds value);
     std::chrono::milliseconds duration() const;
 
-    /** Start time in milliseconds. */
-    qint64 startTimeMs;
+    constexpr bool operator==(const QnTimePeriod& other) const
+    {
+        return startTimeMs == other.startTimeMs && durationMs == other.durationMs;
+    };
 
-    /** Duration in milliseconds.
-     *
+    constexpr bool operator!=(const QnTimePeriod& other) const
+    {
+        return !(*this == other);
+    };
+
+    constexpr bool operator<(const QnTimePeriod& other) const
+    {
+        return startTimeMs < other.startTimeMs;
+    };
+
+    constexpr bool operator<(qint64 timeMs) const
+    {
+        return this->startTimeMs < timeMs;
+    };
+
+public:
+    /** Start time in milliseconds. */
+    qint64 startTimeMs = 0;
+
+    /**
+     * Duration in milliseconds.
      * infiniteDuration() if duration is infinite or unknown. It may be the case if this time period
-     * represents a video chunk that is being recorded at the moment. */
-    qint64 durationMs;
+     * represents a video chunk that is being recorded at the moment.
+     */
+    qint64 durationMs = 0;
 };
 
-bool operator==(const QnTimePeriod &first, const QnTimePeriod &other);
-bool operator!=(const QnTimePeriod &first, const QnTimePeriod &other);
-bool operator<(const QnTimePeriod &first, const QnTimePeriod &other);
-bool operator<(qint64 first, const QnTimePeriod &other);
-bool operator<(const QnTimePeriod &other, qint64 first);
+constexpr bool operator<(qint64 timeMs, const QnTimePeriod& other)
+{
+    return timeMs < other.startTimeMs;
+};
 
 QDebug operator<<(QDebug dbg, const QnTimePeriod &period);
 

@@ -1,6 +1,7 @@
 #include "resource_metadata_context.h"
 
 #include <nx/utils/log/log.h>
+#include <nx/sdk/metadata/consuming_camera_manager.h>
 
 #include "video_data_receptor.h"
 
@@ -55,7 +56,12 @@ void ResourceMetadataContext::addManager(
     HandlerPtr handler,
     const nx::api::AnalyticsDriverManifest& manifest)
 {
+
     ManagerContext context;
+    nxpt::ScopedRef<CameraManager> consumingManager(
+        manager->queryInterface(nx::sdk::metadata::IID_ConsumingCameraManager));
+
+    context.isStreamConsumer = !!consumingManager;
     context.handler = std::move(handler);
     context.manager = std::move(manager);
     context.manager->setHandler(context.handler.get());

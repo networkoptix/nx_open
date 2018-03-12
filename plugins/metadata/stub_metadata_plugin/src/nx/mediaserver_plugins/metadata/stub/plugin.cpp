@@ -28,19 +28,19 @@ std::string Plugin::capabilitiesManifest() const
 {
     return R"json(
         {
-            "driverId": ")json" + kDriverGuid + R"json(",
+            "driverId": ")json" + nxpt::NxGuidHelper::toStdString(kDriverGuid) + R"json(",
             "driverName": {
                 "value": "Stub Driver"
             },
             "outputEventTypes": [
                 {
-                    "typeId": ")json" + kLineCrossingEventGuid + R"json(",
+                    "typeId": ")json" + nxpt::NxGuidHelper::toStdString(kLineCrossingEventGuid) + R"json(",
                     "name": {
                         "value": "Line crossing"
                     }
                 },
                 {
-                    "typeId": ")json" + kObjectInTheAreaEventGuid + R"json(",
+                    "typeId": ")json" + nxpt::NxGuidHelper::toStdString(kObjectInTheAreaEventGuid) + R"json(",
                     "name": {
                         "value": "Object in the area"
                     },
@@ -49,13 +49,13 @@ std::string Plugin::capabilitiesManifest() const
             ],
             "outputObjectTypes": [
                 {
-                    "typeId": ")json" + kCarObjectGuid + R"json(",
+                    "typeId": ")json" + nxpt::NxGuidHelper::toStdString(kCarObjectGuid) + R"json(",
                     "name": {
                         "value": "Car"
                     }
                 },
                 {
-                    "typeId": ")json" + kHumanFaceObjectGuid + R"json(",
+                    "typeId": ")json" + nxpt::NxGuidHelper::toStdString(kHumanFaceObjectGuid) + R"json(",
                     "name": {
                         "value": "Human face"
                     }
@@ -101,8 +101,8 @@ std::string Plugin::capabilitiesManifest() const
                     "name": {
                         "value": "Add to list"
                     },
-                    "supportedObjectTypes": [
-                        ")json" + kCarObjectGuid + R"json("
+                    "supportedObjectTypeIds": [
+                        ")json" + nxpt::NxGuidHelper::toStdString(kCarObjectGuid) + R"json("
                     ],
                     "settings": {
                         "params": [
@@ -127,8 +127,8 @@ std::string Plugin::capabilitiesManifest() const
                     "name": {
                         "value": "Add person (URL-based)"
                     },
-                    "supportedObjectTypes": [
-                        ")json" + kCarObjectGuid + R"json("
+                    "supportedObjectTypeIds": [
+                        ")json" + nxpt::NxGuidHelper::toStdString(kCarObjectGuid) + R"json("
                     ]
                 }
             ]
@@ -143,7 +143,7 @@ void Plugin::settingsChanged()
 
 void Plugin::executeAction(
     const std::string& actionId,
-    const Object* object,
+    nxpl::NX_GUID objectId,
     const std::map<std::string, std::string>& params,
     std::string* outActionUrl,
     std::string* outMessageToUser,
@@ -151,21 +151,34 @@ void Plugin::executeAction(
 {
     if (actionId == "nx.stub.addToList")
     {
-        NX_PRINT << __func__ << "(): nx.stub.addToList; returning a message with param values.";
+        NX_PRINT << __func__
+            << "(): id [nx.stub.addToList]; returning a message with param values.";
+
+        std::string valueA;
+        auto paramAIt = params.find("paramA");
+        if (paramAIt != params.cend())
+            valueA = paramAIt->second;
+
+        std::string valueB;
+        auto paramBIt = params.find("paramB");
+        if (paramBIt != params.cend())
+            valueB = paramBIt->second;
+
         *outMessageToUser = std::string("Your param values are: ")
-            + "paramA: [" + params.at("paramA") + "], "
-            + "paramB: [" + params.at("paramB") + "]";
+            + "paramA: [" + valueA + "], "
+            + "paramB: [" + valueB + "]";
 
     }
     else if (actionId == "nx.stub.addPerson")
     {
         *outActionUrl = "http://internal.server/addPerson?objectId=" +
-            nxpt::NxGuidHelper::toStdString(object->id());
-        NX_PRINT << __func__ << "(): nx.stub.addPerson; returning URL: [" << *outActionUrl << "]";
+            nxpt::NxGuidHelper::toStdString(objectId);
+        NX_PRINT << __func__
+            << "(): id [nx.stub.addPerson]; returning URL: [" << *outActionUrl << "]";
     }
     else
     {
-        NX_PRINT << __func__ << "(): ERROR: Unsupported action: [" << actionId << "]";
+        NX_PRINT << __func__ << "(): ERROR: Unsupported action id: [" << actionId << "]";
         *error = Error::unknownError;
     }
 }

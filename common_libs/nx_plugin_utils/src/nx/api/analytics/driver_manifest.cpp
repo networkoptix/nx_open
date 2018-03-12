@@ -11,5 +11,8 @@ namespace api {
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AnalyticsDriverManifest, (json), AnalyticsDriverManifest_Fields,
     (brief, true))
 
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AnalyticsManifestObjectAction, (json),
+    AnalyticsManifestObjectAction_Fields, (brief, true))
+
 } // namespace api
 } // namespace nx

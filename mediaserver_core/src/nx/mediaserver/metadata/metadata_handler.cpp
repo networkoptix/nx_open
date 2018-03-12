@@ -4,7 +4,7 @@
 #include <nx/utils/log/log.h>
 
 #include <plugins/plugin_tools.h>
-#include <nx/mediaserver_plugins/utils/uuid.h>
+#include <plugins/plugin_internal_tools.h>
 
 #include <nx/vms/event/events/events.h>
 #include <nx/vms/event/events/events_fwd.h>
@@ -33,7 +33,7 @@ nx::api::Analytics::EventType MetadataHandler::eventDescriptor(const QnUuid& eve
 {
     for (const auto& descriptor: m_manifest.outputEventTypes)
     {
-        if (descriptor.eventTypeId == eventId)
+        if (descriptor.typeId == eventId)
             return descriptor;
     }
     return nx::api::Analytics::EventType();
@@ -116,6 +116,9 @@ void MetadataHandler::handleObjectsPacket(nxpt::ScopedRef<ObjectsMetadataPacket>
 
     if (m_dataReceptor)
         m_dataReceptor->putData(nx::common::metadata::toMetadataPacket(data));
+
+    if (m_visualDebugger)
+        m_visualDebugger->push(nx::common::metadata::toMetadataPacket(data));
 }
 
 void MetadataHandler::handleMetadataEvent(
@@ -184,6 +187,12 @@ void MetadataHandler::registerDataReceptor(QnAbstractDataReceptor* dataReceptor)
 void MetadataHandler::removeDataReceptor(QnAbstractDataReceptor* dataReceptor)
 {
     m_dataReceptor = nullptr;
+}
+
+void MetadataHandler::setVisualDebugger(
+    nx::debugging::AbstractVisualMetadataDebugger* visualDebugger)
+{
+    m_visualDebugger = visualDebugger;
 }
 
 nx::vms::event::EventState MetadataHandler::lastEventState(const QnUuid& eventId) const

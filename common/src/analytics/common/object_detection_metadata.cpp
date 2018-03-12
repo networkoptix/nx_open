@@ -107,7 +107,7 @@ QnCompressedMetadataPtr toMetadataPacket(
     return metadataPacket;
 }
 
-DetectionMetadataPacketPtr fromMetadataPacket(const QnCompressedMetadataPtr& compressedMetadata)
+DetectionMetadataPacketPtr fromMetadataPacket(const QnConstCompressedMetadataPtr& compressedMetadata)
 {
     if (!compressedMetadata)
         return DetectionMetadataPacketPtr();

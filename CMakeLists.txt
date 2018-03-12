@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
-
+set(CMAKE_SUPPRESS_REGENERATION true)
 include(cmake/option.cmake)
 
 set(customization "default" CACHE STRING "Product customization")
@@ -18,6 +18,7 @@ endif()
 
 set(CMAKE_BUILD_TYPE ${default_cmake_build_type} CACHE STRING
     "One of [Debug Release RelWithDebInfo MinSizeRel].")
+set(CMAKE_VS_PLATFORM_TOOLSET_HOST_ARCHITECTURE "x64" CACHE INTERNAL "")
 
 set(targetDevice "" CACHE STRING "Target device. For the list see cmake/toolchains.")
 set(box "none")

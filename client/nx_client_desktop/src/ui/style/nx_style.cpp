@@ -42,6 +42,7 @@
 
 #include <nx/client/desktop/ui/common/detail/base_input_field.h>
 #include <nx/client/desktop/ui/common/painter_transform_scale_stripper.h>
+#include <nx/client/desktop/utils/widget_utils.h>
 
 #include <ui/common/indents.h>
 #include <ui/common/popup_shadow.h>
@@ -64,6 +65,7 @@
 #include <nx/client/core/utils/geometry.h>
 
 using namespace style;
+using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
 using nx::client::core::Geometry;
 
@@ -809,7 +811,7 @@ void QnNxStyle::drawPrimitive(
 
             if (option->state.testFlag(State_Enabled))
             {
-                using InputField = nx::client::desktop::ui::detail::BaseInputField;
+                using InputField = ui::detail::BaseInputField;
                 if (auto inputTextField = qobject_cast<const InputField*>(widget->parentWidget()))
                 {
                     readOnly = inputTextField->isReadOnly();
@@ -3655,7 +3657,7 @@ void QnNxStyle::polish(QWidget *widget)
     /* #QTBUG 18838 */
     /* Workaround for incorrectly updated hover state inside QGraphicsProxyWidget. */
     Q_D(QnNxStyle);
-    if (d->graphicsProxyWidget(widget))
+    if (WidgetUtils::graphicsProxyWidget(widget))
         widget->installEventFilter(this);
 
     if (qobject_cast<QAbstractSpinBox*>(widget) ||
@@ -4087,7 +4089,7 @@ bool QnNxStyle::eventFilter(QObject* object, QEvent* event)
     if (auto widget = qobject_cast<QWidget*>(object))
     {
         Q_D(QnNxStyle);
-        if (auto proxy = d->graphicsProxyWidget(widget))
+        if (auto proxy = WidgetUtils::graphicsProxyWidget(widget))
         {
             switch (event->type())
             {
