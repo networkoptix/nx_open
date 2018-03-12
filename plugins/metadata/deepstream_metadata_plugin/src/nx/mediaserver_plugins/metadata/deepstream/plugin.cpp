@@ -193,6 +193,11 @@ CameraManager *Plugin::obtainCameraManager(
     return new Manager(this, std::string(cameraInfo.uid));
 }
 
+void Plugin::executeAction(nx::sdk::metadata::Action*, nx::sdk::Error*)
+{
+    // Do nothing.
+}
+
 } // namespace deepstream
 } // namespace metadata
 } // namespace mediaserver_plugins

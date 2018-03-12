@@ -31,6 +31,8 @@ public:
 
     virtual nx::sdk::metadata::CameraManager* obtainCameraManager(
         const nx::sdk::CameraInfo& cameraInfo, nx::sdk::Error* outError) override;
+
+    virtual void executeAction(nx::sdk::metadata::Action*, nx::sdk::Error*) override;
 };
 
 } // namespace deepstream
