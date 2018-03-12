@@ -2359,10 +2359,10 @@ to view more bookmarks</source>
       <translation>Kante</translation>
     </message>
     <message numerus="yes">
-      <source>This ID already used on camera %1</source>
+      <source>This Id is already used on the following %n cameras: %1</source>
       <translation>
-        <numerusform>Diese ID wird auf Kamera %1 bereits verwendet</numerusform>
-        <numerusform>Diese ID wird auf Kameras %1 bereits verwendet</numerusform>
+        <numerusform>Diese ID wird bereits für die folgende Kamera verwendet: %1</numerusform>
+        <numerusform>Diese ID wird bereits für folgende %n Kameras verwendet: %1</numerusform>
       </translation>
     </message>
   </context>
@@ -2484,7 +2484,7 @@ to view more bookmarks</source>
       <translation>Server</translation>
     </message>
     <message>
-      <source>Logical ID</source>
+      <source>Logical Id</source>
       <translation>Logical-ID</translation>
     </message>
   </context>
@@ -2546,10 +2546,6 @@ to view more bookmarks</source>
   <context>
     <name>QnCameraPasswordChangeDialog</name>
     <message>
-      <source>Password shouldn&apos;t be equal to camera&apos;s user name</source>
-      <translation>Das Passwort sollte nicht identisch mit dem Kamerabenutzernamen sein</translation>
-    </message>
-    <message>
       <source>New Password</source>
       <translation>Neues Passwort</translation>
     </message>
@@ -2564,6 +2560,10 @@ to view more bookmarks</source>
     <message>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
       <translation>Das Passwort sollte mindestens 8 Zeichen lang sein und verschiedene Arten von Zeichen enthalten.</translation>
+    </message>
+    <message>
+      <source>Password should not be equal to camera&apos;s user name</source>
+      <translation>Das Passwort sollte nicht identisch mit dem Kamerabenutzernamen sein</translation>
     </message>
   </context>
   <context>
@@ -3195,12 +3195,9 @@ to %1</source>
       <source>Ask your system administrator to do it.</source>
       <translation>Bitten Sie Ihren Systemadministrator, dies zu tun.</translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>Set Password</source>
-      <translation>
-        <numerusform>Passwort festlegen</numerusform>
-        <numerusform>Passwörter festlegen</numerusform>
-      </translation>
+      <translation type="unfinished">Set Password</translation>
     </message>
   </context>
   <context>
@@ -7662,22 +7659,6 @@ to %1</source>
       <source>No new files to upload in selected folder</source>
       <translation>Keine neuen Dateien im ausgewählten Ordner hochladen</translation>
     </message>
-    <message>
-      <source>%1 - has unsupported format.</source>
-      <translation>%1 - Format wird nicht unterstützt.</translation>
-    </message>
-    <message>
-      <source>%1 - does not have timestamp.</source>
-      <translation>%1 - hat keinen Zeitstempel.</translation>
-    </message>
-    <message>
-      <source>%1 - covers period for which video has already been uploaded.</source>
-      <translation>%1 - deckt den Zeitraum ab, für den das Video bereits hochgeladen wurde.</translation>
-    </message>
-    <message>
-      <source>%1 - covers period for which video is being uploaded.</source>
-      <translation>%1 - umfasst den Zeitraum, für den ein Video hochgeladen wird.</translation>
-    </message>
     <message numerus="yes">
       <source>Selected files are too old</source>
       <translation>
@@ -7730,8 +7711,24 @@ to %1</source>
       <translation>Stellen Sie sicher, dass auf dem Server genügend Speicherplatz vorhanden ist.</translation>
     </message>
     <message>
-      <source>%1 - is older than allowed in camera archive settings.</source>
-      <translation>%1 - ist älter als in den Kameraarchiveinstellungen erlaubt.</translation>
+      <source>%1 has unsupported format.</source>
+      <translation type="unfinished">%1 has unsupported format.</translation>
+    </message>
+    <message>
+      <source>%1 does not have timestamp.</source>
+      <translation type="unfinished">%1 does not have timestamp.</translation>
+    </message>
+    <message>
+      <source>%1 is older than allowed in camera archive settings.</source>
+      <translation type="unfinished">%1 is older than allowed in camera archive settings.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video has already been uploaded.</source>
+      <translation type="unfinished">%1 covers period for which video has already been uploaded.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video is being uploaded.</source>
+      <translation type="unfinished">%1 covers period for which video is being uploaded.</translation>
     </message>
   </context>
   <context>

@@ -2337,9 +2337,9 @@ to view more bookmarks</source>
       <translation>Edge</translation>
     </message>
     <message numerus="yes">
-      <source>This ID already used on camera %1</source>
-      <translation>
-        <numerusform>此 ID 已在相机 %1上使用</numerusform>
+      <source>This Id is already used on the following %n cameras: %1</source>
+      <translation type="unfinished">
+        <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
       </translation>
     </message>
   </context>
@@ -2457,8 +2457,8 @@ to view more bookmarks</source>
       <translation>服务器</translation>
     </message>
     <message>
-      <source>Logical ID</source>
-      <translation>逻辑 ID</translation>
+      <source>Logical Id</source>
+      <translation type="unfinished">Logical Id</translation>
     </message>
   </context>
   <context>
@@ -2518,10 +2518,6 @@ to view more bookmarks</source>
   <context>
     <name>QnCameraPasswordChangeDialog</name>
     <message>
-      <source>Password shouldn&apos;t be equal to camera&apos;s user name</source>
-      <translation>密码不得与摄像机的用户名称相同</translation>
-    </message>
-    <message>
       <source>New Password</source>
       <translation>新密码</translation>
     </message>
@@ -2536,6 +2532,10 @@ to view more bookmarks</source>
     <message>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
       <translation>密码长度应至少为8个符号，并包含不同类型的字符。</translation>
+    </message>
+    <message>
+      <source>Password should not be equal to camera&apos;s user name</source>
+      <translation type="unfinished">Password should not be equal to camera&apos;s user name</translation>
     </message>
   </context>
   <context>
@@ -3164,11 +3164,9 @@ to %1</source>
       <source>Ask your system administrator to do it.</source>
       <translation>要求您的系统管理员执行此操作。</translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>Set Password</source>
-      <translation>
-        <numerusform>设置密码</numerusform>
-      </translation>
+      <translation type="unfinished">Set Password</translation>
     </message>
   </context>
   <context>
@@ -7574,22 +7572,6 @@ to %1</source>
       <source>No new files to upload in selected folder</source>
       <translation>未在选定文件夹中上载新文件</translation>
     </message>
-    <message>
-      <source>%1 - has unsupported format.</source>
-      <translation>%1 - 格式不受支持。</translation>
-    </message>
-    <message>
-      <source>%1 - does not have timestamp.</source>
-      <translation>%1 -没有时间戳。</translation>
-    </message>
-    <message>
-      <source>%1 - covers period for which video has already been uploaded.</source>
-      <translation>%1 - 涵盖已上传视频的时间段。</translation>
-    </message>
-    <message>
-      <source>%1 - covers period for which video is being uploaded.</source>
-      <translation>%1 - 涵盖已上传视频的时间段。</translation>
-    </message>
     <message numerus="yes">
       <source>Selected files are too old</source>
       <translation>
@@ -7637,8 +7619,24 @@ to %1</source>
       <translation>确保服务器存储空间足够。</translation>
     </message>
     <message>
-      <source>%1 - is older than allowed in camera archive settings.</source>
-      <translation>%1 - 比相机存档设置中允许的时间早。</translation>
+      <source>%1 has unsupported format.</source>
+      <translation type="unfinished">%1 has unsupported format.</translation>
+    </message>
+    <message>
+      <source>%1 does not have timestamp.</source>
+      <translation type="unfinished">%1 does not have timestamp.</translation>
+    </message>
+    <message>
+      <source>%1 is older than allowed in camera archive settings.</source>
+      <translation type="unfinished">%1 is older than allowed in camera archive settings.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video has already been uploaded.</source>
+      <translation type="unfinished">%1 covers period for which video has already been uploaded.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video is being uploaded.</source>
+      <translation type="unfinished">%1 covers period for which video is being uploaded.</translation>
     </message>
   </context>
   <context>

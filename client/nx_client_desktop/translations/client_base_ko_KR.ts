@@ -2336,9 +2336,9 @@ to view more bookmarks</source>
       <translation>Edge</translation>
     </message>
     <message numerus="yes">
-      <source>This ID already used on camera %1</source>
+      <source>This Id is already used on the following %n cameras: %1</source>
       <translation>
-        <numerusform>이 ID는 이미 %1 카메라에 사용되어 있습니다</numerusform>
+        <numerusform>이 Id는 이미 %n 카메라에서 사용되었습니다: %1</numerusform>
       </translation>
     </message>
   </context>
@@ -2456,8 +2456,8 @@ to view more bookmarks</source>
       <translation>서버</translation>
     </message>
     <message>
-      <source>Logical ID</source>
-      <translation>논리적 ID</translation>
+      <source>Logical Id</source>
+      <translation>논리 Id</translation>
     </message>
   </context>
   <context>
@@ -2517,10 +2517,6 @@ to view more bookmarks</source>
   <context>
     <name>QnCameraPasswordChangeDialog</name>
     <message>
-      <source>Password shouldn&apos;t be equal to camera&apos;s user name</source>
-      <translation>패스워드는 카메라의 사용자 이름과 같으면 안됩니다.</translation>
-    </message>
-    <message>
       <source>New Password</source>
       <translation>신규 사용자</translation>
     </message>
@@ -2535,6 +2531,10 @@ to view more bookmarks</source>
     <message>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
       <translation>암호는 8 자 이상이어야하며 다른 유형의 문자를 포함해야합니다.</translation>
+    </message>
+    <message>
+      <source>Password should not be equal to camera&apos;s user name</source>
+      <translation>암호는 카메라의 사용자&apos;이름이 같으면 안됩니다</translation>
     </message>
   </context>
   <context>
@@ -3163,11 +3163,9 @@ to %1</source>
       <source>Ask your system administrator to do it.</source>
       <translation>시스템 관리자에게 요청하십시오.</translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>Set Password</source>
-      <translation>
-        <numerusform>비밀번호 설정</numerusform>
-      </translation>
+      <translation>암호 설정</translation>
     </message>
   </context>
   <context>
@@ -7573,22 +7571,6 @@ to %1</source>
       <source>No new files to upload in selected folder</source>
       <translation>선택한 폴더의 업로드할 신규 파일이 없습니다</translation>
     </message>
-    <message>
-      <source>%1 - has unsupported format.</source>
-      <translation>%1 -은 지원하지 않는 형식입니다.</translation>
-    </message>
-    <message>
-      <source>%1 - does not have timestamp.</source>
-      <translation>%1 - 은 타임스탬프가 없습니다.</translation>
-    </message>
-    <message>
-      <source>%1 - covers period for which video has already been uploaded.</source>
-      <translation>%1 - 커버 기간은 동영상 이미 업로드 된 기간입니다.</translation>
-    </message>
-    <message>
-      <source>%1 - covers period for which video is being uploaded.</source>
-      <translation>%1 - 커버 기간은 동영상 이미 업로드 되는 기간입니다.</translation>
-    </message>
     <message numerus="yes">
       <source>Selected files are too old</source>
       <translation>
@@ -7636,8 +7618,24 @@ to %1</source>
       <translation>서버에 충분한 저장공간을 확보하세요.</translation>
     </message>
     <message>
-      <source>%1 - is older than allowed in camera archive settings.</source>
-      <translation>%1 - 은 카메라 보관 설정에서 허용 된 것보다 오래되었습니다.</translation>
+      <source>%1 has unsupported format.</source>
+      <translation type="unfinished">%1 has unsupported format.</translation>
+    </message>
+    <message>
+      <source>%1 does not have timestamp.</source>
+      <translation type="unfinished">%1 does not have timestamp.</translation>
+    </message>
+    <message>
+      <source>%1 is older than allowed in camera archive settings.</source>
+      <translation type="unfinished">%1 is older than allowed in camera archive settings.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video has already been uploaded.</source>
+      <translation type="unfinished">%1 covers period for which video has already been uploaded.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video is being uploaded.</source>
+      <translation type="unfinished">%1 covers period for which video is being uploaded.</translation>
     </message>
   </context>
   <context>

@@ -754,11 +754,6 @@
     </message>
     <message>
       <location/>
-      <source>Logical ID</source>
-      <translation>逻辑 ID</translation>
-    </message>
-    <message>
-      <location/>
       <source>Generate</source>
       <translation>生成</translation>
     </message>
@@ -769,8 +764,8 @@
     </message>
     <message>
       <location/>
-      <source>Invalid Logical Id label</source>
-      <translation>无效的逻辑 ID 标签</translation>
+      <source>Logical Id</source>
+      <translation type="unfinished">Logical Id</translation>
     </message>
   </context>
   <context>
@@ -1808,8 +1803,8 @@
     </message>
     <message>
       <location/>
-      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
-      <translation>&quot;可穿戴相机&quot; 是视频文件的虚拟存储空间，可以上传到系统中的任何服务器并由任何用户访问。</translation>
+      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
     </message>
   </context>
   <context>
