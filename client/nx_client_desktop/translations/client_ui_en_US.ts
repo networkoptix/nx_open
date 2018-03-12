@@ -754,11 +754,6 @@
     </message>
     <message>
         <location/>
-        <source>Logical ID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Generate</source>
         <translation type="unfinished"></translation>
     </message>
@@ -769,7 +764,7 @@
     </message>
     <message>
         <location/>
-        <source>Invalid Logical Id label</source>
+        <source>Logical Id</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
