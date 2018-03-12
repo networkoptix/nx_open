@@ -58,6 +58,7 @@ def customization_cache(customization_name, value=None, force=False):
 
 class Product(models.Model):
     name = models.CharField(max_length=255, unique=True)
+    can_preview = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name
