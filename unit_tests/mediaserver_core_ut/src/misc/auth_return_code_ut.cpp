@@ -150,16 +150,16 @@ public:
         int expectedStatusCode,
         boost::optional<Qn::AuthResult> expectedAuthResult)
     {
-        nx_http::HttpClient httpClient;
-        httpClient.setUserName(login);
-        httpClient.setUserPassword(password);
-        httpClient.setAuthType(authType);
-        httpClient.addAdditionalHeader(Qn::CUSTOM_CHANGE_REALM_HEADER_NAME, QByteArray());
-        testServerReturnCode(&httpClient, expectedStatusCode, expectedAuthResult);
+        auto httpClient = std::make_unique<nx_http::HttpClient>();
+        httpClient->setUserName(login);
+        httpClient->setUserPassword(password);
+        httpClient->setAuthType(authType);
+        httpClient->addAdditionalHeader(Qn::CUSTOM_CHANGE_REALM_HEADER_NAME, QByteArray());
+        testServerReturnCode(std::move(httpClient), expectedStatusCode, expectedAuthResult);
     }
 
     void testServerReturnCode(
-        nx_http::HttpClient* httpClient,
+        std::unique_ptr<nx_http::HttpClient> httpClient,
         int expectedStatusCode,
         boost::optional<Qn::AuthResult> expectedAuthResult = boost::none)
     {
@@ -192,6 +192,8 @@ public:
 
             if (expectedStatusCode == nx_http::StatusCode::unauthorized)
             {
+                httpClient.reset(); //< Ensure connection is closed.
+
                 QnTimePeriod period(0, QnTimePeriod::infiniteDuration());
                 QnAuditRecordList outputData;
                 static const std::chrono::seconds kMaxWaitTime(10);
@@ -202,6 +204,8 @@ public:
                 {
                     static_cast<QnMServerAuditManager*>(qnAuditManager)->flushRecords();
                     outputData = qnServerDb->getAuditData(period, QnUuid());
+                    if (outputData.isEmpty())
+                        std::this_thread::sleep_for(std::chrono::milliseconds(1));
                 } while (outputData.isEmpty() && timer.elapsed() < kMaxWaitTime);
                 ASSERT_TRUE(!outputData.isEmpty());
                 ASSERT_EQ(Qn::AuditRecordType::AR_UnauthorizedLogin, outputData.last().eventType);
@@ -321,17 +325,17 @@ static std::unique_ptr<nx_http::HttpClient> manualDigestClient(
 TEST_F(AuthReturnCodeTest, manualDigest)
 {
     auto client = manualDigestClient("GET", "/ec2/getUsers");
-    testServerReturnCode(client.get(), 200);
+    testServerReturnCode(std::move(client), 200);
 }
 
 TEST_F(AuthReturnCodeTest, manualDigestWrongUri)
 {
     auto client = manualDigestClient("GET", "/api/getCameras");
-    testServerReturnCode(client.get(), 401, Qn::AuthResult::Auth_WrongDigest);
+    testServerReturnCode(std::move(client), 401, Qn::AuthResult::Auth_WrongDigest);
 }
 
 TEST_F(AuthReturnCodeTest, manualDigestWrongMethod)
 {
     auto client = manualDigestClient("POST", "/api/getUsers");
-    testServerReturnCode(client.get(), 401, Qn::AuthResult::Auth_WrongDigest);
+    testServerReturnCode(std::move(client), 401, Qn::AuthResult::Auth_WrongDigest);
 }
