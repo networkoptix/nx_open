@@ -164,6 +164,12 @@ const char* Plugin::capabilitiesManifest(Error* error) const
 
 void Plugin::setDeclaredSettings(const nxpl::Setting* settings, int count)
 {
+    // Do nothing.
+}
+
+void Plugin::executeAction(Action* action, Error* outError)
+{
+    // Do nothing.
 }
 
 boost::optional<QList<QnUuid>> Plugin::fetchSupportedEvents(

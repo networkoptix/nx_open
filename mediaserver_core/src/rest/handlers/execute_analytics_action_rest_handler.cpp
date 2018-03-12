@@ -6,7 +6,7 @@
 #include <core/resource/media_server_resource.h>
 #include <media_server/media_server_module.h>
 #include <nx/mediaserver/metadata/manager_pool.h>
-#include "plugins/plugin_internal_tools.h"
+#include <nx/mediaserver_plugins/utils/uuid.h>
 
 int QnExecuteAnalyticsActionRestHandler::executePost(
     const QString& /*path*/,
@@ -96,7 +96,8 @@ public:
         NX_ASSERT(m_actionResult);
 
         m_actionId = actionData.actionId.toStdString();
-        m_objectId = nxpt::fromQnUuidToPluginGuid(actionData.objectId);
+        m_objectId = nx::mediaserver_plugins::utils::fromQnUuidToPluginGuid(
+            actionData.objectId);
 
         // Avoiding reallocation of this vector is essential since we need to store pointers to its
         // internals as "char*" to pass through an SDK interface.

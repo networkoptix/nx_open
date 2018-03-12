@@ -156,7 +156,7 @@ boost::optional<Event> BytestreamFilter::createEvent(
 /*static*/ bool BytestreamFilter::isEventActive(const QString& eventSourceState)
 {
     bool isActive = (eventSourceState == kActive);
-    NX_VERBOSE(this, lm("eventSourceState = '%1' -> %2").args(eventSourceState, isActive));
+    NX_VERBOSE(typeid(BytestreamFilter), lm("eventSourceState = '%1' -> %2").args(eventSourceState, isActive));
     return isActive;
 }
 

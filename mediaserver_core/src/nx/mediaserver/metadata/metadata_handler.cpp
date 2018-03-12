@@ -4,7 +4,7 @@
 #include <nx/utils/log/log.h>
 
 #include <plugins/plugin_tools.h>
-#include <plugins/plugin_internal_tools.h>
+#include <nx/mediaserver_plugins/utils/uuid.h>
 
 #include <nx/vms/event/events/events.h>
 #include <nx/vms/event/events/events_fwd.h>
