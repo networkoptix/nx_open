@@ -1,7 +1,5 @@
 #include "workbench_wearable_handler.h"
 
-#include <QtCore/QStringBuilder>
-
 #include <QtWidgets/QAction>
 
 #include <nx/utils/string.h>
@@ -456,7 +454,7 @@ void QnWorkbenchWearableHandler::at_wearableManager_stateChanged(const WearableS
 QString QnWorkbenchWearableHandler::calculateExtendedErrorMessage(const WearablePayload& upload)
 {
     static const auto kNDash = QString::fromWCharArray(L"\x2013");
-    const QString fileName = QFileInfo(upload.path).fileName() % " " % kNDash;
+    const QString fileName = QFileInfo(upload.path).fileName() + lit(" ") + kNDash;
 
     switch (upload.status)
     {
