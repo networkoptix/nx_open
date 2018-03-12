@@ -27,6 +27,8 @@ public:
         int maxFrameCacheSize,
         int maxMetadataCacheSize);
 
+    virtual ~VisualMetadataDebugger();
+
 public:
     virtual void push(const QnConstCompressedVideoDataPtr& video) override;
     virtual void push(

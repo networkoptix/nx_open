@@ -9,7 +9,8 @@ enum class DebuggerType
 {
     managerPool,
     archiveStreamReader,
-    liveConnection
+    liveConnection,
+    nxRtpParser,
 };
 
 class VisualMetadataDebuggerFactory
