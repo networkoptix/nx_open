@@ -23,7 +23,7 @@ Item
     onResourceIdChanged:
     {
         hintControl.hide()
-        panel.forceAnimation()
+        panel.forceInitialSlideAnimation()
     }
 
     Image

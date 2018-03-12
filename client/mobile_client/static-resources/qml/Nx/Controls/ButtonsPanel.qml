@@ -19,19 +19,22 @@ ListView
 
     interactive: d.allowInteractiveState && scrollable
 
-    function forceAnimation() { delayedAnimationTimer.restart() }
+    leftMargin: emptyHeaderSize
+    rightMargin: emptyHeaderSize
+
+    function forceInitialSlideAnimation() { delayedAnimationTimer.restart() }
 
     onVisibleChanged:
     {
         if (visible && interactive)
-            forceAnimation()
+            forceInitialSlideAnimation()
     }
 
     Timer
     {
         id: delayedAnimationTimer
 
-        interval: 30
+        interval: 0
         onTriggered: showAnimation.restart()
 
     }
@@ -46,13 +49,6 @@ ListView
         properties: "contentX"
         from: -width - height + emptyHeaderSize
         to: -width + emptyHeaderSize
-    }
-
-    header: Item
-    {
-        width: emptyHeaderSize
-        height: control.height
-        visible: emptyHeaderSize > 0
     }
 
     Image
