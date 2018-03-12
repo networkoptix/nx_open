@@ -114,7 +114,7 @@ ListView
         onCanceled: handleButtonReleased()
 
         onPressedChanged:
-        {   
+        {
             if (!buttonPressed && pressedStateFilterTimer.running)
                 pressedStateFilterTimer.stop()
         }
