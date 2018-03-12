@@ -276,26 +276,5 @@
         ]
       }
     ]
-  },
-  {
-    "product": "vms",
-    "canPreview": false,
-    "contexts": [
-      {
-        "name": "Build page",
-        "file_path": "",
-        "url": "",
-        "translatable": false,
-        "values": [
-          {
-            "label": "Build",
-            "name": "%BUILD%",
-            "value": "",
-            "description": "A page for a build",
-            "type": "text"
-          }
-        ]
-      }
-    ]
   }
 ]
