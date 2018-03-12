@@ -53,7 +53,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Delete bookmark</source>
-      <translation>ลบบุ๊คมาร์ค</translation>
+      <translation>ลบ​บุ๊ค​มา​ร์ค</translation>
     </message>
     <message>
       <source>Export bookmark</source>
@@ -182,7 +182,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>New Video Wall...</source>
-      <translation>สร้างจอแสดงผลใหม่...</translation>
+      <translation>Video Wall ใหม่....</translation>
     </message>
     <message>
       <source>Web Page...</source>
@@ -295,7 +295,7 @@ to view more bookmarks</source>
     <message>
       <source>Log in to %1...</source>
       <comment>Log in to Nx Cloud</comment>
-      <translation>เข้าสู่ระบบ %1...</translation>
+      <translation>เข้าสู่ระบบ %1</translation>
     </message>
     <message>
       <source>Log out from %1</source>
@@ -485,7 +485,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Manage...</source>
-      <translation>การจัดการ...</translation>
+      <translation>จัดการ...</translation>
     </message>
     <message>
       <source>Show Motion/Smart Search</source>
@@ -848,6 +848,22 @@ to view more bookmarks</source>
       <translation>ทำ Showreel</translation>
     </message>
     <message>
+      <source>Wearable Camera...</source>
+      <translation type="unfinished">Wearable Camera...</translation>
+    </message>
+    <message>
+      <source>New Wearable Camera...</source>
+      <translation type="unfinished">New Wearable Camera...</translation>
+    </message>
+    <message>
+      <source>Upload File...</source>
+      <translation type="unfinished">Upload File...</translation>
+    </message>
+    <message>
+      <source>Upload Folder...</source>
+      <translation type="unfinished">Upload Folder...</translation>
+    </message>
+    <message>
       <source>Start Analytics...</source>
       <translation>เริ่มต้นวิเคราะห์</translation>
     </message>
@@ -874,22 +890,6 @@ to view more bookmarks</source>
     <message>
       <source>Cell Spacing...</source>
       <translation>ระยะห่างระหว่างเซลล์</translation>
-    </message>
-    <message>
-      <source>Wearable Camera...</source>
-      <translation type="unfinished">Wearable Camera...</translation>
-    </message>
-    <message>
-      <source>New Wearable Camera...</source>
-      <translation type="unfinished">New Wearable Camera...</translation>
-    </message>
-    <message>
-      <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
-    </message>
-    <message>
-      <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
     </message>
   </context>
   <context>
@@ -947,7 +947,7 @@ to view more bookmarks</source>
     <name>Deactivator</name>
     <message>
       <source>Unknown error.</source>
-      <translation>ข้อผิดพลาดที่ไม่รู้จัก.</translation>
+      <translation>ข้อผิดพลาดที่ไม่รู้จัก</translation>
     </message>
     <message>
       <source>License does not exist.</source>
@@ -1001,12 +1001,12 @@ to view more bookmarks</source>
       <translation>คุณกำลังจะส่งออกวิดีโอยาว อาจต้องใช้พื้นที่ฮาร์ดดิสก์เป็นจำนวนมากและใช้เวลาหลายนาทีในการดำเนินการ</translation>
     </message>
     <message>
-      <source>Local files, server monitor widgets and webpages will not be exported.</source>
-      <translation>แฟ้มภายในเครื่อง เครื่องมือตรวจสอบเซิร์ฟเวอร์ และเว็บเพจจะไม่ถูกส่งออก</translation>
-    </message>
-    <message>
       <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
       <translation>ไฟล์. EXE ที่เอ็กซ์พอร์ตจะมีขนาดมากกว่า 4 GB และไม่สามารถเปิดได้ด้วยการดับเบิลคลิกใน Windows สามารถเล่นได้เฉพาะใน %1 Client</translation>
+    </message>
+    <message>
+      <source>Local files, server monitor widgets and webpages will not be exported.</source>
+      <translation>แฟ้มภายในเครื่อง เครื่องมือตรวจสอบเซิร์ฟเวอร์ และเว็บเพจจะไม่ถูกส่งออก</translation>
     </message>
     <message>
       <source>Settings are not available for .NOV and .EXE files.</source>
@@ -1021,7 +1021,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Matroska</source>
-      <translation type="unfinished">Matroska</translation>
+      <translation>Matroska</translation>
     </message>
     <message>
       <source>MPEG-4 Part 14</source>
@@ -1052,7 +1052,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Top</source>
-      <translation>ด้านบน</translation>
+      <translation>ข้างบน</translation>
     </message>
     <message>
       <source>Right Edge</source>
@@ -1148,7 +1148,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Password should contain different types of symbols.</source>
-      <translation>รหัสผ่านควรมีสัญลักษณ์ประเภทต่างๆกัน.</translation>
+      <translation>รหัสผ่านควรมีสัญลักษณ์ประเภทต่างๆกัน</translation>
     </message>
     <message>
       <source>Short</source>
@@ -1168,15 +1168,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
-      <translation>อนุญาตเฉพาะตัวอักษรละตินตัวเลขและสัญลักษณ์บนแป้นพิมพ์เท่านั้น.</translation>
-    </message>
-    <message>
-      <source>Long</source>
-      <translation>ยาว</translation>
-    </message>
-    <message>
-      <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
-      <translation>อนุญาตเฉพาะตัวอักษรละตินตัวเลขและสัญลักษณ์แป้นพิมพ์ %1 เท่านั้น</translation>
+      <translation>อนุญาตเฉพาะตัวอักษรละตินตัวเลขและสัญลักษณ์บนแป้นพิมพ์เท่านั้น</translation>
     </message>
     <message numerus="yes">
       <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
@@ -1189,6 +1181,10 @@ to view more bookmarks</source>
       <translation>
         <numerusform>รหัสผ่านต้องมีความยาวอย่างน้อย %n อักขระ</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Long</source>
+      <translation>ยาว</translation>
     </message>
     <message numerus="yes">
       <source>Password must be no longer than %n characters.</source>
@@ -1207,6 +1203,10 @@ to view more bookmarks</source>
       <translation>
         <numerusform>รหัสผ่านไม่ควรประกอบด้วย %n อักขระขึ้นไป</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
+      <translation>อนุญาตเฉพาะตัวอักษรละตินตัวเลขและสัญลักษณ์แป้นพิมพ์ %1 เท่านั้น</translation>
     </message>
   </context>
   <context>
@@ -1347,7 +1347,7 @@ to view more bookmarks</source>
     <name>QnAbstractPtzDialog</name>
     <message>
       <source>Loading...</source>
-      <translation>กำลังโหลด...</translation>
+      <translation>กำลังโหลด ...</translation>
     </message>
     <message>
       <source>Saving...</source>
@@ -1430,7 +1430,7 @@ to view more bookmarks</source>
     <name>QnAuditLogDialog</name>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation>คัดลอกเลือกไปที่คลิปบอร์ด</translation>
+      <translation>คัดลอกส่วนที่เลือกไปยังคลิปบอร์ด</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
@@ -1446,7 +1446,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Devices</source>
-      <translation>อุุปกรณ์</translation>
+      <translation>อุปกรณ์</translation>
     </message>
     <message>
       <source>Cameras</source>
@@ -1527,7 +1527,7 @@ to view more bookmarks</source>
     <name>QnAuditLogModel</name>
     <message>
       <source>Unknown</source>
-      <translation>ม่รู้จัก</translation>
+      <translation>ไม่ทราบ</translation>
     </message>
     <message>
       <source>Unsuccessful login</source>
@@ -1535,7 +1535,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>เข้าสู่ระบบ</translation>
+      <translation>ชื่อผู้ใช้</translation>
     </message>
     <message>
       <source>User updated</source>
@@ -1543,11 +1543,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Watching live</source>
-      <translation>ดู ภาพสด</translation>
+      <translation>ดูถ่ายทอดสด</translation>
     </message>
     <message>
       <source>Watching archive</source>
-      <translation>ดูที่เก็บ</translation>
+      <translation>ดูที่ เก็บไว้</translation>
     </message>
     <message>
       <source>Exporting video</source>
@@ -1633,7 +1633,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Description</source>
-      <translation>&amp;รายละเอียด</translation>
+      <translation>รายละเอียด</translation>
     </message>
     <message>
       <source>Click to expand</source>
@@ -1858,7 +1858,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Instant</source>
-      <translation>เร่งด่วน</translation>
+      <translation>ทางด่วน</translation>
     </message>
     <message>
       <source>Stops</source>
@@ -1937,7 +1937,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Devices</source>
-      <translation>อุุปกรณ์</translation>
+      <translation>อุปกรณ์</translation>
     </message>
     <message>
       <source>Cameras</source>
@@ -2019,11 +2019,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Source</source>
-      <translation>ทรัพยากร</translation>
+      <translation>ต้นทาง</translation>
     </message>
     <message>
       <source>Action</source>
-      <translation>การกระทำ</translation>
+      <translation>กระทำ</translation>
     </message>
     <message>
       <source>Target</source>
@@ -2230,7 +2230,7 @@ to view more bookmarks</source>
     <name>QnCameraAnalyticsPolicy</name>
     <message>
       <source>Analytics is not available for %1</source>
-      <translation type="unfinished">Analytics is not available for %1</translation>
+      <translation>ไม่มีการวิเคราะห์สำหรับ %1</translation>
     </message>
   </context>
   <context>
@@ -2335,6 +2335,12 @@ to view more bookmarks</source>
       <source>Edge</source>
       <translation>ขอบ</translation>
     </message>
+    <message numerus="yes">
+      <source>This Id is already used on the following %n cameras: %1</source>
+      <translation type="unfinished">
+        <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnCameraInputBusinessEventWidget</name>
@@ -2356,11 +2362,11 @@ to view more bookmarks</source>
     <name>QnCameraListDialog</name>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation>คัดลอกเลือกไปที่คลิปบอร์ด</translation>
+      <translation>คัดลอกคลิปบอร์ดที่เลือก</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation>เลือกส่งออกไปยังแฟ้ม...</translation>
+      <translation>เลือกไฟล์ที่จะนำออก...</translation>
     </message>
     <message>
       <source>Select All</source>
@@ -2419,7 +2425,7 @@ to view more bookmarks</source>
     <name>QnCameraListModel</name>
     <message>
       <source>Recording</source>
-      <translation>การบันทึก</translation>
+      <translation>กำลังบันทึก</translation>
     </message>
     <message>
       <source>Name</source>
@@ -2427,7 +2433,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Vendor</source>
-      <translation>ผู้ติดต่อ:</translation>
+      <translation>ผู้ขาย</translation>
     </message>
     <message>
       <source>Model</source>
@@ -2447,7 +2453,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Server</source>
-      <translation>เซิร์ฟเวอร์</translation>
+      <translation>เซอร์ฟเวอร์</translation>
+    </message>
+    <message>
+      <source>Logical Id</source>
+      <translation type="unfinished">Logical Id</translation>
     </message>
   </context>
   <context>
@@ -2485,7 +2495,7 @@ to view more bookmarks</source>
     <name>QnCameraMotionPolicy</name>
     <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation type="unfinished">Recording or motion detection is disabled for %1</translation>
+      <translation>การตรวจสอบการบันทึกหรือการเคลื่อนไหวที่ถูกปิดใช้งานสำหรับ %1</translation>
     </message>
   </context>
   <context>
@@ -2507,10 +2517,6 @@ to view more bookmarks</source>
   <context>
     <name>QnCameraPasswordChangeDialog</name>
     <message>
-      <source>Password shouldn&apos;t be equal to camera&apos;s user name</source>
-      <translation>รหัสผ่าน shouldn&apos;t เท่ากับชื่อผู้ใช้ camera&apos;s</translation>
-    </message>
-    <message>
       <source>New Password</source>
       <translation>สร้างรหัสผ่านใหม่</translation>
     </message>
@@ -2526,12 +2532,16 @@ to view more bookmarks</source>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
       <translation>รหัสผ่านควรมีสัญลักษณ์น้อย 8 ยาว และประกอบด้วยอักขระที่แตกต่างกันไป</translation>
     </message>
+    <message>
+      <source>Password should not be equal to camera&apos;s user name</source>
+      <translation type="unfinished">Password should not be equal to camera&apos;s user name</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraRecordingPolicy</name>
     <message>
       <source>Recording is disabled for %1</source>
-      <translation type="unfinished">Recording is disabled for %1</translation>
+      <translation>การบันทึกถูกปิดไว้ สำหรับ %1</translation>
     </message>
   </context>
   <context>
@@ -2800,8 +2810,8 @@ to %1</source>
       <translation>อีเมลหรือรหัสผ่านไม่ถูกต้อง</translation>
     </message>
     <message>
-      <source>Account isn&apos;t activated. Please check your email and follow provided instructions</source>
-      <translation>บัญชี isn&apos; เปิดใช้งานแล้ว โปรดตรวจสอบอีเมลของคุณและทำตามคำแนะนำที่ระบุไว้</translation>
+      <source>Account is not activated. Please check your email and follow provided instructions</source>
+      <translation type="unfinished">Account is not activated. Please check your email and follow provided instructions</translation>
     </message>
   </context>
   <context>
@@ -3050,7 +3060,7 @@ to %1</source>
     </message>
     <message>
       <source>Connect</source>
-      <translation>เชื่อมต่อ</translation>
+      <translation>การเชื่อมต่อ</translation>
     </message>
   </context>
   <context>
@@ -3149,22 +3159,20 @@ to %1</source>
       <source>Some of selected cameras requires password to be set up.</source>
       <translation>บางกล้องที่เลือกจะต้องใช้รหัสผ่านเพื่อตั้งค่า</translation>
     </message>
-    <message numerus="yes">
-      <source>Set Password</source>
-      <translation>
-        <numerusform>ตั้งรหัสผ่าน</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Ask your system administrator to do it.</source>
       <translation>ขอให้ผู้ดูแลระบบของคุณทำเช่นนั้น</translation>
+    </message>
+    <message>
+      <source>Set Password</source>
+      <translation type="unfinished">Set Password</translation>
     </message>
   </context>
   <context>
     <name>QnDesktopAudioOnlyDataProvider</name>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>ไม่สามารถเริ่มต้น เข้ารหัส เสียง.</translation>
+      <translation>ไม่สามารถเริ่มต้น encoder เสียง.</translation>
     </message>
     <message>
       <source>Sample format of input device %1 is not supported.</source>
@@ -3187,11 +3195,11 @@ to %1</source>
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
-      <translation>ไม่สามารถเริ่มต้น เข้ารหัส วีดีโอ.</translation>
+      <translation>ไม่สามารถเริ่มต้นการเข้ารหัสวิดีโอ.</translation>
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>ไม่สามารถเริ่มต้น เข้ารหัส เสียง.</translation>
+      <translation>ไม่สามารถเริ่มต้น encoder เสียง.</translation>
     </message>
     <message>
       <source>Could not start primary audio device.</source>
@@ -3230,7 +3238,7 @@ to %1</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>เข้าสู่ระบบ</translation>
+      <translation>ชื่อผู้ใช้</translation>
     </message>
     <message>
       <source>Password</source>
@@ -3268,7 +3276,7 @@ to %1</source>
     <message>
       <source>Disconnect System from %1?</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>ยกเลิกการเชื่อมต่อระบบจาก %1?</translation>
+      <translation>ยกเลิกการเชื่อมต่อระบบจาก %1</translation>
     </message>
     <message>
       <source>You will be disconnected from this System and able to login again through local network with local account</source>
@@ -3300,7 +3308,7 @@ to %1</source>
     </message>
     <message>
       <source>Clear Filter</source>
-      <translation>ล้าง ตัวกรอง</translation>
+      <translation>ล้าง Filter</translation>
     </message>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n event(s) found</source>
@@ -3355,7 +3363,7 @@ to %1</source>
     </message>
     <message>
       <source>Description</source>
-      <translation>&amp;รายละเอียด</translation>
+      <translation>รายละเอียด</translation>
     </message>
     <message>
       <source>All users</source>
@@ -3445,7 +3453,7 @@ to %1</source>
     <message>
       <source>Never</source>
       <comment>Failover priority</comment>
-      <translation>ตลอด</translation>
+      <translation>ไม่ต้อง</translation>
     </message>
     <message>
       <source>Low</source>
@@ -3512,7 +3520,7 @@ to %1</source>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Select folder...</source>
-      <translation>เลือกโฟลเดอร์...</translation>
+      <translation>เลือกโฟลเดอร์ ...</translation>
     </message>
     <message>
       <source>Folder already added</source>
@@ -3600,7 +3608,7 @@ to %1</source>
     <name>QnIOPortsViewModel</name>
     <message>
       <source>Type</source>
-      <translation>ประเภท</translation>
+      <translation>ชนิด</translation>
     </message>
     <message>
       <source>Default state</source>
@@ -3613,7 +3621,7 @@ to %1</source>
     <message>
       <source>Unknown</source>
       <comment>IO Port Type</comment>
-      <translation>ม่รู้จัก</translation>
+      <translation>ไม่ทราบ</translation>
     </message>
     <message>
       <source>Disabled</source>
@@ -3774,11 +3782,11 @@ to %1</source>
     <name>QnLdapUserListModel</name>
     <message>
       <source>Login</source>
-      <translation>เข้าสู่ระบบ</translation>
+      <translation>ชื่อผู้ใช้</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation>อีเมลล์</translation>
+      <translation>อีเมล</translation>
     </message>
     <message>
       <source>DN</source>
@@ -3844,7 +3852,7 @@ to %1</source>
     </message>
     <message>
       <source>License Key</source>
-      <translation>คีร์ใบอนุญาติ:</translation>
+      <translation>กุญแจรหัส</translation>
     </message>
     <message>
       <source>Features:</source>
@@ -3859,11 +3867,11 @@ to %1</source>
     <name>QnLicenseListModel</name>
     <message>
       <source>Type</source>
-      <translation>ประเภท</translation>
+      <translation>ชนิด</translation>
     </message>
     <message>
       <source>License Key</source>
-      <translation>คีร์ใบอนุญาติ:</translation>
+      <translation>กุญแจรหัส</translation>
     </message>
     <message>
       <source>Status</source>
@@ -3871,7 +3879,7 @@ to %1</source>
     </message>
     <message>
       <source>Server</source>
-      <translation>เซิร์ฟเวอร์</translation>
+      <translation>เซร์อฟเวอร์</translation>
     </message>
     <message>
       <source>Never</source>
@@ -4078,7 +4086,7 @@ to %1</source>
     </message>
     <message>
       <source>Remove</source>
-      <translation>เอาออก</translation>
+      <translation>ลบออก</translation>
     </message>
     <message>
       <source>Deactivate</source>
@@ -4102,7 +4110,7 @@ to %1</source>
     </message>
     <message>
       <source>Invalid License Key</source>
-      <translation>คีย์สัญญาอนุญาตไม่ถูกต้อง</translation>
+      <translation>ใบอนุญาตไม่ถูกต้อง</translation>
     </message>
     <message>
       <source>Please contact Customer Support to obtain a valid License Key.</source>
@@ -4203,7 +4211,7 @@ to %1</source>
     </message>
     <message>
       <source>Look and Feel</source>
-      <translation>รูปลักษณ์ และ การใช้งาน</translation>
+      <translation>รูปลักษณะและความรู้สึก</translation>
     </message>
     <message>
       <source>Screen Recording</source>
@@ -4315,7 +4323,7 @@ to %1</source>
     <message>
       <source>Welcome to %1!</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>ยินดีต้อนรับสู่ %1!</translation>
+      <translation>ยินดีต้อนรับสู่ %1</translation>
     </message>
   </context>
   <context>
@@ -4397,7 +4405,7 @@ to %1</source>
     </message>
     <message>
       <source>LIVE</source>
-      <translation>สด</translation>
+      <translation>ภาพสด</translation>
     </message>
     <message>
       <source>%1 (Tour &quot;%2&quot; is active)</source>
@@ -4409,7 +4417,7 @@ to %1</source>
     </message>
     <message>
       <source>I/O Module</source>
-      <translation>I/O โมดูล</translation>
+      <translation>โมดูล I/O</translation>
     </message>
     <message>
       <source>Lo-Res</source>
@@ -4706,16 +4714,16 @@ to %1</source>
   <context>
     <name>QnPerformanceTest</name>
     <message>
-      <source>For full - featured mode, please use another computer</source>
-      <translation>สำหรับโหมดเต็มรูปแบบโปรดใช้คอมพิวเตอร์เครื่องอื่น</translation>
-    </message>
-    <message>
       <source>%1 can work in configuration mode only</source>
       <translation>%1 สามารถทำงานได้เฉพาะในโหมดกำหนดค่าเท่านั้น</translation>
     </message>
     <message>
       <source>Performance of this computer allows running %1 in configuration mode only.</source>
       <translation>ประสิทธิภาพของคอมพิวเตอร์เครื่องนี้ช่วยให้สามารถใช้งานโหมดการตั้งค่าได้ %1 เท่านั้น</translation>
+    </message>
+    <message>
+      <source>For full-featured mode please use another computer</source>
+      <translation type="unfinished">For full-featured mode please use another computer</translation>
     </message>
   </context>
   <context>
@@ -4802,7 +4810,7 @@ to %1</source>
     </message>
     <message>
       <source>Home</source>
-      <translation>หน้าหลัก</translation>
+      <translation>โฮม</translation>
     </message>
     <message>
       <source>Details</source>
@@ -4917,7 +4925,7 @@ to %1</source>
     </message>
     <message>
       <source>Instant</source>
-      <translation>เร่งด่วน</translation>
+      <translation>แทน</translation>
     </message>
     <message>
       <source>Position</source>
@@ -4970,22 +4978,6 @@ to %1</source>
       <source>Quarter Native</source>
       <translation>พื้นเมืองไตรมาส</translation>
     </message>
-    <message>
-      <source>1920x1080</source>
-      <translation>1920x1080</translation>
-    </message>
-    <message>
-      <source>1280x720</source>
-      <translation>1280x720</translation>
-    </message>
-    <message>
-      <source>640x480</source>
-      <translation>640x480</translation>
-    </message>
-    <message>
-      <source>320x240</source>
-      <translation>320x240</translation>
-    </message>
   </context>
   <context>
     <name>QnRecordingStatsModel</name>
@@ -5031,7 +5023,7 @@ to %1</source>
     </message>
     <message>
       <source>Device</source>
-      <translation>อุุปกรณ์</translation>
+      <translation>อุปกรณ์</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -6053,11 +6045,15 @@ to %1</source>
     </message>
     <message>
       <source>Activate License</source>
-      <translation>เปิดใช้งานใบอนุญาต</translation>
+      <translation>ใบอนุญาติใช้งาน</translation>
     </message>
     <message>
       <source>Please check authentication information</source>
       <translation>โปรดตรวจสอบข้อมูลการตรวจสอบสิทธิ์</translation>
+    </message>
+    <message>
+      <source>NO LIVE STREAM</source>
+      <translation type="unfinished">NO LIVE STREAM</translation>
     </message>
     <message>
       <source>TOO MANY CONNECTIONS</source>
@@ -6072,8 +6068,8 @@ to %1</source>
       <translation>ตั้งค่าสำหรับกล้องนี้</translation>
     </message>
     <message>
-      <source>NO LIVE STREAM</source>
-      <translation type="unfinished">NO LIVE STREAM</translation>
+      <source>UNSUPPORTED FIRMWARE VERSION</source>
+      <translation type="unfinished">UNSUPPORTED FIRMWARE VERSION</translation>
     </message>
   </context>
   <context>
@@ -6084,7 +6080,7 @@ to %1</source>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation>เลือกส่งออกไปยังแฟ้ม...</translation>
+      <translation>เลือกไฟล์ที่จะนำออก...</translation>
     </message>
     <message>
       <source>Copy Selection to Clipboard</source>
@@ -6108,7 +6104,7 @@ to %1</source>
     <message>
       <source>TB</source>
       <comment>TB - terabytes</comment>
-      <translation>TB</translation>
+      <translation>เทราไบต์</translation>
     </message>
   </context>
   <context>
@@ -6234,7 +6230,7 @@ to %1</source>
     </message>
     <message>
       <source>Remove</source>
-      <translation>เอาออก</translation>
+      <translation>ลบออก</translation>
     </message>
     <message>
       <source>Inaccessible</source>
@@ -6456,7 +6452,7 @@ to %1</source>
     </message>
     <message>
       <source>Some users have not set their email addresses.</source>
-      <translation>ผู้ใช้บางคนไม่ได้ตั้งค่าอยู่อีเมล.</translation>
+      <translation>ผู้ใช้บางคนไม่ได้ตั้งค่าอยู่อีเมล</translation>
     </message>
     <message>
       <source>They cannot receive System notifications by email.</source>
@@ -6492,7 +6488,7 @@ to %1</source>
     </message>
     <message>
       <source>Remote archive synchronization</source>
-      <translation>การซิงโครไนซ์ที่เก็บข้อมูลระยะไกล</translation>
+      <translation>Remote archive synchronization</translation>
     </message>
     <message>
       <source>Archive integrity problem detected</source>
@@ -6609,12 +6605,12 @@ to %1</source>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation>dd MMMM yyyy hh:mm</translation>
+      <translation>dd MMMM yyyy hh: mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation>dd MMMM yyyy hh:mm</translation>
+      <translation>dd MMMM yyyy hh: mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h ap</source>
@@ -6629,7 +6625,7 @@ to %1</source>
     <message>
       <source>MMMM yyyy</source>
       <comment>Format for displaying month caption in timeline&apos;s header.</comment>
-      <translation>MMMM yyyy</translation>
+      <translation>MMMM d, yyyy</translation>
     </message>
     <message>
       <source>yyyy</source>
@@ -6639,12 +6635,12 @@ to %1</source>
     <message>
       <source>h:mm ap</source>
       <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-      <translation>hh:mm</translation>
+      <translation>h: mm ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h:mm ap</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>dd MMMM yyyy hh:mm</translation>
+      <translation>dd MMMM yyyy h: mm ap</translation>
     </message>
   </context>
   <context>
@@ -6774,7 +6770,7 @@ to %1</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>เข้าสู่ระบบ</translation>
+      <translation>ชื่อผู้ใช้</translation>
     </message>
     <message>
       <source>Role</source>
@@ -6831,7 +6827,7 @@ to %1</source>
     <name>QnUserProfileWidget</name>
     <message>
       <source>Login</source>
-      <translation>เข้าสู่ระบบ</translation>
+      <translation>ชื่อผู้ใช้</translation>
     </message>
     <message>
       <source>Name</source>
@@ -6977,7 +6973,7 @@ to %1</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>เข้าสู่ระบบ</translation>
+      <translation>ชื่อผู้ใช้</translation>
     </message>
     <message>
       <source>Login cannot be empty.</source>
@@ -7093,12 +7089,6 @@ to %1</source>
       <source>Uploading %1... %2	%p%</source>
       <translation type="unfinished">Uploading %1... %2	%p%</translation>
     </message>
-    <message numerus="yes">
-      <source>(%n more file(s) in queue)</source>
-      <translation type="unfinished">
-        <numerusform>(%n more file(s) in queue)</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Stop uploading?</source>
       <translation type="unfinished">Stop uploading?</translation>
@@ -7110,6 +7100,10 @@ to %1</source>
     <message>
       <source>Finalizing %1... %2	%p%</source>
       <translation type="unfinished">Finalizing %1... %2	%p%</translation>
+    </message>
+    <message>
+      <source>(%1 of %2)</source>
+      <translation type="unfinished">(%1 of %2)</translation>
     </message>
   </context>
   <context>
@@ -7164,7 +7158,7 @@ to %1</source>
     <name>QnWorkbenchBookmarksHandler</name>
     <message>
       <source>Bookmark</source>
-      <translation>บุ๊คมาร์ก</translation>
+      <translation>บุ๊คมาร์ค</translation>
     </message>
     <message>
       <source>Bookmarks can only be added to an online server.</source>
@@ -7184,7 +7178,7 @@ to %1</source>
     </message>
     <message>
       <source>Delete bookmark?</source>
-      <translation>ลบ​บุ๊ค​มา​ร์ค?</translation>
+      <translation>ลบบุ๊คมาร์ค?</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n bookmarks?</source>
@@ -7413,7 +7407,7 @@ to %1</source>
     <name>QnWorkbenchVideoWallHandler</name>
     <message>
       <source>Video Wall</source>
-      <translation>วีดีโอ กำแพง</translation>
+      <translation>จอแสดงผล</translation>
     </message>
     <message>
       <source>Video Wall %1</source>
@@ -7451,7 +7445,7 @@ to %1</source>
     </message>
     <message>
       <source>Stop Video Wall?</source>
-      <translation>หยุด Video Wall?</translation>
+      <translation>หยุดกำแพงวิดีโอหรือไม่?</translation>
     </message>
     <message>
       <source>To start it again, you should have physical access to its computer.</source>
@@ -7499,10 +7493,6 @@ to %1</source>
   <context>
     <name>QnWorkbenchWearableHandler</name>
     <message>
-      <source>Could not add wearable camera to server &quot;%1&quot;.</source>
-      <translation type="unfinished">Could not add wearable camera to server &quot;%1&quot;.</translation>
-    </message>
-    <message>
       <source>All files (*.*)</source>
       <translation>ทุกไฟล์ (*.*)</translation>
     </message>
@@ -7515,74 +7505,8 @@ to %1</source>
       <translation type="unfinished">Open Wearable Camera Recordings...</translation>
     </message>
     <message>
-      <source>No video files found in &quot;%1&quot;</source>
-      <translation type="unfinished">No video files found in &quot;%1&quot;</translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected file format(s) are not supported</source>
-      <translation type="unfinished">
-        <numerusform>Selected file format(s) are not supported</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Only video files are supported.</source>
-      <translation type="unfinished">Only video files are supported.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected file(s) do not have timestamp(s)</source>
-      <translation type="unfinished">
-        <numerusform>Selected file(s) do not have timestamp(s)</numerusform>
-      </translation>
-    </message>
-    <message>
       <source>Only video files with correct timestamp are supported.</source>
       <translation type="unfinished">Only video files with correct timestamp are supported.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected file(s) cover periods for which videos are already being uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Selected file(s) cover periods for which videos are already being uploaded</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>You can upload these file(s) to a different instance of a Wearable Camera.</source>
-      <translation type="unfinished">
-        <numerusform>You can upload these file(s) to a different instance of a Wearable Camera.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected file(s) cover periods for which videos have already been uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Selected file(s) cover periods for which videos have already been uploaded</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected file(s) will not be uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Selected file(s) will not be uploaded</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Some file(s) will not be uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Some file(s) will not be uploaded</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>There is no new files to upload in &quot;%1&quot;</source>
-      <translation type="unfinished">There is no new files to upload in &quot;%1&quot;</translation>
-    </message>
-    <message>
-      <source>Not enough space on server storage</source>
-      <translation type="unfinished">Not enough space on server storage</translation>
-    </message>
-    <message numerus="yes">
-      <source>File(s) size - %1
-Free space - %2</source>
-      <translation type="unfinished">
-        <numerusform>File(s) size - %1
-Free space - %2</numerusform>
-      </translation>
     </message>
     <message>
       <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
@@ -7593,24 +7517,124 @@ Free space - %2</numerusform>
       <translation type="unfinished">Could not start upload as another user is currently uploading footage to this camera.</translation>
     </message>
     <message>
-      <source>File format of &quot;%1&quot; is not supported.</source>
-      <translation type="unfinished">File format of &quot;%1&quot; is not supported.</translation>
+      <source>Failed to add wearable camera</source>
+      <translation type="unfinished">Failed to add wearable camera</translation>
     </message>
     <message>
-      <source>File &quot;%1&quot; does not have timestamp.</source>
-      <translation type="unfinished">File &quot;%1&quot; does not have timestamp.</translation>
+      <source>No video files found in selected folder</source>
+      <translation type="unfinished">No video files found in selected folder</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file formats are not supported</source>
+      <translation type="unfinished">
+        <numerusform>Selected file formats are not supported</numerusform>
+      </translation>
     </message>
     <message>
-      <source>File &quot;%1&quot; cover periods for which video is already being uploaded.</source>
-      <translation type="unfinished">File &quot;%1&quot; cover periods for which video is already being uploaded.</translation>
+      <source>Use .MKV, .AVI, .MP4 or other video files.</source>
+      <translation type="unfinished">Use .MKV, .AVI, .MP4 or other video files.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files do not have timestamps</source>
+      <translation type="unfinished">
+        <numerusform>Selected files do not have timestamps</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files cover periods for which videos are already being uploaded</source>
+      <translation type="unfinished">
+        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>You can upload these files to a different instance of a Wearable Camera.</source>
+      <translation type="unfinished">
+        <numerusform>You can upload these files to a different instance of a Wearable Camera.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files cover periods for which videos have already been uploaded</source>
+      <translation type="unfinished">
+        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+      </translation>
     </message>
     <message>
-      <source>File &quot;%1&quot; cover periods for which video has already been uploaded.</source>
-      <translation type="unfinished">File &quot;%1&quot; cover periods for which video has already been uploaded.</translation>
+      <source>Selected files will not be uploaded</source>
+      <translation type="unfinished">Selected files will not be uploaded</translation>
     </message>
     <message>
-      <source>There is no space on server for file &quot;%1&quot;.</source>
-      <translation type="unfinished">There is no space on server for file &quot;%1&quot;.</translation>
+      <source>Some files will not be uploaded</source>
+      <translation type="unfinished">Some files will not be uploaded</translation>
+    </message>
+    <message>
+      <source>No new files to upload in selected folder</source>
+      <translation type="unfinished">No new files to upload in selected folder</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files are too old</source>
+      <translation type="unfinished">
+        <numerusform>Selected files are too old</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation type="unfinished">
+        <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation type="unfinished">
+        <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Some footage may be deleted after uploading these files</source>
+      <translation type="unfinished">
+        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
+      <translation type="unfinished">
+        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
+      <translation type="unfinished">To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</translation>
+    </message>
+    <message>
+      <source>Upload anyway?</source>
+      <translation type="unfinished">Upload anyway?</translation>
+    </message>
+    <message>
+      <source>Could not finish upload to %1</source>
+      <translation type="unfinished">Could not finish upload to %1</translation>
+    </message>
+    <message>
+      <source>Make sure there is enough space on server storage.</source>
+      <translation type="unfinished">Make sure there is enough space on server storage.</translation>
+    </message>
+    <message>
+      <source>%1 has unsupported format.</source>
+      <translation type="unfinished">%1 has unsupported format.</translation>
+    </message>
+    <message>
+      <source>%1 does not have timestamp.</source>
+      <translation type="unfinished">%1 does not have timestamp.</translation>
+    </message>
+    <message>
+      <source>%1 is older than allowed in camera archive settings.</source>
+      <translation type="unfinished">%1 is older than allowed in camera archive settings.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video has already been uploaded.</source>
+      <translation type="unfinished">%1 covers period for which video has already been uploaded.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video is being uploaded.</source>
+      <translation type="unfinished">%1 covers period for which video is being uploaded.</translation>
     </message>
   </context>
   <context>
@@ -7640,7 +7664,7 @@ Free space - %2</numerusform>
     </message>
     <message>
       <source>There is another layout with the same name.</source>
-      <translation>มีรูปแบบอื่นที่มีชื่อเดียวกัน.</translation>
+      <translation>มีรูปแบบอื่นที่มีชื่อเดียวกัน</translation>
     </message>
     <message numerus="yes">
       <source>User will still have access to %n removed resources:</source>
@@ -7865,12 +7889,12 @@ Free space - %2</numerusform>
       <translation>ข้อผิดพลาดในการเขียนไฟล์</translation>
     </message>
     <message>
-      <source>Internal error</source>
-      <translation>ข้อผิดพลาดภายใน</translation>
-    </message>
-    <message>
       <source>No data exported.</source>
       <translation>ไม่มีข้อมูลที่ส่งออก</translation>
+    </message>
+    <message>
+      <source>Internal error</source>
+      <translation>ข้อผิดพลาดภายใน</translation>
     </message>
   </context>
   <context>
@@ -7960,7 +7984,7 @@ Free space - %2</numerusform>
     </message>
     <message>
       <source>Select folder...</source>
-      <translation>เลือกโฟลเดอร์...</translation>
+      <translation>เลือกโฟลเดอร์ ...</translation>
     </message>
   </context>
   <context>
@@ -8253,13 +8277,6 @@ Free space - %2</numerusform>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::ui::LayoutPreviewPainter</name>
-    <message>
-      <source>NO DATA</source>
-      <translation>ไม่มมีข้อมูล</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::client::desktop::ui::LayoutTourDropPlaceholder</name>
     <message>
       <source>Drag layout or camera here to add it to the showreel</source>
@@ -8348,7 +8365,7 @@ Free space - %2</numerusform>
     </message>
     <message>
       <source>Email</source>
-      <translation>อีเมลล์</translation>
+      <translation>อีเมล</translation>
     </message>
     <message>
       <source>Reason for deactivation</source>
@@ -8516,7 +8533,7 @@ Free space - %2</numerusform>
     </message>
     <message>
       <source>Server</source>
-      <translation>เซิร์ฟเวอร์</translation>
+      <translation>เซอร์ฟเวอร์</translation>
     </message>
     <message>
       <source>Please update all components to the version %1</source>
@@ -8559,16 +8576,16 @@ Free space - %2</numerusform>
       <translation>ไม่สามารถเปิดเว็บเซิร์ฟเวอร์ได้</translation>
     </message>
     <message>
+      <source>Wearable Cameras cannot be moved between servers</source>
+      <translation type="unfinished">Wearable Cameras cannot be moved between servers</translation>
+    </message>
+    <message>
       <source>Failed to change password</source>
       <translation>ไม่สามารถเปลี่ยนรหัสผ่าน</translation>
     </message>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
       <translation>ไม่สามารถเปลี่ยนรหัสผ่านได้ที่ %1 จาก %2 กล้อง</translation>
-    </message>
-    <message>
-      <source>Wearable Cameras cannot be moved between servers</source>
-      <translation type="unfinished">Wearable Cameras cannot be moved between servers</translation>
     </message>
   </context>
   <context>
@@ -8609,7 +8626,7 @@ Free space - %2</numerusform>
     </message>
     <message>
       <source>Delete Showreel %1?</source>
-      <translation>ลบ Showreel %1 หรือไม่?</translation>
+      <translation>Delete Showreel %1?</translation>
     </message>
   </context>
   <context>

@@ -2,34 +2,31 @@
 Resource          ../resource.robot
 Resource          ../variables.robot
 Suite Teardown    Close All Browsers
+Force Tags        system
 
 *** Variables ***
 ${password}    ${BASE PASSWORD}
-${url}         ${CLOUD TEST}
+${url}         ${ENV}
 
 *** Keywords ***
 Log in to Auto Tests System
     [arguments]    ${email}
     Go To    ${url}/systems/${AUTO TESTS SYSTEM ID}
     Log In    ${email}    ${password}    None
+    Validate Log In
     Run Keyword If    '${email}' == '${EMAIL OWNER}'    Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
     Run Keyword If    '${email}' == '${EMAIL ADMIN}'    Wait Until Elements Are Visible    ${DISCONNECT FROM MY ACCOUNT}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
     Run Keyword Unless    '${email}' == '${EMAIL OWNER}' or '${email}' == '${EMAIL ADMIN}'    Wait Until Elements Are Visible    ${DISCONNECT FROM MY ACCOUNT}    ${OPEN IN NX BUTTON}
 
 *** Test Cases ***
-has system name, owner and OpenInNx button visible on systems page
+systems dropdown should allow you to go back to the systems page
     Open Browser and go to URL    ${url}
-    Log In    ${EMAIL OWNER}    ${password}
-    Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
-    Element Text Should Be    ${AUTO TESTS TITLE}    Auto Tests
-    Close Browser
-
-shows offline status and does not show open in nx button when offline
-    Open Browser and go to URL    ${url}
-    Log In    ${EMAIL OWNER}    ${password}
-    Validate Log In
-    Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTOTESTS OFFLINE}
-    Wait Until Element Is Not Visible    ${AUTOTESTS OFFLINE OPEN NX}
+    Log in to Auto Tests System    ${EMAIL OWNER}
+    Wait Until Element Is Visible    ${SYSTEMS DROPDOWN}
+    Click Link    ${SYSTEMS DROPDOWN}
+    Wait Until Element Is Visible    ${ALL SYSTEMS}
+    Click Link    ${ALL SYSTEMS}
+    Location Should Be    ${url}/systems
     Close Browser
 
 should confirm, if owner deletes system (You are going to disconnect your system from cloud)
@@ -75,33 +72,90 @@ Cancel should cancel disconnection and disconnect should remove it when not owne
     Check For Alert    ${NEW PERMISSIONS SAVED}
     Close Browser
 
-has Share button, visible for admin and owner
+has Share button and user list visible for admin and owner
     Open Browser and go to URL    ${url}
     Log in to Auto Tests System    ${EMAIL OWNER}
+    Wait Until Element Is Visible    ${USERS LIST}
     Log Out
     Log in to Auto Tests System    ${EMAIL ADMIN}
+    Wait Until Element Is Visible    ${USERS LIST}
     Close Browser
 
-does not show Share button to viewer, advanced viewer, live viewer
+does not show Share button, Rename button, or user list to viewer, advanced viewer, live viewer
 #This allows the expected error to not run the close browser action
     Open Browser and go to URL    ${url}
     Log in to Auto Tests System    ${EMAIL VIEWER}
     Register Keyword To Run On Failure    NONE
     Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
+    Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${RENAME SYSTEM}
+    Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${USERS LIST}
     Register Keyword To Run On Failure    Failure Tasks
     Element Should Not Be Visible    ${SHARE BUTTON SYSTEMS}
     Log Out
     Log in to Auto Tests System    ${EMAIL ADV VIEWER}
     Register Keyword To Run On Failure    NONE
     Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
+    Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${RENAME SYSTEM}
+    Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${USERS LIST}
     Register Keyword To Run On Failure    Failure Tasks
     Element Should Not Be Visible    ${SHARE BUTTON SYSTEMS}
     Log Out
     Log in to Auto Tests System    ${EMAIL LIVE VIEWER}
     Register Keyword To Run On Failure    NONE
     Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
+    Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${RENAME SYSTEM}
+    Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${USERS LIST}
     Register Keyword To Run On Failure    Failure Tasks
     Element Should Not Be Visible    ${SHARE BUTTON SYSTEMS}
+    Close Browser
+
+does not display edit and remove for owner row
+    Open Browser and go to URL    ${url}
+    Log in to Auto Tests System    ${EMAIL ADMIN}
+    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL OWNER}')]
+    Mouse Over    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL OWNER}')]
+    Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL OWNER}')]/following-sibling::td/a[@ng-click='unshare(user)']/span['&nbsp&nbspDelete']
+    Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL OWNER}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),'Edit')]/..
+    Close Browser
+
+always displays owner on the top of the table
+    Open Browser and go to URL    ${url}
+    Log in to Auto Tests System    ${EMAIL OWNER}
+    Wait Until Element Is Visible    ${FIRST USER OWNER}
+    Close Browser
+
+contains user emails and names
+    Open Browser and go to URL    ${url}
+    Log in to Auto Tests System    ${EMAIL OWNER}
+    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL ADMIN}')]
+    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${ADMIN FIRST NAME} ${ADMIN LAST NAME}')]
+    Close Browser
+
+rename button opens dialog; cancel closes without rename; save renames system
+    Open Browser and go to URL    ${url}
+    Log in to Auto Tests System    ${EMAIL OWNER}
+    Wait Until Element Is Visible    ${RENAME SYSTEM}
+    Click Button    ${RENAME SYSTEM}
+    Wait Until Elements Are Visible    ${RENAME CANCEL}    ${RENAME SAVE}
+    Click Button    ${RENAME CANCEL}
+    Wait Until Page Does Not Contain Element    //div[@modal-render='true']
+    Verify In System    Auto Tests
+    Wait Until Elements Are Visible    ${RENAME SYSTEM}    ${OPEN IN NX BUTTON}    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}
+    Click Button    ${RENAME SYSTEM}
+    Wait Until Elements Are Visible    ${RENAME CANCEL}    ${RENAME SAVE}    ${RENAME INPUT}
+    Clear Element Text    ${RENAME INPUT}
+    Input Text    ${RENAME INPUT}    Auto Tests Rename
+    Click Button    ${RENAME SAVE}
+    Check For Alert    ${SYSTEM NAME SAVED}
+    Verify In System    Auto Tests Rename
+    Wait Until Elements Are Visible    ${RENAME SYSTEM}    ${OPEN IN NX BUTTON}    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}
+    Click Button    ${RENAME SYSTEM}
+    Wait Until Elements Are Visible    ${RENAME CANCEL}    ${RENAME SAVE}    ${RENAME INPUT}
+    Clear Element Text    ${RENAME INPUT}
+    Input Text    ${RENAME INPUT}    Auto Tests
+    Click Button    ${RENAME SAVE}
+    Check For Alert    ${SYSTEM NAME SAVED}
+    Verify In System    Auto Tests
     Close Browser
 
 should open System page by link to not authorized user and redirect to homepage, if he does not log in
@@ -132,10 +186,11 @@ should open System page by link not authorized user, and show alert if logs in a
     Close Browser
 
 should display same user data as user provided during registration (stress to cyrillic)
+    [tags]    email
 #create user
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
-    Register    ${CYRILLIC NAME}    ${CYRILLIC NAME}    ${email}    ${password}
+    Register    ${CYRILLIC TEXT}    ${CYRILLIC TEXT}    ${email}    ${password}
     Activate    ${email}
 #share system with new user
     Log in to Auto Tests System    ${EMAIL OWNER}
@@ -153,7 +208,7 @@ should display same user data as user provided during registration (stress to cy
 
 #verify user was added with appropriate name
     Log In    ${email}    ${password}
-    Wait Until Element Is Visible    //td[contains(text(),'${CYRILLIC NAME} ${CYRILLIC NAME}')]
+    Wait Until Element Is Visible    //td[contains(text(),'${CYRILLIC TEXT} ${CYRILLIC TEXT}')]
 
 #remove new user from system
     Log Out
@@ -162,6 +217,7 @@ should display same user data as user provided during registration (stress to cy
     Close Browser
 
 should display same user data as showed in user account (stress to cyrillic)
+    [tags]    not-ready
 #create user
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
@@ -186,15 +242,15 @@ should display same user data as showed in user account (stress to cyrillic)
     Wait Until Textfield Contains    ${ACCOUNT FIRST NAME}    mark
     Wait Until Textfield Contains    ${ACCOUNT LAST NAME}    hamill
     Clear Element Text    ${ACCOUNT FIRST NAME}
-    Input Text    ${ACCOUNT FIRST NAME}    ${CYRILLIC NAME}
+    Input Text    ${ACCOUNT FIRST NAME}    ${CYRILLIC TEXT}
     Clear Element Text    ${ACCOUNT LAST NAME}
-    Input Text    ${ACCOUNT LAST NAME}    ${CYRILLIC NAME}
+    Input Text    ${ACCOUNT LAST NAME}    ${CYRILLIC TEXT}
     sleep    .15
     Wait Until Element Is Visible    ${ACCOUNT SAVE}
     Click Button    ${ACCOUNT SAVE}
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
     Go To    ${url}/systems/${AUTO TESTS SYSTEM ID}
-    Wait Until Element Is Visible    //td[contains(text(),'${CYRILLIC NAME} ${CYRILLIC NAME}')]
+    Wait Until Element Is Visible    //td[contains(text(),'${CYRILLIC TEXT} ${CYRILLIC TEXT}')]
 
     #remove new user from system
     Log Out

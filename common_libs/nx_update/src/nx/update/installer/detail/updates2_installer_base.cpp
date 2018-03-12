@@ -30,7 +30,7 @@ void Updates2InstallerBase::prepareAsync(const QString& path, PrepareUpdateCompl
     m_extractor->extractAsync(
         path,
         installerWorkDir(),
-        [self = this, handler](QnZipExtractor::Error errorCode)
+        [self = this, handler](QnZipExtractor::Error errorCode, const QString& outputPath)
         {
             auto cleanupGuard = QnRaiiGuard::createDestructible(
                 [self, errorCode]()
@@ -46,7 +46,7 @@ void Updates2InstallerBase::prepareAsync(const QString& path, PrepareUpdateCompl
             switch (errorCode)
             {
                 case QnZipExtractor::Error::Ok:
-                    return handler(self->checkContents());
+                    return handler(self->checkContents(outputPath));
                 case QnZipExtractor::Error::NoFreeSpace:
                     return handler(PrepareResult::noFreeSpace);
                 default:
@@ -58,19 +58,19 @@ void Updates2InstallerBase::prepareAsync(const QString& path, PrepareUpdateCompl
         });
 }
 
-PrepareResult Updates2InstallerBase::checkContents() const
+PrepareResult Updates2InstallerBase::checkContents(const QString& outputPath) const
 {
-    QVariantMap infoMap = updateInformation();
+    QVariantMap infoMap = updateInformation(outputPath);
     if (infoMap.isEmpty())
         return PrepareResult::updateContentsError;
 
-    m_executable = infoMap.value("executable").toString();
-    if (m_executable.isEmpty())
+    if (infoMap.value("executable").toString().isEmpty())
     {
         NX_ERROR(this, "No executable specified in the update information file");
         return PrepareResult::updateContentsError;
     }
 
+    m_executable = outputPath + QDir::separator() + infoMap.value("executable").toString();
     if (!checkExecutable(m_executable))
     {
         NX_ERROR(this, "Update executable file is invalid");

@@ -14,7 +14,7 @@
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/http/multipart_content_parser.h>
 #include <nx/network/http/test_http_server.h>
-#include <common/common_module.h>
+#include <nx/utils/elapsed_timer_thread_safe.h>
 
 #include "common.h"
 
@@ -22,31 +22,6 @@ namespace nx {
 namespace mediaserver_plugins {
 namespace metadata {
 namespace axis {
-
-class ElapsedTimerThreadSafe
-{
-    // TODO: change to shared_timed_mutex to shared_mutex when c++17 available
-    using mutex_type = std::shared_timed_mutex;
-    mutable mutex_type m_mutex;
-    QElapsedTimer m_timer;
-
-public:
-    void start();
-    void stop();
-
-    /** @return 0 if timer is stopped when function is invoked */
-    std::chrono::milliseconds elapsedSinceStart() const;
-
-    /** @return false if timer was is stopped when function is invoked */
-    bool hasExpiredSinceStart(std::chrono::milliseconds ms) const;
-
-#if 0
-    // Further methods may be useful, but their usage was excised out the code after refactoring
-    bool isStarted() const;
-    std::chrono::milliseconds elapsed() const;
-    bool hasExpired(std::chrono::milliseconds ms) const;
-#endif
-};
 
 /**
  * The purpose of ElapsedEvent is to store information when event of corresponding type happened
@@ -58,7 +33,7 @@ struct ElapsedEvent
 {
 public:
     const AnalyticsEventType type;
-    ElapsedTimerThreadSafe timer;
+    nx::utils::ElapsedTimerThreadSafe timer;
     ElapsedEvent(const AnalyticsEventType& analyticsEventType): type(analyticsEventType){}
 };
 using ElapsedEvents = std::list<ElapsedEvent>;

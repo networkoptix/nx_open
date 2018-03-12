@@ -9,7 +9,7 @@
 
 #include <plugins/plugin_manager.h>
 #include <plugins/plugin_tools.h>
-#include <plugins/plugin_internal_tools.h>
+#include <nx/mediaserver_plugins/utils/uuid.h>
 
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_resource.h>
@@ -820,3 +820,24 @@ void ManagerPool::registerDataReceptor(
 } // namespace metadata
 } // namespace mediaserver
 } // namespace nx
+
+namespace nx {
+namespace sdk {
+
+QString toString(const nx::sdk::CameraInfo& cameraInfo)
+{
+    return lm(
+        "Vendor: %1, Model: %2, Firmware: %3, UID: %4, Shared ID: %5, URL: %6, Channel: %7")
+        .args(
+            cameraInfo.vendor,
+            cameraInfo.model,
+            cameraInfo.firmware,
+            cameraInfo.uid,
+            cameraInfo.sharedId,
+            cameraInfo.url,
+            cameraInfo.channel).toQString();
+}
+
+} // namespace sdk
+} // namespace nx
+

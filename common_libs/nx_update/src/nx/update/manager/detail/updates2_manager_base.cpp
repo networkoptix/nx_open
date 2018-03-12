@@ -111,23 +111,24 @@ void Updates2ManagerBase::checkForRemoteUpdate(utils::TimerId /*timerId*/)
 {
     auto onExitGuard =
         makeScopeGuard([this]() { remoteUpdateCompleted(); });
+
+    {
+        QnMutexLocker lock(&m_mutex);
+        switch (m_currentStatus.state)
         {
-            QnMutexLocker lock(&m_mutex);
-            switch (m_currentStatus.state)
-            {
-                case api::Updates2StatusData::StatusCode::notAvailable:
-                case api::Updates2StatusData::StatusCode::available:
-                case api::Updates2StatusData::StatusCode::error:
-                    m_currentStatus.fromBase(
-                        api::Updates2StatusData(
-                            moduleGuid(),
-                            api::Updates2StatusData::StatusCode::checking,
-                            "Checking for update"));
-                    break;
-                default:
-                    return;
-            }
+            case api::Updates2StatusData::StatusCode::notAvailable:
+            case api::Updates2StatusData::StatusCode::available:
+            case api::Updates2StatusData::StatusCode::error:
+                m_currentStatus.fromBase(
+                    api::Updates2StatusData(
+                        moduleGuid(),
+                        api::Updates2StatusData::StatusCode::checking,
+                        "Checking for update"));
+                break;
+            default:
+                return;
         }
+    }
 
     auto remoteRegistry = getRemoteRegistry();
     if (remoteRegistry)
@@ -225,33 +226,31 @@ api::Updates2StatusData Updates2ManagerBase::download()
     using namespace vms::common::p2p::downloader;
 
     FileInformation fileInformation;
-    fileInformation.md5 = fileData.md5;
+    fileInformation.md5 = QByteArray::fromHex(fileData.md5.toBase64());
     fileInformation.name = fileData.file;
     fileInformation.size = fileData.size;
     fileInformation.url = fileData.url;
     fileInformation.peerPolicy = FileInformation::PeerSelectionPolicy::byPlatform;
 
+    downloader()->deleteFile(fileData.file);
+    for (const auto& fileName : m_currentStatus.files)
+            downloader()->deleteFile(fileName);
+
     ResultCode resultCode = downloader()->addFile(fileInformation);
     switch (resultCode)
     {
         case ResultCode::fileAlreadyDownloaded:
-            setStatus(
-                api::Updates2StatusData::StatusCode::preparing,
-                lit("Preparing update file: %1").arg(fileData.file));
-            startPreparing(downloader()->filePath(fileData.file));
-            break;
         case ResultCode::fileAlreadyExists:
+            NX_ASSERT(false);
+            setStatus(
+                api::Updates2StatusData::StatusCode::error,
+                lit("Downloader internal error: File exists after preliminary deleting: %1")
+                    .arg(fileData.file));
+            break;
         case ResultCode::ok:
             setStatus(
                 api::Updates2StatusData::StatusCode::downloading,
                 lit("Downloading update file: %1").arg(fileData.file));
-
-            for (const auto& fileName: m_currentStatus.files)
-            {
-                if (fileName != fileData.file)
-                    downloader()->deleteFile(fileName);
-            }
-
             m_currentStatus.files.insert(fileData.file);
             break;
         case ResultCode::fileDoesNotExist:
@@ -401,7 +400,7 @@ void Updates2ManagerBase::onDownloadFailed(const QString& fileName)
             break;
     }
 
-    downloader()->deleteFile(fileName, /*deleteTrue*/ true);
+    downloader()->deleteFile(fileName, /*deleteData*/ true);
     m_currentStatus.files.remove(fileName);
 }
 
@@ -417,12 +416,13 @@ void Updates2ManagerBase::onFileDeleted(const QString& /*fileName*/)
 
 void Updates2ManagerBase::onFileInformationChanged(const FileInformation& /*fileInformation*/)
 {
-
+    // #TODO #akulikov implement
 }
 
-void Updates2ManagerBase::onFileInformationStatusChanged(const FileInformation& /*fileInformation*/)
+void Updates2ManagerBase::onFileInformationStatusChanged(const FileInformation& fileInformation)
 {
-
+    if (fileInformation.status == FileInformation::Status::corrupted)
+        onDownloadFailed(fileInformation.name);
 }
 
 void Updates2ManagerBase::onChunkDownloadFailed(const QString& fileName)

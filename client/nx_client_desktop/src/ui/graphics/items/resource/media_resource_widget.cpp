@@ -419,7 +419,6 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     at_camDisplay_liveChanged();
     at_ptzButton_toggled(false);
     at_histogramButton_toggled(item->imageEnhancement().enabled);
-    updateButtonsVisibility();
     updateIconButton();
 
     updateTitleText();
@@ -447,6 +446,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     const bool canRotate = accessController()->hasPermissions(item->layout()->resource(),
         Qn::WritePermission);
     setOption(WindowRotationForbidden, !hasVideo() || !canRotate);
+    updateButtonsVisibility();
 }
 
 QnMediaResourceWidget::~QnMediaResourceWidget()
@@ -1896,7 +1896,7 @@ int QnMediaResourceWidget::helpTopicAt(const QPointF &) const
     if (statusOverlay == Qn::AnalogWithoutLicenseOverlay)
         return Qn::MainWindow_MediaItem_AnalogLicense_Help;
 
-    if (statusOverlay == Qn::OfflineOverlay)
+    if (statusOverlay == Qn::OfflineOverlay || statusOverlay == Qn::OldFirmwareOverlay)
         return Qn::MainWindow_MediaItem_Diagnostics_Help;
 
     if (statusOverlay == Qn::UnauthorizedOverlay)
@@ -2185,6 +2185,9 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
     if (d->isPlayingLive() && d->camera && d->camera->hasFlags(Qn::wearable_camera))
         return Qn::NoLiveStreamOverlay;
 
+    if (d->camera && d->camera->hasCameraCapabilities(Qn::isOldFirmwareCapability))
+        return Qn::OldFirmwareOverlay;
+
     if (d->isOffline())
         return Qn::OfflineOverlay;
 
@@ -2221,7 +2224,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
             return Qn::IoModuleDisabledOverlay;
     }
 
-    if (d->display()->camDisplay()->lastMediaEvent() == Qn::MediaStreamEvent::TooManyOpenedConnections)
+    if (d->display()->camDisplay()->lastMediaEvent() == Qn::MediaStreamEvent::TooManyOpenedConnectionsError)
     {
         // Too many opened connections
         return Qn::TooManyOpenedConnectionsOverlay;
@@ -2242,8 +2245,15 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
         return Qn::EmptyOverlay;
     }
 
-    if (d->resource->hasFlags(Qn::local_video) && d->resource->getStatus() == Qn::Offline)
-        return Qn::NoDataOverlay;
+    if (d->resource->hasFlags(Qn::local_video))
+    {
+        if (d->resource->getStatus() == Qn::Offline)
+            return Qn::NoDataOverlay;
+
+        // Handle export from I/O modules.
+        if (!d->hasVideo)
+            return Qn::NoVideoDataOverlay;
+    }
 
     if (options().testFlag(DisplayActivity) && d->display()->isPaused())
     {
@@ -2310,6 +2320,7 @@ Qn::ResourceOverlayButton QnMediaResourceWidget::calculateOverlayButton(
             return Qn::ResourceOverlayButton::Empty;
         }
 
+        case Qn::OldFirmwareOverlay:
         case Qn::OfflineOverlay:
         {
             return menu()->canTrigger(action::CameraDiagnosticsAction, d->camera)

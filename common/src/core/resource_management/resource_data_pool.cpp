@@ -31,6 +31,7 @@ QnResourceDataPool::QnResourceDataPool(QObject *parent):
 {
     m_shortVendorByName.insert(lit("digital watchdog"), lit("dw"));
     m_shortVendorByName.insert(lit("digital_watchdog"), lit("dw"));
+    m_shortVendorByName.insert(lit("digitalwatchdog"), lit("dw"));
     m_shortVendorByName.insert(lit("panoramic"), lit("dw"));
     m_shortVendorByName.insert(lit("ipnc"), lit("dw"));
     m_shortVendorByName.insert(lit("acti corporation"), lit("acti"));

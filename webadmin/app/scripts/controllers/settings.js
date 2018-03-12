@@ -1,9 +1,9 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('SettingsCtrl', ['$scope', '$rootScope', '$modal', '$log', 'mediaserver', '$poll', '$localStorage',
+    .controller('SettingsCtrl', ['$scope', '$rootScope', '$uibModal', '$log', 'mediaserver', '$poll', '$localStorage',
                                  'cloudAPI', '$location', '$timeout', 'dialogs', 'nativeClient',
-    function ($scope, $rootScope, $modal, $log, mediaserver, $poll, $localStorage, cloudAPI, $location,
+    function ($scope, $rootScope, $uibModal, $log, mediaserver, $poll, $localStorage, cloudAPI, $location,
               $timeout, dialogs, nativeClient) {
 
         if(mediaserver.hasProxy()){
@@ -103,7 +103,7 @@ angular.module('webadminApp')
         $scope.confirmPassword = '';
 
         $scope.openJoinDialog = function () {
-            $modal.open({
+            $uibModal.open({
                 templateUrl: Config.viewsDir + 'join.html',
                 controller: 'JoinCtrl',
                 resolve: {
@@ -140,7 +140,7 @@ angular.module('webadminApp')
         };
 
         function restartServer(passPort){
-            $modal.open({
+            $uibModal.open({
                 templateUrl: Config.viewsDir + 'restart.html',
                 controller: 'RestartCtrl',
                 resolve:{
@@ -283,7 +283,7 @@ angular.module('webadminApp')
         }
 
         function openCloudDialog(){
-            $modal.open({
+            $uibModal.open({
                 templateUrl: Config.viewsDir + 'dialogs/cloudDialog.html',
                 controller: 'CloudDialogCtrl',
                 backdrop:'static',

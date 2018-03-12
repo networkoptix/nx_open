@@ -49,11 +49,11 @@
                        class="form-control" ng-model="account.email" readonly>
             </div>
             <div class="col-sm-4">
-                <span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">Courriel requis</span>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">Courriel requis.</span></div>
 
-                <span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">S.V.P entrez un courriel valide</span>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">Veuillez entrer un courriel valide.</span></div>
 
-                <span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">Ce courriel a déjà été enregistré dans {{PRODUCT_NAME}}.</span>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">Ce courriel a déjà été enregistré dans {{PRODUCT_NAME}}.</span></div>
             </div>
         </div>
         <password-input ng-model="account.password" id="'registerPassword'" label="$root.L.regActions.passwordLabel"></password-input>
@@ -70,7 +70,10 @@
                                 form="registerForm"
                                 class="pull-left"
                                 button-text="$root.L.regActions.createAccount"></process-button>
-                <small class="conditions-note">En cliquant sur «Créer Compte», vous acceptez<br> les <a href="/content/eula" target="_blank">Conditions générales</a></small>
+                <div class="small conditions-note">
+                    En cliquant sur "Créer compte", vous acceptez
+                    <div><a href="/content/eula" target="_blank">Termes et conditions</a></div>
+                </div>
             </div>
         </div>
     </form>

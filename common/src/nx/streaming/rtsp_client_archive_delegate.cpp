@@ -92,18 +92,18 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* 
     m_flags |= Flag_CanSeekImmediatly;
 
     // These signals are emitted from the same thread. It is safe to call close();
-    connect(reader, &QnLongRunnable::paused, this,
+    auto closeIfExpired =
         [this]()
-        {
-            if (isConnectionExpired())
-                close();
-        }, Qt::DirectConnection);
-    connect(reader, &QnArchiveStreamReader::waitForDataCanBeAccepted, this,
-        [this]()
-        {
-            if (isConnectionExpired())
-                close();
-        }, Qt::DirectConnection);
+	    {
+		    if (isConnectionExpired())
+			    close();
+        };
+    if (reader)
+    {
+        connect(reader, &QnLongRunnable::paused, this, closeIfExpired, Qt::DirectConnection);
+        connect(reader, &QnArchiveStreamReader::waitForDataCanBeAccepted,
+            this, closeIfExpired, Qt::DirectConnection);
+    }
 }
 
 void QnRtspClientArchiveDelegate::setCamera(const QnSecurityCamResourcePtr &camera)
@@ -127,7 +127,7 @@ void QnRtspClientArchiveDelegate::setCamera(const QnSecurityCamResourcePtr &came
     if (maxSessionDuration.count() > 0)
         m_maxSessionDurationMs = maxSessionDuration;
     else
-        m_maxSessionDurationMs = std::chrono::milliseconds(std::numeric_limits<qint64>::max());
+        m_maxSessionDurationMs = std::chrono::milliseconds::max();
 
     m_auth.username = commonModule->currentUrl().userName();
     m_auth.password = commonModule->currentUrl().password();
@@ -916,8 +916,7 @@ void QnRtspClientArchiveDelegate::beforeSeek(qint64 time)
     bool longNoData = ((m_position == DATETIME_NOW || time == DATETIME_NOW) && diff > 250) || diff > 1000*10;
     if (longNoData || m_quality == MEDIA_Quality_Low || m_quality == MEDIA_Quality_LowIframesOnly)
     {
-        m_blockReopening = true;
-        close();
+        beforeClose();
     }
 }
 

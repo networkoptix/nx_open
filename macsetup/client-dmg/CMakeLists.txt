@@ -91,7 +91,7 @@ if(NOT useLoginKeychain AND NOT ${mac.skip.sign})
     endif()
 
     add_custom_target(prepare_keychain
-        ${CMAKE_SOURCE_DIR}/build_utils/shell/prepare_build_keychain.sh
+        ${CMAKE_SOURCE_DIR}/build_utils/macos/prepare_build_keychain.sh
             --keychain ${codeSigningKeychainName}
             --keychain-password ${codeSigningKeychainPassword}
             --certificate ${certificate}

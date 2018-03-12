@@ -7,7 +7,7 @@ log = logging.getLogger(__name__)
 
 @pytest.fixture
 def server(server_factory):
-    return server_factory('server')
+    return server_factory.create('server')
 
 
 # storing only those event fields which should not change

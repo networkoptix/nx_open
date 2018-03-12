@@ -61,7 +61,7 @@ private:
 
 Q_DECLARE_METATYPE(QnResourceTypeList)
 
-class QN_EXPORT QnResourceTypePool
+class QnResourceTypePool
 {
 public:
     typedef QMap<QnUuid, QnResourceTypePtr> QnResourceTypeMap;

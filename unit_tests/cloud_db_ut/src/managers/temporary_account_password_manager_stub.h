@@ -52,6 +52,10 @@ public:
     virtual boost::optional<TemporaryAccountCredentialsEx> getCredentialsByLogin(
         const std::string& login) const override;
 
+    virtual bool authorize(
+        const std::string& credentialsId,
+        const nx::utils::stree::AbstractResourceReader& inputData) const override;
+
     const std::vector<data::TemporaryAccountCredentials>& registeredCredentials() const
     {
         return m_registeredCredentials;

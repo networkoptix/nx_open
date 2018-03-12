@@ -89,6 +89,7 @@ void DbInstanceController::initializeStructureMigration()
 
     // Version 17.2.
     dbStructureUpdater().addUpdateScript(db::kAddBeingMergedState);
+    dbStructureUpdater().addUpdateScript(db::kAddMergeInformation);
 }
 
 } // namespace rdb

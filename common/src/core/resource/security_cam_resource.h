@@ -13,7 +13,6 @@
 #include <common/common_globals.h>
 #include <api/model/api_ioport_data.h>
 
-#include <core/dataconsumer/audio_data_transmitter.h>
 #include <core/misc/schedule_task.h>
 
 #include <core/resource/media_resource.h>
@@ -26,10 +25,6 @@
 
 class QnAbstractArchiveDelegate;
 class QnDataProviderFactory;
-
-#ifdef ENABLE_DATA_PROVIDERS
-typedef std::shared_ptr<QnAbstractAudioTransmitter> QnAudioTransmitterPtr;
-#endif
 
 class QnSecurityCamResource : public QnNetworkResource, public QnMediaResource
 {
@@ -126,6 +121,8 @@ public:
      */
     bool isSharingLicenseInGroup() const;
 
+    bool isMultiSensorCamera() const;
+
 
     virtual Qn::StreamFpsSharingMethod streamFpsSharingMethod() const;
     void setStreamFpsSharingMethod(Qn::StreamFpsSharingMethod value);
@@ -209,6 +206,9 @@ public:
     QString getVendor() const;
     void setVendor(const QString &value);
 
+    QString getLogicalId() const;
+    void setLogicalId(const QString &value);
+
     bool isGroupPlayOnly() const;
 
     bool needsToChangeDefaultPassword() const;
@@ -249,7 +249,7 @@ public:
     QnUuid preferredServerId() const;
 
     nx::api::AnalyticsSupportedEvents analyticsSupportedEvents() const;
-    void setAnalyticsSupportedEvents(const nx::api::AnalyticsSupportedEvents& eventsList);
+    virtual void setAnalyticsSupportedEvents(const nx::api::AnalyticsSupportedEvents& eventsList);
 
     //!Returns list of time periods of DTS archive, containing motion at specified \a regions with timestamp in region [\a msStartTime; \a msEndTime)
     /*!
@@ -300,9 +300,10 @@ public:
     // Allow getting multi video layout directly from a RTSP SDP info
     virtual bool allowRtspVideoLayout() const { return true; }
 
-#ifdef ENABLE_DATA_PROVIDERS
-    virtual QnAudioTransmitterPtr getAudioTransmitter();
-#endif
+    /**
+     * Return non zero media event error if camera resource has an issue.
+     */
+    Qn::MediaStreamEvent checkForErrors() const;
 
     bool isEnoughFpsToRunSecondStream(int currentFps) const;
     virtual nx::core::resource::AbstractRemoteArchiveManager* remoteArchiveManager();
@@ -421,10 +422,6 @@ protected:
     virtual bool isInputPortMonitored() const;
 
     virtual Qn::LicenseType calculateLicenseType() const;
-protected:
-#ifdef ENABLE_DATA_PROVIDERS
-    QnAudioTransmitterPtr m_audioTransmitter;
-#endif
 private:
     QnDataProviderFactory *m_dpFactory;
     QAtomicInt m_inputPortListenerCount;

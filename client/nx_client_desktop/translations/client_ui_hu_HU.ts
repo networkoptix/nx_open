@@ -173,11 +173,6 @@
     <name>ArchiveLengthWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
-      <source>Form</source>
-      <translation>Űrlap</translation>
-    </message>
-    <message>
-      <location/>
       <source>Fixed Archive Length</source>
       <translation>Fix archiválási hossz</translation>
     </message>
@@ -755,7 +750,22 @@
     <message>
       <location/>
       <source>PTZ</source>
-      <translation type="unfinished">PTZ</translation>
+      <translation>PTZ</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Generate</source>
+      <translation type="unfinished">Generate</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset</source>
+      <translation>Visszaállitás</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Logical Id</source>
+      <translation type="unfinished">Logical Id</translation>
     </message>
   </context>
   <context>
@@ -958,6 +968,14 @@
       <location/>
       <source>Description contains:</source>
       <translation>Leírás tartalma:</translation>
+    </message>
+  </context>
+  <context>
+    <name>CustomSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/custom_settings/widgets/custom_settings_widget.ui"/>
+      <source>Category</source>
+      <translation>Kategória</translation>
     </message>
   </context>
   <context>
@@ -1722,7 +1740,7 @@
     <message>
       <location/>
       <source>Tour cycle</source>
-      <translation>Túra ciklus</translation>
+      <translation>Tour cycle</translation>
     </message>
   </context>
   <context>
@@ -1785,8 +1803,8 @@
     </message>
     <message>
       <location/>
-      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</translation>
+      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
     </message>
   </context>
   <context>
@@ -2667,11 +2685,6 @@
     </message>
     <message>
       <location/>
-      <source>TextLabel</source>
-      <translation type="unfinished">TextLabel</translation>
-    </message>
-    <message>
-      <location/>
       <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage.
 The oldest footage among all cameras on the server will be deleted first.</source>
       <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage.
@@ -3065,11 +3078,6 @@ Kattintson az &quot;Új szerepkör&quot; gombra a létrehozáshoz.</translation>
     <name>WearableMotionWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
-      <source>Form</source>
-      <translation>Űrlap</translation>
-    </message>
-    <message>
-      <location/>
       <source>Motion Detection</source>
       <translation>Mozgásérzékelés</translation>
     </message>
@@ -3088,11 +3096,6 @@ Kattintson az &quot;Új szerepkör&quot; gombra a létrehozáshoz.</translation>
     <name>WearableProgressWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
-      <source>Form</source>
-      <translation>Űrlap</translation>
-    </message>
-    <message>
-      <location/>
       <source>Cancel</source>
       <translation>Mégsem</translation>
     </message>
@@ -3101,11 +3104,6 @@ Kattintson az &quot;Új szerepkör&quot; gombra a létrehozáshoz.</translation>
     <name>WearableUploadWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
-      <source>Form</source>
-      <translation>Űrlap</translation>
-    </message>
-    <message>
-      <location/>
       <source>Upload Video</source>
       <translation>Video feltöltése</translation>
     </message>

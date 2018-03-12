@@ -5,14 +5,9 @@ Suite Teardown    Close All Browsers
 
 *** Variables ***
 ${password}    ${BASE PASSWORD}
-${url}         ${CLOUD TEST}
+${url}         ${ENV}
 
 *** Keywords ***
-Validate Register Success
-    [arguments]    ${location}
-    Wait Until Element Is Visible    ${ACCOUNT CREATION SUCCESS}
-    Location Should Be    ${location}
-
 Check Bad Email Input
     [arguments]    ${email}
     Wait Until Elements Are Visible    ${REGISTER EMAIL INPUT}    ${CREATE ACCOUNT BUTTON}
@@ -30,6 +25,7 @@ should open register page in anonymous state by clicking Register button on top 
     Close Browser
 
 should open register page from register success page by clicking Register button on top right corner
+    [tags]    email
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
     Register    'mark'    'hamill'    ${email}    ${password}
@@ -56,42 +52,42 @@ should register user with correct credentials
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${email}    ${password}
-    Validate Register Success    ${url}/register/success
+    Validate Register Success
     Close Browser
 
 should register user with cyrillic First and Last names and correct credentials
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
-    Register    ${CYRILLIC NAME}    ${CYRILLIC NAME}    ${email}    ${password}
-    Validate Register Success    ${url}/register/success
+    Register    ${CYRILLIC TEXT}    ${CYRILLIC TEXT}    ${email}    ${password}
+    Validate Register Success
     Close Browser
 
 should register user with smiley First and Last names and correct credentials
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
-    Register    ${SMILEY NAME}    ${SMILEY NAME}    ${email}    ${password}
-    Validate Register Success    ${url}/register/success
+    Register    ${SMILEY TEXT}    ${SMILEY TEXT}    ${email}    ${password}
+    Validate Register Success
     Close Browser
 
 should register user with glyph First and Last names and correct credentials
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
-    Register    ${GLYPH NAME}    ${GLYPH NAME}    ${email}    ${password}
-    Validate Register Success    ${url}/register/success
+    Register    ${GLYPH TEXT}    ${GLYPH TEXT}    ${email}    ${password}
+    Validate Register Success
     Close Browser
 
 should allow `~!@#$%^&*()_:\";\'{}[]+<>?,./ in First and Last name fields
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
-    Register    ${SYMBOL NAME}    ${SYMBOL NAME}    ${email}    ${password}
-    Validate Register Success    ${url}/register/success
+    Register    ${SYMBOL TEXT}    ${SYMBOL TEXT}    ${email}    ${password}
+    Validate Register Success
     Close Browser
 
 should allow !#$%&'*+-/=?^_`{|}~ in email field
     ${email}    Get Random Symbol Email
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${email}    ${password}
-    Validate Register Success    ${url}/register/success
+    Validate Register Success
     Close Browser
 
 should respond to Enter key and save data
@@ -103,12 +99,12 @@ should respond to Enter key and save data
     Input Text    ${REGISTER EMAIL INPUT}    ${email}
     Input Text    ${REGISTER PASSWORD INPUT}    ${password}
     Press Key    ${REGISTER PASSWORD INPUT}    ${ENTER}
-    Validate Register Success    ${url}/register/success
+    Validate Register Success
     Close Browser
 
 should respond to Tab key
     Open Browser and go to URL    ${url}/register
-    Wait Until Element Is Visible    ${REGISTER FIRST NAME INPUT}
+    Wait Until Elements Are Visible    ${REGISTER FIRST NAME INPUT}    ${REGISTER LAST NAME INPUT}    ${REGISTER EMAIL INPUT}    ${REGISTER PASSWORD INPUT}
     Element Should Be Focused    ${REGISTER FIRST NAME INPUT}
     Press Key    ${REGISTER FIRST NAME INPUT}    ${TAB}
     Element Should Be Focused    ${REGISTER LAST NAME INPUT}

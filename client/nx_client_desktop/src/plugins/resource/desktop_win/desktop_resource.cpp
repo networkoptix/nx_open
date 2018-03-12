@@ -97,8 +97,8 @@ QnConstResourceAudioLayoutPtr QnWinDesktopResource::getAudioLayout(const QnAbstr
     return m_desktopDataProvider->getAudioLayout();
 }
 
-QString QnWinDesktopResource::toSearchString() const
+QStringList QnWinDesktopResource::searchFilters() const
 {
     // Desktop cameras are not to be found by search
-    return QString();
+    return QStringList();
 }

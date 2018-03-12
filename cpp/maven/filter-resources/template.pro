@@ -125,6 +125,9 @@ INCLUDEPATH +=  ${project.build.sourceDirectory} \
                 $$clean_path("${libdir}")/include \
                 $$ADDITIONAL_QT_INCLUDES
 
+INCLUDEPATH += $$ROOT_DIR/common_libs/nx_plugin_utils/src/
+INCLUDEPATH += $$ROOT_DIR/common_libs/nx_sdk/src/
+
 win* {
     DEFINES += \
         NX_KIT_API=__declspec(dllimport) \
@@ -217,23 +220,16 @@ win* {
     QMAKE_LFLAGS += /MACHINE:${arch} /LARGEADDRESSAWARE
   }
 
-  !staticlib {
-    DEFINES += QN_EXPORT=Q_DECL_EXPORT
-  }
-  else {
-    DEFINES += QN_EXPORT=
-  }
-
   QMAKE_MOC_OPTIONS += -DQ_OS_WIN
 }
 
 ## BOTH LINUX AND MAC
 unix: {
-  DEFINES += QN_EXPORT=
   clang {
     QMAKE_CXXFLAGS += -Wno-c++14-extensions -Wno-inconsistent-missing-override
   } else {
-    #QMAKE_CXXFLAGS += -std=c++1y
+    QMAKE_CXXFLAGS -= -std=c++11
+    QMAKE_CXXFLAGS -= -std=c++1y
   }
   QMAKE_CXXFLAGS += -Werror=enum-compare -Werror=reorder -Werror=delete-non-virtual-dtor -Werror=return-type -Werror=conversion-null -Wuninitialized
 
@@ -322,3 +318,7 @@ CONFIG(debug, debug|release) {
   include(dependencies.pri)
 }
 
+linux {
+  QMAKE_CXXFLAGS_CXX14 = -std=c++17
+  QMAKE_CXXFLAGS_GNUCXX14 = -std=c++17
+}

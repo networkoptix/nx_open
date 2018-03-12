@@ -17,28 +17,19 @@ QString AppInfo::realm()
 static const char* kCloudHostNameWithPrefix = "this_is_cloud_host_name ${cloudHost}\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
 static const char* kCloudHostName = kCloudHostNameWithPrefix + sizeof("this_is_cloud_host_name");
 
-QString AppInfo::defaultCloudHost()
+QString AppInfo::defaultCloudHostName()
 {
-#ifdef _DEBUG
-    if (SocketGlobals::isInitialized())
-    {
-        const QString overriddenHost = SocketGlobals::cloud().ini().cloudHost;
-        if (!overriddenHost.isEmpty())
-            return overriddenHost;
-    }
-#endif
-
     return QString::fromUtf8(kCloudHostName);
 }
 
-QString AppInfo::defaultCloudPortalUrl()
+QString AppInfo::defaultCloudPortalUrl(const QString& cloudHost)
 {
-    return QString::fromLatin1("https://%1").arg(defaultCloudHost());
+    return QString::fromLatin1("https://%1").arg(cloudHost);
 }
 
-QString AppInfo::defaultCloudModulesXmlUrl()
+QString AppInfo::defaultCloudModulesXmlUrl(const QString& cloudHost)
 {
-    return QString::fromLatin1("http://%1/discovery/v1/cloud_modules.xml").arg(defaultCloudHost());
+    return QString::fromLatin1("http://%1/discovery/v1/cloud_modules.xml").arg(cloudHost);
 }
 
 QString AppInfo::cloudName()

@@ -40,7 +40,7 @@ public:
     //!Overrides \a QnResource::getName. Returns camera name from \a QnMediaServerUserAttributes
     virtual QString getName() const override;
 
-    virtual QString toSearchString() const override;
+    virtual QStringList searchFilters() const override;
 
     //!Overrides \a QnResource::setName. Writes name to \a QnMediaServerUserAttributes
     virtual void setName( const QString& name ) override;
@@ -153,7 +153,6 @@ private slots:
     void resetCachedValues();
 
 signals:
-    void portChanged(const QnResourcePtr &resource);
     void serverFlagsChanged(const QnResourcePtr &resource);
     //! This signal is emmited when the set of additional URLs or ignored URLs has been changed.
     void auxUrlsChanged(const QnResourcePtr &resource);

@@ -13,7 +13,7 @@
 #include <QtCore/QMap>
 
 #include <plugins/resource/onvif/onvif_audio_transmitter.h>
-#include <plugins/plugin_internal_tools.h>
+#include <nx/mediaserver_plugins/utils/uuid.h>
 #include <utils/xml/camera_advanced_param_reader.h>
 
 #include <camera/camera_pool.h>
@@ -795,10 +795,12 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
 {
     setCameraCapability(Qn::SetUserPasswordCapability, true);
     bool isDefaultPassword = false;
+    bool isOldFirmware = false;
     auto isDefaultPasswordGuard = makeScopeGuard(
-        [this, &isDefaultPassword]
+        [&]
         {
             setCameraCapability(Qn::isDefaultPasswordCapability, isDefaultPassword);
+            setCameraCapability(Qn::isOldFirmwareCapability, isOldFirmware);
             saveParams();
         });
 
@@ -820,9 +822,9 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
         !getFirmware().isEmpty()
         && minFirmwareVersion > getFirmware())
     {
-        return CameraDiagnostics::CameraInvalidParams(
-            lit("Please update firmware for this device. Minimal supported firmware: '%1'. Device firmware: '%2'.")
-            .arg(minFirmwareVersion).arg(getFirmware()));
+        isOldFirmware = true;
+        return CameraDiagnostics::CameraOldFirmware(
+            minFirmwareVersion, getFirmware());
     }
 
     result = initMedia();
@@ -1046,6 +1048,11 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
                 return result;
         }
     }
+    else
+    {
+        fetchExistingProfiles();
+        hasDualStreaming = (profileByRole(Qn::CR_SecondaryLiveVideo) != kHanwhaInvalidProfile);
+    }
 
     const bool hasAudio = m_attributes.attribute<int>(
         lit("Media/MaxAudioInput/%1").arg(channel)) > 0;
@@ -1159,6 +1166,11 @@ CameraDiagnostics::Result HanwhaResource::initIo()
     return CameraDiagnostics::NoErrorResult();
 }
 
+static QString ptzCapabilityBits(Ptz::Capabilities capabilities)
+{
+    return QString::number(static_cast<int>(capabilities), 2);
+}
+
 CameraDiagnostics::Result HanwhaResource::initPtz()
 {
     removeProperty(Qn::DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME);
@@ -1171,14 +1183,23 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
         mainDescriptors,
         m_attributes,
         getChannel());
+    NX_VERBOSE(this, lm("%1: Supported PTZ capabilities direct: %2")
+        .args(getPhysicalId(), ptzCapabilityBits(m_ptzCapabilities)));
 
     if (isNvr() && m_isChannelConnectedViaSunapi)
     {
-        // We consider capability is true if it's supported both by a NVR and a camera.
-        m_ptzCapabilities &= calculateSupportedPtzCapabilities(
+        const auto pypassPtzCapabilities = calculateSupportedPtzCapabilities(
             kHanwhaCameraPtzCapabilityDescriptors,
             m_bypassDeviceAttributes,
             0); //< TODO: #dmishin is it correct for multichannel resources connected to a NVR?
+
+        NX_VERBOSE(this, lm("%1: Supported PTZ capabilities bypass: %2")
+            .args(getPhysicalId(), ptzCapabilityBits(pypassPtzCapabilities)));
+
+        // We consider capability is true if it's supported both by a NVR and a camera.
+        m_ptzCapabilities &= pypassPtzCapabilities;
+        NX_VERBOSE(this, lm("%1: Supported PTZ capabilities both: %2")
+            .args(getPhysicalId(), ptzCapabilityBits(m_ptzCapabilities)));
     }
 
     if ((m_ptzCapabilities & Ptz::AbsolutePtzCapabilities) == Ptz::AbsolutePtzCapabilities)
@@ -1197,6 +1218,8 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
     if (m_ptzTraits.contains(Ptz::ManualAutoFocusPtzTrait))
         m_ptzCapabilities |= Ptz::AuxilaryPtzCapability;
 
+    NX_DEBUG(this, lm("%1: Supported PTZ capabilities: %2")
+        .args(getPhysicalId(), ptzCapabilityBits(m_ptzCapabilities)));
     return CameraDiagnostics::NoErrorResult();
 }
 
@@ -1241,6 +1264,8 @@ CameraDiagnostics::Result HanwhaResource::initAlternativePtz()
         m_alternativePtzRanges[split.last()] = std::move(possibleValues);
     }
 
+    NX_VERBOSE(this, lm("%1: Supported PTZ capabilities alternative: %2")
+        .args(getPhysicalId(), ptzCapabilityBits(m_ptzCapabilities)));
     return CameraDiagnostics::NoErrorResult();
 }
 
@@ -1384,7 +1409,87 @@ CameraDiagnostics::Result HanwhaResource::createNxProfiles()
     }
 
     m_profileByRole[Qn::ConnectionRole::CR_LiveVideo] = nxPrimaryProfileNumber;
+    m_profileByRole[Qn::ConnectionRole::CR_Archive] = nxPrimaryProfileNumber;
     m_profileByRole[Qn::ConnectionRole::CR_SecondaryLiveVideo] = nxSecondaryProfileNumber;
+
+    return CameraDiagnostics::NoErrorResult();
+}
+
+CameraDiagnostics::Result HanwhaResource::fetchExistingProfiles()
+{
+    m_profileByRole.clear();
+
+    HanwhaRequestHelper helper(sharedContext());
+    helper.setIgnoreMutexAnalyzer(true);
+    const auto response = helper.view(
+        lit("media/videoprofilepolicy"),
+        {{kHanwhaChannelProperty, QString::number(getChannel())}});
+
+    std::set<int> availableProfiles;
+    for (const auto& profile: response.response())
+    {
+        bool isOk = false;
+        const auto profileNumber = profile.second.toInt(&isOk);
+        if (!isOk)
+            continue;
+
+        if (profile.first.endsWith(lit("Profile")))
+            availableProfiles.insert(profile.second.toInt());
+
+        // Accodring to hawna request for ONVIF:
+        // - Use Recording profile from NVR as a Primary stream.
+        // - Use Live Streaming profile from NVR as a Secondary stream.
+        // See: http://git.wisenetdev.com/HanwhaTechwinAmerica/WAVE/issues/290
+        if (profile.first.endsWith(lit("RecordProfile")))
+        {
+              m_profileByRole[Qn::ConnectionRole::CR_LiveVideo] = profileNumber;
+              m_profileByRole[Qn::ConnectionRole::CR_Archive] = profileNumber;
+        }
+        else if (profile.first.endsWith(lit("LiveProfile")))
+        {
+              m_profileByRole[Qn::ConnectionRole::CR_SecondaryLiveVideo] = profileNumber;
+        }
+    }
+
+    // Select the best avaliable profile, for primary live and archive.
+    if (m_profileByRole.find(Qn::ConnectionRole::CR_LiveVideo) == m_profileByRole.end())
+    {
+        const auto response = helper.view(
+            lit("media/videoprofile"),
+            {{kHanwhaChannelProperty, QString::number(getChannel())}});
+
+        int bestProfile = kHanwhaInvalidProfile;
+        int bestScore = 0;
+        const auto& channelProfiles = parseProfiles(response).at(getChannel());
+        for (const auto& profileEntry: channelProfiles)
+        {
+            const auto profile = profileEntry.second;
+            const auto codecCoefficient =
+                kHanwhaCodecCoefficients.find(profile.codec) != kHanwhaCodecCoefficients.cend()
+                ? kHanwhaCodecCoefficients.at(profile.codec)
+                : -1;
+
+            if (!availableProfiles.count(profile.number))
+                continue;
+
+            const auto score = profile.resolution.width()
+                * profile.resolution.height()
+                * codecCoefficient
+                + profile.frameRate;
+
+            if (score > bestScore)
+            {
+                bestScore = score;
+                bestProfile = profile.number;
+            }
+        }
+
+        if (bestProfile != kHanwhaInvalidProfile)
+        {
+            m_profileByRole[Qn::ConnectionRole::CR_LiveVideo] = bestProfile;
+            m_profileByRole[Qn::ConnectionRole::CR_Archive] = bestProfile;
+        }
+    }
 
     return CameraDiagnostics::NoErrorResult();
 }
@@ -2689,6 +2794,18 @@ QnAbstractArchiveDelegate* HanwhaResource::createArchiveDelegate()
         return new HanwhaArchiveDelegate(toSharedPointer());
 
     return nullptr;
+}
+
+void HanwhaResource::setAnalyticsSupportedEvents(const nx::api::AnalyticsSupportedEvents& eventsList)
+{
+    nx::api::AnalyticsSupportedEvents externalEvents;
+    for (const auto& event: eventsList)
+    {
+        if (event != kHanwhaInputPortEventId)
+            externalEvents.push_back(event);
+    }
+
+    base_type::setAnalyticsSupportedEvents(externalEvents);
 }
 
 QnTimePeriodList HanwhaResource::getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int /*detailLevel*/)

@@ -6,15 +6,27 @@ ${ALERT}                              //div[contains(@class, 'ng-toast')]//span[
 ${ALERT CLOSE}                        //div[contains(@class, 'ng-toast')]//span[@ng-bind-html='message.content']/../preceding-sibling::button[@ng-click='!message.dismissOnClick && dismiss()']
 
 ${LOCAL}                              https://localhost:9000/
-
 ${CLOUD TEST}                         https://cloud-test.hdw.mx
 ${CLOUD DEV}                          https://cloud-dev2.hdw.mx
 ${CLOUD TEST REGISTER}                https://cloud-test.hdw.mx/register
+${CLOUD STAGE}                        https://cloud-stage.hdw.mx
+${ENV}                                ${CLOUD TEST}
 
-${CYRILLIC NAME}                     Кенгшщзх
-${SMILEY NAME}                       ☠☿☂⊗⅓∠∩λ℘웃♞⊀☻★
-${GLYPH NAME}                        您都可以享受源源不絕的好禮及優惠
-${SYMBOL NAME}                       `~!@#$%^&*()_:";'{}[]+<>?,./\
+${BROWSER}                            Chrome
+
+${LANGUAGE DROPDOWN}                  //footer//button[@uib-dropdown-toggle]
+${LANGUAGE TO SELECT}                 //footer//span[@lang='${LANGUAGE}']/..
+
+@{LANGUAGES LIST}                          en_US    en_GB    ru_RU           fr_FR   de_DE    es_ES   hu_HU  zh_CN  zh_TW  ja_JP   ko_KR  tr_TR  th_TH     nl_NL    he_IL  pl_PL  vi_VN
+@{LANGUAGES ACCOUNT TEXT LIST}             Account  Account  Учетная запись  Compte  Account  Cuenta  Fiók   帐户    帳號   アカウント  계정    Hesap  บัญชีผู้ใช้  Account  חשבון    Konto  Tài khoản
+
+
+
+${CYRILLIC TEXT}                      Кенгшщзх
+${SMILEY TEXT}                        ☠☿☂⊗⅓∠∩λ℘웃♞⊀☻★
+${GLYPH TEXT}                         您都可以享受源源不絕的好禮及優惠
+${SYMBOL TEXT}                        `~!@#$%^&*()_:";'{}[]+<>?,./\
+${TM TEXT}                            qweasdzxc123®™
 
 #Log In Elements
 ${LOG IN MODAL}                       //div[contains(@class, 'modal-content')]
@@ -30,6 +42,9 @@ ${YOU HAVE NO SYSTEMS}                //span[contains(text(),'${YOU HAVE NO SYST
 
 ${ACCOUNT DROPDOWN}                   //li[contains(@class, 'collapse-first')]//a['uib-dropdown-toggle']
 ${LOG OUT BUTTON}                     //li[contains(@class, 'collapse-first')]//a[contains(text(), '${LOG OUT BUTTON TEXT}')]
+${ACCOUNT SETTINGS BUTTON}            //li[contains(@class, 'collapse-first')]//a[contains(text(), '${ACCOUNT SETTINGS BUTTON TEXT}')]
+${SYSTEMS DROPDOWN}                   //li[contains(@class, 'collapse-second')]//a['uib-dropdown-toggle']
+${ALL SYSTEMS}                        //li[contains(@class, 'collapse-second')]//a[@ng-href='/systems']
 ${AUTHORIZED BODY}                    //body[contains(@class, 'authorized')]
 ${ANONYMOUS BODY}                     //body[contains(@class,'anonymous')]
 ${CREATE ACCOUNT HEADER}              //header//a[@href='/register']
@@ -41,13 +56,14 @@ ${RESET PASSWORD BUTTON}              //form[@name='restorePassword']//button[@n
 ${RESET PASSWORD INPUT}               //form[@name='restorePasswordWithCode']//input[@type='password']
 ${SAVE PASSWORD}                      //form[@name='restorePasswordWithCode']//button[@ng-click='checkForm()']
 ${RESET EMAIL SENT MESSAGE}           //div[@ng-if='restoringSuccess']/h1[contains(text(),'${RESET EMAIL SENT MESAGE TEXT}')]
-${RESET SUCCESS MESSAGE}              //h1[@ng-if='change.success || changeSuccess']/div[contains(text(), '${RESET SUCCESS MESSAGE TEXT}')]
+${RESET SUCCESS MESSAGE}              //h1[contains(text(), '${RESET SUCCESS MESSAGE TEXT}')]
 ${RESET SUCCESS LOG IN LINK}          //h1[@ng-if='change.success || changeSuccess']//a[@href='/login']
 
 #Change Password
 ${CURRENT PASSWORD INPUT}             //form[@name='passwordForm']//input[@ng-model='pass.password']
 ${NEW PASSWORD INPUT}                 //form[@name='passwordForm']//password-input[@ng-model='pass.newPassword']//input[@type='password']
 ${CHANGE PASSWORD BUTTON}             //form[@name='passwordForm']//button[@ng-click='checkForm()']
+${PASSWORD IS REQUIRED}               //span[@ng-if='passwordInput.password.$error.required']
 
 #Register Form Elements
 ${REGISTER FIRST NAME INPUT}          //form[@name= 'registerForm']//input[@ng-model='account.firstName']
@@ -59,19 +75,28 @@ ${CREATE ACCOUNT BUTTON}              //form[@name= 'registerForm']//button[cont
 ${TERMS AND CONDITIONS LINK}          //form[@name= 'registerForm']//a[@href='/content/eula' and contains(text(), '${TERMS AND CONDITIONS LINK TEXT}')]
 ${RESEND ACTIVATION LINK BUTTON}      //form[@name= 'reactivateAccount']//button[contains(text(), '${RESEND ACTIVATION LINK BUTTON TEXT}')]
 
-${ACCOUNT CREATION SUCCESS}           //h1[@ng-if='(register.success || registerSuccess) && !activated']
-${ACTIVATION SUCCESS}                 //div[@ng-model-options="{ updateOn: 'blur' }"]//h1[@ng-if='activate.success' and contains(text(), '${ACCOUNT SUCCESSFULLY ACTIVATED TEXT}')]
-${SUCCESS LOG IN BUTTON}              //div[@ng-model-options="{ updateOn: 'blur' }"]//h1[@ng-if='activate.success' and contains(text(), '${ACCOUNT SUCCESSFULLY ACTIVATED TEXT}')]//a[@href='/login']
+${EMAIL ALREADY REGISTERED}           //span[@ng-if="registerForm.registerEmail.$error.alreadyExists"]
 
+${ACCOUNT CREATION SUCCESS}           //h1[@ng-if='(register.success || registerSuccess) && !activated']
+${ACTIVATION SUCCESS}                 //h1[@ng-if='activate.success' and contains(text(), '${ACCOUNT SUCCESSFULLY ACTIVATED TEXT}')]
+${SUCCESS LOG IN BUTTON}              //div[@ng-model-options="{ updateOn: 'blur' }"]//h1[@ng-if='activate.success' and contains(text(), '${ACCOUNT SUCCESSFULLY ACTIVATED TEXT}')]/following-sibling::h1/a[@href="/login"]
 #In system settings
+${FIRST USER OWNER}                   //table[@ng-if='system.users.length']/tbody/tr/td[3]/span[contains(text(),'${OWNER TEXT}')]
 ${DISCONNECT FROM NX}                 //button[@ng-click='disconnect()']
 ${RENAME SYSTEM}                      //button[@ng-click='rename()']
+${RENAME CANCEL}                      //form[@name='renameForm']//button[@ng-click='close()']
+${RENAME SAVE}                        //form[@name='renameForm']//button[@ng-click='checkForm()']
+${RENAME INPUT}                       //form[@name='renameForm']//input[@ng-model='model.systemName']
 ${DISCONNECT FROM MY ACCOUNT}         //button[@ng-click='delete()']
 ${SHARE BUTTON SYSTEMS}               //div[@process-loading='gettingSystem']//button[@ng-click='share()']
+${SHARE BUTTON DISABLED}              //div[@process-loading='gettingSystem']//button[@ng-click='share()' and @ng-disabled='!system.isAvailable']
 ${OPEN IN NX BUTTON}                  //div[@process-loading='gettingSystem']//button[@ng-click='checkForm()']
+${OPEN IN NX BUTTON DISABLED}         //div[@process-loading='gettingSystem']//button[@ng-click='checkForm()' and @ng-disabled='buttonDisabled']
 ${DELETE USER MODAL}                  //div[@uib-modal-transclude]
 ${DELETE USER BUTTON}                 //button[@ng-click='ok()' and contains(text(), '${DELETE USER BUTTON TEXT}')]
 ${DELETE USER CANCEL BUTTON}          //button[@ng-click='cancel()' and contains(text(), '${DELETE USER CANCEL BUTTON TEXT}')]
+${SYSTEM NAME OFFLINE}                //span[@ng-if='!system.isOnline']
+${USERS LIST}                         //div[@process-loading='gettingSystemUsers']
 
 ${SYSTEM NO ACCESS}                   //div[@ng-if='systemNoAccess']/h1[contains(text(), '${SYSTEM NO ACCESS TEXT}')]
 
@@ -95,11 +120,11 @@ ${SHARE PERMISSIONS DROPDOWN}         //form[@name='shareForm']//select[@ng-mode
 ${SHARE BUTTON MODAL}                 //form[@name='shareForm']//button[@ng-click='checkForm()']
 ${SHARE CANCEL}                       //form[@name='shareForm']//button[@ng-click='close()']
 ${SHARE CLOSE}                        //div[@uib-modal-transclude]//div[@ng-if='settings.title']//button[@ng-click='close()']
-${SHARE PERMISSIONS ADMINISTRATOR}    //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='Administrator']
-${SHARE PERMISSIONS ADVANCED VIEWER}  //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='Advanced Viewer']
-${SHARE PERMISSIONS VIEWER}           //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='Viewer']
-${SHARE PERMISSIONS LIVE VIEWER}      //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='Live Viewer']
-${SHARE PERMISSIONS CUSTOM}           //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='Custom']
+${SHARE PERMISSIONS ADMINISTRATOR}    //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='${ADMIN TEXT}']
+${SHARE PERMISSIONS ADVANCED VIEWER}  //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='${ADV VIEWER TEXT}']
+${SHARE PERMISSIONS VIEWER}           //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='${VIEWER TEXT}']
+${SHARE PERMISSIONS LIVE VIEWER}      //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='${LIVE VIEWER TEXT}']
+${SHARE PERMISSIONS CUSTOM}           //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='${CUSTOM TEXT}']
 ${SHARE PERMISSIONS HINT}             //form[@name='shareForm']//span[contains(@class,'help-block')]
 
 ${EDIT PERMISSIONS EMAIL}             //form[@name='shareForm']//input[@ng-model='user.email']
@@ -118,7 +143,9 @@ ${EDIT PERMISSIONS HINT}              //form[@name='shareForm']//span[contains(@
 ${ACCOUNT EMAIL}                      //form[@name='accountForm']//input[@ng-model='account.email']
 ${ACCOUNT FIRST NAME}                 //form[@name='accountForm']//input[@ng-model='account.first_name']
 ${ACCOUNT LAST NAME}                  //form[@name='accountForm']//input[@ng-model='account.last_name']
+${ACCOUNT LANGUAGE DROPDOWN}          //form[@name='accountForm']//language-select//button
 ${ACCOUNT SAVE}                       //form[@name='accountForm']//button[@ng-click='checkForm()']
+${ACCOUNT SUBSCRIBE CHECKBOX}         //form[@name='accountForm']//input[@ng-model='account.subscribe']
 
 #Already logged in modal
 ${LOGGED IN CONTINUE BUTTON}          //div[@uib-modal-transclude]//button[@ng-click='ok()']
@@ -137,6 +164,8 @@ ${EMAIL LIVE VIEWER}                  noptixqa+liveviewer@gmail.com
 ${EMAIL OWNER}                        noptixqa+owner@gmail.com
 ${EMAIL NOT OWNER}                    noptixqa+notowner@gmail.com
 ${EMAIL ADMIN}                        noptixqa+admin@gmail.com
+${ADMIN FIRST NAME}                   asdasasd
+${ADMIN LAST NAME}                    asdasasdas
 ${EMAIL UNREGISTERED}                 noptixqa+unregistered@gmail.com
 ${EMAIL NOPERM}                       noptixqa+noperm@gmail.com
 ${BASE PASSWORD}                      qweasd123
@@ -146,17 +175,17 @@ ${TEST FIRST NAME}                    testFirstName
 ${TEST LAST NAME}                     testLastName
 
 #Related to Auto Tests system
-${AUTO TESTS SYSTEM ID}                     b4939b35-5b98-492b-a092-27fe8efeef38
+${AUTO_TESTS SYSTEM ID}                     97b27ae5-1d36-4ddf-8a1c-ab0f3e244e97
 ${AUTO TESTS TITLE}                   //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests')]
 ${AUTO TESTS USER}                    //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests')]/following-sibling::span[contains(@class,'user-name')]
 ${AUTO TESTS OPEN NX}                 //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests')]/..//button[@ng-click='checkForm()']
-
 ${SYSTEMS SEARCH INPUT}               //input[@ng-model='search.value']
 ${SYSTEMS TILE}                       //div[@ng-repeat="system in systems | filter:searchSystems as filtered"]
 
 #AUTOTESTS (with no space) is an offline system used for testing offline status on the systems page
 ${AUTOTESTS OFFLINE}                  //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Autotests')]/following-sibling::span[contains(text(), '${AUTOTESTS OFFLINE TEXT}')]
 ${AUTOTESTS OFFLINE OPEN NX}          //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Autotests')]/..//button[@ng-click='checkForm()']
+${AUTOTESTS OFFLINE SYSTEM ID}                dd06f8bf-f7ea-49b3-96fc-fbc6742a2ad4
 
 #ASCII
 ${ESCAPE}                             \\27

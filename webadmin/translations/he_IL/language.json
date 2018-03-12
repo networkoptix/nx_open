@@ -13,8 +13,8 @@
     "passwordRequirements": {
         "minLengthMessage": "סיסמא חייבת להכיל לפחות 8 תווים",
         "requiredMessage": "רק אותיות לטינית, מספרים וסימני מקלדת מותרים",
-        "weakMessage": "הסיסמא צריכה להכיל סוגים שונים של סמלים",
-        "strongMessage": "סיסמה חזקה!",
+        "weakMessage": "הסיסמה צריכה להכיל סוגים שונים של סמלים",
+        "strongMessage": "סיסמא חזקה!",
         "commonMessage": "סיסמה זו נמצאת ברשימת הסיסמהות הפופולריות ביותר"
     },
     "settings": {
@@ -29,7 +29,7 @@
         "confirmRestoreDefaultTitle": "שחזר להגדרות ברירת מחדל",
         "unexpectedError": "כשלון: שגיאה בלתי צפויה התרחשה",
         "connnetionError": "שגיאת חיבור",
-        "wrongPassword": "סיסמה שגויה.",
+        "wrongPassword": "סיסמא שגויה.",
         "error": "שגיאה: ",
         "restartNeeded": "שינויים שנשמרו. להפעיל מחדש את השרת בכדי להחיל את ההגדרות החדשות?",
         "settingsSaved": "ההגדרות נשמרו",
@@ -40,7 +40,7 @@
         "unsafePortConfirm": "אין זה בטוח להשתמש במספר היציאה הקטן מ -1025. ייתכן שהשרת לה יהיה נגיש. המשך בכל זאת?",
         "confirmDisconnectFromCloud": "נתק את המערכת מ {{CLOUD_NAME}}",
         "confirmDisconnectFromCloudTitle": "<span class='warning-label'> כל משתמשי הענן יימחקו.</span> <br><br>המערכת תהיה נגישה דרך הרשת המקומית עם חשבון מנהל מערכת מקומי.",
-        "confirmDisconnectFromCloudAction": "נתק",
+        "confirmDisconnectFromCloudAction": "התנתק",
         "disconnectedFromCloudSuccess": "המערכת נותקה בהצלחה מ {{CLOUD_NAME}}",
         "confirmDisconnectFromSystem": "נתק שרת מהמערכת הנוכחית",
         "confirmDisconnectFromSystemAction": "ניתוק",
@@ -176,6 +176,20 @@
         "default": "ממשק אינטרנט ל {{PRODUCT_NAME}}"
     },
     "common": {
+        "voiceCommands": {
+            "search": "find + [text for searchbar]",
+            "pause": "השהה",
+            "help": "help | show commands",
+            "collapse all servers": "collapse all servers",
+            "collapse server": "collapse server + [server name]",
+            "play": "נגן",
+            "clear search": "clear search",
+            "live": "go to live | show me live",
+            "expand all servers": "expand all servers",
+            "stop listening": "stop listening",
+            "expand server": "expand server + [server name]",
+            "view": "view + [camera name]"
+        },
         "systemOffline": "השרת אינו זמין",
         "cameraLinks": {
             "copyToClipboard": "העתק ללוח העריכה",
@@ -188,7 +202,7 @@
         },
         "searchCamPlaceholder": "חיפוש",
         "cameraStates": {
-            "noFormat": "דפדפן או התקן זה אינו תומך בהפעלת וידאו ממצלמה זו.",
+            "noFormat": "דפדפן זה אינו תומך בשיחזור וידאו ממצלמה זו.",
             "ieWin10": "השתמש ב- Microsoft Edge או בדפדפן Google Chrome.",
             "iosVideoTooLarge": "iOS אינה תומכת בוידאו גדול מ fullHD (2MP: 1920 x 1080).",
             "unauthorized": "נדרש אימות",
@@ -199,7 +213,13 @@
             "error": "שגיאה",
             "offline": "לא מקוון",
             "noData": "אין נתונים",
-            "flashRequired": "אנא התקן <a href='https://get.adobe.com/flashplayer/' target='_blank'> את Adobe Flash</a> להפעלת וידאו משרתים מבוססי ARM."
+            "flashRequired": "אנא התקן <a href='https://get.adobe.com/flashplayer/' target='_blank'> את Adobe Flash</a> להפעלת וידאו משרתים מבוססי Arm."
+        },
+        "chromeCastWarning": "Chromecast is resource intensive and may cause issues on your server.",
+        "resolution": {
+            "high": "גבוה",
+            "auto": "אוטומטי",
+            "low": "נמוך"
         }
     }
 }

@@ -1,171 +1,194 @@
+import contextlib
 import logging
+import socket
+import struct
 import time
 from collections import namedtuple
 from datetime import datetime, timedelta
 
 import pytest
-import pytz
+from pylru import lrudecorator
+from pytz import utc
 
-from test_utils.internet_time import TimeProtocolRestriction, get_internet_time
-from test_utils.networking import setup_networks
-from test_utils.server import Server
-from test_utils.server_installation import install_mediaserver
-from test_utils.service import UpstartService
-from test_utils.utils import holds_long_enough, wait_until
+from network_layouts import get_layout
+from test_utils.api_shortcuts import get_server_id, get_time
+from test_utils.merging import merge_system
+from test_utils.networking import disable_internet, enable_internet, setup_networks
+from test_utils.utils import RunningTime, holds_long_enough, wait_until
 
 log = logging.getLogger(__name__)
 
-BASE_TIME = datetime(2017, 3, 14, 15, 0, 0, tzinfo=pytz.utc)  # Tue Mar 14 15:00:00 UTC 2017
+BASE_TIME = datetime(2017, 3, 14, 15, 0, 0, tzinfo=utc)  # Tue Mar 14 15:00:00 UTC 2017
 
 System = namedtuple('System', ['primary', 'secondary'])
 
 
-def _make_timeless_server(vm, mediaserver_deb, ca, server_name):
-    server_installation = install_mediaserver(vm.guest_os_access, mediaserver_deb)
-    server_installation.change_config(ecInternetSyncTimePeriodSec=3, ecMaxInternetTimeSyncRetryPeriodSec=3)
-    service = UpstartService(vm.guest_os_access, mediaserver_deb.customization.service_name)
-    api_url = 'http://{host}:{port}/'.format(host=vm.host_os_access.hostname, port=vm.config.rest_api_forwarded_port)
-    server = Server(server_name, vm.guest_os_access, service, server_installation, api_url, ca, vm)
-    server.stop_service()
-    vm.networking.os.prohibit_global()
-    server_installation.cleanup_var_dir()
-    server.start_service()
-    server.setup_local_system()
-    return server
+@lrudecorator(1)
+def get_internet_time(address='time.rfc868server.com', port=37):
+    """Get time from RFC868 time server wrap into Python's datetime.
+    >>> import timeit
+    >>> get_internet_time()  # doctest: +ELLIPSIS
+    RunningTime(...)
+    >>> timeit.timeit(get_internet_time, number=1) < 1e-4
+    True
+    """
+    with contextlib.closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
+        started_at = datetime.now(utc)
+        s.connect((address, port))
+        time_data = s.recv(4)
+        request_duration = datetime.now(utc) - started_at
+    remote_as_rfc868_timestamp, = struct.unpack('!I', time_data)
+    posix_to_rfc868_diff = datetime.fromtimestamp(0, utc) - datetime(1900, 1, 1, tzinfo=utc)
+    remote_as_posix_timestamp = remote_as_rfc868_timestamp - posix_to_rfc868_diff.total_seconds()
+    remote_as_datetime = datetime.fromtimestamp(remote_as_posix_timestamp, utc)
+    return RunningTime(remote_as_datetime, request_duration)
 
 
-@pytest.fixture
-def system(vm_factory, mediaserver_deb, ca):
-    vms, _ = setup_networks([vm_factory() for _ in range(2)], {'10.254.0.0/28': {'first': None, 'second': None}})
-    one = _make_timeless_server(vms['first'], mediaserver_deb, ca, 'one')
-    two = _make_timeless_server(vms['second'], mediaserver_deb, ca, 'two')
-    one.merge([two])
-    response = one.rest_api.ec2.getCurrentTime.GET()
-    primary_server_guid = response['primaryTimeServerGuid']
-    system = System(one, two) if one.ecs_guid == primary_server_guid else System(two, one)
+@pytest.fixture()
+def system(vm_pools, server_factory):
+    layout = get_layout('direct-merge_toward_requested.yaml')
+    vms = setup_networks(vm_pools, layout.networks)
+    servers = {}
+    for alias in {'first', 'second'}:
+        server = server_factory.create(alias, vm=vms[alias])
+        if server.service.is_running():
+            server.stop()
+        # Reset server without internet access.
+        server.machine.networking.os_networking.prohibit_global()
+        server.installation.cleanup_var_dir()
+        server.installation.change_config(ecInternetSyncTimePeriodSec=3, ecMaxInternetTimeSyncRetryPeriodSec=3)
+        server.start()
+        server.setup_local_system()
+        servers[alias] = server
+    merge_system(servers, layout.mergers)
+    first_server_response = servers['first'].rest_api.ec2.getCurrentTime.GET()
+    if first_server_response['isPrimaryTimeServer']:
+        system = System(primary=servers['first'], secondary=servers['second'])
+    else:
+        system = System(primary=servers['second'], secondary=servers['first'])
     primary_vm_time = system.primary.os_access.set_time(BASE_TIME)
     system.secondary.os_access.set_time(BASE_TIME)
-    assert wait_until(lambda: system.primary.get_time().is_close_to(primary_vm_time)), (
+    assert wait_until(lambda: get_time(system.primary.rest_api).is_close_to(primary_vm_time)), (
         "Time %s on PRIMARY time server doesn't align with time %s on MACHINE WITH PRIMARY time server." % (
-            system.primary.get_time(), primary_vm_time))
-    assert wait_until(lambda: system.secondary.get_time().is_close_to(primary_vm_time)), (
+            get_time(system.primary.rest_api), primary_vm_time))
+    assert wait_until(lambda: get_time(system.secondary.rest_api).is_close_to(primary_vm_time)), (
         "Time %s on NON-PRIMARY time server doesn't align with time %s on MACHINE WITH PRIMARY time server." % (
-            system.secondary.get_time(), primary_vm_time))
+            get_time(system.secondary.rest_api), primary_vm_time))
     return system
 
 
 @pytest.mark.quick
 def test_primary_follows_vm_time(system):
     primary_vm_time = system.primary.os_access.set_time(BASE_TIME + timedelta(hours=20))
-    assert wait_until(lambda: system.primary.get_time().is_close_to(primary_vm_time)), (
+    assert wait_until(lambda: get_time(system.primary.rest_api).is_close_to(primary_vm_time)), (
         "Time on PRIMARY time server %s does NOT FOLLOW time on MACHINE WITH PRIMARY time server %s." % (
-            system.primary.get_time(), primary_vm_time))
+            get_time(system.primary.rest_api), primary_vm_time))
 
 
 @pytest.mark.quick
 def test_change_time_on_primary_server(system):
     """Change time on PRIMARY server's machine. Expect all servers align with it."""
     primary_vm_time = system.primary.os_access.set_time(BASE_TIME + timedelta(hours=20))
-    assert wait_until(lambda: system.primary.get_time().is_close_to(primary_vm_time)), (
+    assert wait_until(lambda: get_time(system.primary.rest_api).is_close_to(primary_vm_time)), (
         "Time on PRIMARY time server %s does NOT FOLLOW time on MACHINE WITH PRIMARY time server %s." % (
-            system.primary.get_time(), primary_vm_time))
-    assert wait_until(lambda: system.secondary.get_time().is_close_to(primary_vm_time)), (
+            get_time(system.primary.rest_api), primary_vm_time))
+    assert wait_until(lambda: get_time(system.secondary.rest_api).is_close_to(primary_vm_time)), (
         "Time on NON-PRIMARY time server %s does NOT FOLLOW time on PRIMARY time server %s." % (
-            system.secondary.get_time(), primary_vm_time))
+            get_time(system.secondary.rest_api), primary_vm_time))
 
 
 @pytest.mark.quick
 def test_change_primary_server(system):
     """Change PRIMARY server, change time on its machine. Expect all servers align with it."""
-    system.secondary.rest_api.ec2.forcePrimaryTimeServer.POST(id=system.secondary.ecs_guid)
+    guid = get_server_id(system.secondary.rest_api)
+    system.secondary.rest_api.ec2.forcePrimaryTimeServer.POST(id=guid)
     new_primary, new_secondary = system.secondary, system.primary
     new_primary_vm_time = new_primary.os_access.set_time(BASE_TIME + timedelta(hours=5))
-    assert wait_until(lambda: new_primary.get_time().is_close_to(new_primary_vm_time)), (
+    assert wait_until(lambda: get_time(new_primary.rest_api).is_close_to(new_primary_vm_time)), (
         "Time on NEW PRIMARY time server %s does NOT FOLLOW time on MACHINE WITH NEW PRIMARY time server %s." % (
-            new_primary.get_time(), new_primary_vm_time))
-    assert wait_until(lambda: new_secondary.get_time().is_close_to(new_primary_vm_time)), (
+            get_time(new_primary.rest_api), new_primary_vm_time))
+    assert wait_until(lambda: get_time(new_secondary.rest_api).is_close_to(new_primary_vm_time)), (
         "Time on NEW NON-PRIMARY time server %s does NOT FOLLOW time on NEW PRIMARY time server %s." % (
-            new_secondary.get_time(), new_primary_vm_time))
+            get_time(new_secondary.rest_api), new_primary_vm_time))
 
 
 def test_change_time_on_secondary_server(system):
     """Change time on NON-PRIMARY server's machine. Expect all servers' time doesn't change."""
-    primary_time = system.primary.get_time()
+    primary_time = get_time(system.primary.rest_api)
     system.secondary.os_access.set_time(BASE_TIME + timedelta(hours=10))
-    assert holds_long_enough(lambda: system.secondary.get_time().is_close_to(primary_time)), (
+    assert holds_long_enough(lambda: get_time(system.secondary.rest_api).is_close_to(primary_time)), (
         "Time on NON-PRIMARY time server %s does NOT FOLLOW time on PRIMARY time server %s." % (
-            system.secondary.get_time(), primary_time))
+            get_time(system.secondary.rest_api), primary_time))
 
 
 def test_primary_server_temporary_offline(system):
     primary_time = system.primary.os_access.set_time(BASE_TIME - timedelta(hours=2))
-    assert wait_until(lambda: system.secondary.get_time().is_close_to(primary_time))
-    system.primary.stop_service()
+    assert wait_until(lambda: get_time(system.secondary.rest_api).is_close_to(primary_time))
+    system.primary.stop()
     system.secondary.os_access.set_time(BASE_TIME + timedelta(hours=4))
-    assert holds_long_enough(lambda: system.secondary.get_time().is_close_to(primary_time)), (
+    assert holds_long_enough(lambda: get_time(system.secondary.rest_api).is_close_to(primary_time)), (
         "After PRIMARY time server was stopped, "
         "time on NON-PRIMARY time server %s does NOT FOLLOW time on PRIMARY time server %s." % (
-            system.secondary.get_time(), primary_time))
+            get_time(system.secondary.rest_api), primary_time))
 
 
 def test_secondary_server_temporary_inet_on(system):
-    system.primary.set_system_settings(synchronizeTimeWithInternet=True)
+    system.primary.rest_api.api.systemSettings.GET(synchronizeTimeWithInternet=True)
 
-    # Turn on RFC868 (time protocol) on secondary VM.
-    TimeProtocolRestriction(system.secondary).disable()
-    assert wait_until(lambda: system.primary.get_time().is_close_to(get_internet_time())), (
+    enable_internet(system.secondary.machine)
+    assert wait_until(lambda: get_time(system.primary.rest_api).is_close_to(get_internet_time())), (
         "After connection to internet time server on MACHINE WITH NON-PRIMARY time server was allowed, "
         "time on PRIMARY time server %s is NOT EQUAL to internet time %s" % (
-            system.primary.get_time(), get_internet_time()))
-    assert wait_until(lambda: system.secondary.get_time().is_close_to(get_internet_time())), (
+            get_time(system.primary.rest_api), get_internet_time()))
+    assert wait_until(lambda: get_time(system.secondary.rest_api).is_close_to(get_internet_time())), (
         "After connection to internet time server on MACHINE WITH NON-PRIMARY time server was allowed, "
         "its time %s is NOT EQUAL to internet time %s" % (
-            system.secondary.get_time(), get_internet_time()))  # Change system time on PRIMARY VM.
+            get_time(system.secondary.rest_api), get_internet_time()))  # Change system time on PRIMARY VM.
     system.primary.os_access.set_time(BASE_TIME - timedelta(hours=5))
-    assert holds_long_enough(lambda: system.primary.get_time().is_close_to(get_internet_time())), (
+    assert holds_long_enough(lambda: get_time(system.primary.rest_api).is_close_to(get_internet_time())), (
         "After connection to internet time server on MACHINE WITH NON-PRIMARY time server was allowed, "
         "time on PRIMARY time server %s does NOT FOLLOW to internet time %s" % (
-            system.primary.get_time(), get_internet_time()))
-    TimeProtocolRestriction(system.secondary).enable()
+            get_time(system.primary.rest_api), get_internet_time()))
+    disable_internet(system.secondary.machine)
 
     # Turn off RFC868 (time protocol)
-    assert holds_long_enough(lambda: system.primary.get_time().is_close_to(get_internet_time())), (
+    assert holds_long_enough(lambda: get_time(system.primary.rest_api).is_close_to(get_internet_time())), (
         "After connection to internet time server "
         "on NON-PRIMARY time server was again restricted, "
         "time on PRIMARY time server %s is NOT EQUAL to internet time %s" % (
-            system.primary.get_time(), get_internet_time()))
+            get_time(system.primary.rest_api), get_internet_time()))
 
     # Stop secondary server
-    system.secondary.stop_service()
-    assert holds_long_enough(lambda: system.primary.get_time().is_close_to(get_internet_time())), (
+    system.secondary.stop()
+    assert holds_long_enough(lambda: get_time(system.primary.rest_api).is_close_to(get_internet_time())), (
         "When NON-PRIMARY server was stopped, "
         "time on PRIMARY time server %s is NOT EQUAL to internet time %s" % (
-            system.primary.get_time(), get_internet_time()))
-    system.secondary.start_service()
+            get_time(system.primary.rest_api), get_internet_time()))
+    system.secondary.start()
 
     # Restart secondary server
     system.secondary.restart_via_api()
-    assert holds_long_enough(lambda: system.primary.get_time().is_close_to(get_internet_time())), (
+    assert holds_long_enough(lambda: get_time(system.primary.rest_api).is_close_to(get_internet_time())), (
         "After NON-PRIMARY time server restart via API, "
         "its time %s is NOT EQUAL to internet time %s" % (
-            system.primary.get_time(), get_internet_time()))
+            get_time(system.primary.rest_api), get_internet_time()))
 
     # Stop and start both servers - so that servers could forget internet time
-    system.secondary.stop_service()
-    system.primary.stop_service()
+    system.secondary.stop()
+    system.primary.stop()
     time.sleep(1)
-    system.primary.start_service()
-    system.secondary.start_service()
+    system.primary.start()
+    system.secondary.start()
 
     # Detect new PRIMARY and change its system time
     system.primary.os_access.set_time(BASE_TIME - timedelta(hours=25))
-    assert wait_until(lambda: system.primary.get_time().is_close_to(get_internet_time())), (
+    assert wait_until(lambda: get_time(system.primary.rest_api).is_close_to(get_internet_time())), (
         "After servers restart as services "
         "and changing system time on MACHINE WITH PRIMARY time server, "
         "time on PRIMARY time server %s is NOT EQUAL to internet time %s" % (
-            system.primary.get_time(), get_internet_time()))
-    assert wait_until(lambda: system.secondary.get_time().is_close_to(get_internet_time())), (
+            get_time(system.primary.rest_api), get_internet_time()))
+    assert wait_until(lambda: get_time(system.secondary.rest_api).is_close_to(get_internet_time())), (
         "After servers restart as services "
         "and changing system time on MACHINE WITH PRIMARY time server, "
         "time on NON-PRIMARY time server %s is NOT EQUAL to internet time %s" % (
-            system.secondary.get_time(), get_internet_time()))
+            get_time(system.secondary.rest_api), get_internet_time()))

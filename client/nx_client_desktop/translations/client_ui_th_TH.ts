@@ -173,11 +173,6 @@
     <name>ArchiveLengthWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
-      <source>Form</source>
-      <translation>แบบฟอร์ม</translation>
-    </message>
-    <message>
-      <location/>
       <source>Fixed Archive Length</source>
       <translation>จำกัดความยาว</translation>
     </message>
@@ -202,7 +197,7 @@
     <message>
       <location filename="../src/ui/dialogs/audit_log_dialog.ui"/>
       <source>Refresh</source>
-      <translation>รีเฟรส</translation>
+      <translation>รีเฟส</translation>
     </message>
     <message>
       <location/>
@@ -450,7 +445,7 @@
     <message>
       <location filename="../src/ui/dialogs/private/search_bookmarks_dialog.ui"/>
       <source>Refresh</source>
-      <translation>รีเฟรส</translation>
+      <translation>รีเฟรช</translation>
     </message>
     <message>
       <location/>
@@ -755,7 +750,22 @@
     <message>
       <location/>
       <source>PTZ</source>
-      <translation type="unfinished">PTZ</translation>
+      <translation>PTZ</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Generate</source>
+      <translation type="unfinished">Generate</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset</source>
+      <translation>รีเซ็ต</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Logical Id</source>
+      <translation type="unfinished">Logical Id</translation>
     </message>
   </context>
   <context>
@@ -797,7 +807,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui"/>
       <source>Schedule Settings</source>
-      <translation>การตั้งค่าการบันทึก</translation>
+      <translation>กำหนดการตั้งค่า</translation>
     </message>
     <message>
       <location/>
@@ -877,7 +887,7 @@
     <message>
       <location/>
       <source>Panic Mode:</source>
-      <translation>โหมดฟังเพลง:</translation>
+      <translation>โหมดตื่นตระหนก:</translation>
     </message>
     <message>
       <location/>
@@ -961,6 +971,14 @@
     </message>
   </context>
   <context>
+    <name>CustomSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/custom_settings/widgets/custom_settings_widget.ui"/>
+      <source>Category</source>
+      <translation>ประเภท</translation>
+    </message>
+  </context>
+  <context>
     <name>DatabaseManagementWidget</name>
     <message>
       <location filename="../src/ui/widgets/system_settings/database_management_widget.ui"/>
@@ -988,7 +1006,7 @@
     <message>
       <location/>
       <source>Refresh</source>
-      <translation>รีเฟรส</translation>
+      <translation>รีเฟส</translation>
     </message>
     <message>
       <location/>
@@ -1207,7 +1225,7 @@
     <message>
       <location/>
       <source>Remove</source>
-      <translation>เอาออก</translation>
+      <translation>&amp;ลบ</translation>
     </message>
     <message>
       <location/>
@@ -1509,7 +1527,7 @@
     <message>
       <location/>
       <source>Remove</source>
-      <translation>เอาออก</translation>
+      <translation>ถอนออก</translation>
     </message>
     <message>
       <location/>
@@ -1585,7 +1603,7 @@
     <message>
       <location/>
       <source>Invalid License Key</source>
-      <translation>ใบอนุญาตไม่ถูกต้อง</translation>
+      <translation>คีย์สัญญาอนุญาตไม่ถูกต้อง</translation>
     </message>
     <message>
       <location/>
@@ -1722,7 +1740,7 @@
     <message>
       <location/>
       <source>Tour cycle</source>
-      <translation>ทัวร์รอบ</translation>
+      <translation>Tour cycle</translation>
     </message>
   </context>
   <context>
@@ -1743,7 +1761,7 @@
     <message>
       <location/>
       <source>Authentication</source>
-      <translation>ผู้ดูแลระบบ</translation>
+      <translation>การยืนยันตัวตน</translation>
     </message>
     <message>
       <location/>
@@ -1753,7 +1771,7 @@
     <message>
       <location/>
       <source>Login:</source>
-      <translation>ชื่อผู้ใช้:</translation>
+      <translation>ชื่อผู้ใช้งาน:</translation>
     </message>
     <message>
       <location/>
@@ -1768,7 +1786,7 @@
     <message>
       <location/>
       <source>Expert</source>
-      <translation>ผู้เชี่ยวชาญ</translation>
+      <translation>เพิ่มเติม</translation>
     </message>
   </context>
   <context>
@@ -1785,8 +1803,8 @@
     </message>
     <message>
       <location/>
-      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</translation>
+      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
     </message>
   </context>
   <context>
@@ -1945,7 +1963,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui"/>
       <source>Bookmark</source>
-      <translation>บุ๊คมาร์ก</translation>
+      <translation>ที่คั่นหนังสือ</translation>
     </message>
   </context>
   <context>
@@ -2033,7 +2051,7 @@
     <message>
       <location/>
       <source>Login:</source>
-      <translation>เข้าสู่ระบบ:</translation>
+      <translation>ชื่อผู้ใช้:</translation>
     </message>
     <message>
       <location/>
@@ -2087,7 +2105,7 @@
     <message>
       <location/>
       <source>Remove</source>
-      <translation>เอาออก</translation>
+      <translation>ลบ</translation>
     </message>
     <message>
       <location/>
@@ -2563,7 +2581,7 @@
     <message>
       <location/>
       <source>Recording</source>
-      <translation>การบันทึก</translation>
+      <translation>กำลังบันทึก</translation>
     </message>
     <message>
       <location/>
@@ -2667,11 +2685,6 @@
     </message>
     <message>
       <location/>
-      <source>TextLabel</source>
-      <translation type="unfinished">TextLabel</translation>
-    </message>
-    <message>
-      <location/>
       <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage.
 The oldest footage among all cameras on the server will be deleted first.</source>
       <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage.
@@ -2734,7 +2747,7 @@ The oldest footage among all cameras on the server will be deleted first.</trans
     <message>
       <location/>
       <source>Port:</source>
-      <translation>พอร์ท:</translation>
+      <translation>พอร์ต:</translation>
     </message>
     <message>
       <location/>
@@ -2879,7 +2892,7 @@ The oldest footage among all cameras on the server will be deleted first.</trans
     <message>
       <location/>
       <source>Login:</source>
-      <translation>เข้าสู่ระบบ:</translation>
+      <translation>ชื่อผู้ใช้:</translation>
     </message>
     <message>
       <location/>
@@ -3052,7 +3065,7 @@ Click &quot;New role&quot; button to create one.</source>
     <message>
       <location/>
       <source>Role</source>
-      <translation>สิทธิพิเศษ</translation>
+      <translation>บทบาท</translation>
     </message>
     <message>
       <location/>
@@ -3064,11 +3077,6 @@ Click &quot;New role&quot; button to create one.</source>
     <name>WearableMotionWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
-      <source>Form</source>
-      <translation>แบบฟอร์ม</translation>
-    </message>
-    <message>
-      <location/>
       <source>Motion Detection</source>
       <translation>ตรวจจับการเคลื่อนไหว</translation>
     </message>
@@ -3087,11 +3095,6 @@ Click &quot;New role&quot; button to create one.</source>
     <name>WearableProgressWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
-      <source>Form</source>
-      <translation>แบบฟอร์ม</translation>
-    </message>
-    <message>
-      <location/>
       <source>Cancel</source>
       <translation>ยกเลิก</translation>
     </message>
@@ -3100,11 +3103,6 @@ Click &quot;New role&quot; button to create one.</source>
     <name>WearableUploadWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
-      <source>Form</source>
-      <translation>แบบฟอร์ม</translation>
-    </message>
-    <message>
-      <location/>
       <source>Upload Video</source>
       <translation type="unfinished">Upload Video</translation>
     </message>

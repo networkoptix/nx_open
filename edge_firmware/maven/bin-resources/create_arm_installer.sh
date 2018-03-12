@@ -79,6 +79,13 @@ copyLib() # file lib_dir alt_lib_dir symlink_target_dir
     fi
 }
 
+# [in] Library name
+# [in] Destination directory
+copy_sys_lib()
+{
+    "$SOURCE_DIR"/build_utils/copy_system_library.sh -c "$COMPILER" "$@"
+}
+
 #--------------------------------------------------------------------------------------------------
 
 # [in] LIB_INSTALL_DIR
@@ -97,8 +104,9 @@ copyBuildLibs()
         libnx_kit
         libnx_network
         libnx_update
-        libnx_speech_synthesizer
         libnx_utils
+        libnx_sdk
+        libnx_plugin_utils
 
         # ffmpeg
         libavcodec
@@ -111,10 +119,7 @@ copyBuildLibs()
         libpostproc
 
         # third-party
-        liblber
-        libldap
         libquazip
-        libsasl2
         libsigar
         libudt
     )
@@ -122,6 +127,12 @@ copyBuildLibs()
     local OPTIONAL_LIBS_TO_COPY=(
         libvpx
     )
+
+    if [ "$BOX" != "edge1" ]; then
+        LIBS_TO_COPY+=(
+            libnx_speech_synthesizer
+        )
+    fi
 
     # Libs for BananaPi-based platforms.
     if [ "$BOX" = "bpi" ] || [ "$BOX" = "bananapi" ]; then
@@ -150,6 +161,22 @@ copyBuildLibs()
             libvdpau_sunxi
             libEGL
             libGLESv1_CM
+        )
+    fi
+
+    # OpenSSL (for latest debians).
+    if [ "$BOX" = "rpi" ] || [ "$BOX" = "bpi" ] || [ "$BOX" = "bananapi" ]; then
+        LIBS_TO_COPY+=(
+            libssl
+            libcrypto
+        )
+    fi
+
+    if [ "$BOX" = "edge1" ]; then
+        LIBS_TO_COPY+=(
+            liblber
+            libldap
+            libsasl2
         )
     fi
 
@@ -245,7 +272,7 @@ copyBins()
         if [ -d "$BIN_BUILD_DIR/plugins" ]; then
             local FILE
             for FILE in "$BIN_BUILD_DIR/plugins/"*; do
-                if [[ $FILE != *.debug ]]; then
+                if [ -f $FILE ] && [[ $FILE != *.debug ]]; then
                     if [ "$CUSTOMIZATION" != "hanwha" ] && [[ "$FILE" == *hanwha* ]]; then
                         continue
                     fi
@@ -438,13 +465,11 @@ copyVox()
 }
 
 # [in] LIB_INSTALL_DIR
-copyToolchainLibsIfNeeded()
+copyToolchainLibs()
 {
-    [ -z "$TOOLCHAIN_LIB_DIR" ] && exit
-
     echo "Copying toolchain libs (libstdc++, libatomic)"
-    cp -r "$TOOLCHAIN_LIB_DIR/libstdc++.so"* "$LIB_INSTALL_DIR/"
-    cp -r "$TOOLCHAIN_LIB_DIR/libatomic.so"* "$LIB_INSTALL_DIR/"
+    copy_sys_lib "libstdc++.so.6" "$LIB_INSTALL_DIR"
+    copy_sys_lib "libatomic.so.1" "$LIB_INSTALL_DIR"
 }
 
 # [in] WORK_DIR
@@ -536,7 +561,7 @@ buildDistribution()
     copyDebs
     copyAdditionalSysrootFilesIfNeeded
     copyVox
-    copyToolchainLibsIfNeeded
+    copyToolchainLibs
 
     if [ "$BOX" = "bpi" ]; then
         copyBpiSpecificFiles

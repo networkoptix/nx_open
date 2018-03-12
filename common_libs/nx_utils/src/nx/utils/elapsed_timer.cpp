@@ -13,9 +13,9 @@ bool ElapsedTimer::hasExpired(std::chrono::milliseconds value) const
     return !m_timer.isValid() || m_timer.hasExpired(value.count());
 }
 
-void ElapsedTimer::restart()
+std::chrono::milliseconds ElapsedTimer::restart()
 {
-    m_timer.restart();
+    return std::chrono::milliseconds(m_timer.restart());
 }
 
 void ElapsedTimer::invalidate()

@@ -182,6 +182,11 @@ public:
         PostCallback callback,
         QThread* targetThread = nullptr);
 
+    Handle validateFileInformation(
+        const QString& url,
+        GetCallback callback,
+        QThread* targetThread = nullptr);
+
     Handle removeFileDownload(
         const QString& fileName,
         bool deleteData,

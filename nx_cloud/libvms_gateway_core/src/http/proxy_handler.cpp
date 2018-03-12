@@ -237,7 +237,7 @@ void ProxyHandler::onConnected(
 
         return nx::utils::swapAndCall(
             m_requestCompletionHandler,
-            (errorCode == SystemError::hostNotFound || errorCode == SystemError::hostUnreach)
+            (errorCode == SystemError::hostNotFound || errorCode == SystemError::hostUnreachable)
                 ? nx::network::http::StatusCode::notFound
                 : nx::network::http::StatusCode::serviceUnavailable);
     }

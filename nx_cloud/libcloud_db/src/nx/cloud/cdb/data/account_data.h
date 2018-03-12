@@ -7,10 +7,13 @@
 
 #include <nx/fusion/fusion/fusion_fwd.h>
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/utils/stree/resourcecontainer.h>
+#include <nx/utils/stree/resourcenameset.h>
 #include <nx/utils/uuid.h>
 
 #include <nx/cloud/cdb/client/data/account_data.h>
-#include <nx/utils/stree/resourcecontainer.h>
+
+#include "access_rules.h"
 
 namespace nx {
 namespace cdb {
@@ -78,25 +81,6 @@ class TemporaryCredentialsParams:
 public:
     virtual bool getAsVariant(int resID, QVariant* const value) const override;
     virtual void put(int resID, const QVariant& value) override;
-};
-
-class AccessRestrictions
-{
-public:
-    /** exact names of allowed requests. if empty, \a requestsDenied is analyzed */
-    std::vector<std::string> requestsAllowed;
-    std::vector<std::string> requestsDenied;
-
-    /** ABNF syntax for serialized format:
-        auth_rights = *(api_method_rule ":")
-        api_method_rule = control_modifier api_method_name
-        control_modifier = "+" | "-"
-        api_method_name = uri_abs_path
-    */
-    std::string toString() const;
-    bool parse(const std::string& str);
-
-    bool authorize(const nx::utils::stree::AbstractResourceReader& requestAttributes) const;
 };
 
 class TemporaryAccountCredentials

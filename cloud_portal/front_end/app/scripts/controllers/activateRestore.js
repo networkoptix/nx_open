@@ -27,17 +27,28 @@ angular.module('cloudApp')
             if($scope.reactivating){
                 account.redirectAuthorised();
             }
-            if($scope.data.restoreCode || $scope.data.activateCode){
-                account.logoutAuthorised();
-                var code = $scope.data.restoreCode || $scope.data.activateCode;
-                account.checkCode(code).then(function(registered){
-                    if(!registered){
-                        // send to registration form with the code
-                        $location.path('/register/' + code);
-                    }
-                },function(){
-                    // Wrong activation code or some error - do nothing, keep user on this page
-                });
+            function checkActivate(){
+                if($scope.data.activateCode){
+                    setContext(null);
+                    $scope.activate.run();
+                }
+            }
+            function init(){
+                if($scope.data.restoreCode || $scope.data.activateCode){
+                    account.logoutAuthorised();
+                    var code = $scope.data.restoreCode || $scope.data.activateCode;
+                    account.checkCode(code).then(function(registered){
+                        if(!registered){
+                            // send to registration form with the code
+                            $location.path('/register/' + code);
+                        }else{
+                            checkActivate();
+                        }
+                    },function(){
+                        // Wrong activation code or some error - do nothing, keep user on this page
+                        checkActivate();
+                    });
+                }
             }
 
             function setContext(name){
@@ -137,9 +148,6 @@ angular.module('cloudApp')
                 dialogs.notify(L.account.activationLinkSent, 'success');
             });
 
-            if($scope.data.activateCode){
-                setContext(null);
-                $scope.activate.run();
-            }
+            init();
 
         }]);

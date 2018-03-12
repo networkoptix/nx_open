@@ -150,11 +150,9 @@ void QnFfmpegVideoDecoder::closeDecoder()
     m_decoderContext.close();
 #endif
 
-    av_free(m_frame);
-    m_frame = 0;
-    if (m_deinterlaceBuffer)
-        av_free(m_deinterlaceBuffer);
-    av_free(m_deinterlacedFrame);
+    av_frame_free(&m_frame);
+    av_freep(&m_deinterlaceBuffer);
+    av_frame_free(&m_deinterlacedFrame);
     delete m_frameTypeExtractor;
 }
 

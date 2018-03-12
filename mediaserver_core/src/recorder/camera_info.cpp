@@ -366,7 +366,13 @@ void Reader::addProperty(const ParseResult& result)
     else if (result.key().contains(kArchiveCameraGroupNameKey))
         coreData.groupName = result.value();
     else if (result.key().contains(kArchiveCameraUrlKey))
+    {
         coreData.url = result.value();
+
+        // TODO: #wearable This is a hack, and I'm failing to see an easy workaround.
+        if (coreData.url.startsWith(lit("wearable://")))
+            coreData.typeId = QnResourceTypePool::kWearableCameraTypeUuid;
+    }
     else
         m_archiveCamData.properties.emplace_back(result.key(), result.value());
 }

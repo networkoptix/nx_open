@@ -6,7 +6,7 @@
 #include <nx/streaming/abstract_data_packet.h>
 #include <core/resource/resource_consumer.h>
 
-class QN_EXPORT QnResourceCommand : public QnAbstractDataPacket, public QnResourceConsumer
+class QnResourceCommand : public QnAbstractDataPacket, public QnResourceConsumer
 {
 public:
     QnResourceCommand(const QnResourcePtr& res);

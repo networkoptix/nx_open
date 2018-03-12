@@ -78,11 +78,6 @@
       <translation>这些系统都采用了不同的 %1 URL。合并不是允许的。</translation>
     </message>
     <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>云系统只可以与非云合并。系统名称和密码取自云系统。</translation>
-    </message>
-    <message>
       <source>New System</source>
       <translation>新系统</translation>
     </message>
@@ -90,6 +85,10 @@
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
       <translation>发现的系统%1与当前系统不兼容。</translation>
+    </message>
+    <message>
+      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
+      <translation>云系统只可以与非云合并。系统名称和密码取自云系统。</translation>
     </message>
   </context>
   <context>
@@ -313,6 +312,10 @@
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
       <translation>首先，试着打开记录 （如果它是关闭的） 和减少 fps 在 I/O 模块设置 (错误&quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
+      <translation>请更新固件。最小支持版本是 %1。当前版本是 %2</translation>
     </message>
   </context>
   <context>
@@ -982,15 +985,15 @@
     </message>
     <message>
       <source>Advanced Viewer</source>
-      <translation>高级操作员</translation>
+      <translation>高级浏览者</translation>
     </message>
     <message>
       <source>Viewer</source>
-      <translation>操作员</translation>
+      <translation>浏览者</translation>
     </message>
     <message>
       <source>Live Viewer</source>
-      <translation>实时操作员</translation>
+      <translation>实时浏览者</translation>
     </message>
     <message>
       <source>Custom Role</source>

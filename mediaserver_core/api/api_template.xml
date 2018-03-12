@@ -3008,6 +3008,7 @@ the respective JSON fields can be empty.</description>
                 <function>
                     <name>HTTP Basic/Digest authentication</name>
                     <description>
+                        <b>This method is preferable for external applications, most of HTTP libraries support it.</b><br/>
                         Server is fully conformant with the authentication defined in rfc2617 (https://tools.ietf.org/html/rfc2617).
                     </description>
                     <method/>
@@ -3017,6 +3018,7 @@ the respective JSON fields can be empty.</description>
                 <function>
                     <name>Cookie-based authentication</name>
                     <description>
+                        <b>This method should only be used in browser javascript applications.</b><br/>
                         Cookie authorization scheme allows to avoid standard login/password dialog in web-applications.<br/>
                         It provides you a way to replace it with your own dialog.<br/>
                         It works mostly like sessions, but is a bit more secure because it doesn't send user's password over HTTP.<br/>
@@ -3033,8 +3035,14 @@ the respective JSON fields can be empty.</description>
                                 <li>Call <code>GET /api/getNonce</code></li>
                                 <li>In response you'll get a JSON object with <i>realm</i> and <i>nonce</i> (nonce is a session key for this user)</li>
                                 <li>Calculate authentication hash <i>auth_digest</i>, using realm and nonce (see algorithm below)</li>
-                                <li>Call <code>POST /api/cookieLogin</code> and pass the "auth" parameter in the request</li>
+                                <li>Call <code>POST /api/cookieLogin</code> and pass the "auth" parameter in the json request body</li>
                                 <li>Server will check authentication and set session cookies</li>
+                            </ol>
+                        </li>
+                        <li>Executing requests:
+                            <ol>
+                                <li>Session cookie should be supplied with every request, browser does it automatically if cookies are enabled</li>
+                                <li>HTTP header <i>Nx-Vms-Csrf-Token</i> should contain the key from <i>nx-vms-csrf-token</i> cookie value</li>
                             </ol>
                         </li>
                         <li>To log out:
@@ -3052,11 +3060,12 @@ the respective JSON fields can be empty.</description>
                 <function>
                     <name>URL-based authentication</name>
                     <description>
-                        You can add the "auth" parameter to the URL query section.
+                        <b>This method should only be used if other methods are not applicable, e.g. webm direct link.</b><br/>
+                        Add the "auth" parameter to the URL query section of any GET request
                         <ul>
                             <li>Call <code>/api/getNonce</code> to get <i>realm</i> and <i>nonce</i> from the server (the current server time is used as a nonce value, and the nonce is valid for about 5 minutes)</li>
                             <li>Calculate the authentication hash <i>auth_digest</i>, using realm and nonce (see algorithm below)</li>
-                            <li>Specify the authentication hash in the URL parameter: http://127.0.0.1:7001/ec2/method?...&amp;auth=<i>auth_digest</i> </li>
+                            <li>Specify the authentication hash in the URL parameter: http://127.0.0.1:7001/<i>method</i>?auth=<i>auth_digest</i>&amp;<i>other_params</i></li>
                         </ul>
                     </description>
                     <method/>

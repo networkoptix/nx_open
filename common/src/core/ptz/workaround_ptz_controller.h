@@ -22,6 +22,8 @@ private:
 
     bool m_overrideCapabilities;
     Ptz::Capabilities m_capabilities;
+    Ptz::Capabilities m_capabilitiesToAdd;
+    Ptz::Capabilities m_capabilitiesToRemove;
 };
 
 #endif // QN_WORKAROUND_PTZ_CONTROLLER_H

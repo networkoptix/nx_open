@@ -16,7 +16,7 @@
     <message>
       <location/>
       <source>Credits</source>
-      <translation>Credits</translation>
+      <translation>생성</translation>
     </message>
     <message>
       <location/>
@@ -173,11 +173,6 @@
     <name>ArchiveLengthWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
-      <source>Form</source>
-      <translation>틀</translation>
-    </message>
-    <message>
-      <location/>
       <source>Fixed Archive Length</source>
       <translation>녹화 범위 설정</translation>
     </message>
@@ -262,7 +257,7 @@
     <message>
       <location/>
       <source>Audit Trail</source>
-      <translation>감사 추적</translation>
+      <translation>시스템 감사</translation>
     </message>
     <message>
       <location/>
@@ -498,7 +493,7 @@
     <message>
       <location/>
       <source>At</source>
-      <translation>항목</translation>
+      <translation>At</translation>
     </message>
   </context>
   <context>
@@ -521,7 +516,7 @@
     <message>
       <location/>
       <source>Event Log...</source>
-      <translation>이벤트정보...</translation>
+      <translation>이벤트 로그...</translation>
     </message>
     <message>
       <location/>
@@ -534,7 +529,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_addition_dialog.ui"/>
       <source>Server is offline</source>
-      <translation>서버는 오프 라인 입니다</translation>
+      <translation>오프라인</translation>
     </message>
     <message>
       <location/>
@@ -559,7 +554,7 @@
     <message>
       <location/>
       <source>Stop</source>
-      <translation>멈춤</translation>
+      <translation>정지</translation>
     </message>
     <message>
       <location/>
@@ -614,12 +609,12 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation>패스워드</translation>
+      <translation>비밀번호</translation>
     </message>
     <message>
       <location/>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>로그인</translation>
     </message>
     <message>
       <location/>
@@ -680,7 +675,7 @@
     <message>
       <location/>
       <source>Restore Defaults</source>
-      <translation>기본값 복원</translation>
+      <translation>초기값 복구</translation>
     </message>
     <message>
       <location/>
@@ -756,6 +751,21 @@
       <location/>
       <source>PTZ</source>
       <translation>PTZ</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Generate</source>
+      <translation>생성</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset</source>
+      <translation>초기화</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Logical Id</source>
+      <translation>논리 Id</translation>
     </message>
   </context>
   <context>
@@ -895,7 +905,7 @@
     <message>
       <location filename="../src/ui/dialogs/resource_properties/change_user_password_dialog.ui"/>
       <source>Change password</source>
-      <translation>패스워드 변경</translation>
+      <translation>암호 변경</translation>
     </message>
   </context>
   <context>
@@ -903,7 +913,7 @@
     <message>
       <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
       <source>Stay logged in</source>
-      <translation>로그인 유지</translation>
+      <translation>로그인 상태 유지</translation>
     </message>
   </context>
   <context>
@@ -921,7 +931,7 @@
     <message>
       <location/>
       <source>Save password</source>
-      <translation>패스워드 저장</translation>
+      <translation>비밀번호 저장</translation>
     </message>
   </context>
   <context>
@@ -958,6 +968,14 @@
       <location/>
       <source>Description contains:</source>
       <translation>상세 포함</translation>
+    </message>
+  </context>
+  <context>
+    <name>CustomSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/custom_settings/widgets/custom_settings_widget.ui"/>
+      <source>Category</source>
+      <translation>카테고리</translation>
     </message>
   </context>
   <context>
@@ -1016,7 +1034,7 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>로그인</translation>
     </message>
     <message>
       <location/>
@@ -1026,7 +1044,7 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation>패스워드</translation>
+      <translation>비밀번호</translation>
     </message>
     <message>
       <location/>
@@ -1164,7 +1182,7 @@
     <message>
       <location/>
       <source>X Offset</source>
-      <translation>X 오프셋</translation>
+      <translation>오프셋 X</translation>
     </message>
     <message>
       <location/>
@@ -1207,7 +1225,7 @@
     <message>
       <location/>
       <source>Remove</source>
-      <translation>삭제</translation>
+      <translation>제거</translation>
     </message>
     <message>
       <location/>
@@ -1425,7 +1443,7 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation>패스워드</translation>
+      <translation>비밀번호</translation>
     </message>
     <message>
       <location/>
@@ -1443,7 +1461,7 @@
     <message>
       <location filename="../src/ui/dialogs/ldap_users_dialog.ui"/>
       <source>Fetch Users from LDAP...</source>
-      <translation>LDAP으로 부터 사용자 정보 가져오기</translation>
+      <translation>LDAP으로 부터 사용자 정보 일기</translation>
     </message>
     <message>
       <location/>
@@ -1509,7 +1527,7 @@
     <message>
       <location/>
       <source>Remove</source>
-      <translation>삭제</translation>
+      <translation>제거</translation>
     </message>
     <message>
       <location/>
@@ -1649,12 +1667,12 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>로그인</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation>패스워드</translation>
+      <translation>비밀번호</translation>
     </message>
     <message>
       <location/>
@@ -1707,7 +1725,7 @@
     <message>
       <location/>
       <source>Intensity</source>
-      <translation>강도</translation>
+      <translation>강도:</translation>
     </message>
     <message>
       <location/>
@@ -1722,7 +1740,7 @@
     <message>
       <location/>
       <source>Tour cycle</source>
-      <translation>투어 간격</translation>
+      <translation>Tour cycle</translation>
     </message>
   </context>
   <context>
@@ -1785,8 +1803,8 @@
     </message>
     <message>
       <location/>
-      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</translation>
+      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation>&quot;웨어러블 카메라&quot;는 서버에 업로드 및 사용자가 접근 할수 있는 가상저장소 입니다.</translation>
     </message>
   </context>
   <context>
@@ -1945,7 +1963,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui"/>
       <source>Bookmark</source>
-      <translation>북마크(책갈피)</translation>
+      <translation>북마크</translation>
     </message>
   </context>
   <context>
@@ -1966,7 +1984,7 @@
     <message>
       <location/>
       <source>Password:</source>
-      <translation>패스워드:</translation>
+      <translation>비밀번호:</translation>
     </message>
     <message>
       <location/>
@@ -1997,7 +2015,7 @@
     <message>
       <location/>
       <source>Stay logged in</source>
-      <translation>로그인 유지</translation>
+      <translation>로그인 상태 유지</translation>
     </message>
   </context>
   <context>
@@ -2023,7 +2041,7 @@
     <message>
       <location/>
       <source>Password:</source>
-      <translation>패스워드:</translation>
+      <translation>비밀번호:</translation>
     </message>
     <message>
       <location/>
@@ -2033,7 +2051,7 @@
     <message>
       <location/>
       <source>Login:</source>
-      <translation>Login:</translation>
+      <translation>로그인:</translation>
     </message>
     <message>
       <location/>
@@ -2087,7 +2105,7 @@
     <message>
       <location/>
       <source>Remove</source>
-      <translation>삭제</translation>
+      <translation>제거</translation>
     </message>
     <message>
       <location/>
@@ -2143,7 +2161,7 @@
     <message>
       <location filename="../src/ui/dialogs/system_administration_dialog.ui"/>
       <source>System Administration</source>
-      <translation>시스템 관리자</translation>
+      <translation>관리자</translation>
     </message>
   </context>
   <context>
@@ -2171,7 +2189,7 @@
     <message>
       <location/>
       <source>Options</source>
-      <translation>옵션:</translation>
+      <translation>옵션</translation>
     </message>
     <message>
       <location/>
@@ -2456,7 +2474,7 @@
     <message>
       <location/>
       <source>Failover Priority...</source>
-      <translation>Failover우선순위...</translation>
+      <translation>이중화 우선순위</translation>
     </message>
     <message>
       <location/>
@@ -2598,7 +2616,7 @@
     <message>
       <location/>
       <source>Fisheye</source>
-      <translation>Fisheye</translation>
+      <translation>어안렌즈</translation>
     </message>
     <message>
       <location/>
@@ -2633,12 +2651,12 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>로그인</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation>패스워드</translation>
+      <translation>비밀번호</translation>
     </message>
     <message>
       <location/>
@@ -2664,11 +2682,6 @@
       <location/>
       <source>Reset</source>
       <translation>초기화</translation>
-    </message>
-    <message>
-      <location/>
-      <source>TextLabel</source>
-      <translation type="unfinished">TextLabel</translation>
     </message>
     <message>
       <location/>
@@ -2878,12 +2891,12 @@ The oldest footage among all cameras on the server will be deleted first.</sourc
     <message>
       <location/>
       <source>Login:</source>
-      <translation>Login:</translation>
+      <translation>로그인:</translation>
     </message>
     <message>
       <location/>
       <source>Password:</source>
-      <translation>패스워드:</translation>
+      <translation>비밀번호:</translation>
     </message>
   </context>
   <context>
@@ -2891,7 +2904,7 @@ The oldest footage among all cameras on the server will be deleted first.</sourc
     <message>
       <location filename="../src/nx/client/desktop/ui/event_rules/subject_selection_dialog.ui"/>
       <source>Roles</source>
-      <translation>역할</translation>
+      <translation>역할들:</translation>
     </message>
     <message>
       <location/>
@@ -3063,18 +3076,13 @@ Click &quot;New role&quot; button to create one.</source>
     <name>WearableMotionWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
-      <source>Form</source>
-      <translation>틀</translation>
-    </message>
-    <message>
-      <location/>
       <source>Motion Detection</source>
       <translation>움직임 감지:</translation>
     </message>
     <message>
       <location/>
       <source>Detect motion in uploaded video</source>
-      <translation type="unfinished">Detect motion in uploaded video</translation>
+      <translation>업로드 된 동영상의 움직임 감지</translation>
     </message>
     <message>
       <location/>
@@ -3086,11 +3094,6 @@ Click &quot;New role&quot; button to create one.</source>
     <name>WearableProgressWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
-      <source>Form</source>
-      <translation>틀</translation>
-    </message>
-    <message>
-      <location/>
       <source>Cancel</source>
       <translation>취소</translation>
     </message>
@@ -3099,11 +3102,6 @@ Click &quot;New role&quot; button to create one.</source>
     <name>WearableUploadWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
-      <source>Form</source>
-      <translation>틀</translation>
-    </message>
-    <message>
-      <location/>
       <source>Upload Video</source>
       <translation>비디오 업로드</translation>
     </message>

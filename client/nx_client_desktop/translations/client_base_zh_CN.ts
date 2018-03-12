@@ -296,7 +296,7 @@ to view more bookmarks</source>
     <message>
       <source>Log in to %1...</source>
       <comment>Log in to Nx Cloud</comment>
-      <translation>登录到 %1...</translation>
+      <translation>登录到 %1</translation>
     </message>
     <message>
       <source>Log out from %1</source>
@@ -318,7 +318,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Event Rules...</source>
-      <translation>事件规则...</translation>
+      <translation>事件规则</translation>
     </message>
     <message>
       <source>Devices List</source>
@@ -849,6 +849,22 @@ to view more bookmarks</source>
       <translation>制作幻灯片</translation>
     </message>
     <message>
+      <source>Wearable Camera...</source>
+      <translation>穿戴式相机...</translation>
+    </message>
+    <message>
+      <source>New Wearable Camera...</source>
+      <translation>新的穿戴式相机...</translation>
+    </message>
+    <message>
+      <source>Upload File...</source>
+      <translation>上传文件</translation>
+    </message>
+    <message>
+      <source>Upload Folder...</source>
+      <translation>上传文件夹...</translation>
+    </message>
+    <message>
       <source>Start Analytics...</source>
       <translation>启动分析...</translation>
     </message>
@@ -875,22 +891,6 @@ to view more bookmarks</source>
     <message>
       <source>Cell Spacing...</source>
       <translation>网格间距：</translation>
-    </message>
-    <message>
-      <source>Wearable Camera...</source>
-      <translation type="unfinished">Wearable Camera...</translation>
-    </message>
-    <message>
-      <source>New Wearable Camera...</source>
-      <translation type="unfinished">New Wearable Camera...</translation>
-    </message>
-    <message>
-      <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
-    </message>
-    <message>
-      <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
     </message>
   </context>
   <context>
@@ -948,7 +948,7 @@ to view more bookmarks</source>
     <name>Deactivator</name>
     <message>
       <source>Unknown error.</source>
-      <translation>未知的错误.</translation>
+      <translation>出现未知的错误。</translation>
     </message>
     <message>
       <source>License does not exist.</source>
@@ -1002,16 +1002,16 @@ to view more bookmarks</source>
       <translation>您即将导出长视频。它可能需要超过千兆字节的硬盘空间，需要几分钟才能完成。</translation>
     </message>
     <message>
-      <source>Local files, server monitor widgets and webpages will not be exported.</source>
-      <translation>本地文件，服务器监视器小部件和网页将不会被导出。</translation>
-    </message>
-    <message>
       <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
       <translation>导出的.EXE文件的大小超过4 GB，无法在Windows中双击打开。它只能在 %1 Client中播放。</translation>
     </message>
     <message>
+      <source>Local files, server monitor widgets and webpages will not be exported.</source>
+      <translation>本地文件，服务器监视器小部件和网页将不会被导出。</translation>
+    </message>
+    <message>
       <source>Settings are not available for .NOV and .EXE files.</source>
-      <translation type="unfinished">Settings are not available for .NOV and .EXE files.</translation>
+      <translation>设置不适用于.NOV和.EXE文件。</translation>
     </message>
   </context>
   <context>
@@ -1022,7 +1022,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Matroska</source>
-      <translation type="unfinished">Matroska</translation>
+      <translation>Matroska</translation>
     </message>
     <message>
       <source>MPEG-4 Part 14</source>
@@ -1171,14 +1171,6 @@ to view more bookmarks</source>
       <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
       <translation>允许只拉丁文字母、 数字和符号键盘。</translation>
     </message>
-    <message>
-      <source>Long</source>
-      <translation>长</translation>
-    </message>
-    <message>
-      <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
-      <translation>允许只拉丁文字母、 数字和符号键盘%1。</translation>
-    </message>
     <message numerus="yes">
       <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
       <translation>
@@ -1190,6 +1182,10 @@ to view more bookmarks</source>
       <translation>
         <numerusform>密码必须至少 %n 个字符长。</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Long</source>
+      <translation>长</translation>
     </message>
     <message numerus="yes">
       <source>Password must be no longer than %n characters.</source>
@@ -1209,6 +1205,10 @@ to view more bookmarks</source>
         <numerusform>密码不应当包含%n重复字符</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
+      <translation>允许只拉丁文字母、 数字和符号键盘%1。</translation>
+    </message>
   </context>
   <context>
     <name>PermissionsInfoTable</name>
@@ -1218,7 +1218,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Shared Layouts</source>
-      <translation>共享的布局</translation>
+      <translation>共享视窗</translation>
     </message>
     <message>
       <source>All</source>
@@ -1376,7 +1376,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>All Cameras &amp; Resources</source>
-      <translation>所有的摄像机与资源</translation>
+      <translation>摄像机与资源</translation>
     </message>
   </context>
   <context>
@@ -1831,11 +1831,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Any Device</source>
-      <translation>任何设备</translation>
+      <translation>所有设备</translation>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation>任何摄像机</translation>
+      <translation>所有摄像机</translation>
     </message>
   </context>
   <context>
@@ -1909,11 +1909,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Any Device</source>
-      <translation>任何设备</translation>
+      <translation>所有设备</translation>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation>任何摄像机</translation>
+      <translation>所有摄像机</translation>
     </message>
   </context>
   <context>
@@ -1946,11 +1946,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Any Device</source>
-      <translation>任何设备</translation>
+      <translation>所有设备</translation>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation>任何摄像机</translation>
+      <translation>所有摄像机</translation>
     </message>
   </context>
   <context>
@@ -2224,14 +2224,14 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>No settings</source>
-      <translation type="unfinished">No settings</translation>
+      <translation>无设置</translation>
     </message>
   </context>
   <context>
     <name>QnCameraAnalyticsPolicy</name>
     <message>
       <source>Analytics is not available for %1</source>
-      <translation type="unfinished">Analytics is not available for %1</translation>
+      <translation>分析不可用于%1</translation>
     </message>
   </context>
   <context>
@@ -2334,7 +2334,13 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Edge</source>
-      <translation type="unfinished">Edge</translation>
+      <translation>Edge</translation>
+    </message>
+    <message numerus="yes">
+      <source>This Id is already used on the following %n cameras: %1</source>
+      <translation type="unfinished">
+        <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -2450,6 +2456,10 @@ to view more bookmarks</source>
       <source>Server</source>
       <translation>服务器</translation>
     </message>
+    <message>
+      <source>Logical Id</source>
+      <translation type="unfinished">Logical Id</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraMotionMaskWidget</name>
@@ -2486,7 +2496,7 @@ to view more bookmarks</source>
     <name>QnCameraMotionPolicy</name>
     <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation type="unfinished">Recording or motion detection is disabled for %1</translation>
+      <translation>%1 录像或移动侦测功能已禁用</translation>
     </message>
   </context>
   <context>
@@ -2508,10 +2518,6 @@ to view more bookmarks</source>
   <context>
     <name>QnCameraPasswordChangeDialog</name>
     <message>
-      <source>Password shouldn&apos;t be equal to camera&apos;s user name</source>
-      <translation>密码不得与摄像机的用户名称相同</translation>
-    </message>
-    <message>
       <source>New Password</source>
       <translation>新密码</translation>
     </message>
@@ -2527,12 +2533,16 @@ to view more bookmarks</source>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
       <translation>密码长度应至少为8个符号，并包含不同类型的字符。</translation>
     </message>
+    <message>
+      <source>Password should not be equal to camera&apos;s user name</source>
+      <translation type="unfinished">Password should not be equal to camera&apos;s user name</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraRecordingPolicy</name>
     <message>
       <source>Recording is disabled for %1</source>
-      <translation type="unfinished">Recording is disabled for %1</translation>
+      <translation>%1 的录像功能关闭</translation>
     </message>
   </context>
   <context>
@@ -2703,11 +2713,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Cannot edit properties for several wearable and non-wearable cameras.</source>
-      <translation type="unfinished">Cannot edit properties for several wearable and non-wearable cameras.</translation>
+      <translation>无法编辑某些穿戴式和非穿戴式相机的属性。</translation>
     </message>
     <message>
       <source>Cannot edit properties for several wearable cameras.</source>
-      <translation type="unfinished">Cannot edit properties for several wearable cameras.</translation>
+      <translation>无法编辑某些穿戴式相机的属性。</translation>
     </message>
   </context>
   <context>
@@ -2801,7 +2811,7 @@ to %1</source>
       <translation>不正确的邮箱或密码</translation>
     </message>
     <message>
-      <source>Account isn&apos;t activated. Please check your email and follow provided instructions</source>
+      <source>Account is not activated. Please check your email and follow provided instructions</source>
       <translation>帐户无法激活。请检查您的电子邮件并遵循提供的说明操作</translation>
     </message>
   </context>
@@ -3150,15 +3160,13 @@ to %1</source>
       <source>Some of selected cameras requires password to be set up.</source>
       <translation>某些选定的相机需要设置密码。</translation>
     </message>
-    <message numerus="yes">
-      <source>Set Password</source>
-      <translation>
-        <numerusform>设置密码</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Ask your system administrator to do it.</source>
       <translation>要求您的系统管理员执行此操作。</translation>
+    </message>
+    <message>
+      <source>Set Password</source>
+      <translation type="unfinished">Set Password</translation>
     </message>
   </context>
   <context>
@@ -4302,7 +4310,7 @@ to %1</source>
     </message>
     <message>
       <source>Forgot password?</source>
-      <translation>忘记密码？</translation>
+      <translation>忘记密码?</translation>
     </message>
     <message>
       <source>Learn more about</source>
@@ -4316,7 +4324,7 @@ to %1</source>
     <message>
       <source>Welcome to %1!</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>欢迎来到 %1!</translation>
+      <translation>欢迎来到 %1</translation>
     </message>
   </context>
   <context>
@@ -4472,7 +4480,7 @@ to %1</source>
     </message>
     <message>
       <source>Failed to merge Systems</source>
-      <translation>无法合并系统</translation>
+      <translation>无法联网系统</translation>
     </message>
     <message>
       <source>URL is invalid.</source>
@@ -4492,11 +4500,11 @@ to %1</source>
     </message>
     <message>
       <source>Systems will be merged shortly</source>
-      <translation>系统将于短期内合并</translation>
+      <translation>系统将很快合并</translation>
     </message>
     <message>
       <source>You will be reconnected.</source>
-      <translation>将重连.</translation>
+      <translation>您将被重新连接。</translation>
     </message>
   </context>
   <context>
@@ -4538,11 +4546,11 @@ to %1</source>
     </message>
     <message>
       <source>Enable Secondary Stream</source>
-      <translation>启用次码流</translation>
+      <translation>启用副码流</translation>
     </message>
     <message>
       <source>multiple values</source>
-      <translation>多重取值</translation>
+      <translation>多个值</translation>
     </message>
     <message>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
@@ -4607,11 +4615,11 @@ to %1</source>
     <name>QnNewWearableCameraDialog</name>
     <message>
       <source>Wearable Camera</source>
-      <translation type="unfinished">Wearable Camera</translation>
+      <translation>穿戴式相机...</translation>
     </message>
     <message>
       <source>Wearable Camera %1</source>
-      <translation type="unfinished">Wearable Camera %1</translation>
+      <translation>穿戴式相机 %1</translation>
     </message>
     <message>
       <source>Name</source>
@@ -4619,7 +4627,7 @@ to %1</source>
     </message>
     <message>
       <source>Name cannot be empty</source>
-      <translation type="unfinished">Name cannot be empty</translation>
+      <translation>名称不能为空。</translation>
     </message>
   </context>
   <context>
@@ -4707,16 +4715,16 @@ to %1</source>
   <context>
     <name>QnPerformanceTest</name>
     <message>
-      <source>For full - featured mode, please use another computer</source>
-      <translation>若需启用全功能模式, 请使用另外的服务器.</translation>
-    </message>
-    <message>
       <source>%1 can work in configuration mode only</source>
       <translation>%1 只工作在配置模式下</translation>
     </message>
     <message>
       <source>Performance of this computer allows running %1 in configuration mode only.</source>
       <translation>当前服务器性能在配置模式下仅允许运行 %1.</translation>
+    </message>
+    <message>
+      <source>For full-featured mode please use another computer</source>
+      <translation>若需启用全功能模式,请使用另外的服务器</translation>
     </message>
   </context>
   <context>
@@ -4970,22 +4978,6 @@ to %1</source>
     <message>
       <source>Quarter Native</source>
       <translation>1/4 原生</translation>
-    </message>
-    <message>
-      <source>1920x1080</source>
-      <translation>1920 x 1080</translation>
-    </message>
-    <message>
-      <source>1280x720</source>
-      <translation>1280 x 720</translation>
-    </message>
-    <message>
-      <source>640x480</source>
-      <translation>640 x 480</translation>
-    </message>
-    <message>
-      <source>320x240</source>
-      <translation>320 x 240</translation>
     </message>
   </context>
   <context>
@@ -5293,7 +5285,7 @@ to %1</source>
     <name>QnScheduleGridWidget</name>
     <message>
       <source>All</source>
-      <translation>全部</translation>
+      <translation>所有</translation>
     </message>
   </context>
   <context>
@@ -5380,7 +5372,7 @@ to %1</source>
     <name>QnSelectServersButton</name>
     <message>
       <source>Any Server</source>
-      <translation>所有服务器</translation>
+      <translation>任何服务器</translation>
     </message>
     <message>
       <source>All Servers</source>
@@ -5405,7 +5397,7 @@ to %1</source>
     </message>
     <message>
       <source>All Users</source>
-      <translation>All 用户</translation>
+      <translation>所有用户</translation>
     </message>
     <message>
       <source>Select Users...</source>
@@ -5911,7 +5903,7 @@ to %1</source>
     </message>
     <message>
       <source>Password cannot be empty.</source>
-      <translation>密码不能为空.</translation>
+      <translation>密码不能为空。</translation>
     </message>
     <message>
       <source>System Signature</source>
@@ -5970,7 +5962,7 @@ to %1</source>
     </message>
     <message>
       <source>Network error</source>
-      <translation>网络错误</translation>
+      <translation>网络链接错误</translation>
     </message>
     <message>
       <source>Invalid parameters</source>
@@ -6043,7 +6035,7 @@ to %1</source>
     </message>
     <message>
       <source>I/O Module Settings</source>
-      <translation>I/O 模板设置</translation>
+      <translation>I/O模块设置</translation>
     </message>
     <message>
       <source>Diagnostics</source>
@@ -6062,6 +6054,10 @@ to %1</source>
       <translation>请检查身份验证信息</translation>
     </message>
     <message>
+      <source>NO LIVE STREAM</source>
+      <translation>没有实时流</translation>
+    </message>
+    <message>
       <source>TOO MANY CONNECTIONS</source>
       <translation>连接太多</translation>
     </message>
@@ -6074,8 +6070,8 @@ to %1</source>
       <translation>为此相机设置</translation>
     </message>
     <message>
-      <source>NO LIVE STREAM</source>
-      <translation type="unfinished">NO LIVE STREAM</translation>
+      <source>UNSUPPORTED FIRMWARE VERSION</source>
+      <translation>无支持的固件版本</translation>
     </message>
   </context>
   <context>
@@ -6169,11 +6165,11 @@ to %1</source>
     </message>
     <message>
       <source>Archive backup is completed up to &lt;b&gt;%1&lt;/b&gt;</source>
-      <translation>档案备份被完成 &lt;b&gt;%1&lt;/b&gt;</translation>
+      <translation>存档备份完成於 &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
       <source>Next backup is scheduled for &lt;b&gt;%1&lt;/b&gt;</source>
-      <translation>下一次备份被定于 &lt;b&gt;%1&lt;/b&gt;</translation>
+      <translation>下次备份时程为 &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
       <source>Next backup is not scheduled.</source>
@@ -6225,7 +6221,7 @@ to %1</source>
     </message>
     <message>
       <source>Recording was enabled on the USB storage</source>
-      <translation type="unfinished">Recording was enabled on the USB storage</translation>
+      <translation>在USB存储器上启用了录制</translation>
     </message>
   </context>
   <context>
@@ -6494,7 +6490,7 @@ to %1</source>
     </message>
     <message>
       <source>Remote archive synchronization</source>
-      <translation>远程归档同步</translation>
+      <translation>Remote archive synchronization</translation>
     </message>
     <message>
       <source>Archive integrity problem detected</source>
@@ -6555,7 +6551,7 @@ to %1</source>
     </message>
     <message>
       <source>Time</source>
-      <translation>时效性</translation>
+      <translation>时间</translation>
     </message>
   </context>
   <context>
@@ -6641,12 +6637,12 @@ to %1</source>
     <message>
       <source>h:mm ap</source>
       <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-      <translation>hh:mm</translation>
+      <translation>h: mm ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h:mm ap</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>dd日 MMMM yyyy hh:mm</translation>
+      <translation>dd日 MMMM yyyy h:mm ap</translation>
     </message>
   </context>
   <context>
@@ -7034,7 +7030,7 @@ to %1</source>
     </message>
     <message>
       <source>Password cannot be empty.</source>
-      <translation>密码不能为空.</translation>
+      <translation>密码不能为空。</translation>
     </message>
     <message>
       <source>Avoid leading and trailing spaces.</source>
@@ -7093,36 +7089,34 @@ to %1</source>
     <name>QnWearableProgressWidget</name>
     <message>
       <source>Uploading %1... %2	%p%</source>
-      <translation type="unfinished">Uploading %1... %2	%p%</translation>
-    </message>
-    <message numerus="yes">
-      <source>(%n more file(s) in queue)</source>
-      <translation type="unfinished">
-        <numerusform>(%n more file(s) in queue)</numerusform>
-      </translation>
+      <translation>上传 %1... %2	%p％</translation>
     </message>
     <message>
       <source>Stop uploading?</source>
-      <translation type="unfinished">Stop uploading?</translation>
+      <translation>停止上传？</translation>
     </message>
     <message>
       <source>Already uploaded files will be kept.</source>
-      <translation type="unfinished">Already uploaded files will be kept.</translation>
+      <translation>已经上传的文件将被保留。</translation>
     </message>
     <message>
       <source>Finalizing %1... %2	%p%</source>
-      <translation type="unfinished">Finalizing %1... %2	%p%</translation>
+      <translation>正在完成 %1... %2	%p％</translation>
+    </message>
+    <message>
+      <source>(%1 of %2)</source>
+      <translation>(%1 of %2)</translation>
     </message>
   </context>
   <context>
     <name>QnWearableUploadWidget</name>
     <message>
       <source>User &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation type="unfinished">User &quot;%1&quot; is currently uploading footage to this camera.</translation>
+      <translation>用户 &quot;%1&quot; 当前正在将档案上传到本相机。</translation>
     </message>
     <message>
       <source>Another user is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Another user is currently uploading footage to this camera.</translation>
+      <translation>另一位用户正在将档案上传到此相机。</translation>
     </message>
   </context>
   <context>
@@ -7219,7 +7213,7 @@ to %1</source>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
       <source>Systems will be merged shortly</source>
-      <translation>系统将很快合并</translation>
+      <translation>系统将于短期内合并</translation>
     </message>
     <message>
       <source>Servers from the other System will appear in the resource tree.</source>
@@ -7501,118 +7495,148 @@ to %1</source>
   <context>
     <name>QnWorkbenchWearableHandler</name>
     <message>
-      <source>Could not add wearable camera to server &quot;%1&quot;.</source>
-      <translation type="unfinished">Could not add wearable camera to server &quot;%1&quot;.</translation>
-    </message>
-    <message>
       <source>All files (*.*)</source>
       <translation>所有文件(*.*)</translation>
     </message>
     <message>
       <source>Video (%1)</source>
-      <translation type="unfinished">Video (%1)</translation>
+      <translation>视频 (%1)</translation>
     </message>
     <message>
       <source>Open Wearable Camera Recordings...</source>
-      <translation type="unfinished">Open Wearable Camera Recordings...</translation>
-    </message>
-    <message>
-      <source>No video files found in &quot;%1&quot;</source>
-      <translation type="unfinished">No video files found in &quot;%1&quot;</translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected file format(s) are not supported</source>
-      <translation type="unfinished">
-        <numerusform>Selected file format(s) are not supported</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Only video files are supported.</source>
-      <translation type="unfinished">Only video files are supported.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected file(s) do not have timestamp(s)</source>
-      <translation type="unfinished">
-        <numerusform>Selected file(s) do not have timestamp(s)</numerusform>
-      </translation>
+      <translation>打开穿戴式相机录像..。</translation>
     </message>
     <message>
       <source>Only video files with correct timestamp are supported.</source>
-      <translation type="unfinished">Only video files with correct timestamp are supported.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected file(s) cover periods for which videos are already being uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Selected file(s) cover periods for which videos are already being uploaded</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>You can upload these file(s) to a different instance of a Wearable Camera.</source>
-      <translation type="unfinished">
-        <numerusform>You can upload these file(s) to a different instance of a Wearable Camera.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected file(s) cover periods for which videos have already been uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Selected file(s) cover periods for which videos have already been uploaded</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected file(s) will not be uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Selected file(s) will not be uploaded</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Some file(s) will not be uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Some file(s) will not be uploaded</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>There is no new files to upload in &quot;%1&quot;</source>
-      <translation type="unfinished">There is no new files to upload in &quot;%1&quot;</translation>
-    </message>
-    <message>
-      <source>Not enough space on server storage</source>
-      <translation type="unfinished">Not enough space on server storage</translation>
-    </message>
-    <message numerus="yes">
-      <source>File(s) size - %1
-Free space - %2</source>
-      <translation type="unfinished">
-        <numerusform>File(s) size - %1
-Free space - %2</numerusform>
-      </translation>
+      <translation>仅支持具有正确时间戳的视频文件。</translation>
     </message>
     <message>
       <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</translation>
+      <translation>用户 &quot;%1&quot; 正在将档案上传到本相机因此无法开始上传.</translation>
     </message>
     <message>
       <source>Could not start upload as another user is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Could not start upload as another user is currently uploading footage to this camera.</translation>
+      <translation>其它用户正在将档案上传到本相机因此无法开始上传.</translation>
     </message>
     <message>
-      <source>File format of &quot;%1&quot; is not supported.</source>
-      <translation type="unfinished">File format of &quot;%1&quot; is not supported.</translation>
+      <source>Failed to add wearable camera</source>
+      <translation>无法添加穿戴式相机</translation>
     </message>
     <message>
-      <source>File &quot;%1&quot; does not have timestamp.</source>
-      <translation type="unfinished">File &quot;%1&quot; does not have timestamp.</translation>
+      <source>No video files found in selected folder</source>
+      <translation>在选定文件夹中找不到视频文件</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file formats are not supported</source>
+      <translation>
+        <numerusform>所选文件格式不受支持</numerusform>
+      </translation>
     </message>
     <message>
-      <source>File &quot;%1&quot; cover periods for which video is already being uploaded.</source>
-      <translation type="unfinished">File &quot;%1&quot; cover periods for which video is already being uploaded.</translation>
+      <source>Use .MKV, .AVI, .MP4 or other video files.</source>
+      <translation>使用.MKV，.AVI，.MP4或其他视频文件。</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files do not have timestamps</source>
+      <translation>
+        <numerusform>所选文件没有时间戳</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files cover periods for which videos are already being uploaded</source>
+      <translation>
+        <numerusform>选定的文件覆盖已经上传视频的时段</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>You can upload these files to a different instance of a Wearable Camera.</source>
+      <translation>
+        <numerusform>您可以将这些文件上传到穿戴式相机的其它区。</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files cover periods for which videos have already been uploaded</source>
+      <translation>
+        <numerusform>选定的文件覆盖已经上传视频的时段</numerusform>
+      </translation>
     </message>
     <message>
-      <source>File &quot;%1&quot; cover periods for which video has already been uploaded.</source>
-      <translation type="unfinished">File &quot;%1&quot; cover periods for which video has already been uploaded.</translation>
+      <source>Selected files will not be uploaded</source>
+      <translation>所选文件不会被上传</translation>
     </message>
     <message>
-      <source>There is no space on server for file &quot;%1&quot;.</source>
-      <translation type="unfinished">There is no space on server for file &quot;%1&quot;.</translation>
+      <source>Some files will not be uploaded</source>
+      <translation>有些文件不会被上传</translation>
+    </message>
+    <message>
+      <source>No new files to upload in selected folder</source>
+      <translation>未在选定文件夹中上载新文件</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files are too old</source>
+      <translation>
+        <numerusform>所选文件太旧</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation>
+        <numerusform>所选文件记录在 %1上，但只能上载最近 %n 天内记录的文件。您可以在相机存档设置中更改此设置。</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation>
+        <numerusform>所选文件记录在 %1 和 %2之间，但只能上载最近 %n 天内记录的文件。您可以在相机存档设置中更改此设置。</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Some footage may be deleted after uploading these files</source>
+      <translation>
+        <numerusform>上传这些文件后可能会删除一些文件</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
+      <translation>
+        <numerusform>服务器存储上没有太多可用空间。一些旧镜头可能会被删除以释放空间。请注意，如果选定的文件碰巧是服务器上最旧的文件，它们将在上传后立即删除。</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
+      <translation>为了防止这种情况，您可以添加额外的存储。您还可以通过更改相机设置中的存档保留时间来控制首先删除哪些素材。</translation>
+    </message>
+    <message>
+      <source>Upload anyway?</source>
+      <translation>无论如何上传？</translation>
+    </message>
+    <message>
+      <source>Could not finish upload to %1</source>
+      <translation>无法完成上传到 %1</translation>
+    </message>
+    <message>
+      <source>Make sure there is enough space on server storage.</source>
+      <translation>确保服务器存储空间足够。</translation>
+    </message>
+    <message>
+      <source>%1 has unsupported format.</source>
+      <translation type="unfinished">%1 has unsupported format.</translation>
+    </message>
+    <message>
+      <source>%1 does not have timestamp.</source>
+      <translation type="unfinished">%1 does not have timestamp.</translation>
+    </message>
+    <message>
+      <source>%1 is older than allowed in camera archive settings.</source>
+      <translation type="unfinished">%1 is older than allowed in camera archive settings.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video has already been uploaded.</source>
+      <translation type="unfinished">%1 covers period for which video has already been uploaded.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video is being uploaded.</source>
+      <translation type="unfinished">%1 covers period for which video is being uploaded.</translation>
     </message>
   </context>
   <context>
@@ -7788,7 +7812,7 @@ Free space - %2</numerusform>
     </message>
     <message>
       <source>Stop uploading?</source>
-      <translation type="unfinished">Stop uploading?</translation>
+      <translation>停止上传？</translation>
     </message>
     <message>
       <source>Stop</source>
@@ -7796,8 +7820,8 @@ Free space - %2</numerusform>
     </message>
     <message numerus="yes">
       <source>Some video file(s) are still being uploaded to %n wearable cameras:</source>
-      <translation type="unfinished">
-        <numerusform>Some video file(s) are still being uploaded to %n wearable cameras:</numerusform>
+      <translation>
+        <numerusform>某些视频文件仍在上传至 %n 穿戴式相机：</numerusform>
       </translation>
     </message>
   </context>
@@ -7867,12 +7891,12 @@ Free space - %2</numerusform>
       <translation>文件写入错误</translation>
     </message>
     <message>
-      <source>Internal error</source>
-      <translation>内部错误</translation>
-    </message>
-    <message>
       <source>No data exported.</source>
       <translation>没有数据导出。</translation>
+    </message>
+    <message>
+      <source>Internal error</source>
+      <translation>内部错误</translation>
     </message>
   </context>
   <context>
@@ -8045,34 +8069,34 @@ Free space - %2</numerusform>
     <name>nx::client::desktop::UploadWorker</name>
     <message>
       <source>Could not open file &quot;%1&quot;</source>
-      <translation type="unfinished">Could not open file &quot;%1&quot;</translation>
+      <translation>无法打开文件 &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Could not calculate md5 for file &quot;%1&quot;</source>
-      <translation type="unfinished">Could not calculate md5 for file &quot;%1&quot;</translation>
+      <translation>无法计算文件 &quot;%1&quot; 的 md5</translation>
     </message>
     <message>
       <source>Could not create upload on the server side</source>
-      <translation type="unfinished">Could not create upload on the server side</translation>
+      <translation>无法在服务器端创建上载</translation>
     </message>
     <message>
       <source>Could not upload file chunk to the server</source>
-      <translation type="unfinished">Could not upload file chunk to the server</translation>
+      <translation>无法将文件块上载到服务器</translation>
     </message>
     <message>
       <source>Could not check uploaded file on the server</source>
-      <translation type="unfinished">Could not check uploaded file on the server</translation>
+      <translation>无法检查服务器上的上传文件</translation>
     </message>
     <message>
       <source>File was corrupted while being uploaded to the server</source>
-      <translation type="unfinished">File was corrupted while being uploaded to the server</translation>
+      <translation>文件在上传到服务器时被损坏</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::WearableWorker</name>
     <message>
       <source>Failed to send request to the server.</source>
-      <translation type="unfinished">Failed to send request to the server.</translation>
+      <translation>无法将请求发送到服务器。</translation>
     </message>
   </context>
   <context>
@@ -8107,7 +8131,7 @@ Free space - %2</numerusform>
     </message>
     <message>
       <source>Selected period cannot be exported for the current camera.</source>
-      <translation type="unfinished">Selected period cannot be exported for the current camera.</translation>
+      <translation>当前相机所选的时间段不能导出。</translation>
     </message>
   </context>
   <context>
@@ -8255,13 +8279,6 @@ Free space - %2</numerusform>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::ui::LayoutPreviewPainter</name>
-    <message>
-      <source>NO DATA</source>
-      <translation>没有数据</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::client::desktop::ui::LayoutTourDropPlaceholder</name>
     <message>
       <source>Drag layout or camera here to add it to the showreel</source>
@@ -8280,7 +8297,7 @@ Free space - %2</numerusform>
     </message>
     <message>
       <source>All Users</source>
-      <translation>All 用户</translation>
+      <translation>所有用户</translation>
     </message>
   </context>
   <context>
@@ -8561,16 +8578,16 @@ Free space - %2</numerusform>
       <translation>无法打开服务器 web 页</translation>
     </message>
     <message>
+      <source>Wearable Cameras cannot be moved between servers</source>
+      <translation>穿戴式摄像机不能在服务器之间移动</translation>
+    </message>
+    <message>
       <source>Failed to change password</source>
       <translation>变更密码失败</translation>
     </message>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
       <translation>无法更改%2个摄像机中%1个摄像机上的密码</translation>
-    </message>
-    <message>
-      <source>Wearable Cameras cannot be moved between servers</source>
-      <translation type="unfinished">Wearable Cameras cannot be moved between servers</translation>
     </message>
   </context>
   <context>
@@ -8611,7 +8628,7 @@ Free space - %2</numerusform>
     </message>
     <message>
       <source>Delete Showreel %1?</source>
-      <translation>删除幻灯片 %1？</translation>
+      <translation>Delete Showreel %1?</translation>
     </message>
   </context>
   <context>

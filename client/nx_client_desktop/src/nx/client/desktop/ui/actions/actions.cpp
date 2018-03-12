@@ -498,6 +498,16 @@ void initialize(Manager* manager, Action* root)
             .separator();
     }
 
+    factory(ExportStandaloneClientAction)
+        .flags(Main | DevMode)
+        .text(lit("Export Standalone Client"))
+        .condition(condition::isTrue(nx::utils::AppInfo::isWindows()));
+    
+    factory()
+        .flags(Main | DevMode)
+        .separator()
+        .condition(condition::isTrue(nx::utils::AppInfo::isWindows()));
+
     factory(EscapeHotkeyAction)
         .flags(GlobalHotkey)
         .mode(DesktopMode)

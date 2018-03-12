@@ -26,7 +26,7 @@
     <message>
       <location/>
       <source>Support</source>
-      <translation type="unfinished">Support</translation>
+      <translation>Supporto</translation>
     </message>
     <message>
       <location/>
@@ -173,11 +173,6 @@
     <name>ArchiveLengthWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
-      <source>Form</source>
-      <translation type="unfinished">Form</translation>
-    </message>
-    <message>
-      <location/>
       <source>Fixed Archive Length</source>
       <translation type="unfinished">Fixed Archive Length</translation>
     </message>
@@ -757,6 +752,21 @@
       <source>PTZ</source>
       <translation type="unfinished">PTZ</translation>
     </message>
+    <message>
+      <location/>
+      <source>Generate</source>
+      <translation type="unfinished">Generate</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset</source>
+      <translation type="unfinished">Reset</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Logical Id</source>
+      <translation type="unfinished">Logical Id</translation>
+    </message>
   </context>
   <context>
     <name>CameraInputBusinessEventWidget</name>
@@ -958,6 +968,14 @@
       <location/>
       <source>Description contains:</source>
       <translation type="unfinished">Description contains:</translation>
+    </message>
+  </context>
+  <context>
+    <name>CustomSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/custom_settings/widgets/custom_settings_widget.ui"/>
+      <source>Category</source>
+      <translation type="unfinished">Category</translation>
     </message>
   </context>
   <context>
@@ -1453,7 +1471,7 @@
     <message>
       <location/>
       <source>Connection error</source>
-      <translation type="unfinished">Connection error</translation>
+      <translation>Errore di connessione</translation>
     </message>
     <message>
       <location/>
@@ -1785,8 +1803,8 @@
     </message>
     <message>
       <location/>
-      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</translation>
+      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
     </message>
   </context>
   <context>
@@ -2667,11 +2685,6 @@
     </message>
     <message>
       <location/>
-      <source>TextLabel</source>
-      <translation type="unfinished">TextLabel</translation>
-    </message>
-    <message>
-      <location/>
       <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage.
 The oldest footage among all cameras on the server will be deleted first.</source>
       <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage.
@@ -2729,7 +2742,7 @@ The oldest footage among all cameras on the server will be deleted first.</trans
     <message>
       <location filename="../src/ui/widgets/system_settings/smtp/smtp_test_connection_widget.ui"/>
       <source>Server:</source>
-      <translation type="unfinished">Server:</translation>
+      <translation>Server:</translation>
     </message>
     <message>
       <location/>
@@ -3065,11 +3078,6 @@ Click &quot;New role&quot; button to create one.</translation>
     <name>WearableMotionWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
-      <source>Form</source>
-      <translation type="unfinished">Form</translation>
-    </message>
-    <message>
-      <location/>
       <source>Motion Detection</source>
       <translation type="unfinished">Motion Detection</translation>
     </message>
@@ -3088,11 +3096,6 @@ Click &quot;New role&quot; button to create one.</translation>
     <name>WearableProgressWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
-      <source>Form</source>
-      <translation type="unfinished">Form</translation>
-    </message>
-    <message>
-      <location/>
       <source>Cancel</source>
       <translation type="unfinished">Cancel</translation>
     </message>
@@ -3101,11 +3104,6 @@ Click &quot;New role&quot; button to create one.</translation>
     <name>WearableUploadWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
-      <source>Form</source>
-      <translation type="unfinished">Form</translation>
-    </message>
-    <message>
-      <location/>
       <source>Upload Video</source>
       <translation type="unfinished">Upload Video</translation>
     </message>

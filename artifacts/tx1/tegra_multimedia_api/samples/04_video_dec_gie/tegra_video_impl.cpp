@@ -14,8 +14,9 @@
 #include "net_dimensions.h"
 #include "rects_serialization.h"
 
-#define NX_PRINT_PREFIX "[tegra_video_impl" << (m_id.empty() ? "" : " #" + m_id) << "] "
 #include <nx/kit/debug.h>
+
+#define NX_PRINT_PREFIX "[tegra_video_impl" << (m_id.empty() ? "" : " #" + m_id) << "] "
 
 namespace {
 

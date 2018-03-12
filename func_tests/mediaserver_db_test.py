@@ -19,6 +19,7 @@ import pytest
 from test_utils.server import MEDIASERVER_MERGE_TIMEOUT
 from test_utils.utils import SimpleNamespace, datetime_utc_now, bool_to_str
 
+
 SERVER_CONFIG = dict(
     one=SimpleNamespace(
         DATABASE_FILE_V_2_4='v2.4.1-box1.db',
@@ -41,26 +42,32 @@ def db_version(request):
 
 
 @pytest.fixture
-def one(server_factory, run_options, db_version):
-    return server('one', server_factory, run_options.bin_dir, db_version)
+def one(server_factory, bin_dir, db_version):
+    return server('one', server_factory, bin_dir, db_version)
 
 @pytest.fixture
-def two(server_factory, run_options, db_version):
-    return server('two', server_factory, run_options.bin_dir, db_version)
+def two(server_factory, bin_dir, db_version):
+    return server('two', server_factory, bin_dir, db_version)
 
 
 def server(name, server_factory, bin_dir, db_version):
     server_config = SERVER_CONFIG[name]
     if db_version == '2.4':
-        config_file_params = dict(guidIsHWID='no', serverGuid=server_config.SERVER_GUID)
-        server = server_factory(name, start=False, config_file_params=config_file_params)
+        config_file_params = dict(
+            guidIsHWID='no',
+            serverGuid=server_config.SERVER_GUID,
+            minStorageSpace=1024*1024,  # 1M
+            )
+        server = server_factory.create(name, config_file_params=config_file_params)
+        server.stop()
         copy_database_file(server, bin_dir, server_config.DATABASE_FILE_V_2_4)
     else:
-        server = server_factory(name, start=False)
-    server.start_service()
+        server = server_factory.create(name)
+        server.stop()
+    server.start()
     system_settings = dict(autoDiscoveryEnabled=bool_to_str(False))
     server.setup_local_system(systemSettings=system_settings)
-    server.set_system_settings(statisticsAllowed=False)
+    server.rest_api.api.systemSettings.GET(statisticsAllowed=False)
     if db_version == '2.4':
         check_camera(server, server_config.CAMERA_GUID)
     return server
@@ -69,7 +76,7 @@ def copy_database_file(server, bin_dir, backup_db_filename):
     backup_db_path = bin_dir / backup_db_filename
     assert backup_db_path.exists(), (
         "Binary artifact required for this test (database file) '%s' does not exist." % backup_db_path)
-    server_db_path = server.dir / MEDIASERVER_DATABASE_PATH
+    server_db_path = server.installation.dir / MEDIASERVER_DATABASE_PATH
     server.os_access.put_file(backup_db_path, server_db_path)
 
 def check_camera(server, camera_guid):
@@ -145,13 +152,13 @@ def test_backup_restore(artifact_factory, one, two, camera):
 @pytest.mark.skip(reason="VMS-5969")
 @pytest.mark.parametrize('db_version', ['current'])
 def test_server_guids_changed(one, two):
-    one.stop_service()
-    two.stop_service()
+    one.stop()
+    two.stop()
     # To make server database and configuration file guids different
-    one.change_config(guidIsHWID='no', serverGuid=SERVER_CONFIG['one'].SERVER_GUID)
-    two.reset_config(guidIsHWID='no', serverGuid=SERVER_CONFIG['two'].SERVER_GUID)
-    one.start_service()
-    two.start_service()
+    one.installation.change_config(guidIsHWID='no', serverGuid=SERVER_CONFIG['one'].SERVER_GUID)
+    two.installation.reset_config(guidIsHWID='no', serverGuid=SERVER_CONFIG['two'].SERVER_GUID)
+    one.start()
+    two.start()
     one.setup_local_system()
     two.setup_local_system()
     two.merge_systems(one)

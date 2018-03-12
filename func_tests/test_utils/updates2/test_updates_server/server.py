@@ -1,3 +1,4 @@
+import copy
 import json
 import logging
 import shutil
@@ -6,7 +7,7 @@ from textwrap import dedent
 
 import click
 from flask import Flask, request, send_file
-from pathlib2 import Path, PurePath
+from pathlib2 import Path
 from werkzeug.exceptions import BadRequest, NotFound, SecurityError
 
 if sys.version_info[:2] == (2, 7):
@@ -22,12 +23,9 @@ UPDATE_PATH_PATTERN = '/{}/{}/update.json'
 UPDATES_PATH = '/updates.json'
 
 DATA_DIR = Path(__file__).with_name('data').resolve()
-DUMMY_FILE_NAME = 'dummy.raw'
-DUMMY_FILE_PATH = DATA_DIR / DUMMY_FILE_NAME
+DUMMY_FILE_NAME = 'dummy.zip'
+DUMMY_FILE_PATH = Path(__file__).parent / DUMMY_FILE_NAME
 UPDATES_FILE_NAME = 'updates.json'
-
-if not DUMMY_FILE_PATH.exists():
-    raise Exception('Dummy file not found')
 
 
 def write_json(path, data):
@@ -88,7 +86,7 @@ def append_new_versions(root_obj, path_to_update_obj, new_versions):
             if customization_name == path_parts[1] and int(path_parts[2]) > highest_build:
                 if 'packages' in path_to_update_obj[path]:
                     highest_build = int(path_parts[2])
-                    new_update_obj = path_to_update_obj[path]
+                    new_update_obj = copy.deepcopy(path_to_update_obj[path])
 
         if not new_update_obj:
             continue
@@ -153,9 +151,10 @@ def generate():
     new_versions = [('4.0', '4.0.0.21200', 'cloud-test.hdw.mx')]
     new_root, new_path_to_update_obj = append_new_versions(root_obj, path_to_update_obj, new_versions)
     save_data_to_files(new_root, new_path_to_update_obj)
-    with DUMMY_FILE_PATH.open('wb') as f:
-        f.seek(1024 * 1024 * 100)
-        f.write(b'\0')
+    if not DUMMY_FILE_PATH.exists():
+        with DUMMY_FILE_PATH.open('wb') as f:
+            f.seek(1024 * 1024 * 100)
+            f.write(b'\0')
 
 
 @main.command(short_help="Start HTTP server", help="Serve update metadata and, optionally, archives by HTTP.")
@@ -196,3 +195,4 @@ def serve(serve_update_archives, range_header):
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     main()
+

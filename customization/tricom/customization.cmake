@@ -1,5 +1,4 @@
 # Components Namings
-set(parent.customization "default")
 set(display.product.name "Tricom MVSS")
 set(display.mobile.name "MVSS Mobile")
 set(product.name "Tricom MVSS")

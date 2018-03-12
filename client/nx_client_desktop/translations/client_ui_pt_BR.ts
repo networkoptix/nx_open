@@ -31,7 +31,7 @@
     <message>
       <location/>
       <source>System Servers</source>
-      <translation type="unfinished">System Servers</translation>
+      <translation>System Servers</translation>
     </message>
   </context>
   <context>
@@ -57,12 +57,12 @@
     <message>
       <location/>
       <source>Gamma</source>
-      <translation>Gama</translation>
+      <translation>Gamma</translation>
     </message>
     <message>
       <location/>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <location/>
@@ -85,17 +85,17 @@
     <message>
       <location/>
       <source>Double Buffering</source>
-      <translation type="unfinished">Double Buffering</translation>
+      <translation>Double Buffering</translation>
     </message>
     <message>
       <location/>
       <source>Disable only if the client takes too much CPU</source>
-      <translation type="unfinished">Disable only if the client takes too much CPU</translation>
+      <translation>Disable only if the client takes too much CPU</translation>
     </message>
     <message>
       <location/>
       <source>Maximum Live Buffer Length</source>
-      <translation type="unfinished">Maximum Live Buffer Length</translation>
+      <translation>Maximum Live Buffer Length</translation>
     </message>
     <message>
       <location/>
@@ -110,17 +110,17 @@
     <message>
       <location/>
       <source>Reset All Warnings</source>
-      <translation type="unfinished">Reset All Warnings</translation>
+      <translation>Reset All Warnings</translation>
     </message>
     <message>
       <location/>
       <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
-      <translation type="unfinished">Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</translation>
+      <translation>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</translation>
     </message>
     <message>
       <location/>
       <source>Disable blur</source>
-      <translation type="unfinished">Disable blur</translation>
+      <translation>Disable blur</translation>
     </message>
   </context>
   <context>
@@ -143,7 +143,7 @@
     <message>
       <location/>
       <source>Instant</source>
-      <translation>Instante</translation>
+      <translation>Instantâneo</translation>
     </message>
   </context>
   <context>
@@ -173,11 +173,6 @@
     <name>ArchiveLengthWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
-      <source>Form</source>
-      <translation>Formulário</translation>
-    </message>
-    <message>
-      <location/>
       <source>Fixed Archive Length</source>
       <translation>Tamanho fixo do arquivo</translation>
     </message>
@@ -189,7 +184,7 @@
     <message>
       <location/>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <location/>
@@ -212,17 +207,17 @@
     <message>
       <location/>
       <source>Watching archive</source>
-      <translation>A ver arquivos</translation>
+      <translation>A visualizar arquivos</translation>
     </message>
     <message>
       <location/>
       <source>Exporting video</source>
-      <translation>A Exportar vídeo</translation>
+      <translation>A exportar vídeo</translation>
     </message>
     <message>
       <location/>
       <source>Watching live</source>
-      <translation>A ver Live</translation>
+      <translation>A visualizar em directo</translation>
     </message>
     <message>
       <location/>
@@ -277,7 +272,7 @@
     <message>
       <location/>
       <source>All servers are offline. Audit data is not available.</source>
-      <translation type="unfinished">All servers are offline. Audit data is not available.</translation>
+      <translation>All servers are offline. Audit data is not available.</translation>
     </message>
   </context>
   <context>
@@ -305,17 +300,17 @@
     <message>
       <location/>
       <source>Bitrate limitation could lead to backup failure.</source>
-      <translation type="unfinished">Bitrate limitation could lead to backup failure.</translation>
+      <translation>Bitrate limitation could lead to backup failure.</translation>
     </message>
     <message>
       <location/>
       <source>Finish</source>
-      <translation type="unfinished">Finish</translation>
+      <translation>Finish</translation>
     </message>
     <message>
       <location/>
       <source>Start</source>
-      <translation>Começar</translation>
+      <translation>Start</translation>
     </message>
   </context>
   <context>
@@ -323,7 +318,7 @@
     <message>
       <location filename="../src/ui/dialogs/backup_settings_dialog.ui"/>
       <source>Backup Settings</source>
-      <translation type="unfinished">Backup Settings</translation>
+      <translation>Backup Settings</translation>
     </message>
     <message>
       <location/>
@@ -338,7 +333,7 @@
     <message>
       <location/>
       <source>Only further recording will be backed up. Backup process will ignore existing footage.</source>
-      <translation type="unfinished">Only further recording will be backed up. Backup process will ignore existing footage.</translation>
+      <translation>Only further recording will be backed up. Backup process will ignore existing footage.</translation>
     </message>
     <message>
       <location/>
@@ -348,12 +343,12 @@
     <message>
       <location/>
       <source>Backup Archive From</source>
-      <translation type="unfinished">Backup Archive From</translation>
+      <translation>Backup Archive From</translation>
     </message>
     <message>
       <location/>
       <source>Backup Quality</source>
-      <translation type="unfinished">Backup Quality</translation>
+      <translation>Backup Quality</translation>
     </message>
   </context>
   <context>
@@ -371,7 +366,7 @@
     <message>
       <location/>
       <source>Tags:</source>
-      <translation type="unfinished">Tags:</translation>
+      <translation>Tags:</translation>
     </message>
     <message>
       <location/>
@@ -427,7 +422,7 @@
     <message>
       <location/>
       <source>Description</source>
-      <translation>Descrição</translation>
+      <translation>&amp;Descrição</translation>
     </message>
     <message>
       <location/>
@@ -437,12 +432,12 @@
     <message>
       <location/>
       <source>Tags</source>
-      <translation type="unfinished">Tags</translation>
+      <translation>Tags</translation>
     </message>
     <message>
       <location/>
       <source>List of tags divided by commas</source>
-      <translation type="unfinished">List of tags divided by commas</translation>
+      <translation>List of tags divided by commas</translation>
     </message>
   </context>
   <context>
@@ -498,7 +493,7 @@
     <message>
       <location/>
       <source>At</source>
-      <translation>Nas</translation>
+      <translation>At</translation>
     </message>
   </context>
   <context>
@@ -516,7 +511,7 @@
     <message>
       <location/>
       <source>Event Rules</source>
-      <translation type="unfinished">Event Rules</translation>
+      <translation>Event Rules</translation>
     </message>
     <message>
       <location/>
@@ -544,7 +539,7 @@
     <message>
       <location/>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <location/>
@@ -594,12 +589,12 @@
     <message>
       <location/>
       <source>Start IP</source>
-      <translation type="unfinished">Start IP</translation>
+      <translation>Start IP</translation>
     </message>
     <message>
       <location/>
       <source>End IP</source>
-      <translation type="unfinished">End IP</translation>
+      <translation>End IP</translation>
     </message>
     <message>
       <location/>
@@ -614,17 +609,17 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <location/>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <location/>
       <source>Scan</source>
-      <translation type="unfinished">Scan</translation>
+      <translation>Scan</translation>
     </message>
     <message>
       <location/>
@@ -665,37 +660,37 @@
     <message>
       <location/>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <location/>
       <source>TCP</source>
-      <translation type="unfinished">TCP</translation>
+      <translation>TCP</translation>
     </message>
     <message>
       <location/>
       <source>UDP</source>
-      <translation type="unfinished">UDP</translation>
+      <translation>UDP</translation>
     </message>
     <message>
       <location/>
       <source>Restore Defaults</source>
-      <translation>Restaurar Predefinições</translation>
+      <translation>Restaurar Padrões</translation>
     </message>
     <message>
       <location/>
       <source>Force motion detection for stream:</source>
-      <translation type="unfinished">Force motion detection for stream:</translation>
+      <translation>Force motion detection for stream:</translation>
     </message>
     <message>
       <location/>
       <source>Disable native presets, use system presets instead</source>
-      <translation type="unfinished">Disable native presets, use system presets instead</translation>
+      <translation>Disable native presets, use system presets instead</translation>
     </message>
     <message>
       <location/>
       <source>Warning! Native camera presets will not be avaliable.</source>
-      <translation type="unfinished">Warning! Native camera presets will not be avaliable.</translation>
+      <translation>Warning! Native camera presets will not be avaliable.</translation>
     </message>
     <message>
       <location/>
@@ -730,7 +725,7 @@
     <message>
       <location/>
       <source>Secondary Stream</source>
-      <translation type="unfinished">Secondary Stream</translation>
+      <translation>Secondary Stream</translation>
     </message>
     <message>
       <location/>
@@ -755,7 +750,22 @@
     <message>
       <location/>
       <source>PTZ</source>
-      <translation type="unfinished">PTZ</translation>
+      <translation>PTZ</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Generate</source>
+      <translation type="unfinished">Generate</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset</source>
+      <translation>Restaurar</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Logical Id</source>
+      <translation type="unfinished">Logical Id</translation>
     </message>
   </context>
   <context>
@@ -763,7 +773,7 @@
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
       <source>Input Id</source>
-      <translation type="unfinished">Input Id</translation>
+      <translation>Input Id</translation>
     </message>
   </context>
   <context>
@@ -771,7 +781,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_list_dialog.ui"/>
       <source>Add Device...</source>
-      <translation type="unfinished">Add Device...</translation>
+      <translation>Add Device...</translation>
     </message>
   </context>
   <context>
@@ -789,7 +799,7 @@
     <message>
       <location/>
       <source>Output Id:</source>
-      <translation type="unfinished">Output Id:</translation>
+      <translation>Output Id:</translation>
     </message>
   </context>
   <context>
@@ -797,12 +807,12 @@
     <message>
       <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui"/>
       <source>Schedule Settings</source>
-      <translation>Definições da Agenda</translation>
+      <translation>Definições de Agenda</translation>
     </message>
     <message>
       <location/>
       <source>FPS</source>
-      <translation type="unfinished">FPS</translation>
+      <translation>FPS</translation>
     </message>
     <message>
       <location/>
@@ -852,12 +862,12 @@
     <message>
       <location/>
       <source>Activate License...</source>
-      <translation type="unfinished">Activate License...</translation>
+      <translation>Activate License...</translation>
     </message>
     <message>
       <location/>
       <source>Show Quality</source>
-      <translation type="unfinished">Show Quality</translation>
+      <translation>Show Quality</translation>
     </message>
     <message>
       <location/>
@@ -867,7 +877,7 @@
     <message>
       <location/>
       <source>Copying Schedule</source>
-      <translation type="unfinished">Copying Schedule</translation>
+      <translation>Copying Schedule</translation>
     </message>
     <message>
       <location/>
@@ -877,7 +887,7 @@
     <message>
       <location/>
       <source>Panic Mode:</source>
-      <translation type="unfinished">Panic Mode:</translation>
+      <translation>Panic Mode:</translation>
     </message>
     <message>
       <location/>
@@ -887,7 +897,7 @@
     <message>
       <location/>
       <source>Bitrate</source>
-      <translation type="unfinished">Bitrate</translation>
+      <translation>Bitrate</translation>
     </message>
   </context>
   <context>
@@ -895,7 +905,7 @@
     <message>
       <location filename="../src/ui/dialogs/resource_properties/change_user_password_dialog.ui"/>
       <source>Change password</source>
-      <translation type="unfinished">Change password</translation>
+      <translation>Change password</translation>
     </message>
   </context>
   <context>
@@ -903,7 +913,7 @@
     <message>
       <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
       <source>Stay logged in</source>
-      <translation type="unfinished">Stay logged in</translation>
+      <translation>Stay logged in</translation>
     </message>
   </context>
   <context>
@@ -961,6 +971,14 @@
     </message>
   </context>
   <context>
+    <name>CustomSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/custom_settings/widgets/custom_settings_widget.ui"/>
+      <source>Category</source>
+      <translation>Categoria</translation>
+    </message>
+  </context>
+  <context>
     <name>DatabaseManagementWidget</name>
     <message>
       <location filename="../src/ui/widgets/system_settings/database_management_widget.ui"/>
@@ -993,12 +1011,12 @@
     <message>
       <location/>
       <source>All Servers are offline. Logs are not available.</source>
-      <translation>Todos os servidores estão offline. Os Log's não estão disponíveis.</translation>
+      <translation>Todos os Servidores estão Offline. Os Logs não estão disponíveis.</translation>
     </message>
     <message>
       <location/>
       <source>Event Rules...</source>
-      <translation type="unfinished">Event Rules...</translation>
+      <translation>Event Rules...</translation>
     </message>
   </context>
   <context>
@@ -1016,7 +1034,7 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <location/>
@@ -1026,17 +1044,17 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <location/>
       <source>Content type</source>
-      <translation type="unfinished">Content type</translation>
+      <translation>Content type</translation>
     </message>
     <message>
       <location/>
       <source>HTTP URL</source>
-      <translation type="unfinished">HTTP URL</translation>
+      <translation>HTTP URL</translation>
     </message>
     <message>
       <location/>
@@ -1144,7 +1162,7 @@
     <message>
       <location/>
       <source>Fisheye Dewarping</source>
-      <translation type="unfinished">Fisheye Dewarping</translation>
+      <translation>Fisheye Dewarping</translation>
     </message>
     <message>
       <location/>
@@ -1154,17 +1172,17 @@
     <message>
       <location/>
       <source>Mount Angle Correction:</source>
-      <translation type="unfinished">Mount Angle Correction:</translation>
+      <translation>Mount Angle Correction:</translation>
     </message>
     <message>
       <location/>
       <source>Y Offset</source>
-      <translation type="unfinished">Y Offset</translation>
+      <translation>Y Offset</translation>
     </message>
     <message>
       <location/>
       <source>X Offset</source>
-      <translation type="unfinished">X Offset</translation>
+      <translation>X Offset</translation>
     </message>
     <message>
       <location/>
@@ -1174,7 +1192,7 @@
     <message>
       <location/>
       <source>Ellipticity</source>
-      <translation type="unfinished">Ellipticity</translation>
+      <translation>Ellipticity</translation>
     </message>
   </context>
   <context>
@@ -1182,7 +1200,7 @@
     <message>
       <location filename="../src/ui/widgets/local_settings/general_preferences_widget.ui"/>
       <source>Misc</source>
-      <translation type="unfinished">Misc</translation>
+      <translation>Misc</translation>
     </message>
     <message>
       <location/>
@@ -1212,17 +1230,17 @@
     <message>
       <location/>
       <source>Local Media Folders</source>
-      <translation type="unfinished">Local Media Folders</translation>
+      <translation>Local Media Folders</translation>
     </message>
     <message>
       <location/>
       <source>Audio Input</source>
-      <translation type="unfinished">Audio Input</translation>
+      <translation>Audio Input</translation>
     </message>
     <message>
       <location/>
       <source>First Source</source>
-      <translation type="unfinished">First Source</translation>
+      <translation>First Source</translation>
     </message>
     <message>
       <location/>
@@ -1232,12 +1250,12 @@
     <message>
       <location/>
       <source>Second Source</source>
-      <translation type="unfinished">Second Source</translation>
+      <translation>Second Source</translation>
     </message>
     <message>
       <location/>
       <source>Run Application when PC Boots up</source>
-      <translation type="unfinished">Run Application when PC Boots up</translation>
+      <translation>Run Application when PC Boots up</translation>
     </message>
   </context>
   <context>
@@ -1250,7 +1268,7 @@
     <message>
       <location/>
       <source>Backup and Restore</source>
-      <translation type="unfinished">Backup and Restore</translation>
+      <translation>Backup and Restore</translation>
     </message>
   </context>
   <context>
@@ -1263,12 +1281,12 @@
     <message>
       <location/>
       <source>Aspect Ratio</source>
-      <translation type="unfinished">Aspect Ratio</translation>
+      <translation>Aspect Ratio</translation>
     </message>
     <message>
       <location/>
       <source>Rotation</source>
-      <translation type="unfinished">Rotation</translation>
+      <translation>Rotation</translation>
     </message>
   </context>
   <context>
@@ -1319,7 +1337,7 @@
     <message>
       <location/>
       <source>No image</source>
-      <translation type="unfinished">No image</translation>
+      <translation>No image</translation>
     </message>
   </context>
   <context>
@@ -1342,7 +1360,7 @@
     <message>
       <location/>
       <source>Background</source>
-      <translation type="unfinished">Background</translation>
+      <translation>Background</translation>
     </message>
     <message>
       <location/>
@@ -1415,27 +1433,27 @@
     <message>
       <location/>
       <source>Server URL</source>
-      <translation>URL Servidor</translation>
+      <translation>Server URL</translation>
     </message>
     <message>
       <location/>
       <source>Admin DN</source>
-      <translation type="unfinished">Admin DN</translation>
+      <translation>Admin DN</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <location/>
       <source>Search Base</source>
-      <translation type="unfinished">Search Base</translation>
+      <translation>Search Base</translation>
     </message>
     <message>
       <location/>
       <source>Search Filter</source>
-      <translation type="unfinished">Search Filter</translation>
+      <translation>Search Filter</translation>
     </message>
   </context>
   <context>
@@ -1443,12 +1461,12 @@
     <message>
       <location filename="../src/ui/dialogs/ldap_users_dialog.ui"/>
       <source>Fetch Users from LDAP...</source>
-      <translation>Obter utilizador a partir do LDAP...</translation>
+      <translation>Obter Utilizador através do LDAP...</translation>
     </message>
     <message>
       <location/>
       <source>Loading...</source>
-      <translation>A carregar...</translation>
+      <translation>A Carregar...</translation>
     </message>
     <message>
       <location/>
@@ -1458,12 +1476,12 @@
     <message>
       <location/>
       <source>Role to assign to imported users</source>
-      <translation type="unfinished">Role to assign to imported users</translation>
+      <translation>Role to assign to imported users</translation>
     </message>
     <message>
       <location/>
       <source>Disable imported users</source>
-      <translation type="unfinished">Disable imported users</translation>
+      <translation>Disable imported users</translation>
     </message>
   </context>
   <context>
@@ -1496,7 +1514,7 @@
     <message>
       <location/>
       <source>Locked to Hardware Id:</source>
-      <translation type="unfinished">Locked to Hardware Id:</translation>
+      <translation>Locked to Hardware Id:</translation>
     </message>
   </context>
   <context>
@@ -1519,12 +1537,12 @@
     <message>
       <location/>
       <source>Details...</source>
-      <translation type="unfinished">Details...</translation>
+      <translation>Details...</translation>
     </message>
     <message>
       <location/>
       <source>The software is licensed to</source>
-      <translation type="unfinished">The software is licensed to</translation>
+      <translation>The software is licensed to</translation>
     </message>
   </context>
   <context>
@@ -1537,7 +1555,7 @@
     <message>
       <location/>
       <source>License issues:</source>
-      <translation type="unfinished">License issues:</translation>
+      <translation>License issues:</translation>
     </message>
   </context>
   <context>
@@ -1565,7 +1583,7 @@
     <message>
       <location/>
       <source>Activate Free License</source>
-      <translation>Activar licença gratuita</translation>
+      <translation>Activar Licença Gratuita</translation>
     </message>
     <message>
       <location/>
@@ -1575,7 +1593,7 @@
     <message>
       <location/>
       <source>Internet Activation</source>
-      <translation type="unfinished">Internet Activation</translation>
+      <translation>Internet Activation</translation>
     </message>
     <message>
       <location/>
@@ -1585,7 +1603,7 @@
     <message>
       <location/>
       <source>Invalid License Key</source>
-      <translation type="unfinished">Invalid License Key</translation>
+      <translation>Invalid License Key</translation>
     </message>
     <message>
       <location/>
@@ -1595,7 +1613,7 @@
     <message>
       <location/>
       <source>Hardware Id</source>
-      <translation type="unfinished">Hardware Id</translation>
+      <translation>Hardware Id</translation>
     </message>
   </context>
   <context>
@@ -1608,7 +1626,7 @@
     <message>
       <location/>
       <source>Activate License...</source>
-      <translation type="unfinished">Activate License...</translation>
+      <translation>Activate License...</translation>
     </message>
   </context>
   <context>
@@ -1639,27 +1657,27 @@
     <message>
       <location/>
       <source>Host</source>
-      <translation type="unfinished">Host</translation>
+      <translation>Host</translation>
     </message>
     <message>
       <location/>
       <source>Port</source>
-      <translation>Porto</translation>
+      <translation>Port</translation>
     </message>
     <message>
       <location/>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <location/>
       <source>Test</source>
-      <translation>Teste</translation>
+      <translation>Testar</translation>
     </message>
     <message>
       <location/>
@@ -1672,7 +1690,7 @@
     <message>
       <location filename="../src/ui/widgets/local_settings/look_and_feel_preferences_widget.ui"/>
       <source>Look and Feel</source>
-      <translation>Aspecto e Comportamento</translation>
+      <translation>Aspecto e Ambiente</translation>
     </message>
     <message>
       <location/>
@@ -1702,7 +1720,7 @@
     <message>
       <location/>
       <source>Mode</source>
-      <translation type="unfinished">Mode</translation>
+      <translation>Mode</translation>
     </message>
     <message>
       <location/>
@@ -1712,7 +1730,7 @@
     <message>
       <location/>
       <source>Show additional info in tree</source>
-      <translation type="unfinished">Show additional info in tree</translation>
+      <translation>Show additional info in tree</translation>
     </message>
     <message>
       <location/>
@@ -1722,7 +1740,7 @@
     <message>
       <location/>
       <source>Tour cycle</source>
-      <translation type="unfinished">Tour cycle</translation>
+      <translation>Tour cycle</translation>
     </message>
   </context>
   <context>
@@ -1730,7 +1748,7 @@
     <message>
       <location filename="../src/ui/dialogs/common/message_box.ui"/>
       <source>Do not show this message again</source>
-      <translation type="unfinished">Do not show this message again</translation>
+      <translation>Do not show this message again</translation>
     </message>
   </context>
   <context>
@@ -1748,22 +1766,22 @@
     <message>
       <location/>
       <source>Password:</source>
-      <translation type="unfinished">Password:</translation>
+      <translation>Password:</translation>
     </message>
     <message>
       <location/>
       <source>Login:</source>
-      <translation type="unfinished">Login:</translation>
+      <translation>Login:</translation>
     </message>
     <message>
       <location/>
       <source>Enable Audio</source>
-      <translation>Activar Áudio</translation>
+      <translation>Habilitar áudio</translation>
     </message>
     <message>
       <location/>
       <source>Recording</source>
-      <translation>Gravação</translation>
+      <translation>Em gravação</translation>
     </message>
     <message>
       <location/>
@@ -1785,8 +1803,8 @@
     </message>
     <message>
       <location/>
-      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</translation>
+      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
     </message>
   </context>
   <context>
@@ -1799,7 +1817,7 @@
     <message>
       <location/>
       <source>Volume:</source>
-      <translation type="unfinished">Volume:</translation>
+      <translation>Volume:</translation>
     </message>
     <message>
       <location/>
@@ -1809,7 +1827,7 @@
     <message>
       <location/>
       <source>Play to users</source>
-      <translation type="unfinished">Play to users</translation>
+      <translation>Play to users</translation>
     </message>
   </context>
   <context>
@@ -1827,7 +1845,7 @@
     <message>
       <location/>
       <source>Force Acknowledgment</source>
-      <translation type="unfinished">Force Acknowledgment</translation>
+      <translation>Force Acknowledgment</translation>
     </message>
   </context>
   <context>
@@ -1845,7 +1863,7 @@
     <message>
       <location/>
       <source>Events</source>
-      <translation type="unfinished">Events</translation>
+      <translation>Events</translation>
     </message>
   </context>
   <context>
@@ -1888,7 +1906,7 @@
     <message>
       <location/>
       <source>Preview</source>
-      <translation type="unfinished">Preview</translation>
+      <translation>Preview</translation>
     </message>
     <message>
       <location/>
@@ -1924,12 +1942,12 @@
     <message>
       <location filename="../src/ui/dialogs/attach_to_videowall_dialog.ui"/>
       <source>Attach to Video Wall...</source>
-      <translation>Associar a Video Wall...</translation>
+      <translation>Assignar a Video Wall...</translation>
     </message>
     <message>
       <location/>
       <source>Preview</source>
-      <translation type="unfinished">Preview</translation>
+      <translation>Preview</translation>
     </message>
   </context>
   <context>
@@ -1937,7 +1955,7 @@
     <message>
       <location filename="../src/ui/dialogs/build_number_dialog.ui"/>
       <source>Choose a specific build</source>
-      <translation type="unfinished">Choose a specific build</translation>
+      <translation>Choose a specific build</translation>
     </message>
   </context>
   <context>
@@ -1945,7 +1963,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui"/>
       <source>Bookmark</source>
-      <translation type="unfinished">Bookmark</translation>
+      <translation>Bookmark</translation>
     </message>
   </context>
   <context>
@@ -1953,7 +1971,7 @@
     <message>
       <location filename="../src/ui/dialogs/compatibility_version_installation_dialog.ui"/>
       <source>Installing Compatibility Version...</source>
-      <translation type="unfinished">Installing Compatibility Version...</translation>
+      <translation>Installing Compatibility Version...</translation>
     </message>
   </context>
   <context>
@@ -1966,7 +1984,7 @@
     <message>
       <location/>
       <source>Password:</source>
-      <translation type="unfinished">Password:</translation>
+      <translation>Password:</translation>
     </message>
     <message>
       <location/>
@@ -1984,7 +2002,7 @@
     <message>
       <location/>
       <source>Enable tile interface</source>
-      <translation type="unfinished">Enable tile interface</translation>
+      <translation>Enable tile interface</translation>
     </message>
   </context>
   <context>
@@ -1992,12 +2010,12 @@
     <message>
       <location filename="../src/ui/dialogs/cloud/login_to_cloud_dialog.ui"/>
       <source>Log in</source>
-      <translation type="unfinished">Log in</translation>
+      <translation>Log in</translation>
     </message>
     <message>
       <location/>
       <source>Stay logged in</source>
-      <translation type="unfinished">Stay logged in</translation>
+      <translation>Stay logged in</translation>
     </message>
   </context>
   <context>
@@ -2023,7 +2041,7 @@
     <message>
       <location/>
       <source>Password:</source>
-      <translation type="unfinished">Password:</translation>
+      <translation>Password:</translation>
     </message>
     <message>
       <location/>
@@ -2033,12 +2051,12 @@
     <message>
       <location/>
       <source>Login:</source>
-      <translation type="unfinished">Login:</translation>
+      <translation>Login:</translation>
     </message>
     <message>
       <location/>
       <source>The new System will have password and name from System:</source>
-      <translation type="unfinished">The new System will have password and name from System:</translation>
+      <translation>The new System will have password and name from System:</translation>
     </message>
   </context>
   <context>
@@ -2097,7 +2115,7 @@
     <message>
       <location/>
       <source>Removing this connection option could lead to System malfunction.</source>
-      <translation type="unfinished">Removing this connection option could lead to System malfunction.</translation>
+      <translation>Removing this connection option could lead to System malfunction.</translation>
     </message>
   </context>
   <context>
@@ -2120,22 +2138,22 @@
     <message>
       <location/>
       <source>Updating to...</source>
-      <translation type="unfinished">Updating to...</translation>
+      <translation>Updating to...</translation>
     </message>
     <message>
       <location/>
       <source>Link copied</source>
-      <translation type="unfinished">Link copied</translation>
+      <translation>Link copied</translation>
     </message>
     <message>
       <location/>
       <source>You have the latest version installed</source>
-      <translation type="unfinished">You have the latest version installed</translation>
+      <translation>You have the latest version installed</translation>
     </message>
     <message>
       <location/>
       <source>Applying System updates at the end of the week is not recommended.</source>
-      <translation type="unfinished">Applying System updates at the end of the week is not recommended.</translation>
+      <translation>Applying System updates at the end of the week is not recommended.</translation>
     </message>
   </context>
   <context>
@@ -2176,7 +2194,7 @@
     <message>
       <location/>
       <source>Warning: file with the same name already exists!</source>
-      <translation type="unfinished">Warning: file with the same name already exists!</translation>
+      <translation>Warning: file with the same name already exists!</translation>
     </message>
   </context>
   <context>
@@ -2194,7 +2212,7 @@
     <message>
       <location/>
       <source>Fetch Users from LDAP...</source>
-      <translation>Obter Utilizador através do LDAP...</translation>
+      <translation>Obter utilizador a partir do LDAP...</translation>
     </message>
     <message>
       <location/>
@@ -2204,7 +2222,7 @@
     <message>
       <location/>
       <source>Search users</source>
-      <translation type="unfinished">Search users</translation>
+      <translation>Search users</translation>
     </message>
     <message>
       <location/>
@@ -2214,7 +2232,7 @@
     <message>
       <location/>
       <source>Disable</source>
-      <translation type="unfinished">Disable</translation>
+      <translation>Disable</translation>
     </message>
     <message>
       <location/>
@@ -2224,7 +2242,7 @@
     <message>
       <location/>
       <source>Edit Roles...</source>
-      <translation type="unfinished">Edit Roles...</translation>
+      <translation>Edit Roles...</translation>
     </message>
   </context>
   <context>
@@ -2301,12 +2319,12 @@
     <message>
       <location/>
       <source>FPS</source>
-      <translation type="unfinished">FPS</translation>
+      <translation>FPS</translation>
     </message>
     <message>
       <location/>
       <source>s</source>
-      <translation type="unfinished">s</translation>
+      <translation>s</translation>
     </message>
     <message>
       <location/>
@@ -2359,7 +2377,7 @@
     <message>
       <location/>
       <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation type="unfinished">A powerful computer is recommended for &quot;Best&quot; quality and resolution.</translation>
+      <translation>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</translation>
     </message>
     <message>
       <location/>
@@ -2397,7 +2415,7 @@
     <message>
       <location/>
       <source>Search</source>
-      <translation>Pesquisa</translation>
+      <translation>Pesquisar</translation>
     </message>
   </context>
   <context>
@@ -2415,7 +2433,7 @@
     <message>
       <location/>
       <source>Volume:</source>
-      <translation type="unfinished">Volume:</translation>
+      <translation>Volume:</translation>
     </message>
     <message>
       <location/>
@@ -2425,7 +2443,7 @@
     <message>
       <location/>
       <source>Speak to users</source>
-      <translation type="unfinished">Speak to users</translation>
+      <translation>Speak to users</translation>
     </message>
   </context>
   <context>
@@ -2446,12 +2464,12 @@
     <message>
       <location filename="../src/ui/widgets/properties/server_settings_widget.ui"/>
       <source>Ping</source>
-      <translation type="unfinished">Ping</translation>
+      <translation>Ping</translation>
     </message>
     <message>
       <location/>
       <source>Failover</source>
-      <translation type="unfinished">Failover</translation>
+      <translation>Failover</translation>
     </message>
     <message>
       <location/>
@@ -2471,7 +2489,7 @@
     <message>
       <location/>
       <source>Port</source>
-      <translation>Porto</translation>
+      <translation>Port</translation>
     </message>
   </context>
   <context>
@@ -2553,7 +2571,7 @@
     <message>
       <location/>
       <source>Ping</source>
-      <translation type="unfinished">Ping</translation>
+      <translation>Ping</translation>
     </message>
     <message>
       <location/>
@@ -2563,7 +2581,7 @@
     <message>
       <location/>
       <source>Recording</source>
-      <translation>Em gravação</translation>
+      <translation>Gravação</translation>
     </message>
     <message>
       <location/>
@@ -2583,7 +2601,7 @@
     <message>
       <location/>
       <source>Enable Audio</source>
-      <translation>Habilitar áudio</translation>
+      <translation>Activar Áudio</translation>
     </message>
     <message>
       <location/>
@@ -2598,7 +2616,7 @@
     <message>
       <location/>
       <source>Fisheye</source>
-      <translation type="unfinished">Fisheye</translation>
+      <translation>Fisheye</translation>
     </message>
     <message>
       <location/>
@@ -2628,17 +2646,17 @@
     <message>
       <location/>
       <source>Audio</source>
-      <translation type="unfinished">Audio</translation>
+      <translation>Audio</translation>
     </message>
     <message>
       <location/>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <location/>
@@ -2664,11 +2682,6 @@
       <location/>
       <source>Reset</source>
       <translation>Restaurar</translation>
-    </message>
-    <message>
-      <location/>
-      <source>TextLabel</source>
-      <translation type="unfinished">TextLabel</translation>
     </message>
     <message>
       <location/>
@@ -2759,7 +2772,7 @@ The oldest footage among all cameras on the server will be deleted first.</trans
     <message>
       <location/>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <location/>
@@ -2772,7 +2785,7 @@ The oldest footage among all cameras on the server will be deleted first.</trans
     <message>
       <location filename="../src/ui/widgets/business/software_trigger_business_event_widget.ui"/>
       <source>Available to</source>
-      <translation type="unfinished">Available to</translation>
+      <translation>Available to</translation>
     </message>
     <message>
       <location/>
@@ -2782,7 +2795,7 @@ The oldest footage among all cameras on the server will be deleted first.</trans
     <message>
       <location/>
       <source>Icon</source>
-      <translation type="unfinished">Icon</translation>
+      <translation>Icon</translation>
     </message>
   </context>
   <context>
@@ -2790,12 +2803,12 @@ The oldest footage among all cameras on the server will be deleted first.</trans
     <message>
       <location filename="../src/ui/widgets/properties/storage_analytics_widget.ui"/>
       <source>Current Statistics</source>
-      <translation type="unfinished">Current Statistics</translation>
+      <translation>Current Statistics</translation>
     </message>
     <message>
       <location/>
       <source>Forecast for Full Storage Usage</source>
-      <translation type="unfinished">Forecast for Full Storage Usage</translation>
+      <translation>Forecast for Full Storage Usage</translation>
     </message>
     <message>
       <location/>
@@ -2805,7 +2818,7 @@ The oldest footage among all cameras on the server will be deleted first.</trans
     <message>
       <location/>
       <source>Server is offline. Statistics are not available.</source>
-      <translation type="unfinished">Server is offline. Statistics are not available.</translation>
+      <translation>Server is offline. Statistics are not available.</translation>
     </message>
   </context>
   <context>
@@ -2828,27 +2841,27 @@ The oldest footage among all cameras on the server will be deleted first.</trans
     <message>
       <location/>
       <source>Storage Locations</source>
-      <translation type="unfinished">Storage Locations</translation>
+      <translation>Storage Locations</translation>
     </message>
     <message>
       <location/>
       <source>Reindex Archive</source>
-      <translation type="unfinished">Reindex Archive</translation>
+      <translation>Reindex Archive</translation>
     </message>
     <message>
       <location/>
       <source>Reindex Backup</source>
-      <translation type="unfinished">Reindex Backup</translation>
+      <translation>Reindex Backup</translation>
     </message>
     <message>
       <location/>
       <source>Backup Archive</source>
-      <translation type="unfinished">Backup Archive</translation>
+      <translation>Backup Archive</translation>
     </message>
     <message>
       <location/>
       <source>Backup Settings...</source>
-      <translation type="unfinished">Backup Settings...</translation>
+      <translation>Backup Settings...</translation>
     </message>
   </context>
   <context>
@@ -2874,17 +2887,17 @@ The oldest footage among all cameras on the server will be deleted first.</trans
     <message>
       <location/>
       <source>URL:</source>
-      <translation type="unfinished">URL:</translation>
+      <translation>URL:</translation>
     </message>
     <message>
       <location/>
       <source>Login:</source>
-      <translation type="unfinished">Login:</translation>
+      <translation>Login:</translation>
     </message>
     <message>
       <location/>
       <source>Password:</source>
-      <translation type="unfinished">Password:</translation>
+      <translation>Password:</translation>
     </message>
   </context>
   <context>
@@ -2892,22 +2905,22 @@ The oldest footage among all cameras on the server will be deleted first.</trans
     <message>
       <location filename="../src/nx/client/desktop/ui/event_rules/subject_selection_dialog.ui"/>
       <source>Roles</source>
-      <translation type="unfinished">Roles</translation>
+      <translation>Roles</translation>
     </message>
     <message>
       <location/>
       <source>Show all users</source>
-      <translation type="unfinished">Show all users</translation>
+      <translation>Show all users</translation>
     </message>
     <message>
       <location/>
       <source>Select Users</source>
-      <translation type="unfinished">Select Users</translation>
+      <translation>Select Users</translation>
     </message>
     <message>
       <location/>
       <source>Nothing matches your search.</source>
-      <translation type="unfinished">Nothing matches your search.</translation>
+      <translation>Nothing matches your search.</translation>
     </message>
   </context>
   <context>
@@ -2930,7 +2943,7 @@ The oldest footage among all cameras on the server will be deleted first.</trans
     <message>
       <location/>
       <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
-      <translation>Aviso! Esta opção irá tornar irrelevante as definições de Qualidade e Frame Rate (FPS) na Agenda de Gravação.</translation>
+      <translation>Aviso! Esta opção irá tornar irrelevantes as definições na agenda de gravação em relação à "Qualidade e Frame Rate (FPS)".</translation>
     </message>
   </context>
   <context>
@@ -2966,12 +2979,12 @@ The oldest footage among all cameras on the server will be deleted first.</trans
     <message>
       <location filename="../src/ui/widgets/system_settings/time_server_selection_widget.ui"/>
       <source>System Time</source>
-      <translation type="unfinished">System Time</translation>
+      <translation>System Time</translation>
     </message>
     <message>
       <location/>
       <source>Sync time with the Internet</source>
-      <translation type="unfinished">Sync time with the Internet</translation>
+      <translation>Sync time with the Internet</translation>
     </message>
   </context>
   <context>
@@ -2979,7 +2992,7 @@ The oldest footage among all cameras on the server will be deleted first.</trans
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/timestamp_overlay_settings_widget.ui"/>
       <source>Timestamp</source>
-      <translation type="unfinished">Timestamp</translation>
+      <translation>Timestamp</translation>
     </message>
     <message>
       <location/>
@@ -3002,7 +3015,7 @@ The oldest footage among all cameras on the server will be deleted first.</trans
     <message>
       <location filename="../src/ui/widgets/properties/user_profile_widget.ui"/>
       <source>Change Password...</source>
-      <translation type="unfinished">Change Password...</translation>
+      <translation>Change Password...</translation>
     </message>
   </context>
   <context>
@@ -3020,7 +3033,7 @@ The oldest footage among all cameras on the server will be deleted first.</trans
     <message>
       <location/>
       <source>Delete Role</source>
-      <translation type="unfinished">Delete Role</translation>
+      <translation>Delete Role</translation>
     </message>
   </context>
   <context>
@@ -3028,19 +3041,19 @@ The oldest footage among all cameras on the server will be deleted first.</trans
     <message>
       <location filename="../src/ui/dialogs/resource_properties/user_roles_dialog.ui"/>
       <source>User Roles</source>
-      <translation type="unfinished">User Roles</translation>
+      <translation>User Roles</translation>
     </message>
     <message>
       <location/>
       <source>There are no custom user roles yet.
 Click &quot;New role&quot; button to create one.</source>
-      <translation type="unfinished">There are no custom user roles yet.
+      <translation>There are no custom user roles yet.
 Click &quot;New role&quot; button to create one.</translation>
     </message>
     <message>
       <location/>
       <source>New role</source>
-      <translation type="unfinished">New role</translation>
+      <translation>New role</translation>
     </message>
   </context>
   <context>
@@ -3048,28 +3061,23 @@ Click &quot;New role&quot; button to create one.</translation>
     <message>
       <location filename="../src/ui/widgets/properties/user_settings_widget.ui"/>
       <source>User Type</source>
-      <translation type="unfinished">User Type</translation>
+      <translation>User Type</translation>
     </message>
     <message>
       <location/>
       <source>Role</source>
-      <translation type="unfinished">Role</translation>
+      <translation>Role</translation>
     </message>
     <message>
       <location/>
       <source>Edit Roles...</source>
-      <translation type="unfinished">Edit Roles...</translation>
+      <translation>Edit Roles...</translation>
     </message>
   </context>
   <context>
     <name>WearableMotionWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
-      <source>Form</source>
-      <translation>Formulário</translation>
-    </message>
-    <message>
-      <location/>
       <source>Motion Detection</source>
       <translation>Detecção de Movimento</translation>
     </message>
@@ -3088,11 +3096,6 @@ Click &quot;New role&quot; button to create one.</translation>
     <name>WearableProgressWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
-      <source>Form</source>
-      <translation>Formulário</translation>
-    </message>
-    <message>
-      <location/>
       <source>Cancel</source>
       <translation>Cancelar</translation>
     </message>
@@ -3101,11 +3104,6 @@ Click &quot;New role&quot; button to create one.</translation>
     <name>WearableUploadWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
-      <source>Form</source>
-      <translation>Formulário</translation>
-    </message>
-    <message>
-      <location/>
       <source>Upload Video</source>
       <translation type="unfinished">Upload Video</translation>
     </message>
@@ -3133,7 +3131,7 @@ Click &quot;New role&quot; button to create one.</translation>
     <message>
       <location filename="../src/ui/dialogs/week_time_schedule_dialog.ui"/>
       <source>Schedule Settings</source>
-      <translation>Definições de Agenda</translation>
+      <translation>Definições da Agenda</translation>
     </message>
     <message>
       <location/>

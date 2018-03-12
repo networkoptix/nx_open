@@ -163,12 +163,12 @@ def activate(request):
             raise APIInternalException('No email from cloud_db', ErrorCodes.cloud_invalid_response)
 
         email = user_data['email'].lower()
-        try:
-            user = api.models.Account.objects.get(email=email)
-            user.activated_date = timezone.now()
-            user.save(update_fields=['activated_date'])
-        except ObjectDoesNotExist:
+        if not AccountBackend.is_email_in_portal(email):
             raise APIInternalException('No email in portal_db', ErrorCodes.portal_critical_error)
+
+        user = api.models.Account.objects.get(email=email)
+        user.activated_date = timezone.now()
+        user.save(update_fields=['activated_date'])
         return api_success()
     elif 'user_email' in request.data:
         user_email = request.data['user_email'].lower()

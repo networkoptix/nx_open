@@ -2,7 +2,7 @@
 
 #include <nx_ec/ec_api_fwd.h>
 
-class QN_EXPORT QnAppServerConnectionFactory
+class QnAppServerConnectionFactory
 {
 public:
     static void setEc2Connection(const ec2::AbstractECConnectionPtr &connection );

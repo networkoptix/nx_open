@@ -1,30 +1,21 @@
-"""Server controller
-
-Setup/start/stop server on vagrant VMs, remote or local hosts.
-"""
-
 import abc
-
-MEDIASERVER_DIR = 'opt/{customization_company_name}/mediaserver'
-MEDIASERVER_SERVICE_NAME = '{customization_company_name}-mediaserver'
-SERVER_CTL_TARGET_PATH = 'server_ctl.sh'
 
 
 class Service(object):
-
     __metaclass__ = abc.ABCMeta
 
     # returns bool: True if server is running, False if it's not
     @abc.abstractmethod
-    def get_state(self):
+    def is_running(self):
         pass
 
     @abc.abstractmethod
-    def set_state(self, is_started):
+    def start(self):
         pass
 
-    def is_running(self):
-        return self.get_state() == True
+    @abc.abstractmethod
+    def stop(self):
+        pass
 
 
 class UpstartService(Service):
@@ -33,24 +24,23 @@ class UpstartService(Service):
     SystemV's Upstart was deprecated several years ago and is not used by Debian/Ubuntu anymore.
     These tests are running mostly on Ubuntu 14.04, that is stated as requirement.
     """
+
     def __init__(self, os_access, service_name):
         self.os_access = os_access
         self._service_name = service_name
 
-    def get_state(self):
-        output = self._run_service_action('status')
-        goal = output.split()[1].split('/')[0]
-        assert goal in ['start', 'stop'], repr(output.strip())
-        return goal == 'start'
+    def is_running(self):
+        output = self.os_access.run_command(['status', self._service_name])
+        return output.split()[1].split('/')[0] == 'start'
 
-    def set_state(self, is_started):
-        self._run_service_action('start' if is_started else 'stop')
+    def start(self):
+        self.os_access.run_command(['start', self._service_name])
+
+    def stop(self):
+        self.os_access.run_command(['stop', self._service_name])
 
     def make_core_dump(self):
-        self.os_access.run_command(['killall', '--signal', 'SIGTRAP', 'mediaserver-bin'])
-
-    def _run_service_action(self, action):
-        return self.os_access.run_command([action, self._service_name])
+        self.os_access.run_command(['killall', '--signal', 'SIGTRAP', 'mediaserver-bin'], check_retcode=False)
 
 
 class AdHocService(Service):
@@ -64,21 +54,21 @@ class AdHocService(Service):
     shell script is created from templates.
     Its interface mimic a `service` command.
     """
+
     def __init__(self, os_access, dir):
         self._os_access = os_access
-        self._dir = dir
-        self._service_script_path = self._dir / 'server_ctl.sh'
+        self._service_script_path = dir / 'server_ctl.sh'
 
-    def get_state(self):
+    def is_running(self):
         if not self._os_access.file_exists(self._service_script_path):
             return False  # not even installed
-        return self._run_service_action('is_active') == 'active'
+        return self._os_access.run_command([self._service_script_path, 'is_active']).strip() == 'active'
 
-    def set_state(self, is_started):
-        self._run_service_action('start' if is_started else 'stop')
+    def start(self):
+        return self._os_access.run_command([self._service_script_path, 'start'])
+
+    def stop(self):
+        return self._os_access.run_command([self._service_script_path, 'stop'])
 
     def make_core_dump(self):
-        self._run_service_action('make_core_dump')
-
-    def _run_service_action(self, action):
-        return self._os_access.run_command([self._service_script_path, action]).strip()
+        self._os_access.run_command([self._service_script_path, 'make_core_dump'])

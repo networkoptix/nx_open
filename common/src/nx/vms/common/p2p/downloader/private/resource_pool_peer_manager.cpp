@@ -9,6 +9,7 @@
 #include <rest/server/json_rest_result.h>
 #include <common/common_module.h>
 #include "peer_selection/peer_selector_factory.h"
+#include "validate_result.h"
 
 namespace nx {
 namespace vms {
@@ -143,7 +144,7 @@ rest::Handle ResourcePoolPeerManager::requestFileInfo(
         [this, callback](bool success, rest::Handle handle, const QnJsonRestResult& result)
         {
             if (!success)
-                callback(success, handle, FileInformation());
+                return callback(success, handle, FileInformation());
 
             const auto& fileInfo = result.deserialized<FileInformation>();
             callback(success, handle, fileInfo);
@@ -165,7 +166,7 @@ rest::Handle ResourcePoolPeerManager::requestChecksums(
         [this, callback](bool success, rest::Handle handle, const QnJsonRestResult& result)
         {
             if (!success)
-                callback(success, handle, QVector<QByteArray>());
+                return callback(success, handle, QVector<QByteArray>());
 
             const auto& checksums = result.deserialized<QVector<QByteArray>>();
             callback(success, handle, checksums);
@@ -188,29 +189,97 @@ rest::Handle ResourcePoolPeerManager::downloadChunk(
 }
 
 rest::Handle ResourcePoolPeerManager::validateFileInformation(
-    const FileInformation& fileInformation, AbstractPeerManager::ValidateCallback callback)
+    const QnUuid& peerId,
+    const FileInformation& fileInformation,
+    AbstractPeerManager::ValidateCallback callback)
 {
+    if (peerId != selfId())
+    {
+        NX_VERBOSE(
+            this,
+            lm("[Downloader, validate] File %1 via other peer %2")
+                .args(fileInformation.name, peerId));
+
+        const auto& connection = getConnection(peerId);
+        if (!connection)
+        {
+            NX_WARNING(this, lm("[Downloader, validate] File %1. No rest connection for %2")
+                .args(fileInformation.name, peerId));
+            return -1;
+        }
+
+        auto handleReply =
+            [this, callback, fileInformation, peerId](
+                bool success,
+                rest::Handle handle,
+                const QnJsonRestResult& result)
+            {
+                if (!success)
+                {
+                    NX_WARNING(this, lm("[Downloader, validate] File %1. Rest connection to %2 response error")
+                        .args(fileInformation.name, peerId));
+                    return callback(success, handle);
+                }
+
+                const auto validateResult = result.deserialized<ValidateResult>();
+                if (!validateResult.success)
+                {
+                    NX_WARNING(this, lm("[Downloader, validate] File %1. peer %2 responded that validation had failed")
+                        .args(fileInformation.name, peerId));
+                }
+
+                NX_VERBOSE(this, lm("[Downloader, validate] File %1. peer %2 validation successful")
+                    .args(fileInformation.name, peerId));
+
+                callback(success, handle);
+            };
+
+        return connection->validateFileInformation(
+            fileInformation.url.toString(), handleReply, thread());
+    }
+
+    NX_VERBOSE(
+        this,
+        lm("[Downloader, validate] Trying to validate %1 directly")
+            .args(fileInformation.name));
+
     const auto handle = ++m_currentSelfRequestHandle;
     auto httpClient = createHttpClient();
     httpClient->doHead(fileInformation.url,
-        [this, &fileInformation, callback, handle, httpClient](
+        [this, fileInformation, callback, handle, httpClient](
             network::http::AsyncHttpClientPtr asyncClient) mutable
         {
             if (asyncClient->failed()
+                || !asyncClient->response()
                 || asyncClient->response()->statusLine.statusCode != network::http::StatusCode::ok)
             {
+                NX_WARNING(
+                    this,
+                    lm("[Downloader, validate] Validate %1 http request failed. Http client failed: %2, has response: %3, status code: %4")
+                        .args(fileInformation.name, asyncClient->failed(), asyncClient->response(),
+                            asyncClient->response()->statusLine.statusCode));
+
                 return callback(false, handle);
             }
 
             auto& responseHeaders = asyncClient->response()->headers;
             auto contentLengthItr = responseHeaders.find("Content-Length");
-            if (contentLengthItr == responseHeaders.cend()
-                || contentLengthItr->second.toInt() != fileInformation.size)
+            const bool hasHeader = contentLengthItr != responseHeaders.cend();
+
+            if (!hasHeader || contentLengthItr->second.toInt() != fileInformation.size)
             {
+                NX_WARNING(
+                    this,
+                    lm("[Downloader, validate] %1. Content-Length: %2, fileInformation.size: %3")
+                        .args(fileInformation.name,
+                            hasHeader ? contentLengthItr->second.toInt() : -1,
+                            fileInformation.size));
+
                 return callback(false, handle);
             }
 
-            callback(false, handle);
+            NX_VERBOSE(this, lm("[Downloader, validate] %1. Success").args(fileInformation.name));
+            callback(true, handle);
         });
 
     return handle;
@@ -256,14 +325,15 @@ rest::Handle ResourcePoolPeerManager::downloadChunkFromInternet(
             if (!m_httpClientByHandle.remove(handle))
                 return;
 
+            using namespace network;
             QByteArray result;
 
-            if (!client->failed()
-                && client->response()
-                && client->response()->statusLine.statusCode == network::http::StatusCode::ok)
-            {
+            auto okResponse = client->response() &&
+                (client->response()->statusLine.statusCode == http::StatusCode::partialContent
+                || client->response()->statusLine.statusCode == http::StatusCode::ok);
+
+            if (!client->failed() && okResponse)
                 result = client->fetchMessageBodyBuffer();
-            }
 
             callback(!result.isNull(), handle, result);
         });

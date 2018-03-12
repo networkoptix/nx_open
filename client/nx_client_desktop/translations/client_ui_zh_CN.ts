@@ -16,7 +16,7 @@
     <message>
       <location/>
       <source>Credits</source>
-      <translation>认证</translation>
+      <translation>开发环境</translation>
     </message>
     <message>
       <location/>
@@ -173,11 +173,6 @@
     <name>ArchiveLengthWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
-      <source>Form</source>
-      <translation>从</translation>
-    </message>
-    <message>
-      <location/>
       <source>Fixed Archive Length</source>
       <translation>固定的录像范围</translation>
     </message>
@@ -237,12 +232,12 @@
     <message>
       <location/>
       <source>Server actions</source>
-      <translation>服务器操作</translation>
+      <translation>服务端操作</translation>
     </message>
     <message>
       <location/>
       <source>System actions</source>
-      <translation>系统操作</translation>
+      <translation>系统设置</translation>
     </message>
     <message>
       <location/>
@@ -257,7 +252,7 @@
     <message>
       <location/>
       <source>Details</source>
-      <translation>配置信息</translation>
+      <translation>内容</translation>
     </message>
     <message>
       <location/>
@@ -366,7 +361,7 @@
     <message>
       <location/>
       <source>seconds</source>
-      <translation>秒</translation>
+      <translation>s</translation>
     </message>
     <message>
       <location/>
@@ -534,7 +529,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_addition_dialog.ui"/>
       <source>Server is offline</source>
-      <translation>服务器已离线</translation>
+      <translation>服务器离线</translation>
     </message>
     <message>
       <location/>
@@ -680,7 +675,7 @@
     <message>
       <location/>
       <source>Restore Defaults</source>
-      <translation>恢复默认</translation>
+      <translation>还原为默认值</translation>
     </message>
     <message>
       <location/>
@@ -755,7 +750,22 @@
     <message>
       <location/>
       <source>PTZ</source>
-      <translation type="unfinished">PTZ</translation>
+      <translation>PTZ</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Generate</source>
+      <translation>生成</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset</source>
+      <translation>重置</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Logical Id</source>
+      <translation type="unfinished">Logical Id</translation>
     </message>
   </context>
   <context>
@@ -784,7 +794,7 @@
     <message>
       <location/>
       <source>seconds</source>
-      <translation>秒</translation>
+      <translation>s</translation>
     </message>
     <message>
       <location/>
@@ -797,7 +807,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui"/>
       <source>Schedule Settings</source>
-      <translation>录像计划设置</translation>
+      <translation>计划设定</translation>
     </message>
     <message>
       <location/>
@@ -807,7 +817,7 @@
     <message>
       <location/>
       <source>Quality</source>
-      <translation>质量</translation>
+      <translation>画质</translation>
     </message>
     <message>
       <location/>
@@ -961,6 +971,14 @@
     </message>
   </context>
   <context>
+    <name>CustomSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/custom_settings/widgets/custom_settings_widget.ui"/>
+      <source>Category</source>
+      <translation>分类</translation>
+    </message>
+  </context>
+  <context>
     <name>DatabaseManagementWidget</name>
     <message>
       <location filename="../src/ui/widgets/system_settings/database_management_widget.ui"/>
@@ -1006,7 +1024,7 @@
     <message>
       <location filename="../src/ui/widgets/business/exec_http_request_action_widget.ui"/>
       <source>HTTP content</source>
-      <translation>HTTP 文本</translation>
+      <translation>HTTP内容</translation>
     </message>
     <message>
       <location/>
@@ -1443,7 +1461,7 @@
     <message>
       <location filename="../src/ui/dialogs/ldap_users_dialog.ui"/>
       <source>Fetch Users from LDAP...</source>
-      <translation>从LDAP获取用户...</translation>
+      <translation>获取用户的LDAP...</translation>
     </message>
     <message>
       <location/>
@@ -1496,7 +1514,7 @@
     <message>
       <location/>
       <source>Locked to Hardware Id:</source>
-      <translation>已关联硬件ID:</translation>
+      <translation>已关联硬件ID</translation>
     </message>
   </context>
   <context>
@@ -1570,7 +1588,7 @@
     <message>
       <location/>
       <source>Activate License</source>
-      <translation>激活授权</translation>
+      <translation>激活许可</translation>
     </message>
     <message>
       <location/>
@@ -1595,7 +1613,7 @@
     <message>
       <location/>
       <source>Hardware Id</source>
-      <translation>硬件 Id</translation>
+      <translation>硬件ID:</translation>
     </message>
   </context>
   <context>
@@ -1672,7 +1690,7 @@
     <message>
       <location filename="../src/ui/widgets/local_settings/look_and_feel_preferences_widget.ui"/>
       <source>Look and Feel</source>
-      <translation>界面外观</translation>
+      <translation>常规设置</translation>
     </message>
     <message>
       <location/>
@@ -1692,7 +1710,7 @@
     <message>
       <location/>
       <source>Time Mode</source>
-      <translation>时间模式</translation>
+      <translation>时间模式:</translation>
     </message>
     <message>
       <location/>
@@ -1707,7 +1725,7 @@
     <message>
       <location/>
       <source>Intensity</source>
-      <translation>对比度</translation>
+      <translation>对比度:</translation>
     </message>
     <message>
       <location/>
@@ -1717,12 +1735,12 @@
     <message>
       <location/>
       <source>seconds</source>
-      <translation>秒</translation>
+      <translation>s</translation>
     </message>
     <message>
       <location/>
       <source>Tour cycle</source>
-      <translation>轮巡周期</translation>
+      <translation>Tour cycle</translation>
     </message>
   </context>
   <context>
@@ -1738,7 +1756,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui"/>
       <source>General</source>
-      <translation>通用</translation>
+      <translation>一般</translation>
     </message>
     <message>
       <location/>
@@ -1776,17 +1794,17 @@
     <message>
       <location filename="../src/ui/dialogs/new_wearable_camera_dialog.ui"/>
       <source>New Wearable Camera...</source>
-      <translation type="unfinished">New Wearable Camera...</translation>
+      <translation>新的穿戴式相机...</translation>
     </message>
     <message>
       <location/>
       <source>To server</source>
-      <translation type="unfinished">To server</translation>
+      <translation>到服务器</translation>
     </message>
     <message>
       <location/>
-      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</translation>
+      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
     </message>
   </context>
   <context>
@@ -1945,7 +1963,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui"/>
       <source>Bookmark</source>
-      <translation>标记</translation>
+      <translation>标签</translation>
     </message>
   </context>
   <context>
@@ -2331,7 +2349,7 @@
     <message>
       <location/>
       <source>seconds</source>
-      <translation>秒</translation>
+      <translation>s</translation>
     </message>
   </context>
   <context>
@@ -2466,7 +2484,7 @@
     <message>
       <location/>
       <source>IP Address</source>
-      <translation>IP地址</translation>
+      <translation>IP地址:</translation>
     </message>
     <message>
       <location/>
@@ -2497,7 +2515,7 @@
     <message>
       <location filename="../src/ui/widgets/business/show_text_overlay_action_widget.ui"/>
       <source>seconds</source>
-      <translation>秒</translation>
+      <translation>s</translation>
     </message>
     <message>
       <location/>
@@ -2543,7 +2561,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui"/>
       <source>General</source>
-      <translation>通用</translation>
+      <translation>一般</translation>
     </message>
     <message>
       <location/>
@@ -2568,7 +2586,7 @@
     <message>
       <location/>
       <source>Motion</source>
-      <translation>监控</translation>
+      <translation>移动侦测</translation>
     </message>
     <message>
       <location/>
@@ -2643,7 +2661,7 @@
     <message>
       <location/>
       <source>IP Address</source>
-      <translation>IP地址</translation>
+      <translation>IP地址:</translation>
     </message>
     <message>
       <location/>
@@ -2667,15 +2685,9 @@
     </message>
     <message>
       <location/>
-      <source>TextLabel</source>
-      <translation type="unfinished">TextLabel</translation>
-    </message>
-    <message>
-      <location/>
       <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage.
 The oldest footage among all cameras on the server will be deleted first.</source>
-      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage.
-The oldest footage among all cameras on the server will be deleted first.</translation>
+      <translation>如果服务器存储上没有可用空间，则上传的存档会自动删除。服务器上所有摄像机中最老的文件将首先被删除。</translation>
     </message>
   </context>
   <context>
@@ -2759,7 +2771,7 @@ The oldest footage among all cameras on the server will be deleted first.</trans
     <message>
       <location/>
       <source>OK</source>
-      <translation>确定</translation>
+      <translation>确认</translation>
     </message>
     <message>
       <location/>
@@ -3064,18 +3076,13 @@ Click &quot;New role&quot; button to create one.</source>
     <name>WearableMotionWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
-      <source>Form</source>
-      <translation>从</translation>
-    </message>
-    <message>
-      <location/>
       <source>Motion Detection</source>
       <translation>移动侦测</translation>
     </message>
     <message>
       <location/>
       <source>Detect motion in uploaded video</source>
-      <translation type="unfinished">Detect motion in uploaded video</translation>
+      <translation>检测上传的视频中的运动</translation>
     </message>
     <message>
       <location/>
@@ -3087,36 +3094,26 @@ Click &quot;New role&quot; button to create one.</source>
     <name>WearableProgressWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
-      <source>Form</source>
-      <translation>从</translation>
-    </message>
-    <message>
-      <location/>
       <source>Cancel</source>
-      <translation>取消</translation>
+      <translation>撤消</translation>
     </message>
   </context>
   <context>
     <name>WearableUploadWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
-      <source>Form</source>
-      <translation>从</translation>
-    </message>
-    <message>
-      <location/>
       <source>Upload Video</source>
-      <translation type="unfinished">Upload Video</translation>
+      <translation>上传视频</translation>
     </message>
     <message>
       <location/>
       <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
+      <translation>上传文件</translation>
     </message>
     <message>
       <location/>
       <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
+      <translation>上传文件夹...</translation>
     </message>
   </context>
   <context>

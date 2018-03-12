@@ -77,7 +77,7 @@ ExportSettingsDialog::Private::~Private()
 
 void ExportSettingsDialog::Private::updateOverlaysVisibility()
 {
-    if (m_exportMediaPersistentSettings.shouldExportOverlays())
+    if (m_exportMediaPersistentSettings.canExportOverlays())
     {
         for (const auto overlayType: m_exportMediaPersistentSettings.usedOverlays)
         {
@@ -132,7 +132,7 @@ void ExportSettingsDialog::Private::loadSettings()
     refreshMediaPreview();
     updateOverlaysVisibility();
 
-    if (m_exportMediaPersistentSettings.shouldExportOverlays())
+    if (m_exportMediaPersistentSettings.canExportOverlays())
     {
         const auto& used = m_exportMediaPersistentSettings.usedOverlays;
         for (const auto type : used)
@@ -219,7 +219,7 @@ void ExportSettingsDialog::Private::refreshMediaPreview()
         api::ResourceImageRequest request;
         request.resource = m_exportMediaSettings.mediaResource->toResourcePtr();
         request.msecSinceEpoch = m_exportMediaSettings.timePeriod.startTimeMs;
-        request.roundMethod = api::ImageRequest::RoundMethod::precise;
+        request.roundMethod = api::ImageRequest::RoundMethod::iFrameBefore;
         request.rotation = 0;
         request.aspectRatio = api::ImageRequest::AspectRatio::source;
 
@@ -280,6 +280,8 @@ void ExportSettingsDialog::Private::setMediaResource(const QnMediaResourcePtr& m
     // We land here once, when ExportSettingsDialog is constructed
     m_availableTranscodingSettings = settings;
     m_exportMediaSettings.mediaResource = media;
+    if (!media->hasVideo())
+        m_exportMediaPersistentSettings.hasVideo = false;
 
     refreshMediaPreview();
     updateOverlays();
@@ -331,6 +333,7 @@ void ExportSettingsDialog::Private::setLayout(const QnLayoutResourcePtr& layout,
 
     provider->setItemBackgroundColor(palette.color(QPalette::Window));
     provider->setFontColor(palette.color(QPalette::WindowText));
+    provider->setRequestRoundMethod(api::ResourceImageRequest::RoundMethod::iFrameBefore);
     provider->loadAsync();
 
     m_layoutPreviewProvider = std::move(provider);
@@ -365,6 +368,9 @@ void ExportSettingsDialog::Private::setMediaFilename(const Filename& filename)
     {
         refreshMediaPreview();
     }
+
+    validateSettings(Mode::Media);
+
     emit transcodingModeChanged();
 }
 

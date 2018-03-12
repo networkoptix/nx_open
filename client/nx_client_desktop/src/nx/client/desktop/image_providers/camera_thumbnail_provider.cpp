@@ -10,6 +10,7 @@
 #include <core/resource/camera_resource.h>
 
 #include <nx/fusion/model_functions.h>
+#include <nx/utils/log/log.h>
 
 namespace nx {
 namespace client {
@@ -28,27 +29,31 @@ CameraThumbnailProvider::CameraThumbnailProvider(
 
     if (!request.camera || !request.camera->hasVideo(nullptr))
     {
+        // We will rise an event there. But client could not expect it before doLoadAsync call
         setStatus(Qn::ThumbnailStatus::NoData);
         return;
     }
 
     /* Making connection through event loop to handle data from another thread. */
     connect(this, &CameraThumbnailProvider::imageDataLoadedInternal, this,
-        [this](const QByteArray &data)
+        [this](const QByteArray &data, Qn::ThumbnailStatus nextStatus)
         {
             if (!data.isEmpty())
             {
+                NX_VERBOSE(this) << "CameraThumbnailProvider::imageDataLoadedInternal(" << m_request.camera->getName() << ") - got response with data";
                 const auto imageFormat = QnLexical::serialized(m_request.imageFormat).toUtf8();
                 m_image.loadFromData(data, imageFormat);
             }
-            else
+            else if (nextStatus != Qn::ThumbnailStatus::NoData)
             {
-                setStatus(Qn::ThumbnailStatus::NoData);
+                // We should not be here
+                NX_VERBOSE(this) << "CameraThumbnailProvider::imageDataLoadedInternal(" << m_request.camera->getName() << ") - empty data but status not NoData!";
             }
 
             emit imageChanged(m_image);
             emit sizeHintChanged(sizeHint());
-            emit statusChanged(status());
+
+            setStatus(nextStatus);
         }, Qt::QueuedConnection);
 }
 
@@ -89,27 +94,30 @@ void CameraThumbnailProvider::doLoadAsync()
 
     if (!commonModule()->currentServer())
     {
-        emit imageDataLoadedInternal(QByteArray());
-        setStatus(Qn::ThumbnailStatus::NoData);
+        NX_VERBOSE(this) << "CameraThumbnailProvider::doLoadAsync(" << m_request.camera->getName() << ") - no server is available. Returning early";
+        emit imageDataLoadedInternal(QByteArray(), Qn::ThumbnailStatus::NoData);
         return;
     }
 
     QPointer<CameraThumbnailProvider> guard(this);
+    NX_VERBOSE(this) << "CameraThumbnailProvider::doLoadAsync(" << m_request.camera->getName() << ") - sending request to the server";
     auto handle = commonModule()->currentServer()->restConnection()->cameraThumbnailAsync(
         m_request,
         [this, guard] (bool success, rest::Handle /*id*/, const QByteArray& imageData)
         {
             if (!guard)
                 return;
-            if (success)
-                emit imageDataLoadedInternal(imageData);
-            setStatus(success ? Qn::ThumbnailStatus::Loaded : Qn::ThumbnailStatus::NoData);
+            Qn::ThumbnailStatus nextStatus =
+                success ? Qn::ThumbnailStatus::Loaded : Qn::ThumbnailStatus::NoData;
+            if (imageData.isEmpty())
+                nextStatus = Qn::ThumbnailStatus::NoData;
+            emit imageDataLoadedInternal(imageData, nextStatus);
         });
 
     if (handle <= 0)
     {
-        emit imageDataLoadedInternal(QByteArray());
-        setStatus(Qn::ThumbnailStatus::NoData);
+        // It will change to status NoData as well
+        emit imageDataLoadedInternal(QByteArray(), Qn::ThumbnailStatus::NoData);
     }
 }
 

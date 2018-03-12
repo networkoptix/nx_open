@@ -108,11 +108,11 @@ QnAbstractMediaDataPtr HanwhaArchiveDelegate::getNextData()
             m_streamReader->setPositionUsec(m_currentPositionUsec);
         if (!open(m_streamReader->m_resource, /*archiveIntegrityWatcher*/ nullptr))
         {
-            if (m_lastOpenResult.errorCode == CameraDiagnostics::ErrorCode::tooManyOpenedConnections)
+            if (auto mediaStreamEvent = m_lastOpenResult.toMediaStreamEvent())
             {
                 return QnCompressedMetadata::createMediaEventPacket(
                     isForwardDirection() ? DATETIME_NOW : 0,
-                    Qn::MediaStreamEvent::TooManyOpenedConnections);
+                    mediaStreamEvent);
             }
             if (m_errorHandler)
                 m_errorHandler(lit("Can not open stream."));
@@ -278,6 +278,11 @@ bool HanwhaArchiveDelegate::setQuality(
     const QSize& /*resolution*/)
 {
     return true;
+}
+
+CameraDiagnostics::Result HanwhaArchiveDelegate::lastError() const
+{
+    return m_lastOpenResult;
 }
 
 } // namespace plugins

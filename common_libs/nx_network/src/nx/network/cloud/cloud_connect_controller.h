@@ -4,7 +4,7 @@
 #include <memory>
 #include <string>
 
-#include <nx/kit/ini_config.h>
+#include <QtCore/QString>
 
 namespace nx {
 
@@ -25,32 +25,23 @@ namespace tcp { class ReverseConnectionPool; }
 
 struct NX_NETWORK_API CloudConnectControllerImpl;
 
-struct NX_NETWORK_API Ini:
-    nx::kit::IniConfig
-{
-    Ini();
-
-    NX_INI_STRING("", cloudHost, "Overridden Cloud Host");
-    NX_INI_FLAG(0, disableCloudSockets, "Use plain TCP sockets instead of Cloud sockets");
-};
-
 class NX_NETWORK_API CloudConnectController
 {
 public:
     CloudConnectController(
+        const QString& customCloudHost,
         aio::AIOService* aioService,
         AddressResolver* addressResolver);
     ~CloudConnectController();
 
     void applyArguments(const utils::ArgumentParser& arguments);
 
+    const QString& cloudHost() const;
     hpm::api::MediatorConnector& mediatorConnector();
     MediatorAddressPublisher& addressPublisher();
     OutgoingTunnelPool& outgoingTunnelPool();
     CloudConnectSettings& settings();
     tcp::ReverseConnectionPool& tcpReversePool();
-
-    const Ini& ini() const;
 
     /**
      * Deletes all objects and creates them.
@@ -60,16 +51,9 @@ public:
     static void printArgumentsHelp(std::ostream* outputStream);
 
 private:
-    struct Settings
-    {
-        std::string forcedMediatorUrl;
-        bool isUdpHpDisabled = false;
-        bool isOnlyCloudProxyEnabled = false;
-    };
-
     std::unique_ptr<CloudConnectControllerImpl> m_impl;
-    Settings m_settings;
 
+    void readSettingsFromIni();
     void loadSettings(const utils::ArgumentParser& arguments);
     void applySettings();
 };

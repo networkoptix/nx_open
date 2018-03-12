@@ -18,6 +18,10 @@
 #include "utils/common/sleep.h"
 #include "common/common_module.h"
 #include <api/global_settings.h>
+#include <database/server_db.h>
+#include <recording/time_period.h>
+#include <audit/mserver_audit_manager.h>
+#include <nx/utils/elapsed_timer.h>
 
 class AuthReturnCodeTest:
     public ::testing::Test
@@ -146,16 +150,16 @@ public:
         int expectedStatusCode,
         boost::optional<Qn::AuthResult> expectedAuthResult)
     {
-        nx::network::http::HttpClient httpClient;
-        httpClient.setUserName(login);
-        httpClient.setUserPassword(password);
-        httpClient.setAuthType(authType);
-        httpClient.addAdditionalHeader(Qn::CUSTOM_CHANGE_REALM_HEADER_NAME, QByteArray());
-        testServerReturnCode(&httpClient, expectedStatusCode, expectedAuthResult);
+        auto httpClient = std::make_unique<nx::network::http::HttpClient>();
+        httpClient->setUserName(login);
+        httpClient->setUserPassword(password);
+        httpClient->setAuthType(authType);
+        httpClient->addAdditionalHeader(Qn::CUSTOM_CHANGE_REALM_HEADER_NAME, QByteArray());
+        testServerReturnCode(std::move(httpClient), expectedStatusCode, expectedAuthResult);
     }
 
     void testServerReturnCode(
-        nx::network::http::HttpClient* httpClient,
+        std::unique_ptr<nx::network::http::HttpClient> httpClient,
         int expectedStatusCode,
         boost::optional<Qn::AuthResult> expectedAuthResult = boost::none)
     {
@@ -185,6 +189,27 @@ public:
 
             Qn::AuthResult authResult = QnLexical::deserialized<Qn::AuthResult>(authResultStr);
             ASSERT_EQ(expectedAuthResult, authResult);
+
+            if (expectedStatusCode == nx::network::http::StatusCode::unauthorized)
+            {
+                httpClient.reset(); //< Ensure connection is closed.
+
+                QnTimePeriod period(0, QnTimePeriod::infiniteDuration());
+                QnAuditRecordList outputData;
+                static const std::chrono::seconds kMaxWaitTime(10);
+                nx::utils::ElapsedTimer timer;
+                timer.restart();
+                // Server send "Unauthorized" response before it write data to the auditLog.
+                do
+                {
+                    static_cast<QnMServerAuditManager*>(qnAuditManager)->flushRecords();
+                    outputData = qnServerDb->getAuditData(period, QnUuid());
+                    if (outputData.isEmpty())
+                        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                } while (outputData.isEmpty() && timer.elapsed() < kMaxWaitTime);
+                ASSERT_TRUE(!outputData.isEmpty());
+                ASSERT_EQ(Qn::AuditRecordType::AR_UnauthorizedLogin, outputData.last().eventType);
+            }
         }
     }
 };
@@ -300,17 +325,17 @@ static std::unique_ptr<nx::network::http::HttpClient> manualDigestClient(
 TEST_F(AuthReturnCodeTest, manualDigest)
 {
     auto client = manualDigestClient("GET", "/ec2/getUsers");
-    testServerReturnCode(client.get(), 200);
+    testServerReturnCode(std::move(client), 200);
 }
 
 TEST_F(AuthReturnCodeTest, manualDigestWrongUri)
 {
     auto client = manualDigestClient("GET", "/api/getCameras");
-    testServerReturnCode(client.get(), 401, Qn::AuthResult::Auth_WrongDigest);
+    testServerReturnCode(std::move(client), 401, Qn::AuthResult::Auth_WrongDigest);
 }
 
 TEST_F(AuthReturnCodeTest, manualDigestWrongMethod)
 {
     auto client = manualDigestClient("POST", "/api/getUsers");
-    testServerReturnCode(client.get(), 401, Qn::AuthResult::Auth_WrongDigest);
+    testServerReturnCode(std::move(client), 401, Qn::AuthResult::Auth_WrongDigest);
 }

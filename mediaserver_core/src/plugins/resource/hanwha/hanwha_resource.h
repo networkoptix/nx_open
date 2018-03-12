@@ -107,6 +107,7 @@ public:
     virtual bool setCameraCredentialsSync(const QAuthenticator& auth, QString* outErrorString = nullptr) override;
 
     bool isConnectedViaSunapi() const;
+
 protected:
     virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
         Qn::StreamIndex streamIndex) override;
@@ -115,6 +116,8 @@ protected:
     virtual QnAbstractPtzController* createPtzControllerInternal() const override;
     virtual QnAbstractArchiveDelegate* createArchiveDelegate() override;
     virtual bool allowRtspVideoLayout() const override { return false; }
+    virtual void setAnalyticsSupportedEvents(const nx::api::AnalyticsSupportedEvents& eventsList) override;
+
 private:
     CameraDiagnostics::Result initDevice();
     CameraDiagnostics::Result initSystem();
@@ -127,6 +130,7 @@ private:
     CameraDiagnostics::Result initRemoteArchive();
 
     CameraDiagnostics::Result createNxProfiles();
+    CameraDiagnostics::Result fetchExistingProfiles();
     CameraDiagnostics::Result createNxProfile(
         Qn::ConnectionRole role,
         int* outNxProfile,

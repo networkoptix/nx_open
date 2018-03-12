@@ -1,6 +1,12 @@
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+
+if(MSVC)
+    # Visual Studio 2017 currently (15.5.x) ignores "set(CMAKE_CXX_STANDARD 17)".
+    # So we need to set c++17 support explicitly.
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17")
+endif(MSVC)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
@@ -23,6 +29,10 @@ if(MSVC)
 endif()
 
 if(CMAKE_BUILD_TYPE MATCHES "Release|RelWithDebInfo")
+    # TODO: Use CMake defaults in the next release version (remove the following two lines).
+    string(REPLACE "-O3" "-O2" CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}")
+    string(REPLACE "-O3" "-O2" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         add_compile_options(-fno-devirtualize)
     endif()
@@ -41,10 +51,6 @@ if(WINDOWS)
     add_definitions(
         -D_WINSOCKAPI_=
     )
-endif()
-
-if(UNIX)
-    add_definitions(-DQN_EXPORT=)
 endif()
 
 if(ANDROID OR IOS)
@@ -88,9 +94,6 @@ if(WINDOWS)
     add_definitions(
         -DNOMINMAX=
         -DUNICODE)
-    set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS
-        $<$<STREQUAL:$<TARGET_PROPERTY:TYPE>,STATIC_LIBRARY>:QN_EXPORT=>
-        $<$<NOT:$<STREQUAL:$<TARGET_PROPERTY:TYPE>,STATIC_LIBRARY>>:QN_EXPORT=Q_DECL_EXPORT>)
 
     add_compile_options(
         /MP
@@ -100,6 +103,8 @@ if(WINDOWS)
         /wd4100
         /we4717
     )
+    add_definitions(-D_SILENCE_CXX17_OLD_ALLOCATOR_MEMBERS_DEPRECATION_WARNING)
+    add_definitions(-D_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING)
 
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         add_compile_options(/wd4250)
@@ -142,10 +147,6 @@ if(UNIX)
 endif()
 
 if(LINUX)
-    # TODO: Use CMake defaults in the next release version (remove the following two lines).
-    string(REPLACE "-O3" "-O2" CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}")
-    string(REPLACE "-O3" "-O2" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
-
     if(NOT "${arch}" MATCHES "arm|aarch64")
         add_compile_options(-msse2)
     endif()
@@ -156,11 +157,7 @@ if(LINUX)
     )
     set(CMAKE_SKIP_BUILD_RPATH ON)
     set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
-
-    # TODO: #dmishin ask #dklychkov about this condition.
-    if(LINUX)
-        set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
-    endif()
+    set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
 
     set(CMAKE_EXE_LINKER_FLAGS
         "${CMAKE_EXE_LINKER_FLAGS} -Wl,--disable-new-dtags")

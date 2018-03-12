@@ -403,15 +403,22 @@ void ExportSettingsDialog::updateSettingsWidgets()
 {
     const auto& mediaPersistentSettings = d->exportMediaPersistentSettings();
 
-    ui->exportLayoutSettingsPage->setLayoutReadOnly(d->exportLayoutPersistentSettings().readOnly);
-    ui->exportMediaSettingsPage->setApplyFilters(mediaPersistentSettings.applyFilters);
-    ui->timestampSettingsPage->setData(mediaPersistentSettings.timestampOverlay);
-    ui->timestampSettingsPage->setFormatEnabled(d->mediaSupportsUtc());
-    ui->bookmarkSettingsPage->setData(mediaPersistentSettings.bookmarkOverlay);
-    ui->imageSettingsPage->setData(mediaPersistentSettings.imageOverlay);
-    ui->textSettingsPage->setData(mediaPersistentSettings.textOverlay);
+    if (mediaPersistentSettings.canExportOverlays())
+    {
+        ui->exportLayoutSettingsPage->setLayoutReadOnly(d->exportLayoutPersistentSettings().readOnly);
+        ui->exportMediaSettingsPage->setApplyFilters(mediaPersistentSettings.applyFilters);
+        ui->timestampSettingsPage->setData(mediaPersistentSettings.timestampOverlay);
+        ui->bookmarkSettingsPage->setData(mediaPersistentSettings.bookmarkOverlay);
+        ui->imageSettingsPage->setData(mediaPersistentSettings.imageOverlay);
+        ui->textSettingsPage->setData(mediaPersistentSettings.textOverlay);
 
-    ui->rapidReviewSettingsPage->setSpeed(d->storedRapidReviewSettings().speed);
+        if(mediaPersistentSettings.rapidReview.enabled)
+        {
+            int speed = d->storedRapidReviewSettings().speed;
+            ui->rapidReviewSettingsPage->setSpeed(speed);
+        }
+    }
+
     ui->mediaFilenamePanel->setFilename(d->selectedFileName(Mode::Media));
     ui->layoutFilenamePanel->setFilename(d->selectedFileName(Mode::Layout));
 }
@@ -498,18 +505,12 @@ void ExportSettingsDialog::updateWidgetsState()
     const auto& settings = d->exportMediaPersistentSettings();
     bool transcodingLocked = settings.areFiltersForced();
     bool transcodingChecked = settings.applyFilters;
-    bool overlayOptionsAvailable = d->mode() == Mode::Media;
+    bool overlayOptionsAvailable = d->mode() == Mode::Media && settings.canExportOverlays();
 
     if (d->mode() == Mode::Media && !d->hasVideo())
     {
         transcodingLocked = true;
         transcodingChecked = false;
-    }
-
-    // Should hide additional overlay buttons of transcoding is disabled.
-    if (!transcodingChecked || transcodingLocked)
-    {
-        overlayOptionsAvailable = false;
     }
 
     // Applying data to UI.
@@ -524,6 +525,11 @@ void ExportSettingsDialog::updateWidgetsState()
     if (overlayOptionsAvailable == ui->transcodingButtonsWidget->isHidden())
     {
         ui->transcodingButtonsWidget->setHidden(!overlayOptionsAvailable);
+    }
+
+    if (settings.canExportOverlays())
+    {
+        ui->timestampSettingsPage->setFormatEnabled(d->mediaSupportsUtc());
     }
 
     // Update button state for used overlays.

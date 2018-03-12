@@ -64,7 +64,7 @@
         <Property Id="CLIENT_DIRECTORY_REG" Secure="yes">
             <RegistrySearch Id="ClientDirectoryReg"
                             Root="HKCU"
-                            Key="Software\[Manufacturer]\$(var.clientName)"
+                            Key="Software\[Manufacturer]\$(var.clientInternalName)"
                             Name="mediaRoot"
                             Type="raw"
                             Win64="yes"/>
@@ -82,6 +82,8 @@
         <Binary Id="CustomActions.dll" SourceFile="$(var.SourceDir)\wix_custom_actions.dll" />
 
         <CustomAction Id="CleanAutorunRegistryKeys" BinaryKey="CustomActions.dll" DllEntry="CleanAutorunRegistryKeys" Execute="immediate" Impersonate="yes"/>
+        <CustomAction Id="CleanClientRegistryKeys_Cmd" Property="CleanClientRegistryKeys" Value="$(var.clientRegPath)" Execute="immediate" Impersonate="yes"/>
+        <CustomAction Id="CleanClientRegistryKeys" BinaryKey="CustomActions.dll" DllEntry="CleanClientRegistryKeys" Execute="deferred" Impersonate="yes"/>
 
         <!-- Custom actions -->
         <CustomAction Id="ResetPreselected" Property="Preselected" Value="" />
@@ -117,6 +119,8 @@
             <AppSearch Before="LaunchConditions" />
 
             <Custom Action="CleanAutorunRegistryKeys" Before="InstallFinalize">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
+            <Custom Action="CleanClientRegistryKeys_Cmd" After="CleanAutorunRegistryKeys">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
+            <Custom Action="CleanClientRegistryKeys" After="CleanClientRegistryKeys_Cmd">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
 
             <Custom Action="CloseAppLauncherAction_Cmd" Before="CloseAppLauncherAction">NOT $(var.VmsInstalling)</Custom>
             <Custom Action="CloseAppLauncherAction" Before="CloseAppLauncherAction2_Cmd">NOT $(var.VmsInstalling)</Custom>

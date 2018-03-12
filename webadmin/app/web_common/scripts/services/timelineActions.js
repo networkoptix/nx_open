@@ -1,6 +1,6 @@
 'use strict';
 
-function TimelineActions(timelineConfig, positionProvider, scaleManager, animationState, animateScope, scope ) {
+window.TimelineActions = function(timelineConfig, positionProvider, scaleManager, animationState, animateScope, scope ) {
     this.animateScope = animateScope;
     this.scope = scope;
     this.positionProvider = positionProvider;

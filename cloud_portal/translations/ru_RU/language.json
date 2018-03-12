@@ -9,7 +9,7 @@
     "loginButton": "Войти",
     "logoutAuthorisedTitle": "Вы уже выполнили вход",
     "logoutAuthorisedContinueButton": "Продолжить",
-    "logoutAuthorisedLogoutButton": "Выйти"
+    "logoutAuthorisedLogoutButton": "Выход"
   },
   "pageTitles": {
     "template": "{{title}} {{PRODUCT_NAME}}",
@@ -53,15 +53,15 @@
     },
     "Viewer": {
       "label": "Видео с камер и архив",
-      "description": "Может смотреть видео в реальном времени и архив"
+      "description": "Может смотреть живое видео и архив"
     },
     "Live Viewer": {
-      "label": "Только видео в реальном времени",
-      "description": "Может смотреть только видео в реальном времени"
+      "label": "Только видео с камер",
+      "description": "Может смотреть только живое видео"
     },
     "Advanced Viewer": {
       "label": "Просмотр и настройка",
-      "description": "Может смотреть видео в реальном времени, архив, изменять настройки камер, управлять PTZ и т. д"
+      "description": "Может смотреть живое видео, архив, изменять настройки камер, управлять PTZ и т. д"
     },
     "Administrator": {
       "label": "Администратор",
@@ -88,12 +88,12 @@
       "description": "Может смотреть живое видео и архив"
     },
     "liveViewer": {
-      "label": "Только видео в реальном времени",
-      "description": "Может смотреть только видео в реальном времени"
+      "label": "Только видео с камер",
+      "description": "Может смотреть только живое видео"
     },
     "advancedViewer": {
       "label": "Просмотр и настройка",
-      "description": "Может смотреть видео в реальном времени, архив, изменять настройки камер, управлять PTZ и т. д"
+      "description": "Может смотреть живое видео, архив, изменять настройки камер, управлять PTZ и т. д"
     },
     "custom": {
       "label": "Особые",
@@ -101,7 +101,7 @@
     }
   },
   "errorCodes": {
-    "ok": "ok",
+    "ok": "ок",
     "cantSendActivationPrefix": "Не удается отправить подтверждение по Email",
     "cantDisconnectSystemPrefix": "Не удается удалить систему",
     "cantUnshareWithMeSystemPrefix": "Не удается удалить систему",

@@ -157,6 +157,13 @@ bool MultipleServerSocket::getLastError(SystemError::ErrorCode* errorCode) const
     return true;
 }
 
+bool MultipleServerSocket::setIpv6Only(bool /*val*/)
+{
+    NX_ASSERT(false);
+    SystemError::setLastErrorCode(SystemError::notImplemented);
+    return false;
+}
+
 AbstractSocket::SOCKET_HANDLE MultipleServerSocket::handle() const
 {
     NX_ASSERT(false);

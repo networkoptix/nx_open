@@ -49,7 +49,7 @@ void QnMdnsListener::registerConsumer(std::uintptr_t id)
     m_consumersData->registerConsumer(id);
 }
 
-const ConsumerData* QnMdnsListener::getData(std::uintptr_t id)
+std::shared_ptr<const ConsumerData> QnMdnsListener::getData(std::uintptr_t id)
 {
     auto data = m_consumersData->data(id);
     NX_ASSERT(

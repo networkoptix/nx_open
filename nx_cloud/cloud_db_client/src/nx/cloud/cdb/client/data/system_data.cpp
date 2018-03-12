@@ -284,8 +284,8 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (optional, false)*/)
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (SystemDataEx)(SystemDataList)(SystemDataExList)(SystemSharingList)(SystemSharingEx) \
-        (SystemSharingExList)(SystemAccessRoleData)(SystemAccessRoleList) \
+    (SystemMergeInfo)(SystemDataEx)(SystemDataList)(SystemDataExList)(SystemSharingList) \
+        (SystemSharingEx)(SystemSharingExList)(SystemAccessRoleData)(SystemAccessRoleList) \
         (SystemHealthHistoryItem)(SystemHealthHistory),
     (json),
     _Fields/*,
@@ -323,4 +323,14 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb::api, SystemAccessRole,
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb::api, FilterField,
     (nx::cdb::api::FilterField::customization, "customization")
+)
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb::api, MergeRole,
+    (nx::cdb::api::MergeRole::none, "none")
+    (nx::cdb::api::MergeRole::master, "master")
+    (nx::cdb::api::MergeRole::slave, "slave")
+)
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb::api, SystemCapabilityFlag,
+    (nx::cdb::api::SystemCapabilityFlag::cloudMerge, "cloudMerge")
 )

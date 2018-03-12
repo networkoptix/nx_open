@@ -1,7 +1,5 @@
 #include <memory>
 
-#include <boost/optional.hpp>
-
 #include <gtest/gtest.h>
 
 #include <nx/network/cloud/tunnel/relay/api/relay_api_client.h>
@@ -9,6 +7,7 @@
 #include <nx/network/http/fusion_data_http_client.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/std/cpp14.h>
+#include <nx/utils/std/optional.h>
 #include <nx/utils/thread/sync_queue.h>
 #include <nx/utils/random.h>
 
@@ -19,6 +18,7 @@
 #include "connect_session_manager_mock.h"
 #include "listening_peer_manager_mock.h"
 #include "../basic_component_test.h"
+#include "../statistics_provider_ut.h"
 
 namespace nx {
 namespace cloud {
@@ -49,12 +49,6 @@ protected:
     void onRequestCompletion(api::ResultCode resultCode)
     {
         m_apiResponse.push(resultCode);
-    }
-
-    nx::utils::Url basicUrl() const
-    {
-        return nx::network::url::Builder().setScheme("http").setHost("127.0.0.1")
-            .setPort(moduleInstance()->httpEndpoints()[0].port).toUrl();
     }
 
 private:
@@ -284,7 +278,7 @@ private:
 
     std::unique_ptr<GetStatisticsHttpClient> m_httpClient;
     nx::utils::SyncQueue<nx::cloud::relay::Statistics> m_receivedStatistics;
-    boost::optional<StatisticsProviderFactory::Function> m_statisticsProviderFactoryBak;
+    std::optional<StatisticsProviderFactory::Function> m_statisticsProviderFactoryBak;
     Statistics m_expectedStatistics;
 
     std::unique_ptr<AbstractStatisticsProvider> createStatisticsProviderStub()
@@ -299,16 +293,9 @@ private:
     {
         Statistics statistics;
 
-        statistics.relaying.connectionsAcceptedPerMinute =
-            nx::utils::random::number<>(1, 20);
-        statistics.relaying.connectionCount = nx::utils::random::number<>(1, 20);
-        statistics.relaying.connectionsAveragePerServerCount = nx::utils::random::number<>(1, 20);
-        statistics.relaying.listeningServerCount = nx::utils::random::number<>(1, 20);
-
-        statistics.http.connectionCount = nx::utils::random::number<>(1, 20);
-        statistics.http.connectionsAcceptedPerMinute = nx::utils::random::number<>(1, 20);
-        statistics.http.requestsAveragePerConnection = nx::utils::random::number<>(1, 20);
-        statistics.http.requestsServedPerMinute = nx::utils::random::number<>(1, 20);
+        statistics.relaying = generateRelayingStatistics();
+        statistics.relaySessions = generateRelaySessionStatistics();
+        statistics.http = generateHttpServerStatistics();
 
         return statistics;
     }

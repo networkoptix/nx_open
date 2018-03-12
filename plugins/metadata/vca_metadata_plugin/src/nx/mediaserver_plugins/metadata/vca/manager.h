@@ -10,6 +10,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <plugins/plugin_tools.h>
 #include <nx/sdk/metadata/camera_manager.h>
+#include <nx/utils/elapsed_timer_thread_safe.h>
 
 #include <nx/network/aio/timer.h>
 #include <nx/network/system_socket.h>
@@ -22,6 +23,20 @@ namespace mediaserver_plugins {
 namespace metadata {
 namespace vca {
 
+/**
+ * The purpose of ElapsedEvent is to store information when event of corresponding type happened
+ * last time.
+ * @note ElapsedEvent is non-copyable and non-movable.
+ */
+struct ElapsedEvent
+{
+public:
+    const AnalyticsEventType type;
+    nx::utils::ElapsedTimerThreadSafe timer;
+    ElapsedEvent(const AnalyticsEventType& analyticsEventType): type(analyticsEventType){}
+};
+using ElapsedEvents = std::list<ElapsedEvent>;
+
 class Manager: public nxpt::CommonRefCounter<nx::sdk::metadata::CameraManager>
 {
 public:
@@ -33,10 +48,12 @@ public:
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
+    void treatMessage(int size);
+
     void onReceive(SystemError::ErrorCode, size_t);
 
     virtual nx::sdk::Error startFetchingMetadata(
-        nxpl::NX_GUID* typeList, int typeListSize) override;
+        nxpl::NX_GUID* eventTypeList, int eventTypeListSize) override;
 
     virtual nx::sdk::Error setHandler(nx::sdk::metadata::MetadataHandler* handler) override;
 
@@ -63,7 +80,7 @@ private:
     QAuthenticator m_auth;
     Plugin* m_plugin;
     QByteArray m_cameraManifest;
-    std::vector<QnUuid> m_eventsToCatch;
+    ElapsedEvents m_eventsToCatch;
     QByteArray m_buffer;
     nx::network::TCPSocket* m_tcpSocket = nullptr;
     nx::sdk::metadata::MetadataHandler* m_handler = nullptr;

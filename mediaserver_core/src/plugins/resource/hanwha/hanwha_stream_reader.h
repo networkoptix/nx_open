@@ -39,14 +39,13 @@ protected:
 private:
     HanwhaProfileParameters makeProfileParameters(
         int profileNumber,
-        const QnLiveStreamParams& parameters) const;
+        const QnLiveStreamParams& parameters,
+        bool isAudioSupported) const;
 
     CameraDiagnostics::Result updateProfile(
         int profileNumber,
         const QnLiveStreamParams& parameters);
 
-    QSet<int> availableProfiles(int channel) const;
-    int chooseNvrChannelProfile(Qn::ConnectionRole role) const;
     bool isCorrectProfile(int profileNumber) const;
 
     CameraDiagnostics::Result streamUri(int profileNumber, QString* outUrl);

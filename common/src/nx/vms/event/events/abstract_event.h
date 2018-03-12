@@ -10,8 +10,6 @@
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/analytics_helper.h>
 
-class QnCommonModule;
-
 namespace nx {
 namespace vms {
 namespace event {

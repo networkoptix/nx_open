@@ -37,7 +37,7 @@ static const int kMaxSyncTimeoutMs = 1000 * 20 * 1000;
 
 int getIntParam(const nx::utils::ArgumentParser& args, const QString& name, int defaultValue = 0)
 {
-    auto result = args.get(name);
+    auto result = args.get<QString>(name);
     return result ? result->toInt() : defaultValue;
 }
 
@@ -272,7 +272,7 @@ protected:
             commonModule->bindModuleInformation(serverRes);
         }
 
-        while (args.get(kStandaloneModeParamName))
+        while (args.get<QString>(kStandaloneModeParamName))
             std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 };

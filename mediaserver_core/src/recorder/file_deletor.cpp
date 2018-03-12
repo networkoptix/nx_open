@@ -1,5 +1,4 @@
-#include <cstdio>
-#include "file_deletor.h"
+#include <stdio.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
 #include "utils/common/util.h"
@@ -8,6 +7,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <media_server/media_server_module.h>
 #include <nx/mediaserver/root_tool.h>
+
+#include "file_deletor.h"
 
 static const int POSTPONE_FILES_INTERVAL = 1000*60;
 static const int SPACE_CLEARANCE_INTERVAL = 10;
@@ -67,7 +68,7 @@ void QnFileDeletor::init(const QString& tmpRoot)
 
 bool QnFileDeletor::internalDeleteFile(const QString& fileName)
 {
-    if (std::remove(fileName.toLatin1().constData()))
+    if (std::remove(fileName.toLatin1().constData()) == 0)
         return true;
 
     if (const auto rootTool = qnServerModule->rootTool())

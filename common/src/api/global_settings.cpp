@@ -708,7 +708,7 @@ void QnGlobalSettings::setEmailSettings(const QnEmailSettings &settings)
 {
     m_serverAdaptor->setValue(settings.server);
     m_fromAdaptor->setValue(settings.email);
-    m_portAdaptor->setValue(settings.port == QnEmailSettings::defaultPort(settings.connectionType) ? 0 : settings.port);
+    m_portAdaptor->setValue(settings.port);
     m_userAdaptor->setValue(settings.user);
     m_passwordAdaptor->setValue(
         settings.isValid()

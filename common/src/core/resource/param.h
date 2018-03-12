@@ -97,8 +97,11 @@ namespace Qn
     static const QString IO_PORT_DISPLAY_NAMES_PARAM_NAME = lit("ioDisplayName");
     static const QString IO_OVERLAY_STYLE_PARAM_NAME = lit("ioOverlayStyle");
     static const QString FORCE_ONVIF_PARAM_NAME = lit("forceONVIF");
+    static const QString MAC_FROM_MULTICAST_PARAM_NAME = lit("macFromMulticast");
     static const QString IGNORE_ONVIF_PARAM_NAME = lit("ignoreONVIF");
     static const QString PTZ_CAPABILITIES_PARAM_NAME = lit("ptzCapabilities");
+    static const QString PTZ_CAPABILITIES_TO_ADD_PARAM_NAME = lit("ptzCapabilitiesToAdd");
+    static const QString PTZ_CAPABILITIES_TO_REMOVE_PARAM_NAME = lit("ptzCapabilitiesToRemove");
     static const QString DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME = lit("disableNativePtzPresets");
 	static const QString DW_REBRANDED_TO_ISD_MODEL = lit("isdDwCam");
     static const QString ONVIF_VENDOR_SUBTYPE = lit("onvifVendorSubtype");

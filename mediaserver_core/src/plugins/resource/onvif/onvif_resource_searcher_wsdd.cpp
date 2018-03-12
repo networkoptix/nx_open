@@ -14,6 +14,9 @@
 #include "onvif_resource_searcher_wsdd.h"
 #include "onvif_resource.h"
 #include "onvif_helper.h"
+#include <common/static_common_module.h>
+#include <core/resource/resource_data.h>
+#include <core/resource_management/resource_data_pool.h>
 
 
 //static const int SOAP_DISCOVERY_TIMEOUT = 1; // "+" in seconds, "-" in mseconds
@@ -461,16 +464,28 @@ QString OnvifResourceSearcherWsdd::getMac(const T* source, const SOAP_ENV__Heade
     }
     QString macFromMessageId = messageId.right(messageId.size() - pos - 1).trimmed();
 
-    if (macFromEndpoint.size() == 12 && macFromEndpoint == macFromMessageId) {
-        QString result;
-        for (int i = 1; i < 12; i += 2) {
-            int ind = i + i / 2;
-            if (i < 11) result[ind + 1] = QLatin1Char('-');
-            result[ind] = macFromEndpoint[i];
-            result[ind - 1] = macFromEndpoint[i - 1];
-        }
+    static const int kMacAddressLength = 12;
+    if (macFromEndpoint.size() == kMacAddressLength)
+    {
+        QString name = extractScope(source, QLatin1String(SCOPES_NAME_PREFIX));
+        QString manufacturer = getManufacturer(source, name);
 
-        return result.toUpper();
+        const QnResourceData resourceData = qnStaticCommon->dataPool()->data(manufacturer, name);
+
+        if (macFromEndpoint == macFromMessageId
+            || resourceData.value<bool>(Qn::MAC_FROM_MULTICAST_PARAM_NAME))
+        {
+            QString result;
+            for (int i = 1; i < kMacAddressLength; i += 2)
+            {
+                int ind = i + i / 2;
+                if (i < 11) result[ind + 1] = QLatin1Char('-');
+                result[ind] = macFromEndpoint[i];
+                result[ind - 1] = macFromEndpoint[i - 1];
+            }
+
+            return result.toUpper();
+        }
     }
 
     return QString();

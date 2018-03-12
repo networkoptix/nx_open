@@ -78,11 +78,6 @@
       <translation>Deze systemen zijn gebouwd met een andere %1 URL. Samenvoegen is niet toegestaan.</translation>
     </message>
     <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Cloud Systeem kan alleen met non-cloud worden samengevoegd. Systeemnaam en wachtwoord worden afkomstig van Cloud Systeem.</translation>
-    </message>
-    <message>
       <source>New System</source>
       <translation>Nieuw systeem</translation>
     </message>
@@ -90,6 +85,10 @@
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
       <translation>Het gevonden systeem %1 is niet samen te voegen met het huidige systeem.</translation>
+    </message>
+    <message>
+      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
+      <translation>Cloud Systeem kan alleen met non-cloud worden samengevoegd. Systeemnaam en wachtwoord worden afkomstig van Cloud Systeem.</translation>
     </message>
   </context>
   <context>
@@ -313,6 +312,10 @@
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
       <translation>Probeer eerst de opname aan te zetten (als deze uit staat) en verminder het aantal fps in I/O instellingen (fout &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
+      <translation>Werk de firmware bij. Minimale ondersteunde versie is %1. De huidige versie is %2</translation>
     </message>
   </context>
   <context>
@@ -632,14 +635,14 @@
     </message>
     <message numerus="yes">
       <source>%n I/O Module(s)</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n I/O Module(s)</numerusform>
         <numerusform>%n I/O Module(s)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O module(s)</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n I/O module(s)</numerusform>
         <numerusform>%n I/O module(s)</numerusform>
       </translation>
@@ -1000,11 +1003,11 @@
     </message>
     <message>
       <source>Advanced Viewer</source>
-      <translation>Geavanceerde Kijker</translation>
+      <translation>Geavanceerde Viewer</translation>
     </message>
     <message>
       <source>Viewer</source>
-      <translation>Kijker</translation>
+      <translation>Viewer</translation>
     </message>
     <message>
       <source>Live Viewer</source>

@@ -78,11 +78,6 @@
       <translation>Ezek a rendszerek különböző %1 URL- használnak. Összevonás nem engedélyezett.</translation>
     </message>
     <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Felhő rendszer csak nem-felhő rendszerrel vonható össze. A rendszer név és jelszó a felhő rendszerből lesz átvéve.</translation>
-    </message>
-    <message>
       <source>New System</source>
       <translation>Új rendszer</translation>
     </message>
@@ -90,6 +85,10 @@
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
       <translation>A felfedezett %1 rendszer nem kompatibilis az aktuális rendszerrel.</translation>
+    </message>
+    <message>
+      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
+      <translation>Felhő rendszer csak nem-felhő rendszerrel vonható össze. A rendszer név és jelszó a felhő rendszerből lesz átvéve.</translation>
     </message>
   </context>
   <context>
@@ -314,6 +313,10 @@
       <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
       <translation>Először próbálja bekapcsolni a rögzítést (ha ki van kapcsolva) és csökkentse az fps beállításokat az I/O modul menüjében (hiba &quot;%1&quot;).</translation>
     </message>
+    <message>
+      <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
+      <translation type="unfinished">Please update firmware. Minimal supported version is %1. Current version is %2</translation>
+    </message>
   </context>
   <context>
     <name>QnFfmpegAudioTranscoder</name>
@@ -440,7 +443,7 @@
     </message>
     <message>
       <source>Edge Licenses</source>
-      <translation>edge licenc</translation>
+      <translation>Edge licencek</translation>
     </message>
     <message>
       <source>Vmax Licenses</source>
@@ -488,7 +491,7 @@
     </message>
     <message>
       <source>Bridge</source>
-      <translation type="unfinished">Bridge</translation>
+      <translation>Bridge</translation>
     </message>
     <message>
       <source>Bridge Licenses</source>
@@ -1330,7 +1333,7 @@
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
         <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
       </translation>

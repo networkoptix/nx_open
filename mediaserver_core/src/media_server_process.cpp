@@ -1,7 +1,5 @@
 #include "media_server_process.h"
 
-#include <plugins/plugin_internal_tools.h>
-
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
@@ -27,7 +25,6 @@
 #include <QtConcurrent/QtConcurrent>
 #include <nx/utils/uuid.h>
 #include <utils/common/ldap.h>
-#include <utils/call_counter/call_counter.h>
 #include <QtCore/QThreadPool>
 
 #include <QtNetwork/QUdpSocket>
@@ -746,22 +743,36 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
             messageProcessor->updateResource(storage, ec2::NotificationSource::Local);
         }
 
-        QnStorageResourceList storagesToRemove = getSmallStorages(m_mediaServer->getStorages());
+        const auto unmountedStorages =
+            mserver_aux::getUnmountedStorages(m_mediaServer->getStorages());
+        for (const auto& storageResource: unmountedStorages)
+        {
+            auto fileStorageResource = storageResource.dynamicCast<QnFileStorageResource>();
+            if (fileStorageResource)
+                fileStorageResource->setMounted(false);
+        }
 
-        nx::mserver_aux::UnmountedLocalStoragesFilter unmountedLocalStoragesFilter(QnAppInfo::mediaFolderName());
-        auto unMountedStorages = unmountedLocalStoragesFilter.getUnmountedStorages(
-                [this]()
+        QnStorageResourceList smallStorages = getSmallStorages(m_mediaServer->getStorages());
+        QnStorageResourceList storagesToRemove;
+        // We won't remove automatically storages which might have been unmounted because of their
+        // small size. This small size might be the result of the unmounting itself (just the size
+        // of the local drive where mount folder is located). User will be able to remove such
+        // storages by themselves.
+        for (const auto& smallStorage: smallStorages)
+        {
+            bool isSmallStorageAmongstUnmounted = false;
+            for (const auto& unmountedStorage: unmountedStorages)
+            {
+                if (unmountedStorage == smallStorage)
                 {
-                    QnStorageResourceList result;
-                    for (const auto& storage: m_mediaServer->getStorages())
-                        if (!storage->isExternal())
-                            result.push_back(storage);
+                    isSmallStorageAmongstUnmounted = true;
+                    break;
+                }
+            }
 
-                    return result;
-                }(),
-                listRecordFolders(true));
-
-        storagesToRemove.append(unMountedStorages);
+            if (!isSmallStorageAmongstUnmounted)
+                storagesToRemove.append(smallStorage);
+        }
 
         NX_DEBUG(this, lm("Found %1 storages to remove").arg(storagesToRemove.size()));
         for (const auto& storage: storagesToRemove)
@@ -2327,7 +2338,6 @@ void MediaServerProcess::run()
         qnStaticCommon->setEngineVersion(QnSoftwareVersion(m_cmdLineArguments.engineVersion));
     }
 
-    QnCallCountStart(std::chrono::milliseconds(5000));
 #ifdef Q_OS_WIN32
     nx::misc::ServerDataMigrateHandler migrateHandler;
     switch (nx::misc::migrateFilesFromWindowsOldDir(&migrateHandler))
@@ -2901,7 +2911,7 @@ void MediaServerProcess::run()
         {
             if (settingsProxy->isCloudInstanceChanged())
                 qWarning() << "Cloud instance changed from" << globalSettings->cloudHost() <<
-                    "to" << nx::network::AppInfo::defaultCloudHost() << ". Server goes to the new state";
+                    "to" << nx::network::SocketGlobals::cloud().cloudHost() << ". Server goes to the new state";
 
             resetSystemState(cloudIntegrationManager->cloudManagerGroup().connectionManager);
         }
@@ -2925,7 +2935,7 @@ void MediaServerProcess::run()
 
             } while (errCode != ec2::ErrorCode::ok && !m_needStop);
         }
-        globalSettings->setCloudHost(nx::network::AppInfo::defaultCloudHost());
+        globalSettings->setCloudHost(nx::network::SocketGlobals::cloud().cloudHost());
         globalSettings->synchronizeNow();
     }
 
@@ -3092,7 +3102,7 @@ void MediaServerProcess::run()
             videoCameraPool.reset();
 
             commonModule()->resourceDiscoveryManager()->stop();
-            qnServerModule->metadataManagerPool()->stop(); //< Stop processing analytics event.
+            qnServerModule->metadataManagerPool()->stop(); //< Stop processing analytics events.
             QnResource::stopAsyncTasks();
 
             //since mserverResourceDiscoveryManager instance is dead no events can be delivered to serverResourceProcessor: can delete it now
@@ -3385,12 +3395,11 @@ const CmdLineArguments MediaServerProcess::cmdLineArguments() const
 void MediaServerProcess::configureApiRestrictions(nx::network::http::AuthMethodRestrictionList* restrictions)
 {
     // For "OPTIONS * RTSP/1.0"
-    restrictions->allow(lit("."), nx::network::http::AuthMethod::noAuth);
+    restrictions->allow(lit("\\*"), nx::network::http::AuthMethod::noAuth);
 
     const auto webPrefix = lit("(/web)?(/proxy/[^/]*(/[^/]*)?)?");
     restrictions->allow(webPrefix + lit("/api/ping"), nx::network::http::AuthMethod::noAuth);
     restrictions->allow(webPrefix + lit("/api/camera_event.*"), nx::network::http::AuthMethod::noAuth);
-    restrictions->allow(webPrefix + lit("/api/showLog.*"), nx::network::http::AuthMethod::urlQueryParam);
     restrictions->allow(webPrefix + lit("/api/moduleInformation"), nx::network::http::AuthMethod::noAuth);
     restrictions->allow(webPrefix + lit("/api/gettime"), nx::network::http::AuthMethod::noAuth);
     restrictions->allow(webPrefix + lit("/api/getTimeZones"), nx::network::http::AuthMethod::noAuth);
@@ -3401,6 +3410,14 @@ void MediaServerProcess::configureApiRestrictions(nx::network::http::AuthMethodR
     restrictions->allow(webPrefix + lit("/static/.*"), nx::network::http::AuthMethod::noAuth);
     restrictions->allow(lit("/crossdomain.xml"), nx::network::http::AuthMethod::noAuth);
     restrictions->allow(webPrefix + lit("/api/startLiteClient"), nx::network::http::AuthMethod::noAuth);
+
+    // For open in new browser window.
+    restrictions->allow(webPrefix + lit("/api/showLog.*"),
+        nx::network::http::AuthMethod::urlQueryParam | nx::network::http::AuthMethod::allowWithourCsrf);
+
+    // For inserting in HTML <img src="...">.
+    restrictions->allow(webPrefix + lit("/ec2/cameraThumbnail"),
+        nx::network::http::AuthMethod::allowWithourCsrf);
 
     // TODO: #3.1 Remove this method and use /api/installUpdate in client when offline cloud
     // authentication is implemented.

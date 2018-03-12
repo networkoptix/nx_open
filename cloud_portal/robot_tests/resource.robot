@@ -9,9 +9,24 @@ Resource          variables.robot
 *** Keywords ***
 Open Browser and go to URL
     [Arguments]    ${url}
-    Open Browser    ${url}    Chrome
+    Open Browser    ${ENV}    ${BROWSER}
 #    Maximize Browser Window
     Set Selenium Speed    0
+    Check Language
+    Go To    ${url}
+
+Check Language
+    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}
+    Register Keyword To Run On Failure    NONE
+    ${status}    ${value}=    Run Keyword And Ignore Error    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}/span[@lang='${LANGUAGE}']    2
+    Register Keyword To Run On Failure    Failure Tasks
+    Run Keyword If    "${status}"=="FAIL"    Set Language
+
+Set Language
+    Click Button    ${LANGUAGE DROPDOWN}
+    Wait Until Element Is Visible    ${LANGUAGE TO SELECT}
+    Click Element    ${LANGUAGE TO SELECT}
+    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}/span[@lang='${LANGUAGE}']    5
 
 Log In
     [arguments]    ${email}    ${password}    ${button}=${LOG IN NAV BAR}
@@ -27,6 +42,7 @@ Log In
 Validate Log In
     Wait Until Page Contains Element    ${AUTHORIZED BODY}
     Page Should Contain Element    ${AUTHORIZED BODY}
+    Check Language
 
 Log Out
     Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
@@ -39,13 +55,19 @@ Validate Log Out
     Wait Until Element Is Visible    ${ANONYMOUS BODY}
 
 Register
-    [arguments]    ${first name}    ${last name}    ${email}    ${password}
+    [arguments]    ${first name}    ${last name}    ${email}    ${password}    ${checked}=true
     Wait Until Elements Are Visible    ${REGISTER FIRST NAME INPUT}    ${REGISTER LAST NAME INPUT}    ${REGISTER EMAIL INPUT}    ${REGISTER PASSWORD INPUT}    ${CREATE ACCOUNT BUTTON}
     Input Text    ${REGISTER FIRST NAME INPUT}    ${first name}
     Input Text    ${REGISTER LAST NAME INPUT}    ${last name}
     Input Text    ${REGISTER EMAIL INPUT}    ${email}
     Input Text    ${REGISTER PASSWORD INPUT}    ${password}
+    Run Keyword If    "${checked}"=="false"    Click Element    ${REGISTER SUBSCRIBE CHECKBOX}
     Click Button    ${CREATE ACCOUNT BUTTON}
+
+Validate Register Success
+    [arguments]    ${location}=${url}/register/success
+    Wait Until Element Is Visible    ${ACCOUNT CREATION SUCCESS}
+    Location Should Be    ${location}
 
 Validate Register Email Received
     [arguments]    ${recipient}
@@ -75,8 +97,8 @@ Edit User Permissions In Systems
     Wait Until Element Is Not Visible    ${SHARE MODAL}
     Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]
     Mouse Over    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]
-    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),'Edit')]/..
-    Click Element    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),'Edit')]/..
+    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),'${EDIT USER BUTTON TEXT}')]/..
+    Click Element    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),'${EDIT USER BUTTON TEXT}')]/..
     Wait Until Element Is Visible    //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='${permissions}']
     Click Element    //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='${permissions}']
     Wait Until Element Is Visible    ${EDIT PERMISSIONS SAVE}
@@ -98,6 +120,7 @@ Remove User Permissions
     Click Button    ${DELETE USER BUTTON}
     ${PERMISSIONS WERE REMOVED FROM EMAIL}    Replace String    ${PERMISSIONS WERE REMOVED FROM}    {{email}}    ${user email}
     Check For Alert    ${PERMISSIONS WERE REMOVED FROM EMAIL}
+    Wait Until Element Is Not Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]
 
 Check For Alert
     [arguments]    ${alert text}
@@ -111,12 +134,11 @@ Check For Alert Dismissable
     Wait Until Elements Are Visible    ${ALERT}    ${ALERT CLOSE}
     Element Should Be Visible    ${ALERT}
     Element Text Should Be    ${ALERT}    ${alert text}
-
+    Click Element    ${ALERT CLOSE}
 
 Verify In System
     [arguments]    ${system name}
     Wait Until Element Is Visible    //h1[@ng-if='gettingSystem.success' and contains(text(), '${system name}')]
-    Element Should Be Visible    //h1[@ng-if='gettingSystem.success' and contains(text(), '${system name}')]
 
 Failure Tasks
     Capture Page Screenshot    selenium-screenshot-{index}.png
@@ -149,3 +171,11 @@ Register Form Validation
     Input Text    ${REGISTER EMAIL INPUT}    ${email}
     Input Text    ${REGISTER PASSWORD INPUT}    ${password}
     click button    ${CREATE ACCOUNT BUTTON}
+
+Get Reset Password Link
+    [arguments]    ${recipient}
+    Open Mailbox    host=imap.gmail.com    password=qweasd!@#    port=993    user=noptixqa@gmail.com    is_secure=True
+    ${email}    Wait For Email    recipient=${recipient}    timeout=120    subject=${RESET PASSWORD EMAIL SUBJECT}
+    ${links}    Get Links From Email    ${email}
+    Close Mailbox
+    Return From Keyword    @{links}[1]

@@ -11,6 +11,7 @@
 #ifndef Q_MOC_RUN
 #include <boost/preprocessor/tuple/enum.hpp>
 #endif
+#include <boost/optional.hpp>
 
 #include <QtCore/QSize>
 #include <QtCore/QSizeF>
@@ -316,6 +317,29 @@ inline bool deserialize(
     // Adding milliseconds since epoch.
     *target += std::chrono::milliseconds(millisSinceEpoch);
     return true;
+}
+
+template<typename T>
+inline void serialize(
+    QnJsonContext* ctx,
+    const boost::optional<T>& value,
+    QJsonValue* target)
+{
+    if (!value)
+        return;
+
+    QJson::serialize<T>(ctx, value.get(), target);
+}
+
+
+template<typename T>
+inline bool deserialize(
+    QnJsonContext* ctx,
+    const QJsonValue& value,
+    boost::optional<T>* target)
+{
+    *target = T();
+    return QJson::deserialize<T>(ctx, value, &target->get());
 }
 
 #endif

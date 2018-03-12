@@ -23,7 +23,7 @@ def _patch_sshd_config(root_os_access, new_settings, config_path='/etc/ssh/sshd_
         root_os_access.write_file(config_path, '\n'.join(updated_lines) + '\n')
         root_os_access.run_command(['sshd', '-t'])
         root_os_access.run_command(['service', 'ssh', 'reload'])
-        assert root_os_access.works()
+        assert root_os_access.is_working()
 
 
 def optimize_sshd(root_os_access):

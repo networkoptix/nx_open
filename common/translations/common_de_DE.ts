@@ -78,11 +78,6 @@
       <translation>Diese Systeme sind mit verschiedenen %1 URL erstellt worden. Zusammenführung ist nicht zulässig.</translation>
     </message>
     <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Das Cloudsystem kann nur mit einer nicht-Cloud zusammengeführt werden. Systemname und Passwort werden vom Cloudsystem übernommen.</translation>
-    </message>
-    <message>
       <source>New System</source>
       <translation>Neues System</translation>
     </message>
@@ -90,6 +85,10 @@
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
       <translation>Die entdeckte System %1 ist inkompatibel mit dem aktuellen System.</translation>
+    </message>
+    <message>
+      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
+      <translation>Das Cloudsystem kann nur mit einer nicht-Cloud zusammengeführt werden. Systemname und Passwort werden vom Cloudsystem übernommen.</translation>
     </message>
   </context>
   <context>
@@ -313,6 +312,10 @@
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
       <translation>Versuchen Sie zuerst die Aufnahme einzuschalten (falls ausgeschaltet) und verringern Sie die fps in den I/O-Einstellungen (Fehler &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
+      <translation>Bitte aktualisieren Sie Firmware. Minimale unterstützte Version ist %1. Aktuelle Version ist %2</translation>
     </message>
   </context>
   <context>

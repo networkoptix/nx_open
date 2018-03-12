@@ -79,6 +79,6 @@ void QnDefaultPasswordAlertBar::updateState()
     else
         setText(kSingleCameraAlertText + suffix);
 
-    m_setPasswordButton->setText(tr("Set Password", "", m_cameras.size()));
+    m_setPasswordButton->setText(tr("Set Password"));
     m_setPasswordButton->setVisible(hasAdminAccess);
 }

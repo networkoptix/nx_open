@@ -1,12 +1,10 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.1)
 
-set(TARGET ftpstorageplugin)
+set(STORAGE_TARGET ftpstorageplugin)
 
-project(${TARGET})
+project(${STORAGE_TARGET})
 
-include_directories(
-    "../../../include"
-)
+include_directories("../../../include")
 
 add_definitions(
     -DNOSSL
@@ -14,13 +12,10 @@ add_definitions(
 )
 
 if(WINDOWS)
-    add_definitions(
-        -D_CRT_SECURE_NO_WARNINGS
-    )
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 endif()
 
-add_library( 
-    ${TARGET} SHARED 
+add_library(${STORAGE_TARGET} SHARED
         "impl/ftplib.h"
         "impl/ftplib.cpp"
         "ftp_library.h"
@@ -28,16 +23,11 @@ add_library(
 )
 
 if(WINDOWS)
-    target_link_libraries(
-        ${TARGET}
-        ws2_32
-    )
+    target_link_libraries(${STORAGE_TARGET} ws2_32)
 endif()
 
-if(UNIX)
-    set_target_properties(
-        ${TARGET}
-            PROPERTIES
-            COMPILE_FLAGS "-std=c++11"
-    )
-endif()
+set_target_properties(${STORAGE_TARGET} PROPERTIES
+    CXX_STANDARD 11
+    CXX_STANDARD_REQUIRED YES
+    CXX_EXTENSIONS NO
+)

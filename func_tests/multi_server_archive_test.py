@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 
 import pytz
 
+from test_utils.api_shortcuts import get_local_system_id, set_local_system_id
 from test_utils.server import TimePeriod
 from test_utils.utils import log_list
 
@@ -13,9 +14,9 @@ log = logging.getLogger(__name__)
 def test_merged_archive(server_factory, camera, sample_media_file):
     log.debug('camera: %r, sample media file: %r', camera, sample_media_file)
 
-    one = server_factory('one')
-    two = server_factory('two')
-    one.merge([two])
+    one = server_factory.create('one')
+    two = server_factory.create('two')
+    one.merge_systems(two)
 
     one.add_camera(camera)
 
@@ -55,6 +56,8 @@ def test_merged_archive(server_factory, camera, sample_media_file):
 
 def test_separated_archive(server_factory, camera, sample_media_file):
     one, two, expected_periods_one, expected_periods_two = test_merged_archive(server_factory, camera, sample_media_file)
-    one.change_system_id('{%s}' % uuid.uuid4())
+    new_id = '{%s}' % uuid.uuid4()
+    set_local_system_id(one.rest_api, new_id)
+    assert get_local_system_id(one) == new_id
     assert expected_periods_one == one.get_recorded_time_periods(camera)
     assert expected_periods_two == two.get_recorded_time_periods(camera)

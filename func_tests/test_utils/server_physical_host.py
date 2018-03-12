@@ -3,10 +3,10 @@
 import logging
 import uuid
 
-from test_utils.build_info import customization_from_company_name
+from test_utils.rest_api import RestApi
 from .os_access import SshAccessConfig
 from .server import Server
-from .service import MEDIASERVER_DIR, AdHocService, SERVER_CTL_TARGET_PATH
+from .service import AdHocService
 from .server_installation import MEDIASERVER_CONFIG_PATH, MEDIASERVER_CONFIG_PATH_INITIAL, ServerInstallation
 from .template_renderer import TemplateRenderer
 from .utils import is_list_inst
@@ -17,7 +17,6 @@ log = logging.getLogger(__name__)
 SERVER_CTL_TEMPLATE_PATH = 'server_ctl.sh.jinja2'
 SERVER_CONF_TEMPLATE_PATH = 'mediaserver.conf.jinja2'
 SERVER_PORT_BASE = 1700
-
 
 
 class PhysicalInstallationHostConfig(object):
@@ -63,8 +62,7 @@ class PhysicalInstallationCtl(object):
         assert is_list_inst(config_list, PhysicalInstallationHostConfig), repr(config_list)
         self.config_list = config_list
         self.installation_hosts = [
-            PhysicalInstallationHost.from_config(
-                config, deb_path, customization_from_company_name(customization_company_name), ca)
+            PhysicalInstallationHost.from_config(config, deb_path, customization_company_name, ca)
             for config in config_list]
         self._available_hosts = self.installation_hosts[:]
 
@@ -120,8 +118,7 @@ class PhysicalInstallationHost(object):
 
     @property
     def unpacked_mediaserver_dir(self):
-        return self._unpacked_mediaserver_root_dir / MEDIASERVER_DIR.format(
-            customization_company_name=self._customization_company_name)
+        return self._unpacked_mediaserver_root_dir / 'opt' / self._customization_company_name / 'mediaserver'
 
     def set_reset_installation_flag(self):
         self._must_reset_installation = True
@@ -146,16 +143,16 @@ class PhysicalInstallationHost(object):
             if not installation:
                 return None
         server_port = self._installation_server_port(self._installations.index(installation))
-        rest_api_url = '%s://%s:%d/' % (config.http_schema, self.os_access.hostname, server_port)
+        api_url = '%s://%s:%d/' % (config.http_schema, self.os_access.hostname, server_port)
+        rest_api = RestApi(config.name, api_url, timeout=config.rest_api_timeout)
         service = AdHocService(self.os_access, installation.dir)
-        server = Server(config.name, self.os_access, service, installation, rest_api_url, self._ca,
-                        rest_api_timeout=config.rest_api_timeout, internal_ip_port=server_port)
+        server = Server(config.name, service, installation, rest_api, self, port=server_port)
         self._allocated_server_list.append(server)
         return server
 
     def release_all_servers(self):
         for server in self._allocated_server_list:
-            server.ensure_service_status(is_started=False)
+            server.stop(already_stopped_ok=True)
         self._allocated_server_list = []
         self._available_installations = self._installations[:]
 
@@ -189,8 +186,8 @@ class PhysicalInstallationHost(object):
     def _ensure_servers_are_stopped(self):
         for installation in self._installations:
             service = AdHocService(self.os_access, installation.dir)
-            if service.get_state():
-                service.set_state(is_started=False)
+            if service.is_running():
+                service.stop()
 
     def _create_installation(self):
         if self._limit and len(self._installations) >= self._limit:
@@ -224,7 +221,7 @@ class PhysicalInstallationHost(object):
             SERVER_CTL_TEMPLATE_PATH,
             SERVER_DIR=dir,
             )
-        service_path = dir / SERVER_CTL_TARGET_PATH
+        service_path = dir / 'server_ctl.sh'
         self.os_access.write_file(service_path, contents)
         self.os_access.run_command(['chmod', '+x', service_path])
 

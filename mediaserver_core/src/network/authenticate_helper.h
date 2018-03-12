@@ -54,6 +54,13 @@ public:
         Qn::UserAccessData* accessRights = 0,
         nx::network::http::AuthMethod::Value* usedAuthMethod = 0);
 
+    Qn::AuthResult httpAuthenticate(
+        const nx::network::http::Request& request,
+        nx::network::http::Response& response,
+        bool isProxy,
+        Qn::UserAccessData* accessRights,
+        nx::network::http::AuthMethod::Value* usedAuthMethod);
+
     nx::network::http::AuthMethodRestrictionList* restrictionList();
 
     //!Creates query item for \a path which does not require authentication
@@ -71,7 +78,8 @@ public:
     QByteArray generateNonce(NonceProvider provider = NonceProvider::automatic) const;
 
     Qn::AuthResult doCookieAuthorization(
-        const QByteArray& method, const QByteArray& authData, const QByteArray& csrfToken,
+        const QByteArray& method, const QByteArray& authData,
+        const boost::optional<QByteArray>& csrfToken,
         nx::network::http::Response& responseHeaders, Qn::UserAccessData* accessRights);
 
     /*!
@@ -130,7 +138,6 @@ private:
         void parse( const nx::network::http::Request& request );
         bool empty() const;
     };
-
 
     /*!
         \param userRes Can be NULL

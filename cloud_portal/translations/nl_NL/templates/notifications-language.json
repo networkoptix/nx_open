@@ -3,7 +3,7 @@
     "emailSubject": "Activeer uw account"
   },
   "restore_password": {
-    "emailSubject": "Reset uw wachtwoord"
+    "emailSubject": "Stel je wachtwoord opnieuw in"
   },
   "system_invite": {
     "emailSubject": "{{message.sharer_name}} nodigt u uit voor {{PRODUCT_NAME}}"

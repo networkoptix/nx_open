@@ -34,7 +34,7 @@ QnUniversalRequestProcessor::~QnUniversalRequestProcessor()
 QnUniversalRequestProcessor::QnUniversalRequestProcessor(
     QSharedPointer<nx::network::AbstractStreamSocket> socket,
     QnUniversalTcpListener* owner, bool needAuth)
-: 
+:
     QnTCPConnectionProcessor(new QnUniversalRequestProcessorPrivate, socket, owner)
 {
     Q_D(QnUniversalRequestProcessor);
@@ -45,11 +45,11 @@ QnUniversalRequestProcessor::QnUniversalRequestProcessor(
 }
 
 QnUniversalRequestProcessor::QnUniversalRequestProcessor(
-    QnUniversalRequestProcessorPrivate* priv, 
+    QnUniversalRequestProcessorPrivate* priv,
     QSharedPointer<nx::network::AbstractStreamSocket> socket,
-    QnUniversalTcpListener* owner, 
+    QnUniversalTcpListener* owner,
     bool needAuth)
-: 
+:
     QnTCPConnectionProcessor(priv, socket, owner)
 {
     Q_D(QnUniversalRequestProcessor);
@@ -86,27 +86,18 @@ bool QnUniversalRequestProcessor::authenticate(Qn::UserAccessData* accessRights,
         t.restart();
         nx::network::http::AuthMethod::Value usedMethod = nx::network::http::AuthMethod::noAuth;
         Qn::AuthResult authResult;
+        QnAuthSession lastUnauthorizedData;
         while ((authResult = qnAuthHelper->authenticate(d->request, d->response, isProxy, accessRights, &usedMethod)) != Qn::Auth_OK)
         {
+            lastUnauthorizedData = authSession();
+
             nx::network::http::insertOrReplaceHeader(
                 &d->response.headers,
                 nx::network::http::HttpHeader( Qn::AUTH_RESULT_HEADER_NAME, QnLexical::serialized(authResult).toUtf8() ) );
 
-            int retryThreshold = 0;
-            if (usedMethod == nx::network::http::AuthMethod::httpDigest)
-                retryThreshold = MAX_AUTH_RETRY_COUNT;
-            else if (d->authenticatedOnce)
-                retryThreshold = 2; // Allow two more try if password just changed (QT client need it because of password cache)
-            if (retryCount >= retryThreshold && !logReported && authResult != Qn::Auth_WrongInternalLogin)
-            {
-                logReported = true;
-                auto session = authSession();
-                session.id = QnUuid::createUuid();
-                qnAuditManager->addAuditRecord(qnAuditManager->prepareRecord(session, Qn::AR_UnauthorizedLogin));
-            }
 
             if( !d->socket->isConnected() )
-                return false;   //connection has been closed
+                break;   //connection has been closed
 
             nx::network::http::StatusCode::Value httpResult;
             QByteArray msgBody;
@@ -132,7 +123,7 @@ bool QnUniversalRequestProcessor::authenticate(Qn::UserAccessData* accessRights,
 
 
             if (++retryCount > MAX_AUTH_RETRY_COUNT) {
-                return false;
+                break;
             }
             while (t.elapsed() < AUTH_TIMEOUT && d->socket->isConnected())
             {
@@ -142,12 +133,27 @@ bool QnUniversalRequestProcessor::authenticate(Qn::UserAccessData* accessRights,
                 }
             }
             if (t.elapsed() >= AUTH_TIMEOUT || !d->socket->isConnected())
-                return false; // close connection
+                break; // close connection
         }
-        if (qnAuthHelper->restrictionList()->getAllowedAuthMethods(d->request) & nx::network::http::AuthMethod::noAuth)
+
+        if (usedMethod == nx::network::http::AuthMethod::noAuth)
+        {
             *noAuth = true;
-        if (usedMethod != nx::network::http::AuthMethod::noAuth)
+        }
+        else if (authResult != Qn::Auth_OK)
+        {
+            if (authResult != Qn::Auth_WrongInternalLogin)
+            {
+                lastUnauthorizedData.id = QnUuid::createUuid();
+                qnAuditManager->addAuditRecord(qnAuditManager->prepareRecord(
+                    lastUnauthorizedData, Qn::AR_UnauthorizedLogin));
+            }
+            return false;
+        }
+        else
+        {
             d->authenticatedOnce = true;
+        }
     }
     return true;
 }
@@ -286,7 +292,7 @@ bool QnUniversalRequestProcessor::needStandardProxy(QnCommonModule* commonModule
 
 bool QnUniversalRequestProcessor::isCloudRequest(const nx::network::http::Request& request)
 {
-    return request.requestLine.url.host() == nx::network::AppInfo::defaultCloudHost() ||
+    return request.requestLine.url.host() == nx::network::SocketGlobals::cloud().cloudHost() ||
            request.requestLine.url.path().startsWith("/cdb") ||
            request.requestLine.url.path().startsWith("/nxcloud") ||
            request.requestLine.url.path().startsWith("/nxlicense");

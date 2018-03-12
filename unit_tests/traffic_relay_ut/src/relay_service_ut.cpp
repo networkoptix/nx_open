@@ -2,13 +2,12 @@
 #include <memory>
 #include <string>
 
-#include <boost/optional.hpp>
-
 #include <gtest/gtest.h>
 
 #include <nx/casssandra/async_cassandra_connection.h>
 #include <nx/network/system_socket.h>
 #include <nx/utils/std/cpp14.h>
+#include <nx/utils/std/optional.h>
 #include <nx/utils/string.h>
 #include <nx/utils/thread/sync_queue.h>
 
@@ -88,7 +87,7 @@ protected:
     }
 
 private:
-    boost::optional<nx::cassandra::AsyncConnectionFactory::Function>
+    std::optional<nx::cassandra::AsyncConnectionFactory::Function>
         m_cassandraConnectionFactoryBak;
     bool m_isCassandraOnline = true;
     nx::utils::SyncQueue<bool> m_cassandraConnectionInitializationEvents;

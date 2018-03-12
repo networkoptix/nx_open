@@ -40,10 +40,6 @@ class CloudAccount(object):
         return '%r @ %r' % (self.name, self.url)
 
     @property
-    def user(self):
-        return self.rest_api.user
-
-    @property
     def password(self):
         return self.rest_api.password
 
@@ -59,8 +55,8 @@ class CloudAccount(object):
 
     def register_user(self, first_name, last_name):
         response = self.rest_api.api.account.register.POST(
-            email=self.user,
-            password=self.password,
+            email=self.rest_api.user,
+            password=self.rest_api.password,
             first_name=first_name,
             last_name=last_name,
             subscribe=False,
@@ -68,12 +64,12 @@ class CloudAccount(object):
         assert response == dict(resultCode='ok'), repr(response)
 
     def resend_activation_code(self):
-        response = self.rest_api.cdb.account.reactivate.POST(email=self.user)
+        response = self.rest_api.cdb.account.reactivate.POST(email=self.rest_api.user)
         assert response == dict(code=''), repr(response)
 
     def activate_user(self, activation_code):
         response = self.rest_api.cdb.account.activate.POST(code=activation_code)
-        assert response.get('email') == self.user, repr(response)  # Got activation code for another user?
+        assert response.get('email') == self.rest_api.user, repr(response)  # Got activation code for another user?
 
     def set_user_customization(self, customization):
         response = self.rest_api.cdb.account.update.POST(customization=customization)

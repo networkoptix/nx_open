@@ -1,7 +1,7 @@
 <ng-include ng-if="!register.success && !registerSuccess && session.fromClient" src="$root.C.viewsDir + 'static/register-intro.html'"></ng-include>
 <div class="container auth-hidden">
     <h1 class="process-success" ng-if="(register.success || registerSuccess) && !activated">
-        Konto zostało utworzone. <br>Potwierdzenie wysłano na adres e-mail <br>{{account.email}}
+        Account is created. <br>Confirmation message is sent to <br>{{account.email}}
     </h1>
 
     <h1 class="process-success" ng-if="(register.success || registerSuccess) && activated">
@@ -39,7 +39,7 @@
             </div>
         </div>
         <div class="form-group" validate-field>
-            <label for="registerEmail"  class="col-sm-4 control-label">E-mail</label>
+            <label for="registerEmail"  class="col-sm-4 control-label">Email</label>
             <div class="col-sm-4">
                 <input ng-hide="lockEmail" type="email" class="form-control" ng-model="account.email" id="registerEmail" maxlength="255"
                        name="registerEmail" required autocomplete="off"  validate-email
@@ -49,11 +49,11 @@
                        class="form-control" ng-model="account.email" readonly>
             </div>
             <div class="col-sm-4">
-                <span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">E-mail jest wymagany.</span>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">Email is required.</span></div>
 
-                <span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">Proszę wprowadzić prawidłowy adres e-mail.</span>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">Please, enter a valid Email.</span></div>
 
-                <span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">Ten adres został już zarejestrowany w {{PRODUCT_NAME}}.</span>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">This Email has been already registered in {{PRODUCT_NAME}}.</span></div>
             </div>
         </div>
         <password-input ng-model="account.password" id="'registerPassword'" label="$root.L.regActions.passwordLabel"></password-input>
@@ -70,7 +70,10 @@
                                 form="registerForm"
                                 class="pull-left"
                                 button-text="$root.L.regActions.createAccount"></process-button>
-                <small class="conditions-note">Klikając "Utwórz konto", zgadzasz się <br> na te <a href="/content/eula" target="_blank">warunki</a></small>
+                <div class="small conditions-note">
+                    By clicking "Create Account", you agree to
+                    <div><a href="/content/eula" target="_blank">Terms and Conditions</a></div>
+                </div>
             </div>
         </div>
     </form>

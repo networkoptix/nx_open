@@ -1,5 +1,4 @@
 # Components Namings
-set(parent.customization "default")
 set(display.product.name "SK VMS")
 set(display.mobile.name "SK VMS")
 set(product.name "SK VMS")

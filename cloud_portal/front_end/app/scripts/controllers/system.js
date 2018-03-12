@@ -7,6 +7,7 @@ angular.module('cloudApp')
     account, $q, system, $poll, page, $timeout, systemsProvider) {
 
         var systemId = $routeParams.systemId;
+        $scope.debugMode = Config.allowDebugMode;
 
 
         account.requireLogin().then(function(account){
@@ -57,8 +58,10 @@ angular.module('cloudApp')
             }
         });
 
+
+        var pollingSystemUpdate = null;
         function delayedUpdateSystemInfo(){
-            var pollingSystemUpdate = $poll(function(){
+            pollingSystemUpdate = $poll(function(){
                 return $scope.system.update().catch(function(error){
                     if(error.data.resultCode == 'forbidden' || error.data.resultCode == 'notFound'){
                         connectionLost();
@@ -159,6 +162,7 @@ angular.module('cloudApp')
             dialogs.confirm(L.system.confirmUnshare, L.system.confirmUnshareTitle, L.system.confirmUnshareAction, 'danger').
                 then(function(){
                     // Run a process of sharing
+                    $poll.cancel(pollingSystemUpdate);
                     $scope.unsharing = process.init(function(){
                         return $scope.system.deleteUser(user);
                     },{
@@ -166,17 +170,16 @@ angular.module('cloudApp')
                         errorPrefix: L.errorCodes.cantSharePrefix
                     }).then(function(){
                         $scope.locked[user.email] = false;
-                        var userId = user.id;
-                        $scope.system.users = _.filter($scope.system.users, function(user){
-                            return user.id != userId;
-                        });
-
+                        $scope.system.getUsers()
+                        delayedUpdateSystemInfo();
                     },function(){
                         $scope.locked[user.email] = false;
                     });
                     $scope.unsharing.run();
                 }, function(){
                     $scope.locked[user.email] = false;
+                    $scope.system.getUsers()
+                    delayedUpdateSystemInfo();
                 });
         };
 

@@ -11,7 +11,7 @@ USER_GUID_PREFIX = "58e20000-0000-0000-0000"
 STORAGE_GUID_PREFIX = "81012a6e-0000-0000-0000"
 LAYOUT_GUID_PREFIX = "1a404100-0000-0000-0000"
 LAYOUT_ITEM_GUID_PREFIX = "1a404100-11e1-1000-0000"
-CAMERA_MAC_PREFIX = "CA:14:"
+CAMERA_MAC_PREFIX = "92-61-"
 
 
 def generate_camera_server_guid(id, quoted=True):
@@ -45,7 +45,7 @@ def generate_layout_item_guid(id):
 
 
 def generate_mac(id):
-    return CAMERA_MAC_PREFIX + ":".join(map(lambda n: "%02X" % (id >> n & 0xFF), [24, 16, 8, 0]))
+    return CAMERA_MAC_PREFIX + "-".join(map(lambda n: "%02X" % (id >> n & 0xFF), [24, 16, 8, 0]))
 
 
 def generate_name(prefix, id):

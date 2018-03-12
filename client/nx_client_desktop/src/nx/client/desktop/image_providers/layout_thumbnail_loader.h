@@ -37,6 +37,9 @@ public:
 
     QColor itemBackgroundColor() const;
     void setItemBackgroundColor(const QColor& value);
+    void setRequestRoundMethod(api::ImageRequest::RoundMethod roundMethod);
+
+    void setResourcePool(const QPointer<QnResourcePool>& pool);
 
     QColor fontColor() const;
     void setFontColor(const QColor& value);
@@ -47,6 +50,8 @@ protected:
 private:
     struct Private;
     QScopedPointer<Private> d;
+
+    QPointer<QnResourcePool> m_resourcePool;
 };
 
 } // namespace desktop

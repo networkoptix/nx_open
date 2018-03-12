@@ -10,3 +10,6 @@ nx_add_target(applauncher EXECUTABLE
         nx_kit
         common
 )
+
+string(REPLACE ".exe" "" binary_name ${applauncher.binary.name})
+set_target_properties(applauncher PROPERTIES OUTPUT_NAME ${binary_name})

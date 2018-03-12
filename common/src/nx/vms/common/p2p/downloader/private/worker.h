@@ -92,6 +92,7 @@ private:
 
     void cancelRequests();
     void cancelRequestsByType(State type);
+    bool hasPendingRequestsByType(State type) const;
 
     void finish();
     void fail();

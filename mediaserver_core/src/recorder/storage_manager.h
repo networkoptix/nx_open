@@ -116,6 +116,7 @@ public:
 
     bool checkIfMyStorage(const QnStorageResourcePtr &storage) const;
     QnStorageResourcePtr getStorageByUrlExact(const QString& storageUrl);
+    QnStorageResourcePtr getStorageByVolume(const QString& volumeRoot) const;
     QnStorageResourcePtr storageRoot(int storage_index) const { QnMutexLocker lock( &m_mutexStorages ); return m_storageRoots.value(storage_index); }
     bool isStorageAvailable(int storage_index) const;
     bool isStorageAvailable(const QnStorageResourcePtr& storage) const;
@@ -148,13 +149,15 @@ public:
     /*
      * Return all storages which can be used for writing
      */
-    QSet<QnStorageResourcePtr> getAllWritableStorages() const;
+    QSet<QnStorageResourcePtr> getAllWritableStorages(
+        const QnStorageResourceList* additionalStorages = nullptr) const;
 
     QnStorageResourceList getStoragesInLexicalOrder() const;
     bool hasRebuildingStorages() const;
 
     void clearSpace(bool forced=false);
     bool clearSpaceForFile(const QString& path, qint64 size);
+    bool canAddChunk(qint64 timeMs, qint64 size);
     void checkSystemStorageSpace();
     void removeEmptyDirs(const QnStorageResourcePtr &storage);
 

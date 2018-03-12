@@ -223,15 +223,21 @@ int QnArecontPanoramicResource::getChannelCount() const
     return layout->channelCount();
 }
 
+void QnArecontPanoramicResource::initializeVideoLayoutUnsafe() const
+{
+    auto layoutString = getProperty(Qn::VIDEO_LAYOUT_PARAM_NAME);
+    m_customVideoLayout = QnCustomResourceVideoLayout::fromString(layoutString);
+}
+
 QnConstResourceVideoLayoutPtr QnArecontPanoramicResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider) const
 {
     const auto resourceId = getId();    //saving id before locking m_layoutMutex to avoid potential deadlock
 
     Q_UNUSED(dataProvider)
     QnMutexLocker lock(&m_layoutMutex);
-    return m_customVideoLayout ?
-        m_customVideoLayout.dynamicCast<const QnResourceVideoLayout>() :
-        getDefaultVideoLayout();
+    if (!m_customVideoLayout)
+        initializeVideoLayoutUnsafe();
+    return m_customVideoLayout;
 }
 
 #endif

@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import admin
 from django.utils.html import format_html
 import pytz
@@ -5,8 +6,9 @@ import datetime
 
 # Register your models here.
 
-from .models import Message, Event, Subscription, CloudNotification
-
+from .models import *
+from django_celery_results.models import TaskResult
+admin.site.unregister(TaskResult)
 
 class SubscriptionAdmin(admin.ModelAdmin):
     list_display = ('id', 'object', 'type', 'user_email', 'created_date', 'enabled')
@@ -42,6 +44,20 @@ class CloudNotificationAdmin(admin.ModelAdmin):
         ("When and who sent the notification", {'fields': (('sent_by', 'convert_date'))})
     ]
 
+    def add_view(self, request, form_url='', extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['BROADCAST_NOTIFICATIONS_SUPERUSERS_ONLY'] = settings.BROADCAST_NOTIFICATIONS_SUPERUSERS_ONLY
+        return super(CloudNotificationAdmin, self).add_view(
+            request, form_url, extra_context=extra_context,
+        )
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['BROADCAST_NOTIFICATIONS_SUPERUSERS_ONLY'] = settings.BROADCAST_NOTIFICATIONS_SUPERUSERS_ONLY
+        return super(CloudNotificationAdmin, self).change_view(
+            request, object_id, form_url, extra_context=extra_context,
+        )
+
     def convert_date(self, obj):
         session = self.request.session
         if obj.sent_date and 'timezone' in self.request.session and self.request.session['timezone']:
@@ -68,3 +84,37 @@ class CloudNotificationAdmin(admin.ModelAdmin):
         return self.readonly_fields
 
 admin.site.register(CloudNotification, CloudNotificationAdmin)
+
+
+class TaskResultAdmin(admin.ModelAdmin):
+    list_display = ('task_id', 'date_done', 'status')
+    readonly_fields = ('date_done', 'result', 'hidden', 'meta')
+    list_filter = ('date_done', 'status')
+    search_fields = ('date_done', 'meta', 'result', 'task_id')
+
+    fieldsets = (
+        (None, {
+            'fields': (
+                'task_id',
+                'status',
+                'content_type',
+                'content_encoding',
+            ),
+            'classes': ('extrapretty', 'wide')
+        }),
+        ('Result', {
+            'fields': (
+                'result',
+                'date_done',
+                'traceback',
+                'hidden',
+                'meta',
+            ),
+            'classes': ('extrapretty', 'wide')
+        }),
+    )
+
+    class Meta:
+        proxy = True
+
+admin.site.register(TaskResult, TaskResultAdmin)

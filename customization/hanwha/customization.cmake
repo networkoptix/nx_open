@@ -1,5 +1,5 @@
-set(defaultSkin "dark_orange")
-set(parent.customization "digitalwatchdog")
+set(defaultSkin "gray_orange")
+set(enable_hanwha ON)
 
 # Components Namings
 set(display.product.name "Wisenet WAVE")
@@ -21,7 +21,7 @@ set(productUrl "https://www.hanwhasecurity.com/wave")
 set(supportUrl "http://wavevms.com/support")
 set(supportEmail "")
 set(supportPhone "")
-set(licenseEmail "<br><a href=\"http://wavevms.com/support\">http://wavevms.com/support</a><br>")
+set(licenseEmail "http://wavevms.com/support")
 
 set(installer.name "wave")
 set(android.packageName "com.hanwhasecurity.wavemobile")

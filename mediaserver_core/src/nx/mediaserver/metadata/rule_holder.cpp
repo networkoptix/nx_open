@@ -8,7 +8,7 @@
 #include <nx/mediaserver/metadata/event_type_mapping.h>
 
 #include <common/common_module.h>
-#include <plugins/plugin_internal_tools.h>
+#include <nx/mediaserver_plugins/utils/uuid.h>
 
 #include <core/resource/security_cam_resource.h>
 #include <core/resource_management/resource_pool.h>

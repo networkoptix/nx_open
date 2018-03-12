@@ -78,11 +78,6 @@
       <translation>これらのシステムは異なる %1 の URL で構築されています　統合は許可されていません</translation>
     </message>
     <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>クラウド システムへの統合はクラウドに接続されていないシステムとのみ結合できます　システム名とパスワードはクラウド システムから取得されます。</translation>
-    </message>
-    <message>
       <source>New System</source>
       <translation>新規システム</translation>
     </message>
@@ -90,6 +85,10 @@
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
       <translation>検出されたシステム%1は、現在のシステムと互換性がありません</translation>
+    </message>
+    <message>
+      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
+      <translation>クラウド システムへの統合はクラウドに接続されていないシステムとのみ結合できます　システム名とパスワードはクラウド システムから取得されます。</translation>
     </message>
   </context>
   <context>
@@ -313,6 +312,10 @@
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
       <translation>まず、録画をOnにしてI/Oモジュール設定で fps を減少します (エラー&quot;%1&quot;)。</translation>
+    </message>
+    <message>
+      <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
+      <translation>ファームウェアを更新してください。最小サポートバージョンは %1です。現在のバージョンは %2です</translation>
     </message>
   </context>
   <context>

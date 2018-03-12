@@ -393,6 +393,18 @@ Handle ServerConnection::addFileUpload(
         targetThread);
 }
 
+Handle ServerConnection::validateFileInformation(
+    const QString& url,
+    GetCallback callback,
+    QThread* targetThread)
+{
+    return executeGet(
+        lit("/api/downloads/%1/validate").arg(url),
+        QnRequestParamList(),
+        callback,
+        targetThread);
+}
+
 Handle ServerConnection::removeFileDownload(
     const QString& fileName,
     bool deleteData,

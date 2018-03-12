@@ -2,10 +2,8 @@ import re
 
 from collections import namedtuple
 
-from pathlib2 import PurePosixPath
-
 Version = namedtuple('Version', ['major', 'minor', 'fix', 'build'])
-Customization = namedtuple('Customization', ['company_name', 'service_name', 'installation_subdir'])
+Customization = namedtuple('Customization', ['name', 'company', 'service', 'installation_subdir'])
 BuildInfo = namedtuple('BuildInfo', [
     'version', 'beta', 'proto_version', 'change_set',
     'customization', 'brand', 'cloud_host', 'cloud_group',
@@ -22,20 +20,21 @@ def _camel_case_to_underscore(name):
     return name
 
 
-def version_from_str(version_as_str):
+def _version_from_str(version_as_str):
     parts_as_str = version_as_str.split('.', 3)
     parts = [int(part) for part in parts_as_str]
     return Version(*parts)
 
 
-def customization_from_company_name(company_name):
-    return Customization(company_name, company_name + '-mediaserver', PurePosixPath(company_name, 'mediaserver'))
-
-
 def customizations_from_paths(paths, installation_root):
     for path in paths:
         if path.name == 'mediaserver' and path.parent.parent == installation_root:
-            yield customization_from_company_name(path.parent.name)
+            company = path.parent.name
+            yield Customization(
+                name=('default' if company == 'networkoptix' else company),
+                company=company,
+                service=company + '-mediaserver',
+                installation_subdir=path.relative_to(installation_root))
 
 
 def build_info_from_text(text):
@@ -44,7 +43,7 @@ def build_info_from_text(text):
     for line in text.splitlines(False):
         name, value = line.split('=', 1)
         if name == 'version':
-            version = version_from_str(value)
+            version = _version_from_str(value)
         else:
             parts[_camel_case_to_underscore(name)] = value
     return BuildInfo(version=version, **parts)

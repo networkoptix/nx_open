@@ -1,8 +1,8 @@
 'use strict';
 
 angular.module('webadminApp')
-    .factory('mediaserver', ['$http', '$modal', '$q', '$localStorage', '$location', '$log', 'nativeClient', 'systemAPI',
-    function ($http, $modal, $q, $localStorage, $location, $log, nativeClient, systemAPI) {
+    .factory('mediaserver', ['$http', '$uibModal', '$q', '$localStorage', '$location', '$log', 'nativeClient', 'systemAPI',
+    function ($http, $uibModal, $q, $localStorage, $location, $log, nativeClient, systemAPI) {
 
 
         if($localStorage.auth){
@@ -69,7 +69,7 @@ angular.module('webadminApp')
         var loginDialog = null;
         function callLogin(){
             if (loginDialog === null) { //Dialog is not displayed
-                loginDialog = $modal.open({
+                loginDialog = $uibModal.open({
                     templateUrl: Config.viewsDir + 'login.html',
                     keyboard:false,
                     backdrop:'static'
@@ -116,7 +116,7 @@ angular.module('webadminApp')
             cacheModuleInfo = null;
             if(offlineDialog === null) { //Dialog is not displayed
                 getModuleInformation().catch(function (/*error*/) {
-                    offlineDialog = $modal.open({
+                    offlineDialog = $uibModal.open({
                         templateUrl: Config.viewsDir + 'components/offline.html',
                         controller: 'OfflineCtrl',
                         keyboard:false,
@@ -549,8 +549,10 @@ angular.module('webadminApp')
             },
             getLanguages:function(){
                 return wrapGet('languages.json').then(function(data){
-                    return _.filter(data.data,function(language){
-                        return Config.supportedLanguages.indexOf(language.language) >= 0;
+                    return _.map(Config.supportedLanguages, function(configLang){
+                        return _.filter(data.data, function(mediaServerLang){
+                            return mediaServerLang.language == configLang;
+                        })[0];
                     });
                 });
             },

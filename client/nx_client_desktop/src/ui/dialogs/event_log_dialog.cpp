@@ -633,7 +633,7 @@ void QnEventLogDialog::at_eventsGrid_customContextMenuRequested(const QPoint&)
     {
         QnResourcePtr resource = m_model->data(idx, Qn::ResourceRole).value<QnResourcePtr>();
         auto manager = context()->menu();
-        if (resource)
+        if (resource && accessController()->hasPermissions(resource, Qn::ViewContentPermission))
         {
             action::Parameters parameters(resource);
             parameters.setArgument(Qn::NodeTypeRole, Qn::ResourceNode);

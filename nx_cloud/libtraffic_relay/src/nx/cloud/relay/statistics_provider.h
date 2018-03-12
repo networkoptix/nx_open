@@ -8,6 +8,8 @@
 
 #include <nx/cloud/relaying/statistics.h>
 
+#include "controller/traffic_relay.h"
+
 namespace nx {
 namespace cloud {
 
@@ -19,11 +21,12 @@ struct Statistics
 {
     relaying::Statistics relaying;
     nx::network::server::Statistics http;
+    controller::RelaySessionStatistics relaySessions;
 
     bool operator==(const Statistics& right) const;
 };
 
-#define Statistics_relay_controller_Fields (relaying)(http)
+#define Statistics_relay_controller_Fields (relaying)(http)(relaySessions)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Statistics),
@@ -45,7 +48,8 @@ class StatisticsProvider:
 public:
     StatisticsProvider(
         const relaying::AbstractListeningPeerPool& listeningPeerPool,
-        const nx::network::server::AbstractStatisticsProvider& httpServerStatisticsProvider);
+        const nx::network::server::AbstractStatisticsProvider& httpServerStatisticsProvider,
+        const controller::AbstractTrafficRelay& trafficRelay);
     virtual ~StatisticsProvider() = default;
 
     virtual Statistics getAllStatistics() const override;
@@ -53,14 +57,16 @@ public:
 private:
     const relaying::AbstractListeningPeerPool& m_listeningPeerPool;
     const nx::network::server::AbstractStatisticsProvider& m_httpServerStatisticsProvider;
+    const controller::AbstractTrafficRelay& m_trafficRelay;
 };
 
 //-------------------------------------------------------------------------------------------------
 
 using StatisticsProviderFactoryFunc =
     std::unique_ptr<AbstractStatisticsProvider>(
-        const relaying::AbstractListeningPeerPool& /*listeningPeerPool*/,
-        const nx::network::server::AbstractStatisticsProvider& /*httpServerStatisticsProvider*/);
+        const relaying::AbstractListeningPeerPool&,
+        const nx::network::server::AbstractStatisticsProvider&,
+        const controller::AbstractTrafficRelay&);
 
 class StatisticsProviderFactory:
     public nx::utils::BasicFactory<StatisticsProviderFactoryFunc>
@@ -75,7 +81,8 @@ public:
 private:
     std::unique_ptr<AbstractStatisticsProvider> defaultFactoryFunction(
         const relaying::AbstractListeningPeerPool& listeningPeerPool,
-        const nx::network::server::AbstractStatisticsProvider& httpServerStatisticsProvider);
+        const nx::network::server::AbstractStatisticsProvider& httpServerStatisticsProvider,
+        const controller::AbstractTrafficRelay& trafficRelay);
 };
 
 } // namespace relay

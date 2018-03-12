@@ -7,9 +7,16 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 
-class QN_EXPORT QnTimePeriod
+class QnTimePeriod;
+
+class QnTimePeriod
 {
 public:
+
+    static const qint64 UnlimitedPeriod;
+    static const qint64 kMaxTimeValue;
+    static const qint64 kMinTimeValue;
+
     /**
      * Constructs a null time period.
      */

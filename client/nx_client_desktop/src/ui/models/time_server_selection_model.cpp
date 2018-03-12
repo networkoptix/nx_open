@@ -21,7 +21,6 @@
 
 #include <nx/client/core/utils/human_readable.h>
 #include <utils/common/synctime.h>
-#include <utils/tz/tz.h>
 
 #include <boost/algorithm/cxx11/any_of.hpp>
 #include <algorithm>

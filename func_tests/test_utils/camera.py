@@ -23,6 +23,8 @@ import hachoir_core.config
 import pytest
 
 # overwise hachoir will replace sys.stdout/err with UnicodeStdout, incompatible with pytest terminal module:
+from test_utils.api_shortcuts import get_server_id
+
 hachoir_core.config.unicode_stdout = False
 import hachoir_parser
 import hachoir_metadata
@@ -120,14 +122,15 @@ class Camera(object):
 
     def switch_to_server(self, server):
         assert self.id, 'Camera %s is not yet registered on server' % self
-        server.rest_api.ec2.saveCamera.POST(id=self.id, parentId=server.ecs_guid)
+        server_guid = get_server_id(server.rest_api)
+        server.rest_api.ec2.saveCamera.POST(id=self.id, parentId=server_guid)
         d = None
         for d in server.rest_api.ec2.getCamerasEx.GET():
             if d['id'] == self.id:
                 break
         if d is None:
             pytest.fail('Camera %s is unknown for server %s' % (self, server))
-        assert d['parentId'] == server.ecs_guid
+        assert d['parentId'] == server_guid
 
     def start_streaming(self):
         # assert isinstance(server, Server), repr(server)  # import circular dependency
@@ -234,14 +237,17 @@ class MediaListener(object):
 
     def _thread_main(self, listen_socket):
         log.info('%s: thread started.', self)
+        poll = select.poll()
+        poll.register(select.POLLIN | select.POLLERR, listen_socket, )
         while not self._stop_flag:
-            read, write, error = select.select([listen_socket], [], [listen_socket], 0.1)
-            if not read and not error:
+            events = poll.poll(100)  # timeout in milliseconds
+            if not events:
                 continue
             sock, addr = listen_socket.accept()
             log.info('%s: accepted connection from %s:%d', self, addr[0], addr[1])
             streamer = MediaStreamer(self._media_stream_path, sock, addr)
             self._streamers.append(streamer)
+        poll.unregister(listen_socket)
         listen_socket.close()
         log.info('%s: thread is finished.', self)
 

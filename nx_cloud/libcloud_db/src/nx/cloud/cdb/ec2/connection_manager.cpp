@@ -148,7 +148,10 @@ void ConnectionManager::createTransactionConnection(
         connectionRequestAttributes.connectionId,
         {systemIdLocal, connectionRequestAttributes.remotePeer.id.toByteArray()} };
 
-    if (!addNewConnection(std::move(context)))
+    ::ec2::ApiPeerDataEx remotePeer;
+    remotePeer.assign(connectionRequestAttributes.remotePeer);
+    remotePeer.protoVersion = connectionRequestAttributes.remotePeerProtocolVersion;
+    if (!addNewConnection(std::move(context), remotePeer))
     {
         NX_LOGX(QnLog::EC2_TRAN_LOG,
             lm("Failed to add new transaction connection from (%1.%2; %3). connectionId %4")
@@ -188,7 +191,8 @@ void ConnectionManager::createWebsocketTransactionConnection(
     const nx::String systemIdLocal(systemId.c_str());
 
 
-    ::ec2::ApiPeerDataEx localPeer(m_localPeerData);
+    ::ec2::ApiPeerDataEx localPeer;
+    localPeer.assign(m_localPeerData);
     ::ec2::serializeToResponse(response, localPeer, remotePeerInfo.dataFormat);
 
     auto error = websocket::validateRequest(request, response);
@@ -416,7 +420,9 @@ ConnectionManager::SystemStatusChangedSubscription&
     return m_systemStatusChangedSubscription;
 }
 
-bool ConnectionManager::addNewConnection(ConnectionContext context)
+bool ConnectionManager::addNewConnection(
+    ConnectionContext context,
+    const ::ec2::ApiPeerDataEx& remotePeerInfo)
 {
     using namespace std::placeholders;
 
@@ -456,7 +462,9 @@ bool ConnectionManager::addNewConnection(ConnectionContext context)
     if (systemWasOffline)
     {
         lock.unlock();
-        m_systemStatusChangedSubscription.notify(systemId, api::SystemHealth::online);
+        m_systemStatusChangedSubscription.notify(
+            systemId,
+            { api::SystemHealth::online, remotePeerInfo.protoVersion });
     }
 
     return true;
@@ -569,7 +577,7 @@ void ConnectionManager::sendSystemOfflineNotificationIfNeeded(
         return;
 
     m_systemStatusChangedSubscription.notify(
-        systemId.toStdString(), api::SystemHealth::offline);
+        systemId.toStdString(), { api::SystemHealth::offline });
 }
 
 void ConnectionManager::removeConnection(const nx::String& connectionId)
@@ -762,7 +770,8 @@ void ConnectionManager::onHttpConnectionUpgraded(
 
     auto connectionId = QnUuid::createUuid();
 
-    ::ec2::ApiPeerDataEx localPeerData(m_localPeerData);
+    ::ec2::ApiPeerDataEx localPeerData;
+    localPeerData.assign(m_localPeerData);
     auto transactionTransport = std::make_unique<WebSocketTransactionTransport>(
         connection->getAioThread(),
         m_transactionLog,
@@ -777,7 +786,7 @@ void ConnectionManager::onHttpConnectionUpgraded(
         connectionId.toSimpleByteArray(),
         { systemId, remotePeerInfo.id.toByteArray() } };
 
-    if (!addNewConnection(std::move(context)))
+    if (!addNewConnection(std::move(context), remotePeerInfo))
     {
         NX_LOGX(QnLog::EC2_TRAN_LOG,
             lm("Failed to add new websocket transaction connection from (%1.%2; %3). connectionId %4")

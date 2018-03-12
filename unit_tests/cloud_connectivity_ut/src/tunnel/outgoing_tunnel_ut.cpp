@@ -12,6 +12,7 @@
 #include <nx/network/system_socket.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/future.h>
+#include <nx/utils/std/optional.h>
 #include <nx/utils/test_support/test_options.h>
 #include <nx/utils/scope_guard.h>
 
@@ -460,7 +461,7 @@ protected:
     }
 
 private:
-    boost::optional<CrossNatConnectorFactory::Function> m_oldFactoryFunc;
+    std::optional<CrossNatConnectorFactory::Function> m_oldFactoryFunc;
     AddressEntry m_addressEntry;
     std::chrono::milliseconds m_connectTimeout;
 
@@ -721,11 +722,6 @@ TEST_F(OutgoingTunnel, connectTimeout)
     requestSeveralConnectionsToTheTarget();
     assertConnectResultIs(SystemError::timedOut);
     assertNoConnectionsHaveBeenCreated();
-
-    #ifdef _DEBUG
-        if (!utils::TestOptions::areTimeAssertsDisabled())
-            assertActualTimeoutErrorDoesNotExceed(std::chrono::milliseconds(500));
-    #endif
 }
 
 /** testing that tunnel passes correct connect timeout to tunnel connection */

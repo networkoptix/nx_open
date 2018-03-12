@@ -1,6 +1,6 @@
 'use strict';
 
-function JsHlsAPI(){
+window.JsHlsAPI = function(){
     var events, stats, fmp4Data,
     debugMode, //Create the jshls player in debug mode
     enableWorker = true,

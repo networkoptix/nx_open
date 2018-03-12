@@ -20,7 +20,7 @@ public:
 
 protected:
     QString installerWorkDir() const;
-    PrepareResult checkContents() const;
+    PrepareResult checkContents(const QString& outputPath) const;
 
 private:
     AbstractZipExtractorPtr m_extractor;
@@ -37,7 +37,7 @@ private:
     // These below should be overriden in CommonUpdates2Installer
     virtual bool cleanInstallerDirectory() = 0;
     virtual AbstractZipExtractorPtr createZipExtractor() const = 0;
-    virtual QVariantMap updateInformation() const = 0;
+    virtual QVariantMap updateInformation(const QString& outputPath) const = 0;
     virtual QnSystemInformation systemInformation() const = 0;
     virtual bool checkExecutable(const QString& executableName) const = 0;
 };

@@ -168,7 +168,8 @@ TEST_F(OutgoingTunnelConnectionTest, common)
     ASSERT_TRUE(start()) << SystemError::getLastOSErrorText().toStdString();
 
     auto udtConnection = std::make_unique<UdtStreamSocket>(AF_INET);
-    ASSERT_TRUE(udtConnection->connect(serverEndpoint(), nx::network::kNoTimeout));
+    ASSERT_TRUE(udtConnection->connect(serverEndpoint(), nx::network::kNoTimeout))
+        << SystemError::getLastOSErrorText().toStdString();
     const auto localAddress = udtConnection->getLocalAddress();
 
     OutgoingTunnelConnection tunnelConnection(
@@ -239,21 +240,6 @@ TEST_F(OutgoingTunnelConnectionTest, timeout)
         ASSERT_EQ(SystemError::timedOut, result.errorCode);
         ASSERT_EQ(nullptr, result.connection);
         ASSERT_TRUE(result.stillValid);
-
-        #ifdef _DEBUG
-            if (!utils::TestOptions::areTimeAssertsDisabled())
-            {
-                const auto connectTime =
-                    connectContexts[i].endTime - connectContexts[i].startTime;
-
-                auto connectTimeDiff =
-                    connectTime > connectContexts[i].timeout
-                    ? connectTime - connectContexts[i].timeout
-                    : connectContexts[i].timeout - connectTime;
-
-                ASSERT_LE(connectTimeDiff, acceptableTimeoutFault);
-            }
-        #endif
     }
 }
 
@@ -349,22 +335,10 @@ TEST_F(OutgoingTunnelConnectionTest, controlConnectionFailure)
     controlConnectionGuard.fire();
 
     //waiting for control connection to close
-    const auto t1 = std::chrono::steady_clock::now();
     ASSERT_EQ(
         std::future_status::ready,
         controlConnectionClosedPromise.get_future().wait_for(
             udpTunnelKeepAlive.maxConnectionInactivityPeriod() * 10));
-
-    #ifdef _DEBUG
-        if (!utils::TestOptions::areTimeAssertsDisabled())
-        {
-            EXPECT_LT(
-                std::chrono::steady_clock::now() - t1,
-                udpTunnelKeepAlive.maxConnectionInactivityPeriod() * 15 / 10);
-        }
-    #else
-        static_cast<void>(t1);
-    #endif
 
     auto connectContexts = startConnections(&tunnelConnection, 1);
     auto future = connectContexts[0].connectedPromise.get_future();

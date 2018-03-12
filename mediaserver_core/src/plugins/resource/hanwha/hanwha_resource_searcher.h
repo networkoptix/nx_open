@@ -82,7 +82,7 @@ private:
 
     mutable QnMutex m_mutex;
     QnResourceList m_foundUpnpResources;
-    std::set<QString> m_alreadFoundMacAddresses;
+    std::set<QString> m_alreadyFoundMacAddresses;
     QMap<QString, int> m_channelsByCamera;
 
     // TODO: #dmishin make different session keys for different session types

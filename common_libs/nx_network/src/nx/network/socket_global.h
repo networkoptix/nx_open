@@ -43,7 +43,11 @@ public:
     static cloud::CloudConnectController& cloud();
     static int initializationFlags();
 
-    static void init(int initializationFlags = 0); /**< Should be called before any socket use. */
+    static const QString& cloudHost();
+
+    static void init(
+        int initializationFlags = 0,
+        const QString& customCloudHost = QString()); /**< Should be called before any socket use. */
     static void deinit(); /**< Should be called when sockets are not needed any more. */
     static void verifyInitialization();
     static bool isInitialized();
@@ -82,7 +86,7 @@ private:
 
     void initializeNetworking();
 
-    void initializeCloudConnectivity();
+    void initializeCloudConnectivity(const QString& customCloudHost);
     void deinitializeCloudConnectivity();
 };
 

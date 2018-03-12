@@ -78,11 +78,6 @@
       <translation>Ces systèmes sont construits avec différents %1 URL. Fusion non autorisée.</translation>
     </message>
     <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Système Nuage peut seulement être fusionné avec un non-nuage. Nom Système et mot de passe sont pris du Système Nuage.</translation>
-    </message>
-    <message>
       <source>New System</source>
       <translation>Nouveau Système</translation>
     </message>
@@ -90,6 +85,10 @@
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
       <translation>Le système découvert %1 est incompatible avec le système actuel.</translation>
+    </message>
+    <message>
+      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
+      <translation>Système Nuage peut seulement être fusionné avec un non-nuage. Nom Système et mot de passe sont pris du Système Nuage.</translation>
     </message>
   </context>
   <context>
@@ -313,6 +312,10 @@
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
       <translation>Premièrement, essayez d'activer l'enregistrement (si désactivé) et diminuer ips dans les paramètres module I/O (erreur &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
+      <translation>Veuillez mettre à jour le firmware. La version minimale prise en charge est %1. La version actuelle est %2</translation>
     </message>
   </context>
   <context>
@@ -923,7 +926,7 @@
     <message numerus="yes">
       <source>minutes</source>
       <comment>Full suffix for displaying minutes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>minute</numerusform>
         <numerusform>minutes</numerusform>
       </translation>

@@ -15,6 +15,8 @@
 
 #include <nx/fusion/serialization/json_functions.h>
 #include <common/common_module.h>
+#include <core/resource/security_cam_resource.h>
+#include <core/resource_management/resource_pool.h>
 
 QnManualCameraAdditionRestHandler::QnManualCameraAdditionRestHandler()
 {
@@ -198,8 +200,18 @@ int QnManualCameraAdditionRestHandler::addCameras(
         cameraList.push_back(info);
     }
 
-    int registered = owner->commonModule()->resourceDiscoveryManager()->registerManualCameras(cameraList);
-    if (registered > 0)
+    auto registered = owner->commonModule()->resourceDiscoveryManager()->registerManualCameras(cameraList);
+    auto resPool = owner->commonModule()->resourcePool();
+    for (const auto& id: registered)
+    {
+        if (auto camera = resPool->getResourceByUniqueId<QnSecurityCamResource>(id))
+        {
+            camera->setAuth(auth);
+            camera->saveParams();
+        }
+
+    }
+    if (!registered.isEmpty())
     {
         QnAuditRecord auditRecord =
             qnAuditManager->prepareRecord(owner->authSession(), Qn::AR_CameraInsert);
@@ -211,7 +223,7 @@ int QnManualCameraAdditionRestHandler::addCameras(
         qnAuditManager->addAuditRecord(auditRecord);
     }
 
-    return registered > 0 ? CODE_OK : CODE_INTERNAL_ERROR;
+    return registered.size() > 0 ? CODE_OK : CODE_INTERNAL_ERROR;
 }
 
 int QnManualCameraAdditionRestHandler::executeGet(

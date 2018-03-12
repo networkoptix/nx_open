@@ -1,7 +1,7 @@
 <ng-include ng-if="!register.success && !registerSuccess && session.fromClient" src="$root.C.viewsDir + 'static/register-intro.html'"></ng-include>
 <div class="container auth-hidden">
     <h1 class="process-success" ng-if="(register.success || registerSuccess) && !activated">
-        계정이 생성되었습니다. <br> 확인 메시지가 <br> {{account.email}} (으)로 전송되었습니다.
+        계정이 생성 되었습니다. <br>확인 메세지가 <br>{{account.email}} 로 전송되었습니다.
     </h1>
 
     <h1 class="process-success" ng-if="(register.success || registerSuccess) && activated">
@@ -49,7 +49,11 @@
                        class="form-control" ng-model="account.email" readonly>
             </div>
             <div class="col-sm-4">
-                <span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required"> 이메일이 필요합니다. </span> <span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email"> 올바른 이메일을 입력하십시오. </span> <span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">이 이메일은 이미 {{PRODUCT_NAME}} 에 등록되어 있습니다. </span>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">이메일이 필요합니다.</span></div>
+
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">유효한 이메일을 입력하십시오.</span></div>
+
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">이 이메일은 이미 {{PRODUCT_NAME}} 에 등록되었습니다.</span></div>
             </div>
         </div>
         <password-input ng-model="account.password" id="'registerPassword'" label="$root.L.regActions.passwordLabel"></password-input>
@@ -66,7 +70,10 @@
                                 form="registerForm"
                                 class="pull-left"
                                 button-text="$root.L.regActions.createAccount"></process-button>
-                <small class="conditions-note"> "계정 만들기"를 클릭하면 <br> ~ <a href="/content/eula" target="_blank"> 이용 약관에 동의하게됩니다. </a></small>
+                <div class="small conditions-note">
+                    동의하시면 "계정 생성" 을 선택하세요
+                    <div><a href="/content/eula" target="_blank">이용 약관</a></div>
+                </div>
             </div>
         </div>
     </form>

@@ -8,6 +8,7 @@
 #include <nx/network/deprecated/simple_http_client.h>
 #include <nx/network/http/http_types.h>
 #include <nx/network/deprecated/asynchttpclient.h>
+#include <nx/utils/log/log.h>
 
 namespace {
     const QRegExp DW_RES_SETTINGS_FILTER(QLatin1String("[{},']"));
@@ -176,7 +177,9 @@ QnCameraAdvancedParamValueList QnWin4NetCameraProxy::requestParamValues(const QS
         httpClient.readAll(body);
         return fetchParamsFromHttpResponse(body);;
     }
-    qWarning() << "DWCameraProxy::getFromCameraImpl: HTTP GET request '" << request << "' failed: status: " << status << "host=" << m_host << ":" << m_port;
+
+    NX_WARNING(this, lm("HTTP GET request '%1' failed: status: %2, host: %3:%4")
+        .args(request, status, m_host, m_port));
     return QnCameraAdvancedParamValueList();
 }
 
@@ -254,7 +257,8 @@ QnCameraAdvancedParamValueList QnPravisCameraProxy::getParamsList() const
         apiUrl.setUserName(m_auth.user());
         apiUrl.setPassword(m_auth.password());
 
-        auto requestCompletionFunc = [&](SystemError::ErrorCode, int statusCode, nx::network::http::StringType, nx::network::http::BufferType msgBody)
+        auto requestCompletionFunc = [&](SystemError::ErrorCode, int statusCode, nx::network::http::StringType,
+            nx::network::http::BufferType msgBody, nx::network::http::HttpHeaders /*httpResponseHeaders*/)
         {
             {
                 QnMutexLocker lock(&waitMutex);
@@ -262,7 +266,8 @@ QnCameraAdvancedParamValueList QnPravisCameraProxy::getParamsList() const
                 if (statusCode == nx::network::http::StatusCode::ok && !msgBody.isEmpty())
                     param.value = fromInnerValue(cameraAdvParam, parseParamFromHttpResponse(cameraAdvParam, msgBody));
                 else
-                    qWarning() << "error reading param" << cameraAdvParam.id << "for camera" << m_host;
+                    NX_WARNING(this, lm("Error reading param: %1, host: %2:%3").args(cameraAdvParam.id, m_host, m_port));
+
                 param.id = cameraAdvParam.id;
                 result << param;
                 --workers;
@@ -340,7 +345,8 @@ bool QnPravisCameraProxy::setParams(const QVector<QPair<QnCameraAdvancedParamete
         apiUrl.setUserName(m_auth.user());
         apiUrl.setPassword(m_auth.password());
 
-        auto requestCompletionFunc = [&](SystemError::ErrorCode, int statusCode, nx::network::http::StringType, nx::network::http::BufferType msgBody)
+        auto requestCompletionFunc = [&](SystemError::ErrorCode, int statusCode, nx::network::http::StringType,
+            nx::network::http::BufferType msgBody, nx::network::http::HttpHeaders /*httpResponseHeaders*/)
         {
             {
                 QnMutexLocker lock(&waitMutex);

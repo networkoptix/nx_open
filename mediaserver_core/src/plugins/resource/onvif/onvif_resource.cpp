@@ -1940,11 +1940,12 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(Medi
     NX_LOGX(QString(lit("ONVIF debug: got %1 encoders for camera %2")).arg(optionsList.size()).arg(getHostAddress()), cl_logDEBUG1);
 
     bool dualStreamingAllowed = optionsList.size() >= 2;
+
+    QnMutexLocker lock(&m_mutex);
     m_secondaryStreamCapabilities = VideoOptionsLocal();
     if (dualStreamingAllowed)
     {
         int secondaryIndex = channelProfiles.isEmpty() ? getSecondaryIndex(optionsList) : 1;
-        QnMutexLocker lock( &m_mutex );
         m_secondaryStreamCapabilities = optionsList[secondaryIndex];
     }
 
@@ -2701,7 +2702,7 @@ CameraDiagnostics::Result QnPlOnvifResource::sendVideoEncoderToCamera(VideoEncod
         if (soapWrapper.getLastError().contains(QLatin1String("not possible to set")))
             return CameraDiagnostics::CannotConfigureMediaStreamResult( QLatin1String("fps") );   // TODO: #ak find param name
         else
-            return CameraDiagnostics::CannotConfigureMediaStreamResult( QString() );
+            return CameraDiagnostics::CannotConfigureMediaStreamResult( QString("'stream profile parameters'") );
     }
     return CameraDiagnostics::NoErrorResult();
 }

@@ -53,7 +53,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Delete bookmark</source>
-      <translation>ブックマークを削除しますか</translation>
+      <translation>ブックマークを削除</translation>
     </message>
     <message>
       <source>Export bookmark</source>
@@ -848,6 +848,22 @@ to view more bookmarks</source>
       <translation>シーケンス表示作成</translation>
     </message>
     <message>
+      <source>Wearable Camera...</source>
+      <translation>ウェアラブルカメラ...</translation>
+    </message>
+    <message>
+      <source>New Wearable Camera...</source>
+      <translation>新しいウェアラブルカメラ...</translation>
+    </message>
+    <message>
+      <source>Upload File...</source>
+      <translation>ファイルをアップロード</translation>
+    </message>
+    <message>
+      <source>Upload Folder...</source>
+      <translation>フォルダをアップロード...</translation>
+    </message>
+    <message>
       <source>Start Analytics...</source>
       <translation>解析開始...</translation>
     </message>
@@ -874,22 +890,6 @@ to view more bookmarks</source>
     <message>
       <source>Cell Spacing...</source>
       <translation>セルの間隔...</translation>
-    </message>
-    <message>
-      <source>Wearable Camera...</source>
-      <translation>ウェアラブルカメラ...</translation>
-    </message>
-    <message>
-      <source>New Wearable Camera...</source>
-      <translation>新しいウェアラブルカメラ...</translation>
-    </message>
-    <message>
-      <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
-    </message>
-    <message>
-      <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
     </message>
   </context>
   <context>
@@ -947,7 +947,7 @@ to view more bookmarks</source>
     <name>Deactivator</name>
     <message>
       <source>Unknown error.</source>
-      <translation>未知のエラー.</translation>
+      <translation>不明なエラー</translation>
     </message>
     <message>
       <source>License does not exist.</source>
@@ -1001,16 +1001,16 @@ to view more bookmarks</source>
       <translation>長いビデオをエクスポートしようとしています　ギガバイト以上の空き容量のを必要とし、数分かかることがあります</translation>
     </message>
     <message>
-      <source>Local files, server monitor widgets and webpages will not be exported.</source>
-      <translation>ローカルファイル、サーバーモニターウィジェット、およびWebページはエクスポートされません</translation>
-    </message>
-    <message>
       <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
       <translation>エクスポートされた.EXEファイルのサイズは4 GBを超えるのでWindowsで開くことはできません %1 Clientでのみ再生できます</translation>
     </message>
     <message>
+      <source>Local files, server monitor widgets and webpages will not be exported.</source>
+      <translation>ローカルファイル、サーバーモニターウィジェット、およびWebページはエクスポートされません</translation>
+    </message>
+    <message>
       <source>Settings are not available for .NOV and .EXE files.</source>
-      <translation type="unfinished">Settings are not available for .NOV and .EXE files.</translation>
+      <translation>.NOVと.EXEファイルでは設定を使用できません</translation>
     </message>
   </context>
   <context>
@@ -1170,14 +1170,6 @@ to view more bookmarks</source>
       <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
       <translation>ラテン文字、数字、およびキーボードの記号のみが許可されます</translation>
     </message>
-    <message>
-      <source>Long</source>
-      <translation>文字数</translation>
-    </message>
-    <message>
-      <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
-      <translation>ラテン文字、数字、およびキーボードシンボル%1のみが許可されます</translation>
-    </message>
     <message numerus="yes">
       <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
       <translation>
@@ -1189,6 +1181,10 @@ to view more bookmarks</source>
       <translation>
         <numerusform>パスワードは最低でも %n 文字以上にして下さい</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Long</source>
+      <translation>文字数</translation>
     </message>
     <message numerus="yes">
       <source>Password must be no longer than %n characters.</source>
@@ -1207,6 +1203,10 @@ to view more bookmarks</source>
       <translation>
         <numerusform>パスワードに %n 以上の繰り返し文字を使用しないでください</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
+      <translation>ラテン文字、数字、およびキーボードシンボル%1のみが許可されます</translation>
     </message>
   </context>
   <context>
@@ -2219,11 +2219,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Web</source>
-      <translation type="unfinished">Web</translation>
+      <translation>Web</translation>
     </message>
     <message>
       <source>No settings</source>
-      <translation type="unfinished">No settings</translation>
+      <translation>設定がありません</translation>
     </message>
   </context>
   <context>
@@ -2334,6 +2334,12 @@ to view more bookmarks</source>
     <message>
       <source>Edge</source>
       <translation>Edge</translation>
+    </message>
+    <message numerus="yes">
+      <source>This Id is already used on the following %n cameras: %1</source>
+      <translation type="unfinished">
+        <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -2449,6 +2455,10 @@ to view more bookmarks</source>
       <source>Server</source>
       <translation>サーバー</translation>
     </message>
+    <message>
+      <source>Logical Id</source>
+      <translation type="unfinished">Logical Id</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraMotionMaskWidget</name>
@@ -2485,7 +2495,7 @@ to view more bookmarks</source>
     <name>QnCameraMotionPolicy</name>
     <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation>%1 の録画やモーション検知は無効になります</translation>
+      <translation>%1 の記録やモーション検知は無効になります</translation>
     </message>
   </context>
   <context>
@@ -2507,10 +2517,6 @@ to view more bookmarks</source>
   <context>
     <name>QnCameraPasswordChangeDialog</name>
     <message>
-      <source>Password shouldn&apos;t be equal to camera&apos;s user name</source>
-      <translation>パスワードはカメラのユーザー名と同じにできません</translation>
-    </message>
-    <message>
       <source>New Password</source>
       <translation>新規パスワード</translation>
     </message>
@@ -2526,12 +2532,16 @@ to view more bookmarks</source>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
       <translation>パスワードは8文字以上で、異なる種類の文字を含む必要があります</translation>
     </message>
+    <message>
+      <source>Password should not be equal to camera&apos;s user name</source>
+      <translation type="unfinished">Password should not be equal to camera&apos;s user name</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraRecordingPolicy</name>
     <message>
       <source>Recording is disabled for %1</source>
-      <translation>%1 の録画を無効</translation>
+      <translation>%1 の記録を無効</translation>
     </message>
   </context>
   <context>
@@ -2702,11 +2712,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Cannot edit properties for several wearable and non-wearable cameras.</source>
-      <translation type="unfinished">Cannot edit properties for several wearable and non-wearable cameras.</translation>
+      <translation>複数のウェアラブルおよび非ウェアラブルカメラのプロパティを編集することはできません</translation>
     </message>
     <message>
       <source>Cannot edit properties for several wearable cameras.</source>
-      <translation type="unfinished">Cannot edit properties for several wearable cameras.</translation>
+      <translation>複数のウェアラブルカメラのプロパティを編集することはできません</translation>
     </message>
   </context>
   <context>
@@ -2800,8 +2810,8 @@ to %1</source>
       <translation>Emailまたはパスワードが間違っています</translation>
     </message>
     <message>
-      <source>Account isn&apos;t activated. Please check your email and follow provided instructions</source>
-      <translation>アカウントisn&apos;tが有効化されました。あなたのメールアドレスを確認して、指示に従ってください</translation>
+      <source>Account is not activated. Please check your email and follow provided instructions</source>
+      <translation>アカウントは有効化されていません。メールを確認して、指示に従ってください</translation>
     </message>
   </context>
   <context>
@@ -3149,15 +3159,13 @@ to %1</source>
       <source>Some of selected cameras requires password to be set up.</source>
       <translation>選択されたカメラの中には、パスワードの設定が必要なものがあります</translation>
     </message>
-    <message numerus="yes">
-      <source>Set Password</source>
-      <translation>
-        <numerusform>パスワードの設定</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Ask your system administrator to do it.</source>
       <translation>システム管理者に依頼してください</translation>
+    </message>
+    <message>
+      <source>Set Password</source>
+      <translation type="unfinished">Set Password</translation>
     </message>
   </context>
   <context>
@@ -4706,16 +4714,16 @@ to %1</source>
   <context>
     <name>QnPerformanceTest</name>
     <message>
-      <source>For full - featured mode, please use another computer</source>
-      <translation>フル機能モードでは別のコンピューターを使用してください</translation>
-    </message>
-    <message>
       <source>%1 can work in configuration mode only</source>
       <translation>%1 構成モードでのみ動作することができます</translation>
     </message>
     <message>
       <source>Performance of this computer allows running %1 in configuration mode only.</source>
       <translation>このコンピューターのパフォーマンスは構成モードでのみ %1 を実行することができます</translation>
+    </message>
+    <message>
+      <source>For full-featured mode please use another computer</source>
+      <translation type="unfinished">For full-featured mode please use another computer</translation>
     </message>
   </context>
   <context>
@@ -4969,22 +4977,6 @@ to %1</source>
     <message>
       <source>Quarter Native</source>
       <translation>Quarter Native</translation>
-    </message>
-    <message>
-      <source>1920x1080</source>
-      <translation>1920 x 1080</translation>
-    </message>
-    <message>
-      <source>1280x720</source>
-      <translation>1280 x 720</translation>
-    </message>
-    <message>
-      <source>640x480</source>
-      <translation>640 x 480</translation>
-    </message>
-    <message>
-      <source>320x240</source>
-      <translation>320 x 240</translation>
     </message>
   </context>
   <context>
@@ -6061,6 +6053,10 @@ to %1</source>
       <translation>認証情報を確認してください</translation>
     </message>
     <message>
+      <source>NO LIVE STREAM</source>
+      <translation>ライブストリームなし</translation>
+    </message>
+    <message>
       <source>TOO MANY CONNECTIONS</source>
       <translation>接続が多すぎます</translation>
     </message>
@@ -6073,8 +6069,8 @@ to %1</source>
       <translation>このカメラに設定</translation>
     </message>
     <message>
-      <source>NO LIVE STREAM</source>
-      <translation>ライブストリームなし</translation>
+      <source>UNSUPPORTED FIRMWARE VERSION</source>
+      <translation>サポートされていないファームウェアバージョン</translation>
     </message>
   </context>
   <context>
@@ -6168,11 +6164,11 @@ to %1</source>
     </message>
     <message>
       <source>Archive backup is completed up to &lt;b&gt;%1&lt;/b&gt;</source>
-      <translation>アーカイブのバックアップは &lt;b&gt;%1&lt;/b&gt;まで完了</translation>
+      <translation>アーカイブバックアップは&lt;b&gt;%1&lt;/b&gt;まで完了</translation>
     </message>
     <message>
       <source>Next backup is scheduled for &lt;b&gt;%1&lt;/b&gt;</source>
-      <translation>次のバックアップは &lt;b&gt;%1&lt;/b&gt; の予定</translation>
+      <translation>次のバックアップは&lt;b&gt;%1&lt;/b&gt;にスケジュールされています</translation>
     </message>
     <message>
       <source>Next backup is not scheduled.</source>
@@ -6457,7 +6453,7 @@ to %1</source>
     </message>
     <message>
       <source>Some users have not set their email addresses.</source>
-      <translation>一部のユーザーにメール アドレスが設定されていません.</translation>
+      <translation>一部のユーザーにメール アドレスが設定されていません</translation>
     </message>
     <message>
       <source>They cannot receive System notifications by email.</source>
@@ -6493,7 +6489,7 @@ to %1</source>
     </message>
     <message>
       <source>Remote archive synchronization</source>
-      <translation>リモートアーカイブの同期</translation>
+      <translation>Remote archive synchronization</translation>
     </message>
     <message>
       <source>Archive integrity problem detected</source>
@@ -6610,22 +6606,22 @@ to %1</source>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation>yyyy MMMM dd hh:mm</translation>
+      <translation>yyyy/MMMM/dd hh:mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation>yyyy MMMM dd hh:mm</translation>
+      <translation>yyyy/MMMM/dd hh:mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h ap</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>yyyy MMMM dd h ap</translation>
+      <translation>yyyy/MMMM/dd h ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy</source>
       <comment>Format for displaying day caption in timeline&apos;s header.</comment>
-      <translation>yyyy MMMM dd</translation>
+      <translation>yyyy/MMMM/dd</translation>
     </message>
     <message>
       <source>MMMM yyyy</source>
@@ -6640,12 +6636,12 @@ to %1</source>
     <message>
       <source>h:mm ap</source>
       <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-      <translation>hh:mm</translation>
+      <translation>h:mm ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h:mm ap</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>dd MMMM yyyy hh:mm</translation>
+      <translation>dd MMMM yyyy h:mm ap</translation>
     </message>
   </context>
   <context>
@@ -7094,23 +7090,21 @@ to %1</source>
       <source>Uploading %1... %2	%p%</source>
       <translation>アップロード中 %1... %2	%p%</translation>
     </message>
-    <message numerus="yes">
-      <source>(%n more file(s) in queue)</source>
-      <translation>
-        <numerusform>（%n 以上のファイル）</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Stop uploading?</source>
-      <translation type="unfinished">Stop uploading?</translation>
+      <translation>アップロードを停止しますか？</translation>
     </message>
     <message>
       <source>Already uploaded files will be kept.</source>
-      <translation type="unfinished">Already uploaded files will be kept.</translation>
+      <translation>既にアップロードされたファイルは保管されます</translation>
     </message>
     <message>
       <source>Finalizing %1... %2	%p%</source>
-      <translation type="unfinished">Finalizing %1... %2	%p%</translation>
+      <translation>ファイナライズ %1... %2	%p%</translation>
+    </message>
+    <message>
+      <source>(%1 of %2)</source>
+      <translation>(%1 / %2)</translation>
     </message>
   </context>
   <context>
@@ -7500,90 +7494,20 @@ to %1</source>
   <context>
     <name>QnWorkbenchWearableHandler</name>
     <message>
-      <source>Could not add wearable camera to server &quot;%1&quot;.</source>
-      <translation>サーバー &quot;%1&quot; にウェアラブルカメラを追加できません</translation>
-    </message>
-    <message>
       <source>All files (*.*)</source>
       <translation>すべてのファイル (*.*)</translation>
     </message>
     <message>
       <source>Video (%1)</source>
-      <translation type="unfinished">Video (%1)</translation>
+      <translation>ビデオ（%1）</translation>
     </message>
     <message>
       <source>Open Wearable Camera Recordings...</source>
-      <translation type="unfinished">Open Wearable Camera Recordings...</translation>
-    </message>
-    <message>
-      <source>No video files found in &quot;%1&quot;</source>
-      <translation type="unfinished">No video files found in &quot;%1&quot;</translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected file format(s) are not supported</source>
-      <translation type="unfinished">
-        <numerusform>Selected file format(s) are not supported</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Only video files are supported.</source>
-      <translation type="unfinished">Only video files are supported.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected file(s) do not have timestamp(s)</source>
-      <translation type="unfinished">
-        <numerusform>Selected file(s) do not have timestamp(s)</numerusform>
-      </translation>
+      <translation>ウェアラブルカメラ録画を開く...</translation>
     </message>
     <message>
       <source>Only video files with correct timestamp are supported.</source>
-      <translation type="unfinished">Only video files with correct timestamp are supported.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected file(s) cover periods for which videos are already being uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Selected file(s) cover periods for which videos are already being uploaded</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>You can upload these file(s) to a different instance of a Wearable Camera.</source>
-      <translation type="unfinished">
-        <numerusform>You can upload these file(s) to a different instance of a Wearable Camera.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected file(s) cover periods for which videos have already been uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Selected file(s) cover periods for which videos have already been uploaded</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected file(s) will not be uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Selected file(s) will not be uploaded</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Some file(s) will not be uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Some file(s) will not be uploaded</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>There is no new files to upload in &quot;%1&quot;</source>
-      <translation type="unfinished">There is no new files to upload in &quot;%1&quot;</translation>
-    </message>
-    <message>
-      <source>Not enough space on server storage</source>
-      <translation type="unfinished">Not enough space on server storage</translation>
-    </message>
-    <message numerus="yes">
-      <source>File(s) size - %1
-Free space - %2</source>
-      <translation type="unfinished">
-        <numerusform>File(s) size - %1
-Free space - %2</numerusform>
-      </translation>
+      <translation>正しいタイムスタンプを持つビデオファイルのみがサポートされます</translation>
     </message>
     <message>
       <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
@@ -7594,24 +7518,124 @@ Free space - %2</numerusform>
       <translation>別のユーザーが現在このカメラに映像をアップロードしているため、アップロードを開始できませんでした</translation>
     </message>
     <message>
-      <source>File format of &quot;%1&quot; is not supported.</source>
-      <translation type="unfinished">File format of &quot;%1&quot; is not supported.</translation>
+      <source>Failed to add wearable camera</source>
+      <translation>ウェアラブルカメラの追加に失敗しました</translation>
     </message>
     <message>
-      <source>File &quot;%1&quot; does not have timestamp.</source>
-      <translation type="unfinished">File &quot;%1&quot; does not have timestamp.</translation>
+      <source>No video files found in selected folder</source>
+      <translation>選択したフォルダにビデオファイルがありません</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file formats are not supported</source>
+      <translation>
+        <numerusform>選択したファイル形式はサポートされていません</numerusform>
+      </translation>
     </message>
     <message>
-      <source>File &quot;%1&quot; cover periods for which video is already being uploaded.</source>
-      <translation type="unfinished">File &quot;%1&quot; cover periods for which video is already being uploaded.</translation>
+      <source>Use .MKV, .AVI, .MP4 or other video files.</source>
+      <translation>MKV、AVI、MP4、またはその他のビデオファイルを使用してください</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files do not have timestamps</source>
+      <translation>
+        <numerusform>選択したファイルにタイムスタンプがありません</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files cover periods for which videos are already being uploaded</source>
+      <translation>
+        <numerusform>選択したファイルは、既にアップロードされている期間と重複します</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>You can upload these files to a different instance of a Wearable Camera.</source>
+      <translation>
+        <numerusform>これらのファイルは別のウェアラブルカメラにアップロードできます</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files cover periods for which videos have already been uploaded</source>
+      <translation>
+        <numerusform>選択したファイルは、既にアップロードされている期間と重複します</numerusform>
+      </translation>
     </message>
     <message>
-      <source>File &quot;%1&quot; cover periods for which video has already been uploaded.</source>
-      <translation type="unfinished">File &quot;%1&quot; cover periods for which video has already been uploaded.</translation>
+      <source>Selected files will not be uploaded</source>
+      <translation>選択したファイルはアップロードされません</translation>
     </message>
     <message>
-      <source>There is no space on server for file &quot;%1&quot;.</source>
-      <translation type="unfinished">There is no space on server for file &quot;%1&quot;.</translation>
+      <source>Some files will not be uploaded</source>
+      <translation>一部のファイルはアップロードされません</translation>
+    </message>
+    <message>
+      <source>No new files to upload in selected folder</source>
+      <translation>選択したフォルダにアップロードする新しいファイルがありません</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files are too old</source>
+      <translation>
+        <numerusform>選択したファイルは古すぎます</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation>
+        <numerusform>選択したファイルは %1に記録されましたが、最後の %n 日に録画されたファイルのみをアップロードできます。これはカメラのアーカイブ設定で変更できます</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation>
+        <numerusform>選択したファイルは %1 から %2の間で記録されましたが、最後の %n 日に記録されたファイルのみをアップロードできます。これはカメラのアーカイブ設定で変更できます</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Some footage may be deleted after uploading these files</source>
+      <translation>
+        <numerusform>これらのファイルをアップロードした後に一部の映像が削除されることがあります</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
+      <translation>
+        <numerusform>サーバーストレージには空き容量がほとんどありません。いくつかの古い映像は、空き容量を増やすために削除されることがあります。選択したファイルがサーバー上で最も古いファイルの場合は、アップロードされた直後に削除されます</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
+      <translation>これを防ぐために、追加のストレージを追加することができます。また、カメラ設定でアーカイブの保持時間を変更することで、最初に削除する映像を制御することもできます</translation>
+    </message>
+    <message>
+      <source>Upload anyway?</source>
+      <translation>アップロードを行いますか？</translation>
+    </message>
+    <message>
+      <source>Could not finish upload to %1</source>
+      <translation>%1へのアップロードを完了できませんでした</translation>
+    </message>
+    <message>
+      <source>Make sure there is enough space on server storage.</source>
+      <translation>サーバーストレージに十分なスペースがあることを確認してください</translation>
+    </message>
+    <message>
+      <source>%1 has unsupported format.</source>
+      <translation type="unfinished">%1 has unsupported format.</translation>
+    </message>
+    <message>
+      <source>%1 does not have timestamp.</source>
+      <translation type="unfinished">%1 does not have timestamp.</translation>
+    </message>
+    <message>
+      <source>%1 is older than allowed in camera archive settings.</source>
+      <translation type="unfinished">%1 is older than allowed in camera archive settings.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video has already been uploaded.</source>
+      <translation type="unfinished">%1 covers period for which video has already been uploaded.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video is being uploaded.</source>
+      <translation type="unfinished">%1 covers period for which video is being uploaded.</translation>
     </message>
   </context>
   <context>
@@ -7795,8 +7819,8 @@ Free space - %2</numerusform>
     </message>
     <message numerus="yes">
       <source>Some video file(s) are still being uploaded to %n wearable cameras:</source>
-      <translation type="unfinished">
-        <numerusform>Some video file(s) are still being uploaded to %n wearable cameras:</numerusform>
+      <translation>
+        <numerusform>一部のビデオファイルはウェアラブルカメラ %n にアップロード中です</numerusform>
       </translation>
     </message>
   </context>
@@ -7866,12 +7890,12 @@ Free space - %2</numerusform>
       <translation>ファイル書き込みエラー</translation>
     </message>
     <message>
-      <source>Internal error</source>
-      <translation>内部エラー</translation>
-    </message>
-    <message>
       <source>No data exported.</source>
       <translation>データはエクスポートされませんでした</translation>
+    </message>
+    <message>
+      <source>Internal error</source>
+      <translation>内部エラー</translation>
     </message>
   </context>
   <context>
@@ -8071,7 +8095,7 @@ Free space - %2</numerusform>
     <name>nx::client::desktop::WearableWorker</name>
     <message>
       <source>Failed to send request to the server.</source>
-      <translation type="unfinished">Failed to send request to the server.</translation>
+      <translation>サーバーへのリクエストに失敗しました</translation>
     </message>
   </context>
   <context>
@@ -8106,7 +8130,7 @@ Free space - %2</numerusform>
     </message>
     <message>
       <source>Selected period cannot be exported for the current camera.</source>
-      <translation type="unfinished">Selected period cannot be exported for the current camera.</translation>
+      <translation>選択した期間は現在のカメラではエクスポートできません</translation>
     </message>
   </context>
   <context>
@@ -8251,13 +8275,6 @@ Free space - %2</numerusform>
       <source>Pasted</source>
       <comment>from Clipboard</comment>
       <translation>貼付け</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::client::desktop::ui::LayoutPreviewPainter</name>
-    <message>
-      <source>NO DATA</source>
-      <translation>データがありません</translation>
     </message>
   </context>
   <context>
@@ -8560,16 +8577,16 @@ Free space - %2</numerusform>
       <translation>サーバーの ウェブ ページを開くのに失敗しました</translation>
     </message>
     <message>
+      <source>Wearable Cameras cannot be moved between servers</source>
+      <translation>ウェアラブルカメラはサーバー間で移動できません</translation>
+    </message>
+    <message>
       <source>Failed to change password</source>
       <translation>パスワードを変更できませんでした</translation>
     </message>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
       <translation>%2 カメラの %1 のパスワードを変更できませんでした</translation>
-    </message>
-    <message>
-      <source>Wearable Cameras cannot be moved between servers</source>
-      <translation type="unfinished">Wearable Cameras cannot be moved between servers</translation>
     </message>
   </context>
   <context>
@@ -8610,7 +8627,7 @@ Free space - %2</numerusform>
     </message>
     <message>
       <source>Delete Showreel %1?</source>
-      <translation>%1シーケンス表示を削除しますか？</translation>
+      <translation>Delete Showreel %1?</translation>
     </message>
   </context>
   <context>

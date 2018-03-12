@@ -5,7 +5,7 @@ Suite Teardown    Close All Browsers
 Test Template     Test Login Invalid
 
 *** Variables ***
-${url}    ${CLOUD TEST}
+${url}    ${ENV}
 ${good email}                   ${EMAIL VIEWER}
 ${good email unregistered}      ${EMAIL UNREGISTERED}
 ${good password}                ${BASE PASSWORD}
