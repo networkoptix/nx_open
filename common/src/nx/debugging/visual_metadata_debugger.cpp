@@ -36,6 +36,11 @@ VisualMetadataDebugger::VisualMetadataDebugger(
     start();
 }
 
+VisualMetadataDebugger::~VisualMetadataDebugger()
+{
+    stop();
+}
+
 void VisualMetadataDebugger::push(const CLConstVideoDecoderOutputPtr& frame)
 {
     QnMutexLocker lock(&m_mutex);
@@ -139,7 +144,7 @@ CLVideoDecoderOutputPtr VisualMetadataDebugger::decode(const QnConstCompressedVi
         m_decoder->getContext()->flags &= ~CODEC_FLAG_GRAY; //< Turn off Y-only mode.
     }
 
-    CLVideoDecoderOutputPtr decoded;
+    CLVideoDecoderOutputPtr decoded(new CLVideoDecoderOutput());
     if (!m_decoder->decode(video, &decoded))
         return CLVideoDecoderOutputPtr{nullptr};
 

@@ -5,6 +5,7 @@
 #include <QMap>
 
 #include <nx/streaming/rtp_stream_parser.h>
+#include <nx/debugging/abstract_visual_metadata_debugger.h>
 
 class QnRtspStatistic;
 
@@ -40,6 +41,7 @@ private:
     QFile m_analyticsMetadataLogFile;
     bool m_isAnalyticsMetadataLogFileOpened = false;
     qint64 m_lastFramePtsUs; //< Intended for debug.
+    nx::debugging::VisualMetadataDebuggerPtr m_visualDebugger;
 };
 
 typedef QSharedPointer<QnNxRtpParser> QnNxRtpParserPtr;

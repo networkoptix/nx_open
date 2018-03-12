@@ -77,6 +77,28 @@ struct VisualMetadataDebuggerIni : public nx::kit::IniConfig
         100,
         liveConnectionDebuggerMetadataCacheSize,
         "Metadata cache size of live connection visual metadata debugger.");
+
+    // Nx RTP parser debugger settings.
+    NX_INI_FLAG(
+        0,
+        enableNxRtpParserDebuggerInstance,
+        "Enable visual debugger for Nx RTP parser.");
+
+    NX_INI_STRING(
+        "",
+        nxRtpParserDebugOutputDirectory,
+        "Directory for Nx RTP parser visual debugger instance output.");
+
+    NX_INI_INT(
+        100,
+        nxRtpParserDebuggerFrameCacheSize,
+        "Frame cache size of Nx RTP parser visual metadata debugger.");
+
+    NX_INI_INT(
+        100,
+        nxRtpParserDebuggerMetadataCacheSize,
+        "Metadata cache size of Nx RTP parser visual metadata debugger.");
+
 };
 
 inline VisualMetadataDebuggerIni& visualDebuggerIni()

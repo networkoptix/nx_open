@@ -45,6 +45,14 @@ VisualMetadataDebuggerPtr VisualMetadataDebuggerFactory::makeDebugger(
             metadataCacheSize = visualDebuggerIni().liveConnectionDebuggerMetadataCacheSize;
             return makeDebuggerInternal(isEnabled, path, frameCacheSize, metadataCacheSize);
         }
+        case DebuggerType::nxRtpParser:
+        {
+            isEnabled = visualDebuggerIni().enableNxRtpParserDebuggerInstance;
+            path = QString::fromUtf8(visualDebuggerIni().nxRtpParserDebugOutputDirectory);
+            frameCacheSize = visualDebuggerIni().nxRtpParserDebuggerFrameCacheSize;
+            metadataCacheSize = visualDebuggerIni().nxRtpParserDebuggerMetadataCacheSize;
+            return makeDebuggerInternal(isEnabled, path, frameCacheSize, metadataCacheSize);
+        }
         default:
         {
             NX_ASSERT(false, lit("We should never be here"));
