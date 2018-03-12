@@ -49,7 +49,10 @@
 <table class="description" style="color: #263137;border: none;border-spacing: 0;width: 100%;padding: 10px 20px;background-color: #F8F9FA;margin-top: 15px">
     <thead>
         <tr>
-	    <th style="line-height: 30px">#</th>
+	        <th style="line-height: 30px">#</th>
+            {{#sourceIcon}}
+                <th style="line-height: 30px"></th>
+            {{/sourceIcon}}
             <th style="line-height: 30px">Source</th>
             <th style="line-height: 30px">User</th>
             <th style="line-height: 30px">Time</th>
@@ -59,6 +62,11 @@
     {{#aggregated}}
         <tr>
             <td style="vertical-align: top;text-align: left;padding-right: 5px;padding-top: 3px;padding-bottom: 3px">{{index}}</td>
+            {{#sourceIcon}}
+            <td style="vertical-align: top;text-align: left;padding-right: 5px;padding-top: 3px;padding-bottom: 3px">
+                <img src="{{sourceIcon}}" style="max-width: 100%" />
+            </td>
+            {{/sourceIcon}}
             <td style="vertical-align: top;text-align: left;padding-right: 5px;padding-top: 3px;padding-bottom: 3px"><b>{{source}}</b> ({{sourceIp}})</td>
             <td style="vertical-align: top;text-align: left;padding-right: 5px;padding-top: 3px;padding-bottom: 3px">{{user}}</td>
             <td style="vertical-align: top;text-align: left;padding-right: 5px;padding-top: 3px;padding-bottom: 3px">{{timestampDate}} <b>{{timestampTime}}</b></td>
@@ -79,6 +87,9 @@
 <table class="description" style="color: #263137;border: none;border-spacing: 0;width: 100%;padding: 10px 20px;background-color: #F8F9FA;margin-top: 15px">
     <thead>
         <tr>
+            {{#sourceIcon}}
+                <th style="line-height: 30px"></th>
+            {{/sourceIcon}}
             <th style="line-height: 30px">Source</th>
             <th style="line-height: 30px">User</th>
             <th style="line-height: 30px">Time</th>
@@ -87,6 +98,11 @@
     <tbody>
     {{#aggregated}}
         <tr>
+            {{#sourceIcon}}
+            <td style="vertical-align: top;text-align: left;padding-right: 5px;padding-top: 3px;padding-bottom: 3px">
+                <img src="{{sourceIcon}}" style="max-width: 100%" />
+            </td>
+            {{/sourceIcon}}
             <td style="vertical-align: top;text-align: left;padding-right: 5px;padding-top: 3px;padding-bottom: 3px"><b>{{source}}</b> ({{sourceIp}})</td>
             <td style="vertical-align: top;text-align: left;padding-right: 5px;padding-top: 3px;padding-bottom: 3px">{{user}}</td>
             <td style="vertical-align: top;text-align: left;padding-right: 5px;padding-top: 3px;padding-bottom: 3px">{{timestampDate}} <b>{{timestampTime}}</b></td>

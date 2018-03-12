@@ -78,11 +78,6 @@
       <translation>Estos sistemas se construyen con diferentes %1 URL. No se permite la unión.</translation>
     </message>
     <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>El Sistema de la nube sólo puede ser combinado con la no nube. El nombre del sistema y la contraseña son tomados del Sistema de la Nube.</translation>
-    </message>
-    <message>
       <source>New System</source>
       <translation>Nuevo Sistema</translation>
     </message>
@@ -90,6 +85,10 @@
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
       <translation>El Sistema descubierto %1 es incompatible con el Sistema actual.</translation>
+    </message>
+    <message>
+      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
+      <translation>El Sistema de la nube sólo puede ser combinado con la no nube. El nombre del sistema y la contraseña son tomados del Sistema de la Nube.</translation>
     </message>
   </context>
   <context>

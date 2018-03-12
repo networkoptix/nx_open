@@ -76,12 +76,34 @@
 
 #include <plugins/io_device/joystick/joystick_manager.h>
 
-namespace
+namespace {
+
+const int kSuccessCode = 0;
+const int kInvalidParametersCode = -1;
+static const nx::utils::log::Tag kMainWindow(lit("MainWindow"));
+
+void sendCloudPortalConfirmation(const nx::vms::utils::SystemUri& uri, QObject* owner)
 {
-    const int kSuccessCode = 0;
-    const int kInvalidParametersCode = -1;
-    static const nx::utils::log::Tag kMainWindow(lit("MainWindow"));
+    QPointer<QNetworkAccessManager> manager(new QNetworkAccessManager(owner));
+        QObject::connect(manager.data(), &QNetworkAccessManager::finished,
+            [manager](QNetworkReply* reply)
+            {
+                reply->deleteLater();
+                manager->deleteLater();
+            });
+
+        QUrl url(nx::network::AppInfo::defaultCloudPortalUrl(
+            nx::network::SocketGlobals::cloud().cloudHost()));
+        url.setPath(lit("/api/utils/visitedKey"));
+
+        const QJsonObject data{{lit("key"), uri.authenticator().encode()}};
+        QNetworkRequest request(url);
+        request.setHeader(QNetworkRequest::ContentTypeHeader, lit("application/json"));
+
+        manager->post(request, QJsonDocument(data).toJson(QJsonDocument::Compact));
 }
+
+} // namespace
 
 #ifndef API_TEST_MAIN
 
@@ -95,29 +117,6 @@ int runApplication(QtSingleApplication* application, const QnStartupParameters& 
         || !startupParams.customUri.isNull()
         || !startupParams.videoWallGuid.isNull();
 
-    if (startupParams.customUri.isValid())
-    {
-        QPointer<QNetworkAccessManager> manager(new QNetworkAccessManager(application));
-        QObject::connect(manager.data(), &QNetworkAccessManager::finished,
-            [manager](QNetworkReply* reply)
-            {
-                qDebug() << lit("Cloud Reply received: %1").arg(QLatin1String(reply->readAll()));
-                reply->deleteLater();
-                manager->deleteLater();
-            });
-
-        QUrl url(nx::network::AppInfo::defaultCloudPortalUrl(
-            nx::network::SocketGlobals::cloud().cloudHost()));
-        url.setPath(lit("/api/utils/visitedKey"));
-        qDebug() << "Sending Cloud Portal Confirmation to" << url.toString();
-
-        QJsonObject data{{lit("key"), startupParams.customUri.authenticator().encode()}};
-        QNetworkRequest request(url);
-        request.setHeader(QNetworkRequest::ContentTypeHeader, lit("application/json"));
-
-        manager->post(request, QJsonDocument(data).toJson(QJsonDocument::Compact));
-    }
-
     if (!allowMultipleClientInstances)
     {
         /* Check if application is already running. */
@@ -126,6 +125,9 @@ int runApplication(QtSingleApplication* application, const QnStartupParameters& 
     }
 
     QnClientModule client(startupParams);
+
+    if (startupParams.customUri.isValid())
+        sendCloudPortalConfirmation(startupParams.customUri, application);
 
     /* Running updater after QApplication and NX_LOG are initialized. */
     if (qnRuntime->isDesktopMode() && !startupParams.exportedMode)

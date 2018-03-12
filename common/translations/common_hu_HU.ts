@@ -78,11 +78,6 @@
       <translation>Ezek a rendszerek különböző %1 URL- használnak. Összevonás nem engedélyezett.</translation>
     </message>
     <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Felhő rendszer csak nem-felhő rendszerrel vonható össze. A rendszer név és jelszó a felhő rendszerből lesz átvéve.</translation>
-    </message>
-    <message>
       <source>New System</source>
       <translation>Új rendszer</translation>
     </message>
@@ -90,6 +85,10 @@
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
       <translation>A felfedezett %1 rendszer nem kompatibilis az aktuális rendszerrel.</translation>
+    </message>
+    <message>
+      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
+      <translation>Felhő rendszer csak nem-felhő rendszerrel vonható össze. A rendszer név és jelszó a felhő rendszerből lesz átvéve.</translation>
     </message>
   </context>
   <context>

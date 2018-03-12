@@ -68,21 +68,6 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
-    <name>CameraExpertSettingsWidget</name>
-    <message>
-        <source>Primary</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Secondary</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Edge</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>CompatibilityVersionInstallationDialog</name>
     <message>
         <source>Installing version %1</source>
@@ -998,25 +983,6 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
-    <name>ExportScheduleResourceSelectionDialogDelegate</name>
-    <message>
-        <source>Copy archive length settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Schedule motion type is not supported by some cameras.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Recording cannot be enabled for some cameras.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Schedule settings are not compatible with some devices.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>ExportSettingsDialog</name>
     <message>
         <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
@@ -1378,6 +1344,10 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Customer Support</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Client is not connected to any System</source>
         <translation></translation>
     </message>
 </context>
@@ -2207,6 +2177,80 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
+    <name>QnCameraAdvancedParamsWidget</name>
+    <message>
+        <source>Loading values...</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Applying changes...</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>QnCameraAdvancedSettingsWidget</name>
+    <message>
+        <source>Loading...</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Primary Stream</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Secondary Stream</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Camera has no secondary stream</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>This I/O module has no advanced settings</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>This camera has no advanced settings</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Audio Stream</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>URL is not available. Open stream and try again.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>URL is not available. Open video stream and try again.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>I/O module has no audio stream</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>I/O Module Id</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Camera Id</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Web</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnCameraAnalyticsPolicy</name>
     <message>
         <source>Analytics is not available for %1</source>
@@ -2300,6 +2344,28 @@ to view more bookmarks</source>
     <message>
         <source>Diagnostics complete</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>QnCameraExpertSettingsWidget</name>
+    <message>
+        <source>Primary</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Secondary</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Edge</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>This ID already used on camera %1</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2419,6 +2485,41 @@ to view more bookmarks</source>
         <source>Server</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Logical ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnCameraMotionMaskWidget</name>
+    <message>
+        <source>Too many motion windows</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Maximum number of motion windows for the current camera is %1, and %2 motion windows are currently selected.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Too many motion sensitivity settings</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Maximum number of motion sensitivity settings for the current camera is %1, and %2 settings are currently selected.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Too many motion areas</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Maximum number of motion areas for the current camera is %1, and %2 motion areas are currently selected.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Maximum number of motion sensitivity settings for any sensor of the current camera is %1, and %2 settings are currently selected.</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>QnCameraMotionPolicy</name>
@@ -2472,6 +2573,184 @@ to view more bookmarks</source>
     <message>
         <source>Recording is disabled for %1</source>
         <translation type="unfinished">Recording is disabled for %1.</translation>
+    </message>
+</context>
+<context>
+    <name>QnCameraScheduleWidget</name>
+    <message>
+        <source>Off</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>On</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Recording Schedule</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>based on server time</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Not enough licenses to enable recording</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>License limit exceeded, recording will not be enabled.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Turn on selector at the top of the window to enable recording.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Select areas on the schedule to apply chosen parameters to.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Set recording parameters and select areas on the schedule grid to apply them to.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Motion detection disabled or not supported</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Dual-Streaming not supported for this camera</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Dual-Streaming and motion detection not supported for this camera</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Motion detection disabled</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Mbit/s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Less Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>More Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnCameraSettingsDialog</name>
+    <message>
+        <source>Device Settings</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Devices Settings</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Camera Settings</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Cameras Settings</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>I/O Module Settings</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>I/O Modules Settings</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Show on Layout</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Event Log...</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Device Rules...</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Devices Rules...</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Camera Rules...</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Cameras Rules...</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>I/O Module Rules...</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>I/O Modules Rules...</source>
+        <translation></translation>
+    </message>
+    <message numerus="yes">
+        <source>Changes to the following %n devices are not saved:</source>
+        <translation>
+            <numerusform>Changes to the following %n device are not saved:</numerusform>
+            <numerusform>Changes to the following %n devices are not saved:</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Changes to the following %n cameras are not saved:</source>
+        <translation>
+            <numerusform>Changes to the following %n camera are not saved:</numerusform>
+            <numerusform>Changes to the following %n cameras are not saved:</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Changes to the following %n I/O Modules are not saved:</source>
+        <translation>
+            <numerusform>Changes to the following %n I/O Module are not saved:</numerusform>
+            <numerusform>Changes to the following %n I/O Modules are not saved:</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Apply changes before switching to another camera?</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>QnCameraSettingsWidget</name>
+    <message>
+        <source>Cannot edit properties for items of different types.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>No device selected.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Cannot edit properties for several wearable and non-wearable cameras.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Cannot edit properties for several wearable cameras.</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -3190,6 +3469,25 @@ to %1</source>
     </message>
 </context>
 <context>
+    <name>QnExportScheduleResourceSelectionDialogDelegate</name>
+    <message>
+        <source>Copy archive length settings</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Schedule motion type is not supported by some cameras.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Recording cannot be enabled for some cameras.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Schedule settings are not compatible with some devices.</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
     <name>QnFailoverPriorityDialog</name>
     <message>
         <source>Failover Priority</source>
@@ -3239,6 +3537,25 @@ to %1</source>
     </message>
     <message>
         <source>Failed to overwrite file</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>QnFisheyeCalibrationWidget</name>
+    <message>
+        <source>Loading preview, please wait...</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Auto calibration failed</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Image is not round.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Image might be too dim.</source>
         <translation></translation>
     </message>
 </context>
@@ -3404,6 +3721,21 @@ to %1</source>
     </message>
     <message>
         <source>Id</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>QnImageControlWidget</name>
+    <message>
+        <source>%1 degrees</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>multiple values</source>
         <translation></translation>
     </message>
 </context>
@@ -4261,6 +4593,29 @@ to %1</source>
     </message>
 </context>
 <context>
+    <name>QnMultipleCameraSettingsWidget</name>
+    <message>
+        <source>Secondary stream disabled for these cameras</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Set Recording to &quot;Always&quot;</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Enable Secondary Stream</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>multiple values</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
     <name>QnNavigationItem</name>
     <message>
         <source>Speed Down</source>
@@ -4419,16 +4774,16 @@ to %1</source>
 <context>
     <name>QnPerformanceTest</name>
     <message>
-        <source>For full - featured mode, please use another computer</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>%1 can work in configuration mode only</source>
         <translation></translation>
     </message>
     <message>
         <source>Performance of this computer allows running %1 in configuration mode only.</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>For full-featured mode please use another computer</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4783,6 +5138,37 @@ to %1</source>
     </message>
 </context>
 <context>
+    <name>QnRecordingStatusHelper</name>
+    <message>
+        <source>Not recording</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Recording everything</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Recording motion only</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Recording motion and low quality</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Continuous</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Motion only</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Motion + Lo-Res</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
     <name>QnRequiredPermissionSubjectPolicy</name>
     <message>
         <source>Role %1 has no %2 permission</source>
@@ -4916,71 +5302,12 @@ to %1</source>
         <source>Showreel</source>
         <translation></translation>
     </message>
-    <message>
-        <source>Cameras &amp; Devices</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Videowalls</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>QnResourceTreeModelOtherSystemsNode</name>
     <message>
         <source>New System</source>
         <translation></translation>
-    </message>
-</context>
-<context>
-    <name>QnResourceTreeWidget</name>
-    <message>
-        <source>All types</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Servers</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cameras &amp; Devices</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Layouts</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Layout Tours</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Video Walls</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Web Pages</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Users</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Local Files</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>add to current layout</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>open all at a new layout</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cameras &amp; Resources</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5531,6 +5858,65 @@ to %1</source>
     </message>
     <message>
         <source>Watermark Matched</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>QnSingleCameraSettingsWidget</name>
+    <message>
+        <source>Device Settings</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Camera Settings</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>I/O Module Settings</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Motion detection will work only when camera is being viewed. Enable recording to make it work all the time.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>FPS too high</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>FPS in the schedule was lowered from %1 to %2, which is the maximum for this camera.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>For software motion detection, 2 FPS are reserved for the secondary stream.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>FPS in the schedule was lowered from %1 to %2.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Secondary stream disabled for this camera</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Set Recording to &quot;Always&quot;</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Enable Secondary Stream</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Reset motion regions to default?</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>This action cannot be undone.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
         <translation></translation>
     </message>
 </context>
@@ -7598,496 +7984,6 @@ to %1</source>
     </message>
 </context>
 <context>
-    <name>nx::client::desktop::AnalyticsSearchListModel::Private</name>
-    <message>
-        <source>Unknown object</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Start</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Duration</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>nx::client::desktop::CameraAdvancedParamsWidget</name>
-    <message>
-        <source>Loading values...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Applying changes...</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>nx::client::desktop::CameraAdvancedSettingsWidget</name>
-    <message>
-        <source>Secondary Stream</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>I/O Module Id</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Camera Id</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This I/O module has no advanced settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This camera has no advanced settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Audio Stream</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Primary Stream</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>URL is not available. Open stream and try again.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>URL is not available. Open video stream and try again.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Web</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>No settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>I/O module has no audio stream</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Camera has no secondary stream</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Loading...</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>nx::client::desktop::CameraInfoWidget</name>
-    <message>
-        <source>Device Rules...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Camera Rules...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>I/O Module Rules...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>More Info</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Less Info</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>nx::client::desktop::CameraMotionMaskWidget</name>
-    <message>
-        <source>Too many motion windows</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Maximum number of motion windows for the current camera is %1, and %2 motion windows are currently selected.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Maximum number of motion sensitivity settings for any sensor of the current camera is %1, and %2 settings are currently selected.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Maximum number of motion sensitivity settings for the current camera is %1, and %2 settings are currently selected.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Too many motion sensitivity settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Too many motion areas</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Maximum number of motion areas for the current camera is %1, and %2 motion areas are currently selected.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>nx::client::desktop::CameraScheduleWidget</name>
-    <message>
-        <source>Mbit/s</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Recording Schedule</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>based on server time</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Less Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>More Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Off</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>On</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Motion detection disabled or not supported</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Dual-Streaming not supported for this camera</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Dual-Streaming and motion detection not supported for this camera</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Motion detection disabled</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Not enough licenses to enable recording</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>License limit exceeded, recording will not be enabled.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select areas on the schedule to apply chosen parameters to.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Turn on selector at the top of the window to enable recording.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Set recording parameters and select areas on the schedule grid to apply them to.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>nx::client::desktop::CameraSettingsDialog</name>
-    <message>
-        <source>General</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Recording</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>Changes to the following %n devices are not saved:</source>
-        <translation type="unfinished">
-            <numerusform>Changes to the following %n device are not saved:</numerusform>
-            <numerusform>Changes to the following %n devices are not saved:</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Changes to the following %n cameras are not saved:</source>
-        <translation type="unfinished">
-            <numerusform>Changes to the following %n camera are not saved:</numerusform>
-            <numerusform>Changes to the following %n cameras are not saved:</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Changes to the following %n I/O Modules are not saved:</source>
-        <translation type="unfinished">
-            <numerusform>Changes to the following %n I/O Module are not saved:</numerusform>
-            <numerusform>Changes to the following %n I/O Modules are not saved:</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Apply changes before switching to another camera?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Device Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Devices Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Camera Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cameras Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>I/O Module Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>I/O Modules Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>nx::client::desktop::CameraSettingsModel</name>
-    <message>
-        <source>I/O module has no audio stream</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Camera has no secondary stream</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>nx::client::desktop::CameraSettingsWidget</name>
-    <message>
-        <source>Cannot edit properties for items of different types.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>No device selected.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cannot edit properties for several wearable and non-wearable cameras.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cannot edit properties for several wearable cameras.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>nx::client::desktop::DeviceAdditionDialog</name>
-    <message>
-        <source>IP / Hostname / RTSP link / UDP link</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Start address</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>End address</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Examples:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Server offline</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Device search failed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>Failed to add %n devices</source>
-        <translation type="unfinished">
-            <numerusform>Failed to add %n device</numerusform>
-            <numerusform>Failed to add %n devices</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Scan</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Search</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>Add %n Devices</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Add all devices</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Initializing scan</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Scanning online hosts</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Checking host</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Finished</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Aborted</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Searching...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>No devices found</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>nx::client::desktop::EventPanel::Private</name>
-    <message>
-        <source>Notifications</source>
-        <comment>Notifications tab title</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Motion</source>
-        <comment>Motion tab title</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Bookmarks</source>
-        <comment>Bookmarks tab title</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Events</source>
-        <comment>Events tab title</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Objects</source>
-        <comment>Analytics tab title</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>No events</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>No events occured</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Any type</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&gt;99 events</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n events</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>No bookmarks</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select some period on timeline and click with right mouse button on it to create a bookmark.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&gt;99 bookmarks</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n bookmarks</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>No objects</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>No objects detected</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Anywhere on the video</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select some area on video</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>In selected area</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&gt;99 detected objects</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n detected objects</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-</context>
-<context>
     <name>nx::client::desktop::ExportProcess</name>
     <message>
         <source>Unsupported media for data export.</source>
@@ -8209,59 +8105,6 @@ to %1</source>
     </message>
 </context>
 <context>
-    <name>nx::client::desktop::FisheyeCalibrationWidget</name>
-    <message>
-        <source>Loading preview, please wait...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Auto calibration failed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Image is not round.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Image might be too dim.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>nx::client::desktop::FoundDevicesModel</name>
-    <message>
-        <source>Brand</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Model</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Address</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 devices total, %2 new </source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>nx::client::desktop::ImageControlWidget</name>
-    <message>
-        <source>Auto</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>multiple values</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 degrees</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>nx::client::desktop::ImageOverlaySettingsWidget</name>
     <message>
         <source>Select file...</source>
@@ -8288,206 +8131,6 @@ to %1</source>
     </message>
     <message>
         <source>NOT A CAMERA</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>nx::client::desktop::LegacyCameraSettingsDialog</name>
-    <message>
-        <source>Show on Layout</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Event Log...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Device Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Devices Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Camera Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cameras Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>I/O Module Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>I/O Modules Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Device Rules...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Devices Rules...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Camera Rules...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cameras Rules...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>I/O Module Rules...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>I/O Modules Rules...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>Changes to the following %n devices are not saved:</source>
-        <translation type="unfinished">
-            <numerusform>Changes to the following %n device are not saved:</numerusform>
-            <numerusform>Changes to the following %n devices are not saved:</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Changes to the following %n cameras are not saved:</source>
-        <translation type="unfinished">
-            <numerusform>Changes to the following %n camera are not saved:</numerusform>
-            <numerusform>Changes to the following %n cameras are not saved:</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Changes to the following %n I/O Modules are not saved:</source>
-        <translation type="unfinished">
-            <numerusform>Changes to the following %n I/O Module are not saved:</numerusform>
-            <numerusform>Changes to the following %n I/O Modules are not saved:</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Apply changes before switching to another camera?</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>nx::client::desktop::ManualDeviceSearcher</name>
-    <message>
-        <source>Server is not specified</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Server offline</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Device address field must contain a valid URL, IP address, or RTSP link.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>First address in range is greater than the last one.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The specified IP address range has more than 255 addresses.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Can&apos;t start searching process</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>nx::client::desktop::MotionSearchListModel</name>
-    <message>
-        <source>Motion on camera</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Start</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Duration</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>nx::client::desktop::MotionSearchListModel::Private</name>
-    <message>
-        <source>Bookmark it...</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>nx::client::desktop::MotionSearchWidget</name>
-    <message>
-        <source>No motion</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>No motion detected</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Motion search is turned off</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n motion events</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-</context>
-<context>
-    <name>nx::client::desktop::MultipleCameraSettingsWidget</name>
-    <message>
-        <source>Secondary stream disabled for these cameras</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Set Recording to &quot;Always&quot;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enable Secondary Stream</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>multiple values</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>nx::client::desktop::NotificationListModel::Private</name>
-    <message>
-        <source>Alarm: %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Acknowledge</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>nx::client::desktop::PresentedStateDelegate</name>
-    <message>
-        <source>Added</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Adding</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8528,96 +8171,6 @@ to %1</source>
     </message>
 </context>
 <context>
-    <name>nx::client::desktop::RecordingStatusHelper</name>
-    <message>
-        <source>Not recording</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Recording everything</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Recording motion only</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Recording motion and low quality</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Continuous</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Motion only</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Motion + Lo-Res</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>nx::client::desktop::SingleCameraSettingsWidget</name>
-    <message>
-        <source>Device Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Camera Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>I/O Module Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>FPS too high</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>FPS in the schedule was lowered from %1 to %2, which is the maximum for this camera.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>For software motion detection, 2 FPS are reserved for the secondary stream.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>FPS in the schedule was lowered from %1 to %2.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Motion detection will work only when camera is being viewed. Enable recording to make it work all the time.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Secondary stream disabled for this camera</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Set Recording to &quot;Always&quot;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enable Secondary Stream</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Reset motion regions to default?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This action cannot be undone.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>nx::client::desktop::TimestampOverlaySettingsWidget</name>
     <message>
         <source>Long</source>
@@ -8625,29 +8178,6 @@ to %1</source>
     </message>
     <message>
         <source>Short</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>nx::client::desktop::UnifiedSearchWidget</name>
-    <message>
-        <source>Any time</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Last day</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Last 7 days</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Last 30 days</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Selected on Timeline</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8717,14 +8247,6 @@ to %1</source>
     </message>
     <message>
         <source>Selected period cannot be exported for the current camera.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Export video</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Minimize</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -9128,6 +8650,14 @@ to %1</source>
     </message>
     <message>
         <source>Failed to upload image</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Client</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Server</source>
         <translation></translation>
     </message>
     <message>

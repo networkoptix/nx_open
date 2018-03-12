@@ -752,6 +752,26 @@
       <source>PTZ</source>
       <translation type="unfinished">PTZ</translation>
     </message>
+    <message>
+      <location/>
+      <source>Logical ID</source>
+      <translation type="unfinished">Logical ID</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Generate</source>
+      <translation type="unfinished">Generate</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset</source>
+      <translation>Reset</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Invalid Logical Id label</source>
+      <translation type="unfinished">Invalid Logical Id label</translation>
+    </message>
   </context>
   <context>
     <name>CameraInputBusinessEventWidget</name>

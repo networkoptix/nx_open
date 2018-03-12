@@ -78,11 +78,6 @@
       <translation>These Systems are built with different %1 URL. Merge is not allowed.</translation>
     </message>
     <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</translation>
-    </message>
-    <message>
       <source>New System</source>
       <translation>New System</translation>
     </message>
@@ -90,6 +85,10 @@
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
       <translation>The discovered System %1 is incompatible with the current System.</translation>
+    </message>
+    <message>
+      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
+      <translation>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</translation>
     </message>
   </context>
   <context>

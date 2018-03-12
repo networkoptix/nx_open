@@ -2985,15 +2985,13 @@ void QnWorkbenchVideoWallHandler::updateControlLayout(const QnVideoWallResourceP
     }
     else if (action == ItemAction::Removed)
     {
-        for (int i = 0; i < workbench()->layouts().size(); ++i)
+        QnWorkbenchLayoutList layoutsToClose;
+        for (auto layout: workbench()->layouts())
         {
-            QnWorkbenchLayout *layout = workbench()->layout(i);
-
-            if (layout->data(Qn::VideoWallItemGuidRole).value<QnUuid>() != item.uuid)
-                continue;
-            layout->setData(Qn::VideoWallItemGuidRole, qVariantFromValue(QnUuid()));
-            layout->notifyTitleChanged();
+            if (layout->data(Qn::VideoWallItemGuidRole).value<QnUuid>() == item.uuid)
+                layoutsToClose << layout;
         }
+        menu()->trigger(ui::action::CloseLayoutAction, layoutsToClose);
     }
 }
 

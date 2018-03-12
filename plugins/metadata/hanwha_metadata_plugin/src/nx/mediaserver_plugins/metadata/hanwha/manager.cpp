@@ -9,6 +9,7 @@
 
 #include <nx/sdk/metadata/common_event.h>
 #include <nx/sdk/metadata/common_metadata_packet.h>
+#include <nx/utils/log/log.h>
 
 #include "common.h"
 
@@ -78,6 +79,9 @@ Error Manager::startFetchingMetadata(nxpl::NX_GUID* /*typeList*/, int /*typeList
                     << hanwhaEvent.caption.toStdString() << "], description ["
                     << hanwhaEvent.description.toStdString() << "], "
                     << "channel " << m_channel;
+                    
+                NX_VERBOSE(this, lm("Got event: %1 %2 on channel %3").args(
+                    hanwhaEvent.caption, hanwhaEvent.description, m_channel));
 
                 event->setTypeId(hanwhaEvent.typeId);
                 event->setCaption(hanwhaEvent.caption.toStdString());

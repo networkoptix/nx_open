@@ -4,6 +4,7 @@
 
 #include <nx/utils/std/cpp14.h>
 #include "bytestream_filter.h"
+#include <nx/utils/log/log.h>
 
 #if defined(__GNUC__) || defined(__clang__)
     #define NX_PRETTY_FUNCTION __PRETTY_FUNCTION__
@@ -71,7 +72,7 @@ void MetadataMonitor::stopMonitoring()
         });
 
     promise.get_future().wait();
-    std::cout << "--------------" << NX_PRETTY_FUNCTION << std::endl;
+    NX_DEBUG(this, "Stopped");
 }
 
 void MetadataMonitor::addHandler(const QString& handlerId, const Handler& handler)
@@ -117,7 +118,7 @@ void MetadataMonitor::initMonitorUnsafe()
     if (!m_monitoringIsInProgress)
         return;
 
-    std::cout << "--------------" << NX_PRETTY_FUNCTION << std::endl;
+    NX_DEBUG(this, "Initialization");
     auto httpClient = nx::network::http::AsyncHttpClient::create();
     m_timer.cancelSync();
     httpClient->bindToAioThread(m_timer.getAioThread());

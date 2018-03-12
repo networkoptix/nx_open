@@ -6,7 +6,6 @@
 #include <nx/network/system_socket.h>
 
 #include <QtXml/QXmlDefaultHandler>
-#include "core/resource_management/resource_pool.h"
 #include <nx/network/nettools.h>
 #include <nx/network/socket.h>
 

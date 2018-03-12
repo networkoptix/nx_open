@@ -403,7 +403,7 @@ void ExportSettingsDialog::updateSettingsWidgets()
 {
     const auto& mediaPersistentSettings = d->exportMediaPersistentSettings();
 
-    if (mediaPersistentSettings.shouldExportOverlays())
+    if (mediaPersistentSettings.canExportOverlays())
     {
         ui->exportLayoutSettingsPage->setLayoutReadOnly(d->exportLayoutPersistentSettings().readOnly);
         ui->exportMediaSettingsPage->setApplyFilters(mediaPersistentSettings.applyFilters);
@@ -505,18 +505,12 @@ void ExportSettingsDialog::updateWidgetsState()
     const auto& settings = d->exportMediaPersistentSettings();
     bool transcodingLocked = settings.areFiltersForced();
     bool transcodingChecked = settings.applyFilters;
-    bool overlayOptionsAvailable = d->mode() == Mode::Media;
+    bool overlayOptionsAvailable = d->mode() == Mode::Media && settings.canExportOverlays();
 
     if (d->mode() == Mode::Media && !d->hasVideo())
     {
         transcodingLocked = true;
         transcodingChecked = false;
-    }
-
-    // Should hide additional overlay buttons of transcoding is disabled.
-    if (!transcodingChecked || transcodingLocked)
-    {
-        overlayOptionsAvailable = false;
     }
 
     // Applying data to UI.
@@ -533,7 +527,7 @@ void ExportSettingsDialog::updateWidgetsState()
         ui->transcodingButtonsWidget->setHidden(!overlayOptionsAvailable);
     }
 
-    if (settings.shouldExportOverlays())
+    if (settings.canExportOverlays())
     {
         ui->timestampSettingsPage->setFormatEnabled(d->mediaSupportsUtc());
     }

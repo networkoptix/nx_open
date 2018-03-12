@@ -249,7 +249,7 @@ public:
     QnUuid preferredServerId() const;
 
     nx::api::AnalyticsSupportedEvents analyticsSupportedEvents() const;
-    void setAnalyticsSupportedEvents(const nx::api::AnalyticsSupportedEvents& eventsList);
+    virtual void setAnalyticsSupportedEvents(const nx::api::AnalyticsSupportedEvents& eventsList);
 
     //!Returns list of time periods of DTS archive, containing motion at specified \a regions with timestamp in region [\a msStartTime; \a msEndTime)
     /*!

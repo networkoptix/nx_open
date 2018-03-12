@@ -81,11 +81,10 @@
 
 namespace {
 
-static const QString tpProductLogoFilename(lit("productLogoFilename"));
-static const QString tpEventLogoFilename(lit("eventLogoFilename"));
 static const QString tpProductLogo(lit("logo"));
 static const QString tpSystemIcon(lit("systemIcon"));
 static const QString tpOwnerIcon(lit("ownerIcon"));
+static const QString tpSourceIcon(lit("sourceIcon"));
 static const QString tpCloudOwner(lit("cloudOwner"));
 static const QString tpCloudOwnerEmail(lit("cloudOwnerEmail"));
 static const QString tpCompanyName(lit("companyName"));
@@ -628,22 +627,41 @@ void ExtendedRuleProcessor::sendEmailAsync(
     QnEmailSettings emailSettings = commonModule()->globalSettings()->emailSettings();
     QString cloudOwnerAccount = commonModule()->globalSettings()->cloudAccountName();
 
+    auto addIcon =
+        [&attachments, &contextMap](const QString& name, const QString& source)
+        {
+            attachments << QnEmailAttachmentPtr(
+                new QnEmailAttachment(
+                    name,
+                    source,
+                    tpImageMimeType));
+            contextMap[name] = lit("cid:") + name;
+        };
+
+
     if (isHtml)
     {
-        attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpProductLogo, lit(":/skin/email_attachments/productLogo.png"), tpImageMimeType)));
-        attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpSystemIcon, lit(":/skin/email_attachments/systemIcon.png"), tpImageMimeType)));
+        addIcon(tpProductLogo, lit(":/skin/email_attachments/productLogo.png"));
+        addIcon(tpSystemIcon, lit(":/skin/email_attachments/systemIcon.png"));
 
-        contextMap[tpProductLogoFilename] = lit("cid:") + tpProductLogo;
-        contextMap[tpSystemIcon] = lit("cid:") + tpSystemIcon;
+        const auto eventType = action->getRuntimeParams().eventType;
+        switch (eventType)
+        {
+            case vms::event::cameraDisconnectEvent:
+            case vms::event::licenseIssueEvent:
+            case vms::event::networkIssueEvent:
+            case vms::event::softwareTriggerEvent:
+                addIcon(tpSourceIcon, lit(":/skin/email_attachments/cameraIcon.png"));
+                break;
+            default:
+                break;
+        }
     }
 
     if (!cloudOwnerAccount.isEmpty())
     {
         if (isHtml)
-        {
-            attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpOwnerIcon, lit(":/skin/email_attachments/ownerIcon.png"), tpImageMimeType)));
-            contextMap[tpOwnerIcon] = lit("cid:") + tpOwnerIcon;
-        }
+            addIcon(tpOwnerIcon, lit(":/skin/email_attachments/ownerIcon.png"));
 
         contextMap[tpCloudOwnerEmail] = cloudOwnerAccount;
 

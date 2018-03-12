@@ -255,6 +255,7 @@ def wait_for_method_matched(artifact_factory, servers, method, api_object, api_m
 
 def wait_for_data_merged(artifact_factory, servers, merge_timeout, start_time):
     for api_method in [
+#            'getMediaServersEx',  # the only method to debug/check if servers are actually able to merge
             'getUsers',
             'getStorages',
             'getLayouts',

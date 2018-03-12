@@ -110,7 +110,10 @@ void HanwhaPtzExecutor::sendValueToDevice(const QString& parameterName, int para
             const auto url = HanwhaRequestHelper::buildRequestUrl(
                 m_hanwhaResource->sharedContext().get(),
                 lit("image/focus/control"),
-                {{parameterName, QString::number(parameterValue)}});
+                {
+                    { parameterName, QString::number(parameterValue) },
+                    { kHanwhaChannelProperty, QString::number(m_hanwhaResource->getChannel())}
+                });
 
             httpClient->doGet(
                 url,

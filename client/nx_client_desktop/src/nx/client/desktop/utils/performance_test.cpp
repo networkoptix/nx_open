@@ -48,7 +48,7 @@ void PerformanceTest::detectLightMode()
             const auto renderer = QString::fromLatin1(reinterpret_cast<const char*>(
                 context->functions()->glGetString(GL_RENDERER)));
             QRegExp poorRendererRegExp(
-                lit("Gallium .* on llvmpipe .*|Mesa DRI Intel\\(R\\) Bay Trail.*"));
+                QLatin1String("Gallium .* on llvmpipe .*|Mesa DRI Intel\\(R\\) Bay Trail.*"));
             poorGpu = poorRendererRegExp.exactMatch(renderer);
 
             NX_LOG(lm("QnPerformanceTest: Renderer: \"%1\" poor: %2").arg(renderer).arg(poorGpu), cl_logINFO);
@@ -69,7 +69,7 @@ void PerformanceTest::detectLightMode()
                 .arg(QnClientAppInfo::applicationDisplayName());
         extras += L'\n';
         extras += QCoreApplication::translate(
-            "QnPerformanceTest", "For full-featured mode, please use another computer");
+            "QnPerformanceTest", "For full-featured mode please use another computer");
 
         QnMessageBox::warning(nullptr, text, extras);
     }

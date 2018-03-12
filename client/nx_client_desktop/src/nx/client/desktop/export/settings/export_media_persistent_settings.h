@@ -114,6 +114,8 @@ struct ExportMediaPersistentSettings
     bool applyFilters = false;
     QString fileFormat;
 
+    bool hasVideo = true;
+
     int dimension = 1080; //< Smaller dimension of exported resolution.
 
     ExportRapidReviewPersistentSettings rapidReview;
@@ -146,7 +148,7 @@ struct ExportMediaPersistentSettings
     /**
      * Check if we add overlays to exported video.
      */
-    bool shouldExportOverlays() const;
+    bool canExportOverlays() const;
 
     void updateRuntimeSettings(ExportMediaSettings& runtimeSettings) const;
     void setDimension(int newDimension);
