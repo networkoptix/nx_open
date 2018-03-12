@@ -35,7 +35,7 @@
     </message>
     <message>
       <source>Save password</source>
-      <translation>שמור סיסמה</translation>
+      <translation>שמור סיסמא</translation>
     </message>
     <message>
       <source>Auto-login</source>

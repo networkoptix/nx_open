@@ -88,7 +88,7 @@
     </message>
     <message>
       <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <translation>מערכת ענן מאפשרת למזג רק עם שאינה בענן. שם המערכת והסיסמה נלקחים מהמערכת שבענן.</translation>
+      <translation>מערכת ענן מאפשרת למזג רק עם שאינה בענן. שם המערכת והסיסמא נלקחים מהמערכת שבענן.</translation>
     </message>
   </context>
   <context>
@@ -491,7 +491,7 @@
     </message>
     <message>
       <source>Bridge</source>
-      <translation type="unfinished">Bridge</translation>
+      <translation>Bridge</translation>
     </message>
     <message>
       <source>Bridge Licenses</source>

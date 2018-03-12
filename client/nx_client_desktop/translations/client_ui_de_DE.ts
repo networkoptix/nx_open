@@ -754,13 +754,8 @@
     </message>
     <message>
       <location/>
-      <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
-    </message>
-    <message>
-      <location/>
       <source>Generate</source>
-      <translation type="unfinished">Generate</translation>
+      <translation>Erzeugen</translation>
     </message>
     <message>
       <location/>
@@ -769,8 +764,8 @@
     </message>
     <message>
       <location/>
-      <source>Invalid Logical Id label</source>
-      <translation type="unfinished">Invalid Logical Id label</translation>
+      <source>Logical Id</source>
+      <translation>Logical-ID</translation>
     </message>
   </context>
   <context>
@@ -1808,7 +1803,7 @@
     </message>
     <message>
       <location/>
-      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
+      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
       <translation>&quot;Tragbare Kamera&quot; ist ein virtueller Speicher für Videodateien, der auf jeden Server auf Ihrem System hochgeladen werden kann und von jedem Benutzer zugänglich ist.</translation>
     </message>
   </context>

@@ -32,7 +32,7 @@ Qn::TextValidateFunction makeNonCameraUserNameValidator(const QnVirtualCameraRes
         [userNames](const QString& text)
         {
             static const auto kErrorMessage = QnCameraPasswordChangeDialog::tr(
-                "Password shouldn't be equal to camera's user name");
+                "Password should not be equal to camera's user name");
             return userNames.contains(text)
                 ? Qn::ValidationResult(QValidator::Invalid, kErrorMessage)
                 : Qn::kValidResult;

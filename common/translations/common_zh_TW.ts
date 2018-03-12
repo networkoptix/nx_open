@@ -315,7 +315,7 @@
     </message>
     <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
-      <translation type="unfinished">Please update firmware. Minimal supported version is %1. Current version is %2</translation>
+      <translation>請更新韌體. 至少更新到 %1. 目前版本是 %2</translation>
     </message>
   </context>
   <context>
@@ -993,7 +993,7 @@
     </message>
     <message>
       <source>Live Viewer</source>
-      <translation>即時影像瀏覽</translation>
+      <translation>即時影像瀏覽者</translation>
     </message>
     <message>
       <source>Custom Role</source>

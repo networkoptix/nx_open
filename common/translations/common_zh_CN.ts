@@ -315,7 +315,7 @@
     </message>
     <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
-      <translation type="unfinished">Please update firmware. Minimal supported version is %1. Current version is %2</translation>
+      <translation>请更新固件。最小支持版本是 %1。当前版本是 %2</translation>
     </message>
   </context>
   <context>
@@ -985,15 +985,15 @@
     </message>
     <message>
       <source>Advanced Viewer</source>
-      <translation>高级操作员</translation>
+      <translation>高级浏览者</translation>
     </message>
     <message>
       <source>Viewer</source>
-      <translation>操作员</translation>
+      <translation>浏览者</translation>
     </message>
     <message>
       <source>Live Viewer</source>
-      <translation>实时操作员</translation>
+      <translation>实时浏览者</translation>
     </message>
     <message>
       <source>Custom Role</source>

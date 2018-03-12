@@ -55,7 +55,7 @@ QnCameraExpertSettingsWidget::QnCameraExpertSettingsWidget(QWidget* parent):
     setWarningStyle(ui->settingsWarningLabel);
     setWarningStyle(ui->bitrateIncreaseWarningLabel);
     setWarningStyle(ui->generalWarningLabel);
-    setWarningStyle(ui->InvalidLogicalIdText);
+    setWarningStyle(ui->logicalIdWarningLabel);
 
     ui->settingsWarningLabel->setVisible(false);
     ui->bitrateIncreaseWarningLabel->setVisible(false);
@@ -468,20 +468,23 @@ void QnCameraExpertSettingsWidget::updateLogicalIdControls()
 {
     auto duplicateCameras = commonModule()->resourcePool()->getAllCameras().filtered(
         [this](const QnVirtualCameraResourcePtr camera)
-    {
-        return !camera->getLogicalId().isEmpty()
-            && camera->getLogicalId().toInt() == ui->logicalIdSpinBox->value()
-            && camera->getId() != m_currentCameraId;
-    });
+        {
+            return !camera->getLogicalId().isEmpty()
+                && camera->getLogicalId().toInt() == ui->logicalIdSpinBox->value()
+                && camera->getId() != m_currentCameraId;
+        });
 
     QStringList cameraNames;
     for (const auto& camera : duplicateCameras)
         cameraNames << camera->getName();
-    const auto errorMessage = tr("This ID already used on camera %1", "", cameraNames.size())
+    const auto errorMessage = tr(
+            "This Id is already used on the following %n cameras: %1",
+            "",
+            cameraNames.size())
         .arg(lit("<b>%1</b>").arg(cameraNames.join(lit(", "))));
 
-    ui->InvalidLogicalIdText->setVisible(!duplicateCameras.isEmpty());
-    ui->InvalidLogicalIdText->setText(errorMessage);
+    ui->logicalIdWarningLabel->setVisible(!duplicateCameras.isEmpty());
+    ui->logicalIdWarningLabel->setText(errorMessage);
 
     if (duplicateCameras.isEmpty())
         resetStyle(ui->logicalIdSpinBox);

@@ -394,7 +394,7 @@
     <message>
       <location/>
       <source>Area Width</source>
-      <translation>Kích thước hình ảnh</translation>
+      <translation>Chiều rộng diện tích</translation>
     </message>
     <message>
       <location/>
@@ -675,7 +675,7 @@
     <message>
       <location/>
       <source>Restore Defaults</source>
-      <translation>Khôi phục mặc định</translation>
+      <translation>khôi phục mặc định</translation>
     </message>
     <message>
       <location/>
@@ -750,12 +750,7 @@
     <message>
       <location/>
       <source>PTZ</source>
-      <translation type="unfinished">PTZ</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>PTZ</translation>
     </message>
     <message>
       <location/>
@@ -769,8 +764,8 @@
     </message>
     <message>
       <location/>
-      <source>Invalid Logical Id label</source>
-      <translation type="unfinished">Invalid Logical Id label</translation>
+      <source>Logical Id</source>
+      <translation type="unfinished">Logical Id</translation>
     </message>
   </context>
   <context>
@@ -1098,7 +1093,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/export_media_settings_widget.ui"/>
       <source>Export Settings</source>
-      <translation>Xuất cài đặt</translation>
+      <translation>Lưu cầu hình cài đặt</translation>
     </message>
     <message>
       <location/>
@@ -1131,7 +1126,7 @@
     <message>
       <location/>
       <source>Export Settings</source>
-      <translation>Xuất cài đặt</translation>
+      <translation>Lưu cầu hình cài đặt</translation>
     </message>
     <message>
       <location/>
@@ -1808,8 +1803,8 @@
     </message>
     <message>
       <location/>
-      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</translation>
+      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
     </message>
   </context>
   <context>

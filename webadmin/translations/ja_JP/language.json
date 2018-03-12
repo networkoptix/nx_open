@@ -215,7 +215,7 @@
             "noData": "データがありません",
             "flashRequired": "動画を再生するには <a href='https://get.adobe.com/flashplayer/' target='_blank'> Adobe Flash をインストール</a> をしてください。"
         },
-        "chromeCastWarning": "Chromecast はリソース集中型の為、サーバーで問題が発生する可能性があります",
+        "chromeCastWarning": "Chromecast リソース集中型の為、サーバーで問題が発生する可能性があります",
         "resolution": {
             "high": "高い",
             "auto": "自動",

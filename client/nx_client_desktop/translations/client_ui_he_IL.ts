@@ -394,7 +394,7 @@
     <message>
       <location/>
       <source>Area Width</source>
-      <translation>רוחב שטח</translation>
+      <translation>רוחב אזור</translation>
     </message>
     <message>
       <location/>
@@ -754,11 +754,6 @@
     </message>
     <message>
       <location/>
-      <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
-    </message>
-    <message>
-      <location/>
       <source>Generate</source>
       <translation type="unfinished">Generate</translation>
     </message>
@@ -769,8 +764,8 @@
     </message>
     <message>
       <location/>
-      <source>Invalid Logical Id label</source>
-      <translation type="unfinished">Invalid Logical Id label</translation>
+      <source>Logical Id</source>
+      <translation type="unfinished">Logical Id</translation>
     </message>
   </context>
   <context>
@@ -1771,7 +1766,7 @@
     <message>
       <location/>
       <source>Password:</source>
-      <translation>סיסמה:</translation>
+      <translation>סיסמא:</translation>
     </message>
     <message>
       <location/>
@@ -1808,8 +1803,8 @@
     </message>
     <message>
       <location/>
-      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</translation>
+      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
     </message>
   </context>
   <context>
@@ -1994,7 +1989,7 @@
     <message>
       <location/>
       <source>Enter a valid username and password...</source>
-      <translation>הכנס שם משתמש וסיסמה תקינים...</translation>
+      <translation>הכנס שם משתמש וסיסמא תקינים...</translation>
     </message>
   </context>
   <context>
@@ -2061,7 +2056,7 @@
     <message>
       <location/>
       <source>The new System will have password and name from System:</source>
-      <translation>המערכת החדשה תקבל שם וסיסמה ממערכת:</translation>
+      <translation>המערכת החדשה תקבל שם וסיסמא ממערכת:</translation>
     </message>
   </context>
   <context>

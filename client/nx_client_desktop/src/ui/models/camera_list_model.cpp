@@ -129,7 +129,7 @@ QVariant QnCameraListModel::headerData(int section, Qt::Orientation orientation,
     case FirmwareColumn:  return tr("Firmware");
     case IpColumn:        return tr("IP/Name");
     case MacColumn:       return tr("MAC address");
-    case LogicalIdColumn: return tr("Logical ID");
+    case LogicalIdColumn: return tr("Logical Id");
     case ServerColumn:    return tr("Server");
     default:
         break;

@@ -178,17 +178,17 @@
     "common": {
         "voiceCommands": {
             "search": "find + [text for searchbar]",
-            "pause": "pause",
+            "pause": "pausa",
             "help": "help | show commands",
-            "collapse all servers": "collapse all servers",
+            "collapse all servers": "colapsar todos los servidores",
             "collapse server": "collapse server + [server name]",
-            "play": "play",
-            "clear search": "clear search",
+            "play": "reproducir",
+            "clear search": "borrar búsqueda",
             "live": "go to live | show me live",
-            "expand all servers": "expand all servers",
-            "stop listening": "stop listening",
+            "expand all servers": "expandir todos los servidores",
+            "stop listening": "detener escucha",
             "expand server": "expand server + [server name]",
-            "view": "view + [camera name]"
+            "view": "vista + [nombre de la cámara]"
         },
         "systemOffline": "Sistema está desconectado",
         "cameraLinks": {
@@ -200,9 +200,9 @@
             "transcoding": "Transcodificación",
             "copyActiveText": "copiado al portapapeles"
         },
-        "searchCamPlaceholder": "Search",
+        "searchCamPlaceholder": "Búsqueda",
         "cameraStates": {
-            "noFormat": "This browser does not support video playback from this camera.",
+            "noFormat": "Este navegador no admite reproducción de video desde esta cámara.",
             "ieWin10": "Utilice navegadores Microsoft Edge o Google Chrome.",
             "iosVideoTooLarge": "iOS no soporta video más grande que el fullHD (2MP: 1920 x 1080).",
             "unauthorized": "Autenticación necesaria",
@@ -213,13 +213,13 @@
             "error": "Error",
             "offline": "Desconectado",
             "noData": "No hay datos",
-            "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing videos."
+            "flashRequired": "Por favor, instale <a href='https://get.adobe.com/flashplayer/' target='_blank'>instalar Adobe Flash</a> para reproducir videos."
         },
-        "chromeCastWarning": "Chromecast is resource intensive and may cause issues on your server.",
+        "chromeCastWarning": "Chromecast consume muchos recursos y puede causar problemas en tu servidor.",
         "resolution": {
-            "high": "High",
+            "high": "Elevado",
             "auto": "Auto",
-            "low": "Low"
+            "low": "Bajo"
         }
     }
 }
