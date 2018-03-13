@@ -13,9 +13,6 @@ class QnTimeline: public QQuickItem
 {
     Q_OBJECT
 
-    Q_PROPERTY(qint64 visualOffset READ visualOffset WRITE setVisualOffset
-        NOTIFY visualOffsetChanged)
-
     Q_PROPERTY(qint64 defaultWindowSize READ defaultWindowSize CONSTANT)
     Q_PROPERTY(qint64 windowSize READ windowSize WRITE setWindowSize NOTIFY windowSizeChanged)
     Q_PROPERTY(qint64 windowStart READ windowStart WRITE setWindowStart NOTIFY windowStartChanged)
@@ -30,6 +27,8 @@ class QnTimeline: public QQuickItem
         NOTIFY autoReturnToBoundsEnabledChanged)
     Q_PROPERTY(int timeZoneShift
         READ timeZoneShift WRITE setTimeZoneShift NOTIFY timeZoneShiftChanged)
+    Q_PROPERTY(int serverTimeZoneShift
+        READ serverTimeZoneShift WRITE setServerTimeZoneShift NOTIFY serverTimeZoneShiftChanged)
 
     Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor NOTIFY textColorChanged)
     Q_PROPERTY(QColor chunkBarColor
@@ -71,9 +70,6 @@ public:
 
     qint64 defaultWindowSize() const;
 
-    qint64 visualOffset() const;
-    void setVisualOffset(qint64 offset);
-
     qint64 windowStart() const;
     void setWindowStart(qint64 windowStart);
 
@@ -111,6 +107,9 @@ public:
     int timeZoneShift() const;
     void setTimeZoneShift(int timeZoneShift);
 
+    int serverTimeZoneShift() const;
+    void setServerTimeZoneShift(int timeZoneShift);
+
     Q_INVOKABLE void zoomIn();
     Q_INVOKABLE void zoomOut();
 
@@ -142,9 +141,9 @@ signals:
     void startBoundChanged();
     void autoPlayChanged();
     void autoReturnToBoundsEnabledChanged();
-    void visualOffsetChanged();
 
     void timeZoneShiftChanged();
+    void serverTimeZoneShiftChanged();
 
     void textColorChanged();
     void chunkColorChanged();

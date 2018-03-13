@@ -124,7 +124,6 @@ public:
     qint64 targetPosition = -1;
     bool autoReturnToBounds = true;
 
-    qint64 visualOffset = 0;
     qint64 windowStart = 0;
     qint64 windowEnd = 0;
 
@@ -152,6 +151,7 @@ public:
     QnTimePeriodList timePeriods[Qn::TimePeriodContentCount];
 
     int timeZoneShift = 0;
+    int serverTimeZoneShift = 0;
 
     QElapsedTimer animationTimer;
     qint64 prevAnimationMs = 0;
@@ -220,11 +220,8 @@ public:
 
     void updateZoomLevel()
     {
-        const auto shiftedWindowStart = windowStart + visualOffset;
-        const auto shiftedWindowEnd = windowEnd + visualOffset;
-
         int index = (prevZoomIndex == -1) ? zoomLevels.size() - 1 : qMax(prevZoomIndex, 0);
-        int tickCount = zoomLevels[index].tickCount(shiftedWindowStart, shiftedWindowEnd);
+        int tickCount = zoomLevels[index].tickCount(windowStart, windowEnd);
         qreal width = parent->width();
         qreal tickSize = width / tickCount;
 
@@ -233,7 +230,7 @@ public:
             while (tickSize < minTickDps && index < zoomLevels.size() - zoomLevelsVisible)
             {
                 ++index;
-                tickCount = zoomLevels[index].tickCount(shiftedWindowStart, shiftedWindowEnd);
+                tickCount = zoomLevels[index].tickCount(windowStart, windowEnd);
                 tickSize = width / tickCount;
             }
         }
@@ -241,7 +238,7 @@ public:
         {
             while (index > 0)
             {
-                tickCount = zoomLevels[index - 1].tickCount(shiftedWindowStart, shiftedWindowEnd);
+                tickCount = zoomLevels[index - 1].tickCount(windowStart, windowEnd);
                 tickSize = width / tickCount;
                 if (tickSize >= minTickDps)
                     --index;
@@ -275,23 +272,18 @@ public:
 
     qint64 pixelPosToTime(qreal x) const
     {
-        return windowStart + static_cast<qint64>(x / parent->width()
-            * (windowEnd - windowStart));
+        return windowStart + static_cast<qint64>(x / parent->width() * (windowEnd - windowStart));
     }
 
     qreal timeToPixelPos(qint64 time) const
     {
-        const auto shiftedWindowStart = windowStart + visualOffset;
-        const auto shiftedWindowEnd = windowEnd + visualOffset;
-
         return parent->width() *
-            (static_cast<qreal>(time - shiftedWindowStart) / (shiftedWindowEnd - shiftedWindowStart));
+            (static_cast<qreal>(time - windowStart) / (windowEnd - windowStart));
     }
 
     qint64 stickPoint() const
     {
-        const auto shiftedWindowStart = windowStart + visualOffset;
-        return shiftedWindowStart;
+        return windowStart;
     }
 
     int maxSiblingLevel(int zoomLevel) const
@@ -314,7 +306,7 @@ public:
 
     qint64 adjustTime(qint64 time) const
     {
-        return time + timeZoneShift;
+        return time + timeZoneShift + serverTimeZoneShift;
     }
 
     void updateTextHelper()
@@ -371,21 +363,6 @@ QnTimeline::QnTimeline(QQuickItem* parent):
 
 QnTimeline::~QnTimeline()
 {
-}
-
-qint64 QnTimeline::visualOffset() const
-{
-    return d->visualOffset;
-}
-
-void QnTimeline::setVisualOffset(qint64 offset)
-{
-    if (d->visualOffset == offset)
-        return;
-
-    d->visualOffset = offset;
-    emit visualOffsetChanged();
-    update();
 }
 
 qint64 QnTimeline::windowStart() const
@@ -515,7 +492,7 @@ void QnTimeline::setPositionImmediately(qint64 position)
 
 QDateTime QnTimeline::positionDate() const
 {
-    return QDateTime::fromMSecsSinceEpoch(position() + d->visualOffset, Qt::UTC);
+    return QDateTime::fromMSecsSinceEpoch(position() + d->serverTimeZoneShift, Qt::UTC);
 }
 
 bool QnTimeline::stickToEnd() const
@@ -582,6 +559,22 @@ void QnTimeline::setAutoReturnToBoundsEnabled(bool enabled)
 
     d->autoReturnToBounds = enabled;
     emit autoReturnToBoundsEnabledChanged();
+}
+
+int QnTimeline::serverTimeZoneShift() const
+{
+    return d->serverTimeZoneShift;
+}
+
+void QnTimeline::setServerTimeZoneShift(int timeZoneShift)
+{
+    if (d->serverTimeZoneShift == timeZoneShift)
+        return;
+
+    d->serverTimeZoneShift = timeZoneShift;
+    emit serverTimeZoneShiftChanged();
+
+    update();
 }
 
 int QnTimeline::timeZoneShift() const
@@ -1558,11 +1551,8 @@ void QnTimelinePrivate::zoomWindow(qreal factor)
     if (factor < 1)
         speed = -speed;
 
-    const auto shiftedWindowStart = windowStart + visualOffset;
-    const auto shiftedWindowEnd = windowEnd + visualOffset;
-
     startZoom = parent->width();
-    startWindowSize = shiftedWindowEnd - shiftedWindowStart;
+    startWindowSize = windowEnd - windowStart;
     zoomKineticHelper.flick(startZoom, speed);
 
     parent->update();
@@ -1583,11 +1573,8 @@ int QnTimelinePrivate::calculateTargetTextLevel() const
 {
     NX_ASSERT(maxZoomLevelTextLength.size() == zoomLevels.size());
 
-    const auto shiftedWindowStart = windowStart + visualOffset;
-    const auto shiftedWindowEnd = windowEnd + visualOffset;
-
     const int zoomIndex = cFloor(zoomLevel);
-    const auto windowSize = shiftedWindowEnd - shiftedWindowStart;
+    const auto windowSize = windowEnd - windowStart;
     const auto width = parent->width();
 
     for (int textMarkLevel = zoomIndex; textMarkLevel < zoomLevels.size() - 1; ++textMarkLevel)
@@ -1618,15 +1605,12 @@ int QnTimelinePrivate::calculateTargetTextLevel() const
 
 QVector<TextMarkInfo> QnTimelinePrivate::calculateVisibleTextMarks() const
 {
-    const auto shiftedWindowStart = windowStart + visualOffset;
-    const auto shiftedWindowEnd = windowEnd + visualOffset;
-
     const auto& zoomLevel = zoomLevels[cFloor(this->zoomLevel)];
     const auto textMarkLevel = cFloor(textLevel);
 
-    const auto windowSize = shiftedWindowEnd - shiftedWindowStart;
-    const auto windowStartAligned = zoomLevel.alignTick(adjustTime(shiftedWindowStart));
-    const auto windowEndAligned = zoomLevel.alignTick(adjustTime(shiftedWindowEnd));
+    const auto windowSize = windowEnd - windowStart;
+    const auto windowStartAligned = zoomLevel.alignTick(adjustTime(windowStart));
+    const auto windowEndAligned = zoomLevel.alignTick(adjustTime(windowEnd));
     const auto windowSizeAligned = windowEndAligned - windowStartAligned;
     const auto width = parent->width();
 
@@ -1638,7 +1622,7 @@ QVector<TextMarkInfo> QnTimelinePrivate::calculateVisibleTextMarks() const
 
     QVector<TextMarkInfo> result;
     auto tick = windowStartAligned;
-    auto xStart = timeToPixelPos(tick + (shiftedWindowStart - adjustTime(shiftedWindowStart)));
+    auto xStart = timeToPixelPos(tick + (windowStart - adjustTime(windowStart)));
 
     for (int i = 0; i < tickCount; ++i, tick = zoomLevel.nextTick(tick))
     {
