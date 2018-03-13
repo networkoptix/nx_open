@@ -6,10 +6,10 @@
     "emailSubject": "Reimpostare la password"
   },
   "system_invite": {
-    "emailSubject": "{{message.sharer_name}} ti invita a {{PRODUCT_NAME}}"
+    "emailSubject": "{{message.sharer_name}} vi invita a {{PRODUCT_NAME}}"
   },
   "system_shared": {
-    "emailSubject": "{{message.sharer_name}} ti invita a {{PRODUCT_NAME}}"
+    "emailSubject": "{{message.sharer_name}} vi invita a {{PRODUCT_NAME}}"
   },
   "review_version": {
     "emailSubject": "Versione {{message.id}} è pronto per essere rivisto"

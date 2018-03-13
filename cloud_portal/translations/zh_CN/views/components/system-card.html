@@ -17,8 +17,8 @@
         <a ng-href="mailto:{{system.info.ownerAccountEmail}}">{{system.info.ownerAccountEmail}}</a>
         <hr>
         <p>
-            您的权限︰ 
-<b>{{$root.L.accessRoles[system.accessRole].label | | system.accessRole}}</b>
+            您的权限︰
+            <b>{{$root.L.accessRoles[system.accessRole].label || system.accessRole}}</b>
         </p>
 
         <p ng-if="system.permissions.isAdmin">

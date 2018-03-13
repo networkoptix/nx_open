@@ -143,7 +143,7 @@ def init_skin(customization_name, product='cloud_portal'):
     fill_content(customization_name, product, preview=True, incremental=False)
 
 
-def fill_content(customization_name='default', product='cloud_portal',
+def fill_content(customization_name='default', product_name='cloud_portal',
                  preview=True,
                  version_id=None,
                  incremental=False,
@@ -156,7 +156,10 @@ def fill_content(customization_name='default', product='cloud_portal',
     # else
     #   if version_id is None - preview latest available datarecords
     #   else - preview specific version
-    product_id = Product.objects.get(name=product).id
+    product = Product.objects.get(name=product_name)
+    if not product.can_preview:
+        return
+    product_id = product.id
     customization = Customization.objects.get(name=customization_name)
 
     if preview:  # Here we decide, if we need to change preview state

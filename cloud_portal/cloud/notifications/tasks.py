@@ -10,19 +10,22 @@ from django.conf import settings
 
 from api.models import Account
 from notifications import api
+from util.helpers import get_language_for_email
 
 import traceback
 import logging
 logger = logging.getLogger(__name__)
 
-def log_error(error, user_email, type, message, customization, attempt):
-    error_formatted = '\n{}:{}\nTarget Email: {}\nType: {}\nMessage:{}\nCustomization: {}\nAttempt: {}\nCall Stack: {}'\
+def log_error(error, user_email, type, message, customization, language_code, queue_name, attempt):
+    error_formatted = '\n{}:{}\nTarget Email: {}\nType: {}\nMessage:{}\nCustomization: {}\nLanguage: {}\nQueue: {}\nAttempt: {}\nCall Stack: {}'\
         .format(error.__class__.__name__,
                 error,
                 user_email,
                 type,
                 message,
                 customization,
+                language_code,
+                queue_name,
                 attempt,
                 traceback.format_exc())
 
@@ -34,27 +37,29 @@ def log_error(error, user_email, type, message, customization, attempt):
 
 @shared_task
 def send_email(user_email, type, message, customization, queue="", attempt=1):
+    language_code = get_language_for_email(user_email, customization)
     try:
-        email_engine.send(user_email, type, message, customization)
+        email_engine.send(user_email, type, message, language_code, customization)
     except Exception as error:
         if (isinstance(error, SMTPException) or isinstance(error, SSLError)) and attempt < settings.MAX_RETRIES:
             send_email.apply_async(args=[user_email, type, message, customization, queue, attempt+1],
                                    queue=queue)
 
-        log_error(error, user_email, type, message, customization, attempt)
+        log_error(error, user_email, type, message, customization, language_code, queue, attempt)
 
         send_email.update_state(state="FAILURE", meta={'error': str(error),
                                                        'user_email': user_email,
                                                        'type': type,
                                                        'message': message,
                                                        'customization': customization,
+                                                       'language': language_code,
                                                        'queue': queue,
                                                        'attempt': attempt,
                                                        })
         raise Ignore()
     else:
-        return {'user_email': user_email, 'type': type, 'message': message,
-                'customization': customization, 'queue': queue, 'attempt': attempt}
+        return {'user_email': user_email, 'type': type, 'message': message, 'customization': customization,
+                'language': language_code, 'queue': queue, 'attempt': attempt}
 
 
 # For testing we dont want to send emails to everyone so we need to set
@@ -62,8 +67,8 @@ def send_email(user_email, type, message, customization, queue="", attempt=1):
 @shared_task
 def send_to_all_users(notification_id, message, force=False):
     # if forced and not testing dont apply any filters to send to all users
-    users = Account.objects.exclude(activated_date=None)
-
+    users = Account.objects.exclude(activated_date=None, last_login=None)
+    
     if not force:
         users = users.filter(subscribe=True)
 
