@@ -80,7 +80,7 @@ def second_camera_backup_type(request):
 def server(server_factory, system_backup_type):
     config_file_params = dict(minStorageSpace=1024*1024)  # 1M
     server = server_factory.create('server', start=False, config_file_params=config_file_params)
-    server.os_access.run_command(['rm', '-rfv', os.path.join(BACKUP_STORAGE_PATH, '*')])
+    server.os_access.run_command(['rm', '-rfv', str(BACKUP_STORAGE_PATH / '*')])
     server.start()
     server.setup_local_system()
     server.rest_api.api.systemSettings.GET(backupQualities=system_backup_type)
