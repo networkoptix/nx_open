@@ -21,7 +21,6 @@ public:
     QString value(const QnUuid& resourceId, const QString& key) const;
     bool setValue(const QnUuid& resourceId, const QString& key, const QString& value, bool markDirty = true, bool replaceIfExists = true);
     bool hasProperty(const QnUuid& resourceId, const QString& key) const;
-    bool removeProperty(const QnUuid& resourceId, const QString& key);
     ec2::ApiResourceParamDataList allProperties(const QnUuid& resourceId) const;
 
     /**
@@ -33,6 +32,8 @@ public:
 
     void clear();
     void clear(const QVector<QnUuid>& idList);
+public slots:
+    bool on_resourceParamRemoved(const QnUuid& resourceId, const QString& key);
 signals:
     void asyncSaveDone(int recId, ec2::ErrorCode);
 private:

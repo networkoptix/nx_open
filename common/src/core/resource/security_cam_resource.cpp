@@ -146,11 +146,6 @@ bool QnSecurityCamResource::setProperty(
 	return QnResource::setProperty(key, value, options);
 }
 
-bool QnSecurityCamResource::removeProperty(const QString& key)
-{
-	return QnResource::removeProperty(key);
-}
-
 bool QnSecurityCamResource::isGroupPlayOnly() const {
     return hasParam(Qn::kGroupPlayParamName);
 }

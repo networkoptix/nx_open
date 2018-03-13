@@ -292,8 +292,6 @@ public:
 		const QVariant& value,
 		PropertyOptions options = DEFAULT_OPTIONS) override;
 
-    virtual bool removeProperty(const QString& key) override;
-
     //!Returns list if IO ports
     QnIOPortDataList getIOPorts() const;
 
