@@ -32,7 +32,6 @@
 #include <ui/dialogs/common/file_messages.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
-#include <ui/workbench/watchers/workbench_server_time_watcher.h>
 
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
@@ -42,6 +41,7 @@
 
 #include "transcoding/filters/filter_helper.h"
 #include <nx/core/transcoding/filters/legacy_transcoding_settings.h>
+#include <nx/client/core/watchers/server_time_watcher.h>
 
 using namespace nx::client::desktop::ui;
 
@@ -197,7 +197,8 @@ qint64 QnWorkbenchScreenshotHandler::screenshotTimeMSec(QnMediaResourceWidget *w
     if (!adjust)
         return timeMSec;
 
-    qint64 localOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->displayOffset(widget->resource());
+    const auto timeWatcher = context()->instance<nx::client::core::ServerTimeWatcher>();
+    qint64 localOffset = timeWatcher->displayOffset(widget->resource());
 
     timeMSec += localOffset;
     return timeMSec;

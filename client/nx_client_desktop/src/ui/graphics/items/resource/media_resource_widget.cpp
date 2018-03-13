@@ -103,7 +103,6 @@
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
-#include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/workbench/watchers/workbench_render_watcher.h>
 #include <ui/workbench/watchers/default_password_cameras_watcher.h>
 
@@ -118,6 +117,7 @@
 #include <utils/media/sse_helper.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource_management/resource_runtime_data.h>
+#include <nx/client/core/watchers/server_time_watcher.h>
 #include <ini.h>
 
 using namespace std::chrono;
@@ -2705,8 +2705,8 @@ qint64 QnMediaResourceWidget::getDisplayTimeUsec() const
     qint64 result = getUtcCurrentTimeUsec();
     if (!isSpecialDateTimeValueUsec(result))
     {
-        result += context()->instance<QnWorkbenchServerTimeWatcher>()->displayOffset(
-            d->mediaResource) * 1000ll;
+        const auto timeWatcher = context()->instance<nx::client::core::ServerTimeWatcher>();
+        result += timeWatcher->displayOffset(d->mediaResource) * 1000ll;
     }
     return result;
 }

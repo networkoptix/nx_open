@@ -10,7 +10,7 @@
 #include <ui/style/skin.h>
 #include <utils/common/synctime.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/watchers/workbench_server_time_watcher.h>
+#include <nx/client/core/watchers/server_time_watcher.h>
 
 namespace nx {
 namespace client {
@@ -65,8 +65,8 @@ void RecordingStatusHelper::setCamera(const QnVirtualCameraResourcePtr& camera)
         return;
 
     connect(
-        context()->instance<QnWorkbenchServerTimeWatcher>(),
-        &QnWorkbenchServerTimeWatcher::displayOffsetsChanged,
+        context()->instance<core::ServerTimeWatcher>(),
+        &core::ServerTimeWatcher::displayOffsetsChanged,
         this,
         &RecordingStatusHelper::updateRecordingMode);
     connect(m_camera.data(), &QnVirtualCameraResource::statusChanged, this,

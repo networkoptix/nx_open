@@ -9,7 +9,6 @@
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/style/resource_icon_cache.h>
 
 #include <utils/camera/bookmark_helpers.h>
@@ -18,6 +17,7 @@
 #include <nx/utils/collection.h>
 #include <nx/utils/raii_guard.h>
 #include <nx/utils/algorithm/index_of.h>
+#include <nx/client/core/watchers/server_time_watcher.h>
 
 namespace
 {
@@ -168,7 +168,7 @@ int QnSearchBookmarksModelPrivate::getBookmarkIndex(const QnUuid& bookmarkId) co
 
 QDateTime QnSearchBookmarksModelPrivate::displayTime(qint64 millisecondsSinceEpoch) const
 {
-    const auto timeWatcher = context()->instance<QnWorkbenchServerTimeWatcher>();
+    const auto timeWatcher = context()->instance<nx::client::core::ServerTimeWatcher>();
     return timeWatcher->displayTime(millisecondsSinceEpoch);
 }
 

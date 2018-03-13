@@ -16,7 +16,7 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_navigator.h>
-#include <ui/workbench/watchers/workbench_server_time_watcher.h>
+#include <nx/client/core/watchers/server_time_watcher.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
@@ -589,7 +589,7 @@ QString AnalyticsSearchListModel::Private::description(
 {
     QString result;
 
-    const auto timeWatcher = q->context()->instance<QnWorkbenchServerTimeWatcher>();
+    const auto timeWatcher = q->context()->instance<nx::client::core::ServerTimeWatcher>();
     const auto start = timeWatcher->displayTime(startTimeMs(object));
     // TODO: #vkutin Is this duration formula good enough for us?
     //   Or we need to add some "lastAppearanceDurationUsec"?
