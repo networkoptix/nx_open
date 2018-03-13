@@ -14,7 +14,7 @@ IMAGES_EXTENSIONS = ('ico', 'png', 'bmp', 'icns')
 def image_meta(data, extension):
     with Image.open(io.BytesIO(data)) as img:
         width, height = img.size
-    return OrderedDict([('width', width), ('height', height), ('format', extension)])
+    return OrderedDict([('width', width), ('height', height), ('format', [extension])])
 
 
 def find_context(name, file_path, structure, product_name):
@@ -100,7 +100,7 @@ def read_data(data, short_name, context, cms_structure, product_name):
     extension = os.path.splitext(short_name)[1][1:]
     if short_name.endswith('DS_Store'):
         return
-    meta = OrderedDict(format=extension)
+    meta = OrderedDict(format=[extension])
     structure_type = 'file'
     if extension in IMAGES_EXTENSIONS:
         meta = image_meta(data, extension)
