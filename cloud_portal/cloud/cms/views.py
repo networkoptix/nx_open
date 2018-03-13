@@ -180,7 +180,7 @@ def version_action(request, version_id=None):
         if not request.user.has_perm('cms.publish_version'):
             raise PermissionDenied
         customization = Customization.objects.get(name=settings.CUSTOMIZATION)
-        publishing_errors = publish_latest_version(customization, request.user)
+        publishing_errors = publish_latest_version(customization, version_id, request.user)
         if publishing_errors:
             messages.error(request, "Version {} {}".format(version_id, publishing_errors))
         else:
@@ -206,7 +206,11 @@ def version(request, version_id=None):
         preview_link = generate_preview_link()
     version = ContentVersion.objects.get(id=version_id)
     contexts = get_records_for_version(version)
-    product = contexts.values()[0][0].data_structure.context.product
+    #else happens when the user makes a revision without any changes
+    if contexts.values():
+        product = contexts.values()[0][0].data_structure.context.product
+    else:
+        product = {'can_preview': False, 'name': ""}
     return render(request, 'review_records.html', {'version': version,
                                                    'contexts': contexts,
                                                    'product': product,
