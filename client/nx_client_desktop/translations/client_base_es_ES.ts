@@ -5100,11 +5100,11 @@ a %1</translation>
     </message>
     <message>
       <source>%1 TB</source>
-      <translation>%1 Tb</translation>
+      <translation>%1 TB</translation>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation>%1 Gb</translation>
+      <translation>%1 GB</translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n devices</source>
@@ -5917,6 +5917,10 @@ a %1</translation>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
       <translation>&quot;Movimiento + Baja - Res&quot; opción de grabación no se puede establecer.</translation>
     </message>
+    <message>
+      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
+      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</translation>
+    </message>
   </context>
   <context>
     <name>QnSmtpAdvancedSettingsWidget</name>
@@ -6335,7 +6339,7 @@ a %1</translation>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation>%1 Gb</translation>
+      <translation>%1 GB</translation>
     </message>
     <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>

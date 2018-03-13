@@ -2683,12 +2683,6 @@
       <source>Reset</source>
       <translation>重置</translation>
     </message>
-    <message>
-      <location/>
-      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage.
-The oldest footage among all cameras on the server will be deleted first.</source>
-      <translation>如果服务器存储上没有可用空间，则上传的存档会自动删除。服务器上所有摄像机中最老的文件将首先被删除。</translation>
-    </message>
   </context>
   <context>
     <name>SmtpAdvancedSettingsWidget</name>
@@ -3044,14 +3038,18 @@ The oldest footage among all cameras on the server will be deleted first.</sourc
     </message>
     <message>
       <location/>
-      <source>There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</source>
-      <translation>目前还没有自定义用户角色。单击 &quot;新角色&quot; 按钮来创建一个。</translation>
+      <source>New role</source>
+      <translation>新建角色</translation>
     </message>
     <message>
       <location/>
-      <source>New role</source>
-      <translation>新建角色</translation>
+      <source>There are no custom user roles yet.</source>
+      <translation type="unfinished">There are no custom user roles yet.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Click &quot;New role&quot; button to create one.</source>
+      <translation type="unfinished">Click &quot;New role&quot; button to create one.</translation>
     </message>
   </context>
   <context>

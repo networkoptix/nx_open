@@ -2683,12 +2683,6 @@
       <source>Reset</source>
       <translation>Sıfırla</translation>
     </message>
-    <message>
-      <location/>
-      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage.
-The oldest footage among all cameras on the server will be deleted first.</source>
-      <translation>Yüklenen arşiv, sunucu deposunda boş alan yoksa otomatik olarak silinebilir. Sunucudaki tüm kameralar arasındaki en eski çekim ilk önce silinecek.</translation>
-    </message>
   </context>
   <context>
     <name>SmtpAdvancedSettingsWidget</name>
@@ -3044,14 +3038,18 @@ The oldest footage among all cameras on the server will be deleted first.</sourc
     </message>
     <message>
       <location/>
-      <source>There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</source>
-      <translation>Özel tanımlı kullanıcı yetkilendirmesi yok. Oluşturmak için &quot;Yeni Rol&quot; butonuna tıklayın.</translation>
+      <source>New role</source>
+      <translation>Yeni yetki</translation>
     </message>
     <message>
       <location/>
-      <source>New role</source>
-      <translation>Yeni yetki</translation>
+      <source>There are no custom user roles yet.</source>
+      <translation type="unfinished">There are no custom user roles yet.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Click &quot;New role&quot; button to create one.</source>
+      <translation type="unfinished">Click &quot;New role&quot; button to create one.</translation>
     </message>
   </context>
   <context>

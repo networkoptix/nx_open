@@ -5846,6 +5846,10 @@ to %1</source>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
       <translation>"모션 + 낮은-해상도" 녹화 옵션을 설정할 수 없습니다.</translation>
     </message>
+    <message>
+      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
+      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</translation>
+    </message>
   </context>
   <context>
     <name>QnSmtpAdvancedSettingsWidget</name>
@@ -8072,7 +8076,7 @@ to %1</source>
     </message>
     <message>
       <source>Could not calculate md5 for file &quot;%1&quot;</source>
-      <translation> &quot;%1&quot; 파일에 대한 md5를 계산할 수 없습니다</translation>
+      <translation>&quot;%1&quot; 파일에 대한 md5를 계산할 수 없습니다</translation>
     </message>
     <message>
       <source>Could not create upload on the server side</source>

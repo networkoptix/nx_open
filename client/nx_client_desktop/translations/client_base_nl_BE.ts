@@ -2229,11 +2229,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>I/O Module Id</source>
-      <translation>I/O Module ID</translation>
+      <translation>I/O Module Id</translation>
     </message>
     <message>
       <source>Camera Id</source>
-      <translation>Camera ID</translation>
+      <translation>Camera Id</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -3716,7 +3716,7 @@ to %1</source>
     </message>
     <message>
       <source>Id</source>
-      <translation>ID</translation>
+      <translation>Id</translation>
     </message>
   </context>
   <context>
@@ -4175,7 +4175,7 @@ to %1</source>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware Id %1</source>
-      <translation>Deze licentie is al geactiveerd en gekoppeld aan hardware Id %1</translation>
+      <translation>Deze licentie is al geactiveerd en gekoppeld aan Hardware Id %1</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware Id %1 on %2</source>
@@ -4214,7 +4214,7 @@ to %1</source>
     </message>
     <message>
       <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>Stuur alsjeblieft een e-mail met de licentiecode en het hardware-ID dat is verstrekt aan %1 om een ​​activatie bestand te verkrijgen.</translation>
+      <translation>Stuur alsjeblieft een e-mail met de licentiecode en het Hardware-Id dat is verstrekt aan %1 om een ​​activatie bestand te verkrijgen.</translation>
     </message>
   </context>
   <context>
@@ -4474,7 +4474,7 @@ to %1</source>
     </message>
     <message>
       <source>Lo-Res</source>
-      <translation>Low-Res</translation>
+      <translation>Lo-Res</translation>
     </message>
     <message>
       <source>Failed to invoke trigger %1 (%2)</source>
@@ -5914,6 +5914,10 @@ to %1</source>
     <message>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
       <translation>&quot;Motion + Low - Res&quot; opnameoptie kan niet worden ingesteld.</translation>
+    </message>
+    <message>
+      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
+      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</translation>
     </message>
   </context>
   <context>

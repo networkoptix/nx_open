@@ -2229,11 +2229,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>I/O Module Id</source>
-      <translation>I/O-Modul-ID</translation>
+      <translation>I/O-Modul-Id</translation>
     </message>
     <message>
       <source>Camera Id</source>
-      <translation>Kamera-ID</translation>
+      <translation>Kamera-Id</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -2360,8 +2360,8 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>This Id is already used on the following %n cameras: %1</source>
-      <translation>
-        <numerusform>Diese ID wird bereits für die folgende Kamera verwendet: %1</numerusform>
+      <translation type="unfinished">
+        <numerusform>Diese Id wird bereits für die folgende %n Kamera verwendet: %1</numerusform>
         <numerusform>Diese ID wird bereits für folgende %n Kameras verwendet: %1</numerusform>
       </translation>
     </message>
@@ -2485,7 +2485,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Logical Id</source>
-      <translation>Logical-ID</translation>
+      <translation>Logical-Id</translation>
     </message>
   </context>
   <context>
@@ -3716,7 +3716,7 @@ to %1</source>
     </message>
     <message>
       <source>Id</source>
-      <translation>ID</translation>
+      <translation>Id</translation>
     </message>
   </context>
   <context>
@@ -5915,6 +5915,10 @@ to %1</source>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
       <translation>Aufnahmeoption &quot;Bewegung + Low - Res&quot; kann nicht festgelegt werden.</translation>
     </message>
+    <message>
+      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
+      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</translation>
+    </message>
   </context>
   <context>
     <name>QnSmtpAdvancedSettingsWidget</name>
@@ -7177,11 +7181,11 @@ to %1</source>
     </message>
     <message>
       <source>Uploading %1...</source>
-      <translation type="unfinished">Uploading %1...</translation>
+      <translation>Hochladen %1...</translation>
     </message>
     <message>
       <source>Finalizing %1...</source>
-      <translation type="unfinished">Finalizing %1...</translation>
+      <translation>Fertigstellen %1...</translation>
     </message>
   </context>
   <context>
