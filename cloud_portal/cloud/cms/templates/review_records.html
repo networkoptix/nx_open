@@ -80,7 +80,7 @@
 		{% endif %}
 		{% if version.state == 'current' and not product.can_preview %}
 		<button class="btn btn-sm btn-default">
-			<a href="{% url 'download_package' product.name %}"download>Download</a>
+			<a href="{% url 'download_package' product.name %}?version_id={{version.id}}"download>Download</a>
 		</button>
 		{% endif %}
 		{% if preview_link and product.can_preview %}
@@ -91,7 +91,7 @@
         	<button class="btn btn-sm btn-primary" type="submit" name="Preview">Generate Preview</button>
 			{% else %}
 			<button class="btn btn-sm btn-default">
-				<a href="{% url 'download_package' product.name %}"download>Download</a>
+				<a href="{% url 'download_package' product.name %}?version_id={{version.id}}"download>Download</a>
 			</button>
 			{% endif %}
 			{% if perms.cms.publish_version %}
