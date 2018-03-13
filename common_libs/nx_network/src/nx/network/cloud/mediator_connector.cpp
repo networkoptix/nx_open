@@ -35,7 +35,7 @@ MediatorConnector::MediatorConnector():
 
 MediatorConnector::~MediatorConnector()
 {
-    NX_ASSERT((m_stunClient == nullptr) || m_stunClient.unique());
+    NX_ASSERT((m_stunClient == nullptr) || m_stunClient.use_count() == 1);
     pleaseStopSync(false);
 }
 

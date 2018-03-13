@@ -70,7 +70,7 @@
                                 <b>אתר אינטרנט</b><br>
                                 <a href="{{companyUrl}}">{{companyUrl}}</a>
                             </td>
-                        {{/מערכת}}
+                        {{/system}}
                         <td class="left-border">
                             <b>תמיכה</b><br>
                             <a href="{{supportLink}}">{{supportLinkText}}</a>

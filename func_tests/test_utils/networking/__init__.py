@@ -21,10 +21,10 @@ def reset_networking(machine):
     enable_internet(machine)
 
 
-def setup_networks(machine_factory, networks_tree, default_gateways=None):
+def setup_networks(machines, networks_tree, default_gateways=None):
     default_gateways = default_gateways or {}
     nodes_ip_addresses = {}
-    machines = {}
+    allocated_machines = {'linux': {}}
 
     def setup_tree(tree, router_alias, reachable_networks):
         for network_name in tree:
@@ -35,20 +35,20 @@ def setup_networks(machine_factory, networks_tree, default_gateways=None):
             if router_alias is not None:
                 nodes[router_alias] = router_ip_address
             for alias, ip_address in nodes.items():
-                machines[alias] = machine_factory.get(alias)
-                networking = machines[alias].networking
-                mac_address = networking.hypervisor_networking.plug(network_name)
-                networking.os_networking.setup_ip(mac_address, ip_address, network.prefixlen)
+                machine = machines['linux'].get(alias)  # TODO: Specify OS (generally, VM type) of interest.
+                allocated_machines[alias] = machine
+                mac_address = machine.networking.hypervisor_networking.plug(network_name)
+                machine.networking.os_networking.setup_ip(mac_address, ip_address, network.prefixlen)
                 if alias != router_alias:
                     # Routes on router was set up when it was interpreted as host.
                     for reachable_network in reachable_networks:
-                        networking.os_networking.route(reachable_network, mac_address, router_ip_address)
+                        machine.networking.os_networking.route(reachable_network, mac_address, router_ip_address)
                     # Default gateway can be specified explicitly.
                     if alias in default_gateways and default_gateways[alias] == router_alias:
-                        networking.os_networking.route_global(mac_address, router_ip_address)
+                        machine.networking.os_networking.route_global(mac_address, router_ip_address)
                     subtree = tree[network_name][alias]
                     if subtree is not None:
-                        networking.os_networking.setup_nat(mac_address)
+                        machine.networking.os_networking.setup_nat(mac_address)
                         setup_tree(subtree, alias, reachable_networks + [network])
             for alias, ip_address in nodes.items():
                 nodes_ip_addresses.setdefault(alias, []).append(ip_address)
@@ -57,6 +57,6 @@ def setup_networks(machine_factory, networks_tree, default_gateways=None):
 
     for alias in default_gateways:
         if default_gateways[alias] is None:
-            machine_factory.get(alias).networking.os_networking.prohibit_global()
+            machines.get(alias).networking.os_networking.prohibit_global()
 
-    return machines
+    return allocated_machines

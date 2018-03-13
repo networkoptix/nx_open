@@ -101,13 +101,19 @@ public:
 
     virtual SystemError::ErrorCode prevRequestSysErrorCode() const override;
 
+protected:
+    std::list<std::unique_ptr<network::aio::BasicPollable>> m_activeRequests;
+
+    virtual void stopWhileInAioThread() override;
+
+    ResultCode toResultCode(
+        SystemError::ErrorCode sysErrorCode,
+        const nx::network::http::Response* httpResponse);
+
 private:
     const nx::utils::Url m_baseUrl;
     SystemError::ErrorCode m_prevSysErrorCode;
     nx::network::http::AuthInfo m_authInfo;
-    std::list<std::unique_ptr<network::aio::BasicPollable>> m_activeRequests;
-
-    virtual void stopWhileInAioThread() override;
 
     template<
         typename Request,
@@ -157,10 +163,26 @@ private:
     ResultCode toUpgradeResultCode(
         SystemError::ErrorCode sysErrorCode,
         const nx::network::http::Response* httpResponse);
+};
 
-    ResultCode toResultCode(
-        SystemError::ErrorCode sysErrorCode,
-        const nx::network::http::Response* httpResponse);
+//-------------------------------------------------------------------------------------------------
+
+class NX_NETWORK_API ClientImplUsingHttpConnect:
+    public ClientImpl
+{
+    using base_type = ClientImpl;
+
+public:
+    ClientImplUsingHttpConnect(const nx::utils::Url& baseUrl);
+
+    virtual void beginListening(
+        const nx::String& peerName,
+        BeginListeningHandler completionHandler) override;
+
+private:
+    void processBeginListeningResponse(
+        std::list<std::unique_ptr<network::aio::BasicPollable>>::iterator httpClientIter,
+        BeginListeningHandler completionHandler);
 };
 
 } // namespace api

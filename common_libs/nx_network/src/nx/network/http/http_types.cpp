@@ -273,10 +273,16 @@ const StringType Method::post("POST");
 const StringType Method::put("PUT");
 const StringType Method::delete_("DELETE");
 const StringType Method::options("OPTIONS");
+const StringType Method::connect("CONNECT");
 
 bool Method::isMessageBodyAllowed(ValueType method)
 {
-    return method != get && method != head && method != delete_;
+    return method != get && method != head && method != delete_ && method != connect;
+}
+
+bool Method::isMessageBodyAllowedInResponse(ValueType method)
+{
+    return method != connect;
 }
 
 //-------------------------------------------------------------------------------------------------

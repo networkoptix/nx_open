@@ -2,16 +2,18 @@
 Resource          ../resource.robot
 Resource          ../variables.robot
 Suite Teardown    Close All Browsers
+Force Tags        system
 
 *** Variables ***
 ${password}    ${BASE PASSWORD}
-${url}         ${CLOUD TEST}
+${url}         ${ENV}
 
 *** Keywords ***
 Log in to Auto Tests System
     [arguments]    ${email}
     Go To    ${url}/systems/${AUTO TESTS SYSTEM ID}
     Log In    ${email}    ${password}    None
+    Validate Log In
     Run Keyword If    '${email}' == '${EMAIL OWNER}'    Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
     Run Keyword If    '${email}' == '${EMAIL ADMIN}'    Wait Until Elements Are Visible    ${DISCONNECT FROM MY ACCOUNT}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
     Run Keyword Unless    '${email}' == '${EMAIL OWNER}' or '${email}' == '${EMAIL ADMIN}'    Wait Until Elements Are Visible    ${DISCONNECT FROM MY ACCOUNT}    ${OPEN IN NX BUTTON}
@@ -127,9 +129,9 @@ contains user emails and names
     Log in to Auto Tests System    ${EMAIL OWNER}
     Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL ADMIN}')]
     Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${ADMIN FIRST NAME} ${ADMIN LAST NAME}')]
+    Close Browser
 
 rename button opens dialog; cancel closes without rename; save renames system
-    [tags]    not-ready
     Open Browser and go to URL    ${url}
     Log in to Auto Tests System    ${EMAIL OWNER}
     Wait Until Element Is Visible    ${RENAME SYSTEM}
@@ -138,6 +140,7 @@ rename button opens dialog; cancel closes without rename; save renames system
     Click Button    ${RENAME CANCEL}
     Wait Until Page Does Not Contain Element    //div[@modal-render='true']
     Verify In System    Auto Tests
+    Wait Until Elements Are Visible    ${RENAME SYSTEM}    ${OPEN IN NX BUTTON}    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}
     Click Button    ${RENAME SYSTEM}
     Wait Until Elements Are Visible    ${RENAME CANCEL}    ${RENAME SAVE}    ${RENAME INPUT}
     Clear Element Text    ${RENAME INPUT}
@@ -145,6 +148,7 @@ rename button opens dialog; cancel closes without rename; save renames system
     Click Button    ${RENAME SAVE}
     Check For Alert    ${SYSTEM NAME SAVED}
     Verify In System    Auto Tests Rename
+    Wait Until Elements Are Visible    ${RENAME SYSTEM}    ${OPEN IN NX BUTTON}    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}
     Click Button    ${RENAME SYSTEM}
     Wait Until Elements Are Visible    ${RENAME CANCEL}    ${RENAME SAVE}    ${RENAME INPUT}
     Clear Element Text    ${RENAME INPUT}
@@ -182,6 +186,7 @@ should open System page by link not authorized user, and show alert if logs in a
     Close Browser
 
 should display same user data as user provided during registration (stress to cyrillic)
+    [tags]    email
 #create user
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
@@ -245,7 +250,7 @@ should display same user data as showed in user account (stress to cyrillic)
     Click Button    ${ACCOUNT SAVE}
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
     Go To    ${url}/systems/${AUTO TESTS SYSTEM ID}
-    Wait Until Element Is Visible    //td[contains(text(),'${CYRILLIC NAME} ${CYRILLIC NAME}')]
+    Wait Until Element Is Visible    //td[contains(text(),'${CYRILLIC TEXT} ${CYRILLIC TEXT}')]
 
     #remove new user from system
     Log Out

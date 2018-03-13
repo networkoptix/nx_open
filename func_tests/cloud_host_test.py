@@ -41,8 +41,7 @@ def test_with_different_cloud_hosts_must_not_be_able_to_merge(server_factory, cl
     one.stop()
     one.patch_binary_set_cloud_host(cloud_host_2)
     one.start()
-    assert (
-        one.rest_api.get('/api/systemSettings')['settings']['localSystemId'] == UUID(0),
+    assert one.rest_api.get('/api/systemSettings')['settings']['localSystemId'] == UUID(0), (
         "patch/change cloud host must reset the system")
     one.setup_local_system()
     check_user_exists(one, is_cloud=False)  # cloud user must be gone after patch/changed cloud host

@@ -115,6 +115,10 @@ class RunningTime(object):
         return '{self.__class__.__name__}({self:s})'.format(self=self)
 
 
+class Timeout(Exception):
+    pass
+
+
 class Wait(object):
     def __init__(self, name, timeout_sec=10, attempts_limit=100, logging_levels=(logging.WARNING, logging.ERROR)):
         self._continue_level, self._stop_level = logging_levels

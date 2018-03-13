@@ -51,16 +51,9 @@ public:
     static void printArgumentsHelp(std::ostream* outputStream);
 
 private:
-    struct Settings
-    {
-        std::string forcedMediatorUrl;
-        bool isUdpHpDisabled = false;
-        bool isOnlyCloudProxyEnabled = false;
-    };
-
     std::unique_ptr<CloudConnectControllerImpl> m_impl;
-    Settings m_settings;
 
+    void readSettingsFromIni();
     void loadSettings(const utils::ArgumentParser& arguments);
     void applySettings();
 };
