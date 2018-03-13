@@ -41,19 +41,54 @@
      </property>
      <widget class="QWidget" name="noUserRolesPage">
       <layout class="QVBoxLayout" name="verticalLayout_2">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <item>
+        <spacer name="verticalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
        <item>
         <widget class="QLabel" name="label">
          <property name="text">
-          <string>There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</string>
+          <string>There are no custom user roles yet.</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
          </property>
-         <property name="wordWrap">
-          <bool>true</bool>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Click &quot;New role&quot; button to create one.</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
          </property>
         </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </widget>
