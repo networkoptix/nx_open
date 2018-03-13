@@ -117,7 +117,7 @@
             "description": "Favicon for browser tabs",
             "type": "image",
             "meta": {
-              "format": ["ico"]
+              "format": "ico"
             }
           },
           {
@@ -127,7 +127,7 @@
             "description": "Logo for branding. ",
             "type": "image",
             "meta": {
-              "format": ["png"],
+              "format": "png",
               "height": 64
             }
           },
@@ -138,7 +138,7 @@
             "description": "Logo for email. ",
             "type": "image",
             "meta": {
-              "format": ["png"],
+              "format": "png",
               "height_ge": 32,
               "height_le": 64,
               "width_ge": 32,
@@ -161,7 +161,7 @@
             "description": "Image for the front page. Image must have transparent background.",
             "type": "image",
             "meta": {
-              "format": ["png"],
+              "format": "png",
               "height_ge": 240
             }
           },
@@ -239,7 +239,7 @@
             "type": "image",
             "description": "Image for page. Image goes above text on page",
             "meta": {
-              "format": ["png"]
+              "format": "png"
             }
           },
           {
@@ -248,7 +248,7 @@
             "type": "image",
             "description": "High res image for page. Image goes above text on page",
             "meta": {
-              "format": ["png"]
+              "format": "png"
             }
           }
         ]
