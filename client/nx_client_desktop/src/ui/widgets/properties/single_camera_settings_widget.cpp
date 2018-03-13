@@ -230,6 +230,10 @@ QnSingleCameraSettingsWidget::~QnSingleCameraSettingsWidget()
 
 void QnSingleCameraSettingsWidget::retranslateUi()
 {
+    ui->wearableInfoLabel->setText(tr("Uploaded archive can be deleted automatically, "
+        "if there is no free space on a server storage. "
+        "The oldest footage among all cameras on the server will be deleted first."));
+
     setWindowTitle(QnDeviceDependentStrings::getNameFromSet(
         resourcePool(),
         QnCameraDeviceStringSet(
