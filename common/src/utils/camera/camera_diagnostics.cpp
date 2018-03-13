@@ -366,7 +366,7 @@ Qn::MediaStreamEvent Result::toMediaStreamEvent() const
     switch (errorCode)
     {
         case ErrorCode::tooManyOpenedConnections:
-            return Qn::MediaStreamEvent::TooManyOpenedConnectionsError;
+            return Qn::MediaStreamEvent::TooManyOpenedConnections;
         default:
             return Qn::MediaStreamEvent::NoEvent;
     }

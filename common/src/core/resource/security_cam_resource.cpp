@@ -1491,8 +1491,8 @@ Qn::MediaStreamEvent QnSecurityCamResource::checkForErrors() const
 {
     const auto capabilities = getCameraCapabilities();
     if (capabilities.testFlag(Qn::isDefaultPasswordCapability))
-        return Qn::MediaStreamEvent::ForbiddentBecauseDefaultPasswordError;
+        return Qn::MediaStreamEvent::ForbiddenWithDefaultPassword;
     if (capabilities.testFlag(Qn::isOldFirmwareCapability))
-        return Qn::MediaStreamEvent::oldFirmwareError;
+        return Qn::MediaStreamEvent::oldFirmware;
     return Qn::MediaStreamEvent::NoEvent;
 }
