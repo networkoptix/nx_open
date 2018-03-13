@@ -188,7 +188,7 @@ should open System page by link not authorized user, and show alert if logs in a
 should display same user data as user provided during registration (stress to cyrillic)
     [tags]    email
 #create user
-    ${email}    Get Random Email
+    ${email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    ${CYRILLIC TEXT}    ${CYRILLIC TEXT}    ${email}    ${password}
     Activate    ${email}
@@ -219,7 +219,7 @@ should display same user data as user provided during registration (stress to cy
 should display same user data as showed in user account (stress to cyrillic)
     [tags]    not-ready
 #create user
-    ${email}    Get Random Email
+    ${email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${email}    ${password}
     Activate    ${email}

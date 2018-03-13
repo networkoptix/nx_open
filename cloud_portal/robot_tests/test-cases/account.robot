@@ -50,7 +50,7 @@ Accessing the account page from a direct link while logged out asks for login, o
 
 Check box is checked when registering with it checked
     [tags]    email
-    ${random email}    Get Random Email
+    ${random email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${random email}    ${password}
     Activate    ${random email}
@@ -64,7 +64,7 @@ Check box is checked when registering with it checked
 
 Check box is not checked when registering with it not checked
     [tags]    email
-    ${random email}    Get Random Email
+    ${random email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${random email}    ${password}    false
     Activate    ${random email}
@@ -78,7 +78,7 @@ Check box is not checked when registering with it not checked
 
 Unchecking check box and saving maintains that setting
     [tags]    email
-    ${random email}    Get Random Email
+    ${random email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${random email}    ${password}
     Activate    ${random email}
@@ -99,7 +99,7 @@ Unchecking check box and saving maintains that setting
 
 Checking check box and saving maintains that setting
     [tags]    email
-    ${random email}    Get Random Email
+    ${random email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${random email}    ${password}    false
     Activate    ${random email}

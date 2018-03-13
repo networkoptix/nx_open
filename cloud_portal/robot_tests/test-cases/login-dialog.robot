@@ -43,7 +43,7 @@ redirects to systems after log In
     Log In    ${email}    ${password}
     Validate Log In
     Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
-    Location Should Be    ${url}/systems
+    Location Should Be    ${url}/systems/${AUTO_TESTS SYSTEM ID}
     Close Browser
 
 after log In, display user's email and menu in top right corner
@@ -122,7 +122,7 @@ passes email from email input to Restore password page, even without clicking 'L
 redirects to /activate and shows non-activated user message when not activated; Resend activation button sends email
     [tags]    email
     Open Browser and go to URL    ${url}/register
-    ${random email}    get random email
+    ${random email}    get random email    ${BASE EMAIL}
     Register    'mark'    'hamill'    ${random email}    ${BASE PASSWORD}
     Wait Until Element Is Visible    //h1[contains(@class,'process-success')]
     Log In    ${random email}    ${BASE PASSWORD}

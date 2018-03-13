@@ -131,7 +131,7 @@ Sharing works
     Log in to Auto Tests System    ${email}
     Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
     Click Button    ${SHARE BUTTON SYSTEMS}
-    ${random email}    Get Random Email
+    ${random email}    Get Random Email    ${BASE EMAIL}
     Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE BUTTON MODAL}
     Input Text    ${SHARE EMAIL}    ${random email}
     Click Button    ${SHARE BUTTON MODAL}
@@ -146,7 +146,7 @@ displays pencil and cross links for each user only on hover
     Log in to Auto Tests System    ${email}
     Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
     Click Button    ${SHARE BUTTON SYSTEMS}
-    ${random email}    Get Random Email
+    ${random email}    Get Random Email    ${BASE EMAIL}
     Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE BUTTON MODAL}
     Input Text    ${SHARE EMAIL}    ${random email}
     Click Button    ${SHARE BUTTON MODAL}
@@ -164,7 +164,7 @@ Edit permission works
     Log in to Auto Tests System    ${email}
     Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
     Click Button    ${SHARE BUTTON SYSTEMS}
-    ${random email}    Get Random Email
+    ${random email}    Get Random Email    ${BASE EMAIL}
     Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE BUTTON MODAL}
     Input Text    ${SHARE EMAIL}    ${random email}
     Click Button    ${SHARE BUTTON MODAL}
@@ -179,7 +179,7 @@ Edit permission works
 Delete user works
     [tags]    email
     Open Browser and go to URL    ${url}/register
-    ${random email}    Get Random Email
+    ${random email}    Get Random Email    ${BASE EMAIL}
     Register    mark    harmill    ${random email}    ${password}
     Activate    ${random email}
     Log in to Auto Tests System    ${email}

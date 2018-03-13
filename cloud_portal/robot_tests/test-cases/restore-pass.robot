@@ -26,7 +26,7 @@ should not succeed, if email is not registered
 
 restores password
     [tags]    email
-    ${email}    Get Random Email
+    ${email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${email}    ${password}
     ${link}    Get Activation Link    ${email}
@@ -47,7 +47,7 @@ should not allow to access /restore_password/sent /restore_password/success by d
 
 should be able to set new password (which is same as old), redirect
     [tags]    email
-    ${email}    Get Random Email
+    ${email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${email}    ${password}
     ${link}    Get Activation Link    ${email}
@@ -66,7 +66,7 @@ should be able to set new password (which is same as old), redirect
 
 should set new password, login with new password
     [tags]    email
-    ${email}    Get Random Email
+    ${email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${email}    ${password}
     ${link}    Get Activation Link    ${email}
@@ -88,7 +88,7 @@ should set new password, login with new password
 
 should not allow to use one restore link twice
     [tags]    email
-    ${email}    Get Random Email
+    ${email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${email}    ${password}
     ${link}    Get Activation Link    ${email}
@@ -112,7 +112,7 @@ should not allow to use one restore link twice
 
 should make not-activated user active by restoring password
     [tags]    email
-    ${email}    Get Random Email
+    ${email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${email}    ${password}
     Go To    ${url}/restore_password
@@ -132,7 +132,7 @@ should make not-activated user active by restoring password
 
 should allow logged in user visit restore password page
     [tags]    email
-    ${email}    Get Random Email
+    ${email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${email}    ${password}
     Activate    ${email}
@@ -144,7 +144,7 @@ should allow logged in user visit restore password page
 
 should prompt log user out if he visits restore password link from email
     [tags]    email
-    ${email}    Get Random Email
+    ${email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${email}    ${password}
     Activate    ${email}

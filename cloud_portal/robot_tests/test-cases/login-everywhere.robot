@@ -24,7 +24,7 @@ works at registration page before submit
 
 works at registration page after submit success
     Open Browser and go to URL    ${url}/register
-    ${random email}    Get Random Email
+    ${random email}    Get Random Email    ${BASE EMAIL}
     Register    mark    hamill    ${random email}    ${password}
     Validate Register Success
     Check Log In
@@ -32,7 +32,7 @@ works at registration page after submit success
 
 works at registration page after submit with alert error message
     Open Browser and go to URL    ${url}/register
-    ${random email}    Get Random Email
+    ${random email}    Get Random Email    ${BASE EMAIL}
     Register    mark    hamill    ${email}    ${password}
     Wait Until Element Is Visible    ${EMAIL ALREADY REGISTERED}
     Check Log In
@@ -41,7 +41,7 @@ works at registration page after submit with alert error message
 works at registration page on account activation success
     [tags]    email
     Open Browser and go to URL    ${url}/register
-    ${random email}    Get Random Email
+    ${random email}    Get Random Email    ${BASE EMAIL}
     Register    mark    hamill    ${random email}    ${password}
     Activate    ${random email}
     Check Log In
@@ -49,7 +49,7 @@ works at registration page on account activation success
 
 works at registration page on account activation error
     [tags]    email
-    ${random email}    Get Random Email
+    ${random email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    'mark'    'hamill'    ${random email}    ${password}
     ${link}    Get Activation Link    ${random email}
@@ -89,7 +89,7 @@ works at restore password page with email input - after submit success
 
 works at restore password page with password input - before submit
     [tags]    email
-    ${random email}    Get Random Email
+    ${random email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${random email}    ${password}
     ${link}    Get Activation Link    ${random email}
@@ -99,7 +99,7 @@ works at restore password page with password input - before submit
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${random email}
     Click Button    ${RESET PASSWORD BUTTON}
-    ${RESET EMAIL SENT MESSAGE TEXT}    Replace String    ${RESET EMAIL SENT MESSAGE TEXT}    {{email}}    ${email}
+    ${RESET EMAIL SENT MESSAGE TEXT}    Replace String    ${RESET EMAIL SENT MESSAGE TEXT}    {{email}}    ${random email}
     Wait Until Element Is Visible    ${RESET EMAIL SENT MESSAGE}
     ${text}    Get Text    ${RESET EMAIL SENT MESSAGE}
     ${replaced}    Replace String    ${text}    \n    ${SPACE}
@@ -111,7 +111,7 @@ works at restore password page with password input - before submit
 
 works at restore password page with password input - after submit error
     [tags]    email
-    ${random email}    Get Random Email
+    ${random email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${random email}    ${password}
     ${link}    Get Activation Link    ${random email}
@@ -120,7 +120,7 @@ works at restore password page with password input - after submit error
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${random email}
     Click Button    ${RESET PASSWORD BUTTON}
-    ${RESET EMAIL SENT MESSAGE TEXT}    Replace String    ${RESET EMAIL SENT MESSAGE TEXT}    {{email}}    ${email}
+    ${RESET EMAIL SENT MESSAGE TEXT}    Replace String    ${RESET EMAIL SENT MESSAGE TEXT}    {{email}}    ${random email}
     Wait Until Element Is Visible    ${RESET EMAIL SENT MESSAGE}
     ${text}    Get Text    ${RESET EMAIL SENT MESSAGE}
     ${replaced}    Replace String    ${text}    \n    ${SPACE}
@@ -135,7 +135,7 @@ works at restore password page with password input - after submit error
 
 works at restore password page with password input - after submit success
     [tags]    email
-    ${random email}    Get Random Email
+    ${random email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${random email}    ${password}
     ${link}    Get Activation Link    ${random email}
@@ -144,7 +144,7 @@ works at restore password page with password input - after submit success
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${random email}
     Click Button    ${RESET PASSWORD BUTTON}
-    ${RESET EMAIL SENT MESSAGE TEXT}    Replace String    ${RESET EMAIL SENT MESSAGE TEXT}    {{email}}    ${email}
+    ${RESET EMAIL SENT MESSAGE TEXT}    Replace String    ${RESET EMAIL SENT MESSAGE TEXT}    {{email}}    ${random email}
     Wait Until Element Is Visible    ${RESET EMAIL SENT MESSAGE}
     ${text}    Get Text    ${RESET EMAIL SENT MESSAGE}
     ${replaced}    Replace String    ${text}    \n    ${SPACE}

@@ -33,10 +33,12 @@ class NoptixLibrary(object):
         locator.send_keys(Keys.CONTROL+'v')
 
 
-    def get_random_email(self):
-        return "noptixqa+" + str(time.time()) + "@gmail.com"
+    def get_random_email(self, email):
+        index = email.find('@')
+        email = email[:index] + '+' + str(time.time()) + email[index:]
+        return email
 
-    def get_many_random_emails(self, howMany):
+    def get_many_random_emails(self, howMany, email):
         emails = []
         for x in xrange(0,int(howMany)):
             emails.append(self.get_random_email())

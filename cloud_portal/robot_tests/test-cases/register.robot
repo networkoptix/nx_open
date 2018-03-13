@@ -26,7 +26,7 @@ should open register page in anonymous state by clicking Register button on top 
 
 should open register page from register success page by clicking Register button on top right corner
     [tags]    email
-    ${email}    Get Random Email
+    ${email}    Get Random Email        ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    'mark'    'hamill'    ${email}    ${password}
     Activate    ${email}
@@ -49,35 +49,35 @@ should open register page in anonymous state
     Close Browser
 
 should register user with correct credentials
-    ${email}    Get Random Email
+    ${email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${email}    ${password}
     Validate Register Success
     Close Browser
 
 should register user with cyrillic First and Last names and correct credentials
-    ${email}    Get Random Email
+    ${email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    ${CYRILLIC TEXT}    ${CYRILLIC TEXT}    ${email}    ${password}
     Validate Register Success
     Close Browser
 
 should register user with smiley First and Last names and correct credentials
-    ${email}    Get Random Email
+    ${email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    ${SMILEY TEXT}    ${SMILEY TEXT}    ${email}    ${password}
     Validate Register Success
     Close Browser
 
 should register user with glyph First and Last names and correct credentials
-    ${email}    Get Random Email
+    ${email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    ${GLYPH TEXT}    ${GLYPH TEXT}    ${email}    ${password}
     Validate Register Success
     Close Browser
 
 should allow `~!@#$%^&*()_:\";\'{}[]+<>?,./ in First and Last name fields
-    ${email}    Get Random Email
+    ${email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    ${SYMBOL TEXT}    ${SYMBOL TEXT}    ${email}    ${password}
     Validate Register Success
@@ -91,7 +91,7 @@ should allow !#$%&'*+-/=?^_`{|}~ in email field
     Close Browser
 
 should respond to Enter key and save data
-    ${email}    Get Random Email
+    ${email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Wait Until Elements Are Visible    ${REGISTER FIRST NAME INPUT}    ${REGISTER LAST NAME INPUT}    ${REGISTER EMAIL INPUT}    ${REGISTER PASSWORD INPUT}
     Input Text    ${REGISTER FIRST NAME INPUT}    mark
@@ -149,7 +149,7 @@ should not display promo-block, if user goes to registration not from native app
     Close Browser
 
 should remove promo-block on registration form successful submitting form when from=client
-    ${email}    Get Random Email
+    ${email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register?from=client
     Register    mark    hamill    ${email}    ${password}
     Validate Register Success    ${url}/register/success?from=client
@@ -157,7 +157,7 @@ should remove promo-block on registration form successful submitting form when f
     Close Browser
 
 should remove promo-block on registration form successful submitting form when from=mobile
-    ${email}    Get Random Email
+    ${email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register?from=mobile
     Register    mark    hamill    ${email}    ${password}
     Validate Register Success    ${url}/register/success?from=mobile

@@ -1,7 +1,7 @@
 *** Settings ***
 
 Library           SeleniumLibrary    screenshot_root_directory=\Screenshots    run_on_failure=Failure Tasks
-Library           ImapLibrary
+Library           NoptixImapLibrary/
 Library           String
 Library           NoptixLibrary/
 Resource          variables.robot
@@ -71,7 +71,7 @@ Validate Register Success
 
 Validate Register Email Received
     [arguments]    ${recipient}
-    Open Mailbox    host=imap.gmail.com    password=qweasd!@#    port=993    user=noptixqa@gmail.com    is_secure=True
+    Open Mailbox    host=imap.gmail.com    password=${BASE EMAIL PASSWORD}    port=993    user=${BASE EMAIL}    is_secure=True
     ${email}    Wait For Email    recipient=${recipient}    timeout=120    status=UNSEEN
     Check Email Subject    ${email}    ${ACTIVATE YOUR ACCOUNT EMAIL SUBJECT}
     Should Not Be Equal    ${email}    ${EMPTY}
@@ -79,7 +79,7 @@ Validate Register Email Received
 
 Get Activation Link
     [arguments]    ${recipient}
-    Open Mailbox    host=imap.gmail.com    password=qweasd!@#    port=993    user=noptixqa@gmail.com    is_secure=True
+    Open Mailbox    host=imap.gmail.com    password=${BASE EMAIL PASSWORD}    port=993    user=${BASE EMAIL}    is_secure=True
     ${email}    Wait For Email    recipient=${recipient}    timeout=120    status=UNSEEN
     check email subject    ${email}    ${ACTIVATE YOUR ACCOUNT EMAIL SUBJECT}
     ${links}    Get Links From Email    ${email}
@@ -179,7 +179,7 @@ Register Form Validation
 
 Get Reset Password Link
     [arguments]    ${recipient}
-    Open Mailbox    host=imap.gmail.com    password=qweasd!@#    port=993    user=noptixqa@gmail.com    is_secure=True
+    Open Mailbox    host=imap.gmail.com    password=${BASE EMAIL PASSWORD}    port=993    user=${BASE EMAIL}    is_secure=True
     ${email}    Wait For Email    recipient=${recipient}    timeout=120    status=UNSEEN
     Check Email Subject    ${email}    ${RESET PASSWORD EMAIL SUBJECT}
     ${links}    Get Links From Email    ${email}

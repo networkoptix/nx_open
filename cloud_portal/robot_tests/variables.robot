@@ -158,16 +158,18 @@ ${300CHARS}                           QWErtyuiopasdfghhkljzxcvbnmqwertyuiopasdfg
 ${255CHARS}                           QWErtyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopas
 
 #Emails
-${EMAIL VIEWER}                       noptixqa+viewer@gmail.com
-${EMAIL ADV VIEWER}                   noptixqa+advviewer@gmail.com
-${EMAIL LIVE VIEWER}                  noptixqa+liveviewer@gmail.com
-${EMAIL OWNER}                        noptixqa+owner@gmail.com
-${EMAIL NOT OWNER}                    noptixqa+notowner@gmail.com
-${EMAIL ADMIN}                        noptixqa+admin@gmail.com
+${BASE EMAIL}                         noptixautoqa@gmail.com
+${BASE EMAIL PASSWORD}                qweasd!@#
+${EMAIL VIEWER}                       noptixautoqa+viewer@gmail.com
+${EMAIL ADV VIEWER}                   noptixautoqa+advviewer@gmail.com
+${EMAIL LIVE VIEWER}                  noptixautoqa+liveviewer@gmail.com
+${EMAIL OWNER}                        noptixautoqa+owner@gmail.com
+${EMAIL NOT OWNER}                    noptixautoqa+notowner@gmail.com
+${EMAIL ADMIN}                        noptixautoqa+admin@gmail.com
 ${ADMIN FIRST NAME}                   asdasasd
 ${ADMIN LAST NAME}                    asdasasdas
-${EMAIL UNREGISTERED}                 noptixqa+unregistered@gmail.com
-${EMAIL NOPERM}                       noptixqa+noperm@gmail.com
+${EMAIL UNREGISTERED}                 noptixautoqa+unregistered@gmail.com
+${EMAIL NOPERM}                       noptixautoqa+noperm@gmail.com
 ${BASE PASSWORD}                      qweasd123
 ${ALT PASSWORD}                       qweasd1234
 
@@ -175,7 +177,7 @@ ${TEST FIRST NAME}                    testFirstName
 ${TEST LAST NAME}                     testLastName
 
 #Related to Auto Tests system
-${AUTO_TESTS SYSTEM ID}                     97b27ae5-1d36-4ddf-8a1c-ab0f3e244e97
+${AUTO_TESTS SYSTEM ID}                     ff891c00-c886-44fa-877f-bb185f586ec7
 ${AUTO TESTS TITLE}                   //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests')]
 ${AUTO TESTS USER}                    //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests')]/following-sibling::span[contains(@class,'user-name')]
 ${AUTO TESTS OPEN NX}                 //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests')]/..//button[@ng-click='checkForm()']
