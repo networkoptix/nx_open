@@ -275,11 +275,8 @@ public:
 
     qint64 pixelPosToTime(qreal x) const
     {
-        const auto shiftedWindowStart = windowStart + visualOffset;
-        const auto shiftedWindowEnd = windowEnd + visualOffset;
-
-        return shiftedWindowStart + static_cast<qint64>(x / parent->width()
-            * (shiftedWindowEnd - shiftedWindowStart));
+        return windowStart + static_cast<qint64>(x / parent->width()
+            * (windowEnd - windowStart));
     }
 
     qreal timeToPixelPos(qint64 time) const
@@ -518,12 +515,7 @@ void QnTimeline::setPositionImmediately(qint64 position)
 
 QDateTime QnTimeline::positionDate() const
 {
-    return QDateTime::fromMSecsSinceEpoch(position(), Qt::UTC);
-}
-
-void QnTimeline::setPositionDate(const QDateTime& dateTime)
-{
-    setPosition(dateTime.isValid() ? dateTime.toMSecsSinceEpoch() : -1);
+    return QDateTime::fromMSecsSinceEpoch(position() + d->visualOffset, Qt::UTC);
 }
 
 bool QnTimeline::stickToEnd() const

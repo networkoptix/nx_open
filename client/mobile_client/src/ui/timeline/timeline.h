@@ -21,8 +21,7 @@ class QnTimeline: public QQuickItem
     Q_PROPERTY(qint64 windowStart READ windowStart WRITE setWindowStart NOTIFY windowStartChanged)
     Q_PROPERTY(qint64 windowEnd READ windowEnd WRITE setWindowEnd NOTIFY windowEndChanged)
     Q_PROPERTY(qint64 position READ position WRITE setPosition NOTIFY positionChanged)
-    Q_PROPERTY(QDateTime positionDate
-        READ positionDate WRITE setPositionDate NOTIFY positionDateChanged)
+    Q_PROPERTY(QDateTime positionDate READ positionDate NOTIFY positionDateChanged)
     Q_PROPERTY(qint64 startBound READ startBound WRITE setStartBound NOTIFY startBoundChanged)
     Q_PROPERTY(bool stickToEnd READ stickToEnd WRITE setStickToEnd NOTIFY stickToEndChanged)
     Q_PROPERTY(bool autoPlay READ autoPlay WRITE setAutoPlay NOTIFY autoPlayChanged)
@@ -93,7 +92,6 @@ public:
     Q_INVOKABLE void setPositionImmediately(qint64 position);
 
     QDateTime positionDate() const;
-    void setPositionDate(const QDateTime &dateTime);
 
     QnTimePeriodList timePeriods(Qn::TimePeriodContent type) const;
     void setTimePeriods(Qn::TimePeriodContent type, const QnTimePeriodList& timePeriods);
