@@ -1,6 +1,6 @@
 *** Settings ***
 
-Library           Selenium2Library    screenshot_root_directory=\Screenshots    run_on_failure=Failure Tasks
+Library           SeleniumLibrary    screenshot_root_directory=\Screenshots    run_on_failure=Failure Tasks
 Library           ImapLibrary
 Library           String
 Library           NoptixLibrary/
@@ -72,17 +72,21 @@ Validate Register Success
 Validate Register Email Received
     [arguments]    ${recipient}
     Open Mailbox    host=imap.gmail.com    password=qweasd!@#    port=993    user=noptixqa@gmail.com    is_secure=True
-    ${email}    Wait For Email    recipient=${recipient}    timeout=120
+    ${email}    Wait For Email    recipient=${recipient}    timeout=120    status=UNSEEN
+    Check Email Subject    ${email}    ${ACTIVATE YOUR ACCOUNT EMAIL SUBJECT}
     Should Not Be Equal    ${email}    ${EMPTY}
     Close Mailbox
 
 Get Activation Link
     [arguments]    ${recipient}
     Open Mailbox    host=imap.gmail.com    password=qweasd!@#    port=993    user=noptixqa@gmail.com    is_secure=True
-    ${email}    Wait For Email    recipient=${recipient}    timeout=120
+    ${email}    Wait For Email    recipient=${recipient}    timeout=120    status=UNSEEN
+    check email subject    ${email}    ${ACTIVATE YOUR ACCOUNT EMAIL SUBJECT}
     ${links}    Get Links From Email    ${email}
+    Mark Email As Read    ${email}
     Close Mailbox
-    Return From Keyword    @{links}[1]
+    log    ${links}
+    Return From Keyword    ${links}
 
 Activate
     [arguments]    ${email}
@@ -132,9 +136,10 @@ Check For Alert
 Check For Alert Dismissable
     [arguments]    ${alert text}
     Wait Until Elements Are Visible    ${ALERT}    ${ALERT CLOSE}
-    Element Should Be Visible    ${ALERT}
     Element Text Should Be    ${ALERT}    ${alert text}
     Click Element    ${ALERT CLOSE}
+    Wait Until Page Does Not Contain Element    ${ALERT}
+
 
 Verify In System
     [arguments]    ${system name}
@@ -175,7 +180,9 @@ Register Form Validation
 Get Reset Password Link
     [arguments]    ${recipient}
     Open Mailbox    host=imap.gmail.com    password=qweasd!@#    port=993    user=noptixqa@gmail.com    is_secure=True
-    ${email}    Wait For Email    recipient=${recipient}    timeout=120    subject=${RESET PASSWORD EMAIL SUBJECT}
+    ${email}    Wait For Email    recipient=${recipient}    timeout=120    status=UNSEEN
+    Check Email Subject    ${email}    ${RESET PASSWORD EMAIL SUBJECT}
     ${links}    Get Links From Email    ${email}
+    Mark Email As Read    ${email}
     Close Mailbox
-    Return From Keyword    @{links}[1]
+    Return From Keyword    ${links}

@@ -64,7 +64,7 @@
       "description": "Kan live video bekijken, bladeren in het archief, camera configureren, PTZ, enz. bedienen"
     },
     "Administrator": {
-      "label": "Beheerder",
+      "label": "Administrator",
       "description": "Onbeperkt toegang inclusief de mogelijkheid om te delen"
     },
     "Custom": {
@@ -72,7 +72,7 @@
       "description": "Gebruik de {{PRODUCT_NAME}} client-applicatie om aangepaste rechten in te stellen"
     },
     "cloudAdmin": {
-      "label": "Beheerder",
+      "label": "Administrator",
       "description": "Kan systeem configureren en delen"
     },
     "customRole": {
@@ -127,9 +127,9 @@
     "alreadyExists": "Deze account bestaat al",
     "unknownError": "Er is een onverwachte fout opgetreden",
     "accountAlreadyActivated": "Deze account is al geactiveerd",
-    "emailNotFound": "Dit account bestaat niet",
+    "emailNotFound": "Account bestaat niet.",
     "EmailAlreadyExists": "Dit e-mailadres is al geregistreerd",
-    "oldPasswordMistmatch": "Dit wachtwoord is onjuist",
+    "oldPasswordMistmatch": "Dit wachtwoord is onjuist.",
     "passwordMismatch": "Wachtwoord onjuist",
     "cantEditYourself": "Het wijzigen van eigen machtigingen is niet toegestaan",
     "cantEditAdmin": "Deze gebruiker heeft beheerdersrechten",
