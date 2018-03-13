@@ -58,6 +58,7 @@ class ContextAdmin(CMSAdmin):
                     'url', 'translatable', 'is_global')
 
     list_display_links = ('name', )
+    list_filter = ('product',)
     search_fields = ('name', 'description', 'url', 'product__name')
 
     def context_actions(self, obj):
