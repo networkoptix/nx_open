@@ -125,8 +125,9 @@ public:
      */
     bool isSharingLicenseInGroup() const;
 
-    bool isMultiSensorCamera() const;
+    bool isNvr() const;
 
+    bool isMultiSensorCamera() const;
 
     virtual Qn::StreamFpsSharingMethod streamFpsSharingMethod() const;
     void setStreamFpsSharingMethod(Qn::StreamFpsSharingMethod value);

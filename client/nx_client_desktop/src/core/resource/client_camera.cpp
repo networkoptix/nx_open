@@ -20,16 +20,21 @@ Qn::ResourceFlags QnClientCameraResource::flags() const {
     return result;
 }
 
-void QnClientCameraResource::setAuthToMultisensorCamera(
+void QnClientCameraResource::setAuthToCameraGroup(
     const QnVirtualCameraResourcePtr& camera,
     const QAuthenticator& authenticator)
 {
-    NX_ASSERT(camera->isMultiSensorCamera());
+    NX_ASSERT(camera->isMultiSensorCamera() || camera->isNvr());
     if (!camera->resourcePool())
         return;
 
+    const auto groupId = camera->getGroupId();
+    NX_ASSERT(!groupId.isEmpty());
+    if (groupId.isEmpty())
+        return;
+
     auto sensors = camera->resourcePool()->getResources<QnVirtualCameraResource>(
-        [groupId = camera->getGroupId()](const QnVirtualCameraResourcePtr& camera)
+        [groupId](const QnVirtualCameraResourcePtr& camera)
         {
             return camera->getGroupId() == groupId;
         });

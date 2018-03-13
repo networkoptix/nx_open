@@ -410,8 +410,8 @@ void QnSingleCameraSettingsWidget::submitToResource()
         loginEditAuth.setPassword(ui->passwordEdit->text().trimmed());
         if (m_camera->getAuth() != loginEditAuth)
         {
-            if (m_camera->isMultiSensorCamera())
-                QnClientCameraResource::setAuthToMultisensorCamera(m_camera, loginEditAuth);
+            if (m_camera->isMultiSensorCamera() || m_camera->isNvr())
+                QnClientCameraResource::setAuthToCameraGroup(m_camera, loginEditAuth);
             else
                 m_camera->setAuth(loginEditAuth);
         }
