@@ -1,4 +1,7 @@
 function(hg_changeset dir var)
+    if(${var})
+        return()
+    endif()
     execute_process(
         COMMAND hg --repository "${dir}" id -i
         OUTPUT_VARIABLE changeset
@@ -9,6 +12,9 @@ function(hg_changeset dir var)
 endfunction()
 
 function(hg_branch dir var)
+    if(${var})
+        return()
+    endif()
     execute_process(
         COMMAND hg --repository "${dir}" branch
         OUTPUT_VARIABLE branch
@@ -18,6 +24,9 @@ function(hg_branch dir var)
 endfunction()
 
 function(hg_last_commit_branch dir var)
+    if(${var})
+        return()
+    endif()
     execute_process(
         COMMAND hg --repository "${dir}" log --template "{branch}" -r -1
         OUTPUT_VARIABLE parent_branch
@@ -27,6 +36,9 @@ function(hg_last_commit_branch dir var)
 endfunction()
 
 function(hg_parent_branch dir branch var)
+    if(${var})
+        return()
+    endif()
     execute_process(
         COMMAND hg --repository "${dir}"
             log --template "{branch}" -r "parents(min(branch(${branch})))"
