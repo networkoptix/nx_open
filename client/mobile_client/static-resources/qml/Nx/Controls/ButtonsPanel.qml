@@ -34,7 +34,7 @@ ListView
     {
         id: delayedAnimationTimer
 
-        interval: 0
+        interval: 30
         onTriggered: showAnimation.restart()
 
     }
