@@ -2360,9 +2360,9 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>This Id is already used on the following %n cameras: %1</source>
-      <translation type="unfinished">
-        <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
-        <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
+      <translation>
+        <numerusform>Deze Id wordt al gebruikt op de volgende %n camera's: %1</numerusform>
+        <numerusform>Deze Id wordt al gebruikt op de volgende %n camera's: %1</numerusform>
       </translation>
     </message>
   </context>
@@ -2485,7 +2485,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Logical Id</source>
-      <translation type="unfinished">Logical Id</translation>
+      <translation>Logische Id</translation>
     </message>
   </context>
   <context>
@@ -2563,7 +2563,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Password should not be equal to camera&apos;s user name</source>
-      <translation type="unfinished">Password should not be equal to camera&apos;s user name</translation>
+      <translation>Wachtwoord mag niet gelijk zijn aan de gebruikersnaam van de camera&apos;s</translation>
     </message>
   </context>
   <context>
@@ -7164,10 +7164,6 @@ to %1</source>
   <context>
     <name>QnWearableProgressWidget</name>
     <message>
-      <source>Uploading %1... %2	%p%</source>
-      <translation>Uploaden %1... %2	%p%</translation>
-    </message>
-    <message>
       <source>Stop uploading?</source>
       <translation>Stoppen met uploaden?</translation>
     </message>
@@ -7176,12 +7172,16 @@ to %1</source>
       <translation>Reeds geuploade bestanden worden bewaard.</translation>
     </message>
     <message>
-      <source>Finalizing %1... %2	%p%</source>
-      <translation>Afronden %1... %2	%p%</translation>
-    </message>
-    <message>
       <source>(%1 of %2)</source>
       <translation>(%1 van %2)</translation>
+    </message>
+    <message>
+      <source>Uploading %1...</source>
+      <translation type="unfinished">Uploading %1...</translation>
+    </message>
+    <message>
+      <source>Finalizing %1...</source>
+      <translation type="unfinished">Finalizing %1...</translation>
     </message>
   </context>
   <context>
@@ -7712,23 +7712,23 @@ to %1</source>
     </message>
     <message>
       <source>%1 has unsupported format.</source>
-      <translation type="unfinished">%1 has unsupported format.</translation>
+      <translation>%1 heeft een niet-ondersteund formaat.</translation>
     </message>
     <message>
       <source>%1 does not have timestamp.</source>
-      <translation type="unfinished">%1 does not have timestamp.</translation>
+      <translation>%1 heeft geen tijdstempel.</translation>
     </message>
     <message>
       <source>%1 is older than allowed in camera archive settings.</source>
-      <translation type="unfinished">%1 is older than allowed in camera archive settings.</translation>
+      <translation>%1 is ouder dan toegestaan ​​in de camera-archiefinstellingen.</translation>
     </message>
     <message>
       <source>%1 covers period for which video has already been uploaded.</source>
-      <translation type="unfinished">%1 covers period for which video has already been uploaded.</translation>
+      <translation>%1 bevat een periode waarvoor de video al is geüpload.</translation>
     </message>
     <message>
       <source>%1 covers period for which video is being uploaded.</source>
-      <translation type="unfinished">%1 covers period for which video is being uploaded.</translation>
+      <translation>%1 bevat een periode waarvoor video wordt geüpload.</translation>
     </message>
   </context>
   <context>

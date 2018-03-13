@@ -7088,10 +7088,6 @@ to %1</source>
   <context>
     <name>QnWearableProgressWidget</name>
     <message>
-      <source>Uploading %1... %2	%p%</source>
-      <translation>上传 %1... %2	%p％</translation>
-    </message>
-    <message>
       <source>Stop uploading?</source>
       <translation>停止上传？</translation>
     </message>
@@ -7100,12 +7096,16 @@ to %1</source>
       <translation>已经上传的文件将被保留。</translation>
     </message>
     <message>
-      <source>Finalizing %1... %2	%p%</source>
-      <translation>正在完成 %1... %2	%p％</translation>
-    </message>
-    <message>
       <source>(%1 of %2)</source>
       <translation>(%1 of %2)</translation>
+    </message>
+    <message>
+      <source>Uploading %1...</source>
+      <translation type="unfinished">Uploading %1...</translation>
+    </message>
+    <message>
+      <source>Finalizing %1...</source>
+      <translation type="unfinished">Finalizing %1...</translation>
     </message>
   </context>
   <context>

@@ -7166,10 +7166,6 @@ a %1</translation>
   <context>
     <name>QnWearableProgressWidget</name>
     <message>
-      <source>Uploading %1... %2	%p%</source>
-      <translation>Cargando %1... %2%p%</translation>
-    </message>
-    <message>
       <source>Stop uploading?</source>
       <translation>Detener la subida?</translation>
     </message>
@@ -7178,12 +7174,16 @@ a %1</translation>
       <translation>Se mantendrán los archivos ya subidos.</translation>
     </message>
     <message>
-      <source>Finalizing %1... %2	%p%</source>
-      <translation>Finalizando %1... %2%p%</translation>
-    </message>
-    <message>
       <source>(%1 of %2)</source>
       <translation>(%1 de %2)</translation>
+    </message>
+    <message>
+      <source>Uploading %1...</source>
+      <translation type="unfinished">Uploading %1...</translation>
+    </message>
+    <message>
+      <source>Finalizing %1...</source>
+      <translation type="unfinished">Finalizing %1...</translation>
     </message>
   </context>
   <context>

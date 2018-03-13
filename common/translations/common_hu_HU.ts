@@ -561,7 +561,7 @@
     </message>
     <message>
       <source>Server with matching Hardware Id not found</source>
-      <translation>Nem található szerver egyező hardver ID-vel</translation>
+      <translation>Nem található szerver egyező Hardver Id-vel</translation>
     </message>
   </context>
   <context>
@@ -684,7 +684,7 @@
     </message>
     <message>
       <source>Hardware Id: %1</source>
-      <translation>Hardver ID: %1</translation>
+      <translation>Hardver Id: %1</translation>
     </message>
     <message>
       <source>Time License</source>
