@@ -2671,6 +2671,14 @@ void QnPlOnvifResource::fetchAndSetAdvancedParameters() {
     m_advancedParametersProvider.assign(params.filtered(supportedParams));
 }
 
+CameraDiagnostics::Result QnPlOnvifResource::sendVideoEncoderToCameraEx(
+    VideoEncoder& encoder,
+    Qn::StreamIndex /*streamIndex*/,
+    const QnLiveStreamParams& /*params*/)
+{
+    return sendVideoEncoderToCamera(encoder);
+}
+
 CameraDiagnostics::Result QnPlOnvifResource::sendVideoEncoderToCamera(VideoEncoder& encoder)
 {
     QAuthenticator auth = getAuth();
