@@ -30,11 +30,9 @@
         <div class="form-row">
             {% is_optional field.name context as optional %}
             {% has_value field.name context customization language as record_exists %}
-            {% if not optional and not record_exists %}
-            <label class="text-danger" for="id_{{ field.name }}">{{ field.label }}</label>
-            {% else %}
-            <label for="id_{{ field.name }}">{{ field.label }}</label>
-            {% endif %}
+            <label {% if not optional and not record_exists %} class="text-danger" {% endif %}
+                   for="id_{{ field.name }}">{{ field.label }}<p class="help">{{field.name}}</p>
+            </label>
             <div id="{{field.name}}" style="display:inline-block;">
                 {% if field|is_ImageField and field.value %}
                     <div>
@@ -72,7 +70,6 @@
                 
                 {% if field.help_text %}
                 <p class="help">{{ field.help_text|safe }}</p>
-                <p class="help">Name: {{field.name}}</p>
                 {% endif %}
             </div>
         </div>
