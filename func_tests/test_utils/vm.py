@@ -1,4 +1,3 @@
-import csv
 import logging
 from collections import namedtuple
 from pprint import pformat
@@ -10,15 +9,12 @@ from test_utils.move_lock import MoveLock
 from test_utils.networking import NodeNetworking, reset_networking
 from test_utils.networking.linux import LinuxNodeNetworking
 from test_utils.networking.virtual_box import VirtualBoxNodeNetworking
-from test_utils.os_access import FileNotFound, ProcessError
-from test_utils.serialize import load, dump
+from test_utils.os_access import FileNotFound
+from test_utils.serialize import dump, load
 from test_utils.utils import wait_until
+from test_utils.virtual_box import VMNotFound
 
 logger = logging.getLogger(__name__)
-
-
-class VMNotFound(Exception):
-    pass
 
 
 class VMConfiguration(object):
@@ -40,70 +36,7 @@ class VMConfiguration(object):
             host_port = host_port_base + forwarded_port['host_port_offset']
             if not forwarded_port['host_port_offset'] < configuration['host_ports_per_vm']:
                 raise self.HostPortOffsetOutOfRange("Configuration:\n{}", pformat(configuration))
-            yield name, forwarded_port['protocol'], forwarded_port['guest_port'], host_port
-
-
-class VirtualBox(object):
-    """Interface for VirtualBox as hypervisor."""
-
-    class VMInfo(object):
-        def __init__(self, hypervisor_address, raw_dict):
-            self._hypervisor_address = hypervisor_address
-            self._raw_dict = raw_dict
-            self.name = self._raw_dict['name']
-            self.is_running = self._raw_dict['VMState'] == 'running'
-            self.ports = {}
-            for index in range(100):
-                try:
-                    raw_value = self._raw_dict['Forwarding({})'.format(index)]
-                except KeyError:
-                    break
-                tag, protocol, host_address, host_port, guest_address, guest_port = raw_value.split(',')
-                self.ports[protocol, int(guest_port)] = hypervisor_address, int(host_port)
-
-    def __init__(self, os_access, address):
-        self._os_access = os_access
-        self._address = address
-
-    def _info(self, name):
-        try:
-            output = self._os_access.run_command(['VBoxManage', 'showvminfo', name, '--machinereadable'])
-        except ProcessError as e:
-            if e.returncode == 1:
-                raise VMNotFound("Cannot find VM {}; VBoxManage says:\n{}".format(name, e.output))
-            raise
-        raw_dict = dict(csv.reader(output.splitlines(), delimiter='=', escapechar='\\', doublequote=False))
-        info = self.VMInfo(self._address, raw_dict)
-        return info
-
-    def find(self, name):
-        return self._info(name)
-
-    def power_on(self, name):
-        self._os_access.run_command(['VBoxManage', 'startvm', name, '--type', 'headless'])
-
-    def power_off(self, name):
-        self._os_access.run_command(['VBoxManage', 'controlvm', name, 'acpipowerbutton'])
-
-    def create(self, name, template, forwarded_ports):
-        """Clone and setup VM with simple and generic parameters. Template can be any specific type."""
-        self._os_access.run_command([
-            'VBoxManage', 'clonevm', template['vm'],
-            '--snapshot', template['snapshot'],
-            '--name', name,
-            '--options', 'link',
-            '--register'])
-        for tag, protocol, guest_port, host_port in forwarded_ports:
-            self._os_access.run_command([
-                'VBoxManage', 'modifyvm', name,
-                '--natpf1', '{},{},,{},,{}'.format(tag, protocol, host_port, guest_port)])
-        return self._info(name)
-
-    def destroy(self, name):
-        if self.find(name).is_running:
-            self._os_access.run_command(['VBoxManage', 'controlvm', name, 'poweroff'])
-            assert wait_until(lambda: not self.find(name).is_running, name='until VM is off')
-        self._os_access.run_command(['VBoxManage', 'unregistervm', name, '--delete'])
+            yield name, forwarded_port['protocol'], host_port, forwarded_port['guest_port']
 
 
 Machine = namedtuple('Machine', ['alias', 'index', 'name', 'ports', 'os_access', 'networking'])
@@ -183,8 +116,8 @@ class Pool(object):
         assert info.name == name
         if not info.is_running:
             self._hypervisor.power_on(info.name)
-        hostname, port = info.ports['tcp', self._access_manager.guest_port]
-        os_access = self._access_manager.register(hostname, [alias, info.name], port)
+        port = info.ports['tcp', self._access_manager.guest_port]
+        os_access = self._access_manager.register(self._hypervisor.hostname, [alias, info.name], port)
         if not wait_until(os_access.is_working, timeout_sec=self._vm_configuration.power_on_timeout):
             raise MachineNotResponding(alias, info.name)
         networking = NodeNetworking(LinuxNodeNetworking(os_access), VirtualBoxNodeNetworking(info.name))

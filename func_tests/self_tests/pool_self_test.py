@@ -5,7 +5,8 @@ from pathlib2 import Path
 from test_utils.os_access import LocalAccess
 from test_utils.ssh.access_manager import SSHAccessManager
 from test_utils.ssh.config import SSHConfig
-from test_utils.vm import Pool, Registry, VMConfiguration, VirtualBox
+from test_utils.virtual_box import VirtualBox
+from test_utils.vm import Pool, Registry, VMConfiguration
 
 
 @pytest.fixture()

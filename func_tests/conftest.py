@@ -23,7 +23,8 @@ from test_utils.server_factory import ServerFactory
 from test_utils.server_physical_host import PhysicalInstallationCtl
 from test_utils.ssh.access_manager import SSHAccessManager
 from test_utils.ssh.config import SSHConfig
-from test_utils.vm import Pool, Registry, VMConfiguration, VirtualBox
+from test_utils.virtual_box import VirtualBox
+from test_utils.vm import Pool, Registry, VMConfiguration
 
 JUNK_SHOP_PLUGIN_NAME = 'junk-shop-db-capture'
 
