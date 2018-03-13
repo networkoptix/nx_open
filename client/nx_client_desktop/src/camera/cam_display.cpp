@@ -527,7 +527,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
         }
     }
 
-    if (m_isRealTimeSource && vd && !isPrebuffering)
+    if (m_isRealTimeSource && vd && !isPrebuffering && !isForcedBufferingEnabled())
     {
         qint64 queueLen = m_lastQueuedVideoTime - m_lastVideoPacketTime;
         //qDebug() << "queueLen" << queueLen/1000 << "ms";
@@ -1146,9 +1146,10 @@ void QnCamDisplay::putData(const QnAbstractDataPacketPtr& data)
     {
         m_lastQueuedVideoTime = video->timestamp;
 
-        if (isForcedBufferingEnabled() && isDataQueueFull())
+        if (isForcedBufferingEnabled())
         {
-            m_delay.breakSleep();
+            if (isDataQueueFull())
+                m_delay.breakSleep();
         }
         else if (video->flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE)
             && m_dataQueue.size() > 0
