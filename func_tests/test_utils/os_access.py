@@ -84,7 +84,7 @@ class SshAccessConfig(object):
         self.key_file_path = key_file_path
 
     def __repr__(self):
-        return '<_os_access=%r user=%r key_file=%r>' % (self.hostname, self.user, self.key_file_path)
+        return '<hostname=%r user=%r key_file=%r>' % (self.hostname, self.user, self.key_file_path)
 
 
 class OsAccess(object):
