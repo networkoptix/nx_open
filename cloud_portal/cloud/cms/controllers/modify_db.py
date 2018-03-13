@@ -64,7 +64,7 @@ def save_unrevisioned_records(context, customization, language, data_structures,
                         (data_structure_name,
                          "Invalid file type. Uploaded file is {}. It should be {}."\
                          .format(request_files[data_structure_name].content_type,
-                                 " or ".join(data_structure.meta_settings['format']))))
+                                 " or ".join(data_structure.meta_settings['format'].split(',')))))
                     continue
 
                 # Gets the meta_settings form the DataStructure to check if the sizes are valid
@@ -238,7 +238,8 @@ def get_records_for_version(version):
 
 
 def is_valid_file_type(file_type, meta_types):
-    for meta_type in meta_types:
+    print meta_types.split(',')
+    for meta_type in meta_types.split(','):
         if meta_type in file_type:
             return False
     return True
