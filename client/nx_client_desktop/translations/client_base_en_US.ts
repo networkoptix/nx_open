@@ -7165,10 +7165,6 @@ to %1</source>
 <context>
     <name>QnWearableProgressWidget</name>
     <message>
-        <source>Uploading %1... %2	%p%</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Stop uploading?</source>
         <translation></translation>
     </message>
@@ -7177,12 +7173,16 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Finalizing %1... %2	%p%</source>
+        <source>(%1 of %2)</source>
         <translation></translation>
     </message>
     <message>
-        <source>(%1 of %2)</source>
-        <translation></translation>
+        <source>Uploading %1...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Finalizing %1...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
