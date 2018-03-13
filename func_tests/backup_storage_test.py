@@ -102,8 +102,8 @@ def wait_storage_ready(server, storage_guid):
 def change_and_assert_server_backup_type(server, expected_backup_type):
     server_guid = get_server_id(server.rest_api)
     server.rest_api.ec2.saveMediaServerUserAttributes.POST(
-        serverId=server_guid, 
-		backupType='BackupManual',
+        serverId=server_guid,
+        backupType='BackupManual',
         backupDaysOfTheWeek=BACKUP_EVERY_DAY,
         backupStart=0,  # start backup at 00:00:00
         backupDuration=BACKUP_DURATION_NOT_SET,
