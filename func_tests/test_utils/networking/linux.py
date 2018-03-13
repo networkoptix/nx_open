@@ -1,6 +1,9 @@
 import csv
+import logging
 
 from netaddr import EUI
+
+logger = logging.getLogger(__name__)
 
 
 class LinuxNodeNetworking(object):

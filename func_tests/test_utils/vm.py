@@ -157,11 +157,15 @@ class Registry(object):
             self._os_access.rm_tree(self._path, ignore_errors=True)  # Not removed in case of exception.
 
 
+class MachineNotResponding(Exception):
+    def __init__(self, alias, name):
+        super(MachineNotResponding, self).__init__("Machine {} ({}) is not responding".format(name, alias))
+        self.alias = alias
+        self.name = name
+
+
 class Pool(object):
     """Get (with caching), allocate (bypassing cache) and recycle VMs."""
-
-    class MachineNotAlive(Exception):
-        pass
 
     def __init__(self, vm_configuration, registry, hypervisor, access_manager):
         self._vm_configuration = vm_configuration
@@ -182,7 +186,7 @@ class Pool(object):
         hostname, port = info.ports['tcp', self._access_manager.guest_port]
         os_access = self._access_manager.register(hostname, [alias, info.name], port)
         if not wait_until(os_access.is_working, timeout_sec=self._vm_configuration.power_on_timeout):
-            raise self.MachineNotAlive()
+            raise MachineNotResponding(alias, info.name)
         networking = NodeNetworking(LinuxNodeNetworking(os_access), VirtualBoxNodeNetworking(info.name))
         machine = Machine(alias, index, info.name, info.ports, os_access, networking)
         reset_networking(machine)
