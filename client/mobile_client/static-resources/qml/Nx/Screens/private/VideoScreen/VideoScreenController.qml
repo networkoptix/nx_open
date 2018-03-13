@@ -106,7 +106,7 @@ Object
         {
             if (d.waitForLastPosition)
             {
-                d.lastPosition = position
+                d.lastPosition = liveMode ? -1 : position
                 d.waitForLastPosition = false
             }
 
@@ -184,6 +184,7 @@ Object
     {
         d.playing = true
         mediaPlayer.playLive()
+        d.savePosition()
     }
 
     function stop()
