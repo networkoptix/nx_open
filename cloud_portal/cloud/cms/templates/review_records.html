@@ -50,7 +50,7 @@
 						{% endif %}
 					</td>
 					<td>{{ record.language.code }}</td>
-					<td>{{ record.data_structure.label }}</td>
+					<td>{{ record.data_structure.label }} <span class="help">{{record.data_structure.name}}</span></td>
 					<td>
 					{% if record.data_structure.type == 1 %}
 						<img class="preview-image review-preview" src="data:image/png;base64,{{record}}">
