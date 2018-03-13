@@ -146,7 +146,7 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
     if (isSearchAction)
         addMultichannelResources(result);
     else if (urlQuery.hasQueryItem(kUrlChannelNumber))
-        updateToChannel(resource, urlQuery.queryItemValue(kUrlChannelNumber).toInt());
+        setChannelToResource(resource, urlQuery.queryItemValue(kUrlChannelNumber).toInt());
 
     return result;
 }
@@ -324,7 +324,7 @@ QAuthenticator QnPlAxisResourceSearcher::determineResourceCredentials(
     return QAuthenticator();
 }
 
-void QnPlAxisResourceSearcher::updateToChannel(const QnPlAxisResourcePtr& resource, int value)
+void QnPlAxisResourceSearcher::setChannelToResource(const QnPlAxisResourcePtr& resource, int value)
 {
     QUrl url(resource->getUrl());
     QUrlQuery q(url.query());
@@ -358,7 +358,7 @@ void QnPlAxisResourceSearcher::addMultichannelResources(QList<T>& result)
         firstResource->setGroupName(physicalId);
         firstResource->setGroupId(physicalId);
 
-        updateToChannel(firstResource, 1);
+        setChannelToResource(firstResource, 1);
 
         for (uint i = 2; i <= channels; ++i)
         {
@@ -381,7 +381,7 @@ void QnPlAxisResourceSearcher::addMultichannelResources(QList<T>& result)
 
             resource->setUrl(firstResource->getUrl());
 
-            updateToChannel(resource, i);
+            setChannelToResource(resource, i);
 
             result.push_back(resource);
         }
