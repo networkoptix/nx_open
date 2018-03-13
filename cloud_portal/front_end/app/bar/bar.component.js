@@ -10,14 +10,25 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@angular/core");
+const http_1 = require("@angular/common/http");
 const index_1 = require("../../app/core/index");
+const angular_uuid2_1 = require("../../app/scripts/services/angular-uuid2");
+const language_1 = require("../../app/scripts/services/language");
 let BarComponent = class BarComponent {
-    constructor(quoteService, changeDetector) {
+    constructor(uuid2, language, http, quoteService, changeDetector) {
+        this.http = http;
         this.quoteService = quoteService;
         this.changeDetector = changeDetector;
         this.title = 'bar';
+        this.uuid2 = uuid2;
+        this.language = language;
+    }
+    getLanguages() {
+        return this.http.get('/static/languages.json', {});
     }
     ngOnInit() {
+        this.serviceMessage = this.uuid2.newguid();
+        this.languageMessage = this.language.getLanguage();
         this.quoteService
             .getRandomQuote({ category: 'dev' })
             .subscribe((data) => {
@@ -29,14 +40,22 @@ let BarComponent = class BarComponent {
             console.log(err.message);
             console.log(err.status);
         });
+        this.getLanguages()
+            .subscribe((data) => {
+            this.activeLanguage = data.data;
+        });
     }
 };
 BarComponent = __decorate([
     core_1.Component({
         selector: 'bar-component',
-        templateUrl: 'bar.component.html'
+        templateUrl: './bar/bar.component.html'
     }),
-    __metadata("design:paramtypes", [index_1.QuoteService, core_1.ChangeDetectorRef])
+    __metadata("design:paramtypes", [angular_uuid2_1.uuid2Service,
+        language_1.languageService,
+        http_1.HttpClient,
+        index_1.QuoteService,
+        core_1.ChangeDetectorRef])
 ], BarComponent);
 exports.BarComponent = BarComponent;
 //# sourceMappingURL=bar.component.js.map

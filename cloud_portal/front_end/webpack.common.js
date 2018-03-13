@@ -8,6 +8,14 @@ const ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 const webCommonPath = path.join(__dirname, '../../webadmin/app/web_common');
 
+const babelLoader = {
+    loader: 'babel-loader',
+    options: {
+        cacheDirectory: true,
+        presets: ['babel-preset-env']
+    }
+};
+
 module.exports = {
     context: path.resolve(__dirname + '/app'),
     entry: {
@@ -33,10 +41,11 @@ module.exports = {
         //Plugins used for making templates
         new webpack.NamedModulesPlugin(),
         new HtmlWebpackPlugin({
-            title: 'Custom template',
             template: 'index-template.html',
             filename: 'index.html',
-            inject: false
+            inject: false,
+            chunks: ['commons', 'app', 'webcommon', 'polyfills','vendor','appnew'],
+            chunksSortMode: 'manual'
         }),
         new ExtractTextPlugin("styles/main.css"),
         new CopyWebpackPlugin([
@@ -82,21 +91,21 @@ module.exports = {
         }
     },
     module: {
-        loaders: [
-            {
-                test: /\.js$/,
-                exclude: /node_modules/,
-                loader: 'babel-loader'
-            }
-        ],
         rules: [
             {
-                test: /\.ts$/,
-                loaders: [
+                test: /\.ts(x?)$/,
+                exclude: /node_modules/,
+                use: [
+                    babelLoader,
                     {
-                        loader: 'awesome-typescript-loader',
-                        options: {configFileName: 'tsconfig.json'}
-                    }, 'angular2-template-loader'
+                        loader: 'ts-loader'
+                    }
+                ]
+            }, {
+                test: /\.js$/,
+                exclude: /node_modules/,
+                use: [
+                    babelLoader
                 ]
             },
             {

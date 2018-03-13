@@ -6,6 +6,7 @@ angular.module('cloudApp.animations', []);
 angular.module('cloudApp.filters', []);
 angular.module('cloudApp.constants', []);
 angular.module('cloudApp.templates', []);
+// angular.module('nxCommon', []);
 
 window.Config = {};
 window.L = {};
@@ -20,10 +21,10 @@ window.L = {};
             'ngSanitize',
             'ngAnimate',
             'ngRoute',
-            'ui.bootstrap',
+            // 'ui.bootstrap',
             'ngStorage',
             'base64',
-            'nxCommon',
+            // 'nxCommon',
             'ngToast',
             'angular-clipboard',
 

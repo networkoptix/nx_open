@@ -35,11 +35,24 @@
     Please, turn on JavaScript in your browser
 </noscript>
 
-<header></header>
+<nx-header></nx-header>
 
-<nx-app>Loading...</nx-app>
+<nx-app>
+    <div class="lds-css ng-scope">
+        <div class="lds-cube">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
 
-<footer></footer>
+        <div class="lds-text">
+            Loading...
+        </div>
+    </div>
+</nx-app>
+
+<nx-footer></nx-footer>
 
 <% for (key in htmlWebpackPlugin.files.chunks) { %>
 <script type="text/javascript" src="/static<%= htmlWebpackPlugin.files.chunks[key].entry %>"></script>

@@ -12,7 +12,11 @@ const platform_browser_1 = require("@angular/platform-browser");
 const static_1 = require("@angular/upgrade/static");
 const router_1 = require("@angular/router");
 const http_1 = require("@angular/common/http");
+const ng_bootstrap_1 = require("@ng-bootstrap/ng-bootstrap");
 const index_1 = require("./core/index");
+const ajs_upgraded_providers_1 = require("./ajs-upgraded-providers");
+const ajs_upgraded_providers_2 = require("./ajs-upgraded-providers");
+const ajs_upgraded_providers_3 = require("./ajs-upgraded-providers");
 const app_component_1 = require("./app.component");
 const bar_module_1 = require("./bar/bar.module");
 class HybridUrlHandlingStrategy {
@@ -40,11 +44,15 @@ AppModule = __decorate([
             http_1.HttpClientModule,
             index_1.CoreModule,
             bar_module_1.BarModule,
+            ng_bootstrap_1.NgbModule.forRoot(),
             router_1.RouterModule.forRoot([], { initialNavigation: false })
         ],
         providers: [
             { provide: common_1.LocationStrategy, useClass: common_1.PathLocationStrategy },
-            { provide: router_1.UrlHandlingStrategy, useClass: HybridUrlHandlingStrategy }
+            { provide: router_1.UrlHandlingStrategy, useClass: HybridUrlHandlingStrategy },
+            ajs_upgraded_providers_1.cloudApiServiceProvider,
+            ajs_upgraded_providers_2.languageServiceProvider,
+            ajs_upgraded_providers_3.uuid2ServiceProvider
         ],
         declarations: [app_component_1.AppComponent],
         bootstrap: [app_component_1.AppComponent]

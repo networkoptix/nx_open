@@ -8,7 +8,8 @@
 @import '_theme_override';
 @import '_header';
 
-@import '_big_brother';
+//@import '_big_brother';
+@import '_icons';
 
 @import '../../../../webadmin/app/web_common/styles/common';
 
@@ -67,7 +68,17 @@ footer {
       padding:6px;
     }
   }
-  .navbar-right > li > a, .navbar-right > li > span > a{
+    
+    .navbar-nav {
+        flex-direction : row;
+        float          : left;
+    }
+    
+    .navbar-right {
+        float : right;
+    }
+    
+    .navbar-right > li > a, .navbar-right > li > span > a{
     color:$light8;
     &:hover{
       color:$light12;

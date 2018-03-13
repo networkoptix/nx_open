@@ -1,5 +1,6 @@
 import 'angular';
-import 'bootstrap-sass';
+import 'bootstrap';
+// import 'bootstrap-sass';
 import 'ng-toast';
 import 'ngstorage';
 import 'angular-route';
@@ -8,7 +9,8 @@ import 'angular-cookies';
 import 'angular-resource';
 import 'angular-sanitize';
 import 'angular-animate';
-import 'angular-ui-bootstrap';
+// import 'angular-ui-bootstrap';
+import '@ng-bootstrap/ng-bootstrap';
 import 'angular-clipboard';
 import 'tc-angular-chartjs';
 import 'jquery-mousewheel';

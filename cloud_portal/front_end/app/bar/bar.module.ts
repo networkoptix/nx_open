@@ -4,25 +4,37 @@ import { BrowserModule } from '@angular/platform-browser';
 import { UpgradeModule } from '@angular/upgrade/static';
 import { RouterModule, Routes } from '@angular/router';
 
+import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
+
+import { uuid2Service } from '../../app/scripts/services/angular-uuid2';
 import { QuoteService } from "../../app/core";
+import { languageService } from "../scripts/services/language";
+
+import { NxLanguageDropdown } from "../dropdown/language.component";
 
 import { BarComponent } from './bar.component';
 
+
 const appRoutes: Routes = [
-  { path: 'bar', component: BarComponent }
+    { path: 'bar', component: BarComponent }
 ];
 
 @NgModule({
-  imports: [
-    CommonModule,
-    BrowserModule,
-    UpgradeModule,
-    RouterModule.forChild(appRoutes)
-  ],
-  providers: [
-      QuoteService
-  ],
-  declarations: [ BarComponent ],
-  bootstrap: []    
+    imports: [
+        CommonModule,
+        BrowserModule,
+        UpgradeModule,
+        NgbDropdownModule,
+
+        RouterModule.forChild(appRoutes)
+    ],
+    providers: [
+        QuoteService,
+        uuid2Service,
+        languageService
+    ],
+    declarations: [BarComponent, NxLanguageDropdown],
+    bootstrap: []
 })
-export class BarModule { }
+export class BarModule {
+}

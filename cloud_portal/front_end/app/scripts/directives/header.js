@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudApp')
-    .directive('header',['dialogs', 'cloudApi', 'account', '$location', '$route', 'systemsProvider',
+    .directive('nxHeader',['dialogs', 'cloudApi', 'account', '$location', '$route', 'systemsProvider',
     function (dialogs, cloudApi, account, $location, $route, systemsProvider) {
         return {
             restrict: 'E',

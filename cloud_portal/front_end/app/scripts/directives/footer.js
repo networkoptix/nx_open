@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudApp')
-    .directive('footer', function () {
+    .directive('nxFooter', function () {
         return {
             restrict: 'E',
             templateUrl: Config.viewsDir + 'components/footer.html',
