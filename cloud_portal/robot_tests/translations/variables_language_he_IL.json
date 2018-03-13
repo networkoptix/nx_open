@@ -2,7 +2,7 @@
     "YOU HAVE NO SYSTEMS TEXT": "אין לך מערכות המחוברות ל- {{PRODUCT_NAME}}",
     "LOG OUT BUTTON TEXT": "יציאה",
     "ACCOUNT SETTINGS BUTTON TEXT": "הגדרות החשבון",
-    "RESET EMAIL SENT MESAGE TEXT": "הוראות לאיפוס סיסמה נשלחות לדוא\"ל  {{email}}",
+    "RESET EMAIL SENT MESSAGE TEXT": "הוראות לאיפוס סיסמה נשלחות לדוא\"ל {{email}}",
     "CREATE ACCOUNT BUTTON TEXT": "צור חשבון",
     "TERMS AND CONDITIONS LINK TEXT": "תנאים",
     "RESEND ACTIVATION LINK BUTTON TEXT": "שלח את קישור ההפעלה שוב",

@@ -2,7 +2,7 @@
     "YOU HAVE NO SYSTEMS TEXT": "Sinulla ei ole järjestelmää kytketty {{PRODUCT_NAME}}",
     "LOG OUT BUTTON TEXT": "Kirjautua ulos",
     "ACCOUNT SETTINGS BUTTON TEXT": "Tilin asetukset",
-    "RESET EMAIL SENT MESAGE TEXT": "Password reset instructions are sent to Email {{email}}",
+    "RESET EMAIL SENT MESSAGE TEXT": "Password reset instructions are sent to Email {{email}}",
     "CREATE ACCOUNT BUTTON TEXT": "Luo tili",
     "TERMS AND CONDITIONS LINK TEXT": "Käyttöehdot",
     "RESEND ACTIVATION LINK BUTTON TEXT": "Lähetä aktivointilinkki uudelleen",

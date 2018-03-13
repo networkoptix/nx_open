@@ -2,7 +2,7 @@
     "YOU HAVE NO SYSTEMS TEXT": "Nu aveți niciun sistem conectat la {{PRODUCT_NAME}}",
     "LOG OUT BUTTON TEXT": "Deconectați-vă",
     "ACCOUNT SETTINGS BUTTON TEXT": "Setările contului",
-    "RESET EMAIL SENT MESAGE TEXT": "Password reset instructions are sent to Email {{email}}",
+    "RESET EMAIL SENT MESSAGE TEXT": "Password reset instructions are sent to Email {{email}}",
     "CREATE ACCOUNT BUTTON TEXT": "Creează cont",
     "TERMS AND CONDITIONS LINK TEXT": "Termeni si conditii",
     "RESEND ACTIVATION LINK BUTTON TEXT": "Trimiteți din nou linkul de activare",

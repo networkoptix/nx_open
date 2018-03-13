@@ -2,7 +2,7 @@
     "YOU HAVE NO SYSTEMS TEXT": "{{PRODUCT_NAME}} 에 연결된 시스템이 없습니다.",
     "LOG OUT BUTTON TEXT": "로그 아웃",
     "ACCOUNT SETTINGS BUTTON TEXT": "계정 설정",
-    "RESET EMAIL SENT MESAGE TEXT": "패스워드 재설정 지침이 이메일 {{email}} 로 전송 되었읍니다.",
+    "RESET EMAIL SENT MESSAGE TEXT": "패스워드 재설정 지침이 이메일 {{email}} 로 전송 되었읍니다.",
     "CREATE ACCOUNT BUTTON TEXT": "계정 만들기",
     "TERMS AND CONDITIONS LINK TEXT": "이용 약관",
     "RESEND ACTIVATION LINK BUTTON TEXT": "활성화 링크 재전송",

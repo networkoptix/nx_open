@@ -217,11 +217,13 @@ Langauge is changeable on the account page
     \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Wait Until Element Is Visible    //form[@name='accountForm']//a[@ng-click='changeLanguage(lang.language)']/span[@lang='${lang}']
     \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Click Element    //form[@name='accountForm']//a[@ng-click='changeLanguage(lang.language)']/span[@lang='${lang}']
     \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Click Button    ${ACCOUNT SAVE}
+    \  Sleep    1    #to allow the system to change languages
     \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Wait Until Element Is Visible    //h1['${account}']
-    Sleep    1
+    Wait Until Element Is Visible    ${ACCOUNT LANGUAGE DROPDOWN}
     Click Button    ${ACCOUNT LANGUAGE DROPDOWN}
     Wait Until Element Is Visible    //form[@name='accountForm']//a[@ng-click='changeLanguage(lang.language)']/span[@lang='${LANGUAGE}']
     Click Element    //form[@name='accountForm']//a[@ng-click='changeLanguage(lang.language)']/span[@lang='${LANGUAGE}']
     Click Button    ${ACCOUNT SAVE}
+    Verify In Account Page
     Wait Until Element Is Visible    //h1['${ACCOUNT TEXT}']
     Close Browser

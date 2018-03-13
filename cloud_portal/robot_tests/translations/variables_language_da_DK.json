@@ -2,7 +2,7 @@
     "YOU HAVE NO SYSTEMS TEXT": "Du har ingen systemer forbundet til {{PRODUCT_NAME}}",
     "LOG OUT BUTTON TEXT": "Log ud",
     "ACCOUNT SETTINGS BUTTON TEXT": "Bruger indstillinger",
-    "RESET EMAIL SENT MESAGE TEXT": "Password reset instructions are sent to Email {{email}}",
+    "RESET EMAIL SENT MESSAGE TEXT": "Password reset instructions are sent to Email {{email}}",
     "CREATE ACCOUNT BUTTON TEXT": "Opret konto",
     "TERMS AND CONDITIONS LINK TEXT": "Vilkår og betingelser",
     "RESEND ACTIVATION LINK BUTTON TEXT": "Send aktiveringslinket igen",

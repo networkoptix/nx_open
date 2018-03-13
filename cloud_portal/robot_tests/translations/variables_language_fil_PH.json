@@ -2,7 +2,7 @@
     "YOU HAVE NO SYSTEMS TEXT": "Wala kang mga System na konektado sa {{PRODUCT_NAME}}",
     "LOG OUT BUTTON TEXT": "Mag-log Out",
     "ACCOUNT SETTINGS BUTTON TEXT": "Account Settings",
-    "RESET EMAIL SENT MESAGE TEXT": "Password reset instructions are sent to Email {{email}}",
+    "RESET EMAIL SENT MESSAGE TEXT": "Password reset instructions are sent to Email {{email}}",
     "CREATE ACCOUNT BUTTON TEXT": "Lumikha ng Account",
     "TERMS AND CONDITIONS LINK TEXT": "Mga Tuntunin at Kundisyon",
     "RESEND ACTIVATION LINK BUTTON TEXT": "Ipadala muli ang link sa pag-activate",

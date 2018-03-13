@@ -4,7 +4,6 @@
 import imaplib
 import re
 import email.header
-import base64
 from email.parser import HeaderParser
 import os.path
 import time

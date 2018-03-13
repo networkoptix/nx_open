@@ -2,7 +2,7 @@
     "YOU HAVE NO SYSTEMS TEXT": "{{PRODUCT_NAME}} nem kapcsolódik egy rendszeréhez sem",
     "LOG OUT BUTTON TEXT": "Kijelentkezés",
     "ACCOUNT SETTINGS BUTTON TEXT": "Fiókbeállítások",
-    "RESET EMAIL SENT MESAGE TEXT": "Jelszó visszaállítási teendők megadását e-mailen megküldtük {{email}}",
+    "RESET EMAIL SENT MESSAGE TEXT": "Jelszó visszaállítási teendők megadását e-mailen megküldtük {{email}}",
     "CREATE ACCOUNT BUTTON TEXT": "Fiók létrehozása",
     "TERMS AND CONDITIONS LINK TEXT": "Felhasználási feltételek",
     "RESEND ACTIVATION LINK BUTTON TEXT": "Aktiválási link újraküldése",

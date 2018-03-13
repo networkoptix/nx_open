@@ -2,7 +2,7 @@
     "YOU HAVE NO SYSTEMS TEXT": "U heeft geen systemen aangesloten op {{PRODUCT_NAME}}",
     "LOG OUT BUTTON TEXT": "Uitloggen",
     "ACCOUNT SETTINGS BUTTON TEXT": "Accountinstellingen",
-    "RESET EMAIL SENT MESAGE TEXT": "Wachtwoordherstelinstructies worden verzonden naar het volgende emailadres:  {{email}}",
+    "RESET EMAIL SENT MESSAGE TEXT": "Wachtwoordherstelinstructies worden verzonden naar het volgende emailadres: {{email}}",
     "CREATE ACCOUNT BUTTON TEXT": "Account aanmaken",
     "TERMS AND CONDITIONS LINK TEXT": "Voorwaarden",
     "RESEND ACTIVATION LINK BUTTON TEXT": "Activatielink opnieuw verzenden",

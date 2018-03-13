@@ -2,7 +2,7 @@
     "YOU HAVE NO SYSTEMS TEXT": "你有没有连接到 {{PRODUCT_NAME}} 的系统",
     "LOG OUT BUTTON TEXT": "退出登录",
     "ACCOUNT SETTINGS BUTTON TEXT": "帐户设置",
-    "RESET EMAIL SENT MESAGE TEXT": "密码重置命令发送电子邮件 {{email}}",
+    "RESET EMAIL SENT MESSAGE TEXT": "密码重置命令发送电子邮件 {{email}}",
     "CREATE ACCOUNT BUTTON TEXT": "创建帐户",
     "TERMS AND CONDITIONS LINK TEXT": "条款和条件",
     "RESEND ACTIVATION LINK BUTTON TEXT": "重新发送激活链接",

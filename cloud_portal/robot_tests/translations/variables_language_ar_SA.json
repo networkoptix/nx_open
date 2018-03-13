@@ -2,7 +2,7 @@
     "YOU HAVE NO SYSTEMS TEXT": "ليس لديك أي أنظمة متصلة {{PRODUCT_NAME}}",
     "LOG OUT BUTTON TEXT": "الخروج",
     "ACCOUNT SETTINGS BUTTON TEXT": "Account Settings",
-    "RESET EMAIL SENT MESAGE TEXT": "Password reset instructions are sent to Email {{email}}",
+    "RESET EMAIL SENT MESSAGE TEXT": "Password reset instructions are sent to Email {{email}}",
     "CREATE ACCOUNT BUTTON TEXT": "إصنع حساب",
     "TERMS AND CONDITIONS LINK TEXT": "الأحكام والشروط",
     "RESEND ACTIVATION LINK BUTTON TEXT": "إعادة إرسال رابط التنشيط",

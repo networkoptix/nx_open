@@ -2,7 +2,7 @@
     "YOU HAVE NO SYSTEMS TEXT": "У вас нет систем, подключенных к {{PRODUCT_NAME}}",
     "LOG OUT BUTTON TEXT": "Выйти",
     "ACCOUNT SETTINGS BUTTON TEXT": "Настройки учётной записи",
-    "RESET EMAIL SENT MESAGE TEXT": "Инструкции по сбросу пароля были высланы на Email {{email}}",
+    "RESET EMAIL SENT MESSAGE TEXT": "Инструкции по сбросу пароля были высланы на Email {{email}}",
     "CREATE ACCOUNT BUTTON TEXT": "Зарегистрироваться",
     "TERMS AND CONDITIONS LINK TEXT": "Условия и положения",
     "RESEND ACTIVATION LINK BUTTON TEXT": "Повторно отправить ссылку активации",

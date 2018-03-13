@@ -2,7 +2,7 @@
     "YOU HAVE NO SYSTEMS TEXT": "Hệ thống được kết nối với {{PRODUCT_NAME}}",
     "LOG OUT BUTTON TEXT": "Đăng xuất",
     "ACCOUNT SETTINGS BUTTON TEXT": "Cài đặt tài khoản",
-    "RESET EMAIL SENT MESAGE TEXT": "Đặt lại mật khẩu được gửi tới Email  {{email}}",
+    "RESET EMAIL SENT MESSAGE TEXT": "Đặt lại mật khẩu được gửi tới Email {{email}}",
     "CREATE ACCOUNT BUTTON TEXT": "Tạo tài khoản",
     "TERMS AND CONDITIONS LINK TEXT": "Các điều khoản và điều kiện",
     "RESEND ACTIVATION LINK BUTTON TEXT": "Gửi lại link kích hoạt",
