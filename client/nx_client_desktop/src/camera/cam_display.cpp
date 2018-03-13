@@ -448,38 +448,25 @@ qint64 QnCamDisplay::doSmartSleep(const qint64 needToSleep, float speed)
         return m_delay.sleep(needToSleep, maxSleepTime);
 }
 
-bool QnCamDisplay::fillDataQueue()
-{
-    if (!isForcedBufferingEnabled() || isDataQueueFilled())
-        return false;
-
-    const auto requiredBufferLengthUs =
-        std::chrono::microseconds(m_forcedVideoBufferLength).count();
-    while (!needToStop()
-        && m_lastQueuedVideoTime >= m_lastVideoPacketTime
-        && m_lastQueuedVideoTime - m_lastVideoPacketTime <= requiredBufferLengthUs)
-    {
-        if (m_dataQueue.size() == m_dataQueue.maxSize())
-            m_dataQueue.setMaxSize(m_dataQueue.maxSize() * 2);
-
-        constexpr qint64 kMinSleepTimeUs = 30000;
-        constexpr qint64 kMaxSleepTimeUs = 1000000;
-
-        const auto sleepTime = std::max(kMinSleepTimeUs,
-            requiredBufferLengthUs - (m_lastQueuedVideoTime - m_lastVideoPacketTime));
-        const auto maxSleepTime = std::min(kMaxSleepTimeUs, sleepTime + kMinSleepTimeUs);
-
-        m_delay.terminatedSleep(sleepTime, maxSleepTime);
-    }
-
-    return m_lastQueuedVideoTime >= m_lastVideoPacketTime;
-}
-
-bool QnCamDisplay::isDataQueueFilled() const
+bool QnCamDisplay::isDataQueueFull() const
 {
     const auto forcedVideoBufferLengthUs =
         std::chrono::microseconds(m_forcedVideoBufferLength).count();
     return m_lastQueuedVideoTime - m_lastVideoPacketTime > forcedVideoBufferLengthUs;
+}
+
+int QnCamDisplay::maxDataQueueSize(QueueSizeType type) const
+{
+    if (isForcedBufferingEnabled())
+    {
+        constexpr int kMillisecondsPerFrame = 10; //< Should be enough for every camera so far.
+        return (int) forcedVideoBufferLength().count() / kMillisecondsPerFrame;
+    }
+
+    if (type == QueueSizeType::slowStream)
+        return CL_MAX_DISPLAY_QUEUE_FOR_SLOW_SOURCE_SIZE;
+
+    return CL_MAX_DISPLAY_QUEUE_SIZE;
 }
 
 bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
@@ -653,9 +640,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
         }
         else if (!m_display[0]->selfSyncUsed())
         {
-            if (fillDataQueue())
-                realSleepTime = AV_NOPTS_VALUE;
-            else if (m_lastFrameDisplayed == QnVideoStreamDisplay::Status_Displayed)
+            if (m_lastFrameDisplayed == QnVideoStreamDisplay::Status_Displayed)
                 realSleepTime = doSmartSleep(needToSleep, speed);
             else
                 realSleepTime = m_delay.addQuant(needToSleep);
@@ -1130,8 +1115,7 @@ void QnCamDisplay::processNewSpeed(float speed)
     }
     if (qAbs(speed) > 1.0) {
         m_storedMaxQueueSize = m_dataQueue.maxSize();
-        if (!isForcedBufferingEnabled())
-            m_dataQueue.setMaxSize(CL_MAX_DISPLAY_QUEUE_FOR_SLOW_SOURCE_SIZE);
+        m_dataQueue.setMaxSize(maxDataQueueSize(QueueSizeType::normalStream));
         m_delay.setMaxOverdraft(-1);
     }
     else
@@ -1162,8 +1146,7 @@ void QnCamDisplay::putData(const QnAbstractDataPacketPtr& data)
     {
         m_lastQueuedVideoTime = video->timestamp;
 
-        if (isForcedBufferingEnabled()
-            && (isDataQueueFilled() || m_dataQueue.size() == m_dataQueue.maxSize()))
+        if (isForcedBufferingEnabled() && isDataQueueFull())
         {
             m_delay.breakSleep();
         }
@@ -1581,7 +1564,11 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
                 //return result;
                 return false;
             }
+
+            if (isForcedBufferingEnabled() && !isDataQueueFull())
+                return false;
         }
+
         // three are 3 possible scenarios:
 
         //1) we do not have audio playing;
@@ -1882,8 +1869,7 @@ void QnCamDisplay::onRealTimeStreamHint(bool value)
 
 void QnCamDisplay::onSlowSourceHint()
 {
-    if (!isForcedBufferingEnabled())
-        m_dataQueue.setMaxSize(CL_MAX_DISPLAY_QUEUE_FOR_SLOW_SOURCE_SIZE);
+    m_dataQueue.setMaxSize(maxDataQueueSize(QueueSizeType::slowStream));
 }
 
 qint64 QnCamDisplay::getDisplayedMax() const
@@ -2111,6 +2097,7 @@ std::chrono::milliseconds QnCamDisplay::forcedVideoBufferLength() const
 void QnCamDisplay::setForcedVideoBufferLength(std::chrono::milliseconds length)
 {
     m_forcedVideoBufferLength = length;
+    m_dataQueue.setMaxSize(maxDataQueueSize(QueueSizeType::normalStream));
 }
 
 bool QnCamDisplay::isForcedBufferingEnabled() const
