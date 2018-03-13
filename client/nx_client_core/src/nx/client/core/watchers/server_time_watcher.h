@@ -51,14 +51,14 @@ signals:
     void timeModeChanged();
 
 private:
-    void sendRequest(const QnMediaServerResourcePtr &server);
+    void sendRequest(const QnMediaServerResourcePtr& server);
 
-    qint64 localOffset(const QnMediaResourcePtr &resource,
+    qint64 localOffset(const QnMediaResourcePtr& resource,
         qint64 defaultValue = Qn::InvalidUtcOffset) const;
 
 private:
-    void handleResourceAdded(const QnResourcePtr &resource);
-    void handleResourceRemoved(const QnResourcePtr &resource);
+    void handleResourceAdded(const QnResourcePtr& resource);
+    void handleResourceRemoved(const QnResourcePtr& resource);
 
 private:
     TimeMode m_mode = serverTimeMode;

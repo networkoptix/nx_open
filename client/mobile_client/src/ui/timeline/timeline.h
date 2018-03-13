@@ -13,6 +13,9 @@ class QnTimeline: public QQuickItem
 {
     Q_OBJECT
 
+    Q_PROPERTY(qint64 visualOffset READ visualOffset WRITE setVisualOffset
+        NOTIFY visualOffsetChanged)
+
     Q_PROPERTY(qint64 defaultWindowSize READ defaultWindowSize CONSTANT)
     Q_PROPERTY(qint64 windowSize READ windowSize WRITE setWindowSize NOTIFY windowSizeChanged)
     Q_PROPERTY(qint64 windowStart READ windowStart WRITE setWindowStart NOTIFY windowStartChanged)
@@ -68,6 +71,9 @@ public:
     void setTextY(int textY);
 
     qint64 defaultWindowSize() const;
+
+    qint64 visualOffset() const;
+    void setVisualOffset(qint64 offset);
 
     qint64 windowStart() const;
     void setWindowStart(qint64 windowStart);
@@ -138,6 +144,7 @@ signals:
     void startBoundChanged();
     void autoPlayChanged();
     void autoReturnToBoundsEnabledChanged();
+    void visualOffsetChanged();
 
     void timeZoneShiftChanged();
 

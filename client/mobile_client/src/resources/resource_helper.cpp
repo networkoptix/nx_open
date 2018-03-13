@@ -1,13 +1,18 @@
 #include "resource_helper.h"
 
+#include <common/common_module.h>
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/client/core/watchers/server_time_watcher.h>
 
 QnResourceHelper::QnResourceHelper(QObject* parent):
     base_type(parent),
     QnConnectionContextAware()
 {
+    const auto timeWatcher = commonModule()->instance<nx::client::core::ServerTimeWatcher>();
+    connect(timeWatcher, &nx::client::core::ServerTimeWatcher::displayOffsetsChanged,
+        this, &QnResourceHelper::serverTimeOffsetChanged);
 }
 
 QString QnResourceHelper::resourceId() const
@@ -48,6 +53,7 @@ void QnResourceHelper::setResourceId(const QString& id)
     emit resourceStatusChanged();
     emit oldCameraFirmwareChanged();
     emit defaultCameraPasswordChanged();
+    emit serverTimeOffsetChanged();
 }
 
 Qn::ResourceStatus QnResourceHelper::resourceStatus() const
@@ -81,4 +87,14 @@ bool QnResourceHelper::hasDefaultCameraPassword() const
 bool QnResourceHelper::hasOldCameraFirmware() const
 {
     return hasCameraCapability(Qn::isOldFirmwareCapability);
+}
+
+qint64 QnResourceHelper::serverTimeOffset() const
+{
+    const auto mediaResource = m_resource.dynamicCast<QnMediaResource>();
+    if (!mediaResource)
+        return 0;
+
+    const auto timeWatcher = commonModule()->instance<nx::client::core::ServerTimeWatcher>();
+    return timeWatcher->displayOffset(mediaResource);
 }

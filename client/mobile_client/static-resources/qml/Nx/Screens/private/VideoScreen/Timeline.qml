@@ -19,6 +19,8 @@ Item
     property alias startBound: timeline.startBound
     property alias autoPlay: timeline.autoPlay
     property alias autoReturnToBounds: timeline.autoReturnToBounds
+    property alias visualOffset: timeline.visualOffset
+
     readonly property bool dragging: timeline.dragging
     readonly property bool moving: timeline.moving
     readonly property var timelineView: timeline

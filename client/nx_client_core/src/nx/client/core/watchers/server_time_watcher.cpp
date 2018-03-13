@@ -134,7 +134,7 @@ QDateTime ServerTimeWatcher::displayTime(qint64 msecsSinceEpoch) const
 }
 
 qint64 ServerTimeWatcher::localOffset(
-    const QnMediaResourcePtr &resource,
+    const QnMediaResourcePtr& resource,
     qint64 defaultValue) const
 {
     const qint64 utcOffsetMs = utcOffset(resource, Qn::InvalidUtcOffset);
@@ -149,7 +149,7 @@ qint64 ServerTimeWatcher::localOffset(
     return utcOffsetMs - utcDateTime.msecsTo(localDateTime);
 }
 
-void ServerTimeWatcher::sendRequest(const QnMediaServerResourcePtr &server)
+void ServerTimeWatcher::sendRequest(const QnMediaServerResourcePtr& server)
 {
     if (server->getStatus() != Qn::Online || server.dynamicCast<QnFakeMediaServerResource>())
         return;
@@ -172,7 +172,7 @@ void ServerTimeWatcher::sendRequest(const QnMediaServerResourcePtr &server)
         this->thread());
 }
 
-void ServerTimeWatcher::handleResourceAdded(const QnResourcePtr &resource)
+void ServerTimeWatcher::handleResourceAdded(const QnResourcePtr& resource)
 {
     const auto server = resource.dynamicCast<QnMediaServerResource>();
     if (!server || server.dynamicCast<QnFakeMediaServerResource>())

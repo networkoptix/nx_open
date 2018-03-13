@@ -44,6 +44,7 @@
 #include <nx/mobile_client/settings/settings_migration.h>
 #include <nx/client/mobile/software_trigger/event_rules_watcher.h>
 #include <nx/client/core/watchers/known_server_connections.h>
+#include <nx/client/core/watchers/server_time_watcher.h>
 #include <nx/client/mobile/two_way_audio/server_audio_connection_watcher.h>
 #include <client_core/client_core_settings.h>
 #include <core/ptz/client_ptz_controller_pool.h>
@@ -154,6 +155,7 @@ QnMobileClientModule::QnMobileClientModule(
 
     commonModule->store(new settings::SessionsMigrationHelper());
     commonModule->store(new QnVoiceSpectrumAnalyzer());
+    commonModule->store(new nx::client::core::ServerTimeWatcher());
 
     connect(qApp, &QGuiApplication::applicationStateChanged, this,
         [moduleManager = commonModule->moduleDiscoveryManager()](Qt::ApplicationState state)

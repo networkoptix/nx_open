@@ -207,7 +207,7 @@ Item
             id: timeline
 
             property bool resumeWhenDragFinished: false
-
+            visualOffset: videoScreenController.resourceHelper.serverTimeOffset;
             enabled: d.hasArchive
 
             anchors.bottom: parent.bottom
