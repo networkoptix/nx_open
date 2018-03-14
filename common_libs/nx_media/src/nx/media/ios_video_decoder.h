@@ -1,5 +1,5 @@
 #pragma once
-#if defined (Q_OS_IOS)
+#if defined(Q_OS_IOS)
 
 #include <QtCore/QObject>
 #include <QtMultimedia/QVideoFrame>

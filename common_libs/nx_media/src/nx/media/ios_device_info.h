@@ -16,6 +16,12 @@ struct IosDeviceInformation
         unknown
     };
 
+    enum Version
+    {
+        iPhone6 = 7,
+        iPadAir2 = 5,
+    };
+
     Type type = Type::unknown;
     int majorVersion = 0;
     int minorVersion = 0;
