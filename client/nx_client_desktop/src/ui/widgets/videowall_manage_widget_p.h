@@ -14,9 +14,10 @@ class QnVideowallManageWidget;
 class QnVideowallManageWidgetPrivate: public QObject
 {
     Q_OBJECT
+    using base_type = QObject;
 
 public:
-    QnVideowallManageWidgetPrivate(QnVideowallManageWidget* q);
+    QnVideowallManageWidgetPrivate(QnVideowallManageWidget* q, QObject* parent = nullptr);
 
     QTransform getTransform(const QRect& rect);
     QTransform getInvertedTransform(const QRect& rect);
@@ -39,6 +40,8 @@ public:
 
     /** Count of videowall items that is proposed to be on this PC. */
     int proposedItemsCount() const;
+
+    void initScreenGeometries();
 
 signals :
     void itemsChanged();
@@ -124,8 +127,8 @@ private:
         virtual QRect bodyRect() const;
         virtual QRect deleteButtonRect() const;
         virtual QPainterPath bodyPath() const;
-        virtual int fontSize() const;
-        virtual int iconSize() const;
+        int fontSize() const;
+        int iconSize() const;
         virtual QColor baseColor() const = 0;
         virtual void paintProposed(QPainter* painter, const QRect& proposedGeometry) const;
         void paintDashBorder(QPainter* painter, const QPainterPath& path) const;
@@ -149,8 +152,7 @@ private:
 
         QString name;
     protected:
-        Q_DECLARE_PUBLIC(QnVideowallManageWidget);
-        QnVideowallManageWidget* q_ptr;
+        QnVideowallManageWidget* q;
     };
 
     struct ModelItem: BaseModelItem
@@ -214,8 +216,6 @@ private:
     };
 
 private:
-    Q_DECLARE_PUBLIC(QnVideowallManageWidget);
-
     /**
      * Utility function that iterates over all items and calls handler to each of them.
      * If the handler sets 'abort' variable to true, iterator will stop.
@@ -246,7 +246,7 @@ private:
     void processItemStart(BaseModelItem& item, calculateProposedGeometryFunction proposedGeometry);
     void processItemEnd(BaseModelItem& item, calculateProposedGeometryFunction proposedGeometry);
 private:
-    QnVideowallManageWidget* q_ptr;
+    QnVideowallManageWidget* q;
     QTransform m_transform;
     QTransform m_invertedTransform;
     QRect m_widgetRect;

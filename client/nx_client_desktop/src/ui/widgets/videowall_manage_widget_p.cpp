@@ -1,10 +1,7 @@
 #include "videowall_manage_widget_p.h"
 
 #include <QtGui/QIcon>
-#include <QtGui/QScreen>
-
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QDesktopWidget>
 
 #include <client/client_settings.h>
 
@@ -20,7 +17,11 @@
 
 #include <utils/math/color_transformations.h>
 #include <utils/math/linear_combination.h>
+
 #include <nx/utils/app_info.h>
+#include <utils/screen_utils.h>
+
+using Screens = nx::gui::Screens;
 
 namespace {
 
@@ -61,35 +62,6 @@ int pixelRatio()
         : qApp->devicePixelRatio();
 }
 
-QList<QRect> screenGeometries()
-{
-    QList<QRect> result;
-
-    if (nx::utils::AppInfo::isMacOsX())
-    {
-        for (const auto screen: QGuiApplication::screens())
-            result.append(screen->geometry());
-    }
-    else
-    {
-        const auto desktop = qApp->desktop();
-        for (int screenNumber = 0; screenNumber < desktop->screenCount(); ++screenNumber)
-        {
-            if (const auto screen = desktop->screen(screenNumber))
-            {
-                const auto rect = screen->geometry();
-                auto pixelRatio = screen->devicePixelRatio();
-                result.append(QRect(rect.topLeft(), rect.size() * pixelRatio));
-            }
-            else
-            {
-                NX_ASSERT(false, "Invalid screen.");
-            }
-        }
-    }
-    return result;
-}
-
 } // namespace
 
 /************************************************************************/
@@ -108,7 +80,7 @@ QnVideowallManageWidgetPrivate::BaseModelItem::BaseModelItem(
     opacity(minOpacity),
     deleteButtonOpacity(0.0),
     editable(false),
-    q_ptr(q)
+    q(q)
 {
 }
 
@@ -212,7 +184,6 @@ void QnVideowallManageWidgetPrivate::BaseModelItem::paint(
 
     if (!name.isEmpty())
     {
-        Q_Q(const QnVideowallManageWidget);
         QPen textPen(q->colors().text);
         QnScopedPainterPenRollback namePenRollback(painter, textPen);
 
@@ -263,7 +234,6 @@ void QnVideowallManageWidgetPrivate::BaseModelItem::paintDashBorder(
     QPainter* painter,
     const QPainterPath& path) const
 {
-    Q_Q(const QnVideowallManageWidget);
     QPen pen(q->colors().text);
     pen.setWidth(borderWidth);
     pen.setDashPattern(dashPattern);
@@ -285,7 +255,6 @@ void QnVideowallManageWidgetPrivate::BaseModelItem::paintPixmap(
 
 void QnVideowallManageWidgetPrivate::BaseModelItem::paintDeleteButton(QPainter* painter) const
 {
-    Q_Q(const QnVideowallManageWidget);
     QnScopedPainterPenRollback penRollback(painter, Qt::NoPen);
 
     QColor color = linearCombine(
@@ -325,7 +294,6 @@ void QnVideowallManageWidgetPrivate::BaseModelItem::paintResizeAnchors(
     QPainter* painter,
     const QRect& rect) const
 {
-    Q_Q(const QnVideowallManageWidget);
     QPen resizeBorderPen(q->colors().text);
     resizeBorderPen.setWidth(resizeBorderWidth);
 
@@ -399,7 +367,6 @@ void QnVideowallManageWidgetPrivate::FreeSpaceItem::paint(
 
 QColor QnVideowallManageWidgetPrivate::FreeSpaceItem::baseColor() const
 {
-    Q_Q(const QnVideowallManageWidget);
     return q->colors().freeSpace;
 }
 
@@ -487,7 +454,6 @@ void QnVideowallManageWidgetPrivate::ModelScreen::paint(
     const TransformationProcess& process) const
 {
     {
-        Q_Q(const QnVideowallManageWidget);
         QRect targetRect = QnGeometry::eroded(geometry, frameMargin);
 
         QPainterPath path;
@@ -548,9 +514,8 @@ bool QnVideowallManageWidgetPrivate::ModelItem::free() const
     return false;
 }
 
-void QnVideowallManageWidgetPrivate::ModelItem::setFree(bool value)
+void QnVideowallManageWidgetPrivate::ModelItem::setFree(bool /*value*/)
 {
-    Q_UNUSED(value);
     NX_ASSERT(false, "Should never get here");
 }
 
@@ -560,7 +525,6 @@ void QnVideowallManageWidgetPrivate::ModelItem::paintProposed(
 {
     base_type::paintProposed(painter, proposedGeometry);
 
-    Q_Q(const QnVideowallManageWidget);
     QnScopedPainterPenRollback pen(painter, Qt::NoPen);
     QnScopedPainterBrushRollback brush(painter, q->colors().error);
     painter->drawPath(bodyPath());
@@ -568,7 +532,6 @@ void QnVideowallManageWidgetPrivate::ModelItem::paintProposed(
 
 QColor QnVideowallManageWidgetPrivate::ModelItem::baseColor() const
 {
-    Q_Q(const QnVideowallManageWidget);
     return q->colors().item;
 }
 
@@ -584,16 +547,13 @@ QnVideowallManageWidgetPrivate::TransformationProcess::TransformationProcess():
 /* QnVideowallManageWidgetPrivate                                       */
 /************************************************************************/
 
-QnVideowallManageWidgetPrivate::QnVideowallManageWidgetPrivate(QnVideowallManageWidget* q):
-    QObject(),
-    q_ptr(q)
+QnVideowallManageWidgetPrivate::QnVideowallManageWidgetPrivate(
+    QnVideowallManageWidget* q,
+    QObject* parent)
+    :
+    base_type(parent),
+    q(q)
 {
-    int screenNumber = 0;
-    for (const auto rect: screenGeometries())
-    {
-        m_unitedGeometry = m_unitedGeometry.united(rect);
-        m_screens.append({screenNumber++, rect, q});
-    }
 }
 
 // TODO: #GDM #VW create iterators
@@ -659,7 +619,7 @@ void QnVideowallManageWidgetPrivate::foreachItemConst(
 
 void QnVideowallManageWidgetPrivate::loadFromResource(const QnVideoWallResourcePtr& videowall)
 {
-    QList<QRect> screens = screenGeometries();
+    QList<QRect> screens = q->screenGeometries();
     QnUuid pcUuid = qnSettings->pcUuid();
 
     for (const QnVideoWallItem& item: videowall->items()->getItems())
@@ -667,7 +627,7 @@ void QnVideowallManageWidgetPrivate::loadFromResource(const QnVideoWallResourceP
         if (item.pcUuid != pcUuid)
             continue;
 
-        ModelItem modelItem(ItemType::Existing, item.uuid, q_ptr);
+        ModelItem modelItem(ItemType::Existing, item.uuid, q);
         modelItem.name = item.name;
         modelItem.snaps = item.screenSnaps;
         modelItem.geometry = item.screenSnaps.geometry(screens);
@@ -769,7 +729,7 @@ QRect QnVideowallManageWidgetPrivate::targetRect(const QRect& rect) const
 
 void QnVideowallManageWidgetPrivate::setFree(const QnScreenSnaps& snaps, bool value)
 {
-    QSet<int> screenIdxs = snaps.screens();
+    QSet<int> screenIdxs = Screens::coveredBy(snaps, q->screenGeometries());
     // if the item takes some screens, it should take them fully
     if (screenIdxs.size() > 1)
     {
@@ -839,7 +799,7 @@ void QnVideowallManageWidgetPrivate::mouseLeave()
             item.flags &= ~(StateFlag::Hovered | StateFlag::DeleteHovered);
         });
     QCursor cursor(transformationsCursor(ItemTransformation::None));
-    q_ptr->setCursor(cursor);
+    q->setCursor(cursor);
 }
 
 void QnVideowallManageWidgetPrivate::mouseMoveAt(const QPoint& pos)
@@ -871,7 +831,7 @@ void QnVideowallManageWidgetPrivate::mouseMoveAt(const QPoint& pos)
         });
 
     QCursor cursor(transformationsCursor(proposed));
-    q_ptr->setCursor(cursor);
+    q->setCursor(cursor);
 }
 
 void QnVideowallManageWidgetPrivate::mouseClickAt(const QPoint& pos, Qt::MouseButtons buttons)
@@ -887,7 +847,7 @@ void QnVideowallManageWidgetPrivate::mouseClickAt(const QPoint& pos, Qt::MouseBu
             if (!item.geometry.contains(pos) || !item.free())
                 return;
 
-            ModelItem added(ItemType::Added, QnUuid::createUuid(), q_ptr);
+            ModelItem added(ItemType::Added, QnUuid::createUuid(), q);
             added.name = tr("New Item");
             added.geometry = item.geometry;
             added.snaps = item.snaps;
@@ -914,7 +874,7 @@ void QnVideowallManageWidgetPrivate::mouseClickAt(const QPoint& pos, Qt::MouseBu
                 QString(),
                 QDialogButtonBox::Cancel,
                 QDialogButtonBox::NoButton,
-                q_ptr);
+                q);
 
             dialog.addCustomButton(
                 QnMessageBoxCustomButton::Delete,
@@ -1233,7 +1193,7 @@ QRect QnVideowallManageWidgetPrivate::calculateProposedMoveGeometry(
 {
     QRect geometry = item.geometry;
 
-    const int screenCount = item.snaps.screens().size();
+    const int screenCount = Screens::coveredBy(item.snaps, q->screenGeometries()).size();
     if (multiScreen)
         *multiScreen = screenCount > 1;
 
@@ -1341,4 +1301,14 @@ void QnVideowallManageWidgetPrivate::processItemEnd(
 int QnVideowallManageWidgetPrivate::proposedItemsCount() const
 {
     return m_items.size();
+}
+
+void QnVideowallManageWidgetPrivate::initScreenGeometries()
+{
+    int screenNumber = 0;
+    for (const auto rect: q->screenGeometries())
+    {
+        m_unitedGeometry = m_unitedGeometry.united(rect);
+        m_screens.append({screenNumber++, rect, q});
+    }
 }
