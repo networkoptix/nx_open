@@ -159,12 +159,25 @@ def mediaserver_deb(request, bin_dir):
 
 
 @pytest.fixture(scope='session', autouse=True)
-def init_logging(request):
-    # format = '%(asctime)-15s %(threadName)s %(name)s %(levelname)s  %(message)s'
-    # %.10s limits formatted string to 10 chars; %(text).10s makes the same for dict-style formatting
-    max_log_width = request.config.getoption('--max-log-width'),
-    format = '%%(asctime)-15s %%(threadName)-15s %%(levelname)-7s %%(message).%ds' % max_log_width
-    logging.basicConfig(level=request.config.getoption('--log-level'), format=format)
+def init_logging(request, work_dir):
+    root_logger = logging.getLogger()
+    root_logger.setLevel(logging.DEBUG)  # It's WARNING by default. Level constraints are set in handlers.
+
+    stderr_log_width = request.config.getoption('--max-log-width')
+    stderr_handler = logging.StreamHandler()
+    # %(message).10s truncates log message to 10 characters.
+    stderr_handler.setFormatter(logging.Formatter(
+        '%(asctime)-15s %(threadName)-15s %(levelname)-7s %(message).{:d}s'.format(stderr_log_width)))
+    stderr_handler.setLevel(request.config.getoption('--log-level'))
+    root_logger.addHandler(stderr_handler)
+
+    file_formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s')
+    for level in {logging.DEBUG, logging.INFO}:
+        file_name = logging.getLevelName(level).lower() + '.log'
+        file_handler = logging.FileHandler(str(work_dir / file_name), mode='w')
+        file_handler.setFormatter(file_formatter)
+        root_logger.addHandler(file_handler)
+
 
 
 @pytest.fixture(scope='session')
