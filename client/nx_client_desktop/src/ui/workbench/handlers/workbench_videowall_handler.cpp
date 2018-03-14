@@ -95,6 +95,7 @@
 
 #include <nx/vms/utils/platform/autorun.h>
 #include <nx/client/desktop/ui/workbench/layouts/layout_factory.h>
+#include <utils/screen_utils.h>
 
 
 //#define SENDER_DEBUG
@@ -186,7 +187,8 @@ void addItemToLayout(const QnLayoutResourcePtr &layout, const QnVideoWallItemInd
     if (!firstIdx.isValid())
         return;
 
-    QList<int> screens = firstIdx.item().screenSnaps.screens().toList();
+    QList<int> screens = nx::gui::Screens::coveredBy(firstIdx.item().screenSnaps).toList();
+    std::sort(screens.begin(), screens.end());
     if (screens.isEmpty())
         return;
 
@@ -1844,7 +1846,7 @@ void QnWorkbenchVideoWallHandler::at_openVideoWallReviewAction_triggered()
 
     for (const auto& item: videoWall->items()->getItems())
     {
-        ScreenWidgetKey key(item.pcUuid, item.screenSnaps.screens());
+        ScreenWidgetKey key(item.pcUuid, nx::gui::Screens::coveredBy(item.screenSnaps));
         itemGroups[key].append(QnVideoWallItemIndex(videoWall, item.uuid));
     }
 
@@ -2824,7 +2826,7 @@ bool QnWorkbenchVideoWallHandler::saveReviewLayout(QnWorkbenchLayout *layout, st
         QnVideoWallItemIndex firstIdx = indices.first();
         QnVideoWallResourcePtr videowall = firstIdx.videowall();
         QnVideoWallItem item = firstIdx.item();
-        QSet<int> screenIndices = item.screenSnaps.screens();
+        QSet<int> screenIndices = nx::gui::Screens::coveredBy(item.screenSnaps);
         if (!videowall->pcs()->hasItem(item.pcUuid))
             continue;
         QnVideoWallPcData pc = videowall->pcs()->getItem(item.pcUuid);
@@ -3024,7 +3026,8 @@ void QnWorkbenchVideoWallHandler::updateReviewLayout(const QnVideoWallResourcePt
                 [&item](const QnVideoWallItemIndex &idx) { return idx.uuid() != item.uuid; });
             if (other != indices.cend()
                 && (other->item().pcUuid == item.pcUuid)
-                && (other->item().screenSnaps.screens() == item.screenSnaps.screens()))
+                && (nx::gui::Screens::coveredBy(other->item().screenSnaps)
+                    == nx::gui::Screens::coveredBy(item.screenSnaps)))
             {
                 return workbenchItem;
             }

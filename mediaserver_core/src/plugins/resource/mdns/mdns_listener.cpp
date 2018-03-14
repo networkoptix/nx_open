@@ -5,6 +5,7 @@
 #include <nx/network/nettools.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/socket_factory.h>
+#include <nx/utils/log/log.h>
 
 #ifndef Q_OS_WIN
 #include <netinet/in.h>
@@ -131,10 +132,14 @@ void QnMdnsListener::readSocketInternal(AbstractDatagramSocket* socket, const QS
         if (m_localAddressList.contains(remoteEndpoint.address.toString()))
             continue; //< ignore own packets
 
-        const auto& laddr = localAddress.isEmpty()
+        const auto remoteIp = remoteEndpoint.address.toString();
+        const auto localIp = localAddress.isEmpty()
                 ? getBestLocalAddress(remoteEndpoint.address.toString())
                 : localAddress;
-        m_consumersData->addData(remoteEndpoint.address.toString(), laddr, responseData);
+
+        m_consumersData->addData(remoteIp, localIp, responseData);
+        NX_VERBOSE(this, lm("Add data %1 -> %2, size %3").args(
+            remoteIp, localIp, responseData.size()));
     }
 }
 

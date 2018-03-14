@@ -19,6 +19,8 @@ namespace
 {
     const QString kTestCredentialsUrl = lit("axis-cgi/param.cgi?action=list&group=root.Network.Bonjour.FriendlyName");
     const int kDefaultAxisTimeout = 4000;
+    static const QString kChannelNumberSuffix(lit("_channel_")); //< For physicalId.
+    static const QString kUrlChannelNumber(lit("channel"));
 }
 
 QnPlAxisResourceSearcher::QnPlAxisResourceSearcher(QnCommonModule* commonModule):
@@ -140,8 +142,11 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
     QList<QnResourcePtr> result;
     result << resource;
 
-    if (!isSearchAction)
+    QUrlQuery urlQuery(url.query());
+    if (isSearchAction)
         addMultichannelResources(result);
+    else if (urlQuery.hasQueryItem(kUrlChannelNumber))
+        updateToChannel(resource, urlQuery.queryItemValue(kUrlChannelNumber).toInt());
 
     return result;
 }
@@ -319,6 +324,23 @@ QAuthenticator QnPlAxisResourceSearcher::determineResourceCredentials(
     return QAuthenticator();
 }
 
+void QnPlAxisResourceSearcher::updateToChannel(const QnPlAxisResourcePtr& resource, int value)
+{
+    QUrl url(resource->getUrl());
+    QUrlQuery q(url.query());
+    q.removeAllQueryItems(kUrlChannelNumber);
+    q.addQueryItem(kUrlChannelNumber, QString::number(value));
+    url.setQuery(q);
+    resource->setUrl(url.toString());
+
+    const auto physicalId = resource->getPhysicalId();
+    if (physicalId.indexOf(kChannelNumberSuffix) == -1)
+    {
+        resource->setPhysicalId(physicalId + kChannelNumberSuffix + QString::number(value));
+        resource->setName(resource->getName() + QString(QLatin1String("-channel %1")).arg(value));
+    }
+}
+
 template <typename T>
 void QnPlAxisResourceSearcher::addMultichannelResources(QList<T>& result)
 {
@@ -336,7 +358,7 @@ void QnPlAxisResourceSearcher::addMultichannelResources(QList<T>& result)
         firstResource->setGroupName(physicalId);
         firstResource->setGroupId(physicalId);
 
-        firstResource->setPhysicalId(physicalId + QLatin1String("_channel_") + QString::number(1));
+        updateToChannel(firstResource, 1);
 
         for (uint i = 2; i <= channels; ++i)
         {
@@ -359,7 +381,7 @@ void QnPlAxisResourceSearcher::addMultichannelResources(QList<T>& result)
 
             resource->setUrl(firstResource->getUrl());
 
-            resource->setPhysicalId(resource->getPhysicalId() + QLatin1String("_channel_") + QString::number(i));
+            updateToChannel(resource, i);
 
             result.push_back(resource);
         }
