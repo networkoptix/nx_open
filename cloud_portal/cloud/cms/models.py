@@ -186,7 +186,8 @@ class Customization(models.Model):
 
     @property
     def version_id(self):
-        return self.contentversion_set.latest('accepted_date').id if self.contentversion_set.exists() else 0
+        versions = self.contentversion_set.filter(name=settings.PRIMARY_PRODUCT)
+        return versions.latest('accepted_date').id if versions.exists() else 0
 
     @property
     def languages_list(self):
@@ -210,7 +211,7 @@ class Customization(models.Model):
             # TODO: need to update all static right here
 
     def read_global_value(self, record_name):
-        product = Product.objects.get(name='cloud_portal')
+        product = Product.objects.get(name=settings.PRIMARY_PRODUCT)
         global_contexts = product.context_set.filter(is_global=True)
         data_structure = None
         for context in global_contexts:
@@ -257,10 +258,14 @@ class ContentVersion(models.Model):
         if self.accepted_by == None:
             return 'in review'
 
-        version_id = customization_cache(self.customization.name, 'version_id')
+        if self.name == settings.PRIMARY_PRODUCT:
+            version_id = customization_cache(self.customization.name, 'version_id')
+        else:
+            versions = ContentVersion.objects.filter(name=self.name)
+            version_id = versions.latest("accepted_date").id if versions.exists() else 0
 
         if version_id > self.id:
-                return 'old'
+            return 'old'
 
         return 'current'
 

@@ -131,6 +131,7 @@ def save_unrevisioned_records(context, customization, language, data_structures,
         record.save()
 
     fill_content(customization_name=customization.name,
+                 product_name=context.product.name,
                  preview=True,
                  incremental=True,
                  changed_context=context)
