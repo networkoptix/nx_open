@@ -346,14 +346,13 @@ angular.module('nxCommon').controller('ViewCtrl',
         $scope.playerHandler = function(error){
             if(error){
                 return $scope.positionProvider.checkEndOfArchive().then(function(jumpToLive){
-                   return handleVideoError(jumpToLive);
+                    return handleVideoError(jumpToLive);  // Check crash count to reload media
                 },function(){
-                    return true;
+                    return true; // Return true to show error to user
                 });
             }
-
             $scope.crashCount = 0;
-            return $q.resolve(false);
+            return false;  // Return false to not show error to user
         };
 
         $scope.selectFormat = function(format){
