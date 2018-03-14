@@ -50,6 +50,21 @@ static int reportArgErrorAndExit(const std::string& command)
     return -1;
 }
 
+static const std::string kMount = "mount";
+static const std::string kUMount1 = "umount";
+static const std::string kUMount2 = "unmount";
+static const std::string kChown = "chown";
+static const std::string kTouch = "touch";
+static const std::string kMkdir = "mkdir";
+static const std::string kInstall = "install";
+static const std::string kIds = "ids";
+
+static bool unknownCommand(const std::string& command)
+{
+    return command != kMount && command != kUMount1 && command != kUMount2 && command != kChown
+        && command != kTouch && command != kMkdir && command != kInstall && command != kIds;
+}
+
 int main(int /*argc*/, const char** argv)
 {
     if (argv == nullptr || *argv == nullptr)
@@ -60,14 +75,17 @@ int main(int /*argc*/, const char** argv)
     if (!command)
         return reportErrorAndExit("command is required");
 
+    if (*command == "-h" || *command == "--help")
+        return showHelp();
+
+    if (unknownCommand(*command))
+        return reportErrorAndExit("Unknown command: " + *command);
+
     nx::root_tool::Actions actions;
     if (!actions.setupIds())
         return reportErrorAndExit(actions.lastError());
 
-    if (*command == "-h" || *command == "--help")
-        return showHelp();
-
-    if (*command == "mount")
+    if (*command == kMount)
     {
         const auto url = getOptionalArg(argv);
         if (!url)
@@ -82,9 +100,11 @@ int main(int /*argc*/, const char** argv)
 
         if (!actions.mount(*url, *directory, user, password))
             return reportErrorAndExit(actions.lastError());
+
+        return 0;
     }
 
-    if (*command == "ids")
+    if (*command == kIds)
     {
         actions.showIds();
         return 0;
@@ -94,17 +114,13 @@ int main(int /*argc*/, const char** argv)
     if (!commandArg)
         return reportArgErrorAndExit(*command);
 
-    if (((*command == "umount" || *command == "unmount") && !actions.unmount(*commandArg))
-        || (*command == "chown" && !actions.changeOwner(*commandArg))
-        || (*command == "touch" && !actions.touchFile(*commandArg))
-        || (*command == "mkdir" && !actions.makeDirectory(*commandArg))
-        || (*command == "install" && !actions.install(*commandArg)))
+    if (((*command == kUMount1 || *command == kUMount2) && !actions.unmount(*commandArg))
+        || (*command == kChown && !actions.changeOwner(*commandArg))
+        || (*command == kTouch && !actions.touchFile(*commandArg))
+        || (*command == kMkdir && !actions.makeDirectory(*commandArg))
+        || (*command == kInstall && !actions.install(*commandArg)))
     {
         return reportErrorAndExit(actions.lastError());
-    }
-    else
-    {
-        return reportErrorAndExit("Unknown command: " + *command);
     }
 
     return 0;

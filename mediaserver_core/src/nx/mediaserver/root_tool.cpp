@@ -79,9 +79,6 @@ Qn::StorageInitResult RootTool::remount(const QUrl& url, const QString& path)
         this,
         lm("[initOrUpdate, mount] root_tool unmount %1 result %2").args(path, result));
 
-    if (!result)
-        return Qn::StorageInit_WrongPath;
-
     auto mountResult = mount(url, path);
     NX_VERBOSE(
         this,

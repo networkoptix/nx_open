@@ -22,7 +22,7 @@ namespace {
 std::string formatImpl(const char* pstr, std::stringstream& out)
 {
     while (*pstr)
-        out << *pstr;
+        out << *pstr++;
 
     return out.str();
 }
@@ -77,6 +77,7 @@ bool Actions::checkMountPermissions(const std::string& directory)
 {
     static const std::string kAllowedMountPointPreffix("/tmp/");
     static const std::string kAllowedMountPointSuffix("_temp_folder_");
+
 
     if (directory.find(kAllowedMountPointPreffix) != 0
         || directory.find(kAllowedMountPointSuffix) == std::string::npos)
@@ -177,32 +178,48 @@ bool Actions::mount(const std::string& url, const std::string& directory,
     }
 
     auto makeCommandString =
-        [&url, &directory](const std::string& username, const std::string& password)
+        [&url, &directory](const std::string& username, const std::string& password,
+            const std::string& domain)
         {
             std::ostringstream command;
             command << "mount -t cifs '" << url << "' '" << directory << "'"
                 << " -o uid=" << kRealUid << ",gid=" << kRealGid
-                <<",username=" << username << ",password=" << password;
+                << ",username=" << username << ",password=" << password;
+
+            if (!password.empty())
+                command << ",domain=" << domain;
 
             return command.str();
         };
 
     std::string passwordString = password ? *password : "";
-    std::string usernameString = username ? *username : "guest";
+    std::string userNameString = username ? *username : "guest";
+    std::string userProvidedDomain;
 
-    for (const auto& candidate: {usernameString, "WORKGROUP\\" + usernameString})
+    if (auto pos = userNameString.find("\\");
+        pos != std::string::npos && pos != userNameString.size() - 1)
+    {
+        userProvidedDomain = userNameString.substr(pos + 1);
+        userNameString = userNameString.substr(0, pos);
+    }
+
+    std::vector<std::string> domains = { "WORKGROUP", "" };
+    if (!userProvidedDomain.empty())
+        domains.push_back(userProvidedDomain);
+
+    for (const auto& domain: domains)
     {
         if (passwordString.empty())
         {
             for (const auto& passwordCandidate: {"", "123"})
             {
-                if (execute(makeCommandString(candidate, passwordCandidate)))
+                if (execute(makeCommandString(userNameString, passwordCandidate, domain)))
                    return true;
             }
         }
         else
         {
-            if (execute(makeCommandString(candidate, passwordString)))
+            if (execute(makeCommandString(userNameString, passwordString, domain)))
                return true;
         }
     }
