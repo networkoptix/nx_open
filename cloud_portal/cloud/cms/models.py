@@ -21,17 +21,14 @@ def check_update_cache(customization, version_id):
     global_cache = caches['global']
     global_id = global_cache.get(customization)
 
-    if version_id != global_id:
-        return True, global_id
-    else:
-        return False, 0
+    return version_id != global_id, global_id
 
 
 def customization_cache(customization_name, value=None, force=False):
     data = cache.get(customization_name)
 
     if data and 'version_id' in data and not force:
-        force = check_update_cache(customization_name,data['version_id'])[0]
+        force = check_update_cache(customization_name, data['version_id'])[0]
 
     if not data or force:
         customization = Customization.objects.get(name=customization_name)
