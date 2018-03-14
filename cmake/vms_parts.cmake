@@ -65,6 +65,7 @@ option(withTestCamera "Enable test camera" ${_withTestCamera})
 option(withTests "Enable unit tests" ${_withTests})
 option(withPluginStubs "Enable plugin stubs" ON)
 option(withMiniLauncher "Enable minilauncher" ${_withMiniLauncher})
+option(withScreenChecker "Enable screen checker" OFF)
 
 cmake_dependent_option(withDistributions "Enable distributions build"
     OFF "developerBuild"
