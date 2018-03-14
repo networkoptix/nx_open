@@ -69,7 +69,7 @@ Object
 
         function savePosition()
         {
-            lastPosition = mediaPlayer.liveMode ? -1 : mediaPlayer.position
+            lastPosition = currentPosition()
             waitForLastPosition = true
         }
 
@@ -82,6 +82,14 @@ Object
                 mediaPlayer.pause()
             else if (d.playing)
                 mediaPlayer.play()
+        }
+
+        function currentPosition()
+        {
+            if (mediaPlayer.liveMode)
+                return d.playing ? -1 : (new Date()).getTime()
+
+            return mediaPlayer.position;
         }
     }
 
@@ -106,7 +114,7 @@ Object
         {
             if (d.waitForLastPosition)
             {
-                d.lastPosition = liveMode ? -1 : position
+                d.lastPosition = d.currentPosition()
                 d.waitForLastPosition = false
             }
 
