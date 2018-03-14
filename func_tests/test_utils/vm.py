@@ -114,8 +114,8 @@ class Pool(object):
         assert info.name == name
         if not info.is_running:
             self._hypervisor.power_on(info.name)
-        port = info.ports['tcp', self._access_manager.guest_port]
-        os_access = self._access_manager.register(self._hypervisor.hostname, [alias, info.name], port)
+        hostname, port = info.ports['tcp', self._access_manager.guest_port]
+        os_access = self._access_manager.register(hostname, [alias, info.name], port)
         if not wait_until(os_access.is_working, timeout_sec=self._vm_configuration.power_on_timeout):
             raise MachineNotResponding(alias, info.name)
         networking = LinuxNetworking(os_access, info.macs.values())

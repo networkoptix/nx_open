@@ -49,7 +49,11 @@ class VirtualBox(object):
             except KeyError:
                 break
             tag, protocol, host_address, host_port, guest_address, guest_port = raw_value.split(',')
-            ports[protocol, int(guest_port)] = int(host_port)
+            # Hostname is given with port because knowledge that VMs are accessible through
+            # forwarded port is not part of logical interface. Other possibility is to make virtual network
+            # in which host can access VMs on IP level. One more option is special VM which is accessible by IP
+            # and forwards ports to target VMs.
+            ports[protocol, int(guest_port)] = self.hostname, int(host_port)
         macs = {}
         networks = {}
         for slot in NETWORK_SLOTS:

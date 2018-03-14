@@ -49,8 +49,8 @@ def test_clone(hypervisor, template):
     logger.debug("Clone:\n%s", pformat(clone))
     assert clone.name == clone_name
     assert not clone.is_running
-    assert clone.ports['tcp', 22] == 65022
-    assert clone.ports['udp', 53] == 65053
+    assert clone.ports['tcp', 22] == (hypervisor.hostname, 65022)
+    assert clone.ports['udp', 53] == (hypervisor.hostname, 65053)
 
 
 def test_power(hypervisor, dummy):
