@@ -136,42 +136,35 @@ def test_secondary_server_temporary_inet_on(system):
     system.primary.rest_api.api.systemSettings.GET(synchronizeTimeWithInternet=True)
 
     system.secondary.machine.networking.enable_internet()
-    assert wait_until(lambda: get_time(system.primary.rest_api).is_close_to(get_internet_time())), (
-        "After connection to internet time server on MACHINE WITH NON-PRIMARY time server was allowed, "
-        "time on PRIMARY time server %s is NOT EQUAL to internet time %s" % (
-            get_time(system.primary.rest_api), get_internet_time()))
-    assert wait_until(lambda: get_time(system.secondary.rest_api).is_close_to(get_internet_time())), (
-        "After connection to internet time server on MACHINE WITH NON-PRIMARY time server was allowed, "
-        "its time %s is NOT EQUAL to internet time %s" % (
-            get_time(system.secondary.rest_api), get_internet_time()))  # Change system time on PRIMARY VM.
+    assert wait_until(
+        lambda: get_time(system.secondary.rest_api).is_close_to(get_internet_time()),
+        name="until NON-PRIMARY aligns with INTERNET while internet is enabled")
+    assert wait_until(
+        lambda: get_time(system.primary.rest_api).is_close_to(get_internet_time()),
+        name="until PRIMARY aligns with INTERNET while internet is enabled")
     system.primary.os_access.set_time(BASE_TIME - timedelta(hours=5))
-    assert holds_long_enough(lambda: get_time(system.primary.rest_api).is_close_to(get_internet_time())), (
-        "After connection to internet time server on MACHINE WITH NON-PRIMARY time server was allowed, "
-        "time on PRIMARY time server %s does NOT FOLLOW to internet time %s" % (
-            get_time(system.primary.rest_api), get_internet_time()))
+    assert holds_long_enough(
+        lambda: get_time(system.primary.rest_api).is_close_to(get_internet_time()),
+        name="until PRIMARY aligns with INTERNET after system time is shifted but while internet is enabled")
     system.secondary.machine.networking.disable_internet()
 
     # Turn off RFC868 (time protocol)
-    assert holds_long_enough(lambda: get_time(system.primary.rest_api).is_close_to(get_internet_time())), (
-        "After connection to internet time server "
-        "on NON-PRIMARY time server was again restricted, "
-        "time on PRIMARY time server %s is NOT EQUAL to internet time %s" % (
-            get_time(system.primary.rest_api), get_internet_time()))
+    assert holds_long_enough(
+        lambda: get_time(system.primary.rest_api).is_close_to(get_internet_time()),
+        name="until PRIMARY aligns with INTERNET after internet was disabled")
 
     # Stop secondary server
     system.secondary.stop()
-    assert holds_long_enough(lambda: get_time(system.primary.rest_api).is_close_to(get_internet_time())), (
-        "When NON-PRIMARY server was stopped, "
-        "time on PRIMARY time server %s is NOT EQUAL to internet time %s" % (
-            get_time(system.primary.rest_api), get_internet_time()))
+    assert holds_long_enough(
+        lambda: get_time(system.primary.rest_api).is_close_to(get_internet_time()),
+        name="until PRIMARY aligns with INTERNET while NON-PRIMARY is stopped")
     system.secondary.start()
 
     # Restart secondary server
     system.secondary.restart_via_api()
-    assert holds_long_enough(lambda: get_time(system.primary.rest_api).is_close_to(get_internet_time())), (
-        "After NON-PRIMARY time server restart via API, "
-        "its time %s is NOT EQUAL to internet time %s" % (
-            get_time(system.primary.rest_api), get_internet_time()))
+    assert holds_long_enough(
+        lambda: get_time(system.primary.rest_api).is_close_to(get_internet_time()),
+        name="until NON-PRIMARY aligns with INTERNET after restart via API")
 
     # Stop and start both servers - so that servers could forget internet time
     system.secondary.stop()
@@ -182,13 +175,9 @@ def test_secondary_server_temporary_inet_on(system):
 
     # Detect new PRIMARY and change its system time
     system.primary.os_access.set_time(BASE_TIME - timedelta(hours=25))
-    assert wait_until(lambda: get_time(system.primary.rest_api).is_close_to(get_internet_time())), (
-        "After servers restart as services "
-        "and changing system time on MACHINE WITH PRIMARY time server, "
-        "time on PRIMARY time server %s is NOT EQUAL to internet time %s" % (
-            get_time(system.primary.rest_api), get_internet_time()))
-    assert wait_until(lambda: get_time(system.secondary.rest_api).is_close_to(get_internet_time())), (
-        "After servers restart as services "
-        "and changing system time on MACHINE WITH PRIMARY time server, "
-        "time on NON-PRIMARY time server %s is NOT EQUAL to internet time %s" % (
-            get_time(system.secondary.rest_api), get_internet_time()))
+    assert wait_until(
+        lambda: get_time(system.primary.rest_api).is_close_to(get_internet_time()),
+        name="until PRIMARY aligns with INTERNET after both are restarted")
+    assert wait_until(
+        lambda: get_time(system.secondary.rest_api).is_close_to(get_internet_time()),
+        name="until NON-PRIMARY aligns with INTERNET after both are restarted")
