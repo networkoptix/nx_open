@@ -7,7 +7,8 @@ import glob
 import logging
 import shutil
 import subprocess
-import threading
+import timeit
+from select import select
 from textwrap import dedent
 try:
     from shlex import quote  # In Python 3.3+.
@@ -23,6 +24,7 @@ from .utils import RunningTime
 log = logging.getLogger(__name__)
 
 
+timer = timeit.default_timer
 PROCESS_TIMEOUT = datetime.timedelta(hours=1)
 
 
@@ -171,7 +173,7 @@ class LocalAccess(OsAccess):
 
     def run_command(self, args, input=None, cwd=None, check_retcode=True, log_output=True, timeout=None, env=None):
         timeout = timeout or PROCESS_TIMEOUT
-        if isinstance(args, str):
+        if isinstance(args, (bytes, str)):
             args = 'set -eux\n' + dedent(args).strip()
             shell = True
             logged_command_line = args
@@ -179,70 +181,57 @@ class LocalAccess(OsAccess):
             args = [str(arg) for arg in args]
             shell = False
             logged_command_line = _arg_list_to_str(args)
-        if input:
-            log.debug('executing:\n%s (with %d bytes input)', logged_command_line, len(input))
-            stdin = subprocess.PIPE
-        else:
-            log.debug('executing:\n%s', logged_command_line)
-            stdin = None
+        log.debug('COMMAND:\n%s', logged_command_line)
         pipe = subprocess.Popen(
-            args, cwd=cwd and str(cwd), env=env and {k: str(v) for k, v in env.items()}, shell=shell,
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=stdin, close_fds=True)
-        stdout_buffer = []
-        stderr_buffer = []
-        stdout_thread = threading.Thread(target=self._read_thread, args=(pipe.stdout, 'STDOUT', stdout_buffer, log_output))
-        stderr_thread = threading.Thread(target=self._read_thread, args=(pipe.stderr, 'STDERR', stderr_buffer, True))
-        stdout_thread.daemon = True
-        stderr_thread.daemon = True
-        stdout_thread.start()
-        stderr_thread.start()
-        try:
-            try:
-                if input:
-                    try:
-                        pipe.stdin.write(input)
-                    except IOError as e:
-                        if e.errno == errno.EPIPE:
-                            # communicate() should ignore broken pipe error
-                            pass
-                        elif e.errno == errno.EINVAL and pipe.poll() is not None:
-                            # stdin.write() fails with EINVAL if the process already exited before the write
-                            pass
+            args,
+            shell=shell,
+            cwd=cwd and str(cwd), env=env and {k: str(v) for k, v in env.items()},
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE if input else None,
+            close_fds=True)
+        streams = [pipe.stdout, pipe.stderr]
+        buffers = {stream: bytearray() for stream in streams}
+        names = {pipe.stdout: 'STDOUT', pipe.stderr: 'STDERR'}
+        started_at = timer()
+        while streams:
+            streams_to_read, _, _ = select(streams, [], [], 0.1)
+            for stream in streams_to_read:
+                name = names[stream]
+                chunk = stream.read()
+                if not chunk:
+                    log.debug("%s closed.", name)
+                    stream.close()
+                    streams.remove(stream)
+                else:
+                    if stream is not pipe.stdout or log_output:
+                        try:
+                            decoded = chunk.decode()
+                        except UnicodeDecodeError as e:
+                            log.error("Cannot decode %d bytes chunk, assuming it's binary. %s: %s.", len(chunk), e, e.message)
                         else:
-                            raise
-                    pipe.stdin.close()
-            finally:
-                stdout_thread.join(timeout=timeout.total_seconds())
-                if not stdout_thread.isAlive():
-                    stderr_thread.join(timeout=timeout.total_seconds())
-                if stdout_thread.isAlive() or stderr_thread.isAlive():
-                    pipe.kill()
+                            log.debug("%s:\n%s", name, decoded)
+                    buffers[stream].extend(chunk)
+            else:
+                if timer() - started_at > timeout.total_seconds():
                     raise ProcessTimeoutError(args, timeout)
-        finally:
-            stdout_thread.join()
-            stderr_thread.join()
-            pipe.stdout.close()
-            pipe.stderr.close()
+        if input:
+            try:
+                log.debug("STDIN:\n%s", input)
+                pipe.stdin.write(input)
+            except IOError as e:
+                if e.errno == errno.EPIPE:
+                    log.error("STDIN broken.")
+                    pass
+                elif e.errno == errno.EINVAL and pipe.poll() is not None:
+                    log.error("STDIN already closed (process exited).")
+                    pass
+                else:
+                    raise
+            pipe.stdin.close()
+            log.error("STDIN closed.")
         retcode = pipe.wait()
         if check_retcode and retcode:
-            raise ProcessError(retcode, logged_command_line, output=''.join(stderr_buffer))
-        return ''.join(stdout_buffer)
-
-    @staticmethod
-    def _read_thread(f, name, buffer, log_lines):
-        while True:
-            chunk = f.read()
-            if not chunk:
-                log.debug("%s end.", name)
-                return
-            if log_lines:
-                try:
-                    decoded = chunk.decode()
-                except UnicodeDecodeError as e:
-                    log.error("Cannot decode %d bytes chunk, assuming it's binary. %s: %s.", len(chunk), e, e.message)
-                else:
-                    log.debug("%s:\n%s", name, decoded)
-            buffer.append(chunk)
+            raise ProcessError(retcode, logged_command_line, output=bytes(buffers[pipe.stderr]))
+        return bytes(buffers[pipe.stdout])
 
     def is_working(self):
         return True
