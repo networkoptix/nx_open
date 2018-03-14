@@ -1,6 +1,7 @@
 import calendar
 import logging
 import time
+import timeit
 from datetime import datetime, timedelta
 
 import pytz
@@ -124,12 +125,13 @@ class Wait(object):
         self._continue_level, self._stop_level = logging_levels
         self._name = name
         self._timeout_sec = timeout_sec
-        self._started_at = time.time()
+        self._started_at = timeit.default_timer()
+        self._last_tried_at = None
         self._attempts_limit = attempts_limit
-        self._delay_sec = 0.1
         self._attempts_made = 0
+        self.delay_sec = 0.1
 
-    def sleep_and_continue(self):
+    def again(self):
         self._attempts_made += 1
         since_start_sec = time.time() - self._started_at
         if since_start_sec > self._timeout_sec or self._attempts_made >= self._attempts_limit:
@@ -137,12 +139,20 @@ class Wait(object):
                 self._stop_level, "Stop to wait %s: %g/%g sec, %d/%d attempts.",
                 self._name, since_start_sec, self._timeout_sec, self._attempts_made, self._attempts_limit)
             return False
-        self._delay_sec *= 2
+        now = timeit.default_timer()
+        if self._last_tried_at is not None:
+            self.delay_sec = (now - self._last_tried_at) * 2 + 0.1
+        self._last_tried_at = now
         log.log(
-            self._continue_level, "Continue to wait %s: %g/%g sec, %d/%d attempts, sleep %g sec.",
-            self._name, since_start_sec, self._timeout_sec, self._attempts_made, self._attempts_limit, self._delay_sec)
-        time.sleep(self._delay_sec)
+            self._continue_level, "Continue to wait %s: %.1f/%.1f sec, %d/%d attempts, delay %.1f sec.",
+            self._name, since_start_sec, self._timeout_sec, self._attempts_made, self._attempts_limit, self.delay_sec)
         return True
+
+    def sleep_and_continue(self):
+        if self.again():
+            time.sleep(self.delay_sec)
+            return True
+        return False
 
 
 def wait_until(condition_is_true, name=None, timeout_sec=10):
