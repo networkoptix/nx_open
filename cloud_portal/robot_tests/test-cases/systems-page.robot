@@ -8,17 +8,18 @@ Force Tags        system
 ${password}    ${BASE PASSWORD}
 ${url}         ${ENV}
 
+*** Test Cases ***
 should show list of Systems
     Open Browser and go to URL    ${url}
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
-    Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${SYSTEMS TILE}
+    Wait Until Elements Are Visible    ${SYSTEMS TILE}
     Close Browser
 
 has system name, owner and OpenInNx button visible on systems page
     Open Browser and go to URL    ${url}
     Log In    ${EMAIL OWNER}    ${password}
-    Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
+    Wait Until Elements Are Visible    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
     Element Text Should Be    ${AUTO TESTS TITLE}    Auto Tests
     Close Browser
 
@@ -26,21 +27,21 @@ should show Open in NX client button for online system
     Open Browser and go to URL    ${url}
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
-    Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
+    Wait Until Elements Are Visible    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
     Close Browser
 
 should not show Open in NX client button for offline system
     Open Browser and go to URL    ${url}
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
-    Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTOTESTS OFFLINE}
+    Wait Until Elements Are Visible    ${AUTOTESTS OFFLINE}
     Close Browser
 
 should show system's state for systems if they are offline. Otherwise - button Open in Nx
     Open Browser and go to URL    ${url}
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
-    Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
+    Wait Until Elements Are Visible    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
     ${systems}    Get WebElements    //div[@ng-repeat='system in systems | filter:searchSystems as filtered']
     Check Online Or Offline    ${systems}    ${AUTOTESTS OFFLINE TEXT}
     Close Browser
@@ -49,7 +50,7 @@ should open system page (users list) when clicked on system
     Open Browser and go to URL    ${url}
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
-    Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
+    Wait Until Elements Are Visible    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
     Click Element    ${AUTO TESTS TITLE}
     Verify In System    Auto Tests
     Close Browser
@@ -67,7 +68,7 @@ should update owner name in systems list, if it's changed
     Click Button    ${ACCOUNT SAVE}
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
     Go To    ${url}/systems
-    Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
+    Wait Until Elements Are Visible    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
     Element Text Should Be    ${AUTO TESTS USER}    newFirstName newLastName
 
     Go To    ${url}/account
