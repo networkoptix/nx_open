@@ -78,7 +78,7 @@ void OpenLayoutActionWidget::at_model_dataChanged(Fields fields)
     if (fields.testFlag(Field::actionParams))
     {
         auto params = model()->actionParams();
-        m_selectedLayout = resourcePool()->getResourceById<QnLayoutResource>(params.layoutResourceId);
+        m_selectedLayout = resourcePool()->getResourceById<QnLayoutResource>(params.actionResourceId);
         checkWarnings();
         updateLayoutsButton();
     }
@@ -337,13 +337,13 @@ void OpenLayoutActionWidget::openLayoutSelectionDialog()
         auto selection = dialog.checkedLayouts();
         if (selection.empty())
         {
-            params.layoutResourceId = QnUuid();
+            params.actionResourceId = QnUuid();
         }
         else
         {
             auto uuid = *selection.begin();
             m_selectedLayout = resourcePool()->getResourceById<QnLayoutResource>(uuid);
-            params.layoutResourceId = uuid;
+            params.actionResourceId = uuid;
         }
         model()->setActionParams(params);
     }

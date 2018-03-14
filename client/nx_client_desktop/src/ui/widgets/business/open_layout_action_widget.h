@@ -31,7 +31,7 @@ public:
 
     virtual void updateTabOrder(QWidget* before, QWidget* after) override;
 
-protected slots:
+protected:
     virtual void at_model_dataChanged(Fields fields) override;
 
 private:
@@ -42,7 +42,7 @@ private:
         NoWarning,
         MissingAccess,  //< Some users have no access
         NobodyHasAccess,   //< No user has an access
-    }m_layoutWarning = LayoutWarning::NoWarning;
+    } m_layoutWarning = LayoutWarning::NoWarning;
 
     // Warnings for picked users.
     // They are displayed under 'select user' button.
@@ -50,7 +50,7 @@ private:
     {
         NoWarning,
         LocalResource,  //< Selected local resource and multiple users
-    }m_userWarning = UserWarning::NoWarning;
+    } m_userWarning = UserWarning::NoWarning;
 
     void displayWarning(LayoutWarning warning);
     void displayWarning(UserWarning warning);
