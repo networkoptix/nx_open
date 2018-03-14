@@ -410,10 +410,12 @@ std::string IniConfig::Impl::determineIniDir()
             static const char kSeparator = '\\';
             static const char* const kEnvVar = "LOCALAPPDATA";
             static const std::string extraDir = "";
+            static const std::string defaultDir = ""; //< Current directory.
         #else
             static const char kSeparator = '/';
             static const char* const kEnvVar = "HOME";
             static const std::string extraDir = std::string(".config") + kSeparator;
+            static const std::string defaultDir = "/etc/nx_ini/";
         #endif
 
         const char* const env_NX_INI_DIR = getenv("NX_INI_DIR");
@@ -423,6 +425,8 @@ std::string IniConfig::Impl::determineIniDir()
         const char* const env = getenv(kEnvVar);
         if (env != nullptr)
             return std::string(env) + kSeparator + extraDir + "nx_ini" + kSeparator;
+
+        return defaultDir;
     #endif
 
 #if 0 // Using OS temp dir has been abandoned.
@@ -441,9 +445,6 @@ std::string IniConfig::Impl::determineIniDir()
     }
     return std::string(iniFileDir);
 #endif // 0
-
-    // If the path cannot be determined, use empty string.
-    return "";
 }
 
 /**
