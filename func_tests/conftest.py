@@ -168,7 +168,7 @@ def init_logging(request, work_dir):
     stderr_handler = logging.StreamHandler()
     # %(message).10s truncates log message to 10 characters.
     stderr_handler.setFormatter(logging.Formatter(
-        '%(asctime)-15s %(threadName)-15s %(levelname)-7s %(message).{:d}s'.format(stderr_log_width)))
+        '%(asctime)-15s %(name)s %(levelname)s %(message).{:d}s'.format(stderr_log_width)))
     stderr_handler.setLevel(request.config.getoption('--log-level'))
     root_logger.addHandler(stderr_handler)
 
