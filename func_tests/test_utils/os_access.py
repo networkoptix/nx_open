@@ -7,7 +7,6 @@ import glob
 import logging
 import shutil
 import subprocess
-import timeit
 from select import select
 from textwrap import dedent
 try:
@@ -19,12 +18,11 @@ import pytz
 import tzlocal
 from pathlib2 import Path, PurePosixPath
 
-from .utils import RunningTime
+from .utils import RunningTime, Wait
 
 log = logging.getLogger(__name__)
 
 
-timer = timeit.default_timer
 PROCESS_TIMEOUT = datetime.timedelta(hours=1)
 
 
@@ -181,56 +179,73 @@ class LocalAccess(OsAccess):
             args = [str(arg) for arg in args]
             shell = False
             logged_command_line = _arg_list_to_str(args)
-        log.debug('COMMAND:\n%s', logged_command_line)
         pipe = subprocess.Popen(
             args,
             shell=shell,
             cwd=cwd and str(cwd), env=env and {k: str(v) for k, v in env.items()},
             stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE if input else None,
             close_fds=True)
+        process_logger = log.getChild(str(pipe.pid))
+        process_logger.debug('Started:\n%s', logged_command_line)
+        stdin_logger = process_logger.getChild('stdin')
+        if input:
+            try:
+                stdin_logger.debug("Data:\n%s", input)
+                pipe.stdin.write(input)
+            except IOError as e:
+                if e.errno == errno.EPIPE:
+                    stdin_logger.error("Broken.")
+                    pass
+                elif e.errno == errno.EINVAL and pipe.poll() is not None:
+                    if pipe.poll() is None:
+                        stdin_logger.error("Invalid but process is still running.")
+                    else:
+                        stdin_logger.error("Invalid: process terminated.")
+                    pass
+                else:
+                    raise
+            pipe.stdin.close()
+            stdin_logger.debug("Closed.")
         streams = [pipe.stdout, pipe.stderr]
         buffers = {stream: bytearray() for stream in streams}
-        names = {pipe.stdout: 'STDOUT', pipe.stderr: 'STDERR'}
-        started_at = timer()
+        loggers = {pipe.stdout: process_logger.getChild('stdout'), pipe.stderr: process_logger.getChild('stderr')}
+        wait = Wait(
+            name='for events from process',
+            timeout_sec=timeout.total_seconds(),
+            logging_levels=(logging.DEBUG, logging.ERROR))
         while streams:
-            streams_to_read, _, _ = select(streams, [], [], 0.1)
+            streams_to_read, _, streams_exceptional = select(streams, [], streams, wait.delay_sec)
+            if streams_exceptional:
+                for stream in streams_exceptional:
+                    loggers[stream].error("Exceptional condition.")
             for stream in streams_to_read:
-                name = names[stream]
                 chunk = stream.read()
                 if not chunk:
-                    log.debug("%s closed.", name)
+                    loggers[stream].debug("Closed, %d bytes total.", len(buffers[stream]))
                     stream.close()
                     streams.remove(stream)
                 else:
                     if stream is not pipe.stdout or log_output:
                         try:
                             decoded = chunk.decode()
-                        except UnicodeDecodeError as e:
-                            log.error("Cannot decode %d bytes chunk, assuming it's binary. %s: %s.", len(chunk), e, e.message)
+                        except UnicodeDecodeError:
+                            loggers[stream].debug("Data, %d bytes.", len(chunk))
                         else:
-                            log.debug("%s:\n%s", name, decoded)
+                            loggers[stream].debug(u"Data, %d bytes, %d characters:\n%s", len(chunk), len(decoded), decoded)
                     buffers[stream].extend(chunk)
             else:
-                if timer() - started_at > timeout.total_seconds():
+                if not wait.again():
                     raise ProcessTimeoutError(args, timeout)
-        if input:
-            try:
-                log.debug("STDIN:\n%s", input)
-                pipe.stdin.write(input)
-            except IOError as e:
-                if e.errno == errno.EPIPE:
-                    log.error("STDIN broken.")
-                    pass
-                elif e.errno == errno.EINVAL and pipe.poll() is not None:
-                    log.error("STDIN already closed (process exited).")
-                    pass
-                else:
-                    raise
-            pipe.stdin.close()
-            log.error("STDIN closed.")
-        retcode = pipe.wait()
-        if check_retcode and retcode:
-            raise ProcessError(retcode, logged_command_line, output=bytes(buffers[pipe.stderr]))
+        while True:
+            return_code = pipe.poll()
+            if return_code is None:
+                if not wait.sleep_and_continue():
+                    raise ProcessTimeoutError(args, timeout)
+            else:
+                break
+        process_logger.debug("Exit: return code %d.", return_code)
+        if check_retcode and return_code:
+            raise ProcessError(return_code, logged_command_line, output=bytes(buffers[pipe.stderr]))
         return bytes(buffers[pipe.stdout])
 
     def is_working(self):
