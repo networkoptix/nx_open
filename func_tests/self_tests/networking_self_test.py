@@ -16,7 +16,10 @@ def test_setup_basic(vm_pools, hypervisor):
                     'router-2': {
                         '10.254.3.0/24': {
                             'second': None}}}}}}
-    reachability = {'10.254.1.0/24': {'first': {'second': None}}}
+    reachability = {
+        '10.254.1.0/24': {
+            'first': {
+                'second': None}}}
     nodes, ip_addresses = setup_networks(vm_pools, hypervisor, structure, reachability)
 
     assert IPNetwork('10.254.1.0/24') in ip_addresses['first']
