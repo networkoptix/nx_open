@@ -35,7 +35,7 @@ def customization_cache(customization_name, value=None, force=False):
         custom_config = get_config(customization.name)
 
         data = {
-            'version_id': customization.version_id,
+            'version_id': customization.version_id(),
             'languages': customization.languages_list,
             'default_language': customization.default_language.code,
             'mail_from_name': customization.read_global_value('%MAIL_FROM_NAME%'),
@@ -184,9 +184,8 @@ class Customization(models.Model):
     def __str__(self):
         return self.name
 
-    @property
-    def version_id(self):
-        versions = self.contentversion_set.filter(name=settings.PRIMARY_PRODUCT)
+    def version_id(self, product_name=settings.PRIMARY_PRODUCT):
+        versions = ContentVersion.objects.filter(datarecord__data_structure__context__product__name=product_name)
         return versions.latest('accepted_date').id if versions.exists() else 0
 
     @property
@@ -222,7 +221,7 @@ class Customization(models.Model):
 
         if not data_structure:
             return None
-        return data_structure.find_actual_value(self, version_id=self.version_id)
+        return data_structure.find_actual_value(self, version_id=self.version_id(product.name))
 
 # CMS data. Partners can change that
 
@@ -257,12 +256,8 @@ class ContentVersion(models.Model):
     def state(self):
         if self.accepted_by == None:
             return 'in review'
-
-        if self.name == settings.PRIMARY_PRODUCT:
-            version_id = customization_cache(self.customization.name, 'version_id')
-        else:
-            versions = ContentVersion.objects.filter(name=self.name)
-            version_id = versions.latest("accepted_date").id if versions.exists() else 0
+        product = Product.objects.filter(context__datastructure__datarecord__version__id=self.id).last()
+        version_id = self.customization.version_id(product.name)
 
         if version_id > self.id:
             return 'old'
