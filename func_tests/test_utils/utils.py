@@ -121,7 +121,7 @@ class Timeout(Exception):
 
 
 class Wait(object):
-    def __init__(self, name, timeout_sec=10, attempts_limit=100, logging_levels=(logging.WARNING, logging.ERROR)):
+    def __init__(self, name, timeout_sec=30, attempts_limit=100, logging_levels=(logging.WARNING, logging.ERROR)):
         self._continue_level, self._stop_level = logging_levels
         self._name = name
         self._timeout_sec = timeout_sec
@@ -155,7 +155,7 @@ class Wait(object):
         return False
 
 
-def wait_until(condition_is_true, name=None, timeout_sec=10):
+def wait_until(condition_is_true, name=None, timeout_sec=30):
     name = name or "until %s returns True" % condition_is_true.__name__
     wait = Wait(name=name, timeout_sec=timeout_sec)
     while True:
