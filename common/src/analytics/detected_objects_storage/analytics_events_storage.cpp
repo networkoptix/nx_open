@@ -251,14 +251,11 @@ void EventsStorage::prepareLookupQuery(
     QString eventsFilteredByFreeTextSubQuery;
     const auto sqlQueryFilter =
         prepareSqlFilterExpression(filter, &eventsFilteredByFreeTextSubQuery);
-    QString sqlQueryFilterWhereClause;
-    QString sqlQueryFilterPrefixedWithAndIfNotEmpty;
+    QString sqlQueryFilterStr;
     if (!sqlQueryFilter.empty())
     {
-        const auto filterExpression =
-            nx::utils::db::generateWhereClauseExpression(sqlQueryFilter);
-        sqlQueryFilterWhereClause = lm("WHERE %1").args(filterExpression);
-        sqlQueryFilterPrefixedWithAndIfNotEmpty = lm("AND %1").args(filterExpression);
+        sqlQueryFilterStr = lm("WHERE %1").args(
+            nx::utils::db::generateWhereClauseExpression(sqlQueryFilter));
     }
 
     QString sqlLimitStr;
@@ -277,17 +274,13 @@ void EventsStorage::prepareLookupQuery(
         FROM event e,
             ( SELECT timestamp_usec_utc AS matching_track_start_time, r
               FROM filtered_events AS t
-              WHERE timestamp_usec_utc=(
-                SELECT MIN(timestamp_usec_utc) FROM %1
-                WHERE object_id=t.object_id %3
-              )
-              %4) objects
+              WHERE timestamp_usec_utc=(SELECT MIN(timestamp_usec_utc) FROM event WHERE object_id=t.object_id)
+              %3) objects
         WHERE e.rowid=objects.r
-        ORDER BY timestamp_usec_utc %5
+        ORDER BY timestamp_usec_utc %4
     )sql").args(
         eventsFilteredByFreeTextSubQuery,
-        sqlQueryFilterWhereClause,
-        sqlQueryFilterPrefixedWithAndIfNotEmpty,
+        sqlQueryFilterStr,
         sqlLimitStr,
         filter.sortOrder == Qt::SortOrder::AscendingOrder ? "ASC" : "DESC").toQString());
     nx::utils::db::bindFields(query, sqlQueryFilter);
