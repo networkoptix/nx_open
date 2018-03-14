@@ -346,9 +346,9 @@ def sample_media_file(request, bin_dir):
 
 
 @pytest.fixture()
-def network(vm_pools, server_factory, layout_file):
+def network(vm_pools, hypervisor, server_factory, layout_file):
     layout = get_layout(layout_file)
-    vms, _ = setup_networks(vm_pools, layout.networks)
+    vms, _ = setup_networks(vm_pools, hypervisor, layout.networks, {})
     servers = merge_system(server_factory, layout.mergers)
     return vms, servers
 

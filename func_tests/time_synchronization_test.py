@@ -45,9 +45,9 @@ def get_internet_time(address='time.rfc868server.com', port=37):
 
 
 @pytest.fixture()
-def system(vm_pools, server_factory):
+def system(vm_pools, hypervisor, server_factory):
     layout = get_layout('direct-merge_toward_requested.yaml')
-    vms, _ = setup_networks(vm_pools, layout.networks)
+    vms, _ = setup_networks(vm_pools, hypervisor, layout.networks, {})
     servers = {}
     for alias in {'first', 'second'}:
         server = server_factory.create(alias, vm=vms[alias])
