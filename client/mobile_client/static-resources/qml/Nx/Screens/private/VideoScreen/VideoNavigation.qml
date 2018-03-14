@@ -409,7 +409,15 @@ Item
                     playbackController.checked = false
                     videoScreenController.playLive()
                 }
-                opacity: d.liveMode ? 0.0 : 1.0
+
+                visible: opacity > 0
+                opacity:
+                {
+                    var futurePosition =
+                        videoScreenController.mediaPlayer.position > (new Date()).getTime()
+                    return d.liveMode || futurePosition ? 0 : 1
+                }
+
                 Behavior on opacity { NumberAnimation { duration: 200 } }
             }
 
@@ -426,11 +434,21 @@ Item
                 anchors.rightMargin: -4
 
                 anchors.verticalCenter: parent.verticalCenter
-                visible: d.liveMode
 
+                opacity:
+                {
+                    var futurePosition =
+                        videoScreenController.mediaPlayer.position > (new Date()).getTime()
+                    var correctState = videoScreenController.dummyState.length == 0
+                    return (d.liveMode || futurePosition) && correctState ? 1 : 0
+                }
+
+                visible: opacity > 0
                 onPtzButtonClicked: videoNavigation.ptzButtonClicked()
                 onTwoWayAudioButtonPressed: twoWayAudioController.start()
                 onTwoWayAudioButtonReleased: twoWayAudioController.stop()
+
+                Behavior on opacity { NumberAnimation { duration: 200 } }
 
                 Binding
                 {
