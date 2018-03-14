@@ -26,7 +26,7 @@ void appSourceNeedData(GstElement* appSrc, guint /*unused*/, gpointer userData)
 {
     NX_OUTPUT << __func__ << " Running need-data GstAppSrc callback";
     auto pipeline = (metadata::deepstream::DefaultPipeline*) userData;
-    nxpt::ScopedRef<sdk::metadata::DataPacket> frame(pipeline->nextDataPacket());
+    nxpt::ScopedRef<sdk::metadata::DataPacket> frame(pipeline->nextDataPacket(), false);
     if (!frame)
     {
         NX_OUTPUT << __func__ << " No data available in the frame queue";
@@ -35,8 +35,7 @@ void appSourceNeedData(GstElement* appSrc, guint /*unused*/, gpointer userData)
 
     nxpt::ScopedRef<sdk::metadata::CompressedVideoPacket> video(
         (sdk::metadata::CompressedVideoPacket*) frame->queryInterface(
-            sdk::metadata::IID_CompressedVideoPacket),
-        false);
+            sdk::metadata::IID_CompressedVideoPacket));
 
     if (!video)
     {
@@ -144,16 +143,24 @@ gboolean metadataHandlerCallback(GstBuffer* buffer, GstMeta** meta, gpointer use
     auto pipeline = (metadata::deepstream::DefaultPipeline*) userData;
     auto trackingMapper = pipeline->trackingMapper();
 
+    const auto frameWidth = pipeline->currentFrameWidth();
+    if (frameWidth <= 0)
+        return true; //< Skip data.
+
+    const auto frameHeight = pipeline->currentFrameHeight();
+    if (frameHeight <= 0)
+        return true; //< Skip data.
+
     for (auto i = 0; i < bboxes->num_rects; ++i)
     {
         const auto& roiMeta = bboxes->roi_meta[i];
         auto detectedObject = new nx::sdk::metadata::CommonObject();
         nx::sdk::metadata::Rect rectangle;
 
-        rectangle.x = roiMeta.rect_params.left / 1920.0;
-        rectangle.y = roiMeta.rect_params.top / 1080.0;
-        rectangle.width = roiMeta.rect_params.width / 1920.0;
-        rectangle.height = roiMeta.rect_params.height / 1080.0;
+        rectangle.x = roiMeta.rect_params.left / (double) frameWidth;
+        rectangle.y = roiMeta.rect_params.top / (double) frameHeight;
+        rectangle.width = roiMeta.rect_params.width / (double) frameWidth;
+        rectangle.height = roiMeta.rect_params.height / (double) frameHeight;
 
         NX_OUTPUT
             << __func__ << " Got rectangle: "

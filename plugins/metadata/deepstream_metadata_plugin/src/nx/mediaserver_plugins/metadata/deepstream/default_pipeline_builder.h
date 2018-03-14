@@ -39,13 +39,7 @@ private:
     std::unique_ptr<nx::gstreamer::Element> createFakeSink(
         const nx::gstreamer::ElementName& pipelineName);
 
-
     std::map<LabelMappingId, LabelMapping> makeLabelMapping();
-
-    std::string makeElementName(
-        const std::string& pipelineName,
-        const std::string& factoryName,
-        const std::string& elementName);
 
     RawLabels parseLabelFile(const std::string& path) const;
 };

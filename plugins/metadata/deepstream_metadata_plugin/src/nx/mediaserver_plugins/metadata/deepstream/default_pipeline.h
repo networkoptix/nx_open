@@ -43,11 +43,17 @@ public:
 
     void setMainLoop(LoopPtr loop);
 
+    int currentFrameWidth() const;
+
+    int currentFrameHeight() const;
+
 private:
     nx::gstreamer::MetadataCallback m_metadataCallback;
     std::queue<nx::sdk::metadata::DataPacket*> m_packetQueue;
     LoopPtr m_mainLoop;
     TrackingMapper m_trackingMapper;
+    int m_currentFrameWidth = 0;
+    int m_currentFrameHeight = 0;
 
     mutable std::condition_variable m_wait;
     mutable std::mutex m_mutex;
