@@ -98,7 +98,7 @@ class NoptixLibrary(object):
     4.  Активируйте учетную запись
     '''
     def check_email_subject(self, email_id, sub_text, emailAddress, password, host, port):
-        conn = imaplib.IMAP4_SSL(host, port)
+        conn = imaplib.IMAP4_SSL(host, int(port))
         conn.login(emailAddress, password)
         conn.select()
         typ, data = conn.uid('fetch', email_id, '(BODY.PEEK[HEADER.FIELDS (SUBJECT)])')
