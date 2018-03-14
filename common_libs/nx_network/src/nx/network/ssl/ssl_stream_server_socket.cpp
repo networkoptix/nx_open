@@ -29,6 +29,14 @@ void StreamServerSocket::acceptAsync(AcceptCompletionHandler handler)
         });
 }
 
+AbstractStreamSocket* StreamServerSocket::accept()
+{
+    AbstractStreamSocket* accepted = base_type::accept();
+    if (accepted)
+        accepted = new StreamSocket(std::unique_ptr<AbstractStreamSocket>(accepted), true);
+    return accepted;
+}
+
 void StreamServerSocket::onAcceptCompletion(
     AcceptCompletionHandler handler,
     SystemError::ErrorCode sysErrorCode,

@@ -13,8 +13,6 @@
 namespace nx {
 namespace network {
 
-// TODO: #ak Uncomment and fix.
-#if 0
 namespace test {
 
 namespace {
@@ -54,15 +52,13 @@ struct SslSocketTypeSet
 } // namespace
 
 INSTANTIATE_TYPED_TEST_CASE_P(
-    SslSocketStream,
+    SslStreamSocket,
     StreamSocketAcceptance,
     SslSocketTypeSet);
 
 } // namespace test
-#endif
 
 //-------------------------------------------------------------------------------------------------
-
 
 namespace ssl {
 namespace test {
@@ -153,6 +149,8 @@ private:
     }
 };
 
+//-------------------------------------------------------------------------------------------------
+
 class SynchronousReflectorPool:
     public AbstractReflectorPool
 {
@@ -186,6 +184,8 @@ public:
 private:
     std::deque<std::unique_ptr<SynchronousReflector>> m_reflectors;
 };
+
+//-------------------------------------------------------------------------------------------------
 
 using AbstractStreamSocketAsyncReflector = aio::AsyncChannelReflector<AbstractStreamSocket>;
 
