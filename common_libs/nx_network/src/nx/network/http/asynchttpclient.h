@@ -561,7 +561,8 @@ void NX_NETWORK_API downloadFileAsyncEx(
     DownloadCompletionHandlerEx completionHandlerEx,
     const nx_http::HttpHeaders& extraHeaders,
     AsyncHttpClient::AuthType authType,
-    AsyncHttpClient::Timeouts timeouts);
+    AsyncHttpClient::Timeouts timeouts,
+    nx_http::Method::ValueType method = nx_http::Method::ValueType());
 
 using UploadCompletionHandler = std::function<void(SystemError::ErrorCode, int httpStatus)>;
 
@@ -575,7 +576,8 @@ void NX_NETWORK_API uploadDataAsync(const QUrl &url
     , const UploadCompletionHandler &callback
     , const AsyncHttpClient::AuthType authType = AsyncHttpClient::authBasicAndDigest
     , const QString &user = QString()
-    , const QString &password = QString());
+    , const QString &password = QString()
+    , nx_http::Method::ValueType method = nx_http::Method::ValueType());
 
 SystemError::ErrorCode NX_NETWORK_API uploadDataSync(const QUrl &url
     , const QByteArray &data
