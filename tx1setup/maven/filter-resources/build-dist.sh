@@ -22,7 +22,7 @@ BOX_INSTALL_DIR="/opt/$COMPANY_NAME"
 BOX_DESKTOP_CLIENT_DIR="$BOX_INSTALL_DIR/desktop_client"
 BOX_MEDIASERVER_DIR="$BOX_INSTALL_DIR/mediaserver"
 BOX_LIBS_DIR="$BOX_INSTALL_DIR/lib"
-DESKTOP_CLIENT_BIN=""
+DESKTOP_CLIENT_BIN="@client.binary.name@"
 
 TEGRA_VIDEO_SRC_PATH="artifacts/tx1/tegra_multimedia_api" #< Relative to source dir.
 NVIDIA_MODELS_PATH="$TEGRA_VIDEO_SRC_PATH/data/model" #< Demo neural networks. Relative to source dir.
@@ -52,6 +52,11 @@ cp_files() # src_dir file_mask dst_dir
     shopt -s extglob #< Enable extended globs: ?(), *(), +(), @(), !().
     eval FILES_LIST=(${FILE_MASK// /\" \"})
     shopt -u extglob #< Disable extended globs.
+
+    if [ ${#FILES_LIST[@]} == 0 ]; then
+        echo "ERROR: No match in [$SRC_DIR] of [$FILE_MASK]." >&2
+        return -1
+    fi
 
     cp -r "${FILES_LIST[@]}" "${BOX_MNT}$DST_DIR/" || exit $?
 
