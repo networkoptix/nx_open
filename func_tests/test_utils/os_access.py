@@ -190,8 +190,8 @@ class LocalAccess(OsAccess):
             stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=stdin, close_fds=True)
         stdout_buffer = []
         stderr_buffer = []
-        stdout_thread = threading.Thread(target=self._read_thread, args=(log.debug, pipe.stdout, stdout_buffer, log_output))
-        stderr_thread = threading.Thread(target=self._read_thread, args=(log.debug, pipe.stderr, stderr_buffer, True))
+        stdout_thread = threading.Thread(target=self._read_thread, args=(pipe.stdout, 'STDOUT', stdout_buffer, log_output))
+        stderr_thread = threading.Thread(target=self._read_thread, args=(pipe.stderr, 'STDERR', stderr_buffer, True))
         stdout_thread.daemon = True
         stderr_thread.daemon = True
         stdout_thread.start()
@@ -228,23 +228,21 @@ class LocalAccess(OsAccess):
             raise ProcessError(retcode, logged_command_line, output=''.join(stderr_buffer))
         return ''.join(stdout_buffer)
 
-    def _read_thread(self, logger, f, buffer, log_lines):
-        is_binary = False
+    @staticmethod
+    def _read_thread(f, name, buffer, log_lines):
         while True:
-            line = f.readline()
-            if not line:
+            chunk = f.read()
+            if not chunk:
+                log.debug("%s end.", name)
                 return
-            if '\0' in line:
-                is_binary = True
-            if log_lines and not is_binary:
-                logger('\t> %s' % ''.join(map(self._mask_ws, line.rstrip('\r\n'))))
-            buffer.append(line)
-
-    def _mask_ws(self, ch):
-        if ch == '\t' or ch >= ' ':
-            return ch
-        else:
-            return '.'
+            if log_lines:
+                try:
+                    decoded = chunk.decode()
+                except UnicodeDecodeError as e:
+                    log.error("Cannot decode %d bytes chunk, assuming it's binary. %s: %s.", len(chunk), e, e.message)
+                else:
+                    log.debug("%s:\n%s", name, decoded)
+            buffer.append(chunk)
 
     def is_working(self):
         return True

@@ -36,11 +36,11 @@ def setup_networks(machines, hypervisor, networks_tree, reachability):
 
     for alias, ips in nodes_ips.items():
         for ip in ips.values():
-            assert wait_until(lambda: allocated_machines[alias].networking.can_reach(ip, 1))
+            assert wait_until(lambda: allocated_machines[alias].networking.can_reach(ip))
     for destination_net in reachability:
         for destination_alias in reachability[destination_net]:
             for source_alias in reachability[destination_net][destination_alias]:
                 destination_ip = nodes_ips[destination_alias][IPNetwork(destination_net)]
-                assert wait_until(lambda: allocated_machines[source_alias].networking.can_reach(destination_ip, 1))
+                assert wait_until(lambda: allocated_machines[source_alias].networking.can_reach(destination_ip))
 
     return allocated_machines, nodes_ips
