@@ -12,9 +12,10 @@ const platform_browser_1 = require("@angular/platform-browser");
 const static_1 = require("@angular/upgrade/static");
 const router_1 = require("@angular/router");
 const ng_bootstrap_1 = require("@ng-bootstrap/ng-bootstrap");
-const angular_uuid2_1 = require("../../app/scripts/services/angular-uuid2");
+// import { cloudApiService } from "../scripts/services/cloud_api";
+// import { uuid2Service } from '../../app/scripts/services/angular-uuid2';
 const core_2 = require("../../app/core");
-const language_1 = require("../scripts/services/language");
+// import { languageService } from "../scripts/services/language";
 const language_component_1 = require("../dropdown/language.component");
 const bar_component_1 = require("./bar.component");
 const appRoutes = [
@@ -32,9 +33,8 @@ BarModule = __decorate([
             router_1.RouterModule.forChild(appRoutes)
         ],
         providers: [
+            // cloudApiService,
             core_2.QuoteService,
-            angular_uuid2_1.uuid2Service,
-            language_1.languageService
         ],
         declarations: [bar_component_1.BarComponent, language_component_1.NxLanguageDropdown],
         bootstrap: []

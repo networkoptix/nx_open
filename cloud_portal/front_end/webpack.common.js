@@ -120,13 +120,15 @@ module.exports = {
                     use: [{
                         loader: "css-loader",
                         options: {
-                            url: false
+                            url: false,
+                            sourceMap: true
                         }
                     },
                         {
                             loader: "sass-loader",
                             options: {
-                                url: false
+                                url: false,
+                                sourceMap: true
                             }
                         }]
                 })

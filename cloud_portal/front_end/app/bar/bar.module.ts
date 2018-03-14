@@ -6,9 +6,10 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 
-import { uuid2Service } from '../../app/scripts/services/angular-uuid2';
+// import { cloudApiService } from "../scripts/services/cloud_api";
+// import { uuid2Service } from '../../app/scripts/services/angular-uuid2';
 import { QuoteService } from "../../app/core";
-import { languageService } from "../scripts/services/language";
+// import { languageService } from "../scripts/services/language";
 
 import { NxLanguageDropdown } from "../dropdown/language.component";
 
@@ -29,9 +30,10 @@ const appRoutes: Routes = [
         RouterModule.forChild(appRoutes)
     ],
     providers: [
+        // cloudApiService,
         QuoteService,
-        uuid2Service,
-        languageService
+        // uuid2Service,
+        // languageService
     ],
     declarations: [BarComponent, NxLanguageDropdown],
     bootstrap: []

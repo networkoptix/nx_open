@@ -1,9 +1,6 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
-
-import { cloudApiService } from "../scripts/services/cloud_api";
-import { languageService } from "../scripts/services/language";
 
 export interface activeLanguage {
     language: string;
@@ -13,17 +10,17 @@ export interface activeLanguage {
 @Component({
     selector: 'nx-language-select',
     templateUrl: './dropdown/language.component.html',
-    styleUrls: ['./dropdown/language.component.scss']
+    styleUrls: ['./dropdown/language.component.scss'],
+    inputs: ['accountMode'],
 })
 
 export class NxLanguageDropdown implements OnInit {
-
-    languages: any;
-
-    activeLanguage: any = {
-        language : '',
+    accountMode: boolean;
+    activeLanguage = {
+        language: '',
         name: ''
     };
+    languages = [];
 
     // function (language) {
     //     if (!this.accountMode) {
@@ -41,15 +38,15 @@ export class NxLanguageDropdown implements OnInit {
     //     }
     // }
 
-    constructor(private httpClient: HttpClient,
-                private api: cloudApiService,
+    constructor(@Inject('cloudApiService') private cloudApi: any,
+                @Inject('languageService') private language: any,
+                private httpClient: HttpClient,
                 private dropdown: NgbDropdownModule,
                 private changeDetector: ChangeDetectorRef) {
     }
 
-
-    getLanguages(): any {
-        this.httpClient.get('/static/languages.json');
+    changeLanguage(lang: activeLanguage){
+        this.activeLanguage = lang;
     }
 
     ngOnInit(): void {
@@ -59,7 +56,7 @@ export class NxLanguageDropdown implements OnInit {
         //             this.activeLanguage = data.data;
         //         });
 
-        console.log(this.activeLanguage);
+        // console.log(this.activeLanguage);
 
         // this.api.get().getLanguages()
         //         .subscribe((data: any) => {
@@ -77,7 +74,26 @@ export class NxLanguageDropdown implements OnInit {
         //             this.languages = languages;
         //         });
 
-        // this.changeLanguage();
+        this.accountMode = this.accountMode || false;
+
+        this.cloudApi
+                .getLanguages()
+                .then((data: any) => {
+                    this.languages = data.data;
+
+                    this.activeLanguage = this.languages.find(lang => {
+                        return (lang.language === this.language.lang.language);
+                    });
+
+                    if (!this.activeLanguage) {
+                        this.activeLanguage = this.languages[0];
+                    }
+                });
     }
 }
 
+// angular
+//         .module('cloudApp.directives')
+//         .directive('nxLanguageSelect', downgradeComponent({ component: NxLanguageDropdown }) as angular.IDirectiveFactory);
+//
+//

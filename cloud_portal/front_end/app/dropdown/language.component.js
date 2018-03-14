@@ -8,11 +8,13 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@angular/core");
 const http_1 = require("@angular/common/http");
 const ng_bootstrap_1 = require("@ng-bootstrap/ng-bootstrap");
-const cloud_api_1 = require("../scripts/services/cloud_api");
 let NxLanguageDropdown = class NxLanguageDropdown {
     // function (language) {
     //     if (!this.accountMode) {
@@ -29,25 +31,27 @@ let NxLanguageDropdown = class NxLanguageDropdown {
     //         });
     //     }
     // }
-    constructor(httpClient, api, dropdown, changeDetector) {
+    constructor(cloudApi, language, httpClient, dropdown, changeDetector) {
+        this.cloudApi = cloudApi;
+        this.language = language;
         this.httpClient = httpClient;
-        this.api = api;
         this.dropdown = dropdown;
         this.changeDetector = changeDetector;
         this.activeLanguage = {
             language: '',
             name: ''
         };
+        this.languages = [];
     }
-    getLanguages() {
-        this.httpClient.get('/static/languages.json');
+    changeLanguage(lang) {
+        this.activeLanguage = lang;
     }
     ngOnInit() {
         // this.getLanguages()
         //         .subscribe((data: any) => {
         //             this.activeLanguage = data.data;
         //         });
-        console.log(this.activeLanguage);
+        // console.log(this.activeLanguage);
         // this.api.get().getLanguages()
         //         .subscribe((data: any) => {
         //             let languages = data.data;
@@ -63,19 +67,37 @@ let NxLanguageDropdown = class NxLanguageDropdown {
         //             }
         //             this.languages = languages;
         //         });
-        // this.changeLanguage();
+        this.accountMode = this.accountMode || false;
+        this.cloudApi
+            .getLanguages()
+            .then((data) => {
+            this.languages = data.data;
+            this.activeLanguage = this.languages.find(lang => {
+                return (lang.language === this.language.lang.language);
+            });
+            if (!this.activeLanguage) {
+                this.activeLanguage = this.languages[0];
+            }
+        });
     }
 };
 NxLanguageDropdown = __decorate([
     core_1.Component({
         selector: 'nx-language-select',
         templateUrl: './dropdown/language.component.html',
-        styleUrls: ['./dropdown/language.component.scss']
+        styleUrls: ['./dropdown/language.component.scss'],
+        inputs: ['accountMode'],
     }),
-    __metadata("design:paramtypes", [http_1.HttpClient,
-        cloud_api_1.cloudApiService,
+    __param(0, core_1.Inject('cloudApiService')),
+    __param(1, core_1.Inject('languageService')),
+    __metadata("design:paramtypes", [Object, Object, http_1.HttpClient,
         ng_bootstrap_1.NgbDropdownModule,
         core_1.ChangeDetectorRef])
 ], NxLanguageDropdown);
 exports.NxLanguageDropdown = NxLanguageDropdown;
+// angular
+//         .module('cloudApp.directives')
+//         .directive('nxLanguageSelect', downgradeComponent({ component: NxLanguageDropdown }) as angular.IDirectiveFactory);
+//
+//
 //# sourceMappingURL=language.component.js.map

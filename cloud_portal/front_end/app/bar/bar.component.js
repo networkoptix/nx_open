@@ -8,27 +8,34 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@angular/core");
 const http_1 = require("@angular/common/http");
+// import { cloudApiService } from "../scripts/services/cloud_api";
 const index_1 = require("../../app/core/index");
-const angular_uuid2_1 = require("../../app/scripts/services/angular-uuid2");
-const language_1 = require("../../app/scripts/services/language");
+// import { uuid2Service } from '../../app/scripts/services/angular-uuid2';
+// import { languageService } from '../../app/scripts/services/language';
 let BarComponent = class BarComponent {
-    constructor(uuid2, language, http, quoteService, changeDetector) {
+    constructor(uuid2, language, cloudApi, http, quoteService, changeDetector) {
+        this.uuid2 = uuid2;
+        this.language = language;
+        this.cloudApi = cloudApi;
         this.http = http;
         this.quoteService = quoteService;
         this.changeDetector = changeDetector;
         this.title = 'bar';
-        this.uuid2 = uuid2;
-        this.language = language;
+        // this.uuid2 = uuid2;
+        //this.language = language;
+        //this.cloudApi = cloudApi;
     }
-    getLanguages() {
-        return this.http.get('/static/languages.json', {});
-    }
+    // getLanguages(): any {
+    //     return this.http.get('/static/languages.json', {});
+    // }
     ngOnInit() {
         this.serviceMessage = this.uuid2.newguid();
-        this.languageMessage = this.language.getLanguage();
         this.quoteService
             .getRandomQuote({ category: 'dev' })
             .subscribe((data) => {
@@ -40,9 +47,16 @@ let BarComponent = class BarComponent {
             console.log(err.message);
             console.log(err.status);
         });
-        this.getLanguages()
-            .subscribe((data) => {
-            this.activeLanguage = data.data;
+        // this.getLanguages()
+        //         .subscribe((data: any) => {
+        //             console.log(data);
+        //             this.activeLanguage = data;
+        //         });
+        this.cloudApi
+            .getLanguages()
+            .then((data) => {
+            console.log('Data: ', data.data);
+            console.log('Length: ', data.data.length);
         });
     }
 };
@@ -51,9 +65,10 @@ BarComponent = __decorate([
         selector: 'bar-component',
         templateUrl: './bar/bar.component.html'
     }),
-    __metadata("design:paramtypes", [angular_uuid2_1.uuid2Service,
-        language_1.languageService,
-        http_1.HttpClient,
+    __param(0, core_1.Inject('uuid2Service')),
+    __param(1, core_1.Inject('languageService')),
+    __param(2, core_1.Inject('cloudApiService')),
+    __metadata("design:paramtypes", [Object, Object, Object, http_1.HttpClient,
         index_1.QuoteService,
         core_1.ChangeDetectorRef])
 ], BarComponent);

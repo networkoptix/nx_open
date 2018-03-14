@@ -19,6 +19,7 @@ const ajs_upgraded_providers_2 = require("./ajs-upgraded-providers");
 const ajs_upgraded_providers_3 = require("./ajs-upgraded-providers");
 const app_component_1 = require("./app.component");
 const bar_module_1 = require("./bar/bar.module");
+const language_component_1 = require("./dropdown/language.component");
 class HybridUrlHandlingStrategy {
     // use only process the `/bar` url
     shouldProcessUrl(url) {
@@ -44,19 +45,25 @@ AppModule = __decorate([
             http_1.HttpClientModule,
             index_1.CoreModule,
             bar_module_1.BarModule,
+            ajs_upgraded_providers_3.uuid2ServiceModule,
+            ajs_upgraded_providers_2.languageServiceModule,
             ng_bootstrap_1.NgbModule.forRoot(),
             router_1.RouterModule.forRoot([], { initialNavigation: false })
+        ],
+        entryComponents: [
+            language_component_1.NxLanguageDropdown
         ],
         providers: [
             { provide: common_1.LocationStrategy, useClass: common_1.PathLocationStrategy },
             { provide: router_1.UrlHandlingStrategy, useClass: HybridUrlHandlingStrategy },
-            ajs_upgraded_providers_1.cloudApiServiceProvider,
-            ajs_upgraded_providers_2.languageServiceProvider,
-            ajs_upgraded_providers_3.uuid2ServiceProvider
+            ajs_upgraded_providers_1.cloudApiServiceProvider
         ],
         declarations: [app_component_1.AppComponent],
         bootstrap: [app_component_1.AppComponent]
     })
 ], AppModule);
 exports.AppModule = AppModule;
+angular
+    .module('cloudApp.directives')
+    .directive('nxLanguageSelect', static_1.downgradeComponent({ component: language_component_1.NxLanguageDropdown }));
 //# sourceMappingURL=app.module.js.map
