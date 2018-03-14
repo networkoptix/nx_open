@@ -6,9 +6,7 @@ from decorator import contextmanager
 from pylru import lrudecorator
 
 from test_utils.move_lock import MoveLock
-from test_utils.networking import NodeNetworking, reset_networking
-from test_utils.networking.linux import LinuxNodeNetworking
-from test_utils.networking.virtual_box import VirtualBoxNodeNetworking
+from test_utils.networking.linux import LinuxNetworking
 from test_utils.os_access import FileNotFound
 from test_utils.serialize import dump, load
 from test_utils.utils import wait_until
@@ -39,7 +37,7 @@ class VMConfiguration(object):
             yield name, forwarded_port['protocol'], host_port, forwarded_port['guest_port']
 
 
-Machine = namedtuple('Machine', ['alias', 'index', 'name', 'ports', 'os_access', 'networking'])
+VM = namedtuple('VM', ['alias', 'name', 'ports', 'networking', 'os_access'])
 
 
 class Registry(object):
@@ -112,7 +110,7 @@ class Pool(object):
             info = self._hypervisor.find(name)
         except VMNotFound:
             forwarded_ports = self._vm_configuration.forwarded_ports(index)
-            info = self._hypervisor.create(name, self._vm_configuration.template, forwarded_ports)
+            info = self._hypervisor.clone(name, self._vm_configuration.template, forwarded_ports)
         assert info.name == name
         if not info.is_running:
             self._hypervisor.power_on(info.name)
@@ -120,10 +118,12 @@ class Pool(object):
         os_access = self._access_manager.register(self._hypervisor.hostname, [alias, info.name], port)
         if not wait_until(os_access.is_working, timeout_sec=self._vm_configuration.power_on_timeout):
             raise MachineNotResponding(alias, info.name)
-        networking = NodeNetworking(LinuxNodeNetworking(os_access), VirtualBoxNodeNetworking(info.name))
-        machine = Machine(alias, index, info.name, info.ports, os_access, networking)
-        reset_networking(machine)
-        return machine
+        networking = LinuxNetworking(os_access, info.macs.values())
+        vm = VM(alias, info.name, info.ports, networking, os_access)
+        self._hypervisor.unplug_all(vm.name)
+        vm.networking.reset()
+        vm.networking.enable_internet()
+        return vm
 
     @lrudecorator(100)
     def get(self, alias):
@@ -152,6 +152,6 @@ class Pool(object):
                 try:
                     self._hypervisor.find(name)
                 except VMNotFound:
-                    logger.warning("Machine %s is not created yet", name)
+                    logger.warning("VM %s is not created yet", name)
                 else:
                     self._hypervisor.destroy(name)

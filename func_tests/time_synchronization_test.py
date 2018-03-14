@@ -54,7 +54,7 @@ def system(vm_pools, server_factory):
         if server.service.is_running():
             server.stop()
         # Reset server without internet access.
-        server.machine.networking.os_networking.prohibit_global()
+        server.machine.networking.prohibit_global()
         server.installation.cleanup_var_dir()
         server.installation.change_config(ecInternetSyncTimePeriodSec=3, ecMaxInternetTimeSyncRetryPeriodSec=3)
         server.start()
@@ -135,7 +135,7 @@ def test_primary_server_temporary_offline(system):
 def test_secondary_server_temporary_inet_on(system):
     system.primary.rest_api.api.systemSettings.GET(synchronizeTimeWithInternet=True)
 
-    enable_internet(system.secondary.machine)
+    system.secondary.machine.networking.enable_internet()
     assert wait_until(lambda: get_time(system.primary.rest_api).is_close_to(get_internet_time())), (
         "After connection to internet time server on MACHINE WITH NON-PRIMARY time server was allowed, "
         "time on PRIMARY time server %s is NOT EQUAL to internet time %s" % (
@@ -149,7 +149,7 @@ def test_secondary_server_temporary_inet_on(system):
         "After connection to internet time server on MACHINE WITH NON-PRIMARY time server was allowed, "
         "time on PRIMARY time server %s does NOT FOLLOW to internet time %s" % (
             get_time(system.primary.rest_api), get_internet_time()))
-    disable_internet(system.secondary.machine)
+    system.secondary.machine.networking.disable_internet()
 
     # Turn off RFC868 (time protocol)
     assert holds_long_enough(lambda: get_time(system.primary.rest_api).is_close_to(get_internet_time())), (

@@ -6,67 +6,60 @@ from netaddr import EUI
 logger = logging.getLogger(__name__)
 
 
-class LinuxNodeNetworking(object):
-    def __init__(self, os_access):
+class LinuxNetworking(object):
+    def __init__(self, os_access, available_macs):
         self._os_access = os_access
-        self._interface_names = dict()
-
-        raw_mac_addresses = self._os_access.run_command('''
-            mkdir -p /tmp/func_tests/networking && cd /tmp/func_tests/networking
+        output = self._os_access.run_command(
+            '''
+            mkdir -p /tmp/func_tests/networking
+            cd /tmp/func_tests/networking
             ls -1 /sys/class/net > interfaces.txt
-            xargs -t -a interfaces.txt -I {} cat /sys/class/net/{}/address > mac_addresses.txt
-            paste interfaces.txt mac_addresses.txt
+            xargs -t -a interfaces.txt -I {} cat /sys/class/net/{}/address > macs.txt
+            paste interfaces.txt macs.txt
             ''')
-        self._interface_names = {
-            EUI(mac_address): interface
-            for interface, mac_address
-            in csv.reader(raw_mac_addresses.splitlines(), delimiter='\t')}
+        interfaces = {EUI(mac): interface for interface, mac in csv.reader(output.splitlines(), delimiter='\t')}
+        self.available_interfaces = {interfaces[mac]: mac for mac in available_macs}
 
-    def reset(self, available_mac_addresses):
+    def reset(self):
         """Don't touch localhost, host-bound interface and interfaces unknown to VM."""
-        available_interfaces = {self._interface_names[mac_address] for mac_address in available_mac_addresses}
         self._os_access.run_command(
             '''
             echo "${AVAILABLE_INTERFACES}" | xargs -t -I {} ip addr flush dev {}
             echo "${AVAILABLE_INTERFACES}" | xargs -t -I {} ip link set dev {} down
             ip route flush proto static  # Manually routes are static.
             sysctl net.ipv4.ip_forward=0
+            iptables -F
+            iptables -t nat -F
+            iptables -A OUTPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+            iptables -A OUTPUT -o lo -j ACCEPT
+            iptables -A OUTPUT -d 10.0.0.0/8 -j ACCEPT
             ''',
-            env={'AVAILABLE_INTERFACES': '\n'.join(available_interfaces)})
+            env={'AVAILABLE_INTERFACES': '\n'.join(self.available_interfaces.keys())})
 
-    def setup_ip(self, mac_address, address, prefix_length):
+    def setup_ip(self, mac, ip, prefix_length):
         self._os_access.run_command(
             '''
-                ip addr replace ${ADDRESS}/${PREFIX_LENGTH} dev ${INTERFACE} 
-                ip link set dev ${INTERFACE} up
-                ''',
-            env={
-                'INTERFACE': self._interface_names[mac_address],
-                'ADDRESS': address,
-                'PREFIX_LENGTH': prefix_length,
-                })
+            ip addr replace ${ADDRESS}/${PREFIX_LENGTH} dev ${INTERFACE} 
+            ip link set dev ${INTERFACE} up
+            ''',
+            env={'INTERFACE': self.available_interfaces[mac], 'ADDRESS': ip, 'PREFIX_LENGTH': prefix_length})
 
-    def route(self, destination_network, gateway_bound_mac_address, gateway_ip_address):
+    def route(self, destination_ip_net, gateway_bound_mac, gateway_ip):
+        interface = self.available_interfaces[gateway_bound_mac]
         self._os_access.run_command(
-            'ip route replace ${NETWORK} dev ${INTERFACE} via ${GATEWAY} proto static',
-            env={
-                'INTERFACE': self._interface_names[gateway_bound_mac_address],
-                'GATEWAY': gateway_ip_address,
-                'NETWORK': destination_network,
-                })
+            ['ip', 'route', 'replace', destination_ip_net, 'dev', interface, 'via', gateway_ip, 'proto', 'static'])
 
-    def route_global(self, gateway_bound_mac_address, gateway_ip_address):
-        self.route('default', gateway_bound_mac_address, gateway_ip_address)
+    def enable_internet(self):
+        self._os_access.run_command(['iptables', '-D', 'OUTPUT', '-j', 'REJECT'])
 
-    def prohibit_global(self):
-        """Prohibit default route explicitly."""
-        self._os_access.run_command('ip route replace prohibit default proto static')
+    def disable_internet(self):
+        self._os_access.run_command(['iptables', '-A', 'OUTPUT', '-j', 'REJECT'])
 
-    def setup_nat(self, outer_mac_address):
+    def setup_nat(self, outer_mac):
         """Connection can be initiated from inner_net_nodes only. Addresses are masqueraded."""
         self._os_access.run_command(
             '''
-                sysctl net.ipv4.ip_forward=1
-                iptables -t nat -A POSTROUTING -o ${OUTER_INTERFACE} -j MASQUERADE
-                ''',
-            env={'OUTER_INTERFACE': self._interface_names[outer_mac_address]})
+            sysctl net.ipv4.ip_forward=1
+            iptables -t nat -A POSTROUTING -o ${OUTER_INTERFACE} -j MASQUERADE
+            ''',
+            env={'OUTER_INTERFACE': self.available_interfaces[outer_mac]})

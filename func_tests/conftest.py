@@ -180,7 +180,6 @@ def init_logging(request, work_dir):
         root_logger.addHandler(file_handler)
 
 
-
 @pytest.fixture(scope='session')
 def test_config(request):
     return TestsConfig.merge_config_list(
@@ -243,14 +242,22 @@ def configuration():
     return load(Path(__file__).with_name('configuration.yaml').read_text())
 
 
+@pytest.fixture(scope='session')
+def host_os_access():
+    return LocalAccess()
+
+
+@pytest.fixture(scope='session')
+def hypervisor(configuration, host_os_access):
+    return VirtualBox(host_os_access, configuration['vm_host']['address'])
+
+
 @pytest.fixture()
-def vm_pools(request, configuration, ssh_config):
+def vm_pools(request, host_os_access, hypervisor, configuration, ssh_config):
     # All objects here are initialized quickly.
     # After pool has been closed, it's possible to reuse it, but, for simplicity, it's recreated.
-    host_os_access = LocalAccess()
     registry = Registry(host_os_access, host_os_access.expand_path(configuration['vm_host']['registry']), 100)
     access_manager = SSHAccessManager(ssh_config, 'root', Path(configuration['ssh']['private_key']).expanduser())
-    hypervisor = VirtualBox(host_os_access, configuration['vm_host']['address'])
     pools = {
         vm_type: Pool(VMConfiguration(vm_configuration_raw), registry, hypervisor, access_manager)
         for vm_type, vm_configuration_raw

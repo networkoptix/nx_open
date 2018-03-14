@@ -1,15 +1,30 @@
 import csv
 import logging
 from collections import namedtuple
-from itertools import count
+from pprint import pformat
 
-from test_utils.networking.virtual_box import SLOTS
+from netaddr import EUI
+
 from test_utils.os_access import ProcessError
 from test_utils.utils import wait_until
 
 logger = logging.getLogger(__name__)
 
-VMInfo = namedtuple('VMInfo', ['name', 'ports', 'is_running'])
+NETWORK_SLOTS = [2, 3, 4, 5, 6, 7, 8]
+
+VMInfo = namedtuple('VMInfo', ['name', 'ports', 'macs', 'networks', 'is_running'])
+
+
+class VMNotFound(Exception):
+    pass
+
+
+class VMNoAvailableNetworkSlot(Exception):
+    def __init__(self, vm_name, vm_networks):
+        super(VMNoAvailableNetworkSlot, self).__init__(
+            "No available network slot on {}:\n{}".format(vm_name, pformat(vm_networks)))
+        self.vm_name = vm_name
+        self.vm_networks = vm_networks
 
 
 class VirtualBox(object):
@@ -19,34 +34,38 @@ class VirtualBox(object):
         self.hostname = hostname
         self.os_access = os_access
 
-    def _info(self, name):
+    def find(self, name):
         try:
             output = self.os_access.run_command(['VBoxManage', 'showvminfo', name, '--machinereadable'])
         except ProcessError as e:
             if e.returncode == 1:
                 raise VMNotFound("Cannot find VM {}; VBoxManage says:\n{}".format(name, e.output))
             raise
-        raw_dict = dict(csv.reader(output.splitlines(), delimiter='=', escapechar='\\', doublequote=False))
+        raw_info = dict(csv.reader(output.splitlines(), delimiter='=', escapechar='\\', doublequote=False))
         ports = {}
-        for index in count():
+        for index in range(10):  # Arbitrary.
             try:
-                raw_value = raw_dict['Forwarding({})'.format(index)]
+                raw_value = raw_info['Forwarding({})'.format(index)]
             except KeyError:
                 break
             tag, protocol, host_address, host_port, guest_address, guest_port = raw_value.split(',')
             ports[protocol, int(guest_port)] = int(host_port)
-        return VMInfo(name=raw_dict['name'], is_running=raw_dict['VMState'] == 'running', ports=ports)
+        macs = {}
+        networks = {}
+        for slot in NETWORK_SLOTS:
+            try:
+                raw_mac = raw_info['macaddress{}'.format(slot)]
+            except KeyError:
+                # If not present, interface is disabled ('none'). Skip this slot at all.
+                continue
+            macs[slot] = EUI(raw_mac)
+            if raw_info['nic{}'.format(slot)] == 'null':
+                networks[slot] = None
+            else:
+                networks[slot] = raw_info['intnet{}'.format(slot)]
+        return VMInfo(raw_info['name'], ports, macs, networks, raw_info['VMState'] == 'running')
 
-    def find(self, name):
-        return self._info(name)
-
-    def power_on(self, name):
-        self.os_access.run_command(['VBoxManage', 'startvm', name, '--type', 'headless'])
-
-    def power_off(self, name):
-        self.os_access.run_command(['VBoxManage', 'controlvm', name, 'acpipowerbutton'])
-
-    def create(self, name, template, forwarded_ports):
+    def clone(self, name, template, forwarded_ports):
         """Clone and setup VM with simple and generic parameters. Template can be any specific type."""
         self.os_access.run_command([
             'VBoxManage', 'clonevm', template['vm'],
@@ -56,17 +75,16 @@ class VirtualBox(object):
             '--register',
             ])
         settings_args = []
-        settings_args += ['--nic1', 'nat', '--natnet1', '10.10.0.0/24']
-        for slot in SLOTS:
-            settings_args += ['--nic{}'.format(slot), 'null']
+        settings_args += ['--nic1', 'nat', '--natnet1', '10.254.0.0/24']
         for tag, protocol, host_port, guest_port in forwarded_ports:
             settings_args += ['--natpf1', '{},{},,{},,{}'.format(tag, protocol, host_port, guest_port)]
+        for slot in NETWORK_SLOTS:
+            settings_args += ['--nic{}'.format(slot), 'null']
         self.os_access.run_command(['VBoxManage', 'modifyvm', name] + settings_args)
-        self.os_access.run_command([
-            'VBoxManage', 'setextradata', name,
-            'VBoxInternal/Devices/VMMDev/0/Config/GetHostTimeDisabled', 1  # Don't spoil tests with time sync.
-            ])
-        return self._info(name)
+        extra_data = {'VBoxInternal/Devices/VMMDev/0/Config/GetHostTimeDisabled': 1}
+        for extra_key, extra_value in extra_data.items():
+            self.os_access.run_command(['VBoxManage', 'setextradata', name, extra_key, extra_value])
+        return self.find(name)
 
     def destroy(self, name):
         if self.find(name).is_running:
@@ -74,6 +92,23 @@ class VirtualBox(object):
             assert wait_until(lambda: not self.find(name).is_running, name='until VM is off')
         self.os_access.run_command(['VBoxManage', 'unregistervm', name, '--delete'])
 
+    def power_on(self, name):
+        self.os_access.run_command(['VBoxManage', 'startvm', name, '--type', 'headless'])
 
-class VMNotFound(Exception):
-    pass
+    def power_off(self, name):
+        self.os_access.run_command(['VBoxManage', 'controlvm', name, 'poweroff'])
+
+    def plug(self, name, network):
+        info = self.find(name)
+        try:
+            slot = next(slot for slot in info.networks if info.networks[slot] is None)
+        except StopIteration:
+            raise VMNoAvailableNetworkSlot(name, info.networks)
+        self.os_access.run_command(['VBoxManage', 'controlvm', name, 'nic{}'.format(slot), 'intnet', network])
+        return info.macs[slot]
+
+    def unplug_all(self, name):
+        info = self.find(name)
+        for slot in info.networks:
+            if info.networks[slot] is not None:
+                self.os_access.run_command(['VBoxManage', 'controlvm', name, 'nic{}'.format(slot), 'null'])
