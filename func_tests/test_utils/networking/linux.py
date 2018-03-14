@@ -57,9 +57,11 @@ class LinuxNetworking(object):
 
     def enable_internet(self):
         self._os_access.run_command(['iptables', '-D', 'OUTPUT', '-j', 'REJECT'])
+        assert self.can_reach('8.8.8.8')
 
     def disable_internet(self):
         self._os_access.run_command(['iptables', '-A', 'OUTPUT', '-j', 'REJECT'])
+        assert not self.can_reach('8.8.8.8')
 
     def setup_nat(self, outer_mac):
         """Connection can be initiated from inner_net_nodes only. Addresses are masqueraded."""
