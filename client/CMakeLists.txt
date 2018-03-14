@@ -13,7 +13,9 @@ if(withDesktopClient)
     endif()
 
     if(WINDOWS)
-        add_subdirectory(minilauncher)
+        if(withMiniLauncher)
+            add_subdirectory(minilauncher)
+        endif()
         add_subdirectory(nov_file_launcher)
     endif()
 
