@@ -4,14 +4,17 @@ ListView
 {
     id: control
 
-    property int pressedStateFilterMs: 500
+    property int pressedStateFilterMs: 400
     property int emptyHeaderSize: 4
     readonly property alias scrollable: d.prefferToBeInteractive
 
+    signal initiallyPressed(int index)
     signal buttonClicked(int index)
     signal pressedChanged(int index, bool pressed)
+    signal actionCancelled(int index, bool longCancel)
     signal enabledChanged(int index, bool buttonEnabled)
 
+    pressDelay: 100
     clip: true
     layoutDirection: Qt.RightToLeft
     orientation: Qt.Horizontal
@@ -69,11 +72,11 @@ ListView
         id: button
 
         property bool buttonPressed: false
+        property bool active: false
 
         icon: model.iconPath
         enabled: model.enabled
         padding: 0
-
         anchors.verticalCenter: parent.verticalCenter
 
         onButtonPressedChanged: control.pressedChanged(index, buttonPressed)
@@ -83,8 +86,8 @@ ListView
         {
             target: control
 
-            onFlickingChanged: pressedStateFilterTimer.stop();
-            onDraggingChanged: pressedStateFilterTimer.stop();
+            onFlickingChanged: handleCancelled(false)
+            onDraggingChanged: handleCancelled(false)
         }
 
         property bool filteringPressing: false
@@ -100,18 +103,30 @@ ListView
 
         onPressed:
         {
-            if (model.allowLongPress)
-                pressedStateFilterTimer.restart()
-            else
-                pressedStateFilterTimer.stop()
+            button.active = true
+            control.initiallyPressed(index)
+            pressedStateFilterTimer.restart()
         }
 
-        onReleased: handleButtonReleased()
-        onCanceled: handleButtonReleased()
+        onReleased:
+        {
+            handleButtonReleased()
+            button.active = false
+        }
+
+        onCanceled:
+        {
+            if (!buttonPressed)
+                handleCancelled(true)
+            else
+                handleButtonReleased()
+
+            button.active = false
+        }
 
         onPressedChanged:
         {
-            if (!buttonPressed && pressedStateFilterTimer.running)
+            if (!buttonPressed)
                 pressedStateFilterTimer.stop()
         }
 
@@ -135,6 +150,19 @@ ListView
             button.filteringPressing = value
             button.buttonPressed = value
             d.allowInteractiveState = !value
+        }
+
+        function handleCancelled(longCancel)
+        {
+            if (pressedStateFilterTimer.running)
+                pressedStateFilterTimer.stop()
+            else
+                buttonPressed = false
+
+            if (button.active)
+                control.actionCancelled(index, longCancel)
+
+            button.active = false
         }
     }
 

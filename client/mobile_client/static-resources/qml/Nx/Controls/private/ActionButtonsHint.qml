@@ -8,6 +8,7 @@ Rectangle
 
     property int horizontalPadding: 12
     property int verticalPadding: 12
+    property alias progressDuration: progressAnmiation.duration
 
     width: bodyRow.width + horizontalPadding
     height: bodyRow.height + verticalPadding * 2
@@ -16,9 +17,42 @@ Rectangle
 
     visible: false
 
+    onWidthChanged:
+    {
+        if (!progressAnmiation.running)
+            return;
+
+        progressAnmiation.stop()
+        progressAnmiation.from = progressRect.width
+        progressAnmiation.to = control.width
+        progressAnmiation.start()
+    }
+
+    Rectangle
+    {
+        id: progressRect
+        color: Qt.rgba(0, 1, 0, 0.3)
+        height: parent.height
+        width: 0
+    }
+
+
+    PropertyAnimation
+    {
+        id: progressAnmiation
+
+        target: progressRect
+        properties: "width"
+        from: 0
+        to: control.width
+        duration: 1000
+    }
+
     function showHint(text, iconPath)
     {
-        hideTimer.restart()
+        hideTimer.stop()
+
+        hintText.visible = true
 
         border.color = control.color
 
@@ -30,11 +64,18 @@ Rectangle
         visualDataLoader.item.source = iconPath
 
         control.visible = true
+        progressAnmiation.stop()
+        progressAnmiation.from = 0
+        progressAnmiation.to = control.width
+        progressAnmiation.start()
     }
 
     function showCustomProcess(component, iconPath)
     {
         hideTimer.stop()
+
+        hintText.visible = false
+        stopProgressAnimation()
 
         border.color = control.color
 
@@ -49,6 +90,9 @@ Rectangle
     function showPreloader(text)
     {
         hideTimer.stop();
+
+        hintText.visible = false
+        stopProgressAnimation()
 
         border.color = control.color
 
@@ -74,6 +118,9 @@ Rectangle
     {
         hideTimer.restart()
 
+        hintText.visible = false
+        stopProgressAnimation()
+
         var customColor = success
             ? ColorTheme.brightText
             : ColorTheme.red_l2
@@ -95,6 +142,17 @@ Rectangle
         control.visible = true
     }
 
+    function stopProgressAnimation()
+    {
+        progressAnmiation.stop()
+        progressRect.width = 0
+    }
+
+    function hideDelayed()
+    {
+        hideTimer.restart();
+    }
+
     function hide()
     {
         loader.sourceComponent = dummyComponent
@@ -111,6 +169,20 @@ Rectangle
         x: control.horizontalPadding
         y: control.verticalPadding
         height: 24
+
+        Text
+        {
+            id: hintText
+
+            height: 24
+            wrapMode: Text.NoWrap
+            verticalAlignment: Text.AlignVCenter
+            color: "lightblue"
+            font.pixelSize: 14
+            font.weight: Font.Normal
+            text: qsTr("Hold to:")
+            rightPadding: 8
+        }
 
         Loader
         {

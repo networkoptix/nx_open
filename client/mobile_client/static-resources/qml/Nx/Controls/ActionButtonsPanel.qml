@@ -40,6 +40,18 @@ Item
         x: line.visible ? 1 : 0
         width: parent.width - x
         height: parent.height
+
+        onInitiallyPressed:
+        {
+            var type = d.modelDataAccessor.getData(index, "type")
+            if (type == ActionButtonsModel.PtzButton)
+                return;
+
+            hintControl.showHint(
+                d.modelDataAccessor.getData(index, "hint"),
+                d.modelDataAccessor.getData(index, "iconPath"))
+        }
+
         onPressedChanged:
         {
             var type = d.modelDataAccessor.getData(index, "type")
@@ -49,23 +61,31 @@ Item
                 d.handleSoftwareTriggerPressed(index, pressed)
         }
 
+        onActionCancelled:
+        {
+            hintControl.stopProgressAnimation()
+            if (!longCancel)
+            {
+                hintControl.hide()
+                return
+            }
+
+            var text = d.modelDataAccessor.getData(index, "hint")
+            var prolonged = d.modelDataAccessor.getData(index, "allowLongPress")
+            hintControl.showFailure(text, prolonged)
+        }
+
         onButtonClicked:
         {
             var type = d.modelDataAccessor.getData(index, "type")
-            switch (type)
+            if (type == ActionButtonsModel.PtzButton)
             {
-                case ActionButtonsModel.PtzButton:
-                    ptzButtonClicked()
-                    break
-                case ActionButtonsModel.TwoWayAudioButton:
-                    hintControl.showHint(
-                        d.modelDataAccessor.getData(index, "hint"),
-                        d.modelDataAccessor.getData(index, "iconPath"))
-                    break
-                case ActionButtonsModel.SoftTriggerButton:
-                    d.handleSoftwareTriggerClicked(index)
-                    break
+                ptzButtonClicked()
+                return
             }
+
+            hintControl.stopProgressAnimation()
+            hintControl.hideDelayed()
         }
 
         onEnabledChanged:
@@ -134,30 +154,9 @@ Item
             }
         }
 
-        function handleSoftwareTriggerClicked(index)
-        {
-            var text = d.modelDataAccessor.getData(index, "hint")
-            var prolonged = d.modelDataAccessor.getData(index, "allowLongPress")
-            if (prolonged)
-            {
-                var hintText = qsTr("Press and hold to %1").arg(text)
-                hintControl.showHint(hintText, d.modelDataAccessor.getData(index, "iconPath"))
-                return
-            }
-
-            var id = d.modelDataAccessor.getData(index, "id")
-            if (triggersController.activateTrigger(id))
-                hintControl.showPreloader(text)
-            else
-                hintControl.showFailure(text, false)
-        }
-
         function handleSoftwareTriggerPressed(index, pressed)
         {
             var prolonged = d.modelDataAccessor.getData(index, "allowLongPress")
-            if (!prolonged)
-                return
-
             var id = d.modelDataAccessor.getData(index, "id")
             if (pressed)
             {
@@ -165,12 +164,11 @@ Item
                 if (triggersController.activateTrigger(id))
                     hintControl.showPreloader(text)
                 else
-                    hintControl.showFailure(text, true)
+                    hintControl.showFailure(text, prolonged)
             }
-            else
+            else if (prolonged)
             {
                 triggersController.deactivateTrigger(id)
-                hintControl.hide()
             }
         }
     }
@@ -178,6 +176,8 @@ Item
     ActionButtonsHint
     {
         id: hintControl
+
+        progressDuration: panel.pressedStateFilterMs
 
         x: parent.width - width
         y: -(height + 4 + 4)
