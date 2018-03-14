@@ -331,8 +331,8 @@ angular.module('nxCommon').controller('ViewCtrl',
         $scope.crashCount = 0;
 
         function handleVideoError(forceLive){
-            var showError = $scope.crashCount < Config.webclient.maxCrashCount;
-            if(showError){
+            var tryToReload = $scope.crashCount < Config.webclient.maxCrashCount;
+            if(tryToReload){
                 updateVideoSource($scope.positionProvider.liveMode || forceLive
                                                                     ? null : $scope.positionProvider.playedPosition);
                 $scope.crashCount += 1;
@@ -340,7 +340,7 @@ angular.module('nxCommon').controller('ViewCtrl',
             else{
                 $scope.crashCount = 0;
             }
-            return !showError;
+            return !tryToReload;
         }
 
         $scope.playerHandler = function(error){

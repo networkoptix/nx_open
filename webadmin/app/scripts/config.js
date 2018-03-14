@@ -125,14 +125,16 @@
             leftPanelPreviewHeight: 38, // 38px is the height for previews in the left panel
             resetDisplayedTextTimer: 3 * 1000,
             hlsLoadingTimeout: 60 * 1000,
-            updateArchiveStateTimeout: 60 * 1000,
             // One minute timeout for manifest:
             // * 30 seconds for server to init camera
             // * 20 seconds for chunks
             // * 10 seconds extra
+            updateArchiveStateTimeout: 60 * 1000,
             flashChromelessPath: "components/flashlsChromeless.swf",
             flashChromelessDebugPath: "components/flashlsChromeless_debug.swf",
-            staticResources: "web_common/"
+            staticResources: "web_common/",
+            maxCrashCount: 2, //Number of retries to get video
+            nativeTimeout: 60 * 1000 //60s
         },
         debugEvents: {
             events: [

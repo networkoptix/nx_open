@@ -375,6 +375,7 @@ angular.module('nxCommon')
                                             scope.videoFlags.errorDescription = response.data.errorString;
                                         }, function(failResponse){
                                             // What is here?
+                                            console.error("failResponse", failResponse);
                                         });
                                 }
                             });
