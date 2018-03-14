@@ -38,12 +38,14 @@ class NoptixLibrary(object):
         email = email[:index] + '+' + str(time.time()) + email[index:]
         return email
 
+
     def get_many_random_emails(self, howMany, email):
         emails = []
         for x in xrange(0,int(howMany)):
             emails.append(self.get_random_email())
             time.sleep(.2)
         return emails
+
 
     def get_random_symbol_email(self):
         return '''!#$%&'*+-/=?^_`{|}~''' + str(time.time()) + "@gmail.com"
@@ -79,9 +81,23 @@ class NoptixLibrary(object):
                         print ("offline")
                 except: raise NoSuchElementException
 
+    ''' Get the email subject from an email in other languages
+
+    Takes the email UID and the expected text of the email subject.
+    The important part of this is in the for loop.  First we take the 2nd item
+    in the subject, which is the actual subject text, and decode it from ascii
+    so that it is not a byte string.  Then use decode_header to decode the
+    base64 string into unicode bytes.  Then finally we take that string and
+    decode with UTF-8 to get the actual text.  Here is the process:
+    
+    1.  b'Subject: =?utf-8?b?INCQ0LrRgtC40LLQuNGA0YPQudGC0LUg0YPRh9C10YLQvdGD0Y4g0LfQsNC/?=\r\n =?utf-8?b?0LjRgdGM?=\r\n\r\n'
+    2.  Subject: =?utf-8?b?INCQ0LrRgtC40LLQuNGA0YPQudGC0LUg0YPRh9C10YLQvdGD0Y4g0LfQsNC/?= =?utf-8?b?0LjRgdGM?=
+    3.  [(b'Subject: ', None), (b' \xd0\x90\xd0\xba\xd1\x82\xd0\xb8\xd0\xb2\xd0\xb8\xd1\x80\xd1\x83\xd0\xb9\xd1\x82\xd0\xb5 \xd1\x83\xd1\x87\xd0\xb5\xd1\x82\xd0\xbd\xd1\x83\xd1\x8e \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd1\x8c', 'utf-8')]
+    4.  Активируйте учетную запись
+    '''
     def check_email_subject(self, email_id, sub_text):
         conn = imaplib.IMAP4_SSL('imap.gmail.com', 993)
-        conn.login('noptixqa@gmail.com', 'qweasd!@#')
+        conn.login('noptixautoqa@gmail.com', 'qweasd!@#')
         conn.select()
         typ, data = conn.uid('fetch', email_id, '(BODY.PEEK[HEADER.FIELDS (SUBJECT)])')
         for res in data:

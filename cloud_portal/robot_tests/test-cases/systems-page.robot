@@ -8,19 +8,6 @@ Force Tags        system
 ${password}    ${BASE PASSWORD}
 ${url}         ${ENV}
 
-${BASE EMAIL}                         noptixqa@gmail.com
-${BASE EMAIL PASSWORD}                qweasd!@#
-${EMAIL VIEWER}                       noptixqa+viewer@gmail.com
-${EMAIL ADV VIEWER}                   noptixqa+advviewer@gmail.com
-${EMAIL LIVE VIEWER}                  noptixqa+liveviewer@gmail.com
-${EMAIL OWNER}                        noptixqa+owner@gmail.com
-${EMAIL NOT OWNER}                    noptixqa+notowner@gmail.com
-${EMAIL ADMIN}                        noptixqa+admin@gmail.com
-${ADMIN FIRST NAME}                   asdasasd
-${ADMIN LAST NAME}                    asdasasdas
-${EMAIL UNREGISTERED}                 noptixqa+unregistered@gmail.com
-${EMAIL NOPERM}                       noptixqa+noperm@gmail.com
-*** Test Cases ***
 should show list of Systems
     Open Browser and go to URL    ${url}
     Log In    ${EMAIL OWNER}    ${password}

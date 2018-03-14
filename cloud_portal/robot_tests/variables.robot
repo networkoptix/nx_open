@@ -177,7 +177,7 @@ ${TEST FIRST NAME}                    testFirstName
 ${TEST LAST NAME}                     testLastName
 
 #Related to Auto Tests system
-${AUTO_TESTS SYSTEM ID}                     ff891c00-c886-44fa-877f-bb185f586ec7
+${AUTO_TESTS SYSTEM ID}                     a95b6d30-66a1-4694-a1ce-1bcae5855741
 ${AUTO TESTS TITLE}                   //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests')]
 ${AUTO TESTS USER}                    //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests')]/following-sibling::span[contains(@class,'user-name')]
 ${AUTO TESTS OPEN NX}                 //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests')]/..//button[@ng-click='checkForm()']
@@ -185,9 +185,9 @@ ${SYSTEMS SEARCH INPUT}               //input[@ng-model='search.value']
 ${SYSTEMS TILE}                       //div[@ng-repeat="system in systems | filter:searchSystems as filtered"]
 
 #AUTOTESTS (with no space) is an offline system used for testing offline status on the systems page
-${AUTOTESTS OFFLINE}                  //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Autotests')]/following-sibling::span[contains(text(), '${AUTOTESTS OFFLINE TEXT}')]
-${AUTOTESTS OFFLINE OPEN NX}          //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Autotests')]/..//button[@ng-click='checkForm()']
-${AUTOTESTS OFFLINE SYSTEM ID}                dd06f8bf-f7ea-49b3-96fc-fbc6742a2ad4
+${AUTOTESTS OFFLINE}                  //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests 2')]/following-sibling::span[contains(text(), '${AUTOTESTS OFFLINE TEXT}')]
+${AUTOTESTS OFFLINE OPEN NX}          //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests 2')]/..//button[@ng-click='checkForm()']
+${AUTOTESTS OFFLINE SYSTEM ID}                ff891c00-c886-44fa-877f-bb185f586ec7
 
 #ASCII
 ${ESCAPE}                             \\27

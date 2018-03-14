@@ -217,7 +217,7 @@ Share with registered user - sends him notification
     Click Button    ${SHARE BUTTON MODAL}
     Check For Alert    ${NEW PERMISSIONS SAVED}
     Check User Permissions    ${EMAIL NOPERM}    ${CUSTOM TEXT}
-    Open Mailbox    host=imap.gmail.com    password=qweasd!@#    port=993    user=noptixqa@gmail.com    is_secure=True
+    Open Mailbox    host=imap.gmail.com    password=${BASE PASSWORD}    port=993    user=${BASE EMAIL}    is_secure=True
     ${INVITED TO SYSTEM EMAIL SUBJECT}    Replace String    ${INVITED TO SYSTEM EMAIL SUBJECT}    {{message.sharer_name}}    ${TEST FIRST NAME} ${TEST LAST NAME}
     ${email}    Wait For Email    recipient=${EMAIL NOPERM}    subject=${INVITED TO SYSTEM EMAIL SUBJECT}    timeout=120
     Remove User Permissions    ${EMAIL NOPERM}
