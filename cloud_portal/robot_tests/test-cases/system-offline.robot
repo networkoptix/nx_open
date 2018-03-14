@@ -106,7 +106,7 @@ rename button opens dialog; cancel closes without rename; save renames system wh
     Input Text    ${RENAME INPUT}    Auto Tests Rename
     Click Button    ${RENAME SAVE}
     Check For Alert    ${SYSTEM NAME SAVED}
-    Verify In System    Autotests Rename
+    Verify In System    Auto Tests Rename
     Click Button    ${RENAME SYSTEM}
     Wait Until Elements Are Visible    ${RENAME CANCEL}    ${RENAME SAVE}    ${RENAME INPUT}
     Clear Element Text    ${RENAME INPUT}
