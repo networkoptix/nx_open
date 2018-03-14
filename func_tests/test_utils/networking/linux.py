@@ -3,11 +3,13 @@ import logging
 
 from netaddr import EUI
 
+from test_utils.os_access import ProcessError
+
 logger = logging.getLogger(__name__)
 
 
 class LinuxNetworking(object):
-    def __init__(self, os_access, available_macs):
+    def __init__(self, os_access, macs):
         self._os_access = os_access
         output = self._os_access.run_command(
             '''
@@ -17,8 +19,11 @@ class LinuxNetworking(object):
             xargs -t -a interfaces.txt -I {} cat /sys/class/net/{}/address > macs.txt
             paste interfaces.txt macs.txt
             ''')
-        interfaces = {EUI(mac): interface for interface, mac in csv.reader(output.splitlines(), delimiter='\t')}
-        self.available_interfaces = {interfaces[mac]: mac for mac in available_macs}
+        self.interfaces = {
+            EUI(raw_mac): interface
+            for interface, raw_mac
+            in csv.reader(output.splitlines(), delimiter='\t')
+            if EUI(raw_mac) in macs}
 
     def reset(self):
         """Don't touch localhost, host-bound interface and interfaces unknown to VM."""
@@ -26,15 +31,16 @@ class LinuxNetworking(object):
             '''
             echo "${AVAILABLE_INTERFACES}" | xargs -t -I {} ip addr flush dev {}
             echo "${AVAILABLE_INTERFACES}" | xargs -t -I {} ip link set dev {} down
-            ip route flush proto static  # Manually routes are static.
+            ip route flush proto static  # Manually added routes are static.
             sysctl net.ipv4.ip_forward=0
             iptables -F
             iptables -t nat -F
             iptables -A OUTPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
             iptables -A OUTPUT -o lo -j ACCEPT
             iptables -A OUTPUT -d 10.0.0.0/8 -j ACCEPT
+            iptables -A OUTPUT -j REJECT
             ''',
-            env={'AVAILABLE_INTERFACES': '\n'.join(self.available_interfaces.keys())})
+            env={'AVAILABLE_INTERFACES': '\n'.join(self.interfaces.values())})
 
     def setup_ip(self, mac, ip, prefix_length):
         self._os_access.run_command(
@@ -42,10 +48,10 @@ class LinuxNetworking(object):
             ip addr replace ${ADDRESS}/${PREFIX_LENGTH} dev ${INTERFACE} 
             ip link set dev ${INTERFACE} up
             ''',
-            env={'INTERFACE': self.available_interfaces[mac], 'ADDRESS': ip, 'PREFIX_LENGTH': prefix_length})
+            env={'INTERFACE': self.interfaces[mac], 'ADDRESS': ip, 'PREFIX_LENGTH': prefix_length})
 
     def route(self, destination_ip_net, gateway_bound_mac, gateway_ip):
-        interface = self.available_interfaces[gateway_bound_mac]
+        interface = self.interfaces[gateway_bound_mac]
         self._os_access.run_command(
             ['ip', 'route', 'replace', destination_ip_net, 'dev', interface, 'via', gateway_ip, 'proto', 'static'])
 
@@ -62,4 +68,13 @@ class LinuxNetworking(object):
             sysctl net.ipv4.ip_forward=1
             iptables -t nat -A POSTROUTING -o ${OUTER_INTERFACE} -j MASQUERADE
             ''',
-            env={'OUTER_INTERFACE': self.available_interfaces[outer_mac]})
+            env={'OUTER_INTERFACE': self.interfaces[outer_mac]})
+
+    def can_reach(self, ip, timeout_sec=4):
+        try:
+            self._os_access.run_command(['ping', '-c', 1, '-W', timeout_sec, ip])
+        except ProcessError as e:
+            if e.returncode == 1:  # See man page.
+                return False
+            raise
+        return True
