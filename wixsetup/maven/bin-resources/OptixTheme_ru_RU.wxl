@@ -28,11 +28,11 @@
   <String Id="OptionsLocationLabel">Установить в:</String>
   <String Id="OptionsBrowseButton">Обзор</String>
   <String Id="OptionsOkButton">OK</String>
-  <String Id="OptionsCancelButton">Отмена</String>
+  <String Id="OptionsCancelButton">Отменить</String>
   <String Id="ProgressHeader">Этапы установки</String>
   <String Id="ProgressLabel">Обработка...</String>
   <String Id="OverallProgressPackageText">Инициализация...</String>
-  <String Id="ProgressCancelButton">Отмена</String>
+  <String Id="ProgressCancelButton">Отменить</String>
   <String Id="ModifyHeader">Изменить настройки</String>
   <String Id="ModifyRepairButton">Восстановить</String>
   <String Id="ModifyUninstallButton">Удалить</String>
@@ -57,7 +57,7 @@
   <String Id="FilesInUseCloseRadioButton">Закрыть приложения и попытаться перезапустить их</String>
   <String Id="FilesInUseDontCloseRadioButton">Не закрывать приложения. Потребуется перезагрузка</String>
   <String Id="FilesInUseOkButton">OK</String>
-  <String Id="FilesInUseCancelButton">Отмена</String>
+  <String Id="FilesInUseCancelButton">Отменить</String>
   <String Id="InstallLicenseText">Нажав кнопку «Принять и установить», вы соглашаетесь с</String>
   <String Id="Options">Параметры</String>
   <String Id="SelectApps">Выбор приложений для установки:</String>

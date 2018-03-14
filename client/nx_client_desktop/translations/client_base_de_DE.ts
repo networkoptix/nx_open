@@ -2229,11 +2229,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>I/O Module Id</source>
-      <translation>I/O-Modul-ID</translation>
+      <translation>I/O-Modul-Id</translation>
     </message>
     <message>
       <source>Camera Id</source>
-      <translation>Kamera-ID</translation>
+      <translation>Kamera-Id</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -2358,6 +2358,13 @@ to view more bookmarks</source>
       <source>Edge</source>
       <translation>Kante</translation>
     </message>
+    <message numerus="yes">
+      <source>This Id is already used on the following %n cameras: %1</source>
+      <translation type="unfinished">
+        <numerusform>Diese Id wird bereits für die folgende %n Kamera verwendet: %1</numerusform>
+        <numerusform>Diese ID wird bereits für folgende %n Kameras verwendet: %1</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnCameraInputBusinessEventWidget</name>
@@ -2476,6 +2483,10 @@ to view more bookmarks</source>
       <source>Server</source>
       <translation>Server</translation>
     </message>
+    <message>
+      <source>Logical Id</source>
+      <translation>Logical-Id</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraMotionMaskWidget</name>
@@ -2512,7 +2523,7 @@ to view more bookmarks</source>
     <name>QnCameraMotionPolicy</name>
     <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation type="unfinished">Recording or motion detection is disabled for %1</translation>
+      <translation>Aufnahme oder Bewegungserkennung deaktiviert für %1</translation>
     </message>
   </context>
   <context>
@@ -2535,10 +2546,6 @@ to view more bookmarks</source>
   <context>
     <name>QnCameraPasswordChangeDialog</name>
     <message>
-      <source>Password shouldn&apos;t be equal to camera&apos;s user name</source>
-      <translation>Das Passwort sollte nicht identisch mit dem Kamerabenutzernamen sein</translation>
-    </message>
-    <message>
       <source>New Password</source>
       <translation>Neues Passwort</translation>
     </message>
@@ -2554,12 +2561,16 @@ to view more bookmarks</source>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
       <translation>Das Passwort sollte mindestens 8 Zeichen lang sein und verschiedene Arten von Zeichen enthalten.</translation>
     </message>
+    <message>
+      <source>Password should not be equal to camera&apos;s user name</source>
+      <translation>Das Passwort sollte nicht identisch mit dem Kamerabenutzernamen sein</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraRecordingPolicy</name>
     <message>
       <source>Recording is disabled for %1</source>
-      <translation type="unfinished">Recording is disabled for %1</translation>
+      <translation>Aufnahmen deaktiviert für %1</translation>
     </message>
   </context>
   <context>
@@ -3184,12 +3195,9 @@ to %1</source>
       <source>Ask your system administrator to do it.</source>
       <translation>Bitten Sie Ihren Systemadministrator, dies zu tun.</translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>Set Password</source>
-      <translation>
-        <numerusform>Passwort festlegen</numerusform>
-        <numerusform>Passwörter festlegen</numerusform>
-      </translation>
+      <translation type="unfinished">Set Password</translation>
     </message>
   </context>
   <context>
@@ -3708,7 +3716,7 @@ to %1</source>
     </message>
     <message>
       <source>Id</source>
-      <translation>ID</translation>
+      <translation>Id</translation>
     </message>
   </context>
   <context>
@@ -4761,16 +4769,16 @@ to %1</source>
   <context>
     <name>QnPerformanceTest</name>
     <message>
-      <source>For full - featured mode, please use another computer</source>
-      <translation>Nutzen Sie für den vollen Funktionsumfang bitte einen anderen Computer</translation>
-    </message>
-    <message>
       <source>%1 can work in configuration mode only</source>
       <translation>%1 kann nur im Konfigurationsmodus arbeiten</translation>
     </message>
     <message>
       <source>Performance of this computer allows running %1 in configuration mode only.</source>
       <translation>Die Leistungsfähigkeit dieses Computers erlaubt das Ausführen von %1 lediglich im Konfigurationsmodus.</translation>
+    </message>
+    <message>
+      <source>For full-featured mode please use another computer</source>
+      <translation>Nutzen Sie für den vollen Funktionsumfang bitte einen anderen Computer</translation>
     </message>
   </context>
   <context>
@@ -5906,6 +5914,10 @@ to %1</source>
     <message>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
       <translation>Aufnahmeoption &quot;Bewegung + Low - Res&quot; kann nicht festgelegt werden.</translation>
+    </message>
+    <message>
+      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
+      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</translation>
     </message>
   </context>
   <context>
@@ -7156,10 +7168,6 @@ to %1</source>
   <context>
     <name>QnWearableProgressWidget</name>
     <message>
-      <source>Uploading %1... %2	%p%</source>
-      <translation>Hochladen %1... %2	%p%</translation>
-    </message>
-    <message>
       <source>Stop uploading?</source>
       <translation>Hochladen stoppen?</translation>
     </message>
@@ -7168,12 +7176,16 @@ to %1</source>
       <translation>Bereits hochgeladene Dateien werden beibehalten.</translation>
     </message>
     <message>
-      <source>Finalizing %1... %2	%p%</source>
-      <translation>Fertigstellen %1... %2	%p%</translation>
-    </message>
-    <message>
       <source>(%1 of %2)</source>
       <translation>(%1 von %2)</translation>
+    </message>
+    <message>
+      <source>Uploading %1...</source>
+      <translation>Hochladen %1...</translation>
+    </message>
+    <message>
+      <source>Finalizing %1...</source>
+      <translation>Fertigstellen %1...</translation>
     </message>
   </context>
   <context>
@@ -7585,10 +7597,6 @@ to %1</source>
       <translation>Nur Videodateien mit dem richtigen Zeitstempel werden unterstützt.</translation>
     </message>
     <message>
-      <source>Not enough space on server storage</source>
-      <translation>Nicht genügend Speicherplatz auf dem Serverspeicher</translation>
-    </message>
-    <message>
       <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
       <translation>Der Upload konnte nicht gestartet werden, da der Nutzer &quot;%1&quot; gerade Material auf diese Kamera hochlädt.</translation>
     </message>
@@ -7656,35 +7664,75 @@ to %1</source>
       <translation>Keine neuen Dateien im ausgewählten Ordner hochladen</translation>
     </message>
     <message numerus="yes">
-      <source>Files size - %2</source>
+      <source>Selected files are too old</source>
       <translation>
-        <numerusform>Dateigröße - %2</numerusform>
-        <numerusform>Dateigrößen - %2</numerusform>
+        <numerusform>Ausgewählte Datei ist zu alt</numerusform>
+        <numerusform>Ausgewählte Dateien sind zu alt</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation>
+        <numerusform>Die ausgewählte Datei wurde am %1 aufgezeichnet. Es können jedoch nur Dateien hochgeladen werden, die in den letzten %n Tagen aufgezeichnet wurden. Sie können dies in den Kameraarchiveinstellungen ändern.</numerusform>
+        <numerusform>Die ausgewählten Dateien wurde am %1 aufgezeichnet. Es können jedoch nur Dateien hochgeladen werden, die in den letzten %n Tagen aufgezeichnet wurden. Sie können dies in den Kameraarchiveinstellungen ändern.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation>
+        <numerusform>Ausgewählte Datei wurde zwischen %1 und %2 aufgezeichnet. Es können jedoch nur Dateien hochgeladen werden, die in den letzten %n Tagen aufgezeichnet wurden. Sie können dies in den Kameraarchiveinstellungen ändern.</numerusform>
+        <numerusform>Ausgewählte Dateien wurden zwischen %1 und %2 aufgezeichnet. Es können jedoch nur Dateien hochgeladen werden, die in den letzten %n Tagen aufgezeichnet wurden. Sie können dies in den Kameraarchiveinstellungen ändern.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Some footage may be deleted after uploading these files</source>
+      <translation>
+        <numerusform>Das Material kann nach dem Hochladen gelöscht werden</numerusform>
+        <numerusform>Das Material kann nach dem Hochladen gelöscht werden</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
+      <translation>
+        <numerusform>Auf dem Serverspeicher ist nicht genügend freier Speicherplatz vorhanden. Einige alte Aufnahmen können gelöscht werden, um Speicherplatz freizugeben. Beachten Sie, dass ausgewählte Dateien, die auf dem Server am ältesten sind, unmittelbar nach dem Hochladen gelöscht werden.</numerusform>
+        <numerusform>Auf dem Serverspeicher ist nicht genügend freier Speicherplatz vorhanden. Einige alte Aufnahmen können gelöscht werden, um Speicherplatz freizugeben. Beachten Sie, dass ausgewählte Dateien, die auf dem Server am ältesten sind, unmittelbar nach dem Hochladen gelöscht werden.</numerusform>
       </translation>
     </message>
     <message>
-      <source>Free space - %2</source>
-      <translation>Freier Speicher - %2</translation>
+      <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
+      <translation>Um dies zu verhindern, können Sie zusätzlichen Speicher hinzufügen. Sie können auch steuern, welches Material zuerst gelöscht wird, indem Sie die Archivierungszeit in den Kameraeinstellungen ändern.</translation>
     </message>
     <message>
-      <source>%1 - has unsupported format.</source>
-      <translation>%1 - Format wird nicht unterstützt.</translation>
+      <source>Upload anyway?</source>
+      <translation>Trotzdem hochladen?</translation>
     </message>
     <message>
-      <source>%1 - does not have timestamp.</source>
-      <translation>%1 - hat keinen Zeitstempel.</translation>
+      <source>Could not finish upload to %1</source>
+      <translation>Der Upload auf %1 konnte nicht abgeschlossen werden</translation>
     </message>
     <message>
-      <source>%1 - covers period for which video has already been uploaded.</source>
-      <translation>%1 - deckt den Zeitraum ab, für den das Video bereits hochgeladen wurde.</translation>
+      <source>Make sure there is enough space on server storage.</source>
+      <translation>Stellen Sie sicher, dass auf dem Server genügend Speicherplatz vorhanden ist.</translation>
     </message>
     <message>
-      <source>%1 - covers period for which video is being uploaded.</source>
-      <translation>%1 - umfasst den Zeitraum, für den ein Video hochgeladen wird.</translation>
+      <source>%1 has unsupported format.</source>
+      <translation>%1 hat ein nicht unterstütztes Format.</translation>
     </message>
     <message>
-      <source>%1 - does not fit on server storage.</source>
-      <translation>%1 - passt nicht auf den Serverspeicher.</translation>
+      <source>%1 does not have timestamp.</source>
+      <translation>%1 hat keinen Zeitstempel.</translation>
+    </message>
+    <message>
+      <source>%1 is older than allowed in camera archive settings.</source>
+      <translation>%1 ist älter als in den Kameraarchiveinstellungen erlaubt.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video has already been uploaded.</source>
+      <translation>%1 umfasst den Zeitraum, für den das Video bereits hochgeladen wurde.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video is being uploaded.</source>
+      <translation>%1 deckt den Zeitraum ab, für den das Video hochgeladen wird.</translation>
     </message>
   </context>
   <context>

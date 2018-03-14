@@ -125,8 +125,9 @@ public:
      */
     bool isSharingLicenseInGroup() const;
 
-    bool isMultiSensorCamera() const;
+    bool isNvr() const;
 
+    bool isMultiSensorCamera() const;
 
     virtual Qn::StreamFpsSharingMethod streamFpsSharingMethod() const;
     void setStreamFpsSharingMethod(Qn::StreamFpsSharingMethod value);
@@ -253,7 +254,7 @@ public:
     QnUuid preferredServerId() const;
 
     nx::api::AnalyticsSupportedEvents analyticsSupportedEvents() const;
-    void setAnalyticsSupportedEvents(const nx::api::AnalyticsSupportedEvents& eventsList);
+    virtual void setAnalyticsSupportedEvents(const nx::api::AnalyticsSupportedEvents& eventsList);
 
     //!Returns list of time periods of DTS archive, containing motion at specified \a regions with timestamp in region [\a msStartTime; \a msEndTime)
     /*!
@@ -290,8 +291,6 @@ public:
 		const QString &key,
 		const QVariant& value,
 		PropertyOptions options = DEFAULT_OPTIONS) override;
-
-    virtual bool removeProperty(const QString& key) override;
 
     //!Returns list if IO ports
     QnIOPortDataList getIOPorts() const;

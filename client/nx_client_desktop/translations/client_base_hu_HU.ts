@@ -858,11 +858,11 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
+      <translation>Fájl feltöltése...</translation>
     </message>
     <message>
       <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
+      <translation>Mappa feltöltése...</translation>
     </message>
     <message>
       <source>Start Analytics...</source>
@@ -980,7 +980,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
-      <translation>A licenchez adott média szerver hardver ID nem egyezik meg az eszköz hardver ID-vel melyhez a licencet aktiválták.</translation>
+      <translation>A licenchez adott média szerver Hardver Id nem egyezik meg az eszköz Hardver Id-vel melyhez a licencet aktiválták.</translation>
     </message>
   </context>
   <context>
@@ -1011,7 +1011,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Settings are not available for .NOV and .EXE files.</source>
-      <translation type="unfinished">Settings are not available for .NOV and .EXE files.</translation>
+      <translation>A beállítások nem állnak rendelkezésre .NOV és .EXE fájlokhoz.</translation>
     </message>
   </context>
   <context>
@@ -1022,11 +1022,11 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Matroska</source>
-      <translation type="unfinished">Matroska</translation>
+      <translation>Matroska</translation>
     </message>
     <message>
       <source>MPEG-4 Part 14</source>
-      <translation type="unfinished">MPEG-4 Part 14</translation>
+      <translation>MPEG-4 Part 14</translation>
     </message>
     <message>
       <source>%1 Media File</source>
@@ -2230,11 +2230,11 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>I/O Module Id</source>
-      <translation>I/O modul ID</translation>
+      <translation>I/O modul Id</translation>
     </message>
     <message>
       <source>Camera Id</source>
-      <translation>Kamera ID</translation>
+      <translation>Kamera Id</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -2253,7 +2253,7 @@ több könyvjelző megjelenítéséhez</translation>
     <name>QnCameraAnalyticsPolicy</name>
     <message>
       <source>Analytics is not available for %1</source>
-      <translation type="unfinished">Analytics is not available for %1</translation>
+      <translation>%1 esetében nem használható analitika</translation>
     </message>
   </context>
   <context>
@@ -2357,7 +2357,14 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Edge</source>
-      <translation type="unfinished">Edge</translation>
+      <translation>Edge</translation>
+    </message>
+    <message numerus="yes">
+      <source>This Id is already used on the following %n cameras: %1</source>
+      <translation type="unfinished">
+        <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
+        <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -2477,6 +2484,10 @@ több könyvjelző megjelenítéséhez</translation>
       <source>Server</source>
       <translation>Szerver</translation>
     </message>
+    <message>
+      <source>Logical Id</source>
+      <translation type="unfinished">Logical Id</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraMotionMaskWidget</name>
@@ -2513,7 +2524,7 @@ több könyvjelző megjelenítéséhez</translation>
     <name>QnCameraMotionPolicy</name>
     <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation type="unfinished">Recording or motion detection is disabled for %1</translation>
+      <translation>Rögzítés vagy mozgásérzékelés kikapcsolva %1</translation>
     </message>
   </context>
   <context>
@@ -2536,10 +2547,6 @@ több könyvjelző megjelenítéséhez</translation>
   <context>
     <name>QnCameraPasswordChangeDialog</name>
     <message>
-      <source>Password shouldn&apos;t be equal to camera&apos;s user name</source>
-      <translation>A jelszón nem egyezhet meg a kamerák felhasználó nevével</translation>
-    </message>
-    <message>
       <source>New Password</source>
       <translation>Új Jelszó</translation>
     </message>
@@ -2555,12 +2562,16 @@ több könyvjelző megjelenítéséhez</translation>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
       <translation>A jelszónak legalább 8 szimbólumból kell állnia, és különböző karaktereket kell tartalmaznia.</translation>
     </message>
+    <message>
+      <source>Password should not be equal to camera&apos;s user name</source>
+      <translation type="unfinished">Password should not be equal to camera&apos;s user name</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraRecordingPolicy</name>
     <message>
       <source>Recording is disabled for %1</source>
-      <translation type="unfinished">Recording is disabled for %1</translation>
+      <translation>%1 rögzítése letiltva</translation>
     </message>
   </context>
   <context>
@@ -2627,7 +2638,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Mbit/s</source>
-      <translation type="unfinished">Mbit/s</translation>
+      <translation>Mbit/s</translation>
     </message>
     <message>
       <source>Less Settings</source>
@@ -2966,7 +2977,7 @@ to %1</source>
     </message>
     <message>
       <source>Incorrect username or password</source>
-      <translation>Hibás Email cím vagy jelszó</translation>
+      <translation>Hibás felhasználónév cím vagy jelszó</translation>
     </message>
     <message>
       <source>Server may be restarting now. Please try again later.</source>
@@ -3187,12 +3198,9 @@ to %1</source>
       <source>Ask your system administrator to do it.</source>
       <translation>Kérje a rendszergazda segítségét.</translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>Set Password</source>
-      <translation>
-        <numerusform>Jelszó beállítása</numerusform>
-        <numerusform>Jelszó beállítása</numerusform>
-      </translation>
+      <translation type="unfinished">Set Password</translation>
     </message>
   </context>
   <context>
@@ -3711,7 +3719,7 @@ to %1</source>
     </message>
     <message>
       <source>Id</source>
-      <translation>ID</translation>
+      <translation>Id</translation>
     </message>
   </context>
   <context>
@@ -3894,7 +3902,7 @@ to %1</source>
     </message>
     <message>
       <source>Locked to Hardware Id</source>
-      <translation>Hardver ID-hez rendelve</translation>
+      <translation>Hardver Id-hez rendelve</translation>
     </message>
   </context>
   <context>
@@ -4170,11 +4178,11 @@ to %1</source>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware Id %1</source>
-      <translation>Ez a licenc már aktiválva van %1 hardver ID-hoz</translation>
+      <translation>Ez a licenc már aktiválva van %1 Hardver Id-hoz</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware Id %1 on %2</source>
-      <translation>Ez a licenc már aktiválva van %1 hardver ID-hoz (%2)</translation>
+      <translation>Ez a licenc már aktiválva van %1 Hardver Id-hoz (%2)</translation>
     </message>
     <message>
       <source>If the problem persists please contact Customer Support.</source>
@@ -4205,11 +4213,11 @@ to %1</source>
     </message>
     <message>
       <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>Az aktivációs kulcs megküldéséhez, kérjük e-mailben küldje el a licenc kulcsot és a hardver ID-t %1 címre.</translation>
+      <translation>Az aktivációs kulcs megküldéséhez, kérjük e-mailben küldje el a licenc kulcsot és a Hardver Id-t %1 címre.</translation>
     </message>
     <message>
       <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>Az aktivációs kulcs megküldéséhez, kérjük küldje el a licenc kulcsot és a hardver ID-t %1 címre.</translation>
+      <translation>Az aktivációs kulcs megküldéséhez, kérjük küldje el a licenc kulcsot és a Hardver Id-t %1 címre.</translation>
     </message>
   </context>
   <context>
@@ -4764,16 +4772,16 @@ to %1</source>
   <context>
     <name>QnPerformanceTest</name>
     <message>
-      <source>For full - featured mode, please use another computer</source>
-      <translation>A teljes - kiemelt mód eléréséhez használjon másik számítógépet</translation>
-    </message>
-    <message>
       <source>%1 can work in configuration mode only</source>
       <translation>%1 csak a konfigurációs módban dolgozhat</translation>
     </message>
     <message>
       <source>Performance of this computer allows running %1 in configuration mode only.</source>
       <translation>A számítógép teljesítménye csak csak konfigurációs módban teszi lehetővé %1 futtatását.</translation>
+    </message>
+    <message>
+      <source>For full-featured mode please use another computer</source>
+      <translation type="unfinished">For full-featured mode please use another computer</translation>
     </message>
   </context>
   <context>
@@ -5909,6 +5917,10 @@ to %1</source>
     <message>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
       <translation>&quot;Mozgás + Alacsony felbontás&quot; opció nem állítható be.</translation>
+    </message>
+    <message>
+      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
+      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</translation>
     </message>
   </context>
   <context>
@@ -7069,7 +7081,7 @@ to %1</source>
     </message>
     <message>
       <source>Email cannot be empty.</source>
-      <translation>Az Email mező nem lehet üres.</translation>
+      <translation>Az email mező nem lehet üres.</translation>
     </message>
     <message>
       <source>Password</source>
@@ -7085,18 +7097,18 @@ to %1</source>
     </message>
     <message>
       <source>Cloud user with specified email already exists.</source>
-      <translation>A felhő felhasználó a megadott e-mail címmel már létezik.</translation>
+      <translation>A felhő felhasználó a megadott email címmel már létezik.</translation>
     </message>
   </context>
   <context>
     <name>QnValidatorStrings</name>
     <message>
       <source>Email cannot be empty.</source>
-      <translation>Az e-mail mező nem lehet üres.</translation>
+      <translation>Az email mező nem lehet üres.</translation>
     </message>
     <message>
       <source>Email is not valid.</source>
-      <translation>Nem érvényes Email.</translation>
+      <translation>Nem érvényes email.</translation>
     </message>
     <message>
       <source>Password cannot be empty.</source>
@@ -7159,24 +7171,24 @@ to %1</source>
   <context>
     <name>QnWearableProgressWidget</name>
     <message>
-      <source>Uploading %1... %2	%p%</source>
-      <translation>Feltöltés %1... %2	%p%</translation>
-    </message>
-    <message>
       <source>Stop uploading?</source>
-      <translation type="unfinished">Stop uploading?</translation>
+      <translation>Leállítja a feltöltés?</translation>
     </message>
     <message>
       <source>Already uploaded files will be kept.</source>
       <translation type="unfinished">Already uploaded files will be kept.</translation>
     </message>
     <message>
-      <source>Finalizing %1... %2	%p%</source>
-      <translation type="unfinished">Finalizing %1... %2	%p%</translation>
-    </message>
-    <message>
       <source>(%1 of %2)</source>
       <translation type="unfinished">(%1 of %2)</translation>
+    </message>
+    <message>
+      <source>Uploading %1...</source>
+      <translation type="unfinished">Uploading %1...</translation>
+    </message>
+    <message>
+      <source>Finalizing %1...</source>
+      <translation type="unfinished">Finalizing %1...</translation>
     </message>
   </context>
   <context>
@@ -7588,10 +7600,6 @@ to %1</source>
       <translation type="unfinished">Only video files with correct timestamp are supported.</translation>
     </message>
     <message>
-      <source>Not enough space on server storage</source>
-      <translation type="unfinished">Not enough space on server storage</translation>
-    </message>
-    <message>
       <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
       <translation type="unfinished">Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</translation>
     </message>
@@ -7659,35 +7667,75 @@ to %1</source>
       <translation type="unfinished">No new files to upload in selected folder</translation>
     </message>
     <message numerus="yes">
-      <source>Files size - %2</source>
+      <source>Selected files are too old</source>
       <translation type="unfinished">
-        <numerusform>Files size - %2</numerusform>
-        <numerusform>Files size - %2</numerusform>
+        <numerusform>Selected files are too old</numerusform>
+        <numerusform>Selected files are too old</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation type="unfinished">
+        <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+        <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation type="unfinished">
+        <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+        <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Some footage may be deleted after uploading these files</source>
+      <translation type="unfinished">
+        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
+      <translation type="unfinished">
+        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
       </translation>
     </message>
     <message>
-      <source>Free space - %2</source>
-      <translation type="unfinished">Free space - %2</translation>
+      <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
+      <translation type="unfinished">To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</translation>
     </message>
     <message>
-      <source>%1 - has unsupported format.</source>
-      <translation type="unfinished">%1 - has unsupported format.</translation>
+      <source>Upload anyway?</source>
+      <translation type="unfinished">Upload anyway?</translation>
     </message>
     <message>
-      <source>%1 - does not have timestamp.</source>
-      <translation type="unfinished">%1 - does not have timestamp.</translation>
+      <source>Could not finish upload to %1</source>
+      <translation type="unfinished">Could not finish upload to %1</translation>
     </message>
     <message>
-      <source>%1 - covers period for which video has already been uploaded.</source>
-      <translation type="unfinished">%1 - covers period for which video has already been uploaded.</translation>
+      <source>Make sure there is enough space on server storage.</source>
+      <translation type="unfinished">Make sure there is enough space on server storage.</translation>
     </message>
     <message>
-      <source>%1 - covers period for which video is being uploaded.</source>
-      <translation type="unfinished">%1 - covers period for which video is being uploaded.</translation>
+      <source>%1 has unsupported format.</source>
+      <translation type="unfinished">%1 has unsupported format.</translation>
     </message>
     <message>
-      <source>%1 - does not fit on server storage.</source>
-      <translation type="unfinished">%1 - does not fit on server storage.</translation>
+      <source>%1 does not have timestamp.</source>
+      <translation type="unfinished">%1 does not have timestamp.</translation>
+    </message>
+    <message>
+      <source>%1 is older than allowed in camera archive settings.</source>
+      <translation type="unfinished">%1 is older than allowed in camera archive settings.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video has already been uploaded.</source>
+      <translation type="unfinished">%1 covers period for which video has already been uploaded.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video is being uploaded.</source>
+      <translation type="unfinished">%1 covers period for which video is being uploaded.</translation>
     </message>
   </context>
   <context>
@@ -8202,7 +8250,7 @@ to %1</source>
     </message>
     <message>
       <source>Selected period cannot be exported for the current camera.</source>
-      <translation type="unfinished">Selected period cannot be exported for the current camera.</translation>
+      <translation>A kiválasztott időszak nem exportálható az aktuális kamera számára.</translation>
     </message>
   </context>
   <context>

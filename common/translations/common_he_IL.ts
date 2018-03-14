@@ -78,11 +78,6 @@
       <translation>מערכות אלה בנויות עם כתובת אתר שונה של %1. המיזוג אסור.</translation>
     </message>
     <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>מערכת ענן מאפשרת למזג רק עם שאינה בענן. שם המערכת והסיסמה נלקחים מהמערכת שבענן.</translation>
-    </message>
-    <message>
       <source>New System</source>
       <translation>מערכת חדשה</translation>
     </message>
@@ -90,6 +85,10 @@
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
       <translation>מערכת %1 שהתגלתה אינה תואמת למערכת הנוכחית.</translation>
+    </message>
+    <message>
+      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
+      <translation>מערכת ענן מאפשרת למזג רק עם שאינה בענן. שם המערכת והסיסמא נלקחים מהמערכת שבענן.</translation>
     </message>
   </context>
   <context>
@@ -492,7 +491,7 @@
     </message>
     <message>
       <source>Bridge</source>
-      <translation type="unfinished">Bridge</translation>
+      <translation>Bridge</translation>
     </message>
     <message>
       <source>Bridge Licenses</source>

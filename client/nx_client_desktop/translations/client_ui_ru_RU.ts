@@ -750,7 +750,22 @@
     <message>
       <location/>
       <source>PTZ</source>
-      <translation type="unfinished">PTZ</translation>
+      <translation>PTZ</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Generate</source>
+      <translation type="unfinished">Generate</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset</source>
+      <translation>Сброс</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Logical Id</source>
+      <translation type="unfinished">Logical Id</translation>
     </message>
   </context>
   <context>
@@ -1788,8 +1803,8 @@
     </message>
     <message>
       <location/>
-      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</translation>
+      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
     </message>
   </context>
   <context>
@@ -2668,13 +2683,6 @@
       <source>Reset</source>
       <translation>Сброс</translation>
     </message>
-    <message>
-      <location/>
-      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage.
-The oldest footage among all cameras on the server will be deleted first.</source>
-      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage.
-The oldest footage among all cameras on the server will be deleted first.</translation>
-    </message>
   </context>
   <context>
     <name>SmtpAdvancedSettingsWidget</name>
@@ -3030,15 +3038,18 @@ The oldest footage among all cameras on the server will be deleted first.</trans
     </message>
     <message>
       <location/>
-      <source>There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</source>
-      <translation>В системе ещё не созданы особые роли. 
-Для создания используйте кнопку &quot;Новая роль&quot;.</translation>
+      <source>New role</source>
+      <translation>Новая роль</translation>
     </message>
     <message>
       <location/>
-      <source>New role</source>
-      <translation>Новая роль</translation>
+      <source>There are no custom user roles yet.</source>
+      <translation type="unfinished">There are no custom user roles yet.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Click &quot;New role&quot; button to create one.</source>
+      <translation type="unfinished">Click &quot;New role&quot; button to create one.</translation>
     </message>
   </context>
   <context>
@@ -3082,7 +3093,7 @@ Click &quot;New role&quot; button to create one.</source>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
       <source>Cancel</source>
-      <translation>Отмена</translation>
+      <translation>Отменить</translation>
     </message>
   </context>
   <context>

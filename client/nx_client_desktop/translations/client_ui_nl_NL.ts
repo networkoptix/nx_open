@@ -166,7 +166,7 @@
     <message>
       <location/>
       <source>Event Type:</source>
-      <translation type="unfinished">Event Type:</translation>
+      <translation>Event Type:</translation>
     </message>
   </context>
   <context>
@@ -750,7 +750,22 @@
     <message>
       <location/>
       <source>PTZ</source>
-      <translation type="unfinished">PTZ</translation>
+      <translation>PTZ</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Generate</source>
+      <translation type="unfinished">Generate</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset</source>
+      <translation>Reset</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Logical Id</source>
+      <translation type="unfinished">Logical Id</translation>
     </message>
   </context>
   <context>
@@ -882,7 +897,7 @@
     <message>
       <location/>
       <source>Bitrate</source>
-      <translation type="unfinished">Bitrate</translation>
+      <translation>Bitrate</translation>
     </message>
   </context>
   <context>
@@ -1116,7 +1131,7 @@
     <message>
       <location/>
       <source>Multi Video</source>
-      <translation type="unfinished">Multi Video</translation>
+      <translation>Multi Video</translation>
     </message>
   </context>
   <context>
@@ -1788,8 +1803,8 @@
     </message>
     <message>
       <location/>
-      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</translation>
+      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
     </message>
   </context>
   <context>
@@ -2253,7 +2268,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/rapid_review_settings_widget.ui"/>
       <source>Rapid Review</source>
-      <translation type="unfinished">Rapid Review</translation>
+      <translation>Rapid Review</translation>
     </message>
     <message>
       <location/>
@@ -2668,12 +2683,6 @@
       <source>Reset</source>
       <translation>Reset</translation>
     </message>
-    <message>
-      <location/>
-      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage.
-The oldest footage among all cameras on the server will be deleted first.</source>
-      <translation>Het geüploade archief kan automatisch worden verwijderd als er geen vrije ruimte meer is op de serveropslag. De oudste beelden van alle camera's op de server worden eerst verwijderd.</translation>
-    </message>
   </context>
   <context>
     <name>SmtpAdvancedSettingsWidget</name>
@@ -3029,14 +3038,18 @@ The oldest footage among all cameras on the server will be deleted first.</sourc
     </message>
     <message>
       <location/>
-      <source>There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</source>
-      <translation>Er zijn nog geen aangepaste gebruikersprofielen. Klik op de &quot;Nieuwe rol&quot; knop om deze aan ​​te maken.</translation>
+      <source>New role</source>
+      <translation>Nieuwe profiel</translation>
     </message>
     <message>
       <location/>
-      <source>New role</source>
-      <translation>Nieuwe profiel</translation>
+      <source>There are no custom user roles yet.</source>
+      <translation type="unfinished">There are no custom user roles yet.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Click &quot;New role&quot; button to create one.</source>
+      <translation type="unfinished">Click &quot;New role&quot; button to create one.</translation>
     </message>
   </context>
   <context>

@@ -61,7 +61,7 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource( const QnUuid &resource
 
     if( resourceType.isNull() )
     {
-        NX_LOG( lit("ThirdPartyResourceSearcher. No resource type for ID = %1").arg(resourceTypeId.toString()), cl_logDEBUG1 );
+        NX_DEBUG(this, lit("ThirdPartyResourceSearcher. No resource type for ID = %1").arg(resourceTypeId.toString()));
         return result;
     }
 
@@ -94,7 +94,14 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource( const QnUuid &resource
         //so just instanciating QnThirdPartyResource
     result = QnThirdPartyResourcePtr( new QnThirdPartyResource( cameraInfo, nullptr, *discoveryManager ) );
     result->setTypeId(resourceTypeId);
-    result->setPhysicalId(QString::fromUtf8(cameraInfo.uid).trimmed());
+
+    // If third party driver returns MAC based physical ID then re-format MAC address string
+    // to ensure it has same string format as build-in drivers.
+    auto uuidStr = QString::fromUtf8(cameraInfo.uid).trimmed();
+    auto uuidMac = QnMacAddress(uuidStr);
+    if (!uuidMac.isNull())
+        uuidStr = uuidMac.toString();
+    result->setPhysicalId(uuidStr);
 
     NX_LOG( lit("Created third party resource (manufacturer %1, res type id %2)").
         arg(discoveryManager->getVendorName()).arg(resourceTypeId.toString()), cl_logDEBUG2 );
@@ -219,6 +226,9 @@ QnResourceList ThirdPartyResourceSearcher::findResources()
     const QnResourceList& mdnsFoundResList = QnMdnsResourceSearcher::findResources();
     const QnResourceList& upnpFoundResList = QnUpnpResourceSearcherAsync::findResources();
     const QnResourceList& customFoundResList = doCustomSearch();
+
+    NX_DEBUG(this, lm("Found %1 mdns, %2 upnp and %3 customSearch resources")
+        .args(mdnsFoundResList.size(), upnpFoundResList.size(), customFoundResList.size()));
     return mdnsFoundResList + upnpFoundResList + customFoundResList;
 }
 
@@ -270,14 +280,14 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
 
     if( strlen(cameraInfo.uid) == 0 )
     {
-        NX_LOG( lit("THIRD_PARTY. Plugin %1 returned camera with empty uid. This is forbidden").
-            arg(vendor), cl_logDEBUG1 );
+        NX_DEBUG(this, lit("Plugin %1 returned camera with empty uid. This is forbidden").
+            arg(vendor));
         return QnThirdPartyResourcePtr();
     }
     if( strlen(cameraInfo.url) == 0 )
     {
-        NX_LOG( lit("THIRD_PARTY. Plugin %1 returned camera with empty url. This is forbidden").
-            arg(vendor), cl_logDEBUG1 );
+        NX_DEBUG(this, lit("Plugin %1 returned camera with empty url. This is forbidden").
+            arg(vendor));
         return QnThirdPartyResourcePtr();
     }
 
@@ -288,7 +298,7 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
     nxcip::BaseCameraManager* camManager = discoveryManager->createCameraManager( cameraInfo );
     if( !camManager )
     {
-        NX_LOG( lit("THIRD_PARTY. Plugin %1 could not create BaseCameraManager").arg(vendor), cl_logDEBUG1 );
+        NX_DEBUG(this, lit("Plugin %1 could not create BaseCameraManager").arg(vendor));
         return QnThirdPartyResourcePtr();
     }
 
@@ -303,8 +313,11 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
     else
         resource->setName( QString::fromUtf8("%1-%2").arg(vendor).arg(QString::fromUtf8(cameraInfo.modelName)) );
     resource->setModel( QString::fromUtf8(cameraInfo.modelName) );
-    resource->setPhysicalId( QString::fromUtf8(cameraInfo.uid).trimmed() );
-    resource->setMAC( QnMacAddress(QString::fromUtf8(cameraInfo.uid).trimmed()) );
+
+    auto uuid = QString::fromUtf8(cameraInfo.uid).trimmed();
+    auto uuidMac = QnMacAddress(uuid);
+    resource->setPhysicalId(uuidMac.isNull() ? uuid : uuidMac.toString());
+    resource->setMAC(uuidMac);
     resource->setDefaultAuth( QString::fromUtf8(cameraInfo.defaultLogin), QString::fromUtf8(cameraInfo.defaultPassword) );
     resource->setUrl( QString::fromUtf8(cameraInfo.url) );
     resource->setVendor( vendor );

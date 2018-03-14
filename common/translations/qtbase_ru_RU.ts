@@ -663,7 +663,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation>%1 Гб</translation>
+      <translation>%1 ГБ</translation>
     </message>
     <message>
       <source>%1 MB</source>
@@ -941,7 +941,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Отмена</translation>
+      <translation>Отменить</translation>
     </message>
     <message>
       <source>Discard</source>
@@ -1120,7 +1120,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Download</source>
-      <translation>Загрузка</translation>
+      <translation>Загрузить</translation>
     </message>
   </context>
   <context>

@@ -21,7 +21,7 @@
     </message>
     <message>
       <source>This account is blocked.</source>
-      <translation>此帳戶已被封鎖.</translation>
+      <translation>此帳號已被封鎖.</translation>
     </message>
     <message>
       <source>Requested feature is not implemented.</source>

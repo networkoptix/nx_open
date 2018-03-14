@@ -526,7 +526,7 @@ namespace nx_hls
             if (commonModule()->resourceAccessManager()->hasPermission(
                 accessRights, camResource, Qn::Permission::ViewLivePermission))
             {
-                error->errorString = toString(Qn::MediaStreamEvent::ForbiddenBecauseNoLicenseError);
+                error->errorString = toString(Qn::MediaStreamEvent::ForbiddenWithNoLicense);
                 error->error = QnRestResult::Forbidden;
                 return nx_http::StatusCode::ok;
             }

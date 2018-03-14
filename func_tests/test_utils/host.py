@@ -343,7 +343,7 @@ class RemoteSshHost(Host):
     def run_command(self, args, input=None, cwd=None, check_retcode=True, log_output=True, timeout=None):
         ssh_cmd = self._make_ssh_cmd() + [self._user_and_host]
         if cwd:
-            args = [subprocess.list2cmdline(['cd', cwd, '&&'] + args)]
+            args = ['cd', cwd, '&&'] + args
         quoted_args = subprocess.list2cmdline(args)
         return self._local_host.run_command(ssh_cmd + [quoted_args], input, check_retcode=check_retcode, log_output=log_output, timeout=timeout)
 

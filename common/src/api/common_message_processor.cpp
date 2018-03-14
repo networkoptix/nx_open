@@ -295,11 +295,7 @@ void QnCommonMessageProcessor::on_resourceParamChanged(const ec2::ApiResourcePar
 
 void QnCommonMessageProcessor::on_resourceParamRemoved(const ec2::ApiResourceParamWithRefData& param )
 {
-    QnResourcePtr resource = resourcePool()->getResourceById(param.resourceId);
-    if (resource)
-        resource->removeProperty(param.name);
-    else
-        propertyDictionary()->removeProperty(param.resourceId, param.name);
+    propertyDictionary()->on_resourceParamRemoved(param.resourceId, param.name);
 }
 
 void QnCommonMessageProcessor::on_resourceRemoved( const QnUuid& resourceId )

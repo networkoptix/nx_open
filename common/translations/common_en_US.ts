@@ -78,17 +78,16 @@
         <translation></translation>
     </message>
     <message>
-        <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation></translation>
-    </message>
-    <message>
         <source>New System</source>
         <translation></translation>
     </message>
     <message>
         <source>The discovered System %1 is incompatible with the current System.</source>
         <comment>%1 is name of System</comment>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
         <translation></translation>
     </message>
 </context>
@@ -316,7 +315,7 @@
     </message>
     <message>
         <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -492,11 +491,11 @@
     </message>
     <message>
         <source>Bridge</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Bridge Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -789,7 +788,7 @@
     </message>
     <message>
         <source>No data exported.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -891,7 +890,7 @@
     <message>
         <source>days</source>
         <comment>Long suffix for displaying days</comment>
-        <translation>day</translation>
+        <translation></translation>
     </message>
     <message>
         <source>wks</source>
@@ -1523,12 +1522,12 @@
     </message>
     <message>
         <source>Analytics Event</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>%1 at %2</source>
         <comment>Analytics Event at some camera</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>

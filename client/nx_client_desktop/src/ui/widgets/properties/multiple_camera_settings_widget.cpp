@@ -192,8 +192,8 @@ void QnMultipleCameraSettingsWidget::submitToResources()
         if (!password.isEmpty() || !m_passwordWasEmpty)
             auth.setPassword(password);
 
-        if (camera->isMultiSensorCamera())
-            QnClientCameraResource::setAuthToMultisensorCamera(camera, auth);
+        if (camera->isMultiSensorCamera() || camera->isNvr())
+            QnClientCameraResource::setAuthToCameraGroup(camera, auth);
         else
             camera->setAuth(auth);
 

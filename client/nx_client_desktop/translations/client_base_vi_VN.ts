@@ -1081,7 +1081,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Scroll Left</source>
-      <translation>Di chuyển sang trái</translation>
+      <translation>di chuyển sang trái</translation>
     </message>
     <message>
       <source>Scroll Up</source>
@@ -1089,7 +1089,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation>Di chuyển sang phải</translation>
+      <translation>di chuyển sang phải</translation>
     </message>
     <message>
       <source>Scroll Down</source>
@@ -2231,7 +2231,7 @@ to view more bookmarks</source>
     <name>QnCameraAnalyticsPolicy</name>
     <message>
       <source>Analytics is not available for %1</source>
-      <translation type="unfinished">Analytics is not available for %1</translation>
+      <translation>Analytics không khả dụng cho %1</translation>
     </message>
   </context>
   <context>
@@ -2336,6 +2336,12 @@ to view more bookmarks</source>
       <source>Edge</source>
       <translation>Cạnh</translation>
     </message>
+    <message numerus="yes">
+      <source>This Id is already used on the following %n cameras: %1</source>
+      <translation type="unfinished">
+        <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnCameraInputBusinessEventWidget</name>
@@ -2428,7 +2434,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Vendor</source>
-      <translation>Nhà cung cấp</translation>
+      <translation>Nhà cung cấp:</translation>
     </message>
     <message>
       <source>Model</source>
@@ -2449,6 +2455,10 @@ to view more bookmarks</source>
     <message>
       <source>Server</source>
       <translation>Máy chủ</translation>
+    </message>
+    <message>
+      <source>Logical Id</source>
+      <translation type="unfinished">Logical Id</translation>
     </message>
   </context>
   <context>
@@ -2486,7 +2496,7 @@ to view more bookmarks</source>
     <name>QnCameraMotionPolicy</name>
     <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation type="unfinished">Recording or motion detection is disabled for %1</translation>
+      <translation>%1 Video bên giám sát hoặc chức năng dịch chuyển không thể được sử dụng</translation>
     </message>
   </context>
   <context>
@@ -2508,10 +2518,6 @@ to view more bookmarks</source>
   <context>
     <name>QnCameraPasswordChangeDialog</name>
     <message>
-      <source>Password shouldn&apos;t be equal to camera&apos;s user name</source>
-      <translation>Mật khẩu shouldn&apos;t bằng tên người dùng camera&apos;s</translation>
-    </message>
-    <message>
       <source>New Password</source>
       <translation>Mật khẩu mới</translation>
     </message>
@@ -2527,12 +2533,16 @@ to view more bookmarks</source>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
       <translation>Mật khẩu phải có ít nhất 8 ký tự dài và chứa các loại ký tự khác nhau.</translation>
     </message>
+    <message>
+      <source>Password should not be equal to camera&apos;s user name</source>
+      <translation type="unfinished">Password should not be equal to camera&apos;s user name</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraRecordingPolicy</name>
     <message>
       <source>Recording is disabled for %1</source>
-      <translation type="unfinished">Recording is disabled for %1</translation>
+      <translation>%1 video thể</translation>
     </message>
   </context>
   <context>
@@ -2599,7 +2609,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Mbit/s</source>
-      <translation type="unfinished">Mbit/s</translation>
+      <translation>Mbit/s</translation>
     </message>
     <message>
       <source>Less Settings</source>
@@ -3154,11 +3164,9 @@ to %1</source>
       <source>Ask your system administrator to do it.</source>
       <translation>Yêu cầu quản trị viên hệ thống của bạn làm điều đó.</translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>Set Password</source>
-      <translation>
-        <numerusform>Đặt mật khẩu</numerusform>
-      </translation>
+      <translation type="unfinished">Set Password</translation>
     </message>
   </context>
   <context>
@@ -4707,16 +4715,16 @@ to %1</source>
   <context>
     <name>QnPerformanceTest</name>
     <message>
-      <source>For full - featured mode, please use another computer</source>
-      <translation>Để dùng với chế độ đầy đủ tính năng, hãy sử dụng một máy tính khác</translation>
-    </message>
-    <message>
       <source>%1 can work in configuration mode only</source>
       <translation>%1 chỉ có thể hoạt động ở chế độ cấu hình</translation>
     </message>
     <message>
       <source>Performance of this computer allows running %1 in configuration mode only.</source>
       <translation>Hiệu năng của máy tính này chỉ cho phép chạy %1 ở chế độ cấu hình.</translation>
+    </message>
+    <message>
+      <source>For full-featured mode please use another computer</source>
+      <translation type="unfinished">For full-featured mode please use another computer</translation>
     </message>
   </context>
   <context>
@@ -5837,6 +5845,10 @@ to %1</source>
     <message>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
       <translation>Không thể đặt tùy chọn ghi "Motion + Low - Res".</translation>
+    </message>
+    <message>
+      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
+      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</translation>
     </message>
   </context>
   <context>
@@ -7079,10 +7091,6 @@ to %1</source>
   <context>
     <name>QnWearableProgressWidget</name>
     <message>
-      <source>Uploading %1... %2	%p%</source>
-      <translation type="unfinished">Uploading %1... %2	%p%</translation>
-    </message>
-    <message>
       <source>Stop uploading?</source>
       <translation type="unfinished">Stop uploading?</translation>
     </message>
@@ -7091,12 +7099,16 @@ to %1</source>
       <translation type="unfinished">Already uploaded files will be kept.</translation>
     </message>
     <message>
-      <source>Finalizing %1... %2	%p%</source>
-      <translation type="unfinished">Finalizing %1... %2	%p%</translation>
-    </message>
-    <message>
       <source>(%1 of %2)</source>
       <translation type="unfinished">(%1 of %2)</translation>
+    </message>
+    <message>
+      <source>Uploading %1...</source>
+      <translation type="unfinished">Uploading %1...</translation>
+    </message>
+    <message>
+      <source>Finalizing %1...</source>
+      <translation type="unfinished">Finalizing %1...</translation>
     </message>
   </context>
   <context>
@@ -7502,10 +7514,6 @@ to %1</source>
       <translation type="unfinished">Only video files with correct timestamp are supported.</translation>
     </message>
     <message>
-      <source>Not enough space on server storage</source>
-      <translation type="unfinished">Not enough space on server storage</translation>
-    </message>
-    <message>
       <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
       <translation type="unfinished">Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</translation>
     </message>
@@ -7568,34 +7576,70 @@ to %1</source>
       <translation type="unfinished">No new files to upload in selected folder</translation>
     </message>
     <message numerus="yes">
-      <source>Files size - %2</source>
-      <translation type="unfinished">
-        <numerusform>Files size - %2</numerusform>
+      <source>Selected files are too old</source>
+      <translation>
+        <numerusform>Các tệp đã chọn quá cũ</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation>
+        <numerusform>Tệp đã chọn đã được ghi lại trên %1, nhưng chỉ có thể tải lên các tệp được ghi lại trong %n ngày qua. Bạn có thể thay đổi điều này trong cài đặt lưu trữ trên camera.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation>
+        <numerusform>Tệp đã chọn đã được ghi lại trên %1, nhưng chỉ có thể tải lên các tệp được ghi lại trong %n ngày qua. Bạn có thể thay đổi điều này trong cài đặt lưu trữ trên camera.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Some footage may be deleted after uploading these files</source>
+      <translation>
+        <numerusform>Một số cảnh quay có thể bị xóa sau khi tải lên các tệp này</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
+      <translation>
+        <numerusform>Không còn nhiều không gian trống trên bộ nhớ máy chủ. Một số cảnh quay cũ có thể bị xóa để giải phóng không gian. Lưu ý rằng nếu tệp tin đã chọn xuất hiện lâu nhất trên máy chủ, chúng sẽ bị xóa ngay sau khi được tải lên.</numerusform>
       </translation>
     </message>
     <message>
-      <source>Free space - %2</source>
-      <translation type="unfinished">Free space - %2</translation>
+      <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
+      <translation>Để ngăn chặn điều này bạn có thể thêm bộ nhớ bổ sung. Bạn cũng có thể kiểm soát cảnh quay nào sẽ bị xóa đầu tiên bằng cách thay đổi kho lưu giữ thời gian trong cài đặt máy ảnh.</translation>
     </message>
     <message>
-      <source>%1 - has unsupported format.</source>
-      <translation type="unfinished">%1 - has unsupported format.</translation>
+      <source>Upload anyway?</source>
+      <translation>Upload mọi cách?</translation>
     </message>
     <message>
-      <source>%1 - does not have timestamp.</source>
-      <translation type="unfinished">%1 - does not have timestamp.</translation>
+      <source>Could not finish upload to %1</source>
+      <translation>Không thể hoàn tất tải lên %1</translation>
     </message>
     <message>
-      <source>%1 - covers period for which video has already been uploaded.</source>
-      <translation type="unfinished">%1 - covers period for which video has already been uploaded.</translation>
+      <source>Make sure there is enough space on server storage.</source>
+      <translation>Đảm bảo có đủ dung lượng trên bộ nhớ máy chủ.</translation>
     </message>
     <message>
-      <source>%1 - covers period for which video is being uploaded.</source>
-      <translation type="unfinished">%1 - covers period for which video is being uploaded.</translation>
+      <source>%1 has unsupported format.</source>
+      <translation type="unfinished">%1 has unsupported format.</translation>
     </message>
     <message>
-      <source>%1 - does not fit on server storage.</source>
-      <translation type="unfinished">%1 - does not fit on server storage.</translation>
+      <source>%1 does not have timestamp.</source>
+      <translation type="unfinished">%1 does not have timestamp.</translation>
+    </message>
+    <message>
+      <source>%1 is older than allowed in camera archive settings.</source>
+      <translation type="unfinished">%1 is older than allowed in camera archive settings.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video has already been uploaded.</source>
+      <translation type="unfinished">%1 covers period for which video has already been uploaded.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video is being uploaded.</source>
+      <translation type="unfinished">%1 covers period for which video is being uploaded.</translation>
     </message>
   </context>
   <context>

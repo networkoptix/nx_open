@@ -99,7 +99,7 @@ void StubMetadataManager::freeManifest(const char* data)
 StubMetadataManager::~StubMetadataManager()
 {
     stopFetchingMetadata();
-    std::cout << "Destroying Creating nx::mediaserver::plugins::StubMetadataManager "
+    std::cout << "Destroying nx::mediaserver::plugins::StubMetadataManager "
         << (uintptr_t) this << std::endl;
 }
 

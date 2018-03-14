@@ -644,42 +644,12 @@ CameraDiagnostics::Result QnPlAxisResource::initializeCameraDriver()
     return CameraDiagnostics::NoErrorResult();
 }
 
-QnPlAxisResource::AxisResolution QnPlAxisResource::getMaxResolution() const
-{
-    QnMutexLocker lock( &m_mutex );
-    return !m_resolutionList.isEmpty() ? m_resolutionList[0] : AxisResolution();
-}
-
 float QnPlAxisResource::getResolutionAspectRatio(const AxisResolution& resolution) const
 {
     if (!resolution.size.isEmpty())
         return resolution.size.width() / (float) resolution.size.height();
     else
         return 1.0;
-}
-
-
-QnPlAxisResource::AxisResolution QnPlAxisResource::getNearestResolution(const QSize& resolution, float aspectRatio) const
-{
-    QnMutexLocker lock( &m_mutex );
-
-    float requestSquare = resolution.width() * resolution.height();
-    int bestIndex = -1;
-    float bestMatchCoeff = (float)INT_MAX;
-    for (int i = 0; i < m_resolutionList.size(); ++ i)
-    {
-        float ar = getResolutionAspectRatio(m_resolutionList[i]);
-        if (aspectRatio != 0 && qAbs(ar-aspectRatio) > MAX_AR_EPS)
-            continue;
-        float square = m_resolutionList[i].size.width() * m_resolutionList[i].size.height();
-        float matchCoeff = qMax(requestSquare, square) / qMin(requestSquare, square);
-        if (matchCoeff < bestMatchCoeff)
-        {
-            bestIndex = i;
-            bestMatchCoeff = matchCoeff;
-        }
-    }
-    return bestIndex >= 0 ? m_resolutionList[bestIndex] : AxisResolution();
 }
 
 QRect QnPlAxisResource::getMotionWindow(int num) const
@@ -1609,23 +1579,26 @@ QMap<QString, QString> QnPlAxisResource::executeParamsQueries(const QSet<QString
     CLHttpStatus status;
     isSuccessful = true;
 
-    CLSimpleHTTPClient httpClient(
-        getHostAddress(),
-        QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT),
-        getNetworkTimeout(),
-        getAuth());
-
     for (const auto& query: queries)
     {
         if (QnResource::isStopping())
             break;
 
-        status = httpClient.doGET(query);
-        if ( status == CL_HTTP_SUCCESS )
-        {
-            QByteArray body;
-            httpClient.readAll( body );
+        QUrl url = lit("http://%1:%2/%3")
+            .arg(getHostAddress())
+            .arg(QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT))
+            .arg(query);
+        url.setUserName(getAuth().user());
+        url.setPassword(getAuth().password());
 
+        int statusCode = nx_http::StatusCode::undefined;
+        QByteArray body;
+        SystemError::ErrorCode errorCode = nx_http::downloadFileSync(
+            url,
+            &statusCode,
+            &body);
+        if (statusCode == nx_http::StatusCode::ok)
+        {
             if (body.startsWith("OK"))
                 continue;
 

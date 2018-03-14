@@ -5,7 +5,7 @@
     <name>AsyncImageWidget</name>
     <message>
         <source>NO DATA</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -57,7 +57,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Export bookmark</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -865,31 +865,31 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Start Analytics...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Some cameras require passwords to be set</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Export Video...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Export Bookmark...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Resolution...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Cell Aspect Ratio...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Cell Spacing...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -986,58 +986,58 @@ to view more bookmarks</source>
     <name>ExportSettingsDialog</name>
     <message>
         <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>AVI format is not recommended to export a non-continuous recording with audio track.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>You are about to export a long video. It may require over a gigabyte of HDD space and take several minutes to complete.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Local files, server monitor widgets and webpages will not be exported.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Settings are not available for .NOV and .EXE files.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>FileSystemStrings</name>
     <message>
         <source>Audio Video Interleave</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Matroska</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>MPEG-4 Part 14</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>%1 Media File</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Executable %1 Media File (x64)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Executable %1 Media File (x86)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1175,46 +1175,46 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
         <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Password should contain %n different combination of either characters, symbols, or digits</numerusform>
+            <numerusform>Password should contain %n different combinations of either characters, symbols, or digits</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Password must be at least %n characters long.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Password must be at least %n character long.</numerusform>
+            <numerusform>Password must be at least %n characters long.</numerusform>
         </translation>
     </message>
     <message>
         <source>Long</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <source>Password must be no longer than %n characters.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Password must be no longer than %n character.</numerusform>
+            <numerusform>Password must be no longer than %n characters.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Password should not contain %n or more consecutive characters together.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Password should not contain %n or more consecutive character together.</numerusform>
+            <numerusform>Password should not contain %n or more consecutive characters together.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Password should not contain %n or more repeating characters.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Password should not contain %n or more repeating character.</numerusform>
+            <numerusform>Password should not contain %n or more repeating characters.</numerusform>
         </translation>
     </message>
     <message>
         <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2239,22 +2239,22 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Web</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>No settings</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>QnCameraAnalyticsPolicy</name>
     <message>
         <source>Analytics is not available for %1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2358,7 +2358,14 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Edge</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
+    </message>
+    <message numerus="yes">
+        <source>This Id is already used on the following %n cameras: %1</source>
+        <translation>
+            <numerusform>This Id is already used on the following camera: %1</numerusform>
+            <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2478,6 +2485,10 @@ to view more bookmarks</source>
         <source>Server</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Logical Id</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>QnCameraMotionMaskWidget</name>
@@ -2514,7 +2525,7 @@ to view more bookmarks</source>
     <name>QnCameraMotionPolicy</name>
     <message>
         <source>Recording or motion detection is disabled for %1</source>
-        <translation type="unfinished">Recording or motion detection is disabled on %1</translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2537,31 +2548,31 @@ to view more bookmarks</source>
 <context>
     <name>QnCameraPasswordChangeDialog</name>
     <message>
-        <source>Password shouldn&apos;t be equal to camera&apos;s user name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>New Password</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Repeat Password</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Passwords do not match.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Password should be at least 8 symbols long and contain different types of characters.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Password should not be equal to camera&apos;s user name</source>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>QnCameraRecordingPolicy</name>
     <message>
         <source>Recording is disabled for %1</source>
-        <translation type="unfinished">Recording is disabled for %1.</translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2628,15 +2639,15 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Mbit/s</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Less Settings</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>More Settings</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2834,7 +2845,7 @@ to %1</source>
     </message>
     <message>
         <source>Account is not activated. Please check your email and follow provided instructions</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -3176,22 +3187,19 @@ to %1</source>
     <name>QnDefaultPasswordAlertBar</name>
     <message>
         <source>This camera requires password to be set up.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Some of selected cameras requires password to be set up.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Ask your system administrator to do it.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
-    <message numerus="yes">
+    <message>
         <source>Set Password</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -4236,9 +4244,9 @@ to %1</source>
     </message>
     <message numerus="yes">
         <source>Use licenses to view these %n cameras</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Use a license to view this camera</numerusform>
+            <numerusform>Use licenses to view these %n cameras</numerusform>
         </translation>
     </message>
 </context>
@@ -4485,9 +4493,9 @@ to %1</source>
     </message>
     <message numerus="yes">
         <source>Set for all %n Cameras</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Set for the camera</numerusform>
+            <numerusform>Set for all %n cameras</numerusform>
         </translation>
     </message>
 </context>
@@ -4640,7 +4648,7 @@ to %1</source>
     </message>
     <message>
         <source>NVR cameras do not support not-synchronized playback</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -4757,21 +4765,21 @@ to %1</source>
     </message>
     <message>
         <source>Set Passwords</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>QnPerformanceTest</name>
-    <message>
-        <source>For full - featured mode, please use another computer</source>
-        <translation></translation>
-    </message>
     <message>
         <source>%1 can work in configuration mode only</source>
         <translation></translation>
     </message>
     <message>
         <source>Performance of this computer allows running %1 in configuration mode only.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>For full-featured mode please use another computer</source>
         <translation></translation>
     </message>
 </context>
@@ -5908,6 +5916,10 @@ to %1</source>
         <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnSmtpAdvancedSettingsWidget</name>
@@ -6120,19 +6132,19 @@ to %1</source>
     </message>
     <message>
         <source>TOO MANY CONNECTIONS</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>PASSWORD REQUIRED</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Set for this Camera</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>UNSUPPORTED FIRMWARE VERSION</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -6556,7 +6568,7 @@ to %1</source>
     </message>
     <message>
         <source>Archive integrity problem detected</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -6624,11 +6636,11 @@ to %1</source>
     </message>
     <message>
         <source>System time is synchronized with the Internet and does not depend on local time on servers.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>System time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -7157,10 +7169,6 @@ to %1</source>
 <context>
     <name>QnWearableProgressWidget</name>
     <message>
-        <source>Uploading %1... %2	%p%</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Stop uploading?</source>
         <translation></translation>
     </message>
@@ -7169,12 +7177,16 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Finalizing %1... %2	%p%</source>
+        <source>(%1 of %2)</source>
         <translation></translation>
     </message>
     <message>
-        <source>(%1 of %2)</source>
-        <translation></translation>
+        <source>Uploading %1...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Finalizing %1...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7652,75 +7664,75 @@ to %1</source>
         <source>No new files to upload in selected folder</source>
         <translation></translation>
     </message>
-    <message>
-        <source>%1 - has unsupported format.</source>
-        <translation>%1 — has unsupported format.</translation>
-    </message>
-    <message>
-        <source>%1 - does not have timestamp.</source>
-        <translation>%1 — does not have timestamp.</translation>
-    </message>
-    <message>
-        <source>%1 - covers period for which video has already been uploaded.</source>
-        <translation>%1 — covers period for which video has already been uploaded.</translation>
-    </message>
-    <message>
-        <source>%1 - covers period for which video is being uploaded.</source>
-        <translation>%1 — covers period for which video is being uploaded.</translation>
-    </message>
     <message numerus="yes">
         <source>Selected files are too old</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Selected file is too old</numerusform>
+            <numerusform>Selected files are too old</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Selected file was recorded on %1, but only files that were recorded in the last 24 hours can be uploaded. You can change this in camera archive settings.</numerusform>
+            <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last 24 hours can be uploaded. You can change this in camera archive settings.</numerusform>
+            <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Some footage may be deleted after uploading these files</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Some footage may be deleted after uploading this file</numerusform>
+            <numerusform>Some footage may be deleted after uploading these files</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected file happens to be the oldest on the server, it will be deleted right after being uploaded.</numerusform>
+            <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
         </translation>
     </message>
     <message>
         <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Upload anyway?</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Could not finish upload to %1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Make sure there is enough space on server storage.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>%1 has unsupported format.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%1 - is older than allowed in camera archive settings.</source>
+        <source>%1 does not have timestamp.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 is older than allowed in camera archive settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 covers period for which video has already been uploaded.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 covers period for which video is being uploaded.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7969,193 +7981,193 @@ to %1</source>
     <name>nx::client::desktop::AnalyticsActionFactory</name>
     <message>
         <source>Dynamic</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>nx::client::desktop::ExportProcess</name>
     <message>
         <source>Unsupported media for data export.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Selected format is not supported by FFMPEG library.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>FFMPEG library error.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Video or audio codec is incompatible with selected format.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>File write error.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>No data exported.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Internal error</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>nx::client::desktop::ExportSettingsDialog</name>
     <message>
         <source>exported</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Rapid Review</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Export Settings</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Add Timestamp</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Delete Timestamp</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Timestamp</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Add Image</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Delete Image</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Image</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Add Text</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Delete Text</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Text</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Reset Speed</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Add Bookmark Info</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Delete Bookmark Info</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Bookmark Info</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>nx::client::desktop::FilenamePanel</name>
     <message>
         <source>Folder</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Name cannot be empty.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Select folder...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>nx::client::desktop::ImageOverlaySettingsWidget</name>
     <message>
         <source>Select file...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Pictures (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Image cannot be loaded.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>nx::client::desktop::LayoutThumbnailLoader</name>
     <message>
         <source>NO DATA</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>NOT A CAMERA</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>nx::client::desktop::RadassActionFactory</name>
     <message>
         <source>Auto</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Low</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>High</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Custom</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>nx::client::desktop::RadassActionHandler</name>
     <message>
         <source>Set layout resolution to &quot;Auto&quot; to increase performance.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>nx::client::desktop::RapidReviewSettingsWidget</name>
     <message numerus="yes">
         <source>For exporting as Rapid Review video length should be at least %n seconds.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>For exporting as Rapid Review video length should be at least %n second.</numerusform>
+            <numerusform>For exporting as Rapid Review video length should be at least %n seconds.</numerusform>
         </translation>
     </message>
 </context>
@@ -8163,11 +8175,11 @@ to %1</source>
     <name>nx::client::desktop::TimestampOverlaySettingsWidget</name>
     <message>
         <source>Long</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Short</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -8208,148 +8220,148 @@ to %1</source>
     <name>nx::client::desktop::WorkbenchAnalyticsController</name>
     <message>
         <source>%1 Analytics</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>nx::client::desktop::WorkbenchExportHandler</name>
     <message>
         <source>Stop Export</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Export completed</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Export failed</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Cannot write file</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>%1 is in use by another export.</source>
         <comment>%1 is file name</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Selected period cannot be exported for the current camera.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>nx::client::desktop::legacy::ExportLayoutTool</name>
     <message>
         <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Could not create output file %1...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Unknown error has occurred.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Exporting to &quot;%1&quot;...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Could not export device %1.</source>
         <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Could not export camera %1.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Could not export I/O module %1.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>nx::client::desktop::legacy::WorkbenchExportHandler</name>
     <message>
         <source>Executable %1 Media File (x64) (*.exe)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Executable %1 Media File (x86) (*.exe)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>File already used for recording</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Please choose another name or wait until recording is finished.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Exporting Layout</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>EXE format not recommended</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>EXE files over 4 GB cannot be opened by double click due to a Windows limitation.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Export to EXE anyway?</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Failed to export Multi-Video</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Local files not allowed for Multi-Video export</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Please remove all local files from the layout and try again.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Save local layout as...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>exported</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>%1 Media File (*.nov)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Make file read-only.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>nx::client::desktop::ui::AnalyticsSdkEventModel</name>
     <message>
         <source>No event types supported</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>nx::client::desktop::ui::AnalyticsSdkEventWidget</name>
     <message>
         <source>Event will trigger only if Analytics Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Analytics Event contains any keyword.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -8695,11 +8707,11 @@ to %1</source>
     </message>
     <message>
         <source>Failed to change password</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Failed to change password on %1 of %2 cameras</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>

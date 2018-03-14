@@ -752,6 +752,21 @@
       <source>PTZ</source>
       <translation>PTZ</translation>
     </message>
+    <message>
+      <location/>
+      <source>Generate</source>
+      <translation>Generar</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset</source>
+      <translation>Reiniciar</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Logical Id</source>
+      <translation type="unfinished">Logical Id</translation>
+    </message>
   </context>
   <context>
     <name>CameraInputBusinessEventWidget</name>
@@ -1788,8 +1803,8 @@
     </message>
     <message>
       <location/>
-      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
-      <translation>&quot;Cámara portátil&quot; es un almacenamiento virtual para archivos de video, que podría cargarse en cualquier servidor de su sistema y ser accesible para cualquier usuario.</translation>
+      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
     </message>
   </context>
   <context>
@@ -2668,12 +2683,6 @@
       <source>Reset</source>
       <translation>Reiniciar</translation>
     </message>
-    <message>
-      <location/>
-      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage.
-The oldest footage among all cameras on the server will be deleted first.</source>
-      <translation>El archivo cargado se puede eliminar automáticamente, si no hay espacio libre en el almacenamiento del servidor. Primero se eliminará el metraje más antiguo entre todas las cámaras del servidor.</translation>
-    </message>
   </context>
   <context>
     <name>SmtpAdvancedSettingsWidget</name>
@@ -3029,14 +3038,18 @@ The oldest footage among all cameras on the server will be deleted first.</sourc
     </message>
     <message>
       <location/>
-      <source>There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</source>
-      <translation>Todavía no hay roles de usuario personalizados. Cliquee &quot;Nuevo rol&quot; para crear uno.</translation>
+      <source>New role</source>
+      <translation>Nuevo rol</translation>
     </message>
     <message>
       <location/>
-      <source>New role</source>
-      <translation>Nuevo rol</translation>
+      <source>There are no custom user roles yet.</source>
+      <translation type="unfinished">There are no custom user roles yet.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Click &quot;New role&quot; button to create one.</source>
+      <translation type="unfinished">Click &quot;New role&quot; button to create one.</translation>
     </message>
   </context>
   <context>

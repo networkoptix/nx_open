@@ -1937,11 +1937,12 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(Medi
     NX_LOGX(QString(lit("ONVIF debug: got %1 encoders for camera %2")).arg(optionsList.size()).arg(getHostAddress()), cl_logDEBUG1);
 
     bool dualStreamingAllowed = optionsList.size() >= 2;
+
+    QnMutexLocker lock(&m_mutex);
     m_secondaryStreamCapabilities = VideoOptionsLocal();
     if (dualStreamingAllowed)
     {
         int secondaryIndex = channelProfiles.isEmpty() ? getSecondaryIndex(optionsList) : 1;
-        QnMutexLocker lock( &m_mutex );
         m_secondaryStreamCapabilities = optionsList[secondaryIndex];
     }
 
@@ -2668,6 +2669,14 @@ void QnPlOnvifResource::fetchAndSetAdvancedParameters() {
 
     QSet<QString> supportedParams = calculateSupportedAdvancedParameters();
     m_advancedParametersProvider.assign(params.filtered(supportedParams));
+}
+
+CameraDiagnostics::Result QnPlOnvifResource::sendVideoEncoderToCameraEx(
+    VideoEncoder& encoder,
+    Qn::StreamIndex /*streamIndex*/,
+    const QnLiveStreamParams& /*params*/)
+{
+    return sendVideoEncoderToCamera(encoder);
 }
 
 CameraDiagnostics::Result QnPlOnvifResource::sendVideoEncoderToCamera(VideoEncoder& encoder)

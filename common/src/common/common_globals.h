@@ -874,12 +874,10 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     {
         NoEvent,
 
-        startErrorEvent = 100,
-        TooManyOpenedConnectionsError,
-        ForbiddentBecauseDefaultPasswordError,
-        ForbiddenBecauseNoLicenseError,
-        oldFirmwareError,
-        endErrorEvent = 199,
+        TooManyOpenedConnections,
+        ForbiddenWithDefaultPassword,
+        ForbiddenWithNoLicense,
+        oldFirmware,
     };
     QString toString(MediaStreamEvent value);
 

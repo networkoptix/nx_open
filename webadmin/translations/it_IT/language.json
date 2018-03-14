@@ -210,7 +210,7 @@
             "ieNoWebm": "Please, install <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> for Internet Explorer.",
             "flashOrWebmRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> or<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> for playing video in Internet Explorer.",
             "noArmSupport": "This browser or device does not support video playback from ARM-based servers.",
-            "error": "Error",
+            "error": "Errore",
             "offline": "Offline",
             "noData": "No data",
             "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing videos."
