@@ -127,11 +127,15 @@ buildDistribution()
     cp_mediaserver_bins "external.dat" "plugins" "vox"
     ln -s "../lib" "${BOX_MNT}$BOX_MEDIASERVER_DIR/lib" #< rpath: [$ORIGIN/..lib]
 
-    echo "Copying tegra_video"
+    echo "Copying tegra_video analytics"
     cp_package_libs "tegra_video" #< Tegra-specific plugin for video decoding and neural networks.
     cp_files "$SOURCE_ROOT_PATH/$NVIDIA_MODELS_PATH" "*" "$BOX_NVIDIA_MODELS_DIR" #< Demo neural networks.
 
-    rm "${BOX_MNT}$BOX_MEDIASERVER_DIR/bin/plugins"/libstub_metadata_plugin.so*
+    echo "Disabling (renaming) unneeded metadata plugins"
+    ( cd "${BOX_MNT}$BOX_MEDIASERVER_DIR/bin/plugins"
+        mv libstub_metadata_plugin.so libstub_metadata_plugin.so_DISABLED
+        mv libtegra_video_metadata_plugin.so libtegra_video_metadata_plugin.so_DISABLED
+    )
 
     echo "Copying desktop_client"
     cp_desktop_client_bins "$DESKTOP_CLIENT_BIN"
