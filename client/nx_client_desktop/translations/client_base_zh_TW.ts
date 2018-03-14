@@ -5852,6 +5852,10 @@ to %1</source>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
       <translation>&quot;位移主串流+全時次串流&quot; 選項無法使用.</translation>
     </message>
+    <message>
+      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
+      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</translation>
+    </message>
   </context>
   <context>
     <name>QnSmtpAdvancedSettingsWidget</name>
@@ -7093,10 +7097,6 @@ to %1</source>
   <context>
     <name>QnWearableProgressWidget</name>
     <message>
-      <source>Uploading %1... %2	%p%</source>
-      <translation>正在上傳 %1... %2 %p%</translation>
-    </message>
-    <message>
       <source>Stop uploading?</source>
       <translation>是否停止上傳?</translation>
     </message>
@@ -7105,12 +7105,16 @@ to %1</source>
       <translation>已經上傳的檔案將被保存.</translation>
     </message>
     <message>
-      <source>Finalizing %1... %2	%p%</source>
-      <translation>正在完成 %1... %2 %p%</translation>
-    </message>
-    <message>
       <source>(%1 of %2)</source>
       <translation>(%1 of %2)</translation>
+    </message>
+    <message>
+      <source>Uploading %1...</source>
+      <translation type="unfinished">Uploading %1...</translation>
+    </message>
+    <message>
+      <source>Finalizing %1...</source>
+      <translation type="unfinished">Finalizing %1...</translation>
     </message>
   </context>
   <context>

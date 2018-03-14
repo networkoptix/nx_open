@@ -41,6 +41,7 @@ void P2pMessageBusTestBase::createData(
     int userCount)
 {
     const auto connection = server->moduleInstance()->ecConnection();
+    ASSERT_TRUE(connection != nullptr);
     auto messageProcessor = server->moduleInstance()->commonModule()->messageProcessor();
 
     initResourceTypes(connection);

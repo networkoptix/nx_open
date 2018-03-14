@@ -5846,6 +5846,10 @@ to %1</source>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
       <translation>"모션 + 낮은-해상도" 녹화 옵션을 설정할 수 없습니다.</translation>
     </message>
+    <message>
+      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
+      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</translation>
+    </message>
   </context>
   <context>
     <name>QnSmtpAdvancedSettingsWidget</name>
@@ -7087,10 +7091,6 @@ to %1</source>
   <context>
     <name>QnWearableProgressWidget</name>
     <message>
-      <source>Uploading %1... %2	%p%</source>
-      <translation>업로드 중 %1... %2	%p%</translation>
-    </message>
-    <message>
       <source>Stop uploading?</source>
       <translation>전송을 중지 하겠습니까?</translation>
     </message>
@@ -7099,12 +7099,16 @@ to %1</source>
       <translation>이미 업로드 된 파일은 보관됩니다.</translation>
     </message>
     <message>
-      <source>Finalizing %1... %2	%p%</source>
-      <translation>마무리중 %1... %2	%p%</translation>
-    </message>
-    <message>
       <source>(%1 of %2)</source>
       <translation>(%2 의 %1)</translation>
+    </message>
+    <message>
+      <source>Uploading %1...</source>
+      <translation type="unfinished">Uploading %1...</translation>
+    </message>
+    <message>
+      <source>Finalizing %1...</source>
+      <translation type="unfinished">Finalizing %1...</translation>
     </message>
   </context>
   <context>
@@ -7619,23 +7623,23 @@ to %1</source>
     </message>
     <message>
       <source>%1 has unsupported format.</source>
-      <translation type="unfinished">%1 has unsupported format.</translation>
+      <translation>%1 은 지원하지 않는 형식입니다.</translation>
     </message>
     <message>
       <source>%1 does not have timestamp.</source>
-      <translation type="unfinished">%1 does not have timestamp.</translation>
+      <translation>%1 은 타임스탬프가 없습니다.</translation>
     </message>
     <message>
       <source>%1 is older than allowed in camera archive settings.</source>
-      <translation type="unfinished">%1 is older than allowed in camera archive settings.</translation>
+      <translation>%1 은 카메라 보관 설정에서 허용 된 것보다 오래되었습니다.</translation>
     </message>
     <message>
       <source>%1 covers period for which video has already been uploaded.</source>
-      <translation type="unfinished">%1 covers period for which video has already been uploaded.</translation>
+      <translation>%1 커버 기간은 동영상 이미 업로드 된 기간입니다.</translation>
     </message>
     <message>
       <source>%1 covers period for which video is being uploaded.</source>
-      <translation type="unfinished">%1 covers period for which video is being uploaded.</translation>
+      <translation>%1 커버 기간은 동영상 이미 업로드 되는 기간입니다.</translation>
     </message>
   </context>
   <context>
@@ -8072,7 +8076,7 @@ to %1</source>
     </message>
     <message>
       <source>Could not calculate md5 for file &quot;%1&quot;</source>
-      <translation> &quot;%1&quot; 파일에 대한 md5를 계산할 수 없습니다</translation>
+      <translation>&quot;%1&quot; 파일에 대한 md5를 계산할 수 없습니다</translation>
     </message>
     <message>
       <source>Could not create upload on the server side</source>

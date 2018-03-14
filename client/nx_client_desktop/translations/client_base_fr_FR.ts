@@ -980,7 +980,7 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
-      <translation>ID matériel du Server avec cette licence ne correspond pas à l'ID matériel sur lequel la licence a été activée.</translation>
+      <translation>Id Matériel du Server avec cette licence ne correspond pas à l'Id Matériel sur lequel la licence a été activée.</translation>
     </message>
   </context>
   <context>
@@ -2230,11 +2230,11 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>I/O Module Id</source>
-      <translation>ID Modules I/O</translation>
+      <translation>Id Modules I/O</translation>
     </message>
     <message>
       <source>Camera Id</source>
-      <translation>ID Caméra</translation>
+      <translation>Id Caméra</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -2963,7 +2963,7 @@ to %1</source>
     </message>
     <message>
       <source>The username or password you have entered is incorrect. Please try again.</source>
-      <translation>L'ID ou le mot de passe que vous avez entré est incorrect, S.V.P. réessayez .</translation>
+      <translation>L'Id ou le mot de passe que vous avez entré est incorrect, S.V.P. réessayez.</translation>
     </message>
     <message>
       <source>Unable to connect to the server</source>
@@ -3721,7 +3721,7 @@ to %1</source>
     </message>
     <message>
       <source>Id</source>
-      <translation>ID</translation>
+      <translation>Id</translation>
     </message>
   </context>
   <context>
@@ -3904,7 +3904,7 @@ to %1</source>
     </message>
     <message>
       <source>Locked to Hardware Id</source>
-      <translation>Verrouillé sur ID Matériel</translation>
+      <translation>Verrouillé sur Id Matériel</translation>
     </message>
   </context>
   <context>
@@ -4180,11 +4180,11 @@ to %1</source>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware Id %1</source>
-      <translation>Cette licence est déjà activée et liée au ID Matériel %1</translation>
+      <translation>Cette licence est déjà activée et liée au Id Matériel %1</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware Id %1 on %2</source>
-      <translation>Cette licence est déjà activée et liée au ID Matériel %1 sur %2</translation>
+      <translation>Cette licence est déjà activée et liée au Id Matériel %1 sur %2</translation>
     </message>
     <message>
       <source>If the problem persists please contact Customer Support.</source>
@@ -4215,11 +4215,11 @@ to %1</source>
     </message>
     <message>
       <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>S.V.P envoyer courriel avec clé de licence et ID matériel fourni à %1 pour obtenir un fichier de clé d’activation.</translation>
+      <translation>S.V.P envoyer courriel avec clé de licence et Id Matériel fourni à %1 pour obtenir un fichier de clé d’activation.</translation>
     </message>
     <message>
       <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>S.V.P envoyer clé de licence et ID matériel fourni à %1 pour obtenir un fichier de clé d’activation.</translation>
+      <translation>S.V.P envoyer clé de licence et Id Matériel fourni à %1 pour obtenir un fichier de clé d’activation.</translation>
     </message>
   </context>
   <context>
@@ -5920,6 +5920,10 @@ to %1</source>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
       <translation>Enregistrement &quot; Mouv. + Basse-Res.&quot; ne peut pas être définie.</translation>
     </message>
+    <message>
+      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
+      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</translation>
+    </message>
   </context>
   <context>
     <name>QnSmtpAdvancedSettingsWidget</name>
@@ -7169,10 +7173,6 @@ to %1</source>
   <context>
     <name>QnWearableProgressWidget</name>
     <message>
-      <source>Uploading %1... %2	%p%</source>
-      <translation>Envoie %1... %2	%p%</translation>
-    </message>
-    <message>
       <source>Stop uploading?</source>
       <translation>Arrêter l'envoie?</translation>
     </message>
@@ -7181,12 +7181,16 @@ to %1</source>
       <translation>Fichiers déjà envoyés seront conservés.</translation>
     </message>
     <message>
-      <source>Finalizing %1... %2	%p%</source>
-      <translation>Finalisation %1... %2	%p%</translation>
-    </message>
-    <message>
       <source>(%1 of %2)</source>
       <translation>(%1 sur %2)</translation>
+    </message>
+    <message>
+      <source>Uploading %1...</source>
+      <translation type="unfinished">Uploading %1...</translation>
+    </message>
+    <message>
+      <source>Finalizing %1...</source>
+      <translation type="unfinished">Finalizing %1...</translation>
     </message>
   </context>
   <context>

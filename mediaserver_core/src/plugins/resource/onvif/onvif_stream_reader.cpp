@@ -423,8 +423,9 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(
 
     int triesLeft = m_onvifRes->getMaxOnvifRequestTries();
     CameraDiagnostics::Result result = CameraDiagnostics::UnknownErrorResult();
-    while ((result.errorCode != CameraDiagnostics::ErrorCode::noError) && --triesLeft >= 0) {
-        result = m_onvifRes->sendVideoEncoderToCamera(*encoderParamsToSet);
+    while ((result.errorCode != CameraDiagnostics::ErrorCode::noError) && --triesLeft >= 0)
+    {
+        result = m_onvifRes->sendVideoEncoderToCameraEx(*encoderParamsToSet, streamIndex, params);
         if (result.errorCode != CameraDiagnostics::ErrorCode::noError)
             msleep(300);
     }

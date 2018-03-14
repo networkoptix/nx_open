@@ -103,6 +103,35 @@ public:
     QnSharedResourcePointer<VideoCameraMock> m_videoCamera;
 };
 
+class EmptyLiveStreamParameters: public CameraTest
+{
+public:
+    EmptyLiveStreamParameters()
+    {
+        m_camera = newCamera(
+            [](CameraMock* camera)
+        {
+        });
+        NX_ASSERT(m_camera);
+        m_camera->setId(QnUuid::createUuid());
+
+        m_videoCamera.reset(new VideoCameraMock(m_camera));
+        m_videoCamera->init();
+    }
+
+    QnSharedResourcePointer<CameraMock> m_camera;
+    QnSharedResourcePointer<VideoCameraMock> m_videoCamera;
+};
+
+TEST_F(EmptyLiveStreamParameters, checkDefaultQuality)
+{
+    auto primaryParams = m_videoCamera->getPrimaryReader()->getLiveParams();
+    EXPECT_EQ(Qn::QualityNormal, primaryParams.quality);
+
+    auto secondaryParams = m_videoCamera->getSecondaryReader()->getLiveParams();
+    EXPECT_EQ(Qn::QualityLow, secondaryParams.quality);
+}
+
 TEST_F(LiveStreamParameters, mergeWithEmptyParams)
 {
     QnLiveStreamParams params;

@@ -1,5 +1,4 @@
-#ifndef VIDEOWALL_MANAGE_WIDGET_H
-#define VIDEOWALL_MANAGE_WIDGET_H
+#pragma once
 
 #include <QtWidgets/QWidget>
 
@@ -17,23 +16,29 @@ class QAbstractAnimation;
 
 class QnVideowallManageWidgetPrivate;
 
-class QnVideowallManageWidget : public QWidget, protected  DragProcessHandler, protected AnimationTimerListener {
+class QnVideowallManageWidget: public QWidget,
+    protected DragProcessHandler,
+    protected AnimationTimerListener
+{
     Q_OBJECT
     Q_PROPERTY(QnVideowallManageWidgetColors colors READ colors WRITE setColors)
 
     typedef QWidget base_type;
 public:
-    explicit QnVideowallManageWidget(QWidget *parent = 0);
+    explicit QnVideowallManageWidget(QWidget* parent = 0);
     virtual ~QnVideowallManageWidget();
 
-    const QnVideowallManageWidgetColors &colors() const;
-    void setColors(const QnVideowallManageWidgetColors &colors);
+    const QnVideowallManageWidgetColors& colors() const;
+    void setColors(const QnVideowallManageWidgetColors& colors);
 
-    void loadFromResource(const QnVideoWallResourcePtr &videowall);
-    void submitToResource(const QnVideoWallResourcePtr &videowall); 
+    QList<QRect> screenGeometries() const;
+    void setScreenGeometries(const QList<QRect>& value);
+
+    void loadFromResource(const QnVideoWallResourcePtr& videowall);
+    void submitToResource(const QnVideoWallResourcePtr& videowall);
 
     virtual QSize minimumSizeHint() const;
-    /** Count of videowall items that is proposed to be on this PC. */	
+    /** Count of videowall items that is proposed to be on this PC. */
     int proposedItemsCount() const;
 
 signals:
@@ -42,26 +47,25 @@ signals:
 protected:
     Q_DECLARE_PRIVATE(QnVideowallManageWidget);
 
-    virtual void paintEvent(QPaintEvent *event) override;
+    virtual void paintEvent(QPaintEvent* event) override;
 
-    virtual bool eventFilter(QObject *target, QEvent *event) override;
+    virtual bool eventFilter(QObject* target, QEvent* event) override;
 
-    virtual void startDrag(DragInfo *info) override;
-    virtual void dragMove(DragInfo *info) override;
-    virtual void finishDrag(DragInfo *info) override;
+    virtual void startDrag(DragInfo* info) override;
+    virtual void dragMove(DragInfo* info) override;
+    virtual void finishDrag(DragInfo* info) override;
 
-    virtual void mousePressEvent(QMouseEvent *event) override;
-    virtual void mouseReleaseEvent(QMouseEvent *event) override;
-    virtual void mouseMoveEvent(QMouseEvent *event) override;
+    virtual void mousePressEvent(QMouseEvent* event) override;
+    virtual void mouseReleaseEvent(QMouseEvent* event) override;
+    virtual void mouseMoveEvent(QMouseEvent* event) override;
 
     virtual void tick(int deltaTime) override;
 
 private:
     QScopedPointer<QnVideowallManageWidgetPrivate> d_ptr;
-    DragProcessor *m_dragProcessor;
+    DragProcessor* m_dragProcessor;
     bool m_skipReleaseEvent;
     Qt::MouseButtons m_pressedButtons;
     QnVideowallManageWidgetColors m_colors;
+    QList<QRect> m_screenGeometries;
 };
-
-#endif // VIDEOWALL_MANAGE_WIDGET_H

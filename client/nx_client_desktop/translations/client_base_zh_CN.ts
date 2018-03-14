@@ -5847,6 +5847,10 @@ to %1</source>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
       <translation>&quot;移动主码流 + 连续子码流&quot;录像选项不能设置。</translation>
     </message>
+    <message>
+      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
+      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</translation>
+    </message>
   </context>
   <context>
     <name>QnSmtpAdvancedSettingsWidget</name>
@@ -7088,10 +7092,6 @@ to %1</source>
   <context>
     <name>QnWearableProgressWidget</name>
     <message>
-      <source>Uploading %1... %2	%p%</source>
-      <translation>上传 %1... %2	%p％</translation>
-    </message>
-    <message>
       <source>Stop uploading?</source>
       <translation>停止上传？</translation>
     </message>
@@ -7100,12 +7100,16 @@ to %1</source>
       <translation>已经上传的文件将被保留。</translation>
     </message>
     <message>
-      <source>Finalizing %1... %2	%p%</source>
-      <translation>正在完成 %1... %2	%p％</translation>
-    </message>
-    <message>
       <source>(%1 of %2)</source>
       <translation>(%1 of %2)</translation>
+    </message>
+    <message>
+      <source>Uploading %1...</source>
+      <translation type="unfinished">Uploading %1...</translation>
+    </message>
+    <message>
+      <source>Finalizing %1...</source>
+      <translation type="unfinished">Finalizing %1...</translation>
     </message>
   </context>
   <context>

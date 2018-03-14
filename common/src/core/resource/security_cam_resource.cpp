@@ -146,11 +146,6 @@ bool QnSecurityCamResource::setProperty(
 	return QnResource::setProperty(key, value, options);
 }
 
-bool QnSecurityCamResource::removeProperty(const QString& key)
-{
-	return QnResource::removeProperty(key);
-}
-
 bool QnSecurityCamResource::isGroupPlayOnly() const {
     return hasParam(Qn::kGroupPlayParamName);
 }
@@ -1274,31 +1269,22 @@ bool QnSecurityCamResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &s
         return false;
 
     bool result = base_type::mergeResourcesIfNeeded(source);
+    const auto mergeValue =
+        [&](auto getter, auto setter)
+        {
+            const auto thisValue = (this->*getter)();
+            const auto newValue = (camera->*getter)();
+            if (newValue != thisValue && !newValue.isEmpty())
+            {
+                (this->*setter)(newValue);
+                result = true;
+            }
+        };
 
-    if (getGroupId() != camera->getGroupId())
-    {
-        // Group ID can be changed for ONVIF resource because if we unauthorized,
-        // maxChannels is not accessible.
-        setGroupId(camera->getGroupId());
-        result = true;
-    }
-    if (getGroupName().isEmpty() && getGroupName() != camera->getGroupName())
-    {
-        setGroupName(camera->getGroupName());
-        result = true;
-    }
-
-    if (getModel() != camera->getModel() && !camera->getModel().isEmpty())
-    {
-        setModel(camera->getModel());
-        result = true;
-    }
-    if (getVendor() != camera->getVendor() && !camera->getVendor().isEmpty())
-    {
-        setVendor(camera->getVendor());
-        result = true;
-    }
-
+    mergeValue(&QnSecurityCamResource::getGroupId, &QnSecurityCamResource::setGroupId);
+    mergeValue(&QnSecurityCamResource::getGroupName, &QnSecurityCamResource::setGroupName);
+    mergeValue(&QnSecurityCamResource::getModel, &QnSecurityCamResource::setModel);
+    mergeValue(&QnSecurityCamResource::getVendor, &QnSecurityCamResource::setVendor);
     return result;
 }
 
@@ -1505,8 +1491,8 @@ Qn::MediaStreamEvent QnSecurityCamResource::checkForErrors() const
 {
     const auto capabilities = getCameraCapabilities();
     if (capabilities.testFlag(Qn::isDefaultPasswordCapability))
-        return Qn::MediaStreamEvent::ForbiddentBecauseDefaultPasswordError;
+        return Qn::MediaStreamEvent::ForbiddenWithDefaultPassword;
     if (capabilities.testFlag(Qn::isOldFirmwareCapability))
-        return Qn::MediaStreamEvent::oldFirmwareError;
+        return Qn::MediaStreamEvent::oldFirmware;
     return Qn::MediaStreamEvent::NoEvent;
 }

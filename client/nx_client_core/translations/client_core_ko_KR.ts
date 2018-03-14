@@ -29,8 +29,7 @@
     </message>
     <message>
       <source>Unknown realm.</source>
-      <translation>Text for Translation
-Unknown realm.</translation>
+      <translation>Unknown realm.</translation>
     </message>
     <message>
       <source>Bad request.</source>

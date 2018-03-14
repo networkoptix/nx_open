@@ -2683,12 +2683,6 @@
       <source>Reset</source>
       <translation>リセット</translation>
     </message>
-    <message>
-      <location/>
-      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage.
-The oldest footage among all cameras on the server will be deleted first.</source>
-      <translation>アップロードされたアーカイブは、サーバーストレージに空き容量がない場合、自動的に削除されます　サーバー上のすべてのカメラの中で最も古い映像が最初に削除されます</translation>
-    </message>
   </context>
   <context>
     <name>SmtpAdvancedSettingsWidget</name>
@@ -3044,14 +3038,18 @@ The oldest footage among all cameras on the server will be deleted first.</sourc
     </message>
     <message>
       <location/>
-      <source>There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</source>
-      <translation>カスタムユーザーの役割はまだありません　 &quot;新しい役割&quot;ボタンをクリックして作成してください</translation>
+      <source>New role</source>
+      <translation>新しい役割</translation>
     </message>
     <message>
       <location/>
-      <source>New role</source>
-      <translation>新しい役割</translation>
+      <source>There are no custom user roles yet.</source>
+      <translation type="unfinished">There are no custom user roles yet.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Click &quot;New role&quot; button to create one.</source>
+      <translation type="unfinished">Click &quot;New role&quot; button to create one.</translation>
     </message>
   </context>
   <context>

@@ -2683,12 +2683,6 @@
       <source>Reset</source>
       <translation>Reset</translation>
     </message>
-    <message>
-      <location/>
-      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage.
-The oldest footage among all cameras on the server will be deleted first.</source>
-      <translation>Het geüploade archief kan automatisch worden verwijderd als er geen vrije ruimte meer is op de serveropslag. De oudste beelden van alle camera's op de server worden eerst verwijderd.</translation>
-    </message>
   </context>
   <context>
     <name>SmtpAdvancedSettingsWidget</name>
@@ -3044,14 +3038,18 @@ The oldest footage among all cameras on the server will be deleted first.</sourc
     </message>
     <message>
       <location/>
-      <source>There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</source>
-      <translation>Er zijn nog geen aangepaste gebruikersprofielen. Klik op de &quot;Nieuwe rol&quot; knop om deze aan ​​te maken.</translation>
+      <source>New role</source>
+      <translation>Nieuwe profiel</translation>
     </message>
     <message>
       <location/>
-      <source>New role</source>
-      <translation>Nieuwe profiel</translation>
+      <source>There are no custom user roles yet.</source>
+      <translation type="unfinished">There are no custom user roles yet.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Click &quot;New role&quot; button to create one.</source>
+      <translation type="unfinished">Click &quot;New role&quot; button to create one.</translation>
     </message>
   </context>
   <context>

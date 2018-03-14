@@ -348,7 +348,7 @@ bool QnMServerResourceDiscoveryManager::hasIpConflict(const QSet<QnNetworkResour
         if (!camera || !camera->needCheckIpConflicts())
             continue;
 
-        QString groupId = camera->getGroupId().isEmpty() ? camera->getId().toString() : camera->getGroupId();
+        QString groupId = camera->getGroupId().isEmpty() ? camera->getPhysicalId() : camera->getGroupId();
         cameraGroups << groupId;
         portList << QUrl(camera->getUrl()).port();
 

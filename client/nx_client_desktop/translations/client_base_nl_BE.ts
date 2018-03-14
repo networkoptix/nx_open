@@ -2229,11 +2229,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>I/O Module Id</source>
-      <translation>I/O Module ID</translation>
+      <translation>I/O Module Id</translation>
     </message>
     <message>
       <source>Camera Id</source>
-      <translation>Camera ID</translation>
+      <translation>Camera Id</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -2360,9 +2360,9 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>This Id is already used on the following %n cameras: %1</source>
-      <translation type="unfinished">
-        <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
-        <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
+      <translation>
+        <numerusform>Deze Id wordt al gebruikt op de volgende %n camera's: %1</numerusform>
+        <numerusform>Deze Id wordt al gebruikt op de volgende %n camera's: %1</numerusform>
       </translation>
     </message>
   </context>
@@ -2485,7 +2485,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Logical Id</source>
-      <translation type="unfinished">Logical Id</translation>
+      <translation>Logische Id</translation>
     </message>
   </context>
   <context>
@@ -2563,7 +2563,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Password should not be equal to camera&apos;s user name</source>
-      <translation type="unfinished">Password should not be equal to camera&apos;s user name</translation>
+      <translation>Wachtwoord mag niet gelijk zijn aan de gebruikersnaam van de camera&apos;s</translation>
     </message>
   </context>
   <context>
@@ -3716,7 +3716,7 @@ to %1</source>
     </message>
     <message>
       <source>Id</source>
-      <translation>ID</translation>
+      <translation>Id</translation>
     </message>
   </context>
   <context>
@@ -4175,7 +4175,7 @@ to %1</source>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware Id %1</source>
-      <translation>Deze licentie is al geactiveerd en gekoppeld aan hardware Id %1</translation>
+      <translation>Deze licentie is al geactiveerd en gekoppeld aan Hardware Id %1</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware Id %1 on %2</source>
@@ -4214,7 +4214,7 @@ to %1</source>
     </message>
     <message>
       <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>Stuur alsjeblieft een e-mail met de licentiecode en het hardware-ID dat is verstrekt aan %1 om een ​​activatie bestand te verkrijgen.</translation>
+      <translation>Stuur alsjeblieft een e-mail met de licentiecode en het Hardware-Id dat is verstrekt aan %1 om een ​​activatie bestand te verkrijgen.</translation>
     </message>
   </context>
   <context>
@@ -4474,7 +4474,7 @@ to %1</source>
     </message>
     <message>
       <source>Lo-Res</source>
-      <translation>Low-Res</translation>
+      <translation>Lo-Res</translation>
     </message>
     <message>
       <source>Failed to invoke trigger %1 (%2)</source>
@@ -5915,6 +5915,10 @@ to %1</source>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
       <translation>&quot;Motion + Low - Res&quot; opnameoptie kan niet worden ingesteld.</translation>
     </message>
+    <message>
+      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
+      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</translation>
+    </message>
   </context>
   <context>
     <name>QnSmtpAdvancedSettingsWidget</name>
@@ -7164,10 +7168,6 @@ to %1</source>
   <context>
     <name>QnWearableProgressWidget</name>
     <message>
-      <source>Uploading %1... %2	%p%</source>
-      <translation>Uploaden %1... %2	%p%</translation>
-    </message>
-    <message>
       <source>Stop uploading?</source>
       <translation>Stoppen met uploaden?</translation>
     </message>
@@ -7176,12 +7176,16 @@ to %1</source>
       <translation>Reeds geuploade bestanden worden bewaard.</translation>
     </message>
     <message>
-      <source>Finalizing %1... %2	%p%</source>
-      <translation>Afronden %1... %2	%p%</translation>
-    </message>
-    <message>
       <source>(%1 of %2)</source>
       <translation>(%1 van %2)</translation>
+    </message>
+    <message>
+      <source>Uploading %1...</source>
+      <translation type="unfinished">Uploading %1...</translation>
+    </message>
+    <message>
+      <source>Finalizing %1...</source>
+      <translation type="unfinished">Finalizing %1...</translation>
     </message>
   </context>
   <context>
@@ -7712,23 +7716,23 @@ to %1</source>
     </message>
     <message>
       <source>%1 has unsupported format.</source>
-      <translation type="unfinished">%1 has unsupported format.</translation>
+      <translation>%1 heeft een niet-ondersteund formaat.</translation>
     </message>
     <message>
       <source>%1 does not have timestamp.</source>
-      <translation type="unfinished">%1 does not have timestamp.</translation>
+      <translation>%1 heeft geen tijdstempel.</translation>
     </message>
     <message>
       <source>%1 is older than allowed in camera archive settings.</source>
-      <translation type="unfinished">%1 is older than allowed in camera archive settings.</translation>
+      <translation>%1 is ouder dan toegestaan ​​in de camera-archiefinstellingen.</translation>
     </message>
     <message>
       <source>%1 covers period for which video has already been uploaded.</source>
-      <translation type="unfinished">%1 covers period for which video has already been uploaded.</translation>
+      <translation>%1 bevat een periode waarvoor de video al is geüpload.</translation>
     </message>
     <message>
       <source>%1 covers period for which video is being uploaded.</source>
-      <translation type="unfinished">%1 covers period for which video is being uploaded.</translation>
+      <translation>%1 bevat een periode waarvoor video wordt geüpload.</translation>
     </message>
   </context>
   <context>
