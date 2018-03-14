@@ -29,7 +29,7 @@ restores password
     ${email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${email}    ${password}
-    ${link}    Get Activation Link    ${email}
+    ${link}    Get Email Link    ${email}    activate
     Go To    ${link}[1]
     Go To    ${url}/restore_password
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
@@ -50,13 +50,13 @@ should be able to set new password (which is same as old), redirect
     ${email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${email}    ${password}
-    ${link}    Get Activation Link    ${email}
+    ${link}    Get Email Link    ${email}    activate
     Go To    ${link}[1]
     Go To    ${url}/restore_password
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
     Click Button    ${RESET PASSWORD BUTTON}
-    ${link}    Get Reset Password Link    ${email}
+    ${link}    Get Email Link    ${email}    reset
     Go To    ${link}[1]
     Wait Until Elements Are Visible    ${RESET PASSWORD INPUT}    ${SAVE PASSWORD}
     Input Text    ${RESET PASSWORD INPUT}    ${password}
@@ -69,13 +69,13 @@ should set new password, login with new password
     ${email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${email}    ${password}
-    ${link}    Get Activation Link    ${email}
+    ${link}    Get Email Link    ${email}    activate
     Go To    ${link}[1]
     Go To    ${url}/restore_password
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
     Click Button    ${RESET PASSWORD BUTTON}
-    ${link}    Get Reset Password Link    ${email}
+    ${link}    Get Email Link    ${email}    reset
     Go To    ${link}[1]
     Wait Until Elements Are Visible    ${RESET PASSWORD INPUT}    ${SAVE PASSWORD}
     Input Text    ${RESET PASSWORD INPUT}    ${ALT PASSWORD}
@@ -91,13 +91,13 @@ should not allow to use one restore link twice
     ${email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${email}    ${password}
-    ${link}    Get Activation Link    ${email}
+    ${link}    Get Email Link    ${email}    activate
     Go To    ${link}[1]
     Go To    ${url}/restore_password
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
     Click Button    ${RESET PASSWORD BUTTON}
-    ${link}    Get Reset Password Link    ${email}
+    ${link}    Get Email Link    ${email}    reset
     Go To    ${link}[1]
     Wait Until Elements Are Visible    ${RESET PASSWORD INPUT}    ${SAVE PASSWORD}
     Input Text    ${RESET PASSWORD INPUT}    ${ALT PASSWORD}
@@ -119,7 +119,7 @@ should make not-activated user active by restoring password
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
     Click Button    ${RESET PASSWORD BUTTON}
-    ${link}    Get Reset Password Link    ${email}
+    ${link}    Get Email Link    ${email}    reset
     Go To    ${link}[1]
     Wait Until Elements Are Visible    ${RESET PASSWORD INPUT}    ${SAVE PASSWORD}
     Input Text    ${RESET PASSWORD INPUT}    ${ALT PASSWORD}
@@ -154,7 +154,7 @@ should prompt log user out if he visits restore password link from email
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
     Click Button    ${RESET PASSWORD BUTTON}
-    ${link}    Get Reset Password Link    ${email}
+    ${link}    Get Email Link    ${email}    reset
     Go To    ${link}
     Wait Until Elements Are Visible    ${LOGGED IN CONTINUE BUTTON}    ${LOGGED IN LOG OUT BUTTON}
     Click Button    ${LOGGED IN CONTINUE BUTTON}

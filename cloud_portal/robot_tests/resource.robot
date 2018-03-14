@@ -73,24 +73,24 @@ Validate Register Email Received
     [arguments]    ${recipient}
     Open Mailbox    host=${BASE HOST}    password=${BASE EMAIL PASSWORD}    port=${BASE PORT}    user=${BASE EMAIL}    is_secure=True
     ${email}    Wait For Email    recipient=${recipient}    timeout=120    status=UNSEEN
-    Check Email Subject    ${email}    ${ACTIVATE YOUR ACCOUNT EMAIL SUBJECT}
+    Check Email Subject    ${email}    ${ACTIVATE YOUR ACCOUNT EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
     Should Not Be Equal    ${email}    ${EMPTY}
     Close Mailbox
 
-Get Activation Link
-    [arguments]    ${recipient}
+Get Email Link
+    [arguments]    ${recipient}    ${link type}
     Open Mailbox    host=${BASE HOST}    password=${BASE EMAIL PASSWORD}    port=${BASE PORT}    user=${BASE EMAIL}    is_secure=True
     ${email}    Wait For Email    recipient=${recipient}    timeout=120    status=UNSEEN
-    check email subject    ${email}    ${ACTIVATE YOUR ACCOUNT EMAIL SUBJECT}
+    Run Keyword If    "${link type}"=="activate"    Check Email Subject    ${email}    ${ACTIVATE YOUR ACCOUNT EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
+    Run Keyword If    "${link type}"=="reset"    Check Email Subject    ${email}    ${RESET PASSWORD EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
     ${links}    Get Links From Email    ${email}
     Mark Email As Read    ${email}
     Close Mailbox
-    log    ${links}
     Return From Keyword    ${links}
 
 Activate
     [arguments]    ${email}
-    ${link}    Get Activation Link    ${email}
+    ${link}    Get Email Link    ${email}    activate
     Go To    ${link}
     Wait Until Element Is Visible    ${ACTIVATION SUCCESS}
     Element Should Be Visible    ${ACTIVATION SUCCESS}
@@ -177,12 +177,3 @@ Register Form Validation
     Input Text    ${REGISTER PASSWORD INPUT}    ${password}
     click button    ${CREATE ACCOUNT BUTTON}
 
-Get Reset Password Link
-    [arguments]    ${recipient}
-    Open Mailbox    host=${BASE HOST}    password=${BASE EMAIL PASSWORD}    port=${BASE PORT}    user=${BASE EMAIL}    is_secure=True
-    ${email}    Wait For Email    recipient=${recipient}    timeout=120    status=UNSEEN
-    Check Email Subject    ${email}    ${RESET PASSWORD EMAIL SUBJECT}
-    ${links}    Get Links From Email    ${email}
-    Mark Email As Read    ${email}
-    Close Mailbox
-    Return From Keyword    ${links}

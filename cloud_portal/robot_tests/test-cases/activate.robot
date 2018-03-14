@@ -23,7 +23,7 @@ should show error if same link is used twice
     ${email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    'mark'    'hamill'    ${email}    ${password}
-    ${link}    Get Activation Link    ${email}
+    ${link}    Get Email Link    ${email}    activate
     Go To    ${link}
     Wait Until Element Is Visible    ${ACTIVATION SUCCESS}
     Go To    ${link}
@@ -78,7 +78,7 @@ link works and suggests to log out user, if he was logged in, buttons operate co
     ${email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${email}    ${password}
-    ${link}    Get Activation Link    ${email}
+    ${link}    Get Email Link    ${email}    activate
     Go To    ${link}
     Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
     Validate Log In

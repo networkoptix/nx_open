@@ -43,7 +43,7 @@ redirects to systems after log In
     Log In    ${email}    ${password}
     Validate Log In
     Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
-    Location Should Be    ${url}/systems/${AUTO_TESTS SYSTEM ID}
+    Location Should Be    ${url}/systems
     Close Browser
 
 after log In, display user's email and menu in top right corner

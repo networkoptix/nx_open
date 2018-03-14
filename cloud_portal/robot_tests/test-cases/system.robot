@@ -38,7 +38,7 @@ should confirm, if owner deletes system (You are going to disconnect your system
 
 should confirm, if not owner deletes system (You will loose access to this system)
     Open Browser and go to URL    ${url}
-    Log In    ${EMAIL NOT OWNER}    ${password}
+    Log In To Auto Tests System    ${EMAIL NOT OWNER}
     Validate Log In
     Wait Until Element Is Visible    ${DISCONNECT FROM MY ACCOUNT}
     Click Button    ${DISCONNECT FROM MY ACCOUNT}
@@ -47,7 +47,7 @@ should confirm, if not owner deletes system (You will loose access to this syste
 
 Cancel should cancel disconnection and disconnect should remove it when not owner
     Open Browser and go to URL    ${url}
-    Log In    ${EMAIL NOT OWNER}    ${password}
+    Log In To Auto Tests System    ${EMAIL NOT OWNER}
     Validate Log In
     Wait Until Element Is Visible    ${DISCONNECT FROM MY ACCOUNT}
     Click Button    ${DISCONNECT FROM MY ACCOUNT}

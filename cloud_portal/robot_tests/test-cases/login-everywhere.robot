@@ -52,7 +52,7 @@ works at registration page on account activation error
     ${random email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    'mark'    'hamill'    ${random email}    ${password}
-    ${link}    Get Activation Link    ${random email}
+    ${link}    Get Email Link    ${random email}    activate
     Go To    ${link}
     Wait Until Element Is Visible    ${ACTIVATION SUCCESS}
     Go To    ${link}
@@ -92,7 +92,7 @@ works at restore password page with password input - before submit
     ${random email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${random email}    ${password}
-    ${link}    Get Activation Link    ${random email}
+    ${link}    Get Email Link    ${random email}    activate
     ${link}    Strip String    ${link}
     Go To    ${link}
     Go To    ${url}/restore_password
@@ -104,7 +104,7 @@ works at restore password page with password input - before submit
     ${text}    Get Text    ${RESET EMAIL SENT MESSAGE}
     ${replaced}    Replace String    ${text}    \n    ${SPACE}
     Should Match    ${replaced}    ${RESET EMAIL SENT MESSAGE TEXT}
-    ${link}    Get Reset Password Link    ${random email}
+    ${link}    Get Email Link    ${random email}    reset
     Go To    ${link}
     Check Log In
     Close Browser
@@ -114,7 +114,7 @@ works at restore password page with password input - after submit error
     ${random email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${random email}    ${password}
-    ${link}    Get Activation Link    ${random email}
+    ${link}    Get Email Link    ${random email}    activate
     Go To    ${link}[1]
     Go To    ${url}/restore_password
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
@@ -125,7 +125,7 @@ works at restore password page with password input - after submit error
     ${text}    Get Text    ${RESET EMAIL SENT MESSAGE}
     ${replaced}    Replace String    ${text}    \n    ${SPACE}
     Should Match    ${replaced}    ${RESET EMAIL SENT MESSAGE TEXT}
-    ${link}    Get Reset Password Link    ${random email}
+    ${link}    Get Email Link    ${random email}    reset
     Go To    ${link}
     Wait Until Elements Are Visible    ${RESET PASSWORD INPUT}    ${SAVE PASSWORD}
     Input Text    ${RESET PASSWORD INPUT}    ${EMPTY}
@@ -138,7 +138,7 @@ works at restore password page with password input - after submit success
     ${random email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${random email}    ${password}
-    ${link}    Get Activation Link    ${random email}
+    ${link}    Get Email Link    ${random email}    activate
     Go To    ${link}[1]
     Go To    ${url}/restore_password
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
@@ -149,7 +149,7 @@ works at restore password page with password input - after submit success
     ${text}    Get Text    ${RESET EMAIL SENT MESSAGE}
     ${replaced}    Replace String    ${text}    \n    ${SPACE}
     Should Match    ${replaced}    ${RESET EMAIL SENT MESSAGE TEXT}
-    ${link}    Get Reset Password Link    ${random email}
+    ${link}    Get Email Link    ${random email}    reset
     Go To    ${link}
     Wait Until Elements Are Visible    ${RESET PASSWORD INPUT}    ${SAVE PASSWORD}
     Input Text    ${RESET PASSWORD INPUT}    ${password}
