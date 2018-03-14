@@ -79,7 +79,7 @@ class VirtualBox(object):
             '--register',
             ])
         settings_args = []
-        settings_args += ['--nic1', 'nat', '--natnet1', '10.254.0.0/24']
+        settings_args += ['--nic1', 'nat', '--natnet1', '10.254.254.0/24']
         for tag, protocol, host_port, guest_port in forwarded_ports:
             settings_args += ['--natpf1', '{},{},,{},,{}'.format(tag, protocol, host_port, guest_port)]
         for slot in NETWORK_SLOTS:

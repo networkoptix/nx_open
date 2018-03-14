@@ -193,8 +193,8 @@ class Server(object):
         self.rest_api.api.detachFromCloud.POST(password=password)
         self.set_user_password(REST_API_USER, password)
 
-    def merge_systems(self, other, remote_network=IPNetwork('10.254.0.0/16'), take_remote_settings=False):
-        log.info('Merging servers: %s with local_system_id=%r and %s', self, other)
+    def merge_systems(self, other, remote_network=IPNetwork('10.254.0.0/17'), take_remote_settings=False):
+        log.info('Merging servers: %s with %s', self, other)
         assert self.is_online() and other.is_online()
         assert get_local_system_id(self.rest_api) != get_local_system_id(other.rest_api)  # Must not be merged yet.
 
