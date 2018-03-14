@@ -13,7 +13,7 @@ from pytz import utc
 from network_layouts import get_layout
 from test_utils.api_shortcuts import get_server_id, get_time
 from test_utils.merging import merge_system
-from test_utils.networking import disable_internet, enable_internet, setup_networks
+from test_utils.networking import setup_networks
 from test_utils.utils import RunningTime, holds_long_enough, wait_until
 
 log = logging.getLogger(__name__)
@@ -54,7 +54,7 @@ def system(vm_pools, hypervisor, server_factory):
         if server.service.is_running():
             server.stop()
         # Reset server without internet access.
-        server.machine.networking.prohibit_global()
+        server.machine.networking.disable_internet()
         server.installation.cleanup_var_dir()
         server.installation.change_config(ecInternetSyncTimePeriodSec=3, ecMaxInternetTimeSyncRetryPeriodSec=3)
         server.start()
