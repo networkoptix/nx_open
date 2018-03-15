@@ -450,9 +450,8 @@ qint64 QnCamDisplay::doSmartSleep(const qint64 needToSleep, float speed)
 
 bool QnCamDisplay::isDataQueueFull() const
 {
-    const auto forcedVideoBufferLengthUs =
-        std::chrono::microseconds(m_forcedVideoBufferLength).count();
-    return m_lastQueuedVideoTime - m_lastVideoPacketTime > forcedVideoBufferLengthUs;
+    return std::chrono::microseconds(m_lastQueuedVideoTime - m_lastVideoPacketTime)
+        >= m_forcedVideoBufferLength;
 }
 
 int QnCamDisplay::maxDataQueueSize(QueueSizeType type) const
@@ -527,12 +526,12 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
         }
     }
 
-    if (m_isRealTimeSource && vd && !isPrebuffering && !isForcedBufferingEnabled())
+    if (m_isRealTimeSource && vd && !isPrebuffering)
     {
         qint64 queueLen = m_lastQueuedVideoTime - m_lastVideoPacketTime;
         //qDebug() << "queueLen" << queueLen/1000 << "ms";
 
-        if (queueLen == 0)
+        if (queueLen <= m_forcedVideoBufferLength.count())
         {
             if (m_liveMaxLenReached)
                 m_liveBufferSize = qMin(maximumLiveBufferMkSecs(), m_liveBufferSize * 1.2); // increase buffer
@@ -542,14 +541,15 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
             m_delay.addQuant(m_liveBufferSize /2); // realtime buffering for more smooth playback
             m_realTimeHurryUp = false;
         }
-        else if (queueLen > m_liveBufferSize )
+        else if (queueLen > m_forcedVideoBufferLength.count() + m_liveBufferSize)
         {
             m_liveMaxLenReached = true;
             //if (!m_realTimeHurryUp)
             //    qDebug() << "full queueLen. do fast play";
             m_realTimeHurryUp = true;
         }
-        else if (m_realTimeHurryUp && queueLen <= m_liveBufferSize /2)
+        else if (m_realTimeHurryUp
+            && queueLen <= m_forcedVideoBufferLength.count() + m_liveBufferSize / 2)
         {
             //qDebug() << "half queueLen again. remove fast play";
             m_realTimeHurryUp = false;
@@ -1148,7 +1148,7 @@ void QnCamDisplay::putData(const QnAbstractDataPacketPtr& data)
 
         if (isForcedBufferingEnabled())
         {
-            if (isDataQueueFull())
+            if (m_dataQueue.size() == m_dataQueue.maxSize())
                 m_delay.breakSleep();
         }
         else if (video->flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE)
@@ -1550,6 +1550,10 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
                     afterJump(vd);
                 }
             }
+
+            if (isForcedBufferingEnabled() && !isDataQueueFull())
+                return false;
+
             m_lastVideoPacketTime = vd->timestamp;
 
             if (channel >= CL_MAX_CHANNELS)
@@ -1565,9 +1569,6 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
                 //return result;
                 return false;
             }
-
-            if (isForcedBufferingEnabled() && !isDataQueueFull())
-                return false;
         }
 
         // three are 3 possible scenarios:
@@ -2092,7 +2093,7 @@ Qn::MediaStreamEvent QnCamDisplay::lastMediaEvent() const
 
 std::chrono::milliseconds QnCamDisplay::forcedVideoBufferLength() const
 {
-    return m_forcedVideoBufferLength;
+    return std::chrono::duration_cast<std::chrono::milliseconds>(m_forcedVideoBufferLength);
 }
 
 void QnCamDisplay::setForcedVideoBufferLength(std::chrono::milliseconds length)
@@ -2103,7 +2104,7 @@ void QnCamDisplay::setForcedVideoBufferLength(std::chrono::milliseconds length)
 
 bool QnCamDisplay::isForcedBufferingEnabled() const
 {
-    return m_forcedVideoBufferLength != std::chrono::milliseconds::zero();
+    return m_forcedVideoBufferLength != std::chrono::microseconds::zero();
 }
 
 // -------------------------------- QnFpsStatistics -----------------------

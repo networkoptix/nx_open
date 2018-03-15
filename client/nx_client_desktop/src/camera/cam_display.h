@@ -293,7 +293,7 @@ protected:
     bool m_fisheyeEnabled;
     int m_channelsCount;
 
-    std::chrono::milliseconds m_forcedVideoBufferLength = std::chrono::milliseconds::zero();
+    std::chrono::microseconds m_forcedVideoBufferLength = std::chrono::microseconds::zero();
     qint64 m_lastQueuedVideoTime;
     int m_liveBufferSize;
     bool m_liveMaxLenReached;
