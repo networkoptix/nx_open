@@ -237,7 +237,7 @@ class LocalAccess(OsAccess):
                     else:
                         if stream is not pipe.stdout or log_output:
                             try:
-                                process_logger.debug("%s data to be decoded.")
+                                process_logger.debug("%s data to be decoded.", names[stream])
                                 decoded = chunk.decode()
                             except UnicodeDecodeError as e:
                                 process_logger.debug(
