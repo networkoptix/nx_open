@@ -217,7 +217,9 @@ class LocalAccess(OsAccess):
             timeout_sec=timeout.total_seconds(),
             logging_levels=(logging.DEBUG, logging.ERROR))
         while streams:
-            streams_to_read, _, _ = select(streams, [], [], int(ceil(wait.delay_sec)))
+            select_timeout_sec = int(ceil(wait.delay_sec))
+            process_logger.debug("Wait for select with %r seconds", select_timeout_sec)
+            streams_to_read, _, _ = select(streams, [], [], select_timeout_sec)
             if not streams_to_read:
                 process_logger.debug("Nothing in streams.")
                 if pipe.poll() is not None:
@@ -226,21 +228,26 @@ class LocalAccess(OsAccess):
                     raise ProcessTimeoutError(args, timeout)
             else:
                 for stream in streams_to_read:
+                    process_logger.debug("%s to be read from.", names[stream])
                     chunk = stream.read()
                     if not chunk:
-                        process_logger.debug("%s closed, %d bytes total.", names[stream], len(buffers[stream]))
+                        process_logger.debug("%s to be closed, %d bytes total.", names[stream], len(buffers[stream]))
                         stream.close()
                         streams.remove(stream)
                     else:
                         if stream is not pipe.stdout or log_output:
                             try:
+                                process_logger.debug("%s data to be decoded.")
                                 decoded = chunk.decode()
-                            except UnicodeDecodeError:
-                                process_logger.debug("%s data, %d bytes.", names[stream], len(chunk))
+                            except UnicodeDecodeError as e:
+                                process_logger.debug(
+                                    "%s data, %d bytes, considered binary because of %r.",
+                                    names[stream], len(chunk), e)
                             else:
                                 process_logger.debug(
-                                    u"%s data, %d bytes, %d characters:\n%s",
+                                    u"%s data, %d bytes, %d characters, decoded:\n%s",
                                     names[stream], len(chunk), len(decoded), decoded)
+                        process_logger.debug("%s data appended to buffer.")
                         buffers[stream].extend(chunk)
         while True:
             return_code = pipe.poll()
