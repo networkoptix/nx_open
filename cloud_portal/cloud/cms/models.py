@@ -237,7 +237,7 @@ class ContentVersion(models.Model):
         )
 
     customization = models.ForeignKey(Customization)
-    product = models.ForeignKey(Product, default=Product.objects.get(name=settings.PRIMARY_PRODUCT).id)
+    product = models.ForeignKey(Product, default=1)
     name = models.CharField(max_length=1024)
 
     created_date = models.DateTimeField(auto_now_add=True)

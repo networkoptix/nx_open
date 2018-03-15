@@ -16,6 +16,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='contentversion',
             name='product',
-            field=models.ForeignKey(default=1L, on_delete=django.db.models.deletion.CASCADE, to='cms.Product'),
+            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, to='cms.Product'),
         ),
     ]
