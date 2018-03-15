@@ -21,7 +21,11 @@ FilterConfig FilterConfig::createDefault(bool includeNonHdd)
         : static_cast<bool>(settings->value(nx_ms_conf::ALLOW_REMOVABLE_STORAGES).toInt());
     result.isNetworkDrivesAllowed = includeNonHdd;
 
-    result.partitions = qnPlatform->monitor()->totalPartitionSpaceInfo();
+    result.partitions = ((QnPlatformMonitor *)qnPlatform->monitor())->totalPartitionSpaceInfo(
+        QnPlatformMonitor::LocalDiskPartition
+        | QnPlatformMonitor::NetworkPartition
+        | QnPlatformMonitor::RemovableDiskPartition);
+
     result.dataDirectory = getDataDirectory();
     result.mediaFolderName = QnAppInfo::mediaFolderName();
     result.serverUuid = serverGuid();

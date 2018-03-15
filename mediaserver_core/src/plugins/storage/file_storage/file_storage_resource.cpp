@@ -506,25 +506,8 @@ void QnFileStorageResource::removeOldDirs()
 #ifndef _WIN32
 
 namespace {
-QString prepareCommandString(const QUrl& url, const QString& localPath)
-{
-    QString cifsOptionsString = lit("rsize=8192,wsize=8192");
-    if (!url.userName().isEmpty())
-        cifsOptionsString +=
-            lit(",username=%2,password=%3")
-                .arg(url.userName())
-                .arg(aux::passwordFromUrl(url));
-    else
-        cifsOptionsString += lit(",password=");
 
-    QString srcString = lit("//") + url.host() + url.path();
-    return lit("mount -t cifs -o %1 %2 %3 2>&1")
-                .arg(cifsOptionsString)
-                .arg(srcString)
-                .arg(localPath);
-}
-
-int callMount(const QString& commandString)
+static int callMountImpl(const QString& commandString)
 {
     FILE* pipe;
     char buf[BUFSIZ];
@@ -549,7 +532,61 @@ int callMount(const QString& commandString)
     int processReturned = pclose(pipe);
     return retCode == -1 ? processReturned : retCode;
 }
+
+static int callMount(const QUrl& url, const QString localPath)
+{
+    QString user = url.userName().isEmpty() ? "guest" : url.userName();
+    QString password = url.password();
+    QString domain;
+
+    int separatorIndex = user.indexOf('\\');
+    if (separatorIndex != -1 && separatorIndex != user.size() - 1)
+    {
+        domain = user.left(separatorIndex);
+        user = user.mid(separatorIndex + 1);
+    }
+
+    QList<QString> domains = QList<QString>() << "WORKGROUP" << "";
+    if (!domain.isEmpty())
+        domains.append(domain);
+
+    auto prepateCommand =
+        [&url, localPath](const QString& userName, const QString& password,
+            const QString& domain)
+    {
+        QString source = lit("//") + url.host() + url.path();
+        QString options = lit("rsize=8192,wsize=8192,username=%1,password=%2")
+            .arg(userName).arg(password);
+
+        if (!domain.isEmpty())
+            options += lit(",domain=%3").arg(domain);
+
+        return lit("mount -t cifs -o %1 %2 %3 2>&1").arg(options).arg(source).arg(localPath);
+    };
+
+    int mountRetCode = -1;
+    bool accessError = false;
+    for (const auto& domainString: domains)
+    {
+        for (const auto& passwordString: {password, lit("123")})
+        {
+            const auto command = prepateCommand(user, passwordString, domainString);
+            mountRetCode = callMountImpl(command);
+            NX_VERBOSE(typeid(QnFileStorageResource),
+                lm("Call mount command: '%1'. Result: %2").args(command, mountRetCode));
+
+            if (mountRetCode == 0)
+                return 0;
+
+            if (mountRetCode == EACCES)
+                accessError = true;
+        }
+    }
+
+    return accessError ? EACCES : mountRetCode;
 }
+
+} // namespace
 
 Qn::StorageInitResult QnFileStorageResource::mountTmpDrive(const QString& urlString)
 {
@@ -570,19 +607,13 @@ Qn::StorageInitResult QnFileStorageResource::mountTmpDrive(const QString& urlStr
     }
 
 #if __linux__
-    retCode = callMount(prepareCommandString(url, localPath));
+    retCode = callMount(url, localPath);
 #elif __APPLE__
 #error "TODO BSD-style mount call"
 #endif
 
     if (retCode != 0)
-    {
-        NX_LOG(lit("Mount SMB resource call with options '%1' failed with retCode %2")
-                .arg(prepareCommandString(url, localPath))
-                .arg(retCode),
-               cl_logWARNING);
         return retCode == EACCES ? Qn::StorageInit_WrongAuth : Qn::StorageInit_WrongPath;
-    }
 
     return Qn::StorageInit_Ok;
 }
