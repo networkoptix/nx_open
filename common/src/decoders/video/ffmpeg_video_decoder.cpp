@@ -370,7 +370,7 @@ int QnFfmpegVideoDecoder::decodeVideo(
 {
     int result = avcodec_decode_video2(avctx, picture, got_picture_ptr, avpkt);
 
-    if (result && avpkt && avpkt->dts != AV_NOPTS_VALUE)
+    if (result > 0 && avpkt && avpkt->dts != AV_NOPTS_VALUE)
         m_dtsQueue.push_back(avpkt->dts);
 
     if (*got_picture_ptr && !m_dtsQueue.empty())
