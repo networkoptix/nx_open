@@ -118,7 +118,11 @@ class DataStructure(models.Model):
 
     @staticmethod
     def get_type(name):
-        return getattr(DataStructure.DATA_TYPES, name, DataStructure.DATA_TYPES.text)
+        data_types = DataStructure.DATA_TYPES
+        for i in range(len(data_types)):
+            if data_types[i] == name:
+                return i
+        return data_types.text
 
     def find_actual_value(self, customization, language=None, version_id=None):
         content_value = ""
