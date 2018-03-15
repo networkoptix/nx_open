@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euxo pipefail
-test -e "~/.func_tests/$1.ova" || VBoxManage export "$1" -o "~/.func_tests/$1.ova"
+test -e ~/".func_tests/$1-template.ova" || VBoxManage export "$1-template" -o ~/".func_tests/$1-template.ova"
 ssh "$2" mkdir -p ".func_tests"
-ssh "$2" test -e ".func_tests/$1.ova" || scp "~/.func_tests/$1.ova" "$2:.func_tests/$1.ova"
-scp "~/.func_tests/$1.ova" "$2:.func_tests/$1.ova"
-ssh "$2" VBoxManage import ".func_tests/$1.ova"
+rsync ~/".func_tests/$1-template.ova" "$2:.func_tests/$1-template.ova"
+rsync ~/".func_tests/$1-key.key" "$2:.func_tests/$1-key.key"
+ssh "$2" VBoxManage import ".func_tests/$1-template.ova"

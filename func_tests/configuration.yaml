@@ -1,5 +1,5 @@
 ssh:
-  private_key: ~/.func_tests/private_key
+  private_key: ~/.func_tests/ubuntu-14.04-key.key
 vm_host:
   address: 127.0.0.1
 vm_types:

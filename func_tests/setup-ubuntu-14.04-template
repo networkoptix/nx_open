@@ -1,8 +1,9 @@
 #!/bin/bash
 set -euxo pipefail
-PRIVATE_KEY_PATH=~/.func_tests/private_key
-DIRTY='ubuntu-14.04-dirty'  # "Dirty" VM can be deleted in this script, completed cannot.
-COMPLETE='ubuntu-14.04-template'
+NAME='ubuntu-14.04'
+DIRTY="${NAME}-dirty"  # "Dirty" VM can be deleted in this script, completed cannot.
+COMPLETE="${NAME}-template"
+KEY=~/".func_tests/${NAME}-key"
 VBoxManage controlvm "${DIRTY}" poweroff || :
 sleep 1s
 VBoxManage unregistervm "${DIRTY}" --delete || :
@@ -19,17 +20,18 @@ Vagrant.configure("2") do |config|
 end
 VAGRANTFILE
 vagrant up
-ssh-keygen -y -f "${PRIVATE_KEY_PATH}" > "${PRIVATE_KEY_PATH}.pub"
-vagrant ssh -c 'cat - >> /home/vagrant/.ssh/authorized_keys' < "${PRIVATE_KEY_PATH}.pub"
+mkdir -p "$(dirname "${KEY}")"
+find -name private_key | xargs -I '{}' cp '{}' "${KEY}.key"
+ssh-keygen -y -f "${KEY}.key" > "${KEY}.pub"
+vagrant ssh -c 'cat - >> /home/vagrant/.ssh/authorized_keys' < "${KEY}.pub"
 vagrant ssh -c 'sudo cp /home/vagrant/.ssh/authorized_keys /root/.ssh/authorized_keys'
 vagrant ssh -c 'sudo chown root:root /root/.ssh/authorized_keys'
 cd -
-find .temp_vagrant -name private_key | xargs cp -t .
 rm -rf .temp_vagrant
 VBoxManage controlvm "${DIRTY}" acpipowerbutton
 sleep 10s
 VBoxManage modifyvm "${DIRTY}" --natpf1 delete "ssh"  # Left by Vagrant.
 VBoxManage modifyvm "${DIRTY}" --ioapic 'on' # See: https://www.virtualbox.org/manual/ch03.html#settings-motherboard.
-VBoxManage modifyvm "${DIRTY}" --cpus 1 --cpuexecutioncap 75 --memory 512 --vram 32 --audio none
-VBoxManage modifyvm "${DIRTY}" --name "${COMPLETE}"  # Rename if everythin is correct.
-VBoxManage snapshot "${COMPLETE}" take "template"
+VBoxManage modifyvm "${DIRTY}" --cpus 2 --cpuexecutioncap 100 --memory 2048 --vram 32 --audio none
+VBoxManage snapshot "${DIRTY}" take "template"
+VBoxManage modifyvm "${DIRTY}" --name "${COMPLETE}"  # If this line is reached, above was successful (set -e).
