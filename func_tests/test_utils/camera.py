@@ -36,7 +36,7 @@ log = logging.getLogger(__name__)
 DEFAULT_CAMERA_MAC_ADDR = '11:22:33:44:55:66'
 TEST_CAMERA_NAME = 'TestCameraLive'  # hardcoded to server, mandatory for auto-discovered cameras
 
-CAMERA_DISCOVERY_WAIT_TIMEOUT = datetime.timedelta(minutes=1)
+CAMERA_DISCOVERY_WAIT_TIMEOUT = 60
 
 TEST_CAMERA_DISCOVERY_PORT = 4984  # hardcoded to server UDP multicast address for test camera
 TEST_CAMERA_FIND_MSG = 'Network optix camera emulator 3.0 discovery'  # UDP discovery multicast request

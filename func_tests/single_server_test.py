@@ -154,7 +154,7 @@ def test_remove_child_resources(server):
 
 # https://networkoptix.atlassian.net/browse/VMS-3068
 def test_http_header_server(server):
-    url = server.rest_api.url + 'ec2/testConnection'
+    url = server.rest_api.url('ec2/testConnection')
     response = requests.get(url, auth=HTTPDigestAuth(server.rest_api.user, server.rest_api.password))
     log.debug('%r headers: %s', server, response.headers)
     assert response.status_code == 200
@@ -170,14 +170,14 @@ def test_http_header_server(server):
 def test_static_vulnerability(server):
     filepath = server.installation.dir / 'var' / 'web' / 'static' / 'test.file'
     server.os_access.write_file(filepath, 'This is just a test file')
-    url = server.rest_api.url + 'static/../../test.file'
+    url = server.rest_api.url('') + 'static/../../test.file'
     response = requests.get(url)
     assert response.status_code == 403
 
 
 # https://networkoptix.atlassian.net/browse/VMS-7775
 def test_auth_with_time_changed(timeless_server):
-    url = timeless_server.rest_api.url + 'ec2/getCurrentTime'
+    url = timeless_server.rest_api.url('ec2/getCurrentTime')
 
     timeless_server.os_access.set_time(datetime.now(pytz.utc))
     assert wait_until(lambda: get_time(timeless_server.rest_api).is_close_to(datetime.now(pytz.utc)))
@@ -226,13 +226,13 @@ def test_frequent_restarts(server):
     '/api/nonExistent', '/ec2/nonExistent'])  # VMS-7809: Redirects with 301 but not returns 404.
 def test_non_existent_api_endpoints(server, path):
     auth = HTTPDigestAuth(server.rest_api.user, server.rest_api.password)
-    response = requests.get(server.rest_api.url.rstrip('/') + path, auth=auth, allow_redirects=False)
+    response = requests.get(server.rest_api.url(path), auth=auth, allow_redirects=False)
     assert response.status_code == 404, "Expected 404 but got %r"
 
 
 def test_https_verification(server_factory):
     server = server_factory.create('server', http_schema='https')
-    url = server.rest_api.url.rstrip('/') + '/api/ping'
+    url = server.rest_api.url('/api/ping')
     with warnings.catch_warnings(record=True) as warning_list:
         response = requests.get(url, verify=str(server.rest_api.ca_cert))
     assert response.status_code == 200

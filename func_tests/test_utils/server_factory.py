@@ -42,12 +42,11 @@ class ServerFactory(object):
             else:
                 vm = self._linux_vm_pool.get(name)
             hostname, port = vm.ports['tcp', 7001]
-            api_url = '%s://%s:%d/' % (config.http_schema, hostname, port)
             server = Server(
                 name,
                 UpstartService(vm.os_access, self._mediaserver_deb.customization.service),
                 install_mediaserver(vm.os_access, self._mediaserver_deb),
-                RestApi(name, api_url, timeout=config.rest_api_timeout),
+                RestApi(name, hostname, port),
                 vm)
         self._allocated_servers.append(server)  # Following may fail, will need to save it's artifact in that case.
         server.stop(already_stopped_ok=True)

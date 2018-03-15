@@ -22,7 +22,6 @@ LWS_CTL_TEMPLATE_PATH = 'lws_ctl.sh.jinja2'
 LWS_PORT_BASE = 3000
 LWS_BINARY_NAME = 'appserver2_ut'
 LWS_START_TIMEOUT = datetime.timedelta(minutes=10)  # timeout when waiting for lws become online (pingable)
-LWS_SYNC_CHECK_TIMEOUT = datetime.timedelta(minutes=1)  # calling api/moduleInformation to check for SF_P2pSyncDone flag
 
 
 class LightweightServersFactory(object):
@@ -121,7 +120,8 @@ class LightweightServer(Server):
         start_time = utils.datetime_utc_now()
         while utils.datetime_utc_now() - start_time < timeout:
             try:
-                response = self.rest_api.api.moduleInformation.GET(timeout=LWS_SYNC_CHECK_TIMEOUT)
+                # calling api/moduleInformation to check for SF_P2pSyncDone flag
+                response = self.rest_api.api.moduleInformation.GET(timeout=60)
             except ReadTimeout:
                 #log.error('ReadTimeout when waiting for lws api/moduleInformation; will make core dump')
                 #self.service.make_core_dump()
@@ -168,7 +168,7 @@ class LightweightServersHost(object):
         for idx in range(server_count):
             server_port = LWS_PORT_BASE + idx
             name = 'lws-%05d' % idx
-            api = RestApi(name, '%s://%s:%d/' % ('http', self._os_access.hostname, server_port))
+            api = RestApi(name, self._os_access.hostname, server_port)
             server = LightweightServer(name, self._os_access, self.service, self._installation, api, port=server_port)
             wait_until(server.is_online)
             if not self._first_server:

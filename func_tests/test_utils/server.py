@@ -67,7 +67,7 @@ class ServerConfig(object):
 
     def __init__(self, name, setup=True, leave_initial_cloud_host=False,
                  vm=None, config_file_params=None, setup_settings=None, setup_cloud_account=None,
-                 http_schema=None, rest_api_timeout=None):
+                 http_schema=None):
         assert name, repr(name)
         assert type(setup) is bool, repr(setup)
         assert config_file_params is None or isinstance(config_file_params, dict), repr(config_file_params)
@@ -86,7 +86,6 @@ class ServerConfig(object):
         self.setup_settings = setup_settings or {}  # dict
         self.setup_cloud_account = setup_cloud_account  # CloudAccount or None
         self.http_schema = http_schema or DEFAULT_HTTP_SCHEMA  # 'http' or 'https'
-        self.rest_api_timeout = rest_api_timeout
 
     def __repr__(self):
         return 'ServerConfig(%r @ %s)' % (self.name, self.vm)
@@ -107,7 +106,7 @@ class Server(object):
         self.internal_ip_port = port or 7001
 
     def __repr__(self):
-        return '<Server at %s>' % self.rest_api.url
+        return '<Server at %s>' % self.rest_api.url('')
 
     def is_online(self):
         try:
@@ -182,7 +181,7 @@ class Server(object):
             cloudAuthKey=bind_info.auth_key,
             cloudSystemID=bind_info.system_id,
             cloudAccountName=cloud_account.rest_api.user,
-            timeout=datetime.timedelta(minutes=5),
+            timeout=300,
             **kw)
         settings = setup_response['settings']
         self.set_user_password(cloud_account.rest_api.user, cloud_account.password)
@@ -294,7 +293,7 @@ class Server(object):
     def get_media_stream(self, stream_type, camera):
         assert stream_type in ['rtsp', 'webm', 'hls', 'direct-hls'], repr(stream_type)
         assert isinstance(camera, Camera), repr(camera)
-        return open_media_stream(self.rest_api.url, self.rest_api.user, self.rest_api.password, stream_type, camera.mac_addr)
+        return open_media_stream(self.rest_api.url(''), self.rest_api.user, self.rest_api.password, stream_type, camera.mac_addr)
 
 
 class Storage(object):

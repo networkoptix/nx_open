@@ -26,7 +26,6 @@ log = logging.getLogger(__name__)
 
 
 SET_RESOURCE_STATUS_CMD = '202'
-CHECK_METHOD_TIMEOUT = datetime.timedelta(minutes=2)
 CHECK_METHOD_RETRY_COUNT = 5
 
 
@@ -73,8 +72,7 @@ def servers(metrics_saver, server_factory, lightweight_servers, config):
         ))
     start_time = utils.datetime_utc_now()
     server_list = [server_factory.create('server_%04d' % (idx + 1),
-                                           setup_settings=setup_settings,
-                                           rest_api_timeout=config.REST_API_TIMEOUT)
+                                           setup_settings=setup_settings)
                        for idx in range(server_count)]
     metrics_saver.save('server_init_duration', utils.datetime_utc_now() - start_time)
     return server_list
@@ -162,7 +160,7 @@ def create_test_data(config, servers):
 def get_response(server, method, api_object, api_method):
     for i in range(CHECK_METHOD_RETRY_COUNT):
         try:
-            return server.rest_api.get_api_fn(method, api_object, api_method)(timeout=CHECK_METHOD_TIMEOUT)
+            return server.rest_api.get_api_fn(method, api_object, api_method)(timeout=120)
         except ReadTimeout as x:
             log.error('ReadTimeout when waiting for %s call %s/%s: %s', server, api_object, api_method, x)
         except Exception as x:

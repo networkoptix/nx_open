@@ -10,7 +10,6 @@ log = logging.getLogger(__name__)
 
 
 CLOUD_HOST_REGISTRY_URL = 'https://ireg.hdw.mx/api/v1/cloudhostfinder/'
-CLOUD_HOST_REGISTRY_TIMEOUT_SEC = 120
 
 IMAP_HOST = 'imap.gmail.com'
 AUTOTEST_EMAIL_ALIAS = 'autotest@networkoptix.com'
@@ -34,7 +33,7 @@ class CloudAccount(object):
         self.name = name
         self.customization = customization
         self.hostname = hostname
-        self.rest_api = RestApi('cloud-host:%s' % name, self.url, username=user, password=password)
+        self.rest_api = RestApi('cloud-host:%s' % name, self.hostname, 80, username=user, password=password)
 
     def __repr__(self):
         return '%r @ %r' % (self.name, self.url)
@@ -162,7 +161,7 @@ def resolve_cloud_host_from_registry(cloud_group, customization):
     response = requests.get(
         CLOUD_HOST_REGISTRY_URL,
         params=dict(group=cloud_group, vms_customization=customization),
-        timeout=CLOUD_HOST_REGISTRY_TIMEOUT_SEC)
+        timeout=120)
     response.raise_for_status()
     cloud_host = response.content
     log.info('Resolved cloud host for cloud group %r, customization %r: %r', cloud_group, customization, cloud_host)

@@ -48,7 +48,7 @@ class RestApiError(Exception):
 
     def __init__(self, server_name, url, error, error_string):
         super(RestApiError, self).__init__(
-            self, 'Server %s at %s REST API request returned error: [%s] %s' % (server_name, url, error, error_string))
+            self, 'Server %s at %s REST API request returned error: %s %s' % (server_name, url, error, error_string))
         self.error = error
         self.error_string = error_string
 
@@ -97,50 +97,27 @@ class RestApi(object):
     HttpError...401...
     """
 
-    def __init__(
-            self,
-            server_name, root_url,
-            username=REST_API_USER, password=REST_API_PASSWORD,
-            timeout=None,
-            ca_cert=None,
-            ):
-        self.server_name = server_name
-        self._root_url = root_url.rstrip('/')
-        self.url = self._root_url + '/'
-        assert timeout is None or isinstance(timeout, datetime.timedelta), repr(timeout)
-        self._default_timeout = timeout or REST_API_TIMEOUT
-        self._session = requests.Session()
+    def __init__(self, alias, hostname, port, username='admin', password='admin', ca_cert=None):
+        self._port = port
+        self._hostname = hostname
+        self._alias = alias
         if ca_cert is not None:
             self.ca_cert = ca_cert
             log.info("We will trust CA cert: %s.", self.ca_cert)
         self._auth = HTTPDigestAuth(username, password)
-
-    def __enter__(self):
-        self._session.__enter__()
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self._session.__exit__(exc_type, exc_val, exc_tb)
+        self.user = username  # Only for interface.
+        self.password = password  # Only for interface.
 
     def __getattr__(self, name):
         return _RestApiProxy(self, '/' + name)
 
     def __repr__(self):
-        return self.__class__.__name__ + str((
-            self.server_name,
-            self._root_url,
-            self._auth.username,
-            self._auth.password if self._auth.password in STANDARD_PASSWORDS else '***'))
-
-    @property
-    def user(self):
-        return self._auth.username
-
-    @property
-    def password(self):
-        return self._auth.password
+        password_display = self._auth.password if self._auth.password in STANDARD_PASSWORDS else '***'
+        return "<RestApi {} {} {}:{}>".format(self._alias, self.url, self._auth.username, password_display)
 
     def set_credentials(self, username, password):
+        self.user = username  # Only for interface.
+        self.password = password  # Only for interface.
         self._auth = HTTPDigestAuth(username, password)
 
     def get_api_fn(self, method, api_object, api_method):
@@ -161,22 +138,20 @@ class RestApi(object):
                     error_string = response_data.get('errorString')
                     if error_string:
                         reason = error_string
-            raise HttpError(self.server_name, response.request.url, response.status_code, reason, response_data)
+            raise HttpError(self._alias, response.request.url, response.status_code, reason, response_data)
         else:
             response.raise_for_status()
 
     def _retrieve_data(self, response):
         if not response.content:
-            log.warning("No response data.")
+            log.warning("Empty response.")
             return None
         try:
             response_data = response.json()
         except ValueError:
-            log.warning("Non-JSON response:\n%r", response.content)
+            log.warning("Non-JSON response:\n%s", response.content)
             return response.content
-
-        log.debug("Response data:\n%s", json.dumps(response_data, indent=4))
-
+        log.debug("JSON response:\n%s", json.dumps(response_data, indent=4))
         if not isinstance(response_data, dict):
             return response_data
         try:
@@ -184,32 +159,21 @@ class RestApi(object):
         except KeyError:
             return response_data
         if error_code != 0:
-            raise RestApiError(self.server_name, response.request.url, error_code, response_data['errorString'])
+            raise RestApiError(self._alias, response.request.url, error_code, response_data['errorString'])
         return response_data['reply']
+
+    def url(self, path, secure=False):
+        return '{}://{}:{}/{}'.format('https' if secure else 'http', self._hostname, self._port, path.lstrip('/'))
 
     def get(self, path, **kwargs):
         return self.request('GET', path, **kwargs)
 
-    def post(self, path, data, **kwargs):
-        return self.request('GET', path, json=data, **kwargs)
+    def post(self, path, json, **kwargs):
+        return self.request('POST', path, json=json, **kwargs)
 
-    def request(self, method, path, new_connection=False, timeout=None, **kwargs):
-        log.debug('%r: %s %s\n%s', self, method, path, json.dumps(kwargs, indent=4))
-        try:
-            make_request = requests.request if new_connection else self._session.request
-            response = make_request(
-                method, self._root_url + path,
-                auth=self._auth,
-                timeout=(timeout or self._default_timeout).total_seconds(),
-                verify=str(self.ca_cert), **kwargs)
-        except requests.ConnectionError as e:
-            if not new_connection:
-                log.error("Try new connection after %r.", e)
-                return self.request(
-                    method, path,
-                    new_connection=True,
-                    timeout=timeout, **kwargs)
-            raise
+    def request(self, method, path, secure=False, **kwargs):
+        url = self.url(path, secure=secure)
+        response = requests.request(method, url, auth=self._auth, verify=str(self.ca_cert), **kwargs)
         data = self._retrieve_data(response)
         self._raise_for_status(response)
         return data
