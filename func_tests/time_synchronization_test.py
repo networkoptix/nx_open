@@ -10,10 +10,8 @@ import pytest
 from pylru import lrudecorator
 from pytz import utc
 
-from network_layouts import get_layout
 from test_utils.api_shortcuts import get_server_id, get_time
 from test_utils.merging import merge_system
-from test_utils.networking import setup_networks
 from test_utils.utils import RunningTime, holds_long_enough, wait_until
 
 log = logging.getLogger(__name__)
@@ -45,12 +43,10 @@ def get_internet_time(address='time.rfc868server.com', port=37):
 
 
 @pytest.fixture()
-def system(vm_pools, hypervisor, server_factory):
-    layout = get_layout('direct-merge_toward_requested.yaml')
-    vms, _ = setup_networks(vm_pools, hypervisor, layout.networks, {})
+def system(two_linux_vms, server_factory):
     servers = {}
     for alias in {'first', 'second'}:
-        server = server_factory.create(alias, vm=vms[alias])
+        server = server_factory.create(alias, vm=two_linux_vms[alias])
         if server.service.is_running():
             server.stop()
         # Reset server without internet access.
@@ -60,7 +56,7 @@ def system(vm_pools, hypervisor, server_factory):
         server.start()
         server.setup_local_system()
         servers[alias] = server
-    merge_system(servers, layout.mergers)
+    merge_system(servers, {'first': {'second': None}})
     first_server_response = servers['first'].rest_api.ec2.getCurrentTime.GET()
     if first_server_response['isPrimaryTimeServer']:
         system = System(primary=servers['first'], secondary=servers['second'])

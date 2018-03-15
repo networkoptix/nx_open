@@ -59,22 +59,14 @@ def check_admin_disabled(server):
     assert x_info.value.status_code == 403
 
 
-@pytest.fixture()
-def vms(vm_pools, hypervisor):
-    path = Path(__file__).with_name('network_layouts') / 'direct-no_merge.yaml'
-    layout = yaml.load(path.read_text())
-    vms, _ = setup_networks(vm_pools, hypervisor, layout['networks'], {})
-    return vms
+@pytest.fixture
+def one(two_linux_vms, server_factory, test_system_settings):
+    return server_factory.create('one', vm=two_linux_vms.first, setup_settings=test_system_settings)
 
 
 @pytest.fixture
-def one(vms, server_factory, test_system_settings):
-    return server_factory.create('one', vm=vms['first'], setup_settings=test_system_settings)
-
-
-@pytest.fixture
-def two(vms, server_factory):
-    return server_factory.create('two', vm=vms['second'])
+def two(two_linux_vms, server_factory):
+    return server_factory.create('two', vm=two_linux_vms.second)
 
 
 def test_merge_take_local_settings(one, two, test_system_settings):
@@ -125,11 +117,11 @@ def test_merge_take_remote_settings(one, two):
         auditTrailEnabled=bool_to_str(expected_auditTrailEnabled))
 
 
-def test_merge_cloud_with_local(vms, server_factory, cloud_account, test_system_settings):
+def test_merge_cloud_with_local(two_linux_vms, server_factory, cloud_account, test_system_settings):
     # Start local server systemName
     # and move it to working state
-    one = server_factory.create('one', vm=vms['first'], setup_cloud_account=cloud_account, setup_settings=test_system_settings)
-    two = server_factory.create('two', vm=vms['second'])
+    one = server_factory.create('one', vm=two_linux_vms.first, setup_cloud_account=cloud_account, setup_settings=test_system_settings)
+    two = server_factory.create('two', vm=two_linux_vms.second)
 
     # Merge systems (takeRemoteSettings = False) -> Error
     try:
@@ -147,11 +139,11 @@ def test_merge_cloud_with_local(vms, server_factory, cloud_account, test_system_
 
 
 # https://networkoptix.atlassian.net/wiki/spaces/SD/pages/71467018/Merge+systems+test#Mergesystemstest-test_merge_cloud_systems
-def test_merge_cloud_systems(vms, server_factory, cloud_account_factory):
+def test_merge_cloud_systems(two_linux_vms, server_factory, cloud_account_factory):
     cloud_account_1 = cloud_account_factory()
     cloud_account_2 = cloud_account_factory()
-    one = server_factory.create('one', vm=vms['first'], setup_cloud_account=cloud_account_1)
-    two = server_factory.create('two', vm=vms['second'], setup_cloud_account=cloud_account_2)
+    one = server_factory.create('one', vm=two_linux_vms.first, setup_cloud_account=cloud_account_1)
+    two = server_factory.create('two', vm=two_linux_vms.second, setup_cloud_account=cloud_account_2)
 
     # Merge 2 cloud systems one way
     try:
@@ -173,12 +165,12 @@ def test_merge_cloud_systems(vms, server_factory, cloud_account_factory):
     check_admin_disabled(one)
 
 
-def test_cloud_merge_after_disconnect(vms, server_factory, cloud_account, test_system_settings):
+def test_cloud_merge_after_disconnect(two_linux_vms, server_factory, cloud_account, test_system_settings):
     # Setup cloud and wait new cloud credentials
     one = server_factory.create(
-        'one', vm=vms['first'],
+        'one', vm=two_linux_vms.first,
         setup_cloud_account=cloud_account, setup_settings=test_system_settings)
-    two = server_factory.create('two', vm=vms['second'], setup_cloud_account=cloud_account)
+    two = server_factory.create('two', vm=two_linux_vms.second, setup_cloud_account=cloud_account)
 
     # Check setupCloud's settings on Server1
     check_system_settings(
@@ -214,9 +206,9 @@ def wait_entity_merge_done(one, two, method, api_object, api_method, expected_re
         time.sleep(MEDIASERVER_MERGE_TIMEOUT.total_seconds() / 10.0)
 
 
-def test_merge_resources(vms, server_factory):
-    one = server_factory.create('one', vm=vms['first'])
-    two = server_factory.create('two', vm=vms['second'])
+def test_merge_resources(two_linux_vms, server_factory):
+    one = server_factory.create('one', vm=two_linux_vms.first)
+    two = server_factory.create('two', vm=two_linux_vms.second)
     user_data = generator.generate_user_data(1)
     camera_data = generator.generate_camera_data(1)
     one.rest_api.ec2.saveUser.POST(**user_data)
@@ -226,9 +218,9 @@ def test_merge_resources(vms, server_factory):
     wait_entity_merge_done(one, two, 'GET', 'ec2', 'getCamerasEx', [camera_data['id']])
 
 
-def test_restart_one_server(vms, server_factory, cloud_account):
-    one = server_factory.create('one', vm=vms['first'])
-    two = server_factory.create('two', vm=vms['second'])
+def test_restart_one_server(two_linux_vms, server_factory, cloud_account):
+    one = server_factory.create('one', vm=two_linux_vms.first)
+    two = server_factory.create('two', vm=two_linux_vms.second)
     one.merge_systems(two)
 
     # Stop Server2 and clear its database

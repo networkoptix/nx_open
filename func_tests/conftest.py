@@ -1,6 +1,7 @@
 import logging
 import os
 from collections import namedtuple
+from contextlib import closing
 
 import pytest
 from netaddr import IPAddress
@@ -302,9 +303,32 @@ def vm_pools(vm_types, registries, vm_factories):
         pools[vm_types].close()
 
 
+def _make_linux_vm_pool(registries, vm_factories):
+    return Pool(registries['linux'], vm_factories['linux'])
+
+
 @pytest.fixture()
-def linux_vm_pool(vm_pools):
-    return vm_pools['linux']
+def linux_vm_pool(registries, vm_factories):
+    with closing(_make_linux_vm_pool(registries, vm_factories)) as pool:
+        yield pool
+
+
+TwoLinuxVms = namedtuple('TwoLinuxVms', ['first', 'second'])
+
+
+@pytest.fixture(scope='session')
+def two_linux_vms(registries, vm_factories, hypervisor):
+    structure = {'10.254.0.0/29': {'first': None, 'second': None}}
+    reachability = {'10.254.0.0/29': {'first': {'second': None}, 'second': {'first': None}}}
+    with closing(_make_linux_vm_pool(registries, vm_factories)) as pool:
+        vms, _ = setup_networks({'linux': pool}, hypervisor, structure, reachability)
+        yield TwoLinuxVms(**vms)
+
+
+@pytest.fixture(scope='session')
+def one_linux_vm(registries, vm_factories):
+    with closing(_make_linux_vm_pool(registries, vm_factories)) as pool:
+        yield pool.get('server')
 
 
 @pytest.fixture(scope='session')
