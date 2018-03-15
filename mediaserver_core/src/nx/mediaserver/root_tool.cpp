@@ -132,7 +132,6 @@ bool RootTool::changeOwner(const QString& path)
 
     return execute({"chown", path}) == 0;
 #else
-    NX_ASSERT(false, "Only linux is supported so far");
     return false;
 #endif
 }
