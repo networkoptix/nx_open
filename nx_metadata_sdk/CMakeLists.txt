@@ -24,10 +24,8 @@ set(sdk_src_nx_kit_origin ${CMAKE_SOURCE_DIR}/open/artifacts/nx_kit)
 file(GLOB_RECURSE sdk_src_nx_kit_files ${sdk_src_nx_kit_origin}/*)
 
 # Collect source files for Plugin SDK.
-set(sdk_src_nx_sdk ${CMAKE_SOURCE_DIR}/common_libs/nx_sdk/src)
-file(GLOB_RECURSE sdk_src_common_files
-    ${sdk_src_nx_sdk}/*
-)
+set(sdk_src_nx_sdk_origin ${CMAKE_SOURCE_DIR}/common_libs/nx_sdk/src)
+file(GLOB_RECURSE sdk_src_nx_sdk_files ${sdk_src_nx_sdk_origin}/*)
 
 # Collect source files for the sample - Stub Metadata Plugin.
 set(sdk_src_sample_origin ${CMAKE_SOURCE_DIR}/plugins/metadata/stub_metadata_plugin/src)
@@ -68,7 +66,7 @@ add_custom_command(OUTPUT ${zip_file}
         ${CMAKE_CURRENT_SOURCE_DIR}/${sdk_name}/${sample_build_script}
         ${sdk_src_static_files}
         ${sdk_src_nx_kit_files}
-        ${sdk_src_common_files}
+        ${sdk_src_nx_sdk_files}
         ${sdk_src_sample_files}
 )
 
