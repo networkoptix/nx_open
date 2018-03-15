@@ -13,6 +13,7 @@ const static_1 = require("@angular/upgrade/static");
 const router_1 = require("@angular/router");
 const http_1 = require("@angular/common/http");
 const ng_bootstrap_1 = require("@ng-bootstrap/ng-bootstrap");
+const ng_bootstrap_2 = require("@ng-bootstrap/ng-bootstrap");
 const index_1 = require("./core/index");
 const ajs_upgraded_providers_1 = require("./ajs-upgraded-providers");
 const ajs_upgraded_providers_2 = require("./ajs-upgraded-providers");
@@ -20,6 +21,7 @@ const ajs_upgraded_providers_3 = require("./ajs-upgraded-providers");
 const app_component_1 = require("./app.component");
 const bar_module_1 = require("./bar/bar.module");
 const language_component_1 = require("./dropdown/language.component");
+const modal_component_1 = require("./modal/modal.component");
 class HybridUrlHandlingStrategy {
     // use only process the `/bar` url
     shouldProcessUrl(url) {
@@ -51,9 +53,11 @@ AppModule = __decorate([
             router_1.RouterModule.forRoot([], { initialNavigation: false })
         ],
         entryComponents: [
-            language_component_1.NxLanguageDropdown
+            language_component_1.NxLanguageDropdown,
+            modal_component_1.NxModalComponent
         ],
         providers: [
+            ng_bootstrap_2.NgbModal,
             { provide: common_1.LocationStrategy, useClass: common_1.PathLocationStrategy },
             { provide: router_1.UrlHandlingStrategy, useClass: HybridUrlHandlingStrategy },
             ajs_upgraded_providers_1.cloudApiServiceProvider
@@ -65,5 +69,6 @@ AppModule = __decorate([
 exports.AppModule = AppModule;
 angular
     .module('cloudApp.directives')
-    .directive('nxLanguageSelect', static_1.downgradeComponent({ component: language_component_1.NxLanguageDropdown }));
+    .directive('nxLanguageSelect', static_1.downgradeComponent({ component: language_component_1.NxLanguageDropdown }))
+    .directive('nxModal', static_1.downgradeComponent({ component: modal_component_1.NxModalComponent }));
 //# sourceMappingURL=app.module.js.map

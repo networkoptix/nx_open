@@ -16,21 +16,6 @@ const core_1 = require("@angular/core");
 const http_1 = require("@angular/common/http");
 const ng_bootstrap_1 = require("@ng-bootstrap/ng-bootstrap");
 let NxLanguageDropdown = class NxLanguageDropdown {
-    // function (language) {
-    //     if (!this.accountMode) {
-    //         if (language == L.language) {
-    //             return;
-    //         }
-    //         this.api.get().changeLanguage(language).then(function () {
-    //             window.location.reload();
-    //         });
-    //     } else {
-    //         this.ngModel = language;
-    //         this.activeLanguage = _.find(this.languages, function (lang) {
-    //             return lang.language == this.ngModel;
-    //         });
-    //     }
-    // }
     constructor(cloudApi, language, httpClient, dropdown, changeDetector) {
         this.cloudApi = cloudApi;
         this.language = language;
@@ -47,26 +32,6 @@ let NxLanguageDropdown = class NxLanguageDropdown {
         this.activeLanguage = lang;
     }
     ngOnInit() {
-        // this.getLanguages()
-        //         .subscribe((data: any) => {
-        //             this.activeLanguage = data.data;
-        //         });
-        // console.log(this.activeLanguage);
-        // this.api.get().getLanguages()
-        //         .subscribe((data: any) => {
-        //             let languages = data.data;
-        //
-        //             console.log(data);
-        //
-        //             this.activeLanguage = languages.find(lang => {
-        //                 return (lang.language === languageService.get().lang.language);
-        //             });
-        //
-        //             if (!this.activeLanguage) {
-        //                 this.activeLanguage = languages[0];
-        //             }
-        //             this.languages = languages;
-        //         });
         this.accountMode = this.accountMode || false;
         this.cloudApi
             .getLanguages()
@@ -95,9 +60,4 @@ NxLanguageDropdown = __decorate([
         core_1.ChangeDetectorRef])
 ], NxLanguageDropdown);
 exports.NxLanguageDropdown = NxLanguageDropdown;
-// angular
-//         .module('cloudApp.directives')
-//         .directive('nxLanguageSelect', downgradeComponent({ component: NxLanguageDropdown }) as angular.IDirectiveFactory);
-//
-//
 //# sourceMappingURL=language.component.js.map

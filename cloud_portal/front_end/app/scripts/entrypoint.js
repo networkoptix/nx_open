@@ -26,6 +26,7 @@ require('./vendor/protocolcheck.js');
 
 //App
 require('./app.js');
+require('./downgraded-providers.js');
 
 //Directives
 require('./directives/autofocus.js');

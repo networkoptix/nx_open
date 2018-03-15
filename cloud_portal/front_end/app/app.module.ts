@@ -6,6 +6,7 @@ import { RouterModule, UrlHandlingStrategy, UrlTree, Routes } from '@angular/rou
 import { HttpClientModule } from '@angular/common/http';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { CoreModule } from './core/index';
 import { cloudApiServiceProvider } from './ajs-upgraded-providers';
@@ -15,6 +16,7 @@ import { uuid2ServiceModule } from './ajs-upgraded-providers';
 import { AppComponent } from './app.component';
 import { BarModule } from './bar/bar.module';
 import { NxLanguageDropdown } from "./dropdown/language.component";
+import { NxModalComponent } from './modal/modal.component';
 
 class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
     // use only process the `/bar` url
@@ -46,9 +48,11 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
         RouterModule.forRoot([], { initialNavigation: false })
     ],
     entryComponents: [
-        NxLanguageDropdown
+        NxLanguageDropdown,
+        NxModalComponent
     ],
     providers: [
+        NgbModal,
         { provide: LocationStrategy, useClass: PathLocationStrategy },
         { provide: UrlHandlingStrategy, useClass: HybridUrlHandlingStrategy },
         cloudApiServiceProvider
@@ -65,7 +69,8 @@ export class AppModule {
 declare var angular: angular.IAngularStatic;
 angular
         .module('cloudApp.directives')
-        .directive('nxLanguageSelect', downgradeComponent({ component: NxLanguageDropdown }) as angular.IDirectiveFactory);
+        .directive('nxLanguageSelect', downgradeComponent({ component: NxLanguageDropdown }) as angular.IDirectiveFactory)
+        .directive('nxModal', downgradeComponent({ component: NxModalComponent }) as angular.IDirectiveFactory);
 
 
 

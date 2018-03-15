@@ -1,12 +1,20 @@
-'use strict';
+(function () {
 
-angular.module('cloudApp')
-    .directive('nxFooter', function () {
+    'use strict';
+
+    angular
+    .module('cloudApp.directives')
+    .directive('nxFooter', NxFooter);
+
+    NxFooter.$inject = ['CONFIG'];
+
+    function NxFooter (CONFIG) {
         return {
             restrict: 'E',
-            templateUrl: Config.viewsDir + 'components/footer.html',
+            templateUrl: CONFIG.viewsDir + 'components/footer.html',
             link: function (scope, element, attrs) {
 
             }
         }
-    });
+    }
+})();

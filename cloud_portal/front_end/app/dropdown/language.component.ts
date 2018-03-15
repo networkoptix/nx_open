@@ -22,22 +22,6 @@ export class NxLanguageDropdown implements OnInit {
     };
     languages = [];
 
-    // function (language) {
-    //     if (!this.accountMode) {
-    //         if (language == L.language) {
-    //             return;
-    //         }
-    //         this.api.get().changeLanguage(language).then(function () {
-    //             window.location.reload();
-    //         });
-    //     } else {
-    //         this.ngModel = language;
-    //         this.activeLanguage = _.find(this.languages, function (lang) {
-    //             return lang.language == this.ngModel;
-    //         });
-    //     }
-    // }
-
     constructor(@Inject('cloudApiService') private cloudApi: any,
                 @Inject('languageService') private language: any,
                 private httpClient: HttpClient,
@@ -50,30 +34,6 @@ export class NxLanguageDropdown implements OnInit {
     }
 
     ngOnInit(): void {
-
-        // this.getLanguages()
-        //         .subscribe((data: any) => {
-        //             this.activeLanguage = data.data;
-        //         });
-
-        // console.log(this.activeLanguage);
-
-        // this.api.get().getLanguages()
-        //         .subscribe((data: any) => {
-        //             let languages = data.data;
-        //
-        //             console.log(data);
-        //
-        //             this.activeLanguage = languages.find(lang => {
-        //                 return (lang.language === languageService.get().lang.language);
-        //             });
-        //
-        //             if (!this.activeLanguage) {
-        //                 this.activeLanguage = languages[0];
-        //             }
-        //             this.languages = languages;
-        //         });
-
         this.accountMode = this.accountMode || false;
 
         this.cloudApi
@@ -91,9 +51,3 @@ export class NxLanguageDropdown implements OnInit {
                 });
     }
 }
-
-// angular
-//         .module('cloudApp.directives')
-//         .directive('nxLanguageSelect', downgradeComponent({ component: NxLanguageDropdown }) as angular.IDirectiveFactory);
-//
-//

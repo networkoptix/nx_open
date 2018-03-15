@@ -22,9 +22,10 @@ window.L = {};
             'ngAnimate',
             'ngRoute',
             // 'ui.bootstrap',
+            // 'NgbModal',
             'ngStorage',
             'base64',
-            // 'nxCommon',
+            'nxCommon',
             'ngToast',
             'angular-clipboard',
 

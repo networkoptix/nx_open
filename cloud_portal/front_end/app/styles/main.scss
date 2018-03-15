@@ -63,15 +63,17 @@ footer {
     &:hover{
       color:$light16;
     }
-
-    &.dropdown{
-      padding:6px;
-    }
   }
     
     .navbar-nav {
         flex-direction : row;
         float          : left;
+    
+        .dropdown-menu {
+            position : absolute;
+            float    : left;
+            padding  : 6px;
+        }
     }
     
     .navbar-right {
