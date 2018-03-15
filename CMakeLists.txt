@@ -190,6 +190,7 @@ if(withMediaServer)
     add_subdirectory(storage_plugins)
 
     if(LINUX AND box MATCHES "none|tx1")
+        add_subdirectory(root_tool_lib)
         add_subdirectory(root_tool)
     endif()
 endif()
