@@ -260,10 +260,8 @@ def hypervisor(configuration, host_os_access):
     return VirtualBox(host_os_access, configuration['vm_host']['address'])
 
 
-@pytest.fixture()
-def vm_pools(request, host_os_access, hypervisor, configuration, ssh_config):
-    # All objects here are initialized quickly.
-    # After pool has been closed, it's possible to reuse it, but, for simplicity, it's recreated.
+@pytest.fixture(scope='session')
+def session_vm_pools(request, ssh_config, configuration, host_os_access, hypervisor):
     access_manager = SSHAccessManager(ssh_config, 'root', Path(configuration['ssh']['private_key']).expanduser())
     pools = {
         vm_type: Pool(
@@ -280,9 +278,15 @@ def vm_pools(request, host_os_access, hypervisor, configuration, ssh_config):
         for vm_type, vm_configuration_raw
         in configuration['vm_types'].items()}
     if request.config.getoption('--clean'):
-        pools['linux'].destroy()
-    yield pools
-    for pool in pools.values():
+        for pool in pools.values():
+            pool.destroy()
+    return pools
+
+
+@pytest.fixture()
+def vm_pools(session_vm_pools):
+    yield session_vm_pools
+    for pool in session_vm_pools.values():
         pool.close()
 
 
