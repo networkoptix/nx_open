@@ -1078,19 +1078,20 @@ QString QnStorageManager::toCanonicalPath(const QString& path)
 
 void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
 {
-    {
-        int storageIndex = qnStorageDbPool->getStorageIndex(storage);
-        NX_LOG(QString("Adding storage. Path: %1").arg(storage->getUrl()), cl_logINFO);
+    int storageIndex = qnStorageDbPool->getStorageIndex(storage);
+    NX_LOG(QString("Adding storage. Path: %1").arg(storage->getUrl()), cl_logINFO);
 
-        removeStorage(storage); // remove existing storage record if exists
-        storage->setStatus(Qn::Offline); // we will check status after
-        {
-            QnMutexLocker lk(&m_mutexStorages);
-            m_storageRoots.insert(storageIndex, storage);
-        }
-        connect(storage.data(), SIGNAL(archiveRangeChanged(const QnStorageResourcePtr &, qint64, qint64)),
-                this, SLOT(at_archiveRangeChanged(const QnStorageResourcePtr &, qint64, qint64)), Qt::DirectConnection);
+    removeStorage(storage); // remove existing storage record if exists
+    storage->setStatus(Qn::Offline); // we will check status after
+    {
+        QnMutexLocker lk(&m_mutexStorages);
+        m_storageRoots.insert(storageIndex, storage);
     }
+    connect(storage.data(), SIGNAL(archiveRangeChanged(const QnStorageResourcePtr &, qint64, qint64)),
+            this, SLOT(at_archiveRangeChanged(const QnStorageResourcePtr &, qint64, qint64)), Qt::DirectConnection);
+    connect(storage.data(), &QnStorageResource::isUsedForWritingChanged,
+        this, [this]() { m_warnSended = false; });
+    m_warnSended = false;
 }
 
 bool QnStorageManager::checkIfMyStorage(const QnStorageResourcePtr &storage) const
@@ -1116,8 +1117,6 @@ void QnStorageManager::onNewResource(const QnResourcePtr &resource)
         connect(storage.data(), &QnStorageResource::isBackupChanged, this, &QnStorageManager::at_storageChanged);
         if (checkIfMyStorage(storage))
             addStorage(storage);
-        connect(storage.data(), &QnStorageResource::isUsedForWritingChanged,
-            this, [this]() { m_warnSended = false; });
     }
 }
 
@@ -1180,6 +1179,7 @@ void QnStorageManager::removeStorage(const QnStorageResourcePtr &storage)
         }
     }
     m_spaceInfo.storageRemoved(storageIndex);
+    disconnect(storage.data(), nullptr, this, nullptr);
 }
 
 void QnStorageManager::at_storageChanged(const QnResourcePtr &resource)
@@ -1187,8 +1187,6 @@ void QnStorageManager::at_storageChanged(const QnResourcePtr &resource)
     QnStorageResourcePtr storage = qSharedPointerDynamicCast<QnStorageResource>(resource);
     if (!storage)
         return;
-    if (storage->getParentId() == commonModule()->moduleGUID())
-        m_warnSended = false;
 
     NX_LOG(lit("%1 role: %2, storage role: %3")
             .arg(Q_FUNC_INFO)
