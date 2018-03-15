@@ -92,9 +92,7 @@ class ArtifactFactory(object):
             if not artifact.path.exists():
                 log.warning('Artifact file is missing, skipping: %s' % artifact.path)
                 continue
-            data = artifact.path.read_bytes
-            with open(artifact.path, 'rb') as f:
-                data = f.read()
+            data = artifact.path.read_bytes()
             repository_artifact_type = artifact.artifact_type.produce_repository_type(repository)
             repository.add_artifact_with_session(
                 self._current_test_run,
