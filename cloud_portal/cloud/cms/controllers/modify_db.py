@@ -38,7 +38,7 @@ def notify_version_ready(customization, version_id, product_name, exclude_user):
 
 
 def save_unrevisioned_records(context, customization, language, data_structures,
-                              request_data, request_files, user):
+                              request_data, request_files, user, version_id=None):
     upload_errors = []
     for data_structure in data_structures:
         data_structure_name = data_structure.name
@@ -134,6 +134,7 @@ def save_unrevisioned_records(context, customization, language, data_structures,
                  product_name=context.product.name,
                  preview=True,
                  incremental=True,
+                 version_id=version_id,
                  changed_context=context)
 
     return upload_errors
@@ -184,11 +185,12 @@ def generate_preview_link(context=None):
     return context.url + "?preview" if context else "/content/about?preview"
 
 
-def generate_preview(context=None, send_to_review=False):
+def generate_preview(context=None, version_id=None, send_to_review=False):
     fill_content(customization_name=settings.CUSTOMIZATION,
                  preview=True,
                  incremental=True,
                  changed_context=context,
+                 version_id=version_id,
                  send_to_review=send_to_review)
     return generate_preview_link(context)
 
@@ -203,20 +205,20 @@ def publish_latest_version(customization, version_id, user):
 
 def send_version_for_review(context, customization, language, data_structures,
                             product, request_data, request_files, user):
-    old_versions = ContentVersion.objects.filter(accepted_date=None, name=product.name)
+    old_versions = ContentVersion.objects.filter(accepted_date=None, product=product)
 
     if old_versions.exists():
         old_version = old_versions.latest('created_date')
         strip_version_from_records(old_version, product)
         old_version.delete()
 
-    upload_errors = save_unrevisioned_records(context,
-        customization, language, data_structures,
-        request_data, request_files, user)
-
     version = ContentVersion(customization=customization,
                              product=product, created_by=user)
     version.save()
+
+    upload_errors = save_unrevisioned_records(context,
+        customization, language, data_structures,
+        request_data, request_files, user, version_id=version.id)
 
     update_records_to_version(Context.objects.filter(
         product=product), customization, version)

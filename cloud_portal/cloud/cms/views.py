@@ -173,7 +173,7 @@ def version_action(request, version_id=None):
         defaults.bad_request("Version does not exist")
 
     if "Preview" in request.POST:
-        generate_preview(send_to_review=True)
+        generate_preview(version_id=version_id, send_to_review=True)
         preview_flag = "?preview"
 
     elif "Publish" in request.POST:
