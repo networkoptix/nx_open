@@ -17,7 +17,7 @@ import server_api_data_generators as generator
 import test_utils.utils as utils
 import transaction_log
 from memory_usage_metrics import load_host_memory_usage
-from test_utils.api_shortcuts import get_server_id
+from test_utils.api_shortcuts import get_server_id, get_system_settings
 from test_utils.compare import compare_values
 from test_utils.server import MEDIASERVER_MERGE_TIMEOUT
 from test_utils.utils import GrowingSleep
@@ -304,5 +304,5 @@ def test_scalability(artifact_factory, metrics_saver, config, lightweight_server
         collect_additional_metrics(metrics_saver, servers, lightweight_servers)
     finally:
         if servers[0].is_online():
-            servers[0].rest_api.get('/api/systemSettings')  # log final settings
+            get_system_settings(servers[0].rest_api)  # log final settings
     assert utils.str_to_bool(servers[0].settings['autoDiscoveryEnabled']) == False

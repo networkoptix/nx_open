@@ -11,7 +11,7 @@ import yaml
 from pathlib2 import Path
 
 import server_api_data_generators as generator
-from test_utils.api_shortcuts import get_server_id, get_settings
+from test_utils.api_shortcuts import get_server_id, get_system_settings
 from test_utils.networking import setup_networks
 from test_utils.rest_api import HttpError, RestApiError
 from test_utils.server import MEDIASERVER_MERGE_TIMEOUT
@@ -29,12 +29,12 @@ def test_system_settings():
 
 
 def check_system_settings(server, **kw):
-    settings_to_check = {k: v for k, v in get_settings(server.rest_api).items() if k in kw.keys()}
+    settings_to_check = {k: v for k, v in get_system_settings(server.rest_api).items() if k in kw.keys()}
     assert settings_to_check == kw
 
 
 def change_bool_setting(server, setting):
-    val = str_to_bool(get_settings(server.rest_api)[setting])
+    val = str_to_bool(get_system_settings(server.rest_api)[setting])
     settings = {setting:  bool_to_str(not val)}
     server.rest_api.get('/api/systemSettings', params=settings)
     check_system_settings(server, **settings)
@@ -43,7 +43,7 @@ def change_bool_setting(server, setting):
 
 def wait_for_settings_merge(one, two):
     assert wait_until(
-        lambda: one.rest_api.get('/api/systemSettings') == two.rest_api.get('/api/systemSettings'),
+        lambda: get_system_settings(one.rest_api) == get_system_settings(two.rest_api),
         name='for same response to /api/systemSettings from {} and {}'.format(one.machine.alias, two.machine.alias))
 
 

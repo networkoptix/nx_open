@@ -5,7 +5,7 @@ import logging
 import pytest
 
 import server_api_data_generators as generator
-from test_utils.api_shortcuts import get_server_id
+from test_utils.api_shortcuts import get_server_id, get_system_settings, get_local_system_id
 from test_utils.utils import SimpleNamespace
 
 log = logging.getLogger(__name__)
@@ -44,5 +44,5 @@ def test_change_local_system_id(env):
     check_servers_online(env)
     new_local_system_id = generator.generate_server_guid(1, True)
     env.one.rest_api.api.configure.POST(localSystemId=new_local_system_id)
-    assert env.one.rest_api.get('/api/systemSettings')['settings']['localSystemId'] == new_local_system_id
+    assert get_local_system_id(env.one.rest_api) == new_local_system_id
     check_servers_offline(env)

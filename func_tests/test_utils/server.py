@@ -16,7 +16,7 @@ import requests.exceptions
 from netaddr.ip import IPAddress, IPNetwork
 from pathlib2 import Path
 
-from test_utils.api_shortcuts import get_local_system_id, get_server_id, get_settings
+from test_utils.api_shortcuts import get_local_system_id, get_server_id, get_system_settings
 from test_utils.utils import wait_until
 from .camera import Camera, SampleMediaFile, make_schedule_task
 from .cloud_host import CloudAccount
@@ -185,7 +185,7 @@ class Server(object):
             **kw)
         settings = setup_response['settings']
         self.set_user_password(cloud_account.rest_api.user, cloud_account.password)
-        assert get_settings(self.rest_api)['systemName'] == self.name
+        assert get_system_settings(self.rest_api)['systemName'] == self.name
         return settings
 
     def detach_from_cloud(self, password):
