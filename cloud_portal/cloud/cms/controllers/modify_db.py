@@ -196,7 +196,7 @@ def generate_preview(context=None, send_to_review=False):
 def publish_latest_version(customization, version_id, user):
     publish_errors = accept_latest_draft(customization, version_id, user)
     if not publish_errors:
-        product = Product.objects.filter(context__datastructure__datarecord__version__id=version_id).last()
+        product = Product.objects.get(contentversion__id=version_id)
         fill_content(customization_name=customization.name, product_name=product.name, preview=False, incremental=True)
     return publish_errors
 
@@ -215,7 +215,7 @@ def send_version_for_review(context, customization, language, data_structures,
         request_data, request_files, user)
 
     version = ContentVersion(customization=customization,
-                             name=product.name, created_by=user)
+                             product=product, created_by=user)
     version.save()
 
     update_records_to_version(Context.objects.filter(

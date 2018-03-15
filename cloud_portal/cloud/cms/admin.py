@@ -107,11 +107,13 @@ admin.site.register(DataRecord, DataRecordAdmin)
 
 
 class ContentVersionAdmin(CMSAdmin):
-    list_display = ('content_version_actions', 'id', 'customization', 'name',
+    list_display = ('content_version_actions', 'id', 'product','customization',
                     'created_date', 'created_by',
                     'accepted_date', 'accepted_by', 'state')
 
     list_display_links = ('id', )
+    list_filter = ('product', 'customization')
+    search_fields = ('accepted_by__email', 'created_by__email')
 
     def content_version_actions(self, obj):
         return format_html('<button class="btn btn-sm btn-info"> <a href="{}">review version</a></button>',

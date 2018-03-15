@@ -185,7 +185,7 @@ class Customization(models.Model):
         return self.name
 
     def version_id(self, product_name=settings.PRIMARY_PRODUCT):
-        versions = ContentVersion.objects.filter(datarecord__data_structure__context__product__name=product_name)
+        versions = ContentVersion.objects.filter(product__name=product_name)
         return versions.latest('accepted_date').id if versions.exists() else 0
 
     @property
@@ -237,6 +237,7 @@ class ContentVersion(models.Model):
         )
 
     customization = models.ForeignKey(Customization)
+    product = models.ForeignKey(Product, default=Product.objects.get(name=settings.PRIMARY_PRODUCT).id)
     name = models.CharField(max_length=1024)
 
     created_date = models.DateTimeField(auto_now_add=True)
@@ -256,8 +257,8 @@ class ContentVersion(models.Model):
     def state(self):
         if self.accepted_by == None:
             return 'in review'
-        product = Product.objects.filter(context__datastructure__datarecord__version__id=self.id).last()
-        version_id = self.customization.version_id(product.name)
+
+        version_id = self.customization.version_id(self.product.name)
 
         if version_id > self.id:
             return 'old'
