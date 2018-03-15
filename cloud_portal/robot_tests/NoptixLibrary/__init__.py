@@ -65,7 +65,7 @@ class NoptixLibrary(object):
             except:
                 not_found = "Something weird happened it's Kyle's fault"
             else:
-                not_found = None
+                raise NoSuchElementException
             time.sleep(.2)  
         raise AssertionError(not_found)
 
@@ -97,9 +97,9 @@ class NoptixLibrary(object):
     3.  [(b'Subject: ', None), (b' \xd0\x90\xd0\xba\xd1\x82\xd0\xb8\xd0\xb2\xd0\xb8\xd1\x80\xd1\x83\xd0\xb9\xd1\x82\xd0\xb5 \xd1\x83\xd1\x87\xd0\xb5\xd1\x82\xd0\xbd\xd1\x83\xd1\x8e \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd1\x8c', 'utf-8')]
     4.  Активируйте учетную запись
     '''
-    def check_email_subject(self, email_id, sub_text, emailAddress, password, host, port):
+    def check_email_subject(self, email_id, sub_text, email_address, password, host, port):
         conn = imaplib.IMAP4_SSL(host, int(port))
-        conn.login(emailAddress, password)
+        conn.login(email_address, password)
         conn.select()
         typ, data = conn.uid('fetch', email_id, '(BODY.PEEK[HEADER.FIELDS (SUBJECT)])')
         for res in data:

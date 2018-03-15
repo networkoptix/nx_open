@@ -84,7 +84,7 @@ Get Email Link
     Run Keyword If    "${link type}"=="activate"    Check Email Subject    ${email}    ${ACTIVATE YOUR ACCOUNT EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
     Run Keyword If    "${link type}"=="reset"    Check Email Subject    ${email}    ${RESET PASSWORD EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
     ${links}    Get Links From Email    ${email}
-    Mark Email As Read    ${email}
+    Mark All Emails As Read
     Close Mailbox
     Return From Keyword    ${links}
 

@@ -122,14 +122,17 @@ Changing first name and saving maintains that setting
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
     Verify In Account Page
+    Clear Element Text    ${ACCOUNT FIRST NAME}
     Input Text    ${ACCOUNT FIRST NAME}    nameChanged
     Click Button    ${ACCOUNT SAVE}
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
     Close Browser
     Open Browser and go to URL    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
+    Validate Log In
     Verify In Account Page
     Wait Until Textfield Contains    ${ACCOUNT FIRST NAME}    nameChanged
+    Clear Element Text    ${ACCOUNT FIRST NAME}
     Input Text    ${ACCOUNT FIRST NAME}    ${TEST FIRST NAME}
     Click Button    ${ACCOUNT SAVE}
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
@@ -147,6 +150,7 @@ Changing last name and saving maintains that setting
     Close Browser
     Open Browser and go to URL    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
+    Validate Log In
     Verify In Account Page
     Wait Until Textfield Contains    ${ACCOUNT LAST NAME}    nameChanged
     Input Text    ${ACCOUNT LAST NAME}    ${TEST FIRST NAME}
@@ -211,8 +215,8 @@ Langauge is changeable on the account page
     Open Browser and go to URL    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     :FOR    ${lang}    ${account}   IN ZIP    ${LANGUAGES LIST}    ${LANGUAGES ACCOUNT TEXT LIST}
-    \  Verify In Account Page
     \  Sleep    1
+    \  Verify In Account Page
     \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Click Button    ${ACCOUNT LANGUAGE DROPDOWN}
     \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Wait Until Element Is Visible    //form[@name='accountForm']//a[@ng-click='changeLanguage(lang.language)']/span[@lang='${lang}']
     \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Click Element    //form[@name='accountForm']//a[@ng-click='changeLanguage(lang.language)']/span[@lang='${lang}']

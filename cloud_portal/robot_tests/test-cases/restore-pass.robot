@@ -57,7 +57,7 @@ should be able to set new password (which is same as old), redirect
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
     Click Button    ${RESET PASSWORD BUTTON}
     ${link}    Get Email Link    ${email}    reset
-    Go To    ${link}[1]
+    Go To    ${link}
     Wait Until Elements Are Visible    ${RESET PASSWORD INPUT}    ${SAVE PASSWORD}
     Input Text    ${RESET PASSWORD INPUT}    ${password}
     Click Button    ${SAVE PASSWORD}
@@ -76,7 +76,7 @@ should set new password, login with new password
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
     Click Button    ${RESET PASSWORD BUTTON}
     ${link}    Get Email Link    ${email}    reset
-    Go To    ${link}[1]
+    Go To    ${link}
     Wait Until Elements Are Visible    ${RESET PASSWORD INPUT}    ${SAVE PASSWORD}
     Input Text    ${RESET PASSWORD INPUT}    ${ALT PASSWORD}
     Click Button    ${SAVE PASSWORD}
@@ -98,12 +98,12 @@ should not allow to use one restore link twice
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
     Click Button    ${RESET PASSWORD BUTTON}
     ${link}    Get Email Link    ${email}    reset
-    Go To    ${link}[1]
+    Go To    ${link}
     Wait Until Elements Are Visible    ${RESET PASSWORD INPUT}    ${SAVE PASSWORD}
     Input Text    ${RESET PASSWORD INPUT}    ${ALT PASSWORD}
     Click Button    ${SAVE PASSWORD}
     Wait Until Elements Are Visible    ${RESET SUCCESS MESSAGE}    ${RESET SUCCESS LOG IN LINK}
-    Go To    ${link}[1]
+    Go To    ${link}
     Wait Until Elements Are Visible    ${RESET PASSWORD INPUT}    ${SAVE PASSWORD}
     Input Text    ${RESET PASSWORD INPUT}    ${ALT PASSWORD}
     Click Button    ${SAVE PASSWORD}
@@ -119,8 +119,9 @@ should make not-activated user active by restoring password
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
     Click Button    ${RESET PASSWORD BUTTON}
+    Sleep    20    #This is to allow the email server to update making sure you get the reset email insetad of the activate email
     ${link}    Get Email Link    ${email}    reset
-    Go To    ${link}[1]
+    Go To    ${link}
     Wait Until Elements Are Visible    ${RESET PASSWORD INPUT}    ${SAVE PASSWORD}
     Input Text    ${RESET PASSWORD INPUT}    ${ALT PASSWORD}
     Click Button    ${SAVE PASSWORD}
