@@ -4,6 +4,7 @@ import logging
 from netaddr import EUI
 
 from test_utils.os_access import ProcessError
+from test_utils.utils import wait_until
 
 logger = logging.getLogger(__name__)
 
@@ -57,11 +58,11 @@ class LinuxNetworking(object):
 
     def enable_internet(self):
         self._os_access.run_command(['iptables', '-D', 'OUTPUT', '-j', 'REJECT'])
-        assert self.can_reach('8.8.8.8')
+        assert wait_until(lambda: self.can_reach('8.8.8.8'), name="until internet is on")
 
     def disable_internet(self):
         self._os_access.run_command(['iptables', '-A', 'OUTPUT', '-j', 'REJECT'])
-        assert not self.can_reach('8.8.8.8')
+        assert wait_until(lambda: not self.can_reach('8.8.8.8'), name="until internet is off")
 
     def setup_nat(self, outer_mac):
         """Connection can be initiated from inner_net_nodes only. Addresses are masqueraded."""
