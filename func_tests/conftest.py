@@ -95,7 +95,7 @@ def pytest_addoption(parser):
 
 @pytest.fixture(scope='session')
 def vm_address(request):
-    return request.config.getoption('--vm-address'),
+    return request.config.getoption('--vm-address')
 
 
 VMHost = namedtuple('VMHost', ['hostname', 'username', 'private_key', 'work_dir', 'vm_port_base', 'vm_name_prefix'])
@@ -241,7 +241,7 @@ def stream_type(request):
 
 @pytest.fixture()
 def cloud_host(request, mediaserver_deb):
-    cloud_group = request.config.getoption('--cloud-group'),
+    cloud_group = request.config.getoption('--cloud-group')
     return resolve_cloud_host_from_registry(cloud_group, mediaserver_deb.customization.company)
 
 
