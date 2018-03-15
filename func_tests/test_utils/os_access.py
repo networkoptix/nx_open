@@ -164,6 +164,10 @@ class OsAccess(object):
         return RunningTime(new_time, datetime.datetime.now(pytz.utc) - started_at)
 
 
+subprocesses_logger = log.getChild('subprocesses')
+subprocesses_logger.setLevel(logging.INFO)
+
+
 class LocalAccess(OsAccess):
     def __init__(self):
         self.name = 'localhost'
@@ -181,35 +185,34 @@ class LocalAccess(OsAccess):
         else:
             args = [str(arg) for arg in args]
             shell = False
-            logged_command_line = _arg_list_to_str(args)
-        log.debug('Execute:\n%s', logged_command_line)
+            logged_command_line = '\n' + _arg_list_to_str(args)
+        log.debug('RUN: %s', logged_command_line)
         pipe = subprocess.Popen(
             args,
             shell=shell,
             cwd=cwd and str(cwd), env=env and {k: str(v) for k, v in env.items()},
             stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE if input else None,
             close_fds=True)
-        child = log.getChild('subprocesses')
-        process_logger = child.getChild(str(pipe.pid))
-        process_logger.debug("Started.")
+        subprocess_logger = subprocesses_logger.getChild(str(pipe.pid))
+        subprocess_logger.debug("Started.")
         if input:
             try:
-                process_logger.debug("STDIN data:\n%s", input)
+                subprocess_logger.debug("STDIN data:\n%s", input)
                 pipe.stdin.write(input)
             except IOError as e:
                 if e.errno == errno.EPIPE:
-                    process_logger.error("STDIN broken.")
+                    subprocess_logger.error("STDIN broken.")
                     pass
                 elif e.errno == errno.EINVAL and pipe.poll() is not None:
                     if pipe.poll() is None:
-                        process_logger.error("STDIN invalid but process is still running.")
+                        subprocess_logger.error("STDIN invalid but process is still running.")
                     else:
-                        process_logger.error("STDIN invalid: process terminated.")
+                        subprocess_logger.error("STDIN invalid: process terminated.")
                     pass
                 else:
                     raise
             pipe.stdin.close()
-            process_logger.debug("STDIN closed.")
+            subprocess_logger.debug("STDIN closed.")
         streams = [pipe.stdout, pipe.stderr]
         buffers = {stream: bytearray() for stream in streams}
         names = {pipe.stdout: 'STDOUT', pipe.stderr: 'STDERR'}
@@ -219,36 +222,36 @@ class LocalAccess(OsAccess):
             logging_levels=(logging.DEBUG, logging.ERROR))
         while streams:
             select_timeout_sec = int(ceil(wait.delay_sec))
-            process_logger.debug("Wait for select with %r seconds", select_timeout_sec)
+            subprocess_logger.debug("Wait for select for %r seconds", select_timeout_sec)
             streams_to_read, _, _ = select(streams, [], [], select_timeout_sec)
             if not streams_to_read:
-                process_logger.debug("Nothing in streams.")
+                subprocess_logger.debug("Nothing in streams.")
                 if pipe.poll() is not None:
                     break
                 if not wait.again():
                     raise ProcessTimeoutError(args, timeout)
             else:
                 for stream in streams_to_read:
-                    process_logger.debug("%s to be read from.", names[stream])
+                    subprocess_logger.debug("%s to be read from.", names[stream])
                     chunk = stream.read()
                     if not chunk:
-                        process_logger.debug("%s to be closed, %d bytes total.", names[stream], len(buffers[stream]))
+                        subprocess_logger.debug("%s to be closed, %d bytes total.", names[stream], len(buffers[stream]))
                         stream.close()
                         streams.remove(stream)
                     else:
                         if stream is not pipe.stdout or log_output:
                             try:
-                                process_logger.debug("%s data to be decoded.", names[stream])
+                                subprocess_logger.debug("%s data to be decoded.", names[stream])
                                 decoded = chunk.decode()
                             except UnicodeDecodeError as e:
-                                process_logger.debug(
+                                subprocess_logger.debug(
                                     "%s data, %d bytes, considered binary because of %r.",
                                     names[stream], len(chunk), e)
                             else:
-                                process_logger.debug(
+                                subprocess_logger.debug(
                                     u"%s data, %d bytes, %d characters, decoded:\n%s",
                                     names[stream], len(chunk), len(decoded), decoded)
-                        process_logger.debug("%s data appended to buffer.")
+                        subprocess_logger.debug("%s data appended to buffer.")
                         buffers[stream].extend(chunk)
         while True:
             return_code = pipe.poll()
@@ -257,7 +260,7 @@ class LocalAccess(OsAccess):
                     raise ProcessTimeoutError(args, timeout)
             else:
                 break
-        process_logger.debug("Return code %d.", return_code)
+        subprocess_logger.debug("Return code %d.", return_code)
         if check_retcode and return_code:
             raise ProcessError(return_code, logged_command_line, output=bytes(buffers[pipe.stderr]))
         return bytes(buffers[pipe.stdout])
