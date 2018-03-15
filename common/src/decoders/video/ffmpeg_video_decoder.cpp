@@ -128,7 +128,7 @@ void QnFfmpegVideoDecoder::flush()
     //avcodec_flush_buffers(c); // does not flushing output frames
     int got_picture = 0;
     QnFfmpegAvPacket avpkt;
-    while (avcodec_decode_video2(m_context, m_frame, &got_picture, &avpkt) > 0);
+    while (decodeVideo(m_context, m_frame, &got_picture, &avpkt) > 0);
 }
 
 
@@ -302,6 +302,7 @@ void QnFfmpegVideoDecoder::resetDecoder(const QnConstCompressedVideoDataPtr& dat
     //m_context->flags2 |= CODEC_FLAG2_FAST;
     m_frame->data[0] = 0;
     m_spsFound = false;
+    m_dtsQueue.clear();
 }
 
 void QnFfmpegVideoDecoder::setOutPictureSize( const QSize& /*outSize*/ )
@@ -359,6 +360,25 @@ void QnFfmpegVideoDecoder::forceMtDecoding(bool value)
         m_forcedMtDecoding = value;
         m_needRecreate = oldMtDecoding != newMtDecoding;
     }
+}
+
+int QnFfmpegVideoDecoder::decodeVideo(
+    AVCodecContext *avctx,
+    AVFrame *picture,
+    int *got_picture_ptr,
+    const AVPacket *avpkt)
+{
+    int result = avcodec_decode_video2(avctx, picture, got_picture_ptr, avpkt);
+
+    if (result && avpkt && avpkt->dts != AV_NOPTS_VALUE)
+        m_dtsQueue.push_back(avpkt->dts);
+
+    if (*got_picture_ptr && !m_dtsQueue.empty())
+    {
+        picture->pkt_dts = m_dtsQueue.front();
+        m_dtsQueue.pop_front();
+    }
+    return result;
 }
 
 //The input buffer must be FF_INPUT_BUFFER_PADDING_SIZE larger than the actual read bytes because some optimized bitstream readers read 32 or 64 bits at once and could read over the end.
@@ -504,9 +524,9 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
         // -------------------------
         if(m_context->codec)
         {
-            avcodec_decode_video2(m_context, m_frame, &got_picture, &avpkt);
+            decodeVideo(m_context, m_frame, &got_picture, &avpkt);
             for(int i = 0; i < 2 && !got_picture && (data->flags & QnAbstractMediaData::MediaFlags_DecodeTwice); ++i)
-                avcodec_decode_video2(m_context, m_frame, &got_picture, &avpkt);
+                decodeVideo(m_context, m_frame, &got_picture, &avpkt);
         }
 
         if (got_picture)
@@ -550,7 +570,7 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
     else {
         QnFfmpegAvPacket avpkt;
         avpkt.pts = avpkt.dts = m_prevTimestamp;
-        avcodec_decode_video2(m_context, m_frame, &got_picture, &avpkt); // flush
+        decodeVideo(m_context, m_frame, &got_picture, &avpkt); // flush
     }
 
     if (got_picture)
