@@ -12,7 +12,7 @@
 				<b>{{source}}</b> ({{sourceIp}})
 			</td>
 			{{#aggregated}}
-				<td>{{reason}}</td>
+				<td class="error">{{reason}}</td>
 				<td>{{timestampDate}} <b>{{timestampTime}}</b></td>
 			{{/aggregated}}
 		</tr>
