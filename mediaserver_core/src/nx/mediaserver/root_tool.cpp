@@ -99,6 +99,7 @@ Qn::StorageInitResult RootTool::remount(const QUrl& url, const QString& path)
 
 bool RootTool::unmount(const QString& path)
 {
+#if defined (Q_OS_LINUX)
     if (m_toolPath.isEmpty())
     {
         root_tool::Actions actions;
@@ -109,6 +110,10 @@ bool RootTool::unmount(const QString& path)
     }
 
     return execute({"unmount", path}) == 0;
+#else
+    NX_ASSERT(false, "Only linux is supported so far");
+    return false;
+#endif
 }
 
 bool RootTool::changeOwner(const QString& path)
