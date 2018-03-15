@@ -2,7 +2,6 @@ import logging
 from collections import namedtuple
 from pprint import pformat
 
-from decorator import contextmanager
 from pylru import lrudecorator
 
 from test_utils.move_lock import MoveLock
@@ -45,12 +44,12 @@ class Registry(object):
 
     class Error(Exception):
         def __init__(self, reservations, message):
-            super(Exception, self).__init__("{}; current reservations:\n{}".format(message, pformat(reservations)))
+            super(Exception, self).__init__("current reservations:\n{}".format(message, pformat(reservations)))
             self.reservations = reservations
 
     class NoAvailableNames(Exception):
         def __init__(self, reservations, alias):
-            super(Registry.NoAvailableNames, self).__init__(reservations, "No available name for {}".format(alias))
+            super(Registry.NoAvailableNames, self).__init__(reservations, "No available names for {}".format(alias))
             self.alias = alias
 
     class NotReserved(Exception):
@@ -76,31 +75,36 @@ class Registry(object):
         else:
             return load(contents)
 
-    def reserve(self, alias):
+    def reserve(self, *aliases):
         with self._lock:
             reservations = self._read_reservations()
+            aliases_left = list(aliases)
             for index in range(self._limit):
                 name = '{}{:03d}'.format(self._name_prefix, index)
                 if name not in reservations or reservations[name] is None:
+                    alias = aliases_left.pop()
                     reservations[name] = alias
                     self._os_access.write_file(self._path, dump(reservations))
-                    return index, name
-        raise self.NoAvailableNames(reservations, alias)
+                    yield index, name
+                    if not aliases_left:
+                        return
+        raise self.NoAvailableNames(reservations, aliases_left)
 
-    def relinquish(self, name):
+    def relinquish(self, *names):
         with self._lock:
             reservations = self._read_reservations()
-            if name in reservations and reservations[name] is not None:
-                reservations[name] = None
-                self._os_access.write_file(self._path, dump(reservations))
-            else:
-                raise self.NotReserved(reservations, name)
+            for name in names:
+                if name in reservations and reservations[name] is not None:
+                    reservations[name] = None
+                    self._os_access.write_file(self._path, dump(reservations))
+                else:
+                    raise self.NotReserved(reservations, name)
 
-    @contextmanager
-    def clean(self):
+    def clean(self, cleanup_procedure=None):
         with self._lock:
-            reservations = self._read_reservations()
-            yield reservations.keys()
+            if cleanup_procedure is not None:
+                for name in self._read_reservations():
+                    cleanup_procedure(name)
             self._os_access.rm_tree(self._path, ignore_errors=True)  # Not removed in case of exception.
 
 
@@ -111,17 +115,13 @@ class MachineNotResponding(Exception):
         self.name = name
 
 
-class Pool(object):
-    """Get (with caching), allocate (bypassing cache) and recycle VMs."""
-
-    def __init__(self, vm_configuration, registry, hypervisor, access_manager):
+class Factory(object):
+    def __init__(self, vm_configuration, hypervisor, access_manager):
         self._vm_configuration = vm_configuration
         self._access_manager = access_manager
-        self._registry = registry
         self._hypervisor = hypervisor
 
-    def allocate(self, alias):
-        index, name = self._registry.reserve(alias)
+    def allocate(self, alias, name, index):
         try:
             info = self._hypervisor.find(name)
         except VMNotFound:
@@ -141,33 +141,24 @@ class Pool(object):
         vm.networking.enable_internet()
         return vm
 
+
+class Pool(object):
+    """Get many VMs with caching, release all at once."""
+
+    def __init__(self, registry, factory):
+        self._factory = factory
+        self._registry = registry
+
     @lrudecorator(100)
     def get(self, alias):
-        return self.allocate(alias)
-
-    def recycle(self, machine):
-        del self.get.cache[(self, machine.alias), ()]
-        self._registry.relinquish(machine.name)
+        (index, name), = self._registry.reserve(alias)
+        return self._factory.allocate(alias, name, index)
 
     def close(self):
-        for key in self.get.cache:
-            machine = self.get.cache[key]
-            (pool, alias), empty_kwargs = key
+        names = []
+        for cache_key, machine in self.get.cache.items():
+            (pool, alias), _empty_kwargs = cache_key
             if pool is self:
-                assert not empty_kwargs
                 assert alias == machine.alias
-                self.recycle(machine)
-
-    def clean(self):
-        with self._registry.clean():
-            pass
-
-    def destroy(self):
-        with self._registry.clean() as names:
-            for name in names:
-                try:
-                    self._hypervisor.find(name)
-                except VMNotFound:
-                    logger.warning("VM %s is not created yet", name)
-                else:
-                    self._hypervisor.destroy(name)
+                names.append(machine.name)
+        self._registry.relinquish(*names)

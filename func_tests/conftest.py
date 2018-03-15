@@ -24,7 +24,7 @@ from test_utils.server_physical_host import PhysicalInstallationCtl
 from test_utils.ssh.access_manager import SSHAccessManager
 from test_utils.ssh.config import SSHConfig
 from test_utils.virtual_box import VirtualBox
-from test_utils.vm import Pool, Registry, VMConfiguration
+from test_utils.vm import Factory, Registry, VMConfiguration, Pool
 
 JUNK_SHOP_PLUGIN_NAME = 'junk-shop-db-capture'
 
@@ -261,22 +261,33 @@ def hypervisor(configuration, host_os_access):
 
 
 @pytest.fixture(scope='session')
-def session_vm_pools(request, ssh_config, configuration, host_os_access, hypervisor):
+def vm_types(configuration):
+    return configuration['vm_types'].keys()
+
+
+@pytest.fixture(scope='session')
+def registries(vm_types, configuration, host_os_access):
+    return {
+        vm_type: Registry(
+            host_os_access,
+            host_os_access.expand_path(configuration['vm_types'][vm_type]['registry']),
+            100,
+            configuration['vm_types'][vm_type]['name_prefix'],
+            )
+        for vm_type in vm_types
+        }
+
+
+@pytest.fixture(scope='session')
+def vm_factories(request, ssh_config, configuration, hypervisor):
     access_manager = SSHAccessManager(ssh_config, 'root', Path(configuration['ssh']['private_key']).expanduser())
     pools = {
-        vm_type: Pool(
+        vm_type: Factory(
             VMConfiguration(vm_configuration_raw),
-            Registry(
-                host_os_access,
-                host_os_access.expand_path(vm_configuration_raw['registry']),
-                100,
-                vm_configuration_raw['name_prefix'],
-                ),
             hypervisor,
             access_manager,  # TODO: Instantiate separate for each
             )
-        for vm_type, vm_configuration_raw
-        in configuration['vm_types'].items()}
+        for vm_type, vm_configuration_raw in configuration['vm_types'].items()}
     if request.config.getoption('--clean'):
         for pool in pools.values():
             pool.destroy()
@@ -284,10 +295,11 @@ def session_vm_pools(request, ssh_config, configuration, host_os_access, hypervi
 
 
 @pytest.fixture()
-def vm_pools(session_vm_pools):
-    yield session_vm_pools
-    for pool in session_vm_pools.values():
-        pool.close()
+def vm_pools(vm_types, registries, vm_factories):
+    pools = {vm_type: Pool(registries[vm_type], vm_factories[vm_type]) for vm_type in vm_types}
+    yield pools
+    for vm_types in vm_types:
+        pools[vm_types].close()
 
 
 @pytest.fixture()
