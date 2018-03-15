@@ -6,8 +6,11 @@ Item
 
     property string message
 
+    property alias contentX: flick.contentX
+    property alias contentY: flick.contentY
     property alias contentWidth: flick.contentWidth
     property alias contentHeight: flick.contentHeight
+
     default property alias data: contentItem.data
 
     property real minContentWidth: 0
@@ -24,11 +27,10 @@ Item
     property real allowedTopMargin: 0
     property real allowedBottomMargin: 0
 
-    readonly property alias contentX: flick.contentX
-    readonly property alias contentY: flick.contentY
+    readonly property alias flickable: flick
 
     signal clicked()
-    signal doubleClicked()
+    signal doubleClicked(int mouseX, int mouseY)
 
     function resizeContent(width, height, animate, forceSize)
     {
@@ -322,11 +324,21 @@ Item
 
             propagateComposedEvents: true
 
-            onDoubleClicked: rootItem.doubleClicked()
-            onClicked:
+            onDoubleClicked:
             {
-                rootItem.clicked()
-                mouse.accepted = false
+                clickFilterTimer.stop()
+                rootItem.doubleClicked(mouse.x, mouse.y)
+            }
+
+            onClicked: clickFilterTimer.restart()
+
+            Timer
+            {
+                id: clickFilterTimer
+
+                interval: 200
+
+                onTriggered: rootItem.clicked()
             }
 
             onWheel:

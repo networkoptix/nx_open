@@ -45,6 +45,80 @@ ZoomableFlickable
 
     clip: true
 
+    onDoubleClicked:
+    {
+        var twiceTargetScale = 2
+        var initialTargetScale = 1
+        var eps = 0.000001
+        var zoomIn = d.scale < twiceTargetScale - eps
+        var targetScale = zoomIn ? twiceTargetScale : initialTargetScale
+
+        var baseWidth = contentWidth / d.scale
+        var baseHeight = contentHeight / d.scale
+
+        flickable.animating = true
+        flickable.fixMargins()
+
+
+        var point = mapToItem(content, mouseX, mouseY)
+        var dx = point.x / d.scale
+        var dy = point.y / d.scale
+
+        contentWidth = baseWidth * targetScale
+        contentHeight = baseHeight * targetScale
+
+        var x = zoomIn ? (width / 2 - targetScale * dx) : (width - baseWidth) / 2
+        var y = zoomIn ? (height / 2 - targetScale * dy) : (height - baseHeight) / 2
+
+        console.log(allowedLeftMargin, allowedRightMargin, allowedTopMargin, allowedBottomMargin)
+
+        if (x > allowedLeftMargin)
+            x = allowedLeftMargin - 1
+        else if (x + contentWidth < width - allowedRightMargin)
+            x = width - contentWidth - allowedRightMargin + 1
+
+        if (y > allowedTopMargin)
+            y = allowedTopMargin - 1
+        else if (y + contentHeight < height - allowedBottomMargin)
+            y = height - contentHeight - allowedBottomMargin + 1
+
+        contentX = -x
+        contentY = -y
+
+        flickable.animateToBounds()
+    }
+
+    QtObject
+    {
+        id: d
+
+        property real contentFactor: contentWidth ? contentHeight / contentWidth : 0
+
+        readonly property real scale:
+        {
+            if (!contentFactor)
+                return 1
+
+            var baseSize = 0
+            var currentSize = 0
+
+            var baseHeight = zf.width * contentFactor
+            if (baseHeight <= zf.height)
+            {
+
+                baseSize = baseHeight
+                currentSize = zf.contentHeight
+            }
+            else
+            {
+                baseSize = width
+                currentSize = zf.contentWidth
+            }
+
+            return baseSize > 0 ? currentSize / baseSize : 1
+        }
+    }
+
     VideoPositioner
     {
         id: content
