@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import imaplib
+import re
+import email.header
+from email.parser import HeaderParser
 import os.path
 import time
 import types
@@ -44,7 +48,7 @@ class NoptixLibrary(object):
 
 
     def wait_until_textfield_contains(self, locator, expected, timeout=5):
-        seleniumlib = BuiltIn().get_library_instance('Selenium2Library')
+        seleniumlib = BuiltIn().get_library_instance('SeleniumLibrary')
         timeout = timeout + time.time()
         not_found = None
         
@@ -66,9 +70,23 @@ class NoptixLibrary(object):
         for element in elements:
             try:
                 if element.find_element_by_xpath(".//button[@ng-click='checkForm()']"): 
-                    print "online"
+                    print ("online")
             except NoSuchElementException:
                 try:
                     if element.find_element_by_xpath(".//span[contains(text(),'"+offlineText+"')]"):                    
-                        print "offline"
+                        print ("offline")
                 except: raise NoSuchElementException
+
+    def check_email_subject(self, email_id, sub_text):
+        conn = imaplib.IMAP4_SSL('imap.gmail.com', 993)
+        conn.login('noptixqa@gmail.com', 'qweasd!@#')
+        conn.select()
+        typ, data = conn.uid('fetch', email_id, '(BODY.PEEK[HEADER.FIELDS (SUBJECT)])')
+        for res in data:
+            if isinstance(res, tuple):
+                header = email.header.decode_header(res[1].decode('ascii').strip())
+                header_str = "".join([x[0].decode('utf-8').strip() if x[1] else re.sub("(^b\'|\')", "", str(x[0])) for x in header])
+                header_str = re.sub("Subject: ", "", header_str)
+                if sub_text != header_str.strip():
+                    raise Exception(header_str+' was not '+sub_text)      
+        conn.logout()

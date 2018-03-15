@@ -1,4 +1,4 @@
-{{PRODUCT_NAME}} üdvözli Önt
+{{PRODUCT_NAME}} üdvözli
 
 {{#message.sharer_name}}
 {{message.sharer_name}} ({{message.sharer_email}}) meghívja Önt, hogy csatlakozzon {{PRODUCT_NAME}} alkalmazással és megosztotta Önnel {{message.system_name}} rendszerét.

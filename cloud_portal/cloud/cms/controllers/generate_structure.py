@@ -163,13 +163,13 @@ def iterate_contexts(file_iterator):
         yield name, context_name, data
 
 
-def process_files(file_iterator, product_name):
-    structure = OrderedDict([('product', product_name), ('contexts', [])])
-    root_context = find_context('root', '.', structure, product_name)
+def process_files(file_iterator, product):
+    structure = OrderedDict([('product', product.name), ('canPreview', product.can_preview), ('contexts', [])])
+    root_context = find_context('root', '.', structure, product.name)
     for short_name, context_name, data in iterate_contexts(file_iterator):
-        context = find_context(context_name, context_name, structure, product_name)
-        read_data(data, short_name, context, structure, product_name)
-    return structure
+        context = find_context(context_name, context_name, structure, product.name)
+        read_data(data, short_name, context, structure, product.name)
+    return [structure]
 
 
 def from_zip(file_descriptor, product_name):

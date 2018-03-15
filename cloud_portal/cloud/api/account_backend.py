@@ -87,6 +87,9 @@ class AccountManager(db.models.Manager):
                           last_name=last_name,
                           customization=settings.CUSTOMIZATION,
                           **extra_fields)
+
+        if code:
+            user.activated_date = timezone.now()
         user.save(using=self._db)
 
         return user

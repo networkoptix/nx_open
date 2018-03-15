@@ -70,7 +70,7 @@ works at restore password page with email input - after submit error
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${EMAIL UNREGISTERED}
     Click Button    ${RESET PASSWORD BUTTON}
-    Check For Alert Dismissable    ${CANNOT SEND CONFIRMATION EMAIL} ${ACCOUNT DOES NOT EXIST}
+    Check For Alert Dismissable    ${CANNOT SEND CONFIRMATION EMAIL}${SPACE}${ACCOUNT DOES NOT EXIST}
     Check Log In
     Close Browser
 
@@ -79,7 +79,11 @@ works at restore password page with email input - after submit success
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
     Click Button    ${RESET PASSWORD BUTTON}
+    ${RESET EMAIL SENT MESSAGE TEXT}    Replace String    ${RESET EMAIL SENT MESSAGE TEXT}    {{email}}    ${email}
     Wait Until Element Is Visible    ${RESET EMAIL SENT MESSAGE}
+    ${text}    Get Text    ${RESET EMAIL SENT MESSAGE}
+    ${replaced}    Replace String    ${text}    \n    ${SPACE}
+    Should Match    ${replaced}    ${RESET EMAIL SENT MESSAGE TEXT}
     Check Log In
     Close Browser
 
@@ -89,12 +93,17 @@ works at restore password page with password input - before submit
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${random email}    ${password}
     ${link}    Get Activation Link    ${random email}
-    Go To    ${link}[1]
+    ${link}    Strip String    ${link}
+    Go To    ${link}
     Go To    ${url}/restore_password
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${random email}
     Click Button    ${RESET PASSWORD BUTTON}
+    ${RESET EMAIL SENT MESSAGE TEXT}    Replace String    ${RESET EMAIL SENT MESSAGE TEXT}    {{email}}    ${email}
     Wait Until Element Is Visible    ${RESET EMAIL SENT MESSAGE}
+    ${text}    Get Text    ${RESET EMAIL SENT MESSAGE}
+    ${replaced}    Replace String    ${text}    \n    ${SPACE}
+    Should Match    ${replaced}    ${RESET EMAIL SENT MESSAGE TEXT}
     ${link}    Get Reset Password Link    ${random email}
     Go To    ${link}
     Check Log In
@@ -111,7 +120,11 @@ works at restore password page with password input - after submit error
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${random email}
     Click Button    ${RESET PASSWORD BUTTON}
+    ${RESET EMAIL SENT MESSAGE TEXT}    Replace String    ${RESET EMAIL SENT MESSAGE TEXT}    {{email}}    ${email}
     Wait Until Element Is Visible    ${RESET EMAIL SENT MESSAGE}
+    ${text}    Get Text    ${RESET EMAIL SENT MESSAGE}
+    ${replaced}    Replace String    ${text}    \n    ${SPACE}
+    Should Match    ${replaced}    ${RESET EMAIL SENT MESSAGE TEXT}
     ${link}    Get Reset Password Link    ${random email}
     Go To    ${link}
     Wait Until Elements Are Visible    ${RESET PASSWORD INPUT}    ${SAVE PASSWORD}
@@ -131,7 +144,11 @@ works at restore password page with password input - after submit success
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${random email}
     Click Button    ${RESET PASSWORD BUTTON}
+    ${RESET EMAIL SENT MESSAGE TEXT}    Replace String    ${RESET EMAIL SENT MESSAGE TEXT}    {{email}}    ${email}
     Wait Until Element Is Visible    ${RESET EMAIL SENT MESSAGE}
+    ${text}    Get Text    ${RESET EMAIL SENT MESSAGE}
+    ${replaced}    Replace String    ${text}    \n    ${SPACE}
+    Should Match    ${replaced}    ${RESET EMAIL SENT MESSAGE TEXT}
     ${link}    Get Reset Password Link    ${random email}
     Go To    ${link}
     Wait Until Elements Are Visible    ${RESET PASSWORD INPUT}    ${SAVE PASSWORD}

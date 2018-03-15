@@ -143,7 +143,7 @@ def init_skin(customization_name, product='cloud_portal'):
     fill_content(customization_name, product, preview=True, incremental=False)
 
 
-def fill_content(customization_name='default', product='cloud_portal',
+def fill_content(customization_name='default', product_name='cloud_portal',
                  preview=True,
                  version_id=None,
                  incremental=False,
@@ -156,7 +156,10 @@ def fill_content(customization_name='default', product='cloud_portal',
     # else
     #   if version_id is None - preview latest available datarecords
     #   else - preview specific version
-    product_id = Product.objects.get(name=product).id
+    product = Product.objects.get(name=product_name)
+    if not product.can_preview:
+        return
+    product_id = product.id
     customization = Customization.objects.get(name=customization_name)
 
     if preview:  # Here we decide, if we need to change preview state
@@ -173,7 +176,7 @@ def fill_content(customization_name='default', product='cloud_portal',
                     return  # When previewing awaiting version and state is review - do nothing
                 pass
         else:  # draft
-            if customization.preview_status != Customization.PREVIEW_STATUS.review:
+            if customization.preview_status == Customization.PREVIEW_STATUS.review:
                 # When saving draft and state is review - do incremental update
                 # applying all drafted changes and change state to draft
                 # incremental = True
@@ -229,6 +232,13 @@ def fill_content(customization_name='default', product='cloud_portal',
             incremental = False
         else:
             changed_contexts = [changed_context]
+            changed_records = DataRecord.objects.filter(version_id=version_id, customization_id=customization.id)
+            changed_records_ids = [DataRecord.objects.
+                                       filter(language_id=record.language_id,
+                                              data_structure_id=record.data_structure_id,
+                                              customization_id=customization.id).
+                                       latest('created_date').id for record in changed_records]
+            changed_records = changed_records.filter(id__in=changed_records_ids)
 
     if not incremental:  # If not incremental - iterate all contexts and all languages
         changed_contexts = Context.objects.filter(product_id=product_id).all()
