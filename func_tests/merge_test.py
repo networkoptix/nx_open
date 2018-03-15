@@ -42,7 +42,9 @@ def change_bool_setting(server, setting):
 
 
 def wait_for_settings_merge(one, two):
-    assert wait_until(lambda: one.rest_api.get('/api/systemSettings') == two.rest_api.get('/api/systemSettings'))
+    assert wait_until(
+        lambda: one.rest_api.get('/api/systemSettings') == two.rest_api.get('/api/systemSettings'),
+        name='for same response to /api/systemSettings from {} and {}'.format(one.machine.alias, two.machine.alias))
 
 
 def check_admin_disabled(server):

@@ -132,7 +132,10 @@ class Factory(object):
             self._hypervisor.power_on(info.name)
         hostname, port = info.ports['tcp', self._access_manager.guest_port]
         os_access = self._access_manager.register(hostname, [alias, info.name], port)
-        if not wait_until(os_access.is_working, timeout_sec=self._vm_configuration.power_on_timeout):
+        if not wait_until(
+                os_access.is_working,
+                name='until {} ({}) can be accesses via {!r}'.format(alias, name, os_access),
+                timeout_sec=self._vm_configuration.power_on_timeout):
             raise MachineNotResponding(alias, info.name)
         networking = LinuxNetworking(os_access, info.macs.values())
         vm = VM(alias, info.name, info.ports, networking, os_access)
