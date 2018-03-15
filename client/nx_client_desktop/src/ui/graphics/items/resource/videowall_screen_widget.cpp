@@ -30,6 +30,7 @@
 
 #include <utils/common/warnings.h>
 #include <nx/utils/collection.h>
+#include <utils/screen_utils.h>
 
 namespace {
 
@@ -118,7 +119,8 @@ QString QnVideowallScreenWidget::calculateTitleText() const
     int pcVisualIdx = idx + 1;
     QString base = tr("PC %1").arg(pcVisualIdx);
 
-    QSet<int> screens = m_items.first().screenSnaps.screens();
+    auto screens = nx::gui::Screens::coveredBy(m_items.first().screenSnaps).toList();
+    std::sort(screens.begin(), screens.end());
     if (screens.isEmpty())
         return base;
 
@@ -133,7 +135,7 @@ QString QnVideowallScreenWidget::calculateTitleText() const
         "%2 will be substituted by _list_ of displays",
         screens.size())
         .arg(pcVisualIdx)
-        .arg(screenIndices.join(lit(" ,")));
+        .arg(screenIndices.join(lit(", ")));
 }
 
 Qn::ResourceStatusOverlay QnVideowallScreenWidget::calculateStatusOverlay() const
@@ -246,7 +248,8 @@ void QnVideowallScreenWidget::at_videoWall_itemChanged(const QnVideoWallResource
 
     NX_ASSERT(*existing == oldItem);
 
-    if (existing->screenSnaps.screens() != item.screenSnaps.screens())
+    if (nx::gui::Screens::coveredBy(existing->screenSnaps)
+        != nx::gui::Screens::coveredBy(item.screenSnaps))
     {
         // if there are more than one item on the widget, this one will be updated from outside
         if (m_items.size() == 1)
@@ -292,7 +295,7 @@ void QnVideowallScreenWidget::updateItems()
         QnVideoWallPcData pc = m_videowall->pcs()->getItem(m_items.first().pcUuid);
 
         QRect totalDesktopGeometry;
-        QSet<int> screens = m_items.first().screenSnaps.screens();
+        QSet<int> screens = nx::gui::Screens::coveredBy(m_items.first().screenSnaps);
         for (const auto& screen: pc.screens)
         {
             if (screens.contains(screen.index))

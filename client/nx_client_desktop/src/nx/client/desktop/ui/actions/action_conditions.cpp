@@ -1532,11 +1532,6 @@ ActionVisibility DesktopCameraCondition::check(const Parameters& /*parameters*/,
         /* Do not check real pointer type to speed up check. */
         const auto desktopCamera = context->resourcePool()->getResourceByUniqueId(
             desktopCameraId);
-#ifdef DESKTOP_CAMERA_DEBUG
-        NX_ASSERT(!desktopCamera || (desktopCamera->hasFlags(Qn::desktop_camera) && desktopCamera->getParentId() == commonModule()->remoteGUID()),
-            Q_FUNC_INFO,
-            "Desktop camera must have correct flags and parent (if exists)");
-#endif
         if (desktopCamera && desktopCamera->hasFlags(Qn::desktop_camera))
             return EnabledAction;
 

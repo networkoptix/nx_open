@@ -74,6 +74,7 @@ private:
     UserListModel* m_users = nullptr;
     RoleListDelegate* m_roleListDelegate = nullptr;
     UserListDelegate* m_userListDelegate = nullptr;
+    bool m_allUsersSelectorEnabled = true;
 };
 
 } // namespace ui

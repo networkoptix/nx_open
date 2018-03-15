@@ -208,9 +208,12 @@ var Config = {
             // * 30 seconds for server to init camera
             // * 20 seconds for chunks
             // * 10 seconds extra
+        updateArchiveStateTimeout: 60*1000, // If camera hs no archive - try to update it every minute
         flashChromelessPath: "components/flashlsChromeless.swf",
         flashChromelessDebugPath: "components/flashlsChromeless_debug.swf",
-        staticResources: "static/web_common/"
+        staticResources: "static/web_common/",
+        maxCrashCount: 2, //Number of retries to get video
+        nativeTimeout: 60 * 1000 //60s
     },
     globalEditServersPermissions: 'GlobalAdminPermission',
     globalViewArchivePermission: 'GlobalViewArchivePermission',
