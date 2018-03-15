@@ -5,7 +5,9 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/system_error.h>
-#include <nx/root_tool/actions.h>
+#if defined(Q_OS_LINUX)
+    #include <nx/root_tool/actions.h>
+#endif
 #include "root_tool.h"
 
 namespace nx {
@@ -73,7 +75,7 @@ Qn::StorageInitResult RootTool::mount(const QUrl& url, const QString& path)
     return Qn::StorageInit_Ok;
 #else
     NX_ASSERT(false, "Only linux is supported so far");
-    return false;
+    return Qn::StorageInit_WrongPath;
 #endif
 }
 
@@ -93,7 +95,7 @@ Qn::StorageInitResult RootTool::remount(const QUrl& url, const QString& path)
     return mountResult;
 #else
     NX_ASSERT(false, "Only linux is supported so far");
-    return false;
+    return Qn::StorageInit_WrongPath;
 #endif
 }
 

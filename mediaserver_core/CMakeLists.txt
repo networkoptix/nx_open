@@ -83,6 +83,10 @@ if(NOT targetDevice STREQUAL edge1)
     list(APPEND private_libs nx_speech_synthesizer)
 endif()
 
+if(LINUX)
+    set(ROOT_TOOL_STR root_tool_lib)
+endif()
+
 nx_add_target(mediaserver_core LIBRARY
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/mediaserver_core_app_info_impl.cpp"
@@ -96,7 +100,7 @@ nx_add_target(mediaserver_core LIBRARY
         "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.json"
     PUBLIC_LIBS
         Qt5::WebSockets
-        appserver2 nx_onvif nx_email cloud_db_client root_tool_lib
+        appserver2 nx_onvif nx_email cloud_db_client ${ROOT_TOOL_STR}
     PRIVATE_LIBS ${private_libs}
 )
 
