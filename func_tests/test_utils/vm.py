@@ -43,17 +43,30 @@ VM = namedtuple('VM', ['alias', 'name', 'ports', 'networking', 'os_access'])
 class Registry(object):
     """Manage names allocation. Safe for parallel usage."""
 
-    class NothingAvailable(Exception):
-        pass
+    class Error(Exception):
+        def __init__(self, reservations, message):
+            super(Exception, self).__init__("{}; current reservations:\n{}".format(message, pformat(reservations)))
+            self.reservations = reservations
 
-    def __init__(self, os_access, base_dir, limit):
+    class NoAvailableNames(Exception):
+        def __init__(self, reservations, alias):
+            super(Registry.NoAvailableNames, self).__init__(reservations, "No available name for {}".format(alias))
+            self.alias = alias
+
+    class NotReserved(Exception):
+        def __init__(self, reservations, name):
+            super(Registry.NotReserved, self).__init__(reservations, "Name {} is not reserved".format(name))
+            self.name = name
+
+    def __init__(self, os_access, path, limit, name_prefix):
         self._os_access = os_access
-        self._path = base_dir / 'registry.yaml'
+        self._path = path
         self._limit = limit
         self._lock = MoveLock(self._os_access, self._path.with_suffix('.lock'))
         if not self._os_access.dir_exists(self._path.parent):
             logger.warning("Create %r; OK only if a clean run", self._path.parent)
             self._os_access.mk_dir(self._path.parent)
+        self._name_prefix = name_prefix
 
     def _read_reservations(self):
         try:
@@ -63,22 +76,25 @@ class Registry(object):
         else:
             return load(contents)
 
-    def reserve(self, mark, make_name):
+    def reserve(self, alias):
         with self._lock:
+            reservations = self._read_reservations()
             for index in range(self._limit):
-                name = make_name(index)
-                reservations = self._read_reservations()
+                name = '{}{:03d}'.format(self._name_prefix, index)
                 if name not in reservations or reservations[name] is None:
-                    reservations[name] = mark
+                    reservations[name] = alias
                     self._os_access.write_file(self._path, dump(reservations))
                     return index, name
-            raise self.NothingAvailable()
+        raise self.NoAvailableNames(reservations, alias)
 
     def relinquish(self, name):
         with self._lock:
             reservations = self._read_reservations()
-            reservations[name] = None
-            self._os_access.write_file(self._path, dump(reservations))
+            if name in reservations and reservations[name] is not None:
+                reservations[name] = None
+                self._os_access.write_file(self._path, dump(reservations))
+            else:
+                raise self.NotReserved(reservations, name)
 
     @contextmanager
     def clean(self):
@@ -105,7 +121,7 @@ class Pool(object):
         self._hypervisor = hypervisor
 
     def allocate(self, alias):
-        index, name = self._registry.reserve(alias, self._vm_configuration.name)
+        index, name = self._registry.reserve(alias)
         try:
             info = self._hypervisor.find(name)
         except VMNotFound:

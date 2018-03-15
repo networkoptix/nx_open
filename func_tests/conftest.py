@@ -256,10 +256,19 @@ def hypervisor(configuration, host_os_access):
 def vm_pools(request, host_os_access, hypervisor, configuration, ssh_config):
     # All objects here are initialized quickly.
     # After pool has been closed, it's possible to reuse it, but, for simplicity, it's recreated.
-    registry = Registry(host_os_access, host_os_access.expand_path(configuration['vm_host']['registry']), 100)
     access_manager = SSHAccessManager(ssh_config, 'root', Path(configuration['ssh']['private_key']).expanduser())
     pools = {
-        vm_type: Pool(VMConfiguration(vm_configuration_raw), registry, hypervisor, access_manager)
+        vm_type: Pool(
+            VMConfiguration(vm_configuration_raw),
+            Registry(
+                host_os_access,
+                host_os_access.expand_path(vm_configuration_raw['registry']),
+                100,
+                vm_configuration_raw['name_prefix'],
+                ),
+            hypervisor,
+            access_manager,  # TODO: Instantiate separate for each
+            )
         for vm_type, vm_configuration_raw
         in configuration['vm_types'].items()}
     if request.config.getoption('--clean'):

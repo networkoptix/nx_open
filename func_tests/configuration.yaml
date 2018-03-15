@@ -1,10 +1,10 @@
 ssh:
   private_key: ~/.func_tests/private_key
 vm_host:
-  registry: ~/.func_tests/registry
   address: 127.0.0.1
 vm_types:
   linux:
+    registry: ~/.func_tests/ubuntu-14.04-registry.yaml
     power_on_timeout: 60
     name_prefix: ubuntu-14.04-
     template:
@@ -23,6 +23,7 @@ vm_types:
           guest_port: 22
           host_port_offset: 2
   windows:
+    registry: ~/.func_tests/windows-10-registry.yaml
     power_on_timeout: 600  # After SysPrep, first boot takes several minutes to prepare user profile.
     name_prefix: windows-10-
     template:
