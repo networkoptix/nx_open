@@ -1116,6 +1116,8 @@ void QnStorageManager::onNewResource(const QnResourcePtr &resource)
         connect(storage.data(), &QnStorageResource::isBackupChanged, this, &QnStorageManager::at_storageChanged);
         if (checkIfMyStorage(storage))
             addStorage(storage);
+        connect(storage.data(), &QnStorageResource::isUsedForWritingChanged,
+            this, [this]() { m_warnSended = false; });
     }
 }
 
@@ -1185,6 +1187,8 @@ void QnStorageManager::at_storageChanged(const QnResourcePtr &resource)
     QnStorageResourcePtr storage = qSharedPointerDynamicCast<QnStorageResource>(resource);
     if (!storage)
         return;
+    if (storage->getParentId() == commonModule()->moduleGUID())
+        m_warnSended = false;
 
     NX_LOG(lit("%1 role: %2, storage role: %3")
             .arg(Q_FUNC_INFO)
