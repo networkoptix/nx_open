@@ -189,7 +189,8 @@ class LocalAccess(OsAccess):
             cwd=cwd and str(cwd), env=env and {k: str(v) for k, v in env.items()},
             stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE if input else None,
             close_fds=True)
-        process_logger = log.getChild('subprocesses').getChild(str(pipe.pid))
+        child = log.getChild('subprocesses')
+        process_logger = child.getChild(str(pipe.pid))
         process_logger.debug("Started.")
         if input:
             try:

@@ -71,16 +71,16 @@ class _RestApiProxy(object):
         return _RestApiProxy(self._api, self._path + '/' + name)
 
     # noinspection PyPep8Naming
-    def GET(self, raise_exception=True, timeout=None, headers=None, **kw):
+    def GET(self, timeout=None, headers=None, **kw):
         params = {name: _to_get_param(value) for name, value in kw.items()}
-        return self._api.request('GET', self._path, raise_exception, timeout=timeout, headers=headers, params=params)
+        return self._api.request('GET', self._path, timeout=timeout, headers=headers, params=params)
 
     # noinspection PyPep8Naming
-    def POST(self, raise_exception=True, timeout=None, headers=None, json=None, **kw):
+    def POST(self, timeout=None, headers=None, json=None, **kw):
         if kw:
             assert not json, 'kw and json arguments are mutually exclusive - only one may be used at a time'
             json = kw
-        return self._api.request('POST', self._path, raise_exception, timeout=timeout, headers=headers, json=json)
+        return self._api.request('POST', self._path, timeout=timeout, headers=headers, json=json)
 
 
 class RestApi(object):
@@ -193,7 +193,7 @@ class RestApi(object):
     def post(self, path, data, **kwargs):
         return self.request('GET', path, json=data, **kwargs)
 
-    def request(self, method, path, raise_exception=True, new_connection=False, timeout=None, **kwargs):
+    def request(self, method, path, new_connection=False, timeout=None, **kwargs):
         log.debug('%r: %s %s\n%s', self, method, path, json.dumps(kwargs, indent=4))
         try:
             make_request = requests.request if new_connection else self._session.request
@@ -207,11 +207,9 @@ class RestApi(object):
                 log.error("Try new connection after %r.", e)
                 return self.request(
                     method, path,
-                    raise_exception=raise_exception, new_connection=True,
+                    new_connection=True,
                     timeout=timeout, **kwargs)
             raise
-        if not raise_exception:
-            return response.content
         data = self._retrieve_data(response)
         self._raise_for_status(response)
         return data
