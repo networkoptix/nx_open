@@ -15,10 +15,11 @@ class SSHConfig(object):
         self.path.write_text(dedent(u'''
             BatchMode yes
             EscapeChar none
+            LogLevel VERBOSE
             StrictHostKeyChecking no
             UserKnownHostsFile /dev/null
-            ConnectTimeout 1
-            ConnectionAttempts 1
+            ConnectTimeout 5
+            ConnectionAttempts 2
             ControlMaster auto
             ControlPersist 10m
             ControlPath {connections_dir}/%r@%h:%p.ssh.sock
