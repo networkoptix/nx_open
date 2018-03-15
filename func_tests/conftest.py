@@ -11,7 +11,7 @@ from test_utils.artifact import ArtifactFactory
 from test_utils.ca import CA
 from test_utils.camera import CameraFactory, SampleMediaFile
 from test_utils.cloud_host import CloudAccountFactory, resolve_cloud_host_from_registry
-from test_utils.config import TestParameter, TestsConfig
+from test_utils.config import TestParameter, TestsConfig, SingleTestConfig
 from test_utils.lightweight_servers_factory import LWS_BINARY_NAME, LightweightServersFactory
 from test_utils.mediaserverdeb import MediaserverDeb
 from test_utils.merging import merge_system
@@ -181,10 +181,18 @@ def init_logging(request, work_dir):
 
 
 @pytest.fixture(scope='session')
-def test_config(request):
+def tests_config(request):
     return TestsConfig.merge_config_list(
         request.config.getoption('--tests-config-file'),
         request.config.getoption('--test-parameters'))
+
+
+@pytest.fixture()
+def test_config(request, tests_config):
+    if tests_config is None:
+        return SingleTestConfig()
+    else:
+        return tests_config.get_test_config(request.node.nodeid)
 
 
 @pytest.fixture()
@@ -284,13 +292,13 @@ def linux_vm_pool(vm_pools):
 
 
 @pytest.fixture(scope='session')
-def physical_installation_ctl(test_config, ca, mediaserver_deb):
-    if not test_config:
+def physical_installation_ctl(tests_config, ca, mediaserver_deb):
+    if not tests_config:
         return None
     pic = PhysicalInstallationCtl(
         mediaserver_deb.path,
         mediaserver_deb.customization.company,
-        test_config.physical_installation_host_list,
+        tests_config.physical_installation_host_list,
         ca)
     return pic
 
