@@ -19,6 +19,7 @@ RootTool::RootTool(const QString& toolPath):
 
 Qn::StorageInitResult RootTool::mount(const QUrl& url, const QString& path)
 {
+#if defined (Q_OS_LINUX)
     makeDirectory(path);
 
     auto uncString = "//" + url.host() + url.path();
@@ -70,10 +71,15 @@ Qn::StorageInitResult RootTool::mount(const QUrl& url, const QString& path)
         .args(url.toString(), path));
 
     return Qn::StorageInit_Ok;
+#else
+    NX_ASSERT(false, "Only linux is supported so far");
+    return false;
+#endif
 }
 
 Qn::StorageInitResult RootTool::remount(const QUrl& url, const QString& path)
 {
+#if defined (Q_OS_LINUX)
     bool result = unmount(path);
     NX_VERBOSE(
         this,
@@ -85,6 +91,10 @@ Qn::StorageInitResult RootTool::remount(const QUrl& url, const QString& path)
         lm("[initOrUpdate, mount] root_tool mount %1 to %2 result %3").args(url, path, result));
 
     return mountResult;
+#else
+    NX_ASSERT(false, "Only linux is supported so far");
+    return false;
+#endif
 }
 
 bool RootTool::unmount(const QString& path)
@@ -103,6 +113,7 @@ bool RootTool::unmount(const QString& path)
 
 bool RootTool::changeOwner(const QString& path)
 {
+#if defined (Q_OS_LINUX)
     if (m_toolPath.isEmpty())
     {
         root_tool::Actions actions;
@@ -113,10 +124,15 @@ bool RootTool::changeOwner(const QString& path)
     }
 
     return execute({"chown", path}) == 0;
+#else
+    NX_ASSERT(false, "Only linux is supported so far");
+    return false;
+#endif
 }
 
 bool RootTool::touchFile(const QString& path)
 {
+#if defined (Q_OS_LINUX)
     if (m_toolPath.isEmpty())
     {
         root_tool::Actions actions;
@@ -127,10 +143,15 @@ bool RootTool::touchFile(const QString& path)
     }
 
     return execute({"touch", path}) == 0;
+#else
+    NX_ASSERT(false, "Only linux is supported so far");
+    return false;
+#endif
 }
 
 bool RootTool::makeDirectory(const QString& path)
 {
+#if defined (Q_OS_LINUX)
     if (m_toolPath.isEmpty())
     {
         root_tool::Actions actions;
@@ -141,6 +162,10 @@ bool RootTool::makeDirectory(const QString& path)
     }
 
     return execute({"mkdir", path}) == 0;
+#else
+    NX_ASSERT(false, "Only linux is supported so far");
+    return false;
+#endif
 }
 
 static std::string makeArgsLine(const std::vector<QString>& args)
@@ -161,36 +186,36 @@ static std::string makeCommand(const QString& toolPath, const std::string& argsL
 
 int  RootTool::execute(const std::vector<QString>& args)
 {
-    #if defined( Q_OS_LINUX )
-        const auto argsLine = makeArgsLine(args);
-        const auto commandLine = makeCommand(m_toolPath, argsLine);
-        const auto pipe = popen(commandLine.c_str(), "r");
-        if (pipe == nullptr)
-        {
-            NX_DEBUG(this, lm("Popen %1 has failed: %2").args(
-                m_toolPath, SystemError::getLastOSErrorText()));
+#if defined( Q_OS_LINUX )
+    const auto argsLine = makeArgsLine(args);
+    const auto commandLine = makeCommand(m_toolPath, argsLine);
+    const auto pipe = popen(commandLine.c_str(), "r");
+    if (pipe == nullptr)
+    {
+        NX_DEBUG(this, lm("Popen %1 has failed: %2").args(
+            m_toolPath, SystemError::getLastOSErrorText()));
 
-            return false;
-        }
-
-        std::ostringstream outputStream;
-        char buffer[1024];
-        while (fgets(buffer, sizeof(buffer), pipe) != NULL)
-            outputStream << buffer;
-
-        const auto resultCode = pclose(pipe);
-        NX_DEBUG(this, lm("%1 -- %2").args(argsLine, resultCode));
-
-        auto output = outputStream.str();
-        output.erase(output.find_last_not_of(" \n\r\t") + 1);
-        if (output.size() != 0)
-            NX_VERBOSE(this, output);
-
-        return resultCode;
-    #else
-        NX_WARNING(this, "Only linux is supported so far");
         return false;
-    #endif
+    }
+
+    std::ostringstream outputStream;
+    char buffer[1024];
+    while (fgets(buffer, sizeof(buffer), pipe) != NULL)
+        outputStream << buffer;
+
+    const auto resultCode = pclose(pipe);
+    NX_DEBUG(this, lm("%1 -- %2").args(argsLine, resultCode));
+
+    auto output = outputStream.str();
+    output.erase(output.find_last_not_of(" \n\r\t") + 1);
+    if (output.size() != 0)
+        NX_VERBOSE(this, output);
+
+    return resultCode;
+#else
+    NX_ASSERT(false, "Only linux is supported so far");
+    return false;
+#endif
 }
 
 std::unique_ptr<RootTool> findRootTool(const QString& applicationPath)

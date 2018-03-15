@@ -262,7 +262,7 @@ qint64 getLocalPossiblyNonExistingPathSize(const QString &path)
 
     if (!QDir().mkpath(path))
     {
-        if (qnServerModule->rootTool()->makeDirectory(path))
+        if (!qnServerModule->rootTool()->makeDirectory(path))
             return -1;
         qnServerModule->rootTool()->changeOwner(path);
     }
