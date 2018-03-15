@@ -64,15 +64,7 @@ Item
         onActionCancelled:
         {
             hintControl.stopProgressAnimation()
-            if (!longCancel)
-            {
-                hintControl.hide()
-                return
-            }
-
-            var text = d.modelDataAccessor.getData(index, "hint")
-            var prolonged = d.modelDataAccessor.getData(index, "allowLongPress")
-            hintControl.showFailure(text, prolonged)
+            hintControl.hide()
         }
 
         onButtonClicked:

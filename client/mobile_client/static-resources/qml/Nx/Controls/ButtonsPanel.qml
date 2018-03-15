@@ -11,10 +11,10 @@ ListView
     signal initiallyPressed(int index)
     signal buttonClicked(int index)
     signal pressedChanged(int index, bool pressed)
-    signal actionCancelled(int index, bool longCancel)
+    signal actionCancelled(int index)
     signal enabledChanged(int index, bool buttonEnabled)
 
-    pressDelay: 100
+    pressDelay: 150
     clip: true
     layoutDirection: Qt.RightToLeft
     orientation: Qt.Horizontal
@@ -86,8 +86,8 @@ ListView
         {
             target: control
 
-            onFlickingChanged: handleCancelled(false)
-            onDraggingChanged: handleCancelled(false)
+            onFlickingChanged: handleCancelled()
+            onDraggingChanged: handleCancelled()
         }
 
         property bool filteringPressing: false
@@ -117,17 +117,11 @@ ListView
         onCanceled:
         {
             if (!buttonPressed)
-                handleCancelled(true)
+                handleCancelled()
             else
                 handleButtonReleased()
 
             button.active = false
-        }
-
-        onPressedChanged:
-        {
-            if (!buttonPressed)
-                pressedStateFilterTimer.stop()
         }
 
         Timer
@@ -147,12 +141,18 @@ ListView
 
         function finishStateProcessing(value)
         {
+            if (!button.active)
+                return
+
             button.filteringPressing = value
             button.buttonPressed = value
             d.allowInteractiveState = !value
+
+            if (!value)
+                button.active = false
         }
 
-        function handleCancelled(longCancel)
+        function handleCancelled()
         {
             if (pressedStateFilterTimer.running)
                 pressedStateFilterTimer.stop()
@@ -160,7 +160,7 @@ ListView
                 buttonPressed = false
 
             if (button.active)
-                control.actionCancelled(index, longCancel)
+                control.actionCancelled(index)
 
             button.active = false
         }
