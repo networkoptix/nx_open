@@ -210,6 +210,7 @@ class Server(object):
                 url = 'http://{ip_address}:{port}/'.format(ip_address=ip_address_to, port=self.internal_ip_port)
         if url is None:
             raise Exception("No IP address from {} from interfaces:\n{}".format(remote_network, pformat(interfaces)))
+        log.info("Merging with %s", url)
         self.rest_api.api.mergeSystems.POST(
             url=url,
             getKey=make_key('GET'), postKey=make_key('POST'),
