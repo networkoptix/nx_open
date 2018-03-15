@@ -61,6 +61,11 @@ std::string formatImpl(const char* pstr, std::stringstream& out, Head&& head, Ta
     return std::string();
 }
 
+/**
+ * This is formatting helper function which accepts format string with '%' as placeholders and any
+ * number of arguments which might be put into the stringstream and produce string with substituted
+ * arguments.
+ */
 template<typename... Args>
 std::string format(const std::string& formatString, Args&&... args)
 {
