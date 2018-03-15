@@ -5,7 +5,7 @@ vm_host:
   address: 127.0.0.1
 vm_types:
   linux:
-    power_on_timeout: 20
+    power_on_timeout: 60
     name_prefix: ubuntu-14.04-
     template:
       vm: ubuntu-14.04-template
