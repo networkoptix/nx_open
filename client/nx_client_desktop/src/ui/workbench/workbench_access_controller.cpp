@@ -343,12 +343,19 @@ void QnWorkbenchAccessController::at_resourcePool_resourceAdded(const QnResource
     connect(resource, &QnResource::flagsChanged, this,
         &QnWorkbenchAccessController::updatePermissions);
 
+
+    if (const auto& camera = resource.dynamicCast<QnVirtualCameraResource>())
+    {
+        connect(camera, &QnVirtualCameraResource::licenseUsedChanged, this,
+            &QnWorkbenchAccessController::updatePermissions);
+    }
+
     updatePermissions(resource);
 }
 
 void QnWorkbenchAccessController::at_resourcePool_resourceRemoved(const QnResourcePtr& resource)
 {
-    disconnect(resource, NULL, this, NULL);
+    resource->disconnect(this);
     m_dataByResource.remove(resource);
 }
 
