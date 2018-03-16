@@ -223,7 +223,7 @@ class Server(object):
 
     def set_user_password(self, user, password):
         log.debug('%s got user/password: %r/%r', self, user, password)
-        self.rest_api.set_credentials(user, password)
+        self.rest_api = self.rest_api.with_credentials(user, password)
         if self.is_online():
             self._wait_for_credentials_accepted()
 

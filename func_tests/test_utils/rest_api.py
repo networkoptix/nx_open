@@ -115,10 +115,11 @@ class RestApi(object):
         password_display = self._auth.password if self._auth.password in STANDARD_PASSWORDS else '***'
         return "<RestApi {} {} {}:{}>".format(self._alias, self.url, self._auth.username, password_display)
 
-    def set_credentials(self, username, password):
-        self.user = username  # Only for interface.
-        self.password = password  # Only for interface.
-        self._auth = HTTPDigestAuth(username, password)
+    def with_credentials(self, username, password):
+        return self.__class__(
+            self._alias, self._hostname, self._port,
+            username=username, password=password,
+            ca_cert=self.ca_cert)
 
     def get_api_fn(self, method, api_object, api_method):
         object = getattr(self, api_object)  # server.rest_api.ec2
