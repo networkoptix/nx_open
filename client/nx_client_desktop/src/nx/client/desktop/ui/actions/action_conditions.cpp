@@ -1668,6 +1668,15 @@ ConditionWrapper scoped(ActionScope scope, ConditionWrapper&& condition)
     return new ScopedCondition(scope, std::move(condition));
 }
 
+ConditionWrapper hasGlobalPermission(Qn::GlobalPermission permission)
+{
+    return new CustomBoolCondition(
+        [permission](const Parameters& /*parameters*/, QnWorkbenchContext* context)
+        {
+            return context->accessController()->hasGlobalPermission(permission);
+        });
+}
+
 ConditionWrapper isPreviewSearchMode()
 {
     return new CustomBoolCondition(

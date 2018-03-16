@@ -484,7 +484,9 @@ void initialize(Manager* manager, Action* root)
             .shortcut(lit("Alt+R"))
             .shortcut(Qt::Key_MediaRecord)
             .shortcutContext(Qt::ApplicationShortcut)
-            .autoRepeat(false);
+            .autoRepeat(false)
+            .condition(!condition::isLoggedIn()
+                || condition::hasGlobalPermission(Qn::GlobalExportPermission));
 
         factory()
             .flags(Main)
@@ -495,7 +497,7 @@ void initialize(Manager* manager, Action* root)
         .flags(Main | DevMode)
         .text(lit("Export Standalone Client"))
         .condition(condition::isTrue(nx::utils::AppInfo::isWindows()));
-    
+
     factory()
         .flags(Main | DevMode)
         .separator()
