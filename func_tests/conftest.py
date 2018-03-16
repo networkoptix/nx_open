@@ -280,7 +280,10 @@ def registries(vm_types, configuration, host_os_access):
 
 
 @pytest.fixture(scope='session')
-def vm_factories(request, ssh_config, configuration, hypervisor):
+def vm_factories(request, vm_types, registries, ssh_config, configuration, hypervisor):
+    if request.config.getoption('--clean'):
+        for vm_type in vm_types:
+            registries[vm_type].clean(hypervisor.destroy)
     access_manager = SSHAccessManager(ssh_config, 'root', Path(configuration['ssh']['private_key']).expanduser())
     pools = {
         vm_type: Factory(
@@ -289,9 +292,6 @@ def vm_factories(request, ssh_config, configuration, hypervisor):
             access_manager,  # TODO: Instantiate separate for each
             )
         for vm_type, vm_configuration_raw in configuration['vm_types'].items()}
-    if request.config.getoption('--clean'):
-        for pool in pools.values():
-            pool.destroy()
     return pools
 
 
