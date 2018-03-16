@@ -187,13 +187,26 @@ gboolean metadataHandlerCallback(GstBuffer* buffer, GstMeta** meta, gpointer use
         const auto& objectDescriptions = pipeline->objectClassDescriptions();
         const auto objectClassId = roiMeta.class_id;
 
-        if (objectClassId < objectDescriptions.size())
-            detectedObject->setTypeId(objectDescriptions[objectClassId].guid);
-        else
-            detectedObject->setTypeId(kNullGuid);
-
         auto trackingMapper = pipeline->trackingMapper();
-        detectedObject->setAttributes(trackingMapper->attributes(roiMeta));
+        auto attributes = trackingMapper->attributes(roiMeta);
+        if (objectClassId < objectDescriptions.size())
+        {
+            detectedObject->setTypeId(objectDescriptions[objectClassId].guid);
+            attributes.emplace_front(
+                nx::sdk::AttributeType::string,
+                "Type",
+                objectDescriptions[objectClassId].name);
+        }
+        else
+        {
+            detectedObject->setTypeId(kNullGuid);
+        }
+
+        detectedObject->setAttributes(
+            std::vector<nx::sdk::metadata::CommonAttribute>(
+                attributes.begin(),
+                attributes.end()));
+
         packet->addItem(detectedObject);
     }
 
