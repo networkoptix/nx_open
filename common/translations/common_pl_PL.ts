@@ -502,7 +502,7 @@
     <name>QnLicenseUsageHelper</name>
     <message numerus="yes">
       <source>%n %2 are used out of %1.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%2: %n jest wykorzystywana na %1.</numerusform>
         <numerusform>%2: %n są wykorzystywane na %1.</numerusform>
         <numerusform>%2: %n jest wykorzystywanych na %1.</numerusform>
@@ -511,7 +511,7 @@
     </message>
     <message numerus="yes">
       <source>%n %2 will be used out of %1.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%2: %n zostanie wykorzystana na %1.</numerusform>
         <numerusform>%2: %n zostaną wykorzystane na %1.</numerusform>
         <numerusform>%2: %n zostanie wykorzystanych na %1.</numerusform>
@@ -520,7 +520,7 @@
     </message>
     <message numerus="yes">
       <source>Activate %n more %1.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1: aktywuj jeszcze %n.</numerusform>
         <numerusform>%1: aktywuj jeszcze %n.</numerusform>
         <numerusform>%1: aktywuj jeszcze %n.</numerusform>

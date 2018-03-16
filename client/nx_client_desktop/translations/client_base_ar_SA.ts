@@ -2603,8 +2603,8 @@ to view more bookmarks</translation>
       <translation>Server</translation>
     </message>
     <message>
-      <source>Logical Id</source>
-      <translation type="unfinished">Logical Id</translation>
+      <source>Id</source>
+      <translation>Id</translation>
     </message>
   </context>
   <context>
@@ -6357,10 +6357,6 @@ to %1</translation>
   <context>
     <name>QnStatusOverlayController</name>
     <message>
-      <source>NOT ENOUGH LICENCES</source>
-      <translation>NOT ENOUGH LICENCES</translation>
-    </message>
-    <message>
       <source>NO DATA</source>
       <translation>NO DATA</translation>
     </message>
@@ -6431,6 +6427,10 @@ to %1</translation>
     <message>
       <source>UNSUPPORTED FIRMWARE VERSION</source>
       <translation type="unfinished">UNSUPPORTED FIRMWARE VERSION</translation>
+    </message>
+    <message>
+      <source>NOT ENOUGH LICENSES</source>
+      <translation type="unfinished">NOT ENOUGH LICENSES</translation>
     </message>
   </context>
   <context>
@@ -7611,6 +7611,10 @@ to %1</translation>
     <message>
       <source>Could not connect to server. Video Wall will be closed.</source>
       <translation>Could not connect to server. Video Wall will be closed.</translation>
+    </message>
+    <message>
+      <source>Video Wall is removed on the server and will be closed.</source>
+      <translation type="unfinished">Video Wall is removed on the server and will be closed.</translation>
     </message>
   </context>
   <context>

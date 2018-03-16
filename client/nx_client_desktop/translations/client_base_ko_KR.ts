@@ -2456,8 +2456,8 @@ to view more bookmarks</source>
       <translation>서버</translation>
     </message>
     <message>
-      <source>Logical Id</source>
-      <translation>논리 Id</translation>
+      <source>Id</source>
+      <translation>Id</translation>
     </message>
   </context>
   <context>
@@ -6001,10 +6001,6 @@ to %1</source>
   <context>
     <name>QnStatusOverlayController</name>
     <message>
-      <source>NOT ENOUGH LICENCES</source>
-      <translation>라인센스 부족</translation>
-    </message>
-    <message>
       <source>NO DATA</source>
       <translation>데이터 없음</translation>
     </message>
@@ -6075,6 +6071,10 @@ to %1</source>
     <message>
       <source>UNSUPPORTED FIRMWARE VERSION</source>
       <translation>지원되지 않는 펌웨어 버전</translation>
+    </message>
+    <message>
+      <source>NOT ENOUGH LICENSES</source>
+      <translation type="unfinished">NOT ENOUGH LICENSES</translation>
     </message>
   </context>
   <context>
@@ -7210,6 +7210,10 @@ to %1</source>
     <message>
       <source>Could not connect to server. Video Wall will be closed.</source>
       <translation>서버에 연결할 수 없습니다. 비디오월이 닫힘니다.</translation>
+    </message>
+    <message>
+      <source>Video Wall is removed on the server and will be closed.</source>
+      <translation type="unfinished">Video Wall is removed on the server and will be closed.</translation>
     </message>
   </context>
   <context>
