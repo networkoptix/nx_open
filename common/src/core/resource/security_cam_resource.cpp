@@ -131,19 +131,19 @@ QnMediaServerResourcePtr QnSecurityCamResource::getParentServer() const {
 }
 
 bool QnSecurityCamResource::setProperty(
-	const QString &key,
-	const QString &value,
-	PropertyOptions options)
+    const QString &key,
+    const QString &value,
+    PropertyOptions options)
 {
-	return QnResource::setProperty(key, value, options);
+    return QnResource::setProperty(key, value, options);
 }
 
 bool QnSecurityCamResource::setProperty(
-	const QString &key,
-	const QVariant& value,
-	PropertyOptions options)
+    const QString &key,
+    const QVariant& value,
+    PropertyOptions options)
 {
-	return QnResource::setProperty(key, value, options);
+    return QnResource::setProperty(key, value, options);
 }
 
 bool QnSecurityCamResource::isGroupPlayOnly() const {
@@ -656,8 +656,8 @@ void QnSecurityCamResource::at_motionRegionChanged()
 
     if (getMotionType() == Qn::MT_HardwareGrid || getMotionType() == Qn::MT_MotionWindow)
     {
-    	QnConstResourceVideoLayoutPtr layout = getVideoLayout();
-    	int numChannels = layout->channelCount();
+        QnConstResourceVideoLayoutPtr layout = getVideoLayout();
+        int numChannels = layout->channelCount();
         for (int i = 0; i < numChannels; ++i)
             setMotionMaskPhysical(i);
     }
@@ -680,7 +680,6 @@ int QnSecurityCamResource::motionSensWindowCount() const
     QString val = getProperty(Qn::MOTION_SENS_WINDOW_CNT_PARAM_NAME);
     return val.toInt();
 }
-
 
 bool QnSecurityCamResource::hasTwoWayAudio() const
 {
@@ -803,7 +802,6 @@ QString QnSecurityCamResource::getUserDefinedName() const
 
     return QnSecurityCamResource::getName();
 }
-
 
 QString QnSecurityCamResource::getGroupName() const
 {
@@ -1024,7 +1022,6 @@ void QnSecurityCamResource::setLicenseUsed(bool value)
     emit licenseUsedChanged(::toSharedPointer(this));
 }
 
-
 bool QnSecurityCamResource::isLicenseUsed() const
 {
     /// TODO: #gdm Refactor licence management
@@ -1243,7 +1240,6 @@ void QnSecurityCamResource::removeStatusFlags(Qn::CameraStatusFlag flag)
     emit statusFlagsChanged(::toSharedPointer(this));
 }
 
-
 bool QnSecurityCamResource::needCheckIpConflicts() const {
     return !hasCameraCapabilities(Qn::ShareIpCapability);
 }
@@ -1461,7 +1457,6 @@ int QnSecurityCamResource::suggestBitrateForQualityKbps(Qn::StreamQuality qualit
             bitrate * ((double)fps / streamCapability.defaultFps),
             (double)streamCapability.maxBitrateKbps);
     }
-
 
     auto result = rawSuggestBitrateKbps(quality, resolution, fps);
 

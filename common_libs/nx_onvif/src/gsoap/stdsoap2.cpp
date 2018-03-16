@@ -1,7 +1,7 @@
 /*
-	stdsoap2.c[pp] 2.8.8
+    stdsoap2.c[pp] 2.8.8
 
-	gSOAP runtime engine
+    gSOAP runtime engine
 
 gSOAP XML Web services tools
 Copyright (C) 2000-2011, Robert van Engelen, Genivia Inc., All Rights Reserved.
@@ -1115,7 +1115,7 @@ zlib_again:
         soap->bufidx = 0;
         if (!ret)
         { soap->ahead = EOF;
-	  return EOF;
+      return EOF;
         }
       }
       else
@@ -1125,7 +1125,7 @@ zlib_again:
       while (!soap_isxdigit((int)(c = soap_getchunkchar(soap))))
       { if ((int)c == EOF)
         { soap->ahead = EOF;
-	  return EOF;
+      return EOF;
         }
       }
       do
@@ -1931,8 +1931,8 @@ soap_getbase64(struct soap *soap, int *n, int malloc_flag)
         int j = 0;
         do
         { soap_wchar c = soap_get(soap);
-	  if (c < SOAP_AP)
-	    c &= 0x7FFFFFFF;
+      if (c < SOAP_AP)
+        c &= 0x7FFFFFFF;
           if (c == '=' || c < 0)
           { unsigned char *p;
             switch (j)
@@ -4211,7 +4211,7 @@ again:
 #endif
               if (ext_data)
               { val = meth->i2v(meth, ext_data, NULL);
-        	if (val)
+            if (val)
                 { for (j = 0; j < sk_CONF_VALUE_num(val); j++)
                   { CONF_VALUE *nval = sk_CONF_VALUE_value(val, j);
                     if (nval && !strcmp(nval->name, "DNS") && !strcmp(nval->value, host))
@@ -6264,26 +6264,26 @@ soap_putcookies(struct soap *soap, const char *domain, const char *path, int sec
           && (!q->path || !strncmp(q->path, path, strlen(q->path)))
           && (!q->secure || secure))
       { size_t n = 12;
-	if (q->name)
-	  n += 3*strlen(q->name);
-	if (q->value && *q->value)
-	  n += 3*strlen(q->value) + 1;
+    if (q->name)
+      n += 3*strlen(q->name);
+    if (q->value && *q->value)
+      n += 3*strlen(q->value) + 1;
         if (q->path && *q->path)
-	  n += strlen(q->path) + 9;
-	if (q->domain)
-	  n += strlen(q->domain) + 11;
-	if (tmp - s + n > sizeof(tmp))
+      n += strlen(q->path) + 9;
+    if (q->domain)
+      n += strlen(q->domain) + 11;
+    if (tmp - s + n > sizeof(tmp))
         { if (s == tmp)
-	    return SOAP_OK; /* HTTP header size overflow */
-	  DBGLOG(TEST, SOAP_MESSAGE(fdebug, "Cookie: %s\n", tmp));
+        return SOAP_OK; /* HTTP header size overflow */
+      DBGLOG(TEST, SOAP_MESSAGE(fdebug, "Cookie: %s\n", tmp));
           if ((soap->error = soap->fposthdr(soap, "Cookie", tmp)))
             return soap->error;
-	  s = tmp;
+      s = tmp;
         }
-	else if (s != tmp)
-	{ strcat(s, " ");
-	  s++;
-	}
+    else if (s != tmp)
+    { strcat(s, " ");
+      s++;
+    }
         if (q->version != version)
         { sprintf(s, "$Version=%u;", q->version);
           version = q->version;
@@ -6302,7 +6302,7 @@ soap_putcookies(struct soap *soap, const char *domain, const char *path, int sec
         if (q->domain)
         { sprintf(s, ";$Domain=\"%s\"", q->domain);
           s += strlen(s);
-	}
+    }
       }
       p = &q->next;
     }
@@ -9181,8 +9181,8 @@ soap_element(struct soap *soap, const char *tag, int id, const char *type)
       for (np = soap->nlist; np; np = np->next)
       { if (np->index == 2)
         { struct soap_nlist *np1 = soap_push_ns(soap, np->id, np->ns, 1);
-	  if (np1)
-	    np1->index = 0;
+      if (np1)
+        np1->index = 0;
         }
       }
       soap->evlev = soap->level;
@@ -15233,7 +15233,7 @@ soap_ntlm_handshake(struct soap *soap, int command, const char *endpoint, const 
       DBGLOG(TEST,SOAP_MESSAGE(fdebug, "NTLM S->C Type 2: waiting on server NTLM response\n"));
       if (soap_begin_recv(soap))
         if (soap->error == SOAP_EOF)
-	  return soap->error;
+      return soap->error;
       soap_end_recv(soap);
       soap->length = l;
       if (soap->status != 401 && soap->status != 407)
@@ -15349,8 +15349,8 @@ soap_base642s(struct soap *soap, const char *s, char *t, size_t l, int *n)
           }
           if (n)
             *n += (int)i;
-	  if (l >= j)
-	    *t = '\0';
+      if (l >= j)
+        *t = '\0';
           return p;
         }
         c -= '+';
@@ -15371,7 +15371,7 @@ soap_base642s(struct soap *soap, const char *s, char *t, size_t l, int *n)
       if (l < 3)
       { if (n)
           *n += (int)i;
-	*t = '\0';
+    *t = '\0';
         return p;
       }
       *t++ = (char)((m >> 16) & 0xFF);
