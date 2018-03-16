@@ -24,3 +24,11 @@ if(NOT developerBuild AND NOT dw_edge1 IN_LIST skipConfigurationChecks)
             PRINT_VARIABLES targetDevice customization)
     endif()
 endif()
+
+if(hardwareSigning AND NOT hardware_signing IN_LIST skipConfigurationChecks)
+    if(WINDOWS AND NOT customization STREQUAL "vista")
+        nx_fail_configuration_check(hardware_signing
+            DESCRIPTION "hardwareSigning can be used only with vista customization."
+            PRINT_VARIABLES hardwareSigning customization)
+    endif()
+endif()

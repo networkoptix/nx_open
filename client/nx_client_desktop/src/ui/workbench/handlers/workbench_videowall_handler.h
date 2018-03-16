@@ -101,6 +101,7 @@ private:
 
 private slots:
     void at_newVideoWallAction_triggered();
+    void at_deleteVideoWallAction_triggered();
     void at_attachToVideoWallAction_triggered();
     void at_detachFromVideoWallAction_triggered();
     void at_deleteVideoWallItemAction_triggered();

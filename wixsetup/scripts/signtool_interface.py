@@ -79,44 +79,69 @@ def signtool_executable(signtool_directory):
     return os.path.join(signtool_directory, 'signtool.exe')
 
 
+def timestamp_options(timestamp_server):
+    return ['/td', 'sha256', '/tr', timestamp_server]
+
+
 def common_signtool_options():
-    return [
-        '/td', 'sha256',
-        '/fd', 'sha256',
-        '/tr', 'http://tsa.startssl.com/rfc3161',
-        '/v',
-        '/a']
+    return ['/fd', 'sha256', '/v']
 
 
-def sign_command(
-    signtool_directory,
-    target_file,
-    sign_description=None,
-    sign_password=None,
-    certificate=None
-):
+def common_sign_command(signtool_directory, timestamp_server):
     command = [signtool_executable(signtool_directory), 'sign']
     command += common_signtool_options()
-    if sign_description:
-        command += ['/d', sign_description]
-    if sign_password:
-        command += ['/p', sign_password]
-    if certificate:
-        command += ['/f', certificate]
+    command += timestamp_options(timestamp_server)
+    return command
+
+
+def sign_software_command(
+    signtool_directory,
+    target_file,
+    certificate,
+    sign_password,
+    timestamp_server
+):
+    command = common_sign_command(signtool_directory, timestamp_server)
+    # if sign_description:
+    #    command += ['/d', sign_description]
+    command += ['/f', certificate]
+    command += ['/p', sign_password]
     command += [target_file]
     return command
 
 
-def sign(
+def sign_hardware_command(
     signtool_directory,
     target_file,
-    sign_description=None,
-    sign_password=None,
-    certificate=None
+    timestamp_server
 ):
-    execute_command(sign_command(
+    command = common_sign_command(signtool_directory, timestamp_server)
+    command += ['/a']
+    command += [target_file]
+    return command
+
+
+def sign_software(
+    signtool_directory,
+    target_file,
+    certificate,
+    sign_password,
+    timestamp_server
+):
+    execute_command(sign_software_command(
         signtool_directory=signtool_directory,
         target_file=target_file,
-        sign_description=sign_description,
+        certificate=certificate,
         sign_password=sign_password,
-        certificate=certificate))
+        timestamp_server=timestamp_server))
+
+
+def sign_hardware(
+    signtool_directory,
+    target_file,
+    timestamp_server
+):
+    execute_command(sign_hardware_command(
+        signtool_directory=signtool_directory,
+        target_file=target_file,
+        timestamp_server=timestamp_server))

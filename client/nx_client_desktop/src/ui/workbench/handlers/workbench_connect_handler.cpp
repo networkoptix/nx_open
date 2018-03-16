@@ -93,7 +93,7 @@
 
 #include <watchers/cloud_status_watcher.h>
 #include <nx_ec/dummy_handler.h>
-
+#include <nx/client/desktop/videowall/utils.h>
 
 using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
@@ -441,7 +441,7 @@ void QnWorkbenchConnectHandler::handleConnectReply(
         return;
     }
 
-    m_connecting.reset();
+    QnRaiiGuard connectingStateGuard([this]() { m_connecting.reset(); });
 
     /* Preliminary exit if application was closed while we were in the inner loop. */
     NX_ASSERT(!context()->closingDown());
@@ -494,11 +494,23 @@ void QnWorkbenchConnectHandler::handleConnectReply(
             menu()->trigger(action::DelayedForcedExitAction);
             break;
         default:    //error
-            if (!qnRuntime->isDesktopMode())
+            if (qnRuntime->isVideoWallMode())
             {
-                QnGraphicsMessageBox::information(
+
+                if (status == Qn::ForbiddenConnectionResult)
+                {
+                    QnGraphicsMessageBox::information(
+                        tr("Video Wall is removed on the server and will be closed."),
+                        kVideowallCloseTimeoutMSec);
+                    const QnUuid videoWallId(m_connecting.url.userName());
+                    setVideoWallAutorunEnabled(videoWallId, false);
+                }
+                else
+                {
+                    QnGraphicsMessageBox::information(
                         tr("Could not connect to server. Video Wall will be closed."),
                         kVideowallCloseTimeoutMSec);
+                }
                 executeDelayedParented(
                     [this]
                     {
@@ -678,7 +690,7 @@ void QnWorkbenchConnectHandler::showWarnMessagesOnce()
 
     auto watcher = context()->instance<QnWorkbenchVersionMismatchWatcher>();
     if (watcher->hasMismatches())
-        menu()->trigger(action::VersionMismatchMessageAction);       
+        menu()->trigger(action::VersionMismatchMessageAction);
 
     context()->instance<QnWorkbenchLicenseNotifier>()->checkLicenses();
 }

@@ -143,7 +143,7 @@ void QnExecHttpRequestActionWidget::paramsChanged()
         params.requestType.clear(); //< Auto value
 
     ui->contentTextEdit->setEnabled(
-        params.requestType.isEmpty() || params.requestType == "POST" || params.requestType == "PUT");
+        params.requestType.isEmpty() || nx_http::Method::isMessageBodyAllowed(params.requestType));
 
     model()->setActionParams(params);
 }
