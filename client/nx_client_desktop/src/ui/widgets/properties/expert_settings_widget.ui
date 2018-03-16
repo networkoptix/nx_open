@@ -356,6 +356,9 @@
             <property name="title">
              <string>Logical Id</string>
             </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
             <layout class="QVBoxLayout" name="verticalLayout_11">
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_3">
