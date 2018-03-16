@@ -1,5 +1,5 @@
 nx_add_target(root_tool EXECUTABLE
-    PUBLIC_LIBS boost root_tool_lib)
+    PUBLIC_LIBS boost nx_system_commands)
 
 if(LINUX)
     # Security requirement (see hardening-check).

@@ -5,9 +5,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/system_error.h>
-#if defined(Q_OS_LINUX)
-    #include <nx/root_tool/actions.h>
-#endif
+#include <nx/system_commands.h>
 #include "root_tool.h"
 
 namespace nx {
@@ -21,30 +19,29 @@ RootTool::RootTool(const QString& toolPath):
 
 Qn::StorageInitResult RootTool::mount(const QUrl& url, const QString& path)
 {
-#if defined (Q_OS_LINUX)
     makeDirectory(path);
 
     auto uncString = "//" + url.host() + url.path();
     if (m_toolPath.isEmpty())
     {
-        root_tool::Actions actions;
-        if (!actions.mount(
+        root_tool::SystemCommands commands;
+        if (!commands.mount(
                 uncString.toStdString(),
                 path.toStdString(),
                 url.userName().isEmpty() ? boost::none : boost::make_optional(url.userName().toStdString()),
                 url.password().isEmpty() ? boost::none : boost::make_optional(url.password().toStdString())))
         {
-            NX_WARNING(this, lm("[mount] Mount via root_tool::Actions failed. url: %1, path: %2")
+            NX_WARNING(this, lm("[mount] Mount via SystemCommands failed. url: %1, path: %2")
                 .args(url.toString(), path));
 
-            auto output = actions.lastError();
+            auto output = commands.lastError();
             if (output.find("13") != std::string::npos)
                 return Qn::StorageInit_WrongAuth;
 
             return Qn::StorageInit_WrongPath;
         }
 
-        NX_VERBOSE(this, lm("[mount] Mount via root_tool::Actions successful. url: %1, path: %2")
+        NX_VERBOSE(this, lm("[mount] Mount via SystemCommands successful. url: %1, path: %2")
             .args(url.toString(), path));
 
         return Qn::StorageInit_Ok;
@@ -73,15 +70,10 @@ Qn::StorageInitResult RootTool::mount(const QUrl& url, const QString& path)
         .args(url.toString(), path));
 
     return Qn::StorageInit_Ok;
-#else
-    NX_ASSERT(false, "Only linux is supported so far");
-    return Qn::StorageInit_WrongPath;
-#endif
 }
 
 Qn::StorageInitResult RootTool::remount(const QUrl& url, const QString& path)
 {
-#if defined (Q_OS_LINUX)
     bool result = unmount(path);
     NX_VERBOSE(
         this,
@@ -93,85 +85,62 @@ Qn::StorageInitResult RootTool::remount(const QUrl& url, const QString& path)
         lm("[initOrUpdate, mount] root_tool mount %1 to %2 result %3").args(url, path, result));
 
     return mountResult;
-#else
-    NX_ASSERT(false, "Only linux is supported so far");
-    return Qn::StorageInit_WrongPath;
-#endif
 }
 
 bool RootTool::unmount(const QString& path)
 {
-#if defined (Q_OS_LINUX)
     if (m_toolPath.isEmpty())
     {
-        root_tool::Actions actions;
-        if (!actions.unmount(path.toStdString()))
+        root_tool::SystemCommands commands;
+        if (!commands.unmount(path.toStdString()))
             return false;
 
         return true;
     }
 
     return execute({"unmount", path}) == 0;
-#else
-    NX_ASSERT(false, "Only linux is supported so far");
-    return false;
-#endif
 }
 
 bool RootTool::changeOwner(const QString& path)
 {
-#if defined (Q_OS_LINUX)
     if (m_toolPath.isEmpty())
     {
-        root_tool::Actions actions;
-        if (!actions.changeOwner(path.toStdString()))
+        root_tool::SystemCommands commands;
+        if (!commands.changeOwner(path.toStdString()))
             return false;
 
         return true;
     }
 
     return execute({"chown", path}) == 0;
-#else
-    return false;
-#endif
 }
 
 bool RootTool::touchFile(const QString& path)
 {
-#if defined (Q_OS_LINUX)
     if (m_toolPath.isEmpty())
     {
-        root_tool::Actions actions;
-        if (!actions.touchFile(path.toStdString()))
+        root_tool::SystemCommands commands;
+        if (!commands.touchFile(path.toStdString()))
             return false;
 
         return true;
     }
 
     return execute({"touch", path}) == 0;
-#else
-    NX_ASSERT(false, "Only linux is supported so far");
-    return false;
-#endif
 }
 
 bool RootTool::makeDirectory(const QString& path)
 {
-#if defined (Q_OS_LINUX)
     if (m_toolPath.isEmpty())
     {
-        root_tool::Actions actions;
-        if (!actions.makeDirectory(path.toStdString()))
+        root_tool::SystemCommands commands;
+        if (!commands.makeDirectory(path.toStdString()))
             return false;
 
         return true;
     }
 
     return execute({"mkdir", path}) == 0;
-#else
-    NX_ASSERT(false, "Only linux is supported so far");
-    return false;
-#endif
 }
 
 static std::string makeArgsLine(const std::vector<QString>& args)

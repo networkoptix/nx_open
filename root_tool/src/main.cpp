@@ -1,6 +1,6 @@
 #include <iostream>
 #include <assert.h>
-#include <nx/root_tool/actions.h>
+#include <nx/system_commands.h>
 
 static int showHelp()
 {
@@ -81,9 +81,9 @@ int main(int /*argc*/, const char** argv)
     if (unknownCommand(*command))
         return reportErrorAndExit("Unknown command: " + *command);
 
-    nx::root_tool::Actions actions;
-    if (!actions.setupIds())
-        return reportErrorAndExit(actions.lastError());
+    nx::root_tool::SystemCommands commands;
+    if (!commands.setupIds())
+        return reportErrorAndExit(commands.lastError());
 
     if (*command == kMount)
     {
@@ -98,15 +98,15 @@ int main(int /*argc*/, const char** argv)
         const auto user = getOptionalArg(argv);
         const auto password = getOptionalArg(argv);
 
-        if (!actions.mount(*url, *directory, user, password))
-            return reportErrorAndExit(actions.lastError());
+        if (!commands.mount(*url, *directory, user, password))
+            return reportErrorAndExit(commands.lastError());
 
         return 0;
     }
 
     if (*command == kIds)
     {
-        actions.showIds();
+        commands.showIds();
         return 0;
     }
 
@@ -114,13 +114,13 @@ int main(int /*argc*/, const char** argv)
     if (!commandArg)
         return reportArgErrorAndExit(*command);
 
-    if (((*command == kUMount1 || *command == kUMount2) && !actions.unmount(*commandArg))
-        || (*command == kChown && !actions.changeOwner(*commandArg))
-        || (*command == kTouch && !actions.touchFile(*commandArg))
-        || (*command == kMkdir && !actions.makeDirectory(*commandArg))
-        || (*command == kInstall && !actions.install(*commandArg)))
+    if (((*command == kUMount1 || *command == kUMount2) && !commands.unmount(*commandArg))
+        || (*command == kChown && !commands.changeOwner(*commandArg))
+        || (*command == kTouch && !commands.touchFile(*commandArg))
+        || (*command == kMkdir && !commands.makeDirectory(*commandArg))
+        || (*command == kInstall && !commands.install(*commandArg)))
     {
-        return reportErrorAndExit(actions.lastError());
+        return reportErrorAndExit(commands.lastError());
     }
 
     return 0;

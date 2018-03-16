@@ -14,6 +14,7 @@
 #include <utils/common/writer_pool.h>
 #include <nx/fusion/serialization/lexical.h>
 #include <media_server/media_server_module.h>
+#include <nx/system_commands.h>
 #include <nx/mediaserver/root_tool.h>
 
 #ifndef _WIN32
