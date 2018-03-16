@@ -237,7 +237,13 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createWidgetsForPage(
             continue;
         }
 
-        if (param.dataType != QnCameraAdvancedParameter::DataType::Button)
+        // Column span for a control
+        int colSpan = 1;
+        
+        bool hasLabel = false;
+
+        if (param.dataType != QnCameraAdvancedParameter::DataType::Button
+            && param.dataType != QnCameraAdvancedParameter::DataType::LensControl)
         {
             auto label = new QLabel(scrollAreaWidgetContents);
             label->setToolTip(param.description);
@@ -248,9 +254,15 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createWidgetsForPage(
             m_paramLabelsById[param.id] = label;
             label->setFixedWidth(kParameterLabelWidth);
             label->setWordWrap(true);
+            hasLabel = true;
+        }
+        else
+        {
+            hasLabel = false;
+            colSpan = 2;
         }
 
-        gridLayout->addWidget(widget, row, 1, Qt::AlignVCenter);
+        gridLayout->addWidget(widget, row, hasLabel ? 1:0, 1, colSpan, Qt::AlignVCenter);
         m_paramWidgetsById[param.id] = widget;
 
         /* Widget is disabled until it receives correct value. */
