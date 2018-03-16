@@ -4,7 +4,7 @@
 namespace nx {
 namespace root_tool {
 
-class Actions
+class SystemCommands
 {
 public:
     /** Mounts NAS from url to directory for real UID and GID. */

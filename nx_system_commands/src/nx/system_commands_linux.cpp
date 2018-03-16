@@ -8,7 +8,7 @@
 #include <iostream>
 #include <set>
 #include <assert.h>
-#include "actions.h"
+#include "system_commands.h"
 
 
 namespace nx {
@@ -78,7 +78,7 @@ std::string format(const std::string& formatString, Args&&... args)
 } // namespace
 
 
-bool Actions::checkMountPermissions(const std::string& directory)
+bool SystemCommands::checkMountPermissions(const std::string& directory)
 {
     static const std::string kAllowedMountPointPreffix("/tmp/");
     static const std::string kAllowedMountPointSuffix("_temp_folder_");
@@ -94,7 +94,7 @@ bool Actions::checkMountPermissions(const std::string& directory)
     return true;
 }
 
-bool Actions::checkOwnerPermissions(const std::string& path)
+bool SystemCommands::checkOwnerPermissions(const std::string& path)
 {
     static const std::set<std::string> kForbiddenOwnershipPaths = {"/"};
     static const std::set<std::string> kForbiddenOwnershipPrefixes = {
@@ -122,7 +122,7 @@ bool Actions::checkOwnerPermissions(const std::string& path)
     return true;
 }
 
-bool Actions::execute(const std::string& command)
+bool SystemCommands::execute(const std::string& command)
 {
     const auto pipe = popen((command + " 2>&1").c_str(), "r");
     if (pipe == nullptr)
@@ -148,7 +148,7 @@ bool Actions::execute(const std::string& command)
     return true;
 }
 
-Actions::CheckOwnerResult Actions::checkCurrentOwner(const std::string& url)
+SystemCommands::CheckOwnerResult SystemCommands::checkCurrentOwner(const std::string& url)
 {
     struct stat info;
     if (stat(url.c_str(), &info))
@@ -170,7 +170,7 @@ Actions::CheckOwnerResult Actions::checkCurrentOwner(const std::string& url)
     return CheckOwnerResult::other;
 }
 
-bool Actions::mount(const std::string& url, const std::string& directory,
+bool SystemCommands::mount(const std::string& url, const std::string& directory,
     const boost::optional<std::string>& username, const boost::optional<std::string>& password)
 {
     if (!checkMountPermissions(directory))
@@ -191,7 +191,7 @@ bool Actions::mount(const std::string& url, const std::string& directory,
                 << " -o uid=" << kRealUid << ",gid=" << kRealGid
                 << ",username=" << username << ",password=" << password;
 
-            if (!password.empty())
+            if (!domain.empty())
                 command << ",domain=" << domain;
 
             return command.str();
@@ -214,17 +214,13 @@ bool Actions::mount(const std::string& url, const std::string& directory,
 
     for (const auto& domain: domains)
     {
-        if (passwordString.empty())
+        for (const auto& passwordCandidate: {passwordString, std::string("123")})
         {
-            for (const auto& passwordCandidate: {"", "123"})
-            {
-                if (execute(makeCommandString(userNameString, passwordCandidate, domain)))
-                   return true;
-            }
-        }
-        else
-        {
-            if (execute(makeCommandString(userNameString, passwordString, domain)))
+            const auto command = makeCommandString(userNameString, passwordCandidate, domain);
+            auto result = execute(command);
+            std::cout << format("Call mount command '%'. Result: %", command, result) << std::endl;
+
+            if (result)
                return true;
         }
     }
@@ -232,7 +228,7 @@ bool Actions::mount(const std::string& url, const std::string& directory,
     return false;
 }
 
-bool Actions::unmount(const std::string& directory)
+bool SystemCommands::unmount(const std::string& directory)
 {
     if (!checkMountPermissions(directory))
         return false;
@@ -241,7 +237,7 @@ bool Actions::unmount(const std::string& directory)
     return execute("umount '" + directory + "'");
 }
 
-bool Actions::changeOwner(const std::string& path)
+bool SystemCommands::changeOwner(const std::string& path)
 {
     if (!checkOwnerPermissions(path))
         return false;
@@ -251,7 +247,7 @@ bool Actions::changeOwner(const std::string& path)
     return execute(command.str());
 }
 
-bool Actions::touchFile(const std::string& filePath)
+bool SystemCommands::touchFile(const std::string& filePath)
 {
     if (!checkOwnerPermissions(filePath) || !execute("touch '" + filePath + "'"))
         return false;
@@ -270,7 +266,7 @@ bool Actions::touchFile(const std::string& filePath)
     return false;
 }
 
-bool Actions::makeDirectory(const std::string& directoryPath)
+bool SystemCommands::makeDirectory(const std::string& directoryPath)
 {
     if (!checkOwnerPermissions(directoryPath) || !execute("mkdir -p '" + directoryPath + "'"))
         return false;
@@ -289,14 +285,14 @@ bool Actions::makeDirectory(const std::string& directoryPath)
     return false;
 }
 
-bool Actions::install(const std::string& debPackage)
+bool SystemCommands::install(const std::string& debPackage)
 {
     // TODO: Check for deb package signature as soon as it is avaliable.
 
     return execute("dpkg -i '" + debPackage + "'");
 }
 
-void Actions::showIds()
+void SystemCommands::showIds()
 {
     const auto w = std::setw(6);
     std::cout
@@ -305,7 +301,7 @@ void Actions::showIds()
         << "Setup       UID:" << w << kRealUid << ",  GID:" << w << kRealGid << std::endl;
 }
 
-bool Actions::setupIds()
+bool SystemCommands::setupIds()
 {
     if (setreuid(geteuid(), geteuid()) != 0)
     {
@@ -322,7 +318,7 @@ bool Actions::setupIds()
     return true;
 }
 
-std::string Actions::lastError() const
+std::string SystemCommands::lastError() const
 {
     return m_lastError;
 }
