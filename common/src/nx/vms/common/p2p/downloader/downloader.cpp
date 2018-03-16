@@ -2,8 +2,11 @@
 
 #include <QtCore/QHash>
 
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/std/future.h>
 #include <utils/common/delayed.h>
 
 #include "private/storage.h"
@@ -214,6 +217,62 @@ QVector<QByteArray> Downloader::getChunkChecksums(const QString& fileName)
 {
     Q_D(Downloader);
     return d->storage->getChunkChecksums(fileName);
+}
+
+void Downloader::validateAsync(const QString& url, int expectedSize,
+    std::function<void(bool)> callback)
+{
+    auto httpClient = createHttpClient();
+    httpClient->doHead(url,
+        [httpClient, url, callback, expectedSize](
+            network::http::AsyncHttpClientPtr asyncClient) mutable
+        {
+            if (asyncClient->failed()
+                || !asyncClient->response()
+                || asyncClient->response()->statusLine.statusCode != network::http::StatusCode::ok)
+            {
+                NX_WARNING(
+                    typeid(Downloader),
+                    lm("[Downloader, validate] Validate %1 http request failed. Http client failed: %2, has response: %3, status code: %4")
+                    .args(url, asyncClient->failed(), asyncClient->response(),
+                        asyncClient->response()->statusLine.statusCode));
+
+                return callback(false);
+            }
+
+            auto& responseHeaders = asyncClient->response()->headers;
+            auto contentLengthItr = responseHeaders.find("Content-Length");
+            const bool hasHeader = contentLengthItr != responseHeaders.cend();
+
+            if (!hasHeader || contentLengthItr->second.toInt() != expectedSize)
+            {
+                NX_WARNING(
+                    typeid(Downloader),
+                    lm("[Downloader, validate] %1. Content-Length: %2, fileInformation.size: %3")
+                    .args(url,
+                        hasHeader ? contentLengthItr->second.toInt() : -1,
+                        expectedSize));
+
+                return callback(false);
+            }
+
+            NX_VERBOSE(typeid(Downloader), lm("[Downloader, validate] %1. Success").args(url));
+            callback(true);
+        });
+}
+
+bool Downloader::validate(const QString& url, int expectedSize)
+{
+    nx::utils::promise<bool> readyPromise;
+    auto readyFuture = readyPromise.get_future();
+
+    validateAsync(url, expectedSize,
+        [&readyPromise](bool success) mutable
+        {
+            readyPromise.set_value(success);
+        });
+
+    return readyFuture.get();
 }
 
 } // namespace downloader

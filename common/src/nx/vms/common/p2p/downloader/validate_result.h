@@ -13,6 +13,7 @@ struct ValidateResult
 {
     bool success;
     ValidateResult();
+    explicit ValidateResult(bool success);
 };
 
 #define ValidateResult_Fields (success)

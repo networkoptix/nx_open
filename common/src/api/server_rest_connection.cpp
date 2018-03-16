@@ -395,12 +395,13 @@ Handle ServerConnection::addFileUpload(
 
 Handle ServerConnection::validateFileInformation(
     const QString& url,
+    int expectedSize,
     GetCallback callback,
     QThread* targetThread)
 {
     return executeGet(
         lit("/api/downloads/%1/validate").arg(url),
-        QnRequestParamList(),
+        QnRequestParamList{{lit("expected"), QString::number(expectedSize)}},
         callback,
         targetThread);
 }
