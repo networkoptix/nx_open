@@ -2101,12 +2101,14 @@ void ActionHandler::at_removeFromServerAction_triggered()
 {
     QnResourceList resources = menu()->currentParameters(sender()).resources();
 
-    /* Layouts will be removed in their own handler. Also separately check each resource. */
+    // Layouts and videowalls will be removed in their own handlers.
+    // Also separately check each resource.
     resources = resources.filtered(
         [this](const QnResourcePtr& resource)
         {
             return menu()->canTrigger(action::RemoveFromServerAction, resource)
-                && !resource->hasFlags(Qn::layout);
+                && !resource->hasFlags(Qn::layout)
+                && !resource->hasFlags(Qn::videowall);
         });
 
     if (ui::messages::Resources::deleteResources(mainWindow(), resources))
