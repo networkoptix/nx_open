@@ -216,11 +216,7 @@ bool SystemCommands::mount(const std::string& url, const std::string& directory,
     {
         for (const auto& passwordCandidate: {passwordString, std::string("123")})
         {
-            const auto command = makeCommandString(userNameString, passwordCandidate, domain);
-            auto result = execute(command);
-            std::cout << format("Call mount command '%'. Result: %", command, result) << std::endl;
-
-            if (result)
+            if (execute(makeCommandString(userNameString, passwordCandidate, domain)))
                return true;
         }
     }
