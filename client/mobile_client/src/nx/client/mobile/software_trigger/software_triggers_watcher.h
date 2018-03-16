@@ -4,6 +4,7 @@
 
 #include <nx/utils/uuid.h>
 #include <nx/vms/event/event_fwd.h>
+#include <client_core/connection_context_aware.h>
 
 class QnCommonModule;
 
@@ -20,7 +21,7 @@ class RuleManager;
 namespace client {
 namespace mobile {
 
-class SoftwareTriggersWatcher: public QObject
+class SoftwareTriggersWatcher: public QObject, public QnConnectionContextAware
 {
     Q_OBJECT
     using base_type = QObject;

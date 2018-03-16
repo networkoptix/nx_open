@@ -3,7 +3,7 @@
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <plugins/resource/desktop_camera/desktop_resource_base.h>
-#include <watchers/user_watcher.h>
+#include <nx/client/core/watchers/user_watcher.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/media_server_resource.h>
 
@@ -15,7 +15,7 @@ ServerAudioConnectionWatcher::ServerAudioConnectionWatcher(QObject* parent)
 {
     const auto common = commonModule();
     const auto pool = common->resourcePool();
-    const auto userWatcher = common->instance<QnUserWatcher>();
+    const auto userWatcher = common->instance<nx::client::core::UserWatcher>();
 
     connect(pool, &QnResourcePool::resourceAdded,
         this, &ServerAudioConnectionWatcher::handleResourceAdded);
@@ -23,7 +23,7 @@ ServerAudioConnectionWatcher::ServerAudioConnectionWatcher(QObject* parent)
         this, &ServerAudioConnectionWatcher::handleResourceRemoved);
     connect(common, &QnCommonModule::remoteIdChanged,
         this, &ServerAudioConnectionWatcher::handleRemoteIdChanged);
-    connect(userWatcher, &QnUserWatcher::userChanged,
+    connect(userWatcher, &nx::client::core::UserWatcher::userChanged,
         this, &ServerAudioConnectionWatcher::tryAddCurrentServerConnection);
 
     handleRemoteIdChanged();
@@ -41,7 +41,7 @@ void ServerAudioConnectionWatcher::tryAddCurrentServerConnection()
 {
     tryRemoveCurrentServerConnection();
 
-    const auto userWatcher = commonModule()->instance<QnUserWatcher>();
+    const auto userWatcher = commonModule()->instance<nx::client::core::UserWatcher>();
     const auto user = userWatcher->user();
     if (m_server && m_desktop && user)
         m_desktop->addConnection(m_server, user->getId());

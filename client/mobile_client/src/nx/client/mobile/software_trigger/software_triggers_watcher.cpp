@@ -5,10 +5,10 @@
 #include <nx/vms/event/rule_manager.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/user_roles_manager.h>
-#include <core/resource_access/resource_access_manager.h>
+#include <core/resource_access/global_permissions_manager.h>
 #include <common/common_module.h>
 #include <client_core/client_core_module.h>
-#include <watchers/user_watcher.h>
+#include <nx/client/core/watchers/user_watcher.h>
 #include <utils/common/synctime.h>
 #include <nx/vms/event/strings_helper.h>
 
@@ -76,8 +76,7 @@ SoftwareTriggersWatcher::DescriptionPtr SoftwareTriggersWatcher::Description::cr
 
 SoftwareTriggersWatcher::SoftwareTriggersWatcher(QObject* parent):
     base_type(parent),
-    m_commonModule(qnClientCoreModule->commonModule()),
-    m_ruleManager(m_commonModule->eventRuleManager())
+    m_ruleManager(eventRuleManager())
 {
     connect(m_ruleManager, &vms::event::RuleManager::rulesReset,
         this, &SoftwareTriggersWatcher::updateTriggers);
@@ -88,6 +87,21 @@ SoftwareTriggersWatcher::SoftwareTriggersWatcher(QObject* parent):
 
     connect(this, &SoftwareTriggersWatcher::resourceIdChanged,
         this, &SoftwareTriggersWatcher::updateTriggers);
+
+    const auto manager = globalPermissionsManager();
+    const auto userWatcher = commonModule()->instance<core::UserWatcher>();
+    connect(userWatcher, &core::UserWatcher::userChanged,
+        this, &SoftwareTriggersWatcher::updateTriggers);
+    connect(manager, &QnGlobalPermissionsManager::globalPermissionsChanged, this,
+        [this, userWatcher]
+            (const QnResourceAccessSubject& subject, Qn::GlobalPermissions /*permissions*/)
+        {
+            const auto user = userWatcher->user();
+            if (subject != user)
+                return;
+
+            updateTriggers();
+        });
 }
 
 void SoftwareTriggersWatcher::setResourceId(const QnUuid& resourceId)
@@ -160,9 +174,8 @@ void SoftwareTriggersWatcher::updateTriggersAvailability()
 void SoftwareTriggersWatcher::updateTriggerByRule(const nx::vms::event::RulePtr& rule)
 {
     const auto id = rule->id();
-    const auto accessManager = m_commonModule->resourceAccessManager();
-    const auto currentUser = m_commonModule->instance<QnUserWatcher>()->user();
-    if (!accessManager->hasGlobalPermission(currentUser, Qn::GlobalUserInputPermission)
+    const auto currentUser = commonModule()->instance<nx::client::core::UserWatcher>()->user();
+    if (!globalPermissionsManager()->hasGlobalPermission(currentUser, Qn::GlobalUserInputPermission)
         || !appropriateSoftwareTriggerRule(rule, currentUser, m_resourceId))
     {
         tryRemoveTrigger(id);

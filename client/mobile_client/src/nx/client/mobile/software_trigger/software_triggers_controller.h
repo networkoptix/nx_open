@@ -7,7 +7,6 @@
 
 class QnUuid;
 
-class QnUserWatcher;
 class QnCommonModule;
 class QnResourceAccessManager;
 
@@ -22,6 +21,13 @@ class RuleManager;
 } // namespace vms
 
 namespace client {
+
+namespace core {
+
+class UserWatcher;
+
+} // namespace core
+
 namespace mobile {
 
 class SoftwareTriggersController: public QObject
@@ -58,7 +64,7 @@ private:
 
 private:
     QnCommonModule* const m_commonModule = nullptr;
-    QnUserWatcher* const m_userWatcher = nullptr;
+    core::UserWatcher* const m_userWatcher = nullptr;
     QnResourceAccessManager* const m_accessManager = nullptr;
     vms::event::RuleManager* const m_ruleManager = nullptr;
 

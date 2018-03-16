@@ -2,7 +2,7 @@
 
 #include <QtQml/QtQml>
 
-#include <watchers/user_watcher.h>
+#include <nx/client/core/watchers/user_watcher.h>
 #include <common/common_module.h>
 #include <client_core/client_core_module.h>
 #include <core/resource/user_resource.h>
@@ -22,7 +22,7 @@ namespace mobile {
 SoftwareTriggersController::SoftwareTriggersController(QObject* parent):
     base_type(parent),
     m_commonModule(qnClientCoreModule->commonModule()),
-    m_userWatcher(m_commonModule->instance<QnUserWatcher>()),
+    m_userWatcher(m_commonModule->instance<nx::client::core::UserWatcher>()),
     m_accessManager(m_commonModule->resourceAccessManager()),
     m_ruleManager(m_commonModule->eventRuleManager())
 {

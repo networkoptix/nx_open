@@ -25,7 +25,7 @@
 
 #include <nx_ec/dummy_handler.h>
 
-#include <watchers/user_watcher.h>
+#include <nx/client/core/watchers/user_watcher.h>
 #include <nx/network/address_resolver.h>
 #include <nx/network/socket_global.h>
 #include <network/system_helpers.h>
@@ -254,7 +254,7 @@ void QnConnectionManager::disconnectFromServer()
     d->doDisconnect();
 
     d->setUrl(nx::utils::Url());
-    commonModule()->instance<QnUserWatcher>()->setUserName(QString());
+    commonModule()->instance<nx::client::core::UserWatcher>()->setUserName(QString());
 
     // TODO: #dklychkov Move it to a better place
     QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(Qn::remote);
@@ -411,7 +411,7 @@ bool QnConnectionManagerPrivate::doConnect()
                 QnSyncTime::instance(),
                 static_cast<void(QnSyncTime::*)(qint64)>(&QnSyncTime::updateTime));
 
-            commonModule()->instance<QnUserWatcher>()->setUserName(
+            commonModule()->instance<nx::client::core::UserWatcher>()->setUserName(
                 connectionInfo.effectiveUserName.isEmpty()
                     ? url.userName()
                     : connectionInfo.effectiveUserName);

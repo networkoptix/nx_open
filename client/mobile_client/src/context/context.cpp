@@ -17,7 +17,6 @@
 #include <mobile_client/mobile_client_module.h>
 #include <watchers/available_cameras_watcher.h>
 #include <watchers/cloud_status_watcher.h>
-#include <watchers/user_watcher.h>
 #include <helpers/cloud_url_helper.h>
 #include <helpers/system_helpers.h>
 #include <settings/last_connection.h>
@@ -26,6 +25,7 @@
 #include <nx/network/socket_global.h>
 #include <nx/network/address_resolver.h>
 #include <nx/client/core/two_way_audio/two_way_audio_mode_controller.h>
+#include <nx/client/core/watchers/user_watcher.h>
 
 using namespace nx::vms::utils;
 
@@ -105,9 +105,9 @@ nx::client::core::TwoWayAudioController* QnContext::twoWayAudioController() cons
     return commonModule()->instance<nx::client::core::TwoWayAudioController>();
 }
 
-QnUserWatcher* QnContext::userWatcher() const
+nx::client::core::UserWatcher* QnContext::userWatcher() const
 {
-    return commonModule()->instance<QnUserWatcher>();
+    return commonModule()->instance<nx::client::core::UserWatcher>();
 }
 
 QmlSettingsAdaptor* QnContext::settings() const

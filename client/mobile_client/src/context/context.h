@@ -10,7 +10,6 @@ class QnConnectionManager;
 class QnMobileAppInfo;
 class QnCloudStatusWatcher;
 class QnMobileClientUiController;
-class QnUserWatcher;
 class QnCloudUrlHelper;
 
 namespace nx {
@@ -18,6 +17,7 @@ namespace client {
 
 namespace core {
 
+class UserWatcher;
 class TwoWayAudioController;
 
 } // namespace core
@@ -43,7 +43,7 @@ class QnContext: public QObject, public QnConnectionContextAware
     Q_PROPERTY(QnMobileAppInfo* applicationInfo MEMBER m_appInfo CONSTANT)
     Q_PROPERTY(QnCloudStatusWatcher* cloudStatusWatcher READ cloudStatusWatcher CONSTANT)
     Q_PROPERTY(QnMobileClientUiController* uiController READ uiController CONSTANT)
-    Q_PROPERTY(QnUserWatcher* userWatcher READ userWatcher CONSTANT)
+    Q_PROPERTY(nx::client::core::UserWatcher* userWatcher READ userWatcher CONSTANT)
     Q_PROPERTY(nx::client::core::TwoWayAudioController* twoWayAudioController
         READ twoWayAudioController CONSTANT)
     Q_PROPERTY(QnCloudUrlHelper* cloudUrlHelper MEMBER m_cloudUrlHelper CONSTANT)
@@ -63,7 +63,7 @@ public:
 
     QnMobileClientUiController* uiController() const { return m_uiController; }
     QnCloudStatusWatcher* cloudStatusWatcher() const;
-    QnUserWatcher* userWatcher() const;
+    nx::client::core::UserWatcher* userWatcher() const;
     nx::client::core::TwoWayAudioController* twoWayAudioController() const;
     QmlSettingsAdaptor* settings() const;
 
