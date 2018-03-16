@@ -186,6 +186,7 @@ def process_zip(file_descriptor, user, update_structure, update_content):
                     context.save()
                     log_messages.append(('success', 'Updated template for context %s using %s' % (context.name, name)))
             if update_content:
+                print "updating content"
                 customization = Customization.objects.filter(name=customization_name)
                 if not customization.exists():
                     log_messages.append(
