@@ -7,10 +7,6 @@ namespace mediaserver_plugins {
 namespace metadata {
 namespace deepstream {
 
-//------------------------------------------------------------------------------------------------
-// Primary GIE settings.
-
-
 struct DeepStreamConfig: public nx::kit::IniConfig
 {
     DeepStreamConfig():
@@ -19,10 +15,26 @@ struct DeepStreamConfig: public nx::kit::IniConfig
         reload();
     }
 
+//------------------------------------------------------------------------------------------------
+// Common settings.
+
     NX_INI_STRING("", debugDotFilesDir, "Directory for pipeline graph .dot files");
     NX_INI_INT(0, gstreamerDebugLevel, "Verbosity of GStreamer library, Range is: [0, 8]");
 
     NX_INI_FLAG(1, enableOutput, "Enable logging");
+    NX_INI_INT(
+        1920,
+        defaultFrameWidth,
+        "Frame width to use in the case if incoming data has no information about resolution");
+
+    NX_INI_INT(
+        1080,
+        defaultFrameHeight,
+        "Frame height to use in the case if incoming data has no information about resolution");
+
+//------------------------------------------------------------------------------------------------
+// Primary GIE settings.
+
     NX_INI_STRING(
         "/home/nvidia/Model/ResNet_18/class_guids.txt",
         pgie_classGuidsFile,
@@ -574,7 +586,7 @@ struct DeepStreamConfig: public nx::kit::IniConfig
     NX_INI_FLAG(
         0,
         sgie2_enableDbScan,
-        "When enabled uses dbscan. When disabled uses grouprectangles");
+        "When enabled uses dbscan. When disabled uses grouprectangles");    
 };
 
 inline DeepStreamConfig& ini()

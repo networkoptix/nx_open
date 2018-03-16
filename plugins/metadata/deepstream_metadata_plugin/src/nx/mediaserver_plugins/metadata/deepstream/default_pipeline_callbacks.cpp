@@ -4,8 +4,12 @@
 #include <cassert>
 #include <stdio.h>
 
+extern "C" {
+
 #include <nvosd.h>
 #include <gstnvivameta_api.h>
+
+} // extern "C"
 
 #include "default_pipeline.h"
 #include "deepstream_common.h"
@@ -145,11 +149,11 @@ gboolean metadataHandlerCallback(GstBuffer* buffer, GstMeta** meta, gpointer use
 
     auto frameWidth = pipeline->currentFrameWidth();
     if (frameWidth <= 0)
-        frameWidth = 1920; //< TODO: #dmishin move to config.
+        frameWidth = ini().defaultFrameWidth;
 
     auto frameHeight = pipeline->currentFrameHeight();
     if (frameHeight <= 0)
-        frameHeight = 1080; //< TODO: #dmishin move to config.
+        frameHeight = ini().defaultFrameHeight;
 
     for (auto i = 0; i < bboxes->num_rects; ++i)
     {
