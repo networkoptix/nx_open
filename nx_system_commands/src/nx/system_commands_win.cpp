@@ -36,7 +36,6 @@ bool SystemCommands::install(const std::string& /*debPackage*/)
 
 void SystemCommands::showIds()
 {
-    return false;
 }
 
 bool SystemCommands::setupIds()
@@ -64,9 +63,9 @@ bool SystemCommands::execute(const std::string& /*command*/)
     return false;
 }
 
-CheckOwnerResult SystemCommands::checkCurrentOwner(const std::string& /*url*/)
+SystemCommands::CheckOwnerResult SystemCommands::checkCurrentOwner(const std::string& /*url*/)
 {
-    return false;
+    return CheckOwnerResult::failed;
 }
 
 } // namespace nx
