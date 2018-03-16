@@ -1,5 +1,7 @@
 import abc
 
+from test_utils.os_access import NonZeroExitStatus
+
 
 class Service(object):
     __metaclass__ = abc.ABCMeta
@@ -40,7 +42,10 @@ class UpstartService(Service):
         self.os_access.run_command(['stop', self._service_name])
 
     def make_core_dump(self):
-        self.os_access.run_command(['killall', '--signal', 'SIGTRAP', 'mediaserver-bin'], check_retcode=False)
+        try:
+            self.os_access.run_command(['killall', '--signal', 'SIGTRAP', 'mediaserver-bin'])
+        except NonZeroExitStatus as e:
+            pass
 
 
 class AdHocService(Service):

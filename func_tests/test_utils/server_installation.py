@@ -6,7 +6,7 @@ import sys
 from pathlib2 import PurePosixPath
 
 from test_utils.build_info import build_info_from_text, customizations_from_paths
-from test_utils.os_access import ProcessError
+from test_utils.os_access import NonZeroExitStatus
 from test_utils.service import UpstartService
 from test_utils.utils import wait_until
 
@@ -178,8 +178,8 @@ def find_deb_installation(os_access, mediaserver_deb, installation_root=DEFAULT_
 def _port_is_opened_on_server_machine(hostname, port):
     try:
         hostname.run_command(['nc', '-z', 'localhost', port])
-    except ProcessError as e:
-        if e.returncode == 1:
+    except NonZeroExitStatus as e:
+        if e.exit_status == 1:
             return False
     else:
         return True

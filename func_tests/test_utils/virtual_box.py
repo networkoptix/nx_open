@@ -5,7 +5,7 @@ from pprint import pformat
 
 from netaddr import EUI
 
-from test_utils.os_access import ProcessError
+from test_utils.os_access import NonZeroExitStatus
 from test_utils.utils import wait_until
 
 logger = logging.getLogger(__name__)
@@ -37,9 +37,9 @@ class VirtualBox(object):
     def find(self, name):
         try:
             output = self.os_access.run_command(['VBoxManage', 'showvminfo', name, '--machinereadable'])
-        except ProcessError as e:
-            if e.returncode == 1:
-                raise VMNotFound("Cannot find VM {}; VBoxManage says:\n{}".format(name, e.output))
+        except NonZeroExitStatus as e:
+            if e.exit_status == 1:
+                raise VMNotFound("Cannot find VM {}; VBoxManage says:\n{}".format(name, e.stderr))
             raise
         raw_info = dict(csv.reader(output.splitlines(), delimiter='=', escapechar='\\', doublequote=False))
         ports = {}

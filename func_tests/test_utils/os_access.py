@@ -7,10 +7,7 @@ import glob
 import logging
 import shutil
 import subprocess
-from select import select
 from textwrap import dedent
-
-from math import ceil
 
 try:
     from shlex import quote  # In Python 3.3+.
@@ -21,16 +18,10 @@ import pytz
 import tzlocal
 from pathlib2 import Path, PurePosixPath
 
-from .utils import RunningTime, Wait
+from test_utils.communicate import communicate
+from test_utils.utils import RunningTime
 
 log = logging.getLogger(__name__)
-
-
-PROCESS_TIMEOUT = datetime.timedelta(hours=1)
-
-
-def _arg_list_to_str(args):
-    return ' '.join(quote(str(arg)) for arg in args)
 
 
 def args_from_env(env):
@@ -38,28 +29,30 @@ def args_from_env(env):
     return ['{}={}'.format(name, quote(str(value))) for name, value in env.items()]
 
 
-class ProcessError(subprocess.CalledProcessError):
-    def __init__(self, return_code, command, output):
-        subprocess.CalledProcessError.__init__(self, return_code, command, output=output)
+def args_list_to_str(args):
+    if isinstance(args, str):
+        return args
+    return ' '.join(quote(str(arg)) for arg in args)
+
+
+class NonZeroExitStatus(Exception):
+    def __init__(self, command, exit_status, stdout, stderr):
+        self.exit_status = exit_status
+        self.command = command
+        self.stdout = stdout
+        self.stderr = stderr
 
     def __str__(self):
-        return 'Command "%s" returned non-zero exit status %d:\n%s' % (self.cmd, self.returncode, self.output)
-
-    def __repr__(self):
-        return 'ProcessError(%s)' % self
+        return "Command %s returned non-zero exit status %d" % (args_list_to_str(self.command), self.exit_status)
 
 
-class ProcessTimeoutError(subprocess.CalledProcessError):
-
-    def __init__(self, args, timeout):
-        subprocess.CalledProcessError.__init__(self, returncode=None, cmd=_arg_list_to_str(args))
-        self.timeout = timeout
+class Timeout(Exception):
+    def __init__(self, command, timeout_sec):
+        self.command = command
+        self.timeout_sec = timeout_sec
 
     def __str__(self):
-        return 'Command "%s" was timed out (timeout is %s)' % (self.cmd, self.timeout)
-
-    def __repr__(self):
-        return 'ProcessTimeoutError(%s)' % self
+        return "Command %s was timed out (%s sec)" % (args_list_to_str(self.command), self.timeout_sec)
 
 
 class FileNotFound(Exception):
@@ -68,7 +61,6 @@ class FileNotFound(Exception):
 
 
 class SshAccessConfig(object):
-
     @classmethod
     def from_dict(cls, d):
         assert isinstance(d, dict), 'ssh location should be dict: %r' % d
@@ -91,11 +83,10 @@ class SshAccessConfig(object):
 
 
 class OsAccess(object):
-
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
-    def run_command(self, args, input=None, cwd=None, check_retcode=True, log_output=True, timeout=None, env=None):
+    def run_command(self, args, input=None, cwd=None, env=None):
         pass
 
     @abc.abstractmethod
@@ -164,10 +155,6 @@ class OsAccess(object):
         return RunningTime(new_time, datetime.datetime.now(pytz.utc) - started_at)
 
 
-subprocesses_logger = log.getChild('subprocesses')
-subprocesses_logger.setLevel(logging.INFO)
-
-
 class LocalAccess(OsAccess):
     def __init__(self):
         self.name = 'localhost'
@@ -176,94 +163,26 @@ class LocalAccess(OsAccess):
     def __repr__(self):
         return '<LocalAccess>'
 
-    def run_command(self, args, input=None, cwd=None, check_retcode=True, log_output=True, timeout=None, env=None):
-        timeout = timeout or PROCESS_TIMEOUT
-        if isinstance(args, (bytes, str)):
-            args = 'set -eux\n' + dedent(args).strip()
+    def run_command(self, command, input=None, cwd=None, env=None, timeout_sec=60 * 60):
+        if isinstance(command, (bytes, str)):
+            command = 'set -eux\n' + dedent(command).strip()
             shell = True
-            logged_command_line = args
         else:
-            args = [str(arg) for arg in args]
+            command = [str(arg) for arg in command]
             shell = False
-            logged_command_line = '\n' + _arg_list_to_str(args)
-        log.debug('RUN: %s', logged_command_line)
-        pipe = subprocess.Popen(
-            args,
-            shell=shell,
-            cwd=cwd and str(cwd), env=env and {k: str(v) for k, v in env.items()},
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE if input else None,
-            close_fds=True)
-        subprocess_logger = subprocesses_logger.getChild(str(pipe.pid))
-        subprocess_logger.debug("Started.")
-        if input:
-            try:
-                subprocess_logger.debug("STDIN data:\n%s", input)
-                pipe.stdin.write(input)
-            except IOError as e:
-                if e.errno == errno.EPIPE:
-                    subprocess_logger.error("STDIN broken.")
-                    pass
-                elif e.errno == errno.EINVAL and pipe.poll() is not None:
-                    if pipe.poll() is None:
-                        subprocess_logger.error("STDIN invalid but process is still running.")
-                    else:
-                        subprocess_logger.error("STDIN invalid: process terminated.")
-                    pass
-                else:
-                    raise
-            pipe.stdin.close()
-            subprocess_logger.debug("STDIN closed.")
-        streams = [pipe.stdout, pipe.stderr]
-        buffers = {stream: bytearray() for stream in streams}
-        names = {pipe.stdout: 'STDOUT', pipe.stderr: 'STDERR'}
-        wait = Wait(
-            name='for events from process',
-            timeout_sec=timeout.total_seconds(),
-            logging_levels=(logging.DEBUG, logging.ERROR))
-        while streams:
-            select_timeout_sec = int(ceil(wait.delay_sec))
-            subprocess_logger.debug("Wait for select for %r seconds", select_timeout_sec)
-            streams_to_read, _, _ = select(streams, [], [], select_timeout_sec)
-            if not streams_to_read:
-                subprocess_logger.debug("Nothing in streams.")
-                if pipe.poll() is not None:
-                    break
-                if not wait.again():
-                    raise ProcessTimeoutError(args, timeout)
-            else:
-                for stream in streams_to_read:
-                    subprocess_logger.debug("%s to be read from.", names[stream])
-                    chunk = stream.read()
-                    if not chunk:
-                        subprocess_logger.debug("%s to be closed, %d bytes total.", names[stream], len(buffers[stream]))
-                        stream.close()
-                        streams.remove(stream)
-                    else:
-                        if stream is not pipe.stdout or log_output:
-                            try:
-                                subprocess_logger.debug("%s data to be decoded.", names[stream])
-                                decoded = chunk.decode()
-                            except UnicodeDecodeError as e:
-                                subprocess_logger.debug(
-                                    "%s data, %d bytes, considered binary because of %r.",
-                                    names[stream], len(chunk), e)
-                            else:
-                                subprocess_logger.debug(
-                                    u"%s data, %d bytes, %d characters, decoded:\n%s",
-                                    names[stream], len(chunk), len(decoded), decoded)
-                        subprocess_logger.debug("%s data appended to buffer.")
-                        buffers[stream].extend(chunk)
-        while True:
-            return_code = pipe.poll()
-            if return_code is None:
-                if not wait.sleep_and_continue():
-                    raise ProcessTimeoutError(args, timeout)
-            else:
-                break
-        subprocess_logger.debug("Return code %d.", return_code)
-        if check_retcode and return_code:
-            raise ProcessError(return_code, logged_command_line, output=bytes(buffers[pipe.stderr]))
-        return bytes(buffers[pipe.stdout])
+        cwd = cwd and str(cwd) or None
+        env = env and {k: str(v) for k, v in env.items()} or None
+        log.debug('Run: %s', args_list_to_str(command))
+        process = subprocess.Popen(
+            command,
+            shell=shell, cwd=cwd, env=env, close_fds=True,
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE if input else None)
+        exit_status, stdout, stderr = communicate(process, input, timeout_sec)
+        if exit_status is None:
+            raise Timeout(command, timeout_sec)
+        if exit_status != 0:
+            raise NonZeroExitStatus(command, exit_status, stdout, stderr)
+        return stdout
 
     def is_working(self):
         return True
@@ -330,7 +249,6 @@ class LocalAccess(OsAccess):
 
 
 class SSHAccess(OsAccess):
-
     def __init__(self, config_path, hostname, user=None):
         self.hostname = hostname
         self._config_path = config_path
@@ -338,9 +256,9 @@ class SSHAccess(OsAccess):
 
     def __repr__(self):
         args = ['ssh', '-F', self._config_path, self._user_and_hostname]
-        return '<{} {}>'.format(self.__class__.__name__, _arg_list_to_str(args))
+        return '<{} {}>'.format(self.__class__.__name__, args_list_to_str(args))
 
-    def run_command(self, args, input=None, cwd=None, check_retcode=True, log_output=True, timeout=None, env=None):
+    def run_command(self, args, input=None, cwd=None, timeout=None, env=None):
         if isinstance(args, str):
             script = dedent(args).strip()
             script = '\n'.join(args_from_env(env)) + '\n' + script
@@ -353,17 +271,12 @@ class SSHAccess(OsAccess):
             args = args_from_env(env) + args
             if cwd:
                 args = ['cd', str(cwd), ';'] + args
-        return LocalAccess().run_command(
-            ['ssh', '-F', self._config_path, self._user_and_hostname] + args,
-            input,
-            check_retcode=check_retcode,
-            log_output=log_output,
-            timeout=timeout)
+        return LocalAccess().run_command(['ssh', '-F', self._config_path, self._user_and_hostname] + args, input)
 
     def is_working(self):
         try:
             self.run_command([':'])
-        except ProcessError:
+        except NonZeroExitStatus:
             return False
         return True
 
@@ -390,17 +303,17 @@ class SSHAccess(OsAccess):
     def _call_rsync(self, source, destination):
         # If file size and modification time is same, rsync doesn't copy file.
         ssh_args = ['ssh', '-F', self._config_path]  # Without user and hostname!
-        LocalAccess().run_command(['rsync', '-aL', '-e', _arg_list_to_str(ssh_args), source, destination])
+        LocalAccess().run_command(['rsync', '-aL', '-e', args_list_to_str(ssh_args), source, destination])
 
     def read_file(self, from_remote_path, ofs=None):
         try:
             if ofs:
                 assert type(ofs) is int, repr(ofs)
-                return self.run_command(['tail', '--bytes=+%d' % ofs, from_remote_path], log_output=False)
+                return self.run_command(['tail', '--bytes=+%d' % ofs, from_remote_path])
             else:
-                return self.run_command(['cat', from_remote_path], log_output=False)
-        except ProcessError as e:
-            if e.returncode == 1:
+                return self.run_command(['cat', from_remote_path])
+        except NonZeroExitStatus as e:
+            if e.exit_status == 1:
                 if not self.file_exists(from_remote_path):
                     raise FileNotFound(from_remote_path)
             raise
@@ -419,7 +332,11 @@ class SSHAccess(OsAccess):
         return [path / line for line in self.run_command(['ls', '-A', '-1', str(path)]).splitlines()]
 
     def rm_tree(self, path, ignore_errors=False):
-        self.run_command(['rm', '-r', path], check_retcode=not ignore_errors)
+        try:
+            self.run_command(['rm', '-r', path])
+        except NonZeroExitStatus:
+            if not ignore_errors:
+                raise
 
     def expand_path(self, path):
         assert '*' not in str(path), repr(path)  # Only expands user and env vars.
@@ -432,7 +349,7 @@ class SSHAccess(OsAccess):
             return [str(path_mask)]  # ssh expands '*' masks automatically
         else:
             fixed_root = next(parent for parent in path_mask.parent.parents if '*' not in str(parent))
-            output = self.run_command(['find', fixed_root, '-wholename',  "'" + str(path_mask) + "'"]).strip()
+            output = self.run_command(['find', fixed_root, '-wholename', "'" + str(path_mask) + "'"]).strip()
             return [PurePosixPath(path) for path in output.splitlines()]
 
     def get_timezone(self):

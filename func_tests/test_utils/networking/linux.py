@@ -3,7 +3,7 @@ import logging
 
 from netaddr import EUI
 
-from test_utils.os_access import ProcessError
+from test_utils.os_access import NonZeroExitStatus
 from test_utils.utils import wait_until
 
 logger = logging.getLogger(__name__)
@@ -76,8 +76,8 @@ class LinuxNetworking(object):
     def can_reach(self, ip, timeout_sec=4):
         try:
             self._os_access.run_command(['ping', '-c', 1, '-W', timeout_sec, ip])
-        except ProcessError as e:
-            if e.returncode == 1:  # See man page.
+        except NonZeroExitStatus as e:
+            if e.exit_status == 1:  # See man page.
                 return False
             raise
         return True

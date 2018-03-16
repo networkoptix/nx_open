@@ -9,7 +9,7 @@ from pathlib2 import Path
 import server_api_data_generators as generator
 import test_utils.utils as utils
 from test_utils.api_shortcuts import get_server_id
-from test_utils.os_access import ProcessError
+from test_utils.os_access import NonZeroExitStatus
 
 log = logging.getLogger(__name__)
 
@@ -157,9 +157,9 @@ def add_camera(camera_factory, server, camera_id, backup_type):
 
 def assert_path_does_not_exist(server, path):
     assert_message = "'%r': unexpected existen path '%s'" % (server, path)
-    with pytest.raises(ProcessError, message=assert_message) as x_info:
+    with pytest.raises(NonZeroExitStatus, message=assert_message) as x_info:
         server.os_access.run_command(['[', '-e', path, ']'])
-    assert x_info.value.returncode == 1, assert_message
+    assert x_info.value.exit_status == 1, assert_message
 
 
 def assert_paths_are_equal(server, path_1, path_2):

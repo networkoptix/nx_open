@@ -289,7 +289,7 @@ def vm_factories(request, vm_types, registries, ssh_config, configuration, hyper
         vm_type: Factory(
             VMConfiguration(vm_configuration_raw),
             hypervisor,
-            access_manager,  # TODO: Instantiate separate for each
+            access_manager,  # TODO: Instantiate separately for each VM type.
             )
         for vm_type, vm_configuration_raw in configuration['vm_types'].items()}
     return pools

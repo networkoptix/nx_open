@@ -1,4 +1,4 @@
-from test_utils.os_access import ProcessError
+from test_utils.os_access import NonZeroExitStatus
 
 
 class RemotePython(object):
@@ -8,7 +8,7 @@ class RemotePython(object):
     def is_installed(self):
         try:
             self._os_access.run_command(['python3.4', '-V'])
-        except ProcessError:
+        except NonZeroExitStatus:
             return False
         return True
 

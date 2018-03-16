@@ -121,31 +121,33 @@ class Timeout(Exception):
 
 
 class Wait(object):
-    def __init__(self, name, timeout_sec=30, attempts_limit=100, logging_levels=(logging.WARNING, logging.ERROR)):
-        self._continue_level, self._stop_level = logging_levels
+    def __init__(self, name, timeout_sec=30, attempts_limit=100, log_continue=log.debug, log_stop=log.error):
         self._name = name
         self._timeout_sec = timeout_sec
         self._started_at = timeit.default_timer()
-        self._last_tried_at = None
+        self._last_checked_at = self._started_at
         self._attempts_limit = attempts_limit
         self._attempts_made = 0
-        self.delay_sec = 0.1
+        self.delay_sec = 0.5
+        self.log_continue = log_continue
+        self.log_stop = log_stop
 
     def again(self):
+        now = timeit.default_timer()
+        if now - self._last_checked_at < self.delay_sec:
+            return True
         self._attempts_made += 1
+        self.delay_sec = self.delay_sec * 2
         since_start_sec = time.time() - self._started_at
         if since_start_sec > self._timeout_sec or self._attempts_made >= self._attempts_limit:
-            log.log(
-                self._stop_level, "Stop to wait %s: %g/%g sec, %d/%d attempts.",
+            self.log_stop(
+                "Stop to wait %s: %g/%g sec, %d/%d attempts.",
                 self._name, since_start_sec, self._timeout_sec, self._attempts_made, self._attempts_limit)
             return False
-        now = timeit.default_timer()
-        if self._last_tried_at is not None:
-            self.delay_sec = (now - self._last_tried_at) * 2 + 0.1
-        self._last_tried_at = now
-        log.log(
-            self._continue_level, "Continue to wait %s: %.1f/%.1f sec, %d/%d attempts, delay %.1f sec.",
+        self.log_continue(
+            "Continue to wait %s: %.1f/%.1f sec, %d/%d attempts, delay %.1f sec.",
             self._name, since_start_sec, self._timeout_sec, self._attempts_made, self._attempts_limit, self.delay_sec)
+        self._last_checked_at = now
         return True
 
     def sleep_and_continue(self):
@@ -168,7 +170,7 @@ def wait_until(condition_is_true, name=None, timeout_sec=30):
 
 def holds_long_enough(condition_is_true, name=None, timeout_sec=10):
     name = name or "while %s is returning True" % condition_is_true.__name__
-    wait = Wait(name=name, timeout_sec=timeout_sec, logging_levels=(logging.DEBUG, logging.INFO))
+    wait = Wait(name=name, timeout_sec=timeout_sec, log_continue=log.debug, log_stop=log.info)
     while True:
         if not condition_is_true():
             break
