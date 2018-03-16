@@ -47,6 +47,10 @@ ZoomableFlickable
 
     onDoubleClicked:
     {
+        var videoMappedPosition = mapToItem(video, mouseX, mouseY)
+        if (!video.pointInVideo(videoMappedPosition))
+            return
+
         var twiceTargetScale = 2
         var initialTargetScale = 1
         var eps = 0.000001
