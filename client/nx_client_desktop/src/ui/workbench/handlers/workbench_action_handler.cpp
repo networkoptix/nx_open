@@ -2146,6 +2146,7 @@ void ActionHandler::closeApplication(bool force) {
 
     menu()->trigger(action::BeforeExitAction);
     context()->setClosingDown(true);
+    mainWindowWidget()->hide();
     qApp->exit(0);
     applauncher::scheduleProcessKill(QCoreApplication::applicationPid(), PROCESS_TERMINATE_TIMEOUT);
 }
