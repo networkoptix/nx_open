@@ -81,7 +81,7 @@ int main(int /*argc*/, const char** argv)
     if (unknownCommand(*command))
         return reportErrorAndExit("Unknown command: " + *command);
 
-    nx::root_tool::SystemCommands commands;
+    nx::SystemCommands commands;
     if (!commands.setupIds())
         return reportErrorAndExit(commands.lastError());
 

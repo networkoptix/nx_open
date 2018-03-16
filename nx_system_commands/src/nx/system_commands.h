@@ -2,7 +2,6 @@
 #include <boost/optional.hpp>
 
 namespace nx {
-namespace root_tool {
 
 class SystemCommands
 {
@@ -50,5 +49,4 @@ private:
     CheckOwnerResult checkCurrentOwner(const std::string& url);
 };
 
-} // namespace root_tool
 } // namespace nx
