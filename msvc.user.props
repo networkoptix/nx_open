@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerEnvironment>PATH=${QT_DIR}\bin;$(ExecutablePath)</LocalDebuggerEnvironment>
+    <LocalDebuggerEnvironment>PATH=C:/develop/buildenv/packages/windows-x64/qt-5.6.1-1\bin;$(ExecutablePath)</LocalDebuggerEnvironment>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LocalDebuggerEnvironment>PATH=${QT_DIR}\bin;$(ExecutablePath)</LocalDebuggerEnvironment>
+    <LocalDebuggerEnvironment>PATH=C:/develop/buildenv/packages/windows-x64/qt-5.6.1-1\bin;$(ExecutablePath)</LocalDebuggerEnvironment>
   </PropertyGroup>
 </Project>

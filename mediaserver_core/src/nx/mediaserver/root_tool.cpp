@@ -24,7 +24,7 @@ Qn::StorageInitResult RootTool::mount(const QUrl& url, const QString& path)
     auto uncString = "//" + url.host() + url.path();
     if (m_toolPath.isEmpty())
     {
-        root_tool::SystemCommands commands;
+        SystemCommands commands;
         if (!commands.mount(
                 uncString.toStdString(),
                 path.toStdString(),
@@ -91,7 +91,7 @@ bool RootTool::unmount(const QString& path)
 {
     if (m_toolPath.isEmpty())
     {
-        root_tool::SystemCommands commands;
+        SystemCommands commands;
         if (!commands.unmount(path.toStdString()))
             return false;
 
@@ -105,7 +105,7 @@ bool RootTool::changeOwner(const QString& path)
 {
     if (m_toolPath.isEmpty())
     {
-        root_tool::SystemCommands commands;
+        SystemCommands commands;
         if (!commands.changeOwner(path.toStdString()))
             return false;
 
@@ -119,7 +119,7 @@ bool RootTool::touchFile(const QString& path)
 {
     if (m_toolPath.isEmpty())
     {
-        root_tool::SystemCommands commands;
+        SystemCommands commands;
         if (!commands.touchFile(path.toStdString()))
             return false;
 
@@ -133,7 +133,7 @@ bool RootTool::makeDirectory(const QString& path)
 {
     if (m_toolPath.isEmpty())
     {
-        root_tool::SystemCommands commands;
+        SystemCommands commands;
         if (!commands.makeDirectory(path.toStdString()))
             return false;
 

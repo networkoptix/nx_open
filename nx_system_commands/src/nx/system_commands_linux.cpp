@@ -12,7 +12,6 @@
 
 
 namespace nx {
-namespace root_tool {
 
 static const uid_t kRealUid = getuid();
 static const uid_t kRealGid = getgid();
@@ -319,5 +318,4 @@ std::string SystemCommands::lastError() const
     return m_lastError;
 }
 
-} // namespace root_tool
 } // namespace nx
