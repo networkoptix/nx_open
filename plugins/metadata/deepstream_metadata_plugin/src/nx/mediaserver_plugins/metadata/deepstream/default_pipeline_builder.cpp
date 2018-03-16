@@ -20,7 +20,10 @@ namespace mediaserver_plugins {
 namespace metadata {
 namespace deepstream {
 
-DefaultPipelineBuilder::DefaultPipelineBuilder()
+DefaultPipelineBuilder::DefaultPipelineBuilder(
+    const std::vector<ObjectClassDescription>& objectClassDescritions)
+    :
+    m_objectClassDescritions(objectClassDescritions)
 {
     ini().reload();
 }
@@ -30,7 +33,7 @@ std::unique_ptr<nx::gstreamer::Pipeline> DefaultPipelineBuilder::build(
 {
     NX_OUTPUT << __func__ << " Building pipeline " << pipelineName;
     auto pipeline =
-        std::make_unique<DefaultPipeline>(pipelineName);
+        std::make_unique<DefaultPipeline>(pipelineName, m_objectClassDescritions);
 
     NX_OUTPUT << __func__ << " Creating elements and bins for " << pipelineName;
     auto appSource = createAppSource(pipelineName);

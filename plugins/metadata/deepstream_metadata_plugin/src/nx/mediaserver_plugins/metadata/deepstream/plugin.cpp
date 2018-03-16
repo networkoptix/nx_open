@@ -1,5 +1,7 @@
 #include "plugin.h"
 
+#include <fstream>
+
 extern "C" {
 
 #include <gst/gst.h>
@@ -7,9 +9,9 @@ extern "C" {
 } // extern "C"
 
 #include "manager.h"
+#include "utils.h"
 #include "deepstream_common.h"
 #include "deepstream_metadata_plugin_ini.h"
-
 #define NX_PRINT_PREFIX "metadata::deepstream::Plugin::"
 #include <nx/kit/debug.h>
 #include <nx/gstreamer/gstreamer_common.h>
@@ -48,6 +50,9 @@ Plugin::Plugin()
 
     gst_init(NULL, NULL);
     NX_PRINT << " Created plugin: \"" << name() << "\"";
+
+    if (m_objectClassDescritions.empty())
+        m_objectClassDescritions = loadObjectClasses();
 }
 
 Plugin::~Plugin()
@@ -134,7 +139,10 @@ const char* Plugin::capabilitiesManifest(Error* error) const
 {
     *error = Error::noError;
 
-    static const auto pluginManifest = (R"json(
+    if (!m_manifest.empty())
+        return m_manifest.c_str();
+
+    static const std::string kManifestPrefix = (R"json(
         {
             "driverId": "{2CAE7F92-01E5-478D-ABA4-50938034D46E}",
             "driverName": {
@@ -144,39 +152,23 @@ const char* Plugin::capabilitiesManifest(Error* error) const
                 }
             },
             "outputObjectTypes": [
-                {
-                    "typeId": ")json" + nxpt::NxGuidHelper::toStdString(kCarGuid) + R"json(",
-                    "name": {
-                        "value": "Car",
-                        "localization": {
-                            "ru_RU": "Car detected (translated to Russian)"
-                        }
-                    }
-                },
-                {
-                    "typeId": ")json" + nxpt::NxGuidHelper::toStdString(kHumanGuid) + R"json(",
-                    "name": {
-                        "value": "Human",
-                        "localization": {
-                            "ru_RU": "Human (translated to Russian)"
-                        }
-                    }
-                },
-                {
-                    "typeId": ")json" + nxpt::NxGuidHelper::toStdString(kRcGuid) + R"json(",
-                    "name": {
-                        "value": "RC",
-                        "localization": {
-                            "ru_RU": "RC (chto eto? translated to Russian)"
-                        }
-                    }
-                }
+        )json");
+
+    static const std::string kManifestPostfix = (R"json(
             ],
             "capabilities": "needDeepCopyForMediaFrame"
-        }
-    )json");
+        })json");
 
-    return pluginManifest.c_str();
+    m_manifest = kManifestPrefix;
+    for (auto i = 0; i < m_objectClassDescritions.size(); ++i)
+    {
+        m_manifest += buildManifestObectTypeString(m_objectClassDescritions[i]);
+        if (i < m_objectClassDescritions.size() - 1)
+            m_manifest += ',';
+    }
+
+    m_manifest += kManifestPostfix;
+    return m_manifest.c_str();
 }
 
 CameraManager *Plugin::obtainCameraManager(
@@ -196,6 +188,108 @@ CameraManager *Plugin::obtainCameraManager(
 void Plugin::executeAction(nx::sdk::metadata::Action*, nx::sdk::Error*)
 {
     // Do nothing.
+}
+
+std::vector<ObjectClassDescription> Plugin::objectClassDescritions() const
+{
+    return m_objectClassDescritions;
+}
+
+std::vector<ObjectClassDescription> Plugin::loadObjectClasses() const
+{
+    if (!ini().pgie_enabled)
+        return {};
+
+    const auto labelFile = ini().pgie_labelFile;
+    if (labelFile[0] == '\0')
+    {
+        NX_OUTPUT << __func__ << " Error: label file is not specified";
+        return {};
+    }
+
+    const auto classGuidsFile = ini().pgie_classGuidsFile;
+    if (classGuidsFile[0] == '\0')
+    {
+        NX_OUTPUT << __func__ << " Error: class guids file is not specified";
+        return {};
+    }
+
+    auto labels = loadLabels(labelFile);
+    auto guids = loadClassGuids(classGuidsFile);
+
+    if (labels.size() != guids.size())
+    {
+        NX_OUTPUT
+            << __func__
+            << " Error: number of labels is not equal to number of class guids: "
+            << labels.size() <<  " labels, "
+            << guids.size() << " guids";
+
+        return {};
+    }
+
+    std::vector<ObjectClassDescription> result;
+    for (auto i = 0; i < labels.size(); ++i)
+        result.emplace_back(/*name*/ labels[i], /*description*/ "", /*guid*/ guids[i]);
+
+    return result;
+}
+
+std::vector<std::string> Plugin::loadLabels(const std::string& labelFilePath) const
+{
+    std::vector<std::string> result;
+    std::ifstream labelFile(labelFilePath, std::ios::in);
+
+    std::string line;
+    while (std::getline(labelFile, line))
+    {
+        if (trim(&line)->empty())
+            continue;
+
+        result.push_back(line);
+    }
+
+    return result;
+}
+
+std::vector<nxpl::NX_GUID> Plugin::loadClassGuids(const std::string& guidsFilePath) const
+{
+    std::vector<nxpl::NX_GUID> result;
+    std::ifstream guidsFile(guidsFilePath, std::ios::in);
+
+    std::string line;
+    while (std::getline(guidsFile, line))
+    {
+        if (trim(&line)->empty())
+            continue;
+
+        auto guid = nxpt::NxGuidHelper::fromStdString(line);
+        if (guid == kNullGuid)
+            continue;
+
+        result.push_back(guid);
+    }
+
+    return result;
+}
+
+std::string Plugin::buildManifestObectTypeString(const ObjectClassDescription& description) const
+{
+    static const std::string kObjectTypeStringPrefix = (R"json({
+        "typeId": ")json");
+    static const std::string kObjectTypeStringMiddle = (R"json(",
+        "name": {
+            "value": ")json");
+    static const std::string kObjectTypeStringPostfix = (R"json(",
+            "localization": {}
+        }
+    })json");
+
+    return kObjectTypeStringPrefix
+        + nxpt::NxGuidHelper::toStdString(description.guid)
+        + kObjectTypeStringMiddle
+        + description.name
+        + kObjectTypeStringPostfix;
 }
 
 } // namespace deepstream

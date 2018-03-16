@@ -1,5 +1,6 @@
 #pragma once
 
+#include <nx/mediaserver_plugins/metadata/deepstream/object_class_description.h>
 #include <nx/mediaserver_plugins/metadata/deepstream/pipeline_builder.h>
 #include <nx/mediaserver_plugins/metadata/deepstream/tracking_mapper.h>
 
@@ -16,7 +17,9 @@ class DefaultPipelineBuilder: public PipelineBuilder
 {
 
 public:
-    DefaultPipelineBuilder();
+    DefaultPipelineBuilder(
+        const std::vector<ObjectClassDescription>& objectClassDescritions);
+
     virtual std::unique_ptr<nx::gstreamer::Pipeline> build(
         const nx::gstreamer::ElementName& pipeleineName) override;
 
@@ -42,6 +45,9 @@ private:
     std::map<LabelMappingId, LabelMapping> makeLabelMapping();
 
     RawLabels parseLabelFile(const std::string& path) const;
+
+private:
+    std::vector<ObjectClassDescription> m_objectClassDescritions;
 };
 
 } // namespace deepstream

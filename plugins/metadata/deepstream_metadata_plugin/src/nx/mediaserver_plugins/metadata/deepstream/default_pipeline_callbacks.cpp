@@ -143,13 +143,13 @@ gboolean metadataHandlerCallback(GstBuffer* buffer, GstMeta** meta, gpointer use
     auto pipeline = (metadata::deepstream::DefaultPipeline*) userData;
     auto trackingMapper = pipeline->trackingMapper();
 
-    const auto frameWidth = pipeline->currentFrameWidth();
+    auto frameWidth = pipeline->currentFrameWidth();
     if (frameWidth <= 0)
-        return true; //< Skip data.
+        frameWidth = 1920; //< TODO: #dmishin move to config.
 
-    const auto frameHeight = pipeline->currentFrameHeight();
+    auto frameHeight = pipeline->currentFrameHeight();
     if (frameHeight <= 0)
-        return true; //< Skip data.
+        frameHeight = 1080; //< TODO: #dmishin move to config.
 
     for (auto i = 0; i < bboxes->num_rects; ++i)
     {
@@ -167,7 +167,7 @@ gboolean metadataHandlerCallback(GstBuffer* buffer, GstMeta** meta, gpointer use
             << "x: " << rectangle.x << ", "
             << "y: " << rectangle.y << ", "
             << "width: " << rectangle.width << ", "
-            << "height: " << rectangle.height << ".";
+            << "height: " << rectangle.height;
 
         auto guid = trackingMapper->getMapping(roiMeta.tracking_id);
         if (isNull(guid))
@@ -179,11 +179,14 @@ gboolean metadataHandlerCallback(GstBuffer* buffer, GstMeta** meta, gpointer use
         detectedObject->setId(guid);
         detectedObject->setBoundingBox(rectangle);
         detectedObject->setConfidence(1.0);
-        detectedObject->setObjectSubType("TODO: #dmishin add class id label here");
-        detectedObject->setTypeId({{
-                0x15, 0x3D, 0xD8, 0x79, 0x1C, 0xD2, 0x46, 0xB7,
-                0xAD, 0xD6, 0x7C, 0x6B, 0x48, 0xEA, 0xC1, 0xFC
-            }}); //< TODO: #dmishin remove hardcode!
+
+        const auto& objectDescriptions = pipeline->objectClassDescriptions();
+        const auto objectClassId = roiMeta.class_id;
+
+        if (objectClassId < objectDescriptions.size())
+            detectedObject->setTypeId(objectDescriptions[objectClassId].guid);
+        else
+            detectedObject->setTypeId(kNullGuid);
 
         auto trackingMapper = pipeline->trackingMapper();
         detectedObject->setAttributes(trackingMapper->attributes(roiMeta));

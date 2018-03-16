@@ -18,9 +18,13 @@ static const int kDefaultTrackingLifetime = 1;
 
 } // namespace
 
-DefaultPipeline::DefaultPipeline(const nx::gstreamer::ElementName& elementName):
+DefaultPipeline::DefaultPipeline(
+    const nx::gstreamer::ElementName& elementName,
+    const std::vector<ObjectClassDescription>& objectClassDescritions)
+    :
     base_type(elementName),
-    m_trackingMapper(kDefaultTrackingLifetime)
+    m_trackingMapper(kDefaultTrackingLifetime),
+    m_objectClassDescriptions(objectClassDescritions)
 {
     NX_OUTPUT << __func__ << " Creating DefaultPipeline...";
 }
@@ -129,6 +133,11 @@ int DefaultPipeline::currentFrameWidth() const
 int DefaultPipeline::currentFrameHeight() const
 {
     return m_currentFrameHeight;
+}
+
+const std::vector<ObjectClassDescription>& DefaultPipeline::objectClassDescriptions() const
+{
+    return m_objectClassDescriptions;
 }
 
 } // namespace deepstream

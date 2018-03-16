@@ -23,7 +23,12 @@ struct DeepStreamConfig: public nx::kit::IniConfig
     NX_INI_INT(0, gstreamerDebugLevel, "Verbosity of GStreamer library, Range is: [0, 8]");
 
     NX_INI_FLAG(1, enableOutput, "Enable logging");
-    NX_INI_FLAG(0, pgie_enabled, "Whether primary GIE is enabled or not");
+    NX_INI_STRING(
+        "/home/nvidia/Model/ResNet_18/class_guids.txt",
+        pgie_classGuidsFile,
+        "File containing guids for classes that primary GIE can detect.");
+
+    NX_INI_FLAG(1, pgie_enabled, "Whether primary GIE is enabled or not");
     NX_INI_INT(0, pgie_colorFormat, "Color format. 0 = RGBA, 1 = BGRA");
     NX_INI_STRING(
         "0;0;0",
