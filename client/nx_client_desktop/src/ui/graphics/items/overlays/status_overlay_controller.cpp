@@ -243,7 +243,7 @@ QString QnStatusOverlayController::currentButtonText() const
 
 QString QnStatusOverlayController::captionText(Qn::ResourceStatusOverlay overlay)
 {
-    static const auto kNotEnoughLicenses = tr("NOT ENOUGH LICENCES");
+    static const auto kNotEnoughLicenses = tr("NOT ENOUGH LICENSES");
     static const IntStringHash kCaptions
     {
         { Qn::NoDataOverlay, tr("NO DATA") },
