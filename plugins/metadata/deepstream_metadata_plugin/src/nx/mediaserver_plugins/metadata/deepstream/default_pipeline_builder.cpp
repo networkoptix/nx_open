@@ -95,10 +95,10 @@ std::unique_ptr<nx::gstreamer::Pipeline> DefaultPipelineBuilder::build(
 
     pipeline->setMainLoop(std::move(mainLoop));
 
-    GST_DEBUG_BIN_TO_DOT_FILE_WITH_TS(
+    GST_DEBUG_BIN_TO_DOT_FILE(
         GST_BIN(pipeline->nativeElement()),
         GST_DEBUG_GRAPH_SHOW_ALL,
-        "nx-pipeline-null");
+        "nx-pipeline-null-initial");
 
     auto trackingMapper = pipeline->trackingMapper();
     trackingMapper->setLabelMapping(makeLabelMapping());
