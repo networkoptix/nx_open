@@ -560,12 +560,8 @@ nx::mediaserver::resource::StreamCapabilityMap QnPlOnvifResource::getStreamCapab
     return result;
 }
 
-std::mutex mu;
-
 CameraDiagnostics::Result QnPlOnvifResource::initializeCameraDriver()
 {
-//    std::lock_guard<std::mutex> lock(mu);
-
     if (m_appStopping)
         return CameraDiagnostics::ServerTerminatedResult();
 
