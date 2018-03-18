@@ -7,6 +7,9 @@ namespace mediaserver_plugins {
 namespace metadata {
 namespace deepstream {
 
+static const int kDefaultPipeline = 1;
+static const int kOpenAlprPipeline = 2;
+
 struct DeepStreamConfig: public nx::kit::IniConfig
 {
     DeepStreamConfig():
@@ -17,6 +20,14 @@ struct DeepStreamConfig: public nx::kit::IniConfig
 
 //------------------------------------------------------------------------------------------------
 // Common settings.
+
+    NX_INI_INT(
+        //kOpenAlprPipeline,
+        kDefaultPipeline,
+        pipelineType,
+        "Type of pipeline: 1 - default pipeline, 2 - OpenALPR pipeline");
+
+    NX_INI_FLAG(1, showGuids, "Show object guids");
 
     NX_INI_STRING("", debugDotFilesDir, "Directory for pipeline graph .dot files");
     NX_INI_INT(0, gstreamerDebugLevel, "Verbosity of GStreamer library, Range is: [0, 8]");
@@ -31,6 +42,20 @@ struct DeepStreamConfig: public nx::kit::IniConfig
         1080,
         defaultFrameHeight,
         "Frame height to use in the case if incoming data has no information about resolution");
+
+//------------------------------------------------------------------------------------------------
+// OpenALPR settings.
+
+    NX_INI_FLAG(
+        0,
+        enableOpenAlpr,
+        "Enable OpenALPR plugin");
+
+    NX_INI_STRING(
+        "full-frame",
+        openAlprMode,
+        "OpenALPR recognition mode. Possible values: \"full-frame\" - operate on full frames, "
+        "\"crop\" - operate on primary GIE crops.");
 
 //------------------------------------------------------------------------------------------------
 // Primary GIE settings.

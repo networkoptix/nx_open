@@ -25,6 +25,16 @@ GstPadProbeReturn waitForSecondaryGieDoneBufProbe(
     GstPadProbeInfo* info,
     gpointer userData);
 
+GstPadProbeReturn dropOpenAlprFrames(
+    GstPad* pad,
+    GstPadProbeInfo* info,
+    gpointer userData);
+
+GstPadProbeReturn processOpenAlprResult(
+    GstPad* pad,
+    GstPadProbeInfo* info,
+    gpointer userData);
+
 gboolean metadataHandlerCallback(GstBuffer* buffer, GstMeta** meta, gpointer userData);
 
 void decodeBinPadAdded(GstElement* source, GstPad* newPad, gpointer userData);
