@@ -13,6 +13,7 @@ import pytest
 
 import server_api_data_generators as generator
 from test_utils.api_shortcuts import get_server_id, get_system_settings
+from test_utils.merging import merge_systems
 from test_utils.server import MEDIASERVER_MERGE_TIMEOUT
 from test_utils.utils import datetime_utc_now, bool_to_str, str_to_bool, wait_until
 
@@ -192,7 +193,7 @@ def test_failover_and_auto_discovery(server_factory, camera_factory, counter, di
         systemSettings=dict(autoDiscoveryEnabled=bool_to_str(discovery))))
     assert str_to_bool(get_system_settings(two.rest_api)['autoDiscoveryEnabled']) == discovery
     attach_cameras_to_server(one, camera_mac_set)
-    one.merge_systems(two)
+    merge_systems(one, two)
     wait_until_servers_are_online([one, two])
     wait_until_cameras_on_server_reduced_to(two, set())  # recheck there are no cameras on server two
     two.rest_api.ec2.saveMediaServerUserAttributes.POST(

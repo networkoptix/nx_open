@@ -6,10 +6,13 @@ which automatically translated to
     GET /api/manualCamera/status?arg1=1&arg2=2
 But for POST method keyword parameters are translated to json request body.
 """
-
+import base64
+import csv
 import datetime
+import hashlib
 import json
 import logging
+import urllib
 from pprint import pformat
 
 import requests
@@ -117,10 +120,36 @@ class RestApi(object):
         return "<RestApi {} {} {}:{}>".format(self._alias, self.url, self._auth.username, password_display)
 
     def with_credentials(self, username, password):
+        """If credentials were changed"""
         return self.__class__(
             self._alias, self._hostname, self._port,
             username=username, password=password,
             ca_cert=self.ca_cert)
+
+    def with_hostname_and_port(self, hostname, port):
+        """To access same API with changed networking"""
+        return self.__class__(
+            self._alias, hostname, port,
+            username=self.user, password=self.password,
+            ca_cert=self.ca_cert)
+
+    def auth_key(self, method):
+        path = ''
+        header = self._auth.build_digest_header(method, path)
+        if header is None:  # First time requested.
+            response = self.get('api/getNonce')
+            realm, nonce = response['realm'], response['nonce']
+        else:
+            key, value = header.split(' ', 1)
+            assert key.lower() == 'digest'
+            info = dict(csv.reader(value.split(', '), delimiter='=', doublequote=False))
+            realm, nonce = info['realm'], info['nonce']
+        # requests.auth.HTTPDigestAuth.build_digest_header does the same but it substitutes empty path with '/'.
+        ha1 = hashlib.md5(':'.join([self.user.lower(), realm, self.password]).encode()).hexdigest()
+        ha2 = hashlib.md5(':'.join([method, path]).encode()).hexdigest()  # Empty path.
+        digest = hashlib.md5(':'.join([ha1, nonce, ha2]).encode()).hexdigest()
+        key = urllib.quote(base64.urlsafe_b64encode(':'.join([self.user.lower(), nonce, digest])))
+        return key
 
     def get_api_fn(self, method, api_object, api_method):
         object = getattr(self, api_object)  # server.rest_api.ec2
@@ -183,3 +212,12 @@ class RestApi(object):
         data = self._retrieve_data(response)
         self._raise_for_status(response)
         return data
+
+    def credentials_work(self):
+        try:
+            self.get('api/getNonce')  # Any URL that requires authorization.
+        except HttpError as e:
+            if e.status_code == 401:
+                return False
+            raise
+        return True

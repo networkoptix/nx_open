@@ -11,8 +11,8 @@ import yaml
 from pathlib2 import Path
 
 import server_api_data_generators as generator
-from test_utils.api_shortcuts import get_server_id, get_system_settings
-from test_utils.networking import setup_networks
+from test_utils.api_shortcuts import get_local_system_id, get_server_id, get_system_settings
+from test_utils.merging import merge_systems
 from test_utils.rest_api import HttpError, RestApiError
 from test_utils.server import MEDIASERVER_MERGE_TIMEOUT
 from test_utils.utils import bool_to_str, datetime_utc_now, str_to_bool, wait_until
@@ -69,6 +69,11 @@ def two(two_linux_vms, server_factory):
     return server_factory.create('two', vm=two_linux_vms.second)
 
 
+def test_simplest_merge(one, two):
+    merge_systems(one, two)
+    assert get_local_system_id(one.rest_api) == get_local_system_id(two.rest_api)
+
+
 def test_merge_take_local_settings(one, two, test_system_settings):
     # Start two servers without predefined systemName
     # and move them to working state
@@ -79,7 +84,7 @@ def test_merge_take_local_settings(one, two, test_system_settings):
     expected_auditTrailEnabled = not change_bool_setting(two, 'auditTrailEnabled')
 
     # Merge systems (takeRemoteSettings = false)
-    two.merge_systems(one)
+    merge_systems(two, one)
     wait_for_settings_merge(one, two)
     check_system_settings(
       one,
@@ -102,7 +107,7 @@ def test_merge_take_remote_settings(one, two):
     expected_auditTrailEnabled = not change_bool_setting(two, 'auditTrailEnabled')
 
     # Merge systems (takeRemoteSettings = true)
-    two.merge_systems(one, take_remote_settings=True)
+    merge_systems(two, one, take_remote_settings=True)
     wait_for_settings_merge(one, two)
     check_system_settings(
       one,
@@ -125,14 +130,14 @@ def test_merge_cloud_with_local(two_linux_vms, server_factory, cloud_account, te
 
     # Merge systems (takeRemoteSettings = False) -> Error
     try:
-        two.merge_systems(one)
+        merge_systems(two, one)
     except RestApiError as e:
         assert e.error_string == 'DEPENDENT_SYSTEM_BOUND_TO_CLOUD'
     else:
         assert False, 'Expected: DEPENDENT_SYSTEM_BOUND_TO_CLOUD'
 
     # Merge systems (takeRemoteSettings = true)
-    two.merge_systems(one, take_remote_settings=True)
+    merge_systems(two, one, take_remote_settings=True)
     wait_for_settings_merge(one, two)
     check_system_settings(
         two, **test_system_settings['systemSettings'])
@@ -147,7 +152,7 @@ def test_merge_cloud_systems(two_linux_vms, server_factory, cloud_account_factor
 
     # Merge 2 cloud systems one way
     try:
-        two.merge_systems(one, take_remote_settings=False)
+        merge_systems(two, one, take_remote_settings=False)
     except RestApiError as e:
         assert e.error_string == 'BOTH_SYSTEM_BOUND_TO_CLOUD'
     else:
@@ -155,7 +160,7 @@ def test_merge_cloud_systems(two_linux_vms, server_factory, cloud_account_factor
 
     # Merge 2 cloud systems the other way
     try:
-        two.merge_systems(one, take_remote_settings=True)
+        merge_systems(two, one, take_remote_settings=True)
     except RestApiError as e:
         assert e.error_string == 'BOTH_SYSTEM_BOUND_TO_CLOUD'
     else:
@@ -181,7 +186,7 @@ def test_cloud_merge_after_disconnect(two_linux_vms, server_factory, cloud_accou
     two.detach_from_cloud(new_password)
 
     # Merge systems (takeRemoteSettings = true)
-    two.merge_systems(one, take_remote_settings=True)
+    merge_systems(two, one, take_remote_settings=True)
     wait_for_settings_merge(one, two)
 
     # Ensure both servers are merged and sync
@@ -213,7 +218,7 @@ def test_merge_resources(two_linux_vms, server_factory):
     camera_data = generator.generate_camera_data(1)
     one.rest_api.ec2.saveUser.POST(**user_data)
     two.rest_api.ec2.saveCamera.POST(**camera_data)
-    two.merge_systems(one)
+    merge_systems(two, one)
     wait_entity_merge_done(one, two, 'GET', 'ec2', 'getUsers', [user_data['id']])
     wait_entity_merge_done(one, two, 'GET', 'ec2', 'getCamerasEx', [camera_data['id']])
 
@@ -221,7 +226,7 @@ def test_merge_resources(two_linux_vms, server_factory):
 def test_restart_one_server(two_linux_vms, server_factory, cloud_account):
     one = server_factory.create('one', vm=two_linux_vms.first)
     two = server_factory.create('two', vm=two_linux_vms.second)
-    one.merge_systems(two)
+    merge_systems(one, two)
 
     # Stop Server2 and clear its database
     guid2 = get_server_id(two.rest_api)
@@ -237,7 +242,7 @@ def test_restart_one_server(two_linux_vms, server_factory, cloud_account):
     two.rest_api.ec2.getUsers.GET()
 
     # Merge systems (takeRemoteSettings = false)
-    two.merge_systems(one)
+    merge_systems(two, one)
     two.rest_api.ec2.getUsers.GET()
 
     # Ensure both servers are merged and sync

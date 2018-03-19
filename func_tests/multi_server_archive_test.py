@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 import pytz
 
 from test_utils.api_shortcuts import get_local_system_id, set_local_system_id
+from test_utils.merging import merge_systems
 from test_utils.server import TimePeriod
 from test_utils.utils import log_list
 
@@ -16,7 +17,7 @@ def test_merged_archive(server_factory, camera, sample_media_file):
 
     one = server_factory.create('one')
     two = server_factory.create('two')
-    one.merge_systems(two)
+    merge_systems(one, two)
 
     one.add_camera(camera)
 

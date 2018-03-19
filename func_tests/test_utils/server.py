@@ -1,22 +1,17 @@
 """Work with mediaserver as single entity: start/stop, setup, configure, access HTTP api, storage, etc..."""
 
-import base64
 import datetime
-import hashlib
 import logging
 import tempfile
 import time
-import urllib
 import uuid
-from pprint import pformat
 
 import pytest
 import pytz
 import requests.exceptions
-from netaddr.ip import IPAddress, IPNetwork
 from pathlib2 import Path
 
-from test_utils.api_shortcuts import get_local_system_id, get_server_id, get_system_settings
+from test_utils.api_shortcuts import get_server_id, get_system_settings
 from test_utils.utils import wait_until
 from .camera import Camera, SampleMediaFile, make_schedule_task
 from .cloud_host import CloudAccount
@@ -55,12 +50,6 @@ class TimePeriod(object):
         return (isinstance(other, TimePeriod)
                 and other.start == self.start
                 and other.duration == self.duration)
-
-
-def generate_auth_key(method, user, password, nonce, realm):
-    ha1 = hashlib.md5(':'.join([user.lower(), realm, password])).hexdigest()
-    ha2 = hashlib.md5(':'.join([method, ''])).hexdigest()  # only method, with empty url part
-    return hashlib.md5(':'.join([ha1, nonce, ha2])).hexdigest()
 
 
 class ServerConfig(object):
@@ -192,35 +181,6 @@ class Server(object):
         self.rest_api.api.detachFromCloud.POST(password=password)
         self.set_user_password(REST_API_USER, password)
 
-    def merge_systems(self, other, remote_network=IPNetwork('10.254.0.0/17'), take_remote_settings=False):
-        log.info('Merging servers: %s with %s', self, other)
-        assert self.is_online() and other.is_online()
-        assert get_local_system_id(self.rest_api) != get_local_system_id(other.rest_api)  # Must not be merged yet.
-
-        realm, nonce = other.get_nonce()
-
-        def make_key(method):
-            digest = generate_auth_key(method, other.rest_api.user.lower(), other.rest_api.password, nonce, realm)
-            return urllib.quote(base64.urlsafe_b64encode(':'.join([other.rest_api.user.lower(), nonce, digest])))
-        interfaces = other.rest_api.api.iflist.GET()
-        url = None
-        for interface in interfaces:
-            ip_address_to = IPAddress(interface['ipAddr'])
-            if ip_address_to in remote_network:
-                url = 'http://{ip_address}:{port}/'.format(ip_address=ip_address_to, port=self.internal_ip_port)
-        if url is None:
-            raise Exception("No IP address from {} from interfaces:\n{}".format(remote_network, pformat(interfaces)))
-        log.info("Merging with %s", url)
-        self.rest_api.api.mergeSystems.POST(
-            url=url,
-            getKey=make_key('GET'), postKey=make_key('POST'),
-            takeRemoteSettings=take_remote_settings, mergeOneServer=False)
-        if take_remote_settings:
-            self.set_user_password(other.rest_api.user, other.rest_api.password)
-        else:
-            other.set_user_password(self.rest_api.user, self.rest_api.password)
-        wait_until(lambda: get_local_system_id(self.rest_api) == get_local_system_id(other.rest_api))
-
     def set_user_password(self, user, password):
         log.debug('%s got user/password: %r/%r', self, user, password)
         self.rest_api = self.rest_api.with_credentials(user, password)
@@ -242,10 +202,6 @@ class Server(object):
             time.sleep(1)
         pytest.fail('Timed out in %s waiting for server %s to accept credentials: user=%r, password=%r'
                     % (MEDIASERVER_CREDENTIALS_TIMEOUT, self, self.rest_api.user, self.rest_api.password))
-
-    def get_nonce(self):
-        response = self.rest_api.api.getNonce.GET()
-        return response['realm'], response['nonce']
 
     def add_camera(self, camera):
         assert not camera.id, 'Already added to a server with id %r' % camera.id

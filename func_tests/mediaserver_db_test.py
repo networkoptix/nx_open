@@ -16,6 +16,7 @@ import time
 
 import pytest
 
+from test_utils.merging import merge_systems
 from test_utils.server import MEDIASERVER_MERGE_TIMEOUT
 from test_utils.utils import SimpleNamespace, datetime_utc_now, bool_to_str
 
@@ -127,7 +128,7 @@ def wait_for_camera_disappearance_after_backup(server, camera_guid):
 
 # https://networkoptix.atlassian.net/wiki/spaces/SD/pages/85690455/Mediaserver+database+test#Mediaserverdatabasetest-test_backup_restore
 def test_backup_restore(artifact_factory, one, two, camera):
-    two.merge_systems(one)
+    merge_systems(two, one)
     full_info_initial = wait_until_servers_have_same_full_info(one, two)
     backup = one.rest_api.ec2.dumpDatabase.GET()
     camera_guid = two.add_camera(camera)
@@ -161,5 +162,5 @@ def test_server_guids_changed(one, two):
     two.start()
     one.setup_local_system()
     two.setup_local_system()
-    two.merge_systems(one)
+    merge_systems(two, one)
     wait_until_servers_have_same_full_info(one, two)

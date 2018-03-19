@@ -5,6 +5,7 @@ import time
 import pytest
 
 from test_utils.api_shortcuts import get_server_id
+from test_utils.merging import merge_systems
 
 log = logging.getLogger(__name__)
 
@@ -62,7 +63,7 @@ def check_media_stream_transports(server):
 def test_camera_switching_should_be_represented_in_history(artifact_factory, server_factory, camera):
     one = server_factory.create('one')
     two = server_factory.create('two')
-    one.merge_systems(two)
+    merge_systems(one, two)
 
     camera.start_streaming()
     camera.wait_until_discovered_by_server([one, two])

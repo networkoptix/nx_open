@@ -5,7 +5,8 @@ import logging
 import pytest
 
 import server_api_data_generators as generator
-from test_utils.api_shortcuts import get_server_id, get_system_settings, get_local_system_id
+from test_utils.api_shortcuts import get_local_system_id, get_server_id
+from test_utils.merging import merge_systems
 from test_utils.utils import SimpleNamespace
 
 log = logging.getLogger(__name__)
@@ -15,7 +16,7 @@ log = logging.getLogger(__name__)
 def env(server_factory):
     one = server_factory.create('one')
     two = server_factory.create('two')
-    one.merge_systems(two)
+    merge_systems(one, two)
     return SimpleNamespace(
         one=one,
         two=two,

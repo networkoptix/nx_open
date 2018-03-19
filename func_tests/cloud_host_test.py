@@ -35,7 +35,7 @@ def test_with_different_cloud_hosts_must_not_be_able_to_merge(server_factory, cl
     check_user_exists(one, is_cloud=True)
 
     with pytest.raises(HttpError) as x_info:
-        one.merge_systems(two)
+        merge_systems(one, two)
     assert x_info.value.reason == 'INCOMPATIBLE'
 
     # after patching to new cloud host server should reset system and users
@@ -48,7 +48,7 @@ def test_with_different_cloud_hosts_must_not_be_able_to_merge(server_factory, cl
     one.setup_local_system()
     check_user_exists(one, is_cloud=False)  # cloud user must be gone after patch/changed cloud host
 
-    one.merge_systems(two)
+    merge_systems(one, two)
     assert not get_cloud_system_id(two.rest_api)
     check_user_exists(two, is_cloud=False)  # cloud user most not get into server two either
     
@@ -61,7 +61,7 @@ def test_server_should_be_able_to_merge_local_to_cloud_one(server_factory, cloud
     check_user_exists(one, is_cloud=True)
 
     check_user_exists(two, is_cloud=False)
-    one.merge_systems(two)
+    merge_systems(one, two)
     check_user_exists(two, is_cloud=True)
 
 
