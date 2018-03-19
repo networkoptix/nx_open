@@ -1822,17 +1822,17 @@
     <message>
       <location filename="../src/ui/dialogs/new_wearable_camera_dialog.ui"/>
       <source>New Wearable Camera...</source>
-      <translation type="unfinished">New Wearable Camera...</translation>
+      <translation>Camera đeo người mới...</translation>
     </message>
     <message>
       <location/>
       <source>To server</source>
-      <translation type="unfinished">To server</translation>
+      <translation>Đến máy chủ</translation>
     </message>
     <message>
       <location/>
       <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</translation>
+      <translation>&quot;Máy ảnh Wearable&quot; là một lưu trữ ảo cho các tệp video, có thể được tải lên bất kỳ máy chủ nào trong hệ thống của bạn và được truy cập bởi bất kỳ người dùng nào.</translation>
     </message>
   </context>
   <context>
@@ -2720,8 +2720,7 @@
       <location/>
       <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage.
 The oldest footage among all cameras on the server will be deleted first.</source>
-      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage.
-The oldest footage among all cameras on the server will be deleted first.</translation>
+      <translation>Lưu trữ được tải lên có thể bị xóa tự động, nếu không có không gian trống trên bộ nhớ máy chủ. Đoạn phim cổ nhất trong số tất cả các camera trên máy chủ sẽ bị xóa đầu tiên.</translation>
     </message>
   </context>
   <context>
@@ -3116,7 +3115,7 @@ Click &quot;New role&quot; button to create one.</source>
     <message>
       <location/>
       <source>Detect motion in uploaded video</source>
-      <translation type="unfinished">Detect motion in uploaded video</translation>
+      <translation>Phát hiện chuyển động trong video đã tải lên</translation>
     </message>
     <message>
       <location/>
@@ -3137,17 +3136,17 @@ Click &quot;New role&quot; button to create one.</source>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
       <source>Upload Video</source>
-      <translation type="unfinished">Upload Video</translation>
+      <translation>Tải video lên</translation>
     </message>
     <message>
       <location/>
       <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
+      <translation>Tải lên tập tin...</translation>
     </message>
     <message>
       <location/>
       <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
+      <translation>Tải lên tập tin...</translation>
     </message>
   </context>
   <context>

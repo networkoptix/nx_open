@@ -985,7 +985,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
-      <translation>A licenchez adott média szerver hardver ID nem egyezik meg az eszköz hardver ID-vel melyhez a licencet aktiválták.</translation>
+      <translation>A licenchez adott média szerver Hardver Id nem egyezik meg az eszköz Hardver Id-vel melyhez a licencet aktiválták.</translation>
     </message>
   </context>
   <context>
@@ -2235,11 +2235,11 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>I/O Module Id</source>
-      <translation>I/O modul ID</translation>
+      <translation>I/O modul Id</translation>
     </message>
     <message>
       <source>Camera Id</source>
-      <translation>Kamera ID</translation>
+      <translation>Kamera Id</translation>
     </message>
   </context>
   <context>
@@ -2984,7 +2984,7 @@ to %1</source>
     </message>
     <message>
       <source>Incorrect username or password</source>
-      <translation>Hibás Email cím vagy jelszó</translation>
+      <translation>Hibás felhasználónév cím vagy jelszó</translation>
     </message>
     <message>
       <source>Server may be restarting now. Please try again later.</source>
@@ -3729,7 +3729,7 @@ to %1</source>
     </message>
     <message>
       <source>Id</source>
-      <translation>ID</translation>
+      <translation>Id</translation>
     </message>
   </context>
   <context>
@@ -3912,7 +3912,7 @@ to %1</source>
     </message>
     <message>
       <source>Locked to Hardware Id</source>
-      <translation>Hardver ID-hez rendelve</translation>
+      <translation>Hardver Id-hez rendelve</translation>
     </message>
   </context>
   <context>
@@ -4188,11 +4188,11 @@ to %1</source>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware Id %1</source>
-      <translation>Ez a licenc már aktiválva van %1 hardver ID-hoz</translation>
+      <translation>Ez a licenc már aktiválva van %1 Hardver Id-hoz</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware Id %1 on %2</source>
-      <translation>Ez a licenc már aktiválva van %1 hardver ID-hoz (%2)</translation>
+      <translation>Ez a licenc már aktiválva van %1 Hardver Id-hoz (%2)</translation>
     </message>
     <message>
       <source>If the problem persists please contact Customer Support.</source>
@@ -4223,11 +4223,11 @@ to %1</source>
     </message>
     <message>
       <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>Az aktivációs kulcs megküldéséhez, kérjük e-mailben küldje el a licenc kulcsot és a hardver ID-t %1 címre.</translation>
+      <translation>Az aktivációs kulcs megküldéséhez, kérjük e-mailben küldje el a licenc kulcsot és a Hardver Id-t %1 címre.</translation>
     </message>
     <message>
       <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>Az aktivációs kulcs megküldéséhez, kérjük küldje el a licenc kulcsot és a hardver ID-t %1 címre.</translation>
+      <translation>Az aktivációs kulcs megküldéséhez, kérjük küldje el a licenc kulcsot és a Hardver Id-t %1 címre.</translation>
     </message>
   </context>
   <context>
@@ -7106,7 +7106,7 @@ to %1</source>
     </message>
     <message>
       <source>Email cannot be empty.</source>
-      <translation>Az Email mező nem lehet üres.</translation>
+      <translation>Az email mező nem lehet üres.</translation>
     </message>
     <message>
       <source>Password</source>
@@ -7122,18 +7122,18 @@ to %1</source>
     </message>
     <message>
       <source>Cloud user with specified email already exists.</source>
-      <translation>A felhő felhasználó a megadott e-mail címmel már létezik.</translation>
+      <translation>A felhő felhasználó a megadott email címmel már létezik.</translation>
     </message>
   </context>
   <context>
     <name>QnValidatorStrings</name>
     <message>
       <source>Email cannot be empty.</source>
-      <translation>Az e-mail mező nem lehet üres.</translation>
+      <translation>Az email mező nem lehet üres.</translation>
     </message>
     <message>
       <source>Email is not valid.</source>
-      <translation>Nem érvényes Email.</translation>
+      <translation>Nem érvényes email.</translation>
     </message>
     <message>
       <source>Password cannot be empty.</source>

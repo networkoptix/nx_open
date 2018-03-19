@@ -1822,17 +1822,17 @@
     <message>
       <location filename="../src/ui/dialogs/new_wearable_camera_dialog.ui"/>
       <source>New Wearable Camera...</source>
-      <translation type="unfinished">New Wearable Camera...</translation>
+      <translation>Yeni Giyilebilir Kamera...</translation>
     </message>
     <message>
       <location/>
       <source>To server</source>
-      <translation type="unfinished">To server</translation>
+      <translation>Sunucuya</translation>
     </message>
     <message>
       <location/>
       <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</translation>
+      <translation>&quot;Giyilebilir Kamera&quot;, sisteminizdeki herhangi bir sunucuya yüklenebilen ve herhangi bir kullanıcı tarafından erişilebilen video dosyaları için sanal bir depolamadır.</translation>
     </message>
   </context>
   <context>
@@ -2720,8 +2720,7 @@
       <location/>
       <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage.
 The oldest footage among all cameras on the server will be deleted first.</source>
-      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage.
-The oldest footage among all cameras on the server will be deleted first.</translation>
+      <translation>Yüklenen arşiv, sunucu deposunda boş alan yoksa otomatik olarak silinebilir. Sunucudaki tüm kameralar arasındaki en eski çekim ilk önce silinecek.</translation>
     </message>
   </context>
   <context>
@@ -3116,7 +3115,7 @@ Click &quot;New role&quot; button to create one.</source>
     <message>
       <location/>
       <source>Detect motion in uploaded video</source>
-      <translation type="unfinished">Detect motion in uploaded video</translation>
+      <translation>Yüklenen videodaki hareketi algıla</translation>
     </message>
     <message>
       <location/>
@@ -3137,17 +3136,17 @@ Click &quot;New role&quot; button to create one.</source>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
       <source>Upload Video</source>
-      <translation type="unfinished">Upload Video</translation>
+      <translation>Video yükle</translation>
     </message>
     <message>
       <location/>
       <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
+      <translation>Dosya yükle...</translation>
     </message>
     <message>
       <location/>
       <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
+      <translation>Klasör yükle...</translation>
     </message>
   </context>
   <context>
