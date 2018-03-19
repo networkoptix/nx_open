@@ -41,13 +41,15 @@ class ServerFactory(object):
                 vm = config.vm
             else:
                 vm = self._linux_vm_pool.get(name)
-            hostname, port = vm.ports['tcp', 7001]
+            port = 7001
+            hostname_from_here, port_from_here = vm.ports['tcp', port]
             server = Server(
                 name,
                 UpstartService(vm.os_access, self._mediaserver_deb.customization.service),
                 install_mediaserver(vm.os_access, self._mediaserver_deb),
-                RestApi(name, hostname, port),
-                vm)
+                RestApi(name, hostname_from_here, port_from_here),
+                vm,
+                port)
         self._allocated_servers.append(server)  # Following may fail, will need to save it's artifact in that case.
         server.stop(already_stopped_ok=True)
         server.installation.cleanup_core_files()

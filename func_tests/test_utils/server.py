@@ -83,7 +83,7 @@ class ServerConfig(object):
 class Server(object):
     """Mediaserver, same for physical and virtual machines"""
 
-    def __init__(self, name, service, installation, api, machine, port=None):
+    def __init__(self, name, service, installation, api, machine, port):
         assert name, repr(name)
         self.title = name.upper()
         self.name = '%s-%s' % (name, str(uuid.uuid4())[-12:])
@@ -92,7 +92,7 @@ class Server(object):
         self.service = service
         self.machine = machine
         self.rest_api = api
-        self.internal_ip_port = port or 7001
+        self.port = port
 
     def __repr__(self):
         return '<Server at %s>' % self.rest_api.url('')
