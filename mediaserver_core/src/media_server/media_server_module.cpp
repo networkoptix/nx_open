@@ -187,8 +187,9 @@ QnMediaServerModule::QnMediaServerModule(
 
     m_sharedContextPool = store(new nx::mediaserver::resource::SharedContextPool(this));
     m_archiveIntegrityWatcher = store(new nx::mediaserver::ServerArchiveIntegrityWatcher);
-    
-	store(new nx::mediaserver_core::recorder::WearableArchiveSynchronizer(this));
+    m_rootTool = nx::mediaserver::findRootTool(qApp->applicationFilePath());
+
+    store(new nx::mediaserver_core::recorder::WearableArchiveSynchronizer(this));
 
 
     store(new QnWearableLockManager(this));
@@ -288,11 +289,6 @@ nx::mediaserver::resource::SharedContextPool* QnMediaServerModule::sharedContext
 AbstractArchiveIntegrityWatcher* QnMediaServerModule::archiveIntegrityWatcher() const
 {
     return m_archiveIntegrityWatcher;
-}
-
-void QnMediaServerModule::initializeRootTool()
-{
-    m_rootTool = nx::mediaserver::findRootTool(qApp->applicationFilePath());
 }
 
 nx::mediaserver::RootTool* QnMediaServerModule::rootTool() const
