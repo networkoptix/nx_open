@@ -813,7 +813,8 @@
                 "Hikvision|DS-2CD2942F-IS",
                 "Hikvision|DS-2CD4A26FWD-IZS",
                 "Hikvision|DS-2CD63C2F-IS",
-                "Hikvision|DS-2DE4A220IW-DE"
+                "Hikvision|DS-2DE4A220IW-DE",
+                "HIKVISION|DS-2CD4032FWD*"
             ],
             "parseOnvifNotificationsWithHttpReader": true
         },
@@ -833,6 +834,7 @@
                 "Hikvision|DS-2DE4A220IW-DE",
                 "Hikvision|DS-2CD2522FWD*",
                 "HIKVISION|DS-2CD2522FWD*",
+                "HIKVISION|DS-2CD4032FWD*",
                 "ONVIF|H47",
                 "ONVIF|IP-2CD4B26FWD-IZS",
                 "*|NC304-WDA"
