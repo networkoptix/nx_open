@@ -495,7 +495,11 @@ PageBase
                     animatePlaybackControls: d.animatePlaybackControls
                     videoScreenController: d.controller
                     controlsOpacity: d.cameraUiOpacity
-                    onPtzButtonClicked: d.mode = VideoScreenUtils.VideoScreenMode.Ptz
+                    onPtzButtonClicked:
+                    {
+                        d.mode = VideoScreenUtils.VideoScreenMode.Ptz
+                        video.item.to1xScale()
+                    }
                 }
             }
 
