@@ -21,6 +21,7 @@
 
 #include <nx/utils/math/fuzzy.h>
 #include <nx/client/core/animation/kinetic_helper.h>
+#include <utils/math/color_transformations.h>
 
 using KineticHelper = nx::client::core::animation::KineticHelper<qreal>;
 
@@ -66,8 +67,11 @@ namespace {
 
         int stripeWidth = size / 2;
 
-        QImage image(size, size, QImage::Format_RGB888);
+        QImage image(size, size, QImage::Format_RGBA8888);
+        image.fill(Qt::transparent);
+
         QPainter p(&image);
+
         p.setRenderHint(QPainter::Antialiasing);
 
         QPen pen;
@@ -103,6 +107,11 @@ public:
     QColor textColor = QColor("#727272");
     QColor chunkBarColor = QColor("#223925");
     QColor chunkColor = QColor("#3a911e");
+
+    QColor activeLiveColorLight = QColor("#358815");
+    QColor activeLiveColorDark= QColor("#398f16");
+    QColor inactiveLiveColorLight = toTransparent(QColor("#3d6228"), 0.4);
+    QColor inactiveLiveColorDark = toTransparent(QColor("#2f4623"), 0.4);
 
     int chunkBarHeight = 48;
     int textY = -1;
@@ -809,6 +818,75 @@ void QnTimeline::setFont(const QFont& font)
     emit fontChanged();
 }
 
+QColor QnTimeline::activeLiveColorLight() const
+{
+    return d->activeLiveColorLight;
+}
+
+void QnTimeline::setActiveLiveColorLight(const QColor& color)
+{
+    if (d->activeLiveColorLight == color)
+        return;
+
+    d->activeLiveColorLight = color;
+    emit activeLiveColorLightChanged();
+
+    d->updateStripesTextures();
+    update();
+}
+
+QColor QnTimeline::activeLiveColorDark() const
+{
+    return d->activeLiveColorLight;
+}
+
+void QnTimeline::setActiveLiveColorDark(const QColor& color)
+{
+    if (d->activeLiveColorDark == color)
+        return;
+
+    d->activeLiveColorDark = color;
+    emit activeLiveColorDarkChanged();
+
+    d->updateStripesTextures();
+    update();
+}
+
+QColor QnTimeline::inactiveLiveColorLight() const
+{
+    return d->inactiveLiveColorLight;
+}
+
+void QnTimeline::setInactiveLiveColorLight(const QColor& color)
+{
+    if (d->inactiveLiveColorLight == color)
+        return;
+
+    d->inactiveLiveColorLight = color;
+    emit inactiveLiveColorLightChanged();
+
+    d->updateStripesTextures();
+    update();
+}
+
+QColor QnTimeline::inactiveLiveColorDark() const
+{
+    return d->inactiveLiveColorLight;
+}
+
+void QnTimeline::setInactiveLiveColorDark(const QColor& color)
+{
+    if (d->inactiveLiveColorDark == color)
+        return;
+
+    d->inactiveLiveColorDark = color;
+    emit inactiveLiveColorDarkChanged();
+
+    d->updateStripesTextures();
+    update();
+}
+
+
 QColor QnTimeline::chunkColor() const
 {
     return d->chunkColor;
@@ -822,8 +900,6 @@ void QnTimeline::setChunkColor(const QColor& color)
     d->chunkColor = color;
 
     emit chunkColorChanged();
-
-    d->updateStripesTextures();
     update();
 }
 
@@ -840,8 +916,6 @@ void QnTimeline::setChunkBarColor(const QColor& color)
     d->chunkBarColor = color;
 
     emit chunkBarColorChanged();
-
-    d->updateStripesTextures();
     update();
 }
 
@@ -1289,12 +1363,13 @@ void QnTimelinePrivate::updateStripesTextures()
 
     static constexpr int kTintAmount = 106;
     const auto stripesDark = makeStripesImage(
-        chunkBarHeight, chunkBarColor, chunkBarColor.lighter(kTintAmount));
+        chunkBarHeight, inactiveLiveColorLight, inactiveLiveColorDark);
     const auto stripesLight = makeStripesImage(
-        chunkBarHeight, chunkColor, chunkColor.darker(kTintAmount));
+        chunkBarHeight, activeLiveColorLight, activeLiveColorDark);
 
-    stripesDarkTexture = window->createTextureFromImage(stripesDark);
-    stripesLightTexture = window->createTextureFromImage(stripesLight);
+    const auto flags = QQuickWindow::TextureHasAlphaChannel;
+    stripesDarkTexture = window->createTextureFromImage(stripesDark, flags);
+    stripesLightTexture = window->createTextureFromImage(stripesLight, flags);
 }
 
 void QnTimelinePrivate::animateProperties()

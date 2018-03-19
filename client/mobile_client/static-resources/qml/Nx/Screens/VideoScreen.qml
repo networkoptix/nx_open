@@ -21,6 +21,8 @@ PageBase
     property alias initialScreenshot: screenshot.source
     property QnCameraListModel camerasModel: null
 
+    backgroundColor: "black"
+
     VideoScreenController
     {
         id: videoScreenController
@@ -53,8 +55,6 @@ PageBase
         id: d
 
         property alias controller: videoScreenController
-
-        property var videoNavigation: navigationLoader.item
 
         property bool animatePlaybackControls: true
         property bool showOfflineStatus: false
@@ -339,23 +339,19 @@ PageBase
 
         Image
         {
+            property real targetOpacity: visible ? 1 : 0
+
             x: -mainWindow.leftPadding
             width: mainWindow.width
-            height: sourceSize.height
+            height: 96
             anchors.bottom: parent.bottom
             anchors.bottomMargin: videoScreen.height - mainWindow.height
 
-            sourceSize.height: 56 * 2 - anchors.bottomMargin
             source: lp("/images/timeline_gradient.png")
 
             visible: (d.mode == VideoScreenUtils.VideoScreenMode.Ptz && d.uiVisible)
-                || ptzPanel.moveOnTapMode || navigationLoader.visible
-            opacity: visible ? 1 : 0
-
-            Behavior on opacity
-            {
-                NumberAnimation { duration: 250; easing.type: Easing.OutCubic }
-            }
+                || ptzPanel.moveOnTapMode || videoNavigation.visible
+            opacity: Math.max(d.uiOpacity, targetOpacity)
         }
 
         PtzPanel
@@ -444,20 +440,25 @@ PageBase
             parent: videoScreen
         }
 
-        Loader
+        VideoNavigation
         {
-            id: navigationLoader
+            id: videoNavigation
+
+            canViewArchive: videoScreenController.accessRightsHelper.canViewArchive
+            animatePlaybackControls: d.animatePlaybackControls
+            videoScreenController: d.controller
+            controlsOpacity: d.cameraUiOpacity
+            onPtzButtonClicked:
+            {
+                d.mode = VideoScreenUtils.VideoScreenMode.Ptz
+                video.item.to1xScale()
+            }
 
             anchors.bottom: parent.bottom
             width: parent.width
 
             visible: opacity > 0 && d.mode === VideoScreenUtils.VideoScreenMode.Navigation
             opacity: Math.min(d.uiOpacity, d.controlsOpacity)
-
-            sourceComponent:
-                videoScreenController.accessRightsHelper.canViewArchive
-                    ? navigationComponent
-                    : liveNavigationComponent
 
             Button
             {
@@ -485,34 +486,6 @@ PageBase
                 z: 1
                 onClicked: switchToNextCamera()
             }
-
-            Component
-            {
-                id: navigationComponent
-
-                VideoNavigation
-                {
-                    animatePlaybackControls: d.animatePlaybackControls
-                    videoScreenController: d.controller
-                    controlsOpacity: d.cameraUiOpacity
-                    onPtzButtonClicked:
-                    {
-                        d.mode = VideoScreenUtils.VideoScreenMode.Ptz
-                        video.item.to1xScale()
-                    }
-                }
-            }
-
-            Component
-            {
-                id: liveNavigationComponent
-
-                LiveVideoNavigation
-                {
-                    videoScreenController: d.controller
-                    onPtzButtonClicked: d.mode = VideoScreenUtils.VideoScreenMode.Ptz
-                }
-            }
         }
     }
 
@@ -525,7 +498,7 @@ PageBase
         height: video.height
         x: mainWindow.leftPadding ? -mainWindow.leftPadding : parent.width
         anchors.top: video.top
-        opacity: Math.min(navigationLoader.opacity, d.cameraUiOpacity)
+        opacity: Math.min(videoNavigation.opacity, d.cameraUiOpacity)
     }
 
     SequentialAnimation

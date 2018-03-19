@@ -62,6 +62,7 @@ Item
 
         textColor: ColorTheme.transparent(ColorTheme.contrast16, 0.7)
         chunkColor: ColorTheme.green_main
+        chunkBarColor: ColorTheme.transparent(ColorTheme.green_d2, 0.4)
 
         timeZoneShift: -(new Date()).getTimezoneOffset() * 60 * 1000
 

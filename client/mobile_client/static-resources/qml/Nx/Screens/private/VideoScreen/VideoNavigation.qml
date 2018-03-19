@@ -17,6 +17,8 @@ Item
     property bool ptzAvailable: false
     property real controlsOpacity: 1.0
     property alias animatePlaybackControls: playbackControlsOpacityBehaviour.enabled
+    property bool canViewArchive: true
+    property int panelOffset: navigationPanel.visible ? navigationPanel.height : 0
 
     signal ptzButtonClicked()
 
@@ -180,28 +182,6 @@ Item
             }
         }
 
-        Image
-        {
-            width: parent.width
-            anchors.bottom: timeline.bottom
-            height: timeline.chunkBarHeight
-            source: lp("/images/timeline_chunkbar_preloader.png")
-            sourceSize: Qt.size(timeline.chunkBarHeight, timeline.chunkBarHeight)
-            fillMode: Image.Tile
-            visible: d.hasArchive
-        }
-
-        Image
-        {
-            width: timeline.width
-            height: sourceSize.height
-            anchors.bottom: timeline.bottom
-            anchors.bottomMargin: timeline.chunkBarHeight
-            sourceSize.height: 150 - timeline.chunkBarHeight
-            source: lp("/images/timeline_gradient.png")
-            visible: d.hasArchive
-        }
-
         Timeline
         {
             id: timeline
@@ -209,6 +189,7 @@ Item
             property bool resumeWhenDragFinished: false
             serverTimeZoneShift: videoScreenController.resourceHelper.serverTimeOffset;
             enabled: d.hasArchive
+            visible: videoNavigation.canViewArchive
 
             anchors.bottom: parent.bottom
             width: parent.width
@@ -275,70 +256,19 @@ Item
             }
         }
 
-        Item
-        {
-            id: timelineMask
-
-            anchors.fill: timeline
-            visible: false
-
-            Rectangle
-            {
-                id: blurRectangle
-
-                readonly property real blurWidth: 16
-                readonly property real margin: 8
-
-                width: timeline.height - timeline.chunkBarHeight
-                height: timeline.width
-                rotation: 90
-                anchors.centerIn: parent
-                anchors.verticalCenterOffset: -timeline.chunkBarHeight / 2
-                gradient: Gradient
-                {
-                    GradientStop { position: 0.0; color: Qt.rgba(1.0, 1.0, 1.0, 1.0) }
-                    GradientStop { position: (timeLiveLabel.x - blurRectangle.blurWidth - blurRectangle.margin) / timeline.width; color: Qt.rgba(1.0, 1.0, 1.0, 1.0) }
-                    GradientStop { position: (timeLiveLabel.x - blurRectangle.margin) / timeline.width; color: Qt.rgba(1.0, 1.0, 1.0, 0.0) }
-                    GradientStop { position: 0.5; color: Qt.rgba(1.0, 1.0, 1.0, 0.0) }
-                    GradientStop { position: (timeLiveLabel.x + timeLiveLabel.width + blurRectangle.margin) / timeline.width; color: Qt.rgba(1.0, 1.0, 1.0, 0.0) }
-                    GradientStop { position: (timeLiveLabel.x + timeLiveLabel.width + blurRectangle.blurWidth + blurRectangle.margin) / timeline.width; color: Qt.rgba(1.0, 1.0, 1.0, 1.0) }
-                    GradientStop { position: 1.0; color: Qt.rgba(1.0, 1.0, 1.0, 1.0) }
-                }
-            }
-
-            Rectangle
-            {
-                width: timeline.width
-                height: timeline.chunkBarHeight
-                anchors.bottom: parent.bottom
-                color: "#ffffffff"
-            }
-        }
-
-        OpacityMask
-        {
-            id: timelineOpactiyMask
-
-            anchors.fill: timeline
-            source: timeline.timelineView
-            maskSource: timelineMask
-            opacity: Math.min(d.controlsOpacity, d.timelineOpacity)
-
-            Component.onCompleted: timeline.timelineView.visible = false
-        }
-
-        Text
-        {
-            anchors.horizontalCenter: timeline.horizontalCenter
-            text: qsTr("No Archive")
-            font.capitalization: Font.AllUppercase
-            font.pixelSize: 12
-            anchors.bottom: timeline.bottom
-            anchors.bottomMargin: (timeline.chunkBarHeight - height) / 2 + 12
-            color: ColorTheme.windowText
-            visible: !d.hasArchive
-            opacity: 0.5 * timelineOpactiyMask.opacity
-        }
+// TODO: Will lbe fixed in next commits
+//        Text
+//        {
+//            anchors.horizontalCenter: timeline.horizontalCenter
+//            text: qsTr("No Archive")
+//            font.capitalization: Font.AllUppercase
+//            font.pixelSize: 12
+//            anchors.bottom: timeline.bottom
+//            anchors.bottomMargin: (timeline.chunkBarHeight - height) / 2 + 12
+//            color: ColorTheme.windowText
+//            visible: !d.hasArchive && videoNavigation.canViewArchive
+//            opacity: 0.5 * timelineOpactiyMask.opacity
+//        }
 
         Pane
         {
@@ -350,14 +280,17 @@ Item
             width: parent.width
             height: 56
             anchors.top: timeline.bottom
-            background: Rectangle { color: ColorTheme.base3 }
+            background: Item {}
             padding: 4
             z: 1
+
+            visible: videoNavigation.canViewArchive || actionButtonsPanel.buttonsCount > 0
 
             IconButton
             {
                 id: calendarButton
 
+                visible: videoNavigation.canViewArchive
                 anchors.verticalCenter: parent.verticalCenter
                 icon: lp("/images/calendar.png")
                 enabled: d.hasArchive
@@ -374,7 +307,8 @@ Item
                 id: zoomButtonsRow
 
                 anchors.centerIn: parent
-                visible: navigationPanel.showZoomControls || !d.liveMode
+                visible: (navigationPanel.showZoomControls || !d.liveMode)
+                    && videoNavigation.canViewArchive
 
                 IconButton
                 {
@@ -410,7 +344,7 @@ Item
                     videoScreenController.playLive()
                 }
 
-                visible: opacity > 0
+                visible: opacity > 0 && videoNavigation.canViewArchive
                 opacity:
                 {
                     var futurePosition =
@@ -425,6 +359,7 @@ Item
             {
                 id: actionButtonsPanel
 
+                visible: buttonsCount > 0
                 resourceId: videoScreenController.resourceId
 
                 anchors.left: navigationPanel.showZoomControls
@@ -443,7 +378,6 @@ Item
                     return (d.liveMode || futurePosition) && correctState ? 1 : 0
                 }
 
-                visible: opacity > 0
                 onPtzButtonClicked: videoNavigation.ptzButtonClicked()
                 onTwoWayAudioButtonPressed: twoWayAudioController.start()
                 onTwoWayAudioButtonReleased: twoWayAudioController.stop()
@@ -478,6 +412,7 @@ Item
         {
             id: dateTimeLabel
 
+            visible: videoNavigation.canViewArchive
             height: 48
             width: parent.width
             anchors.bottom: timeline.bottom
@@ -495,8 +430,7 @@ Item
                 font.weight: Font.Normal
                 verticalAlignment: Text.AlignVCenter
 
-                // TODO: Remove qsTr from this string!
-                text: timeline.positionDate.toLocaleDateString(d.locale, qsTr("d MMMM yyyy", "DO NOT TRANSLATE THIS STRING!"))
+                text: timeline.positionDate.toLocaleDateString(d.locale, "d MMMM yyyy")
                 color: ColorTheme.windowText
 
                 opacity: d.liveMode ? 0.0 : 1.0
@@ -535,6 +469,16 @@ Item
             }
         }
 
+        Text
+        {
+            anchors.centerIn: parent
+            font.pixelSize: 28
+            font.weight: Font.Normal
+            color: ColorTheme.windowText
+            text: qsTr("LIVE")
+            visible: d.liveMode && !videoNavigation.canViewArchive
+        }
+
         PlaybackController
         {
             id: playbackController
@@ -567,16 +511,16 @@ Item
             }
         }
 
-        Rectangle
-        {
-            color: ColorTheme.windowText
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.bottom: parent.bottom
-            width: 2
-            height: 20
-            visible: d.hasArchive
-            opacity: timelineOpactiyMask.opacity
-        }
+//        Rectangle
+//        {
+//            color: ColorTheme.windowText
+//            anchors.horizontalCenter: parent.horizontalCenter
+//            anchors.bottom: parent.bottom
+//            width: 2
+//            height: 20
+//            visible: d.hasArchive && videoNavigation.canViewArchive
+//            opacity: timelineOpactiyMask.opacity
+//        }
     }
 
     Rectangle

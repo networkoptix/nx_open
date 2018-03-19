@@ -11,7 +11,7 @@ Item
 
     property alias resourceId: buttonModel.resourceId
     property alias contentWidth: panel.contentWidth
-
+    property alias buttonsCount: panel.count
     signal ptzButtonClicked()
 
     signal twoWayAudioButtonPressed()
@@ -37,8 +37,8 @@ Item
     {
         id: panel
 
-        x: line.visible ? 1 : 0
-        width: parent.width - x
+        x: 1
+        width: parent.width - 1
         height: parent.height
         onPressedChanged:
         {
