@@ -18,7 +18,7 @@ from .cloud_host import CloudAccount
 from .media_stream import open_media_stream
 from .os_access import LocalAccess
 from .rest_api import HttpError, REST_API_PASSWORD, REST_API_USER
-from .utils import datetime_utc_now, datetime_utc_to_timestamp, is_list_inst
+from .utils import datetime_utc_now, datetime_utc_to_timestamp
 
 DEFAULT_HTTP_SCHEMA = 'http'
 

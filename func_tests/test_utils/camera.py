@@ -12,7 +12,6 @@ All these 3 classes are internal for this module; Tests only see and use Camera 
 created using 'camera' or 'camera_factory' fixtures.
 """
 
-import datetime
 import logging
 import select
 import socket

@@ -1,8 +1,7 @@
-from netaddr import IPNetwork, IPAddress
+from netaddr import IPAddress, IPNetwork
 from pathlib2 import Path
 
 from test_utils.networking import setup_networks
-from test_utils.utils import wait_until
 
 SAMPLES_DIR = Path(__file__).parent / 'test_utils' / 'networking'
 

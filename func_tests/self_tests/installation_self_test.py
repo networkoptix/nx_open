@@ -1,7 +1,5 @@
 import logging
 
-import pytest
-
 from test_utils.server_installation import install_mediaserver
 
 _logger = logging.getLogger(__name__)

@@ -7,8 +7,6 @@ import logging
 import time
 
 import pytest
-import yaml
-from pathlib2 import Path
 
 import server_api_data_generators as generator
 from test_utils.api_shortcuts import get_local_system_id, get_server_id, get_system_settings
