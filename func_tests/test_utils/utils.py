@@ -131,6 +131,9 @@ class Wait(object):
         self.delay_sec = 0.5
         self.log_continue = log_continue
         self.log_stop = log_stop
+        self.log_continue(
+            "Start waiting %s: %.1f sec, %d attempts.",
+            self._name, self._timeout_sec, self._attempts_limit)
 
     def again(self):
         now = timeit.default_timer()
@@ -141,11 +144,11 @@ class Wait(object):
         since_start_sec = time.time() - self._started_at
         if since_start_sec > self._timeout_sec or self._attempts_made >= self._attempts_limit:
             self.log_stop(
-                "Stop to wait %s: %g/%g sec, %d/%d attempts.",
+                "Stop waiting %s: %g/%g sec, %d/%d attempts.",
                 self._name, since_start_sec, self._timeout_sec, self._attempts_made, self._attempts_limit)
             return False
         self.log_continue(
-            "Continue to wait %s: %.1f/%.1f sec, %d/%d attempts, delay %.1f sec.",
+            "Continue waiting %s: %.1f/%.1f sec, %d/%d attempts, delay %.1f sec.",
             self._name, since_start_sec, self._timeout_sec, self._attempts_made, self._attempts_limit, self.delay_sec)
         self._last_checked_at = now
         return True
