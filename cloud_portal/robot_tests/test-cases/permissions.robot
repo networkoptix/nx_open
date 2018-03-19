@@ -219,6 +219,7 @@ Share with registered user - sends him notification
     Check User Permissions    ${EMAIL NOPERM}    ${CUSTOM TEXT}
     Open Mailbox    host=${BASE HOST}    password=${BASE EMAIL PASSWORD}    port=${BASE PORT}    user=${BASE EMAIL}    is_secure=True
     ${INVITED TO SYSTEM EMAIL SUBJECT}    Replace String    ${INVITED TO SYSTEM EMAIL SUBJECT}    {{message.sharer_name}}    ${TEST FIRST NAME} ${TEST LAST NAME}
-    ${email}    Wait For Email    recipient=${EMAIL NOPERM}    subject=${INVITED TO SYSTEM EMAIL SUBJECT}    timeout=120
+    ${email}    Wait For Email    recipient=${EMAIL NOPERM}    timeout=120
+    Check Email Subject    ${email}    ${INVITED TO SYSTEM EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
     Remove User Permissions    ${EMAIL NOPERM}
     Close Browser

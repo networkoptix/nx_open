@@ -225,6 +225,7 @@ cloud_portal/robot_tests/report*.html
 cloud_portal/robot_tests/MicrosoftWebDriver.exe
 cloud_portal/robot_tests/geckodriver.exe
 cloud_portal/robot_tests/test-cases/outputs/*
+cloud_portal/robot_tests/outputs/
 syntax: regexp
 ^core$
 ^Makefile$
