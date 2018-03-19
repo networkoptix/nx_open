@@ -45,7 +45,7 @@ private:
     void rebuild();
 
     /** Cleanup all node references. */
-    void removeNode(const QnResourceTreeModelNodePtr& node);
+    void removeNode(QnResourceTreeModelNodePtr node);
 
     /** Remove all nodes. */
     void clean();
