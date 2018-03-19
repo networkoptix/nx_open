@@ -131,7 +131,7 @@ Sharing works
     Log in to Auto Tests System    ${email}
     Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
     Click Button    ${SHARE BUTTON SYSTEMS}
-    ${random email}    Get Random Email
+    ${random email}    Get Random Email    ${BASE EMAIL}
     Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE BUTTON MODAL}
     Input Text    ${SHARE EMAIL}    ${random email}
     Click Button    ${SHARE BUTTON MODAL}
@@ -142,10 +142,11 @@ Sharing works
 
 displays pencil and cross links for each user only on hover
     Open Browser and go to URL    ${url}
+    Maximize Browser Window
     Log in to Auto Tests System    ${email}
     Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
     Click Button    ${SHARE BUTTON SYSTEMS}
-    ${random email}    Get Random Email
+    ${random email}    Get Random Email    ${BASE EMAIL}
     Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE BUTTON MODAL}
     Input Text    ${SHARE EMAIL}    ${random email}
     Click Button    ${SHARE BUTTON MODAL}
@@ -159,10 +160,11 @@ displays pencil and cross links for each user only on hover
 
 Edit permission works
     Open Browser and go to URL    ${url}
+    Maximize Browser Window
     Log in to Auto Tests System    ${email}
     Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
     Click Button    ${SHARE BUTTON SYSTEMS}
-    ${random email}    Get Random Email
+    ${random email}    Get Random Email    ${BASE EMAIL}
     Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE BUTTON MODAL}
     Input Text    ${SHARE EMAIL}    ${random email}
     Click Button    ${SHARE BUTTON MODAL}
@@ -177,7 +179,7 @@ Edit permission works
 Delete user works
     [tags]    email
     Open Browser and go to URL    ${url}/register
-    ${random email}    Get Random Email
+    ${random email}    Get Random Email    ${BASE EMAIL}
     Register    mark    harmill    ${random email}    ${password}
     Activate    ${random email}
     Log in to Auto Tests System    ${email}
@@ -215,8 +217,9 @@ Share with registered user - sends him notification
     Click Button    ${SHARE BUTTON MODAL}
     Check For Alert    ${NEW PERMISSIONS SAVED}
     Check User Permissions    ${EMAIL NOPERM}    ${CUSTOM TEXT}
-    Open Mailbox    host=imap.gmail.com    password=qweasd!@#    port=993    user=noptixqa@gmail.com    is_secure=True
+    Open Mailbox    host=${BASE HOST}    password=${BASE EMAIL PASSWORD}    port=${BASE PORT}    user=${BASE EMAIL}    is_secure=True
     ${INVITED TO SYSTEM EMAIL SUBJECT}    Replace String    ${INVITED TO SYSTEM EMAIL SUBJECT}    {{message.sharer_name}}    ${TEST FIRST NAME} ${TEST LAST NAME}
-    ${email}    Wait For Email    recipient=${EMAIL NOPERM}    subject=${INVITED TO SYSTEM EMAIL SUBJECT}    timeout=120
+    ${email}    Wait For Email    recipient=${EMAIL NOPERM}    timeout=120
+    Check Email Subject    ${email}    ${INVITED TO SYSTEM EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
     Remove User Permissions    ${EMAIL NOPERM}
     Close Browser

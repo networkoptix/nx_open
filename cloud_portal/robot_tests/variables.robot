@@ -55,7 +55,7 @@ ${RESTORE PASSWORD EMAIL INPUT}       //form[@name='restorePassword']//input[@ty
 ${RESET PASSWORD BUTTON}              //form[@name='restorePassword']//button[@ng-click='checkForm()']
 ${RESET PASSWORD INPUT}               //form[@name='restorePasswordWithCode']//input[@type='password']
 ${SAVE PASSWORD}                      //form[@name='restorePasswordWithCode']//button[@ng-click='checkForm()']
-${RESET EMAIL SENT MESSAGE}           //div[@ng-if='restoringSuccess']/h1[contains(text(),'${RESET EMAIL SENT MESAGE TEXT}')]
+${RESET EMAIL SENT MESSAGE}           //div[@ng-if='restoringSuccess']/h1
 ${RESET SUCCESS MESSAGE}              //h1[contains(text(), '${RESET SUCCESS MESSAGE TEXT}')]
 ${RESET SUCCESS LOG IN LINK}          //h1[@ng-if='change.success || changeSuccess']//a[@href='/login']
 
@@ -78,8 +78,8 @@ ${RESEND ACTIVATION LINK BUTTON}      //form[@name= 'reactivateAccount']//button
 ${EMAIL ALREADY REGISTERED}           //span[@ng-if="registerForm.registerEmail.$error.alreadyExists"]
 
 ${ACCOUNT CREATION SUCCESS}           //h1[@ng-if='(register.success || registerSuccess) && !activated']
-${ACTIVATION SUCCESS}                 //div[@ng-model-options="{ updateOn: 'blur' }"]//h1[@ng-if='activate.success' and contains(text(), '${ACCOUNT SUCCESSFULLY ACTIVATED TEXT}')]
-${SUCCESS LOG IN BUTTON}              //div[@ng-model-options="{ updateOn: 'blur' }"]//h1[@ng-if='activate.success' and contains(text(), '${ACCOUNT SUCCESSFULLY ACTIVATED TEXT}')]/following-sibling::h1/a[@href="/login"]
+${ACTIVATION SUCCESS}                 //h1[@ng-if='activate.success' and contains(text(), '${ACCOUNT SUCCESSFULLY ACTIVATED TEXT}')]
+${SUCCESS LOG IN BUTTON}              //h1[@ng-if='activate.success' and contains(text(), '${ACCOUNT SUCCESSFULLY ACTIVATED TEXT}')]/following-sibling::h1/a[@href="/login"]
 #In system settings
 ${FIRST USER OWNER}                   //table[@ng-if='system.users.length']/tbody/tr/td[3]/span[contains(text(),'${OWNER TEXT}')]
 ${DISCONNECT FROM NX}                 //button[@ng-click='disconnect()']
@@ -158,16 +158,20 @@ ${300CHARS}                           QWErtyuiopasdfghhkljzxcvbnmqwertyuiopasdfg
 ${255CHARS}                           QWErtyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopas
 
 #Emails
-${EMAIL VIEWER}                       noptixqa+viewer@gmail.com
-${EMAIL ADV VIEWER}                   noptixqa+advviewer@gmail.com
-${EMAIL LIVE VIEWER}                  noptixqa+liveviewer@gmail.com
-${EMAIL OWNER}                        noptixqa+owner@gmail.com
-${EMAIL NOT OWNER}                    noptixqa+notowner@gmail.com
-${EMAIL ADMIN}                        noptixqa+admin@gmail.com
+${BASE EMAIL}                         noptixautoqa@gmail.com
+${BASE EMAIL PASSWORD}                qweasd!@#
+${BASE HOST}                          imap.gmail.com
+${BASE PORT}                          993
+${EMAIL VIEWER}                       noptixautoqa+viewer@gmail.com
+${EMAIL ADV VIEWER}                   noptixautoqa+advviewer@gmail.com
+${EMAIL LIVE VIEWER}                  noptixautoqa+liveviewer@gmail.com
+${EMAIL OWNER}                        noptixautoqa+owner@gmail.com
+${EMAIL NOT OWNER}                    noptixautoqa+notowner@gmail.com
+${EMAIL ADMIN}                        noptixautoqa+admin@gmail.com
 ${ADMIN FIRST NAME}                   asdasasd
 ${ADMIN LAST NAME}                    asdasasdas
-${EMAIL UNREGISTERED}                 noptixqa+unregistered@gmail.com
-${EMAIL NOPERM}                       noptixqa+noperm@gmail.com
+${EMAIL UNREGISTERED}                 noptixautoqa+unregistered@gmail.com
+${EMAIL NOPERM}                       noptixautoqa+noperm@gmail.com
 ${BASE PASSWORD}                      qweasd123
 ${ALT PASSWORD}                       qweasd1234
 
@@ -175,7 +179,7 @@ ${TEST FIRST NAME}                    testFirstName
 ${TEST LAST NAME}                     testLastName
 
 #Related to Auto Tests system
-${AUTO_TESTS SYSTEM ID}                     b4939b35-5b98-492b-a092-27fe8efeef38
+${AUTO_TESTS SYSTEM ID}                     d0ae4976-44f4-4b3f-8bad-86577b644adf
 ${AUTO TESTS TITLE}                   //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests')]
 ${AUTO TESTS USER}                    //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests')]/following-sibling::span[contains(@class,'user-name')]
 ${AUTO TESTS OPEN NX}                 //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests')]/..//button[@ng-click='checkForm()']
@@ -183,9 +187,9 @@ ${SYSTEMS SEARCH INPUT}               //input[@ng-model='search.value']
 ${SYSTEMS TILE}                       //div[@ng-repeat="system in systems | filter:searchSystems as filtered"]
 
 #AUTOTESTS (with no space) is an offline system used for testing offline status on the systems page
-${AUTOTESTS OFFLINE}                  //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Autotests')]/following-sibling::span[contains(text(), '${AUTOTESTS OFFLINE TEXT}')]
-${AUTOTESTS OFFLINE OPEN NX}          //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Autotests')]/..//button[@ng-click='checkForm()']
-${AUTOTESTS OFFLINE SYSTEM ID}                dd06f8bf-f7ea-49b3-96fc-fbc6742a2ad4
+${AUTOTESTS OFFLINE}                  //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests 2')]/following-sibling::span[contains(text(), '${AUTOTESTS OFFLINE TEXT}')]
+${AUTOTESTS OFFLINE OPEN NX}          //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests 2')]/..//button[@ng-click='checkForm()']
+${AUTOTESTS OFFLINE SYSTEM ID}                aee1df1e-ea9d-43c8-9c04-0463758d3616
 
 #ASCII
 ${ESCAPE}                             \\27

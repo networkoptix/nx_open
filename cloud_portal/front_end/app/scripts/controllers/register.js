@@ -6,9 +6,9 @@ angular.module('cloudApp')
         $http.get(Config.viewsDir + 'static/register-intro.html', {cache: $templateCache});
     }])
     .controller('RegisterCtrl', [
-        '$scope', 'cloudApi', 'process', '$location', '$localStorage', '$timeout',
+        '$scope', 'cloudApi', 'process', '$location', '$localStorage', '$timeout', 'dialogs',
         '$sessionStorage', '$routeParams', 'account', 'urlProtocol', '$base64',
-        function ($scope, cloudApi, process, $location, $localStorage, $timeout,
+        function ($scope, cloudApi, process, $location, $localStorage, $timeout, dialogs,
                   $sessionStorage, $routeParams, account, urlProtocol, $base64) {
 
         $scope.registerSuccess = $routeParams.registerSuccess;

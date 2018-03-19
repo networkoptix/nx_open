@@ -21,8 +21,8 @@ can be closed after clicking on background
     Open Browser and Go To URL    ${url}
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
-    Wait Until Elements Are Visible    ${LOG IN MODAL}    //div[@uib-modal-backdrop='modal-backdrop']/..
-    Click Element    //div[@uib-modal-backdrop='modal-backdrop']/..
+    Wait Until Elements Are Visible    ${LOG IN MODAL}    //div[@uib-modal-backdrop='modal-backdrop']/..    ${LOG IN BUTTON}    ${EMAIL INPUT}    ${PASSWORD INPUT}
+    Click Element At Coordinates    //div[@uib-modal-backdrop='modal-backdrop']/..    10    10
     Wait Until Page Does Not Contain Element    ${LOG IN MODAL}
     Page Should Not Contain Element    ${LOG IN MODAL}
     Close Browser
@@ -122,7 +122,7 @@ passes email from email input to Restore password page, even without clicking 'L
 redirects to /activate and shows non-activated user message when not activated; Resend activation button sends email
     [tags]    email
     Open Browser and go to URL    ${url}/register
-    ${random email}    get random email
+    ${random email}    get random email    ${BASE EMAIL}
     Register    'mark'    'hamill'    ${random email}    ${BASE PASSWORD}
     Wait Until Element Is Visible    //h1[contains(@class,'process-success')]
     Log In    ${random email}    ${BASE PASSWORD}

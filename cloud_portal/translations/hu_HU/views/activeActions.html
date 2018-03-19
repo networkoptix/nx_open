@@ -30,7 +30,7 @@
         <h1 ng-if="!data.email">Aktiváld a fiókod</h1>
         <form name="reactivateAccount" class="form-horizontal" ng-if="!reactivate.success" novalidate>
             <div class="form-group" ng-if="!data.email" validate-field>
-                <label for="emailReactivate"  class="col-sm-4 control-label">E-mail</label>
+                <label for="emailReactivate"  class="col-sm-4 control-label">Email</label>
                 <div class="col-sm-4">
                     <input type="email" class="form-control"  validate-email
  ng-model="data.email"
@@ -55,7 +55,7 @@
 
     <div ng-if="restoringSuccess">
         <h1 class="process-success">
-            Jelszóvisszaállítási teendők megadását e-mailen megküldtük <br>{{data.email}}
+            Jelszó visszaállítási teendők megadását e-mailen megküldtük <br>{{data.email}}
         </h1>
     </div>
 
@@ -63,7 +63,7 @@
         <h1>Jelszó visszaállítása</h1>
         <form name="restorePassword" class="form-horizontal" novalidate>
             <div class="form-group" validate-field>
-                <label for="email"  class="col-sm-4 control-label">E-mail</label>
+                <label for="email"  class="col-sm-4 control-label">Email</label>
                 <div class="col-sm-4">
                     <input type="email" class="form-control"  validate-email
  ng-model="data.email"

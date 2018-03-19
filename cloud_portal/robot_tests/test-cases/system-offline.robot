@@ -74,7 +74,7 @@ should open System page by link to not authorized user and redirect to homepage,
 should open System page by link to not authorized user and show it, after owner logs in
     Open Browser and go to URL    ${url}/systems/${AUTOTESTS OFFLINE SYSTEM ID}
     Log In    ${EMAIL OWNER}   ${password}    None
-    Verify In System    Autotests
+    Verify In System    Auto Tests 2
     Close Browser
 
 should open System page by link to user without permission and show alert (System info is unavailable: You have no access to this system)
@@ -99,21 +99,21 @@ rename button opens dialog; cancel closes without rename; save renames system wh
     Wait Until Elements Are Visible    ${RENAME CANCEL}    ${RENAME SAVE}
     Click Button    ${RENAME CANCEL}
     Wait Until Page Does Not Contain Element    //div[@modal-render='true']
-    Verify In System    Autotests
+    Verify In System    Auto Tests 2
     Click Button    ${RENAME SYSTEM}
     Wait Until Elements Are Visible    ${RENAME CANCEL}    ${RENAME SAVE}    ${RENAME INPUT}
     Clear Element Text    ${RENAME INPUT}
-    Input Text    ${RENAME INPUT}    Autotests Rename
+    Input Text    ${RENAME INPUT}    Auto Tests Rename
     Click Button    ${RENAME SAVE}
     Check For Alert    ${SYSTEM NAME SAVED}
-    Verify In System    Autotests Rename
+    Verify In System    Auto Tests Rename
     Click Button    ${RENAME SYSTEM}
     Wait Until Elements Are Visible    ${RENAME CANCEL}    ${RENAME SAVE}    ${RENAME INPUT}
     Clear Element Text    ${RENAME INPUT}
-    Input Text    ${RENAME INPUT}    Autotests
+    Input Text    ${RENAME INPUT}    Auto Tests 2
     Click Button    ${RENAME SAVE}
     Check For Alert    ${SYSTEM NAME SAVED}
-    Verify In System    Autotests
+    Verify In System    Auto Tests 2
     Close Browser
 
 #This can't really be tested unless I can add to an offline system

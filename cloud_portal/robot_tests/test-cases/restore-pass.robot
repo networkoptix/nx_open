@@ -26,10 +26,10 @@ should not succeed, if email is not registered
 
 restores password
     [tags]    email
-    ${email}    Get Random Email
+    ${email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${email}    ${password}
-    ${link}    Get Activation Link    ${email}
+    ${link}    Get Email Link    ${email}    activate
     Go To    ${link}[1]
     Go To    ${url}/restore_password
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
@@ -47,17 +47,17 @@ should not allow to access /restore_password/sent /restore_password/success by d
 
 should be able to set new password (which is same as old), redirect
     [tags]    email
-    ${email}    Get Random Email
+    ${email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${email}    ${password}
-    ${link}    Get Activation Link    ${email}
+    ${link}    Get Email Link    ${email}    activate
     Go To    ${link}[1]
     Go To    ${url}/restore_password
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
     Click Button    ${RESET PASSWORD BUTTON}
-    ${link}    Get Reset Password Link    ${email}
-    Go To    ${link}[1]
+    ${link}    Get Email Link    ${email}    reset
+    Go To    ${link}
     Wait Until Elements Are Visible    ${RESET PASSWORD INPUT}    ${SAVE PASSWORD}
     Input Text    ${RESET PASSWORD INPUT}    ${password}
     Click Button    ${SAVE PASSWORD}
@@ -66,17 +66,17 @@ should be able to set new password (which is same as old), redirect
 
 should set new password, login with new password
     [tags]    email
-    ${email}    Get Random Email
+    ${email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${email}    ${password}
-    ${link}    Get Activation Link    ${email}
+    ${link}    Get Email Link    ${email}    activate
     Go To    ${link}[1]
     Go To    ${url}/restore_password
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
     Click Button    ${RESET PASSWORD BUTTON}
-    ${link}    Get Reset Password Link    ${email}
-    Go To    ${link}[1]
+    ${link}    Get Email Link    ${email}    reset
+    Go To    ${link}
     Wait Until Elements Are Visible    ${RESET PASSWORD INPUT}    ${SAVE PASSWORD}
     Input Text    ${RESET PASSWORD INPUT}    ${ALT PASSWORD}
     Click Button    ${SAVE PASSWORD}
@@ -88,22 +88,22 @@ should set new password, login with new password
 
 should not allow to use one restore link twice
     [tags]    email
-    ${email}    Get Random Email
+    ${email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${email}    ${password}
-    ${link}    Get Activation Link    ${email}
+    ${link}    Get Email Link    ${email}    activate
     Go To    ${link}[1]
     Go To    ${url}/restore_password
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
     Click Button    ${RESET PASSWORD BUTTON}
-    ${link}    Get Reset Password Link    ${email}
-    Go To    ${link}[1]
+    ${link}    Get Email Link    ${email}    reset
+    Go To    ${link}
     Wait Until Elements Are Visible    ${RESET PASSWORD INPUT}    ${SAVE PASSWORD}
     Input Text    ${RESET PASSWORD INPUT}    ${ALT PASSWORD}
     Click Button    ${SAVE PASSWORD}
     Wait Until Elements Are Visible    ${RESET SUCCESS MESSAGE}    ${RESET SUCCESS LOG IN LINK}
-    Go To    ${link}[1]
+    Go To    ${link}
     Wait Until Elements Are Visible    ${RESET PASSWORD INPUT}    ${SAVE PASSWORD}
     Input Text    ${RESET PASSWORD INPUT}    ${ALT PASSWORD}
     Click Button    ${SAVE PASSWORD}
@@ -112,15 +112,16 @@ should not allow to use one restore link twice
 
 should make not-activated user active by restoring password
     [tags]    email
-    ${email}    Get Random Email
+    ${email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${email}    ${password}
     Go To    ${url}/restore_password
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
     Click Button    ${RESET PASSWORD BUTTON}
-    ${link}    Get Reset Password Link    ${email}
-    Go To    ${link}[1]
+    Sleep    20    #This is to allow the email server to update making sure you get the reset email insetad of the activate email
+    ${link}    Get Email Link    ${email}    reset
+    Go To    ${link}
     Wait Until Elements Are Visible    ${RESET PASSWORD INPUT}    ${SAVE PASSWORD}
     Input Text    ${RESET PASSWORD INPUT}    ${ALT PASSWORD}
     Click Button    ${SAVE PASSWORD}
@@ -132,7 +133,7 @@ should make not-activated user active by restoring password
 
 should allow logged in user visit restore password page
     [tags]    email
-    ${email}    Get Random Email
+    ${email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${email}    ${password}
     Activate    ${email}
@@ -144,7 +145,7 @@ should allow logged in user visit restore password page
 
 should prompt log user out if he visits restore password link from email
     [tags]    email
-    ${email}    Get Random Email
+    ${email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${email}    ${password}
     Activate    ${email}
@@ -154,7 +155,7 @@ should prompt log user out if he visits restore password link from email
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
     Click Button    ${RESET PASSWORD BUTTON}
-    ${link}    Get Reset Password Link    ${email}
+    ${link}    Get Email Link    ${email}    reset
     Go To    ${link}
     Wait Until Elements Are Visible    ${LOGGED IN CONTINUE BUTTON}    ${LOGGED IN LOG OUT BUTTON}
     Click Button    ${LOGGED IN CONTINUE BUTTON}

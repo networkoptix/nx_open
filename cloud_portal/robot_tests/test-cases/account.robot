@@ -50,7 +50,7 @@ Accessing the account page from a direct link while logged out asks for login, o
 
 Check box is checked when registering with it checked
     [tags]    email
-    ${random email}    Get Random Email
+    ${random email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${random email}    ${password}
     Activate    ${random email}
@@ -59,12 +59,12 @@ Check box is checked when registering with it checked
     Go To    ${url}/account
     Verify In Account Page
     ${checked}    Get Element Attribute    ${ACCOUNT SUBSCRIBE CHECKBOX}    checked
-    Should Be True    ${checked}
+    Should Be True    "${checked}"
     Close Browser
 
 Check box is not checked when registering with it not checked
     [tags]    email
-    ${random email}    Get Random Email
+    ${random email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${random email}    ${password}    false
     Activate    ${random email}
@@ -78,7 +78,7 @@ Check box is not checked when registering with it not checked
 
 Unchecking check box and saving maintains that setting
     [tags]    email
-    ${random email}    Get Random Email
+    ${random email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${random email}    ${password}
     Activate    ${random email}
@@ -99,7 +99,7 @@ Unchecking check box and saving maintains that setting
 
 Checking check box and saving maintains that setting
     [tags]    email
-    ${random email}    Get Random Email
+    ${random email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${random email}    ${password}    false
     Activate    ${random email}
@@ -114,7 +114,7 @@ Checking check box and saving maintains that setting
     Open Browser and go to URL    ${url}/account
     Log In    ${random email}    ${password}    button=None
     ${checked}    Get Element Attribute    ${ACCOUNT SUBSCRIBE CHECKBOX}    checked
-    Should Be True    ${checked}
+    Should Be True    "${checked}"
     Close Browser
 
 Changing first name and saving maintains that setting
@@ -122,14 +122,17 @@ Changing first name and saving maintains that setting
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
     Verify In Account Page
+    Clear Element Text    ${ACCOUNT FIRST NAME}
     Input Text    ${ACCOUNT FIRST NAME}    nameChanged
     Click Button    ${ACCOUNT SAVE}
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
     Close Browser
     Open Browser and go to URL    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
+    Validate Log In
     Verify In Account Page
     Wait Until Textfield Contains    ${ACCOUNT FIRST NAME}    nameChanged
+    Clear Element Text    ${ACCOUNT FIRST NAME}
     Input Text    ${ACCOUNT FIRST NAME}    ${TEST FIRST NAME}
     Click Button    ${ACCOUNT SAVE}
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
@@ -147,6 +150,7 @@ Changing last name and saving maintains that setting
     Close Browser
     Open Browser and go to URL    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
+    Validate Log In
     Verify In Account Page
     Wait Until Textfield Contains    ${ACCOUNT LAST NAME}    nameChanged
     Input Text    ${ACCOUNT LAST NAME}    ${TEST FIRST NAME}
@@ -211,17 +215,19 @@ Langauge is changeable on the account page
     Open Browser and go to URL    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     :FOR    ${lang}    ${account}   IN ZIP    ${LANGUAGES LIST}    ${LANGUAGES ACCOUNT TEXT LIST}
-    \  Verify In Account Page
     \  Sleep    1
+    \  Verify In Account Page
     \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Click Button    ${ACCOUNT LANGUAGE DROPDOWN}
     \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Wait Until Element Is Visible    //form[@name='accountForm']//a[@ng-click='changeLanguage(lang.language)']/span[@lang='${lang}']
     \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Click Element    //form[@name='accountForm']//a[@ng-click='changeLanguage(lang.language)']/span[@lang='${lang}']
     \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Click Button    ${ACCOUNT SAVE}
+    \  Sleep    1    #to allow the system to change languages
     \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Wait Until Element Is Visible    //h1['${account}']
-    Sleep    1
+    Wait Until Element Is Visible    ${ACCOUNT LANGUAGE DROPDOWN}
     Click Button    ${ACCOUNT LANGUAGE DROPDOWN}
     Wait Until Element Is Visible    //form[@name='accountForm']//a[@ng-click='changeLanguage(lang.language)']/span[@lang='${LANGUAGE}']
     Click Element    //form[@name='accountForm']//a[@ng-click='changeLanguage(lang.language)']/span[@lang='${LANGUAGE}']
     Click Button    ${ACCOUNT SAVE}
+    Verify In Account Page
     Wait Until Element Is Visible    //h1['${ACCOUNT TEXT}']
     Close Browser

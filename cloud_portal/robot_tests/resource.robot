@@ -1,7 +1,7 @@
 *** Settings ***
 
-Library           Selenium2Library    screenshot_root_directory=\Screenshots    #run_on_failure=Failure Tasks
-Library           ImapLibrary
+Library           SeleniumLibrary    screenshot_root_directory=\Screenshots    run_on_failure=Failure Tasks
+Library           NoptixImapLibrary/
 Library           String
 Library           NoptixLibrary/
 Resource          variables.robot
@@ -16,7 +16,7 @@ Open Browser and go to URL
     Go To    ${url}
 
 Check Language
-    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}/span[2]
+    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}
     Register Keyword To Run On Failure    NONE
     ${status}    ${value}=    Run Keyword And Ignore Error    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}/span[@lang='${LANGUAGE}']    2
     Register Keyword To Run On Failure    Failure Tasks
@@ -71,22 +71,26 @@ Validate Register Success
 
 Validate Register Email Received
     [arguments]    ${recipient}
-    Open Mailbox    host=imap.gmail.com    password=qweasd!@#    port=993    user=noptixqa@gmail.com    is_secure=True
-    ${email}    Wait For Email    recipient=${recipient}    timeout=120
+    Open Mailbox    host=${BASE HOST}    password=${BASE EMAIL PASSWORD}    port=${BASE PORT}    user=${BASE EMAIL}    is_secure=True
+    ${email}    Wait For Email    recipient=${recipient}    timeout=120    status=UNSEEN
+    Check Email Subject    ${email}    ${ACTIVATE YOUR ACCOUNT EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
     Should Not Be Equal    ${email}    ${EMPTY}
     Close Mailbox
 
-Get Activation Link
-    [arguments]    ${recipient}
-    Open Mailbox    host=imap.gmail.com    password=qweasd!@#    port=993    user=noptixqa@gmail.com    is_secure=True
-    ${email}    Wait For Email    recipient=${recipient}    timeout=120
+Get Email Link
+    [arguments]    ${recipient}    ${link type}
+    Open Mailbox    host=${BASE HOST}    password=${BASE EMAIL PASSWORD}    port=${BASE PORT}    user=${BASE EMAIL}    is_secure=True
+    ${email}    Wait For Email    recipient=${recipient}    timeout=120    status=UNSEEN
+    Run Keyword If    "${link type}"=="activate"    Check Email Subject    ${email}    ${ACTIVATE YOUR ACCOUNT EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
+    Run Keyword If    "${link type}"=="reset"    Check Email Subject    ${email}    ${RESET PASSWORD EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
     ${links}    Get Links From Email    ${email}
+    Mark All Emails As Read
     Close Mailbox
-    Return From Keyword    @{links}[1]
+    Return From Keyword    ${links}
 
 Activate
     [arguments]    ${email}
-    ${link}    Get Activation Link    ${email}
+    ${link}    Get Email Link    ${email}    activate
     Go To    ${link}
     Wait Until Element Is Visible    ${ACTIVATION SUCCESS}
     Element Should Be Visible    ${ACTIVATION SUCCESS}
@@ -132,9 +136,10 @@ Check For Alert
 Check For Alert Dismissable
     [arguments]    ${alert text}
     Wait Until Elements Are Visible    ${ALERT}    ${ALERT CLOSE}
-    Element Should Be Visible    ${ALERT}
     Element Text Should Be    ${ALERT}    ${alert text}
     Click Element    ${ALERT CLOSE}
+    Wait Until Page Does Not Contain Element    ${ALERT}
+
 
 Verify In System
     [arguments]    ${system name}
@@ -172,10 +177,3 @@ Register Form Validation
     Input Text    ${REGISTER PASSWORD INPUT}    ${password}
     click button    ${CREATE ACCOUNT BUTTON}
 
-Get Reset Password Link
-    [arguments]    ${recipient}
-    Open Mailbox    host=imap.gmail.com    password=qweasd!@#    port=993    user=noptixqa@gmail.com    is_secure=True
-    ${email}    Wait For Email    recipient=${recipient}    timeout=120    subject=${RESET PASSWORD EMAIL SUBJECT}
-    ${links}    Get Links From Email    ${email}
-    Close Mailbox
-    Return From Keyword    @{links}[1]

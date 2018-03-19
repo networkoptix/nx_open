@@ -5,7 +5,7 @@
   "dialogs": {
     "okButton": "승인",
     "cancelButton": "취소",
-    "loginTitle": "{{PRODUCT_NAME}}에 로그인",
+    "loginTitle": "{{PRODUCT_NAME}} 에 로그인",
     "loginButton": "로그인",
     "logoutAuthorisedTitle": "이미 로그인 되어 있습니다",
     "logoutAuthorisedContinueButton": "계속",
@@ -127,9 +127,9 @@
     "alreadyExists": "이 계정이 이미 존재합니다.",
     "unknownError": "예기치 않은 오류가 발생했습니다.",
     "accountAlreadyActivated": "이 계정은 이미 활성화되었습니다.",
-    "emailNotFound": "계정이 존재하지 않습니다.",
+    "emailNotFound": "Account does not exist.",
     "EmailAlreadyExists": "이 전자 메일은 이미 등록되었습니다.",
-    "oldPasswordMistmatch": "현재 패스워드가 잘못되었습니다",
+    "oldPasswordMistmatch": "현재 패스워드가 잘못되었습니다.",
     "passwordMismatch": "패스워드가 틀립니다.",
     "cantEditYourself": "자신의 사용 권한 변경은 허용 되지 않습니다.",
     "cantEditAdmin": "이 사용자는 관리자 권한이 있습니다.",
@@ -138,10 +138,10 @@
     "thisSystem": "시스템"
   },
   "passwordRequirements": {
-    "minLengthMessage": "패스워드는 8 자 이상이어야합니다.",
+    "minLengthMessage": "비밀번호는 최소 8자 이상 포함되어야 합니다.",
     "requiredMessage": "라틴 문자, 숫자 및 키보드 기호 만 사용하고 앞뒤 공백은 피하십시오.",
     "weakMessage": "숫자, 대 / 소문자 및 특수 문자를 사용하여 패스워드를 더 강하게 만듭니다.",
-    "strongMessage": "강력한 패스워드!",
+    "strongMessage": "강력한 암호!",
     "commonMessage": "현재 암호는 가능 많이 사용되는 암호입니다."
   },
   "sharing": {
@@ -157,12 +157,12 @@
     "mySystemSearch": "IMeMyMine",
     "unavailable": "시스템에 연결할 수 없습니다.",
     "offline": "시스템이 오프라인 상태입니다.",
-    "openClient": "{{VMS_NAME}}에서 열기",
+    "openClient": "{{VMS_NAME}} 에서 열기",
     "openClientNoSystem": "Open {{VMS_NAME}}",
     "confirmRenameTitle": "시스템 이름",
     "confirmRenameAction": "저장",
     "successRename": "시스템 이름 저장",
-    "confirmDisconnectTitle": "{{PRODUCT_NAME}}에서 시스템 연결을 끊으시겠습니까?",
+    "confirmDisconnectTitle": "{{PRODUCT_NAME}} 에서 시스템 연결을 끊으시겠습니까?",
     "confirmDisconnectAction": "연결 끊기",
     "confirmUnshareFromMe": "이 시스템을 당신의 계정과의 연결을 해제하려고합니다. 더 이상이 시스템에 액세스 할 수 없습니다. 확실합니까?",
     "confirmUnshareFromMeTitle": "시스템 연결을 끊으시겠습니까?",
@@ -170,9 +170,9 @@
     "confirmUnshare": "이 사용자는 시스템에 액세스 할 수 없게 됩니다. 확실합니까?",
     "confirmUnshareTitle": "사용자 삭제?",
     "confirmUnshareAction": "삭제",
-    "successDisconnected": "시스템이 성공적으로 {{PRODUCT_NAME}}에서 분리 되었습니다.",
-    "successDeleted": "시스템 {{systemName}}이 (가) 귀하의 계정에서 성공적으로 삭제되었습니다.",
-    "permissionsRemoved": "권한이 {{email}}에서 제거 되었습니다."
+    "successDisconnected": "시스템이 성공적으로 {{PRODUCT_NAME}} 에서 분리 되었습니다.",
+    "successDeleted": "시스템 {{systemName}} 이 (가) 귀하의 계정에서 성공적으로 삭제되었습니다.",
+    "permissionsRemoved": "권한이 {{email}} 에서 제거 되었습니다."
   },
   "account": {
     "accountSavedSuccess": "계정이 성공적으로 저장되었습니다.",
@@ -183,7 +183,7 @@
     "saveChanges": "저장"
   },
   "downloads": {
-    "noClientDetectedTitle": "시스템이 성공적으로 {{PRODUCT_NAME}}에서 분리 되었습니다",
+    "noClientDetectedTitle": "시스템이 성공적으로 {{VMS_NAME}} 에서 분리 되었습니다",
     "action": "{{VMS_NAME}} 다운로드",
     "mobile": {
       "ios": {

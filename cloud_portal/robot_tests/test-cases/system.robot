@@ -38,7 +38,7 @@ should confirm, if owner deletes system (You are going to disconnect your system
 
 should confirm, if not owner deletes system (You will loose access to this system)
     Open Browser and go to URL    ${url}
-    Log In    ${EMAIL NOT OWNER}    ${password}
+    Log In To Auto Tests System    ${EMAIL NOT OWNER}
     Validate Log In
     Wait Until Element Is Visible    ${DISCONNECT FROM MY ACCOUNT}
     Click Button    ${DISCONNECT FROM MY ACCOUNT}
@@ -47,7 +47,7 @@ should confirm, if not owner deletes system (You will loose access to this syste
 
 Cancel should cancel disconnection and disconnect should remove it when not owner
     Open Browser and go to URL    ${url}
-    Log In    ${EMAIL NOT OWNER}    ${password}
+    Log In To Auto Tests System    ${EMAIL NOT OWNER}
     Validate Log In
     Wait Until Element Is Visible    ${DISCONNECT FROM MY ACCOUNT}
     Click Button    ${DISCONNECT FROM MY ACCOUNT}
@@ -129,6 +129,7 @@ contains user emails and names
     Log in to Auto Tests System    ${EMAIL OWNER}
     Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL ADMIN}')]
     Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${ADMIN FIRST NAME} ${ADMIN LAST NAME}')]
+    Close Browser
 
 rename button opens dialog; cancel closes without rename; save renames system
     Open Browser and go to URL    ${url}
@@ -187,7 +188,7 @@ should open System page by link not authorized user, and show alert if logs in a
 should display same user data as user provided during registration (stress to cyrillic)
     [tags]    email
 #create user
-    ${email}    Get Random Email
+    ${email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    ${CYRILLIC TEXT}    ${CYRILLIC TEXT}    ${email}    ${password}
     Activate    ${email}
@@ -218,7 +219,7 @@ should display same user data as user provided during registration (stress to cy
 should display same user data as showed in user account (stress to cyrillic)
     [tags]    not-ready
 #create user
-    ${email}    Get Random Email
+    ${email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${email}    ${password}
     Activate    ${email}

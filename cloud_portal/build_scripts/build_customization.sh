@@ -25,17 +25,16 @@ dir=../customizations/$CUSTOMIZATION/
     echo "------------------------------"
     echo "Building front_end"
 
-    echo "Copy custom styles"
-    mkdir -p ../front_end/app/styles/custom
-    cp -rf $dir/front_end/styles/* ../front_end/app/styles/custom
-
     echo "Build statics"
     pushd ../front_end
-    grunt setbranding:$CUSTOMIZATION
-    grunt build
-    popd
+        npm run setBranding $CUSTOMIZATION
+        npm run build
 
-    cp -rf $dir/front_end/styles/* ../front_end/app/styles/custom
+        # Save the repository info.
+        echo "Create version.txt"
+        hg log -r . --repository "$DIR/../.." > dist/version.txt
+        cat dist/version.txt
+    popd
 
     echo "Move fonts"
     rm -rf $TARGET_DIR/common || true
@@ -44,12 +43,6 @@ dir=../customizations/$CUSTOMIZATION/
 
     echo "Move front_end to destination"
     mv ../front_end/dist $TARGET_DIR/$CUSTOMIZATION/source/static
-
-    echo "Overwrite images"
-    cp -rf $dir/front_end/images/* $TARGET_DIR/$CUSTOMIZATION/source/static/images
-
-    echo "Overwrite static"
-    cp -rf $dir/front_end/views/* $TARGET_DIR/$CUSTOMIZATION/source/static/views || true
 
     echo "Building front_end finished"
 

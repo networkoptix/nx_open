@@ -7,7 +7,6 @@ from django.conf import settings
 import json
 import os
 from util.config import get_config
-from util.helpers import get_language_for_email
 
 
 titles_cache = {}
@@ -17,10 +16,7 @@ logos_cache = {}
 modified_file_time_cache = {}
 
 
-def send(email, msg_type, message, customization):
-    custom_config = get_custom_config(customization)
-    lang = get_language_for_email(email, custom_config['languages'])
-
+def send(email, msg_type, message, lang, customization, custom_config):
     templates_root = os.path.join(
         settings.STATIC_LOCATION, customization, "templates")
     templates_location = os.path.join(templates_root, "lang_" + lang)
