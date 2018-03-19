@@ -224,7 +224,7 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddrInternal(
         rt = qnResTypePool->getResourceTypeId(manufacture(), kIsdDefaultResType);
         if (rt.isNull())
         {
-            NX_DEBUG(false, lm("No resource type for %1").arg(name));
+            NX_ASSERT(false, lm("No resource type for %1").arg(name));
             return QList<QnResourcePtr>();
         }
     }
@@ -297,7 +297,7 @@ QnResourcePtr QnPlISDResourceSearcher::processMdnsResponse(
     const QString& mdnsRemoteAddress,
     const QnResourceList& alreadyFoundResources)
 {
-    QString name(lit("ISDcam"));
+    QString name(kIsdDefaultResType);
     if (!responseData.contains("ISD"))
     {
         // check for new ISD models. it has been rebranded
@@ -376,10 +376,10 @@ QnResourcePtr QnPlISDResourceSearcher::processMdnsResponse(
     QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), name);
     if (rt.isNull())
     {
-        rt = qnResTypePool->getResourceTypeId(manufacture(), lit("ISDcam"));
+        rt = qnResTypePool->getResourceTypeId(manufacture(), kIsdDefaultResType);
         if (rt.isNull())
         {
-            NX_DEBUG(false, lm("No resource type for %1").arg(name));
+            NX_ASSERT(false, lm("No resource type for %1").arg(name));
             return QnResourcePtr();
         }
     }
@@ -516,7 +516,7 @@ void QnPlISDResourceSearcher::createResource(
         rt = qnResTypePool->getResourceTypeId(manufacture(), kIsdDefaultResType);
         if (rt.isNull())
         {
-            NX_DEBUG(false, lm("No resource type for %1").arg(devInfo.modelName));
+            NX_ASSERT(false, lm("No resource type for %1").arg(devInfo.modelName));
             return;
         }
     }
