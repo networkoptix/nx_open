@@ -147,6 +147,32 @@ Item
             else
                 return angle
         }
+
+        function rotateTo(x, y)
+        {
+            // Point on hemisphere in camera coordinates.
+            var pointOnSphere = fisheyeShader.unprojectAndTransform(x, y)
+            console.log("absolute:", pointOnSphere, pointOnSphere.length())
+
+            switch (viewMode)
+            {
+                case MediaDewarpingParams.VerticalUp:
+                    // implement me!
+                case MediaDewarpingParams.VerticalDown:
+                    // implement me!
+                default:
+                {
+                    var rXZ = Qt.vector2d(pointOnSphere.x, pointOnSphere.z).length()
+                    var alpha = -Utils3D.degrees(Math.asin(pointOnSphere.y))
+                    var beta = Utils3D.degrees(Math.acos(-pointOnSphere.z / rXZ))
+                    if (pointOnSphere.x > 0)
+                        beta = -beta
+
+                    console.log("alpha:", alpha, "beta:", beta, "\n")
+                    unboundedRotation = Qt.vector2d(alpha, beta)
+                }
+            }
+        }
     }
 
     PinchArea
@@ -179,6 +205,8 @@ Item
             anchors.fill: parent
 
             drag.threshold: 10
+
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
 
             property bool draggingStarted
             property real pressX
@@ -215,6 +243,9 @@ Item
             {
                 pressX = mouse.x
                 pressY = mouse.y
+
+                if (mouse.button == Qt.RightButton)
+                    interactor.rotateTo(pressX, pressY)
             }
 
             onReleased:

@@ -148,6 +148,14 @@ ShaderEffect
 
         void main()
         {
+            // Draw debug cross.
+            if (projectionCoords.x > -0.001 && projectionCoords.x < 0.001
+                || projectionCoords.y > -0.001 && projectionCoords.y < 0.001)
+            {
+                gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+                return;
+            }
+
             vec3 pointOnSphere = unproject(projectionCoords);
             vec3 rotatedPointOnSphere = (viewRotationMatrix * vec4(pointOnSphere, 1.0)).xyz;
 
@@ -229,5 +237,41 @@ ShaderEffect
                     }"
             }
         }
+    }
+
+    function unproject(x, y)
+    {
+        var projectionCoords = Qt.vector2d(x / width, y / height)
+            .minus(viewCenter).times(projectionCoordsScale)
+
+        switch (viewProjectionType)
+        {
+            case Utils3D.SphereProjectionTypes.Equidistant:
+            {
+                var r = Math.min(projectionCoords.length(), 2.0)
+                var theta = r * Math.PI / 2.0
+                var xy = projectionCoords.times(Math.sin(theta) / r)
+                return Qt.vector3d(xy.x, xy.y, -Math.cos(theta))
+            }
+
+            case Utils3D.SphereProjectionTypes.Equisolid:
+            {
+                var r2 = Math.min(projectionCoords.dotProduct(projectionCoords), 2.0)
+                var xy = projectionCoords.times(Math.sqrt(2.0 - r2))
+                return Qt.vector3d(xy.x, xy.y, r2 - 1.0)
+            }
+
+            default: // Utils3D.SphereProjectionTypes.Stereographic
+            {
+                var r2 = projectionCoords.dotProduct(projectionCoords)
+                var xy = projectionCoords.times(2.0)
+                return Qt.vector3d(xy.x, xy.y, r2 - 1.0).times(1.0 / (r2 + 1.0))
+            }
+        }
+    }
+
+    function unprojectAndTransform(x, y)
+    {
+        return viewRotationMatrix.times(unproject(x, y))
     }
 }
