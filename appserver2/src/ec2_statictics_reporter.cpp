@@ -117,8 +117,9 @@ namespace ec2
 
         for (auto& u : users) outData->users.push_back(std::move(u));
 
-        #undef dbManager_queryOrReturn
-        #undef dbManager_queryOrReturn_uuid
+        errCode = m_ec2Connection->getVideowallManager(Qn::kSystemAccess)->getVideowallsSync(&outData->videowalls);
+        if (errCode != ErrorCode::ok)
+            return errCode;
 
         outData->systemId = helpers::currentSystemLocalId(m_ec2Connection->commonModule());
         return ErrorCode::ok;

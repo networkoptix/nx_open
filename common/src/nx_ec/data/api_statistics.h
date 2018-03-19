@@ -12,6 +12,7 @@
 #include "api_business_rule_data.h"
 #include "api_layout_data.h"
 #include "api_user_data.h"
+#include "api_videowall_data.h"
 
 #include <nx/fusion/model_functions_fwd.h>
 
@@ -115,9 +116,10 @@ namespace ec2 {
         std::vector<ApiMediaServerDataStatistics> mediaservers;
         std::vector<ApiLayoutData> layouts;
         std::vector<ApiUserDataStatistics> users;
+        std::vector<ApiVideowallData> videowalls;
     };
 #define ApiSystemStatistics_Fields (systemId) \
-    (mediaservers)(cameras)(licenses)(businessRules)(layouts)(users) \
+    (mediaservers)(cameras)(licenses)(businessRules)(layouts)(users)(videowalls) \
     (reportInfo)
 
     struct ApiStatisticsServerInfo
