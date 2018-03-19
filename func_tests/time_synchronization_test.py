@@ -45,8 +45,8 @@ def get_internet_time(address='time.rfc868server.com', port=37):
 @pytest.fixture()
 def system(two_linux_vms, server_factory):
     servers = {}
-    for alias in {'first', 'second'}:
-        server = server_factory.create(alias, vm=two_linux_vms[alias])
+    for vm in two_linux_vms:
+        server = server_factory.create(vm.alias, vm=vm)
         if server.service.is_running():
             server.stop()
         # Reset server without internet access.
@@ -55,7 +55,7 @@ def system(two_linux_vms, server_factory):
         server.installation.change_config(ecInternetSyncTimePeriodSec=3, ecMaxInternetTimeSyncRetryPeriodSec=3)
         server.start()
         server.setup_local_system()
-        servers[alias] = server
+        servers[vm.alias] = server
     merge_system(servers, {'first': {'second': None}})
     first_server_response = servers['first'].rest_api.ec2.getCurrentTime.GET()
     if first_server_response['isPrimaryTimeServer']:
