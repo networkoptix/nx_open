@@ -550,7 +550,7 @@
     </message>
     <message>
       <source>Server with matching Hardware Id not found</source>
-      <translation>Aucun Serveur avec ID matériel correspondant trouvé</translation>
+      <translation>Aucun Serveur avec Id Matériel correspondant trouvé</translation>
     </message>
   </context>
   <context>
@@ -673,7 +673,7 @@
     </message>
     <message>
       <source>Hardware Id: %1</source>
-      <translation>ID Matériel: %1</translation>
+      <translation>Id Matériel: %1</translation>
     </message>
     <message>
       <source>Time License</source>
