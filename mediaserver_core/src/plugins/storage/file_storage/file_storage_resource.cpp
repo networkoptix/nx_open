@@ -337,7 +337,7 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdateInternal()
     if (!sysPath.isNull())
         m_isSystem = getDevicePath(url).startsWith(sysPath);
     else
-	    m_isSystem = false;
+        m_isSystem = false;
 
     m_valid = result == Qn::StorageInit_Ok;
 
@@ -550,7 +550,7 @@ static int callMount(const QUrl& url, const QString localPath)
     if (!domain.isEmpty())
         domains.append(domain);
 
-    auto prepateCommand =
+    auto prepareCommand =
         [&url, localPath](const QString& userName, const QString& password,
             const QString& domain)
     {
@@ -570,7 +570,7 @@ static int callMount(const QUrl& url, const QString localPath)
     {
         for (const auto& passwordString: {password, lit("123")})
         {
-            const auto command = prepateCommand(user, passwordString, domainString);
+            const auto command = prepareCommand(user, passwordString, domainString);
             mountRetCode = callMountImpl(command);
             NX_VERBOSE(typeid(QnFileStorageResource),
                 lm("Call mount command: '%1'. Result: %2").args(command, mountRetCode));
