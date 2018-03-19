@@ -57,6 +57,7 @@ class ServerFactory(object):
         server.installation.reset_config(
             logLevel=DEFAULT_SERVER_LOG_LEVEL,
             tranLogLevel=DEFAULT_SERVER_LOG_LEVEL,
+            checkForUpdateUrl='http://127.0.0.1:8080',  # TODO: Use fake server responding with small updates.
             **(config.config_file_params or {}))
         server.installation.put_key_and_cert(self._ca.generate_key_and_cert())
         if not config.leave_initial_cloud_host:
