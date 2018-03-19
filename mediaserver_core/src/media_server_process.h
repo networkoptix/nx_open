@@ -71,13 +71,6 @@ public:
     QString crashDirectory;
 
     CmdLineArguments():
-        logLevel(
-            #if defined(_DEBUG)
-                lit("DEBUG")
-            #else
-                lit("INFO")
-            #endif
-        ),
         cleanupDb(false),
         moveHandlingCameras(false),
         showVersion(false),
