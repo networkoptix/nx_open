@@ -138,9 +138,6 @@ void QnAbstractAudioTransmitter::subscribe(
 
     m_providers.emplace(priority, dataProvider);
 
-    if (m_providers.begin()->second == dataProvider)
-        m_dataQueue.clear();
-
     dataProvider->addDataProcessor(this);
     if (auto owner = dataProvider->getOwner())
         owner->inUse(this);

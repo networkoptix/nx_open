@@ -420,10 +420,15 @@ bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractA
 
     nx::utils::Url url(action->getParams().url);
     if ((actionParameters.requestType == nx::network::http::Method::get) ||
+        (actionParameters.requestType == nx::network::http::Method::delete_) ||
         (actionParameters.requestType.isEmpty() && actionParameters.text.isEmpty()))
     {
-        auto callback = [action](SystemError::ErrorCode osErrorCode, int statusCode,
-            nx::network::http::BufferType messageBody, nx::network::http::HttpHeaders /*httpResponseHeaders*/)
+        auto callback = [action](
+            SystemError::ErrorCode osErrorCode,
+            int statusCode,
+            nx::network::http::StringType, /*content type*/
+            nx::network::http::BufferType messageBody,
+            nx::network::http::HttpHeaders /*httpResponseHeaders*/)
         {
             if (osErrorCode != SystemError::noError ||
                 statusCode != nx::network::http::StatusCode::ok)
@@ -436,11 +441,13 @@ bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractA
             }
         };
 
-        nx::network::http::downloadFileAsync(
+        nx::network::http::downloadFileAsyncEx(
             url,
             callback,
             nx::network::http::HttpHeaders(),
-            actionParameters.authType);
+            actionParameters.authType,
+            nx::network::http::AsyncHttpClient::Timeouts(),
+            actionParameters.requestType);
         return true;
     }
     else
@@ -466,7 +473,9 @@ bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractA
             contentType,
             nx::network::http::HttpHeaders(),
             callback,
-            actionParameters.authType);
+            actionParameters.authType,
+            QString(), QString(), //< login/password.
+            actionParameters.requestType);
         return true;
     }
 }

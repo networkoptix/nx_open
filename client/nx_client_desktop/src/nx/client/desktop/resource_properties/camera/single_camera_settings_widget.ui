@@ -229,18 +229,7 @@
              <widget class="QWidget" name="wearableInfoPage">
               <layout class="QVBoxLayout" name="verticalLayout_12">
                <item>
-                <widget class="QLabel" name="wearableInfoLabel">
-                 <property name="text">
-                  <string>Uploaded archive can be deleted automatically, if there is no free space on a server storage.
-The oldest footage among all cameras on the server will be deleted first.</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-                 </property>
-                 <property name="wordWrap">
-                  <bool>true</bool>
-                 </property>
-                </widget>
+                <widget class="QnWordWrappedLabel" name="wearableInfoLabel" native="true"/>
                </item>
               </layout>
              </widget>
@@ -771,6 +760,12 @@ The oldest footage among all cameras on the server will be deleted first.</strin
    <class>QnWearableMotionWidget</class>
    <extends>QWidget</extends>
    <header location="global">ui/widgets/properties/wearable_motion_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnWordWrappedLabel</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/word_wrapped_label.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

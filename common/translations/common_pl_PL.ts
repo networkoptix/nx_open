@@ -25,7 +25,7 @@
     </message>
     <message>
       <source>System name is not configured yet.</source>
-      <translation>Nazwa systemu nie jest jeszcze skonfigurowana.</translation>
+      <translation>Nazwa Systemu nie jest jeszcze skonfigurowana.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
@@ -33,11 +33,11 @@
     </message>
     <message>
       <source>You are about to merge Systems with Starter licenses.</source>
-      <translation>Zamierzasz złączyć systemy w wersjach licencyjnych Starter.</translation>
+      <translation>Zamierzasz złączyć Systemy w wersjach licencyjnych Starter.</translation>
     </message>
     <message>
       <source>Only one Starter license is allowed per System, so the second license will be deactivated.</source>
-      <translation>Tylko jedna licencja Starter jest dozwolona dla każdego systemu, więc druga licencja zostanie zdezaktywowana.</translation>
+      <translation>Tylko jedna licencja Starter jest dozwolona dla każdego Systemu, więc druga licencja zostanie zdezaktywowana.</translation>
     </message>
     <message>
       <source>Merge anyway?</source>
@@ -45,37 +45,37 @@
     </message>
     <message>
       <source>System was not found.</source>
-      <translation>Nie znaleziono systemu.</translation>
+      <translation>Nie znaleziono Systemu.</translation>
     </message>
     <message>
       <source>The discovered System %1 has an incompatible version %2.</source>
       <comment>%1 is name of System, %2 is version information</comment>
-      <translation>Wykryty system %1 ma niezgodną wersję %2.</translation>
+      <translation>Wykryty System %1 ma niezgodną wersję %2.</translation>
     </message>
     <message>
       <source>Cannot connect to the other System because current System is already connected to %1.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Nie można połączyć bieżącego systemu z innym, ponieważ jest już połączony z %1.</translation>
+      <translation>Nie można połączyć bieżącego Systemu z innym, ponieważ jest już połączony z %1.</translation>
     </message>
     <message>
       <source>The discovered System %1 is in safe mode.</source>
       <comment>%1 is name of System</comment>
-      <translation>Wykryty system %1 działa w trybie awaryjnym.</translation>
+      <translation>Wykryty System %1 działa w trybie awaryjnym.</translation>
     </message>
     <message>
       <source>Could not configure the remote System %1.</source>
       <comment>%1 is name of System</comment>
-      <translation>Nie można skonfigurować zdalnego systemu %1.</translation>
+      <translation>Nie można skonfigurować zdalnego Systemu %1.</translation>
     </message>
     <message>
       <source>Both Systems are connected to %1. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Oba systemy są połączone z %1. Operacja złączenia nie jest dozwolona.</translation>
+      <translation>Oba Systemy są połączone z %1. Operacja złączenia nie jest dozwolona.</translation>
     </message>
     <message>
       <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Te systemy są zbudowane z różnych adresów URL %1. Operacja złączenia nie jest dozwolona.</translation>
+      <translation>Te Systemy są zbudowane z różnych adresów URL %1. Operacja złączenia nie jest dozwolona.</translation>
     </message>
     <message>
       <source>New System</source>
@@ -88,7 +88,7 @@
     </message>
     <message>
       <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <translation>System w chmurze można złączyć tylko z systemem spoza chmury. Nazwa systemu i hasło zostaną pobrane z systemu w chmurze.</translation>
+      <translation>System w Chmurze można złączyć tylko z Systemem spoza Chmury. Nazwa Systemu i hasło zostaną pobrane z Systemu w Chmurze.</translation>
     </message>
   </context>
   <context>
@@ -502,7 +502,7 @@
     <name>QnLicenseUsageHelper</name>
     <message numerus="yes">
       <source>%n %2 are used out of %1.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%2: %n jest wykorzystywana na %1.</numerusform>
         <numerusform>%2: %n są wykorzystywane na %1.</numerusform>
         <numerusform>%2: %n jest wykorzystywanych na %1.</numerusform>
@@ -511,7 +511,7 @@
     </message>
     <message numerus="yes">
       <source>%n %2 will be used out of %1.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%2: %n zostanie wykorzystana na %1.</numerusform>
         <numerusform>%2: %n zostaną wykorzystane na %1.</numerusform>
         <numerusform>%2: %n zostanie wykorzystanych na %1.</numerusform>
@@ -520,7 +520,7 @@
     </message>
     <message numerus="yes">
       <source>Activate %n more %1.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1: aktywuj jeszcze %n.</numerusform>
         <numerusform>%1: aktywuj jeszcze %n.</numerusform>
         <numerusform>%1: aktywuj jeszcze %n.</numerusform>

@@ -2484,8 +2484,8 @@ to view more bookmarks</source>
       <translation>Servidor</translation>
     </message>
     <message>
-      <source>Logical Id</source>
-      <translation type="unfinished">Logical Id</translation>
+      <source>Id</source>
+      <translation>Id</translation>
     </message>
   </context>
   <context>
@@ -5100,11 +5100,11 @@ a %1</translation>
     </message>
     <message>
       <source>%1 TB</source>
-      <translation>%1 Tb</translation>
+      <translation>%1 TB</translation>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation>%1 Gb</translation>
+      <translation>%1 GB</translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n devices</source>
@@ -5917,6 +5917,10 @@ a %1</translation>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
       <translation>&quot;Movimiento + Baja - Res&quot; opción de grabación no se puede establecer.</translation>
     </message>
+    <message>
+      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
+      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</translation>
+    </message>
   </context>
   <context>
     <name>QnSmtpAdvancedSettingsWidget</name>
@@ -6068,10 +6072,6 @@ a %1</translation>
   <context>
     <name>QnStatusOverlayController</name>
     <message>
-      <source>NOT ENOUGH LICENCES</source>
-      <translation>NO HAY LICENCIAS SUFICIENTES</translation>
-    </message>
-    <message>
       <source>NO DATA</source>
       <translation>NO HAY DATOS</translation>
     </message>
@@ -6142,6 +6142,10 @@ a %1</translation>
     <message>
       <source>UNSUPPORTED FIRMWARE VERSION</source>
       <translation>VERSIÓN DE FIRMWARE NO COMPATIBLE</translation>
+    </message>
+    <message>
+      <source>NOT ENOUGH LICENSES</source>
+      <translation type="unfinished">NOT ENOUGH LICENSES</translation>
     </message>
   </context>
   <context>
@@ -6335,7 +6339,7 @@ a %1</translation>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation>%1 Gb</translation>
+      <translation>%1 GB</translation>
     </message>
     <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
@@ -7166,10 +7170,6 @@ a %1</translation>
   <context>
     <name>QnWearableProgressWidget</name>
     <message>
-      <source>Uploading %1... %2	%p%</source>
-      <translation>Cargando %1... %2%p%</translation>
-    </message>
-    <message>
       <source>Stop uploading?</source>
       <translation>Detener la subida?</translation>
     </message>
@@ -7178,12 +7178,16 @@ a %1</translation>
       <translation>Se mantendrán los archivos ya subidos.</translation>
     </message>
     <message>
-      <source>Finalizing %1... %2	%p%</source>
-      <translation>Finalizando %1... %2%p%</translation>
-    </message>
-    <message>
       <source>(%1 of %2)</source>
       <translation>(%1 de %2)</translation>
+    </message>
+    <message>
+      <source>Uploading %1...</source>
+      <translation type="unfinished">Uploading %1...</translation>
+    </message>
+    <message>
+      <source>Finalizing %1...</source>
+      <translation type="unfinished">Finalizing %1...</translation>
     </message>
   </context>
   <context>
@@ -7286,6 +7290,10 @@ a %1</translation>
     <message>
       <source>Could not connect to server. Video Wall will be closed.</source>
       <translation>No se pudo conectar al servidor. La pared de vídeo se cerrará.</translation>
+    </message>
+    <message>
+      <source>Video Wall is removed on the server and will be closed.</source>
+      <translation type="unfinished">Video Wall is removed on the server and will be closed.</translation>
     </message>
   </context>
   <context>

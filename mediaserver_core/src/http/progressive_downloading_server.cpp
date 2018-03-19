@@ -689,14 +689,13 @@ void QnProgressiveDownloadingConsumer::run()
             if (commonModule()->resourceAccessManager()->hasPermission(
                 d->accessRights, resource, Qn::Permission::ViewLivePermission))
             {
-                sendMediaEventErrorResponse(Qn::MediaStreamEvent::ForbiddenBecauseNoLicenseError);
+                sendMediaEventErrorResponse(Qn::MediaStreamEvent::ForbiddenWithNoLicense);
                 return;
             }
 
             sendUnauthorizedResponse(nx::network::http::StatusCode::forbidden, STATIC_FORBIDDEN_HTML);
             return;
         }
-
 
         QnProgressiveDownloadingDataConsumer dataConsumer(
             this,

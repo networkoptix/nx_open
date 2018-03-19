@@ -61,6 +61,7 @@ if(NOT targetDevice MATCHES "android|ios|edge1")
     nx_enable_camera_vendor_old(flir)
     nx_enable_camera_vendor_old(advantech)
     nx_enable_camera_vendor_old(wearable)
+    nx_enable_camera_vendor_old(desktop_camera)
 
     if(enable_hanwha)
         nx_enable_camera_vendor(hanwha)
@@ -76,7 +77,6 @@ endif()
 
 if(WINDOWS)
     nx_enable_camera_vendor_old(vmax)
-    nx_enable_camera_vendor_old(desktop_camera)
 endif()
 
 #--------------------------------------------------------------------------------------------------

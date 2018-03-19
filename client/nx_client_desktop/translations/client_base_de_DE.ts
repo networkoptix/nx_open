@@ -2229,11 +2229,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>I/O Module Id</source>
-      <translation>I/O-Modul-ID</translation>
+      <translation>I/O-Modul-Id</translation>
     </message>
     <message>
       <source>Camera Id</source>
-      <translation>Kamera-ID</translation>
+      <translation>Kamera-Id</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -2360,8 +2360,8 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>This Id is already used on the following %n cameras: %1</source>
-      <translation>
-        <numerusform>Diese ID wird bereits für die folgende Kamera verwendet: %1</numerusform>
+      <translation type="unfinished">
+        <numerusform>Diese Id wird bereits für die folgende %n Kamera verwendet: %1</numerusform>
         <numerusform>Diese ID wird bereits für folgende %n Kameras verwendet: %1</numerusform>
       </translation>
     </message>
@@ -2484,8 +2484,8 @@ to view more bookmarks</source>
       <translation>Server</translation>
     </message>
     <message>
-      <source>Logical Id</source>
-      <translation>Logical-ID</translation>
+      <source>Id</source>
+      <translation>ID</translation>
     </message>
   </context>
   <context>
@@ -3716,7 +3716,7 @@ to %1</source>
     </message>
     <message>
       <source>Id</source>
-      <translation>ID</translation>
+      <translation>Id</translation>
     </message>
   </context>
   <context>
@@ -5915,6 +5915,10 @@ to %1</source>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
       <translation>Aufnahmeoption &quot;Bewegung + Low - Res&quot; kann nicht festgelegt werden.</translation>
     </message>
+    <message>
+      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
+      <translation>Hochgeladenes Archiv kann automatisch gelöscht werden, wenn auf einem Serverspeicher kein freier Speicherplatz vorhanden ist. Das älteste Material aller Kameras auf dem Server wird zuerst gelöscht.</translation>
+    </message>
   </context>
   <context>
     <name>QnSmtpAdvancedSettingsWidget</name>
@@ -6066,10 +6070,6 @@ to %1</source>
   <context>
     <name>QnStatusOverlayController</name>
     <message>
-      <source>NOT ENOUGH LICENCES</source>
-      <translation>NICHT GENÜGEND LIZENZEN</translation>
-    </message>
-    <message>
       <source>NO DATA</source>
       <translation>KEINE DATEN</translation>
     </message>
@@ -6140,6 +6140,10 @@ to %1</source>
     <message>
       <source>UNSUPPORTED FIRMWARE VERSION</source>
       <translation>NICHT UNTERSTÜTZTE FIRMWARE-VERSION</translation>
+    </message>
+    <message>
+      <source>NOT ENOUGH LICENSES</source>
+      <translation type="unfinished">NOT ENOUGH LICENSES</translation>
     </message>
   </context>
   <context>
@@ -7164,10 +7168,6 @@ to %1</source>
   <context>
     <name>QnWearableProgressWidget</name>
     <message>
-      <source>Uploading %1... %2	%p%</source>
-      <translation>Hochladen %1... %2	%p%</translation>
-    </message>
-    <message>
       <source>Stop uploading?</source>
       <translation>Hochladen stoppen?</translation>
     </message>
@@ -7176,12 +7176,16 @@ to %1</source>
       <translation>Bereits hochgeladene Dateien werden beibehalten.</translation>
     </message>
     <message>
-      <source>Finalizing %1... %2	%p%</source>
-      <translation>Fertigstellen %1... %2	%p%</translation>
-    </message>
-    <message>
       <source>(%1 of %2)</source>
       <translation>(%1 von %2)</translation>
+    </message>
+    <message>
+      <source>Uploading %1...</source>
+      <translation>Hochladen %1...</translation>
+    </message>
+    <message>
+      <source>Finalizing %1...</source>
+      <translation>Fertigstellen %1...</translation>
     </message>
   </context>
   <context>
@@ -7284,6 +7288,10 @@ to %1</source>
     <message>
       <source>Could not connect to server. Video Wall will be closed.</source>
       <translation>Die Verbindung zum Server konnte nicht hergestellt werden. Videowand wird geschlossen.</translation>
+    </message>
+    <message>
+      <source>Video Wall is removed on the server and will be closed.</source>
+      <translation type="unfinished">Video Wall is removed on the server and will be closed.</translation>
     </message>
   </context>
   <context>
@@ -7712,23 +7720,23 @@ to %1</source>
     </message>
     <message>
       <source>%1 has unsupported format.</source>
-      <translation type="unfinished">%1 has unsupported format.</translation>
+      <translation>%1 hat ein nicht unterstütztes Format.</translation>
     </message>
     <message>
       <source>%1 does not have timestamp.</source>
-      <translation type="unfinished">%1 does not have timestamp.</translation>
+      <translation>%1 hat keinen Zeitstempel.</translation>
     </message>
     <message>
       <source>%1 is older than allowed in camera archive settings.</source>
-      <translation type="unfinished">%1 is older than allowed in camera archive settings.</translation>
+      <translation>%1 ist älter als in den Kameraarchiveinstellungen erlaubt.</translation>
     </message>
     <message>
       <source>%1 covers period for which video has already been uploaded.</source>
-      <translation type="unfinished">%1 covers period for which video has already been uploaded.</translation>
+      <translation>%1 umfasst den Zeitraum, für den das Video bereits hochgeladen wurde.</translation>
     </message>
     <message>
       <source>%1 covers period for which video is being uploaded.</source>
-      <translation type="unfinished">%1 covers period for which video is being uploaded.</translation>
+      <translation>%1 deckt den Zeitraum ab, für den das Video hochgeladen wird.</translation>
     </message>
   </context>
   <context>

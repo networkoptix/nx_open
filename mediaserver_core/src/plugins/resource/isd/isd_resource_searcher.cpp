@@ -11,6 +11,7 @@
 #include <utils/common/credentials.h>
 #include <plugins/resource/mdns/mdns_packet.h>
 #include <common/static_common_module.h>
+#include <nx/utils/log/log.h>
 
 using nx::common::utils::Credentials;
 
@@ -46,7 +47,13 @@ QnPlISDResourceSearcher::QnPlISDResourceSearcher(QnCommonModule* commonModule):
     QnAbstractNetworkResourceSearcher(commonModule),
     SearchAutoHandler(kUpnpBasicDeviceType)
 {
+    NX_DEBUG(this, "Constructed");
     QnMdnsListener::instance()->registerConsumer((std::uintptr_t) this);
+}
+
+QnPlISDResourceSearcher::~QnPlISDResourceSearcher()
+{
+    NX_DEBUG(this, "Destructed");
 }
 
 QnResourcePtr QnPlISDResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& /*params*/)
@@ -54,28 +61,20 @@ QnResourcePtr QnPlISDResourceSearcher::createResource(const QnUuid &resourceType
     QnNetworkResourcePtr result;
 
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
-
     if (resourceType.isNull())
     {
-        qDebug() << "No resource type for ID = " << resourceTypeId;
-
+        NX_DEBUG(this, lm("No resource type for %1").arg(resourceTypeId));
         return result;
     }
 
     if (resourceType->getManufacture() != manufacture())
-    {
-        //qDebug() << "Manufature " << resourceType->getManufacture() << " != " << manufacture();
         return result;
-    }
 
     result = QnVirtualCameraResourcePtr( new QnPlIsdResource() );
     result->setTypeId(resourceTypeId);
 
-    qDebug() << "Create ISD camera resource. typeID:" << resourceTypeId.toString(); // << ", Parameters: " << parameters;
-    //result->deserialize(parameters);
-
+    NX_DEBUG(this, lm("Create resource with type %1").arg(resourceTypeId));
     return result;
-
 }
 
 QString QnPlISDResourceSearcher::manufacture() const
@@ -148,7 +147,10 @@ QnResourceList QnPlISDResourceSearcher::findResources(void)
                 mdnsResults << resource;
         });
 
-    return upnpResults + mdnsResults;
+    const auto totalResults = upnpResults + mdnsResults;
+    NX_DEBUG(this, lm("Found resources: %1 UPnP + %2 MDNS = %3 total").args(
+        upnpResults.size(), mdnsResults.size(), totalResults.size()));
+    return totalResults;
 }
 
 
@@ -221,13 +223,18 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddrInternal(
     if (rt.isNull()) {
         rt = qnResTypePool->getResourceTypeId(manufacture(), kIsdDefaultResType);
         if (rt.isNull())
+        {
+            NX_DEBUG(false, lm("No resource type for %1").arg(name));
             return QList<QnResourcePtr>();
+        }
     }
 
     QnResourceData resourceData = qnStaticCommon->dataPool()->data(manufacture(), name);
-
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
+    {
+        NX_VERBOSE(this, lm("ONVIF is forced for vendor: %1, model: %2").args(manufacture(), name));
         return QList<QnResourcePtr>();
+    }
 
     QnPlIsdResourcePtr resource ( new QnPlIsdResource() );
     auto isDW = resourceData.value<bool>(Qn::DW_REBRANDED_TO_ISD_MODEL);
@@ -249,6 +256,9 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddrInternal(
         resource->setUrl(QString(lit("http://%1:%2"))
             .arg(host)
             .arg(port));
+
+    NX_VERBOSE(this, lm("Checked resource vendor: %1, model: %2, mac: %3, url: %4")
+        .args(vendor, name, mac, resource->getUrl()));
 
     //resource->setDiscoveryAddr(iface.address);
     QList<QnResourcePtr> result;
@@ -277,19 +287,17 @@ bool QnPlISDResourceSearcher::isDwOrIsd(const QString &vendorName, const QString
         if (resourceData.value<bool>(Qn::DW_REBRANDED_TO_ISD_MODEL))
             return true;
     }
+
+    NX_VERBOSE(this, lm("Not a DW or ISD vendor: %1, model: %2").args(vendorName, model));
     return false;
 }
 
-
-
 QnResourcePtr QnPlISDResourceSearcher::processMdnsResponse(
-    const QString &mdnsResponse,
-    const QString &mdnsRemoteAddress,
+    const QByteArray& responseData,
+    const QString& mdnsRemoteAddress,
     const QnResourceList& alreadyFoundResources)
 {
-    QByteArray responseData(mdnsResponse.toLatin1());
     QString name(lit("ISDcam"));
-
     if (!responseData.contains("ISD"))
     {
         // check for new ISD models. it has been rebranded
@@ -298,11 +306,14 @@ QnResourcePtr QnPlISDResourceSearcher::processMdnsResponse(
             modelPos = responseData.indexOf("DWCS-");
         if (modelPos == -1)
             modelPos = responseData.indexOf("DWEA-");
-        if (modelPos == -1 && !responseData.contains("ISD"))
+        if (modelPos == -1)
             return QnResourcePtr(); // not found
 
-        if(modelPos != -1)
+        if (modelPos != -1)
             name = extractWord(modelPos, responseData);
+
+        NX_VERBOSE(this, lm("MDNS from %1 with name: %2").args(
+            mdnsRemoteAddress, name));
     }
 
     int macpos = responseData.indexOf("macaddress=");
@@ -322,9 +333,11 @@ QnResourcePtr QnPlISDResourceSearcher::processMdnsResponse(
         smac += responseData[macpos + i];
     }
 
+    NX_VERBOSE(this, lm("MDNS from %1 with name: %2, MAC: %3").args(
+        mdnsRemoteAddress, name, smac));
+
     quint16 port = nx::network::http::DEFAULT_HTTP_PORT;
     QnMdnsPacket packet;
-
     if (packet.fromDatagram(responseData))
     {
         for (const auto& answer: packet.answerRRs)
@@ -340,7 +353,7 @@ QnResourcePtr QnPlISDResourceSearcher::processMdnsResponse(
     }
     else
     {
-        qDebug() << "There are errors in mdns packet parsing";
+        NX_DEBUG(this, lm("MDNS from %1: Unable to parse packet").arg(mdnsRemoteAddress));
     }
 
     smac = smac.toUpper();
@@ -365,12 +378,18 @@ QnResourcePtr QnPlISDResourceSearcher::processMdnsResponse(
     {
         rt = qnResTypePool->getResourceTypeId(manufacture(), lit("ISDcam"));
         if (rt.isNull())
+        {
+            NX_DEBUG(false, lm("No resource type for %1").arg(name));
             return QnResourcePtr();
+        }
     }
 
     QnResourceData resourceData = qnStaticCommon->dataPool()->data(manufacture(), name);
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
+    {
+        NX_VERBOSE(this, lm("ONVIF is forced for vendor: %1, model: %2").args(manufacture(), name));
         return QnResourcePtr();
+    }
 
     resource->setTypeId(rt);
     resource->setName(name);
@@ -429,6 +448,9 @@ bool QnPlISDResourceSearcher::processPacket(
     if (!isDwOrIsd(devInfo.manufacturer, devInfo.modelName))
         return false;
 
+    NX_VERBOSE(this, lm("UPnP from %1 vendor: %2, model: %3").args(
+        deviceEndpoint, devInfo.manufacturer, devInfo.modelName));
+
     nx::network::QnMacAddress cameraMAC(devInfo.serialNumber);
     QString model(devInfo.modelName);
     QnNetworkResourcePtr existingRes = resourcePool()->getResourceByMacAddress( devInfo.serialNumber );
@@ -471,6 +493,11 @@ bool QnPlISDResourceSearcher::processPacket(
 			m_alreadyFoundMacAddresses.insert(cameraMAC.toString());
 			createResource( devInfo, cameraMAC, cameraAuth, m_foundUpnpResources);
 		}
+        else
+        {
+            NX_VERBOSE(this, lm("UPnP from %1 vendor: %2, model: %3, MAC: %4 is known")
+                .args(deviceEndpoint, devInfo.manufacturer, devInfo.modelName, cameraMAC));
+        }
 	}
 
 	return true;
@@ -488,12 +515,19 @@ void QnPlISDResourceSearcher::createResource(
     {
         rt = qnResTypePool->getResourceTypeId(manufacture(), kIsdDefaultResType);
         if (rt.isNull())
+        {
+            NX_DEBUG(false, lm("No resource type for %1").arg(devInfo.modelName));
             return;
+        }
     }
 
     QnResourceData resourceData = qnStaticCommon->dataPool()->data(devInfo.manufacturer, devInfo.modelName);
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
+    {
+        NX_VERBOSE(this, lm("ONVIF is forced for vendor: %1, model: %2").args(
+            devInfo.manufacturer, devInfo.modelName));
         return;
+    }
 
     auto isDW = resourceData.value<bool>(Qn::DW_REBRANDED_TO_ISD_MODEL);
     auto vendor = isDW ? kDwFullVendorName :
@@ -524,6 +558,8 @@ void QnPlISDResourceSearcher::createResource(
     }
 
     result << resource;
+    NX_VERBOSE(this, lm("Created resource vendor: %1, model: %2, mac: %3, url: %4")
+        .args(vendor, devInfo.modelName, mac, resource->getUrl()));
 }
 
 bool QnPlISDResourceSearcher::testCredentials(const nx::utils::Url &url, const QAuthenticator &auth)

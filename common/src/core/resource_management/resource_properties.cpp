@@ -223,7 +223,7 @@ namespace
     }
 }
 
-bool QnResourcePropertyDictionary::removeProperty(const QnUuid& resourceId, const QString& key)
+bool QnResourcePropertyDictionary::on_resourceParamRemoved(const QnUuid& resourceId, const QString& key)
 {
     QnMutexLocker lock( &m_mutex );
 

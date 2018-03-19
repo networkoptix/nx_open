@@ -524,7 +524,7 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getPlaylist(
         if (commonModule()->resourceAccessManager()->hasPermission(
                 accessRights, camResource, Qn::Permission::ViewLivePermission))
         {
-            error->errorString = toString(Qn::MediaStreamEvent::ForbiddenBecauseNoLicenseError);
+                error->errorString = toString(Qn::MediaStreamEvent::ForbiddenWithNoLicense);
             error->error = QnRestResult::Forbidden;
             return nx::network::http::StatusCode::ok;
         }

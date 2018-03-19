@@ -131,24 +131,19 @@ QnMediaServerResourcePtr QnSecurityCamResource::getParentServer() const {
 }
 
 bool QnSecurityCamResource::setProperty(
-	const QString &key,
-	const QString &value,
-	PropertyOptions options)
+    const QString &key,
+    const QString &value,
+    PropertyOptions options)
 {
-	return QnResource::setProperty(key, value, options);
+    return QnResource::setProperty(key, value, options);
 }
 
 bool QnSecurityCamResource::setProperty(
-	const QString &key,
-	const QVariant& value,
-	PropertyOptions options)
+    const QString &key,
+    const QVariant& value,
+    PropertyOptions options)
 {
-	return QnResource::setProperty(key, value, options);
-}
-
-bool QnSecurityCamResource::removeProperty(const QString& key)
-{
-	return QnResource::removeProperty(key);
+    return QnResource::setProperty(key, value, options);
 }
 
 bool QnSecurityCamResource::isGroupPlayOnly() const {
@@ -532,6 +527,13 @@ bool QnSecurityCamResource::isSharingLicenseInGroup() const
     return resType->hasParam(lit("canShareLicenseGroup"));
 }
 
+bool QnSecurityCamResource::isNvr() const
+{
+    const auto result = isDtsBased();
+    NX_EXPECT(!result || !getGroupId().isEmpty());
+    return result;
+}
+
 bool QnSecurityCamResource::isMultiSensorCamera() const
 {
     return !getGroupId().isEmpty()
@@ -654,8 +656,8 @@ void QnSecurityCamResource::at_motionRegionChanged()
 
     if (getMotionType() == Qn::MT_HardwareGrid || getMotionType() == Qn::MT_MotionWindow)
     {
-    	QnConstResourceVideoLayoutPtr layout = getVideoLayout();
-    	int numChannels = layout->channelCount();
+        QnConstResourceVideoLayoutPtr layout = getVideoLayout();
+        int numChannels = layout->channelCount();
         for (int i = 0; i < numChannels; ++i)
             setMotionMaskPhysical(i);
     }
@@ -678,7 +680,6 @@ int QnSecurityCamResource::motionSensWindowCount() const
     QString val = getProperty(Qn::MOTION_SENS_WINDOW_CNT_PARAM_NAME);
     return val.toInt();
 }
-
 
 bool QnSecurityCamResource::hasTwoWayAudio() const
 {
@@ -801,7 +802,6 @@ QString QnSecurityCamResource::getUserDefinedName() const
 
     return QnSecurityCamResource::getName();
 }
-
 
 QString QnSecurityCamResource::getGroupName() const
 {
@@ -1022,7 +1022,6 @@ void QnSecurityCamResource::setLicenseUsed(bool value)
     emit licenseUsedChanged(::toSharedPointer(this));
 }
 
-
 bool QnSecurityCamResource::isLicenseUsed() const
 {
     /// TODO: #gdm Refactor licence management
@@ -1241,7 +1240,6 @@ void QnSecurityCamResource::removeStatusFlags(Qn::CameraStatusFlag flag)
     emit statusFlagsChanged(::toSharedPointer(this));
 }
 
-
 bool QnSecurityCamResource::needCheckIpConflicts() const {
     return !hasCameraCapabilities(Qn::ShareIpCapability);
 }
@@ -1267,31 +1265,22 @@ bool QnSecurityCamResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &s
         return false;
 
     bool result = base_type::mergeResourcesIfNeeded(source);
+    const auto mergeValue =
+        [&](auto getter, auto setter)
+        {
+            const auto thisValue = (this->*getter)();
+            const auto newValue = (camera->*getter)();
+            if (newValue != thisValue && !newValue.isEmpty())
+            {
+                (this->*setter)(newValue);
+                result = true;
+            }
+        };
 
-    if (getGroupId() != camera->getGroupId())
-    {
-        // Group ID can be changed for ONVIF resource because if we unauthorized,
-        // maxChannels is not accessible.
-        setGroupId(camera->getGroupId());
-        result = true;
-    }
-    if (getGroupName().isEmpty() && getGroupName() != camera->getGroupName())
-    {
-        setGroupName(camera->getGroupName());
-        result = true;
-    }
-
-    if (getModel() != camera->getModel() && !camera->getModel().isEmpty())
-    {
-        setModel(camera->getModel());
-        result = true;
-    }
-    if (getVendor() != camera->getVendor() && !camera->getVendor().isEmpty())
-    {
-        setVendor(camera->getVendor());
-        result = true;
-    }
-
+    mergeValue(&QnSecurityCamResource::getGroupId, &QnSecurityCamResource::setGroupId);
+    mergeValue(&QnSecurityCamResource::getGroupName, &QnSecurityCamResource::setGroupName);
+    mergeValue(&QnSecurityCamResource::getModel, &QnSecurityCamResource::setModel);
+    mergeValue(&QnSecurityCamResource::getVendor, &QnSecurityCamResource::setVendor);
     return result;
 }
 
@@ -1459,7 +1448,6 @@ int QnSecurityCamResource::suggestBitrateForQualityKbps(Qn::StreamQuality qualit
             (double)streamCapability.maxBitrateKbps);
     }
 
-
     auto result = rawSuggestBitrateKbps(quality, resolution, fps);
 
     if (bitratePerGopType() != Qn::BPG_None)
@@ -1488,8 +1476,8 @@ Qn::MediaStreamEvent QnSecurityCamResource::checkForErrors() const
 {
     const auto capabilities = getCameraCapabilities();
     if (capabilities.testFlag(Qn::isDefaultPasswordCapability))
-        return Qn::MediaStreamEvent::ForbiddentBecauseDefaultPasswordError;
+        return Qn::MediaStreamEvent::ForbiddenWithDefaultPassword;
     if (capabilities.testFlag(Qn::isOldFirmwareCapability))
-        return Qn::MediaStreamEvent::oldFirmwareError;
+        return Qn::MediaStreamEvent::oldFirmware;
     return Qn::MediaStreamEvent::NoEvent;
 }

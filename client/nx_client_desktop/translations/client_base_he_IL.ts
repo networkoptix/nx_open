@@ -2540,8 +2540,8 @@ to view more bookmarks</source>
       <translation>שרת</translation>
     </message>
     <message>
-      <source>Logical Id</source>
-      <translation type="unfinished">Logical Id</translation>
+      <source>Id</source>
+      <translation>מזהה</translation>
     </message>
   </context>
   <context>
@@ -3316,7 +3316,7 @@ to %1</source>
     </message>
     <message>
       <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation>תבניות שמע 44.1khz ו- 48Khz אינן נתמכות על-ידי התקן לכידת שמע. בחר התקן שמע אחר או &quot;ללא&quot; בהגדרות הקלטת המסך.</translation>
+      <translation>תבניות שמע 44.1kHz ו- 48kHz אינן נתמכות על-ידי התקן לכידת שמע. בחר התקן שמע אחר או &quot;ללא&quot; בהגדרות הקלטת המסך.</translation>
     </message>
   </context>
   <context>
@@ -5214,11 +5214,11 @@ to %1</source>
     </message>
     <message>
       <source>%1 TB</source>
-      <translation>%1 Tb</translation>
+      <translation>%1 TB</translation>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation>%1 Gb</translation>
+      <translation>%1 GB</translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n devices</source>
@@ -6054,6 +6054,10 @@ to %1</source>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
       <translation>לא ניתן להגדיר אפשרות הקלטה של "תנועה + תזרים משני".</translation>
     </message>
+    <message>
+      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
+      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</translation>
+    </message>
   </context>
   <context>
     <name>QnSmtpAdvancedSettingsWidget</name>
@@ -6205,10 +6209,6 @@ to %1</source>
   <context>
     <name>QnStatusOverlayController</name>
     <message>
-      <source>NOT ENOUGH LICENCES</source>
-      <translation>אין מספיק רישיונות</translation>
-    </message>
-    <message>
       <source>NO DATA</source>
       <translation>אין נתונים</translation>
     </message>
@@ -6279,6 +6279,10 @@ to %1</source>
     <message>
       <source>UNSUPPORTED FIRMWARE VERSION</source>
       <translation type="unfinished">UNSUPPORTED FIRMWARE VERSION</translation>
+    </message>
+    <message>
+      <source>NOT ENOUGH LICENSES</source>
+      <translation type="unfinished">NOT ENOUGH LICENSES</translation>
     </message>
   </context>
   <context>
@@ -6474,7 +6478,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation>%1 Gb</translation>
+      <translation>%1 GB</translation>
     </message>
     <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
@@ -7319,10 +7323,6 @@ to %1</source>
   <context>
     <name>QnWearableProgressWidget</name>
     <message>
-      <source>Uploading %1... %2	%p%</source>
-      <translation type="unfinished">Uploading %1... %2	%p%</translation>
-    </message>
-    <message>
       <source>Stop uploading?</source>
       <translation type="unfinished">Stop uploading?</translation>
     </message>
@@ -7331,12 +7331,16 @@ to %1</source>
       <translation type="unfinished">Already uploaded files will be kept.</translation>
     </message>
     <message>
-      <source>Finalizing %1... %2	%p%</source>
-      <translation type="unfinished">Finalizing %1... %2	%p%</translation>
-    </message>
-    <message>
       <source>(%1 of %2)</source>
       <translation type="unfinished">(%1 of %2)</translation>
+    </message>
+    <message>
+      <source>Uploading %1...</source>
+      <translation type="unfinished">Uploading %1...</translation>
+    </message>
+    <message>
+      <source>Finalizing %1...</source>
+      <translation type="unfinished">Finalizing %1...</translation>
     </message>
   </context>
   <context>
@@ -7441,6 +7445,10 @@ to %1</source>
     <message>
       <source>Could not connect to server. Video Wall will be closed.</source>
       <translation>ההתחברות לשרת נכשלה. קיר הווידאו ייסגר.</translation>
+    </message>
+    <message>
+      <source>Video Wall is removed on the server and will be closed.</source>
+      <translation type="unfinished">Video Wall is removed on the server and will be closed.</translation>
     </message>
   </context>
   <context>

@@ -121,8 +121,9 @@ public:
      */
     bool isSharingLicenseInGroup() const;
 
-    bool isMultiSensorCamera() const;
+    bool isNvr() const;
 
+    bool isMultiSensorCamera() const;
 
     virtual Qn::StreamFpsSharingMethod streamFpsSharingMethod() const;
     void setStreamFpsSharingMethod(Qn::StreamFpsSharingMethod value);
@@ -286,8 +287,6 @@ public:
 		const QString &key,
 		const QVariant& value,
 		PropertyOptions options = DEFAULT_OPTIONS) override;
-
-    virtual bool removeProperty(const QString& key) override;
 
     //!Returns list if IO ports
     QnIOPortDataList getIOPorts() const;

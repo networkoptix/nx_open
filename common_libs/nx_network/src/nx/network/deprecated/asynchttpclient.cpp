@@ -480,7 +480,8 @@ const char* AsyncHttpClient::toString(State state)
 void downloadFileAsyncEx(
     const nx::utils::Url& url,
     DownloadCompletionHandlerEx completionHandlerEx,
-    nx::network::http::AsyncHttpClientPtr httpClientCaptured)
+    nx::network::http::AsyncHttpClientPtr httpClientCaptured,
+    nx::network::http::Method::ValueType method)
 {
     auto requestCompletionFunc = [httpClientCaptured, completionHandlerEx]
         (nx::network::http::AsyncHttpClientPtr httpClient) mutable
@@ -523,7 +524,14 @@ void downloadFileAsyncEx(
         httpClientCaptured.get(), requestCompletionFunc,
         Qt::DirectConnection);
 
-    httpClientCaptured->doGet(url);
+    if (method.isEmpty() || method == nx::network::http::Method::get)
+        httpClientCaptured->doGet(url);
+    else if (method == nx::network::http::Method::delete_)
+        httpClientCaptured->doDelete(url);
+    else if (method == nx::network::http::Method::options)
+        httpClientCaptured->doOptions(url);
+    else
+        NX_ASSERT(0, "Unsupported HTTP method");
 }
 
 void downloadFileAsyncEx(
@@ -531,7 +539,8 @@ void downloadFileAsyncEx(
     DownloadCompletionHandlerEx completionHandlerEx,
     const nx::network::http::HttpHeaders& extraHeaders,
     AuthType authType,
-    AsyncHttpClient::Timeouts timeouts)
+    AsyncHttpClient::Timeouts timeouts,
+    nx::network::http::Method::ValueType method)
 {
     nx::network::http::AsyncHttpClientPtr httpClient = nx::network::http::AsyncHttpClient::create();
     httpClient->setAdditionalHeaders(extraHeaders);
@@ -539,7 +548,7 @@ void downloadFileAsyncEx(
     httpClient->setSendTimeoutMs(timeouts.sendTimeout.count());
     httpClient->setResponseReadTimeoutMs(timeouts.responseReadTimeout.count());
     httpClient->setMessageBodyReadTimeoutMs(timeouts.messageBodyReadTimeout.count());
-    downloadFileAsyncEx(url, completionHandlerEx, std::move(httpClient));
+    downloadFileAsyncEx(url, completionHandlerEx, std::move(httpClient), method);
 }
 
 void downloadFileAsync(
@@ -599,7 +608,8 @@ void uploadDataAsync(
     const UploadCompletionHandler& callback,
     const AuthType authType,
     const QString& user,
-    const QString& password)
+    const QString& password,
+    nx::network::http::Method::ValueType method)
 {
     nx::network::http::AsyncHttpClientPtr httpClientHolder = nx::network::http::AsyncHttpClient::create();
     httpClientHolder->setAdditionalHeaders(extraHeaders);
@@ -633,7 +643,12 @@ void uploadDataAsync(
     QObject::connect(httpClientHolder.get(), &nx::network::http::AsyncHttpClient::done,
         httpClientHolder.get(), completionFunc, Qt::DirectConnection);
 
-    httpClientHolder->doPost(url, contentType, data);
+    if (method == nx::network::http::Method::put)
+        httpClientHolder->doPut(url, contentType, data);
+    else if (method.isEmpty() || method == nx::network::http::Method::post)
+        httpClientHolder->doPost(url, contentType, data);
+    else
+        NX_ASSERT(0, "Unsupported HTTP method");
 }
 
 SystemError::ErrorCode uploadDataSync(

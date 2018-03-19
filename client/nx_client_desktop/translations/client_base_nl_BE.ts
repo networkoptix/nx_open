@@ -2229,11 +2229,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>I/O Module Id</source>
-      <translation>I/O Module ID</translation>
+      <translation>I/O Module Id</translation>
     </message>
     <message>
       <source>Camera Id</source>
-      <translation>Camera ID</translation>
+      <translation>Camera Id</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -2360,9 +2360,9 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>This Id is already used on the following %n cameras: %1</source>
-      <translation type="unfinished">
-        <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
-        <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
+      <translation>
+        <numerusform>Deze Id wordt al gebruikt op de volgende %n camera's: %1</numerusform>
+        <numerusform>Deze Id wordt al gebruikt op de volgende %n camera's: %1</numerusform>
       </translation>
     </message>
   </context>
@@ -2484,8 +2484,8 @@ to view more bookmarks</source>
       <translation>Server</translation>
     </message>
     <message>
-      <source>Logical Id</source>
-      <translation type="unfinished">Logical Id</translation>
+      <source>Id</source>
+      <translation>Id</translation>
     </message>
   </context>
   <context>
@@ -2563,7 +2563,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Password should not be equal to camera&apos;s user name</source>
-      <translation type="unfinished">Password should not be equal to camera&apos;s user name</translation>
+      <translation>Wachtwoord mag niet gelijk zijn aan de gebruikersnaam van de camera&apos;s</translation>
     </message>
   </context>
   <context>
@@ -3197,7 +3197,7 @@ to %1</source>
     </message>
     <message>
       <source>Set Password</source>
-      <translation type="unfinished">Set Password</translation>
+      <translation>Wachtwoorden instellen</translation>
     </message>
   </context>
   <context>
@@ -3716,7 +3716,7 @@ to %1</source>
     </message>
     <message>
       <source>Id</source>
-      <translation>ID</translation>
+      <translation>Id</translation>
     </message>
   </context>
   <context>
@@ -4175,7 +4175,7 @@ to %1</source>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware Id %1</source>
-      <translation>Deze licentie is al geactiveerd en gekoppeld aan hardware Id %1</translation>
+      <translation>Deze licentie is al geactiveerd en gekoppeld aan Hardware Id %1</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware Id %1 on %2</source>
@@ -4214,7 +4214,7 @@ to %1</source>
     </message>
     <message>
       <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>Stuur alsjeblieft een e-mail met de licentiecode en het hardware-ID dat is verstrekt aan %1 om een ​​activatie bestand te verkrijgen.</translation>
+      <translation>Stuur alsjeblieft een e-mail met de licentiecode en het Hardware-Id dat is verstrekt aan %1 om een ​​activatie bestand te verkrijgen.</translation>
     </message>
   </context>
   <context>
@@ -4474,7 +4474,7 @@ to %1</source>
     </message>
     <message>
       <source>Lo-Res</source>
-      <translation>Low-Res</translation>
+      <translation>Lo-Res</translation>
     </message>
     <message>
       <source>Failed to invoke trigger %1 (%2)</source>
@@ -5915,6 +5915,10 @@ to %1</source>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
       <translation>&quot;Motion + Low - Res&quot; opnameoptie kan niet worden ingesteld.</translation>
     </message>
+    <message>
+      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
+      <translation>Het geüploade archief kan automatisch worden verwijderd als er geen vrije ruimte meer is op de serveropslag. De oudste beelden van alle camera's op de server worden eerst verwijderd.</translation>
+    </message>
   </context>
   <context>
     <name>QnSmtpAdvancedSettingsWidget</name>
@@ -6066,10 +6070,6 @@ to %1</source>
   <context>
     <name>QnStatusOverlayController</name>
     <message>
-      <source>NOT ENOUGH LICENCES</source>
-      <translation>ONVOLDOENDE LICENTIES</translation>
-    </message>
-    <message>
       <source>NO DATA</source>
       <translation>GEEN GEGEVENS</translation>
     </message>
@@ -6140,6 +6140,10 @@ to %1</source>
     <message>
       <source>UNSUPPORTED FIRMWARE VERSION</source>
       <translation>NIET-ONDERSTEUNDE FIRMWAREVERSIE</translation>
+    </message>
+    <message>
+      <source>NOT ENOUGH LICENSES</source>
+      <translation type="unfinished">NOT ENOUGH LICENSES</translation>
     </message>
   </context>
   <context>
@@ -7164,10 +7168,6 @@ to %1</source>
   <context>
     <name>QnWearableProgressWidget</name>
     <message>
-      <source>Uploading %1... %2	%p%</source>
-      <translation>Uploaden %1... %2	%p%</translation>
-    </message>
-    <message>
       <source>Stop uploading?</source>
       <translation>Stoppen met uploaden?</translation>
     </message>
@@ -7176,12 +7176,16 @@ to %1</source>
       <translation>Reeds geuploade bestanden worden bewaard.</translation>
     </message>
     <message>
-      <source>Finalizing %1... %2	%p%</source>
-      <translation>Afronden %1... %2	%p%</translation>
-    </message>
-    <message>
       <source>(%1 of %2)</source>
       <translation>(%1 van %2)</translation>
+    </message>
+    <message>
+      <source>Uploading %1...</source>
+      <translation>Uploaden %1...</translation>
+    </message>
+    <message>
+      <source>Finalizing %1...</source>
+      <translation>Finaliseren %1...</translation>
     </message>
   </context>
   <context>
@@ -7284,6 +7288,10 @@ to %1</source>
     <message>
       <source>Could not connect to server. Video Wall will be closed.</source>
       <translation>Kon geen verbinding maken met de server. Videowall wordt afgesloten.</translation>
+    </message>
+    <message>
+      <source>Video Wall is removed on the server and will be closed.</source>
+      <translation type="unfinished">Video Wall is removed on the server and will be closed.</translation>
     </message>
   </context>
   <context>
@@ -7661,74 +7669,74 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Selected files are too old</source>
-      <translation type="unfinished">
-        <numerusform>Selected files are too old</numerusform>
-        <numerusform>Selected files are too old</numerusform>
+      <translation>
+        <numerusform>Geselecteerde bestanden zijn te oud</numerusform>
+        <numerusform>Geselecteerde bestanden zijn te oud</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
-      <translation type="unfinished">
-        <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
-        <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+      <translation>
+        <numerusform>Het geselecteerde bestand is opgenomen op %1, maar alleen bestanden die in de afgelopen %n dagen zijn opgenomen, kunnen worden geüpload. U kunt dit wijzigen in de instellingen van het camera-archief.</numerusform>
+        <numerusform>Het geselecteerde bestand is opgenomen op %1, maar alleen bestanden die in de afgelopen %n dagen zijn opgenomen, kunnen worden geüpload. U kunt dit wijzigen in de instellingen van het camera-archief.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
-      <translation type="unfinished">
-        <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
-        <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+      <translation>
+        <numerusform>Geselecteerde bestanden zijn opgenomen tussen %1 en %2, maar alleen bestanden die in de afgelopen %n dagen zijn opgenomen, kunnen worden geüpload. U kunt dit wijzigen in de instellingen van het camera-archief.</numerusform>
+        <numerusform>Geselecteerde bestanden zijn opgenomen tussen %1 en %2, maar alleen bestanden die in de afgelopen %n dagen zijn opgenomen, kunnen worden geüpload. U kunt dit wijzigen in de instellingen van het camera-archief.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Some footage may be deleted after uploading these files</source>
-      <translation type="unfinished">
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+      <translation>
+        <numerusform>Sommige beelden kunnen worden verwijderd na het uploaden van deze bestanden</numerusform>
+        <numerusform>Sommige beelden kunnen worden verwijderd na het uploaden van deze bestanden</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
-      <translation type="unfinished">
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+      <translation>
+        <numerusform>Er is niet veel vrije ruimte over op serveropslag. Sommige oude beelden kunnen worden verwijderd om ruimte vrij te maken. Merk op dat als geselecteerde bestanden toevallig de oudste op de server zijn, deze meteen na het uploaden worden verwijderd.</numerusform>
+        <numerusform>Er is niet veel vrije ruimte over op serveropslag. Sommige oude beelden kunnen worden verwijderd om ruimte vrij te maken. Merk op dat als geselecteerde bestanden toevallig de oudste op de server zijn, deze meteen na het uploaden worden verwijderd.</numerusform>
       </translation>
     </message>
     <message>
       <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
-      <translation type="unfinished">To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</translation>
+      <translation>Om dit te voorkomen, kunt u extra opslagruimte toevoegen. Je kunt ook bepalen welk beelden eerst wordt verwijderd door de bewaartijd van het archief te wijzigen in camera-instellingen.</translation>
     </message>
     <message>
       <source>Upload anyway?</source>
-      <translation type="unfinished">Upload anyway?</translation>
+      <translation>Hoe dan ook te uploaden?</translation>
     </message>
     <message>
       <source>Could not finish upload to %1</source>
-      <translation type="unfinished">Could not finish upload to %1</translation>
+      <translation>Kan upload naar %1 niet voltooien</translation>
     </message>
     <message>
       <source>Make sure there is enough space on server storage.</source>
-      <translation type="unfinished">Make sure there is enough space on server storage.</translation>
+      <translation>Zorg dat er voldoende ruimte is op de serveropslag.</translation>
     </message>
     <message>
       <source>%1 has unsupported format.</source>
-      <translation type="unfinished">%1 has unsupported format.</translation>
+      <translation>%1 heeft een niet-ondersteund formaat.</translation>
     </message>
     <message>
       <source>%1 does not have timestamp.</source>
-      <translation type="unfinished">%1 does not have timestamp.</translation>
+      <translation>%1 heeft geen tijdstempel.</translation>
     </message>
     <message>
       <source>%1 is older than allowed in camera archive settings.</source>
-      <translation type="unfinished">%1 is older than allowed in camera archive settings.</translation>
+      <translation>%1 is ouder dan toegestaan ​​in de camera-archiefinstellingen.</translation>
     </message>
     <message>
       <source>%1 covers period for which video has already been uploaded.</source>
-      <translation type="unfinished">%1 covers period for which video has already been uploaded.</translation>
+      <translation>%1 bevat een periode waarvoor de video al is geüpload.</translation>
     </message>
     <message>
       <source>%1 covers period for which video is being uploaded.</source>
-      <translation type="unfinished">%1 covers period for which video is being uploaded.</translation>
+      <translation>%1 bevat een periode waarvoor video wordt geüpload.</translation>
     </message>
   </context>
   <context>

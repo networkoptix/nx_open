@@ -226,6 +226,10 @@ SingleCameraSettingsWidget::~SingleCameraSettingsWidget()
 
 void SingleCameraSettingsWidget::retranslateUi()
 {
+    ui->wearableInfoLabel->setText(tr("Uploaded archive can be deleted automatically, "
+        "if there is no free space on a server storage. "
+        "The oldest footage among all cameras on the server will be deleted first."));
+
     setWindowTitle(QnDeviceDependentStrings::getNameFromSet(
         resourcePool(),
         QnCameraDeviceStringSet(
@@ -406,8 +410,8 @@ void SingleCameraSettingsWidget::submitToResource()
         loginEditAuth.setPassword(ui->passwordEdit->text().trimmed());
         if (m_camera->getAuth() != loginEditAuth)
         {
-            if (m_camera->isMultiSensorCamera())
-                QnClientCameraResource::setAuthToMultisensorCamera(m_camera, loginEditAuth);
+            if (m_camera->isMultiSensorCamera() || m_camera->isNvr())
+                QnClientCameraResource::setAuthToCameraGroup(m_camera, loginEditAuth);
             else
                 m_camera->setAuth(loginEditAuth);
         }

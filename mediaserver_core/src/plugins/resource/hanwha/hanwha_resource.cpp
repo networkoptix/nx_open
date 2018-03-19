@@ -1173,7 +1173,7 @@ static QString ptzCapabilityBits(Ptz::Capabilities capabilities)
 
 CameraDiagnostics::Result HanwhaResource::initPtz()
 {
-    removeProperty(Qn::DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME);
+    setProperty(Qn::DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME, QString());
 
     const auto mainDescriptors = isNvr()
         ? kHanwhaNvrPtzCapabilityDescriptors

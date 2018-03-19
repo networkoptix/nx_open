@@ -33,6 +33,9 @@ file(WRITE ${bin_source_dir}/launcher.version "${releaseVersion.full}")
 file(COPY "${CMAKE_SOURCE_DIR}/common/maven/bin-resources/resources/qt/etc/qt.conf"
     DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 
+file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/scripts/signtool_interface.py"
+    DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
+
 set(config_file "${CMAKE_CURRENT_BINARY_DIR}/config.yaml")
 nx_configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.yaml" "${config_file}")
 
@@ -43,6 +46,8 @@ if (withMediaServer OR withDesktopClient)
         COMMENT "Creating installer..."
         COMMAND ${PYTHON_EXECUTABLE} wix-gen.py
         COMMAND ${PYTHON_EXECUTABLE} wix-compile.py
+            "--config" ${config_file}
+            "--output" ${distribution_output_dir}
     )
 endif()
 

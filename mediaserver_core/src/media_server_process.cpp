@@ -3103,6 +3103,7 @@ void MediaServerProcess::run()
 
             commonModule()->resourceDiscoveryManager()->stop();
             qnServerModule->metadataManagerPool()->stop(); //< Stop processing analytics events.
+            auditManager->stop();
             QnResource::stopAsyncTasks();
 
             //since mserverResourceDiscoveryManager instance is dead no events can be delivered to serverResourceProcessor: can delete it now

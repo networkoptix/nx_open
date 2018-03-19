@@ -2363,7 +2363,7 @@ to view more bookmarks</source>
     <message numerus="yes">
         <source>This Id is already used on the following %n cameras: %1</source>
         <translation>
-            <numerusform>This Id is already used on the following camera: %1</numerusform>
+            <numerusform>This Id is already used on camera: %1</numerusform>
             <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
         </translation>
     </message>
@@ -2486,8 +2486,8 @@ to view more bookmarks</source>
         <translation></translation>
     </message>
     <message>
-        <source>Logical Id</source>
-        <translation></translation>
+        <source>Id</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5916,6 +5916,10 @@ to %1</source>
         <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnSmtpAdvancedSettingsWidget</name>
@@ -6067,10 +6071,6 @@ to %1</source>
 <context>
     <name>QnStatusOverlayController</name>
     <message>
-        <source>NOT ENOUGH LICENCES</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>NO DATA</source>
         <translation></translation>
     </message>
@@ -6141,6 +6141,10 @@ to %1</source>
     <message>
         <source>UNSUPPORTED FIRMWARE VERSION</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>NOT ENOUGH LICENSES</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7165,10 +7169,6 @@ to %1</source>
 <context>
     <name>QnWearableProgressWidget</name>
     <message>
-        <source>Uploading %1... %2	%p%</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Stop uploading?</source>
         <translation></translation>
     </message>
@@ -7177,12 +7177,16 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Finalizing %1... %2	%p%</source>
+        <source>(%1 of %2)</source>
         <translation></translation>
     </message>
     <message>
-        <source>(%1 of %2)</source>
-        <translation></translation>
+        <source>Uploading %1...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Finalizing %1...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7285,6 +7289,10 @@ to %1</source>
     <message>
         <source>Could not connect to server. Video Wall will be closed.</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Video Wall is removed on the server and will be closed.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

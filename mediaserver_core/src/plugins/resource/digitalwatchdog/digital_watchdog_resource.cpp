@@ -479,14 +479,17 @@ nx::mediaserver::resource::StreamCapabilityMap QnDigitalWatchdogResource::getStr
     return result;
 }
 
-void QnDigitalWatchdogResource::updateVideoEncoder(
+CameraDiagnostics::Result QnDigitalWatchdogResource::sendVideoEncoderToCameraEx(
     VideoEncoder& encoder,
     Qn::StreamIndex streamIndex,
     const QnLiveStreamParams& streamParams)
 {
+    auto result = base_type::sendVideoEncoderToCameraEx(encoder, streamIndex, streamParams);
+    if (!result)
+        return result;
     if (!m_cproApiClient->setVideoCodec(streamIndex, streamParams.codec))
         NX_WARNING(this, lm("Failed to configure codec %1 for resource %2").args(streamParams.codec, getUrl()));
-    base_type::updateVideoEncoder(encoder, streamIndex, streamParams);
+    return CameraDiagnostics::NoErrorResult();
 }
 
 #endif //ENABLE_ONVIF

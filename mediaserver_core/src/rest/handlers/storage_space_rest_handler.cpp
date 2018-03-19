@@ -190,7 +190,7 @@ QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages(QnCommonMo
             NX_VERBOSE(
                 this,
                 lm("[ApiStorageSpace] Optional storage %1, online: %2, isWritable: %3, wouldBeWritableIfAmongstServerStorages: %4")
-                    .args(storage->getUrl(), data.isOnline, storage->isWritable(),
+                    .args(storage->getUrl(), data.isOnline, data.isWritable,
                         wouldBeWritableIfAmongstServerStorages));
 
             auto fileStorage = storage.dynamicCast<QnFileStorageResource>();

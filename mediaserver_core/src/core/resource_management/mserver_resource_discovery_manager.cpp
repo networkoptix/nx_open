@@ -230,7 +230,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
             QnUuid newTypeId = newNetRes->getTypeId();
             bool updateTypeId = existCamRes->getTypeId() != newNetRes->getTypeId();
 
-            NX_VERBOSE(this, lm("%1 Found existing cam res %1 for new resource %2")
+            NX_VERBOSE(this, lm("%1 Found existing cam res %2 for new resource %3")
                     .arg(FL1(Q_FUNC_INFO))
                     .arg(NetResString(rpNetRes))
                     .arg(NetResString(newNetRes)));
@@ -348,7 +348,7 @@ bool QnMServerResourceDiscoveryManager::hasIpConflict(const QSet<QnNetworkResour
         if (!camera || !camera->needCheckIpConflicts())
             continue;
 
-        QString groupId = camera->getGroupId().isEmpty() ? camera->getId().toString() : camera->getGroupId();
+        QString groupId = camera->getGroupId().isEmpty() ? camera->getPhysicalId() : camera->getGroupId();
         cameraGroups << groupId;
         portList << QUrl(camera->getUrl()).port();
 
