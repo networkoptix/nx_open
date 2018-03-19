@@ -10,6 +10,7 @@ But for POST method keyword parameters are translated to json request body.
 import datetime
 import json
 import logging
+from pprint import pformat
 
 import requests
 import requests.exceptions
@@ -166,11 +167,15 @@ class RestApi(object):
     def url(self, path, secure=False):
         return '{}://{}:{}/{}'.format('https' if secure else 'http', self._hostname, self._port, path.lstrip('/'))
 
-    def get(self, path, **kwargs):
-        return self.request('GET', path, **kwargs)
+    def get(self, path, params=None, **kwargs):
+        log.debug('GET params:\n%s', pformat(params, indent=4))
+        assert 'data' not in kwargs
+        assert 'json' not in kwargs
+        return self.request('GET', path, params=params, **kwargs)
 
-    def post(self, path, json, **kwargs):
-        return self.request('POST', path, json=json, **kwargs)
+    def post(self, path, data, **kwargs):
+        log.debug('JSON payload:\n%s', json.dumps(data, indent=4))
+        return self.request('POST', path, json=data, **kwargs)
 
     def request(self, method, path, secure=False, **kwargs):
         url = self.url(path, secure=secure)
