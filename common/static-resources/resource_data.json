@@ -2278,8 +2278,133 @@
             "videoLayout": "width=2;height=2;sensors=0,1,2,3"
         },
         {
+            "keys":[
+            "N9PC-SLAH5|IP-Camera", "DW|DWC-PZ21M69T"
+            ],
+            "multiresourceVideoChannelMapping": [
+                {
+                    "resourceChannel": 1,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [0]
+                        }
+                    ]
+                },
+                {
+                    "resourceChannel": 2,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [1]
+                        }
+                    ]
+                },
+                {
+                    "resourceChannel": 3,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [2]
+                        }
+                    ]
+                },
+                {
+                    "resourceChannel": 4,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [3]
+                        }
+                    ]
+                }
+            ],
+            "doNotConfigureCamera": false,
+            "ignoreMultisensors": true,
+            "shouldAppearAsSingleChannel": true,
+            "videoLayout": "width=4;height=1;sensors=0,1,2,3"
+        },        
+        {
             "keys": ["*|CMD-C244","COMMANDCO|*"],
             "onvifManufacturerReplacement": "Hikvision"
-        }
+        },
+        {
+            "keys": [
+                "HIKVISION|DS-2DE4220IW*", "HIKVISION|DS-2DE4220W*", "Hikvision|DS-2DE4220IW*", "Hikvision|DS-2DE4220W*"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [  -1,1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [-1, 1],
+                        "logical": [-15, -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.05, 0.1, 0.02, 0.05, 0.1, 0.2, 0.5, 1],
+                        "logical": [1, 1.5, 2, 3.0, 3.5, 4.5, 6, 6.5, 7],
+                        "logicalMultiplier": 37,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+        {
+            "keys": [
+                "HIKVISION|DS-2DF8436IX*", "Hikvision|DS-2DF8436IX*"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [  -1,1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [-1, 1],
+                        "logical": [20, -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.05, 0.1, 0.02, 0.05, 0.1, 0.2, 0.5, 1],
+                        "logical": [1, 1.5, 2, 3.0, 3.5, 4.5, 6, 6.5, 7],
+                        "logicalMultiplier": 37,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+        {
+            "keys": [
+                "HIKVISION|DS-2DE4A220IW*", "Hikvision|DS-2DE4A220IW*"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [  -1,1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [-1, 1],
+                        "logical": [5, -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.05, 0.1, 0.02, 0.05, 0.1, 0.2, 0.5, 1],
+                        "logical": [1, 1.5, 2, 3.0, 3.5, 4.5, 6, 6.5, 7],
+                        "logicalMultiplier": 37,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        }        
     ]
 }
