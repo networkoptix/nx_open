@@ -1,5 +1,3 @@
-set(enable_hanwha ON)
-
 # Components Namings
 set(product.name "Cox Business Security Solutions")
 set(display.product.name "Cox Business Security Solutions")
