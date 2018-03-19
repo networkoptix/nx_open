@@ -17,7 +17,7 @@ class CommonPluginContainer;
 class QThread;
 class AbstractArchiveIntegrityWatcher;
 
-namespace nx { 
+namespace nx {
 namespace mediaserver {
 
 class UnusedWallpapersWatcher;
@@ -76,7 +76,6 @@ public:
     nx::mediaserver::resource::SharedContextPool* sharedContextPool() const;
     AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher() const;
 
-    void initializeRootTool();
     nx::mediaserver::RootTool* rootTool() const;
 
 private:

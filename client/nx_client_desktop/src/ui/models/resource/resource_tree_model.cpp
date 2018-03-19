@@ -262,7 +262,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::ensureRecorderNode(
     return *pos;
 }
 
-void QnResourceTreeModel::removeNode(const QnResourceTreeModelNodePtr& node)
+void QnResourceTreeModel::removeNode(QnResourceTreeModelNodePtr node)
 {
     /* Node was already removed. */
     if (!m_allNodes.contains(node))

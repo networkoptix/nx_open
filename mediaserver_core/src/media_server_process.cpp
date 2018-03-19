@@ -2551,7 +2551,6 @@ void MediaServerProcess::run()
     if (m_serviceMode)
     {
         initializeLogging();
-        qnServerModule->initializeRootTool();
     }
 
     updateAllowedInterfaces();

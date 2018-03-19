@@ -79,7 +79,7 @@ private:
     void removeUserNode(const QnUserResourcePtr& user);
 
     /** Cleanup all node references. */
-    void removeNode(const QnResourceTreeModelNodePtr& node);
+    void removeNode(QnResourceTreeModelNodePtr node);
 
     /** Remove all nodes. */
     void clean();

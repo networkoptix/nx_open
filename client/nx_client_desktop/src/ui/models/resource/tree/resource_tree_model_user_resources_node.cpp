@@ -152,7 +152,7 @@ void QnResourceTreeModelUserResourcesNode::rebuild()
     }
 }
 
-void QnResourceTreeModelUserResourcesNode::removeNode(const QnResourceTreeModelNodePtr& node)
+void QnResourceTreeModelUserResourcesNode::removeNode(QnResourceTreeModelNodePtr node)
 {
     if (node->type() == Qn::RecorderNode)
     {
