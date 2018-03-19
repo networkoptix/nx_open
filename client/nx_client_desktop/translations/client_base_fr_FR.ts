@@ -2485,8 +2485,8 @@ pour afficher plus de signets</translation>
       <translation>Serveur</translation>
     </message>
     <message>
-      <source>Logical Id</source>
-      <translation type="unfinished">Logical Id</translation>
+      <source>Id</source>
+      <translation>ID</translation>
     </message>
   </context>
   <context>
@@ -6075,10 +6075,6 @@ to %1</source>
   <context>
     <name>QnStatusOverlayController</name>
     <message>
-      <source>NOT ENOUGH LICENCES</source>
-      <translation>PAS ASSEZ DE LICENCES</translation>
-    </message>
-    <message>
       <source>NO DATA</source>
       <translation>AUCUNE DONNÉE</translation>
     </message>
@@ -6149,6 +6145,10 @@ to %1</source>
     <message>
       <source>UNSUPPORTED FIRMWARE VERSION</source>
       <translation>VERSION DU FIRMWARE INCOMPATIBLE</translation>
+    </message>
+    <message>
+      <source>NOT ENOUGH LICENSES</source>
+      <translation type="unfinished">NOT ENOUGH LICENSES</translation>
     </message>
   </context>
   <context>
@@ -7293,6 +7293,10 @@ to %1</source>
     <message>
       <source>Could not connect to server. Video Wall will be closed.</source>
       <translation>Impossible de se connecter au serveur. Mur vidéo sera fermé.</translation>
+    </message>
+    <message>
+      <source>Video Wall is removed on the server and will be closed.</source>
+      <translation type="unfinished">Video Wall is removed on the server and will be closed.</translation>
     </message>
   </context>
   <context>

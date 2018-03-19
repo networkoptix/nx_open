@@ -271,9 +271,10 @@ bool HanwhaPtzController::runAuxilaryCommand(const QnPtzAuxilaryTrait& trait, co
             ? lit("SimpleFocus")
             : lit("AutoFocus");
 
-        HanwhaRequestHelper::Parameters parameters{{lit("Mode"), focusMode}};
-        if (m_hanwhaResource->isNvr())
-            parameters.emplace(lit("Channel"), QString::number(m_hanwhaResource->getChannel()));
+        HanwhaRequestHelper::Parameters parameters{
+            { lit("Mode"), focusMode },
+            { kHanwhaChannelProperty, QString::number(m_hanwhaResource->getChannel()) }
+        };
 
         HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
         auto response = helper.control(lit("image/focus"), parameters);

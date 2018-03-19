@@ -77,7 +77,6 @@ soap_smd_update(soap, &context, password, strlen(password));
 soap_smd_final(soap, &context, hash, NULL);
 }
 
-
 /**
 @fn int soap_wsse_add_UsernameTokenDigest(struct soap *soap, const char *id, const char *username, const char *password)
 @brief Adds UsernameToken element for digest authentication.
@@ -117,11 +116,10 @@ soap_wsse_add_UsernameTokenDigest(struct soap *soap, const char *id, const char 
   return SOAP_OK;
 }
 
-const int kSoapDefaultSendTimeoutSeconds = 10;
-const int kSoapDefaultRecvTimeoutSeconds = 10;
-const int kSoapDefaultConnectTimeoutSeconds = 5;
-const int kSoapDefaultAcceptTimeoutSeconds = 5;
-
+const int kSoapDefaultSendTimeoutSeconds = 5 * 10;
+const int kSoapDefaultRecvTimeoutSeconds = 5 * 10;
+const int kSoapDefaultConnectTimeoutSeconds = 5 * 5;
+const int kSoapDefaultAcceptTimeoutSeconds = 5 * 5;
 
 struct SoapTimeouts
 {
@@ -211,10 +209,8 @@ int soap_wsse_add_PlainTextAuth(struct soap *soap, const char *id, const char *u
 
 } // anonymous namespace
 
-
 const QLatin1String DEFAULT_ONVIF_LOGIN = QLatin1String("admin");
 const QLatin1String DEFAULT_ONVIF_PASSWORD = QLatin1String("admin");
-
 
 SOAP_NMAC struct Namespace onvifOverriddenNamespaces[] =
 {
@@ -253,7 +249,6 @@ SOAP_NMAC struct Namespace onvifOverriddenNamespaces[] =
     { "tev-smb", "http://www.onvif.org/ver10/events/wsdl/SubscriptionManagerBinding", NULL, NULL },
     { NULL, NULL, NULL, NULL }
 };
-
 
 // -------------------------------------------------------------------------- //
 // SoapWrapper
@@ -378,7 +373,6 @@ bool SoapWrapper<T>::isConflictError()
 {
     return PasswordHelper::isConflictError(m_soapProxy->soap_fault());
 }
-
 
 // -------------------------------------------------------------------------- //
 // DeviceSoapWrapper
@@ -580,7 +574,6 @@ int DeviceSoapWrapper::GetSystemDateAndTime(_onvifDevice__GetSystemDateAndTime& 
     return m_soapProxy->GetSystemDateAndTime(m_endpoint, NULL, &request, &response);
 }
 
-
 int DeviceSoapWrapper::systemReboot(RebootReq& request, RebootResp& response)
 {
     beforeMethodInvocation();
@@ -600,8 +593,6 @@ int DeviceSoapWrapper::systemFactoryDefaultSoft(FactoryDefaultReq& request, Fact
     request.FactoryDefault = onvifXsd__FactoryDefaultType__Soft;
     return m_soapProxy->SetSystemFactoryDefault(m_endpoint, NULL, &request, &response);
 }
-
-
 
 // -------------------------------------------------------------------------- //
 // DeviceIOWrapper
@@ -634,7 +625,6 @@ int DeviceIOWrapper::setRelayOutputSettings( _onvifDeviceIO__SetRelayOutputSetti
 {
     return invokeMethod( &DeviceIOBindingProxy::SetRelayOutputSettings, &request, &response );
 }
-
 
 // -------------------------------------------------------------------------- //
 // MediaSoapWrapper
@@ -794,7 +784,6 @@ int MediaSoapWrapper::getVideoEncoderConfiguration(VideoConfigReq& request, Vide
     return m_soapProxy->GetVideoEncoderConfiguration(m_endpoint, NULL, &request, &response);
 }
 
-
 // -------------------------------------------------------------------------- //
 // ImagingSoapWrapper
 // -------------------------------------------------------------------------- //
@@ -834,7 +823,6 @@ int ImagingSoapWrapper::move(_onvifImg__Move &request, _onvifImg__MoveResponse &
 {
     return invokeMethod(&ImagingBindingProxy::Move, &request, &response);
 }
-
 
 // -------------------------------------------------------------------------- //
 // PtzSoapWrapper
@@ -928,7 +916,6 @@ int PtzSoapWrapper::doGetServiceCapabilities(PtzGetServiceCapabilitiesReq& reque
     return rez;
 }
 
-
 // -------------------------------------------------------------------------- //
 // NotificationProducerSoapWrapper
 // -------------------------------------------------------------------------- //
@@ -941,7 +928,6 @@ int NotificationProducerSoapWrapper::Subscribe( _oasisWsnB2__Subscribe* const re
 {
     return invokeMethod( &NotificationProducerBindingProxy::Subscribe, request, response );
 }
-
 
 // -------------------------------------------------------------------------- //
 // CreatePullPointSoapWrapper
@@ -956,7 +942,6 @@ int CreatePullPointSoapWrapper::createPullPoint( _oasisWsnB2__CreatePullPoint& r
     return invokeMethod( &CreatePullPointBindingProxy::CreatePullPoint, &request, &response );
 }
 
-
 // -------------------------------------------------------------------------- //
 // CreatePullPointSoapWrapper
 // -------------------------------------------------------------------------- //
@@ -969,7 +954,6 @@ int PullPointSubscriptionWrapper::pullMessages( _onvifEvents__PullMessages& requ
 {
     return invokeMethod( &PullPointSubscriptionBindingProxy::PullMessages, &request, &response );
 }
-
 
 // -------------------------------------------------------------------------- //
 // EventSoapWrapper
@@ -985,7 +969,6 @@ int EventSoapWrapper::createPullPointSubscription(
 {
     return invokeMethod( &EventBindingProxy::CreatePullPointSubscription, &request, &response );
 }
-
 
 // -------------------------------------------------------------------------- //
 // SubscriptionManagerSoapWrapper
@@ -1004,8 +987,6 @@ int SubscriptionManagerSoapWrapper::unsubscribe( _oasisWsnB2__Unsubscribe& reque
 {
     return invokeMethod( &SubscriptionManagerBindingProxy::Unsubscribe, &request, &response );
 }
-
-
 
 //
 // Explicit instantiating

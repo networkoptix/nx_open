@@ -102,7 +102,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::openStreamInternal(bool isCameraC
     m_multiCodec.setRole(getRole());
     m_multiCodec.setRequest(streamUrl);
 
-	m_onvifRes->updateSourceUrl(m_multiCodec.getCurrentStreamUrl(), getRole());
+    m_onvifRes->updateSourceUrl(m_multiCodec.getCurrentStreamUrl(), getRole());
 
     result = m_multiCodec.openStream();
     if (m_multiCodec.getLastResponseCode() == CODE_AUTH_REQUIRED && canChangeStatus())
@@ -120,7 +120,6 @@ void QnOnvifStreamReader::setCameraControlDisabled(bool value)
 CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( QString* const streamUrl, bool isCameraControlRequired, const QnLiveStreamParams& params )
 {
     //QnMutexLocker lock( m_onvifRes->getStreamConfMutex() );
-
 
     if (!m_streamUrl.isEmpty() && !isCameraControlRequired)
     {
@@ -369,7 +368,6 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchStreamUrl(MediaSoapWrapper& 
 
     QUrl relutUrl(m_onvifRes->fromOnvifDiscoveredUrl(response.MediaUri->Uri, false));
 
-
     if (relutUrl.host().size()==0)
     {
         QString temp = relutUrl.toString();
@@ -554,7 +552,6 @@ Profile* QnOnvifStreamReader::fetchExistingProfile(const ProfilesResp& response,
     profileIndex += m_onvifRes->getChannel()* (m_onvifRes->hasDualStreaming() ? 2 : 1);
     if (availableProfiles.size() <= profileIndex)
         return 0; // no existing profile matched
-
 
     QString reqProfileToken = availableProfiles[profileIndex];
     for (iter = response.Profiles.begin(); iter != response.Profiles.end(); ++iter) {
