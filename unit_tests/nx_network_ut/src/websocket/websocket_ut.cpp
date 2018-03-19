@@ -273,11 +273,18 @@ protected:
         givenServerClientWebSockets(kAliveTimeout, kAliveTimeout);
     }
 
+    void givenServerClientWebSocketsWithShortTimeout()
+    {
+        givenClientModes(SendMode::singleMessage, ReceiveMode::message);
+        givenServerModes(SendMode::singleMessage, ReceiveMode::message);
+        givenServerClientWebSockets(kShortTimeout, kShortTimeout * 100);
+    }
+
     void givenServerClientWebSocketsWithDifferentTimeouts()
     {
         givenClientModes(SendMode::singleMessage, ReceiveMode::message);
         givenServerModes(SendMode::singleMessage, ReceiveMode::message);
-        givenServerClientWebSockets(kAliveTimeout, kAliveTimeout * 100);
+        givenServerClientWebSockets(kShortTimeout, kShortTimeout * 100);
     }
 
     void givenClientTestDataPrepared(int size)
@@ -553,7 +560,8 @@ protected:
     std::future<void> readyFuture;
     Role serverRole = Role::undefined;
 
-    const std::chrono::milliseconds kAliveTimeout = std::chrono::milliseconds(3000);
+    const std::chrono::milliseconds kAliveTimeout = std::chrono::milliseconds(100000);
+    const std::chrono::milliseconds kShortTimeout = std::chrono::milliseconds(3000);
 };
 
 TEST_F(WebSocket, MultipleMessages_twoWay)
@@ -823,7 +831,7 @@ protected:
         std::thread(
             [this]()
             {
-                std::this_thread::sleep_for(kAliveTimeout * 2);
+                std::this_thread::sleep_for(kShortTimeout * 2);
                 try { readyPromise.set_value(); } catch (...) {}
             }).detach();
 
@@ -843,7 +851,7 @@ protected:
     bool isClientSending = true;
     bool isTimeoutError = false;
     int sentMessageCount = 0;
-    const int kTotalMessageCount = 100;
+    const int kTotalMessageCount = 30;
     std::queue<nx::Buffer> sendQueue;
 };
 
@@ -859,7 +867,7 @@ TEST_F(WebSocket_PingPong, PingPong_pingsBecauseOfNoData)
     isServerResponding = false;
     isClientSending = false;
 
-    givenServerClientWebSockets();
+    givenServerClientWebSocketsWithShortTimeout();
     whenConnectionIsIdleForSomeTime();
     thenItsBeenKeptAliveByThePings();
 }
