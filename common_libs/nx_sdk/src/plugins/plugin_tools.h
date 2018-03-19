@@ -11,6 +11,7 @@
 #include <cerrno>
 #include <sstream>
 #include <iomanip>
+#include <limits>
 
 #include "plugin_api.h"
 
