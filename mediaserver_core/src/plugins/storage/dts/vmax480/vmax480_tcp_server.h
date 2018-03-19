@@ -17,7 +17,7 @@ class QnVMax480ConnectionProcessorPrivate;
 class QnVMax480Server: public QnTcpListener, public Singleton<QnVMax480Server>
 {
 public:
-    QnVMax480Server(QnCommonModule* commonModule);
+    QnVMax480Server();
     virtual ~QnVMax480Server();
 
     bool waitForConnection(const QString& tcpID, int timeoutMs);

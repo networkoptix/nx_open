@@ -354,9 +354,9 @@ void QnVMax480ConnectionProcessor::run()
 
 }
 
-QnVMax480Server::QnVMax480Server(QnCommonModule* commonModule):
+QnVMax480Server::QnVMax480Server():
     QnTcpListener(
-        commonModule,
+        nullptr,
         QHostAddress(QLatin1String("127.0.0.1")),
         0)
 {
