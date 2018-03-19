@@ -224,7 +224,7 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddrInternal(
         rt = qnResTypePool->getResourceTypeId(manufacture(), kIsdDefaultResType);
         if (rt.isNull())
         {
-            NX_DEBUG(false, lm("No resource type for %1").arg(name));
+            NX_DEBUG(this, lm("No resource type for %1").arg(name));
             return QList<QnResourcePtr>();
         }
     }
@@ -379,7 +379,7 @@ QnResourcePtr QnPlISDResourceSearcher::processMdnsResponse(
         rt = qnResTypePool->getResourceTypeId(manufacture(), lit("ISDcam"));
         if (rt.isNull())
         {
-            NX_DEBUG(false, lm("No resource type for %1").arg(name));
+            NX_DEBUG(this, lm("No resource type for %1").arg(name));
             return QnResourcePtr();
         }
     }
@@ -516,7 +516,7 @@ void QnPlISDResourceSearcher::createResource(
         rt = qnResTypePool->getResourceTypeId(manufacture(), kIsdDefaultResType);
         if (rt.isNull())
         {
-            NX_DEBUG(false, lm("No resource type for %1").arg(devInfo.modelName));
+            NX_DEBUG(this, lm("No resource type for %1").arg(devInfo.modelName));
             return;
         }
     }
