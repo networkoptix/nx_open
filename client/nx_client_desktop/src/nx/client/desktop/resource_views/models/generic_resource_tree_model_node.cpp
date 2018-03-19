@@ -157,7 +157,7 @@ void GenericResourceTreeModelNode::rebuild()
         tryEnsureResourceNode(resource);
 }
 
-void GenericResourceTreeModelNode::removeNode(const QnResourceTreeModelNodePtr& node)
+void GenericResourceTreeModelNode::removeNode(QnResourceTreeModelNodePtr node)
 {
     if (node->type() == Qn::RecorderNode)
     {
