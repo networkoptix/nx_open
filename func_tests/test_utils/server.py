@@ -159,7 +159,7 @@ class Server(object):
 
     def setup_local_system(self, **kw):
         log.info('Setting up server as local system %s:', self)
-        self.rest_api.api.setupLocalSystem.POST(systemName=self.name, password=REST_API_PASSWORD, **kw)  # leave password unchanged
+        self.rest_api.post('api/setupLocalSystem', dict(systemName=self.name, password=REST_API_PASSWORD, **kw))
 
     def setup_cloud_system(self, cloud_account, **kw):
         assert isinstance(cloud_account, CloudAccount), repr(cloud_account)
