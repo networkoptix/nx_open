@@ -32,7 +32,7 @@ ${TM TEXT}                            qweasdzxc123®™
 ${LOG IN MODAL}                       //div[contains(@class, 'modal-content')]
 ${EMAIL INPUT}                        //form[contains(@name, 'loginForm')]//input[@ng-model='auth.email']
 ${PASSWORD INPUT}                     //form[contains(@name, 'loginForm')]//input[@ng-model='auth.password']
-${LOG IN BUTTON}                      //form[contains(@name, 'loginForm')]//button[@ng-click='checkForm()']
+${LOG IN BUTTON}                      //form[contains(@name, 'loginForm')]//process-button[@process='login']
 ${REMEMBER ME CHECKBOX}               //form[contains(@name, 'loginForm')]//input[@ng-model='auth.remember']
 ${FORGOT PASSWORD}                    //form[contains(@name, 'loginForm')]//a[@href='/restore_password']
 ${LOG IN CLOSE BUTTON}                //button[@ng-click='close()']
@@ -52,9 +52,9 @@ ${CREATE ACCOUNT BODY}                //body//a[@href='/register']
 
 #Forgot Password
 ${RESTORE PASSWORD EMAIL INPUT}       //form[@name='restorePassword']//input[@type='email']
-${RESET PASSWORD BUTTON}              //form[@name='restorePassword']//button[@ng-click='checkForm()']
+${RESET PASSWORD BUTTON}              //form[@name='restorePassword']//process-button[@process='restore']
 ${RESET PASSWORD INPUT}               //form[@name='restorePasswordWithCode']//input[@type='password']
-${SAVE PASSWORD}                      //form[@name='restorePasswordWithCode']//button[@ng-click='checkForm()']
+${SAVE PASSWORD}                      //form[@name='restorePasswordWithCode']//process-button[@process='changePassword']
 ${RESET EMAIL SENT MESSAGE}           //div[@ng-if='restoringSuccess']/h1
 ${RESET SUCCESS MESSAGE}              //h1[contains(text(), '${RESET SUCCESS MESSAGE TEXT}')]
 ${RESET SUCCESS LOG IN LINK}          //h1[@ng-if='change.success || changeSuccess']//a[@href='/login']
@@ -62,7 +62,7 @@ ${RESET SUCCESS LOG IN LINK}          //h1[@ng-if='change.success || changeSucce
 #Change Password
 ${CURRENT PASSWORD INPUT}             //form[@name='passwordForm']//input[@ng-model='pass.password']
 ${NEW PASSWORD INPUT}                 //form[@name='passwordForm']//password-input[@ng-model='pass.newPassword']//input[@type='password']
-${CHANGE PASSWORD BUTTON}             //form[@name='passwordForm']//button[@ng-click='checkForm()']
+${CHANGE PASSWORD BUTTON}             //form[@name='passwordForm']//button[@process='change']
 ${PASSWORD IS REQUIRED}               //span[@ng-if='passwordInput.password.$error.required']
 
 #Register Form Elements
