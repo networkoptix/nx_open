@@ -60,6 +60,9 @@ class ServerFactory(object):
         if not config.leave_initial_cloud_host:
             server.patch_binary_set_cloud_host(self._cloud_host)  # may be changed by previous tests...
         server.start()
+        # TODO: Remove once settings level via mediaserver.conf works again.
+        # See: https://networkoptix.atlassian.net/browse/VMS-8257
+        assert server.rest_api.get('api/logLevel', params={'id': 0, 'value': 'DEBUG2'}) == 'DEBUG2'
         if config.setup:
             if config.setup_cloud_account:
                 server.setup_cloud_system(config.setup_cloud_account, **config.setup_settings)
