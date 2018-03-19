@@ -54,7 +54,7 @@ qreal getBitrateForQuality(
     int fps,
     int decimals)
 {
-    const auto resolution = camera->defaultStream().getResolution();
+    const auto resolution = camera->streamInfo().getResolution();
     const auto bitrateMbps = camera->suggestBitrateForQualityKbps(quality, resolution, fps, Qn::CR_LiveVideo) / kKbpsInMbps;
     const auto roundingStep = std::pow(0.1, decimals);
     return qRound(bitrateMbps, roundingStep);

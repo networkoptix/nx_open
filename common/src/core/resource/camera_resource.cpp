@@ -179,27 +179,13 @@ CameraMediaStreams QnVirtualCameraResource::mediaStreams() const
     return supportedMediaStreams;
 }
 
-CameraMediaStreamInfo QnVirtualCameraResource::defaultStream() const
+CameraMediaStreamInfo QnVirtualCameraResource::streamInfo(Qn::StreamIndex index) const
 {
     const auto streams = mediaStreams().streams;
     auto stream = std::find_if(streams.cbegin(), streams.cend(),
-        [](const CameraMediaStreamInfo& stream)
+        [index](const CameraMediaStreamInfo& stream)
         {
-            return (Qn::StreamIndex) stream.encoderIndex == Qn::StreamIndex::primary;
-        });
-    if (stream != streams.cend())
-        return *stream;
-
-    return CameraMediaStreamInfo();
-}
-
-CameraMediaStreamInfo QnVirtualCameraResource::secondaryStream() const
-{
-    const auto streams = mediaStreams().streams;
-    auto stream = std::find_if(streams.cbegin(), streams.cend(),
-        [](const CameraMediaStreamInfo& stream)
-        {
-            return (Qn::StreamIndex) stream.encoderIndex == Qn::StreamIndex::secondary;
+            return (Qn::StreamIndex) stream.encoderIndex == index;
         });
     if (stream != streams.cend())
         return *stream;
@@ -217,25 +203,21 @@ QnAspectRatio QnVirtualCameraResource::aspectRatio() const
     if (!autoAr)
         return QnAspectRatio::closestStandardRatio(static_cast<float>(customAr));
 
-    // The rest of code deals with auto aspect ratio
-    // Aspect ration should be forced to AS of the first stream.
-    // Note: primary stream AR could be changed on the fly and a camera
-    // may not have a primary stream. In this case natural secondary
-    // stream AS should be used.
-
-    const auto stream = defaultStream();
-    const QSize size = stream.getResolution();
+    // The rest of the code deals with auto aspect ratio.
+    // Aspect ration should be forced to AS of the first stream. Note: primary stream AR could be
+    // changed on the fly and a camera may not have a primary stream. In this case natural
+    // secondary stream AS should be used.
+    const auto stream = streamInfo(Qn::StreamIndex::primary);
+    QSize size = stream.getResolution();
     if (size.isEmpty())
     {
         // Trying to use size from secondary stream
-        const auto secondary = secondaryStream();
-        const QSize secondarySize = secondary.getResolution();
-        if (secondarySize.isEmpty())
-        {
-            return QnAspectRatio();
-        }
-        return QnAspectRatio(size);
+        const auto secondary = streamInfo(Qn::StreamIndex::secondary);
+        size = secondary.getResolution();
     }
+
+    if (size.isEmpty())
+        return QnAspectRatio();
 
     const auto& sensor = combinedSensorsDescription().mainSensor();
     if (!sensor.isValid())
