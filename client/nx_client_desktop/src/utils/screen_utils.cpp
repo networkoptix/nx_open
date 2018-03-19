@@ -7,13 +7,15 @@
 
 #include <core/misc/screen_snap.h>
 
+#include <nx/client/core/utils/geometry.h>
+
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/assert.h>
 
-#include <ui/common/geometry.h>
-
 namespace nx {
 namespace gui {
+
+using client::core::Geometry;
 
 /**
  * TODO: #GDM This module should be moved to nx/gui library together with Geometry class.
@@ -73,7 +75,7 @@ QSet<int> Screens::coveredBy(
         if (!screen.isValid())
             continue;
         const QRect intersected = geometry.intersected(screen);
-        const auto overlapping = 1.0 * QnGeometry::area(intersected) / QnGeometry::area(screen);
+        const auto overlapping = 1.0 * Geometry::area(intersected) / Geometry::area(screen);
         if (overlapping >= minAreaOverlapping)
             result.insert(i);
     }

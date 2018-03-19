@@ -1510,7 +1510,7 @@ void QnWorkbenchVideoWallHandler::at_deleteVideoWallAction_triggered()
                 && resource->hasFlags(Qn::videowall);
         });
 
-    if (messages::Resources::deleteResources(mainWindow(), resources))
+    if (messages::Resources::deleteResources(mainWindowWidget(), resources))
     {
         for (const auto& videoWall: resources.filtered<QnVideoWallResource>())
         {

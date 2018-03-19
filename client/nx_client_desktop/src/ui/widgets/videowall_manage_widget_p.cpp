@@ -13,7 +13,6 @@
 
 #include <nx/utils/string.h>
 #include <utils/common/scoped_painter_rollback.h>
-#include <ui/common/geometry.h>
 
 #include <utils/math/color_transformations.h>
 #include <utils/math/linear_combination.h>
@@ -22,7 +21,7 @@
 #include <utils/screen_utils.h>
 
 using nx::client::core::Geometry;
-using Screens;
+using nx::gui::Screens;
 
 namespace {
 
@@ -1019,8 +1018,8 @@ void QnVideowallManageWidgetPrivate::resizeItem(BaseModelItem& item, const QPoin
 }
 
 QnVideowallManageWidgetPrivate::ItemTransformations QnVideowallManageWidgetPrivate::transformationsAnchor(
-    const QRect& geometry, 
-    const QPoint& pos) const 
+    const QRect& geometry,
+    const QPoint& pos) const
 {
     QRect leftAnchor    (Geometry::dilated(QRect(geometry.left(), geometry.top(), 0, geometry.height()), transformationOffset));
     QRect centerXAnchor (Geometry::dilated(QRect(geometry.center().x(), geometry.top(), 0, geometry.height()), transformationOffset));
