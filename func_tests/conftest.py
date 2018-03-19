@@ -358,6 +358,11 @@ def server_factory(mediaserver_deb, ca, artifact_factory, cloud_host, vm_pools, 
 
 
 @pytest.fixture()
+def single_server(server_factory, one_linux_vm):
+    return server_factory.create('single', vm=one_linux_vm)
+
+
+@pytest.fixture()
 def lightweight_servers_factory(bin_dir, ca, artifact_factory, physical_installation_ctl):
     test_binary_path = bin_dir / LWS_BINARY_NAME
     assert test_binary_path.exists(), 'Test binary for lightweight servers is missing at %s' % test_binary_path
