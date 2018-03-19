@@ -153,9 +153,9 @@ void QnResourceListModel::setCheckedResources(const QSet<QnUuid>& ids)
     // We will gather all resource ids to a separate set, and then check ids 
     // from selection with this set. O(NlogM) is here.
     QSet<QnUuid> contained_ids;
-    for (const auto& ptr: m_resources)
+    for (const auto& resource : m_resources)
     {
-        auto id = ptr->getId();
+        auto id = resource->getId();
         contained_ids.insert(id);
     }
 
@@ -289,31 +289,18 @@ bool QnResourceListModel::setData(const QModelIndex &index, const QVariant &valu
         bool checked = value.toInt() == Qt::Checked;
         bool changed = false;
 
-        qDebug() << " QnResourceListModel::setData(" << resource->getName() << ") check changed to " << checked;
         auto id = resource->getId();
 
         // Making a conservative changes. Do not raise event if nothing has changed
-        if(m_singlePick)
+        if (m_singlePick)
         {
-            if(checked)
+            bool wasChecked = m_checkedResources.contains(id);
+            changed = (checked != wasChecked);
+            if (changed)
             {
-                if (!m_checkedResources.contains(id))
-                {
-                    ScopedReset resetModel(this);
-                    m_checkedResources = QSet<QnUuid>{ id };
-                    // TODO: Notify all other elements about the changes
-                    changed = true;
-                }
-            }
-            else
-            {
-                if (m_checkedResources.contains(id))
-                {
-                    ScopedReset resetModel(this);
-                    // TODO: Notify all other elements about the changes
-                    m_checkedResources = QSet<QnUuid>();
-                    changed = true;
-                }
+                ScopedReset resetModel(this);
+                // TODO: Notify all other elements about the changes
+                m_checkedResources = checked ? QSet<QnUuid>{id} : QSet<QnUuid>{};
             }
         }
         else

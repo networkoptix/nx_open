@@ -35,16 +35,9 @@ OpenLayoutActionWidget::OpenLayoutActionWidget(QWidget* parent):
     ui(new Ui::OpenLayoutActionWidget)
 {
     ui->setupUi(this);
-
-    m_defaultPalette = qApp->palette();
-    m_warningPalette = qApp->palette();
-
+    
     connect(ui->selectLayoutButton, &QPushButton::clicked,
         this, &OpenLayoutActionWidget::openLayoutSelectionDialog);
-
-    QColor color = qnGlobals->errorTextColor();
-    m_warningPalette.setColor(QPalette::Text, color);
-    m_warningPalette.setColor(QPalette::BrightText, color);
 
     setWarningStyle(ui->warningForLayouts);
     setWarningStyle(ui->warningForUsers);
@@ -93,11 +86,11 @@ void OpenLayoutActionWidget::displayWarning(LayoutWarning warning)
     {
         case LayoutWarning::MissingAccess:
             setWarningStyle(ui->warningForUsers);
-            ui->warningForLayouts->setText(tr("Some users don't have access to the selected layout.\nAction will not work for them."));
+            ui->warningForLayouts->setText(tr("Some users don't have access to the selected layout. Action will not work for them."));
             break;
         case LayoutWarning::NobodyHasAccess:
             setWarningStyle(ui->warningForUsers);
-            ui->warningForLayouts->setText(tr("None of selected users have access to the selected layout.Action will not work."));
+            ui->warningForLayouts->setText(tr("None of selected users have access to the selected layout. Action will not work."));
             break;
         case LayoutWarning::NoWarning:
             break;
@@ -135,25 +128,25 @@ void OpenLayoutActionWidget::checkWarnings()
     bool foundLayoutWarning = false;
 
     auto accessManager = commonModule()->resourceAccessManager();
-    
-    int noAccess = 0;
-    int othersLocal = 0;
 
-    if(layout)
+    int noAccess = 0;
+    bool othersLocal = false;
+
+    if (layout)
     {
         auto parentResource = layout->getParentResource();
 
-        for (auto user : users)
+        for (auto user: users)
         {
             if (!accessManager->hasPermission(user, layout, Qn::ReadPermission))
-                noAccess++;
+                ++noAccess;
 
             if (parentResource && parentResource->getParentId() != user->getId())
-                othersLocal++;
+                othersLocal = true;
         }
     }
 
-    if (othersLocal > 0)
+    if (othersLocal)
         displayWarning(UserWarning::LocalResource);
 
     if (noAccess > 0)
@@ -212,7 +205,7 @@ void OpenLayoutActionWidget::updateLayoutsButton()
                 button->setIcon(icon(lit("tree/layout_locked_error.png")));
             else
                 button->setIcon(icon(lit("tree/layout_error.png")));
-            button->setPalette(m_warningPalette);
+            setWarningStyle(button);
         }
         else
         {
@@ -222,7 +215,7 @@ void OpenLayoutActionWidget::updateLayoutsButton()
                 button->setIcon(icon(lit("tree/layout_locked.png")));
             else
                 button->setIcon(icon(lit("tree/layout.png")));
-            button->setPalette(m_defaultPalette);
+            resetStyle(button);
         }
     }
     else
@@ -230,7 +223,7 @@ void OpenLayoutActionWidget::updateLayoutsButton()
         button->setText(tr("Select layout..."));
         button->setIcon(icon(lit("tree/layouts.png")));
         button->setForegroundRole(QPalette::ButtonText);
-        button->setPalette(m_defaultPalette);
+        resetStyle(button);
     }
 }
 
@@ -254,24 +247,24 @@ void OpenLayoutActionWidget::openLayoutSelectionDialog()
     */
 
     const bool singlePick = true;
-    ui::LayoutSelectionDialog dialog(singlePick, this);
+    LayoutSelectionDialog dialog(singlePick, this);
 
     const auto& users = getSelectedUsers();
 
-    ui::LayoutSelectionDialog::LocalLayoutSelection selectionMode =
-        ui::LayoutSelectionDialog::ModeFull;
+    LayoutSelectionDialog::LocalLayoutSelection selectionMode =
+        LayoutSelectionDialog::ModeFull;
 
     QSet<QnUuid> selection;
     if (auto layout = getSelectedLayout())
         selection.insert(layout->getId());
-    
+
     QnResourceList localLayouts;
 
     // Gather local layouts. Specification is this tricky.
     if (users.size() > 1)
     {
         // Should add only resources, that are selected. The rest resources are omitted
-        selectionMode = ui::LayoutSelectionDialog::ModeLimited;
+        selectionMode = LayoutSelectionDialog::ModeLimited;
         localLayouts = resourcePool()->getResources<QnLayoutResource>(
             [this, selection, users](const QnLayoutResourcePtr& layout)
             {
@@ -297,7 +290,7 @@ void OpenLayoutActionWidget::openLayoutSelectionDialog()
     {
         auto accessManager = commonModule()->resourceAccessManager();
         // Should show all resources belonging to current user.
-        selectionMode = ui::LayoutSelectionDialog::ModeFull;
+        selectionMode = LayoutSelectionDialog::ModeFull;
         auto user = users.front();
         localLayouts = resourcePool()->getResources<QnLayoutResource>(
             [this, selection, user, accessManager](const QnLayoutResourcePtr& layout)
@@ -314,7 +307,7 @@ void OpenLayoutActionWidget::openLayoutSelectionDialog()
     else if (users.empty())
     {
         dialog.showInfo(tr("Select some single user in \"Show to\" line to display his local layouts in this list"));
-        selectionMode = ui::LayoutSelectionDialog::ModeHideLocal;
+        selectionMode = LayoutSelectionDialog::ModeHideLocal;
     }
     dialog.setLocalLayouts(localLayouts, selection, selectionMode);
 

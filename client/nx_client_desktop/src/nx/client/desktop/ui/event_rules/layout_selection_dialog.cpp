@@ -10,8 +10,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <ui/common/indents.h>
-#include <ui/style/helper.h>
-#include <ui/style/globals.h>
+#include <ui/style/custom_style.h>
 #include <ui/style/nx_style.h>
 #include <ui/style/skin.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
@@ -28,7 +27,6 @@
 namespace nx {
 namespace client {
 namespace desktop {
-namespace ui {
 
 QnCustomizableItemDelegate* makeRadioButtonDelegate(QObject* parent)
 {
@@ -71,8 +69,9 @@ QnCustomizableItemDelegate* makeRedDelegate(QObject* parent)
     delegate->setCustomInitStyleOption(
         [](QStyleOptionViewItem* item, const QModelIndex& index)
         {
-            QColor color = qnGlobals->errorTextColor();
-            item->palette.setColor(QPalette::Text, color);
+            NX_ASSERT(item);
+            if (item)
+                setWarningStyle(&item->palette);
         });
     return delegate;
 }
@@ -89,7 +88,6 @@ LayoutSelectionDialog::LayoutSelectionDialog(bool singlePick, QWidget* parent, Q
     m_localLayoutsModel = new QnResourceListModel(this);
     m_localLayoutsModel->setHasCheckboxes(true);
     m_localLayoutsModel->setSinglePick(m_singlePick);
-    
 
     // Setup shared layouts
     m_sharedLayoutsModel = new QnResourceListModel(this);
@@ -115,28 +113,7 @@ LayoutSelectionDialog::LayoutSelectionDialog(bool singlePick, QWidget* parent, Q
 
     // Lambda will keep the reference to filterLocalLayouts and filterSharedLayouts
 
-    auto indicatorDelegate = new QnCustomizableItemDelegate(this);
-    indicatorDelegate->setCustomSizeHint(
-        [](const QStyleOptionViewItem& option, const QModelIndex& /*index*/)
-        {
-            return qnSkin->maximumSize(option.icon);
-        });
-
-    indicatorDelegate->setCustomPaint(
-        [](QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& /*index*/)
-        {
-            option.widget->style()->drawPrimitive(QStyle::PE_PanelItemViewItem,
-                &option, painter, option.widget);
-            QnScopedPainterOpacityRollback opacityRollback(painter);
-            const bool selected = option.state.testFlag(QStyle::State_Selected);
-            if (selected)
-                painter->setOpacity(painter->opacity() * style::Hints::kDisabledItemOpacity);
-            option.icon.paint(painter, option.rect, Qt::AlignCenter,
-                selected ? QIcon::Normal : QIcon::Disabled);
-        });
-    
-    auto setupTreeView =
-        [this, radioButtonDelegate](QnTreeView* treeView)
+    auto setupTreeView = [this, radioButtonDelegate](QnTreeView* treeView)
         {
             const QnIndents kIndents(1, 0);
             treeView->header()->setStretchLastSection(false);
@@ -146,7 +123,7 @@ LayoutSelectionDialog::LayoutSelectionDialog(bool singlePick, QWidget* parent, Q
             treeView->setProperty(style::Properties::kSideIndentation,
                 QVariant::fromValue(kIndents));
             treeView->setIgnoreDefaultSpace(true);
-            ItemViewUtils::autoToggleOnRowClick(treeView, QnResourceListModel::CheckColumn);
+            ui::ItemViewUtils::autoToggleOnRowClick(treeView, QnResourceListModel::CheckColumn);
             treeView->setItemDelegateForColumn(QnResourceListModel::CheckColumn, radioButtonDelegate);
         };
 
@@ -158,7 +135,7 @@ LayoutSelectionDialog::LayoutSelectionDialog(bool singlePick, QWidget* parent, Q
     scrollBar->setUseMaximumSpace(true);
     ui->scrollArea->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
-    const auto updateFilter =
+    const auto updateFilter = 
         [this, filterLocalLayouts, filterSharedLayouts]()
         {
             const auto filter = ui->searchLineEdit->text().trimmed();
@@ -176,7 +153,6 @@ LayoutSelectionDialog::LayoutSelectionDialog(bool singlePick, QWidget* parent, Q
             updateFilter();
         });
 
-    
     const auto connectToModelChanges =
         [this](QAbstractItemModel* model)
         {
@@ -213,7 +189,7 @@ LayoutSelectionDialog::LayoutSelectionDialog(bool singlePick, QWidget* parent, Q
     connect(m_sharedLayoutsModel, &QAbstractItemModel::rowsRemoved, this, updateVisibility);
     connect(m_sharedLayoutsModel, &QAbstractItemModel::modelReset, this, updateVisibility);
     connect(m_sharedLayoutsModel, &QnResourceListModel::selectionChanged, this, &LayoutSelectionDialog::at_sharedLayoutSelected);
-    
+
     // Customized top margin for panel content:
     static constexpr int kContentTopMargin = 8;
     QnNxStyle::setGroupBoxContentTopMargin(ui->localGroupBox, kContentTopMargin);
@@ -233,9 +209,8 @@ void LayoutSelectionDialog::at_localLayoutSelected()
 {
     auto selection = m_localLayoutsModel->checkedResources();
     if (!selection.empty())
-    {
-        m_sharedLayoutsModel->setCheckedResources(QSet<QnUuid>());
-    }
+        m_sharedLayoutsModel->setCheckedResources({});
+
     update();
 }
 
@@ -243,9 +218,7 @@ void LayoutSelectionDialog::at_sharedLayoutSelected()
 {
     auto selection = m_sharedLayoutsModel->checkedResources();
     if (!selection.empty())
-    {
-        m_localLayoutsModel->setCheckedResources(QSet<QnUuid>());
-    }
+        m_localLayoutsModel->setCheckedResources({});
 
     // Reset local layouts
     if (m_localSelectionMode == ModeLimited)
@@ -301,11 +274,11 @@ QSet<QnUuid> LayoutSelectionDialog::checkedLayouts() const
     {
         if (!local.empty())
             return QSet<QnUuid>{*local.begin()};
-        else if (!shared.empty())
+        if (!shared.empty())
             return QSet<QnUuid>{*shared.begin()};
     }
-    result &= local;
-    result &= shared;
+    result |= local;
+    result |= shared;
     return result;
 }
 
@@ -321,7 +294,6 @@ void LayoutSelectionDialog::showInfo(const QString& text)
     ui->additionalInfoLabel->setText(text);
 }
 
-} // namespace ui
 } // namespace desktop
 } // namespace client
 } // namespace nx

@@ -21,7 +21,6 @@ class LayoutSelectionDialog;
 namespace nx {
 namespace client {
 namespace desktop {
-namespace ui {
 
 // A dialog to select one layout.
 // Used in OpelLayoutActionWidget.
@@ -75,7 +74,6 @@ private:
     LocalLayoutSelection m_localSelectionMode;
 };
 
-} // namespace ui
 } // namespace desktop
 } // namespace client
 } // namespace nx

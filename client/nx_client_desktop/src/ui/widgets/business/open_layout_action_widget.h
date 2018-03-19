@@ -42,7 +42,7 @@ private:
         NoWarning,
         MissingAccess,  //< Some users have no access
         NobodyHasAccess,   //< No user has an access
-    } m_layoutWarning = LayoutWarning::NoWarning;
+    };
 
     // Warnings for picked users.
     // They are displayed under 'select user' button.
@@ -50,7 +50,7 @@ private:
     {
         NoWarning,
         LocalResource,  //< Selected local resource and multiple users
-    } m_userWarning = UserWarning::NoWarning;
+    };
 
     void displayWarning(LayoutWarning warning);
     void displayWarning(UserWarning warning);
@@ -69,13 +69,13 @@ private:
     // Opens a dialog to select necessary layout.
     void openLayoutSelectionDialog();
 
+private:
+    LayoutWarning m_layoutWarning = LayoutWarning::NoWarning;
+    UserWarning m_userWarning = UserWarning::NoWarning;
+
     QScopedPointer<Ui::OpenLayoutActionWidget> ui;
 
     QnLayoutResourcePtr m_selectedLayout;
-
-    // We use this palette to style buttons
-    QPalette m_warningPalette;
-    QPalette m_defaultPalette;
 };
 
 } // namespace desktop
