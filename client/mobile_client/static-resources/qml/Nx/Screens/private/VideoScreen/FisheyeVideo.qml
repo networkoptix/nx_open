@@ -74,7 +74,7 @@ Item
                     return Utils3D.rotationZ(-Utils3D.radians(currentRotation.y)).times(
                         Utils3D.rotationX(Utils3D.radians(currentRotation.x)))
 
-                default:
+                default: // MediaDewarpingParams.Horizontal
                     return Utils3D.rotationY(Utils3D.radians(currentRotation.y)).times(
                         Utils3D.rotationX(Utils3D.radians(currentRotation.x)))
             }
@@ -97,7 +97,7 @@ Item
                     return Qt.vector2d(Math.max(limitByCenter, Math.min(limitByEdge, unboundedRotation.x)),
                         normalizedAngle(unboundedRotation.y))
 
-                default:
+                default: // MediaDewarpingParams.Horizontal
                     return Qt.vector2d(Math.max(-limitByEdge, Math.min(limitByEdge, unboundedRotation.x)),
                         Math.max(-limitByEdge, Math.min(limitByEdge, unboundedRotation.y)))
             }
@@ -152,24 +152,30 @@ Item
         {
             // Point on hemisphere in camera coordinates.
             var pointOnSphere = fisheyeShader.unprojectAndTransform(x, y)
-            console.log("absolute:", pointOnSphere, pointOnSphere.length())
-
             switch (viewMode)
             {
                 case MediaDewarpingParams.VerticalUp:
-                    // implement me!
-                case MediaDewarpingParams.VerticalDown:
-                    // implement me!
-                default:
                 {
-                    var rXZ = Qt.vector2d(pointOnSphere.x, pointOnSphere.z).length()
-                    var alpha = -Utils3D.degrees(Math.asin(pointOnSphere.y))
-                    var beta = Utils3D.degrees(Math.acos(-pointOnSphere.z / rXZ))
-                    if (pointOnSphere.x > 0)
-                        beta = -beta
-
-                    console.log("alpha:", alpha, "beta:", beta, "\n")
+                    var alpha = -Utils3D.degrees(Math.acos(-pointOnSphere.z))
+                    var beta = -Utils3D.degrees(Math.atan2(pointOnSphere.x, pointOnSphere.y))
                     unboundedRotation = Qt.vector2d(alpha, beta)
+                    break
+                }
+
+                case MediaDewarpingParams.VerticalDown:
+                {
+                    var alpha = Utils3D.degrees(Math.acos(-pointOnSphere.z))
+                    var beta = -Utils3D.degrees(Math.atan2(pointOnSphere.x, -pointOnSphere.y))
+                    unboundedRotation = Qt.vector2d(alpha, beta)
+                    break
+                }
+
+                default: // MediaDewarpingParams.Horizontal
+                {
+                    var alpha = -Utils3D.degrees(Math.asin(pointOnSphere.y))
+                    var beta = -Utils3D.degrees(Math.atan2(pointOnSphere.x, -pointOnSphere.z))
+                    unboundedRotation = Qt.vector2d(alpha, beta)
+                    break
                 }
             }
         }
