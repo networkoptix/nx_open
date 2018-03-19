@@ -39,6 +39,7 @@ class LinuxNetworking(object):
             iptables -A OUTPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
             iptables -A OUTPUT -o lo -j ACCEPT
             iptables -A OUTPUT -d 10.0.0.0/8 -j ACCEPT
+            iptables -A OUTPUT -d 192.168.0.0/16 -j ACCEPT
             iptables -A OUTPUT -j REJECT
             ''',
             env={'AVAILABLE_INTERFACES': '\n'.join(self.interfaces.values())})

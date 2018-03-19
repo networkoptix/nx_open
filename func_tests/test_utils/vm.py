@@ -126,7 +126,7 @@ class Factory(object):
             info = self._hypervisor.find(name)
         except VMNotFound:
             forwarded_ports = self._vm_configuration.forwarded_ports(index)
-            info = self._hypervisor.clone(name, self._vm_configuration.template, forwarded_ports)
+            info = self._hypervisor.clone(name, index, self._vm_configuration.template, forwarded_ports)
         assert info.name == name
         if not info.is_running:
             self._hypervisor.power_on(info.name)

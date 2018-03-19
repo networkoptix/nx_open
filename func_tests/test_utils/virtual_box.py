@@ -69,7 +69,7 @@ class VirtualBox(object):
                 networks[slot] = raw_info['intnet{}'.format(slot)]
         return VMInfo(raw_info['name'], ports, macs, networks, raw_info['VMState'] == 'running')
 
-    def clone(self, name, template, forwarded_ports):
+    def clone(self, name, index, template, forwarded_ports):
         """Clone and setup VM with simple and generic parameters. Template can be any specific type."""
         self.os_access.run_command([
             'VBoxManage', 'clonevm', template['vm'],
@@ -78,8 +78,13 @@ class VirtualBox(object):
             '--options', 'link',
             '--register',
             ])
+        # Same IP spaces for NAT cause problems with merging.
+        # When answering to merge, local (requested) server reports its IPs,
+        # remote (which is requested from local) tries to connect all those IPs,
+        # connects with shortest delay to address which is used for NAT by both VMs
+        # and "thinks" it's the peer whereas it "talks" to itself.
         settings_args = [
-            '--nic1', 'nat', '--natnet1', '10.254.254.0/24',
+            '--nic1', 'nat', '--natnet1', '192.168.{:d}.0/24'.format(index),
             '--paravirtprovider', 'kvm',
             '--cpuexecutioncap', 100,
             '--cpus', 4,

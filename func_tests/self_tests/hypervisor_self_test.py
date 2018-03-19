@@ -36,7 +36,7 @@ def template():
 @pytest.fixture(scope='session')
 def dummy(hypervisor, template):
     dummy_name = name_prefix + 'dummy'
-    return hypervisor.clone(dummy_name, template, [('ssh', 'tcp', 65022, 22)])
+    return hypervisor.clone(dummy_name, 0, template, [('ssh', 'tcp', 65022, 22)])
 
 
 def test_find(hypervisor, template):
@@ -45,7 +45,7 @@ def test_find(hypervisor, template):
 
 def test_clone(hypervisor, template):
     clone_name = name_prefix + 'clone'
-    clone = hypervisor.clone(clone_name, template, [('ssh', 'tcp', 65022, 22), ('dns', 'udp', 65053, 53)])
+    clone = hypervisor.clone(clone_name, 1, template, [('ssh', 'tcp', 65022, 22), ('dns', 'udp', 65053, 53)])
     logger.debug("Clone:\n%s", pformat(clone))
     assert clone.name == clone_name
     assert not clone.is_running
