@@ -225,6 +225,7 @@ rest::Handle ResourcePoolPeerManager::validateFileInformation(
                 {
                     NX_WARNING(this, lm("[Downloader, validate] File %1. peer %2 responded that validation had failed")
                         .args(fileInformation.name, peerId));
+                    return callback(false, handle);
                 }
 
                 NX_VERBOSE(this, lm("[Downloader, validate] File %1. peer %2 validation successful")
