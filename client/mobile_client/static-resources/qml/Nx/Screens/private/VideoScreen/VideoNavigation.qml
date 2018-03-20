@@ -19,7 +19,10 @@ Item
     property alias animatePlaybackControls: playbackControlsOpacityBehaviour.enabled
     property bool canViewArchive: true
     property int buttonsPanelHeight: navigationPanel.visible ? navigationPanel.height : 0
+
     signal ptzButtonClicked()
+    signal switchToNextCamera()
+    signal switchToPreviousCamera()
 
     implicitWidth: parent ? parent.width : 0
     implicitHeight: navigator.height + navigationPanel.height
@@ -117,6 +120,33 @@ Item
         running: true
         repeat: true
         onTriggered: cameraChunkProvider.update()
+    }
+
+    Button
+    {
+        y: 56 / 2 - height / 2
+        padding: 8
+        width: 56
+        height: width
+        color: ColorTheme.transparent(ColorTheme.base5, 0.2)
+        icon: lp("/images/previous.png")
+        radius: width / 2
+        z: 1
+        onClicked: videoNavigation.switchToPreviousCamera()
+    }
+
+    Button
+    {
+        y: 56 / 2 - height / 2
+        anchors.right: parent.right
+        padding: 8
+        width: 56
+        height: width
+        color: ColorTheme.transparent(ColorTheme.base5, 0.2)
+        icon: lp("/images/next.png")
+        radius: width / 2
+        z: 1
+        onClicked: videoNavigation.switchToNextCamera()
     }
 
     Item
@@ -330,6 +360,8 @@ Item
 
             Button
             {
+                id: liveModeButton
+
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
                 text: qsTr("LIVE")
@@ -358,7 +390,7 @@ Item
             {
                 id: actionButtonsPanel
 
-                visible: buttonsCount > 0
+                visible: buttonsCount > 0 && !liveModeButton.visible
                 resourceId: videoScreenController.resourceId
 
                 anchors.left: navigationPanel.showZoomControls

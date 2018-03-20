@@ -341,7 +341,6 @@ PageBase
         {
             id: controlsShadowGradient
 
-            property real targetOpacity: visible ? 1 : 0
             property real customHeight:
             {
                 if (d.mode == VideoScreenUtils.VideoScreenMode.Ptz || ptzPanel.moveOnTapMode)
@@ -356,11 +355,18 @@ PageBase
             anchors.bottom: parent.bottom
             anchors.bottomMargin: videoScreen.height - mainWindow.height
 
+            visible: opacity > 0
             source: lp("/images/timeline_gradient.png")
 
-            visible: (d.mode == VideoScreenUtils.VideoScreenMode.Ptz && d.uiVisible)
-                || videoNavigation.visible || ptzPanel.moveOnTapMode
-            opacity: Math.max(d.uiOpacity, targetOpacity)
+            opacity:
+            {
+                var ptzMode = d.mode == VideoScreenUtils.VideoScreenMode.Ptz
+                var visiblePtzControls = ptzMode && d.uiVisible
+                if (visiblePtzControls || ptzPanel.moveOnTapMode)
+                    return 1
+
+                return ptzMode ? d.uiOpacity : videoNavigation.opacity
+            }
         }
 
         Rectangle
@@ -479,31 +485,24 @@ PageBase
             visible: opacity > 0 && d.mode === VideoScreenUtils.VideoScreenMode.Navigation
             opacity: Math.min(d.uiOpacity, d.controlsOpacity)
 
-            Button
+            onSwitchToPreviousCamera:
             {
-                y: 56 / 2 - height / 2
-                padding: 8
-                width: 56
-                height: width
-                color: ColorTheme.transparent(ColorTheme.base5, 0.2)
-                icon: lp("/images/previous.png")
-                radius: width / 2
-                z: 1
-                onClicked: switchToPreviousCamera()
+                if (!camerasModel)
+                    return
+
+                switchToCamera(
+                    camerasModel.previousResourceId(videoScreen.resourceId)
+                        || camerasModel.previousResourceId(""))
             }
 
-            Button
+            onSwitchToNextCamera:
             {
-                y: 56 / 2 - height / 2
-                anchors.right: parent.right
-                padding: 8
-                width: 56
-                height: width
-                color: ColorTheme.transparent(ColorTheme.base5, 0.2)
-                icon: lp("/images/next.png")
-                radius: width / 2
-                z: 1
-                onClicked: switchToNextCamera()
+                if (!camerasModel)
+                    return
+
+                switchToCamera(
+                    camerasModel.nextResourceId(videoScreen.resourceId)
+                        || camerasModel.nextResourceId(""))
             }
         }
     }
@@ -606,25 +605,5 @@ PageBase
         }
 
         cameraSwitchAnimation.start()
-    }
-
-    function switchToPreviousCamera()
-    {
-        if (!camerasModel)
-            return
-
-        switchToCamera(
-            camerasModel.previousResourceId(videoScreen.resourceId)
-                || camerasModel.previousResourceId(""))
-    }
-
-    function switchToNextCamera()
-    {
-        if (!camerasModel)
-            return
-
-        switchToCamera(
-            camerasModel.nextResourceId(videoScreen.resourceId)
-                || camerasModel.nextResourceId(""))
     }
 }
