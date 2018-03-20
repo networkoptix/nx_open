@@ -18,24 +18,11 @@ let NxProcessButtonComponent = class NxProcessButtonComponent {
         if (this.actionType) {
             this.buttonClass = 'btn-' + this.actionType;
         }
-        this.buttonDisabled = this.buttonDisabled || true;
-        // this.process = {
-        //     processing : false
-        // }
     }
     touchForm() {
         for (const ctrl in this.form.form.controls) {
             this.form.form.get(ctrl).markAsTouched();
         }
-        // angular.forEach(form.errors, function (field) {
-        //     angular.forEach(field, function (errorField) {
-        //         if (typeof(errorField.$touched) != 'undefined') {
-        //             errorField.$setTouched();
-        //         } else {
-        //             this.touchForm(errorField); // Embedded form - go recursive
-        //         }
-        //     })
-        // });
     }
     setFocusToInvalid() {
         console.log('ctrls:', this.form.form.controls);
@@ -43,35 +30,32 @@ let NxProcessButtonComponent = class NxProcessButtonComponent {
             const control = this.form.form.get(ctrl);
             // console.log('CTRL:', control);
             if (control.invalid) {
+                // TODO : find how to set element's focus
                 // control.focused = true;
                 return;
             }
         }
-        // $timeout(function () {
-        //     $('[name="' + this.form.$name + '"]').find('.ng-invalid:visible:first').focus();
-        // });
     }
     checkForm() {
         if (this.form && !this.form.valid) {
             //Set the form touched
             this.touchForm();
             this.setFocusToInvalid();
-            console.log('ctrls:', this.form.form.controls);
             return false;
         }
         else {
-            this.process();
+            this.process.run();
         }
     }
 };
 __decorate([
     core_1.Input(),
-    __metadata("design:type", String)
-], NxProcessButtonComponent.prototype, "buttonText", void 0);
+    __metadata("design:type", Object)
+], NxProcessButtonComponent.prototype, "process", void 0);
 __decorate([
     core_1.Input(),
-    __metadata("design:type", Function)
-], NxProcessButtonComponent.prototype, "process", void 0);
+    __metadata("design:type", String)
+], NxProcessButtonComponent.prototype, "buttonText", void 0);
 __decorate([
     core_1.Input(),
     __metadata("design:type", Boolean)

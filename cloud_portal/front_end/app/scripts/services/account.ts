@@ -3,7 +3,7 @@
     'use strict';
 
     angular.module('cloudApp')
-        .factory('accountService', ['cloudApi', 'dialogs', '$q', '$location', '$localStorage',
+        .factory('account', ['cloudApi', 'dialogs', '$q', '$location', '$localStorage',
             '$rootScope', '$base64', 'CONFIG', 'languageService',
 
             function (cloudApi, dialogs, $q, $location, $localStorage,

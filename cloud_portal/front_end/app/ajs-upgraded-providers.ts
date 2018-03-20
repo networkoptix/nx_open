@@ -25,25 +25,34 @@ export const languageServiceProvider = {
 };
 
 export function accountFactory(i: any) {
-    return i.get('accountService');
+    return i.get('account');
 }
 
 export const accountServiceProvider = {
-    provide: 'accountService',
+    provide: 'account',
     useFactory: accountFactory,
     deps: ['$injector']
 };
 
 export function processFactory(i: any) {
-    return i.get('processService');
+    return i.get('process');
 }
 
 export const processServiceProvider = {
-    provide: 'processService',
+    provide: 'process',
     useFactory: processFactory,
     deps: ['$injector']
 };
 
+export function CONFIGFactory(i: any) {
+    return i.get('CONFIG');
+}
+
+export const CONFIGProvider = {
+    provide: 'CONFIG',
+    useFactory: CONFIGFactory,
+    deps: ['$injector']
+};
 
 export function uuid2Factory(i: any) {
     return i.get('uuid2');
@@ -91,4 +100,12 @@ export class accountServiceModule {
     ]
 })
 export class processServiceModule {
+}
+
+@NgModule({
+    providers: [
+        CONFIGProvider
+    ]
+})
+export class CONFIGModule {
 }

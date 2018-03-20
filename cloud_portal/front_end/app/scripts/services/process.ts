@@ -4,8 +4,8 @@
 
     angular
         .module('cloudApp')
-        .factory('processService', ['$q', 'dialogs', 'cloudApi', 'accountService', 'languageService',
-            function ($q, dialogs, cloudApi, accountService, languageService) {
+        .factory('process', ['$q', 'dialogs', 'cloudApi', 'account', 'languageService',
+            function ($q, dialogs, cloudApi, account, languageService) {
 
                 let lang = languageService.lang;
 
@@ -42,6 +42,7 @@
                         let errorPrefix = '';
                         let holdAlerts = false;
                         let successMessage = null;
+
                         if (settings) {
                             errorCodes = settings.errorCodes;
                             holdAlerts = settings.holdAlerts;
@@ -49,6 +50,7 @@
 
                             errorPrefix = settings.errorPrefix ? (settings.errorPrefix + ': ') : '';
                         }
+
                         return {
                             success: false,
                             error: false,
@@ -89,7 +91,7 @@
                                             // we need to handle this like user was not authorised
                                             data.data.resultCode == 'notAuthorized' ||
                                             data.data.resultCode == 'forbidden' && settings.logoutForbidden)) {
-                                        accountService.logout();
+                                        account.logout();
                                         deferred.reject(data);
                                         return;
                                     }

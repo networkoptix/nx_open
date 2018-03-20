@@ -2,8 +2,8 @@
     'use strict';
     angular
         .module('cloudApp')
-        .factory('processService', ['$q', 'dialogs', 'cloudApi', 'accountService', 'languageService',
-        function ($q, dialogs, cloudApi, accountService, languageService) {
+        .factory('process', ['$q', 'dialogs', 'cloudApi', 'account', 'languageService',
+        function ($q, dialogs, cloudApi, account, languageService) {
             let lang = languageService.lang;
             function formatError(error, errorCodes) {
                 if (!error || !error.resultCode) {
@@ -77,7 +77,7 @@
                                         // we need to handle this like user was not authorised
                                         data.data.resultCode == 'notAuthorized' ||
                                         data.data.resultCode == 'forbidden' && settings.logoutForbidden)) {
-                                    accountService.logout();
+                                    account.logout();
                                     deferred.reject(data);
                                     return;
                                 }

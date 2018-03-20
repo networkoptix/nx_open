@@ -1,8 +1,8 @@
 'use strict';
 
 angular.module('cloudApp')
-    .factory('urlProtocol', ['$base64', '$location', 'accountService', '$q', '$timeout',
-    function ($base64, $location, accountService, $q, $timeout) {
+    .factory('urlProtocol', ['$base64', '$location', 'account', '$q', '$timeout',
+    function ($base64, $location, account, $q, $timeout) {
 
         function parseSource() {
             var search = $location.search();
@@ -95,7 +95,7 @@ angular.module('cloudApp')
                     window.protocolCheck(link);
 
                     return $timeout(function(){
-                        return accountService.checkVisitedKey(authKey).then(function(visited){
+                        return account.checkVisitedKey(authKey).then(function(visited){
                             if(!visited){
                                 return $q.reject(visited);
                             }

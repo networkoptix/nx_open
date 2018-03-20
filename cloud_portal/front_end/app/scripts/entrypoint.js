@@ -58,9 +58,6 @@ require('./services/system.js');
 require('./services/systems.js');
 require('./services/urlProtocol.js');
 
-//Upgraded controllers
-require('./components/login.controller');
-
 //Controllers
 require('./controllers/account.js');
 require('./controllers/activateRestore.js');

@@ -1,8 +1,8 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('DisconnectCtrl', ['$scope', 'cloudApi', 'process', 'dialogs', '$q', 'accountService',
-    function ($scope, cloudApi, process, dialogs, $q, accountService) {
+    .controller('DisconnectCtrl', ['$scope', 'cloudApi', 'process', 'dialogs', '$q', 'account',
+    function ($scope, cloudApi, process, dialogs, $q, account) {
         $scope.buttonText = L.sharing.shareConfirmButton;
         $scope.model = {
             password:''

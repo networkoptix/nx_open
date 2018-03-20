@@ -5,5 +5,7 @@
 
     <button class="btn"
             [innerHTML]="buttonText"
+            [ngClass]="process.processing?'processing':buttonClass"
+            [disabled]="buttonDisabled"
             (click)="checkForm()"></button>
 </div>

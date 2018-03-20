@@ -29,21 +29,30 @@ exports.languageServiceProvider = {
     deps: ['$injector']
 };
 function accountFactory(i) {
-    return i.get('accountService');
+    return i.get('account');
 }
 exports.accountFactory = accountFactory;
 exports.accountServiceProvider = {
-    provide: 'accountService',
+    provide: 'account',
     useFactory: accountFactory,
     deps: ['$injector']
 };
 function processFactory(i) {
-    return i.get('processService');
+    return i.get('process');
 }
 exports.processFactory = processFactory;
 exports.processServiceProvider = {
-    provide: 'processService',
+    provide: 'process',
     useFactory: processFactory,
+    deps: ['$injector']
+};
+function CONFIGFactory(i) {
+    return i.get('CONFIG');
+}
+exports.CONFIGFactory = CONFIGFactory;
+exports.CONFIGProvider = {
+    provide: 'CONFIG',
+    useFactory: CONFIGFactory,
     deps: ['$injector']
 };
 function uuid2Factory(i) {
@@ -105,4 +114,14 @@ processServiceModule = __decorate([
     })
 ], processServiceModule);
 exports.processServiceModule = processServiceModule;
+let CONFIGModule = class CONFIGModule {
+};
+CONFIGModule = __decorate([
+    core_1.NgModule({
+        providers: [
+            exports.CONFIGProvider
+        ]
+    })
+], CONFIGModule);
+exports.CONFIGModule = CONFIGModule;
 //# sourceMappingURL=ajs-upgraded-providers.js.map

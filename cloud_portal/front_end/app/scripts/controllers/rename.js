@@ -9,7 +9,7 @@ angular.module('cloudApp')
         var dialogSettings = dialogs.getSettings($scope);
         $scope.model = {
             systemName: dialogSettings.params.systemName
-        }
+        };
 
         var dialogSettings = dialogs.getSettings($scope);
 
@@ -17,7 +17,7 @@ angular.module('cloudApp')
 
         $scope.close = function(){
             dialogs.closeMe($scope);
-        }
+        };
 
         $scope.renaming = process.init(function(){
             return cloudApi.renameSystem(systemId, $scope.model.systemName);

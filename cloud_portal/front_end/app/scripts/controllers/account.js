@@ -1,10 +1,10 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('AccountCtrl', ['$scope', 'cloudApi', 'process', '$routeParams', 'accountService', '$timeout', 'systemsProvider',
-    function ($scope, cloudApi, process, $routeParams, accountService, $timeout, systemsProvider) {
+    .controller('AccountCtrl', ['$scope', 'cloudApi', 'process', '$routeParams', 'account', '$timeout', 'systemsProvider',
+    function ($scope, cloudApi, process, $routeParams, account, $timeout, systemsProvider) {
 
-        accountService.requireLogin().then(function(account){
+        account.requireLogin().then(function(account){
             $scope.account = account;
         });
 

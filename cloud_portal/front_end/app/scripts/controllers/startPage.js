@@ -2,12 +2,12 @@
 
 angular.module('cloudApp')
     .controller('StartPageCtrl', ['$scope', 'cloudApi', '$location', '$routeParams', 'dialogs',
-        'accountService',
+        'account',
 
-        function ($scope, cloudApi, $location, $routeParams, dialogs, accountService) {
-            accountService.redirectAuthorised();
+        function ($scope, cloudApi, $location, $routeParams, dialogs, account) {
+            account.redirectAuthorised();
 
-            $scope.userEmail = accountService.getEmail();
+            $scope.userEmail = account.getEmail();
 
             if ($routeParams.callLogin) {
                 dialogs.login();

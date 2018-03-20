@@ -15,34 +15,29 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@angular/core");
 const common_1 = require("@angular/common");
 const ng_bootstrap_1 = require("@ng-bootstrap/ng-bootstrap");
-// import { NxProcessButtonComponent } from "../../components/process-button/process-button.component";
 let NxModalLoginComponent = class NxModalLoginComponent {
-    constructor(language, account, process, location, modalService) {
+    constructor(language, account, process, 
+    // @Inject('CONFIG') private CONFIG: any,
+    location, modalService) {
         this.language = language;
         this.account = account;
         this.process = process;
         this.location = location;
         this.modalService = modalService;
         this.auth = {
-            email: 'tsanko.tsolov@gmail.com',
+            email: 'ttsolov@networkoptix.com',
             password: '',
             remember: true
         };
     }
     open(content) {
-        console.log('LANG', this.language);
-        const modalRef = this.modalService.open(content);
-        modalRef.result.then((result) => {
-            this.closeResult = `Closed with: ${result}`;
-        }, (reason) => {
-            this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-        });
+        this.modalRef = this.modalService.open(content);
     }
-    login() {
-        debugger;
-        console.log('LANG', this.language);
-        // alert('LOGIN!');
-        this.process.init(function () {
+    close() {
+        this.modalRef.close();
+    }
+    ngOnInit() {
+        this.login = this.process.init(() => {
             return this.account.login(this.auth.email, this.auth.password, this.auth.remember);
         }, {
             ignoreUnauthorized: true,
@@ -54,39 +49,29 @@ let NxModalLoginComponent = class NxModalLoginComponent {
                 notFound: this.language.lang.errorCodes.emailNotFound,
                 portalError: this.language.lang.errorCodes.brokenAccount
             }
-        }).then(function () {
+        }).then(() => {
+            // TODO: soon
             // if (dialogSettings.params.redirect) {
             //     $location.path($routeParams.next ? $routeParams.next : Config.redirectAuthorised);
             // }
-            // setTimeout(function () {
-            //     document.location.reload();
-            // });
+            setTimeout(function () {
+                document.location.reload();
+            });
         });
-    }
-    getDismissReason(reason) {
-        if (reason === ng_bootstrap_1.ModalDismissReasons.ESC) {
-            return 'by pressing ESC';
-        }
-        else if (reason === ng_bootstrap_1.ModalDismissReasons.BACKDROP_CLICK) {
-            return 'by clicking on a backdrop';
-        }
-        else {
-            return `with: ${reason}`;
-        }
-    }
-    ngOnInit() {
     }
 };
 NxModalLoginComponent = __decorate([
     core_1.Component({
         selector: 'nx-modal-login',
         templateUrl: './dialogs/login/login.component.html',
+        // TODO: later
+        // templateUrl: this.CONFIG.viewsDir + 'dialogs/login.html',
         encapsulation: core_1.ViewEncapsulation.None,
         styleUrls: []
     }),
     __param(0, core_1.Inject('languageService')),
-    __param(1, core_1.Inject('accountService')),
-    __param(2, core_1.Inject('processService')),
+    __param(1, core_1.Inject('account')),
+    __param(2, core_1.Inject('process')),
     __metadata("design:paramtypes", [Object, Object, Object, common_1.Location,
         ng_bootstrap_1.NgbModal])
 ], NxModalLoginComponent);

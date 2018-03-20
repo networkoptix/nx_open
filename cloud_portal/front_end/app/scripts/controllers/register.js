@@ -7,17 +7,17 @@ angular.module('cloudApp')
     }])
     .controller('RegisterCtrl', [
         '$scope', 'cloudApi', 'process', '$location', '$localStorage', '$timeout', 'dialogs',
-        '$sessionStorage', '$routeParams', 'accountService', 'urlProtocol', '$base64',
+        '$sessionStorage', '$routeParams', 'account', 'urlProtocol', '$base64',
         function ($scope, cloudApi, process, $location, $localStorage, $timeout, dialogs,
-                  $sessionStorage, $routeParams, accountService, urlProtocol, $base64) {
+                  $sessionStorage, $routeParams, account, urlProtocol, $base64) {
 
         $scope.registerSuccess = $routeParams.registerSuccess;
         $scope.activated = $routeParams.activated;
 
         if(!$scope.registerSuccess){
-            accountService.logoutAuthorised();
+            account.logoutAuthorised();
         }else if($scope.activated){
-            accountService.redirectAuthorised();
+            account.redirectAuthorised();
         }
 
         $scope.session = $localStorage;
@@ -35,11 +35,11 @@ angular.module('cloudApp')
 
 
         if($scope.registerSuccess &&  $scope.context.process !== 'registerSuccess'){
-            accountService.redirectToHome();
+            account.redirectToHome();
         }
 
         $scope.account = {
-            email: registerEmail || accountService.getEmail(),
+            email: registerEmail || account.getEmail(),
             password: '',
             firstName: '',
             lastName: '',
@@ -77,10 +77,10 @@ angular.module('cloudApp')
             if($scope.account.code){
                 $scope.activated = true;
                 $location.path('/register/successActivated',false);
-                accountService.login($scope.account.email, $scope.account.password);
+                account.login($scope.account.email, $scope.account.password);
             }else{
                 $location.path('/register/success',false);
-                accountService.setEmail($scope.account.email);
+                account.setEmail($scope.account.email);
             }
         });
 

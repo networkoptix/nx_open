@@ -12,7 +12,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { CoreModule } from './core/index';
 
-import { cloudApiServiceProvider } from './ajs-upgraded-providers';
+import { cloudApiServiceProvider, CONFIGModule } from './ajs-upgraded-providers';
 import { languageServiceModule } from './ajs-upgraded-providers';
 import { accountServiceModule } from './ajs-upgraded-providers';
 import { processServiceModule } from './ajs-upgraded-providers';

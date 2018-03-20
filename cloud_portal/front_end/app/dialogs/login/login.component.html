@@ -7,31 +7,37 @@
             </button>
         </div>
         <div class="modal-body">
-            <div class="form-group" validate-field>
+            <div class="form-group">
                 <label for="email">Email</label>
-                <input type="email" class="form-control" [(ngModel)]="auth.email" id="email" name="email"
-                       validate-email maxlength="255"
+                <input type="email" class="form-control"
+                       id="email" name="email"
+                       [(ngModel)]="auth.email"
+                       email maxlength="255"
                        required autofocus>
             </div>
-            <div class="form-group" validate-field>
+            <div class="form-group" >
                 <label for="password">Password</label>
-                <input type="password" class="form-control" [(ngModel)]="auth.password" name="password" id="password"
+                <input type="password" class="form-control"
+                       name="password" id="password"
+                       [(ngModel)]="auth.password"
                        maxlength="255"
                        required>
             </div>
             <div class="checkbox">
-                <label><input type="checkbox" [(ngModel)]="auth.remember" name="remember" id="remember"> Remember
-                    me</label>
+                <label>
+                    <input type="checkbox"
+                           [(ngModel)]="auth.remember"
+                           name="remember" id="remember"> Remember me
+                </label>
             </div>
         </div>
         <div class="modal-footer">
-            <nx-process-button [buttonText]="language.lang.dialogs.loginButton" [form]="loginForm" process="login"></nx-process-button>
-            <!--<process-button process="login"-->
-                            <!--form="loginForm"-->
-                            <!--button-text="$root.L.dialogs.loginButton">-->
-            <!--</process-button>-->
+            <nx-process-button [buttonText]="language.lang.dialogs.loginButton"
+                               [form]="loginForm"
+                               [process]="login">
+            </nx-process-button>
 
-            <a href="/restore_password" ng-click="close()" class="form-control-static">Forgot password?</a>
+            <a href="/restore_password" (click)="close()" class="form-control-static">Forgot password?</a>
         </div>
     </form>
 </ng-template>
