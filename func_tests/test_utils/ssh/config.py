@@ -8,7 +8,7 @@ from pathlib2 import Path
 class SSHConfig(object):
     def __init__(self, path):
         self.path = path
-        self._connections_dir = Path('/tmp/func_tests/ssh_connections')
+        self._connections_dir = Path('/tmp/func_tests-ssh_connections')
         self._connections_dir.mkdir(exist_ok=True)
 
     def reset(self):
