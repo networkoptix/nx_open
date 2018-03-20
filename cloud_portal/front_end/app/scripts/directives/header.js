@@ -6,9 +6,11 @@
         .module('cloudApp')
         .directive('nxHeader', NxHeader);
 
-    NxHeader.$inject = ['dialogs', 'cloudApi', 'account', '$location', '$route', 'systemsProvider', 'CONFIG'];
+    NxHeader.$inject = ['dialogs', 'cloudApi', 'account', '$location', '$route',
+        'systemsProvider', 'CONFIG'];
 
-    function NxHeader(dialogs, cloudApi, account, $location, $route, systemsProvider, CONFIG) {
+    function NxHeader(dialogs, cloudApi, account, $location, $route,
+                      systemsProvider, CONFIG) {
         return {
             restrict: 'E',
             templateUrl: CONFIG.viewsDir + 'components/header.html',

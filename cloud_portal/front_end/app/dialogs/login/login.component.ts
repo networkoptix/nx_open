@@ -1,13 +1,27 @@
-import {Component, Inject, OnInit, ViewEncapsulation} from '@angular/core';
+import {Component, Inject, OnInit, Input, ViewEncapsulation} from '@angular/core';
 import {Location} from '@angular/common';
-import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {NgbModal, NgbActiveModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {EmailValidator} from '@angular/forms';
+
+
+@Component({
+    selector: 'ngbd-modal-content',
+    templateUrl: './dialogs/login/login.component.html'
+    // TODO: later
+    // templateUrl: this.CONFIG.viewsDir + 'dialogs/login.html'
+})
+export class LoginModalContent {
+    @Input() auth;
+    @Input() language;
+    @Input() login;
+
+    constructor(public activeModal: NgbActiveModal) {
+    }
+}
 
 @Component({
     selector: 'nx-modal-login',
-    templateUrl: './dialogs/login/login.component.html',
-    // TODO: later
-    // templateUrl: this.CONFIG.viewsDir + 'dialogs/login.html',
+    template: '',
     encapsulation: ViewEncapsulation.None,
     styleUrls: []
 })
@@ -30,8 +44,11 @@ export class NxModalLoginComponent implements OnInit {
                 private modalService: NgbModal) {
     }
 
-    open(content) {
-        this.modalRef = this.modalService.open(content);
+    open() {
+        this.modalRef = this.modalService.open(LoginModalContent);
+        this.modalRef.componentInstance.auth = this.auth;
+        this.modalRef.componentInstance.language = this.language;
+        this.modalRef.componentInstance.login = this.login;
     }
 
     close() {

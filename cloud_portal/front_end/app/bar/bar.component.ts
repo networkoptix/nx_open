@@ -3,7 +3,7 @@ import { HttpErrorResponse } from "@angular/common/http";
 import { HttpClient } from '@angular/common/http';
 
 import { QuoteService } from '../../app/core/index';
-// import { NxModalLoginComponent } from "../dialogs/login/login.component";
+import { NxModalLoginComponent } from "../dialogs/login/login.component";
 
 @Component({
     selector: 'bar-component',
@@ -27,7 +27,7 @@ export class BarComponent implements OnInit {
                 @Inject('cloudApiService') private cloudApi: any,
                 private http: HttpClient,
                 private quoteService: QuoteService,
-                // private login: NxModalLoginComponent,
+                private loginModal: NxModalLoginComponent,
                 private changeDetector: ChangeDetectorRef,
     ){
 
@@ -39,6 +39,10 @@ export class BarComponent implements OnInit {
     // getLanguages(): any {
     //     return this.http.get('/static/languages.json', {});
     // }
+
+    login () {
+        this.loginModal.open();
+    }
 
     ngOnInit(): void {
         this.serviceMessage = this.uuid2.newguid();

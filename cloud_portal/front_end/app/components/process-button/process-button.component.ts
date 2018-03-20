@@ -17,12 +17,15 @@ export class NxProcessButtonComponent implements OnInit {
     @Input() form: any;
 
     buttonClass: string;
-    processing: false;
+    processing = false;
 
     constructor() {
     }
 
     ngOnInit() {
+        // debugger;
+        // this.process.processing = false;
+
         this.buttonClass = 'btn-primary';
         if (this.actionType) {
             this.buttonClass = 'btn-' + this.actionType;
@@ -50,6 +53,7 @@ export class NxProcessButtonComponent implements OnInit {
     }
 
     checkForm() {
+        debugger;
         if (this.form && !this.form.valid) {
             //Set the form touched
             this.touchForm();

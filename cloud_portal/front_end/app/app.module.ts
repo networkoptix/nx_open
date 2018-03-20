@@ -21,7 +21,7 @@ import { uuid2ServiceModule } from './ajs-upgraded-providers';
 import { AppComponent } from './app.component';
 import { BarModule } from './bar/bar.module';
 import { NxLanguageDropdown } from "./dropdown/language.component";
-import { NxModalLoginComponent } from "./dialogs/login/login.component";
+import { NxModalLoginComponent, LoginModalContent } from "./dialogs/login/login.component";
 import { NxProcessButtonComponent } from './components/process-button/process-button.component';
 
 class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
@@ -59,7 +59,8 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
     entryComponents: [
         NxLanguageDropdown,
         NxModalLoginComponent,
-        NxProcessButtonComponent
+        NxProcessButtonComponent,
+        LoginModalContent
     ],
     providers: [
         NgbModal,
@@ -67,7 +68,8 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
         { provide: LocationStrategy, useClass: PathLocationStrategy },
         { provide: UrlHandlingStrategy, useClass: HybridUrlHandlingStrategy },
         { provide: '$scope', useFactory: i => i.get('$rootScope'), deps: ['$injector'] },
-        cloudApiServiceProvider
+        cloudApiServiceProvider,
+        NxModalLoginComponent
     ],
     declarations: [
         AppComponent

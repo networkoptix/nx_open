@@ -12,8 +12,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@angular/core");
 let NxProcessButtonComponent = class NxProcessButtonComponent {
     constructor() {
+        this.processing = false;
     }
     ngOnInit() {
+        // debugger;
+        // this.process.processing = false;
         this.buttonClass = 'btn-primary';
         if (this.actionType) {
             this.buttonClass = 'btn-' + this.actionType;
@@ -37,6 +40,7 @@ let NxProcessButtonComponent = class NxProcessButtonComponent {
         }
     }
     checkForm() {
+        debugger;
         if (this.form && !this.form.valid) {
             //Set the form touched
             this.touchForm();

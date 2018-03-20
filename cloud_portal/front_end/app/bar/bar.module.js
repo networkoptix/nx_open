@@ -43,6 +43,7 @@ BarModule = __decorate([
             bar_component_1.BarComponent,
             language_component_1.NxLanguageDropdown,
             login_component_1.NxModalLoginComponent,
+            login_component_1.LoginModalContent,
             process_button_component_1.NxProcessButtonComponent
         ],
         bootstrap: []

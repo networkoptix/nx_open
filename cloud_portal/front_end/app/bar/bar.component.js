@@ -15,16 +15,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@angular/core");
 const http_1 = require("@angular/common/http");
 const index_1 = require("../../app/core/index");
-// import { NxModalLoginComponent } from "../dialogs/login/login.component";
+const login_component_1 = require("../dialogs/login/login.component");
 let BarComponent = class BarComponent {
-    constructor(uuid2, language, cloudApi, http, quoteService, 
-    // private login: NxModalLoginComponent,
-    changeDetector) {
+    constructor(uuid2, language, cloudApi, http, quoteService, loginModal, changeDetector) {
         this.uuid2 = uuid2;
         this.language = language;
         this.cloudApi = cloudApi;
         this.http = http;
         this.quoteService = quoteService;
+        this.loginModal = loginModal;
         this.changeDetector = changeDetector;
         this.title = 'bar';
         // this.uuid2 = uuid2;
@@ -34,6 +33,9 @@ let BarComponent = class BarComponent {
     // getLanguages(): any {
     //     return this.http.get('/static/languages.json', {});
     // }
+    login() {
+        this.loginModal.open();
+    }
     ngOnInit() {
         this.serviceMessage = this.uuid2.newguid();
         this.quoteService
@@ -70,6 +72,7 @@ BarComponent = __decorate([
     __param(2, core_1.Inject('cloudApiService')),
     __metadata("design:paramtypes", [Object, Object, Object, http_1.HttpClient,
         index_1.QuoteService,
+        login_component_1.NxModalLoginComponent,
         core_1.ChangeDetectorRef])
 ], BarComponent);
 exports.BarComponent = BarComponent;

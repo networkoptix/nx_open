@@ -62,7 +62,8 @@ AppModule = __decorate([
         entryComponents: [
             language_component_1.NxLanguageDropdown,
             login_component_1.NxModalLoginComponent,
-            process_button_component_1.NxProcessButtonComponent
+            process_button_component_1.NxProcessButtonComponent,
+            login_component_1.LoginModalContent
         ],
         providers: [
             ng_bootstrap_2.NgbModal,
@@ -70,7 +71,8 @@ AppModule = __decorate([
             { provide: common_1.LocationStrategy, useClass: common_1.PathLocationStrategy },
             { provide: router_1.UrlHandlingStrategy, useClass: HybridUrlHandlingStrategy },
             { provide: '$scope', useFactory: i => i.get('$rootScope'), deps: ['$injector'] },
-            ajs_upgraded_providers_1.cloudApiServiceProvider
+            ajs_upgraded_providers_1.cloudApiServiceProvider,
+            login_component_1.NxModalLoginComponent
         ],
         declarations: [
             app_component_1.AppComponent

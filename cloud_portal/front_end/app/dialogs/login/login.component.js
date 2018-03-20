@@ -15,6 +15,33 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@angular/core");
 const common_1 = require("@angular/common");
 const ng_bootstrap_1 = require("@ng-bootstrap/ng-bootstrap");
+let LoginModalContent = class LoginModalContent {
+    constructor(activeModal) {
+        this.activeModal = activeModal;
+    }
+};
+__decorate([
+    core_1.Input(),
+    __metadata("design:type", Object)
+], LoginModalContent.prototype, "auth", void 0);
+__decorate([
+    core_1.Input(),
+    __metadata("design:type", Object)
+], LoginModalContent.prototype, "language", void 0);
+__decorate([
+    core_1.Input(),
+    __metadata("design:type", Object)
+], LoginModalContent.prototype, "login", void 0);
+LoginModalContent = __decorate([
+    core_1.Component({
+        selector: 'ngbd-modal-content',
+        templateUrl: './dialogs/login/login.component.html'
+        // TODO: later
+        // templateUrl: this.CONFIG.viewsDir + 'dialogs/login.html'
+    }),
+    __metadata("design:paramtypes", [ng_bootstrap_1.NgbActiveModal])
+], LoginModalContent);
+exports.LoginModalContent = LoginModalContent;
 let NxModalLoginComponent = class NxModalLoginComponent {
     constructor(language, account, process, 
     // @Inject('CONFIG') private CONFIG: any,
@@ -30,8 +57,11 @@ let NxModalLoginComponent = class NxModalLoginComponent {
             remember: true
         };
     }
-    open(content) {
-        this.modalRef = this.modalService.open(content);
+    open() {
+        this.modalRef = this.modalService.open(LoginModalContent);
+        this.modalRef.componentInstance.auth = this.auth;
+        this.modalRef.componentInstance.language = this.language;
+        this.modalRef.componentInstance.login = this.login;
     }
     close() {
         this.modalRef.close();
@@ -63,9 +93,7 @@ let NxModalLoginComponent = class NxModalLoginComponent {
 NxModalLoginComponent = __decorate([
     core_1.Component({
         selector: 'nx-modal-login',
-        templateUrl: './dialogs/login/login.component.html',
-        // TODO: later
-        // templateUrl: this.CONFIG.viewsDir + 'dialogs/login.html',
+        template: '',
         encapsulation: core_1.ViewEncapsulation.None,
         styleUrls: []
     }),
