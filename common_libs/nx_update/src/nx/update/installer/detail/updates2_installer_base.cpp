@@ -3,6 +3,7 @@
 #include <utils/common/process.h>
 #include <nx/utils/raii_guard.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/literal.h>
 
 namespace nx {
 namespace update {
