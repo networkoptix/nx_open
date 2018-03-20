@@ -2,8 +2,8 @@ set(CMAKE_SYSTEM_NAME Linux)
 set(CMAKE_SYSTEM_PROCESSOR arm)
 set(box "bananapi")
 
-set(CMAKE_C_COMPILER "${PACKAGES_DIR}/linux-arm/gcc-7.2.0/bin/arm-unknown-linux-gnueabihf-gcc")
-set(CMAKE_CXX_COMPILER "${PACKAGES_DIR}/linux-arm/gcc-7.2.0/bin/arm-unknown-linux-gnueabihf-g++")
+set(CMAKE_C_COMPILER "${PACKAGES_DIR}/linux-arm/gcc-linaro-7.2.1/bin/arm-linux-gnueabihf-gcc")
+set(CMAKE_CXX_COMPILER "${PACKAGES_DIR}/linux-arm/gcc-linaro-7.2.1/bin/arm-linux-gnueabihf-g++")
 
 include_directories(SYSTEM "${PACKAGES_DIR}/bpi/sysroot/usr/include")
 
