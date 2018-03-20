@@ -47,6 +47,10 @@ class HttpError(Exception):
         self.json = json
 
 
+class Unauthorized(HttpError):
+    pass
+
+
 class RestApiError(Exception):
     """Error received from server."""
 
@@ -169,6 +173,8 @@ class RestApi(object):
                     error_string = response_data.get('errorString')
                     if error_string:
                         reason = error_string
+            if response.status_code == 401:
+                raise Unauthorized(self._alias, response.request.url, response.status_code, reason, response_data)
             raise HttpError(self._alias, response.request.url, response.status_code, reason, response_data)
         else:
             response.raise_for_status()
@@ -215,9 +221,7 @@ class RestApi(object):
 
     def credentials_work(self):
         try:
-            self.get('api/getNonce')  # Any URL that requires authorization.
-        except HttpError as e:
-            if e.status_code == 401:
-                return False
-            raise
+            self.get('ec2/testConnection')
+        except Unauthorized:
+            return False
         return True
