@@ -215,7 +215,6 @@ protected:
 private:
     bool m_waitEOF;
 
-    bool m_forceDefaultCtx;
     bool m_packetWrited;
     StreamRecorderErrorStruct m_lastError;
     qint64 m_currentChunkLen;

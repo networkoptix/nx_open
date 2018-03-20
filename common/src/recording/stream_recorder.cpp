@@ -136,7 +136,6 @@ QnStreamRecorder::QnStreamRecorder(const QnResourcePtr& dev):
     m_startDateTime(AV_NOPTS_VALUE),
     m_currentTimeZone(-1),
     m_waitEOF(false),
-    m_forceDefaultCtx(false),
     m_packetWrited(false),
     m_currentChunkLen(0),
     m_prebufferingUsec(0),
@@ -778,8 +777,6 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
 
         const QnMediaResource* mediaDev = dynamic_cast<const QnMediaResource*>(m_device.data());
 
-        // m_forceDefaultCtx: for server archive, if file is recreated - we need to use default context.
-        // for exporting AVI files we must use original context, so need to reset "force" for exporting purpose
         bool isTranscode = !m_extraTranscodeParams.isEmpty() || (m_dstVideoCodec != AV_CODEC_ID_NONE && m_dstVideoCodec != mediaData->compressionType);
 
         const QnConstResourceVideoLayoutPtr& layout = mediaDev->getVideoLayout(m_mediaProvider);
@@ -867,11 +864,11 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
 
                     QnFfmpegHelper::copyAvCodecContex(videoStream->codec, m_videoTranscoder->getCodecContext());
                 }
-                else if (!m_forceDefaultCtx && mediaData->context && mediaData->context->getWidth() > 0)
+                else if (mediaData->context && mediaData->context->getWidth() > 0)
                 {
                     QnFfmpegHelper::mediaContextToAvCodecContext(videoCodecCtx, mediaData->context);
                 }
-                else if (m_role == StreamRecorderRole::fileExport || m_role == StreamRecorderRole::fileExportWithEmptyContext)
+                else if (m_role == StreamRecorderRole::fileExport)
                 {
                     // determine real width and height
                     QSharedPointer<CLVideoDecoderOutput> outFrame(new CLVideoDecoderOutput());
@@ -1189,9 +1186,6 @@ bool QnStreamRecorder::addSignatureFrame()
 void QnStreamRecorder::setRole(StreamRecorderRole role)
 {
     m_role = role;
-    // TODO: it seems we don't need to force default context either for client or server.
-    // Get rid of this field and fileExportWithEmptyContext enum value (need to recheck NOV export/double export).
-    m_forceDefaultCtx = (m_role == StreamRecorderRole::fileExportWithEmptyContext);
 }
 
 #ifdef SIGN_FRAME_ENABLED
