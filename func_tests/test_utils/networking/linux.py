@@ -1,5 +1,6 @@
 import csv
 import logging
+from pprint import pformat
 
 from netaddr import EUI
 
@@ -25,6 +26,7 @@ class LinuxNetworking(object):
             for interface, raw_mac
             in csv.reader(output.splitlines(), delimiter='\t')
             if EUI(raw_mac) in macs}
+        logger.info("Interfaces on %r:\n%s", self._os_access, pformat(self.interfaces))
 
     def reset(self):
         """Don't touch localhost, host-bound interface and interfaces unknown to VM."""
@@ -45,12 +47,14 @@ class LinuxNetworking(object):
             env={'AVAILABLE_INTERFACES': '\n'.join(self.interfaces.values())})
 
     def setup_ip(self, mac, ip, prefix_length):
+        interface = self.interfaces[mac]
         self._os_access.run_command(
             '''
             ip addr replace ${ADDRESS}/${PREFIX_LENGTH} dev ${INTERFACE} 
             ip link set dev ${INTERFACE} up
             ''',
-            env={'INTERFACE': self.interfaces[mac], 'ADDRESS': ip, 'PREFIX_LENGTH': prefix_length})
+            env={'INTERFACE': interface, 'ADDRESS': ip, 'PREFIX_LENGTH': prefix_length})
+        logger.info("Machine %r has IP %s/%d on %s (%s).", self._os_access, ip, prefix_length, interface, mac)
 
     def route(self, destination_ip_net, gateway_bound_mac, gateway_ip):
         interface = self.interfaces[gateway_bound_mac]

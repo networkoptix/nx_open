@@ -2,8 +2,6 @@ import logging
 from collections import namedtuple
 from pprint import pformat
 
-from pylru import lrudecorator
-
 from test_utils.move_lock import MoveLock
 from test_utils.networking.linux import LinuxNetworking
 from test_utils.os_access import FileNotFound
@@ -151,17 +149,21 @@ class Pool(object):
     def __init__(self, registry, factory):
         self._factory = factory
         self._registry = registry
+        self._cache = {}
 
-    @lrudecorator(100)
     def get(self, alias):
-        (index, name), = self._registry.reserve(alias)
-        return self._factory.allocate(alias, name, index)
+        try:
+            cached_machine = self._cache[alias]
+        except KeyError:
+            (index, name), = self._registry.reserve(alias)
+            machine = self._factory.allocate(alias, name, index)
+            self._cache[alias] = machine
+            logger.info("Machine %r is allocated.", machine)
+            return machine
+        else:
+            logger.info("Machine %r is already allocated, return it from cache.", cached_machine)
+            return cached_machine
 
     def close(self):
-        names = []
-        for cache_key, machine in self.get.cache.items():
-            (pool, alias), _empty_kwargs = cache_key
-            if pool is self:
-                assert alias == machine.alias
-                names.append(machine.name)
+        names = [machine.name for machine in self._cache.values()]
         self._registry.relinquish(*names)
