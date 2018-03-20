@@ -57,7 +57,7 @@ set(freeLicenseKey "0000-0000-0000-0006")
 
 # Installer Customizations
 set(windows.skip.sign "true")
-set(sign.password "")
+set(sign.password "qweasd123")
 set(sign.cer "")
 
 # Localization
