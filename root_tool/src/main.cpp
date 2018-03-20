@@ -33,23 +33,6 @@ static int reportErrorAndExit(const std::string& message)
     return -1;
 }
 
-static int reportArgErrorAndExit(const std::string& command)
-{
-    if (command == "umount" || command == "unmount")
-        return reportErrorAndExit("<source> or <directory> is required");
-    else if (command == "chown")
-        return reportErrorAndExit("<file_or_directory_path> is required");
-    else if (command == "touch")
-        return reportErrorAndExit("<file_path> is required");
-    else if (command == "mkdir")
-        return reportErrorAndExit("<directory_path> is required");
-    else if (command == "install")
-        return reportErrorAndExit("<deb_package> is required");
-
-    assert(false);
-    return -1;
-}
-
 static const std::string kMount = "mount";
 static const std::string kUMount1 = "umount";
 static const std::string kUMount2 = "unmount";
@@ -58,6 +41,23 @@ static const std::string kTouch = "touch";
 static const std::string kMkdir = "mkdir";
 static const std::string kInstall = "install";
 static const std::string kIds = "ids";
+
+static int reportArgErrorAndExit(const std::string& command)
+{
+    if (command == kUMount1 || command == kUMount2)
+        return reportErrorAndExit("<source> or <directory> is required");
+    else if (command == kChown)
+        return reportErrorAndExit("<file_or_directory_path> is required");
+    else if (command == kTouch)
+        return reportErrorAndExit("<file_path> is required");
+    else if (command == kMkdir)
+        return reportErrorAndExit("<directory_path> is required");
+    else if (command == kInstall)
+        return reportErrorAndExit("<deb_package> is required");
+
+    assert(false);
+    return -1;
+}
 
 static bool unknownCommand(const std::string& command)
 {
