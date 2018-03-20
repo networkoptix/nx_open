@@ -15,8 +15,7 @@ import server_api_data_generators as generator
 from test_utils.api_shortcuts import get_server_id, get_system_settings
 from test_utils.merging import merge_systems
 from test_utils.server import MEDIASERVER_MERGE_TIMEOUT
-from test_utils.utils import datetime_utc_now, bool_to_str, str_to_bool, wait_until
-
+from test_utils.utils import bool_to_str, datetime_utc_now, str_to_bool, wait_until
 
 CAMERA_SWITCHING_PERIOD_SEC = 4*60
 
@@ -44,27 +43,32 @@ ServerRec = namedtuple('ServerRec', 'server camera_mac_set')
 # To catch exact moment when servers merge complete, we first wait until each server discover all cameras.
 # After that we merge servers and wait until preferred cameras settle down on destined servers.
 
+
 def create_cameras_and_servers(server_factory, camera_factory, counter, server_name_list):
     server_count = len(server_name_list)
     # we always use 2 cameras per server
     all_camera_mac_set = set(create_cameras(camera_factory, counter, count=server_count*2))
-    server_list = [create_server(server_factory, server_name, all_camera_mac_set)
-                       for server_name in server_name_list]
+    server_list = [
+        create_server(server_factory, server_name, all_camera_mac_set)
+        for server_name in server_name_list]
     for server in server_list[1:]:
         server_list[0].merge_systems(server)
     wait_until_servers_are_online(server_list)
-    server_rec_list = [ServerRec(server, set(sorted(all_camera_mac_set)[idx*2 : idx*2 + 2]))
-                           for idx, server in enumerate(server_list)]
+    server_rec_list = [
+        ServerRec(server, set(sorted(all_camera_mac_set)[idx * 2: idx * 2 + 2]))
+        for idx, server in enumerate(server_list)]
     for rec in server_rec_list:
         attach_cameras_to_server(rec.server, rec.camera_mac_set)
     for rec in server_rec_list:
         wait_until_cameras_on_server_reduced_to(rec.server, rec.camera_mac_set)
     return server_rec_list
 
+
 def create_server(server_factory, name, all_camera_mac_set, setup_settings=None):
     server = server_factory.create(name, setup_settings=setup_settings)
     wait_until_cameras_are_online(server, all_camera_mac_set)
     return server
+
 
 def wait_until_servers_are_online(servers):
     start_time = datetime_utc_now()
@@ -91,6 +95,7 @@ def create_cameras(camera_factory, counter, count):
         log.info('Camera is created: mac=%r', camera.mac_addr)
         yield camera.mac_addr
 
+
 def attach_cameras_to_server(server, camera_mac_list):
     camera_mac_to_id = {camera['mac']: camera['id'] for camera in server.rest_api.ec2.getCameras.GET()}
     for camera_mac in camera_mac_list:
@@ -99,12 +104,16 @@ def attach_cameras_to_server(server, camera_mac_list):
             cameraId=camera_id, preferredServerId=get_server_id(server.rest_api))
         log.info('Camera is set as preferred for server %s: mac=%r, id=%r', server, camera_mac, camera_id)
 
+
 def online_camera_macs_on_server(server):
     camera_list = [camera for camera in server.rest_api.ec2.getCamerasEx.GET()
                    if camera['parentId'] == get_server_id(server.rest_api)]
     for camera in sorted(camera_list, key=itemgetter('mac')):
-        log.info('Camera mac=%r id=%r is %r on server %s: %r', camera['mac'], camera['id'], camera['status'], server, camera)
+        log.info(
+            'Camera mac=%r id=%r is %r on server %s: %r',
+            camera['mac'], camera['id'], camera['status'], server, camera)
     return set(camera['mac'] for camera in camera_list if camera['status'] == 'Online')
+
 
 def wait_until_cameras_on_server_reduced_to(server, camera_mac_set):
     assert wait_until(
@@ -113,6 +122,7 @@ def wait_until_cameras_on_server_reduced_to(server, camera_mac_set):
             'Cameras on server %s were not reduced to %r in %d seconds' %
             (server, sorted(camera_mac_set), CAMERA_SWITCHING_PERIOD_SEC))
 
+
 def wait_until_camera_count_is_online(server, camera_count):
     assert wait_until(
         lambda: len(online_camera_macs_on_server(server)) >= camera_count,
@@ -120,12 +130,14 @@ def wait_until_camera_count_is_online(server, camera_count):
         '%d cameras did not become online on %r in %d seconds' %
             (camera_count, server, CAMERA_SWITCHING_PERIOD_SEC))
 
+
 def wait_until_cameras_are_online(server, camera_mac_set):
     assert wait_until(
         lambda: online_camera_macs_on_server(server) >= camera_mac_set,
         timeout_sec=CAMERA_SWITCHING_PERIOD_SEC), (
         'Cameras %r did not become online on %r in %d seconds' %
             (sorted(camera_mac_set), server, CAMERA_SWITCHING_PERIOD_SEC))
+
 
 def get_server_camera_macs(server):
     server_guid = get_server_id(server.rest_api)
@@ -231,7 +243,8 @@ def test_max_camera_settings(server_factory, camera_factory, counter):
     two.server.start()
     wait_until_camera_count_is_online(two.server, 2)
     assert len(online_camera_macs_on_server(two.server)) == 2, (
-        'Server "two" maxCameras limit (2) does not work - it got cameras from server one, while already has 2 own cameras')
+        'Server "two" maxCameras limit (2) does not work - '
+        'it got cameras from server one, while already has 2 own cameras')
     # start server one again; all cameras must go back to their original owners
     one.server.start()
     wait_until_camera_count_is_online(one.server, 2)
