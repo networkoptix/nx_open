@@ -23,6 +23,7 @@
 #include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
 
+#include <ini.h>
 #include <nx/client/core/utils/human_readable.h>
 #include <nx/client/desktop/common/widgets/web_view_dialog.h>
 #include <nx/utils/datetime.h>
@@ -617,6 +618,9 @@ int AnalyticsSearchListModel::Private::indexOf(const QnUuid& objectId) const
 QString AnalyticsSearchListModel::Private::description(
     const DetectedObject& object) const
 {
+    if (!ini().showDebugTimeInformationInRibbon)
+        return QString();
+
     QString result;
 
     const auto timeWatcher = q->context()->instance<QnWorkbenchServerTimeWatcher>();
