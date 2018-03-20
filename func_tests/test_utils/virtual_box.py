@@ -42,7 +42,9 @@ class VMInfo(namedtuple('VMInfo', ['name', 'ports', 'macs', 'networks', 'is_runn
                 networks[slot] = None
             else:
                 networks[slot] = raw_info['intnet{}'.format(slot)]
-        return cls(raw_info['name'], ports, macs, networks, raw_info['VMState'] == 'running')
+        parsed_info = cls(raw_info['name'], ports, macs, networks, raw_info['VMState'] == 'running')
+        logger.info("Parsed info:\n%s", pformat(parsed_info))
+        return parsed_info
 
 
 class VMNotFound(Exception):
