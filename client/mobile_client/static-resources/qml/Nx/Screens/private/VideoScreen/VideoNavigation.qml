@@ -7,6 +7,8 @@ import Nx.Media 1.0
 import Nx.Controls 1.0
 import com.networkoptix.qml 1.0
 
+// TODO: #ynikitenkov After 18.1 refactor this control.
+
 Item
 {
     id: videoNavigation
@@ -18,14 +20,14 @@ Item
     property real controlsOpacity: 1.0
     property alias animatePlaybackControls: playbackControlsOpacityBehaviour.enabled
     property bool canViewArchive: true
-    property int buttonsPanelHeight: navigationPanel.visible ? navigationPanel.height : 0
+    property int buttonsPanelHeight: buttonsPanel.visible ? buttonsPanel.height : 0
 
     signal ptzButtonClicked()
     signal switchToNextCamera()
     signal switchToPreviousCamera()
 
     implicitWidth: parent ? parent.width : 0
-    implicitHeight: navigator.height + navigationPanel.height
+    implicitHeight: navigator.height + buttonsPanel.height
     anchors.bottom: parent ? parent.bottom : undefined
 
     Connections
@@ -153,8 +155,11 @@ Item
     {
         id: navigator
 
-        width: parent.width
-        height: timeline.height + playbackController.height - 16
+        implicitWidth: parent.width
+        implicitHeight: videoNavigation.canViewArchive
+            ? timeline.height + playbackController.height - 16
+            : 56
+
         Behavior on y { SmoothedAnimation { duration: 200; reversingMode: SmoothedAnimation.Sync } }
 
         MouseArea
@@ -164,7 +169,7 @@ Item
             anchors.fill: navigator
             drag.axis: Drag.YAxis
             drag.minimumY: 0
-            drag.maximumY: navigationPanel.height
+            drag.maximumY: buttonsPanel.height
             drag.filterChildren: true
             drag.threshold: 10
 
@@ -338,29 +343,28 @@ Item
             Component.onCompleted: timeline.timelineView.visible = false
         }
 
-// TODO: Will lbe fixed in next commits
-//        Text
-//        {
-//            anchors.horizontalCenter: timeline.horizontalCenter
-//            text: qsTr("No Archive")
-//            font.capitalization: Font.AllUppercase
-//            font.pixelSize: 12
-//            anchors.bottom: timeline.bottom
-//            anchors.bottomMargin: (timeline.chunkBarHeight - height) / 2 + 12
-//            color: ColorTheme.windowText
-//            visible: !d.hasArchive && videoNavigation.canViewArchive
-//            opacity: 0.5 * timelineOpactiyMask.opacity
-//        }
+        Text
+        {
+            anchors.horizontalCenter: timeline.horizontalCenter
+            text: qsTr("No Archive")
+            font.capitalization: Font.AllUppercase
+            font.pixelSize: 12
+            anchors.bottom: timeline.bottom
+            anchors.bottomMargin: (timeline.chunkBarHeight - height) / 2 + 12
+            color: ColorTheme.windowText
+            visible: !d.hasArchive && videoNavigation.canViewArchive
+            opacity: 0.5 * timelineOpactiyMask.opacity
+        }
 
         Pane
         {
-            id: navigationPanel
+            id: buttonsPanel
 
             readonly property real minimalWidth: width - (zoomButtonsRow.x + zoomButtonsRow.width)
             readonly property bool showZoomControls: actionButtonsPanel.contentWidth < minimalWidth
 
             width: parent.width
-            height: 56
+            height: visible ? 56 : 0
             anchors.top: timeline.bottom
             background: Item {}
             padding: 4
@@ -391,7 +395,7 @@ Item
                 id: zoomButtonsRow
 
                 anchors.centerIn: parent
-                visible: (navigationPanel.showZoomControls || !d.liveMode)
+                visible: (buttonsPanel.showZoomControls || !d.liveMode)
                     && videoNavigation.canViewArchive
 
                 IconButton
@@ -445,11 +449,10 @@ Item
             {
                 id: actionButtonsPanel
 
-                visible: opacity > 0
+                visible: buttonsPanel.showButtonsPanel
 
                 resourceId: videoScreenController.resourceId
-
-                anchors.left: navigationPanel.showZoomControls
+                anchors.left: buttonsPanel.showZoomControls
                     ? zoomButtonsRow.right
                     : calendarButton.right
                 anchors.right: parent.right
@@ -464,7 +467,7 @@ Item
                     var correctState = videoScreenController.dummyState.length == 0
                     var live = d.liveMode || futurePosition
 
-                    return live && correctState && navigationPanel.showButtonsPanel ? 1 : 0
+                    return live && correctState ? 1 : 0
                 }
 
                 onPtzButtonClicked: videoNavigation.ptzButtonClicked()
@@ -560,7 +563,12 @@ Item
 
         Text
         {
-            anchors.centerIn: parent
+            id: liveOnlyText
+
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.bottom: parent.bottom
+            verticalAlignment: Text.AlignVCenter
+            height: 56
             font.pixelSize: 28
             font.weight: Font.Normal
             color: ColorTheme.windowText
@@ -620,7 +628,7 @@ Item
         width: parent.width
         anchors.top: parent.bottom
         color: ColorTheme.base3
-        height: navigationPanel.height
+        height: buttonsPanel.height
     }
 
     CalendarPanel
