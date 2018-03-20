@@ -153,6 +153,7 @@ class VirtualBox(object):
             self.os_access.run_command(['VBoxManage', 'controlvm', name, 'poweroff'])
             assert wait_until(lambda: not self.find(name).is_running, name='until VM is off')
         self.os_access.run_command(['VBoxManage', 'unregistervm', name, '--delete'])
+        logger.info("VM %r destroyed.", name)
 
     def power_on(self, name):
         self.os_access.run_command(['VBoxManage', 'startvm', name, '--type', 'headless'])

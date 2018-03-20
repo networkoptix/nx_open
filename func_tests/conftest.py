@@ -24,7 +24,7 @@ from test_utils.server_factory import ServerFactory
 from test_utils.server_physical_host import PhysicalInstallationCtl
 from test_utils.ssh.access_manager import SSHAccessManager
 from test_utils.ssh.config import SSHConfig
-from test_utils.virtual_box import VirtualBox
+from test_utils.virtual_box import VirtualBox, VMNotFound
 from test_utils.vm import Factory, Registry, VMConfiguration, Pool
 
 JUNK_SHOP_PLUGIN_NAME = 'junk-shop-db-capture'
@@ -279,11 +279,20 @@ def registries(vm_types, configuration, host_os_access):
         }
 
 
+def _destroy_vms(hypervisor, vm_types, registries):
+    def destroy(name):
+        try:
+            hypervisor.destroy(name)
+        except VMNotFound:
+            pass
+    for vm_type in vm_types:
+        registries[vm_type].clean(destroy)
+
+
 @pytest.fixture(scope='session')
 def vm_factories(request, vm_types, registries, ssh_config, configuration, hypervisor):
     if request.config.getoption('--clean'):
-        for vm_type in vm_types:
-            registries[vm_type].clean(hypervisor.destroy)
+        _destroy_vms(hypervisor, vm_types, registries)
     access_manager = SSHAccessManager(ssh_config, 'root', Path(configuration['ssh']['private_key']).expanduser())
     pools = {
         vm_type: Factory(
