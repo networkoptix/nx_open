@@ -26,6 +26,7 @@ class LinuxNetworking(object):
             for interface, raw_mac
             in csv.reader(output.splitlines(), delimiter='\t')
             if EUI(raw_mac) in macs}
+        assert set(macs) == set(self.interfaces.keys())
         logger.info("Interfaces on %r:\n%s", self._os_access, pformat(self.interfaces))
 
     def reset(self):
