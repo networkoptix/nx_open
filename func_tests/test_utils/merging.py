@@ -43,7 +43,7 @@ class MergeChecksFailed(MergeError):
         self.remote = remote
 
 
-def merge_systems(local, remote, accessible_ip_net=IPNetwork('10.254.0.0/17'), take_remote_settings=False):
+def merge_systems(local, remote, accessible_ip_net=IPNetwork('10.254.0.0/16'), take_remote_settings=False):
     # When many servers are merged, there is server visible from others.
     # This server is passed as remote. That's why it's higher in loggers hierarchy.
     merge_logger = _logger.getChild('merge').getChild(remote.name).getChild(local.name)
