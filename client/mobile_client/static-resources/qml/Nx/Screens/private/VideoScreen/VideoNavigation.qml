@@ -18,8 +18,7 @@ Item
     property real controlsOpacity: 1.0
     property alias animatePlaybackControls: playbackControlsOpacityBehaviour.enabled
     property bool canViewArchive: true
-    property int panelOffset: navigationPanel.visible ? navigationPanel.height : 0
-
+    property int buttonsPanelHeight: navigationPanel.visible ? navigationPanel.height : 0
     signal ptzButtonClicked()
 
     implicitWidth: parent ? parent.width : 0

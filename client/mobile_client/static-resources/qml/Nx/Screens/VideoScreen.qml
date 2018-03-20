@@ -339,19 +339,38 @@ PageBase
 
         Image
         {
+            id: controlsShadowGradient
+
             property real targetOpacity: visible ? 1 : 0
+            property real customHeight:
+            {
+                if (d.mode == VideoScreenUtils.VideoScreenMode.Ptz || ptzPanel.moveOnTapMode)
+                    return 0
+
+                return videoNavigation.buttonsPanelHeight
+            }
 
             x: -mainWindow.leftPadding
             width: mainWindow.width
-            height: 96
+            height: 96 + customHeight
             anchors.bottom: parent.bottom
             anchors.bottomMargin: videoScreen.height - mainWindow.height
 
             source: lp("/images/timeline_gradient.png")
 
             visible: (d.mode == VideoScreenUtils.VideoScreenMode.Ptz && d.uiVisible)
-                || ptzPanel.moveOnTapMode || videoNavigation.visible
+                || videoNavigation.visible || ptzPanel.moveOnTapMode
             opacity: Math.max(d.uiOpacity, targetOpacity)
+        }
+
+        Rectangle
+        {
+            id: bottomControlsBackground
+
+            color: Qt.rgba(0, 0, 0, 0.63)
+            width: mainWindow.width
+            anchors.top: controlsShadowGradient.bottom
+            anchors.bottom: parent.bottom
         }
 
         PtzPanel
