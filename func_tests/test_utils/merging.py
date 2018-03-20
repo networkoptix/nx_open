@@ -82,12 +82,12 @@ def merge_systems(local, remote, accessible_ip_net=IPNetwork('10.254.0.0/17'), t
     if not wait_until(
             servant.rest_api.credentials_work,
             name="until {} accepts new credentials from {}".format(servant, master),
-            timeout_sec=60):
+            timeout_sec=10):
         raise MergeChecksFailed(local, remote, "new credentials don't work")
     if not wait_until(
             lambda: get_local_system_id(servant.rest_api) == master_system_id,
             name="until {} responds with system id {}".format(servant, master_system_id),
-            timeout_sec=60):
+            timeout_sec=10):
         raise MergeChecksFailed(local, remote, "local system ids don't match")
 
 
