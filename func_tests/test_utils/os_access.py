@@ -175,7 +175,7 @@ class LocalAccess(OsAccess):
         log.debug('Run: %s', args_list_to_str(command))
         process = subprocess.Popen(
             command,
-            bufsize=-1,
+            bufsize=16 * 1024 * 1024,
             shell=shell, cwd=cwd, env=env, close_fds=True,
             stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE if input else None)
         exit_status, stdout, stderr = communicate(process, input, timeout_sec)
