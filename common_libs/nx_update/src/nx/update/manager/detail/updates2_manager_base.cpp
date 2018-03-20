@@ -131,20 +131,21 @@ void Updates2ManagerBase::checkForRemoteUpdate(utils::TimerId /*timerId*/)
     }
 
     auto remoteRegistry = getRemoteRegistry();
-    if (remoteRegistry)
-    {
-        auto globalRegistry = getGlobalRegistry();
-        if (!globalRegistry || isNewRegistryBetter(globalRegistry, remoteRegistry))
-            updateGlobalRegistry(remoteRegistry->toByteArray());
+    auto globalRegistry = getGlobalRegistry();
 
-        swapRegistries(std::move(remoteRegistry));
-    }
+    if (remoteRegistry && isNewRegistryBetter(globalRegistry, remoteRegistry))
+        updateGlobalRegistry(remoteRegistry->toByteArray());
 
+    swapRegistries(std::move(remoteRegistry));
+    swapRegistries(std::move(globalRegistry));
     refreshStatusAfterCheck();
 }
 
 void Updates2ManagerBase::swapRegistries(update::info::AbstractUpdateRegistryPtr otherRegistry)
 {
+    if (!otherRegistry)
+        return;
+
     QnMutexLocker lock(&m_mutex);
     if (isNewRegistryBetter(m_updateRegistry, otherRegistry))
         m_updateRegistry = std::move(otherRegistry);
