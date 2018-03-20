@@ -49,6 +49,7 @@ def determine_package_versions():
         v["openssl"] = "1.0.2l-deb9"
 
     if box in ("bpi", "bananapi"):
+        v["qt"] = "5.6.2-1"
         v["quazip"] = "0.7"
 
     if box == "bananapi":
