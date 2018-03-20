@@ -234,7 +234,8 @@ rest::Handle ResourcePoolPeerManager::validateFileInformation(
             };
 
         return connection->validateFileInformation(
-            fileInformation.url.toString(), fileInformation.size, handleReply, thread());
+            QString::fromLatin1(fileInformation.url.toString().toLocal8Bit().toBase64()),
+            fileInformation.size, handleReply, thread());
     }
 
     NX_VERBOSE(

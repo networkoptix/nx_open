@@ -79,7 +79,8 @@ struct Request
         else if (sections.last().contains("validate"))
         {
             subject = Subject::validate;
-            url = sections[2].toString();
+            url = QString::fromLocal8Bit(QByteArray::fromBase64(sections[2].toString().toLatin1()));
+            return;
         }
 
         if (!sections.isEmpty())

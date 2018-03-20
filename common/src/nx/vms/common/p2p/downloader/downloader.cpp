@@ -231,11 +231,12 @@ void Downloader::validateAsync(const QString& url, int expectedSize,
                 || !asyncClient->response()
                 || asyncClient->response()->statusLine.statusCode != network::http::StatusCode::ok)
             {
+                auto response = asyncClient->response();
                 NX_WARNING(
                     typeid(Downloader),
                     lm("[Downloader, validate] Validate %1 http request failed. Http client failed: %2, has response: %3, status code: %4")
-                    .args(url, asyncClient->failed(), asyncClient->response(),
-                        asyncClient->response()->statusLine.statusCode));
+                    .args(url, asyncClient->failed(), (bool) response,
+                        response ? -1 : response->statusLine.statusCode));
 
                 return callback(false);
             }
