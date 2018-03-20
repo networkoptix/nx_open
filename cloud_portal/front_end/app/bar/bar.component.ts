@@ -2,10 +2,8 @@ import { Component, OnInit, ChangeDetectorRef, Inject } from '@angular/core';
 import { HttpErrorResponse } from "@angular/common/http";
 import { HttpClient } from '@angular/common/http';
 
-// import { cloudApiService } from "../scripts/services/cloud_api";
 import { QuoteService } from '../../app/core/index';
-// import { uuid2Service } from '../../app/scripts/services/angular-uuid2';
-// import { languageService } from '../../app/scripts/services/language';
+// import { NxModalLoginComponent } from "../dialogs/login/login.component";
 
 @Component({
     selector: 'bar-component',
@@ -29,7 +27,9 @@ export class BarComponent implements OnInit {
                 @Inject('cloudApiService') private cloudApi: any,
                 private http: HttpClient,
                 private quoteService: QuoteService,
-                private changeDetector: ChangeDetectorRef) {
+                // private login: NxModalLoginComponent,
+                private changeDetector: ChangeDetectorRef,
+    ){
 
         // this.uuid2 = uuid2;
         //this.language = language;

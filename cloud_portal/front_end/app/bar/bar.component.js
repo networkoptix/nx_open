@@ -14,12 +14,12 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@angular/core");
 const http_1 = require("@angular/common/http");
-// import { cloudApiService } from "../scripts/services/cloud_api";
 const index_1 = require("../../app/core/index");
-// import { uuid2Service } from '../../app/scripts/services/angular-uuid2';
-// import { languageService } from '../../app/scripts/services/language';
+// import { NxModalLoginComponent } from "../dialogs/login/login.component";
 let BarComponent = class BarComponent {
-    constructor(uuid2, language, cloudApi, http, quoteService, changeDetector) {
+    constructor(uuid2, language, cloudApi, http, quoteService, 
+    // private login: NxModalLoginComponent,
+    changeDetector) {
         this.uuid2 = uuid2;
         this.language = language;
         this.cloudApi = cloudApi;

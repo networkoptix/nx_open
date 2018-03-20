@@ -20,9 +20,14 @@
 <br/>
 <br/>
 <br/>
-<nx-modal></nx-modal>
+<nx-modal-login></nx-modal-login>
 <br/>
 <br/>
+
+<form #f="ngForm" novalidate>
+    <nx-process-button buttonText="Process" [form]="f"></nx-process-button>
+</form>
+
 <br/>
 <br/>
 <br/>

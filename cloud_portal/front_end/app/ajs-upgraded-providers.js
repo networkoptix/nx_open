@@ -28,6 +28,24 @@ exports.languageServiceProvider = {
     useFactory: languageFactory,
     deps: ['$injector']
 };
+function accountFactory(i) {
+    return i.get('accountService');
+}
+exports.accountFactory = accountFactory;
+exports.accountServiceProvider = {
+    provide: 'accountService',
+    useFactory: accountFactory,
+    deps: ['$injector']
+};
+function processFactory(i) {
+    return i.get('processService');
+}
+exports.processFactory = processFactory;
+exports.processServiceProvider = {
+    provide: 'processService',
+    useFactory: processFactory,
+    deps: ['$injector']
+};
 function uuid2Factory(i) {
     return i.get('uuid2');
 }
@@ -67,4 +85,24 @@ languageServiceModule = __decorate([
     })
 ], languageServiceModule);
 exports.languageServiceModule = languageServiceModule;
+let accountServiceModule = class accountServiceModule {
+};
+accountServiceModule = __decorate([
+    core_1.NgModule({
+        providers: [
+            exports.accountServiceProvider
+        ]
+    })
+], accountServiceModule);
+exports.accountServiceModule = accountServiceModule;
+let processServiceModule = class processServiceModule {
+};
+processServiceModule = __decorate([
+    core_1.NgModule({
+        providers: [
+            exports.processServiceProvider
+        ]
+    })
+], processServiceModule);
+exports.processServiceModule = processServiceModule;
 //# sourceMappingURL=ajs-upgraded-providers.js.map

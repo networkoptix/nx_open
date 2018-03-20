@@ -1,12 +1,15 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('StartPageCtrl', ['$scope','cloudApi','$location','$routeParams','dialogs','account', function ($scope,cloudApi,$location,$routeParams,dialogs,account) {
-        account.redirectAuthorised();
+    .controller('StartPageCtrl', ['$scope', 'cloudApi', '$location', '$routeParams', 'dialogs',
+        'accountService',
 
-        $scope.userEmail = account.getEmail();
+        function ($scope, cloudApi, $location, $routeParams, dialogs, accountService) {
+            accountService.redirectAuthorised();
 
-        if($routeParams.callLogin){
-            dialogs.login();
-        }
-    }]);
+            $scope.userEmail = accountService.getEmail();
+
+            if ($routeParams.callLogin) {
+                dialogs.login();
+            }
+        }]);

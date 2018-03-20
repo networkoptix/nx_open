@@ -1,8 +1,8 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('MergeCtrl', ['$scope', 'cloudApi', 'process', 'dialogs', '$q', 'account', 'systemsProvider',
-    function ($scope, cloudApi, process, dialogs, $q, account, systemsProvider) {
+    .controller('MergeCtrl', ['$scope', 'cloudApi', 'process', 'dialogs', '$q', 'accountService', 'systemsProvider',
+    function ($scope, cloudApi, process, dialogs, $q, accountService, systemsProvider) {
         var dialogSettings = dialogs.getSettings($scope);
         $scope.system = dialogSettings.params.system;
 
@@ -20,7 +20,7 @@ angular.module('cloudApp')
             return '';
         }
 
-        account.get().then(function(user){
+        accountService.get().then(function(user){
             $scope.user = user;
             $scope.systems = systemsProvider.getMySystems(user.email, $scope.system.id);
             $scope.showMergeForm = $scope.system.canMerge && $scope.systems.length > 0;

@@ -12,16 +12,20 @@ const platform_browser_1 = require("@angular/platform-browser");
 const static_1 = require("@angular/upgrade/static");
 const router_1 = require("@angular/router");
 const http_1 = require("@angular/common/http");
+const forms_1 = require("@angular/forms");
 const ng_bootstrap_1 = require("@ng-bootstrap/ng-bootstrap");
 const ng_bootstrap_2 = require("@ng-bootstrap/ng-bootstrap");
 const index_1 = require("./core/index");
 const ajs_upgraded_providers_1 = require("./ajs-upgraded-providers");
 const ajs_upgraded_providers_2 = require("./ajs-upgraded-providers");
 const ajs_upgraded_providers_3 = require("./ajs-upgraded-providers");
+const ajs_upgraded_providers_4 = require("./ajs-upgraded-providers");
+const ajs_upgraded_providers_5 = require("./ajs-upgraded-providers");
 const app_component_1 = require("./app.component");
 const bar_module_1 = require("./bar/bar.module");
 const language_component_1 = require("./dropdown/language.component");
-const modal_component_1 = require("./modal/modal.component");
+const login_component_1 = require("./dialogs/login/login.component");
+const process_button_component_1 = require("./components/process-button/process-button.component");
 class HybridUrlHandlingStrategy {
     // use only process the `/bar` url
     shouldProcessUrl(url) {
@@ -45,24 +49,32 @@ AppModule = __decorate([
             platform_browser_1.BrowserModule,
             static_1.UpgradeModule,
             http_1.HttpClientModule,
+            forms_1.FormsModule,
             index_1.CoreModule,
             bar_module_1.BarModule,
-            ajs_upgraded_providers_3.uuid2ServiceModule,
+            ajs_upgraded_providers_5.uuid2ServiceModule,
             ajs_upgraded_providers_2.languageServiceModule,
+            ajs_upgraded_providers_3.accountServiceModule,
+            ajs_upgraded_providers_4.processServiceModule,
             ng_bootstrap_1.NgbModule.forRoot(),
             router_1.RouterModule.forRoot([], { initialNavigation: false })
         ],
         entryComponents: [
             language_component_1.NxLanguageDropdown,
-            modal_component_1.NxModalComponent
+            login_component_1.NxModalLoginComponent,
+            process_button_component_1.NxProcessButtonComponent
         ],
         providers: [
             ng_bootstrap_2.NgbModal,
+            common_1.Location,
             { provide: common_1.LocationStrategy, useClass: common_1.PathLocationStrategy },
             { provide: router_1.UrlHandlingStrategy, useClass: HybridUrlHandlingStrategy },
+            { provide: '$scope', useFactory: i => i.get('$rootScope'), deps: ['$injector'] },
             ajs_upgraded_providers_1.cloudApiServiceProvider
         ],
-        declarations: [app_component_1.AppComponent],
+        declarations: [
+            app_component_1.AppComponent
+        ],
         bootstrap: [app_component_1.AppComponent]
     })
 ], AppModule);
@@ -70,5 +82,5 @@ exports.AppModule = AppModule;
 angular
     .module('cloudApp.directives')
     .directive('nxLanguageSelect', static_1.downgradeComponent({ component: language_component_1.NxLanguageDropdown }))
-    .directive('nxModal', static_1.downgradeComponent({ component: modal_component_1.NxModalComponent }));
+    .directive('nxModalLogin', static_1.downgradeComponent({ component: login_component_1.NxModalLoginComponent }));
 //# sourceMappingURL=app.module.js.map

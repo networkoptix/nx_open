@@ -2,7 +2,7 @@
 
 angular.module('cloudApp').directive('processButton', ['$timeout',function ($timeout) {
         return {
-            restrict: 'E',
+            restrict: 'EA',
             templateUrl: Config.viewsDir + 'components/process-button.html',
             scope:{
                 process:'=',

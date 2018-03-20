@@ -3,20 +3,17 @@ import { CommonModule } from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
 import { UpgradeModule } from '@angular/upgrade/static';
 import { RouterModule, Routes } from '@angular/router';
+import {FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
-import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModalModule, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 
-// import { cloudApiService } from "../scripts/services/cloud_api";
-// import { uuid2Service } from '../../app/scripts/services/angular-uuid2';
 import { QuoteService } from "../../app/core";
-// import { languageService } from "../scripts/services/language";
 
 import { NxLanguageDropdown } from "../dropdown/language.component";
-import { NxModalComponent } from "../modal/modal.component";
+import { NxModalLoginComponent } from "../dialogs/login/login.component";
+import { NxProcessButtonComponent } from "../components/process-button/process-button.component";
 
 import { BarComponent } from './bar.component';
-
 
 const appRoutes: Routes = [
     { path: 'bar', component: BarComponent }
@@ -29,6 +26,8 @@ const appRoutes: Routes = [
         UpgradeModule,
         NgbDropdownModule,
         NgbModalModule,
+        FormsModule,
+        ReactiveFormsModule,
 
         RouterModule.forChild(appRoutes)
     ],
@@ -41,7 +40,9 @@ const appRoutes: Routes = [
     declarations: [
         BarComponent,
         NxLanguageDropdown,
-        NxModalComponent],
+        NxModalLoginComponent,
+        NxProcessButtonComponent
+    ],
     bootstrap: []
 })
 export class BarModule {

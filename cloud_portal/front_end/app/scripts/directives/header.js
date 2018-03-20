@@ -6,9 +6,9 @@
         .module('cloudApp')
         .directive('nxHeader', NxHeader);
 
-    NxHeader.$inject = ['dialogs', 'cloudApi', 'account', '$location', '$route', 'systemsProvider', 'CONFIG'];
+    NxHeader.$inject = ['dialogs', 'cloudApi', 'accountService', '$location', '$route', 'systemsProvider', 'CONFIG'];
 
-    function NxHeader(dialogs, cloudApi, account, $location, $route, systemsProvider, CONFIG) {
+    function NxHeader(dialogs, cloudApi, accountService, $location, $route, systemsProvider, CONFIG) {
         return {
             restrict: 'E',
             templateUrl: CONFIG.viewsDir + 'components/header.html',
@@ -24,7 +24,7 @@
                     dialogs.login();
                 };
                 scope.logout = function () {
-                    account.logout();
+                    accountService.logout();
                 };
 
                 scope.systemsProvider = systemsProvider;
@@ -65,7 +65,7 @@
                 }
 
                 updateActive();
-                account.get().then(function (account) {
+                accountService.get().then(function (account) {
                     scope.account = account;
 
                     $('body').removeClass('loading');

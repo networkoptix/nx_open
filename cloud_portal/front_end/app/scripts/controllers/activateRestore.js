@@ -2,16 +2,16 @@
 
 angular.module('cloudApp')
     .controller('ActivateRestoreCtrl',['$scope', 'cloudApi', '$routeParams', 'process', '$localStorage',
-        '$sessionStorage', 'account', '$location', 'urlProtocol', 'dialogs',
+        '$sessionStorage', 'accountService', '$location', 'urlProtocol', 'dialogs',
         function ($scope, cloudApi, $routeParams, process, $localStorage,
-                  $sessionStorage, account, $location, urlProtocol, dialogs) {
+                  $sessionStorage, accountService, $location, urlProtocol, dialogs) {
 
             $scope.session = $localStorage;
             $scope.context = $sessionStorage;
 
             $scope.data = {
                 newPassword: '',
-                email: account.getEmail(),
+                email: accountService.getEmail(),
                 restoreCode: $routeParams.restoreCode,
                 activateCode: $routeParams.activateCode
             };
@@ -25,7 +25,7 @@ angular.module('cloudApp')
 
 
             if($scope.reactivating){
-                account.redirectAuthorised();
+                accountService.redirectAuthorised();
             }
             function checkActivate(){
                 if($scope.data.activateCode){
@@ -35,9 +35,9 @@ angular.module('cloudApp')
             }
             function init(){
                 if($scope.data.restoreCode || $scope.data.activateCode){
-                    account.logoutAuthorised();
+                    accountService.logoutAuthorised();
                     var code = $scope.data.restoreCode || $scope.data.activateCode;
-                    account.checkCode(code).then(function(registered){
+                    accountService.checkCode(code).then(function(registered){
                         if(!registered){
                             // send to registration form with the code
                             $location.path('/register/' + code);
@@ -60,7 +60,7 @@ angular.module('cloudApp')
                     return false;
                 }
                 if( $scope.context.process !== name ){
-                    account.redirectToHome();
+                    accountService.redirectToHome();
                 }
                 return true;
             }
