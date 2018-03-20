@@ -273,7 +273,7 @@ rest::Handle ResourcePoolPeerManager::downloadChunkFromInternet(
             [this, callback](bool success, rest::Handle handle, const QByteArray& result)
             {
                 if (!success)
-                    callback(success, handle, QByteArray());
+                    return callback(success, handle, QByteArray());
 
                 callback(success, handle, result);
             };

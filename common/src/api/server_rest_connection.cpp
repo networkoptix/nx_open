@@ -456,7 +456,8 @@ Handle ServerConnection::downloadFileChunkFromInternet(
         lit("/api/downloads/%1/chunks/%2").arg(fileName).arg(chunkIndex),
         QnRequestParamList{
             {lit("url"), url.toString()},
-            {lit("chunkSize"), QString::number(chunkSize)}},
+            {lit("chunkSize"), QString::number(chunkSize)},
+            {lit("fromInternet"), lit("true")}},
         callback,
         targetThread);
 }

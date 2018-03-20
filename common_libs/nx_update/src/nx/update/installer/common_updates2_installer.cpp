@@ -26,6 +26,7 @@ detail::AbstractZipExtractorPtr CommonUpdates2Installer::createZipExtractor() co
 QVariantMap CommonUpdates2Installer::updateInformation(const QString& outputPath) const
 {
     QFile updateInfoFile(QDir(outputPath).absoluteFilePath(kUpdateInfoFileName));
+    updateInfoFile.setPermissions(QFileDevice::ReadOwner | QFileDevice::WriteOwner);
     if (!updateInfoFile.open(QFile::ReadOnly))
     {
         NX_ERROR(

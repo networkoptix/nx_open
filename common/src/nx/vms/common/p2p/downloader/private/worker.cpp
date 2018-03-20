@@ -826,6 +826,7 @@ void Worker::downloadNextChunk()
                 .arg(chunkIndex).arg(m_peerManager->peerString(peerId)));
     }
 
+    NX_VERBOSE(m_logTag, lm("Issued download request. Handle: %1, peerId: %2").args(handle, peerId));
     if (handle > 0)
         m_contextByHandle[handle] = RequestContext(peerId, State::downloadingChunks);
 }
@@ -834,6 +835,9 @@ void Worker::handleDownloadChunkReply(
     bool success, rest::Handle handle, int chunkIndex, const QByteArray& data)
 {
     QnMutexLocker lock(&m_mutex);
+
+    NX_VERBOSE(m_logTag, lm("handleDownloadChunkReply: handle: %1, chunk: %2, success: %3")
+        .args(handle, chunkIndex, success));
 
     auto requestContext = m_contextByHandle.take(handle);
     if (requestContext.cancelled)
