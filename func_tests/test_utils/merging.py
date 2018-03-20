@@ -43,13 +43,6 @@ class MergeChecksFailed(MergeError):
         self.remote = remote
 
 
-def _find_accessible_ips(api, ip_net):
-    interfaces = api.get('api/iflist')
-    available_ips = {IPAddress(interface['ipAddr']) for interface in interfaces}
-    ips = {ip for ip in available_ips if ip in ip_net}
-    return ips
-
-
 def merge_systems(local, remote, accessible_ip_net=IPNetwork('10.254.0.0/17'), take_remote_settings=False):
     # When many servers are merged, there is server visible from others.
     # This server is passed as remote. That's why it's higher in loggers hierarchy.
@@ -62,11 +55,13 @@ def merge_systems(local, remote, accessible_ip_net=IPNetwork('10.254.0.0/17'), t
     merge_logger.debug("Other system id %s.", servant_system_id)
     if servant_system_id == master_system_id:
         raise AlreadyMerged(local, remote, master_system_id)
-    accessible_remote_ips = _find_accessible_ips(remote.rest_api, accessible_ip_net)
+    remote_interfaces = remote.rest_api.get('api/iflist')
+    available_remote_ips = {IPAddress(interface['ipAddr']) for interface in remote_interfaces}
+    accessible_remote_ips = {ip for ip in available_remote_ips if ip in accessible_ip_net}
     try:
         any_accessible_remote_ip = next(iter(accessible_remote_ips))
     except StopIteration:
-        raise MergeAddressesError(local, remote, accessible_ip_net, accessible_remote_ips)
+        raise MergeAddressesError(local, remote, accessible_ip_net, available_remote_ips)
     merge_logger.debug("Access %r by %s.", remote, any_accessible_remote_ip)
     try:
         local.rest_api.post('api/mergeSystems', {
