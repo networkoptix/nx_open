@@ -249,9 +249,20 @@ Item
             {
                 pressX = mouse.x
                 pressY = mouse.y
+            }
 
-                if (mouse.button == Qt.RightButton)
-                    interactor.rotateTo(pressX, pressY)
+            onDoubleClicked:
+            {
+                const kPowerThreshold = 0.8
+                if (interactor.scalePower > kPowerThreshold)
+                {
+                    interactor.scalePower = 0.0
+                }
+                else
+                {
+                    interactor.rotateTo(mouse.x, mouse.y)
+                    interactor.scalePower = 1.0
+                }
             }
 
             onReleased:

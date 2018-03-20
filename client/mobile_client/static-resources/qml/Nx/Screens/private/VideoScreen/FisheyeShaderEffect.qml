@@ -149,12 +149,12 @@ ShaderEffect
         void main()
         {
             // Draw debug cross.
-            if (projectionCoords.x > -0.001 && projectionCoords.x < 0.001
-                || projectionCoords.y > -0.001 && projectionCoords.y < 0.001)
-            {
-                gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
-                return;
-            }
+            // if (projectionCoords.x > -0.001 && projectionCoords.x < 0.001
+            //     || projectionCoords.y > -0.001 && projectionCoords.y < 0.001)
+            // {
+            //     gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+            //     return;
+            // }
 
             vec3 pointOnSphere = unproject(projectionCoords);
             vec3 rotatedPointOnSphere = (viewRotationMatrix * vec4(pointOnSphere, 1.0)).xyz;
