@@ -8,6 +8,7 @@
 #include "core/resource/media_resource.h"
 #include "utils/common/sleep.h"
 #include <nx/streaming/video_data_packet.h>
+#include <core/dataprovider/abstract_media_data_filter.h>
 
 QnAbstractArchiveStreamReader::QnAbstractArchiveStreamReader(const QnResourcePtr &dev):
     QnAbstractMediaStreamDataProvider(dev),
@@ -89,6 +90,11 @@ quint64 QnAbstractArchiveStreamReader::lengthUsec() const
         return AV_NOPTS_VALUE;
 }
 
+void QnAbstractArchiveStreamReader::addMediaFilter(const std::shared_ptr<AbstractMediaDataFilter>& filter)
+{
+    m_filters.push_back(filter);
+}
+
 void QnAbstractArchiveStreamReader::run()
 {
     initSystemThreadId();
@@ -112,6 +118,9 @@ void QnAbstractArchiveStreamReader::run()
         }
 
         QnAbstractMediaDataPtr data = getNextData();
+
+        for (const auto& filter: m_filters)
+            data = std::dynamic_pointer_cast<QnAbstractMediaData>(filter->processData(data));
 
         if (data==0 && !needToStop())
         {

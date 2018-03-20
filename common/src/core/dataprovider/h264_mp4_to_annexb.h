@@ -15,7 +15,7 @@
 //!Converts h.264 stream from avc file format (mpeg4 part 15) to mpeg 4 annex b
 /*!
     Takes sequence header from media packet's extradata and inserts it before first packet.
-    
+
     If source stream is not h.264 or is already in Annex B format, this class just forwards data from source to the reader
 */
 class H264Mp4ToAnnexB
@@ -23,14 +23,13 @@ class H264Mp4ToAnnexB
     public AbstractMediaDataFilter
 {
 public:
-    H264Mp4ToAnnexB( const AbstractOnDemandDataProviderPtr& dataSource );
+    H264Mp4ToAnnexB();
 
 protected:
     //!Implementation of AbstractMediaDataFilter::processData
-    virtual QnAbstractDataPacketPtr processData( QnAbstractDataPacketPtr* const data ) override;
+    virtual QnAbstractDataPacketPtr processData(const QnAbstractDataPacketPtr& data ) override;
 
 private:
-    bool m_isFirstPacket;
     QnConstMediaContextPtr m_newContext;
 
     void readH264SeqHeaderFromExtraData(

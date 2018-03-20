@@ -15,6 +15,7 @@
 #include <plugins/resource/avi/thumbnails_stream_reader.h>
 #include <plugins/resource/avi/avi_archive_delegate.h>
 #include <utils/common/util.h>
+#include <core/dataprovider/h264_mp4_to_annexb.h>
 
 // input video with steps between frames in timeStepUsec translated to output video with 30 fps (kOutputDeltaUsec between frames)
 
@@ -229,7 +230,11 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
             }
             archiveReader->setCycleMode(false);
             if (role == StreamRecorderRole::fileExport)
+            {
                 archiveReader->setQuality(MEDIA_Quality_ForceHigh, true); // for 'mkv' and 'avi' files
+                // Additing filtering is required in case of.AVI export.
+                archiveReader->addMediaFilter(std::make_shared<H264Mp4ToAnnexB>());
+            }
 
             QnRtspClientArchiveDelegate* rtspClient = dynamic_cast<QnRtspClientArchiveDelegate*> (archiveReader->getArchiveDelegate());
             if (rtspClient) {

@@ -8,22 +8,31 @@
 
 #include "nx/streaming/video_data_packet.h"
 
+namespace {
 
-H264Mp4ToAnnexB::H264Mp4ToAnnexB( const AbstractOnDemandDataProviderPtr& dataSource )
+static const quint8 START_CODE[] = { 0, 0, 0, 1 };
+
+bool isStartCode(const void* data)
+{
+    return memcmp(data, START_CODE, sizeof(START_CODE)) == 0;
+}
+
+} // namespace
+
+
+H264Mp4ToAnnexB::H264Mp4ToAnnexB()
 :
-    AbstractMediaDataFilter( dataSource ),
-    m_isFirstPacket( true )
+    AbstractMediaDataFilter()
 {
 }
 
-QnAbstractDataPacketPtr H264Mp4ToAnnexB::processData( QnAbstractDataPacketPtr* const data )
+QnAbstractDataPacketPtr H264Mp4ToAnnexB::processData(const QnAbstractDataPacketPtr& data )
 {
-    static const quint8 START_CODE[] = { 0, 0, 0, 1 };
-    QnCompressedVideoData* srcVideoPacket = dynamic_cast<QnCompressedVideoData*>(data->get());
+    QnCompressedVideoData* srcVideoPacket = dynamic_cast<QnCompressedVideoData*>(data.get());
     if( !srcVideoPacket || srcVideoPacket->compressionType != AV_CODEC_ID_H264 )
-        return *data;
-    if(srcVideoPacket->dataSize() >= sizeof(START_CODE) && srcVideoPacket->data()[3] == 1)
-        return *data;   //already in annexb format. TODO #ak: format validation is too weak
+        return data;
+    if(srcVideoPacket->dataSize() >= sizeof(START_CODE) && isStartCode(srcVideoPacket->data()))
+        return data;
 
     //copying packet srcVideoPacket to videoPacket
     //TODO #ak not good, but with current implementation of buffer we can do nothing better
@@ -31,15 +40,15 @@ QnAbstractDataPacketPtr H264Mp4ToAnnexB::processData( QnAbstractDataPacketPtr* c
 
     //replacing NALU size with {0 0 0 1}
     for( quint8* dataStart = (quint8*)videoPacket->m_data.data();
-        dataStart < (quint8*)videoPacket->m_data.data() + videoPacket->m_data.size();
-         )
+        dataStart < (quint8*)videoPacket->m_data.data() + videoPacket->m_data.size();)
     {
         size_t naluSize = ntohl( *(u_long*)dataStart );
         memcpy( dataStart, START_CODE, sizeof(START_CODE) );
         dataStart += sizeof(START_CODE) + naluSize;
     }
 
-    if( m_isFirstPacket && isH264SeqHeaderInExtraData( videoPacket ) )
+    if(srcVideoPacket->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey) &&
+        isH264SeqHeaderInExtraData( videoPacket ) )
     {
         m_newContext = QnConstMediaContextPtr(!videoPacket->context? nullptr :
             videoPacket->context->cloneWithoutExtradata());
@@ -54,7 +63,6 @@ QnAbstractDataPacketPtr H264Mp4ToAnnexB::processData( QnAbstractDataPacketPtr* c
             memcpy( mediaDataWithSeqHeader.data(), seqHeader.data(), seqHeader.size() );
             memcpy( mediaDataWithSeqHeader.data() + seqHeader.size(), videoPacket->data(), videoPacket->dataSize() );
             videoPacket->m_data = mediaDataWithSeqHeader;
-            m_isFirstPacket = false;
 
             //TODO #ak: monitor sequence header change
         }

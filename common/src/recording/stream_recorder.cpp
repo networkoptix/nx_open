@@ -949,9 +949,15 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                 // codec_tag from another source container can cause an issue. Reset value.
                 audioStream->codec->codec_tag = 0;
 
-                // avoid FFMPEG bug for MP3 mono. block_align hardcoded inside ffmpeg for stereo channels and it is cause problem
-                if (srcAudioCodec == AV_CODEC_ID_MP3 && audioStream->codec->channels == 1)
-                    audioStream->codec->block_align = 0;
+                if (srcAudioCodec == AV_CODEC_ID_MP3)
+                {
+                    // avoid FFMPEG bug for MP3 mono. block_align hardcoded inside ffmpeg for stereo channels and it is cause problem
+                    if (audioStream->codec->channels == 1)
+                        audioStream->codec->block_align = 0;
+                    // Fill frame_size for MP3 (it is a constant). AVI container works wrong without it.
+                    if (audioStream->codec->frame_size == 0)
+                        audioStream->codec->frame_size = 1152;
+                }
             }
             else
             {
