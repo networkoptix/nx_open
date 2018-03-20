@@ -10,6 +10,7 @@ from test_utils.utils import wait_until
 
 logger = logging.getLogger(__name__)
 
+HOST_BOUND_NETWORK_SLOT = 1
 NETWORK_SLOTS = [2, 3, 4, 5, 6, 7, 8]
 
 VMInfo = namedtuple('VMInfo', ['name', 'ports', 'macs', 'networks', 'is_running'])
@@ -78,21 +79,34 @@ class VirtualBox(object):
             '--options', 'link',
             '--register',
             ])
+        settings_args = [
+            '--paravirtprovider', 'kvm',
+            '--cpuexecutioncap', 100,
+            '--cpus', 4,
+            '--memory', 4 * 1024]
+        settings_args += [
+            '--nic{}'.format(HOST_BOUND_NETWORK_SLOT),
+            'nat']
         # Same IP spaces for NAT cause problems with merging.
         # When answering to merge, local (requested) server reports its IPs,
         # remote (which is requested from local) tries to connect all those IPs,
         # connects with shortest delay to address which is used for NAT by both VMs
         # and "thinks" it's the peer whereas it "talks" to itself.
-        settings_args = [
-            '--nic1', 'nat', '--natnet1', '192.168.{:d}.0/24'.format(index),
-            '--paravirtprovider', 'kvm',
-            '--cpuexecutioncap', 100,
-            '--cpus', 4,
-            '--memory', 4 * 1024]
+        settings_args += [
+            '--natnet{}'.format(HOST_BOUND_NETWORK_SLOT),
+            '192.168.{:d}.0/24'.format(index)]
         for tag, protocol, host_port, guest_port in forwarded_ports:
-            settings_args += ['--natpf1', '{},{},,{},,{}'.format(tag, protocol, host_port, guest_port)]
+            settings_args += [
+                '--natpf{}'.format(HOST_BOUND_NETWORK_SLOT),
+                '{},{},,{},,{}'.format(tag, protocol, host_port, guest_port)]
         for slot in NETWORK_SLOTS:
-            settings_args += ['--nic{}'.format(slot), 'null']
+            settings_args += [
+                '--nic{}'.format(slot),
+                'null']
+        for slot in [HOST_BOUND_NETWORK_SLOT] + NETWORK_SLOTS:
+            settings_args += [
+                '--macaddress{}'.format(slot),
+                EUI('08-00-27-FE-{:X}-{:X}'.format(index, slot))]
         self.os_access.run_command(['VBoxManage', 'modifyvm', name] + settings_args)
         extra_data = {'VBoxInternal/Devices/VMMDev/0/Config/GetHostTimeDisabled': 1}
         for extra_key, extra_value in extra_data.items():
