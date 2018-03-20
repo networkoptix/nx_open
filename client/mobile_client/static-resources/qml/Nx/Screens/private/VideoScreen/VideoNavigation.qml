@@ -130,7 +130,7 @@ Item
         padding: 8
         width: 56
         height: width
-        color: ColorTheme.transparent(ColorTheme.base5, 0.2)
+        color: ColorTheme.transparent(ColorTheme.base1, 0.2)
         icon: lp("/images/previous.png")
         radius: width / 2
         z: 1
@@ -144,7 +144,7 @@ Item
         padding: 8
         width: 56
         height: width
-        color: ColorTheme.transparent(ColorTheme.base5, 0.2)
+        color: ColorTheme.transparent(ColorTheme.base1, 0.2)
         icon: lp("/images/next.png")
         radius: width / 2
         z: 1
@@ -237,6 +237,30 @@ Item
 
             chunkProvider: cameraChunkProvider
             startBound: cameraChunkProvider.bottomBound
+
+            readonly property color lineColor: ColorTheme.transparent(ColorTheme.base1, 0.2)
+            readonly property real lineOpacity:
+                videoNavigation.canViewArchive && d.hasArchive ? d.timelineOpacity : 0
+
+            Rectangle
+            {
+                width: parent.width
+                height: 1
+                anchors.bottom: timeline.bottom
+                anchors.bottomMargin: -1
+                opacity: timeline.lineOpacity
+                color: timeline.lineColor
+            }
+
+            Rectangle
+            {
+                width: parent.width
+                height: 1
+                anchors.bottom: timeline.bottom
+                anchors.bottomMargin: timeline.chunkBarHeight
+                opacity: timeline.lineOpacity
+                color: timeline.lineColor
+            }
 
             onMovingChanged:
             {

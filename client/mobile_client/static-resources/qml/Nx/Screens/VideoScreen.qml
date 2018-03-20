@@ -137,7 +137,8 @@ PageBase
         onLeftButtonClicked: Workflow.popCurrentScreen()
         background: Image
         {
-            anchors.fill: parent
+            width: parent.width
+            height: 96
             anchors.topMargin: -toolBar.statusBarHeight
             source: lp("/images/toolbar_gradient.png")
         }
