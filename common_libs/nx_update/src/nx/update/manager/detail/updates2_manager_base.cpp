@@ -109,9 +109,7 @@ void Updates2ManagerBase::checkForGlobalDictionaryUpdate()
 
 void Updates2ManagerBase::checkForRemoteUpdate(utils::TimerId /*timerId*/)
 {
-    auto onExitGuard =
-        makeScopeGuard([this]() { remoteUpdateCompleted(); });
-
+    auto onExitGuard = makeScopeGuard([this]() { remoteUpdateCompleted(); });
     {
         QnMutexLocker lock(&m_mutex);
         switch (m_currentStatus.state)
@@ -131,13 +129,10 @@ void Updates2ManagerBase::checkForRemoteUpdate(utils::TimerId /*timerId*/)
     }
 
     auto remoteRegistry = getRemoteRegistry();
-    auto globalRegistry = getGlobalRegistry();
-
-    if (remoteRegistry && isNewRegistryBetter(globalRegistry, remoteRegistry))
+    if (remoteRegistry && isNewRegistryBetter(getGlobalRegistry(), remoteRegistry))
         updateGlobalRegistry(remoteRegistry->toByteArray());
 
     swapRegistries(std::move(remoteRegistry));
-    swapRegistries(std::move(globalRegistry));
     refreshStatusAfterCheck();
 }
 
