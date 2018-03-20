@@ -547,11 +547,11 @@ void Worker::handleFileInformationReply(
     QnMutexLocker lock(&m_mutex);
 
     auto requestContext = m_contextByHandle.take(handle);
-    NX_ASSERT(!requestContext.peerId.isNull());
-    NX_ASSERT(requestContext.type == State::requestingFileInformation);
-
     if (requestContext.cancelled)
         return;
+
+    NX_ASSERT(!requestContext.peerId.isNull());
+    NX_ASSERT(requestContext.type == State::requestingFileInformation);
 
     NX_VERBOSE(m_logTag,
         lm("Got %3 reply from %1: %2")
@@ -676,11 +676,11 @@ void Worker::handleChecksumsReply(
     QnMutexLocker lock(&m_mutex);
 
     auto requestContext = m_contextByHandle.take(handle);
-    NX_ASSERT(!requestContext.peerId.isNull());
-    NX_ASSERT(requestContext.type == State::requestingChecksums);
-
     if (requestContext.cancelled)
         return;
+
+    NX_ASSERT(!requestContext.peerId.isNull());
+    NX_ASSERT(requestContext.type == State::requestingChecksums);
 
     NX_VERBOSE(m_logTag,
         lm("Got %1 from %2: %3")
@@ -836,11 +836,11 @@ void Worker::handleDownloadChunkReply(
     QnMutexLocker lock(&m_mutex);
 
     auto requestContext = m_contextByHandle.take(handle);
-    NX_ASSERT(!requestContext.peerId.isNull());
-    NX_ASSERT(requestContext.type == State::downloadingChunks);
-
     if (requestContext.cancelled)
         return;
+
+    NX_ASSERT(!requestContext.peerId.isNull());
+    NX_ASSERT(requestContext.type == State::downloadingChunks);
 
     auto exitGuard = QnRaiiGuard::createDestructible(
         [this, &success, &lock]()
