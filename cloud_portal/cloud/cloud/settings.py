@@ -369,6 +369,9 @@ NOTIFICATIONS_CONFIG = {
     'system_shared': {
         'engine': 'email'
     },
+    "review_version": {
+        'engine': 'email'
+    },
     'cloud_notification':{
         'engine': 'email',
         'queue': 'broadcast-notifications'

@@ -120,6 +120,7 @@ class DataStructure(models.Model):
     def get_type(name):
         return getattr(DataStructure.DATA_TYPES, name, DataStructure.DATA_TYPES.text)
 
+
     def find_actual_value(self, customization, language=None, version_id=None):
         content_value = ""
         content_record = None
