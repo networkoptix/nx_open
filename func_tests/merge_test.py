@@ -10,8 +10,8 @@ import pytest
 
 import server_api_data_generators as generator
 from test_utils.api_shortcuts import get_local_system_id, get_server_id, get_system_settings
-from test_utils.merging import merge_systems
-from test_utils.rest_api import HttpError, RestApiError
+from test_utils.merging import merge_systems, ExplicitMergeError
+from test_utils.rest_api import HttpError
 from test_utils.server import MEDIASERVER_MERGE_TIMEOUT
 from test_utils.utils import bool_to_str, datetime_utc_now, str_to_bool, wait_until
 
@@ -129,7 +129,7 @@ def test_merge_cloud_with_local(two_linux_vms, server_factory, cloud_account, te
     # Merge systems (takeRemoteSettings = False) -> Error
     try:
         merge_systems(two, one)
-    except RestApiError as e:
+    except ExplicitMergeError as e:
         assert e.error_string == 'DEPENDENT_SYSTEM_BOUND_TO_CLOUD'
     else:
         assert False, 'Expected: DEPENDENT_SYSTEM_BOUND_TO_CLOUD'
@@ -151,7 +151,7 @@ def test_merge_cloud_systems(two_linux_vms, server_factory, cloud_account_factor
     # Merge 2 cloud systems one way
     try:
         merge_systems(two, one, take_remote_settings=False)
-    except RestApiError as e:
+    except ExplicitMergeError as e:
         assert e.error_string == 'BOTH_SYSTEM_BOUND_TO_CLOUD'
     else:
         assert False, 'Expected: BOTH_SYSTEM_BOUND_TO_CLOUD'
@@ -159,7 +159,7 @@ def test_merge_cloud_systems(two_linux_vms, server_factory, cloud_account_factor
     # Merge 2 cloud systems the other way
     try:
         merge_systems(two, one, take_remote_settings=True)
-    except RestApiError as e:
+    except ExplicitMergeError as e:
         assert e.error_string == 'BOTH_SYSTEM_BOUND_TO_CLOUD'
     else:
         assert False, 'Expected: BOTH_SYSTEM_BOUND_TO_CLOUD'
