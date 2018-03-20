@@ -369,7 +369,7 @@ void Worker::validateFileInformation()
         {
             NX_VERBOSE(
                 this,
-                lm("[Downloader, validate] Issuing validateFileInformation request for %1 to peer %1")
+                lm("[Downloader, validate] Issuing validateFileInformation request for %1 to peer %2")
                     .args(fileInfo.name, peerId));
 
             auto handle = m_peerManager->validateFileInformation(peerId, fileInfo,
