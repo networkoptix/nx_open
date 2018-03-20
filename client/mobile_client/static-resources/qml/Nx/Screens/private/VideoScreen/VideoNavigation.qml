@@ -216,6 +216,7 @@ Item
             id: timeline
 
             property bool resumeWhenDragFinished: false
+
             serverTimeZoneShift: videoScreenController.resourceHelper.serverTimeOffset;
             enabled: d.hasArchive
             visible: videoNavigation.canViewArchive
@@ -285,6 +286,58 @@ Item
             }
         }
 
+        Item
+        {
+            id: timelineMask
+
+            anchors.fill: timeline
+            visible: false
+
+            Rectangle
+            {
+                id: blurRectangle
+
+                readonly property real blurWidth: 16
+                readonly property real margin: 8
+
+                width: timeline.height - timeline.chunkBarHeight
+                height: timeline.width
+                rotation: 90
+                anchors.centerIn: parent
+                anchors.verticalCenterOffset: -timeline.chunkBarHeight / 2
+                gradient: Gradient
+                {
+                    GradientStop { position: 0.0; color: Qt.rgba(1.0, 1.0, 1.0, 1.0) }
+                    GradientStop { position: (timeLiveLabel.x - blurRectangle.blurWidth - blurRectangle.margin) / timeline.width; color: Qt.rgba(1.0, 1.0, 1.0, 1.0) }
+                    GradientStop { position: (timeLiveLabel.x - blurRectangle.margin) / timeline.width; color: Qt.rgba(1.0, 1.0, 1.0, 0.0) }
+                    GradientStop { position: 0.5; color: Qt.rgba(1.0, 1.0, 1.0, 0.0) }
+                    GradientStop { position: (timeLiveLabel.x + timeLiveLabel.width + blurRectangle.margin) / timeline.width; color: Qt.rgba(1.0, 1.0, 1.0, 0.0) }
+                    GradientStop { position: (timeLiveLabel.x + timeLiveLabel.width + blurRectangle.blurWidth + blurRectangle.margin) / timeline.width; color: Qt.rgba(1.0, 1.0, 1.0, 1.0) }
+                    GradientStop { position: 1.0; color: Qt.rgba(1.0, 1.0, 1.0, 1.0) }
+                }
+            }
+
+            Rectangle
+            {
+                width: timeline.width
+                height: timeline.chunkBarHeight
+                anchors.bottom: parent.bottom
+                color: "#ffffffff"
+            }
+        }
+
+        OpacityMask
+        {
+            id: timelineOpactiyMask
+
+            anchors.fill: timeline
+            source: timeline.timelineView
+            maskSource: timelineMask
+            opacity: Math.min(d.controlsOpacity, d.timelineOpacity, timeline.visible ? 1 : 0)
+
+            Component.onCompleted: timeline.timelineView.visible = false
+        }
+
 // TODO: Will lbe fixed in next commits
 //        Text
 //        {
@@ -313,7 +366,9 @@ Item
             padding: 4
             z: 1
 
-            visible: videoNavigation.canViewArchive || actionButtonsPanel.buttonsCount > 0
+            readonly property bool showButtonsPanel:
+                !liveModeButton.visible && actionButtonsPanel.buttonsCount > 0
+            visible:  videoNavigation.canViewArchive || showButtonsPanel
 
             IconButton
             {
@@ -390,7 +445,8 @@ Item
             {
                 id: actionButtonsPanel
 
-                visible: buttonsCount > 0 && !liveModeButton.visible
+                visible: opacity > 0
+
                 resourceId: videoScreenController.resourceId
 
                 anchors.left: navigationPanel.showZoomControls
@@ -406,7 +462,9 @@ Item
                     var futurePosition =
                         videoScreenController.mediaPlayer.position > (new Date()).getTime()
                     var correctState = videoScreenController.dummyState.length == 0
-                    return (d.liveMode || futurePosition) && correctState ? 1 : 0
+                    var live = d.liveMode || futurePosition
+
+                    return live && correctState && navigationPanel.showButtonsPanel ? 1 : 0
                 }
 
                 onPtzButtonClicked: videoNavigation.ptzButtonClicked()
@@ -514,6 +572,8 @@ Item
         {
             id: playbackController
 
+            visible: videoNavigation.canViewArchive
+
             anchors.top: navigator.top
             anchors.horizontalCenter: parent.horizontalCenter
 
@@ -542,16 +602,16 @@ Item
             }
         }
 
-//        Rectangle
-//        {
-//            color: ColorTheme.windowText
-//            anchors.horizontalCenter: parent.horizontalCenter
-//            anchors.bottom: parent.bottom
-//            width: 2
-//            height: 20
-//            visible: d.hasArchive && videoNavigation.canViewArchive
-//            opacity: timelineOpactiyMask.opacity
-//        }
+        Rectangle
+        {
+            color: ColorTheme.windowText
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.bottom: parent.bottom
+            width: 2
+            height: 20
+            visible: d.hasArchive && videoNavigation.canViewArchive
+            opacity: timelineOpactiyMask.opacity
+        }
     }
 
     Rectangle
