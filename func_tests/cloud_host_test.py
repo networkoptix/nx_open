@@ -4,6 +4,7 @@ from uuid import UUID
 import pytest
 
 from test_utils.api_shortcuts import get_local_system_id, get_cloud_system_id
+from test_utils.merging import merge_systems
 from test_utils.rest_api import HttpError
 
 log = logging.getLogger(__name__)
