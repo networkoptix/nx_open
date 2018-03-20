@@ -90,20 +90,31 @@ Item
             switch (viewMode)
             {
                 case MediaDewarpingParams.VerticalUp:
-                    return Qt.vector2d(Math.max(-limitByEdge, Math.min(-limitByCenter, unboundedRotation.x)),
-                        normalizedAngle(unboundedRotation.y))
+                    return Qt.vector2d(Math.max(-limitByEdge, Math.min(-limitByCenter, animatedRotationX)),
+                        normalizedAngle(animatedRotationY))
 
                 case MediaDewarpingParams.VerticalDown:
-                    return Qt.vector2d(Math.max(limitByCenter, Math.min(limitByEdge, unboundedRotation.x)),
-                        normalizedAngle(unboundedRotation.y))
+                    return Qt.vector2d(Math.max(limitByCenter, Math.min(limitByEdge, animatedRotationX)),
+                        normalizedAngle(animatedRotationY))
 
                 default: // MediaDewarpingParams.Horizontal
-                    return Qt.vector2d(Math.max(-limitByEdge, Math.min(limitByEdge, unboundedRotation.x)),
-                        Math.max(-limitByEdge, Math.min(limitByEdge, unboundedRotation.y)))
+                    return Qt.vector2d(Math.max(-limitByEdge, Math.min(limitByEdge, animatedRotationX)),
+                        Math.max(-limitByEdge, Math.min(limitByEdge, animatedRotationY)))
             }
         }
 
-        property vector2d unboundedRotation: Qt.vector2d(0.0, 0.0)
+        property real animatedRotationX: 0
+        property real animatedRotationY: 0
+
+        Behavior on animatedRotationX
+        {
+            RotationAnimation { direction: RotationAnimation.Shortest; duration: 250}
+        }
+
+        Behavior on animatedRotationY
+        {
+            RotationAnimation { direction: RotationAnimation.Shortest; duration: 250}
+        }
 
         property vector2d previousRotation
 
@@ -124,17 +135,16 @@ Item
         function updateRotation(aroundX, aroundY) // angle deltas since start, in degrees
         {
             var rotationFactor = fisheyeShader.fov / 180.0
-
-            unboundedRotation = previousRotation.plus(Qt.vector2d(
-                aroundX * rotationFactor,
-                aroundY * rotationFactor))
+            animatedRotationX += aroundX * rotationFactor
+            animatedRotationY += aroundY * rotationFactor
         }
 
         function scaleBy(deltaPower, animated)
         {
             scalePowerAnimationBehavior.enabled = animated
             scalePower = Math.min(4.0, Math.max(0.0, scalePower + deltaPower))
-            unboundedRotation = currentRotation
+            animatedRotationX = currentRotation.x
+            animatedRotationY = currentRotation.y
         }
 
         function normalizedAngle(degrees) // brings angle to [-180, 180] range
@@ -156,25 +166,22 @@ Item
             {
                 case MediaDewarpingParams.VerticalUp:
                 {
-                    var alpha = -Utils3D.degrees(Math.acos(-pointOnSphere.z))
-                    var beta = -Utils3D.degrees(Math.atan2(pointOnSphere.x, pointOnSphere.y))
-                    unboundedRotation = Qt.vector2d(alpha, beta)
+                    animatedRotationX = -Utils3D.degrees(Math.acos(-pointOnSphere.z))
+                    animatedRotationY = -Utils3D.degrees(Math.atan2(pointOnSphere.x, pointOnSphere.y))
                     break
                 }
 
                 case MediaDewarpingParams.VerticalDown:
                 {
-                    var alpha = Utils3D.degrees(Math.acos(-pointOnSphere.z))
-                    var beta = -Utils3D.degrees(Math.atan2(pointOnSphere.x, -pointOnSphere.y))
-                    unboundedRotation = Qt.vector2d(alpha, beta)
+                    animatedRotationX = Utils3D.degrees(Math.acos(-pointOnSphere.z))
+                    animatedRotationY = -Utils3D.degrees(Math.atan2(pointOnSphere.x, -pointOnSphere.y))
                     break
                 }
 
                 default: // MediaDewarpingParams.Horizontal
                 {
-                    var alpha = -Utils3D.degrees(Math.asin(pointOnSphere.y))
-                    var beta = -Utils3D.degrees(Math.atan2(pointOnSphere.x, -pointOnSphere.z))
-                    unboundedRotation = Qt.vector2d(alpha, beta)
+                    animatedRotationX = -Utils3D.degrees(Math.asin(pointOnSphere.y))
+                    animatedRotationY = -Utils3D.degrees(Math.atan2(pointOnSphere.x, -pointOnSphere.z))
                     break
                 }
             }
@@ -253,6 +260,8 @@ Item
 
             onDoubleClicked:
             {
+                clickFilterTimer.stop()
+
                 const kPowerThreshold = 0.8
                 if (interactor.scalePower > kPowerThreshold)
                 {
@@ -267,15 +276,22 @@ Item
 
             onReleased:
             {
-                if (draggingStarted)
-                {
-                    kinetics.finishMeasurement(Qt.point(mouse.x, mouse.y))
-                    draggingStarted = false
-                }
-                else
-                {
-                    content.clicked()
-                }
+                if (!draggingStarted)
+                    return
+
+                kinetics.finishMeasurement(Qt.point(mouse.x, mouse.y))
+                draggingStarted = false
+            }
+
+            onClicked: clickFilterTimer.restart()
+
+            Timer
+            {
+                id: clickFilterTimer
+
+                interval: 200
+
+                onTriggered: content.clicked()
             }
 
             onPositionChanged:
