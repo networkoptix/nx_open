@@ -108,12 +108,24 @@ Item
 
         Behavior on animatedRotationX
         {
-            RotationAnimation { direction: RotationAnimation.Shortest; duration: 250}
+            enabled: !mouseArea.draggingStarted && !pinchArea.pinch.active
+
+            RotationAnimation
+            {
+                direction: RotationAnimation.Shortest;
+                duration: 250
+            }
         }
 
         Behavior on animatedRotationY
         {
-            RotationAnimation { direction: RotationAnimation.Shortest; duration: 250}
+            enabled: !mouseArea.draggingStarted && !pinchArea.pinch.active
+
+            RotationAnimation
+            {
+                direction: RotationAnimation.Shortest;
+                duration: 250
+            }
         }
 
         property vector2d previousRotation
@@ -135,8 +147,8 @@ Item
         function updateRotation(aroundX, aroundY) // angle deltas since start, in degrees
         {
             var rotationFactor = fisheyeShader.fov / 180.0
-            animatedRotationX += aroundX * rotationFactor
-            animatedRotationY += aroundY * rotationFactor
+            animatedRotationX = previousRotation.x + aroundX * rotationFactor
+            animatedRotationY = previousRotation.y + aroundY * rotationFactor
         }
 
         function scaleBy(deltaPower, animated)
@@ -224,6 +236,7 @@ Item
             property bool draggingStarted
             property real pressX
             property real pressY
+            property bool acceptClick
 
             readonly property real pixelRadius: Math.min(width, height) / 2.0
             readonly property vector2d pixelCenter: Qt.vector2d(width, height).times(0.5)
@@ -276,14 +289,20 @@ Item
 
             onReleased:
             {
+                acceptClick = !draggingStarted
                 if (!draggingStarted)
                     return
 
+                clickFilterTimer.stop()
                 kinetics.finishMeasurement(Qt.point(mouse.x, mouse.y))
                 draggingStarted = false
             }
 
-            onClicked: clickFilterTimer.restart()
+            onClicked:
+            {
+                if (acceptClick)
+                    clickFilterTimer.restart()
+            }
 
             Timer
             {
