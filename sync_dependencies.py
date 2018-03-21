@@ -51,6 +51,8 @@ def determine_package_versions():
     if box in ("bpi", "bananapi"):
         v["qt"] = "5.6.2-1"
         v["quazip"] = "0.7"
+        v["festival"] = "2.4-1"
+        v["festival-vox"] = "2.4"
 
     if box == "bananapi":
         v["ffmpeg"] = "3.1.1-bananapi"
@@ -70,7 +72,8 @@ def determine_package_versions():
         v["openssl"] = "1.0.0j"
         v["quazip"] = "0.7"
 
-    v["festival-vox"] = v["festival"]
+    if not "festival-vox" in v:
+        v["festival-vox"] = v["festival"]
 
     return v
 
