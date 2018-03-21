@@ -217,7 +217,7 @@ void FcResource::setIframeDistance(int, int)
     // Do nothing.
 }
 
-bool FcResource::hasDualStreaming() const
+bool FcResource::hasDualStreamingInternal() const
 {
     return false;
 }

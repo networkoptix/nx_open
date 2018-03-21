@@ -170,7 +170,7 @@ public:
                     motionOk = false;
                     break;
                 }
-                if (m_dualStreamingUsed && !camera->hasDualStreaming2())
+                if (m_dualStreamingUsed && !camera->hasDualStreaming())
                 {
                     motionOk = false;
                     break;
@@ -1154,7 +1154,7 @@ void CameraScheduleWidget::updateMotionButtons()
     bool hasMotion = !m_cameras.isEmpty();
     for (const auto &camera: m_cameras)
     {
-        hasDualStreaming &= camera->hasDualStreaming2();
+        hasDualStreaming &= camera->hasDualStreaming();
         hasMotion &= camera->hasMotion();
     }
 
@@ -1312,7 +1312,7 @@ void CameraScheduleWidget::at_releaseSignalizer_activated(QObject *target)
         QnVirtualCameraResourcePtr camera = m_cameras.first();
 
         // TODO: #GDM #Common duplicate code.
-        bool hasDualStreaming = all_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) { return camera->hasDualStreaming2(); });
+        bool hasDualStreaming = all_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) { return camera->hasDualStreaming(); });
         bool hasMotion = all_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) { return camera->hasMotion(); });
 
         if (hasMotion && !hasDualStreaming)

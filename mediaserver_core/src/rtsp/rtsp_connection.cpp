@@ -1035,7 +1035,7 @@ void QnRtspConnectionProcessor::at_camera_resourceChanged(const QnResourcePtr & 
     QnVirtualCameraResourcePtr cameraResource = qSharedPointerDynamicCast<QnVirtualCameraResource>(d->mediaRes);
     if (cameraResource) {
         if (cameraResource->isAudioEnabled() != d->audioEnabled ||
-            cameraResource->hasDualStreaming2() != d->wasDualStreaming ||
+            cameraResource->hasDualStreaming() != d->wasDualStreaming ||
             (!cameraResource->isCameraControlDisabled() && d->wasCameraControlDisabled))
         {
             m_needStop = true;
@@ -1129,7 +1129,7 @@ void QnRtspConnectionProcessor::createDataProvider()
             QnVirtualCameraResourcePtr cameraRes = qSharedPointerDynamicCast<QnVirtualCameraResource> (d->mediaRes);
             QSharedPointer<QnLiveStreamProvider> liveHiProvider = qSharedPointerDynamicCast<QnLiveStreamProvider> (d->liveDpHi);
             int fps = d->liveDpHi->getLiveParams().fps;
-            if (cameraRes->hasDualStreaming2() && cameraRes->isEnoughFpsToRunSecondStream(fps))
+            if (cameraRes->hasDualStreaming() && cameraRes->isEnoughFpsToRunSecondStream(fps))
                 d->liveDpLow = camera->getLiveReader(QnServer::LowQualityCatalog);
         }
         if (d->liveDpLow) {
@@ -1187,7 +1187,7 @@ void QnRtspConnectionProcessor::checkQuality()
     }
     QnVirtualCameraResourcePtr cameraRes = d->mediaRes.dynamicCast<QnVirtualCameraResource>();
     if (cameraRes) {
-        d->wasDualStreaming = cameraRes->hasDualStreaming2();
+        d->wasDualStreaming = cameraRes->hasDualStreaming();
         d->wasCameraControlDisabled = cameraRes->isCameraControlDisabled();
     }
 }

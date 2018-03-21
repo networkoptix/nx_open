@@ -253,7 +253,7 @@ static const bool transcodingAvailable = false;
 bool QnVirtualCameraResource::saveMediaStreamInfoIfNeeded( const CameraMediaStreamInfo& mediaStreamInfo )
 {
     //saving hasDualStreaming flag before locking mutex
-    const auto hasDualStreamingLocal = hasDualStreaming2();
+    const auto hasDualStreamingLocal = hasDualStreaming();
 
     //TODO #ak remove m_mediaStreamsMutex lock, use resource mutex
     QnMutexLocker lk( &m_mediaStreamsMutex );

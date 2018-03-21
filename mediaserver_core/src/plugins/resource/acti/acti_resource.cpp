@@ -953,7 +953,7 @@ bool QnActiResource::isAudioSupported() const
     return m_hasAudio;
 }
 
-bool QnActiResource::hasDualStreaming() const
+bool QnActiResource::hasDualStreamingInternal() const
 {
     return getProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME).toInt() > 0;
 }

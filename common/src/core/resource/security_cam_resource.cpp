@@ -64,7 +64,7 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
     m_manuallyAdded(false),
     m_cachedLicenseType([this] { return calculateLicenseType(); }, &m_mutex),
     m_cachedHasDualStreaming2(
-        [this]()->bool{ return hasDualStreaming() && !isDualStreamingDisabled(); },
+        [this]()->bool{ return hasDualStreamingInternal() && !isDualStreamingDisabled(); },
         &m_mutex ),
     m_cachedSupportedMotionType(
         std::bind( &QnSecurityCamResource::calculateSupportedMotionType, this ),
@@ -257,7 +257,7 @@ bool QnSecurityCamResource::isEnoughFpsToRunSecondStream(int currentFps) const
 #ifdef ENABLE_DATA_PROVIDERS
 QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(Qn::ConnectionRole role)
 {
-    if (role == Qn::CR_SecondaryLiveVideo && !hasDualStreaming2())
+    if (role == Qn::CR_SecondaryLiveVideo && !hasDualStreaming())
         return nullptr;
 
     switch (role)
@@ -443,7 +443,7 @@ QnScheduleTaskList QnSecurityCamResource::getScheduleTasks() const
     return (*userAttributesLock)->scheduleTasks;
 }
 
-bool QnSecurityCamResource::hasDualStreaming2() const {
+bool QnSecurityCamResource::hasDualStreaming() const {
     return m_cachedHasDualStreaming2.get();
 }
 
@@ -460,7 +460,7 @@ void QnSecurityCamResource::setCameraMediaCapability(const nx::media::CameraMedi
     saveParams();
 }
 
-bool QnSecurityCamResource::hasDualStreaming() const
+bool QnSecurityCamResource::hasDualStreamingInternal() const
 {
     const auto capabilities = cameraMediaCapability();
     if (capabilities.hasDualStreaming)
@@ -722,7 +722,7 @@ bool QnSecurityCamResource::hasMotion() const
     Qn::MotionType motionType = getDefaultMotionType();
     if (motionType == Qn::MT_SoftwareGrid)
     {
-        return hasDualStreaming2()
+        return hasDualStreaming()
             || (getCameraCapabilities() & Qn::PrimaryStreamSoftMotionCapability)
             || !getProperty(QnMediaResource::motionStreamKey()).isEmpty();
     }

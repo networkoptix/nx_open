@@ -190,10 +190,10 @@ void CameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraResour
         if (!camera->supportedMotionType().testFlag(Qn::MT_SoftwareGrid))
             allCamerasSupportForceMotion = false;
 
-        m_hasDualStreaming |= camera->hasDualStreaming();
+        m_hasDualStreaming |= camera->hasDualStreamingInternal();
         m_hasRemoteArchiveCapability |= camera->hasCameraCapabilities(Qn::RemoteArchiveCapability);
 
-        if (camera->hasDualStreaming())
+        if (camera->hasDualStreamingInternal())
         {
             if (isDualStreamingDisabled.is_initialized())
             {
@@ -381,7 +381,7 @@ void CameraExpertSettingsWidget::submitToResources(const QnVirtualCameraResource
                 camera->setCameraControlDisabled(false);
         }
 
-        if (globalControlEnabled && enableControls && camera->hasDualStreaming())
+        if (globalControlEnabled && enableControls && camera->hasDualStreamingInternal())
         {
             if (ui->secondStreamDisableCheckBox->checkState() != Qt::PartiallyChecked)
                 camera->setDisableDualStreaming(
@@ -392,7 +392,7 @@ void CameraExpertSettingsWidget::submitToResources(const QnVirtualCameraResource
             camera->setProperty(QnMediaResource::dontRecordPrimaryStreamKey(), ui->checkBoxPrimaryRecorder->isChecked() ? lit("1") : lit("0"));
         if (ui->bitratePerGopCheckBox->checkState() != Qt::PartiallyChecked)
             camera->setProperty(Qn::FORCE_BITRATE_PER_GOP, ui->bitratePerGopCheckBox->isChecked() ? lit("1") : lit("0"));
-        if (ui->checkBoxSecondaryRecorder->checkState() != Qt::PartiallyChecked && camera->hasDualStreaming())
+        if (ui->checkBoxSecondaryRecorder->checkState() != Qt::PartiallyChecked && camera->hasDualStreamingInternal())
             camera->setProperty(QnMediaResource::dontRecordSecondaryStreamKey(), ui->checkBoxSecondaryRecorder->isChecked() ? lit("1") : lit("0"));
 
         if (ui->comboBoxTransport->currentIndex() >= 0) {
@@ -444,7 +444,7 @@ bool CameraExpertSettingsWidget::isArecontCamera(const QnVirtualCameraResourcePt
 
 bool CameraExpertSettingsWidget::isMdPolicyAllowedForCamera(const QnVirtualCameraResourcePtr& camera, const QString& mdPolicy) const
 {
-    const bool hasDualStreaming  = camera->hasDualStreaming();
+    const bool hasDualStreaming  = camera->hasDualStreamingInternal();
     const bool hasRemoteArchive = camera->hasCameraCapabilities(Qn::RemoteArchiveCapability);
 
     return mdPolicy.isEmpty() //< Do not force MD policy

@@ -88,10 +88,11 @@ public:
     void setScheduleTasks(const QnScheduleTaskList &scheduleTasks);
     QnScheduleTaskList getScheduleTasks() const;
 
-    virtual bool hasDualStreaming() const;
+    /** @return true if dual streaming is supported */
+    virtual bool hasDualStreamingInternal() const;
 
-    /** Return true if dual streaming supported and don't blocked by user */
-    virtual bool hasDualStreaming2() const;
+    /** @return true if dual streaming is supported and don't blocked by user */
+    virtual bool hasDualStreaming() const;
 
     /** Returns true if camera stores archive on a external system */
     bool isDtsBased() const;

@@ -425,7 +425,7 @@ void QnVideoCamera::at_camera_resourceChanged()
 	const QnSecurityCamResource* cameraResource = dynamic_cast<QnSecurityCamResource*>(m_resource.data());
 	if ( cameraResource )
 	{
-		if ( !cameraResource->hasDualStreaming2() && m_secondaryReader )
+		if ( !cameraResource->hasDualStreaming() && m_secondaryReader )
 		{
 			if ( m_secondaryReader->isRunning() )
 				m_secondaryReader->pleaseStop();
@@ -453,7 +453,7 @@ void QnVideoCamera::createReader(QnServer::ChunksCatalog catalog)
     if (reader == 0)
     {
 		QnAbstractStreamDataProvider* dataProvider = NULL;
-		if ( primaryLiveStream || (cameraResource && cameraResource->hasDualStreaming2()) )
+		if ( primaryLiveStream || (cameraResource && cameraResource->hasDualStreaming()) )
 			dataProvider = m_resource->createDataProvider(role);
 
 		if ( dataProvider )
@@ -500,7 +500,7 @@ void QnVideoCamera::startLiveCacheIfNeeded()
     else if (m_primaryReader && !m_liveCache[MEDIA_Quality_High])
     {
         //if camera has one stream only and it is suitable for motion then caching first stream
-        if (!cameraResource->hasDualStreaming2() &&
+        if (!cameraResource->hasDualStreaming() &&
             cameraResource->hasCameraCapabilities(Qn::PrimaryStreamSoftMotionCapability))
         {
             ensureLiveCacheStarted(
@@ -681,7 +681,7 @@ void QnVideoCamera::stopIfNoActivity()
             const QnSecurityCamResource* cameraResource = dynamic_cast<QnSecurityCamResource*>(m_resource.data());
             const bool isSingleStreamCameraAndHiSuitableForCaching =
                 cameraResource &&
-                !cameraResource->hasDualStreaming2() &&
+                !cameraResource->hasDualStreaming() &&
                 cameraResource->hasCameraCapabilities( Qn::PrimaryStreamSoftMotionCapability );
             if( !isSingleStreamCameraAndHiSuitableForCaching || !isSomeActivity() )
             {
@@ -792,7 +792,7 @@ QnLiveStreamProviderPtr QnVideoCamera::getLiveReaderNonSafe(QnServer::ChunksCata
         m_resource->initAsync( true );
     }
 	const QnSecurityCamResource* cameraResource = dynamic_cast<QnSecurityCamResource*>(m_resource.data());
-	if ( cameraResource && !cameraResource->hasDualStreaming2() && catalog == QnServer::LowQualityCatalog )
+	if ( cameraResource && !cameraResource->hasDualStreaming() && catalog == QnServer::LowQualityCatalog )
 		return QnLiveStreamProviderPtr();
     return catalog == QnServer::HiQualityCatalog ? m_primaryReader : m_secondaryReader;
 }

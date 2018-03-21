@@ -158,12 +158,12 @@ bool CameraMock::saveParams()
     return true;
 }
 
-bool CameraMock::hasDualStreaming() const
+bool CameraMock::hasDualStreamingInternal() const
 {
     return true;
 }
 
-bool CameraMock::hasDualStreaming2() const
+bool CameraMock::hasDualStreaming() const
 {
     return true;
 }

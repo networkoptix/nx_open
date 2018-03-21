@@ -371,7 +371,7 @@ bool QnServerStreamRecorder::isMotionRec(Qn::RecordingType recType) const
 {
     const QnSecurityCamResource* camera = static_cast<const nx::mediaserver::resource::Camera*>(m_device.data());
     return recType == Qn::RT_MotionOnly ||
-           (m_catalog == QnServer::HiQualityCatalog && recType == Qn::RT_MotionAndLowQuality && camera->hasDualStreaming2());
+           (m_catalog == QnServer::HiQualityCatalog && recType == Qn::RT_MotionAndLowQuality && camera->hasDualStreaming());
 }
 
 void QnServerStreamRecorder::beforeProcessData(const QnConstAbstractMediaDataPtr& media)
@@ -474,7 +474,7 @@ bool QnServerStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& med
 
     if (task.getRecordingType() == Qn::RT_Always)
         return true;
-    else if (task.getRecordingType() == Qn::RT_MotionAndLowQuality && (m_catalog == QnServer::LowQualityCatalog || !camera->hasDualStreaming2()))
+    else if (task.getRecordingType() == Qn::RT_MotionAndLowQuality && (m_catalog == QnServer::LowQualityCatalog || !camera->hasDualStreaming()))
         return true;
     else if (task.getRecordingType() == Qn::RT_Never)
     {

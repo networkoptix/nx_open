@@ -832,7 +832,7 @@ bool SingleCameraSettingsWidget::isValidSecondStream()
     if (!ui->cameraScheduleWidget->isScheduleEnabled())
         return true;
 
-    if (!m_camera->hasDualStreaming())
+    if (!m_camera->hasDualStreamingInternal())
         return true;
 
     auto filteredTasks = ui->cameraScheduleWidget->scheduleTasks();

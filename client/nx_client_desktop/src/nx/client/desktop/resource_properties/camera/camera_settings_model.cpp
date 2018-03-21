@@ -52,7 +52,7 @@ struct CameraSettingsModel::Private
             ? singleCamera->sourceUrl(Qn::CR_LiveVideo)
             : CameraSettingsModel::tr("I/O module has no audio stream");
 
-        bool hasSecondaryStream = singleCamera->hasDualStreaming2();
+        bool hasSecondaryStream = singleCamera->hasDualStreaming();
         networkInfo.secondaryStream = hasSecondaryStream
             ? singleCamera->sourceUrl(Qn::CR_SecondaryLiveVideo)
             : CameraSettingsModel::tr("Camera has no secondary stream");
