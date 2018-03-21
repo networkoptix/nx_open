@@ -953,7 +953,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                         audioStream->codec->block_align = 0;
                     // Fill frame_size for MP3 (it is a constant). AVI container works wrong without it.
                     if (audioStream->codec->frame_size == 0)
-                        audioStream->codec->frame_size = 1152;
+                        audioStream->codec->frame_size = QnFfmpegHelper::getDefaultFrameSize(audioStream->codec);
                 }
             }
             else
