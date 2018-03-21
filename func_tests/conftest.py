@@ -250,7 +250,7 @@ def hypervisor(configuration, host_os_access):
 
 @pytest.fixture(scope='session')
 def vm_factories(request, configuration, hypervisor, host_os_access):
-    pools = {
+    factories = {
         vm_type: Factory(
             VMConfiguration(vm_configuration_raw),
             hypervisor,
@@ -261,9 +261,9 @@ def vm_factories(request, configuration, hypervisor, host_os_access):
                 ))
         for vm_type, vm_configuration_raw in configuration['vm_types'].items()}
     if request.config.getoption('--clean'):
-        for vm_factory in vm_factories.values():
+        for vm_factory in factories.values():
             vm_factory.cleanup()
-    return pools
+    return factories
 
 
 @pytest.fixture()
