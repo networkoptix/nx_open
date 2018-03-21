@@ -19,6 +19,7 @@ using namespace vms::common::p2p::downloader;
 
 namespace {
 
+// #TODO #akulikov turn this to AbstractUpdateRegistry::isBetter() and AbstractUpdateRegistry::merge()
 static bool isNewRegistryBetter(
     const update::info::AbstractUpdateRegistryPtr& oldRegistry,
     const update::info::AbstractUpdateRegistryPtr& newRegistry)
