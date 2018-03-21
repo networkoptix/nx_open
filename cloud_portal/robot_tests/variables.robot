@@ -32,12 +32,12 @@ ${TM TEXT}                            qweasdzxc123®™
 ${LOG IN MODAL}                       //div[contains(@class, 'modal-content')]
 ${EMAIL INPUT}                        //form[contains(@name, 'loginForm')]//input[@ng-model='auth.email']
 ${PASSWORD INPUT}                     //form[contains(@name, 'loginForm')]//input[@ng-model='auth.password']
-${LOG IN BUTTON}                      //form[contains(@name, 'loginForm')]//process-button[@process='login']
+${LOG IN BUTTON}                      //form[contains(@name, 'loginForm')]//button[@ng-click='checkForm()']
 ${REMEMBER ME CHECKBOX}               //form[contains(@name, 'loginForm')]//input[@ng-model='auth.remember']
 ${FORGOT PASSWORD}                    //form[contains(@name, 'loginForm')]//a[@href='/restore_password']
 ${LOG IN CLOSE BUTTON}                //button[@ng-click='close()']
 
-${LOG IN NAV BAR}                     //nav//a[contains(@ng-click, 'login()')]/..
+${LOG IN NAV BAR}                     //nav//a[contains(@ng-click, 'login()')]
 ${YOU HAVE NO SYSTEMS}                //span[contains(text(),'${YOU HAVE NO SYSTEMS TEXT}')]
 
 ${ACCOUNT DROPDOWN}                   //li[contains(@class, 'collapse-first')]//a['uib-dropdown-toggle']

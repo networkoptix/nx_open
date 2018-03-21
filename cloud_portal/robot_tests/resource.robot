@@ -31,7 +31,7 @@ Set Language
 Log In
     [arguments]    ${email}    ${password}    ${button}=${LOG IN NAV BAR}
     Run Keyword Unless    '''${button}''' == "None"    Wait Until Element Is Visible    ${button}
-    Run Keyword Unless    '''${button}''' == "None"    Click Element    ${button}
+    Run Keyword Unless    '''${button}''' == "None"    Click Link    ${button}
     Wait Until Elements Are Visible    ${EMAIL INPUT}    ${PASSWORD INPUT}
     Input Text    ${EMAIL INPUT}    ${email}
     Input Text    ${PASSWORD INPUT}    ${password}
