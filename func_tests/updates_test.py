@@ -39,6 +39,6 @@ def test_single_server(server):
     python_path = prepare_virtual_environment(server.os_access)
     install_updates_server(server.os_access, python_path)
     server.stop(already_stopped_ok=True)
-    server.installation.change_config(checkForUpdateUrl=ROOT_URL)
+    server.installation.update_mediaserver_conf({'checkForUpdateUrl': ROOT_URL})
     server.start(already_started_ok=False)
     assert wait_until(lambda: api.status.GET()['status'] == 'available')

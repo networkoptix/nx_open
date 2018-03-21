@@ -93,12 +93,6 @@ class LightweightServersInstallation(object):
     def cleanup_test_tmp_dir(self):
         self.os_access.rm_tree(self.test_tmp_dir, ignore_errors=True)
 
-    def reset_config(self, **kw):
-        self._not_supported()
-
-    def change_config(self, **kw):
-        self._not_supported()
-
     def get_log_file(self):
         if self.os_access.file_exists(self.log_path_base):
             return self.os_access.read_file(self.log_path_base + '.log')

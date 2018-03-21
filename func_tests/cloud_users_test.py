@@ -4,6 +4,7 @@ Initial task https://networkoptix.atlassian.net/browse/UT-42.
 """
 import pytest
 
+from test_utils.utils import wait_until
 
 SECOND_CLOUD_USER='vfedorov@networkoptix.com'
 SECOND_CLOUD_PASSWORD='123qweasd'
@@ -22,7 +23,7 @@ ADMIN_PERMISSIONS='|'.join([
 @pytest.mark.skip(reason="Disabled until release")
 def test_mediaserver_cloud_protocol_synchronization(server_factory, cloud_account):
     server = server_factory.create('server', setup=False)
-    server.setup_cloud_system(cloud_account)
+    setup_cloud_system(server, cloud_account, {})
     server.rest_api.ec2.saveUser.POST(
         email=SECOND_CLOUD_USER,
         isCloud=True,
@@ -34,4 +35,5 @@ def test_mediaserver_cloud_protocol_synchronization(server_factory, cloud_accoun
     assert second_cloud_users[0]['isEnabled']
     assert second_cloud_users[0]['isCloud']
 
-    server.set_user_password(SECOND_CLOUD_USER, SECOND_CLOUD_PASSWORD)
+    server.rest_api = server.rest_api.with_credentials(SECOND_CLOUD_USER, SECOND_CLOUD_PASSWORD)
+    wait_until(server.rest_api.credentials_work)

@@ -78,29 +78,23 @@ class ServerInstallation(object):
             '--',  # Avoid confusion with options.
             self.dir / '*core*'])
 
-    def backup_config(self):
+    def backup_mediaserver_conf(self):
         self.os_access.run_command(['sudo', 'cp', self._config_path, self._config_path_initial])
         log.info("Initial config is saved at: %s", self._config_path_initial)
 
-    def reset_config(self, **kw):
+    def restore_mediaserver_conf(self):
         self.os_access.run_command(['cp', self._config_path_initial, self._config_path])
-        self.change_config(**kw)
 
-    def change_config(self, **kw):
+    def update_mediaserver_conf(self, new_configuration):
         old_config = self.os_access.read_file(self._config_path)
-        new_config = self._modify_config(old_config, **kw)
-        self.os_access.write_file(self._config_path, new_config)
-
-    @staticmethod
-    def _modify_config(old_config, **kw):
         config = ConfigParser()
-        config.optionxform = str  # make it case-sensitive, server treats it this way (yes, this is a bug)
+        config.optionxform = str  # Configuration is case-sensitive.
         config.readfp(BytesIO(old_config))
-        for name, value in kw.items():
+        for name, value in new_configuration.items():
             config.set('General', name, str(value))
         f = BytesIO()
         config.write(f)
-        return f.getvalue()
+        self.os_access.write_file(self._config_path, f.getvalue())
 
     def get_log_file(self):
         if self.os_access.file_exists(self._log_path):
@@ -219,7 +213,7 @@ def install_mediaserver(os_access, mediaserver_deb, installation_root=DEFAULT_IN
         service.start()
     assert wait_until(lambda: _port_is_opened_on_server_machine(os_access, 7001))  # Opens after a while.
 
-    installation.backup_config()
+    installation.backup_mediaserver_conf()
 
     # Server may crash several times during one test, all cores are kept.
     # Legend: %t is timestamp, %p is pid.

@@ -6,19 +6,16 @@ import tempfile
 import time
 import uuid
 
-import pytest
 import pytz
 import requests.exceptions
 from pathlib2 import Path
 
-from test_utils.api_shortcuts import get_server_id, get_system_settings
+from test_utils.api_shortcuts import get_server_id
 from test_utils.utils import wait_until
 from .camera import Camera, SampleMediaFile, make_schedule_task
-from .cloud_host import CloudAccount
 from .media_stream import open_media_stream
 from .os_access import LocalAccess
-from .rest_api import HttpError, REST_API_PASSWORD, REST_API_USER
-from .utils import datetime_utc_now, datetime_utc_to_timestamp
+from .utils import datetime_utc_to_timestamp
 
 DEFAULT_HTTP_SCHEMA = 'http'
 
@@ -28,8 +25,6 @@ MEDIASERVER_CREDENTIALS_TIMEOUT = datetime.timedelta(minutes=5)
 MEDIASERVER_MERGE_TIMEOUT = MEDIASERVER_CREDENTIALS_TIMEOUT  # timeout for local system ids become the same
 MEDIASERVER_MERGE_REQUEST_TIMEOUT = datetime.timedelta(seconds=90)  # timeout for mergeSystems REST api request
 MEDIASERVER_START_TIMEOUT = datetime.timedelta(minutes=5)  # timeout when waiting for server become online (pingable)
-
-DEFAULT_SERVER_LOG_LEVEL = 'DEBUG2'
 
 
 log = logging.getLogger(__name__)
@@ -52,34 +47,6 @@ class TimePeriod(object):
                 and other.duration == self.duration)
 
 
-class ServerConfig(object):
-
-    def __init__(self, name, setup=True, leave_initial_cloud_host=False,
-                 vm=None, config_file_params=None, setup_settings=None, setup_cloud_account=None,
-                 http_schema=None):
-        assert name, repr(name)
-        assert type(setup) is bool, repr(setup)
-        assert config_file_params is None or isinstance(config_file_params, dict), repr(config_file_params)
-        assert setup_settings is None or isinstance(setup_settings, dict), repr(setup_settings)
-        assert setup_cloud_account is None or isinstance(setup_cloud_account, CloudAccount), repr(setup_cloud_account)
-        assert http_schema in [None, 'http', 'https'], repr(http_schema)
-        self.name = name
-        self.setup = setup  # setup as local system if setup_cloud_account is None, to cloud if it is set
-        # By default, by Server's 'init' method  it's hardcoded cloud host will be patched/restored to the one
-        # deduced from --cloud-group option. With leave_initial_cloud_host=True, this step will be skipped.
-        # With leave_initial_cloud_host=True VM will also be always recreated before this test to ensure
-        # server binaries has original cloud host encoded by compilation step.
-        self.leave_initial_cloud_host = leave_initial_cloud_host  # bool
-        self.vm = vm  # VagrantVM or None
-        self.config_file_params = config_file_params  # dict or None
-        self.setup_settings = setup_settings or {}  # dict
-        self.setup_cloud_account = setup_cloud_account  # CloudAccount or None
-        self.http_schema = http_schema or DEFAULT_HTTP_SCHEMA  # 'http' or 'https'
-
-    def __repr__(self):
-        return 'ServerConfig(%r @ %s)' % (self.name, self.vm)
-
-
 class Server(object):
     """Mediaserver, same for physical and virtual machines"""
 
@@ -95,7 +62,7 @@ class Server(object):
         self.port = port
 
     def __repr__(self):
-        return '<Server at %s>' % self.rest_api.url('')
+        return '<Server {} at {}>'.format(self.name, self.rest_api.url(''))
 
     def is_online(self):
         try:
@@ -151,57 +118,6 @@ class Server(object):
                 continue
             log.info("Server restarted successfully, new runtime id is %s", new_runtime_id)
             break
-
-    def patch_binary_set_cloud_host(self, new_host):
-        assert not self.service.is_running(), 'Server %s must be stopped first for patching its binaries' % self
-        self.installation.patch_binary_set_cloud_host(new_host)
-        self.set_user_password(REST_API_USER, REST_API_PASSWORD)  # Must be reset to default ones
-
-    def setup_local_system(self, **kw):
-        log.info('Setting up server as local system %s:', self)
-        self.rest_api.post('api/setupLocalSystem', dict(systemName=self.name, password=REST_API_PASSWORD, **kw))
-
-    def setup_cloud_system(self, cloud_account, **kw):
-        assert isinstance(cloud_account, CloudAccount), repr(cloud_account)
-        log.info('Setting up server as local system %s:', self)
-        bind_info = cloud_account.bind_system(self.name)
-        setup_response = self.rest_api.api.setupCloudSystem.POST(
-            systemName=self.name,
-            cloudAuthKey=bind_info.auth_key,
-            cloudSystemID=bind_info.system_id,
-            cloudAccountName=cloud_account.rest_api.user,
-            timeout=300,
-            **kw)
-        settings = setup_response['settings']
-        self.set_user_password(cloud_account.rest_api.user, cloud_account.password)
-        assert get_system_settings(self.rest_api)['systemName'] == self.name
-        return settings
-
-    def detach_from_cloud(self, password):
-        self.rest_api.api.detachFromCloud.POST(password=password)
-        self.set_user_password(REST_API_USER, password)
-
-    def set_user_password(self, user, password):
-        log.debug('%s got user/password: %r/%r', self, user, password)
-        self.rest_api = self.rest_api.with_credentials(user, password)
-        if self.is_online():
-            self._wait_for_credentials_accepted()
-
-    # wait until existing server credentials become valid
-    def _wait_for_credentials_accepted(self):
-        start_time = datetime_utc_now()
-        t = time.time()
-        while datetime_utc_now() - start_time < MEDIASERVER_CREDENTIALS_TIMEOUT:
-            try:
-                self.rest_api.ec2.testConnection.GET()
-                log.info('Server accepted new credentials in %s', datetime_utc_now() - start_time)
-                return
-            except HttpError as x:
-                if x.status_code != 401:
-                    raise
-            time.sleep(1)
-        pytest.fail('Timed out in %s waiting for server %s to accept credentials: user=%r, password=%r'
-                    % (MEDIASERVER_CREDENTIALS_TIMEOUT, self, self.rest_api.user, self.rest_api.password))
 
     def add_camera(self, camera):
         assert not camera.id, 'Already added to a server with id %r' % camera.id

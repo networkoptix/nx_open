@@ -9,6 +9,7 @@ from pathlib2 import Path
 import server_api_data_generators as generator
 import test_utils.utils as utils
 from test_utils.api_shortcuts import get_server_id
+from test_utils.merging import setup_local_system
 from test_utils.os_access import NonZeroExitStatus
 
 log = logging.getLogger(__name__)
@@ -83,7 +84,7 @@ def server(server_factory, system_backup_type):
     server.stop()
     server.os_access.run_command(['rm', '-rfv', str(BACKUP_STORAGE_PATH / '*')])
     server.start()
-    server.setup_local_system()
+    setup_local_system(server, {})
     server.rest_api.api.systemSettings.GET(backupQualities=system_backup_type)
     return server
 

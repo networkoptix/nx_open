@@ -1,14 +1,11 @@
 import logging
 
-from pylru import lrudecorator
-
 from test_utils.rest_api import RestApi
-from test_utils.server import DEFAULT_SERVER_LOG_LEVEL
 from test_utils.server_installation import install_mediaserver
 from test_utils.service import UpstartService
 from .artifact import ArtifactType
 from .core_file_traceback import create_core_file_traceback
-from .server import Server, ServerConfig
+from .server import Server
 
 log = logging.getLogger(__name__)
 
@@ -27,54 +24,32 @@ class ServerFactory(object):
         self._ca = ca
         self._mediaserver_deb = mediaserver_deb
 
-    @lrudecorator(1000)
-    def get(self, name):
-        return self.create(name)
-
-    def create(self, name, *args, **kw):
-        config = ServerConfig(name, *args, **kw)
-        server = None
-        if self._physical_installation_ctl and not config.vm:  # this server requires specific vm, can not allocate it on physical one
-            server = self._physical_installation_ctl.allocate_server(config)
-        if not server:
-            if config.vm:
-                vm = config.vm
-            else:
-                vm = self._linux_vm_pool.get(name)
-            port = 7001
-            hostname_from_here, port_from_here = vm.ports['tcp', port]
-            server = Server(
-                name,
-                UpstartService(vm.os_access, self._mediaserver_deb.customization.service),
-                install_mediaserver(vm.os_access, self._mediaserver_deb),
-                RestApi(name, hostname_from_here, port_from_here),
-                vm,
-                port)
+    def create(self, name, vm=None):
+        if vm is None:
+            vm = self._linux_vm_pool.get(name)
+        port = 7001
+        hostname_from_here, port_from_here = vm.ports['tcp', port]
+        server = Server(
+            name,
+            UpstartService(vm.os_access, self._mediaserver_deb.customization.service),
+            install_mediaserver(vm.os_access, self._mediaserver_deb),
+            RestApi(name, hostname_from_here, port_from_here),
+            vm,
+            port)
         self._allocated_servers.append(server)  # Following may fail, will need to save it's artifact in that case.
         server.stop(already_stopped_ok=True)
         server.installation.cleanup_core_files()
         server.installation.cleanup_var_dir()
-        server.installation.reset_config(
-            logLevel=DEFAULT_SERVER_LOG_LEVEL,
-            tranLogLevel=DEFAULT_SERVER_LOG_LEVEL,
-            checkForUpdateUrl='http://127.0.0.1:8080',  # TODO: Use fake server responding with small updates.
-            **(config.config_file_params or {}))
         server.installation.put_key_and_cert(self._ca.generate_key_and_cert())
-        if not config.leave_initial_cloud_host:
-            server.patch_binary_set_cloud_host(self._cloud_host)  # may be changed by previous tests...
-        server.start()
-        # TODO: Remove once settings level via mediaserver.conf works again.
-        # See: https://networkoptix.atlassian.net/browse/VMS-8257
-        assert server.rest_api.get('api/logLevel', params={'id': 0, 'value': 'DEBUG2'}) == 'DEBUG2'
-        if config.setup:
-            if config.setup_cloud_account:
-                server.setup_cloud_system(config.setup_cloud_account, **config.setup_settings)
-            else:
-                server.setup_local_system(**config.setup_settings)
+        server.installation.restore_mediaserver_conf()
+        server.installation.update_mediaserver_conf({
+            'logLevel': 'DEBUG2',
+            'tranLogLevel': 'DEBUG2',
+            'checkForUpdateUrl': 'http://127.0.0.1:8080',  # TODO: Use fake server responding with small updates.
+            })
         return server
 
     def release(self):
-        self.get.clear()
         self._check_if_servers_are_online()
         for server in self._allocated_servers:
             self._save_server_artifacts(server)

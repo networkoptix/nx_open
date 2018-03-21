@@ -19,9 +19,9 @@ import requests
 import requests.exceptions
 from requests.auth import HTTPDigestAuth
 
-REST_API_USER = 'admin'
-REST_API_PASSWORD = 'admin'
-STANDARD_PASSWORDS = [REST_API_PASSWORD, 'qweasd123']  # do not mask these passwords in log files
+DEFAULT_API_USER = 'admin'
+DEFAULT_API_PASSWORD = 'admin'
+STANDARD_PASSWORDS = [DEFAULT_API_PASSWORD, 'qweasd123']  # do not mask these passwords in log files
 REST_API_TIMEOUT = datetime.timedelta(seconds=10)
 MAX_CONTENT_LEN_TO_LOG = 1000
 

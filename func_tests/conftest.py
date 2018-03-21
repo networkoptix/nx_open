@@ -16,7 +16,7 @@ from test_utils.cloud_host import CloudAccountFactory, resolve_cloud_host_from_r
 from test_utils.config import TestParameter, TestsConfig, SingleTestConfig
 from test_utils.lightweight_servers_factory import LWS_BINARY_NAME, LightweightServersFactory
 from test_utils.mediaserverdeb import MediaserverDeb
-from test_utils.merging import merge_system
+from test_utils.merging import setup_system, setup_local_system
 from test_utils.metrics_saver import MetricsSaver
 from test_utils.networking import setup_networks
 from test_utils.os_access import LocalAccess
@@ -284,20 +284,20 @@ def linux_vm_pool(vm_factories):
         yield pool
 
 
-TwoLinuxVms = namedtuple('TwoLinuxVms', ['first', 'second'])
+Pair = namedtuple('_TwoVms', ['first', 'second'])
 
 
 @pytest.fixture(scope='session')
-def two_linux_vms(vm_factories, hypervisor):
+def two_vms(vm_factories, hypervisor):
     structure = {'10.254.0.0/29': {'first': None, 'second': None}}
     reachability = {'10.254.0.0/29': {'first': {'second': None}, 'second': {'first': None}}}
     with closing(_make_linux_vm_pool(vm_factories)) as pool:
         vms, _ = setup_networks({'linux': pool}, hypervisor, structure, reachability)
-        yield TwoLinuxVms(**vms)
+        yield Pair(**vms)
 
 
 @pytest.fixture(scope='session')
-def one_linux_vm(vm_factories):
+def single_vm(vm_factories):
     with closing(_make_linux_vm_pool(vm_factories)) as pool:
         yield pool.get('server')
 
@@ -329,8 +329,27 @@ def server_factory(mediaserver_deb, ca, artifact_factory, cloud_host, vm_pools, 
 
 
 @pytest.fixture()
-def single_server(server_factory, one_linux_vm):
-    return server_factory.create('single', vm=one_linux_vm)
+def single_server(server_factory, single_vm):
+    server = server_factory.create('single', vm=single_vm)
+    server.start()
+    setup_local_system(server, {})
+    return server
+
+
+@pytest.fixture()
+def two_servers(server_factory, two_vms):
+    servers = {}
+    for vm in two_vms:
+        server = server_factory.create(vm.alias, vm=vm)
+        server.start()
+        setup_local_system(server, {})
+        servers[vm.alias] = server
+    return Pair(**servers)
+
+
+@pytest.fixture()
+def two_stopped_servers(server_factory, two_vms):
+    return Pair(*(server_factory.create(vm.alias, vm=vm) for vm in two_vms))
 
 
 @pytest.fixture()
@@ -382,7 +401,7 @@ def sample_media_file(request, bin_dir):
 def network(vm_pools, hypervisor, server_factory, layout_file):
     layout = get_layout(layout_file)
     vms, _ = setup_networks(vm_pools, hypervisor, layout.networks, {})
-    servers = merge_system(server_factory, layout.mergers)
+    servers = setup_system(server_factory, layout.mergers)
     return vms, servers
 
 

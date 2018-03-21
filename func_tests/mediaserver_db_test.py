@@ -16,7 +16,7 @@ import time
 
 import pytest
 
-from test_utils.merging import merge_systems
+from test_utils.merging import merge_systems, setup_local_system
 from test_utils.server import MEDIASERVER_MERGE_TIMEOUT
 from test_utils.utils import SimpleNamespace, datetime_utc_now, bool_to_str
 
@@ -67,7 +67,7 @@ def server(name, server_factory, bin_dir, db_version):
         server.stop()
     server.start()
     system_settings = dict(autoDiscoveryEnabled=bool_to_str(False))
-    server.setup_local_system(systemSettings=system_settings)
+    setup_local_system(server, {'systemSettings': system_settings})
     server.rest_api.api.systemSettings.GET(statisticsAllowed=False)
     if db_version == '2.4':
         check_camera(server, server_config.CAMERA_GUID)
@@ -88,7 +88,7 @@ def check_camera(server, camera_guid):
 def assert_jsons_are_equal(json_one, json_two, json_name):
     """It fails after the first error"""
     if isinstance(json_one, dict):
-        assert json_one.keys() == json_two.keys(), "'%s' dicts have different keys" % json_name
+        assert json_one.keys() == json_two.keys(), "'%s' {}s have different keys" % json_name
         for key in json_one.keys():
             entity_name = '%s.%s' % (json_name, key)
             assert_jsons_are_equal(json_one[key], json_two[key], entity_name)
@@ -156,11 +156,11 @@ def test_server_guids_changed(one, two):
     one.stop()
     two.stop()
     # To make server database and configuration file guids different
-    one.installation.change_config(guidIsHWID='no', serverGuid=SERVER_CONFIG['one'].SERVER_GUID)
-    two.installation.reset_config(guidIsHWID='no', serverGuid=SERVER_CONFIG['two'].SERVER_GUID)
+    one.installation.update_mediaserver_conf({'guidIsHWID': 'no', 'serverGuid': SERVER_CONFIG['one'].SERVER_GUID})
+    two.installation.update_mediaserver_conf({'guidIsHWID': 'no', 'serverGuid': SERVER_CONFIG['two'].SERVER_GUID})
     one.start()
     two.start()
-    one.setup_local_system()
-    two.setup_local_system()
+    setup_local_system(one, {})
+    setup_local_system(two, {})
     merge_systems(two, one)
     wait_until_servers_have_same_full_info(one, two)

@@ -63,7 +63,7 @@ class FileNotFound(Exception):
 class SshAccessConfig(object):
     @classmethod
     def from_dict(cls, d):
-        assert isinstance(d, dict), 'ssh location should be dict: %r' % d
+        assert isinstance(d, dict), 'ssh location should be {}: %r' % d
         assert 'host' in d, '"host" is required parameter for host location'
         return cls(
             name=d.get('name') or d['hostname'],

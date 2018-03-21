@@ -18,6 +18,6 @@ LOG_LEVELS = {
 @pytest.mark.parametrize('level', LOG_LEVELS.keys())
 def test_set_level_in_configuration(single_server, level):
     single_server.stop()
-    single_server.installation.change_config(logLevel=level)
+    single_server.installation.update_mediaserver_conf({'logLevel': level})
     single_server.start()
     assert single_server.rest_api.get('api/logLevel', params={'id': 0}) == LOG_LEVELS[level].api_request

@@ -10,7 +10,13 @@ import pytest
 
 import server_api_data_generators as generator
 from test_utils.api_shortcuts import get_local_system_id, get_server_id, get_system_settings
-from test_utils.merging import merge_systems, ExplicitMergeError
+from test_utils.merging import (
+    ExplicitMergeError,
+    detach_from_cloud,
+    merge_systems,
+    setup_cloud_system,
+    setup_local_system,
+    )
 from test_utils.rest_api import HttpError
 from test_utils.server import MEDIASERVER_MERGE_TIMEOUT
 from test_utils.utils import bool_to_str, datetime_utc_now, str_to_bool, wait_until
@@ -20,10 +26,7 @@ log = logging.getLogger(__name__)
 
 @pytest.fixture
 def test_system_settings():
-    return dict(systemSettings=dict(
-        cameraSettingsOptimization=bool_to_str(False),
-        autoDiscoveryEnabled=bool_to_str(False),
-        statisticsAllowed=bool_to_str(False)))
+    return {'cameraSettingsOptimization': 'false', 'autoDiscoveryEnabled': 'false', 'statisticsAllowed': 'false'}
 
 
 def check_system_settings(server, **kw):
@@ -58,13 +61,21 @@ def check_admin_disabled(server):
 
 
 @pytest.fixture
-def one(two_linux_vms, server_factory, test_system_settings):
-    return server_factory.create('one', vm=two_linux_vms.first, setup_settings=test_system_settings)
+def one(two_vms, server_factory, test_system_settings, cloud_host):
+    one = server_factory.create('one', vm=two_vms.first)
+    one.installation.patch_binary_set_cloud_host(cloud_host)
+    one.start()
+    setup_local_system(one, test_system_settings)
+    return one
 
 
 @pytest.fixture
-def two(two_linux_vms, server_factory):
-    return server_factory.create('two', vm=two_linux_vms.second)
+def two(two_vms, server_factory, cloud_host):
+    two = server_factory.create('two', vm=two_vms.second)
+    two.installation.patch_binary_set_cloud_host(cloud_host)
+    two.start()
+    setup_local_system(two, {})
+    return two
 
 
 def test_simplest_merge(one, two):
@@ -75,7 +86,7 @@ def test_simplest_merge(one, two):
 def test_merge_take_local_settings(one, two, test_system_settings):
     # Start two servers without predefined systemName
     # and move them to working state
-    check_system_settings(one, **test_system_settings['systemSettings'])
+    check_system_settings(one, **test_system_settings)
 
     # On each server update some globalSettings to different values
     expected_arecontRtspEnabled = change_bool_setting(one, 'arecontRtspEnabled')
@@ -120,11 +131,16 @@ def test_merge_take_remote_settings(one, two):
         auditTrailEnabled=bool_to_str(expected_auditTrailEnabled))
 
 
-def test_merge_cloud_with_local(two_linux_vms, server_factory, cloud_account, test_system_settings):
-    # Start local server systemName
-    # and move it to working state
-    one = server_factory.create('one', vm=two_linux_vms.first, setup_cloud_account=cloud_account, setup_settings=test_system_settings)
-    two = server_factory.create('two', vm=two_linux_vms.second)
+def test_merge_cloud_with_local(two_vms, server_factory, cloud_account, test_system_settings, cloud_host):
+    one = server_factory.create('one', vm=two_vms.first)
+    one.installation.patch_binary_set_cloud_host(cloud_host)
+    one.start()
+    setup_cloud_system(one, cloud_account, test_system_settings)
+
+    two = server_factory.create('two', vm=two_vms.second)
+    two.installation.patch_binary_set_cloud_host(cloud_host)
+    two.start()
+    setup_local_system(two, {})
 
     # Merge systems (takeRemoteSettings = False) -> Error
     try:
@@ -137,16 +153,23 @@ def test_merge_cloud_with_local(two_linux_vms, server_factory, cloud_account, te
     # Merge systems (takeRemoteSettings = true)
     merge_systems(two, one, take_remote_settings=True)
     wait_for_settings_merge(one, two)
-    check_system_settings(
-        two, **test_system_settings['systemSettings'])
+    check_system_settings(two, **test_system_settings)
 
 
 # https://networkoptix.atlassian.net/wiki/spaces/SD/pages/71467018/Merge+systems+test#Mergesystemstest-test_merge_cloud_systems
-def test_merge_cloud_systems(two_linux_vms, server_factory, cloud_account_factory):
+def test_merge_cloud_systems(two_vms, server_factory, cloud_account_factory, cloud_host):
     cloud_account_1 = cloud_account_factory()
     cloud_account_2 = cloud_account_factory()
-    one = server_factory.create('one', vm=two_linux_vms.first, setup_cloud_account=cloud_account_1)
-    two = server_factory.create('two', vm=two_linux_vms.second, setup_cloud_account=cloud_account_2)
+
+    one = server_factory.create('one', vm=two_vms.first)
+    one.installation.patch_binary_set_cloud_host(cloud_host)
+    one.start()
+    setup_cloud_system(one, cloud_account_1, {})
+
+    two = server_factory.create('two', vm=two_vms.second)
+    two.installation.patch_binary_set_cloud_host(cloud_host)
+    two.start()
+    setup_cloud_system(two, cloud_account_2, {})
 
     # Merge 2 cloud systems one way
     try:
@@ -168,20 +191,23 @@ def test_merge_cloud_systems(two_linux_vms, server_factory, cloud_account_factor
     check_admin_disabled(one)
 
 
-def test_cloud_merge_after_disconnect(two_linux_vms, server_factory, cloud_account, test_system_settings):
-    # Setup cloud and wait new cloud credentials
-    one = server_factory.create(
-        'one', vm=two_linux_vms.first,
-        setup_cloud_account=cloud_account, setup_settings=test_system_settings)
-    two = server_factory.create('two', vm=two_linux_vms.second, setup_cloud_account=cloud_account)
+def test_cloud_merge_after_disconnect(two_vms, server_factory, cloud_account, test_system_settings, cloud_host):
+    one = server_factory.create('one', vm=two_vms.first)
+    one.installation.patch_binary_set_cloud_host(cloud_host)
+    one.start()
+
+    setup_cloud_system(one, cloud_account, test_system_settings)
+    two = server_factory.create('two', vm=two_vms.second)
+    two.installation.patch_binary_set_cloud_host(cloud_host)
+    two.start()
+    setup_cloud_system(two, cloud_account, {})
 
     # Check setupCloud's settings on Server1
-    check_system_settings(
-        one, **test_system_settings['systemSettings'])
+    check_system_settings(one, **test_system_settings)
 
     # Disconnect Server2 from cloud
     new_password = 'new_password'
-    two.detach_from_cloud(new_password)
+    detach_from_cloud(two, new_password)
 
     # Merge systems (takeRemoteSettings = true)
     merge_systems(two, one, take_remote_settings=True)
@@ -209,9 +235,8 @@ def wait_entity_merge_done(one, two, method, api_object, api_method, expected_re
         time.sleep(MEDIASERVER_MERGE_TIMEOUT.total_seconds() / 10.0)
 
 
-def test_merge_resources(two_linux_vms, server_factory):
-    one = server_factory.create('one', vm=two_linux_vms.first)
-    two = server_factory.create('two', vm=two_linux_vms.second)
+def test_merge_resources(two_servers):
+    one, two = two_servers
     user_data = generator.generate_user_data(1)
     camera_data = generator.generate_camera_data(1)
     one.rest_api.ec2.saveUser.POST(**user_data)
@@ -221,9 +246,7 @@ def test_merge_resources(two_linux_vms, server_factory):
     wait_entity_merge_done(one, two, 'GET', 'ec2', 'getCamerasEx', [camera_data['id']])
 
 
-def test_restart_one_server(two_linux_vms, server_factory, cloud_account):
-    one = server_factory.create('one', vm=two_linux_vms.first)
-    two = server_factory.create('two', vm=two_linux_vms.second)
+def test_restart_one_server(one, two, cloud_account):
     merge_systems(one, two)
 
     # Stop Server2 and clear its database
@@ -236,12 +259,12 @@ def test_restart_one_server(two_linux_vms, server_factory, cloud_account):
     one.rest_api.ec2.removeResource.POST(id=guid2)
 
     # Start server 2 again and move it from initial to working state
-    two.setup_cloud_system(cloud_account)
-    two.rest_api.ec2.getUsers.GET()
+    setup_cloud_system(two, cloud_account, {})
+    two.rest_api.get('ec2/getUsers')
 
     # Merge systems (takeRemoteSettings = false)
     merge_systems(two, one)
-    two.rest_api.ec2.getUsers.GET()
+    two.rest_api.get('ec2/getUsers')
 
     # Ensure both servers are merged and sync
     expected_arecontRtspEnabled = not change_bool_setting(one, 'arecontRtspEnabled')

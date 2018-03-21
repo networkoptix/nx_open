@@ -11,7 +11,7 @@ from pylru import lrudecorator
 from pytz import utc
 
 from test_utils.api_shortcuts import get_server_id, get_time
-from test_utils.merging import merge_system
+from test_utils.merging import setup_system, setup_local_system
 from test_utils.utils import RunningTime, holds_long_enough, wait_until
 
 log = logging.getLogger(__name__)
@@ -43,20 +43,23 @@ def get_internet_time(address='time.rfc868server.com', port=37):
 
 
 @pytest.fixture()
-def system(two_linux_vms, server_factory):
+def system(two_vms, server_factory):
     servers = {}
-    for vm in two_linux_vms:
+    for vm in two_vms:
         server = server_factory.create(vm.alias, vm=vm)
         if server.service.is_running():
             server.stop()
         # Reset server without internet access.
         server.machine.networking.disable_internet()
         server.installation.cleanup_var_dir()
-        server.installation.change_config(ecInternetSyncTimePeriodSec=3, ecMaxInternetTimeSyncRetryPeriodSec=3)
+        server.installation.update_mediaserver_conf({
+            'ecInternetSyncTimePeriodSec': 3,
+            'ecMaxInternetTimeSyncRetryPeriodSec': 3,
+            })
         server.start()
-        server.setup_local_system()
+        setup_local_system(server, {})
         servers[vm.alias] = server
-    merge_system(servers, {'first': {'second': None}})
+    setup_system(servers, {'first': {'second': None}})
     first_server_response = servers['first'].rest_api.ec2.getCurrentTime.GET()
     if first_server_response['isPrimaryTimeServer']:
         system = System(primary=servers['first'], secondary=servers['second'])

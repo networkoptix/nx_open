@@ -3,7 +3,7 @@ import logging
 from netaddr import IPAddress, IPNetwork
 
 from test_utils.api_shortcuts import get_local_system_id
-from test_utils.rest_api import RestApiError
+from test_utils.rest_api import DEFAULT_API_PASSWORD, DEFAULT_API_USER, RestApiError
 from test_utils.utils import wait_until
 
 _logger = logging.getLogger(__name__)
@@ -34,6 +34,13 @@ class ExplicitMergeError(MergeError):
         super(ExplicitMergeError, self).__init__(local, remote, "{:d} {}".format(error, error_string))
         self.error = error
         self.error_string = error_string
+
+
+class IncompatibleServersMerge(ExplicitMergeError):
+    def __init__(self, local, remote, error, error_string):
+        assert error == 3
+        assert error_string == 'INCOMPATIBLE'
+        super(IncompatibleServersMerge, self).__init__(local, remote, error, error_string)
 
 
 class MergeChecksFailed(MergeError):
@@ -72,6 +79,8 @@ def merge_systems(local, remote, accessible_ip_net=IPNetwork('10.254.0.0/16'), t
             'mergeOneServer': False,
             })
     except RestApiError as e:
+        if e.error == 3:
+            raise IncompatibleServersMerge(local, remote, e.error, e.error_string)
         raise ExplicitMergeError(local, remote, e.error, e.error_string)
     servant.rest_api = servant.rest_api.with_credentials(master.rest_api.user, master.rest_api.password)
     if not wait_until(
@@ -86,12 +95,50 @@ def merge_systems(local, remote, accessible_ip_net=IPNetwork('10.254.0.0/16'), t
         raise MergeChecksFailed(local, remote, "local system ids don't match")
 
 
-def merge_system(server_factory, scheme):
-    servers = {}
+def setup_local_system(server, system_settings):
+    _logger.info('Setup local system on %s.', server)
+    response = server.rest_api.post('api/setupLocalSystem', {
+        'password': DEFAULT_API_PASSWORD,
+        'systemName': server.name,
+        'systemSettings': system_settings,
+        })
+    assert system_settings == {key: response['settings'][key] for key in system_settings.keys()}
+    return response['settings']
+
+
+def setup_cloud_system(server, cloud_account, system_settings):
+    _logger.info('Setting up server as local system %s:', server)
+    bind_info = cloud_account.bind_system(server.name)
+    request = {
+        'systemName': server.name,
+        'cloudAuthKey': bind_info.auth_key,
+        'cloudSystemID': bind_info.system_id,
+        'cloudAccountName': cloud_account.rest_api.user,
+        'systemSettings': system_settings, }
+    response = server.rest_api.post('api/setupCloudSystem', request, timeout=300)
+    assert system_settings == {key: response['settings'][key] for key in system_settings.keys()}
+    server.rest_api = server.rest_api.with_credentials(cloud_account.rest_api.user, cloud_account.password)
+    assert server.rest_api.credentials_work()
+    return response['settings']
+
+
+def detach_from_cloud(server, password):
+    server.rest_api.post('api/detachFromCloud', {'password': password})
+    server.rest_api = server.rest_api.with_credentials(DEFAULT_API_USER, password)
+
+
+def setup_system(servers, scheme):
+    # if config.setup_cloud_account:
+    #     server.setup_cloud_system(config.setup_cloud_account, **config.setup_settings)
+    #     if not config.leave_initial_cloud_host:
+    #         server.rest_api = server.rest_api.with_credentials(DEFAULT_API_USER, DEFAULT_API_PASSWORD)  # TODO: Needed?
+    # else:
+    #     setup_local_system(server, dict((**config.setup_settings)))
+    allocated_servers = {}
     for remote_alias, local_aliases in scheme.items():
-        servers[remote_alias] = server_factory.get(remote_alias)  # Create server but don't merge.
+        allocated_servers[remote_alias] = servers.get(remote_alias)  # Create server but don't merge.
         for local_alias, merge_parameters in (local_aliases or {}).items():
-            servers[local_alias] = server_factory.get(local_alias)
+            allocated_servers[local_alias] = servers.get(local_alias)
             merge_kwargs = {}
             if merge_parameters is not None:
                 try:
@@ -104,5 +151,5 @@ def merge_system(server_factory, scheme):
                     pass
                 else:
                     merge_kwargs['accessible_ip_net'] = remote_network
-            merge_systems(servers[local_alias], servers[remote_alias], **merge_kwargs)
-    return servers
+            merge_systems(allocated_servers[local_alias], allocated_servers[remote_alias], **merge_kwargs)
+    return allocated_servers

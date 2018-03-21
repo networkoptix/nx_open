@@ -97,7 +97,7 @@ class TestsConfig(object):
 
     def __init__(self, physical_installation_host_list=None, tests=None):
         self.physical_installation_host_list = physical_installation_host_list or []  # PhysicalInstallationHostConfig list
-        self.tests = tests or {}  # dict, full test name -> dict
+        self.tests = tests or {}  # {}, full test name -> {}
 
     def _update_with_tests_params(self, test_params):
         for p in test_params:
@@ -131,7 +131,7 @@ class TestsConfig(object):
 class SingleTestConfig(object):
 
     def __init__(self, config=None):
-        self._config = config or {}  # dict
+        self._config = config or {}  # {}
 
     # parameters in config file and parameters which do not have defaults in test are ignored
     def with_defaults(self, **kw):
