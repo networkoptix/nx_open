@@ -51,7 +51,7 @@ class NoptixLibrary(object):
         return '''!#$%&'*+-/=?^_`{|}~''' + str(time.time()) + "@gmail.com"
 
 
-    def wait_until_textfield_contains(self, locator, expected, timeout=5):
+    def wait_until_textfield_contains(self, locator, expected, timeout=10):
         seleniumlib = BuiltIn().get_library_instance('SeleniumLibrary')
         timeout = timeout + time.time()
         not_found = None
@@ -63,9 +63,7 @@ class NoptixLibrary(object):
                 if value == expected:
                     return
             except:
-                not_found = "Something weird happened it's Kyle's fault"
-            else:
-                raise NoSuchElementException
+                not_found = "No element found with text" + expected
             time.sleep(.2)  
         raise AssertionError(not_found)
 

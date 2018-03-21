@@ -236,6 +236,7 @@ handles two tabs, updates second tab state if logout is done on first
     Select Window    @{tabs}[1]
     Location Should Be    ${url}/content/eula
     Validate Log Out
+    Sleep    5    #This is specifically for Ubuntu Firefox as the JS seems to load slowly and doesn't redirect correctly after login.
     Log In    ${email}    ${password}
     Validate Log In
     Select Window    @{tabs}[0]
