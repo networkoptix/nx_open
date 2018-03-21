@@ -1,5 +1,6 @@
 #pragma once
 
+#include <nx/utils/log/assert.h>
 #include <utils/common/software_version.h>
 
 namespace nx {
@@ -38,7 +39,17 @@ struct NX_UPDATE_API OsVersion
     {
         return lit("%1.%2.%3").arg(family).arg(architecture).arg(version);
     }
+
+    static OsVersion fromString(const QString& s)
+    {
+        auto splits = s.split('.');
+        NX_ASSERT(splits.size() == 3);
+        return OsVersion(splits[0], splits[1], splits[2]);
+    }
 };
+
+NX_UPDATE_API bool operator==(const OsVersion& lhs, const OsVersion& rhs);
+NX_UPDATE_API uint qHash(const OsVersion& osVersion);
 
 NX_UPDATE_API OsVersion ubuntuX64();
 NX_UPDATE_API OsVersion ubuntuX86();
@@ -64,6 +75,8 @@ struct NX_UPDATE_API UpdateRequestData
         currentNxVersion(currentNxVersion)
     {}
 
+    UpdateRequestData(): currentNxVersion("0.0.0.0") {}
+
     QString toString() const
     {
         return lit("cloud host=%1, customization=%2, current nx version=%3")
@@ -87,11 +100,16 @@ struct NX_UPDATE_API UpdateFileRequestData: UpdateRequestData
         osVersion(osVersion)
     {}
 
+    UpdateFileRequestData() = default;
+
     QString toString() const
     {
         return UpdateRequestData::toString() + lit(", os=%1").arg(osVersion.toString());
     }
 };
+
+NX_UPDATE_API bool operator==(const UpdateFileRequestData& lhs, const UpdateFileRequestData& rhs);
+NX_UPDATE_API uint qHash(const UpdateFileRequestData& fileRequestData);
 
 } // namespace info
 } // namespace update

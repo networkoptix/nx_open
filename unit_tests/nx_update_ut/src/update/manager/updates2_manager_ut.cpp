@@ -35,6 +35,8 @@ public:
     MOCK_CONST_METHOD0(toByteArray, QByteArray());
     MOCK_METHOD1(fromByteArray, bool(const QByteArray& rawData));
     MOCK_CONST_METHOD1(equals, bool(AbstractUpdateRegistry* other));
+    MOCK_METHOD2(addFileData, void(const update::info::UpdateFileRequestData&,
+        const update::info::FileData&));
 };
 
 using namespace vms::common::p2p;

@@ -24,6 +24,8 @@ public:
     virtual ResultCode latestUpdate(
         const UpdateRequestData& updateRequestData,
         QnSoftwareVersion* outSoftwareVersion) const override;
+    virtual void addFileData(const UpdateFileRequestData& updateFileRequestData,
+        const FileData& fileData) override;
     virtual QList<QString> alternativeServers() const override;
     virtual QByteArray toByteArray() const override;
     virtual bool fromByteArray(const QByteArray& rawData) override;
@@ -32,6 +34,7 @@ private:
     QString m_baseUrl;
     detail::data_parser::UpdatesMetaData m_metaData;
     detail::CustomizationVersionToUpdate m_customizationVersionToUpdate;
+    QHash<UpdateFileRequestData, FileData> m_manualData;
 
     bool hasUpdateForCustomizationAndVersion(
         const UpdateRequestData& updateRequestData,

@@ -14,12 +14,22 @@ namespace info {
 namespace test {
 
 static const QString kBaseUrl = "http://updates.networkoptix.com";
+static const UpdateFileRequestData kManualDataKey1{"manualCloudHost1", "manualCustomization1",
+    QnSoftwareVersion("1.2.3.4"),OsVersion("manualfamily1", "manualArchitecture1", "manualVersion1")};
+
+static const UpdateFileRequestData kManualDataKey2{ "manualCloudHost2", "manualCustomization2",
+    QnSoftwareVersion("1.2.3.4"),OsVersion("manualfamily1", "manualArchitecture2", "manualVersion2") };
+
+static const FileData kManualDataValue1{"file1", "url1", 11, "md51", {QnUuid::createUuid(), QnUuid::createUuid()}};
+static const FileData kManualDataValue2{"file2", "url2", 22, "md52", {QnUuid::createUuid(), QnUuid::createUuid()}};
 
 class AsyncUpdateChecker: public ::testing::Test
 {
 protected:
     virtual void SetUp() override
     {
+        m_manualData.insert(kManualDataKey1, kManualDataValue1);
+        m_manualData.insert(kManualDataKey2, kManualDataValue2);
     }
 
     virtual void TearDown() override
@@ -45,14 +55,20 @@ protected:
         m_asyncUpdateChecker.check(
             std::bind(&AsyncUpdateChecker::onCheckCompleted, this, _1, _2),
             kBaseUrl);
+
+        QnMutexLocker lock(&m_mutex);
+        while (!m_done)
+            m_condition.wait(lock.mutex());
+    }
+
+    void whenSomeManualDataHasBeenAdded()
+    {
+        m_updateRegistry->addFileData(kManualDataKey1, kManualDataValue1);
+        m_updateRegistry->addFileData(kManualDataKey2, kManualDataValue2);
     }
 
     void thenCorrectUpdateRegistryShouldBeReturned()
     {
-        QnMutexLocker lock(&m_mutex);
-        while (!m_done)
-            m_condition.wait(lock.mutex());
-
         ASSERT_EQ(ResultCode::ok, m_resultCode);
         ASSERT_TRUE((bool) m_updateRegistry);
         assertUpdateRegistryContent();
@@ -65,6 +81,7 @@ private:
     QnWaitCondition m_condition;
     bool m_done = false;
     ResultCode m_resultCode = ResultCode::noData;
+    QHash<UpdateFileRequestData, FileData> m_manualData;
 
     void onCheckCompleted(ResultCode resultCode, AbstractUpdateRegistryPtr updateRegistry)
     {
@@ -196,6 +213,14 @@ private:
             UpdateFileRequestData("tricom.cloud-demo.hdw.mx", "tricom", QnSoftwareVersion(3, 0, 0, 9872), armRpi()),
             &fileData);
         assertFindResult(resultCode, fileData, false);
+
+        resultCode = m_updateRegistry->findUpdateFile(kManualDataKey1, &fileData);
+        ASSERT_EQ(ResultCode::ok, resultCode);
+        ASSERT_EQ(kManualDataValue1, fileData);
+
+        resultCode = m_updateRegistry->findUpdateFile(kManualDataKey2, &fileData);
+        ASSERT_EQ(ResultCode::ok, resultCode);
+        ASSERT_EQ(kManualDataValue2, fileData);
     }
 
     void assertFindResult(ResultCode resultCode, const FileData& fileData, bool shouldFail) const
@@ -226,6 +251,7 @@ TEST_F(AsyncUpdateChecker, CorrectUpdateRegistryProvided)
 {
     whenMockupDataProviderHasBeenSetUp();
     whenAsyncCheckRequestHasBeenIssued();
+    whenSomeManualDataHasBeenAdded();
     thenCorrectUpdateRegistryShouldBeReturned();
 }
 

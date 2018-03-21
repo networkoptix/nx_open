@@ -12,15 +12,18 @@ namespace info {
 class NX_UPDATE_API AbstractUpdateRegistry
 {
 public:
-    // todo: implement findClientUpdate()
     virtual ~AbstractUpdateRegistry() {}
 
     virtual ResultCode findUpdateFile(
-        const UpdateFileRequestData& updateFileRequestData,
-        FileData* outFileData) const = 0;
+        const UpdateFileRequestData& updateFileRequestData, FileData* outFileData) const = 0;
     virtual ResultCode latestUpdate(
         const UpdateRequestData& updateRequestData,
         QnSoftwareVersion* outSoftwareVersion) const = 0;
+    virtual void addFileData(const UpdateFileRequestData& updateFileRequestDat,
+        const FileData& fileData) = 0;
+
+    // #TODO #akulikov implement OR refactor above functions for client updates
+
     virtual QList<QString> alternativeServers() const = 0;
 
     virtual QByteArray toByteArray() const = 0;

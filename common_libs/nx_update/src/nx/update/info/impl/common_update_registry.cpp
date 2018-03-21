@@ -175,12 +175,18 @@ private:
 };
 
 static const QString kUrlKey = "url";
+static const QString kManualDataKey = "manualData";
+static const QString kManualDataKeyKey = "manualDataKey";
+static const QString kManualDataValueKey = "manualDataValue";
 static const QString kMetaDataKey = "metaData";
 static const QString kAlternativeServersKey = "alternativeServers";
+static const QString kCustomizationKey = "customization";
 static const QString kCustomizationsKey = "customizations";
 static const QString kAlternativeServerNameKey = "name";
 static const QString kAlternativeServerUrlKey = "url";
 static const QString kCustomizationNameKey = "name";
+static const QString kNxVersionKey = "nxVersion";
+static const QString kOsVersionKey = "osVersion";
 static const QString kVersionsKey = "versions";
 static const QString kCustomizationVersionToUpdateKey = "customizationVersionToUpdate";
 static const QString kCustomizationVersionNameKey = "customizationName";
@@ -200,7 +206,8 @@ public:
     Serializer(
         const QString& url,
         const UpdatesMetaData& metaData,
-        const CustomizationVersionToUpdate& customizationVersionToUpdate)
+        const CustomizationVersionToUpdate& customizationVersionToUpdate,
+        const QHash<UpdateFileRequestData, FileData>& manualData)
         :
         m_url(url),
         m_metaData(metaData),
@@ -208,6 +215,7 @@ public:
     {
         serializeUrl();
         serializeMetaData();
+        serializeManualData(manualData);
         serializeCustomizationVersionToUpdate();
     }
 
@@ -221,6 +229,31 @@ private:
     void serializeUrl()
     {
         m_jsonObject[kUrlKey] = m_url;
+    }
+
+    void serializeManualData(const QHash<UpdateFileRequestData, FileData>& manualData)
+    {
+        QJsonArray manualDataArray;
+        for (const auto& key: manualData.keys())
+        {
+            const auto& fileData = manualData.value(key);
+            QJsonObject keyObject;
+            keyObject[kCloudHostKey] = key.cloudHost;
+            keyObject[kCustomizationKey] = key.customization;
+            keyObject[kNxVersionKey] = key.currentNxVersion.toString();
+            keyObject[kOsVersionKey] = key.osVersion.toString();
+
+            QJsonObject valueObject;
+            serializeFileData(fileData, valueObject);
+
+            QJsonObject arrayObject;
+            arrayObject[kManualDataKeyKey] = keyObject;
+            arrayObject[kManualDataValueKey] = valueObject;
+
+            manualDataArray.append(arrayObject);
+        }
+
+        m_jsonObject[kManualDataKey] = manualDataArray;
     }
 
     void serializeMetaData()
@@ -331,6 +364,7 @@ public:
         m_rootObject = QJsonDocument::fromJson(rawData).object();
         deserializeUrl();
         deserializeMetaData();
+        deserializeManualData();
         deserializeCustomizationVersionToUpdate();
 
         if (!m_ok)
@@ -343,12 +377,15 @@ public:
     {
         return m_customizationVersionToUpdate;
     }
+    QHash<UpdateFileRequestData, FileData> manualData() const { return m_manualData; }
     bool ok() const { return m_ok; }
+
 private:
     const QByteArray& m_rawData;
     QString m_url;
     UpdatesMetaData m_metaData;
     CustomizationVersionToUpdate m_customizationVersionToUpdate;
+    QHash<UpdateFileRequestData, FileData> m_manualData;
     bool m_ok = true;
     QJsonObject m_rootObject;
 
@@ -361,6 +398,37 @@ private:
         }
 
         m_url = m_rootObject[kUrlKey].toString();
+    }
+
+    void deserializeManualData()
+    {
+        if (!m_ok)
+            return;
+
+        if (!m_rootObject.contains(kManualDataKey) || !m_rootObject[kManualDataKey].isArray())
+        {
+            m_ok = false;
+            return;
+        }
+
+        auto manualDataArray = m_rootObject[kManualDataKey].toArray();
+        for (int i = 0; i < manualDataArray.size(); ++i)
+        {
+            auto obj = manualDataArray[i].toObject();
+
+            UpdateFileRequestData key;
+            auto keyObject = obj[kManualDataKeyKey].toObject();
+            key.cloudHost = keyObject[kCloudHostKey].toString();
+            key.currentNxVersion = QnSoftwareVersion(keyObject[kNxVersionKey].toString());
+            key.customization = keyObject[kCustomizationKey].toString();
+            key.osVersion = OsVersion::fromString(keyObject[kOsVersionKey].toString());
+
+            auto valueObject = obj[kManualDataValueKey].toObject();
+            FileData value(valueObject[kFileKey].toString(), valueObject[kUrlKey].toString(),
+                valueObject[kSizeKey].toDouble(), valueObject[kMd5Key].toString().toLatin1());
+
+            m_manualData.insert(key, value);
+        }
     }
 
     void deserializeMetaData()
@@ -667,6 +735,7 @@ private:
                 targetToUpdateObject[kMd5Key].toString().toLatin1()));
     }
 };
+
 } // namespace
 
 CommonUpdateRegistry::CommonUpdateRegistry(
@@ -684,6 +753,12 @@ ResultCode CommonUpdateRegistry::findUpdateFile(
     FileData* outFileData) const
 {
     NX_VERBOSE(this, lm("Requested update for %1").args(updateRequestData.toString()));
+
+    if (m_manualData.contains(updateRequestData))
+    {
+        *outFileData = m_manualData.value(updateRequestData);
+        return ResultCode::ok;
+    }
 
     CustomizationData customizationData;
     if (!hasUpdateForCustomizationAndVersion(updateRequestData, &customizationData))
@@ -741,7 +816,7 @@ bool CommonUpdateRegistry::hasUpdateForCustomizationAndVersion(
 
 QByteArray CommonUpdateRegistry::toByteArray() const
 {
-    return Serializer(m_baseUrl, m_metaData, m_customizationVersionToUpdate).json();
+    return Serializer(m_baseUrl, m_metaData, m_customizationVersionToUpdate, m_manualData).json();
 }
 
 bool CommonUpdateRegistry::fromByteArray(const QByteArray& rawData)
@@ -753,6 +828,7 @@ bool CommonUpdateRegistry::fromByteArray(const QByteArray& rawData)
     m_baseUrl = deserializer.url();
     m_metaData = deserializer.metaData();
     m_customizationVersionToUpdate = deserializer.customizationVersionToUpdate();
+    m_manualData = deserializer.manualData();
 
     return true;
 }
@@ -790,6 +866,12 @@ ResultCode CommonUpdateRegistry::latestUpdate(
 
     *outSoftwareVersion = updateDataFinder.version();
     return ResultCode::ok;
+}
+
+void CommonUpdateRegistry::addFileData(const UpdateFileRequestData& updateFileRequestData,
+    const FileData& fileData)
+{
+    m_manualData.insert(updateFileRequestData, fileData);
 }
 
 } // namespace impl

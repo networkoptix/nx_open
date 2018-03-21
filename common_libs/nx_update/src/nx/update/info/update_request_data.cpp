@@ -48,6 +48,29 @@ OsVersion armBananapi()
     return OsVersion(kLinuxFamily, kArm, "bananapi");
 }
 
+bool operator==(const OsVersion& lhs, const OsVersion& rhs)
+{
+    return lhs.architecture == rhs.architecture && lhs.family == rhs.family
+        && lhs.version == rhs.version;
+}
+
+static uint qHash(const OsVersion& osVersion)
+{
+    return qHash(osVersion.architecture) ^ qHash(osVersion.family) ^ qHash(osVersion.version);
+}
+
+bool operator==(const UpdateFileRequestData& lhs, const UpdateFileRequestData& rhs)
+{
+    return lhs.cloudHost == rhs.cloudHost && lhs.currentNxVersion == rhs.currentNxVersion
+        && lhs.osVersion == rhs.osVersion;
+}
+
+uint qHash(const UpdateFileRequestData& fileRequestData)
+{
+    return qHash(fileRequestData.cloudHost) ^ qHash(fileRequestData.currentNxVersion) ^
+        qHash(fileRequestData.customization) ^ qHash(fileRequestData.osVersion);
+}
+
 } // namespace info
 } // namespace update
 } // namespace nx

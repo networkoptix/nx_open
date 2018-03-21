@@ -242,7 +242,7 @@ void Downloader::validateAsync(const QString& url, int expectedSize,
                     typeid(Downloader),
                     lm("[Downloader, validate] Validate %1 http request failed. Http client failed: %2, has response: %3, status code: %4")
                     .args(url, asyncClient->failed(), (bool) response,
-                        response ? -1 : response->statusLine.statusCode));
+                       !response ? -1 : response->statusLine.statusCode));
 
                 return callback(false);
             }

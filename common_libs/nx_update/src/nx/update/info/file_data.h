@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore>
+#include <nx/utils/uuid.h>
 
 namespace nx {
 namespace update {
@@ -12,13 +13,17 @@ struct FileData
     QString url;
     qint64 size;
     QByteArray md5;
+    QList<QnUuid> peers;
 
     FileData() = default;
-    FileData(const QString& file, const QString& url, qint64 size, const QByteArray& md5):
+    FileData(const QString& file, const QString& url, qint64 size, const QByteArray& md5,
+        const QList<QnUuid>& peers = QList<QnUuid>())
+        :
         file(file),
         url(url),
         size(size),
-        md5(md5)
+        md5(md5),
+        peers(peers)
     {}
 
     FileData(FileData&&) = default;

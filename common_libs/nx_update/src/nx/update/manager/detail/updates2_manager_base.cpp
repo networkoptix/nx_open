@@ -230,7 +230,7 @@ api::Updates2StatusData Updates2ManagerBase::download()
 
     downloader()->deleteFile(fileData.file);
     for (const auto& fileName : m_currentStatus.files)
-            downloader()->deleteFile(fileName);
+        downloader()->deleteFile(fileName);
 
     ResultCode resultCode = downloader()->addFile(fileInformation);
     switch (resultCode)
