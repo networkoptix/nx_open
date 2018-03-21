@@ -1,5 +1,5 @@
-#include <nx/kit/debug.h>
 #define NX_PRINT_PREFIX "[metadata::hanwha::Manager] "
+#include <nx/kit/debug.h>
 
 #include "manager.h"
 
@@ -79,7 +79,7 @@ Error Manager::startFetchingMetadata(nxpl::NX_GUID* /*typeList*/, int /*typeList
                     << hanwhaEvent.caption.toStdString() << "], description ["
                     << hanwhaEvent.description.toStdString() << "], "
                     << "channel " << m_channel;
-                    
+
                 NX_VERBOSE(this, lm("Got event: %1 %2 on channel %3").args(
                     hanwhaEvent.caption, hanwhaEvent.description, m_channel));
 

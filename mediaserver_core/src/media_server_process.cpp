@@ -1017,7 +1017,7 @@ nx::utils::Url appServerConnectionUrl(QSettings &settings)
 }
 
 MediaServerProcess::MediaServerProcess(int argc, char* argv[], bool serviceMode)
-:
+    :
     m_argc(argc),
     m_argv(argv),
     m_startMessageSent(false),

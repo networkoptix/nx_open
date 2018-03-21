@@ -3,6 +3,7 @@
 #include <iostream>
 #include <chrono>
 
+#define NX_PRINT_PREFIX (std::string("[") + this->plugin()->name() + " CameraManager] ")
 #include <nx/kit/debug.h>
 
 #include <nx/sdk/metadata/common_metadata_packet.h>
@@ -11,8 +12,6 @@
 #include "tegra_video_metadata_plugin_ini.h"
 #include "attribute_options.h"
 #include <nx/mediaserver_plugins/utils/uuid.h>
-
-#define NX_PRINT_PREFIX (std::string("[") + this->plugin()->name() + " CameraManager] ")
 
 namespace nx {
 namespace mediaserver_plugins {

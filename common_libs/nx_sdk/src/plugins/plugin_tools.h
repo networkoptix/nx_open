@@ -359,7 +359,7 @@ namespace nxpt
                     if (hasError)
                         return NxGuidHelper::nullGuid();
 
-                    guid.bytes[currentByteIndex] = v;
+                    guid.bytes[currentByteIndex] = (unsigned char) v;
                     ++currentByteIndex;
                     currentByteString.clear();
                 }
