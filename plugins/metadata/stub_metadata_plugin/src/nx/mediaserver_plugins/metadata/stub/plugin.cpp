@@ -144,15 +144,23 @@ void Plugin::settingsChanged()
 void Plugin::executeAction(
     const std::string& actionId,
     nxpl::NX_GUID objectId,
+    nxpl::NX_GUID cameraId,
+    int64_t timestampUs,
     const std::map<std::string, std::string>& params,
     std::string* outActionUrl,
     std::string* outMessageToUser,
     Error* error)
 {
+    const std::string logHeader = std::string(__func__)
+        + "(actionId: [" + actionId + "]"
+        + ", objectId: " + nxpt::NxGuidHelper::toStdString(objectId)
+        + ", cameraId: " + nxpt::NxGuidHelper::toStdString(cameraId)
+        + ", timestampUs: " + std::to_string(timestampUs)
+        + ")";
+
     if (actionId == "nx.stub.addToList")
     {
-        NX_PRINT << __func__
-            << "(): id [nx.stub.addToList]; returning a message with param values.";
+        NX_PRINT << logHeader << ": Returning a message with param values.";
 
         std::string valueA;
         auto paramAIt = params.find("paramA");
@@ -173,12 +181,11 @@ void Plugin::executeAction(
     {
         *outActionUrl = "http://internal.server/addPerson?objectId=" +
             nxpt::NxGuidHelper::toStdString(objectId);
-        NX_PRINT << __func__
-            << "(): id [nx.stub.addPerson]; returning URL: [" << *outActionUrl << "]";
+        NX_PRINT << logHeader << ": Returning URL: [" << *outActionUrl << "]";
     }
     else
     {
-        NX_PRINT << __func__ << "(): ERROR: Unsupported action id: [" << actionId << "]";
+        NX_PRINT << logHeader << ": ERROR: Unsupported actionId.";
         *error = Error::unknownError;
     }
 }

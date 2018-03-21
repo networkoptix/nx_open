@@ -96,8 +96,9 @@ public:
         NX_ASSERT(m_actionResult);
 
         m_actionId = actionData.actionId.toStdString();
-        m_objectId = nx::mediaserver_plugins::utils::fromQnUuidToPluginGuid(
-            actionData.objectId);
+        m_objectId = nx::mediaserver_plugins::utils::fromQnUuidToPluginGuid(actionData.objectId);
+        m_cameraId = nx::mediaserver_plugins::utils::fromQnUuidToPluginGuid(actionData.cameraId);
+        m_timestampUs = actionData.timestampUs;
 
         // Avoiding reallocation of this vector is essential since we need to store pointers to its
         // internals as "char*" to pass through an SDK interface.
@@ -120,6 +121,10 @@ public:
 
     virtual nxpl::NX_GUID objectId() override { return m_objectId; }
 
+    virtual nxpl::NX_GUID cameraId() override { return m_cameraId; }
+
+    virtual int64_t timestampUs() override { return m_timestampUs; }
+
     virtual const nxpl::Setting* params() override
     {
         return &m_settings.front();
@@ -136,6 +141,8 @@ public:
 private:
     std::string m_actionId;
     nxpl::NX_GUID m_objectId;
+    nxpl::NX_GUID m_cameraId;
+    int64_t m_timestampUs;
 
     struct Param
     {

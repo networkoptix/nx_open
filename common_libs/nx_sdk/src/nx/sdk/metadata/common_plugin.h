@@ -51,6 +51,8 @@ protected:
     virtual void executeAction(
         const std::string& /*actionId*/,
         nxpl::NX_GUID /*objectId*/,
+        nxpl::NX_GUID /*cameraId*/,
+        int64_t /*timestampUs*/,
         const std::map<std::string, std::string>& /*params*/,
         std::string* /*outActionUrl*/,
         std::string* /*outMessageToUser*/,

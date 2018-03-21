@@ -28,6 +28,12 @@ public:
     /** Id of a metadata object for which the action has been triggered. */
     virtual nxpl::NX_GUID objectId() = 0;
 
+    /** Id of a camera from which the action has been triggered. */
+    virtual nxpl::NX_GUID cameraId() = 0;
+
+    /** Timestamp of a video frame from which the action has been triggered. */
+    virtual int64_t timestampUs() = 0;
+
     /**
      * If the plugin manifest defines params for this action type, contains the array of their
      * values after they are filled by the user via Client form. Otherwise, null.

@@ -141,7 +141,8 @@ void CommonPlugin::executeAction(Action* action, Error* outError)
     std::string actionUrl;
     std::string messageToUser;
     executeAction(
-        action->actionId(), action->objectId(), params, &actionUrl, &messageToUser, outError);
+        action->actionId(), action->objectId(), action->cameraId(), action->timestampUs(), params,
+        &actionUrl, &messageToUser, outError);
 
     const char* const actionUrlPtr = actionUrl.empty() ? nullptr : actionUrl.c_str();
     const char* const messageToUserPtr = messageToUser.empty() ? nullptr : messageToUser.c_str();
