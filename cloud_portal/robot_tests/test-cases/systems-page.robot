@@ -13,7 +13,7 @@ should show list of Systems
     Open Browser and go to URL    ${url}
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
-    Wait Until Elements Are Visible    ${SYSTEMS TILE}
+    Wait Until Elements Are Visible    ${ACCOUNT DROPDOWN}    ${SYSTEMS TILE}
     Close Browser
 
 has system name, owner and OpenInNx button visible on systems page

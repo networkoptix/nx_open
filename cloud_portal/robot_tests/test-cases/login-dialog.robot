@@ -232,6 +232,7 @@ handles two tabs, updates second tab state if logout is done on first
     Open Browser and go to URL    ${url}/register
     Wait Until Elements Are Visible    ${REGISTER FIRST NAME INPUT}    ${REGISTER LAST NAME INPUT}    ${REGISTER EMAIL INPUT}    ${REGISTER PASSWORD INPUT}    ${CREATE ACCOUNT BUTTON}
     Click Link    ${TERMS AND CONDITIONS LINK}
+    Sleep    2    #This is specifically for Ubuntu Firefox because the new page isn't created fast enough and Get Window Handles only gets 1 item.
     ${tabs}    Get Window Handles
     Select Window    @{tabs}[1]
     Location Should Be    ${url}/content/eula

@@ -41,7 +41,6 @@ Log In
 
 Validate Log In
     Wait Until Page Contains Element    ${AUTHORIZED BODY}
-    Page Should Contain Element    ${AUTHORIZED BODY}
     Check Language
 
 Log Out
