@@ -10,36 +10,18 @@ def os_access():
 
 
 @pytest.fixture()
-def two_names_registry(os_access, work_dir):
+def registry(os_access, work_dir):
     path = work_dir / 'test_registry.yaml'
     os_access.run_command(['rm', '-f', path])
-    return Registry(os_access, path, 2, 'test-prefix-{}'.format)
+    return Registry(os_access, path)
 
 
-@pytest.fixture()
-def full_registry(two_names_registry):
-    _, _ = two_names_registry.reserve('test-name-a')
-    _, _ = two_names_registry.reserve('test-name-b')
-    return two_names_registry
-
-
-def test_no_available_names(full_registry):
-    with pytest.raises(Registry.NoAvailableNames):
-        _, _ = full_registry.reserve('c')
-
-
-def test_not_reserved(two_names_registry):
+def test_not_reserved(registry):
     with pytest.raises(Registry.NotReserved):
-        two_names_registry.relinquish('c')
+        registry.relinquish(0)
 
 
-def test_reserved_successfully(two_names_registry):
-    _, _ = two_names_registry.reserve('a')
-    _, _ = two_names_registry.reserve('b')
-
-
-def test_reuse(two_names_registry):
-    _, a_name = two_names_registry.reserve('a')
-    _, _ = two_names_registry.reserve('b')
-    two_names_registry.relinquish(a_name)
-    _, _ = two_names_registry.reserve('c')
+def test_reserved_successfully(registry):
+    a_index = registry.reserve('a')
+    b_index = registry.reserve('b')
+    assert a_index != b_index

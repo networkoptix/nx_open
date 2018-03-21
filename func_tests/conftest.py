@@ -8,6 +8,7 @@ from netaddr import IPAddress
 from pathlib2 import Path
 
 from network_layouts import get_layout
+from test_utils.access_managers import make_access_manager
 from test_utils.artifact import ArtifactFactory
 from test_utils.ca import CA
 from test_utils.camera import CameraFactory, SampleMediaFile
@@ -22,10 +23,8 @@ from test_utils.os_access import LocalAccess
 from test_utils.serialize import load
 from test_utils.server_factory import ServerFactory
 from test_utils.server_physical_host import PhysicalInstallationCtl
-from test_utils.ssh.access_manager import SSHAccessManager
-from test_utils.ssh.config import SSHConfig
-from test_utils.virtual_box import VirtualBox, VMNotFound
-from test_utils.vm import Factory, Registry, VMConfiguration, Pool
+from test_utils.virtual_box import VirtualBox
+from test_utils.vm import Factory, Pool, Registry, VMConfiguration
 
 JUNK_SHOP_PLUGIN_NAME = 'junk-shop-db-capture'
 
@@ -111,18 +110,6 @@ def vm_host(request):
         vm_port_base=request.config.getoption('--vm-port-base'),
         username=request.config.getoption('--vm-host-user'),
         private_key=request.config.getoption('--vm-host-key'))
-
-
-@pytest.fixture(scope='session')
-def ssh_config(work_dir, vm_host):
-    config = SSHConfig(work_dir / 'ssh.config')
-    config.reset()
-    if vm_host.hostname:
-        config.add_host(
-            vm_host.hostname,
-            user=vm_host.username,
-            key_path=vm_host.private_key)
-    return config
 
 
 @pytest.fixture(scope='session')
@@ -262,63 +249,38 @@ def hypervisor(configuration, host_os_access):
 
 
 @pytest.fixture(scope='session')
-def vm_types(configuration):
-    return configuration['vm_types'].keys()
-
-
-@pytest.fixture(scope='session')
-def registries(vm_types, configuration, host_os_access):
-    return {
-        vm_type: Registry(
-            host_os_access,
-            host_os_access.expand_path(configuration['vm_types'][vm_type]['registry']),
-            100,
-            configuration['vm_types'][vm_type]['name_prefix'],
-            )
-        for vm_type in vm_types
-        }
-
-
-def _destroy_vms(hypervisor, vm_types, registries):
-    def destroy(name):
-        try:
-            hypervisor.destroy(name)
-        except VMNotFound:
-            pass
-    for vm_type in vm_types:
-        registries[vm_type].clean(destroy)
-
-
-@pytest.fixture(scope='session')
-def vm_factories(request, vm_types, registries, ssh_config, configuration, hypervisor):
-    if request.config.getoption('--clean'):
-        _destroy_vms(hypervisor, vm_types, registries)
-    access_manager = SSHAccessManager(ssh_config, 'root', Path(configuration['ssh']['private_key']).expanduser())
+def vm_factories(request, configuration, hypervisor, host_os_access):
     pools = {
         vm_type: Factory(
             VMConfiguration(vm_configuration_raw),
             hypervisor,
-            access_manager,  # TODO: Instantiate separately for each VM type.
-            )
+            make_access_manager(**vm_configuration_raw['access']),
+            Registry(
+                host_os_access,
+                host_os_access.expand_path(vm_configuration_raw['registry']),
+                ))
         for vm_type, vm_configuration_raw in configuration['vm_types'].items()}
+    if request.config.getoption('--clean'):
+        for vm_factory in vm_factories.values():
+            vm_factory.cleanup()
     return pools
 
 
 @pytest.fixture()
-def vm_pools(vm_types, registries, vm_factories):
-    pools = {vm_type: Pool(registries[vm_type], vm_factories[vm_type]) for vm_type in vm_types}
+def vm_pools(vm_factories):
+    pools = {vm_type: Pool(vm_factory) for vm_type, vm_factory in vm_factories.items()}
     yield pools
-    for vm_types in vm_types:
-        pools[vm_types].close()
+    for pool in pools.values():
+        pool.close()
 
 
-def _make_linux_vm_pool(registries, vm_factories):
-    return Pool(registries['linux'], vm_factories['linux'])
+def _make_linux_vm_pool(vm_factories):
+    return Pool(vm_factories['linux'])
 
 
 @pytest.fixture()
-def linux_vm_pool(registries, vm_factories):
-    with closing(_make_linux_vm_pool(registries, vm_factories)) as pool:
+def linux_vm_pool(vm_factories):
+    with closing(_make_linux_vm_pool(vm_factories)) as pool:
         yield pool
 
 
@@ -326,17 +288,17 @@ TwoLinuxVms = namedtuple('TwoLinuxVms', ['first', 'second'])
 
 
 @pytest.fixture(scope='session')
-def two_linux_vms(registries, vm_factories, hypervisor):
+def two_linux_vms(vm_factories, hypervisor):
     structure = {'10.254.0.0/29': {'first': None, 'second': None}}
     reachability = {'10.254.0.0/29': {'first': {'second': None}, 'second': {'first': None}}}
-    with closing(_make_linux_vm_pool(registries, vm_factories)) as pool:
+    with closing(_make_linux_vm_pool(vm_factories)) as pool:
         vms, _ = setup_networks({'linux': pool}, hypervisor, structure, reachability)
         yield TwoLinuxVms(**vms)
 
 
 @pytest.fixture(scope='session')
-def one_linux_vm(registries, vm_factories):
-    with closing(_make_linux_vm_pool(registries, vm_factories)) as pool:
+def one_linux_vm(vm_factories):
+    with closing(_make_linux_vm_pool(vm_factories)) as pool:
         yield pool.get('server')
 
 

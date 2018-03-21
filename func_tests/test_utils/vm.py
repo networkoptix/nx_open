@@ -34,7 +34,7 @@ class VMConfiguration(object):
             yield name, forwarded_port['protocol'], host_port, forwarded_port['guest_port']
 
 
-VM = namedtuple('VM', ['alias', 'name', 'ports', 'networking', 'os_access'])
+VM = namedtuple('VM', ['alias', 'index', 'name', 'ports', 'networking', 'os_access'])
 
 
 class Registry(object):
@@ -45,65 +45,62 @@ class Registry(object):
             super(Exception, self).__init__("current reservations:\n{}".format(message, pformat(reservations)))
             self.reservations = reservations
 
-    class NoAvailableNames(Exception):
-        def __init__(self, reservations, alias):
-            super(Registry.NoAvailableNames, self).__init__(reservations, "No available names for {}".format(alias))
-            self.alias = alias
-
     class NotReserved(Exception):
-        def __init__(self, reservations, name):
-            super(Registry.NotReserved, self).__init__(reservations, "Name {} is not reserved".format(name))
-            self.name = name
+        def __init__(self, reservations, index):
+            super(Registry.NotReserved, self).__init__(reservations, "Index {} is not reserved".format(index))
+            self.index = index
 
-    def __init__(self, os_access, path, limit, name_prefix):
+    def __init__(self, os_access, path):
         self._os_access = os_access
         self._path = path
-        self._limit = limit
         self._lock = MoveLock(self._os_access, self._path.with_suffix('.lock'))
         if not self._os_access.dir_exists(self._path.parent):
             logger.warning("Create %r; OK only if a clean run", self._path.parent)
             self._os_access.mk_dir(self._path.parent)
-        self._name_prefix = name_prefix
+
+    def __repr__(self):
+        return '<Registry {}>'.format(self._path)
 
     def _read_reservations(self):
         try:
             contents = self._os_access.read_file(self._path)
         except FileNotFound:
-            return {}
-        else:
-            return load(contents)
+            return []
+        return load(contents)
 
-    def reserve(self, *aliases):
+    def reserve(self, alias):
         with self._lock:
             reservations = self._read_reservations()
-            aliases_left = list(aliases)
-            for index in range(self._limit):
-                name = '{}{:03d}'.format(self._name_prefix, index)
-                if name not in reservations or reservations[name] is None:
-                    alias = aliases_left.pop()
-                    reservations[name] = alias
-                    self._os_access.write_file(self._path, dump(reservations))
-                    yield index, name
-                    if not aliases_left:
-                        return
-        raise self.NoAvailableNames(reservations, aliases_left)
+            try:
+                index = reservations.index(None)
+            except ValueError:
+                index = len(reservations)
+                reservations.append(alias)
+            else:
+                reservations[index] = alias
+            self._os_access.write_file(self._path, dump(reservations))
+            logger.info("Index %.03d taken in %r.", index, self)
+            return index
 
-    def relinquish(self, *names):
+    def relinquish(self, index):
         with self._lock:
             reservations = self._read_reservations()
-            for name in names:
-                if name in reservations and reservations[name] is not None:
-                    reservations[name] = None
-                    self._os_access.write_file(self._path, dump(reservations))
-                else:
-                    raise self.NotReserved(reservations, name)
+            try:
+                alias = reservations[index]
+            except IndexError:
+                alias = None
+            if alias is not None:
+                reservations[index] = None
+                self._os_access.write_file(self._path, dump(reservations))
+                logger.info("Index %.03d freed in %r.", index, self)
+            else:
+                raise self.NotReserved(reservations, index)
 
-    def clean(self, cleanup_procedure=None):
+    def for_each(self, procedure):
         with self._lock:
-            if cleanup_procedure is not None:
-                for name in self._read_reservations():
-                    cleanup_procedure(name)
-            self._os_access.rm_tree(self._path, ignore_errors=True)  # Not removed in case of exception.
+            reservations = self._read_reservations()
+            for index, alias in enumerate(reservations):
+                procedure(index, alias)
 
 
 class MachineNotResponding(Exception):
@@ -114,12 +111,15 @@ class MachineNotResponding(Exception):
 
 
 class Factory(object):
-    def __init__(self, vm_configuration, hypervisor, access_manager):
+    def __init__(self, vm_configuration, hypervisor, access_manager, registry):
         self._vm_configuration = vm_configuration
         self._access_manager = access_manager
         self._hypervisor = hypervisor
+        self._registry = registry
 
-    def allocate(self, alias, name, index):
+    def allocate(self, alias):
+        index = self._registry.reserve(alias)
+        name = self._vm_configuration.name(index)
         try:
             info = self._hypervisor.find(name)
         except VMNotFound:
@@ -129,41 +129,58 @@ class Factory(object):
         if not info.is_running:
             self._hypervisor.power_on(info.name)
         hostname, port = info.ports['tcp', self._access_manager.guest_port]
-        os_access = self._access_manager.register(hostname, [alias, info.name], port)
+        os_access = self._access_manager.register(alias, hostname, port)
         if not wait_until(
                 os_access.is_working,
                 name='until {} ({}) can be accesses via {!r}'.format(alias, name, os_access),
                 timeout_sec=self._vm_configuration.power_on_timeout):
             raise MachineNotResponding(alias, info.name)
         networking = LinuxNetworking(os_access, info.macs.values())
-        vm = VM(alias, info.name, info.ports, networking, os_access)
+        vm = VM(alias, index, info.name, info.ports, networking, os_access)
         self._hypervisor.unplug_all(vm.name)
         vm.networking.reset()
         vm.networking.enable_internet()
         return vm
 
+    def dispose(self, vm):
+        self._access_manager.unregister(vm.alias)
+        self._registry.relinquish(vm.index)
+
+    def cleanup(self):
+        def destroy(index, alias):
+            name = self._vm_configuration.name(index)
+            if alias is None:
+                try:
+                    self._hypervisor.destroy(name)
+                except VMNotFound:
+                    logger.info("VM %s not found.", name)
+                else:
+                    logger.info("VM %s destroyed.", name)
+            else:
+                logger.warning("VM %s reserved now.", name)
+
+        self._registry.for_each(destroy)
+
 
 class Pool(object):
-    """Get many VMs with caching, release all at once."""
+    """Allocate multiple items, dispose all at once with .close()"""
 
-    def __init__(self, registry, factory):
+    def __init__(self, factory):
         self._factory = factory
-        self._registry = registry
         self._cache = {}
 
     def get(self, alias):
         try:
             cached_machine = self._cache[alias]
         except KeyError:
-            (index, name), = self._registry.reserve(alias)
-            machine = self._factory.allocate(alias, name, index)
-            self._cache[alias] = machine
-            logger.info("Machine %r is allocated.", machine)
-            return machine
+            item = self._factory.allocate(alias)
+            self._cache[alias] = item
+            logger.info("Item %r is allocated.", item)
+            return item
         else:
-            logger.info("Machine %r is already allocated, return it from cache.", cached_machine)
+            logger.info("Item %r is already allocated, return it from cache.", cached_machine)
             return cached_machine
 
     def close(self):
-        names = [machine.name for machine in self._cache.values()]
-        self._registry.relinquish(*names)
+        for item in self._cache.values():
+            self._factory.dispose(item)

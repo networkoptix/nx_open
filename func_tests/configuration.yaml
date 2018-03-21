@@ -1,10 +1,12 @@
-ssh:
-  private_key: ~/.func_tests/ubuntu-14.04-key.key
 vm_host:
   address: 127.0.0.1
 vm_types:
   linux:
     registry: ~/.func_tests/ubuntu-14.04-registry.yaml
+    access:
+      type: ssh
+      private_key_path: ~/.func_tests/ubuntu-14.04-key.key
+      configuration_file_path: ~/.func_tests/ubuntu-14.04-ssh.conf
     power_on_timeout: 60
     name_prefix: ubuntu-14.04-
     template:
@@ -24,6 +26,10 @@ vm_types:
           host_port_offset: 2
   windows:
     registry: ~/.func_tests/windows-10-registry.yaml
+    access:
+      type: ssh
+      private_key_path: ~/.func_tests/ubuntu-14.04-key.key
+      configuration_file_path: ~/.func_tests/ubuntu-14.04-ssh.conf
     power_on_timeout: 600  # After SysPrep, first boot takes several minutes to prepare user profile.
     name_prefix: windows-10-
     template:

@@ -12,11 +12,11 @@ def test_get(linux_vm_pool):
     assert first.name == first_again.name
 
 
-def test_close(registries, vm_factories):
-    with closing(Pool(registries['linux'], vm_factories['linux'])) as pool:
+def test_close(vm_factories):
+    with closing(Pool(vm_factories['linux'])) as pool:
         first = pool.get('first')
         first_name = first.name
-    with closing(Pool(registries['linux'], vm_factories['linux'])) as pool:
+    with closing(Pool(vm_factories['linux'])) as pool:
         second = pool.get('second')
         second_name = second.name
     assert first_name == second_name
