@@ -101,6 +101,16 @@ DummyMessage
                 image: lp("/images/alert_alert.png")
                 description: qsTr("Please update firmware")
             }
+        },
+        State
+        {
+            name: "tooManyConnections"
+            PropertyChanges
+            {
+                target: dummyMessage
+                title: qsTr("Too many connections")
+                image: lp("/images/alert_alert.png")
+            }
         }
     ]
 }

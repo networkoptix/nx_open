@@ -4,7 +4,9 @@
 
 #include <core/resource/media_resource.h>
 #include <nx/streaming/archive_stream_reader.h>
+#include <nx/streaming/media_data_packet.h>
 #include <nx/utils/log/log.h>
+#include <nx/fusion/serialization/lexical.h>
 
 #include "seamless_video_decoder.h"
 #include "seamless_audio_decoder.h"
@@ -120,6 +122,40 @@ ConstAudioOutputPtr PlayerDataConsumer::audioOutput() const
     return m_audioOutput;
 }
 
+Qn::MediaStreamEvent PlayerDataConsumer::mediaEvent() const
+{
+    return m_mediaEvent;
+}
+
+void PlayerDataConsumer::updateMediaEvent(const QnAbstractMediaDataPtr& data)
+{
+    static const auto getMediaEvent =
+        [](const QnAbstractMediaDataPtr& data) -> Qn::MediaStreamEvent
+        {
+            const auto metadata = std::dynamic_pointer_cast<QnAbstractCompressedMetadata>(data);
+            if (!metadata || metadata->metadataType != MetadataType::MediaStreamEvent)
+                return Qn::MediaStreamEvent::NoEvent;
+
+            const auto mediaData = QByteArray::fromRawData(metadata->data(), metadata->dataSize());
+            const auto stringData = QString::fromLatin1(mediaData);
+            auto mediaEvent = QnLexical::deserialized<Qn::MediaStreamEvent>(stringData);
+
+            // TODO: removed this when me new serialization of Qn::MediaStreamEvent
+            // will be merged from 3.2->defalut->current_branch
+            if (mediaEvent == Qn::MediaStreamEvent::NoEvent && stringData == lit("TooManyOpenedConnections"))
+                mediaEvent = Qn::MediaStreamEvent::TooManyOpenedConnectionsError;
+
+            return mediaEvent;
+        };
+
+    const auto mediaEvent = getMediaEvent(data);
+    if (mediaEvent == m_mediaEvent)
+        return;
+
+    m_mediaEvent = mediaEvent;
+    emit mediaEventChanged();
+}
+
 bool PlayerDataConsumer::processData(const QnAbstractDataPacketPtr& data)
 {
     if (m_needToResetAudio)
@@ -144,11 +180,13 @@ bool PlayerDataConsumer::processData(const QnAbstractDataPacketPtr& data)
         return processEmptyFrame(emptyFrame);
     m_emptyPacketCounter = 0;
 
-    auto videoFrame = std::dynamic_pointer_cast<QnCompressedVideoData>(data);
+    updateMediaEvent(mediaData);
+
+    const auto videoFrame = std::dynamic_pointer_cast<QnCompressedVideoData>(data);
     if (videoFrame)
         return processVideoFrame(videoFrame);
 
-    auto audioFrame = std::dynamic_pointer_cast<QnCompressedAudioData>(data);
+    const auto audioFrame = std::dynamic_pointer_cast<QnCompressedAudioData>(data);
     if (audioFrame && m_audioEnabled)
         return processAudioFrame(audioFrame);
 

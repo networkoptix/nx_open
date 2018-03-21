@@ -25,6 +25,7 @@ Object
     readonly property bool noLicenses: resourceHelper.analogCameraWithoutLicense;
     readonly property bool hasDefaultCameraPassword: resourceHelper.hasDefaultCameraPassword
     readonly property bool hasOldFirmware: resourceHelper.hasOldCameraFirmware
+    readonly property bool tooManyConnections: mediaPlayer.tooManyConnectionsError
 
     readonly property string dummyState:
     {
@@ -44,6 +45,8 @@ Object
             return "videoLoadingFailed"
         if (noLicenses)
             return "noLicenses";
+        if (tooManyConnections)
+            return "tooManyConnections"
 
         return ""
     }
