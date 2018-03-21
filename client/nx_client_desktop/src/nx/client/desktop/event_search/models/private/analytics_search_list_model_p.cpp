@@ -624,17 +624,18 @@ QString AnalyticsSearchListModel::Private::description(
     QString result;
 
     const auto timeWatcher = q->context()->instance<QnWorkbenchServerTimeWatcher>();
-    const auto start = timeWatcher->displayTime(startTimeMs(object));
+    const auto timestampMs = startTimeMs(object);
+    const auto start = timeWatcher->displayTime(timestampMs);
     // TODO: #vkutin Is this duration formula good enough for us?
     //   Or we need to add some "lastAppearanceDurationUsec"?
     const auto durationUs = object.lastAppearanceTimeUsec - object.firstAppearanceTimeUsec;
 
-    return lit("%1: %2<br>%3: %4")
-        .arg(tr("Start"))
+    return lit("Timestamp: %1<br>Start: %2<br>Duration: %3<br>%4")
+        .arg(timestampMs)
         .arg(start.toString(Qt::RFC2822Date))
-        .arg(tr("Duration"))
         .arg(core::HumanReadable::timeSpan(std::chrono::duration_cast<std::chrono::milliseconds>(
-            std::chrono::microseconds(durationUs))));
+            std::chrono::microseconds(durationUs))))
+        .arg(object.objectId.toSimpleString());
 }
 
 QString AnalyticsSearchListModel::Private::attributes(
