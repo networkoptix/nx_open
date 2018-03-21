@@ -4,7 +4,7 @@
 
     angular
         .module('cloudApp')
-        .directive('nxHeader', NxHeader);
+        .directive('__DEPRECATED__nxHeader', NxHeader);
 
     NxHeader.$inject = ['dialogs', 'cloudApi', 'account', '$location', '$route',
         'systemsProvider', 'CONFIG'];

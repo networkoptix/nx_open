@@ -31,7 +31,7 @@ require('./downgraded-providers.js');
 //Directives
 require('./directives/autofocus.js');
 require('./directives/footer.js');
-require('./directives/header.js');
+// require('./directives/header.js');
 require('./directives/languageSelect.js');
 require('./directives/openClientButton.js');
 require('./directives/passwordInput.js');
