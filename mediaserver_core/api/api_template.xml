@@ -2079,48 +2079,118 @@ content type "application/json". Example of such object:
                 </function>
                 <function>
                     <name>mergeSystems</name>
-                    <description>Merge two systems.</description>
+                    <description>
+                        Merge two Systems. <br/>
+                        The System that joins another System is called the current System, the
+                        joinable System is called the target System. The <b>URL</b>
+                        parameter sets the target Server which should be joined with the current
+                        System. Other servers, that are merged with the target Server will be
+                        joined if parameter <b>mergeOneServer</b> is set to false. <br/>
+                        The method uses digest authentication. Two hashes should be previouly
+                        calculated: <b>getKey</b> and <b>postKey</b>. Both are mandatory.
+                        The calculation algorithm is described in <b>Calculating authentication
+                        hash</b> section (in the bootom of the page). While calculating hashes,
+                        username and password of the target Server are needed. Digest
+                        authentication needs realm and nonce, both can be obtained with
+                        <code>GET /api/getNonce call</code> call. The lifetime of a nonce is
+                        about a few minutes.
+                    </description>
                     <permissions>Administrator.</permissions>
-                    <method>GET</method>
+                    <method>POST</method>
                     <params>
                         <param>
-                            <name>url</name>
-                            <description>URL of one server in the system to join.</description>
+                          <name>url</name>
+                          <description>URL of one Server in the System to join.</description>
+                          <optional>false</optional>
+                        </param>
+                        <param>
+                            <name>getKey</name>
+                            <description>
+                                Authentication hash of the target Server for GET requests.
+                            </description>
                             <optional>false</optional>
                         </param>
                         <param>
-                            <name>password</name>
-                            <description>Administrator password of the target system.</description>
-                            <optional>false</optional>
-                        </param>
-                        <param>
-                            <name>currentPassword</name>
-                            <description>Administrator password of the current system.</description>
+                            <name>postKey</name>
+                            <description>
+                                Authentication hash of the target Server for POST requests.
+                            </description>
                             <optional>false</optional>
                         </param>
                         <param>
                             <name>takeRemoteSettings</name>
-                            <description>Direction of the merge.</description>
+                            <description>
+                              Direction of the merge. Default value is false.
+                              If <b>mergeOneServer</b> is true, <b>takeRemoteSettings</b>
+                              parameter is ignored and treated as false.
+                            </description>
                             <optional>true</optional>
                             <values>
                                 <value>
                                     <name>true</name>
-                                    <description>The current system will get system name and administrator password of the target system.</description>
+                                    <description>
+                                        The current system will get system name and administrator password of the target system.
+                                    </description>
                                 </value>
                                 <value>
                                     <name>false</name>
-                                    <description>The target system will get system name and administrator password of the current system.</description>
+                                    <description>
+                                        The target system will get system name and administrator password of the current system.
+                                    </description>
+                                </value>
+                            </values>
+                        </param>
+                        <param>
+                            <name>mergeOneServer</name>
+                            <description>
+                                Whether to merge with servers merged with the target server.
+                                Default value is false. If <b>mergeOneServer</b> is set to true,
+                                <b>takeRemoteSettings</b> is ignored and treated as false.
+                            </description>
+                            <optional>true</optional>
+                            <values>
+                                <value>
+                                    <name>true</name>
+                                    <description>
+                                        The current system will merge with target server only. The target server will be disjoined from another system (if it was joined).
+                                    </description>
+                                </value>
+                                <value>
+                                    <name>false</name>
+                                    <description>
+                                        The current system will merge with target server and all servers which are merged with the target server.
+                                    </description>
+                                </value>
+                            </values>
+                        </param>
+                        <param>
+                            <name>ignoreIncompatible</name>
+                            <description>
+                                  Whether to ignore different version of merged server protocols.
+                                  Default value is false.
+                            </description>
+                            <optional>true</optional>
+                            <values>
+                                <value>
+                                    <name>true</name>
+                                    <description>Merge will start anyway.</description>
+                                </value>
+                                <value>
+                                    <name>false</name>
+                                    <description>
+                                        If the target server protocol version differs from the current server protocol version merge aborts.
+                                    </description>
                                 </value>
                             </values>
                         </param>
                     </params>
                     <result>
                         <caption>JSON with error code and error string.
-                            Error string could be
-                            empty in case of successful ping,
-                            "FAIL" if the specified system is unreachable or there is no any system,
+                            Error string could be empty in case of successful ping,
+                            "FAIL" if the specified system is unreachable or there is no system,
                             "UNAUTHORIZED" if the authentication credentials are invalid,
-                            "INCOMPATIBLE" if the found system has incompatible version or different customization, and
+                            "INCOMPATIBLE" if the found system has incompatible version or
+                            different customization, and
                             "BACKUP_ERROR" if database backup could not been created.
                         </caption>
                     </result>
@@ -2948,7 +3018,7 @@ the respective JSON fields can be empty.</description>
                             <li>Call <code>GET /api/getNonce</code></li>
                             <li>In response you'll get a JSON object with <i>realm</i> and <i>nonce</i></li>
                             <li>Translate user's <i>username</i> to the lower case</li>
-                            <li>Check the required <i>method</i> ("GET" for HTTP requests, "PLAY" for RTSP)</li>
+                            <li>Check the required <i>method</i> ("GET" for HTTP GET requests, "POST" for HTTP POST requests, "PLAY" for RTSP etc)</li>
                             <li><code>digest = md5_hex(user_name + ":" + realm + ":" + password)</code></li>
                             <li><code>partial_ha2 = md5_hex(method + ":")</code></li>
                             <li><code>simplified_ha2 = md5_hex(digest + ":" + nonce + ":" + partial_ha2)</code></li>
