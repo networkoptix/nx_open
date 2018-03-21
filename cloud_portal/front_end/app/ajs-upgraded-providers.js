@@ -55,6 +55,24 @@ exports.CONFIGProvider = {
     useFactory: CONFIGFactory,
     deps: ['$injector']
 };
+function ngToastFactory(i) {
+    return i.get('ngToast');
+}
+exports.ngToastFactory = ngToastFactory;
+exports.ngToastProvider = {
+    provide: 'ngToast',
+    useFactory: ngToastFactory,
+    deps: ['$injector']
+};
+function systemsFactory(i) {
+    return i.get('systemsProvider');
+}
+exports.systemsFactory = systemsFactory;
+exports.systemsProvider = {
+    provide: 'systemsProvider',
+    useFactory: systemsFactory,
+    deps: ['$injector']
+};
 function uuid2Factory(i) {
     return i.get('uuid2');
 }
@@ -124,4 +142,24 @@ CONFIGModule = __decorate([
     })
 ], CONFIGModule);
 exports.CONFIGModule = CONFIGModule;
+let ngToastModule = class ngToastModule {
+};
+ngToastModule = __decorate([
+    core_1.NgModule({
+        providers: [
+            exports.ngToastProvider
+        ]
+    })
+], ngToastModule);
+exports.ngToastModule = ngToastModule;
+let systemsModule = class systemsModule {
+};
+systemsModule = __decorate([
+    core_1.NgModule({
+        providers: [
+            exports.systemsProvider
+        ]
+    })
+], systemsModule);
+exports.systemsModule = systemsModule;
 //# sourceMappingURL=ajs-upgraded-providers.js.map

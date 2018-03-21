@@ -1,28 +1,31 @@
-import { NgModule } from '@angular/core';
-import { Location, PathLocationStrategy, LocationStrategy, CommonModule } from '@angular/common';
-import { BrowserModule } from '@angular/platform-browser';
-import { downgradeComponent, UpgradeModule } from '@angular/upgrade/static';
-import { RouterModule, UrlHandlingStrategy, UrlTree, Routes } from '@angular/router';
-import { HttpClientModule } from '@angular/common/http';
+import {NgModule} from '@angular/core';
+import {Location, PathLocationStrategy, LocationStrategy, CommonModule} from '@angular/common';
+import {BrowserModule} from '@angular/platform-browser';
+import {downgradeComponent, UpgradeModule} from '@angular/upgrade/static';
+import {RouterModule, UrlHandlingStrategy, UrlTree, Routes} from '@angular/router';
+import {HttpClientModule} from '@angular/common/http';
 
-import { FormsModule } from '@angular/forms';
+import {FormsModule} from '@angular/forms';
 
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {OrderModule} from 'ngx-order-pipe';
 
-import { CoreModule } from './core/index';
+import {CoreModule} from './core/index';
 
-import { cloudApiServiceProvider, CONFIGModule } from './ajs-upgraded-providers';
-import { languageServiceModule } from './ajs-upgraded-providers';
-import { accountServiceModule } from './ajs-upgraded-providers';
-import { processServiceModule } from './ajs-upgraded-providers';
-import { uuid2ServiceModule } from './ajs-upgraded-providers';
+import {cloudApiServiceProvider, systemsProvider, CONFIGModule} from './ajs-upgraded-providers';
+import {languageServiceModule} from './ajs-upgraded-providers';
+import {accountServiceModule} from './ajs-upgraded-providers';
+import {processServiceModule} from './ajs-upgraded-providers';
+import {uuid2ServiceModule} from './ajs-upgraded-providers';
 
-import { AppComponent } from './app.component';
-import { BarModule } from './bar/bar.module';
-import { NxLanguageDropdown } from "./dropdown/language.component";
-import { NxModalLoginComponent, LoginModalContent } from "./dialogs/login/login.component";
-import { NxProcessButtonComponent } from './components/process-button/process-button.component';
+import {AppComponent} from './app.component';
+import {BarModule} from './bar/bar.module';
+import {NxLanguageDropdown} from "./dropdown/language.component";
+import {NxModalLoginComponent, LoginModalContent} from "./dialogs/login/login.component";
+import {NxProcessButtonComponent} from './components/process-button/process-button.component';
+import {NxHeaderComponent} from './components/header/header.component';
+
 
 class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
     // use only process the `/bar` url
@@ -46,6 +49,7 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
         UpgradeModule,
         HttpClientModule,
         FormsModule,
+        OrderModule,
         CoreModule,
         BarModule,
         uuid2ServiceModule,
@@ -54,7 +58,7 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
         processServiceModule,
 
         NgbModule.forRoot(),
-        RouterModule.forRoot([], { initialNavigation: false })
+        RouterModule.forRoot([], {initialNavigation: false})
     ],
     entryComponents: [
         NxLanguageDropdown,
@@ -65,14 +69,16 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
     providers: [
         NgbModal,
         Location,
-        { provide: LocationStrategy, useClass: PathLocationStrategy },
-        { provide: UrlHandlingStrategy, useClass: HybridUrlHandlingStrategy },
-        { provide: '$scope', useFactory: i => i.get('$rootScope'), deps: ['$injector'] },
+        {provide: LocationStrategy, useClass: PathLocationStrategy},
+        {provide: UrlHandlingStrategy, useClass: HybridUrlHandlingStrategy},
+        {provide: '$scope', useFactory: i => i.get('$rootScope'), deps: ['$injector']},
         cloudApiServiceProvider,
+        systemsProvider,
         NxModalLoginComponent
     ],
     declarations: [
-        AppComponent
+        AppComponent,
+        NxHeaderComponent
     ],
     bootstrap: [AppComponent]
 })
@@ -84,9 +90,9 @@ export class AppModule {
 
 declare var angular: angular.IAngularStatic;
 angular
-        .module('cloudApp.directives')
-        .directive('nxLanguageSelect', downgradeComponent({ component: NxLanguageDropdown }) as angular.IDirectiveFactory)
-        .directive('nxModalLogin', downgradeComponent({ component: NxModalLoginComponent }) as angular.IDirectiveFactory);
+    .module('cloudApp.directives')
+    .directive('nxLanguageSelect', downgradeComponent({component: NxLanguageDropdown}) as angular.IDirectiveFactory)
+    .directive('nxModalLogin', downgradeComponent({component: NxModalLoginComponent}) as angular.IDirectiveFactory);
 
 
 

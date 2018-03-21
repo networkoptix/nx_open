@@ -54,6 +54,26 @@ export const CONFIGProvider = {
     deps: ['$injector']
 };
 
+export function ngToastFactory(i: any) {
+    return i.get('ngToast');
+}
+
+export const ngToastProvider = {
+    provide: 'ngToast',
+    useFactory: ngToastFactory,
+    deps: ['$injector']
+};
+
+export function systemsFactory(i: any) {
+    return i.get('systemsProvider');
+}
+
+export const systemsProvider = {
+    provide: 'systemsProvider',
+    useFactory: systemsFactory,
+    deps: ['$injector']
+};
+
 export function uuid2Factory(i: any) {
     return i.get('uuid2');
 }
@@ -108,4 +128,20 @@ export class processServiceModule {
     ]
 })
 export class CONFIGModule {
+}
+
+@NgModule({
+    providers: [
+        ngToastProvider
+    ]
+})
+export class ngToastModule {
+}
+
+@NgModule({
+    providers: [
+        systemsProvider
+    ]
+})
+export class systemsModule {
 }

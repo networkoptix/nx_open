@@ -15,6 +15,7 @@ const http_1 = require("@angular/common/http");
 const forms_1 = require("@angular/forms");
 const ng_bootstrap_1 = require("@ng-bootstrap/ng-bootstrap");
 const ng_bootstrap_2 = require("@ng-bootstrap/ng-bootstrap");
+const ngx_order_pipe_1 = require("ngx-order-pipe");
 const index_1 = require("./core/index");
 const ajs_upgraded_providers_1 = require("./ajs-upgraded-providers");
 const ajs_upgraded_providers_2 = require("./ajs-upgraded-providers");
@@ -26,6 +27,7 @@ const bar_module_1 = require("./bar/bar.module");
 const language_component_1 = require("./dropdown/language.component");
 const login_component_1 = require("./dialogs/login/login.component");
 const process_button_component_1 = require("./components/process-button/process-button.component");
+const header_component_1 = require("./components/header/header.component");
 class HybridUrlHandlingStrategy {
     // use only process the `/bar` url
     shouldProcessUrl(url) {
@@ -50,6 +52,7 @@ AppModule = __decorate([
             static_1.UpgradeModule,
             http_1.HttpClientModule,
             forms_1.FormsModule,
+            ngx_order_pipe_1.OrderModule,
             index_1.CoreModule,
             bar_module_1.BarModule,
             ajs_upgraded_providers_5.uuid2ServiceModule,
@@ -72,10 +75,12 @@ AppModule = __decorate([
             { provide: router_1.UrlHandlingStrategy, useClass: HybridUrlHandlingStrategy },
             { provide: '$scope', useFactory: i => i.get('$rootScope'), deps: ['$injector'] },
             ajs_upgraded_providers_1.cloudApiServiceProvider,
+            ajs_upgraded_providers_1.systemsProvider,
             login_component_1.NxModalLoginComponent
         ],
         declarations: [
-            app_component_1.AppComponent
+            app_component_1.AppComponent,
+            header_component_1.NxHeaderComponent
         ],
         bootstrap: [app_component_1.AppComponent]
     })
