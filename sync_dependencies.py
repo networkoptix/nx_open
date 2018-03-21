@@ -93,7 +93,7 @@ def sync_dependencies(syncher):
     sync("ffmpeg")
 
     if box in ("bpi", "bananapi"):
-        sync("sysroot")
+        sync("sysroot-1")
         sync("opengl-es-mali")
 
     if box == "rpi":
