@@ -26,7 +26,6 @@ QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, IOPortTypes)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, AuditRecordType)
 //QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, IODefaultState)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, AuthResult)
-QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, MediaStreamEvent)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, StreamIndex)
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, IOPortType,
@@ -59,6 +58,14 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, StorageInitResult,
     (Qn::StorageInit_CreateFailed,  "CreateFailed")
     (Qn::StorageInit_WrongPath,     "InitFailed_WrongPath")
     (Qn::StorageInit_WrongAuth,     "InitFailed_WrongAuth")
+)
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, MediaStreamEvent,
+    (Qn::NoEvent,                       "NoEvent")
+    (Qn::TooManyOpenedConnections,      "TooManyOpenedConnections")
+    (Qn::ForbiddenWithDefaultPassword,  "ForbiddenWithDefaultPassword")
+    (Qn::ForbiddenWithNoLicense,        "ForbiddenWithNoLicense")
+    (Qn::oldFirmware,                   "oldFirmare")
 )
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, CameraBackupQualities,
