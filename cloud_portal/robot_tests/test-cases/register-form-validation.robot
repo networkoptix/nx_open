@@ -78,7 +78,7 @@ Check Password Outline
     Run Keyword If    "${pass}"=="${7char password}"    Element Should Be Visible    ${PASSWORD TOO SHORT}
     Run Keyword If    "${pass}"=="${CYRILLIC TEXT}" or "${pass}"=="${SMILEY TEXT}" or "${pass}"=="${GLYPH TEXT}" or "${pass}"=="${TM TEXT}" or "${pass}"=="${SPACE}${BASE PASSWORD}" or "${pass}"=="${BASE PASSWORD}${SPACE}"    Element Should Be Visible    ${PASSWORD SPECIAL CHARS}
     Run Keyword If    "${pass}"=="${common password}"    Element Should Be Visible    ${PASSWORD TOO COMMON}
-    Run Keyword If    "${pass}"=="${weak password}    condition    name    *args
+    Run Keyword If    "${pass}"=="${weak password}"    Element Should Be Visible    ${PASSWORD IS WEAK}
 
 Check First Name Outline
     [Arguments]    ${first}
