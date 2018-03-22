@@ -87,11 +87,11 @@
 #include <nx/vms/discovery/manager.h>
 #include <network/router.h>
 #include <network/system_helpers.h>
-#include <utils/reconnect_helper.h>
 #include <nx/utils/raii_guard.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/app_info.h>
 #include <helpers/system_helpers.h>
+#include <nx/client/core/utils/reconnect_helper.h>
 
 #include <watchers/cloud_status_watcher.h>
 #include <nx_ec/dummy_handler.h>
@@ -1210,7 +1210,7 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection()
         return false;
 
     if (!m_reconnectHelper)
-        m_reconnectHelper.reset(new QnReconnectHelper());
+        m_reconnectHelper.reset(new nx::client::core::ReconnectHelper());
 
     if (m_reconnectHelper->servers().isEmpty())
     {

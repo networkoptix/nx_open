@@ -20,11 +20,13 @@
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
 #include <utils/common/app_info.h>
+#include <utils/common/delayed.h>
 #include <common/common_module.h>
 #include <network/connection_validator.h>
 
 #include <nx_ec/dummy_handler.h>
 
+#include <nx/client/core/utils/reconnect_helper.h>
 #include <nx/client/core/watchers/user_watcher.h>
 #include <nx/network/address_resolver.h>
 #include <nx/network/socket_global.h>
@@ -74,6 +76,7 @@ public:
 
     bool doConnect();
     void doDisconnect();
+    void tryResotreConnection();
 
     void updateConnectionState();
 
@@ -83,6 +86,7 @@ public:
 
 public:
     nx::utils::Url url;
+    QScopedPointer<nx::client::core::ReconnectHelper> reconnectHelper;
     QString systemName;
     bool suspended = false;
     bool wasConnected = false;
@@ -103,8 +107,6 @@ QnConnectionManager::QnConnectionManager(QObject* parent):
     connect(settings.data(), &QnGlobalSettings::systemNameChanged, this,
         [d, settings]()
         {
-
-
             /* 2.6 servers use another property name for systemName, so in 3.0 it's always empty.
                However we fill system name in doConnect().
                This value won't change, but it's not so critical. */
@@ -122,6 +124,8 @@ QnConnectionManager::QnConnectionManager(QObject* parent):
         });
     connect(qnClientMessageProcessor->connectionStatus(), &QnClientConnectionStatus::stateChanged,
         d, &QnConnectionManagerPrivate::updateConnectionState);
+    connect(qnClientMessageProcessor, &QnClientMessageProcessor::connectionClosed,
+        d, &QnConnectionManagerPrivate::tryResotreConnection);
 
     connect(this, &QnConnectionManager::currentUrlChanged, this, &QnConnectionManager::currentHostChanged);
     connect(this, &QnConnectionManager::currentUrlChanged, this, &QnConnectionManager::currentLoginChanged);
@@ -448,10 +452,36 @@ bool QnConnectionManagerPrivate::doConnect()
     return true;
 }
 
+void QnConnectionManagerPrivate::tryResotreConnection()
+{
+    if (!wasConnected)
+        return;
+
+    if (!reconnectHelper)
+        reconnectHelper.reset(new nx::client::core::ReconnectHelper());
+
+    // We don't check if we have at least one server for reconnection.
+    // We suppose we want to keep waiting for offline server until user disconnects manually.
+
+    reconnectHelper->next();
+    const auto currentUrl = reconnectHelper->currentUrl();
+    if (currentUrl.isValid())
+    {
+        Q_Q(QnConnectionManager);
+        q->connectToServer(currentUrl);
+        return;
+    }
+
+    static constexpr auto kReconnectDelayMs = 3000;
+    const auto callReconnect = [this]{ tryResotreConnection(); };
+    executeDelayedParented(callReconnect, kReconnectDelayMs, reconnectHelper.data());
+}
+
 void QnConnectionManagerPrivate::doDisconnect()
 {
     Q_Q(QnConnectionManager);
 
+    reconnectHelper.reset();
     qnGlobalSettings->synchronizeNow();
 
     disconnect(runtimeInfoManager(), nullptr, this, nullptr);
@@ -493,6 +523,8 @@ void QnConnectionManagerPrivate::updateConnectionState()
     connectionState = newState;
 
     Q_Q(QnConnectionManager);
+
+
     emit q->connectionStateChanged();
 }
 
