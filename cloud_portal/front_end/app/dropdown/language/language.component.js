@@ -13,13 +13,11 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@angular/core");
-const http_1 = require("@angular/common/http");
 const ng_bootstrap_1 = require("@ng-bootstrap/ng-bootstrap");
 let NxLanguageDropdown = class NxLanguageDropdown {
-    constructor(cloudApi, language, httpClient, dropdown, changeDetector) {
+    constructor(cloudApi, language, dropdown, changeDetector) {
         this.cloudApi = cloudApi;
         this.language = language;
-        this.httpClient = httpClient;
         this.dropdown = dropdown;
         this.changeDetector = changeDetector;
         this.activeLanguage = {
@@ -49,14 +47,13 @@ let NxLanguageDropdown = class NxLanguageDropdown {
 NxLanguageDropdown = __decorate([
     core_1.Component({
         selector: 'nx-language-select',
-        templateUrl: './dropdown/language.component.html',
-        styleUrls: ['./dropdown/language.component.scss'],
+        templateUrl: './dropdown/language/language.component.html',
+        styleUrls: ['./dropdown/language/language.component.scss'],
         inputs: ['accountMode'],
     }),
     __param(0, core_1.Inject('cloudApiService')),
     __param(1, core_1.Inject('languageService')),
-    __metadata("design:paramtypes", [Object, Object, http_1.HttpClient,
-        ng_bootstrap_1.NgbDropdownModule,
+    __metadata("design:paramtypes", [Object, Object, ng_bootstrap_1.NgbDropdownModule,
         core_1.ChangeDetectorRef])
 ], NxLanguageDropdown);
 exports.NxLanguageDropdown = NxLanguageDropdown;

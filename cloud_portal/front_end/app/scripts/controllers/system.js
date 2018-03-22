@@ -2,15 +2,15 @@
 
 angular.module('cloudApp')
     .controller('SystemCtrl', ['$scope', 'cloudApi', '$routeParams', '$location', 'urlProtocol', 'dialogs', 'process',
-    'account', '$q', 'system', '$poll', 'page', '$timeout', 'systemsProvider',
+    'account', '$q', 'system', '$poll', 'page', '$timeout', 'systemsProvider', 'authorizationCheckService',
     function ($scope, cloudApi, $routeParams, $location, urlProtocol, dialogs, process,
-    account, $q, system, $poll, page, $timeout, systemsProvider) {
+    account, $q, system, $poll, page, $timeout, systemsProvider, authorizationCheckService) {
 
         var systemId = $routeParams.systemId;
         $scope.debugMode = Config.allowDebugMode;
 
 
-        account.requireLogin().then(function(account){
+        authorizationCheckService.requireLogin().then(function(account){
             $scope.account = account;
             $scope.system = system(systemId, account.email);
             $scope.gettingSystem.run();

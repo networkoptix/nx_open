@@ -37,7 +37,6 @@
                     <span class="btn-wrapper">
                         <a href class="btn btn-default"
                            ng-click="login()">Log In</a>
-                        <!--<nx-modal-login></nx-modal-login>-->
                     </span>
                     <span class="btn-wrapper" ng-if="!active.register">
                         <a href="/register" class="btn btn-primary">Create Account</a>
@@ -78,23 +77,26 @@
                     </ul>
                 </li>
                 <li class="vertical-bar"></li>
-                <li uib-dropdown class="collapse-first">
-                    <a uib-dropdown-toggle href="">
-                        <span class="glyphicon glyphicon-user"></span>
-                        <span class="ellipsis">{{account.email}}</span>
-                        <span class="icon-caret"></span>
-                    </a>
-                    <ul uib-dropdown-menu>
-                        <li class="hidden-expanded active"><a href="">{{account.email}}</a></li>
-                        <li class="hidden-expanded nav-divider" role="separator"></li>
+                <!--<li uib-dropdown class="collapse-first">-->
+                    <!--<a uib-dropdown-toggle href="">-->
+                        <!--<span class="glyphicon glyphicon-user"></span>-->
+                        <!--<span class="ellipsis">{{account.email}}</span>-->
+                        <!--<span class="icon-caret"></span>-->
+                    <!--</a>-->
+                    <!--<ul uib-dropdown-menu>-->
+                        <!--<li class="hidden-expanded active"><a href="">{{account.email}}</a></li>-->
+                        <!--<li class="hidden-expanded nav-divider" role="separator"></li>-->
 
-                        <li><a href="/account/">Account Settings</a></li>
-                        <li><a href="/account/password/">Change Password</a></li>
-                        <li><a href="" ng-click="logout()">Log Out</a></li>
+                        <!--<li><a href="/account/">Account Settings</a></li>-->
+                        <!--<li><a href="/account/password/">Change Password</a></li>-->
+                        <!--<li><a href="" ng-click="logout()">Log Out</a></li>-->
 
-                        <li class="nav-divider" role="separator" ng-if="account.is_staff"></li>
-                        <li><a href="/admin/" target="_blank" ng-if="account.is_staff">Portal management</a></li>
-                    </ul>
+                        <!--<li class="nav-divider" role="separator" ng-if="account.is_staff"></li>-->
+                        <!--<li><a href="/admin/" target="_blank" ng-if="account.is_staff">Portal management</a></li>-->
+                    <!--</ul>-->
+                <!--</li>-->
+                <li class="collapse-first">
+                    <nx-account-settings-select [account]="account"></nx-account-settings-select>
                 </li>
                 <li class="vertical-bar"></li>
             </ul>

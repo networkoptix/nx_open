@@ -2,11 +2,11 @@
 
 
 angular.module('cloudApp')
-    .controller('DownloadHistoryCtrl', ['$scope', '$routeParams', '$location', 'page', 'cloudApi', 'account',
-    function ($scope, $routeParams, $location, page, cloudApi, account) {
+    .controller('DownloadHistoryCtrl', ['$scope', '$routeParams', '$location', 'page', 'cloudApi', 'authorizationCheckService',
+    function ($scope, $routeParams, $location, page, cloudApi, authorizationCheckService) {
 
         $scope.downloads = Config.downloads;
-        account.requireLogin().then(function(){
+        authorizationCheckService.requireLogin().then(function(){
             cloudApi.getDownloadsHistory($routeParams.build).then(function(result){
                 $scope.linkbase = result.data.updatesPrefix;
 
@@ -16,8 +16,8 @@ angular.module('cloudApp')
                     $scope.downloadsData = result.data;
                 }else{
                     $scope.activeBuilds = [result.data];
-                    $scope.downloadTypes = [result.data.type]
-                    $scope.downloadsData = {}
+                    $scope.downloadTypes = [result.data.type];
+                    $scope.downloadsData = {};
                     $scope.downloadsData[result.data.type] = $scope.activeBuilds;
                 }
             },function(error){

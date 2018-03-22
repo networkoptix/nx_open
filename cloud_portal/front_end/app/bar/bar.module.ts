@@ -9,11 +9,12 @@ import { NgbModalModule, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { QuoteService } from "../../app/core";
 
-import { NxLanguageDropdown } from "../dropdown/language.component";
+import { NxLanguageDropdown } from "../dropdown/language/language.component";
 // import { LoginModalContent, NxModalLoginComponent} from "../dialogs/login/login.component";
 // import { NxProcessButtonComponent } from "../components/process-button/process-button.component";
 
 import { BarComponent } from './bar.component';
+import {NxAccountSettingsDropdown} from "../dropdown/account-settings/account-settings.component";
 
 const appRoutes: Routes = [
     { path: 'bar', component: BarComponent }
@@ -40,7 +41,7 @@ const appRoutes: Routes = [
     declarations: [
         BarComponent,
         NxLanguageDropdown,
-        // NxProcessButtonComponent
+        NxAccountSettingsDropdown
     ],
     bootstrap: []
 })

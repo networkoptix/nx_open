@@ -24,7 +24,8 @@ import {ngToastModule} from './ajs-upgraded-providers';
 
 import {AppComponent} from './app.component';
 import {BarModule} from './bar/bar.module';
-import {NxLanguageDropdown} from "./dropdown/language.component";
+import {NxLanguageDropdown} from "./dropdown/language/language.component";
+import {NxAccountSettingsDropdown} from "./dropdown/account-settings/account-settings.component";
 import {NxModalLoginComponent, LoginModalContent} from "./dialogs/login/login.component";
 import {NxProcessButtonComponent} from './components/process-button/process-button.component';
 import {nxDialogsService} from "./dialogs/dialogs.service";
@@ -67,6 +68,7 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
     ],
     entryComponents: [
         NxLanguageDropdown,
+        NxAccountSettingsDropdown,
         NxProcessButtonComponent,
         LoginModalContent,
         NxModalLoginComponent,
@@ -106,7 +108,8 @@ declare var angular: angular.IAngularStatic;
 angular
     .module('cloudApp.directives')
     .directive('nxLanguageSelect', downgradeComponent({component: NxLanguageDropdown}) as angular.IDirectiveFactory)
-    .directive('nxModalLogin', downgradeComponent({component: NxModalLoginComponent}) as angular.IDirectiveFactory)
+    .directive('nxAccountSettingsSelect', downgradeComponent({component: NxAccountSettingsDropdown}) as angular.IDirectiveFactory)
+    .directive('nxModalLogin', downgradeComponent({component: NxModalLoginComponent}) as angular.IDirectiveFactory);
 
 angular
     .module('cloudApp.services')

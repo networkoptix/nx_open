@@ -14,10 +14,11 @@ const router_1 = require("@angular/router");
 const forms_1 = require("@angular/forms");
 const ng_bootstrap_1 = require("@ng-bootstrap/ng-bootstrap");
 const core_2 = require("../../app/core");
-const language_component_1 = require("../dropdown/language.component");
+const language_component_1 = require("../dropdown/language/language.component");
 // import { LoginModalContent, NxModalLoginComponent} from "../dialogs/login/login.component";
 // import { NxProcessButtonComponent } from "../components/process-button/process-button.component";
 const bar_component_1 = require("./bar.component");
+const account_settings_component_1 = require("../dropdown/account-settings/account-settings.component");
 const appRoutes = [
     { path: 'bar', component: bar_component_1.BarComponent }
 ];
@@ -42,6 +43,7 @@ BarModule = __decorate([
         declarations: [
             bar_component_1.BarComponent,
             language_component_1.NxLanguageDropdown,
+            account_settings_component_1.NxAccountSettingsDropdown
         ],
         bootstrap: []
     })

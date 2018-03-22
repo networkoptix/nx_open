@@ -85,8 +85,8 @@ let NxModalLoginComponent = class NxModalLoginComponent {
         this.location = location;
         this.modalService = modalService;
         this.auth = {
-            email: '',
-            password: '',
+            email: 'ttsolov@networkoptix.com',
+            password: '2l2b2l2n1ts2',
             remember: true
         };
     }

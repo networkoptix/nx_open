@@ -2,11 +2,11 @@
 
 angular.module('cloudApp')
     .controller('DebugCtrl', ['$scope', 'cloudApi', 'account', 'process', '$q', '$timeout',
-                'dialogs', 'urlProtocol', '$base64', 'systemsProvider',
+                'dialogs', 'urlProtocol', '$base64', 'systemsProvider', 'authorizationCheckService',
         function ($scope, cloudApi, account, process, $q, $timeout,
-                  dialogs, urlProtocol, $base64, systemsProvider) {
+                  dialogs, urlProtocol, $base64, systemsProvider, authorizationCheckService) {
 
-        account.requireLogin();
+            authorizationCheckService.requireLogin();
 
         $scope.user_email = 'ebalashov@networkoptix.com';
         $scope.type = 'activate_account';

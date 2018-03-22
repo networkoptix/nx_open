@@ -2,9 +2,9 @@
 
 angular.module('cloudApp')
     .controller('ViewPageCtrl', ['$scope', 'account', 'system', '$routeParams', 'systemAPI', 'dialogs',
-    '$location', '$q', '$poll',
-    function ($scope, account, system, $routeParams, systemAPI, dialogs, $location, $q, $poll) {
-        account.requireLogin().then(function(account){
+    '$location', '$q', '$poll', 'authorizationCheckService',
+    function ($scope, account, system, $routeParams, systemAPI, dialogs, $location, $q, $poll, authorizationCheckService) {
+        authorizationCheckService.requireLogin().then(function(account){
             $scope.currentSystem = system($routeParams.systemId, account.email);
             var systemInfoRequest = $scope.currentSystem.getInfo();
             var systemAuthRequest = $scope.currentSystem.updateSystemAuth();
