@@ -18,7 +18,6 @@ private:
     ServerUpdates2Installer m_installer;
 
     virtual update::info::AbstractUpdateRegistryPtr getRemoteRegistry() override;
-    virtual void connectToSignals() override;
     virtual qint64 refreshTimeout() const override;
     virtual vms::common::p2p::downloader::AbstractDownloader* downloader() override;
     virtual QString filePath() const override;

@@ -46,34 +46,6 @@ qint64 ServerUpdates2Manager::refreshTimeout() const
     return settingsValue == 0 ? kRefreshTimeoutMs : settingsValue;
 }
 
-void ServerUpdates2Manager::connectToSignals()
-{
-    connect(
-        globalSettings(), &QnGlobalSettings::updates2RegistryChanged,
-        this, &ServerUpdates2Manager::checkForGlobalDictionaryUpdate);
-    connect(
-        downloader(), &Downloader::downloadFinished,
-        this, &ServerUpdates2Manager::onDownloadFinished);
-    connect(
-        qnServerModule->findInstance<Downloader>(), &Downloader::downloadFailed,
-        this, &ServerUpdates2Manager::onDownloadFailed);
-    connect(
-        qnServerModule->findInstance<Downloader>(), &Downloader::fileAdded,
-        this, &ServerUpdates2Manager::onFileAdded);
-    connect(
-        qnServerModule->findInstance<Downloader>(), &Downloader::fileDeleted,
-        this, &ServerUpdates2Manager::onFileDeleted);
-    connect(
-        qnServerModule->findInstance<Downloader>(), &Downloader::fileInformationChanged,
-        this, &ServerUpdates2Manager::onFileInformationChanged);
-    connect(
-        qnServerModule->findInstance<Downloader>(), &Downloader::fileStatusChanged,
-        this, &ServerUpdates2Manager::onFileInformationStatusChanged);
-    connect(
-        qnServerModule->findInstance<Downloader>(), &Downloader::chunkDownloadFailed,
-        this, &ServerUpdates2Manager::onChunkDownloadFailed);
-}
-
 vms::common::p2p::downloader::AbstractDownloader* ServerUpdates2Manager::downloader()
 {
     return qnServerModule->findInstance<vms::common::p2p::downloader::Downloader>();

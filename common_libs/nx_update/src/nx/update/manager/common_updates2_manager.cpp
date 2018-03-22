@@ -32,6 +32,34 @@ CommonUpdates2Manager::CommonUpdates2Manager(QnCommonModule* commonModule):
 {
 }
 
+void CommonUpdates2Manager::connectToSignals()
+{
+    connect(
+        globalSettings(), &QnGlobalSettings::updates2RegistryChanged,
+        this, &CommonUpdates2Manager::checkForGlobalDictionaryUpdate);
+    connect(
+        downloader(), &Downloader::downloadFinished,
+        this, &CommonUpdates2Manager::onDownloadFinished);
+    connect(
+        downloader(), &Downloader::downloadFailed,
+        this, &CommonUpdates2Manager::onDownloadFailed);
+    connect(
+        downloader(), &Downloader::fileAdded,
+        this, &CommonUpdates2Manager::onFileAdded);
+    connect(
+        downloader(), &Downloader::fileDeleted,
+        this, &CommonUpdates2Manager::onFileDeleted);
+    connect(
+        downloader(), &Downloader::fileInformationChanged,
+        this, &CommonUpdates2Manager::onFileInformationChanged);
+    connect(
+        downloader(), &Downloader::fileStatusChanged,
+        this, &CommonUpdates2Manager::onFileInformationStatusChanged);
+    connect(
+        downloader(), &Downloader::chunkDownloadFailed,
+        this, &CommonUpdates2Manager::onChunkDownloadFailed);
+}
+
 void CommonUpdates2Manager::loadStatusFromFile()
 {
     QFile file(filePath());

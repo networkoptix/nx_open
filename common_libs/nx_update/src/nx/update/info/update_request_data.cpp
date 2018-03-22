@@ -54,7 +54,7 @@ bool operator==(const OsVersion& lhs, const OsVersion& rhs)
         && lhs.version == rhs.version;
 }
 
-static uint qHash(const OsVersion& osVersion)
+uint qHash(const OsVersion& osVersion)
 {
     return qHash(osVersion.architecture) ^ qHash(osVersion.family) ^ qHash(osVersion.version);
 }

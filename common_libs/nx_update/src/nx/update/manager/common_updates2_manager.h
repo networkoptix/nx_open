@@ -20,6 +20,8 @@ private:
     virtual void updateGlobalRegistry(const QByteArray& serializedRegistry) override;
     virtual void writeStatusToFile(const detail::Updates2StatusDataEx& statusData) override;
     virtual void remoteUpdateCompleted() override {}
+
+    void connectToSignals();
 };
 
 } // namespace update
