@@ -433,7 +433,7 @@ private:
     QString m_model;
     QString m_vendor;
     CachedValue<Qn::LicenseType> m_cachedLicenseType;
-    CachedValue<bool> m_cachedHasDualStreaming2;
+    CachedValue<bool> m_cachedHasDualStreaming;
     CachedValue<Qn::MotionTypes> m_cachedSupportedMotionType;
     CachedValue<Qn::CameraCapabilities> m_cachedCameraCapabilities;
     CachedValue<bool> m_cachedIsDtsBased;

@@ -63,7 +63,7 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
     m_statusFlags(Qn::CSF_NoFlags),
     m_manuallyAdded(false),
     m_cachedLicenseType([this] { return calculateLicenseType(); }, &m_mutex),
-    m_cachedHasDualStreaming2(
+    m_cachedHasDualStreaming(
         [this]()->bool{ return hasDualStreamingInternal() && !isDualStreamingDisabled(); },
         &m_mutex ),
     m_cachedSupportedMotionType(
@@ -444,7 +444,7 @@ QnScheduleTaskList QnSecurityCamResource::getScheduleTasks() const
 }
 
 bool QnSecurityCamResource::hasDualStreaming() const {
-    return m_cachedHasDualStreaming2.get();
+    return m_cachedHasDualStreaming.get();
 }
 
 nx::media::CameraMediaCapability QnSecurityCamResource::cameraMediaCapability() const
@@ -1151,7 +1151,7 @@ void QnSecurityCamResource::setDisableDualStreaming(bool value)
         (*userAttributesLock)->disableDualStreaming = value;
     }
 
-    m_cachedHasDualStreaming2.reset();
+    m_cachedHasDualStreaming.reset();
     emit disableDualStreamingChanged(toSharedPointer());
 }
 
@@ -1314,7 +1314,7 @@ void QnSecurityCamResource::resetCachedValues()
 {
     // TODO: #rvasilenko reset only required values on property changed (as in server resource).
     //resetting cached values
-    m_cachedHasDualStreaming2.reset();
+    m_cachedHasDualStreaming.reset();
     m_cachedSupportedMotionType.reset();
     m_cachedCameraCapabilities.reset();
     m_cachedIsDtsBased.reset();
