@@ -61,7 +61,7 @@ protected:
     virtual bool hasAccessRights() const override;
 
 private:
-    void processMetadata(const QnAbstractCompressedMetadataPtr& metadata);
+    void processMetadata();
     media::SignalingMetadataConsumer* createMetadataSource();
 
     int indexOf(const QnUuid& objectId) const;
@@ -72,7 +72,7 @@ private:
     void emitDataChangedIfNeeded();
 
     void advanceObject(analytics::storage::DetectedObject& object,
-        analytics::storage::ObjectPosition&& position);
+        analytics::storage::ObjectPosition&& position, bool emitDataChanged = true);
 
     using GetCallback = std::function<void(bool, rest::Handle, analytics::storage::LookupResult&&)>;
     rest::Handle getObjects(qint64 startMs, qint64 endMs, GetCallback callback,
@@ -109,6 +109,10 @@ private:
     bool m_success = true;
 
     QHash<QnUuid, qint64> m_objectIdToTimestampUs;
+
+    const QScopedPointer<QTimer> m_metadataProcessingTimer;
+    QVector<QnAbstractCompressedMetadataPtr> m_metadataPackets;
+    mutable QMutex m_metadataMutex;
 };
 
 } // namespace desktop

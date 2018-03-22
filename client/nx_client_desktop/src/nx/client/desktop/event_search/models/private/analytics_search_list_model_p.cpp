@@ -44,6 +44,7 @@ using namespace std::chrono;
 using namespace std::chrono_literals;
 
 static constexpr milliseconds kUpdateTimerInterval = 30s;
+static constexpr milliseconds kMetadataTimerInterval = 10ms;
 static constexpr milliseconds kDataChangedInterval = 250ms;
 
 static const auto lowerBoundPredicateUs =
@@ -74,12 +75,17 @@ AnalyticsSearchListModel::Private::Private(AnalyticsSearchListModel* q):
     m_emitDataChanged(new utils::PendingOperation([this] { emitDataChangedIfNeeded(); },
         kDataChangedInterval.count(), this)),
     m_updateWorkbenchFilter(createUpdateWorkbenchFilterOperation()),
-    m_metadataSource(createMetadataSource())
+    m_metadataSource(createMetadataSource()),
+    m_metadataProcessingTimer(new QTimer())
 {
     m_emitDataChanged->setFlags(utils::PendingOperation::NoFlags);
 
     m_updateTimer->setInterval(kUpdateTimerInterval.count());
     connect(m_updateTimer.data(), &QTimer::timeout, this, &Private::periodicUpdate);
+
+    m_metadataProcessingTimer->setInterval(kMetadataTimerInterval.count());
+    connect(m_metadataProcessingTimer.data(), &QTimer::timeout, this, &Private::processMetadata);
+    m_metadataProcessingTimer->start();
 }
 
 AnalyticsSearchListModel::Private::~Private()
@@ -112,9 +118,16 @@ utils::PendingOperation* AnalyticsSearchListModel::Private::createUpdateWorkbenc
 
 media::SignalingMetadataConsumer* AnalyticsSearchListModel::Private::createMetadataSource()
 {
+    const auto processMetadataInSourceThread =
+        [this](const QnAbstractCompressedMetadataPtr& packet)
+        {
+            QnMutexLocker lock(&m_metadataMutex);
+            m_metadataPackets.push_back(packet);
+        };
+
     auto metadataSource = new media::SignalingMetadataConsumer(MetadataType::ObjectDetection);
     connect(metadataSource, &media::SignalingMetadataConsumer::metadataReceived,
-        this, &Private::processMetadata);
+        this, processMetadataInSourceThread, Qt::DirectConnection);
 
     return metadataSource;
 }
@@ -491,31 +504,53 @@ rest::Handle AnalyticsSearchListModel::Private::getObjects(qint64 startMs, qint6
         request, false /*isLocal*/, internalCallback, thread());
 }
 
-void AnalyticsSearchListModel::Private::processMetadata(
-    const QnAbstractCompressedMetadataPtr& metadata)
+void AnalyticsSearchListModel::Private::processMetadata()
 {
-    NX_EXPECT(metadata->metadataType == MetadataType::ObjectDetection);
-    const auto compressedMetadata = std::dynamic_pointer_cast<QnCompressedMetadata>(metadata);
-    const auto detectionMetadata = common::metadata::fromMetadataPacket(compressedMetadata);
+    QnMutexLocker locker(&m_metadataMutex);
+    auto packets = m_metadataPackets;
+    m_metadataPackets.clear();
+    locker.unlock();
 
-    if (!detectionMetadata || detectionMetadata->objects.empty() || !q->navigator()->isLive())
+    if (!q->navigator()->isLive() || !q->relevantTimePeriod().isInfinite() || packets.empty())
         return;
 
-    std::vector<DetectedObject> newObjects;
-    newObjects.reserve(detectionMetadata->objects.size());
+    QVector<DetectedObject> newObjects;
+    QHash<QnUuid, int> newObjectIndices;
 
-    ObjectPosition pos;
-    pos.deviceId = detectionMetadata->deviceId;
-    pos.timestampUsec = detectionMetadata->timestampUsec;
-    pos.durationUsec = detectionMetadata->durationUsec;
-
-    for (const auto& item: detectionMetadata->objects)
+    for (const auto& metadata: packets)
     {
-        pos.boundingBox = item.boundingBox;
+        NX_EXPECT(metadata->metadataType == MetadataType::ObjectDetection);
+        const auto compressedMetadata = std::dynamic_pointer_cast<QnCompressedMetadata>(metadata);
+        const auto detectionMetadata = common::metadata::fromMetadataPacket(compressedMetadata);
 
-        const auto index = indexOf(item.objectId);
-        if (index < 0)
+        if (!detectionMetadata || detectionMetadata->objects.empty())
+            continue;
+
+        ObjectPosition pos;
+        pos.deviceId = detectionMetadata->deviceId;
+        pos.timestampUsec = detectionMetadata->timestampUsec;
+        pos.durationUsec = detectionMetadata->durationUsec;
+
+        for (const auto& item: detectionMetadata->objects)
         {
+            pos.boundingBox = item.boundingBox;
+
+            auto index = newObjectIndices.value(item.objectId, -1);
+            if (index >= 0)
+            {
+                pos.attributes = std::move(item.labels);
+                advanceObject(newObjects[index], std::move(pos), false);
+                continue;
+            }
+
+            index = indexOf(item.objectId);
+            if (index >= 0)
+            {
+                pos.attributes = std::move(item.labels);
+                advanceObject(m_data[index], std::move(pos));
+                continue;
+            }
+
             if (m_filterRect.isValid() && !m_filterRect.intersects(item.boundingBox))
                 continue;
 
@@ -526,12 +561,9 @@ void AnalyticsSearchListModel::Private::processMetadata(
             newObject.track.push_back(pos);
             newObject.firstAppearanceTimeUsec = pos.timestampUsec;
             newObject.lastAppearanceTimeUsec = pos.timestampUsec;
+
+            newObjectIndices[item.objectId] = newObjects.size();
             newObjects.push_back(std::move(newObject));
-        }
-        else
-        {
-            pos.attributes = std::move(item.labels);
-            advanceObject(m_data[index], std::move(pos));
         }
     }
 
@@ -584,7 +616,7 @@ void AnalyticsSearchListModel::Private::emitDataChangedIfNeeded()
 };
 
 void AnalyticsSearchListModel::Private::advanceObject(DetectedObject& object,
-    ObjectPosition&& position)
+    ObjectPosition&& position, bool emitDataChanged)
 {
     // Currently there's a mess between object.attributes and object.track[i].attributes.
     // There's no clear understanding what to use and what to show.
@@ -608,7 +640,9 @@ void AnalyticsSearchListModel::Private::advanceObject(DetectedObject& object,
 
     object.lastAppearanceTimeUsec = position.timestampUsec;
     m_dataChangedObjectIds.insert(object.objectId);
-    m_emitDataChanged->requestOperation();
+
+    if (emitDataChanged)
+        m_emitDataChanged->requestOperation();
 }
 
 int AnalyticsSearchListModel::Private::indexOf(const QnUuid& objectId) const
