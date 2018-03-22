@@ -80,5 +80,6 @@ SetFile -a C "$TMP"
 hdiutil detach "$TMP"
 rm -rf "$TMP"
 rm -f "$DMG_FILE"
+lsof -t "raw-$DMG_FILE" | xargs kill -9
 hdiutil convert "raw-$DMG_FILE" -format UDZO -o "$DMG_FILE"
 rm -f "raw-$DMG_FILE"
