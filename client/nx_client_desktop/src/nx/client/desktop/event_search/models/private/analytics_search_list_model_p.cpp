@@ -40,8 +40,11 @@ namespace {
 
 static constexpr int kFetchBatchSize = 110;
 
-static constexpr auto kUpdateTimerInterval = std::chrono::seconds(30);
-static constexpr auto kDataChangedInterval = std::chrono::milliseconds(250);
+using namespace std::chrono;
+using namespace std::chrono_literals;
+
+static constexpr milliseconds kUpdateTimerInterval = 30s;
+static constexpr milliseconds kDataChangedInterval = 250ms;
 
 static const auto lowerBoundPredicateUs =
     [](const DetectedObject& left, qint64 rightUs)
@@ -58,7 +61,6 @@ static const auto upperBoundPredicateUs =
 static const auto upperBoundPredicateMs =
     [](qint64 leftMs, const DetectedObject& right)
     {
-        using namespace std::chrono;
         return leftMs > duration_cast<milliseconds>(
             microseconds(right.firstAppearanceTimeUsec)).count();
     };
@@ -70,13 +72,13 @@ AnalyticsSearchListModel::Private::Private(AnalyticsSearchListModel* q):
     q(q),
     m_updateTimer(new QTimer()),
     m_emitDataChanged(new utils::PendingOperation([this] { emitDataChangedIfNeeded(); },
-        std::chrono::milliseconds(kDataChangedInterval).count(), this)),
+        kDataChangedInterval.count(), this)),
     m_updateWorkbenchFilter(createUpdateWorkbenchFilterOperation()),
     m_metadataSource(createMetadataSource())
 {
     m_emitDataChanged->setFlags(utils::PendingOperation::NoFlags);
 
-    m_updateTimer->setInterval(std::chrono::milliseconds(kUpdateTimerInterval).count());
+    m_updateTimer->setInterval(kUpdateTimerInterval.count());
     connect(m_updateTimer.data(), &QTimer::timeout, this, &Private::periodicUpdate);
 }
 
