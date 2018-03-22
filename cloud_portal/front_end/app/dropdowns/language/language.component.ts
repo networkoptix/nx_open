@@ -1,5 +1,5 @@
-import {Component, OnInit, ChangeDetectorRef, Inject} from '@angular/core';
-import {NgbDropdownModule} from '@ng-bootstrap/ng-bootstrap';
+import { Component, OnInit, ChangeDetectorRef, Inject } from '@angular/core';
+import { NgbDropdownModule }                            from '@ng-bootstrap/ng-bootstrap';
 
 export interface activeLanguage {
     language: string;
@@ -8,8 +8,8 @@ export interface activeLanguage {
 
 @Component({
     selector: 'nx-language-select',
-    templateUrl: './dropdown/language/language.component.html',
-    styleUrls: ['./dropdown/language/language.component.scss'],
+    templateUrl: './dropdowns/language/language.component.html',
+    styleUrls: ['./dropdowns/language/language.component.scss'],
     inputs: ['accountMode'],
 })
 

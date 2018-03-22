@@ -27,8 +27,9 @@ const ajs_upgraded_providers_6 = require("./ajs-upgraded-providers");
 const ajs_upgraded_providers_7 = require("./ajs-upgraded-providers");
 const app_component_1 = require("./app.component");
 const bar_module_1 = require("./bar/bar.module");
-const language_component_1 = require("./dropdown/language/language.component");
-const account_settings_component_1 = require("./dropdown/account-settings/account-settings.component");
+const dropdowns_module_1 = require("./dropdowns/dropdowns.module");
+const language_component_1 = require("./dropdowns/language/language.component");
+const account_settings_component_1 = require("./dropdowns/account-settings/account-settings.component");
 const login_component_1 = require("./dialogs/login/login.component");
 const process_button_component_1 = require("./components/process-button/process-button.component");
 const dialogs_service_1 = require("./dialogs/dialogs.service");
@@ -66,6 +67,7 @@ AppModule = __decorate([
             ajs_upgraded_providers_5.processServiceModule,
             ajs_upgraded_providers_2.systemsModule,
             ajs_upgraded_providers_7.ngToastModule,
+            dropdowns_module_1.DropdownsModule,
             ng_bootstrap_1.NgbModule.forRoot(),
             router_1.RouterModule.forRoot([], { initialNavigation: false })
         ],
@@ -97,7 +99,7 @@ AppModule = __decorate([
             login_component_1.NxModalLoginComponent,
             general_component_1.GeneralModalContent,
             general_component_1.NxModalGeneralComponent,
-            process_button_component_1.NxProcessButtonComponent
+            process_button_component_1.NxProcessButtonComponent,
         ],
         bootstrap: [app_component_1.AppComponent]
     })

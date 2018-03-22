@@ -3,8 +3,8 @@ import { NgbDropdownModule }                                   from '@ng-bootstr
 
 @Component({
     selector: 'nx-account-settings-select',
-    templateUrl: './dropdown/account-settings/account-settings.component.html',
-    styleUrls: ['./dropdown/account-settings/account-settings.component.scss']
+    templateUrl: './dropdowns/account-settings/account-settings.component.html',
+    styleUrls: ['./dropdowns/account-settings/account-settings.component.scss']
 })
 
 export class NxAccountSettingsDropdown implements OnInit {

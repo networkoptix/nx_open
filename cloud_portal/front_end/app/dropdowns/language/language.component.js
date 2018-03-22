@@ -47,8 +47,8 @@ let NxLanguageDropdown = class NxLanguageDropdown {
 NxLanguageDropdown = __decorate([
     core_1.Component({
         selector: 'nx-language-select',
-        templateUrl: './dropdown/language/language.component.html',
-        styleUrls: ['./dropdown/language/language.component.scss'],
+        templateUrl: './dropdowns/language/language.component.html',
+        styleUrls: ['./dropdowns/language/language.component.scss'],
         inputs: ['accountMode'],
     }),
     __param(0, core_1.Inject('cloudApiService')),

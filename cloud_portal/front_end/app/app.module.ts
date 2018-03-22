@@ -24,8 +24,9 @@ import {ngToastModule} from './ajs-upgraded-providers';
 
 import {AppComponent} from './app.component';
 import {BarModule} from './bar/bar.module';
-import {NxLanguageDropdown} from "./dropdown/language/language.component";
-import {NxAccountSettingsDropdown} from "./dropdown/account-settings/account-settings.component";
+import { DropdownsModule} from './dropdowns/dropdowns.module';
+import {NxLanguageDropdown} from "./dropdowns/language/language.component";
+import {NxAccountSettingsDropdown} from "./dropdowns/account-settings/account-settings.component";
 import {NxModalLoginComponent, LoginModalContent} from "./dialogs/login/login.component";
 import {NxProcessButtonComponent} from './components/process-button/process-button.component';
 import {nxDialogsService} from "./dialogs/dialogs.service";
@@ -62,6 +63,7 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
         processServiceModule,
         systemsModule,
         ngToastModule,
+        DropdownsModule,
 
         NgbModule.forRoot(),
         RouterModule.forRoot([], {initialNavigation: false})
@@ -94,7 +96,9 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
         NxModalLoginComponent,
         GeneralModalContent,
         NxModalGeneralComponent,
-        NxProcessButtonComponent
+        NxProcessButtonComponent,
+        // NxLanguageDropdown,
+        // NxAccountSettingsDropdown
     ],
     bootstrap: [AppComponent]
 })
