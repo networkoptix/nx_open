@@ -1024,7 +1024,7 @@ CLConstVideoDecoderOutputPtr QnMotionEstimation::decodeFrame(const QnCompressedV
     if (!m_decoder || m_decoder->getContext()->codec_id != frame->compressionType)
     {
         delete m_decoder;
-        m_decoder = new QnFfmpegVideoDecoder(frame->compressionType, frame, false);
+        m_decoder = new QnFfmpegVideoDecoder(frame->compressionType, frame, /*mtDecoding*/ false);
     }
 
     m_decoder->getContext()->flags &= ~CODEC_FLAG_GRAY; //< Turn off Y-only mode.
@@ -1047,7 +1047,7 @@ bool QnMotionEstimation::analyzeFrame(const QnCompressedVideoDataPtr& frame,
     if (!m_decoder || m_decoder->getContext()->codec_id != frame->compressionType)
     {
         delete m_decoder;
-        m_decoder = new QnFfmpegVideoDecoder(frame->compressionType, frame, false);
+        m_decoder = new QnFfmpegVideoDecoder(frame->compressionType, frame, /*mtDecoding*/ false);
     }
 
     // Turn on Y-only mode if the decoded frame was not requested from this function.
