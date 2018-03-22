@@ -37,6 +37,7 @@ static const char* kGstElementAppSrc = "appsrc";
 static const char* kGstElementH264Parser = "h264parse";
 static const char* kGstElementH264Decoder = "omxh264dec";
 static const char* kGstElementDecodeBin = "decodebin";
+static const char* kElementOpenAlpr = "dsexample";
 
 static const GQuark kNvidiaIvaMetadataQuark = g_quark_from_static_string("ivameta");
 

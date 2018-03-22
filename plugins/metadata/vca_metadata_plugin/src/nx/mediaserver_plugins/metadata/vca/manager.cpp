@@ -4,6 +4,7 @@
 
 #include <QtCore/QUrl>
 
+#define NX_PRINT_PREFIX "[metadata::vca::Manager] "
 #include <nx/kit/debug.h>
 
 #include <nx/mediaserver_plugins/utils/uuid.h>
@@ -15,8 +16,6 @@
 #include <nx/utils/std/cppnx.h>
 
 #include "nx/vca/camera_controller.h"
-
-#define NX_PRINT_PREFIX "[metadata::vca::Manager] "
 
 namespace nx {
 namespace mediaserver_plugins {

@@ -214,7 +214,8 @@ bool Param<float>::reload(const std::string* value, std::ostream* output)
         // NOTE: std::stof() is missing on Android.
         char* pEnd = nullptr;
         errno = 0; //< Required before strtof().
-        const long v = std::strtof(value->c_str(), &pEnd);
+        // Android NDK does not support std::strtof.
+        const float v = (float) std::strtod(value->c_str(), &pEnd);
         if (errno == ERANGE || *pEnd != '\0')
             error = " [invalid value]";
         else
@@ -235,7 +236,7 @@ bool Param<double>::reload(const std::string* value, std::ostream* output)
         // NOTE: std::stof() is missing on Android.
         char* pEnd = nullptr;
         errno = 0; //< Required before strtod().
-        const long v = std::strtod(value->c_str(), &pEnd);
+        const double v = std::strtod(value->c_str(), &pEnd);
         if (errno == ERANGE || *pEnd != '\0')
             error = " [invalid value]";
         else

@@ -1,10 +1,9 @@
 function(hg_changeset dir var)
     execute_process(
-        COMMAND hg --repository "${dir}" id -i
+        COMMAND hg --repository "${dir}" log --rev . --template "{node|short}"     
         OUTPUT_VARIABLE changeset
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
-    string(REPLACE "+" "" changeset "${changeset}")
     set(${var} ${changeset} PARENT_SCOPE)
 endfunction()
 
@@ -19,7 +18,7 @@ endfunction()
 
 function(hg_last_commit_branch dir var)
     execute_process(
-        COMMAND hg --repository "${dir}" log --template "{branch}" -r -1
+        COMMAND hg --repository "${dir}" log --template "{branch}" -r .
         OUTPUT_VARIABLE parent_branch
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )

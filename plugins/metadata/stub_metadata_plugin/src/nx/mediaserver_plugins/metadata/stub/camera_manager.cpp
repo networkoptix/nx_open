@@ -11,9 +11,8 @@
 #include <nx/sdk/metadata/common_compressed_video_packet.h>
 
 #define NX_DEBUG_ENABLE_OUTPUT true //< Stub plugin is itself a debug feature, thus is verbose.
-#include <nx/kit/debug.h>
-
 #define NX_PRINT_PREFIX (std::string("[") + this->plugin()->name() + " CameraManager] ")
+#include <nx/kit/debug.h>
 
 namespace nx {
 namespace mediaserver_plugins {

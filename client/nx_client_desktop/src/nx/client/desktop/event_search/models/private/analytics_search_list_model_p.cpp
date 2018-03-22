@@ -23,6 +23,7 @@
 #include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
 
+#include <ini.h>
 #include <nx/client/core/utils/human_readable.h>
 #include <nx/client/desktop/common/widgets/web_view_dialog.h>
 #include <nx/utils/datetime.h>
@@ -68,15 +69,15 @@ AnalyticsSearchListModel::Private::Private(AnalyticsSearchListModel* q):
     base_type(q),
     q(q),
     m_updateTimer(new QTimer()),
-    m_dataChangedTimer(new QTimer()),
+    m_emitDataChanged(new utils::PendingOperation([this] { emitDataChangedIfNeeded(); },
+        std::chrono::milliseconds(kDataChangedInterval).count(), this)),
     m_updateWorkbenchFilter(createUpdateWorkbenchFilterOperation()),
     m_metadataSource(createMetadataSource())
 {
+    m_emitDataChanged->setFlags(utils::PendingOperation::NoFlags);
+
     m_updateTimer->setInterval(std::chrono::milliseconds(kUpdateTimerInterval).count());
     connect(m_updateTimer.data(), &QTimer::timeout, this, &Private::periodicUpdate);
-
-    m_dataChangedTimer->setInterval(std::chrono::milliseconds(kDataChangedInterval).count());
-    connect(m_dataChangedTimer.data(), &QTimer::timeout, this, &Private::emitDataChangedIfNeeded);
 }
 
 AnalyticsSearchListModel::Private::~Private()
@@ -567,7 +568,7 @@ void AnalyticsSearchListModel::Private::emitDataChangedIfNeeded()
     if (m_dataChangedObjectIds.empty())
         return;
 
-    static const QVector<int> kUpdateRoles({Qt::ToolTipRole, Qn::DescriptionTextRole});
+    static const QVector<int> kUpdateRoles({Qt::ToolTipRole, Qn::AdditionalTextRole});
     for (const auto& id: m_dataChangedObjectIds)
     {
         const auto index = indexOf(id);
@@ -584,18 +585,29 @@ void AnalyticsSearchListModel::Private::emitDataChangedIfNeeded()
 void AnalyticsSearchListModel::Private::advanceObject(DetectedObject& object,
     ObjectPosition&& position)
 {
-    // Remove object-related attributes from position.
-    for (int i = int(position.attributes.size()) - 1; i >= 0; --i)
+    // Currently there's a mess between object.attributes and object.track[i].attributes.
+    // There's no clear understanding what to use and what to show.
+    // On GUI side we use just object.attributes for now.
+
+    for (const auto& attribute: position.attributes)
     {
-        if (std::find(object.attributes.cbegin(), object.attributes.cend(), position.attributes[i])
-            != object.attributes.cend())
-        {
-            position.attributes.erase(position.attributes.begin() + i);
-        }
+        auto iter = std::find_if(
+            object.attributes.begin(),
+            object.attributes.end(),
+            [&attribute](const common::metadata::Attribute& value)
+            {
+                return attribute.name == value.name;
+            });
+
+        if (iter != object.attributes.end())
+            iter->value = attribute.value;
+        else
+            object.attributes.push_back(attribute);
     }
 
     object.lastAppearanceTimeUsec = position.timestampUsec;
     m_dataChangedObjectIds.insert(object.objectId);
+    m_emitDataChanged->requestOperation();
 }
 
 int AnalyticsSearchListModel::Private::indexOf(const QnUuid& objectId) const
@@ -617,20 +629,24 @@ int AnalyticsSearchListModel::Private::indexOf(const QnUuid& objectId) const
 QString AnalyticsSearchListModel::Private::description(
     const DetectedObject& object) const
 {
+    if (!ini().showDebugTimeInformationInRibbon)
+        return QString();
+
     QString result;
 
     const auto timeWatcher = q->context()->instance<QnWorkbenchServerTimeWatcher>();
-    const auto start = timeWatcher->displayTime(startTimeMs(object));
+    const auto timestampMs = startTimeMs(object);
+    const auto start = timeWatcher->displayTime(timestampMs);
     // TODO: #vkutin Is this duration formula good enough for us?
     //   Or we need to add some "lastAppearanceDurationUsec"?
     const auto durationUs = object.lastAppearanceTimeUsec - object.firstAppearanceTimeUsec;
 
-    return lit("%1: %2<br>%3: %4")
-        .arg(tr("Start"))
+    return lit("Timestamp: %1<br>Start: %2<br>Duration: %3<br>%4")
+        .arg(timestampMs)
         .arg(start.toString(Qt::RFC2822Date))
-        .arg(tr("Duration"))
         .arg(core::HumanReadable::timeSpan(std::chrono::duration_cast<std::chrono::milliseconds>(
-            std::chrono::microseconds(durationUs))));
+            std::chrono::microseconds(durationUs))))
+        .arg(object.objectId.toSimpleString());
 }
 
 QString AnalyticsSearchListModel::Private::attributes(

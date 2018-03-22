@@ -16,6 +16,8 @@ struct Ini: public nx::kit::IniConfig
         "Don't recreate metadata managers on resource changes (workaround of libtegra_video.so bug).");
     NX_INI_STRING("", stubPluginSettings, "Filename for a JSON Object with Stub Metadata Plugin param values.");
     NX_INI_STRING("", stubCameraManagerSettings, "Filename for a JSON Object with Stub Metadata CameraManager param values.");
+
+    NX_INI_FLAG(0, forceLiveCacheForPrimaryStream, "Always cache primary stream frames in liveCache.");
 };
 
 inline Ini& ini()

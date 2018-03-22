@@ -289,7 +289,7 @@
 #include <nx/mediaserver/updates2/server_updates2_manager.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
 
-#if !defined(EDGE_SERVER)
+#if !defined(EDGE_SERVER) && !defined(__aarch64__)
     #include <nx_speech_synthesizer/text_to_wav.h>
     #include <nx/utils/file_system.h>
 #endif
@@ -1012,7 +1012,7 @@ nx::utils::Url appServerConnectionUrl(QSettings &settings)
 }
 
 MediaServerProcess::MediaServerProcess(int argc, char* argv[], bool serviceMode)
-:
+    :
     m_argc(argc),
     m_argv(argv),
     m_startMessageSent(false),
@@ -3358,7 +3358,7 @@ int MediaServerProcess::main(int argc, char* argv[])
     signal( SIGUSR1, SIGUSR1_handler );
 #endif
 
-#ifndef EDGE_SERVER
+#if !defined(EDGE_SERVER) && !defined(__aarch64__)
     std::unique_ptr<TextToWaveServer> textToWaveServer = std::make_unique<TextToWaveServer>(
         nx::utils::file_system::applicationDirPath(argc, argv));
 

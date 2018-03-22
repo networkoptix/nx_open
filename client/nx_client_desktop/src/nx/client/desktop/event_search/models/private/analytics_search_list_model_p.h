@@ -96,7 +96,7 @@ private:
     QRectF m_filterRect;
     QString m_filterText;
     const QScopedPointer<QTimer> m_updateTimer;
-    const QScopedPointer<QTimer> m_dataChangedTimer;
+    const QScopedPointer<utils::PendingOperation> m_emitDataChanged;
     const QScopedPointer<utils::PendingOperation> m_updateWorkbenchFilter;
     QSet<QnUuid> m_dataChangedObjectIds; //< For which objects delayed dataChanged is queued.
     media::AbstractMetadataConsumerPtr m_metadataSource;

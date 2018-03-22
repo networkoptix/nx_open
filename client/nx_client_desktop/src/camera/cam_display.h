@@ -194,8 +194,15 @@ private:
     bool needBuffering(qint64 vTime) const;
     void processSkippingFramesTime();
     qint64 doSmartSleep(const qint64 needToSleep, float speed);
-    bool fillDataQueue();
-    bool isDataQueueFilled() const;
+
+    bool isDataQueueFull() const;
+
+    enum class QueueSizeType
+    {
+        normalStream,
+        slowStream
+    };
+    int maxDataQueueSize(QueueSizeType type) const;
 
     static qint64 initialLiveBufferMkSecs();
     static qint64 maximumLiveBufferMkSecs();
@@ -286,7 +293,7 @@ protected:
     bool m_fisheyeEnabled;
     int m_channelsCount;
 
-    std::chrono::milliseconds m_forcedVideoBufferLength = std::chrono::milliseconds::zero();
+    std::chrono::microseconds m_forcedVideoBufferLength = std::chrono::microseconds::zero();
     qint64 m_lastQueuedVideoTime;
     int m_liveBufferSize;
     bool m_liveMaxLenReached;

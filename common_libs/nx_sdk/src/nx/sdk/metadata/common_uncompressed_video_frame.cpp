@@ -60,7 +60,7 @@ int CommonUncompressedVideoFrame::dataSize(int plane) const
     if (!m_externalData.empty())
         return m_externalDataSize.at(plane);
     if (!m_ownedData.empty())
-        return m_ownedData.at(plane).size();
+        return (int) m_ownedData.at(plane).size();
 
     return 0;
 }

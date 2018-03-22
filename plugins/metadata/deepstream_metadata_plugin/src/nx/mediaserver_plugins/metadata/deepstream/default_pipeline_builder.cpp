@@ -4,8 +4,10 @@
 #include <fstream>
 
 #include "utils.h"
-#include "default_pipeline.h"
 #include "default_pipeline_callbacks.h"
+
+#include "secondary_gie_builder.h"
+#include "secondary_gie_common.h"
 
 #include "deepstream_common.h"
 #include "deepstream_metadata_plugin_ini.h"
@@ -17,7 +19,10 @@ namespace mediaserver_plugins {
 namespace metadata {
 namespace deepstream {
 
-DefaultPipelineBuilder::DefaultPipelineBuilder()
+DefaultPipelineBuilder::DefaultPipelineBuilder(
+    const std::vector<ObjectClassDescription>& objectClassDescritions)
+    :
+    m_objectClassDescritions(objectClassDescritions)
 {
     ini().reload();
 }
@@ -25,12 +30,21 @@ DefaultPipelineBuilder::DefaultPipelineBuilder()
 std::unique_ptr<nx::gstreamer::Pipeline> DefaultPipelineBuilder::build(
     const std::string& pipelineName)
 {
+    if (ini().pipelineType == kOpenAlprPipeline)
+        return buildOpenAlprDeepStreamPipeline(pipelineName);
+
+    return buildDefaultDeepStreamPipeline(pipelineName);
+}
+
+std::unique_ptr<gstreamer::Pipeline> DefaultPipelineBuilder::buildDefaultDeepStreamPipeline(
+    const gstreamer::ElementName& pipelineName)
+{
     NX_OUTPUT << __func__ << " Building pipeline " << pipelineName;
     auto pipeline =
-        std::make_unique<DefaultPipeline>(pipelineName);
+        std::make_unique<DefaultPipeline>(pipelineName, m_objectClassDescritions);
 
     NX_OUTPUT << __func__ << " Creating elements and bins for " << pipelineName;
-    auto appSource = createAppSource(pipelineName);
+    auto appSource = createAppSource(pipeline.get(), pipelineName);
     auto preGieBin = buildPreGieBin(pipelineName);
     auto primaryGieBin = buildPrimaryGieBin(pipelineName, pipeline.get());
     auto trackerBin = buildTrackerBin(pipelineName, pipeline.get());
@@ -52,50 +66,53 @@ std::unique_ptr<nx::gstreamer::Pipeline> DefaultPipelineBuilder::build(
     secondaryGieBin->linkAfter(trackerBin.get());
     fakeSink->linkAfter(secondaryGieBin.get());
 
-    NX_OUTPUT
-        << __func__
-        << " Connecting appsource 'need-data' signal for pipeline " << pipelineName;
+    connectToPreGieBin(
+        preGieBin.get(),
+        primaryGieBin.get(),
+        pipelineName);
 
-    g_signal_connect(
-        appSource->nativeElement(),
-        "need-data",
-        G_CALLBACK(appSourceNeedData),
-        pipeline.get());
-
-    NX_OUTPUT
-        << __func__
-        << " Connecting decoder bin 'pad-added' signal for pipeline " << pipelineName;
-
-    auto pad = gst_element_get_static_pad(
-        primaryGieBin->nativeElement(),
-        "sink");
-
-    g_signal_connect(
-        preGieBin->nativeElement(),
-        "pad-added",
-        G_CALLBACK(decodeBinPadAdded),
-        pad);
-
-    g_object_unref(G_OBJECT(pad));
-
-    NX_OUTPUT << __func__ << " Creating main loop and bus for pipeline " << pipelineName;
-    auto mainLoop = LoopPtr(
-        g_main_loop_new(NULL, false),
-        [](GMainLoop* loop) { g_main_loop_unref(loop); });
-
-    auto bus = gst_pipeline_get_bus(GST_PIPELINE(pipeline->nativeElement()));
-    gst_bus_add_watch(bus, busCallback, pipeline.get());
-    gst_object_unref(bus);
-
-    pipeline->setMainLoop(std::move(mainLoop));
-
-    GST_DEBUG_BIN_TO_DOT_FILE_WITH_TS(
-        GST_BIN(pipeline->nativeElement()),
-        GST_DEBUG_GRAPH_SHOW_ALL,
-        "nx-pipeline-null");
+    createMainLoop(pipeline.get(), pipelineName);
 
     auto trackingMapper = pipeline->trackingMapper();
     trackingMapper->setLabelMapping(makeLabelMapping());
+
+    return pipeline;
+}
+
+std::unique_ptr<gstreamer::Pipeline> DefaultPipelineBuilder::buildOpenAlprDeepStreamPipeline(
+    const gstreamer::ElementName& pipelineName)
+{
+    NX_OUTPUT << __func__ << " (OpenALPR) Building pipeline " << pipelineName;
+    auto pipeline =
+        std::make_unique<DefaultPipeline>(pipelineName, m_objectClassDescritions);
+
+    NX_OUTPUT << __func__ << " (OpenALPR) Creating elements and bins for " << pipelineName;
+    auto appSource = createAppSource(pipeline.get(), pipelineName);
+    auto preGieBin = buildPreGieBin(pipelineName);
+    auto primaryGieBin = buildPrimaryGieBin(pipelineName, pipeline.get());
+    auto openAlprBin = buildOpenAlprBin(pipeline.get(), pipelineName);
+    auto tracker = buildTrackerBin(pipelineName, pipeline.get());
+    auto fakeSink = createFakeSink(pipelineName);
+
+    NX_OUTPUT << __func__ << " (OpenALPR) Adding elements and bins to pipeline " << pipelineName;
+    pipeline->add(appSource.get());
+    pipeline->add(preGieBin.get());
+    pipeline->add(primaryGieBin.get());
+    pipeline->add(openAlprBin.get());
+    pipeline->add(tracker.get());
+    pipeline->add(fakeSink.get());
+
+    preGieBin->linkAfter(appSource.get());
+    openAlprBin->linkAfter(primaryGieBin.get());
+    tracker->linkAfter(openAlprBin.get());
+    fakeSink->linkAfter(tracker.get());
+
+    connectToPreGieBin(
+        preGieBin.get(),
+        primaryGieBin.get(),
+        pipelineName);
+
+    createMainLoop(pipeline.get(), pipelineName);
 
     return pipeline;
 }
@@ -208,121 +225,106 @@ std::unique_ptr<nx::gstreamer::Bin> DefaultPipelineBuilder::buildTrackerBin(
     return bin;
 }
 
+std::unique_ptr<gstreamer::Bin> DefaultPipelineBuilder::buildOpenAlprBin(
+    DefaultPipeline* pipeline,
+    const gstreamer::ElementName& pipelineName)
+{
+    NX_OUTPUT << __func__ << " Creating OpenALPR bin for " << pipelineName;
+
+    auto openAlpr = std::make_unique<nx::gstreamer::Element>(
+        kElementOpenAlpr,
+        makeElementName(pipelineName, kElementOpenAlpr, "openAlpr"));
+
+    auto inputQueue = std::make_unique<nx::gstreamer::Element>(
+        kGstElementQueue,
+        makeElementName(pipelineName, kGstElementQueue, "openAlpr_inputQueue"));
+
+    auto converter = std::make_unique<nx::gstreamer::Element>(
+        kNvidiaElementVideoConverter,
+        makeElementName(pipelineName, kNvidiaElementVideoConverter, "openAlpr_NvVideoConverter"));
+
+    auto capsFilter = std::make_unique<nx::gstreamer::Element>(
+        kGstElementCapsFilter,
+        makeElementName(pipelineName, kGstElementCapsFilter, "openAlpr_CapsFilter"));
+
+    auto outputQueue = std::make_unique<nx::gstreamer::Element>(
+        kGstElementQueue,
+        makeElementName(pipelineName, kGstElementQueue, "openAlpr_outputQueue"));
+
+    g_object_set(
+        G_OBJECT(openAlpr->nativeElement()),
+        "full-frame",
+        TRUE,
+    #if 0 //< TODO: #dmishin pass processing resolution to OpenALPR
+        "processing-width",
+        1920,
+        "processing-height",
+        1080,
+    #endif
+        NULL);
+
+    auto bin = std::make_unique<nx::gstreamer::Bin>(
+        makeElementName(pipelineName, "bin", "openAlprBin"));
+
+    bin->add(inputQueue.get());
+#if 0
+    bin->add(converter.get());
+    bin->add(capsFilter.get());
+#endif
+    bin->add(openAlpr.get());
+    bin->add(outputQueue.get());
+
+#if 0
+    converter->linkAfter(inputQueue.get());
+    capsFilter->linkAfter(converter.get());
+#endif
+    openAlpr->linkAfter(inputQueue.get());
+    outputQueue->linkAfter(openAlpr.get());
+
+    bin->createGhostPad(inputQueue.get(), kSinkPadName);
+    bin->createGhostPad(outputQueue.get(), kSourcePadName);
+
+    auto probePad = gst_element_get_static_pad(
+        bin->nativeElement(),
+        kSinkPadName);
+
+    gst_pad_add_probe(
+        probePad,
+        GST_PAD_PROBE_TYPE_BUFFER,
+        dropOpenAlprFrames,
+        NULL,
+        NULL);
+
+    gst_object_unref(GST_OBJECT(probePad));
+
+    //-- HANDLE METADATA
+    auto outputProbePad = gst_element_get_static_pad(
+        bin->nativeElement(),
+        kSourcePadName);
+
+    gst_pad_add_probe(
+        outputProbePad,
+        GST_PAD_PROBE_TYPE_BUFFER,
+        processOpenAlprResult,
+        pipeline,
+        NULL);
+
+    gst_object_unref(GST_OBJECT(outputProbePad));
+    return bin;
+}
+
 std::unique_ptr<nx::gstreamer::Bin> DefaultPipelineBuilder::buildSecondaryGieBin(
     const nx::gstreamer::ElementName& pipelineName,
     DefaultPipeline* pipeline)
 {
     NX_OUTPUT << __func__ << " Creating secondary GIE bin for " << pipelineName;
-    auto bin = std::make_unique<nx::gstreamer::Bin>(
-        makeElementName(pipelineName, "bin", "sgieBin"));
-
-    auto tee = std::make_unique<nx::gstreamer::Element>(
-        kGstElementTee,
-        makeElementName(pipelineName, kGstElementTee, "sgieTee"));
-
-    auto outputQueue = std::make_unique<nx::gstreamer::Element>(
-        kGstElementQueue,
-        makeElementName(pipelineName, kGstElementQueue, "sgieOutputQueue"));
-
-    // Config dependent number of classifiers.
-    auto secondaryGieQueue = std::make_unique<nx::gstreamer::Element>(
-        kGstElementQueue,
-        makeElementName(pipelineName, kGstElementQueue, "sgieQueue0"));
-
-    auto secondaryGie = std::make_unique<nx::gstreamer::Element>(
-        kNvidiaElementGie,
-        makeElementName(pipelineName, kNvidiaElementGie, "sgieInferenceEngine0"));
-
-    auto secondaryGieFakeSink = std::make_unique<nx::gstreamer::Element>(
-        kGstElementFakeSink,
-        makeElementName(pipelineName, kGstElementFakeSink, "sgieFakeSink"));
-
-    bin->add(secondaryGieQueue.get());
-    bin->add(secondaryGie.get());
-    bin->add(secondaryGieFakeSink.get());
-
-// ---------------------------------------------
-
-    bin->add(tee.get());
-    bin->add(outputQueue.get());
-
-    secondaryGieQueue->linkToRequestPad(
-        tee.get(),
-        "src_%u",
-        kSinkPadName);
-
-    outputQueue->linkToRequestPad(
-        tee.get(),
-        "src_%u",
-        kSinkPadName);
-
-    secondaryGie->linkAfter(secondaryGieQueue.get());
-    secondaryGieFakeSink->linkAfter(secondaryGie.get());
-
-    bin->createGhostPad(tee.get(), kSinkPadName);
-    bin->createGhostPad(outputQueue.get(), kSourcePadName);
-
-    secondaryGie->setProperties(
-        {
-            nx::gstreamer::makeProperty("net-scale-factor", ini().sgie0_netScaleFactor),
-            nx::gstreamer::makeProperty("model-path", ini().sgie0_modelFile),
-            nx::gstreamer::makeProperty("protofile-path", ini().sgie0_protoFile),
-            nx::gstreamer::makeProperty(
-                "meanfile-path",
-                (const gchar*)NULL/*ini().sgie0_meanFile*/),
-            nx::gstreamer::makeProperty("labelfile-path", ini().sgie0_labelFile),
-            nx::gstreamer::makeProperty("net-stride", (guint) ini().sgie0_netStride),
-            nx::gstreamer::makeProperty("batch-size", (guint) ini().sgie0_batchSize),
-            nx::gstreamer::makeProperty("gie-mode", guint{2}),
-            nx::gstreamer::makeProperty("interval", (guint) ini().sgie0_inferenceInterval),
-            nx::gstreamer::makeProperty("detected-min-w-h", ini().sgie0_minDetectedWH),
-            nx::gstreamer::makeProperty("detected-max-w-h", ini().sgie0_maxDetectedWH),
-            nx::gstreamer::makeProperty("model-cache", ini().sgie0_cacheFile),
-            nx::gstreamer::makeProperty("model-color-format", ini().sgie0_colorFormat),
-            nx::gstreamer::makeProperty("class-thresh-params", ini().sgie0_classThresholds),
-            nx::gstreamer::makeProperty("detect-clr", guint{0}),
-            nx::gstreamer::makeProperty("force-fp32", ini().sgie0_forceFp32),
-            nx::gstreamer::makeProperty("enable-dbscan", ini().sgie0_enableDbScan),
-            nx::gstreamer::makeProperty("crypto-flags", gboolean{0}),
-            nx::gstreamer::makeProperty(
-                "sec-class-threshold",
-                ini().sgie0_secondaryGieClassifierThreshold),
-            nx::gstreamer::makeProperty("gie-unique-id", ini().sgie0_gieUniqueId),
-            nx::gstreamer::makeProperty("infer-on-gie-id", ini().sgie0_makeInferenceOnGieWithId),
-            nx::gstreamer::makeProperty(
-                "infer-on-class-ids",
-                ini().sgie0_makeInferenceOnClassIds),
-            nx::gstreamer::makeProperty("is-classifier", ini().sgie0_isClassifier),
-            nx::gstreamer::makeProperty("offsets", ini().sgie0_colorOffsets),
-            nx::gstreamer::makeProperty(
-                "output-bbox-layer-name",
-                ini().sgie0_outputBboxLayerName),
-            nx::gstreamer::makeProperty(
-                "output-coverage-layer-names",
-                ini().sgie0_outputCoverageLayerNames),
-
-            nx::gstreamer::makeProperty("parse-func", guint{0}),
-            nx::gstreamer::makeProperty("parse-bbox-func-name", (const gchar*)NULL),
-            nx::gstreamer::makeProperty("parse-bbox-lib-name", (const gchar*)NULL)
-        });
-
-    auto probePad = gst_element_get_static_pad(
-        bin->nativeElement(),
-        kSourcePadName);
-
-    gst_pad_add_probe(
-        probePad,
-        GST_PAD_PROBE_TYPE_BUFFER,
-        waitForSecondaryGieDoneBufProbe,
-        pipeline,
-        NULL);
-
-    gst_object_unref(GST_OBJECT(probePad));
-
-    return bin;
+    return SecondaryGieBuilder::buildSecondaryGie(
+        pipelineName,
+        pipeline);
 }
 
 std::unique_ptr<nx::gstreamer::Element> DefaultPipelineBuilder::createAppSource(
+    nx::gstreamer::Pipeline* pipeline,
     const nx::gstreamer::ElementName& pipelineName)
 {
     NX_OUTPUT << __func__ << " Creating application source for pipeline " << pipelineName;
@@ -347,6 +349,16 @@ std::unique_ptr<nx::gstreamer::Element> DefaultPipelineBuilder::createAppSource(
         TRUE,
         NULL);
 
+    NX_OUTPUT
+        << __func__
+        << " Connecting appsource 'need-data' signal for pipeline " << pipelineName;
+
+    g_signal_connect(
+        appSource->nativeElement(),
+        "need-data",
+        G_CALLBACK(appSourceNeedData),
+        pipeline);
+
     return appSource;
 }
 
@@ -361,24 +373,78 @@ std::unique_ptr<gstreamer::Element> DefaultPipelineBuilder::createFakeSink(
     return fakeSink;
 }
 
+void DefaultPipelineBuilder::connectToPreGieBin(
+    nx::gstreamer::Element* preGieBin,
+    nx::gstreamer::Element* postGieElement,
+    const nx::gstreamer::ElementName& pipelineName)
+{
+    NX_OUTPUT
+        << __func__
+        << " Connecting decoder bin 'pad-added' signal for pipeline " << pipelineName;
+
+    auto pad = gst_element_get_static_pad(
+        postGieElement->nativeElement(),
+        "sink");
+
+    g_signal_connect(
+        preGieBin->nativeElement(),
+        "pad-added",
+        G_CALLBACK(decodeBinPadAdded),
+        pad);
+
+    g_object_unref(G_OBJECT(pad));
+}
+
+void DefaultPipelineBuilder::createMainLoop(
+    DefaultPipeline* pipeline,
+    const nx::gstreamer::ElementName& pipelineName)
+{
+    NX_OUTPUT << __func__ << " Creating main loop and bus for pipeline " << pipelineName;
+    auto mainLoop = LoopPtr(
+        g_main_loop_new(NULL, false),
+        [](GMainLoop* loop) { g_main_loop_unref(loop); });
+
+    auto bus = gst_pipeline_get_bus(GST_PIPELINE(pipeline->nativeElement()));
+    gst_bus_add_watch(bus, busCallback, pipeline);
+    gst_object_unref(bus);
+
+    pipeline->setMainLoop(std::move(mainLoop));
+
+    GST_DEBUG_BIN_TO_DOT_FILE(
+        GST_BIN(pipeline->nativeElement()),
+        GST_DEBUG_GRAPH_SHOW_ALL,
+        "nx-pipeline-null-initial");
+}
+
 std::map<LabelMappingId, LabelMapping> DefaultPipelineBuilder::makeLabelMapping()
 {
-    NX_OUTPUT << __func__ << " Making label mapping from label files files";
     std::map<LabelMappingId, LabelMapping> result;
-    auto rawLabels = parseLabelFile(ini().sgie0_labelFile);
 
-    LabelMapping labelMapping;
-    for (auto i = 0; i < rawLabels.size(); ++i)
+    for (auto i = 0; i < kMaxClassifiers; ++i)
     {
-        LabelTypeMapping labelTypeMapping;
-        labelTypeMapping.labelTypeString = "Vehicle type"; //< TODO: #dmishin remove hardcode!
-        for (auto j = 0; j < rawLabels[i].size(); ++j)
-            labelTypeMapping.labelValueMapping.emplace(j, rawLabels[i][j]);
+        if (!isSecondaryGieEnabled(i))
+            continue;
 
-        labelMapping.emplace(i, labelTypeMapping);
+        const auto labelFile = labelFileByIndex(i);
+        if (labelFile.empty())
+            continue;
+
+        auto rawLabels = parseLabelFile(labelFile);
+        NX_OUTPUT << __func__ << " Making label mapping from label files files";
+        LabelMapping labelMapping;
+        for (auto j = 0; j < rawLabels.size(); ++j)
+        {
+            LabelTypeMapping labelTypeMapping;
+            labelTypeMapping.labelTypeString = labelTypeByIndex(i);
+            for (auto k = 0; k < rawLabels[j].size(); ++k)
+                labelTypeMapping.labelValueMapping.emplace(k, rawLabels[j][k]);
+
+            labelMapping.emplace(j, labelTypeMapping);
+        }
+
+        result.emplace(uniqueIdByIndex(i), labelMapping);
     }
 
-    result.emplace(ini().sgie0_gieUniqueId, labelMapping);
     return result;
 }
 
@@ -401,14 +467,6 @@ RawLabels DefaultPipelineBuilder::parseLabelFile(const std::string& path) const
     }
 
     return result;
-}
-
-std::string DefaultPipelineBuilder::makeElementName(
-    const nx::gstreamer::ElementName& pipelineName,
-    const nx::gstreamer::FactoryName& factoryName,
-    const nx::gstreamer::ElementName& elementName)
-{
-    return pipelineName + "_" + factoryName + "_" + elementName;
 }
 
 } // namespace deepstream

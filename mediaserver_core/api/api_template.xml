@@ -2720,6 +2720,18 @@ the respective JSON fields can be empty.</description>
                             <optional>false</optional>
                         </param>
                         <param>
+                            <name>cameraId</name>
+                            <description>
+                                Id of a camera from which the action was triggered.</description>
+                            <optional>false</optional>
+                        </param>
+                        <param>
+                            <name>timestampUs</name>
+                            <description>
+                                Timestamp (microseconds) of the video frame from which the action was triggered.</description>
+                            <optional>false</optional>
+                        </param>
+                        <param>
                             <name>params</name>
                             <description>
                                 JSON object with key-value pairs containing values for the action

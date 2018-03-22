@@ -48,7 +48,7 @@ void TrackingMapper::setLabelMapping(std::map<LabelMappingId, LabelMapping> labe
     m_labelMapping = labelMapping;
 }
 
-std::vector<sdk::metadata::CommonAttribute> TrackingMapper::attributes(
+std::deque<sdk::metadata::CommonAttribute> TrackingMapper::attributes(
     const ROIMeta_Params& roiMeta)
 {
     NX_OUTPUT
@@ -57,12 +57,12 @@ std::vector<sdk::metadata::CommonAttribute> TrackingMapper::attributes(
 
     auto objectItr = m_trackingMap.find(roiMeta.tracking_id);
     if (objectItr == m_trackingMap.cend())
-        return std::vector<nx::sdk::metadata::CommonAttribute>();
+        return std::deque<nx::sdk::metadata::CommonAttribute>();
 
     if (!roiMeta.has_new_info)
         return objectItr->second.attributes;
 
-    std::vector<nx::sdk::metadata::CommonAttribute> result;
+    std::deque<nx::sdk::metadata::CommonAttribute> result;
     for (const auto& entry: m_labelMapping)
     {
         const auto mappingId = entry.first;

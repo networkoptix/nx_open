@@ -240,6 +240,10 @@ if(withDistributions)
         add_subdirectory(debsetup)
     endif()
 
+    if(box STREQUAL "tx1")
+        add_subdirectory(tx1setup)
+    endif()
+
     if(MACOSX)
         add_subdirectory(macsetup)
     endif()

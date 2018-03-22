@@ -1,8 +1,8 @@
 #include "common_plugin.h"
-#include <nx/kit/debug.h>
 
 #define NX_DEBUG_ENABLE_OUTPUT m_enableOutput
 #define NX_PRINT_PREFIX (std::string("[") + m_name + "] ")
+#include <nx/kit/debug.h>
 
 namespace nx {
 namespace sdk {
@@ -141,7 +141,8 @@ void CommonPlugin::executeAction(Action* action, Error* outError)
     std::string actionUrl;
     std::string messageToUser;
     executeAction(
-        action->actionId(), action->objectId(), params, &actionUrl, &messageToUser, outError);
+        action->actionId(), action->objectId(), action->cameraId(), action->timestampUs(), params,
+        &actionUrl, &messageToUser, outError);
 
     const char* const actionUrlPtr = actionUrl.empty() ? nullptr : actionUrl.c_str();
     const char* const messageToUserPtr = messageToUser.empty() ? nullptr : messageToUser.c_str();

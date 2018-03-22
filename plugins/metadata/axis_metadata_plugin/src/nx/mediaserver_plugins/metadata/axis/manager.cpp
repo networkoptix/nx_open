@@ -8,9 +8,9 @@
 #include <nx/sdk/metadata/common_metadata_packet.h>
 #include <nx/api/analytics/device_manifest.h>
 #include <nx/fusion/serialization/json.h>
-#include <nx/kit/debug.h>
 
 #define NX_PRINT_PREFIX "[metadata::axis::Manager] "
+#include <nx/kit/debug.h>
 
 namespace nx {
 namespace mediaserver_plugins {
