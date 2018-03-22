@@ -570,7 +570,6 @@ void AnalyticsSearchListModel::Private::emitDataChangedIfNeeded()
     if (m_dataChangedObjectIds.empty())
         return;
 
-    static const QVector<int> kUpdateRoles({Qt::ToolTipRole, Qn::AdditionalTextRole});
     for (const auto& id: m_dataChangedObjectIds)
     {
         const auto index = indexOf(id);
@@ -578,7 +577,7 @@ void AnalyticsSearchListModel::Private::emitDataChangedIfNeeded()
             continue;
 
         const auto modelIndex = q->index(index);
-        emit q->dataChanged(modelIndex, modelIndex, kUpdateRoles);
+        emit q->dataChanged(modelIndex, modelIndex);
     }
 
     m_dataChangedObjectIds.clear();
@@ -634,8 +633,6 @@ QString AnalyticsSearchListModel::Private::description(
     if (!ini().showDebugTimeInformationInRibbon)
         return QString();
 
-    QString result;
-
     const auto timeWatcher = q->context()->instance<QnWorkbenchServerTimeWatcher>();
     const auto timestampMs = startTimeMs(object);
     const auto start = timeWatcher->displayTime(timestampMs);
@@ -643,11 +640,11 @@ QString AnalyticsSearchListModel::Private::description(
     //   Or we need to add some "lastAppearanceDurationUsec"?
     const auto durationUs = object.lastAppearanceTimeUsec - object.firstAppearanceTimeUsec;
 
-    return lit("Timestamp: %1<br>Start: %2<br>Duration: %3<br>%4")
+    using namespace std::chrono;
+    return lit("Timestamp: %1 ms<br>As date & time: %2<br>Duration: %3 ms<br>%4")
         .arg(timestampMs)
         .arg(start.toString(Qt::RFC2822Date))
-        .arg(core::HumanReadable::timeSpan(std::chrono::duration_cast<std::chrono::milliseconds>(
-            std::chrono::microseconds(durationUs))))
+        .arg(duration_cast<milliseconds>(microseconds(durationUs)).count())
         .arg(object.objectId.toSimpleString());
 }
 
