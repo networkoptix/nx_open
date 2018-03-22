@@ -12,8 +12,7 @@ let AppComponent = class AppComponent {
 AppComponent = __decorate([
     core_1.Component({
         selector: 'nx-app',
-        template: `
-        <nx-header></nx-header>
+        template: `        
         <router-outlet></router-outlet>
         <div ng-view="" ng-model-options="{ updateOn: 'blur' }"></div>
     `,

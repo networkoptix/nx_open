@@ -7,9 +7,6 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@angular/core");
-// import { cloudApiService } from '../app/scripts/services/cloud_api';
-// import { languageService } from '../app/scripts/services/language';
-// import { uuid2Service } from '../app/scripts/services/angular-uuid2';
 function cloudApiFactory(i) {
     return i.get('cloudApi');
 }
@@ -64,13 +61,13 @@ exports.ngToastProvider = {
     useFactory: ngToastFactory,
     deps: ['$injector']
 };
-function systemsFactory(i) {
+function systemsServiceFactory(i) {
     return i.get('systemsProvider');
 }
-exports.systemsFactory = systemsFactory;
-exports.systemsProvider = {
+exports.systemsServiceFactory = systemsServiceFactory;
+exports.systemsServiceProvider = {
     provide: 'systemsProvider',
-    useFactory: systemsFactory,
+    useFactory: systemsServiceFactory,
     deps: ['$injector']
 };
 function uuid2Factory(i) {
@@ -157,7 +154,7 @@ let systemsModule = class systemsModule {
 systemsModule = __decorate([
     core_1.NgModule({
         providers: [
-            exports.systemsProvider
+            exports.systemsServiceProvider
         ]
     })
 ], systemsModule);

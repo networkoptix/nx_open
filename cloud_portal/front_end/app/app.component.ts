@@ -1,10 +1,8 @@
-import { Component } from '@angular/core';
-import {NxHeaderComponent} from './components/header/header.component';
+import {Component} from '@angular/core';
 
 @Component({
     selector: 'nx-app',
-    template: `
-        <nx-header></nx-header>
+    template: `        
         <router-outlet></router-outlet>
         <div ng-view="" ng-model-options="{ updateOn: 'blur' }"></div>
     `,

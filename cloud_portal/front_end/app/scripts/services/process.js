@@ -2,8 +2,8 @@
     'use strict';
     angular
         .module('cloudApp')
-        .factory('process', ['$q', 'dialogs', 'cloudApi', 'account', 'languageService',
-        function ($q, dialogs, cloudApi, account, languageService) {
+        .factory('process', ['$q', 'ngToast', 'cloudApi', 'account', 'languageService',
+        function ($q, ngToast, cloudApi, account, languageService) {
             let lang = languageService.lang;
             function formatError(error, errorCodes) {
                 if (!error || !error.resultCode) {
@@ -85,7 +85,15 @@
                                 if (formatted !== false) {
                                     self.errorMessage = formatted;
                                     // Error handler here
-                                    dialogs.notify(errorPrefix + self.errorMessage, 'danger', holdAlerts);
+                                    // Circular dependencies ... keep ngToast for no -- TT
+                                    // nxDialogsService.notify(errorPrefix + self.errorMessage, 'danger', holdAlerts);
+                                    ngToast.create({
+                                        className: 'danger',
+                                        content: errorPrefix + self.errorMessage,
+                                        dismissOnTimeout: !holdAlerts,
+                                        dismissOnClick: !holdAlerts,
+                                        dismissButton: holdAlerts
+                                    });
                                 }
                                 deferred.reject(data);
                             }
@@ -99,7 +107,15 @@
                                 else {
                                     self.success = true;
                                     if (successMessage && data !== false) {
-                                        dialogs.notify(successMessage, 'success', holdAlerts);
+                                        // nxDialogsService.notify(successMessage, 'success', holdAlerts);
+                                        // Circular dependencies ... keep ngToast for no -- TT
+                                        ngToast.create({
+                                            className: 'success',
+                                            content: successMessage,
+                                            dismissOnTimeout: !holdAlerts,
+                                            dismissOnClick: !holdAlerts,
+                                            dismissButton: holdAlerts
+                                        });
                                     }
                                     deferred.resolve(data);
                                 }

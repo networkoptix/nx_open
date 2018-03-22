@@ -32,6 +32,14 @@ __decorate([
     core_1.Input(),
     __metadata("design:type", Object)
 ], LoginModalContent.prototype, "login", void 0);
+__decorate([
+    core_1.Input(),
+    __metadata("design:type", Object)
+], LoginModalContent.prototype, "cancellable", void 0);
+__decorate([
+    core_1.Input(),
+    __metadata("design:type", Object)
+], LoginModalContent.prototype, "closable", void 0);
 LoginModalContent = __decorate([
     core_1.Component({
         selector: 'ngbd-modal-content',
@@ -57,11 +65,14 @@ let NxModalLoginComponent = class NxModalLoginComponent {
             remember: true
         };
     }
-    open() {
+    open(keepPage) {
         this.modalRef = this.modalService.open(LoginModalContent);
         this.modalRef.componentInstance.auth = this.auth;
         this.modalRef.componentInstance.language = this.language;
         this.modalRef.componentInstance.login = this.login;
+        this.modalRef.componentInstance.cancellable = !keepPage || false;
+        this.modalRef.componentInstance.closable = true;
+        return this.modalRef;
     }
     close() {
         this.modalRef.close();

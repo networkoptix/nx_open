@@ -34,7 +34,7 @@ let BarComponent = class BarComponent {
     //     return this.http.get('/static/languages.json', {});
     // }
     login() {
-        this.loginModal.open();
+        // this.loginModal.open();
     }
     ngOnInit() {
         this.serviceMessage = this.uuid2.newguid();
@@ -57,8 +57,8 @@ let BarComponent = class BarComponent {
         this.cloudApi
             .getLanguages()
             .then((data) => {
-            console.log('Data: ', data.data);
-            console.log('Length: ', data.data.length);
+            // console.log('Data: ', data.data);
+            // console.log('Length: ', data.data.length);
         });
     }
 };

@@ -4,17 +4,17 @@
 
     angular
         .module('cloudApp')
-        .directive('__DEPRECATED__nxHeader', NxHeader);
+        .directive('nxHeader', NxHeader);
 
-    NxHeader.$inject = ['dialogs', 'cloudApi', 'account', '$location', '$route',
-        'systemsProvider', 'CONFIG'];
+    NxHeader.$inject = [ 'nxDialogsService', 'cloudApi', 'account', '$location', '$route',
+        'systemsProvider', 'CONFIG' ];
 
-    function NxHeader(dialogs, cloudApi, account, $location, $route,
+    function NxHeader(nxDialogsService, cloudApi, account, $location, $route,
                       systemsProvider, CONFIG) {
         return {
-            restrict: 'E',
+            restrict   : 'E',
             templateUrl: CONFIG.viewsDir + 'components/header.html',
-            link: function (scope) {
+            link       : function (scope) {
                 scope.config = CONFIG;
                 scope.inline = typeof($location.search().inline) != 'undefined';
 
@@ -23,7 +23,7 @@
                 }
 
                 scope.login = function () {
-                    dialogs.login();
+                    nxDialogsService.login();
                 };
                 scope.logout = function () {
                     account.logout();
@@ -32,7 +32,7 @@
                 scope.systemsProvider = systemsProvider;
                 scope.$watch('systemsProvider.systems', function () {
                     scope.systems = scope.systemsProvider.systems;
-                    scope.singleSystem = scope.systems.length == 1;
+                    scope.singleSystem = (scope.systems.length == 1);
                     scope.systemCounter = scope.systems.length;
                     updateActiveSystem();
                 });
@@ -62,7 +62,7 @@
                         return $route.current.params.systemId == system.id;
                     });
                     if (scope.singleSystem) { // Special case for a single system - it always active
-                        scope.activeSystem = scope.systems[0];
+                        scope.activeSystem = scope.systems[ 0 ];
                     }
                 }
 

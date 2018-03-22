@@ -1,7 +1,7 @@
 import {NgModule} from '@angular/core';
 import {Location, PathLocationStrategy, LocationStrategy, CommonModule} from '@angular/common';
 import {BrowserModule} from '@angular/platform-browser';
-import {downgradeComponent, UpgradeModule} from '@angular/upgrade/static';
+import {downgradeComponent, downgradeInjectable, UpgradeModule} from '@angular/upgrade/static';
 import {RouterModule, UrlHandlingStrategy, UrlTree, Routes} from '@angular/router';
 import {HttpClientModule} from '@angular/common/http';
 
@@ -13,19 +13,22 @@ import {OrderModule} from 'ngx-order-pipe';
 
 import {CoreModule} from './core/index';
 
-import {cloudApiServiceProvider, systemsProvider, CONFIGModule} from './ajs-upgraded-providers';
+import {cloudApiServiceProvider} from './ajs-upgraded-providers';
+import {systemsModule} from './ajs-upgraded-providers';
+// import {CONFIGModule} from './ajs-upgraded-providers';
 import {languageServiceModule} from './ajs-upgraded-providers';
 import {accountServiceModule} from './ajs-upgraded-providers';
 import {processServiceModule} from './ajs-upgraded-providers';
 import {uuid2ServiceModule} from './ajs-upgraded-providers';
+import {ngToastModule} from './ajs-upgraded-providers';
 
 import {AppComponent} from './app.component';
 import {BarModule} from './bar/bar.module';
 import {NxLanguageDropdown} from "./dropdown/language.component";
 import {NxModalLoginComponent, LoginModalContent} from "./dialogs/login/login.component";
 import {NxProcessButtonComponent} from './components/process-button/process-button.component';
-import {NxHeaderComponent} from './components/header/header.component';
-
+import {nxDialogsService} from "./dialogs/dialogs.service";
+import {GeneralModalContent, NxModalGeneralComponent} from "./dialogs/general/general.component";
 
 class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
     // use only process the `/bar` url
@@ -56,29 +59,40 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
         languageServiceModule,
         accountServiceModule,
         processServiceModule,
+        systemsModule,
+        ngToastModule,
 
         NgbModule.forRoot(),
         RouterModule.forRoot([], {initialNavigation: false})
     ],
     entryComponents: [
         NxLanguageDropdown,
-        NxModalLoginComponent,
         NxProcessButtonComponent,
-        LoginModalContent
+        LoginModalContent,
+        NxModalLoginComponent,
+        GeneralModalContent,
+        NxModalGeneralComponent
     ],
     providers: [
         NgbModal,
         Location,
         {provide: LocationStrategy, useClass: PathLocationStrategy},
         {provide: UrlHandlingStrategy, useClass: HybridUrlHandlingStrategy},
-        {provide: '$scope', useFactory: i => i.get('$rootScope'), deps: ['$injector']},
+        // {provide: '$scope', useFactory: i => i.get('$rootScope'), deps: ['$injector']},
+        // {provide: '$rootScope', useFactory: i => i.get('$rootScope'), deps: ['$injector']},
         cloudApiServiceProvider,
-        systemsProvider,
-        NxModalLoginComponent
+        NxModalLoginComponent,
+        NxModalGeneralComponent,
+        NxProcessButtonComponent,
+        nxDialogsService
     ],
     declarations: [
         AppComponent,
-        NxHeaderComponent
+        LoginModalContent,
+        NxModalLoginComponent,
+        GeneralModalContent,
+        NxModalGeneralComponent,
+        NxProcessButtonComponent
     ],
     bootstrap: [AppComponent]
 })
@@ -92,7 +106,9 @@ declare var angular: angular.IAngularStatic;
 angular
     .module('cloudApp.directives')
     .directive('nxLanguageSelect', downgradeComponent({component: NxLanguageDropdown}) as angular.IDirectiveFactory)
-    .directive('nxModalLogin', downgradeComponent({component: NxModalLoginComponent}) as angular.IDirectiveFactory);
+    .directive('nxModalLogin', downgradeComponent({component: NxModalLoginComponent}) as angular.IDirectiveFactory)
 
-
+angular
+    .module('cloudApp.services')
+    .service('nxDialogsService', downgradeInjectable(nxDialogsService));
 

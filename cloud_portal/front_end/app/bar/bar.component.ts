@@ -41,7 +41,7 @@ export class BarComponent implements OnInit {
     // }
 
     login () {
-        this.loginModal.open();
+        // this.loginModal.open();
     }
 
     ngOnInit(): void {
@@ -70,8 +70,8 @@ export class BarComponent implements OnInit {
         this.cloudApi
                 .getLanguages()
                 .then((data) => {
-                    console.log('Data: ', data.data);
-                    console.log('Length: ', data.data.length);
+                    // console.log('Data: ', data.data);
+                    // console.log('Length: ', data.data.length);
                 });
 
     }

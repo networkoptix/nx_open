@@ -1,8 +1,5 @@
-import { FactoryProvider, NgModule } from '@angular/core';
-
-// import { cloudApiService } from '../app/scripts/services/cloud_api';
-// import { languageService } from '../app/scripts/services/language';
-// import { uuid2Service } from '../app/scripts/services/angular-uuid2';
+import * as angular from 'angular';
+import { NgModule } from '@angular/core';
 
 export function cloudApiFactory(i: any) {
     return i.get('cloudApi');
@@ -64,13 +61,13 @@ export const ngToastProvider = {
     deps: ['$injector']
 };
 
-export function systemsFactory(i: any) {
+export function systemsServiceFactory(i: any) {
     return i.get('systemsProvider');
 }
 
-export const systemsProvider = {
+export const systemsServiceProvider = {
     provide: 'systemsProvider',
-    useFactory: systemsFactory,
+    useFactory: systemsServiceFactory,
     deps: ['$injector']
 };
 
@@ -140,7 +137,7 @@ export class ngToastModule {
 
 @NgModule({
     providers: [
-        systemsProvider
+        systemsServiceProvider
     ]
 })
 export class systemsModule {

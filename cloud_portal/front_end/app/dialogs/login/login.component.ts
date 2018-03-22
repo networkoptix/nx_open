@@ -3,7 +3,6 @@ import {Location} from '@angular/common';
 import {NgbModal, NgbActiveModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {EmailValidator} from '@angular/forms';
 
-
 @Component({
     selector: 'ngbd-modal-content',
     templateUrl: './dialogs/login/login.component.html'
@@ -14,6 +13,8 @@ export class LoginModalContent {
     @Input() auth;
     @Input() language;
     @Input() login;
+    @Input() cancellable;
+    @Input() closable;
 
     constructor(public activeModal: NgbActiveModal) {
     }
@@ -25,11 +26,9 @@ export class LoginModalContent {
     encapsulation: ViewEncapsulation.None,
     styleUrls: []
 })
-
 export class NxModalLoginComponent implements OnInit {
     login: any;
     modalRef: NgbModalRef;
-    closeResult: string;
     auth = {
         email: 'ttsolov@networkoptix.com',
         password: '',
@@ -39,18 +38,23 @@ export class NxModalLoginComponent implements OnInit {
     constructor(@Inject('languageService') private language: any,
                 @Inject('account') private account: any,
                 @Inject('process') private process: any,
+
                 // @Inject('CONFIG') private CONFIG: any,
                 private location: Location,
                 private modalService: NgbModal) {
     }
 
-    open() {
+    open(keepPage?) {
         this.modalRef = this.modalService.open(LoginModalContent);
         this.modalRef.componentInstance.auth = this.auth;
         this.modalRef.componentInstance.language = this.language;
         this.modalRef.componentInstance.login = this.login;
-    }
+        this.modalRef.componentInstance.cancellable = !keepPage || false;
+        this.modalRef.componentInstance.closable = true;
 
+        return this.modalRef;
+    }
+    
     close() {
         this.modalRef.close();
     }

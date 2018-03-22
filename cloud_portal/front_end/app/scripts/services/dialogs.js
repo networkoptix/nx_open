@@ -7,9 +7,12 @@ angular.module('cloudApp').run(['$http','$templateCache', 'CONFIG', function($ht
         $http.get(CONFIG.viewsDir + 'components/dialog.html', {cache: $templateCache});
     }])
     .factory('dialogs', ['$http', 'NgbModal', '$q', '$location', 'ngToast', 'CONFIG',
-        function ($http, NgbModal, $q, $location, ngToast, CONFIG) {
+        'nxDialogsService',
 
-        function openDialog(settings ){
+
+        function ($http, NgbModal, $q, $location, ngToast, CONFIG, nxDialogsService) {
+
+        function openDialog(settings){
 
             function isInline(){
                 return typeof($location.search().inline) != 'undefined';
@@ -20,7 +23,8 @@ angular.module('cloudApp').run(['$http','$templateCache', 'CONFIG', function($ht
             settings.params.getModalInstance = function(){return modalInstance;};
             // Check 401 against offline
 
-            modalInstance = NgbModal.open(content, {/* settings */});
+            modalInstance = NgbModal.open(settings.template + `: This dialog have to be moved! Ng-Bootstrap requires dialog content and not templateUrl`,
+                {/* settings */});
 
             // modalInstance = $uibModal.open({
             //     size: settings.size || 'sm',
@@ -76,7 +80,7 @@ angular.module('cloudApp').run(['$http','$templateCache', 'CONFIG', function($ht
             }
             */
 
-
+            debugger;
 
             return modalInstance;
         }
@@ -118,16 +122,17 @@ angular.module('cloudApp').run(['$http','$templateCache', 'CONFIG', function($ht
                 }).result;
             },
             login:function(keepPage){
-                return openDialog({
-                    title: L.dialogs.loginTitle,
-                    template: CONFIG.viewsDir + 'dialogs/login.html',
-                    url: 'login',
-                    hasFooter: false,
-                    cancellable: !keepPage,
-                    closable:true,
-                    params:{
-                        redirect: !keepPage
-                    }}).result;
+                return nxDialogsService.open();
+                // return openDialog({
+                //     title: L.dialogs.loginTitle,
+                //     template: CONFIG.viewsDir + 'dialogs/login.html',
+                //     url: 'login',
+                //     hasFooter: false,
+                //     cancellable: !keepPage,
+                //     closable:true,
+                //     params:{
+                //         redirect: !keepPage
+                //     }}).result;
             },
             share:function(system, user){
                 var url = 'share';

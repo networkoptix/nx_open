@@ -7,6 +7,7 @@ const angular = require("angular");
     angular
         .module('cloudApp')
         .service('systemsProvider', ['cloudApi', '$interval', '$q', 'CONFIG', 'languageService',
+        // Systems.$inject = ['cloudApi', '$interval', '$q', 'CONFIG', 'languageService'];
         function (cloudApi, $interval, $q, CONFIG, languageService) {
             const self = this;
             this.systems = [];

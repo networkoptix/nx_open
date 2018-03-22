@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import {NxHeaderComponent} from "./header.component";
+import {NxModalGeneralComponent } from './general.component';
 
-describe('NxHeaderComponent', () => {
-  let component: NxHeaderComponent;
-  let fixture: ComponentFixture<NxHeaderComponent>;
+describe('NxModalGeneralComponent', () => {
+  let component: NxModalGeneralComponent;
+  let fixture: ComponentFixture<NxModalGeneralComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [NxHeaderComponent ]
+      declarations: [NxModalGeneralComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(NxHeaderComponent);
+    fixture = TestBed.createComponent(NxModalGeneralComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

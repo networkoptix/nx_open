@@ -7,10 +7,7 @@ import { FormControl } from '@angular/forms';
     styleUrls: []
 })
 export class NxProcessButtonComponent implements OnInit {
-    // @Output() process = new EventEmitter();
-
     @Input() process: any;
-
     @Input() buttonText: string;
     @Input() buttonDisabled: boolean;
     @Input() actionType: boolean;
@@ -23,9 +20,6 @@ export class NxProcessButtonComponent implements OnInit {
     }
 
     ngOnInit() {
-        // debugger;
-        // this.process.processing = false;
-
         this.buttonClass = 'btn-primary';
         if (this.actionType) {
             this.buttonClass = 'btn-' + this.actionType;
@@ -43,7 +37,7 @@ export class NxProcessButtonComponent implements OnInit {
 
         for(const ctrl in this.form.form.controls) {
             const control = this.form.form.get(ctrl);
-            // console.log('CTRL:', control);
+
             if (control.invalid) {
                 // TODO : find how to set element's focus
                 // control.focused = true;
@@ -53,7 +47,6 @@ export class NxProcessButtonComponent implements OnInit {
     }
 
     checkForm() {
-        debugger;
         if (this.form && !this.form.valid) {
             //Set the form touched
             this.touchForm();

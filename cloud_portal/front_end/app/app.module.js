@@ -19,15 +19,19 @@ const ngx_order_pipe_1 = require("ngx-order-pipe");
 const index_1 = require("./core/index");
 const ajs_upgraded_providers_1 = require("./ajs-upgraded-providers");
 const ajs_upgraded_providers_2 = require("./ajs-upgraded-providers");
+// import {CONFIGModule} from './ajs-upgraded-providers';
 const ajs_upgraded_providers_3 = require("./ajs-upgraded-providers");
 const ajs_upgraded_providers_4 = require("./ajs-upgraded-providers");
 const ajs_upgraded_providers_5 = require("./ajs-upgraded-providers");
+const ajs_upgraded_providers_6 = require("./ajs-upgraded-providers");
+const ajs_upgraded_providers_7 = require("./ajs-upgraded-providers");
 const app_component_1 = require("./app.component");
 const bar_module_1 = require("./bar/bar.module");
 const language_component_1 = require("./dropdown/language.component");
 const login_component_1 = require("./dialogs/login/login.component");
 const process_button_component_1 = require("./components/process-button/process-button.component");
-const header_component_1 = require("./components/header/header.component");
+const dialogs_service_1 = require("./dialogs/dialogs.service");
+const general_component_1 = require("./dialogs/general/general.component");
 class HybridUrlHandlingStrategy {
     // use only process the `/bar` url
     shouldProcessUrl(url) {
@@ -55,32 +59,43 @@ AppModule = __decorate([
             ngx_order_pipe_1.OrderModule,
             index_1.CoreModule,
             bar_module_1.BarModule,
-            ajs_upgraded_providers_5.uuid2ServiceModule,
-            ajs_upgraded_providers_2.languageServiceModule,
-            ajs_upgraded_providers_3.accountServiceModule,
-            ajs_upgraded_providers_4.processServiceModule,
+            ajs_upgraded_providers_6.uuid2ServiceModule,
+            ajs_upgraded_providers_3.languageServiceModule,
+            ajs_upgraded_providers_4.accountServiceModule,
+            ajs_upgraded_providers_5.processServiceModule,
+            ajs_upgraded_providers_2.systemsModule,
+            ajs_upgraded_providers_7.ngToastModule,
             ng_bootstrap_1.NgbModule.forRoot(),
             router_1.RouterModule.forRoot([], { initialNavigation: false })
         ],
         entryComponents: [
             language_component_1.NxLanguageDropdown,
-            login_component_1.NxModalLoginComponent,
             process_button_component_1.NxProcessButtonComponent,
-            login_component_1.LoginModalContent
+            login_component_1.LoginModalContent,
+            login_component_1.NxModalLoginComponent,
+            general_component_1.GeneralModalContent,
+            general_component_1.NxModalGeneralComponent
         ],
         providers: [
             ng_bootstrap_2.NgbModal,
             common_1.Location,
             { provide: common_1.LocationStrategy, useClass: common_1.PathLocationStrategy },
             { provide: router_1.UrlHandlingStrategy, useClass: HybridUrlHandlingStrategy },
-            { provide: '$scope', useFactory: i => i.get('$rootScope'), deps: ['$injector'] },
+            // {provide: '$scope', useFactory: i => i.get('$rootScope'), deps: ['$injector']},
+            // {provide: '$rootScope', useFactory: i => i.get('$rootScope'), deps: ['$injector']},
             ajs_upgraded_providers_1.cloudApiServiceProvider,
-            ajs_upgraded_providers_1.systemsProvider,
-            login_component_1.NxModalLoginComponent
+            login_component_1.NxModalLoginComponent,
+            general_component_1.NxModalGeneralComponent,
+            process_button_component_1.NxProcessButtonComponent,
+            dialogs_service_1.nxDialogsService
         ],
         declarations: [
             app_component_1.AppComponent,
-            header_component_1.NxHeaderComponent
+            login_component_1.LoginModalContent,
+            login_component_1.NxModalLoginComponent,
+            general_component_1.GeneralModalContent,
+            general_component_1.NxModalGeneralComponent,
+            process_button_component_1.NxProcessButtonComponent
         ],
         bootstrap: [app_component_1.AppComponent]
     })
@@ -90,4 +105,7 @@ angular
     .module('cloudApp.directives')
     .directive('nxLanguageSelect', static_1.downgradeComponent({ component: language_component_1.NxLanguageDropdown }))
     .directive('nxModalLogin', static_1.downgradeComponent({ component: login_component_1.NxModalLoginComponent }));
+angular
+    .module('cloudApp.services')
+    .service('nxDialogsService', static_1.downgradeInjectable(dialogs_service_1.nxDialogsService));
 //# sourceMappingURL=app.module.js.map

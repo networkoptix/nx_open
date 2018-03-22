@@ -15,8 +15,6 @@ let NxProcessButtonComponent = class NxProcessButtonComponent {
         this.processing = false;
     }
     ngOnInit() {
-        // debugger;
-        // this.process.processing = false;
         this.buttonClass = 'btn-primary';
         if (this.actionType) {
             this.buttonClass = 'btn-' + this.actionType;
@@ -31,7 +29,6 @@ let NxProcessButtonComponent = class NxProcessButtonComponent {
         console.log('ctrls:', this.form.form.controls);
         for (const ctrl in this.form.form.controls) {
             const control = this.form.form.get(ctrl);
-            // console.log('CTRL:', control);
             if (control.invalid) {
                 // TODO : find how to set element's focus
                 // control.focused = true;
@@ -40,7 +37,6 @@ let NxProcessButtonComponent = class NxProcessButtonComponent {
         }
     }
     checkForm() {
-        debugger;
         if (this.form && !this.form.valid) {
             //Set the form touched
             this.touchForm();

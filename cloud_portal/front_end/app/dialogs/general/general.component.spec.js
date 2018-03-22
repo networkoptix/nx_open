@@ -1,18 +1,18 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const testing_1 = require("@angular/core/testing");
-const header_component_1 = require("./header.component");
-describe('NxHeaderComponent', () => {
+const general_component_1 = require("./general.component");
+describe('NxModalGeneralComponent', () => {
     let component;
     let fixture;
     beforeEach(testing_1.async(() => {
         testing_1.TestBed.configureTestingModule({
-            declarations: [header_component_1.NxHeaderComponent]
+            declarations: [general_component_1.NxModalGeneralComponent]
         })
             .compileComponents();
     }));
     beforeEach(() => {
-        fixture = testing_1.TestBed.createComponent(header_component_1.NxHeaderComponent);
+        fixture = testing_1.TestBed.createComponent(general_component_1.NxModalGeneralComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });
@@ -20,4 +20,4 @@ describe('NxHeaderComponent', () => {
         expect(component).toBeTruthy();
     });
 });
-//# sourceMappingURL=header.component.spec.js.map
+//# sourceMappingURL=general.component.spec.js.map
