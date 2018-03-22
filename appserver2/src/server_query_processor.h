@@ -351,11 +351,9 @@ public:
      */
     template<class OutputData, class InputParamType1, class InputParamType2, class HandlerType>
     void processQueryAsync(
-        ApiCommand::Value cmdCode, InputParamType1 input1, InputParamType2 input2,
+        ApiCommand::Value /*cmdCode*/, InputParamType1 input1, InputParamType2 input2,
         HandlerType handler)
     {
-        QN_UNUSED(cmdCode);
-
         QnDbManagerAccess accessDataCopy(m_db);
         m_owner->incRunningAsyncOperationsCount();
         nx::utils::concurrent::run(Ec2ThreadPool::instance(),
