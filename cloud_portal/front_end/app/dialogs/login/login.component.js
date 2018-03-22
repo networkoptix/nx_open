@@ -16,8 +16,33 @@ const core_1 = require("@angular/core");
 const common_1 = require("@angular/common");
 const ng_bootstrap_1 = require("@ng-bootstrap/ng-bootstrap");
 let LoginModalContent = class LoginModalContent {
-    constructor(activeModal) {
+    constructor(activeModal, account, process) {
         this.activeModal = activeModal;
+        this.account = account;
+        this.process = process;
+    }
+    ngOnInit() {
+        this.login = this.process.init(() => {
+            return this.account.login(this.auth.email, this.auth.password, this.auth.remember);
+        }, {
+            ignoreUnauthorized: true,
+            errorCodes: {
+                accountNotActivated: function () {
+                    this.location.go('/activate');
+                    return false;
+                },
+                notFound: this.language.lang.errorCodes.emailNotFound,
+                portalError: this.language.lang.errorCodes.brokenAccount
+            }
+        }).then(() => {
+            // TODO: soon
+            // if (dialogSettings.params.redirect) {
+            //     $location.path($routeParams.next ? $routeParams.next : Config.redirectAuthorised);
+            // }
+            setTimeout(function () {
+                document.location.reload();
+            });
+        });
     }
 };
 __decorate([
@@ -47,20 +72,20 @@ LoginModalContent = __decorate([
         // TODO: later
         // templateUrl: this.CONFIG.viewsDir + 'dialogs/login.html'
     }),
-    __metadata("design:paramtypes", [ng_bootstrap_1.NgbActiveModal])
+    __param(1, core_1.Inject('account')),
+    __param(2, core_1.Inject('process')),
+    __metadata("design:paramtypes", [ng_bootstrap_1.NgbActiveModal, Object, Object])
 ], LoginModalContent);
 exports.LoginModalContent = LoginModalContent;
 let NxModalLoginComponent = class NxModalLoginComponent {
-    constructor(language, account, process, 
+    constructor(language, 
     // @Inject('CONFIG') private CONFIG: any,
     location, modalService) {
         this.language = language;
-        this.account = account;
-        this.process = process;
         this.location = location;
         this.modalService = modalService;
         this.auth = {
-            email: 'ttsolov@networkoptix.com',
+            email: '',
             password: '',
             remember: true
         };
@@ -78,27 +103,7 @@ let NxModalLoginComponent = class NxModalLoginComponent {
         this.modalRef.close();
     }
     ngOnInit() {
-        this.login = this.process.init(() => {
-            return this.account.login(this.auth.email, this.auth.password, this.auth.remember);
-        }, {
-            ignoreUnauthorized: true,
-            errorCodes: {
-                accountNotActivated: function () {
-                    this.location.go('/activate');
-                    return false;
-                },
-                notFound: this.language.lang.errorCodes.emailNotFound,
-                portalError: this.language.lang.errorCodes.brokenAccount
-            }
-        }).then(() => {
-            // TODO: soon
-            // if (dialogSettings.params.redirect) {
-            //     $location.path($routeParams.next ? $routeParams.next : Config.redirectAuthorised);
-            // }
-            setTimeout(function () {
-                document.location.reload();
-            });
-        });
+        // Initialization should be in LoginModalContent.ngOnInit()
     }
 };
 NxModalLoginComponent = __decorate([
@@ -109,9 +114,7 @@ NxModalLoginComponent = __decorate([
         styleUrls: []
     }),
     __param(0, core_1.Inject('languageService')),
-    __param(1, core_1.Inject('account')),
-    __param(2, core_1.Inject('process')),
-    __metadata("design:paramtypes", [Object, Object, Object, common_1.Location,
+    __metadata("design:paramtypes", [Object, common_1.Location,
         ng_bootstrap_1.NgbModal])
 ], NxModalLoginComponent);
 exports.NxModalLoginComponent = NxModalLoginComponent;

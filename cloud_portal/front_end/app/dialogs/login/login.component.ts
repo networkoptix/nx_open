@@ -16,47 +16,9 @@ export class LoginModalContent {
     @Input() cancellable;
     @Input() closable;
 
-    constructor(public activeModal: NgbActiveModal) {
-    }
-}
-
-@Component({
-    selector: 'nx-modal-login',
-    template: '',
-    encapsulation: ViewEncapsulation.None,
-    styleUrls: []
-})
-export class NxModalLoginComponent implements OnInit {
-    login: any;
-    modalRef: NgbModalRef;
-    auth = {
-        email: 'ttsolov@networkoptix.com',
-        password: '',
-        remember: true
-    };
-
-    constructor(@Inject('languageService') private language: any,
+    constructor(public activeModal: NgbActiveModal,
                 @Inject('account') private account: any,
-                @Inject('process') private process: any,
-
-                // @Inject('CONFIG') private CONFIG: any,
-                private location: Location,
-                private modalService: NgbModal) {
-    }
-
-    open(keepPage?) {
-        this.modalRef = this.modalService.open(LoginModalContent);
-        this.modalRef.componentInstance.auth = this.auth;
-        this.modalRef.componentInstance.language = this.language;
-        this.modalRef.componentInstance.login = this.login;
-        this.modalRef.componentInstance.cancellable = !keepPage || false;
-        this.modalRef.componentInstance.closable = true;
-
-        return this.modalRef;
-    }
-    
-    close() {
-        this.modalRef.close();
+                @Inject('process') private process: any,) {
     }
 
     ngOnInit() {
@@ -81,5 +43,47 @@ export class NxModalLoginComponent implements OnInit {
                 document.location.reload();
             });
         });
+    }
+}
+
+@Component({
+    selector: 'nx-modal-login',
+    template: '',
+    encapsulation: ViewEncapsulation.None,
+    styleUrls: []
+})
+export class NxModalLoginComponent implements OnInit {
+    login: any;
+    modalRef: NgbModalRef;
+    auth = {
+        email: '',
+        password: '',
+        remember: true
+    };
+
+    constructor(@Inject('languageService') private language: any,
+
+                // @Inject('CONFIG') private CONFIG: any,
+                private location: Location,
+                private modalService: NgbModal) {
+    }
+
+    open(keepPage?) {
+        this.modalRef = this.modalService.open(LoginModalContent);
+        this.modalRef.componentInstance.auth = this.auth;
+        this.modalRef.componentInstance.language = this.language;
+        this.modalRef.componentInstance.login = this.login;
+        this.modalRef.componentInstance.cancellable = !keepPage || false;
+        this.modalRef.componentInstance.closable = true;
+
+        return this.modalRef;
+    }
+
+    close() {
+        this.modalRef.close();
+    }
+
+    ngOnInit() {
+        // Initialization should be in LoginModalContent.ngOnInit()
     }
 }

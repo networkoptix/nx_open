@@ -3,8 +3,6 @@ import {Location} from '@angular/common';
 import {NgbModal, NgbActiveModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {EmailValidator} from '@angular/forms';
 
-import {NxProcessButtonComponent} from '../../components/process-button/process-button.component';
-
 @Component({
     selector: 'nx-modal-general-content',
     templateUrl: './dialogs/general/general.component.html'
