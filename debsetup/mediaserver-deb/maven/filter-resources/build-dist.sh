@@ -8,7 +8,8 @@ COMPANY_NAME=@deb.customization.company.name@
 VERSION=@release.version@
 ARCHITECTURE=@os.arch@
 
-COMPILER=@CMAKE_CXX_COMPILER@
+COMPILER="@CMAKE_CXX_COMPILER@"
+CFLAGS="@CMAKE_C_FLAGS@"
 SOURCE_ROOT_PATH=@root.dir@
 TARGET=/opt/$COMPANY_NAME/mediaserver
 BINTARGET=$TARGET/bin
@@ -49,7 +50,7 @@ LOG_FILE="$LOGS_DIR/server-build-dist.log"
 # [in] Destination directory
 cp_sys_lib()
 {
-    "$SOURCE_ROOT_PATH"/build_utils/copy_system_library.sh -c "$COMPILER" "$@"
+    "$SOURCE_ROOT_PATH"/build_utils/copy_system_library.sh -c "$COMPILER" -f "$CFLAGS" "$@"
 }
 
 buildDistribution()
