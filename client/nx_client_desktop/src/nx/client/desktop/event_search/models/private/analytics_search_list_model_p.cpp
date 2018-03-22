@@ -675,7 +675,7 @@ QString AnalyticsSearchListModel::Private::description(
     const auto durationUs = object.lastAppearanceTimeUsec - object.firstAppearanceTimeUsec;
 
     using namespace std::chrono;
-    return lit("Timestamp: %1 ms<br>As date & time: %2<br>Duration: %3 ms<br>%4")
+    return lit("Timestamp: %1 ms<br>%2<br>Duration: %3 ms<br>%4")
         .arg(timestampMs)
         .arg(start.toString(Qt::RFC2822Date))
         .arg(duration_cast<milliseconds>(microseconds(durationUs)).count())

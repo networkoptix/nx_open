@@ -29,6 +29,8 @@
 #include <nx/client/desktop/utils/widget_utils.h>
 #include <nx/utils/log/assert.h>
 
+#include <ini.h>
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -260,8 +262,26 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
     if (color.isValid())
         tile->setTitleColor(color);
 
+    const auto showPreviewTimestamp =
+        [tile](CameraThumbnailProvider* provider)
+        {
+            if (provider->status() == Qn::ThumbnailStatus::Loaded)
+            {
+                tile->setDescription(lit("%1<br>Preview: %2 us").arg(tile->description())
+                    .arg(provider->timestampUs()));
+            }
+        };
+
     if (tile->preview())
+    {
+        if (ini().showDebugTimeInformationInRibbon)
+        {
+            if (auto provider = qobject_cast<CameraThumbnailProvider*>(tile->preview()))
+                showPreviewTimestamp(provider);
+        }
+
         return; //< Don't ever update existing previews.
+    }
 
     const auto camera = index.data(Qn::ResourceRole).value<QnResourcePtr>()
         .dynamicCast<QnVirtualCameraResource>();
@@ -286,7 +306,14 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
         ? nx::api::ImageRequest::RoundMethod::iFrameAfter
         : nx::api::ImageRequest::RoundMethod::precise;
 
-    tile->setPreview(new CameraThumbnailProvider(request, tile));
+    auto provider = new CameraThumbnailProvider(request, tile);
+    tile->setPreview(provider);
+
+    if (ini().showDebugTimeInformationInRibbon)
+    {
+        connect(provider, &QnImageProvider::statusChanged, tile,
+            [showPreviewTimestamp, provider]() { showPreviewTimestamp(provider); });
+    }
 
     tile->preview()->loadAsync();
     tile->setPreviewCropRect(previewCropRect);

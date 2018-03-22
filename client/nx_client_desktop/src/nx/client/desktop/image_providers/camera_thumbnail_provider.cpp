@@ -10,6 +10,7 @@
 #include <core/resource/camera_resource.h>
 
 #include <nx/fusion/model_functions.h>
+#include <nx/network/http/custom_headers.h>
 #include <nx/utils/log/log.h>
 
 namespace nx {
@@ -36,7 +37,7 @@ CameraThumbnailProvider::CameraThumbnailProvider(
 
     /* Making connection through event loop to handle data from another thread. */
     connect(this, &CameraThumbnailProvider::imageDataLoadedInternal, this,
-        [this](const QByteArray &data, Qn::ThumbnailStatus nextStatus)
+        [this](const QByteArray &data, Qn::ThumbnailStatus nextStatus, qint64 timestampUs)
         {
             if (!data.isEmpty())
             {
@@ -49,6 +50,8 @@ CameraThumbnailProvider::CameraThumbnailProvider(
                 // We should not be here
                 NX_VERBOSE(this) << "CameraThumbnailProvider::imageDataLoadedInternal(" << m_request.camera->getName() << ") - empty data but status not NoData!";
             }
+
+            m_timestampUs = timestampUs;
 
             emit imageChanged(m_image);
             emit sizeHintChanged(sizeHint());
@@ -95,7 +98,7 @@ void CameraThumbnailProvider::doLoadAsync()
     if (!commonModule()->currentServer())
     {
         NX_VERBOSE(this) << "CameraThumbnailProvider::doLoadAsync(" << m_request.camera->getName() << ") - no server is available. Returning early";
-        emit imageDataLoadedInternal(QByteArray(), Qn::ThumbnailStatus::NoData);
+        emit imageDataLoadedInternal(QByteArray(), Qn::ThumbnailStatus::NoData, 0);
         return;
     }
 
@@ -103,21 +106,37 @@ void CameraThumbnailProvider::doLoadAsync()
     NX_VERBOSE(this) << "CameraThumbnailProvider::doLoadAsync(" << m_request.camera->getName() << ") - sending request to the server";
     auto handle = commonModule()->currentServer()->restConnection()->cameraThumbnailAsync(
         m_request,
-        [this, guard] (bool success, rest::Handle /*id*/, const QByteArray& imageData)
+        [this, guard](
+            bool success,
+            rest::Handle /*requestId*/,
+            QByteArray imageData,
+            const nx::network::http::HttpHeaders& headers)
         {
             if (!guard)
                 return;
+
             Qn::ThumbnailStatus nextStatus =
                 success ? Qn::ThumbnailStatus::Loaded : Qn::ThumbnailStatus::NoData;
+
+            qint64 timestampUs = 0;
+
             if (imageData.isEmpty())
+            {
                 nextStatus = Qn::ThumbnailStatus::NoData;
-            emit imageDataLoadedInternal(imageData, nextStatus);
+            }
+            else
+            {
+                timestampUs = nx::network::http::getHeaderValue(
+                    headers, Qn::FRAME_TIMESTAMP_US_HEADER_NAME).toLongLong();
+            }
+
+            emit imageDataLoadedInternal(imageData, nextStatus, timestampUs);
         });
 
     if (handle <= 0)
     {
         // It will change to status NoData as well
-        emit imageDataLoadedInternal(QByteArray(), Qn::ThumbnailStatus::NoData);
+        emit imageDataLoadedInternal(QByteArray(), Qn::ThumbnailStatus::NoData, 0);
     }
 }
 
@@ -128,6 +147,11 @@ void CameraThumbnailProvider::setStatus(Qn::ThumbnailStatus status)
 
     m_status = status;
     emit statusChanged(status);
+}
+
+qint64 CameraThumbnailProvider::timestampUs() const
+{
+    return m_timestampUs;
 }
 
 } // namespace desktop
