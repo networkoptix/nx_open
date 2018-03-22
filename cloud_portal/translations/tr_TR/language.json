@@ -117,7 +117,7 @@
     "cloudInvalidResponse": "Cloud DB, beklenmedik bir yanıt verdi",
     "notAuthorized": "Hatalı parola",
     "wrongParameters": "Formdaki bazı parametreler yanlış",
-    "brokenAccount": "Unexpected problem with account. <a href=\"/restore_password\">Restore account</a>",
+    "brokenAccount": "Hesapla beklenmeyen bir problem. <a href=\"/restore_password\">Hesabı geri yükle</a>",
     "wrongCode": "Hesap zaten etkinleştirildi veya onay kodu yanlış",
     "wrongCodeRestore": "Onay kodu zaten kullanılmış veya yanlış",
     "forbidden": "Bu işlemi gerçekleştirecek izinlere sahip değilsiniz",

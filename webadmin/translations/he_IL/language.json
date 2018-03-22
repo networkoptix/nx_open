@@ -13,8 +13,8 @@
     "passwordRequirements": {
         "minLengthMessage": "סיסמא חייבת להכיל לפחות 8 תווים",
         "requiredMessage": "רק אותיות לטינית, מספרים וסימני מקלדת מותרים",
-        "weakMessage": "הסיסמא צריכה להכיל סוגים שונים של סמלים",
-        "strongMessage": "סיסמה חזקה!",
+        "weakMessage": "הסיסמה צריכה להכיל סוגים שונים של סמלים",
+        "strongMessage": "סיסמא חזקה!",
         "commonMessage": "סיסמה זו נמצאת ברשימת הסיסמהות הפופולריות ביותר"
     },
     "settings": {
@@ -29,7 +29,7 @@
         "confirmRestoreDefaultTitle": "שחזר להגדרות ברירת מחדל",
         "unexpectedError": "כשלון: שגיאה בלתי צפויה התרחשה",
         "connnetionError": "שגיאת חיבור",
-        "wrongPassword": "סיסמה שגויה.",
+        "wrongPassword": "סיסמא שגויה.",
         "error": "שגיאה: ",
         "restartNeeded": "שינויים שנשמרו. להפעיל מחדש את השרת בכדי להחיל את ההגדרות החדשות?",
         "settingsSaved": "ההגדרות נשמרו",
@@ -40,7 +40,7 @@
         "unsafePortConfirm": "אין זה בטוח להשתמש במספר היציאה הקטן מ -1025. ייתכן שהשרת לה יהיה נגיש. המשך בכל זאת?",
         "confirmDisconnectFromCloud": "נתק את המערכת מ {{CLOUD_NAME}}",
         "confirmDisconnectFromCloudTitle": "<span class='warning-label'> כל משתמשי הענן יימחקו.</span> <br><br>המערכת תהיה נגישה דרך הרשת המקומית עם חשבון מנהל מערכת מקומי.",
-        "confirmDisconnectFromCloudAction": "נתק",
+        "confirmDisconnectFromCloudAction": "התנתק",
         "disconnectedFromCloudSuccess": "המערכת נותקה בהצלחה מ {{CLOUD_NAME}}",
         "confirmDisconnectFromSystem": "נתק שרת מהמערכת הנוכחית",
         "confirmDisconnectFromSystemTitle": "",

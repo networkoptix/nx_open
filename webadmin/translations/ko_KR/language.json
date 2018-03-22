@@ -1,5 +1,5 @@
 {
-    "language_name": "언어",
+    "language_name": "한국어",
     "dialogs": {
         "okButton": "Ok",
         "openLink": "이 링크를 방문",
@@ -14,7 +14,7 @@
         "minLengthMessage": "비밀번호는 8자 이상이어야 합니다",
         "requiredMessage": "라틴 문자, 숫자 및 키보드 기호만 사용할 수 있습니다.",
         "weakMessage": "암호는 다양한 유형의 기호를 포함 해야 합니다.",
-        "strongMessage": "강력한 패스워드!",
+        "strongMessage": "강력한 암호!",
         "commonMessage": "이 비밀번호는 매우 흔한 비밀번호입니다."
     },
     "settings": {
