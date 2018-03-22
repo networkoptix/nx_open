@@ -37,11 +37,10 @@ Log In
     Input Text    ${PASSWORD INPUT}    ${password}
 
     Wait Until Element Is Visible    ${LOG IN BUTTON}
-    Click Button    ${LOG IN BUTTON}
+    Click Element    ${LOG IN BUTTON}
 
 Validate Log In
     Wait Until Page Contains Element    ${AUTHORIZED BODY}
-    Page Should Contain Element    ${AUTHORIZED BODY}
     Check Language
 
 Log Out

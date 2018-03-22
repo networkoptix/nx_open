@@ -92,6 +92,7 @@ Unchecking check box and saving maintains that setting
     Close Browser
     Open Browser and go to URL    ${url}/account
     Log In    ${random email}    ${password}    button=None
+    Validate Log In
     ${checked}    Get Element Attribute    ${ACCOUNT SUBSCRIBE CHECKBOX}    checked
     Should Not Be True    ${checked}
     Close Browser
@@ -113,6 +114,7 @@ Checking check box and saving maintains that setting
     Close Browser
     Open Browser and go to URL    ${url}/account
     Log In    ${random email}    ${password}    button=None
+    Validate Log In
     ${checked}    Get Element Attribute    ${ACCOUNT SUBSCRIBE CHECKBOX}    checked
     Should Be True    "${checked}"
     Close Browser

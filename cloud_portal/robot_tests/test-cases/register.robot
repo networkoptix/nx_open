@@ -103,7 +103,9 @@ should respond to Enter key and save data
     Close Browser
 
 should respond to Tab key
-    Open Browser and go to URL    ${url}/register
+    Open Browser and go to URL    ${url}
+    Wait Until Element Is Visible    ${CREATE ACCOUNT HEADER}
+    Click Link    ${CREATE ACCOUNT HEADER}
     Wait Until Elements Are Visible    ${REGISTER FIRST NAME INPUT}    ${REGISTER LAST NAME INPUT}    ${REGISTER EMAIL INPUT}    ${REGISTER PASSWORD INPUT}
     Element Should Be Focused    ${REGISTER FIRST NAME INPUT}
     Press Key    ${REGISTER FIRST NAME INPUT}    ${TAB}
@@ -122,6 +124,7 @@ should open Terms and conditions in a new page
     Open Browser and go to URL    ${url}/register
     Wait Until Element Is Visible    ${TERMS AND CONDITIONS LINK}
     Click Link    ${TERMS AND CONDITIONS LINK}
+    Sleep    2    #This is specifically for Firefox
     ${tabs}    Get Window Handles
     Select Window    @{tabs}[1]
     Location Should Be    ${url}/content/eula
