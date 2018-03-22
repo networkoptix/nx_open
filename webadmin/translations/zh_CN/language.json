@@ -1,5 +1,5 @@
 {
-    "language_name": "简体中文",
+    "language_name": "LANGUAGE_NAME",
     "dialogs": {
         "okButton": "确定",
         "openLink": "访问此链接",
