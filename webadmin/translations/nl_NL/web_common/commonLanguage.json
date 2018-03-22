@@ -39,7 +39,7 @@
     "clear search": "wis zoekopdracht",
     "expand server": "expand server + [server name]",
     "collapse server": "collapse server + [server name]",
-    "expand all servers": "toon alle servers",
+    "expand all servers": "vouw alle servers uit",
     "collapse all servers": "vouw alle servers samen",
     "stop listening": "stop met luisteren",
     "help": "help | show commands"
