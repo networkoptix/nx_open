@@ -155,7 +155,7 @@ Changing last name and saving maintains that setting
     Validate Log In
     Verify In Account Page
     Wait Until Textfield Contains    ${ACCOUNT LAST NAME}    nameChanged
-    Input Text    ${ACCOUNT LAST NAME}    ${TEST FIRST NAME}
+    Input Text    ${ACCOUNT LAST NAME}    ${TEST LAST NAME}
     Click Button    ${ACCOUNT SAVE}
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
     Close Browser

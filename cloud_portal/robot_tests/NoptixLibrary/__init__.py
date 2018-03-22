@@ -87,7 +87,7 @@ class NoptixLibrary(object):
     in the subject, which is the actual subject text, and decode it from ascii
     so that it is not a byte string.  Then use decode_header to decode the
     base64 string into unicode bytes.  Then finally we take that string and
-    decode with UTF-8 to get the actual text.  Note that some in cases decoding
+    decode with UTF-8 to get the actual text.  Note that in some cases decoding
     UTF-8 is unnecessary (english, spanish, etc.) so the else statement clears 
     any remaining junk.  Here is the process:
     
@@ -105,7 +105,7 @@ class NoptixLibrary(object):
             if isinstance(res, tuple):
                 header = email.header.decode_header(res[1].decode('ascii').strip())
                 header_str = "".join([x[0].decode('utf-8').strip() if x[1] else re.sub("(^b\'|\')", "", str(x[0])) for x in header])
-                header_str = re.sub("Subject: ", "", header_str)
+                header_str = re.sub("Subject:", "", header_str)
                 if sub_text != header_str.strip():
                     raise Exception(header_str+' was not '+sub_text)      
         conn.logout()
