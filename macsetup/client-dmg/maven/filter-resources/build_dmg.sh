@@ -102,5 +102,6 @@ done
 
 rm -rf "$TMP"
 rm -f "$DMG_FILE"
+kill -9 $(lsof | grep "raw-$DMG_FILE" | awk {'print $2'})
 hdiutil convert "raw-$DMG_FILE" -format UDZO -o "$DMG_FILE"
 rm -f "raw-$DMG_FILE"
