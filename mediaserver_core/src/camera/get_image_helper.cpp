@@ -280,8 +280,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameFromCaches(
     }
 
     // Try liveCache.
-    if (auto frame = decodeFrameFromLiveCache(
-        usePrimaryStream ? MEDIA_Quality_High : MEDIA_Quality_Low, timestampUs, camera))
+    if (auto frame = decodeFrameFromLiveCache(usePrimaryStream, timestampUs, camera))
     {
         NX_VERBOSE(kLogTag) << lm("%1(): Got from liveCache; roundMethod %2")
             .args(__func__, roundMethod);
@@ -295,11 +294,9 @@ CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameFromCaches(
 }
 
 CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameFromLiveCache(
-    MediaQuality stream, qint64 timestampUs, QnVideoCameraPtr camera)
+    bool usePrimaryStream, qint64 timestampUs, QnVideoCameraPtr camera)
 {
-    NX_ASSERT(stream == MEDIA_Quality_High || stream == MEDIA_Quality_Low);
-
-    auto gopFrames = getLiveCacheGopTillTime(stream, timestampUs, camera);
+    auto gopFrames = getLiveCacheGopTillTime(usePrimaryStream, timestampUs, camera);
     if (!gopFrames)
         return CLVideoDecoderOutputPtr();
 
@@ -310,8 +307,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameFromLiveCache(
     return CLVideoDecoderOutputPtr();
 }
 
-CLVideoDecoderOutputPtr QnGetImageHelper::getImage(
-    const nx::api::CameraImageRequest& request)
+CLVideoDecoderOutputPtr QnGetImageHelper::getImage(const nx::api::CameraImageRequest& request)
 {
     NX_VERBOSE(kLogTag) << lm("%1(%2 us, roundMethod: %3) BEGIN")
         .args(__func__, request.msecSinceEpoch * 1000, request.roundMethod);
@@ -340,18 +336,18 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImage(
         dstSize.setHeight(dstSize.height() * kMinSize / dstSize.width());
     }
 
-    bool useHQ = true;
-    if ((dstSize.width() > 0 && dstSize.width() <= 480) || (dstSize.height() > 0 && dstSize.height() <= 316))
-        useHQ = false;
+    const bool usePrimaryStream = !(
+        (dstSize.width() > 0 && dstSize.width() <= 480)
+        || (dstSize.height() > 0 && dstSize.height() <= 316));
 
-    if (auto frame = getImageWithCertainQuality(useHQ, request))
+    if (auto frame = getImageWithCertainQuality(usePrimaryStream, request))
     {
         NX_VERBOSE(kLogTag) << lm("%1() END -> frame").arg(__func__);
         return frame;
     }
 
     // Attempting alternate stream if could not find the frame.
-    if (auto frame = getImageWithCertainQuality(!useHQ, request))
+    if (auto frame = getImageWithCertainQuality(!usePrimaryStream, request))
     {
         NX_VERBOSE(kLogTag) << lm("%1() END -> frame from alternate stream").arg(__func__);
         return frame;
@@ -365,8 +361,16 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImage(
  * @return Sequence from an I-frame to the desired frame. Can be null but not empty.
  */
 std::unique_ptr<QnConstDataPacketQueue> QnGetImageHelper::getLiveCacheGopTillTime(
-    MediaQuality stream, qint64 timestampUs, QnVideoCameraPtr camera)
+    bool usePrimaryStream, qint64 timestampUs, QnVideoCameraPtr camera)
 {
+    const MediaQuality stream = usePrimaryStream ? MEDIA_Quality_High : MEDIA_Quality_Low;
+    if (!camera->liveCache(stream))
+    {
+        NX_VERBOSE(kLogTag) << lm("%1(): NOTE: liveCache not initialized for %2 stream")
+            .args(__func__, usePrimaryStream ? "primary" : "secondary");
+        return nullptr;
+    }
+
     quint64 iFrameTimestampUs;
     QnAbstractDataPacketPtr iFrameData = camera->liveCache(stream)->findByTimestamp(
         timestampUs, /*findKeyFramesOnly*/ true, &iFrameTimestampUs);

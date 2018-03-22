@@ -57,8 +57,8 @@ private:
         std::unique_ptr<QnConstDataPacketQueue>& sequence, quint64 timestampUs);
 
     static CLVideoDecoderOutputPtr decodeFrameFromLiveCache(
-        MediaQuality stream, qint64 timestampUs, QnVideoCameraPtr camera);
+        bool usePrimaryStream, qint64 timestampUs, QnVideoCameraPtr camera);
 
     static std::unique_ptr<QnConstDataPacketQueue> getLiveCacheGopTillTime(
-        MediaQuality stream, qint64 timestampUs, QnVideoCameraPtr camera);
+        bool usePrimaryStream, qint64 timestampUs, QnVideoCameraPtr camera);
 };
