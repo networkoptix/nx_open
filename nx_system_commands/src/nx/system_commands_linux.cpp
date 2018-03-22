@@ -183,7 +183,8 @@ bool SystemCommands::mount(const std::string& url, const std::string& directory,
 
     auto makeCommandString =
         [&url, &directory](const std::string& username, const std::string& password,
-            const std::string& domain)
+            const std::string& domain,
+            const std::string& dialect)
         {
             std::ostringstream command;
             command << "mount -t cifs '" << url << "' '" << directory << "'"
@@ -192,6 +193,9 @@ bool SystemCommands::mount(const std::string& url, const std::string& directory,
 
             if (!domain.empty())
                 command << ",domain=" << domain;
+
+            if (!dialect.empty())
+                command << ",vers=" << dialect;
 
             return command.str();
         };
@@ -215,8 +219,11 @@ bool SystemCommands::mount(const std::string& url, const std::string& directory,
     {
         for (const auto& passwordCandidate: {passwordString, std::string("123")})
         {
-            if (execute(makeCommandString(userNameString, passwordCandidate, domain)))
-               return true;
+            for (const auto& dialect: std::vector<std::string>{"", "2.0", "1.0"})
+            {
+                if (execute(makeCommandString(userNameString, passwordCandidate, domain, dialect)))
+                    return true;
+            }
         }
     }
 
