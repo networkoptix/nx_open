@@ -219,7 +219,7 @@ bool SystemCommands::mount(const std::string& url, const std::string& directory,
     {
         for (const auto& passwordCandidate: {passwordString, std::string("123")})
         {
-            for (const auto& dialect: std::vector<std::string>{"", "2.0", "1.0"})
+            for (const auto& dialect: {"", "2.0", "1.0"})
             {
                 if (execute(makeCommandString(userNameString, passwordCandidate, domain, dialect)))
                     return true;
