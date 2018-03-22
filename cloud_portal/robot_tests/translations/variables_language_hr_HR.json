@@ -51,5 +51,6 @@
     "PASSWORD IS REQUIRED TEXT": "potrebna je lozinka",
     "PASSWORD SPECIAL CHARS TEXT": "Koristite samo latino slova, brojeve i simbole tipkovnice, izbjegavajte vodeće i prateće prostore",
     "PASSWORD TOO SHORT TEXT": "Zaporka mora sadržavati najmanje 8 znakova",
-    "PASSWORD TOO COMMON TEXT": "Ova je lozinka na vrhu najpopularnijih lozinki na svijetu"
+    "PASSWORD TOO COMMON TEXT": "Ova je lozinka na vrhu najpopularnijih lozinki na svijetu",
+    "PASSWORD IS WEAK TEXT": "Use numbers, upper and lower case letters and special characters to make your password stronger"
 }

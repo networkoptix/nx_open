@@ -51,5 +51,6 @@
     "PASSWORD IS REQUIRED TEXT": "Heslo je vyžadováno",
     "PASSWORD SPECIAL CHARS TEXT": "Použijte pouze latinská písmena, čísla a symboly klávesnice, vyhněte se předním a koncovým mezerám",
     "PASSWORD TOO SHORT TEXT": "Heslo musí obsahovat alespoň 8 znaků",
-    "PASSWORD TOO COMMON TEXT": "Toto heslo je v nejpopulárnějších nejoblíbenějších heslech na světě"
+    "PASSWORD TOO COMMON TEXT": "Toto heslo je v nejpopulárnějších nejoblíbenějších heslech na světě",
+    "PASSWORD IS WEAK TEXT": "Use numbers, upper and lower case letters and special characters to make your password stronger"
 }

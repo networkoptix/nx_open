@@ -51,5 +51,6 @@
     "PASSWORD IS REQUIRED TEXT": "Jelszó megadása szükséges",
     "PASSWORD SPECIAL CHARS TEXT": "Csak latin betűket, számokat és billentyűzet szimbólumok használhatók, kerülje a szóközöket",
     "PASSWORD TOO SHORT TEXT": "A jelszónak legalább 8 karakterből kell állnia",
-    "PASSWORD TOO COMMON TEXT": "Ez a jelszó a leggyakoribb jelszavak egyike"
+    "PASSWORD TOO COMMON TEXT": "Ez a jelszó a leggyakoribb jelszavak egyike",
+    "PASSWORD IS WEAK TEXT": "Használjon számokat, kis és nagybetűket és speciális karaktereket az erősebb jelszó érdekében"
 }

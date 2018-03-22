@@ -51,5 +51,6 @@
     "PASSWORD IS REQUIRED TEXT": "Parola gerekmektedir",
     "PASSWORD SPECIAL CHARS TEXT": "Sadece alfanümerik ve klavye karakterleri kullanın",
     "PASSWORD TOO SHORT TEXT": "Şifre en az 8 karakter içermelidir",
-    "PASSWORD TOO COMMON TEXT": "Dünyada en çok kullanılan parolayı seçtiniz"
+    "PASSWORD TOO COMMON TEXT": "Dünyada en çok kullanılan parolayı seçtiniz",
+    "PASSWORD IS WEAK TEXT": "Parolanın güçlü olması için \nküçük büyük harf ve özel karakterler kullanın"
 }

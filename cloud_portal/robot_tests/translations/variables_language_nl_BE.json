@@ -2,7 +2,7 @@
     "YOU HAVE NO SYSTEMS TEXT": "U heeft geen systemen aangesloten op {{PRODUCT_NAME}}",
     "LOG OUT BUTTON TEXT": "Uitloggen",
     "ACCOUNT SETTINGS BUTTON TEXT": "Accountinstellingen",
-    "RESET EMAIL SENT MESSAGE TEXT": "Wachtwoordherstelinstructies worden verzonden naar het volgende emailadres:  {{email}}",
+    "RESET EMAIL SENT MESSAGE TEXT": "Wachtwoordherstelinstructies worden verzonden naar het volgende emailadres: {{email}}",
     "CREATE ACCOUNT BUTTON TEXT": "Account aanmaken",
     "TERMS AND CONDITIONS LINK TEXT": "Voorwaarden",
     "RESEND ACTIVATION LINK BUTTON TEXT": "Activatielink opnieuw verzenden",
@@ -51,5 +51,6 @@
     "PASSWORD IS REQUIRED TEXT": "Wachtwoord is vereist",
     "PASSWORD SPECIAL CHARS TEXT": "Gebruik alleen alfanumerieke tekens en symbolen van het toetsenbord, Vermijd spaties voor en na het wachtwoord",
     "PASSWORD TOO SHORT TEXT": "Het wachtwoord moet minstens 8 karakters bevatten",
-    "PASSWORD TOO COMMON TEXT": "Dit wachtwoord bevind zich in de top van de meest populaire wachtwoorden in de wereld"
+    "PASSWORD TOO COMMON TEXT": "Dit wachtwoord bevind zich in de top van de meest populaire wachtwoorden in de wereld",
+    "PASSWORD IS WEAK TEXT": "Gebruik cijfers, hoofdletters, kleine letters en speciale tekens om uw wachtwoord sterker te maken"
 }

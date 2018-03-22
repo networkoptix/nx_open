@@ -51,5 +51,6 @@
     "PASSWORD IS REQUIRED TEXT": "패스워드가 필요합니다.",
     "PASSWORD SPECIAL CHARS TEXT": "라틴 문자, 숫자 및 키보드 기호 만 사용하고 앞뒤 공백은 피하십시오.",
     "PASSWORD TOO SHORT TEXT": "비밀번호는 최소 8자 이상 포함되어야 합니다.",
-    "PASSWORD TOO COMMON TEXT": "현재 암호는 가능 많이 사용되는 암호입니다."
+    "PASSWORD TOO COMMON TEXT": "현재 암호는 가능 많이 사용되는 암호입니다.",
+    "PASSWORD IS WEAK TEXT": "숫자, 대 / 소문자 및 특수 문자를 사용하여 패스워드를 더 강하게 만듭니다."
 }

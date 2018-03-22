@@ -61,5 +61,6 @@
     "PASSWORD IS REQUIRED TEXT"            :    "Password is required",
     "PASSWORD SPECIAL CHARS TEXT"          :    "Use only latin letters, numbers and keyboard symbols, avoid leading and trailing spaces",
     "PASSWORD TOO SHORT TEXT"              :    "Password must contain at least 8 characters",
-    "PASSWORD TOO COMMON TEXT"             :    "This password is in top most popular passwords in the world"
+    "PASSWORD TOO COMMON TEXT"             :    "This password is in top most popular passwords in the world",
+    "PASSWORD IS WEAK TEXT"                :    "Use numbers, upper and lower case letters and special characters to make your password stronger"
 }

@@ -51,5 +51,6 @@
     "PASSWORD IS REQUIRED TEXT": "изисква се парола",
     "PASSWORD SPECIAL CHARS TEXT": "Използвайте само латински букви, цифри и символи на клавиатурата, избягвайте водещи и задни интервали",
     "PASSWORD TOO SHORT TEXT": "Паролата трябва да съдържа поне 8 знака",
-    "PASSWORD TOO COMMON TEXT": "Тази парола е в най-популярните най-популярни пароли в света"
+    "PASSWORD TOO COMMON TEXT": "Тази парола е в най-популярните най-популярни пароли в света",
+    "PASSWORD IS WEAK TEXT": "Use numbers, upper and lower case letters and special characters to make your password stronger"
 }

@@ -51,5 +51,6 @@
     "PASSWORD IS REQUIRED TEXT": "Kinakailangan ang password",
     "PASSWORD SPECIAL CHARS TEXT": "Gumamit lamang ng mga liham na latin, numero at mga simbolo ng keyboard, iwasan ang mga nangungunang at sumusunod na mga puwang",
     "PASSWORD TOO SHORT TEXT": "Ang password ay dapat maglaman ng hindi bababa sa 8 mga character",
-    "PASSWORD TOO COMMON TEXT": "Ang password na ito ay nasa itaas ng pinaka-popular na mga password sa mundo"
+    "PASSWORD TOO COMMON TEXT": "Ang password na ito ay nasa itaas ng pinaka-popular na mga password sa mundo",
+    "PASSWORD IS WEAK TEXT": "Use numbers, upper and lower case letters and special characters to make your password stronger"
 }

@@ -51,5 +51,6 @@
     "PASSWORD IS REQUIRED TEXT": "Parola este necesara",
     "PASSWORD SPECIAL CHARS TEXT": "Utilizați numai litere latine, numere și simboluri de tastatură, evitați spațiile de conducere și de sfârșit",
     "PASSWORD TOO SHORT TEXT": "Parola trebuie să conțină cel puțin 8 caractere",
-    "PASSWORD TOO COMMON TEXT": "Această parolă se află în cele mai populare parole din lume"
+    "PASSWORD TOO COMMON TEXT": "Această parolă se află în cele mai populare parole din lume",
+    "PASSWORD IS WEAK TEXT": "Use numbers, upper and lower case letters and special characters to make your password stronger"
 }

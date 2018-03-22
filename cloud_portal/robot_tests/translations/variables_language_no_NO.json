@@ -51,5 +51,6 @@
     "PASSWORD IS REQUIRED TEXT": "Passord er påkrevd",
     "PASSWORD SPECIAL CHARS TEXT": "Bruk bare latinske bokstaver, tall og tastatur symboler, unngå ledende og etterfølgende mellomrom",
     "PASSWORD TOO SHORT TEXT": "Passordet må inneholde minst 8 tegn",
-    "PASSWORD TOO COMMON TEXT": "Dette passordet er i de mest populære passordene i verden"
+    "PASSWORD TOO COMMON TEXT": "Dette passordet er i de mest populære passordene i verden",
+    "PASSWORD IS WEAK TEXT": "Use numbers, upper and lower case letters and special characters to make your password stronger"
 }

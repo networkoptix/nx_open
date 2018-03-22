@@ -51,5 +51,6 @@
     "PASSWORD IS REQUIRED TEXT": "كلمة المرور مطلوبة",
     "PASSWORD SPECIAL CHARS TEXT": "استخدم فقط الأحرف اللاتينية والأرقام ورموز لوحة المفاتيح، وتجنب المسافات الرائدة والزائدة",
     "PASSWORD TOO SHORT TEXT": "يجب أن تحتوي كلمة المرور على 8 أحرف على الأقل",
-    "PASSWORD TOO COMMON TEXT": "كلمة المرور هذه هي في أعلى كلمات السر الأكثر شعبية في العالم"
+    "PASSWORD TOO COMMON TEXT": "كلمة المرور هذه هي في أعلى كلمات السر الأكثر شعبية في العالم",
+    "PASSWORD IS WEAK TEXT": "Use numbers, upper and lower case letters and special characters to make your password stronger"
 }

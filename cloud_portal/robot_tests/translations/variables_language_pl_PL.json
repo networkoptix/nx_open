@@ -51,5 +51,6 @@
     "PASSWORD IS REQUIRED TEXT": "Hasło jest wymagane",
     "PASSWORD SPECIAL CHARS TEXT": "Używaj tylko liter łacińskich, cyfr i symboli z klawiatury, unikając spacji na początku i na końcu",
     "PASSWORD TOO SHORT TEXT": "Hasło musi zawierać co najmniej 8 znaków",
-    "PASSWORD TOO COMMON TEXT": "To hasło znajduje się na liście najczęściej stosowanych haseł na świecie"
+    "PASSWORD TOO COMMON TEXT": "To hasło znajduje się na liście najczęściej stosowanych haseł na świecie",
+    "PASSWORD IS WEAK TEXT": "Użyj liczb, wielkich i małych liter oraz znaków specjalnych, aby ustawić bezpieczniejsze hasło"
 }

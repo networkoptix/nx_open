@@ -51,5 +51,6 @@
     "PASSWORD IS REQUIRED TEXT": "salasana tarvitaan",
     "PASSWORD SPECIAL CHARS TEXT": "Käytä vain latinalaisia ​​kirjaimia, numeroita ja näppäimistön symboleja, vältä johtavaa ja jäljellä olevaa tilaa",
     "PASSWORD TOO SHORT TEXT": "Salasanan tulee sisältää vähintään 8 merkkiä",
-    "PASSWORD TOO COMMON TEXT": "Tämä salasana on maailman suosituimpia salasanoja"
+    "PASSWORD TOO COMMON TEXT": "Tämä salasana on maailman suosituimpia salasanoja",
+    "PASSWORD IS WEAK TEXT": "Use numbers, upper and lower case letters and special characters to make your password stronger"
 }
