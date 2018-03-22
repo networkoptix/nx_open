@@ -104,7 +104,7 @@ private:
         const nx::api::AnalyticsDriverManifest& manifest,
         const QnMediaServerResourcePtr& server);
 
-    void mergePluginManifestToServer(
+    nx::api::AnalyticsDriverManifest mergePluginManifestToServer(
         const nx::api::AnalyticsDriverManifest& manifest,
         const QnMediaServerResourcePtr& server);
 
