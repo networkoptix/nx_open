@@ -4,7 +4,6 @@
 
 #include <ui/dialogs/failover_priority_dialog.h>
 
-
 QnFailoverPriorityResourceModelDelegate::QnFailoverPriorityResourceModelDelegate(QObject* parent):
     base_type(parent)
     , m_colors()
@@ -53,8 +52,7 @@ QVariant QnFailoverPriorityResourceModelDelegate::data(const QModelIndex &index,
     return QVariant();
 }
 
-bool QnFailoverPriorityResourceModelDelegate::setData(const QModelIndex &index, const QVariant &value, int role) {
-    QN_UNUSED(index, value, role);
+bool QnFailoverPriorityResourceModelDelegate::setData(const QModelIndex& /*index*/, const QVariant& /*value*/, int /*role*/) {
     return false;
 }
 
@@ -76,4 +74,3 @@ void QnFailoverPriorityResourceModelDelegate::forceCamerasPriority( const QnVirt
 QHash<QnUuid, Qn::FailoverPriority> QnFailoverPriorityResourceModelDelegate::forcedCamerasPriorities() const {
     return m_forcedPriorities;
 }
-

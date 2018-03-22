@@ -153,7 +153,6 @@ QnResourceList QnPlISDResourceSearcher::findResources(void)
     return totalResults;
 }
 
-
 QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddrInternal(
     const nx::utils::Url &url,
     const QAuthenticator &authOriginal)
@@ -217,7 +216,6 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddrInternal(
 
     if (mac.length() > 17 && mac.endsWith(QLatin1Char('0')))
         mac.chop(mac.length() - 17);
-
 
     QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), name);
     if (rt.isNull()) {
@@ -368,7 +366,6 @@ QnResourcePtr QnPlISDResourceSearcher::processMdnsResponse(
 
     QnPlIsdResourcePtr resource ( new QnPlIsdResource() );
 
-
     QAuthenticator cameraAuth;
     if (auto existingRes = resourcePool()->getResourceByMacAddress( smac ) )
         cameraAuth = existingRes->getAuth();
@@ -408,7 +405,6 @@ QnResourcePtr QnPlISDResourceSearcher::processMdnsResponse(
     else
         resource->setDefaultAuth(lit("root"), lit("admin"));
 
-
     if(!cameraAuth.isNull())
     {
         resource->setAuth(cameraAuth);
@@ -435,16 +431,12 @@ QnResourcePtr QnPlISDResourceSearcher::processMdnsResponse(
     return resource;
 }
 
-
 bool QnPlISDResourceSearcher::processPacket(
-    const QHostAddress& discoveryAddr,
+    const QHostAddress& /*discoveryAddr*/,
     const nx::network::SocketAddress& deviceEndpoint,
     const nx::network::upnp::DeviceInfo& devInfo,
     const QByteArray& /*xmlDevInfo*/)
 {
-
-	QN_UNUSED(discoveryAddr);
-
     if (!isDwOrIsd(devInfo.manufacturer, devInfo.modelName))
         return false;
 

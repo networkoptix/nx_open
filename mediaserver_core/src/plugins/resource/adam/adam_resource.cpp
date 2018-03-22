@@ -99,7 +99,6 @@ CameraDiagnostics::Result QnAdamResource::initializeCameraDriver()
 
 bool QnAdamResource::startInputPortMonitoringAsync(std::function<void(bool)>&& completionHandler)
 {
-    QN_UNUSED(completionHandler);
     if (!m_ioManager)
         return false;
 

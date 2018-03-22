@@ -39,13 +39,12 @@ int QnSetupCloudSystemRestHandler::executeGet(
 }
 
 int QnSetupCloudSystemRestHandler::executePost(
-    const QString& path,
-    const QnRequestParams& params,
+    const QString& /*path*/,
+    const QnRequestParams& /*params*/,
     const QByteArray& body,
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
-    QN_UNUSED(path, params);
     const SetupCloudSystemData data = QJson::deserialized<SetupCloudSystemData>(body);
     return execute(std::move(data), owner, result);
 }

@@ -161,7 +161,6 @@ bool loadSyncTime(
     return true;
 }
 
-
 //////////////////////////////////////////////
 //   TimePriorityKey
 //////////////////////////////////////////////
@@ -228,7 +227,6 @@ bool TimePriorityKey::hasLessPriorityThan(
         seed < right.seed;
 }
 
-
 quint64 TimePriorityKey::toUInt64() const
 {
     return ((quint64)sequence << 48) | ((quint64)flags << 32) | seed;
@@ -245,7 +243,6 @@ bool TimePriorityKey::isTakenFromInternet() const
 {
     return (flags & Qn::TF_peerTimeSynchronizedWithInternetServer) > 0;
 }
-
 
 //////////////////////////////////////////////
 //   TimeSyncInfo
@@ -292,9 +289,7 @@ bool TimeSyncInfo::fromString(const QByteArray& str)
     return true;
 }
 
-
 //#define TEST_PTS_SELECTION
-
 
 //////////////////////////////////////////////
 //   TimeSynchronizationManager
@@ -1432,7 +1427,7 @@ void TimeSynchronizationManager::handleLocalTimePriorityKeyChange(
         });
 #else
     // TODO: this is an old version from 3.0 We can switch to the new as soon as saveMiscParam will work asynchronously
-    QN_UNUSED(lock);
+    nx::utils::unused(lock);
     ++m_asyncOperationsInProgress;
     Ec2ThreadPool::instance()->start(make_custom_runnable(
         [this]

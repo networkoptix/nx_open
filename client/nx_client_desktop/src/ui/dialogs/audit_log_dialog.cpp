@@ -346,7 +346,6 @@ QnAuditRecordRefList QnAuditLogDialog::applyFilter()
     return result;
 }
 
-
 QnAuditRecordRefList QnAuditLogDialog::filterChildDataBySessions(const QnAuditRecordRefList& checkedRows)
 {
     QMap<QnUuid, int> selectedSessions;
@@ -578,9 +577,9 @@ void setGridGeneralCheckState(QTableView* gridMaster)
     }
 }
 
-void QnAuditLogDialog::at_masterGridSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
+void QnAuditLogDialog::at_masterGridSelectionChanged(const QItemSelection& /*selected*/,
+    const QItemSelection& /*deselected*/)
 {
-    QN_UNUSED(selected, deselected);
     if (auto tableView = qobject_cast<QTableView*>(sender()->parent()))
         setGridGeneralCheckState(tableView);
 }
@@ -825,7 +824,6 @@ void QnAuditLogDialog::query(qint64 fromMsec, qint64 toMsec)
     m_sessionData.clear();
     m_cameraData.clear();
     m_filteredData.clear();
-
 
     const auto onlineServers = resourcePool()->getAllServers(Qn::Online);
     for(const QnMediaServerResourcePtr& mserver: onlineServers)

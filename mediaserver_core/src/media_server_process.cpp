@@ -289,7 +289,6 @@
 #include <nx/mediaserver/updates2/server_updates2_manager.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
 
-
 #if !defined(EDGE_SERVER)
     #include <nx_speech_synthesizer/text_to_wav.h>
     #include <nx/utils/file_system.h>
@@ -304,7 +303,6 @@
 #endif
 
 #include "mediaserver_ini.h"
-
 
 using namespace nx;
 
@@ -326,7 +324,6 @@ class MediaServerProcess;
 static MediaServerProcess* serviceMainInstance = 0;
 void stopServer(int signal);
 bool restartFlag = false;
-
 
 namespace {
 const QString YES = lit("yes");
@@ -451,7 +448,6 @@ QString defaultLocalAddress(const QHostAddress& target)
         if (result.length()>0)
             return result;
     }
-
 
     {
         // if nothing else works use first enabled hostaddr
@@ -593,7 +589,6 @@ QnStorageResourceList getSmallStorages(const QnStorageResourceList& storages)
     }
     return result;
 }
-
 
 QnStorageResourceList createStorages(
     QnCommonModule* commonModule,
@@ -1190,7 +1185,6 @@ void MediaServerProcess::stopAsync()
     QTimer::singleShot(0, this, SLOT(stopSync()));
 }
 
-
 int MediaServerProcess::getTcpPort() const
 {
     return m_universalTcpListener ? m_universalTcpListener->getPort() : 0;
@@ -1271,7 +1265,6 @@ void MediaServerProcess::updateAddressesList()
 
     ec2::ApiMediaServerData prevValue;
     fromResourceToApi(m_mediaServer, prevValue);
-
 
     nx::network::AddressFilters addressMask =
         nx::network::AddressFilter::ipV4
@@ -2291,7 +2284,6 @@ void MediaServerProcess::run()
         this, &MediaServerProcess::started,
         [&serverModule]() {serverModule->findInstance<Downloader>()->atServerStart(); });
 
-
     qnServerModule->runTimeSettings()->remove("rebuild");
 
     if (m_serviceMode)
@@ -2717,13 +2709,11 @@ void MediaServerProcess::run()
             } while (appserverHost.toIPv4Address() == 0);
         }
 
-
         server->setPrimaryAddress(
             nx::network::SocketAddress(defaultLocalAddress(appserverHost), m_universalTcpListener->getPort()));
         server->setSslAllowed(sslAllowed);
         cloudIntegrationManager->cloudManagerGroup().connectionManager.setProxyVia(
             nx::network::SocketAddress(nx::network::HostAddress::localhost, m_universalTcpListener->getPort()));
-
 
         // used for statistics reported
         server->setSystemInfo(QnSystemInformation::currentSystemInformation());
@@ -2870,8 +2860,6 @@ void MediaServerProcess::run()
     auto serverMessageProcessor = dynamic_cast<QnServerMessageProcessor*> (commonModule()->messageProcessor());
     serverMessageProcessor->startReceivingLocalNotifications(ec2Connection);
 
-
-
     qnServerModule->metadataManagerPool()->init();
     at_runtimeInfoChanged(runtimeManager->localInfo());
 
@@ -2957,7 +2945,6 @@ void MediaServerProcess::run()
 
     std::unique_ptr<QnLdapManager> ldapManager(new QnLdapManager(commonModule()));
 
-
     commonModule()->resourceDiscoveryManager()->setReady(true);
     const bool isDiscoveryDisabled =
         qnServerModule->roSettings()->value(QnServer::kNoResourceDiscovery, false).toBool();
@@ -2965,7 +2952,6 @@ void MediaServerProcess::run()
         commonModule()->resourceDiscoveryManager()->start();
     //else
     //    we are not able to add cameras to DB anyway, so no sense to do discover
-
 
     connect(
         commonModule()->resourceDiscoveryManager(),
@@ -3228,11 +3214,11 @@ void MediaServerProcess::at_emptyDigestDetected(const QnUserResourcePtr& user, c
 
         QnUuid userId = user->getId();
         m_updateUserRequests << userId;
-        appServerConnection->getUserManager(Qn::kSystemAccess)->save(userData, password, this, [this, userId]( int reqID, ec2::ErrorCode errorCode )
-        {
-            QN_UNUSED(reqID, errorCode);
-            m_updateUserRequests.remove(userId);
-        } );
+        appServerConnection->getUserManager(Qn::kSystemAccess)->save(userData, password, this,
+            [this, userId]( int /*reqID*/, ec2::ErrorCode /*errorCode*/ )
+            {
+                m_updateUserRequests.remove(userId);
+            });
     }
 }
 
@@ -3371,7 +3357,6 @@ int MediaServerProcess::main(int argc, char* argv[])
 #ifdef __linux__
     signal( SIGUSR1, SIGUSR1_handler );
 #endif
-
 
 #ifndef EDGE_SERVER
     std::unique_ptr<TextToWaveServer> textToWaveServer = std::make_unique<TextToWaveServer>(

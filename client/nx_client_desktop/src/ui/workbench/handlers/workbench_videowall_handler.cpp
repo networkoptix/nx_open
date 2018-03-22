@@ -384,7 +384,6 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
 
         });
 
-
     foreach(const QnPeerRuntimeInfo &info, runtimeInfoManager()->items()->getItems())
     {
         if (info.data.peer.peerType != Qn::PT_VideowallClient)
@@ -980,16 +979,16 @@ void QnWorkbenchVideoWallHandler::handleMessage(const QnVideoWallControlMessage 
             navigator()->setPosition(message[positionKey].toLongLong());
             break;
         }
-	    case QnVideoWallControlMessage::NavigatorPlayingChanged:
-	    {
-	        navigator()->setPlaying(QnLexical::deserialized<bool>(message[valueKey]));
-	        break;
-	    }
+        case QnVideoWallControlMessage::NavigatorPlayingChanged:
+        {
+            navigator()->setPlaying(QnLexical::deserialized<bool>(message[valueKey]));
+            break;
+        }
         case QnVideoWallControlMessage::NavigatorSpeedChanged:
         {
             navigator()->setSpeed(message[speedKey].toDouble());
-	        if (message.contains(positionKey))
-	            navigator()->setPosition(message[positionKey].toLongLong());
+            if (message.contains(positionKey))
+                navigator()->setPosition(message[positionKey].toLongLong());
             break;
         }
         case QnVideoWallControlMessage::SynchronizationChanged:
@@ -1080,7 +1079,6 @@ void QnWorkbenchVideoWallHandler::restoreMessages(const QnUuid &controllerUuid, 
     }
 }
 
-
 bool QnWorkbenchVideoWallHandler::canStartControlMode() const
 {
     if (!m_licensesHelper->isValid(Qn::LC_VideoWall))
@@ -1090,7 +1088,6 @@ bool QnWorkbenchVideoWallHandler::canStartControlMode() const
             tr("To enable this feature, please activate a Video Wall license."));
         return false;
     }
-
 
     QnVideoWallLicenseUsageProposer proposer(m_licensesHelper, 0, 1);
     if (!validateLicenses(tr("Activate one more license to start Video Wall control session.")))
@@ -1544,7 +1541,6 @@ void QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered()
         d->submitToResource(videoWall);
     });
 
-
     menu()->trigger(action::OpenVideoWallReviewAction, videoWall);
 }
 
@@ -1973,7 +1969,6 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered()
         targetLayout->setParentId(videoWallId);
     }
 
-
     /* User can occasionally remove own access to cameras by dropping something on videowall. */
     if (dropAction == Action::SetAction && currentLayout)
     {
@@ -2071,7 +2066,6 @@ void QnWorkbenchVideoWallHandler::at_saveVideowallMatrixAction_triggered()
     videowall->matrices()->addItem(matrix);
     saveVideowall(videowall);
 }
-
 
 void QnWorkbenchVideoWallHandler::at_loadVideowallMatrixAction_triggered()
 {
@@ -2284,11 +2278,10 @@ void QnWorkbenchVideoWallHandler::at_videoWall_pcAdded(const QnVideoWallResource
     }
 }
 
-void QnWorkbenchVideoWallHandler::at_videoWall_pcChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallPcData &pc)
+void QnWorkbenchVideoWallHandler::at_videoWall_pcChanged(const QnVideoWallResourcePtr& videoWall, const QnVideoWallPcData& pc)
 {
     // TODO: #GDM #VW implement screen size changes handling
-    QN_UNUSED(videoWall);
-    QN_UNUSED(pc);
+    nx::utils::unused(videoWall, pc);
 }
 
 void QnWorkbenchVideoWallHandler::at_videoWall_pcRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallPcData &pc)
@@ -2913,16 +2906,15 @@ void QnWorkbenchVideoWallHandler::setItemControlledBy(const QnUuid &layoutId, co
         updateMode();
 }
 
-
 void QnWorkbenchVideoWallHandler::updateMainWindowGeometry(const QnScreenSnaps &screenSnaps)
 {
     const QRect targetGeometry = screenSnaps.geometry(nx::gui::Screens::geometries());
     mainWindowWidget()->setGeometry(targetGeometry);
 }
 
-void QnWorkbenchVideoWallHandler::updateControlLayout(const QnVideoWallResourcePtr &videowall, const QnVideoWallItem &item, ItemAction action)
+void QnWorkbenchVideoWallHandler::updateControlLayout(const QnVideoWallResourcePtr& /*videowall*/,
+    const QnVideoWallItem& item, ItemAction action)
 {
-    QN_UNUSED(videowall);
     if (action == ItemAction::Changed)
     {
 

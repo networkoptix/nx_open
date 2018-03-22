@@ -34,13 +34,11 @@ QnStorageSpaceRestHandler::QnStorageSpaceRestHandler()
 {}
 
 int QnStorageSpaceRestHandler::executeGet(
-    const QString& path,
+    const QString& /*path*/,
     const QnRequestParams& params,
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
-    QN_UNUSED(path, owner);
-
     /* Some api calls can take a lot of time, so client can make a fast request for the first time. */
     const bool fastRequest = QnLexical::deserialized(params[kFastRequestKey], false);
 
