@@ -60,7 +60,6 @@ set(ios.new_bundle_identifier "com.senturian.SentryMobile")
 set(ios.group_identifier "group.com.senturian.SentryMobile")
 set(ios.sign.identity "iPhone Distribution: Senturian Solutions Pte Ltd (2DME8ZLDN5)")
 
-set(mac.skip.sign "false")
 set(mac.sign.identity "Developer ID Application: Network Optix, Inc. (L6FE34GJWM)")
 set(mac.app.sign.identity "3rd Party Mac Developer Application: Senturian Solutions Pte Ltd (2DME8ZLDN5)")
 set(mac.pkg.sign.identity "3rd Party Mac Developer Installer: Senturian Solutions Pte Ltd (2DME8ZLDN5)")
