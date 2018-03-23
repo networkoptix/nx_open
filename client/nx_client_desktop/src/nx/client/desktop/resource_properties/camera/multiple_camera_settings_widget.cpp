@@ -21,7 +21,7 @@
 #include <ui/widgets/licensing/licenses_propose_widget.h>
 #include <ui/workbench/workbench_context.h>
 
-#include "camera_schedule_widget.h"
+#include "legacy_camera_schedule_widget.h"
 #include "camera_motion_mask_widget.h"
 
 namespace nx {
@@ -56,9 +56,9 @@ MultipleCameraSettingsWidget::MultipleCameraSettingsWidget(QWidget *parent):
     connect(ui->cameraScheduleWidget, &QnAbstractPreferencesWidget::hasChangesChanged, this,
         &MultipleCameraSettingsWidget::at_dbDataChanged);
 
-    connect(ui->cameraScheduleWidget, &CameraScheduleWidget::scheduleEnabledChanged, this,
+    connect(ui->cameraScheduleWidget, &LegacyCameraScheduleWidget::scheduleEnabledChanged, this,
         &MultipleCameraSettingsWidget::at_cameraScheduleWidget_scheduleEnabledChanged);
-    connect(ui->cameraScheduleWidget, &CameraScheduleWidget::alert, this,
+    connect(ui->cameraScheduleWidget, &LegacyCameraScheduleWidget::alert, this,
         [this](const QString& text) { m_alertText = text; updateAlertBar(); });
 
     connect(ui->licensingWidget, &QnLicensesProposeWidget::changed, this,

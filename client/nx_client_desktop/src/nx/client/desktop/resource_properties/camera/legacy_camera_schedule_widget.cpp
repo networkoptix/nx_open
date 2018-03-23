@@ -1,5 +1,5 @@
-#include "camera_schedule_widget.h"
-#include "ui_camera_schedule_widget.h"
+#include "legacy_camera_schedule_widget.h"
+#include "ui_legacy_camera_schedule_widget.h"
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QScopedValueRollback>
@@ -31,7 +31,7 @@
 #include <ui/style/skin.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
-#include <ui/widgets/properties/archive_length_widget.h>
+#include <ui/widgets/properties/legacy_archive_length_widget.h>
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -41,24 +41,15 @@
 #include <utils/math/math.h>
 #include <utils/license_usage_helper.h>
 
+#include "export_schedule_resource_selection_dialog_delegate.h"
+#include <utils/camera/camera_bitrate_calculator.h>
+
 using boost::algorithm::all_of;
 using boost::algorithm::any_of;
 
 namespace {
 
-static constexpr qreal kKbpsInMbps = 1000.0;
-
-qreal getBitrateForQuality(
-    const QnVirtualCameraResourcePtr& camera,
-    Qn::StreamQuality quality,
-    int fps,
-    int decimals)
-{
-    const auto resolution = camera->streamInfo().getResolution();
-    const auto bitrateMbps = camera->suggestBitrateForQualityKbps(quality, resolution, fps, Qn::CR_LiveVideo) / kKbpsInMbps;
-    const auto roundingStep = std::pow(0.1, decimals);
-    return qRound(bitrateMbps, roundingStep);
-}
+static constexpr float kKbpsInMbps = 1000.0f;
 
 void setLayoutEnabled(QLayout* layout, bool enabled)
 {
@@ -85,124 +76,6 @@ void setNormalizedValue(InputWidget* widget, qreal fraction)
     widget->setValue(widget->minimum() + fraction * (widget->maximum() - widget->minimum()));
 }
 
-class ExportScheduleResourceSelectionDialogDelegate: public QnResourceSelectionDialogDelegate
-{
-    Q_DECLARE_TR_FUNCTIONS(ExportScheduleResourceSelectionDialogDelegate);
-    typedef QnResourceSelectionDialogDelegate base_type;
-public:
-    ExportScheduleResourceSelectionDialogDelegate(QWidget* parent,
-        bool recordingEnabled,
-        bool motionUsed,
-        bool dualStreamingUsed,
-        bool hasVideo)
-        :
-        base_type(parent),
-        m_licensesLabel(NULL),
-        m_motionLabel(NULL),
-        m_dtsLabel(NULL),
-        m_recordingEnabled(recordingEnabled),
-        m_motionUsed(motionUsed),
-        m_dualStreamingUsed(dualStreamingUsed),
-        m_hasVideo(hasVideo)
-    {
-    }
-
-    virtual ~ExportScheduleResourceSelectionDialogDelegate()
-    {
-
-    }
-
-    bool doCopyArchiveLength() const
-    {
-        return m_archiveCheckbox->isChecked();
-    }
-
-    virtual void init(QWidget* parent) override
-    {
-        m_parentPalette = parent->palette();
-
-        m_archiveCheckbox = new QCheckBox(parent);
-        m_archiveCheckbox->setText(tr("Copy archive length settings"));
-        parent->layout()->addWidget(m_archiveCheckbox);
-
-        m_licensesLabel = new QLabel(parent);
-        parent->layout()->addWidget(m_licensesLabel);
-
-        auto addWarningLabel = [parent](const QString &text) -> QLabel*
-        {
-            auto label = new QLabel(text, parent);
-            setWarningStyle(label);
-            parent->layout()->addWidget(label);
-            label->setVisible(false);
-            return label;
-        };
-
-        m_motionLabel = addWarningLabel(tr("Schedule motion type is not supported by some cameras."));
-        m_dtsLabel = addWarningLabel(tr("Recording cannot be enabled for some cameras."));
-        m_noVideoLabel = addWarningLabel(tr("Schedule settings are not compatible with some devices."));
-    }
-
-    virtual bool validate(const QSet<QnUuid>& selected) override
-    {
-        auto cameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(selected);
-
-        QnCamLicenseUsageHelper helper(cameras, m_recordingEnabled, commonModule());
-
-        QPalette palette = m_parentPalette;
-        bool licensesOk = helper.isValid();
-        QString licenseUsage = helper.getProposedUsageMsg();
-        if (!licensesOk)
-        {
-            setWarningStyle(&palette);
-            licenseUsage += L'\n' + helper.getRequiredMsg();
-        }
-        m_licensesLabel->setText(licenseUsage);
-        m_licensesLabel->setPalette(palette);
-
-        bool motionOk = true;
-        if (m_motionUsed)
-        {
-            foreach(const QnVirtualCameraResourcePtr &camera, cameras)
-            {
-                bool hasMotion = (camera->getMotionType() != Qn::MT_NoMotion);
-                if (!hasMotion)
-                {
-                    motionOk = false;
-                    break;
-                }
-                if (m_dualStreamingUsed && !camera->hasDualStreaming())
-                {
-                    motionOk = false;
-                    break;
-                }
-            }
-        }
-        m_motionLabel->setVisible(!motionOk);
-
-        bool dtsCamPresent = any_of(cameras, [](const QnVirtualCameraResourcePtr &camera) { return camera->isDtsBased(); });
-        m_dtsLabel->setVisible(dtsCamPresent);
-
-        /* If source camera has no video, allow to copy only to cameras without video. */
-        bool videoOk = m_hasVideo || !any_of(cameras, [](const QnVirtualCameraResourcePtr &camera) { return camera->hasVideo(0); });
-        m_noVideoLabel->setVisible(!videoOk);
-
-        return licensesOk && motionOk && !dtsCamPresent && videoOk;
-    }
-
-private:
-    QLabel* m_licensesLabel;
-    QLabel* m_motionLabel;
-    QLabel* m_dtsLabel;
-    QLabel* m_noVideoLabel;
-    QCheckBox *m_archiveCheckbox;
-    QPalette m_parentPalette;
-
-    bool m_recordingEnabled;
-    bool m_motionUsed;
-    bool m_dualStreamingUsed;
-    bool m_hasVideo;
-};
-
 static const int kRecordingTypeLabelFontSize = 12;
 static const int kRecordingTypeLabelFontWeight = QFont::DemiBold;
 static const int kDefaultBeforeThresholdSec = 5;
@@ -216,10 +89,10 @@ namespace desktop {
 
 using namespace ui;
 
-CameraScheduleWidget::CameraScheduleWidget(QWidget* parent, bool snapScrollbarToParent):
+LegacyCameraScheduleWidget::LegacyCameraScheduleWidget(QWidget* parent, bool snapScrollbarToParent):
     base_type(parent),
     QnWorkbenchContextAware(parent, InitializationMode::lazy),
-    ui(new Ui::CameraScheduleWidget)
+    ui(new Ui::LegacyCameraScheduleWidget)
 {
     ui->setupUi(this);
     ui->recordBeforeSpinBox->setSuffix(L' ' + QnTimeStrings::suffix(QnTimeStrings::Suffix::Seconds));
@@ -259,7 +132,7 @@ CameraScheduleWidget::CameraScheduleWidget(QWidget* parent, bool snapScrollbarTo
 
     // init buttons
     connect(ui->gridWidget, &QnScheduleGridWidget::colorsChanged, this,
-        &CameraScheduleWidget::updateColors);
+        &LegacyCameraScheduleWidget::updateColors);
     updateColors();
 
     QnCamLicenseUsageHelper helper(commonModule());
@@ -307,56 +180,56 @@ CameraScheduleWidget::CameraScheduleWidget(QWidget* parent, bool snapScrollbarTo
     connect(ui->gridWidget, &QnScheduleGridWidget::cellValuesChanged,
         this, handleCellValuesChanged);
     connect(ui->recordAlwaysButton, &QToolButton::toggled, this,
-        &CameraScheduleWidget::updateGridParams);
+        &LegacyCameraScheduleWidget::updateGridParams);
     connect(ui->recordMotionButton, &QToolButton::toggled, this,
-        &CameraScheduleWidget::updateGridParams);
+        &LegacyCameraScheduleWidget::updateGridParams);
     connect(ui->recordMotionPlusLQButton, &QToolButton::toggled, this,
-        &CameraScheduleWidget::updateGridParams);
+        &LegacyCameraScheduleWidget::updateGridParams);
     connect(ui->bitrateSpinBox, QnSpinboxDoubleValueChanged, this,
-        &CameraScheduleWidget::updateGridParams);
+        &LegacyCameraScheduleWidget::updateGridParams);
     connect(ui->recordMotionPlusLQButton, &QToolButton::toggled, this,
-        &CameraScheduleWidget::updateMaxFpsValue);
+        &LegacyCameraScheduleWidget::updateMaxFpsValue);
     connect(ui->noRecordButton, &QToolButton::toggled, this,
-        &CameraScheduleWidget::updateGridParams);
+        &LegacyCameraScheduleWidget::updateGridParams);
     connect(ui->qualityComboBox, QnComboboxCurrentIndexChanged, this,
-        &CameraScheduleWidget::updateGridParams);
+        &LegacyCameraScheduleWidget::updateGridParams);
     connect(ui->fpsSpinBox, QnSpinboxIntValueChanged, this,
-        &CameraScheduleWidget::updateGridParams);
+        &LegacyCameraScheduleWidget::updateGridParams);
 
     connect(ui->recordBeforeSpinBox, QnSpinboxIntValueChanged, this,
-        &CameraScheduleWidget::hasChangesChanged);
+        &LegacyCameraScheduleWidget::hasChangesChanged);
     connect(ui->recordAfterSpinBox, QnSpinboxIntValueChanged, this,
-        &CameraScheduleWidget::hasChangesChanged);
+        &LegacyCameraScheduleWidget::hasChangesChanged);
 
     connect(ui->licensesButton, &QPushButton::clicked, this,
-        &CameraScheduleWidget::at_licensesButton_clicked);
+        &LegacyCameraScheduleWidget::at_licensesButton_clicked);
     connect(ui->displayQualityCheckBox, &QCheckBox::stateChanged, this,
-        &CameraScheduleWidget::at_displayQualiteCheckBox_stateChanged);
+        &LegacyCameraScheduleWidget::at_displayQualiteCheckBox_stateChanged);
     connect(ui->displayFpsCheckBox, &QCheckBox::stateChanged, this,
-        &CameraScheduleWidget::at_displayFpsCheckBox_stateChanged);
+        &LegacyCameraScheduleWidget::at_displayFpsCheckBox_stateChanged);
 
     connect(ui->enableRecordingCheckBox, &QCheckBox::stateChanged, this,
-        &CameraScheduleWidget::updateLicensesLabelText);
+        &LegacyCameraScheduleWidget::updateLicensesLabelText);
     connect(ui->enableRecordingCheckBox, &QCheckBox::stateChanged, this,
-        &CameraScheduleWidget::updateGridEnabledState);
+        &LegacyCameraScheduleWidget::updateGridEnabledState);
     connect(ui->enableRecordingCheckBox, &QCheckBox::stateChanged, this,
         notifyAboutScheduleEnabledChanged);
 
     connect(ui->gridWidget, &QnScheduleGridWidget::cellActivated, this,
-        &CameraScheduleWidget::at_gridWidget_cellActivated);
+        &LegacyCameraScheduleWidget::at_gridWidget_cellActivated);
 
     connect(ui->exportScheduleButton, &QPushButton::clicked, this,
-        &CameraScheduleWidget::at_exportScheduleButton_clicked);
+        &LegacyCameraScheduleWidget::at_exportScheduleButton_clicked);
 
     connect(ui->archiveLengthWidget, &QnArchiveLengthWidget::alertChanged, this,
-        &nx::client::desktop::CameraScheduleWidget::alert);
+        &nx::client::desktop::LegacyCameraScheduleWidget::alert);
     connect(ui->archiveLengthWidget, &QnArchiveLengthWidget::changed, this,
         notifyAboutArchiveRangeChanged);
 
     ui->exportWarningLabel->setVisible(false);
 
     installEventHandler({ ui->recordMotionButton, ui->recordMotionPlusLQButton },
-        QEvent::MouseButtonRelease, this, &CameraScheduleWidget::at_releaseSignalizer_activated);
+        QEvent::MouseButtonRelease, this, &LegacyCameraScheduleWidget::at_releaseSignalizer_activated);
 
     updateMotionButtons();
 
@@ -391,32 +264,30 @@ CameraScheduleWidget::CameraScheduleWidget(QWidget* parent, bool snapScrollbarTo
 
     // Sync bitrate spin box and quality combo box with bitrate slider changes.
     connect(ui->bitrateSlider, &QSlider::valueChanged,
-        this, &CameraScheduleWidget::bitrateSliderChanged);
+        this, &LegacyCameraScheduleWidget::bitrateSliderChanged);
 
     // Sync bitrate slider and quality combo box with bitrate spin box changes.
     connect(ui->bitrateSpinBox, QnSpinboxDoubleValueChanged,
-        this, &CameraScheduleWidget::bitrateSpinBoxChanged);
+        this, &LegacyCameraScheduleWidget::bitrateSpinBoxChanged);
 
     // Sync bitrate with quality changes.
     syncBitrateWithQuality();
     connect(ui->qualityComboBox, QnComboboxCurrentIndexChanged,
-        this, &CameraScheduleWidget::syncBitrateWithQuality);
+        this, &LegacyCameraScheduleWidget::syncBitrateWithQuality);
 
     // Sync bitrate with fps changes.
     syncBitrateWithFps();
     connect(ui->fpsSpinBox, QnSpinboxIntValueChanged,
-        this, &CameraScheduleWidget::syncBitrateWithFps);
+        this, &LegacyCameraScheduleWidget::syncBitrateWithFps);
 
     setAdvancedSettingsVisible(false);
 
     retranslateUi();
 }
 
-CameraScheduleWidget::~CameraScheduleWidget()
-{
-}
+LegacyCameraScheduleWidget::~LegacyCameraScheduleWidget() = default;
 
-void CameraScheduleWidget::syncQualityWithBitrate()
+void LegacyCameraScheduleWidget::syncQualityWithBitrate()
 {
     if (!m_advancedSettingsSupported)
         return;
@@ -426,7 +297,7 @@ void CameraScheduleWidget::syncQualityWithBitrate()
         + (quality.second ? 0 : Qn::StreamQualityCount)));
 }
 
-void CameraScheduleWidget::syncBitrateWithQuality()
+void LegacyCameraScheduleWidget::syncBitrateWithQuality()
 {
     if (m_bitrateUpdating || !m_advancedSettingsSupported)
         return;
@@ -434,7 +305,7 @@ void CameraScheduleWidget::syncBitrateWithQuality()
     ui->bitrateSpinBox->setValue(bitrateForQuality(currentQualityApproximation()));
 }
 
-void CameraScheduleWidget::syncBitrateWithFps()
+void LegacyCameraScheduleWidget::syncBitrateWithFps()
 {
     if (!m_advancedSettingsSupported)
         return;
@@ -468,7 +339,7 @@ void CameraScheduleWidget::syncBitrateWithFps()
     }
 }
 
-void CameraScheduleWidget::bitrateSpinBoxChanged()
+void LegacyCameraScheduleWidget::bitrateSpinBoxChanged()
 {
     if (m_bitrateUpdating)
         return;
@@ -478,7 +349,7 @@ void CameraScheduleWidget::bitrateSpinBoxChanged()
     syncQualityWithBitrate();
 }
 
-void CameraScheduleWidget::bitrateSliderChanged()
+void LegacyCameraScheduleWidget::bitrateSliderChanged()
 {
     if (m_bitrateUpdating)
         return;
@@ -488,7 +359,7 @@ void CameraScheduleWidget::bitrateSliderChanged()
     syncQualityWithBitrate();
 }
 
-void CameraScheduleWidget::overrideMotionType(Qn::MotionType motionTypeOverride)
+void LegacyCameraScheduleWidget::overrideMotionType(Qn::MotionType motionTypeOverride)
 {
     if (m_motionTypeOverride == motionTypeOverride)
         return;
@@ -499,7 +370,7 @@ void CameraScheduleWidget::overrideMotionType(Qn::MotionType motionTypeOverride)
     updateMaxFPS();
 }
 
-void CameraScheduleWidget::retranslateUi()
+void LegacyCameraScheduleWidget::retranslateUi()
 {
     ui->retranslateUi(this);
 
@@ -508,24 +379,24 @@ void CameraScheduleWidget::retranslateUi()
         tr("based on server time")));
 }
 
-void CameraScheduleWidget::afterContextInitialized()
+void LegacyCameraScheduleWidget::afterContextInitialized()
 {
     connect(
         context()->instance<QnWorkbenchPanicWatcher>(),
         &QnWorkbenchPanicWatcher::panicModeChanged,
         this,
-        &CameraScheduleWidget::updatePanicLabelText);
+        &LegacyCameraScheduleWidget::updatePanicLabelText);
     updatePanicLabelText();
 
     connect(
         context(),
         &QnWorkbenchContext::userChanged,
         this,
-        &CameraScheduleWidget::updateLicensesButtonVisible);
+        &LegacyCameraScheduleWidget::updateLicensesButtonVisible);
     updateLicensesButtonVisible();
 }
 
-void CameraScheduleWidget::setReadOnlyInternal(bool readOnly)
+void LegacyCameraScheduleWidget::setReadOnlyInternal(bool readOnly)
 {
     using ::setReadOnly;
     setReadOnly(ui->recordAlwaysButton, readOnly);
@@ -544,12 +415,12 @@ void CameraScheduleWidget::setReadOnlyInternal(bool readOnly)
     setReadOnly(ui->archiveLengthWidget, readOnly);
 }
 
-const QnVirtualCameraResourceList &CameraScheduleWidget::cameras() const
+const QnVirtualCameraResourceList &LegacyCameraScheduleWidget::cameras() const
 {
     return m_cameras;
 }
 
-void CameraScheduleWidget::setCameras(const QnVirtualCameraResourceList &cameras)
+void LegacyCameraScheduleWidget::setCameras(const QnVirtualCameraResourceList &cameras)
 {
     if (m_cameras == cameras)
         return;
@@ -564,7 +435,7 @@ void CameraScheduleWidget::setCameras(const QnVirtualCameraResourceList &cameras
     for (const auto& camera: m_cameras)
     {
         connect(camera, &QnSecurityCamResource::resourceChanged,
-            this, &CameraScheduleWidget::at_cameraResourceChanged, Qt::QueuedConnection);
+            this, &LegacyCameraScheduleWidget::at_cameraResourceChanged, Qt::QueuedConnection);
         connect(camera, &QnResource::propertyChanged, this,
             [this](const QnResourcePtr& resource, const QString& propertyName)
             {
@@ -577,12 +448,12 @@ void CameraScheduleWidget::setCameras(const QnVirtualCameraResourceList &cameras
     }
 }
 
-bool CameraScheduleWidget::hasChanges() const
+bool LegacyCameraScheduleWidget::hasChanges() const
 {
     return false;
 }
 
-void CameraScheduleWidget::loadDataToUi()
+void LegacyCameraScheduleWidget::loadDataToUi()
 {
     QScopedValueRollback<bool> updateRollback(m_updating, true);
 
@@ -670,7 +541,7 @@ void CameraScheduleWidget::loadDataToUi()
     retranslateUi();
 }
 
-void CameraScheduleWidget::applyChanges()
+void LegacyCameraScheduleWidget::applyChanges()
 {
     bool scheduleChanged = ui->gridWidget->isActive();
 
@@ -716,7 +587,7 @@ void CameraScheduleWidget::applyChanges()
     }
 }
 
-void CameraScheduleWidget::updateScheduleEnabled()
+void LegacyCameraScheduleWidget::updateScheduleEnabled()
 {
     int enabledCount = 0, disabledCount = 0;
     for (const auto &camera : m_cameras)
@@ -726,7 +597,7 @@ void CameraScheduleWidget::updateScheduleEnabled()
         enabledCount == 0 || disabledCount == 0, enabledCount > 0);
 }
 
-void CameraScheduleWidget::updateMaxFPS()
+void LegacyCameraScheduleWidget::updateMaxFPS()
 {
     QPair<int, int> fpsLimits = Qn::calculateMaxFps(m_cameras, m_motionTypeOverride);
     int maxFps = fpsLimits.first;
@@ -761,7 +632,7 @@ void CameraScheduleWidget::updateMaxFPS()
 // Quality combo box contains Qn::StreamQuality constants as user data for normal visible items
 // (Low, Medium, High, Best), and those constants + Qn::StreamQualityCount for invisible items
 // with asterisks (Low*, Medium*, High*, Best*).
-Qn::StreamQuality CameraScheduleWidget::currentQualityApproximation() const
+Qn::StreamQuality LegacyCameraScheduleWidget::currentQualityApproximation() const
 {
     auto value = ui->qualityComboBox->currentData().toInt();
     if (value >= Qn::StreamQualityCount)
@@ -769,12 +640,12 @@ Qn::StreamQuality CameraScheduleWidget::currentQualityApproximation() const
     return static_cast<Qn::StreamQuality>(value);
 }
 
-bool CameraScheduleWidget::isCurrentBitrateCustom() const
+bool LegacyCameraScheduleWidget::isCurrentBitrateCustom() const
 {
     return ui->qualityComboBox->currentData().toInt() >= Qn::StreamQualityCount;
 }
 
-void CameraScheduleWidget::setAdvancedSettingsVisible(bool value)
+void LegacyCameraScheduleWidget::setAdvancedSettingsVisible(bool value)
 {
     const auto text = value ? tr("Less Settings") : tr("More Settings");
     const auto icon = qnSkin->icon(value ? lit("text_buttons/collapse.png") : lit("text_buttons/expand.png"));
@@ -785,7 +656,7 @@ void CameraScheduleWidget::setAdvancedSettingsVisible(bool value)
     m_advancedSettingsVisible = value;
 }
 
-QPair<Qn::StreamQuality, bool> CameraScheduleWidget::qualityForBitrate(qreal bitrateMbps) const
+QPair<Qn::StreamQuality, bool> LegacyCameraScheduleWidget::qualityForBitrate(qreal bitrateMbps) const
 {
     static constexpr auto kMinQuality = Qn::QualityLow;
     static constexpr auto kMaxQuality = Qn::QualityHighest;
@@ -808,7 +679,7 @@ QPair<Qn::StreamQuality, bool> CameraScheduleWidget::qualityForBitrate(qreal bit
     return {current, qFuzzyIsNull(bitrateMbps - currentBr)};
 }
 
-qreal CameraScheduleWidget::bitrateForQuality(Qn::StreamQuality quality) const
+qreal LegacyCameraScheduleWidget::bitrateForQuality(Qn::StreamQuality quality) const
 {
     if (!m_advancedSettingsSupported)
         return 0.0;
@@ -819,11 +690,11 @@ qreal CameraScheduleWidget::bitrateForQuality(Qn::StreamQuality quality) const
         return 0.0;
     }
 
-    return getBitrateForQuality(m_cameras.front(), quality,
+    return core::CameraBitrateCalculator::getBitrateForQualityMbps(m_cameras.front(), quality,
         ui->fpsSpinBox->value(), ui->bitrateSpinBox->decimals());
 }
 
-void CameraScheduleWidget::updateMotionAvailable()
+void LegacyCameraScheduleWidget::updateMotionAvailable()
 {
     using boost::algorithm::all_of;
 
@@ -846,13 +717,13 @@ void CameraScheduleWidget::updateMotionAvailable()
     updateRecordSpinboxes();
 }
 
-void CameraScheduleWidget::setExportScheduleButtonEnabled(bool enabled)
+void LegacyCameraScheduleWidget::setExportScheduleButtonEnabled(bool enabled)
 {
     ui->exportScheduleButton->setEnabled(enabled);
     ui->exportWarningLabel->setVisible(!enabled);
 }
 
-void CameraScheduleWidget::updatePanicLabelText()
+void LegacyCameraScheduleWidget::updatePanicLabelText()
 {
     ui->panicModeLabel->setText(tr("Off"));
     ui->panicModeLabel->setPalette(this->palette());
@@ -869,7 +740,7 @@ void CameraScheduleWidget::updatePanicLabelText()
     }
 }
 
-QnScheduleTaskList CameraScheduleWidget::scheduleTasks() const
+QnScheduleTaskList LegacyCameraScheduleWidget::scheduleTasks() const
 {
     QnScheduleTaskList tasks;
     if (!ui->gridWidget->isActive())
@@ -933,7 +804,7 @@ QnScheduleTaskList CameraScheduleWidget::scheduleTasks() const
     return tasks;
 }
 
-void CameraScheduleWidget::setScheduleTasks(const QnScheduleTaskList& value)
+void LegacyCameraScheduleWidget::setScheduleTasks(const QnScheduleTaskList& value)
 {
     QSignalBlocker gridBlocker(ui->gridWidget);
 
@@ -976,7 +847,7 @@ void CameraScheduleWidget::setScheduleTasks(const QnScheduleTaskList& value)
                     bitrateMbps = task.getBitrateKbps() / kKbpsInMbps;
                     break;
                 default:
-                    qWarning("CameraScheduleWidget::setScheduleTasks(): Unhandled StreamQuality value %d.", task.getStreamQuality());
+                    qWarning("LegacyCameraScheduleWidget::setScheduleTasks(): Unhandled StreamQuality value %d.", task.getStreamQuality());
                     break;
             }
         }
@@ -997,13 +868,13 @@ void CameraScheduleWidget::setScheduleTasks(const QnScheduleTaskList& value)
         emit hasChangesChanged();
 }
 
-bool CameraScheduleWidget::canEnableRecording() const
+bool LegacyCameraScheduleWidget::canEnableRecording() const
 {
     QnCamLicenseUsageHelper licenseHelper(commonModule());
     return licenseHelper.canEnableRecording(m_cameras);
 }
 
-void CameraScheduleWidget::updateRecordThresholds(QnScheduleTaskList& tasks)
+void LegacyCameraScheduleWidget::updateRecordThresholds(QnScheduleTaskList& tasks)
 {
     int before = ui->recordBeforeSpinBox->value();
     int after = ui->recordAfterSpinBox->value();
@@ -1014,7 +885,7 @@ void CameraScheduleWidget::updateRecordThresholds(QnScheduleTaskList& tasks)
     }
 }
 
-void CameraScheduleWidget::updateScheduleTypeControls()
+void LegacyCameraScheduleWidget::updateScheduleTypeControls()
 {
     const bool recordingEnabled = ui->enableRecordingCheckBox->isChecked();
     const auto labels =
@@ -1029,7 +900,7 @@ void CameraScheduleWidget::updateScheduleTypeControls()
     }
 }
 
-void CameraScheduleWidget::updateGridParams(bool pickedFromGrid)
+void LegacyCameraScheduleWidget::updateGridParams(bool pickedFromGrid)
 {
     if (m_disableUpdateGridParams)
         return;
@@ -1044,7 +915,7 @@ void CameraScheduleWidget::updateGridParams(bool pickedFromGrid)
     else if (ui->recordMotionPlusLQButton->isChecked())
         recordType = Qn::RT_MotionAndLowQuality;
     else
-        qWarning() << "CameraScheduleWidget::No record type is selected!";
+        qWarning() << "LegacyCameraScheduleWidget::No record type is selected!";
 
     updateScheduleTypeControls();
     bool enabled = !ui->noRecordButton->isChecked();
@@ -1083,27 +954,27 @@ void CameraScheduleWidget::updateGridParams(bool pickedFromGrid)
     updateAlert(CurrentParamsChange);
 }
 
-void CameraScheduleWidget::setFps(int value)
+void LegacyCameraScheduleWidget::setFps(int value)
 {
     ui->fpsSpinBox->setValue(value);
 }
 
-int CameraScheduleWidget::getGridMaxFps(bool motionPlusLqOnly)
+int LegacyCameraScheduleWidget::getGridMaxFps(bool motionPlusLqOnly)
 {
     return ui->gridWidget->getMaxFps(motionPlusLqOnly);
 }
 
-void CameraScheduleWidget::setScheduleEnabled(bool enabled)
+void LegacyCameraScheduleWidget::setScheduleEnabled(bool enabled)
 {
     ui->enableRecordingCheckBox->setCheckState(enabled ? Qt::Checked : Qt::Unchecked);
 }
 
-bool CameraScheduleWidget::isScheduleEnabled() const
+bool LegacyCameraScheduleWidget::isScheduleEnabled() const
 {
     return ui->enableRecordingCheckBox->checkState() != Qt::Unchecked;
 }
 
-void CameraScheduleWidget::updateGridEnabledState()
+void LegacyCameraScheduleWidget::updateGridEnabledState()
 {
     const bool recordingEnabled = ui->enableRecordingCheckBox->isChecked();
     ui->motionGroupBox->setEnabled(m_recordingParamsAvailable);
@@ -1113,7 +984,7 @@ void CameraScheduleWidget::updateGridEnabledState()
     updateScheduleTypeControls();
 }
 
-void CameraScheduleWidget::updateLicensesLabelText()
+void LegacyCameraScheduleWidget::updateLicensesLabelText()
 {
     QnCamLicenseUsageHelper helper(commonModule());
 
@@ -1131,24 +1002,24 @@ void CameraScheduleWidget::updateLicensesLabelText()
     ui->licensesUsageWidget->loadData(&helper);
 }
 
-void CameraScheduleWidget::updateLicensesButtonVisible()
+void LegacyCameraScheduleWidget::updateLicensesButtonVisible()
 {
     ui->licensesButton->setVisible(accessController()->hasGlobalPermission(Qn::GlobalAdminPermission));
 }
 
-void CameraScheduleWidget::updateRecordSpinboxes()
+void LegacyCameraScheduleWidget::updateRecordSpinboxes()
 {
     ui->recordBeforeSpinBox->setEnabled(m_motionAvailable);
     ui->recordAfterSpinBox->setEnabled(m_motionAvailable);
 }
 
-void CameraScheduleWidget::at_cameraResourceChanged()
+void LegacyCameraScheduleWidget::at_cameraResourceChanged()
 {
     updateMaxFPS();
     updateMotionButtons();
 }
 
-void CameraScheduleWidget::updateMotionButtons()
+void LegacyCameraScheduleWidget::updateMotionButtons()
 {
     bool hasDualStreaming = !m_cameras.isEmpty();
     bool hasMotion = !m_cameras.isEmpty();
@@ -1192,7 +1063,7 @@ void CameraScheduleWidget::updateMotionButtons()
     }
 }
 
-void CameraScheduleWidget::updateMaxFpsValue(bool motionPlusLqToggled)
+void LegacyCameraScheduleWidget::updateMaxFpsValue(bool motionPlusLqToggled)
 {
     int maximum = motionPlusLqToggled ? m_maxDualStreamingFps : m_maxFps;
 
@@ -1203,7 +1074,7 @@ void CameraScheduleWidget::updateMaxFpsValue(bool motionPlusLqToggled)
     ui->fpsSpinBox->setMaximum(maximum);
 }
 
-void CameraScheduleWidget::updateRecordingParamsAvailable()
+void LegacyCameraScheduleWidget::updateRecordingParamsAvailable()
 {
     bool available = any_of(m_cameras,
         [](const QnVirtualCameraResourcePtr& camera)
@@ -1228,7 +1099,7 @@ void CameraScheduleWidget::updateRecordingParamsAvailable()
     ui->displayFpsCheckBox->setEnabled(m_recordingParamsAvailable);
 }
 
-void CameraScheduleWidget::updateColors()
+void LegacyCameraScheduleWidget::updateColors()
 {
     ui->recordAlwaysButton->setCustomPaintFunction(ui->gridWidget->paintFunction(Qn::RT_Always));
     ui->recordMotionButton->setCustomPaintFunction(ui->gridWidget->paintFunction(Qn::RT_MotionOnly));
@@ -1239,7 +1110,7 @@ void CameraScheduleWidget::updateColors()
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void CameraScheduleWidget::at_gridWidget_cellActivated(const QPoint &cell)
+void LegacyCameraScheduleWidget::at_gridWidget_cellActivated(const QPoint &cell)
 {
     /* Called when a cell is Alt-clicked this handler fetches cell settings as current. */
 
@@ -1274,22 +1145,22 @@ void CameraScheduleWidget::at_gridWidget_cellActivated(const QPoint &cell)
     updateGridParams(true);
 }
 
-void CameraScheduleWidget::at_displayQualiteCheckBox_stateChanged(int state)
+void LegacyCameraScheduleWidget::at_displayQualiteCheckBox_stateChanged(int state)
 {
     ui->gridWidget->setShowQuality(state && m_recordingParamsAvailable);
 }
 
-void CameraScheduleWidget::at_displayFpsCheckBox_stateChanged(int state)
+void LegacyCameraScheduleWidget::at_displayFpsCheckBox_stateChanged(int state)
 {
     ui->gridWidget->setShowFps(state && m_recordingParamsAvailable);
 }
 
-void CameraScheduleWidget::at_licensesButton_clicked()
+void LegacyCameraScheduleWidget::at_licensesButton_clicked()
 {
     menu()->trigger(action::PreferencesLicensesTabAction);
 }
 
-void CameraScheduleWidget::at_releaseSignalizer_activated(QObject *target)
+void LegacyCameraScheduleWidget::at_releaseSignalizer_activated(QObject *target)
 {
     QWidget *widget = qobject_cast<QWidget *>(target);
     if (!widget)
@@ -1332,7 +1203,7 @@ void CameraScheduleWidget::at_releaseSignalizer_activated(QObject *target)
     }
 }
 
-void CameraScheduleWidget::at_exportScheduleButton_clicked()
+void LegacyCameraScheduleWidget::at_exportScheduleButton_clicked()
 {
     if (m_cameras.size() > 1)
     {
@@ -1392,12 +1263,18 @@ void CameraScheduleWidget::at_exportScheduleButton_clicked()
                 if (const auto bitrate = task.getBitrateKbps()) // Try to calculate new custom bitrate
                 {
                     // Target camera supports custom bitrate
-                    const auto normalBitrate = getBitrateForQuality(sourceCamera,
-                        task.getStreamQuality(), task.getFps(), ui->bitrateSpinBox->decimals());
+                    const auto normalBitrate = core::CameraBitrateCalculator::getBitrateForQualityMbps(
+                        sourceCamera,
+                        task.getStreamQuality(),
+                        task.getFps(),
+                        ui->bitrateSpinBox->decimals());
                     const auto bitrateAspect = (bitrate - normalBitrate) / normalBitrate;
 
-                    const auto targetNormalBitrate = getBitrateForQuality(camera,
-                        task.getStreamQuality(), task.getFps(), ui->bitrateSpinBox->decimals());
+                    const auto targetNormalBitrate = core::CameraBitrateCalculator::getBitrateForQualityMbps(
+                        camera,
+                        task.getStreamQuality(),
+                        task.getFps(),
+                        ui->bitrateSpinBox->decimals());
                     const auto targetBitrate = targetNormalBitrate * bitrateAspect;
                     task.setBitrateKbps(targetBitrate);
                 }
@@ -1414,7 +1291,7 @@ void CameraScheduleWidget::at_exportScheduleButton_clicked()
     updateLicensesLabelText();
 }
 
-bool CameraScheduleWidget::hasMotionOnGrid() const
+bool LegacyCameraScheduleWidget::hasMotionOnGrid() const
 {
     for (int row = 0; row < ui->gridWidget->rowCount(); ++row)
     {
@@ -1429,7 +1306,7 @@ bool CameraScheduleWidget::hasMotionOnGrid() const
     return false;
 }
 
-bool CameraScheduleWidget::hasDualStreamingMotionOnGrid() const
+bool LegacyCameraScheduleWidget::hasDualStreamingMotionOnGrid() const
 {
     for (int row = 0; row < ui->gridWidget->rowCount(); ++row)
     {
@@ -1443,14 +1320,14 @@ bool CameraScheduleWidget::hasDualStreamingMotionOnGrid() const
     return false;
 }
 
-void CameraScheduleWidget::setScheduleAlert(const QString& scheduleAlert)
+void LegacyCameraScheduleWidget::setScheduleAlert(const QString& scheduleAlert)
 {
     /* We want to force update - emit a signal - even if the text didn't change: */
     m_scheduleAlert = scheduleAlert;
     emit alert(m_scheduleAlert);
 }
 
-void CameraScheduleWidget::setArchiveLengthAlert(const QString& archiveLengthAlert)
+void LegacyCameraScheduleWidget::setArchiveLengthAlert(const QString& archiveLengthAlert)
 {
     if (!m_scheduleAlert.isEmpty())
         emit alert(m_scheduleAlert);
@@ -1458,7 +1335,7 @@ void CameraScheduleWidget::setArchiveLengthAlert(const QString& archiveLengthAle
         emit alert(ui->archiveLengthWidget->alert());
 }
 
-void CameraScheduleWidget::updateAlert(AlertReason when)
+void LegacyCameraScheduleWidget::updateAlert(AlertReason when)
 {
     /* License check and alert: */
     const auto checkCanEnableRecording =
@@ -1535,7 +1412,7 @@ void CameraScheduleWidget::updateAlert(AlertReason when)
     }
 }
 
-bool CameraScheduleWidget::isRecordingScheduled() const
+bool LegacyCameraScheduleWidget::isRecordingScheduled() const
 {
     return any_of(scheduleTasks(),
         [](const QnScheduleTask& task) -> bool

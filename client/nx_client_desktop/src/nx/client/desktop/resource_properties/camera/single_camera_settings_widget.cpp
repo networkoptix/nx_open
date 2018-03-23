@@ -50,7 +50,7 @@
 #include <utils/common/html.h>
 #include <utils/license_usage_helper.h>
 
-#include "camera_schedule_widget.h"
+#include "legacy_camera_schedule_widget.h"
 #include "camera_motion_mask_widget.h"
 
 using nx::client::core::Geometry;
@@ -133,11 +133,11 @@ SingleCameraSettingsWidget::SingleCameraSettingsWidget(QWidget *parent) :
     connect(ui->cameraScheduleWidget, &QnAbstractPreferencesWidget::hasChangesChanged, this,
         &SingleCameraSettingsWidget::at_dbDataChanged);
 
-    connect(ui->cameraScheduleWidget, &CameraScheduleWidget::scheduleEnabledChanged,
+    connect(ui->cameraScheduleWidget, &LegacyCameraScheduleWidget::scheduleEnabledChanged,
         this, &SingleCameraSettingsWidget::at_cameraScheduleWidget_scheduleEnabledChanged);
-    connect(ui->cameraScheduleWidget, &CameraScheduleWidget::scheduleEnabledChanged,
+    connect(ui->cameraScheduleWidget, &LegacyCameraScheduleWidget::scheduleEnabledChanged,
         this, &SingleCameraSettingsWidget::at_dbDataChanged);
-    connect(ui->cameraScheduleWidget, &CameraScheduleWidget::alert, this,
+    connect(ui->cameraScheduleWidget, &LegacyCameraScheduleWidget::alert, this,
         [this](const QString& text) { m_recordingAlert = text; updateAlertBar(); });
 
     connect(ui->webPageLink, &QLabel::linkActivated,

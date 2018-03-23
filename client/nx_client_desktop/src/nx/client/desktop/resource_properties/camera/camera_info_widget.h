@@ -9,9 +9,10 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-class CameraSettingsModel;
+struct CameraSettingsDialogState;
+class CameraSettingsDialogStore;
 
-class CameraInfoWidget: public QnPanel, public QnAbstractPreferencesInterface
+class CameraInfoWidget: public QnPanel
 {
     Q_OBJECT
     using base_type = QnPanel;
@@ -20,25 +21,17 @@ public:
     explicit CameraInfoWidget(QWidget* parent = nullptr);
     virtual ~CameraInfoWidget() override;
 
-    void setModel(CameraSettingsModel* model);
-
-    virtual bool hasChanges() const override;
-    virtual void loadDataToUi() override;
-    virtual void applyChanges() override;
-
-signals:
-    /** Signal is emitted whenever hasChanges() is changed. */
-    void hasChangesChanged();
+    void setStore(CameraSettingsDialogStore* store);
 
 private:
+    void loadState(const CameraSettingsDialogState& state);
+
     void alignLabels();
     void updatePalette();
     void updatePageSwitcher();
-    void updateNetworkInfo();
 
 private:
     QScopedPointer<Ui::CameraInfoWidget> ui;
-    CameraSettingsModel* m_model = nullptr;
 };
 
 } // namespace desktop

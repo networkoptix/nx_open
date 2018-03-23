@@ -33,6 +33,8 @@ public:
 
     struct CellParams
     {
+        static constexpr auto kAutomaticBitrate = 0.0;
+
         int fps;
         Qn::StreamQuality quality;
         Qn::RecordingType recordingType;
@@ -40,6 +42,8 @@ public:
 
         CellParams();
         bool operator==(const CellParams& other) const;
+
+        bool isAutomaticBitrate() const;
     };
 
     CellParams brush() const;

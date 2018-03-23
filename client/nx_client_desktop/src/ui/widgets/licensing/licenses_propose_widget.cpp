@@ -18,7 +18,6 @@ using namespace nx::client::desktop::ui;
 QnLicensesProposeWidget::QnLicensesProposeWidget(QWidget *parent):
     QWidget(parent),
     QnWorkbenchContextAware(parent, InitializationMode::lazy),
-    QnUpdatable(),
     ui(new Ui::LicensesProposeWidget)
 {
     ui->setupUi(this);

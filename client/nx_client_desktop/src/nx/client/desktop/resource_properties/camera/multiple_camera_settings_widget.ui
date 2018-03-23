@@ -127,7 +127,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="nx::client::desktop::CameraScheduleWidget" name="cameraScheduleWidget" native="true"/>
+        <widget class="nx::client::desktop::LegacyCameraScheduleWidget" name="cameraScheduleWidget" native="true"/>
        </item>
       </layout>
      </widget>
@@ -185,9 +185,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>nx::client::desktop::CameraScheduleWidget</class>
+   <class>nx::client::desktop::LegacyCameraScheduleWidget</class>
    <extends>QWidget</extends>
-   <header location="global">nx/client/desktop/resource_properties/camera/camera_schedule_widget.h</header>
+   <header location="global">nx/client/desktop/resource_properties/camera/legacy_camera_schedule_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

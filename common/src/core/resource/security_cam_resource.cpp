@@ -26,6 +26,7 @@
 #include <utils/common/synctime.h>
 
 #include <nx/utils/log/log.h>
+#include <utils/camera/camera_bitrate_calculator.h>
 
 #define SAFE(expr) {QnMutexLocker lock( &m_mutex ); expr;}
 
@@ -1370,18 +1371,10 @@ void QnSecurityCamResource::analyticsEventEnded(const QString& caption, const QS
 
 float QnSecurityCamResource::rawSuggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps)
 {
-    float lowEnd = 0.1f;
-    float hiEnd = 1.0f;
-
-    float qualityFactor = lowEnd + (hiEnd - lowEnd) * (quality - Qn::QualityLowest) / (Qn::QualityHighest - Qn::QualityLowest);
-
-    float resolutionFactor = 0.009f * pow(resolution.width() * resolution.height(), 0.7f);
-
-    float frameRateFactor = fps / 1.0f;
-
-    float result = qualityFactor*frameRateFactor * resolutionFactor;
-
-    return qMax(192.0, result);
+    return nx::core::CameraBitrateCalculator::suggestBitrateForQualityKbps(
+        quality,
+        resolution,
+        fps);
 }
 
 bool QnSecurityCamResource::captureEvent(const nx::vms::event::AbstractEventPtr& event)
@@ -1414,54 +1407,17 @@ int QnSecurityCamResource::suggestBitrateKbps(const QnLiveStreamParams& streamPa
 
 int QnSecurityCamResource::suggestBitrateForQualityKbps(Qn::StreamQuality quality, QSize resolution, int fps, Qn::ConnectionRole role) const
 {
-    auto bitrateCoefficient = [](Qn::StreamQuality quality)
-    {
-        switch (quality)
-        {
-        case Qn::StreamQuality::QualityLowest:
-            return 0.66;
-        case Qn::StreamQuality::QualityLow:
-            return 0.8;
-        case Qn::StreamQuality::QualityNormal:
-            return 1.0;
-        case Qn::StreamQuality::QualityHigh:
-            return 2.0;
-        case Qn::StreamQuality::QualityHighest:
-            return 2.5;
-        case Qn::StreamQuality::QualityPreSet:
-        case Qn::StreamQuality::QualityNotDefined:
-        default:
-            return 1.0;
-        }
-    };
     if (role == Qn::CR_Default)
         role = Qn::CR_LiveVideo;
     auto mediaCaps = cameraMediaCapability();
     auto streamCapability = mediaCaps.streamCapabilities.value(toStreamIndex(role));
-    if (streamCapability.defaultBitrateKbps > 0)
-    {
-        double coefficient = bitrateCoefficient(quality);
-        const int bitrate = streamCapability.defaultBitrateKbps * coefficient;
-        return qBound(
-            (double)streamCapability.minBitrateKbps,
-            bitrate * ((double)fps / streamCapability.defaultFps),
-            (double)streamCapability.maxBitrateKbps);
-    }
 
-    auto result = rawSuggestBitrateKbps(quality, resolution, fps);
-
-    if (bitratePerGopType() != Qn::BPG_None)
-        result = result * (30.0 / (qreal)fps);
-
-    if (streamCapability.maxBitrateKbps > 0)
-    {
-        result = qBound(
-            (float)streamCapability.minBitrateKbps,
-            result,
-            (float)streamCapability.maxBitrateKbps);
-    }
-
-    return result;
+    return nx::core::CameraBitrateCalculator::suggestBitrateForQualityKbps(
+        quality,
+        resolution,
+        fps,
+        streamCapability,
+        bitratePerGopType());
 }
 
 bool QnSecurityCamResource::setCameraCredentialsSync(

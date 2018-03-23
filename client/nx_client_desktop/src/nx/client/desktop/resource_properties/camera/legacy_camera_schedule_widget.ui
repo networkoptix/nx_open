@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>CameraScheduleWidget</class>
- <widget class="QWidget" name="CameraScheduleWidget">
+ <class>LegacyCameraScheduleWidget</class>
+ <widget class="QWidget" name="LegacyCameraScheduleWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -914,7 +914,7 @@
   <customwidget>
    <class>QnArchiveLengthWidget</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/properties/archive_length_widget.h</header>
+   <header location="global">ui/widgets/properties/legacy_archive_length_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
