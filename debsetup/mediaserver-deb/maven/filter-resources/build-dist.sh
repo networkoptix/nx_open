@@ -20,6 +20,7 @@ ETCTARGET=$TARGET/etc
 INITTARGET=/etc/init
 INITDTARGET=/etc/init.d
 SYSTEMDTARGET=/etc/systemd/system
+ENABLE_HANWHA="@enable_hanwha@"
 
 FINALNAME=@artifact.name.server@
 UPDATE_NAME=@artifact.name.server_update@.zip
@@ -95,7 +96,7 @@ buildDistribution()
     local PLUGINS=( hikvision_metadata_plugin )
     PLUGINS+=( axis_metadata_plugin )
     PLUGINS+=( vca_metadata_plugin )
-    if [ "$COMPANY_NAME" == "hanwha" ]
+    if [ "$ENABLE_HANWHA" == "true" ]
     then
         PLUGINS+=( hanwha_metadata_plugin )
     fi

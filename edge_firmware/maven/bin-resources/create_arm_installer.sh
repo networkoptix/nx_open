@@ -272,7 +272,7 @@ copyBins()
             local FILE
             for FILE in "$BIN_BUILD_DIR/plugins/"*; do
                 if [ -f $FILE ] && [[ $FILE != *.debug ]]; then
-                    if [ "$CUSTOMIZATION" != "hanwha" ] && [[ "$FILE" == *hanwha* ]]; then
+                    if [ "$ENABLE_HANWHA" != "true" ] && [[ "$FILE" == *hanwha* ]]; then
                         continue
                     fi
 
