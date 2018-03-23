@@ -430,7 +430,7 @@ std::vector<char> CLVideoDecoderOutput::toRgba(int* outLineSize) const
     #else
         convertImageFormat(width, height,
             data, linesize, (AVPixelFormat) format,
-            targetData, targetLineSize, AV_PIX_FMT_BGR32);
+            targetData, targetLineSize, AV_PIX_FMT_ARGB);
     #endif
     return result;
 }
