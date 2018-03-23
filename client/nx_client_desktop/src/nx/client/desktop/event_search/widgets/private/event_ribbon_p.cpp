@@ -309,6 +309,8 @@ void EventRibbon::Private::showContextMenu(EventTile* tile, const QPoint& posRel
 
 void EventRibbon::Private::debugCheckGeometries()
 {
+
+#if 0
 #if defined(_DEBUG)
     int pos = 0;
     for (int i = 0; i < m_tiles.size(); ++i)
@@ -319,6 +321,7 @@ void EventRibbon::Private::debugCheckGeometries()
     }
 
     NX_ASSERT(pos == m_totalHeight);
+#endif
 #endif
 }
 

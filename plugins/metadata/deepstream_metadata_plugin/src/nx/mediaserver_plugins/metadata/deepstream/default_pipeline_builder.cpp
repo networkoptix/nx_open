@@ -99,13 +99,17 @@ std::unique_ptr<gstreamer::Pipeline> DefaultPipelineBuilder::buildOpenAlprDeepSt
     pipeline->add(preGieBin.get());
     pipeline->add(primaryGieBin.get());
     pipeline->add(openAlprBin.get());
+#if 0
     pipeline->add(tracker.get());
+#endif
     pipeline->add(fakeSink.get());
 
     preGieBin->linkAfter(appSource.get());
-    openAlprBin->linkAfter(primaryGieBin.get());
+    openAlprBin->linkAfter(primaryGieBin.get());    
+#if 0
     tracker->linkAfter(openAlprBin.get());
-    fakeSink->linkAfter(tracker.get());
+#endif
+    fakeSink->linkAfter(openAlprBin.get());
 
     connectToPreGieBin(
         preGieBin.get(),
@@ -113,6 +117,20 @@ std::unique_ptr<gstreamer::Pipeline> DefaultPipelineBuilder::buildOpenAlprDeepSt
         pipelineName);
 
     createMainLoop(pipeline.get(), pipelineName);
+
+    //-- HANDLE METADATA
+    auto outputProbePad = gst_element_get_static_pad(
+        openAlprBin->nativeElement(),
+        kSourcePadName);
+
+    gst_pad_add_probe(
+        outputProbePad,
+        GST_PAD_PROBE_TYPE_BUFFER,
+        processOpenAlprResult,
+        pipeline.get(),
+        NULL);
+
+    gst_object_unref(GST_OBJECT(outputProbePad));
 
     return pipeline;
 }
@@ -203,6 +221,22 @@ std::unique_ptr<nx::gstreamer::Bin> DefaultPipelineBuilder::buildPrimaryGieBin(
     bin->createGhostPad(inputQueue.get(), kSinkPadName);
     bin->createGhostPad(outputQueue.get(), kSourcePadName);
 
+    if (ini().pipelineType == kOpenAlprPipeline)
+    {
+        auto probePad = gst_element_get_static_pad(
+            bin->nativeElement(),
+            kSinkPadName);
+
+        gst_pad_add_probe(
+            probePad,
+            GST_PAD_PROBE_TYPE_BUFFER,
+            dropOpenAlprFrames,
+            pipeline,
+            NULL);
+
+        gst_object_unref(GST_OBJECT(probePad));
+    }
+
     return bin;
 }
 
@@ -266,50 +300,27 @@ std::unique_ptr<gstreamer::Bin> DefaultPipelineBuilder::buildOpenAlprBin(
     auto bin = std::make_unique<nx::gstreamer::Bin>(
         makeElementName(pipelineName, "bin", "openAlprBin"));
 
-    bin->add(inputQueue.get());
 #if 0
+    bin->add(inputQueue.get());
     bin->add(converter.get());
     bin->add(capsFilter.get());
 #endif
     bin->add(openAlpr.get());
+#if 0
     bin->add(outputQueue.get());
 
-#if 0
     converter->linkAfter(inputQueue.get());
     capsFilter->linkAfter(converter.get());
 #endif
     openAlpr->linkAfter(inputQueue.get());
+
+#if 0
     outputQueue->linkAfter(openAlpr.get());
+#endif
 
-    bin->createGhostPad(inputQueue.get(), kSinkPadName);
-    bin->createGhostPad(outputQueue.get(), kSourcePadName);
+    bin->createGhostPad(openAlpr.get(), kSinkPadName);
+    bin->createGhostPad(openAlpr.get(), kSourcePadName);
 
-    auto probePad = gst_element_get_static_pad(
-        bin->nativeElement(),
-        kSinkPadName);
-
-    gst_pad_add_probe(
-        probePad,
-        GST_PAD_PROBE_TYPE_BUFFER,
-        dropOpenAlprFrames,
-        NULL,
-        NULL);
-
-    gst_object_unref(GST_OBJECT(probePad));
-
-    //-- HANDLE METADATA
-    auto outputProbePad = gst_element_get_static_pad(
-        bin->nativeElement(),
-        kSourcePadName);
-
-    gst_pad_add_probe(
-        outputProbePad,
-        GST_PAD_PROBE_TYPE_BUFFER,
-        processOpenAlprResult,
-        pipeline,
-        NULL);
-
-    gst_object_unref(GST_OBJECT(outputProbePad));
     return bin;
 }
 

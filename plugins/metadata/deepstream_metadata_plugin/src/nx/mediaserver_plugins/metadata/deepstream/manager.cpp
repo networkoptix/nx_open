@@ -6,6 +6,7 @@
 #include <nx/sdk/metadata/common_compressed_video_packet.h>
 
 #include <nx/mediaserver_plugins/metadata/deepstream/deepstream_common.h>
+#include <nx/mediaserver_plugins/metadata/deepstream/openalpr_common.h>
 #include <nx/mediaserver_plugins/metadata/deepstream/default_pipeline_builder.h>
 #include <nx/mediaserver_plugins/metadata/deepstream/deepstream_metadata_plugin_ini.h>
 
@@ -135,14 +136,23 @@ const char* Manager::capabilitiesManifest(Error* error)
     m_manifest = kManifestPrefix;
     const auto descriptions = m_plugin->objectClassDescritions();
 
-    for (auto i = 0; i < descriptions.size(); ++i)
+    if (ini().pipelineType == kOpenAlprPipeline)
     {
         m_manifest += "\""
-            + nxpt::NxGuidHelper::toStdString(descriptions[i].guid);
+            + nxpt::NxGuidHelper::toStdString(kLicensePlateGuid);
             +"\"";
+    }
+    else
+    {
+        for (auto i = 0; i < descriptions.size(); ++i)
+        {
+            m_manifest += "\""
+                + nxpt::NxGuidHelper::toStdString(descriptions[i].guid);
+                +"\"";
 
-        if (i < descriptions.size() - 1)
-            m_manifest += ',';
+            if (i < descriptions.size() - 1)
+                m_manifest += ',';
+        }
     }
 
     m_manifest += kManifestPostfix;

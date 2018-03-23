@@ -13,6 +13,7 @@ extern "C" {
 
 #include "default_pipeline.h"
 #include "deepstream_common.h"
+#include "openalpr_common.h"
 #include "deepstream_metadata_plugin_ini.h"
 #define NX_PRINT_PREFIX "deepstream::callbacks::"
 #include <nx/kit/debug.h>
@@ -140,12 +141,16 @@ gboolean metadataHandlerCallback(GstBuffer* buffer, GstMeta** meta, gpointer use
     if (!bboxes)
         return true;
 
+    if (ini().pipelineType == kOpenAlprPipeline && bboxes->gie_type != 3)
+        return true;
+
     auto packet = new nx::sdk::metadata::CommonObjectsMetadataPacket();
     packet->setTimestampUsec(GST_BUFFER_PTS(buffer));
     packet->setDurationUsec(30000); //< TODO: #dmishin calculate duration or take it from buffer.
 
     auto pipeline = (metadata::deepstream::DefaultPipeline*) userData;
     auto trackingMapper = pipeline->trackingMapper();
+    auto licensePlateTracker = pipeline->licensePlateTracker();
 
     auto frameWidth = pipeline->currentFrameWidth();
     if (frameWidth <= 0)
@@ -158,7 +163,6 @@ gboolean metadataHandlerCallback(GstBuffer* buffer, GstMeta** meta, gpointer use
     for (auto i = 0; i < bboxes->num_rects; ++i)
     {
         const auto& roiMeta = bboxes->roi_meta[i];
-
         std::string displayText;
         if (roiMeta.text_params.display_text)
         {
@@ -183,12 +187,60 @@ gboolean metadataHandlerCallback(GstBuffer* buffer, GstMeta** meta, gpointer use
             << "width: " << rectangle.width << ", "
             << "height: " << rectangle.height;
 
-        auto attributes = trackingMapper->attributes(roiMeta);
-        auto guid = trackingMapper->getMapping(roiMeta.tracking_id);
-        if (isNull(guid))
+        nxpl::NX_GUID guid;
+        std::deque<nx::sdk::metadata::CommonAttribute> attributes;
+        if (ini().pipelineType == kOpenAlprPipeline)
         {
-            guid = makeGuid();
-            trackingMapper->addMapping(roiMeta.tracking_id, guid);
+            auto info = licensePlateTracker->licensePlateInfo(displayText);
+            guid = info.guid;
+
+            auto encodedAttributes = split(displayText, '%');
+            for (auto i = 0; i < encodedAttributes.size(); ++i)
+            {
+                switch (i)
+                {
+                    case 0:
+                    {
+                        attributes.emplace_back(
+                            nx::sdk::AttributeType::string,
+                            "Number",
+                            encodedAttributes[i]);
+                        break;
+                    }
+                    case 1:
+                    {
+                        attributes.emplace_back(
+                            nx::sdk::AttributeType::string,
+                            "Country",
+                            encodedAttributes[i]);
+                        break;
+                    }
+                    case 2:
+                    {
+                        attributes.emplace_back(
+                            nx::sdk::AttributeType::string,
+                            "Region",
+                            encodedAttributes[i]);
+                        break;
+
+                    }
+                    default:
+                    {
+                        NX_OUTPUT << __func__ << " Unknown attribute";
+                        break;
+                    }
+                }
+            }
+        }
+        else
+        {
+            attributes = trackingMapper->attributes(roiMeta);
+            guid = trackingMapper->getMapping(roiMeta.tracking_id);
+            if (isNull(guid))
+            {
+                guid = makeGuid();
+                trackingMapper->addMapping(roiMeta.tracking_id, guid);
+            }
         }
 
         detectedObject->setId(guid);
@@ -198,16 +250,11 @@ gboolean metadataHandlerCallback(GstBuffer* buffer, GstMeta** meta, gpointer use
         const auto& objectDescriptions = pipeline->objectClassDescriptions();
         const auto objectClassId = roiMeta.class_id;
 
-        auto trackingMapper = pipeline->trackingMapper();
-        if (!displayText.empty())
+        if (ini().pipelineType == kOpenAlprPipeline)
         {
-            attributes.emplace_back(
-                nx::sdk::AttributeType::string,
-                "License plate",
-                displayText);
+            detectedObject->setTypeId(kLicensePlateGuid);
         }
-
-        if (objectClassId < objectDescriptions.size())
+        else if (objectClassId < objectDescriptions.size())
         {
             detectedObject->setTypeId(objectDescriptions[objectClassId].guid);
             attributes.emplace_front(
@@ -366,14 +413,17 @@ GstPadProbeReturn primaryGieDoneCallback(
     return GST_PAD_PROBE_OK;
 }
 
-
 GstPadProbeReturn dropOpenAlprFrames(GstPad* pad, GstPadProbeInfo* info, gpointer userData)
 {
     NX_OUTPUT << __func__ << " Calling OpenALPR drop frames probe";
-    static int frameNumber = 0;
-    ++frameNumber;
+    auto pipeline = (DefaultPipeline*) userData;
+    if (!pipeline)
+    {
+        NX_OUTPUT << __func__ << " Can't convert user data to DefaultPipeline";
+        return GST_PAD_PROBE_OK;
+    }
 
-    if (frameNumber % 7 != 0)
+    if (pipeline->shouldDropFrame(GST_BUFFER_PTS((GstBuffer*)info->data)))
         return GST_PAD_PROBE_DROP;
 
     return GST_PAD_PROBE_OK;
