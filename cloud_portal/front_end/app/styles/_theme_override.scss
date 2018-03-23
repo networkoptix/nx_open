@@ -11,7 +11,7 @@ $font-size-a-bit-large:   ceil($font-size-base * 1.15); //~16px - we just need 1
     padding:0;
 }
 
-.panel{
+.card{
   box-shadow: 0 1px 2px transparentize($dark15,0.9);
 }
 .panel-heading {
@@ -322,7 +322,7 @@ select {
 //    }
 //}
 
-.tab-pane>.panel{
+.tab-pane>.card{
     border-top: none;
     border-top-right-radius: 0;
     border-top-left-radius: 0;

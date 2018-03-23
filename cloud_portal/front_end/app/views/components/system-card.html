@@ -1,6 +1,6 @@
 
-<div class="panel panel-default" ng-if="system.isMine">
-    <div class="panel-body">
+<div class="card card-default" ng-if="system.isMine">
+    <div class="card-body">
         <h2>Your System</h2>
         <p></p>
         <p>
@@ -14,8 +14,8 @@
             <span class="product-name">%PRODUCT_NAME%</span></button>
     </div>
 </div>
-<div class="panel panel-default" ng-if="!system.isMine">
-    <div class="panel-body">
+<div class="card card-default" ng-if="!system.isMine">
+    <div class="card-body">
         <h2>Owner</h2>
         <h3 class="user-name">{{system.info.ownerFullName}}</h3>
         <a ng-href="mailto:{{system.info.ownerAccountEmail}}">{{system.info.ownerAccountEmail}}</a>
@@ -31,14 +31,14 @@
         <button class="btn btn-default" ng-click="delete()">Disconnect from my account</button>
     </div>
 </div>
-<div class="panel panel-default" ng-if="currentlyMerging">
-    <div class="panel-body" ng-if="isMaster && system.isMine">
+<div class="card card-default" ng-if="currentlyMerging">
+    <div class="card-body" ng-if="isMaster && system.isMine">
         <div><strong>{{mergeTargetSystem.name}}</strong>
             is being merged to this system</div>
         <hr></hr>
         <div class="merge-info-text">Depending of the size of the database it may take up to several hours</div>
     </div>
-    <div class="panel-body" ng-if="!isMaster || !system.isMine">
+    <div class="card-body" ng-if="!isMaster || !system.isMine">
         <div>This system is being merged to
             <strong>{{mergeTargetSystem.name}}</strong></div>
         <hr></hr>
