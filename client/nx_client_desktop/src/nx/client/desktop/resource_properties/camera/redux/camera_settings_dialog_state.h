@@ -5,6 +5,8 @@
 #include <core/resource/media_stream_capability.h>
 #include <nx_ec/data/api_camera_attributes_data.h>
 
+#include <nx/utils/std/optional.h>
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -12,18 +14,16 @@ namespace desktop {
 template<class T>
 struct UserEditable
 {
-    T get() const { return hasUser ? user : base; }
-    void setUser(T value) { hasUser = true; user = value; }
-    void setBase(T value) {base = value;}
-    void submitToBase() { if (hasUser) { base = user; resetUser(); }}
-    void resetUser() { hasUser = false;  user = T(); }
+    T get() const { return m_user.value_or(m_base); }
+    void setUser(T value) { m_user = value; }
+    void setBase(T value) {m_base = value;}
+    void resetUser() { m_user.reset(); }
 
     T operator()() const { return get(); }
 
 private:
-    T base;
-    bool hasUser = false;
-    T user;
+    T m_base;
+    std::optional<T> m_user;
 };
 
 struct CameraSettingsDialogState

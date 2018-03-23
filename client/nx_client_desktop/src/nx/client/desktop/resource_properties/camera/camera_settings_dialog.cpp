@@ -65,16 +65,27 @@ struct CameraSettingsDialog::Private
             camera->setMaxDays(actualValue);
     }
 
-    void submitStateToCameras()
+    bool hasChanges() const
     {
+        return !cameras.empty()
+            && store->state().hasChanges;
+    }
+
+    void applyChanges()
+    {
+        store->applyChanges();
         const auto& state = store->state();
-        NX_ASSERT(!state.hasChanges);
         if (state.isSingleCamera())
         {
             cameras.first()->setName(state.singleCameraSettings.name());
         }
         setMinRecordingDays(state.recording.minDays);
         setMaxRecordingDays(state.recording.maxDays);
+    }
+
+    void resetChanges()
+    {
+        store->loadCameras(cameras);
     }
 
 };
@@ -172,8 +183,7 @@ bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras
         !force
         && isVisible()
         && d->cameras != cameras
-        && !d->cameras.empty()
-        && d->store->state().hasChanges;
+        && d->hasChanges();
 
     if (askConfirmation)
     {
@@ -181,8 +191,7 @@ bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras
         switch (result)
         {
             case QDialogButtonBox::Apply:
-                d->store->applyChanges();
-                d->submitStateToCameras();
+                d->applyChanges();
                 break;
             case QDialogButtonBox::Discard:
                 break;
@@ -190,12 +199,29 @@ bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras
                 /* Cancel changes. */
                 return false;
         }
-
     }
 
     d->cameras = cameras;
-    d->store->loadCameras(d->cameras);
+    d->resetChanges();
     return true;
+}
+
+void CameraSettingsDialog::buttonBoxClicked(QDialogButtonBox::StandardButton button)
+{
+    base_type::buttonBoxClicked(button);
+    switch (button)
+    {
+        case QDialogButtonBox::Ok:
+        case QDialogButtonBox::Apply:
+            if (d->hasChanges())
+                d->applyChanges();
+            break;
+        case QDialogButtonBox::Cancel:
+            d->resetChanges();
+            break;
+        default:
+            break;
+    }
 }
 
 QDialogButtonBox::StandardButton CameraSettingsDialog::showConfirmationDialog()
@@ -231,10 +257,16 @@ void CameraSettingsDialog::loadState(const CameraSettingsDialogState& state)
         ).getString(state.deviceType, state.devicesCount != 1);
 
     const QString description = state.devicesCount == 1
-        ? state.singleCameraSettings.name.get()
+        ? state.singleCameraSettings.name()
         : QnDeviceDependentStrings::getNumericName(state.deviceType, state.devicesCount);
 
     setWindowTitle(kWindowTitlePattern.arg(caption).arg(description));
+
+    if (buttonBox())
+    {
+        if (auto applyButton = buttonBox()->button(QDialogButtonBox::Apply))
+            applyButton->setEnabled(!isReadOnly() && state.hasChanges);
+    }
 }
 
 } // namespace desktop

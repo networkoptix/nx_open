@@ -195,8 +195,6 @@ State::RecordingDays calculateMaxRecordingDays(const QnVirtualCameraResourceList
 State CameraSettingsDialogStateReducer::applyChanges(State state)
 {
     state.hasChanges = false;
-    state.singleCameraSettings.name.submitToBase();
-
     return state;
 }
 
