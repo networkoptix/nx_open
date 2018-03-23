@@ -381,12 +381,14 @@ template <typename T>
 void HanwhaResourceSearcher::addMultichannelResources(QList<T>& result, const QAuthenticator& auth)
 {
     HanwhaResourcePtr firstResource = result.last().template dynamicCast<HanwhaResource>();
+    const auto physicalId = firstResource->getPhysicalId();
+    auto channels = m_channelsByCamera[physicalId];
+    if (channels == 0)
+    {
+        if (auto info = cachedDeviceInfo(auth, firstResource->getUrl()))
+            channels = m_channelsByCamera[physicalId] = info->channelCount;
+    }
 
-    const auto info = cachedDeviceInfo(auth, firstResource->getUrl());
-    if (!info)
-        return;
-
-    const auto channels = info->channelCount;
     if (channels > 1)
     {
         firstResource->updateToChannel(0);
