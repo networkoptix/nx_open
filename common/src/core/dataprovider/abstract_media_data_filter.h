@@ -10,8 +10,20 @@
 #include "abstract_ondemand_data_provider.h"
 
 
-//!Reads stream from specified source and performs some processing
 class AbstractMediaDataFilter
+{
+public:
+    /*!
+    Whether to copy source data or perform in-place processing is up to implementation
+    \param data Source data
+    \return Modified data. Can be \a data
+    */
+    virtual QnAbstractDataPacketPtr processData(const QnAbstractDataPacketPtr& data) = 0;
+};
+using AbstractMediaDataFilterPtr = std::shared_ptr<AbstractMediaDataFilter>;
+
+//!Reads stream from specified source and performs some processing
+class FilteredOnDemandDataProvider
 :
     public AbstractOnDemandDataProvider
 {
@@ -19,7 +31,9 @@ public:
     /*!
         \param dataSource MUST NOT be NULL
     */
-    AbstractMediaDataFilter( const AbstractOnDemandDataProviderPtr& dataSource );
+    FilteredOnDemandDataProvider(
+        const AbstractOnDemandDataProviderPtr& dataSource,
+        const AbstractMediaDataFilterPtr& filter);
 
     //!Implementation of AbstractOnDemandDataProvider::tryRead
     /*!
@@ -38,13 +52,7 @@ public:
 
 protected:
     AbstractOnDemandDataProviderPtr m_dataSource;
-
-    /*!
-        Whether to copy source data or perform in-place processing is up to implementation
-        \param data Source data
-        \return Modified data. Can be \a data
-    */
-    virtual QnAbstractDataPacketPtr processData( QnAbstractDataPacketPtr* const data ) = 0;
+    AbstractMediaDataFilterPtr m_filter;
 };
 
 #endif // ENABLE_DATA_PROVIDERS
