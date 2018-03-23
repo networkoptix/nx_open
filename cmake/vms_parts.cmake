@@ -76,7 +76,7 @@ option(enableHanwha OFF "Enable hanwha camera vendor even if it is disabled by d
 mark_as_advanced(enableHanwha)
 
 if(enableHanwha OR developerBuild)
-    set(enable_hanwha ON)
+    set(enable_hanwha true)
 endif()
 
 unset(_withMediaServer)

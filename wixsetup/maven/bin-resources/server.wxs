@@ -74,7 +74,7 @@
                     <Component Id="ServerMulticastPlugin">
                         <File Id="generic_multicast_plugin.dll" Name="generic_multicast_plugin.dll" Source="$(var.PluginsDir)\generic_multicast_plugin.dll" DiskId="10" />
                     </Component>
-                    <?if $(var.enable_hanwha) = "ON"?>
+                    <?if $(var.enable_hanwha) = "true"?>
                         <Component Id="ServerHanwhaMetadataPlugin">
                             <File Id="hanwha_metadata_plugin.dll" Name="hanwha_metadata_plugin.dll" Source="$(var.PluginsDir)\hanwha_metadata_plugin.dll" DiskId="10" />
                         </Component>
@@ -248,7 +248,7 @@
             <ComponentRef Id="ServerRtspPlugin"/>
             <ComponentRef Id="ServerHttpPlugin"/>
             <ComponentRef Id="ServerMulticastPlugin"/>
-            <?if $(var.enable_hanwha) = "ON"?>
+            <?if $(var.enable_hanwha) = "true"?>
                 <ComponentRef Id="ServerHanwhaMetadataPlugin"/>
             <?endif?>
             <ComponentRef Id="ServerHikvisionMetadataPlugin"/>

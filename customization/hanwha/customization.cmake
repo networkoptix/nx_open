@@ -1,5 +1,5 @@
 set(defaultSkin "gray_orange")
-set(enable_hanwha ON)
+set(enable_hanwha true)
 
 # Components Namings
 set(display.product.name "Wisenet WAVE")
