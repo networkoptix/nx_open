@@ -78,7 +78,6 @@ Error HanwhaMetadataManager::startFetchingMetadata(
                 packet->addEvent(event);
             }
 
-            std::cout << std::endl << std::endl;
             m_handler->handleMetadata(Error::noError, packet);
         };
 

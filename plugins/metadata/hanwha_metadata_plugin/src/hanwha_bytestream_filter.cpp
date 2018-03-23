@@ -116,7 +116,7 @@ boost::optional<int> HanwhaBytestreamFilter::eventChannel(const QString& eventSo
     if (split.size() < 2)
         return boost::none;
 
-    if (split[0] != kChannelField)
+    if (split[0].toLower() != kChannelField)
         return boost::none;
 
     bool success = false;
