@@ -1023,6 +1023,8 @@ CLConstVideoDecoderOutputPtr QnMotionEstimation::decodeFrame(const QnCompressedV
         return CLConstVideoDecoderOutputPtr{nullptr};
     if (!m_decoder || m_decoder->getContext()->codec_id != frame->compressionType)
     {
+        NX_VERBOSE(this) << lm("Recreating decoder, old codec_id: %1")
+            .arg(!m_decoder ? -1 : m_decoder->getContext()->codec_id);
         delete m_decoder;
         m_decoder = new QnFfmpegVideoDecoder(frame->compressionType, frame, /*mtDecoding*/ false);
     }
