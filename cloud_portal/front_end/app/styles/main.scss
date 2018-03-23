@@ -447,6 +447,10 @@ td{
   .buttons-panel {
     float: right;
     padding-top: 15px;
+
+    button {
+      float: left;
+    }
   }
 }
 
@@ -733,7 +737,7 @@ h2.version-number{
   background-size: 112px 56px;
   width: 16px;
   height: 16px;
-  display: inline-block;
+  margin-right: 5px;
   background-image: url('/static/images/portal_icons.png');
   @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
     background-image: url('/static/images/portal_icons@2x.png');
@@ -741,7 +745,6 @@ h2.version-number{
 }
 
 @mixin kill-glyphicon{
-  top:2px;
   @include icon;
   &:before{
     content:none;

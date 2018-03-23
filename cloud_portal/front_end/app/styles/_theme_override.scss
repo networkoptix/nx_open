@@ -178,6 +178,8 @@ select.form-control{
   border-radius: 2px;
   padding: 5px 16px;
   font-size: 14px;
+  display: flex;
+  align-items: center;
 
   &:hover,
   &:active,
@@ -185,6 +187,10 @@ select.form-control{
   &:focus,
   &.focus {
     outline: none !important;
+  }
+
+  &.dropdown-toggle{
+    display: block;
   }
 }
 
