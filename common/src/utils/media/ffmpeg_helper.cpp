@@ -9,6 +9,7 @@
 #include <utils/media/av_codec_helper.h>
 #include <nx/streaming/av_codec_media_context.h>
 #include <nx/streaming/basic_media_context.h>
+#include <nx/utils/type_utils.h>
 
 extern "C"
 {
@@ -502,14 +503,16 @@ int QnFfmpegHelper::getDefaultFrameSize(AVCodecContext* context)
     if (!avCodec)
         return 0;
 
-    auto encoderCtx = avcodec_alloc_context3(avCodec);
-    if (avCodec->sample_fmts)
-        encoderCtx->sample_fmt = avCodec->sample_fmts[0];
-    encoderCtx->channels = context->channels;
-    encoderCtx->sample_rate = context->sample_rate;
-    auto result = avcodec_open2(encoderCtx, avCodec, nullptr) >= 0 ? encoderCtx->frame_size : 0;
+    auto encoderContext = nx::utils::wrapUnique(
+        avcodec_alloc_context3(avCodec),
+        &QnFfmpegHelper::deleteAvCodecContext);
 
-    QnFfmpegHelper::deleteAvCodecContext(encoderCtx);
+    if (avCodec->sample_fmts)
+        encoderContext->sample_fmt = avCodec->sample_fmts[0];
+    encoderContext->channels = context->channels;
+    encoderContext->sample_rate = context->sample_rate;
+    auto result = avcodec_open2(encoderContext.get(), avCodec, nullptr) >= 0 ? encoderContext->frame_size : 0;
+
     return result;
 }
 
