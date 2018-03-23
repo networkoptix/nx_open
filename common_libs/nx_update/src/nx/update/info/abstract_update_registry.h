@@ -22,7 +22,7 @@ public:
     virtual void addFileData(const UpdateFileRequestData& updateFileRequestDat,
         const FileData& fileData) = 0;
 
-    // #TODO #akulikov implement OR refactor above functions for client updates
+    // #TODO #akulikov Implement OR refactor above functions for client updates.
 
     virtual QList<QString> alternativeServers() const = 0;
 

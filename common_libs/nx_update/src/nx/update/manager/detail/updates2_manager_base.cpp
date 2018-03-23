@@ -19,7 +19,7 @@ using namespace vms::common::p2p::downloader;
 
 namespace {
 
-// #TODO #akulikov turn this to AbstractUpdateRegistry::isBetter() and AbstractUpdateRegistry::merge()
+// #TODO #akulikov Turn this to AbstractUpdateRegistry::isBetter() and AbstractUpdateRegistry::merge().
 static bool isNewRegistryBetter(
     const update::info::AbstractUpdateRegistryPtr& oldRegistry,
     const update::info::AbstractUpdateRegistryPtr& newRegistry)
@@ -403,17 +403,17 @@ void Updates2ManagerBase::onDownloadFailed(const QString& fileName)
 
 void Updates2ManagerBase::onFileAdded(const FileInformation& /*fileInformation*/)
 {
-    // #TODO #akulikov implement
+    // #TODO #akulikov Implement this.
 }
 
 void Updates2ManagerBase::onFileDeleted(const QString& /*fileName*/)
 {
-    // #TODO #akulikov implement
+    // #TODO #akulikov Implement this.
 }
 
 void Updates2ManagerBase::onFileInformationChanged(const FileInformation& /*fileInformation*/)
 {
-    // #TODO #akulikov implement
+    // #TODO #akulikov Implement this.
 }
 
 void Updates2ManagerBase::onFileInformationStatusChanged(const FileInformation& fileInformation)

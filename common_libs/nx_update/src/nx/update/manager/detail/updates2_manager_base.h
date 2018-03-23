@@ -22,7 +22,7 @@ public:
     api::Updates2StatusData status();
     api::Updates2StatusData download();
     api::Updates2StatusData install();
-    /** #TODO #akulikov implement this */
+    /** #TODO #akulikov Implement this. */
     api::Updates2StatusData cancel();
     void atServerStart();
     /** After this method is called manager is not operational and should be destroyed */
