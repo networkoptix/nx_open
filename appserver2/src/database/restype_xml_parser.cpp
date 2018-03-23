@@ -89,10 +89,8 @@ bool ResTypeXmlParser::processResource(const QString& localName, const QXmlAttri
     return true;
 }
 
-bool ResTypeXmlParser::processParam(const QString& localName, const QXmlAttributes& attrs)
+bool ResTypeXmlParser::processParam(const QString& /*localName*/, const QXmlAttributes& attrs)
 {
-    Q_UNUSED(localName);
-
     ApiPropertyTypeData p;
     if (!m_resTypeFound) {
         qWarning() << "Invalid XML format. You should specify resource type before params";
@@ -111,11 +109,8 @@ bool ResTypeXmlParser::processParam(const QString& localName, const QXmlAttribut
     return true;
 }
 
-bool ResTypeXmlParser::startElement( const QString& namespaceURI, const QString& localName, const QString& qName, const QXmlAttributes& attrs )
+bool ResTypeXmlParser::startElement( const QString& /*namespaceURI*/, const QString& localName, const QString& /*qName*/, const QXmlAttributes& attrs )
 {
-    Q_UNUSED(namespaceURI)
-    Q_UNUSED(qName)
-
     if (localName == lit("oem"))
         m_vendor = attrs.value("name").trimmed();
     else if (localName == lit("resource"))
@@ -126,11 +121,8 @@ bool ResTypeXmlParser::startElement( const QString& namespaceURI, const QString&
     return true;
 }
 
-bool ResTypeXmlParser::endElement( const QString& namespaceURI, const QString& localName, const QString& qName )
+bool ResTypeXmlParser::endElement( const QString& /*namespaceURI*/, const QString& localName, const QString& /*qName*/ )
 {
-    Q_UNUSED(namespaceURI)
-    Q_UNUSED(qName)
-
     if (localName == lit("resource"))
         m_resTypeFound = false;
 

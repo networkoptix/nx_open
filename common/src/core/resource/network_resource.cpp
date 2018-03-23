@@ -20,7 +20,6 @@
 #include <recording/time_period_list.h>
 #include <nx_ec/data/api_camera_data.h>
 
-
 QnNetworkResource::QnNetworkResource(QnCommonModule* commonModule):
     base_type(commonModule),
     m_authenticated(true),
@@ -42,7 +41,6 @@ QString QnNetworkResource::getUniqueId() const
 {
     return getPhysicalId();
 }
-
 
 QString QnNetworkResource::getHostAddress() const
 {
@@ -276,7 +274,6 @@ bool QnNetworkResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &sourc
     return mergedSomething;
 }
 
-
 int QnNetworkResource::getChannel() const
 {
     return 0;
@@ -297,10 +294,7 @@ void QnNetworkResource::checkIfOnlineAsync( std::function<void(bool)> completion
     nx::network::SocketGlobals::aioService().post(std::bind(completionHandler, false));
 }
 
-QnTimePeriodList QnNetworkResource::getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) {
-    Q_UNUSED(startTimeMs)
-    Q_UNUSED(endTimeMs)
-    Q_UNUSED(detailLevel)
+QnTimePeriodList QnNetworkResource::getDtsTimePeriods(qint64 /*startTimeMs*/, qint64 /*endTimeMs*/, int /*detailLevel*/) {
     return QnTimePeriodList();
 }
 
@@ -313,7 +307,6 @@ void QnNetworkResource::getDevicesBasicInfo(QnResourceMap& lst, int threads)
     QTime time;
     time.start();
 
-
     QList<QnResourcePtr> local_list;
     for (const QnResourcePtr& res: lst.values())
     {
@@ -321,7 +314,6 @@ void QnNetworkResource::getDevicesBasicInfo(QnResourceMap& lst, int threads)
         if (netRes && !(netRes->checkNetworkStatus(QnNetworkResource::HasConflicts)))
             local_list << res.data();
     }
-
 
     QThreadPool* global = QThreadPool::globalInstance();
     for (int i = 0; i < threads; ++i ) global->releaseThread();

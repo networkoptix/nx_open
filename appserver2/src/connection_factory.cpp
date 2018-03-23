@@ -69,7 +69,6 @@ Ec2DirectConnectionFactory::Ec2DirectConnectionFactory(
         m_jsonTranSerializer.get(),
         m_ubjsonTranSerializer.get()));
 
-
     m_timeSynchronizationManager.reset(new TimeSynchronizationManager(
         peerType,
         timerManager,
@@ -1960,18 +1959,16 @@ ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
                 });
         }
     #else
-        Q_UNUSED(loginInfo);
+        nx::utils::unused(loginInfo);
     #endif
 
     return ErrorCode::ok;
 }
 
 int Ec2DirectConnectionFactory::testDirectConnection(
-    const nx::utils::Url& addr,
+    const nx::utils::Url& /*addr*/,
     impl::TestConnectionHandlerPtr handler)
 {
-    Q_UNUSED(addr);
-
     const int reqId = generateRequestID();
     QnConnectionInfo connectionInfo;
     fillConnectionInfo(ApiLoginData(), &connectionInfo);

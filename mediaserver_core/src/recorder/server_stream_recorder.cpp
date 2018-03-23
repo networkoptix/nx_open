@@ -120,9 +120,8 @@ void QnServerStreamRecorder::at_camera_propertyChanged(const QnResourcePtr &, co
 }
 
 void QnServerStreamRecorder::at_recordingFinished(const StreamRecorderErrorStruct& status,
-    const QString& filename)
+    const QString& /*filename*/)
 {
-    Q_UNUSED(filename)
     if (status.lastError == StreamRecorderError::noError)
         return;
 
@@ -521,10 +520,9 @@ int QnServerStreamRecorder::getFpsForValue(int fps)
     }
 }
 
-void QnServerStreamRecorder::startForcedRecording(Qn::StreamQuality quality, int fps, int beforeThreshold, int afterThreshold, int maxDurationSec)
+void QnServerStreamRecorder::startForcedRecording(Qn::StreamQuality quality, int fps,
+    int /*beforeThreshold*/, int afterThreshold, int maxDurationSec)
 {
-    Q_UNUSED(beforeThreshold)
-
     QnScheduleTask::Data scheduleData;
     scheduleData.m_startTime = 0;
     scheduleData.m_endTime = 24*3600*7;

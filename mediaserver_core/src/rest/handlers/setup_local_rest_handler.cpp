@@ -21,23 +21,21 @@
 #include "system_settings_handler.h"
 
 int QnSetupLocalSystemRestHandler::executeGet(
-    const QString& path,
+    const QString& /*path*/,
     const QnRequestParams& params,
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
-    Q_UNUSED(path);
     return execute(std::move(SetupLocalSystemData(params)), owner, result);
 }
 
 int QnSetupLocalSystemRestHandler::executePost(
-    const QString& path,
+    const QString& /*path*/,
     const QnRequestParams&,
     const QByteArray& body,
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
-    Q_UNUSED(path);
     SetupLocalSystemData data = QJson::deserialized<SetupLocalSystemData>(body);
     return execute(std::move(data), owner, result);
 }

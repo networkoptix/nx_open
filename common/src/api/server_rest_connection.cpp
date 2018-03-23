@@ -653,7 +653,6 @@ Handle ServerConnection::releaseWearableCameraLock(
         targetThread);
 }
 
-
 Handle ServerConnection::consumeWearableCameraFile(
     const QnNetworkResourcePtr& camera,
     const QnUuid& token,
@@ -957,9 +956,8 @@ Handle ServerConnection::executeRequest(
         QPointer<QThread> targetThreadGuard(targetThread);
         return sendRequest(request,
             [callback, targetThread, targetThreadGuard, serverId, timer]
-            (Handle id, SystemError::ErrorCode osErrorCode, int statusCode, nx::network::http::StringType contentType, nx::network::http::BufferType msgBody)
+            (Handle id, SystemError::ErrorCode osErrorCode, int statusCode, nx::network::http::StringType /*contentType*/, nx::network::http::BufferType msgBody)
             {
-                Q_UNUSED(contentType)
                 bool success = (osErrorCode == SystemError::noError
                     && statusCode >= nx::network::http::StatusCode::ok
                     && statusCode <= nx::network::http::StatusCode::partialContent);
@@ -1069,7 +1067,6 @@ nx::network::http::ClientPool::Request ServerConnection::prepareRequest(
         request.url.setHost(route.addr.address.toString());
         request.url.setPort(route.addr.port);
     }
-
 
     request.url.setUserName(user);
     request.url.setPassword(password);

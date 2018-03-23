@@ -7,8 +7,6 @@
 
 #include <QtConcurrent/QtConcurrentMap>
 
-
-
 QnPlIpWebCamResourceSearcher::QnPlIpWebCamResourceSearcher(QnCommonModule* commonModule):
     QnAbstractResourceSearcher(commonModule),
     base_type(commonModule)
@@ -54,15 +52,10 @@ QString QnPlIpWebCamResourceSearcher::manufacture() const
     return QnPlDriodIpWebCamResource::MANUFACTURE;
 }
 
-
-QList<QnResourcePtr> QnPlIpWebCamResourceSearcher::checkHostAddr(const nx::utils::Url& url, const QAuthenticator& auth, bool doMultichannelCheck)
+QList<QnResourcePtr> QnPlIpWebCamResourceSearcher::checkHostAddr(const nx::utils::Url& /*url*/, const QAuthenticator& /*auth*/, bool /*doMultichannelCheck*/)
 {
-    Q_UNUSED(url)
-    Q_UNUSED(auth)
-    Q_UNUSED(doMultichannelCheck)
     return QList<QnResourcePtr>();
 }
-
 
 struct AnDroidDev
 {
@@ -91,12 +84,9 @@ struct AnDroidDev
     }
 };
 
-
 QnResourceList QnPlIpWebCamResourceSearcher::findResources()
 {
     QnResourceList result;
-
-
 
     QFile file(QLatin1String("android.txt")); // Create a file handle for the file named
     if (!file.exists())
@@ -118,13 +108,11 @@ QnResourceList QnPlIpWebCamResourceSearcher::findResources()
 
         QStringList list = line.split(QLatin1Char(' '), QString::SkipEmptyParts);
 
-
         if (list.count()<2)
             continue;
 
         QHostAddress min_addr(list.at(0));
         QHostAddress max_addr(list.at(1));
-
 
         QList<AnDroidDev> alist;
 
@@ -146,7 +134,6 @@ QnResourceList QnPlIpWebCamResourceSearcher::findResources()
             alist.push_back(adev);
             ++curr;
         }
-
 
         int threads = 10;
         QThreadPool* global = QThreadPool::globalInstance();
@@ -176,14 +163,12 @@ QnResourceList QnPlIpWebCamResourceSearcher::findResources()
 
                 QString smac = QLatin1String("00-00-00-00-00-") + lastMac;
 
-
                 resource->setTypeId(rt);
                 resource->setName(name);
                 resource->setMAC(nx::network::QnMacAddress(smac));
                 resource->setHostAddress(QHostAddress(ad.ip).toString());
 
                 result.push_back(resource);
-
 
             }
         }

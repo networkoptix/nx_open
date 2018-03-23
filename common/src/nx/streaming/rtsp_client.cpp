@@ -27,6 +27,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/uuid.h>
 #include <nx/utils/system_error.h>
+#include <nx/utils/unused.h>
 
 #define DEFAULT_RTP_PORT 554
 #define RESERVED_TIMEOUT_TIME (10*1000)
@@ -222,7 +223,6 @@ QnMutex QnRtspTimeHelper::m_camClockMutex;
 QMap<QString, QPair<QSharedPointer<QnRtspTimeHelper::CamSyncInfo>, int>>
     QnRtspTimeHelper::m_camClock;
 
-
 QnRtspTimeHelper::QnRtspTimeHelper(const QString& resourceId):
     m_localStartTime(0),
     m_rtcpReportTimeDiff(INT_MAX),
@@ -298,7 +298,6 @@ bool QnRtspTimeHelper::isLocalTimeChanged()
     }
     return timeChanged;
 }
-
 
 bool QnRtspTimeHelper::isCameraTimeChanged(const QnRtspStatistic& statistics)
 {
@@ -598,7 +597,6 @@ void QnRtspClient::updateTrackNum()
     std::sort(m_sdpTracks.begin(), m_sdpTracks.end(), trackNumLess);
 }
 
-
 void QnRtspClient::parseSDP()
 {
     QList<QByteArray> lines = m_sdp.split('\n');
@@ -797,7 +795,6 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
     tmp = extractRTSPParam(QLatin1String(response), QLatin1String("Content-Base:"));
     if (!tmp.isEmpty())
         m_contentBase = tmp;
-
 
     CameraDiagnostics::Result result = CameraDiagnostics::NoErrorResult();
     updateResponseStatus(response);
@@ -1129,7 +1126,6 @@ bool QnRtspClient::sendSetup()
             request += "\r\n";
         }
 
-
         request += "\r\n";
 
         //qDebug() << request;
@@ -1156,7 +1152,6 @@ bool QnRtspClient::sendSetup()
 
         request.requestLine.version = nx_rtsp::rtsp_1_0;
         addCommonHeaders(request.headers);
-
 
         {   //generating transport header
             nx::network::http::StringType transportStr = "RTP/AVP/";
@@ -1451,7 +1446,7 @@ QnRtspStatistic QnRtspClient::parseServerRTCPReport(
         {
             int messageCode = reader.getBits(8);
             int messageLen = reader.getBits(16);
-            Q_UNUSED(messageLen);
+            nx::utils::unused(messageLen);
             if (messageCode == RTCP_SENDER_REPORT)
             {
                 stats.ssrc = reader.getBits(32);
@@ -1475,7 +1470,6 @@ QnRtspStatistic QnRtspClient::parseServerRTCPReport(
     }
     return stats;
 }
-
 
 int QnRtspClient::buildClientRTCPReport(quint8* dstBuffer, int bufferLen)
 {
@@ -1557,7 +1551,6 @@ void QnRtspClient::sendBynaryResponse(const quint8* buffer, int size)
     m_outStreamFile.write( (const char*)buffer, size );
 #endif
 }
-
 
 bool QnRtspClient::processTextResponseInsideBinData()
 {

@@ -83,7 +83,6 @@ public:
         const QnResourcePtr& resource,
         Qn::Permissions permissions) const;
 
-
     /**
     * \param user                      User that should have permissions for resource creating.
     * \param resource                  Resource to get permissions for.
@@ -113,10 +112,9 @@ public:
 
     template <typename ResourceSharedPointer, typename ApiDataType>
     bool canModifyResource(const QnResourceAccessSubject& subject,
-        const ResourceSharedPointer& target, const ApiDataType& update) const
+        const ResourceSharedPointer& target, const ApiDataType& /*update*/) const
     {
         /* By default we require only generic permissions to modify resource. */
-        Q_UNUSED(update);
         return hasPermission(subject, target, Qn::ReadWriteSavePermission);
     }
 

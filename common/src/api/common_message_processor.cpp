@@ -81,7 +81,6 @@ void QnCommonMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
     connection->startReceivingNotifications();
 }
 
-
 ec2::AbstractECConnectionPtr QnCommonMessageProcessor::connection() const
 {
     return m_connection;
@@ -515,7 +514,6 @@ void QnCommonMessageProcessor::resetResources(const ec2::ApiFullInfoData& fullDa
     };
     */
 
-
     /* Packet adding. */
     resourcePool()->beginTran();
 
@@ -554,10 +552,9 @@ void QnCommonMessageProcessor::resetTime()
         return;
 
     auto timeManager = m_connection->getTimeManager(Qn::kSystemAccess);
-    timeManager->getCurrentTime(this, [this](int handle, ec2::ErrorCode errCode, qint64 syncTime)
+    timeManager->getCurrentTime(this, [this](int /*handle*/, ec2::ErrorCode errCode, qint64 syncTime)
     {
         const auto& runtimeManager = runtimeInfoManager();
-        Q_UNUSED(handle);
         if (errCode != ec2::ErrorCode::ok || !m_connection)
             return;
 

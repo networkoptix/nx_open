@@ -16,7 +16,6 @@ static const int DROID_CONTROL_TCP_SERVER_PORT = 5690;
 QnMutex PlDroidStreamReader::m_allReadersMutex;
 QMap<quint32, PlDroidStreamReader*> PlDroidStreamReader::m_allReaders;
 
-
 void PlDroidStreamReader::setSDPInfo(quint32 ipv4, QByteArray sdpInfo)
 {
     QnMutexLocker lock( &m_allReadersMutex );
@@ -77,20 +76,19 @@ QnAbstractMediaDataPtr PlDroidStreamReader::getNextData()
     return result;
 }
 
-CameraDiagnostics::Result PlDroidStreamReader::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params)
+CameraDiagnostics::Result PlDroidStreamReader::openStreamInternal(bool /*isCameraControlRequired*/,
+    const QnLiveStreamParams& /*params*/)
 {
-    Q_UNUSED(isCameraControlRequired);
-    Q_UNUSED(params);
 
     m_gotSDP =  false;
     if (isStreamOpened())
         return CameraDiagnostics::NoErrorResult();
 
     QString portStr = m_resource->getUrl();
-	auto virtRes = m_resource.dynamicCast<QnVirtualCameraResource>();
+    auto virtRes = m_resource.dynamicCast<QnVirtualCameraResource>();
 
-	if (virtRes)
-		virtRes->updateSourceUrl(portStr, getRole());
+    if (virtRes)
+        virtRes->updateSourceUrl(portStr, getRole());
 
     if (!portStr.startsWith(QLatin1String("raw://")))
         return CameraDiagnostics::UnsupportedProtocolResult(portStr, QUrl(portStr).scheme());

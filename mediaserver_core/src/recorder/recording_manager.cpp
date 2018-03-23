@@ -401,10 +401,8 @@ void QnRecordingManager::updateCamera(const QnSecurityCamResourcePtr& cameraRes)
     startOrStopRecording(cameraRes, camera, recorders.recorderHiRes, recorders.recorderLowRes);
 }
 
-void QnRecordingManager::at_camera_resourceChanged(const QnResourcePtr &resource)
+void QnRecordingManager::at_camera_resourceChanged(const QnResourcePtr& /*resource*/)
 {
-    Q_UNUSED(resource)
-
     QnVirtualCameraResource* cameraPtr = dynamic_cast<QnVirtualCameraResource*>(sender());
     if( !cameraPtr )
         return;
@@ -573,7 +571,6 @@ void QnRecordingManager::at_checkLicenses()
     {
         if (++m_tooManyRecordingCnt < 5)
             return; // do not report license problem immediately. Server should wait several minutes, probably other servers will be available soon
-
 
         qint64 licenseOverflowTime = runtimeInfoManager()->localInfo().data.prematureLicenseExperationDate;
         if (licenseOverflowTime == 0) {

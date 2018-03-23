@@ -1,6 +1,5 @@
 #ifdef ENABLE_DROID
 
-
 #include "droid_resource_searcher.h"
 #include "droid_resource.h"
 #include <nx/network/nettools.h>
@@ -124,7 +123,6 @@ QnResourcePtr QnPlDroidResourceSearcher::createResource(const QnUuid &resourceTy
         return result; // it is not a new droid resource
     }
 
-
     result = QnVirtualCameraResourcePtr( new QnDroidResource() );
     result->setTypeId(resourceTypeId);
 
@@ -140,11 +138,9 @@ QString QnPlDroidResourceSearcher::manufacture() const
     return QnDroidResource::MANUFACTURE;
 }
 
-QList<QnResourcePtr> QnPlDroidResourceSearcher::checkHostAddr(const nx::utils::Url& url, const QAuthenticator& auth, bool doMultichannelCheck)
+QList<QnResourcePtr> QnPlDroidResourceSearcher::checkHostAddr(const nx::utils::Url& /*url*/,
+    const QAuthenticator& /*auth*/, bool /*doMultichannelCheck*/)
 {
-    Q_UNUSED(url)
-    Q_UNUSED(auth)
-    Q_UNUSED(doMultichannelCheck)
     return QList<QnResourcePtr>();
 }
 

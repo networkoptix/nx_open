@@ -22,15 +22,12 @@ int QnRestoreStateRestHandler::executeGet(
 }
 
 int QnRestoreStateRestHandler::executePost(
-    const QString &path,
-    const QnRequestParams &params,
-    const QByteArray &body,
-    QnJsonRestResult &result,
+    const QString& /*path*/,
+    const QnRequestParams& /*params*/,
+    const QByteArray& body,
+    QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
-    Q_UNUSED(path);
-    Q_UNUSED(params);
-
     PasswordData passwordData = QJson::deserialized<PasswordData>(body);
     return execute(std::move(passwordData), owner, result);
 }
@@ -61,15 +58,11 @@ int QnRestoreStateRestHandler::execute(
 }
 
 void QnRestoreStateRestHandler::afterExecute(
-    const QString& path,
-    const QnRequestParamList& params,
+    const QString& /*path*/,
+    const QnRequestParamList& /*params*/,
     const QByteArray& body,
-    const QnRestConnectionProcessor* owner)
+    const QnRestConnectionProcessor* /*owner*/)
 {
-    Q_UNUSED(path);
-    Q_UNUSED(params);
-    Q_UNUSED(owner);
-
     QnJsonRestResult reply;
     if (QJson::deserialize(body, &reply) && reply.error == QnJsonRestResult::NoError)
     {

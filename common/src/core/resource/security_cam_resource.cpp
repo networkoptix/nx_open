@@ -609,11 +609,8 @@ QnIOPortDataList QnSecurityCamResource::getIOPorts() const
     return QJson::deserialized<QnIOPortDataList>(getProperty(Qn::IO_SETTINGS_PARAM_NAME).toUtf8());
 }
 
-bool QnSecurityCamResource::setRelayOutputState(const QString& ouputID, bool activate, unsigned int autoResetTimeout)
+bool QnSecurityCamResource::setRelayOutputState(const QString& /*ouputID*/, bool /*activate*/, unsigned int /*autoResetTimeout*/)
 {
-    Q_UNUSED(ouputID)
-    Q_UNUSED(activate)
-    Q_UNUSED(autoResetTimeout)
     return false;
 }
 
@@ -1246,16 +1243,11 @@ bool QnSecurityCamResource::needCheckIpConflicts() const {
 }
 
 QnTimePeriodList QnSecurityCamResource::getDtsTimePeriodsByMotionRegion(
-    const QList<QRegion>& regions,
-    qint64 msStartTime,
-    qint64 msEndTime,
-    int detailLevel )
+    const QList<QRegion>& /*regions*/,
+    qint64 /*msStartTime*/,
+    qint64 /*msEndTime*/,
+    int /*detailLevel*/ )
 {
-    Q_UNUSED( regions );
-    Q_UNUSED( msStartTime );
-    Q_UNUSED( msEndTime );
-    Q_UNUSED( detailLevel );
-
     return QnTimePeriodList();
 }
 

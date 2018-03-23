@@ -8,7 +8,6 @@
 #include "utils/common/synctime.h"
 #include <nx/network/http/http_types.h>
 
-
 char jpeg_start[2] = {'\xff', '\xd8'};
 char jpeg_end[2] = {'\xff', '\xd9'};
 
@@ -23,7 +22,6 @@ int contain_subst(char *data, int datalen, char *subdata, int subdatalen)
 
     int coincidence_len = 0;
     char *pdata = data;
-
 
     while(1)
     {
@@ -42,7 +40,6 @@ int contain_subst(char *data, int datalen, char *subdata, int subdatalen)
 
     }
 }
-
 
 int contain_subst(char *data, int datalen, int start_index ,  char *subdata, int subdatalen)
 {
@@ -69,7 +66,6 @@ QnPlDroidIpWebCamReader::~QnPlDroidIpWebCamReader()
     stop();
 }
 
-
 QnAbstractMediaDataPtr QnPlDroidIpWebCamReader::getNextData()
 {
     if (!isStreamOpened())
@@ -77,7 +73,6 @@ QnAbstractMediaDataPtr QnPlDroidIpWebCamReader::getNextData()
 
     QnWritableCompressedVideoDataPtr videoData(new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, 3*1024*1024+FF_INPUT_BUFFER_PADDING_SIZE));
     QnByteArray& img = videoData->m_data;
-
 
     bool getting_image = false;
 
@@ -96,7 +91,6 @@ QnAbstractMediaDataPtr QnPlDroidIpWebCamReader::getNextData()
 
         if (readed < 0 )
             break;
-
 
         if (!getting_image)
         {
@@ -119,7 +113,6 @@ QnAbstractMediaDataPtr QnPlDroidIpWebCamReader::getNextData()
             if (img.size() + BLOCK_SIZE > img.capacity())// too big image
                 break;
 
-
             int image_end_index = contain_subst(mData, readed, jpeg_end, 2);
             if (image_end_index<0)
             {
@@ -129,7 +122,6 @@ QnAbstractMediaDataPtr QnPlDroidIpWebCamReader::getNextData()
             {
                 image_end_index+=2;
 
-
                 // found the end of image
                 getting_image = false;
                 img.write(mData, image_end_index);
@@ -138,7 +130,6 @@ QnAbstractMediaDataPtr QnPlDroidIpWebCamReader::getNextData()
                     mDataRemainedBeginIndex = image_end_index + 1;
                 else
                     mDataRemainedBeginIndex = -1;
-
 
                 videoData->compressionType = AV_CODEC_ID_MJPEG;
                 videoData->width = 1920;
@@ -150,40 +141,35 @@ QnAbstractMediaDataPtr QnPlDroidIpWebCamReader::getNextData()
 
                 return videoData;
 
-
             }
         }
 
-
     }
-
 
     closeStream();
     return QnAbstractMediaDataPtr(0);
 
 }
 
-CameraDiagnostics::Result QnPlDroidIpWebCamReader::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params)
+CameraDiagnostics::Result QnPlDroidIpWebCamReader::openStreamInternal(
+    bool /*isCameraControlRequired*/, const QnLiveStreamParams& /*params*/)
 {
-    Q_UNUSED(isCameraControlRequired);
-    Q_UNUSED(params);
-
     if (isStreamOpened())
         return CameraDiagnostics::NoErrorResult();
 
     auto nres = getResource().dynamicCast<QnNetworkResource>();
-	auto virtRes = getResource().dynamicCast<QnVirtualCameraResource>();
+    auto virtRes = getResource().dynamicCast<QnVirtualCameraResource>();
 
     mHttpClient = new CLSimpleHTTPClient(nres->getHostAddress(), nres->httpPort() , 2000, nres->getAuth());
     mDataRemainedBeginIndex = -1;
-	QUrl requestedUrl;
-	requestedUrl.setHost(nres->getHostAddress());
-	requestedUrl.setPort(nres->httpPort());
-	requestedUrl.setScheme(QLatin1String("http"));
-	requestedUrl.setPath(QLatin1String("videofeed"));
+    QUrl requestedUrl;
+    requestedUrl.setHost(nres->getHostAddress());
+    requestedUrl.setPort(nres->httpPort());
+    requestedUrl.setScheme(QLatin1String("http"));
+    requestedUrl.setPath(QLatin1String("videofeed"));
 
-	if (virtRes)
-		virtRes->updateSourceUrl(requestedUrl.toString(), getRole());
+    if (virtRes)
+        virtRes->updateSourceUrl(requestedUrl.toString(), getRole());
 
     const CLHttpStatus status = mHttpClient->doGET(QLatin1String("videofeed"));
     switch( status )

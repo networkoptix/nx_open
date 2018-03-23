@@ -114,7 +114,6 @@ public:
     */
     void setAudioCodec(AVCodecID codec);
 
-
     /*
     * Server time zone. Used for export to avi/mkv files
     */
@@ -140,13 +139,12 @@ protected:
     virtual bool saveMotion(const QnConstMetaDataV1Ptr& media);
 
     virtual void fileFinished(
-        qint64 durationMs,
-        const QString& fileName,
-        QnAbstractMediaStreamDataProvider *provider,
-        qint64 fileSize,
+        qint64 /*durationMs*/,
+        const QString& /*fileName*/,
+        QnAbstractMediaStreamDataProvider* /*provider*/,
+        qint64 /*fileSize*/,
         qint64 startTimeMs = AV_NOPTS_VALUE)
     {
-        Q_UNUSED(durationMs) Q_UNUSED(fileName) Q_UNUSED(provider) Q_UNUSED(fileSize)
     }
     virtual void fileStarted(
         qint64 startTimeMs,

@@ -23,10 +23,9 @@ QnDesktopCameraStreamReader::~QnDesktopCameraStreamReader()
     stop();
 }
 
-CameraDiagnostics::Result QnDesktopCameraStreamReader::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params)
+CameraDiagnostics::Result QnDesktopCameraStreamReader::openStreamInternal(
+    bool isCameraControlRequired, const QnLiveStreamParams& /*params*/)
 {
-    Q_UNUSED(isCameraControlRequired);
-    Q_UNUSED(params);
     closeStream();
 
     if (!m_socket) {

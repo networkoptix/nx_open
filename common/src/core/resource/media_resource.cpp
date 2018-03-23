@@ -30,7 +30,6 @@ namespace {
     const qreal noCustomAspectRatio = 0.0;
 }
 
-
 class QnStreamQualityStrings {
     Q_DECLARE_TR_FUNCTIONS(QnStreamQualityStrings);
 public:
@@ -144,14 +143,12 @@ QnConstResourceAudioLayoutPtr QnMediaResource::getAudioLayout(const QnAbstractSt
     return audioLayout;
 }
 
-bool QnMediaResource::hasVideo(const QnAbstractStreamDataProvider* dataProvider) const
+bool QnMediaResource::hasVideo(const QnAbstractStreamDataProvider* /*dataProvider*/) const
 {
-    Q_UNUSED(dataProvider);
     if (!m_hasVideo.is_initialized())
         m_hasVideo = toResource()->getProperty(Qn::VIDEO_DISABLED_PARAM_NAME).toInt() == 0;
     return *m_hasVideo;
 }
-
 
 void QnMediaResource::initMediaResource()
 {

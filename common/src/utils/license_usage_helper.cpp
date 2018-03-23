@@ -24,7 +24,6 @@
 
 #include <licensing/license_validator.h>
 
-
 //#define QN_NO_LICENSE_CHECK
 
 namespace {
@@ -114,7 +113,6 @@ QnLicenseUsageWatcher::QnLicenseUsageWatcher(QnCommonModule* commonModule, QObje
         updateIfServerStatusChanged);
 }
 
-
 /************************************************************************/
 /* QnLicenseUsageHelper                                                 */
 /************************************************************************/
@@ -126,7 +124,6 @@ QnLicenseUsageHelper::Cache::Cache()
     boost::fill(overflow, 0);
     boost::fill(total, 0);
 }
-
 
 QnLicenseUsageHelper::QnLicenseUsageHelper(QnCommonModule* commonModule, QObject* parent):
     base_type(parent),
@@ -226,7 +223,6 @@ void QnLicenseUsageHelper::updateCache() const
     /* Used licenses without proposed cameras. */
     licensesArray basicUsedLicenses;
 
-
     /* Borrowed licenses count without proposed cameras. */
     licensesArray basicBorrowedLicenses;
     boost::fill(basicBorrowedLicenses, 0);
@@ -253,9 +249,8 @@ void QnLicenseUsageHelper::updateCache() const
     }
 }
 
-int QnLicenseUsageHelper::calculateOverflowLicenses(Qn::LicenseType licenseType, int borrowedLicenses) const
+int QnLicenseUsageHelper::calculateOverflowLicenses(Qn::LicenseType licenseType, int /*borrowedLicenses*/) const
 {
-    Q_UNUSED(borrowedLicenses);
     return qMax(0, m_cache.used[licenseType] - m_cache.total[licenseType]);
 }
 
@@ -315,8 +310,6 @@ QList<Qn::LicenseType> QnLicenseUsageHelper::licenseTypes() const
         m_licenseTypes = calculateLicenseTypes();
     return m_licenseTypes;
 }
-
-
 
 /************************************************************************/
 /* QnCamLicenseUsageWatcher                                             */
@@ -386,7 +379,6 @@ QnCamLicenseUsageWatcher::QnCamLicenseUsageWatcher(
     for (const auto& camera: resPool->getAllCameras(QnResourcePtr(), true))
         connectToCamera(camera);
 }
-
 
 /************************************************************************/
 /* QnCamLicenseUsageHelper                                              */
@@ -594,7 +586,6 @@ QnLicenseUsageStatus QnSingleCamLicenseStatusHelper::status() const
     return (isLicenseUsed ? QnLicenseUsageStatus::used : QnLicenseUsageStatus::notUsed);
 }
 
-
 /************************************************************************/
 /* QnVideoWallLicenseUsageWatcher                                       */
 /************************************************************************/
@@ -638,7 +629,6 @@ QnVideoWallLicenseUsageWatcher::QnVideoWallLicenseUsageWatcher(
     for (const auto& videowall: resPool->getResources<QnVideoWallResource>())
         connectTo(videowall);
 }
-
 
 /************************************************************************/
 /* QnVideoWallLicenseUsageHelper                                        */
@@ -694,7 +684,6 @@ int QnVideoWallLicenseUsageHelper::licensesForScreens(int screens)
 {
     return (screens + 1) / 2;
 }
-
 
 /************************************************************************/
 /* QnVideoWallLicenseUsageProposer                                      */

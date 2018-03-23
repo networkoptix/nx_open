@@ -19,7 +19,6 @@ QnDesktopCameraResource::QnDesktopCameraResource()
     setFlags(flags() | Qn::no_last_gop | Qn::desktop_camera);
 }
 
-
 QnDesktopCameraResource::QnDesktopCameraResource(const QString &userName)
 {
     setFlags(flags() | Qn::no_last_gop | Qn::desktop_camera);
@@ -30,11 +29,9 @@ QnDesktopCameraResource::~QnDesktopCameraResource()
 {
 }
 
-bool QnDesktopCameraResource::setRelayOutputState(const QString& outputID, bool activate, unsigned int autoResetTimeoutMS)
+bool QnDesktopCameraResource::setRelayOutputState(const QString& /*outputID*/, bool /*activate*/,
+    unsigned int /*autoResetTimeoutMS*/)
 {
-    Q_UNUSED(outputID)
-    Q_UNUSED(activate)
-    Q_UNUSED(autoResetTimeoutMS)
     return false;
 }
 

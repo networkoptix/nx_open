@@ -60,12 +60,9 @@ namespace {
 }
 
 #ifdef Q_OS_WIN
-static BOOLEAN _cdecl VerifyServerCertificate(PLDAP Connection, PCCERT_CONTEXT *ppServerCert)
+static BOOLEAN _cdecl VerifyServerCertificate(PLDAP /*Connection*/, PCCERT_CONTEXT *ppServerCert)
 {
-    Q_UNUSED(Connection)
-
     CertFreeCertificateContext(*ppServerCert);
-
     return TRUE;
 }
 #endif
@@ -178,7 +175,6 @@ struct OpenLdapType : DirectoryType
         return attr;
     }
 };
-
 
 namespace
 {
@@ -318,7 +314,6 @@ bool LdapSession::connect()
         m_dType.reset(new ActiveDirectoryType());
     else
         m_dType.reset(new OpenLdapType());
-
 
     return true;
 }

@@ -36,7 +36,6 @@ namespace QnCodecParams
     static const QLatin1String global_quality( "global_quality" );
 }
 
-
 //!Base class for all raw media stream transcoders
 /*!
     Transcoder receives input stream coded picture at the input and provides output stream coded picture at output.
@@ -88,7 +87,6 @@ protected:
 };
 typedef QSharedPointer<QnCodecTranscoder> QnCodecTranscoderPtr;
 
-
 //!Base class for all video transcoders
 class QnVideoTranscoder: public QnCodecTranscoder
 {
@@ -124,13 +122,12 @@ protected:
 };
 typedef QSharedPointer<QnVideoTranscoder> QnVideoTranscoderPtr;
 
-
 //!Base class for all audio transcoders
 class QnAudioTranscoder: public QnCodecTranscoder
 {
 public:
     QnAudioTranscoder(AVCodecID codecId): QnCodecTranscoder(codecId) {}
-    virtual bool open(const QnConstCompressedAudioDataPtr& video) { Q_UNUSED(video) return true; }
+    virtual bool open(const QnConstCompressedAudioDataPtr& /*video*/) { return true; }
 };
 typedef QSharedPointer<QnAudioTranscoder> QnAudioTranscoderPtr;
 
@@ -161,7 +158,6 @@ public:
     */
     virtual int setContainer(const QString& value) = 0;
 
-
     /*
     * Set ffmpeg video codec and params
     * @return Returns OperationResult::Success if no error or error code otherwise
@@ -178,7 +174,6 @@ public:
         const QSize& resolution = QSize(1024,768),
         int bitrate = -1,
         QnCodecParams::Value params = QnCodecParams::Value());
-
 
     /*
     * Set ffmpeg audio codec and params

@@ -69,7 +69,7 @@ public:
 #ifdef _DEBUG
         assertSorted(data, &T::id);
 #else
-        Q_UNUSED(data);
+        nx::utils::unused(data);
 #endif // DEBUG
     }
 
@@ -88,8 +88,7 @@ public:
             prev = next;
         }
 #else
-        Q_UNUSED(data);
-        Q_UNUSED(idField);
+        nx::utils::unused(data, idField);
 #endif // DEBUG
     }
 

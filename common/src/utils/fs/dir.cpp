@@ -16,8 +16,9 @@
 #include <sys/statvfs.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/file_system.h>
+#else
+#include <nx/utils/unused.h>
 #endif
-
 
 static const size_t MAX_LINE_LENGTH = 512;
 
@@ -108,7 +109,7 @@ SystemError::ErrorCode readPartitions(
 
     return SystemError::noError;
 #else
-    Q_UNUSED(partitionInfoList);
+    nx::utils::unused(partitionInfoList);
     return SystemError::notImplemented;
 #endif
 }

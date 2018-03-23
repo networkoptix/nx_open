@@ -21,7 +21,6 @@ const int kDefaultChannelCount = 4;
 
 } // namespace
 
-
 QnArecontPanoramicResource::QnArecontPanoramicResource(const QString& name)
 {
     setName(name);
@@ -31,7 +30,6 @@ QnArecontPanoramicResource::QnArecontPanoramicResource(const QString& name)
 QnArecontPanoramicResource::~QnArecontPanoramicResource()
 {
 }
-
 
 bool QnArecontPanoramicResource::getDescription()
 {
@@ -67,7 +65,6 @@ bool QnArecontPanoramicResource::getParamPhysicalByChannel(int channel, const QS
 
     if (status != CL_HTTP_SUCCESS)
         return false;
-
 
     QByteArray response;
     connection.readAll(response);
@@ -229,11 +226,12 @@ void QnArecontPanoramicResource::initializeVideoLayoutUnsafe() const
     m_customVideoLayout = QnCustomResourceVideoLayout::fromString(layoutString);
 }
 
-QnConstResourceVideoLayoutPtr QnArecontPanoramicResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider) const
+QnConstResourceVideoLayoutPtr QnArecontPanoramicResource::getVideoLayout(
+    const QnAbstractStreamDataProvider* /*dataProvider*/) const
 {
-    const auto resourceId = getId();    //saving id before locking m_layoutMutex to avoid potential deadlock
+    // Saving id before locking m_layoutMutex to avoid potential deadlock.
+    const auto resourceId = getId();
 
-    Q_UNUSED(dataProvider)
     QnMutexLocker lock(&m_layoutMutex);
     if (!m_customVideoLayout)
         initializeVideoLayoutUnsafe();

@@ -68,7 +68,6 @@ QnResourcePtr QnPlPulseSearcher::createResource(const QnUuid &resourceTypeId, co
     else
         return result;
 
-
     result->setTypeId(resourceTypeId);
 
     qDebug() << "Create Pulse camera resource. typeID:" << resourceTypeId.toString(); // << ", Parameters: " << parameters;
@@ -78,11 +77,9 @@ QnResourcePtr QnPlPulseSearcher::createResource(const QnUuid &resourceTypeId, co
     return result;
 }
 
-QList<QnResourcePtr> QnPlPulseSearcher::checkHostAddr(const nx::utils::Url& url, const QAuthenticator& auth, bool doMultichannelCheck)
+QList<QnResourcePtr> QnPlPulseSearcher::checkHostAddr(const nx::utils::Url& /*url*/,
+    const QAuthenticator& /*auth*/, bool /*doMultichannelCheck*/)
 {
-    Q_UNUSED(url)
-    Q_UNUSED(auth)
-    Q_UNUSED(doMultichannelCheck)
     return QList<QnResourcePtr>();
 }
 
@@ -90,7 +87,6 @@ QString QnPlPulseSearcher::manufacture() const
 {
     return QString();
 }
-
 
 QnNetworkResourcePtr QnPlPulseSearcher::createResource(const QString& manufacture, const QString& name)
 {

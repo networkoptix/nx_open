@@ -54,11 +54,9 @@ namespace {
 
 struct FffmpegLog
 {
-    static void av_log_default_callback_impl(void* ptr, int level, const char* fmt, va_list vl)
+    static void av_log_default_callback_impl(void* /*ptr*/, int /*level*/, const char* fmt, va_list vl)
     {
-        Q_UNUSED(level)
-            Q_UNUSED(ptr)
-            NX_ASSERT(fmt && "NULL Pointer");
+        NX_ASSERT(fmt && "NULL Pointer");
 
         if (!fmt) {
             return;
@@ -70,7 +68,6 @@ struct FffmpegLog
         qDebug() << "ffmpeg library: " << strText;
     }
 };
-
 
 QnFfmpegVideoDecoder::QnFfmpegVideoDecoder(AVCodecID codec_id, const QnConstCompressedVideoDataPtr& data, bool mtDecoding, QAtomicInt* const swDecoderCount):
     m_passedContext(0),
@@ -130,7 +127,6 @@ void QnFfmpegVideoDecoder::flush()
     QnFfmpegAvPacket avpkt;
     while (decodeVideo(m_context, m_frame, &got_picture, &avpkt) > 0);
 }
-
 
 AVCodec* QnFfmpegVideoDecoder::findCodec(AVCodecID codecId)
 {
@@ -241,7 +237,6 @@ void QnFfmpegVideoDecoder::openDecoder(const QnConstCompressedVideoDataPtr& data
 
     m_checkH264ResolutionChange = m_context->thread_count > 1 && m_context->codec_id == AV_CODEC_ID_H264 && (!m_context->extradata_size || m_context->extradata[0] == 0);
 
-
     NX_LOG(QLatin1String("Creating ") + QLatin1String(m_context->thread_count > 1 ? "FRAME threaded decoder" : "SLICE threaded decoder"), cl_logDEBUG2);
     // TODO: #vasilenko check return value
     if (avcodec_open2(m_context, m_codec, NULL) < 0)
@@ -315,10 +310,9 @@ unsigned int QnFfmpegVideoDecoder::getDecoderCaps() const
     return QnAbstractVideoDecoder::multiThreadedMode;
 }
 
-void QnFfmpegVideoDecoder::setSpeed( float newValue )
+void QnFfmpegVideoDecoder::setSpeed( float /*newValue*/ )
 {
-    Q_UNUSED(newValue)
-    //ffmpeg-based decoder has nothing to do here
+    // ffmpeg-based decoder has nothing to do here
 }
 
 void QnFfmpegVideoDecoder::reallocateDeinterlacedFrame()
@@ -483,7 +477,6 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
         // ### handle errors
         if (m_context->pix_fmt == -1)
             m_context->pix_fmt = AVPixelFormat(0);
-
 
         bool dataWithNalPrefixes = (m_context->extradata==0 || m_context->extradata[0] == 0);
         // workaround ffmpeg crash

@@ -249,8 +249,6 @@ bool AioTaskQueue::removeReverseTask(
     AIOEventHandler* const eventHandler,
     unsigned int newTimeoutMS)
 {
-    Q_UNUSED(eventHandler)
-
     for (typename std::deque<SocketAddRemoveTask>::iterator
         it = m_pollSetModificationQueue.begin();
         it != m_pollSetModificationQueue.end();

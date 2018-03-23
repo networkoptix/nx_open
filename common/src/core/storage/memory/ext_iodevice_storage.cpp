@@ -7,7 +7,6 @@
 
 #include <nx/utils/thread/mutex.h>
 
-
 QnExtIODeviceStorageResource::QnExtIODeviceStorageResource(QnCommonModule* commonModule):
     base_type(commonModule),
     m_capabilities(0)
@@ -34,9 +33,8 @@ int QnExtIODeviceStorageResource::getCapabilities() const
     return m_capabilities;
 }
 
-QIODevice* QnExtIODeviceStorageResource::open( const QString& filePath, QIODevice::OpenMode openMode )
+QIODevice* QnExtIODeviceStorageResource::open( const QString& filePath, QIODevice::OpenMode /*openMode*/ )
 {
-    Q_UNUSED(openMode)
     QnMutexLocker lk( &m_mutex );
 
     std::map<QString, QIODevice*>::iterator it = m_urlToDevice.find( filePath );

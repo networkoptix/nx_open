@@ -159,7 +159,6 @@ private:
     QString                     m_cameraUniqueId;
 };
 
-
 class ScanMediaFilesTask: public QnLongRunnable
 {
 private:
@@ -459,7 +458,6 @@ private:
 
 // -------------------- QnStorageManager --------------------
 
-
 static QnStorageManager* QnNormalStorageManager_instance = nullptr;
 static QnStorageManager* QnBackupStorageManager_instance = nullptr;
 
@@ -525,7 +523,6 @@ QnStorageManager::QnStorageManager(
         m_scheduleSync.reset(new QnScheduleSync(commonModule));
         connect(m_scheduleSync.get(), &QnScheduleSync::backupFinished, this, &QnStorageManager::backupFinished, Qt::DirectConnection);
     }
-
 
     m_rebuildArchiveThread = new ScanMediaFilesTask(this);
     m_rebuildArchiveThread->start();
@@ -824,7 +821,6 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
         NX_LOG(lit("%1 Rename failed for deprecated db file %2. Rename (remove) it manually and restart server")
             .arg(Q_FUNC_INFO)
             .arg(fileName), cl_logWARNING);
-
 
     auto sdb = qnStorageDbPool->getSDB(storage);
     if (!sdb)
@@ -1426,7 +1422,6 @@ QnRecordingStatsData QnStorageManager::mergeStatsFromCatalogs(qint64 bitrateAnal
     bitrateThreshold = bitrateAnalizePeriodMs ? bitrateThreshold - bitrateAnalizePeriodMs : 0;
     result.archiveDurationSecs = qMax(0ll, (qnSyncTime->currentMSecsSinceEpoch() - archiveStartTimeMs) / 1000);
 
-
     //auto itrHiLeft = std::lower_bound(catalogHi->m_chunks.cbegin(), catalogHi->m_chunks.cend(), startTime);
     //auto itrHiRight = std::upper_bound(itrHiLeft, catalogHi->m_chunks.cend(), endTime);
     auto itrHiLeft = catalogHi->m_chunks.cbegin();
@@ -1510,7 +1505,6 @@ QnRecordingStatsData QnStorageManager::mergeStatsFromCatalogs(qint64 bitrateAnal
     NX_ASSERT(result.averageBitrate >= 0);
     return result;
 }
-
 
 void QnStorageManager::removeEmptyDirs(const QnStorageResourcePtr &storage)
 {
@@ -2149,9 +2143,9 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
     return toDelete <= 0;
 }
 
-void QnStorageManager::at_archiveRangeChanged(const QnStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs)
+void QnStorageManager::at_archiveRangeChanged(const QnStorageResourcePtr &resource,
+    qint64 newStartTimeMs, qint64 /*newEndTimeMs*/)
 {
-    Q_UNUSED(newEndTimeMs)
     int storageIndex = qnStorageDbPool->getStorageIndex(resource);
     QnMutexLocker lock(&m_mutexCatalog);
     for(const DeviceFileCatalogPtr& catalogHi: m_devFileCatalog[QnServer::HiQualityCatalog])
@@ -2837,7 +2831,6 @@ bool QnStorageManager::isStorageAvailable(int storage_index) const {
 bool QnStorageManager::isStorageAvailable(const QnStorageResourcePtr& storage) const {
     return storage && storage->getStatus() == Qn::Online;
 }
-
 
 std::vector<QnUuid> QnStorageManager::getCamerasWithArchiveHelper() const
 {

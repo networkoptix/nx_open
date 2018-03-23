@@ -47,7 +47,6 @@ namespace {
 
 // ------------------- CameraHistory Pool ------------------------
 
-
 void QnCameraHistoryPool::setHistoryCheckDelay(int value)
 {
     m_historyCheckDelay = value;
@@ -213,12 +212,10 @@ void QnCameraHistoryPool::invalidateCameraHistory(const QnUuid &cameraId) {
     if (requestToTerminate > 0)
         server->restConnection()->cancelRequest(requestToTerminate);
 
-
     if (notify)
         if (QnSecurityCamResourcePtr camera = toCamera(cameraId))
             emit cameraHistoryInvalidated(camera);
 }
-
 
 QnCameraHistoryPool::StartResult QnCameraHistoryPool::updateCameraHistoryAsync(const QnSecurityCamResourcePtr &camera, callbackFunction callback)
 {
@@ -280,7 +277,6 @@ QnCameraHistoryPool::StartResult QnCameraHistoryPool::updateCameraHistoryAsync(c
 
 void QnCameraHistoryPool::at_cameraPrepared(bool success, const rest::Handle& requestId, const ec2::ApiCameraHistoryDataList &periods, callbackFunction callback)
 {
-    Q_UNUSED(requestId);
     QnMutexLocker lock(&m_mutex);
     bool requestFound = false;
     for (auto itr = m_asyncRunningRequests.begin(); itr != m_asyncRunningRequests.end(); ++itr) {
@@ -605,7 +601,6 @@ QnSecurityCamResourceList QnCameraHistoryPool::getServerFootageCameras( const Qn
 
     return result;
 }
-
 
 bool QnCameraHistoryPool::updateCameraHistorySync(const QnSecurityCamResourcePtr &camera)
 {

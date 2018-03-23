@@ -29,12 +29,11 @@ QnSetupCloudSystemRestHandler::QnSetupCloudSystemRestHandler(
 }
 
 int QnSetupCloudSystemRestHandler::executeGet(
-    const QString& path,
+    const QString& /*path*/,
     const QnRequestParams& params,
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
-    Q_UNUSED(path);
     return execute(std::move(SetupCloudSystemData(params)), owner, result);
 }
 

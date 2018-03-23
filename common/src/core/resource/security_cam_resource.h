@@ -405,7 +405,7 @@ protected:
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() = 0;
 
-    virtual void setMotionMaskPhysical(int channel) { Q_UNUSED(channel); }
+    virtual void setMotionMaskPhysical(int /*channel*/) {}
     //!MUST be overridden for camera with input port. Default implementation does nothing
     /*!
         \warning Excess calls of this method is legal and MUST be correctly handled in implementation

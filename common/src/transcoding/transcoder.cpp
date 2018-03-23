@@ -33,7 +33,6 @@ QnCodecTranscoder::QnCodecTranscoder(AVCodecID codecId)
     m_codecId = codecId;
 }
 
-
 void QnCodecTranscoder::setParams(const QnCodecParams::Value& params)
 {
     m_params = params;
@@ -158,7 +157,6 @@ bool QnVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
         if (srcResolution.isEmpty())
             srcResolution = QSize(decoder.getContext()->width, decoder.getContext()->height);
 
-
         m_resolution.setHeight(qMin(srcResolution.height(), m_resolution.height())); // strict to source frame height
         // Round resolution height.
         m_resolution.setHeight(
@@ -183,7 +181,6 @@ bool QnVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
 }
 
 // ---------------------- QnTranscoder -------------------------
-
 
 QnTranscoder::QnTranscoder():
     m_videoCodec(AV_CODEC_ID_NONE),
@@ -288,7 +285,6 @@ int QnTranscoder::setVideoCodec(
     int bitrate,
     QnCodecParams::Value params )
 {
-    Q_UNUSED(params)
     if (bitrate == -1) {
         //bitrate = resolution.width() * resolution.height() * 5;
         bitrate = suggestMediaStreamParams( codec, resolution, quality, &params );

@@ -231,7 +231,6 @@ void QnResource::setParentId(const QnUuid& parent)
         emit this->initializedChanged(toSharedPointer(this));
 }
 
-
 QString QnResource::getName() const
 {
     QnMutexLocker mutexLocker(&m_mutex);
@@ -792,7 +791,6 @@ private:
     QnResourcePtr m_resource;
 };
 
-
 void QnResource::stopAsyncTasks()
 {
     pleaseStopAsyncTasks();
@@ -862,9 +860,8 @@ bool QnResource::isInitialized() const
     return m_initialized;
 }
 
-void QnResource::setUniqId(const QString& value)
+void QnResource::setUniqId(const QString& /*value*/)
 {
-    Q_UNUSED(value)
     NX_ASSERT(false, Q_FUNC_INFO, "Not implemented");
 }
 

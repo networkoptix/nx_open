@@ -503,7 +503,6 @@ vms::event::AbstractActionPtr RuleProcessor::processInstantAction(
     if (rule->eventState() != vms::event::EventState::undefined && rule->eventState() != event->getToggleState())
         return vms::event::AbstractActionPtr();
 
-
     if (rule->aggregationPeriod() == 0 || !vms::event::allowsAggregation(rule->actionType()))
     {
         return vms::event::ActionFactory::instantiateAction(
@@ -631,15 +630,13 @@ vms::event::AbstractActionList RuleProcessor::matchActions(
     return std::move(result);
 }
 
-void RuleProcessor::at_actionDelivered(const vms::event::AbstractActionPtr& action)
+void RuleProcessor::at_actionDelivered(const vms::event::AbstractActionPtr& /*action*/)
 {
-    Q_UNUSED(action)
     // TODO: #vasilenko implement me.
 }
 
-void RuleProcessor::at_actionDeliveryFailed(const vms::event::AbstractActionPtr& action)
+void RuleProcessor::at_actionDeliveryFailed(const vms::event::AbstractActionPtr& /*action*/)
 {
-    Q_UNUSED(action)
     // TODO: #vasilenko implement me.
 }
 

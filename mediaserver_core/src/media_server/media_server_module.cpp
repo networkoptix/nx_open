@@ -195,8 +195,7 @@ QnMediaServerModule::QnMediaServerModule(
     m_updates2Manager = store(
         new nx::mediaserver::updates2::ServerUpdates2Manager(this->commonModule()));
 
-	store(new nx::mediaserver_core::recorder::WearableArchiveSynchronizer(this));
-
+    store(new nx::mediaserver_core::recorder::WearableArchiveSynchronizer(this));
 
     store(new QnWearableLockManager(this));
 
