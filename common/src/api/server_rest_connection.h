@@ -61,29 +61,33 @@ struct RestResultWithData: public RestResultWithDataBase
 using EventLogData = RestResultWithData<nx::vms::event::ActionDataList>;
 using MultiServerTimeData = RestResultWithData<ApiMultiserverServerDateTimeDataList>;
 
-class ServerConnection:
-    public QObject,
-    public QnCommonModuleAware,
-    public Qn::EnableSafeDirectConnection
+struct ServerConnectionBase
 {
-    Q_OBJECT
-public:
-    ServerConnection(QnCommonModule* commonModule, const QnUuid& serverId);
-    virtual ~ServerConnection();
-
-
     template<typename ResultType>
     struct Result
     {
         using type = std::function<void (bool success, Handle requestId, ResultType result)>;
     };
+};
 
-    template<>
-    struct Result<QByteArray>
-    {
-        using type = std::function<void (bool success, Handle requestId, QByteArray result,
-            const nx::network::http::HttpHeaders& headers)>;
-    };
+template<>
+struct ServerConnectionBase::Result<QByteArray>
+{
+    using type = std::function<void(bool success, Handle requestId, QByteArray result,
+        const nx::network::http::HttpHeaders& headers)>;
+};
+
+class ServerConnection:
+    public QObject,
+    public QnCommonModuleAware,
+    public Qn::EnableSafeDirectConnection,
+    public ServerConnectionBase
+{
+    Q_OBJECT
+
+public:
+    ServerConnection(QnCommonModule* commonModule, const QnUuid& serverId);
+    virtual ~ServerConnection();
 
     struct EmptyResponseType {};
     typedef Result<EmptyResponseType>::type PostCallback;   // use this type for POST requests without result data
