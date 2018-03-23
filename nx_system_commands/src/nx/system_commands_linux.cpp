@@ -287,6 +287,26 @@ bool SystemCommands::makeDirectory(const std::string& directoryPath)
     return false;
 }
 
+bool SystemCommands::removePath(const std::string& path)
+{
+    if (!checkOwnerPermissions(path) || !execute("rm -rf '" + path + "'"))
+        return false;
+
+    return true;
+}
+
+bool SystemCommands::rename(const std::string& oldPath, const std::string& newPath)
+{
+    if (!checkOwnerPermissions(oldPath) || !checkOwnerPermissions(newPath)
+        || !execute("mv '" + oldPath + "' '" + newPath + "'"))
+    {
+        return false;
+    }
+
+    return true;
+}
+
+
 bool SystemCommands::install(const std::string& debPackage)
 {
     // TODO: Check for deb package signature as soon as it is avaliable.

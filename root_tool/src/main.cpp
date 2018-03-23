@@ -12,6 +12,8 @@ static int showHelp()
         << " chown <file_or_directory_path>" << std::endl
         << " touch <file_path>" << std::endl
         << " mkdir <directory_path>" << std::endl
+        << " rm <path>" << std::endl
+        << " mv <source_path> <target_path>" << std::endl
         << " install <deb_package>" << std::endl;
 
     return 0;
@@ -39,6 +41,8 @@ static const std::string kUMount2 = "unmount";
 static const std::string kChown = "chown";
 static const std::string kTouch = "touch";
 static const std::string kMkdir = "mkdir";
+static const std::string kRemove = "rm";
+static const std::string kMove = "mv";
 static const std::string kInstall = "install";
 static const std::string kIds = "ids";
 
@@ -52,6 +56,8 @@ static int reportArgErrorAndExit(const std::string& command)
         return reportErrorAndExit("<file_path> is required");
     else if (command == kMkdir)
         return reportErrorAndExit("<directory_path> is required");
+    else if (command == kRemove)
+        return reportErrorAndExit("<path> is required");
     else if (command == kInstall)
         return reportErrorAndExit("<deb_package> is required");
 
@@ -62,7 +68,8 @@ static int reportArgErrorAndExit(const std::string& command)
 static bool unknownCommand(const std::string& command)
 {
     return command != kMount && command != kUMount1 && command != kUMount2 && command != kChown
-        && command != kTouch && command != kMkdir && command != kInstall && command != kIds;
+        && command != kTouch && command != kMkdir && command != kRemove && command != kMove
+        && command != kInstall && command != kIds;
 }
 
 int main(int /*argc*/, const char** argv)
@@ -104,6 +111,22 @@ int main(int /*argc*/, const char** argv)
         return 0;
     }
 
+    if (*command == kMove)
+    {
+        const auto source = getOptionalArg(argv);
+        if (!source)
+            return reportErrorAndExit("<source_path> is required");
+
+        const auto target = getOptionalArg(argv);
+        if (!target)
+            return reportErrorAndExit("<target_path> is required");
+
+        if (!commands.rename(*source, *target))
+            return reportErrorAndExit(commands.lastError());
+
+        return 0;
+    }
+
     if (*command == kIds)
     {
         commands.showIds();
@@ -118,6 +141,7 @@ int main(int /*argc*/, const char** argv)
         || (*command == kChown && !commands.changeOwner(*commandArg))
         || (*command == kTouch && !commands.touchFile(*commandArg))
         || (*command == kMkdir && !commands.makeDirectory(*commandArg))
+        || (*command == kRemove && !commands.removePath(*commandArg))
         || (*command == kInstall && !commands.install(*commandArg)))
     {
         return reportErrorAndExit(commands.lastError());
