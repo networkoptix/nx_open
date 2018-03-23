@@ -138,7 +138,7 @@ boost::optional<int> HanwhaBytestreamFilter::eventRegion(const QString& eventSou
 
     for (auto i = 0; i < splitSize; ++i)
     {
-        if (split[i] == kRegionField && i < splitSize - 1)
+        if (split[i].toLower() == kRegionField && i < splitSize - 1)
         {
             bool success = false;
             int region = split[i + 1].toInt(&success);
