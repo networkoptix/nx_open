@@ -49,18 +49,32 @@ footer {
   border-top: 1px solid $common-border-color;
   padding-bottom: 2px;
 
+  .nav > li {
+    position: relative;
+    display: block;
 
-  .nav > li > span{
-    line-height:24px;
-    display:block;
+    & > span {
+      line-height: 24px;
+      display: block;
+    }
+
+    nx-language-select {
+      padding: 7px 5px;
+      display: block;
+    }
   }
 
   .nav > li > a,
   .nav > li > span{
+    position: relative;
+    display: block;
     font-size: $font-size-sm;
-    padding: 10px;
+    padding: 15px 10px;
     color:  $light12;
+
     &:hover{
+      text-decoration: none !important;
+      background-color: transparentize($light5, 0.75);
       color:$light16;
     }
   }
