@@ -8,6 +8,7 @@
 
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QTextEdit>
+#include <QtWidgets/QPushButton>
 
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
@@ -25,32 +26,47 @@ static void debugMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const
 
 int runApplication(QApplication* application)
 {
-    QScopedPointer<QWidget> mainWindow(new QWidget());
-    mainWindow->setAttribute(Qt::WA_QuitOnClose);
+    QWidget mainWindow;
+    mainWindow.setAttribute(Qt::WA_QuitOnClose);
 
-    auto layout = new QVBoxLayout(mainWindow.data());
+    auto layout = new QVBoxLayout(&mainWindow);
 
-    auto logWindow = new QTextEdit(mainWindow.data());
+    auto logWindow = new QTextEdit(&mainWindow);
     layout->addWidget(logWindow);
     logWindow->setReadOnly(true);
+
+    const auto refreshButton = new QPushButton("Refresh", &mainWindow);
+    layout->addWidget(refreshButton);
 
     QStringList log;
     globalLog = &log;
 
     const auto previousMsgHandler = qInstallMessageHandler(debugMsgHandler);
 
-    QDesktopWidget *desktop = qApp->desktop();
-    qDebug() << "System screen configuration:";
-    for (int i = 0; i < desktop->screenCount(); ++i)
-    {
-        const auto screen = QGuiApplication::screens().value(i);
-        qDebug() << "Screen " << i << "geometry is" << screen->geometry();
-        if (desktop->screenGeometry(i) != screen->geometry())
-            qDebug() << "Alternative screen" << i << "geometry is" << desktop->screenGeometry(i);
-    }
-    mainWindow->show();
+    const auto refresh =
+        [logWindow]
+        {
+            globalLog->clear();
+            const auto desktop = qApp->desktop();
+            qDebug() << "System screen configuration:";
+            for (int i = 0; i < desktop->screenCount(); ++i)
+            {
+                const auto screen = QGuiApplication::screens().value(i);
+                qDebug() << "Screen " << i << "geometry is" << screen->geometry();
+                if (desktop->screenGeometry(i) != screen->geometry())
+                {
+                    qDebug() << "Alternative screen" << i << "geometry is" << desktop->
+                        screenGeometry(
+                            i);
+                }
+            }
+            logWindow->setPlainText(globalLog->join('\n'));
+        };
+    refresh();
 
-    logWindow->setPlainText(log.join('\n'));
+    QObject::connect(refreshButton, &QPushButton::clicked, &mainWindow, refresh);
+
+    mainWindow.show();
     const auto result = application->exec();
 
     qInstallMessageHandler(previousMsgHandler);
@@ -68,7 +84,7 @@ int main(int argc, char** argv)
 
     QScopedPointer<QApplication> application(new QApplication(argc, argv));
 
-    //adding exe dir to plugin search path
+    // Adding exe dir to plugin search path.
     QStringList pluginDirs = QCoreApplication::libraryPaths();
     pluginDirs << QCoreApplication::applicationDirPath();
     QCoreApplication::setLibraryPaths(pluginDirs);
