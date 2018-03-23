@@ -104,12 +104,17 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     connect(connection, &ec2::AbstractECConnection::initNotification,               this, &QnCommonMessageProcessor::on_gotInitialNotification);
     connect(connection, &ec2::AbstractECConnection::runtimeInfoChanged,             this, &QnCommonMessageProcessor::runtimeInfoChanged);
 
-    auto resourceManager = connection->getResourceNotificationManager();
-    connect(resourceManager, &ec2::AbstractResourceNotificationManager::statusChanged,          this, &QnCommonMessageProcessor::on_resourceStatusChanged, Qt::DirectConnection);
-    connect(resourceManager, &ec2::AbstractResourceNotificationManager::resourceParamChanged,   this, &QnCommonMessageProcessor::on_resourceParamChanged, Qt::DirectConnection);
-    connect(resourceManager, &ec2::AbstractResourceNotificationManager::resourceParamRemoved,   this, &QnCommonMessageProcessor::on_resourceParamRemoved, Qt::DirectConnection);
-    connect(resourceManager, &ec2::AbstractResourceNotificationManager::resourceRemoved,        this, &QnCommonMessageProcessor::on_resourceRemoved, Qt::DirectConnection);
-    connect(resourceManager, &ec2::AbstractResourceNotificationManager::resourceStatusRemoved,  this, &QnCommonMessageProcessor::on_resourceStatusRemoved, Qt::DirectConnection);
+    const auto resourceManager = connection->getResourceNotificationManager();
+    connect(resourceManager, &ec2::AbstractResourceNotificationManager::statusChanged,
+        this, &QnCommonMessageProcessor::on_resourceStatusChanged);
+    connect(resourceManager, &ec2::AbstractResourceNotificationManager::resourceParamChanged,
+        this, &QnCommonMessageProcessor::on_resourceParamChanged);
+    connect(resourceManager, &ec2::AbstractResourceNotificationManager::resourceParamRemoved,
+        this, &QnCommonMessageProcessor::on_resourceParamRemoved);
+    connect(resourceManager, &ec2::AbstractResourceNotificationManager::resourceRemoved,
+        this, &QnCommonMessageProcessor::on_resourceRemoved);
+    connect(resourceManager, &ec2::AbstractResourceNotificationManager::resourceStatusRemoved,
+        this, &QnCommonMessageProcessor::on_resourceStatusRemoved);
 
     auto mediaServerManager = connection->getMediaServerNotificationManager();
     connect(mediaServerManager, &ec2::AbstractMediaServerNotificationManager::addedOrUpdated,   this, on_resourceUpdated(ec2::ApiMediaServerData), Qt::DirectConnection);
