@@ -174,6 +174,11 @@ select.form-control{
   text-overflow: ellipsis;
   overflow: hidden;
   line-height: 1.428571429;
+  font-weight: 700;
+  border-radius: 2px;
+  padding: 5px 16px;
+  font-size: 14px;
+
   &:hover,
   &:active,
   &.active,
@@ -184,6 +189,10 @@ select.form-control{
 }
 
 .btn-default{
+  color: $dark10;
+  background-color: transparent;
+  border-color: $light5;
+
   &:hover,
   &:focus,
   &.focus {
