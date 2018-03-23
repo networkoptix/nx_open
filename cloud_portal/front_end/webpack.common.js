@@ -115,25 +115,6 @@ module.exports = {
                 use: ['html-loader']
             },
             {
-                test: /\.(scss|css)$/,
-                use: ExtractTextPlugin.extract({
-                    use: [{
-                        loader: "css-loader",
-                        options: {
-                            url: false,
-                            sourceMap: true
-                        }
-                    },
-                        {
-                            loader: "sass-loader",
-                            options: {
-                                url: false,
-                                sourceMap: true
-                            }
-                        }]
-                })
-            },
-            {
                 test: /\.(png|jpe?g|gif|svg|woff|woff2|ttf|eot|ico)$/,
                 loader: 'file-loader?name=assets/[name].[hash].[ext]'
             }
