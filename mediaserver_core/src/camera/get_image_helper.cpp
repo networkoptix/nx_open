@@ -257,39 +257,26 @@ CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameFromCaches(
     int preferredChannel,
     nx::api::ImageRequest::RoundMethod roundMethod)
 {
-    // Try GopKeeper for the requested stream.
+    const auto logPrefix = lm("%1(%2, %3 us, channel: %4, %5):").args(__func__,
+        usePrimaryStream ? "primary" : "secondary", timestampUs, preferredChannel, roundMethod);
+
+    // Try GopKeeper.
     auto videoSequence = camera->getFrameSequenceByTime(
         usePrimaryStream, timestampUs, preferredChannel, roundMethod);
     if (videoSequence)
     {
-        NX_VERBOSE(kLogTag) << lm(
-            "%1(): Got from GopKeeper for the requested stream; roundMethod %2")
-            .args(__func__, roundMethod);
-        return decodeFrameSequence(videoSequence, timestampUs);
-    }
-
-    // Try GopKeeper for the alternate stream.
-    videoSequence = camera->getFrameSequenceByTime(
-        !usePrimaryStream, timestampUs, preferredChannel, roundMethod);
-    if (videoSequence)
-    {
-        NX_VERBOSE(kLogTag) << lm(
-            "%1(): Got from GopKeeper for the alternate stream; roundMethod %2")
-            .args(__func__, roundMethod);
+        NX_VERBOSE(kLogTag) << logPrefix << "Got from GopKeeper";
         return decodeFrameSequence(videoSequence, timestampUs);
     }
 
     // Try liveCache.
     if (auto frame = decodeFrameFromLiveCache(usePrimaryStream, timestampUs, camera))
     {
-        NX_VERBOSE(kLogTag) << lm("%1(): Got from liveCache; roundMethod %2")
-            .args(__func__, roundMethod);
+        NX_VERBOSE(kLogTag) << logPrefix << "Got from liveCache";
         return frame;
     }
 
-    NX_VERBOSE(kLogTag) << lm(
-        "%1(): Missing from GopKeeper for both streams and liveCache; roundMethod %2")
-        .args(__func__, roundMethod);
+    NX_VERBOSE(kLogTag) << logPrefix << "Missing from GopKeeper for both streams and liveCache";
     return CLVideoDecoderOutputPtr();
 }
 
