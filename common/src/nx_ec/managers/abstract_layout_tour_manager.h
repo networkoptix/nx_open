@@ -11,7 +11,7 @@ class AbstractLayoutTourNotificationManager: public QObject
 {
     Q_OBJECT
 signals:
-    void addedOrUpdated(const ec2::ApiLayoutTourData& layout, NotificationSource source);
+    void addedOrUpdated(const ec2::ApiLayoutTourData& layout, ec2::NotificationSource source);
     void removed(const QnUuid& id);
 };
 
