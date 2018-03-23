@@ -1,35 +1,31 @@
 #pragma once
 
-#include <ui/widgets/common/abstract_preferences_widget.h>
-#include <QtCore/QPointer>
+#include <QtCore/QScopedPointer>
 
-namespace Ui {
-class CameraSettingsGeneralTabWidget;
-}
+namespace Ui { class CameraSettingsGeneralTabWidget; }
 
 namespace nx {
 namespace client {
 namespace desktop {
 
-class CameraSettingsModel;
+struct CameraSettingsDialogState;
+class CameraSettingsDialogStore;
 
-class CameraSettingsGeneralTabWidget: public QnAbstractPreferencesWidget
+class CameraSettingsGeneralTabWidget: public QWidget
 {
     Q_OBJECT
-    using base_type = QnAbstractPreferencesWidget;
+    using base_type = QWidget;
 
 public:
-    explicit CameraSettingsGeneralTabWidget(CameraSettingsModel* model,
+    explicit CameraSettingsGeneralTabWidget(CameraSettingsDialogStore* store,
         QWidget* parent = nullptr);
     virtual ~CameraSettingsGeneralTabWidget() override;
 
-    virtual bool hasChanges() const override;
-    virtual void loadDataToUi() override;
-    virtual void applyChanges() override;
+private:
+    void loadState(const CameraSettingsDialogState& state);
 
 private:
     QScopedPointer<Ui::CameraSettingsGeneralTabWidget> ui;
-    CameraSettingsModel* const m_model;
 };
 
 } // namespace desktop

@@ -1,5 +1,5 @@
-#include "archive_length_widget.h"
-#include "ui_archive_length_widget.h"
+#include "legacy_archive_length_widget.h"
+#include "ui_legacy_archive_length_widget.h"
 
 #include <boost/algorithm/algorithm.hpp>
 

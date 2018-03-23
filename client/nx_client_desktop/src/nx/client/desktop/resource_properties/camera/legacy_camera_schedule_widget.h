@@ -11,15 +11,13 @@
 
 #include <utils/common/connective.h>
 
-namespace Ui {
-class CameraScheduleWidget;
-}
+namespace Ui { class LegacyCameraScheduleWidget; }
 
 namespace nx {
 namespace client {
 namespace desktop {
 
-class CameraScheduleWidget: public Connective<QnAbstractPreferencesWidget>,
+class LegacyCameraScheduleWidget: public Connective<QnAbstractPreferencesWidget>,
     public QnWorkbenchContextAware
 {
     Q_OBJECT
@@ -29,8 +27,8 @@ class CameraScheduleWidget: public Connective<QnAbstractPreferencesWidget>,
 
 public:
     // TODO: #GDM Remove snapScrollbarToParent hacky parameter when legacy camera settings gone.
-    explicit CameraScheduleWidget(QWidget* parent = nullptr, bool snapScrollbarToParent = true);
-    virtual ~CameraScheduleWidget();
+    explicit LegacyCameraScheduleWidget(QWidget* parent = nullptr, bool snapScrollbarToParent = true);
+    virtual ~LegacyCameraScheduleWidget() override;
 
     void overrideMotionType(Qn::MotionType motionTypeOverride = Qn::MT_Default);
 
@@ -136,9 +134,9 @@ private:
     void updateAlert(AlertReason when);
 
 private:
-    Q_DISABLE_COPY(CameraScheduleWidget)
+    Q_DISABLE_COPY(LegacyCameraScheduleWidget)
 
-    QScopedPointer<Ui::CameraScheduleWidget> ui;
+    QScopedPointer<Ui::LegacyCameraScheduleWidget> ui;
 
     QnVirtualCameraResourceList m_cameras;
     bool m_disableUpdateGridParams = false;

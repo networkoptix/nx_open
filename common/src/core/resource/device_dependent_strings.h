@@ -29,7 +29,7 @@ public:
         , const QString &ioModulePluralString
         );
 
-    QString getString(QnCameraDeviceType deviceType, bool plural) const;
+    QString getString(QnCameraDeviceType deviceType, bool plural = false) const;
     void setString(QnCameraDeviceType deviceType, bool plural, const QString &value);
 
     bool isValid() const;
@@ -52,6 +52,19 @@ public:
     static QString getNumericName(
         QnResourcePool* resPool,
         const QnVirtualCameraResourceList &devices,
+        bool capitalize = true);
+
+    /**
+    * @brief Calculate common name for the target devices list.
+    * @details Following rules are applied:
+    * * If all devices are cameras - "%n Cameras";
+    * * If all devices are I/O Modules - "%n I/O Modules";
+    * * For mixed list "%n Devices" is used;
+    * @param capitalize Should the word begin from the capital letter, default value is true.
+    */
+    static QString getNumericName(
+        QnCameraDeviceType deviceType,
+        int count,
         bool capitalize = true);
 
     /**

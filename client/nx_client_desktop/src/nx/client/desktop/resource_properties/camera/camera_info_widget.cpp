@@ -10,7 +10,8 @@
 #include <ui/style/skin.h>
 #include <ui/common/aligner.h>
 
-#include "camera_settings_model.h"
+#include "redux/camera_settings_dialog_state.h"
+#include "redux/camera_settings_dialog_store.h"
 
 namespace nx {
 namespace client {
@@ -51,35 +52,11 @@ CameraInfoWidget::CameraInfoWidget(QWidget* parent):
     connect(ui->secondaryStreamCopyButton, &ui::ClipboardButton::clicked, this,
         [this] { ui::ClipboardButton::setClipboardText(ui->secondaryStreamLabel->text()); });
 
-    connect(ui->nameLabel, &QnEditableLabel::textChanged, this,
-        &CameraInfoWidget::hasChangesChanged);
-}
 
-CameraInfoWidget::~CameraInfoWidget()
-{
-}
 
-void CameraInfoWidget::setModel(CameraSettingsModel* model)
-{
-    NX_EXPECT(model && !m_model);
 
-    if (m_model)
-    {
-        m_model->disconnect(this);
-        ui->pingButton->disconnect(m_model);
-        ui->showOnLayoutButton->disconnect(m_model);
-        ui->eventLogButton->disconnect(m_model);
-        ui->cameraRulesButton->disconnect(m_model);
-    }
-
-    m_model = model;
-
-    if (m_model)
-    {
-        connect(m_model, &CameraSettingsModel::networkInfoChanged, this,
-            &CameraInfoWidget::updateNetworkInfo);
-
-        connect(ui->pingButton, &QPushButton::clicked, m_model,
+    /*
+            connect(ui->pingButton, &QPushButton::clicked, m_model,
             &CameraSettingsModel::pingCamera);
         connect(ui->showOnLayoutButton, &QPushButton::clicked, m_model,
             &CameraSettingsModel::showCamerasOnLayout);
@@ -87,25 +64,45 @@ void CameraInfoWidget::setModel(CameraSettingsModel* model)
             &CameraSettingsModel::openEventLog);
         connect(ui->cameraRulesButton, &QPushButton::clicked, m_model,
             &CameraSettingsModel::openCameraRules);
-    }
+            void CameraSettingsModel::pingCamera()
+{
+    menu()->trigger(ui::action::PingAction, {Qn::TextRole, d->networkInfo.ipAddress});
 }
 
-bool CameraInfoWidget::hasChanges() const
+void CameraSettingsModel::showCamerasOnLayout()
 {
-    NX_EXPECT(m_model);
-    if (!m_model || !m_model->isSingleCameraMode())
-        return false;
-
-    return m_model->name() != ui->nameLabel->text();
+    menu()->trigger(ui::action::OpenInNewTabAction, d->adaptor.cameras());
 }
 
-void CameraInfoWidget::loadDataToUi()
+void CameraSettingsModel::openEventLog()
 {
-    NX_EXPECT(m_model);
-    if (!m_model)
-        return;
+    menu()->trigger(ui::action::CameraIssuesAction, d->adaptor.cameras());
+}
 
-    const bool singleCamera = m_model->isSingleCameraMode();
+void CameraSettingsModel::openCameraRules()
+{
+    menu()->trigger(ui::action::CameraBusinessRulesAction, d->adaptor.cameras());
+}
+
+    */
+}
+
+CameraInfoWidget::~CameraInfoWidget() = default;
+
+void CameraInfoWidget::setStore(CameraSettingsDialogStore* store)
+{
+    connect(store, &CameraSettingsDialogStore::stateChanged, this, &CameraInfoWidget::loadState);
+
+    connect(ui->nameLabel, &QnEditableLabel::textChanged, store,
+        [store](const QString& text)
+        {
+            store->setSingleCameraUserName(text);
+        });
+}
+
+void CameraInfoWidget::loadState(const CameraSettingsDialogState& state)
+{
+    const bool singleCamera = state.isSingleCamera();
     ui->nameLabel->setVisible(singleCamera);
     ui->controlsStackedWidget->setCurrentWidget(singleCamera
         ? ui->toggleInfoPage
@@ -113,43 +110,32 @@ void CameraInfoWidget::loadDataToUi()
 
     ui->stackedWidget->setVisible(singleCamera);
     ui->cameraRulesButton->setVisible(singleCamera);
-    if (singleCamera)
-    {
-        const auto camera = m_model->singleCamera();
-        NX_EXPECT(camera);
-        const QString rulesTitle = QnDeviceDependentStrings::getNameFromSet(
-            camera->resourcePool(),
-            QnCameraDeviceStringSet(
-                tr("Device Rules..."),
-                tr("Camera Rules..."),
-                tr("I/O Module Rules...")
-            ), camera);
 
-        ui->cameraRulesButton->setText(rulesTitle);
-    }
+    const QString rulesTitle = QnCameraDeviceStringSet(
+        tr("Device Rules..."),
+        tr("Camera Rules..."),
+        tr("I/O Module Rules...")
+    ).getString(state.deviceType);
 
-    ui->nameLabel->setText(m_model->name());
-    ui->multipleNameLabel->setText(m_model->name());
+    ui->cameraRulesButton->setText(rulesTitle);
 
-    ui->modelLabel->setText(m_model->info().model);
-    ui->modelDetailLabel->setText(m_model->info().model);
-    ui->vendorLabel->setText(m_model->info().vendor);
-    ui->vendorDetailLabel->setText(m_model->info().vendor);
-    ui->macAddressLabel->setText(m_model->info().macAddress);
-    ui->firmwareLabel->setText(m_model->info().firmware);
-    ui->cameraIdLabel->setText(m_model->info().id);
+    ui->nameLabel->setText(state.singleCameraSettings.name());
+    ui->multipleNameLabel->setText(
+        QnDeviceDependentStrings::getNumericName(state.deviceType, state.devicesCount));
 
-    updateNetworkInfo();
-}
+    ui->modelLabel->setText(state.singleCameraSettings.model);
+    ui->modelDetailLabel->setText(state.singleCameraSettings.model);
+    ui->vendorLabel->setText(state.singleCameraSettings.vendor);
+    ui->vendorDetailLabel->setText(state.singleCameraSettings.vendor);
+    ui->macAddressLabel->setText(state.singleCameraSettings.macAddress);
+    ui->firmwareLabel->setText(state.singleCameraSettings.firmware);
+    ui->cameraIdLabel->setText(state.singleCameraSettings.id);
 
-void CameraInfoWidget::applyChanges()
-{
-    NX_EXPECT(m_model);
-    if (!m_model)
-        return;
-
-    if (m_model->isSingleCameraMode())
-        m_model->setName(ui->nameLabel->text());
+    ui->ipAddressLabel->setText(state.singleCameraSettings.ipAddress);
+    ui->ipAddressDetailLabel->setText(state.singleCameraSettings.ipAddress);
+    ui->webPageLabel->setText(state.singleCameraSettings.webPage);
+    ui->primaryStreamLabel->setText(state.singleCameraSettings.primaryStream);
+    ui->secondaryStreamLabel->setText(state.singleCameraSettings.secondaryStream);
 }
 
 void CameraInfoWidget::alignLabels()
@@ -201,16 +187,6 @@ void CameraInfoWidget::updatePageSwitcher()
         ui->toggleInfoButton->setText(tr("Less Info"));
         ui->toggleInfoButton->setIcon(qnSkin->icon("text_buttons/collapse.png"));
     }
-}
-
-void CameraInfoWidget::updateNetworkInfo()
-{
-    NX_EXPECT(m_model);
-    ui->ipAddressLabel->setText(m_model->networkInfo().ipAddress);
-    ui->ipAddressDetailLabel->setText(m_model->networkInfo().ipAddress);
-    ui->webPageLabel->setText(m_model->networkInfo().webPage);
-    ui->primaryStreamLabel->setText(m_model->networkInfo().primaryStream);
-    ui->secondaryStreamLabel->setText(m_model->networkInfo().secondaryStream);
 }
 
 } // namespace desktop
