@@ -95,7 +95,7 @@ link works and suggests to log out user, if he was logged in, buttons operate co
 #This is identical to "redirects to /activate and shows non-activated
 #user message when not activated; Resend activation button sends email"
 #in login-dialog
-email can be sent again
+Logging in before activation brings you to /activate and email can be sent again
     [tags]    email
     Open Browser and go to URL    ${url}/register
     ${random email}    get random email    ${BASE EMAIL}
