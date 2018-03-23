@@ -166,6 +166,7 @@ public:
     ~CLVideoDecoderOutput();
 
     QImage toImage() const;
+    std::vector<char> toRgba(int* outLineSize) const;
 
     static void copy(const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst);
     static bool imagesAreEqual(const CLVideoDecoderOutput* img1, const CLVideoDecoderOutput* img2, unsigned int max_diff);
