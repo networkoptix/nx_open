@@ -296,8 +296,8 @@ CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameFromLiveCache(
 
 CLVideoDecoderOutputPtr QnGetImageHelper::getImage(const nx::api::CameraImageRequest& request)
 {
-    NX_VERBOSE(kLogTag) << lm("%1(%2 us, roundMethod: %3) BEGIN")
-        .args(__func__, request.msecSinceEpoch * 1000, request.roundMethod);
+    NX_VERBOSE(kLogTag) << lm("%1(%2 us, roundMethod: %3, size: %4) BEGIN")
+        .args(__func__, request.msecSinceEpoch * 1000, request.roundMethod, request.size);
 
     if (!request.camera)
     {
@@ -326,6 +326,8 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImage(const nx::api::CameraImageReq
     const bool usePrimaryStream = !(
         (dstSize.width() > 0 && dstSize.width() <= 480)
         || (dstSize.height() > 0 && dstSize.height() <= 316));
+    if (dstSize != request.size)
+        NX_VERBOSE(kLogTag) << lm("%1(): dstSize: %2").args(__func__, dstSize);
 
     if (auto frame = getImageWithCertainQuality(usePrimaryStream, request))
     {
@@ -366,7 +368,7 @@ std::unique_ptr<QnConstDataPacketQueue> QnGetImageHelper::getLiveCacheGopTillTim
     auto iFrame = std::dynamic_pointer_cast<const QnCompressedVideoData>(iFrameData);
     if (!iFrame)
     {
-        NX_VERBOSE(kLogTag) << lm("%1(): WARNING: Wrong liveCache I-frame data for %2 us")
+        NX_VERBOSE(kLogTag) << lm("%1(): WARNING: Wrong liveCache I-frame data for %2 us: %3")
             .args(__func__, iFrameTimestampUs);
         return nullptr;
     }
@@ -393,8 +395,8 @@ std::unique_ptr<QnConstDataPacketQueue> QnGetImageHelper::getLiveCacheGopTillTim
             auto pFrame = std::dynamic_pointer_cast<const QnCompressedVideoData>(pFrameData);
             if (!pFrame)
             {
-                NX_VERBOSE(kLogTag) << lm("%1(): WARNING: Wrong liveCache P-frame data for %2 us")
-                    .args(__func__, pFrameTimestampUs);
+                NX_VERBOSE(kLogTag) << lm("%1(): WARNING: Wrong liveCache P-frame data for %2 us: %3")
+                    .args(__func__, pFrameTimestampUs, pFrameData);
                 continue;
             }
 
