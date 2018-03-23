@@ -220,7 +220,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
         state.singleCameraSettings.model = firstCamera->getModel();
         state.singleCameraSettings.vendor = firstCamera->getVendor();
 
-        state = loadNetworkInfo(state, firstCamera);
+        state = loadNetworkInfo(std::move(state), firstCamera);
 
         state.recording.bitratePerGopType = firstCamera->bitratePerGopType();
         state.recording.defaultStreamResolution = firstCamera->streamInfo().getResolution();
@@ -228,7 +228,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
             streamCapabilities.value(Qn::StreamIndex::primary);
 
         state.recording.customBitrateAvailable = true;
-        state = loadMinMaxCustomBitrate(state);
+        state = loadMinMaxCustomBitrate(std::move(state));
     }
 
     state.recording.parametersAvailable = calculateRecordingParametersAvailable(cameras);
@@ -241,7 +241,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
         kMinFps,
         state.recording.brush.fps,
         state.recording.maxBrushFps());
-    state = fillBitrateFromFixedQuality(state);
+    state = fillBitrateFromFixedQuality(std::move(state));
 
     state.recording.minDays = calculateMinRecordingDays(cameras);
     state.recording.maxDays = calculateMaxRecordingDays(cameras);
@@ -278,15 +278,15 @@ State CameraSettingsDialogStateReducer::setScheduleBrushFps(State state, int val
     if (state.recording.brush.isAutomaticBitrate() || !state.recording.customBitrateAvailable)
     {
         // Lock quality.
-        state = loadMinMaxCustomBitrate(state);
-        state = fillBitrateFromFixedQuality(state);
+        state = loadMinMaxCustomBitrate(std::move(state));
+        state = fillBitrateFromFixedQuality(std::move(state));
     }
     else
     {
         // Lock normalized bitrate.
         const auto normalizedBitrate = state.recording.normalizedCustomBitrateMbps();
-        state = loadMinMaxCustomBitrate(state);
-        state = setCustomRecordingBitrateNormalized(state, normalizedBitrate);
+        state = loadMinMaxCustomBitrate(std::move(state));
+        state = setCustomRecordingBitrateNormalized(std::move(state), normalizedBitrate);
     }
 
     return state;
@@ -297,7 +297,7 @@ State CameraSettingsDialogStateReducer::setScheduleBrushQuality(
     Qn::StreamQuality value)
 {
     state.recording.brush.quality = value;
-    state = fillBitrateFromFixedQuality(state);
+    state = fillBitrateFromFixedQuality(std::move(state));
     return state;
 }
 
@@ -336,7 +336,7 @@ State CameraSettingsDialogStateReducer::setCustomRecordingBitrateNormalized(
     NX_EXPECT(state.recording.customBitrateAvailable && state.recording.customBitrateVisible);
     const auto spread = state.recording.maxBitrateMpbs - state.recording.minBitrateMbps;
     const auto mbps = state.recording.minBitrateMbps + value * spread;
-    return setCustomRecordingBitrateMbps(state, mbps);
+    return setCustomRecordingBitrateMbps(std::move(state), mbps);
 }
 
 State CameraSettingsDialogStateReducer::setMinRecordingDaysAutomatic(State state, bool value)

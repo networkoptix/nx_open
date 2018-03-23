@@ -28,6 +28,12 @@ private:
 
 struct CameraSettingsDialogState
 {
+    CameraSettingsDialogState() = default;
+    CameraSettingsDialogState(const CameraSettingsDialogState& other) = delete;
+    CameraSettingsDialogState(CameraSettingsDialogState&& other) = default;
+    CameraSettingsDialogState& operator=(const CameraSettingsDialogState&) = delete;
+    CameraSettingsDialogState& operator=(CameraSettingsDialogState&&) = default;
+
     bool hasChanges = false;
 
     // Generic cameras info.
