@@ -19,14 +19,14 @@ struct QnScreenSnap
     static QnScreenSnap decode(int encoded);
     static int snapsPerScreen();
 
-    friend bool operator==(const QnScreenSnap& l, const QnScreenSnap& r)
+    bool operator==(const QnScreenSnap& other) const
     {
-        return (l.screenIndex == r.screenIndex && l.snapIndex == r.snapIndex);
+        return (screenIndex == other.screenIndex && snapIndex == other.snapIndex);
     }
 
-    friend bool operator!=(const QnScreenSnap& x, const QnScreenSnap y)
+    bool operator!=(const QnScreenSnap& other) const
     {
-        return !static_cast<bool>(x == y);
+        return !(*this == other);
     }
 };
 
@@ -50,14 +50,14 @@ struct QnScreenSnaps
 
     QRect geometry(const QList<QRect>& screenGeometries) const;
 
-    friend bool operator==(const QnScreenSnaps& l, const QnScreenSnaps& r)
+    bool operator==(const QnScreenSnaps& other) const
     {
-        return l.values == r.values;
+        return values == other.values;
     }
 
-    friend bool operator!=(const QnScreenSnaps& x, const QnScreenSnaps y)
+    bool operator!=(const QnScreenSnaps& other) const
     {
-        return !static_cast<bool>(x == y);
+        return !(*this == other);
     }
 };
 
