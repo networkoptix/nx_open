@@ -1,5 +1,3 @@
-#pragma once
-
 #include "manual_file_data.h"
 
 namespace nx {
@@ -15,7 +13,7 @@ ManualFileData::ManualFileData(const QString& file, const OsVersion& osVersion,
     isClient(isClient)
 {}
 
-ManualFileData ManualFileData::fromFileName(const QString& fileName)
+ManualFileData ManualFileData::fromFileName(const QString& /*fileName*/)
 {
     // #TODO #akulikov: Implement this!
     return ManualFileData();
