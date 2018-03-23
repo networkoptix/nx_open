@@ -27,6 +27,7 @@ def generate_testcamera_package(
 ):
     with zipfile.ZipFile(output_file, "w", zipfile.ZIP_DEFLATED) as zip:
         e.zip_files_to(zip, e.ffmpeg_files(binaries_dir), binaries_dir)
+        e.zip_files_to(zip, e.openssl_files(binaries_dir), binaries_dir)
         e.zip_files_to(zip, e.nx_files(binaries_dir, nx_libraries), binaries_dir)
 
         qt_bin_dir = os.path.join(qt_dir, 'bin')
