@@ -1,7 +1,7 @@
 *** Settings ***
 Resource          ../resource.robot
 Resource          ../variables.robot
-Suite Teardown    Close All Browsers
+Test Teardown    Close Browser
 
 *** Variables ***
 ${password}    ${BASE PASSWORD}
@@ -14,7 +14,6 @@ should demand that email field is not empty
     Click Button    ${RESET PASSWORD BUTTON}
     ${class}    Get Element Attribute    ${RESTORE PASSWORD EMAIL INPUT}/../..    class
     Should Contain    ${class}    has-error
-    Close Browser
 
 should not succeed, if email is not registered
     Open Browser and go to URL    ${url}/restore_password
@@ -22,7 +21,6 @@ should not succeed, if email is not registered
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${EMAIL UNREGISTERED}
     Click Button    ${RESET PASSWORD BUTTON}
     Check For Alert Dismissable    ${CANNOT SEND CONFIRMATION EMAIL} ${ACCOUNT DOES NOT EXIST}
-    Close Browser
 
 restores password
     [tags]    email
@@ -36,14 +34,12 @@ restores password
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
     Click Button    ${RESET PASSWORD BUTTON}
     Wait Until Element Is Visible    ${RESET EMAIL SENT MESSAGE}
-    Close Browser
 
 should not allow to access /restore_password/sent /restore_password/success by direct input
     Open Browser and go to URL    ${url}/restore_password/sent
     Wait Until Element Is Visible    ${JUMBOTRON}
     Go To    ${url}/restore_password/success
     Wait Until Element Is Visible    ${JUMBOTRON}
-    Close Browser
 
 should be able to set new password (which is same as old), redirect
     [tags]    email
@@ -62,7 +58,6 @@ should be able to set new password (which is same as old), redirect
     Input Text    ${RESET PASSWORD INPUT}    ${password}
     Click Button    ${SAVE PASSWORD}
     Wait Until Elements Are Visible    ${RESET SUCCESS MESSAGE}    ${RESET SUCCESS LOG IN LINK}
-    Close Browser
 
 should set new password, login with new password
     [tags]    email
@@ -84,7 +79,6 @@ should set new password, login with new password
     Click Link    ${RESET SUCCESS LOG IN LINK}
     Log In    ${email}    ${ALT PASSWORD}    None
     Validate Log In
-    Close Browser
 
 should not allow to use one restore link twice
     [tags]    email
@@ -108,7 +102,6 @@ should not allow to use one restore link twice
     Input Text    ${RESET PASSWORD INPUT}    ${ALT PASSWORD}
     Click Button    ${SAVE PASSWORD}
     Check For Alert Dismissable    ${CANNOT SAVE PASSWORD} ${CODE USED/INCORRECT}
-    Close Browser
 
 should make not-activated user active by restoring password
     [tags]    email
@@ -129,7 +122,6 @@ should make not-activated user active by restoring password
     Click Link    ${RESET SUCCESS LOG IN LINK}
     Log In    ${email}    ${ALT PASSWORD}    None
     Validate Log In
-    Close Browser
 
 should allow logged in user visit restore password page
     [tags]    email
@@ -141,7 +133,6 @@ should allow logged in user visit restore password page
     Validate Log In
     Go To    ${url}/restore_password
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
-    Close Browser
 
 should prompt log user out if he visits restore password link from email
     [tags]    email
@@ -165,7 +156,6 @@ should prompt log user out if he visits restore password link from email
     Click Button    ${LOGGED IN LOG OUT BUTTON}
     Validate Log Out
     Wait Until Elements Are Visible    ${RESET PASSWORD INPUT}    ${SAVE PASSWORD}
-    Close Browser
 
 should handle click I forgot my password link at restore password page
     Open Browser and go to URL    ${url}/restore_password
@@ -174,4 +164,3 @@ should handle click I forgot my password link at restore password page
     Wait Until Elements Are Visible    ${LOG IN MODAL}    ${EMAIL INPUT}    ${PASSWORD INPUT}    ${LOG IN BUTTON}    ${REMEMBER ME CHECKBOX}    ${FORGOT PASSWORD}    ${LOG IN CLOSE BUTTON}
     Click Link    ${FORGOT PASSWORD}
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
-    Close Browser

@@ -1,7 +1,7 @@
 *** Settings ***
 Resource          ../resource.robot
 Resource          ../variables.robot
-Suite Teardown    Close All Browsers
+Test Teardown     Close Browser
 
 *** Variables ***
 ${email}    ${EMAIL OWNER}
@@ -20,7 +20,6 @@ Check Log In
 works at registration page before submit
     Open Browser and go to URL    ${url}/register
     Check Log In
-    Close Browser
 
 works at registration page after submit success
     Open Browser and go to URL    ${url}/register
@@ -28,7 +27,6 @@ works at registration page after submit success
     Register    mark    hamill    ${random email}    ${password}
     Validate Register Success
     Check Log In
-    Close Browser
 
 works at registration page after submit with alert error message
     Open Browser and go to URL    ${url}/register
@@ -36,7 +34,6 @@ works at registration page after submit with alert error message
     Register    mark    hamill    ${email}    ${password}
     Wait Until Element Is Visible    ${EMAIL ALREADY REGISTERED}
     Check Log In
-    Close Browser
 
 works at registration page on account activation success
     [tags]    email
@@ -45,7 +42,6 @@ works at registration page on account activation success
     Register    mark    hamill    ${random email}    ${password}
     Activate    ${random email}
     Check Log In
-    Close Browser
 
 works at registration page on account activation error
     [tags]    email
@@ -58,12 +54,10 @@ works at registration page on account activation error
     Go To    ${link}
     Wait Until Element Is Visible    ${ALREADY ACTIVATED}
     Check Log In
-    Close Browser
 
 works at restore password page with email input - before submit
     Open Browser and go to URL    ${url}/restore_password
     Check Log In
-    Close Browser
 
 works at restore password page with email input - after submit error
     Open Browser and go to URL    ${url}/restore_password
@@ -72,7 +66,6 @@ works at restore password page with email input - after submit error
     Click Button    ${RESET PASSWORD BUTTON}
     Check For Alert Dismissable    ${CANNOT SEND CONFIRMATION EMAIL}${SPACE}${ACCOUNT DOES NOT EXIST}
     Check Log In
-    Close Browser
 
 works at restore password page with email input - after submit success
     Open Browser and go to URL    ${url}/restore_password
@@ -85,7 +78,6 @@ works at restore password page with email input - after submit success
     ${replaced}    Replace String    ${text}    \n    ${SPACE}
     Should Match    ${replaced}    ${RESET EMAIL SENT MESSAGE TEXT}
     Check Log In
-    Close Browser
 
 works at restore password page with password input - before submit
     [tags]    email
@@ -107,7 +99,6 @@ works at restore password page with password input - before submit
     ${link}    Get Email Link    ${random email}    reset
     Go To    ${link}
     Check Log In
-    Close Browser
 
 works at restore password page with password input - after submit error
     [tags]    email
@@ -131,7 +122,6 @@ works at restore password page with password input - after submit error
     Input Text    ${RESET PASSWORD INPUT}    ${EMPTY}
     Click Button    ${SAVE PASSWORD}
     Wait Until Element Is Visible    ${PASSWORD IS REQUIRED}
-    Close Browser
 
 works at restore password page with password input - after submit success
     [tags]    email
@@ -156,4 +146,3 @@ works at restore password page with password input - after submit success
     Click Button    ${SAVE PASSWORD}
     Wait Until Elements Are Visible    ${RESET SUCCESS MESSAGE}    ${RESET SUCCESS LOG IN LINK}
     Check Log In
-    Close Browser

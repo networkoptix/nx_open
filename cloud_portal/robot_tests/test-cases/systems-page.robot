@@ -1,7 +1,7 @@
 *** Settings ***
 Resource          ../resource.robot
 Resource          ../variables.robot
-Suite Teardown    Close All Browsers
+Test Teardown    Close Browser
 Force Tags        system
 
 *** Variables ***
@@ -14,28 +14,24 @@ should show list of Systems
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
     Wait Until Elements Are Visible    ${ACCOUNT DROPDOWN}    ${SYSTEMS TILE}
-    Close Browser
 
 has system name, owner and OpenInNx button visible on systems page
     Open Browser and go to URL    ${url}
     Log In    ${EMAIL OWNER}    ${password}
     Wait Until Elements Are Visible    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
     Element Text Should Be    ${AUTO TESTS TITLE}    Auto Tests
-    Close Browser
 
 should show Open in NX client button for online system
     Open Browser and go to URL    ${url}
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
     Wait Until Elements Are Visible    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
-    Close Browser
 
 should not show Open in NX client button for offline system
     Open Browser and go to URL    ${url}
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
     Wait Until Elements Are Visible    ${AUTOTESTS OFFLINE}
-    Close Browser
 
 should show system's state for systems if they are offline. Otherwise - button Open in Nx
     Open Browser and go to URL    ${url}
@@ -44,7 +40,6 @@ should show system's state for systems if they are offline. Otherwise - button O
     Wait Until Elements Are Visible    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
     ${systems}    Get WebElements    //div[@ng-repeat='system in systems | filter:searchSystems as filtered']
     Check Online Or Offline    ${systems}    ${AUTOTESTS OFFLINE TEXT}
-    Close Browser
 
 should open system page (users list) when clicked on system
     Open Browser and go to URL    ${url}
@@ -53,7 +48,6 @@ should open system page (users list) when clicked on system
     Wait Until Elements Are Visible    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
     Click Element    ${AUTO TESTS TITLE}
     Verify In System    Auto Tests
-    Close Browser
 
 should update owner name in systems list, if it's changed
     Open Browser and go to URL    ${url}/account
@@ -79,4 +73,3 @@ should update owner name in systems list, if it's changed
     Input Text    ${ACCOUNT LAST NAME}    testLastName
     Click Button    ${ACCOUNT SAVE}
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
-    Close Browser

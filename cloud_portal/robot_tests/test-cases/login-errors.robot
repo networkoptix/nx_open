@@ -1,7 +1,7 @@
 *** Settings ***
 Resource          ../resource.robot
 Resource          ../variables.robot
-Suite Teardown    Close All Browsers
+Test Teardown     Close Browser
 Test Template     Test Login Invalid
 
 *** Variables ***
@@ -35,7 +35,6 @@ Test Login Invalid
     Run Keyword If    "${expected} "== "outline"    Outline Error    ${email}    ${pass}
     Run Keyword If    "${expected}" == "alert"    Alert Error    ${email}    ${pass}
     Run Keyword If    "${expected}" == "neither"    Validate Login
-    Close Browser
 
 Outline Error
     [Arguments]    ${email}    ${pass}

@@ -147,7 +147,6 @@ Verify In System
 
 Failure Tasks
     Capture Page Screenshot    selenium-screenshot-{index}.png
-    Close Browser
 
 Wait Until Elements Are Visible
     [arguments]    @{elements}

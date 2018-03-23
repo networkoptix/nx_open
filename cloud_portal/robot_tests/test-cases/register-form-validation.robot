@@ -1,7 +1,7 @@
 *** Settings ***
 Resource          ../resource.robot
 Resource          ../variables.robot
-Suite Teardown    Close All Browsers
+Test Teardown     Close Browser
 Test Template     Test Register Invalid
 
 *** Variables ***
@@ -62,7 +62,6 @@ Test Register Invalid
     Run Keyword Unless    "${email}"=="${valid email}"    Check Email Outline    ${email}
     Run Keyword Unless    "${first}"=="mark"    Check First Name Outline    ${first}
     Run Keyword Unless    "${last}"=="hamill"    Check Last Name Outline    ${last}
-    Close Browser
 
 Check Email Outline
     [Arguments]    ${email}
