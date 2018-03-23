@@ -8,17 +8,25 @@ import { NgbDropdownModule }                                   from '@ng-bootstr
 })
 
 export class NxAccountSettingsDropdown implements OnInit {
-    @Input() account;
+    settings = {
+        email: '',
+        is_staff: false
+    };
 
-    constructor() {
+    constructor(@Inject('account') private account: any) {
     }
 
     ngOnInit(): void {
-        // prevent *ngIf complaining of undefined property --TT
-        if (undefined === this.account) {
-            this.account = {
-                is_staff: false
-            }
-        }
+
+        this.account
+            .get()
+            .then(result => {
+                this.settings.email = result.email;
+                this.settings.is_staff = result.is_staff;
+            })
+    }
+
+    logout() {
+        this.account.logout();
     }
 }

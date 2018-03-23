@@ -358,6 +358,11 @@ nx-header {
   .navbar-nav {
     flex-direction: row;
   }
+
+  .navbar-default {
+    background-color: #fff;
+    padding: 0;
+  }
 }
 
 .dropdown-menu {
