@@ -57,3 +57,18 @@ Clean up noperm first/last name
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
     Close Browser
 
+Clean up owner first/last name
+    Register Keyword To Run On Failure    None
+    Open Browser and go to URL    ${url}/account
+    Log In    ${EMAIL OWNER}    ${password}    button=None
+    Validate Log In
+    Run Keyword And Ignore Error    Wait Until Textfield Contains    ${ACCOUNT FIRST NAME}    newFirstName
+    Run Keyword And Ignore Error    Wait Until Textfield Contains    ${ACCOUNT LAST NAME}    newLastName
+
+    Clear Element Text    ${ACCOUNT FIRST NAME}
+    Input Text    ${ACCOUNT FIRST NAME}    ${TEST FIRST NAME}
+    Clear Element Text    ${ACCOUNT LAST NAME}
+    Input Text    ${ACCOUNT LAST NAME}    ${TEST LAST NAME}
+    Click Button    ${ACCOUNT SAVE}
+    Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
+    Close Browser
