@@ -496,6 +496,23 @@ AVCodecID QnFfmpegHelper::fromQtAudioFormatToFfmpegPcmCodec(const QnAudioFormat&
     return  AV_CODEC_ID_NONE;
 }
 
+int QnFfmpegHelper::getDefaultFrameSize(AVCodecContext* context)
+{
+    AVCodec* avCodec = avcodec_find_encoder(context->codec_id);
+    if (!avCodec)
+        return 0;
+
+    auto encoderCtx = avcodec_alloc_context3(avCodec);
+    if (avCodec->sample_fmts)
+        encoderCtx->sample_fmt = avCodec->sample_fmts[0];
+    encoderCtx->channels = context->channels;
+    encoderCtx->sample_rate = context->sample_rate;
+    auto result = avcodec_open2(encoderCtx, avCodec, nullptr) >= 0 ? encoderCtx->frame_size : 0;
+
+    QnFfmpegHelper::deleteAvCodecContext(encoderCtx);
+    return result;
+}
+
 QnFfmpegAudioHelper::QnFfmpegAudioHelper(AVCodecContext* decoderContex):
     m_swr(swr_alloc())
 {

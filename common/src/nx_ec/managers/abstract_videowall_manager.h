@@ -12,7 +12,8 @@ namespace ec2
         Q_OBJECT
     public:
     signals:
-        void addedOrUpdated(const ec2::ApiVideowallData& videowall, NotificationSource source);
+        void addedOrUpdated(
+            const ec2::ApiVideowallData& videowall, ec2::NotificationSource source);
         void removed(const QnUuid &id);
         void controlMessage(const ec2::ApiVideowallControlMessageData& message);
     };
