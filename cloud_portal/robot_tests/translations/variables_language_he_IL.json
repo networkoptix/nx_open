@@ -17,7 +17,7 @@
     "ACCOUNT SUCCESSFULLY ACTIVATED TEXT": "החשבון שלך נשמר בהצלחה",
     "SYSTEM NAME SAVED": "שם המערכת נשמר",
     "ACCOUNT IS CREATED": "חשבון נוצר",
-    "CONFIRMATION MESSAGE IS SENT TO": "הודעת האישור נשלחת אל {{email}}",
+    "CONFIRMATION MESSAGE IS SENT TO": "הודעת האישור נשלחת לדוא אל {{email}}",
     "CANNOT SAVE PASSWORD": "לא ניתן לשמור סיסמה:",
     "PASSWORD INCORRECT": "הסיסמא הנוכחית אינה נכונה.",
     "WRONG PASSWORD": "סיסמה שגויה",
