@@ -22,8 +22,8 @@ struct DeepStreamConfig: public nx::kit::IniConfig
 // Common settings.
 
     NX_INI_INT(
-        //kOpenAlprPipeline,
-        kDefaultPipeline,
+        kOpenAlprPipeline,
+        //kDefaultPipeline,
         pipelineType,
         "Type of pipeline: 1 - default pipeline, 2 - OpenALPR pipeline");
 
@@ -56,6 +56,11 @@ struct DeepStreamConfig: public nx::kit::IniConfig
         openAlprMode,
         "OpenALPR recognition mode. Possible values: \"full-frame\" - operate on full frames, "
         "\"crop\" - operate on primary GIE crops.");
+
+    NX_INI_INT(
+        500,
+        maxAllowedFrameDelayMs,
+        "Maximum allowed frame delay.");
 
 //------------------------------------------------------------------------------------------------
 // Primary GIE settings.
@@ -125,7 +130,7 @@ struct DeepStreamConfig: public nx::kit::IniConfig
         "Number of units [frames(PGIE) or objects(SGIE)] to be inferred together in a batch");
 
     NX_INI_INT(
-        1,
+        100,
         pgie_inferenceInterval,
         "Specifies number of consecutive frames to be skipped for inference. "
         "Actual frames to be skipped = batch_size * interval");
