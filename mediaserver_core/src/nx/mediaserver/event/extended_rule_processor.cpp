@@ -416,20 +416,20 @@ bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractA
         auto callback = [action](
             SystemError::ErrorCode osErrorCode,
             int statusCode,
-            nx_http::StringType, /*content type*/
+            nx_http::StringType, /*contentType*/
             nx_http::BufferType messageBody,
             nx_http::HttpHeaders /*httpResponseHeaders*/)
-        {
-            if (osErrorCode != SystemError::noError ||
-                statusCode != nx_http::StatusCode::ok)
             {
-                qWarning() << "Failed to execute HTTP action for url "
-                    << QUrl(action->getParams().url).toString(QUrl::RemoveUserInfo)
-                    << "osErrorCode:" << osErrorCode
-                    << "HTTP result:" << statusCode
-                    << "message:" << messageBody;
-            }
-        };
+                if (osErrorCode != SystemError::noError ||
+                    statusCode != nx_http::StatusCode::ok)
+                {
+                    qWarning() << "Failed to execute HTTP action for url "
+                        << QUrl(action->getParams().url).toString(QUrl::RemoveUserInfo)
+                        << "osErrorCode:" << osErrorCode
+                        << "HTTP result:" << statusCode
+                        << "message:" << messageBody;
+                }
+            };
 
         nx_http::downloadFileAsyncEx(
             url,
