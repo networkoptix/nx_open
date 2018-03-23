@@ -1,9 +1,39 @@
 #include <utils/common/app_info.h>
-#include "update_request_data.h"
+#include "os_version.h"
 
 namespace nx {
 namespace update {
 namespace info {
+
+OsVersion::OsVersion(const QString& family, const QString& architecture, const QString& version) :
+    family(family),
+    architecture(architecture),
+    version(version)
+{}
+
+bool OsVersion::isEmpty() const
+{
+    return family.isEmpty() && architecture.isEmpty() && version.isEmpty();
+}
+
+bool OsVersion::matches(const QString& target) const
+{
+    return target.contains(family)
+        && target.contains(architecture)
+        && target.contains(version);
+}
+
+QString OsVersion::toString() const
+{
+    return lit("%1.%2.%3").arg(family).arg(architecture).arg(version);
+}
+
+OsVersion OsVersion::fromString(const QString& s)
+{
+    auto splits = s.split('.');
+    NX_ASSERT(splits.size() == 3);
+    return OsVersion(splits[0], splits[1], splits[2]);
+}
 
 static const QString kLinuxFamily = "linux";
 static const QString kWindowsFamily = "windows";
@@ -46,29 +76,6 @@ OsVersion armRpi()
 OsVersion armBananapi()
 {
     return OsVersion(kLinuxFamily, kArm, "bananapi");
-}
-
-bool operator==(const OsVersion& lhs, const OsVersion& rhs)
-{
-    return lhs.architecture == rhs.architecture && lhs.family == rhs.family
-        && lhs.version == rhs.version;
-}
-
-uint qHash(const OsVersion& osVersion)
-{
-    return qHash(osVersion.architecture) ^ qHash(osVersion.family) ^ qHash(osVersion.version);
-}
-
-bool operator==(const UpdateFileRequestData& lhs, const UpdateFileRequestData& rhs)
-{
-    return lhs.cloudHost == rhs.cloudHost && lhs.currentNxVersion == rhs.currentNxVersion
-        && lhs.osVersion == rhs.osVersion;
-}
-
-uint qHash(const UpdateFileRequestData& fileRequestData)
-{
-    return qHash(fileRequestData.cloudHost) ^ qHash(fileRequestData.currentNxVersion) ^
-        qHash(fileRequestData.customization) ^ qHash(fileRequestData.osVersion);
 }
 
 } // namespace info

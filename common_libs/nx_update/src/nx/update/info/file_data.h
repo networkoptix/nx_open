@@ -7,23 +7,23 @@ namespace nx {
 namespace update {
 namespace info {
 
+/**
+ * Update file information mapped from update.json.
+ */
 struct FileData
 {
     QString file;
     QString url;
     qint64 size;
     QByteArray md5;
-    QList<QnUuid> peers;
 
     FileData() = default;
-    FileData(const QString& file, const QString& url, qint64 size, const QByteArray& md5,
-        const QList<QnUuid>& peers = QList<QnUuid>())
+    FileData(const QString& file, const QString& url, qint64 size, const QByteArray& md5)
         :
         file(file),
         url(url),
         size(size),
-        md5(md5),
-        peers(peers)
+        md5(md5)
     {}
 
     FileData(FileData&&) = default;
@@ -32,9 +32,10 @@ struct FileData
     FileData& operator = (const FileData&) = default;
 };
 
-inline bool operator == (const FileData& lhs, const FileData& rhs)
+inline bool operator==(const FileData& lhs, const FileData& rhs)
 {
-    return lhs.file == rhs.file && lhs.url == rhs.url && lhs.size == rhs.size && lhs.md5 == rhs.md5;
+    return lhs.file == rhs.file && lhs.url == rhs.url && lhs.size == rhs.size
+        && lhs.md5 == rhs.md5;
 }
 
 } // namespace info

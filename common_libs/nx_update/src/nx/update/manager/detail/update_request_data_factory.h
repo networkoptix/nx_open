@@ -12,7 +12,7 @@ class NX_UPDATE_API UpdateFileRequestDataFactory
 public:
     using FactoryFunc = utils::MoveOnlyFunc<update::info::UpdateFileRequestData()>;
 
-    static update::info::UpdateFileRequestData create();
+    static update::info::UpdateFileRequestData create(bool isClient);
     static void setFactoryFunc(FactoryFunc factoryFunc);
 private:
     static FactoryFunc s_factoryFunc;

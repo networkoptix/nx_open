@@ -20,6 +20,8 @@ private:
     virtual void updateGlobalRegistry(const QByteArray& serializedRegistry) override;
     virtual void writeStatusToFile(const detail::Updates2StatusDataEx& statusData) override;
     virtual void remoteUpdateCompleted() override {}
+    virtual bool isClient() const override;
+    virtual QnUuid peerId() const override;
 
     void connectToSignals();
 };

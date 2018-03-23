@@ -60,7 +60,7 @@ public:
             return;
         }
 
-        // #TODO #akulikov: implement parsing information about unsupported versions
+        // #TODO #akulikov: Implement parsing information about unsupported versions.
         parseAlternativesServerData();
         parseCustomizationData();
     }

@@ -1,6 +1,7 @@
 #include <nx/update/manager/detail/update_request_data_factory.h>
 #include <nx/update/installer/detail/abstract_updates2_installer.h>
 #include <nx/update/info/abstract_update_registry.h>
+#include <nx/update/info/manual_file_data.h>
 #include <nx/update/manager/detail/updates2_manager_base.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <nx/utils/thread/long_runnable.h>
@@ -37,6 +38,8 @@ public:
     MOCK_CONST_METHOD1(equals, bool(AbstractUpdateRegistry* other));
     MOCK_METHOD2(addFileData, void(const update::info::UpdateFileRequestData&,
         const update::info::FileData&));
+    MOCK_METHOD1(merge, void(AbstractUpdateRegistry* other));
+    MOCK_METHOD1(addFileData, void(const info::ManualFileData& fileData));
 };
 
 using namespace vms::common::p2p;
@@ -244,6 +247,9 @@ public:
         m_remoteUpdateCondition.wakeOne();
     }
 
+    MOCK_CONST_METHOD0(isClient, bool());
+    MOCK_CONST_METHOD0(peerId, QnUuid());
+
 private:
     std::function<update::info::AbstractUpdateRegistryPtr()> m_globalRegistryFactoryFunc;
     std::function<update::info::AbstractUpdateRegistryPtr()> m_remoteRegistryFactoryFunc;
@@ -287,9 +293,8 @@ protected:
         detail::UpdateFileRequestDataFactory::setFactoryFunc(
             []()
             {
-                return update::info::UpdateFileRequestData(
-                    kCloudHost, kCustomization, kVersion,
-                    update::info::OsVersion(kPlatform, kArch, kModification));
+                return update::info::UpdateFileRequestData(kCloudHost, kCustomization, kVersion,
+                    update::info::OsVersion(kPlatform, kArch, kModification), false);
             });
         m_testInstaller.start();
     }
@@ -851,6 +856,8 @@ TEST_F(Updates2Manager, Prepare_failedNoFreeSpace)
     whenRemoteUpdateDone();
     thenStateShouldBe(api::Updates2StatusData::StatusCode::available);
 }
+
+// #TODO: #akulikov: Add tests regarding manual file data.
 
 } // namespace test
 } // namespace detail

@@ -3,6 +3,7 @@
 #include <nx/api/updates2/updates2_status_data.h>
 #include <nx/update/info/sync_update_checker.h>
 #include <nx/update/info/update_registry_factory.h>
+#include <nx/update/info/manual_file_data.h>
 #include <common/common_module.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log.h>
@@ -17,39 +18,8 @@ namespace detail {
 
 using namespace vms::common::p2p::downloader;
 
-namespace {
-
-// #TODO #akulikov Turn this to AbstractUpdateRegistry::isBetter() and AbstractUpdateRegistry::merge().
-static bool isNewRegistryBetter(
-    const update::info::AbstractUpdateRegistryPtr& oldRegistry,
-    const update::info::AbstractUpdateRegistryPtr& newRegistry)
-{
-    if (!oldRegistry)
-        return true;
-
-    QnSoftwareVersion newRegistryServerVersion;
-    if (newRegistry->latestUpdate(
-            UpdateFileRequestDataFactory::create(),
-            &newRegistryServerVersion) != update::info::ResultCode::ok)
-    {
-        return false;
-    }
-
-    QnSoftwareVersion oldRegistryServerVersion;
-    if (oldRegistry->latestUpdate(
-            UpdateFileRequestDataFactory::create(),
-            &oldRegistryServerVersion) != update::info::ResultCode::ok
-        || newRegistryServerVersion > oldRegistryServerVersion)
-    {
-        return true;
-    }
-
-    return false;
-}
-
-} // namespace
-
-Updates2ManagerBase::Updates2ManagerBase()
+Updates2ManagerBase::Updates2ManagerBase():
+    m_updateRegistry(info::UpdateRegistryFactory::create())
 {
 }
 
@@ -104,7 +74,8 @@ void Updates2ManagerBase::checkForGlobalDictionaryUpdate()
     auto globalRegistry = getGlobalRegistry();
     if (!globalRegistry)
         return;
-    swapRegistries(std::move(globalRegistry));
+
+    updateRegistryIfNeeded(std::move(globalRegistry));
     refreshStatusAfterCheck();
 }
 
@@ -130,21 +101,36 @@ void Updates2ManagerBase::checkForRemoteUpdate(utils::TimerId /*timerId*/)
     }
 
     auto remoteRegistry = getRemoteRegistry();
-    if (remoteRegistry && isNewRegistryBetter(getGlobalRegistry(), remoteRegistry))
-        updateGlobalRegistry(remoteRegistry->toByteArray());
+    if (remoteRegistry)
+    {
+        updateRegistryIfNeeded(std::move(remoteRegistry));
 
-    swapRegistries(std::move(remoteRegistry));
+        auto globalRegistry = getGlobalRegistry();
+        QByteArray serializedUpdatedRegistry;
+        {
+            QnMutexLocker lock(&m_mutex);
+            if (!globalRegistry || !m_updateRegistry->equals(globalRegistry.get()))
+            {
+                m_updateRegistry->merge(globalRegistry.get());
+                serializedUpdatedRegistry = m_updateRegistry->toByteArray();
+            }
+        }
+
+        if (!serializedUpdatedRegistry.isNull())
+            updateGlobalRegistry(serializedUpdatedRegistry);
+    }
+
     refreshStatusAfterCheck();
 }
 
-void Updates2ManagerBase::swapRegistries(update::info::AbstractUpdateRegistryPtr otherRegistry)
+void Updates2ManagerBase::updateRegistryIfNeeded(update::info::AbstractUpdateRegistryPtr other)
 {
-    if (!otherRegistry)
-        return;
-
     QnMutexLocker lock(&m_mutex);
-    if (isNewRegistryBetter(m_updateRegistry, otherRegistry))
-        m_updateRegistry = std::move(otherRegistry);
+    if (!other->equals(m_updateRegistry.get()))
+    {
+        other->merge(m_updateRegistry.get());
+        m_updateRegistry = std::move(other);
+    }
 }
 
 void Updates2ManagerBase::refreshStatusAfterCheck()
@@ -167,7 +153,7 @@ void Updates2ManagerBase::refreshStatusAfterCheck()
             }
 
             if (m_updateRegistry->latestUpdate(
-                    detail::UpdateFileRequestDataFactory::create(),
+                    detail::UpdateFileRequestDataFactory::create(isClient()),
                     &version) != update::info::ResultCode::ok)
             {
                 setStatus(
@@ -178,7 +164,7 @@ void Updates2ManagerBase::refreshStatusAfterCheck()
 
             nx::update::info::FileData fileData;
             const auto result = m_updateRegistry->findUpdateFile(
-                detail::UpdateFileRequestDataFactory::create(), &fileData);
+                detail::UpdateFileRequestDataFactory::create(isClient()), &fileData);
             NX_ASSERT(result == update::info::ResultCode::ok);
             if (result != update::info::ResultCode::ok)
             {
@@ -210,7 +196,7 @@ api::Updates2StatusData Updates2ManagerBase::download()
 
     nx::update::info::FileData fileData;
     const auto result = m_updateRegistry->findUpdateFile(
-        detail::UpdateFileRequestDataFactory::create(), &fileData);
+        detail::UpdateFileRequestDataFactory::create(isClient()), &fileData);
     NX_ASSERT(result == update::info::ResultCode::ok);
 
     if (result != update::info::ResultCode::ok)
@@ -401,9 +387,32 @@ void Updates2ManagerBase::onDownloadFailed(const QString& fileName)
     m_currentStatus.files.remove(fileName);
 }
 
-void Updates2ManagerBase::onFileAdded(const FileInformation& /*fileInformation*/)
+void Updates2ManagerBase::onFileAdded(const FileInformation& fileInformation)
 {
-    // #TODO #akulikov Implement this.
+    auto manualFileData = update::info::ManualFileData::fromFileName(fileInformation.name);
+    if (manualFileData.isNull())
+        return;
+
+    QByteArray serializedGlobalRegistry;
+    {
+        QnMutexLocker lock(&m_mutex);
+        if (m_currentStatus.files.contains(fileInformation.name))
+            return;
+
+        NX_VERBOSE(this, lm("External update file %1 added to the Downloader")
+            .args(fileInformation.name));
+
+        manualFileData.peers.append(peerId());
+        m_updateRegistry->addFileData(manualFileData);
+        auto globalRegistry = getGlobalRegistry();
+        if (!m_updateRegistry->equals(globalRegistry.get()))
+        {
+            m_updateRegistry->merge(globalRegistry.get());
+            serializedGlobalRegistry = m_updateRegistry->toByteArray();
+        }
+    }
+
+    updateGlobalRegistry(serializedGlobalRegistry);
 }
 
 void Updates2ManagerBase::onFileDeleted(const QString& /*fileName*/)

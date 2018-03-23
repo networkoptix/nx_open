@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <nx/update/info/file_data.h>
+#include <nx/update/info/manual_file_data.h>
 #include <nx/update/info/result_code.h>
 #include <nx/update/info/update_request_data.h>
 
@@ -19,16 +20,13 @@ public:
     virtual ResultCode latestUpdate(
         const UpdateRequestData& updateRequestData,
         QnSoftwareVersion* outSoftwareVersion) const = 0;
-    virtual void addFileData(const UpdateFileRequestData& updateFileRequestDat,
-        const FileData& fileData) = 0;
-
-    // #TODO #akulikov Implement OR refactor above functions for client updates.
-
+    virtual void addFileData(const ManualFileData& manualFileData) = 0;
     virtual QList<QString> alternativeServers() const = 0;
 
     virtual QByteArray toByteArray() const = 0;
     virtual bool fromByteArray(const QByteArray& rawData) = 0;
     virtual bool equals(AbstractUpdateRegistry* other) const = 0;
+    virtual void merge(AbstractUpdateRegistry* other) = 0;
 };
 
 using AbstractUpdateRegistryPtr = std::unique_ptr<AbstractUpdateRegistry>;

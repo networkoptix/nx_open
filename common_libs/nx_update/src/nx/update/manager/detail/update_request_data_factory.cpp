@@ -10,7 +10,7 @@ namespace detail {
 
 UpdateFileRequestDataFactory::FactoryFunc UpdateFileRequestDataFactory::s_factoryFunc = nullptr;
 
-update::info::UpdateFileRequestData UpdateFileRequestDataFactory::create()
+update::info::UpdateFileRequestData UpdateFileRequestDataFactory::create(bool isClient)
 {
     if (s_factoryFunc)
         return s_factoryFunc();
@@ -22,7 +22,8 @@ update::info::UpdateFileRequestData UpdateFileRequestDataFactory::create()
         update::info::OsVersion(
             QnAppInfo::applicationPlatform(),
             QnAppInfo::applicationArch(),
-            QnAppInfo::applicationPlatformModification()));
+            QnAppInfo::applicationPlatformModification()),
+        isClient);
 }
 
 void UpdateFileRequestDataFactory::setFactoryFunc(UpdateFileRequestDataFactory::FactoryFunc factoryFunc)
