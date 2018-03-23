@@ -5,7 +5,3 @@ platforms:
   linux-x86:
     c_compiler: gcc-7
     cxx_compiler: g++-7
-ci:
-  platform_list:
-    - tx1
-  customization: default
