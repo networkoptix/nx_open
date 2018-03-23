@@ -384,6 +384,10 @@ void EventRibbon::Private::insertNewTiles(int index, int count, UpdateMode updat
     int nextIndex = index;
 
     const auto oldUnreadCount = unreadCount();
+    const bool viewportVisible = m_viewport->isVisible() && m_viewport->width() > 0;
+
+    if (!viewportVisible)
+        updateMode = UpdateMode::instant;
 
     for (int i = 0; i < count; ++i)
     {
@@ -393,7 +397,7 @@ void EventRibbon::Private::insertNewTiles(int index, int count, UpdateMode updat
         if (!tile)
             continue;
 
-        if (m_viewport->isVisible() && m_viewport->width() > 0)
+        if (viewportVisible)
         {
             static const QPoint kOutside(-10000, 0); //< Somewhere outside of visible area.
             tile->move(kOutside);
@@ -407,12 +411,11 @@ void EventRibbon::Private::insertNewTiles(int index, int count, UpdateMode updat
             tile->setVisible(false);
             tile->resize(qMax(1, m_viewport->width()), kApproximateTileHeight);
             tile->setParent(m_viewport);
-            updateMode = UpdateMode::instant;
         }
 
         m_tiles.insert(nextIndex++, tile);
         m_positions[tile] = currentPosition;
-        currentPosition += kApproximateTileHeight + kDefaultTileSpacing;
+        currentPosition += tile->height() + kDefaultTileSpacing;
     }
 
     const auto delta = currentPosition - position;
@@ -426,7 +429,10 @@ void EventRibbon::Private::insertNewTiles(int index, int count, UpdateMode updat
     m_scrollBar->setMaximum(m_scrollBar->maximum() + delta);
 
     if (position < m_scrollBar->value())
+    {
         m_scrollBar->setValue(m_scrollBar->value() + delta);
+        updateMode = UpdateMode::instant;
+    }
 
     // Correct current animations.
     for (auto& animatedIndex: m_itemShiftAnimations)
