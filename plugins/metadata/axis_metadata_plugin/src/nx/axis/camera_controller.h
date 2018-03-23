@@ -195,8 +195,6 @@ struct ActiveRecipient
 
 };
 
-
-
 class CameraController
 {
 public:
@@ -248,6 +246,7 @@ public:
 
     void filterSupportedEvents(const std::vector<std::string>& neededTopics);
     void filterSupportedEvents(std::initializer_list<const char*> neededTopics);
+    void removeForbiddenEvents(const std::vector<std::string>& forbiddenDescriptions);
 
     // The methods which names begin with "add" or "remove" do not modify corresponding inner
     // vectors. To update a vector call appropriate read method.
