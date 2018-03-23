@@ -2321,6 +2321,33 @@
         },
         {
             "keys": [
+                "Hikvision|DS-7216*", "HIKVISION|DS-7216*"
+            ],
+            "forcedOnvifParams":
+            {
+                "videoEncoders":
+                [
+                    "VideoEncoderConfigurationToken001,VideoEncoderConfigurationToken019",
+                    "VideoEncoderConfigurationToken002,VideoEncoderConfigurationToken020",
+                    "VideoEncoderConfigurationToken003,VideoEncoderConfigurationToken021",
+                    "VideoEncoderConfigurationToken004,VideoEncoderConfigurationToken022",
+                    "VideoEncoderConfigurationToken005,VideoEncoderConfigurationToken023",
+                    "VideoEncoderConfigurationToken006,VideoEncoderConfigurationToken024",
+                    "VideoEncoderConfigurationToken007,VideoEncoderConfigurationToken025",
+                    "VideoEncoderConfigurationToken008,VideoEncoderConfigurationToken026",
+                    "VideoEncoderConfigurationToken009,VideoEncoderConfigurationToken027",
+                    "VideoEncoderConfigurationToken010,VideoEncoderConfigurationToken028",
+                    "VideoEncoderConfigurationToken011,VideoEncoderConfigurationToken029",
+                    "VideoEncoderConfigurationToken012,VideoEncoderConfigurationToken030",
+                    "VideoEncoderConfigurationToken013,VideoEncoderConfigurationToken031",
+                    "VideoEncoderConfigurationToken014,VideoEncoderConfigurationToken032",
+                    "VideoEncoderConfigurationToken015,VideoEncoderConfigurationToken033",
+                    "VideoEncoderConfigurationToken016,VideoEncoderConfigurationToken034"
+                ]
+            }
+        },        
+        {
+            "keys": [
                 "HIKVISION|DS-2DE4A220IW*", "Hikvision|DS-2DE4A220IW*"
             ],
             "ptzMapper": {
