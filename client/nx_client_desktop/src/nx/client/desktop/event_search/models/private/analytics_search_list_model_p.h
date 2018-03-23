@@ -112,7 +112,7 @@ private:
 
     const QScopedPointer<QTimer> m_metadataProcessingTimer;
     QVector<QnAbstractCompressedMetadataPtr> m_metadataPackets;
-    mutable QMutex m_metadataMutex;
+    mutable QnMutex m_metadataMutex;
 };
 
 } // namespace desktop
