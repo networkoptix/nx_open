@@ -2,6 +2,7 @@
 
 #include <map>
 #include <string>
+#include <chrono>
 
 #include <plugins/plugin_api.h>
 
@@ -13,14 +14,20 @@ namespace deepstream {
 struct LicensePlateInfo
 {
     LicensePlateInfo() = default;
-    LicensePlateInfo(const std::string& plateNumber, const nxpl::NX_GUID& guid):
+    LicensePlateInfo(
+        const std::string& plateNumber,
+        const nxpl::NX_GUID& guid,
+        const std::chrono::milliseconds& detectionTime)
+        :
         plateNumber(plateNumber),
-        guid(guid)
+        guid(guid),
+        lastAppearanceTime(detectionTime)
     {
     }
 
     std::string plateNumber;
     nxpl::NX_GUID guid;
+    std::chrono::milliseconds lastAppearanceTime;
 };
 
 class SimpleLicensePlateTracker

@@ -62,6 +62,11 @@ struct DeepStreamConfig: public nx::kit::IniConfig
         maxAllowedFrameDelayMs,
         "Maximum allowed frame delay.");
 
+    NX_INI_INT(
+        3000,
+        licensePlateLifetimeMs,
+        "License plate preserves the same GUID during this period even if not appearing on the scene.");
+
 //------------------------------------------------------------------------------------------------
 // Primary GIE settings.
 
