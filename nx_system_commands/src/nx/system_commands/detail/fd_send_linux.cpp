@@ -13,8 +13,6 @@ namespace nx {
 namespace system_commands {
 namespace detail {
 
-/*-----------------------------------------------------------------------------------------------*/
-
 static int create_connected_socket(const char* path)
 {
     struct sockaddr_un addr;
@@ -45,8 +43,6 @@ static int create_connected_socket(const char* path)
 
     return fd;
 }
-
-/*-----------------------------------------------------------------------------------------------*/
 
 static int sendFdImpl(int socketfd, int sendfd)
 {
@@ -80,8 +76,6 @@ static int sendFdImpl(int socketfd, int sendfd)
 
     return sendmsg(socketfd, &msg, 0);
 }
-
-/*-----------------------------------------------------------------------------------------------*/
 
 bool sendFd(int fd)
 {

@@ -14,8 +14,6 @@ static boost::optional<std::string> getOptionalArg(const char**& argv)
     return value;
 }
 
-/*-----------------------------------------------------------------------------------------------*/
-
 void regCommands(CommandsFactory& factory, nx::SystemCommands* systemCommands)
 {
     using namespace std::placeholders;
@@ -109,8 +107,6 @@ void regCommands(CommandsFactory& factory, nx::SystemCommands* systemCommands)
             return Result::ok;
         });
 }
-
-/*-----------------------------------------------------------------------------------------------*/
 
 int main(int /*argc*/, const char** argv)
 {

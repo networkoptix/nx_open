@@ -12,8 +12,6 @@
 namespace nx {
 namespace system_commands {
 
-/*-----------------------------------------------------------------------------------------------*/
-
 static ssize_t readFdImpl(int fd, int *recvfd)
 {
     struct msghdr msg;
@@ -62,8 +60,6 @@ static ssize_t readFdImpl(int fd, int *recvfd)
 
     return n;
 }
-
-/*-----------------------------------------------------------------------------------------------*/
 
 static int acceptConnection(const char* path)
 {

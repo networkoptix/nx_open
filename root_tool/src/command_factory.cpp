@@ -8,8 +8,6 @@
 CommandsFactory::CommandsFactory() = default;
 CommandsFactory::~CommandsFactory() = default;
 
-/*-----------------------------------------------------------------------------------------------*/
-
 void CommandsFactory::reg(
     const std::vector<std::string>& names,
     const std::vector<std::string>& argsNames,
@@ -25,8 +23,6 @@ void CommandsFactory::reg(
             std::make_pair(name, std::unique_ptr<Command>(new Command(name, argsNames, action))));
     }
 }
-
-/*-----------------------------------------------------------------------------------------------*/
 
 Command* CommandsFactory::get(const char*** argv) const
 {
@@ -53,8 +49,6 @@ Command* CommandsFactory::get(const char*** argv) const
 
     return commandIt->second.get();
 }
-
-/*-----------------------------------------------------------------------------------------------*/
 
 std::string CommandsFactory::help() const
 {

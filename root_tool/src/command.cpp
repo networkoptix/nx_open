@@ -11,8 +11,6 @@ Command::Command(const std::string& name, const std::vector<std::string>& argNam
     assert(m_action);
 }
 
-/*-----------------------------------------------------------------------------------------------*/
-
 Result Command::exec(const char** argv)
 {
     auto result = m_action(argv);
@@ -21,8 +19,6 @@ Result Command::exec(const char** argv)
 
     return result;
 }
-
-/*-----------------------------------------------------------------------------------------------*/
 
 std::string Command::help() const
 {
