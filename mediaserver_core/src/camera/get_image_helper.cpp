@@ -272,7 +272,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameFromCaches(
     // Try liveCache.
     if (auto frame = decodeFrameFromLiveCache(usePrimaryStream, timestampUs, camera))
     {
-        NX_VERBOSE(kLogTag) << logPrefix << "Got from liveCache";
+        NX_VERBOSE(kLogTag) << logPrefix << lm("Got from liveCache: %1 us").arg(frame->pkt_dts);
         return frame;
     }
 
@@ -283,6 +283,8 @@ CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameFromCaches(
 CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameFromLiveCache(
     bool usePrimaryStream, qint64 timestampUs, QnVideoCameraPtr camera)
 {
+    NX_VERBOSE(kLogTag) << lm("%1()").arg(__func__);
+
     auto gopFrames = getLiveCacheGopTillTime(usePrimaryStream, timestampUs, camera);
     if (!gopFrames)
         return CLVideoDecoderOutputPtr();
@@ -369,9 +371,11 @@ std::unique_ptr<QnConstDataPacketQueue> QnGetImageHelper::getLiveCacheGopTillTim
     if (!iFrame)
     {
         NX_VERBOSE(kLogTag) << lm("%1(): WARNING: Wrong liveCache I-frame data for %2 us: %3")
-            .args(__func__, iFrameTimestampUs);
+            .args(__func__, iFrameTimestampUs, iFrameData);
         return nullptr;
     }
+
+    NX_VERBOSE(kLogTag) << lm("%1(): I-frame found: %2 us").args(__func__, iFrameTimestampUs);
 
     auto frames = std::make_unique<QnConstDataPacketQueue>();
     frames->push(iFrame);
@@ -380,7 +384,10 @@ std::unique_ptr<QnConstDataPacketQueue> QnGetImageHelper::getLiveCacheGopTillTim
     {
         // Add subsequent P-frames.
         quint64 frameTimestampUs = iFrameTimestampUs;
-        for (;;)
+
+        static const int kMaxPFrames = 1000;
+        int i = 0;
+        for (i = 0; i < kMaxPFrames; ++i)
         {
             quint64 pFrameTimestampUs;
             QnAbstractDataPacketPtr pFrameData = camera->liveCache(stream)->getNextPacket(
@@ -399,9 +406,12 @@ std::unique_ptr<QnConstDataPacketQueue> QnGetImageHelper::getLiveCacheGopTillTim
                     .args(__func__, pFrameTimestampUs, pFrameData);
                 continue;
             }
-
+           
+            NX_VERBOSE(kLogTag) << lm("%1(): P-frame found: %2 us").args(__func__, pFrameTimestampUs);
             frames->push(pFrame);
         }
+        if (i >= kMaxPFrames)
+            NX_VERBOSE(kLogTag) << lm("%1(): WARNING: Too many P-frames: %2").args(__func__, i);
     }
 
     return frames;
@@ -587,15 +597,22 @@ CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameSequence(
 
     CLVideoDecoderOutputPtr outFrame(new CLVideoDecoderOutput());
     QnFfmpegVideoDecoder decoder(firstFrame->compressionType, firstFrame, false);
-
-    for (auto i = 0; i < randomAccess.size() && !gotFrame; ++i)
+    for (int i = 0; i < randomAccess.size(); ++i)
     {
         auto frame = std::dynamic_pointer_cast<const QnCompressedVideoData>(randomAccess.at(i));
         gotFrame = decoder.decode(frame, &outFrame);
+        
+        NX_VERBOSE(kLogTag) << lm("%1(): Decoded: gotFrame: %2, frame->timestamp: %3, timestampUs: %4")
+            .args(__func__, gotFrame ? "true" : "false", frame->timestamp, timestampUs);
         if (frame->timestamp >= (qint64) timestampUs)
             break;
     }
     while (decoder.decode(QnConstCompressedVideoDataPtr(), &outFrame))
+    {
+        NX_VERBOSE(kLogTag) << lm("%1(): Flushed: outFrame->pkt_dts: %2")
+            .args(__func__, outFrame->pkt_dts);
+
         gotFrame = true; //< flush decoder buffer
+    }
     return gotFrame ? outFrame : CLVideoDecoderOutputPtr();
 }
