@@ -239,7 +239,6 @@ QnActiResource::ActiSystemInfo QnActiResource::parseSystemInfo(const QByteArray&
     return result;
 }
 
-
 void QnActiResource::cameraMessageReceived( const QString& path, const QnRequestParamList& /*params*/ )
 {
     const QStringList& pathItems = path.split(QLatin1Char('/'));
@@ -697,7 +696,6 @@ bool QnActiResource::SetupAudioInput()
     }
 }
 
-
 bool QnActiResource::startInputPortMonitoringAsync( std::function<void(bool)>&& /*completionHandler*/ )
 {
     if( hasFlags(Qn::foreigner) ||      //we do not own camera
@@ -777,7 +775,6 @@ bool QnActiResource::startInputPortMonitoringAsync( std::function<void(bool)>&& 
         responseStatusCode );
     if( responseStatusCode != CL_HTTP_SUCCESS )
         return false;
-
 
         //registering events (one event per input port)
             //GET /cgi-bin/cmd/encoder?EVENT_CONFIG HTTP/1.1\r\n
@@ -1085,7 +1082,7 @@ QList<QnCameraAdvancedParameter> QnActiResource::getParamsByIds(const QSet<QStri
     return  params;
 }
 
-QMap<QString, QnCameraAdvancedParameter> QnActiResource::getParamsMap(const QSet<QString> &idList) const
+QMap<QString, QnCameraAdvancedParameter> QnActiResource::getParamsMap(const QSet<QString>& idList) const
 {
     QMap<QString, QnCameraAdvancedParameter> params;
     for(const auto& id: idList)
@@ -1099,7 +1096,7 @@ QMap<QString, QnCameraAdvancedParameter> QnActiResource::getParamsMap(const QSet
  * Needed when user changes not all params in aggregate parameter.
  * Example: WB_GAIN=127,%WB_R_GAIN becomes WB_GAIN=127,245
  */
-QMap<QString, QString> QnActiResource::resolveQueries(QMap<QString, CameraAdvancedParamQueryInfo> &queries) const
+QMap<QString, QString> QnActiResource::resolveQueries(QMap<QString, CameraAdvancedParamQueryInfo>& queries) const
 {
     CLHttpStatus status;
     QMap<QString, QString> setQueries;
@@ -1130,7 +1127,8 @@ QMap<QString, QString> QnActiResource::resolveQueries(QMap<QString, CameraAdvanc
 /*
  * Used by resolveQueries function. Performs opertaions with parameter strings
  */
-QString QnActiResource::fillMissingParams(const QString &unresolvedTemplate, const QString &valueFromCamera) const
+QString QnActiResource::fillMissingParams(const QString& unresolvedTemplate,
+    const QString& valueFromCamera) const
 {
     auto templateValues = unresolvedTemplate.split(",");
     auto cameraValues = valueFromCamera.split(",");
@@ -1146,7 +1144,8 @@ QString QnActiResource::fillMissingParams(const QString &unresolvedTemplate, con
     return templateValues.join(',');
 }
 
-boost::optional<QString> QnActiResource::tryToGetSystemInfoValue(const ActiSystemInfo& report, const QString& key) const
+boost::optional<QString> QnActiResource::tryToGetSystemInfoValue(const ActiSystemInfo& report,
+    const QString& key) const
 {
     auto modifiedKey = key;
 
@@ -1164,7 +1163,8 @@ boost::optional<QString> QnActiResource::tryToGetSystemInfoValue(const ActiSyste
     return boost::none;
 }
 
-QMap<QString, QString> QnActiResource::buildGetParamsQueries(const QList<QnCameraAdvancedParameter> &params) const
+QMap<QString, QString> QnActiResource::buildGetParamsQueries(
+    const QList<QnCameraAdvancedParameter>& params) const
 {
     QSet<QString> agregates;
     QMap<QString, QString> queries;
@@ -1188,7 +1188,8 @@ QMap<QString, QString> QnActiResource::buildGetParamsQueries(const QList<QnCamer
     return queries;
 }
 
-QMap<QString, QString> QnActiResource::buildSetParamsQueries(const QnCameraAdvancedParamValueList &values) const
+QMap<QString, QString> QnActiResource::buildSetParamsQueries(
+    const QnCameraAdvancedParamValueList& values) const
 {
     QMap<QString, QString> paramToAgregate;
     QMap<QString, QString> paramToValue;
@@ -1233,7 +1234,8 @@ QMap<QString, QString> QnActiResource::buildSetParamsQueries(const QnCameraAdvan
     return resolveQueries(agregateToCmd);
 }
 
-QMap<QString, QString> QnActiResource::buildMaintenanceQueries(const QnCameraAdvancedParamValueList &values) const
+QMap<QString, QString> QnActiResource::buildMaintenanceQueries(
+    const QnCameraAdvancedParamValueList& values) const
 {
     QSet<QString> paramsIds;
     QMap<QString, QString> queries;
@@ -1253,7 +1255,8 @@ QMap<QString, QString> QnActiResource::buildMaintenanceQueries(const QnCameraAdv
  * Executes the queries, parses the response and returns map (paramName => paramValue).
  * paramName and paramValue are raw strings that we got from camera (no parsing of agregate params).
  */
-QMap<QString, QString> QnActiResource::executeParamsQueries(const QMap<QString, QString>& queries, bool& isSuccessful) const
+QMap<QString, QString> QnActiResource::executeParamsQueries(const QMap<QString, QString>& queries,
+    bool& isSuccessful) const
 {
     CLHttpStatus status;
     QMap<QString, QString> result;
@@ -1274,9 +1277,9 @@ QMap<QString, QString> QnActiResource::executeParamsQueries(const QMap<QString, 
  * This function performs parsing of agregate params.
  */
 void QnActiResource::parseParamsQueriesResult(
-    const QMap<QString, QString> &queriesResult,
-    const QList<QnCameraAdvancedParameter> &params,
-    QnCameraAdvancedParamValueList &result) const
+    const QMap<QString, QString>& queriesResult,
+    const QList<QnCameraAdvancedParameter>& params,
+    QnCameraAdvancedParamValueList& result) const
 {
 
     QMap<QString, QString> parsed;
@@ -1304,8 +1307,7 @@ void QnActiResource::parseParamsQueriesResult(
     }
 }
 
-
-QString QnActiResource::getParamCmd(const QnCameraAdvancedParameter &param) const
+QString QnActiResource::getParamCmd(const QnCameraAdvancedParameter& param) const
 {
     return param.writeCmd.isEmpty() ?
         param.id + lit("=%") + param.id :
@@ -1318,7 +1320,8 @@ QString QnActiResource::getParamCmd(const QnCameraAdvancedParameter &param) cons
  * Example: paramValue = "1,2,3", mask="%param1,%param2".
  * Two items will be added to map: param1 => "1" , param2 => "2,3"
  */
-void QnActiResource::extractParamValues(const QString &paramValue, const QString &mask, QMap<QString, QString>& result) const
+void QnActiResource::extractParamValues(const QString& paramValue, const QString& mask,
+    QMap<QString, QString>& result) const
 {
 
     const auto paramNames = mask.split(',');
@@ -1335,7 +1338,7 @@ void QnActiResource::extractParamValues(const QString &paramValue, const QString
     }
 }
 
-QString QnActiResource::getParamGroup(const QnCameraAdvancedParameter &param) const
+QString QnActiResource::getParamGroup(const QnCameraAdvancedParameter& param) const
 {
     return param.readCmd.isEmpty() ? CAMERA_PARAMETER_GROUP_DEFAULT : param.readCmd;
 }
@@ -1359,7 +1362,8 @@ bool QnActiResource::parseParameter(const QString& paramStr, QnCameraAdvancedPar
     return success;
 }
 
-void QnActiResource::parseCameraParametersResponse(const QByteArray& response, QnCameraAdvancedParamValueList& result) const
+void QnActiResource::parseCameraParametersResponse(const QByteArray& response,
+    QnCameraAdvancedParamValueList& result) const
 {
     auto lines = response.split('\n');
     for(const auto& line: lines)
@@ -1372,7 +1376,8 @@ void QnActiResource::parseCameraParametersResponse(const QByteArray& response, Q
     }
 }
 
-void QnActiResource::parseCameraParametersResponse(const QByteArray& response, QMap<QString, QString>& result) const
+void QnActiResource::parseCameraParametersResponse(const QByteArray& response,
+    QMap<QString, QString>& result) const
 {
     auto lines = response.split('\n');
     for(const auto& line: lines)
@@ -1385,7 +1390,8 @@ void QnActiResource::parseCameraParametersResponse(const QByteArray& response, Q
     }
 }
 
-QString QnActiResource::convertParamValueToDeviceFormat(const QString &paramValue, const QnCameraAdvancedParameter &param) const
+QString QnActiResource::convertParamValueToDeviceFormat(const QString& paramValue,
+    const QnCameraAdvancedParameter& param) const
 {
     auto tmp = paramValue;
 
@@ -1397,7 +1403,8 @@ QString QnActiResource::convertParamValueToDeviceFormat(const QString &paramValu
     return tmp;
 }
 
-QString QnActiResource::convertParamValueFromDeviceFormat(const QString &paramValue, const QnCameraAdvancedParameter &param) const
+QString QnActiResource::convertParamValueFromDeviceFormat(const QString& paramValue,
+    const QnCameraAdvancedParameter& param) const
 {
     QString tmp = paramValue;
     if(param.dataType == QnCameraAdvancedParameter::DataType::Enumeration )
@@ -1414,7 +1421,8 @@ QString QnActiResource::convertParamValueFromDeviceFormat(const QString &paramVa
     return tmp;
 }
 
-bool QnActiResource::loadAdvancedParametersTemplateFromFile(QnCameraAdvancedParams& params, const QString& templateFilename)
+bool QnActiResource::loadAdvancedParametersTemplateFromFile(QnCameraAdvancedParams& params,
+    const QString& templateFilename)
 {
     QFile paramsTemplateFile(templateFilename);
 #ifdef _DEBUG
@@ -1453,7 +1461,8 @@ QString QnActiResource::getAdvancedParametersTemplate() const
         DEFAULT_ADVANCED_PARAMETERS_TEMPLATE : advancedParametersTemplate;
 }
 
-QSet<QString> QnActiResource::calculateSupportedAdvancedParameters(const QnCameraAdvancedParams &allParams) const
+QSet<QString> QnActiResource::calculateSupportedAdvancedParameters(
+    const QnCameraAdvancedParams& allParams) const
 {
     QList<QnCameraAdvancedParameter> paramsList;
     QSet<QString> result;
@@ -1508,6 +1517,5 @@ QString QnActiResource::toActiEncoderString(const QString& value)
         return lit("MJPEG");
     return "H264"; //< Default value.
 }
-
 
 #endif // #ifdef ENABLE_ACTI

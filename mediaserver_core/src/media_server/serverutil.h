@@ -25,7 +25,7 @@ namespace ec2 {
 }
 
 QString getDataDirectory();
-void syncStoragesToSettings(const QnMediaServerResourcePtr &server);
+void syncStoragesToSettings(const QnMediaServerResourcePtr& server);
 bool backupDatabase(std::shared_ptr<ec2::AbstractECConnection> connection);
 
 namespace nx
@@ -68,7 +68,6 @@ namespace nx
     };
 }
 
-
 bool updateUserCredentials(
     std::shared_ptr<ec2::AbstractECConnection> connection,
     PasswordData data,
@@ -76,9 +75,7 @@ bool updateUserCredentials(
     const QnUserResourcePtr& userRes,
     QString* errString = nullptr);
 
-
-bool isLocalAppServer(const QString &host);
-
+bool isLocalAppServer(const QString& host);
 
 /*
 * @param localSystemId - new local system id

@@ -12,12 +12,11 @@
 #include <rest/helpers/permissions_helper.h>
 
 int QnRestoreStateRestHandler::executeGet(
-    const QString& path,
-    const QnRequestParams & params,
-    QnJsonRestResult &result,
+    const QString& /*path*/,
+    const QnRequestParams& params,
+    QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
-    Q_UNUSED(path);
     return execute(std::move(PasswordData(params)), owner, result);
 }
 

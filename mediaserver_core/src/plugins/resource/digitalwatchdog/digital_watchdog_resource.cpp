@@ -306,7 +306,8 @@ QnAbstractPtzController *QnDigitalWatchdogResource::createPtzControllerInternal(
     return result.take();
 }
 
-bool QnDigitalWatchdogResource::loadAdvancedParametersTemplate(QnCameraAdvancedParams &params) const
+bool QnDigitalWatchdogResource::loadAdvancedParametersTemplate(
+    QnCameraAdvancedParams& params) const
 {
     QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
     if (useOnvifAdvancedParameterProviders())
@@ -391,8 +392,7 @@ QString QnDigitalWatchdogResource::fetchCameraModel() {
     return QString::fromUtf8(response.Model.c_str());
 }
 
-
-bool QnDigitalWatchdogResource::loadAdvancedParamsUnderLock(QnCameraAdvancedParamValueMap &values)
+bool QnDigitalWatchdogResource::loadAdvancedParamsUnderLock(QnCameraAdvancedParamValueMap& values)
 {
     bool baseResult = base_type::loadAdvancedParamsUnderLock(values);
     if (!m_cameraProxy)
@@ -403,7 +403,7 @@ bool QnDigitalWatchdogResource::loadAdvancedParamsUnderLock(QnCameraAdvancedPara
 }
 
 bool QnDigitalWatchdogResource::setAdvancedParameterUnderLock(
-    const QnCameraAdvancedParameter &parameter, const QString &value)
+    const QnCameraAdvancedParameter& parameter, const QString& value)
 {
     if (base_type::setAdvancedParameterUnderLock(parameter, value))
         return true;
@@ -418,7 +418,7 @@ bool QnDigitalWatchdogResource::setAdvancedParameterUnderLock(
 }
 
 bool QnDigitalWatchdogResource::setAdvancedParametersUnderLock(
-    const QnCameraAdvancedParamValueList &values, QnCameraAdvancedParamValueList &result)
+    const QnCameraAdvancedParamValueList& values, QnCameraAdvancedParamValueList& result)
 {
     if (useOnvifAdvancedParameterProviders())
         return base_type::setAdvancedParametersUnderLock(values, result);
@@ -457,8 +457,8 @@ bool QnDigitalWatchdogResource::setAdvancedParametersUnderLock(
     return success && m_cameraProxy->setParams(moreParamsToProcess, &result);
 }
 
-nx::mediaserver::resource::StreamCapabilityMap QnDigitalWatchdogResource::getStreamCapabilityMapFromDrives(
-    Qn::StreamIndex streamIndex)
+nx::mediaserver::resource::StreamCapabilityMap
+    QnDigitalWatchdogResource::getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex)
 {
     using namespace nx::mediaserver::resource;
     auto onvifResult = base_type::getStreamCapabilityMapFromDrives(streamIndex);

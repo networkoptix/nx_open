@@ -19,7 +19,7 @@ QnDesktopCameraResource::QnDesktopCameraResource()
     setFlags(flags() | Qn::no_last_gop | Qn::desktop_camera);
 }
 
-QnDesktopCameraResource::QnDesktopCameraResource(const QString &userName)
+QnDesktopCameraResource::QnDesktopCameraResource(const QString& userName)
 {
     setFlags(flags() | Qn::no_last_gop | Qn::desktop_camera);
     setName(userName);
@@ -40,10 +40,12 @@ QnAbstractStreamDataProvider* QnDesktopCameraResource::createLiveDataProvider()
     return new QnDesktopCameraStreamReader(toSharedPointer());
 }
 
-bool QnDesktopCameraResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &source) {
+bool QnDesktopCameraResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr& source)
+{
     bool result = base_type::mergeResourcesIfNeeded(source);
 
-    if (getName() != source->getName()) {
+    if (getName() != source->getName())
+    {
         setName(source->getName());
         result = true;
     }
@@ -51,7 +53,8 @@ bool QnDesktopCameraResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr 
     return result;
 }
 
-bool QnDesktopCameraResource::isReadyToDetach() const {
+bool QnDesktopCameraResource::isReadyToDetach() const
+{
     if (!QnDesktopCameraResourceSearcher::instance())
         return true;
 
@@ -59,8 +62,8 @@ bool QnDesktopCameraResource::isReadyToDetach() const {
     return !QnDesktopCameraResourceSearcher::instance()->isCameraConnected(camera);  // check if we have already lost connection
 }
 
-nx::mediaserver::resource::StreamCapabilityMap QnDesktopCameraResource::getStreamCapabilityMapFromDrives(
-    Qn::StreamIndex /*streamIndex*/)
+nx::mediaserver::resource::StreamCapabilityMap
+    QnDesktopCameraResource::getStreamCapabilityMapFromDrives(Qn::StreamIndex)
 {
     return nx::mediaserver::resource::StreamCapabilityMap(); //< Not used.
 }

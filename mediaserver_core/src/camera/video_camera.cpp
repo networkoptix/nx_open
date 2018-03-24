@@ -88,7 +88,7 @@ private:
     qint64 m_nextMinTryTime;
 };
 
-QnVideoCameraGopKeeper::QnVideoCameraGopKeeper(QnVideoCamera* camera, const QnResourcePtr &resource, QnServer::ChunksCatalog catalog):
+QnVideoCameraGopKeeper::QnVideoCameraGopKeeper(QnVideoCamera* camera, const QnResourcePtr& resource, QnServer::ChunksCatalog catalog):
     QnResourceConsumer(resource),
     QnAbstractDataConsumer(100),
     m_lastKeyFrameChannel(0),
@@ -501,7 +501,6 @@ void QnVideoCamera::stop()
         m_secondaryReader->stop();
 }
 
-
 QnVideoCamera::~QnVideoCamera()
 {
     beforeStop();
@@ -898,7 +897,6 @@ bool QnVideoCamera::ensureLiveCacheStarted(
         int removedChunksToKeepCount = m_settings.roSettings()->value(
             nx_ms_conf::HLS_REMOVED_LIVE_CHUNKS_TO_KEEP,
             nx_ms_conf::DEFAULT_HLS_REMOVED_LIVE_CHUNKS_TO_KEEP).toInt();
-
 
         m_hlsLivePlaylistManager[streamQuality] =
             std::make_shared<nx::mediaserver::hls::LivePlaylistManager>(

@@ -89,7 +89,7 @@ bool QnServerUpdateTool::initializeUpdateLog(const QString& targetVersion, QStri
     return true;
 }
 
-QnServerUpdateTool::ReplyCode QnServerUpdateTool::processUpdate(const QString &updateId, QIODevice *ioDevice, bool sync) {
+QnServerUpdateTool::ReplyCode QnServerUpdateTool::processUpdate(const QString& updateId, QIODevice* ioDevice, bool sync) {
     if (!m_fileMd5.isEmpty() && makeMd5(ioDevice) != m_fileMd5) {
         NX_LOG(lit("QnServerUpdateTool: Checksum test failed: %1").arg(getUpdateFilePath(updateId)), cl_logWARNING);
         return UnknownError;
@@ -125,7 +125,7 @@ void QnServerUpdateTool::sendReply(int code)
                 m_updateId, commonModule()->moduleGUID(), code, this, [this](int, ec2::ErrorCode) {});
 }
 
-bool QnServerUpdateTool::addUpdateFile(const QString &updateId, const QByteArray &data) {
+bool QnServerUpdateTool::addUpdateFile(const QString& updateId, const QByteArray& data) {
     NX_LOG(lit("QnServerUpdateTool: Update file added [size = %1].").arg(data.size()), cl_logDEBUG2);
     m_zipExtractor.reset();
     clearUpdatesLocation();
@@ -134,7 +134,8 @@ bool QnServerUpdateTool::addUpdateFile(const QString &updateId, const QByteArray
     return processUpdate(updateId, &buffer, true);
 }
 
-qint64 QnServerUpdateTool::addUpdateFileChunkSync(const QString &updateId, const QByteArray &data, qint64 offset) {
+qint64 QnServerUpdateTool::addUpdateFileChunkSync(const QString& updateId, const QByteArray& data, qint64 offset)
+{
     qint64 reply = addUpdateFileChunkInternal(updateId, data, offset);
 
     switch (reply) {
@@ -153,7 +154,8 @@ qint64 QnServerUpdateTool::addUpdateFileChunkSync(const QString &updateId, const
     }
 }
 
-void QnServerUpdateTool::addUpdateFileChunkAsync(const QString &updateId, const QByteArray &data, qint64 offset) {
+void QnServerUpdateTool::addUpdateFileChunkAsync(const QString& updateId, const QByteArray& data, qint64 offset)
+{
     qint64 reply = addUpdateFileChunkInternal(updateId, data, offset);
 
     switch (reply) {
@@ -182,7 +184,9 @@ void QnServerUpdateTool::addUpdateFileChunkAsync(const QString &updateId, const 
     }
 }
 
-qint64 QnServerUpdateTool::addUpdateFileChunkInternal(const QString &updateId, const QByteArray &data, qint64 offset) {
+qint64 QnServerUpdateTool::addUpdateFileChunkInternal(const QString& updateId,
+    const QByteArray& data, qint64 offset)
+{
     NX_LOG(lit("QnServerUpdateTool: Update chunk [id = %1, offset = %2, size = %3].")
            .arg(updateId).arg(offset).arg(data.size()), cl_logDEBUG2);
 
@@ -256,7 +260,7 @@ qint64 QnServerUpdateTool::addUpdateFileChunkInternal(const QString &updateId, c
     return UploadFinished;
 }
 
-bool QnServerUpdateTool::installUpdate(const QString &updateId, UpdateType updateType)
+bool QnServerUpdateTool::installUpdate(const QString& updateId, UpdateType updateType)
 {
     if (updateType == UpdateType::Delayed)
     {
@@ -372,7 +376,8 @@ void QnServerUpdateTool::removeUpdateFiles(const QString& updateId)
         dir.removeRecursively();
 }
 
-void QnServerUpdateTool::clearUpdatesLocation(const QString &idToLeave) {
+void QnServerUpdateTool::clearUpdatesLocation(const QString& idToLeave)
+{
     QDir dir = getUpdatesDir();
 
     QString fileToLeave = idToLeave + ".zip";
@@ -388,7 +393,8 @@ void QnServerUpdateTool::clearUpdatesLocation(const QString &idToLeave) {
     }
 }
 
-void QnServerUpdateTool::at_zipExtractor_extractionFinished(int error) {
+void QnServerUpdateTool::at_zipExtractor_extractionFinished(int error)
+{
     if (sender() != m_zipExtractor.data())
         return;
 

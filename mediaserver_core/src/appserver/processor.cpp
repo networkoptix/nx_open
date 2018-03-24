@@ -55,7 +55,7 @@ QnAppserverResourceProcessor::~QnAppserverResourceProcessor()
     delete m_cameraDataHandler;
 }
 
-void QnAppserverResourceProcessor::processResources(const QnResourceList &resources)
+void QnAppserverResourceProcessor::processResources(const QnResourceList& resources)
 {
     for (const QnVirtualCameraResourcePtr& camera: resources.filtered<QnVirtualCameraResource>())
     {
@@ -259,7 +259,6 @@ void QnAppserverResourceProcessor::at_mutexTimeout()
     m_lockInProgress.remove(mutex->name());
     mutex->deleteLater();
 }
-
 
 bool QnAppserverResourceProcessor::isBusy() const
 {

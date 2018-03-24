@@ -95,7 +95,8 @@ nx::network::upnp::DeviceInfo QnActiResourceSearcher::getDeviceInfoSync(const nx
     return deviceInfo;
 }
 
-QnResourcePtr QnActiResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& /*params*/)
+QnResourcePtr QnActiResourceSearcher::createResource(const QnUuid& resourceTypeId,
+    const QnResourceParams& /*params*/)
 {
     QnNetworkResourcePtr result;
 
@@ -124,8 +125,8 @@ QString QnActiResourceSearcher::manufacture() const
     return QnActiResource::MANUFACTURE;
 }
 
-
-QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const nx::utils::Url& url, const QAuthenticator& auth, bool doMultichannelCheck)
+QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const nx::utils::Url& url,
+    const QAuthenticator& auth, bool doMultichannelCheck)
 {
     if (!url.scheme().isEmpty() && doMultichannelCheck)
         return QList<QnResourcePtr>();
@@ -189,7 +190,8 @@ QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const nx::utils::Url&
     return result;
 }
 
-boost::optional<QnActiResource::ActiSystemInfo> QnActiResourceSearcher::getActiSystemInfo(const QnActiResourcePtr& actiResource)
+boost::optional<QnActiResource::ActiSystemInfo> QnActiResourceSearcher::getActiSystemInfo(
+    const QnActiResourcePtr& actiResource)
 {
     CLHttpStatus status;
     auto response = actiResource->makeActiRequest(
@@ -306,7 +308,6 @@ bool QnActiResourceSearcher::processPacket(
             auto checker = std::make_shared<QnActiSystemInfoChecker>(nx::utils::Url(devInfo.presentationUrl));
             m_systemInfoCheckers[host] = checker;
         }
-
 
         // Possible auth = auth from resources with the same host address + default one.
         QSet<QAuthenticator> possibleAuth;

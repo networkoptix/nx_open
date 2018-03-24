@@ -54,7 +54,8 @@ QnMServerResourceDiscoveryManager::~QnMServerResourceDiscoveryManager()
     stop();
 }
 
-QnResourcePtr QnMServerResourceDiscoveryManager::createResource(const QnUuid &resourceTypeId, const QnResourceParams &params)
+QnResourcePtr QnMServerResourceDiscoveryManager::createResource(const QnUuid& resourceTypeId,
+    const QnResourceParams& params)
 {
     QnResourcePtr res = QnResourceDiscoveryManager::createResource( resourceTypeId, params );
     if( res )
@@ -110,7 +111,8 @@ void QnMServerResourceDiscoveryManager::sortForeignResources(QList<QnSecurityCam
     });
 }
 
-bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceList& resources, SearchType searchType)
+bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceList& resources,
+    SearchType searchType)
 {
     // fill camera's ID
 
@@ -171,7 +173,6 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
     // Assemble list of existing ip.
     QMap<quint32, QSet<QnNetworkResourcePtr> > ipsList;
 
-
     // Excluding already existing resources.
     QnResourceList::iterator it = resources.begin();
     while (it != resources.end())
@@ -204,22 +205,22 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
             continue;
         }
 
-		if (rpResource->hasFlags(Qn::foreigner))
-		{
-			if (!canTakeForeignCamera(rpResource.dynamicCast<QnSecurityCamResource>(), extraResources.size()))
-			{
+        if (rpResource->hasFlags(Qn::foreigner))
+        {
+            if (!canTakeForeignCamera(rpResource.dynamicCast<QnSecurityCamResource>(), extraResources.size()))
+            {
                 NX_VERBOSE(this, lit("Can't take foreign resource %1 now").arg(NetResString(newNetRes)));
-				it = resources.erase(it); // do not touch foreign resource
-				continue;
-			}
-		}
+                it = resources.erase(it); // do not touch foreign resource
+                continue;
+            }
+        }
 
-		if (newCamRes)
-		{
-			quint32 ips = nx::network::resolveAddress(newNetRes->getHostAddress()).toIPv4Address();
-			if (ips)
-				ipsList[ips].insert(newNetRes);
-		}
+        if (newCamRes)
+        {
+            quint32 ips = nx::network::resolveAddress(newNetRes->getHostAddress()).toIPv4Address();
+            if (ips)
+                ipsList[ips].insert(newNetRes);
+        }
 
         QnNetworkResourcePtr rpNetRes = rpResource.dynamicCast<QnNetworkResource>();
 
@@ -391,7 +392,6 @@ void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& disco
         {
             // resource is not found
             m_resourceDiscoveryCounter[uniqId]++;
-
 
             if (m_resourceDiscoveryCounter[uniqId] >= kRetryCountToMakeCamOffline)
             {

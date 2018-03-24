@@ -304,7 +304,7 @@ bool QnAdamResource::setRelayOutputState(
     return m_ioManager->setOutputPortState(outputId, isActive);
 }
 
-void QnAdamResource::at_propertyChanged(const QnResourcePtr &res, const QString &key)
+void QnAdamResource::at_propertyChanged(const QnResourcePtr& res, const QString& key)
 {
     if (key == Qn::IO_SETTINGS_PARAM_NAME && res && !res->hasFlags(Qn::foreigner))
     {

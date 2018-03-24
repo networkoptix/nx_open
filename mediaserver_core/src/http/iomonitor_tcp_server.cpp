@@ -99,7 +99,7 @@ void QnIOMonitorConnectionProcessor::run()
     d->socket->close();
 }
 
-void QnIOMonitorConnectionProcessor::at_cameraInitDone(const QnResourcePtr &resource)
+void QnIOMonitorConnectionProcessor::at_cameraInitDone(const QnResourcePtr& resource)
 {
     Q_D(QnIOMonitorConnectionProcessor);
     QnMutexLocker lock(&d->waitMutex);

@@ -51,7 +51,8 @@ QnAbstractStreamDataProvider* QnArecontPanoramicResource::createLiveDataProvider
     }
 }
 
-bool QnArecontPanoramicResource::getParamPhysicalByChannel(int channel, const QString& name, QString &val)
+bool QnArecontPanoramicResource::getParamPhysicalByChannel(int channel, const QString& name,
+    QString& val)
 {
     m_mutex.lock();
     m_mutex.unlock();
@@ -77,7 +78,7 @@ bool QnArecontPanoramicResource::getParamPhysicalByChannel(int channel, const QS
     return true;
 }
 
-bool QnArecontPanoramicResource::setApiParameter(const QString &id, const QString &value)
+bool QnArecontPanoramicResource::setApiParameter(const QString& id, const QString& value)
 {
     if (setSpecialParam(id, value))
         return true;
@@ -97,7 +98,7 @@ bool QnArecontPanoramicResource::setApiParameter(const QString &id, const QStrin
     return true;
 }
 
-bool QnArecontPanoramicResource::setSpecialParam(const QString &id, const QString& value)
+bool QnArecontPanoramicResource::setSpecialParam(const QString& id, const QString& value)
 {
     if (id == lit("resolution"))
     {

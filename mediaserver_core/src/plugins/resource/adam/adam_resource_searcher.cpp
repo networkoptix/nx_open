@@ -279,7 +279,8 @@ QnResourceList QnAdamResourceSearcher::findResources()
     return result;
 }
 
-QnResourcePtr QnAdamResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams &/*params*/)
+QnResourcePtr QnAdamResourceSearcher::createResource(const QnUuid& resourceTypeId,
+    const QnResourceParams&)
 {
     QnNetworkResourcePtr result;
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);

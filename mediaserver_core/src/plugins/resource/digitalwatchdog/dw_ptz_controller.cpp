@@ -8,11 +8,12 @@ namespace {
     const QString mirrirParamId = lit("mirrormode1");
 }
 
-QnDwPtzController::QnDwPtzController(const QnDigitalWatchdogResourcePtr &resource):
+QnDwPtzController::QnDwPtzController(const QnDigitalWatchdogResourcePtr& resource):
     base_type(resource),
     m_resource(resource)
 {
-    connect(resource.data(), &QnDigitalWatchdogResource::advancedParameterChanged, this, &QnDwPtzController::at_physicalParamChanged);
+    connect(resource.data(), &QnDigitalWatchdogResource::advancedParameterChanged, this,
+        &QnDwPtzController::at_physicalParamChanged);
     updateFlipState();
 }
 
