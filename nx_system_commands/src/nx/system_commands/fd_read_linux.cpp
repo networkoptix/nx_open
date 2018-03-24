@@ -92,8 +92,6 @@ static int acceptConnection(const char* path)
     return accept(fd, NULL, NULL);
 }
 
-/*-----------------------------------------------------------------------------------------------*/
-
 int readFd()
 {
     int acceptfd = acceptConnection(SystemCommands::kDomainSocket);
