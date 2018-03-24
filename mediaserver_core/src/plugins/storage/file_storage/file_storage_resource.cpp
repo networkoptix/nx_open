@@ -207,21 +207,27 @@ QIODevice* QnFileStorageResource::open(
     std::unique_ptr<QBufferedFile> rez(
         new QBufferedFile(
             std::shared_ptr<IQnFile>(new QnFile(fileName)),
-                ioBlockSize,
-                ffmpegBufferSize,
-                ffmpegMaxBufferSize,
-                getId()));
+            ioBlockSize,
+            ffmpegBufferSize,
+            ffmpegMaxBufferSize,
+            getId()));
     rez->setSystemFlags(systemFlags);
 
     if (rez->open(openMode))
         return rez.release();
 
-    if (rootTool()->touchFile(fileName) && rez->open(openMode))
-        return rez.release();
+    int fd = rootTool()->open(fileName, openMode);
+    if (fd <= 0)
+    {
+        NX_ERROR(this, lm("[open] failed to open file %1").args(fileName));
+        return nullptr;
+    }
 
-    NX_ERROR(this, lm("[open] failed to open file %1").args(fileName));
+    auto result = new QBufferedFile(
+        std::make_shared<QnFile>(fd), ioBlockSize, ffmpegBufferSize, ffmpegMaxBufferSize, getId());
+    result->open(openMode);
 
-    return nullptr;
+    return result;
 }
 
 nx::mediaserver::RootTool* QnFileStorageResource::rootTool() const
@@ -790,9 +796,7 @@ QnAbstractStorageResource::FileInfoList QnFileStorageResource::getFileList(const
             QnAbstractStorageResource::FileInfo(
                 translateUrlToRemote(entry.absoluteFilePath()),
                 entry.size(),
-                entry.isDir()
-            )
-        );
+                entry.isDir()));
     }
     return ret;
 }
@@ -816,18 +820,17 @@ bool QnFileStorageResource::testWriteCapInternal() const
     if (file.open(QIODevice::WriteOnly))
         return true;
 
-    bool result = rootTool()->changeOwner(fileName) || rootTool()->touchFile(fileName);
-    NX_VERBOSE(this,
-       lm("[initOrUpdate, WriteTest] root_tool chown || touch file %1 result %2").args(fileName, result));
-
-    if (!result)
-        return false;
-
-    if (file.open(QIODevice::WriteOnly))
+    int rootToolFd = rootTool()->open(fileName, QIODevice::WriteOnly);
+    if (rootToolFd > 0)
+    {
+#if !defined(Q_OS_WIN)
+        ::close(rootToolFd);
+#endif
         return true;
+    }
 
-    NX_ERROR(this,
-       lm("[initOrUpdate, WriteTest] Open file %1 for writing failed").args(fileName));
+    NX_ERROR(
+        this, lm("[initOrUpdate, WriteTest] Open file %1 for writing failed").args(fileName));
 
     return false;
 }

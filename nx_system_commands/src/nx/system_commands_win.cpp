@@ -73,6 +73,11 @@ bool SystemCommands::removePath(const std::string& path)
     return false;
 }
 
+int SystemCommands::open(const std::string& path, int mode, bool usePipe)
+{
+    return -1;
+}
+
 bool SystemCommands::rename(const std::string& /*oldPath*/, const std::string& /*newPath*/)
 {
     return false;

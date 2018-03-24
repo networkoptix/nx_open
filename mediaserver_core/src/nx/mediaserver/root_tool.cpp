@@ -1,11 +1,14 @@
-
 #include <QFileInfo>
 #include <QDir>
-
+#include <utils/fs/file.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/system_error.h>
+#include <nx/utils/concurrent.h>
 #include <nx/system_commands.h>
+#if defined (Q_OS_LINUX)
+    #include <nx/system_commands/fd_read_linux.h>
+#endif
 #include "root_tool.h"
 
 namespace nx {
@@ -169,6 +172,24 @@ bool RootTool::rename(const QString& oldPath, const QString& newPath)
     }
 
     return execute({"mv", oldPath, newPath}) == 0;
+}
+
+int RootTool::open(const QString& path, QIODevice::OpenMode mode)
+{
+#if defined (Q_OS_LINUX)
+    int sysFlags = makeUnixOpenFlags(mode);
+    if (m_toolPath.isEmpty())
+        return SystemCommands().open(path.toStdString(), sysFlags, /*usePipe*/ false);
+
+    static QnMutex openMutex;
+    QnMutexLocker lock(&openMutex);
+    utils::concurrent::run(
+        [this, path, sysFlags]() { execute({"open", path, QString::number(sysFlags)}); });
+    auto result = system_commands::readFd();
+    return result;
+#else
+    return -1;
+#endif
 }
 
 static std::string makeArgsLine(const std::vector<QString>& args)

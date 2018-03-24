@@ -28,6 +28,7 @@ public:
     bool makeDirectory(const QString& path);
     bool removePath(const QString& path);
     bool rename(const QString& oldPath, const QString& newPath);
+    int open(const QString& path, QIODevice::OpenMode mode);
 
 private:
     int execute(const std::vector<QString>& args);
