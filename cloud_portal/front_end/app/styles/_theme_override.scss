@@ -7,6 +7,10 @@
 $font-size-a-bit-large:   ceil($font-size-base * 1.15); //~16px - we just need 16px sometimes :-)
 
 
+body{
+  color: $text-color;
+}
+
 .container-fluid {
     padding:0;
 }
@@ -20,7 +24,7 @@ $font-size-a-bit-large:   ceil($font-size-base * 1.15); //~16px - we just need 1
 
 
 h1{
-  margin-bottom: $line-height-computed;
+  margin: $line-height-computed;
 }
 h2{
   margin:0;
@@ -124,6 +128,25 @@ h1>.label{
 hr {
   margin-top:    16px;
   margin-bottom: 16px;
+}
+
+label {
+  font-weight: 700;
+}
+
+.form-horizontal {
+  .form-group {
+    display: flex;
+  }
+  .control-label, .form-group div {
+    float: left;
+  }
+
+  .control-label {
+    text-align: right;
+    margin-bottom: 0;
+    padding-top: 8px;
+  }
 }
 
 .form-control {
@@ -368,7 +391,7 @@ select {
 }
 
 ///////////////////////
-// New styling
+// New styling or retrofitting missing styles
 ///////////////////////
 
 nx-header {
@@ -386,4 +409,28 @@ nx-header {
   position: absolute !important;
   float: left !important;
   padding: 6px;
+}
+
+.input-group-addon {
+  padding: 5px 16px;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1;
+  color: #121517;
+  text-align: center;
+  background-color: #ebeff1;
+  border: 1px solid #d7dfe3;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-items: center;
+
+  .glyphicon {
+    margin: 0;
+  }
+}
+
+.badge {
+  font-size: 90%;
+  margin-top: 7px;
 }

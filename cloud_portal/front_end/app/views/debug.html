@@ -33,7 +33,7 @@
 
 
         <div class="form-group">
-            <div class="col-sm-offset-2 col-sm-10">
+            <div class="offset-sm-2 col-sm-10">
                 <button class="btn btn-default" ng-click="mergeSystems()">Merge</button>
             </div>
         </div>
@@ -50,13 +50,13 @@
 
 
         <div class="form-group">
-            <div class="col-sm-offset-2 col-sm-10">
+            <div class="offset-sm-2 col-sm-10">
                 <open-client-button system="{id:'dummy',isOnline:true}"></open-client-button>
             </div>
         </div>
 
         <div class="form-group">
-            <div class="col-sm-offset-2 col-sm-4">
+            <div class="offset-sm-2 col-sm-4">
                 <label><input type="checkbox" ng-model="linkSettings.native"/> Native link</label>
             </div>
         </div>
@@ -129,7 +129,7 @@
 
 
         <div class="form-group">
-            <div class="col-sm-offset-2 col-sm-10">
+            <div class="offset-sm-2 col-sm-10">
                 <button class="btn btn-default" ng-click="openLink()"
                         title="{{system.stateMessage}}">Call url</button>
             </div>
@@ -146,17 +146,17 @@
         <hr>
         <h1>Debug processes and notifications</h1>
         <div class="form-group">
-            <div class="col-sm-offset-2 col-sm-10">
+            <div class="offset-sm-2 col-sm-10">
                 <pre>{{formatJSON(debugProcess.process)}}</pre>
             </div>
         </div>
         <div class="form-group">
-            <div class="col-sm-offset-2 col-sm-10">
+            <div class="offset-sm-2 col-sm-10">
                 <label><input type="checkbox" ng-model="debugProcess.success"/>Success</label>
             </div>
         </div>
         <div class="form-group">
-            <div class="col-sm-offset-2 col-sm-10">
+            <div class="offset-sm-2 col-sm-10">
                 <button class="btn btn-primary" ng-click="debugProcess.process.run()">Run process</button>
                 <button class="btn btn-primary" ng-click="notify()">Call notification</button>
                 <br>
@@ -199,7 +199,7 @@
             </div>
         </div>
         <div class="form-group">
-            <div class="col-sm-offset-2 col-sm-10">
+            <div class="offset-sm-2 col-sm-10">
                 <button type="submit" class="btn btn-default" ng-click="testNotification()">Send Notification</button>
             </div>
         </div>

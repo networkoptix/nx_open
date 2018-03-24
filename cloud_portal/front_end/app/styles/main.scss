@@ -447,10 +447,7 @@ td{
   .buttons-panel {
     float: right;
     padding-top: 15px;
-
-    button {
-      float: left;
-    }
+    display: flex;
   }
 }
 

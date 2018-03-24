@@ -16,6 +16,7 @@ $gray-lighter:           $light3;    //~#EEE
 
 
 $body-bg:                 $light2;
+$text-color:              $dark11;
 $navbar-default-bg:       $light1;
 $navbar-default-link-color: $dark10;
 $navbar-margin-bottom:    10px;
@@ -49,14 +50,14 @@ $modal-header-border-color:   transparent;
 $modal-content-border-color:  transparent;
 $panel-default-heading-bg:    transparent;
 
-$font-size-base : 1rem; // Assumes the browser default, typically `16px`
+$font-size-base : 0.9rem; // Assumes the browser default, typically `16px`
 $font-size-lg : $font-size-base * 1.25;
 $font-size-sm : $font-size-base * .785;
 
-$h1-font-size : $font-size-base * 2;
-$h2-font-size : $font-size-base * 1.75;
-$h3-font-size : $font-size-base * 1.5;
-$h4-font-size : $font-size-base * 1.25;
+$h1-font-size : $font-size-base * 1.75;
+$h2-font-size : $font-size-base * 1.5;
+$h3-font-size : $font-size-base * 1.25;
+$h4-font-size : $font-size-base * 1;
 $h5-font-size : $font-size-base;
 $h6-font-size : $font-size-base * .875;
 
