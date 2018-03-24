@@ -37,10 +37,11 @@ public:
     nx_http::StatusCode::Value statusCode() const;
 
 private:
-    void parseXml(QXmlStreamReader& reader);
-    void parseCgi(QXmlStreamReader& reader, const QString& cgiName);
-    void parseSubmenu(QXmlStreamReader& reader, const QString& cgi, const QString& submenu);
-    void parseAction(QXmlStreamReader& reader, const QString& cgi, const QString& submenu, const QString& action);
+    void parseXml(
+        QXmlStreamReader& reader,
+        const QString& cgi = QString(),
+        const QString& submenu = QString(),
+        const QString& action = QString());
     void parseParameter(
         QXmlStreamReader& reader,
         const QString& cgi,

@@ -78,52 +78,22 @@ QString HanwhaCgiParameters::strAttribute(QXmlStreamReader& reader, const QStrin
     return reader.attributes().value(name).toString();
 }
 
-void HanwhaCgiParameters::parseXml(QXmlStreamReader& reader)
+void HanwhaCgiParameters::parseXml(
+    QXmlStreamReader& reader,
+    const QString& cgi,
+    const QString& submenu,
+    const QString& action)
 {
     while (!reader.atEnd() && reader.readNextStartElement())
     {
         if (reader.name() == "cgi")
-            parseCgi(reader, strAttribute(reader, "name"));
-        else
-            parseXml(reader);
-    }
-}
-
-void HanwhaCgiParameters::parseCgi(QXmlStreamReader& reader, const QString& cgi)
-{
-    while (!reader.atEnd() && reader.readNextStartElement())
-    {
-        if (reader.name() == "submenu")
-            parseSubmenu(reader, cgi, strAttribute(reader, "name"));
-        else
-            parseXml(reader);
-    }
-}
-
-void HanwhaCgiParameters::parseSubmenu(
-    QXmlStreamReader& reader,
-    const QString& cgi,
-    const QString& submenu)
-{
-    while (!reader.atEnd() && reader.readNextStartElement())
-    {
-        if (reader.name() == "action")
-            parseAction(reader, cgi, submenu, strAttribute(reader, "name").replace(L'/', L'_'));
-        else
-            parseXml(reader);
-    }
-}
-
-void HanwhaCgiParameters::parseAction(
-    QXmlStreamReader& reader,
-    const QString& cgi,
-    const QString& submenu,
-    const QString& actionName)
-{
-    while (!reader.atEnd() && reader.readNextStartElement())
-    {
-        if (reader.name() == "parameter")
-            parseParameter(reader, cgi, submenu, actionName, strAttribute(reader, "name"));
+            parseXml(reader, strAttribute(reader, "name"));
+        else if (reader.name() == "submenu")
+            parseXml(reader, cgi, strAttribute(reader, "name"));
+        else if (reader.name() == "action")
+            parseXml(reader, cgi, submenu, strAttribute(reader, "name").replace(L'/', L'_'));
+        else if (reader.name() == "parameter")
+            parseParameter(reader, cgi, submenu, action, strAttribute(reader, "name"));
         else
             parseXml(reader);
     }
@@ -148,14 +118,7 @@ void HanwhaCgiParameters::parseParameter(
     parameter.setIsRequestParameter(isRequestParameter);
     parameter.setIsResponseParameter(isResponseParameter);
 
-    while (!reader.atEnd() && reader.readNextStartElement())
-    {
-        if (reader.name() == "dataType")
-            parseDataType(reader, &parameter);
-        else
-            parseXml(reader);
-    }
-
+    parseDataType(reader, &parameter);
     m_parameters[cgi][submenu][action][parameterName] = parameter;
 }
 
@@ -213,10 +176,8 @@ void HanwhaCgiParameters::parseDataType(
             outParameter->setFormatString(strAttribute(reader, kHanwhaFormatAttribute));
             outParameter->setMaxLength(attributes.value(kHanwhaMaxLengthAttribute).toInt());
         }
-        else
-        {
-            parseXml(reader);
-        }
+
+        parseDataType(reader, outParameter);
     }
 }
 
