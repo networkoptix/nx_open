@@ -551,8 +551,6 @@ void QnConnectionManagerPrivate::updateConnectionState()
     connectionState = newState;
 
     Q_Q(QnConnectionManager);
-
-
     emit q->connectionStateChanged();
 }
 
