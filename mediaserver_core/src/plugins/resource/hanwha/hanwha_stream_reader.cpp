@@ -21,7 +21,7 @@ namespace {
 
 static const QString kLive4NvrProfileName = lit("Live4NVR");
 static const int kHanwhaDefaultPrimaryStreamProfile = 2;
-static const int kNvrSocketReadTimeoutMs = 500;
+static const std::chrono::milliseconds kNvrSocketReadTimeoutMs(500);
 static const std::chrono::milliseconds kTimeoutToExtrapolateTimeMs(1000 * 3);
 
 } // namespace
@@ -80,8 +80,9 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
     m_rtpReader.setRole(role);
     if (m_hanwhaResource->isNvr() && m_sessionType == HanwhaSessionType::archive)
     {
-        m_rtpReader.rtspClient().setTCPTimeout(kNvrSocketReadTimeoutMs);
-        m_rtpReader.setOnSocketReadTimeoutCallback([this](){ return createEmptyPacket(); });
+        m_rtpReader.setOnSocketReadTimeoutCallback(
+            kNvrSocketReadTimeoutMs,
+            [this](){ return createEmptyPacket(); });
         m_rtpReader.setRtpFrameTimeoutMs(std::numeric_limits<int>::max()); //< Media frame timeout
     }
 

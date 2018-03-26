@@ -1926,9 +1926,24 @@ void QnRtspClient::removeAdditionAttribute(const QByteArray& name)
     m_additionAttrs.remove(name);
 }
 
-void QnRtspClient::setTCPTimeout(int timeout)
+void QnRtspClient::setTCPTimeout(int timeoutMs)
+{
+    setTCPTimeout(std::chrono::milliseconds(timeoutMs));
+}
+
+void QnRtspClient::setTCPTimeout(std::chrono::milliseconds timeout)
 {
     m_tcpTimeout = timeout;
+    if (m_tcpSock)
+    {
+        m_tcpSock->setRecvTimeout(m_tcpTimeout);
+        m_tcpSock->setSendTimeout(m_tcpTimeout);
+    }
+}
+
+std::chrono::milliseconds QnRtspClient::getTCPTimeout() const
+{
+    return m_tcpTimeout;
 }
 
 void QnRtspClient::setAuth(const QAuthenticator& auth, nx_http::header::AuthScheme::Value defaultAuthScheme)
