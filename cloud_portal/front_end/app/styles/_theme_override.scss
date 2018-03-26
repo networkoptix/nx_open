@@ -1,6 +1,4 @@
 /* Here we override some default bootstrap styles and behavior for our purposes */
-
-
 @import '_theme_variables';
 
 
@@ -137,12 +135,15 @@ label {
 .form-horizontal {
   .form-group {
     display: flex;
-  }
-  .control-label, .form-group div {
-    float: left;
+    & div {
+      display: flex;
+      align-items: center;
+      float: left;
+    }
   }
 
   .control-label {
+    float: left;
     text-align: right;
     margin-bottom: 0;
     padding-top: 8px;
@@ -175,7 +176,12 @@ label {
   }
 
   &.ng-invalid:not(.ng-untouched) {
-    border-color: $red_main;
+    border-color: $error;
+
+    + .input-group-addon {
+      border-color: $error;
+      background-color: $red2;
+    }
   }
 }
 
@@ -193,6 +199,7 @@ select.form-control{
 
 .btn{
   outline: none !important;
+  outline: 0 !important;
   max-width: 278px;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -209,7 +216,9 @@ select.form-control{
   &.active,
   &:focus,
   &.focus {
+    box-shadow: none;
     outline: none !important;
+    outline: 0 !important;
   }
 
   &.dropdown-toggle{
@@ -259,13 +268,13 @@ select.form-control{
   background-color: transparent;
 }
 
-
 .alert {
   font-size: $h4-font-size;
   padding-top: 8px;
   padding-bottom: 8px;
   @include box-shadow(0px 8px 4px 0px transparentize($light16, 0.9));
 }
+
 .alert-dismissable .close, .alert-dismissible .close{
   -webkit-appearance: none !important;
   -moz-appearance: none !important;
@@ -277,9 +286,7 @@ select.form-control{
     -moz-appearance: none !important;
     outline: none !important;
   }
-
 }
-
 
 label {
   line-height:  16px;
@@ -299,13 +306,11 @@ label {
   input[type="checkbox"] {
     margin-top: 2px;
   }
-
 }
 
 .form-control-static{
   min-height:32px;
 }
-
 
 .table{
   th{
@@ -317,8 +322,6 @@ label {
 .help-block{
   background-color: $body-bg;
 }
-
-
 
 @mixin kill-glyphicon{
   background-size: 112px 32px;
@@ -344,13 +347,6 @@ select {
   }
 }
 
-//.uib-tab.active{
-//    .tab-heading-hack{
-//        border-bottom:1px solid $nav-tabs-border-color;
-//        padding: 10px 0;
-//    }
-//}
-
 .tab-pane>.card{
     border-top: none;
     border-top-right-radius: 0;
@@ -369,10 +365,10 @@ select {
     }
 }
 
-
 .nav-tabs > li > a{
   line-height: 16px;
 }
+
 .nav-tabs > li > a:hover {
   background-color: #fff !important;
 }
@@ -412,14 +408,16 @@ nx-header {
 }
 
 .input-group-addon {
+  height: 32px;
   padding: 5px 16px;
   font-size: 14px;
   font-weight: 400;
   line-height: 1;
   color: #121517;
   text-align: center;
-  background-color: #ebeff1;
-  border: 1px solid #d7dfe3;
+  background-color: $light3;
+  border: 1px solid $light5;
+  border-left: none;
   border-radius: 2px;
   display: flex;
   align-items: center;

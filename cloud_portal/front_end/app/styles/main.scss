@@ -72,7 +72,10 @@ footer {
     padding: 15px 10px;
     color:  $light12;
 
-    &:hover{
+    &:hover, &:focus {
+      outline: none !important;
+      outline: 0 !important;
+      box-shadow: none;
       text-decoration: none !important;
       background-color: transparentize($light5, 0.75);
       color:$light16;
@@ -565,6 +568,10 @@ td{
     padding-bottom: 0;
   }
 
+}
+
+.input-error {
+  color: $red_main;
 }
 
 .error-page{
