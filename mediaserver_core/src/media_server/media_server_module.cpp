@@ -99,11 +99,11 @@ QnMediaServerModule::QnMediaServerModule(
 
     m_settings = store(new MSSettings(roSettingsPath, rwSettingsPath));
 
-    m_commonModule = store(new QnCommonModule(/*clientMode*/ false, nx::core::access::Mode::direct));
 #ifdef ENABLE_VMAX
     // It depend on Vmax480Resources in the pool. Pool should be cleared before QnVMax480Server destructor.
-    store(new QnVMax480Server(commonModule()));
+    store(new QnVMax480Server());
 #endif
+    m_commonModule = store(new QnCommonModule(/*clientMode*/ false, nx::core::access::Mode::direct));
 
     instance<QnWriterPool>();
 #ifdef ENABLE_ONVIF
@@ -194,6 +194,7 @@ QnMediaServerModule::QnMediaServerModule(
     m_archiveIntegrityWatcher = store(new nx::mediaserver::ServerArchiveIntegrityWatcher);
     m_updates2Manager = store(
         new nx::mediaserver::updates2::ServerUpdates2Manager(this->commonModule()));
+    m_rootTool = nx::mediaserver::findRootTool(qApp->applicationFilePath());
 
     store(new nx::mediaserver_core::recorder::WearableArchiveSynchronizer(this));
 
@@ -207,10 +208,10 @@ QnMediaServerModule::QnMediaServerModule(
 
 QnMediaServerModule::~QnMediaServerModule()
 {
-    m_commonModule->resourcePool()->clear();
     m_context.reset();
     m_metadataManagerPoolThread->exit();
     m_metadataManagerPoolThread->wait();
+    m_commonModule->resourcePool()->clear();
     clear();
 }
 
@@ -299,11 +300,6 @@ AbstractArchiveIntegrityWatcher* QnMediaServerModule::archiveIntegrityWatcher() 
 nx::analytics::storage::AbstractEventsStorage* QnMediaServerModule::analyticsEventsStorage() const
 {
     return m_analyticsEventsStorage.get();
-}
-
-void QnMediaServerModule::initializeRootTool()
-{
-    m_rootTool = nx::mediaserver::findRootTool(qApp->applicationFilePath());
 }
 
 nx::mediaserver::RootTool* QnMediaServerModule::rootTool() const

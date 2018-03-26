@@ -295,6 +295,9 @@ QAuthenticator QnPlAxisResourceSearcher::determineResourceCredentials(
     if (existingResource)
         return existingResource->getAuth();
 
+    if (discoveryMode() != DiscoveryMode::fullyEnabled)
+        return QAuthenticator();
+
     auto resData = qnStaticCommon->dataPool()->data(resource->getVendor(), resource->getModel());
     auto possibleCredentials = resData.value<QList<nx::common::utils::Credentials>>(
         Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);

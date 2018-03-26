@@ -116,7 +116,7 @@ boost::optional<Event> BytestreamFilter::createEvent(
     if (split.size() < 2)
         return boost::none;
 
-    if (split[0] != kChannelField)
+    if (split[0].toLower() != kChannelField)
         return boost::none;
 
     bool success = false;
@@ -138,7 +138,7 @@ boost::optional<Event> BytestreamFilter::createEvent(
 
     for (auto i = 0; i < splitSize; ++i)
     {
-        if (split[i] == kRegionField && i < splitSize - 1)
+        if (split[i].toLower() == kRegionField && i < splitSize - 1)
         {
             bool success = false;
             int region = split[i + 1].toInt(&success);

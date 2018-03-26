@@ -8,9 +8,12 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-AbstractMediaDataFilter::AbstractMediaDataFilter( const AbstractOnDemandDataProviderPtr& dataSource )
+FilteredOnDemandDataProvider::FilteredOnDemandDataProvider(
+    const AbstractOnDemandDataProviderPtr& dataSource,
+    const AbstractMediaDataFilterPtr& filter)
 :
-    m_dataSource( dataSource )
+    m_dataSource(dataSource),
+    m_filter(filter)
 {
     NX_ASSERT( m_dataSource );
     connect( dataSource.get(), &AbstractOnDemandDataProvider::dataAvailable,
@@ -18,23 +21,23 @@ AbstractMediaDataFilter::AbstractMediaDataFilter( const AbstractOnDemandDataProv
              Qt::DirectConnection );
 }
 
-bool AbstractMediaDataFilter::tryRead( QnAbstractDataPacketPtr* const data )
+bool FilteredOnDemandDataProvider::tryRead(QnAbstractDataPacketPtr* const data )
 {
     if( !m_dataSource->tryRead( data ) )
         return false;
     if( !data )
         return true;
-    *data = processData( data );
+    *data = m_filter->processData(*data);
     return true;
 }
 
 //!Implementation of AbstractOnDemandDataProvider::currentPos
-quint64 AbstractMediaDataFilter::currentPos() const
+quint64 FilteredOnDemandDataProvider::currentPos() const
 {
     return m_dataSource->currentPos();
 }
 
-void AbstractMediaDataFilter::put(QnAbstractDataPacketPtr packet)
+void FilteredOnDemandDataProvider::put(QnAbstractDataPacketPtr packet)
 {
     return m_dataSource->put(std::move(packet));
 }

@@ -127,11 +127,12 @@ std::vector<HikvisionEvent> AttributesParser::parseLprXml(
     std::vector<HikvisionEvent> result;
     QXmlStreamReader reader(content);
 
-    auto addEvent = [&](HikvisionEvent hikvisionEvent)
-    {
-        hikvisionEvent.isActive = true;
-        result.push_back(hikvisionEvent);
-    };
+    auto addEvent =
+        [&](HikvisionEvent hikvisionEvent)
+        {
+            hikvisionEvent.isActive = true;
+            result.push_back(hikvisionEvent);
+        };
 
     while (!reader.atEnd() && reader.readNextStartElement())
     {

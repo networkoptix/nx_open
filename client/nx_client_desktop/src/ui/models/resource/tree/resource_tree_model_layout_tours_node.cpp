@@ -78,7 +78,7 @@ void QnResourceTreeModelLayoutToursNode::rebuild()
         handleTourAdded(tour);
 }
 
-void QnResourceTreeModelLayoutToursNode::removeNode(const QnResourceTreeModelNodePtr& node)
+void QnResourceTreeModelLayoutToursNode::removeNode(QnResourceTreeModelNodePtr node)
 {
     if (!node)
         return;

@@ -20,6 +20,7 @@
 
 namespace detail {
 
+// TODO: this class doesn't take into account channelNumber. It cause bugs for multichannel devices.
 class MediaStreamCache
 {
 public:

@@ -311,6 +311,20 @@ void CameraController::filterSupportedEvents(const std::vector<std::string>& nee
     m_supportedEvents = std::move(events);
 }
 
+void CameraController::removeForbiddenEvents(const std::vector<std::string>& forbiddenDescriptions)
+{
+    if (forbiddenDescriptions.empty())
+        return;
+    std::vector<SupportedEvent> events;
+    std::copy_if(m_supportedEvents.cbegin(), m_supportedEvents.cend(), std::back_inserter(events),
+        [&forbiddenDescriptions](const auto& event)
+    {
+        return find(forbiddenDescriptions.cbegin(), forbiddenDescriptions.cend(),
+            event.description) == forbiddenDescriptions.cend();
+    });
+    m_supportedEvents = std::move(events);
+}
+
 void CameraController::filterSupportedEvents(std::initializer_list<const char*> neededTopics)
 {
     std::vector<std::string> filter;

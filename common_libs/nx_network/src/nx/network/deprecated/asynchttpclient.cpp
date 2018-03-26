@@ -525,13 +525,22 @@ void downloadFileAsyncEx(
         Qt::DirectConnection);
 
     if (method.isEmpty() || method == nx::network::http::Method::get)
+    {
         httpClientCaptured->doGet(url);
+    }
     else if (method == nx::network::http::Method::delete_)
+    {
         httpClientCaptured->doDelete(url);
+    }
     //else if (method == nx::network::http::Method::options)
+    // {
     //    httpClientCaptured->doOptions(url);
+    // }
     else
+    {
         NX_ASSERT(0, "Unsupported HTTP method");
+        requestCompletionFunc(httpClientCaptured);
+    }
 }
 
 void downloadFileAsyncEx(

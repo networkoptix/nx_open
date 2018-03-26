@@ -19,35 +19,35 @@ Options:
 
 while [[ $# -gt 0 ]]
 do
-    case $1 in
+    case "$1" in
         -k|--keychain)
-        KEYCHAIN="$2"
-        shift
-        shift
-        ;;
+            KEYCHAIN="$2"
+            shift
+            shift
+            ;;
         -p|--keychain-password)
-        KEYCHAIN_PASSWORD="$2"
-        shift
-        shift
-        ;;
+            KEYCHAIN_PASSWORD="$2"
+            shift
+            shift
+            ;;
         -c|--certificate)
-        CERT="$2"
-        shift
-        shift
-        ;;
+            CERT="$2"
+            shift
+            shift
+            ;;
         -P|--certificate-password)
-        CERT_PASSWORD="$2"
-        shift
-        shift
-        ;;
+            CERT_PASSWORD="$2"
+            shift
+            shift
+            ;;
         -h|--help)
-        echo "$HELP_MESSAGE"
-        exit
-        ;;
+            echo "$HELP_MESSAGE"
+            exit
+            ;;
         *)
-        echo "Unknown argument $1"
-        exit 1
-        ;;
+            echo "Unknown argument $1"
+            exit 1
+            ;;
     esac
 done
 

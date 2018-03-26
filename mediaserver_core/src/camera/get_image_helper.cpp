@@ -595,7 +595,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameSequence(
     CLVideoDecoderOutputPtr outFrame(new CLVideoDecoderOutput());
     QnFfmpegVideoDecoder decoder(firstFrame->compressionType, firstFrame, false);
 
-    for (auto i = 0; i < randomAccess.size() && !gotFrame; ++i)
+    for (int i = 0; i < randomAccess.size(); ++i)
     {
         auto frame = std::dynamic_pointer_cast<const QnCompressedVideoData>(randomAccess.at(i));
         gotFrame = decoder.decode(frame, &outFrame);

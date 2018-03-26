@@ -13,8 +13,8 @@ class AbstractMediaServerNotificationManager : public QObject
     Q_OBJECT
 public:
 signals:
-    void addedOrUpdated(const ec2::ApiMediaServerData& server, NotificationSource source);
-    void storageChanged(const ec2::ApiStorageData& storage, NotificationSource source);
+    void addedOrUpdated(const ec2::ApiMediaServerData& server, ec2::NotificationSource source);
+    void storageChanged(const ec2::ApiStorageData& storage, ec2::NotificationSource source);
     void removed(const QnUuid& id);
     void storageRemoved(const QnUuid& id);
     void userAttributesChanged(const ec2::ApiMediaServerUserAttributesData& attributes);

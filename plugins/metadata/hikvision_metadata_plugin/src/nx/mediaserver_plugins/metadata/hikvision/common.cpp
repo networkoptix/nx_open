@@ -56,7 +56,7 @@ const Hikvision::EventDescriptor& Hikvision::DriverManifest::eventDescriptorById
 const Hikvision::EventDescriptor Hikvision::DriverManifest::eventDescriptorByInternalName(const QString& internalName) const
 {
     return eventDescriptorById(eventTypeByInternalName(internalName));
-};
+}
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Hikvision::EventDescriptor, (json), EventDescriptor_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Hikvision::DriverManifest, (json), DriverManifest_Fields)

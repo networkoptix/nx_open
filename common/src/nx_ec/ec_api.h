@@ -286,7 +286,7 @@ namespace ec2
         Q_OBJECT
     public:
     signals:
-        void addedOrUpdated( nx::vms::event::RulePtr businessRule, NotificationSource source);
+        void addedOrUpdated(nx::vms::event::RulePtr businessRule, ec2::NotificationSource source);
         void removed( QnUuid id );
         void businessActionBroadcasted( const nx::vms::event::AbstractActionPtr& businessAction );
         void businessRuleReset( const ec2::ApiBusinessRuleDataList& rules );

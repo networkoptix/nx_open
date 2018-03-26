@@ -1261,15 +1261,20 @@ bool QnSecurityCamResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &s
     const auto mergeValue =
         [&](auto getter, auto setter)
         {
-            const auto thisValue = (this->*getter)();
             const auto newValue = (camera->*getter)();
-            if (newValue != thisValue && !newValue.isEmpty())
+            if (!newValue.isEmpty())
             {
-                (this->*setter)(newValue);
-                result = true;
+                const auto currentValue = (this->*getter)();
+                if (currentValue != newValue)
+                {
+                    (this->*setter)(newValue);
+                    result = true;
+                }
             }
         };
 
+    // Group id and name can be changed for any resource because if we unable to authorize,
+    // number of channels is not accessible.
     mergeValue(&QnSecurityCamResource::getGroupId, &QnSecurityCamResource::setGroupId);
     mergeValue(&QnSecurityCamResource::getGroupName, &QnSecurityCamResource::setGroupName);
     mergeValue(&QnSecurityCamResource::getModel, &QnSecurityCamResource::setModel);

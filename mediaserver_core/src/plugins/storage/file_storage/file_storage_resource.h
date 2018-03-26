@@ -16,13 +16,7 @@
 
 class QnStorageManager;
 
-namespace nx {
-namespace mediaserver {
-
-class RootTool;
-
-}
-}
+namespace nx { namespace mediaserver { class RootTool; } }
 
 const QString NX_TEMP_FOLDER_NAME = QnAppInfo::productNameShort() + "_temp_folder_";
 
