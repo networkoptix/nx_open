@@ -108,10 +108,10 @@ void HanwhaCgiParameters::parseParameter(
 {
     const auto attributes = reader.attributes();
     const bool isRequestParameter = strAttribute(reader, kHanwhaParameterIsRequestAttribute)
-        .compare(kHanwhaTrue, Qt::CaseInsensitive);
+        .compare(kHanwhaTrue, Qt::CaseInsensitive) == 0;
 
     const bool isResponseParameter = strAttribute(reader, kHanwhaParameterIsResponseAttribute)
-        .compare(kHanwhaTrue, Qt::CaseInsensitive);
+        .compare(kHanwhaTrue, Qt::CaseInsensitive) == 0;
 
     HanwhaCgiParameter parameter;
     parameter.setName(parameterName);
@@ -129,7 +129,12 @@ void HanwhaCgiParameters::parseDataType(
     while (!reader.atEnd() && reader.readNextStartElement())
     {
         const auto& attributes = reader.attributes();
-        if (reader.name() == kHanwhaEnumEntryNodeName)
+
+        if (reader.name() == kHanwhaDataTypeNodeName)
+        {
+            outParameter->setType(HanwhaCgiParameterType::enumeration);
+        }
+        else if (reader.name() == kHanwhaEnumEntryNodeName)
         {
             auto entryValue = strAttribute(reader, kHanwhaValueAttribute);
             if (!entryValue.isEmpty())
