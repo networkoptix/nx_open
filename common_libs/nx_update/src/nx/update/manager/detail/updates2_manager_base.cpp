@@ -14,6 +14,7 @@
 
 namespace nx {
 namespace update {
+namespace manager {
 namespace detail {
 
 using namespace vms::common::p2p::downloader;
@@ -280,6 +281,7 @@ void Updates2ManagerBase::setStatus(
 
 void Updates2ManagerBase::startPreparing(const QString& updateFilePath)
 {
+    using namespace installer::detail;
     installer()->prepareAsync(
         updateFilePath,
         [this](PrepareResult prepareResult)
@@ -466,5 +468,6 @@ api::Updates2StatusData Updates2ManagerBase::install()
 }
 
 } // namespace detail
+} // namespace manager
 } // namespace update
 } // namespace nx

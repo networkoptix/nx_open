@@ -4,6 +4,7 @@
 
 namespace nx {
 namespace update {
+namespace installer {
 namespace detail {
 
 void ZipExtractor::extractAsync(
@@ -25,5 +26,6 @@ void ZipExtractor::extractAsync(
 }
 
 } // namespace detail
+} // namespace installer
 } // namespace update
 } // namespace nx

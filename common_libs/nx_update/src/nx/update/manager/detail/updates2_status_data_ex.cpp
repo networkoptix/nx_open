@@ -3,6 +3,7 @@
 
 namespace nx {
 namespace update {
+namespace manager {
 namespace detail {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((Updates2StatusDataEx), (json), _Fields)
@@ -52,5 +53,6 @@ bool operator != (const Updates2StatusDataEx& lhs, const Updates2StatusDataEx& r
 }
 
 } // namespace detail
+} // namespace manager
 } // namespace update
 } // namespace nx

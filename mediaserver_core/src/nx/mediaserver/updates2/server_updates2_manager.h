@@ -21,7 +21,7 @@ private:
     virtual qint64 refreshTimeout() const override;
     virtual vms::common::p2p::downloader::AbstractDownloader* downloader() override;
     virtual QString filePath() const override;
-    virtual update::detail::AbstractUpdates2Installer* installer() override;
+    virtual update::installer::detail::AbstractUpdates2Installer* installer() override;
 };
 
 } // namespace updates2

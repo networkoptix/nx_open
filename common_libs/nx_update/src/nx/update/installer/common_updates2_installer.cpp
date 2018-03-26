@@ -18,9 +18,9 @@ bool CommonUpdates2Installer::cleanInstallerDirectory()
     return QDir(installerWorkDir()).removeRecursively() && QDir().mkpath(installerWorkDir());
 }
 
-detail::AbstractZipExtractorPtr CommonUpdates2Installer::createZipExtractor() const
+installer::detail::AbstractZipExtractorPtr CommonUpdates2Installer::createZipExtractor() const
 {
-    return std::make_shared<detail::ZipExtractor>();
+    return std::make_shared<installer::detail::ZipExtractor>();
 }
 
 QVariantMap CommonUpdates2Installer::updateInformation(const QString& outputPath) const

@@ -6,6 +6,7 @@
 
 namespace nx {
 namespace update {
+namespace manager {
 namespace detail {
 
 UpdateFileRequestDataFactory::FactoryFunc UpdateFileRequestDataFactory::s_factoryFunc = nullptr;
@@ -32,5 +33,6 @@ void UpdateFileRequestDataFactory::setFactoryFunc(UpdateFileRequestDataFactory::
 }
 
 } // namespace detail
+} // namespace manager
 } // namespace update
 } // namespace nx

@@ -11,6 +11,7 @@
 
 namespace nx {
 namespace update {
+namespace manager {
 namespace detail {
 
 class NX_UPDATE_API Updates2ManagerBase: public QObject
@@ -68,11 +69,12 @@ protected:
     virtual void connectToSignals() = 0;
     virtual update::info::AbstractUpdateRegistryPtr getRemoteRegistry() = 0;
     virtual vms::common::p2p::downloader::AbstractDownloader* downloader() = 0;
-    virtual AbstractUpdates2Installer* installer() = 0;
+    virtual installer::detail::AbstractUpdates2Installer* installer() = 0;
     virtual QString filePath() const = 0;
 
 };
 
 } // namespace detail
+} // namespace manager
 } // namespace update
 } // namespace nx

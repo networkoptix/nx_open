@@ -14,6 +14,7 @@
 
 namespace nx {
 namespace update {
+namespace manager {
 namespace detail {
 namespace test {
 
@@ -78,12 +79,12 @@ enum class PrepareExpectedOutcome
 
 const static QString kFileName = "test.file.name";
 
-class TestInstaller: public detail::AbstractUpdates2Installer, public QnLongRunnable
+class TestInstaller: public installer::detail::AbstractUpdates2Installer, public QnLongRunnable
 {
 public:
     virtual void prepareAsync(
         const QString& /*path*/,
-        PrepareUpdateCompletionHandler handler) override
+        installer::detail::PrepareUpdateCompletionHandler handler) override
     {
         put(handler);
     }
@@ -106,7 +107,7 @@ private:
     const static int s_timeoutBeforeTaskMs = 300;
     QnMutex m_mutex;
     QnWaitCondition m_condition;
-    QQueue<PrepareUpdateCompletionHandler> m_queue;
+    QQueue<installer::detail::PrepareUpdateCompletionHandler> m_queue;
     PrepareExpectedOutcome m_expectedOutcome = PrepareExpectedOutcome::success;
 
     virtual void run() override
@@ -129,10 +130,10 @@ private:
             switch (m_expectedOutcome)
             {
                 case PrepareExpectedOutcome::success:
-                    handler(PrepareResult::ok);
+                    handler(installer::detail::PrepareResult::ok);
                     break;
                 case PrepareExpectedOutcome::fail_noFreeSpace:
-                    handler(PrepareResult::noFreeSpace);
+                    handler(installer::detail::PrepareResult::noFreeSpace);
                     break;
             }
 
@@ -147,7 +148,7 @@ private:
         m_condition.wakeOne();
     }
 
-    void put(PrepareUpdateCompletionHandler taskFunc)
+    void put(installer::detail::PrepareUpdateCompletionHandler taskFunc)
     {
         QnMutexLocker lock(&m_mutex);
         m_queue.push_back(taskFunc);
@@ -238,7 +239,7 @@ public:
     }
 
     MOCK_METHOD0(downloader, vms::common::p2p::downloader::AbstractDownloader*());
-    MOCK_METHOD0(installer, AbstractUpdates2Installer*());
+    MOCK_METHOD0(installer, installer::detail::AbstractUpdates2Installer*());
 
     virtual void remoteUpdateCompleted() override
     {
@@ -861,5 +862,6 @@ TEST_F(Updates2Manager, Prepare_failedNoFreeSpace)
 
 } // namespace test
 } // namespace detail
+} // namespace manager
 } // namespace update
 } // namespace nx

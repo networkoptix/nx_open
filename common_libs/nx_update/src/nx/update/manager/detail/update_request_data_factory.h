@@ -5,6 +5,7 @@
 
 namespace nx {
 namespace update {
+namespace manager {
 namespace detail {
 
 class NX_UPDATE_API UpdateFileRequestDataFactory
@@ -19,5 +20,6 @@ private:
 };
 
 } // namespace detail
+} // namespace manager
 } // namespace update
 } // namespace nx

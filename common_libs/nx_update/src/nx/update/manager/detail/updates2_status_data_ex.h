@@ -4,6 +4,7 @@
 
 namespace nx {
 namespace update {
+namespace manager {
 namespace detail {
 
 struct NX_UPDATE_API Updates2StatusDataEx: api::Updates2StatusData
@@ -36,5 +37,6 @@ bool operator != (const Updates2StatusDataEx& lhs, const Updates2StatusDataEx& r
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((Updates2StatusDataEx), (json))
 
 } // namespace detail
+} // namespace manager
 } // namespace update
 } // namespace nx

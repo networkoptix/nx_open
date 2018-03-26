@@ -65,7 +65,7 @@ QString ServerUpdates2Manager::filePath() const
     return qnServerModule->settings()->getDataDirectory() + QDir::separator() + kFileName;
 }
 
-update::detail::AbstractUpdates2Installer* ServerUpdates2Manager::installer()
+update::installer::detail::AbstractUpdates2Installer* ServerUpdates2Manager::installer()
 {
     return &m_installer;
 }

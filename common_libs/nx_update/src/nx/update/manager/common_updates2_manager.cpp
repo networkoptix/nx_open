@@ -97,7 +97,7 @@ void CommonUpdates2Manager::updateGlobalRegistry(const QByteArray& serializedReg
     globalSettings()->synchronizeNow();
 }
 
-void CommonUpdates2Manager::writeStatusToFile(const detail::Updates2StatusDataEx& statusData)
+void CommonUpdates2Manager::writeStatusToFile(const manager::detail::Updates2StatusDataEx& statusData)
 {
     QFile file(filePath());
     if (!file.open(QIODevice::WriteOnly) || !file.write(QJson::serialized(statusData)))

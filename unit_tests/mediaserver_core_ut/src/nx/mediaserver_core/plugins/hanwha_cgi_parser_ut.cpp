@@ -12,7 +12,7 @@ struct HanwhaCgiParser: ::testing::Test
 {
     void parse(const char* data)
     {
-        HanwhaCgiParameters parameters(data, nx_http::StatusCode::ok);
+        HanwhaCgiParameters parameters(data, network::http::StatusCode::ok);
         ASSERT_TRUE(parameters.isValid());
 
         auto stringParam = parameters.parameter("system/deviceinfo/view/stringParam");
