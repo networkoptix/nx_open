@@ -12,6 +12,8 @@ namespace cdb {
 class AbstractSchedulerDbHelper
 {
 public:
+    virtual ~AbstractSchedulerDbHelper() = default;
+
     virtual nx::utils::db::DBResult getScheduleData(
         nx::utils::db::QueryContext* queryContext,
         ScheduleData* scheduleData) const = 0;

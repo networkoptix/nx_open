@@ -42,6 +42,8 @@ namespace nx_hls
                 bool _discontinuity = false );
         };
 
+        virtual ~AbstractPlaylistManager() = default;
+
         //!Generates chunks and appends them to \a chunkList
         /*!
             \param endOfStreamReached Can be NULL
