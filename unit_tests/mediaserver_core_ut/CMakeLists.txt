@@ -10,5 +10,6 @@ endif()
 if(NOT customization STREQUAL "hanwha")
     nx_exclude_sources_from_target(mediaserver_core_ut
         hanwha_attributes_parser_ut.cpp
+        hanwha_cgi_parser_ut.cpp
     )
 endif()
