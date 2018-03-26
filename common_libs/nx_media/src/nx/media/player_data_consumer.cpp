@@ -136,15 +136,8 @@ void PlayerDataConsumer::updateMediaEvent(const QnAbstractMediaDataPtr& data)
             if (!metadata || metadata->metadataType != MetadataType::MediaStreamEvent)
                 return Qn::MediaStreamEvent::NoEvent;
 
-            const auto mediaData = QByteArray::fromRawData(metadata->data(), metadata->dataSize());
-            const auto stringData = QString::fromLatin1(mediaData);
-            auto mediaEvent = QnLexical::deserialized<Qn::MediaStreamEvent>(stringData);
-
-            // TODO: removed this when me new serialization of Qn::MediaStreamEvent
-            // will be merged from 3.2->defalut->current_branch
-            if (mediaEvent == Qn::MediaStreamEvent::NoEvent && stringData == lit("TooManyOpenedConnections"))
-                mediaEvent = Qn::MediaStreamEvent::TooManyOpenedConnectionsError;
-
+            const auto stringData = QString::fromLatin1(metadata->data(), metadata->dataSize());
+            const auto mediaEvent = QnLexical::deserialized<Qn::MediaStreamEvent>(stringData);
             return mediaEvent;
         };
 
