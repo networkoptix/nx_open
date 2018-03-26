@@ -242,6 +242,12 @@ State CameraSettingsDialogStateReducer::applyChanges(State state)
     return state;
 }
 
+State CameraSettingsDialogStateReducer::setReadOnly(State state, bool value)
+{
+    state.readOnly = value;
+    return state;
+}
+
 State CameraSettingsDialogStateReducer::loadCameras(
     State state,
     const QnVirtualCameraResourceList& cameras)

@@ -120,6 +120,7 @@ void CameraInfoWidget::loadState(const CameraSettingsDialogState& state)
     ui->cameraRulesButton->setText(rulesTitle);
 
     ui->nameLabel->setText(state.singleCameraSettings.name());
+    ui->nameLabel->setReadOnly(state.readOnly);
     ui->multipleNameLabel->setText(
         QnDeviceDependentStrings::getNumericName(state.deviceType, state.devicesCount));
 

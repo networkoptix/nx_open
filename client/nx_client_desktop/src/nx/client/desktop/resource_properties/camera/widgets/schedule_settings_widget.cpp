@@ -7,6 +7,7 @@
 #include <core/resource/media_resource.h>
 
 #include <ui/common/aligner.h>
+#include <ui/common/read_only.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
 #include <ui/workaround/widgets_signals_workaround.h>
@@ -199,22 +200,31 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
 {
     const auto& recording = state.recording;
     const auto& brush = recording.brush;
-
     const bool recordingParamsEnabled = brush.recordingType != Qn::RT_Never
         && recording.parametersAvailable;
 
     ui->recordAlwaysButton->setChecked(brush.recordingType == Qn::RT_Always);
+    setReadOnly(ui->recordAlwaysButton, state.readOnly);
+
+    // TODO: #GDM This is not valid. Camera may not support HW motion, we need to check for this.
     ui->recordMotionButton->setChecked(brush.recordingType == Qn::RT_MotionOnly);
+    setReadOnly(ui->recordMotionButton, state.readOnly);
+
     ui->recordMotionPlusLQButton->setChecked(brush.recordingType == Qn::RT_MotionAndLowQuality);
+    setReadOnly(ui->recordMotionPlusLQButton, state.readOnly);
+
     ui->noRecordButton->setChecked(brush.recordingType == Qn::RT_Never);
+    setReadOnly(ui->noRecordButton, state.readOnly);
 
     ui->fpsSpinBox->setEnabled(recordingParamsEnabled);
     ui->fpsSpinBox->setMaximum(recording.maxBrushFps());
     ui->fpsSpinBox->setValue(brush.fps);
+    setReadOnly(ui->fpsSpinBox, state.readOnly);
 
     const bool automaticBitrate = brush.isAutomaticBitrate()
         /* && recording.customBitrateAvailable */;
     ui->qualityComboBox->setEnabled(recordingParamsEnabled);
+    setReadOnly(ui->qualityComboBox, state.readOnly);
     ui->qualityComboBox->setCurrentIndex(
         ui->qualityComboBox->findData(
             brush.quality
@@ -229,7 +239,9 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
         ui->advancedSettingsWidget->setEnabled(recordingParamsEnabled);
         ui->bitrateSpinBox->setRange(recording.minBitrateMbps, recording.maxBitrateMpbs);
         ui->bitrateSpinBox->setValue(recording.bitrateMbps);
+        setReadOnly(ui->bitrateSpinBox, state.readOnly);
         setNormalizedValue(ui->bitrateSlider, recording.normalizedCustomBitrateMbps());
+        setReadOnly(ui->bitrateSlider, state.readOnly);
 
         const auto buttonText = recording.customBitrateVisible
             ? tr("Less Settings")
@@ -246,20 +258,6 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
 }
 
 /*
-void ScheduleSettingsWidget::setReadOnly(bool readOnly)
-{
-    using ::setReadOnly;
-    setReadOnly(ui->recordAlwaysButton, readOnly);
-    // TODO: #GDM This is not valid. Camera may not support HW motion, we need to check for this.
-    setReadOnly(ui->recordMotionButton, readOnly);
-    setReadOnly(ui->recordMotionPlusLQButton, readOnly);
-    setReadOnly(ui->noRecordButton, readOnly);
-    setReadOnly(ui->qualityComboBox, readOnly);
-    setReadOnly(ui->bitrateSlider, readOnly);
-    setReadOnly(ui->bitrateSpinBox, readOnly);
-    setReadOnly(ui->fpsSpinBox, readOnly);
-}
-
 
 void ScheduleSettingsWidget::updateScheduleTypeControls()
 {

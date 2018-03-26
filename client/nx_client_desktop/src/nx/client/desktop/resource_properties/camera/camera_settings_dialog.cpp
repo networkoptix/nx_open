@@ -12,7 +12,6 @@
 #include <ui/widgets/views/resource_list_view.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/watchers/workbench_selection_watcher.h>
-#include <ui/workbench/watchers/workbench_safemode_watcher.h>
 
 #include <utils/common/html.h>
 
@@ -23,6 +22,8 @@
 #include "redux/camera_settings_dialog_state.h"
 #include "redux/camera_settings_dialog_store.h"
 
+#include "watchers/camera_settings_readonly_watcher.h"
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -30,8 +31,8 @@ namespace desktop {
 struct CameraSettingsDialog::Private
 {
     QPointer<CameraSettingsDialogStore> store;
+    QPointer<CameraSettingsReadonlyWatcher> readOnlyWatcher;
     QnVirtualCameraResourceList cameras;
-
 
     using State = CameraSettingsDialogState;
 
@@ -123,7 +124,6 @@ struct CameraSettingsDialog::Private
     {
         store->loadCameras(cameras);
     }
-
 };
 
 CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
@@ -141,18 +141,34 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
         &CameraSettingsDialog::loadState);
 
     ui->setupUi(this);
+    setButtonBox(ui->buttonBox);
 
-    addPage(int(CameraSettingsTab::general),
+    d->readOnlyWatcher = new CameraSettingsReadonlyWatcher(this);
+    connect(
+        d->readOnlyWatcher,
+        &CameraSettingsReadonlyWatcher::readOnlyChanged,
+        this,
+        [this](bool readOnly)
+        {
+            d->store->setReadOnly(readOnly);
+        });
+
+    addPage(
+        int(CameraSettingsTab::general),
         new CameraSettingsGeneralTabWidget(d->store, this),
         tr("General"));
 
     auto cameraScheduleWidget = new CameraScheduleWidget(d->store, ui->tabWidget);
-    addPage(int(CameraSettingsTab::recording),
+    addPage(
+        int(CameraSettingsTab::recording),
         cameraScheduleWidget,
         tr("Recording"));
 
     auto selectionWatcher = new QnWorkbenchSelectionWatcher(this);
-    connect(selectionWatcher, &QnWorkbenchSelectionWatcher::selectionChanged, this,
+    connect(
+        selectionWatcher,
+        &QnWorkbenchSelectionWatcher::selectionChanged,
+        this,
         [this](const QnResourceList& resources)
         {
             if (isHidden())
@@ -163,9 +179,11 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
                 setCameras(cameras);
         });
 
-
     // TODO: #GDM Should we handle current user permission to camera change?
-    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
+    connect(
+        resourcePool(),
+        &QnResourcePool::resourceRemoved,
+        this,
         [this](const QnResourcePtr& resource)
         {
             const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
@@ -183,18 +201,6 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
         });
 
     ui->alertBar->setReservedSpace(false);
-
-    const auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
-    const auto applyButton = ui->buttonBox->button(QDialogButtonBox::Apply);
-
-    auto safeModeWatcher = new QnWorkbenchSafeModeWatcher(this);
-    safeModeWatcher->addWarningLabel(ui->buttonBox);
-    safeModeWatcher->addControlledWidget(okButton,
-        QnWorkbenchSafeModeWatcher::ControlMode::Disable);
-
-    // Hiding Apply button, otherwise it will be enabled in the QnGenericTabbedDialog code.
-    safeModeWatcher->addControlledWidget(applyButton,
-        QnWorkbenchSafeModeWatcher::ControlMode::Hide);
 }
 
 CameraSettingsDialog::~CameraSettingsDialog() = default;
@@ -239,6 +245,7 @@ bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras
 
     d->cameras = cameras;
     d->resetChanges();
+    d->readOnlyWatcher->setCameras(cameras);
     return true;
 }
 
@@ -271,12 +278,16 @@ QDialogButtonBox::StandardButton CameraSettingsDialog::showConfirmationDialog()
             tr("Changes to the following %n devices are not saved:", "", d->cameras.size()),
             tr("Changes to the following %n cameras are not saved:", "", d->cameras.size()),
             tr("Changes to the following %n I/O Modules are not saved:", "", d->cameras.size())
-        ), d->cameras);
+        ),
+        d->cameras);
 
-    QnMessageBox messageBox(QnMessageBoxIcon::Question,
-        tr("Apply changes before switching to another camera?"), extras,
+    QnMessageBox messageBox(
+        QnMessageBoxIcon::Question,
+        tr("Apply changes before switching to another camera?"),
+        extras,
         QDialogButtonBox::Apply | QDialogButtonBox::Discard | QDialogButtonBox::Cancel,
-        QDialogButtonBox::Apply, this);
+        QDialogButtonBox::Apply,
+        this);
 
     messageBox.addCustomWidget(new QnResourceListView(d->cameras, &messageBox));
     return QDialogButtonBox::StandardButton(messageBox.exec());
@@ -287,10 +298,13 @@ void CameraSettingsDialog::loadState(const CameraSettingsDialogState& state)
     static const QString kWindowTitlePattern = lit("%1 - %2");
 
     const QString caption = QnCameraDeviceStringSet(
-            tr("Device Settings"), tr("Devices Settings"),
-            tr("Camera Settings"), tr("Cameras Settings"),
-            tr("I/O Module Settings"), tr("I/O Modules Settings")
-        ).getString(state.deviceType, state.devicesCount != 1);
+        tr("Device Settings"),
+        tr("Devices Settings"),
+        tr("Camera Settings"),
+        tr("Cameras Settings"),
+        tr("I/O Module Settings"),
+        tr("I/O Modules Settings")
+    ).getString(state.deviceType, state.devicesCount != 1);
 
     const QString description = state.devicesCount == 1
         ? state.singleCameraSettings.name()
@@ -300,8 +314,14 @@ void CameraSettingsDialog::loadState(const CameraSettingsDialogState& state)
 
     if (buttonBox())
     {
-        if (auto applyButton = buttonBox()->button(QDialogButtonBox::Apply))
-            applyButton->setEnabled(!isReadOnly() && state.hasChanges);
+        const auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
+        const auto applyButton = ui->buttonBox->button(QDialogButtonBox::Apply);
+
+        if (okButton)
+            okButton->setEnabled(!state.readOnly);
+
+        if (applyButton)
+            applyButton->setEnabled(!state.readOnly && state.hasChanges);
     }
 }
 

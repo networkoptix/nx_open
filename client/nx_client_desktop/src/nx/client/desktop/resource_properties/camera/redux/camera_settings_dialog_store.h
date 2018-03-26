@@ -28,6 +28,7 @@ public:
 
     // Actions.
     void applyChanges();
+    void setReadOnly(bool value);
     void loadCameras(const QnVirtualCameraResourceList& cameras);
     void setSingleCameraUserName(const QString& text);
     void setScheduleBrushRecordingType(Qn::RecordingType value);

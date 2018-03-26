@@ -123,6 +123,7 @@ void ImageControlWidget::loadState(const CameraSettingsDialogState& state)
             : QVariant();
         const auto index = ui->aspectRatioComboBox->findData(data);
         ui->aspectRatioComboBox->setCurrentIndex(index);
+        setReadOnly(ui->aspectRatioComboBox, state.readOnly);
     }
 
     ui->rotationLabel->setVisible(imageControl.rotationAvailable);
@@ -134,6 +135,7 @@ void ImageControlWidget::loadState(const CameraSettingsDialogState& state)
             : QVariant();
         const auto index = ui->rotationComboBox->findData(data);
         ui->rotationComboBox->setCurrentIndex(index);
+        setReadOnly(ui->rotationComboBox, state.readOnly);
     }
 
     ui->formLayout->setVerticalSpacing(
@@ -143,23 +145,6 @@ void ImageControlWidget::loadState(const CameraSettingsDialogState& state)
 
     setVisible(imageControl.aspectRatioAvailable || imageControl.rotationAvailable);
 }
-
-//bool ImageControlWidget::isReadOnly() const
-//{
-//    return m_readOnly;
-//}
-//
-//void ImageControlWidget::setReadOnly(bool readOnly)
-//{
-//    if (m_readOnly == readOnly)
-//        return;
-//
-//    using ::setReadOnly;
-//    setReadOnly(ui->aspectRatioComboBox, readOnly);
-//    setReadOnly(ui->rotationComboBox, readOnly);
-//
-//    m_readOnly = readOnly;
-//}
 
 } // namespace desktop
 } // namespace client

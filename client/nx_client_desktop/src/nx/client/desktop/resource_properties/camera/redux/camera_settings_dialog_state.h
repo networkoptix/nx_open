@@ -57,6 +57,7 @@ struct CameraSettingsDialogState
     ~CameraSettingsDialogState() = default;
 
     bool hasChanges = false;
+    bool readOnly = true;
 
     // Generic cameras info.
 
