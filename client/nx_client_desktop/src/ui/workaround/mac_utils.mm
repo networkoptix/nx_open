@@ -348,3 +348,16 @@ void mac_disableFullscreenButton(void *winId) {
         [button setEnabled:NO];
     }
 }
+
+void setHidesOnDeactivate(WId windowId, bool value)
+{
+    NSView* nativeView = reinterpret_cast<NSView*>(windowId);
+    if (!nativeView)
+        return;
+
+    NSWindow* nativeWindow = [nativeView window];
+    if (!nativeWindow)
+        return;
+
+    [nativeWindow setHidesOnDeactivate: value ? YES : NO];
+}
