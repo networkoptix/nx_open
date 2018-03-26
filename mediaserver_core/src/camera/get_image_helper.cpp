@@ -25,9 +25,8 @@ static constexpr int kRoundFactor = 4;
 
 static const nx::utils::log::Tag kLogTag(lit("QnGetImageHelper"));
 
-} // namespace
-
-QnCompressedVideoDataPtr getNextArchiveVideoPacket(QnAbstractArchiveDelegate* archiveDelegate, qint64 ceilTime)
+QnCompressedVideoDataPtr getNextArchiveVideoPacket(
+    QnAbstractArchiveDelegate* archiveDelegate, qint64 ceilTimeUs)
 {
     QnCompressedVideoDataPtr video;
     for (int i = 0; i < 20 && !video; ++i)
@@ -38,8 +37,8 @@ QnCompressedVideoDataPtr getNextArchiveVideoPacket(QnAbstractArchiveDelegate* ar
         video = std::dynamic_pointer_cast<QnCompressedVideoData>(media);
     }
 
-    // if ceilTime specified try frame with time > requested time (round time to ceil)
-    if (ceilTime != (qint64)AV_NOPTS_VALUE && video && video->timestamp < ceilTime - 1000ll)
+    // If ceilTime specified try frame with time > requested time (round time to ceil).
+    if (ceilTimeUs != (qint64)AV_NOPTS_VALUE && video && video->timestamp < ceilTimeUs - 1000ll)
     {
         for (int i = 0; i < kMaxGopLen; ++i)
         {
@@ -54,6 +53,8 @@ QnCompressedVideoDataPtr getNextArchiveVideoPacket(QnAbstractArchiveDelegate* ar
 
     return video;
 }
+
+} // namespace
 
 QSize QnGetImageHelper::updateDstSize(
     const QnVirtualCameraResourcePtr& camera,
@@ -105,7 +106,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::readFrame(
     bool& isOpened)
 {
     const auto& resource = request.camera;
-    qint64 timestampUs = request.msecSinceEpoch * 1000;
+    qint64 timestampUs = request.usecSinceEpoch;
 
     auto openDelegateIfNeeded =
         [&](std::function<qint64()> positionUs)
@@ -134,7 +135,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::readFrame(
     CLVideoDecoderOutputPtr outFrame(new CLVideoDecoderOutput());
     QnConstCompressedVideoDataPtr video;
     bool isArchiveVideoPacket = false;
-    if (request.msecSinceEpoch == DATETIME_NOW)
+    if (request.usecSinceEpoch == DATETIME_NOW)
     {
         if (camera)
         {
@@ -154,7 +155,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::readFrame(
             NX_VERBOSE(kLogTag) << lm("%1(NOW): Reject: camera missing").arg(__func__);
         }
     }
-    else if (request.msecSinceEpoch == nx::api::ImageRequest::kLatestThumbnail)
+    else if (request.usecSinceEpoch == nx::api::ImageRequest::kLatestThumbnail)
     {
         NX_VERBOSE(kLogTag) << lm("%1(LATEST): Get latest data").args(__func__);
         if (camera)
@@ -201,7 +202,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::readFrame(
         video = getNextArchiveVideoPacket(
             archiveDelegate,
             request.roundMethod == nx::api::ImageRequest::RoundMethod::iFrameAfter
-                ? request.msecSinceEpoch
+                ? request.usecSinceEpoch
                 : AV_NOPTS_VALUE);
         if (video)
             NX_VERBOSE(kLogTag) << lm("%1(%2 us): Got from archive").args(__func__, timestampUs);
@@ -225,7 +226,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::readFrame(
     {
         if (resource->getStatus() == Qn::Online
             || resource->getStatus() == Qn::Recording
-            || request.msecSinceEpoch != DATETIME_NOW)
+            || request.usecSinceEpoch != DATETIME_NOW)
         {
             gotFrame = decoder.decode(video, &outFrame);
             if (!gotFrame)
@@ -299,7 +300,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameFromLiveCache(
 CLVideoDecoderOutputPtr QnGetImageHelper::getImage(const nx::api::CameraImageRequest& request)
 {
     NX_VERBOSE(kLogTag) << lm("%1(%2 us, roundMethod: %3, size: %4) BEGIN")
-        .args(__func__, request.msecSinceEpoch * 1000, request.roundMethod, request.size);
+        .args(__func__, request.usecSinceEpoch, request.roundMethod, request.size);
 
     if (!request.camera)
     {
@@ -406,7 +407,7 @@ std::unique_ptr<QnConstDataPacketQueue> QnGetImageHelper::getLiveCacheGopTillTim
                     .args(__func__, pFrameTimestampUs, pFrameData);
                 continue;
             }
-           
+
             NX_VERBOSE(kLogTag) << lm("%1(): P-frame found: %2 us").args(__func__, pFrameTimestampUs);
             frames->push(pFrame);
         }
@@ -490,10 +491,8 @@ QByteArray QnGetImageHelper::encodeImage(const CLVideoDecoderOutputPtr& outFrame
 CLVideoDecoderOutputPtr QnGetImageHelper::getImageWithCertainQuality(
     bool usePrimaryStream, const nx::api::CameraImageRequest& request)
 {
-    const qint64 timestampUs = request.msecSinceEpoch * 1000;
-
     NX_VERBOSE(kLogTag) << lm("%1(%2, %3 us, roundMethod: %4) BEGIN").args(__func__,
-        usePrimaryStream ? "primary" : "secondary", timestampUs, request.roundMethod);
+        usePrimaryStream ? "primary" : "secondary", request.usecSinceEpoch, request.roundMethod);
 
     const auto camera = request.camera;
 
@@ -601,7 +600,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameSequence(
     {
         auto frame = std::dynamic_pointer_cast<const QnCompressedVideoData>(randomAccess.at(i));
         gotFrame = decoder.decode(frame, &outFrame);
-        
+
         NX_VERBOSE(kLogTag) << lm("%1(): Decoded: gotFrame: %2, frame->timestamp: %3, timestampUs: %4")
             .args(__func__, gotFrame ? "true" : "false", frame->timestamp, timestampUs);
         if (frame->timestamp >= (qint64) timestampUs)

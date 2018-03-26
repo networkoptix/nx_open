@@ -129,8 +129,7 @@ QVariant EventSearchListModel::Private::data(const QModelIndex& index, int role,
                 return QVariant();
             /*fallthrough*/
         case Qn::TimestampRole:
-            return QVariant::fromValue(std::chrono::duration_cast<std::chrono::milliseconds>(
-                std::chrono::microseconds(event.eventParams.eventTimestampUsec)).count());
+            return QVariant::fromValue(event.eventParams.eventTimestampUsec);
 
         case Qn::ResourceRole:
             return hasPreview(event.eventParams.eventType)

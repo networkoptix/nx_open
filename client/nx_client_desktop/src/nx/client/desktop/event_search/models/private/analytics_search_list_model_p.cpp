@@ -194,7 +194,7 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
 
         case Qn::TimestampRole:
         case Qn::PreviewTimeRole:
-            return startTimeMs(object);
+            return object.firstAppearanceTimeUsec;
 
         case Qn::DurationRole:
         {
@@ -668,15 +668,14 @@ QString AnalyticsSearchListModel::Private::description(
         return QString();
 
     const auto timeWatcher = q->context()->instance<QnWorkbenchServerTimeWatcher>();
-    const auto timestampMs = startTimeMs(object);
-    const auto start = timeWatcher->displayTime(timestampMs);
+    const auto start = timeWatcher->displayTime(startTimeMs(object));
     // TODO: #vkutin Is this duration formula good enough for us?
     //   Or we need to add some "lastAppearanceDurationUsec"?
     const auto durationUs = object.lastAppearanceTimeUsec - object.firstAppearanceTimeUsec;
 
     using namespace std::chrono;
-    return lit("Timestamp: %1 ms<br>%2<br>Duration: %3 ms<br>%4")
-        .arg(timestampMs)
+    return lit("Timestamp: %1 us<br>%2<br>Duration: %3 ms<br>%4")
+        .arg(object.firstAppearanceTimeUsec)
         .arg(start.toString(Qt::RFC2822Date))
         .arg(duration_cast<milliseconds>(microseconds(durationUs)).count())
         .arg(object.objectId.toSimpleString());

@@ -1,5 +1,7 @@
 #include "bookmark_search_list_model_p.h"
 
+#include <chrono>
+
 #include <QtGui/QPalette>
 #include <QtGui/QPixmap>
 
@@ -90,7 +92,10 @@ QVariant BookmarkSearchListModel::Private::data(const QModelIndex& index, int ro
 
         case Qn::TimestampRole:
         case Qn::PreviewTimeRole:
-            return QVariant::fromValue(bookmark.startTimeMs);
+        {
+            using namespace std::chrono;
+            return QVariant::fromValue(microseconds(milliseconds(bookmark.startTimeMs)).count());
+        }
 
         case Qn::DurationRole:
             return QVariant::fromValue(bookmark.durationMs);

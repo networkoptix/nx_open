@@ -1,5 +1,7 @@
 #include "active_camera_thumbnail_loader_p.h"
 
+#include <chrono>
+
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <api/server_rest_connection.h>
@@ -76,8 +78,10 @@ void QnActiveCameraThumbnailLoaderPrivate::refresh(bool force)
     if (!server)
         return;
 
+    using namespace std::chrono;
+
     request.camera = camera;
-    request.msecSinceEpoch = position;
+    request.usecSinceEpoch = microseconds(milliseconds(position)).count();
     request.size = currentSize();
 
     const auto handleReply =

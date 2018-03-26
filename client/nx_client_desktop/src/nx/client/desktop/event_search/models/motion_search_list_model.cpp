@@ -61,7 +61,10 @@ QVariant MotionSearchListModel::data(const QModelIndex& index, int role) const
 
         case Qn::TimestampRole:
         case Qn::PreviewTimeRole:
-            return QVariant::fromValue(d->period(index.row()).startTimeMs);
+        {
+            return QVariant::fromValue(std::chrono::microseconds(std::chrono::milliseconds(
+                d->period(index.row()).startTimeMs)).count());
+        }
 
         case Qn::DurationRole:
             return QVariant::fromValue(d->period(index.row()).durationMs);

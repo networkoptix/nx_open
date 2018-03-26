@@ -289,7 +289,7 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
     if (!camera)
         return;
 
-    const auto previewTimeMs = index.data(Qn::PreviewTimeRole).value<qint64>();
+    const auto previewTimeUs = index.data(Qn::PreviewTimeRole).value<qint64>();
     const auto previewCropRect = index.data(Qn::ItemZoomRectRole).value<QRectF>();
     const auto thumbnailWidth = previewCropRect.isEmpty()
         ? kDefaultThumbnailWidth
@@ -297,7 +297,8 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
 
     api::CameraImageRequest request;
     request.camera = camera;
-    request.msecSinceEpoch = previewTimeMs > 0 ? previewTimeMs : nx::api::ImageRequest::kLatestThumbnail;
+    request.usecSinceEpoch =
+        previewTimeUs > 0 ? previewTimeUs : nx::api::ImageRequest::kLatestThumbnail;
     request.rotation = nx::api::ImageRequest::kDefaultRotation;
     request.size = QSize(thumbnailWidth, 0);
     request.imageFormat = nx::api::ImageRequest::ThumbnailFormat::jpg;
