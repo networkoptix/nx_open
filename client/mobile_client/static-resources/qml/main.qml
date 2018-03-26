@@ -26,8 +26,6 @@ ApplicationWindow
     visible: true
     color: ColorTheme.windowBackground
 
-    modality: Qt.WindowModal
-
     overlay.background: Rectangle
     {
         color: ColorTheme.transparent(ColorTheme.base5, 0.4)
