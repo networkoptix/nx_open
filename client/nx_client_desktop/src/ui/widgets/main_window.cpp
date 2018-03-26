@@ -183,7 +183,6 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
 
     /* Set up properties. */
     setWindowTitle(QString());
-//    setWindowFlags(windowFlags() | Qt::Tool);
 
     /* Initialize animations manager. */
     context->instance<workbench::Animations>();
