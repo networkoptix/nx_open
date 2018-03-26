@@ -238,6 +238,7 @@ State::ImageControlSettings calculateImageControlSettings(
 
 State CameraSettingsDialogStateReducer::applyChanges(State state)
 {
+    NX_EXPECT(!state.readOnly);
     state.hasChanges = false;
     return state;
 }

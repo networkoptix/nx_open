@@ -99,7 +99,8 @@ struct CameraSettingsDialog::Private
     bool hasChanges() const
     {
         return !cameras.empty()
-            && store->state().hasChanges;
+            && store->state().hasChanges
+            && !store->state().readOnly;
     }
 
     void applyChanges()
