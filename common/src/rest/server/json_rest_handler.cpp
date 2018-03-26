@@ -88,34 +88,31 @@ int QnJsonRestHandler::executeGet(
     const QString& path, const QnRequestParams& params, QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
-    auto response = executePost(JsonRestRequest(path, params, owner), QByteArray());
-    result = std::move(response.json);
-    return (int) response.statusCode;
+    // Default behavior: if request is not implemented in heir - it is bad request
+    return static_cast<int>(nx::network::http::StatusCode::badRequest);
 }
 
 int QnJsonRestHandler::executeDelete(
     const QString& /*path*/, const QnRequestParams& /*params*/, QnJsonRestResult& /*result*/,
     const QnRestConnectionProcessor* /*owner*/)
 {
-    return (int) nx::network::http::StatusCode::notImplemented;
+    return static_cast<int>(nx::network::http::StatusCode::notImplemented);
 }
 
 int QnJsonRestHandler::executePost(
     const QString& path, const QnRequestParams& params, const QByteArray& /*body*/,
     QnJsonRestResult& result, const QnRestConnectionProcessor* owner)
 {
-    auto response = executeGet(JsonRestRequest(path, params, owner));
-    result = std::move(response.json);
-    return (int) response.statusCode;
+    // Default behavior: if request is not implemented in heir - it is bad request
+    return static_cast<int>(nx::network::http::StatusCode::badRequest);
 }
 
 int QnJsonRestHandler::executePut(
     const QString& path, const QnRequestParams& params, const QByteArray& body,
     QnJsonRestResult& result, const QnRestConnectionProcessor* owner)
 {
-    auto response = executePost(JsonRestRequest(path, params, owner), body);
-    result = std::move(response.json);
-    return (int) response.statusCode;
+    // Default behavior: if request is not implemented in heir - it is bad request
+    return static_cast<int>(nx::network::http::StatusCode::badRequest);
 }
 
 RestResponse QnJsonRestHandler::executeGet(const RestRequest& request)

@@ -11,15 +11,6 @@
 #include <media_server_process.h>
 #include <rest/helpers/permissions_helper.h>
 
-int QnRestoreStateRestHandler::executeGet(
-    const QString& /*path*/,
-    const QnRequestParams& params,
-    QnJsonRestResult& result,
-    const QnRestConnectionProcessor* owner)
-{
-    return execute(std::move(PasswordData(params)), owner, result);
-}
-
 int QnRestoreStateRestHandler::executePost(
     const QString& /*path*/,
     const QnRequestParams& /*params*/,
