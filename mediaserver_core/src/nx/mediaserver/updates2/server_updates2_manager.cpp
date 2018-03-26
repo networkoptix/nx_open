@@ -46,7 +46,7 @@ qint64 ServerUpdates2Manager::refreshTimeout() const
     return settingsValue == 0 ? kRefreshTimeoutMs : settingsValue;
 }
 
-vms::common::p2p::downloader::AbstractDownloader* ServerUpdates2Manager::downloader()
+AbstractDownloader* ServerUpdates2Manager::downloader()
 {
     return qnServerModule->findInstance<vms::common::p2p::downloader::Downloader>();
 }
