@@ -132,7 +132,7 @@ void MessageBus::printTran(
         directionName = lm("<---");
     }
 
-    NX_DEBUG(
+    NX_VERBOSE(
         this,
         lit("%1 tran:\t %2 %3 %4. Command: %5. Seq=%6. Created by %7")
         .arg(msgName)
@@ -362,7 +362,7 @@ void MessageBus::printPeersMessage()
             .arg(minDistance);
     }
 
-    NX_DEBUG(
+    NX_VERBOSE(
         this,
         lit("Peer %1 records:\n%3")
         .arg(qnStaticCommon->moduleDisplayName(localPeer().id))
@@ -384,7 +384,7 @@ void MessageBus::printSubscribeMessage(
             .arg(sequences[index++]);
     }
 
-    NX_DEBUG(
+    NX_VERBOSE(
         this,
         lit("Subscribe:\t %1 ---> %2:\n%3")
         .arg(qnStaticCommon->moduleDisplayName(localPeer().id))
@@ -446,7 +446,7 @@ void MessageBus::sendAlivePeersMessage(const P2pConnectionPtr& connection)
         {
             connectionContext->localPeersMessage = data;
             connectionContext->localPeersTimer.restart();
-            if (nx::utils::log::isToBeLogged(cl_logDEBUG1, this))
+            if (nx::utils::log::isToBeLogged(cl_logDEBUG2, this))
                 printPeersMessage();
             connection->sendMessage(data);
         }
@@ -502,7 +502,7 @@ void MessageBus::resubscribePeers(
             NX_ASSERT(newValue.contains(connection->remotePeer()));
             auto sequences = m_db->transactionLog()->getTransactionsState(newValue);
 
-            if (nx::utils::log::isToBeLogged(cl_logDEBUG1, this))
+            if (nx::utils::log::isToBeLogged(cl_logDEBUG2, this))
                 printSubscribeMessage(connection->remotePeer().id, newValue, sequences);
 
             QVector<SubscribeRecord> request;
@@ -705,7 +705,7 @@ void MessageBus::doSubscribe(const QMap<ApiPersistentIdData, P2pConnectionPtr>& 
             auto connection = findBestConnectionToSubscribe(viaList, tmpNewSubscription);
             if (subscribedVia)
             {
-                NX_DEBUG(
+                NX_VERBOSE(
                     this,
                     lit("Peer %1 is changing subscription to %2. subscribed via %3. new subscribe via %4")
                     .arg(qnStaticCommon->moduleDisplayName(localPeer.id))
@@ -881,14 +881,14 @@ void MessageBus::at_gotMessage(
 
     if (connection->state() == Connection::State::Error)
         return; //< Connection has been closed
-    if (nx::utils::log::isToBeLogged(cl_logDEBUG1, this) &&
+    if (nx::utils::log::isToBeLogged(cl_logDEBUG2, this) &&
         messageType != MessageType::pushTransactionData &&
         messageType != MessageType::pushTransactionList)
     {
         auto localPeerName = qnStaticCommon->moduleDisplayName(commonModule()->moduleGUID());
         auto remotePeerName = qnStaticCommon->moduleDisplayName(connection->remotePeer().id);
 
-        NX_DEBUG(
+        NX_VERBOSE(
             this,
             lit("Got message:\t %1 <--- %2. Type: %3. Size=%4")
             .arg(localPeerName)
@@ -1100,7 +1100,7 @@ struct SendTransactionToTransportFastFuction
     {
         if (connection->userAccessData().userId != Qn::kSystemAccess.userId)
         {
-            NX_VERBOSE(
+            NX_DEBUG(
                 this,
                 lit("Permission check failed while sending SERIALIZED transaction to peer %1")
                 .arg(connection->remotePeer().id.toString()));
@@ -1206,7 +1206,7 @@ bool MessageBus::selectAndSendTransactions(
     context(connection)->sendDataInProgress = !isFinished;
     context(connection)->remoteSubscription = newSubscription;
 
-    if (nx::utils::log::isToBeLogged(cl_logDEBUG1, this))
+    if (nx::utils::log::isToBeLogged(cl_logDEBUG2, this))
     {
         for (const auto& serializedTran: serializedTransactions)
         {
@@ -1300,7 +1300,7 @@ void MessageBus::gotTransaction(
     //NX_ASSERT(connection->localPeerSubscribedTo(peerId)); //< loop
     //NX_ASSERT(!context(connection)->isRemotePeerSubscribedTo(peerId)); //< loop
 
-    if (nx::utils::log::isToBeLogged(cl_logDEBUG1, this))
+    if (nx::utils::log::isToBeLogged(cl_logDEBUG2, this))
         printTran(connection, tran, Connection::Direction::incoming);
 
     updateOfflineDistance(connection, peerId, tran.persistentInfo.sequence);
@@ -1371,7 +1371,7 @@ void MessageBus::gotTransaction(
     const P2pConnectionPtr& connection,
     const TransportHeader& transportHeader)
 {
-    if (nx::utils::log::isToBeLogged(cl_logDEBUG1, this))
+    if (nx::utils::log::isToBeLogged(cl_logDEBUG2, this))
         printTran(connection, tran, Connection::Direction::incoming);
 
     ApiPersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
@@ -1449,7 +1449,7 @@ void MessageBus::gotUnicastTransaction(
     const P2pConnectionPtr& connection,
     const TransportHeader& header)
 {
-    if (nx::utils::log::isToBeLogged(cl_logDEBUG1, this))
+    if (nx::utils::log::isToBeLogged(cl_logDEBUG2, this))
         printTran(connection, tran, Connection::Direction::incoming);
 
     std::set<QnUuid> unprocessedPeers;

@@ -13,7 +13,7 @@ class AbstractWebPageNotificationManager : public QObject
     Q_OBJECT
 public:
 signals:
-    void addedOrUpdated(const ec2::ApiWebPageData &webpage, NotificationSource source);
+    void addedOrUpdated(const ec2::ApiWebPageData &webpage, ec2::NotificationSource source);
     void removed(const QnUuid &id);
 };
 

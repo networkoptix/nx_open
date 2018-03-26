@@ -83,6 +83,8 @@ public:
     static AVSampleFormat fromQtAudioFormatToFfmpegSampleType(const QnAudioFormat& format);
     static AVCodecID fromQtAudioFormatToFfmpegPcmCodec(const QnAudioFormat& format);
 
+
+    static int getDefaultFrameSize(AVCodecContext* context);
 private:
     static void copyMediaContextFieldsToAvCodecContext(
         AVCodecContext* av, const QnConstMediaContextPtr& media);

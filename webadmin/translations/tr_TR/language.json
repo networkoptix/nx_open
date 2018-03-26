@@ -112,7 +112,7 @@
         "timeSynchronizationEnabled": "Zaman senkronizasyonu etkin",
         "updateNotificationsEnabled": "Güncelleştirme bildirimleri etkin",
         "upnpPortMappingEnabled": "UPNP bağlantı noktası eşlemesi etkinleştirildi",
-        "useTextEmailFormat": "Send plain-text emails"
+        "useTextEmailFormat": "Düz metin e-postaları gönder"
     },
     "info": {
         "tabs": {

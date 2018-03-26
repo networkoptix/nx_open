@@ -13,7 +13,8 @@ FULLVERSION=@release.version@.@buildNumber@
 MINORVERSION=@parsedVersion.majorVersion@.@parsedVersion.minorVersion@
 ARCHITECTURE=@os.arch@
 
-COMPILER=@CMAKE_CXX_COMPILER@
+COMPILER="@CMAKE_CXX_COMPILER@"
+CFLAGS="@CMAKE_C_FLAGS@"
 SOURCE_ROOT_PATH="@root.dir@"
 TARGET=/opt/$COMPANY_NAME/client/$FULLVERSION
 USRTARGET=/usr
@@ -58,7 +59,7 @@ LOG_FILE="$LOGS_DIR/client-build-dist.log"
 # [in] Destination directory
 cp_sys_lib()
 {
-    "$SOURCE_ROOT_PATH"/build_utils/copy_system_library.sh -c "$COMPILER" "$@"
+    "$SOURCE_ROOT_PATH"/build_utils/copy_system_library.sh -c "$COMPILER" -f "$CFLAGS" "$@"
 }
 
 buildDistribution()

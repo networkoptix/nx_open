@@ -14,7 +14,7 @@ class AbstractLayoutNotificationManager : public QObject
 public:
 
 signals:
-    void addedOrUpdated(const ec2::ApiLayoutData& layout, NotificationSource source);
+    void addedOrUpdated(const ec2::ApiLayoutData& layout, ec2::NotificationSource source);
     void removed(const QnUuid& id);
 };
 

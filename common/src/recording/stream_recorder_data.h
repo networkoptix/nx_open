@@ -7,8 +7,7 @@ struct AVFormatContext;
 enum class StreamRecorderRole
 {
     serverRecording,
-    fileExport,
-    fileExportWithEmptyContext
+    fileExport
 };
 
 enum class StreamRecorderError

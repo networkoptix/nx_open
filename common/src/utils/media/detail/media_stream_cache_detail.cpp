@@ -246,6 +246,8 @@ QnAbstractDataPacketPtr MediaStreamCache::findByTimestamp(
         if( findKeyFrameOnly && !it->isKeyFrame )
         {
             //searching for I-frame
+            if( it == m_packetsByTimestamp.cbegin() )
+                return QnAbstractDataPacketPtr();
             --it;
             continue;
         }
