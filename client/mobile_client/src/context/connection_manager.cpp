@@ -74,7 +74,7 @@ public:
     void suspend();
     void resume();
 
-    bool doConnect();
+    bool doConnect(bool restoringConnection);
     void doDisconnect();
     void tryResotreConnection();
 
@@ -84,7 +84,14 @@ public:
 
     void setSystemName(const QString& systemName);
 
+    void updateRestoringConnectionValue();
+    void setRestoringConnectionFlag(bool value);
+    bool connectToServerInternal(const nx::utils::Url& url, bool restoringConnection);
+
 public:
+    QTimer setRestoringConnectionTimer;
+    bool restoringConnectionFlag;
+
     nx::utils::Url url;
     QScopedPointer<nx::client::core::ReconnectHelper> reconnectHelper;
     QString systemName;
@@ -115,22 +122,28 @@ QnConnectionManager::QnConnectionManager(QObject* parent):
                 d->setSystemName(systemName);
         });
 
-    connect(qnClientMessageProcessor, &QnMobileClientMessageProcessor::initialResourcesReceived,
-        d,
-        [d]()
+    connect(qnClientMessageProcessor, &QnMobileClientMessageProcessor::initialResourcesReceived, d,
+        [this, d]()
         {
             d->wasConnected = true;
             d->updateConnectionState();
+            d->updateRestoringConnectionValue();
         });
     connect(qnClientMessageProcessor->connectionStatus(), &QnClientConnectionStatus::stateChanged,
         d, &QnConnectionManagerPrivate::updateConnectionState);
     connect(qnClientMessageProcessor, &QnClientMessageProcessor::connectionClosed,
         d, &QnConnectionManagerPrivate::tryResotreConnection);
+    connect(this, &QnConnectionManager::connectionStateChanged,
+        d, &QnConnectionManagerPrivate::updateRestoringConnectionValue);
 
-    connect(this, &QnConnectionManager::currentUrlChanged, this, &QnConnectionManager::currentHostChanged);
-    connect(this, &QnConnectionManager::currentUrlChanged, this, &QnConnectionManager::currentLoginChanged);
-    connect(this, &QnConnectionManager::currentUrlChanged, this, &QnConnectionManager::currentPasswordChanged);
-    connect(this, &QnConnectionManager::connectionStateChanged, this, &QnConnectionManager::isOnlineChanged);
+    connect(this, &QnConnectionManager::currentUrlChanged,
+        this, &QnConnectionManager::currentHostChanged);
+    connect(this, &QnConnectionManager::currentUrlChanged,
+        this, &QnConnectionManager::currentLoginChanged);
+    connect(this, &QnConnectionManager::currentUrlChanged,
+        this, &QnConnectionManager::currentPasswordChanged);
+    connect(this, &QnConnectionManager::connectionStateChanged,
+        this, &QnConnectionManager::isOnlineChanged);
 }
 
 QnConnectionManager::~QnConnectionManager()
@@ -196,19 +209,16 @@ QnSoftwareVersion QnConnectionManager::connectionVersion() const
     return d->connectionVersion;
 }
 
+bool QnConnectionManager::restoringConnection() const
+{
+    Q_D(const QnConnectionManager);
+    return d->restoringConnectionFlag;
+}
+
 bool QnConnectionManager::connectToServer(const nx::utils::Url& url)
 {
     Q_D(QnConnectionManager);
-
-    if (connectionState() != QnConnectionManager::Disconnected)
-        disconnectFromServer();
-
-    nx::utils::Url actualUrl = url;
-    if (actualUrl.port() == -1)
-        actualUrl.setPort(defaultServerPort());
-    actualUrl.setUserName(actualUrl.userName().toLower());
-    d->setUrl(actualUrl);
-    return d->doConnect();
+    return d->connectToServerInternal(url, false);
 }
 
 bool QnConnectionManager::connectToServer(
@@ -255,6 +265,7 @@ void QnConnectionManager::disconnectFromServer()
         return;
 
     d->wasConnected = false;
+    restoringConnection();
     d->doDisconnect();
 
     d->setUrl(nx::utils::Url());
@@ -276,6 +287,12 @@ QnConnectionManagerPrivate::QnConnectionManagerPrivate(QnConnectionManager* pare
 
     connect(suspendTimer, &QTimer::timeout, this, &QnConnectionManagerPrivate::suspend);
     connect(qApp, &QGuiApplication::applicationStateChanged, this, &QnConnectionManagerPrivate::at_applicationStateChanged);
+
+    static constexpr int kDelayMs = 20 * 1000;
+    setRestoringConnectionTimer.setSingleShot(true);
+    setRestoringConnectionTimer.setInterval(kDelayMs);
+    connect(&setRestoringConnectionTimer, &QTimer::timeout,
+        this, [this](){ setRestoringConnectionFlag(true); });
 }
 
 void QnConnectionManagerPrivate::at_applicationStateChanged(Qt::ApplicationState state)
@@ -313,10 +330,10 @@ void QnConnectionManagerPrivate::resume()
 
     suspended = false;
 
-    doConnect();
+    doConnect(false);
 }
 
-bool QnConnectionManagerPrivate::doConnect()
+bool QnConnectionManagerPrivate::doConnect(bool restoringConnection)
 {
     NX_LOG(lm("doConnect() BEGIN: url: %1").arg(url.toString()), cl_logDEBUG1);
     if (!url.isValid() || url.host().isEmpty())
@@ -349,7 +366,7 @@ bool QnConnectionManagerPrivate::doConnect()
     }
 
     connect(result, &QnEc2ConnectionRequestResult::replyProcessed, this,
-        [this, result, connectUrl]()
+        [this, result, connectUrl, restoringConnection]()
         {
             result->deleteLater();
 
@@ -384,13 +401,18 @@ bool QnConnectionManagerPrivate::doConnect()
             if (status != Qn::SuccessConnectionResult)
             {
                 updateConnectionState();
-                emit q->connectionFailed(status, infoParameter);
+                if (restoringConnection)
+                    tryResotreConnection();
+                else
+                    emit q->connectionFailed(status, infoParameter);
+
                 NX_LOG(lm("doConnect() END: Bad status"), cl_logDEBUG1);
                 return;
             }
 
-            const auto ec2Connection = result->connection();
+            reconnectHelper.reset();
 
+            const auto ec2Connection = result->connection();
             QnAppServerConnectionFactory::setEc2Connection(ec2Connection);
 
             qnMobileClientMessageProcessor->init(ec2Connection);
@@ -437,12 +459,15 @@ bool QnConnectionManagerPrivate::doConnect()
                 qnClientCoreSettings->save();
             }
 
-            LastConnectionData connectionData{
-                connectionInfo.systemName,
-                url.cleanUrl(),
-                QnEncodedCredentials(url)};
-            qnSettings->setLastUsedConnection(connectionData);
-            qnSettings->save();
+            if (!restoringConnection)
+            {
+                LastConnectionData connectionData{
+                    connectionInfo.systemName,
+                    url.cleanUrl(),
+                    QnEncodedCredentials(url)};
+                qnSettings->setLastUsedConnection(connectionData);
+                qnSettings->save();
+            }
 
             connectionVersion = connectionInfo.version;
             emit q->connectionVersionChanged();
@@ -457,23 +482,28 @@ void QnConnectionManagerPrivate::tryResotreConnection()
     if (!wasConnected)
         return;
 
+    if (connectionState == QnConnectionManager::Connecting
+        || connectionState == QnConnectionManager::Ready)
+    {
+        return;
+    }
+
     if (!reconnectHelper)
         reconnectHelper.reset(new nx::client::core::ReconnectHelper());
 
-    // We don't check if we have at least one server for reconnection.
-    // We suppose we want to keep waiting for offline server until user disconnects manually.
+    if (reconnectHelper->servers().size() <= 1)
+        return; // We are already reconnecting.
 
     reconnectHelper->next();
     const auto currentUrl = reconnectHelper->currentUrl();
     if (currentUrl.isValid())
     {
-        Q_Q(QnConnectionManager);
-        q->connectToServer(currentUrl);
+        connectToServerInternal(currentUrl, true);
         return;
     }
 
     static constexpr auto kReconnectDelayMs = 3000;
-    const auto callReconnect = [this]{ tryResotreConnection(); };
+    const auto callReconnect = [this] { tryResotreConnection(); };
     executeDelayedParented(callReconnect, kReconnectDelayMs, reconnectHelper.data());
 }
 
@@ -555,4 +585,52 @@ void QnConnectionManagerPrivate::setSystemName(const QString& systemName)
 
     this->systemName = systemName;
     emit q->systemNameChanged(systemName);
+}
+
+void QnConnectionManagerPrivate::setRestoringConnectionFlag(bool value)
+{
+    if (restoringConnectionFlag == value)
+        return;
+
+    restoringConnectionFlag = value;
+
+    Q_Q(QnConnectionManager);
+    emit q->restoringConnectionChanged();
+}
+
+void QnConnectionManagerPrivate::updateRestoringConnectionValue()
+{
+    const bool restoring = wasConnected
+        && (connectionState == QnConnectionManager::Connecting
+            || connectionState == QnConnectionManager::Disconnected
+            || connectionState == QnConnectionManager::Reconnecting);
+
+    if (restoring)
+    {
+        setRestoringConnectionTimer.start();
+        return;
+    }
+
+    setRestoringConnectionFlag(false);
+    setRestoringConnectionTimer.stop();
+}
+
+bool QnConnectionManagerPrivate::connectToServerInternal(
+    const nx::utils::Url& url,
+    bool restoringConnection)
+{
+    Q_Q(QnConnectionManager);
+    if (!restoringConnection)
+    {
+        setRestoringConnectionTimer.stop();
+        if (connectionState != QnConnectionManager::Disconnected)
+            q->disconnectFromServer();
+    }
+
+    nx::utils::Url actualUrl = url;
+    if (actualUrl.port() == -1)
+        actualUrl.setPort(q->defaultServerPort());
+    actualUrl.setUserName(actualUrl.userName().toLower());
+    setUrl(actualUrl);
+    return doConnect(restoringConnection);
 }

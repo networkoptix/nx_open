@@ -15,7 +15,6 @@ Page
 
     leftButtonIcon: lp("/images/menu.png")
     onLeftButtonClicked: sideNavigation.open()
-    warningText: qsTr("Server offline")
     sideNavigationEnabled: !searchToolBar.visible
 
     titleControls:
@@ -24,7 +23,7 @@ Page
         {
             icon: lp("/images/search.png")
             enabled: d.enabled
-            opacity: !warningVisible ? 1.0 : 0.2
+            opacity: !connectionManager.restoringConnection ? 1.0 : 0.2
             onClicked:
             {
                 sideNavigation.close()
@@ -53,34 +52,8 @@ Page
     {
         id: d
 
-        readonly property bool serverOffline:
-            connectionManager.connectionState === QnConnectionManager.Reconnecting
-        readonly property bool enabled: !warningVisible && !loadingDummy.visible
-
-        onServerOfflineChanged:
-        {
-            if (serverOffline)
-            {
-                offlineWarningDelay.restart()
-            }
-            else
-            {
-                warningVisible = false
-                offlineWarningDelay.stop()
-            }
-        }
-    }
-
-    Timer
-    {
-        id: offlineWarningDelay
-
-        interval: 20 * 1000
-        onTriggered:
-        {
-            searchToolBar.close()
-            warningVisible = true
-        }
+        readonly property bool enabled: !connectionManager.restoringConnection
+            && !loadingDummy.visible
     }
 
     SearchToolBar
@@ -108,7 +81,7 @@ Page
 
         layoutId: uiController.layoutId
 
-        keepStatuses: !resourcesScreen.warningVisible
+        keepStatuses: !connectionManager.restoringConnection
             && connectionManager.connectionState !== QnConnectionManager.Ready
 
         active: activePage
@@ -187,7 +160,7 @@ Page
         color: ColorTheme.transparent(ColorTheme.base5, 0.8)
 
         Behavior on opacity { NumberAnimation { duration: 200 } }
-        opacity: warningVisible ? 1.0 : 0.0
+        opacity: connectionManager.restoringConnection ? 1.0 : 0.0
         visible: opacity > 0
     }
 
@@ -199,7 +172,7 @@ Page
         color: ColorTheme.windowBackground
         Behavior on opacity { NumberAnimation { duration: 200 } }
         visible: opacity > 0
-        opacity: connectionManager.online ? 0.0 : 1.0
+        opacity: connectionManager.online || connectionManager.restoringConnection ? 0.0 : 1.0
 
         Column
         {

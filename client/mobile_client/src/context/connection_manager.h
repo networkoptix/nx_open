@@ -24,7 +24,7 @@ class QnConnectionManager: public QObject, public QnConnectionContextAware
     Q_PROPERTY(QString currentHost READ currentHost NOTIFY currentHostChanged)
     Q_PROPERTY(QString currentLogin READ currentLogin NOTIFY currentLoginChanged)
     Q_PROPERTY(QString currentPassword READ currentPassword NOTIFY currentPasswordChanged)
-
+    Q_PROPERTY(bool restoringConnection READ restoringConnection NOTIFY restoringConnectionChanged)
     Q_ENUM(Qn::ConnectionResult)
 
 public:
@@ -67,6 +67,8 @@ public:
 
     QnSoftwareVersion connectionVersion() const;
 
+    bool restoringConnection() const;
+
 signals:
     void connectionFailed(Qn::ConnectionResult status, const QVariant &infoParameter);
     void systemNameChanged(const QString &systemName);
@@ -80,6 +82,7 @@ signals:
     void connectionTypeChanged();
 
     void connectionVersionChanged();
+    void restoringConnectionChanged();
 
 public slots:
     bool connectToServer(const nx::utils::Url& url);
