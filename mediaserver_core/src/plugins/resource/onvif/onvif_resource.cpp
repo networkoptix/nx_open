@@ -3948,7 +3948,7 @@ void QnPlOnvifResource::updateVideoEncoder(
         bool forcedAR = resourceData.value<bool>(QString("forceArFromPrimaryStream"), false);
         if (forcedAR && params.resolution.height() > 0)
         {
-            qreal ar = params.resolution.width() / (qreal)params.resolution.height();
+            QnAspectRatio ar(params.resolution.width(), params.resolution.height());
             setCustomAspectRatio(ar);
         }
 
@@ -3956,7 +3956,7 @@ void QnPlOnvifResource::updateVideoEncoder(
         QStringList parts = defaultAR.split(L'x');
         if (parts.size() == 2)
         {
-            qreal ar = parts[0].toFloat() / parts[1].toFloat();
+            QnAspectRatio ar(parts[0].toInt(), parts[1].toInt());
             setCustomAspectRatio(ar);
         }
         saveParams();

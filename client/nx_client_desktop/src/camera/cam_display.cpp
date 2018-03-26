@@ -2058,14 +2058,14 @@ bool QnCamDisplay::isBuffering() const
     return m_resource->toResource()->getStatus() == Qn::Online || m_resource->toResource()->getStatus() == Qn::Recording;
 }
 
-qreal QnCamDisplay::overridenAspectRatio() const
+QnAspectRatio QnCamDisplay::overridenAspectRatio() const
 {
     if (m_display[0])
         return m_display[0]->overridenAspectRatio();
-    return 0.0;
+    return QnAspectRatio();
 }
 
-void QnCamDisplay::setOverridenAspectRatio(qreal aspectRatio)
+void QnCamDisplay::setOverridenAspectRatio(QnAspectRatio aspectRatio)
 {
     for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i)
         m_display[i]->setOverridenAspectRatio(aspectRatio);

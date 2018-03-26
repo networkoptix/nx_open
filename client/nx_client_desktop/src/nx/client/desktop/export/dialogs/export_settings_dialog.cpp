@@ -580,9 +580,7 @@ void ExportSettingsDialog::setMediaParams(
     const auto customAr = mediaResource->customAspectRatio();
 
     nx::core::transcoding::Settings settings;
-    settings.aspectRatio = qFuzzyIsNull(customAr)
-        ? QnAspectRatio()
-        : QnAspectRatio::closestStandardRatio(customAr);
+    settings.aspectRatio = mediaResource->customAspectRatio();
     settings.enhancement = itemData.contrastParams;
     settings.dewarping = itemData.dewarpingParams;
     settings.zoomWindow = itemData.zoomRect;

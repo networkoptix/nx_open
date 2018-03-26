@@ -1,5 +1,5 @@
-#include "image_control_widget.h"
-#include "ui_image_control_widget.h"
+#include "legacy_image_control_widget.h"
+#include "ui_legacy_image_control_widget.h"
 
 #include <core/resource/camera_resource.h>
 
@@ -9,6 +9,7 @@
 #include <ui/help/help_topics.h>
 
 #include <ui/workaround/widgets_signals_workaround.h>
+#include <nx/utils/algorithm/same.h>
 
 namespace {
 
@@ -26,10 +27,10 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-ImageControlWidget::ImageControlWidget(QWidget *parent)
+LegacyImageControlWidget::LegacyImageControlWidget(QWidget *parent)
     : QWidget(parent)
     , QnUpdatable()
-    , ui(new Ui::ImageControlWidget)
+    , ui(new Ui::LegacyImageControlWidget)
     , m_readOnly(false)
 {
     ui->setupUi(this);
@@ -57,19 +58,19 @@ ImageControlWidget::ImageControlWidget(QWidget *parent)
     m_aligner->addWidgets({ui->rotationLabel, ui->aspectRatioLabel});
 }
 
-ImageControlWidget::~ImageControlWidget()
+LegacyImageControlWidget::~LegacyImageControlWidget()
 {
 }
 
-QnAligner* ImageControlWidget::aligner() const
+QnAligner* LegacyImageControlWidget::aligner() const
 {
     return m_aligner;
 }
 
-void ImageControlWidget::updateFromResources(
+void LegacyImageControlWidget::updateFromResources(
         const QnVirtualCameraResourceList &cameras)
 {
-    QnUpdatableGuard<ImageControlWidget> guard(this);
+    QnUpdatableGuard<LegacyImageControlWidget> guard(this);
     bool allCamerasHaveVideo = true;
     bool hasWearable = false;
     for (const auto& camera: cameras)
@@ -87,7 +88,7 @@ void ImageControlWidget::updateFromResources(
     updateRotationFromResources(cameras);
 }
 
-void ImageControlWidget::submitToResources(
+void LegacyImageControlWidget::submitToResources(
         const QnVirtualCameraResourceList &cameras)
 {
     if (m_readOnly)
@@ -113,7 +114,7 @@ void ImageControlWidget::submitToResources(
         if (overrideAspectRatio)
         {
             if (aspectRatio.isValid())
-                camera->setCustomAspectRatio(aspectRatio.toFloat());
+                camera->setCustomAspectRatio(aspectRatio);
             else
                 camera->clearCustomAspectRatio();
         }
@@ -123,12 +124,12 @@ void ImageControlWidget::submitToResources(
     }
 }
 
-bool ImageControlWidget::isReadOnly() const
+bool LegacyImageControlWidget::isReadOnly() const
 {
     return m_readOnly;
 }
 
-void ImageControlWidget::setReadOnly(bool readOnly)
+void LegacyImageControlWidget::setReadOnly(bool readOnly)
 {
     if (m_readOnly == readOnly)
         return;
@@ -141,19 +142,18 @@ void ImageControlWidget::setReadOnly(bool readOnly)
 }
 
 
-void ImageControlWidget::updateAspectRatioFromResources(
+void LegacyImageControlWidget::updateAspectRatioFromResources(
         const QnVirtualCameraResourceList &cameras)
 {
-    qreal aspectRatio = cameras.empty() ? 0 : cameras.first()->customAspectRatio();
-    bool sameAspectRatio = std::all_of(cameras.cbegin(), cameras.cend(),
-        [aspectRatio](const QnVirtualCameraResourcePtr &camera)
+    QnAspectRatio aspectRatio;
+    const bool sameAspectRatio = utils::algorithm::same(cameras.cbegin(), cameras.cend(),
+        [](const QnVirtualCameraResourcePtr &camera)
         {
-            return qFuzzyEquals(camera->customAspectRatio(), aspectRatio);
-        }
-    );
+            return camera->customAspectRatio();
+        },
+        &aspectRatio);
 
     ui->aspectRatioComboBox->clear();
-
     ui->aspectRatioComboBox->addItem(
             tr("Auto"), QVariant::fromValue(QnAspectRatio()));
     for (const QnAspectRatio &aspectRatio: QnAspectRatio::standardRatios())
@@ -168,14 +168,13 @@ void ImageControlWidget::updateAspectRatioFromResources(
 
     if (sameAspectRatio)
     {
-        if (qFuzzyIsNull(aspectRatio))
+        if (!aspectRatio.isValid())
         {
             ui->aspectRatioComboBox->setCurrentIndex(0);
         }
         else
         {
-            QnAspectRatio closest = QnAspectRatio::closestStandardRatio(aspectRatio);
-            int index = ui->aspectRatioComboBox->findData(QVariant::fromValue(closest));
+            int index = ui->aspectRatioComboBox->findData(QVariant::fromValue(aspectRatio));
             if (index != -1)
                 ui->aspectRatioComboBox->setCurrentIndex(index);
         }
@@ -187,7 +186,7 @@ void ImageControlWidget::updateAspectRatioFromResources(
     }
 }
 
-void ImageControlWidget::updateRotationFromResources(
+void LegacyImageControlWidget::updateRotationFromResources(
         const QnVirtualCameraResourceList &cameras)
 {
     QString rotationString = cameras.isEmpty()

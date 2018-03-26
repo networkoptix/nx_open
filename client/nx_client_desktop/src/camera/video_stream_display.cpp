@@ -50,8 +50,7 @@ QnVideoStreamDisplay::QnVideoStreamDisplay(bool canDownscale, int channelNumber)
     m_prevSrcWidth(0),
     m_prevSrcHeight(0),
     m_lastIgnoreTime(AV_NOPTS_VALUE),
-    m_isPaused(false),
-    m_overridenAspectRatio(0.0)
+    m_isPaused(false)
 {
     for (int i = 0; i < kMaxFrameQueueSize; ++i)
         m_frameQueue[i] = QSharedPointer<CLVideoDecoderOutput>( new CLVideoDecoderOutput() );
@@ -380,13 +379,13 @@ void QnVideoStreamDisplay::updateRenderList()
 
 void QnVideoStreamDisplay::calcSampleAR(QSharedPointer<CLVideoDecoderOutput> outFrame, QnAbstractVideoDecoder* dec)
 {
-    if (qFuzzyIsNull(m_overridenAspectRatio))
+    if (!m_overridenAspectRatio.isValid())
     {
         outFrame->sample_aspect_ratio = dec->getSampleAspectRatio();
     }
     else {
         qreal realAR = outFrame->height > 0 ? (qreal) outFrame->width / (qreal) outFrame->height : 1.0;
-        outFrame->sample_aspect_ratio = m_overridenAspectRatio / realAR;
+        outFrame->sample_aspect_ratio = m_overridenAspectRatio.toFloat() / realAR;
     }
 }
 
@@ -596,14 +595,16 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
     m_mtx.unlock();
     m_rawDataSize = QSize(decodeToFrame->width,decodeToFrame->height);
     if (decodeToFrame->width) {
-        if (qFuzzyIsNull(m_overridenAspectRatio)) {
+        if (!m_overridenAspectRatio.isValid())
+        {
             //qreal sampleAr = decodeToFrame->height > 0 ? (qreal)decodeToFrame->width / (qreal)decodeToFrame->height : 1.0;
             QSize imageSize(decodeToFrame->width * dec->getSampleAspectRatio(), decodeToFrame->height);
             QnMutexLocker lock( &m_imageSizeMtx );
             m_imageSize = imageSize;
         }
         else {
-            QSize imageSize(decodeToFrame->height*m_overridenAspectRatio, decodeToFrame->height);
+            QSize imageSize(decodeToFrame->height*m_overridenAspectRatio.toFloat(),
+                decodeToFrame->height);
             QnMutexLocker lock( &m_imageSizeMtx );
             m_imageSize = imageSize;
         }
@@ -817,11 +818,11 @@ bool QnVideoStreamDisplay::selfSyncUsed() const
     return m_bufferedFrameDisplayer;
 }
 
-qreal QnVideoStreamDisplay::overridenAspectRatio() const {
+QnAspectRatio QnVideoStreamDisplay::overridenAspectRatio() const {
     return m_overridenAspectRatio;
 }
 
-void QnVideoStreamDisplay::setOverridenAspectRatio(qreal aspectRatio) {
+void QnVideoStreamDisplay::setOverridenAspectRatio(QnAspectRatio aspectRatio) {
     m_overridenAspectRatio = aspectRatio;
 }
 

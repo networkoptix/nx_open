@@ -129,6 +129,18 @@ void CameraSettingsDialogStore::setMaxRecordingDaysValue(int value)
         [&](State state) { return Reducer::setMaxRecordingDaysValue(std::move(state), value); });
 }
 
+void CameraSettingsDialogStore::setCustomAspectRatio(const QnAspectRatio& value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setCustomAspectRatio(std::move(state), value); });
+}
+
+void CameraSettingsDialogStore::setCustomRotation(const Rotation& value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setCustomRotation(std::move(state), value); });
+}
+
 } // namespace desktop
 } // namespace client
 } // namespace nx

@@ -641,12 +641,10 @@ QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnConstAbst
     else
         rotation = res->getProperty(QnMediaResource::rotationKey()).toInt();
 
-    qreal customAR = getResource()->customAspectRatio();
-
     QnLegacyTranscodingSettings extraTranscodeParams;
     extraTranscodeParams.resource = getResource();
     extraTranscodeParams.rotation = rotation;
-    extraTranscodeParams.forcedAspectRatio = customAR;
+    extraTranscodeParams.forcedAspectRatio = getResource()->customAspectRatio();
 
     switch (dstCodec)
     {

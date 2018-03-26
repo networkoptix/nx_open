@@ -6,10 +6,13 @@
 
 #include <core/resource/resource_fwd.h>
 
+class QnAspectRatio;
+
 namespace nx {
 namespace client {
 namespace desktop {
 
+class Rotation;
 struct CameraSettingsDialogState;
 
 class CameraSettingsDialogStore: public QObject
@@ -39,6 +42,8 @@ public:
     void setMinRecordingDaysValue(int value);
     void setMaxRecordingDaysAutomatic(bool value);
     void setMaxRecordingDaysValue(int value);
+    void setCustomAspectRatio(const QnAspectRatio& value);
+    void setCustomRotation(const Rotation& value);
 
 signals:
     void stateChanged(const CameraSettingsDialogState& state);

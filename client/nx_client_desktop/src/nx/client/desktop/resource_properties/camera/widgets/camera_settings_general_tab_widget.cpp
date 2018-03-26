@@ -1,7 +1,7 @@
 #include "camera_settings_general_tab_widget.h"
 #include "ui_camera_settings_general_tab_widget.h"
 
-#include "redux/camera_settings_dialog_store.h"
+#include "../redux/camera_settings_dialog_store.h"
 
 namespace nx {
 namespace client {
@@ -16,6 +16,7 @@ CameraSettingsGeneralTabWidget::CameraSettingsGeneralTabWidget(
 {
     ui->setupUi(this);
     ui->cameraInfoWidget->setStore(store);
+    ui->imageControlWidget->setStore(store);
 
     connect(store, &CameraSettingsDialogStore::stateChanged, this,
         &CameraSettingsGeneralTabWidget::loadState);

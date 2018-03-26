@@ -605,9 +605,8 @@ void QnProgressiveDownloadingConsumer::run()
                 rotation = decodedUrlQuery.queryItemValue("rotation").toInt();
             else
                 rotation = mediaRes->toResource()->getProperty(QnMediaResource::rotationKey()).toInt();
-            qreal customAR = mediaRes->customAspectRatio();
             extraParams.rotation = rotation;
-            extraParams.forcedAspectRatio = customAR;
+            extraParams.forcedAspectRatio = mediaRes->customAspectRatio();
 
             d->transcoder.setTranscodingSettings(extraParams);
             d->transcoder.setStartTimeOffset(100 * 1000); // droid client has issue if enumerate timings from 0

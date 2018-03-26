@@ -71,7 +71,7 @@ MultipleCameraSettingsWidget::MultipleCameraSettingsWidget(QWidget *parent):
             ui->cameraScheduleWidget->setScheduleEnabled(ui->licensingWidget->state() == Qt::Checked);
         });
 
-    connect(ui->imageControlWidget, &ImageControlWidget::changed, this,
+    connect(ui->imageControlWidget, &LegacyImageControlWidget::changed, this,
         &MultipleCameraSettingsWidget::at_dbDataChanged);
     connect(ui->expertSettingsWidget, &CameraExpertSettingsWidget::dataChanged, this,
         &MultipleCameraSettingsWidget::at_dbDataChanged);

@@ -922,10 +922,9 @@ qreal QnMediaResourceWidget::calculateVideoAspectRatio() const
             return aspect.toFloat();
     }
 
-    /* Here we get 0.0 if no custom aspect ratio set. */
-    qreal result = resource()->customAspectRatio();
-    if (!qFuzzyIsNull(result))
-        return result;
+    auto result = resource()->customAspectRatio();
+    if (result.isValid())
+        return result.toFloat();
 
     if (const auto& camera = resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>())
     {

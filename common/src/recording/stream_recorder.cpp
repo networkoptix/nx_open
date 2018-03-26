@@ -781,7 +781,8 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
         {
             context.metadata.videoLayoutSize = layout->size();
             context.metadata.videoLayoutChannels = layout->getChannels();
-            context.metadata.overridenAr = mediaDev->customAspectRatio();
+            if (mediaDev->customAspectRatio().isValid())
+                context.metadata.overridenAr = mediaDev->customAspectRatio().toFloat();
         }
 
         if (isUtcOffsetAllowed())

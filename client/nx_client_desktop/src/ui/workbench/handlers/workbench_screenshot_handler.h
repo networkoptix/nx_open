@@ -17,6 +17,7 @@
 #include <nx/client/desktop/image_providers/image_provider.h>
 #include <utils/color_space/image_correction.h>
 #include <utils/common/connective.h>
+#include <utils/common/aspect_ratio.h>
 
 class QPainter;
 class QnProgressDialog;
@@ -35,7 +36,7 @@ struct QnScreenshotParameters
     QnItemDewarpingParams itemDewarpingParams;
     ImageCorrectionParams imageCorrectionParams;
     QRectF zoomRect;
-    qreal customAspectRatio = 0;
+    QnAspectRatio customAspectRatio;
     qreal rotationAngle = 0;
 
     QString timeString() const;

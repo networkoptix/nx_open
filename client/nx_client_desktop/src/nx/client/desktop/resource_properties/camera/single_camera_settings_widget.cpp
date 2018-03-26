@@ -181,7 +181,7 @@ SingleCameraSettingsWidget::SingleCameraSettingsWidget(QWidget *parent) :
     connect(ui->fisheyeSettingsWidget, &FisheyeSettingsWidget::dataChanged,
         this, &SingleCameraSettingsWidget::at_fisheyeSettingsChanged);
 
-    connect(ui->imageControlWidget, &ImageControlWidget::changed,
+    connect(ui->imageControlWidget, &LegacyImageControlWidget::changed,
         this, &SingleCameraSettingsWidget::at_dbDataChanged);
 
     connect(ui->ioPortSettingsWidget, &IoPortSettingsWidget::dataChanged,

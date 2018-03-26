@@ -673,9 +673,9 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
     {
         if (QnMediaResourcePtr mediaRes = resList[0].dynamicCast<QnMediaResource>())
         {
-            qreal customAspectRatio = mediaRes->customAspectRatio();
-            if (!qFuzzyIsNull(customAspectRatio))
-                desiredCellAspectRatio = customAspectRatio;
+            const auto customAspectRatio = mediaRes->customAspectRatio();
+            if (customAspectRatio.isValid())
+                desiredCellAspectRatio = customAspectRatio.toFloat();
         }
     }
 

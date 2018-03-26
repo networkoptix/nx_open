@@ -8,15 +8,14 @@
 #include <utils/common/updatable.h>
 
 class QnAligner;
-namespace Ui {
-class ImageControlWidget;
-}
+
+namespace Ui { class LegacyImageControlWidget; }
 
 namespace nx {
 namespace client {
 namespace desktop {
 
-class ImageControlWidget: public QWidget, public QnUpdatable
+class LegacyImageControlWidget: public QWidget, public QnUpdatable
 {
     Q_OBJECT
     Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
@@ -24,8 +23,8 @@ class ImageControlWidget: public QWidget, public QnUpdatable
     using base_type = QWidget;
 
 public:
-    ImageControlWidget(QWidget *parent = nullptr);
-    virtual ~ImageControlWidget();
+    LegacyImageControlWidget(QWidget *parent = nullptr);
+    virtual ~LegacyImageControlWidget();
 
     QnAligner* aligner() const;
 
@@ -43,7 +42,7 @@ signals:
     void changed();
 
 private:
-    QScopedPointer<Ui::ImageControlWidget> ui;
+    QScopedPointer<Ui::LegacyImageControlWidget> ui;
     QnAligner* m_aligner = nullptr;
     bool m_readOnly;
 };

@@ -17,7 +17,7 @@
 #include <utils/common/html.h>
 
 #include "camera_settings_tab.h"
-#include "camera_settings_general_tab_widget.h"
+#include "widgets/camera_settings_general_tab_widget.h"
 #include "widgets/camera_schedule_widget.h"
 
 #include "redux/camera_settings_dialog_state.h"
@@ -65,6 +65,36 @@ struct CameraSettingsDialog::Private
             camera->setMaxDays(actualValue);
     }
 
+    void setCustomRotation(const Rotation& value)
+    {
+        for (const auto& camera: cameras)
+        {
+            NX_EXPECT(camera->hasVideo());
+            if (camera->hasVideo())
+            {
+                if (value.isValid())
+                    camera->setProperty(QnMediaResource::rotationKey(), value.toString());
+                else
+                    camera->setProperty(QnMediaResource::rotationKey(), QString());
+            }
+        }
+    }
+
+    void setCustomAspectRatio(const QnAspectRatio& value)
+    {
+        for (const auto& camera: cameras)
+        {
+            NX_EXPECT(camera->hasVideo() && !camera->hasFlags(Qn::wearable_camera));
+            if (camera->hasVideo() && !camera->hasFlags(Qn::wearable_camera))
+            {
+                if (value.isValid())
+                    camera->setCustomAspectRatio(value);
+                else
+                    camera->clearCustomAspectRatio();
+            }
+        }
+    }
+
     bool hasChanges() const
     {
         return !cameras.empty()
@@ -81,6 +111,12 @@ struct CameraSettingsDialog::Private
         }
         setMinRecordingDays(state.recording.minDays);
         setMaxRecordingDays(state.recording.maxDays);
+
+        if (state.imageControl.aspectRatio.hasValue())
+            setCustomAspectRatio(state.imageControl.aspectRatio());
+
+        if (state.imageControl.rotation.hasValue())
+            setCustomRotation(state.imageControl.rotation());
     }
 
     void resetChanges()

@@ -5,7 +5,10 @@
 #include <core/resource/media_stream_capability.h>
 #include <nx_ec/data/api_camera_attributes_data.h>
 
+#include <nx/client/desktop/common/data/rotation.h>
+
 #include <nx/utils/std/optional.h>
+#include <utils/common/aspect_ratio.h>
 
 namespace nx {
 namespace client {
@@ -26,6 +29,24 @@ private:
     std::optional<T> m_user;
 };
 
+template<class T>
+struct UserEditableMultiple
+{
+    bool hasValue() const { return m_user.has_value() || m_base.has_value(); }
+    T get() const { return m_user.value_or(m_base.value()); }
+    void setUser(T value) { m_user = value; }
+    void setBase(T value) {m_base = value;}
+    void resetUser() { m_user.reset(); }
+    void resetBase() { m_base.reset(); }
+
+    T operator()() const { return get(); }
+
+private:
+    std::optional<T> m_base;
+    std::optional<T> m_user;
+};
+
+
 struct CameraSettingsDialogState
 {
     CameraSettingsDialogState() = default;
@@ -33,6 +54,7 @@ struct CameraSettingsDialogState
     CameraSettingsDialogState(CameraSettingsDialogState&& other) = default;
     CameraSettingsDialogState& operator=(const CameraSettingsDialogState&) = delete;
     CameraSettingsDialogState& operator=(CameraSettingsDialogState&&) = default;
+    ~CameraSettingsDialogState() = default;
 
     bool hasChanges = false;
 
@@ -111,8 +133,16 @@ struct CameraSettingsDialogState
         }
 
     };
-
     RecordingSettings recording;
+
+    struct ImageControlSettings
+    {
+        bool aspectRatioAvailable = true;
+        UserEditableMultiple<QnAspectRatio> aspectRatio;
+        bool rotationAvailable = true;
+        UserEditableMultiple<Rotation> rotation;
+    };
+    ImageControlSettings imageControl;
 
     // Helper methods.
 

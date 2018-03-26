@@ -242,11 +242,11 @@ void QnWorkbenchScreenshotHandler::takeDebugScreenshotsSet(QnMediaResourceWidget
         formats << lit(".jpg");
     count *= formats.size();
 
-    typedef QPair<QString, float> ar_type;
+    typedef QPair<QString, QnAspectRatio> ar_type;
     QList<ar_type> ars;
-    ars << ar_type(QString(), 0.0);
+    ars << ar_type(QString(), QnAspectRatio());
     for (const QnAspectRatio &ar: QnAspectRatio::standardRatios())
-        ars << ar_type(ar.toString(lit("_%1x%2")), ar.toFloat());
+        ars << ar_type(ar.toString(lit("_%1x%2")), ar);
     count*= ars.size();
 
     QList<int> rotations;
@@ -613,7 +613,7 @@ void QnWorkbenchScreenshotHandler::takeScreenshot(QnMediaResourceWidget *widget,
         localParameters.imageCorrectionParams.enabled = false;
         localParameters.itemDewarpingParams.enabled = false;
         localParameters.zoomRect = QRectF();
-        localParameters.customAspectRatio = 0.0;
+        localParameters.customAspectRatio = QnAspectRatio();
         localParameters.rotationAngle = 0;
     } else {
         QnVirtualCameraResourcePtr camera = widget->resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>();

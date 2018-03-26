@@ -4,6 +4,7 @@
 #include <core/resource/resource_display_info.h>
 #include <camera/fps_calculator.h>
 #include <utils/camera/camera_bitrate_calculator.h>
+#include <nx/utils/algorithm/same.h>
 
 namespace nx {
 namespace client {
@@ -190,6 +191,49 @@ State::RecordingDays calculateMaxRecordingDays(const QnVirtualCameraResourceList
     return {calcMaxDays(maxDays), isAuto, sameMaxDays};
 }
 
+State::ImageControlSettings calculateImageControlSettings(
+    const QnVirtualCameraResourceList& cameras)
+{
+    const bool hasVideo = std::all_of(cameras.cbegin(), cameras.cend(),
+        [](const auto& camera) { return camera->hasVideo(); });
+
+    State::ImageControlSettings result;
+    result.aspectRatioAvailable = hasVideo;
+
+    if (result.aspectRatioAvailable)
+    {
+        QnAspectRatio value;
+        if (utils::algorithm::same(cameras.cbegin(), cameras.cend(),
+            [](const auto& camera) { return camera->customAspectRatio(); },
+            &value))
+        {
+            result.aspectRatio.setBase(value);
+        }
+    }
+
+    result.rotationAvailable = hasVideo && std::all_of(cameras.cbegin(), cameras.cend(),
+        [](const auto& camera) { return !camera->hasFlags(Qn::wearable_camera); });
+
+    if (result.rotationAvailable)
+    {
+        Rotation value;
+        if (utils::algorithm::same(cameras.cbegin(), cameras.cend(),
+            [](const auto& camera)
+            {
+                QString rotationString = camera->getProperty(QnMediaResource::rotationKey());
+                return rotationString.isEmpty()
+                    ? Rotation()
+                    : Rotation::closestStandardRotation(rotationString.toInt());
+            },
+            &value))
+        {
+            result.rotation.setBase(value);
+        }
+    }
+
+    return result;
+}
+
 } // namespace
 
 State CameraSettingsDialogStateReducer::applyChanges(State state)
@@ -207,7 +251,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
         : cameras.first();
 
     state.hasChanges = false;
-    state.singleCameraSettings = CameraSettingsDialogState::SingleCameraSettings();
+    state.singleCameraSettings = {};
     state.recording = {};
     state.devicesCount = cameras.size();
 
@@ -245,6 +289,8 @@ State CameraSettingsDialogStateReducer::loadCameras(
 
     state.recording.minDays = calculateMinRecordingDays(cameras);
     state.recording.maxDays = calculateMaxRecordingDays(cameras);
+
+    state.imageControl = calculateImageControlSettings(cameras);
 
     return state;
 }
@@ -341,6 +387,7 @@ State CameraSettingsDialogStateReducer::setCustomRecordingBitrateNormalized(
 
 State CameraSettingsDialogStateReducer::setMinRecordingDaysAutomatic(State state, bool value)
 {
+    state.hasChanges = true;
     state.recording.minDays.same = true;
     state.recording.minDays.automatic = value;
     return state;
@@ -349,12 +396,14 @@ State CameraSettingsDialogStateReducer::setMinRecordingDaysAutomatic(State state
 State CameraSettingsDialogStateReducer::setMinRecordingDaysValue(State state, int value)
 {
     NX_EXPECT(state.recording.minDays.same && !state.recording.minDays.automatic);
+    state.hasChanges = true;
     state.recording.minDays.absoluteValue = value;
     return state;
 }
 
 State CameraSettingsDialogStateReducer::setMaxRecordingDaysAutomatic(State state, bool value)
 {
+    state.hasChanges = true;
     state.recording.maxDays.same = true;
     state.recording.maxDays.automatic = value;
     return state;
@@ -363,7 +412,26 @@ State CameraSettingsDialogStateReducer::setMaxRecordingDaysAutomatic(State state
 State CameraSettingsDialogStateReducer::setMaxRecordingDaysValue(State state, int value)
 {
     NX_EXPECT(state.recording.maxDays.same && !state.recording.maxDays.automatic);
+    state.hasChanges = true;
     state.recording.maxDays.absoluteValue = value;
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setCustomAspectRatio(
+    State state,
+    const QnAspectRatio& value)
+{
+    NX_EXPECT(state.imageControl.aspectRatioAvailable);
+    state.hasChanges = true;
+    state.imageControl.aspectRatio.setUser(value);
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setCustomRotation(State state, const Rotation& value)
+{
+    NX_EXPECT(state.imageControl.rotationAvailable);
+    state.hasChanges = true;
+    state.imageControl.rotation.setUser(value);
     return state;
 }
 

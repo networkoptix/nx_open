@@ -553,9 +553,9 @@ void QnGLRenderer::drawYV12VideoTexture(
     if (m_fisheyeController && m_fisheyeController->mediaDewarpingParams().enabled && m_fisheyeController->itemDewarpingParams().enabled)
     {
         ar = picLock->width()/(float)picLock->height();
-        float customAR = m_fisheyeController->customAR();
-        if (!qFuzzyIsNull(customAR))
-            ar = customAR;
+        auto customAR = m_fisheyeController->customAR();
+        if (customAR.isValid())
+            ar = customAR.toFloat();
         //m_fisheyeController->tick();
         mediaParams = m_fisheyeController->mediaDewarpingParams();
         itemParams = m_fisheyeController->itemDewarpingParams();

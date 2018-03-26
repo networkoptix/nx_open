@@ -197,11 +197,10 @@ QnAspectRatio QnVirtualCameraResource::aspectRatio() const
 {
     using nx::vms::common::core::resource::SensorDescription;
 
-    qreal customAr = customAspectRatio();
-    const bool autoAr = qFuzzyIsNull(customAr);
+    const auto customAr = customAspectRatio();
 
-    if (!autoAr)
-        return QnAspectRatio::closestStandardRatio(static_cast<float>(customAr));
+    if (customAr.isValid())
+        return customAr;
 
     // The rest of the code deals with auto aspect ratio.
     // Aspect ration should be forced to AS of the first stream. Note: primary stream AR could be

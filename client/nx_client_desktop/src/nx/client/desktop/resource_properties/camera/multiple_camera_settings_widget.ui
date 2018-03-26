@@ -79,7 +79,7 @@
         </widget>
        </item>
        <item>
-        <widget class="nx::client::desktop::ImageControlWidget" name="imageControlWidget" native="true"/>
+        <widget class="nx::client::desktop::LegacyImageControlWidget" name="imageControlWidget" native="true"/>
        </item>
        <item>
         <widget class="QnLicensesProposeWidget" name="licensingWidget" native="true"/>
@@ -173,9 +173,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>nx::client::desktop::ImageControlWidget</class>
+   <class>nx::client::desktop::LegacyImageControlWidget</class>
    <extends>QWidget</extends>
-   <header location="global">nx/client/desktop/resource_properties/camera/image_control_widget.h</header>
+   <header location="global">nx/client/desktop/resource_properties/camera/legacy_image_control_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

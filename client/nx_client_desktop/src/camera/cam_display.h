@@ -119,8 +119,8 @@ public:
     int getAvarageFps() const;
     virtual bool isBuffering() const override;
 
-    qreal overridenAspectRatio() const;
-    void setOverridenAspectRatio(qreal aspectRatio);
+    QnAspectRatio overridenAspectRatio() const;
+    void setOverridenAspectRatio(QnAspectRatio aspectRatio);
 
     const QSize& getRawDataSize() const {
         return m_display[0]->getRawDataSize();

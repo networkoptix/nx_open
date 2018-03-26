@@ -10,8 +10,8 @@
 #include <ui/style/skin.h>
 #include <ui/common/aligner.h>
 
-#include "redux/camera_settings_dialog_state.h"
-#include "redux/camera_settings_dialog_store.h"
+#include "../redux/camera_settings_dialog_state.h"
+#include "../redux/camera_settings_dialog_store.h"
 
 namespace nx {
 namespace client {
