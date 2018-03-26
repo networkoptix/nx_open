@@ -25,7 +25,7 @@ static constexpr int kRoundFactor = 4;
 } // namespace
 
 
-QnCompressedVideoDataPtr getNextArchiveVideoPacket(QnAbstractArchiveDelegate* archiveDelegate, qint64 ceilTime)
+QnCompressedVideoDataPtr getNextArchiveVideoPacket(QnAbstractArchiveDelegate* archiveDelegate, qint64 ceilTimeUs)
 {
     QnCompressedVideoDataPtr video;
     for (int i = 0; i < 20 && !video; ++i)
@@ -37,7 +37,7 @@ QnCompressedVideoDataPtr getNextArchiveVideoPacket(QnAbstractArchiveDelegate* ar
     }
 
     // if ceilTime specified try frame with time > requested time (round time to ceil)
-    if (ceilTime != (qint64)AV_NOPTS_VALUE && video && video->timestamp < ceilTime - 1000ll)
+    if (ceilTimeUs != (qint64)AV_NOPTS_VALUE && video && video->timestamp < ceilTimeUs - 1000ll)
     {
         for (int i = 0; i < kMaxGopLen; ++i)
         {
@@ -164,7 +164,7 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::readFrame(
         video = getNextArchiveVideoPacket(
             archiveDelegate,
             request.roundMethod == nx::api::ImageRequest::RoundMethod::iFrameAfter
-                ? request.msecSinceEpoch
+                ? request.msecSinceEpoch * 1000LL
                 : AV_NOPTS_VALUE);
         if (!video && camera)
         {
