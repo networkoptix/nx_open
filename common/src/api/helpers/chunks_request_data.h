@@ -4,6 +4,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <utils/common/request_param.h>
+#include <common/common_globals.h>
 
 struct QnChunksRequestData
 {

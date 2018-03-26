@@ -132,6 +132,7 @@ enum LdapVendor
 
 struct DirectoryType
 {
+    virtual ~DirectoryType() = default;
     virtual const QString& UidAttr() const = 0;
     virtual const QString& Filter() const = 0;
     virtual const QString& FullNameAttr() const = 0;
@@ -151,7 +152,7 @@ struct ActiveDirectoryType : DirectoryType
         return attr;
     }
 
-    const QString& FullNameAttr() const
+    const QString& FullNameAttr() const override
     {
         static QString attr(lit("displayName"));
         return attr;
@@ -164,7 +165,7 @@ struct OpenLdapType : DirectoryType
     {
         static QString attr(lit("uid"));
         return attr;
-    };
+    }
 
     const QString& Filter() const override
     {
@@ -172,7 +173,7 @@ struct OpenLdapType : DirectoryType
         return attr;
     }
 
-    const QString& FullNameAttr() const
+    const QString& FullNameAttr() const override
     {
         static QString attr(lit("gecos"));
         return attr;

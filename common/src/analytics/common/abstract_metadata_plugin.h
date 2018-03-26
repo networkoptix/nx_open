@@ -11,8 +11,8 @@ namespace analytics {
 
 class AbstractMetadataPlugin
 {
-
 public:
+    virtual ~AbstractMetadataPlugin() = default;
     virtual QString id() const = 0;
     virtual bool hasMetadata() = 0;
     virtual QnAbstractCompressedMetadataPtr getNextMetadata() = 0;

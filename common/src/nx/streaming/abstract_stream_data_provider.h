@@ -22,6 +22,8 @@ class QnAbstractVideoCamera:
 
 {
 public:
+    virtual ~QnAbstractVideoCamera() = default;
+
     virtual QSharedPointer<QnLiveStreamProvider> getPrimaryReader() = 0;
     virtual QSharedPointer<QnLiveStreamProvider> getSecondaryReader() = 0;
 

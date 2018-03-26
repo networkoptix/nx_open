@@ -53,6 +53,7 @@ def determine_package_versions():
         v["quazip"] = "0.7"
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
+        v["sysroot"] = "1"
 
     if box == "bananapi":
         v["ffmpeg"] = "3.1.1-bananapi"
@@ -95,15 +96,14 @@ def sync_dependencies(syncher):
 
     sync("ffmpeg")
 
+    if box in ("bpi", "bananapi", "rpi", "tx1"):
+        sync("sysroot", path_variable="sysroot_directory")
+
     if box in ("bpi", "bananapi"):
-        sync("sysroot-1")
         sync("opengl-es-mali")
 
     if box == "rpi":
         sync("cifs-utils")
-
-    if box in ("rpi", "tx1"):
-        sync("sysroot")
 
     if platform in ("android", "windows") or box == "bpi":
         sync("openal")

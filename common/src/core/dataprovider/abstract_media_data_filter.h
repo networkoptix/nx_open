@@ -13,6 +13,8 @@
 class AbstractMediaDataFilter
 {
 public:
+    virtual ~AbstractMediaDataFilter() = default;
+
     /**
      * Whether to copy source data or perform in-place processing is up to implementation.
      * @param data Source data.
