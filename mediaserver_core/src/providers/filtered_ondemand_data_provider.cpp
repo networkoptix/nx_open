@@ -2,7 +2,7 @@
 // 20 feb 2012    Andrey Kolesnikov
 ////////////////////////////////////////////////////////////
 
-#include "abstract_media_data_filter.h"
+#include "filtered_ondemand_data_provider.h"
 
 #include <nx/utils/log/assert.h>
 
@@ -11,21 +11,21 @@
 FilteredOnDemandDataProvider::FilteredOnDemandDataProvider(
     const AbstractOnDemandDataProviderPtr& dataSource,
     const AbstractMediaDataFilterPtr& filter)
-:
+    :
     m_dataSource(dataSource),
     m_filter(filter)
 {
-    NX_ASSERT( m_dataSource );
-    connect( dataSource.get(), &AbstractOnDemandDataProvider::dataAvailable,
-             this, [this]( AbstractOnDemandDataProvider* /*pThis*/ ) { emit dataAvailable(this); },
-             Qt::DirectConnection );
+    NX_ASSERT(m_dataSource);
+    connect(dataSource.get(), &AbstractOnDemandDataProvider::dataAvailable,
+        this, [this](AbstractOnDemandDataProvider* /*pThis*/) { emit dataAvailable(this); },
+        Qt::DirectConnection);
 }
 
-bool FilteredOnDemandDataProvider::tryRead(QnAbstractDataPacketPtr* const data )
+bool FilteredOnDemandDataProvider::tryRead(QnAbstractDataPacketPtr* const data)
 {
-    if( !m_dataSource->tryRead( data ) )
+    if (!m_dataSource->tryRead(data))
         return false;
-    if( !data )
+    if (!data)
         return true;
     *data = m_filter->processData(*data);
     return true;

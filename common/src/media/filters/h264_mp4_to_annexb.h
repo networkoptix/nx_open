@@ -18,9 +18,7 @@
 
     If source stream is not h.264 or is already in Annex B format, this class just forwards data from source to the reader
 */
-class H264Mp4ToAnnexB
-:
-    public AbstractMediaDataFilter
+class H264Mp4ToAnnexB: public AbstractMediaDataFilter
 {
 public:
     H264Mp4ToAnnexB();
