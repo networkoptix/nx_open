@@ -9,7 +9,7 @@ function focusCurrentScreen()
 function popCurrentScreen()
 {
     if (stackView.depth > 1)
-        stackView.pop()
+        stackView.pop().destroy()
     stackView.currentItem.forceActiveFocus()
 }
 
@@ -23,26 +23,25 @@ function openSessionsScreen()
     }
     else
     {
-        item = stackView.replace(null, Qt.resolvedUrl("Screens/SessionsScreen.qml"))
-        item.forceActiveFocus()
+        stackView.safeReplace(null, Qt.resolvedUrl("Screens/SessionsScreen.qml"))
     }
 }
 
 function openSessionsScreenWithWarning(systemName)
 {
-    var item = stackView.replace(null, Qt.resolvedUrl("Screens/SessionsScreen.qml"))
+    var item = stackView.safeReplace(null, Qt.resolvedUrl("Screens/SessionsScreen.qml"))
     item.openConnectionWarningDialog(systemName)
 }
 
 function openNewSessionScreen()
 {
-    var item = stackView.push(Qt.resolvedUrl("Screens/CustomConnectionScreen.qml"))
+    var item = stackView.safePush(Qt.resolvedUrl("Screens/CustomConnectionScreen.qml"))
     item.focusHostField()
 }
 
 function openDiscoveredSession(systemId, localSystemId, systemName, address)
 {
-    var item = stackView.push(
+    var item = stackView.safePush(
             Qt.resolvedUrl("Screens/CustomConnectionScreen.qml"),
             {
                 "systemId": systemId,
@@ -56,19 +55,18 @@ function openDiscoveredSession(systemId, localSystemId, systemName, address)
 
 function openSavedSession(systemId, localSystemId, systemName, address, login, password)
 {
-    var item = stackView.push(
-            Qt.resolvedUrl("Screens/CustomConnectionScreen.qml"),
-            {
-                "systemId": systemId,
-                "localSystemId": localSystemId,
-                "systemName": systemName,
-                "address": address,
-                "login": login,
-                "password": password,
-                "saved": true
-            }
+    stackView.safePush(
+        Qt.resolvedUrl("Screens/CustomConnectionScreen.qml"),
+        {
+            "systemId": systemId,
+            "localSystemId": localSystemId,
+            "systemName": systemName,
+            "address": address,
+            "login": login,
+            "password": password,
+            "saved": true
+        }
     )
-    item.forceActiveFocus()
 }
 
 function openResourcesScreen(systemName)
@@ -81,53 +79,49 @@ function openResourcesScreen(systemName)
     }
     else
     {
-        item = stackView.replace(
-                null,
-                Qt.resolvedUrl("Screens/ResourcesScreen.qml"),
-                {
-                    "title": systemName
-                }
+        stackView.safeReplace(
+            null,
+            Qt.resolvedUrl("Screens/ResourcesScreen.qml"),
+            {
+                "title": systemName
+            }
         )
     }
-    item.forceActiveFocus()
 }
 
 function openVideoScreen(resourceId, screenshotUrl, xHint, yHint)
 {
     stackView.setScaleTransitionHint(xHint, yHint)
-    var item = stackView.push(
-            Qt.resolvedUrl("Screens/VideoScreen.qml"),
-            {
-                "resourceId": resourceId,
-                "initialScreenshot": screenshotUrl
-            }
+    var operation = stackView.busy ? Controls.StackView.Immediate : Controls.StackView.Transition
+    var item = stackView.safePush(
+        Qt.resolvedUrl("Screens/VideoScreen.qml"),
+        {
+            "resourceId": resourceId,
+            "initialScreenshot": screenshotUrl
+        },
+        operation
     )
-    item.forceActiveFocus()
     return item
 }
 
 function openSettingsScreen()
 {
-    var item = stackView.push(Qt.resolvedUrl("Screens/SettingsScreen.qml"))
-    item.forceActiveFocus()
+    stackView.safePush(Qt.resolvedUrl("Screens/SettingsScreen.qml"))
 }
 
 function openDeveloperSettingsScreen()
 {
-    var item = stackView.push(Qt.resolvedUrl("Screens/DeveloperSettingsScreen.qml"))
-    item.forceActiveFocus()
+    stackView.safePush(Qt.resolvedUrl("Screens/DeveloperSettingsScreen.qml"))
 }
 
 function openCloudWelcomeScreen()
 {
-    var item = stackView.replace(null, Qt.resolvedUrl("Screens/Cloud/WelcomeScreen.qml"))
-    item.forceActiveFocus()
+    stackView.safeReplace(null, Qt.resolvedUrl("Screens/Cloud/WelcomeScreen.qml"))
 }
 
 function openCloudScreen()
 {
-    var item = stackView.push(Qt.resolvedUrl("Screens/Cloud/CloudScreen.qml"))
-    item.forceActiveFocus()
+    stackView.safePush(Qt.resolvedUrl("Screens/Cloud/CloudScreen.qml"))
 }
 
 function openLiteClientControlScreen(clientId)
@@ -141,7 +135,7 @@ function openLiteClientControlScreen(clientId)
     }
     else
     {
-        item = stackView.replace(
+        stackView.safeReplace(
             null,
             Qt.resolvedUrl("Screens/LiteClientControlScreen.qml"),
             {
@@ -149,7 +143,6 @@ function openLiteClientControlScreen(clientId)
             }
         )
     }
-    item.forceActiveFocus()
 }
 
 function openLiteClientWelcomeScreen()
@@ -162,8 +155,7 @@ function openLiteClientWelcomeScreen()
     }
     else
     {
-        item = stackView.replace(null, Qt.resolvedUrl("Screens/LiteClientWelcomeScreen.qml"))
-        item.forceActiveFocus()
+        stackView.safeReplace(null, Qt.resolvedUrl("Screens/LiteClientWelcomeScreen.qml"))
     }
 }
 
