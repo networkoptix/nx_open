@@ -56,7 +56,7 @@ using namespace nx::sdk::metadata;
 #if 0
     uncompressedFrame = convertToYuv420pSdkFrame(frame, needDeepCopy);
 #else
-    uncompressedFrame = convertToBgraSdkFrame(frame, needDeepCopy);
+    uncompressedFrame = convertToArgbSdkFrame(frame, needDeepCopy);
 #endif
     return uncompressedFrame;
 }
@@ -110,15 +110,16 @@ using namespace nx::sdk::metadata;
     return packet;
 }
 
-/*static*/ nx::sdk::metadata::UncompressedVideoFrame* VideoDataReceptor::convertToBgraSdkFrame(
+/*static*/ nx::sdk::metadata::UncompressedVideoFrame* VideoDataReceptor::convertToArgbSdkFrame(
     CLConstVideoDecoderOutputPtr frame,
     bool needDeepCopy)
 {
     const auto packet = new CommonUncompressedVideoFrame(
         frame->pkt_dts, frame->width, frame->height);
+    packet->setPixelFormat(UncompressedVideoFrame::PixelFormat::argb);
     std::vector<std::vector<char>> data(1);
     std::vector<int> lineSize(1);
-    data[0] = frame->toRgba(&lineSize[0]);
+    data[0] = frame->toArgb(&lineSize[0]);
 
     packet->setOwnedData(std::move(data), std::move(lineSize));
     return packet;

@@ -84,7 +84,7 @@ bool CameraManager::pushUncompressedVideoFrame(const CommonUncompressedVideoFram
 
     m_lastVideoFrameTimestampUsec = videoFrame->timestampUsec();
 
-    if (videoFrame->pixelFormat() == UncompressedVideoFrame::PixelFormat::bgra)
+    if (videoFrame->pixelFormat() == UncompressedVideoFrame::PixelFormat::argb)
         return checkRgbFrame(videoFrame);
 
     if (videoFrame->pixelFormat() == UncompressedVideoFrame::PixelFormat::yuv420)

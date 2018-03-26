@@ -404,7 +404,7 @@ QImage CLVideoDecoderOutput::toImage() const
     return img;
 }
 
-std::vector<char> CLVideoDecoderOutput::toRgba(int* outLineSize) const
+std::vector<char> CLVideoDecoderOutput::toArgb(int* outLineSize) const
 {
     NX_ASSERT(outLineSize);
 
