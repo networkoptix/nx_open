@@ -29,12 +29,8 @@ struct NX_UPDATE_API Updates2StatusDataEx: api::Updates2StatusData
     void clone(const Updates2StatusDataEx& other);
 };
 
-bool operator == (const Updates2StatusDataEx& lhs, const Updates2StatusDataEx& rhs);
-bool operator != (const Updates2StatusDataEx& lhs, const Updates2StatusDataEx& rhs);
-
-
 #define Updates2StatusDataEx_Fields Updates2StatusData_Fields (lastRefreshTime)(files)
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((Updates2StatusDataEx), (json))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((Updates2StatusDataEx), (json)(eq))
 
 } // namespace detail
 } // namespace manager
