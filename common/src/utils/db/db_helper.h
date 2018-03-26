@@ -7,6 +7,7 @@
 
 #include <nx/utils/db/sql_query_execution_helper.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/unused.h>
 #include <nx/utils/uuid.h>
 
 class QSqlDatabase;
