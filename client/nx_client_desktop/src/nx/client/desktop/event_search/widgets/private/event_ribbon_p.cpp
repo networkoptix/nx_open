@@ -336,14 +336,13 @@ void EventRibbon::Private::showContextMenu(EventTile* tile, const QPoint& posRel
 
 void EventRibbon::Private::debugCheckGeometries()
 {
-
 #if 0
 #if defined(_DEBUG)
     int pos = 0;
     for (int i = 0; i < m_tiles.size(); ++i)
     {
-        NX_ASSERT(pos == m_positions[m_tiles[i]]);
         pos += m_currentShifts.value(i);
+        NX_ASSERT(pos == m_positions[m_tiles[i]]);
         pos += m_tiles[i]->height() + kDefaultTileSpacing;
     }
 
@@ -693,42 +692,56 @@ void EventRibbon::Private::doUpdateView()
         return;
     }
 
+    updateCurrentShifts();
+
     const int base = m_scrollBar->isHidden() ? 0 : m_scrollBar->value();
     const int height = m_viewport->height();
 
     const auto secondInView = std::upper_bound(m_tiles.cbegin(), m_tiles.cend(), base,
         [this](int left, EventTile* right) { return left < m_positions.value(right); });
 
-    NX_ASSERT(secondInView != m_tiles.begin());
-    auto iter = secondInView - 1;
+    int firstIndexToUpdate = qMax(0, secondInView - m_tiles.cbegin() - 1);
 
-    int currentPosition = m_positions.value(*iter);
+    if (!m_currentShifts.empty())
+        firstIndexToUpdate = qMin(firstIndexToUpdate, m_currentShifts.begin().key());
+
+    int currentPosition = 0;
+    if (firstIndexToUpdate > 0)
+    {
+        const auto prevTile = m_tiles[firstIndexToUpdate - 1];
+        currentPosition = m_positions.value(prevTile) + prevTile->height() + kDefaultTileSpacing;
+    }
+
     const auto positionLimit = base + height;
-
-    QSet<EventTile*> newVisible;
-
-    updateCurrentShifts();
 
     static constexpr int kWidthThreshold = 400;
     const auto mode = m_viewport->width() > kWidthThreshold
         ? EventTile::Mode::wide
         : EventTile::Mode::standard;
 
+    QSet<EventTile*> newVisible;
+
+    auto iter = m_tiles.cbegin() + firstIndexToUpdate;
     while (iter != m_tiles.end() && currentPosition < positionLimit)
     {
         const auto tile = *iter;
-        m_positions[tile] = currentPosition;
         currentPosition += m_currentShifts.value(iter - m_tiles.cbegin());
+        m_positions[tile] = currentPosition;
         tile->setGeometry(0, currentPosition - base, m_viewport->width(), calculateHeight(tile));
         tile->setMode(mode);
-        tile->setVisible(true);
-        newVisible.insert(tile);
-        currentPosition += tile->height() + kDefaultTileSpacing;
+        const auto bottom = currentPosition + tile->height();
+        currentPosition = bottom + kDefaultTileSpacing;
 
-        if (!tile->isRead() && shouldSetTileRead(tile))
+        if (bottom > 0)
         {
-            tile->setRead(true);
-            m_unread.remove(tile);
+            tile->setVisible(true);
+            newVisible.insert(tile);
+
+            if (!tile->isRead() && shouldSetTileRead(tile))
+            {
+                tile->setRead(true);
+                m_unread.remove(tile);
+            }
         }
 
         ++iter;
@@ -736,8 +749,8 @@ void EventRibbon::Private::doUpdateView()
 
     while (iter != m_tiles.end())
     {
-        m_positions[*iter] = currentPosition;
         currentPosition += m_currentShifts.value(iter - m_tiles.cbegin());
+        m_positions[*iter] = currentPosition;
         currentPosition += (*iter)->height() + kDefaultTileSpacing;
         ++iter;
     }
