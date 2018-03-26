@@ -2130,13 +2130,15 @@ content type "application/json". Example of such object:
                                 <value>
                                     <name>true</name>
                                     <description>
-                                        The current system will get system name and administrator password of the target system.
+                                        The current system will get system name and administrator
+                                        password of the target system.
                                     </description>
                                 </value>
                                 <value>
                                     <name>false</name>
                                     <description>
-                                        The target system will get system name and administrator password of the current system.
+                                        The target system will get system name and administrator
+                                        password of the current system.
                                     </description>
                                 </value>
                             </values>
@@ -2153,13 +2155,16 @@ content type "application/json". Example of such object:
                                 <value>
                                     <name>true</name>
                                     <description>
-                                        The current system will merge with target server only. The target server will be disjoined from another system (if it was joined).
+                                        The current system will merge with target server only. The
+                                        target server will be disjoined from another system (if it
+                                        was joined).
                                     </description>
                                 </value>
                                 <value>
                                     <name>false</name>
                                     <description>
-                                        The current system will merge with target server and all servers which are merged with the target server.
+                                        The current system will merge with target server and all
+                                        servers which are merged with the target server.
                                     </description>
                                 </value>
                             </values>
@@ -2179,7 +2184,8 @@ content type "application/json". Example of such object:
                                 <value>
                                     <name>false</name>
                                     <description>
-                                        If the target server protocol version differs from the current server protocol version merge aborts.
+                                        If the target server protocol version differs from the
+                                        current server protocol version merge aborts.
                                     </description>
                                 </value>
                             </values>
@@ -2203,6 +2209,20 @@ content type "application/json". Example of such object:
                     <params/>
                     <result>
                         <caption>JSON with error code.</caption>
+                    </result>
+                </function>
+                <function>
+                    <name>restoreState</name>
+                    <description>
+                        Restore initial server state, i.e. <b>delete server's database</b>.
+                        No parameters needed.
+                        <br/>Server will restart after executing this command.
+                    </description>
+                    <permissions>Administrator.</permissions>
+                    <method>POST</method>
+                    <params/>
+                    <result>
+                        <caption>JSON with error code: ok or forbidden.</caption>
                     </result>
                 </function>
                 <function>

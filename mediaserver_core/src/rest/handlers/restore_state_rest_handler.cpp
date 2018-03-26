@@ -14,16 +14,14 @@
 int QnRestoreStateRestHandler::executePost(
     const QString& /*path*/,
     const QnRequestParams& /*params*/,
-    const QByteArray& body,
+    const QByteArray& /*body*/,
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
-    PasswordData passwordData = QJson::deserialized<PasswordData>(body);
-    return execute(std::move(passwordData), owner, result);
+    return execute(owner, result);
 }
 
 int QnRestoreStateRestHandler::execute(
-    PasswordData passwordData,
     const QnRestConnectionProcessor* owner,
     QnJsonRestResult &result)
 {
@@ -33,13 +31,6 @@ int QnRestoreStateRestHandler::execute(
         return QnPermissionsHelper::safeModeError(result);
     if (!QnPermissionsHelper::hasOwnerPermissions(owner->resourcePool(), accessRights))
         return QnPermissionsHelper::notOwnerError(result);
-
-    QString errStr;
-    if (!nx::vms::utils::validatePasswordData(passwordData, &errStr))
-    {
-        result.setError(QnJsonRestResult::CantProcessRequest, errStr);
-        return nx::network::http::StatusCode::ok;
-    }
 
     if (QnPermissionsHelper::isSafeMode(owner->commonModule()))
         return QnPermissionsHelper::safeModeError(result);

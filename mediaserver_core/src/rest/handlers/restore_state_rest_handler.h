@@ -32,8 +32,5 @@ private:
         const QByteArray& body,
         const QnRestConnectionProcessor* owner) override;
 
-    int execute(
-        PasswordData passwordData,
-        const QnRestConnectionProcessor* owner,
-        QnJsonRestResult& result);
+    int execute(const QnRestConnectionProcessor* owner, QnJsonRestResult& result);
 };
