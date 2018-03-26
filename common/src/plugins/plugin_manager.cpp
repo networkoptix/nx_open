@@ -174,13 +174,13 @@ bool PluginManager::loadNxPlugin(
     typedef nxpl::PluginInterface* (*EntryProc)();
 
     auto entryProc = (EntryProc) lib.resolve("createNXPluginInstance");
-
     if (entryProc == nullptr)
         entryProc = (EntryProc) lib.resolve("createNxMetadataPlugin");
-
     if (entryProc == nullptr)
     {
-        NX_ERROR(this) << lit("Failed to load %1: no createNXPluginInstance").arg(filePath);
+        NX_ERROR(this) << lit("Failed to load %1: "
+            "neither of createNXPluginInstance nor createNxMetadataPlugin functions found")
+            .arg(filePath);
         lib.unload();
         return false;
     }
@@ -188,7 +188,8 @@ bool PluginManager::loadNxPlugin(
     nxpl::PluginInterface* obj = entryProc();
     if (!obj)
     {
-        NX_ERROR(this) << lit("Failed to load %1: no PluginInterface").arg(filePath);
+        NX_ERROR(this) << lit("Failed to load %1: no PluginInterface function found")
+            .arg(filePath);
         lib.unload();
         return false;
     }
