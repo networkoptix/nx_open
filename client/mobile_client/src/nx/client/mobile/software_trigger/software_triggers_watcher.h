@@ -29,11 +29,11 @@ class SoftwareTriggersWatcher: public QObject, public QnConnectionContextAware
 public:
     enum TriggerField
     {
-        NoField         = 0,
-        EnabledField    = 0x1,
-        ProlongedField  = 0x2,
-        NameField       = 0x4,
-        IconField     = 0x8
+        NoField = 0,
+        EnabledField = 0x1,
+        ProlongedField = 0x2,
+        NameField = 0x4,
+        IconField = 0x8
     };
 
     Q_DECLARE_FLAGS(TriggerFields, TriggerField)

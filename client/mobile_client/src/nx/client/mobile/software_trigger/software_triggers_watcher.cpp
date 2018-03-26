@@ -72,7 +72,7 @@ SoftwareTriggersWatcher::DescriptionPtr SoftwareTriggersWatcher::Description::cr
     return DescriptionPtr(new Description({extractIconPath(rule), name, prolonged, true}));
 }
 
-//
+//-------------------------------------------------------------------------------------------------
 
 SoftwareTriggersWatcher::SoftwareTriggersWatcher(QObject* parent):
     base_type(parent),
@@ -161,7 +161,7 @@ void SoftwareTriggersWatcher::tryRemoveTrigger(const QnUuid& id)
 
 void SoftwareTriggersWatcher::updateTriggers()
 {
-    for(const auto& rule: m_ruleManager->rules())
+    for (const auto& rule: m_ruleManager->rules())
         updateTriggerByRule(rule);
 }
 

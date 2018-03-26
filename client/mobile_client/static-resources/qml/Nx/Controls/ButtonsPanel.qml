@@ -36,7 +36,6 @@ ListView
 
         interval: 30
         onTriggered: showAnimation.restart()
-
     }
 
     PropertyAnimation

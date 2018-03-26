@@ -90,7 +90,7 @@ bool SoftwareTriggersController::activateTrigger(const QnUuid& id)
 bool SoftwareTriggersController::deactivateTrigger()
 {
     if (m_activeTriggerId.isNull())
-        return false; // May be when activation failed.
+        return false; //< May be when activation failed.
 
     const auto rule = m_ruleManager->rule(m_activeTriggerId);
     if (!rule || !rule->isActionProlonged())
@@ -143,9 +143,9 @@ bool SoftwareTriggersController::setTriggerState(QnUuid id, vms::event::EventSta
         [this, state, id](bool success, rest::Handle /*handle*/, const QnJsonRestResult& result)
         {
             if (state == nx::vms::event::EventState::inactive)
-                triggerDeactivated(id);
+                emit triggerDeactivated(id);
             else
-                triggerActivated(id, success && result.error == QnRestResult::NoError);
+                emit triggerActivated(id, success && result.error == QnRestResult::NoError);
         };
 
     const auto connection = m_commonModule->currentServer()->restConnection();

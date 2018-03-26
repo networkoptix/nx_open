@@ -87,37 +87,36 @@ Item
 
         property variant modelDataAccessor: ModelDataAccessor { model: buttonModel }
 
-        property SoftwareTriggersController triggersController:
-            SoftwareTriggersController
+        property SoftwareTriggersController triggersController: SoftwareTriggersController
+        {
+            resourceId: control.resourceId
+
+            onTriggerActivated:
             {
-                resourceId: control.resourceId
+                var index = buttonModel.rowById(id)
+                var text = d.modelDataAccessor.getData(index, "hint")
+                var prolonged = d.modelDataAccessor.getData(index, "allowLongPress")
 
-                onTriggerActivated:
-                {
-                    var index = buttonModel.rowById(id)
-                    var text = d.modelDataAccessor.getData(index, "hint")
-                    var prolonged = d.modelDataAccessor.getData(index, "allowLongPress")
-
-                    if (!success)
-                        hintControl.showFailure(text, prolonged)
-                    else if (!prolonged)
-                        hintControl.showSuccess(text, false)
-                }
-
-                onTriggerDeactivated:
-                {
-                    var index = buttonModel.rowById(id)
-                    var text = d.modelDataAccessor.getData(index, "hint")
-                    var prolonged = d.modelDataAccessor.getData(index, "allowLongPress")
-                    if (prolonged)
-                        hintControl.showSuccess(text, true)
-                }
-
-                onTriggerCancelled:
-                {
-                    hintControl.hide()
-                }
+                if (!success)
+                    hintControl.showFailure(text, prolonged)
+                else if (!prolonged)
+                    hintControl.showSuccess(text, false)
             }
+
+            onTriggerDeactivated:
+            {
+                var index = buttonModel.rowById(id)
+                var text = d.modelDataAccessor.getData(index, "hint")
+                var prolonged = d.modelDataAccessor.getData(index, "allowLongPress")
+                if (prolonged)
+                    hintControl.showSuccess(text, true)
+            }
+
+            onTriggerCancelled:
+            {
+                hintControl.hide()
+            }
+        }
 
         function handleTwoWayAudioPressed(index, pressed)
         {
