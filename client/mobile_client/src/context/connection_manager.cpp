@@ -90,7 +90,7 @@ public:
 
 public:
     QTimer setRestoringConnectionTimer;
-    bool restoringConnectionFlag;
+    bool restoringConnectionFlag = false;
 
     nx::utils::Url url;
     QScopedPointer<nx::client::core::ReconnectHelper> reconnectHelper;
@@ -265,7 +265,6 @@ void QnConnectionManager::disconnectFromServer()
         return;
 
     d->wasConnected = false;
-    restoringConnection();
     d->doDisconnect();
 
     d->setUrl(nx::utils::Url());
@@ -445,22 +444,21 @@ bool QnConnectionManagerPrivate::doConnect(bool restoringConnection)
             updateConnectionState();
             setSystemName(connectionInfo.systemName);
 
-            const auto localId = helpers::getLocalSystemId(connectionInfo);
-
-            using namespace nx::client::core::helpers;
-            if (connectionTypeForUrl(url) != QnConnectionManager::CloudConnection)
-            {
-                const auto credentials = qnSettings->savePasswords()
-                    ? QnEncodedCredentials(url)
-                    : QnEncodedCredentials(url.userName(), QString());
-                storeCredentials(localId, credentials);
-                storeConnection(localId, connectionInfo.systemName, url);
-                updateWeightData(localId);
-                qnClientCoreSettings->save();
-            }
-
             if (!restoringConnection)
             {
+                const auto localId = helpers::getLocalSystemId(connectionInfo);
+                using namespace nx::client::core::helpers;
+                if (connectionTypeForUrl(url) != QnConnectionManager::CloudConnection)
+                {
+                    const auto credentials = qnSettings->savePasswords()
+                        ? QnEncodedCredentials(url)
+                        : QnEncodedCredentials(url.userName(), QString());
+                    storeCredentials(localId, credentials);
+                    storeConnection(localId, connectionInfo.systemName, url);
+                    updateWeightData(localId);
+                    qnClientCoreSettings->save();
+                }
+
                 LastConnectionData connectionData{
                     connectionInfo.systemName,
                     url.cleanUrl(),
