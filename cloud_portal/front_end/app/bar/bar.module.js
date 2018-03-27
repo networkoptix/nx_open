@@ -18,6 +18,7 @@ const bar_component_1 = require("./bar.component");
 const account_settings_component_1 = require("../dropdowns/account-settings/account-settings.component");
 const language_component_1 = require("../dropdowns/language/language.component");
 const active_system_component_1 = require("../dropdowns/active-system/active-system.component");
+const systems_component_1 = require("../dropdowns/systems/systems.component");
 const appRoutes = [
     { path: 'bar', component: bar_component_1.BarComponent }
 ];
@@ -42,7 +43,8 @@ BarModule = __decorate([
             bar_component_1.BarComponent,
             language_component_1.NxLanguageDropdown,
             account_settings_component_1.NxAccountSettingsDropdown,
-            active_system_component_1.NxActiveSystemDropdown
+            active_system_component_1.NxActiveSystemDropdown,
+            systems_component_1.NxSystemsDropdown
         ],
         bootstrap: []
     })

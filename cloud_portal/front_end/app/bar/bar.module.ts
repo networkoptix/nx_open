@@ -13,6 +13,7 @@ import { BarComponent }              from './bar.component';
 import { NxAccountSettingsDropdown } from "../dropdowns/account-settings/account-settings.component";
 import { NxLanguageDropdown }        from "../dropdowns/language/language.component";
 import { NxActiveSystemDropdown }    from "../dropdowns/active-system/active-system.component";
+import { NxSystemsDropdown }         from "../dropdowns/systems/systems.component";
 
 
 const appRoutes: Routes = [
@@ -38,7 +39,8 @@ const appRoutes: Routes = [
         BarComponent,
         NxLanguageDropdown,
         NxAccountSettingsDropdown,
-        NxActiveSystemDropdown
+        NxActiveSystemDropdown,
+        NxSystemsDropdown
     ],
     bootstrap: []
 })
