@@ -38,21 +38,21 @@
                 });
 
 
-                function isActive(val) {
-                    var currentPath = $location.path();
-                    if (currentPath.indexOf(val) < 0) { // no match
-                        return false;
-                    }
-                    return true;
-                }
+                // function isActive(val) {
+                //     var currentPath = $location.path();
+                //     if (currentPath.indexOf(val) < 0) { // no match
+                //         return false;
+                //     }
+                //     return true;
+                // }
 
-                scope.active = {};
-
-                function updateActive() {
-                    scope.active.register = isActive('/register');
-                    scope.active.view = isActive('/view');
-                    scope.active.settings = $route.current.params.systemId && !isActive('/view');
-                }
+                // scope.active = {};
+                //
+                // function updateActive() {
+                //     scope.active.register = isActive('/register');
+                //     scope.active.view = isActive('/view');
+                //     scope.active.settings = $route.current.params.systemId && !isActive('/view');
+                // }
 
                 function updateActiveSystem() {
                     if (!scope.systems) {
@@ -66,7 +66,7 @@
                     }
                 }
 
-                updateActive();
+                // updateActive();
                 account.get().then(function (account) {
                     scope.account = account;
 
@@ -86,7 +86,7 @@
                             updateActiveSystem();
                         }
                     }
-                    updateActive();
+                    // updateActive();
                 });
 
             }

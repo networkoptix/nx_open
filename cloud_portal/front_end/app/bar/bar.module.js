@@ -14,12 +14,10 @@ const router_1 = require("@angular/router");
 const forms_1 = require("@angular/forms");
 const ng_bootstrap_1 = require("@ng-bootstrap/ng-bootstrap");
 const core_2 = require("../../app/core");
-// import { LoginModalContent, NxModalLoginComponent} from "../dialogs/login/login.component";
-// import { NxProcessButtonComponent } from "../components/process-button/process-button.component";
 const bar_component_1 = require("./bar.component");
-// import { DropdownsModule} from '../dropdowns/dropdowns.module';
 const account_settings_component_1 = require("../dropdowns/account-settings/account-settings.component");
 const language_component_1 = require("../dropdowns/language/language.component");
+const active_system_component_1 = require("../dropdowns/active-system/active-system.component");
 const appRoutes = [
     { path: 'bar', component: bar_component_1.BarComponent }
 ];
@@ -35,17 +33,16 @@ BarModule = __decorate([
             ng_bootstrap_1.NgbModalModule,
             forms_1.FormsModule,
             forms_1.ReactiveFormsModule,
-            // DropdownsModule,
             router_1.RouterModule.forChild(appRoutes)
         ],
         providers: [
-            // cloudApiService,
             core_2.QuoteService,
         ],
         declarations: [
             bar_component_1.BarComponent,
             language_component_1.NxLanguageDropdown,
-            account_settings_component_1.NxAccountSettingsDropdown
+            account_settings_component_1.NxAccountSettingsDropdown,
+            active_system_component_1.NxActiveSystemDropdown
         ],
         bootstrap: []
     })

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 
 import { NxLanguageDropdown }        from "../dropdowns/language/language.component";
 import { NxAccountSettingsDropdown } from "../dropdowns/account-settings/account-settings.component";
+import { NxActiveSystemDropdown }    from "../dropdowns/active-system/active-system.component";
 
 @NgModule({
     imports: [

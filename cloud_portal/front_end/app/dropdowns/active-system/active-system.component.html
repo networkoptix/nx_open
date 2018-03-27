@@ -1,0 +1,17 @@
+<div ngbDropdown class="d-inline-block">
+
+    <button class="btn btn-dropdown-toggle"
+            id="activeSystemDropdown"
+            ngbDropdownToggle>
+        <span class="glyphicon glyphicon-menu-hamburger"></span>
+    </button>
+
+    <ul ngbDropdownMenu aria-labelledby="activeSystemDropdown">
+        <li *ngIf="activeSystem" [ngClass]="{ 'active' :active.settings}">
+            <a routerLink="/systems/{{activeSystem.id}}">Settings</a>
+        </li>
+        <li ng-if="activeSystem" [ngClass]="{ 'active' :active.view }">
+            <a routerLink="/systems/{{activeSystem.id}}/view">View</a>
+        </li>
+    </ul>
+</div>
