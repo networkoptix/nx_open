@@ -50,6 +50,7 @@ private:
 private:
     std::unique_ptr<std::thread> m_thread;
     std::atomic<bool> m_stopping{false};
+    int m_frameCounter = 0;
     int m_counter = 0;
     int m_counterObjects = 0;
     nxpl::NX_GUID m_eventTypeId;

@@ -73,6 +73,7 @@ void CameraManager::settingsChanged()
 bool CameraManager::pushCompressedVideoFrame(const CommonCompressedVideoPacket* videoFrame)
 {
     NX_OUTPUT << __func__ << "() BEGIN: timestamp " << videoFrame->timestampUsec() << " us";
+    ++m_frameCounter;
     m_lastVideoFrameTimestampUsec = videoFrame->timestampUsec();
     NX_OUTPUT << __func__ << "() END -> true";
     return true;
@@ -80,8 +81,9 @@ bool CameraManager::pushCompressedVideoFrame(const CommonCompressedVideoPacket* 
 
 bool CameraManager::pushUncompressedVideoFrame(const CommonUncompressedVideoFrame* videoFrame)
 {
-    NX_OUTPUT << __func__ << "() BEGIN: timestamp " << videoFrame->timestampUsec() << " us";
-
+    NX_OUTPUT << __func__ << "(): timestamp " << videoFrame->timestampUsec() << " us";
+    
+    ++m_frameCounter;
     m_lastVideoFrameTimestampUsec = videoFrame->timestampUsec();
 
     if (videoFrame->pixelFormat() == UncompressedVideoFrame::PixelFormat::argb)
@@ -89,7 +91,9 @@ bool CameraManager::pushUncompressedVideoFrame(const CommonUncompressedVideoFram
 
     if (videoFrame->pixelFormat() == UncompressedVideoFrame::PixelFormat::yuv420)
         return checkYuv420pFrame(videoFrame);
-
+    
+    NX_OUTPUT << __func__ << "(): ERROR: Unsupported pixel format: " 
+        << (int) videoFrame->pixelFormat();
     return false;
 }
 
@@ -188,6 +192,10 @@ MetadataPacket* CameraManager::cookSomeEvents()
 MetadataPacket* CameraManager::cookSomeObjects()
 {
     if (m_lastVideoFrameTimestampUsec == 0)
+        return nullptr;
+    
+    static const int kObjectFrequency = 30; //< Generate object every n frames.
+    if (m_frameCounter % kObjectFrequency != 0)
         return nullptr;
 
     auto commonObject = new CommonObject();
