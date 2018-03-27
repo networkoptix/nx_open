@@ -12,11 +12,11 @@ from test_utils.utils import log_list
 log = logging.getLogger(__name__)
 
 
-def test_merged_archive(server_factory, camera, sample_media_file):
+def test_merged_archive(linux_servers_pool, camera, sample_media_file):
     log.debug('camera: %r, sample media file: %r', camera, sample_media_file)
 
-    one = server_factory.create('one')
-    two = server_factory.create('two')
+    one = linux_servers_pool.get('one')
+    two = linux_servers_pool.get('two')
     merge_systems(one, two)
 
     one.add_camera(camera)
@@ -55,10 +55,12 @@ def test_merged_archive(server_factory, camera, sample_media_file):
     return one, two, expected_periods_one, expected_periods_two
 
 
-def test_separated_archive(server_factory, camera, sample_media_file):
-    one, two, expected_periods_one, expected_periods_two = test_merged_archive(server_factory, camera, sample_media_file)
+def test_separated_archive(linux_servers_pool, camera, sample_media_file):
+    one, two, expected_periods_one, expected_periods_two = test_merged_archive(linux_servers_pool, camera, sample_media_file)
     new_id = '{%s}' % uuid.uuid4()
-    set_local_system_id(one.rest_api, new_id)
+    set_local_system_id(one.api, new_id)
     assert get_local_system_id(one) == new_id
     assert expected_periods_one == one.get_recorded_time_periods(camera)
     assert expected_periods_two == two.get_recorded_time_periods(camera)
+    assert not one.installation.list_core_dumps()
+    assert not two.installation.list_core_dumps()

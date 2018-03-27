@@ -43,15 +43,15 @@ def db_version(request):
 
 
 @pytest.fixture
-def one(server_factory, bin_dir, db_version):
-    return server('one', server_factory, bin_dir, db_version)
+def one(linux_servers_pool, bin_dir, db_version):
+    return server('one', linux_servers_pool, bin_dir, db_version)
 
 @pytest.fixture
-def two(server_factory, bin_dir, db_version):
-    return server('two', server_factory, bin_dir, db_version)
+def two(linux_servers_pool, bin_dir, db_version):
+    return server('two', linux_servers_pool, bin_dir, db_version)
 
 
-def server(name, server_factory, bin_dir, db_version):
+def server(name, linux_servers_pool, bin_dir, db_version):
     server_config = SERVER_CONFIG[name]
     if db_version == '2.4':
         config_file_params = dict(
@@ -59,16 +59,14 @@ def server(name, server_factory, bin_dir, db_version):
             serverGuid=server_config.SERVER_GUID,
             minStorageSpace=1024*1024,  # 1M
             )
-        server = server_factory.create(name, config_file_params=config_file_params)
-        server.stop()
+        server = linux_servers_pool.get(name, config_file_params=config_file_params)
         copy_database_file(server, bin_dir, server_config.DATABASE_FILE_V_2_4)
     else:
-        server = server_factory.create(name)
-        server.stop()
+        server = linux_servers_pool.get(name)
     server.start()
     system_settings = dict(autoDiscoveryEnabled=bool_to_str(False))
     setup_local_system(server, {'systemSettings': system_settings})
-    server.rest_api.api.systemSettings.GET(statisticsAllowed=False)
+    server.api.api.systemSettings.GET(statisticsAllowed=False)
     if db_version == '2.4':
         check_camera(server, server_config.CAMERA_GUID)
     return server
@@ -78,10 +76,10 @@ def copy_database_file(server, bin_dir, backup_db_filename):
     assert backup_db_path.exists(), (
         "Binary artifact required for this test (database file) '%s' does not exist." % backup_db_path)
     server_db_path = server.installation.dir / MEDIASERVER_DATABASE_PATH
-    server.os_access.put_file(backup_db_path, server_db_path)
+    server.machine.os_access.put_file(backup_db_path, server_db_path)
 
 def check_camera(server, camera_guid):
-    cameras = [c for c in server.rest_api.ec2.getCameras.GET() if c['id'] == camera_guid]
+    cameras = [c for c in server.api.ec2.getCameras.GET() if c['id'] == camera_guid]
     assert len(cameras) == 1, "'%r': one of cameras '%s' is absent" % (server, camera_guid)
 
 
@@ -104,8 +102,8 @@ def assert_jsons_are_equal(json_one, json_two, json_name):
 def wait_until_servers_have_same_full_info(one, two):
     start_time = datetime_utc_now()
     while True:
-        full_info_one = one.rest_api.ec2.getFullInfo.GET()
-        full_info_two = two.rest_api.ec2.getFullInfo.GET()
+        full_info_one = one.api.ec2.getFullInfo.GET()
+        full_info_two = two.api.ec2.getFullInfo.GET()
         if full_info_one == full_info_two:
             return full_info_one
         if datetime_utc_now() - start_time >= MEDIASERVER_MERGE_TIMEOUT:
@@ -116,7 +114,7 @@ def wait_until_servers_have_same_full_info(one, two):
 def wait_for_camera_disappearance_after_backup(server, camera_guid):
     start_time = datetime_utc_now()
     while True:
-        cameras = [c for c in server.rest_api.ec2.getCameras.GET()
+        cameras = [c for c in server.api.ec2.getCameras.GET()
                    if c['id'] == camera_guid]
         if not cameras:
             return
@@ -130,12 +128,12 @@ def wait_for_camera_disappearance_after_backup(server, camera_guid):
 def test_backup_restore(artifact_factory, one, two, camera):
     merge_systems(two, one)
     full_info_initial = wait_until_servers_have_same_full_info(one, two)
-    backup = one.rest_api.ec2.dumpDatabase.GET()
+    backup = one.api.ec2.dumpDatabase.GET()
     camera_guid = two.add_camera(camera)
     full_info_with_new_camera = wait_until_servers_have_same_full_info(one, two)
     assert full_info_with_new_camera != full_info_initial, (
         "ec2/getFullInfo data before and after saveCamera are the same")
-    one.rest_api.ec2.restoreDatabase.POST(data=backup['data'])
+    one.api.ec2.restoreDatabase.POST(data=backup['data'])
     wait_for_camera_disappearance_after_backup(one, camera_guid)
     full_info_after_backup_restore = wait_until_servers_have_same_full_info(one, two)
     try:
@@ -146,6 +144,9 @@ def test_backup_restore(artifact_factory, one, two, camera):
         artifact_factory(['full_info_after_backup_restore'],
                          name='full_info_after_backup_restore').save_as_json(full_info_after_backup_restore)
         raise
+
+    assert not one.installation.list_core_dumps()
+    assert not two.installation.list_core_dumps()
 
 
 # To detect VMS-5969
@@ -164,3 +165,6 @@ def test_server_guids_changed(one, two):
     setup_local_system(two, {})
     merge_systems(two, one)
     wait_until_servers_have_same_full_info(one, two)
+
+    assert not one.installation.list_core_dumps()
+    assert not two.installation.list_core_dumps()

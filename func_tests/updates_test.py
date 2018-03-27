@@ -1,4 +1,3 @@
-import pytest
 from pathlib2 import Path
 
 from test_utils.remote_daemon import RemoteDaemon
@@ -28,17 +27,13 @@ def install_updates_server(os_access, python_path):
     wait_until(lambda: os_access.run_command(['curl', '-I', ROOT_URL + '/updates.json']))
 
 
-@pytest.fixture
-def server(server_factory):
-    return server_factory.create('server')
-
-
-def test_single_server(server):
-    api = server.rest_api.api.updates2
+def test_running_linux_server(running_linux_server):
+    api = running_linux_server.api.api.updates2
     assert holds_long_enough(lambda: api.status.GET()['status'] in {'notAvailable', 'checking'})
-    python_path = prepare_virtual_environment(server.os_access)
-    install_updates_server(server.os_access, python_path)
-    server.stop(already_stopped_ok=True)
-    server.installation.update_mediaserver_conf({'checkForUpdateUrl': ROOT_URL})
-    server.start(already_started_ok=False)
+    python_path = prepare_virtual_environment(running_linux_server.machine.os_access)
+    install_updates_server(running_linux_server.machine.os_access, python_path)
+    running_linux_server.stop(already_stopped_ok=True)
+    running_linux_server.installation.update_mediaserver_conf({'checkForUpdateUrl': ROOT_URL})
+    running_linux_server.start(already_started_ok=False)
     assert wait_until(lambda: api.status.GET()['status'] == 'available')
+    assert not running_linux_server.installation.list_core_dumps()

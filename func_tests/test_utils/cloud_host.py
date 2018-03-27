@@ -3,8 +3,8 @@ import logging
 
 import requests
 
-from .imap import IMAPConnection
-from .rest_api import HttpError, RestApi
+from test_utils.imap import IMAPConnection
+from test_utils.rest_api import HttpError, RestApi
 
 log = logging.getLogger(__name__)
 
@@ -33,29 +33,29 @@ class CloudAccount(object):
         self.name = name
         self.customization = customization
         self.hostname = hostname
-        self.rest_api = RestApi('cloud-host:%s' % name, self.hostname, 80, username=user, password=password)
+        self.api = RestApi('cloud-host:%s' % name, self.hostname, 80, username=user, password=password)
 
     def __repr__(self):
         return '%r @ %r' % (self.name, self.url)
 
     @property
     def password(self):
-        return self.rest_api.password
+        return self.api.password
 
     @property
     def url(self):
         return 'http://%s/' % self.hostname
 
     def ping(self):
-        unused_realm = self.rest_api.cdb.ping.GET()
+        unused_realm = self.api.cdb.ping.GET()
 
     def get_user_info(self):
-        return self.rest_api.cdb.account.get.GET()
+        return self.api.cdb.account.get.GET()
 
     def register_user(self, first_name, last_name):
-        response = self.rest_api.api.account.register.POST(
-            email=self.rest_api.user,
-            password=self.rest_api.password,
+        response = self.api.api.account.register.POST(
+            email=self.api.user,
+            password=self.api.password,
             first_name=first_name,
             last_name=last_name,
             subscribe=False,
@@ -63,15 +63,15 @@ class CloudAccount(object):
         assert response == dict(resultCode='ok'), repr(response)
 
     def resend_activation_code(self):
-        response = self.rest_api.cdb.account.reactivate.POST(email=self.rest_api.user)
+        response = self.api.cdb.account.reactivate.POST(email=self.api.user)
         assert response == dict(code=''), repr(response)
 
     def activate_user(self, activation_code):
-        response = self.rest_api.cdb.account.activate.POST(code=activation_code)
-        assert response.get('email') == self.rest_api.user, repr(response)  # Got activation code for another user?
+        response = self.api.cdb.account.activate.POST(code=activation_code)
+        assert response.get('email') == self.api.user, repr(response)  # Got activation code for another user?
 
     def set_user_customization(self, customization):
-        response = self.rest_api.cdb.account.update.POST(customization=customization)
+        response = self.api.cdb.account.update.POST(customization=customization)
         assert response.get('resultCode') == 'ok'
 
     def check_user_is_valid(self):
@@ -86,7 +86,7 @@ class CloudAccount(object):
         log.info('Cloud host %r is up and test user is valid', self)
 
     def bind_system(self, system_name):
-        response = self.rest_api.cdb.system.bind.GET(
+        response = self.api.cdb.system.bind.GET(
             name=system_name,
             customization=self.customization,
             )

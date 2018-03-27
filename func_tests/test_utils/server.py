@@ -4,7 +4,6 @@ import datetime
 import logging
 import tempfile
 import time
-import uuid
 
 import pytz
 import requests.exceptions
@@ -51,22 +50,19 @@ class Server(object):
     """Mediaserver, same for physical and virtual machines"""
 
     def __init__(self, name, service, installation, api, machine, port):
-        assert name, repr(name)
-        self.title = name.upper()
-        self.name = '%s-%s' % (name, str(uuid.uuid4())[-12:])
-        self.os_access = machine.os_access  # Deprecated.
+        self.name = name
         self.installation = installation
         self.service = service
         self.machine = machine
-        self.rest_api = api
+        self.api = api
         self.port = port
 
     def __repr__(self):
-        return '<Server {} at {}>'.format(self.name, self.rest_api.url(''))
+        return '<Server {} at {}>'.format(self.name, self.api.url(''))
 
     def is_online(self):
         try:
-            self.rest_api.get('/api/ping')
+            self.api.get('/api/ping')
         except requests.RequestException:
             return False
         else:
@@ -91,15 +87,15 @@ class Server(object):
                 raise Exception("Already stopped")
 
     def restart_via_api(self, timeout=MEDIASERVER_START_TIMEOUT):
-        old_runtime_id = self.rest_api.api.moduleInformation.GET()['runtimeId']
+        old_runtime_id = self.api.api.moduleInformation.GET()['runtimeId']
         log.info("Runtime id before restart: %s", old_runtime_id)
         started_at = datetime.datetime.now(pytz.utc)
-        self.rest_api.api.restart.GET()
+        self.api.api.restart.GET()
         sleep_time_sec = timeout.total_seconds() / 100.
         failed_connections = 0
         while True:
             try:
-                response = self.rest_api.api.moduleInformation.GET()
+                response = self.api.api.moduleInformation.GET()
             except requests.ConnectionError as e:
                 if datetime.datetime.now(pytz.utc) - started_at > timeout:
                     assert False, "Server hasn't started, caught %r, timed out." % e
@@ -121,15 +117,15 @@ class Server(object):
 
     def add_camera(self, camera):
         assert not camera.id, 'Already added to a server with id %r' % camera.id
-        params = camera.get_info(parent_id=get_server_id(self.rest_api))
-        result = self.rest_api.ec2.saveCamera.POST(**params)
+        params = camera.get_info(parent_id=get_server_id(self.api))
+        result = self.api.ec2.saveCamera.POST(**params)
         camera.id = result['id']
         return camera.id
 
     def set_camera_recording(self, camera, recording):
         assert camera, 'Camera %r is not yet registered on server' % camera
         schedule_tasks = [make_schedule_task(day_of_week + 1) for day_of_week in range(7)]
-        self.rest_api.ec2.saveCameraUserAttributes.POST(
+        self.api.ec2.saveCameraUserAttributes.POST(
             cameraId=camera.id, scheduleEnabled=recording, scheduleTasks=schedule_tasks)
 
     def start_recording_camera(self, camera):
@@ -145,9 +141,9 @@ class Server(object):
         return Storage(self.os_access, storage_path, self.os_access.get_timezone())
 
     def rebuild_archive(self):
-        self.rest_api.api.rebuildArchive.GET(mainPool=1, action='start')
+        self.api.api.rebuildArchive.GET(mainPool=1, action='start')
         for i in range(30):
-            response = self.rest_api.api.rebuildArchive.GET(mainPool=1)
+            response = self.api.api.rebuildArchive.GET(mainPool=1)
             if response['state'] == 'RebuildState_None':
                 return
             time.sleep(0.3)
@@ -157,7 +153,7 @@ class Server(object):
         assert camera.id, 'Camera %r is not yet registered on server' % camera.name
         periods = [TimePeriod(datetime.datetime.utcfromtimestamp(int(d['startTimeMs'])/1000.).replace(tzinfo=pytz.utc),
                               datetime.timedelta(seconds=int(d['durationMs']) / 1000.))
-                   for d in self.rest_api.ec2.recordedTimePeriods.GET(cameraId=camera.id, flat=True)]
+                   for d in self.api.ec2.recordedTimePeriods.GET(cameraId=camera.id, flat=True)]
         log.info('Server %r returned %d recorded periods:', self.name, len(periods))
         for period in periods:
             log.info('\t%s', period)
@@ -166,7 +162,7 @@ class Server(object):
     def get_media_stream(self, stream_type, camera):
         assert stream_type in ['rtsp', 'webm', 'hls', 'direct-hls'], repr(stream_type)
         assert isinstance(camera, Camera), repr(camera)
-        return open_media_stream(self.rest_api.url(''), self.rest_api.user, self.rest_api.password, stream_type, camera.mac_addr)
+        return open_media_stream(self.api.url(''), self.api.user, self.api.password, stream_type, camera.mac_addr)
 
 
 class Storage(object):

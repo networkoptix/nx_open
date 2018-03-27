@@ -65,12 +65,12 @@ class LayoutItemGenerator(SeedResourceGenerator):
 
     def set_resources(self, resources):
         for server, resource in resources:
-            self.__resources.setdefault(get_server_id(server.rest_api), []).append(
+            self.__resources.setdefault(get_server_id(server.api), []).append(
                 generator.get_resource_id(resource))
 
     def get_resources_by_server(self, server):
         if server:
-            return self.__resources[get_server_id(server.rest_api)]
+            return self.__resources[get_server_id(server.api)]
         else:
             return list(
                 itertools.chain.from_iterable(self.__resources.values()))
@@ -125,7 +125,7 @@ def env(network, layout_file):
 
 
 def get_response(server, method, api_object, api_method):
-    return server.rest_api.get_api_fn(method, api_object, api_method)()
+    return server.api.get_api_fn(method, api_object, api_method)()
 
 
 def wait_entity_merge_done(servers, method, api_object, api_method):
@@ -170,7 +170,7 @@ def check_transaction_log(env):
         srv_transactions = {}
         for srv in env.servers:
             transactions = transaction_log.transactions_from_json(
-                srv.rest_api.ec2.getTransactionLog.GET())
+                srv.api.ec2.getTransactionLog.GET())
             for t in transactions:
                 srv_transactions.setdefault(t, []).append(srv)
         unmatched_transactions = {t: l for t, l in srv_transactions.items()
@@ -183,7 +183,7 @@ def check_transaction_log(env):
 
 
 def server_api_post((server, api_method, data)):
-    server_api_fn = server.rest_api.get_api_fn('POST', 'ec2', api_method)
+    server_api_fn = server.api.get_api_fn('POST', 'ec2', api_method)
     return server_api_fn(json=data)
 
 
@@ -203,7 +203,7 @@ def get_servers_admins(env):
     """
     admins = []
     for server in env.servers:
-        users = server.rest_api.ec2.getUsers.GET()
+        users = server.api.ec2.getUsers.GET()
         admins += [(server, u) for u in users if u['isAdmin']]
     return admins
 
@@ -284,6 +284,8 @@ def test_initial_merge(env):
          ('GET', 'ec2', 'getUsers'),
          ('GET', 'ec2', 'getFullInfo')])
     check_transaction_log(env)
+    for server in env.servers:
+        assert not server.installation.list_core_dumps()
 
 
 @pytest.mark.parametrize('layout_file', ['direct-merge_toward_requested.yaml'])
@@ -310,7 +312,9 @@ def test_api_get_methods(env):
         ]
     for srv in env.servers:
         for method, api_object, api_method in test_api_get_methods:
-            srv.rest_api.get_api_fn(method, api_object, api_method)()
+            srv.api.get_api_fn(method, api_object, api_method)()
+    for server in env.servers:
+        assert not server.installation.list_core_dumps()
 
 
 @pytest.mark.parametrize('layout_file', ['direct-merge_toward_requested.yaml', 'direct-no_merge.yaml'])
@@ -324,6 +328,8 @@ def test_camera_data_synchronization(env):
          ('GET', 'ec2', 'getCameraUserAttributesList'),
          ('GET', 'ec2', 'getFullInfo')])
     check_transaction_log(env)
+    for server in env.servers:
+        assert not server.installation.list_core_dumps()
 
 
 @pytest.mark.parametrize('layout_file', ['direct-merge_toward_requested.yaml', 'direct-no_merge.yaml'])
@@ -334,6 +340,8 @@ def test_user_data_synchronization(env):
         env,
         [('GET', 'ec2', 'getFullInfo')])
     check_transaction_log(env)
+    for server in env.servers:
+        assert not server.installation.list_core_dumps()
 
 
 @pytest.mark.parametrize('layout_file', ['direct-merge_toward_requested.yaml', 'direct-no_merge.yaml'])
@@ -347,12 +355,14 @@ def test_mediaserver_data_synchronization(env):
          ('GET', 'ec2', 'getMediaServersUserAttributesList'),
          ('GET', 'ec2', 'getFullInfo')])
     check_transaction_log(env)
+    for server in env.servers:
+        assert not server.installation.list_core_dumps()
 
 
 @pytest.mark.parametrize('layout_file', ['direct-merge_toward_requested.yaml', 'direct-no_merge.yaml'])
 def test_storage_data_synchronization(env):
     servers = [env.servers[i % len(env.servers)] for i in range(env.test_size)]
-    server_with_guid_list = map(lambda s: (s, get_server_id(s.rest_api)), servers)
+    server_with_guid_list = map(lambda s: (s, get_server_id(s.api)), servers)
     storages = prepare_and_make_async_post_calls(env, 'saveStorage', server_with_guid_list)
     merge_system_if_unmerged(env)
     check_api_calls(
@@ -360,6 +370,8 @@ def test_storage_data_synchronization(env):
         [('GET', 'ec2', 'getStorages'),
          ('GET', 'ec2', 'getFullInfo')])
     check_transaction_log(env)
+    for server in env.servers:
+        assert not server.installation.list_core_dumps()
 
 
 @pytest.mark.parametrize('layout_file', ['direct-merge_toward_requested.yaml', 'direct-no_merge.yaml'])
@@ -375,6 +387,8 @@ def test_resource_params_data_synchronization(env):
         [('GET', 'ec2', 'getResourceParams'),
          ('GET', 'ec2', 'getFullInfo')])
     check_transaction_log(env)
+    for server in env.servers:
+        assert not server.installation.list_core_dumps()
 
 
 @pytest.mark.parametrize('layout_file', ['direct-merge_toward_requested.yaml', 'direct-no_merge.yaml'])
@@ -391,6 +405,8 @@ def test_remove_resource_params_data_synchronization(env):
         env,
         [('GET', 'ec2', 'getFullInfo')])
     check_transaction_log(env)
+    for server in env.servers:
+        assert not server.installation.list_core_dumps()
 
 
 @pytest.mark.parametrize('layout_file', ['direct-merge_toward_requested.yaml', 'direct-no_merge.yaml'])
@@ -417,6 +433,8 @@ def test_layout_data_synchronization(env):
         [('GET', 'ec2', 'getLayouts'),
          ('GET', 'ec2', 'getFullInfo')])
     check_transaction_log(env)
+    for server in env.servers:
+        assert not server.installation.list_core_dumps()
 
 
 @pytest.mark.parametrize('layout_file', ['direct-merge_toward_requested.yaml'])
@@ -449,3 +467,5 @@ def test_resource_remove_update_conflict(env):
         env,
         [('GET', 'ec2', 'getFullInfo')])
     check_transaction_log(env)
+    for server in env.servers:
+        assert not server.installation.list_core_dumps()

@@ -142,7 +142,7 @@ class Factory(object):
         vm.networking.enable_internet()
         return vm
 
-    def dispose(self, vm):
+    def release(self, vm):
         self._access_manager.unregister(vm.alias)
         self._registry.relinquish(vm.index)
 
@@ -160,27 +160,3 @@ class Factory(object):
                 logger.warning("VM %s reserved now.", name)
 
         self._registry.for_each(destroy)
-
-
-class Pool(object):
-    """Allocate multiple items, dispose all at once with .close()"""
-
-    def __init__(self, factory):
-        self._factory = factory
-        self._cache = {}
-
-    def get(self, alias):
-        try:
-            cached_machine = self._cache[alias]
-        except KeyError:
-            item = self._factory.allocate(alias)
-            self._cache[alias] = item
-            logger.info("Item %r is allocated.", item)
-            return item
-        else:
-            logger.info("Item %r is already allocated, return it from cache.", cached_machine)
-            return cached_machine
-
-    def close(self):
-        for item in self._cache.values():
-            self._factory.dispose(item)

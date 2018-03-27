@@ -1,32 +1,30 @@
 import logging
 
+from test_utils.core_file_traceback import create_core_file_traceback
 from test_utils.rest_api import RestApi
 from test_utils.server_installation import install_mediaserver
 from test_utils.service import UpstartService
 from .artifact import ArtifactType
-from .core_file_traceback import create_core_file_traceback
 from .server import Server
 
 log = logging.getLogger(__name__)
 
-SERVER_LOG_ARTIFACT_TYPE = ArtifactType(name='log', ext='.log')
 CORE_FILE_ARTIFACT_TYPE = ArtifactType(name='core')
 TRACEBACK_ARTIFACT_TYPE = ArtifactType(name='core-traceback')
+SERVER_LOG_ARTIFACT_TYPE = ArtifactType(name='log', ext='.log')
 
 
 class ServerFactory(object):
-    def __init__(self, artifact_factory, cloud_host, vm_pool, physical_installation_ctl, mediaserver_deb, ca):
+    def __init__(self, artifact_factory, machines, mediaserver_deb, ca):
         self._artifact_factory = artifact_factory
-        self._cloud_host = cloud_host
-        self._linux_vm_pool = vm_pool
-        self._physical_installation_ctl = physical_installation_ctl  # PhysicalInstallationCtl or None
+        self._machines = machines
         self._allocated_servers = []
         self._ca = ca
         self._mediaserver_deb = mediaserver_deb
 
-    def create(self, name, vm=None):
+    def allocate(self, name, vm=None):
         if vm is None:
-            vm = self._linux_vm_pool.get(name)
+            vm = self._machines.get(name)
         port = 7001
         hostname_from_here, port_from_here = vm.ports['tcp', port]
         server = Server(
@@ -36,7 +34,6 @@ class ServerFactory(object):
             RestApi(name, hostname_from_here, port_from_here),
             vm,
             port)
-        self._allocated_servers.append(server)  # Following may fail, will need to save it's artifact in that case.
         server.stop(already_stopped_ok=True)
         server.installation.cleanup_core_files()
         server.installation.cleanup_var_dir()
@@ -49,58 +46,36 @@ class ServerFactory(object):
             })
         return server
 
-    def release(self):
-        self._check_if_servers_are_online()
-        for server in self._allocated_servers:
-            self._save_server_artifacts(server)
-        if self._physical_installation_ctl:
-            self._physical_installation_ctl.release_all_servers()
-        self._allocated_servers = []
+    def release(self, server):
+        if server.service.is_running() and not server.is_online():
+            log.warning('Server %s is started but does not respond to ping - making core dump', server)
+            server.service.make_core_dump()
 
-    def _save_server_artifacts(self, server):
-        self._save_server_log(server)
-        self._save_server_core_files(server)
-
-    def _save_server_log(self, server):
-        server_name = server.title.lower()
-        log_contents = server.installation.get_log_file()
-        if not log_contents:
-            return
-        artifact_factory = self._artifact_factory(
-            ['server', server_name], name='server-%s' % server_name, artifact_type=SERVER_LOG_ARTIFACT_TYPE)
-        log_path = artifact_factory.produce_file_path().write_bytes(log_contents)
-        log.debug('log file for server %s, %s is stored to %s', server.title, server, log_path)
-
-    def _save_server_core_files(self, server):
-        server_name = server.title.lower()
-        for remote_core_path in server.installation.list_core_files():
-            fname = remote_core_path.name
+        log_contents = server.installation.read_log()
+        if log_contents:
             artifact_factory = self._artifact_factory(
-                ['server', server_name, fname],
-                name='%s-%s' % (server_name, fname), is_error=True, artifact_type=CORE_FILE_ARTIFACT_TYPE)
-            local_core_path = artifact_factory.produce_file_path()
-            server.os_access.get_file(remote_core_path, local_core_path)
-            log.debug('core file for server %s, %s is stored to %s', server.title, server, local_core_path)
+                ['server', server.name], name='server-%s' % server.name, artifact_type=SERVER_LOG_ARTIFACT_TYPE)
+            log_path = artifact_factory.produce_file_path().write_bytes(log_contents)
+            log.debug('log file for server %s, %s is stored to %s', server.name, server, log_path)
+
+        for core_dump in server.installation.list_core_dumps():
+            artifact_factory = self._artifact_factory(
+                ['server', server.name.lower(), core_dump.name],
+                name='%s-%s' % (server.name.lower(), core_dump.name),
+                is_error=True,
+                artifact_type=CORE_FILE_ARTIFACT_TYPE)
+            local_core_dump_path = artifact_factory.produce_file_path()
+            server.machine.os_access.get_file(core_dump, local_core_dump_path)
             traceback = create_core_file_traceback(
-                server.os_access, server.installation.dir / 'bin/mediaserver-bin', server.dir / 'lib', remote_core_path)
+                server.machine.os_access,
+                server.installation.binary,
+                server.dir / 'lib',
+                core_dump)
             artifact_factory = self._artifact_factory(
-                ['server', server_name, fname, 'traceback'],
-                name='%s-%s-tb' % (server_name, fname), is_error=True, artifact_type=TRACEBACK_ARTIFACT_TYPE)
-            path = artifact_factory.produce_file_path().write_bytes(traceback)
-            log.debug('core file traceback for server %s, %s is stored to %s', server.title, server, path)
-
-    def _check_if_servers_are_online(self):
-        for server in self._allocated_servers:
-            if server.service.is_running() and not server.is_online():
-                log.warning('Server %s is started but does not respond to ping - making core dump', server)
-                server.service.make_core_dump()
-
-    def perform_post_checks(self):
-        log.info('----- performing post-test checks for servers'
-                 '---------------------->8 ---------------------------')
-        self._check_if_servers_are_online()
-        core_dumped_servers = []
-        for server in self._allocated_servers:
-            if server.installation.list_core_files():
-                core_dumped_servers.append(server.title)
-        assert not core_dumped_servers, 'Following server(s) left core dump(s): %s' % ', '.join(core_dumped_servers)
+                ['server', server.name.lower(), core_dump.name, 'traceback'],
+                name='%s-%s-tb' % (server.name.lower(), core_dump.name),
+                is_error=True,
+                artifact_type=TRACEBACK_ARTIFACT_TYPE)
+            local_traceback_path = artifact_factory.produce_file_path()
+            local_traceback_path.write_bytes(traceback)
+            log.warning('Core dump on %r: %s, %s.', server.name, server, local_core_dump_path, local_traceback_path)

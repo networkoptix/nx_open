@@ -63,7 +63,7 @@ def lightweight_servers(metrics_saver, lightweight_servers_factory, config):
     return lws_list
 
 @pytest.fixture
-def servers(metrics_saver, server_factory, lightweight_servers, config):
+def servers(metrics_saver, linux_servers_pool, lightweight_servers, config):
     server_count = config.SERVER_COUNT - len(lightweight_servers)
     log.info('Creating %d servers:', server_count)
     setup_settings = dict(systemSettings=dict(
@@ -71,7 +71,7 @@ def servers(metrics_saver, server_factory, lightweight_servers, config):
         synchronizeTimeWithInternet=utils.bool_to_str(False),
         ))
     start_time = utils.datetime_utc_now()
-    server_list = [server_factory.create('server_%04d' % (idx + 1),
+    server_list = [linux_servers_pool.get('server_%04d' % (idx + 1),
                                            setup_settings=setup_settings)
                        for idx in range(server_count)]
     metrics_saver.save('server_init_duration', utils.datetime_utc_now() - start_time)
@@ -95,7 +95,7 @@ def create_resources_on_server(server, api_method, resource_generators, sequence
         _, val = v
         resource_data = data_generator.get(server, val)
         req_start_time = utils.datetime_utc_now()
-        server.rest_api.get_api_fn('POST', 'ec2', api_method)(json=resource_data)
+        server.api.get_api_fn('POST', 'ec2', api_method)(json=resource_data)
         req_duration += utils.datetime_utc_now() - req_start_time
         resources.append((server, resource_data))
     duration = utils.datetime_utc_now() - start_time
@@ -106,7 +106,7 @@ def create_resources_on_server(server, api_method, resource_generators, sequence
 
 
 def get_server_admin(server):
-    admins = [(server, u) for u in server.rest_api.ec2.getUsers.GET() if u['isAdmin']]
+    admins = [(server, u) for u in server.api.ec2.getUsers.GET() if u['isAdmin']]
     assert admins
     return admins[0]
 
@@ -131,7 +131,7 @@ def create_test_data_on_server((config, server, index)):
         saveUser=resource_test.SeedResourceGenerator(generator.generate_user_data, index * config.USERS_PER_SERVER),
         saveStorage=resource_test.SeedResourceWithParentGenerator(generator.generate_storage_data, index * config.STORAGES_PER_SERVER),
         saveLayout=resource_test.LayoutGenerator(index * (config.USERS_PER_SERVER + 1)))
-    servers_with_guids = [(server, get_server_id(server.rest_api))]
+    servers_with_guids = [(server, get_server_id(server.api))]
     users = create_resources_on_server_by_size(
         server, 'saveUser',  resource_generators, config.USERS_PER_SERVER)
     users.append(get_server_admin(server))
@@ -160,7 +160,7 @@ def create_test_data(config, servers):
 def get_response(server, method, api_object, api_method):
     for i in range(CHECK_METHOD_RETRY_COUNT):
         try:
-            return server.rest_api.get_api_fn(method, api_object, api_method)(timeout=120)
+            return server.api.get_api_fn(method, api_object, api_method)(timeout=120)
         except ReadTimeout as x:
             log.error('ReadTimeout when waiting for %s call %s/%s: %s', server, api_object, api_method, x)
         except Exception as x:
@@ -204,7 +204,7 @@ def log_diffs(x, y):
 def save_json_artifact(artifact_factory, api_method, side_name, server, value):
     artifact = artifact_factory(['result', api_method, side_name], name='%s-%s' % (api_method, side_name))
     file_path = artifact.save_as_json(value, encoder=transaction_log.TransactionJsonEncoder)
-    log.debug('results from %s from server %s %s is stored to %s', api_method, server.title, server, file_path)
+    log.debug('results from %s from server %s %s is stored to %s', api_method, server.name, server, file_path)
 
 
 def make_dumps_and_fail(message, servers, merge_timeout, api_method, api_call_start_time):
@@ -266,12 +266,12 @@ def wait_for_data_merged(artifact_factory, servers, merge_timeout, start_time):
 
 def collect_additional_metrics(metrics_saver, servers, lightweight_servers):
     if lightweight_servers:
-        reply = lightweight_servers[0].rest_api.api.p2pStats.GET()
+        reply = lightweight_servers[0].api.api.p2pStats.GET()
         metrics_saver.save('total_bytes_sent', int(reply['totalBytesSent']))
         # for test with lightweight servers pick only hosts with lightweight servers
-        access_to_oses = set(server.os_access for server in lightweight_servers)
+        access_to_oses = set(server.machine.os_access for server in lightweight_servers)
     else:
-        access_to_oses = set(server.os_access for server in servers)
+        access_to_oses = set(server.machine.os_access for server in servers)
     for os_access in access_to_oses:
         metrics = load_host_memory_usage(os_access)
         for name in 'total used free used_swap mediaserver lws'.split():
@@ -280,7 +280,7 @@ def collect_additional_metrics(metrics_saver, servers, lightweight_servers):
             metrics_saver.save(metric_name, metric_value)
 
 
-def test_scalability(artifact_factory, metrics_saver, config, lightweight_servers, servers):
+def test_scalability(artifact_factory, metrics_saver, config, lightweight_servers, lightweight_servers_factory, servers):
     assert isinstance(config.MERGE_TIMEOUT, datetime.timedelta)
 
     # lightweight servers create data themselves
@@ -304,5 +304,9 @@ def test_scalability(artifact_factory, metrics_saver, config, lightweight_server
         collect_additional_metrics(metrics_saver, servers, lightweight_servers)
     finally:
         if servers[0].is_online():
-            get_system_settings(servers[0].rest_api)  # log final settings
+            get_system_settings(servers[0].api)  # log final settings
     assert utils.str_to_bool(servers[0].settings['autoDiscoveryEnabled']) == False
+
+    for server in servers:
+        assert not server.installation.list_core_dumps()
+    lightweight_servers_factory.perform_post_checks()

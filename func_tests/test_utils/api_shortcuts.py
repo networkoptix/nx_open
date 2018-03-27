@@ -1,5 +1,6 @@
 from datetime import datetime
 
+import requests
 from pytz import utc
 
 from test_utils.utils import RunningTime

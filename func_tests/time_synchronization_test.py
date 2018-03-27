@@ -43,10 +43,10 @@ def get_internet_time(address='time.rfc868server.com', port=37):
 
 
 @pytest.fixture()
-def system(two_vms, server_factory):
+def system(two_vms, linux_servers_pool):
     servers = {}
     for vm in two_vms:
-        server = server_factory.create(vm.alias, vm=vm)
+        server = linux_servers_pool.get(vm.alias, vm=vm)
         if server.service.is_running():
             server.stop()
         # Reset server without internet access.
@@ -60,109 +60,119 @@ def system(two_vms, server_factory):
         setup_local_system(server, {})
         servers[vm.alias] = server
     setup_system(servers, {'first': {'second': None}})
-    first_server_response = servers['first'].rest_api.ec2.getCurrentTime.GET()
+    first_server_response = servers['first'].api.ec2.getCurrentTime.GET()
     if first_server_response['isPrimaryTimeServer']:
         system = System(primary=servers['first'], secondary=servers['second'])
     else:
         system = System(primary=servers['second'], secondary=servers['first'])
     primary_vm_time = system.primary.os_access.set_time(BASE_TIME)
     system.secondary.os_access.set_time(BASE_TIME)
-    assert wait_until(lambda: get_time(system.primary.rest_api).is_close_to(primary_vm_time)), (
+    assert wait_until(lambda: get_time(system.primary.api).is_close_to(primary_vm_time)), (
         "Time %s on PRIMARY time server doesn't align with time %s on MACHINE WITH PRIMARY time server." % (
-            get_time(system.primary.rest_api), primary_vm_time))
-    assert wait_until(lambda: get_time(system.secondary.rest_api).is_close_to(primary_vm_time)), (
+            get_time(system.primary.api), primary_vm_time))
+    assert wait_until(lambda: get_time(system.secondary.api).is_close_to(primary_vm_time)), (
         "Time %s on NON-PRIMARY time server doesn't align with time %s on MACHINE WITH PRIMARY time server." % (
-            get_time(system.secondary.rest_api), primary_vm_time))
+            get_time(system.secondary.api), primary_vm_time))
     return system
 
 
 @pytest.mark.quick
 def test_primary_follows_vm_time(system):
     primary_vm_time = system.primary.os_access.set_time(BASE_TIME + timedelta(hours=20))
-    assert wait_until(lambda: get_time(system.primary.rest_api).is_close_to(primary_vm_time)), (
+    assert wait_until(lambda: get_time(system.primary.api).is_close_to(primary_vm_time)), (
         "Time on PRIMARY time server %s does NOT FOLLOW time on MACHINE WITH PRIMARY time server %s." % (
-            get_time(system.primary.rest_api), primary_vm_time))
+            get_time(system.primary.api), primary_vm_time))
+    assert not system.primary.installation.list_core_dumps()
+    assert not system.secondary.installation.list_core_dumps()
 
 
 @pytest.mark.quick
 def test_change_time_on_primary_server(system):
     """Change time on PRIMARY server's machine. Expect all servers align with it."""
     primary_vm_time = system.primary.os_access.set_time(BASE_TIME + timedelta(hours=20))
-    assert wait_until(lambda: get_time(system.primary.rest_api).is_close_to(primary_vm_time)), (
+    assert wait_until(lambda: get_time(system.primary.api).is_close_to(primary_vm_time)), (
         "Time on PRIMARY time server %s does NOT FOLLOW time on MACHINE WITH PRIMARY time server %s." % (
-            get_time(system.primary.rest_api), primary_vm_time))
-    assert wait_until(lambda: get_time(system.secondary.rest_api).is_close_to(primary_vm_time)), (
+            get_time(system.primary.api), primary_vm_time))
+    assert wait_until(lambda: get_time(system.secondary.api).is_close_to(primary_vm_time)), (
         "Time on NON-PRIMARY time server %s does NOT FOLLOW time on PRIMARY time server %s." % (
-            get_time(system.secondary.rest_api), primary_vm_time))
+            get_time(system.secondary.api), primary_vm_time))
+    assert not system.primary.installation.list_core_dumps()
+    assert not system.secondary.installation.list_core_dumps()
 
 
 @pytest.mark.quick
 def test_change_primary_server(system):
     """Change PRIMARY server, change time on its machine. Expect all servers align with it."""
-    guid = get_server_id(system.secondary.rest_api)
-    system.secondary.rest_api.ec2.forcePrimaryTimeServer.POST(id=guid)
+    guid = get_server_id(system.secondary.api)
+    system.secondary.api.ec2.forcePrimaryTimeServer.POST(id=guid)
     new_primary, new_secondary = system.secondary, system.primary
     new_primary_vm_time = new_primary.os_access.set_time(BASE_TIME + timedelta(hours=5))
-    assert wait_until(lambda: get_time(new_primary.rest_api).is_close_to(new_primary_vm_time)), (
+    assert wait_until(lambda: get_time(new_primary.api).is_close_to(new_primary_vm_time)), (
         "Time on NEW PRIMARY time server %s does NOT FOLLOW time on MACHINE WITH NEW PRIMARY time server %s." % (
-            get_time(new_primary.rest_api), new_primary_vm_time))
-    assert wait_until(lambda: get_time(new_secondary.rest_api).is_close_to(new_primary_vm_time)), (
+            get_time(new_primary.api), new_primary_vm_time))
+    assert wait_until(lambda: get_time(new_secondary.api).is_close_to(new_primary_vm_time)), (
         "Time on NEW NON-PRIMARY time server %s does NOT FOLLOW time on NEW PRIMARY time server %s." % (
-            get_time(new_secondary.rest_api), new_primary_vm_time))
+            get_time(new_secondary.api), new_primary_vm_time))
+    assert not system.primary.installation.list_core_dumps()
+    assert not system.secondary.installation.list_core_dumps()
 
 
 def test_change_time_on_secondary_server(system):
     """Change time on NON-PRIMARY server's machine. Expect all servers' time doesn't change."""
-    primary_time = get_time(system.primary.rest_api)
+    primary_time = get_time(system.primary.api)
     system.secondary.os_access.set_time(BASE_TIME + timedelta(hours=10))
-    assert holds_long_enough(lambda: get_time(system.secondary.rest_api).is_close_to(primary_time)), (
+    assert holds_long_enough(lambda: get_time(system.secondary.api).is_close_to(primary_time)), (
         "Time on NON-PRIMARY time server %s does NOT FOLLOW time on PRIMARY time server %s." % (
-            get_time(system.secondary.rest_api), primary_time))
+            get_time(system.secondary.api), primary_time))
+    assert not system.primary.installation.list_core_dumps()
+    assert not system.secondary.installation.list_core_dumps()
 
 
 def test_primary_server_temporary_offline(system):
     primary_time = system.primary.os_access.set_time(BASE_TIME - timedelta(hours=2))
-    assert wait_until(lambda: get_time(system.secondary.rest_api).is_close_to(primary_time))
+    assert wait_until(lambda: get_time(system.secondary.api).is_close_to(primary_time))
     system.primary.stop()
     system.secondary.os_access.set_time(BASE_TIME + timedelta(hours=4))
-    assert holds_long_enough(lambda: get_time(system.secondary.rest_api).is_close_to(primary_time)), (
+    assert holds_long_enough(lambda: get_time(system.secondary.api).is_close_to(primary_time)), (
         "After PRIMARY time server was stopped, "
         "time on NON-PRIMARY time server %s does NOT FOLLOW time on PRIMARY time server %s." % (
-            get_time(system.secondary.rest_api), primary_time))
+            get_time(system.secondary.api), primary_time))
+    assert not system.primary.installation.list_core_dumps()
+    assert not system.secondary.installation.list_core_dumps()
 
 
 def test_secondary_server_temporary_inet_on(system):
-    system.primary.rest_api.api.systemSettings.GET(synchronizeTimeWithInternet=True)
+    system.primary.api.api.systemSettings.GET(synchronizeTimeWithInternet=True)
 
     system.secondary.machine.networking.enable_internet()
     assert wait_until(
-        lambda: get_time(system.secondary.rest_api).is_close_to(get_internet_time()),
+        lambda: get_time(system.secondary.api).is_close_to(get_internet_time()),
         name="until NON-PRIMARY aligns with INTERNET while internet is enabled")
     assert wait_until(
-        lambda: get_time(system.primary.rest_api).is_close_to(get_internet_time()),
+        lambda: get_time(system.primary.api).is_close_to(get_internet_time()),
         name="until PRIMARY aligns with INTERNET while internet is enabled")
     system.primary.os_access.set_time(BASE_TIME - timedelta(hours=5))
     assert holds_long_enough(
-        lambda: get_time(system.primary.rest_api).is_close_to(get_internet_time()),
+        lambda: get_time(system.primary.api).is_close_to(get_internet_time()),
         name="until PRIMARY aligns with INTERNET after system time is shifted but while internet is enabled")
     system.secondary.machine.networking.disable_internet()
 
     # Turn off RFC868 (time protocol)
     assert holds_long_enough(
-        lambda: get_time(system.primary.rest_api).is_close_to(get_internet_time()),
+        lambda: get_time(system.primary.api).is_close_to(get_internet_time()),
         name="until PRIMARY aligns with INTERNET after internet was disabled")
 
     # Stop secondary server
     system.secondary.stop()
     assert holds_long_enough(
-        lambda: get_time(system.primary.rest_api).is_close_to(get_internet_time()),
+        lambda: get_time(system.primary.api).is_close_to(get_internet_time()),
         name="until PRIMARY aligns with INTERNET while NON-PRIMARY is stopped")
     system.secondary.start()
 
     # Restart secondary server
     system.secondary.restart_via_api()
     assert holds_long_enough(
-        lambda: get_time(system.primary.rest_api).is_close_to(get_internet_time()),
+        lambda: get_time(system.primary.api).is_close_to(get_internet_time()),
         name="until NON-PRIMARY aligns with INTERNET after restart via API")
 
     # Stop and start both servers - so that servers could forget internet time
@@ -175,8 +185,11 @@ def test_secondary_server_temporary_inet_on(system):
     # Detect new PRIMARY and change its system time
     system.primary.os_access.set_time(BASE_TIME - timedelta(hours=25))
     assert wait_until(
-        lambda: get_time(system.primary.rest_api).is_close_to(get_internet_time()),
+        lambda: get_time(system.primary.api).is_close_to(get_internet_time()),
         name="until PRIMARY aligns with INTERNET after both are restarted")
     assert wait_until(
-        lambda: get_time(system.secondary.rest_api).is_close_to(get_internet_time()),
+        lambda: get_time(system.secondary.api).is_close_to(get_internet_time()),
         name="until NON-PRIMARY aligns with INTERNET after both are restarted")
+    
+    assert not system.primary.installation.list_core_dumps()
+    assert not system.secondary.installation.list_core_dumps()

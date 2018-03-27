@@ -44,12 +44,12 @@ ServerRec = namedtuple('ServerRec', 'server camera_mac_set')
 # After that we merge servers and wait until preferred cameras settle down on destined servers.
 
 
-def create_cameras_and_servers(server_factory, camera_factory, counter, server_name_list):
+def create_cameras_and_servers(linux_servers_pool, camera_factory, counter, server_name_list):
     server_count = len(server_name_list)
     # we always use 2 cameras per server
     all_camera_mac_set = set(create_cameras(camera_factory, counter, count=server_count*2))
     server_list = [
-        create_server(server_factory, server_name, all_camera_mac_set)
+        create_server(linux_servers_pool, server_name, all_camera_mac_set)
         for server_name in server_name_list]
     for server in server_list[1:]:
         server_list[0].merge_systems(server)
@@ -64,18 +64,18 @@ def create_cameras_and_servers(server_factory, camera_factory, counter, server_n
     return server_rec_list
 
 
-def create_server(server_factory, name, all_camera_mac_set, setup_settings=None):
-    server = server_factory.create(name, setup_settings=setup_settings)
+def create_server(linux_servers_pool, name, all_camera_mac_set, setup_settings=None):
+    server = linux_servers_pool.get(name, setup_settings=setup_settings)
     wait_until_cameras_are_online(server, all_camera_mac_set)
     return server
 
 
 def wait_until_servers_are_online(servers):
     start_time = datetime_utc_now()
-    server_guids = sorted([get_server_id(s.rest_api) for s in servers])
+    server_guids = sorted([get_server_id(s.api) for s in servers])
     for srv in servers:
         while True:
-            online_server_guids = sorted([s['id'] for s in srv.rest_api.ec2.getMediaServersEx.GET()
+            online_server_guids = sorted([s['id'] for s in srv.api.ec2.getMediaServersEx.GET()
                                           if s['status'] == 'Online'])
             log.debug("%r online servers: %s, system servers: %s", srv, online_server_guids, server_guids)
             if server_guids == online_server_guids:
@@ -97,17 +97,17 @@ def create_cameras(camera_factory, counter, count):
 
 
 def attach_cameras_to_server(server, camera_mac_list):
-    camera_mac_to_id = {camera['mac']: camera['id'] for camera in server.rest_api.ec2.getCameras.GET()}
+    camera_mac_to_id = {camera['mac']: camera['id'] for camera in server.api.ec2.getCameras.GET()}
     for camera_mac in camera_mac_list:
         camera_id = camera_mac_to_id[camera_mac]
-        server.rest_api.ec2.saveCameraUserAttributes.POST(
-            cameraId=camera_id, preferredServerId=get_server_id(server.rest_api))
+        server.api.ec2.saveCameraUserAttributes.POST(
+            cameraId=camera_id, preferredServerId=get_server_id(server.api))
         log.info('Camera is set as preferred for server %s: mac=%r, id=%r', server, camera_mac, camera_id)
 
 
 def online_camera_macs_on_server(server):
-    camera_list = [camera for camera in server.rest_api.ec2.getCamerasEx.GET()
-                   if camera['parentId'] == get_server_id(server.rest_api)]
+    camera_list = [camera for camera in server.api.ec2.getCamerasEx.GET()
+                   if camera['parentId'] == get_server_id(server.api)]
     for camera in sorted(camera_list, key=itemgetter('mac')):
         log.info(
             'Camera mac=%r id=%r is %r on server %s: %r',
@@ -140,8 +140,8 @@ def wait_until_cameras_are_online(server, camera_mac_set):
 
 
 def get_server_camera_macs(server):
-    server_guid = get_server_id(server.rest_api)
-    camera_list = [c for c in server.rest_api.ec2.getCameras.GET()
+    server_guid = get_server_id(server.api)
+    camera_list = [c for c in server.api.ec2.getCameras.GET()
                    if c['parentId'] == server_guid]
     for camera in sorted(camera_list, key=itemgetter('id')):
         log.info('Camera is on server %s: id=%r, mac=%r', server, camera['id'], camera['mac'])
@@ -151,10 +151,10 @@ def get_server_camera_macs(server):
 # Based on testrail C744 Check "Enable failover" for server
 # https://networkoptix.testrail.net/index.php?/cases/view/744
 @pytest.mark.testcam
-def test_enable_failover_on_one_server(server_factory, camera_factory, counter):
-    one, two, three = create_cameras_and_servers(server_factory, camera_factory, counter, ['one', 'two', 'three'])
-    two.server.rest_api.ec2.saveMediaServerUserAttributes.POST(
-        serverId=get_server_id(two.server.rest_api),
+def test_enable_failover_on_one_server(linux_servers_pool, camera_factory, counter):
+    one, two, three = create_cameras_and_servers(linux_servers_pool, camera_factory, counter, ['one', 'two', 'three'])
+    two.server.api.ec2.saveMediaServerUserAttributes.POST(
+        serverId=get_server_id(two.server.api),
         maxCameras=4,
         allowAutoRedundancy=True)
     # stop server one; all it's cameras must go to server two
@@ -165,16 +165,20 @@ def test_enable_failover_on_one_server(server_factory, camera_factory, counter):
     wait_until_camera_count_is_online(one.server, 2)
     wait_until_camera_count_is_online(two.server, 2)
 
+    assert not one.installation.list_core_dumps()
+    assert not two.installation.list_core_dumps()
+    assert not three.installation.list_core_dumps()
+
 
 @pytest.mark.testcam
-def test_enable_failover_on_two_servers(server_factory, camera_factory, counter):
-    one, two, three = create_cameras_and_servers(server_factory, camera_factory, counter, ['one', 'two', 'three'])
-    one.server.rest_api.ec2.saveMediaServerUserAttributes.POST(
-        serverId=get_server_id(one.server.rest_api),
+def test_enable_failover_on_two_servers(linux_servers_pool, camera_factory, counter):
+    one, two, three = create_cameras_and_servers(linux_servers_pool, camera_factory, counter, ['one', 'two', 'three'])
+    one.server.api.ec2.saveMediaServerUserAttributes.POST(
+        serverId=get_server_id(one.server.api),
         maxCameras=3,
         allowAutoRedundancy=True)
-    three.server.rest_api.ec2.saveMediaServerUserAttributes.POST(
-        serverId=get_server_id(three.server.rest_api),
+    three.server.api.ec2.saveMediaServerUserAttributes.POST(
+        serverId=get_server_id(three.server.api),
         maxCameras=3,
         allowAutoRedundancy=True)
     # stop server two; one of it's 2 cameras must go to server one, another - to server three:
@@ -189,6 +193,10 @@ def test_enable_failover_on_two_servers(server_factory, camera_factory, counter)
     two.server.start()
     wait_until_camera_count_is_online(two.server, 2)
 
+    assert not one.installation.list_core_dumps()
+    assert not two.installation.list_core_dumps()
+    assert not three.installation.list_core_dumps()
+
 
 @pytest.fixture(params=['enabled', 'disabled'])
 def discovery(request):
@@ -198,18 +206,18 @@ def discovery(request):
 # Based on testrail C745 Check "Enable failover" for server
 # https://networkoptix.testrail.net/index.php?/cases/view/745
 @pytest.mark.testcam
-def test_failover_and_auto_discovery(server_factory, camera_factory, counter, discovery):
+def test_failover_and_auto_discovery(linux_servers_pool, camera_factory, counter, discovery):
     camera_mac_set = set(create_cameras(camera_factory, counter, count=2))
-    one = create_server(server_factory, 'one', camera_mac_set)
-    two = create_server(server_factory, 'two', set(), setup_settings=dict(
+    one = create_server(linux_servers_pool, 'one', camera_mac_set)
+    two = create_server(linux_servers_pool, 'two', set(), setup_settings=dict(
         systemSettings=dict(autoDiscoveryEnabled=bool_to_str(discovery))))
-    assert str_to_bool(get_system_settings(two.rest_api)['autoDiscoveryEnabled']) == discovery
+    assert str_to_bool(get_system_settings(two.api)['autoDiscoveryEnabled']) == discovery
     attach_cameras_to_server(one, camera_mac_set)
     merge_systems(one, two)
     wait_until_servers_are_online([one, two])
     wait_until_cameras_on_server_reduced_to(two, set())  # recheck there are no cameras on server two
-    two.rest_api.ec2.saveMediaServerUserAttributes.POST(
-        serverId=get_server_id(two.rest_api),
+    two.api.ec2.saveMediaServerUserAttributes.POST(
+        serverId=get_server_id(two.api),
         maxCameras=2,
         allowAutoRedundancy=True)
     # stop server one - all cameras must go to server two
@@ -219,18 +227,21 @@ def test_failover_and_auto_discovery(server_factory, camera_factory, counter, di
     one.start()
     wait_until_cameras_are_online(one, camera_mac_set)
 
+    assert not one.installation.list_core_dumps()
+    assert not two.installation.list_core_dumps()
+
 
 # Based on testrail C747 Check "Enable failover" for server
 # https://networkoptix.testrail.net/index.php?/cases/view/747
 @pytest.mark.testcam
-def test_max_camera_settings(server_factory, camera_factory, counter):
-    one, two = create_cameras_and_servers(server_factory, camera_factory, counter, ['one', 'two'])
-    one.server.rest_api.ec2.saveMediaServerUserAttributes.POST(
-        serverId=get_server_id(one.server.rest_api),
+def test_max_camera_settings(linux_servers_pool, camera_factory, counter):
+    one, two = create_cameras_and_servers(linux_servers_pool, camera_factory, counter, ['one', 'two'])
+    one.server.api.ec2.saveMediaServerUserAttributes.POST(
+        serverId=get_server_id(one.server.api),
         maxCameras=3,
         allowAutoRedundancy=True)
-    two.server.rest_api.ec2.saveMediaServerUserAttributes.POST(
-        serverId=get_server_id(two.server.rest_api),
+    two.server.api.ec2.saveMediaServerUserAttributes.POST(
+        serverId=get_server_id(two.server.api),
         maxCameras=2,
         allowAutoRedundancy=True)
     # stop server two; exactly one camera from server two must go to server one
@@ -249,3 +260,6 @@ def test_max_camera_settings(server_factory, camera_factory, counter):
     one.server.start()
     wait_until_camera_count_is_online(one.server, 2)
     wait_until_camera_count_is_online(two.server, 2)
+
+    assert not one.installation.list_core_dumps()
+    assert not two.installation.list_core_dumps()

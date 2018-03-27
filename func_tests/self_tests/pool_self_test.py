@@ -1,14 +1,14 @@
 from contextlib import closing
 
-from test_utils.vm import Pool
+from test_utils.pool import Pool
 
 
-def test_get(linux_vm_pool):
-    first = linux_vm_pool.get('first')
+def test_get(linux_vms_pool):
+    first = linux_vms_pool.get('first')
     assert first.alias == 'first'
-    second = linux_vm_pool.get('second')
+    second = linux_vms_pool.get('second')
     assert second.alias == 'second'
-    first_again = linux_vm_pool.get('first')
+    first_again = linux_vms_pool.get('first')
     assert first.name == first_again.name
 
 

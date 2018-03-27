@@ -19,12 +19,12 @@ def wait_for_and_check_camera_history(camera, server_list, expected_servers_orde
     while True:
         camera_history_responses = []
         for server in server_list:
-            response = server.rest_api.ec2.cameraHistory.GET(
+            response = server.api.ec2.cameraHistory.GET(
                 cameraId=camera.id, startTime=0, endTime='now')
             assert len(response) == 1, repr(response)  # must contain exactly one record for one camera
             servers_order = [item['serverGuid'] for item in response[0]['items']]
             log.debug('Received camera history servers order: %s', servers_order)
-            if servers_order == [get_server_id(server.rest_api) for server in expected_servers_order]:
+            if servers_order == [get_server_id(server.api) for server in expected_servers_order]:
                 camera_history_responses.append(response)
                 continue
             if time.time() - t > HISTORY_WAIT_TIMEOUT_SEC:
@@ -41,7 +41,7 @@ def wait_for_and_check_camera_history(camera, server_list, expected_servers_orde
 # https://networkoptix.atlassian.net/browse/TEST-181
 # transport check part (3):
 def check_media_stream_transports(server):
-    camera_info_list = server.rest_api.ec2.getCamerasEx.GET()
+    camera_info_list = server.api.ec2.getCamerasEx.GET()
     assert camera_info_list  # At least one camera must be returned for following check to work
     for camera_info in camera_info_list:
         for add_params_rec in camera_info['addParams']:
@@ -60,9 +60,9 @@ def check_media_stream_transports(server):
 # https://networkoptix.atlassian.net/browse/TEST-178
 # https://networkoptix.atlassian.net/wiki/spaces/SD/pages/77234376/Camera+history+test
 @pytest.mark.testcam
-def test_camera_switching_should_be_represented_in_history(artifact_factory, server_factory, camera):
-    one = server_factory.create('one')
-    two = server_factory.create('two')
+def test_camera_switching_should_be_represented_in_history(artifact_factory, linux_servers_pool, camera):
+    one = linux_servers_pool.get('one')
+    two = linux_servers_pool.get('two')
     merge_systems(one, two)
 
     camera.start_streaming()
@@ -84,3 +84,7 @@ def test_camera_switching_should_be_represented_in_history(artifact_factory, ser
     assert metadata_list  # Must not be empty
 
     check_media_stream_transports(one)
+
+    assert not one.installation.list_core_dumps()
+    assert not two.installation.list_core_dumps()
+

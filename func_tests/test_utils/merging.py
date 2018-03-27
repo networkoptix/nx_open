@@ -37,10 +37,11 @@ class ExplicitMergeError(MergeError):
 
 
 class IncompatibleServersMerge(ExplicitMergeError):
-    def __init__(self, local, remote, error, error_string):
-        assert error == 3
-        assert error_string == 'INCOMPATIBLE'
-        super(IncompatibleServersMerge, self).__init__(local, remote, error, error_string)
+    pass
+
+
+class MergeUnauthorized(ExplicitMergeError):
+    pass
 
 
 class MergeChecksFailed(MergeError):
@@ -56,13 +57,13 @@ def merge_systems(local, remote, accessible_ip_net=IPNetwork('10.254.0.0/16'), t
     merge_logger = _logger.getChild('merge').getChild(remote.name).getChild(local.name)
     merge_logger.info("Request %r to merge %r (takeRemoteSettings: %s).", local, remote, take_remote_settings)
     master, servant = (remote, local) if take_remote_settings else (local, remote)
-    master_system_id = get_local_system_id(master.rest_api)
+    master_system_id = get_local_system_id(master.api)
     merge_logger.debug("Settings from %r, system id %s.", master, master_system_id)
-    servant_system_id = get_local_system_id(servant.rest_api)
+    servant_system_id = get_local_system_id(servant.api)
     merge_logger.debug("Other system id %s.", servant_system_id)
     if servant_system_id == master_system_id:
         raise AlreadyMerged(local, remote, master_system_id)
-    remote_interfaces = remote.rest_api.get('api/iflist')
+    remote_interfaces = remote.api.get('api/iflist')
     available_remote_ips = {IPAddress(interface['ipAddr']) for interface in remote_interfaces}
     accessible_remote_ips = {ip for ip in available_remote_ips if ip in accessible_ip_net}
     try:
@@ -71,25 +72,27 @@ def merge_systems(local, remote, accessible_ip_net=IPNetwork('10.254.0.0/16'), t
         raise MergeAddressesError(local, remote, accessible_ip_net, available_remote_ips)
     merge_logger.debug("Access %r by %s.", remote, any_accessible_remote_ip)
     try:
-        local.rest_api.post('api/mergeSystems', {
-            'url': remote.rest_api.with_hostname_and_port(any_accessible_remote_ip, remote.port).url(''),
-            'getKey': remote.rest_api.auth_key('GET'),
-            'postKey': remote.rest_api.auth_key('POST'),
+        local.api.post('api/mergeSystems', {
+            'url': remote.api.with_hostname_and_port(any_accessible_remote_ip, remote.port).url(''),
+            'getKey': remote.api.auth_key('GET'),
+            'postKey': remote.api.auth_key('POST'),
             'takeRemoteSettings': take_remote_settings,
             'mergeOneServer': False,
             })
     except RestApiError as e:
-        if e.error == 3:
+        if e.error_string == 'INCOMPATIBLE':
             raise IncompatibleServersMerge(local, remote, e.error, e.error_string)
+        if e.error_string == 'UNAUTHORIZED':
+            raise MergeUnauthorized(local, remote, e.error, e.error_string)
         raise ExplicitMergeError(local, remote, e.error, e.error_string)
-    servant.rest_api = servant.rest_api.with_credentials(master.rest_api.user, master.rest_api.password)
+    servant.api = servant.api.with_credentials(master.api.user, master.api.password)
     if not wait_until(
-            servant.rest_api.credentials_work,
+            servant.api.credentials_work,
             name="until {} accepts new credentials from {}".format(servant, master),
             timeout_sec=10):
         raise MergeChecksFailed(local, remote, "new credentials don't work")
     if not wait_until(
-            lambda: get_local_system_id(servant.rest_api) == master_system_id,
+            lambda: get_local_system_id(servant.api) == master_system_id,
             name="until {} responds with system id {}".format(servant, master_system_id),
             timeout_sec=10):
         raise MergeChecksFailed(local, remote, "local system ids don't match")
@@ -97,7 +100,7 @@ def merge_systems(local, remote, accessible_ip_net=IPNetwork('10.254.0.0/16'), t
 
 def setup_local_system(server, system_settings):
     _logger.info('Setup local system on %s.', server)
-    response = server.rest_api.post('api/setupLocalSystem', {
+    response = server.api.post('api/setupLocalSystem', {
         'password': DEFAULT_API_PASSWORD,
         'systemName': server.name,
         'systemSettings': system_settings,
@@ -113,25 +116,25 @@ def setup_cloud_system(server, cloud_account, system_settings):
         'systemName': server.name,
         'cloudAuthKey': bind_info.auth_key,
         'cloudSystemID': bind_info.system_id,
-        'cloudAccountName': cloud_account.rest_api.user,
+        'cloudAccountName': cloud_account.api.user,
         'systemSettings': system_settings, }
-    response = server.rest_api.post('api/setupCloudSystem', request, timeout=300)
+    response = server.api.post('api/setupCloudSystem', request, timeout=300)
     assert system_settings == {key: response['settings'][key] for key in system_settings.keys()}
-    server.rest_api = server.rest_api.with_credentials(cloud_account.rest_api.user, cloud_account.password)
-    assert server.rest_api.credentials_work()
+    server.api = server.api.with_credentials(cloud_account.api.user, cloud_account.password)
+    assert server.api.credentials_work()
     return response['settings']
 
 
 def detach_from_cloud(server, password):
-    server.rest_api.post('api/detachFromCloud', {'password': password})
-    server.rest_api = server.rest_api.with_credentials(DEFAULT_API_USER, password)
+    server.api.post('api/detachFromCloud', {'password': password})
+    server.api = server.api.with_credentials(DEFAULT_API_USER, password)
 
 
 def setup_system(servers, scheme):
     # if config.setup_cloud_account:
     #     server.setup_cloud_system(config.setup_cloud_account, **config.setup_settings)
     #     if not config.leave_initial_cloud_host:
-    #         server.rest_api = server.rest_api.with_credentials(DEFAULT_API_USER, DEFAULT_API_PASSWORD)  # TODO: Needed?
+    #         server.api = server.api.with_credentials(DEFAULT_API_USER, DEFAULT_API_PASSWORD)  # TODO: Needed?
     # else:
     #     setup_local_system(server, dict((**config.setup_settings)))
     allocated_servers = {}

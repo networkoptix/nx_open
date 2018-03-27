@@ -1,57 +1,28 @@
 import logging
-import os
-from collections import namedtuple
-from contextlib import closing
 
 import pytest
-from netaddr import IPAddress
 from pathlib2 import Path
 
-from network_layouts import get_layout
-from test_utils.access_managers import make_access_manager
 from test_utils.artifact import ArtifactFactory
 from test_utils.ca import CA
-from test_utils.camera import CameraFactory, SampleMediaFile
-from test_utils.cloud_host import CloudAccountFactory, resolve_cloud_host_from_registry
-from test_utils.config import TestParameter, TestsConfig, SingleTestConfig
-from test_utils.lightweight_servers_factory import LWS_BINARY_NAME, LightweightServersFactory
+from test_utils.config import SingleTestConfig, TestParameter, TestsConfig
 from test_utils.mediaserverdeb import MediaserverDeb
-from test_utils.merging import setup_system, setup_local_system
 from test_utils.metrics_saver import MetricsSaver
-from test_utils.networking import setup_networks
-from test_utils.os_access import LocalAccess
-from test_utils.serialize import load
-from test_utils.server_factory import ServerFactory
-from test_utils.server_physical_host import PhysicalInstallationCtl
-from test_utils.virtual_box import VirtualBox
-from test_utils.vm import Factory, Pool, Registry, VMConfiguration
+
+pytest_plugins = ['fixtures.vms', 'fixtures.servers', 'fixtures.cloud']
 
 JUNK_SHOP_PLUGIN_NAME = 'junk-shop-db-capture'
-
-DEFAULT_CLOUD_GROUP = 'test'
 
 DEFAULT_WORK_DIR = '/tmp/funtest'
 DEFAULT_MEDIASERVER_DIST_NAME = 'mediaserver.deb'  # in bin dir
 DEFAULT_REST_API_FORWARDED_PORT_BASE = 17000
 
-DEFAULT_VM_HOST_USER = 'root'
-DEFAULT_VM_HOST_DIR = '/tmp/jenkins-test'
-
 DEFAULT_MAX_LOG_WIDTH = 500
-
-MEDIA_SAMPLE_PATH = 'sample.mkv'
-MEDIA_STREAM_PATH = 'sample.testcam-stream.data'
 
 log = logging.getLogger(__name__)
 
 
 def pytest_addoption(parser):
-    parser.addoption('--cloud-group', default=DEFAULT_CLOUD_GROUP, help=(
-        'Cloud group; cloud host for it will be requested from ireg.hdw.mx; '
-        'default is %r' % DEFAULT_CLOUD_GROUP))
-    parser.addoption('--autotest-email-password', help=(
-        'Password for accessing service account via IMAP protocol. '
-        'Used for activation cloud accounts for different cloud groups and customizations.'))
     parser.addoption('--work-dir', type=Path, default=DEFAULT_WORK_DIR, help=(
         'working directory for tests: all generated files will be placed there'))
     parser.addoption('--bin-dir', type=Path, help=(
@@ -61,26 +32,6 @@ def pytest_addoption(parser):
         "Manufacturer name or 'default'. Optional. Checked against customization from .deb file."))
     parser.addoption('--mediaserver-dist-path', type=Path, default=DEFAULT_MEDIASERVER_DIST_NAME, help=(
         'mediaserver package, relative to bin dir [%s]' % DEFAULT_MEDIASERVER_DIST_NAME))
-    parser.addoption('--media-sample-path', type=Path, default=MEDIA_SAMPLE_PATH, help=(
-        'media sample file path, default is %s at binary directory' % MEDIA_SAMPLE_PATH))
-    parser.addoption('--media-stream-path', type=Path, default=MEDIA_STREAM_PATH, help=(
-        'media sample test camera stream, relative to bin dir [%s]' % MEDIA_STREAM_PATH))
-    parser.addoption('--vm-name-prefix', help=(
-        'Deprecated. Left for backward compatibility. Ignored.'))
-    parser.addoption('--vm-port-base', type=int, default=DEFAULT_REST_API_FORWARDED_PORT_BASE, help=(
-        'base REST API port forwarded to host'))
-    parser.addoption('--vm-address', type=IPAddress, help=(
-        'IP address virtual machines bind to. '
-        'Test camera discovery will answer only to this address if this option is specified.'))
-    parser.addoption('--vm-host', help=(
-        'hostname or IP address for host with VirtualBox, '
-        'used to start virtual machines (by default it is local host)'))
-    parser.addoption('--vm-host-user', default=DEFAULT_VM_HOST_USER, help=(
-        'User to use for ssh to login to VirtualBox host'))
-    parser.addoption('--vm-host-key', help=(
-        'Identity file to use for ssh to login to VirtualBox host'))
-    parser.addoption('--vm-host-dir', default=DEFAULT_VM_HOST_DIR, help=(
-        'Working directory at host with VirtualBox, used to store vagrant files'))
     parser.addoption('--max-log-width', default=DEFAULT_MAX_LOG_WIDTH, type=int, help=(
         'Change maximum log message width. Default is %d' % DEFAULT_MAX_LOG_WIDTH))
     parser.addoption(
@@ -91,25 +42,6 @@ def pytest_addoption(parser):
     parser.addoption('--test-parameters', type=TestParameter.from_str, help=(
         'Configuration parameters for a test, format: --test-parameter=test.param1=value1,test.param2=value2'))
     parser.addoption('--clean', '--reinstall', action='store_true', help='destroy VMs first')
-
-
-@pytest.fixture(scope='session')
-def vm_address(request):
-    return request.config.getoption('--vm-address')
-
-
-VMHost = namedtuple('VMHost', ['hostname', 'username', 'private_key', 'work_dir', 'vm_port_base', 'vm_name_prefix'])
-
-
-@pytest.fixture(scope='session')
-def vm_host(request):
-    return VMHost(
-        hostname=request.config.getoption('--vm-host'),
-        work_dir=request.config.getoption('--vm-host-dir'),
-        vm_name_prefix=request.config.getoption('--vm-name-prefix'),
-        vm_port_base=request.config.getoption('--vm-port-base'),
-        username=request.config.getoption('--vm-host-user'),
-        private_key=request.config.getoption('--vm-host-key'))
 
 
 @pytest.fixture(scope='session')
@@ -215,215 +147,3 @@ def metrics_saver(junk_shop_repository):
     if not db_capture_repository:
         log.warning('Junk shop plugin is not available; No metrics will be saved')
     return MetricsSaver(db_capture_repository, current_test_run)
-
-
-@pytest.fixture(params=['http', 'https'])
-def http_schema(request):
-    return request.param
-
-
-@pytest.fixture(params=['rtsp', 'webm', 'hls', 'direct-hls'])
-def stream_type(request):
-    return request.param
-
-
-@pytest.fixture()
-def cloud_host(request, mediaserver_deb):
-    cloud_group = request.config.getoption('--cloud-group')
-    return resolve_cloud_host_from_registry(cloud_group, mediaserver_deb.customization.company)
-
-
-@pytest.fixture(scope='session')
-def configuration():
-    return load(Path(__file__).with_name('configuration.yaml').read_text())
-
-
-@pytest.fixture(scope='session')
-def host_os_access():
-    return LocalAccess()
-
-
-@pytest.fixture(scope='session')
-def hypervisor(configuration, host_os_access):
-    return VirtualBox(host_os_access, configuration['vm_host']['address'])
-
-
-@pytest.fixture(scope='session')
-def vm_factories(request, configuration, hypervisor, host_os_access):
-    factories = {
-        vm_type: Factory(
-            VMConfiguration(vm_configuration_raw),
-            hypervisor,
-            make_access_manager(**vm_configuration_raw['access']),
-            Registry(
-                host_os_access,
-                host_os_access.expand_path(vm_configuration_raw['registry']),
-                ))
-        for vm_type, vm_configuration_raw in configuration['vm_types'].items()}
-    if request.config.getoption('--clean'):
-        for vm_factory in factories.values():
-            vm_factory.cleanup()
-    return factories
-
-
-@pytest.fixture()
-def vm_pools(vm_factories):
-    pools = {vm_type: Pool(vm_factory) for vm_type, vm_factory in vm_factories.items()}
-    yield pools
-    for pool in pools.values():
-        pool.close()
-
-
-def _make_linux_vm_pool(vm_factories):
-    return Pool(vm_factories['linux'])
-
-
-@pytest.fixture()
-def linux_vm_pool(vm_factories):
-    with closing(_make_linux_vm_pool(vm_factories)) as pool:
-        yield pool
-
-
-Pair = namedtuple('_TwoVms', ['first', 'second'])
-
-
-@pytest.fixture(scope='session')
-def two_vms(vm_factories, hypervisor):
-    structure = {'10.254.0.0/29': {'first': None, 'second': None}}
-    reachability = {'10.254.0.0/29': {'first': {'second': None}, 'second': {'first': None}}}
-    with closing(_make_linux_vm_pool(vm_factories)) as pool:
-        vms, _ = setup_networks({'linux': pool}, hypervisor, structure, reachability)
-        yield Pair(**vms)
-
-
-@pytest.fixture(scope='session')
-def single_vm(vm_factories):
-    with closing(_make_linux_vm_pool(vm_factories)) as pool:
-        yield pool.get('server')
-
-
-@pytest.fixture(scope='session')
-def physical_installation_ctl(tests_config, ca, mediaserver_deb):
-    if not tests_config:
-        return None
-    pic = PhysicalInstallationCtl(
-        mediaserver_deb.path,
-        mediaserver_deb.customization.company,
-        tests_config.physical_installation_host_list,
-        ca)
-    return pic
-
-
-@pytest.fixture()
-def server_factory(mediaserver_deb, ca, artifact_factory, cloud_host, vm_pools, physical_installation_ctl):
-    server_factory = ServerFactory(
-        artifact_factory,
-        cloud_host,
-        vm_pools['linux'],
-        physical_installation_ctl,
-        mediaserver_deb,
-        ca,
-        )
-    yield server_factory
-    server_factory.release()
-
-
-@pytest.fixture()
-def single_server(server_factory, single_vm):
-    server = server_factory.create('single', vm=single_vm)
-    server.start()
-    setup_local_system(server, {})
-    return server
-
-
-@pytest.fixture()
-def two_servers(server_factory, two_vms):
-    servers = {}
-    for vm in two_vms:
-        server = server_factory.create(vm.alias, vm=vm)
-        server.start()
-        setup_local_system(server, {})
-        servers[vm.alias] = server
-    return Pair(**servers)
-
-
-@pytest.fixture()
-def two_stopped_servers(server_factory, two_vms):
-    return Pair(*(server_factory.create(vm.alias, vm=vm) for vm in two_vms))
-
-
-@pytest.fixture()
-def lightweight_servers_factory(bin_dir, ca, artifact_factory, physical_installation_ctl):
-    test_binary_path = bin_dir / LWS_BINARY_NAME
-    assert test_binary_path.exists(), 'Test binary for lightweight servers is missing at %s' % test_binary_path
-    lightweight_factory = LightweightServersFactory(artifact_factory, physical_installation_ctl, test_binary_path, ca)
-    yield lightweight_factory
-    lightweight_factory.release()
-
-
-@pytest.fixture()
-def cloud_account_factory(request, mediaserver_deb, cloud_host):
-    return CloudAccountFactory(
-        request.config.getoption('--cloud-group'),
-        mediaserver_deb.customization.company,
-        cloud_host,
-        request.config.getoption('--autotest-email-password') or os.environ.get('AUTOTEST_EMAIL_PASSWORD'))
-
-
-# CloudAccount instance
-@pytest.fixture()
-def cloud_account(cloud_account_factory):
-    return cloud_account_factory()
-
-
-@pytest.fixture()
-def camera_factory(request, bin_dir, vm_address):
-    stream_path = bin_dir / request.config.getoption('--media-stream-path')
-    assert stream_path.exists(), '%s is expected at %s' % (stream_path.name, stream_path.parent)
-    factory = CameraFactory(vm_address, stream_path)
-    yield factory
-    factory.close()
-
-
-@pytest.fixture()
-def camera(camera_factory):
-    return camera_factory()
-
-
-@pytest.fixture()
-def sample_media_file(request, bin_dir):
-    path = bin_dir / request.config.getoption('--media-sample-path')
-    assert path.exists(), '%s is expected at %s' % (path.name, path.parent)
-    return SampleMediaFile(path)
-
-
-@pytest.fixture()
-def network(vm_pools, hypervisor, server_factory, layout_file):
-    layout = get_layout(layout_file)
-    vms, _ = setup_networks(vm_pools, hypervisor, layout.networks, {})
-    servers = setup_system(server_factory, layout.mergers)
-    return vms, servers
-
-
-# pytest teardown does not allow failing the test from it. We have to use pytest hook for this.
-@pytest.mark.hookwrapper
-def pytest_pyfunc_call(pyfuncitem):
-    # look up for server factory fixture()
-    server_factory = None
-    lws_factory = None
-    # noinspection PyProtectedMember
-    request = pyfuncitem._request
-    for name in request.fixturenames:
-        value = request.getfixturevalue(name)
-        if isinstance(value, ServerFactory):
-            server_factory = value
-        if isinstance(value, LightweightServersFactory):
-            lws_factory = value
-    # run the test
-    outcome = yield
-    # perform post-checks if passed and have our server factory in fixtures
-    passed = outcome.excinfo is None
-    if passed and server_factory:
-        server_factory.perform_post_checks()
-    if passed and lws_factory:
-        lws_factory.perform_post_checks()

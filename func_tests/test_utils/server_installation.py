@@ -42,6 +42,7 @@ class ServerInstallation(object):
     def __init__(self, host, dir):
         self.os_access = host
         self.dir = dir
+        self.binary = self.dir / 'bin' / 'mediaserver-bin'
         self._config_path = self.dir / MEDIASERVER_CONFIG_PATH
         self._config_path_initial = self.dir / MEDIASERVER_CONFIG_PATH_INITIAL
         self._log_path = self.dir / MEDIASERVER_LOG_PATH
@@ -55,7 +56,7 @@ class ServerInstallation(object):
         raw_exit_codes = self.os_access.run_command([
             'test', '-d', self.dir, ';', 'echo', '$?', ';',
             'test', '-f', self.dir / 'bin' / 'mediaserver', ';', 'echo', '$?', ';',
-            'test', '-f', self.dir / 'bin' / 'mediaserver-bin', ';', 'echo', '$?', ';',
+            'test', '-f', self.binary, ';', 'echo', '$?', ';',
             'test', '-f', self._config_path, ';', 'echo', '$?', ';',
             'test', '-f', self._config_path_initial, ';', 'echo', '$?', ';',
             ])
@@ -67,7 +68,7 @@ class ServerInstallation(object):
     def put_key_and_cert(self, key_and_cert):
         self.os_access.write_file(self.dir / MEDIASERVER_KEY_CERT_PATH, key_and_cert.encode())
 
-    def list_core_files(self):
+    def list_core_dumps(self):
         return self.os_access.expand_glob(self.dir / 'bin' / '*core*')
 
     def cleanup_core_files(self):
@@ -96,7 +97,7 @@ class ServerInstallation(object):
         config.write(f)
         self.os_access.write_file(self._config_path, f.getvalue())
 
-    def get_log_file(self):
+    def read_log(self):
         if self.os_access.file_exists(self._log_path):
             return self.os_access.read_file(self._log_path)
         else:

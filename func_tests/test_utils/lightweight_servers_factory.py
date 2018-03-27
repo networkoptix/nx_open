@@ -6,11 +6,11 @@ import logging
 from requests.exceptions import ReadTimeout
 
 from test_utils.rest_api import RestApi
+from test_utils.server_factory import SERVER_LOG_ARTIFACT_TYPE, CORE_FILE_ARTIFACT_TYPE, TRACEBACK_ARTIFACT_TYPE
 from test_utils.utils import wait_until
 from . import utils
 from .utils import GrowingSleep
 from .core_file_traceback import create_core_file_traceback
-from .server_factory import SERVER_LOG_ARTIFACT_TYPE, CORE_FILE_ARTIFACT_TYPE, TRACEBACK_ARTIFACT_TYPE
 from .server import Server
 from .service import AdHocService
 from .template_renderer import TemplateRenderer
@@ -18,9 +18,9 @@ from .template_renderer import TemplateRenderer
 log = logging.getLogger(__name__)
 
 
+LWS_BINARY_NAME = 'appserver2_ut'
 LWS_CTL_TEMPLATE_PATH = 'lws_ctl.sh.jinja2'
 LWS_PORT_BASE = 3000
-LWS_BINARY_NAME = 'appserver2_ut'
 LWS_START_TIMEOUT = datetime.timedelta(minutes=10)  # timeout when waiting for lws become online (pingable)
 
 
@@ -104,8 +104,8 @@ class LightweightServersInstallation(object):
 
 
 class LightweightServer(Server):
-    def __init__(self, name, os_access, service, installation, rest_api, port=None):
-        super(LightweightServer, self).__init__(name, service, installation, rest_api, None, port=port)
+    def __init__(self, name, os_access, service, installation, api, port=None):
+        super(LightweightServer, self).__init__(name, service, installation, api, None, port=port)
         self.internal_ip_address = os_access.hostname
 
     def wait_until_synced(self, timeout):
@@ -115,7 +115,7 @@ class LightweightServer(Server):
         while utils.datetime_utc_now() - start_time < timeout:
             try:
                 # calling api/moduleInformation to check for SF_P2pSyncDone flag
-                response = self.rest_api.api.moduleInformation.GET(timeout=60)
+                response = self.api.api.moduleInformation.GET(timeout=60)
             except ReadTimeout:
                 #log.error('ReadTimeout when waiting for lws api/moduleInformation; will make core dump')
                 #self.service.make_core_dump()

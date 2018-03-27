@@ -143,9 +143,9 @@ class PhysicalInstallationHost(object):
             if not installation:
                 return None
         server_port = self._installation_server_port(self._installations.index(installation))
-        rest_api = RestApi(config.name, config.http_schema, server_port)
+        api = RestApi(config.name, config.http_schema, server_port)
         service = AdHocService(self.os_access, installation.dir)
-        server = Server(config.name, service, installation, rest_api, self, port=server_port)
+        server = Server(config.name, service, installation, api, self, port=server_port)
         self._allocated_server_list.append(server)
         return server
 

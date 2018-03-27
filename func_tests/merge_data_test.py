@@ -35,14 +35,14 @@ log = logging.getLogger(__name__)
 def test_responses_are_equal(network, target_alias, proxy_alias, api_endpoint):
     _, servers = network
     wait = Wait("until responses become equal")
-    target_guid = get_server_id(servers[target_alias].rest_api)
+    target_guid = get_server_id(servers[target_alias].api)
     while True:
         response_direct = requests.get(
-            servers[target_alias].rest_api.url(api_endpoint),
-            auth=requests.auth.HTTPDigestAuth(servers[target_alias].rest_api.user, servers[target_alias].rest_api.password))
+            servers[target_alias].api.url(api_endpoint),
+            auth=requests.auth.HTTPDigestAuth(servers[target_alias].api.user, servers[target_alias].api.password))
         response_via_proxy = requests.get(
-            servers[proxy_alias].rest_api.url(api_endpoint),
-            auth=requests.auth.HTTPDigestAuth(servers[proxy_alias].rest_api.user, servers[proxy_alias].rest_api.password),
+            servers[proxy_alias].api.url(api_endpoint),
+            auth=requests.auth.HTTPDigestAuth(servers[proxy_alias].api.user, servers[proxy_alias].api.password),
             headers={'X-server-guid': target_guid})
         diff = datadiff.diff(
             response_via_proxy.json(), response_direct.json(),
@@ -52,6 +52,9 @@ def test_responses_are_equal(network, target_alias, proxy_alias, api_endpoint):
             break
         if not wait.sleep_and_continue():
             assert not diff, 'Found difference:\n{}'.format(diff)
+
+    assert not servers[target_alias].installation.list_core_dumps()
+    assert not servers[proxy_alias].installation.list_core_dumps()
 
 
 def assert_server_stream(server, camera, sample_media_file, stream_type, artifact_factory, start_time):
@@ -85,3 +88,6 @@ def test_get_streams(artifact_factory, network, camera, sample_media_file, strea
         servers['second'], camera, sample_media_file, stream_type, artifact_factory, start_time_2)
     assert_server_stream(
         servers['first'], camera, sample_media_file, stream_type, artifact_factory, start_time_2)
+
+    assert not servers['first'].installation.list_core_dumps()
+    assert not servers['second'].installation.list_core_dumps()

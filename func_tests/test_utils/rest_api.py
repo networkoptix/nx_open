@@ -1,7 +1,7 @@
 """Proxy object for accessing REST API.
 
 Allows calls to REST API using notation:
-    rest_api_object.api.manualCamera.status.GET(arg1=1, arg2=2)
+    api_object.api.manualCamera.status.GET(arg1=1, arg2=2)
 which automatically translated to
     GET /api/manualCamera/status?arg1=1&arg2=2
 But for POST method keyword parameters are translated to json request body.
@@ -12,7 +12,6 @@ import datetime
 import hashlib
 import json
 import logging
-import urllib
 from pprint import pformat
 
 import requests
@@ -121,7 +120,7 @@ class RestApi(object):
 
     def __repr__(self):
         password_display = self._auth.password if self._auth.password in STANDARD_PASSWORDS else '***'
-        return "<RestApi {} {} {}:{}>".format(self._alias, self.url, self._auth.username, password_display)
+        return "<RestApi {} {} {}:{}>".format(self._alias, self.url(''), self._auth.username, password_display)
 
     def with_credentials(self, username, password):
         """If credentials were changed"""
@@ -152,13 +151,14 @@ class RestApi(object):
         ha1 = hashlib.md5(':'.join([self.user.lower(), realm, self.password]).encode()).hexdigest()
         ha2 = hashlib.md5(':'.join([method, path]).encode()).hexdigest()  # Empty path.
         digest = hashlib.md5(':'.join([ha1, nonce, ha2]).encode()).hexdigest()
-        key = urllib.quote(base64.urlsafe_b64encode(':'.join([self.user.lower(), nonce, digest])))
+        key = base64.b64encode(':'.join([self.user.lower(), nonce, digest]))
+        assert requests.get(self.url('api/getCurrentUser'), params={'auth': key}).status_code == 200
         return key
 
     def get_api_fn(self, method, api_object, api_method):
-        object = getattr(self, api_object)  # server.rest_api.ec2
-        function = getattr(object, api_method)  # server.rest_api.ec2.getUsers
-        return getattr(function, method)  # server.rest_api.ec2.getUsers.GET
+        object = getattr(self, api_object)  # server.api.ec2
+        function = getattr(object, api_method)  # server.api.ec2.getUsers
+        return getattr(function, method)  # server.api.ec2.getUsers.GET
 
     def _raise_for_status(self, response):
         if 400 <= response.status_code < 600:
