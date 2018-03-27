@@ -10,11 +10,6 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-class CameraSettingsDialogStateStrings
-{
-    Q_DECLARE_TR_FUNCTIONS(CameraSettingsDialogStateStrings)
-};
-
 using State = CameraSettingsDialogState;
 
 namespace {
@@ -117,14 +112,12 @@ State loadNetworkInfo(State state, const QnVirtualCameraResourcePtr& camera)
 
     const bool isIoModule = camera->isIOModule();
     const bool hasPrimaryStream = !isIoModule || camera->isAudioSupported();
-    state.singleCameraSettings.primaryStream = hasPrimaryStream
-        ? camera->sourceUrl(Qn::CR_LiveVideo)
-        : CameraSettingsDialogStateStrings::tr("I/O module has no audio stream");
+    if (hasPrimaryStream)
+        state.singleCameraSettings.primaryStream = camera->sourceUrl(Qn::CR_LiveVideo);
 
     const bool hasSecondaryStream = camera->hasDualStreaming();
-    state.singleCameraSettings.secondaryStream = hasSecondaryStream
-        ? camera->sourceUrl(Qn::CR_SecondaryLiveVideo)
-        : CameraSettingsDialogStateStrings::tr("Camera has no secondary stream");
+    if (hasSecondaryStream)
+        state.singleCameraSettings.secondaryStream = camera->sourceUrl(Qn::CR_SecondaryLiveVideo);
 
     return state;
 }

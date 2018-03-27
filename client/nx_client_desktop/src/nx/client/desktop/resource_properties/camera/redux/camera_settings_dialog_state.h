@@ -75,8 +75,8 @@ struct CameraSettingsDialogState
         QString macAddress;
         QString ipAddress;
         QString webPage;
-        QString primaryStream;
-        QString secondaryStream;
+        std::optional<QString> primaryStream;
+        std::optional<QString> secondaryStream;
     };
     SingleCameraSettings singleCameraSettings;
 

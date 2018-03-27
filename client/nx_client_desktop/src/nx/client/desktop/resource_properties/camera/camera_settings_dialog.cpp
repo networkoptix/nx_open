@@ -25,6 +25,8 @@
 #include "watchers/camera_settings_readonly_watcher.h"
 #include "watchers/camera_settings_panic_watcher.h"
 
+#include "utils/camera_settings_dialog_state_conversion_functions.h"
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -34,68 +36,6 @@ struct CameraSettingsDialog::Private
     QPointer<CameraSettingsDialogStore> store;
     QPointer<CameraSettingsReadOnlyWatcher> readOnlyWatcher;
     QnVirtualCameraResourceList cameras;
-
-    using State = CameraSettingsDialogState;
-
-    void setMinRecordingDays(const State::RecordingDays& value)
-    {
-        if (!value.same)
-            return;
-        int actualValue = value.absoluteValue;
-        NX_ASSERT(actualValue > 0);
-        if (actualValue == 0)
-            actualValue = ec2::kDefaultMinArchiveDays;
-        if (value.automatic)
-            actualValue = -actualValue;
-
-        for (const auto& camera: cameras)
-            camera->setMinDays(actualValue);
-    }
-
-    void setMaxRecordingDays(const State::RecordingDays& value)
-    {
-        if (!value.same)
-            return;
-        int actualValue = value.absoluteValue;
-        NX_ASSERT(actualValue > 0);
-        if (actualValue == 0)
-            actualValue = ec2::kDefaultMaxArchiveDays;
-        if (value.automatic)
-            actualValue = -actualValue;
-
-        for (const auto& camera: cameras)
-            camera->setMaxDays(actualValue);
-    }
-
-    void setCustomRotation(const Rotation& value)
-    {
-        for (const auto& camera: cameras)
-        {
-            NX_EXPECT(camera->hasVideo());
-            if (camera->hasVideo())
-            {
-                if (value.isValid())
-                    camera->setProperty(QnMediaResource::rotationKey(), value.toString());
-                else
-                    camera->setProperty(QnMediaResource::rotationKey(), QString());
-            }
-        }
-    }
-
-    void setCustomAspectRatio(const QnAspectRatio& value)
-    {
-        for (const auto& camera: cameras)
-        {
-            NX_EXPECT(camera->hasVideo() && !camera->hasFlags(Qn::wearable_camera));
-            if (camera->hasVideo() && !camera->hasFlags(Qn::wearable_camera))
-            {
-                if (value.isValid())
-                    camera->setCustomAspectRatio(value);
-                else
-                    camera->clearCustomAspectRatio();
-            }
-        }
-    }
 
     bool hasChanges() const
     {
@@ -108,18 +48,7 @@ struct CameraSettingsDialog::Private
     {
         store->applyChanges();
         const auto& state = store->state();
-        if (state.isSingleCamera())
-        {
-            cameras.first()->setName(state.singleCameraSettings.name());
-        }
-        setMinRecordingDays(state.recording.minDays);
-        setMaxRecordingDays(state.recording.maxDays);
-
-        if (state.imageControl.aspectRatio.hasValue())
-            setCustomAspectRatio(state.imageControl.aspectRatio());
-
-        if (state.imageControl.rotation.hasValue())
-            setCustomRotation(state.imageControl.rotation());
+        CameraSettingsDialogStateConversionFunctions::applyStateToCameras(state, cameras);
     }
 
     void resetChanges()

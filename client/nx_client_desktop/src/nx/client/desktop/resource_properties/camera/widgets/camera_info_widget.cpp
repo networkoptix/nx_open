@@ -119,24 +119,41 @@ void CameraInfoWidget::loadState(const CameraSettingsDialogState& state)
 
     ui->cameraRulesButton->setText(rulesTitle);
 
-    ui->nameLabel->setText(state.singleCameraSettings.name());
+    const auto& single = state.singleCameraSettings;
+    ui->nameLabel->setText(single.name());
     ui->nameLabel->setReadOnly(state.readOnly);
     ui->multipleNameLabel->setText(
         QnDeviceDependentStrings::getNumericName(state.deviceType, state.devicesCount));
 
-    ui->modelLabel->setText(state.singleCameraSettings.model);
-    ui->modelDetailLabel->setText(state.singleCameraSettings.model);
-    ui->vendorLabel->setText(state.singleCameraSettings.vendor);
-    ui->vendorDetailLabel->setText(state.singleCameraSettings.vendor);
-    ui->macAddressLabel->setText(state.singleCameraSettings.macAddress);
-    ui->firmwareLabel->setText(state.singleCameraSettings.firmware);
-    ui->cameraIdLabel->setText(state.singleCameraSettings.id);
+    ui->modelLabel->setText(single.model);
+    ui->modelDetailLabel->setText(single.model);
+    ui->vendorLabel->setText(single.vendor);
+    ui->vendorDetailLabel->setText(single.vendor);
+    ui->macAddressLabel->setText(single.macAddress);
+    ui->firmwareLabel->setText(single.firmware);
+    ui->cameraIdLabel->setText(single.id);
 
-    ui->ipAddressLabel->setText(state.singleCameraSettings.ipAddress);
-    ui->ipAddressDetailLabel->setText(state.singleCameraSettings.ipAddress);
-    ui->webPageLabel->setText(state.singleCameraSettings.webPage);
-    ui->primaryStreamLabel->setText(state.singleCameraSettings.primaryStream);
-    ui->secondaryStreamLabel->setText(state.singleCameraSettings.secondaryStream);
+    ui->ipAddressLabel->setText(single.ipAddress);
+    ui->ipAddressDetailLabel->setText(single.ipAddress);
+    ui->webPageLabel->setText(single.webPage);
+
+    const QString noPrimaryStreamText = QnCameraDeviceStringSet(
+        tr("Device has no primary stream"),
+        tr("Camera has no primary stream"),
+        tr("I/O module has no audio stream")
+    ).getString(state.deviceType);
+    ui->primaryStreamLabel->setText(single.primaryStream.has_value()
+        ? noPrimaryStreamText
+        : single.primaryStream.value());
+
+    const QString noSecondaryStreamText = QnCameraDeviceStringSet(
+        tr("Device has no secondary stream"),
+        tr("Camera has no secondary stream"),
+        tr("I/O module has no secondary stream")
+    ).getString(state.deviceType);
+    ui->secondaryStreamLabel->setText(single.secondaryStream.has_value()
+        ? noSecondaryStreamText
+        : single.secondaryStream.value());
 }
 
 void CameraInfoWidget::alignLabels()
