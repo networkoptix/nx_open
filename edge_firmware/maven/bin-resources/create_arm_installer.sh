@@ -469,6 +469,7 @@ copyToolchainLibs()
 {
     echo "Copying toolchain libs (libstdc++, libatomic)"
     copy_sys_lib "libstdc++.so.6" "$LIB_INSTALL_DIR"
+    copy_sys_lib "libgcc_s.so.1" "$LIB_INSTALL_DIR"
     copy_sys_lib "libatomic.so.1" "$LIB_INSTALL_DIR"
 }
 
