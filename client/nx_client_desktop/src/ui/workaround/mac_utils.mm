@@ -4,6 +4,7 @@
 #include <QtCore/QFile>
 #include <QtCore/QDebug>
 #include <QtCore/QtMath>
+#include <QtCore/QEventLoop>
 
 #include <sys/resource.h>
 
@@ -12,54 +13,55 @@
 
 #import "mac_utils.h"
 
-static NSString* fromQString(const QString &string)
+#include <utils/common/delayed.h>
+
+namespace {
+
+NSString* fromQString(const QString& string)
 {
-    const QByteArray utf8 = string.toUtf8();
-    const char* cString = utf8.constData();
+    const auto utf8 = string.toUtf8();
+    const auto cString = utf8.constData();
     return [[NSString alloc] initWithUTF8String:cString];
 }
 
-static NSArray *fromQStringList(const QStringList &strings) {
-    NSMutableArray *array = [NSMutableArray array];
-
-    foreach (const QString& item, strings) {
+NSArray* fromQStringList(const QStringList& strings)
+{
+    auto array = [NSMutableArray array];
+    for (const auto& item: strings)
         [array addObject:fromQString(item)];
-    }
 
     return array;
 }
 
-static QString toQString(NSString *string)
+QString toQString(NSString* string)
 {
-    if (!string)
-        return QString();
-
-    return QString::fromUtf8([string UTF8String]);
+    return string
+        ? QString::fromUtf8([string UTF8String])
+        : QString();
 }
 
-bool mac_isSandboxed() {
-    NSDictionary* environ = [[NSProcessInfo processInfo] environment];
-    return (nil != [environ objectForKey:@"APP_SANDBOX_CONTAINER_ID"]);
-}
-
-void saveFileBookmark(NSString *path) {
+void saveFileBookmark(NSString* path)
+{
     NSLog(@"saveFileBookmark(): %@", path);
 
-    NSURL *url = [NSURL fileURLWithPath:path];
+    NSURL* url = [NSURL fileURLWithPath:path];
 
-    NSError *error = nil;
-    NSData *data = [url bookmarkDataWithOptions:NSURLBookmarkCreationWithSecurityScope includingResourceValuesForKeys:nil relativeToURL:nil error:&error];
-    if (error) {
+    NSError* error = nil;
+    auto data = [url bookmarkDataWithOptions:NSURLBookmarkCreationWithSecurityScope
+        includingResourceValuesForKeys:nil relativeToURL:nil error:&error];
+    if (error)
+    {
         NSLog(@"Error securing bookmark for url %@ %@", url, error);
         return;
     }
 
     NSLog(@"Data length: %d", data.length);
-    NSUserDefaults* prefs = [NSUserDefaults standardUserDefaults];
-    NSDictionary *savedEntitlements = [prefs dictionaryForKey:@"directoryEntitlements"];
+    const auto prefs = [NSUserDefaults standardUserDefaults];
+    const auto savedEntitlements = [prefs dictionaryForKey:@"directoryEntitlements"];
 
-    NSMutableDictionary *entitlements = [NSMutableDictionary dictionary];
-    if (savedEntitlements) {
+    const auto entitlements = [NSMutableDictionary dictionary];
+    if (savedEntitlements)
+    {
         NSLog(@"saveFileBookmark(): existing keys %@", entitlements.allKeys);
         [entitlements addEntriesFromDictionary:savedEntitlements];
     }
@@ -67,6 +69,88 @@ void saveFileBookmark(NSString *path) {
     [entitlements setObject:data forKey:path];
     [prefs setObject:entitlements forKey:@"directoryEntitlements"];
     [prefs synchronize];
+}
+
+enum class OpenDialogMode
+{
+    chooseFile,
+    chooseMultipleFiles,
+    chooseDirectory
+};
+
+QStringList showOpenDialog(
+    OpenDialogMode mode,
+    const QString& caption,
+    const QString& directory,
+    const QStringList& extensions = QStringList())
+{
+    const bool sandboxed = mac_isSandboxed();
+    const auto panel = [NSOpenPanel openPanel];
+    [panel setTitle:fromQString(caption)];
+    [panel setCanCreateDirectories:YES];
+    [panel setAllowsMultipleSelection: mode == OpenDialogMode::chooseMultipleFiles ? YES : NO];
+    [panel setCanChooseFiles: mode == OpenDialogMode::chooseDirectory ? NO : YES];
+    [panel setCanChooseDirectories: mode == OpenDialogMode::chooseDirectory ? YES : NO];
+
+    if (extensions.size() != 0)
+        [panel setAllowedFileTypes:fromQStringList(extensions)];
+
+    if (!sandboxed && !directory.isEmpty())
+        [panel setDirectoryURL:[NSURL fileURLWithPath:fromQString(directory)]];
+
+    qApp->processEvents(QEventLoop::ExcludeUserInputEvents | QEventLoop::ExcludeSocketNotifiers);
+    const bool ok = ([panel runModal] == NSModalResponseOK);
+    QAbstractEventDispatcher::instance()->interrupt();
+
+    if (!ok)
+        return QStringList();
+
+    QStringList result;
+    if (mode == OpenDialogMode::chooseMultipleFiles)
+    {
+        for (size_t i = 0; i < panel.URLs.count; ++i)
+            result.append(toQString([[[panel URLs] objectAtIndex:i] path]));
+    }
+    else
+    {
+        result.append(toQString(panel.URL.path));
+    }
+
+    if (sandboxed)
+        saveFileBookmark(panel.URL.path);
+
+    return result;
+}
+
+// We have to use our oun event loop to prevent dialog from sudden hide. Otherwise, it looks like
+// somewone sends message to close dialog unexpectecly.
+QStringList showOpenDialogWorkaround(
+    OpenDialogMode mode,
+    const QString& caption,
+    const QString& directory,
+    const QStringList& extensions = QStringList())
+{
+    QStringList result;
+
+    QEventLoop loop;
+    const auto callback =
+        [&loop, &result, mode, caption, directory, extensions]()
+        {
+            result = showOpenDialog(mode, caption, directory, extensions);
+            loop.quit();
+        };
+
+    executeDelayed(callback, 0);
+    loop.exec();
+    return result;
+}
+
+} // namespace
+
+bool mac_isSandboxed()
+{
+    NSDictionary* environ = [[NSProcessInfo processInfo] environment];
+    return (nil != [environ objectForKey:@"APP_SANDBOX_CONTAINER_ID"]);
 }
 
 void mac_saveFileBookmark(const QString& qpath) {
@@ -119,126 +203,92 @@ void mac_stopFileAccess() {
     }
 }
 
-QString mac_getExistingDirectory(const QString &caption, const QString &dir) {
-    bool sandboxed = mac_isSandboxed();
-
-    NSOpenPanel *panel = [NSOpenPanel openPanel];
-    [panel setTitle:fromQString(caption)];
-    [panel setCanChooseDirectories:YES];
-    [panel setCanCreateDirectories:YES];
-    [panel setAllowsMultipleSelection:NO];
-    [panel setCanChooseFiles:NO];
-    if (!sandboxed && !dir.isEmpty())
-        [panel setDirectoryURL:[NSURL fileURLWithPath:fromQString(dir)]];
-
-    qApp->processEvents(QEventLoop::ExcludeUserInputEvents | QEventLoop::ExcludeSocketNotifiers);
-    bool ok = ([panel runModal] == NSOKButton);
-    QAbstractEventDispatcher::instance()->interrupt();
-
-    if (ok) {
-        if (sandboxed)
-            saveFileBookmark(panel.URL.path);
-
-        return toQString(panel.URL.path);
-    }
-
-    return QString();
+QString mac_getExistingDirectory(
+    const QString& caption,
+    const QString& directory)
+{
+    const auto result = showOpenDialogWorkaround(
+        OpenDialogMode::chooseDirectory, caption, directory);
+    return result.isEmpty() ? QString() : result.front();
 }
 
-QString mac_getOpenFileName(const QString &caption, const QString &dir, const QStringList &extensions) {
-    bool sandboxed = mac_isSandboxed();
-
-    NSOpenPanel *panel = [NSOpenPanel openPanel];
-    [panel setTitle:fromQString(caption)];
-    [panel setCanChooseDirectories:NO];
-    [panel setCanCreateDirectories:YES];
-    [panel setAllowsMultipleSelection:NO];
-    [panel setCanChooseFiles:YES];
-    if (extensions.size() != 0)
-        [panel setAllowedFileTypes:fromQStringList(extensions)];
-    if (!sandboxed && !dir.isEmpty())
-        [panel setDirectoryURL:[NSURL fileURLWithPath:fromQString(dir)]];
-
-    qApp->processEvents(QEventLoop::ExcludeUserInputEvents | QEventLoop::ExcludeSocketNotifiers);
-    bool ok = ([panel runModal] == NSOKButton);
-    QAbstractEventDispatcher::instance()->interrupt();
-
-    if (ok) {
-        if (sandboxed)
-            saveFileBookmark(panel.URL.path);
-
-        return toQString(panel.URL.path);
-    }
-
-    return QString();
+QString mac_getOpenFileName(
+    const QString& caption,
+    const QString& directory,
+    const QStringList& extensions)
+{
+    const auto result = showOpenDialogWorkaround(
+        OpenDialogMode::chooseFile, caption, directory, extensions);
+    return result.isEmpty() ? QString() : result.front();
 }
 
-QStringList mac_getOpenFileNames(const QString &caption, const QString &dir, const QStringList &extensions) {
-    bool sandboxed = mac_isSandboxed();
-
-    NSOpenPanel *panel = [NSOpenPanel openPanel];
-    [panel setTitle:fromQString(caption)];
-    [panel setCanChooseDirectories:NO];
-    [panel setCanCreateDirectories:YES];
-    [panel setAllowsMultipleSelection:YES];
-    [panel setCanChooseFiles:YES];
-    if (extensions.size() != 0)
-        [panel setAllowedFileTypes:fromQStringList(extensions)];
-    if (!sandboxed && !dir.isEmpty())
-        [panel setDirectoryURL:[NSURL fileURLWithPath:fromQString(dir)]];
-
-    qApp->processEvents(QEventLoop::ExcludeUserInputEvents | QEventLoop::ExcludeSocketNotifiers);
-    bool ok = ([panel runModal] == NSOKButton);
-    QAbstractEventDispatcher::instance()->interrupt();
-
-    if (ok) {
-        QStringList urls;
-        for (size_t i = 0; i < panel.URLs.count; ++i)
-            urls.append(toQString([[[panel URLs] objectAtIndex:i] path]));
-
-        if (sandboxed)
-            saveFileBookmark(panel.URL.path);
-
-        return urls;
-    }
-
-    return QStringList();
+QStringList mac_getOpenFileNames(
+    const QString& caption,
+    const QString& directory,
+    const QStringList& extensions)
+{
+    return showOpenDialogWorkaround(
+        OpenDialogMode::chooseMultipleFiles, caption, directory, extensions);
 }
 
+// We have to use our oun event loop to prevent dialog from sudden hide. Otherwise, it looks like
+// somewone sends message to close dialog unexpectecly.
+QString mac_getSaveFileName(
+    const QString& caption,
+    const QString& directory,
+    const QStringList& extensions)
+{
+    QString result;
+    QEventLoop loop;
 
-QString mac_getSaveFileName(const QString &caption, const QString &dir, const QStringList &extensions) {
-    bool sandboxed = mac_isSandboxed();
+    const auto callback =
+        [caption, directory, extensions]()
+        {
+            const bool sandboxed = mac_isSandboxed();
 
-    NSSavePanel *panel = [NSSavePanel savePanel];
-    [panel setTitle:fromQString(caption)];
-    [panel setCanCreateDirectories:YES];
-    if (extensions.size() != 0)
-        [panel setAllowedFileTypes:fromQStringList(extensions)];
-    [panel setAllowsOtherFileTypes:YES];
-    if (!sandboxed && !dir.isEmpty())
-        [panel setDirectoryURL:[NSURL fileURLWithPath:fromQString(dir)]];
+            const auto panel = [NSSavePanel savePanel];
+            [panel setTitle:fromQString(caption)];
+            [panel setCanCreateDirectories:YES];
+            if (extensions.size() != 0)
+                [panel setAllowedFileTypes:fromQStringList(extensions)];
+            [panel setAllowsOtherFileTypes:YES];
+            if (!sandboxed && !directory.isEmpty())
+                [panel setDirectoryURL:[NSURL fileURLWithPath:fromQString(directory)]];
 
-    qApp->processEvents(QEventLoop::ExcludeUserInputEvents | QEventLoop::ExcludeSocketNotifiers);
-    bool ok = ([panel runModal] == NSOKButton);
-    QAbstractEventDispatcher::instance()->interrupt();
+            qApp->processEvents(QEventLoop::ExcludeUserInputEvents | QEventLoop::ExcludeSocketNotifiers);
+            const bool ok = ([panel runModal] == NSModalResponseOK);
+            QAbstractEventDispatcher::instance()->interrupt();
 
-    if (ok) {
-        if (sandboxed) {
-            // This is a hack! We cannot save bookmark for an inexistent file. So we create it before bookmark saving...
-            QFile file(toQString(panel.URL.path));
-            file.open(QFile::WriteOnly);
-            file.close();
+            if (!ok)
+                return QString();
 
-            saveFileBookmark(panel.URL.path);
+            if (sandboxed)
+            {
+                // This is a hack! We cannot save bookmark for an inexistent file.
+                // So we create it before bookmark saving.
+                QFile file(toQString(panel.URL.path));
+                file.open(QFile::WriteOnly);
+                file.close();
 
-            // ... and remove after
-            file.remove();
-        }
+                saveFileBookmark(panel.URL.path);
 
-        return toQString(panel.URL.path);
-    }
+                // ... and remove after
+                file.remove();
+            }
 
-    return QString();
+            return toQString(panel.URL.path);
+        };
+
+    const auto loopCallback =
+        [&loop, &result, callback]()
+        {
+            result = callback();
+            loop.quit();
+        };
+
+    executeDelayed(loopCallback, 0);
+    loop.exec();
+    return result;
 }
 
 extern "C" {
