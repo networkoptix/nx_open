@@ -108,9 +108,9 @@ class RestApi(object):
         self._port = port
         self._hostname = hostname
         self._alias = alias
-        if ca_cert is not None:
-            self.ca_cert = ca_cert
-            log.info("We will trust CA cert: %s.", self.ca_cert)
+        self.ca_cert = ca_cert
+        if self.ca_cert is not None:
+            log.info("Trust CA cert: %s.", self.ca_cert)
         self._auth = HTTPDigestAuth(username, password)
         self.user = username  # Only for interface.
         self.password = password  # Only for interface.
