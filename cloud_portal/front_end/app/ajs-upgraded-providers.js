@@ -43,13 +43,13 @@ exports.processServiceProvider = {
     useFactory: processFactory,
     deps: ['$injector']
 };
-function CONFIGFactory(i) {
-    return i.get('CONFIG');
+function configServiceFactory(i) {
+    return i.get('configService');
 }
-exports.CONFIGFactory = CONFIGFactory;
-exports.CONFIGProvider = {
-    provide: 'CONFIG',
-    useFactory: CONFIGFactory,
+exports.configServiceFactory = configServiceFactory;
+exports.configServiceProvider = {
+    provide: 'configService',
+    useFactory: configServiceFactory,
     deps: ['$injector']
 };
 function ngToastFactory(i) {
@@ -129,16 +129,16 @@ processServiceModule = __decorate([
     })
 ], processServiceModule);
 exports.processServiceModule = processServiceModule;
-let CONFIGModule = class CONFIGModule {
+let configServiceModule = class configServiceModule {
 };
-CONFIGModule = __decorate([
+configServiceModule = __decorate([
     core_1.NgModule({
         providers: [
-            exports.CONFIGProvider
+            exports.configServiceProvider
         ]
     })
-], CONFIGModule);
-exports.CONFIGModule = CONFIGModule;
+], configServiceModule);
+exports.configServiceModule = configServiceModule;
 let ngToastModule = class ngToastModule {
 };
 ngToastModule = __decorate([

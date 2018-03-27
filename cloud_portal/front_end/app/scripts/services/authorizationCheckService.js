@@ -3,8 +3,9 @@
     angular
         .module('cloudApp')
         .factory('authorizationCheckService', AuthorizationCheckService);
-    AuthorizationCheckService.$inject = ['$rootScope', '$q', '$localStorage', '$base64', 'cloudApi', 'CONFIG', 'nxDialogsService', 'languageService', '$location'];
-    function AuthorizationCheckService($rootScope, $q, $localStorage, $base64, cloudApi, CONFIG, nxDialogsService, languageService, $location) {
+    AuthorizationCheckService.$inject = ['$rootScope', '$q', '$localStorage', '$base64', 'cloudApi', 'configService', 'nxDialogsService', 'languageService', '$location'];
+    function AuthorizationCheckService($rootScope, $q, $localStorage, $base64, cloudApi, configService, nxDialogsService, languageService, $location) {
+        const CONFIG = configService.config;
         let search = $location.search();
         let auth;
         let requestingLogin;

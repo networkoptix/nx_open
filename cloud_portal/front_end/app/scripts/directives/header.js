@@ -7,10 +7,13 @@
         .directive('nxHeader', NxHeader);
 
     NxHeader.$inject = [ 'nxDialogsService', 'cloudApi', 'account', '$location', '$route',
-        'systemsProvider', 'CONFIG' ];
+        'systemsProvider', 'configService' ];
 
     function NxHeader(nxDialogsService, cloudApi, account, $location, $route,
-                      systemsProvider, CONFIG) {
+                      systemsProvider, configService) {
+
+        const CONFIG = configService.config;
+
         return {
             restrict   : 'E',
             templateUrl: CONFIG.viewsDir + 'components/header.html',

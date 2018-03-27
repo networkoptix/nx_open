@@ -4,11 +4,12 @@
         .module('cloudApp')
         .factory('account', AccountService);
     AccountService.$inject = ['cloudApi', '$q', '$location', '$localStorage',
-        '$rootScope', '$base64', 'CONFIG'];
-    function AccountService(cloudApi, $q, $location, $localStorage, $rootScope, $base64, CONFIG) {
+        '$rootScope', '$base64', 'configService'];
+    function AccountService(cloudApi, $q, $location, $localStorage, $rootScope, $base64, configService) {
         $rootScope.session = $localStorage;
         let requestingLogin;
         let initialState = $rootScope.session.loginState;
+        const CONFIG = configService.config;
         $rootScope.$watch('session.loginState', function (value) {
             if (initialState !== value) {
                 document.location.reload();

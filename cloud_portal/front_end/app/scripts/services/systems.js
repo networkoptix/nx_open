@@ -6,10 +6,10 @@ const angular = require("angular");
     'use strict';
     angular
         .module('cloudApp')
-        .service('systemsProvider', ['cloudApi', '$interval', '$q', 'CONFIG', 'languageService',
-        // Systems.$inject = ['cloudApi', '$interval', '$q', 'CONFIG', 'languageService'];
-        function (cloudApi, $interval, $q, CONFIG, languageService) {
+        .service('systemsProvider', ['cloudApi', '$interval', '$q', 'configService', 'languageService',
+        function (cloudApi, $interval, $q, configService, languageService) {
             const self = this;
+            const CONFIG = configService.config;
             this.systems = [];
             this.forceUpdateSystems = function () {
                 return cloudApi.systems().then(function (result) {

@@ -15,12 +15,12 @@ import { CoreModule } from './core/index';
 
 import { cloudApiServiceProvider } from './ajs-upgraded-providers';
 import { systemsModule }           from './ajs-upgraded-providers';
-// import {CONFIGModule} from './ajs-upgraded-providers';
 import { languageServiceModule }   from './ajs-upgraded-providers';
 import { accountServiceModule }    from './ajs-upgraded-providers';
 import { processServiceModule }    from './ajs-upgraded-providers';
 import { uuid2ServiceModule }      from './ajs-upgraded-providers';
 import { ngToastModule }           from './ajs-upgraded-providers';
+import { configServiceModule }     from './ajs-upgraded-providers';
 
 import { AppComponent }                                 from './app.component';
 import { BarModule }                                    from './bar/bar.module';
@@ -32,6 +32,7 @@ import { NxModalLoginComponent, LoginModalContent }     from "./dialogs/login/lo
 import { NxProcessButtonComponent }                     from './components/process-button/process-button.component';
 import { nxDialogsService }                             from "./dialogs/dialogs.service";
 import { GeneralModalContent, NxModalGeneralComponent } from "./dialogs/general/general.component";
+import { NxSystemsDropdown }                            from "./dropdowns/systems/systems.component";
 
 class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
     // use only process the `/bar` url
@@ -64,6 +65,7 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
         processServiceModule,
         systemsModule,
         ngToastModule,
+        configServiceModule,
         DropdownsModule,
 
         NgbModule.forRoot(),
@@ -99,8 +101,6 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
         GeneralModalContent,
         NxModalGeneralComponent,
         NxProcessButtonComponent,
-        // NxLanguageDropdown,
-        // NxAccountSettingsDropdown
     ],
     bootstrap: [AppComponent]
 })
@@ -116,6 +116,7 @@ angular
     .directive('nxLanguageSelect', downgradeComponent({component: NxLanguageDropdown}) as angular.IDirectiveFactory)
     .directive('nxAccountSettingsSelect', downgradeComponent({component: NxAccountSettingsDropdown}) as angular.IDirectiveFactory)
     .directive('nxActiveSystem', downgradeComponent({component: NxActiveSystemDropdown}) as angular.IDirectiveFactory)
+    .directive('nxSystems', downgradeComponent({component: NxSystemsDropdown}) as angular.IDirectiveFactory)
     .directive('nxModalLogin', downgradeComponent({component: NxModalLoginComponent}) as angular.IDirectiveFactory);
 
 angular

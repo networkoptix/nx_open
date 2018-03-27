@@ -7,15 +7,16 @@
         .factory('account', AccountService);
 
     AccountService.$inject = ['cloudApi', '$q', '$location', '$localStorage',
-        '$rootScope', '$base64', 'CONFIG'];
+        '$rootScope', '$base64', 'configService'];
 
     function AccountService(cloudApi, $q, $location, $localStorage,
-                            $rootScope, $base64, CONFIG) {
+                            $rootScope, $base64, configService) {
 
         $rootScope.session = $localStorage;
 
         let requestingLogin: any;
         let initialState = $rootScope.session.loginState;
+        const CONFIG = configService.config;
 
         $rootScope.$watch('session.loginState', function (value) {  // Catch logout from other tabs
             if (initialState !== value) {

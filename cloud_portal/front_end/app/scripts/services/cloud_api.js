@@ -6,8 +6,10 @@ const angular = require("angular");
     angular
         .module('cloudApp')
         .factory('cloudApi', CloudApi);
-    CloudApi.$inject = ['$http', '$q', 'CONFIG'];
-    function CloudApi($http, $q, CONFIG) {
+    CloudApi.$inject = ['$http', '$q', 'configService'];
+    function CloudApi($http, $q, configService) {
+        console.log(configService);
+        const CONFIG = configService.config;
         let apiBase = CONFIG.apiBase;
         let cachedResults = {};
         let cacheReceived = {};

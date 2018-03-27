@@ -41,13 +41,13 @@ export const processServiceProvider = {
     deps: ['$injector']
 };
 
-export function CONFIGFactory(i: any) {
-    return i.get('CONFIG');
+export function configServiceFactory(i: any) {
+    return i.get('configService');
 }
 
-export const CONFIGProvider = {
-    provide: 'CONFIG',
-    useFactory: CONFIGFactory,
+export const configServiceProvider = {
+    provide: 'configService',
+    useFactory: configServiceFactory,
     deps: ['$injector']
 };
 
@@ -121,10 +121,10 @@ export class processServiceModule {
 
 @NgModule({
     providers: [
-        CONFIGProvider
+        configServiceProvider
     ]
 })
-export class CONFIGModule {
+export class configServiceModule {
 }
 
 @NgModule({

@@ -7,12 +7,12 @@ import * as angular from 'angular';
 
     angular
         .module('cloudApp')
-        .service('systemsProvider', ['cloudApi', '$interval', '$q', 'CONFIG', 'languageService',
+        .service('systemsProvider', ['cloudApi', '$interval', '$q', 'configService', 'languageService',
 
-            // Systems.$inject = ['cloudApi', '$interval', '$q', 'CONFIG', 'languageService'];
-
-            function (cloudApi, $interval, $q, CONFIG, languageService) {
+            function (cloudApi, $interval, $q, configService, languageService) {
                 const self = this;
+                const CONFIG = configService.config;
+
                 this.systems = [];
 
                 this.forceUpdateSystems = function () {

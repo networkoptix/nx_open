@@ -7,14 +7,19 @@ import * as angular from 'angular';
             .module('cloudApp')
             .factory('cloudApi', CloudApi);
 
-    CloudApi.$inject = ['$http', '$q', 'CONFIG'];
+    CloudApi.$inject = ['$http', '$q', 'configService'];
 
-    function CloudApi($http, $q, CONFIG) {
+    function CloudApi($http, $q, configService) {
+
+        console.log (configService);
+
+        const CONFIG = configService.config;
 
         let apiBase = CONFIG.apiBase;
 
         let cachedResults = {};
         let cacheReceived = {};
+
 
         function cacheGet(url, cacheForever?) {
             cacheReceived[url] = 0;

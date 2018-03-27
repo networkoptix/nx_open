@@ -19,12 +19,12 @@ const ngx_order_pipe_1 = require("ngx-order-pipe");
 const index_1 = require("./core/index");
 const ajs_upgraded_providers_1 = require("./ajs-upgraded-providers");
 const ajs_upgraded_providers_2 = require("./ajs-upgraded-providers");
-// import {CONFIGModule} from './ajs-upgraded-providers';
 const ajs_upgraded_providers_3 = require("./ajs-upgraded-providers");
 const ajs_upgraded_providers_4 = require("./ajs-upgraded-providers");
 const ajs_upgraded_providers_5 = require("./ajs-upgraded-providers");
 const ajs_upgraded_providers_6 = require("./ajs-upgraded-providers");
 const ajs_upgraded_providers_7 = require("./ajs-upgraded-providers");
+const ajs_upgraded_providers_8 = require("./ajs-upgraded-providers");
 const app_component_1 = require("./app.component");
 const bar_module_1 = require("./bar/bar.module");
 const dropdowns_module_1 = require("./dropdowns/dropdowns.module");
@@ -35,6 +35,7 @@ const login_component_1 = require("./dialogs/login/login.component");
 const process_button_component_1 = require("./components/process-button/process-button.component");
 const dialogs_service_1 = require("./dialogs/dialogs.service");
 const general_component_1 = require("./dialogs/general/general.component");
+const systems_component_1 = require("./dropdowns/systems/systems.component");
 class HybridUrlHandlingStrategy {
     // use only process the `/bar` url
     shouldProcessUrl(url) {
@@ -68,6 +69,7 @@ AppModule = __decorate([
             ajs_upgraded_providers_5.processServiceModule,
             ajs_upgraded_providers_2.systemsModule,
             ajs_upgraded_providers_7.ngToastModule,
+            ajs_upgraded_providers_8.configServiceModule,
             dropdowns_module_1.DropdownsModule,
             ng_bootstrap_1.NgbModule.forRoot(),
             router_1.RouterModule.forRoot([], { initialNavigation: false })
@@ -112,6 +114,7 @@ angular
     .directive('nxLanguageSelect', static_1.downgradeComponent({ component: language_component_1.NxLanguageDropdown }))
     .directive('nxAccountSettingsSelect', static_1.downgradeComponent({ component: account_settings_component_1.NxAccountSettingsDropdown }))
     .directive('nxActiveSystem', static_1.downgradeComponent({ component: active_system_component_1.NxActiveSystemDropdown }))
+    .directive('nxSystems', static_1.downgradeComponent({ component: systems_component_1.NxSystemsDropdown }))
     .directive('nxModalLogin', static_1.downgradeComponent({ component: login_component_1.NxModalLoginComponent }));
 angular
     .module('cloudApp.services')

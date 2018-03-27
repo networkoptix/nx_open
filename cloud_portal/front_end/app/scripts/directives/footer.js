@@ -3,16 +3,19 @@
     'use strict';
 
     angular
-    .module('cloudApp.directives')
-    .directive('nxFooter', NxFooter);
+        .module('cloudApp.directives')
+        .directive('nxFooter', NxFooter);
 
-    NxFooter.$inject = ['CONFIG'];
+    NxFooter.$inject = [ 'configService' ];
 
-    function NxFooter (CONFIG) {
+    function NxFooter(configService) {
+
+        var CONFIG = configService.config;
+
         return {
-            restrict: 'E',
+            restrict   : 'E',
             templateUrl: CONFIG.viewsDir + 'components/footer.html',
-            link: function (scope, element, attrs) {
+            link       : function (scope, element, attrs) {
 
             }
         }
