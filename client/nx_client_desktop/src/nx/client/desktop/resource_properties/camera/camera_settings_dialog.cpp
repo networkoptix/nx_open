@@ -23,6 +23,7 @@
 #include "redux/camera_settings_dialog_store.h"
 
 #include "watchers/camera_settings_readonly_watcher.h"
+#include "watchers/camera_settings_panic_watcher.h"
 
 namespace nx {
 namespace client {
@@ -134,6 +135,9 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
     d(new Private())
 {
     d->store = new CameraSettingsDialogStore(this);
+
+    auto panicWatcher = new CameraSettingsPanicWatcher(this);
+    panicWatcher->setStore(d->store);
 
     connect(
         d->store,

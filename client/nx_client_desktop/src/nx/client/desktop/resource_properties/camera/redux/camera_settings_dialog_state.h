@@ -58,6 +58,7 @@ struct CameraSettingsDialogState
 
     bool hasChanges = false;
     bool readOnly = true;
+    bool panicMode = false;
 
     // Generic cameras info.
 

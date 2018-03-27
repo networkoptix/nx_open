@@ -16,6 +16,7 @@
 
 #include "../redux/camera_settings_dialog_state.h"
 #include "../redux/camera_settings_dialog_store.h"
+#include <ui/style/custom_style.h>
 
 namespace {
 
@@ -184,18 +185,6 @@ void ScheduleSettingsWidget::setStore(CameraSettingsDialogStore* store)
         });
 }
 
-/*
-void ScheduleSettingsWidget::afterContextInitialized()
-{
-    connect(
-        context()->instance<QnWorkbenchPanicWatcher>(),
-        &QnWorkbenchPanicWatcher::panicModeChanged,
-        this,
-        &ScheduleSettingsWidget::updatePanicLabelText);
-    updatePanicLabelText();
-}
-*/
-
 void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
 {
     const auto& recording = state.recording;
@@ -254,6 +243,9 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
         ui->advancedSettingsButton->setIcon(buttonIcon);
     }
 
+    ui->panicModeLabel->setText(state.panicMode ? tr("On") : tr("Off"));
+    setWarningStyleOn(ui->panicModeLabel, state.panicMode);
+
     ui->settingsGroupBox->layout()->activate();
 }
 
@@ -274,22 +266,6 @@ void ScheduleSettingsWidget::updateScheduleTypeControls()
     }
 }
 
-void ScheduleSettingsWidget::updatePanicLabelText()
-{
-    ui->panicModeLabel->setText(tr("Off"));
-    ui->panicModeLabel->setPalette(this->palette());
-
-    if (!context())
-        return;
-
-    if (context()->instance<QnWorkbenchPanicWatcher>()->isPanicMode())
-    {
-        QPalette palette = this->palette();
-        palette.setColor(QPalette::WindowText, QColor(255, 0, 0));
-        ui->panicModeLabel->setPalette(palette);
-        ui->panicModeLabel->setText(tr("On"));
-    }
-}
 
 void ScheduleSettingsWidget::at_releaseSignalizer_activated(QObject *target)
 {

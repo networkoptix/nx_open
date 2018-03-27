@@ -249,6 +249,12 @@ State CameraSettingsDialogStateReducer::setReadOnly(State state, bool value)
     return state;
 }
 
+State CameraSettingsDialogStateReducer::setPanicMode(State state, bool value)
+{
+    state.panicMode = value;
+    return state;
+}
+
 State CameraSettingsDialogStateReducer::loadCameras(
     State state,
     const QnVirtualCameraResourceList& cameras)

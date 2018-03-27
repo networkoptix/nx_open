@@ -58,6 +58,11 @@ void CameraSettingsDialogStore::setReadOnly(bool value)
     d->executeAction([&](State state) { return Reducer::setReadOnly(std::move(state), value); });
 }
 
+void CameraSettingsDialogStore::setPanicMode(bool value)
+{
+    d->executeAction([&](State state) { return Reducer::setPanicMode(std::move(state), value); });
+}
+
 void CameraSettingsDialogStore::loadCameras(const QnVirtualCameraResourceList& cameras)
 {
     d->executeAction([&](State state) { return Reducer::loadCameras(std::move(state), cameras); });

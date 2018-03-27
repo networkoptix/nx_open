@@ -15,6 +15,7 @@ public:
 
     static State applyChanges(State state);
     static State setReadOnly(State state, bool value);
+    static State setPanicMode(State state, bool value);
     static State loadCameras(State state, const QnVirtualCameraResourceList& cameras);
     static State setSingleCameraUserName(State state, const QString& text);
     static State setScheduleBrushRecordingType(State state, Qn::RecordingType value);
