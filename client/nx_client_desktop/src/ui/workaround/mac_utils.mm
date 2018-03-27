@@ -78,7 +78,7 @@ enum class OpenDialogMode
     chooseDirectory
 };
 
-QStringList showOpenDialog(
+QStringList showOpenDialogInternal(
     OpenDialogMode mode,
     const QString& caption,
     const QString& directory,
@@ -124,7 +124,7 @@ QStringList showOpenDialog(
 
 // We have to use our oun event loop to prevent dialog from sudden hide. Otherwise, it looks like
 // somewone sends message to close dialog unexpectecly.
-QStringList showOpenDialogWorkaround(
+QStringList showOpenDialog(
     OpenDialogMode mode,
     const QString& caption,
     const QString& directory,
@@ -136,7 +136,7 @@ QStringList showOpenDialogWorkaround(
     const auto callback =
         [&loop, &result, mode, caption, directory, extensions]()
         {
-            result = showOpenDialog(mode, caption, directory, extensions);
+            result = showOpenDialogInternal(mode, caption, directory, extensions);
             loop.quit();
         };
 
@@ -207,7 +207,7 @@ QString mac_getExistingDirectory(
     const QString& caption,
     const QString& directory)
 {
-    const auto result = showOpenDialogWorkaround(
+    const auto result = showOpenDialog(
         OpenDialogMode::chooseDirectory, caption, directory);
     return result.isEmpty() ? QString() : result.front();
 }
@@ -217,7 +217,7 @@ QString mac_getOpenFileName(
     const QString& directory,
     const QStringList& extensions)
 {
-    const auto result = showOpenDialogWorkaround(
+    const auto result = showOpenDialog(
         OpenDialogMode::chooseFile, caption, directory, extensions);
     return result.isEmpty() ? QString() : result.front();
 }
@@ -227,7 +227,7 @@ QStringList mac_getOpenFileNames(
     const QString& directory,
     const QStringList& extensions)
 {
-    return showOpenDialogWorkaround(
+    return showOpenDialog(
         OpenDialogMode::chooseMultipleFiles, caption, directory, extensions);
 }
 
