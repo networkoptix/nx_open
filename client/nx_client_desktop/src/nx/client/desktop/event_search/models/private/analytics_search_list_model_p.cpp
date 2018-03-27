@@ -700,7 +700,7 @@ QString AnalyticsSearchListModel::Private::attributes(
     QString rows;
     for (const auto& attribute: object.attributes)
     {
-        if (attribute.name.startsWith(lit("nx.sys")))
+        if (attribute.name.startsWith(lit("nx.sys.")))
             rows += kRowTemplate.arg(attribute.name, attribute.value);
     }
 
