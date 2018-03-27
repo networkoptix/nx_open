@@ -10,7 +10,7 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-class CameraSettingsReadonlyWatcher:
+class CameraSettingsReadOnlyWatcher:
     public QObject,
     public QnWorkbenchContextAware
 {
@@ -18,7 +18,7 @@ class CameraSettingsReadonlyWatcher:
     using base_type = QObject;
 
 public:
-    explicit CameraSettingsReadonlyWatcher(QObject* parent = nullptr);
+    explicit CameraSettingsReadOnlyWatcher(QObject* parent = nullptr);
 
     QnVirtualCameraResourceList cameras() const;
     void setCameras(const QnVirtualCameraResourceList& value);

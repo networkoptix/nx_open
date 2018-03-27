@@ -31,7 +31,7 @@ namespace desktop {
 struct CameraSettingsDialog::Private
 {
     QPointer<CameraSettingsDialogStore> store;
-    QPointer<CameraSettingsReadonlyWatcher> readOnlyWatcher;
+    QPointer<CameraSettingsReadOnlyWatcher> readOnlyWatcher;
     QnVirtualCameraResourceList cameras;
 
     using State = CameraSettingsDialogState;
@@ -144,10 +144,10 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
     ui->setupUi(this);
     setButtonBox(ui->buttonBox);
 
-    d->readOnlyWatcher = new CameraSettingsReadonlyWatcher(this);
+    d->readOnlyWatcher = new CameraSettingsReadOnlyWatcher(this);
     connect(
         d->readOnlyWatcher,
-        &CameraSettingsReadonlyWatcher::readOnlyChanged,
+        &CameraSettingsReadOnlyWatcher::readOnlyChanged,
         this,
         [this](bool readOnly)
         {

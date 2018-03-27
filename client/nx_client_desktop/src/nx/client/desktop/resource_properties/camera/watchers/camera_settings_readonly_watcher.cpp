@@ -11,18 +11,18 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-CameraSettingsReadonlyWatcher::CameraSettingsReadonlyWatcher(QObject* parent):
+CameraSettingsReadOnlyWatcher::CameraSettingsReadOnlyWatcher(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent, InitializationMode::lazy)
 {
 }
 
-QnVirtualCameraResourceList CameraSettingsReadonlyWatcher::cameras() const
+QnVirtualCameraResourceList CameraSettingsReadOnlyWatcher::cameras() const
 {
     return m_cameras;
 }
 
-void CameraSettingsReadonlyWatcher::setCameras(const QnVirtualCameraResourceList& value)
+void CameraSettingsReadOnlyWatcher::setCameras(const QnVirtualCameraResourceList& value)
 {
     if (m_cameras == value)
         return;
@@ -31,21 +31,21 @@ void CameraSettingsReadonlyWatcher::setCameras(const QnVirtualCameraResourceList
     updateReadOnly();
 }
 
-bool CameraSettingsReadonlyWatcher::isReadOnly() const
+bool CameraSettingsReadOnlyWatcher::isReadOnly() const
 {
     return m_readOnly;
 }
 
-void CameraSettingsReadonlyWatcher::afterContextInitialized()
+void CameraSettingsReadOnlyWatcher::afterContextInitialized()
 {
     connect(context(), &QnWorkbenchContext::userChanged, this,
-        &CameraSettingsReadonlyWatcher::updateReadOnly);
+        &CameraSettingsReadOnlyWatcher::updateReadOnly);
 
     connect(commonModule(), &QnCommonModule::readOnlyChanged, this,
-        &CameraSettingsReadonlyWatcher::updateReadOnly);
+        &CameraSettingsReadOnlyWatcher::updateReadOnly);
 }
 
-void CameraSettingsReadonlyWatcher::updateReadOnly()
+void CameraSettingsReadOnlyWatcher::updateReadOnly()
 {
     const auto value = calculateReadOnly();
     if (m_readOnly == value)
@@ -55,7 +55,7 @@ void CameraSettingsReadonlyWatcher::updateReadOnly()
     emit readOnlyChanged(value);
 }
 
-bool CameraSettingsReadonlyWatcher::calculateReadOnly() const
+bool CameraSettingsReadOnlyWatcher::calculateReadOnly() const
 {
     return commonModule()->isReadOnly()
         || !accessController()->combinedPermissions(m_cameras).testFlag(Qn::WritePermission);
