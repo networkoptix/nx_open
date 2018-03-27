@@ -1,6 +1,6 @@
 import pytest
 
-from test_utils.lightweight_servers_factory import LightweightServersFactory, LWS_BINARY_NAME
+from framework.lightweight_servers_factory import LightweightServersFactory, LWS_BINARY_NAME
 
 
 @pytest.fixture()

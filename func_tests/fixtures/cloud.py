@@ -1,7 +1,7 @@
 import os
 import pytest
 
-from test_utils.cloud_host import CloudAccountFactory, resolve_cloud_host_from_registry
+from framework.cloud_host import CloudAccountFactory, resolve_cloud_host_from_registry
 
 DEFAULT_CLOUD_GROUP = 'test'
 

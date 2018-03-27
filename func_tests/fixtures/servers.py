@@ -2,9 +2,9 @@ from contextlib import closing
 
 import pytest
 
-from test_utils.merging import setup_local_system, merge_systems
-from test_utils.pool import Pool
-from test_utils.server_factory import ServerFactory
+from framework.merging import setup_local_system, merge_systems
+from framework.pool import Pool
+from framework.server_factory import ServerFactory
 
 
 @pytest.fixture()

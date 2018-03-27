@@ -1,7 +1,7 @@
 import pytest
 from pathlib2 import Path
 
-from test_utils.camera import CameraFactory, SampleMediaFile
+from framework.camera import CameraFactory, SampleMediaFile
 
 MEDIA_SAMPLE_PATH = 'sample.mkv'
 MEDIA_STREAM_PATH = 'sample.testcam-stream.data'

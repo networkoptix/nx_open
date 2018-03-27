@@ -1,9 +1,9 @@
 from netaddr import IPAddress, IPNetwork
 from pathlib2 import Path
 
-from test_utils.networking import setup_networks
+from framework.networking import setup_networks
 
-SAMPLES_DIR = Path(__file__).parent / 'test_utils' / 'networking'
+SAMPLES_DIR = Path(__file__).parent / 'framework' / 'networking'
 
 
 def test_setup_basic(vm_pools, hypervisor):

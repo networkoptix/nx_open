@@ -6,14 +6,14 @@ from netaddr import IPAddress
 from pathlib2 import Path
 
 from network_layouts import get_layout
-from test_utils.access_managers import make_access_manager
-from test_utils.merging import setup_system
-from test_utils.networking import setup_networks
-from test_utils.os_access import LocalAccess
-from test_utils.pool import Pool
-from test_utils.serialize import load
-from test_utils.virtual_box import VirtualBox
-from test_utils.vm import Factory, Registry, VMConfiguration
+from framework.access_managers import make_access_manager
+from framework.merging import setup_system
+from framework.networking import setup_networks
+from framework.os_access import LocalAccess
+from framework.pool import Pool
+from framework.serialize import load
+from framework.virtual_box import VirtualBox
+from framework.vm import Factory, Registry, VMConfiguration
 
 DEFAULT_VM_HOST_USER = 'root'
 DEFAULT_VM_HOST_DIR = '/tmp/jenkins-test'

@@ -1,8 +1,8 @@
 import pytest
 from pathlib2 import Path
 
-from test_utils.os_access import LocalAccess
-from test_utils.move_lock import MoveLock
+from framework.os_access import LocalAccess
+from framework.move_lock import MoveLock
 
 
 @pytest.fixture(scope='session')

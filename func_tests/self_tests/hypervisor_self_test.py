@@ -4,8 +4,8 @@ from subprocess import call, check_call, check_output
 
 import pytest
 
-from test_utils.utils import wait_until
-from test_utils.virtual_box import VMInfo
+from framework.utils import wait_until
+from framework.virtual_box import VMInfo
 
 logger = logging.getLogger(__name__)
 

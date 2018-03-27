@@ -1,6 +1,6 @@
 import pytest
 
-from test_utils.server_physical_host import PhysicalInstallationCtl
+from framework.server_physical_host import PhysicalInstallationCtl
 
 
 @pytest.fixture(scope='session')

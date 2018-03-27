@@ -3,11 +3,11 @@ import logging
 import pytest
 from pathlib2 import Path
 
-from test_utils.artifact import ArtifactFactory
-from test_utils.ca import CA
-from test_utils.config import SingleTestConfig, TestParameter, TestsConfig
-from test_utils.mediaserverdeb import MediaserverDeb
-from test_utils.metrics_saver import MetricsSaver
+from framework.artifact import ArtifactFactory
+from framework.ca import CA
+from framework.config import SingleTestConfig, TestParameter, TestsConfig
+from framework.mediaserverdeb import MediaserverDeb
+from framework.metrics_saver import MetricsSaver
 
 pytest_plugins = ['fixtures.vms', 'fixtures.servers', 'fixtures.cloud']
 

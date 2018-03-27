@@ -1,6 +1,6 @@
 from contextlib import closing
 
-from test_utils.pool import Pool
+from framework.pool import Pool
 
 
 def test_get(linux_vms_pool):

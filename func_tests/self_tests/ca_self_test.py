@@ -4,7 +4,7 @@ import shutil
 import pytest
 from subprocess import check_call, check_output, call, Popen, PIPE
 
-from test_utils.ca import CA
+from framework.ca import CA
 
 _logger = logging.getLogger(__name__)
 

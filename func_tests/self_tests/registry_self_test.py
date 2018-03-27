@@ -1,7 +1,7 @@
 import pytest
 
-from test_utils.os_access import LocalAccess
-from test_utils.vm import Registry
+from framework.os_access import LocalAccess
+from framework.vm import Registry
 
 
 @pytest.fixture()
