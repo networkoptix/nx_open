@@ -58,21 +58,21 @@
 <div class="container" ng-if="passwordMode" >
     <h1>Change Password</h1>
     <form name="passwordForm" class="form-horizontal" novalidate>
-        <div class="form-group" validate-field>
-            <label for="password"  class="col-sm-4 control-label">Current password</label>
-            <div class="col-sm-4">
+        <div class="form-group row" validate-field>
+            <label for="password"  class="col-12 col-md-4 control-label">Current password</label>
+            <div class="col-12 col-md-4">
                 <input type="password" class="form-control" ng-model="pass.password"
                        name="password"
                        id="password" required>
             </div>
-            <div class="col-sm-4">
+            <div class="col-12 col-md-4">
                 <span class="help-block input-error" ng-if="passwordForm.password.$touched && passwordForm.password.$error.required">Current password is required.</span>
             </div>
         </div>
 
         <password-input ng-model="pass.newPassword" id="'newPassword'" label="$root.L.account.newPasswordLabel"></password-input>
 
-        <div class="form-group">
+        <div class="form-group row">
             <div class="offset-sm-4 col-sm-4">
                 <process-button process="changePassword"
                                 form="passwordForm"

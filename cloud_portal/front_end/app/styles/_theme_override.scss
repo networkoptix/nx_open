@@ -23,16 +23,33 @@ body{
 
 h1{
   margin: $line-height-computed;
+  font-size: $h1-font-size;
 }
+
 h2{
   margin:0;
+  font-size: $h2-font-size;
 }
 
 h3{
   margin-top: ( $line-height-computed / 2 );
   margin-bottom: ( $line-height-computed / 4 );
   font-weight: normal;
+  font-size: $h3-font-size;
 }
+
+h4 {
+  font-size: $h4-font-size;
+}
+
+h5 {
+  font-size: $h5-font-size;
+}
+
+h6 {
+  font-size: $h6-font-size;
+}
+
 h1>.label{
   font-size:60%;
   vertical-align: 33%;
