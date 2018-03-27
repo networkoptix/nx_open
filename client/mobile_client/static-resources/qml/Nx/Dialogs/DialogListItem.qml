@@ -45,7 +45,19 @@ Control
         id: mouseArea
         parent: control
         anchors.fill: control
+
+        property bool pressedAndHeld: false
         onClicked: control.clicked()
+        onPressAndHold: { pressedAndHeld = true }
+        onCanceled: { pressedAndHeld = false }
+        onReleased:
+        {
+            if (!pressedAndHeld)
+                return
+
+            pressedAndHeld = false
+            control.clicked()
+        }
     }
 
     Text
