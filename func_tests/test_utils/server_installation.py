@@ -73,11 +73,7 @@ class ServerInstallation(object):
 
     def cleanup_core_files(self):
         # When filename contain space, it's interpreted as several arguments.
-        self.os_access.run_command([
-            'rm',
-            '--force',  # Ignore non-existent files.
-            '--',  # Avoid confusion with options.
-            self.dir / '*core*'])
+        self.os_access.run_command('''find {}/bin -name 'core.*' -print -delete'''.format(self.dir))
 
     def backup_mediaserver_conf(self):
         self.os_access.run_command(['sudo', 'cp', self._config_path, self._config_path_initial])
