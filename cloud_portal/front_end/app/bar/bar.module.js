@@ -12,13 +12,12 @@ const platform_browser_1 = require("@angular/platform-browser");
 const static_1 = require("@angular/upgrade/static");
 const router_1 = require("@angular/router");
 const forms_1 = require("@angular/forms");
-const ng_bootstrap_1 = require("@ng-bootstrap/ng-bootstrap");
+// import { NgbModalModule, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 const core_2 = require("../../app/core");
+const dropdowns_module_1 = require("../dropdowns/dropdowns.module");
 const bar_component_1 = require("./bar.component");
-const account_settings_component_1 = require("../dropdowns/account-settings/account-settings.component");
-const language_component_1 = require("../dropdowns/language/language.component");
-const active_system_component_1 = require("../dropdowns/active-system/active-system.component");
-const systems_component_1 = require("../dropdowns/systems/systems.component");
+// import { NxActiveSystemDropdown }    from "../dropdowns/active-system/active-system.component";
+// import { NxSystemsDropdown }         from "../dropdowns/systems/systems.component";
 const appRoutes = [
     { path: 'bar', component: bar_component_1.BarComponent }
 ];
@@ -30,21 +29,19 @@ BarModule = __decorate([
             common_1.CommonModule,
             platform_browser_1.BrowserModule,
             static_1.UpgradeModule,
-            ng_bootstrap_1.NgbDropdownModule,
-            ng_bootstrap_1.NgbModalModule,
+            // NgbDropdownModule,
+            // NgbModalModule,
             forms_1.FormsModule,
             forms_1.ReactiveFormsModule,
+            dropdowns_module_1.DropdownsModule,
             router_1.RouterModule.forChild(appRoutes)
         ],
         providers: [
             core_2.QuoteService,
+            dropdowns_module_1.DropdownsModule
         ],
         declarations: [
             bar_component_1.BarComponent,
-            language_component_1.NxLanguageDropdown,
-            account_settings_component_1.NxAccountSettingsDropdown,
-            active_system_component_1.NxActiveSystemDropdown,
-            systems_component_1.NxSystemsDropdown
         ],
         bootstrap: []
     })

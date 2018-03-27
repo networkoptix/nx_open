@@ -28,14 +28,10 @@ const ajs_upgraded_providers_8 = require("./ajs-upgraded-providers");
 const app_component_1 = require("./app.component");
 const bar_module_1 = require("./bar/bar.module");
 const dropdowns_module_1 = require("./dropdowns/dropdowns.module");
-const language_component_1 = require("./dropdowns/language/language.component");
-const active_system_component_1 = require("./dropdowns/active-system/active-system.component");
-const account_settings_component_1 = require("./dropdowns/account-settings/account-settings.component");
 const login_component_1 = require("./dialogs/login/login.component");
 const process_button_component_1 = require("./components/process-button/process-button.component");
 const dialogs_service_1 = require("./dialogs/dialogs.service");
 const general_component_1 = require("./dialogs/general/general.component");
-const systems_component_1 = require("./dropdowns/systems/systems.component");
 class HybridUrlHandlingStrategy {
     // use only process the `/bar` url
     shouldProcessUrl(url) {
@@ -63,6 +59,7 @@ AppModule = __decorate([
             ngx_order_pipe_1.OrderModule,
             index_1.CoreModule,
             bar_module_1.BarModule,
+            ajs_upgraded_providers_1.cloudApiServiceModule,
             ajs_upgraded_providers_6.uuid2ServiceModule,
             ajs_upgraded_providers_3.languageServiceModule,
             ajs_upgraded_providers_4.accountServiceModule,
@@ -75,9 +72,6 @@ AppModule = __decorate([
             router_1.RouterModule.forRoot([], { initialNavigation: false })
         ],
         entryComponents: [
-            language_component_1.NxLanguageDropdown,
-            account_settings_component_1.NxAccountSettingsDropdown,
-            active_system_component_1.NxActiveSystemDropdown,
             process_button_component_1.NxProcessButtonComponent,
             login_component_1.LoginModalContent,
             login_component_1.NxModalLoginComponent,
@@ -91,7 +85,6 @@ AppModule = __decorate([
             { provide: router_1.UrlHandlingStrategy, useClass: HybridUrlHandlingStrategy },
             // {provide: '$scope', useFactory: i => i.get('$rootScope'), deps: ['$injector']},
             // {provide: '$rootScope', useFactory: i => i.get('$rootScope'), deps: ['$injector']},
-            ajs_upgraded_providers_1.cloudApiServiceProvider,
             login_component_1.NxModalLoginComponent,
             general_component_1.NxModalGeneralComponent,
             process_button_component_1.NxProcessButtonComponent,
@@ -111,10 +104,6 @@ AppModule = __decorate([
 exports.AppModule = AppModule;
 angular
     .module('cloudApp.directives')
-    .directive('nxLanguageSelect', static_1.downgradeComponent({ component: language_component_1.NxLanguageDropdown }))
-    .directive('nxAccountSettingsSelect', static_1.downgradeComponent({ component: account_settings_component_1.NxAccountSettingsDropdown }))
-    .directive('nxActiveSystem', static_1.downgradeComponent({ component: active_system_component_1.NxActiveSystemDropdown }))
-    .directive('nxSystems', static_1.downgradeComponent({ component: systems_component_1.NxSystemsDropdown }))
     .directive('nxModalLogin', static_1.downgradeComponent({ component: login_component_1.NxModalLoginComponent }));
 angular
     .module('cloudApp.services')
