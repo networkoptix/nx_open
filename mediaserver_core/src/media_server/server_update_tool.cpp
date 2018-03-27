@@ -21,6 +21,7 @@
 #include <utils/common/delayed.h>
 #include <common/static_common_module.h>
 #include <media_server/media_server_module.h>
+#include <nx/mediaserver/root_tool.h>
 
 namespace {
 
@@ -380,6 +381,8 @@ void QnServerUpdateTool::removeUpdateFiles(const QString& updateId)
 
 void QnServerUpdateTool::clearUpdatesLocation(const QString &idToLeave) {
     QDir dir = getUpdatesDir();
+
+    qnServerModule->rootTool()->changeOwner(dir.absolutePath());
 
     QString fileToLeave = idToLeave + ".zip";
 
