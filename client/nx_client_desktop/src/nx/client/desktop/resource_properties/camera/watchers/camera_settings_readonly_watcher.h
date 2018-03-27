@@ -10,6 +10,8 @@ namespace nx {
 namespace client {
 namespace desktop {
 
+class CameraSettingsDialogStore;
+
 class CameraSettingsReadOnlyWatcher:
     public QObject,
     public QnWorkbenchContextAware
@@ -23,7 +25,7 @@ public:
     QnVirtualCameraResourceList cameras() const;
     void setCameras(const QnVirtualCameraResourceList& value);
 
-    bool isReadOnly() const;
+    void setStore(CameraSettingsDialogStore* store);
 
 signals:
     void readOnlyChanged(bool value);

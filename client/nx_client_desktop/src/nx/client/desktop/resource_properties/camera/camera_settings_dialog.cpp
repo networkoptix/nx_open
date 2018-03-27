@@ -134,39 +134,28 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
     ui(new Ui::CameraSettingsDialog()),
     d(new Private())
 {
+    ui->setupUi(this);
+    setButtonBox(ui->buttonBox);
+    ui->alertBar->setReservedSpace(false);
+
     d->store = new CameraSettingsDialogStore(this);
+    connect(d->store, &CameraSettingsDialogStore::stateChanged, this,
+        &CameraSettingsDialog::loadState);
+
+    d->readOnlyWatcher = new CameraSettingsReadOnlyWatcher(this);
+    d->readOnlyWatcher->setStore(d->store);
 
     auto panicWatcher = new CameraSettingsPanicWatcher(this);
     panicWatcher->setStore(d->store);
 
-    connect(
-        d->store,
-        &CameraSettingsDialogStore::stateChanged,
-        this,
-        &CameraSettingsDialog::loadState);
-
-    ui->setupUi(this);
-    setButtonBox(ui->buttonBox);
-
-    d->readOnlyWatcher = new CameraSettingsReadOnlyWatcher(this);
-    connect(
-        d->readOnlyWatcher,
-        &CameraSettingsReadOnlyWatcher::readOnlyChanged,
-        this,
-        [this](bool readOnly)
-        {
-            d->store->setReadOnly(readOnly);
-        });
-
     addPage(
         int(CameraSettingsTab::general),
-        new CameraSettingsGeneralTabWidget(d->store, this),
+        new CameraSettingsGeneralTabWidget(d->store, ui->tabWidget),
         tr("General"));
 
-    auto cameraScheduleWidget = new CameraScheduleWidget(d->store, ui->tabWidget);
     addPage(
         int(CameraSettingsTab::recording),
-        cameraScheduleWidget,
+        new CameraScheduleWidget(d->store, ui->tabWidget),
         tr("Recording"));
 
     auto selectionWatcher = new QnWorkbenchSelectionWatcher(this);
@@ -185,6 +174,7 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
         });
 
     // TODO: #GDM Should we handle current user permission to camera change?
+    // TODO: #GDM Shouldn't this logic be incapsulated in the selection watcher?
     connect(
         resourcePool(),
         &QnResourcePool::resourceRemoved,
@@ -204,8 +194,6 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
                     tryClose(true);
             }
         });
-
-    ui->alertBar->setReservedSpace(false);
 }
 
 CameraSettingsDialog::~CameraSettingsDialog() = default;

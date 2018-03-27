@@ -7,6 +7,8 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 
+#include "../redux/camera_settings_dialog_store.h"
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -31,9 +33,10 @@ void CameraSettingsReadOnlyWatcher::setCameras(const QnVirtualCameraResourceList
     updateReadOnly();
 }
 
-bool CameraSettingsReadOnlyWatcher::isReadOnly() const
+void CameraSettingsReadOnlyWatcher::setStore(CameraSettingsDialogStore* store)
 {
-    return m_readOnly;
+    connect(this, &CameraSettingsReadOnlyWatcher::readOnlyChanged, store,
+        [store](bool value) { store->setReadOnly(value); });
 }
 
 void CameraSettingsReadOnlyWatcher::afterContextInitialized()
