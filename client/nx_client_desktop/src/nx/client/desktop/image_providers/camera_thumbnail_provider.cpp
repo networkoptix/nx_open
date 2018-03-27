@@ -90,7 +90,7 @@ Qn::ThumbnailStatus CameraThumbnailProvider::status() const
 
 void CameraThumbnailProvider::doLoadAsync()
 {
-    if (m_status == Qn::ThumbnailStatus::Loaded || m_status == Qn::ThumbnailStatus::Loading)
+    if (m_status == Qn::ThumbnailStatus::Loading)
         return;
 
     setStatus(Qn::ThumbnailStatus::Loading);

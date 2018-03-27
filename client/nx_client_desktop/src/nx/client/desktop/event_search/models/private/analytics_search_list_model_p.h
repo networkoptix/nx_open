@@ -91,6 +91,14 @@ private:
 
     void constrainLength();
 
+    struct PreviewParams
+    {
+        qint64 timestampUs = 0;
+        QRectF boundingBox;
+    };
+
+    static PreviewParams previewParams(const analytics::storage::DetectedObject& object);
+
 private:
     AnalyticsSearchListModel* const q = nullptr;
     QRectF m_filterRect;

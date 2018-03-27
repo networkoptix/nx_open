@@ -193,8 +193,10 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
             return attributes(object);
 
         case Qn::TimestampRole:
-        case Qn::PreviewTimeRole:
             return object.firstAppearanceTimeUsec;
+
+        case Qn::PreviewTimeRole:
+            return previewParams(object).timestampUs;
 
         case Qn::DurationRole:
         {
@@ -210,9 +212,7 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
             return QVariant::fromValue<QnResourcePtr>(camera());
 
         case Qn::ItemZoomRectRole:
-            return QVariant::fromValue(object.track.empty()
-                ? QRectF()
-                : object.track.front().boundingBox);
+            return QVariant::fromValue(previewParams(object).boundingBox);
 
         case Qn::ContextMenuRole:
             return QVariant::fromValue(contextMenu(object));
@@ -699,7 +699,13 @@ QString AnalyticsSearchListModel::Private::attributes(
 
     QString rows;
     for (const auto& attribute: object.attributes)
-        rows += kRowTemplate.arg(attribute.name, attribute.value);
+    {
+        if (attribute.name.startsWith(lit("nx.sys")))
+            rows += kRowTemplate.arg(attribute.name, attribute.value);
+    }
+
+    if (rows.isEmpty())
+        return QString();
 
     const auto color = QPalette().color(QPalette::WindowText);
     return kCss.arg(color.name()) + kTableTemplate.arg(rows);
@@ -790,6 +796,73 @@ qint64 AnalyticsSearchListModel::Private::startTimeMs(
 {
     return std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::microseconds(object.firstAppearanceTimeUsec)).count();
+}
+
+AnalyticsSearchListModel::Private::PreviewParams AnalyticsSearchListModel::Private::previewParams(
+    const analytics::storage::DetectedObject& object)
+{
+    PreviewParams result;
+    result.timestampUs = object.firstAppearanceTimeUsec;
+    result.boundingBox = object.track.empty()
+        ? QRectF()
+        : object.track.front().boundingBox;
+
+    const auto attribute =
+        [&object](const QString& name)
+        {
+            const auto iter = std::find_if(object.attributes.cbegin(), object.attributes.cend(),
+                [&name](const common::metadata::Attribute& attribute)
+                {
+                    return attribute.name == name;
+                });
+
+            return (iter != object.attributes.cend()) ? iter->value : QString();
+        };
+
+    const auto getRealAttribute =
+        [&attribute](const QString& name, qreal defaultValue)
+        {
+            bool ok = false;
+            const QString valueStr = attribute(name);
+            if (valueStr.isNull())
+                return defaultValue; //< Attribute is missing.
+
+            const qreal value = valueStr.toDouble(&ok);
+            if (ok)
+                return value;
+
+            NX_WARNING(typeid(Private)) << lm("Invalid %1 value: [%2]").args(name, valueStr);
+            return defaultValue;
+        };
+
+    const QString previewTimestampStr = attribute(lit("nx.sys.preview.timestampUs"));
+    if (!previewTimestampStr.isNull())
+    {
+        const qint64 previewTimestampUs = previewTimestampStr.toLongLong();
+        if (previewTimestampUs > 0)
+        {
+            result.timestampUs = previewTimestampUs;
+        }
+        else
+        {
+            NX_WARNING(typeid(Private)) << lm("Invalid nx.sys.preview.timestampUs value: [%1]")
+                .arg(previewTimestampStr);
+        }
+    }
+
+    result.boundingBox.setLeft(getRealAttribute(lit("nx.sys.preview.boundingBox.x"),
+        result.boundingBox.left()));
+
+    result.boundingBox.setTop(getRealAttribute(lit("nx.sys.preview.boundingBox.y"),
+        result.boundingBox.top()));
+
+    result.boundingBox.setWidth(getRealAttribute(lit("nx.sys.preview.boundingBox.width"),
+        result.boundingBox.width()));
+
+    result.boundingBox.setHeight(getRealAttribute(lit("nx.sys.preview.boundingBox.height"),
+        result.boundingBox.height()));
+
+    return result;
 }
 
 } // namespace desktop
