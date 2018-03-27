@@ -50,6 +50,13 @@ ZoomableFlickable
         d.toggleScale(false, width / 2, height / 2)
     }
 
+    doubleTapStartCheckFuncion:
+        function(initialPosition)
+        {
+            var videoMappedPosition = mapToItem(video, initialPosition.x, initialPosition.y)
+            return video.pointInVideo(videoMappedPosition);
+        }
+
     onDoubleClicked:
     {
         var videoMappedPosition = mapToItem(video, mouseX, mouseY)
@@ -58,7 +65,7 @@ ZoomableFlickable
 
         var twiceTargetScale = 2
         var eps = 0.000001
-        var zoomIn = d.scale < twiceTargetScale - eps
+        var zoomIn = zf.scale < twiceTargetScale - eps
 
         d.toggleScale(zoomIn, mouseX, mouseY)
     }
@@ -67,45 +74,19 @@ ZoomableFlickable
     {
         id: d
 
-        property real contentFactor: contentWidth ? contentHeight / contentWidth : 0
-
-        readonly property real scale:
-        {
-            if (!contentFactor)
-                return 1
-
-            var baseSize = 0
-            var currentSize = 0
-
-            var baseHeight = zf.width * contentFactor
-            if (baseHeight <= zf.height)
-            {
-
-                baseSize = baseHeight
-                currentSize = zf.contentHeight
-            }
-            else
-            {
-                baseSize = width
-                currentSize = zf.contentWidth
-            }
-
-            return baseSize > 0 ? currentSize / baseSize : 1
-        }
-
         function toggleScale(to2x, mouseX, mouseY)
         {
             var targetScale = to2x ? 2 : 1
 
-            var baseWidth = contentWidth / d.scale
-            var baseHeight = contentHeight / d.scale
+            var baseWidth = contentWidth / zf.scale
+            var baseHeight = contentHeight / zf.scale
 
             flickable.animating = true
             flickable.fixMargins()
 
             var point = mapToItem(content, mouseX, mouseY)
-            var dx = point.x / d.scale
-            var dy = point.y / d.scale
+            var dx = point.x / zf.scale
+            var dy = point.y / zf.scale
 
             contentWidth = baseWidth * targetScale
             contentHeight = baseHeight * targetScale

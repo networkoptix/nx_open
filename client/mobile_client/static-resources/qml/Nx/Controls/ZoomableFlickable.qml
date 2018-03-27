@@ -32,9 +32,36 @@ Item
     signal clicked()
     signal doubleClicked(int mouseX, int mouseY)
 
+    property var doubleTapStartCheckFuncion
+
     function resizeContent(width, height, animate, forceSize)
     {
         flick.animateToSize(width, height, animate, forceSize)
+    }
+
+    property real contentFactor: contentWidth ? contentHeight / contentWidth : 0
+    readonly property real scale:
+    {
+        if (!contentFactor)
+            return 1
+
+        var baseSize = 0
+        var currentSize = 0
+
+        var baseHeight = width * contentFactor
+        if (baseHeight <= height)
+        {
+
+            baseSize = baseHeight
+            currentSize = contentHeight
+        }
+        else
+        {
+            baseSize = width
+            currentSize = contentWidth
+        }
+
+        return baseSize > 0 ? currentSize / baseSize : 1
     }
 
     Flickable
@@ -57,6 +84,8 @@ Item
 
         flickableDirection: Flickable.HorizontalAndVerticalFlick
         boundsBehavior: allowOvershoot ? Flickable.DragOverBounds : Flickable.StopAtBounds
+
+        interactive: !mouseArea.doubleTapScaleMode
 
         Item
         {
@@ -271,7 +300,7 @@ Item
         property real initialContentX
         property real initialContentY
 
-        onPinchStarted:
+        function startPinch()
         {
             boundsAnimation.stop()
             initialWidth = flick.contentWidth
@@ -285,33 +314,43 @@ Item
             flick.fixMargins()
         }
 
-        onPinchUpdated:
-        {
-            flick.contentX += pinch.previousCenter.x - pinch.center.x
-            flick.contentY += pinch.previousCenter.y - pinch.center.y
-
-            var cx = pinch.center.x + flick.contentX
-            var cy = pinch.center.y + flick.contentY
-
-            var scale = pinch.scale
-
-            var w = initialWidth * scale
-            var h = initialHeight * scale
-
-            if (w > maxContentWidth)
-                scale = maxContentWidth / initialWidth
-            if (h > maxContentHeight)
-                scale = Math.min(scale, maxContentHeight / initialHeight)
-
-            flick.resizeContent(initialWidth * scale, initialHeight * scale, Qt.point(cx, cy))
-        }
-
-        onPinchFinished:
+        function finishPinch()
         {
             flick.animating = true
             flick.fixMargins()
             flick.animateToBounds()
         }
+
+        function updatePinch(center, previousCenter, targetScale)
+        {
+            flick.contentX += previousCenter.x - center.x
+            flick.contentY += previousCenter.y - center.y
+
+            var cx = center.x + flick.contentX
+            var cy = center.y + flick.contentY
+
+            var w = initialWidth * targetScale
+            var h = initialHeight * targetScale
+
+            if (w > maxContentWidth)
+                targetScale = maxContentWidth / initialWidth
+            else if (w < minContentWidth)
+                targetScale = minContentWidth / initialWidth
+
+            w = initialWidth * targetScale
+            h = initialHeight * targetScale
+
+            if (h > maxContentHeight)
+                targetScale = Math.min(targetScale, maxContentHeight / initialHeight)
+            else if (h < minContentHeight)
+                targetScale = minContentHeight / initialHeight
+
+            flick.resizeContent(initialWidth * targetScale, initialHeight * targetScale, Qt.point(cx, cy))
+        }
+
+        onPinchStarted: startPinch()
+        onPinchUpdated: updatePinch(pinch.center, pinch.previousCenter, pinch.scale)
+        onPinchFinished: finishPinch()
 
         MouseArea
         {
@@ -320,13 +359,74 @@ Item
             readonly property real zoomFactor: 1.1
             readonly property real wheelStep: 120
 
+            property var doubleTapDownPos: undefined
+            property bool doubleTapScaleMode: false
+            property real initialDoubleTapScale: 0
+
             anchors.fill: parent
 
             propagateComposedEvents: true
 
+            onDoubleTapScaleModeChanged:
+            {
+                if (doubleTapScaleMode)
+                {
+                    initialDoubleTapScale = rootItem.scale
+                    pinchArea.startPinch()
+                }
+                else
+                {
+                    doubleTapDownPos = undefined
+                    pinchArea.finishPinch()
+                }
+            }
+
+            onPositionChanged:
+            {
+                if (!doubleTapDownPos)
+                    return
+
+                var currentVector = Qt.vector2d(
+                    doubleTapDownPos.x - mouseX,
+                    doubleTapDownPos.y - mouseY)
+
+                if (!doubleTapScaleMode)
+                {
+                    var minDoubleTapStartLength = 15
+                    if (currentVector.length() > minDoubleTapStartLength)
+                        doubleTapScaleMode = true
+                }
+
+                if (!doubleTapScaleMode)
+                    return
+
+                var sideSize = Math.max(rootItem.width, rootItem.height)
+                var targetScale = 1 + currentVector.y / sideSize * 4
+                pinchArea.updatePinch(doubleTapDownPos, doubleTapDownPos, targetScale)
+            }
+
             onDoubleClicked:
             {
                 clickFilterTimer.stop()
+                doubleClickFilter.restart();
+
+                var mousePosition = Qt.point(mouseX, mouseY)
+                if (rootItem.doubleTapStartCheckFuncion
+                    && rootItem.doubleTapStartCheckFuncion(mousePosition))
+                {
+                    doubleTapDownPos = mousePosition
+                }
+            }
+
+            onCanceled: doubleTapScaleMode = false
+
+            onReleased:
+            {
+                doubleTapScaleMode = false
+                if (!doubleClickFilter.running)
+                    return
+
+                doubleClickFilter.stop()
                 rootItem.doubleClicked(mouse.x, mouse.y)
             }
 
@@ -339,6 +439,12 @@ Item
                 interval: 200
 
                 onTriggered: rootItem.clicked()
+            }
+
+            Timer
+            {
+                id: doubleClickFilter
+                interval: 200
             }
 
             onWheel:
