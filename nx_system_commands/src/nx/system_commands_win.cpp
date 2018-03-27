@@ -68,4 +68,14 @@ SystemCommands::CheckOwnerResult SystemCommands::checkCurrentOwner(const std::st
     return CheckOwnerResult::failed;
 }
 
+bool SystemCommands::removePath(const std::string& path)
+{
+    return false;
+}
+
+bool SystemCommands::rename(const std::string& /*oldPath*/, const std::string& /*newPath*/)
+{
+    return false;
+}
+
 } // namespace nx
