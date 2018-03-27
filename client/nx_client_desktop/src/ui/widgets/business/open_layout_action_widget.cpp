@@ -35,7 +35,7 @@ OpenLayoutActionWidget::OpenLayoutActionWidget(QWidget* parent):
     ui(new Ui::OpenLayoutActionWidget)
 {
     ui->setupUi(this);
-    
+
     connect(ui->selectLayoutButton, &QPushButton::clicked,
         this, &OpenLayoutActionWidget::openLayoutSelectionDialog);
 
@@ -197,7 +197,9 @@ void OpenLayoutActionWidget::updateLayoutsButton()
         button->setText(layout->getName());
         button->setForegroundRole(QPalette::BrightText);
 
-        if (m_layoutWarning != LayoutWarning::NoWarning)
+        const bool isWarning = m_layoutWarning != LayoutWarning::NoWarning;
+        setWarningStyleOn(button, isWarning);
+        if (isWarning)
         {
             if (layout->isShared())
                 button->setIcon(icon(lit("tree/layout_shared.png")));
@@ -205,7 +207,6 @@ void OpenLayoutActionWidget::updateLayoutsButton()
                 button->setIcon(icon(lit("tree/layout_locked_error.png")));
             else
                 button->setIcon(icon(lit("tree/layout_error.png")));
-            setWarningStyle(button);
         }
         else
         {
@@ -215,7 +216,6 @@ void OpenLayoutActionWidget::updateLayoutsButton()
                 button->setIcon(icon(lit("tree/layout_locked.png")));
             else
                 button->setIcon(icon(lit("tree/layout.png")));
-            resetStyle(button);
         }
     }
     else
@@ -234,7 +234,7 @@ void OpenLayoutActionWidget::openLayoutSelectionDialog()
     /*
     Cases from the specification:
         No users selected:
-            - hide local layouts 
+            - hide local layouts
             - show notification
         Exactly one user selected:
             - show shared

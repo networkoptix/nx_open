@@ -503,10 +503,7 @@ void CameraExpertSettingsWidget::updateLogicalIdControls()
     ui->logicalIdWarningLabel->setVisible(!duplicateCameras.isEmpty());
     ui->logicalIdWarningLabel->setText(errorMessage);
 
-    if (duplicateCameras.isEmpty())
-        resetStyle(ui->logicalIdSpinBox);
-    else
-        setWarningStyle(ui->logicalIdSpinBox);
+    setWarningStyleOn(ui->logicalIdSpinBox, !duplicateCameras.isEmpty());
 }
 
 void CameraExpertSettingsWidget::at_dataChanged()
