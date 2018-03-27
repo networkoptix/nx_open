@@ -7,6 +7,7 @@
 
 #include "utils/common/id.h"
 
+//TODO: #GDM Refactor this class.
 class QnScheduleTask
 {
 public:
@@ -241,6 +242,16 @@ inline QTextStream& operator<<(QTextStream& stream, const QnScheduleTask& data)
 
 
 typedef QVector<QnScheduleTask> QnScheduleTaskList;
+
+namespace nx {
+namespace client {
+namespace desktop {
+
+using ScheduleTasks = QList<QnScheduleTask::Data>;
+
+} // namespace desktop
+} // namespace client
+} // namespace nx
 
 Q_DECLARE_TYPEINFO(QnScheduleTask, Q_MOVABLE_TYPE);
 Q_DECLARE_METATYPE(QnScheduleTask)

@@ -7,7 +7,7 @@
 #include <utils/common/updatable.h>
 #include <ui/workbench/workbench_context_aware.h>
 
-namespace Ui { class ArchiveLengthWidget; }
+namespace Ui { class LegacyArchiveLengthWidget; }
 
 class QnAligner;
 
@@ -47,7 +47,7 @@ private:
     void updateMaxDays(const QnVirtualCameraResourceList& cameras);
 
 private:
-    QScopedPointer<Ui::ArchiveLengthWidget> ui;
+    QScopedPointer<Ui::LegacyArchiveLengthWidget> ui;
     bool m_readOnly = false;
     QString m_alert;
     QnAligner* m_aligner = nullptr;

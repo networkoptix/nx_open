@@ -32,6 +32,7 @@ public:
     static State setMaxRecordingDaysValue(State state, int value);
     static State setCustomAspectRatio(State state, const QnAspectRatio& value);
     static State setCustomRotation(State state, const Rotation& value);
+    static State setRecordingEnabled(State state, bool value);
 };
 
 } // namespace desktop

@@ -9,46 +9,46 @@
 
 #include <nx/utils/std/optional.h>
 #include <utils/common/aspect_ratio.h>
+#include <core/misc/schedule_task.h>
 
 namespace nx {
 namespace client {
 namespace desktop {
 
-template<class T>
-struct UserEditable
-{
-    T get() const { return m_user.value_or(m_base); }
-    void setUser(T value) { m_user = value; }
-    void setBase(T value) {m_base = value;}
-    void resetUser() { m_user.reset(); }
-
-    T operator()() const { return get(); }
-
-private:
-    T m_base;
-    std::optional<T> m_user;
-};
-
-template<class T>
-struct UserEditableMultiple
-{
-    bool hasValue() const { return m_user.has_value() || m_base.has_value(); }
-    T get() const { return m_user.value_or(m_base.value()); }
-    void setUser(T value) { m_user = value; }
-    void setBase(T value) {m_base = value;}
-    void resetUser() { m_user.reset(); }
-    void resetBase() { m_base.reset(); }
-
-    T operator()() const { return get(); }
-
-private:
-    std::optional<T> m_base;
-    std::optional<T> m_user;
-};
-
-
 struct CameraSettingsDialogState
 {
+    template<class T>
+    struct UserEditable
+    {
+        T get() const { return m_user.value_or(m_base); }
+        void setUser(T value) { m_user = value; }
+        void setBase(T value) { m_base = value; }
+        void resetUser() { m_user.reset(); }
+
+        T operator()() const { return get(); }
+
+    private:
+        T m_base;
+        std::optional<T> m_user;
+    };
+
+    template<class T>
+    struct UserEditableMultiple
+    {
+        bool hasValue() const { return m_user || m_base; }
+        T get() const { return m_user.value_or(m_base.value()); }
+        void setUser(T value) { m_user = value; }
+        void setBase(T value) { m_base = value; }
+        void resetUser() { m_user.reset(); }
+        void resetBase() { m_base.reset(); }
+
+        T operator()() const { return get(); }
+
+    private:
+        std::optional<T> m_base;
+        std::optional<T> m_user;
+    };
+
     CameraSettingsDialogState() = default;
     CameraSettingsDialogState(const CameraSettingsDialogState& other) = delete;
     CameraSettingsDialogState(CameraSettingsDialogState&& other) = default;
@@ -89,6 +89,8 @@ struct CameraSettingsDialogState
 
     struct RecordingSettings
     {
+        UserEditableMultiple<bool> enabled;
+
         // TODO: #GDM Refactor QnScheduleGridWidget.
         QnScheduleGridWidget::CellParams brush;
         int maxFps = 0;
@@ -114,6 +116,10 @@ struct CameraSettingsDialogState
 
         /** Value to be displayed in the dialog. */
         float bitrateMbps = 0.0;
+
+        int beforeThresholdSec = 0;
+        int afterThresholdSec = 0;
+        UserEditableMultiple<ScheduleTasks> schedule;
 
         bool showQuality = true;
         bool showFps = true;

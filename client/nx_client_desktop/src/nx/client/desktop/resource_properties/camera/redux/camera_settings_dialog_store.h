@@ -46,6 +46,7 @@ public:
     void setMaxRecordingDaysValue(int value);
     void setCustomAspectRatio(const QnAspectRatio& value);
     void setCustomRotation(const Rotation& value);
+    void setRecordingEnabled(bool value);
 
 signals:
     void stateChanged(const CameraSettingsDialogState& state);

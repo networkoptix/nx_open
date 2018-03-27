@@ -16,8 +16,22 @@ namespace {
 
 static constexpr int kMinFps = 1;
 
+static constexpr int kDefaultBeforeThresholdSec = 5;
+static constexpr int kDefaultAfterThresholdSec = 5;
+
 static constexpr auto kMinQuality = Qn::QualityLow;
 static constexpr auto kMaxQuality = Qn::QualityHighest;
+
+template<class Data>
+void fetchFromCameras(
+    State::UserEditableMultiple<Data>& value,
+    const QnVirtualCameraResourceList& cameras,
+    std::function<Data(const QnVirtualCameraResourcePtr&)> predicate)
+{
+    Data data;
+    if (utils::algorithm::same(cameras.cbegin(), cameras.cend(), predicate, &data))
+        value.setBase(data);
+}
 
 QString calculateWebPage(const QnVirtualCameraResourcePtr& camera)
 {
@@ -195,13 +209,10 @@ State::ImageControlSettings calculateImageControlSettings(
 
     if (result.aspectRatioAvailable)
     {
-        QnAspectRatio value;
-        if (utils::algorithm::same(cameras.cbegin(), cameras.cend(),
-            [](const auto& camera) { return camera->customAspectRatio(); },
-            &value))
-        {
-            result.aspectRatio.setBase(value);
-        }
+        fetchFromCameras<QnAspectRatio>(
+            result.aspectRatio,
+            cameras,
+            [](const auto& camera) { return camera->customAspectRatio(); });
     }
 
     result.rotationAvailable = hasVideo && std::all_of(cameras.cbegin(), cameras.cend(),
@@ -209,22 +220,27 @@ State::ImageControlSettings calculateImageControlSettings(
 
     if (result.rotationAvailable)
     {
-        Rotation value;
-        if (utils::algorithm::same(cameras.cbegin(), cameras.cend(),
+        fetchFromCameras<Rotation>(
+            result.rotation,
+            cameras,
             [](const auto& camera)
             {
                 QString rotationString = camera->getProperty(QnMediaResource::rotationKey());
                 return rotationString.isEmpty()
                     ? Rotation()
                     : Rotation::closestStandardRotation(rotationString.toInt());
-            },
-            &value))
-        {
-            result.rotation.setBase(value);
-        }
+            });
     }
 
     return result;
+}
+
+QList<QnScheduleTask::Data> calculateRecordingSchedule(const QnVirtualCameraResourcePtr& camera)
+{
+    QList<QnScheduleTask::Data> data;
+    for (const auto& scheduleTask: camera->getScheduleTasks())
+        data.push_back(scheduleTask.getData());
+    return data;
 }
 
 } // namespace
@@ -281,7 +297,25 @@ State CameraSettingsDialogStateReducer::loadCameras(
         state = loadMinMaxCustomBitrate(std::move(state));
     }
 
+    state.recording.enabled = {};
+    fetchFromCameras<bool>(state.recording.enabled, cameras,
+        [](const auto& camera) { return !camera->isScheduleDisabled(); });
+
     state.recording.parametersAvailable = calculateRecordingParametersAvailable(cameras);
+
+    state.recording.schedule = {};
+    fetchFromCameras<ScheduleTasks>(state.recording.schedule, cameras, calculateRecordingSchedule);
+    if (state.recording.schedule.hasValue() && !state.recording.schedule().empty())
+    {
+        const auto& firstTask = state.recording.schedule().first();
+        state.recording.beforeThresholdSec = firstTask.m_beforeThreshold;
+        state.recording.afterThresholdSec = firstTask.m_afterThreshold;
+    }
+    else
+    {
+        state.recording.beforeThresholdSec = kDefaultBeforeThresholdSec;
+        state.recording.afterThresholdSec = kDefaultAfterThresholdSec;
+    }
 
     // TODO: Handle overriding motion type.
     const auto fpsLimits = Qn::calculateMaxFps(cameras);
@@ -438,6 +472,30 @@ State CameraSettingsDialogStateReducer::setCustomRotation(State state, const Rot
     NX_EXPECT(state.imageControl.rotationAvailable);
     state.hasChanges = true;
     state.imageControl.rotation.setUser(value);
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setRecordingEnabled(State state, bool value)
+{
+    state.hasChanges = true;
+    state.recording.enabled.setUser(value);
+
+    if (value && !state.recording.schedule.hasValue())
+    {
+        ScheduleTasks tasks;
+        for (int dayOfWeek = 1; dayOfWeek <= 7; ++dayOfWeek)
+        {
+            QnScheduleTask::Data data;
+            data.m_dayOfWeek = dayOfWeek;
+            data.m_startTime = 0;
+            data.m_endTime = 86400;
+            data.m_beforeThreshold = kDefaultBeforeThresholdSec;
+            data.m_afterThreshold = kDefaultAfterThresholdSec;
+            tasks << data;
+        }
+        state.recording.schedule.setUser(tasks);
+    }
+
     return state;
 }
 

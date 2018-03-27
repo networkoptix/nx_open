@@ -10,6 +10,7 @@
 
 #include "../redux/camera_settings_dialog_state.h"
 #include "../redux/camera_settings_dialog_store.h"
+#include <ui/common/read_only.h>
 
 namespace {
 
@@ -46,7 +47,7 @@ QnAligner* ArchiveLengthWidget::aligner() const
 
 void ArchiveLengthWidget::setStore(CameraSettingsDialogStore* store)
 {
-        connect(store, &CameraSettingsDialogStore::stateChanged, this,
+    connect(store, &CameraSettingsDialogStore::stateChanged, this,
         &ArchiveLengthWidget::loadState);
 
     connect(ui->checkBoxMinArchive, &QCheckBox::stateChanged, store,
@@ -87,22 +88,14 @@ void ArchiveLengthWidget::loadState(const CameraSettingsDialogState& state)
 
     load(ui->checkBoxMinArchive, ui->spinBoxMinDays, state.recording.minDays);
     load(ui->checkBoxMaxArchive, ui->spinBoxMaxDays, state.recording.maxDays);
+
+    setReadOnly(ui->checkBoxMaxArchive, state.readOnly);
+    setReadOnly(ui->checkBoxMinArchive, state.readOnly);
+    setReadOnly(ui->spinBoxMaxDays, state.readOnly);
+    setReadOnly(ui->spinBoxMinDays, state.readOnly);
 }
 
 /*
-void ArchiveLengthWidget::setReadOnly(bool readOnly)
-{
-    if (m_readOnly == readOnly)
-        return;
-
-    using ::setReadOnly;
-    setReadOnly(ui->checkBoxMaxArchive, readOnly);
-    setReadOnly(ui->checkBoxMinArchive, readOnly);
-    setReadOnly(ui->spinBoxMaxDays, readOnly);
-    setReadOnly(ui->spinBoxMinDays, readOnly);
-    m_readOnly = readOnly;
-}
-
 void ArchiveLengthWidget::validateArchiveLength()
 {
     if (ui->checkBoxMinArchive->checkState() == Qt::Unchecked

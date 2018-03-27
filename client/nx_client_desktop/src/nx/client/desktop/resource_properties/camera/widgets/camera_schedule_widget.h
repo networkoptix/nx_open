@@ -29,8 +29,7 @@ public:
     void setStore(CameraSettingsDialogStore* store);
 
 private:
-    //void setReadOnlyInternal(bool readOnly);
-    //void afterContextInitialized();
+    void setupUi();
 
     void loadState(const CameraSettingsDialogState& state);
 

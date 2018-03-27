@@ -26,7 +26,7 @@ QnArchiveLengthWidget::QnArchiveLengthWidget(QWidget* parent):
     base_type(parent),
     QnUpdatable(),
     QnWorkbenchContextAware(parent, InitializationMode::lazy),
-    ui(new Ui::ArchiveLengthWidget)
+    ui(new Ui::LegacyArchiveLengthWidget)
 {
     ui->setupUi(this);
 

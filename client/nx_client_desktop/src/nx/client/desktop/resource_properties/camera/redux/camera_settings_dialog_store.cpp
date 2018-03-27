@@ -151,6 +151,12 @@ void CameraSettingsDialogStore::setCustomRotation(const Rotation& value)
         [&](State state) { return Reducer::setCustomRotation(std::move(state), value); });
 }
 
+void CameraSettingsDialogStore::setRecordingEnabled(bool value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setRecordingEnabled(std::move(state), value); });
+}
+
 } // namespace desktop
 } // namespace client
 } // namespace nx
