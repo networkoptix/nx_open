@@ -261,6 +261,16 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
 
     m_dataTimer.restart();
 
+    const auto tcpTimeout = m_RtpSession.getTCPTimeout();
+    if (m_callbackTimeout.count() > 0)
+        m_RtpSession.setTCPTimeout(m_callbackTimeout);
+    const auto scopeGuard = makeScopeGuard([
+        this, tcpTimeout]()
+        {
+            if (m_callbackTimeout.count() > 0)
+                m_RtpSession.setTCPTimeout(tcpTimeout);
+        });
+
     while (m_RtpSession.isOpened() && !m_pleaseStop && m_dataTimer.elapsed() <= m_rtpFrameTimeoutMs)
     {
         while (m_gotData)
@@ -881,8 +891,12 @@ bool QnMulticodecRtpReader::isOnvifNtpExtensionId(uint16_t id) const
         || id == kOnvifNtpExtensionAltId;
 }
 
-void QnMulticodecRtpReader::setOnSocketReadTimeoutCallback(OnSocketReadTimeoutCallback callback)
+void QnMulticodecRtpReader::setOnSocketReadTimeoutCallback(
+    std::chrono::milliseconds timeout,
+    OnSocketReadTimeoutCallback callback)
 {
+    m_callbackTimeout = timeout;
+    //m_rtpReader.rtspClient().setTCPTimeout(readTimeout);
     m_onSocketReadTimeoutCallback = std::move(callback);
 }
 

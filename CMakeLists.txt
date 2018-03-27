@@ -196,7 +196,8 @@ if(withMediaServer)
 endif()
 
 #add_subdirectory(_axis_controller)
-#add_subdirectory(_vca_controller)
+#add_subdirectory(_dw_vca_controller)
+#add_subdirectory(_dw_mtt_controller)
 
 if(withTestCamera)
     add_subdirectory(testcamera)
