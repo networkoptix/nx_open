@@ -85,8 +85,8 @@ class VirtualBox(object):
     def _make_setting_args(index, forwarded_ports):
         yield '--paravirtprovider={}'.format('kvm')
         yield '--cpuexecutioncap={}'.format(100)
-        yield '--cpus={}'.format(4)
-        yield '--memory={}'.format(4 * 102)
+        yield '--cpus={}'.format(2)
+        yield '--memory={}'.format(2 * 1024)
 
         yield '--nic{}={}'.format(HOST_BOUND_NETWORK_SLOT, 'nat')
 
@@ -109,8 +109,8 @@ class VirtualBox(object):
     def _check_info(self, raw_info, parsed_info, index, forwarded_ports):
         assert raw_info['paravirtprovider'] == 'kvm'
         assert int(raw_info['cpuexecutioncap']) == 100
-        assert int(raw_info['cpus']) == 4
-        assert int(raw_info['memory']) == 4 * 102
+        assert int(raw_info['cpus']) == 2
+        assert int(raw_info['memory']) == 2 * 1024
 
         assert raw_info['nic{}'.format(HOST_BOUND_NETWORK_SLOT)] == 'nat'
         assert raw_info['macaddress{}'.format(HOST_BOUND_NETWORK_SLOT)] == '080027FE{:02X}01'.format(index)
