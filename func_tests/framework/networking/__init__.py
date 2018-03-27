@@ -1,3 +1,5 @@
+from uuid import uuid1
+
 from netaddr import IPNetwork
 
 from framework.utils import wait_until
@@ -6,31 +8,33 @@ from framework.utils import wait_until
 def setup_networks(machines, hypervisor, networks_tree, reachability):
     nodes_ips = {}
     allocated_machines = {}
+    setup_uuid = uuid1()  # Network identifiers are unique to avoid clashes between tests and runs.
 
     def setup_tree(tree, router_alias, reachable_networks):
-        for network in tree:
-            ip_net = IPNetwork(network)  # Network name is same as network address space.
-            ips = ip_net.iter_hosts()
+        for network_name in tree:
+            network_uuid = '{} {}'.format(setup_uuid, network_name)
+            network_ip = IPNetwork(network_name)
+            ips = network_ip.iter_hosts()
             router_ip_address = next(ips)  # May be unused but must be reserved.
-            nodes = dict(zip(tree[network].keys(), ips))
+            nodes = dict(zip(tree[network_name].keys(), ips))
             if router_alias is not None:
                 nodes[router_alias] = router_ip_address
             for alias, ip in nodes.items():
                 machine = machines['linux'].get(alias)  # TODO: Specify OS (generally, VM type) of interest.
                 allocated_machines[alias] = machine
-                mac = hypervisor.plug(machine.name, network)
-                machine.networking.setup_ip(mac, ip, ip_net.prefixlen)
+                mac = hypervisor.plug(machine.name, network_uuid)
+                machine.networking.setup_ip(mac, ip, network_ip.prefixlen)
                 if alias != router_alias:
                     # Routes on router was set up when it was interpreted as host.
                     for reachable_network in reachable_networks:
                         machine.networking.route(reachable_network, mac, router_ip_address)
                     # Default gateway can be specified explicitly.
-                    subtree = tree[network][alias]
+                    subtree = tree[network_name][alias]
                     if subtree is not None:
                         machine.networking.setup_nat(mac)
-                        setup_tree(subtree, alias, reachable_networks + [ip_net])
+                        setup_tree(subtree, alias, reachable_networks + [network_ip])
             for alias, ip in nodes.items():
-                nodes_ips.setdefault(alias, {})[ip_net] = ip
+                nodes_ips.setdefault(alias, {})[network_ip] = ip
 
     setup_tree(networks_tree, None, [])
 
