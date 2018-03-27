@@ -1,12 +1,12 @@
 import logging
-from uuid import UUID
 
 import pytest
 
-from test_utils.api_shortcuts import get_cloud_system_id, get_local_system_id
 from test_utils.merging import IncompatibleServersMerge, merge_systems, setup_cloud_system, setup_local_system
-from test_utils.rest_api import HttpError
+from test_utils.rest_api import HttpError, RestApi
+from test_utils.server import Server
 from test_utils.server_installation import install_mediaserver
+from test_utils.service import UpstartService
 
 pytest_plugins = ['fixtures.cloud']
 
@@ -26,71 +26,72 @@ def check_user_exists(server, is_cloud):
 # https://networkoptix.atlassian.net/browse/VMS-3730
 # https://networkoptix.atlassian.net/wiki/display/SD/Merge+systems+test#Mergesystemstest-test_with_different_cloud_hosts_must_not_be_able_to_merge
 def test_with_different_cloud_hosts_must_not_be_able_to_merge(two_linux_servers, cloud_account):
-    cloud_host_2 = 'cloud.non.existent'
+    test_cloud_server, wrong_cloud_server = two_linux_servers
 
-    one, two = two_linux_servers
+    test_cloud_server.start()
+    setup_cloud_system(test_cloud_server, cloud_account, {})
 
-    one.start()
-    setup_cloud_system(one, cloud_account, {})
+    wrong_cloud_server.installation.patch_binary_set_cloud_host('cloud.non.existent')
+    wrong_cloud_server.start()
+    setup_local_system(wrong_cloud_server, {})
 
-    two.installation.patch_binary_set_cloud_host(cloud_host_2)
-    two.start()
-    setup_local_system(two, {})
-
-    check_user_exists(one, is_cloud=True)
+    check_user_exists(test_cloud_server, is_cloud=True)
 
     with pytest.raises(IncompatibleServersMerge):
-        merge_systems(one, two)
+        merge_systems(test_cloud_server, wrong_cloud_server)
 
-    # after patching to new cloud host server should reset system and users
-    one.stop()
-    one.installation.patch_binary_set_cloud_host(cloud_host_2)
-    one.start()
-    assert get_local_system_id(one.api) == UUID(0), "patch/change cloud host must reset the system"
-    setup_local_system(one, {})
-    check_user_exists(one, is_cloud=False)  # cloud user must be gone after patch/changed cloud host
-
-    merge_systems(one, two)
-    assert not get_cloud_system_id(two.api)
-    check_user_exists(two, is_cloud=False)  # cloud user most not get into server two either
-
-    assert not one.installation.list_core_dumps()
-    assert not two.installation.list_core_dumps()
+    assert not test_cloud_server.installation.list_core_dumps()
+    assert not wrong_cloud_server.installation.list_core_dumps()
 
 
 def test_server_should_be_able_to_merge_local_to_cloud_one(two_linux_servers, cloud_account):
-    one, two = two_linux_servers
+    cloud_bound_server, local_server = two_linux_servers
 
-    one.start()
-    setup_cloud_system(one, cloud_account, {})
-    check_user_exists(one, is_cloud=True)
+    cloud_bound_server.start()
+    setup_cloud_system(cloud_bound_server, cloud_account, {})
+    check_user_exists(cloud_bound_server, is_cloud=True)
 
-    two.start()
-    setup_local_system(two, {})
-    check_user_exists(two, is_cloud=False)
+    local_server.start()
+    setup_local_system(local_server, {})
+    check_user_exists(local_server, is_cloud=False)
 
-    merge_systems(one, two)
-    check_user_exists(two, is_cloud=True)
+    merge_systems(cloud_bound_server, local_server)
+    check_user_exists(local_server, is_cloud=True)
 
-    assert not one.installation.list_core_dumps()
-    assert not two.installation.list_core_dumps()
+    assert not cloud_bound_server.installation.list_core_dumps()
+    assert not local_server.installation.list_core_dumps()
+
+
+@pytest.fixture()
+def original_cloud_host_server(linux_vm, mediaserver_deb, ca):
+    installation = install_mediaserver(linux_vm.os_access, mediaserver_deb, reinstall=True)
+    service = UpstartService(linux_vm.os_access, mediaserver_deb.customization.service)
+    name = 'original-cloud-host'
+    api = RestApi(name, *linux_vm.ports['tcp', 7001])
+    server = Server(name, service, installation, api, linux_vm, 7001)
+    server.stop()
+    server.installation.cleanup_core_files()
+    server.installation.cleanup_var_dir()
+    server.installation.put_key_and_cert(ca.generate_key_and_cert())
+    server.installation.restore_mediaserver_conf()
+    server.installation.update_mediaserver_conf({
+        'logLevel': 'DEBUG2',
+        'tranLogLevel': 'DEBUG2',
+        'checkForUpdateUrl': 'http://127.0.0.1:8080',  # TODO: Use fake server responding with small updates.
+        })
+    server.start()
+    return server
 
 
 # https://networkoptix.atlassian.net/wiki/spaces/SD/pages/85204446/Cloud+test
-def test_server_with_hardcoded_cloud_host_should_be_able_to_setup_with_cloud(
-        linux_vm, mediaserver_deb, linux_servers_pool, cloud_account):
-    vm = linux_vm.get('original-cloud-host')
-    install_mediaserver(vm.os_access, mediaserver_deb, reinstall=True)
-    one = linux_servers_pool.get(vm.alias, vm=vm)
-
-    one.start()
+def test_server_with_hardcoded_cloud_host_should_be_able_to_setup_with_cloud(original_cloud_host_server, cloud_account):
     try:
-        setup_cloud_system(one, cloud_account, {})
+        setup_cloud_system(original_cloud_host_server, cloud_account, {})
     except HttpError as x:
         if x.reason == 'Could not connect to cloud: notAuthorized':
             pytest.fail('Server is incompatible with this cloud host/customization')
         else:
             raise
-    check_user_exists(one, is_cloud=True)
+    check_user_exists(original_cloud_host_server, is_cloud=True)
 
-    assert not one.installation.list_core_dumps()
+    assert not original_cloud_host_server.installation.list_core_dumps()

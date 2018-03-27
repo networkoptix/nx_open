@@ -1,4 +1,5 @@
 from datetime import datetime
+from uuid import UUID
 
 import requests
 from pytz import utc
@@ -17,7 +18,8 @@ def get_system_settings(api):
 
 
 def get_local_system_id(api):
-    return get_system_settings(api)['localSystemId']
+    response = requests.get(api.url('api/ping'))
+    return UUID(response.json()['reply']['localSystemId'])
 
 
 def set_local_system_id(api, new_id):

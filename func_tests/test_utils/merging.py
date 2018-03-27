@@ -89,7 +89,7 @@ def merge_systems(local, remote, accessible_ip_net=IPNetwork('10.254.0.0/16'), t
     if not wait_until(
             servant.api.credentials_work,
             name="until {} accepts new credentials from {}".format(servant, master),
-            timeout_sec=10):
+            timeout_sec=30):
         raise MergeChecksFailed(local, remote, "new credentials don't work")
     if not wait_until(
             lambda: get_local_system_id(servant.api) == master_system_id,
@@ -120,6 +120,7 @@ def setup_cloud_system(server, cloud_account, system_settings):
         'systemSettings': system_settings, }
     response = server.api.post('api/setupCloudSystem', request, timeout=300)
     assert system_settings == {key: response['settings'][key] for key in system_settings.keys()}
+    assert cloud_account.api.user == response['settings']['cloudAccountName']
     server.api = server.api.with_credentials(cloud_account.api.user, cloud_account.password)
     assert server.api.credentials_work()
     return response['settings']

@@ -36,7 +36,7 @@ class CloudAccount(object):
         self.api = RestApi('cloud-host:%s' % name, self.hostname, 80, username=user, password=password)
 
     def __repr__(self):
-        return '%r @ %r' % (self.name, self.url)
+        return '<CloudAccount {self.name} at {self.hostname}>'.format(self=self)
 
     @property
     def password(self):
