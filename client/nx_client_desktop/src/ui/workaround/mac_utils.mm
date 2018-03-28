@@ -13,8 +13,6 @@
 
 #import "mac_utils.h"
 
-#include <utils/common/delayed.h>
-
 namespace {
 
 NSString* fromQString(const QString& string)
@@ -122,27 +120,79 @@ QStringList showOpenDialogInternal(
     return result;
 }
 
+template<typename ResultType>
+class DelayedCall: public QObject
+{
+    using base_type = QObject;
+
+public:
+    using FunctionType = std::function<ResultType ()>;
+
+    static ResultType execute(FunctionType function);
+
+private:
+    DelayedCall(QEventLoop& loop, FunctionType function);
+
+    ResultType result() const;
+
+    virtual bool event(QEvent* e) override;
+
+private:
+    QEventLoop& m_loop;
+    const FunctionType m_function;
+    ResultType m_result;
+};
+
+template<typename ResultType>
+DelayedCall<ResultType>::DelayedCall(QEventLoop& loop, FunctionType function):
+    m_loop(loop),
+    m_function(function)
+{
+}
+
+template<typename ResultType>
+bool DelayedCall<ResultType>::event(QEvent* e)
+{
+    if (e->type() != QEvent::User)
+        return base_type::event(e);
+
+    if (m_function)
+        m_result = m_function();
+    m_loop.quit();
+    return true;
+}
+
+template<typename ResultType>
+ResultType DelayedCall<ResultType>::execute(FunctionType function)
+{
+    QEventLoop loop;
+    DelayedCall<ResultType> delayedCall(loop, function);
+    qApp->postEvent(&delayedCall, new QEvent(QEvent::User));
+    loop.exec();
+    return delayedCall.result();
+}
+
+template<typename ResultType>
+ResultType DelayedCall<ResultType>::result() const
+{
+    return m_result;
+}
+
 // We have to use our oun event loop to prevent dialog from sudden hide. Otherwise, it looks like
 // somewone sends message to close dialog unexpectecly.
+// We can't use executeDelayed function since sometimes event loop is broken (Qt bug) and it does
+// not fire. So, we have to use qApp->postEvent.
 QStringList showOpenDialog(
     OpenDialogMode mode,
     const QString& caption,
     const QString& directory,
     const QStringList& extensions = QStringList())
 {
-    QStringList result;
-
-    QEventLoop loop;
-    const auto callback =
-        [&loop, &result, mode, caption, directory, extensions]()
+    return DelayedCall<QStringList>::execute(
+        [mode, caption, directory, extensions]()
         {
-            result = showOpenDialogInternal(mode, caption, directory, extensions);
-            loop.quit();
-        };
-
-    executeDelayed(callback, 0);
-    loop.exec();
-    return result;
+            return showOpenDialogInternal(mode, caption, directory, extensions);
+        });
 }
 
 } // namespace
@@ -233,15 +283,15 @@ QStringList mac_getOpenFileNames(
 
 // We have to use our oun event loop to prevent dialog from sudden hide. Otherwise, it looks like
 // somewone sends message to close dialog unexpectecly.
+// We can't use executeDelayed function since sometimes event loop is broken (Qt bug) and it does
+// not fire. So, we have to use qApp->postEvent.
+
 QString mac_getSaveFileName(
     const QString& caption,
     const QString& directory,
     const QStringList& extensions)
 {
-    QString result;
-    QEventLoop loop;
-
-    const auto callback =
+    return DelayedCall<QString>::execute(
         [caption, directory, extensions]()
         {
             const bool sandboxed = mac_isSandboxed();
@@ -277,18 +327,7 @@ QString mac_getSaveFileName(
             }
 
             return toQString(panel.URL.path);
-        };
-
-    const auto loopCallback =
-        [&loop, &result, callback]()
-        {
-            result = callback();
-            loop.quit();
-        };
-
-    executeDelayed(loopCallback, 0);
-    loop.exec();
-    return result;
+        });
 }
 
 extern "C" {
