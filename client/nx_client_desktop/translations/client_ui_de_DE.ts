@@ -765,7 +765,7 @@
     <message>
       <location/>
       <source>Logical Id</source>
-      <translation>Logical-ID</translation>
+      <translation>Logical-Id</translation>
     </message>
   </context>
   <context>

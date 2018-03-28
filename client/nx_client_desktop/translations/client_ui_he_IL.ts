@@ -174,7 +174,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
       <source>Fixed Archive Length</source>
-      <translation>מספר הימים לשמירה בארכיון</translation>
+      <translation>אורך ארכיון קבוע</translation>
     </message>
     <message>
       <location/>
@@ -755,7 +755,7 @@
     <message>
       <location/>
       <source>Generate</source>
-      <translation type="unfinished">Generate</translation>
+      <translation>חולל</translation>
     </message>
     <message>
       <location/>
@@ -765,7 +765,7 @@
     <message>
       <location/>
       <source>Logical Id</source>
-      <translation type="unfinished">Logical Id</translation>
+      <translation>זיהוי ID לוגי</translation>
     </message>
   </context>
   <context>
@@ -1794,17 +1794,17 @@
     <message>
       <location filename="../src/ui/dialogs/new_wearable_camera_dialog.ui"/>
       <source>New Wearable Camera...</source>
-      <translation type="unfinished">New Wearable Camera...</translation>
+      <translation>מצלמה לבישה חדשה...</translation>
     </message>
     <message>
       <location/>
       <source>To server</source>
-      <translation type="unfinished">To server</translation>
+      <translation>לשרת</translation>
     </message>
     <message>
       <location/>
       <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+      <translation>&amp;;quot;מצלמה לבישה&amp;;quot; היא אחסון וירטואלי עבור קובצי וידאו, שניתן להעלותם לכל שרת במערכת ולהיכנס אליו על ידי כל משתמש.</translation>
     </message>
   </context>
   <context>
@@ -3044,12 +3044,12 @@
     <message>
       <location/>
       <source>There are no custom user roles yet.</source>
-      <translation type="unfinished">There are no custom user roles yet.</translation>
+      <translation>אין עדיין תפקידי הרשאות משתמש מותאמים אישית.</translation>
     </message>
     <message>
       <location/>
       <source>Click &quot;New role&quot; button to create one.</source>
-      <translation type="unfinished">Click &quot;New role&quot; button to create one.</translation>
+      <translation>לחץ על לחצן &amp;;quot;תפקיד הרשאות חדש&amp;;quot; כדי ליצור אחד.</translation>
     </message>
   </context>
   <context>
@@ -3080,7 +3080,7 @@
     <message>
       <location/>
       <source>Detect motion in uploaded video</source>
-      <translation type="unfinished">Detect motion in uploaded video</translation>
+      <translation>זיהוי תנועה בסרטון שהועלה</translation>
     </message>
     <message>
       <location/>
@@ -3101,17 +3101,17 @@
     <message>
       <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
       <source>Upload Video</source>
-      <translation type="unfinished">Upload Video</translation>
+      <translation>העלאת סרטון</translation>
     </message>
     <message>
       <location/>
       <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
+      <translation>העלה קובץ...</translation>
     </message>
     <message>
       <location/>
       <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
+      <translation>תיקיה להעלאה...</translation>
     </message>
   </context>
   <context>

@@ -1,5 +1,5 @@
 {
-    "language_name": "Tiếng Việt",
+    "language_name": "TÊN NGÔN NGỮ",
     "dialogs": {
         "okButton": "Ok",
         "openLink": "Truy cập liên kết này",
@@ -186,7 +186,7 @@
             "clear search": "xóa tìm kiếm",
             "live": "go to live | show me live",
             "expand all servers": "mở rộng tất cả các máy chủ",
-            "stop listening": "dừng nghe",
+            "stop listening": "ngừng lắng nghe",
             "expand server": "expand server + [server name]",
             "view": "view + [camera name]"
         },
