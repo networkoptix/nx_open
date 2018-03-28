@@ -24,7 +24,7 @@ Rotation::Rotation(qreal degrees):
 
 bool Rotation::isValid() const
 {
-    return m_degrees.has_value();
+    return static_cast<bool>(m_degrees);
 }
 
 qreal Rotation::value() const
