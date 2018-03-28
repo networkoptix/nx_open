@@ -11,13 +11,11 @@ namespace client {
 namespace desktop {
 
 using State = CameraSettingsDialogState;
+using RecordingThresholds = State::RecordingSettings::Thresholds;
 
 namespace {
 
 static constexpr int kMinFps = 1;
-
-static constexpr int kDefaultBeforeThresholdSec = 5;
-static constexpr int kDefaultAfterThresholdSec = 5;
 
 static constexpr auto kMinQuality = Qn::QualityLow;
 static constexpr auto kMaxQuality = Qn::QualityHighest;
@@ -237,10 +235,35 @@ State::ImageControlSettings calculateImageControlSettings(
 
 QList<QnScheduleTask::Data> calculateRecordingSchedule(const QnVirtualCameraResourcePtr& camera)
 {
+    if (camera->isDtsBased())
+        return {};
+
     QList<QnScheduleTask::Data> data;
     for (const auto& scheduleTask: camera->getScheduleTasks())
         data.push_back(scheduleTask.getData());
     return data;
+}
+
+int calculateRecordingThresholdBefore(const QnVirtualCameraResourcePtr& camera)
+{
+    const auto schedule = camera->getScheduleTasks();
+    if (!schedule.empty())
+    {
+        const auto& firstTask = schedule.first();
+        return firstTask.getBeforeThreshold();
+    }
+    return State::RecordingSettings::Thresholds::kDefaultBeforeSec;
+}
+
+int calculateRecordingThresholdAfter(const QnVirtualCameraResourcePtr& camera)
+{
+    const auto schedule = camera->getScheduleTasks();
+    if (!schedule.empty())
+    {
+        const auto& firstTask = schedule.first();
+        return firstTask.getAfterThreshold();
+    }
+    return State::RecordingSettings::Thresholds::kDefaultAfterSec;
 }
 
 } // namespace
@@ -303,24 +326,30 @@ State CameraSettingsDialogStateReducer::loadCameras(
 
     state.recording.parametersAvailable = calculateRecordingParametersAvailable(cameras);
 
-    state.recording.schedule = {};
-    fetchFromCameras<ScheduleTasks>(state.recording.schedule, cameras, calculateRecordingSchedule);
-    if (state.recording.schedule.hasValue() && !state.recording.schedule().empty())
-    {
-        const auto& firstTask = state.recording.schedule().first();
-        state.recording.beforeThresholdSec = firstTask.m_beforeThreshold;
-        state.recording.afterThresholdSec = firstTask.m_afterThreshold;
-    }
-    else
-    {
-        state.recording.beforeThresholdSec = kDefaultBeforeThresholdSec;
-        state.recording.afterThresholdSec = kDefaultAfterThresholdSec;
-    }
-
     // TODO: Handle overriding motion type.
     const auto fpsLimits = Qn::calculateMaxFps(cameras);
     state.recording.maxFps = qMax(kMinFps, fpsLimits.first);
     state.recording.maxDualStreamingFps = qMax(kMinFps, fpsLimits.second);
+
+    state.recording.schedule = {};
+    fetchFromCameras<ScheduleTasks>(state.recording.schedule, cameras, calculateRecordingSchedule);
+    const auto& schedule = state.recording.schedule;
+    if (schedule.hasValue() && !schedule().empty())
+    {
+        const auto tasks = schedule();
+        state.recording.brush.fps = std::max_element(tasks.cbegin(), tasks.cend(),
+            [](const auto& l, const auto& r) { return l.m_fps < r.m_fps; })->m_fps;
+    }
+    else
+    {
+        state.recording.brush.fps = state.recording.maxBrushFps();
+    }
+
+    fetchFromCameras<int>(state.recording.thresholds.beforeSec, cameras,
+        calculateRecordingThresholdBefore);
+    fetchFromCameras<int>(state.recording.thresholds.afterSec, cameras,
+        calculateRecordingThresholdAfter);
+
     state.recording.brush.fps = qBound(
         kMinFps,
         state.recording.brush.fps,
@@ -339,6 +368,20 @@ State CameraSettingsDialogStateReducer::setSingleCameraUserName(State state, con
 {
     state.hasChanges = true;
     state.singleCameraSettings.name.setUser(text);
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setScheduleBrush(
+    State state,
+    const QnScheduleGridWidget::CellParams& brush)
+{
+    state.recording.brush = brush;
+
+    state = setScheduleBrushFps(std::move(state), qBound(
+        kMinFps,
+        state.recording.brush.fps,
+        state.recording.maxBrushFps()));
+
     return state;
 }
 
@@ -384,6 +427,21 @@ State CameraSettingsDialogStateReducer::setScheduleBrushQuality(
 {
     state.recording.brush.quality = value;
     state = fillBitrateFromFixedQuality(std::move(state));
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setSchedule(State state, const ScheduleTasks& schedule)
+{
+    state.hasChanges = true;
+
+    ScheduleTasks processed = schedule;
+    if (!state.recording.customBitrateAvailable)
+    {
+        for (auto& task: processed)
+            task.m_bitrateKbps = 0;
+    }
+
+    state.recording.schedule.setUser(processed);
     return state;
 }
 
@@ -457,6 +515,20 @@ State CameraSettingsDialogStateReducer::setMaxRecordingDaysValue(State state, in
     return state;
 }
 
+State CameraSettingsDialogStateReducer::setRecordingBeforeThresholdSec(State state, int value)
+{
+    state.hasChanges = true;
+    state.recording.thresholds.beforeSec.setUser(value);
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setRecordingAfterThresholdSec(State state, int value)
+{
+    state.hasChanges = true;
+    state.recording.thresholds.afterSec.setUser(value);
+    return state;
+}
+
 State CameraSettingsDialogStateReducer::setCustomAspectRatio(
     State state,
     const QnAspectRatio& value)
@@ -482,6 +554,12 @@ State CameraSettingsDialogStateReducer::setRecordingEnabled(State state, bool va
 
     if (value && !state.recording.schedule.hasValue())
     {
+        const int beforeThreshold = state.recording.thresholds.beforeSec.valueOr(
+            State::RecordingSettings::Thresholds::kDefaultBeforeSec);
+
+        const int afterThreshold = state.recording.thresholds.afterSec.valueOr(
+            State::RecordingSettings::Thresholds::kDefaultAfterSec);
+
         ScheduleTasks tasks;
         for (int dayOfWeek = 1; dayOfWeek <= 7; ++dayOfWeek)
         {
@@ -489,8 +567,8 @@ State CameraSettingsDialogStateReducer::setRecordingEnabled(State state, bool va
             data.m_dayOfWeek = dayOfWeek;
             data.m_startTime = 0;
             data.m_endTime = 86400;
-            data.m_beforeThreshold = kDefaultBeforeThresholdSec;
-            data.m_afterThreshold = kDefaultAfterThresholdSec;
+            data.m_beforeThreshold = beforeThreshold;
+            data.m_afterThreshold = afterThreshold;
             tasks << data;
         }
         state.recording.schedule.setUser(tasks);

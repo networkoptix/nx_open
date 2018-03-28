@@ -18,9 +18,11 @@ public:
     static State setPanicMode(State state, bool value);
     static State loadCameras(State state, const QnVirtualCameraResourceList& cameras);
     static State setSingleCameraUserName(State state, const QString& text);
+    static State setScheduleBrush(State state, const QnScheduleGridWidget::CellParams& brush);
     static State setScheduleBrushRecordingType(State state, Qn::RecordingType value);
     static State setScheduleBrushFps(State state, int value);
     static State setScheduleBrushQuality(State state, Qn::StreamQuality value);
+    static State setSchedule(State state, const ScheduleTasks& schedule);
     static State setRecordingShowFps(State state, bool value);
     static State setRecordingShowQuality(State state, bool value);
     static State toggleCustomBitrateVisible(State state);
@@ -30,6 +32,8 @@ public:
     static State setMinRecordingDaysValue(State state, int value);
     static State setMaxRecordingDaysAutomatic(State state, bool value);
     static State setMaxRecordingDaysValue(State state, int value);
+    static State setRecordingBeforeThresholdSec(State state, int value);
+    static State setRecordingAfterThresholdSec(State state, int value);
     static State setCustomAspectRatio(State state, const QnAspectRatio& value);
     static State setCustomRotation(State state, const Rotation& value);
     static State setRecordingEnabled(State state, bool value);

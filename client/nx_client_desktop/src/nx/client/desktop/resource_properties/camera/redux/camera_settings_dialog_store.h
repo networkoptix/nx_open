@@ -5,6 +5,8 @@
 #include <common/common_globals.h>
 
 #include <core/resource/resource_fwd.h>
+#include <ui/widgets/properties/schedule_grid_widget.h>
+#include <core/misc/schedule_task.h>
 
 class QnAspectRatio;
 
@@ -32,9 +34,11 @@ public:
     void setPanicMode(bool value);
     void loadCameras(const QnVirtualCameraResourceList& cameras);
     void setSingleCameraUserName(const QString& text);
+    void setScheduleBrush(const QnScheduleGridWidget::CellParams& brush);
     void setScheduleBrushRecordingType(Qn::RecordingType value);
     void setScheduleBrushFps(int value);
     void setScheduleBrushQuality(Qn::StreamQuality value);
+    void setSchedule(const ScheduleTasks& schedule);
     void setRecordingShowFps(bool value);
     void setRecordingShowQuality(bool value);
     void toggleCustomBitrateVisible();
@@ -44,6 +48,8 @@ public:
     void setMinRecordingDaysValue(int value);
     void setMaxRecordingDaysAutomatic(bool value);
     void setMaxRecordingDaysValue(int value);
+    void setRecordingBeforeThresholdSec(int value);
+    void setRecordingAfterThresholdSec(int value);
     void setCustomAspectRatio(const QnAspectRatio& value);
     void setCustomRotation(const Rotation& value);
     void setRecordingEnabled(bool value);

@@ -36,7 +36,8 @@ struct CameraSettingsDialogState
     struct UserEditableMultiple
     {
         bool hasValue() const { return m_user || m_base; }
-        T get() const { return m_user.value_or(m_base.value()); }
+        T get() const { return m_user.value_or(*m_base); }
+        T valueOr(T value) const { return m_user.value_or(m_base.value_or(value)); }
         void setUser(T value) { m_user = value; }
         void setBase(T value) { m_base = value; }
         void resetUser() { m_user.reset(); }
@@ -117,8 +118,16 @@ struct CameraSettingsDialogState
         /** Value to be displayed in the dialog. */
         float bitrateMbps = 0.0;
 
-        int beforeThresholdSec = 0;
-        int afterThresholdSec = 0;
+        struct Thresholds
+        {
+            static constexpr int kDefaultBeforeSec = 5;
+            static constexpr int kDefaultAfterSec = 5;
+
+            UserEditableMultiple<int> beforeSec;
+            UserEditableMultiple<int> afterSec;
+        };
+        Thresholds thresholds;
+
         UserEditableMultiple<ScheduleTasks> schedule;
 
         bool showQuality = true;

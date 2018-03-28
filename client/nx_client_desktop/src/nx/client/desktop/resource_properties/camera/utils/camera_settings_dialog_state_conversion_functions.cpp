@@ -12,10 +12,11 @@ namespace desktop {
 namespace {
 
 using State = CameraSettingsDialogState;
+using Cameras = QnVirtualCameraResourceList;
 
 void setMinRecordingDays(
     const State::RecordingDays& value,
-    const QnVirtualCameraResourceList& cameras)
+    const Cameras& cameras)
 {
     if (!value.same)
         return;
@@ -32,7 +33,7 @@ void setMinRecordingDays(
 
 void setMaxRecordingDays(
     const State::RecordingDays& value,
-    const QnVirtualCameraResourceList& cameras)
+    const Cameras& cameras)
 {
     if (!value.same)
         return;
@@ -49,7 +50,7 @@ void setMaxRecordingDays(
 
 void setCustomRotation(
     const Rotation& value,
-    const QnVirtualCameraResourceList& cameras)
+    const Cameras& cameras)
 {
     for (const auto& camera: cameras)
     {
@@ -64,7 +65,7 @@ void setCustomRotation(
 
 void setCustomAspectRatio(
     const QnAspectRatio& value,
-    const QnVirtualCameraResourceList& cameras)
+    const Cameras& cameras)
 {
     for (const auto& camera: cameras)
     {
@@ -79,12 +80,68 @@ void setCustomAspectRatio(
     }
 }
 
-} // namespace
+void setSchedule(const ScheduleTasks& schedule, const Cameras& cameras)
+{
+    QnScheduleTaskList scheduleTasks;
+    for (const auto& data: schedule)
+        scheduleTasks << data;
 
+    for (const auto& camera: cameras)
+    {
+        if (camera->isDtsBased())
+            continue;
+
+        camera->setScheduleTasks(scheduleTasks);
+    }
+}
+
+void setRecordingBeforeThreshold(
+    int value,
+    const Cameras& cameras)
+{
+    for (const auto& camera: cameras)
+    {
+        if (camera->isDtsBased())
+            continue;
+
+        QnScheduleTaskList scheduleTasks = camera->getScheduleTasks();
+        for (auto& task: scheduleTasks)
+            task.setBeforeThreshold(value);
+        camera->setScheduleTasks(scheduleTasks);
+    }
+}
+
+void setRecordingAfterThreshold(
+    int value,
+    const Cameras& cameras)
+{
+    for (const auto& camera: cameras)
+    {
+        if (camera->isDtsBased())
+            continue;
+
+        QnScheduleTaskList scheduleTasks = camera->getScheduleTasks();
+        for (auto& task: scheduleTasks)
+            task.setAfterThreshold(value);
+        camera->setScheduleTasks(scheduleTasks);
+    }
+}
+
+
+void setRecordingEnabled(bool value, const Cameras& cameras)
+{
+    for (const auto& camera: cameras)
+    {
+        camera->setLicenseUsed(value);
+        camera->setScheduleDisabled(!value);
+    }
+}
+
+} // namespace
 
 void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
     const CameraSettingsDialogState& state,
-    const QnVirtualCameraResourceList& cameras)
+    const Cameras& cameras)
 {
     if (state.isSingleCamera())
     {
@@ -98,8 +155,21 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
 
     if (state.imageControl.rotation.hasValue())
         setCustomRotation(state.imageControl.rotation(), cameras);
-}
 
+    if (state.recording.enabled.hasValue())
+        setRecordingEnabled(state.recording.enabled(), cameras);
+
+    if (state.recording.schedule.hasValue())
+        setSchedule(state.recording.schedule(), cameras);
+
+    // TODO: #GDM #Refactor camera resource.
+    // Must be called after schedule is set.
+    if (state.recording.thresholds.beforeSec.hasValue())
+        setRecordingBeforeThreshold(state.recording.thresholds.beforeSec(), cameras);
+
+    if (state.recording.thresholds.afterSec.hasValue())
+        setRecordingAfterThreshold(state.recording.thresholds.afterSec(), cameras);
+}
 
 } // namespace desktop
 } // namespace client

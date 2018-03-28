@@ -142,20 +142,20 @@ void CameraInfoWidget::loadState(const CameraSettingsDialogState& state)
         tr("Camera has no primary stream"),
         tr("I/O module has no audio stream")
     ).getString(state.deviceType);
-    ui->primaryStreamLabel->setText(single.primaryStream.has_value()
-        ? single.primaryStream.value()
+    ui->primaryStreamLabel->setText(single.primaryStream
+        ? *single.primaryStream
         : noPrimaryStreamText);
-    ui->primaryStreamCopyButton->setVisible(single.primaryStream.has_value());
+    ui->primaryStreamCopyButton->setVisible(static_cast<bool>(single.primaryStream));
 
     const QString noSecondaryStreamText = QnCameraDeviceStringSet(
         tr("Device has no secondary stream"),
         tr("Camera has no secondary stream"),
         tr("I/O module has no secondary stream")
     ).getString(state.deviceType);
-    ui->secondaryStreamLabel->setText(single.secondaryStream.has_value()
-        ? single.secondaryStream.value()
+    ui->secondaryStreamLabel->setText(single.secondaryStream
+        ? *single.secondaryStream
         : noSecondaryStreamText);
-    ui->secondaryStreamCopyButton->setVisible(single.secondaryStream.has_value());
+    ui->secondaryStreamCopyButton->setVisible(static_cast<bool>(single.secondaryStream));
 }
 
 void CameraInfoWidget::alignLabels()

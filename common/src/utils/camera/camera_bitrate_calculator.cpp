@@ -97,6 +97,12 @@ float CameraBitrateCalculator::roundKbpsToMbps(float kbps, int decimals)
     return qRound(kbps / kKbpsInMbps, roundingStep);
 }
 
+float CameraBitrateCalculator::roundMbpsToKbps(float mbps, int decimals)
+{
+    const auto roundingStep = std::pow(0.1, decimals);
+    return qRound(mbps * kKbpsInMbps, roundingStep);
+}
+
 float CameraBitrateCalculator::getBitrateForQualityMbps(
     const QnVirtualCameraResourcePtr& camera,
     Qn::StreamQuality quality,

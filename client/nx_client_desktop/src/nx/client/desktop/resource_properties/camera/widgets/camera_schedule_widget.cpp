@@ -106,15 +106,6 @@ CameraScheduleWidget::CameraScheduleWidget(
         };
 
 
-    auto handleCellValuesChanged =
-        [this]()
-        {
-            updateAlert(ScheduleChange);
-        };
-
-    connect(ui->gridWidget, &QnScheduleGridWidget::cellValuesChanged,
-        this, handleCellValuesChanged);
-
     connect(ui->licensesButton, &QPushButton::clicked, this,
         &CameraScheduleWidget::at_licensesButton_clicked);
 
@@ -125,16 +116,12 @@ CameraScheduleWidget::CameraScheduleWidget(
     connect(ui->enableRecordingCheckBox, &QCheckBox::stateChanged, this,
         notifyAboutScheduleEnabledChanged);
 
-    connect(ui->gridWidget, &QnScheduleGridWidget::cellActivated, this,
-        &CameraScheduleWidget::at_gridWidget_cellActivated);
-
     connect(ui->exportScheduleButton, &QPushButton::clicked, this,
         &CameraScheduleWidget::at_exportScheduleButton_clicked);
 
 
     connect(ui->archiveLengthWidget, &QnArchiveLengthWidget::alertChanged, this,
         &nx::client::desktop::CameraScheduleWidget::alert);
-
 
     ui->exportWarningLabel->setVisible(false);
 
@@ -168,6 +155,20 @@ void CameraScheduleWidget::setStore(CameraSettingsDialogStore* store)
         [store](int state)
         {
             store->setRecordingEnabled(state == Qt::Checked);
+        });
+
+    // Called when a cell is Alt-clicked. Fetches cell settings as current.
+    connect(ui->gridWidget, &QnScheduleGridWidget::cellActivated, store,
+        [this, store](const QPoint& pos)
+        {
+            store->setScheduleBrush(ui->gridWidget->cellValue(pos));
+        });
+
+    connect(ui->gridWidget, &QnScheduleGridWidget::cellValuesChanged, store,
+        [this, store]()
+        {
+            store->setSchedule(calculateScheduleTasks());
+            // TODO: updateAlert(ScheduleChange);
         });
 }
 
@@ -205,9 +206,10 @@ void CameraScheduleWidget::loadState(const CameraSettingsDialogState& state)
     }
     ui->gridWidget->setBrush(actualBrush);
 
+    const bool recordingEnabled = recording.enabled.valueOr(false);
     CheckboxUtils::setupTristateCheckbox(ui->enableRecordingCheckBox,
         state.recording.enabled.hasValue(),
-        state.recording.enabled.hasValue() && state.recording.enabled());
+        recordingEnabled);
     setReadOnly(ui->enableRecordingCheckBox, state.readOnly);
 
     setReadOnly(ui->exportScheduleButton, state.readOnly);
@@ -216,6 +218,7 @@ void CameraScheduleWidget::loadState(const CameraSettingsDialogState& state)
 
     ui->gridWidget->resetCellValues();
     const auto& schedule = state.recording.schedule;
+    ui->gridWidget->setActive(schedule.hasValue());
     if (schedule.hasValue())
     {
         for (const auto& task: schedule())
@@ -253,6 +256,74 @@ void CameraScheduleWidget::loadState(const CameraSettingsDialogState& state)
             }
         }
     }
+
+    ui->scheduleSettingsWidget->setEnabled(recordingEnabled);
+    setLayoutEnabled(ui->recordingScheduleLayout, recordingEnabled);
+    setLayoutEnabled(ui->bottomParametersLayout, recordingEnabled);
+}
+
+ScheduleTasks CameraScheduleWidget::calculateScheduleTasks() const
+{
+    ScheduleTasks tasks;
+    if (!ui->gridWidget->isActive())
+        return tasks;
+
+    for (int row = 0; row < ui->gridWidget->rowCount(); ++row)
+    {
+        QnScheduleTask::Data task;
+
+        for (int col = 0; col < ui->gridWidget->columnCount();)
+        {
+            const QPoint cell(col, row);
+            const QnScheduleGridWidget::CellParams params = ui->gridWidget->cellValue(cell);
+
+            const auto recordingType = params.recordingType;
+            Qn::StreamQuality streamQuality = Qn::QualityHighest;
+            int bitrateKbps = 0;
+
+            if (recordingType != Qn::RT_Never)
+            {
+                streamQuality = params.quality;
+                bitrateKbps = qRound(
+                    core::CameraBitrateCalculator::roundMbpsToKbps(params.bitrateMbps));
+            }
+
+            int fps = params.fps;
+            if (fps == 0 && recordingType != Qn::RT_Never)
+                fps = 10;
+
+            if (task.m_startTime == task.m_endTime)
+            {
+                // An invalid one; initialize.
+                task.m_dayOfWeek = row + 1;
+                task.m_startTime = col * 3600;     //< In secs from start of day.
+                task.m_endTime = (col + 1) * 3600; //< In secs from start of day.
+                task.m_recordType = recordingType;
+                task.m_streamQuality = streamQuality;
+                task.m_bitrateKbps = bitrateKbps;
+                task.m_fps = fps;
+                ++col;
+            }
+            else if (task.m_recordType == recordingType
+                && task.m_streamQuality == streamQuality
+                && task.m_bitrateKbps == bitrateKbps
+                && task.m_fps == fps)
+            {
+                task.m_endTime = (col + 1) * 3600; //< In secs from start of day.
+                ++col;
+            }
+            else
+            {
+                tasks.append(task);
+                task = QnScheduleTask::Data();
+            }
+        }
+
+        if (task.m_startTime != task.m_endTime)
+            tasks.append(task);
+    }
+
+    return tasks;
 }
 
 CameraScheduleWidget::~CameraScheduleWidget() = default;
@@ -307,18 +378,6 @@ void CameraScheduleWidget::loadDataToUi()
     updateMotionAvailable();
     updateRecordingParamsAvailable();
 
-    m_advancedSettingsSupported = m_cameras.size() == 1;
-
-    ui->advancedSettingsButton->setVisible(m_advancedSettingsSupported);
-    ui->advancedSettingsWidget->setVisible(m_advancedSettingsSupported && m_advancedSettingsVisible);
-    ui->settingsGroupBox->layout()->activate();
-
-    if (!m_advancedSettingsSupported && isCurrentBitrateCustom())
-    {
-        ui->qualityComboBox->setCurrentIndex(
-            ui->qualityComboBox->findData(currentQualityApproximation()));
-    }
-
     if (m_cameras.isEmpty())
     {
         setScheduleTasks(QnScheduleTaskList());
@@ -327,17 +386,11 @@ void CameraScheduleWidget::loadDataToUi()
     {
         bool isScheduleEqual = true;
         bool isFpsValid = true;
-        QList<QnScheduleTask::Data> scheduleTasksData;
-        for (const auto& scheduleTask: m_cameras.front()->getScheduleTasks())
-            scheduleTasksData << scheduleTask.getData();
-
         for (const auto& camera : m_cameras)
         {
             QList<QnScheduleTask::Data> cameraScheduleTasksData;
             for (const auto& scheduleTask : camera->getScheduleTasks())
             {
-                cameraScheduleTasksData << scheduleTask.getData();
-
                 switch (scheduleTask.getRecordingType())
                 {
                     case Qn::RT_Never:
@@ -353,77 +406,18 @@ void CameraScheduleWidget::loadDataToUi()
                         break;
                 }
             }
-
-            if (!isScheduleEqual || cameraScheduleTasksData != scheduleTasksData)
-            {
-                isScheduleEqual = false;
-                break;
-            }
         }
 
-        if (isScheduleEqual)
-            setScheduleTasks(m_cameras.front()->getScheduleTasks());
-        else
-            setScheduleTasks(QnScheduleTaskList());
         ui->gridWidget->setActive(isScheduleEqual && isFpsValid);
     }
-
-    int currentMaxFps = getGridMaxFps();
-    if (currentMaxFps > 0)
-        setFps(currentMaxFps);
-    else if (!m_cameras.isEmpty())
-        setFps(m_cameras.first()->getMaxFps());
-    syncBitrateWithFps();
-
-    ui->archiveLengthWidget->updateFromResources(m_cameras);
-
-    updateScheduleEnabled();
-    updatePanicLabelText();
     updateMotionButtons();
     updateLicensesLabelText();
     updateGridParams();
     setScheduleAlert(QString());
-
-    retranslateUi();
 }
 
 void CameraScheduleWidget::applyChanges()
 {
-    bool scheduleChanged = ui->gridWidget->isActive();
-
-    ui->archiveLengthWidget->submitToResources(m_cameras);
-
-    QnScheduleTaskList basicScheduleTasks;
-    if (scheduleChanged)
-    {
-        for (const auto& scheduleTaskData : this->scheduleTasks())
-            basicScheduleTasks.append(scheduleTaskData);
-    }
-    updateRecordThresholds(basicScheduleTasks);
-
-    bool enableRecording = isScheduleEnabled();
-    bool canChangeRecording = !enableRecording || canEnableRecording();
-
-    for (const auto& camera: m_cameras)
-    {
-        if (canChangeRecording)
-        {
-            camera->setLicenseUsed(enableRecording);
-            camera->setScheduleDisabled(!enableRecording);
-        }
-
-        if (camera->isDtsBased())
-            continue;
-
-        QnScheduleTaskList scheduleTasks = basicScheduleTasks;
-        if (!scheduleChanged)
-        {
-            scheduleTasks = camera->getScheduleTasks();
-            updateRecordThresholds(scheduleTasks);
-        }
-        camera->setScheduleTasks(scheduleTasks);
-    }
-
     if (!canChangeRecording)
     {
         QSignalBlocker blocker(ui->enableRecordingCheckBox);
@@ -437,14 +431,16 @@ void CameraScheduleWidget::updateMotionAvailable()
 {
     using boost::algorithm::all_of;
 
-    bool available = all_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) { return !camera->isDtsBased(); });
+    bool available = all_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera)
+        { return !camera->isDtsBased(); });
     if (m_motionTypeOverride != Qn::MT_Default)
     {
         available &= m_motionTypeOverride != Qn::MT_NoMotion;
     }
     else
     {
-        available &= all_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) { return camera->hasMotion(); });
+        available &= all_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera)
+            { return camera->hasMotion(); });
     }
 
     if (m_motionAvailable == available)
@@ -462,69 +458,6 @@ void CameraScheduleWidget::setExportScheduleButtonEnabled(bool enabled)
     ui->exportWarningLabel->setVisible(!enabled);
 }
 
-QnScheduleTaskList CameraScheduleWidget::scheduleTasks() const
-{
-    QnScheduleTaskList tasks;
-    if (!ui->gridWidget->isActive())
-        return tasks;
-
-    for (int row = 0; row < ui->gridWidget->rowCount(); ++row)
-    {
-        QnScheduleTask::Data task;
-
-        for (int col = 0; col < ui->gridWidget->columnCount();)
-        {
-            const QPoint cell(col, row);
-            const QnScheduleGridWidget::CellParams params = ui->gridWidget->cellValue(cell);
-
-            Qn::RecordingType recordType = params.recordingType;
-            Qn::StreamQuality streamQuality = Qn::QualityHighest;
-            int bitrateKbps = 0;
-
-            if (recordType != Qn::RT_Never)
-            {
-                streamQuality = params.quality;
-                if (m_advancedSettingsSupported)
-                    bitrateKbps = qRound(params.bitrateMbps * kKbpsInMbps);
-            }
-
-            int fps = params.fps;
-            if (fps == 0 && recordType != Qn::RT_Never)
-                fps = 10;
-
-            if (task.m_startTime == task.m_endTime)
-            {
-                // An invalid one; initialize.
-                task.m_dayOfWeek = row + 1;
-                task.m_startTime = col * 3600; //< In secs from start of day.
-                task.m_endTime = (col + 1) * 3600; //< In secs from start of day.
-                task.m_recordType = recordType;
-                task.m_streamQuality = streamQuality;
-                task.m_bitrateKbps = bitrateKbps;
-                task.m_fps = fps;
-                ++col;
-            }
-            else if (task.m_recordType == recordType
-                && task.m_streamQuality == streamQuality
-                && task.m_bitrateKbps == bitrateKbps
-                && task.m_fps == fps)
-            {
-                task.m_endTime = (col + 1) * 3600; //< In secs from start of day.
-                ++col;
-            }
-            else
-            {
-                tasks.append(task);
-                task = QnScheduleTask::Data();
-            }
-        }
-
-        if (task.m_startTime != task.m_endTime)
-            tasks.append(task);
-    }
-
-    return tasks;
-}
 
 bool CameraScheduleWidget::canEnableRecording() const
 {
@@ -556,16 +489,6 @@ void CameraScheduleWidget::setScheduleEnabled(bool enabled)
 bool CameraScheduleWidget::isScheduleEnabled() const
 {
     return ui->enableRecordingCheckBox->checkState() != Qt::Unchecked;
-}
-
-void CameraScheduleWidget::updateGridEnabledState()
-{
-    const bool recordingEnabled = ui->enableRecordingCheckBox->isChecked();
-    ui->motionGroupBox->setEnabled(state.recording.parametersAvailable);
-    setLayoutEnabled(ui->recordingScheduleLayout, recordingEnabled);
-    ui->scheduleSettingsWidget->setEnabled(recordingEnabled);
-    setLayoutEnabled(ui->bottomParametersLayout, recordingEnabled);
-    updateScheduleTypeControls();
 }
 
 void CameraScheduleWidget::updateLicensesLabelText()
@@ -665,49 +588,10 @@ void CameraScheduleWidget::updateColors()
     ui->noRecordButton->setCustomPaintFunction(ui->gridWidget->paintFunction(Qn::RT_Never));
 }
 
-// -------------------------------------------------------------------------- //
-// Handlers
-// -------------------------------------------------------------------------- //
-void CameraScheduleWidget::at_gridWidget_cellActivated(const QPoint &cell)
-{
-    // Called when a cell is Alt-clicked this handler fetches cell settings as current.
-
-    m_disableUpdateGridParams = true;
-    const auto params = ui->gridWidget->cellValue(cell);
-    switch (params.recordingType)
-    {
-        case Qn::RT_Always:
-            ui->recordAlwaysButton->setChecked(true);
-            break;
-        case Qn::RT_MotionOnly:
-            ui->recordMotionButton->setChecked(true);
-            break;
-        case Qn::RT_MotionAndLowQuality:
-            ui->recordMotionPlusLQButton->setChecked(true);
-            break;
-        default:
-            ui->noRecordButton->setChecked(true);
-            break;
-    }
-
-    if (params.recordingType != Qn::RT_Never)
-    {
-        ui->fpsSpinBox->setValue(params.fps);
-        if (qFuzzyIsNull(params.bitrateMbps) || !m_advancedSettingsSupported)
-            ui->qualityComboBox->setCurrentIndex(ui->qualityComboBox->findData(params.quality));
-        else
-            ui->bitrateSpinBox->setValue(params.bitrateMbps);
-    }
-
-    m_disableUpdateGridParams = false;
-    updateGridParams(true);
-}
-
 void CameraScheduleWidget::at_licensesButton_clicked()
 {
     menu()->trigger(action::PreferencesLicensesTabAction);
 }
-
 
 void CameraScheduleWidget::at_exportScheduleButton_clicked()
 {

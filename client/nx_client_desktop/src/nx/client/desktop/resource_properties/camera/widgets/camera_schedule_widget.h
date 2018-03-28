@@ -3,6 +3,7 @@
 #include <QtCore/QScopedPointer>
 
 #include <QtWidgets/QWidget>
+#include <core/misc/schedule_task.h>
 
 namespace Ui { class CameraScheduleWidget; }
 
@@ -33,6 +34,7 @@ private:
 
     void loadState(const CameraSettingsDialogState& state);
 
+    ScheduleTasks calculateScheduleTasks() const;
 
     enum AlertReason
     {

@@ -70,55 +70,86 @@ void CameraSettingsDialogStore::loadCameras(const QnVirtualCameraResourceList& c
 
 void CameraSettingsDialogStore::setSingleCameraUserName(const QString& text)
 {
-    d->executeAction([&](State state) { return Reducer::setSingleCameraUserName(std::move(state), text); });
+    d->executeAction(
+        [&](State state) { return Reducer::setSingleCameraUserName(std::move(state), text); });
+}
+
+void CameraSettingsDialogStore::setScheduleBrush(const QnScheduleGridWidget::CellParams& brush)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setScheduleBrush(std::move(state), brush); });
 }
 
 void CameraSettingsDialogStore::setScheduleBrushRecordingType(Qn::RecordingType value)
 {
-    d->executeAction([&](State state) { return Reducer::setScheduleBrushRecordingType(std::move(state), value); });
+    d->executeAction(
+        [&](State state)
+        {
+            return Reducer::setScheduleBrushRecordingType(std::move(state), value);
+        });
 }
 
 void CameraSettingsDialogStore::setScheduleBrushFps(int value)
 {
-    d->executeAction([&](State state) { return Reducer::setScheduleBrushFps(std::move(state), value); });
+    d->executeAction(
+        [&](State state) { return Reducer::setScheduleBrushFps(std::move(state), value); });
 }
 
 void CameraSettingsDialogStore::setScheduleBrushQuality(Qn::StreamQuality value)
 {
-    d->executeAction([&](State state) { return Reducer::setScheduleBrushQuality(std::move(state), value); });
+    d->executeAction(
+        [&](State state) { return Reducer::setScheduleBrushQuality(std::move(state), value); });
+}
+
+void CameraSettingsDialogStore::setSchedule(const ScheduleTasks& schedule)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setSchedule(std::move(state), schedule); });
 }
 
 void CameraSettingsDialogStore::setRecordingShowFps(bool value)
 {
-    d->executeAction([&](State state) { return Reducer::setRecordingShowFps(std::move(state), value); });
+    d->executeAction(
+        [&](State state) { return Reducer::setRecordingShowFps(std::move(state), value); });
 }
 
 void CameraSettingsDialogStore::setRecordingShowQuality(bool value)
 {
-    d->executeAction([&](State state) { return Reducer::setRecordingShowQuality(std::move(state), value); });
+    d->executeAction(
+        [&](State state) { return Reducer::setRecordingShowQuality(std::move(state), value); });
 }
 
 void CameraSettingsDialogStore::toggleCustomBitrateVisible()
 {
-    d->executeAction([&](State state) { return Reducer::toggleCustomBitrateVisible(std::move(state)); });
+    d->executeAction(
+        [&](State state) { return Reducer::toggleCustomBitrateVisible(std::move(state)); });
 }
 
 void CameraSettingsDialogStore::setCustomRecordingBitrateMbps(float mbps)
 {
     d->executeAction(
-        [&](State state) { return Reducer::setCustomRecordingBitrateMbps(std::move(state), mbps); });
+        [&](State state)
+        {
+            return Reducer::setCustomRecordingBitrateMbps(std::move(state), mbps);
+        });
 }
 
 void CameraSettingsDialogStore::setCustomRecordingBitrateNormalized(float value)
 {
     d->executeAction(
-        [&](State state) { return Reducer::setCustomRecordingBitrateNormalized(std::move(state), value); });
+        [&](State state)
+        {
+            return Reducer::setCustomRecordingBitrateNormalized(std::move(state), value);
+        });
 }
 
 void CameraSettingsDialogStore::setMinRecordingDaysAutomatic(bool value)
 {
     d->executeAction(
-        [&](State state) { return Reducer::setMinRecordingDaysAutomatic(std::move(state), value); });
+        [&](State state)
+        {
+            return Reducer::setMinRecordingDaysAutomatic(std::move(state), value);
+        });
 }
 
 void CameraSettingsDialogStore::setMinRecordingDaysValue(int value)
@@ -130,13 +161,34 @@ void CameraSettingsDialogStore::setMinRecordingDaysValue(int value)
 void CameraSettingsDialogStore::setMaxRecordingDaysAutomatic(bool value)
 {
     d->executeAction(
-        [&](State state) { return Reducer::setMaxRecordingDaysAutomatic(std::move(state), value); });
+        [&](State state)
+        {
+            return Reducer::setMaxRecordingDaysAutomatic(std::move(state), value);
+        });
 }
 
 void CameraSettingsDialogStore::setMaxRecordingDaysValue(int value)
 {
     d->executeAction(
         [&](State state) { return Reducer::setMaxRecordingDaysValue(std::move(state), value); });
+}
+
+void CameraSettingsDialogStore::setRecordingBeforeThresholdSec(int value)
+{
+    d->executeAction(
+        [&](State state)
+        {
+            return Reducer::setRecordingBeforeThresholdSec(std::move(state), value);
+        });
+}
+
+void CameraSettingsDialogStore::setRecordingAfterThresholdSec(int value)
+{
+    d->executeAction(
+        [&](State state)
+        {
+            return Reducer::setRecordingAfterThresholdSec(std::move(state), value);
+        });
 }
 
 void CameraSettingsDialogStore::setCustomAspectRatio(const QnAspectRatio& value)

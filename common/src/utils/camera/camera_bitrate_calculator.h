@@ -23,6 +23,7 @@ struct CameraBitrateCalculator
         Qn::BitratePerGopType bitratePerGopType);
 
     static float roundKbpsToMbps(float kbps, int decimals = 1);
+    static float roundMbpsToKbps(float mbps, int decimals = 1);
 
     // TODO: #GDM Remove this overload when old camera settings will be removed.
     static float getBitrateForQualityMbps(

@@ -26,6 +26,7 @@
 #include "watchers/camera_settings_panic_watcher.h"
 
 #include "utils/camera_settings_dialog_state_conversion_functions.h"
+#include <utils/license_usage_helper.h>
 
 namespace nx {
 namespace client {
@@ -36,6 +37,7 @@ struct CameraSettingsDialog::Private
     QPointer<CameraSettingsDialogStore> store;
     QPointer<CameraSettingsReadOnlyWatcher> readOnlyWatcher;
     QnVirtualCameraResourceList cameras;
+    QPointer<QnCamLicenseUsageHelper> licenseUsageHelper;
 
     bool hasChanges() const
     {
@@ -46,6 +48,12 @@ struct CameraSettingsDialog::Private
 
     void applyChanges()
     {
+        if (store->state().recording.enabled.valueOr(false))
+        {
+            if (!licenseUsageHelper->canEnableRecording(cameras))
+                store->setRecordingEnabled(false);
+        }
+
         store->applyChanges();
         const auto& state = store->state();
         CameraSettingsDialogStateConversionFunctions::applyStateToCameras(state, cameras);
@@ -73,6 +81,8 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
 
     d->readOnlyWatcher = new CameraSettingsReadOnlyWatcher(this);
     d->readOnlyWatcher->setStore(d->store);
+
+    d->licenseUsageHelper = new QnCamLicenseUsageHelper(commonModule(), this);
 
     auto panicWatcher = new CameraSettingsPanicWatcher(this);
     panicWatcher->setStore(d->store);

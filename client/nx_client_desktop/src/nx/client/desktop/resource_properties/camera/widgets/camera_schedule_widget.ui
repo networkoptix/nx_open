@@ -44,6 +44,9 @@
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_7" stretch="0,0,0,0,0,1">
+       <property name="topMargin">
+        <number>16</number>
+       </property>
        <item>
         <layout class="QHBoxLayout" name="topButtonsLayout">
          <item>

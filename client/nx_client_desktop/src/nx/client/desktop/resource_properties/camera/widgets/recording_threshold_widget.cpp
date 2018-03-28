@@ -35,22 +35,27 @@ void RecordingThresholdWidget::setStore(CameraSettingsDialogStore* store)
     connect(ui->recordBeforeSpinBox, QnSpinboxIntValueChanged, store,
         [store](int value)
         {
-            store->setMinRecordingDaysValue(value);
+            store->setRecordingBeforeThresholdSec(value);
         });
 
     connect(ui->recordAfterSpinBox, QnSpinboxIntValueChanged, store,
         [store](int value)
         {
-            store->setMaxRecordingDaysValue(value);
+            store->setRecordingAfterThresholdSec(value);
         });
 }
 
 void RecordingThresholdWidget::loadState(const CameraSettingsDialogState& state)
 {
-    ui->recordBeforeSpinBox->setValue(10);
+    using Thresholds = CameraSettingsDialogState::RecordingSettings::Thresholds;
+
+    ui->recordBeforeSpinBox->setValue(state.recording.thresholds.beforeSec.valueOr(
+        Thresholds::kDefaultBeforeSec));
     setReadOnly(ui->recordBeforeSpinBox, state.readOnly);
-    ui->recordAfterSpinBox->setValue(10);
-    setReadOnly(ui->recordBeforeSpinBox, state.readOnly);
+
+    ui->recordAfterSpinBox->setValue(state.recording.thresholds.afterSec.valueOr(
+        Thresholds::kDefaultAfterSec));
+    setReadOnly(ui->recordAfterSpinBox, state.readOnly);
 }
 
 } // namespace desktop
