@@ -1,4 +1,7 @@
 #include "rotation.h"
+
+#include <cmath>
+
 #include <nx/utils/math/fuzzy.h>
 
 namespace {
