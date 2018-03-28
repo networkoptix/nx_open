@@ -141,6 +141,12 @@ QnAbstractMediaDataPtr HanwhaArchiveDelegate::getNextData()
         return rez;
     }
 
+    if (result && result->dataType == QnAbstractMediaData::EMPTY_DATA)
+    {
+        if (auto resource = m_streamReader->getResource())
+            NX_VERBOSE(this, lm("Send empty packet for camera %1").arg(resource->getUrl()));
+    }
+
     return result;
 }
 
