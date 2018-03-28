@@ -16,7 +16,9 @@
                 *ngFor="let lang of languages"
                 [ngClass]="{active:lang.language === activeLanguage.language}"
                 (click)="changeLanguage(lang.language)">
-                <span class="lang-sm" lang="{{lang.language}}"></span> {{lang.name}}
+
+            <span class="lang-sm" lang="{{lang.language}}"></span>
+            <span>{{lang.name}}</span>
         </button>
     </div>
 </div>

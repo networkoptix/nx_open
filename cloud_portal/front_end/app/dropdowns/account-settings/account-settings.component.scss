@@ -1,0 +1,28 @@
+@media (max-width: 920px) {
+
+    .dropdown-menu {
+        right: 0;
+        left: auto !important;
+    }
+
+    .dropdown-menu li > a {
+        text-align: right;
+    }
+
+    .arrow {
+        right: 32px;
+        left: auto;
+    }
+}
+
+.arrow {
+    &.up {
+        &:after {
+            top: 1px;
+            margin-left: -$arrow-width;
+            border-top-width: 1px;
+            border-bottom-color: $arrow-color;
+        }
+    }
+}
+

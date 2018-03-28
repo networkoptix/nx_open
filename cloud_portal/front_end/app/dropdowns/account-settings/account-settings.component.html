@@ -1,4 +1,4 @@
-<div ngbDropdown placement="bottom-right" class="d-inline-block">
+<div ngbDropdown class="d-inline-block">
 
     <button class="btn btn-dropdown-toggle"
             id="accountSettingsSelect"
@@ -8,8 +8,9 @@
     </button>
 
     <ul ngbDropdownMenu aria-labelledby="accountSettingsSelect">
-        <li class="hidden-expanded active"><a href="" [innerHTML]="settings.email"></a></li>
-        <li class="hidden-expanded nav-divider" role="separator"></li>
+        <div class="arrow up"></div>
+        <!--<li class="hidden-expanded active"><a href="" [innerHTML]="settings.email"></a></li>-->
+        <!--<li class="hidden-expanded nav-divider" role="separator"></li>-->
 
         <li><a href="/account/">Account Settings</a></li>
         <li><a href="/account/password/">Change Password</a></li>
