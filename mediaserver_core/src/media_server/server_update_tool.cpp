@@ -21,6 +21,7 @@
 #include <utils/common/delayed.h>
 #include <common/static_common_module.h>
 #include <media_server/media_server_module.h>
+#include <nx/mediaserver/root_tool.h>
 
 namespace {
 
@@ -181,11 +182,16 @@ void QnServerUpdateTool::addUpdateFileChunkAsync(const QString &updateId, const 
 }
 
 qint64 QnServerUpdateTool::addUpdateFileChunkInternal(const QString &updateId, const QByteArray &data, qint64 offset) {
-    NX_LOG(lit("QnServerUpdateTool: Update chunk [id = %1, offset = %2, size = %3].")
-           .arg(updateId).arg(offset).arg(data.size()), cl_logDEBUG2);
+    NX_VERBOSE(
+        this,
+        lm("Update chunk [id = %1, offset = %2, size = %3].")
+            .arg(updateId).arg(offset).arg(data.size()));
 
     if (m_bannedUpdates.contains(updateId))
+    {
+        NX_ERROR(this, lm("Update %1 is banned.").arg(updateId));
         return NoReply;
+    }
 
     if (m_updateId != updateId) {
         m_file.reset();
@@ -202,7 +208,7 @@ qint64 QnServerUpdateTool::addUpdateFileChunkInternal(const QString &updateId, c
     if (!m_file) {
         m_file.reset(new QFile(getUpdateFilePath(updateId)));
         if (!m_file->open(QFile::ReadWrite)) {
-            NX_LOG(lit("QnServerUpdateTool: Could not save update to %1").arg(m_file->fileName()), cl_logERROR);
+            NX_ERROR(this, lm("Could not save update to %1").arg(m_file->fileName()));
             m_bannedUpdates.insert(updateId);
             return UnknownError;
         }
@@ -228,7 +234,10 @@ qint64 QnServerUpdateTool::addUpdateFileChunkInternal(const QString &updateId, c
         m_file->seek(offset);
 
         if (m_file->write(data) != data.size())
+        {
+            NX_ERROR(this, lm("Cannot write to %1").arg(m_file->fileName()));
             return NoFreeSpace;
+        }
 
         const auto pos = m_file->pos();
 
@@ -372,6 +381,8 @@ void QnServerUpdateTool::removeUpdateFiles(const QString& updateId)
 
 void QnServerUpdateTool::clearUpdatesLocation(const QString &idToLeave) {
     QDir dir = getUpdatesDir();
+
+    qnServerModule->rootTool()->changeOwner(dir.absolutePath());
 
     QString fileToLeave = idToLeave + ".zip";
 

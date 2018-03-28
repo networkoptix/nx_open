@@ -22,6 +22,12 @@ public:
     /** Creates directory and gives ownership to real UID and GID. */
     bool makeDirectory(const std::string& directoryPath);
 
+    /** Removes recursively given path */
+    bool removePath(const std::string& path);
+
+    /** Renames (moves) oldPath to the newPath */
+    bool rename(const std::string& oldPath, const std::string& newPath);
+
     /** Installs deb package to system. */
     bool install(const std::string& debPackage);
 

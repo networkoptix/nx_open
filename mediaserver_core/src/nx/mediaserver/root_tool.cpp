@@ -143,6 +143,34 @@ bool RootTool::makeDirectory(const QString& path)
     return execute({"mkdir", path}) == 0;
 }
 
+bool RootTool::removePath(const QString& path)
+{
+    if (m_toolPath.isEmpty())
+    {
+        SystemCommands commands;
+        if (!commands.removePath(path.toStdString()))
+            return false;
+
+        return true;
+    }
+
+    return execute({"rm", path}) == 0;
+}
+
+bool RootTool::rename(const QString& oldPath, const QString& newPath)
+{
+    if (m_toolPath.isEmpty())
+    {
+        SystemCommands commands;
+        if (!commands.rename(oldPath.toStdString(), newPath.toStdString()))
+            return false;
+
+        return true;
+    }
+
+    return execute({"mv", oldPath, newPath}) == 0;
+}
+
 static std::string makeArgsLine(const std::vector<QString>& args)
 {
     std::ostringstream argsStream;

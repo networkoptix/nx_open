@@ -111,6 +111,7 @@ buildDistribution()
     cp -r $SERVER_VOX_PATH $BINSTAGE
 
     cp_sys_lib libstdc++.so.6 "$LIBSTAGE"
+    cp_sys_lib libgcc_s.so.1 "$LIBSTAGE"
 
     if [ '@arch@' != 'arm' ]
     then

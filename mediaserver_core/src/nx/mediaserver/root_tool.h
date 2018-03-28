@@ -26,6 +26,8 @@ public:
     bool changeOwner(const QString& path);
     bool touchFile(const QString& path);
     bool makeDirectory(const QString& path);
+    bool removePath(const QString& path);
+    bool rename(const QString& oldPath, const QString& newPath);
 
 private:
     int execute(const std::vector<QString>& args);
