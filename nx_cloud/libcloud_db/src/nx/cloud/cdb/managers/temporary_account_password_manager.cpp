@@ -1,11 +1,5 @@
 #include "temporary_account_password_manager.h"
 
-#if defined(Q_OS_MACX) || defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
-#include <zlib.h>
-#else
-#include <QtZlib/zlib.h>
-#endif
-
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/join.hpp>
 #include <boost/algorithm/string/split.hpp>
