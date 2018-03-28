@@ -2,15 +2,15 @@ vm_host:
   address: 127.0.0.1
 vm_types:
   linux:
-    registry: ~/.func_tests/ubuntu-14.04-registry.yaml
+    registry: ~/.func_tests/trusty-registry.yaml
     access:
       type: ssh
-      private_key_path: ~/.func_tests/ubuntu-14.04-key.key
-      configuration_file_path: ~/.func_tests/ubuntu-14.04-ssh.conf
+      private_key_path: ~/.func_tests/trusty-key.key
+      configuration_file_path: ~/.func_tests/trusty-ssh.conf
     power_on_timeout: 60
-    name_prefix: ubuntu-14.04-
+    name_prefix: trusty-
     template:
-      vm: ubuntu-14.04-template
+      vm: trusty-template
       snapshot: template
     port_forwarding:
       host_ports_base: 33000
@@ -25,15 +25,15 @@ vm_types:
           guest_port: 22
           host_port_offset: 2
   windows:
-    registry: ~/.func_tests/windows-10-registry.yaml
+    registry: ~/.func_tests/win10-registry.yaml
     access:
-      type: ssh
-      private_key_path: ~/.func_tests/ubuntu-14.04-key.key
-      configuration_file_path: ~/.func_tests/ubuntu-14.04-ssh.conf
+      type: winrm
+      private_key_path: ~/.func_tests/trusty-key.key
+      configuration_file_path: ~/.func_tests/trusty-ssh.conf
     power_on_timeout: 600  # After SysPrep, first boot takes several minutes to prepare user profile.
-    name_prefix: windows-10-
+    name_prefix: win10-
     template:
-      mv: windows-10-template
+      vm: win10-template
       snapshot: template
     port_forwarding:
       host_ports_base: 35000

@@ -1,6 +1,6 @@
 #!/bin/bash
 set -euxo pipefail
-NAME='ubuntu-14.04'
+NAME='trusty'
 DIRTY="${NAME}-dirty"  # "Dirty" VM can be deleted in this script, completed cannot.
 COMPLETE="${NAME}-template"
 KEY=~/".func_tests/${NAME}-key"
