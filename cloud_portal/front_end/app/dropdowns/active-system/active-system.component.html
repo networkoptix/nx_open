@@ -7,6 +7,8 @@
     </button>
 
     <ul ngbDropdownMenu aria-labelledby="activeSystemDropdown">
+        <div class="arrow up"></div>
+
         <li *ngIf="activeSystem" [ngClass]="{ 'active' :active.settings}">
             <a [href]="'/systems/' + activeSystem.id">Settings</a>
         </li>

@@ -71,8 +71,6 @@ $border-radius-small:     2px;
 // Variables from Bootstrap 3 ****************************
 $line-height-base : 1.5 !default;
 $line-height-computed : floor(($font-size-base * $line-height-base)); // ~20px
-$grid-float-breakpoint : 845px;
-$grid-float-breakpoint-max : $grid-float-breakpoint - 1;
 $brand-primary : $blue10;
 $brand-info : $blue8;
 $brand-success : $green_main;
@@ -148,7 +146,8 @@ $link-color:                  $brand_d2;
 $link-hover-color:            $brand_core;
 
 $grid-float-breakpoint:       420px;
-$dialog-sm-float-breakpoint:     434px;
+$grid-float-breakpoint-max:   $grid-float-breakpoint - 1;
+$dialog-sm-float-breakpoint:  434px;
 
 $panel-body-padding:    16px;
 $panel-heading-padding: 16px;

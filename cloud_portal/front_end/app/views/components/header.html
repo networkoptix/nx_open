@@ -4,7 +4,9 @@
         <div class="container-fluid">
             <div class="app-header-left">
                 <ul ng-if="activeSystem" class="nav navbar-nav navbar-left auth-visible hidden-expanded">
-                    <nx-active-system [system]="activeSystem"></nx-active-system>
+                    <li>
+                        <nx-active-system [system]="activeSystem"></nx-active-system>
+                    </li>
                 </ul>
 
                 <div class="navbar-header">

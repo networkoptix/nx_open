@@ -8,7 +8,7 @@
 
     <ul ngbDropdownMenu aria-labelledby="systemsDropdown">
         <li *ngIf="activeSystem" class="hidden-expanded active">
-            <a routerLink="">{{activeSystem.name}}</a>
+            <a [href]>{{activeSystem.name}}</a>
         </li>
         <li *ngIf="activeSystem" class="hidden-expanded nav-divider" role="separator"></li>
 
