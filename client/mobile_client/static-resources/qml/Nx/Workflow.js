@@ -50,12 +50,12 @@ function openDiscoveredSession(systemId, localSystemId, systemName, address)
                 "address": address
             }
     )
-    item.focusLoginField()
+    item.focusCredentialsField()
 }
 
 function openSavedSession(systemId, localSystemId, systemName, address, login, password)
 {
-    stackView.safePush(
+    var item = stackView.safePush(
         Qt.resolvedUrl("Screens/CustomConnectionScreen.qml"),
         {
             "systemId": systemId,
@@ -67,6 +67,7 @@ function openSavedSession(systemId, localSystemId, systemName, address, login, p
             "saved": true
         }
     )
+    item.focusCredentialsField()
 }
 
 function openResourcesScreen(systemName)

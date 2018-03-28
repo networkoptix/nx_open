@@ -227,8 +227,8 @@ Page
         credentialsEditor.focusAddressField()
     }
 
-    function focusLoginField()
+    function focusCredentialsField()
     {
-        credentialsEditor.focusLoginField()
+        credentialsEditor.focusCredentialsField()
     }
 }
