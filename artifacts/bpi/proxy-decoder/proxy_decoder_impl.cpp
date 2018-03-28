@@ -537,7 +537,7 @@ int Impl::decodeToYuvPlanar(const CompressedFrame* compressedFrame, int64_t* out
 
             if (ini().enableYuvDump)
             {
-                debugDumpYuvSurfaceToFiles(ini().iniFileDir(), renderState->surface,
+                debugDumpYuvSurfaceToFiles(nx::kit::IniConfig::iniFilesDir(), renderState->surface,
                     yBuffer, yLineSize, uBuffer, vBuffer, uVLineSize);
             }
         }
