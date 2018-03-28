@@ -407,17 +407,6 @@ select {
 // New styling or retrofitting missing styles
 ///////////////////////
 
-nx-header {
-  .navbar-nav {
-    flex-direction: row;
-  }
-
-  .navbar-default {
-    background-color: #fff;
-    padding: 0;
-  }
-}
-
 .dropdown-menu {
   position: absolute !important;
   float: left !important;
