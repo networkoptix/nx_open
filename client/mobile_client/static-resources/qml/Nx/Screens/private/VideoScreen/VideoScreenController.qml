@@ -66,6 +66,7 @@ Object
         property bool playing: false
 
         property real lastPosition: -1
+        property real interruptedPosition: -1
         property bool waitForLastPosition: false
         property bool waitForFirstPosition: true
 
@@ -75,15 +76,27 @@ Object
             waitForLastPosition = true
         }
 
+        function interrupt()
+        {
+            d.interruptedPosition = d.currentPosition()
+            mediaPlayer.pause()
+        }
+
+        function resumePlaying()
+        {
+            mediaPlayer.position = interruptedPosition
+            mediaPlayer.play()
+        }
+
         onApplicationActiveChanged:
         {
             if (!Utils.isMobile())
                 return
 
             if (!applicationActive)
-                mediaPlayer.pause()
-            else if (d.playing)
-                mediaPlayer.play()
+                interrupt()
+            else if (playing)
+                resumePlaying()
         }
 
         function currentPosition()
