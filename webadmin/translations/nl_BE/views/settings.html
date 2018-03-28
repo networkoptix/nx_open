@@ -121,9 +121,9 @@ Anders zal alleen het recovery wachtwoord gewijzigd worden.</p>
 
                 <uib-tab heading="{{L.settings.tabs.device}}" active="active.device" ng-if="controlDevice">
                     <div ng-if="settings.flags.canSetupNetwork">
-                        <h3>Netwerkinstellingen Apparaat</h3>
+                        <h3>Apparaat netwerkinstellingen</h3>
                         <network-settings settings="networkSettings[0]" ng-if="networkSettings"></network-settings>
-                        <button class="btn btn-default" ng-click="saveNetworkSettings()">Instellingen opslaan en herstart de server</button>
+                        <button class="btn btn-default" ng-click="saveNetworkSettings()">Sla instellingen op en start het apparaat opnieuw op</button>
                     </div>
                     <div ng-if="settings.flags.canSetupTime">
                         <h3>Datum en tijd</h3>

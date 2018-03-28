@@ -315,7 +315,7 @@
     </message>
     <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
-      <translation type="unfinished">Please update firmware. Minimal supported version is %1. Current version is %2</translation>
+      <translation>אנא עדכן קושחה. הגירסה הנתמכת המינימלית היא %1. גרסת הקושחה הגרסה הנוכחית היא %2</translation>
     </message>
   </context>
   <context>

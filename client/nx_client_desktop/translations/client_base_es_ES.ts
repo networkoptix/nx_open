@@ -2360,9 +2360,9 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>This Id is already used on the following %n cameras: %1</source>
-      <translation type="unfinished">
-        <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
-        <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
+      <translation>
+        <numerusform>Esta identificación ya se usa en las siguientes cámaras %n: %1</numerusform>
+        <numerusform>Esta identificación ya se usa en las siguientes cámaras %n: %1</numerusform>
       </translation>
     </message>
   </context>
@@ -2563,7 +2563,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Password should not be equal to camera&apos;s user name</source>
-      <translation type="unfinished">Password should not be equal to camera&apos;s user name</translation>
+      <translation>La contraseña no debe ser igual al nombre de usuario de la cámara&amp;apos</translation>
     </message>
   </context>
   <context>
@@ -3200,7 +3200,7 @@ a %1</translation>
     </message>
     <message>
       <source>Set Password</source>
-      <translation type="unfinished">Set Password</translation>
+      <translation>Configurar contraseña</translation>
     </message>
   </context>
   <context>
@@ -5104,7 +5104,7 @@ a %1</translation>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation>%1 GB</translation>
+      <translation>%1 GiB</translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n devices</source>
@@ -5919,7 +5919,7 @@ a %1</translation>
     </message>
     <message>
       <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
-      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</translation>
+      <translation>El archivo cargado se puede eliminar automáticamente, si no hay espacio libre en el almacenamiento del servidor. Primero se eliminará el metraje más antiguo entre todas las cámaras del servidor.</translation>
     </message>
   </context>
   <context>
@@ -6145,7 +6145,7 @@ a %1</translation>
     </message>
     <message>
       <source>NOT ENOUGH LICENSES</source>
-      <translation type="unfinished">NOT ENOUGH LICENSES</translation>
+      <translation>NO HAY SUFICIENTES LICENCIAS</translation>
     </message>
   </context>
   <context>
@@ -7183,11 +7183,11 @@ a %1</translation>
     </message>
     <message>
       <source>Uploading %1...</source>
-      <translation type="unfinished">Uploading %1...</translation>
+      <translation>Subiendo %1...</translation>
     </message>
     <message>
       <source>Finalizing %1...</source>
-      <translation type="unfinished">Finalizing %1...</translation>
+      <translation>Finalizando %1...</translation>
     </message>
   </context>
   <context>
@@ -7293,7 +7293,7 @@ a %1</translation>
     </message>
     <message>
       <source>Video Wall is removed on the server and will be closed.</source>
-      <translation type="unfinished">Video Wall is removed on the server and will be closed.</translation>
+      <translation>Video Wall se elimina en el servidor y se cerrará.</translation>
     </message>
   </context>
   <context>
@@ -7722,23 +7722,23 @@ a %1</translation>
     </message>
     <message>
       <source>%1 has unsupported format.</source>
-      <translation type="unfinished">%1 has unsupported format.</translation>
+      <translation>%1 tiene formato no compatible.</translation>
     </message>
     <message>
       <source>%1 does not have timestamp.</source>
-      <translation type="unfinished">%1 does not have timestamp.</translation>
+      <translation>%1 no tiene marca de tiempo.</translation>
     </message>
     <message>
       <source>%1 is older than allowed in camera archive settings.</source>
-      <translation type="unfinished">%1 is older than allowed in camera archive settings.</translation>
+      <translation>%1 es anterior a la permitida en la configuración del archivo de la cámara.</translation>
     </message>
     <message>
       <source>%1 covers period for which video has already been uploaded.</source>
-      <translation type="unfinished">%1 covers period for which video has already been uploaded.</translation>
+      <translation>%1 cubre el período para el cual el video ya se ha subido.</translation>
     </message>
     <message>
       <source>%1 covers period for which video is being uploaded.</source>
-      <translation type="unfinished">%1 covers period for which video is being uploaded.</translation>
+      <translation>%1 cubre el período durante el cual se sube el video.</translation>
     </message>
   </context>
   <context>

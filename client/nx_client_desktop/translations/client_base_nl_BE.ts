@@ -2563,7 +2563,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Password should not be equal to camera&apos;s user name</source>
-      <translation>Wachtwoord mag niet gelijk zijn aan de gebruikersnaam van de camera&apos;s</translation>
+      <translation>Het wachtwoord mag niet gelijk zijn aan de gebruikersnaam van de camera's</translation>
     </message>
   </context>
   <context>
@@ -2744,11 +2744,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Cannot edit properties for several wearable and non-wearable cameras.</source>
-      <translation>Kan eigenschappen voor verschillende draagbare en niet-draagbare camera's niet bewerken.</translation>
+      <translation>Kan de eigenschappen voor verschillende draagbare en niet-draagbare camera's niet bewerken.</translation>
     </message>
     <message>
       <source>Cannot edit properties for several wearable cameras.</source>
-      <translation>Kan eigenschappen voor verschillende draagbare niet bewerken.</translation>
+      <translation>Kan de eigenschappen voor verschillende draagbare camera's niet bewerken.</translation>
     </message>
   </context>
   <context>
@@ -2843,7 +2843,7 @@ to %1</source>
     </message>
     <message>
       <source>Account is not activated. Please check your email and follow provided instructions</source>
-      <translation>Account is niet geactiveerd. Controleer uw e-mail en volg de instructies</translation>
+      <translation>Het account is niet geactiveerd. Controleer uw e-mail en volg de instructies</translation>
     </message>
   </context>
   <context>
@@ -4778,7 +4778,7 @@ to %1</source>
     </message>
     <message>
       <source>For full-featured mode please use another computer</source>
-      <translation>Voor volledige functionaliteit is het nodig een andere computer te gebruiken</translation>
+      <translation>Gebruik om gebruik te maken van de volledige functionaliteit een andere computer</translation>
     </message>
   </context>
   <context>
@@ -6143,7 +6143,7 @@ to %1</source>
     </message>
     <message>
       <source>NOT ENOUGH LICENSES</source>
-      <translation type="unfinished">NOT ENOUGH LICENSES</translation>
+      <translation>NIET GENOEG LICENTIES</translation>
     </message>
   </context>
   <context>
@@ -7173,7 +7173,7 @@ to %1</source>
     </message>
     <message>
       <source>Already uploaded files will be kept.</source>
-      <translation>Reeds geuploade bestanden worden bewaard.</translation>
+      <translation>Reeds geüploade bestanden worden bewaard.</translation>
     </message>
     <message>
       <source>(%1 of %2)</source>
@@ -7185,7 +7185,7 @@ to %1</source>
     </message>
     <message>
       <source>Finalizing %1...</source>
-      <translation>Finaliseren %1...</translation>
+      <translation>Afronden %1...</translation>
     </message>
   </context>
   <context>
@@ -7291,7 +7291,7 @@ to %1</source>
     </message>
     <message>
       <source>Video Wall is removed on the server and will be closed.</source>
-      <translation type="unfinished">Video Wall is removed on the server and will be closed.</translation>
+      <translation>Videomuur is verwijderd op de server en zal worden gesloten.</translation>
     </message>
   </context>
   <context>
@@ -7594,7 +7594,7 @@ to %1</source>
     </message>
     <message>
       <source>Open Wearable Camera Recordings...</source>
-      <translation>Open draagbare Camera opnames...</translation>
+      <translation>Open draagbare camera opnames...</translation>
     </message>
     <message>
       <source>Only video files with correct timestamp are supported.</source>
@@ -7657,15 +7657,15 @@ to %1</source>
     </message>
     <message>
       <source>Selected files will not be uploaded</source>
-      <translation>Geselecteerde bestanden worden niet geüpload</translation>
+      <translation>De geselecteerde bestanden worden niet geüpload</translation>
     </message>
     <message>
       <source>Some files will not be uploaded</source>
-      <translation>Sommige bestanden zullen niet worden geüpload</translation>
+      <translation>Sommige bestanden worden niet geüpload</translation>
     </message>
     <message>
       <source>No new files to upload in selected folder</source>
-      <translation>Geen nieuwe bestanden om te uploaden in de geselecteerde map</translation>
+      <translation>Geen nieuwe bestanden om te uploaden naar de geselecteerde map</translation>
     </message>
     <message numerus="yes">
       <source>Selected files are too old</source>
@@ -7704,15 +7704,15 @@ to %1</source>
     </message>
     <message>
       <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
-      <translation>Om dit te voorkomen, kunt u extra opslagruimte toevoegen. Je kunt ook bepalen welk beelden eerst wordt verwijderd door de bewaartijd van het archief te wijzigen in camera-instellingen.</translation>
+      <translation>Om dit te voorkomen, kunt u extra opslagruimte toevoegen. U kunt ook bepalen welk beeld eerst wordt verwijderd door de bewaartijd van het archief te wijzigen in camera-instellingen.</translation>
     </message>
     <message>
       <source>Upload anyway?</source>
-      <translation>Hoe dan ook te uploaden?</translation>
+      <translation>Toch uploaden?</translation>
     </message>
     <message>
       <source>Could not finish upload to %1</source>
-      <translation>Kan upload naar %1 niet voltooien</translation>
+      <translation>Kan de upload naar %1 niet voltooien</translation>
     </message>
     <message>
       <source>Make sure there is enough space on server storage.</source>
@@ -7720,7 +7720,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 has unsupported format.</source>
-      <translation>%1 heeft een niet-ondersteund formaat.</translation>
+      <translation>%1 heeft een niet-ondersteund format.</translation>
     </message>
     <message>
       <source>%1 does not have timestamp.</source>
@@ -7732,11 +7732,11 @@ to %1</source>
     </message>
     <message>
       <source>%1 covers period for which video has already been uploaded.</source>
-      <translation>%1 bevat een periode waarvoor de video al is geüpload.</translation>
+      <translation>%1 bevat de periode waarvoor de video al is geüpload.</translation>
     </message>
     <message>
       <source>%1 covers period for which video is being uploaded.</source>
-      <translation>%1 bevat een periode waarvoor video wordt geüpload.</translation>
+      <translation>%1 bevat de periode waarvoor de video wordt geüpload.</translation>
     </message>
   </context>
   <context>
@@ -8011,7 +8011,7 @@ to %1</source>
     </message>
     <message>
       <source>No data exported.</source>
-      <translation>Geen gegevens geëxporteerd.</translation>
+      <translation>Er zijn geen gegevens geëxporteerd.</translation>
     </message>
     <message>
       <source>Internal error</source>
@@ -8216,7 +8216,7 @@ to %1</source>
     <name>nx::client::desktop::WearableWorker</name>
     <message>
       <source>Failed to send request to the server.</source>
-      <translation>Kan geen verbinding maken met de server.</translation>
+      <translation>Mislukt om een ​​verzoek naar de server te verzenden.</translation>
     </message>
   </context>
   <context>
@@ -8706,7 +8706,7 @@ to %1</source>
     </message>
     <message>
       <source>Wearable Cameras cannot be moved between servers</source>
-      <translation>Draagbare camera's kunnen niet van server worden verplaatst</translation>
+      <translation>Draagbare camera's kunnen niet tussen servers worden verplaatst</translation>
     </message>
     <message>
       <source>Failed to change password</source>

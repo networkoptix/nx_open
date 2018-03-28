@@ -3166,7 +3166,7 @@ to %1</source>
     </message>
     <message>
       <source>Set Password</source>
-      <translation type="unfinished">Set Password</translation>
+      <translation>设置密码</translation>
     </message>
   </context>
   <context>
@@ -4615,7 +4615,7 @@ to %1</source>
     <name>QnNewWearableCameraDialog</name>
     <message>
       <source>Wearable Camera</source>
-      <translation>穿戴式相机...</translation>
+      <translation>穿戴式相机</translation>
     </message>
     <message>
       <source>Wearable Camera %1</source>

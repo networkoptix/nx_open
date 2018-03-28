@@ -3171,7 +3171,7 @@ to %1</source>
     </message>
     <message>
       <source>Set Password</source>
-      <translation type="unfinished">Set Password</translation>
+      <translation>設定密碼</translation>
     </message>
   </context>
   <context>
@@ -7098,7 +7098,7 @@ to %1</source>
     <name>QnWearableProgressWidget</name>
     <message>
       <source>Stop uploading?</source>
-      <translation>是否停止上傳?</translation>
+      <translation>停止上傳?</translation>
     </message>
     <message>
       <source>Already uploaded files will be kept.</source>
@@ -7825,7 +7825,7 @@ to %1</source>
     </message>
     <message>
       <source>Stop uploading?</source>
-      <translation>停止上傳?</translation>
+      <translation>是否停止上傳?</translation>
     </message>
     <message>
       <source>Stop</source>
