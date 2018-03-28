@@ -376,7 +376,7 @@ Item
             anchors.bottom: timeline.bottom
             anchors.bottomMargin: (timeline.chunkBarHeight - height) / 2 + 12
             color: ColorTheme.windowText
-            visible: !d.hasArchive && videoNavigation.canViewArchive
+            visible: d.liveMode && !d.hasArchive && videoNavigation.canViewArchive
             opacity: 0.5 * timelineOpactiyMask.opacity
         }
 
