@@ -54,13 +54,11 @@ void setCustomRotation(
     for (const auto& camera: cameras)
     {
         NX_EXPECT(camera->hasVideo());
-        if (camera->hasVideo())
-        {
-            if (value.isValid())
-                camera->setProperty(QnMediaResource::rotationKey(), value.toString());
-            else
-                camera->setProperty(QnMediaResource::rotationKey(), QString());
-        }
+        if (!camera->hasVideo())
+            continue;
+
+        const QString rotationString = value.isValid() ? value.toString() : QString();
+        camera->setProperty(QnMediaResource::rotationKey(), rotationString);
     }
 }
 
