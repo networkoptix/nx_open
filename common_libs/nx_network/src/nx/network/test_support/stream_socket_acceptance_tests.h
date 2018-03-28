@@ -300,6 +300,17 @@ protected:
             serverEndpoint(), nx::network::kNoTimeout));
     }
 
+    void startAsyncConnect()
+    {
+        using namespace std::placeholders;
+
+        m_connection = std::make_unique<typename SocketTypeSet::ClientSocket>();
+        ASSERT_TRUE(m_connection->setNonBlockingMode(true));
+        m_connection->connectAsync(
+            serverEndpoint(),
+            std::bind(&StreamSocketAcceptance::saveConnectResult, this, _1));
+    }
+
     void givenPingPongServer()
     {
         givenMessageServer();
@@ -449,6 +460,11 @@ protected:
             return m_serverSocket->getLocalAddress();
         else
             return SocketAddress();
+    }
+
+    typename SocketTypeSet::ClientSocket* connection()
+    {
+        return m_connection.get();
     }
 
 private:
@@ -621,6 +637,17 @@ TYPED_TEST_P(StreamSocketAcceptance, recv_timeout_is_reported)
     this->thenClientSocketReportedTimedout();
 }
 
+TYPED_TEST_P(StreamSocketAcceptance, async_connect_can_be_cancelled_with_cancel_io_call)
+{
+    this->givenListeningServer();
+
+    this->whenConnectUsingHostName();
+
+    this->connection()->cancelIOSync(aio::etWrite);
+
+    // On failure there will be an assert in socket destructor.
+}
+
 REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     DISABLED_receiveDelay,
     sendDelay,
@@ -630,7 +657,8 @@ REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     randomly_stopping_multiple_simultaneous_connections,
     receive_timeout_change_is_not_ignored,
     transfer_async,
-    recv_timeout_is_reported);
+    recv_timeout_is_reported,
+    async_connect_can_be_cancelled_with_cancel_io_call);
 
 } // namespace test
 } // namespace network
