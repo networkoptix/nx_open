@@ -95,7 +95,6 @@ for i in {1..20}
 do
     hdiutil detach "$TMP" && DETACHED=1 && break
     echo "Cannot detach $TMP" >&2
-    (set -x && lsof "$TMP")
     sleep 1
 done
 [ $DETACHED -ne 1 ] && exit 1
