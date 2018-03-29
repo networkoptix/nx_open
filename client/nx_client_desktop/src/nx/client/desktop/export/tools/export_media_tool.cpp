@@ -103,8 +103,11 @@ struct ExportMediaTool::Private
                 emit q->valueChanged(100);
             });
 
-        if (settings.fileName.extension == FileExtension::avi)
-            exportRecorder->setAudioCodec(AV_CODEC_ID_MP3); // transcode audio to MP3
+        if (settings.fileName.extension == FileExtension::avi
+            || settings.fileName.extension == FileExtension::mp4)
+        {
+            exportRecorder->setAudioCodec(AV_CODEC_ID_MP3); //< Transcode audio to MP3.
+        }
 
         auto archiveReader = dynamic_cast<QnAbstractArchiveStreamReader*>(dataProvider.data());
 
