@@ -413,7 +413,7 @@ QString QnFfmpegHelper::getErrorStr(int errnum)
 {
     QByteArray result(AV_ERROR_MAX_STRING_SIZE, '\0');
     if (av_strerror(errnum, result.data(), result.size()) != 0)
-        return QString(QString::fromLatin1("Unknown FFMPEG error with code %d")).arg(errnum);
+        return lit("Unknown FFMPEG error code %1").arg(errnum);
     return QString::fromLatin1(result);
 }
 
