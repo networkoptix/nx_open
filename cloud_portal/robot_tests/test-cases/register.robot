@@ -123,6 +123,11 @@ should suggest user to log out, if he was logged in and goes to registration lin
     Validate Log In
     Go To    ${url}/register
     Wait Until Elements Are Visible    ${LOGGED IN CONTINUE BUTTON}    ${LOGGED IN LOG OUT BUTTON}
+    Click Button    ${LOGGED IN CONTINUE BUTTON}
+    Go To    ${url}/register
+    Wait Until Elements Are Visible    ${LOGGED IN CONTINUE BUTTON}    ${LOGGED IN LOG OUT BUTTON}
+    Click Button    ${LOGGED IN LOG OUT BUTTON}
+    Validate Log Out
 
 should display promo-block, if user goes to registration from native app
     Open Browser and go to URL    ${url}/register?from=client

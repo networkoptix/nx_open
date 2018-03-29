@@ -34,6 +34,7 @@ restores password
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
     Click Button    ${RESET PASSWORD BUTTON}
     Wait Until Element Is Visible    ${RESET EMAIL SENT MESSAGE}
+    Location Should Be    ${url}/restore_password/sent
 
 should not allow to access /restore_password/sent /restore_password/success by direct input
     Open Browser and go to URL    ${url}/restore_password/sent
@@ -164,3 +165,5 @@ should handle click I forgot my password link at restore password page
     Wait Until Elements Are Visible    ${LOG IN MODAL}    ${EMAIL INPUT}    ${PASSWORD INPUT}    ${LOG IN BUTTON}    ${REMEMBER ME CHECKBOX}    ${FORGOT PASSWORD}    ${LOG IN CLOSE BUTTON}
     Click Link    ${FORGOT PASSWORD}
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
+
+#CLOUD-1747

@@ -155,7 +155,7 @@ logout refreshes page
     Log Out
     Validate Log Out
 
-# We don't actually allow copy of the password field...
+# We don't actually allow copy of the password field at log in.
 allows copy-paste in input fields
     Open Browser and go to URL    ${url}
     Wait Until Element Is Visible    ${LOG IN NAV BAR}

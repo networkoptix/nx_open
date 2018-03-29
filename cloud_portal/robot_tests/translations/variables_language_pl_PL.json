@@ -47,7 +47,7 @@
     "LAST NAME IS REQUIRED TEXT": "Nazwisko jest wymagane",
     "EMAIL IS REQUIRED TEXT": "email jest wymagany",
     "EMAIL ALREADY REGISTERED TEXT": "Ten adres e-mail został już zarejestrowany w {{PRODUCT_NAME}}",
-    "EMAIL INVALID TEXT": "Proszę podać poprawny adres e-mail",
+    "EMAIL INVALID TEXT": "Proszę wprowadzić prawidłowy adres e-mail",
     "PASSWORD IS REQUIRED TEXT": "Hasło jest wymagane",
     "PASSWORD SPECIAL CHARS TEXT": "Używaj tylko liter łacińskich, cyfr i symboli z klawiatury, unikając spacji na początku i na końcu",
     "PASSWORD TOO SHORT TEXT": "Hasło musi zawierać co najmniej 8 znaków",
