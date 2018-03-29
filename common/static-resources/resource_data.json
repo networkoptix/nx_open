@@ -2169,7 +2169,7 @@
         },
         {
             "keys":[
-            "DW|DWC-PVX16W4", "DW|DWC-PVX16W6", "DW|DWC-PVX16W28"
+            "DW|DWC-PVX16W4", "DW|DWC-PVX16W6", "DW|DWC-PVX16W28", "N8PC-OLAH4|IP-Camera", "DW|DWC-PVX16W"
             ],
             "multiresourceVideoChannelMapping": [
                 {
@@ -2216,7 +2216,7 @@
         },
         {
             "keys":[
-            "N9PC-SLAH5|IP-Camera", "DW|DWC-PZ21M69T"
+            "N9PC-SLAH5|IP-Camera", "DW|DWC-PZ21M69T", "N9PC-SLAH5|DWC-PZ21M69T"
             ],
             "multiresourceVideoChannelMapping": [
                 {
