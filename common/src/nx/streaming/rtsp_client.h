@@ -281,7 +281,6 @@ public:
     void setAdditionAttribute(const QByteArray& name, const QByteArray& value);
     void removeAdditionAttribute(const QByteArray& name);
 
-    void setTCPTimeout(int timeoutMs);
     void setTCPTimeout(std::chrono::milliseconds timeout);
     std::chrono::milliseconds getTCPTimeout() const;
 

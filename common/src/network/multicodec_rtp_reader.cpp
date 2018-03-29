@@ -90,7 +90,7 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(
     m_rtpFrameTimeoutMs = globalSettings->rtpFrameTimeoutMs();
     m_maxRtpRetryCount = globalSettings->maxRtpRetryCount();
 
-    m_RtpSession.setTCPTimeout(m_rtpFrameTimeoutMs);
+    m_RtpSession.setTCPTimeout(std::chrono::milliseconds(m_rtpFrameTimeoutMs));
 
     QnMediaResourcePtr mr = qSharedPointerDynamicCast<QnMediaResource>(res);
     m_numberOfVideoChannels = 1;
@@ -896,7 +896,6 @@ void QnMulticodecRtpReader::setOnSocketReadTimeoutCallback(
     OnSocketReadTimeoutCallback callback)
 {
     m_callbackTimeout = timeout;
-    //m_rtpReader.rtspClient().setTCPTimeout(readTimeout);
     m_onSocketReadTimeoutCallback = std::move(callback);
 }
 

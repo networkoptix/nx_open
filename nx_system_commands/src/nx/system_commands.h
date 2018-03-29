@@ -6,6 +6,8 @@ namespace nx {
 class SystemCommands
 {
 public:
+    static const char* const kDomainSocket;
+
     /** Mounts NAS from url to directory for real UID and GID. */
     bool mount(const std::string& url, const std::string& directory,
         const boost::optional<std::string>& username, const boost::optional<std::string>& password);
@@ -22,11 +24,14 @@ public:
     /** Creates directory and gives ownership to real UID and GID. */
     bool makeDirectory(const std::string& directoryPath);
 
-    /** Removes recursively given path */
+    /** Removes recursively given path. */
     bool removePath(const std::string& path);
 
-    /** Renames (moves) oldPath to the newPath */
+    /** Renames (moves) oldPath to the newPath. */
     bool rename(const std::string& oldPath, const std::string& newPath);
+
+    /** Returns file descriptor for the given path. */
+    int open(const std::string& path, int mode, bool usePipe);
 
     /** Installs deb package to system. */
     bool install(const std::string& debPackage);

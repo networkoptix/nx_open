@@ -213,7 +213,6 @@ void CdbNonceFetcher::fetchCdbNonceAsync()
     QnMutexLocker lock(&m_mutex);
 
     newConnection = m_cloudConnectionManager->getCloudConnection();
-    newConnection->bindToAioThread(m_timer.getAioThread());
     std::swap(m_connection, newConnection);
     if (!m_connection)
     {
@@ -225,6 +224,7 @@ void CdbNonceFetcher::fetchCdbNonceAsync()
     }
 
     using namespace std::placeholders;
+    m_connection->bindToAioThread(m_timer.getAioThread());
     m_connection->authProvider()->getCdbNonce(
         std::bind(&CdbNonceFetcher::gotNonce, this, _1, _2));
 }

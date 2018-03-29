@@ -96,5 +96,6 @@ void QnAbstractStreamDataProvider::beforeDisconnectFromResource()
 
 void QnAbstractStreamDataProvider::setRole(Qn::ConnectionRole role)
 {
+    NX_ASSERT(!isRunning());
     m_role = role;
 }

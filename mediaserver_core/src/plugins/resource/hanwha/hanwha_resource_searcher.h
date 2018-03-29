@@ -72,7 +72,6 @@ private:
     bool isHostBelongsToValidSubnet(const QHostAddress& address) const;
     static std::vector<std::vector<quint8>> createProbePackets();
 private:
-    QMap<QString, std::shared_ptr<HanwhaSharedResourceContext>> m_sharedContext;
     struct SessionKeyData
     {
         QString sessionKey;
@@ -94,6 +93,7 @@ private:
     std::vector<std::unique_ptr<AbstractDatagramSocket>> m_sunApiSocketList;
     QList<QnInterfaceAndAddr> m_lastInterfaceList;
     QMap<QnMacAddress, SunApiData> m_sunapiDiscoveredDevices;
+    QMap<QString, std::shared_ptr<HanwhaSharedResourceContext>> m_sharedContexts;
 };
 
 } // namespace plugins

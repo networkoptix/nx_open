@@ -107,13 +107,11 @@ QnLiveStreamProvider::~QnLiveStreamProvider()
 void QnLiveStreamProvider::setRole(Qn::ConnectionRole role)
 {
     QnAbstractMediaStreamDataProvider::setRole(role);
-    QnMutexLocker lock(&m_livemutex);
     updateSoftwareMotion();
 }
 
 Qn::ConnectionRole QnLiveStreamProvider::getRole() const
 {
-    QnMutexLocker lock(&m_livemutex);
     return m_role;
 }
 

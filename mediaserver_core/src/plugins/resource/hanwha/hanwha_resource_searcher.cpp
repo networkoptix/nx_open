@@ -42,8 +42,12 @@ HanwhaResult<HanwhaInformation> HanwhaResourceSearcher::cachedDeviceInfo(const Q
     const auto context = qnServerModule->sharedContextPool()
         ->sharedContext<HanwhaSharedResourceContext>(sharedId);
 
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_sharedContexts[sharedId] = context;
+    }
+
     context->setRecourceAccess(url, auth);
-    m_sharedContext[sharedId] = context;
     return context->information();
 }
 

@@ -14,6 +14,7 @@
 
 #include <plugins/resource/avi/avi_archive_delegate.h>
 #include <plugins/resource/avi/thumbnails_stream_reader.h>
+#include <core/dataprovider/h264_mp4_to_annexb.h>
 
 namespace nx {
 namespace client {
@@ -103,8 +104,11 @@ struct ExportMediaTool::Private
                 emit q->valueChanged(100);
             });
 
-        if (settings.fileName.extension == FileExtension::avi)
-            exportRecorder->setAudioCodec(AV_CODEC_ID_MP3); // transcode audio to MP3
+        if (settings.fileName.extension == FileExtension::avi
+            || settings.fileName.extension == FileExtension::mp4)
+        {
+            exportRecorder->setAudioCodec(AV_CODEC_ID_MP3); //< Transcode audio to MP3.
+        }
 
         auto archiveReader = dynamic_cast<QnAbstractArchiveStreamReader*>(dataProvider.data());
 
@@ -178,6 +182,9 @@ private:
 
         archiveReader->setCycleMode(false);
         archiveReader->setQuality(MEDIA_Quality_ForceHigh, true);
+        // Additing filtering is required in case of.AVI export.
+        archiveReader->addMediaFilter(std::make_shared<H264Mp4ToAnnexB>());
+
         if (auto rtspClient = dynamic_cast<QnRtspClientArchiveDelegate*>
             (archiveReader->getArchiveDelegate()))
         {
