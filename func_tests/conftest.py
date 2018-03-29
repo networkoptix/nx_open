@@ -65,7 +65,7 @@ def ca(work_dir):
 
 @pytest.fixture(scope='session')
 def mediaserver_deb(request, bin_dir):
-    deb = MediaserverDeb(bin_dir / request.config.getoption('--mediaserver-dist-path'))
+    deb = MediaserverDeb(bin_dir / request.config.getoption('--mediaserver-dist-path').expanduser())
     customization_from_command_line = request.config.getoption('--customization')
     if customization_from_command_line is not None:
         if deb.customization.name != customization_from_command_line:

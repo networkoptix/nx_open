@@ -20,6 +20,8 @@ DEFAULT_VM_HOST_DIR = '/tmp/jenkins-test'
 
 
 def pytest_addoption(parser):
+    parser.addoption('--vm-port-base', help=(
+        'Deprecated. Left for backward compatibility. Ignored.'))
     parser.addoption('--vm-name-prefix', help=(
         'Deprecated. Left for backward compatibility. Ignored.'))
     parser.addoption('--vm-address', type=IPAddress, help=(
