@@ -493,16 +493,24 @@ int doInterruptableSystemCallWithTimeout(const Func& func, unsigned int timeout)
     for (;; )
     {
         int result = func();
-        if (result == -1 && errno == EINTR)
+        if (result == -1)
         {
-            if (timeout == 0 ||  //< No timeout
-                !waitStartTimeActual)  //< Cannot check timeout expiration
+            if (errno == EINTR)
             {
-                continue;
+                if (timeout == 0 ||  //< No timeout
+                    !waitStartTimeActual)  //< Cannot check timeout expiration
+                {
+                    continue;
+                }
+                if (et.elapsed() < timeout)
+                    continue;
+                errno = ETIMEDOUT;
             }
-            if (et.elapsed() < timeout)
-                continue;
-            errno = ETIMEDOUT;
+            else if (errno == EWOULDBLOCK || errno == EAGAIN)
+            {
+                // Returning ETIMEDOUT on timeout to make error codes consistent across platforms.
+                errno = ETIMEDOUT;
+            }
         }
         return result;
     }
