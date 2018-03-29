@@ -170,31 +170,40 @@ Item
                 return angle
         }
 
-        function rotateTo(x, y)
+        function centerAtPixel(x, y)
         {
-            // Point on hemisphere in camera coordinates.
-            var pointOnSphere = fisheyeShader.unprojectAndTransform(x, y)
+            centerAt(fisheyeShader.unprojectAndTransform(
+                fisheyeShader.pixelToProjection(x, y, currentScale)))
+        }
+
+        function centerAt(pointOnSphere)
+        {
+            unboundedRotation = rotationAngles(pointOnSphere)
+        }
+
+        function rotationAngles(pointOnSphere)
+        {
             switch (viewMode)
             {
                 case MediaDewarpingParams.VerticalUp:
                 {
-                    animatedRotationX = -Utils3D.degrees(Math.acos(-pointOnSphere.z))
-                    animatedRotationY = -Utils3D.degrees(Math.atan2(pointOnSphere.x, pointOnSphere.y))
-                    break
+                    var alpha = -Utils3D.degrees(Math.acos(-pointOnSphere.z))
+                    var beta = -Utils3D.degrees(Math.atan2(pointOnSphere.x, pointOnSphere.y))
+                    return Qt.vector2d(alpha, beta)
                 }
 
                 case MediaDewarpingParams.VerticalDown:
                 {
-                    animatedRotationX = Utils3D.degrees(Math.acos(-pointOnSphere.z))
-                    animatedRotationY = -Utils3D.degrees(Math.atan2(pointOnSphere.x, -pointOnSphere.y))
-                    break
+                    var alpha = Utils3D.degrees(Math.acos(-pointOnSphere.z))
+                    var beta = -Utils3D.degrees(Math.atan2(pointOnSphere.x, -pointOnSphere.y))
+                    return Qt.vector2d(alpha, beta)
                 }
 
                 default: // MediaDewarpingParams.Horizontal
                 {
-                    animatedRotationX = -Utils3D.degrees(Math.asin(pointOnSphere.y))
-                    animatedRotationY = -Utils3D.degrees(Math.atan2(pointOnSphere.x, -pointOnSphere.z))
-                    break
+                    var alpha = -Utils3D.degrees(Math.asin(pointOnSphere.y))
+                    var beta = -Utils3D.degrees(Math.atan2(pointOnSphere.x, -pointOnSphere.z))
+                    return Qt.vector2d(alpha, beta)
                 }
             }
         }
@@ -282,7 +291,7 @@ Item
                 }
                 else
                 {
-                    interactor.rotateTo(mouse.x, mouse.y)
+                    interactor.centerAtPixel(mouse.x, mouse.y)
                     interactor.scalePower = 1.0
                 }
             }

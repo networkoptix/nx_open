@@ -63,7 +63,9 @@ ShaderEffect
 
     readonly property var sourceTexture: shaderSource
 
-    readonly property vector2d projectionCoordsScale:
+    readonly property vector2d projectionCoordsScale: calculateProjectionScale(viewScale)
+
+    function calculateProjectionScale(viewScale)
     {
         var targetAspectRatio = width / height
         return (targetAspectRatio < 1.0
@@ -239,11 +241,14 @@ ShaderEffect
         }
     }
 
-    function unproject(x, y)
+    function pixelToProjection(x, y, scale)
     {
-        var projectionCoords = Qt.vector2d(x / width, y / height)
-            .minus(viewCenter).times(projectionCoordsScale)
+        return Qt.vector2d(x / width, y / height).minus(viewCenter)
+            .times(calculateProjectionScale(scale))
+    }
 
+    function unproject(projectionCoords)
+    {
         switch (viewProjectionType)
         {
             case Utils3D.SphereProjectionTypes.Equidistant:
@@ -270,8 +275,8 @@ ShaderEffect
         }
     }
 
-    function unprojectAndTransform(x, y)
+    function unprojectAndTransform(projectionCoords)
     {
-        return viewRotationMatrix.times(unproject(x, y))
+        return viewRotationMatrix.times(unproject(projectionCoords))
     }
 }
