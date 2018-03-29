@@ -1,6 +1,6 @@
 <div ngbDropdown class="d-inline-block"
-     placement="top-left"
-     [ngClass]="{dropup:!accountMode, 'dropdown-wide':accountMode}">
+     placement="{{ !accountMode ? 'top-left' : 'down-left' }}"
+     [ngClass]="{ 'dropdown-wide': accountMode}">
 
     <button class="btn btn-default"
             id="languageSelect"
@@ -10,11 +10,11 @@
     </button>
 
     <div ngbDropdownMenu aria-labelledby="languageSelect"
-         [ngClass]="{'two-columns':languages.length>12}">
+         [ngClass]="{'two-columns': languages.length>12}">
 
         <button class="dropdown-item"
                 *ngFor="let lang of languages"
-                [ngClass]="{active:lang.language === activeLanguage.language}"
+                [ngClass]="{'active': lang.language === activeLanguage.language}"
                 (click)="changeLanguage(lang.language)">
 
             <span class="lang-sm" lang="{{lang.language}}"></span>

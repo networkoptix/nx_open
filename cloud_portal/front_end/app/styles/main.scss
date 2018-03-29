@@ -717,7 +717,12 @@ h2.version-number{
 .dropdown-wide{
     display:inline-block;
     width:100%;
+
+    .dropdown-menu {
+        top: 32px !important;
+    }
 }
+
 .dropdown .lang-sm{
     margin-right: $padding-input-horizontal/2;
 }

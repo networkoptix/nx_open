@@ -152,7 +152,8 @@ label {
 .form-horizontal {
   .form-group {
     display: flex;
-    & div {
+
+    & > div {
       display: flex;
       align-items: center;
       float: left;
