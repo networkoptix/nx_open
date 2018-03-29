@@ -65,7 +65,7 @@ ZoomableFlickable
 
         var twiceTargetScale = 2
         var eps = 0.000001
-        var zoomIn = zf.scale < twiceTargetScale - eps
+        var zoomIn = zf.contentScale < twiceTargetScale - eps
 
         d.toggleScale(zoomIn, mouseX, mouseY)
     }
@@ -78,15 +78,15 @@ ZoomableFlickable
         {
             var targetScale = to2x ? 2 : 1
 
-            var baseWidth = contentWidth / zf.scale
-            var baseHeight = contentHeight / zf.scale
+            var baseWidth = contentWidth / zf.contentScale
+            var baseHeight = contentHeight / zf.contentScale
 
             flickable.animating = true
             flickable.fixMargins()
 
             var point = mapToItem(content, mouseX, mouseY)
-            var dx = point.x / zf.scale
-            var dy = point.y / zf.scale
+            var dx = point.x / zf.contentScale
+            var dy = point.y / zf.contentScale
 
             contentWidth = baseWidth * targetScale
             contentHeight = baseHeight * targetScale

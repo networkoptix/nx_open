@@ -40,7 +40,7 @@ Item
     }
 
     property real contentFactor: contentWidth ? contentHeight / contentWidth : 0
-    readonly property real scale:
+    readonly property real contentScale:
     {
         if (!contentFactor)
             return 1
@@ -371,7 +371,7 @@ Item
             {
                 if (doubleTapScaleMode)
                 {
-                    initialDoubleTapScale = rootItem.scale
+                    initialDoubleTapScale = rootItem.contentScale
                     pinchArea.startPinch()
                 }
                 else
