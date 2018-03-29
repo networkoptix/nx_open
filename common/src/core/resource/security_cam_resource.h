@@ -13,8 +13,6 @@
 #include <common/common_globals.h>
 #include <api/model/api_ioport_data.h>
 
-#include <core/misc/schedule_task.h>
-
 #include <core/resource/media_resource.h>
 #include <core/resource/motion_window.h>
 #include <core/resource/network_resource.h>

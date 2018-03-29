@@ -11,6 +11,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/client_camera.h>
+#include <core/misc/schedule_task.h>
 
 #include <nx/client/desktop/ui/common/checkbox_utils.h>
 #include <ui/common/read_only.h>
@@ -211,10 +212,10 @@ bool MultipleCameraSettingsWidget::isValidSecondStream()
     bool usesSecondStream = false;
     for (auto& task : filteredTasks)
     {
-        if (task.getRecordingType() == Qn::RT_MotionAndLowQuality)
+        if (task.recordingType == Qn::RT_MotionAndLowQuality)
         {
             usesSecondStream = true;
-            task.setRecordingType(Qn::RT_Always);
+            task.recordingType = Qn::RT_Always;
         }
     }
 

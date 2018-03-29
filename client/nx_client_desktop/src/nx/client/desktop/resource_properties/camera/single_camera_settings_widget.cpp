@@ -20,6 +20,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/misc/schedule_task.h>
 
 #include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
@@ -703,18 +704,18 @@ void SingleCameraSettingsWidget::showMaxFpsWarningIfNeeded()
     int maxFps = -1;
     int maxDualStreamFps = -1;
 
-    for (const QnScheduleTask& scheduleTask : m_camera->getScheduleTasks())
+    for (const QnScheduleTask& scheduleTask: m_camera->getScheduleTasks())
     {
-        switch (scheduleTask.getRecordingType())
+        switch (scheduleTask.recordingType)
         {
             case Qn::RT_Never:
                 continue;
             case Qn::RT_MotionAndLowQuality:
-                maxDualStreamFps = qMax(maxDualStreamFps, scheduleTask.getFps());
+                maxDualStreamFps = qMax(maxDualStreamFps, scheduleTask.fps);
                 break;
             case Qn::RT_Always:
             case Qn::RT_MotionOnly:
-                maxFps = qMax(maxFps, scheduleTask.getFps());
+                maxFps = qMax(maxFps, scheduleTask.fps);
                 break;
             default:
                 break;
@@ -839,10 +840,10 @@ bool SingleCameraSettingsWidget::isValidSecondStream()
     bool usesSecondStream = false;
     for (auto& task : filteredTasks)
     {
-        if (task.getRecordingType() == Qn::RT_MotionAndLowQuality)
+        if (task.recordingType == Qn::RT_MotionAndLowQuality)
         {
             usesSecondStream = true;
-            task.setRecordingType(Qn::RT_Always);
+            task.recordingType = Qn::RT_Always;
         }
     }
 

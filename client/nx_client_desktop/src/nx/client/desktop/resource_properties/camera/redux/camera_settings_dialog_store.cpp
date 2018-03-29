@@ -101,7 +101,7 @@ void CameraSettingsDialogStore::setScheduleBrushQuality(Qn::StreamQuality value)
         [&](State state) { return Reducer::setScheduleBrushQuality(std::move(state), value); });
 }
 
-void CameraSettingsDialogStore::setSchedule(const ScheduleTasks& schedule)
+void CameraSettingsDialogStore::setSchedule(const QnScheduleTaskList& schedule)
 {
     d->executeAction(
         [&](State state) { return Reducer::setSchedule(std::move(state), schedule); });

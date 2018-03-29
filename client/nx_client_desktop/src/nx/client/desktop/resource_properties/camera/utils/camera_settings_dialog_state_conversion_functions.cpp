@@ -106,7 +106,7 @@ void setRecordingBeforeThreshold(
 
         QnScheduleTaskList scheduleTasks = camera->getScheduleTasks();
         for (auto& task: scheduleTasks)
-            task.setBeforeThreshold(value);
+            task.beforeThresholdSec = value;
         camera->setScheduleTasks(scheduleTasks);
     }
 }
@@ -122,7 +122,7 @@ void setRecordingAfterThreshold(
 
         QnScheduleTaskList scheduleTasks = camera->getScheduleTasks();
         for (auto& task: scheduleTasks)
-            task.setAfterThreshold(value);
+            task.afterThresholdSec = value;
         camera->setScheduleTasks(scheduleTasks);
     }
 }

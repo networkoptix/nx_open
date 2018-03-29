@@ -2,7 +2,8 @@
 
 #include <QtWidgets/QWidget>
 
-#include <core/misc/schedule_task.h>
+#include <common/common_globals.h>
+
 #include <core/resource/resource_fwd.h>
 
 #include <ui/widgets/common/abstract_preferences_widget.h>

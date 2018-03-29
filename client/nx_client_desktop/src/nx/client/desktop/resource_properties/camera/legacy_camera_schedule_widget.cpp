@@ -10,6 +10,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_server_resource.h>
+#include <core/misc/schedule_task.h>
 #include <nx_ec/data/api_camera_attributes_data.h>
 
 #include <camera/fps_calculator.h>
@@ -481,27 +482,25 @@ void LegacyCameraScheduleWidget::loadDataToUi()
     {
         bool isScheduleEqual = true;
         bool isFpsValid = true;
-        QList<QnScheduleTask::Data> scheduleTasksData;
-        for (const auto& scheduleTask: m_cameras.front()->getScheduleTasks())
-            scheduleTasksData << scheduleTask.getData();
+        auto scheduleTasksData = m_cameras.front()->getScheduleTasks();
 
-        for (const auto& camera : m_cameras)
+        for (const auto& camera: m_cameras)
         {
-            QList<QnScheduleTask::Data> cameraScheduleTasksData;
+            QnScheduleTaskList cameraScheduleTasksData;
             for (const auto& scheduleTask : camera->getScheduleTasks())
             {
-                cameraScheduleTasksData << scheduleTask.getData();
+                cameraScheduleTasksData << scheduleTask;
 
-                switch (scheduleTask.getRecordingType())
+                switch (scheduleTask.recordingType)
                 {
                     case Qn::RT_Never:
                         continue;
                     case Qn::RT_MotionAndLowQuality:
-                        isFpsValid &= scheduleTask.getFps() <= m_maxDualStreamingFps;
+                        isFpsValid &= scheduleTask.fps <= m_maxDualStreamingFps;
                         break;
                     case Qn::RT_Always:
                     case Qn::RT_MotionOnly:
-                        isFpsValid &= scheduleTask.getFps() <= m_maxFps;
+                        isFpsValid &= scheduleTask.fps <= m_maxFps;
                         break;
                     default:
                         break;
@@ -748,7 +747,7 @@ QnScheduleTaskList LegacyCameraScheduleWidget::scheduleTasks() const
 
     for (int row = 0; row < ui->gridWidget->rowCount(); ++row)
     {
-        QnScheduleTask::Data task;
+        QnScheduleTask task;
 
         for (int col = 0; col < ui->gridWidget->columnCount();)
         {
@@ -770,34 +769,34 @@ QnScheduleTaskList LegacyCameraScheduleWidget::scheduleTasks() const
             if (fps == 0 && recordType != Qn::RT_Never)
                 fps = 10;
 
-            if (task.m_startTime == task.m_endTime)
+            if (task.startTime == task.endTime)
             {
                 // An invalid one; initialize.
-                task.m_dayOfWeek = row + 1;
-                task.m_startTime = col * 3600; //< In secs from start of day.
-                task.m_endTime = (col + 1) * 3600; //< In secs from start of day.
-                task.m_recordType = recordType;
-                task.m_streamQuality = streamQuality;
-                task.m_bitrateKbps = bitrateKbps;
-                task.m_fps = fps;
+                task.dayOfWeek = row + 1;
+                task.startTime = col * 3600; //< In secs from start of day.
+                task.endTime = (col + 1) * 3600; //< In secs from start of day.
+                task.recordingType = recordType;
+                task.streamQuality = streamQuality;
+                task.bitrateKbps = bitrateKbps;
+                task.fps = fps;
                 ++col;
             }
-            else if (task.m_recordType == recordType
-                && task.m_streamQuality == streamQuality
-                && task.m_bitrateKbps == bitrateKbps
-                && task.m_fps == fps)
+            else if (task.recordingType == recordType
+                && task.streamQuality == streamQuality
+                && task.bitrateKbps == bitrateKbps
+                && task.fps == fps)
             {
-                task.m_endTime = (col + 1) * 3600; //< In secs from start of day.
+                task.endTime = (col + 1) * 3600; //< In secs from start of day.
                 ++col;
             }
             else
             {
                 tasks.append(task);
-                task = QnScheduleTask::Data();
+                task = QnScheduleTask();
             }
         }
 
-        if (task.m_startTime != task.m_endTime)
+        if (task.startTime != task.endTime)
             tasks.append(task);
     }
 
@@ -815,50 +814,50 @@ void LegacyCameraScheduleWidget::setScheduleTasks(const QnScheduleTaskList& valu
     {
         for (int nDay = 1; nDay <= 7; ++nDay)
         {
-            QnScheduleTask::Data data;
-            data.m_dayOfWeek = nDay;
-            data.m_startTime = 0;
-            data.m_endTime = 86400;
-            data.m_beforeThreshold = kDefaultBeforeThresholdSec;
-            data.m_afterThreshold = kDefaultAfterThresholdSec;
+            QnScheduleTask data;
+            data.dayOfWeek = nDay;
+            data.startTime = 0;
+            data.endTime = 86400;
+            data.beforeThresholdSec = kDefaultBeforeThresholdSec;
+            data.afterThresholdSec = kDefaultAfterThresholdSec;
             tasks << data;
         }
     }
 
     auto task = tasks.first();
-    ui->recordBeforeSpinBox->setValue(task.getBeforeThreshold());
-    ui->recordAfterSpinBox->setValue(task.getAfterThreshold());
+    ui->recordBeforeSpinBox->setValue(task.beforeThresholdSec);
+    ui->recordAfterSpinBox->setValue(task.afterThresholdSec);
 
     for (const auto &task : tasks)
     {
-        const int row = task.getDayOfWeek() - 1;
+        const int row = task.dayOfWeek - 1;
         Qn::StreamQuality quality = Qn::QualityNotDefined;
         qreal bitrateMbps = 0.0;
 
-        if (task.getRecordingType() != Qn::RT_Never)
+        if (task.recordingType != Qn::RT_Never)
         {
-            switch (task.getStreamQuality())
+            switch (task.streamQuality)
             {
                 case Qn::QualityLow:
                 case Qn::QualityNormal:
                 case Qn::QualityHigh:
                 case Qn::QualityHighest:
-                    quality = task.getStreamQuality();
-                    bitrateMbps = task.getBitrateKbps() / kKbpsInMbps;
+                    quality = task.streamQuality;
+                    bitrateMbps = task.bitrateKbps / kKbpsInMbps;
                     break;
                 default:
-                    qWarning("LegacyCameraScheduleWidget::setScheduleTasks(): Unhandled StreamQuality value %d.", task.getStreamQuality());
+                    qWarning("LegacyCameraScheduleWidget::setScheduleTasks(): Unhandled StreamQuality value %d.", task.streamQuality);
                     break;
             }
         }
 
-        for (int col = task.getStartTime() / 3600; col < task.getEndTime() / 3600; ++col)
+        for (int col = task.startTime / 3600; col < task.endTime / 3600; ++col)
         {
             const QPoint cell(col, row);
             QnScheduleGridWidget::CellParams params;
-            params.recordingType = task.getRecordingType();
+            params.recordingType = task.recordingType;
             params.quality = quality;
-            params.fps = task.getFps();
+            params.fps = task.fps;
             params.bitrateMbps = m_advancedSettingsSupported ? bitrateMbps : 0.0;
             ui->gridWidget->setCellValue(cell, params);
         }
@@ -878,10 +877,10 @@ void LegacyCameraScheduleWidget::updateRecordThresholds(QnScheduleTaskList& task
 {
     int before = ui->recordBeforeSpinBox->value();
     int after = ui->recordAfterSpinBox->value();
-    for (auto& task : tasks)
+    for (auto& task: tasks)
     {
-        task.setBeforeThreshold(before);
-        task.setAfterThreshold(after);
+        task.beforeThresholdSec = before;
+        task.afterThresholdSec = after;
     }
 }
 
@@ -1238,7 +1237,7 @@ void LegacyCameraScheduleWidget::at_exportScheduleButton_clicked()
             if (copyArchiveLength)
                 ui->archiveLengthWidget->submitToResources({camera});
 
-            camera->setScheduleDisabled(!recordingEnabled);
+            camera->setLicenseUsed(recordingEnabled);
             int maxFps = camera->getMaxFps();
 
             // TODO: #GDM #Common ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
@@ -1255,28 +1254,28 @@ void LegacyCameraScheduleWidget::at_exportScheduleButton_clicked()
             QnScheduleTaskList tasks;
             for (auto task: scheduleTasks())
             {
-                if (task.getRecordingType() == Qn::RT_MotionAndLowQuality)
-                    task.setFps(qMin(task.getFps(), maxFps - decreaseIfMotionPlusLQ));
+                if (task.recordingType == Qn::RT_MotionAndLowQuality)
+                    task.fps = qMin(task.fps, maxFps - decreaseIfMotionPlusLQ);
                 else
-                    task.setFps(qMin(task.getFps(), maxFps - decreaseAlways));
+                    task.fps = qMin(task.fps, maxFps - decreaseAlways);
 
-                if (const auto bitrate = task.getBitrateKbps()) // Try to calculate new custom bitrate
+                if (const auto bitrate = task.bitrateKbps) // Try to calculate new custom bitrate
                 {
                     // Target camera supports custom bitrate
                     const auto normalBitrate = core::CameraBitrateCalculator::getBitrateForQualityMbps(
                         sourceCamera,
-                        task.getStreamQuality(),
-                        task.getFps(),
+                        task.streamQuality,
+                        task.fps,
                         ui->bitrateSpinBox->decimals());
                     const auto bitrateAspect = (bitrate - normalBitrate) / normalBitrate;
 
                     const auto targetNormalBitrate = core::CameraBitrateCalculator::getBitrateForQualityMbps(
                         camera,
-                        task.getStreamQuality(),
-                        task.getFps(),
+                        task.streamQuality,
+                        task.fps,
                         ui->bitrateSpinBox->decimals());
                     const auto targetBitrate = targetNormalBitrate * bitrateAspect;
-                    task.setBitrateKbps(targetBitrate);
+                    task.bitrateKbps = targetBitrate;
                 }
                 tasks.append(task);
             }
@@ -1417,7 +1416,7 @@ bool LegacyCameraScheduleWidget::isRecordingScheduled() const
     return any_of(scheduleTasks(),
         [](const QnScheduleTask& task) -> bool
         {
-            return !task.isEmpty() && task.getRecordingType() != Qn::RT_Never;
+            return !task.isEmpty() && task.recordingType != Qn::RT_Never;
         });
 }
 

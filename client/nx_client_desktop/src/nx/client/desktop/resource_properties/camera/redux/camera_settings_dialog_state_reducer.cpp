@@ -233,15 +233,12 @@ State::ImageControlSettings calculateImageControlSettings(
     return result;
 }
 
-QList<QnScheduleTask::Data> calculateRecordingSchedule(const QnVirtualCameraResourcePtr& camera)
+QnScheduleTaskList calculateRecordingSchedule(const QnVirtualCameraResourcePtr& camera)
 {
     if (camera->isDtsBased())
         return {};
 
-    QList<QnScheduleTask::Data> data;
-    for (const auto& scheduleTask: camera->getScheduleTasks())
-        data.push_back(scheduleTask.getData());
-    return data;
+    return camera->getScheduleTasks();
 }
 
 int calculateRecordingThresholdBefore(const QnVirtualCameraResourcePtr& camera)
@@ -250,7 +247,7 @@ int calculateRecordingThresholdBefore(const QnVirtualCameraResourcePtr& camera)
     if (!schedule.empty())
     {
         const auto& firstTask = schedule.first();
-        return firstTask.getBeforeThreshold();
+        return firstTask.beforeThresholdSec;
     }
     return State::RecordingSettings::Thresholds::kDefaultBeforeSec;
 }
@@ -261,7 +258,7 @@ int calculateRecordingThresholdAfter(const QnVirtualCameraResourcePtr& camera)
     if (!schedule.empty())
     {
         const auto& firstTask = schedule.first();
-        return firstTask.getAfterThreshold();
+        return firstTask.afterThresholdSec;
     }
     return State::RecordingSettings::Thresholds::kDefaultAfterSec;
 }
@@ -322,7 +319,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
 
     state.recording.enabled = {};
     fetchFromCameras<bool>(state.recording.enabled, cameras,
-        [](const auto& camera) { return !camera->isScheduleDisabled(); });
+        [](const auto& camera) { return camera->isLicenseUsed(); });
 
     state.recording.parametersAvailable = calculateRecordingParametersAvailable(cameras);
 
@@ -338,7 +335,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
     {
         const auto tasks = schedule();
         state.recording.brush.fps = std::max_element(tasks.cbegin(), tasks.cend(),
-            [](const auto& l, const auto& r) { return l.m_fps < r.m_fps; })->m_fps;
+            [](const auto& l, const auto& r) { return l.fps < r.fps; })->fps;
     }
     else
     {
@@ -376,11 +373,12 @@ State CameraSettingsDialogStateReducer::setScheduleBrush(
     const QnScheduleGridWidget::CellParams& brush)
 {
     state.recording.brush = brush;
-
-    state = setScheduleBrushFps(std::move(state), qBound(
+    const auto fps = qBound(
         kMinFps,
         state.recording.brush.fps,
-        state.recording.maxBrushFps()));
+        state.recording.maxBrushFps());
+
+    state = setScheduleBrushFps(std::move(state), fps);
 
     return state;
 }
@@ -438,7 +436,7 @@ State CameraSettingsDialogStateReducer::setSchedule(State state, const ScheduleT
     if (!state.recording.customBitrateAvailable)
     {
         for (auto& task: processed)
-            task.m_bitrateKbps = 0;
+            task.bitrateKbps = 0;
     }
 
     state.recording.schedule.setUser(processed);
@@ -563,12 +561,12 @@ State CameraSettingsDialogStateReducer::setRecordingEnabled(State state, bool va
         ScheduleTasks tasks;
         for (int dayOfWeek = 1; dayOfWeek <= 7; ++dayOfWeek)
         {
-            QnScheduleTask::Data data;
-            data.m_dayOfWeek = dayOfWeek;
-            data.m_startTime = 0;
-            data.m_endTime = 86400;
-            data.m_beforeThreshold = beforeThreshold;
-            data.m_afterThreshold = afterThreshold;
+            QnScheduleTask data;
+            data.dayOfWeek = dayOfWeek;
+            data.startTime = 0;
+            data.endTime = 86400;
+            data.beforeThresholdSec = beforeThreshold;
+            data.afterThresholdSec = afterThreshold;
             tasks << data;
         }
         state.recording.schedule.setUser(tasks);

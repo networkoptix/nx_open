@@ -1,22 +1,16 @@
-/**********************************************************
-* 2 oct 2014
-* akolesnikov
-***********************************************************/
-
-#ifndef CAMERA_USER_ATTRIBUTES_H
-#define CAMERA_USER_ATTRIBUTES_H
+#pragma once
 
 #include <QtCore/QByteArray>
 #include <QtCore/QList>
 #include <QtCore/QSet>
 #include <QtCore/QSharedPointer>
 
-#include <core/misc/schedule_task.h>
 #include <core/ptz/media_dewarping_params.h>
-#include <core/resource/resource_fwd.h>
+#include <core/misc/schedule_task.h>
 
 #include "motion_window.h"
 
+#include <nx/utils/uuid.h>
 
 //!Contains camera settings usually modified by user
 /*!
@@ -53,5 +47,3 @@ public:
 Q_DECLARE_METATYPE(QnCameraUserAttributes)
 Q_DECLARE_METATYPE(QnCameraUserAttributesPtr)
 Q_DECLARE_METATYPE(QnCameraUserAttributesList)
-
-#endif  //CAMERA_USER_ATTRIBUTES_H

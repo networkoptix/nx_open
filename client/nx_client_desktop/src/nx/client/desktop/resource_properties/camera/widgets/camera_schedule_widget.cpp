@@ -11,6 +11,7 @@
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_server_resource.h>
 #include <nx_ec/data/api_camera_attributes_data.h>
+#include <core/misc/schedule_task.h>
 
 #include <camera/fps_calculator.h>
 
@@ -223,34 +224,34 @@ void CameraScheduleWidget::loadState(const CameraSettingsDialogState& state)
     {
         for (const auto& task: schedule())
         {
-            const int row = task.m_dayOfWeek - 1;
+            const int row = task.dayOfWeek - 1;
             Qn::StreamQuality quality = Qn::QualityNotDefined;
             qreal bitrateMbps = 0.0;
 
-            if (task.m_recordType != Qn::RT_Never)
+            if (task.recordingType != Qn::RT_Never)
             {
-                switch (task.m_streamQuality)
+                switch (task.streamQuality)
                 {
                     case Qn::QualityLow:
                     case Qn::QualityNormal:
                     case Qn::QualityHigh:
                     case Qn::QualityHighest:
-                        quality = task.m_streamQuality;
+                        quality = task.streamQuality;
                         bitrateMbps = core::CameraBitrateCalculator::roundKbpsToMbps(
-                            task.m_bitrateKbps);
+                            task.bitrateKbps);
                         break;
                     default:
                         break;
                 }
             }
 
-            for (int col = task.m_startTime / 3600; col < task.m_endTime / 3600; ++col)
+            for (int col = task.startTime / 3600; col < task.endTime / 3600; ++col)
             {
                 const QPoint cell(col, row);
                 QnScheduleGridWidget::CellParams params;
-                params.recordingType = task.m_recordType;
+                params.recordingType = task.recordingType;
                 params.quality = quality;
-                params.fps = task.m_fps;
+                params.fps = task.fps;
                 params.bitrateMbps = state.recording.customBitrateAvailable ? bitrateMbps : 0.0;
                 ui->gridWidget->setCellValue(cell, params);
             }
@@ -270,7 +271,7 @@ ScheduleTasks CameraScheduleWidget::calculateScheduleTasks() const
 
     for (int row = 0; row < ui->gridWidget->rowCount(); ++row)
     {
-        QnScheduleTask::Data task;
+        QnScheduleTask task;
 
         for (int col = 0; col < ui->gridWidget->columnCount();)
         {
@@ -292,34 +293,34 @@ ScheduleTasks CameraScheduleWidget::calculateScheduleTasks() const
             if (fps == 0 && recordingType != Qn::RT_Never)
                 fps = 10;
 
-            if (task.m_startTime == task.m_endTime)
+            if (task.startTime == task.endTime)
             {
                 // An invalid one; initialize.
-                task.m_dayOfWeek = row + 1;
-                task.m_startTime = col * 3600;     //< In secs from start of day.
-                task.m_endTime = (col + 1) * 3600; //< In secs from start of day.
-                task.m_recordType = recordingType;
-                task.m_streamQuality = streamQuality;
-                task.m_bitrateKbps = bitrateKbps;
-                task.m_fps = fps;
+                task.dayOfWeek = row + 1;
+                task.startTime = col * 3600;     //< In secs from start of day.
+                task.endTime = (col + 1) * 3600; //< In secs from start of day.
+                task.recordingType = recordingType;
+                task.streamQuality = streamQuality;
+                task.bitrateKbps = bitrateKbps;
+                task.fps = fps;
                 ++col;
             }
-            else if (task.m_recordType == recordingType
-                && task.m_streamQuality == streamQuality
-                && task.m_bitrateKbps == bitrateKbps
-                && task.m_fps == fps)
+            else if (task.recordingType == recordingType
+                && task.streamQuality == streamQuality
+                && task.bitrateKbps == bitrateKbps
+                && task.fps == fps)
             {
-                task.m_endTime = (col + 1) * 3600; //< In secs from start of day.
+                task.endTime = (col + 1) * 3600; //< In secs from start of day.
                 ++col;
             }
             else
             {
                 tasks.append(task);
-                task = QnScheduleTask::Data();
+                task = QnScheduleTask();
             }
         }
 
-        if (task.m_startTime != task.m_endTime)
+        if (task.startTime != task.endTime)
             tasks.append(task);
     }
 

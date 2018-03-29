@@ -6,7 +6,6 @@
 
 #include <core/resource/resource_fwd.h>
 #include <ui/widgets/properties/schedule_grid_widget.h>
-#include <core/misc/schedule_task.h>
 
 class QnAspectRatio;
 
@@ -38,7 +37,7 @@ public:
     void setScheduleBrushRecordingType(Qn::RecordingType value);
     void setScheduleBrushFps(int value);
     void setScheduleBrushQuality(Qn::StreamQuality value);
-    void setSchedule(const ScheduleTasks& schedule);
+    void setSchedule(const QnScheduleTaskList& schedule);
     void setRecordingShowFps(bool value);
     void setRecordingShowQuality(bool value);
     void toggleCustomBitrateVisible();

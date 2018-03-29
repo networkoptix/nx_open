@@ -299,7 +299,7 @@ bool QnRecordingManager::startOrStopRecording(
 
         if (recorderLowRes)
         {
-            float currentFps = recorderHiRes ? recorderHiRes->currentScheduleTask().getFps() : 0;
+            const auto currentFps = recorderHiRes ? recorderHiRes->currentScheduleTask().fps : 0;
 
             // second stream should run if camera do not share fps or at least MIN_SECONDARY_FPS frames left for second stream
             bool runSecondStream = cameraRes->isEnoughFpsToRunSecondStream(currentFps) &&
