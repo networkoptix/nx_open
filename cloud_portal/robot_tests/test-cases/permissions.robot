@@ -2,6 +2,7 @@
 Resource          ../resource.robot
 Resource          ../variables.robot
 Test Teardown     Close Browser
+Suite Teardown    Run Keyword If Any Tests Failed    Permissions Failure
 Force Tags        system
 
 *** Variables ***
@@ -19,6 +20,10 @@ Log in to Auto Tests System
     Run Keyword If    '${email}' == '${EMAIL OWNER}'    Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
     Run Keyword If    '${email}' == '${EMAIL ADMIN}'    Wait Until Elements Are Visible    ${DISCONNECT FROM MY ACCOUNT}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
     Run Keyword Unless    '${email}' == '${EMAIL OWNER}' or '${email}' == '${EMAIL ADMIN}'    Wait Until Elements Are Visible    ${DISCONNECT FROM MY ACCOUNT}    ${OPEN IN NX BUTTON}
+
+Permissions Failure
+    Clean up random emails
+    Clean up email noperm
 
 *** Test Cases ***
 Share button - opens dialog

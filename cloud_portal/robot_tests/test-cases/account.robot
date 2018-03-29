@@ -2,6 +2,7 @@
 Resource          ../resource.robot
 Resource          ../variables.robot
 Test Teardown     Close Browser
+Suite Teardown    Run Keyword If Any Tests Failed    Clean up noperm first/last name
 
 *** Variables ***
 ${password}    ${BASE PASSWORD}

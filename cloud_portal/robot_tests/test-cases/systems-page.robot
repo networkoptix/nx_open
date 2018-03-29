@@ -1,7 +1,8 @@
 *** Settings ***
 Resource          ../resource.robot
 Resource          ../variables.robot
-Test Teardown    Close Browser
+Test Teardown     Close Browser
+Suite Teardown    Run Keyword If Any Tests Failed    Clean up owner first/last name
 Force Tags        system
 
 *** Variables ***

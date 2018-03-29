@@ -8,7 +8,7 @@ ${password}    ${BASE PASSWORD}
 ${url}    ${ENV}
 
 *** Keywords ***
-Find and remove
+Find and remove emails
     ${random emails}    Get WebElements    //div[@process-loading='gettingSystemUsers']//tbody//tr//td[contains(text(), 'noptixautoqa+15')]
     :FOR    ${element}    IN    @{random emails}
     \  ${email}    Get Text    ${element}
@@ -38,7 +38,7 @@ Clean up random emails
     Validate Log In
     Go To    ${url}/systems/${AUTO_TESTS SYSTEM ID}
     ${status}    Run Keyword And Return Status    Wait Until Element Is Visible    //div[@process-loading='gettingSystemUsers']//tbody//tr//td[contains(text(), 'noptixautoqa+15')]
-    Run Keyword If    ${status}    Find and remove
+    Run Keyword If    ${status}    Find and remove emails
     Close Browser
 
 Clean up noperm first/last name
