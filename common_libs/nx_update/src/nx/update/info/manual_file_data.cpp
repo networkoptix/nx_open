@@ -1,3 +1,4 @@
+#include <QRegExp>
 #include "manual_file_data.h"
 
 namespace nx {
@@ -13,9 +14,9 @@ ManualFileData::ManualFileData(const QString& file, const OsVersion& osVersion,
     isClient(isClient)
 {}
 
-ManualFileData ManualFileData::fromFileName(const QString& /*fileName*/)
+ManualFileData ManualFileData::fromFileName(const QString& fileName)
 {
-    // #TODO #akulikov: Implement this!
+    const QRegExp fileRegExp("^.+-([a-z]+)_update_([0-9:.]+)-(.+)\.zip$");
     return ManualFileData();
 }
 

@@ -35,8 +35,16 @@ OsVersion OsVersion::fromString(const QString& s)
     return OsVersion(splits[0], splits[1], splits[2]);
 }
 
+bool operator==(const OsVersion& lhs, const OsVersion& rhs)
+{
+    return lhs.architecture == rhs.architecture && lhs.family == rhs.family
+        && lhs.version == rhs.version;
+}
+
 static const QString kLinuxFamily = "linux";
 static const QString kWindowsFamily = "windows";
+static const QString kMacOsxFamily = "macosx";
+static const QString kMacOsx = kMacOsxFamily;
 static const QString kx86 = "x86";
 static const QString kx64 = "x64";
 static const QString kUbuntu = "ubuntu";
@@ -51,6 +59,11 @@ OsVersion ubuntuX64()
 OsVersion ubuntuX86()
 {
     return OsVersion(kLinuxFamily, kx86, kUbuntu);
+}
+
+OsVersion macosx()
+{
+    return OsVersion(kMacOsxFamily, kx64, kMacOsx);
 }
 
 OsVersion windowsX64()
@@ -77,6 +90,8 @@ OsVersion armBananapi()
 {
     return OsVersion(kLinuxFamily, kArm, "bananapi");
 }
+
+
 
 } // namespace info
 } // namespace update
