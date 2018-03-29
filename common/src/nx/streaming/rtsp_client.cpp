@@ -1926,11 +1926,6 @@ void QnRtspClient::removeAdditionAttribute(const QByteArray& name)
     m_additionAttrs.remove(name);
 }
 
-void QnRtspClient::setTCPTimeout(int timeoutMs)
-{
-    setTCPTimeout(std::chrono::milliseconds(timeoutMs));
-}
-
 void QnRtspClient::setTCPTimeout(std::chrono::milliseconds timeout)
 {
     m_tcpTimeout = timeout;
