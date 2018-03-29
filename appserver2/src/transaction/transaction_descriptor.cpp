@@ -722,7 +722,7 @@ struct ModifyCameraAttributesAccess
         }
 
         // Check the license if and only if recording goes from 'off' to 'on' state
-        const bool prevScheduleEnabled = !camera->isScheduleDisabled();
+        const bool prevScheduleEnabled = camera->isLicenseUsed();
         if (prevScheduleEnabled != param.scheduleEnabled)
         {
             licenseUsageHelper.propose(camera, param.scheduleEnabled);
@@ -763,7 +763,7 @@ struct ModifyCameraAttributesListAccess
                 return;
             }
             cameras.push_back(camera);
-            const bool prevScheduleEnabled = !camera->isScheduleDisabled();
+            const bool prevScheduleEnabled = camera->isLicenseUsed();
             if (prevScheduleEnabled != p.scheduleEnabled)
                 licenseUsageHelper.propose(camera, p.scheduleEnabled);
         }

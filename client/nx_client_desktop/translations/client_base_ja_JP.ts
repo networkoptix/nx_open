@@ -857,7 +857,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Upload File...</source>
-      <translation>ファイルをアップロード...</translation>
+      <translation>ファイルをアップロード</translation>
     </message>
     <message>
       <source>Upload Folder...</source>
@@ -2335,6 +2335,12 @@ to view more bookmarks</source>
       <source>Edge</source>
       <translation>Edge</translation>
     </message>
+    <message numerus="yes">
+      <source>This Id is already used on the following %n cameras: %1</source>
+      <translation type="unfinished">
+        <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnCameraInputBusinessEventWidget</name>
@@ -2449,6 +2455,10 @@ to view more bookmarks</source>
       <source>Server</source>
       <translation>サーバー</translation>
     </message>
+    <message>
+      <source>Id</source>
+      <translation>Id</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraMotionMaskWidget</name>
@@ -2485,7 +2495,7 @@ to view more bookmarks</source>
     <name>QnCameraMotionPolicy</name>
     <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation>%1 の録画やモーション検知は無効になります</translation>
+      <translation>%1 の記録やモーション検知は無効になります</translation>
     </message>
   </context>
   <context>
@@ -2507,10 +2517,6 @@ to view more bookmarks</source>
   <context>
     <name>QnCameraPasswordChangeDialog</name>
     <message>
-      <source>Password shouldn&apos;t be equal to camera&apos;s user name</source>
-      <translation>パスワードはカメラのユーザー名と同じにできません</translation>
-    </message>
-    <message>
       <source>New Password</source>
       <translation>新規パスワード</translation>
     </message>
@@ -2526,12 +2532,16 @@ to view more bookmarks</source>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
       <translation>パスワードは8文字以上で、異なる種類の文字を含む必要があります</translation>
     </message>
+    <message>
+      <source>Password should not be equal to camera&apos;s user name</source>
+      <translation type="unfinished">Password should not be equal to camera&apos;s user name</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraRecordingPolicy</name>
     <message>
       <source>Recording is disabled for %1</source>
-      <translation>%1 の録画を無効</translation>
+      <translation>%1 の記録を無効</translation>
     </message>
   </context>
   <context>
@@ -3153,11 +3163,9 @@ to %1</source>
       <source>Ask your system administrator to do it.</source>
       <translation>システム管理者に依頼してください</translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>Set Password</source>
-      <translation>
-        <numerusform>パスワードの設定</numerusform>
-      </translation>
+      <translation type="unfinished">Set Password</translation>
     </message>
   </context>
   <context>
@@ -4706,16 +4714,16 @@ to %1</source>
   <context>
     <name>QnPerformanceTest</name>
     <message>
-      <source>For full - featured mode, please use another computer</source>
-      <translation>フル機能モードでは別のコンピューターを使用してください</translation>
-    </message>
-    <message>
       <source>%1 can work in configuration mode only</source>
       <translation>%1 構成モードでのみ動作することができます</translation>
     </message>
     <message>
       <source>Performance of this computer allows running %1 in configuration mode only.</source>
       <translation>このコンピューターのパフォーマンスは構成モードでのみ %1 を実行することができます</translation>
+    </message>
+    <message>
+      <source>For full-featured mode please use another computer</source>
+      <translation type="unfinished">For full-featured mode please use another computer</translation>
     </message>
   </context>
   <context>
@@ -5838,6 +5846,10 @@ to %1</source>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
       <translation>&quot;モーション+低解像度&quot;録画オプションを設定できません</translation>
     </message>
+    <message>
+      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
+      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</translation>
+    </message>
   </context>
   <context>
     <name>QnSmtpAdvancedSettingsWidget</name>
@@ -5989,10 +6001,6 @@ to %1</source>
   <context>
     <name>QnStatusOverlayController</name>
     <message>
-      <source>NOT ENOUGH LICENCES</source>
-      <translation>ライセンスが不足しています</translation>
-    </message>
-    <message>
       <source>NO DATA</source>
       <translation>データがありません</translation>
     </message>
@@ -6063,6 +6071,10 @@ to %1</source>
     <message>
       <source>UNSUPPORTED FIRMWARE VERSION</source>
       <translation>サポートされていないファームウェアバージョン</translation>
+    </message>
+    <message>
+      <source>NOT ENOUGH LICENSES</source>
+      <translation type="unfinished">NOT ENOUGH LICENSES</translation>
     </message>
   </context>
   <context>
@@ -7079,10 +7091,6 @@ to %1</source>
   <context>
     <name>QnWearableProgressWidget</name>
     <message>
-      <source>Uploading %1... %2	%p%</source>
-      <translation>アップロード中 %1... %2	%p%</translation>
-    </message>
-    <message>
       <source>Stop uploading?</source>
       <translation>アップロードを停止しますか？</translation>
     </message>
@@ -7091,12 +7099,16 @@ to %1</source>
       <translation>既にアップロードされたファイルは保管されます</translation>
     </message>
     <message>
-      <source>Finalizing %1... %2	%p%</source>
-      <translation>ファイナライズ %1... %2	%p%</translation>
-    </message>
-    <message>
       <source>(%1 of %2)</source>
       <translation>(%1 / %2)</translation>
+    </message>
+    <message>
+      <source>Uploading %1...</source>
+      <translation type="unfinished">Uploading %1...</translation>
+    </message>
+    <message>
+      <source>Finalizing %1...</source>
+      <translation type="unfinished">Finalizing %1...</translation>
     </message>
   </context>
   <context>
@@ -7198,6 +7210,10 @@ to %1</source>
     <message>
       <source>Could not connect to server. Video Wall will be closed.</source>
       <translation>サーバーに接続できませんでした　ビデオウォールが閉じられます</translation>
+    </message>
+    <message>
+      <source>Video Wall is removed on the server and will be closed.</source>
+      <translation type="unfinished">Video Wall is removed on the server and will be closed.</translation>
     </message>
   </context>
   <context>
@@ -7563,22 +7579,6 @@ to %1</source>
       <source>No new files to upload in selected folder</source>
       <translation>選択したフォルダにアップロードする新しいファイルがありません</translation>
     </message>
-    <message>
-      <source>%1 - has unsupported format.</source>
-      <translation>%1 - サポートされていないフォーマット</translation>
-    </message>
-    <message>
-      <source>%1 - does not have timestamp.</source>
-      <translation>%1 - タイムスタンプがありません</translation>
-    </message>
-    <message>
-      <source>%1 - covers period for which video has already been uploaded.</source>
-      <translation>ファイル %1 は既にアップロードされているビデオの期間と重複します</translation>
-    </message>
-    <message>
-      <source>%1 - covers period for which video is being uploaded.</source>
-      <translation>ファイル %1 は既にアップロードされているビデオの期間と重複します</translation>
-    </message>
     <message numerus="yes">
       <source>Selected files are too old</source>
       <translation>
@@ -7626,8 +7626,24 @@ to %1</source>
       <translation>サーバーストレージに十分なスペースがあることを確認してください</translation>
     </message>
     <message>
-      <source>%1 - is older than allowed in camera archive settings.</source>
-      <translation>%1 - カメラのアーカイブ設定より古いです</translation>
+      <source>%1 has unsupported format.</source>
+      <translation type="unfinished">%1 has unsupported format.</translation>
+    </message>
+    <message>
+      <source>%1 does not have timestamp.</source>
+      <translation type="unfinished">%1 does not have timestamp.</translation>
+    </message>
+    <message>
+      <source>%1 is older than allowed in camera archive settings.</source>
+      <translation type="unfinished">%1 is older than allowed in camera archive settings.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video has already been uploaded.</source>
+      <translation type="unfinished">%1 covers period for which video has already been uploaded.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video is being uploaded.</source>
+      <translation type="unfinished">%1 covers period for which video is being uploaded.</translation>
     </message>
   </context>
   <context>

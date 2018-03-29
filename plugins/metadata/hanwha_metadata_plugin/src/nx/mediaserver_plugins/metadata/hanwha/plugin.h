@@ -45,6 +45,10 @@ public:
 
     virtual void setDeclaredSettings(const nxpl::Setting* settings, int count) override;
 
+    virtual void executeAction(
+        nx::sdk::metadata::Action* action,
+        nx::sdk::Error* outError) override;
+
     const Hanwha::DriverManifest& driverManifest() const;
 
     MetadataMonitor* monitor(

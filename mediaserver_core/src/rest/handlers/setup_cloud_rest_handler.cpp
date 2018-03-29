@@ -29,23 +29,21 @@ QnSetupCloudSystemRestHandler::QnSetupCloudSystemRestHandler(
 }
 
 int QnSetupCloudSystemRestHandler::executeGet(
-    const QString& path,
+    const QString& /*path*/,
     const QnRequestParams& params,
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
-    Q_UNUSED(path);
     return execute(std::move(SetupCloudSystemData(params)), owner, result);
 }
 
 int QnSetupCloudSystemRestHandler::executePost(
-    const QString& path,
-    const QnRequestParams& params,
+    const QString& /*path*/,
+    const QnRequestParams& /*params*/,
     const QByteArray& body,
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
-    QN_UNUSED(path, params);
     const SetupCloudSystemData data = QJson::deserialized<SetupCloudSystemData>(body);
     return execute(std::move(data), owner, result);
 }

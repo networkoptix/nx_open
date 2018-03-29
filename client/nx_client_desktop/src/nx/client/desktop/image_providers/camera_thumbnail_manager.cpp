@@ -214,7 +214,7 @@ QSize QnCameraThumbnailManager::sizeHintForCamera(const QnVirtualCameraResourceP
         if (!camera)
             return result;
 
-        const auto stream = camera->defaultStream();
+        const auto stream = camera->streamInfo();
         result = Geometry::cwiseMul(stream.getResolution(), tiling);
     }
     // Only height is given, calculating width by aspect ratio

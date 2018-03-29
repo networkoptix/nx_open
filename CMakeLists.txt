@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
-
+set(CMAKE_SUPPRESS_REGENERATION true)
 include(cmake/option.cmake)
 
 set(customization "default" CACHE STRING "Product customization")
@@ -62,7 +62,6 @@ include(CMakeParseArguments)
 include(CMakeDependentOption)
 include(ExternalProject)
 include(target_detection)
-include(parameters_validation)
 include(utils)
 include(find_sources)
 include(moc_utils)
@@ -87,6 +86,12 @@ if(MACOSX OR IOS)
     include(macosx_keychain)
 endif()
 
+if(WINDOWS)
+    include(windows_signing)
+endif()
+
+include(parameters_validation)
+
 if(WINDOWS OR ANDROID OR IOS)
     set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
 else()
@@ -96,10 +101,6 @@ endif()
 include(dependencies)
 include(maven_compatibility)
 include(generate_current_config)
-
-if(WINDOWS)
-    include(windows_signing)
-endif()
 include(project_utils)
 include(test_utils)
 
@@ -194,6 +195,7 @@ if(withMediaServer)
     add_subdirectory(mediaserver)
     add_subdirectory(plugins)
     add_subdirectory(storage_plugins)
+    add_subdirectory(nx_system_commands)
 
     if(withDistributions)
         # TODO: Combine all SDKs (nx_storage_sdk, nx_sdk, nx_metadata_sdk) into one like this.
@@ -236,6 +238,10 @@ if(withDistributions)
 
     if(LINUX AND box STREQUAL "none") #< Desktop Linux.
         add_subdirectory(debsetup)
+    endif()
+
+    if(box STREQUAL "tx1")
+        add_subdirectory(tx1setup)
     endif()
 
     if(MACOSX)

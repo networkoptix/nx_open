@@ -42,10 +42,9 @@ QnUuid guidFromEventName(const char* eventFullName)
 {
     // TODO: Use guidFromArbitraryData here after moving QnUuid functions from common to common_libs
     const QString kTrimmedEventFullName = ignoreNamespaces(QString(eventFullName));
-    const char* bytesToHash = kTrimmedEventFullName.toUtf8().constData();
 
     QCryptographicHash md5Hash(QCryptographicHash::Md5);
-    md5Hash.addData(bytesToHash);
+    md5Hash.addData(kTrimmedEventFullName.toUtf8());
     QByteArray hashResult = md5Hash.result();
     return QnUuid::fromRfc4122(hashResult);
 }
@@ -54,7 +53,7 @@ QnUuid guidFromEventName(const char* eventFullName)
 
 AnalyticsEventType::AnalyticsEventType(const nx::axis::SupportedEvent& supportedEvent)
 {
-    eventTypeId = guidFromEventName(supportedEvent.fullName().c_str());
+    typeId = guidFromEventName(supportedEvent.fullName().c_str());
     name.value = supportedEvent.description.c_str();
     if (name.value.simplified().isEmpty())
     {
@@ -67,7 +66,7 @@ AnalyticsEventType::AnalyticsEventType(const nx::axis::SupportedEvent& supported
 
     topic = supportedEvent.topic.c_str();
     caption = supportedEvent.name.c_str();
-    eventTypeIdExternal = nx::mediaserver_plugins::utils::fromQnUuidToPluginGuid(eventTypeId);
+    eventTypeIdExternal = nx::mediaserver_plugins::utils::fromQnUuidToPluginGuid(typeId);
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AnalyticsEventType, (json),
@@ -79,4 +78,3 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AnalyticsDriverManifest, (json),
 } // metadata
 } // mediaserver_plugins
 } // nx
-

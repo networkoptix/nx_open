@@ -93,6 +93,14 @@ bool isNull(const nxpl::NX_GUID& guid)
     return memcmp(guid.bytes, kNullGuid.bytes, sizeof(nxpl::NX_GUID::bytes)) == 0;
 }
 
+std::string makeElementName(
+    const std::string& pipelineName,
+    const std::string& factoryName,
+    const std::string& elementName)
+{
+    return pipelineName + "_" + factoryName + "_" + elementName;
+}
+
 } // namespace deepstream
 } // namespace metadata
 } // namespace mediaserver_plugins

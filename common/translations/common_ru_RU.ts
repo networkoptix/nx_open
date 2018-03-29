@@ -78,11 +78,6 @@
       <translation>Эти системы построены с различными %1 URL. Объединение не допускается.</translation>
     </message>
     <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Облачная система может быть объединена только с локальной. Системное имя и пароль берутся из облачной системы.</translation>
-    </message>
-    <message>
       <source>New System</source>
       <translation>Новая система</translation>
     </message>
@@ -90,6 +85,10 @@
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
       <translation>Обнаружкнная система %1 несовместима с текущей.</translation>
+    </message>
+    <message>
+      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
+      <translation>Облачная система может быть объединена только с локальной. Системное имя и пароль берутся из облачной системы.</translation>
     </message>
   </context>
   <context>
@@ -492,7 +491,7 @@
     </message>
     <message>
       <source>Bridge</source>
-      <translation type="unfinished">Bridge</translation>
+      <translation>Bridge</translation>
     </message>
     <message>
       <source>Bridge Licenses</source>
@@ -881,7 +880,7 @@
     <message>
       <source>M</source>
       <comment>Suffix for displaying months</comment>
-      <translation>М</translation>
+      <translation>M</translation>
     </message>
     <message>
       <source>y</source>
@@ -1555,7 +1554,7 @@
     </message>
     <message>
       <source>All Users</source>
-      <translation>Все пользователи</translation>
+      <translation>Всем пользователям</translation>
     </message>
     <message>
       <source>Select at least one user</source>

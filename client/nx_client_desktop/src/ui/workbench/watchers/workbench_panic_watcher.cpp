@@ -35,7 +35,7 @@ void QnWorkbenchPanicWatcher::updatePanicMode() {
 
     m_panicMode = panicMode;
 
-    emit panicModeChanged();
+    emit panicModeChanged(panicMode);
 }
 
 

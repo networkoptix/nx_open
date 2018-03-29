@@ -6,6 +6,7 @@
 #include <QtCore/QString>
 #include <QtCore/QStringList>
 #include <QtCore/QUrl>
+#include <common/common_globals.h>
 
 namespace nx {
 namespace mediaserver {
@@ -18,8 +19,8 @@ class RootTool
 public:
     RootTool(const QString& toolPath);
 
-    bool mount(const QUrl& url, const QString& path);
-    bool remount(const QUrl& url, const QString& path);
+    Qn::StorageInitResult mount(const QUrl& url, const QString& path);
+    Qn::StorageInitResult remount(const QUrl& url, const QString& path);
     bool unmount(const QString& path);
 
     bool changeOwner(const QString& path);
@@ -27,7 +28,7 @@ public:
     bool makeDirectory(const QString& path);
 
 private:
-    bool execute(const std::vector<QString>& args);
+    int execute(const std::vector<QString>& args);
 
 private:
     const QString m_toolPath;

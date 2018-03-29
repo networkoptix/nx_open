@@ -29,10 +29,8 @@
 #include "av_singesensor.h"
 #include <common/static_common_module.h>
 
-
 const QString QnPlAreconVisionResource::MANUFACTURE(lit("ArecontVision"));
 #define MAX_RESPONSE_LEN (4*1024)
-
 
 QnPlAreconVisionResource::QnPlAreconVisionResource()
     : m_totalMdZones(64),
@@ -105,7 +103,6 @@ public:
           m_reg(reg),
           m_val(val)
       {}
-
 
       bool execute()
       {
@@ -234,7 +231,6 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initializeCameraDriver()
     //    return;
 
     setRegister(3, 21, 20); // sets I frame frequency to 1/20
-
 
     if (!setApiParameter(lit("motiondetect"), lit("on"))) // enables motion detection;
         return CameraDiagnostics::RequestFailedResult(lit("Enable motion detection"), lit("unknown"));
@@ -388,7 +384,6 @@ QnMetaDataV1Ptr QnPlAreconVisionResource::getCameraMetadata()
     if (mdresult == lit("no motion"))
         return motion; // no motion detected
 
-
     int zones = totalMdZones() == 1024 ? 32 : 8;
 
     QStringList md = mdresult.split(L' ', QString::SkipEmptyParts);
@@ -411,7 +406,6 @@ QnMetaDataV1Ptr QnPlAreconVisionResource::getCameraMetadata()
         {
             int index = y*zones + x;
             QString m = md.at(index);
-
 
             if (m == lit("00") || m == lit("0"))
                 continue;
@@ -545,7 +539,8 @@ QString QnPlAreconVisionResource::generateRequestString(
 }
 
 // ===============================================================================================================================
-bool QnPlAreconVisionResource::getApiParameter(const QString &id, QString &value) {
+bool QnPlAreconVisionResource::getApiParameter(const QString& id, QString& value)
+{
     QUrl devUrl(getUrl());
     CLSimpleHTTPClient connection(getHostAddress(), devUrl.port(80), getNetworkTimeout(), getAuth());
 
@@ -557,7 +552,6 @@ bool QnPlAreconVisionResource::getApiParameter(const QString &id, QString &value
 
     if (status != CL_HTTP_SUCCESS)
         return false;
-
 
     QByteArray response;
     connection.readAll(response);
@@ -572,7 +566,8 @@ bool QnPlAreconVisionResource::getApiParameter(const QString &id, QString &value
     return true;
 }
 
-bool QnPlAreconVisionResource::setApiParameter(const QString &id, const QString &value) {
+bool QnPlAreconVisionResource::setApiParameter(const QString& id, const QString& value)
+{
     QUrl devUrl(getUrl());
     CLSimpleHTTPClient connection(getHostAddress(), devUrl.port(80), getNetworkTimeout(), getAuth());
 
@@ -595,7 +590,7 @@ bool QnPlAreconVisionResource::setApiParameter(const QString &id, const QString 
     return false;
 }
 
-QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByName(const QString &name)
+QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByName(const QString& name)
 {
     QnUuid rt = qnResTypePool->getLikeResourceTypeId(MANUFACTURE, name);
     if (rt.isNull())
@@ -681,7 +676,8 @@ void QnPlAreconVisionResource::setMotionMaskPhysical(int channel)
     }
 }
 
-bool QnPlAreconVisionResource::startInputPortMonitoringAsync(std::function<void(bool)>&& completionHandler)
+bool QnPlAreconVisionResource::startInputPortMonitoringAsync(
+    std::function<void(bool)>&& completionHandler)
 {
     nx::utils::Url url;
     url.setScheme(lit("http"));
@@ -715,7 +711,8 @@ void QnPlAreconVisionResource::stopInputPortMonitoringAsync()
     m_relayInputClient.reset();
 }
 
-void QnPlAreconVisionResource::inputPortStateRequestDone(nx::network::http::AsyncHttpClientPtr client)
+void QnPlAreconVisionResource::inputPortStateRequestDone(
+    nx::network::http::AsyncHttpClientPtr client)
 {
     static const unsigned int INPUT_PORT_STATE_CHECK_TIMEOUT_MS = 1000;
 
@@ -768,7 +765,8 @@ QnCameraAdvancedParams QnPlAreconVisionResource::AvParametersProvider::descripti
     return {};
 }
 
-QnCameraAdvancedParamValueMap QnPlAreconVisionResource::AvParametersProvider::get(const QSet<QString>& ids)
+QnCameraAdvancedParamValueMap QnPlAreconVisionResource::AvParametersProvider::get(
+    const QSet<QString>& ids)
 {
     QnCameraAdvancedParamValueMap result;
     for (const auto id: ids)
@@ -781,7 +779,8 @@ QnCameraAdvancedParamValueMap QnPlAreconVisionResource::AvParametersProvider::ge
     return result;
 }
 
-QSet<QString> QnPlAreconVisionResource::AvParametersProvider::set(const QnCameraAdvancedParamValueMap& values)
+QSet<QString> QnPlAreconVisionResource::AvParametersProvider::set(
+    const QnCameraAdvancedParamValueMap& values)
 {
     QSet<QString> result;
     for (auto it = values.begin(); it != values.end(); ++it)
@@ -815,7 +814,6 @@ bool QnPlAreconVisionResource::getParamPhysical2(int channel, const QString& nam
 
     if (status != CL_HTTP_SUCCESS)
         return false;
-
 
     QByteArray response;
     connection.readAll(response);

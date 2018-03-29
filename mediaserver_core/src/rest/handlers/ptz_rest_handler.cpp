@@ -273,7 +273,6 @@ int QnPtzRestHandler::executeContinuousMove(const QnPtzControllerPtr &controller
 {
     NX_VERBOSE(this, lit("Start execute ContinuousMove. params=%1").arg(toString(params)));
 
-
     qreal xSpeed, ySpeed, zSpeed;
     if (
         !requireParameter(params, lit("xSpeed"), result, &xSpeed) ||
@@ -508,10 +507,9 @@ int QnPtzRestHandler::executeGetHomeObject(const QnPtzControllerPtr &controller,
     return CODE_OK;
 }
 
-int QnPtzRestHandler::executeGetAuxilaryTraits(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result)
+int QnPtzRestHandler::executeGetAuxilaryTraits(const QnPtzControllerPtr& controller,
+    const QnRequestParams& /*params*/, QnJsonRestResult& result)
 {
-    Q_UNUSED(params);
-
     QnPtzAuxilaryTraitList traits;
     if (!controller->getAuxilaryTraits(&traits))
         return CODE_INTERNAL_ERROR;

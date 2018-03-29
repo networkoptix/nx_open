@@ -185,6 +185,8 @@
 #include <rest/handlers/multiserver_thumbnail_rest_handler.h>
 #include <rest/handlers/multiserver_statistics_rest_handler.h>
 #include <rest/handlers/multiserver_analytics_lookup_detected_objects.h>
+#include <rest/handlers/execute_analytics_action_rest_handler.h>
+#include <rest/handlers/get_analytics_actions_rest_handler.h>
 #include <rest/server/rest_connection_processor.h>
 #include <rest/handlers/get_hardware_info_rest_handler.h>
 #include <rest/handlers/system_settings_handler.h>
@@ -287,8 +289,7 @@
 #include <nx/mediaserver/updates2/server_updates2_manager.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
 
-
-#if !defined(EDGE_SERVER)
+#if !defined(EDGE_SERVER) && !defined(__aarch64__)
     #include <nx_speech_synthesizer/text_to_wav.h>
     #include <nx/utils/file_system.h>
 #endif
@@ -302,7 +303,6 @@
 #endif
 
 #include "mediaserver_ini.h"
-
 
 using namespace nx;
 
@@ -324,7 +324,6 @@ class MediaServerProcess;
 static MediaServerProcess* serviceMainInstance = 0;
 void stopServer(int signal);
 bool restartFlag = false;
-
 
 namespace {
 const QString YES = lit("yes");
@@ -449,7 +448,6 @@ QString defaultLocalAddress(const QHostAddress& target)
         if (result.length()>0)
             return result;
     }
-
 
     {
         // if nothing else works use first enabled hostaddr
@@ -591,7 +589,6 @@ QnStorageResourceList getSmallStorages(const QnStorageResourceList& storages)
     }
     return result;
 }
-
 
 QnStorageResourceList createStorages(
     QnCommonModule* commonModule,
@@ -1015,7 +1012,7 @@ nx::utils::Url appServerConnectionUrl(QSettings &settings)
 }
 
 MediaServerProcess::MediaServerProcess(int argc, char* argv[], bool serviceMode)
-:
+    :
     m_argc(argc),
     m_argv(argv),
     m_startMessageSent(false),
@@ -1188,7 +1185,6 @@ void MediaServerProcess::stopAsync()
     QTimer::singleShot(0, this, SLOT(stopSync()));
 }
 
-
 int MediaServerProcess::getTcpPort() const
 {
     return m_universalTcpListener ? m_universalTcpListener->getPort() : 0;
@@ -1269,7 +1265,6 @@ void MediaServerProcess::updateAddressesList()
 
     ec2::ApiMediaServerData prevValue;
     fromResourceToApi(m_mediaServer, prevValue);
-
 
     nx::network::AddressFilters addressMask =
         nx::network::AddressFilter::ipV4
@@ -1648,11 +1643,11 @@ void MediaServerProcess::registerRestHandlers(
     reg("ec2/cameraThumbnail", new QnMultiserverThumbnailRestHandler("ec2/cameraThumbnail"));
     reg("ec2/statistics", new QnMultiserverStatisticsRestHandler("ec2/statistics"));
 
-    reg(
-        "ec2/analyticsLookupDetectedObjects",
-        new QnMultiserverAnalyticsLookupDetectedObjects(
-            commonModule(),
-            qnServerModule->analyticsEventsStorage()));
+    reg("ec2/analyticsLookupDetectedObjects", new QnMultiserverAnalyticsLookupDetectedObjects(
+        commonModule(), qnServerModule->analyticsEventsStorage()));
+
+    reg("api/getAnalyticsActions", new QnGetAnalyticsActionsRestHandler());
+    reg("api/executeAnalyticsAction", new QnExecuteAnalyticsActionRestHandler());
 
     reg("api/saveCloudSystemCredentials", new QnSaveCloudSystemCredentialsHandler(cloudManagerGroup));
 
@@ -2289,7 +2284,6 @@ void MediaServerProcess::run()
         this, &MediaServerProcess::started,
         [&serverModule]() {serverModule->findInstance<Downloader>()->atServerStart(); });
 
-
     qnServerModule->runTimeSettings()->remove("rebuild");
 
     if (m_serviceMode)
@@ -2303,7 +2297,6 @@ void MediaServerProcess::run()
     if (m_serviceMode)
     {
         initializeLogging();
-        qnServerModule->initializeRootTool();
     }
 
     updateAllowedInterfaces();
@@ -2715,13 +2708,11 @@ void MediaServerProcess::run()
             } while (appserverHost.toIPv4Address() == 0);
         }
 
-
         server->setPrimaryAddress(
             nx::network::SocketAddress(defaultLocalAddress(appserverHost), m_universalTcpListener->getPort()));
         server->setSslAllowed(sslAllowed);
         cloudIntegrationManager->cloudManagerGroup().connectionManager.setProxyVia(
             nx::network::SocketAddress(nx::network::HostAddress::localhost, m_universalTcpListener->getPort()));
-
 
         // used for statistics reported
         server->setSystemInfo(QnSystemInformation::currentSystemInformation());
@@ -2868,8 +2859,6 @@ void MediaServerProcess::run()
     auto serverMessageProcessor = dynamic_cast<QnServerMessageProcessor*> (commonModule()->messageProcessor());
     serverMessageProcessor->startReceivingLocalNotifications(ec2Connection);
 
-
-
     qnServerModule->metadataManagerPool()->init();
     at_runtimeInfoChanged(runtimeManager->localInfo());
 
@@ -2955,7 +2944,6 @@ void MediaServerProcess::run()
 
     std::unique_ptr<QnLdapManager> ldapManager(new QnLdapManager(commonModule()));
 
-
     commonModule()->resourceDiscoveryManager()->setReady(true);
     const bool isDiscoveryDisabled =
         qnServerModule->roSettings()->value(QnServer::kNoResourceDiscovery, false).toBool();
@@ -2963,7 +2951,6 @@ void MediaServerProcess::run()
         commonModule()->resourceDiscoveryManager()->start();
     //else
     //    we are not able to add cameras to DB anyway, so no sense to do discover
-
 
     connect(
         commonModule()->resourceDiscoveryManager(),
@@ -3101,6 +3088,7 @@ void MediaServerProcess::run()
 
             commonModule()->resourceDiscoveryManager()->stop();
             qnServerModule->metadataManagerPool()->stop(); //< Stop processing analytics events.
+            auditManager->stop();
             QnResource::stopAsyncTasks();
 
             //since mserverResourceDiscoveryManager instance is dead no events can be delivered to serverResourceProcessor: can delete it now
@@ -3225,11 +3213,11 @@ void MediaServerProcess::at_emptyDigestDetected(const QnUserResourcePtr& user, c
 
         QnUuid userId = user->getId();
         m_updateUserRequests << userId;
-        appServerConnection->getUserManager(Qn::kSystemAccess)->save(userData, password, this, [this, userId]( int reqID, ec2::ErrorCode errorCode )
-        {
-            QN_UNUSED(reqID, errorCode);
-            m_updateUserRequests.remove(userId);
-        } );
+        appServerConnection->getUserManager(Qn::kSystemAccess)->save(userData, password, this,
+            [this, userId]( int /*reqID*/, ec2::ErrorCode /*errorCode*/ )
+            {
+                m_updateUserRequests.remove(userId);
+            });
     }
 }
 
@@ -3369,8 +3357,7 @@ int MediaServerProcess::main(int argc, char* argv[])
     signal( SIGUSR1, SIGUSR1_handler );
 #endif
 
-
-#ifndef EDGE_SERVER
+#if !defined(EDGE_SERVER) && !defined(__aarch64__)
     std::unique_ptr<TextToWaveServer> textToWaveServer = std::make_unique<TextToWaveServer>(
         nx::utils::file_system::applicationDirPath(argc, argv));
 

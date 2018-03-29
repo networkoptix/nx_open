@@ -21,14 +21,12 @@
 #include <network/authenticate_helper.h>
 
 int QnMergeLdapUsersRestHandler::executePost(
-    const QString &path,
-    const QnRequestParams &params,
-    const QByteArray &body,
-    QnJsonRestResult &result,
+    const QString& /*path*/,
+    const QnRequestParams &/*params*/,
+    const QByteArray& /*body*/,
+    QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
-    QN_UNUSED(path, params, body);
-
     QnLdapUsers ldapUsers;
     Qn::LdapResult ldapResult = qnAuthHelper->ldapManager()->fetchUsers(ldapUsers);
     if (ldapResult != Qn::Ldap_NoError)

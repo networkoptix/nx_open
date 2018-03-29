@@ -7,13 +7,12 @@
 #include <network/authenticate_helper.h>
 
 int QnTestLdapSettingsHandler::executePost(
-    const QString &path,
-    const QnRequestParams &params,
-    const QByteArray &body,
-    QnJsonRestResult &result,
+    const QString& /*path*/,
+    const QnRequestParams& /*params*/,
+    const QByteArray& body,
+    QnJsonRestResult& result,
     const QnRestConnectionProcessor*)
 {
-    QN_UNUSED(path, params);
 
     QnLdapSettings settings = QJson::deserialized(body, QnLdapSettings());
 

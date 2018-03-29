@@ -78,11 +78,6 @@
       <translation>これらのシステムは異なる %1 の URL で構築されています　統合は許可されていません</translation>
     </message>
     <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>クラウド システムへの統合はクラウドに接続されていないシステムとのみ結合できます　システム名とパスワードはクラウド システムから取得されます。</translation>
-    </message>
-    <message>
       <source>New System</source>
       <translation>新規システム</translation>
     </message>
@@ -90,6 +85,10 @@
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
       <translation>検出されたシステム%1は、現在のシステムと互換性がありません</translation>
+    </message>
+    <message>
+      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
+      <translation>クラウド システムへの統合はクラウドに接続されていないシステムとのみ結合できます　システム名とパスワードはクラウド システムから取得されます。</translation>
     </message>
   </context>
   <context>

@@ -394,7 +394,7 @@
     <message>
       <location/>
       <source>Area Width</source>
-      <translation>רוחב שטח</translation>
+      <translation>רוחב אזור</translation>
     </message>
     <message>
       <location/>
@@ -751,6 +751,21 @@
       <location/>
       <source>PTZ</source>
       <translation>מצלמה ממונעת</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Generate</source>
+      <translation type="unfinished">Generate</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset</source>
+      <translation>אפס</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Logical Id</source>
+      <translation type="unfinished">Logical Id</translation>
     </message>
   </context>
   <context>
@@ -1751,7 +1766,7 @@
     <message>
       <location/>
       <source>Password:</source>
-      <translation>סיסמה:</translation>
+      <translation>סיסמא:</translation>
     </message>
     <message>
       <location/>
@@ -1788,8 +1803,8 @@
     </message>
     <message>
       <location/>
-      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</translation>
+      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
     </message>
   </context>
   <context>
@@ -1974,7 +1989,7 @@
     <message>
       <location/>
       <source>Enter a valid username and password...</source>
-      <translation>הכנס שם משתמש וסיסמה תקינים...</translation>
+      <translation>הכנס שם משתמש וסיסמא תקינים...</translation>
     </message>
   </context>
   <context>
@@ -2041,7 +2056,7 @@
     <message>
       <location/>
       <source>The new System will have password and name from System:</source>
-      <translation>המערכת החדשה תקבל שם וסיסמה ממערכת:</translation>
+      <translation>המערכת החדשה תקבל שם וסיסמא ממערכת:</translation>
     </message>
   </context>
   <context>
@@ -2668,13 +2683,6 @@
       <source>Reset</source>
       <translation>אפס</translation>
     </message>
-    <message>
-      <location/>
-      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage.
-The oldest footage among all cameras on the server will be deleted first.</source>
-      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage.
-The oldest footage among all cameras on the server will be deleted first.</translation>
-    </message>
   </context>
   <context>
     <name>SmtpAdvancedSettingsWidget</name>
@@ -3030,14 +3038,18 @@ The oldest footage among all cameras on the server will be deleted first.</trans
     </message>
     <message>
       <location/>
-      <source>There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</source>
-      <translation>אין עדיין תפקידי משתמש מותאמים אישית. לחץ על &quot;תפקיד חדש&quot; כדי ליצור אחד.</translation>
+      <source>New role</source>
+      <translation>תפקיד חדש</translation>
     </message>
     <message>
       <location/>
-      <source>New role</source>
-      <translation>תפקיד חדש</translation>
+      <source>There are no custom user roles yet.</source>
+      <translation type="unfinished">There are no custom user roles yet.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Click &quot;New role&quot; button to create one.</source>
+      <translation type="unfinished">Click &quot;New role&quot; button to create one.</translation>
     </message>
   </context>
   <context>

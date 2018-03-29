@@ -356,6 +356,20 @@ Handle ServerConnection::searchCameraStop(
             callback, targetThread);
 }
 
+Handle ServerConnection::executeAnalyticsAction(
+    const AnalyticsAction& action,
+    Result<QnJsonRestResult>::type callback,
+    QThread* targetThread)
+{
+    return executePost(
+        lit("/api/executeAnalyticsAction"),
+        QnRequestParamList(),
+        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+        QJson::serialized(action),
+        callback,
+        targetThread);
+}
+
 Handle ServerConnection::addFileUpload(
     const QString& fileName,
     qint64 size,
@@ -381,12 +395,13 @@ Handle ServerConnection::addFileUpload(
 
 Handle ServerConnection::validateFileInformation(
     const QString& url,
+    int expectedSize,
     GetCallback callback,
     QThread* targetThread)
 {
     return executeGet(
         lit("/api/downloads/%1/validate").arg(url),
-        QnRequestParamList(),
+        QnRequestParamList{{lit("expected"), QString::number(expectedSize)}},
         callback,
         targetThread);
 }
@@ -441,7 +456,8 @@ Handle ServerConnection::downloadFileChunkFromInternet(
         lit("/api/downloads/%1/chunks/%2").arg(fileName).arg(chunkIndex),
         QnRequestParamList{
             {lit("url"), url.toString()},
-            {lit("chunkSize"), QString::number(chunkSize)}},
+            {lit("chunkSize"), QString::number(chunkSize)},
+            {lit("fromInternet"), lit("true")}},
         callback,
         targetThread);
 }
@@ -636,7 +652,6 @@ Handle ServerConnection::releaseWearableCameraLock(
         callback,
         targetThread);
 }
-
 
 Handle ServerConnection::consumeWearableCameraFile(
     const QnNetworkResourcePtr& camera,
@@ -941,9 +956,8 @@ Handle ServerConnection::executeRequest(
         QPointer<QThread> targetThreadGuard(targetThread);
         return sendRequest(request,
             [callback, targetThread, targetThreadGuard, serverId, timer]
-            (Handle id, SystemError::ErrorCode osErrorCode, int statusCode, nx::network::http::StringType contentType, nx::network::http::BufferType msgBody)
+            (Handle id, SystemError::ErrorCode osErrorCode, int statusCode, nx::network::http::StringType /*contentType*/, nx::network::http::BufferType msgBody)
             {
-                Q_UNUSED(contentType)
                 bool success = (osErrorCode == SystemError::noError
                     && statusCode >= nx::network::http::StatusCode::ok
                     && statusCode <= nx::network::http::StatusCode::partialContent);
@@ -1053,7 +1067,6 @@ nx::network::http::ClientPool::Request ServerConnection::prepareRequest(
         request.url.setHost(route.addr.address.toString());
         request.url.setPort(route.addr.port);
     }
-
 
     request.url.setUserName(user);
     request.url.setPassword(password);

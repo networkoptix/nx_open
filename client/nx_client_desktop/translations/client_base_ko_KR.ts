@@ -1010,7 +1010,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Settings are not available for .NOV and .EXE files.</source>
-      <translation type="unfinished">Settings are not available for .NOV and .EXE files.</translation>
+      <translation>.NOV 와 .EXE 파일에 대한 설정을 할 수 없습니다.</translation>
     </message>
   </context>
   <context>
@@ -2223,14 +2223,14 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>No settings</source>
-      <translation type="unfinished">No settings</translation>
+      <translation>설정 없음</translation>
     </message>
   </context>
   <context>
     <name>QnCameraAnalyticsPolicy</name>
     <message>
       <source>Analytics is not available for %1</source>
-      <translation>%1에 대하여 분석할 수 없습니다.</translation>
+      <translation>%1에 사용할 수 있는 분석은 없습니다.</translation>
     </message>
   </context>
   <context>
@@ -2333,7 +2333,13 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Edge</source>
-      <translation>엣지</translation>
+      <translation>Edge</translation>
+    </message>
+    <message numerus="yes">
+      <source>This Id is already used on the following %n cameras: %1</source>
+      <translation>
+        <numerusform>이 Id는 이미 %n 카메라에서 사용되었습니다: %1</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -2449,6 +2455,10 @@ to view more bookmarks</source>
       <source>Server</source>
       <translation>서버</translation>
     </message>
+    <message>
+      <source>Id</source>
+      <translation>Id</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraMotionMaskWidget</name>
@@ -2485,7 +2495,7 @@ to view more bookmarks</source>
     <name>QnCameraMotionPolicy</name>
     <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation type="unfinished">Recording or motion detection is disabled for %1</translation>
+      <translation>%1의 녹화와 움직임 검출이 비활성화됩니다.</translation>
     </message>
   </context>
   <context>
@@ -2507,10 +2517,6 @@ to view more bookmarks</source>
   <context>
     <name>QnCameraPasswordChangeDialog</name>
     <message>
-      <source>Password shouldn&apos;t be equal to camera&apos;s user name</source>
-      <translation>패스워드는 카메라의 사용자 이름과 같으면 안됩니다.</translation>
-    </message>
-    <message>
       <source>New Password</source>
       <translation>신규 사용자</translation>
     </message>
@@ -2526,12 +2532,16 @@ to view more bookmarks</source>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
       <translation>암호는 8 자 이상이어야하며 다른 유형의 문자를 포함해야합니다.</translation>
     </message>
+    <message>
+      <source>Password should not be equal to camera&apos;s user name</source>
+      <translation>암호는 카메라의 사용자&apos;이름이 같으면 안됩니다</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraRecordingPolicy</name>
     <message>
       <source>Recording is disabled for %1</source>
-      <translation type="unfinished">Recording is disabled for %1</translation>
+      <translation>%1의 저장이 비활성화 됩니다.</translation>
     </message>
   </context>
   <context>
@@ -2801,7 +2811,7 @@ to %1</source>
     </message>
     <message>
       <source>Account is not activated. Please check your email and follow provided instructions</source>
-      <translation type="unfinished">Account is not activated. Please check your email and follow provided instructions</translation>
+      <translation>계정이 활성화 되었 있지 않습니다. 이메일을 확인하고 제공된 지침을 따르십시오.</translation>
     </message>
   </context>
   <context>
@@ -3153,11 +3163,9 @@ to %1</source>
       <source>Ask your system administrator to do it.</source>
       <translation>시스템 관리자에게 요청하십시오.</translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>Set Password</source>
-      <translation>
-        <numerusform>비밀번호 설정</numerusform>
-      </translation>
+      <translation>암호 설정</translation>
     </message>
   </context>
   <context>
@@ -4522,7 +4530,7 @@ to %1</source>
     </message>
     <message>
       <source>Stop</source>
-      <translation>중지</translation>
+      <translation>정지</translation>
     </message>
   </context>
   <context>
@@ -4706,16 +4714,16 @@ to %1</source>
   <context>
     <name>QnPerformanceTest</name>
     <message>
-      <source>For full - featured mode, please use another computer</source>
-      <translation>전체 기능 사용을 위해 다른 컴퓨터를 이용 하시기 바랍니다</translation>
-    </message>
-    <message>
       <source>%1 can work in configuration mode only</source>
       <translation>%1 구성 모드 에서만 사용할 수 있습니다.</translation>
     </message>
     <message>
       <source>Performance of this computer allows running %1 in configuration mode only.</source>
       <translation>%1: 이 컴퓨터의 성능은 설정 모드만 실행 수 있습니다.</translation>
+    </message>
+    <message>
+      <source>For full-featured mode please use another computer</source>
+      <translation>전체 기능 사용을 위해 다른 컴퓨터를 이용 하시기 바랍니다</translation>
     </message>
   </context>
   <context>
@@ -5035,7 +5043,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation>%1 GB</translation>
+      <translation>%1GB</translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n devices</source>
@@ -5838,6 +5846,10 @@ to %1</source>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
       <translation>"모션 + 낮은-해상도" 녹화 옵션을 설정할 수 없습니다.</translation>
     </message>
+    <message>
+      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
+      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</translation>
+    </message>
   </context>
   <context>
     <name>QnSmtpAdvancedSettingsWidget</name>
@@ -5989,10 +6001,6 @@ to %1</source>
   <context>
     <name>QnStatusOverlayController</name>
     <message>
-      <source>NOT ENOUGH LICENCES</source>
-      <translation>라인센스 부족</translation>
-    </message>
-    <message>
       <source>NO DATA</source>
       <translation>데이터 없음</translation>
     </message>
@@ -6062,7 +6070,11 @@ to %1</source>
     </message>
     <message>
       <source>UNSUPPORTED FIRMWARE VERSION</source>
-      <translation type="unfinished">UNSUPPORTED FIRMWARE VERSION</translation>
+      <translation>지원되지 않는 펌웨어 버전</translation>
+    </message>
+    <message>
+      <source>NOT ENOUGH LICENSES</source>
+      <translation type="unfinished">NOT ENOUGH LICENSES</translation>
     </message>
   </context>
   <context>
@@ -7079,24 +7091,24 @@ to %1</source>
   <context>
     <name>QnWearableProgressWidget</name>
     <message>
-      <source>Uploading %1... %2	%p%</source>
-      <translation>업로드 중 %1... %2	%p%</translation>
-    </message>
-    <message>
       <source>Stop uploading?</source>
       <translation>전송을 중지 하겠습니까?</translation>
     </message>
     <message>
       <source>Already uploaded files will be kept.</source>
-      <translation type="unfinished">Already uploaded files will be kept.</translation>
-    </message>
-    <message>
-      <source>Finalizing %1... %2	%p%</source>
-      <translation type="unfinished">Finalizing %1... %2	%p%</translation>
+      <translation>이미 업로드 된 파일은 보관됩니다.</translation>
     </message>
     <message>
       <source>(%1 of %2)</source>
-      <translation type="unfinished">(%1 of %2)</translation>
+      <translation>(%2 의 %1)</translation>
+    </message>
+    <message>
+      <source>Uploading %1...</source>
+      <translation type="unfinished">Uploading %1...</translation>
+    </message>
+    <message>
+      <source>Finalizing %1...</source>
+      <translation type="unfinished">Finalizing %1...</translation>
     </message>
   </context>
   <context>
@@ -7198,6 +7210,10 @@ to %1</source>
     <message>
       <source>Could not connect to server. Video Wall will be closed.</source>
       <translation>서버에 연결할 수 없습니다. 비디오월이 닫힘니다.</translation>
+    </message>
+    <message>
+      <source>Video Wall is removed on the server and will be closed.</source>
+      <translation type="unfinished">Video Wall is removed on the server and will be closed.</translation>
     </message>
   </context>
   <context>
@@ -7491,19 +7507,15 @@ to %1</source>
     </message>
     <message>
       <source>Video (%1)</source>
-      <translation type="unfinished">Video (%1)</translation>
+      <translation>동영상 (%1)</translation>
     </message>
     <message>
       <source>Open Wearable Camera Recordings...</source>
-      <translation type="unfinished">Open Wearable Camera Recordings...</translation>
+      <translation>웨어러블 카메라 녹화 열기...</translation>
     </message>
     <message>
       <source>Only video files with correct timestamp are supported.</source>
-      <translation type="unfinished">Only video files with correct timestamp are supported.</translation>
-    </message>
-    <message>
-      <source>Not enough space on server storage</source>
-      <translation type="unfinished">Not enough space on server storage</translation>
+      <translation>올바른 타임 스탬프가있는 동영상만 지원됩니다.</translation>
     </message>
     <message>
       <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
@@ -7515,87 +7527,123 @@ to %1</source>
     </message>
     <message>
       <source>Failed to add wearable camera</source>
-      <translation type="unfinished">Failed to add wearable camera</translation>
+      <translation>웨어러블 카메라 추가 실패</translation>
     </message>
     <message>
       <source>No video files found in selected folder</source>
-      <translation type="unfinished">No video files found in selected folder</translation>
+      <translation>선택한 폴더에 비디오 파일을 찾을수 없습니다</translation>
     </message>
     <message numerus="yes">
       <source>Selected file formats are not supported</source>
-      <translation type="unfinished">
-        <numerusform>Selected file formats are not supported</numerusform>
+      <translation>
+        <numerusform>선택된 동영상 확장자는 지원하지 않습니다.</numerusform>
       </translation>
     </message>
     <message>
       <source>Use .MKV, .AVI, .MP4 or other video files.</source>
-      <translation type="unfinished">Use .MKV, .AVI, .MP4 or other video files.</translation>
+      <translation>.MKV, .AVI, .MP4 또는 다른 비디오 파일을 사용하세요.</translation>
     </message>
     <message numerus="yes">
       <source>Selected files do not have timestamps</source>
-      <translation type="unfinished">
-        <numerusform>Selected files do not have timestamps</numerusform>
+      <translation>
+        <numerusform>선택한 파일에 타임 스탬프가 없습니다.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos are already being uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+      <translation>
+        <numerusform>선택한 파일 커버는 동영상 이미 업로드 되는 기간입니다.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Wearable Camera.</source>
-      <translation type="unfinished">
-        <numerusform>You can upload these files to a different instance of a Wearable Camera.</numerusform>
+      <translation>
+        <numerusform>이 파일들을 착용 식 카메라의 다른 인스턴스에 업로드 할 수 있습니다.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos have already been uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+      <translation>
+        <numerusform>선택한 파일 커버는 동영상 이미 업로드 된 기간입니다.</numerusform>
       </translation>
     </message>
     <message>
       <source>Selected files will not be uploaded</source>
-      <translation type="unfinished">Selected files will not be uploaded</translation>
+      <translation>선택한 파일은 업로드되지 않습니다.</translation>
     </message>
     <message>
       <source>Some files will not be uploaded</source>
-      <translation type="unfinished">Some files will not be uploaded</translation>
+      <translation>일부 파일은 업로드 할수 없습니다.</translation>
     </message>
     <message>
       <source>No new files to upload in selected folder</source>
-      <translation type="unfinished">No new files to upload in selected folder</translation>
+      <translation>선택한 폴더의 업로드할 신규 파일이 없습니다</translation>
     </message>
     <message numerus="yes">
-      <source>Files size - %2</source>
-      <translation type="unfinished">
-        <numerusform>Files size - %2</numerusform>
+      <source>Selected files are too old</source>
+      <translation>
+        <numerusform>선택한 파일은 너무 오래되었습니다</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation>
+        <numerusform>선택된 %1파일은 저장되었지만, 최종 %n 일 내에 기록 된 파일 만 업로드 할 수 있습니다. 카메라 보관 설정에서 이를 변경할 수 있습니다.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation>
+        <numerusform>선택된 %1 과 %2 사이의 파일은 저장되었지만, 최종 %n 일 내에 기록 된 파일 만 업로드 할 수 있습니다. 카메라 보관 설정에서 이를 변경할 수 있습니다.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Some footage may be deleted after uploading these files</source>
+      <translation>
+        <numerusform>선택된 촬영영상은 전송후 삭제 될 수 있습니다.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
+      <translation>
+        <numerusform>서버 저장 영역에 여유 공간이 거의 없습니다. 일부 오래된 장면은 공간을 확보하기 위해 삭제 될 수 있습니다. 선택한 파일이 서버에서 가장 오래된 파일 일 경우 업로드 한 직후에 삭제됩니다.</numerusform>
       </translation>
     </message>
     <message>
-      <source>Free space - %2</source>
-      <translation type="unfinished">Free space - %2</translation>
+      <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
+      <translation>이를 방지하기 위해 추가 저장 공간을 추가 할 수 있습니다. 또한 카메라 설정에서 보관 유지 시간을 변경하여 먼저 삭제할 촬영영상를 제어 할 수 있습니다.</translation>
     </message>
     <message>
-      <source>%1 - has unsupported format.</source>
-      <translation type="unfinished">%1 - has unsupported format.</translation>
+      <source>Upload anyway?</source>
+      <translation>강제 업로드 하시겠습니까?</translation>
     </message>
     <message>
-      <source>%1 - does not have timestamp.</source>
-      <translation type="unfinished">%1 - does not have timestamp.</translation>
+      <source>Could not finish upload to %1</source>
+      <translation>%1에 업로드를 완료 할 수 없습니다.</translation>
     </message>
     <message>
-      <source>%1 - covers period for which video has already been uploaded.</source>
-      <translation type="unfinished">%1 - covers period for which video has already been uploaded.</translation>
+      <source>Make sure there is enough space on server storage.</source>
+      <translation>서버에 충분한 저장공간을 확보하세요.</translation>
     </message>
     <message>
-      <source>%1 - covers period for which video is being uploaded.</source>
-      <translation type="unfinished">%1 - covers period for which video is being uploaded.</translation>
+      <source>%1 has unsupported format.</source>
+      <translation>%1 은 지원하지 않는 형식입니다.</translation>
     </message>
     <message>
-      <source>%1 - does not fit on server storage.</source>
-      <translation type="unfinished">%1 - does not fit on server storage.</translation>
+      <source>%1 does not have timestamp.</source>
+      <translation>%1 은 타임스탬프가 없습니다.</translation>
+    </message>
+    <message>
+      <source>%1 is older than allowed in camera archive settings.</source>
+      <translation>%1 은 카메라 보관 설정에서 허용 된 것보다 오래되었습니다.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video has already been uploaded.</source>
+      <translation>%1 커버 기간은 동영상 이미 업로드 된 기간입니다.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video is being uploaded.</source>
+      <translation>%1 커버 기간은 동영상 이미 업로드 되는 기간입니다.</translation>
     </message>
   </context>
   <context>
@@ -7775,12 +7823,12 @@ to %1</source>
     </message>
     <message>
       <source>Stop</source>
-      <translation>중지</translation>
+      <translation>정지</translation>
     </message>
     <message numerus="yes">
       <source>Some video file(s) are still being uploaded to %n wearable cameras:</source>
-      <translation type="unfinished">
-        <numerusform>Some video file(s) are still being uploaded to %n wearable cameras:</numerusform>
+      <translation>
+        <numerusform>일부 동영상(들) 은 %n 웨어어블 카메라에 업로드되고 있습니다:</numerusform>
       </translation>
     </message>
   </context>
@@ -8032,7 +8080,7 @@ to %1</source>
     </message>
     <message>
       <source>Could not calculate md5 for file &quot;%1&quot;</source>
-      <translation> &quot;%1&quot; 파일에 대한 md5를 계산할 수 없습니다</translation>
+      <translation>&quot;%1&quot; 파일에 대한 md5를 계산할 수 없습니다</translation>
     </message>
     <message>
       <source>Could not create upload on the server side</source>
@@ -8055,7 +8103,7 @@ to %1</source>
     <name>nx::client::desktop::WearableWorker</name>
     <message>
       <source>Failed to send request to the server.</source>
-      <translation type="unfinished">Failed to send request to the server.</translation>
+      <translation>서버 응답 전송에 실패하였습니다.</translation>
     </message>
   </context>
   <context>
@@ -8090,7 +8138,7 @@ to %1</source>
     </message>
     <message>
       <source>Selected period cannot be exported for the current camera.</source>
-      <translation type="unfinished">Selected period cannot be exported for the current camera.</translation>
+      <translation>현재 카메라는 선택한 기간동안 영상을 추출 할수 없습니다.</translation>
     </message>
   </context>
   <context>
@@ -8538,7 +8586,7 @@ to %1</source>
     </message>
     <message>
       <source>Wearable Cameras cannot be moved between servers</source>
-      <translation type="unfinished">Wearable Cameras cannot be moved between servers</translation>
+      <translation>웨어러블 카메라는 서버간에 이동할 수 없습니다.</translation>
     </message>
     <message>
       <source>Failed to change password</source>

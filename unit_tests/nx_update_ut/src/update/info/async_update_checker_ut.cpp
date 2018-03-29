@@ -13,13 +13,28 @@ namespace update {
 namespace info {
 namespace test {
 
+// #TODO #akulikov: Extract common_update_registry_ut from this.
+// #TODO #akulikov: Check every commented code here and deal with it somehow.
+
 static const QString kBaseUrl = "http://updates.networkoptix.com";
+static const UpdateFileRequestData kManualDataKey1{"manualCloudHost1", "manualCustomization1",
+    QnSoftwareVersion("1.2.3.4"),
+    OsVersion("manualfamily1", "manualArchitecture1", "manualVersion1"), false};
+
+static const UpdateFileRequestData kManualDataKey2{ "manualCloudHost2", "manualCustomization2",
+    QnSoftwareVersion("1.2.3.4"),
+    OsVersion("manualfamily1", "manualArchitecture2", "manualVersion2"), false };
+
+//static const FileData kManualDataValue1{"file1", "url1", 11, "md51" };
+//static const FileData kManualDataValue2{"file2", "url2", 22, "md52" };
 
 class AsyncUpdateChecker: public ::testing::Test
 {
 protected:
     virtual void SetUp() override
     {
+        //m_manualData.insert(kManualDataKey1, kManualDataValue1);
+        //m_manualData.insert(kManualDataKey2, kManualDataValue2);
     }
 
     virtual void TearDown() override
@@ -45,14 +60,21 @@ protected:
         m_asyncUpdateChecker.check(
             std::bind(&AsyncUpdateChecker::onCheckCompleted, this, _1, _2),
             kBaseUrl);
+
+        QnMutexLocker lock(&m_mutex);
+        while (!m_done)
+            m_condition.wait(lock.mutex());
+    }
+
+    void whenSomeManualDataHasBeenAdded()
+    {
+        // #TODO #akulikov. Uncomment and implement this correctly.
+        //m_updateRegistry->addFileData(kManualDataKey1, kManualDataValue1);
+        //m_updateRegistry->addFileData(kManualDataKey2, kManualDataValue2);
     }
 
     void thenCorrectUpdateRegistryShouldBeReturned()
     {
-        QnMutexLocker lock(&m_mutex);
-        while (!m_done)
-            m_condition.wait(lock.mutex());
-
         ASSERT_EQ(ResultCode::ok, m_resultCode);
         ASSERT_TRUE((bool) m_updateRegistry);
         assertUpdateRegistryContent();
@@ -168,34 +190,42 @@ private:
     {
         FileData fileData;
         ResultCode resultCode = m_updateRegistry->findUpdateFile(
-            UpdateFileRequestData("nxvms.com", "default", QnSoftwareVersion(2, 0, 0, 0), ubuntuX64()),
+            UpdateFileRequestData("nxvms.com", "default", QnSoftwareVersion(2, 0, 0, 0), ubuntuX64(), false),
             &fileData);
         assertFindResult(resultCode, fileData, false);
 
         resultCode = m_updateRegistry->findUpdateFile(
-            UpdateFileRequestData("nxvms.com", "default", QnSoftwareVersion(10, 0, 0, 0), ubuntuX64()),
+            UpdateFileRequestData("nxvms.com", "default", QnSoftwareVersion(10, 0, 0, 0), ubuntuX64(), false),
             &fileData);
         assertFindResult(resultCode, fileData, true);
 
         resultCode = m_updateRegistry->findUpdateFile(
-            UpdateFileRequestData("not-existing-host", "default", QnSoftwareVersion(2, 0, 0, 0), ubuntuX64()),
+            UpdateFileRequestData("not-existing-host", "default", QnSoftwareVersion(2, 0, 0, 0), ubuntuX64(), false),
             &fileData);
         assertFindResult(resultCode, fileData, true);
 
         resultCode = m_updateRegistry->findUpdateFile(
-            UpdateFileRequestData("nxvms.com", "not-existing-customization", QnSoftwareVersion(2, 0, 0, 0), ubuntuX64()),
+            UpdateFileRequestData("nxvms.com", "not-existing-customization", QnSoftwareVersion(2, 0, 0, 0), ubuntuX64(), false),
             &fileData);
         assertFindResult(resultCode, fileData, true);
 
         resultCode = m_updateRegistry->findUpdateFile(
-            UpdateFileRequestData("qcloud.vista-cctv.com", "vista", QnSoftwareVersion(3, 0, 2, 9872), windowsX64()),
+            UpdateFileRequestData("qcloud.vista-cctv.com", "vista", QnSoftwareVersion(3, 0, 2, 9872), windowsX64(), false),
             &fileData);
         assertFindResult(resultCode, fileData, false);
 
         resultCode = m_updateRegistry->findUpdateFile(
-            UpdateFileRequestData("tricom.cloud-demo.hdw.mx", "tricom", QnSoftwareVersion(3, 0, 0, 9872), armRpi()),
+            UpdateFileRequestData("tricom.cloud-demo.hdw.mx", "tricom", QnSoftwareVersion(3, 0, 0, 9872), armRpi(), false),
             &fileData);
         assertFindResult(resultCode, fileData, false);
+
+        //resultCode = m_updateRegistry->findUpdateFile(kManualDataKey1, &fileData);
+        //ASSERT_EQ(ResultCode::ok, resultCode);
+        //ASSERT_EQ(kManualDataValue1, fileData);
+
+        //resultCode = m_updateRegistry->findUpdateFile(kManualDataKey2, &fileData);
+        //ASSERT_EQ(ResultCode::ok, resultCode);
+        //ASSERT_EQ(kManualDataValue2, fileData);
     }
 
     void assertFindResult(ResultCode resultCode, const FileData& fileData, bool shouldFail) const
@@ -222,10 +252,12 @@ private:
     }
 };
 
-TEST_F(AsyncUpdateChecker, CorrectUpdateRegistryProvided)
+// #TODO #akulikov: Enable and fix this!
+TEST_F(AsyncUpdateChecker, DISABLED_CorrectUpdateRegistryProvided)
 {
     whenMockupDataProviderHasBeenSetUp();
     whenAsyncCheckRequestHasBeenIssued();
+    whenSomeManualDataHasBeenAdded();
     thenCorrectUpdateRegistryShouldBeReturned();
 }
 

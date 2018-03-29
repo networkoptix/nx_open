@@ -17,6 +17,8 @@
 #include <core/resource/avi/avi_archive_delegate.h>
 #include <utils/common/util.h>
 
+#include <media/filters/h264_mp4_to_annexb.h>
+
 QnClientVideoCamera::QnClientVideoCamera(const QnMediaResourcePtr &resource, QnAbstractMediaStreamDataProvider* reader) :
     base_type(nullptr),
     m_resource(resource),
@@ -166,7 +168,11 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
             }
             archiveReader->setCycleMode(false);
             if (role == StreamRecorderRole::fileExport)
+            {
                 archiveReader->setQuality(MEDIA_Quality_ForceHigh, true); // for 'mkv' and 'avi' files
+                // Additing filtering is required in case of.AVI export.
+                 archiveReader->addMediaFilter(std::make_shared<H264Mp4ToAnnexB>());
+            }
 
             QnRtspClientArchiveDelegate* rtspClient = dynamic_cast<QnRtspClientArchiveDelegate*> (archiveReader->getArchiveDelegate());
             if (rtspClient) {
@@ -237,7 +243,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
     }
 
     m_exportRecorder->clearUnprocessedData();
-    m_exportRecorder->setEofDateTime(endTimeUs);
+    m_exportRecorder->setProgressBounds(startTimeUs, endTimeUs);
 
     if (storage)
         m_exportRecorder->addRecordingContext(

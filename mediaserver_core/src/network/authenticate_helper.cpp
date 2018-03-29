@@ -216,7 +216,17 @@ Qn::AuthResult QnAuthHelper::authenticate(
         NX_VERBOSE(this, lm("Authenticating %1 with HTTP authentication")
             .arg(request.requestLine));
 
-        return httpAuthenticate(request, response, isProxy, accessRights, usedAuthMethod);
+        result = httpAuthenticate(request, response, isProxy, accessRights, usedAuthMethod);
+        if (result == Qn::Auth_OK)
+        {
+            NX_VERBOSE(this, lm("Authenticated %1 with HTTP authentication").args(request.requestLine.url));
+            return result;
+        }
+        else
+        {
+            NX_VERBOSE(this, lm("Failed to authenticate %1 with HTTP authentication: %2")
+                .args(request.requestLine.url, result));
+        }
     }
 
     NX_VERBOSE(this, lm("Failed to authenticate %1 with any method").arg(request.requestLine.url));

@@ -247,7 +247,7 @@ void QnResourceTreeModelOtherSystemsNode::rebuild()
     }
 }
 
-void QnResourceTreeModelOtherSystemsNode::removeNode(const QnResourceTreeModelNodePtr& node)
+void QnResourceTreeModelOtherSystemsNode::removeNode(QnResourceTreeModelNodePtr node)
 {
     if (!node)
         return;

@@ -571,7 +571,7 @@ QnRecordingStatsReply QnStorageAnalyticsWidget::getForecastData(qint64 extraSize
         QnSecurityCamResourcePtr camRes = resourcePool()->getResourceByUniqueId<QnSecurityCamResource>(cameraStats.uniqueId);
         if (camRes)
         {
-            cameraForecast.expand = !camRes->isScheduleDisabled();
+            cameraForecast.expand = camRes->isLicenseUsed();
             cameraForecast.expand &= (camRes->getStatus() == Qn::Online || camRes->getStatus() == Qn::Recording);
             cameraForecast.expand &= cameraStats.archiveDurationSecs > 0 && cameraStats.recordedBytes > 0;
             cameraForecast.minDays = qMax(0, camRes->minDays());

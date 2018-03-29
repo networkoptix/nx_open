@@ -191,7 +191,7 @@ void CameraAdvancedSettingsWidget::updateUrls()
             ? m_camera->sourceUrl(Qn::CR_LiveVideo)
             : tr("I/O module has no audio stream"));
 
-        bool hasSecondaryStream = m_camera->hasDualStreaming2();
+        bool hasSecondaryStream = m_camera->hasDualStreaming();
         ui->secondaryStreamUrlInputField->setEnabled(hasSecondaryStream);
         ui->secondaryStreamUrlInputField->setText(hasSecondaryStream
             ? m_camera->sourceUrl(Qn::CR_SecondaryLiveVideo)

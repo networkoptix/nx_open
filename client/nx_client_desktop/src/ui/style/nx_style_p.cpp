@@ -13,6 +13,7 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <nx/utils/math/fuzzy.h>
 #include <nx/client/core/utils/geometry.h>
+#include <nx/client/desktop/utils/widget_utils.h>
 
 using namespace style;
 using nx::client::core::Geometry;
@@ -60,37 +61,6 @@ QnNxStylePrivate::QnNxStylePrivate() :
 
 QnNxStylePrivate::~QnNxStylePrivate()
 {
-}
-
-/* Workaround while Qt's QWidget::mapFromGlobal is broken: */
-
-QPoint QnNxStylePrivate::mapFromGlobal(const QWidget* to, const QPoint& globalPos)
-{
-    if (auto proxied = QnNxStylePrivate::graphicsProxiedWidget(to))
-    {
-        return to->mapFrom(proxied, mapFromGlobal(
-            proxied->graphicsProxyWidget(), globalPos));
-    }
-
-    return to->mapFromGlobal(globalPos);
-}
-
-QPoint QnNxStylePrivate::mapFromGlobal(const QGraphicsWidget* to, const QPoint& globalPos)
-{
-    static const QPoint kInvalidPos(
-        std::numeric_limits<int>::max(),
-        std::numeric_limits<int>::max());
-
-    auto scene = to->scene();
-    if (!scene)
-        return kInvalidPos;
-
-    auto views = scene->views();
-    if (views.empty())
-        return kInvalidPos;
-
-    auto viewPos = mapFromGlobal(views[0], globalPos);
-    return to->mapFromScene(views[0]->mapToScene(viewPos)).toPoint();
 }
 
 QnPaletteColor QnNxStylePrivate::findColor(const QColor &color) const
@@ -711,22 +681,6 @@ bool QnNxStylePrivate::polishInputDialog(QInputDialog* inputDialog) const
     return true;
 }
 
-const QWidget* QnNxStylePrivate::graphicsProxiedWidget(const QWidget* widget)
-{
-    while (widget && !widget->graphicsProxyWidget())
-        widget = widget->parentWidget();
-
-    return widget;
-}
-
-QGraphicsProxyWidget* QnNxStylePrivate::graphicsProxyWidget(const QWidget* widget)
-{
-    if (auto proxied = graphicsProxiedWidget(widget))
-        return proxied->graphicsProxyWidget();
-
-    return nullptr;
-}
-
 void QnNxStylePrivate::updateScrollAreaHover(QScrollBar* scrollBar) const
 {
     QAbstractScrollArea* area = nullptr;
@@ -741,7 +695,7 @@ void QnNxStylePrivate::updateScrollAreaHover(QScrollBar* scrollBar) const
         return;
 
     const auto globalPos = QCursor::pos(); //< relative to the primary screen
-    const auto localPos = mapFromGlobal(viewport, globalPos);
+    const auto localPos = nx::client::desktop::WidgetUtils::mapFromGlobal(viewport, globalPos);
 
     QHoverEvent hoverMove(
         QEvent::HoverMove,

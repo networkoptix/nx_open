@@ -1,4 +1,10 @@
-set(depends desktop_client)
+set(depends
+    desktop_client
+    mediaserver
+    root_tool
+    server_plugins
+    testcamera
+)
 
 # Files copied to .deb by build-dist.sh.
 

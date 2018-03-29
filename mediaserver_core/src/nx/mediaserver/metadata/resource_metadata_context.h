@@ -36,6 +36,7 @@ struct ManagerContext final
 {
     HandlerPtr handler;
     ManagerPtr manager;
+    bool isStreamConsumer = false;
     nx::api::AnalyticsDriverManifest manifest;
     ManagerContext() = default;
     ManagerContext(ManagerContext&& other) = default;

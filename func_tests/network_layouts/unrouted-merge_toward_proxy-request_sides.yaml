@@ -2,14 +2,14 @@ mergers:
   proxy:
     first:
       settings: remote
-      network: 10.254.254.0/28
+      network: 10.254.0.0/28
     second:
       settings: remote
-      network: 10.254.254.16/28
+      network: 10.254.0.16/28
 networks:
-  10.254.254.0/28:
+  10.254.0.0/28:
     first:
     proxy:
-  10.254.254.16/28:
+  10.254.0.16/28:
     proxy:
     second:

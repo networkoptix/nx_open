@@ -17,8 +17,6 @@ extern "C"
 #include "vmax480_resource.h"
 #include "utils/common/util.h"
 
-
-
 static const QByteArray GROUP_ID("{347E1C92-4627-405d-99B3-5C7EF78B0055}");
 
 // ----------------------------------- QnVMax480LiveProvider -----------------------
@@ -55,7 +53,7 @@ QnAbstractMediaDataPtr QnVMax480LiveProvider::getNextData()
     if (!result)
         closeStream();
 
-    if (!m_needStop) 
+    if (!m_needStop)
     {
         QnAbstractMediaDataPtr media = std::dynamic_pointer_cast<QnAbstractMediaData>(result);
         if (media && (media->dataType != QnAbstractMediaData::EMPTY_DATA)) {
@@ -76,11 +74,9 @@ bool QnVMax480LiveProvider::canChangeStatus() const
     return false; // do not allow to ancessor update status
 }
 
-
-CameraDiagnostics::Result QnVMax480LiveProvider::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params)
+CameraDiagnostics::Result QnVMax480LiveProvider::openStreamInternal(
+    bool /*isCameraControlRequired*/, const QnLiveStreamParams& /*params*/)
 {
-    Q_UNUSED(isCameraControlRequired);
-    Q_UNUSED(params)
     if (m_opened)
         return CameraDiagnostics::NoErrorResult();
 
@@ -88,10 +84,9 @@ CameraDiagnostics::Result QnVMax480LiveProvider::openStreamInternal(bool isCamer
     if (channel > 0)
         channel--;
 
-
     if (m_maxStream == 0)
         m_maxStream = VMaxStreamFetcher::getInstance(GROUP_ID, m_resource.data(), true);
-    m_opened = m_maxStream->registerConsumer(this); 
+    m_opened = m_maxStream->registerConsumer(this);
     m_lastMediaTimer.restart();
 
     return CameraDiagnostics::NoErrorResult();

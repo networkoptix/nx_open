@@ -77,14 +77,12 @@ struct SendTransactionToTransportFuction
 
 struct SendTransactionToTransportFastFuction
 {
-    bool operator()(QnTransactionMessageBus *bus, Qn::SerializationFormat srcFormat, const QByteArray& serializedTran, QnTransactionTransport *sender,
+    bool operator()(QnTransactionMessageBus* /*bus*/, Qn::SerializationFormat srcFormat, const QByteArray& serializedTran, QnTransactionTransport *sender,
         const QnTransactionTransportHeader &transportHeader) const
     {
-        Q_UNUSED(bus)
         return sender->sendSerializedTransaction(srcFormat, serializedTran, transportHeader);
     }
 };
-
 
 // --------------------------------- QnTransactionMessageBus ------------------------------
 
@@ -171,7 +169,6 @@ void QnTransactionMessageBus::removeTTSequenceForPeer(const QnUuid& id)
     while (itr != m_lastTransportSeq.end() && itr.key().id == id)
         itr = m_lastTransportSeq.erase(itr);
 }
-
 
 void QnTransactionMessageBus::removeAlivePeer(const QnUuid& id, bool sendTran, bool isRecursive)
 {
@@ -443,9 +440,7 @@ void QnTransactionMessageBus::at_gotTransaction(
     sender->transactionProcessed();
 }
 
-
 // ------------------ QnTransactionMessageBus::CustomHandler -------------------
-
 
 void QnTransactionMessageBus::onGotDistributedMutexTransaction(const QnTransaction<ApiLockData>& tran)
 {
@@ -455,16 +450,14 @@ void QnTransactionMessageBus::onGotDistributedMutexTransaction(const QnTransacti
         emit gotLockResponse(tran.params);
 }
 
-void QnTransactionMessageBus::onGotTransactionSyncResponse(QnTransactionTransport* sender, const QnTransaction<QnTranStateResponse> &tran)
+void QnTransactionMessageBus::onGotTransactionSyncResponse(QnTransactionTransport* sender, const QnTransaction<QnTranStateResponse>& /*tran*/)
 {
-    Q_UNUSED(tran)
-        sender->setReadSync(true);
+    sender->setReadSync(true);
 }
 
-void QnTransactionMessageBus::onGotTransactionSyncDone(QnTransactionTransport* sender, const QnTransaction<ApiTranSyncDoneData> &tran)
+void QnTransactionMessageBus::onGotTransactionSyncDone(QnTransactionTransport* sender, const QnTransaction<ApiTranSyncDoneData>& /*tran*/)
 {
-    Q_UNUSED(tran)
-        sender->setSyncDone(true);
+    sender->setSyncDone(true);
     sender->setSyncInProgress(false);
     // propagate new data to other peers. Aka send current state, other peers should request update if need
     handlePeerAliveChanged(localPeer(), true, true);
@@ -1570,7 +1563,6 @@ QVector<QnTransportConnectionInfo> QnTransactionMessageBus::connectionsInfo() co
         info.remotePeerId = transport->remotePeer().id;
         connections.append(info);
     };
-
 
     QnMutexLocker lock(&m_mutex);
 

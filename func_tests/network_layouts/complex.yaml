@@ -29,6 +29,3 @@ networks:
       10.254.6.0/24:
         c:
         h51:
-default_gateways:  # Where to route traffic with unknown destination.
-  c: h22  # Mandatory for *c*: disambiguate where to direct unknown traffic.
-  a:  # None: no default route at all -- prohibit unknown traffic.

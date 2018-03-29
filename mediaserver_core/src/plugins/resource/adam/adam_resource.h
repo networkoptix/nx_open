@@ -43,10 +43,11 @@ public:
         unsigned int autoResetTimeoutMS ) override;
 
 public slots:
-    void at_propertyChanged(const QnResourcePtr & res, const QString & key);
+    void at_propertyChanged(const QnResourcePtr& res, const QString& key);
 
 protected:
-    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex) override;
+    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
+        Qn::StreamIndex streamIndex) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override { return nullptr; }
@@ -72,7 +73,6 @@ private:
     std::map<quint64, PortTimerEntry> m_autoResetTimers;
     std::map<QString, Qn::IOPortType> m_portTypes;
     mutable QnMutex m_mutex;
-
 
 };
 

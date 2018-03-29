@@ -35,7 +35,7 @@ namespace ec2
         ApiCameraDataList& dst);
 
     void fromResourceToApi(const QnScheduleTask& src, ApiScheduleTaskData& dst);
-    void fromApiToResource(const ApiScheduleTaskData& src, QnScheduleTask& dst, const QnUuid& resourceId);
+    void fromApiToResource(const ApiScheduleTaskData& src, QnScheduleTask& dst);
 
     void fromApiToResource(const ApiCameraAttributesData& src, const QnCameraUserAttributesPtr& dst);
     void fromResourceToApi(const QnCameraUserAttributesPtr& src, ApiCameraAttributesData& dst);

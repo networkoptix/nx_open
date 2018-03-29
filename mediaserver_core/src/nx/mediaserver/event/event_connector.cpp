@@ -280,7 +280,7 @@ void EventConnector::at_remoteArchiveSyncStarted(const QnResourcePtr& resource)
     qnEventRuleProcessor->broadcastAction(action);
 }
 
-void EventConnector::at_remoteArchiveSyncFinished(const QnResourcePtr &resource)
+void EventConnector::at_remoteArchiveSyncFinished(const QnResourcePtr& resource)
 {
     const auto secRes = resource.dynamicCast<QnSecurityCamResource>();
     NX_ASSERT(secRes, lit("Resource is not a descendant of QnSecurityCamResource"));
@@ -324,7 +324,7 @@ void EventConnector::at_remoteArchiveSyncError(
 }
 
 void EventConnector::at_remoteArchiveSyncProgress(
-    const QnResourcePtr &resource,
+    const QnResourcePtr& resource,
     double progress)
 {
     NX_ASSERT(progress >= 0 && progress <= 1);

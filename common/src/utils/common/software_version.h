@@ -93,4 +93,6 @@ private:
     std::array<int, 4> m_data;
 };
 
+uint qHash(const QnSoftwareVersion& softwareVersion);
+
 Q_DECLARE_METATYPE(QnSoftwareVersion)

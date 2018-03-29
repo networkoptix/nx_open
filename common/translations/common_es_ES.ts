@@ -78,11 +78,6 @@
       <translation>Estos sistemas se construyen con diferentes %1 URL. No se permite la unión.</translation>
     </message>
     <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>El Sistema de la nube sólo puede ser combinado con la no nube. El nombre del sistema y la contraseña son tomados del Sistema de la Nube.</translation>
-    </message>
-    <message>
       <source>New System</source>
       <translation>Nuevo Sistema</translation>
     </message>
@@ -90,6 +85,10 @@
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
       <translation>El Sistema descubierto %1 es incompatible con el Sistema actual.</translation>
+    </message>
+    <message>
+      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
+      <translation>El Sistema de la nube sólo puede ser combinado con la no nube. El nombre del sistema y la contraseña son tomados del Sistema de la Nube.</translation>
     </message>
   </context>
   <context>
@@ -317,7 +316,7 @@
     </message>
     <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
-      <translation type="unfinished">Please update firmware. Minimal supported version is %1. Current version is %2</translation>
+      <translation>Por favor actualice el firmware. La versión mínima admitida es %1. La versión actual es %2</translation>
     </message>
   </context>
   <context>
@@ -563,7 +562,7 @@
     </message>
     <message>
       <source>Server with matching Hardware Id not found</source>
-      <translation>Servidor correspondiente al hardware Id no encontrado</translation>
+      <translation>Servidor correspondiente al Hardware Id no encontrado</translation>
     </message>
   </context>
   <context>

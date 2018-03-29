@@ -7,6 +7,7 @@
 
 class QnCommonModule;
 
+// TODO: Rename with suffix "RestHandler".
 class QnMultiserverAnalyticsLookupDetectedObjects:
     public QnRestRequestHandler
 {

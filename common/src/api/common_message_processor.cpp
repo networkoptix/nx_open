@@ -81,10 +81,14 @@ void QnCommonMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
     connection->startReceivingNotifications();
 }
 
-
 ec2::AbstractECConnectionPtr QnCommonMessageProcessor::connection() const
 {
     return m_connection;
+}
+
+Qt::ConnectionType QnCommonMessageProcessor::handlerConnectionType() const
+{
+    return Qt::DirectConnection;
 }
 
 void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnectionPtr &connection)
@@ -105,12 +109,24 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     connect(connection, &ec2::AbstractECConnection::initNotification,               this, &QnCommonMessageProcessor::on_gotInitialNotification);
     connect(connection, &ec2::AbstractECConnection::runtimeInfoChanged,             this, &QnCommonMessageProcessor::runtimeInfoChanged);
 
-    auto resourceManager = connection->getResourceNotificationManager();
-    connect(resourceManager, &ec2::AbstractResourceNotificationManager::statusChanged,          this, &QnCommonMessageProcessor::on_resourceStatusChanged, Qt::DirectConnection);
-    connect(resourceManager, &ec2::AbstractResourceNotificationManager::resourceParamChanged,   this, &QnCommonMessageProcessor::on_resourceParamChanged, Qt::DirectConnection);
-    connect(resourceManager, &ec2::AbstractResourceNotificationManager::resourceParamRemoved,   this, &QnCommonMessageProcessor::on_resourceParamRemoved, Qt::DirectConnection);
-    connect(resourceManager, &ec2::AbstractResourceNotificationManager::resourceRemoved,        this, &QnCommonMessageProcessor::on_resourceRemoved, Qt::DirectConnection);
-    connect(resourceManager, &ec2::AbstractResourceNotificationManager::resourceStatusRemoved,  this, &QnCommonMessageProcessor::on_resourceStatusRemoved, Qt::DirectConnection);
+    const auto connectionType = handlerConnectionType();
+
+    const auto resourceManager = connection->getResourceNotificationManager();
+    connect(resourceManager, &ec2::AbstractResourceNotificationManager::statusChanged,
+        this, &QnCommonMessageProcessor::on_resourceStatusChanged,
+        connectionType);
+    connect(resourceManager, &ec2::AbstractResourceNotificationManager::resourceParamChanged,
+        this, &QnCommonMessageProcessor::on_resourceParamChanged,
+        connectionType);
+    connect(resourceManager, &ec2::AbstractResourceNotificationManager::resourceParamRemoved,
+        this, &QnCommonMessageProcessor::on_resourceParamRemoved,
+        connectionType);
+    connect(resourceManager, &ec2::AbstractResourceNotificationManager::resourceRemoved,
+        this, &QnCommonMessageProcessor::on_resourceRemoved,
+        connectionType);
+    connect(resourceManager, &ec2::AbstractResourceNotificationManager::resourceStatusRemoved,
+        this, &QnCommonMessageProcessor::on_resourceStatusRemoved,
+        connectionType);
 
     auto mediaServerManager = connection->getMediaServerNotificationManager();
     connect(mediaServerManager, &ec2::AbstractMediaServerNotificationManager::addedOrUpdated,   this, on_resourceUpdated(ec2::ApiMediaServerData), Qt::DirectConnection);
@@ -296,11 +312,7 @@ void QnCommonMessageProcessor::on_resourceParamChanged(const ec2::ApiResourcePar
 
 void QnCommonMessageProcessor::on_resourceParamRemoved(const ec2::ApiResourceParamWithRefData& param )
 {
-    QnResourcePtr resource = resourcePool()->getResourceById(param.resourceId);
-    if (resource)
-        resource->removeProperty(param.name);
-    else
-        propertyDictionary()->removeProperty(param.resourceId, param.name);
+    propertyDictionary()->on_resourceParamRemoved(param.resourceId, param.name);
 }
 
 void QnCommonMessageProcessor::on_resourceRemoved( const QnUuid& resourceId )
@@ -519,7 +531,6 @@ void QnCommonMessageProcessor::resetResources(const ec2::ApiFullInfoData& fullDa
     };
     */
 
-
     /* Packet adding. */
     resourcePool()->beginTran();
 
@@ -558,10 +569,9 @@ void QnCommonMessageProcessor::resetTime()
         return;
 
     auto timeManager = m_connection->getTimeManager(Qn::kSystemAccess);
-    timeManager->getCurrentTime(this, [this](int handle, ec2::ErrorCode errCode, qint64 syncTime)
+    timeManager->getCurrentTime(this, [this](int /*handle*/, ec2::ErrorCode errCode, qint64 syncTime)
     {
         const auto& runtimeManager = runtimeInfoManager();
-        Q_UNUSED(handle);
         if (errCode != ec2::ErrorCode::ok || !m_connection)
             return;
 

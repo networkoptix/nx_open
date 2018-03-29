@@ -20,6 +20,7 @@
 #include <common/common_module_aware.h>
 #include <api/model/time_reply.h>
 #include <analytics/detected_objects_storage/analytics_events_storage.h>
+#include <api/model/analytics_actions.h>
 #include <api/model/wearable_prepare_data.h>
 #include <api/model/manual_camera_seach_reply.h>
 
@@ -183,6 +184,7 @@ public:
 
     Handle validateFileInformation(
         const QString& url,
+        int expectedSize,
         GetCallback callback,
         QThread* targetThread = nullptr);
 
@@ -348,6 +350,11 @@ public:
     Handle searchCameraStop(
         const QnUuid& processUuid,
         GetCallback callback,
+        QThread* targetThread = nullptr);
+
+    Handle executeAnalyticsAction(
+        const AnalyticsAction& action,
+        Result<QnJsonRestResult>::type callback,
         QThread* targetThread = nullptr);
 
     /**

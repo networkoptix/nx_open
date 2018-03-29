@@ -417,7 +417,7 @@ const QList<nxcip::Resolution>& QnThirdPartyResource::getEncoderResolutionList(Q
 }
 
 
-bool QnThirdPartyResource::hasDualStreaming() const
+bool QnThirdPartyResource::hasDualStreamingInternal() const
 {
     return m_encoderCount > 1;
 }

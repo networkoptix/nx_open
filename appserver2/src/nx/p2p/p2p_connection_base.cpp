@@ -313,7 +313,7 @@ void ConnectionBase::sendMessage(const nx::Buffer& data)
 {
     NX_ASSERT(!data.isEmpty());
 
-    if (nx::utils::log::isToBeLogged(cl_logDEBUG1, this))
+    if (nx::utils::log::isToBeLogged(cl_logDEBUG2, this))
     {
         auto localPeerName = qnStaticCommon->moduleDisplayName(localPeer().id);
         auto remotePeerName = qnStaticCommon->moduleDisplayName(remotePeer().id);
@@ -322,7 +322,7 @@ void ConnectionBase::sendMessage(const nx::Buffer& data)
         if (messageType != MessageType::pushTransactionData &&
             messageType != MessageType::pushTransactionList)
         {
-            NX_DEBUG(
+            NX_VERBOSE(
                 this,
                 lit("Send message: %1 ---> %2. Type: %3. Size=%4")
                 .arg(localPeerName)

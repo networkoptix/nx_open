@@ -24,10 +24,8 @@ set(sdk_src_nx_kit_origin ${CMAKE_SOURCE_DIR}/open/artifacts/nx_kit)
 file(GLOB_RECURSE sdk_src_nx_kit_files ${sdk_src_nx_kit_origin}/*)
 
 # Collect source files for Plugin SDK.
-set(sdk_src_nx_sdk ${CMAKE_SOURCE_DIR}/common_libs/nx_sdk/src)
-file(GLOB_RECURSE sdk_src_common_files
-    ${sdk_src_nx_sdk}/*
-)
+set(sdk_src_nx_sdk_origin ${CMAKE_SOURCE_DIR}/common_libs/nx_sdk/src)
+file(GLOB_RECURSE sdk_src_nx_sdk_files ${sdk_src_nx_sdk_origin}/*)
 
 # Collect source files for the sample - Stub Metadata Plugin.
 set(sdk_src_sample_origin ${CMAKE_SOURCE_DIR}/plugins/metadata/stub_metadata_plugin/src)
@@ -52,7 +50,10 @@ add_custom_command(OUTPUT ${zip_file}
     COMMAND ${CMAKE_COMMAND} -P ${create_sdk_script} #< Create and populate sdk directory.
     COMMAND ${CMAKE_COMMAND} -E echo
         "Building SDK samples - see ${sample_build_log}"
-    COMMAND ${CMAKE_COMMAND} -E chdir ${sdk_dir} ${sample_build_script} >${sample_build_log} 2>&1
+    COMMAND ${CMAKE_COMMAND} -E chdir ${sdk_dir} ${sample_build_script}
+        -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
+        -DPACKAGES_DIR=${PACKAGES_DIR}
+        >${sample_build_log} 2>&1
     COMMAND ${CMAKE_COMMAND} -E echo
         "Running Doxygen - see ${doxygen_log}"
     COMMAND ${CMAKE_COMMAND} -E chdir ${sdk_dir} ${doxygen_executable} >${doxygen_log} 2>&1
@@ -65,7 +66,7 @@ add_custom_command(OUTPUT ${zip_file}
         ${CMAKE_CURRENT_SOURCE_DIR}/${sdk_name}/${sample_build_script}
         ${sdk_src_static_files}
         ${sdk_src_nx_kit_files}
-        ${sdk_src_common_files}
+        ${sdk_src_nx_sdk_files}
         ${sdk_src_sample_files}
 )
 

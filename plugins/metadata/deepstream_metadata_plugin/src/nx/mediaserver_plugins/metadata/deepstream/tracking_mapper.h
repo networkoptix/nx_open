@@ -2,6 +2,7 @@
 
 #include <map>
 #include <vector>
+#include <deque>
 
 extern "C" {
 
@@ -49,7 +50,7 @@ struct TrackedObject
     nxpl::NX_GUID guid;
     int lifetime;
     bool found;
-    std::vector<nx::sdk::metadata::CommonAttribute> attributes;
+    std::deque<nx::sdk::metadata::CommonAttribute> attributes;
 };
 
 class TrackingMapper
@@ -61,7 +62,7 @@ public:
     void addMapping(int nvidiaTrackingId, const nxpl::NX_GUID& nxObjectId);
 
     void setLabelMapping(std::map<LabelMappingId, LabelMapping> labelMapping);
-    std::vector<nx::sdk::metadata::CommonAttribute> attributes(const ROIMeta_Params& roiMeta);
+    std::deque<nx::sdk::metadata::CommonAttribute> attributes(const ROIMeta_Params& roiMeta);
 
     void notifyFrameProcessed();
 

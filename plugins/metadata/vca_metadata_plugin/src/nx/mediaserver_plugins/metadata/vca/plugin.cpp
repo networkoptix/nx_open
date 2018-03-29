@@ -115,10 +115,15 @@ const AnalyticsEventType* Plugin::eventByUuid(const QnUuid& uuid) const noexcept
         m_typedManifest.outputEventTypes.cend(),
         [&uuid](const AnalyticsEventType& event)
         {
-            return event.eventTypeId == uuid;
+            return event.typeId == uuid;
         });
 
     return (it != m_typedManifest.outputEventTypes.cend()) ? &(*it) : nullptr;
+}
+
+void Plugin::executeAction(Action* /*action*/, Error* /*outError*/)
+{
+    // Do nothing.
 }
 
 } // namespace vca

@@ -14,10 +14,8 @@
 
 Q_GLOBAL_STATIC(QnEnumLexicalSerializer<int>, qn_abstractConnection_emptySerializer);
 
-void QnAbstractReplyProcessor::processReply(const QnHTTPRawResponse &response, int handle)
+void QnAbstractReplyProcessor::processReply(const QnHTTPRawResponse& /*response*/, int /*handle*/)
 {
-    Q_UNUSED(response);
-    Q_UNUSED(handle);
 }
 
 bool QnAbstractReplyProcessor::connect(const char *signal, QObject *receiver, const char *method, Qt::ConnectionType type)
@@ -220,4 +218,3 @@ bool QnAbstractConnection::isReady() const
 {
     return true;
 }
-

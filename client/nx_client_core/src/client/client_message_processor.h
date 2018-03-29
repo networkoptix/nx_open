@@ -22,6 +22,8 @@ public:
     void setHoldConnection(bool holdConnection);
 
 protected:
+    virtual Qt::ConnectionType handlerConnectionType() const override;
+
     virtual void connectToConnection(const ec2::AbstractECConnectionPtr &connection) override;
     virtual void disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection) override;
 

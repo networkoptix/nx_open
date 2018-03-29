@@ -850,19 +850,19 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>Wearable Camera...</source>
-      <translation type="unfinished">Wearable Camera...</translation>
+      <translation>Caméra portable ...</translation>
     </message>
     <message>
       <source>New Wearable Camera...</source>
-      <translation type="unfinished">New Wearable Camera...</translation>
+      <translation>Nouvelle caméra portable ...</translation>
     </message>
     <message>
       <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
+      <translation>Envoyer Fichier...</translation>
     </message>
     <message>
       <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
+      <translation>Envoyer Dossier...</translation>
     </message>
     <message>
       <source>Start Analytics...</source>
@@ -980,7 +980,7 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
-      <translation>ID matériel du Server avec cette licence ne correspond pas à l'ID matériel sur lequel la licence a été activée.</translation>
+      <translation>Id Matériel du Server avec cette licence ne correspond pas à l'Id Matériel sur lequel la licence a été activée.</translation>
     </message>
   </context>
   <context>
@@ -1011,7 +1011,7 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>Settings are not available for .NOV and .EXE files.</source>
-      <translation type="unfinished">Settings are not available for .NOV and .EXE files.</translation>
+      <translation>Paramètres non disponibles pour les fichiers .EXE et .NOV</translation>
     </message>
   </context>
   <context>
@@ -1022,11 +1022,11 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>Matroska</source>
-      <translation type="unfinished">Matroska</translation>
+      <translation>Matroska</translation>
     </message>
     <message>
       <source>MPEG-4 Part 14</source>
-      <translation type="unfinished">MPEG-4 Part 14</translation>
+      <translation>MPEG-4 Part 14</translation>
     </message>
     <message>
       <source>%1 Media File</source>
@@ -1188,7 +1188,7 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>Long</source>
-      <translation type="unfinished">Long</translation>
+      <translation>Long</translation>
     </message>
     <message numerus="yes">
       <source>Password must be no longer than %n characters.</source>
@@ -2230,11 +2230,11 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>I/O Module Id</source>
-      <translation>ID Modules I/O</translation>
+      <translation>Id Modules I/O</translation>
     </message>
     <message>
       <source>Camera Id</source>
-      <translation>ID Caméra</translation>
+      <translation>Id Caméra</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -2246,14 +2246,14 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>No settings</source>
-      <translation type="unfinished">No settings</translation>
+      <translation>Aucun paramètre</translation>
     </message>
   </context>
   <context>
     <name>QnCameraAnalyticsPolicy</name>
     <message>
       <source>Analytics is not available for %1</source>
-      <translation type="unfinished">Analytics is not available for %1</translation>
+      <translation>Analytique n’est pas disponible pour %1</translation>
     </message>
   </context>
   <context>
@@ -2357,7 +2357,14 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>Edge</source>
-      <translation type="unfinished">Edge</translation>
+      <translation>Edge</translation>
+    </message>
+    <message numerus="yes">
+      <source>This Id is already used on the following %n cameras: %1</source>
+      <translation type="unfinished">
+        <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
+        <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -2477,6 +2484,10 @@ pour afficher plus de signets</translation>
       <source>Server</source>
       <translation>Serveur</translation>
     </message>
+    <message>
+      <source>Id</source>
+      <translation>ID</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraMotionMaskWidget</name>
@@ -2513,7 +2524,7 @@ pour afficher plus de signets</translation>
     <name>QnCameraMotionPolicy</name>
     <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation type="unfinished">Recording or motion detection is disabled for %1</translation>
+      <translation>L'enreg. ou la détection de mouv. sont désactivés pour %1</translation>
     </message>
   </context>
   <context>
@@ -2536,10 +2547,6 @@ pour afficher plus de signets</translation>
   <context>
     <name>QnCameraPasswordChangeDialog</name>
     <message>
-      <source>Password shouldn&apos;t be equal to camera&apos;s user name</source>
-      <translation>Mot de passe ne peut être le nom d'utilisateur de la caméra</translation>
-    </message>
-    <message>
       <source>New Password</source>
       <translation>Nouveau mot de passe</translation>
     </message>
@@ -2555,12 +2562,16 @@ pour afficher plus de signets</translation>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
       <translation>Mot de passe doit comporter au moins 8 symboles et contenir différents types de caractères.</translation>
     </message>
+    <message>
+      <source>Password should not be equal to camera&apos;s user name</source>
+      <translation type="unfinished">Password should not be equal to camera&apos;s user name</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraRecordingPolicy</name>
     <message>
       <source>Recording is disabled for %1</source>
-      <translation type="unfinished">Recording is disabled for %1</translation>
+      <translation>L'enreg.est désactivé pour %1</translation>
     </message>
   </context>
   <context>
@@ -2627,7 +2638,7 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>Mbit/s</source>
-      <translation type="unfinished">Mbit/s</translation>
+      <translation>Mbit/s</translation>
     </message>
     <message>
       <source>Less Settings</source>
@@ -2734,11 +2745,11 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>Cannot edit properties for several wearable and non-wearable cameras.</source>
-      <translation type="unfinished">Cannot edit properties for several wearable and non-wearable cameras.</translation>
+      <translation>Ne peut pas modifier les propriétés de plusieurs caméras portables et non-portable.</translation>
     </message>
     <message>
       <source>Cannot edit properties for several wearable cameras.</source>
-      <translation type="unfinished">Cannot edit properties for several wearable cameras.</translation>
+      <translation>Ne peut pas modifier les propriétés de plusieurs caméras portables.</translation>
     </message>
   </context>
   <context>
@@ -2837,7 +2848,7 @@ to %1</source>
     </message>
     <message>
       <source>Account is not activated. Please check your email and follow provided instructions</source>
-      <translation type="unfinished">Account is not activated. Please check your email and follow provided instructions</translation>
+      <translation>Compte non activé. S.V.P. vérifiez votre courriel et suivez les instructions fournies</translation>
     </message>
   </context>
   <context>
@@ -2952,7 +2963,7 @@ to %1</source>
     </message>
     <message>
       <source>The username or password you have entered is incorrect. Please try again.</source>
-      <translation>L'ID ou le mot de passe que vous avez entré est incorrect, S.V.P. réessayez .</translation>
+      <translation>L'Id ou le mot de passe que vous avez entré est incorrect, S.V.P. réessayez.</translation>
     </message>
     <message>
       <source>Unable to connect to the server</source>
@@ -3189,12 +3200,9 @@ to %1</source>
       <source>Ask your system administrator to do it.</source>
       <translation>Demandez à votre administrateur système de le faire.</translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>Set Password</source>
-      <translation>
-        <numerusform>Définir mot de passe</numerusform>
-        <numerusform>Définir mot de passe</numerusform>
-      </translation>
+      <translation type="unfinished">Set Password</translation>
     </message>
   </context>
   <context>
@@ -3713,7 +3721,7 @@ to %1</source>
     </message>
     <message>
       <source>Id</source>
-      <translation>ID</translation>
+      <translation>Id</translation>
     </message>
   </context>
   <context>
@@ -3896,7 +3904,7 @@ to %1</source>
     </message>
     <message>
       <source>Locked to Hardware Id</source>
-      <translation>Verrouillé sur ID Matériel</translation>
+      <translation>Verrouillé sur Id Matériel</translation>
     </message>
   </context>
   <context>
@@ -4172,11 +4180,11 @@ to %1</source>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware Id %1</source>
-      <translation>Cette licence est déjà activée et liée au ID Matériel %1</translation>
+      <translation>Cette licence est déjà activée et liée au Id Matériel %1</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware Id %1 on %2</source>
-      <translation>Cette licence est déjà activée et liée au ID Matériel %1 sur %2</translation>
+      <translation>Cette licence est déjà activée et liée au Id Matériel %1 sur %2</translation>
     </message>
     <message>
       <source>If the problem persists please contact Customer Support.</source>
@@ -4207,11 +4215,11 @@ to %1</source>
     </message>
     <message>
       <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>S.V.P envoyer courriel avec clé de licence et ID matériel fourni à %1 pour obtenir un fichier de clé d’activation.</translation>
+      <translation>S.V.P envoyer courriel avec clé de licence et Id Matériel fourni à %1 pour obtenir un fichier de clé d’activation.</translation>
     </message>
     <message>
       <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>S.V.P envoyer clé de licence et ID matériel fourni à %1 pour obtenir un fichier de clé d’activation.</translation>
+      <translation>S.V.P envoyer clé de licence et Id Matériel fourni à %1 pour obtenir un fichier de clé d’activation.</translation>
     </message>
   </context>
   <context>
@@ -4665,11 +4673,11 @@ to %1</source>
     <name>QnNewWearableCameraDialog</name>
     <message>
       <source>Wearable Camera</source>
-      <translation type="unfinished">Wearable Camera</translation>
+      <translation>Caméra portable</translation>
     </message>
     <message>
       <source>Wearable Camera %1</source>
-      <translation type="unfinished">Wearable Camera %1</translation>
+      <translation>Caméra portable %1</translation>
     </message>
     <message>
       <source>Name</source>
@@ -4766,16 +4774,16 @@ to %1</source>
   <context>
     <name>QnPerformanceTest</name>
     <message>
-      <source>For full - featured mode, please use another computer</source>
-      <translation>Pour Tout - mode recommandé. S.V.P utiliser un autre PC</translation>
-    </message>
-    <message>
       <source>%1 can work in configuration mode only</source>
       <translation>%1 peut seulement fonctionner en mode de configuration</translation>
     </message>
     <message>
       <source>Performance of this computer allows running %1 in configuration mode only.</source>
       <translation>Performances de cet ordinateur permet seulement de lancer %1 en mode de configuration.</translation>
+    </message>
+    <message>
+      <source>For full-featured mode please use another computer</source>
+      <translation>Pour le mode complet, S.V.P. utilisez un autre ordinateur</translation>
     </message>
   </context>
   <context>
@@ -5912,6 +5920,10 @@ to %1</source>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
       <translation>Enregistrement &quot; Mouv. + Basse-Res.&quot; ne peut pas être définie.</translation>
     </message>
+    <message>
+      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
+      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</translation>
+    </message>
   </context>
   <context>
     <name>QnSmtpAdvancedSettingsWidget</name>
@@ -6063,10 +6075,6 @@ to %1</source>
   <context>
     <name>QnStatusOverlayController</name>
     <message>
-      <source>NOT ENOUGH LICENCES</source>
-      <translation>PAS ASSEZ DE LICENCES</translation>
-    </message>
-    <message>
       <source>NO DATA</source>
       <translation>AUCUNE DONNÉE</translation>
     </message>
@@ -6120,7 +6128,7 @@ to %1</source>
     </message>
     <message>
       <source>NO LIVE STREAM</source>
-      <translation type="unfinished">NO LIVE STREAM</translation>
+      <translation>AUCUN FLUX EN DIRECT</translation>
     </message>
     <message>
       <source>TOO MANY CONNECTIONS</source>
@@ -6136,7 +6144,11 @@ to %1</source>
     </message>
     <message>
       <source>UNSUPPORTED FIRMWARE VERSION</source>
-      <translation type="unfinished">UNSUPPORTED FIRMWARE VERSION</translation>
+      <translation>VERSION DU FIRMWARE INCOMPATIBLE</translation>
+    </message>
+    <message>
+      <source>NOT ENOUGH LICENSES</source>
+      <translation type="unfinished">NOT ENOUGH LICENSES</translation>
     </message>
   </context>
   <context>
@@ -6287,7 +6299,7 @@ to %1</source>
     </message>
     <message>
       <source>Recording was enabled on the USB storage</source>
-      <translation type="unfinished">Recording was enabled on the USB storage</translation>
+      <translation>Enregistrement a été activé sur le stockage USB</translation>
     </message>
   </context>
   <context>
@@ -7161,35 +7173,35 @@ to %1</source>
   <context>
     <name>QnWearableProgressWidget</name>
     <message>
-      <source>Uploading %1... %2	%p%</source>
-      <translation type="unfinished">Uploading %1... %2	%p%</translation>
-    </message>
-    <message>
       <source>Stop uploading?</source>
-      <translation type="unfinished">Stop uploading?</translation>
+      <translation>Arrêter l'envoie?</translation>
     </message>
     <message>
       <source>Already uploaded files will be kept.</source>
-      <translation type="unfinished">Already uploaded files will be kept.</translation>
-    </message>
-    <message>
-      <source>Finalizing %1... %2	%p%</source>
-      <translation type="unfinished">Finalizing %1... %2	%p%</translation>
+      <translation>Fichiers déjà envoyés seront conservés.</translation>
     </message>
     <message>
       <source>(%1 of %2)</source>
-      <translation type="unfinished">(%1 of %2)</translation>
+      <translation>(%1 sur %2)</translation>
+    </message>
+    <message>
+      <source>Uploading %1...</source>
+      <translation type="unfinished">Uploading %1...</translation>
+    </message>
+    <message>
+      <source>Finalizing %1...</source>
+      <translation type="unfinished">Finalizing %1...</translation>
     </message>
   </context>
   <context>
     <name>QnWearableUploadWidget</name>
     <message>
       <source>User &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation type="unfinished">User &quot;%1&quot; is currently uploading footage to this camera.</translation>
+      <translation>Usager &quot;%1&quot; est en train d'envoyer des vidéos sur cette caméra.</translation>
     </message>
     <message>
       <source>Another user is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Another user is currently uploading footage to this camera.</translation>
+      <translation>Un autre usager est en train d'envoyer des vidéos sur cette caméra.</translation>
     </message>
   </context>
   <context>
@@ -7281,6 +7293,10 @@ to %1</source>
     <message>
       <source>Could not connect to server. Video Wall will be closed.</source>
       <translation>Impossible de se connecter au serveur. Mur vidéo sera fermé.</translation>
+    </message>
+    <message>
+      <source>Video Wall is removed on the server and will be closed.</source>
+      <translation type="unfinished">Video Wall is removed on the server and will be closed.</translation>
     </message>
   </context>
   <context>
@@ -7579,117 +7595,153 @@ to %1</source>
     </message>
     <message>
       <source>Video (%1)</source>
-      <translation type="unfinished">Video (%1)</translation>
+      <translation>Vidéo (%1)</translation>
     </message>
     <message>
       <source>Open Wearable Camera Recordings...</source>
-      <translation type="unfinished">Open Wearable Camera Recordings...</translation>
+      <translation>Ouvrir les enregistrements de caméra portable ...</translation>
     </message>
     <message>
       <source>Only video files with correct timestamp are supported.</source>
-      <translation type="unfinished">Only video files with correct timestamp are supported.</translation>
-    </message>
-    <message>
-      <source>Not enough space on server storage</source>
-      <translation type="unfinished">Not enough space on server storage</translation>
+      <translation>Seuls les fichiers vidéo avec horodatage correct sont pris en charge.</translation>
     </message>
     <message>
       <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</translation>
+      <translation>Ne peut pas démarrer l'envoie car usager &quot;%1&quot; est en train d'envoyer des vidéos sur cette caméra.</translation>
     </message>
     <message>
       <source>Could not start upload as another user is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Could not start upload as another user is currently uploading footage to this camera.</translation>
+      <translation>Ne peut pas démarrer l'envoie car un autre usager est en train d'envoyer des vidéos sur cette caméra.</translation>
     </message>
     <message>
       <source>Failed to add wearable camera</source>
-      <translation type="unfinished">Failed to add wearable camera</translation>
+      <translation>Échec d'ajout de caméra portable</translation>
     </message>
     <message>
       <source>No video files found in selected folder</source>
-      <translation type="unfinished">No video files found in selected folder</translation>
+      <translation>Aucun fichier vidéo trouvé dans le dossier sélectionné</translation>
     </message>
     <message numerus="yes">
       <source>Selected file formats are not supported</source>
-      <translation type="unfinished">
-        <numerusform>Selected file formats are not supported</numerusform>
-        <numerusform>Selected file formats are not supported</numerusform>
+      <translation>
+        <numerusform>Formats de fichier sélectionnés ne sont pas pris en charge</numerusform>
+        <numerusform>Formats de fichier sélectionnés ne sont pas pris en charge</numerusform>
       </translation>
     </message>
     <message>
       <source>Use .MKV, .AVI, .MP4 or other video files.</source>
-      <translation type="unfinished">Use .MKV, .AVI, .MP4 or other video files.</translation>
+      <translation>Utiliser .MKV, .AVI, .MP4 ou autres fichiers vidéo.</translation>
     </message>
     <message numerus="yes">
       <source>Selected files do not have timestamps</source>
-      <translation type="unfinished">
-        <numerusform>Selected files do not have timestamps</numerusform>
-        <numerusform>Selected files do not have timestamps</numerusform>
+      <translation>
+        <numerusform>Fichiers sélectionnés n'ont pas d'horodatage</numerusform>
+        <numerusform>Fichiers sélectionnés n'ont pas d'horodatage</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos are already being uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+      <translation>
+        <numerusform>Fichiers sélectionnés couvrent les périodes pour lesquelles des vidéos sont en train d'envoyer</numerusform>
+        <numerusform>Fichiers sélectionnés couvrent les périodes pour lesquelles des vidéos sont en train d'envoyer</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Wearable Camera.</source>
-      <translation type="unfinished">
-        <numerusform>You can upload these files to a different instance of a Wearable Camera.</numerusform>
-        <numerusform>You can upload these files to a different instance of a Wearable Camera.</numerusform>
+      <translation>
+        <numerusform>Vous pouvez envoyer ces fichiers sur une instance différente d'une caméra portable.</numerusform>
+        <numerusform>Vous pouvez envoyer ces fichiers sur une instance différente d'une caméra portable.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos have already been uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+      <translation>
+        <numerusform>Fichiers sélectionnés couvrent les périodes pour lesquelles des vidéos sont déjà envoyer</numerusform>
+        <numerusform>Fichiers sélectionnés couvrent les périodes pour lesquelles des vidéos sont déjà envoyer</numerusform>
       </translation>
     </message>
     <message>
       <source>Selected files will not be uploaded</source>
-      <translation type="unfinished">Selected files will not be uploaded</translation>
+      <translation>Fichiers sélectionnés ne seront pas envoyés</translation>
     </message>
     <message>
       <source>Some files will not be uploaded</source>
-      <translation type="unfinished">Some files will not be uploaded</translation>
+      <translation>Certain fichiers ne seront pas envoyés</translation>
     </message>
     <message>
       <source>No new files to upload in selected folder</source>
-      <translation type="unfinished">No new files to upload in selected folder</translation>
+      <translation>Aucun nouveau fichier à envoyer dans le dossier sélectionné</translation>
     </message>
     <message numerus="yes">
-      <source>Files size - %2</source>
-      <translation type="unfinished">
-        <numerusform>Files size - %2</numerusform>
-        <numerusform>Files size - %2</numerusform>
+      <source>Selected files are too old</source>
+      <translation>
+        <numerusform>Les fichiers sélectionnés sont trop vieux</numerusform>
+        <numerusform>Les fichiers sélectionnés sont trop vieux</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation>
+        <numerusform>Le fichier sélectionné a été enregistré sur %1, mais seulement les fichiers enregistrés au cours des %n derniers jours peuvent être téléchargés. Vous pouvez le modifier dans les paramètres d'archivage de la caméra.</numerusform>
+        <numerusform>Le fichier sélectionné a été enregistré sur %1, mais seulement les fichiers enregistrés au cours des %n derniers jours peuvent être téléchargés. Vous pouvez le modifier dans les paramètres d'archivage de la caméra.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation>
+        <numerusform>Les fichiers sélectionnés ont été enregistrés entre %1 et %2, mais seulement les fichiers enregistrés au cours des %n derniers jours peuvent être téléchargés. Vous pouvez le modifier dans les paramètres d'archivage de la caméra.</numerusform>
+        <numerusform>Les fichiers sélectionnés ont été enregistrés entre %1 et %2, mais seulement les fichiers enregistrés au cours des %n derniers jours peuvent être téléchargés. Vous pouvez le modifier dans les paramètres d'archivage de la caméra.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Some footage may be deleted after uploading these files</source>
+      <translation>
+        <numerusform>Certaines séquences peuvent être supprimées après le téléchargement de ces fichiers</numerusform>
+        <numerusform>Certaines séquences peuvent être supprimées après le téléchargement de ces fichiers</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
+      <translation>
+        <numerusform>Il n'y a pas beaucoup d'espace libre sur le stockage du serveur. Certaines anciennes séquences peuvent être supprimées pour libérer de l'espace. Notez que si les fichiers sélectionnés sont les plus anciens sur le serveur, ils seront supprimés juste après leur téléchargement.</numerusform>
+        <numerusform>Il n'y a pas beaucoup d'espace libre sur le stockage du serveur. Certaines anciennes séquences peuvent être supprimées pour libérer de l'espace. Notez que si les fichiers sélectionnés sont les plus anciens sur le serveur, ils seront supprimés juste après leur téléchargement.</numerusform>
       </translation>
     </message>
     <message>
-      <source>Free space - %2</source>
-      <translation type="unfinished">Free space - %2</translation>
+      <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
+      <translation>Pour éviter cela, vous pouvez ajouter du stockage supplémentaire. Vous pouvez également contrôler quelle séquence sera supprimé en premier en changeant l'heure d'archivage dans les paramètres de caméra.</translation>
     </message>
     <message>
-      <source>%1 - has unsupported format.</source>
-      <translation type="unfinished">%1 - has unsupported format.</translation>
+      <source>Upload anyway?</source>
+      <translation>Envoyer quand même?</translation>
     </message>
     <message>
-      <source>%1 - does not have timestamp.</source>
-      <translation type="unfinished">%1 - does not have timestamp.</translation>
+      <source>Could not finish upload to %1</source>
+      <translation>Impossible de terminer l'envoie vers %1</translation>
     </message>
     <message>
-      <source>%1 - covers period for which video has already been uploaded.</source>
-      <translation type="unfinished">%1 - covers period for which video has already been uploaded.</translation>
+      <source>Make sure there is enough space on server storage.</source>
+      <translation>Assurez-vous qu'il y a suffisamment d'espace sur le stockage du serveur.</translation>
     </message>
     <message>
-      <source>%1 - covers period for which video is being uploaded.</source>
-      <translation type="unfinished">%1 - covers period for which video is being uploaded.</translation>
+      <source>%1 has unsupported format.</source>
+      <translation type="unfinished">%1 has unsupported format.</translation>
     </message>
     <message>
-      <source>%1 - does not fit on server storage.</source>
-      <translation type="unfinished">%1 - does not fit on server storage.</translation>
+      <source>%1 does not have timestamp.</source>
+      <translation type="unfinished">%1 does not have timestamp.</translation>
+    </message>
+    <message>
+      <source>%1 is older than allowed in camera archive settings.</source>
+      <translation type="unfinished">%1 is older than allowed in camera archive settings.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video has already been uploaded.</source>
+      <translation type="unfinished">%1 covers period for which video has already been uploaded.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video is being uploaded.</source>
+      <translation type="unfinished">%1 covers period for which video is being uploaded.</translation>
     </message>
   </context>
   <context>
@@ -7882,7 +7934,7 @@ to %1</source>
     </message>
     <message>
       <source>Stop uploading?</source>
-      <translation type="unfinished">Stop uploading?</translation>
+      <translation>Arrêter l'envoie?</translation>
     </message>
     <message>
       <source>Stop</source>
@@ -7890,9 +7942,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Some video file(s) are still being uploaded to %n wearable cameras:</source>
-      <translation type="unfinished">
-        <numerusform>Some video file(s) are still being uploaded to %n wearable cameras:</numerusform>
-        <numerusform>Some video file(s) are still being uploaded to %n wearable cameras:</numerusform>
+      <translation>
+        <numerusform>Certains fichiers vidéo sont encore en envoie sur %n caméras portables:</numerusform>
+        <numerusform>Certains fichiers vidéo sont encore en envoie sur %n caméras portables:</numerusform>
       </translation>
     </message>
   </context>
@@ -8011,7 +8063,7 @@ to %1</source>
     </message>
     <message>
       <source>Image</source>
-      <translation type="unfinished">Image</translation>
+      <translation>Image</translation>
     </message>
     <message>
       <source>Add Text</source>
@@ -8131,7 +8183,7 @@ to %1</source>
     <name>nx::client::desktop::TimestampOverlaySettingsWidget</name>
     <message>
       <source>Long</source>
-      <translation type="unfinished">Long</translation>
+      <translation>Long</translation>
     </message>
     <message>
       <source>Short</source>
@@ -8142,34 +8194,34 @@ to %1</source>
     <name>nx::client::desktop::UploadWorker</name>
     <message>
       <source>Could not open file &quot;%1&quot;</source>
-      <translation type="unfinished">Could not open file &quot;%1&quot;</translation>
+      <translation>Impossible d'ouvrir le fichier &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Could not calculate md5 for file &quot;%1&quot;</source>
-      <translation type="unfinished">Could not calculate md5 for file &quot;%1&quot;</translation>
+      <translation>Impossible de calculer md5 pour le fichier &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Could not create upload on the server side</source>
-      <translation type="unfinished">Could not create upload on the server side</translation>
+      <translation>Impossible de créer l'envoie côté serveur</translation>
     </message>
     <message>
       <source>Could not upload file chunk to the server</source>
-      <translation type="unfinished">Could not upload file chunk to the server</translation>
+      <translation>Impossible d"envoyer le fragment de fichier sur le serveur</translation>
     </message>
     <message>
       <source>Could not check uploaded file on the server</source>
-      <translation type="unfinished">Could not check uploaded file on the server</translation>
+      <translation>Impossible de vérifier le fichier envoyer sur le serveur</translation>
     </message>
     <message>
       <source>File was corrupted while being uploaded to the server</source>
-      <translation type="unfinished">File was corrupted while being uploaded to the server</translation>
+      <translation>Fichier a été corrompu pendant son envoie sur le serveur</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::WearableWorker</name>
     <message>
       <source>Failed to send request to the server.</source>
-      <translation type="unfinished">Failed to send request to the server.</translation>
+      <translation>Impossible d'envoyer la requête au serveur.</translation>
     </message>
   </context>
   <context>
@@ -8204,7 +8256,7 @@ to %1</source>
     </message>
     <message>
       <source>Selected period cannot be exported for the current camera.</source>
-      <translation type="unfinished">Selected period cannot be exported for the current camera.</translation>
+      <translation>Période sélectionnée ne peut pas être exportée pour la caméra actuelle.</translation>
     </message>
   </context>
   <context>
@@ -8659,7 +8711,7 @@ to %1</source>
     </message>
     <message>
       <source>Wearable Cameras cannot be moved between servers</source>
-      <translation type="unfinished">Wearable Cameras cannot be moved between servers</translation>
+      <translation>Caméras portables ne peuvent pas être déplacées entre les serveurs</translation>
     </message>
     <message>
       <source>Failed to change password</source>

@@ -25,7 +25,7 @@ public:
     virtual int width() const override { return m_width; }
     virtual int height() const override { return m_height; }
     virtual Ratio sampleAspectRatio() const override { return {1, 1}; }
-    virtual PixelFormat pixelFormat() const override { return PixelFormat::yuv420; }
+    virtual PixelFormat pixelFormat() const override { return m_pixelFormat; }
     virtual Handle handleType() const override { return Handle::none; }
     virtual int handle() const override { return 0; }
     virtual int planeCount() const override;
@@ -53,6 +53,11 @@ public:
         m_lineSize = std::move(lineSize);
     }
 
+    void setPixelFormat(UncompressedVideoFrame::PixelFormat pixelFormat)
+    {
+        m_pixelFormat = pixelFormat;
+    }
+
 private:
     bool checkPlane(int plane, const char* func) const;
 
@@ -60,6 +65,8 @@ private:
     const int64_t m_timestampUsec = 0;
     const int m_width = 0;
     const int m_height = 0;
+    UncompressedVideoFrame::PixelFormat m_pixelFormat =
+        UncompressedVideoFrame::PixelFormat::yuv420;
 
     std::vector<std::vector<char>> m_ownedData;
     std::vector<const char*> m_externalData;

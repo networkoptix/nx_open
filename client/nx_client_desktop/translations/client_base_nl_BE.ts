@@ -1923,7 +1923,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Any Server</source>
-      <translation>Een willekeurige server</translation>
+      <translation>Een willekeurige Server</translation>
     </message>
     <message>
       <source>Any Device</source>
@@ -2229,11 +2229,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>I/O Module Id</source>
-      <translation>I/O Module ID</translation>
+      <translation>I/O Module Id</translation>
     </message>
     <message>
       <source>Camera Id</source>
-      <translation>Camera ID</translation>
+      <translation>Camera Id</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -2358,6 +2358,13 @@ to view more bookmarks</source>
       <source>Edge</source>
       <translation>Edge</translation>
     </message>
+    <message numerus="yes">
+      <source>This Id is already used on the following %n cameras: %1</source>
+      <translation>
+        <numerusform>Deze Id wordt al gebruikt op de volgende %n camera's: %1</numerusform>
+        <numerusform>Deze Id wordt al gebruikt op de volgende %n camera's: %1</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnCameraInputBusinessEventWidget</name>
@@ -2476,6 +2483,10 @@ to view more bookmarks</source>
       <source>Server</source>
       <translation>Server</translation>
     </message>
+    <message>
+      <source>Id</source>
+      <translation>Id</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraMotionMaskWidget</name>
@@ -2512,7 +2523,7 @@ to view more bookmarks</source>
     <name>QnCameraMotionPolicy</name>
     <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation type="unfinished">Recording or motion detection is disabled for %1</translation>
+      <translation>Opname of bewegingsdetectie is uitgeschakeld voor %1</translation>
     </message>
   </context>
   <context>
@@ -2535,10 +2546,6 @@ to view more bookmarks</source>
   <context>
     <name>QnCameraPasswordChangeDialog</name>
     <message>
-      <source>Password shouldn&apos;t be equal to camera&apos;s user name</source>
-      <translation>Wachtwoord mag niet gelijk zijn aan de gebruikersnaam van de camera's</translation>
-    </message>
-    <message>
       <source>New Password</source>
       <translation>Nieuw wachtwoord</translation>
     </message>
@@ -2554,12 +2561,16 @@ to view more bookmarks</source>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
       <translation>Wachtwoord moet minstens 8 symbolen lang zijn en verschillende tekens bevatten.</translation>
     </message>
+    <message>
+      <source>Password should not be equal to camera&apos;s user name</source>
+      <translation>Wachtwoord mag niet gelijk zijn aan de gebruikersnaam van de camera&apos;s</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraRecordingPolicy</name>
     <message>
       <source>Recording is disabled for %1</source>
-      <translation type="unfinished">Recording is disabled for %1</translation>
+      <translation>Opname is uitgeschakeld voor %1</translation>
     </message>
   </context>
   <context>
@@ -3069,7 +3080,7 @@ to %1</source>
     <name>QnConnectionTestingDialog</name>
     <message>
       <source>Success</source>
-      <translation>Succes</translation>
+      <translation>Gelukt</translation>
     </message>
     <message>
       <source>Request timeout</source>
@@ -3184,12 +3195,9 @@ to %1</source>
       <source>Ask your system administrator to do it.</source>
       <translation>Vraag uw systeembeheerder om het te doen.</translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>Set Password</source>
-      <translation>
-        <numerusform>Stel nieuw wachtwoord in</numerusform>
-        <numerusform>Stel nieuw wachtwoord in</numerusform>
-      </translation>
+      <translation>Wachtwoorden instellen</translation>
     </message>
   </context>
   <context>
@@ -3708,7 +3716,7 @@ to %1</source>
     </message>
     <message>
       <source>Id</source>
-      <translation>ID</translation>
+      <translation>Id</translation>
     </message>
   </context>
   <context>
@@ -3852,7 +3860,7 @@ to %1</source>
     </message>
     <message>
       <source>Timed Out</source>
-      <translation>Time-out</translation>
+      <translation>Uitgesteld</translation>
     </message>
     <message>
       <source>Import Selected</source>
@@ -4125,7 +4133,7 @@ to %1</source>
     </message>
     <message>
       <source>Remove</source>
-      <translation>Verwijder</translation>
+      <translation>Verwijderen</translation>
     </message>
     <message>
       <source>Deactivate</source>
@@ -4167,7 +4175,7 @@ to %1</source>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware Id %1</source>
-      <translation>Deze licentie is al geactiveerd en gekoppeld aan hardware Id %1</translation>
+      <translation>Deze licentie is al geactiveerd en gekoppeld aan Hardware Id %1</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware Id %1 on %2</source>
@@ -4206,7 +4214,7 @@ to %1</source>
     </message>
     <message>
       <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>Stuur alsjeblieft een e-mail met de licentiecode en het hardware-ID dat is verstrekt aan %1 om een ​​activatie bestand te verkrijgen.</translation>
+      <translation>Stuur alsjeblieft een e-mail met de licentiecode en het Hardware-Id dat is verstrekt aan %1 om een ​​activatie bestand te verkrijgen.</translation>
     </message>
   </context>
   <context>
@@ -4466,7 +4474,7 @@ to %1</source>
     </message>
     <message>
       <source>Lo-Res</source>
-      <translation>Low-Res</translation>
+      <translation>Lo-Res</translation>
     </message>
     <message>
       <source>Failed to invoke trigger %1 (%2)</source>
@@ -4761,16 +4769,16 @@ to %1</source>
   <context>
     <name>QnPerformanceTest</name>
     <message>
-      <source>For full - featured mode, please use another computer</source>
-      <translation>Gebruik om gebruik te maken van de volledige functionaliteit een andere computer</translation>
-    </message>
-    <message>
       <source>%1 can work in configuration mode only</source>
       <translation>%1 kan alleen in de configuratie modus werken</translation>
     </message>
     <message>
       <source>Performance of this computer allows running %1 in configuration mode only.</source>
       <translation>De prestaties van deze computer kunnen alleen in de configuratiemodus %1 uitvoeren.</translation>
+    </message>
+    <message>
+      <source>For full-featured mode please use another computer</source>
+      <translation>Voor volledige functionaliteit is het nodig een andere computer te gebruiken</translation>
     </message>
   </context>
   <context>
@@ -5267,7 +5275,7 @@ to %1</source>
     </message>
     <message>
       <source>All Cameras &amp; Resources</source>
-      <translation>Alle camera's &amp; apparaten</translation>
+      <translation>Alle camera's en apparaten</translation>
     </message>
     <message>
       <source>All Shared Layouts</source>
@@ -5275,7 +5283,7 @@ to %1</source>
     </message>
     <message>
       <source>Shared Layouts</source>
-      <translation>Gedeelde lay-outs</translation>
+      <translation>Gedeelde schermindelingen</translation>
     </message>
     <message>
       <source>Local Files</source>
@@ -5907,6 +5915,10 @@ to %1</source>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
       <translation>&quot;Motion + Low - Res&quot; opnameoptie kan niet worden ingesteld.</translation>
     </message>
+    <message>
+      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
+      <translation>Het geüploade archief kan automatisch worden verwijderd als er geen vrije ruimte meer is op de serveropslag. De oudste beelden van alle camera's op de server worden eerst verwijderd.</translation>
+    </message>
   </context>
   <context>
     <name>QnSmtpAdvancedSettingsWidget</name>
@@ -6058,10 +6070,6 @@ to %1</source>
   <context>
     <name>QnStatusOverlayController</name>
     <message>
-      <source>NOT ENOUGH LICENCES</source>
-      <translation>ONVOLDOENDE LICENTIES</translation>
-    </message>
-    <message>
       <source>NO DATA</source>
       <translation>GEEN GEGEVENS</translation>
     </message>
@@ -6107,7 +6115,7 @@ to %1</source>
     </message>
     <message>
       <source>Activate License</source>
-      <translation>Activeer licentie</translation>
+      <translation>Licentie activeren</translation>
     </message>
     <message>
       <source>Please check authentication information</source>
@@ -6132,6 +6140,10 @@ to %1</source>
     <message>
       <source>UNSUPPORTED FIRMWARE VERSION</source>
       <translation>NIET-ONDERSTEUNDE FIRMWAREVERSIE</translation>
+    </message>
+    <message>
+      <source>NOT ENOUGH LICENSES</source>
+      <translation type="unfinished">NOT ENOUGH LICENSES</translation>
     </message>
   </context>
   <context>
@@ -6493,7 +6505,7 @@ to %1</source>
     </message>
     <message>
       <source>Connect</source>
-      <translation>Verbinden</translation>
+      <translation>Verbind</translation>
     </message>
     <message>
       <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
@@ -7156,10 +7168,6 @@ to %1</source>
   <context>
     <name>QnWearableProgressWidget</name>
     <message>
-      <source>Uploading %1... %2	%p%</source>
-      <translation>Uploaden %1... %2	%p%</translation>
-    </message>
-    <message>
       <source>Stop uploading?</source>
       <translation>Stoppen met uploaden?</translation>
     </message>
@@ -7168,12 +7176,16 @@ to %1</source>
       <translation>Reeds geuploade bestanden worden bewaard.</translation>
     </message>
     <message>
-      <source>Finalizing %1... %2	%p%</source>
-      <translation>Finaliseren %1... %2%p%</translation>
-    </message>
-    <message>
       <source>(%1 of %2)</source>
       <translation>(%1 van %2)</translation>
+    </message>
+    <message>
+      <source>Uploading %1...</source>
+      <translation>Uploaden %1...</translation>
+    </message>
+    <message>
+      <source>Finalizing %1...</source>
+      <translation>Finaliseren %1...</translation>
     </message>
   </context>
   <context>
@@ -7276,6 +7288,10 @@ to %1</source>
     <message>
       <source>Could not connect to server. Video Wall will be closed.</source>
       <translation>Kon geen verbinding maken met de server. Videowall wordt afgesloten.</translation>
+    </message>
+    <message>
+      <source>Video Wall is removed on the server and will be closed.</source>
+      <translation type="unfinished">Video Wall is removed on the server and will be closed.</translation>
     </message>
   </context>
   <context>
@@ -7585,10 +7601,6 @@ to %1</source>
       <translation>Alleen videobestanden met de juiste tijdstempel worden ondersteund.</translation>
     </message>
     <message>
-      <source>Not enough space on server storage</source>
-      <translation>Niet genoeg schijfruimte op de server</translation>
-    </message>
-    <message>
       <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
       <translation>Kan niet starten met uploaden omdat gebruiker &quot;%1&quot; momenteel beeldmateriaal upload naar deze camera.</translation>
     </message>
@@ -7656,35 +7668,75 @@ to %1</source>
       <translation>Geen nieuwe bestanden om te uploaden in de geselecteerde map</translation>
     </message>
     <message numerus="yes">
-      <source>Files size - %2</source>
+      <source>Selected files are too old</source>
       <translation>
-        <numerusform>Bestandsgrootte - %2</numerusform>
-        <numerusform>Bestandsgrootte - %2</numerusform>
+        <numerusform>Geselecteerde bestanden zijn te oud</numerusform>
+        <numerusform>Geselecteerde bestanden zijn te oud</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation>
+        <numerusform>Het geselecteerde bestand is opgenomen op %1, maar alleen bestanden die in de afgelopen %n dagen zijn opgenomen, kunnen worden geüpload. U kunt dit wijzigen in de instellingen van het camera-archief.</numerusform>
+        <numerusform>Het geselecteerde bestand is opgenomen op %1, maar alleen bestanden die in de afgelopen %n dagen zijn opgenomen, kunnen worden geüpload. U kunt dit wijzigen in de instellingen van het camera-archief.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation>
+        <numerusform>Geselecteerde bestanden zijn opgenomen tussen %1 en %2, maar alleen bestanden die in de afgelopen %n dagen zijn opgenomen, kunnen worden geüpload. U kunt dit wijzigen in de instellingen van het camera-archief.</numerusform>
+        <numerusform>Geselecteerde bestanden zijn opgenomen tussen %1 en %2, maar alleen bestanden die in de afgelopen %n dagen zijn opgenomen, kunnen worden geüpload. U kunt dit wijzigen in de instellingen van het camera-archief.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Some footage may be deleted after uploading these files</source>
+      <translation>
+        <numerusform>Sommige beelden kunnen worden verwijderd na het uploaden van deze bestanden</numerusform>
+        <numerusform>Sommige beelden kunnen worden verwijderd na het uploaden van deze bestanden</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
+      <translation>
+        <numerusform>Er is niet veel vrije ruimte over op serveropslag. Sommige oude beelden kunnen worden verwijderd om ruimte vrij te maken. Merk op dat als geselecteerde bestanden toevallig de oudste op de server zijn, deze meteen na het uploaden worden verwijderd.</numerusform>
+        <numerusform>Er is niet veel vrije ruimte over op serveropslag. Sommige oude beelden kunnen worden verwijderd om ruimte vrij te maken. Merk op dat als geselecteerde bestanden toevallig de oudste op de server zijn, deze meteen na het uploaden worden verwijderd.</numerusform>
       </translation>
     </message>
     <message>
-      <source>Free space - %2</source>
-      <translation>Vrije ruimte - %2</translation>
+      <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
+      <translation>Om dit te voorkomen, kunt u extra opslagruimte toevoegen. Je kunt ook bepalen welk beelden eerst wordt verwijderd door de bewaartijd van het archief te wijzigen in camera-instellingen.</translation>
     </message>
     <message>
-      <source>%1 - has unsupported format.</source>
-      <translation>%1 - heeft een niet-ondersteund formaat.</translation>
+      <source>Upload anyway?</source>
+      <translation>Hoe dan ook te uploaden?</translation>
     </message>
     <message>
-      <source>%1 - does not have timestamp.</source>
-      <translation>%1 - heeft geen tijdstempel.</translation>
+      <source>Could not finish upload to %1</source>
+      <translation>Kan upload naar %1 niet voltooien</translation>
     </message>
     <message>
-      <source>%1 - covers period for which video has already been uploaded.</source>
-      <translation>%1 - bevat een periode waarvoor de video al is geüpload.</translation>
+      <source>Make sure there is enough space on server storage.</source>
+      <translation>Zorg dat er voldoende ruimte is op de serveropslag.</translation>
     </message>
     <message>
-      <source>%1 - covers period for which video is being uploaded.</source>
-      <translation>%1 - bevat een periode waarvoor video wordt geüpload.</translation>
+      <source>%1 has unsupported format.</source>
+      <translation>%1 heeft een niet-ondersteund formaat.</translation>
     </message>
     <message>
-      <source>%1 - does not fit on server storage.</source>
-      <translation>%1 - past niet op serveropslag.</translation>
+      <source>%1 does not have timestamp.</source>
+      <translation>%1 heeft geen tijdstempel.</translation>
+    </message>
+    <message>
+      <source>%1 is older than allowed in camera archive settings.</source>
+      <translation>%1 is ouder dan toegestaan ​​in de camera-archiefinstellingen.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video has already been uploaded.</source>
+      <translation>%1 bevat een periode waarvoor de video al is geüpload.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video is being uploaded.</source>
+      <translation>%1 bevat een periode waarvoor video wordt geüpload.</translation>
     </message>
   </context>
   <context>
@@ -7978,7 +8030,7 @@ to %1</source>
     </message>
     <message>
       <source>Rapid Review</source>
-      <translation>Versnelde weergave</translation>
+      <translation>Rapid Review</translation>
     </message>
     <message>
       <source>Export Settings</source>
@@ -8137,11 +8189,11 @@ to %1</source>
     <name>nx::client::desktop::UploadWorker</name>
     <message>
       <source>Could not open file &quot;%1&quot;</source>
-      <translation>Kan bestand &quot;%1&quot; niet openen;</translation>
+      <translation>Kon bestand &quot;%1&quot; niet openen;</translation>
     </message>
     <message>
       <source>Could not calculate md5 for file &quot;%1&quot;</source>
-      <translation>Kan md5 voor bestand &quot;%1&quot; niet berekenen;</translation>
+      <translation>Kon md5 voor bestand &quot;%1&quot; niet berekenen.</translation>
     </message>
     <message>
       <source>Could not create upload on the server side</source>
@@ -8171,7 +8223,7 @@ to %1</source>
     <name>nx::client::desktop::WorkbenchAnalyticsController</name>
     <message>
       <source>%1 Analytics</source>
-      <translation>%1 Analyse</translation>
+      <translation>%1 Analytics</translation>
     </message>
   </context>
   <context>
@@ -8391,11 +8443,11 @@ to %1</source>
     </message>
     <message>
       <source>Stop Tour</source>
-      <translation>Stop tour</translation>
+      <translation>Stop Tour</translation>
     </message>
     <message>
       <source>Start Tour</source>
-      <translation>Start tour</translation>
+      <translation>Start Tour</translation>
     </message>
   </context>
   <context>

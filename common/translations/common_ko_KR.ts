@@ -78,11 +78,6 @@
       <translation>이러한 시스템은 다른 %1 URL로 연결됩니다. 병합할 수 없습니다.</translation>
     </message>
     <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</translation>
-    </message>
-    <message>
       <source>New System</source>
       <translation>새로운 시스템</translation>
     </message>
@@ -90,6 +85,10 @@
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
       <translation>발견 된 시스템 %1이 (가) 현재 시스템과 호환되지 않습니다.</translation>
+    </message>
+    <message>
+      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
+      <translation>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</translation>
     </message>
   </context>
   <context>
@@ -316,7 +315,7 @@
     </message>
     <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
-      <translation type="unfinished">Please update firmware. Minimal supported version is %1. Current version is %2</translation>
+      <translation>펌웨어를 업데이트하십시오. 최소 지원 버전은 %1입니다. 현재 버전은 %2입니다</translation>
     </message>
   </context>
   <context>

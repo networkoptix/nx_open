@@ -16,6 +16,8 @@
 
 class QnStorageManager;
 
+namespace nx { namespace mediaserver { class RootTool; } }
+
 const QString NX_TEMP_FOLDER_NAME = QnAppInfo::productNameShort() + "_temp_folder_";
 
 class QnFileStorageResource: public QnStorageResource
@@ -92,6 +94,7 @@ private:
     void setLocalPathSafe(const QString &path);
     QString getLocalPathSafe() const;
     bool isMounted() const;
+    nx::mediaserver::RootTool* rootTool() const;
 
 public:
     // Try to remove old temporary dirs if any.

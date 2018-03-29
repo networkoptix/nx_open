@@ -478,7 +478,7 @@ void QnResourceTreeModelUserNodes::removeUserNode(const QnUserResourcePtr& user)
         removeNode(m_users.take(id));
 }
 
-void QnResourceTreeModelUserNodes::removeNode(const QnResourceTreeModelNodePtr& node)
+void QnResourceTreeModelUserNodes::removeNode(QnResourceTreeModelNodePtr node)
 {
     /* Node was already removed. */
     if (!m_allNodes.contains(node))

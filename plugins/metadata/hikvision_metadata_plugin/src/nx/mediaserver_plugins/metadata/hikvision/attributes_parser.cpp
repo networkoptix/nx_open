@@ -127,11 +127,12 @@ std::vector<HikvisionEvent> AttributesParser::parseLprXml(
     std::vector<HikvisionEvent> result;
     QXmlStreamReader reader(content);
 
-    auto addEvent = [&](HikvisionEvent hikvisionEvent)
-    {
-        hikvisionEvent.isActive = true;
-        result.push_back(hikvisionEvent);
-    };
+    auto addEvent =
+        [&](HikvisionEvent hikvisionEvent)
+        {
+            hikvisionEvent.isActive = true;
+            result.push_back(hikvisionEvent);
+        };
 
     while (!reader.atEnd() && reader.readNextStartElement())
     {
@@ -146,7 +147,7 @@ std::vector<HikvisionEvent> AttributesParser::parseLprXml(
             for (const auto& dependedName: descriptor.forcedEvent.split(','))
             {
                 const auto childDescriptor = manifest.eventDescriptorByInternalName(dependedName);
-                hikvisionEvent.typeId = childDescriptor.eventTypeId;
+                hikvisionEvent.typeId = childDescriptor.typeId;
                 addEvent(hikvisionEvent);
             }
         }

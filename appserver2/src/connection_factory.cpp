@@ -69,7 +69,6 @@ Ec2DirectConnectionFactory::Ec2DirectConnectionFactory(
         m_jsonTranSerializer.get(),
         m_ubjsonTranSerializer.get()));
 
-
     m_timeSynchronizationManager.reset(new TimeSynchronizationManager(
         peerType,
         timerManager,
@@ -447,9 +446,6 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         from 00:00:00).
      *     %param scheduleTask.endTime Time of day when the backup ends (in seconds passed
      *         from 00:00:00).
-     *     %param scheduleTask.recordAudio Whether to record sound.
-     *         %value false
-     *         %value true
      *     %param scheduleTask.recordingType
      *         %value RT_Always Record always.
      *         %value RT_MotionOnly Record only when the motion is detected.
@@ -547,9 +543,6 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         from 00:00:00).
      *     %param scheduleTask.endTime Time of day when the backup ends (in seconds passed
      *         from 00:00:00).
-     *     %param scheduleTask.recordAudio Whether to record sound.
-     *         %value false
-     *         %value true
      *     %param scheduleTask.recordingType
      *         %value RT_Always Record always.
      *         %value RT_MotionOnly Record only when the motion is detected.
@@ -645,9 +638,6 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *             from 00:00:00).
      *         %param scheduleTask.endTime Time of day when the backup ends (in seconds passed
      *             from 00:00:00).
-     *         %param scheduleTask.recordAudio Whether to record sound.
-     *             %value false
-     *             %value true
      *         %param scheduleTask.recordingType
      *             %value RT_Always Record always.
      *             %value RT_MotionOnly Record only when the motion is detected.
@@ -781,9 +771,6 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *             from 00:00:00).
      *         %param scheduleTask.endTime Time of day when the backup ends (in seconds passed
      *             from 00:00:00).
-     *         %param scheduleTask.recordAudio Whether to record sound.
-     *             %value false
-     *             %value true
      *         %param scheduleTask.recordingType
      *             %value RT_Always Record always.
      *             %value RT_MotionOnly Record only when the motion is detected.
@@ -1960,18 +1947,16 @@ ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
                 });
         }
     #else
-        Q_UNUSED(loginInfo);
+        nx::utils::unused(loginInfo);
     #endif
 
     return ErrorCode::ok;
 }
 
 int Ec2DirectConnectionFactory::testDirectConnection(
-    const nx::utils::Url& addr,
+    const nx::utils::Url& /*addr*/,
     impl::TestConnectionHandlerPtr handler)
 {
-    Q_UNUSED(addr);
-
     const int reqId = generateRequestID();
     QnConnectionInfo connectionInfo;
     fillConnectionInfo(ApiLoginData(), &connectionInfo);

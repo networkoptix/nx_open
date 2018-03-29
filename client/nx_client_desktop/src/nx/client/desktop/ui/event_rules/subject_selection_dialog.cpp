@@ -108,7 +108,7 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
             const auto filter = ui->searchLineEdit->text().trimmed();
             m_users->setFilterFixedString(filter);
             filterRoles->setFilterFixedString(filter);
-            ui->allUsersCheckableLine->setVisible(filter.isEmpty());
+            ui->allUsersCheckableLine->setVisible(m_allUsersSelectorEnabled && filter.isEmpty());
         };
 
     connect(ui->searchLineEdit, &QnSearchLineEdit::textChanged, this, updateFilter);
@@ -172,7 +172,8 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
     const auto allUsersCheckStateChanged =
         [this](Qt::CheckState checkState)
         {
-            const bool checked = checkState == Qt::Checked;
+            const bool checked = m_allUsersSelectorEnabled
+                && checkState == Qt::Checked;
             ui->rolesGroupBox->setEnabled(!checked);
             ui->usersGroupBox->setEnabled(!checked);
             ui->searchLineEdit->setEnabled(!checked);
@@ -286,22 +287,23 @@ QSet<QnUuid> SubjectSelectionDialog::totalCheckedUsers() const
 
 bool SubjectSelectionDialog::allUsers() const
 {
-    return allUsersSelectorEnabled() && ui->allUsersCheckableLine->checked();
+    return m_allUsersSelectorEnabled && ui->allUsersCheckableLine->checked();
 }
 
 void SubjectSelectionDialog::setAllUsers(bool value)
 {
-    if (allUsersSelectorEnabled())
+    if (m_allUsersSelectorEnabled)
         ui->allUsersCheckableLine->setChecked(value);
 }
 
 bool SubjectSelectionDialog::allUsersSelectorEnabled() const
 {
-    return !ui->allUsersCheckableLine->isHidden();
+    return m_allUsersSelectorEnabled;
 }
 
 void SubjectSelectionDialog::setAllUsersSelectorEnabled(bool value)
 {
+    m_allUsersSelectorEnabled = value;
     const bool disabled = !value;
     ui->allUsersCheckableLine->setHidden(disabled);
     if (disabled)

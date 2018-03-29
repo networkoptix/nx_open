@@ -335,6 +335,7 @@ private:
 
     struct SoftwareTrigger
     {
+        QnUuid ruleId;
         SoftwareTriggerInfo info;
         QnUuid overlayItemId;
     };
@@ -347,7 +348,7 @@ private:
     void initAreaHighlightOverlay();
     void initStatusOverlayController();
 
-    SoftwareTrigger* createTriggerIfRelevant(const nx::vms::event::RulePtr& rule);
+    void createTriggerIfRelevant(const nx::vms::event::RulePtr& rule);
     bool isRelevantTriggerRule(const nx::vms::event::RulePtr& rule) const;
     void configureTriggerButton(QnSoftwareTriggerButton* button, const SoftwareTriggerInfo& info,
         std::function<void()> clientSideHandler = std::function<void()>());
@@ -361,6 +362,9 @@ private:
         bool enabledBySchedule);
 
     void getResourceStates();
+
+    using TriggerDataList = QList<SoftwareTrigger>;
+    TriggerDataList::iterator lowerBoundbyTriggerRuleId(const QnUuid& id);
 
 private:
     QScopedPointer<QnMediaResourceWidgetPrivate> d;
@@ -424,7 +428,7 @@ private:
     nx::client::desktop::AreaHighlightOverlayWidget* m_areaHighlightOverlayWidget = nullptr;
     nx::client::desktop::AreaSelectOverlayWidget* m_areaSelectOverlayWidget = nullptr;
 
-    QHash<QnUuid, SoftwareTrigger> m_softwareTriggers; //< ruleId -> softwareTrigger
+    TriggerDataList m_triggers;
 
     QScopedPointer<nx::client::desktop::EntropixImageEnhancer> m_entropixEnhancer;
     QImage m_entropixEnhancedImage;

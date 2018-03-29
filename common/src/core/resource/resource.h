@@ -196,8 +196,6 @@ public:
 		const QVariant& value,
         PropertyOptions options = DEFAULT_OPTIONS);
 
-    virtual bool removeProperty(const QString& key);
-
     template<typename Update>
     bool updateProperty(const QString &key, const Update& update)
     {
@@ -291,7 +289,7 @@ protected:
 
     /** Mutex that is to be used when accessing resource fields. */
     mutable QnMutex m_mutex;
-    QnMutex m_initMutex;
+    mutable QnMutex m_initMutex;
 
     static std::atomic<bool> m_appStopping;
 

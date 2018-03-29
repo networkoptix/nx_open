@@ -44,24 +44,21 @@ QnConfigureRestHandler::QnConfigureRestHandler(ec2::AbstractTransactionMessageBu
 }
 
 int QnConfigureRestHandler::executeGet(
-    const QString &path,
-    const QnRequestParams &params,
-    QnJsonRestResult &result,
+    const QString& /*path*/,
+    const QnRequestParams& params,
+    QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
-    Q_UNUSED(path)
     return execute(ConfigureSystemData(params), result, owner);
 }
 
 int QnConfigureRestHandler::executePost(
-    const QString &path,
-    const QnRequestParams &params,
-    const QByteArray &body,
-    QnJsonRestResult &result,
+    const QString& /*path*/,
+    const QnRequestParams& /*params*/,
+    const QByteArray& body,
+    QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
-    Q_UNUSED(path)
-    Q_UNUSED(params)
     ConfigureSystemData data = QJson::deserialized<ConfigureSystemData>(body);
     return execute(std::move(data), result, owner);
 }

@@ -61,7 +61,7 @@ QVariant AnalyticsSdkEventModel::data(const QModelIndex& index, int role) const
         }
 
         case EventTypeIdRole:
-            return qVariantFromValue(item.eventTypeId);
+            return qVariantFromValue(item.typeId);
 
         case DriverIdRole:
             return qVariantFromValue(item.driverId);

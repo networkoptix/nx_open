@@ -67,8 +67,8 @@ public:
     QSize getMaxScreenSize() const;
     bool selfSyncUsed() const;
 
-    qreal overridenAspectRatio() const;
-    void setOverridenAspectRatio(qreal aspectRatio);
+    QnAspectRatio overridenAspectRatio() const;
+    void setOverridenAspectRatio(QnAspectRatio aspectRatio);
 private:
     friend class QnCamDisplay;
 
@@ -145,7 +145,7 @@ private:
     qint64 m_lastIgnoreTime;
     mutable QnMutex m_renderListMtx;
     bool m_isPaused;
-    qreal m_overridenAspectRatio;
+    QnAspectRatio m_overridenAspectRatio;
 
     void reorderPrevFrames();
     bool allocScaleContext(const CLVideoDecoderOutput& outFrame, int newWidth, int newHeight);

@@ -6,6 +6,7 @@ set(_withMobileClient ON)
 set(_withClouds OFF)
 set(_withTestCamera ON)
 set(_withTests ON)
+set(_withMiniLauncher OFF)
 
 if("${platform}" STREQUAL "linux")
     if("${arch}" MATCHES "arm|aarch64")
@@ -46,6 +47,9 @@ if(WINDOWS)
     if("${arch}" STREQUAL "x64")
         set(_withClouds ON)
     endif()
+    if(NOT developerBuild)
+        set(_withMiniLauncher ON)
+    endif()
 endif()
 
 if(targetDevice STREQUAL "edge1")
@@ -62,6 +66,8 @@ option(withTestCamera "Enable test camera" ${_withTestCamera})
 option(withTests "Enable unit tests" ${_withTests})
 option(withCassandraTests "Enable cassandra related tests" ${_withCassandraTests})
 option(withPluginStubs "Enable plugin stubs" ON)
+option(withMiniLauncher "Enable minilauncher" ${_withMiniLauncher})
+option(withScreenChecker "Enable screen checker" OFF)
 
 cmake_dependent_option(withDistributions "Enable distributions build"
     OFF "developerBuild"
@@ -72,7 +78,7 @@ option(enableHanwha OFF "Enable hanwha camera vendor even if it is disabled by d
 mark_as_advanced(enableHanwha)
 
 if(enableHanwha OR developerBuild)
-    set(enable_hanwha ON)
+    set(enable_hanwha true)
 endif()
 
 unset(_withMediaServer)
@@ -84,3 +90,4 @@ unset(_withClouds)
 unset(_withTestCamera)
 unset(_withTests)
 unset(_withCassandraTests)
+unset(_withMiniLauncher)

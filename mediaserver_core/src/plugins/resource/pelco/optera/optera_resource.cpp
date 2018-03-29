@@ -49,10 +49,8 @@ QnOpteraResource::~QnOpteraResource()
 
 }
 
-QnConstResourceVideoLayoutPtr QnOpteraResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider) const
+QnConstResourceVideoLayoutPtr QnOpteraResource::getVideoLayout(const QnAbstractStreamDataProvider* /*dataProvider*/) const
 {
-    QN_UNUSED(dataProvider);
-
     if (m_videoLayout)
         return m_videoLayout;
 
@@ -147,7 +145,6 @@ QnAbstractStreamDataProvider* QnOpteraResource::createLiveDataProvider()
 
     return new nx::plugins::utils::MultisensorDataProvider(toSharedPointer(this));
 }
-
 
 CLHttpStatus QnOpteraResource::makeGetStitchingModeRequest(CLSimpleHTTPClient& http, QByteArray& response) const
 {

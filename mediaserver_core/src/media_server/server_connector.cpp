@@ -11,7 +11,7 @@
 
 #if 0
 namespace {
-    QUrl trimmedUrl(const QUrl &url) {
+    QUrl trimmedUrl(const QUrl& url) {
         QUrl newUrl;
         newUrl.setScheme(lit("http"));
         newUrl.setHost(url.host());

@@ -78,14 +78,6 @@ public:
     /** Update QScrollArea hover if scrollBar is parented by one. */
     void updateScrollAreaHover(QScrollBar* scrollBar) const;
 
-    /** Unlike QWidget::graphicsProxyWidget finds proxy recursively. */
-    static QGraphicsProxyWidget* graphicsProxyWidget(const QWidget* widget);
-    static const QWidget* graphicsProxiedWidget(const QWidget* widget);
-
-    /** Workaround while Qt's QWidget::mapFromGlobal is broken: */
-    static QPoint mapFromGlobal(const QWidget* to, const QPoint& globalPos);
-    static QPoint mapFromGlobal(const QGraphicsWidget* to, const QPoint& globalPos);
-
 public:
     QnGenericPalette palette;
     QScopedPointer<QnNoptixStyleAnimator> idleAnimator;

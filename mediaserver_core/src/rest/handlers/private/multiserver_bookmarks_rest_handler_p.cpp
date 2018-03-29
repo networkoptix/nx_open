@@ -49,10 +49,9 @@ namespace
         nx::utils::Url url,
         Context *ctx)
     {
-        auto requestCompletionFunc = [ctx] (SystemError::ErrorCode osErrorCode, int statusCode,
-            nx::network::http::BufferType msgBody, nx::network::http::HttpHeaders httpHeaders)
+        auto requestCompletionFunc = [ctx] (SystemError::ErrorCode /*osErrorCode*/, int /*statusCode*/,
+            nx::network::http::BufferType /*msgBody*/, nx::network::http::HttpHeaders /*httpHeaders*/)
         {
-            QN_UNUSED(osErrorCode, statusCode, msgBody, httpHeaders);
             ctx->executeGuarded([ctx]()
             {
                 ctx->requestProcessed();
@@ -226,7 +225,6 @@ QnCameraBookmarkList QnMultiserverBookmarksRestHandlerPrivate::getBookmarks(
     return result;
 }
 
-
 QnCameraBookmarkTagList QnMultiserverBookmarksRestHandlerPrivate::getBookmarkTags(
     QnCommonModule* commonModule,
     QnGetBookmarkTagsRequestContext& context)
@@ -250,7 +248,6 @@ QnCameraBookmarkTagList QnMultiserverBookmarksRestHandlerPrivate::getBookmarkTag
     }
     return QnCameraBookmarkTag::mergeCameraBookmarkTags(outputData, request.limit);
 }
-
 
 bool QnMultiserverBookmarksRestHandlerPrivate::addBookmark(
     QnCommonModule* commonModule,

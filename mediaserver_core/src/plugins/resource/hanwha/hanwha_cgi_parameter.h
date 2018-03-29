@@ -75,6 +75,7 @@ public:
 
     QStringList possibleValues() const;
     void setPossibleValues(QStringList possibleValues);
+    void addPossibleValues(const QString& value);
 
 private:
     QString m_name;

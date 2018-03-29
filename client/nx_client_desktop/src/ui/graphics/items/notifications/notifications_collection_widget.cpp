@@ -262,7 +262,7 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(
         ? Qn::ViewLivePermission
         : Qn::ViewFootagePermission;
 
-    if (accessController()->hasPermissions(camera, requiredPermission))
+    if (!accessController()->hasPermissions(camera, requiredPermission))
         return;
 
     api::CameraImageRequest request;
@@ -287,7 +287,7 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(
     for (const auto& camera: cameraList)
     {
         NX_ASSERT(accessController()->hasPermissions(camera, Qn::ViewContentPermission));
-        if (accessController()->hasPermissions(camera, requiredPermission))
+        if (!accessController()->hasPermissions(camera, requiredPermission))
             continue;
 
         api::CameraImageRequest request;

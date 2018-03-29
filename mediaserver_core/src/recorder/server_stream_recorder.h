@@ -144,8 +144,8 @@ private:
     QnDualStreamingHelperPtr m_dualStreamingHelper;
     QnMediaServerResourcePtr m_mediaServer;
     QnScheduleTask m_panicSchedileRecord;   // panic mode. Highest recording priority
-    QnScheduleTask m_forcedSchedileRecord;  // special recording mode (recording action). Priority higher than regular schedule
-    QElapsedTimer m_forcedSchedileRecordTimer;
+    QnScheduleTask m_forcedScheduleRecord;  // special recording mode (recording action). Priority higher than regular schedule
+    QElapsedTimer m_forcedScheduleRecordTimer;
     int m_forcedScheduleRecordDurationMs;
     bool m_usedPanicMode;
     bool m_usedSpecialRecordingMode;

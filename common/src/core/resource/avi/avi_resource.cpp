@@ -183,8 +183,10 @@ void QnAviResource::setDewarpingParams(const QnMediaDewarpingParams& params)
     }
 }
 
-qreal QnAviResource::customAspectRatio() const
+QnAspectRatio QnAviResource::customAspectRatio() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_aviMetadata ? m_aviMetadata->overridenAr : base_type::customAspectRatio();
+    return m_aviMetadata
+        ? QnAspectRatio::closestStandardRatio(m_aviMetadata->overridenAr)
+        : base_type::customAspectRatio();
 }
