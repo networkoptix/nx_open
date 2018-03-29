@@ -912,5 +912,5 @@ void QnServerStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, in
 bool QnServerStreamRecorder::needConfigureProvider() const
 {
     const nx::mediaserver::resource::Camera* camera = dynamic_cast<nx::mediaserver::resource::Camera*>(m_device.data());
-    return !camera->isScheduleDisabled();
+    return camera->isLicenseUsed();
 }

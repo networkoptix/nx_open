@@ -1269,7 +1269,7 @@ CameraExtraStatus QnResourceTreeModelNode::calculateCameraExtraStatus() const
     if (camera->getStatus() == Qn::Recording)
         result |= CameraExtraStatusFlag::recording;
 
-    if (!camera->isScheduleDisabled())
+    if (camera->isLicenseUsed())
         result |= CameraExtraStatusFlag::scheduled;
 
     if (camera->statusFlags().testFlag(Qn::CSF_HasIssuesFlag))

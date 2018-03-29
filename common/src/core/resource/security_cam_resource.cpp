@@ -979,64 +979,24 @@ int QnSecurityCamResource::minDays() const
     return (*userAttributesLock)->minDays;
 }
 
-void QnSecurityCamResource::setScheduleDisabled(bool value)
+void QnSecurityCamResource::setLicenseUsed(bool value)
 {
     NX_ASSERT(!getId().isNull());
     {
         QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );
-        if ((*userAttributesLock)->scheduleDisabled == value)
+        if ((*userAttributesLock)->licenseUsed == value)
             return;
-        (*userAttributesLock)->scheduleDisabled = value;
+        (*userAttributesLock)->licenseUsed = value;
     }
 
-    emit scheduleDisabledChanged(::toSharedPointer(this));
-}
-
-bool QnSecurityCamResource::isScheduleDisabled() const
-{
-    NX_ASSERT(!getId().isNull());
-    QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );
-    return (*userAttributesLock)->scheduleDisabled;
-}
-
-void QnSecurityCamResource::setLicenseUsed(bool value)
-{
-    /// TODO: #gdm Refactor licence management
-    /*
-    switch (licenseType())
-    {
-        case Qn::LC_IO:
-        {
-            QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );
-            if ((*userAttributesLock)->licenseUsed == value)
-                return;
-            (*userAttributesLock)->licenseUsed = value;
-        }
-        default:
-            break;
-    }
-    */
-    setScheduleDisabled(!value);
     emit licenseUsedChanged(::toSharedPointer(this));
 }
 
 bool QnSecurityCamResource::isLicenseUsed() const
 {
-    /// TODO: #gdm Refactor licence management
-    /*
-    switch (licenseType())
-    {
-        case Qn::LC_IO:
-        {
-            QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );
-            return (*userAttributesLock)->licenseUsed;
-        }
-        default:
-            break;
-    }
-    */
-    /* By default camera requires license when recording is enabled. */
-    return !isScheduleDisabled();
+    NX_ASSERT(!getId().isNull());
+    QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );
+    return (*userAttributesLock)->licenseUsed;
 }
 
 Qn::FailoverPriority QnSecurityCamResource::failoverPriority() const

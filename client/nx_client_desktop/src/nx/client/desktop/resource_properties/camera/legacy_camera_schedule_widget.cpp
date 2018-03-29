@@ -562,7 +562,6 @@ void LegacyCameraScheduleWidget::applyChanges()
         if (canChangeRecording)
         {
             camera->setLicenseUsed(enableRecording);
-            camera->setScheduleDisabled(!enableRecording);
         }
 
         if (camera->isDtsBased())
@@ -590,7 +589,7 @@ void LegacyCameraScheduleWidget::updateScheduleEnabled()
 {
     int enabledCount = 0, disabledCount = 0;
     for (const auto &camera : m_cameras)
-        (camera->isScheduleDisabled() ? disabledCount : enabledCount)++;
+        (camera->isLicenseUsed() ? enabledCount : disabledCount)++;
 
     CheckboxUtils::setupTristateCheckbox(ui->enableRecordingCheckBox,
         enabledCount == 0 || disabledCount == 0, enabledCount > 0);

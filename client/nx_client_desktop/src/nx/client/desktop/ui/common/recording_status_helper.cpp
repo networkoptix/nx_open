@@ -108,7 +108,7 @@ QIcon RecordingStatusHelper::icon() const
 // TODO: #Elric this should be a resource parameter that is updated from the server.
 int RecordingStatusHelper::currentRecordingMode(const QnVirtualCameraResourcePtr& camera)
 {
-    if (!camera || camera->isScheduleDisabled())
+    if (!camera || !camera->isLicenseUsed())
         return Qn::RT_Never;
 
     const auto dateTime = qnSyncTime->currentDateTime();

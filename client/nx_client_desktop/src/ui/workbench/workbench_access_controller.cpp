@@ -346,7 +346,7 @@ void QnWorkbenchAccessController::at_resourcePool_resourceAdded(const QnResource
 
     if (const auto& camera = resource.dynamicCast<QnVirtualCameraResource>())
     {
-        connect(camera, &QnVirtualCameraResource::scheduleDisabledChanged, this,
+        connect(camera, &QnVirtualCameraResource::licenseUsedChanged, this,
             &QnWorkbenchAccessController::updatePermissions);
     }
 

@@ -131,10 +131,7 @@ void setRecordingAfterThreshold(
 void setRecordingEnabled(bool value, const Cameras& cameras)
 {
     for (const auto& camera: cameras)
-    {
         camera->setLicenseUsed(value);
-        camera->setScheduleDisabled(!value);
-    }
 }
 
 } // namespace

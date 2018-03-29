@@ -171,9 +171,6 @@ public:
 
     virtual QString getSharedId() const;
 
-    void setScheduleDisabled(bool value);
-    bool isScheduleDisabled() const;
-
     /** Check if a license is used for the current camera. */
     bool isLicenseUsed() const;
     void setLicenseUsed(bool value);
@@ -184,9 +181,6 @@ public:
     bool isAudioEnabled() const;
     bool isAudioForced() const;
     void setAudioEnabled(bool value);
-
-    bool isAdvancedWorking() const;
-    void setAdvancedWorking(bool value);
 
     bool isManuallyAdded() const;
     void setManuallyAdded(bool value);
@@ -342,13 +336,12 @@ public slots:
     virtual void recordingEventDetached();
 
 signals:
-    void scheduleDisabledChanged(const QnResourcePtr &resource);
+    void licenseUsedChanged(const QnResourcePtr &resource);
     void scheduleTasksChanged(const QnResourcePtr &resource);
     void groupIdChanged(const QnResourcePtr &resource);
     void groupNameChanged(const QnResourcePtr &resource);
     void motionRegionChanged(const QnResourcePtr &resource);
     void statusFlagsChanged(const QnResourcePtr &resource);
-    void licenseUsedChanged(const QnResourcePtr &resource);
     void licenseTypeChanged(const QnResourcePtr &resource);
     void failoverPriorityChanged(const QnResourcePtr &resource);
     void backupQualitiesChanged(const QnResourcePtr &resource);

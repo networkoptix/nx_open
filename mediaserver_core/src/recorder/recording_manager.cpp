@@ -192,7 +192,7 @@ bool QnRecordingManager::isResourceDisabled(const QnResourcePtr& res) const
         return true;
 
     const QnVirtualCameraResource* cameraRes = dynamic_cast<const QnVirtualCameraResource*>(res.data());
-    return  cameraRes && cameraRes->isScheduleDisabled();
+    return  cameraRes && !cameraRes->isLicenseUsed();
 }
 
 bool QnRecordingManager::startForcedRecording(
@@ -628,7 +628,7 @@ void QnRecordingManager::at_licenseMutexLocked()
 
         if (helper.isOverflowForCamera(camera))
         {
-            camera->setScheduleDisabled(true);
+            camera->setLicenseUsed(false);
             QList<QnUuid> idList;
             idList << camera->getId();
 
@@ -640,7 +640,7 @@ void QnRecordingManager::at_licenseMutexLocked()
             if (errCode != ec2::ErrorCode::ok)
             {
                 qWarning() << "Can't turn off recording for camera:" << camera->getUniqueId() << "error:" << ec2::toString(errCode);
-                camera->setScheduleDisabled(false); // rollback
+                camera->setLicenseUsed(true); // rollback
                 continue;
             }
             camera->saveParams();
