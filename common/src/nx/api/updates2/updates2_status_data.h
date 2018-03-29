@@ -48,7 +48,7 @@ public:
 
 #define Updates2StatusData_Fields (serverId)(state)(message)(progress)
 QN_FUSION_DECLARE_FUNCTIONS(Updates2StatusData::StatusCode, (lexical))
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((Updates2StatusData), (json))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((Updates2StatusData), (json)(eq))
 
 } // namespace api
 } // namespace nx

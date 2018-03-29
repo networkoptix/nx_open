@@ -1,4 +1,4 @@
-#if !defined(EDGE_SERVER)
+#if !defined(EDGE_SERVER) && !defined(__arch64__)
 #include "speech_synthesis_data_provider.h"
 
 #include <nx_speech_synthesizer/text_to_wav.h>

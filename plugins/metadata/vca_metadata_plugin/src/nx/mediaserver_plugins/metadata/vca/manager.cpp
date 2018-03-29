@@ -4,6 +4,7 @@
 
 #include <QtCore/QUrl>
 
+#define NX_PRINT_PREFIX "[metadata::vca::Manager] "
 #include <nx/kit/debug.h>
 
 #include <nx/mediaserver_plugins/utils/uuid.h>
@@ -15,8 +16,6 @@
 #include <nx/utils/std/cppnx.h>
 
 #include "nx/vca/camera_controller.h"
-
-#define NX_PRINT_PREFIX "[metadata::vca::Manager] "
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -41,7 +40,7 @@ nx::sdk::metadata::CommonEvent* createCommonEvent(
 {
     auto commonEvent = new nx::sdk::metadata::CommonEvent();
     commonEvent->setTypeId(
-        nx::mediaserver_plugins::utils::fromQnUuidToPluginGuid(event.eventTypeId));
+        nx::mediaserver_plugins::utils::fromQnUuidToPluginGuid(event.typeId));
     commonEvent->setCaption(event.name.value.toStdString());
     commonEvent->setDescription(event.name.value.toStdString());
     commonEvent->setIsActive(active);
@@ -180,7 +179,7 @@ Manager::Manager(Plugin* plugin,
 
     nx::api::AnalyticsDeviceManifest typedCameraManifest;
     for (const auto& eventType: typedManifest.outputEventTypes)
-        typedCameraManifest.supportedEventTypes.push_back(eventType.eventTypeId);
+        typedCameraManifest.supportedEventTypes.push_back(eventType.typeId);
     m_cameraManifest = QJson::serialized(typedCameraManifest);
 
     static const int kBufferCapacity = 4096;
@@ -379,7 +378,7 @@ nx::sdk::Error Manager::setHandler(nx::sdk::metadata::MetadataHandler* handler)
     return nx::sdk::Error::noError;
 }
 
-nx::sdk::Error Manager::startFetchingMetadata(nxpl::NX_GUID* eventTypeList, int eventTypeListSize)
+nx::sdk::Error Manager::startFetchingMetadata(nxpl::NX_GUID* typeList, int typeListSize)
 {
     QString host = m_url.host();
     nx::vca::CameraController vcaCameraConrtoller(host, m_auth.user(), m_auth.password());
@@ -388,9 +387,9 @@ nx::sdk::Error Manager::startFetchingMetadata(nxpl::NX_GUID* eventTypeList, int 
     if (error != nx::sdk::Error::noError)
         return error;
 
-    for (int i = 0; i < eventTypeListSize; ++i)
+    for (int i = 0; i < typeListSize; ++i)
     {
-        QnUuid id = nx::mediaserver_plugins::utils::fromPluginGuidToQnUuid(eventTypeList[i]);
+        QnUuid id = nx::mediaserver_plugins::utils::fromPluginGuidToQnUuid(typeList[i]);
         const AnalyticsEventType* eventType = m_plugin->eventByUuid(id);
         if (!eventType)
             NX_PRINT << "Unknown event type. TypeId = " << id.toStdString();

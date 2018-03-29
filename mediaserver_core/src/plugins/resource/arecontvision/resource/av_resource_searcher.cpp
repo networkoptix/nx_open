@@ -31,7 +31,6 @@ QnPlArecontResourceSearcher::QnPlArecontResourceSearcher(QnCommonModule* commonM
     AVJpeg::Header::Initialize("ArecontVision", "CamLabs", "ArecontVision");
 }
 
-
 QString QnPlArecontResourceSearcher::manufacture() const
 {
     return QnPlAreconVisionResource::MANUFACTURE;
@@ -150,10 +149,8 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
                 /*/
                 QString smac = nx::network::MACToString(mac);
 
-
                 QString id = "AVUNKNOWN";
                 int model = 0;
-
 
                 int shift = 32;
 
@@ -203,7 +200,8 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
 
 }
 
-QnResourcePtr QnPlArecontResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& /*params*/)
+QnResourcePtr QnPlArecontResourceSearcher::createResource(const QnUuid& resourceTypeId,
+    const QnResourceParams&)
 {
     QnNetworkResourcePtr result;
 
@@ -231,7 +229,8 @@ QnResourcePtr QnPlArecontResourceSearcher::createResource(const QnUuid &resource
     return result;
 }
 
-QByteArray downloadFileWithRetry(CLHttpStatus& status, const QString& fileName, const QString& host, int port, unsigned int timeout, const QAuthenticator& auth)
+QByteArray downloadFileWithRetry(CLHttpStatus& status, const QString& fileName,
+    const QString& host, int port, unsigned int timeout, const QAuthenticator& auth)
 {
     QByteArray rez;
     for (int i = 0; i < 4; ++i) {
@@ -243,7 +242,8 @@ QByteArray downloadFileWithRetry(CLHttpStatus& status, const QString& fileName, 
     return rez;
 }
 
-QList<QnResourcePtr> QnPlArecontResourceSearcher::checkHostAddr(const nx::utils::Url& url, const QAuthenticator& auth, bool isSearchAction)
+QList<QnResourcePtr> QnPlArecontResourceSearcher::checkHostAddr(const nx::utils::Url& url,
+    const QAuthenticator& auth, bool isSearchAction)
 {
     if( !url.scheme().isEmpty() && isSearchAction )
         return QList<QnResourcePtr>();  //searching if only host is present, not specific protocol
@@ -256,12 +256,14 @@ QList<QnResourcePtr> QnPlArecontResourceSearcher::checkHostAddr(const nx::utils:
     int timeout = 2000;
 
     CLHttpStatus status;
-    QString model = QLatin1String(downloadFileWithRetry(status, QLatin1String("get?model"), host, port, timeout, auth));
+    QString model = QLatin1String(downloadFileWithRetry(
+        status, QLatin1String("get?model"), host, port, timeout, auth));
 
     if (model.isEmpty())
         return QList<QnResourcePtr>();
 
-    QString modelRelease = QLatin1String(downloadFileWithRetry(status, QLatin1String("get?model=releasename"), host, port, timeout, auth));
+    QString modelRelease = QLatin1String(downloadFileWithRetry(
+        status, QLatin1String("get?model=releasename"), host, port, timeout, auth));
     if (!modelRelease.isEmpty() && modelRelease != model)
     {
         // this camera supports release name
@@ -279,7 +281,6 @@ QList<QnResourcePtr> QnPlArecontResourceSearcher::checkHostAddr(const nx::utils:
     if (model.isEmpty())
         return QList<QnResourcePtr>();
 
-
     QnUuid rt = qnResTypePool->getLikeResourceTypeId(manufacture(), model);
     if (rt.isNull())
     {
@@ -293,7 +294,8 @@ QList<QnResourcePtr> QnPlArecontResourceSearcher::checkHostAddr(const nx::utils:
     if (rt.isNull())
         return QList<QnResourcePtr>();
 
-    QString mac = QString(QLatin1String(downloadFileWithRetry(status, QLatin1String("get?mac"), host, port, timeout, auth)));
+    QString mac = QString(QLatin1String(downloadFileWithRetry(
+        status, QLatin1String("get?mac"), host, port, timeout, auth)));
     mac = getValueFromString(mac);
 
     if (mac.isEmpty())

@@ -16,6 +16,7 @@
 #include <utils/math/color_transformations.h>
 #include <ui/style/globals.h>
 #include <ui/style/helper.h>
+#include <nx/utils/math/fuzzy.h>
 
 namespace {
 
@@ -47,6 +48,11 @@ bool QnScheduleGridWidget::CellParams::operator==(const CellParams& other) const
         && quality == other.quality
         && recordingType == other.recordingType
         && qFuzzyIsNull(bitrateMbps - other.bitrateMbps);
+}
+
+bool QnScheduleGridWidget::CellParams::isAutomaticBitrate() const
+{
+    return qFuzzyEquals(bitrateMbps, kAutomaticBitrate);
 }
 
 QnScheduleGridWidget::QnScheduleGridWidget(QWidget* parent):

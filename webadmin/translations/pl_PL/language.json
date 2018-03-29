@@ -74,9 +74,9 @@
         "emailFrom": "Nadawca e-mail",
         "emailSignature": "Podpis e-mail",
         "emailSupportEmail": "E-mail do supportu",
-        "enableEdgeRecording": "Enable edge recording",
+        "enableEdgeRecording": "Włącz nagrywanie brzegowe",
         "eventLogPeriodDays": "Okres dziennika zdarzeń (dni)",
-        "hanwhaDeleteProfilesOnInitIfNeeded": "Delete camera profiles on init if needed",
+        "hanwhaDeleteProfilesOnInitIfNeeded": "W razie potrzeby usuń profile kamery przy inicjalizacji",
         "ldapAdminDn": "DN admina LDAP",
         "ldapSearchBase": "Podstawa wyszukiwania LDAP",
         "ldapSearchFilter": "Filtr wyszukiwania LDAP",
@@ -86,9 +86,9 @@
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "Max różnica między czasem zsynchronizowanym a lokalnym (ms)",
         "maxRecordQueueSizeBytes": "Max rozmiar kolejki rekordów (bajty)",
         "maxRecordQueueSizeElements": "Max rozmiar kolejki rekordów (elementy)",
-        "maxRemoteArchiveSynchronizationThreads": "Max remote archive synchronization threads",
-        "maxRtspConnectDurationSeconds": "Max Rtsp connect duration seconds",
-        "maxSceneItems": "Max scene items (0 means default)",
+        "maxRemoteArchiveSynchronizationThreads": "Max liczba wątków synchronizacji zdalnej archiwizacji",
+        "maxRtspConnectDurationSeconds": "Limit czasu na połączenie RTSP",
+        "maxSceneItems": "Max liczba elementów sceny (0 oznacza domyślną)",
         "proxyConnectTimeoutSec": "Limit czasu połączenia proxy (sek.)",
         "rtpTimeoutMs": "Limit czasu RTP (ms)",
         "sequentialFlirOnvifSearcherEnabled": "Użyj wyszukiwarki sekwencyjnej Flir Onvif",
@@ -178,17 +178,17 @@
     "common": {
         "voiceCommands": {
             "search": "find + [text for searchbar]",
-            "pause": "pause",
+            "pause": "pauza",
             "help": "help | show commands",
-            "collapse all servers": "collapse all servers",
+            "collapse all servers": "zwiń wszystkie serwery",
             "collapse server": "collapse server + [server name]",
-            "play": "play",
-            "clear search": "clear search",
+            "play": "odtwarzaj",
+            "clear search": "wyczyść wyszukiwanie",
             "live": "go to live | show me live",
-            "expand all servers": "expand all servers",
-            "stop listening": "stop listening",
+            "expand all servers": "rozwiń wszystkie serwery",
+            "stop listening": "przestań słuchać",
             "expand server": "expand server + [server name]",
-            "view": "view + [camera name]"
+            "view": "pokaż + [nazwa kamery]"
         },
         "systemOffline": "Serwer jest odłączony",
         "cameraLinks": {
@@ -200,9 +200,9 @@
             "transcoding": "Transkodowanie",
             "copyActiveText": "skopiowano do schowka"
         },
-        "searchCamPlaceholder": "Search",
+        "searchCamPlaceholder": "Szukaj",
         "cameraStates": {
-            "noFormat": "This browser does not support video playback from this camera.",
+            "noFormat": "Ta przeglądarka nie obsługuje odtwarzania wideo z tej kamery.",
             "ieWin10": "Proszę użyć przeglądarki Microsoft Edge lub Google Chrome.",
             "iosVideoTooLarge": "iOS nie obsługuje wideo większego niż FullHD (2MP: 1920x1080).",
             "unauthorized": "Wymagane uwierzytelnienie",
@@ -213,13 +213,13 @@
             "error": "Błąd",
             "offline": "Offline",
             "noData": "Brak danych",
-            "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing videos."
+            "flashRequired": "Aby odtwarzać filmy wideo, proszę <a href='https://get.adobe.com/flashplayer/' target='_blank'>zainstalować Adobe Flash</a>."
         },
-        "chromeCastWarning": "Chromecast is resource intensive and may cause issues on your server.",
+        "chromeCastWarning": "Chromecast wymaga dużej ilości zasobów i może powodować problemy na serwerze.",
         "resolution": {
-            "high": "High",
+            "high": "Wysoki",
             "auto": "Auto",
-            "low": "Low"
+            "low": "Niski"
         }
     }
 }

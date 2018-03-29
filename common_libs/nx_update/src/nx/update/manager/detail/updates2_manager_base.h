@@ -11,6 +11,7 @@
 
 namespace nx {
 namespace update {
+namespace manager {
 namespace detail {
 
 class NX_UPDATE_API Updates2ManagerBase: public QObject
@@ -22,7 +23,7 @@ public:
     api::Updates2StatusData status();
     api::Updates2StatusData download();
     api::Updates2StatusData install();
-    /** #TODO #akulikov implement this */
+    /** #TODO #akulikov Implement this. */
     api::Updates2StatusData cancel();
     void atServerStart();
     /** After this method is called manager is not operational and should be destroyed */
@@ -36,10 +37,10 @@ protected:
 
     void checkForRemoteUpdate(utils::TimerId timerId);
     void checkForGlobalDictionaryUpdate();
-    void swapRegistries(update::info::AbstractUpdateRegistryPtr otherRegistry);
     void refreshStatusAfterCheck();
     void setStatus(api::Updates2StatusData::StatusCode code, const QString& message);
     void startPreparing(const QString& updateFilePath);
+    void updateRegistryIfNeeded(update::info::AbstractUpdateRegistryPtr other);
 
     void onDownloadFinished(const QString& fileName);
     void onDownloadFailed(const QString& fileName);
@@ -52,25 +53,28 @@ protected:
     void onChunkDownloadFailed(const QString& fileName);
 
     // 'Real world' communication functions
-    // These below should be overriden in CommonUpdates2Manager
+    // These below should be overridden in CommonUpdates2Manager.
     virtual void loadStatusFromFile() = 0;
     virtual update::info::AbstractUpdateRegistryPtr getGlobalRegistry() = 0;
     virtual QnUuid moduleGuid() const = 0;
     virtual void updateGlobalRegistry(const QByteArray& serializedRegistry) = 0;
     virtual void writeStatusToFile(const detail::Updates2StatusDataEx& statusData) = 0;
-    // This is for testing purposes only now
+    virtual bool isClient() const = 0;
+    virtual QnUuid peerId() const = 0;
+    // This is for testing purposes only.
     virtual void remoteUpdateCompleted() = 0;
 
-    // These below should be overriden in Server{Client}Updates2Manager
+    // These below should be overriden in Server{Client}Updates2Manager.
     virtual qint64 refreshTimeout() const = 0;
     virtual void connectToSignals() = 0;
     virtual update::info::AbstractUpdateRegistryPtr getRemoteRegistry() = 0;
     virtual vms::common::p2p::downloader::AbstractDownloader* downloader() = 0;
-    virtual AbstractUpdates2Installer* installer() = 0;
+    virtual installer::detail::AbstractUpdates2Installer* installer() = 0;
     virtual QString filePath() const = 0;
 
 };
 
 } // namespace detail
+} // namespace manager
 } // namespace update
 } // namespace nx

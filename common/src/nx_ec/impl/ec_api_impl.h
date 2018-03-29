@@ -316,5 +316,6 @@ namespace ec2
 
 Q_DECLARE_METATYPE(ec2::ErrorCode);
 Q_DECLARE_METATYPE(ec2::AbstractECConnectionPtr);
+Q_DECLARE_METATYPE(ec2::NotificationSource)
 
 #endif  //EC_API_IMPL_H

@@ -22,6 +22,7 @@
 #include <nx/utils/std/future.h>
 #include <nx/utils/type_utils.h>
 #include <nx/utils/system_error.h>
+#include <nx/utils/unused.h>
 
 #include "ssl/ssl_static_data.h"
 
@@ -521,9 +522,8 @@ void SslAsyncBioHelper::perform(SslAsyncOperation* operation)
     }
 }
 
-void SslAsyncBioHelper::checkShutdown(int sslReturn, int sslError)
+void SslAsyncBioHelper::checkShutdown(int /*sslReturn*/, int sslError)
 {
-    Q_UNUSED(sslReturn);
     if (SSL_get_shutdown(m_ssl) == SSL_RECEIVED_SHUTDOWN ||
         sslError == SSL_ERROR_ZERO_RETURN) {
             // This should be the normal shutdown which means the
@@ -649,7 +649,7 @@ void SslAsyncBioHelper::onSend(
         std::size_t transferred)
 {
     NX_VERBOSE(this, lm("transport sent %1: %2").args(transferred, SystemError::toString(errorCode)));
-    Q_UNUSED(transferred);
+    nx::utils::unused(transferred);
     if (m_writeQueue.empty()) return;
     if (errorCode != SystemError::noError) {
         DeletionFlag deleted(this);
@@ -1192,7 +1192,6 @@ SslSocket::~SslSocket()
 
     delete d_ptr;
 }
-
 
 bool SslSocket::doHandshake()
 {

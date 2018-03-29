@@ -105,3 +105,9 @@ bool deserialize(QnUbjsonReader<QByteArray> *stream, QnSoftwareVersion *target) 
 void serialize(const QnSoftwareVersion &value, QnCsvStreamWriter<QByteArray> *target) {
     target->writeField(value.toString());
 }
+
+uint qHash(const QnSoftwareVersion& softwareVersion)
+{
+    return softwareVersion.major() ^ softwareVersion.minor() ^ softwareVersion.bugfix() ^
+        softwareVersion.build();
+}

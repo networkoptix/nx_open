@@ -8,6 +8,7 @@
 #include <nx/streaming/config.h>
 #include <utils/common/synctime.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/unused.h>
 
 #if 0
 static const char H264_NAL_PREFIX[4] = {0x00, 0x00, 0x00, 0x01};
@@ -480,7 +481,7 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
     // 1. jpeg main header
 
     int typeSpecific = *curPtr++;
-    Q_UNUSED(typeSpecific);
+    nx::utils::unused(typeSpecific);
     int fragmentOffset = (curPtr[0] << 16) + (curPtr[1] << 8) + curPtr[2];
     curPtr += 3;
     int jpegType = *curPtr++;
@@ -533,7 +534,7 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
             if (bytesLeft < 4)
                 return false;
             quint8 MBZ = *curPtr++;
-            Q_UNUSED(MBZ);
+            nx::utils::unused(MBZ);
             quint8 Precision = *curPtr++;
             quint16 length = (curPtr[0] << 8) + curPtr[1];
             curPtr += 2;

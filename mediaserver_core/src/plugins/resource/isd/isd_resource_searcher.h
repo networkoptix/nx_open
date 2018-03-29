@@ -16,6 +16,7 @@ class QnPlISDResourceSearcher:
 
 public:
     QnPlISDResourceSearcher(QnCommonModule* commonModule);
+    virtual ~QnPlISDResourceSearcher() override;
 
     virtual QnResourcePtr createResource(
         const QnUuid &resourceTypeId,
@@ -59,7 +60,7 @@ private:
     bool isDwOrIsd(const QString& vendorName, const QString& model) const;
 
     QnResourcePtr processMdnsResponse(
-        const QString& mdnsResponse,
+        const QByteArray& responseData,
         const QString& mdnsRemoteAddress,
         const QnResourceList& alreadyFoundResources);
 

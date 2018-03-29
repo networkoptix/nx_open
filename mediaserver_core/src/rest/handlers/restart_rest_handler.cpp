@@ -6,18 +6,16 @@
 
 void restartServer(int restartTimeout);
 
-int QnRestartRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor *) {
-    Q_UNUSED(path)
-    Q_UNUSED(params)
+int QnRestartRestHandler::executeGet(const QString& /*path*/, const QnRequestParams& /*params*/,
+    QnJsonRestResult& result, const QnRestConnectionProcessor*)
+{
     result.setError(QnJsonRestResult::NoError);
     return CODE_OK;
 }
 
-void QnRestartRestHandler::afterExecute(const QString &path, const QnRequestParamList &params, const QByteArray& body, const QnRestConnectionProcessor*)
+void QnRestartRestHandler::afterExecute(
+    const QString& /*path*/, const QnRequestParamList& /*params*/, const QByteArray& /*body*/,
+    const QnRestConnectionProcessor*)
 {
-    Q_UNUSED(path)
-    Q_UNUSED(params)
-    Q_UNUSED(body)
-
     restartServer(0);
 }

@@ -849,19 +849,19 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Wearable Camera...</source>
-      <translation type="unfinished">Wearable Camera...</translation>
+      <translation>Camera đeo người...</translation>
     </message>
     <message>
       <source>New Wearable Camera...</source>
-      <translation type="unfinished">New Wearable Camera...</translation>
+      <translation>Camera đeo người mới...</translation>
     </message>
     <message>
       <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
+      <translation>Tải lên tập tin...</translation>
     </message>
     <message>
       <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
+      <translation>Tải lên tập tin...</translation>
     </message>
     <message>
       <source>Start Analytics...</source>
@@ -1010,7 +1010,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Settings are not available for .NOV and .EXE files.</source>
-      <translation type="unfinished">Settings are not available for .NOV and .EXE files.</translation>
+      <translation>Cài đặt không khả dụng cho các tệp .NOV và .EXE.</translation>
     </message>
   </context>
   <context>
@@ -1081,7 +1081,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Scroll Left</source>
-      <translation>Di chuyển sang trái</translation>
+      <translation>di chuyển sang trái</translation>
     </message>
     <message>
       <source>Scroll Up</source>
@@ -1089,7 +1089,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation>Di chuyển sang phải</translation>
+      <translation>di chuyển sang phải</translation>
     </message>
     <message>
       <source>Scroll Down</source>
@@ -2224,14 +2224,14 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>No settings</source>
-      <translation type="unfinished">No settings</translation>
+      <translation>Không có cài đặt</translation>
     </message>
   </context>
   <context>
     <name>QnCameraAnalyticsPolicy</name>
     <message>
       <source>Analytics is not available for %1</source>
-      <translation type="unfinished">Analytics is not available for %1</translation>
+      <translation>Analytics không khả dụng cho %1</translation>
     </message>
   </context>
   <context>
@@ -2336,6 +2336,12 @@ to view more bookmarks</source>
       <source>Edge</source>
       <translation>Cạnh</translation>
     </message>
+    <message numerus="yes">
+      <source>This Id is already used on the following %n cameras: %1</source>
+      <translation>
+        <numerusform>Mã này đã được sử dụng trên %n camera sau: %1</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnCameraInputBusinessEventWidget</name>
@@ -2428,7 +2434,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Vendor</source>
-      <translation>Nhà cung cấp</translation>
+      <translation>Nhà cung cấp:</translation>
     </message>
     <message>
       <source>Model</source>
@@ -2449,6 +2455,10 @@ to view more bookmarks</source>
     <message>
       <source>Server</source>
       <translation>Máy chủ</translation>
+    </message>
+    <message>
+      <source>Id</source>
+      <translation>Id</translation>
     </message>
   </context>
   <context>
@@ -2486,7 +2496,7 @@ to view more bookmarks</source>
     <name>QnCameraMotionPolicy</name>
     <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation type="unfinished">Recording or motion detection is disabled for %1</translation>
+      <translation>%1 Video bên giám sát hoặc chức năng dịch chuyển không thể được sử dụng</translation>
     </message>
   </context>
   <context>
@@ -2508,10 +2518,6 @@ to view more bookmarks</source>
   <context>
     <name>QnCameraPasswordChangeDialog</name>
     <message>
-      <source>Password shouldn&apos;t be equal to camera&apos;s user name</source>
-      <translation>Mật khẩu shouldn&apos;t bằng tên người dùng camera&apos;s</translation>
-    </message>
-    <message>
       <source>New Password</source>
       <translation>Mật khẩu mới</translation>
     </message>
@@ -2527,12 +2533,16 @@ to view more bookmarks</source>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
       <translation>Mật khẩu phải có ít nhất 8 ký tự dài và chứa các loại ký tự khác nhau.</translation>
     </message>
+    <message>
+      <source>Password should not be equal to camera&apos;s user name</source>
+      <translation>Mật khẩu shouldnt bằng tên người dùng camera&apos;s</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraRecordingPolicy</name>
     <message>
       <source>Recording is disabled for %1</source>
-      <translation type="unfinished">Recording is disabled for %1</translation>
+      <translation>%1 video thể</translation>
     </message>
   </context>
   <context>
@@ -2599,7 +2609,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Mbit/s</source>
-      <translation type="unfinished">Mbit/s</translation>
+      <translation>Mbit/s</translation>
     </message>
     <message>
       <source>Less Settings</source>
@@ -2703,11 +2713,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Cannot edit properties for several wearable and non-wearable cameras.</source>
-      <translation type="unfinished">Cannot edit properties for several wearable and non-wearable cameras.</translation>
+      <translation>Không thể chỉnh sửa thuộc tính cho một camera đeo người.</translation>
     </message>
     <message>
       <source>Cannot edit properties for several wearable cameras.</source>
-      <translation type="unfinished">Cannot edit properties for several wearable cameras.</translation>
+      <translation>Không thể chỉnh sửa thuộc tính cho một camera đeo người.</translation>
     </message>
   </context>
   <context>
@@ -2802,7 +2812,7 @@ to %1</source>
     </message>
     <message>
       <source>Account is not activated. Please check your email and follow provided instructions</source>
-      <translation type="unfinished">Account is not activated. Please check your email and follow provided instructions</translation>
+      <translation>Đã kích hoạt tài khoản. Vui lòng kiểm tra email của bạn và làm theo các bước như hướng dẫn</translation>
     </message>
   </context>
   <context>
@@ -3154,11 +3164,9 @@ to %1</source>
       <source>Ask your system administrator to do it.</source>
       <translation>Yêu cầu quản trị viên hệ thống của bạn làm điều đó.</translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>Set Password</source>
-      <translation>
-        <numerusform>Đặt mật khẩu</numerusform>
-      </translation>
+      <translation>Đặt mật khẩu</translation>
     </message>
   </context>
   <context>
@@ -4607,11 +4615,11 @@ to %1</source>
     <name>QnNewWearableCameraDialog</name>
     <message>
       <source>Wearable Camera</source>
-      <translation type="unfinished">Wearable Camera</translation>
+      <translation>Camera đeo người</translation>
     </message>
     <message>
       <source>Wearable Camera %1</source>
-      <translation type="unfinished">Wearable Camera %1</translation>
+      <translation>Camera đeo người</translation>
     </message>
     <message>
       <source>Name</source>
@@ -4707,16 +4715,16 @@ to %1</source>
   <context>
     <name>QnPerformanceTest</name>
     <message>
-      <source>For full - featured mode, please use another computer</source>
-      <translation>Để dùng với chế độ đầy đủ tính năng, hãy sử dụng một máy tính khác</translation>
-    </message>
-    <message>
       <source>%1 can work in configuration mode only</source>
       <translation>%1 chỉ có thể hoạt động ở chế độ cấu hình</translation>
     </message>
     <message>
       <source>Performance of this computer allows running %1 in configuration mode only.</source>
       <translation>Hiệu năng của máy tính này chỉ cho phép chạy %1 ở chế độ cấu hình.</translation>
+    </message>
+    <message>
+      <source>For full-featured mode please use another computer</source>
+      <translation>Để dùng với chế độ đầy đủ tính năng, hãy sử dụng một máy tính khác</translation>
     </message>
   </context>
   <context>
@@ -5838,6 +5846,10 @@ to %1</source>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
       <translation>Không thể đặt tùy chọn ghi "Motion + Low - Res".</translation>
     </message>
+    <message>
+      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
+      <translation>Lưu trữ được tải lên có thể bị xóa tự động, nếu không có không gian trống trên bộ nhớ máy chủ. Đoạn phim cổ nhất trong số tất cả các camera trên máy chủ sẽ bị xóa đầu tiên.</translation>
+    </message>
   </context>
   <context>
     <name>QnSmtpAdvancedSettingsWidget</name>
@@ -5989,10 +6001,6 @@ to %1</source>
   <context>
     <name>QnStatusOverlayController</name>
     <message>
-      <source>NOT ENOUGH LICENCES</source>
-      <translation>KHÔNG CẤP BẢN QUYỀN</translation>
-    </message>
-    <message>
       <source>NO DATA</source>
       <translation>Không có sẵn</translation>
     </message>
@@ -6046,7 +6054,7 @@ to %1</source>
     </message>
     <message>
       <source>NO LIVE STREAM</source>
-      <translation type="unfinished">NO LIVE STREAM</translation>
+      <translation>KHÔNG CÓ LIVE STREAM</translation>
     </message>
     <message>
       <source>TOO MANY CONNECTIONS</source>
@@ -6062,7 +6070,11 @@ to %1</source>
     </message>
     <message>
       <source>UNSUPPORTED FIRMWARE VERSION</source>
-      <translation type="unfinished">UNSUPPORTED FIRMWARE VERSION</translation>
+      <translation>KHÔNG HỖ TRỢ FIRMWARE CHO PHIÊN BẢN NÀY</translation>
+    </message>
+    <message>
+      <source>NOT ENOUGH LICENSES</source>
+      <translation type="unfinished">NOT ENOUGH LICENSES</translation>
     </message>
   </context>
   <context>
@@ -6212,7 +6224,7 @@ to %1</source>
     </message>
     <message>
       <source>Recording was enabled on the USB storage</source>
-      <translation type="unfinished">Recording was enabled on the USB storage</translation>
+      <translation>Ghi âm được kích hoạt trên USB lưu trữ</translation>
     </message>
   </context>
   <context>
@@ -7079,35 +7091,35 @@ to %1</source>
   <context>
     <name>QnWearableProgressWidget</name>
     <message>
-      <source>Uploading %1... %2	%p%</source>
-      <translation type="unfinished">Uploading %1... %2	%p%</translation>
-    </message>
-    <message>
       <source>Stop uploading?</source>
-      <translation type="unfinished">Stop uploading?</translation>
+      <translation>Dừng tải lên?</translation>
     </message>
     <message>
       <source>Already uploaded files will be kept.</source>
-      <translation type="unfinished">Already uploaded files will be kept.</translation>
-    </message>
-    <message>
-      <source>Finalizing %1... %2	%p%</source>
-      <translation type="unfinished">Finalizing %1... %2	%p%</translation>
+      <translation>Các tệp đã tải lên sẽ được lưu giữ.</translation>
     </message>
     <message>
       <source>(%1 of %2)</source>
-      <translation type="unfinished">(%1 of %2)</translation>
+      <translation>(%1 đến %2)</translation>
+    </message>
+    <message>
+      <source>Uploading %1...</source>
+      <translation>Đang tải lên %1...</translation>
+    </message>
+    <message>
+      <source>Finalizing %1...</source>
+      <translation>Hoàn thiện %1...</translation>
     </message>
   </context>
   <context>
     <name>QnWearableUploadWidget</name>
     <message>
       <source>User &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation type="unfinished">User &quot;%1&quot; is currently uploading footage to this camera.</translation>
+      <translation>Người dùng &quot;%1&quot; hiện đang tải lên cảnh quay cho camera này.</translation>
     </message>
     <message>
       <source>Another user is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Another user is currently uploading footage to this camera.</translation>
+      <translation>Người dùng hiện đang tải lên cảnh quay cho camera này.</translation>
     </message>
   </context>
   <context>
@@ -7198,6 +7210,10 @@ to %1</source>
     <message>
       <source>Could not connect to server. Video Wall will be closed.</source>
       <translation>Không thể kết nối tới máy chủ. Video Wall sẽ bị đóng.</translation>
+    </message>
+    <message>
+      <source>Video Wall is removed on the server and will be closed.</source>
+      <translation type="unfinished">Video Wall is removed on the server and will be closed.</translation>
     </message>
   </context>
   <context>
@@ -7491,111 +7507,143 @@ to %1</source>
     </message>
     <message>
       <source>Video (%1)</source>
-      <translation type="unfinished">Video (%1)</translation>
+      <translation>Video (%1)</translation>
     </message>
     <message>
       <source>Open Wearable Camera Recordings...</source>
-      <translation type="unfinished">Open Wearable Camera Recordings...</translation>
+      <translation>Mở ghi lại camera đeo người...</translation>
     </message>
     <message>
       <source>Only video files with correct timestamp are supported.</source>
-      <translation type="unfinished">Only video files with correct timestamp are supported.</translation>
-    </message>
-    <message>
-      <source>Not enough space on server storage</source>
-      <translation type="unfinished">Not enough space on server storage</translation>
+      <translation>Chỉ các tập tin video với dấu thời gian chính xác được hỗ trợ.</translation>
     </message>
     <message>
       <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</translation>
+      <translation>Người dùng &quot;%1&quot; hiện đang tải lên cảnh quay cho camera này.</translation>
     </message>
     <message>
       <source>Could not start upload as another user is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Could not start upload as another user is currently uploading footage to this camera.</translation>
+      <translation>Không thể tải lên vì một người dùng khác đang tải lên cho camera này.</translation>
     </message>
     <message>
       <source>Failed to add wearable camera</source>
-      <translation type="unfinished">Failed to add wearable camera</translation>
+      <translation>Thất bại trong việc thêm camera đeo người</translation>
     </message>
     <message>
       <source>No video files found in selected folder</source>
-      <translation type="unfinished">No video files found in selected folder</translation>
+      <translation>Không tìm thấy tệp video trong thư mục đã chọn</translation>
     </message>
     <message numerus="yes">
       <source>Selected file formats are not supported</source>
-      <translation type="unfinished">
-        <numerusform>Selected file formats are not supported</numerusform>
+      <translation>
+        <numerusform>Định dạng tệp đã chọn không được hỗ trợ</numerusform>
       </translation>
     </message>
     <message>
       <source>Use .MKV, .AVI, .MP4 or other video files.</source>
-      <translation type="unfinished">Use .MKV, .AVI, .MP4 or other video files.</translation>
+      <translation>Sử dụng .MKV, .AVI, .MP4 hoặc các tệp video khác.</translation>
     </message>
     <message numerus="yes">
       <source>Selected files do not have timestamps</source>
-      <translation type="unfinished">
-        <numerusform>Selected files do not have timestamps</numerusform>
+      <translation>
+        <numerusform>Các tệp được chọn không có dấu thời gian</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos are already being uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+      <translation>
+        <numerusform>Các tệp đã chọn bao gồm các khoảng thời gian mà các video đang được tải lên</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Wearable Camera.</source>
-      <translation type="unfinished">
-        <numerusform>You can upload these files to a different instance of a Wearable Camera.</numerusform>
+      <translation>
+        <numerusform>Bạn có thể tải các tệp này lên một camera đeo người.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos have already been uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+      <translation>
+        <numerusform>Các tệp đã chọn bao gồm các khoảng thời gian mà các video đang được tải lên</numerusform>
       </translation>
     </message>
     <message>
       <source>Selected files will not be uploaded</source>
-      <translation type="unfinished">Selected files will not be uploaded</translation>
+      <translation>Các tệp được chọn sẽ không được tải lên</translation>
     </message>
     <message>
       <source>Some files will not be uploaded</source>
-      <translation type="unfinished">Some files will not be uploaded</translation>
+      <translation>Các tệp được chọn sẽ không được tải lên</translation>
     </message>
     <message>
       <source>No new files to upload in selected folder</source>
-      <translation type="unfinished">No new files to upload in selected folder</translation>
+      <translation>Không tìm thấy tệp video trong thư mục đã chọn</translation>
     </message>
     <message numerus="yes">
-      <source>Files size - %2</source>
-      <translation type="unfinished">
-        <numerusform>Files size - %2</numerusform>
+      <source>Selected files are too old</source>
+      <translation>
+        <numerusform>Các tệp đã chọn quá cũ</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation>
+        <numerusform>Tệp đã chọn đã được ghi lại trên %1, nhưng chỉ có thể tải lên các tệp được ghi lại trong %n ngày qua. Bạn có thể thay đổi điều này trong cài đặt lưu trữ trên camera.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation>
+        <numerusform>Tệp đã chọn đã được ghi lại trên %1, nhưng chỉ có thể tải lên các tệp được ghi lại trong %n ngày qua. Bạn có thể thay đổi điều này trong cài đặt lưu trữ trên camera.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Some footage may be deleted after uploading these files</source>
+      <translation>
+        <numerusform>Một số cảnh quay có thể bị xóa sau khi tải lên các tệp này</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
+      <translation>
+        <numerusform>Không còn nhiều không gian trống trên bộ nhớ máy chủ. Một số cảnh quay cũ có thể bị xóa để giải phóng không gian. Lưu ý rằng nếu tệp tin đã chọn xuất hiện lâu nhất trên máy chủ, chúng sẽ bị xóa ngay sau khi được tải lên.</numerusform>
       </translation>
     </message>
     <message>
-      <source>Free space - %2</source>
-      <translation type="unfinished">Free space - %2</translation>
+      <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
+      <translation>Để ngăn chặn điều này bạn có thể thêm bộ nhớ bổ sung. Bạn cũng có thể kiểm soát cảnh quay nào sẽ bị xóa đầu tiên bằng cách thay đổi kho lưu giữ thời gian trong cài đặt máy ảnh.</translation>
     </message>
     <message>
-      <source>%1 - has unsupported format.</source>
-      <translation type="unfinished">%1 - has unsupported format.</translation>
+      <source>Upload anyway?</source>
+      <translation>Upload mọi cách?</translation>
     </message>
     <message>
-      <source>%1 - does not have timestamp.</source>
-      <translation type="unfinished">%1 - does not have timestamp.</translation>
+      <source>Could not finish upload to %1</source>
+      <translation>Không thể hoàn tất tải lên %1</translation>
     </message>
     <message>
-      <source>%1 - covers period for which video has already been uploaded.</source>
-      <translation type="unfinished">%1 - covers period for which video has already been uploaded.</translation>
+      <source>Make sure there is enough space on server storage.</source>
+      <translation>Đảm bảo có đủ dung lượng trên bộ nhớ máy chủ.</translation>
     </message>
     <message>
-      <source>%1 - covers period for which video is being uploaded.</source>
-      <translation type="unfinished">%1 - covers period for which video is being uploaded.</translation>
+      <source>%1 has unsupported format.</source>
+      <translation>định dạng không được hỗ trợ.</translation>
     </message>
     <message>
-      <source>%1 - does not fit on server storage.</source>
-      <translation type="unfinished">%1 - does not fit on server storage.</translation>
+      <source>%1 does not have timestamp.</source>
+      <translation>%1 - không có dấu thời gian.</translation>
+    </message>
+    <message>
+      <source>%1 is older than allowed in camera archive settings.</source>
+      <translation>%1 cũ hơn được cho phép trong cài đặt lưu trữ camera.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video has already been uploaded.</source>
+      <translation>Các tệp đã chọn bao gồm các khoảng thời gian mà các video đang được tải lên.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video is being uploaded.</source>
+      <translation>Các tệp đã chọn bao gồm các khoảng thời gian mà các video đang được tải lên.</translation>
     </message>
   </context>
   <context>
@@ -7771,7 +7819,7 @@ to %1</source>
     </message>
     <message>
       <source>Stop uploading?</source>
-      <translation type="unfinished">Stop uploading?</translation>
+      <translation>Dừng tải lên?</translation>
     </message>
     <message>
       <source>Stop</source>
@@ -7779,8 +7827,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Some video file(s) are still being uploaded to %n wearable cameras:</source>
-      <translation type="unfinished">
-        <numerusform>Some video file(s) are still being uploaded to %n wearable cameras:</numerusform>
+      <translation>
+        <numerusform>Một số tệp tin video vẫn đang được tải lên %n camera đeo người:</numerusform>
       </translation>
     </message>
   </context>
@@ -8028,34 +8076,34 @@ to %1</source>
     <name>nx::client::desktop::UploadWorker</name>
     <message>
       <source>Could not open file &quot;%1&quot;</source>
-      <translation type="unfinished">Could not open file &quot;%1&quot;</translation>
+      <translation>Không thể mở tệp &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Could not calculate md5 for file &quot;%1&quot;</source>
-      <translation type="unfinished">Could not calculate md5 for file &quot;%1&quot;</translation>
+      <translation>Không thể tính toán md5 cho tệp &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Could not create upload on the server side</source>
-      <translation type="unfinished">Could not create upload on the server side</translation>
+      <translation>Không thể tạo tệp tải lên ở phía máy chủ</translation>
     </message>
     <message>
       <source>Could not upload file chunk to the server</source>
-      <translation type="unfinished">Could not upload file chunk to the server</translation>
+      <translation>Không thể tải đoạn tệp lên máy chủ</translation>
     </message>
     <message>
       <source>Could not check uploaded file on the server</source>
-      <translation type="unfinished">Could not check uploaded file on the server</translation>
+      <translation>Không thể kiểm tra tệp đã tải lên trên máy chủ</translation>
     </message>
     <message>
       <source>File was corrupted while being uploaded to the server</source>
-      <translation type="unfinished">File was corrupted while being uploaded to the server</translation>
+      <translation>Tệp bị hỏng trong khi tải lên máy chủ</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::WearableWorker</name>
     <message>
       <source>Failed to send request to the server.</source>
-      <translation type="unfinished">Failed to send request to the server.</translation>
+      <translation>Không thể kết nối đến máy chủ.</translation>
     </message>
   </context>
   <context>
@@ -8090,7 +8138,7 @@ to %1</source>
     </message>
     <message>
       <source>Selected period cannot be exported for the current camera.</source>
-      <translation type="unfinished">Selected period cannot be exported for the current camera.</translation>
+      <translation>Không thể xuất thời gian đã chọn cho máy ảnh hiện tại.</translation>
     </message>
   </context>
   <context>
@@ -8538,7 +8586,7 @@ to %1</source>
     </message>
     <message>
       <source>Wearable Cameras cannot be moved between servers</source>
-      <translation type="unfinished">Wearable Cameras cannot be moved between servers</translation>
+      <translation>Không thể di chuyển camera đeo người giữa các máy chủ</translation>
     </message>
     <message>
       <source>Failed to change password</source>

@@ -13,8 +13,6 @@
 #include <common/common_globals.h>
 #include <api/model/api_ioport_data.h>
 
-#include <core/misc/schedule_task.h>
-
 #include <core/resource/media_resource.h>
 #include <core/resource/motion_window.h>
 #include <core/resource/network_resource.h>
@@ -88,10 +86,11 @@ public:
     void setScheduleTasks(const QnScheduleTaskList &scheduleTasks);
     QnScheduleTaskList getScheduleTasks() const;
 
-    virtual bool hasDualStreaming() const;
+    /** @return true if dual streaming is supported */
+    virtual bool hasDualStreamingInternal() const;
 
-    /** Return true if dual streaming supported and don't blocked by user */
-    virtual bool hasDualStreaming2() const;
+    /** @return true if dual streaming is supported and don't blocked by user */
+    virtual bool hasDualStreaming() const;
 
     /** Returns true if camera stores archive on a external system */
     bool isDtsBased() const;
@@ -121,8 +120,9 @@ public:
      */
     bool isSharingLicenseInGroup() const;
 
-    bool isMultiSensorCamera() const;
+    bool isNvr() const;
 
+    bool isMultiSensorCamera() const;
 
     virtual Qn::StreamFpsSharingMethod streamFpsSharingMethod() const;
     void setStreamFpsSharingMethod(Qn::StreamFpsSharingMethod value);
@@ -171,9 +171,6 @@ public:
 
     virtual QString getSharedId() const;
 
-    void setScheduleDisabled(bool value);
-    bool isScheduleDisabled() const;
-
     /** Check if a license is used for the current camera. */
     bool isLicenseUsed() const;
     void setLicenseUsed(bool value);
@@ -184,9 +181,6 @@ public:
     bool isAudioEnabled() const;
     bool isAudioForced() const;
     void setAudioEnabled(bool value);
-
-    bool isAdvancedWorking() const;
-    void setAdvancedWorking(bool value);
 
     bool isManuallyAdded() const;
     void setManuallyAdded(bool value);
@@ -249,7 +243,7 @@ public:
     QnUuid preferredServerId() const;
 
     nx::api::AnalyticsSupportedEvents analyticsSupportedEvents() const;
-    void setAnalyticsSupportedEvents(const nx::api::AnalyticsSupportedEvents& eventsList);
+    virtual void setAnalyticsSupportedEvents(const nx::api::AnalyticsSupportedEvents& eventsList);
 
     //!Returns list of time periods of DTS archive, containing motion at specified \a regions with timestamp in region [\a msStartTime; \a msEndTime)
     /*!
@@ -286,8 +280,6 @@ public:
 		const QString &key,
 		const QVariant& value,
 		PropertyOptions options = DEFAULT_OPTIONS) override;
-
-    virtual bool removeProperty(const QString& key) override;
 
     //!Returns list if IO ports
     QnIOPortDataList getIOPorts() const;
@@ -344,13 +336,12 @@ public slots:
     virtual void recordingEventDetached();
 
 signals:
-    void scheduleDisabledChanged(const QnResourcePtr &resource);
+    void licenseUsedChanged(const QnResourcePtr &resource);
     void scheduleTasksChanged(const QnResourcePtr &resource);
     void groupIdChanged(const QnResourcePtr &resource);
     void groupNameChanged(const QnResourcePtr &resource);
     void motionRegionChanged(const QnResourcePtr &resource);
     void statusFlagsChanged(const QnResourcePtr &resource);
-    void licenseUsedChanged(const QnResourcePtr &resource);
     void licenseTypeChanged(const QnResourcePtr &resource);
     void failoverPriorityChanged(const QnResourcePtr &resource);
     void backupQualitiesChanged(const QnResourcePtr &resource);
@@ -405,7 +396,7 @@ protected:
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() = 0;
 
-    virtual void setMotionMaskPhysical(int channel) { Q_UNUSED(channel); }
+    virtual void setMotionMaskPhysical(int /*channel*/) {}
     //!MUST be overridden for camera with input port. Default implementation does nothing
     /*!
         \warning Excess calls of this method is legal and MUST be correctly handled in implementation
@@ -433,7 +424,7 @@ private:
     QString m_model;
     QString m_vendor;
     CachedValue<Qn::LicenseType> m_cachedLicenseType;
-    CachedValue<bool> m_cachedHasDualStreaming2;
+    CachedValue<bool> m_cachedHasDualStreaming;
     CachedValue<Qn::MotionTypes> m_cachedSupportedMotionType;
     CachedValue<Qn::CameraCapabilities> m_cachedCameraCapabilities;
     CachedValue<bool> m_cachedIsDtsBased;

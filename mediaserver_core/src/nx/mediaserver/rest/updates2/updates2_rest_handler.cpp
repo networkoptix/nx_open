@@ -138,7 +138,7 @@ JsonRestResponse createActionResponse(const QByteArray& body)
             result.json.setReply(qnServerModule->updates2Manager()->install());
             break;
         case api::Updates2ActionData::ActionCode::stop:
-            // #TODO #akulikov implement
+            // #TODO #akulikov Implement this.
             break;
     }
 

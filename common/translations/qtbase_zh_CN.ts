@@ -939,7 +939,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Cancel</source>
-      <translation>取消</translation>
+      <translation>撤消</translation>
     </message>
     <message>
       <source>Discard</source>

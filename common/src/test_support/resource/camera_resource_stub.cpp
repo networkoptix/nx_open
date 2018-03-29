@@ -30,12 +30,12 @@ Qn::ResourceStatus CameraResourceStub::getStatus() const
     return Qn::Online;
 }
 
-bool CameraResourceStub::hasDualStreaming() const
+bool CameraResourceStub::hasDualStreamingInternal() const
 {
     if (m_hasDualStreaming.is_initialized())
         return m_hasDualStreaming.value();
 
-    return base_type::hasDualStreaming();
+    return base_type::hasDualStreamingInternal();
 }
 
 void CameraResourceStub::setHasDualStreaming(bool value)

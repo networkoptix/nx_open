@@ -87,7 +87,7 @@ bool exeFileIsTooBig(const QnMediaResourcePtr& mediaResource, qint64 durationMs)
 QSize estimatedResolution(const QnMediaResourcePtr& mediaResource)
 {
     if (const auto camera = mediaResource.dynamicCast<QnVirtualCameraResource>())
-        return camera->defaultStream().getResolution();
+        return camera->streamInfo().getResolution();
     return QSize();
 }
 

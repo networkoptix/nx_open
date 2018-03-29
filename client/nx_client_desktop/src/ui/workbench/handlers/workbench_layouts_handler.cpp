@@ -183,12 +183,10 @@ LayoutsHandler::LayoutsHandler(QObject *parent):
 
             if (actionParams.additionalResources.empty())
                 return;
-            QnResourcePool* pool = this->resourcePool();
 
-            QnResourcePtr res = pool->getResourceById(actionParams.layoutResourceId);
-            if (!res)
-                return;
-            QnLayoutResourcePtr layout = res.dynamicCast<QnLayoutResource>();
+            QnResourcePool* pool = this->resourcePool();
+            QnLayoutResourcePtr layout =
+                pool->getResourceById<QnLayoutResource>(actionParams.actionResourceId);
             if (!layout)
                 return;
 

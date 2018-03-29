@@ -8,6 +8,7 @@
 #include <nx/utils/system_error.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/platform/win32_syscall_resolver.h>
+#include <nx/utils/unused.h>
 
 #ifdef _WIN32
 #  include <iphlpapi.h>
@@ -56,7 +57,6 @@ namespace network {
     static std::atomic<qint64> m_totalSocketBytesSent;
     qint64 totalSocketBytesSent() { return m_totalSocketBytesSent; }
 #endif
-
 
 //-------------------------------------------------------------------------------------------------
 // Socket implementation
@@ -1084,7 +1084,6 @@ bool TCPSocket::toggleStatisticsCollection(bool val)
     if (SetPerTcpConnectionEStatsAddr == NULL)
         return false;
 
-
     Win32TcpSocketImpl* d = static_cast<Win32TcpSocketImpl*>(impl());
 
     if (GetTcpRow(
@@ -1119,10 +1118,10 @@ bool TCPSocket::toggleStatisticsCollection(bool val)
     }
     return true;
 #elif defined(__linux__)
-    Q_UNUSED(val);
+    nx::utils::unused(val);
     return true;
 #else
-    Q_UNUSED(val);
+    nx::utils::unused(val);
     return false;
 #endif
 }
@@ -1149,7 +1148,7 @@ bool TCPSocket::getConnectionStatistics(StreamSocketInfo* info)
     info->rttVar = tcpinfo.tcpi_rttvar / USEC_PER_MSEC;
     return true;
 #else
-    Q_UNUSED(info);
+    nx::utils::unused(info);
     return false;
 #endif
 }

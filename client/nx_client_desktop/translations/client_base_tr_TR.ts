@@ -849,19 +849,19 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Wearable Camera...</source>
-      <translation type="unfinished">Wearable Camera...</translation>
+      <translation>Giyilebilir Kamera...</translation>
     </message>
     <message>
       <source>New Wearable Camera...</source>
-      <translation type="unfinished">New Wearable Camera...</translation>
+      <translation>Yeni Giyilebilir Kamera...</translation>
     </message>
     <message>
       <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
+      <translation>Dosya yükle...</translation>
     </message>
     <message>
       <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
+      <translation>Klasör yükle...</translation>
     </message>
     <message>
       <source>Start Analytics...</source>
@@ -1010,22 +1010,22 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Settings are not available for .NOV and .EXE files.</source>
-      <translation type="unfinished">Settings are not available for .NOV and .EXE files.</translation>
+      <translation>.NOV ve .EXE dosyaları için ayarlar kullanılamaz.</translation>
     </message>
   </context>
   <context>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
-      <translation type="unfinished">Audio Video Interleave</translation>
+      <translation>Audio Video Interleave</translation>
     </message>
     <message>
       <source>Matroska</source>
-      <translation type="unfinished">Matroska</translation>
+      <translation>Matroska</translation>
     </message>
     <message>
       <source>MPEG-4 Part 14</source>
-      <translation type="unfinished">MPEG-4 Part 14</translation>
+      <translation>MPEG-4 Part 14</translation>
     </message>
     <message>
       <source>%1 Media File</source>
@@ -2245,14 +2245,14 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>No settings</source>
-      <translation type="unfinished">No settings</translation>
+      <translation>Ayarlanmadı</translation>
     </message>
   </context>
   <context>
     <name>QnCameraAnalyticsPolicy</name>
     <message>
       <source>Analytics is not available for %1</source>
-      <translation type="unfinished">Analytics is not available for %1</translation>
+      <translation>Analytics, %1 için kullanılamaz</translation>
     </message>
   </context>
   <context>
@@ -2357,6 +2357,13 @@ to view more bookmarks</source>
     <message>
       <source>Edge</source>
       <translation>Uç</translation>
+    </message>
+    <message numerus="yes">
+      <source>This Id is already used on the following %n cameras: %1</source>
+      <translation type="unfinished">
+        <numerusform>Bu kimlik, şu %n kamerada zaten kullanılıyor: %1</numerusform>
+        <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -2476,6 +2483,10 @@ to view more bookmarks</source>
       <source>Server</source>
       <translation>Sunucu</translation>
     </message>
+    <message>
+      <source>Id</source>
+      <translation>Id</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraMotionMaskWidget</name>
@@ -2512,7 +2523,7 @@ to view more bookmarks</source>
     <name>QnCameraMotionPolicy</name>
     <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation type="unfinished">Recording or motion detection is disabled for %1</translation>
+      <translation>Kayıt veya Hareket Algılama Devre Dışı Bırakıldı %1</translation>
     </message>
   </context>
   <context>
@@ -2535,10 +2546,6 @@ to view more bookmarks</source>
   <context>
     <name>QnCameraPasswordChangeDialog</name>
     <message>
-      <source>Password shouldn&apos;t be equal to camera&apos;s user name</source>
-      <translation>Parola kullanıcı adı ile aynı olamaz</translation>
-    </message>
-    <message>
       <source>New Password</source>
       <translation>Yeni Parola</translation>
     </message>
@@ -2554,12 +2561,16 @@ to view more bookmarks</source>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
       <translation>Parola en az 8 sembol uzunluğunda ve farklı karakter türleri içermelidir.</translation>
     </message>
+    <message>
+      <source>Password should not be equal to camera&apos;s user name</source>
+      <translation>Parola kamera&apos;s kullanıcı adıyla aynı olmamalıdır</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraRecordingPolicy</name>
     <message>
       <source>Recording is disabled for %1</source>
-      <translation type="unfinished">Recording is disabled for %1</translation>
+      <translation>Kayıt %1 için Devre Dışı Bırakıldı</translation>
     </message>
   </context>
   <context>
@@ -2626,7 +2637,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Mbit/s</source>
-      <translation type="unfinished">Mbit/s</translation>
+      <translation>Mbit/s</translation>
     </message>
     <message>
       <source>Less Settings</source>
@@ -2832,7 +2843,7 @@ to %1</source>
     </message>
     <message>
       <source>Account is not activated. Please check your email and follow provided instructions</source>
-      <translation type="unfinished">Account is not activated. Please check your email and follow provided instructions</translation>
+      <translation>Kullanıcı aktif değil. Lütfen e postanıza kontrol edin ve gönderilen yönergeleri izleyin</translation>
     </message>
   </context>
   <context>
@@ -3184,12 +3195,9 @@ to %1</source>
       <source>Ask your system administrator to do it.</source>
       <translation>Bunu yapmak için sistem yöneticinize başvurun.</translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>Set Password</source>
-      <translation>
-        <numerusform>Parola Belirle</numerusform>
-        <numerusform>Parola Belirle</numerusform>
-      </translation>
+      <translation>Parola Belirle</translation>
     </message>
   </context>
   <context>
@@ -4660,11 +4668,11 @@ to %1</source>
     <name>QnNewWearableCameraDialog</name>
     <message>
       <source>Wearable Camera</source>
-      <translation type="unfinished">Wearable Camera</translation>
+      <translation>Giyilebilir Kamera</translation>
     </message>
     <message>
       <source>Wearable Camera %1</source>
-      <translation type="unfinished">Wearable Camera %1</translation>
+      <translation>Giyilebilir Kamera %1</translation>
     </message>
     <message>
       <source>Name</source>
@@ -4761,16 +4769,16 @@ to %1</source>
   <context>
     <name>QnPerformanceTest</name>
     <message>
-      <source>For full - featured mode, please use another computer</source>
-      <translation>Tüm özellikler için lütfen başka bilgisayar kullanın</translation>
-    </message>
-    <message>
       <source>%1 can work in configuration mode only</source>
       <translation>%1 sadece yapılandırma modunda çalışabilir</translation>
     </message>
     <message>
       <source>Performance of this computer allows running %1 in configuration mode only.</source>
       <translation>Bu Bilgisayarın Performansı %1 'i Yalnızca Yapılandırma Modunda Çalıştırmaya İzin Veriyor.</translation>
+    </message>
+    <message>
+      <source>For full-featured mode please use another computer</source>
+      <translation>Tüm özellikler için lütfen başka bilgisayar kullanın</translation>
     </message>
   </context>
   <context>
@@ -5906,6 +5914,10 @@ to %1</source>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
       <translation>&quot;Hareket algılama + Düşük çözünürlüklü&quot; kayıt ayarlanamadı.</translation>
     </message>
+    <message>
+      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
+      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</translation>
+    </message>
   </context>
   <context>
     <name>QnSmtpAdvancedSettingsWidget</name>
@@ -6057,10 +6069,6 @@ to %1</source>
   <context>
     <name>QnStatusOverlayController</name>
     <message>
-      <source>NOT ENOUGH LICENCES</source>
-      <translation>YETERSİZ LİSANS</translation>
-    </message>
-    <message>
       <source>NO DATA</source>
       <translation>VERİ YOK</translation>
     </message>
@@ -6114,7 +6122,7 @@ to %1</source>
     </message>
     <message>
       <source>NO LIVE STREAM</source>
-      <translation type="unfinished">NO LIVE STREAM</translation>
+      <translation>CANLI AKIŞ YOK</translation>
     </message>
     <message>
       <source>TOO MANY CONNECTIONS</source>
@@ -6130,7 +6138,11 @@ to %1</source>
     </message>
     <message>
       <source>UNSUPPORTED FIRMWARE VERSION</source>
-      <translation type="unfinished">UNSUPPORTED FIRMWARE VERSION</translation>
+      <translation>UYUMSUZ FİRMWARE SÜRÜMÜ</translation>
+    </message>
+    <message>
+      <source>NOT ENOUGH LICENSES</source>
+      <translation type="unfinished">NOT ENOUGH LICENSES</translation>
     </message>
   </context>
   <context>
@@ -7155,24 +7167,24 @@ to %1</source>
   <context>
     <name>QnWearableProgressWidget</name>
     <message>
-      <source>Uploading %1... %2	%p%</source>
-      <translation type="unfinished">Uploading %1... %2	%p%</translation>
-    </message>
-    <message>
       <source>Stop uploading?</source>
-      <translation type="unfinished">Stop uploading?</translation>
+      <translation>Yükleme durdurulsun mu?</translation>
     </message>
     <message>
       <source>Already uploaded files will be kept.</source>
-      <translation type="unfinished">Already uploaded files will be kept.</translation>
-    </message>
-    <message>
-      <source>Finalizing %1... %2	%p%</source>
-      <translation type="unfinished">Finalizing %1... %2	%p%</translation>
+      <translation>Yüklenmiş dosyalar saklanacaktır.</translation>
     </message>
     <message>
       <source>(%1 of %2)</source>
-      <translation type="unfinished">(%1 of %2)</translation>
+      <translation>(%2'de %1)</translation>
+    </message>
+    <message>
+      <source>Uploading %1...</source>
+      <translation>Yükleniyor %1...</translation>
+    </message>
+    <message>
+      <source>Finalizing %1...</source>
+      <translation>%1 tamamlanıyor...</translation>
     </message>
   </context>
   <context>
@@ -7183,7 +7195,7 @@ to %1</source>
     </message>
     <message>
       <source>Another user is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Another user is currently uploading footage to this camera.</translation>
+      <translation>Başka bir kullanıcı şu anda bu kamera için görüntü yüklüyor.</translation>
     </message>
   </context>
   <context>
@@ -7275,6 +7287,10 @@ to %1</source>
     <message>
       <source>Could not connect to server. Video Wall will be closed.</source>
       <translation>Sunucuya bağlanamadı. Video wall kapanacak.</translation>
+    </message>
+    <message>
+      <source>Video Wall is removed on the server and will be closed.</source>
+      <translation type="unfinished">Video Wall is removed on the server and will be closed.</translation>
     </message>
   </context>
   <context>
@@ -7573,19 +7589,15 @@ to %1</source>
     </message>
     <message>
       <source>Video (%1)</source>
-      <translation type="unfinished">Video (%1)</translation>
+      <translation>Video (%1)</translation>
     </message>
     <message>
       <source>Open Wearable Camera Recordings...</source>
-      <translation type="unfinished">Open Wearable Camera Recordings...</translation>
+      <translation>Giyilebilir Kamera Kayıtlarını Aç...</translation>
     </message>
     <message>
       <source>Only video files with correct timestamp are supported.</source>
       <translation type="unfinished">Only video files with correct timestamp are supported.</translation>
-    </message>
-    <message>
-      <source>Not enough space on server storage</source>
-      <translation type="unfinished">Not enough space on server storage</translation>
     </message>
     <message>
       <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
@@ -7597,27 +7609,27 @@ to %1</source>
     </message>
     <message>
       <source>Failed to add wearable camera</source>
-      <translation type="unfinished">Failed to add wearable camera</translation>
+      <translation>Giyilebilir kamera eklenemedi</translation>
     </message>
     <message>
       <source>No video files found in selected folder</source>
-      <translation type="unfinished">No video files found in selected folder</translation>
+      <translation>Seçilen klasörde video dosyası bulunamadı</translation>
     </message>
     <message numerus="yes">
       <source>Selected file formats are not supported</source>
       <translation type="unfinished">
-        <numerusform>Selected file formats are not supported</numerusform>
+        <numerusform>Seçilen dosya biçimleri desteklenmiyor</numerusform>
         <numerusform>Selected file formats are not supported</numerusform>
       </translation>
     </message>
     <message>
       <source>Use .MKV, .AVI, .MP4 or other video files.</source>
-      <translation type="unfinished">Use .MKV, .AVI, .MP4 or other video files.</translation>
+      <translation>.MKV, .AVI, .MP4 veya diğer video dosyalarını kullanın.</translation>
     </message>
     <message numerus="yes">
       <source>Selected files do not have timestamps</source>
       <translation type="unfinished">
-        <numerusform>Selected files do not have timestamps</numerusform>
+        <numerusform>Seçilen dosyalarda zaman damgası yok</numerusform>
         <numerusform>Selected files do not have timestamps</numerusform>
       </translation>
     </message>
@@ -7644,46 +7656,86 @@ to %1</source>
     </message>
     <message>
       <source>Selected files will not be uploaded</source>
-      <translation type="unfinished">Selected files will not be uploaded</translation>
+      <translation>Seçilen dosyalar yüklenmeyecek</translation>
     </message>
     <message>
       <source>Some files will not be uploaded</source>
-      <translation type="unfinished">Some files will not be uploaded</translation>
+      <translation>Bazı dosyalar yüklenemedi</translation>
     </message>
     <message>
       <source>No new files to upload in selected folder</source>
-      <translation type="unfinished">No new files to upload in selected folder</translation>
+      <translation>Seçilen klasörde eklenecek yeni dosya bulunamadı</translation>
     </message>
     <message numerus="yes">
-      <source>Files size - %2</source>
+      <source>Selected files are too old</source>
       <translation type="unfinished">
-        <numerusform>Files size - %2</numerusform>
-        <numerusform>Files size - %2</numerusform>
+        <numerusform>Seçili dosyalar çok eski</numerusform>
+        <numerusform>Selected files are too old</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation type="unfinished">
+        <numerusform>Seçilen dosya %1 kaydedildi, ancak yalnızca son %n gün içinde kaydedilmiş dosyalar yüklenebilir. Bunu kamera arşiv ayarlarından değiştirebilirsiniz.</numerusform>
+        <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation type="unfinished">
+        <numerusform>Seçilen dosyalar %1 ile %2 arasında kaydedildi, ancak yalnızca son %n gün içinde kaydedilen dosyalar yüklenebilir. Bunu kamera arşiv ayarlarından değiştirebilirsiniz.</numerusform>
+        <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Some footage may be deleted after uploading these files</source>
+      <translation type="unfinished">
+        <numerusform>Bu dosyaları yükledikten sonra bazı görüntüler silinebilir</numerusform>
+        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
+      <translation type="unfinished">
+        <numerusform>Sunucu depolama biriminde çok boş alan değil. Bazı eski görüntüleri yer açmak için silinebilir. Seçilen dosyalar sunucudaki en eski dosyalar olursa, yüklendikten hemen sonra silineceklerini unutmayın.</numerusform>
+        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
       </translation>
     </message>
     <message>
-      <source>Free space - %2</source>
-      <translation type="unfinished">Free space - %2</translation>
+      <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
+      <translation>Bunu önlemek için ek depolama alanı ekleyebilirsiniz. Kamera ayarlarında arşiv tutma süresini değiştirerek önce hangi görüntülerin silineceğini kontrol edebilirsiniz.</translation>
     </message>
     <message>
-      <source>%1 - has unsupported format.</source>
-      <translation type="unfinished">%1 - has unsupported format.</translation>
+      <source>Upload anyway?</source>
+      <translation>Yine de karşıya yüklensin mi?</translation>
     </message>
     <message>
-      <source>%1 - does not have timestamp.</source>
-      <translation type="unfinished">%1 - does not have timestamp.</translation>
+      <source>Could not finish upload to %1</source>
+      <translation>Karşıya yükleme tamamlanamadı %1</translation>
     </message>
     <message>
-      <source>%1 - covers period for which video has already been uploaded.</source>
-      <translation type="unfinished">%1 - covers period for which video has already been uploaded.</translation>
+      <source>Make sure there is enough space on server storage.</source>
+      <translation>Sunucu depolama biriminde yeterli boş alan olduğundan emin olun.</translation>
     </message>
     <message>
-      <source>%1 - covers period for which video is being uploaded.</source>
-      <translation type="unfinished">%1 - covers period for which video is being uploaded.</translation>
+      <source>%1 has unsupported format.</source>
+      <translation>%1 desteklenmeyen bir biçime sahip.</translation>
     </message>
     <message>
-      <source>%1 - does not fit on server storage.</source>
-      <translation type="unfinished">%1 - does not fit on server storage.</translation>
+      <source>%1 does not have timestamp.</source>
+      <translation>%1 zaman damgası içermiyor.</translation>
+    </message>
+    <message>
+      <source>%1 is older than allowed in camera archive settings.</source>
+      <translation>%1 - izin verilen arşiv ayarlarından daha eski.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video has already been uploaded.</source>
+      <translation>%1, videonun zaten yüklendiği süreyi kapsar.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video is being uploaded.</source>
+      <translation>%1, videonun zaten yüklendiği süreyi kapsar.</translation>
     </message>
   </context>
   <context>
@@ -7876,7 +7928,7 @@ to %1</source>
     </message>
     <message>
       <source>Stop uploading?</source>
-      <translation type="unfinished">Stop uploading?</translation>
+      <translation>Yükleme durdurulsun mu?</translation>
     </message>
     <message>
       <source>Stop</source>
@@ -8156,14 +8208,14 @@ to %1</source>
     </message>
     <message>
       <source>File was corrupted while being uploaded to the server</source>
-      <translation type="unfinished">File was corrupted while being uploaded to the server</translation>
+      <translation>Sunucuya yüklenirken dosya bozulmuş</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::WearableWorker</name>
     <message>
       <source>Failed to send request to the server.</source>
-      <translation type="unfinished">Failed to send request to the server.</translation>
+      <translation>Sunucuya istek gönderilemedi.</translation>
     </message>
   </context>
   <context>
@@ -8198,7 +8250,7 @@ to %1</source>
     </message>
     <message>
       <source>Selected period cannot be exported for the current camera.</source>
-      <translation type="unfinished">Selected period cannot be exported for the current camera.</translation>
+      <translation>Seçilen süre geçerli kamera için dışa aktarılamaz.</translation>
     </message>
   </context>
   <context>
@@ -8653,7 +8705,7 @@ to %1</source>
     </message>
     <message>
       <source>Wearable Cameras cannot be moved between servers</source>
-      <translation type="unfinished">Wearable Cameras cannot be moved between servers</translation>
+      <translation>Giyilebilir Kameralar sunucular arasında taşınamaz</translation>
     </message>
     <message>
       <source>Failed to change password</source>

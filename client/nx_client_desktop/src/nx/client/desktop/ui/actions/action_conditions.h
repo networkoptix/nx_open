@@ -597,6 +597,9 @@ ConditionWrapper isLoggedIn();
 /** Check a condition only in the given scope */
 ConditionWrapper scoped(ActionScope scope, ConditionWrapper&& condition);
 
+/** Check if current user has certain global permission. */
+ConditionWrapper hasGlobalPermission(Qn::GlobalPermission permission);
+
 /** Visible in preview search mode only. */
 ConditionWrapper isPreviewSearchMode();
 

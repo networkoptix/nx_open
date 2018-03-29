@@ -28,7 +28,7 @@ public:
     int videoPort() const;
     int eventPort() const;
 
-    virtual bool hasDualStreaming() const override { return false; }
+    virtual bool hasDualStreamingInternal() const override { return false; }
 
     void setStartTime(qint64 valueUsec);
     qint64 startTime() const;

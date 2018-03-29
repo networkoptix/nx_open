@@ -21,12 +21,9 @@ namespace ec2
     public:
         ECConnectionAuditManager(AbstractECConnection* ecConnection);
         template <class T>
-        void addAuditRecord(ApiCommand::Value command, const T& params, const QnAuthSession& authInfo)
+        void addAuditRecord(ApiCommand::Value /*command*/, const T& /*params*/, const QnAuthSession& /*authInfo*/)
         {
             // nothing to do by default
-            Q_UNUSED(command);
-            Q_UNUSED(params);
-            Q_UNUSED(authInfo);
         }
 
         void addAuditRecord(ApiCommand::Value command,  const ApiCameraAttributesData& params, const QnAuthSession& authInfo);

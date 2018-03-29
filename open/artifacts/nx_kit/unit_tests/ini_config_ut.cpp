@@ -40,6 +40,8 @@ struct TestIniConfig: IniConfig
     NX_INI_STRING("\"enquoted string\"", str4, "Enquoted string.");
     NX_INI_STRING("simple string", str5, "Simple string.");
     NX_INI_INT(113, number, "Test number.");
+    NX_INI_FLOAT(310.55f, floatNumber ,"Test float number.");
+    NX_INI_DOUBLE(-0.45, doubleNumber, "Test double number.");
 };
 
 static const TestIniConfig defaultIni("will_not_load_from_file.ini");
@@ -69,6 +71,8 @@ struct SavedIniConfig: IniConfig
     NX_INI_STRING("\"Another enquoted string\"", str4, "Enquoted string.");
     NX_INI_STRING("Another simple string", str5, "Simple string.");
     NX_INI_INT(777, number, "Test number.");
+    NX_INI_FLOAT(0.432f, floatNumber ,"Test float number.");
+    NX_INI_DOUBLE(34.45, doubleNumber, "Test double number.");
 };
 
 template<class ExpectedIni, class ActualIni>

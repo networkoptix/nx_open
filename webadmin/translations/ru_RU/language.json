@@ -75,23 +75,23 @@
         "emailSignature": "Подпись к письму",
         "emailSupportEmail": "Электронная почта поддержки",
         "enableEdgeRecording": "Включить запись на внутренний носитель (edge)",
-        "eventLogPeriodDays": "Event log period (days)",
-        "hanwhaDeleteProfilesOnInitIfNeeded": "Delete camera profiles on init if needed",
+        "eventLogPeriodDays": "Размер журнала событий (дни)",
+        "hanwhaDeleteProfilesOnInitIfNeeded": "Удалять профили камеры при инициализации, если необходимо",
         "ldapAdminDn": "LDAP Администратор DN",
         "ldapSearchBase": "База поиска LDAP",
         "ldapSearchFilter": "Фильтр поиска LDAP",
         "ldapUri": "URI LDAP",
-        "localSystemId": "Local System ID",
-        "maxDifferenceBetweenSynchronizedAndInternetTime": "Max difference between synchronized and Internet time (milliseconds)",
-        "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "Max difference between synchronized and local time (milliseconds)",
-        "maxRecordQueueSizeBytes": "Max record queue size (bytes)",
-        "maxRecordQueueSizeElements": "Max record queue size (elements)",
-        "maxRemoteArchiveSynchronizationThreads": "Max remote archive synchronization threads",
-        "maxRtspConnectDurationSeconds": "Max Rtsp connect duration seconds",
-        "maxSceneItems": "Max scene items (0 means default)",
+        "localSystemId": "Идентификатор локальной системы",
+        "maxDifferenceBetweenSynchronizedAndInternetTime": "Максимальное различие между синхронизированным и интернет-временем (миллисекунды)",
+        "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "Максимальное различие между синхронизированным и местным временем (миллисекунды)",
+        "maxRecordQueueSizeBytes": "Максимальный размер очереди записи (байты)",
+        "maxRecordQueueSizeElements": "Максимальный размер очереди записи (элементы)",
+        "maxRemoteArchiveSynchronizationThreads": "Максимальное кол-во потоков синхронизации удаленного архива",
+        "maxRtspConnectDurationSeconds": "Максимальное время соединения Rtsp",
+        "maxSceneItems": "Максимальное количество объектов на сцене (0 - значение по умолчанию)",
         "proxyConnectTimeoutSec": "Время ожидания прокси соединения (в секундах)",
-        "rtpTimeoutMs": "RTP timeout (milliseconds)",
-        "sequentialFlirOnvifSearcherEnabled": "Use sequential Flir Onvif searcher",
+        "rtpTimeoutMs": "Тайм-аут RTP (миллисекунды)",
+        "sequentialFlirOnvifSearcherEnabled": "Использовать последовательный поиск Onvif для Flir",
         "serverDiscoveryPingTimeoutSec": "Тайм-аут обнаружения на сервере",
         "smtpConnectionType": "Тип подключения SMTP",
         "smtpHost": "Узел SMTP",
@@ -178,15 +178,15 @@
     "common": {
         "voiceCommands": {
             "search": "find + [text for searchbar]",
-            "pause": "pause",
+            "pause": "пауза",
             "help": "help | show commands",
-            "collapse all servers": "collapse all servers",
+            "collapse all servers": "свернуть все серверы",
             "collapse server": "collapse server + [server name]",
-            "play": "play",
-            "clear search": "clear search",
+            "play": "воспроизвести",
+            "clear search": "очистить поиск",
             "live": "go to live | show me live",
-            "expand all servers": "expand all servers",
-            "stop listening": "stop listening",
+            "expand all servers": "развернуть все серверы",
+            "stop listening": "прекратить прослушивание",
             "expand server": "expand server + [server name]",
             "view": "view + [camera name]"
         },
@@ -200,9 +200,9 @@
             "transcoding": "Перекодирование",
             "copyActiveText": "скопировано в буфер обмена"
         },
-        "searchCamPlaceholder": "Search",
+        "searchCamPlaceholder": "Поиск",
         "cameraStates": {
-            "noFormat": "This browser does not support video playback from this camera.",
+            "noFormat": "Этот браузер не поддерживает воспроизведение видео с этой камеры.",
             "ieWin10": "Пожалуйста, используйте браузеры Microsoft Edge или Google Chrome.",
             "iosVideoTooLarge": "iOS не поддерживает видео с разрешением больше чем fullHD (2MP: 1920x1080).",
             "unauthorized": "Требуется аутентификация",
@@ -213,13 +213,13 @@
             "error": "Ошибка",
             "offline": "Не в сети",
             "noData": "Нет данных",
-            "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing videos."
+            "flashRequired": "Пожалуйста, <a href='https://get.adobe.com/flashplayer/' target='_blank'>установите Adobe Flash</a> для воспроизведения видео."
         },
-        "chromeCastWarning": "Chromecast is resource intensive and may cause issues on your server.",
+        "chromeCastWarning": "Chromecast является ресурсоемким и может вызывать проблемы на вашем сервере.",
         "resolution": {
-            "high": "High",
-            "auto": "Auto",
-            "low": "Low"
+            "high": "Высокая",
+            "auto": "Авто",
+            "low": "Низкая"
         }
     }
 }

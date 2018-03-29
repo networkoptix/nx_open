@@ -1,8 +1,8 @@
 #include "common_video_frame_processing_camera_manager.h"
-#include <nx/kit/debug.h>
 
 #define NX_DEBUG_ENABLE_OUTPUT m_enableOutput
 #define NX_PRINT_PREFIX (std::string("[") + this->plugin()->name() + " CameraManager] ")
+#include <nx/kit/debug.h>
 
 namespace nx {
 namespace sdk {

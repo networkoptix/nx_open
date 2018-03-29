@@ -116,7 +116,7 @@ bool StreamCapabilityAdvancedParametersProvider::setParameters(const QnLiveStrea
 
     if (value == m_defaults)
     {
-        if (!m_camera->removeProperty(proprtyName()))
+        if (!m_camera->setProperty(proprtyName(), QString()))
             return false;
     }
     else

@@ -37,6 +37,14 @@ void AbstractAsyncSearchListModel::Private::relevantTimePeriodChanged(
     const auto currentValue = q->relevantTimePeriod();
     NX_ASSERT(currentValue != previousValue);
 
+    qDebug() << "Relevant time period changed";
+    qDebug() << "--- Old was from"
+        << utils::timestampToRfc2822(previousValue.startTimeMs) << "to"
+        << utils::timestampToRfc2822(previousValue.endTimeMs());
+    qDebug() << "--- New is from"
+        << utils::timestampToRfc2822(currentValue.startTimeMs) << "to"
+        << utils::timestampToRfc2822(currentValue.endTimeMs());
+
     if (!currentValue.isValid())
     {
         clear();
@@ -101,10 +109,12 @@ void AbstractAsyncSearchListModel::Private::commit(qint64 earliestTimeToCommitMs
     qDebug() << "Commit id:" << m_currentFetchId;
     m_currentFetchId = rest::Handle();
 
+    earliestTimeToCommitMs = q->relevantTimePeriod().bound(earliestTimeToCommitMs);
+
     if (!commitPrefetch(earliestTimeToCommitMs, m_fetchedAll))
         return;
 
-    m_earliestTimeMs = q->relevantTimePeriod().bound(earliestTimeToCommitMs);
+    m_earliestTimeMs = earliestTimeToCommitMs;
 }
 
 bool AbstractAsyncSearchListModel::Private::fetchInProgress() const

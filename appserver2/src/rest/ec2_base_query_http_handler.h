@@ -97,15 +97,14 @@ public:
      * Implementation of QnRestRequestHandler::executePost() - stub.
      */
     virtual int executePost(
-        const QString& path,
-        const QnRequestParamList& params,
-        const QByteArray& body,
-        const QByteArray& srcBodyContentType,
-        QByteArray& result,
-        QByteArray& contentType,
+        const QString& /*path*/,
+        const QnRequestParamList& /*params*/,
+        const QByteArray& /*body*/,
+        const QByteArray& /*srcBodyContentType*/,
+        QByteArray& /*result*/,
+        QByteArray& /*contentType*/,
         const QnRestConnectionProcessor*) override
     {
-        QN_UNUSED(path, params, body, srcBodyContentType, result, contentType);
         return nx::network::http::StatusCode::badRequest;
     }
 
@@ -114,7 +113,6 @@ private:
     QnWaitCondition m_cond;
     QnMutex m_mutex;
 };
-
 
 /**
  * Http request handler for GET requests.
@@ -155,8 +153,6 @@ private:
     ServerQueryProcessorAccess* const m_queryProcessor;
 };
 
-
-
 template<class InputData, class OutputData>
 class FlexibleQueryHttpHandler:
     public BaseQueryHttpHandler<
@@ -173,9 +169,8 @@ public:
         base_type(cmdCode),
         m_queryHandler(
             [queryHandler](
-                InputData input, OutputData* output, const Qn::UserAccessData& accessData, nx::network::http::Response* response) -> ErrorCode
+                InputData input, OutputData* output, const Qn::UserAccessData& accessData, nx::network::http::Response* /*response*/) -> ErrorCode
             {
-                QN_UNUSED(response);
                 return queryHandler(std::move(input), output, accessData);
             })
     {

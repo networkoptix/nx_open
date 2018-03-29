@@ -6,6 +6,7 @@
 
 namespace nx {
 namespace update {
+namespace installer {
 namespace detail {
 namespace test {
 
@@ -426,5 +427,6 @@ TEST_F(Updates2Installer, prepareFailed_modificationNotMatches)
 
 } // namespace test
 } // namespace detail
+} // namespace installer
 } // namespace update
 } // namespace nx

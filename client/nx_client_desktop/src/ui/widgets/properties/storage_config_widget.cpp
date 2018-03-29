@@ -166,9 +166,9 @@ namespace
             }
         }
 
-        virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const override
+        virtual QWidget* createEditor(QWidget* /*parent*/, const QStyleOptionViewItem& /*option*/,
+            const QModelIndex& /*index*/) const override
         {
-            QN_UNUSED(parent, option, index);
             return nullptr;
         }
 
@@ -647,7 +647,6 @@ bool QnStorageConfigWidget::hasStoragesChanges(const QnStorageModelInfoList& sto
     return storages.size() != existingStorages.size();
 }
 
-
 void QnStorageConfigWidget::applyChanges()
 {
     if (isReadOnly())
@@ -674,7 +673,6 @@ void QnStorageConfigWidget::applyChanges()
 
     if (!storagesToUpdate.empty())
         qnServerStorageManager->saveStorages(storagesToUpdate);
-
 
     if (!storagesToRemove.empty())
         qnServerStorageManager->deleteStorages(storagesToRemove);
@@ -768,7 +766,6 @@ bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data,
             continue;
         validStorages << storage;
     }
-
 
     // TODO: #GDM what if there is only one storage - and it is backup?
     // TODO: #GDM what if there are no storages at all?

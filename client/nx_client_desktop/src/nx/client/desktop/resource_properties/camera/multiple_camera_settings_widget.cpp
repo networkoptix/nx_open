@@ -11,6 +11,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/client_camera.h>
+#include <core/misc/schedule_task.h>
 
 #include <nx/client/desktop/ui/common/checkbox_utils.h>
 #include <ui/common/read_only.h>
@@ -21,7 +22,7 @@
 #include <ui/widgets/licensing/licenses_propose_widget.h>
 #include <ui/workbench/workbench_context.h>
 
-#include "camera_schedule_widget.h"
+#include "legacy_camera_schedule_widget.h"
 #include "camera_motion_mask_widget.h"
 
 namespace nx {
@@ -56,9 +57,9 @@ MultipleCameraSettingsWidget::MultipleCameraSettingsWidget(QWidget *parent):
     connect(ui->cameraScheduleWidget, &QnAbstractPreferencesWidget::hasChangesChanged, this,
         &MultipleCameraSettingsWidget::at_dbDataChanged);
 
-    connect(ui->cameraScheduleWidget, &CameraScheduleWidget::scheduleEnabledChanged, this,
+    connect(ui->cameraScheduleWidget, &LegacyCameraScheduleWidget::scheduleEnabledChanged, this,
         &MultipleCameraSettingsWidget::at_cameraScheduleWidget_scheduleEnabledChanged);
-    connect(ui->cameraScheduleWidget, &CameraScheduleWidget::alert, this,
+    connect(ui->cameraScheduleWidget, &LegacyCameraScheduleWidget::alert, this,
         [this](const QString& text) { m_alertText = text; updateAlertBar(); });
 
     connect(ui->licensingWidget, &QnLicensesProposeWidget::changed, this,
@@ -71,7 +72,7 @@ MultipleCameraSettingsWidget::MultipleCameraSettingsWidget(QWidget *parent):
             ui->cameraScheduleWidget->setScheduleEnabled(ui->licensingWidget->state() == Qt::Checked);
         });
 
-    connect(ui->imageControlWidget, &ImageControlWidget::changed, this,
+    connect(ui->imageControlWidget, &LegacyImageControlWidget::changed, this,
         &MultipleCameraSettingsWidget::at_dbDataChanged);
     connect(ui->expertSettingsWidget, &CameraExpertSettingsWidget::dataChanged, this,
         &MultipleCameraSettingsWidget::at_dbDataChanged);
@@ -185,8 +186,8 @@ void MultipleCameraSettingsWidget::submitToResources()
         if (!password.isEmpty() || !m_passwordWasEmpty)
             auth.setPassword(password);
 
-        if (camera->isMultiSensorCamera())
-            QnClientCameraResource::setAuthToMultisensorCamera(camera, auth);
+        if (camera->isMultiSensorCamera() || camera->isNvr())
+            QnClientCameraResource::setAuthToCameraGroup(camera, auth);
         else
             camera->setAuth(auth);
 
@@ -211,10 +212,10 @@ bool MultipleCameraSettingsWidget::isValidSecondStream()
     bool usesSecondStream = false;
     for (auto& task : filteredTasks)
     {
-        if (task.getRecordingType() == Qn::RT_MotionAndLowQuality)
+        if (task.recordingType == Qn::RT_MotionAndLowQuality)
         {
             usesSecondStream = true;
-            task.setRecordingType(Qn::RT_Always);
+            task.recordingType = Qn::RT_Always;
         }
     }
 

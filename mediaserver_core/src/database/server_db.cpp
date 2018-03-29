@@ -276,7 +276,7 @@ QString createBookmarksFilterSortPart(const QnCameraBookmarkSearchFilter& filter
     }
 }
 
-int getBookmarksQueryLimit(const QnCameraBookmarkSearchFilter &filter)
+int getBookmarksQueryLimit(const QnCameraBookmarkSearchFilter& filter)
 {
     if (filter.sparsing.used)
         return QnCameraBookmarkSearchFilter::kNoLimit;
@@ -382,7 +382,6 @@ bool QnServerDb::createDatabase()
         if (!execSQLQuery(&ddlQuery, Q_FUNC_INFO))
             return false;
     }
-
 
     if (!applyUpdates(":/mserver_updates"))
         return false;
@@ -496,7 +495,6 @@ bool QnServerDb::closeUnclosedAuditRecords(int lastRunningTimeSec)
         NX_DEBUG(this, lm("Close %1 audit records with last runnig time %2").args(
             query.numRowsAffected(), lastRunningTimeSec));
     }
-
 
     query.prepare(R"sql(
         UPDATE audit_log
@@ -647,7 +645,6 @@ bool QnServerDb::migrateBusinessParamsUnderTransaction()
             remapData[id] = remappedData;
         }
     }
-
 
     {
         QSqlQuery query(m_sdb);

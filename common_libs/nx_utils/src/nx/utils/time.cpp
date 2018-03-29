@@ -44,7 +44,7 @@ static QString getTimeZoneFile(const QString& timeZoneId)
             return QString();
         return timeZoneFile;
     #else
-        QN_UNUSED(timeZoneId);
+        nx::utils::unused(timeZoneId);
         return lit("");
     #endif
 }
@@ -107,7 +107,7 @@ bool setTimeZone(const QString& timeZoneId)
         return true;
     #else
         NX_LOG(lit("setTimeZone(): Unsupported platform"), cl_logERROR);
-        QN_UNUSED(timeZoneId);
+        nx::utils::unused(timeZoneId);
         return false;
     #endif
 }
@@ -194,7 +194,7 @@ bool setDateTime(qint64 millisecondsSinceEpoch)
 
         return true;
     #else
-        QN_UNUSED(millisecondsSinceEpoch);
+        nx::utils::unused(millisecondsSinceEpoch);
         NX_LOG(lit("setDateTime(): unsupported platform"), cl_logERROR);
     #endif
 

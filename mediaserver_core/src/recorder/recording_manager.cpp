@@ -192,7 +192,7 @@ bool QnRecordingManager::isResourceDisabled(const QnResourcePtr& res) const
         return true;
 
     const QnVirtualCameraResource* cameraRes = dynamic_cast<const QnVirtualCameraResource*>(res.data());
-    return  cameraRes && cameraRes->isScheduleDisabled();
+    return  cameraRes && !cameraRes->isLicenseUsed();
 }
 
 bool QnRecordingManager::startForcedRecording(
@@ -299,11 +299,11 @@ bool QnRecordingManager::startOrStopRecording(
 
         if (recorderLowRes)
         {
-            float currentFps = recorderHiRes ? recorderHiRes->currentScheduleTask().getFps() : 0;
+            const auto currentFps = recorderHiRes ? recorderHiRes->currentScheduleTask().fps : 0;
 
             // second stream should run if camera do not share fps or at least MIN_SECONDARY_FPS frames left for second stream
             bool runSecondStream = cameraRes->isEnoughFpsToRunSecondStream(currentFps) &&
-                                    cameraRes->hasDualStreaming2() && providerLow;
+                                    cameraRes->hasDualStreaming() && providerLow;
             if (runSecondStream)
             {
                 if (recorderLowRes) {
@@ -401,10 +401,8 @@ void QnRecordingManager::updateCamera(const QnSecurityCamResourcePtr& cameraRes)
     startOrStopRecording(cameraRes, camera, recorders.recorderHiRes, recorders.recorderLowRes);
 }
 
-void QnRecordingManager::at_camera_resourceChanged(const QnResourcePtr &resource)
+void QnRecordingManager::at_camera_resourceChanged(const QnResourcePtr& /*resource*/)
 {
-    Q_UNUSED(resource)
-
     QnVirtualCameraResource* cameraPtr = dynamic_cast<QnVirtualCameraResource*>(sender());
     if( !cameraPtr )
         return;
@@ -574,7 +572,6 @@ void QnRecordingManager::at_checkLicenses()
         if (++m_tooManyRecordingCnt < 5)
             return; // do not report license problem immediately. Server should wait several minutes, probably other servers will be available soon
 
-
         qint64 licenseOverflowTime = runtimeInfoManager()->localInfo().data.prematureLicenseExperationDate;
         if (licenseOverflowTime == 0) {
             licenseOverflowTime = qnSyncTime->currentMSecsSinceEpoch();
@@ -631,7 +628,7 @@ void QnRecordingManager::at_licenseMutexLocked()
 
         if (helper.isOverflowForCamera(camera))
         {
-            camera->setScheduleDisabled(true);
+            camera->setLicenseUsed(false);
             QList<QnUuid> idList;
             idList << camera->getId();
 
@@ -643,7 +640,7 @@ void QnRecordingManager::at_licenseMutexLocked()
             if (errCode != ec2::ErrorCode::ok)
             {
                 qWarning() << "Can't turn off recording for camera:" << camera->getUniqueId() << "error:" << ec2::toString(errCode);
-                camera->setScheduleDisabled(false); // rollback
+                camera->setLicenseUsed(true); // rollback
                 continue;
             }
             camera->saveParams();

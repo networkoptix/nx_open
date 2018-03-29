@@ -1,28 +1,22 @@
-import pytest
-import yaml
-from pathlib2 import Path
+from contextlib import closing
 
-from test_utils.os_access import LocalAccess
-from test_utils.ssh.access_manager import SSHAccessManager
-from test_utils.ssh.config import SSHConfig
-from test_utils.vm import Pool, Registry, VMConfiguration, VirtualBox
+from framework.pool import Pool
 
 
-@pytest.fixture()
-def pool():
-    configuration = yaml.load(Path(__file__).with_name('configuration.yaml').read_text())
-    ssh_config = SSHConfig(Path(configuration['ssh']['config']).expanduser())
-    ssh_config.reset()
-    host_os_access = LocalAccess()
-    registry = Registry(host_os_access, host_os_access.expand_path(configuration['vm_host']['registry']), 100)
-    access_manager = SSHAccessManager(ssh_config, 'root', Path(configuration['ssh']['key']).expanduser())
-    hypervisor = VirtualBox(host_os_access, configuration['vm_host']['address'])
-    vm_configuration = VMConfiguration(configuration['vm_types']['linux'])
-    pool = Pool(vm_configuration, registry, hypervisor, access_manager)
-    yield pool
-    pool.close()
+def test_get(linux_vms_pool):
+    first = linux_vms_pool.get('first')
+    assert first.alias == 'first'
+    second = linux_vms_pool.get('second')
+    assert second.alias == 'second'
+    first_again = linux_vms_pool.get('first')
+    assert first.name == first_again.name
 
 
-def test_get(pool):
-    machine = pool.get('oi')
-    assert machine.alias == 'oi'
+def test_close(vm_factories):
+    with closing(Pool(vm_factories['linux'])) as pool:
+        first = pool.get('first')
+        first_name = first.name
+    with closing(Pool(vm_factories['linux'])) as pool:
+        second = pool.get('second')
+        second_name = second.name
+    assert first_name == second_name

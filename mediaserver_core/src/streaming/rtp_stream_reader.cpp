@@ -68,11 +68,8 @@ QnAbstractMediaDataPtr QnRtpStreamReader::getNextData()
     return result;
 }
 
-CameraDiagnostics::Result QnRtpStreamReader::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params)
+CameraDiagnostics::Result QnRtpStreamReader::openStreamInternal(bool /*isCameraControlRequired*/, const QnLiveStreamParams& /*params*/)
 {
-    Q_UNUSED(isCameraControlRequired);
-    Q_UNUSED(params);
-
     m_rtpReader.setRole(getRole());
     m_rtpReader.setRequest(m_request);
     m_rtpReader.setRtpTransport(m_rtpTransport);

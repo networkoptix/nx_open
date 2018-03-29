@@ -99,7 +99,6 @@ CameraDiagnostics::Result QnAdamResource::initializeCameraDriver()
 
 bool QnAdamResource::startInputPortMonitoringAsync(std::function<void(bool)>&& completionHandler)
 {
-    QN_UNUSED(completionHandler);
     if (!m_ioManager)
         return false;
 
@@ -305,7 +304,7 @@ bool QnAdamResource::setRelayOutputState(
     return m_ioManager->setOutputPortState(outputId, isActive);
 }
 
-void QnAdamResource::at_propertyChanged(const QnResourcePtr &res, const QString &key)
+void QnAdamResource::at_propertyChanged(const QnResourcePtr& res, const QString& key)
 {
     if (key == Qn::IO_SETTINGS_PARAM_NAME && res && !res->hasFlags(Qn::foreigner))
     {

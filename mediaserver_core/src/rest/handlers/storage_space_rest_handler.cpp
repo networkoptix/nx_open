@@ -34,13 +34,11 @@ QnStorageSpaceRestHandler::QnStorageSpaceRestHandler()
 {}
 
 int QnStorageSpaceRestHandler::executeGet(
-    const QString& path,
+    const QString& /*path*/,
     const QnRequestParams& params,
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
-    QN_UNUSED(path, owner);
-
     /* Some api calls can take a lot of time, so client can make a fast request for the first time. */
     const bool fastRequest = QnLexical::deserialized(params[kFastRequestKey], false);
 
@@ -190,7 +188,7 @@ QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages(QnCommonMo
             NX_VERBOSE(
                 this,
                 lm("[ApiStorageSpace] Optional storage %1, online: %2, isWritable: %3, wouldBeWritableIfAmongstServerStorages: %4")
-                    .args(storage->getUrl(), data.isOnline, storage->isWritable(),
+                    .args(storage->getUrl(), data.isOnline, data.isWritable,
                         wouldBeWritableIfAmongstServerStorages));
 
             auto fileStorage = storage.dynamicCast<QnFileStorageResource>();

@@ -8,8 +8,10 @@
 
 #include <cstdlib>
 #include <cstring>
+#include <cerrno>
 #include <sstream>
 #include <iomanip>
+#include <limits>
 
 #include "plugin_api.h"
 
@@ -307,11 +309,66 @@ namespace nxpt
     class NxGuidHelper
     {
     public:
+        static nxpl::NX_GUID nullGuid()
+        {
+            return {{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}};
+        }
+
         static nxpl::NX_GUID fromRawData(const char* data)
         {
             nxpl::NX_GUID result;
             memcpy(result.bytes, data, sizeof(result.bytes));
             return result;
+        }
+
+        static nxpl::NX_GUID fromStdString(const std::string& guidStr)
+        {
+            static const auto kMinGuidStrSize = 32;
+            static const auto kGuidBytesNumber = 16;
+
+            if (guidStr.size() < kMinGuidStrSize)
+                return NxGuidHelper::nullGuid();
+
+            nxpl::NX_GUID guid;
+            int currentByteIndex = 0;
+            std::string currentByteString;
+            for (std::string::size_type i = 0; i < guidStr.size(); ++i)
+            {
+                if (guidStr[i] == '{' || guidStr[i] == '}' || guidStr[i] == '-'
+                    || guidStr[i] == '\t' || guidStr[i] == '\n' || guidStr[i] == 'r'
+                    || guidStr[i] == ' ')
+                {
+                    continue;
+                }
+
+                if (currentByteIndex >= kGuidBytesNumber)
+                    return NxGuidHelper::nullGuid();
+
+                currentByteString += guidStr[i];
+                if (currentByteString.size() == 2)
+                {
+                    char* pEnd = nullptr;
+                    errno = 0; //< Required before strtol().
+                    const long v = std::strtol(currentByteString.c_str(), &pEnd, /*base*/ 16);
+                    const bool hasError =  v > std::numeric_limits<unsigned char>::max()
+                        || v < std::numeric_limits<unsigned char>::min()
+                        || errno != 0
+                        || *pEnd != '\0';
+
+                    if (hasError)
+                        return NxGuidHelper::nullGuid();
+
+                    guid.bytes[currentByteIndex] = (unsigned char) v;
+                    ++currentByteIndex;
+                    currentByteString.clear();
+                }
+            }
+
+            if (currentByteIndex != kGuidBytesNumber)
+                return NxGuidHelper::nullGuid();
+
+            return guid;
         }
 
         static std::string toStdString(
@@ -375,8 +432,6 @@ namespace nxpt
             return ss.str();
         }
     };
-
-
 
 } // namespace nxpt
 

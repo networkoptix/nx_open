@@ -1,3 +1,5 @@
+set(enable_hanwha true)
+
 # Components Namings
 set(product.name "Nx Witness Simplified Chinese")
 set(display.product.name "Nx Witness")

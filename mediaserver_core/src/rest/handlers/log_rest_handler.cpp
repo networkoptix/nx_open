@@ -15,14 +15,12 @@
 static const int kReadBlockSize = 1024 * 512;
 
 int QnLogRestHandler::executeGet(
-    const QString& path,
+    const QString& /*path*/,
     const QnRequestParamList& params,
     QByteArray& result,
     QByteArray& contentType,
     const QnRestConnectionProcessor* processor)
 {
-    Q_UNUSED(path);
-
     if (!processor->resourceAccessManager()->hasGlobalPermission(
             processor->accessRights(),
             Qn::GlobalPermission::GlobalAdminPermission))

@@ -484,7 +484,7 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getPlaylist(
                 : MEDIA_Quality_Low;
         }
 
-        if (!camResource->hasDualStreaming2())
+        if (!camResource->hasDualStreaming())
         {
             if (streamQuality == MEDIA_Quality_Low)
             {
@@ -524,7 +524,7 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getPlaylist(
         if (commonModule()->resourceAccessManager()->hasPermission(
                 accessRights, camResource, Qn::Permission::ViewLivePermission))
         {
-            error->errorString = toString(Qn::MediaStreamEvent::ForbiddenBecauseNoLicenseError);
+                error->errorString = toString(Qn::MediaStreamEvent::ForbiddenWithNoLicense);
             error->error = QnRestResult::Forbidden;
             return nx::network::http::StatusCode::ok;
         }
@@ -918,7 +918,7 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::createSession(
     if( streamQuality == MEDIA_Quality_High || streamQuality == MEDIA_Quality_Auto )
         requiredQualities.push_back( MEDIA_Quality_High );
     if( (streamQuality == MEDIA_Quality_Low) ||
-        (streamQuality == MEDIA_Quality_Auto && camResource->hasDualStreaming2()) )
+        (streamQuality == MEDIA_Quality_Auto && camResource->hasDualStreaming()) )
     {
         requiredQualities.push_back( MEDIA_Quality_Low );
     }

@@ -8,7 +8,8 @@ COMPANY_NAME=@deb.customization.company.name@
 VERSION=@release.version@
 ARCHITECTURE=@os.arch@
 
-COMPILER=@CMAKE_CXX_COMPILER@
+COMPILER="@CMAKE_CXX_COMPILER@"
+CFLAGS="@CMAKE_C_FLAGS@"
 SOURCE_ROOT_PATH=@root.dir@
 TARGET=/opt/$COMPANY_NAME/mediaserver
 BINTARGET=$TARGET/bin
@@ -19,6 +20,7 @@ ETCTARGET=$TARGET/etc
 INITTARGET=/etc/init
 INITDTARGET=/etc/init.d
 SYSTEMDTARGET=/etc/systemd/system
+ENABLE_HANWHA="@enable_hanwha@"
 
 FINALNAME=@artifact.name.server@
 UPDATE_NAME=@artifact.name.server_update@.zip
@@ -49,7 +51,7 @@ LOG_FILE="$LOGS_DIR/server-build-dist.log"
 # [in] Destination directory
 cp_sys_lib()
 {
-    "$SOURCE_ROOT_PATH"/build_utils/copy_system_library.sh -c "$COMPILER" "$@"
+    "$SOURCE_ROOT_PATH"/build_utils/copy_system_library.sh -c "$COMPILER" -f "$CFLAGS" "$@"
 }
 
 buildDistribution()
@@ -94,7 +96,7 @@ buildDistribution()
     local PLUGINS=( hikvision_metadata_plugin )
     PLUGINS+=( axis_metadata_plugin )
     PLUGINS+=( vca_metadata_plugin )
-    if [ "$COMPANY_NAME" == "hanwha" ]
+    if [ "$ENABLE_HANWHA" == "true" ]
     then
         PLUGINS+=( hanwha_metadata_plugin )
     fi

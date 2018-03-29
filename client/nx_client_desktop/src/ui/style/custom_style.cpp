@@ -51,6 +51,14 @@ void setWarningStyle(QPalette* palette, qreal disabledOpacity)
     palette->setColor(QPalette::Disabled, QPalette::Text, disabledColor);
 }
 
+void setWarningStyleOn(QWidget* widget, bool on, qreal disabledOpacity)
+{
+    if (on)
+        setWarningStyle(widget, disabledOpacity);
+    else
+        resetStyle(widget);
+}
+
 QString setWarningStyleHtml( const QString &source )
 {
     return lit("<font color=\"%1\">%2</font>").arg(qnGlobals->errorTextColor().name(), source);

@@ -439,17 +439,15 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
             QElapsedTimer timer;
             timer.restart();
             QnResourceList lst = searcher->search();
-            NX_LOG(lit("Discovery----: searcher %1 took %2 ms to find new resources").
-                arg(searcher->manufacture()).
-                arg(timer.elapsed()), cl_logDEBUG1);
+            NX_DEBUG(this, lit("Searcher %1 took %2 ms to find %3 resources").
+                arg(searcher->manufacture())
+                .arg(timer.elapsed())
+                .arg(lst.size()));
 
             // resources can be searched by client in or server.
             // if this client in stand alone => lets add Qn::local
             // server does not care about flags
-            for( QnResourceList::iterator
-                it = lst.begin();
-                it != lst.end();
-                 )
+            for(QnResourceList::iterator it = lst.begin(); it != lst.end();)
             {
                 const QnSecurityCamResource* camRes = dynamic_cast<QnSecurityCamResource*>(it->data());
                 //checking, if found resource is reserved by some other searcher
@@ -640,13 +638,13 @@ QnManualCameraInfo QnResourceDiscoveryManager::manualCameraInfo(const QnSecurity
     return info;
 }
 
-int QnResourceDiscoveryManager::registerManualCameras(const std::vector<QnManualCameraInfo>& cameras)
+QSet<QString> QnResourceDiscoveryManager::registerManualCameras(const std::vector<QnManualCameraInfo>& cameras)
 {
     QnMutexLocker lock(&m_searchersListMutex);
-    int addedCount = 0;
+    QSet<QString> registeredUniqueIds;
     for (const auto& camera: cameras)
     {
-        // This is important to use reverse order of searchers as ONVIF resource type fits both 
+        // This is important to use reverse order of searchers as ONVIF resource type fits both
         // ONVIF and FLEX searchers, while ONVIF is always last one.
         for (auto searcherIterator = m_searchersList.rbegin();
             searcherIterator != m_searchersList.rend();
@@ -661,11 +659,11 @@ int QnResourceDiscoveryManager::registerManualCameras(const std::vector<QnManual
 
             const auto iterator = m_manualCameraByUniqueId.insert(camera.uniqueId, camera);
             iterator.value().searcher = searcher;
-            ++addedCount;
+            registeredUniqueIds << camera.uniqueId;
             break;
         }
     }
-    return addedCount;
+    return registeredUniqueIds;
 }
 
 void QnResourceDiscoveryManager::at_resourceDeleted(const QnResourcePtr& resource)

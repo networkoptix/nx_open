@@ -27,7 +27,9 @@ case "$(uname -s)" in
         ;;
 esac
 
-cmake "$SOURCE_DIR" $GEN_OPTIONS #< Works for any cmake: Linux, Cygwin, and Windows native.
+# Works for any cmake: Linux, Cygwin, and Windows native.
+# All script args are passed to cmake. ATTENTION: Use full paths in these args due to "cd".
+cmake "$SOURCE_DIR" $GEN_OPTIONS "$@"
 cmake --build .
 
 { set +x; } 2>/dev/null #< Silently turn off logging each command.

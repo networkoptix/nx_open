@@ -4,8 +4,10 @@
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnOnvifConfigData), (json), _Fields)
 
-bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnOnvifConfigDataPtr *target) {
-    if(value.type() == QJsonValue::Null) {
+bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnOnvifConfigDataPtr *target)
+{
+    if(value.type() == QJsonValue::Null)
+    {
         *target = QnOnvifConfigDataPtr();
         return true;
     }
@@ -18,6 +20,7 @@ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnOnvifConfigDataP
     return true;
 }
 
-void serialize(QnJsonContext *, const QnOnvifConfigDataPtr &, QJsonValue *) {
-    NX_ASSERT(false); /* Not supported for now. */
+void serialize(QnJsonContext*, const QnOnvifConfigDataPtr&, QJsonValue*)
+{
+    NX_ASSERT(false); //< Not supported for now.
 }

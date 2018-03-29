@@ -8,9 +8,9 @@
 #include <nx/sdk/metadata/common_metadata_packet.h>
 #include <nx/api/analytics/device_manifest.h>
 #include <nx/fusion/serialization/json.h>
-#include <nx/kit/debug.h>
 
 #define NX_PRINT_PREFIX "[metadata::axis::Manager] "
+#include <nx/kit/debug.h>
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -30,7 +30,7 @@ Manager::Manager(
 
     nx::api::AnalyticsDeviceManifest deviceManifest;
     for (const auto& event: typedManifest.outputEventTypes)
-        deviceManifest.supportedEventTypes.push_back(event.eventTypeId);
+        deviceManifest.supportedEventTypes.push_back(event.typeId);
     NX_PRINT << "Axis metadata manager created";
 }
 
@@ -102,7 +102,7 @@ const AnalyticsEventType* Manager::eventByUuid(const QnUuid& uuid) const noexcep
     const auto it = std::find_if(
         m_typedManifest.outputEventTypes.cbegin(),
         m_typedManifest.outputEventTypes.cend(),
-        [&uuid](const AnalyticsEventType& event) { return event.eventTypeId == uuid; });
+        [&uuid](const AnalyticsEventType& event) { return event.typeId == uuid; });
 
     if (it == m_typedManifest.outputEventTypes.cend())
         return nullptr;

@@ -1,0 +1,49 @@
+vm_host:
+  address: 127.0.0.1
+vm_types:
+  linux:
+    registry: ~/.func_tests/trusty-registry.yaml
+    access:
+      type: ssh
+      private_key_path: ~/.func_tests/trusty-key.key
+      configuration_file_path: ~/.func_tests/trusty-ssh.conf
+    power_on_timeout: 60
+    name_prefix: trusty-
+    template:
+      vm: trusty-template
+      snapshot: template
+    port_forwarding:
+      host_ports_base: 33000
+      host_ports_per_vm: 10
+      forwarded_ports:
+        product:
+          protocol: tcp
+          guest_port: 7001
+          host_port_offset: 1
+        ssh:
+          protocol: tcp
+          guest_port: 22
+          host_port_offset: 2
+  windows:
+    registry: ~/.func_tests/win10-registry.yaml
+    access:
+      type: winrm
+      private_key_path: ~/.func_tests/trusty-key.key
+      configuration_file_path: ~/.func_tests/trusty-ssh.conf
+    power_on_timeout: 600  # After SysPrep, first boot takes several minutes to prepare user profile.
+    name_prefix: win10-
+    template:
+      vm: win10-template
+      snapshot: template
+    port_forwarding:
+      host_ports_base: 35000
+      host_ports_per_vm: 10
+      forwarded_ports:
+        product:
+          protocol: tcp
+          guest_port: 7001
+          host_port_offset: 1
+        winrm-http:
+          protocol: tcp
+          guest_port: 5985
+          host_port_offset: 5

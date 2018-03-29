@@ -96,7 +96,12 @@ nx_add_target(mediaserver_core LIBRARY
         "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.json"
     PUBLIC_LIBS
         Qt5::WebSockets
-        appserver2 nx_onvif nx_email cloud_db_client nx_update
+        appserver2 
+	nx_onvif 
+	nx_email 
+	cloud_db_client 
+	nx_update
+	nx_system_commands
     PRIVATE_LIBS ${private_libs}
 )
 

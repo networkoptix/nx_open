@@ -4,8 +4,12 @@
 #include <cassert>
 #include <stdio.h>
 
+extern "C" {
+
 #include <nvosd.h>
 #include <gstnvivameta_api.h>
+
+} // extern "C"
 
 #include "default_pipeline.h"
 #include "deepstream_common.h"
@@ -26,7 +30,7 @@ void appSourceNeedData(GstElement* appSrc, guint /*unused*/, gpointer userData)
 {
     NX_OUTPUT << __func__ << " Running need-data GstAppSrc callback";
     auto pipeline = (metadata::deepstream::DefaultPipeline*) userData;
-    nxpt::ScopedRef<sdk::metadata::DataPacket> frame(pipeline->nextDataPacket());
+    nxpt::ScopedRef<sdk::metadata::DataPacket> frame(pipeline->nextDataPacket(), false);
     if (!frame)
     {
         NX_OUTPUT << __func__ << " No data available in the frame queue";
@@ -35,8 +39,7 @@ void appSourceNeedData(GstElement* appSrc, guint /*unused*/, gpointer userData)
 
     nxpt::ScopedRef<sdk::metadata::CompressedVideoPacket> video(
         (sdk::metadata::CompressedVideoPacket*) frame->queryInterface(
-            sdk::metadata::IID_CompressedVideoPacket),
-        false);
+            sdk::metadata::IID_CompressedVideoPacket));
 
     if (!video)
     {
@@ -144,24 +147,43 @@ gboolean metadataHandlerCallback(GstBuffer* buffer, GstMeta** meta, gpointer use
     auto pipeline = (metadata::deepstream::DefaultPipeline*) userData;
     auto trackingMapper = pipeline->trackingMapper();
 
+    auto frameWidth = pipeline->currentFrameWidth();
+    if (frameWidth <= 0)
+        frameWidth = ini().defaultFrameWidth;
+
+    auto frameHeight = pipeline->currentFrameHeight();
+    if (frameHeight <= 0)
+        frameHeight = ini().defaultFrameHeight;
+
     for (auto i = 0; i < bboxes->num_rects; ++i)
     {
         const auto& roiMeta = bboxes->roi_meta[i];
+
+        std::string displayText;
+        if (roiMeta.text_params.display_text)
+        {
+            displayText = roiMeta.text_params.display_text;
+            NX_OUTPUT << "DISPLAY TEXT: "
+                << displayText
+                << " " << roiMeta.text_params.display_text;
+        }
+
         auto detectedObject = new nx::sdk::metadata::CommonObject();
         nx::sdk::metadata::Rect rectangle;
 
-        rectangle.x = roiMeta.rect_params.left / 1920.0;
-        rectangle.y = roiMeta.rect_params.top / 1080.0;
-        rectangle.width = roiMeta.rect_params.width / 1920.0;
-        rectangle.height = roiMeta.rect_params.height / 1080.0;
+        rectangle.x = roiMeta.rect_params.left / (double) frameWidth;
+        rectangle.y = roiMeta.rect_params.top / (double) frameHeight;
+        rectangle.width = roiMeta.rect_params.width / (double) frameWidth;
+        rectangle.height = roiMeta.rect_params.height / (double) frameHeight;
 
         NX_OUTPUT
             << __func__ << " Got rectangle: "
             << "x: " << rectangle.x << ", "
             << "y: " << rectangle.y << ", "
             << "width: " << rectangle.width << ", "
-            << "height: " << rectangle.height << ".";
+            << "height: " << rectangle.height;
 
+        auto attributes = trackingMapper->attributes(roiMeta);
         auto guid = trackingMapper->getMapping(roiMeta.tracking_id);
         if (isNull(guid))
         {
@@ -172,14 +194,45 @@ gboolean metadataHandlerCallback(GstBuffer* buffer, GstMeta** meta, gpointer use
         detectedObject->setId(guid);
         detectedObject->setBoundingBox(rectangle);
         detectedObject->setConfidence(1.0);
-        detectedObject->setObjectSubType("TODO: #dmishin add class id label here");
-        detectedObject->setTypeId({{
-                0x15, 0x3D, 0xD8, 0x79, 0x1C, 0xD2, 0x46, 0xB7,
-                0xAD, 0xD6, 0x7C, 0x6B, 0x48, 0xEA, 0xC1, 0xFC
-            }}); //< TODO: #dmishin remove hardcode!
+
+        const auto& objectDescriptions = pipeline->objectClassDescriptions();
+        const auto objectClassId = roiMeta.class_id;
 
         auto trackingMapper = pipeline->trackingMapper();
-        detectedObject->setAttributes(trackingMapper->attributes(roiMeta));
+        if (!displayText.empty())
+        {
+            attributes.emplace_back(
+                nx::sdk::AttributeType::string,
+                "License plate",
+                displayText);
+        }
+
+        if (objectClassId < objectDescriptions.size())
+        {
+            detectedObject->setTypeId(objectDescriptions[objectClassId].guid);
+            attributes.emplace_front(
+                nx::sdk::AttributeType::string,
+                "Type",
+                objectDescriptions[objectClassId].name);
+        }
+        else
+        {
+            detectedObject->setTypeId(kNullGuid);
+        }
+
+        if (ini().showGuids)
+        {
+            attributes.emplace_front(
+                nx::sdk::AttributeType::string,
+                "GUID",
+                nxpt::NxGuidHelper::toStdString(guid));
+        }
+
+        detectedObject->setAttributes(
+            std::vector<nx::sdk::metadata::CommonAttribute>(
+                attributes.begin(),
+                attributes.end()));
+
         packet->addItem(detectedObject);
     }
 
@@ -205,6 +258,8 @@ void decodeBinPadAdded(GstElement* source, GstPad* newPad, gpointer userData)
         NX_OUTPUT << __func__ << " Pad link failed";
         return;
     }
+
+    NX_OUTPUT << "Pad succesfully linked" << std::endl;
 }
 
 gboolean busCallback(GstBus* bus, GstMessage* message, gpointer userData)
@@ -240,7 +295,7 @@ gboolean busCallback(GstBus* bus, GstMessage* message, gpointer userData)
         }
         case GST_MESSAGE_STATE_CHANGED:
         {
-            NX_OUTPUT << " GOT STATE CHANGED MESSAGE"
+            NX_OUTPUT << " GOT STATE CHANGED MESSAGE: "
                     <<  GST_ELEMENT(GST_MESSAGE_SRC(message))
                     << " " << GST_ELEMENT(pipeline->nativeElement());
 
@@ -305,6 +360,28 @@ GstPadProbeReturn primaryGieDoneCallback(
     gpointer userData)
 {
     NX_OUTPUT << __func__ << " Calling primary GIE callback, iterating over metadata";
+    auto* buffer = (GstBuffer*) info->data;
+    gst_buffer_foreach_meta(buffer, metadataHandlerCallback, userData);
+
+    return GST_PAD_PROBE_OK;
+}
+
+
+GstPadProbeReturn dropOpenAlprFrames(GstPad* pad, GstPadProbeInfo* info, gpointer userData)
+{
+    NX_OUTPUT << __func__ << " Calling OpenALPR drop frames probe";
+    static int frameNumber = 0;
+    ++frameNumber;
+
+    if (frameNumber % 7 != 0)
+        return GST_PAD_PROBE_DROP;
+
+    return GST_PAD_PROBE_OK;
+}
+
+GstPadProbeReturn processOpenAlprResult(GstPad* pad, GstPadProbeInfo* info, gpointer userData)
+{
+    NX_OUTPUT << __func__ << " Calling OpenALPR process result probe";
     auto* buffer = (GstBuffer*) info->data;
     gst_buffer_foreach_meta(buffer, metadataHandlerCallback, userData);
 
