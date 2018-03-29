@@ -7,6 +7,7 @@
 #include <QtCore/QStringList>
 #include <QtCore/QUrl>
 #include <common/common_globals.h>
+#include <nx/utils/thread/mutex.h>
 
 namespace nx {
 namespace mediaserver {
@@ -35,6 +36,7 @@ private:
 
 private:
     const QString m_toolPath;
+    QnMutex m_mutex;
 };
 
 /** Finds tool next to a appticationPath. */

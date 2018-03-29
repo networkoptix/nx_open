@@ -181,8 +181,7 @@ int RootTool::open(const QString& path, QIODevice::OpenMode mode)
     if (m_toolPath.isEmpty())
         return SystemCommands().open(path.toStdString(), sysFlags, /*usePipe*/ false);
 
-    static QnMutex openMutex;
-    QnMutexLocker lock(&openMutex);
+    QnMutexLocker lock(&m_mutex);
     utils::concurrent::run(
         [this, path, sysFlags]() { execute({"open", path, QString::number(sysFlags)}); });
     auto result = system_commands::readFd();
