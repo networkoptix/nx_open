@@ -43,8 +43,17 @@ void QnResourceHelper::setResourceId(const QString& id)
         connect(camera, &QnSecurityCamResource::capabilitiesChanged, this,
             [this]()
             {
-                defaultCameraPasswordChanged();
-                oldCameraFirmwareChanged();
+                emit defaultCameraPasswordChanged();
+                emit oldCameraFirmwareChanged();
+            });
+
+        connect(camera, &QnSecurityCamResource::parameterValueChanged, this,
+            [this](const QnResourcePtr& /*resource*/, const QString& param)
+            {
+                if (param == nx::media::kCameraMediaCapabilityParamName)
+                    emit audioSupportedChanged();
+                else if (param == Qn::IO_CONFIG_PARAM_NAME)
+                    emit isIoModuleChanged();
             });
     }
 
@@ -54,6 +63,8 @@ void QnResourceHelper::setResourceId(const QString& id)
     emit oldCameraFirmwareChanged();
     emit defaultCameraPasswordChanged();
     emit serverTimeOffsetChanged();
+    emit audioSupportedChanged();
+    emit isIoModuleChanged();
 }
 
 Qn::ResourceStatus QnResourceHelper::resourceStatus() const
@@ -87,6 +98,22 @@ bool QnResourceHelper::hasDefaultCameraPassword() const
 bool QnResourceHelper::hasOldCameraFirmware() const
 {
     return hasCameraCapability(Qn::isOldFirmwareCapability);
+}
+
+bool QnResourceHelper::audioSupported() const
+{
+    if (const auto camera = m_resource.dynamicCast<QnSecurityCamResource>())
+        return camera->isAudioSupported();
+
+    return false;
+}
+
+bool QnResourceHelper::isIoModule() const
+{
+    if (const auto camera = m_resource.dynamicCast<QnSecurityCamResource>())
+        return camera->isIOModule();
+
+    return false;
 }
 
 qint64 QnResourceHelper::serverTimeOffset() const

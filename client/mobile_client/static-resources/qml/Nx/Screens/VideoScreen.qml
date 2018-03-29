@@ -69,6 +69,8 @@ PageBase
             || videoScreenController.hasDefaultCameraPassword
             || videoScreenController.hasOldFirmware
             || videoScreenController.tooManyConnections
+            || videoScreenController.ioModuleWarning
+            || videoScreenController.ioModuleAudioPlaying
 
         readonly property bool applicationActive: Qt.application.state === Qt.ApplicationActive
 

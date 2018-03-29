@@ -25,6 +25,10 @@ Object
     readonly property bool hasDefaultCameraPassword: resourceHelper.hasDefaultCameraPassword
     readonly property bool hasOldFirmware: resourceHelper.hasOldCameraFirmware
     readonly property bool tooManyConnections: mediaPlayer.tooManyConnectionsError
+    readonly property bool ioModuleWarning:
+        resourceHelper.isIoModule && !resourceHelper.audioSupported
+    readonly property bool ioModuleAudioPlaying:
+        resourceHelper.isIoModule && resourceHelper.audioSupported
 
     readonly property string dummyState:
     {
@@ -40,6 +44,10 @@ Object
             return "cameraOffline"
         if (noVideoStreams)
             return "noVideoStreams"
+        if (ioModuleWarning)
+            return "ioModuleWarning"
+        if (ioModuleAudioPlaying)
+            return "ioModuleAudioPlaying"
         if (failed)
             return "videoLoadingFailed"
         if (noLicenses)
