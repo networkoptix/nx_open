@@ -678,23 +678,6 @@ void QnAuthHelper::updateUserHashes(const QnUserResourcePtr& userResource, const
         &ec2::DummyHandler::onRequestDone);
 }
 
-bool QnAuthHelper::checkUserPassword(const QnUserResourcePtr& user, const QString& password)
-{
-    if (!user->isCloud())
-        return user->checkLocalUserPassword(password);
-
-    // 3. Cloud users
-    QByteArray auth = createHttpQueryAuthParam(
-        user->getName(),
-        password,
-        user->getRealm(),
-        kCookieAuthMethod,
-        qnAuthHelper->generateNonce());
-
-    nx::network::http::Response response;
-    return authenticateByUrl(auth, kCookieAuthMethod, response) == Qn::Auth_OK;
-}
-
 QnLdapManager* QnAuthHelper::ldapManager() const
 {
     return m_ldap.get();
