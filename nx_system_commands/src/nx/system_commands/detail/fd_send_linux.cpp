@@ -13,7 +13,7 @@ namespace nx {
 namespace system_commands {
 namespace detail {
 
-static int create_connected_socket(const char* path)
+static int createConnectedSocket(const char* path)
 {
     struct sockaddr_un addr;
     int fd, tries = 0;
@@ -79,7 +79,7 @@ static int sendFdImpl(int socketfd, int sendfd)
 
 bool sendFd(int fd)
 {
-    int socketfd = create_connected_socket(SystemCommands::kDomainSocket);
+    int socketfd = createConnectedSocket(SystemCommands::kDomainSocket);
     if (socketfd < 0)
         return false;
 
