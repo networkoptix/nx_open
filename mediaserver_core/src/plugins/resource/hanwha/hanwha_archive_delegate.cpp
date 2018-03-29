@@ -237,7 +237,7 @@ void HanwhaArchiveDelegate::setOverlappedId(nx::core::resource::OverlappedId ove
 void HanwhaArchiveDelegate::setPlaybackMode(PlaybackMode mode)
 {
     m_playbackMode = mode;
-    m_isSeekAlignedByChunkBorder = true;
+    m_isSeekAlignedByChunkBorder = false; //< I expect this variable is not required any more since we can sends empty frames before first video packet.
     auto& rtspClient = m_streamReader->rtspClient();
     switch (mode)
     {
