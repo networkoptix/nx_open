@@ -123,7 +123,7 @@ QnConnectionManager::QnConnectionManager(QObject* parent):
         });
 
     connect(qnClientMessageProcessor, &QnMobileClientMessageProcessor::initialResourcesReceived, d,
-        [this, d]()
+        [d]()
         {
             d->wasConnected = true;
             d->updateConnectionState();
