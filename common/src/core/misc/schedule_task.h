@@ -19,7 +19,6 @@ struct QnScheduleTask
         int afterThreshold,
         Qn::StreamQuality streamQuality,
         int fps,
-        bool recordAudio,
         int bitrateKbps)
         :
         dayOfWeek(dayOfWeek),
@@ -30,7 +29,6 @@ struct QnScheduleTask
         afterThresholdSec(afterThreshold),
         streamQuality(streamQuality),
         fps(fps),
-        doRecordAudio(recordAudio),
         bitrateKbps(bitrateKbps)
     {
     }
@@ -52,7 +50,6 @@ struct QnScheduleTask
 
     Qn::StreamQuality streamQuality = Qn::QualityHighest;
     int fps = 10;
-    bool doRecordAudio = false; // TODO: #GDM Field is not used.
     int bitrateKbps = 0;
 
     bool operator==(const QnScheduleTask& rhs)
@@ -66,7 +63,6 @@ struct QnScheduleTask
                 afterThresholdSec,
                 streamQuality,
                 fps,
-                doRecordAudio,
                 bitrateKbps)
             == std::tie(
                 rhs.dayOfWeek,
@@ -77,7 +73,6 @@ struct QnScheduleTask
                 rhs.afterThresholdSec,
                 rhs.streamQuality,
                 rhs.fps,
-                rhs.doRecordAudio,
                 rhs.bitrateKbps);
     }
 

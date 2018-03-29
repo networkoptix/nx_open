@@ -9,7 +9,6 @@ struct ApiScheduleTaskData: ApiData
 {
     qint32 startTime = 0;
     qint32 endTime = 0;
-    bool recordAudio = false; //< TODO: #GDM Field is not used.
     Qn::RecordingType recordingType = Qn::RT_Always;
     qint8 dayOfWeek = 1;
     qint16 beforeThreshold = 0;
@@ -21,7 +20,6 @@ struct ApiScheduleTaskData: ApiData
 #define ApiScheduleTaskData_Fields \
     (startTime) \
     (endTime) \
-    (recordAudio) \
     (recordingType) \
     (dayOfWeek) \
     (beforeThreshold) \

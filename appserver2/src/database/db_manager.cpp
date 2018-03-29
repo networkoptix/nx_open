@@ -2127,10 +2127,10 @@ ErrorCode QnDbManager::updateCameraSchedule(const std::vector<ApiScheduleTaskDat
 
     const auto query = m_insertCameraScheduleQuery.get(m_sdb, R"sql(
         INSERT INTO vms_scheduletask (
-            camera_attrs_id, start_time, end_time, do_record_audio, record_type,
+            camera_attrs_id, start_time, end_time, record_type,
             day_of_week, before_threshold, after_threshold, stream_quality, fps, bitrate_kbps
         ) VALUES (
-            :internalId, :startTime, :endTime, :recordAudio, :recordingType,
+            :internalId, :startTime, :endTime, :recordingType,
             :dayOfWeek, :beforeThreshold, :afterThreshold, :streamQuality, :fps, :bitrateKbps
         ))sql");
 
@@ -3416,7 +3416,6 @@ ErrorCode QnDbManager::getScheduleTasks(std::vector<ApiScheduleTaskWithRefData>&
             r.camera_guid as sourceId,             \
             st.start_time as startTime,            \
             st.end_time as endTime,                \
-            st.do_record_audio as recordAudio,     \
             st.record_type as recordingType,       \
             st.day_of_week as dayOfWeek,           \
             st.before_threshold as beforeThreshold,\

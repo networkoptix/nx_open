@@ -446,9 +446,6 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         from 00:00:00).
      *     %param scheduleTask.endTime Time of day when the backup ends (in seconds passed
      *         from 00:00:00).
-     *     %param scheduleTask.recordAudio Whether to record sound.
-     *         %value false
-     *         %value true
      *     %param scheduleTask.recordingType
      *         %value RT_Always Record always.
      *         %value RT_MotionOnly Record only when the motion is detected.
@@ -546,9 +543,6 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         from 00:00:00).
      *     %param scheduleTask.endTime Time of day when the backup ends (in seconds passed
      *         from 00:00:00).
-     *     %param scheduleTask.recordAudio Whether to record sound.
-     *         %value false
-     *         %value true
      *     %param scheduleTask.recordingType
      *         %value RT_Always Record always.
      *         %value RT_MotionOnly Record only when the motion is detected.
@@ -644,9 +638,6 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *             from 00:00:00).
      *         %param scheduleTask.endTime Time of day when the backup ends (in seconds passed
      *             from 00:00:00).
-     *         %param scheduleTask.recordAudio Whether to record sound.
-     *             %value false
-     *             %value true
      *         %param scheduleTask.recordingType
      *             %value RT_Always Record always.
      *             %value RT_MotionOnly Record only when the motion is detected.
@@ -780,9 +771,6 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *             from 00:00:00).
      *         %param scheduleTask.endTime Time of day when the backup ends (in seconds passed
      *             from 00:00:00).
-     *         %param scheduleTask.recordAudio Whether to record sound.
-     *             %value false
-     *             %value true
      *         %param scheduleTask.recordingType
      *             %value RT_Always Record always.
      *             %value RT_MotionOnly Record only when the motion is detected.
