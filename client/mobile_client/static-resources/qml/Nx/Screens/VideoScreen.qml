@@ -275,10 +275,43 @@ PageBase
     Image
     {
         id: screenshot
-        width: mainWindow.width
-        height: width * sourceSize.height / sourceSize.width
+
+        function getAspect(value)
+        {
+            return value.width > 0 && value.height > 0 ? value.width / value.height : 1
+        }
+
+        function fitToBounds(value, bounds)
+        {
+            var aspect = getAspect(value)
+            return aspect < bounds.width / bounds.height
+                ? Qt.size(bounds.height * aspect, bounds.height)
+                : Qt.size(bounds.width, bounds.width / aspect)
+        }
+
+        function fillBounds(value, bounds)
+        {
+            var aspect = getAspect(value)
+            var minimalSize = Math.min(bounds.width, bounds.height)
+            return value.width < value.height
+                ? Qt.size(minimalSize, minimalSize / aspect)
+                : Qt.size(minimalSize * aspect, minimalSize)
+        }
+
+        readonly property size boundingSize:
+        {
+            var isFisheye = videoScreenController.resourceHelper.fisheyeParams.enabled
+            var windowSize = Qt.size(mainWindow.width, mainWindow.height)
+            return isFisheye
+                ? fillBounds(sourceSize, windowSize)
+                : fitToBounds(sourceSize, windowSize)
+        }
+
+        width: boundingSize.width
+        height: boundingSize.height
+
         y: (mainWindow.height - height) / 3 - header.height
-        x: -mainWindow.leftPadding
+        x: (mainWindow.width - width) / 2 - mainWindow.leftPadding
         visible: status == Image.Ready && !dummyLoader.visible
         opacity: d.cameraUiOpacity
     }
