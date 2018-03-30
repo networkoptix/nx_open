@@ -25,20 +25,36 @@ ApplicationWindow
 
     visible: true
     color: ColorTheme.windowBackground
+
     overlay.background: Rectangle
     {
         color: ColorTheme.transparent(ColorTheme.base5, 0.4)
         Behavior on opacity { NumberAnimation { duration: 200 } }
     }
 
-    SideNavigation { id: sideNavigation }
+    WarningPanel
+    {
+        id: reconnectingWarning
+
+        width: mainWindow.availableWidth
+        text: qsTr("Server offline. Reconnecting...")
+        opened: connectionManager.restoringConnection
+    }
+
+    SideNavigation
+    {
+        id: sideNavigation
+
+        y: reconnectingWarning.height
+    }
 
     StackView
     {
         id: stackView
 
+        y: reconnectingWarning.height
         width: mainWindow.availableWidth
-        height: mainWindow.availableHeight - keyboardHeight
+        height: mainWindow.availableHeight - keyboardHeight - reconnectingWarning.height
 
         property real keyboardHeight: mainWindow.keyboardHeight
         Behavior on keyboardHeight

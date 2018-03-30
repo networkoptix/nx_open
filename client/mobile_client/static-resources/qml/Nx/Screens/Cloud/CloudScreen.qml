@@ -9,6 +9,7 @@ import "private"
 Page
 {
     id: cloudScreen
+    objectName: "cloudScreen"
 
     padding: 8
     topPadding: 0

@@ -36,6 +36,16 @@ class QnTimeline: public QQuickItem
     Q_PROPERTY(QColor chunkColor READ chunkColor WRITE setChunkColor NOTIFY chunkColorChanged)
     Q_PROPERTY(QFont font READ font WRITE setFont NOTIFY fontChanged)
 
+    Q_PROPERTY(QColor activeLiveColorLight READ activeLiveColorLight
+        WRITE setActiveLiveColorLight NOTIFY activeLiveColorLightChanged)
+    Q_PROPERTY(QColor activeLiveColorDark READ activeLiveColorDark
+        WRITE setActiveLiveColorDark NOTIFY activeLiveColorDarkChanged)
+
+    Q_PROPERTY(QColor inactiveLiveColorLight READ inactiveLiveColorLight
+        WRITE setInactiveLiveColorLight NOTIFY inactiveLiveColorLightChanged)
+    Q_PROPERTY(QColor inactiveLiveColorDark READ inactiveLiveColorDark
+        WRITE setInactiveLiveColorDark NOTIFY inactiveLiveColorDarkChanged)
+
     Q_PROPERTY(int chunkBarHeight
         READ chunkBarHeight WRITE setChunkBarHeight NOTIFY chunkBarHeightChanged)
     Q_PROPERTY(int textY READ textY WRITE setTextY NOTIFY textYChanged)
@@ -61,6 +71,18 @@ public:
 
     QColor chunkBarColor() const;
     void setChunkBarColor(const QColor& color);
+
+    QColor activeLiveColorLight() const;
+    void setActiveLiveColorLight(const QColor& color);
+
+    QColor activeLiveColorDark() const;
+    void setActiveLiveColorDark(const QColor& color);
+
+    QColor inactiveLiveColorLight() const;
+    void setInactiveLiveColorLight(const QColor& color);
+
+    QColor inactiveLiveColorDark() const;
+    void setInactiveLiveColorDark(const QColor& color);
 
     int chunkBarHeight() const;
     void setChunkBarHeight(int chunkBarHeight);
@@ -149,6 +171,11 @@ signals:
     void chunkColorChanged();
     void chunkBarColorChanged();
     void fontChanged();
+
+    void activeLiveColorDarkChanged();
+    void activeLiveColorLightChanged();
+    void inactiveLiveColorDarkChanged();
+    void inactiveLiveColorLightChanged();
 
     void chunkBarHeightChanged();
     void textYChanged();

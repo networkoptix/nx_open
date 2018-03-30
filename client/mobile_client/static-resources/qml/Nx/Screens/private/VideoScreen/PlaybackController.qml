@@ -70,7 +70,7 @@ AbstractButton
     {
         anchors.fill: parent
         radius: height / 2
-        color: "black"
+        color: ColorTheme.transparent(ColorTheme.base1, 0.2)
         opacity: control.pressed ? 0.2 : 0.0
     }
 }

@@ -6,6 +6,8 @@ import com.networkoptix.qml 1.0
 
 Item
 {
+    id: control
+
     property alias email: emailField.text
     property alias password: passwordField.text
     property alias learnMoreLinkVisible: learnMoreLink.visible
@@ -22,8 +24,12 @@ Item
 
         property bool invalidCredentials: false
         property bool connecting: false
+        property bool reactivationRequested: false
         property string initialLogin
+        property string lastNotActivatedAccount
     }
+
+    onVisibleChanged: d.reactivationRequested = false
 
     Column
     {
@@ -45,7 +51,7 @@ Item
                 id: emailField
                 placeholderText: qsTr("Email")
                 width: parent.availableWidth
-                showError: d.invalidCredentials
+                showError: d.invalidCredentials || notActivatedWarningPanel.opened
                 activeFocusOnTab: true
                 inputMethodHints:
                     Qt.ImhSensitiveData
@@ -63,6 +69,31 @@ Item
                     }
                 }
             }
+
+            FieldWarning
+            {
+                id: notActivatedWarningPanel
+
+                width: parent.availableWidth
+                text: qsTr("Account not activated")
+            }
+
+            LinkButton
+            {
+                width: parent.width
+                visible: notActivatedWarningPanel.opened && d.lastNotActivatedAccount.length > 0
+                enabled: !d.connecting && !d.reactivationRequested
+                opacity: enabled ? 1.0 : 0.3
+
+                text: qsTr("Resend activation email")
+
+                onClicked:
+                {
+                    d.reactivationRequested = true
+                    cloudStatusWatcher.resendActivationEmail(d.lastNotActivatedAccount)
+                }
+            }
+
             TextField
             {
                 id: passwordField
@@ -84,6 +115,7 @@ Item
                     }
                 }
             }
+
             FieldWarning
             {
                 id: warningPanel
@@ -97,6 +129,7 @@ Item
             text: qsTr("Log in")
             width: parent.width
             showProgress: d.connecting
+            enabled: !d.reactivationRequested
             onClicked: login()
         }
 
@@ -133,6 +166,22 @@ Item
     {
         target: cloudStatusWatcher
 
+        onActivationEmailResent:
+        {
+            if (!control.visible)
+                return
+
+            var caption = success
+                ? qsTr("Activation email sent")
+                : qsTr("Can't send activation email")
+            var text = success
+                ? qsTr("Check your inbox and visit provided link to activate account")
+                : qsTr("Check your internet connection or try again later")
+
+            var dialog = Workflow.openStandardDialog("", text)
+            d.reactivationRequested = false
+        }
+
         onErrorChanged:
         {
             if (error == QnCloudStatusWatcher.NoError)
@@ -143,6 +192,11 @@ Item
             {
                 d.invalidCredentials = true
                 showWarning(qsTr("Incorrect email or password"))
+            }
+            else if (error = QnCloudStatusWatcher.AccountNotActivated)
+            {
+                d.lastNotActivatedAccount = emailField.text
+                showNotActivatedAccoundWarning()
             }
             else
             {
@@ -157,6 +211,7 @@ Item
             {
                 loggedIn()
                 d.connecting = false
+                d.reactivationRequested = false
                 return
             }
         }
@@ -176,11 +231,19 @@ Item
         hideWarning()
         d.invalidCredentials = false
         d.connecting = true
+        d.reactivationRequested = false
         setCloudCredentials(email, password)
+    }
+
+    function showNotActivatedAccoundWarning()
+    {
+        warningPanel.opened = false
+        notActivatedWarningPanel.opened = true
     }
 
     function showWarning(text)
     {
+        notActivatedWarningPanel.opened = false
         warningPanel.text = text
         warningPanel.opened = true
     }
@@ -188,6 +251,7 @@ Item
     function hideWarning()
     {
         warningPanel.opened = false
+        notActivatedWarningPanel.opened = false
     }
 
     Component.onCompleted:

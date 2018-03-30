@@ -22,7 +22,7 @@
 #include <nx/vms/discovery/manager.h>
 #include <network/router.h>
 #include <cloud/cloud_connection.h>
-#include <watchers/user_watcher.h>
+#include <nx/client/core/watchers/user_watcher.h>
 #include <watchers/available_cameras_watcher.h>
 #include <watchers/cloud_status_watcher.h>
 #include <watchers/server_interface_watcher.h>
@@ -52,6 +52,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_discovery_manager.h>
 #include <plugins/resource/desktop_camera/desktop_resource_searcher.h>
+#include <plugins/resource/desktop_audio_only/desktop_audio_only_resource_searcher_impl.h>
 #include <nx/client/core/two_way_audio/two_way_audio_mode_controller.h>
 #include <plugins/resource/desktop_camera/desktop_resource_base.h>
 #include <client/client_resource_processor.h>
@@ -109,7 +110,7 @@ QnMobileClientModule::QnMobileClientModule(
     commonModule->instance<QnCameraHistoryPool>();
     commonModule->store(new QnMobileClientCameraFactory());
 
-    const auto userWatcher = commonModule->store(new QnUserWatcher());
+    const auto userWatcher = commonModule->store(new nx::client::core::UserWatcher());
     const auto twoWayAudioController = commonModule->store(
         new nx::client::core::TwoWayAudioController);
 
@@ -122,7 +123,7 @@ QnMobileClientModule::QnMobileClientModule(
             twoWayAudioController->setSourceId(sourceId);
         };
 
-    connect(userWatcher, &QnUserWatcher::userChanged,
+    connect(userWatcher, &nx::client::core::UserWatcher::userChanged,
         this, updateTwoWayAudioControllerSourceId);
     connect(commonModule, &QnCommonModule::moduleInformationChanged,
         this, updateTwoWayAudioControllerSourceId);
@@ -141,7 +142,7 @@ QnMobileClientModule::QnMobileClientModule(
     commonModule->runtimeInfoManager()->updateLocalItem(runtimeData);
 
     auto availableCamerasWatcher = commonModule->instance<QnAvailableCamerasWatcher>();
-    connect(userWatcher, &QnUserWatcher::userChanged,
+    connect(userWatcher, &nx::client::core::UserWatcher::userChanged,
         availableCamerasWatcher, &QnAvailableCamerasWatcher::setUser);
 
     commonModule->store(new QnCloudConnectionProvider());
@@ -220,7 +221,8 @@ void QnMobileClientModule::initDesktopCamera()
 {
     // Initialize desktop camera searcher.
     const auto commonModule = m_clientCoreModule->commonModule();
-    const auto desktopSearcher = commonModule->store(new QnDesktopResourceSearcher(nullptr));
+    const auto desktopSearcher = commonModule->store(new QnDesktopResourceSearcher(
+        new QnDesktopAudioOnlyResourceSearcherImpl()));
     const auto resourceDiscoveryManager = commonModule->resourceDiscoveryManager();
     desktopSearcher->setLocal(true);
     resourceDiscoveryManager->addDeviceServer(desktopSearcher);

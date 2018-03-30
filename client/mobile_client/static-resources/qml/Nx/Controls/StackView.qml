@@ -7,6 +7,38 @@ StackView
 
     property int transitionDuration: 200
 
+    function safePush(url, properties, operation)
+    {
+        if (busy)
+            return undefined
+
+        var component = Qt.createComponent(url)
+        var item = properties
+            ? component.createObject(null, properties)
+            : component.createObject(null)
+
+        if (currentItem && currentItem.objectName == item.objectName)
+        {
+            item.destroy()
+            return undefined
+        }
+
+        return push(item, properties, operation)
+    }
+
+    function safeReplace(target, item, properties, operation)
+    {
+        return busy
+            ? undefined
+            : replace(target, item, properties, operation)
+    }
+
+    onBusyChanged:
+    {
+        if (!busy && currentItem)
+            currentItem.forceActiveFocus()
+    }
+
     QtObject
     {
         id: d

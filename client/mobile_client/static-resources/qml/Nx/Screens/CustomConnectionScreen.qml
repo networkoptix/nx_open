@@ -9,6 +9,7 @@ import com.networkoptix.qml 1.0
 Page
 {
     id: customConnectionScreen
+    objectName: "customConnectionScreen"
 
     title: systemName ? systemName : qsTr("Connect to Server")
     onLeftButtonClicked: Workflow.popCurrentScreen()
@@ -226,8 +227,8 @@ Page
         credentialsEditor.focusAddressField()
     }
 
-    function focusLoginField()
+    function focusCredentialsField()
     {
-        credentialsEditor.focusLoginField()
+        credentialsEditor.focusCredentialsField()
     }
 }

@@ -43,7 +43,11 @@ QnUserResourcePtr findUser(const QString& userName, QnCommonModule* commonModule
 
 } // namespace
 
-QnUserWatcher::QnUserWatcher(QObject* parent) :
+namespace nx {
+namespace client {
+namespace core {
+
+UserWatcher::UserWatcher(QObject* parent) :
     base_type(parent)
 {
     connect(qnClientMessageProcessor,
@@ -66,12 +70,12 @@ QnUserWatcher::QnUserWatcher(QObject* parent) :
     );
 }
 
-const QnUserResourcePtr& QnUserWatcher::user() const
+const QnUserResourcePtr& UserWatcher::user() const
 {
     return m_user;
 }
 
-void QnUserWatcher::setCurrentUser(const QnUserResourcePtr& user)
+void UserWatcher::setCurrentUser(const QnUserResourcePtr& user)
 {
     if (m_user == user)
         return;
@@ -81,12 +85,12 @@ void QnUserWatcher::setCurrentUser(const QnUserResourcePtr& user)
     emit userChanged(user);
 }
 
-const QString& QnUserWatcher::userName() const
+const QString& UserWatcher::userName() const
 {
     return m_userName;
 }
 
-void QnUserWatcher::setUserName(const QString& name)
+void UserWatcher::setUserName(const QString& name)
 {
     if (m_userName == name)
         return;
@@ -94,3 +98,7 @@ void QnUserWatcher::setUserName(const QString& name)
     m_userName = name;
     emit userNameChanged();
 }
+
+} // namespace core
+} // namespace client
+} // namespace nx

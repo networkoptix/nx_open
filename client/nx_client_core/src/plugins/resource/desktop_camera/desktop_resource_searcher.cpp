@@ -2,20 +2,19 @@
 
 #include <client_core/client_core_module.h>
 
-#ifdef Q_OS_WIN
-    #include <plugins/resource/desktop_win/desktop_resource_searcher_impl.h>
-#else
-    #include <plugins/resource/desktop_audio_only/desktop_audio_only_resource_searcher_impl.h>
-#endif
-
 namespace {
-    const QString kManufacture = lit("Network Optix");
-}
 
-QnDesktopResourceSearcher::QnDesktopResourceSearcher(QGLWidget* mainWidget, QObject* parent):
+const QString kManufacture = lit("Network Optix");
+
+} // namespace
+
+QnDesktopResourceSearcher::QnDesktopResourceSearcher(
+    QnAbstractDesktopResourceSearcherImpl* impl,
+    QObject* parent)
+    :
     base_type(parent),
     QnAbstractResourceSearcher(qnClientCoreModule->commonModule()),
-    m_impl(new QnDesktopResourceSearcherImpl(mainWidget))
+    m_impl(impl)
 {
 }
 

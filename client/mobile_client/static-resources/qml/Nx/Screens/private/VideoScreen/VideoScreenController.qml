@@ -11,8 +11,7 @@ Object
 
     property alias resourceId: resourceHelper.resourceId
 
-    readonly property bool serverOffline:
-        connectionManager.connectionState === QnConnectionManager.Reconnecting
+    readonly property bool serverOffline: connectionManager.restoringConnection
     readonly property bool cameraOffline:
         mediaPlayer.liveMode
             && resourceHelper.resourceStatus === MediaResourceHelper.Offline
@@ -25,6 +24,11 @@ Object
     readonly property bool noLicenses: resourceHelper.analogCameraWithoutLicense;
     readonly property bool hasDefaultCameraPassword: resourceHelper.hasDefaultCameraPassword
     readonly property bool hasOldFirmware: resourceHelper.hasOldCameraFirmware
+    readonly property bool tooManyConnections: mediaPlayer.tooManyConnectionsError
+    readonly property bool ioModuleWarning:
+        resourceHelper.isIoModule && !resourceHelper.audioSupported
+    readonly property bool ioModuleAudioPlaying:
+        resourceHelper.isIoModule && resourceHelper.audioSupported
 
     readonly property string dummyState:
     {
@@ -40,10 +44,16 @@ Object
             return "cameraOffline"
         if (noVideoStreams)
             return "noVideoStreams"
+        if (ioModuleWarning)
+            return "ioModuleWarning"
+        if (ioModuleAudioPlaying)
+            return "ioModuleAudioPlaying"
         if (failed)
             return "videoLoadingFailed"
         if (noLicenses)
             return "noLicenses";
+        if (tooManyConnections)
+            return "tooManyConnections"
 
         return ""
     }
@@ -64,6 +74,7 @@ Object
         property bool playing: false
 
         property real lastPosition: -1
+        property real interruptedPosition: -1
         property bool waitForLastPosition: false
         property bool waitForFirstPosition: true
 
@@ -73,15 +84,27 @@ Object
             waitForLastPosition = true
         }
 
+        function interrupt()
+        {
+            d.interruptedPosition = d.currentPosition()
+            mediaPlayer.pause()
+        }
+
+        function resumePlaying()
+        {
+            mediaPlayer.position = interruptedPosition
+            mediaPlayer.play()
+        }
+
         onApplicationActiveChanged:
         {
             if (!Utils.isMobile())
                 return
 
             if (!applicationActive)
-                mediaPlayer.pause()
-            else if (d.playing)
-                mediaPlayer.play()
+                interrupt()
+            else if (playing)
+                resumePlaying()
         }
 
         function currentPosition()

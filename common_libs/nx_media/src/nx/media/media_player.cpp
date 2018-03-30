@@ -121,8 +121,10 @@ QList<int> sortOutEqualQualities(QualityInfoList qualities)
 
 } // namespace
 
-class PlayerPrivate: public QObject
+class PlayerPrivate: public Connective<QObject>
 {
+    using base_type = Connective<QObject>;
+
     Q_DECLARE_PUBLIC(Player)
     Player* q_ptr;
 
@@ -135,6 +137,8 @@ public:
 
     // Either media is on live or archive position. Holds QT property value.
     bool liveMode;
+
+    bool tooManyConnections = false;
 
     // Video aspect ratio
     double aspectRatio;
@@ -233,6 +237,8 @@ public:
 private:
     PlayerPrivate(Player* parent);
 
+    void handleMediaEventChanged();
+
     void at_hurryUp();
     void at_jumpOccurred(int sequence);
     void at_gotVideoFrame();
@@ -265,7 +271,7 @@ private:
 };
 
 PlayerPrivate::PlayerPrivate(Player *parent):
-    QObject(parent),
+    base_type(parent),
     q_ptr(parent),
     state(Player::State::Stopped),
     mediaStatus(Player::MediaStatus::NoMedia),
@@ -777,12 +783,14 @@ bool PlayerPrivate::initDataProvider()
         });
 
     archiveReader->addDataProcessor(dataConsumer.get());
-    connect(dataConsumer.get(), &PlayerDataConsumer::gotVideoFrame,
+    connect(dataConsumer, &PlayerDataConsumer::gotVideoFrame,
         this, &PlayerPrivate::at_gotVideoFrame);
-    connect(dataConsumer.get(), &PlayerDataConsumer::hurryUp,
+    connect(dataConsumer, &PlayerDataConsumer::hurryUp,
         this, &PlayerPrivate::at_hurryUp);
-    connect(dataConsumer.get(), &PlayerDataConsumer::jumpOccurred,
+    connect(dataConsumer, &PlayerDataConsumer::jumpOccurred,
         this, &PlayerPrivate::at_jumpOccurred);
+    connect(dataConsumer, &PlayerDataConsumer::mediaEventChanged,
+        this, &PlayerPrivate::handleMediaEventChanged);
 
     if (!liveMode)
     {
@@ -794,6 +802,22 @@ bool PlayerPrivate::initDataProvider()
     archiveReader->start();
 
     return true;
+}
+
+void PlayerPrivate::handleMediaEventChanged()
+{
+    if (!dataConsumer)
+        return;
+
+    const auto event = dataConsumer->mediaEvent();
+    const auto value = event == Qn::MediaStreamEvent::TooManyOpenedConnectionsError;
+    if (value == tooManyConnections)
+        return;
+
+    tooManyConnections = value;
+
+    Q_Q(Player);
+    emit q->tooManyConnectionsErrorChanged();
 }
 
 void PlayerPrivate::log(const QString& message) const
@@ -863,6 +887,9 @@ qint64 Player::position() const
 
 void Player::setPosition(qint64 value)
 {
+    if (value > QDateTime::currentMSecsSinceEpoch())
+        value = -1;
+
     Q_D(Player);
     d->log(lit("setPosition(%1: %2)")
         .arg(value)
@@ -1046,6 +1073,12 @@ void Player::setAudioEnabled(bool value)
             d->dataConsumer->setAudioEnabled(value);
         emit audioEnabledChanged();
     }
+}
+
+bool Player::tooManyConnectionsError() const
+{
+    Q_D(const Player);
+    return d->tooManyConnections;
 }
 
 bool Player::liveMode() const

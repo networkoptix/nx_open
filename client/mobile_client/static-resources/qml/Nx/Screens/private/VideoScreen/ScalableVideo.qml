@@ -45,6 +45,72 @@ ZoomableFlickable
 
     clip: true
 
+    function to1xScale()
+    {
+        d.toggleScale(false, width / 2, height / 2)
+    }
+
+    doubleTapStartCheckFuncion:
+        function(initialPosition)
+        {
+            var videoMappedPosition = mapToItem(video, initialPosition.x, initialPosition.y)
+            return video.pointInVideo(videoMappedPosition);
+        }
+
+    onDoubleClicked:
+    {
+        var videoMappedPosition = mapToItem(video, mouseX, mouseY)
+        if (!video.pointInVideo(videoMappedPosition))
+            return
+
+        var twiceTargetScale = 2
+        var eps = 0.000001
+        var zoomIn = zf.contentScale < twiceTargetScale - eps
+
+        d.toggleScale(zoomIn, mouseX, mouseY)
+    }
+
+    QtObject
+    {
+        id: d
+
+        function toggleScale(to2x, mouseX, mouseY)
+        {
+            var targetScale = to2x ? 2 : 1
+
+            var baseWidth = contentWidth / zf.contentScale
+            var baseHeight = contentHeight / zf.contentScale
+
+            flickable.animating = true
+            flickable.fixMargins()
+
+            var point = mapToItem(content, mouseX, mouseY)
+            var dx = point.x / zf.contentScale
+            var dy = point.y / zf.contentScale
+
+            contentWidth = baseWidth * targetScale
+            contentHeight = baseHeight * targetScale
+
+            var x = to2x ? (width / 2 - targetScale * dx) : (width - baseWidth) / 2
+            var y = to2x ? (height / 2 - targetScale * dy) : (height - baseHeight) / 2
+
+            if (x > allowedLeftMargin)
+                x = allowedLeftMargin - 1
+            else if (x + contentWidth < width - allowedRightMargin)
+                x = width - contentWidth - allowedRightMargin + 1
+
+            if (y > allowedTopMargin)
+                y = allowedTopMargin - 1
+            else if (y + contentHeight < height - allowedBottomMargin)
+                y = height - contentHeight - allowedBottomMargin + 1
+
+            contentX = -x
+            contentY = -y
+
+            flickable.animateToBounds()
+        }
+    }
+
     VideoPositioner
     {
         id: content

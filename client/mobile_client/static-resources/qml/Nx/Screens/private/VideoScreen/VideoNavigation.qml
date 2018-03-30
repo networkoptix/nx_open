@@ -7,6 +7,8 @@ import Nx.Media 1.0
 import Nx.Controls 1.0
 import com.networkoptix.qml 1.0
 
+// TODO: #ynikitenkov After 18.1 refactor this control.
+
 Item
 {
     id: videoNavigation
@@ -17,11 +19,15 @@ Item
     property bool ptzAvailable: false
     property real controlsOpacity: 1.0
     property alias animatePlaybackControls: playbackControlsOpacityBehaviour.enabled
+    property bool canViewArchive: true
+    property int buttonsPanelHeight: buttonsPanel.visible ? buttonsPanel.height : 0
 
     signal ptzButtonClicked()
+    signal switchToNextCamera()
+    signal switchToPreviousCamera()
 
     implicitWidth: parent ? parent.width : 0
-    implicitHeight: navigator.height + navigationPanel.height
+    implicitHeight: navigator.height + buttonsPanel.height
     anchors.bottom: parent ? parent.bottom : undefined
 
     Connections
@@ -118,12 +124,42 @@ Item
         onTriggered: cameraChunkProvider.update()
     }
 
+    Button
+    {
+        y: 56 / 2 - height / 2
+        padding: 8
+        width: 56
+        height: width
+        color: ColorTheme.transparent(ColorTheme.base1, 0.2)
+        icon: lp("/images/previous.png")
+        radius: width / 2
+        z: 1
+        onClicked: videoNavigation.switchToPreviousCamera()
+    }
+
+    Button
+    {
+        y: 56 / 2 - height / 2
+        anchors.right: parent.right
+        padding: 8
+        width: 56
+        height: width
+        color: ColorTheme.transparent(ColorTheme.base1, 0.2)
+        icon: lp("/images/next.png")
+        radius: width / 2
+        z: 1
+        onClicked: videoNavigation.switchToNextCamera()
+    }
+
     Item
     {
         id: navigator
 
-        width: parent.width
-        height: timeline.height + playbackController.height - 16
+        implicitWidth: parent.width
+        implicitHeight: videoNavigation.canViewArchive
+            ? timeline.height + playbackController.height - 16
+            : 56
+
         Behavior on y { SmoothedAnimation { duration: 200; reversingMode: SmoothedAnimation.Sync } }
 
         MouseArea
@@ -133,7 +169,7 @@ Item
             anchors.fill: navigator
             drag.axis: Drag.YAxis
             drag.minimumY: 0
-            drag.maximumY: navigationPanel.height
+            drag.maximumY: buttonsPanel.height
             drag.filterChildren: true
             drag.threshold: 10
 
@@ -180,35 +216,15 @@ Item
             }
         }
 
-        Image
-        {
-            width: parent.width
-            anchors.bottom: timeline.bottom
-            height: timeline.chunkBarHeight
-            source: lp("/images/timeline_chunkbar_preloader.png")
-            sourceSize: Qt.size(timeline.chunkBarHeight, timeline.chunkBarHeight)
-            fillMode: Image.Tile
-            visible: d.hasArchive
-        }
-
-        Image
-        {
-            width: timeline.width
-            height: sourceSize.height
-            anchors.bottom: timeline.bottom
-            anchors.bottomMargin: timeline.chunkBarHeight
-            sourceSize.height: 150 - timeline.chunkBarHeight
-            source: lp("/images/timeline_gradient.png")
-            visible: d.hasArchive
-        }
-
         Timeline
         {
             id: timeline
 
             property bool resumeWhenDragFinished: false
+
             serverTimeZoneShift: videoScreenController.resourceHelper.serverTimeOffset;
             enabled: d.hasArchive
+            visible: videoNavigation.canViewArchive
 
             anchors.bottom: parent.bottom
             width: parent.width
@@ -221,6 +237,30 @@ Item
 
             chunkProvider: cameraChunkProvider
             startBound: cameraChunkProvider.bottomBound
+
+            readonly property color lineColor: ColorTheme.transparent(ColorTheme.base1, 0.2)
+            readonly property real lineOpacity:
+                videoNavigation.canViewArchive && d.hasArchive ? d.timelineOpacity : 0
+
+            Rectangle
+            {
+                width: parent.width
+                height: 1
+                anchors.bottom: timeline.bottom
+                anchors.bottomMargin: -1
+                opacity: timeline.lineOpacity
+                color: timeline.lineColor
+            }
+
+            Rectangle
+            {
+                width: parent.width
+                height: 1
+                anchors.bottom: timeline.bottom
+                anchors.bottomMargin: timeline.chunkBarHeight
+                opacity: timeline.lineOpacity
+                color: timeline.lineColor
+            }
 
             onMovingChanged:
             {
@@ -322,7 +362,7 @@ Item
             anchors.fill: timeline
             source: timeline.timelineView
             maskSource: timelineMask
-            opacity: Math.min(d.controlsOpacity, d.timelineOpacity)
+            opacity: Math.min(d.controlsOpacity, d.timelineOpacity, timeline.visible ? 1 : 0)
 
             Component.onCompleted: timeline.timelineView.visible = false
         }
@@ -336,28 +376,33 @@ Item
             anchors.bottom: timeline.bottom
             anchors.bottomMargin: (timeline.chunkBarHeight - height) / 2 + 12
             color: ColorTheme.windowText
-            visible: !d.hasArchive
+            visible: d.liveMode && !d.hasArchive && videoNavigation.canViewArchive
             opacity: 0.5 * timelineOpactiyMask.opacity
         }
 
         Pane
         {
-            id: navigationPanel
+            id: buttonsPanel
 
             readonly property real minimalWidth: width - (zoomButtonsRow.x + zoomButtonsRow.width)
             readonly property bool showZoomControls: actionButtonsPanel.contentWidth < minimalWidth
 
             width: parent.width
-            height: 56
+            height: visible ? 56 : 0
             anchors.top: timeline.bottom
-            background: Rectangle { color: ColorTheme.base3 }
+            background: Item {}
             padding: 4
             z: 1
+
+            readonly property bool showButtonsPanel:
+                !liveModeButton.visible && actionButtonsPanel.buttonsCount > 0
+            visible:  videoNavigation.canViewArchive || showButtonsPanel
 
             IconButton
             {
                 id: calendarButton
 
+                visible: videoNavigation.canViewArchive
                 anchors.verticalCenter: parent.verticalCenter
                 icon: lp("/images/calendar.png")
                 enabled: d.hasArchive
@@ -374,7 +419,8 @@ Item
                 id: zoomButtonsRow
 
                 anchors.centerIn: parent
-                visible: navigationPanel.showZoomControls || !d.liveMode
+                visible: (buttonsPanel.showZoomControls || !d.liveMode)
+                    && videoNavigation.canViewArchive
 
                 IconButton
                 {
@@ -397,6 +443,8 @@ Item
 
             Button
             {
+                id: liveModeButton
+
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
                 text: qsTr("LIVE")
@@ -410,7 +458,7 @@ Item
                     videoScreenController.playLive()
                 }
 
-                visible: opacity > 0
+                visible: opacity > 0 && videoNavigation.canViewArchive
                 opacity:
                 {
                     var futurePosition =
@@ -425,9 +473,10 @@ Item
             {
                 id: actionButtonsPanel
 
-                resourceId: videoScreenController.resourceId
+                visible: buttonsPanel.showButtonsPanel
 
-                anchors.left: navigationPanel.showZoomControls
+                resourceId: videoScreenController.resourceId
+                anchors.left: buttonsPanel.showZoomControls
                     ? zoomButtonsRow.right
                     : calendarButton.right
                 anchors.right: parent.right
@@ -440,10 +489,11 @@ Item
                     var futurePosition =
                         videoScreenController.mediaPlayer.position > (new Date()).getTime()
                     var correctState = videoScreenController.dummyState.length == 0
-                    return (d.liveMode || futurePosition) && correctState ? 1 : 0
+                    var live = d.liveMode || futurePosition
+
+                    return live && correctState ? 1 : 0
                 }
 
-                visible: opacity > 0
                 onPtzButtonClicked: videoNavigation.ptzButtonClicked()
                 onTwoWayAudioButtonPressed: twoWayAudioController.start()
                 onTwoWayAudioButtonReleased: twoWayAudioController.stop()
@@ -478,6 +528,7 @@ Item
         {
             id: dateTimeLabel
 
+            visible: videoNavigation.canViewArchive
             height: 48
             width: parent.width
             anchors.bottom: timeline.bottom
@@ -495,8 +546,7 @@ Item
                 font.weight: Font.Normal
                 verticalAlignment: Text.AlignVCenter
 
-                // TODO: Remove qsTr from this string!
-                text: timeline.positionDate.toLocaleDateString(d.locale, qsTr("d MMMM yyyy", "DO NOT TRANSLATE THIS STRING!"))
+                text: timeline.positionDate.toLocaleDateString(d.locale, "d MMMM yyyy")
                 color: ColorTheme.windowText
 
                 opacity: d.liveMode ? 0.0 : 1.0
@@ -535,9 +585,26 @@ Item
             }
         }
 
+        Text
+        {
+            id: liveOnlyText
+
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.bottom: parent.bottom
+            verticalAlignment: Text.AlignVCenter
+            height: 56
+            font.pixelSize: 28
+            font.weight: Font.Normal
+            color: ColorTheme.windowText
+            text: qsTr("LIVE")
+            visible: d.liveMode && !videoNavigation.canViewArchive
+        }
+
         PlaybackController
         {
             id: playbackController
+
+            visible: videoNavigation.canViewArchive
 
             anchors.top: navigator.top
             anchors.horizontalCenter: parent.horizontalCenter
@@ -574,7 +641,7 @@ Item
             anchors.bottom: parent.bottom
             width: 2
             height: 20
-            visible: d.hasArchive
+            visible: d.hasArchive && videoNavigation.canViewArchive
             opacity: timelineOpactiyMask.opacity
         }
     }
@@ -585,7 +652,7 @@ Item
         width: parent.width
         anchors.top: parent.bottom
         color: ColorTheme.base3
-        height: navigationPanel.height
+        height: buttonsPanel.height
     }
 
     CalendarPanel

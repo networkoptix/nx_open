@@ -83,7 +83,10 @@ public:
 
     QnCloudSystemList recentCloudSystems() const;
 
+    Q_INVOKABLE void resendActivationEmail(const QString& email);
+
 signals:
+    void activationEmailResent(bool success);
     void credentialsChanged();
     void loginChanged();
     void passwordChanged();

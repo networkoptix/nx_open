@@ -101,6 +101,40 @@ DummyMessage
                 image: lp("/images/alert_alert.png")
                 description: qsTr("Please update firmware")
             }
+        },
+        State
+        {
+            name: "tooManyConnections"
+            PropertyChanges
+            {
+                target: dummyMessage
+                title: qsTr("Too many connections")
+                image: lp("/images/alert_alert.png")
+            }
+        },
+        State
+        {
+            name: "ioModuleWarning"
+            PropertyChanges
+            {
+                target: dummyMessage
+                title: qsTr("I/O interface not supported yet")
+                description: qsTr(
+                    "In this app I/O module can be used as a sound input device only."
+                    + " To use it as a control module, please use desktop version of %1")
+                    .arg(applicationInfo.productName())
+                image: lp("/images/alert_io.png")
+            }
+        },
+        State
+        {
+            name: "ioModuleAudioPlaying"
+            PropertyChanges
+            {
+                target: dummyMessage
+                image: lp("/images/alert_sound.png")
+            }
         }
+
     ]
 }

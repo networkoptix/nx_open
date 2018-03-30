@@ -2,7 +2,7 @@
 
 #include <QtQml/QtQml>
 
-#include <watchers/user_watcher.h>
+#include <nx/client/core/watchers/user_watcher.h>
 #include <common/common_module.h>
 #include <client_core/client_core_module.h>
 #include <core/resource/user_resource.h>
@@ -22,7 +22,7 @@ namespace mobile {
 SoftwareTriggersController::SoftwareTriggersController(QObject* parent):
     base_type(parent),
     m_commonModule(qnClientCoreModule->commonModule()),
-    m_userWatcher(m_commonModule->instance<QnUserWatcher>()),
+    m_userWatcher(m_commonModule->instance<nx::client::core::UserWatcher>()),
     m_accessManager(m_commonModule->resourceAccessManager()),
     m_ruleManager(m_commonModule->eventRuleManager())
 {
@@ -90,7 +90,7 @@ bool SoftwareTriggersController::activateTrigger(const QnUuid& id)
 bool SoftwareTriggersController::deactivateTrigger()
 {
     if (m_activeTriggerId.isNull())
-        return false; // May be when activation failed.
+        return false; //< May be when activation failed.
 
     const auto rule = m_ruleManager->rule(m_activeTriggerId);
     if (!rule || !rule->isActionProlonged())
@@ -143,9 +143,9 @@ bool SoftwareTriggersController::setTriggerState(QnUuid id, vms::event::EventSta
         [this, state, id](bool success, rest::Handle /*handle*/, const QnJsonRestResult& result)
         {
             if (state == nx::vms::event::EventState::inactive)
-                triggerDeactivated(id);
+                emit triggerDeactivated(id);
             else
-                triggerActivated(id, success && result.error == QnRestResult::NoError);
+                emit triggerActivated(id, success && result.error == QnRestResult::NoError);
         };
 
     const auto connection = m_commonModule->currentServer()->restConnection();

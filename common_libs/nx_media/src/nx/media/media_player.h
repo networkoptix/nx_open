@@ -102,6 +102,9 @@ class Player: public QObject
      */
     Q_PROPERTY(bool audioEnabled READ isAudioEnabled WRITE setAudioEnabled NOTIFY audioEnabledChanged)
 
+    Q_PROPERTY(bool tooManyConnectionsError READ tooManyConnectionsError
+        NOTIFY tooManyConnectionsErrorChanged)
+
 public:
     enum class State
     {
@@ -223,6 +226,8 @@ public:
     bool isAudioEnabled() const;
     void setAudioEnabled(bool value);
 
+    bool tooManyConnectionsError() const;
+
 public slots:
     void play();
     void pause();
@@ -248,6 +253,7 @@ signals:
     void videoGeometryChanged();
     void currentResolutionChanged();
     void audioEnabledChanged();
+    void tooManyConnectionsErrorChanged();
 
 protected: //< for tests
     void testSetOwnedArchiveReader(QnArchiveStreamReader* archiveReader);

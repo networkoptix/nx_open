@@ -3,10 +3,13 @@
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource_access/global_permissions_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/ptz/client_ptz_controller_pool.h>
 #include <client_core/client_core_module.h>
+#include <nx/utils/raii_guard.h>
 #include <nx/utils/uuid.h>
+#include <nx/client/core/watchers/user_watcher.h>
 
 namespace {
 
@@ -25,6 +28,21 @@ namespace mobile {
 PtzAvailabilityWatcher::PtzAvailabilityWatcher(QObject* parent):
     base_type(parent)
 {
+    const auto userWatcher = commonModule()->instance<nx::client::core::UserWatcher>();
+    connect(userWatcher, &nx::client::core::UserWatcher::userChanged,
+        this, &PtzAvailabilityWatcher::updateAvailability);
+
+    const auto manager = globalPermissionsManager();
+    connect(manager, &QnGlobalPermissionsManager::globalPermissionsChanged, this,
+        [this, userWatcher]
+            (const QnResourceAccessSubject& subject, Qn::GlobalPermissions /*permissions*/)
+        {
+            const auto user = userWatcher->user();
+            if (subject != user)
+                return;
+
+            updateAvailability();
+        });
 }
 
 void PtzAvailabilityWatcher::setResourceId(const QnUuid& uuid)
@@ -42,25 +60,43 @@ void PtzAvailabilityWatcher::setResourceId(const QnUuid& uuid)
 
     connect(m_camera, &QnVirtualCameraResource::statusChanged,
         this, &PtzAvailabilityWatcher::updateAvailability);
+    connect(m_camera, &QnVirtualCameraResource::mediaDewarpingParamsChanged,
+        this, &PtzAvailabilityWatcher::updateAvailability);
 
     updateAvailability();
 }
 
 void PtzAvailabilityWatcher::updateAvailability()
 {
+    const auto nonAvaialbleSetter = QnRaiiGuard::createDestructible(
+        [this]() { setAvailable(false); });
+
     if (!m_camera)
-    {
-        setAvailable(false);
         return;
-    }
+
+    const auto userWatcher = commonModule()->instance<nx::client::core::UserWatcher>();
+    const auto user = userWatcher->user();
+    if (!user || !globalPermissionsManager()->hasGlobalPermission(user, Qn::GlobalUserInputPermission))
+        return;
 
     const auto cameraStatus = m_camera->getStatus();
     const bool correctStatus = cameraStatus == Qn::Online || cameraStatus == Qn::Recording;
-    const auto controller = qnClientCoreModule->ptzControllerPool()->controller(m_camera);
-    const auto server = m_camera->getParentServer();
-    const bool validServerVersion = server && server->getVersion() >= QnSoftwareVersion(2, 6);
+    if (!correctStatus)
+        return;
 
-    setAvailable(kSupportMobilePtz && correctStatus && validServerVersion && !controller.isNull());
+    if (!qnClientCoreModule->ptzControllerPool()->controller(m_camera))
+        return;
+
+    const auto server = m_camera->getParentServer();
+    const bool wrongServerVersion = !server || server->getVersion() < QnSoftwareVersion(2, 6);
+    if (wrongServerVersion)
+        return;
+
+    if (m_camera->getDewarpingParams().enabled)
+        return;
+
+    nonAvaialbleSetter->disableDestructionHandler();
+    setAvailable(true);
 }
 
 bool PtzAvailabilityWatcher::available() const

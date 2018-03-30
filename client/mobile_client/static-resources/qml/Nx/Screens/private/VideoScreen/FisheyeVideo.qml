@@ -74,7 +74,7 @@ Item
                     return Utils3D.rotationZ(-Utils3D.radians(currentRotation.y)).times(
                         Utils3D.rotationX(Utils3D.radians(currentRotation.x)))
 
-                default:
+                default: // MediaDewarpingParams.Horizontal
                     return Utils3D.rotationY(Utils3D.radians(currentRotation.y)).times(
                         Utils3D.rotationX(Utils3D.radians(currentRotation.x)))
             }
@@ -90,20 +90,43 @@ Item
             switch (viewMode)
             {
                 case MediaDewarpingParams.VerticalUp:
-                    return Qt.vector2d(Math.max(-limitByEdge, Math.min(-limitByCenter, unboundedRotation.x)),
-                        normalizedAngle(unboundedRotation.y))
+                    return Qt.vector2d(Math.max(-limitByEdge, Math.min(-limitByCenter, animatedRotationX)),
+                        normalizedAngle(animatedRotationY))
 
                 case MediaDewarpingParams.VerticalDown:
-                    return Qt.vector2d(Math.max(limitByCenter, Math.min(limitByEdge, unboundedRotation.x)),
-                        normalizedAngle(unboundedRotation.y))
+                    return Qt.vector2d(Math.max(limitByCenter, Math.min(limitByEdge, animatedRotationX)),
+                        normalizedAngle(animatedRotationY))
 
-                default:
-                    return Qt.vector2d(Math.max(-limitByEdge, Math.min(limitByEdge, unboundedRotation.x)),
-                        Math.max(-limitByEdge, Math.min(limitByEdge, unboundedRotation.y)))
+                default: // MediaDewarpingParams.Horizontal
+                    return Qt.vector2d(Math.max(-limitByEdge, Math.min(limitByEdge, animatedRotationX)),
+                        Math.max(-limitByEdge, Math.min(limitByEdge, animatedRotationY)))
             }
         }
 
-        property vector2d unboundedRotation: Qt.vector2d(0.0, 0.0)
+        property real animatedRotationX: 0
+        property real animatedRotationY: 0
+
+        Behavior on animatedRotationX
+        {
+            enabled: !mouseArea.draggingStarted && !pinchArea.pinch.active
+
+            RotationAnimation
+            {
+                direction: RotationAnimation.Shortest;
+                duration: 250
+            }
+        }
+
+        Behavior on animatedRotationY
+        {
+            enabled: !mouseArea.draggingStarted && !pinchArea.pinch.active
+
+            RotationAnimation
+            {
+                direction: RotationAnimation.Shortest;
+                duration: 250
+            }
+        }
 
         property vector2d previousRotation
 
@@ -124,17 +147,16 @@ Item
         function updateRotation(aroundX, aroundY) // angle deltas since start, in degrees
         {
             var rotationFactor = fisheyeShader.fov / 180.0
-
-            unboundedRotation = previousRotation.plus(Qt.vector2d(
-                aroundX * rotationFactor,
-                aroundY * rotationFactor))
+            animatedRotationX = previousRotation.x + aroundX * rotationFactor
+            animatedRotationY = previousRotation.y + aroundY * rotationFactor
         }
 
         function scaleBy(deltaPower, animated)
         {
             scalePowerAnimationBehavior.enabled = animated
             scalePower = Math.min(4.0, Math.max(0.0, scalePower + deltaPower))
-            unboundedRotation = currentRotation
+            animatedRotationX = currentRotation.x
+            animatedRotationY = currentRotation.y
         }
 
         function normalizedAngle(degrees) // brings angle to [-180, 180] range
@@ -146,6 +168,35 @@ Item
                 return angle - 360
             else
                 return angle
+        }
+
+        function rotateTo(x, y)
+        {
+            // Point on hemisphere in camera coordinates.
+            var pointOnSphere = fisheyeShader.unprojectAndTransform(x, y)
+            switch (viewMode)
+            {
+                case MediaDewarpingParams.VerticalUp:
+                {
+                    animatedRotationX = -Utils3D.degrees(Math.acos(-pointOnSphere.z))
+                    animatedRotationY = -Utils3D.degrees(Math.atan2(pointOnSphere.x, pointOnSphere.y))
+                    break
+                }
+
+                case MediaDewarpingParams.VerticalDown:
+                {
+                    animatedRotationX = Utils3D.degrees(Math.acos(-pointOnSphere.z))
+                    animatedRotationY = -Utils3D.degrees(Math.atan2(pointOnSphere.x, -pointOnSphere.y))
+                    break
+                }
+
+                default: // MediaDewarpingParams.Horizontal
+                {
+                    animatedRotationX = -Utils3D.degrees(Math.asin(pointOnSphere.y))
+                    animatedRotationY = -Utils3D.degrees(Math.atan2(pointOnSphere.x, -pointOnSphere.z))
+                    break
+                }
+            }
         }
     }
 
@@ -180,9 +231,12 @@ Item
 
             drag.threshold: 10
 
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
+
             property bool draggingStarted
             property real pressX
             property real pressY
+            property bool acceptClick
 
             readonly property real pixelRadius: Math.min(width, height) / 2.0
             readonly property vector2d pixelCenter: Qt.vector2d(width, height).times(0.5)
@@ -217,17 +271,46 @@ Item
                 pressY = mouse.y
             }
 
-            onReleased:
+            onDoubleClicked:
             {
-                if (draggingStarted)
+                clickFilterTimer.stop()
+
+                const kPowerThreshold = 0.8
+                if (interactor.scalePower > kPowerThreshold)
                 {
-                    kinetics.finishMeasurement(Qt.point(mouse.x, mouse.y))
-                    draggingStarted = false
+                    interactor.scalePower = 0.0
                 }
                 else
                 {
-                    content.clicked()
+                    interactor.rotateTo(mouse.x, mouse.y)
+                    interactor.scalePower = 1.0
                 }
+            }
+
+            onReleased:
+            {
+                acceptClick = !draggingStarted
+                if (!draggingStarted)
+                    return
+
+                clickFilterTimer.stop()
+                kinetics.finishMeasurement(Qt.point(mouse.x, mouse.y))
+                draggingStarted = false
+            }
+
+            onClicked:
+            {
+                if (acceptClick)
+                    clickFilterTimer.restart()
+            }
+
+            Timer
+            {
+                id: clickFilterTimer
+
+                interval: 200
+
+                onTriggered: content.clicked()
             }
 
             onPositionChanged:

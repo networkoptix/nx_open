@@ -7,11 +7,15 @@
 #include <nx/utils/uuid.h>
 #include <nx/utils/url.h>
 
-class QnReconnectHelper: public QObject, public QnConnectionContextAware
+namespace nx {
+namespace client {
+namespace core {
+
+class ReconnectHelper: public QObject, public QnConnectionContextAware
 {
     Q_OBJECT
 public:
-    QnReconnectHelper(QObject *parent = NULL);
+    ReconnectHelper(QObject *parent = NULL);
 
     QnMediaServerResourceList servers() const;
 
@@ -29,3 +33,8 @@ private:
     QString m_userName;
     QString m_password;
 };
+
+} // namespace core
+} // namespace client
+} // namespace nx
+

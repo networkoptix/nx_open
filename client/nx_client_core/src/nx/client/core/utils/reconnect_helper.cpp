@@ -6,14 +6,14 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource_display_info.h>
 
-#include <client/client_settings.h>
-
 #include <nx/network/url/url_builder.h>
-
-#include <nx/utils/string.h>
 #include <nx/vms/discovery/manager.h>
 
-QnReconnectHelper::QnReconnectHelper(QObject* parent):
+namespace nx {
+namespace client {
+namespace core {
+
+ReconnectHelper::ReconnectHelper(QObject* parent):
     QObject(parent)
 {
     m_userName = commonModule()->currentUrl().userName();
@@ -28,15 +28,10 @@ QnReconnectHelper::QnReconnectHelper(QObject* parent):
     if (m_servers.empty())
         return;
 
-    auto serverName = [this](const QnMediaServerResourcePtr& server)
-        {
-            return QnResourceDisplayInfo(server).toString(qnSettings->extraInfoInTree());
-        };
-
     std::sort(m_servers.begin(), m_servers.end(),
-        [serverName](const QnMediaServerResourcePtr& left, const QnMediaServerResourcePtr& right)
+        [](const QnMediaServerResourcePtr& left, const QnMediaServerResourcePtr& right)
         {
-            return nx::utils::naturalStringLess(serverName(left), serverName(right));
+            return left->getId() < right->getId();
         });
 
     m_currentIndex = m_servers.indexOf(commonModule()->currentServer());
@@ -47,12 +42,12 @@ QnReconnectHelper::QnReconnectHelper(QObject* parent):
     const auto discoverManager = commonModule()->moduleDiscoveryManager();
 }
 
-QnMediaServerResourceList QnReconnectHelper::servers() const
+QnMediaServerResourceList ReconnectHelper::servers() const
 {
     return m_servers;
 }
 
-QnMediaServerResourcePtr QnReconnectHelper::currentServer() const
+QnMediaServerResourcePtr ReconnectHelper::currentServer() const
 {
     if (m_currentIndex < 0)
         return QnMediaServerResourcePtr();
@@ -60,7 +55,7 @@ QnMediaServerResourcePtr QnReconnectHelper::currentServer() const
     return m_servers[m_currentIndex];
 }
 
-nx::utils::Url QnReconnectHelper::currentUrl() const
+nx::utils::Url ReconnectHelper::currentUrl() const
 {
     const auto server = currentServer();
     if (!server)
@@ -79,7 +74,7 @@ nx::utils::Url QnReconnectHelper::currentUrl() const
     return nx::utils::Url();
 }
 
-void QnReconnectHelper::next()
+void ReconnectHelper::next()
 {
     if (m_servers.isEmpty())
         return;
@@ -87,8 +82,11 @@ void QnReconnectHelper::next()
     m_currentIndex = (m_currentIndex + 1) % m_servers.size();
 }
 
-void QnReconnectHelper::markServerAsInvalid(const QnMediaServerResourcePtr& server)
+void ReconnectHelper::markServerAsInvalid(const QnMediaServerResourcePtr& server)
 {
     m_servers.removeAll(server);
 }
 
+} // namespace core
+} // namespace client
+} // namespace nx

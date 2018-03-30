@@ -6,6 +6,7 @@
 #include <decoders/audio/ffmpeg_audio_decoder.h>
 #include <nx/streaming/media_context.h>
 #include <nx/streaming/config.h>
+#include <ui/screen_recording/audio_recorder_settings.h>
 
 extern "C"
 {
@@ -250,7 +251,7 @@ QAudioFormat QnDesktopAudioOnlyDataProvider::getAppropriateAudioFormat(
 
 bool QnDesktopAudioOnlyDataProvider::initInputDevices()
 {
-    QnVideoRecorderSettings settings;
+    QnAudioRecorderSettings settings;
     auto primaryAudioDevice = settings.primaryAudioDevice();
     auto secondaryAudioDevice = QnAppInfo::isMobile()
         ? QnAudioDeviceInfo() // It is not allowed to run several devices at mobile platform.

@@ -1,5 +1,5 @@
 #include "qnaudio_device_info.h"
-#include "video_recorder_settings.h"
+#include "audio_recorder_settings.h"
 
 QnAudioDeviceInfo::QnAudioDeviceInfo(): QAudioDeviceInfo()
 {
@@ -9,11 +9,9 @@ QnAudioDeviceInfo::QnAudioDeviceInfo(const QAudioDeviceInfo& other, const QStrin
     QAudioDeviceInfo(other),
     m_fullName(fullName)
 {
-
 }
-
 
 void QnAudioDeviceInfo::splitFullName(QString& name, int& devNum) const
 {
-    QnVideoRecorderSettings::splitFullName(m_fullName, name, devNum);
+    QnAudioRecorderSettings::splitFullName(m_fullName, name, devNum);
 }

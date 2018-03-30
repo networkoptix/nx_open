@@ -16,6 +16,10 @@ class QnResourceHelper: public Connective<QObject>, public QnConnectionContextAw
         NOTIFY defaultCameraPasswordChanged)
     Q_PROPERTY(bool hasOldCameraFirmware READ hasOldCameraFirmware
         NOTIFY oldCameraFirmwareChanged)
+
+    Q_PROPERTY(bool audioSupported READ audioSupported NOTIFY audioSupportedChanged)
+    Q_PROPERTY(bool isIoModule READ isIoModule NOTIFY isIoModuleChanged)
+
     Q_ENUMS(Qn::ResourceStatus)
 
     using base_type = Connective<QObject>;
@@ -31,6 +35,9 @@ public:
     bool hasDefaultCameraPassword() const;
     bool hasOldCameraFirmware() const;
 
+    bool audioSupported() const;
+    bool isIoModule() const;
+
     qint64 serverTimeOffset() const;
 
 signals:
@@ -40,6 +47,8 @@ signals:
     void defaultCameraPasswordChanged();
     void oldCameraFirmwareChanged();
     void serverTimeOffsetChanged();
+    void audioSupportedChanged();
+    void isIoModuleChanged();
 
 private:
     bool hasCameraCapability(Qn::CameraCapability capability) const;

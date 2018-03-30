@@ -21,6 +21,8 @@ PageBase
     property alias initialScreenshot: screenshot.source
     property QnCameraListModel camerasModel: null
 
+    backgroundColor: "black"
+
     VideoScreenController
     {
         id: videoScreenController
@@ -54,8 +56,6 @@ PageBase
 
         property alias controller: videoScreenController
 
-        property var videoNavigation: navigationLoader.item
-
         property bool animatePlaybackControls: true
         property bool showOfflineStatus: false
         property bool cameraWarningVisible:
@@ -68,6 +68,9 @@ PageBase
             && !videoScreenController.mediaPlayer.playing)
             || videoScreenController.hasDefaultCameraPassword
             || videoScreenController.hasOldFirmware
+            || videoScreenController.tooManyConnections
+            || videoScreenController.ioModuleWarning
+            || videoScreenController.ioModuleAudioPlaying
 
         readonly property bool applicationActive: Qt.application.state === Qt.ApplicationActive
 
@@ -137,7 +140,8 @@ PageBase
         onLeftButtonClicked: Workflow.popCurrentScreen()
         background: Image
         {
-            anchors.fill: parent
+            width: parent.width
+            height: 96
             anchors.topMargin: -toolBar.statusBarHeight
             source: lp("/images/toolbar_gradient.png")
         }
@@ -254,6 +258,7 @@ PageBase
             mediaPlayer: videoScreenController.mediaPlayer
             resourceHelper: videoScreenController.resourceHelper
             videoCenterHeightOffsetFactor: 1 / 3
+            onClicked: toggleUi()
         }
     }
 
@@ -272,10 +277,43 @@ PageBase
     Image
     {
         id: screenshot
-        width: mainWindow.width
-        height: width * sourceSize.height / sourceSize.width
+
+        function getAspect(value)
+        {
+            return value.width > 0 && value.height > 0 ? value.width / value.height : 1
+        }
+
+        function fitToBounds(value, bounds)
+        {
+            var aspect = getAspect(value)
+            return aspect < bounds.width / bounds.height
+                ? Qt.size(bounds.height * aspect, bounds.height)
+                : Qt.size(bounds.width, bounds.width / aspect)
+        }
+
+        function fillBounds(value, bounds)
+        {
+            var aspect = getAspect(value)
+            var minimalSize = Math.min(bounds.width, bounds.height)
+            return value.width < value.height
+                ? Qt.size(minimalSize, minimalSize / aspect)
+                : Qt.size(minimalSize * aspect, minimalSize)
+        }
+
+        readonly property size boundingSize:
+        {
+            var isFisheye = videoScreenController.resourceHelper.fisheyeParams.enabled
+            var windowSize = Qt.size(mainWindow.width, mainWindow.height)
+            return isFisheye
+                ? fillBounds(sourceSize, windowSize)
+                : fitToBounds(sourceSize, windowSize)
+        }
+
+        width: boundingSize.width
+        height: boundingSize.height
+
         y: (mainWindow.height - height) / 3 - header.height
-        x: -mainWindow.leftPadding
+        x: (mainWindow.width - width) / 2 - mainWindow.leftPadding
         visible: status == Image.Ready && !dummyLoader.visible
         opacity: d.cameraUiOpacity
     }
@@ -338,23 +376,44 @@ PageBase
 
         Image
         {
+            id: controlsShadowGradient
+
+            property real customHeight:
+            {
+                if (d.mode == VideoScreenUtils.VideoScreenMode.Ptz || ptzPanel.moveOnTapMode)
+                    return 0
+
+                return videoNavigation.buttonsPanelHeight
+            }
+
             x: -mainWindow.leftPadding
             width: mainWindow.width
-            height: sourceSize.height
+            height: 96 + customHeight
             anchors.bottom: parent.bottom
             anchors.bottomMargin: videoScreen.height - mainWindow.height
 
-            sourceSize.height: 56 * 2 - anchors.bottomMargin
+            visible: opacity > 0
             source: lp("/images/timeline_gradient.png")
 
-            visible: (d.mode == VideoScreenUtils.VideoScreenMode.Ptz && d.uiVisible)
-                || ptzPanel.moveOnTapMode || navigationLoader.visible
-            opacity: visible ? 1 : 0
-
-            Behavior on opacity
+            opacity:
             {
-                NumberAnimation { duration: 250; easing.type: Easing.OutCubic }
+                var ptzMode = d.mode == VideoScreenUtils.VideoScreenMode.Ptz
+                var visiblePtzControls = ptzMode && d.uiVisible
+                if (visiblePtzControls || ptzPanel.moveOnTapMode)
+                    return 1
+
+                return ptzMode ? d.uiOpacity : videoNavigation.opacity
             }
+        }
+
+        Rectangle
+        {
+            id: bottomControlsBackground
+
+            color: Qt.rgba(0, 0, 0, 0.63)
+            width: mainWindow.width
+            anchors.top: controlsShadowGradient.bottom
+            anchors.bottom: parent.bottom
         }
 
         PtzPanel
@@ -443,9 +502,19 @@ PageBase
             parent: videoScreen
         }
 
-        Loader
+        VideoNavigation
         {
-            id: navigationLoader
+            id: videoNavigation
+
+            canViewArchive: videoScreenController.accessRightsHelper.canViewArchive
+            animatePlaybackControls: d.animatePlaybackControls
+            videoScreenController: d.controller
+            controlsOpacity: d.cameraUiOpacity
+            onPtzButtonClicked:
+            {
+                d.mode = VideoScreenUtils.VideoScreenMode.Ptz
+                video.item.to1xScale()
+            }
 
             anchors.bottom: parent.bottom
             width: parent.width
@@ -453,68 +522,24 @@ PageBase
             visible: opacity > 0 && d.mode === VideoScreenUtils.VideoScreenMode.Navigation
             opacity: Math.min(d.uiOpacity, d.controlsOpacity)
 
-            sourceComponent:
-                videoScreenController.accessRightsHelper.canViewArchive
-                    ? navigationComponent
-                    : liveNavigationComponent
-
-            Button
+            onSwitchToPreviousCamera:
             {
-                y: 56 / 2 - height / 2
-                padding: 8
-                width: 56
-                height: width
-                color: ColorTheme.transparent(ColorTheme.base5, 0.2)
-                icon: lp("/images/previous.png")
-                radius: width / 2
-                z: 1
-                onClicked: switchToPreviousCamera()
+                if (!camerasModel)
+                    return
+
+                switchToCamera(
+                    camerasModel.previousResourceId(videoScreen.resourceId)
+                        || camerasModel.previousResourceId(""))
             }
 
-            Button
+            onSwitchToNextCamera:
             {
-                y: 56 / 2 - height / 2
-                anchors.right: parent.right
-                padding: 8
-                width: 56
-                height: width
-                color: ColorTheme.transparent(ColorTheme.base5, 0.2)
-                icon: lp("/images/next.png")
-                radius: width / 2
-                z: 1
-                onClicked: switchToNextCamera()
-            }
+                if (!camerasModel)
+                    return
 
-            Component
-            {
-                id: navigationComponent
-
-                VideoNavigation
-                {
-                    animatePlaybackControls: d.animatePlaybackControls
-                    videoScreenController: d.controller
-                    controlsOpacity: d.cameraUiOpacity
-                    ptzAvailable: ptzPanel.controller.available
-                        && videoScreenController.accessRightsHelper.canManagePtz
-                        && !videoScreenController.offline
-                        && !videoScreenController.resourceHelper.fisheyeParams.enabled
-                    onPtzButtonClicked: d.mode = VideoScreenUtils.VideoScreenMode.Ptz
-                }
-            }
-
-            Component
-            {
-                id: liveNavigationComponent
-
-                LiveVideoNavigation
-                {
-                    videoScreenController: d.controller
-                    ptzAvailable: ptzPanel.controller.available
-                        && videoScreenController.accessRightsHelper.canManagePtz
-                        && !videoScreenController.offline
-                        && !videoScreenController.resourceHelper.fisheyeParams.enabled
-                    onPtzButtonClicked: d.mode = VideoScreenUtils.VideoScreenMode.Ptz
-                }
+                switchToCamera(
+                    camerasModel.nextResourceId(videoScreen.resourceId)
+                        || camerasModel.nextResourceId(""))
             }
         }
     }
@@ -528,7 +553,7 @@ PageBase
         height: video.height
         x: mainWindow.leftPadding ? -mainWindow.leftPadding : parent.width
         anchors.top: video.top
-        opacity: Math.min(navigationLoader.opacity, d.cameraUiOpacity)
+        opacity: Math.min(videoNavigation.opacity, d.cameraUiOpacity)
     }
 
     SequentialAnimation
@@ -617,25 +642,5 @@ PageBase
         }
 
         cameraSwitchAnimation.start()
-    }
-
-    function switchToPreviousCamera()
-    {
-        if (!camerasModel)
-            return
-
-        switchToCamera(
-            camerasModel.previousResourceId(videoScreen.resourceId)
-                || camerasModel.previousResourceId(""))
-    }
-
-    function switchToNextCamera()
-    {
-        if (!camerasModel)
-            return
-
-        switchToCamera(
-            camerasModel.nextResourceId(videoScreen.resourceId)
-                || camerasModel.nextResourceId(""))
     }
 }

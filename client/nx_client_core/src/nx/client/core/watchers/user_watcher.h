@@ -7,7 +7,11 @@
 #include <core/resource/resource_fwd.h>
 #include <utils/common/connective.h>
 
-class QnUserWatcher: public Connective<QObject>, public QnConnectionContextAware
+namespace nx {
+namespace client {
+namespace core {
+
+class UserWatcher: public Connective<QObject>, public QnConnectionContextAware
 {
     Q_OBJECT
     /* This property should remain read-only for QML! */
@@ -16,7 +20,7 @@ class QnUserWatcher: public Connective<QObject>, public QnConnectionContextAware
     using base_type = Connective<QObject>;
 
 public:
-    QnUserWatcher(QObject* parent = nullptr);
+    UserWatcher(QObject* parent = nullptr);
 
     void setUserName(const QString& name);
     const QString& userName() const;
@@ -34,3 +38,7 @@ private:
     QString m_userName;
     QnUserResourcePtr m_user;
 };
+
+} // namespace core
+} // namespace client
+} // namespace nx

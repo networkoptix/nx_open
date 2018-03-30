@@ -4,6 +4,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <utils/common/connective.h>
+#include <client_core/connection_context_aware.h>
 
 class QnUuid;
 
@@ -11,7 +12,7 @@ namespace nx {
 namespace client {
 namespace mobile {
 
-class PtzAvailabilityWatcher: public Connective<QObject>
+class PtzAvailabilityWatcher: public Connective<QObject>, public QnConnectionContextAware
 {
     Q_OBJECT
     using base_type = Connective<QObject>;

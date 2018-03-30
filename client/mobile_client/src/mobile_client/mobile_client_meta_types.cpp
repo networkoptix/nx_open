@@ -23,7 +23,7 @@
 #include <nx/mobile_client/media/media_player.h>
 #include <watchers/cloud_status_watcher.h>
 #include <watchers/cloud_system_information_watcher.h>
-#include <watchers/user_watcher.h>
+#include <nx/client/core/watchers/user_watcher.h>
 #include <mobile_client/mobile_client_ui_controller.h>
 #include <client_core/client_core_meta_types.h>
 #include <controllers/lite_client_controller.h>
@@ -76,7 +76,7 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterType<QnCameraChunkProvider>("com.networkoptix.qml", 1, 0, "QnCameraChunkProvider");
     qmlRegisterType<QnCloudStatusWatcher>("com.networkoptix.qml", 1, 0, "QnCloudStatusWatcher");
     qmlRegisterType<QnCloudSystemInformationWatcher>("com.networkoptix.qml", 1, 0, "QnCloudSystemInformationWatcher");
-    qmlRegisterType<QnUserWatcher>("com.networkoptix.qml", 1, 0, "QnUserWatcher");
+    qmlRegisterType<nx::client::core::UserWatcher>("com.networkoptix.qml", 1, 0, "nx::client::core::UserWatcher");
 
 
     /* NxMediaPlayer should not be used.
