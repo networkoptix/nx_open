@@ -13,6 +13,9 @@ namespace desktop {
 using State = CameraSettingsDialogState;
 using RecordingThresholds = State::RecordingSettings::Thresholds;
 
+using Camera = QnVirtualCameraResourcePtr;
+using Cameras = QnVirtualCameraResourceList;
+
 namespace {
 
 static constexpr int kMinFps = 1;
@@ -23,15 +26,25 @@ static constexpr auto kMaxQuality = Qn::QualityHighest;
 template<class Data>
 void fetchFromCameras(
     State::UserEditableMultiple<Data>& value,
-    const QnVirtualCameraResourceList& cameras,
-    std::function<Data(const QnVirtualCameraResourcePtr&)> predicate)
+    const Cameras& cameras,
+    std::function<Data(const Camera&)> predicate)
 {
     Data data;
     if (utils::algorithm::same(cameras.cbegin(), cameras.cend(), predicate, &data))
         value.setBase(data);
 }
 
-QString calculateWebPage(const QnVirtualCameraResourcePtr& camera)
+State::CombinedValue combinedValue(const Cameras& cameras,
+    std::function<bool(const Camera&)> predicate)
+{
+    bool value;
+    if (!utils::algorithm::same(cameras.cbegin(), cameras.cend(), predicate, &value))
+        return State::CombinedValue::Some;
+
+    return value ? State::CombinedValue::All : State::CombinedValue::None;
+}
+
+QString calculateWebPage(const Camera& camera)
 {
     NX_ASSERT(camera);
     if (!camera)
@@ -54,12 +67,18 @@ QString calculateWebPage(const QnVirtualCameraResourcePtr& camera)
     return lit("<a href=\"%1\">%1</a>").arg(webPageAddress);
 }
 
-bool calculateRecordingParametersAvailable(const QnVirtualCameraResourceList& cameras)
+bool isMotionDetectionEnabled(const Camera& camera)
+{
+    const auto motionType = camera->getMotionType();
+    return motionType != Qn::MT_NoMotion && camera->supportedMotionType().testFlag(motionType);
+}
+
+bool calculateRecordingParametersAvailable(const Cameras& cameras)
 {
     return std::any_of(
         cameras.cbegin(),
         cameras.cend(),
-        [](const QnVirtualCameraResourcePtr& camera)
+        [](const Camera& camera)
         {
             return camera->hasVideo()
                 && !camera->hasParam(Qn::NO_RECORDING_PARAMS_PARAM_NAME);
@@ -113,28 +132,28 @@ State fillBitrateFromFixedQuality(State state)
     return state;
 }
 
-State loadNetworkInfo(State state, const QnVirtualCameraResourcePtr& camera)
+State loadNetworkInfo(State state, const Camera& camera)
 {
     NX_ASSERT(camera);
     if (!camera)
         return state;
 
-    state.singleCameraSettings.ipAddress = QnResourceDisplayInfo(camera).host();
-    state.singleCameraSettings.webPage = calculateWebPage(camera);
+    state.singleCameraProperties.ipAddress = QnResourceDisplayInfo(camera).host();
+    state.singleCameraProperties.webPage = calculateWebPage(camera);
 
     const bool isIoModule = camera->isIOModule();
     const bool hasPrimaryStream = !isIoModule || camera->isAudioSupported();
     if (hasPrimaryStream)
-        state.singleCameraSettings.primaryStream = camera->sourceUrl(Qn::CR_LiveVideo);
+        state.singleCameraProperties.primaryStream = camera->sourceUrl(Qn::CR_LiveVideo);
 
     const bool hasSecondaryStream = camera->hasDualStreaming();
     if (hasSecondaryStream)
-        state.singleCameraSettings.secondaryStream = camera->sourceUrl(Qn::CR_SecondaryLiveVideo);
+        state.singleCameraProperties.secondaryStream = camera->sourceUrl(Qn::CR_SecondaryLiveVideo);
 
     return state;
 }
 
-State::RecordingDays calculateMinRecordingDays(const QnVirtualCameraResourceList& cameras)
+State::RecordingDays calculateMinRecordingDays(const Cameras& cameras)
 {
     if (cameras.empty())
         return {ec2::kDefaultMinArchiveDays, true, true};
@@ -146,8 +165,8 @@ State::RecordingDays calculateMinRecordingDays(const QnVirtualCameraResourceList
         cameras.cbegin(),
         cameras.cend(),
         [calcMinDays](
-        const QnVirtualCameraResourcePtr& l,
-        const QnVirtualCameraResourcePtr& r)
+        const Camera& l,
+        const Camera& r)
         {
             return calcMinDays(l->minDays()) < calcMinDays(r->minDays());
         }))->minDays();
@@ -156,7 +175,7 @@ State::RecordingDays calculateMinRecordingDays(const QnVirtualCameraResourceList
     const bool sameMinDays = std::all_of(
         cameras.cbegin(),
         cameras.cend(),
-        [minDays, isAuto](const QnVirtualCameraResourcePtr& camera)
+        [minDays, isAuto](const Camera& camera)
         {
             return isAuto
                 ? camera->minDays() <= 0
@@ -165,7 +184,7 @@ State::RecordingDays calculateMinRecordingDays(const QnVirtualCameraResourceList
     return {calcMinDays(minDays), isAuto, sameMinDays};
 }
 
-State::RecordingDays calculateMaxRecordingDays(const QnVirtualCameraResourceList& cameras)
+State::RecordingDays calculateMaxRecordingDays(const Cameras& cameras)
 {
     if (cameras.empty())
         return {ec2::kDefaultMaxArchiveDays, true, true};
@@ -177,8 +196,8 @@ State::RecordingDays calculateMaxRecordingDays(const QnVirtualCameraResourceList
         cameras.cbegin(),
         cameras.cend(),
         [calcMaxDays](
-        const QnVirtualCameraResourcePtr& l,
-        const QnVirtualCameraResourcePtr& r)
+        const Camera& l,
+        const Camera& r)
         {
             return calcMaxDays(l->maxDays()) < calcMaxDays(r->maxDays());
         }))->maxDays();
@@ -187,7 +206,7 @@ State::RecordingDays calculateMaxRecordingDays(const QnVirtualCameraResourceList
     const bool sameMaxDays = std::all_of(
         cameras.cbegin(),
         cameras.cend(),
-        [maxDays, isAuto](const QnVirtualCameraResourcePtr& camera)
+        [maxDays, isAuto](const Camera& camera)
         {
             return isAuto
                 ? camera->maxDays() <= 0
@@ -197,7 +216,7 @@ State::RecordingDays calculateMaxRecordingDays(const QnVirtualCameraResourceList
 }
 
 State::ImageControlSettings calculateImageControlSettings(
-    const QnVirtualCameraResourceList& cameras)
+    const Cameras& cameras)
 {
     const bool hasVideo = std::all_of(cameras.cbegin(), cameras.cend(),
         [](const auto& camera) { return camera->hasVideo(); });
@@ -233,7 +252,7 @@ State::ImageControlSettings calculateImageControlSettings(
     return result;
 }
 
-QnScheduleTaskList calculateRecordingSchedule(const QnVirtualCameraResourcePtr& camera)
+QnScheduleTaskList calculateRecordingSchedule(const Camera& camera)
 {
     if (camera->isDtsBased())
         return {};
@@ -241,13 +260,13 @@ QnScheduleTaskList calculateRecordingSchedule(const QnVirtualCameraResourcePtr& 
     return camera->getScheduleTasks();
 }
 
-int calculateRecordingThresholdBefore(const QnVirtualCameraResourcePtr& camera)
+int calculateRecordingThresholdBefore(const Camera& camera)
 {
     const auto value = camera->recordBeforeMotionSec();
     return value > 0 ? value : ec2::kDefaultRecordBeforeMotionSec;
 }
 
-int calculateRecordingThresholdAfter(const QnVirtualCameraResourcePtr& camera)
+int calculateRecordingThresholdAfter(const Camera& camera)
 {
     const auto value = camera->recordAfterMotionSec();
     return value > 0 ? value : ec2::kDefaultRecordAfterMotionSec;
@@ -276,25 +295,36 @@ State CameraSettingsDialogStateReducer::setPanicMode(State state, bool value)
 
 State CameraSettingsDialogStateReducer::loadCameras(
     State state,
-    const QnVirtualCameraResourceList& cameras)
+    const Cameras& cameras)
 {
     const auto firstCamera = cameras.empty()
-        ? QnVirtualCameraResourcePtr()
+        ? Camera()
         : cameras.first();
 
     state.hasChanges = false;
+    state.singleCameraProperties = {};
     state.singleCameraSettings = {};
+    state.devicesProperties = {};
     state.recording = {};
     state.devicesCount = cameras.size();
 
+    state.devicesProperties.isDtsBased = combinedValue(cameras,
+        [](const Camera& camera) { return camera->isDtsBased(); });
+    state.devicesProperties.isWearable = combinedValue(cameras,
+        [](const Camera& camera) { return camera->hasFlags(Qn::wearable_camera); });
+    state.devicesProperties.hasMotion = combinedValue(cameras,
+        [](const Camera& camera) { return camera->hasMotion(); });
+    state.devicesProperties.hasDualStreaming = combinedValue(cameras,
+        [](const Camera& camera) { return camera->hasDualStreaming(); });
+
     if (firstCamera)
     {
-        state.singleCameraSettings.name.setBase(firstCamera->getName());
-        state.singleCameraSettings.id = firstCamera->getId().toSimpleString();
-        state.singleCameraSettings.firmware = firstCamera->getFirmware();
-        state.singleCameraSettings.macAddress = firstCamera->getMAC().toString();
-        state.singleCameraSettings.model = firstCamera->getModel();
-        state.singleCameraSettings.vendor = firstCamera->getVendor();
+        state.singleCameraProperties.name.setBase(firstCamera->getName());
+        state.singleCameraProperties.id = firstCamera->getId().toSimpleString();
+        state.singleCameraProperties.firmware = firstCamera->getFirmware();
+        state.singleCameraProperties.macAddress = firstCamera->getMAC().toString();
+        state.singleCameraProperties.model = firstCamera->getModel();
+        state.singleCameraProperties.vendor = firstCamera->getVendor();
 
         state = loadNetworkInfo(std::move(state), firstCamera);
 
@@ -305,6 +335,15 @@ State CameraSettingsDialogStateReducer::loadCameras(
 
         state.recording.customBitrateAvailable = true;
         state = loadMinMaxCustomBitrate(std::move(state));
+
+        state.singleCameraSettings.enableMotionDetection.setBase(
+            isMotionDetectionEnabled(firstCamera));
+
+        Qn::calculateMaxFps(
+            {firstCamera},
+            &state.singleCameraProperties.maxFpsWithoutMotion,
+            nullptr,
+            false);
     }
 
     state.recording.enabled = {};
@@ -313,10 +352,11 @@ State CameraSettingsDialogStateReducer::loadCameras(
 
     state.recording.parametersAvailable = calculateRecordingParametersAvailable(cameras);
 
-    // TODO: Handle overriding motion type.
-    const auto fpsLimits = Qn::calculateMaxFps(cameras);
-    state.recording.maxFps = qMax(kMinFps, fpsLimits.first);
-    state.recording.maxDualStreamingFps = qMax(kMinFps, fpsLimits.second);
+     Qn::calculateMaxFps(
+            cameras,
+            &state.devicesProperties.maxFps,
+            &state.devicesProperties.maxDualStreamingFps,
+            false);
 
     state.recording.schedule = {};
     fetchFromCameras<ScheduleTasks>(state.recording.schedule, cameras, calculateRecordingSchedule);
@@ -329,7 +369,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
     }
     else
     {
-        state.recording.brush.fps = state.recording.maxBrushFps();
+        state.recording.brush.fps = state.maxRecordingBrushFps();
     }
 
     fetchFromCameras<int>(state.recording.thresholds.beforeSec, cameras,
@@ -340,7 +380,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
     state.recording.brush.fps = qBound(
         kMinFps,
         state.recording.brush.fps,
-        state.recording.maxBrushFps());
+        state.maxRecordingBrushFps());
     state = fillBitrateFromFixedQuality(std::move(state));
 
     state.recording.minDays = calculateMinRecordingDays(cameras);
@@ -354,7 +394,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
 State CameraSettingsDialogStateReducer::setSingleCameraUserName(State state, const QString& text)
 {
     state.hasChanges = true;
-    state.singleCameraSettings.name.setUser(text);
+    state.singleCameraProperties.name.setUser(text);
     return state;
 }
 
@@ -366,7 +406,7 @@ State CameraSettingsDialogStateReducer::setScheduleBrush(
     const auto fps = qBound(
         kMinFps,
         state.recording.brush.fps,
-        state.recording.maxBrushFps());
+        state.maxRecordingBrushFps());
 
     state = setScheduleBrushFps(std::move(state), fps);
 
@@ -377,20 +417,22 @@ State CameraSettingsDialogStateReducer::setScheduleBrushRecordingType(
     State state,
     Qn::RecordingType value)
 {
+    NX_EXPECT(value != Qn::RT_MotionOnly || state.hasMotion());
+    NX_EXPECT(value != Qn::RT_MotionAndLowQuality || state.hasDualStreaming());
     state.recording.brush.recordingType = value;
     if (value == Qn::RT_MotionAndLowQuality)
     {
         state.recording.brush.fps = qBound(
             kMinFps,
             state.recording.brush.fps,
-            state.recording.maxBrushFps());
+            state.maxRecordingBrushFps());
     }
     return state;
 }
 
 State CameraSettingsDialogStateReducer::setScheduleBrushFps(State state, int value)
 {
-    NX_EXPECT(qBound(kMinFps, value, state.recording.maxBrushFps()) == value);
+    NX_EXPECT(qBound(kMinFps, value, state.maxRecordingBrushFps()) == value);
     state.recording.brush.fps = value;
     if (state.recording.brush.isAutomaticBitrate() || !state.recording.customBitrateAvailable)
     {
@@ -505,6 +547,7 @@ State CameraSettingsDialogStateReducer::setMaxRecordingDaysValue(State state, in
 
 State CameraSettingsDialogStateReducer::setRecordingBeforeThresholdSec(State state, int value)
 {
+    NX_EXPECT(state.hasMotion());
     state.hasChanges = true;
     state.recording.thresholds.beforeSec.setUser(value);
     return state;
@@ -512,6 +555,7 @@ State CameraSettingsDialogStateReducer::setRecordingBeforeThresholdSec(State sta
 
 State CameraSettingsDialogStateReducer::setRecordingAfterThresholdSec(State state, int value)
 {
+    NX_EXPECT(state.hasMotion());
     state.hasChanges = true;
     state.recording.thresholds.afterSec.setUser(value);
     return state;

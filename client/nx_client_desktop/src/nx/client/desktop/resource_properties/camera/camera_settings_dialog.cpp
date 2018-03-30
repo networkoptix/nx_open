@@ -239,7 +239,7 @@ void CameraSettingsDialog::loadState(const CameraSettingsDialogState& state)
     ).getString(state.deviceType, state.devicesCount != 1);
 
     const QString description = state.devicesCount == 1
-        ? state.singleCameraSettings.name()
+        ? state.singleCameraProperties.name()
         : QnDeviceDependentStrings::getNumericName(state.deviceType, state.devicesCount);
 
     setWindowTitle(kWindowTitlePattern.arg(caption).arg(description));

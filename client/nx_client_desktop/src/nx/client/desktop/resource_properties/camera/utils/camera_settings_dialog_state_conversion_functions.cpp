@@ -126,7 +126,7 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
 {
     if (state.isSingleCamera())
     {
-        cameras.first()->setName(state.singleCameraSettings.name());
+        cameras.first()->setName(state.singleCameraProperties.name());
     }
     setMinRecordingDays(state.recording.minDays, cameras);
     setMaxRecordingDays(state.recording.maxDays, cameras);

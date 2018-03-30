@@ -50,6 +50,13 @@ struct CameraSettingsDialogState
         std::optional<T> m_user;
     };
 
+    enum class CombinedValue
+    {
+        None,
+        Some,
+        All
+    };
+
     CameraSettingsDialogState() = default;
     CameraSettingsDialogState(const CameraSettingsDialogState& other) = delete;
     CameraSettingsDialogState(CameraSettingsDialogState&& other) = default;
@@ -66,7 +73,7 @@ struct CameraSettingsDialogState
     int devicesCount = 0;
     QnCameraDeviceType deviceType = QnCameraDeviceType::Mixed;
 
-    struct SingleCameraSettings
+    struct SingleCameraProperties
     {
         QString id;
         UserEditable<QString> name;
@@ -78,8 +85,28 @@ struct CameraSettingsDialogState
         QString webPage;
         std::optional<QString> primaryStream;
         std::optional<QString> secondaryStream;
+
+        int maxFpsWithoutMotion = 0;
+    };
+    SingleCameraProperties singleCameraProperties;
+
+    struct SingleCameraSettings
+    {
+        UserEditable<bool> enableMotionDetection;
     };
     SingleCameraSettings singleCameraSettings;
+
+    struct CombinedProperties
+    {
+        CombinedValue isDtsBased;
+        CombinedValue isWearable;
+        CombinedValue hasMotion;
+        CombinedValue hasDualStreaming;
+
+        int maxFps = 0;
+        int maxDualStreamingFps = 0;
+    };
+    CombinedProperties devicesProperties;
 
     struct RecordingDays
     {
@@ -94,14 +121,6 @@ struct CameraSettingsDialogState
 
         // TODO: #GDM Refactor QnScheduleGridWidget.
         QnScheduleGridWidget::CellParams brush;
-        int maxFps = 0;
-        int maxDualStreamingFps = 0;
-        int maxBrushFps() const
-        {
-            return brush.recordingType == Qn::RT_MotionAndLowQuality
-                ? maxDualStreamingFps
-                : maxFps;
-        }
 
         media::CameraStreamCapability mediaStreamCapability;
         Qn::BitratePerGopType bitratePerGopType = Qn::BPG_None;
@@ -161,6 +180,35 @@ struct CameraSettingsDialogState
     // Helper methods.
 
     bool isSingleCamera() const { return devicesCount == 1; }
+
+    int maxRecordingBrushFps() const
+    {
+        if (isSingleCamera() && !singleCameraSettings.enableMotionDetection())
+            return singleCameraProperties.maxFpsWithoutMotion;
+
+        return recording.brush.recordingType == Qn::RT_MotionAndLowQuality
+            ? devicesProperties.maxDualStreamingFps
+            : devicesProperties.maxFps;
+    }
+
+    bool hasMotion() const
+    {
+        bool result = devicesProperties.hasMotion == CombinedValue::All;
+        if (isSingleCamera())
+            result &= singleCameraSettings.enableMotionDetection();
+        return result;
+    }
+
+    bool hasDualStreaming() const
+    {
+        return hasMotion() && devicesProperties.hasDualStreaming == CombinedValue::All;
+    }
+
+    bool supportsSchedule() const
+    {
+        return devicesProperties.isDtsBased == CombinedValue::None
+            && devicesProperties.isWearable == CombinedValue::None;
+    }
 };
 
 } // namespace desktop

@@ -539,11 +539,8 @@ void SingleCameraSettingsWidget::updateFromResource(bool silent)
             auto supported = m_camera->supportedMotionType();
             auto motionType = m_camera->getMotionType();
             auto mdEnabled = supported.testFlag(motionType) && motionType != Qn::MT_NoMotion;
-            if (!mdEnabled)
-                motionType = Qn::MT_NoMotion;
             ui->motionDetectionCheckBox->setChecked(mdEnabled);
-
-            ui->cameraScheduleWidget->overrideMotionType(motionType);
+            ui->cameraScheduleWidget->setMotionDetectionAllowed(mdEnabled);
 
             updateMotionCapabilities();
             updateMotionWidgetFromResource();
@@ -954,7 +951,8 @@ void SingleCameraSettingsWidget::at_motionTypeChanged()
 
     at_dbDataChanged();
     updateMotionWidgetNeedControlMaxRect();
-    ui->cameraScheduleWidget->overrideMotionType(selectedMotionType());
+    ui->cameraScheduleWidget->setMotionDetectionAllowed(
+        m_camera && ui->motionDetectionCheckBox->isChecked());
 }
 
 void SingleCameraSettingsWidget::updateIpAddressText()

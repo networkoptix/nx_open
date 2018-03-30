@@ -287,6 +287,17 @@ LegacyCameraScheduleWidget::LegacyCameraScheduleWidget(QWidget* parent, bool sna
 
 LegacyCameraScheduleWidget::~LegacyCameraScheduleWidget() = default;
 
+void LegacyCameraScheduleWidget::setMotionDetectionAllowed(bool value)
+{
+    if (m_motionDetectionAllowed == value)
+        return;
+
+    m_motionDetectionAllowed = value;
+
+    updateMotionAvailable();
+    updateMaxFPS();
+}
+
 void LegacyCameraScheduleWidget::syncQualityWithBitrate()
 {
     if (!m_advancedSettingsSupported)
@@ -357,17 +368,6 @@ void LegacyCameraScheduleWidget::bitrateSliderChanged()
     QScopedValueRollback<bool> updateRollback(m_bitrateUpdating, true);
     setNormalizedValue(ui->bitrateSpinBox, normalizedValue(ui->bitrateSlider));
     syncQualityWithBitrate();
-}
-
-void LegacyCameraScheduleWidget::overrideMotionType(Qn::MotionType motionTypeOverride)
-{
-    if (m_motionTypeOverride == motionTypeOverride)
-        return;
-
-    m_motionTypeOverride = motionTypeOverride;
-
-    updateMotionAvailable();
-    updateMaxFPS();
 }
 
 void LegacyCameraScheduleWidget::retranslateUi()
@@ -600,7 +600,7 @@ void LegacyCameraScheduleWidget::updateScheduleEnabled()
 
 void LegacyCameraScheduleWidget::updateMaxFPS()
 {
-    QPair<int, int> fpsLimits = Qn::calculateMaxFps(m_cameras, m_motionTypeOverride);
+    QPair<int, int> fpsLimits = Qn::calculateMaxFps(m_cameras, m_motionDetectionAllowed);
     int maxFps = fpsLimits.first;
     int maxDualStreamingFps = fpsLimits.second;
 
@@ -699,15 +699,10 @@ void LegacyCameraScheduleWidget::updateMotionAvailable()
 {
     using boost::algorithm::all_of;
 
-    bool available = all_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) { return !camera->isDtsBased(); });
-    if (m_motionTypeOverride != Qn::MT_Default)
-    {
-        available &= m_motionTypeOverride != Qn::MT_NoMotion;
-    }
-    else
-    {
-        available &= all_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) { return camera->hasMotion(); });
-    }
+    const bool available = m_motionDetectionAllowed
+        && all_of(m_cameras,
+            [](const QnVirtualCameraResourcePtr &camera)
+            { return !camera->isDtsBased() && camera->hasMotion(); });
 
     if (m_motionAvailable == available)
         return;
