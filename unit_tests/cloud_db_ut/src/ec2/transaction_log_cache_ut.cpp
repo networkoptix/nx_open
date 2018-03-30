@@ -87,6 +87,25 @@ protected:
         m_rawData.erase(tranId);
     }
 
+    void saveTransactionWithGreaterTimestampSequence()
+    {
+        const auto tranId = beginTran();
+
+        auto transaction = prepareTransaction(tranId);
+        transaction.persistentInfo.timestamp.sequence =
+            m_cache.committedTimestampSequence() + 1;
+        saveTransactionToCache(tranId, transaction);
+
+        commit(tranId);
+    }
+
+    void assertGreaterSequenceIsApplied()
+    {
+        ASSERT_EQ(
+            *m_transactionSequenceGenerated.begin(),
+            m_cache.committedTimestampSequence());
+    }
+
     void assertIfCommittedDataIsNotVisible()
     {
         assertIfNotEqual(m_committedData, m_cache);
@@ -135,7 +154,7 @@ private:
         return result;
     }
 
-    void generateTransaction(TranId tranId)
+    ::ec2::QnAbstractTransaction prepareTransaction(TranId tranId)
     {
         auto transactionHeader = ::ec2::QnAbstractTransaction(QnUuid(m_peerId));
         transactionHeader.peerID = QnUuid(m_peerId);
@@ -145,9 +164,22 @@ private:
             m_cache.generateTransactionSequence(
                 ::ec2::ApiPersistentIdData(QnUuid(m_peerId), m_dbId));
         transactionHeader.persistentInfo.dbID = m_dbId;
-        transactionHeader.persistentInfo.timestamp = m_cache.generateTransactionTimestamp(tranId);
-        m_cache.insertOrReplaceTransaction(tranId, transactionHeader, m_peerId + m_systemId);
+        transactionHeader.persistentInfo.timestamp =
+            m_cache.generateTransactionTimestamp(tranId);
+        return transactionHeader;
+    }
 
+    void generateTransaction(TranId tranId)
+    {
+        auto transactionHeader = prepareTransaction(tranId);
+        saveTransactionToCache(tranId, transactionHeader);
+    }
+
+    void saveTransactionToCache(
+        TranId tranId,
+        ::ec2::QnAbstractTransaction transactionHeader)
+    {
+        m_cache.insertOrReplaceTransaction(tranId, transactionHeader, m_peerId + m_systemId);
         m_transactionSequenceGenerated.insert(transactionHeader.persistentInfo.sequence);
     }
 
@@ -156,6 +188,8 @@ private:
         ASSERT_EQ(cacheState.timestampSequence, cache.committedTimestampSequence());
     }
 };
+
+//-------------------------------------------------------------------------------------------------
 
 TEST_F(TransactionLogCache, commit_saves_data)
 {
@@ -195,6 +229,12 @@ TEST_F(TransactionLogCache, transaction_pipelining)
 
     assertIfCommittedDataIsNotVisible();
     assertIfCacheStateIsNotValid();
+}
+
+TEST_F(TransactionLogCache, timestamp_sequence_is_updated_by_external_transaction)
+{
+    saveTransactionWithGreaterTimestampSequence();
+    assertGreaterSequenceIsApplied();
 }
 
 } // namespace test
