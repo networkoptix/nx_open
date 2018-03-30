@@ -20,6 +20,8 @@
 
 #include <nx_ec/data/api_tran_state_data.h>
 
+#include <nx/cloud/cdb/client/data/auth_data.h>
+
 #include "managers/business_event_manager.h"
 #include "managers/camera_manager.h"
 #include "managers/discovery_manager.h"
@@ -1116,6 +1118,12 @@ struct SetResourceParamTransactionType
             param.name == nx::settings_names::kNameSystemName)
         {
             // System rename MUST be propagated to Nx Cloud
+            return TransactionType::Cloud;
+        }
+
+        if (param.name == nx::cdb::api::kVmsUserAuthInfoAttributeName ||
+            param.name == Qn::USER_FULL_NAME)
+        {
             return TransactionType::Cloud;
         }
 
