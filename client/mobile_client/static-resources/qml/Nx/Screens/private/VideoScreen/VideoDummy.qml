@@ -123,7 +123,7 @@ DummyMessage
                     "In this app I/O module can be used as a sound input device only."
                     + " To use it as a control module, please use desktop version of %1")
                     .arg(applicationInfo.productName())
-                image: lp("/images/alert_alert.png")//lp("/images/alert_io.png")
+                image: lp("/images/alert_io.png")
             }
         },
         State
@@ -132,7 +132,7 @@ DummyMessage
             PropertyChanges
             {
                 target: dummyMessage
-                image: lp("/images/alert_alert.png")//lp("/images/alert_sound.png")
+                image: lp("/images/alert_sound.png")
             }
         }
 
