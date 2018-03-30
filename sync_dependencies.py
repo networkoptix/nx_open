@@ -28,6 +28,8 @@ def determine_package_versions():
 
     if platform == "linux" and box == "none":
         v["qt"] = "5.6.2-2"
+        v["festival"] = "2.4-1"
+        v["festival-vox"] = "2.4"
         v["sysroot"] = "xenial"
 
     if platform == "macosx":
