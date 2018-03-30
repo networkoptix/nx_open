@@ -1,5 +1,6 @@
 #include "voice_spectrum_analyzer.h"
 
+#include <QtCore/QtMath>
 #include <utils/math/math.h>
 
 //#define USE_TEST_DATA

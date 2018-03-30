@@ -114,6 +114,12 @@
 
 #include <watchers/cloud_status_watcher.h>
 
+#if defined(Q_OS_WIN)
+#include <plugins/resource/desktop_win/desktop_resource_searcher_impl.h>
+#else
+#include <plugins/resource/desktop_audio_only/desktop_audio_only_resource_searcher_impl.h>
+#endif
+
 #include <ini.h>
 
 using namespace nx::client::desktop;
@@ -259,7 +265,12 @@ void QnClientModule::initDesktopCamera(QGLWidget* window)
 {
     /* Initialize desktop camera searcher. */
     auto commonModule = m_clientCoreModule->commonModule();
-    auto desktopSearcher = commonModule->store(new QnDesktopResourceSearcher(window));
+#if defined(Q_OS_WIN)
+    auto impl = new QnDesktopResourceSearcherImpl(window);
+#else
+    auto impl = new QnDesktopAudioOnlyResourceSearcherImpl();
+#endif
+    auto desktopSearcher = commonModule->store(new QnDesktopResourceSearcher(impl));
     desktopSearcher->setLocal(true);
     commonModule->resourceDiscoveryManager()->addDeviceServer(desktopSearcher);
 }

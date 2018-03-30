@@ -1,18 +1,8 @@
 #pragma once
 
-#if !defined(Q_OS_WIN)
-#include <core/resource/resource_fwd.h>
+#include <plugins/resource/desktop_camera/abstract_desktop_resource_searcher_impl.h>
 
-class QGLWidget;
-
-class QnDesktopResourceSearcherImpl
+struct QnDesktopAudioOnlyResourceSearcherImpl: public QnAbstractDesktopResourceSearcherImpl
 {
-
-public:
-    QnDesktopResourceSearcherImpl(QGLWidget* mainWindow = 0);
-    ~QnDesktopResourceSearcherImpl();
-
-    QnResourceList findResources();
+    virtual QnResourceList findResources() override;
 };
-#endif
-

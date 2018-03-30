@@ -1,20 +1,20 @@
 #pragma once
+
 #include <core/resource_management/resource_searcher.h>
+#include <plugins/resource/desktop_camera/abstract_desktop_resource_searcher_impl.h>
+
 #include <nx/utils/singleton.h>
 
-class QGLWidget;
-class QnDesktopResourceSearcherImpl;
-
-class QnDesktopResourceSearcher :
+class QnDesktopResourceSearcher:
     public QObject,
     public QnAbstractResourceSearcher
 {
     Q_OBJECT
+    using base_type = QObject;
 
-   using base_type = QObject;
 public:
-    QnDesktopResourceSearcher(QGLWidget* mainWidget, QObject* parent = nullptr);
-    ~QnDesktopResourceSearcher();
+    QnDesktopResourceSearcher(QnAbstractDesktopResourceSearcherImpl* impl, QObject* parent = nullptr);
+    virtual ~QnDesktopResourceSearcher();
 
     virtual QString manufacture() const override;
 
@@ -25,11 +25,9 @@ public:
     virtual bool isVirtualResource() const override { return true; }
 
 protected:
-    virtual QnResourcePtr createResource(
-        const QnUuid &resourceTypeId,
+    virtual QnResourcePtr createResource(const QnUuid& resourceTypeId,
         const QnResourceParams& params) override;
 
 private:
-
-    std::unique_ptr<QnDesktopResourceSearcherImpl> m_impl;
+    std::unique_ptr<QnAbstractDesktopResourceSearcherImpl> m_impl;
 };
