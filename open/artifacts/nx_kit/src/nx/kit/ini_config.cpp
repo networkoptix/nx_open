@@ -289,7 +289,7 @@ bool Param<double>::reload(const std::string* value, std::ostream* output)
         if (errno == ERANGE || *pEnd != '\0')
             error = " [invalid value]";
         else
-            *pValue = (double) v;
+            *pValue = v;
     }
     printValueLine(output, *pValue, " = ", error, *pValue == defaultValue);
     return oldValue != *pValue;
