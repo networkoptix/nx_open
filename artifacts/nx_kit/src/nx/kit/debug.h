@@ -1,4 +1,4 @@
-// Copyright 2017 Network Optix, Inc. Licensed under GNU Lesser General Public License version 3.
+// Copyright 2018 Network Optix, Inc. Licensed under GNU Lesser General Public License version 3.
 #pragma once
 
 /**@file
@@ -16,7 +16,7 @@
 #include <memory>
 
 #if defined(QT_CORE_LIB)
-    // To be supported in NX_PRINT_VALUE.
+    // To be supported in toString() and NX_PRINT_VALUE.
     #include <QtCore/QByteArray>
     #include <QtCore/QString>
     #include <QtCore/QUrl>
@@ -97,15 +97,15 @@ NX_KIT_API std::string fileBaseNameWithoutExt(const char* file);
 NX_KIT_API std::ostream*& stream();
 
 #if !defined(NX_PRINT)
-/**
-* Print the args to NX_DEBUG_STREAM, starting with NX_PRINT_PREFIX and ending with
-* NX_DEBUG_ENDL. Redefine if needed.
-*/
-#define NX_PRINT /* << args... */ \
-    /* Allocate a temp value, which prints endl in its destructor, in the "<<" expression. */ \
-    ( []() { struct Endl { ~Endl() { NX_DEBUG_STREAM NX_DEBUG_ENDL; } }; \
-        return std::make_shared<Endl>(); }() ) /*operator,*/, \
-    NX_DEBUG_STREAM << NX_PRINT_PREFIX
+    /**
+     * Print the args to NX_DEBUG_STREAM, starting with NX_PRINT_PREFIX and ending with
+     * NX_DEBUG_ENDL. Redefine if needed.
+     */
+    #define NX_PRINT /* << args... */ \
+        /* Allocate a temp value, which prints endl in its destructor, in the "<<" expression. */ \
+        ( []() { struct Endl { ~Endl() { NX_DEBUG_STREAM NX_DEBUG_ENDL; } }; \
+            return std::make_shared<Endl>(); }() ) /*operator,*/, \
+        NX_DEBUG_STREAM << NX_PRINT_PREFIX
 #endif
 
 /**
@@ -126,10 +126,16 @@ NX_KIT_API std::ostream*& stream();
         << ", file " << nx::kit::debug::relativeSrcFilename(__FILE__);
 
 /**
- * Print the expression text and its value in brackets.
+ * Convert various values to their accurate text representation, e.g. quoted and escaped strings.
+ */
+template<typename T>
+std::string toString(T value);
+
+/**
+ * Print the expression text and its value via toString().
  */
 #define NX_PRINT_VALUE(VALUE) \
-    NX_PRINT << "####### " #VALUE ": " << nx::kit::debug::detail::toString((VALUE))
+    NX_PRINT << "####### " #VALUE ": " << nx::kit::debug::toString((VALUE))
 
 /**
  * Hex-dump binary data using NX_PRINT.
@@ -197,8 +203,6 @@ NX_KIT_API std::ostream*& stream();
 //-------------------------------------------------------------------------------------------------
 // Implementation
 
-namespace detail {
-
 #define NX_KIT_DEBUG_DETAIL_CONCAT(X, Y) NX_KIT_DEBUG_DETAIL_CONCAT2(X, Y)
 #define NX_KIT_DEBUG_DETAIL_CONCAT2(X, Y) X##Y
 
@@ -241,9 +245,11 @@ std::string toString(P* ptr)
     return toString((const void*) ptr);
 }
 
+namespace detail {
+
 typedef std::function<void(const char*)> PrintFunc;
 
-#define NX_KIT_DEBUG_DETAIL_PRINT_FUNC [](const char* message) { NX_PRINT << message; }
+#define NX_KIT_DEBUG_DETAIL_PRINT_FUNC [&](const char* message) { NX_PRINT << message; }
 
 /** @param file Supply __FILE__. */
 NX_KIT_API std::string printPrefix(const char* file);

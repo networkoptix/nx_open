@@ -1,13 +1,13 @@
-// Copyright 2017 Network Optix, Inc. Licensed under GNU Lesser General Public License version 3.
+// Copyright 2018 Network Optix, Inc. Licensed under GNU Lesser General Public License version 3.
 
 #include <iostream>
 
 #include <nx/kit/test.h>
 
-#include "test_disabled_ini_config.h"
+#include "disabled_ini_config_ut.h"
 
 extern "C" {
-    #include "test_ini_config_c.h"
+#include "ini_config_c_ut.h"
 } // extern "C"
 
 int main()
@@ -15,8 +15,8 @@ int main()
     int failedTestsCount = 0;
 
     failedTestsCount += nx::kit::test::runAllTests();
-    failedTestsCount += test_disabled_ini_config();
-    failedTestsCount += test_ini_config_c();
+    failedTestsCount += disabled_ini_config_ut();
+    failedTestsCount += ini_config_c_ut();
 
     std::cerr << std::endl;
 
