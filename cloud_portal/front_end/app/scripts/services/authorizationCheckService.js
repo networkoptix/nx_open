@@ -62,7 +62,7 @@
                 if (cloudApi.checkResponseHasError(result)) {
                     return $q.reject(result);
                 }
-                if (result.data.email) {
+                if (result.data.email) { // (result.data.resultCode === L.errorCodes.ok)
                     self.setEmail(result.data.email);
                     $rootScope.session.loginState = result.data.email; //Forcing changing loginState to reload interface
                 }

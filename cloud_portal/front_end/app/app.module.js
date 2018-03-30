@@ -27,6 +27,7 @@ const ajs_upgraded_providers_7 = require("./ajs-upgraded-providers");
 const ajs_upgraded_providers_8 = require("./ajs-upgraded-providers");
 const app_component_1 = require("./app.component");
 const bar_module_1 = require("./bar/bar.module");
+const download_module_1 = require("./download/download.module");
 const dropdowns_module_1 = require("./dropdowns/dropdowns.module");
 const login_component_1 = require("./dialogs/login/login.component");
 const process_button_component_1 = require("./components/process-button/process-button.component");
@@ -35,7 +36,8 @@ const general_component_1 = require("./dialogs/general/general.component");
 class HybridUrlHandlingStrategy {
     // use only process the `/bar` url
     shouldProcessUrl(url) {
-        return url.toString().startsWith('/bar');
+        return url.toString().startsWith('/bar') ||
+            url.toString().startsWith('/download');
     }
     extract(url) {
         return url;
@@ -59,6 +61,7 @@ AppModule = __decorate([
             ngx_order_pipe_1.OrderModule,
             index_1.CoreModule,
             bar_module_1.BarModule,
+            download_module_1.DownloadModule,
             ajs_upgraded_providers_1.cloudApiServiceModule,
             ajs_upgraded_providers_6.uuid2ServiceModule,
             ajs_upgraded_providers_3.languageServiceModule,
@@ -76,7 +79,7 @@ AppModule = __decorate([
             login_component_1.LoginModalContent,
             login_component_1.NxModalLoginComponent,
             general_component_1.GeneralModalContent,
-            general_component_1.NxModalGeneralComponent
+            general_component_1.NxModalGeneralComponent,
         ],
         providers: [
             ng_bootstrap_2.NgbModal,

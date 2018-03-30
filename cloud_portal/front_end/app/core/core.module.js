@@ -35,7 +35,9 @@ CoreModule = __decorate([
             router_1.RouterModule
         ],
         declarations: [],
-        providers: []
+        providers: [
+        // I18nService,
+        ]
     }),
     __param(0, core_1.Optional()), __param(0, core_1.SkipSelf()),
     __metadata("design:paramtypes", [CoreModule])

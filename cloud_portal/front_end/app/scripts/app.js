@@ -23,6 +23,9 @@ window.L = {};
             'ngRoute',
             // 'ui.bootstrap',
             // 'NgbModal',
+            // 'NgbTabset',
+            // 'NgbTab',
+            // 'NgbTabContent',
             'ngStorage',
             'base64',
             'nxCommon',
@@ -299,19 +302,22 @@ window.L = {};
                                 controller: 'DownloadHistoryCtrl'
                             })
                             .when('/downloads', {
-                                title: languageServiceProvider.$get().lang.pageTitles.download,
-                                templateUrl: CONFIG.viewsDir + 'download.html',
-                                controller: 'DownloadCtrl'
+                                // title: languageServiceProvider.$get().lang.pageTitles.download,
+                                // templateUrl: CONFIG.viewsDir + 'download.html',
+                                // controller: 'DownloadCtrl'
+                                template: ''
                             })
                             .when('/download', {
-                                title: languageServiceProvider.$get().lang.pageTitles.download,
-                                templateUrl: CONFIG.viewsDir + 'download.html',
-                                controller: 'DownloadCtrl'
+                                // title: languageServiceProvider.$get().lang.pageTitles.download,
+                                // templateUrl: CONFIG.viewsDir + 'download.html',
+                                // controller: 'DownloadCtrl'
+                                template: ''
                             })
                             .when('/download/:platform', {
-                                title: languageServiceProvider.$get().lang.pageTitles.downloadPlatform,
-                                templateUrl: CONFIG.viewsDir + 'download.html',
-                                controller: 'DownloadCtrl'
+                                // title: languageServiceProvider.$get().lang.pageTitles.downloadPlatform,
+                                // templateUrl: CONFIG.viewsDir + 'download.html',
+                                // controller: 'DownloadCtrl'
+                                template: ''
                             })
                             .when('/', {
                                 title: ''/*languageServiceProvider.$get().lang.pageTitles.startPage*/,

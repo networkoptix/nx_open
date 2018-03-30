@@ -40,7 +40,6 @@ export class NxActiveSystemDropdown implements OnInit {
     ngOnInit(): void {
         this.params = this.route.queryParams.subscribe((params: Params) => {
             this.routeSystemId = params['systemId'];
-            console.log(params);
         });
 
         this.activeSystem = this.system;

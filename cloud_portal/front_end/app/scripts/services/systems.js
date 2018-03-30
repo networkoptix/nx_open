@@ -23,10 +23,10 @@ const angular = require("angular");
                 const system = this.systems.find(function (system) {
                     return system.id == systemId;
                 });
-                if (system) {
+                if (system) { // Cache success
                     return $q.resolve({ data: [system] });
                 }
-                else {
+                else { // Cache miss
                     return cloudApi.systems(systemId);
                 }
             };

@@ -35,7 +35,6 @@ let NxActiveSystemDropdown = class NxActiveSystemDropdown {
     ngOnInit() {
         this.params = this.route.queryParams.subscribe((params) => {
             this.routeSystemId = params['systemId'];
-            console.log(params);
         });
         this.activeSystem = this.system;
         this.updateActive();

@@ -2,7 +2,7 @@ import { NgModule }                                                       from '
 import { Location, PathLocationStrategy, LocationStrategy, CommonModule } from '@angular/common';
 import { BrowserModule }                                                  from '@angular/platform-browser';
 import { downgradeComponent, downgradeInjectable, UpgradeModule }         from '@angular/upgrade/static';
-import { RouterModule, UrlHandlingStrategy, UrlTree, Routes }             from '@angular/router';
+import { RouterModule, UrlHandlingStrategy, UrlTree }                     from '@angular/router';
 import { HttpClientModule }                                               from '@angular/common/http';
 
 import { FormsModule } from '@angular/forms';
@@ -24,6 +24,7 @@ import { configServiceModule }   from './ajs-upgraded-providers';
 
 import { AppComponent }                                 from './app.component';
 import { BarModule }                                    from './bar/bar.module';
+import { DownloadModule }                               from './download/download.module';
 import { DropdownsModule }                              from './dropdowns/dropdowns.module';
 import { NxModalLoginComponent, LoginModalContent }     from "./dialogs/login/login.component";
 import { NxProcessButtonComponent }                     from './components/process-button/process-button.component';
@@ -33,7 +34,8 @@ import { GeneralModalContent, NxModalGeneralComponent } from "./dialogs/general/
 class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
     // use only process the `/bar` url
     shouldProcessUrl(url: UrlTree) {
-        return url.toString().startsWith('/bar');
+        return url.toString().startsWith('/bar') ||
+            url.toString().startsWith('/download');
     }
 
     extract(url: UrlTree) {
@@ -55,6 +57,7 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
         OrderModule,
         CoreModule,
         BarModule,
+        DownloadModule,
         cloudApiServiceModule,
         uuid2ServiceModule,
         languageServiceModule,
@@ -73,7 +76,7 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
         LoginModalContent,
         NxModalLoginComponent,
         GeneralModalContent,
-        NxModalGeneralComponent
+        NxModalGeneralComponent,
     ],
     providers: [
         NgbModal,
