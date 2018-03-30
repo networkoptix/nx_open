@@ -339,6 +339,9 @@ public:
     void animateProperties();
     void zoomWindow(qreal factor);
 
+    qint64 startBoundTimeValue() const;
+    qint64 endBoundTimeValue() const;
+
     void setStickToEnd(bool stickToEnd);
 
     int calculateTargetTextLevel() const;
@@ -1375,17 +1378,26 @@ void QnTimelinePrivate::updateStripesTextures()
     stripesLightTexture = window->createTextureFromImage(stripesLight, flags);
 }
 
-void QnTimelinePrivate::tryFitInBounds()
+qint64 QnTimelinePrivate::startBoundTimeValue() const
 {
-    const qint64 liveTime = QDateTime::currentMSecsSinceEpoch();
-
-    const qint64 startBound = startBoundTime == -1
+    const auto liveTime = QDateTime::currentMSecsSinceEpoch();
+    return startBoundTime == -1
         ? liveTime - kDefaultWindowSize / 2
         : startBoundTime;
+}
 
-    const qint64 endBound = endBoundTime == -1
+qint64 QnTimelinePrivate::endBoundTimeValue() const
+{
+    const auto liveTime = QDateTime::currentMSecsSinceEpoch();
+    return endBoundTime == -1
         ? liveTime
         : endBoundTime;
+}
+
+void QnTimelinePrivate::tryFitInBounds()
+{
+    const auto startBound = startBoundTimeValue();
+    const auto endBound = endBoundTimeValue();
 
     const qint64 position = parent->position();
     const qint64 minimalHalfWindowSize = endBound - startBound;
@@ -1422,10 +1434,9 @@ void QnTimelinePrivate::animateProperties()
         windowEnd += shift;
     }
 
-    qint64 liveTime = QDateTime::currentMSecsSinceEpoch();
-
-    qint64 startBound = startBoundTime == -1 ? liveTime - kDefaultWindowSize / 2 : startBoundTime;
-    qint64 endBound = endBoundTime == -1 ? liveTime : endBoundTime;
+    const qint64 liveTime = QDateTime::currentMSecsSinceEpoch();
+    const qint64 startBound = startBoundTimeValue();
+    const qint64 endBound = endBoundTimeValue();
 
     const bool zoomWasStarted = !zoomKineticHelper.isStopped();
     zoomKineticHelper.update();
