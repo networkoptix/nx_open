@@ -78,13 +78,13 @@ std::string Plugin::capabilitiesManifest() const
             "settings": {
                 "params": [
                     {
-                        "id": "paramAId",
+                        "id": "paramA",
                         "dataType": "Number",
                         "name": "Param A",
                         "description": "Number A"
                     },
                     {
-                        "id": "paramBId",
+                        "id": "paramB",
                         "dataType": "Enumeration",
                         "range": "b1,b3",
                         "name": "Param B",

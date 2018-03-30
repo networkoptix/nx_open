@@ -77,7 +77,7 @@ bool CommonPlugin::fillSettingsMap(
 {
     if (count > 0 && settings == nullptr)
     {
-        NX_PRINT << func << "(): INTERNAL ERROR: settings is null and count > 0";
+        NX_PRINT << func << "(): INTERNAL ERROR: settings is null and count is " << count;
         return false;
     }
 

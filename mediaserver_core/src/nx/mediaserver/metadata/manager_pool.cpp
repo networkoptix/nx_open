@@ -28,6 +28,7 @@
 #include <core/dataconsumer/abstract_data_receptor.h>
 #include <nx/utils/log/log_main.h>
 #include <mediaserver_ini.h>
+#include <plugins/plugins_ini.h>
 
 #include "video_data_receptor.h"
 
@@ -193,10 +194,11 @@ static void freeSettings(std::vector<nxpl::Setting>* settings)
     }
 }
 
-void ManagerPool::loadSettingsFromFile(std::vector<nxpl::Setting>* settings, const char* filename)
+void ManagerPool::loadSettingsFromFile(
+    std::vector<nxpl::Setting>* settings, const QString& filename)
 {
-    if (!filename || !filename[0])
-        return; //< If no filename, settings will remain empty.
+    NX_INFO(this) << lm("Loading metadata Plugin/CameraManager settings from file: [%1]")
+        .arg(filename);
 
     QFile f(filename);
     if (!f.open(QFile::ReadOnly))
@@ -215,23 +217,33 @@ void ManagerPool::loadSettingsFromFile(std::vector<nxpl::Setting>* settings, con
     }
 }
 
-void ManagerPool::setManagerDeclaredSettings(
-    CameraManager* manager, const QnSecurityCamResourcePtr& /*camera*/)
+void ManagerPool::setCameraManagerDeclaredSettings(
+    CameraManager* manager,
+    const QnSecurityCamResourcePtr& /*camera*/,
+    const QString& pluginLibName)
 {
     // TODO: Stub. Implement storing the settings in the database.
+    static const auto& jsonFilenameSuffix = lit("_camera_manager.json");
     std::vector<nxpl::Setting> settings;
-    loadSettingsFromFile(&settings, ini().stubCameraManagerSettings);
+    const QString& jsonFilenamePrefix =
+        QString::fromUtf8(pluginsIni().metadataPluginCameraManagerSettingsFilenamePrefix);
+    if (!jsonFilenamePrefix.isEmpty())
+        loadSettingsFromFile(&settings, jsonFilenamePrefix + pluginLibName + jsonFilenameSuffix);
     manager->setDeclaredSettings(
         settings.empty() ? nullptr : &settings.front(),
         (int) settings.size());
     freeSettings(&settings);
 }
 
-void ManagerPool::setPluginDeclaredSettings(Plugin* plugin)
+void ManagerPool::setPluginDeclaredSettings(Plugin* plugin, const QString& pluginLibName)
 {
     // TODO: Stub. Implement storing the settings in the database.
+    static const auto& jsonFilenameSuffix = lit(".json");
     std::vector<nxpl::Setting> settings;
-    loadSettingsFromFile(&settings, ini().stubPluginSettings);
+    const QString& jsonFilenamePrefix =
+        QString::fromUtf8(pluginsIni().metadataPluginSettingsFilenamePrefix);
+    if (!jsonFilenamePrefix.isEmpty())
+        loadSettingsFromFile(&settings, jsonFilenamePrefix + pluginLibName + jsonFilenameSuffix);
     plugin->setDeclaredSettings(
         settings.empty() ? nullptr : &settings.front(),
         (int) settings.size());
@@ -260,7 +272,10 @@ void ManagerPool::createCameraManagersForResourceUnsafe(const QnSecurityCamResou
 
     for (Plugin* const plugin: availablePlugins())
     {
-        setPluginDeclaredSettings(plugin);
+        const QString& pluginLibName = qnServerModule->pluginManager()->pluginLibName(plugin);
+
+        // TODO: Consider assigning plugin settings earlier.
+        setPluginDeclaredSettings(plugin, pluginLibName);
 
         nxpt::ScopedRef<Plugin> pluginGuard(plugin, /*increaseRef*/ false);
 
@@ -288,7 +303,7 @@ void ManagerPool::createCameraManagersForResourceUnsafe(const QnSecurityCamResou
             mergePluginManifestToServer(*auxiliaryPluginManifest, server);
         }
 
-        setManagerDeclaredSettings(manager.get(), camera);
+        setCameraManagerDeclaredSettings(manager.get(), camera, pluginLibName);
 
         auto& context = m_contexts[camera->getId()];
         std::unique_ptr<MetadataHandler> handler(
