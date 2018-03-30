@@ -28,6 +28,7 @@ def determine_package_versions():
 
     if platform == "linux" and box == "none":
         v["qt"] = "5.6.2-2"
+        v["sysroot"] = "xenial"
 
     if platform == "macosx":
         v["qt"] = "5.6.3"
@@ -96,7 +97,7 @@ def sync_dependencies(syncher):
 
     sync("ffmpeg")
 
-    if box in ("bpi", "bananapi", "rpi", "tx1"):
+    if box in ("bpi", "bananapi", "rpi", "tx1", "none"):
         sync("sysroot", path_variable="sysroot_directory")
 
     if box in ("bpi", "bananapi"):

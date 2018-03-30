@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
 
 include(cmake/option.cmake)
+include(cmake/default_target.cmake)
 
 set(customization "default" CACHE STRING "Product customization")
 nx_option(beta "Is this build is beta build" ON)
@@ -19,7 +20,8 @@ endif()
 set(CMAKE_BUILD_TYPE ${default_cmake_build_type} CACHE STRING
     "One of [Debug Release RelWithDebInfo MinSizeRel].")
 
-set(targetDevice "" CACHE STRING "Target device. For the list see cmake/toolchains.")
+set(targetDevice ${default_target_device} CACHE STRING
+    "Target device. For the list see cmake/toolchains.")
 set(box "none")
 
 if(targetDevice STREQUAL "none")
