@@ -334,6 +334,8 @@ public:
 
     void updateStripesTextures();
 
+    void tryFitInBounds();
+
     void animateProperties();
     void zoomWindow(qreal factor);
 
@@ -643,6 +645,7 @@ void QnTimeline::updateZoom(qreal scale)
 void QnTimeline::finishZoom(qreal scale)
 {
     d->zoomKineticHelper.finish(d->startZoom * scale);
+    d->tryFitInBounds();
 
     if (d->dragWasInterruptedByZoom)
     {
@@ -1372,6 +1375,28 @@ void QnTimelinePrivate::updateStripesTextures()
     stripesLightTexture = window->createTextureFromImage(stripesLight, flags);
 }
 
+void QnTimelinePrivate::tryFitInBounds()
+{
+    const qint64 liveTime = QDateTime::currentMSecsSinceEpoch();
+
+    const qint64 startBound = startBoundTime == -1
+        ? liveTime - kDefaultWindowSize / 2
+        : startBoundTime;
+
+    const qint64 endBound = endBoundTime == -1
+        ? liveTime
+        : endBoundTime;
+
+    const qint64 position = parent->position();
+    const qint64 minimalHalfWindowSize = endBound - startBound;
+    const qint64 minimalStartBound = position - minimalHalfWindowSize;
+    if (windowStart >= minimalStartBound)
+        return;
+
+    const qint64 maximalEndBound = position + minimalHalfWindowSize;
+    parent->setWindow(minimalStartBound, maximalEndBound);
+}
+
 void QnTimelinePrivate::animateProperties()
 {
     qint64 dt = kMinimumAnimationTickMs;
@@ -1402,10 +1427,15 @@ void QnTimelinePrivate::animateProperties()
     qint64 startBound = startBoundTime == -1 ? liveTime - kDefaultWindowSize / 2 : startBoundTime;
     qint64 endBound = endBoundTime == -1 ? liveTime : endBoundTime;
 
+    const bool zoomWasStarted = !zoomKineticHelper.isStopped();
     zoomKineticHelper.update();
+    const bool zoomJustStopped = zoomWasStarted && zoomKineticHelper.isStopped();
+    if (zoomJustStopped)
+        tryFitInBounds();
+
     if (!zoomKineticHelper.isStopped())
     {
-        qint64 maxSize = (liveTime - startBound) * 2;
+        qint64 maxSize = (liveTime - startBound) * 16;
         qint64 minSize = startBoundTime == -1 ? maxSize : parent->width();
         qreal factor = startZoom / zoomKineticHelper.value();
         qreal windowSize = qBound<qreal>(minSize, startWindowSize * factor, maxSize);
