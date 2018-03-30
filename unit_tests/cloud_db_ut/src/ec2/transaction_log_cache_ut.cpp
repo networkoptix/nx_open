@@ -103,7 +103,7 @@ protected:
     {
         ASSERT_EQ(
             *m_transactionSequenceGenerated.begin(),
-            m_cache.committedTimestampSequence());
+            (int)m_cache.committedTimestampSequence());
     }
 
     void assertIfCommittedDataIsNotVisible()
