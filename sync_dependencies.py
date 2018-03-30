@@ -99,7 +99,7 @@ def sync_dependencies(syncher):
 
     sync("ffmpeg")
 
-    if box in ("bpi", "bananapi", "rpi", "tx1", "none"):
+    if platform == "linux" and box in ("bpi", "bananapi", "rpi", "tx1", "none"):
         sync("sysroot", path_variable="sysroot_directory")
 
     if box in ("bpi", "bananapi"):
