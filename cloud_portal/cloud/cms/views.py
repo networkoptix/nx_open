@@ -180,7 +180,7 @@ def version_action(request, version_id=None):
         if not request.user.has_perm('cms.publish_version'):
             raise PermissionDenied
         customization = Customization.objects.get(name=settings.CUSTOMIZATION)
-        publishing_errors = publish_latest_version(customization, request.user)
+        publishing_errors = publish_latest_version(customization, version_id, request.user)
         if publishing_errors:
             messages.error(request, "Version {} {}".format(version_id, publishing_errors))
         else:
@@ -206,8 +206,14 @@ def version(request, version_id=None):
         preview_link = generate_preview_link()
     version = ContentVersion.objects.get(id=version_id)
     contexts = get_records_for_version(version)
+    #else happens when the user makes a revision without any changes
+    if contexts.values():
+        product = contexts.values()[0][0].data_structure.context.product
+    else:
+        product = {'can_preview': False, 'name': ""}
     return render(request, 'review_records.html', {'version': version,
                                                    'contexts': contexts,
+                                                   'product': product,
                                                    'preview_link': preview_link,
                                                    'user': request.user,
                                                    'has_permission': mysite.has_permission(request),
@@ -252,7 +258,7 @@ def product_settings(request, product_id):
             if not file.name.endswith('zip'):
                 return HttpResponseBadRequest('zip archive is expected')
             if generate_json:
-                data = generate_structure.from_zip(file, product.name)
+                data = generate_structure.from_zip(file, product)
                 content = json.dumps(data, ensure_ascii=False, indent=4, separators=(',', ': '))
                 return response_attachment(content, 'structure.json', 'application/json')
             log_messages = structure.process_zip(file, request.user, update_structure, update_content)

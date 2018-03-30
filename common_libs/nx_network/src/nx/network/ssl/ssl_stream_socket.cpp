@@ -86,13 +86,21 @@ void StreamSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
 int StreamSocket::recv(void* buffer, unsigned int bufferLen, int /*flags*/)
 {
     switchToSyncModeIfNeeded();
-    return m_sslPipeline->read(buffer, bufferLen);
+    const int result = m_sslPipeline->read(buffer, bufferLen);
+    if (result >= 0)
+        return result;
+    handleSslError(result);
+    return -1;
 }
 
 int StreamSocket::send(const void* buffer, unsigned int bufferLen)
 {
     switchToSyncModeIfNeeded();
-    return m_sslPipeline->write(buffer, bufferLen);
+    const int result = m_sslPipeline->write(buffer, bufferLen);
+    if (result >= 0)
+        return result;
+    handleSslError(result);
+    return -1;
 }
 
 void StreamSocket::readSomeAsync(
@@ -143,6 +151,19 @@ void StreamSocket::switchToSyncModeIfNeeded()
 void StreamSocket::switchToAsyncModeIfNeeded()
 {
     m_proxyConverter.setDelegatee(m_sslPipeline.get());
+}
+
+void StreamSocket::handleSslError(int sslPipelineResultCode)
+{
+    if (sslPipelineResultCode == nx::utils::bstream::StreamIoError::wouldBlock &&
+        SystemError::getLastOSErrorCode() != SystemError::timedOut) //< TODO: #ak Come up with a better way to pass os error.
+    {
+        SystemError::setLastErrorCode(SystemError::wouldBlock);
+    }
+    else if (sslPipelineResultCode == nx::utils::bstream::StreamIoError::nonRecoverableError)
+    {
+        SystemError::setLastErrorCode(SystemError::invalidData);
+    }
 }
 
 } // namespace ssl

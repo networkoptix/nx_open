@@ -23,6 +23,7 @@ public:
         EncryptionUse encryptionUse);
 
     virtual void acceptAsync(AcceptCompletionHandler handler) override;
+    virtual AbstractStreamSocket* accept() override;
 
 private:
     std::unique_ptr<AbstractStreamServerSocket> m_delegatee;

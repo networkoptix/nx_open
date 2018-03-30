@@ -360,6 +360,11 @@ void StreamTransformingAsyncChannel::cancelIoWhileInAioThread(aio::EventType eve
             ++it;
         }
     }
+
+    // Needed for pleaseStop to work correctly.
+    // Should be removed when AbstractStreamSocket inherits BasicPollable.
+    if (eventType == aio::EventType::etNone)
+        m_rawDataChannel->cancelIOSync(aio::EventType::etNone);
 }
 
 } // namespace aio

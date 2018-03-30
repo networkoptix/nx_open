@@ -2362,7 +2362,7 @@ void QnStorageManager::stopAsyncTasks()
 
     m_rebuildCancelled = true;
     {
-        QnMutexLocker lock(&m_mutexRebuild);
+        //QnMutexLocker lock(&m_mutexRebuild);
         if (m_rebuildArchiveThread)
         {
             m_rebuildArchiveThread->stop();

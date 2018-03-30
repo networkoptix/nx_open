@@ -4,7 +4,7 @@
 
 #include "media_server/media_server_module.h"
 #include "media_server/settings.h"
-#include "network/auth/generic_user_data_provider.h"
+#include <nx/vms/auth/generic_user_data_provider.h>
 #include "server/server_globals.h"
 
 CloudIntegrationManager::CloudIntegrationManager(

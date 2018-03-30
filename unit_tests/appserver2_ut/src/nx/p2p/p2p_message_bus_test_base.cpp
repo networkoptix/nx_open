@@ -164,6 +164,9 @@ Appserver2Ptr P2pMessageBusTestBase::createAppserver(
     const QString guidArg = lit("--moduleGuid=%1").arg(guid.toString());
     result->addArg(guidArg.toStdString().c_str());
 
+    // Some p2p synchronization tests rely on broken authentication in appserver2.
+    result->addArg("--disableAuth");
+
     if (baseTcpPort)
     {
         const QString guidArg = lit("--endpoint=0.0.0.0:%1").arg(baseTcpPort + m_instanceCounter);
