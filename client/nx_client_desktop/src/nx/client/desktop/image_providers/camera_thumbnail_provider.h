@@ -28,9 +28,12 @@ public:
     api::CameraImageRequest requestData() const;
     void setRequestData(const api::CameraImageRequest& data);
 
+    qint64 timestampUs() const;
+
 signals:
     /** Internal signal to implement thread-safety. */
-    void imageDataLoadedInternal(const QByteArray &data, Qn::ThumbnailStatus nextStatus);
+    void imageDataLoadedInternal(const QByteArray &data, Qn::ThumbnailStatus nextStatus,
+        qint64 timestampMs);
 
 protected:
     virtual void doLoadAsync() override;
@@ -42,6 +45,7 @@ private:
     api::CameraImageRequest m_request;
     QImage m_image;
     Qn::ThumbnailStatus m_status;
+    qint64 m_timestampUs = 0;
 };
 
 } // namespace desktop

@@ -1,11 +1,11 @@
 #include "workbench_screenshot_handler.h"
 
+#include <chrono>
+
 #include <QtCore/QTimer>
 #include <QtCore/QStack>
-
 #include <QtGui/QImageWriter>
 #include <QtGui/QPainter>
-
 #include <QtWidgets/QAction>
 #include <QtWidgets/QComboBox>
 
@@ -622,7 +622,8 @@ void QnWorkbenchScreenshotHandler::takeScreenshot(QnMediaResourceWidget *widget,
         {
             nx::api::CameraImageRequest request;
             request.camera = camera;
-            request.msecSinceEpoch = localParameters.utcTimestampMsec;
+            request.usecSinceEpoch = std::chrono::microseconds(std::chrono::milliseconds(
+                localParameters.utcTimestampMsec)).count();
             request.roundMethod = nx::api::ImageRequest::RoundMethod::precise;
             request.rotation = 0;
 

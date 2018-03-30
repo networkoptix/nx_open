@@ -101,6 +101,12 @@ std::string makeElementName(
     return pipelineName + "_" + factoryName + "_" + elementName;
 }
 
+std::chrono::milliseconds now()
+{
+    auto timePointNow = std::chrono::high_resolution_clock::now();
+    return std::chrono::duration_cast<std::chrono::milliseconds>(timePointNow.time_since_epoch());
+}
+
 } // namespace deepstream
 } // namespace metadata
 } // namespace mediaserver_plugins

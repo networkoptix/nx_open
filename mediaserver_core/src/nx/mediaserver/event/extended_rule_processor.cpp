@@ -581,7 +581,7 @@ ExtendedRuleProcessor::TimespampedFrame ExtendedRuleProcessor::getEventScreensho
 
     api::CameraImageRequest request;
     request.camera = camera;
-    request.msecSinceEpoch = timestampUsec / 1000;
+    request.usecSinceEpoch = timestampUsec;
     request.size = dstSize;
     request.roundMethod = api::CameraImageRequest::RoundMethod::precise;
 

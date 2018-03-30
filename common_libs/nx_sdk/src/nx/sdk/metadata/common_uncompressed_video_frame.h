@@ -36,7 +36,7 @@ public:
     virtual void unmap() override {}
 
     void setOwnedData(
-        std::vector<std::vector<char>> data, std::vector<int> lineSize)
+        std::vector<std::vector<char>>&& data, std::vector<int>&& lineSize)
     {
         m_externalData.clear();
         m_externalDataSize.clear();
@@ -45,7 +45,7 @@ public:
     }
 
     void setExternalData(
-        std::vector<const char*> data, std::vector<int> dataSize, std::vector<int> lineSize)
+        std::vector<const char*>&& data, std::vector<int>&& dataSize, std::vector<int>&& lineSize)
     {
         m_ownedData.clear();
         m_externalData = std::move(data);

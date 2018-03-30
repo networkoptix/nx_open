@@ -42,7 +42,7 @@ signals:
 
 protected:
     bool isValid(const QModelIndex& index) const;
-    virtual QString timestampText(qint64 timestampMs) const;
+    virtual QString timestampText(qint64 timestampUs) const;
 
     virtual bool defaultAction(const QModelIndex& index);
     virtual bool activateLink(const QModelIndex& index, const QString& link);

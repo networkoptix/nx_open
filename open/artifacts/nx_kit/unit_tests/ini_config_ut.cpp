@@ -209,14 +209,14 @@ TEST(iniConfig, test)
 
     // Check path properties of IniConfig.
     ASSERT_STREQ(iniFileName.c_str(), ini().iniFile());
-    ASSERT_TRUE(ini().iniFileDir() != nullptr);
+    ASSERT_TRUE(IniConfig::iniFilesDir() != nullptr);
     if (ini().isEnabled())
-        ASSERT_TRUE(ini().iniFileDir()[0] != '\0');
-    ASSERT_EQ(std::string(ini().iniFileDir()) + iniFileName, ini().iniFilePath());
+        ASSERT_TRUE(IniConfig::iniFilesDir()[0] != '\0');
+    ASSERT_EQ(std::string(IniConfig::iniFilesDir()) + iniFileName, ini().iniFilePath());
 
     // Create directory for ini files. Works for Windows as well.
     if (ini().isEnabled())
-        system((std::string("mkdir ") + ini().iniFileDir()).c_str()); //< Ignore possible errors.
+        system((std::string("mkdir ") + IniConfig::iniFilesDir()).c_str()); //< Ignore errors.
 
     std::remove(ini().iniFilePath()); //< Clean up from failed runs (if any).
 

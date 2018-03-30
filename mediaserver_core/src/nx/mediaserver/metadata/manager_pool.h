@@ -81,12 +81,16 @@ public slots:
     void initExistingResources();
 
 private:
-    void loadSettingsFromFile(std::vector<nxpl::Setting>* settings, const char* filename);
+    void loadSettingsFromFile(std::vector<nxpl::Setting>* settings, const QString& filename);
 
-    void setManagerDeclaredSettings(
-        sdk::metadata::CameraManager* manager, const QnSecurityCamResourcePtr& camera);
+    void setCameraManagerDeclaredSettings(
+        sdk::metadata::CameraManager* manager,
+        const QnSecurityCamResourcePtr& camera,
+        const QString& pluginLibName);
 
-    void setPluginDeclaredSettings(sdk::metadata::Plugin* plugin);
+    void setPluginDeclaredSettings(
+        sdk::metadata::Plugin* plugin,
+        const QString& pluginLibName);
 
     void createCameraManagersForResourceUnsafe(const QnSecurityCamResourcePtr& camera);
 
