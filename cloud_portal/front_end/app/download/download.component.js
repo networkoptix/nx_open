@@ -17,8 +17,9 @@ const router_1 = require("@angular/router");
 const platform_browser_1 = require("@angular/platform-browser");
 const common_1 = require("@angular/common");
 const ng_bootstrap_1 = require("@ng-bootstrap/ng-bootstrap");
+const ngx_device_detector_1 = require("ngx-device-detector");
 let DownloadComponent = class DownloadComponent {
-    constructor(language, cloudApi, configService, document, route, router, titleService) {
+    constructor(language, cloudApi, configService, document, route, router, titleService, deviceService) {
         this.language = language;
         this.cloudApi = cloudApi;
         this.configService = configService;
@@ -26,6 +27,13 @@ let DownloadComponent = class DownloadComponent {
         this.route = route;
         this.router = router;
         this.titleService = titleService;
+        this.deviceService = deviceService;
+        this.deviceInfo = null;
+        this.setupDefaults();
+        this.downloads = this.configService.config.downloads;
+        this.deviceInfo = this.deviceService.getDeviceInfo();
+    }
+    setupDefaults() {
         this.downloadsData = {
             version: '',
             installers: [{ platform: '', appType: '' }],
@@ -33,16 +41,11 @@ let DownloadComponent = class DownloadComponent {
         };
         this.installers = [{}];
         this.platformMatch = {
-            'Open BSD': 'Linux',
-            'Sun OS': 'Linux',
-            'QNX': 'Linux',
-            'UNIX': 'Linux',
-            'BeOS': 'Linux',
-            'OS/2': 'Linux',
-            'Mac OS X': 'MacOS',
-            'Mac OS': 'MacOS'
+            'unix': 'Linux',
+            'linux': 'Linux',
+            'mac': 'MacOS',
+            'windows': 'Windows'
         };
-        this.downloads = this.configService.config.downloads;
     }
     beforeChange($event) {
         const platform = $event.nextId;
@@ -53,7 +56,7 @@ let DownloadComponent = class DownloadComponent {
     ngOnInit() {
         this.sub = this.route.params.subscribe(params => {
             this.platform = params['platform'];
-            this.activeOs = this.platform || this.platformMatch[window.jscd.os] || window.jscd.os;
+            this.activeOs = this.platform || this.platformMatch[this.deviceInfo.os];
             for (let mobile in this.downloads.mobile) {
                 if (this.downloads.mobile[mobile].os === this.activeOs) {
                     if (this.language.lang.downloads.mobile[this.downloads.mobile[mobile].name].link !== 'disabled') {
@@ -119,7 +122,8 @@ DownloadComponent = __decorate([
     __param(3, core_1.Inject(common_1.DOCUMENT)),
     __metadata("design:paramtypes", [Object, Object, Object, Object, router_1.ActivatedRoute,
         router_1.Router,
-        platform_browser_1.Title])
+        platform_browser_1.Title,
+        ngx_device_detector_1.DeviceDetectorService])
 ], DownloadComponent);
 exports.DownloadComponent = DownloadComponent;
 //# sourceMappingURL=download.component.js.map

@@ -7,9 +7,10 @@ import { HttpClientModule }                                               from '
 
 import { FormsModule } from '@angular/forms';
 
-import { NgbModule }   from '@ng-bootstrap/ng-bootstrap';
-import { NgbModal }    from '@ng-bootstrap/ng-bootstrap';
-import { OrderModule } from 'ngx-order-pipe';
+import { NgbModule }            from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal }             from '@ng-bootstrap/ng-bootstrap';
+import { OrderModule }          from 'ngx-order-pipe';
+import { DeviceDetectorModule } from 'ngx-device-detector';
 
 import { CoreModule } from './core/index';
 
@@ -68,6 +69,7 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
         configServiceModule,
         DropdownsModule,
 
+        DeviceDetectorModule.forRoot(),
         NgbModule.forRoot(),
         RouterModule.forRoot([], {initialNavigation: false})
     ],

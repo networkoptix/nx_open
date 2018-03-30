@@ -1,8 +1,12 @@
-import { Component, OnInit, OnDestroy, AfterViewChecked, ViewChild, Inject } from '@angular/core';
-import { ActivatedRoute, Router }                          from '@angular/router';
-import { Title }                                           from "@angular/platform-browser";
-import { DOCUMENT }                                        from "@angular/common";
-import { NgbTabChangeEvent, NgbTabset }                    from "@ng-bootstrap/ng-bootstrap";
+import {
+    Component, OnInit, OnDestroy,
+    AfterViewChecked, ViewChild, Inject
+}                                       from '@angular/core';
+import { ActivatedRoute, Router }       from '@angular/router';
+import { Title }                        from "@angular/platform-browser";
+import { DOCUMENT }                     from "@angular/common";
+import { NgbTabChangeEvent, NgbTabset } from "@ng-bootstrap/ng-bootstrap";
+import { DeviceDetectorService }        from 'ngx-device-detector';
 
 
 @Component({
@@ -14,6 +18,8 @@ export class DownloadComponent implements OnInit, OnDestroy, AfterViewChecked {
     private sub: any;
     private platform: any;
     private activeOs: string;
+    private deviceInfo = null;
+
     installers: any;
     downloads: any;
     downloadsData: any;
@@ -22,14 +28,7 @@ export class DownloadComponent implements OnInit, OnDestroy, AfterViewChecked {
     @ViewChild('tabs')
     public tabs: NgbTabset;
 
-    constructor(@Inject('languageService') private language: any,
-                @Inject('cloudApiService') private cloudApi: any,
-                @Inject('configService') private configService: any,
-                @Inject(DOCUMENT) private document: any,
-                private route: ActivatedRoute,
-                private router:Router,
-                private titleService: Title) {
-
+    private setupDefaults () {
         this.downloadsData = {
             version: '',
             installers: [{platform: '', appType: ''}],
@@ -39,18 +38,26 @@ export class DownloadComponent implements OnInit, OnDestroy, AfterViewChecked {
         this.installers = [{}];
 
         this.platformMatch = {
-            'Open BSD': 'Linux',
-            'Sun OS': 'Linux',
-            'QNX': 'Linux',
-            'UNIX': 'Linux',
-            'BeOS': 'Linux',
-            'OS/2': 'Linux',
-
-            'Mac OS X': 'MacOS',
-            'Mac OS': 'MacOS'
+            'unix': 'Linux',
+            'linux': 'Linux',
+            'mac': 'MacOS',
+            'windows': 'Windows'
         };
+    }
+
+    constructor(@Inject('languageService') private language: any,
+                @Inject('cloudApiService') private cloudApi: any,
+                @Inject('configService') private configService: any,
+                @Inject(DOCUMENT) private document: any,
+                private route: ActivatedRoute,
+                private router: Router,
+                private titleService: Title,
+                private deviceService: DeviceDetectorService) {
+
+        this.setupDefaults();
 
         this.downloads = this.configService.config.downloads;
+        this.deviceInfo = this.deviceService.getDeviceInfo();
     }
 
     public beforeChange($event: NgbTabChangeEvent) {
@@ -65,8 +72,8 @@ export class DownloadComponent implements OnInit, OnDestroy, AfterViewChecked {
         this.sub = this.route.params.subscribe(params => {
             this.platform = params['platform'];
 
-            this.activeOs = this.platform || this.platformMatch[window.jscd.os] || window.jscd.os;
-
+            this.activeOs = this.platform || this.platformMatch[this.deviceInfo.os];
+            
             for (let mobile in this.downloads.mobile) {
                 if (this.downloads.mobile[mobile].os === this.activeOs) {
                     if (this.language.lang.downloads.mobile[this.downloads.mobile[mobile].name].link !== 'disabled') {

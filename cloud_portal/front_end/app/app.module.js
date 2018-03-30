@@ -16,6 +16,7 @@ const forms_1 = require("@angular/forms");
 const ng_bootstrap_1 = require("@ng-bootstrap/ng-bootstrap");
 const ng_bootstrap_2 = require("@ng-bootstrap/ng-bootstrap");
 const ngx_order_pipe_1 = require("ngx-order-pipe");
+const ngx_device_detector_1 = require("ngx-device-detector");
 const index_1 = require("./core/index");
 const ajs_upgraded_providers_1 = require("./ajs-upgraded-providers");
 const ajs_upgraded_providers_2 = require("./ajs-upgraded-providers");
@@ -71,6 +72,7 @@ AppModule = __decorate([
             ajs_upgraded_providers_7.ngToastModule,
             ajs_upgraded_providers_8.configServiceModule,
             dropdowns_module_1.DropdownsModule,
+            ngx_device_detector_1.DeviceDetectorModule.forRoot(),
             ng_bootstrap_1.NgbModule.forRoot(),
             router_1.RouterModule.forRoot([], { initialNavigation: false })
         ],
