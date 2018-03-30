@@ -2,7 +2,7 @@
     <h1>Download</h1>
 
     <div class="col-lg-9">
-        <ngb-tabset (tabChange)="beforeChange($event)">
+        <ngb-tabset (tabChange)="beforeChange($event)" #tabs>
             <ngb-tab *ngFor="let platform of downloads.groups"
                      [id]="platform.os || platform.name">
 

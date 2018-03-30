@@ -16,6 +16,7 @@ const core_1 = require("@angular/core");
 const router_1 = require("@angular/router");
 const platform_browser_1 = require("@angular/platform-browser");
 const common_1 = require("@angular/common");
+const ng_bootstrap_1 = require("@ng-bootstrap/ng-bootstrap");
 let DownloadComponent = class DownloadComponent {
     constructor(language, cloudApi, configService, document, route, router, titleService) {
         this.language = language;
@@ -25,6 +26,12 @@ let DownloadComponent = class DownloadComponent {
         this.route = route;
         this.router = router;
         this.titleService = titleService;
+        this.downloadsData = {
+            version: '',
+            installers: [{ platform: '', appType: '' }],
+            releaseUrl: ''
+        };
+        this.installers = [{}];
         this.platformMatch = {
             'Open BSD': 'Linux',
             'Sun OS': 'Linux',
@@ -35,12 +42,7 @@ let DownloadComponent = class DownloadComponent {
             'Mac OS X': 'MacOS',
             'Mac OS': 'MacOS'
         };
-        this.downloadsData = {
-            version: '',
-            installers: [{ platform: '', appType: '' }],
-            releaseUrl: ''
-        };
-        this.installers = [{}];
+        this.downloads = this.configService.config.downloads;
     }
     beforeChange($event) {
         const platform = $event.nextId;
@@ -50,11 +52,29 @@ let DownloadComponent = class DownloadComponent {
     ;
     ngOnInit() {
         this.sub = this.route.params.subscribe(params => {
-            console.log(params['platform']);
             this.platform = params['platform'];
+            this.activeOs = this.platform || this.platformMatch[window.jscd.os] || window.jscd.os;
+            for (let mobile in this.downloads.mobile) {
+                if (this.downloads.mobile[mobile].os === this.activeOs) {
+                    if (this.language.lang.downloads.mobile[this.downloads.mobile[mobile].name].link !== 'disabled') {
+                        this.document.location.href = this.language.lang.downloads.mobile[this.downloads.mobile[mobile].name].link;
+                        return;
+                    }
+                    break;
+                }
+            }
+            let foundPlatform = false;
+            this.downloads.groups.forEach(platform => {
+                foundPlatform = ((platform.os || platform.name) === this.activeOs) || foundPlatform;
+            });
+            if (this.platform && !foundPlatform) {
+                this.router.navigate(['404']);
+                return;
+            }
+            if (!foundPlatform) {
+                this.downloads.groups[0].active = true;
+            }
         });
-        this.downloads = this.configService.config.downloads;
-        console.log('BEFORE', this.downloads.groups);
         this.cloudApi.getDownloads().then(data => {
             this.downloadsData = data.data;
             this.downloads.groups.forEach(platform => {
@@ -70,38 +90,24 @@ let DownloadComponent = class DownloadComponent {
                     }
                     return !!targetInstaller;
                 })[0];
-                console.log('AFTER', this.downloads.groups);
             });
-            console.log(this.downloadsData);
         });
-        // console.log(this.downloads.groups);
-        let foundPlatform = false, activeOs = this.platform; // || this.platformMatch[window.jscd.os] || window.jscd.os;
-        this.downloads.groups.forEach(platform => {
-            // TODO: activate the platform tab
-            //platform.active = (platform.os || platform.name) === activeOs;
-            foundPlatform = platform.active || foundPlatform;
-        });
-        for (let mobile in this.downloads.mobile) {
-            if (this.downloads.mobile[mobile].os === activeOs) {
-                if (this.language.lang.downloads.mobile[this.downloads.mobile[mobile].name].link !== 'disabled') {
-                    this.document.location.href = this.language.lang.downloads.mobile[this.downloads.mobile[mobile].name].link;
-                    return;
-                }
-                break;
-            }
-        }
-        if (this.platform && !foundPlatform) {
-            this.router.navigate(['404']);
-            return;
-        }
-        if (!foundPlatform) {
-            this.downloads.groups[0].active = true;
-        }
     }
     ngOnDestroy() {
         this.sub.unsubscribe();
     }
+    ngAfterViewChecked() {
+        setTimeout(() => {
+            if (this.tabs) {
+                this.tabs.select(this.activeOs);
+            }
+        });
+    }
 };
+__decorate([
+    core_1.ViewChild('tabs'),
+    __metadata("design:type", ng_bootstrap_1.NgbTabset)
+], DownloadComponent.prototype, "tabs", void 0);
 DownloadComponent = __decorate([
     core_1.Component({
         selector: 'download-component',

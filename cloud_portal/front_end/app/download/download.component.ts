@@ -1,8 +1,8 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef, Inject } from '@angular/core';
-import { ActivatedRoute, Router }                                  from '@angular/router';
-import { Title }                                                   from "@angular/platform-browser";
-import { DOCUMENT }                                                from "@angular/common";
-import { NgbTabChangeEvent }                                       from "@ng-bootstrap/ng-bootstrap";
+import { Component, OnInit, OnDestroy, AfterViewChecked, ViewChild, Inject } from '@angular/core';
+import { ActivatedRoute, Router }                          from '@angular/router';
+import { Title }                                           from "@angular/platform-browser";
+import { DOCUMENT }                                        from "@angular/common";
+import { NgbTabChangeEvent, NgbTabset }                    from "@ng-bootstrap/ng-bootstrap";
 
 
 @Component({
@@ -10,24 +10,17 @@ import { NgbTabChangeEvent }                                       from "@ng-boo
     templateUrl: './download/download.component.html'
 })
 
-export class DownloadComponent implements OnInit, OnDestroy {
+export class DownloadComponent implements OnInit, OnDestroy, AfterViewChecked {
     private sub: any;
     private platform: any;
-
+    private activeOs: string;
     installers: any;
     downloads: any;
     downloadsData: any;
-    platformMatch = {
-        'Open BSD': 'Linux',
-        'Sun OS': 'Linux',
-        'QNX': 'Linux',
-        'UNIX': 'Linux',
-        'BeOS': 'Linux',
-        'OS/2': 'Linux',
+    platformMatch: {};
 
-        'Mac OS X': 'MacOS',
-        'Mac OS': 'MacOS'
-    };
+    @ViewChild('tabs')
+    public tabs: NgbTabset;
 
     constructor(@Inject('languageService') private language: any,
                 @Inject('cloudApiService') private cloudApi: any,
@@ -44,6 +37,20 @@ export class DownloadComponent implements OnInit, OnDestroy {
         };
 
         this.installers = [{}];
+
+        this.platformMatch = {
+            'Open BSD': 'Linux',
+            'Sun OS': 'Linux',
+            'QNX': 'Linux',
+            'UNIX': 'Linux',
+            'BeOS': 'Linux',
+            'OS/2': 'Linux',
+
+            'Mac OS X': 'MacOS',
+            'Mac OS': 'MacOS'
+        };
+
+        this.downloads = this.configService.config.downloads;
     }
 
     public beforeChange($event: NgbTabChangeEvent) {
@@ -56,13 +63,35 @@ export class DownloadComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.sub = this.route.params.subscribe(params => {
-            console.log(params['platform']);
             this.platform = params['platform'];
+
+            this.activeOs = this.platform || this.platformMatch[window.jscd.os] || window.jscd.os;
+
+            for (let mobile in this.downloads.mobile) {
+                if (this.downloads.mobile[mobile].os === this.activeOs) {
+                    if (this.language.lang.downloads.mobile[this.downloads.mobile[mobile].name].link !== 'disabled') {
+                        this.document.location.href = this.language.lang.downloads.mobile[this.downloads.mobile[mobile].name].link;
+                        return;
+                    }
+                    break;
+                }
+            }
+
+            let foundPlatform = false;
+            this.downloads.groups.forEach(platform => {
+                foundPlatform = ((platform.os || platform.name) === this.activeOs) || foundPlatform;
+            });
+
+            if (this.platform && !foundPlatform) {
+                this.router.navigate(['404']);
+
+                return;
+            }
+
+            if (!foundPlatform) {
+                this.downloads.groups[0].active = true;
+            }
         });
-
-        this.downloads = this.configService.config.downloads;
-
-        console.log('BEFORE', this.downloads.groups);
 
         this.cloudApi.getDownloads().then(data => {
             this.downloadsData = data.data;
@@ -83,48 +112,20 @@ export class DownloadComponent implements OnInit, OnDestroy {
                     }
                     return !!targetInstaller;
                 })[0];
-                console.log('AFTER', this.downloads.groups);
             });
-
-            console.log(this.downloadsData);
-
         });
-
-        // console.log(this.downloads.groups);
-
-        let foundPlatform = false,
-            activeOs = this.platform; // || this.platformMatch[window.jscd.os] || window.jscd.os;
-
-        this.downloads.groups.forEach(platform => {
-            // TODO: activate the platform tab
-            //platform.active = (platform.os || platform.name) === activeOs;
-            foundPlatform = platform.active || foundPlatform;
-        });
-
-        for (let mobile in this.downloads.mobile) {
-            if (this.downloads.mobile[mobile].os === activeOs) {
-                if (this.language.lang.downloads.mobile[this.downloads.mobile[mobile].name].link !== 'disabled') {
-                    this.document.location.href = this.language.lang.downloads.mobile[this.downloads.mobile[mobile].name].link;
-                    return;
-                }
-                break;
-            }
-        }
-
-        if (this.platform && !foundPlatform) {
-            this.router.navigate(['404']);
-
-            return;
-        }
-        if (!foundPlatform) {
-            this.downloads.groups[0].active = true;
-        }
-
-
     }
 
     ngOnDestroy() {
         this.sub.unsubscribe();
+    }
+
+    ngAfterViewChecked(): void {
+        setTimeout(() => {
+            if (this.tabs) {
+                this.tabs.select(this.activeOs);
+            }
+        });
     }
 }
 
