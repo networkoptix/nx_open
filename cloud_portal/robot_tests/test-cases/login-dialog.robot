@@ -66,14 +66,9 @@ shows red outline if field is wrong/empty after blur
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
     Wait Until Elements Are Visible    ${EMAIL INPUT}    ${PASSWORD INPUT}
-    Click Element    ${EMAIL INPUT}
-    Click Element    ${PASSWORD INPUT}
-    ${class}    Get Element Attribute    ${EMAIL INPUT}/..    class
-    Should Contain    ${class}    has-error
     Wait Until Element Is Visible    ${LOG IN BUTTON}
     Click Element    ${LOG IN BUTTON}
-    ${class}    Get Element Attribute    ${PASSWORD INPUT}/..    class
-    Should Contain    ${class}    has-error
+    Wait Until Elements Are Visible    ${EMAIL INPUT}/parent::div[contains(@class, 'has-error')]    ${PASSWORD INPUT}/parent::div[contains(@class, 'has-error')]
 
 allows log in with 'Remember Me checkmark' switched off
     Open Browser and go to URL    ${url}
