@@ -32,23 +32,6 @@ ShaderEffect
     property matrix4x4 viewRotationMatrix
     property vector2d viewShift
 
-    /* Feedback parameters (to be queried from outside): */
-
-    readonly property real fov: // field of view in degrees
-    {
-        switch (viewProjectionType)
-        {
-            case Utils3D.SphereProjectionTypes.Equidistant:
-                return 180.0 / viewScale
-
-            case Utils3D.SphereProjectionTypes.Equisolid:
-                return 4.0 * Utils3D.degrees(Math.asin(1.0 / (viewScale * Math.sqrt(2.0))))
-
-            default: // Utils3D.SphereProjectionTypes.Stereographic
-                return 4.0 * Utils3D.degrees(Math.atan(1.0 / viewScale))
-        }
-    }
-
     /* Shader uniforms: */
 
     ShaderEffectSource
@@ -150,14 +133,6 @@ ShaderEffect
 
         void main()
         {
-            // Draw debug cross.
-            // if (projectionCoords.x > -0.001 && projectionCoords.x < 0.001
-            //     || projectionCoords.y > -0.001 && projectionCoords.y < 0.001)
-            // {
-            //     gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
-            //     return;
-            // }
-
             vec3 pointOnSphere = unproject(projectionCoords);
             vec3 rotatedPointOnSphere = (viewRotationMatrix * vec4(pointOnSphere, 1.0)).xyz;
 
@@ -241,6 +216,21 @@ ShaderEffect
         }
     }
 
+    function fov(scale) //< Field of view in degrees.
+    {
+        switch (viewProjectionType)
+        {
+            case Utils3D.SphereProjectionTypes.Equidistant:
+                return 180.0 / scale
+
+            case Utils3D.SphereProjectionTypes.Equisolid:
+                return 4.0 * Utils3D.degrees(Math.asin(1.0 / (scale * Math.sqrt(2.0))))
+
+            default: // Utils3D.SphereProjectionTypes.Stereographic
+                return 4.0 * Utils3D.degrees(Math.atan(1.0 / scale))
+        }
+    }
+
     function pixelToProjection(x, y, scale)
     {
         return Qt.vector2d(x / width, y / height).minus(viewCenter)
@@ -273,10 +263,5 @@ ShaderEffect
                 return Qt.vector3d(xy.x, xy.y, r2 - 1.0).times(1.0 / (r2 + 1.0))
             }
         }
-    }
-
-    function unprojectAndTransform(projectionCoords)
-    {
-        return viewRotationMatrix.times(unproject(projectionCoords))
     }
 }
