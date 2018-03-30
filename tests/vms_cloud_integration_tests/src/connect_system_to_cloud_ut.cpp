@@ -10,7 +10,7 @@
 
 #include <api/global_settings.h>
 #include <core/resource/user_resource.h>
-#include <network/auth/time_based_nonce_provider.h>
+#include <nx/vms/auth/time_based_nonce_provider.h>
 #include <test_support/mediaserver_launcher.h>
 
 #include "mediaserver_cloud_integration_test_setup.h"

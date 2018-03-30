@@ -91,12 +91,12 @@ Qn::AuthResult GenericUserDataProvider::authorize(
     {
         if (auto user = res.dynamicCast<QnUserResource>())
         {
-            if (user->checkLocalUserPassword(authorizationHeader.basic->password))
+            if (user->checkLocalUserPassword(QString::fromUtf8(authorizationHeader.basic->password)))
                 return Qn::Auth_OK;
         }
         else if (auto server = res.dynamicCast<QnMediaServerResource>())
         {
-            if (server->getAuthKey() == authorizationHeader.basic->password)
+            if (server->getAuthKey() == QString::fromUtf8(authorizationHeader.basic->password))
                 return Qn::Auth_OK;
         }
         return Qn::Auth_WrongPassword;

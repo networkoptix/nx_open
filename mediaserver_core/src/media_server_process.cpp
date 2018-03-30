@@ -81,7 +81,7 @@
 
 #include <motion/motion_helper.h>
 
-#include <network/auth/time_based_nonce_provider.h>
+#include <nx/vms/auth/time_based_nonce_provider.h>
 #include <network/authenticate_helper.h>
 #include <network/connection_validator.h>
 #include <network/default_tcp_connection_processor.h>

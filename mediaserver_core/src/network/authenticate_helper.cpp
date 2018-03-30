@@ -22,8 +22,8 @@
 #include <nx_ec/dummy_handler.h>
 #include <ldap/ldap_manager.h>
 #include <nx/network/rtsp/rtsp_types.h>
-#include "network/auth/time_based_nonce_provider.h"
-#include "network/auth/generic_user_data_provider.h"
+#include <nx/vms/auth/time_based_nonce_provider.h>
+#include <nx/vms/auth/generic_user_data_provider.h>
 
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_user_manager.h>

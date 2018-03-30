@@ -54,6 +54,8 @@ public:
         const std::string& authKey,
         const std::string& ownerAccountEmail);
 
+    bool detachFromCloud();
+
     QnRestResult::Error mergeTo(const PeerWrapper& remotePeer);
 
     ec2::ErrorCode getTransactionLog(ec2::ApiTransactionDataList* result) const;

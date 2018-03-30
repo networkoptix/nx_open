@@ -10,6 +10,9 @@
 #include <nx/network/abstract_socket.h>
 #include <nx/network/http/http_types.h>
 
+#include <nx/vms/auth/abstract_nonce_provider.h>
+#include <nx/vms/auth/abstract_user_data_provider.h>
+
 #include <api/common_message_processor.h>
 #include <network/http_connection_listener.h>
 #include <nx_ec/ec_api.h>
@@ -59,6 +62,9 @@ public:
 
     bool needAuth(const nx::network::http::Request& request) const;
     void disableAuthForPath(const QString& path);
+    void setAuthenticator(
+        nx::vms::auth::AbstractUserDataProvider* userDataProvider,
+        nx::vms::auth::AbstractNonceProvider* nonceProvider);
 
 protected:
     virtual QnTCPConnectionProcessor* createRequestProcessor(
@@ -66,6 +72,8 @@ protected:
 
 private:
     QSet<QString> m_disableAuthPrefixes;
+    nx::vms::auth::AbstractUserDataProvider* m_userDataProvider = nullptr;
+    nx::vms::auth::AbstractNonceProvider* m_nonceProvider = nullptr;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -85,7 +93,7 @@ protected:
     virtual QnResourceFactory* getResourceFactory() const override;
 
     virtual bool canRemoveResource(const QnUuid& id) override;
-    
+
     virtual void removeResourceIgnored(const QnUuid& resourceId) override;
 
     virtual void updateResource(
