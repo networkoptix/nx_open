@@ -3857,7 +3857,7 @@ QnAudioTransmitterPtr QnPlOnvifResource::initializeTwoWayAudio()
     if (result != SOAP_OK && result != SOAP_MUSTUNDERSTAND)
     {
         NX_VERBOSE(this, lm("Filed to fetch audio outputs from %1").arg(soapWrapper.endpoint()));
-        return false;
+        return QnAudioTransmitterPtr();
     }
 
     if (!response.AudioOutputs.empty())
