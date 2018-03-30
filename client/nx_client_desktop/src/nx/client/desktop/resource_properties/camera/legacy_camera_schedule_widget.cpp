@@ -44,6 +44,7 @@
 
 #include "export_schedule_resource_selection_dialog_delegate.h"
 #include <utils/camera/camera_bitrate_calculator.h>
+#include <nx/utils/algorithm/same.h>
 
 using boost::algorithm::all_of;
 using boost::algorithm::any_of;
@@ -79,8 +80,6 @@ void setNormalizedValue(InputWidget* widget, qreal fraction)
 
 static const int kRecordingTypeLabelFontSize = 12;
 static const int kRecordingTypeLabelFontWeight = QFont::DemiBold;
-static const int kDefaultBeforeThresholdSec = 5;
-static const int kDefaultAfterThresholdSec = 5;
 
 } // namespace
 
@@ -474,6 +473,22 @@ void LegacyCameraScheduleWidget::loadDataToUi()
             ui->qualityComboBox->findData(currentQualityApproximation()));
     }
 
+    int recordBeforeMotionSec = ec2::kDefaultRecordBeforeMotionSec;
+    if (!utils::algorithm::same(m_cameras.cbegin(), m_cameras.cend(),
+        [](const auto& camera) { return camera->recordBeforeMotionSec(); }, &recordBeforeMotionSec))
+    {
+        recordBeforeMotionSec = ec2::kDefaultRecordBeforeMotionSec;
+    }
+    ui->recordBeforeSpinBox->setValue(recordBeforeMotionSec);
+
+    int recordAfterMotionSec = ec2::kDefaultRecordAfterMotionSec;
+    if (!utils::algorithm::same(m_cameras.cbegin(), m_cameras.cend(),
+        [](const auto& camera) { return camera->recordBeforeMotionSec(); }, &recordAfterMotionSec))
+    {
+        recordAfterMotionSec = ec2::kDefaultRecordAfterMotionSec;
+    }
+    ui->recordAfterSpinBox->setValue(recordAfterMotionSec);
+
     if (m_cameras.isEmpty())
     {
         setScheduleTasks(QnScheduleTaskList());
@@ -546,13 +561,7 @@ void LegacyCameraScheduleWidget::applyChanges()
 
     ui->archiveLengthWidget->submitToResources(m_cameras);
 
-    QnScheduleTaskList basicScheduleTasks;
-    if (scheduleChanged)
-    {
-        for (const auto& scheduleTaskData : this->scheduleTasks())
-            basicScheduleTasks.append(scheduleTaskData);
-    }
-    updateRecordThresholds(basicScheduleTasks);
+    QnScheduleTaskList scheduleTasks = this->scheduleTasks();
 
     bool enableRecording = isScheduleEnabled();
     bool canChangeRecording = !enableRecording || canEnableRecording();
@@ -560,20 +569,14 @@ void LegacyCameraScheduleWidget::applyChanges()
     for (const auto& camera: m_cameras)
     {
         if (canChangeRecording)
-        {
             camera->setLicenseUsed(enableRecording);
-        }
 
-        if (camera->isDtsBased())
-            continue;
+        if (scheduleChanged && !camera->isDtsBased())
+            camera->setScheduleTasks(scheduleTasks);
 
-        QnScheduleTaskList scheduleTasks = basicScheduleTasks;
-        if (!scheduleChanged)
-        {
-            scheduleTasks = camera->getScheduleTasks();
-            updateRecordThresholds(scheduleTasks);
-        }
-        camera->setScheduleTasks(scheduleTasks);
+        // FIXME: #GDM This way we are always applying changes!
+        camera->setRecordBeforeMotionSec(ui->recordBeforeSpinBox->value());
+        camera->setRecordAfterMotionSec(ui->recordBeforeSpinBox->value());
     }
 
     if (!canChangeRecording)
@@ -817,15 +820,9 @@ void LegacyCameraScheduleWidget::setScheduleTasks(const QnScheduleTaskList& valu
             data.dayOfWeek = nDay;
             data.startTime = 0;
             data.endTime = 86400;
-            data.beforeThresholdSec = kDefaultBeforeThresholdSec;
-            data.afterThresholdSec = kDefaultAfterThresholdSec;
             tasks << data;
         }
     }
-
-    auto task = tasks.first();
-    ui->recordBeforeSpinBox->setValue(task.beforeThresholdSec);
-    ui->recordAfterSpinBox->setValue(task.afterThresholdSec);
 
     for (const auto &task : tasks)
     {
@@ -870,17 +867,6 @@ bool LegacyCameraScheduleWidget::canEnableRecording() const
 {
     QnCamLicenseUsageHelper licenseHelper(commonModule());
     return licenseHelper.canEnableRecording(m_cameras);
-}
-
-void LegacyCameraScheduleWidget::updateRecordThresholds(QnScheduleTaskList& tasks)
-{
-    int before = ui->recordBeforeSpinBox->value();
-    int after = ui->recordAfterSpinBox->value();
-    for (auto& task: tasks)
-    {
-        task.beforeThresholdSec = before;
-        task.afterThresholdSec = after;
-    }
 }
 
 void LegacyCameraScheduleWidget::updateScheduleTypeControls()
@@ -1278,8 +1264,9 @@ void LegacyCameraScheduleWidget::at_exportScheduleButton_clicked()
                 }
                 tasks.append(task);
             }
-            updateRecordThresholds(tasks);
 
+            camera->setRecordBeforeMotionSec(sourceCamera->recordBeforeMotionSec());
+            camera->setRecordAfterMotionSec(sourceCamera->recordAfterMotionSec());
             camera->setScheduleTasks(tasks);
         };
 

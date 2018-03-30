@@ -95,11 +95,21 @@ protected:
     virtual bool saveData(const QnConstAbstractMediaDataPtr& md) override;
     virtual void writeData(const QnConstAbstractMediaDataPtr& md, int streamIndex) override;
 private:
-    void updateRecordingType(const QnScheduleTask& scheduleTask);
+    struct ScheduleTaskWithThresholds: QnScheduleTask
+    {
+        ScheduleTaskWithThresholds() = default;
+        explicit ScheduleTaskWithThresholds(const QnScheduleTask& base):
+            QnScheduleTask(base) {}
+
+        int recordBeforeSec = 0;
+        int recordAfterSec = 0;
+    };
+
+    void updateRecordingType(const ScheduleTaskWithThresholds& scheduleTask);
     void updateStreamParams();
     bool isMotionRec(Qn::RecordingType recType) const;
     void updateMotionStateInternal(bool value, qint64 timestamp, const QnConstMetaDataV1Ptr& metaData);
-    void setSpecialRecordingMode(QnScheduleTask& task);
+    void setSpecialRecordingMode(const ScheduleTaskWithThresholds& task);
     int getFpsForValue(int fps);
     void writeRecentlyMotion(qint64 writeAfterTime);
     void keepRecentlyMotion(const QnConstAbstractMediaDataPtr& md);
@@ -128,12 +138,14 @@ private slots:
 
     void at_camera_propertyChanged(const QnResourcePtr &, const QString &);
 private:
+
+
     const qint64 m_maxRecordQueueSizeBytes;
     const int m_maxRecordQueueSizeElements;
     mutable QnMutex m_scheduleMutex;
     QnScheduleTaskList m_schedule;
     QnTimePeriod m_lastSchedulePeriod;
-    QnScheduleTask m_currentScheduleTask;
+    ScheduleTaskWithThresholds m_currentScheduleTask;
     //qint64 m_skipDataToTime;
     qint64 m_lastMotionTimeUsec;
     //bool m_lastMotionContainData;
@@ -143,8 +155,8 @@ private:
     QnAbstractMediaStreamDataProvider* m_mediaProvider;
     QnDualStreamingHelperPtr m_dualStreamingHelper;
     QnMediaServerResourcePtr m_mediaServer;
-    QnScheduleTask m_panicSchedileRecord;   // panic mode. Highest recording priority
-    QnScheduleTask m_forcedScheduleRecord;  // special recording mode (recording action). Priority higher than regular schedule
+    ScheduleTaskWithThresholds m_panicScheduleRecordTask;   // panic mode. Highest recording priority
+    ScheduleTaskWithThresholds m_forcedScheduleRecordTask;  // special recording mode (recording action). Priority higher than regular schedule
     QElapsedTimer m_forcedScheduleRecordTimer;
     int m_forcedScheduleRecordDurationMs;
     bool m_usedPanicMode;

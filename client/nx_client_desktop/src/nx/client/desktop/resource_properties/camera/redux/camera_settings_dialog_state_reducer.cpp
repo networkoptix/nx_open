@@ -243,24 +243,14 @@ QnScheduleTaskList calculateRecordingSchedule(const QnVirtualCameraResourcePtr& 
 
 int calculateRecordingThresholdBefore(const QnVirtualCameraResourcePtr& camera)
 {
-    const auto schedule = camera->getScheduleTasks();
-    if (!schedule.empty())
-    {
-        const auto& firstTask = schedule.first();
-        return firstTask.beforeThresholdSec;
-    }
-    return State::RecordingSettings::Thresholds::kDefaultBeforeSec;
+    const auto value = camera->recordBeforeMotionSec();
+    return value > 0 ? value : ec2::kDefaultRecordBeforeMotionSec;
 }
 
 int calculateRecordingThresholdAfter(const QnVirtualCameraResourcePtr& camera)
 {
-    const auto schedule = camera->getScheduleTasks();
-    if (!schedule.empty())
-    {
-        const auto& firstTask = schedule.first();
-        return firstTask.afterThresholdSec;
-    }
-    return State::RecordingSettings::Thresholds::kDefaultAfterSec;
+    const auto value = camera->recordAfterMotionSec();
+    return value > 0 ? value : ec2::kDefaultRecordAfterMotionSec;
 }
 
 } // namespace
@@ -552,12 +542,6 @@ State CameraSettingsDialogStateReducer::setRecordingEnabled(State state, bool va
 
     if (value && !state.recording.schedule.hasValue())
     {
-        const int beforeThreshold = state.recording.thresholds.beforeSec.valueOr(
-            State::RecordingSettings::Thresholds::kDefaultBeforeSec);
-
-        const int afterThreshold = state.recording.thresholds.afterSec.valueOr(
-            State::RecordingSettings::Thresholds::kDefaultAfterSec);
-
         ScheduleTasks tasks;
         for (int dayOfWeek = 1; dayOfWeek <= 7; ++dayOfWeek)
         {
@@ -565,8 +549,6 @@ State CameraSettingsDialogStateReducer::setRecordingEnabled(State state, bool va
             data.dayOfWeek = dayOfWeek;
             data.startTime = 0;
             data.endTime = 86400;
-            data.beforeThresholdSec = beforeThreshold;
-            data.afterThresholdSec = afterThreshold;
             tasks << data;
         }
         state.recording.schedule.setUser(tasks);

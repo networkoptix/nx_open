@@ -979,6 +979,34 @@ int QnSecurityCamResource::minDays() const
     return (*userAttributesLock)->minDays;
 }
 
+int QnSecurityCamResource::recordBeforeMotionSec() const
+{
+    NX_ASSERT(!getId().isNull());
+    QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );
+    return (*userAttributesLock)->recordBeforeMotionSec;
+}
+
+void QnSecurityCamResource::setRecordBeforeMotionSec(int value)
+{
+    NX_ASSERT(!getId().isNull());
+    QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );
+    (*userAttributesLock)->recordBeforeMotionSec = value;
+}
+
+int QnSecurityCamResource::recordAfterMotionSec() const
+{
+    NX_ASSERT(!getId().isNull());
+    QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );
+    return (*userAttributesLock)->recordAfterMotionSec;
+}
+
+void QnSecurityCamResource::setRecordAfterMotionSec(int value)
+{
+    NX_ASSERT(!getId().isNull());
+    QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );
+    (*userAttributesLock)->recordAfterMotionSec = value;
+}
+
 void QnSecurityCamResource::setLicenseUsed(bool value)
 {
     NX_ASSERT(!getId().isNull());

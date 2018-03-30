@@ -120,9 +120,6 @@ struct CameraSettingsDialogState
 
         struct Thresholds
         {
-            static constexpr int kDefaultBeforeSec = 5;
-            static constexpr int kDefaultAfterSec = 5;
-
             UserEditableMultiple<int> beforeSec;
             UserEditableMultiple<int> afterSec;
         };

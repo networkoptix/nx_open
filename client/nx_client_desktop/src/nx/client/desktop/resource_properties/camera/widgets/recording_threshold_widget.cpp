@@ -47,14 +47,12 @@ void RecordingThresholdWidget::setStore(CameraSettingsDialogStore* store)
 
 void RecordingThresholdWidget::loadState(const CameraSettingsDialogState& state)
 {
-    using Thresholds = CameraSettingsDialogState::RecordingSettings::Thresholds;
-
     ui->recordBeforeSpinBox->setValue(state.recording.thresholds.beforeSec.valueOr(
-        Thresholds::kDefaultBeforeSec));
+        ec2::kDefaultRecordBeforeMotionSec));
     setReadOnly(ui->recordBeforeSpinBox, state.readOnly);
 
     ui->recordAfterSpinBox->setValue(state.recording.thresholds.afterSec.valueOr(
-        Thresholds::kDefaultAfterSec));
+        ec2::kDefaultRecordAfterMotionSec));
     setReadOnly(ui->recordAfterSpinBox, state.readOnly);
 }
 
