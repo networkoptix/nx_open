@@ -10,6 +10,7 @@
 #include "utils/common/util.h"
 #include <nx/streaming/av_codec_media_context.h>
 #include <nx/streaming/config.h>
+#include <nx/utils/scope_guard.h>
 
 namespace {
 const static int MAX_VIDEO_FRAME = 1024 * 1024 * 3;
@@ -113,6 +114,8 @@ bool QnFfmpegVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
         m_encoderCtx->thread_count = qMin(2, QThread::idealThreadCount());
 
     AVDictionary* options = nullptr;
+    makeScopeGuard([&]() { av_dict_free(&options); });
+
     for (auto it = m_params.begin(); it != m_params.end(); ++it)
     {
         if( it.key() == QnCodecParams::global_quality )
