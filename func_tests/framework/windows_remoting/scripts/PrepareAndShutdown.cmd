@@ -12,5 +12,9 @@ rem powershell -Command "Get-AppxPackage | Remove-AppxPackage"
 rem defrag C: /X /H /U /V
 rem sdelete /accepteula -z C:
 
+@echo Copy script to run on first logon.
+copy /V /Y %~dp0\FirstLogon.cmd C:\Users\Public\Desktop\FirstLogon.cmd
+type C:\Users\Public\Desktop\FirstLogon.cmd
+
 @echo SysPrep will shutdown machine.
 C:\Windows\System32\SysPrep\SysPrep.exe /generalize /oobe /shutdown /unattend:%~dp0\Autounattend.xml
