@@ -22,8 +22,8 @@
 #include <nx_ec/dummy_handler.h>
 #include <ldap/ldap_manager.h>
 #include <nx/network/rtsp/rtsp_types.h>
-#include "network/auth/time_based_nonce_provider.h"
-#include "network/auth/generic_user_data_provider.h"
+#include <nx/vms/auth/time_based_nonce_provider.h>
+#include <nx/vms/auth/generic_user_data_provider.h>
 
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_user_manager.h>
@@ -676,23 +676,6 @@ void QnAuthHelper::updateUserHashes(const QnUserResourcePtr& userResource, const
         QString(),
         ec2::DummyHandler::instance(),
         &ec2::DummyHandler::onRequestDone);
-}
-
-bool QnAuthHelper::checkUserPassword(const QnUserResourcePtr& user, const QString& password)
-{
-    if (!user->isCloud())
-        return user->checkLocalUserPassword(password);
-
-    // 3. Cloud users
-    QByteArray auth = createHttpQueryAuthParam(
-        user->getName(),
-        password,
-        user->getRealm(),
-        kCookieAuthMethod,
-        qnAuthHelper->generateNonce());
-
-    nx::network::http::Response response;
-    return authenticateByUrl(auth, kCookieAuthMethod, response) == Qn::Auth_OK;
 }
 
 QnLdapManager* QnAuthHelper::ldapManager() const

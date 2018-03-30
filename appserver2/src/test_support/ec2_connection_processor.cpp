@@ -8,14 +8,19 @@
 #include <nx/network/app_info.h>
 #include "appserver2_process.h"
 #include <common/common_module.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 
 Ec2ConnectionProcessor::Ec2ConnectionProcessor(
     QSharedPointer<nx::network::AbstractStreamSocket> socket,
+    nx::vms::auth::AbstractUserDataProvider* userDataProvider,
+    nx::vms::auth::AbstractNonceProvider* nonceProvider,
     QnHttpConnectionListener* owner)
 :
-    QnTCPConnectionProcessor(socket, owner)
+    QnTCPConnectionProcessor(socket, owner),
+    m_userDataProvider(userDataProvider),
+    m_nonceProvider(nonceProvider)
 {
     setObjectName(QLatin1String("Ec2ConnectionProcessor"));
 }
@@ -28,13 +33,12 @@ Ec2ConnectionProcessor::~Ec2ConnectionProcessor()
 void Ec2ConnectionProcessor::addAuthHeader(nx::network::http::Response& response)
 {
     const QString auth =
-        lit("Digest realm=\"%1\", nonce=\"%2\", algorithm=MD5")
-        .arg(nx::network::AppInfo::realm())
-        .arg(QDateTime::currentDateTime().toMSecsSinceEpoch());
+        lm("Digest realm=\"%1\", nonce=\"%2\", algorithm=MD5")
+            .args(nx::network::AppInfo::realm(), m_nonceProvider->generateNonce()).toQString();
 
-    nx::network::http::insertOrReplaceHeader(&response.headers, nx::network::http::HttpHeader(
-        "WWW-Authenticate",
-        auth.toLatin1()));
+    nx::network::http::insertOrReplaceHeader(
+        &response.headers,
+        nx::network::http::HttpHeader("WWW-Authenticate", auth.toLatin1()));
 }
 
 bool Ec2ConnectionProcessor::authenticate()
@@ -49,32 +53,29 @@ bool Ec2ConnectionProcessor::authenticate()
         nx::network::http::getHeaderValue(d->request.headers, "Authorization");
     if (authorization.isEmpty())
     {
-        addAuthHeader(
-            d->response);
+        addAuthHeader(d->response);
         return false;
     }
 
-    const auto findUserByName =
-        [this](const QString& userName)
-        {
-            const auto userNameLower = userName.toLower();
-            for (const auto& user: commonModule()->resourcePool()->getResources<QnUserResource>())
-            {
-                if (user->getName().toLower() == userNameLower)
-                    return user;
-            }
-            return QnUserResourcePtr();
-        };
-
     nx::network::http::header::Authorization authorizationHeader;
-    if (authorizationHeader.parse(authorization))
+    if (!authorizationHeader.parse(authorization))
     {
-        const QByteArray userName = authorizationHeader.userid();
-        if (auto userRes = findUserByName(QString::fromUtf8(userName)))
-            d->accessRights = Qn::UserAccessData(userRes->getId());
+        addAuthHeader(d->response);
+        return false;
     }
 
-    return true;
+    const auto authResult = m_userDataProvider->authorize(
+        d->request.requestLine.method,
+        authorizationHeader,
+        &d->response.headers);
+    if (auto authenticatedResource = std::get<1>(authResult))
+    {
+        if (auto userResource = authenticatedResource.dynamicCast<QnUserResource>())
+            d->accessRights = Qn::UserAccessData(userResource->getId());
+        else if (auto serverResource = authenticatedResource.dynamicCast<QnMediaServerResource>())
+            d->accessRights = Qn::kSystemAccess;
+    }
+    return std::get<0>(authResult) == Qn::AuthResult::Auth_OK;
 }
 
 void Ec2ConnectionProcessor::run()

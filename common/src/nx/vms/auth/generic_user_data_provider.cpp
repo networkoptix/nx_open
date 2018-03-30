@@ -5,7 +5,6 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <network/authenticate_helper.h>
 
 #include <utils/common/app_info.h>
 #include <common/common_module.h>
@@ -92,12 +91,12 @@ Qn::AuthResult GenericUserDataProvider::authorize(
     {
         if (auto user = res.dynamicCast<QnUserResource>())
         {
-            if (qnAuthHelper->checkUserPassword(user, authorizationHeader.basic->password))
+            if (user->checkLocalUserPassword(QString::fromUtf8(authorizationHeader.basic->password)))
                 return Qn::Auth_OK;
         }
         else if (auto server = res.dynamicCast<QnMediaServerResource>())
         {
-            if (server->getAuthKey() == authorizationHeader.basic->password)
+            if (server->getAuthKey() == QString::fromUtf8(authorizationHeader.basic->password))
                 return Qn::Auth_OK;
         }
         return Qn::Auth_WrongPassword;

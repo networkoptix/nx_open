@@ -3,6 +3,7 @@
 #include <QtCore/QObject>
 
 #include <nx/utils/safe_direct_connection.h>
+#include <nx/utils/uuid.h>
 
 #include <nx/vms/auth/abstract_user_data_provider.h>
 

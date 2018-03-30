@@ -13,6 +13,8 @@
 #include <nx/utils/timer_manager.h>
 
 #include <nx/core/access/access_types.h>
+#include <nx/vms/auth/generic_user_data_provider.h>
+#include <nx/vms/auth/time_based_nonce_provider.h>
 #include <nx/vms/cloud_integration/cloud_manager_group.h>
 #include <nx/vms/cloud_integration/vms_cloud_connection_processor.h>
 #include <nx/vms/discovery/manager.h>
@@ -153,25 +155,26 @@ int Appserver2Process::exec()
 
     addSelfServerResource(ec2Connection);
 
+    ::ec2::CloudConnector cloudConnector(ec2ConnectionFactory->messageBus());
+
+    TimeBasedNonceProvider timeBaseNonceProvider;
+    nx::vms::cloud_integration::CloudManagerGroup cloudManagerGroup(
+        m_commonModule.get(),
+        &timeBaseNonceProvider,
+        &cloudConnector,
+        std::make_unique<GenericUserDataProvider>(m_commonModule.get()),
+        settings.cloudIntegration().delayBeforeSettingMasterFlag);
+    m_cloudManagerGroup = &cloudManagerGroup;
+
+    if (!settings.cloudIntegration().cloudDbUrl.isEmpty())
+        cloudManagerGroup.setCloudDbUrl(settings.cloudIntegration().cloudDbUrl);
+
     nx::vms::utils::loadResourcesFromEcs(
         m_commonModule.get(),
         ec2Connection,
         m_commonModule->messageProcessor(),
         QnMediaServerResourcePtr(),
         []() { return false; });
-
-    ::ec2::CloudConnector cloudConnector(ec2ConnectionFactory->messageBus());
-
-    nx::vms::cloud_integration::CloudManagerGroup cloudManagerGroup(
-        m_commonModule.get(),
-        nullptr,
-        &cloudConnector,
-        nullptr,
-        settings.cloudIntegration().delayBeforeSettingMasterFlag);
-    m_cloudManagerGroup = &cloudManagerGroup;
-
-    if (!settings.cloudIntegration().cloudDbUrl.isEmpty())
-        cloudManagerGroup.setCloudDbUrl(settings.cloudIntegration().cloudDbUrl);
 
     QnSimpleHttpConnectionListener tcpListener(
         m_commonModule.get(),
@@ -186,7 +189,15 @@ int Appserver2Process::exec()
     }
 
     if (settings.isAuthDisabled())
+    {
         tcpListener.disableAuth();
+    }
+    else
+    {
+        tcpListener.setAuthenticator(
+            &cloudManagerGroup.userAuthenticator,
+            &cloudManagerGroup.authenticationNonceFetcher);
+    }
 
     registerHttpHandlers(ec2ConnectionFactory.get());
 

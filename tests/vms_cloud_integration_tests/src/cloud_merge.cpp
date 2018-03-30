@@ -306,8 +306,47 @@ protected:
         }
     }
 
-private:
+    void shareSystem(int index, const nx::cdb::AccountWithPassword& cloudUser)
+    {
+        ASSERT_EQ(
+            nx::cdb::api::ResultCode::ok,
+            m_cdb.shareSystem(
+                m_cloudAccounts[index],
+                m_systemMergeFixture.peer(index).getCloudCredentials().systemId.toStdString(),
+                cloudUser.email,
+                nx::cdb::api::SystemAccessRole::cloudAdmin));
+    }
+
+    void disconnectFromCloud(int index)
+    {
+        ASSERT_TRUE(m_systemMergeFixture.peer(index).detachFromCloud());
+    }
+
+    void thenUserIsAbleToLogin(int index, const nx::cdb::AccountWithPassword& cloudUser)
+    {
+        ASSERT_TRUE(testUserLogin(index, cloudUser));
+    }
+
+    void thenUserIsNotAbleToLogin(int index, const nx::cdb::AccountWithPassword& cloudUser)
+    {
+        ASSERT_FALSE(testUserLogin(index, cloudUser));
+    }
+
+    bool testUserLogin(int index, const nx::cdb::AccountWithPassword& cloudUser)
+    {
+        using namespace nx::network::http;
+
+        auto mediaServerClient = m_systemMergeFixture.peer(index).mediaServerClient();
+        mediaServerClient->setUserCredentials(Credentials(
+            cloudUser.email.c_str(),
+            PasswordAuthToken(cloudUser.password.c_str())));
+        ::ec2::ApiUserDataList users;
+        return mediaServerClient->ec2GetUsers(&users) == ::ec2::ErrorCode::ok;
+    }
+
     nx::cdb::CdbLauncher m_cdb;
+
+private:
     ::ec2::test::SystemMergeFixture m_systemMergeFixture;
     std::vector<nx::cdb::AccountWithPassword> m_cloudAccounts;
     std::vector<nx::hpm::api::SystemCredentials> m_systemCloudCredentials;
@@ -411,6 +450,27 @@ TEST_F(CloudMerge, merging_non_cloud_system_to_a_cloud_one_does_not_affect_data_
 
     thenMergeFullyCompleted();
     andVmsTranscationLogMatchesCloudOne();
+}
+
+TEST_F(CloudMerge, DISABLED_system_disconnected_from_cloud_properly_merged_with_a_cloud_system)
+{
+    // TODO: #ak Replace explicit delays with some events.
+    // Probably, "vms transaction log matches cloud one".
+
+    givenTwoCloudSystemsWithDifferentOwners();
+    const auto someCloudUser = m_cdb.addActivatedAccount2();
+
+    shareSystem(1, someCloudUser);
+    std::this_thread::sleep_for(std::chrono::seconds(10));
+    disconnectFromCloud(1); //< Every cloud user is removed from system.
+    thenUserIsNotAbleToLogin(1, someCloudUser);
+
+    whenMergeSystems();
+    thenMergeFullyCompleted();
+
+    shareSystem(0, someCloudUser);
+    std::this_thread::sleep_for(std::chrono::seconds(10));
+    thenUserIsAbleToLogin(0, someCloudUser);
 }
 
 } // namespace test

@@ -72,6 +72,8 @@ private:
     void stopWhileInAioThread();
     void switchToSyncModeIfNeeded();
     void switchToAsyncModeIfNeeded();
+
+    void handleSslError(int sslPipelineResultCode);
 };
 
 } // namespace ssl

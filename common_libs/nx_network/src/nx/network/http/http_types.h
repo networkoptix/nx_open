@@ -206,7 +206,9 @@ public:
     static const StringType connect;
 
     static bool isMessageBodyAllowed(ValueType);
-    static bool isMessageBodyAllowedInResponse(ValueType);
+    static bool isMessageBodyAllowedInResponse(
+        ValueType method,
+        StatusCode::Value statusCode);
 };
 
 /**

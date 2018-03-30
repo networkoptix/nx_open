@@ -254,10 +254,11 @@ void AIOThread::run()
 
         m_taskQueue->processScheduledRemoveSocketTasks();
 
-        if (m_taskQueue->processPeriodicTasks(curClock))
-            continue;   //periodic task handler is allowed to delete socket what can cause undefined behavour while iterating pollset
         if (triggeredSocketCount > 0)
             m_taskQueue->processSocketEvents(curClock);
+
+        if (m_taskQueue->processPeriodicTasks(curClock))
+            continue;
     }
 
     NX_LOG(QLatin1String("AIO thread stopped"), cl_logDEBUG1);
