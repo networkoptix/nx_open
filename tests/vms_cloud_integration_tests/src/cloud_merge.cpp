@@ -461,7 +461,7 @@ TEST_F(CloudMerge, merging_non_cloud_system_to_a_cloud_one_does_not_affect_data_
     waitUntilVmsTranscationLogMatchesCloudOne();
 }
 
-TEST_F(CloudMerge, DISABLED_system_disconnected_from_cloud_is_properly_merged_with_a_cloud_system)
+TEST_F(CloudMerge, system_disconnected_from_cloud_is_properly_merged_with_a_cloud_system)
 {
     givenTwoCloudSystemsWithDifferentOwners();
     const int newerSystemIndex = 1;
