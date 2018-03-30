@@ -1,5 +1,5 @@
-// Copyright 2017 Network Optix, Inc. Licensed under GNU Lesser General Public License version 3.
-#include "test_ini_config_c.h"
+// Copyright 2018 Network Optix, Inc. Licensed under GNU Lesser General Public License version 3.
+#include "ini_config_c_ut.h"
 
 /**@file
  * C99 test for ini_config_c.h.
@@ -34,7 +34,7 @@ static void createFile(const char* filename, const char* content)
 #define STR(VALUE) STR_DETAIL(VALUE)
 #define STR_DETAIL(VALUE) #VALUE
 
-TEST(test_ini_config_c)
+TEST(ini_config_c_ut)
 {
     const bool defaultFlag = ini.testFlag;
     const int defaultInt = ini.testInt;
@@ -43,9 +43,9 @@ TEST(test_ini_config_c)
     ASSERT_TRUE(nx_ini_isEnabled());
     ASSERT_STREQ(NX_INI_FILE, nx_ini_iniFile());
 
-    // Test: iniFilePath() == iniFileDir() + iniFile().
+    // Test: iniFilePath() == iniFilesDir() + iniFile().
     char iniFilePath[1000] = "";
-    strncat(iniFilePath, nx_ini_iniFileDir(), sizeof(iniFilePath) - 1);
+    strncat(iniFilePath, nx_ini_iniFilesDir(), sizeof(iniFilePath) - 1);
     strncat(iniFilePath, nx_ini_iniFile(), sizeof(iniFilePath) - 1);
     ASSERT_STREQ(iniFilePath, nx_ini_iniFilePath());
 
@@ -55,6 +55,11 @@ TEST(test_ini_config_c)
     ASSERT_EQ(defaultFlag, ini.testFlag);
     ASSERT_EQ(defaultInt, ini.testInt);
     ASSERT_STREQ(defaultString, ini.testString);
+
+    // Create directory for ini files. Works for Windows as well.
+    char mkdirCommand[1000] = "mkdir ";
+    strncat(mkdirCommand, nx_ini_iniFilesDir(), sizeof(mkdirCommand) - 1);
+    system(mkdirCommand); //< Ignore possible errors.
 
     createFile(nx_ini_iniFilePath(),
         "testFlag=" STR(NEW_FLAG) "\n"

@@ -1,4 +1,4 @@
-// Copyright 2017 Network Optix, Inc. Licensed under GNU Lesser General Public License version 3.
+// Copyright 2018 Network Optix, Inc. Licensed under GNU Lesser General Public License version 3.
 #include "debug.h"
 
 #include <chrono>
@@ -132,8 +132,6 @@ std::string printPrefix(const char* file)
 //-------------------------------------------------------------------------------------------------
 // Print info
 
-namespace detail {
-
 std::string toString(std::string s)
 {
     return toString(s.c_str());
@@ -143,6 +141,8 @@ std::string toString(char c)
 {
     if (!isAsciiPrintable(c))
         return format("'\\x%02X'", (unsigned char) c);
+    if (c == '\'')
+        return "'\\''";
     return std::string("'") + c + "'";
 }
 
@@ -179,6 +179,8 @@ std::string toString(const void* ptr)
         return "null";
     return format("%p", ptr);
 }
+
+namespace detail {
 
 /**
  * @param bytesPerLine Used to calculate space padding, 0 means no padding.
