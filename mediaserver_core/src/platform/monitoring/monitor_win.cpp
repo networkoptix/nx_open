@@ -439,7 +439,7 @@ private:
 
             if (isRemovable() && !isMediaOk())
             {
-                NX_WARNING(
+                NX_VERBOSE(
                     this,
                     lm("Media is not inserted or is not writable for removable drive %1")
                         .arg(driveName));
@@ -447,7 +447,7 @@ private:
 
             if (!retriveSpaceInfo())
             {
-                NX_WARNING(
+                NX_VERBOSE(
                     this,
                     lm("Failed to retrieve partition space information for drive %1")
                         .arg(driveName));

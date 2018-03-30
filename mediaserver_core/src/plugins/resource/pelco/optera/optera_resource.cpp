@@ -41,7 +41,6 @@ namespace
 QnOpteraResource::QnOpteraResource() :
     m_videoLayout(nullptr)
 {
-    qDebug() << "Creating Optera resource";
 }
 
 QnOpteraResource::~QnOpteraResource()
