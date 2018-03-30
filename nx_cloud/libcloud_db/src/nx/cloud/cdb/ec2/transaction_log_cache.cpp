@@ -114,7 +114,11 @@ void VmsTransactionLogCache::commit(TranId tranId)
     }
 
     if (tranContext.data.timestampSequence)
-        m_committedData.timestampSequence = tranContext.data.timestampSequence;
+    {
+        m_committedData.timestampSequence = std::max(
+            m_committedData.timestampSequence,
+            tranContext.data.timestampSequence);
+    }
 }
 
 void VmsTransactionLogCache::rollback(TranId tranId)
@@ -141,7 +145,11 @@ void VmsTransactionLogCache::insertOrReplaceTransaction(
 
     m_timestampCalculator.shiftTimestampIfNeeded(transaction.persistentInfo.timestamp);
 
-    const ::ec2::ApiPersistentIdData tranKey(transaction.peerID, transaction.persistentInfo.dbID);
+    const ::ec2::ApiPersistentIdData tranKey(
+        transaction.peerID,
+        transaction.persistentInfo.dbID);
+
+    tranContext.data.timestampSequence = transaction.persistentInfo.timestamp.sequence;
     tranContext.data.transactionHashToUpdateAuthor[transactionHash] =
         UpdateHistoryData{
             tranKey,
