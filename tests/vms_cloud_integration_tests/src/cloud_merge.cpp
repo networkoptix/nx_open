@@ -81,6 +81,11 @@ protected:
         }
     }
 
+    nx::cdb::AccountWithPassword registerCloudUser()
+    {
+        return m_cdb.addActivatedAccount2();
+    }
+
     void addRandomCloudUserToEachSystem()
     {
         for (int i = 0; i < m_systemMergeFixture.peerCount(); ++i)
@@ -279,9 +284,9 @@ protected:
         andMergeHistoryRecordIsAdded();
     }
 
-    void andVmsTranscationLogMatchesCloudOne()
+    void waitUntilVmsTranscationLogMatchesCloudOne(int peerIndex = 0)
     {
-        auto mediaServerClient = m_systemMergeFixture.peer(0).mediaServerClient();
+        auto mediaServerClient = m_systemMergeFixture.peer(peerIndex).mediaServerClient();
 
         for (;;)
         {
@@ -292,11 +297,16 @@ protected:
                 ::ec2::ErrorCode::ok,
                 mediaServerClient->ec2GetTransactionLog(filter, &vmsTransactionLog));
 
+            ::ec2::ApiTransactionDataList fullVmsTransactionLog;
+            ASSERT_EQ(
+                ::ec2::ErrorCode::ok,
+                mediaServerClient->ec2GetTransactionLog(::ec2::ApiTranLogFilter(), &fullVmsTransactionLog));
+
             ::ec2::ApiTransactionDataList cloudTransactionLog;
             m_cdb.getTransactionLog(
-                m_cloudAccounts[0].email,
-                m_cloudAccounts[0].password,
-                m_systemMergeFixture.peer(0).getCloudCredentials().systemId.toStdString(),
+                m_cloudAccounts[peerIndex].email,
+                m_cloudAccounts[peerIndex].password,
+                m_systemMergeFixture.peer(peerIndex).getCloudCredentials().systemId.toStdString(),
                 &cloudTransactionLog);
 
             if (vmsTransactionLog == cloudTransactionLog)
@@ -322,14 +332,14 @@ protected:
         ASSERT_TRUE(m_systemMergeFixture.peer(index).detachFromCloud());
     }
 
-    void thenUserIsAbleToLogin(int index, const nx::cdb::AccountWithPassword& cloudUser)
+    void assertUserIsAbleToLogin(int peerIndex, const nx::cdb::AccountWithPassword& cloudUser)
     {
-        ASSERT_TRUE(testUserLogin(index, cloudUser));
+        ASSERT_TRUE(testUserLogin(peerIndex, cloudUser));
     }
 
-    void thenUserIsNotAbleToLogin(int index, const nx::cdb::AccountWithPassword& cloudUser)
+    void assertUserIsNotAbleToLogin(int peerIndex, const nx::cdb::AccountWithPassword& cloudUser)
     {
-        ASSERT_FALSE(testUserLogin(index, cloudUser));
+        ASSERT_FALSE(testUserLogin(peerIndex, cloudUser));
     }
 
     bool testUserLogin(int index, const nx::cdb::AccountWithPassword& cloudUser)
@@ -344,9 +354,8 @@ protected:
         return mediaServerClient->ec2GetUsers(&users) == ::ec2::ErrorCode::ok;
     }
 
-    nx::cdb::CdbLauncher m_cdb;
-
 private:
+    nx::cdb::CdbLauncher m_cdb;
     ::ec2::test::SystemMergeFixture m_systemMergeFixture;
     std::vector<nx::cdb::AccountWithPassword> m_cloudAccounts;
     std::vector<nx::hpm::api::SystemCredentials> m_systemCloudCredentials;
@@ -449,28 +458,32 @@ TEST_F(CloudMerge, merging_non_cloud_system_to_a_cloud_one_does_not_affect_data_
     whenMergeSystems();
 
     thenMergeFullyCompleted();
-    andVmsTranscationLogMatchesCloudOne();
+    waitUntilVmsTranscationLogMatchesCloudOne();
 }
 
-TEST_F(CloudMerge, DISABLED_system_disconnected_from_cloud_properly_merged_with_a_cloud_system)
+TEST_F(CloudMerge, DISABLED_system_disconnected_from_cloud_is_properly_merged_with_a_cloud_system)
 {
-    // TODO: #ak Replace explicit delays with some events.
-    // Probably, "vms transaction log matches cloud one".
-
     givenTwoCloudSystemsWithDifferentOwners();
-    const auto someCloudUser = m_cdb.addActivatedAccount2();
+    const int newerSystemIndex = 1;
+    const int olderSystemIndex = 0;
+    const auto someCloudUser = registerCloudUser();
 
-    shareSystem(1, someCloudUser);
-    std::this_thread::sleep_for(std::chrono::seconds(10));
-    disconnectFromCloud(1); //< Every cloud user is removed from system.
-    thenUserIsNotAbleToLogin(1, someCloudUser);
+    shareSystem(newerSystemIndex, someCloudUser);
+    waitUntilVmsTranscationLogMatchesCloudOne(newerSystemIndex);
+
+    disconnectFromCloud(newerSystemIndex); //< Every cloud user is removed from system.
+    assertUserIsNotAbleToLogin(newerSystemIndex, someCloudUser);
+
+    waitUntilVmsTranscationLogMatchesCloudOne(olderSystemIndex);
 
     whenMergeSystems();
     thenMergeFullyCompleted();
 
-    shareSystem(0, someCloudUser);
-    std::this_thread::sleep_for(std::chrono::seconds(10));
-    thenUserIsAbleToLogin(0, someCloudUser);
+    waitUntilVmsTranscationLogMatchesCloudOne(olderSystemIndex);
+
+    shareSystem(olderSystemIndex, someCloudUser);
+    waitUntilVmsTranscationLogMatchesCloudOne(olderSystemIndex);
+    assertUserIsAbleToLogin(olderSystemIndex, someCloudUser);
 }
 
 } // namespace test
