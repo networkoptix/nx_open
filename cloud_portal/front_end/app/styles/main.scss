@@ -80,6 +80,12 @@ footer {
       color:$light16;
     }
   }
+
+    @include media-breakpoint-down(md) {
+        .nav > li > a:not(.company) {
+            padding: 5px;
+        }
+    }
     
     .navbar-nav {
         flex-direction : row;
