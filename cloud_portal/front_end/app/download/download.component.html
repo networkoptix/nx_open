@@ -1,7 +1,7 @@
 <div class="container">
     <h1>Download</h1>
 
-    <div class="col-md-9">
+    <div class="col-lg-9">
         <ngb-tabset (tabChange)="beforeChange($event)">
             <ngb-tab *ngFor="let platform of downloads.groups"
                      [id]="platform.os || platform.name">
@@ -46,23 +46,13 @@
                                 <div *ngIf="platform.installers.length > 1">
                                     <h5><b>Other packages:</b></h5>
                                     <div class="row">
-                                        <div class="col-sm-4 col-md-6 col-lg-4"
+                                        <div class="col-sm-6 col-lg-4"
                                              *ngFor="let link of platform.installers">
                                                 <a [href]="link.url">
                                                     {{link.formatName}}
                                                 </a>
                                         </div>
                                     </div>
-                                    <!--<div class="row">-->
-                                        <!--<div class="col-sm-4 col-md-6  col-lg-4"-->
-                                             <!--*ngFor="let link of platform.installers; let idx = index">-->
-                                            <!--<p *ngIf="idx >= (platform.installers.length / 2)">-->
-                                                <!--<a [href]="link.url">-->
-                                                    <!--{{link.formatName}}-->
-                                                <!--</a>-->
-                                            <!--</p>-->
-                                        <!--</div>-->
-                                    <!--</div>-->
                                 </div>
                             </div>
                         </div>
