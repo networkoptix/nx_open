@@ -2034,7 +2034,8 @@ QString QnMediaResourceWidget::calculatePositionText() const
     if (!d->resource->flags().testFlag(Qn::utc))
         return QString();
 
-    static const auto extractTime = [](qint64 dateTimeUsec)
+    static const auto extractTime =
+        [](qint64 dateTimeUsec)
         {
             if (isSpecialDateTimeValueUsec(dateTimeUsec))
                 return QString();
@@ -2042,11 +2043,18 @@ QString QnMediaResourceWidget::calculatePositionText() const
             static const auto kOutputFormat = lit("yyyy-MM-dd hh:mm:ss");
 
             const auto dateTimeMs = dateTimeUsec / kMicroInMilliSeconds;
-            return QDateTime::fromMSecsSinceEpoch(dateTimeMs).toString(kOutputFormat);
+            const auto result = QDateTime::fromMSecsSinceEpoch(dateTimeMs).toString(kOutputFormat);
+
+            return ini().showPreciseItemTimestamps
+                ? lit("%1<br>%2 us").arg(result).arg(dateTimeUsec)
+                : result;
+
+            return result;
         };
 
     const QString timeString = (d->display()->camDisplay()->isRealTimeSource()
-        ? tr("LIVE") : extractTime(getDisplayTimeUsec()));
+        ? tr("LIVE")
+        : extractTime(getDisplayTimeUsec()));
 
     static const int kPositionTextPixelSize = 14;
     return htmlFormattedParagraph(timeString, kPositionTextPixelSize, true);

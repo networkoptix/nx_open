@@ -1,5 +1,7 @@
 #include "abstract_event_list_model.h"
 
+#include <chrono>
+
 #include <QtCore/QDateTime>
 
 #include <ui/graphics/items/controls/time_slider.h>
@@ -95,11 +97,13 @@ bool AbstractEventListModel::isValid(const QModelIndex& index) const
         && index.row() >= 0 && index.row() < rowCount();
 }
 
-QString AbstractEventListModel::timestampText(qint64 timestampMs) const
+QString AbstractEventListModel::timestampText(qint64 timestampUs) const
 {
-    if (timestampMs <= 0)
+    if (timestampUs <= 0)
         return QString();
 
+    using namespace std::chrono;
+    const auto timestampMs = duration_cast<milliseconds>(microseconds(timestampUs)).count();
     const auto dateTime = QDateTime::fromMSecsSinceEpoch(timestampMs);
     if (qnSyncTime->currentDateTime().date() != dateTime.date())
         return dateTime.date().toString(Qt::DefaultLocaleShortDate);
@@ -117,8 +121,8 @@ bool AbstractEventListModel::defaultAction(const QModelIndex& index)
     if (!slider)
         return false;
 
-    const auto timestampMsVariant = index.data(Qn::TimestampRole);
-    if (!timestampMsVariant.canConvert<qint64>())
+    const auto timestampUsVariant = index.data(Qn::TimestampRole);
+    if (!timestampUsVariant.canConvert<qint64>())
         return false;
 
     const QnScopedTypedPropertyRollback<bool, QnTimeSlider> downRollback(slider,
@@ -126,7 +130,11 @@ bool AbstractEventListModel::defaultAction(const QModelIndex& index)
         &QnTimeSlider::isSliderDown,
         true);
 
-    slider->setValue(timestampMsVariant.value<qint64>(), true);
+    using namespace std::chrono;
+    const auto timestampMs = duration_cast<milliseconds>(microseconds(
+        timestampUsVariant.value<qint64>())).count();
+
+    slider->setValue(timestampMs, true);
     return true;
 }
 

@@ -6,6 +6,7 @@
 
 #include <nx/gstreamer/pipeline.h>
 #include <nx/mediaserver_plugins/metadata/deepstream/tracking_mapper.h>
+#include <nx/mediaserver_plugins/metadata/deepstream/simple_license_plate_tracker.h>
 #include <nx/mediaserver_plugins/metadata/deepstream/object_class_description.h>
 
 namespace nx {
@@ -44,6 +45,10 @@ public:
 
     TrackingMapper* trackingMapper();
 
+    SimpleLicensePlateTracker* licensePlateTracker();
+
+    bool shouldDropFrame(int64_t frameTimestamp) const;
+
     void setMainLoop(LoopPtr loop);
 
     int currentFrameWidth() const;
@@ -56,10 +61,14 @@ private:
     nx::gstreamer::MetadataCallback m_metadataCallback;
     std::queue<nx::sdk::metadata::DataPacket*> m_packetQueue;
     LoopPtr m_mainLoop;
+
     TrackingMapper m_trackingMapper;
+    SimpleLicensePlateTracker m_licensePlateTracker;
+
     std::vector<ObjectClassDescription> m_objectClassDescriptions;
     int m_currentFrameWidth = 0;
     int m_currentFrameHeight = 0;
+    int64_t m_lastFrameTimestampUs = 0;
 
     mutable std::condition_variable m_wait;
     mutable std::mutex m_mutex;

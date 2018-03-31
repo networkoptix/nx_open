@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <string>
+#include <chrono>
 
 #include <plugins/plugin_api.h>
 
@@ -30,6 +31,8 @@ std::string makeElementName(
     const std::string& pipelineName,
     const std::string& factoryName,
     const std::string& elementName);
+
+std::chrono::milliseconds now();
 
 } // namespace deepstream
 } // namespace metadata

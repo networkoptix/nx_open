@@ -11,8 +11,6 @@ struct ApiScheduleTaskData: ApiData
     qint32 endTime = 0;
     Qn::RecordingType recordingType = Qn::RT_Always;
     qint8 dayOfWeek = 1;
-    qint16 beforeThreshold = 0;
-    qint16 afterThreshold = 0;
     Qn::StreamQuality streamQuality = Qn::QualityNotDefined;
     qint16 fps = 0;
     int bitrateKbps = 0;
@@ -22,8 +20,6 @@ struct ApiScheduleTaskData: ApiData
     (endTime) \
     (recordingType) \
     (dayOfWeek) \
-    (beforeThreshold) \
-    (afterThreshold) \
     (streamQuality) \
     (fps) \
     (bitrateKbps)
@@ -40,6 +36,8 @@ struct ApiScheduleTaskWithRefData: ApiScheduleTaskData
 
 static constexpr int kDefaultMinArchiveDays = 1;
 static constexpr int kDefaultMaxArchiveDays = 30;
+static constexpr int kDefaultRecordBeforeMotionSec = 5;
+static constexpr int kDefaultRecordAfterMotionSec = 5;
 
 struct ApiCameraAttributesData: ApiData
 {
@@ -72,6 +70,8 @@ struct ApiCameraAttributesData: ApiData
     Qn::FailoverPriority failoverPriority = Qn::FP_Medium;
     Qn::CameraBackupQualities backupType = Qn::CameraBackup_Default;
     QString logicalId;
+    int recordBeforeMotionSec = kDefaultRecordBeforeMotionSec;
+    int recordAfterMotionSec = kDefaultRecordAfterMotionSec;
 };
 #define ApiCameraAttributesData_Fields_Short \
     (userDefinedGroupName) \
@@ -89,7 +89,10 @@ struct ApiCameraAttributesData: ApiData
     (preferredServerId) \
     (failoverPriority) \
     (backupType) \
-    (logicalId)
+    (logicalId) \
+    (recordBeforeMotionSec) \
+    (recordAfterMotionSec) \
+
 #define ApiCameraAttributesData_Fields (cameraId)(cameraName) ApiCameraAttributesData_Fields_Short
 
 } // namespace ec2

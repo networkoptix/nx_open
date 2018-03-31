@@ -100,15 +100,7 @@ void setRecordingBeforeThreshold(
     const Cameras& cameras)
 {
     for (const auto& camera: cameras)
-    {
-        if (camera->isDtsBased())
-            continue;
-
-        QnScheduleTaskList scheduleTasks = camera->getScheduleTasks();
-        for (auto& task: scheduleTasks)
-            task.beforeThresholdSec = value;
-        camera->setScheduleTasks(scheduleTasks);
-    }
+         camera->setRecordBeforeMotionSec(value);
 }
 
 void setRecordingAfterThreshold(
@@ -116,15 +108,7 @@ void setRecordingAfterThreshold(
     const Cameras& cameras)
 {
     for (const auto& camera: cameras)
-    {
-        if (camera->isDtsBased())
-            continue;
-
-        QnScheduleTaskList scheduleTasks = camera->getScheduleTasks();
-        for (auto& task: scheduleTasks)
-            task.afterThresholdSec = value;
-        camera->setScheduleTasks(scheduleTasks);
-    }
+         camera->setRecordAfterMotionSec(value);
 }
 
 
@@ -142,7 +126,7 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
 {
     if (state.isSingleCamera())
     {
-        cameras.first()->setName(state.singleCameraSettings.name());
+        cameras.first()->setName(state.singleCameraProperties.name());
     }
     setMinRecordingDays(state.recording.minDays, cameras);
     setMaxRecordingDays(state.recording.maxDays, cameras);
@@ -159,8 +143,6 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
     if (state.recording.schedule.hasValue())
         setSchedule(state.recording.schedule(), cameras);
 
-    // TODO: #GDM #Refactor camera resource.
-    // Must be called after schedule is set.
     if (state.recording.thresholds.beforeSec.hasValue())
         setRecordingBeforeThreshold(state.recording.thresholds.beforeSec(), cameras);
 

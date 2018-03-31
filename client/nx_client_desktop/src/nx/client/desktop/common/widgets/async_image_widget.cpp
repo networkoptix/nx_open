@@ -105,6 +105,7 @@ void AsyncImageWidget::setImageProvider(QnImageProvider* provider)
         m_imageProvider->disconnect(this);
 
     m_imageProvider = provider;
+    m_previousStatus = Qn::ThumbnailStatus::Invalid;
 
     if (m_imageProvider)
     {
@@ -360,6 +361,16 @@ bool AsyncImageWidget::autoScaleUp() const
     return m_autoScaleUp;
 }
 
+AsyncImageWidget::ReloadMode AsyncImageWidget::reloadMode() const
+{
+    return m_reloadMode;
+}
+
+void AsyncImageWidget::setReloadMode(ReloadMode value)
+{
+    m_reloadMode = value;
+}
+
 void AsyncImageWidget::updateThumbnailStatus(Qn::ThumbnailStatus status)
 {
     switch (status)
@@ -370,8 +381,12 @@ void AsyncImageWidget::updateThumbnailStatus(Qn::ThumbnailStatus status)
             break;
 
         case Qn::ThumbnailStatus::Loading:
-            m_placeholder->setHidden(true);
-            m_indicator->setHidden(false);
+            if (m_reloadMode == ReloadMode::showLoadingIndicator
+                || m_previousStatus == Qn::ThumbnailStatus::Invalid)
+            {
+                m_placeholder->setHidden(true);
+                m_indicator->setHidden(false);
+            }
             break;
 
         default:
@@ -379,6 +394,8 @@ void AsyncImageWidget::updateThumbnailStatus(Qn::ThumbnailStatus status)
             m_indicator->setHidden(true);
             break;
     }
+
+    m_previousStatus = status;
 }
 
 void AsyncImageWidget::updateThumbnailImage(const QImage& image)

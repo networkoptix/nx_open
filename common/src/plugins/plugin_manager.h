@@ -80,6 +80,12 @@ public:
         return foundPlugins;
     }
 
+    /** @return Null string if not found. */
+    QString pluginLibName(const nxpl::PluginInterface* plugin)
+    {
+        return m_libNameByNxPlugin.value(plugin);
+    }
+
     /*!
         \param settings This settings are reported to each plugin (if supported by plugin of course)
         This method must be called implicitly
@@ -97,6 +103,7 @@ private:
     nxpl::PluginInterface* const m_pluginContainer;
     QList<QSharedPointer<QPluginLoader> > m_qtPlugins;
     QList<nxpl::PluginInterface*> m_nxPlugins;
+    QHash<const nxpl::PluginInterface*, QString> m_libNameByNxPlugin;
     mutable QnMutex m_mutex;
 
     void loadPluginsFromDir(
@@ -108,5 +115,6 @@ private:
     bool loadNxPlugin(
         const std::vector<nxpl::Setting>& settingsForPlugin,
         const QString& fileDir,
-        const QString& fileName);
+        const QString& fileName,
+        const QStringList& disabledPluginLibNames);
 };

@@ -119,7 +119,7 @@ void CameraInfoWidget::loadState(const CameraSettingsDialogState& state)
 
     ui->cameraRulesButton->setText(rulesTitle);
 
-    const auto& single = state.singleCameraSettings;
+    const auto& single = state.singleCameraProperties;
     ui->nameLabel->setText(single.name());
     ui->nameLabel->setReadOnly(state.readOnly);
     ui->multipleNameLabel->setText(

@@ -7,6 +7,7 @@
 #include <QtCore/QScopedPointer>
 #include <QtCore/QHash>
 #include <QtCore/QList>
+#include <QtCore/QMap>
 #include <QtCore/QSet>
 
 #include <nx/utils/disconnect_helper.h>
@@ -117,7 +118,7 @@ private:
     // When stopped/finished they are destroyed and pointers removed from this hash.
     QHash<QVariantAnimation*, int> m_itemShiftAnimations;
 
-    QHash<int, int> m_currentShifts; //< Maps item index to shift value.
+    QMap<int, int> m_currentShifts; //< Maps item index to shift value. Sorted (!).
 
     bool m_showDefaultToolTips = false;
     bool m_previewsEnabled = true;

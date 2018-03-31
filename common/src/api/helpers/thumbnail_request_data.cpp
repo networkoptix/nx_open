@@ -44,9 +44,9 @@ void QnThumbnailRequestData::loadFromParams(QnResourcePool* resourcePool,
     {
         QString timeValue = params.value(kTimeParam);
         if (timeValue.toLower() == kLatestTimeValue)
-            request.msecSinceEpoch = nx::api::ImageRequest::kLatestThumbnail;
+            request.usecSinceEpoch = nx::api::ImageRequest::kLatestThumbnail;
         else
-            request.msecSinceEpoch = nx::utils::parseDateTimeMsec(timeValue);
+            request.usecSinceEpoch = nx::utils::parseDateTime(timeValue);
     }
 
     request.rotation = QnLexical::deserialized<int>(params.value(kRotateParam), request.rotation);
@@ -72,9 +72,9 @@ QnRequestParamList QnThumbnailRequestData::toParams() const
     result.insert(kCameraIdParam,
         QnLexical::serialized(request.camera ? request.camera->getId().toString() : QString()));
     result.insert(kTimeParam,
-        nx::api::CameraImageRequest::isSpecialTimeValue(request.msecSinceEpoch)
+        nx::api::CameraImageRequest::isSpecialTimeValue(request.usecSinceEpoch)
         ? kLatestTimeValue
-        : QnLexical::serialized(request.msecSinceEpoch));
+        : QnLexical::serialized(request.usecSinceEpoch));
     result.insert(kRotateParam, QnLexical::serialized(request.rotation));
     result.insert(kHeightParam, QnLexical::serialized(request.size.height()));
     result.insert(kWidthParam, QnLexical::serialized(request.size.width()));
@@ -90,8 +90,8 @@ boost::optional<QString> QnThumbnailRequestData::getError() const
         return lit("No camera avaliable");
 
     // Check invalid time.
-    if (request.msecSinceEpoch < 0
-        && request.msecSinceEpoch != nx::api::ImageRequest::kLatestThumbnail)
+    if (request.usecSinceEpoch < 0
+        && request.usecSinceEpoch != nx::api::ImageRequest::kLatestThumbnail)
     {
         return lit("Invalid time");
     }

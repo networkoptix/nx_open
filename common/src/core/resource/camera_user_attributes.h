@@ -8,6 +8,8 @@
 #include <core/ptz/media_dewarping_params.h>
 #include <core/misc/schedule_task.h>
 
+#include <nx_ec/data/api_camera_attributes_data.h>
+
 #include "motion_window.h"
 
 #include <nx/utils/uuid.h>
@@ -27,8 +29,8 @@ public:
     bool cameraControlDisabled = false; //< TODO: #GDM Double negation.
     QnScheduleTaskList scheduleTasks;
     bool disableDualStreaming = false; //< TODO: #GDM Double negation.
-    int minDays = 0;
-    int maxDays = 0;
+    int minDays = -ec2::kDefaultMinArchiveDays; //< Negative means 'auto'.
+    int maxDays = -ec2::kDefaultMaxArchiveDays; //< Negative means 'auto'.
     QnUuid preferredServerId;
     //!User-given name of camera (can be different from resource name). This is name shown to the user
     QString name;
@@ -37,6 +39,8 @@ public:
     Qn::FailoverPriority failoverPriority = Qn::FP_Medium;
     Qn::CameraBackupQualities backupQualities = Qn::CameraBackup_Default;
     QString logicalId;
+    int recordBeforeMotionSec = ec2::kDefaultRecordBeforeMotionSec;
+    int recordAfterMotionSec = ec2::kDefaultRecordAfterMotionSec;
 
     void assign(const QnCameraUserAttributes& right, QSet<QByteArray>* const modifiedFields);
 };

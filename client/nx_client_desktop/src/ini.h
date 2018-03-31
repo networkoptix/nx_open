@@ -38,6 +38,7 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(0, debugThumbnailProviders, "Enable debug mode for thumbnail providers");
     NX_INI_FLAG(0, ignoreZoomWindowConstraints, "Ignore constrains for a zoom region");
     NX_INI_FLAG(0, showDebugTimeInformationInRibbon, "Show extra timestamp information in event ribbon");
+    NX_INI_FLAG(0, showPreciseItemTimestamps, "Show precise timestamps on scene items");
 };
 
 inline Ini& ini()

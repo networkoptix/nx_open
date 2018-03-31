@@ -290,7 +290,11 @@ rest::Handle QnCameraThumbnailManager::loadThumbnailForCamera(const QnVirtualCam
 
     QPointer<QnCameraThumbnailManager> guard(this);
     return commonModule()->currentServer()->restConnection()->cameraThumbnailAsync(request,
-        [guard, this, request] (bool success, rest::Handle id, const QByteArray& imageData)
+        [guard, this, request](
+            bool success,
+            rest::Handle requestId,
+            QByteArray imageData,
+            const nx::network::http::HttpHeaders& /*headers*/)
         {
             if (!guard)
                 return;
@@ -298,8 +302,8 @@ rest::Handle QnCameraThumbnailManager::loadThumbnailForCamera(const QnVirtualCam
             if (!m_thumbnailByCamera.contains(request.camera))
                 return;
 
-            ThumbnailData &data = m_thumbnailByCamera[request.camera];
-            if (data.loadingHandle != id)
+            ThumbnailData& data = m_thumbnailByCamera[request.camera];
+            if (data.loadingHandle != requestId)
                 return;
 
             Qn::ThumbnailStatus oldStatus = data.status;

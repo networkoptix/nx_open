@@ -40,8 +40,12 @@ namespace {
 
 static constexpr int kFetchBatchSize = 110;
 
-static constexpr auto kUpdateTimerInterval = std::chrono::seconds(30);
-static constexpr auto kDataChangedInterval = std::chrono::milliseconds(250);
+using namespace std::chrono;
+using namespace std::chrono_literals;
+
+static constexpr milliseconds kUpdateTimerInterval = 30s;
+static constexpr milliseconds kMetadataTimerInterval = 10ms;
+static constexpr milliseconds kDataChangedInterval = 250ms;
 
 static const auto lowerBoundPredicateUs =
     [](const DetectedObject& left, qint64 rightUs)
@@ -58,7 +62,6 @@ static const auto upperBoundPredicateUs =
 static const auto upperBoundPredicateMs =
     [](qint64 leftMs, const DetectedObject& right)
     {
-        using namespace std::chrono;
         return leftMs > duration_cast<milliseconds>(
             microseconds(right.firstAppearanceTimeUsec)).count();
     };
@@ -70,14 +73,19 @@ AnalyticsSearchListModel::Private::Private(AnalyticsSearchListModel* q):
     q(q),
     m_updateTimer(new QTimer()),
     m_emitDataChanged(new utils::PendingOperation([this] { emitDataChangedIfNeeded(); },
-        std::chrono::milliseconds(kDataChangedInterval).count(), this)),
+        kDataChangedInterval.count(), this)),
     m_updateWorkbenchFilter(createUpdateWorkbenchFilterOperation()),
-    m_metadataSource(createMetadataSource())
+    m_metadataSource(createMetadataSource()),
+    m_metadataProcessingTimer(new QTimer())
 {
     m_emitDataChanged->setFlags(utils::PendingOperation::NoFlags);
 
-    m_updateTimer->setInterval(std::chrono::milliseconds(kUpdateTimerInterval).count());
+    m_updateTimer->setInterval(kUpdateTimerInterval.count());
     connect(m_updateTimer.data(), &QTimer::timeout, this, &Private::periodicUpdate);
+
+    m_metadataProcessingTimer->setInterval(kMetadataTimerInterval.count());
+    connect(m_metadataProcessingTimer.data(), &QTimer::timeout, this, &Private::processMetadata);
+    m_metadataProcessingTimer->start();
 }
 
 AnalyticsSearchListModel::Private::~Private()
@@ -110,9 +118,16 @@ utils::PendingOperation* AnalyticsSearchListModel::Private::createUpdateWorkbenc
 
 media::SignalingMetadataConsumer* AnalyticsSearchListModel::Private::createMetadataSource()
 {
+    const auto processMetadataInSourceThread =
+        [this](const QnAbstractCompressedMetadataPtr& packet)
+        {
+            QnMutexLocker lock(&m_metadataMutex);
+            m_metadataPackets.push_back(packet);
+        };
+
     auto metadataSource = new media::SignalingMetadataConsumer(MetadataType::ObjectDetection);
     connect(metadataSource, &media::SignalingMetadataConsumer::metadataReceived,
-        this, &Private::processMetadata);
+        this, processMetadataInSourceThread, Qt::DirectConnection);
 
     return metadataSource;
 }
@@ -178,8 +193,10 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
             return attributes(object);
 
         case Qn::TimestampRole:
+            return object.firstAppearanceTimeUsec;
+
         case Qn::PreviewTimeRole:
-            return startTimeMs(object);
+            return previewParams(object).timestampUs;
 
         case Qn::DurationRole:
         {
@@ -195,9 +212,7 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
             return QVariant::fromValue<QnResourcePtr>(camera());
 
         case Qn::ItemZoomRectRole:
-            return QVariant::fromValue(object.track.empty()
-                ? QRectF()
-                : object.track.front().boundingBox);
+            return QVariant::fromValue(previewParams(object).boundingBox);
 
         case Qn::ContextMenuRole:
             return QVariant::fromValue(contextMenu(object));
@@ -489,31 +504,53 @@ rest::Handle AnalyticsSearchListModel::Private::getObjects(qint64 startMs, qint6
         request, false /*isLocal*/, internalCallback, thread());
 }
 
-void AnalyticsSearchListModel::Private::processMetadata(
-    const QnAbstractCompressedMetadataPtr& metadata)
+void AnalyticsSearchListModel::Private::processMetadata()
 {
-    NX_EXPECT(metadata->metadataType == MetadataType::ObjectDetection);
-    const auto compressedMetadata = std::dynamic_pointer_cast<QnCompressedMetadata>(metadata);
-    const auto detectionMetadata = common::metadata::fromMetadataPacket(compressedMetadata);
+    QnMutexLocker locker(&m_metadataMutex);
+    auto packets = m_metadataPackets;
+    m_metadataPackets.clear();
+    locker.unlock();
 
-    if (!detectionMetadata || detectionMetadata->objects.empty() || !q->navigator()->isLive())
+    if (!q->navigator()->isLive() || !q->relevantTimePeriod().isInfinite() || packets.empty())
         return;
 
-    std::vector<DetectedObject> newObjects;
-    newObjects.reserve(detectionMetadata->objects.size());
+    QVector<DetectedObject> newObjects;
+    QHash<QnUuid, int> newObjectIndices;
 
-    ObjectPosition pos;
-    pos.deviceId = detectionMetadata->deviceId;
-    pos.timestampUsec = detectionMetadata->timestampUsec;
-    pos.durationUsec = detectionMetadata->durationUsec;
-
-    for (const auto& item: detectionMetadata->objects)
+    for (const auto& metadata: packets)
     {
-        pos.boundingBox = item.boundingBox;
+        NX_EXPECT(metadata->metadataType == MetadataType::ObjectDetection);
+        const auto compressedMetadata = std::dynamic_pointer_cast<QnCompressedMetadata>(metadata);
+        const auto detectionMetadata = common::metadata::fromMetadataPacket(compressedMetadata);
 
-        const auto index = indexOf(item.objectId);
-        if (index < 0)
+        if (!detectionMetadata || detectionMetadata->objects.empty())
+            continue;
+
+        ObjectPosition pos;
+        pos.deviceId = detectionMetadata->deviceId;
+        pos.timestampUsec = detectionMetadata->timestampUsec;
+        pos.durationUsec = detectionMetadata->durationUsec;
+
+        for (const auto& item: detectionMetadata->objects)
         {
+            pos.boundingBox = item.boundingBox;
+
+            auto index = newObjectIndices.value(item.objectId, -1);
+            if (index >= 0)
+            {
+                pos.attributes = std::move(item.labels);
+                advanceObject(newObjects[index], std::move(pos), false);
+                continue;
+            }
+
+            index = indexOf(item.objectId);
+            if (index >= 0)
+            {
+                pos.attributes = std::move(item.labels);
+                advanceObject(m_data[index], std::move(pos));
+                continue;
+            }
+
             if (m_filterRect.isValid() && !m_filterRect.intersects(item.boundingBox))
                 continue;
 
@@ -524,12 +561,9 @@ void AnalyticsSearchListModel::Private::processMetadata(
             newObject.track.push_back(pos);
             newObject.firstAppearanceTimeUsec = pos.timestampUsec;
             newObject.lastAppearanceTimeUsec = pos.timestampUsec;
+
+            newObjectIndices[item.objectId] = newObjects.size();
             newObjects.push_back(std::move(newObject));
-        }
-        else
-        {
-            pos.attributes = std::move(item.labels);
-            advanceObject(m_data[index], std::move(pos));
         }
     }
 
@@ -568,7 +602,6 @@ void AnalyticsSearchListModel::Private::emitDataChangedIfNeeded()
     if (m_dataChangedObjectIds.empty())
         return;
 
-    static const QVector<int> kUpdateRoles({Qt::ToolTipRole, Qn::AdditionalTextRole});
     for (const auto& id: m_dataChangedObjectIds)
     {
         const auto index = indexOf(id);
@@ -576,14 +609,14 @@ void AnalyticsSearchListModel::Private::emitDataChangedIfNeeded()
             continue;
 
         const auto modelIndex = q->index(index);
-        emit q->dataChanged(modelIndex, modelIndex, kUpdateRoles);
+        emit q->dataChanged(modelIndex, modelIndex);
     }
 
     m_dataChangedObjectIds.clear();
 };
 
 void AnalyticsSearchListModel::Private::advanceObject(DetectedObject& object,
-    ObjectPosition&& position)
+    ObjectPosition&& position, bool emitDataChanged)
 {
     // Currently there's a mess between object.attributes and object.track[i].attributes.
     // There's no clear understanding what to use and what to show.
@@ -607,7 +640,9 @@ void AnalyticsSearchListModel::Private::advanceObject(DetectedObject& object,
 
     object.lastAppearanceTimeUsec = position.timestampUsec;
     m_dataChangedObjectIds.insert(object.objectId);
-    m_emitDataChanged->requestOperation();
+
+    if (emitDataChanged)
+        m_emitDataChanged->requestOperation();
 }
 
 int AnalyticsSearchListModel::Private::indexOf(const QnUuid& objectId) const
@@ -632,20 +667,17 @@ QString AnalyticsSearchListModel::Private::description(
     if (!ini().showDebugTimeInformationInRibbon)
         return QString();
 
-    QString result;
-
     const auto timeWatcher = q->context()->instance<QnWorkbenchServerTimeWatcher>();
-    const auto timestampMs = startTimeMs(object);
-    const auto start = timeWatcher->displayTime(timestampMs);
+    const auto start = timeWatcher->displayTime(startTimeMs(object));
     // TODO: #vkutin Is this duration formula good enough for us?
     //   Or we need to add some "lastAppearanceDurationUsec"?
     const auto durationUs = object.lastAppearanceTimeUsec - object.firstAppearanceTimeUsec;
 
-    return lit("Timestamp: %1<br>Start: %2<br>Duration: %3<br>%4")
-        .arg(timestampMs)
+    using namespace std::chrono;
+    return lit("Timestamp: %1 us<br>%2<br>Duration: %3 ms<br>%4")
+        .arg(object.firstAppearanceTimeUsec)
         .arg(start.toString(Qt::RFC2822Date))
-        .arg(core::HumanReadable::timeSpan(std::chrono::duration_cast<std::chrono::milliseconds>(
-            std::chrono::microseconds(durationUs))))
+        .arg(duration_cast<milliseconds>(microseconds(durationUs)).count())
         .arg(object.objectId.toSimpleString());
 }
 
@@ -667,7 +699,13 @@ QString AnalyticsSearchListModel::Private::attributes(
 
     QString rows;
     for (const auto& attribute: object.attributes)
-        rows += kRowTemplate.arg(attribute.name, attribute.value);
+    {
+        if (!attribute.name.startsWith(lit("nx.sys.")))
+            rows += kRowTemplate.arg(attribute.name, attribute.value);
+    }
+
+    if (rows.isEmpty())
+        return QString();
 
     const auto color = QPalette().color(QPalette::WindowText);
     return kCss.arg(color.name()) + kTableTemplate.arg(rows);
@@ -758,6 +796,73 @@ qint64 AnalyticsSearchListModel::Private::startTimeMs(
 {
     return std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::microseconds(object.firstAppearanceTimeUsec)).count();
+}
+
+AnalyticsSearchListModel::Private::PreviewParams AnalyticsSearchListModel::Private::previewParams(
+    const analytics::storage::DetectedObject& object)
+{
+    PreviewParams result;
+    result.timestampUs = object.firstAppearanceTimeUsec;
+    result.boundingBox = object.track.empty()
+        ? QRectF()
+        : object.track.front().boundingBox;
+
+    const auto attribute =
+        [&object](const QString& name)
+        {
+            const auto iter = std::find_if(object.attributes.cbegin(), object.attributes.cend(),
+                [&name](const common::metadata::Attribute& attribute)
+                {
+                    return attribute.name == name;
+                });
+
+            return (iter != object.attributes.cend()) ? iter->value : QString();
+        };
+
+    const auto getRealAttribute =
+        [&attribute](const QString& name, qreal defaultValue)
+        {
+            bool ok = false;
+            const QString valueStr = attribute(name);
+            if (valueStr.isNull())
+                return defaultValue; //< Attribute is missing.
+
+            const qreal value = valueStr.toDouble(&ok);
+            if (ok)
+                return value;
+
+            NX_WARNING(typeid(Private)) << lm("Invalid %1 value: [%2]").args(name, valueStr);
+            return defaultValue;
+        };
+
+    const QString previewTimestampStr = attribute(lit("nx.sys.preview.timestampUs"));
+    if (!previewTimestampStr.isNull())
+    {
+        const qint64 previewTimestampUs = previewTimestampStr.toLongLong();
+        if (previewTimestampUs > 0)
+        {
+            result.timestampUs = previewTimestampUs;
+        }
+        else
+        {
+            NX_WARNING(typeid(Private)) << lm("Invalid nx.sys.preview.timestampUs value: [%1]")
+                .arg(previewTimestampStr);
+        }
+    }
+
+    result.boundingBox.setLeft(getRealAttribute(lit("nx.sys.preview.boundingBox.x"),
+        result.boundingBox.left()));
+
+    result.boundingBox.setTop(getRealAttribute(lit("nx.sys.preview.boundingBox.y"),
+        result.boundingBox.top()));
+
+    result.boundingBox.setWidth(getRealAttribute(lit("nx.sys.preview.boundingBox.width"),
+        result.boundingBox.width()));
+
+    result.boundingBox.setHeight(getRealAttribute(lit("nx.sys.preview.boundingBox.height"),
+        result.boundingBox.height()));
+
+    return result;
 }
 
 } // namespace desktop

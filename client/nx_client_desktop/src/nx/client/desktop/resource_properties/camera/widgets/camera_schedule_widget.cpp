@@ -126,8 +126,6 @@ CameraScheduleWidget::CameraScheduleWidget(
 
     ui->exportWarningLabel->setVisible(false);
 
-    updateMotionButtons();
-
     auto updateLicensesIfNeeded =
         [this]
         {
@@ -450,7 +448,6 @@ void CameraScheduleWidget::updateMotionAvailable()
     m_motionAvailable = available;
 
     updateMotionButtons();
-    updateRecordSpinboxes();
 }
 
 void CameraScheduleWidget::setExportScheduleButtonEnabled(bool enabled)
@@ -464,17 +461,6 @@ bool CameraScheduleWidget::canEnableRecording() const
 {
     QnCamLicenseUsageHelper licenseHelper(commonModule());
     return licenseHelper.canEnableRecording(m_cameras);
-}
-
-void CameraScheduleWidget::updateRecordThresholds(QnScheduleTaskList& tasks)
-{
-    int before = ui->recordBeforeSpinBox->value();
-    int after = ui->recordAfterSpinBox->value();
-    for (auto& task : tasks)
-    {
-        task.setBeforeThreshold(before);
-        task.setAfterThreshold(after);
-    }
 }
 
 int CameraScheduleWidget::getGridMaxFps(bool motionPlusLqOnly)
@@ -515,12 +501,6 @@ void CameraScheduleWidget::updateLicensesButtonVisible()
     ui->licensesButton->setVisible(accessController()->hasGlobalPermission(Qn::GlobalAdminPermission));
 }
 
-void CameraScheduleWidget::updateRecordSpinboxes()
-{
-    ui->recordBeforeSpinBox->setEnabled(m_motionAvailable);
-    ui->recordAfterSpinBox->setEnabled(m_motionAvailable);
-}
-
 void CameraScheduleWidget::at_cameraResourceChanged()
 {
     updateMaxFPS();
@@ -529,29 +509,6 @@ void CameraScheduleWidget::at_cameraResourceChanged()
 
 void CameraScheduleWidget::updateMotionButtons()
 {
-    bool hasDualStreaming = !m_cameras.isEmpty();
-    bool hasMotion = !m_cameras.isEmpty();
-    for (const auto &camera: m_cameras)
-    {
-        hasDualStreaming &= camera->hasDualStreaming2();
-        hasMotion &= camera->hasMotion();
-    }
-
-    bool enabled;
-
-    enabled = m_motionAvailable && hasMotion;
-    ui->recordMotionButton->setEnabled(enabled);
-    ui->labelMotionOnly->setEnabled(enabled);
-
-    enabled = m_motionAvailable && hasDualStreaming && hasMotion;
-    ui->recordMotionPlusLQButton->setEnabled(enabled);
-    ui->labelMotionPlusLQ->setEnabled(enabled);
-
-    if (ui->recordMotionButton->isChecked() && !ui->recordMotionButton->isEnabled())
-        ui->recordAlwaysButton->setChecked(true);
-    if (ui->recordMotionPlusLQButton->isChecked() && !ui->recordMotionPlusLQButton->isEnabled())
-        ui->recordAlwaysButton->setChecked(true);
-
     if (!m_motionAvailable)
     {
         for (int row = 0; row < ui->gridWidget->rowCount(); ++row)

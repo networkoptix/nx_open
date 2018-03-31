@@ -88,11 +88,11 @@ QnServerStreamRecorder::QnServerStreamRecorder(
     m_lastWarningTime = 0;
     m_mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (resourcePool()->getResourceById(getResource()->getParentId()));
 
-    m_panicSchedileRecord.startTime = 0;
-    m_panicSchedileRecord.endTime = 24*3600*7;
-    m_panicSchedileRecord.recordingType = Qn::RT_Always;
-    m_panicSchedileRecord.streamQuality = Qn::QualityHighest;
-    m_panicSchedileRecord.fps = getFpsForValue(0);
+    m_panicScheduleRecordTask.startTime = 0;
+    m_panicScheduleRecordTask.endTime = 24*3600*7;
+    m_panicScheduleRecordTask.recordingType = Qn::RT_Always;
+    m_panicScheduleRecordTask.streamQuality = Qn::QualityHighest;
+    m_panicScheduleRecordTask.fps = getFpsForValue(0);
 
     connect(this, &QnStreamRecorder::recordingFinished, this, &QnServerStreamRecorder::at_recordingFinished);
 
@@ -295,7 +295,7 @@ bool QnServerStreamRecorder::saveMotion(const QnConstMetaDataV1Ptr& motion)
 QnScheduleTask QnServerStreamRecorder::currentScheduleTask() const
 {
     QnMutexLocker lock( &m_scheduleMutex );
-    return m_currentScheduleTask;
+    return static_cast<QnScheduleTask>(m_currentScheduleTask);
 }
 
 void QnServerStreamRecorder::initIoContext(
@@ -403,7 +403,11 @@ void QnServerStreamRecorder::beforeProcessData(const QnConstAbstractMediaDataPtr
         return;
     }
 
-    const QnScheduleTask task = currentScheduleTask();
+    ScheduleTaskWithThresholds task;
+    {
+        QnMutexLocker lock( &m_scheduleMutex );
+        task = m_currentScheduleTask;
+    }
     bool isRecording = task.recordingType != Qn::RT_Never && qnNormalStorageMan->isWritableStoragesAvailable();
     if (!m_device->hasFlags(Qn::foreigner)) {
         if (isRecording) {
@@ -422,7 +426,8 @@ void QnServerStreamRecorder::beforeProcessData(const QnConstAbstractMediaDataPtr
     qint64 motionTime = m_dualStreamingHelper->getLastMotionTime();
     if (motionTime == (qint64)AV_NOPTS_VALUE)
     {
-        setPrebufferingUsec(task.beforeThresholdSec*1000000ll); // no more motion, set prebuffer again
+        // No more motion, set prebuffer again.
+        setPrebufferingUsec(task.recordBeforeSec * 1000000ll);
     }
     else
     {
@@ -454,7 +459,7 @@ bool QnServerStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& med
     qint64 afterThreshold = 5 * 1000000ll;
     Qn::RecordingType recType = m_currentScheduleTask.recordingType;
     if (recType == Qn::RT_MotionOnly || recType == Qn::RT_MotionAndLowQuality)
-        afterThreshold = m_currentScheduleTask.afterThresholdSec*1000000ll;
+        afterThreshold = m_currentScheduleTask.recordAfterSec * 1000000ll;
     bool isMotionContinue = m_lastMotionTimeUsec != (qint64)AV_NOPTS_VALUE && media->timestamp < m_lastMotionTimeUsec + afterThreshold;
     if (!isMotionContinue)
     {
@@ -465,7 +470,7 @@ bool QnServerStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& med
     }
     QnScheduleTask task = currentScheduleTask();
 
-    const QnSecurityCamResource* camera = static_cast<const QnSecurityCamResource*>(m_device.data());
+    const auto camera = static_cast<const nx::mediaserver::resource::Camera*>(m_device.data());
     const QnMetaDataV1* metaData = dynamic_cast<const QnMetaDataV1*>(media.get());
 
     if (m_catalog == QnServer::LowQualityCatalog && !metaData && !m_useSecondaryRecorder)
@@ -535,21 +540,21 @@ int QnServerStreamRecorder::getFpsForValue(int fps)
 }
 
 void QnServerStreamRecorder::startForcedRecording(Qn::StreamQuality quality, int fps,
-    int /*beforeThreshold*/, int afterThreshold, int maxDurationSec)
+    int beforeThreshold, int afterThreshold, int maxDurationSec)
 {
-    m_forcedScheduleRecord.startTime = 0;
-    m_forcedScheduleRecord.endTime = 24*3600*7;
-    m_forcedScheduleRecord.beforeThresholdSec = 0; // beforeThreshold not used now
-    m_forcedScheduleRecord.afterThresholdSec = afterThreshold;
-    m_forcedScheduleRecord.fps = getFpsForValue(fps);
+    m_forcedScheduleRecordTask.startTime = 0;
+    m_forcedScheduleRecordTask.endTime = 24*3600*7;
+    m_forcedScheduleRecordTask.recordBeforeSec = beforeThreshold;
+    m_forcedScheduleRecordTask.recordAfterSec = afterThreshold;
+    m_forcedScheduleRecordTask.fps = getFpsForValue(fps);
     if (maxDurationSec)
     {
         QDateTime dt = qnSyncTime->currentDateTime();
         int currentWeekSeconds = (dt.date().dayOfWeek()-1)*3600*24 + dt.time().hour()*3600 + dt.time().minute()*60 +  dt.time().second();
-        m_forcedScheduleRecord.endTime = currentWeekSeconds + maxDurationSec;
+        m_forcedScheduleRecordTask.endTime = currentWeekSeconds + maxDurationSec;
     }
-    m_forcedScheduleRecord.recordingType = Qn::RT_Always;
-    m_forcedScheduleRecord.streamQuality = quality;
+    m_forcedScheduleRecordTask.recordingType = Qn::RT_Always;
+    m_forcedScheduleRecordTask.streamQuality = quality;
 
     m_forcedScheduleRecordTimer.restart();
     m_forcedScheduleRecordDurationMs = maxDurationSec * 1000;
@@ -559,20 +564,12 @@ void QnServerStreamRecorder::startForcedRecording(Qn::StreamQuality quality, int
 
 void QnServerStreamRecorder::stopForcedRecording()
 {
-    m_forcedScheduleRecord.endTime = 0;
+    m_forcedScheduleRecordTask.endTime = 0;
     updateScheduleInfo(qnSyncTime->currentMSecsSinceEpoch());
 }
 
-void QnServerStreamRecorder::updateRecordingType(const QnScheduleTask& scheduleTask)
+void QnServerStreamRecorder::updateRecordingType(const ScheduleTaskWithThresholds& scheduleTask)
 {
-    /*
-    QString msg;
-    QTextStream str(&msg);
-    str << "Update recording params for camera " << m_device->getUniqueId() << "  " << scheduleTask;
-    str.flush();
-    NX_LOG(msg, cl_logINFO);
-    */
-
     if (!isMotionRec(scheduleTask.recordingType))
     {
         // switch from motion to non-motion recording
@@ -587,21 +584,15 @@ void QnServerStreamRecorder::updateRecordingType(const QnScheduleTask& scheduleT
     }
     else if (getPrebufferingUsec() != 0 || !isMotionRec(m_currentScheduleTask.recordingType)) {
         // do not change prebuffer if previous recording is motion and motion in progress
-        setPrebufferingUsec(scheduleTask.beforeThresholdSec*1000000ll);
+        setPrebufferingUsec(scheduleTask.recordBeforeSec * 1000000ll);
     }
     m_currentScheduleTask = scheduleTask;
 }
 
-void QnServerStreamRecorder::setSpecialRecordingMode(QnScheduleTask& task)
+void QnServerStreamRecorder::setSpecialRecordingMode(const ScheduleTaskWithThresholds& task)
 {
-    // zero fps value means 'autodetect as maximum possible fps'
-
-    // If stream already recording, do not change params in panic mode because if ServerPush provider has some large reopening time
-    //CLServerPushStreamReader* sPushProvider = dynamic_cast<CLServerPushStreamReader*> (m_mediaProvider);
-    bool doNotChangeParams = false; //sPushProvider && sPushProvider->isStreamOpened() && m_currentScheduleTask->getFps() >= m_panicSchedileRecord.getFps()*0.75;
     updateRecordingType(task);
-    if (!doNotChangeParams)
-        updateStreamParams();
+    updateStreamParams();
     m_lastSchedulePeriod.clear();
 }
 
@@ -623,16 +614,16 @@ void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
     {
         if (!m_usedPanicMode)
         {
-            setSpecialRecordingMode(m_panicSchedileRecord);
+            setSpecialRecordingMode(m_panicScheduleRecordTask);
             m_usedPanicMode = true;
         }
         return;
     }
-    else if (!m_forcedScheduleRecord.isEmpty())
+    else if (!m_forcedScheduleRecordTask.isEmpty())
     {
         if (!m_usedSpecialRecordingMode)
         {
-            setSpecialRecordingMode(m_forcedScheduleRecord);
+            setSpecialRecordingMode(m_forcedScheduleRecordTask);
             m_usedSpecialRecordingMode = true;
         }
         bool isExpired = m_forcedScheduleRecordDurationMs > 0
@@ -644,7 +635,7 @@ void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
     }
 
     m_usedSpecialRecordingMode = m_usedPanicMode = false;
-    QnScheduleTask noRecordTask;
+    const ScheduleTaskWithThresholds noRecordTask;
 
     if (!m_schedule.isEmpty())
     {
@@ -666,7 +657,14 @@ void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
 
             if (scheduleTaskContainsWeekTimeMs(*itr, scheduleTimeMs))
             {
-                updateRecordingType(*itr);
+                const auto camera =
+                    static_cast<const nx::mediaserver::resource::Camera*>(m_device.data());
+
+                ScheduleTaskWithThresholds task(*itr);
+                task.recordBeforeSec = camera->recordBeforeMotionSec();
+                task.recordAfterSec = camera->recordAfterMotionSec();
+
+                updateRecordingType(task);
                 updateStreamParams();
             }
             else {
@@ -876,7 +874,7 @@ QnDualStreamingHelperPtr QnServerStreamRecorder::getDualStreamingHelper() const
 
 int QnServerStreamRecorder::getFRAfterThreshold() const
 {
-    return m_forcedScheduleRecord.afterThresholdSec;
+    return m_forcedScheduleRecordTask.recordAfterSec;
 }
 
 void QnServerStreamRecorder::writeRecentlyMotion(qint64 writeAfterTime)

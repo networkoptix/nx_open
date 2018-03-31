@@ -83,7 +83,8 @@ void AbstractAsyncSearchListModel::Private::cancelPrefetch()
 
 bool AbstractAsyncSearchListModel::Private::canFetchMore() const
 {
-    return !m_fetchedAll && m_camera && !fetchInProgress() && hasAccessRights();
+    return !m_fetchedAll && m_camera && !fetchInProgress() && hasAccessRights()
+        && q->relevantTimePeriod().startTimeMs < m_earliestTimeMs;
 }
 
 bool AbstractAsyncSearchListModel::Private::prefetch(PrefetchCompletionHandler completionHandler)

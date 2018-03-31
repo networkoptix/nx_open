@@ -48,6 +48,7 @@ bool DefaultPipeline::pushDataPacket(nx::sdk::metadata::DataPacket* dataPacket)
 
     if (video)
     {
+        m_lastFrameTimestampUs = video->timestampUsec();
         m_currentFrameWidth = video->width();
         m_currentFrameHeight = video->height();
     }
@@ -117,6 +118,16 @@ GMainLoop*DefaultPipeline::mainLoop()
 TrackingMapper*DefaultPipeline::trackingMapper()
 {
     return &m_trackingMapper;
+}
+
+SimpleLicensePlateTracker *DefaultPipeline::licensePlateTracker()
+{
+    return &m_licensePlateTracker;
+}
+
+bool DefaultPipeline::shouldDropFrame(int64_t frameTimestamp) const
+{
+    return m_lastFrameTimestampUs - frameTimestamp > ini().maxAllowedFrameDelayMs * 1000;
 }
 
 void DefaultPipeline::setMainLoop(LoopPtr loop)

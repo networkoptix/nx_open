@@ -61,19 +61,33 @@ struct RestResultWithData: public RestResultWithDataBase
 using EventLogData = RestResultWithData<nx::vms::event::ActionDataList>;
 using MultiServerTimeData = RestResultWithData<ApiMultiserverServerDateTimeDataList>;
 
+struct ServerConnectionBase
+{
+    template<typename ResultType>
+    struct Result
+    {
+        using type = std::function<void (bool success, Handle requestId, ResultType result)>;
+    };
+};
+
+template<>
+struct ServerConnectionBase::Result<QByteArray>
+{
+    using type = std::function<void(bool success, Handle requestId, QByteArray result,
+        const nx::network::http::HttpHeaders& headers)>;
+};
+
 class ServerConnection:
     public QObject,
     public QnCommonModuleAware,
-    public Qn::EnableSafeDirectConnection
+    public Qn::EnableSafeDirectConnection,
+    public ServerConnectionBase
 {
     Q_OBJECT
+
 public:
     ServerConnection(QnCommonModule* commonModule, const QnUuid& serverId);
     virtual ~ServerConnection();
-
-
-    template <typename ResultType>
-    struct Result { typedef std::function<void (bool /*hasSucceeded*/, Handle /*requestId*/, ResultType)> type; };
 
     struct EmptyResponseType {};
     typedef Result<EmptyResponseType>::type PostCallback;   // use this type for POST requests without result data
@@ -370,11 +384,12 @@ public:
 
 private slots:
     void onHttpClientDone(int requestId, nx::network::http::AsyncHttpClientPtr httpClient);
+
 private:
-    template <typename ResultType> Handle executeGet(
+    template<typename CallbackType> Handle executeGet(
         const QString& path,
         const QnRequestParamList& params,
-        Callback<ResultType> callback,
+        CallbackType callback,
         QThread* targetThread);
 
     template <typename ResultType> Handle executePost(
@@ -405,7 +420,7 @@ private:
         QThread* targetThread);
 
     Handle executeRequest(const nx::network::http::ClientPool::Request& request,
-        Callback<QByteArray> callback,
+        Result<QByteArray>::type callback,
         QThread* targetThread);
 
     Handle executeRequest(const nx::network::http::ClientPool::Request& request,
@@ -420,8 +435,16 @@ private:
         const nx::network::http::StringType& contentType = nx::network::http::StringType(),
         const nx::network::http::StringType& messageBody = nx::network::http::StringType());
 
-    typedef std::function<void (Handle, SystemError::ErrorCode, int, nx::network::http::StringType contentType, nx::network::http::BufferType msgBody)> HttpCompletionFunc;
-    Handle sendRequest(const nx::network::http::ClientPool::Request& request, HttpCompletionFunc callback = HttpCompletionFunc());
+    using HttpCompletionFunc = std::function<void (
+        Handle handle,
+        SystemError::ErrorCode errorCode,
+        int statusCode,
+        nx::network::http::StringType contentType,
+        nx::network::http::BufferType msgBody,
+        const nx::network::http::HttpHeaders& headers)>;
+
+    Handle sendRequest(const nx::network::http::ClientPool::Request& request,
+        HttpCompletionFunc callback = HttpCompletionFunc());
 
     QnMediaServerResourcePtr getServerWithInternetAccess() const;
 

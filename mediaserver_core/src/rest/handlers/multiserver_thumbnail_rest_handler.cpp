@@ -1,5 +1,7 @@
 #include "multiserver_thumbnail_rest_handler.h"
 
+#include <chrono>
+
 #include <QtGui/QImage>
 
 #include <api/helpers/thumbnail_request_data.h>
@@ -46,7 +48,7 @@ int QnMultiserverThumbnailRestHandler::executeGet(
     const auto& imageRequest = request.request;
 
     auto requiredPermission =
-        nx::api::CameraImageRequest::isSpecialTimeValue(imageRequest.msecSinceEpoch)
+        nx::api::CameraImageRequest::isSpecialTimeValue(imageRequest.usecSinceEpoch)
         ? Qn::Permission::ViewLivePermission
         : Qn::Permission::ViewFootagePermission;
 
@@ -124,23 +126,17 @@ QnMediaServerResourcePtr QnMultiserverThumbnailRestHandler::targetServer(
         return currentServer;
 
     const auto& imageRequest = request.request;
-    if (nx::api::CameraImageRequest::isSpecialTimeValue(imageRequest.msecSinceEpoch))
+    if (nx::api::CameraImageRequest::isSpecialTimeValue(imageRequest.usecSinceEpoch))
         return imageRequest.camera->getParentServer();
 
+    using namespace std::chrono;
     return commonModule->cameraHistoryPool()->getMediaServerOnTimeSync(imageRequest.camera,
-        imageRequest.msecSinceEpoch);
+        duration_cast<milliseconds>(microseconds(imageRequest.usecSinceEpoch)).count());
 }
 
 int QnMultiserverThumbnailRestHandler::getThumbnailLocal( const QnThumbnailRequestData &request,
     QByteArray& result, QByteArray& contentType, qint64* frameTimestampUsec) const
 {
-    static const qint64 kUsecPerMs = 1000;
-    const auto& imageRequest = request.request;
-
-    qint64 timeUSec = nx::api::CameraImageRequest::isSpecialTimeValue(imageRequest.msecSinceEpoch)
-        ? imageRequest.msecSinceEpoch
-        : imageRequest.msecSinceEpoch * kUsecPerMs;
-
     CLVideoDecoderOutputPtr outFrame = QnGetImageHelper::getImage(request.request);
 
     if (!outFrame)
@@ -153,14 +149,14 @@ int QnMultiserverThumbnailRestHandler::getThumbnailLocal( const QnThumbnailReque
         *frameTimestampUsec = static_cast<qint64>(outFrame.data()->pkt_dts);
 
     QByteArray imageFormat = QnLexical::serialized<nx::api::CameraImageRequest::ThumbnailFormat>(
-        imageRequest.imageFormat).toUtf8();
+        request.request.imageFormat).toUtf8();
 
-    if (imageRequest.imageFormat == nx::api::CameraImageRequest::ThumbnailFormat::jpg)
+    if (request.request.imageFormat == nx::api::CameraImageRequest::ThumbnailFormat::jpg)
     {
         QByteArray encodedData = QnGetImageHelper::encodeImage(outFrame, imageFormat);
         result.append(encodedData);
     }
-    else if (imageRequest.imageFormat == nx::api::CameraImageRequest::ThumbnailFormat::raw)
+    else if (request.request.imageFormat == nx::api::CameraImageRequest::ThumbnailFormat::raw)
     {
         NX_ASSERT(false, Q_FUNC_INFO, "Method is not implemented");
         // TODO: #rvasilenko implement me!!!

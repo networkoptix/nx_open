@@ -61,7 +61,7 @@ void PluginManager::loadPlugins(
     directoriesToSearchForPlugins.insert(QDir(QCoreApplication::applicationDirPath()).absolutePath()
         + lit("/plugins/"));
 
-    //preparing settings for NX plugins
+    //preparing settings for Nx plugins
     const auto& keys = settings->allKeys();
     std::vector<nxpl::Setting> settingsForPlugin;
     for (const auto& key: keys)
@@ -96,16 +96,26 @@ void PluginManager::loadPluginsFromDir(
 {
     QDir pluginDir(dirToSearchIn);
     const QStringList& entries = pluginDir.entryList(QStringList(), QDir::Files | QDir::Readable);
+    QStringList disabledPluginLibNames;
+    if (pluginsIni().disabledNxPlugins[0])
+    {
+        // If the plugin is mentioned in this .ini setting and thus should be skipped.
+        disabledPluginLibNames =
+            QString::fromLatin1(pluginsIni().disabledNxPlugins).split(lit(","));
+        for (auto& s: disabledPluginLibNames)
+            s = s.trimmed();
+    }
+
     for (const QString& entry: entries)
     {
         if (!QLibrary::isLibrary(entry))
             continue;
 
         if(pluginsToLoad & QtPlugin)
-            loadQtPlugin( pluginDir.path() + lit("/") + entry );
+            loadQtPlugin(pluginDir.path() + lit("/") + entry);
 
         if(pluginsToLoad & NxPlugin)
-            loadNxPlugin( settingsForPlugin, pluginDir.path(), entry );
+            loadNxPlugin(settingsForPlugin, pluginDir.path(), entry, disabledPluginLibNames);
     }
 }
 
@@ -136,27 +146,21 @@ bool PluginManager::loadQtPlugin(const QString& fullFilePath)
 bool PluginManager::loadNxPlugin(
     const std::vector<nxpl::Setting>& settingsForPlugin,
     const QString& fileDir,
-    const QString& fileName)
+    const QString& fileName,
+    const QStringList& disabledPluginLibNames)
 {
     const QString filePath = fileDir + lit("/") + fileName;
 
-    if (pluginsIni().disabledNxPlugins[0])
+    QString pluginLibName = fileName.left(fileName.lastIndexOf(lit(".")));
+    static const auto kPrefix = lit("lib");
+    if (pluginLibName.startsWith(kPrefix))
+        pluginLibName.remove(0, kPrefix.size());
+
+    if (disabledPluginLibNames.contains(pluginLibName))
     {
-        // Check if the plugin is mentioned in this setting and thus should be skipped.
-        const QStringList disabledPlugins =
-            QString::fromLatin1(pluginsIni().disabledNxPlugins).split(lit(","));
-
-        QString pluginName = fileName.left(fileName.lastIndexOf(lit(".")));
-        static const auto kPrefix = lit("lib");
-        if (pluginName.startsWith(kPrefix))
-            pluginName.remove(0, kPrefix.size());
-
-        if (disabledPlugins.contains(pluginName))
-        {
-            NX_WARNING(this) << lm("Skipped loading NX plugin %1 - demanded by %2")
-                .args(filePath, pluginsIni().iniFile());
-            return true;
-        }
+        NX_WARNING(this) << lm("Skipped loading Nx plugin [%1] (as per %2)")
+            .args(filePath, pluginsIni().iniFile());
+        return true;
     }
 
     QLibrary lib(filePath);
@@ -167,20 +171,21 @@ bool PluginManager::loadNxPlugin(
     lib.setLoadHints(hints);
     if (!lib.load())
     {
-        NX_ERROR(this) << lit("Failed to load %1: %2").arg(filePath).arg(lib.errorString());
+        NX_ERROR(this) << lit("Failed to load Nx plugin [%1]: %2")
+            .arg(filePath).arg(lib.errorString());
         return false;
     }
 
     typedef nxpl::PluginInterface* (*EntryProc)();
 
     auto entryProc = (EntryProc) lib.resolve("createNXPluginInstance");
-
     if (entryProc == nullptr)
         entryProc = (EntryProc) lib.resolve("createNxMetadataPlugin");
-
     if (entryProc == nullptr)
     {
-        NX_ERROR(this) << lit("Failed to load %1: no createNXPluginInstance").arg(filePath);
+        NX_ERROR(this) << lit("Failed to load Nx plugin [%1]: "
+            "Neither createNXPluginInstance nor createNxMetadataPlugin functions found")
+            .arg(filePath);
         lib.unload();
         return false;
     }
@@ -188,13 +193,15 @@ bool PluginManager::loadNxPlugin(
     nxpl::PluginInterface* obj = entryProc();
     if (!obj)
     {
-        NX_ERROR(this) << lit("Failed to load %1: no PluginInterface").arg(filePath);
+        NX_ERROR(this) << lit("Failed to load Nx plugin [%1]: no PluginInterface function found")
+            .arg(filePath);
         lib.unload();
         return false;
     }
 
-    NX_WARNING(this) << lit("Successfully loaded NX plugin %1").arg(filePath);
+    NX_WARNING(this) << lit("Loaded Nx plugin [%1]").arg(filePath);
     m_nxPlugins.push_back(obj);
+    m_libNameByNxPlugin.insert(obj, pluginLibName);
 
     if (auto pluginObj = nxpt::ScopedRef<nxpl::Plugin>(obj->queryInterface(nxpl::IID_Plugin)))
     {
