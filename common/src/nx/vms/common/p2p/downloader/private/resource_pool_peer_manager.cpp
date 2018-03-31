@@ -184,7 +184,18 @@ rest::Handle ResourcePoolPeerManager::downloadChunk(
     if (!connection)
         return -1;
 
-    return connection->downloadFileChunk(fileName, chunkIndex, callback, thread());
+    const auto internalCallback =
+        [callback = std::move(callback)](
+            bool success,
+            rest::Handle requestId,
+            QByteArray result,
+            const nx::network::http::HttpHeaders& /*headers*/)
+        {
+            return callback(success, requestId, result);
+        };
+
+    return connection->downloadFileChunk(fileName, chunkIndex, std::move(internalCallback),
+        thread());
 }
 
 rest::Handle ResourcePoolPeerManager::validateFileInformation(
@@ -269,17 +280,22 @@ rest::Handle ResourcePoolPeerManager::downloadChunkFromInternet(
         if (!connection)
             return -1;
 
-        auto handleReply =
-            [this, callback](bool success, rest::Handle handle, const QByteArray& result)
+        const auto handleReply =
+            [this, callback = std::move(callback)](
+                bool success,
+                rest::Handle requestId,
+                QByteArray result,
+                const nx::network::http::HttpHeaders& /*headers*/)
             {
                 if (!success)
-                    return callback(success, handle, QByteArray());
+                    return callback(success, requestId, QByteArray());
 
-                callback(success, handle, result);
+                // TODO: #vkutin #common Is double call intended?
+                return callback(success, requestId, result);
             };
 
         return connection->downloadFileChunkFromInternet(
-            fileName, url, chunkIndex, chunkSize, handleReply, thread());
+            fileName, url, chunkIndex, chunkSize, std::move(handleReply), thread());
     }
 
     const qint64 pos = chunkIndex * chunkSize;

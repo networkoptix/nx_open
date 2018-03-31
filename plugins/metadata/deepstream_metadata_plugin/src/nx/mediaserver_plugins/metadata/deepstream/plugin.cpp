@@ -11,6 +11,7 @@ extern "C" {
 #include "manager.h"
 #include "utils.h"
 #include "deepstream_common.h"
+#include "openalpr_common.h"
 #include "deepstream_metadata_plugin_ini.h"
 #define NX_PRINT_PREFIX "metadata::deepstream::Plugin::"
 #include <nx/kit/debug.h>
@@ -160,11 +161,24 @@ const char* Plugin::capabilitiesManifest(Error* error) const
         })json");
 
     m_manifest = kManifestPrefix;
-    for (auto i = 0; i < m_objectClassDescritions.size(); ++i)
+
+    if (ini().pipelineType == kOpenAlprPipeline)
     {
-        m_manifest += buildManifestObectTypeString(m_objectClassDescritions[i]);
-        if (i < m_objectClassDescritions.size() - 1)
-            m_manifest += ',';
+        ObjectClassDescription licensePlateDescrition(
+            "License Plate",
+            "",
+            kLicensePlateGuid);
+
+        m_manifest += buildManifestObectTypeString(licensePlateDescrition);
+    }
+    else
+    {
+        for (auto i = 0; i < m_objectClassDescritions.size(); ++i)
+        {
+            m_manifest += buildManifestObectTypeString(m_objectClassDescritions[i]);
+            if (i < m_objectClassDescritions.size() - 1)
+                m_manifest += ',';
+        }
     }
 
     m_manifest += kManifestPostfix;

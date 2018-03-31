@@ -1,5 +1,7 @@
 #include "export_settings_dialog_p.h"
 
+#include <chrono>
+
 #include <QtCore/QFileInfo>
 #include <QtCore/QScopedValueRollback>
 #include <QtCore/QStandardPaths>
@@ -218,7 +220,8 @@ void ExportSettingsDialog::Private::refreshMediaPreview()
         // We do have our own image processor, so we do not bother server with transcoding.
         api::ResourceImageRequest request;
         request.resource = m_exportMediaSettings.mediaResource->toResourcePtr();
-        request.msecSinceEpoch = m_exportMediaSettings.timePeriod.startTimeMs;
+        request.usecSinceEpoch = std::chrono::microseconds(std::chrono::milliseconds(
+            m_exportMediaSettings.timePeriod.startTimeMs)).count();
         request.roundMethod = api::ImageRequest::RoundMethod::iFrameBefore;
         request.rotation = 0;
         request.aspectRatio = api::ImageRequest::AspectRatio::source;

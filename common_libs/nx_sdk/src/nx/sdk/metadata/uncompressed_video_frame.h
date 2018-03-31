@@ -26,10 +26,7 @@ public:
         yuv420,
         yuv422,
         yuv444,
-        rgba,
-        rgb,
-        bgr,
-        bgra,
+        argb,
     };
 
     enum class Handle

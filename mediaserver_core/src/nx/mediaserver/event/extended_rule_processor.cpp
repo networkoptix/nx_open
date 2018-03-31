@@ -511,7 +511,7 @@ bool ExtendedRuleProcessor::executeRecordingAction(const vms::event::RecordingAc
                 camera,
                 action->getStreamQuality(),
                 action->getFps(),
-                action->getRecordBeforeSec(), //< Record-before setup is allowed after VMS-7148 is implemented
+                action->getRecordBeforeSec(),
                 action->getRecordAfterSec(),
                 action->getDurationSec());
         }
@@ -581,7 +581,7 @@ ExtendedRuleProcessor::TimespampedFrame ExtendedRuleProcessor::getEventScreensho
 
     api::CameraImageRequest request;
     request.camera = camera;
-    request.msecSinceEpoch = timestampUsec / 1000;
+    request.usecSinceEpoch = timestampUsec;
     request.size = dstSize;
     request.roundMethod = api::CameraImageRequest::RoundMethod::precise;
 

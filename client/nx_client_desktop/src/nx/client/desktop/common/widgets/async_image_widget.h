@@ -66,6 +66,15 @@ public:
     void setAutoScaleUp(bool value);
     bool autoScaleUp() const;
 
+    enum class ReloadMode
+    {
+        showLoadingIndicator,
+        showPreviousImage
+    };
+
+    ReloadMode reloadMode() const;
+    void setReloadMode(ReloadMode value);
+
 protected:
     virtual void paintEvent(QPaintEvent* event) override;
     virtual void changeEvent(QEvent* event) override;
@@ -92,6 +101,8 @@ private:
     bool m_autoScaleDown = true;
     // Should the widget enlarge image up to size of the widget
     bool m_autoScaleUp = false;
+    ReloadMode m_reloadMode = ReloadMode::showLoadingIndicator;
+    Qn::ThumbnailStatus m_previousStatus = Qn::ThumbnailStatus::Invalid;
 };
 
 } // namespace desktop

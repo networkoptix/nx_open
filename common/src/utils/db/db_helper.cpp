@@ -16,8 +16,13 @@ struct Ini: public nx::kit::IniConfig
     Ini(): IniConfig("db_helper.ini") { reload(); }
 
     NX_INI_STRING("", tuneDb, "SQL stataments ceparated by ';' to execute after DB open.");
+};
+
+static Ini& ini()
+{
+    static Ini ini;
+    return ini;
 }
-config;
 
 } // namespace
 
@@ -81,7 +86,7 @@ bool QnDbHelper::tuneDBAfterOpen(QSqlDatabase* const sqlDb)
     }
 #endif
 
-    const auto tuneQueries = QString::fromLatin1(config.tuneDb)
+    const auto tuneQueries = QString::fromLatin1(ini().tuneDb)
         .split(QChar::fromLatin1(';'), QString::SkipEmptyParts);
     for (const auto& queryLine: tuneQueries)
     {

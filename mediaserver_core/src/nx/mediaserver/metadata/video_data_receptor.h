@@ -62,7 +62,7 @@ private:
         CLConstVideoDecoderOutputPtr frame,
         bool needDeepCopy);
 
-    static nx::sdk::metadata::UncompressedVideoFrame* convertToBgraSdkFrame(
+    static nx::sdk::metadata::UncompressedVideoFrame* convertToArgbSdkFrame(
         CLConstVideoDecoderOutputPtr frame,
         bool needDeepCopy);
 

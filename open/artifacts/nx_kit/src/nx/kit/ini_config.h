@@ -71,8 +71,11 @@ public:
      */
     static void setOutput(std::ostream* output);
 
+    /** @return Currently used path to .ini files, including the trailing slash or backslash. */
+    static const char* iniFilesDir();
+
     /**
-     * Use the specified directory for .ini files. If iniFileDir is null or empty, and also before
+     * Use the specified directory for .ini files. If iniFilesDir is null or empty, and also before
      * this call, a platform-dependent system temp directory is used, which can be changed defining
      * a macro at compiling ini_config.cpp:
      * -DNX_INI_CONFIG_DEFAULT_INI_FILES_DIR=<enquoted-path-with-trailing-slash-or-backslash>
@@ -87,12 +90,11 @@ public:
     IniConfig(const IniConfig& /*other*/) = delete; //< Disable the copy constructor.
     IniConfig& operator=(const IniConfig& /*other*/) = delete; //< Disable the assignment operator.
 
+    const char* iniFile() const; /**< @return Stored copy of the string supplied to the ctor. */
+    const char* iniFilePath() const; /**< @return iniFilesDir() + iniFile(). */
+
     /** Reload values from .ini file, logging the values first time, or if changed. */
     void reload();
-
-    const char* iniFile() const; /**< @return Stored copy of the string supplied to the ctor. */
-    const char* iniFileDir() const; /**< @return Path including the trailing slash or backslash. */
-    const char* iniFilePath() const; /**< @return iniFileDir() + iniFile(). */
 
 protected:
     #define NX_INI_FLAG(DEFAULT, PARAM, DESCRIPTION) \

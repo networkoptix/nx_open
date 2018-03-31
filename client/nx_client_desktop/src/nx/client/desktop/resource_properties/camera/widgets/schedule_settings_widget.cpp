@@ -187,6 +187,9 @@ void ScheduleSettingsWidget::setStore(CameraSettingsDialogStore* store)
 
 void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
 {
+    if (!state.supportsSchedule())
+        return;
+
     const auto& recording = state.recording;
     const auto& brush = recording.brush;
     const bool recordingParamsEnabled = brush.recordingType != Qn::RT_Never
@@ -195,18 +198,29 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
     ui->recordAlwaysButton->setChecked(brush.recordingType == Qn::RT_Always);
     setReadOnly(ui->recordAlwaysButton, state.readOnly);
 
-    // TODO: #GDM This is not valid. Camera may not support HW motion, we need to check for this.
-    ui->recordMotionButton->setChecked(brush.recordingType == Qn::RT_MotionOnly);
-    setReadOnly(ui->recordMotionButton, state.readOnly);
+    const bool hasMotion = state.hasMotion();
+    ui->recordMotionButton->setEnabled(hasMotion);
+    ui->labelMotionOnly->setEnabled(hasMotion);
+    if (hasMotion)
+    {
+        ui->recordMotionButton->setChecked(brush.recordingType == Qn::RT_MotionOnly);
+        setReadOnly(ui->recordMotionButton, state.readOnly);
+    }
 
-    ui->recordMotionPlusLQButton->setChecked(brush.recordingType == Qn::RT_MotionAndLowQuality);
-    setReadOnly(ui->recordMotionPlusLQButton, state.readOnly);
+    const bool hasDualStreaming = state.hasDualStreaming();
+    ui->recordMotionPlusLQButton->setEnabled(hasDualStreaming);
+    ui->labelMotionPlusLQ->setEnabled(hasDualStreaming);
+    if (hasDualStreaming)
+    {
+        ui->recordMotionPlusLQButton->setChecked(brush.recordingType == Qn::RT_MotionAndLowQuality);
+        setReadOnly(ui->recordMotionPlusLQButton, state.readOnly);
+    }
 
     ui->noRecordButton->setChecked(brush.recordingType == Qn::RT_Never);
     setReadOnly(ui->noRecordButton, state.readOnly);
 
     ui->fpsSpinBox->setEnabled(recordingParamsEnabled);
-    ui->fpsSpinBox->setMaximum(recording.maxBrushFps());
+    ui->fpsSpinBox->setMaximum(state.maxRecordingBrushFps());
     ui->fpsSpinBox->setValue(brush.fps);
     setReadOnly(ui->fpsSpinBox, state.readOnly);
 
@@ -247,13 +261,8 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
     setWarningStyleOn(ui->panicModeLabel, state.panicMode);
 
     ui->settingsGroupBox->layout()->activate();
-}
 
-/*
-
-void ScheduleSettingsWidget::updateScheduleTypeControls()
-{
-    const bool recordingEnabled = ui->enableRecordingCheckBox->isChecked();
+    const bool recordingEnabled = recording.enabled.valueOr(false);
     const auto labels =
         {ui->labelAlways, ui->labelMotionOnly, ui->labelMotionPlusLQ, ui->labelNoRecord};
     for (auto label: labels)
@@ -266,7 +275,7 @@ void ScheduleSettingsWidget::updateScheduleTypeControls()
     }
 }
 
-
+/*
 void ScheduleSettingsWidget::at_releaseSignalizer_activated(QObject *target)
 {
     QWidget *widget = qobject_cast<QWidget *>(target);

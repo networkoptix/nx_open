@@ -239,6 +239,12 @@ public:
     void setMinDays(int value);
     int minDays() const;
 
+    int recordBeforeMotionSec() const;
+    void setRecordBeforeMotionSec(int value);
+
+    int recordAfterMotionSec() const;
+    void setRecordAfterMotionSec(int value);
+
     void setPreferredServerId(const QnUuid& value);
     QnUuid preferredServerId() const;
 

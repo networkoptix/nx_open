@@ -47,15 +47,23 @@ void RecordingThresholdWidget::setStore(CameraSettingsDialogStore* store)
 
 void RecordingThresholdWidget::loadState(const CameraSettingsDialogState& state)
 {
-    using Thresholds = CameraSettingsDialogState::RecordingSettings::Thresholds;
+    if (!state.supportsSchedule())
+        return;
 
-    ui->recordBeforeSpinBox->setValue(state.recording.thresholds.beforeSec.valueOr(
-        Thresholds::kDefaultBeforeSec));
-    setReadOnly(ui->recordBeforeSpinBox, state.readOnly);
+    const bool hasMotion = state.hasMotion();
 
-    ui->recordAfterSpinBox->setValue(state.recording.thresholds.afterSec.valueOr(
-        Thresholds::kDefaultAfterSec));
-    setReadOnly(ui->recordAfterSpinBox, state.readOnly);
+    ui->recordBeforeSpinBox->setEnabled(hasMotion);
+    ui->recordAfterSpinBox->setEnabled(hasMotion);
+    if (hasMotion)
+    {
+        ui->recordBeforeSpinBox->setValue(state.recording.thresholds.beforeSec.valueOr(
+            ec2::kDefaultRecordBeforeMotionSec));
+        setReadOnly(ui->recordBeforeSpinBox, state.readOnly);
+
+        ui->recordAfterSpinBox->setValue(state.recording.thresholds.afterSec.valueOr(
+            ec2::kDefaultRecordAfterMotionSec));
+        setReadOnly(ui->recordAfterSpinBox, state.readOnly);
+    }
 }
 
 } // namespace desktop

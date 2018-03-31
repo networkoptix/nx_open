@@ -4,6 +4,7 @@
 #include <nx/kit/debug.h>
 
 #include "camera_manager.h"
+#include "stub_metadata_plugin_ini.h"
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -26,21 +27,33 @@ nx::sdk::metadata::CameraManager* Plugin::obtainCameraManager(
 
 std::string Plugin::capabilitiesManifest() const
 {
+    using Guid = nxpt::NxGuidHelper;
+
+    std::string capabilities;
+    if (ini().needDeepCopyForMediaFrame)
+        capabilities += "needDeepCopyForMediaFrame";
+    if (ini().needUncompressedVideoFrames)
+    {
+        if (!capabilities.empty())
+            capabilities += "|";
+        capabilities += "needUncompressedVideoFrames";
+    }
+
     return R"json(
         {
-            "driverId": ")json" + nxpt::NxGuidHelper::toStdString(kDriverGuid) + R"json(",
+            "driverId": ")json" + Guid::toStdString(kDriverGuid) + R"json(",
             "driverName": {
                 "value": "Stub Driver"
             },
             "outputEventTypes": [
                 {
-                    "typeId": ")json" + nxpt::NxGuidHelper::toStdString(kLineCrossingEventGuid) + R"json(",
+                    "typeId": ")json" + Guid::toStdString(kLineCrossingEventGuid) + R"json(",
                     "name": {
                         "value": "Line crossing"
                     }
                 },
                 {
-                    "typeId": ")json" + nxpt::NxGuidHelper::toStdString(kObjectInTheAreaEventGuid) + R"json(",
+                    "typeId": ")json" + Guid::toStdString(kObjectInTheAreaEventGuid) + R"json(",
                     "name": {
                         "value": "Object in the area"
                     },
@@ -49,29 +62,29 @@ std::string Plugin::capabilitiesManifest() const
             ],
             "outputObjectTypes": [
                 {
-                    "typeId": ")json" + nxpt::NxGuidHelper::toStdString(kCarObjectGuid) + R"json(",
+                    "typeId": ")json" + Guid::toStdString(kCarObjectGuid) + R"json(",
                     "name": {
                         "value": "Car"
                     }
                 },
                 {
-                    "typeId": ")json" + nxpt::NxGuidHelper::toStdString(kHumanFaceObjectGuid) + R"json(",
+                    "typeId": ")json" + Guid::toStdString(kHumanFaceObjectGuid) + R"json(",
                     "name": {
                         "value": "Human face"
                     }
                 }
             ],
-            "capabilities": "needDeepCopyForMediaFrame|needUncompressedVideoFrames",
+            "capabilities": ")json" + capabilities + R"json(",
             "settings": {
                 "params": [
                     {
-                        "id": "paramAId",
+                        "id": "paramA",
                         "dataType": "Number",
                         "name": "Param A",
                         "description": "Number A"
                     },
                     {
-                        "id": "paramBId",
+                        "id": "paramB",
                         "dataType": "Enumeration",
                         "range": "b1,b3",
                         "name": "Param B",
@@ -128,7 +141,7 @@ std::string Plugin::capabilitiesManifest() const
                         "value": "Add person (URL-based)"
                     },
                     "supportedObjectTypeIds": [
-                        ")json" + nxpt::NxGuidHelper::toStdString(kCarObjectGuid) + R"json("
+                        ")json" + Guid::toStdString(kCarObjectGuid) + R"json("
                     ]
                 }
             ]

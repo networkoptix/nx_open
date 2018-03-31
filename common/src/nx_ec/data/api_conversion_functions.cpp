@@ -217,8 +217,6 @@ void fromResourceToApi(const QnScheduleTask& src, ApiScheduleTaskData& dst)
     dst.endTime = src.endTime;
     dst.recordingType = src.recordingType;
     dst.dayOfWeek = src.dayOfWeek;
-    dst.beforeThreshold = src.beforeThresholdSec;
-    dst.afterThreshold = src.afterThresholdSec;
     dst.streamQuality = src.streamQuality;
     dst.fps = src.fps;
     dst.bitrateKbps = src.bitrateKbps;
@@ -230,8 +228,6 @@ void fromApiToResource(const ApiScheduleTaskData& src, QnScheduleTask& dst)
     dst.endTime = src.endTime;
     dst.recordingType = src.recordingType;
     dst.dayOfWeek = src.dayOfWeek;
-    dst.beforeThresholdSec = src.beforeThreshold;
-    dst.afterThresholdSec = src.afterThreshold;
     dst.streamQuality = src.streamQuality;
     dst.fps = src.fps;
     dst.bitrateKbps = src.bitrateKbps;
@@ -269,6 +265,8 @@ void fromApiToResource(const ApiCameraAttributesData& src, const QnCameraUserAtt
     dst->failoverPriority = src.failoverPriority;
     dst->backupQualities = src.backupType;
     dst->logicalId = src.logicalId;
+    dst->recordBeforeMotionSec = src.recordBeforeMotionSec;
+    dst->recordAfterMotionSec = src.recordAfterMotionSec;
 }
 
 void fromResourceToApi(const QnCameraUserAttributesPtr& src, ApiCameraAttributesData& dst)
@@ -285,7 +283,7 @@ void fromResourceToApi(const QnCameraUserAttributesPtr& src, ApiCameraAttributes
     dst.scheduleTasks.clear();
     for (const QnScheduleTask& srcTask: src->scheduleTasks)
     {
-        dst.scheduleTasks.push_back(ApiScheduleTaskData());
+        dst.scheduleTasks.emplace_back();
         fromResourceToApi(srcTask, dst.scheduleTasks.back());
     }
 
@@ -299,6 +297,8 @@ void fromResourceToApi(const QnCameraUserAttributesPtr& src, ApiCameraAttributes
     dst.failoverPriority = src->failoverPriority;
     dst.backupType = src->backupQualities;
     dst.logicalId = src->logicalId;
+    dst.recordBeforeMotionSec = src->recordBeforeMotionSec;
+    dst.recordAfterMotionSec = src->recordAfterMotionSec;
 }
 
 void fromApiToResourceList(const ApiCameraAttributesDataList& src, QnCameraUserAttributesList& dst)
@@ -308,7 +308,7 @@ void fromApiToResourceList(const ApiCameraAttributesDataList& src, QnCameraUserA
     {
         QnCameraUserAttributesPtr dstElement(new QnCameraUserAttributes());
         fromApiToResource(cameraAttrs, dstElement);
-        dst.push_back(std::move(dstElement));
+        dst.push_back(dstElement);
     }
 }
 

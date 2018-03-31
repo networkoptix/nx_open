@@ -1,6 +1,8 @@
 #include "layout_thumbnail_loader.h"
 
 #include <algorithm>
+#include <chrono>
+
 #include <QtGui/QPainter>
 
 #include <core/resource/camera_resource.h>
@@ -622,11 +624,13 @@ void LayoutThumbnailLoader::doLoadAsync()
         if (!zoomRect.isEmpty())
             thumbnailSize /= zoomRect.height();
 
+        using namespace std::chrono;
+
         // Fill in request for the thumbnail.
         // We will warp this image later.
         api::ResourceImageRequest request;
         request.resource = thumbnailItem->resource;
-        request.msecSinceEpoch = d->msecSinceEpoch;
+        request.usecSinceEpoch = microseconds(milliseconds(d->msecSinceEpoch)).count();
         request.size = thumbnailSize;
         request.rotation = 0;
         // server still should provide most recent frame when we request request.msecSinceEpoch = -1

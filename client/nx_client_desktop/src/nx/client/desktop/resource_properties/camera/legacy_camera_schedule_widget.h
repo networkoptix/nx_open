@@ -31,7 +31,7 @@ public:
     explicit LegacyCameraScheduleWidget(QWidget* parent = nullptr, bool snapScrollbarToParent = true);
     virtual ~LegacyCameraScheduleWidget() override;
 
-    void overrideMotionType(Qn::MotionType motionTypeOverride = Qn::MT_Default);
+    void setMotionDetectionAllowed(bool value = true);
 
     QnScheduleTaskList scheduleTasks() const;
     void setScheduleTasks(const QnScheduleTaskList& value);
@@ -67,8 +67,6 @@ protected:
 
 private:
     bool canEnableRecording() const;
-
-    void updateRecordThresholds(QnScheduleTaskList& tasks);
 
     void updateScheduleTypeControls();
     void updateGridParams(bool pickedFromGrid = false);
@@ -157,7 +155,7 @@ private:
     bool m_advancedSettingsSupported = false;
     bool m_advancedSettingsVisible = false;
 
-    Qn::MotionType m_motionTypeOverride = Qn::MT_Default;
+    bool m_motionDetectionAllowed = true;
 
     QString m_scheduleAlert;
 

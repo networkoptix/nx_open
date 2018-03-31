@@ -56,7 +56,7 @@ using namespace nx::sdk::metadata;
 #if 0
     uncompressedFrame = convertToYuv420pSdkFrame(frame, needDeepCopy);
 #else
-    uncompressedFrame = convertToBgraSdkFrame(frame, needDeepCopy);
+    uncompressedFrame = convertToArgbSdkFrame(frame, needDeepCopy);
 #endif
     return uncompressedFrame;
 }
@@ -85,7 +85,7 @@ using namespace nx::sdk::metadata;
             lineSize[i] = planeLineSize;
         }
 
-        packet->setOwnedData(data, lineSize);
+        packet->setOwnedData(std::move(data), std::move(lineSize));
     }
     else
     {
@@ -104,38 +104,24 @@ using namespace nx::sdk::metadata;
             lineSize[i] = frame->linesize[i];
         }
 
-        packet->setExternalData(data, dataSize, lineSize);
+        packet->setExternalData(std::move(data), std::move(dataSize), std::move(lineSize));
     }
 
     return packet;
 }
 
-/*static*/ nx::sdk::metadata::UncompressedVideoFrame* VideoDataReceptor::convertToBgraSdkFrame(
+/*static*/ nx::sdk::metadata::UncompressedVideoFrame* VideoDataReceptor::convertToArgbSdkFrame(
     CLConstVideoDecoderOutputPtr frame,
     bool needDeepCopy)
 {
-    static const int kPlaneCount = 1;
-    CLVideoDecoderOutputPtr bgraFrame(
-        frame->scaled(QSize(frame->width, frame->height), AV_PIX_FMT_BGRA));
-
-    if (!bgraFrame)
-        return nullptr;
-
     const auto packet = new CommonUncompressedVideoFrame(
-        bgraFrame->pkt_dts, bgraFrame->width, bgraFrame->height);
+        frame->pkt_dts, frame->width, frame->height);
+    packet->setPixelFormat(UncompressedVideoFrame::PixelFormat::argb);
+    std::vector<std::vector<char>> data(1);
+    std::vector<int> lineSize(1);
+    data[0] = frame->toArgb(&lineSize[0]);
 
-    packet->setPixelFormat(UncompressedVideoFrame::PixelFormat::bgra);
-
-    // TODO: #dmishin do not perform deep copy always
-    std::vector<std::vector<char>> data(kPlaneCount);
-    std::vector<int> lineSize(kPlaneCount);
-    const auto dataSize = bgraFrame->width * bgraFrame->height * 4;
-
-    data[0].resize(dataSize);
-    memcpy(&data[0].front(), bgraFrame->data[0], dataSize);
-    lineSize[0] = bgraFrame->linesize[0];
-    packet->setOwnedData(data, lineSize);
-
+    packet->setOwnedData(std::move(data), std::move(lineSize));
     return packet;
 }
 

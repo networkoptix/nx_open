@@ -46,7 +46,7 @@ struct ImageRequest
      * Timestamp of the image. A negative value means "latest" Can have the special value
      * DATETIME_NOW.
      */
-    qint64 msecSinceEpoch = kLatestThumbnail;
+    qint64 usecSinceEpoch = kLatestThumbnail;
 
     /** Forced rotation. Negative value means take default rotation from the camera settings. */
     int rotation = kDefaultRotation;

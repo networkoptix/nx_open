@@ -55,12 +55,16 @@
 #define NX_INI_FLAG(DEFAULT, PARAM, DESCR) bool PARAM
 #define NX_INI_INT(DEFAULT, PARAM, DESCR) int PARAM
 #define NX_INI_STRING(DEFAULT, PARAM, DESCR) const char* PARAM
+#define NX_INI_FLOAT(DEFAULT, PARAM, DESCR) float PARAM
+#define NX_INI_DOUBLE(DEFAULT, PARAM, DESCR) double PARAM
 
 struct Ini NX_INI_STRUCT; //< Ini struct definition.
 
 #undef NX_INI_FLAG
 #undef NX_INI_INT
 #undef NX_INI_STRING
+#undef NX_INI_FLOAT
+#undef NX_INI_DOUBLE
 
 enum NxIniOutput { NX_INI_OUTPUT_NONE, NX_INI_OUTPUT_STDOUT, NX_INI_OUTPUT_STDERR };
 
@@ -78,7 +82,7 @@ NX_KIT_C_API bool nx_ini_isEnabled(void);
 NX_KIT_C_API void nx_ini_setOutput(enum NxIniOutput output);
 NX_KIT_C_API void nx_ini_reload(void);
 NX_KIT_C_API const char* nx_ini_iniFile(void);
-NX_KIT_C_API const char* nx_ini_iniFileDir(void);
+NX_KIT_C_API const char* nx_ini_iniFilesDir(void);
 NX_KIT_C_API const char* nx_ini_iniFilePath(void);
 
 #if defined(__cplusplus)
@@ -116,6 +120,14 @@ struct CppIni: public IniConfig
         #define NX_INI_STRING(DEFAULT, PARAM, DESCR) \
             pIni->PARAM = regStringParam(&pIni->PARAM, (DEFAULT), #PARAM, (DESCR))
 
+        #undef NX_INI_FLOAT
+        #define NX_INI_FLOAT(DEFAULT, PARAM, DESCR) \
+            pIni->PARAM = regFloatParam(&pIni->PARAM, (DEFAULT), #PARAM, (DESCR))
+
+        #undef NX_INI_DOUBLE
+        #define NX_INI_DOUBLE(DEFAULT, PARAM, DESCR) \
+            pIni->PARAM = regDoubleParam(&pIni->PARAM, (DEFAULT), #PARAM, (DESCR))
+
         NX_INI_STRUCT //< Expands using the macros defined above.
     }
 
@@ -145,7 +157,7 @@ void nx_ini_setOutput(enum NxIniOutput output)
 
 void nx_ini_reload() { cppIni.reload(); }
 const char* nx_ini_iniFile() { return cppIni.iniFile(); }
-const char* nx_ini_iniFileDir() { return cppIni.iniFileDir(); }
+const char* nx_ini_iniFilesDir() { return IniConfig::iniFilesDir(); }
 const char* nx_ini_iniFilePath() { return cppIni.iniFilePath(); }
 
 } // extern "C"
