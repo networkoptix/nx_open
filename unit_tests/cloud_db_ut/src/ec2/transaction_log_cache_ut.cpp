@@ -65,13 +65,15 @@ protected:
 
     void assertIfRawDataIsVisible()
     {
-        assertIfNotEqual(m_committedData, m_cache);
+        assertEqual(m_committedData, m_cache);
     }
 
     void commit(TranId tranId)
     {
         m_cache.commit(tranId);
-        m_committedData = m_rawData[tranId];
+        // Timestamp sequence MUST NOT decrease.
+        m_committedData.timestampSequence =
+            std::max(m_committedData.timestampSequence, m_rawData[tranId].timestampSequence);
         m_rawData.erase(tranId);
     }
 
@@ -106,12 +108,12 @@ protected:
             (int)m_cache.committedTimestampSequence());
     }
 
-    void assertIfCommittedDataIsNotVisible()
+    void assertCommittedDataIsVisible()
     {
-        assertIfNotEqual(m_committedData, m_cache);
+        assertEqual(m_committedData, m_cache);
     }
 
-    void assertIfCacheStateIsNotValid()
+    void assertCacheStateIsValid()
     {
         const auto newSequence = m_cache.generateTransactionSequence(
             ::ec2::ApiPersistentIdData(QnUuid(m_peerId), m_dbId));
@@ -121,9 +123,9 @@ protected:
         }
     }
 
-    void assertIfStateHasBeenChanged()
+    void assertStateHasNotBeenChanged()
     {
-        assertIfNotEqual(m_committedData, m_cache);
+        assertEqual(m_committedData, m_cache);
     }
 
 private:
@@ -183,7 +185,7 @@ private:
         m_transactionSequenceGenerated.insert(transactionHeader.persistentInfo.sequence);
     }
 
-    void assertIfNotEqual(const CacheState& cacheState, const VmsTransactionLogCache& cache)
+    void assertEqual(const CacheState& cacheState, const VmsTransactionLogCache& cache)
     {
         ASSERT_EQ(cacheState.timestampSequence, cache.committedTimestampSequence());
     }
@@ -197,7 +199,7 @@ TEST_F(TransactionLogCache, commit_saves_data)
     modifyDataUnderTran(tranId);
     assertIfRawDataIsVisible();
     commit(tranId);
-    assertIfCommittedDataIsNotVisible();
+    assertCommittedDataIsVisible();
 }
 
 TEST_F(TransactionLogCache, transaction_isolation)
@@ -208,7 +210,7 @@ TEST_F(TransactionLogCache, transaction_isolation)
     modifyDataUnderTran(tran2Id);
     commit(tran1Id);
     commit(tran2Id);
-    assertIfCommittedDataIsNotVisible();
+    assertCommittedDataIsVisible();
 }
 
 TEST_F(TransactionLogCache, rollback)
@@ -217,7 +219,7 @@ TEST_F(TransactionLogCache, rollback)
     modifyDataUnderTran(tranId);
     assertIfRawDataIsVisible();
     rollback(tranId);
-    assertIfStateHasBeenChanged();
+    assertStateHasNotBeenChanged();
 }
 
 TEST_F(TransactionLogCache, transaction_pipelining)
@@ -227,8 +229,8 @@ TEST_F(TransactionLogCache, transaction_pipelining)
     modifyDataUnderEachTransaction();
     commitTransactionsInReverseOrder();
 
-    assertIfCommittedDataIsNotVisible();
-    assertIfCacheStateIsNotValid();
+    assertCommittedDataIsVisible();
+    assertCacheStateIsValid();
 }
 
 TEST_F(TransactionLogCache, timestamp_sequence_is_updated_by_external_transaction)
