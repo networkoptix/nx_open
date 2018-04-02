@@ -1,7 +1,8 @@
 #include <algorithm>
 #include <iterator>
-#include "space_info.h"
 #include <nx/utils/log/log.h>
+#include <nx/utils/literal.h>
+#include "space_info.h"
 
 namespace nx{
 namespace recorder {
@@ -38,7 +39,7 @@ void SpaceInfo::storageChanged(int index, int64_t freeSpace, int64_t nxOccupiedS
     QnMutexLocker lock(&m_mutex);
     auto storageIndexIt = storageByIndex(index);
     NX_CRITICAL(storageIndexIt != m_storageSpaceInfo.cend());
-    storageIndexIt->effectiveSpace = qMax(freeSpace + nxOccupiedSpace - spaceLimit, 0LL);
+    storageIndexIt->effectiveSpace = std::max<int64_t>(freeSpace + nxOccupiedSpace - spaceLimit, 0LL);
     NX_LOG(lit("[Storage, SpaceInfo, Selection] Calculating effective space for storage %1. \
 Free space = %2, nxOccupiedSpace = %3, spaceLimit = %4, effectiveSpace = %5")
         .arg(storageIndexIt->index)
