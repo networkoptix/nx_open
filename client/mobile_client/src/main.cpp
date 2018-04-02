@@ -272,7 +272,7 @@ void initLog(const QString& logLevel)
             /*baseName*/
                 QnAppInfo::isAndroid()
                 ? lit("-")
-                : (QString::fromUtf8(ini().iniFileDir()) + lit("ec2_tran")),
+                : (QString::fromUtf8(ini().iniFilesDir()) + lit("ec2_tran")),
             ec2logger);
     }
 }
