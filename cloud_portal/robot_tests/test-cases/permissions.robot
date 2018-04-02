@@ -201,6 +201,10 @@ Delete user works
 Share with registered user - sends him notification
     [tags]    email
     Open Browser and go to URL    ${url}
+    Log In    ${EMAIL NOPERM}    ${password}
+    Validate Log In
+    Log Out
+    Validate Log Out
     Log in to Auto Tests System    ${email}
     Verify In System    Auto Tests
     Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}

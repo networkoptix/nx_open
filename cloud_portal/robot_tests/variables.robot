@@ -73,7 +73,7 @@ ${REGISTER PASSWORD INPUT}            //form[@name= 'registerForm']//password-in
 ${REGISTER SUBSCRIBE CHECKBOX}        //form[@name= 'registerForm']//input[@ng-model='account.subscribe']
 ${CREATE ACCOUNT BUTTON}              //form[@name= 'registerForm']//button[contains(text(), '${CREATE ACCOUNT BUTTON TEXT}')]
 ${TERMS AND CONDITIONS LINK}          //form[@name= 'registerForm']//a[@href='/content/eula' and contains(text(), '${TERMS AND CONDITIONS LINK TEXT}')]
-${RESEND ACTIVATION LINK BUTTON}      //form[@name= 'reactivateAccount']//button[contains(text(), '${RESEND ACTIVATION LINK BUTTON TEXT}')]
+${RESEND ACTIVATION LINK BUTTON}      //form[@name= 'reactivateAccount']//button[contains(text(), "${RESEND ACTIVATION LINK BUTTON TEXT}")]
 
 ${EMAIL ALREADY REGISTERED}           //span[@ng-if="registerForm.registerEmail.$error.alreadyExists"]
 
@@ -159,7 +159,7 @@ ${255CHARS}                           QWErtyuiopasdfghhkljzxcvbnmqwertyuiopasdfg
 
 #Emails
 ${BASE EMAIL}                         noptixautoqa@gmail.com
-${BASE EMAIL PASSWORD}                qweasd!@#
+${BASE EMAIL PASSWORD}                qweasd!@#$
 ${BASE HOST}                          imap.gmail.com
 ${BASE PORT}                          993
 ${EMAIL VIEWER}                       noptixautoqa+viewer@gmail.com
