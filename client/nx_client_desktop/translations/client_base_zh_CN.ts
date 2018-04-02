@@ -4475,7 +4475,7 @@ to %1</source>
     <name>QnNewWearableCameraDialog</name>
     <message>
       <source>Wearable Camera</source>
-      <translation>穿戴式相机...</translation>
+      <translation>穿戴式相机</translation>
     </message>
     <message>
       <source>Wearable Camera %1</source>

@@ -55,7 +55,7 @@
     "settingsConfig": {
         "arecontRtspEnabled": "Arecont RTSP ingeschakeld",
         "auditTrailEnabled": "Audit trail ingeschakeld",
-        "auditTrailPeriodDays": "Audit trail period days",
+        "auditTrailPeriodDays": "Aantal dagen voor de systeemrapportage",
         "autoDiscoveryEnabled": "Schakel automatische detectie van apparaten in",
         "autoUpdateThumbnails": "Miniaturen automatisch bijwerken",
         "backupNewCamerasByDefault": "Maak standaard een back-up van nieuwe camera's",
@@ -101,7 +101,7 @@
         "statisticsAllowed": "Verzend anonieme gebruiksstatistieken en crashmeldingen",
         "statisticsReportLastNumber": "Statistiekenrapport - laatste nummer",
         "statisticsReportLastTime": "Statistiekenrapport - laatste keer",
-        "statisticsReportLastVersion": "Statistics report - last version",
+        "statisticsReportLastVersion": "Statistiekenrapport - laatste versie",
         "statisticsReportServerApi": "Statistieken server api",
         "statisticsReportTimeCycle": "Statistieken rapport interval",
         "statisticsReportUpdateDelay": "Statistieken verslag - update vertraging",

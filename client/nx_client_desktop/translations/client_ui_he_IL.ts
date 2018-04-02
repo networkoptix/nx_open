@@ -151,7 +151,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
       <source>Fixed Archive Length</source>
-      <translation>מספר הימים לשמירה בארכיון</translation>
+      <translation>אורך ארכיון קבוע</translation>
     </message>
     <message>
       <location/>
@@ -1686,17 +1686,17 @@
     <message>
       <location filename="../src/ui/dialogs/new_wearable_camera_dialog.ui"/>
       <source>New Wearable Camera...</source>
-      <translation type="unfinished">New Wearable Camera...</translation>
+      <translation>מצלמה לבישה חדשה...</translation>
     </message>
     <message>
       <location/>
       <source>To server</source>
-      <translation type="unfinished">To server</translation>
+      <translation>לשרת</translation>
     </message>
     <message>
       <location/>
       <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</translation>
+      <translation>&amp;;;quot;מצלמה לבישה&amp;;;quot; היא אחסון וירטואלי עבור קובצי וידאו, שניתן להעלותם לכל שרת במערכת ולהיכנס אליו על ידי כל משתמש.</translation>
     </message>
   </context>
   <context>
@@ -2551,8 +2551,7 @@
       <location/>
       <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage.
 The oldest footage among all cameras on the server will be deleted first.</source>
-      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage.
-The oldest footage among all cameras on the server will be deleted first.</translation>
+      <translation>הארכיון שהועלה יכול להימחק באופן אוטומטי, אם אין שטח פנוי באחסון שרת. הסרטון הישן ביותר מבין כל המצלמות בשרת יימחק תחילה.</translation>
     </message>
   </context>
   <context>
@@ -2896,7 +2895,7 @@ Click &quot;New role&quot; button to create one.</source>
     <message>
       <location/>
       <source>Detect motion in uploaded video</source>
-      <translation type="unfinished">Detect motion in uploaded video</translation>
+      <translation>זיהוי תנועה בסרטון שהועלה</translation>
     </message>
     <message>
       <location/>
@@ -2917,17 +2916,17 @@ Click &quot;New role&quot; button to create one.</source>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
       <source>Upload Video</source>
-      <translation type="unfinished">Upload Video</translation>
+      <translation>העלאת סרטון</translation>
     </message>
     <message>
       <location/>
       <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
+      <translation>העלה קובץ...</translation>
     </message>
     <message>
       <location/>
       <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
+      <translation>תיקיה להעלאה...</translation>
     </message>
   </context>
   <context>

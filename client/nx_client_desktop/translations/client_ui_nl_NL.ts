@@ -1696,7 +1696,7 @@
     <message>
       <location/>
       <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</translation>
+      <translation>&quot;Draagbare camera&quot; is een virtuele opslag voor videobestanden, die kan worden geüpload naar elke server binnen uw systeem en toegankelijk is voor elke gebruiker.</translation>
     </message>
   </context>
   <context>
@@ -2895,7 +2895,7 @@ Click &quot;New role&quot; button to create one.</source>
     <message>
       <location/>
       <source>Detect motion in uploaded video</source>
-      <translation type="unfinished">Detect motion in uploaded video</translation>
+      <translation>Beweging detecteren in de geüploade video</translation>
     </message>
     <message>
       <location/>
