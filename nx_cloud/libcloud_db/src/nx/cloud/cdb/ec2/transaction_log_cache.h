@@ -57,7 +57,6 @@ public:
         ::ec2::ApiPersistentIdData tranStateKey,
         int sequence,
         const nx::Buffer& tranHash,
-        std::uint64_t settingsTimestampHi,
         const ::ec2::Timestamp& timestamp);
 
     TranId beginTran();
