@@ -148,7 +148,7 @@ protected:
         {
             auto tran = prepareFromOtherPeerWithTimestampDiff(1);
             tran.persistentInfo.timestamp.sequence =
-                std::max(m_lastUsedSequence + 1, tran.persistentInfo.timestamp.sequence + 1);
+                std::max<std::uint64_t>(m_lastUsedSequence + 1, tran.persistentInfo.timestamp.sequence + 1);
             m_lastUsedSequence = tran.persistentInfo.timestamp.sequence;
             saveTransaction(tran);
         }
