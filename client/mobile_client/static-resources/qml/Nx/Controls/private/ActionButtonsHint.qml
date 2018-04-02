@@ -151,9 +151,9 @@ Rectangle
         control.state = "hidden"
     }
 
-    onVisibleChanged:
+    onOpacityChanged:
     {
-        if (visible)
+        if (opacity > 0)
             return
 
         loader.sourceComponent = dummyComponent
