@@ -8,127 +8,125 @@ Rectangle
 
     property int horizontalPadding: 12
     property int verticalPadding: 12
-    property alias progressDuration: progressAnmiation.duration
 
     width: bodyRow.width + horizontalPadding
     height: bodyRow.height + verticalPadding * 2
     color: ColorTheme.transparent(ColorTheme.base8, 0.95)
     radius: 2
 
-    visible: false
+    opacity: 0
+    visible: opacity > 0
 
-    onWidthChanged:
-    {
-        if (!progressAnmiation.running)
-            return;
+    states: [
+        State
+        {
+            name: "visible"
+            PropertyChanges { target: control; opacity: 1 }
+        },
 
-        progressAnmiation.stop()
-        progressAnmiation.from = progressRect.width
-        progressAnmiation.to = control.width
-        progressAnmiation.start()
-    }
+        State
+        {
+            name: "hidden"
+            PropertyChanges { target: control; opacity: 0 }
+        }
+    ]
 
-    Rectangle
-    {
-        id: progressRect
-        color: Qt.rgba(0, 1, 0, 0.3)
-        height: parent.height
-        width: 0
-    }
+    transitions: [
+        Transition
+        {
+            from: "visible"
+            to: "hidden"
 
+            NumberAnimation
+            {
+                target: control
+                property: "opacity"
+                duration: 80
+            }
+        },
+        Transition
+        {
+            from: "hidden"
+            to: "visible"
 
-    PropertyAnimation
-    {
-        id: progressAnmiation
-
-        target: progressRect
-        properties: "width"
-        from: 0
-        to: control.width
-        duration: 1000
-    }
+            NumberAnimation
+            {
+                target: control
+                property: "opacity"
+                duration: 160
+            }
+        }
+    ]
 
     function showHint(text, iconPath)
     {
         hideTimer.stop()
 
-        hintText.visible = true
-
-        border.color = control.color
-
         loader.sourceComponent = textComponent
         loader.item.text = text
         loader.item.color = ColorTheme.brightText
 
+        activityPreloader.visible = false
+
         visualDataLoader.sourceComponent = imageComponent
         visualDataLoader.item.source = iconPath
 
-        control.visible = true
-        progressAnmiation.stop()
-        progressAnmiation.from = 0
-        progressAnmiation.to = control.width
-        progressAnmiation.start()
+        control.state = "visible"
     }
 
     function showCustomProcess(component, iconPath)
     {
         hideTimer.stop()
 
-        hintText.visible = false
-        stopProgressAnimation()
-
-        border.color = control.color
-
         loader.sourceComponent = component
+
+        activityPreloader.visible = true
 
         visualDataLoader.sourceComponent = imageComponent
         visualDataLoader.item.source = iconPath
 
-        control.visible = true
+        control.state = "visible"
     }
 
     function showPreloader(text)
     {
         hideTimer.stop();
 
-        hintText.visible = false
-        stopProgressAnimation()
-
-        border.color = control.color
+        activityPreloader.visible = false
 
         loader.sourceComponent = textComponent
         loader.item.text = text
         loader.item.color = ColorTheme.brightText
 
         visualDataLoader.sourceComponent = dotsPreloader
-        control.visible = true
+        control.state = "visible"
     }
 
-    function showSuccess(text, showBorder)
+    function showActivity(text, iconPath)
     {
-        showResult(text, showBorder, true)
+        showHint(text, iconPath)
+        activityPreloader.visible = true
     }
 
-    function showFailure(text, showBorder)
+    function showSuccess(text)
     {
-        showResult(text, showBorder, false)
+        showResult(text, true)
     }
 
-    function showResult(text, showBorder, success)
+    function showFailure(text)
+    {
+        showResult(text, false)
+    }
+
+    function showResult(text, success)
     {
         hideTimer.restart()
-
-        hintText.visible = false
-        stopProgressAnimation()
 
         var customColor = success
             ? ColorTheme.brightText
             : ColorTheme.red_l2
 
-        if (showBorder)
-            border.color = customColor
-        else
-            border.color = control.color
+        activityPreloader.visible = false
 
         loader.sourceComponent = textComponent
         loader.item.text = text
@@ -139,13 +137,7 @@ Rectangle
             ? "qrc:///images/soft_trigger/confirmation_success.png"
             : "qrc:///images/soft_trigger/confirmation_failure.png"
 
-        control.visible = true
-    }
-
-    function stopProgressAnimation()
-    {
-        progressAnmiation.stop()
-        progressRect.width = 0
+        control.state = "visible"
     }
 
     function hideDelayed()
@@ -155,11 +147,17 @@ Rectangle
 
     function hide()
     {
+        hideTimer.stop()
+        control.state = "hidden"
+    }
+
+    onVisibleChanged:
+    {
+        if (visible)
+            return
+
         loader.sourceComponent = dummyComponent
         visualDataLoader.sourceComponent = dummyComponent
-
-        hideTimer.stop()
-        control.visible = false
     }
 
     Row
@@ -169,20 +167,6 @@ Rectangle
         x: control.horizontalPadding
         y: control.verticalPadding
         height: 24
-
-        Text
-        {
-            id: hintText
-
-            height: 24
-            wrapMode: Text.NoWrap
-            verticalAlignment: Text.AlignVCenter
-            color: "lightblue"
-            font.pixelSize: 14
-            font.weight: Font.Normal
-            text: qsTr("Hold to:")
-            rightPadding: 8
-        }
 
         Loader
         {
@@ -195,6 +179,12 @@ Rectangle
             width: 48
             height: 48
             anchors.verticalCenter: parent.verticalCenter
+
+            ActivityPreloader
+            {
+                id: activityPreloader
+                anchors.centerIn: parent
+            }
 
             Loader
             {
@@ -209,7 +199,7 @@ Rectangle
         id: hideTimer
 
         interval: 3000
-        onTriggered: control.visible = false
+        onTriggered: control.state = "hidden"
     }
 
     Component

@@ -4,7 +4,7 @@ ListView
 {
     id: control
 
-    property int pressedStateFilterMs: 400
+    property int pressedStateFilterMs: 500
     property int emptyHeaderSize: 4
     readonly property alias scrollable: d.prefferToBeInteractive
 
