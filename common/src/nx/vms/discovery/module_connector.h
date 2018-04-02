@@ -67,6 +67,7 @@ private:
         ModuleConnector* const m_parent;
         const QnUuid m_id;
         Endpoints m_endpoints;
+        boost::optional<SocketAddress> m_lastSuccessfulEndpoint; //< TODO: Should not be merged into 4.0!!
         std::set<SocketAddress> m_forbiddenEndpoints;
         network::RetryTimer m_reconnectTimer;
         std::set<nx_http::AsyncHttpClientPtr> m_httpClients;

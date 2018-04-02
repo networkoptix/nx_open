@@ -1,5 +1,7 @@
 if(targetDevice)
-    if(targetDevice MATCHES "bpi|bananapi")
+    if(targetDevice MATCHES "linux-x64|linux-x86")
+        nx_rdep_sync_package(${targetDevice}/gcc-7.3.0)
+    elseif(targetDevice MATCHES "bpi|bananapi")
         nx_rdep_sync_package(bpi/gcc-linaro-7.2.1)
         set(toolchain_directory "${PACKAGES_DIR}/bpi/gcc-linaro-7.2.1")
     elseif(targetDevice MATCHES "rpi|edge1")

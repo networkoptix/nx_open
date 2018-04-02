@@ -113,8 +113,6 @@ QnResourcePtr QnActiResourceSearcher::createResource(const QnUuid &resourceTypeI
     result = QnVirtualCameraResourcePtr( new QnActiResource() );
     result->setTypeId(resourceTypeId);
 
-    qDebug() << "Create ACTI camera resource. TypeID" << resourceTypeId.toString(); // << ", Parameters: " << parameters;
-
     return result;
 
 }
