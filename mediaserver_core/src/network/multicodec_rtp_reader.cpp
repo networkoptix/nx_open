@@ -33,6 +33,8 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_data_pool.h>
 
+#include <nx/utils/scope_guard.h>
+
 using namespace nx;
 
 namespace {

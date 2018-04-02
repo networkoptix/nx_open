@@ -88,7 +88,7 @@ boost::optional<Event> BytestreamFilter::createEvent(
     if (!event.isActive
         && !eventDescriptor.flags.testFlag(Analytics::EventTypeFlag::stateDependent))
     {
-        return boost::optional<HanwhaEvent>();
+        return {};
     }
 
     event.itemType = eventItemType(eventSource, eventState);

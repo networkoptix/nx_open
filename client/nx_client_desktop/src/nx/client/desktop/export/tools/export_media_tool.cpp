@@ -14,7 +14,7 @@
 
 #include <core/resource/avi/avi_archive_delegate.h>
 #include <core/resource/avi/thumbnails_stream_reader.h>
-#include <core/dataprovider/h264_mp4_to_annexb.h>
+#include <media/filters/h264_mp4_to_annexb.h>
 
 namespace nx {
 namespace client {

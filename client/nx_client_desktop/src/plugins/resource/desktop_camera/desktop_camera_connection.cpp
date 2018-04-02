@@ -275,7 +275,7 @@ void QnDesktopCameraConnection::run()
     const auto setupNetwork =
         [this](
             std::unique_ptr<nx::network::http::HttpClient> newClient,
-            QSharedPointer<AbstractStreamSocket> newSocket)
+            QSharedPointer<nx::network::AbstractStreamSocket> newSocket)
         {
             auto newProcessor = newSocket
                 ? std::make_shared<QnDesktopCameraConnectionProcessor>(newSocket, nullptr, m_owner)
@@ -292,7 +292,7 @@ void QnDesktopCameraConnection::run()
         QAuthenticator auth;
         auth.setUser(commonModule()->currentUrl().userName());
         auth.setPassword(commonModule()->currentUrl().password());
-        setupNetwork(std::make_unique<nx::network::http::HttpClient>(), QSharedPointer<AbstractStreamSocket>());
+        setupNetwork(std::make_unique<nx::network::http::HttpClient>(), {});
 
         httpClient->addAdditionalHeader("user-name", auth.user().toUtf8());
         // TODO: #GDM #3.2 Remove 3.1 compatibility layer.
@@ -338,5 +338,5 @@ void QnDesktopCameraConnection::run()
         }
     }
 
-    setupNetwork(nullptr, QSharedPointer<AbstractStreamSocket>());
+    setupNetwork(nullptr, {});
 }
