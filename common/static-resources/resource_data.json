@@ -680,9 +680,7 @@
         {
             "keys": [
                 "ACTI|V32",
-                "ACTi Corporation|V32",
-                "AXIS|Q6000-E",
-                "AXIS|*Q6000-E"
+                "ACTi Corporation|V32"
             ],
             "forceONVIF": true
         },
@@ -2233,7 +2231,7 @@
         },
         {
             "keys":[
-            "DW|DWC-PVX16W4", "DW|DWC-PVX16W6", "DW|DWC-PVX16W28"
+            "DW|DWC-PVX16W4", "DW|DWC-PVX16W6", "DW|DWC-PVX16W28", "N8PC-OLAH4|IP-Camera", "DW|DWC-PVX16W"
             ],
             "multiresourceVideoChannelMapping": [
                 {
@@ -2280,7 +2278,7 @@
         },
         {
             "keys":[
-            "N9PC-SLAH5|IP-Camera", "DW|DWC-PZ21M69T"
+            "N9PC-SLAH5|IP-Camera", "DW|DWC-PZ21M69T", "N9PC-SLAH5|DWC-PZ21M69T"
             ],
             "multiresourceVideoChannelMapping": [
                 {
@@ -2324,6 +2322,53 @@
             "ignoreMultisensors": true,
             "shouldAppearAsSingleChannel": true,
             "videoLayout": "width=4;height=1;sensors=0,1,2,3"
+        },   
+        {
+            "keys":[
+            "Axis|AXISQ6000*","AXIS|AXISQ6000*","Axis|Q6000*","AXIS|Q6000*"
+            ],
+            "multiresourceVideoChannelMapping": [
+                {
+                    "resourceChannel": 1,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [0]
+                        }
+                    ]
+                },
+                {
+                    "resourceChannel": 2,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [1]
+                        }
+                    ]
+                },
+                {
+                    "resourceChannel": 3,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [2]
+                        }
+                    ]
+                },
+                {
+                    "resourceChannel": 4,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [3]
+                        }
+                    ]
+                }
+            ],
+            "doNotConfigureCamera": false,
+            "ignoreMultisensors": true,
+            "shouldAppearAsSingleChannel": true,
+            "videoLayout": "width=2;height=2;sensors=0,1,2,3"
         },        
         {
             "keys": ["*|CMD-C244","COMMANDCO|*"],
