@@ -206,7 +206,6 @@ nx::utils::db::DBResult TransactionLog::fetchTransactionState(
     while (selectTransactionStateQuery.next())
     {
         const nx::String systemId = selectTransactionStateQuery.value("system_id").toString().toLatin1();
-        const std::uint64_t settingsTimestampHi = selectTransactionStateQuery.value("settings_timestamp_hi").toULongLong();
         const nx::String peerGuid = selectTransactionStateQuery.value("peer_guid").toString().toLatin1();
         const nx::String dbGuid = selectTransactionStateQuery.value("db_guid").toString().toLatin1();
         const int sequence = selectTransactionStateQuery.value("sequence").toInt();
@@ -223,7 +222,7 @@ nx::utils::db::DBResult TransactionLog::fetchTransactionState(
         TransactionLogContext* vmsTranLog = getTransactionLogContext(lock, systemId);
 
         vmsTranLog->cache.restoreTransaction(
-            std::move(tranStateKey), sequence, tranHash, settingsTimestampHi, timestamp);
+            std::move(tranStateKey), sequence, tranHash, timestamp);
 
         if (systemId != prevSystemId)
         {

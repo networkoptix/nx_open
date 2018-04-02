@@ -64,13 +64,12 @@ void VmsTransactionLogCache::restoreTransaction(
     ::ec2::ApiPersistentIdData tranStateKey,
     int sequence,
     const nx::Buffer& tranHash,
-    std::uint64_t settingsTimestampHi,
     const ::ec2::Timestamp& timestamp)
 {
     QnMutexLocker lock(&m_mutex);
 
     *m_committedData.timestampSequence =
-        std::max(*m_committedData.timestampSequence, settingsTimestampHi);
+        std::max(*m_committedData.timestampSequence, timestamp.sequence);
     qint32& persistentSequence = m_committedData.transactionState.values[tranStateKey];
     if (persistentSequence < sequence)
         persistentSequence = sequence;
