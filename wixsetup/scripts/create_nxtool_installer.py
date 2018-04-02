@@ -169,7 +169,7 @@ def main():
     create_nxtool_installer(
         wix_directory=config['wix_directory'],
         qml_directory=args.qml_dir,
-        vcredist_directory=config['vcredist_directory'],
+        vcredist_directory=os.path.join(config['vcredist_directory'], 'bin'),
         sources_directory=args.sources_dir,
         arch=config['arch'],
         installer_cultures=installer_cultures,
