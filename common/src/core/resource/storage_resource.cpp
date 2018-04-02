@@ -29,8 +29,11 @@ QnMediaServerResourcePtr QnStorageResource::getParentServer() const {
 
 void QnStorageResource::setSpaceLimit(qint64 value)
 {
-    QnMutexLocker lock(&m_mutex);
-    m_spaceLimit = value;
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_spaceLimit = value;
+    }
+    emit spaceLimitChanged(::toSharedPointer(this));
 }
 
 qint64 QnStorageResource::getSpaceLimit() const
@@ -164,7 +167,12 @@ void QnStorageResource::updateInternal(const QnResourcePtr &other, Qn::NotifierL
             notifiers << [r = toSharedPointer(this)]{ emit r->isBackupChanged(r); };
         }
 
-        m_spaceLimit = localOther->m_spaceLimit;
+        if (m_spaceLimit != localOther->m_spaceLimit)
+        {
+            m_spaceLimit = localOther->m_spaceLimit;
+            notifiers << [r = toSharedPointer(this)](){ emit r->spaceLimitChanged(r); };
+        }
+
         m_maxStoreTime = localOther->m_maxStoreTime;
     }
 }

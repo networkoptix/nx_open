@@ -33,14 +33,12 @@ void SpaceInfo::storageAdded(int index, int64_t totalSpace)
     m_storageSpaceInfo.emplace_back(index, totalSpace);
 }
 
-void SpaceInfo::storageRebuilded(int index, int64_t freeSpace, int64_t nxOccupiedSpace, int64_t spaceLimit)
+void SpaceInfo::storageChanged(int index, int64_t freeSpace, int64_t nxOccupiedSpace, int64_t spaceLimit)
 {
     QnMutexLocker lock(&m_mutex);
     auto storageIndexIt = storageByIndex(index);
-    bool storageIndexFound = storageIndexIt != m_storageSpaceInfo.cend();
-
-    NX_CRITICAL(storageIndexFound);
-    storageIndexIt->effectiveSpace = freeSpace + nxOccupiedSpace - spaceLimit;
+    NX_CRITICAL(storageIndexIt != m_storageSpaceInfo.cend());
+    storageIndexIt->effectiveSpace = qMax(freeSpace + nxOccupiedSpace - spaceLimit, 0LL);
     NX_LOG(lit("[Storage, SpaceInfo, Selection] Calculating effective space for storage %1. \
 Free space = %2, nxOccupiedSpace = %3, spaceLimit = %4, effectiveSpace = %5")
         .arg(storageIndexIt->index)
@@ -99,7 +97,7 @@ int SpaceInfo::getOptimalStorageIndex(const std::vector<int>& allowedIndexes) co
         filteredSpaceInfo.cend(),
         [](const StorageSpaceInfo& info)
         {
-            return info.effectiveSpace == 0;
+            return info.isEffectiveSpaceSet();
         });
 
     if (hasStorageWithoutEffectiveSpace)
@@ -127,6 +125,12 @@ int SpaceInfo::getStorageIndexImpl(const SpaceInfoVector& filteredSpaceInfo, boo
     int64_t totalEffectiveSpace = 0;
     for (const auto& spaceInfo: filteredSpaceInfo)
         totalEffectiveSpace += (byEffectiveSpace ? spaceInfo.effectiveSpace : spaceInfo.totalSpace);
+
+    if (totalEffectiveSpace == 0)
+    {
+        NX_DEBUG(this, "[Storage, SpaceInfo, Selection] No appropriate candidate found");
+        return -1;
+    }
 
     NX_LOG(lit("[Storage, SpaceInfo, Selection] Calculating optimal storage index. \
 Candidates count = %1, byEffectiveSpace = %2, totalSpace = %3, selection point = %4")
