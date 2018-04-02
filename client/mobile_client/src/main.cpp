@@ -259,7 +259,7 @@ void initLog(const QString& logLevel)
                 ? QString::fromUtf8(ini().logFile)
                 : QnAppInfo::isAndroid()
                     ? lit("-")
-                    : (QString::fromUtf8(ini().iniFileDir()) + lit("mobile_client")));
+                    : (QString::fromUtf8(ini().iniFilesDir()) + lit("mobile_client")));
     }
 
     const auto ec2logger = nx::utils::log::addLogger({QnLog::EC2_TRAN_LOG});
