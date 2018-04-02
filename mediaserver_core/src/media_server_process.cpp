@@ -2053,6 +2053,14 @@ void MediaServerProcess::initializeCloudConnect()
 
 void MediaServerProcess::changeSystemUser(const QString& userName)
 {
+    // Ini config files are for debug/experimental purposes only, so we do not care about security.
+    const auto command = lm("chmod 777 -R '%1'").args(nx::kit::IniConfig::iniFilesDir());
+    if (::system(command.toUtf8().data()) != 0) //< Let the errors reach stdout and stderr.
+    {
+        qWarning().noquote() << "WARNING: Unable to:" << command;
+        return; //< Server will not be able to run without access to these files.
+    }
+
     // Change owner of all data files, so mediaserver can use them as different user.
     const std::vector<QString> chmodPaths =
     {
