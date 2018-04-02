@@ -44,6 +44,10 @@
                         <RegistryValue Type="string" Name="afterFirstRun" Value="false"/>
                     </RegistryKey>
                 </Component>
+
+                <Component Id="QtConf">
+                    <File Id="qt.conf" Name="qt.conf" Source="$(var.CurrentBinaryDir)/qt.conf" KeyPath="yes" DiskId="1"/>
+                </Component>
             </Directory>
         </DirectoryRef>
 
@@ -89,6 +93,7 @@
             <ComponentRef Id="Executable" />
             <ComponentRef Id="DesktopShortcut"/>
             <ComponentRef Id="Configuration" />
+            <ComponentRef Id="QtConf" />
             <ComponentGroupRef Id="QtLibraries" />
             <ComponentGroupRef Id="QmlComponentGroup"/>
             <ComponentGroupRef Id="Platforms" />
