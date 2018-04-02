@@ -10,7 +10,7 @@
 #include <network/tcp_connection_priv.h>
 
 #include <nx/network/http/custom_headers.h>
-#include "transaction/transaction_message_bus.h"
+#include "transaction/server_transaction_message_bus.h"
 #include "transaction/transaction_transport.h"
 #include "settings.h"
 
@@ -38,11 +38,11 @@ namespace ec2
         {
         }
 
-        QnTransactionMessageBus* messageBus;
+        ServerTransactionMessageBus* messageBus;
     };
 
     QnHttpTransactionReceiver::QnHttpTransactionReceiver(
-        QnTransactionMessageBus* messageBus,
+		ServerTransactionMessageBus* messageBus,
         QSharedPointer<nx::network::AbstractStreamSocket> socket,
         QnTcpListener* owner )
     :

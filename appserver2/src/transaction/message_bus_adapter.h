@@ -58,7 +58,7 @@ namespace ec2 {
         virtual QnUbjsonTransactionSerializer* ubjsonTranSerializer() const override;
 
         virtual ConnectionGuardSharedState* connectionGuardSharedState() override;
-        virtual detail::QnDbManager* getDb() const override;
+        //detail::QnDbManager* getDb() const;
 
         virtual void setTimeSyncManager(TimeSynchronizationManager* timeSyncManager) override;
 

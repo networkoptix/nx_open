@@ -7,14 +7,12 @@
 namespace ec2 {
 
 TransactionMessageBusBase::TransactionMessageBusBase(
-    detail::QnDbManager* db,
     Qn::PeerType peerType,
     QnCommonModule* commonModule,
     QnJsonTransactionSerializer* jsonTranSerializer,
     QnUbjsonTransactionSerializer* ubjsonTranSerializer)
 :
     AbstractTransactionMessageBus(commonModule),
-    m_db(db),
     m_thread(new QThread()),
     m_jsonTranSerializer(jsonTranSerializer),
     m_ubjsonTranSerializer(ubjsonTranSerializer),

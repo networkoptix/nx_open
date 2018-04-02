@@ -16,14 +16,14 @@
 namespace ec2
 {
 
+	class LocalConnectionFactory;
+
     // TODO: #2.4 remove Ec2 prefix to avoid ec2::Ec2DirectConnection
-    class Ec2DirectConnection
-    :
-        public BaseEc2Connection<ServerQueryProcessorAccess>
+    class Ec2DirectConnection: public BaseEc2Connection<ServerQueryProcessorAccess>
     {
     public:
         Ec2DirectConnection(
-            const Ec2DirectConnectionFactory* connectionFactory,
+            const LocalConnectionFactory* connectionFactory,
             ServerQueryProcessorAccess* queryProcessor,
             const QnConnectionInfo& connectionInfo,
             const nx::utils::Url& dbUrl);

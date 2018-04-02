@@ -5,7 +5,7 @@
 
 #include <rest/server/rest_connection_processor.h>
 
-#include "connection_factory.h"
+#include <ec2/local_connection_factory.h>
 #include "managers/time_manager.h"
 
 namespace ec2 {
@@ -13,7 +13,7 @@ namespace ec2 {
 const QString QnTimeSyncRestHandler::PATH = QString::fromLatin1("ec2/timeSync");
 const QByteArray QnTimeSyncRestHandler::TIME_SYNC_HEADER_NAME("NX-TIME-SYNC-DATA");
 
-QnTimeSyncRestHandler::QnTimeSyncRestHandler(Ec2DirectConnectionFactory* connection):
+QnTimeSyncRestHandler::QnTimeSyncRestHandler(LocalConnectionFactory* connection):
     m_appServerConnection(connection)
 {
 }

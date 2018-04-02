@@ -25,6 +25,8 @@
 
 #include <nx/utils/thread/mutex.h>
 
+#define USE_MISC_MANAGER_INSTEAD_OF_DIRECT_DB_CALL
+
 /**
  * Time synchronization in cluster.
  * Server system time is never changed. To adjust server times means, adjust server "delta" which server adds to it's time.
@@ -312,7 +314,9 @@ private:
     Settings* m_settings;
     std::atomic<size_t> m_asyncOperationsInProgress;
     QnWaitCondition m_asyncOperationsWaitCondition;
+#if !defined(USE_MISC_MANAGER_INSTEAD_OF_DIRECT_DB_CALL)
     std::shared_ptr<AbstractWorkAroundMiscDataSaver> m_workAroundMiscDataSaver;
+#endif
     std::shared_ptr<AbstractSystemClock> m_systemClock;
     std::shared_ptr<AbstractSteadyClock> m_steadyClock;
     /** Using monotonic clock to be proof to local system time change. */

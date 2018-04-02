@@ -11,7 +11,7 @@ namespace ec2
 {
 
     class QnHttpTransactionReceiverPrivate;
-    class QnTransactionMessageBus;
+    class ServerTransactionMessageBus;
 
     /*!
         Using this HTTP handler because REST does not support HTTP interleaving
@@ -22,7 +22,7 @@ namespace ec2
     {
     public:
         QnHttpTransactionReceiver(
-            QnTransactionMessageBus* messageBus,
+			ServerTransactionMessageBus* messageBus,
             QSharedPointer<nx::network::AbstractStreamSocket> socket,
             QnTcpListener* owner );
         virtual ~QnHttpTransactionReceiver();

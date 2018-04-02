@@ -10,7 +10,6 @@
 #include "managers/time_manager.h"
 #include "managers/time_manager_api.h"
 #include "nx_ec/data/api_data.h"
-#include "connection_factory.h"
 
 namespace ec2 {
 

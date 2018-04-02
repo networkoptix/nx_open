@@ -303,6 +303,7 @@
 #endif
 
 #include <nx/kit/ini_config.h>
+#include <ec2/local_connection_factory.h>
 
 using namespace nx;
 
@@ -2464,8 +2465,8 @@ void MediaServerProcess::run()
     runtimeData.hardwareIds = m_hardwareGuidList;
     commonModule()->runtimeInfoManager()->updateLocalItem(runtimeData);    // initializing localInfo
 
-    std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(
-        getConnectionFactory(
+    std::unique_ptr<ec2::LocalConnectionFactory> ec2ConnectionFactory(
+        getLocalConnectionFactory(
             Qn::PT_Server,
             nx::utils::TimerManager::instance(),
             commonModule(),

@@ -48,5 +48,8 @@ class AbstractECConnection;
 typedef std::shared_ptr<AbstractECConnection> AbstractECConnectionPtr;
 
 class AbstractECConnectionFactory;
+class RemoteConnectionFactory;
+class LocalConnectionFactory;
+
 
 } // namespace ec2

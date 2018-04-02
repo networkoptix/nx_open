@@ -19,6 +19,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/client/core/watchers/known_server_connections.h>
+#include <ec2/remote_connection_factory.h>
 
 using namespace nx::client::core;
 
@@ -33,7 +34,7 @@ QnClientCoreModule::QnClientCoreModule(QObject* parent):
     m_commonModule->store(new QnFfmpegInitializer());
 
     NX_ASSERT(nx::utils::TimerManager::instance());
-    m_connectionFactory.reset(getConnectionFactory(qnStaticCommon->localPeerType(),
+    m_connectionFactory.reset(getRemoteConnectionFactory(qnStaticCommon->localPeerType(),
         nx::utils::TimerManager::instance(), m_commonModule, false));
 
     m_commonModule->instance<QnResourcesChangesManager>();

@@ -9,13 +9,13 @@ namespace ec2
 {
 
 class QnTransactionTcpProcessorPrivate;
-class QnTransactionMessageBus;
+class ServerTransactionMessageBus;
 
 class QnTransactionTcpProcessor: public QnTCPConnectionProcessor
 {
 public:
     QnTransactionTcpProcessor(
-        QnTransactionMessageBus* messageBus,
+		ServerTransactionMessageBus* messageBus,
         QSharedPointer<nx::network::AbstractStreamSocket> socket,
         QnTcpListener* owner);
     virtual ~QnTransactionTcpProcessor();

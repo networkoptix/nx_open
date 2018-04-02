@@ -24,11 +24,10 @@ namespace nx { namespace vms { namespace cloud_integration { struct CloudManager
 namespace ec2 {
 
 class AbstractECConnection;
-class AbstractECConnectionFactory;
+class LocalConnectionFactory;
 class QnSimpleHttpConnectionListener;
 
-class Appserver2Process:
-    public QnStoppable
+class Appserver2Process: public QnStoppable
 {
 public:
     Appserver2Process(int argc, char **argv);
@@ -59,12 +58,11 @@ private:
     nx::vms::cloud_integration::CloudManagerGroup* m_cloudManagerGroup = nullptr;
 
     void updateRuntimeData();
-    void registerHttpHandlers(ec2::AbstractECConnectionFactory* ec2ConnectionFactory);
+    void registerHttpHandlers(ec2::LocalConnectionFactory* ec2ConnectionFactory);
     void addSelfServerResource(ec2::AbstractECConnectionPtr ec2Connection);
 };
 
-class Appserver2ProcessPublic:
-    public QnStoppable
+class Appserver2ProcessPublic: public QnStoppable
 {
 public:
     Appserver2ProcessPublic(int argc, char **argv);

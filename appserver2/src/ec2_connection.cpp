@@ -6,13 +6,12 @@
 #include <nx/utils/std/cpp14.h>
 #include "nx_ec/data/api_conversion_functions.h"
 #include "transaction/transaction_message_bus.h"
-#include "connection_factory.h"
-#include <database/db_manager.h>
+#include <ec2/local_connection_factory.h>
 
 namespace ec2
 {
     Ec2DirectConnection::Ec2DirectConnection(
-        const Ec2DirectConnectionFactory* connectionFactory,
+        const LocalConnectionFactory* connectionFactory,
         ServerQueryProcessorAccess *queryProcessor,
         const QnConnectionInfo& connectionInfo,
         const nx::utils::Url& dbUrl)
@@ -72,6 +71,5 @@ namespace ec2
         if (transactionLog)
             transactionLog->setTransactionLogTime(value);
     }
-
 
 }

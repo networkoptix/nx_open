@@ -11,7 +11,7 @@ class QnCommonModule;
 
 namespace ec2 {
 
-class Ec2DirectConnectionFactory;
+class LocalConnectionFactory;
 class TimeSynchronizationManager;
 
 class QnTimeSyncRestHandler:
@@ -22,7 +22,7 @@ public:
     /** Contains peer's time synchronization information. */
     static const QByteArray TIME_SYNC_HEADER_NAME;
 
-    QnTimeSyncRestHandler(Ec2DirectConnectionFactory* connection);
+    QnTimeSyncRestHandler(LocalConnectionFactory* connection);
 
     virtual int executeGet(
         const QString& path,
@@ -51,7 +51,7 @@ public:
         nx::network::http::Response* response);
 
 private:
-    Ec2DirectConnectionFactory* m_appServerConnection;
+    LocalConnectionFactory* m_appServerConnection;
 };
 
 } // namespace ec2

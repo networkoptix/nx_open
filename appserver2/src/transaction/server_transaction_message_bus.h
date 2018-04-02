@@ -1,0 +1,86 @@
+#pragma once
+
+#include "transaction_message_bus.h"
+
+namespace ec2 {
+
+class ServerTransactionMessageBus: public QnTransactionMessageBus
+{
+    using base_type = QnTransactionMessageBus;
+public:
+	ServerTransactionMessageBus(
+        detail::QnDbManager* db,
+        Qn::PeerType peerType,
+        QnCommonModule* commonModule,
+        QnJsonTransactionSerializer* jsonTranSerializer,
+        QnUbjsonTransactionSerializer* ubjsonTranSerializer);
+
+    virtual ~ServerTransactionMessageBus();
+
+	void gotConnectionFromRemotePeer(const QnUuid& connectionGuid,
+		ConnectionLockGuard connectionLockGuard,
+		QSharedPointer<nx::network::AbstractStreamSocket> socket,
+		ConnectionType::Type connectionType,
+		const ApiPeerData& remotePeer,
+		qint64 remoteSystemIdentityTime,
+		const nx::network::http::Request& request,
+		const QByteArray& contentEncoding,
+		std::function<void()> ttFinishCallback,
+		const Qn::UserAccessData &userAccessData);
+
+	//!Report socket to receive transactions from
+	/*!
+	\param requestBuf Contains serialized \a request and (possibly) partial (or full) message body
+	*/
+	void gotIncomingTransactionsConnectionFromRemotePeer(
+		const QnUuid& connectionGuid,
+		QSharedPointer<nx::network::AbstractStreamSocket> socket,
+		const ApiPeerData &remotePeer,
+		qint64 remoteSystemIdentityTime,
+		const nx::network::http::Request& request,
+		const QByteArray& requestBuf);
+
+	bool gotTransactionFromRemotePeer(
+		const QnUuid& connectionGuid,
+		const nx::network::http::Request& request,
+		const QByteArray& requestMsgBody);
+protected:
+	virtual bool gotAliveData(
+		const ApiPeerAliveData &aliveData, 
+		QnTransactionTransport* transport, 
+		const QnTransactionTransportHeader* ttHeader) override;
+
+	virtual bool checkSequence(
+		const QnTransactionTransportHeader& transportHeader, 
+		const QnAbstractTransaction& tran, 
+		QnTransactionTransport* transport) override;
+
+	virtual void onGotTransactionSyncRequest(
+		QnTransactionTransport* sender,
+		const QnTransaction<ApiSyncRequestData> &tran) override;
+
+	virtual void queueSyncRequest(QnTransactionTransport* transport) override;
+	virtual bool sendInitialData(QnTransactionTransport* transport) override;
+	virtual void fillExtraAliveTransactionParams(ApiPeerAliveData* outAliveData) override;
+	virtual void logTransactionState() override;
+
+	void handleIncomingTransaction(
+		QnTransactionTransport* sender,
+		Qn::SerializationFormat tranFormat,
+		QByteArray serializedTran,
+		const QnTransactionTransportHeader &transportHeader);
+private:
+	bool isSyncInProgress() const;
+	bool readApiFullInfoData(
+		const Qn::UserAccessData& userAccess, 
+		const ec2::ApiPeerData& remotePeer, 
+		ApiFullInfoData* outData);
+	void printTranState(const QnTranState& tranState);
+
+	template <class T>
+	ErrorCode writePersistentTransaction(const QnTransaction<T> &tran);
+private:
+	detail::QnDbManager* m_db = nullptr;
+};
+
+} //namespace ec2

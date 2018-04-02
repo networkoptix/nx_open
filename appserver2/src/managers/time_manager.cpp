@@ -41,12 +41,13 @@
 #include "settings.h"
 #include "ec2_connection.h"
 
-//#define USE_MISC_MANAGER_INSTEAD_OF_DIRECT_DB_CALL
 //#define ATTACHING_DATA_TO_TRANSACTION_IS_SUPPORTED
 
 namespace ec2 {
 
 namespace {
+
+#if !defined(USE_MISC_MANAGER_INSTEAD_OF_DIRECT_DB_CALL)
 
 class WorkAroundMiscDataSaver:
     public AbstractWorkAroundMiscDataSaver
@@ -74,6 +75,8 @@ public:
 private:
     AbstractTransactionMessageBus* m_messageBus;
 };
+
+#endif
 
 //-------------------------------------------------------------------------------------------------
 
@@ -357,13 +360,17 @@ TimeSynchronizationManager::TimeSynchronizationManager(
     m_internetSynchronizationFailureCount(0),
     m_settings(settings),
     m_asyncOperationsInProgress(0),
+#if !defined(USE_MISC_MANAGER_INSTEAD_OF_DIRECT_DB_CALL)
     m_workAroundMiscDataSaver(workAroundMiscDataSaver),
+#endif
     m_systemClock(systemClock ? systemClock : std::make_shared<SystemClock>()),
     m_steadyClock(steadyClock ? steadyClock : std::make_shared<SteadyClock>()),
     m_monotonicClock(m_steadyClock.get())
 {
-    if (m_workAroundMiscDataSaver == nullptr)
+#if !defined(USE_MISC_MANAGER_INSTEAD_OF_DIRECT_DB_CALL)
+	if (m_workAroundMiscDataSaver == nullptr)
         m_workAroundMiscDataSaver = std::make_shared<WorkAroundMiscDataSaver>(messageBus);
+#endif
 }
 
 TimeSynchronizationManager::~TimeSynchronizationManager()

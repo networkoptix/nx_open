@@ -4,6 +4,11 @@
 #include <common/common_globals.h>
 
 
+namespace ec2 {
+	class RemoteConnectionFactory;
+	class LocalConnectionFactory;
+}
+
 namespace nx {
 namespace utils {
 
@@ -19,10 +24,16 @@ extern "C"
     /*!
         \return This object MUST be freed by caller using operator delete()
     */
-    ec2::AbstractECConnectionFactory* getConnectionFactory(
+    ec2::RemoteConnectionFactory* getRemoteConnectionFactory(
         Qn::PeerType peerType,
         nx::utils::TimerManager* const timerManager,
         QnCommonModule* commonModule,
         bool isP2pMode);
+
+	ec2::LocalConnectionFactory* getLocalConnectionFactory(
+		Qn::PeerType peerType,
+		nx::utils::TimerManager* const timerManager,
+		QnCommonModule* commonModule,
+		bool isP2pMode);
 }
 

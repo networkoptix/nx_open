@@ -56,6 +56,7 @@
 #include "appserver2_process_settings.h"
 #include "cloud_integration/cloud_connector.h"
 #include "ec2_connection_processor.h"
+#include <ec2/local_connection_factory.h>
 
 static int registerQtResources()
 {
@@ -126,8 +127,8 @@ int Appserver2Process::exec()
 
     AuditManager auditManager(m_commonModule.get());
 
-    std::unique_ptr<ec2::AbstractECConnectionFactory>
-        ec2ConnectionFactory(getConnectionFactory(
+    std::unique_ptr<ec2::LocalConnectionFactory>
+        ec2ConnectionFactory(getLocalConnectionFactory(
             Qn::PT_Server,
             nx::utils::TimerManager::instance(),
             m_commonModule.get(),
@@ -267,7 +268,7 @@ void Appserver2Process::updateRuntimeData()
 }
 
 void Appserver2Process::registerHttpHandlers(
-    ec2::AbstractECConnectionFactory* ec2ConnectionFactory)
+    ec2::LocalConnectionFactory* ec2ConnectionFactory)
 {
     ec2ConnectionFactory->registerRestHandlers(m_tcpListener->processorPool());
 

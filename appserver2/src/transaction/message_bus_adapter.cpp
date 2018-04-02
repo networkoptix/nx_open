@@ -133,10 +133,12 @@ ConnectionGuardSharedState* TransactionMessageBusAdapter::connectionGuardSharedS
     return m_bus->connectionGuardSharedState();
 }
 
+#if 0
 detail::QnDbManager* TransactionMessageBusAdapter::getDb() const
 {
     return m_bus->getDb();
 }
+#endif
 
 void TransactionMessageBusAdapter::setTimeSyncManager(TimeSynchronizationManager* timeSyncManager)
 {

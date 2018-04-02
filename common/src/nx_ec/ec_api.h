@@ -872,11 +872,8 @@ namespace ec2
             return impl::doSyncCall<impl::ConnectHandler>(call, connection);
         }
 
-        virtual void registerRestHandlers( QnRestProcessorPool* const restProcessorPool ) = 0;
-        virtual void registerTransactionListener(QnHttpConnectionListener* httpConnectionListener) = 0;
         virtual void setConfParams( std::map<QString, QVariant> confParams ) = 0;
         virtual TransactionMessageBusAdapter* messageBus() const = 0;
-        virtual QnDistributedMutexManager* distributedMutex() const = 0;
         virtual TimeSynchronizationManager* timeSyncManager() const = 0;
         virtual void shutdown() {}
     protected:
