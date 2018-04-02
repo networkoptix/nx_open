@@ -78,7 +78,9 @@ let DownloadComponent = class DownloadComponent {
                 this.downloads.groups[0].active = true;
             }
         });
-        this.cloudApi.getDownloads().then(data => {
+        this.cloudApi
+            .getDownloads()
+            .then(data => {
             this.downloadsData = data.data;
             this.downloads.groups.forEach(platform => {
                 platform.installers.filter(installer => {

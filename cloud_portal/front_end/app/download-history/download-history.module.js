@@ -12,15 +12,15 @@ const platform_browser_1 = require("@angular/platform-browser");
 const static_1 = require("@angular/upgrade/static");
 const router_1 = require("@angular/router");
 const ng_bootstrap_1 = require("@ng-bootstrap/ng-bootstrap");
-const download_component_1 = require("./download.component");
+const release_component_1 = require("./release/release.component");
+const download_history_component_1 = require("./download-history.component");
 const appRoutes = [
-    // {path: 'downloads', component: DownloadComponent},
-    { path: 'download', component: download_component_1.DownloadComponent },
-    { path: 'download/:platform', component: download_component_1.DownloadComponent }
+    { path: 'downloads/history', component: download_history_component_1.DownloadHistoryComponent },
+    { path: 'downloads/:build', component: download_history_component_1.DownloadHistoryComponent }
 ];
-let DownloadModule = class DownloadModule {
+let DownloadHistoryModule = class DownloadHistoryModule {
 };
-DownloadModule = __decorate([
+DownloadHistoryModule = __decorate([
     core_1.NgModule({
         imports: [
             common_1.CommonModule,
@@ -31,10 +31,11 @@ DownloadModule = __decorate([
         ],
         providers: [],
         declarations: [
-            download_component_1.DownloadComponent,
+            download_history_component_1.DownloadHistoryComponent,
+            release_component_1.ReleaseComponent
         ],
         bootstrap: []
     })
-], DownloadModule);
-exports.DownloadModule = DownloadModule;
-//# sourceMappingURL=download.module.js.map
+], DownloadHistoryModule);
+exports.DownloadHistoryModule = DownloadHistoryModule;
+//# sourceMappingURL=download-history.module.js.map

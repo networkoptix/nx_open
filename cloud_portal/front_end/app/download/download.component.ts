@@ -28,7 +28,7 @@ export class DownloadComponent implements OnInit, OnDestroy, AfterViewChecked {
     @ViewChild('tabs')
     public tabs: NgbTabset;
 
-    private setupDefaults () {
+    private setupDefaults() {
         this.downloadsData = {
             version: '',
             installers: [{platform: '', appType: ''}],
@@ -73,7 +73,7 @@ export class DownloadComponent implements OnInit, OnDestroy, AfterViewChecked {
             this.platform = params['platform'];
 
             this.activeOs = this.platform || this.platformMatch[this.deviceInfo.os];
-            
+
             for (let mobile in this.downloads.mobile) {
                 if (this.downloads.mobile[mobile].os === this.activeOs) {
                     if (this.language.lang.downloads.mobile[this.downloads.mobile[mobile].name].link !== 'disabled') {
@@ -100,27 +100,28 @@ export class DownloadComponent implements OnInit, OnDestroy, AfterViewChecked {
             }
         });
 
-        this.cloudApi.getDownloads().then(data => {
-            this.downloadsData = data.data;
+        this.cloudApi
+            .getDownloads()
+            .then(data => {
+                this.downloadsData = data.data;
 
-            this.downloads.groups.forEach(platform => {
+                this.downloads.groups.forEach(platform => {
+                    platform.installers.filter(installer => {
+                        const targetInstaller = this.downloadsData.installers.find(existingInstaller => {
 
-                platform.installers.filter(installer => {
-                    const targetInstaller = this.downloadsData.installers.find(existingInstaller => {
+                            return installer.platform === existingInstaller.platform &&
+                                installer.appType === existingInstaller.appType;
+                        });
 
-                        return installer.platform === existingInstaller.platform &&
-                            installer.appType === existingInstaller.appType;
-                    });
-
-                    if (targetInstaller) {
-                        Object.assign(installer, targetInstaller);
-                        installer.formatName = this.language.lang.downloads.platforms[installer.platform] + ' - ' + this.language.lang.downloads.appTypes[installer.appType];
-                        installer.url = this.downloadsData.releaseUrl + installer.path;
-                    }
-                    return !!targetInstaller;
-                })[0];
+                        if (targetInstaller) {
+                            Object.assign(installer, targetInstaller);
+                            installer.formatName = this.language.lang.downloads.platforms[installer.platform] + ' - ' + this.language.lang.downloads.appTypes[installer.appType];
+                            installer.url = this.downloadsData.releaseUrl + installer.path;
+                        }
+                        return !!targetInstaller;
+                    })[0];
+                });
             });
-        });
     }
 
     ngOnDestroy() {

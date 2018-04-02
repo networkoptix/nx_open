@@ -6,13 +6,12 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
-import { DownloadComponent } from './download.component';
-
+import { ReleaseComponent } from './release/release.component';
+import { DownloadHistoryComponent } from './download-history.component';
 
 const appRoutes: Routes = [
-    // {path: 'downloads', component: DownloadComponent},
-    {path: 'download', component: DownloadComponent},
-    {path: 'download/:platform', component: DownloadComponent}
+    {path: 'downloads/history', component: DownloadHistoryComponent},
+    {path: 'downloads/:build', component: DownloadHistoryComponent}
 ];
 
 @NgModule({
@@ -27,9 +26,10 @@ const appRoutes: Routes = [
     providers: [
     ],
     declarations: [
-        DownloadComponent,
+        DownloadHistoryComponent,
+        ReleaseComponent
     ],
     bootstrap: []
 })
-export class DownloadModule {
+export class DownloadHistoryModule {
 }

@@ -9,6 +9,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@angular/core");
 const common_1 = require("@angular/common");
 const platform_browser_1 = require("@angular/platform-browser");
+const animations_1 = require("@angular/platform-browser/animations");
 const static_1 = require("@angular/upgrade/static");
 const router_1 = require("@angular/router");
 const http_1 = require("@angular/common/http");
@@ -26,9 +27,11 @@ const ajs_upgraded_providers_5 = require("./ajs-upgraded-providers");
 const ajs_upgraded_providers_6 = require("./ajs-upgraded-providers");
 const ajs_upgraded_providers_7 = require("./ajs-upgraded-providers");
 const ajs_upgraded_providers_8 = require("./ajs-upgraded-providers");
+const ajs_upgraded_providers_9 = require("./ajs-upgraded-providers");
 const app_component_1 = require("./app.component");
 const bar_module_1 = require("./bar/bar.module");
 const download_module_1 = require("./download/download.module");
+const download_history_module_1 = require("./download-history/download-history.module");
 const dropdowns_module_1 = require("./dropdowns/dropdowns.module");
 const login_component_1 = require("./dialogs/login/login.component");
 const process_button_component_1 = require("./components/process-button/process-button.component");
@@ -56,6 +59,7 @@ AppModule = __decorate([
         imports: [
             common_1.CommonModule,
             platform_browser_1.BrowserModule,
+            animations_1.BrowserAnimationsModule,
             static_1.UpgradeModule,
             http_1.HttpClientModule,
             forms_1.FormsModule,
@@ -63,6 +67,7 @@ AppModule = __decorate([
             index_1.CoreModule,
             bar_module_1.BarModule,
             download_module_1.DownloadModule,
+            download_history_module_1.DownloadHistoryModule,
             ajs_upgraded_providers_1.cloudApiServiceModule,
             ajs_upgraded_providers_6.uuid2ServiceModule,
             ajs_upgraded_providers_3.languageServiceModule,
@@ -71,6 +76,7 @@ AppModule = __decorate([
             ajs_upgraded_providers_2.systemsModule,
             ajs_upgraded_providers_7.ngToastModule,
             ajs_upgraded_providers_8.configServiceModule,
+            ajs_upgraded_providers_9.authorizationCheckServiceModule,
             dropdowns_module_1.DropdownsModule,
             ngx_device_detector_1.DeviceDetectorModule.forRoot(),
             ng_bootstrap_1.NgbModule.forRoot(),

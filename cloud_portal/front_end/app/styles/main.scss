@@ -48,6 +48,10 @@ footer {
   border-top: 1px solid $common-border-color;
   padding-bottom: 2px;
 
+    .row {
+        margin-left: 0;
+    }
+
   .nav > li {
     position: relative;
     display: block;

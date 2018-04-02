@@ -71,6 +71,16 @@ export const systemsServiceProvider = {
     deps: ['$injector']
 };
 
+export function authorizationCheckServiceFactory(i: any) {
+    return i.get('authorizationCheckService');
+}
+
+export const authorizationCheckServiceProvider = {
+    provide: 'authorizationCheckService',
+    useFactory: authorizationCheckServiceFactory,
+    deps: ['$injector']
+};
+
 export function uuid2Factory(i: any) {
     return i.get('uuid2');
 }
@@ -141,4 +151,12 @@ export class ngToastModule {
     ]
 })
 export class systemsModule {
+}
+
+@NgModule({
+    providers: [
+        authorizationCheckServiceProvider
+    ]
+})
+export class authorizationCheckServiceModule {
 }

@@ -292,14 +292,16 @@ window.L = {};
                                 }
                             })
                             .when('/downloads/history', {
-                                title: languageServiceProvider.$get().lang.pageTitles.download,
-                                templateUrl: CONFIG.viewsDir + 'downloadHistory.html',
-                                controller: 'DownloadHistoryCtrl'
+                                // title: languageServiceProvider.$get().lang.pageTitles.download,
+                                // templateUrl: CONFIG.viewsDir + 'downloadHistory.html',
+                                // controller: 'DownloadHistoryCtrl'
+                                template: ''
                             })
                             .when('/downloads/:build', {
-                                title: languageServiceProvider.$get().lang.pageTitles.download,
-                                templateUrl: CONFIG.viewsDir + 'downloadHistory.html',
-                                controller: 'DownloadHistoryCtrl'
+                                // title: languageServiceProvider.$get().lang.pageTitles.download,
+                                // templateUrl: CONFIG.viewsDir + 'downloadHistory.html',
+                                // controller: 'DownloadHistoryCtrl'
+                                template: ''
                             })
                             .when('/downloads', {
                                 // title: languageServiceProvider.$get().lang.pageTitles.download,

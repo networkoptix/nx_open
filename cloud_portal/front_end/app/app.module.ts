@@ -1,6 +1,7 @@
 import { NgModule }                                                       from '@angular/core';
 import { Location, PathLocationStrategy, LocationStrategy, CommonModule } from '@angular/common';
 import { BrowserModule }                                                  from '@angular/platform-browser';
+import { BrowserAnimationsModule }                                        from '@angular/platform-browser/animations';
 import { downgradeComponent, downgradeInjectable, UpgradeModule }         from '@angular/upgrade/static';
 import { RouterModule, UrlHandlingStrategy, UrlTree }                     from '@angular/router';
 import { HttpClientModule }                                               from '@angular/common/http';
@@ -14,18 +15,20 @@ import { DeviceDetectorModule } from 'ngx-device-detector';
 
 import { CoreModule } from './core/index';
 
-import { cloudApiServiceModule } from './ajs-upgraded-providers';
-import { systemsModule }         from './ajs-upgraded-providers';
-import { languageServiceModule } from './ajs-upgraded-providers';
-import { accountServiceModule }  from './ajs-upgraded-providers';
-import { processServiceModule }  from './ajs-upgraded-providers';
-import { uuid2ServiceModule }    from './ajs-upgraded-providers';
-import { ngToastModule }         from './ajs-upgraded-providers';
-import { configServiceModule }   from './ajs-upgraded-providers';
+import { cloudApiServiceModule }           from './ajs-upgraded-providers';
+import { systemsModule }                   from './ajs-upgraded-providers';
+import { languageServiceModule }           from './ajs-upgraded-providers';
+import { accountServiceModule }            from './ajs-upgraded-providers';
+import { processServiceModule }            from './ajs-upgraded-providers';
+import { uuid2ServiceModule }              from './ajs-upgraded-providers';
+import { ngToastModule }                   from './ajs-upgraded-providers';
+import { configServiceModule }             from './ajs-upgraded-providers';
+import { authorizationCheckServiceModule } from './ajs-upgraded-providers';
 
 import { AppComponent }                                 from './app.component';
 import { BarModule }                                    from './bar/bar.module';
 import { DownloadModule }                               from './download/download.module';
+import { DownloadHistoryModule }                        from './download-history/download-history.module';
 import { DropdownsModule }                              from './dropdowns/dropdowns.module';
 import { NxModalLoginComponent, LoginModalContent }     from "./dialogs/login/login.component";
 import { NxProcessButtonComponent }                     from './components/process-button/process-button.component';
@@ -52,6 +55,7 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
     imports: [
         CommonModule,
         BrowserModule,
+        BrowserAnimationsModule,
         UpgradeModule,
         HttpClientModule,
         FormsModule,
@@ -59,6 +63,7 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
         CoreModule,
         BarModule,
         DownloadModule,
+        DownloadHistoryModule,
         cloudApiServiceModule,
         uuid2ServiceModule,
         languageServiceModule,
@@ -67,6 +72,7 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
         systemsModule,
         ngToastModule,
         configServiceModule,
+        authorizationCheckServiceModule,
         DropdownsModule,
 
         DeviceDetectorModule.forRoot(),

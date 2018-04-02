@@ -1,0 +1,25 @@
+<div class="container">
+    <h1>Release notes</h1>
+
+    <div class="col-12">
+        <ngb-tabset *ngIf="downloadTypes"
+                    (tabChange)="beforeChange($event)" #tabs>
+            <ngb-tab *ngFor="let type of downloadTypes"
+                     [id]="type">
+                <ng-template ngbTabTitle>
+                    <span class="tab-heading">{{language.lang.downloads.releasesTypes[type] || type}}</span>
+                </ng-template>
+                <ng-template ngbTabContent>
+                    <div class="card card-default">
+                        <div class="card-body">
+                            <div *ngFor="let release of activeBuilds">
+                                <nx-release [release]="release"></nx-release>
+                                <!--<ng-include src="$root.C.viewsDir + 'components/downloadRelease.html'"></ng-include>-->
+                            </div>
+                        </div>
+                    </div>
+                </ng-template>
+            </ngb-tab>
+        </ngb-tabset>
+    </div>
+</div>

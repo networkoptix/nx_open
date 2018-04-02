@@ -1,0 +1,42 @@
+<h1>
+    <b>{{release.version}}</b>
+    <small>{{release.productDescription}}</small>
+    <br>
+    <small>PUBLISHED {{release.date}}</small>
+</h1>
+<div *ngIf="release.releaseNotes">
+    <h4>
+        Release Notes
+    </h4>
+    <div [innerHTML]="release.releaseNotes"></div>
+</div>
+
+<h4>In-Client Upgrade:</h4>
+<table>
+    <tr>
+        <td>Build Number:</td>
+        <td>&nbsp;</td>
+        <td><b>{{release.buildNumber}}</b></td>
+    </tr>
+    <tr>
+        <td>Password:</td>
+        <td>&nbsp;</td>
+        <td><b>{{release.password}}</b></td>
+    </tr>
+</table>
+
+<h4>Download Links:</h4>
+<div *ngFor="let platform of release.platforms" #card>
+    <h4>
+        <a href (click)="card.expanded = !card.expanded; false">
+            {{language.lang.downloads.groups[platform.name].label || platform.name}}
+        </a>
+    </h4>
+
+    <ul [ngbCollapse]="!card.expanded">
+        <li *ngFor="let file of platform.files">
+            {{file.niceName}}
+            <a href="{{linkbase}}/{{release.buildNumber}}/{{file.path}}">{{file.fileName}}</a>
+        </li>
+    </ul>
+</div>

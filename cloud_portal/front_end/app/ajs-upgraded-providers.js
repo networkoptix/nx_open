@@ -70,6 +70,15 @@ exports.systemsServiceProvider = {
     useFactory: systemsServiceFactory,
     deps: ['$injector']
 };
+function authorizationCheckServiceFactory(i) {
+    return i.get('authorizationCheckService');
+}
+exports.authorizationCheckServiceFactory = authorizationCheckServiceFactory;
+exports.authorizationCheckServiceProvider = {
+    provide: 'authorizationCheckService',
+    useFactory: authorizationCheckServiceFactory,
+    deps: ['$injector']
+};
 function uuid2Factory(i) {
     return i.get('uuid2');
 }
@@ -159,4 +168,14 @@ systemsModule = __decorate([
     })
 ], systemsModule);
 exports.systemsModule = systemsModule;
+let authorizationCheckServiceModule = class authorizationCheckServiceModule {
+};
+authorizationCheckServiceModule = __decorate([
+    core_1.NgModule({
+        providers: [
+            exports.authorizationCheckServiceProvider
+        ]
+    })
+], authorizationCheckServiceModule);
+exports.authorizationCheckServiceModule = authorizationCheckServiceModule;
 //# sourceMappingURL=ajs-upgraded-providers.js.map
