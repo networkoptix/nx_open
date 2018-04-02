@@ -284,29 +284,6 @@ void MessageBus::printPeersMessage()
         .arg(records.join("\n")));
 }
 
-void MessageBus::printSubscribeMessage(
-    const QnUuid& remoteId,
-    const QVector<ApiPersistentIdData>& subscribedTo,
-    const QVector<qint32>& sequences) const
-{
-    QList<QString> records;
-    int index = 0;
-    for (const auto& peer: subscribedTo)
-    {
-        records << lit("\t\t\t\t\t To:  %1(dbId=%2) from: %3")
-            .arg(qnStaticCommon->moduleDisplayName(peer.id))
-            .arg(peer.persistentId.toString())
-            .arg(sequences[index++]);
-    }
-
-    NX_VERBOSE(
-        this,
-        lit("Subscribe:\t %1 ---> %2:\n%3")
-        .arg(qnStaticCommon->moduleDisplayName(localPeer().id))
-        .arg(qnStaticCommon->moduleDisplayName(remoteId))
-        .arg(records.join("\n")));
-}
-
 bool MessageBus::isLocalConnection(const ApiPersistentIdData& peer) const
 {
     auto connection = m_connections.value(peer.id);
@@ -712,60 +689,6 @@ bool MessageBus::handlePeersMessage(const P2pConnectionPtr& connection, const QB
     connection->sendMessage(serializedData);
     return true;
 }
-
-struct SendTransactionToTransportFuction
-{
-    typedef void result_type;
-
-    template<class T>
-    void operator()(
-        MessageBus* bus,
-        const QnTransaction<T>& transaction,
-        const P2pConnectionPtr& connection) const
-    {
-        ApiPersistentIdData tranId(transaction.peerID, transaction.persistentInfo.dbID);
-        NX_ASSERT(bus->context(connection)->isRemotePeerSubscribedTo(tranId));
-        NX_ASSERT(!(ApiPersistentIdData(connection->remotePeer()) == tranId, "Loop detected"));
-
-        switch (connection->remotePeer().dataFormat)
-        {
-            case Qn::JsonFormat:
-                connection->sendMessage(
-                    bus->jsonTranSerializer()->serializedTransactionWithoutHeader(transaction) + QByteArray("\r\n"));
-                break;
-            case Qn::UbjsonFormat:
-                connection->sendMessage(MessageType::pushTransactionData,
-                    bus->ubjsonTranSerializer()->serializedTransactionWithoutHeader(transaction));
-                break;
-            default:
-                qWarning() << "Client has requested data in an unsupported format"
-                    << connection->remotePeer().dataFormat;
-                break;
-        }
-    }
-};
-
-struct SendTransactionToTransportFastFuction
-{
-    bool operator()(
-        MessageBus* /*bus*/,
-        Qn::SerializationFormat /* srcFormat */,
-        const QByteArray& serializedTran,
-        const P2pConnectionPtr& connection) const
-    {
-        if (connection.staticCast<Connection>()->userAccessData().userId != Qn::kSystemAccess.userId)
-        {
-            NX_DEBUG(
-                this,
-                lit("Permission check failed while sending SERIALIZED transaction to peer %1")
-                .arg(connection->remotePeer().id.toString()));
-            return false;
-        }
-
-        connection->sendMessage(MessageType::pushTransactionData, serializedTran);
-        return true;
-    }
-};
 
 void MessageBus::sendRuntimeData(
     const P2pConnectionPtr& connection,

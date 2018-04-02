@@ -43,8 +43,10 @@ namespace ec2
 
     void RemoteEC2Connection::startReceivingNotifications()
     {
-        m_connectionFactory->messageBus()->init(
-            m_connectionInfo.p2pMode ? MessageBusType::P2pMode : MessageBusType::LegacyMode);
+        if (m_connectionInfo.p2pMode)
+            m_connectionFactory->messageBus()->init<nx::p2p::MessageBus>();
+        else
+            m_connectionFactory->messageBus()->init<ec2::TransactionMessageBusBase>();
         m_connectionFactory->messageBus()->setHandler(notificationManager());
 
         base_type::startReceivingNotifications();
@@ -65,7 +67,7 @@ namespace ec2
         {
             m_connectionFactory->messageBus()->removeOutgoingConnectionFromPeer(m_remotePeerId);
             m_connectionFactory->messageBus()->removeHandler( notificationManager() );
-            m_connectionFactory->messageBus()->init(MessageBusType::None);
+            m_connectionFactory->messageBus()->reset();
         }
 
         //TODO #ak next call can be placed here just because we always have just one connection to EC

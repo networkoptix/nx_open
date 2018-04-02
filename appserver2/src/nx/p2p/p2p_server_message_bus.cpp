@@ -1,6 +1,7 @@
 #include "p2p_server_message_bus.h"
 #include <database/db_manager.h>
 #include <common/common_module.h>
+#include <transaction/transaction_message_bus_priv.h>
 
 namespace {
 
@@ -30,19 +31,76 @@ struct GotTransactionFuction
     }
 };
 
+struct SendTransactionToTransportFuction
+{
+    typedef void result_type;
+
+    template<class T>
+    void operator()(
+        MessageBus* bus,
+        const QnTransaction<T>& transaction,
+        const P2pConnectionPtr& connection) const
+    {
+        ApiPersistentIdData tranId(transaction.peerID, transaction.persistentInfo.dbID);
+        NX_ASSERT(bus->context(connection)->isRemotePeerSubscribedTo(tranId));
+        NX_ASSERT(!(ApiPersistentIdData(connection->remotePeer()) == tranId, "Loop detected"));
+
+        switch (connection->remotePeer().dataFormat)
+        {
+            case Qn::JsonFormat:
+                connection->sendMessage(
+                    bus->jsonTranSerializer()->serializedTransactionWithoutHeader(transaction) + QByteArray("\r\n"));
+                break;
+            case Qn::UbjsonFormat:
+                connection->sendMessage(MessageType::pushTransactionData,
+                    bus->ubjsonTranSerializer()->serializedTransactionWithoutHeader(transaction));
+                break;
+            default:
+                qWarning() << "Client has requested data in an unsupported format"
+                    << connection->remotePeer().dataFormat;
+                break;
+        }
+    }
+};
+
+struct SendTransactionToTransportFastFuction
+{
+    bool operator()(
+        MessageBus* /*bus*/,
+        Qn::SerializationFormat /* srcFormat */,
+        const QByteArray& serializedTran,
+        const P2pConnectionPtr& connection) const
+    {
+        if (connection.staticCast<Connection>()->userAccessData().userId != Qn::kSystemAccess.userId)
+        {
+            NX_DEBUG(
+                this,
+                lit("Permission check failed while sending SERIALIZED transaction to peer %1")
+                .arg(connection->remotePeer().id.toString()));
+            return false;
+        }
+
+        connection->sendMessage(MessageType::pushTransactionData, serializedTran);
+        return true;
+    }
+};
+
 // ---------------------- ServerpMessageBus --------------
 
 ServerMessageBus::ServerMessageBus(
-    ec2::detail::QnDbManager* db,
     Qn::PeerType peerType,
     QnCommonModule* commonModule,
     QnJsonTransactionSerializer* jsonTranSerializer,
     QnUbjsonTransactionSerializer* ubjsonTranSerializer)
-:
-	MessageBus(peerType, commonModule, jsonTranSerializer, ubjsonTranSerializer),
-	m_db(db)
+    :
+	base_type(peerType, commonModule, jsonTranSerializer, ubjsonTranSerializer)
 {
 	m_dbCommitTimer.restart();
+}
+
+void ServerMessageBus::setDatabase(ec2::detail::QnDbManager* db)
+{
+    m_db = db;
 }
 
 ServerMessageBus::~ServerMessageBus()
@@ -387,6 +445,29 @@ void ServerMessageBus::addOfflinePeersFromDb()
 	}
 }
 
+void ServerMessageBus::printSubscribeMessage(
+    const QnUuid& remoteId,
+    const QVector<ApiPersistentIdData>& subscribedTo,
+    const QVector<qint32>& sequences) const
+{
+    QList<QString> records;
+    int index = 0;
+    for (const auto& peer : subscribedTo)
+    {
+        records << lit("\t\t\t\t\t To:  %1(dbId=%2) from: %3")
+            .arg(qnStaticCommon->moduleDisplayName(peer.id))
+            .arg(peer.persistentId.toString())
+            .arg(sequences[index++]);
+    }
+
+    NX_VERBOSE(
+        this,
+        lit("Subscribe:\t %1 ---> %2:\n%3")
+        .arg(qnStaticCommon->moduleDisplayName(localPeer().id))
+        .arg(qnStaticCommon->moduleDisplayName(remoteId))
+        .arg(records.join("\n")));
+}
+
 void ServerMessageBus::resubscribePeers(
 	QMap<ApiPersistentIdData, P2pConnectionPtr> newSubscription)
 {
@@ -595,7 +676,7 @@ void ServerMessageBus::gotTransaction(
 	const P2pConnectionPtr& connection,
 	const TransportHeader& transportHeader)
 {
-	base::type::gotTransaction(tran, connection, transportHeader);
+	base_type::gotTransaction(tran, connection, transportHeader);
 
 	ApiPersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
 	auto errCode = m_db->transactionLog()->updateSequence(tran, TransactionLockType::Lazy);

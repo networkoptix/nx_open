@@ -6,14 +6,12 @@
 namespace ec2 {
 
 TransactionMessageBusAdapter::TransactionMessageBusAdapter(
-    detail::QnDbManager* db,
     Qn::PeerType peerType,
     QnCommonModule* commonModule,
     QnJsonTransactionSerializer* jsonTranSerializer,
     QnUbjsonTransactionSerializer* ubjsonTranSerializer)
     :
     AbstractTransactionMessageBus(commonModule),
-    m_db(db),
     m_peerType(peerType),
     m_jsonTranSerializer(jsonTranSerializer),
     m_ubjsonTranSerializer(ubjsonTranSerializer),
@@ -21,17 +19,19 @@ TransactionMessageBusAdapter::TransactionMessageBusAdapter(
 {
 }
 
-void TransactionMessageBusAdapter::init(MessageBusType value)
+void TransactionMessageBusAdapter::reset()
 {
     m_bus.reset();
+}
 
-    if (value == MessageBusType::None)
-        return;
+template <typename MessageBusType>
+MessageBusType* TransactionMessageBusAdapter::init()
+{
+    reset();
 
     if (value == MessageBusType::P2pMode)
     {
-        m_bus.reset(new nx::p2p::MessageBus(
-            m_db,
+        m_bus.reset(new MessageBusType(
             m_peerType,
             commonModule(),
             m_jsonTranSerializer,
@@ -39,8 +39,7 @@ void TransactionMessageBusAdapter::init(MessageBusType value)
     }
     else
     {
-        m_bus.reset(new QnTransactionMessageBus(
-            m_db,
+        m_bus.reset(new MessageBusType(
             m_peerType,
             commonModule(),
             m_jsonTranSerializer,
@@ -56,6 +55,8 @@ void TransactionMessageBusAdapter::init(MessageBusType value)
         this, &AbstractTransactionMessageBus::remotePeerUnauthorized, Qt::DirectConnection);
     connect(m_bus.get(), &AbstractTransactionMessageBus::newDirectConnectionEstablished,
         this, &AbstractTransactionMessageBus::newDirectConnectionEstablished, Qt::DirectConnection);
+
+    return dynamic_cast<MessageBusType*> (m_bus.get())
 }
 
 void TransactionMessageBusAdapter::start()

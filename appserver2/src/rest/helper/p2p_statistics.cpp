@@ -21,7 +21,7 @@ ec2::ApiP2pStatisticsData P2pStatistics::data(QnCommonModule* commonModule)
         dynamic_cast<ec2::Ec2DirectConnection*> (commonModule->ec2Connection().get());
     if (connection)
     {
-        ec2::detail::QnDbManager* db = connection->messageBus()->getDb();
+        ec2::detail::QnDbManager* db = connection->getDb();
         ec2::ApiTransactionDataList tranList;
         db->doQuery(ec2::ApiTranLogFilter(), tranList);
         for (const auto& tran : tranList)

@@ -106,7 +106,7 @@ public:
     bool isSubscribedTo(const ApiPersistentIdData& peer) const;
     qint32 distanceTo(const ApiPersistentIdData& peer) const;
 
-private:
+protected:
     template<class T>
     void sendTransactionImpl(
         const P2pConnectionPtr& connection,
@@ -255,7 +255,7 @@ private:
         Connection::Direction direction) const;
 
     void deleteRemoveUrlById(const QnUuid& id);
-protected:
+
 	virtual void doPeriodicTasks();
 	virtual void addOfflinePeersFromDb() {}
 	virtual void sendInitialDataToCloud(const P2pConnectionPtr& connection);
@@ -289,15 +289,20 @@ protected:
 	void connectSignals(const P2pConnectionPtr& connection);
 	void startReading(P2pConnectionPtr connection);
 	void sendRuntimeData(const P2pConnectionPtr& connection, const QList<ApiPersistentIdData>& peers);
+
+    void gotTransaction(
+        const QnTransaction<ApiUpdateSequenceData> &tran,
+        const P2pConnectionPtr& connection,
+        const TransportHeader& transportHeader);
+    void gotTransaction(
+        const QnTransaction<ApiRuntimeData> &tran,
+        const P2pConnectionPtr& connection,
+        const TransportHeader& transportHeader);
+
+    template <class T>
+    void gotTransaction(const QnTransaction<T>& tran, const P2pConnectionPtr& connection, const TransportHeader& transportHeader);
 private:
 	void sendAlivePeersMessage(const P2pConnectionPtr& connection = P2pConnectionPtr());
-
-    void printSubscribeMessage(
-        const QnUuid& remoteId,
-        const QVector<ApiPersistentIdData>& subscribedTo,
-        const QVector<qint32>& sequences) const;
-
-    void addOwnfInfoToPeerList();
 
     void doSubscribe(const QMap<ApiPersistentIdData, P2pConnectionPtr>& currentSubscription);
 
@@ -311,18 +316,6 @@ private:
     friend struct GotTransactionFuction;
     friend struct GotUnicastTransactionFuction;
     friend struct SendTransactionToTransportFuction;
-
-    void gotTransaction(
-        const QnTransaction<ApiUpdateSequenceData> &tran,
-        const P2pConnectionPtr& connection,
-        const TransportHeader& transportHeader);
-    void gotTransaction(
-        const QnTransaction<ApiRuntimeData> &tran,
-        const P2pConnectionPtr& connection,
-        const TransportHeader& transportHeader);
-
-    template <class T>
-    void gotTransaction(const QnTransaction<T>& tran,const P2pConnectionPtr& connection, const TransportHeader& transportHeader);
 
     template <class T>
     void gotUnicastTransaction(

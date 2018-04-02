@@ -40,6 +40,9 @@
 #include <transaction/json_transaction_serializer.h>
 #include <transaction/ubjson_transaction_serializer.h>
 
+#include <nx/p2p/p2p_server_message_bus.h>
+#include <transaction/server_transaction_message_bus.h>
+
 
 namespace ec2 {
 
@@ -68,7 +71,6 @@ namespace ec2 {
 		}
 
 		m_bus.reset(new TransactionMessageBusAdapter(
-			m_dbManager.get(),
 			peerType,
 			commonModule,
 			m_jsonTranSerializer.get(),
@@ -80,19 +82,23 @@ namespace ec2 {
 			m_bus.get(),
 			&m_settingsInstance));
 
-		if (peerType == Qn::PT_Server)
-		{
-			m_bus->init(m_p2pMode ? MessageBusType::P2pMode : MessageBusType::LegacyMode);
-			if (auto messageBus = m_bus->dynamicCast<QnTransactionMessageBus*>())
-				m_distributedMutexManager.reset(new QnDistributedMutexManager(messageBus));
-			m_serverQueryProcessor.reset(new ServerQueryProcessorAccess(m_dbManager.get(), m_bus.get()));
-		}
+        if (m_p2pMode)
+        {
+            auto messageBus = m_bus->init<nx::p2p::ServerMessageBus>();
+            messageBus->setDatabase(m_dbManager.get());
+        }
+        else
+        {
+            auto messageBus = m_bus->init<ec2::ServerTransactionMessageBus>();
+            messageBus->setDatabase(m_dbManager.get());
+            m_distributedMutexManager.reset(new QnDistributedMutexManager(messageBus));
+        }
+        
+		m_serverQueryProcessor.reset(new ServerQueryProcessorAccess(m_dbManager.get(), m_bus.get()));
 
-		if (m_dbManager)
-		{
-			m_dbManager->setTransactionLog(m_transactionLog.get());
-			m_dbManager->setTimeSyncManager(m_timeSynchronizationManager.get());
-		}
+		m_dbManager->setTransactionLog(m_transactionLog.get());
+		m_dbManager->setTimeSyncManager(m_timeSynchronizationManager.get());
+		
 		m_bus->setTimeSyncManager(m_timeSynchronizationManager.get());
 		if (peerType != Qn::PT_Server)
 			m_timeSynchronizationManager->start(nullptr);
@@ -174,11 +180,11 @@ namespace ec2 {
 	void LocalConnectionFactory::registerTransactionListener(
 		QnHttpConnectionListener* httpConnectionListener)
 	{
-		if (auto bus = m_bus->dynamicCast<QnTransactionMessageBus*>())
+		if (auto bus = m_bus->dynamicCast<ServerTransactionMessageBus*>())
 		{
-			httpConnectionListener->addHandler<QnTransactionTcpProcessor, QnTransactionMessageBus*>(
+			httpConnectionListener->addHandler<QnTransactionTcpProcessor, ServerTransactionMessageBus*>(
 				"HTTP", "ec2/events", bus);
-			httpConnectionListener->addHandler<QnHttpTransactionReceiver, QnTransactionMessageBus*>(
+			httpConnectionListener->addHandler<QnHttpTransactionReceiver, ServerTransactionMessageBus*>(
 				"HTTP", kIncomingTransactionsPath, bus);
 		}
 		else if (auto bus = m_bus->dynamicCast<nx::p2p::MessageBus*>())

@@ -17,12 +17,13 @@ class ServerMessageBus: public MessageBus
     using base_type = MessageBus;
 public:
 	ServerMessageBus(
-        ec2::detail::QnDbManager* db,
         Qn::PeerType peerType,
         QnCommonModule* commonModule,
         ec2::QnJsonTransactionSerializer* jsonTranSerializer,
         QnUbjsonTransactionSerializer* ubjsonTranSerializer);
 	virtual ~ServerMessageBus();
+
+    void setDatabase(ec2::detail::QnDbManager* db);
 
 	void gotConnectionFromRemotePeer(
 		const ec2::ApiPeerDataEx& remotePeer,
@@ -64,6 +65,8 @@ protected:
 	template <class T>
 	void gotTransaction(const QnTransaction<T>& tran, const P2pConnectionPtr& connection, const TransportHeader& transportHeader);
 private:
+    friend struct GotTransactionFuction;
+
 	void sendAlivePeersMessage(const P2pConnectionPtr& connection = P2pConnectionPtr());
 	void startStopConnections(const QMap<ApiPersistentIdData, P2pConnectionPtr>& currentSubscription);
 	P2pConnectionPtr findBestConnectionToSubscribe(
@@ -82,6 +85,11 @@ private:
 	bool pushTransactionList(
 		const P2pConnectionPtr& connection,
 		const QList<QByteArray>& tranList);
+
+    void printSubscribeMessage(
+        const QnUuid& remoteId,
+        const QVector<ApiPersistentIdData>& subscribedTo,
+        const QVector<qint32>& sequences) const;
 private:
 	ec2::detail::QnDbManager* m_db;
 	QElapsedTimer m_dbCommitTimer;

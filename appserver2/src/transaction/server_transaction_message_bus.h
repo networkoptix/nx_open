@@ -9,13 +9,14 @@ class ServerTransactionMessageBus: public QnTransactionMessageBus
     using base_type = QnTransactionMessageBus;
 public:
 	ServerTransactionMessageBus(
-        detail::QnDbManager* db,
         Qn::PeerType peerType,
         QnCommonModule* commonModule,
         QnJsonTransactionSerializer* jsonTranSerializer,
         QnUbjsonTransactionSerializer* ubjsonTranSerializer);
 
     virtual ~ServerTransactionMessageBus();
+
+    void setDatabase(detail::QnDbManager* db);
 
 	void gotConnectionFromRemotePeer(const QnUuid& connectionGuid,
 		ConnectionLockGuard connectionLockGuard,

@@ -8,13 +8,6 @@
 
 namespace ec2 {
 
-    enum class MessageBusType
-    {
-        None,
-        LegacyMode,
-        P2pMode
-    };
-
     class TransactionMessageBusAdapter:
         public AbstractTransactionMessageBus
     {
@@ -22,14 +15,16 @@ namespace ec2 {
 
     public:
         TransactionMessageBusAdapter(
-            detail::QnDbManager* db,
             Qn::PeerType peerType,
             QnCommonModule* commonModule,
             QnJsonTransactionSerializer* jsonTranSerializer,
             QnUbjsonTransactionSerializer* ubjsonTranSerializer
         );
 
-        void init(MessageBusType value);
+        template <typename MessageBusType>
+        MessageBusType* init();
+
+        void reset();
 
         template <typename T> T dynamicCast() { return dynamic_cast<T> (m_bus.get()); }
 
@@ -100,7 +95,6 @@ namespace ec2 {
     private:
         std::unique_ptr<TransactionMessageBusBase> m_bus;
 
-        detail::QnDbManager* m_db;
         Qn::PeerType m_peerType;
         QnJsonTransactionSerializer* m_jsonTranSerializer;
         QnUbjsonTransactionSerializer* m_ubjsonTranSerializer;

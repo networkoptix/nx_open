@@ -22,6 +22,7 @@ namespace ec2
     {
         // todo: #singletone. Only one connection for each connection factory allowed now
         m_isInitialized = queryProcessor->getDb()->init(dbUrl);
+        m_db = queryProcessor->getDb();
 
         connectionFactory->messageBus()->setHandler(notificationManager());
 
@@ -35,6 +36,11 @@ namespace ec2
     Ec2DirectConnection::~Ec2DirectConnection()
     {
         m_connectionFactory->messageBus()->removeHandler(notificationManager());
+    }
+
+    ec2::detail::QnDbManager* Ec2DirectConnection::getDb() const
+    {
+        return m_db;
     }
 
     QnConnectionInfo Ec2DirectConnection::connectionInfo() const

@@ -42,6 +42,21 @@ struct SendTransactionToTransportFastFuction
 
 // --------------------------------- ServerTransactionMessageBus ------------------------------
 
+ServerTransactionMessageBus::ServerTransactionMessageBus(
+    Qn::PeerType peerType,
+    QnCommonModule* commonModule,
+    QnJsonTransactionSerializer* jsonTranSerializer,
+    QnUbjsonTransactionSerializer* ubjsonTranSerializer)
+    :
+    base_type(peerType, commonModule, jsonTranSerializer, ubjsonTranSerializer)
+{
+}
+
+void ServerTransactionMessageBus::setDatabase(detail::QnDbManager* db)
+{
+    m_db = db;
+}
+
 void ServerTransactionMessageBus::printTranState(const QnTranState& tranState)
 {
 	if (!nx::utils::log::isToBeLogged(nx::utils::log::Level::debug, QnLog::EC2_TRAN_LOG))

@@ -39,10 +39,13 @@ namespace ec2
 
         virtual Timestamp getTransactionLogTime() const override;
         virtual void setTransactionLogTime(Timestamp value) override;
+
+        ec2::detail::QnDbManager* getDb() const;
     private:
         const QnConnectionInfo m_connectionInfo;
         bool m_isInitialized;
         std::unique_ptr<Ec2StaticticsReporter> m_staticticsReporter;
+        ec2::detail::QnDbManager* m_db = nullptr;
     };
     typedef std::shared_ptr<Ec2DirectConnection> Ec2DirectConnectionPtr;
 }
