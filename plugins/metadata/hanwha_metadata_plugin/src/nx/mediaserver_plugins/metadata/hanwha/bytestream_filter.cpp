@@ -84,10 +84,13 @@ boost::optional<Event> BytestreamFilter::createEvent(
     event.typeId = nxpt::NxGuidHelper::fromRawData(eventTypeId.toRfc4122());
     event.channel = eventChannel(eventSource);
     event.region = eventRegion(eventSource);
-    if (eventDescriptor.flags.testFlag(Analytics::EventTypeFlag::stateDependent))
-        event.isActive = isEventActive(eventState);  //< Event start/stop.
-    else
-        event.isActive = true; //< Event occurred.
+    event.isActive = isEventActive(eventState);  //< Event start/stop.
+    if (!event.isActive
+        && !eventDescriptor.flags.testFlag(Analytics::EventTypeFlag::stateDependent))
+    {
+        return boost::optional<HanwhaEvent>();
+    }
+
     event.itemType = eventItemType(eventSource, eventState);
     event.fullEventName = eventSource;
 

@@ -5848,7 +5848,7 @@ to %1</source>
     </message>
     <message>
       <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
-      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</translation>
+      <translation>서버 저장 영역에 여유 공간이 없으면 업로드 된 아카이브를 자동으로 삭제할 수 있습니다. 서버의 모든 카메라 중에서 가장 오래된 장면이 먼저 삭제됩니다.</translation>
     </message>
   </context>
   <context>
@@ -6074,7 +6074,7 @@ to %1</source>
     </message>
     <message>
       <source>NOT ENOUGH LICENSES</source>
-      <translation type="unfinished">NOT ENOUGH LICENSES</translation>
+      <translation>라인센스 부족</translation>
     </message>
   </context>
   <context>
@@ -7104,11 +7104,11 @@ to %1</source>
     </message>
     <message>
       <source>Uploading %1...</source>
-      <translation type="unfinished">Uploading %1...</translation>
+      <translation>업로드중 %1...</translation>
     </message>
     <message>
       <source>Finalizing %1...</source>
-      <translation type="unfinished">Finalizing %1...</translation>
+      <translation>마무리중 %1...</translation>
     </message>
   </context>
   <context>
@@ -7213,7 +7213,7 @@ to %1</source>
     </message>
     <message>
       <source>Video Wall is removed on the server and will be closed.</source>
-      <translation type="unfinished">Video Wall is removed on the server and will be closed.</translation>
+      <translation>비디오월이 서버에서 제거되어 종료합니다.</translation>
     </message>
   </context>
   <context>

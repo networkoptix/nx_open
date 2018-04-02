@@ -586,8 +586,8 @@ private:
     void fillFullUrlInfo( const CapabilitiesResp& response );
     CameraDiagnostics::Result getVideoEncoderTokens(MediaSoapWrapper& soapWrapper, QStringList* result, VideoConfigsResp *confResponse);
     QString getInputPortNumberFromString(const QString& portName);
-    bool initializeTwoWayAudio();
-    bool initializeTwoWayAudioByResourceData();
+    virtual QnAudioTransmitterPtr initializeTwoWayAudio();
+    QnAudioTransmitterPtr initializeTwoWayAudioByResourceData();
 
     mutable QnMutex m_physicalParamsMutex;
     std::unique_ptr<QnOnvifImagingProxy> m_imagingParamsProxy;

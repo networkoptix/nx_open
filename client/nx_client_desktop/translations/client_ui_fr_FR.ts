@@ -765,7 +765,7 @@
     <message>
       <location/>
       <source>Logical Id</source>
-      <translation type="unfinished">Logical Id</translation>
+      <translation>Id logique</translation>
     </message>
   </context>
   <context>
@@ -1804,7 +1804,7 @@
     <message>
       <location/>
       <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+      <translation>&quot;Caméra Portablea&quot; est un stockage virtuel pour les fichiers vidéo, qui peut être envoyer sur n'importe quel serveur de votre Système et accessible à tout utilisateur.</translation>
     </message>
   </context>
   <context>

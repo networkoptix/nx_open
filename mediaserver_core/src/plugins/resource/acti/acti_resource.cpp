@@ -326,10 +326,23 @@ bool QnActiResource::isRtspAudioSupported(const QByteArray& platform, const QByt
 
     for (uint i = 0; i < sizeof(rtspAudio) / sizeof(rtspAudio[0]); ++i)
     {
-        if (platform == rtspAudio[i][0] && version >= rtspAudio[i][1])
-            return true;
+        if (platform == rtspAudio[i][0])
+        {
+            const auto minSupportedVersion = rtspAudio[i][1];
+            if (version < minSupportedVersion)
+            {
+                NX_WARNING(this,
+                    lm("RTSP audio is not supported for camera %1. "
+                       "Camera firmware %2, platform %3, minimal firmware %4")
+                    .args(getPhysicalId(), version, platform, minSupportedVersion));
+            }
+
+            return version >= minSupportedVersion;
+        }
     }
 
+    NX_WARNING(this, lm("RTSP audio is not supported for camera %1. Camera firmware %2, platform %3")
+        .args(getPhysicalId(), version, platform));
     return false;
 }
 

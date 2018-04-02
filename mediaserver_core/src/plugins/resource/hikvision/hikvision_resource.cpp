@@ -43,12 +43,10 @@ using namespace nx::plugins::utils;
 HikvisionResource::HikvisionResource():
     QnPlOnvifResource()
 {
-    m_audioTransmitter.reset(new HikvisionAudioTransmitter(this));
 }
 
 HikvisionResource::~HikvisionResource()
 {
-    m_audioTransmitter.reset();
 }
 
 nx::mediaserver::resource::StreamCapabilityMap HikvisionResource::getStreamCapabilityMapFromDrives(
@@ -82,15 +80,7 @@ nx::mediaserver::resource::StreamCapabilityMap HikvisionResource::getStreamCapab
 CameraDiagnostics::Result HikvisionResource::initializeCameraDriver()
 {
     tryToEnableIntegrationProtocols(getDeviceOnvifUrl(), getAuth());
-
-    auto result = QnPlOnvifResource::initializeCameraDriver();
-    if (result.errorCode != CameraDiagnostics::ErrorCode::noError)
-        return result;
-
-    initialize2WayAudio();
-    saveParams();
-
-    return CameraDiagnostics::NoErrorResult();
+    return QnPlOnvifResource::initializeCameraDriver();
 }
 
 QnAbstractStreamDataProvider* HikvisionResource::createLiveDataProvider()
@@ -185,7 +175,7 @@ CameraDiagnostics::Result HikvisionResource::fetchChannelCapabilities(
     return CameraDiagnostics::NoErrorResult();
 }
 
-CameraDiagnostics::Result HikvisionResource::initialize2WayAudio()
+QnAudioTransmitterPtr HikvisionResource::initializeTwoWayAudio()
 {
     auto httpClient = getHttpClient();
 
@@ -196,9 +186,8 @@ CameraDiagnostics::Result HikvisionResource::initialize2WayAudio()
 
     if (!httpClient->doGet(requestUrl) || !isResponseOK(httpClient.get()))
     {
-        return CameraDiagnostics::CameraResponseParseErrorResult(
-            requestUrl.toString(QUrl::RemovePassword),
-            lit("Read two way audio info"));
+        NX_WARNING(this, lm("Can't read two way audio info for camera %1").arg(getPhysicalId()));
+        return QnAudioTransmitterPtr();
     }
 
     QByteArray data;
@@ -206,12 +195,12 @@ CameraDiagnostics::Result HikvisionResource::initialize2WayAudio()
         data.append(httpClient->fetchMessageBodyBuffer());
 
     if (data.isEmpty())
-        return CameraDiagnostics::NoErrorResult(); //< no 2-way-audio cap
+        return QnAudioTransmitterPtr(); //< no 2-way-audio cap
 
     auto channels = parseAvailableChannelsResponse(data);
 
     if (channels.empty())
-        return CameraDiagnostics::NoErrorResult(); //< no 2-way-audio cap
+        return QnAudioTransmitterPtr(); //< no 2-way-audio cap
 
     boost::optional<ChannelStatusResponse> channel(boost::none);
     for (const auto& ch: channels)
@@ -224,29 +213,21 @@ CameraDiagnostics::Result HikvisionResource::initialize2WayAudio()
     }
 
     if (!channel)
-        return CameraDiagnostics::NoErrorResult();
+        return QnAudioTransmitterPtr();
 
     QnAudioFormat outputFormat = toAudioFormat(
         channel->audioCompression,
         channel->sampleRateKHz);
 
-    if (m_audioTransmitter->isCompatible(outputFormat))
+    auto audioTransmitter = std::make_shared<HikvisionAudioTransmitter>(this);
+    if (audioTransmitter->isCompatible(outputFormat))
     {
-        m_audioTransmitter->setOutputFormat(outputFormat);
-
-        auto hikTransmitter = std::dynamic_pointer_cast<HikvisionAudioTransmitter>(
-            m_audioTransmitter);
-
-        if (hikTransmitter)
-        {
-            hikTransmitter->setChannelId(channel->id);
-            hikTransmitter->setAudioUploadHttpMethod(nx::network::http::Method::put);
-        }
-
-        setCameraCapabilities(getCameraCapabilities() | Qn::AudioTransmitCapability);
+        audioTransmitter->setOutputFormat(outputFormat);
+        audioTransmitter->setChannelId(channel->id);
+        audioTransmitter->setAudioUploadHttpMethod(nx::network::http::Method::put);
+        return audioTransmitter;
     }
-
-    return CameraDiagnostics::NoErrorResult();
+    return QnAudioTransmitterPtr();
 }
 
 boost::optional<ChannelCapabilities> HikvisionResource::channelCapabilities(

@@ -272,18 +272,27 @@ void QnDesktopCameraConnection::pleaseStop()
 
 void QnDesktopCameraConnection::run()
 {
+    const auto setupNetwork =
+        [this](
+            std::unique_ptr<nx::network::http::HttpClient> newClient,
+            QSharedPointer<AbstractStreamSocket> newSocket)
+        {
+            auto newProcessor = newSocket
+                ? std::make_shared<QnDesktopCameraConnectionProcessor>(newSocket, nullptr, m_owner)
+                : std::shared_ptr<QnDesktopCameraConnectionProcessor>();
+
+            QnMutexLocker lock(&m_mutex);
+            std::swap(tcpSocket, newSocket);
+            std::swap(httpClient, newClient);
+            std::swap(processor, newProcessor);
+        };
+
     while (!m_needStop)
     {
         QAuthenticator auth;
         auth.setUser(commonModule()->currentUrl().userName());
         auth.setPassword(commonModule()->currentUrl().password());
-        {
-            decltype(httpClient) localHttpClient(new nx::network::http::HttpClient());
-            QnMutexLocker lock(&m_mutex);
-            tcpSocket.reset();
-            processor.reset();
-            std::swap(httpClient, localHttpClient);
-        }
+        setupNetwork(std::make_unique<nx::network::http::HttpClient>(), QSharedPointer<AbstractStreamSocket>());
 
         httpClient->addAdditionalHeader("user-name", auth.user().toUtf8());
         // TODO: #GDM #3.2 Remove 3.1 compatibility layer.
@@ -311,13 +320,7 @@ void QnDesktopCameraConnection::run()
             continue;
         }
 
-        {
-            decltype(httpClient) localHttpClient;
-            QnMutexLocker lock(&m_mutex);
-            tcpSocket = takeSocketFromHttpClient(httpClient);
-            std::swap(httpClient, localHttpClient);
-            processor.reset(new QnDesktopCameraConnectionProcessor(tcpSocket, 0, m_owner));
-        }
+        setupNetwork(nullptr, takeSocketFromHttpClient(httpClient));
 
         QElapsedTimer timeout;
         timeout.start();
@@ -335,9 +338,5 @@ void QnDesktopCameraConnection::run()
         }
     }
 
-    decltype(httpClient) localHttpClient;
-    QnMutexLocker lock( &m_mutex );
-    processor.reset();
-    std::swap(httpClient, localHttpClient);
-    tcpSocket.reset();
+    setupNetwork(nullptr, QSharedPointer<AbstractStreamSocket>());
 }

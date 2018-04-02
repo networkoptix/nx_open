@@ -3200,7 +3200,7 @@ to %1</source>
     </message>
     <message>
       <source>Set Password</source>
-      <translation type="unfinished">Set Password</translation>
+      <translation>Jelszó beállítása</translation>
     </message>
   </context>
   <context>
@@ -7184,7 +7184,7 @@ to %1</source>
     </message>
     <message>
       <source>Uploading %1...</source>
-      <translation type="unfinished">Uploading %1...</translation>
+      <translation>Feltöltés %1...</translation>
     </message>
     <message>
       <source>Finalizing %1...</source>

@@ -1424,6 +1424,13 @@ CameraDiagnostics::Result HanwhaResource::fetchExistingProfiles()
     const auto response = helper.view(
         lit("media/videoprofilepolicy"),
         {{kHanwhaChannelProperty, QString::number(getChannel())}});
+    if (!response.isSuccessful())
+    {
+        return CameraDiagnostics::RequestFailedResult(
+            response.requestUrl(),
+            lit("can't read video profile policy"));
+    }
+
 
     std::set<int> availableProfiles;
     for (const auto& profile: response.response())

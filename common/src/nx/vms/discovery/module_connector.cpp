@@ -368,6 +368,7 @@ void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
 
     // Initiate parallel connects to each endpoint in a group.
     size_t endpointsInProgress = 0;
+
     for (const auto& endpoint: endpointsGroup->second)
     {
         if (m_forbiddenEndpoints.count(endpoint))

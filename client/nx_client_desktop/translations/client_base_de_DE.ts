@@ -2485,7 +2485,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Id</source>
-      <translation>ID</translation>
+      <translation>Id</translation>
     </message>
   </context>
   <context>
@@ -3197,7 +3197,7 @@ to %1</source>
     </message>
     <message>
       <source>Set Password</source>
-      <translation type="unfinished">Set Password</translation>
+      <translation>Passwort festlegen</translation>
     </message>
   </context>
   <context>
@@ -6143,7 +6143,7 @@ to %1</source>
     </message>
     <message>
       <source>NOT ENOUGH LICENSES</source>
-      <translation type="unfinished">NOT ENOUGH LICENSES</translation>
+      <translation>NICHT GENÜGEND LIZENZEN</translation>
     </message>
   </context>
   <context>
@@ -7291,7 +7291,7 @@ to %1</source>
     </message>
     <message>
       <source>Video Wall is removed on the server and will be closed.</source>
-      <translation type="unfinished">Video Wall is removed on the server and will be closed.</translation>
+      <translation>Die Videowand wird auf dem Server entfernt und geschlossen.</translation>
     </message>
   </context>
   <context>

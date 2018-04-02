@@ -3044,12 +3044,12 @@
     <message>
       <location/>
       <source>There are no custom user roles yet.</source>
-      <translation type="unfinished">There are no custom user roles yet.</translation>
+      <translation>Henüz kişiselleştirilmiş kullanıcı rolü yok.</translation>
     </message>
     <message>
       <location/>
       <source>Click &quot;New role&quot; button to create one.</source>
-      <translation type="unfinished">Click &quot;New role&quot; button to create one.</translation>
+      <translation>Bir tane oluşturmak için &quot;Yeni rol&quot; düğmesini tıklayın.</translation>
     </message>
   </context>
   <context>
