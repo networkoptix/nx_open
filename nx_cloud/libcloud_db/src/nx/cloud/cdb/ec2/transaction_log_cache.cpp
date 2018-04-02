@@ -68,8 +68,16 @@ void VmsTransactionLogCache::restoreTransaction(
 {
     QnMutexLocker lock(&m_mutex);
 
-    *m_committedData.timestampSequence =
-        std::max(*m_committedData.timestampSequence, timestamp.sequence);
+    if (m_committedData.timestampSequence)
+    {
+        m_committedData.timestampSequence =
+            std::max<std::uint64_t>(*m_committedData.timestampSequence, timestamp.sequence);
+    }
+    else
+    {
+        m_committedData.timestampSequence = timestamp.sequence;
+    }
+
     qint32& persistentSequence = m_committedData.transactionState.values[tranStateKey];
     if (persistentSequence < sequence)
         persistentSequence = sequence;
