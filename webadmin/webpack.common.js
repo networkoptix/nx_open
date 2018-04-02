@@ -22,19 +22,22 @@ module.exports = {
         //Plugins used for making templates
         new webpack.NamedModulesPlugin(),
         new HtmlWebpackPlugin({
-            chunks: ['commons', 'app', 'webcommonApp'],
+            chunks: ['commons', 'webcommonApp', 'app'],
+            chunksSortMode: 'manual',
             template: 'index-template.html',
             filename: 'index.html',
             inject:false
         }),
         new HtmlWebpackPlugin({
-            chunks: ['commons', 'inline', 'webcommonPartial'],
+            chunks: ['commons', 'webcommonPartial', 'inline'],
+            chunksSortMode: 'manual',
             template: 'inline-template.html',
             filename: 'inline.html',
             inject:false
         }),
         new HtmlWebpackPlugin({
-            chunks: ['commons', 'login', 'webcommonPartial'],
+            chunks: ['commons', 'webcommonPartial', 'login'],
+            chunksSortMode: 'manual',
             template: 'login-template.html',
             filename: 'login.html',
             inject:false
