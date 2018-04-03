@@ -373,7 +373,7 @@ StorageDistributionMap getStorageDistribution(
 
     StorageDistributionMap result;
     for (const auto& p: selectionsData)
-        result.emplace(p.first, p.second / (double)iterations);
+        result.emplace(p.first, p.second / (double) iterations);
 
     return result;
 }
@@ -393,8 +393,8 @@ protected:
 
 TEST_F(StorageBalancingAlgorithmTest, EqualStorages_NxSpaceNotKnown)
 {
-    spaceInfo.storageRebuilded(0, 50, 20, 10);
-    spaceInfo.storageRebuilded(1, 30, 20, 10);
+    spaceInfo.storageChanged(0, 50, 20, 10);
+    spaceInfo.storageChanged(1, 30, 20, 10);
 
     /* no storage rebulded call for the third storage. getOptimalStorageIndex() should be
     *  equally distributed
@@ -407,9 +407,9 @@ TEST_F(StorageBalancingAlgorithmTest, EqualStorages_NxSpaceNotKnown)
 
 TEST_F(StorageBalancingAlgorithmTest, EqualStorages_NxSpaceKnown)
 {
-    spaceInfo.storageRebuilded(0, 50, 20, 10); // Es = 70
-    spaceInfo.storageRebuilded(1, 30, 20, 10); // Es = 50
-    spaceInfo.storageRebuilded(2, 10, 30, 10); // Es = 40
+    spaceInfo.storageChanged(0, 50, 20, 10); // Es = 70
+    spaceInfo.storageChanged(1, 30, 20, 10); // Es = 50
+    spaceInfo.storageChanged(2, 10, 30, 10); // Es = 40
 
     /* Total Es = 160 => 0 - 0.4375, 1 - 0.3125, 2 - 0.25 */
 
@@ -421,9 +421,9 @@ TEST_F(StorageBalancingAlgorithmTest, EqualStorages_NxSpaceKnown)
 
 TEST_F(StorageBalancingAlgorithmTest, EqualStorages_NxSpaceKnown_OneRemoved)
 {
-    spaceInfo.storageRebuilded(0, 50, 20, 10); // Es = 70
-    spaceInfo.storageRebuilded(1, 30, 20, 10); // Es = 50
-    spaceInfo.storageRebuilded(2, 10, 30, 10); // Es = 40, This will be removed
+    spaceInfo.storageChanged(0, 50, 20, 10); // Es = 70
+    spaceInfo.storageChanged(1, 30, 20, 10); // Es = 50
+    spaceInfo.storageChanged(2, 10, 30, 10); // Es = 40, This will be removed
 
     /* Total Es = 120 => 0 - 0.5833, 1 - 0.4166 */
 
@@ -438,13 +438,35 @@ TEST_F(StorageBalancingAlgorithmTest, EqualStorages_NxSpaceKnown_OneRemoved)
 
 TEST_F(StorageBalancingAlgorithmTest, EqualStorages_NxSpaceKnown_NotAllAllowed)
 {
-    spaceInfo.storageRebuilded(0, 50, 20, 10); // Es = 70
-    spaceInfo.storageRebuilded(1, 30, 20, 10); // Es = 50
-    spaceInfo.storageRebuilded(2, 10, 30, 10); // Es = 40. This won't be allowed
+    spaceInfo.storageChanged(0, 50, 20, 10); // Es = 70
+    spaceInfo.storageChanged(1, 30, 20, 10); // Es = 50
+    spaceInfo.storageChanged(2, 10, 30, 10); // Es = 40. This won't be allowed
     /* Total Es = 120 => 0 - 0.5833, 1 - 0.4166 */
 
     auto storageDistribution = getStorageDistribution(spaceInfo, 100 * 1000, {0, 1});
     ASSERT_EQ(storageDistribution.find(2), storageDistribution.cend());
     ASSERT_LT(storageDistribution[0] - 0.5833, 0.05);
     ASSERT_LT(storageDistribution[1] - 0.4166, 0.05);
+}
+
+TEST_F(StorageBalancingAlgorithmTest, NegativeEffectiveSpace_oneStorage_notCountedAsValid)
+{
+    spaceInfo.storageChanged(0, 10, 0, 30); // fs + nxs < sc => should not be ever selected
+    spaceInfo.storageChanged(1, 50, 10, 30);
+    spaceInfo.storageChanged(2, 50, 10, 30);
+
+    auto storageDistribution = getStorageDistribution(spaceInfo, 100 * 1000, {0, 1, 2});
+    ASSERT_EQ(storageDistribution.find(0), storageDistribution.cend());
+}
+
+TEST_F(StorageBalancingAlgorithmTest, NegativeEffectiveSpace_everyStorage)
+{
+    spaceInfo.storageChanged(0, 10, 0, 30);
+    spaceInfo.storageChanged(1, 10, 0, 30);
+    spaceInfo.storageChanged(2, 10, 0, 30);
+
+    auto storageDistribution = getStorageDistribution(spaceInfo, 100 * 1000, {0, 1, 2});
+    ASSERT_EQ(storageDistribution.find(2), storageDistribution.cend());
+    ASSERT_EQ(storageDistribution.find(1), storageDistribution.cend());
+    ASSERT_EQ(storageDistribution.find(0), storageDistribution.cend());
 }

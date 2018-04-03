@@ -8,10 +8,10 @@
 
             <Directory Id="$(var.paxtonDirId)" Name="$(var.releaseVersionFull)">
                 <Component Id="AxClass">
-                    <File Id="fil3026E8B92FE2CBB52B6417893B92EFA1" KeyPath="yes" Source="$(var.SourceDir)\ax${ax.className}${parsedVersion.majorVersion}.dll">
-                        <Class Id="${ax.classId}" Context="InprocServer32" Description="Ax${ax.className} Class" Version="${nxec.ec2ProtoVersion}" Programmable="yes" Control="yes">
-                            <ProgId Id="axhdwitness.Ax${ax.className}.${nxec.ec2ProtoVersion}" Description="Ax${ax.className} Class">
-                                <ProgId Id="axhdwitness.Ax${ax.className}" Description="Ax${ax.className} Class" />
+                    <File Id="fil3026E8B92FE2CBB52B6417893B92EFA1" KeyPath="yes" Source="$(var.SourceDir)\ax${paxton.className}${parsedVersion.majorVersion}.dll">
+                        <Class Id="${paxton.classId}" Context="InprocServer32" Description="Ax${paxton.className} Class" Version="${nxec.ec2ProtoVersion}" Programmable="yes" Control="yes">
+                            <ProgId Id="axhdwitness.Ax${paxton.className}.${nxec.ec2ProtoVersion}" Description="Ax${paxton.className} Class">
+                                <ProgId Id="axhdwitness.Ax${paxton.className}" Description="Ax${paxton.className} Class" />
                             </ProgId>
                         </Class>
                     </File>

@@ -54,9 +54,11 @@ ResourceMetadataContext::ResourceMetadataContext(
 {
 }
 
-ManagerPool::ManagerPool(QnMediaServerModule* serverModule):
-    m_serverModule(serverModule)
+ManagerPool::ManagerPool(QnMediaServerModule* serverModule, QThread* thread):
+    m_serverModule(serverModule),
+    m_thread(thread)
 {
+    NX_ASSERT(thread);
 }
 
 ManagerPool::~ManagerPool()
@@ -68,6 +70,7 @@ ManagerPool::~ManagerPool()
 void ManagerPool::stop()
 {
     disconnect(this);
+    m_thread->quit();
     m_contexts.clear();
 }
 
