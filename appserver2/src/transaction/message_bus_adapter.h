@@ -15,23 +15,22 @@ namespace ec2 {
 
     public:
         TransactionMessageBusAdapter(
-            Qn::PeerType peerType,
             QnCommonModule* commonModule,
             QnJsonTransactionSerializer* jsonTranSerializer,
             QnUbjsonTransactionSerializer* ubjsonTranSerializer
         );
 
         template <typename MessageBusType>
-		MessageBusType* init()
+		MessageBusType* init(Qn::PeerType peerType)
 		{
 			reset();
 			m_bus.reset(new MessageBusType(
-				m_peerType,
+				peerType,
 				commonModule(),
 				m_jsonTranSerializer,
 				m_ubjsonTranSerializer));
 
-			initInternal();
+			initInternal(peerType);
 			return dynamic_cast<MessageBusType*> (m_bus.get());
 		}
 
@@ -103,11 +102,10 @@ namespace ec2 {
                 NX_CRITICAL(false, "Not implemented");
         }
 	private:
-		void initInternal();
+		void initInternal(Qn::PeerType peerType);
     private:
         std::unique_ptr<TransactionMessageBusBase> m_bus;
 
-        Qn::PeerType m_peerType;
         QnJsonTransactionSerializer* m_jsonTranSerializer;
         QnUbjsonTransactionSerializer* m_ubjsonTranSerializer;
         TimeSynchronizationManager* m_timeSyncManager;

@@ -71,6 +71,10 @@ void BaseEc2Connection<QueryProcessorType>::startReceivingNotifications()
         this, &BaseEc2Connection<QueryProcessorType>::remotePeerLost, Qt::DirectConnection);
     connect(m_connectionFactory->messageBus(), &AbstractTransactionMessageBus::remotePeerUnauthorized,
         this, &BaseEc2Connection<QueryProcessorType>::remotePeerUnauthorized, Qt::DirectConnection);
+    connect(m_connectionFactory->messageBus(), &AbstractTransactionMessageBus::newDirectConnectionEstablished,
+	    this, &BaseEc2Connection<QueryProcessorType>::newDirectConnectionEstablished, Qt::DirectConnection);
+
+    m_connectionFactory->timeSyncManager()->start(this, getMiscManager(Qn::kSystemAccess));
     m_connectionFactory->messageBus()->start();
 }
 
@@ -216,7 +220,7 @@ AbstractVideowallNotificationManagerPtr
 template<class QueryProcessorType>
 QnCommonModule* BaseEc2Connection<QueryProcessorType>::commonModule() const
 {
-    return m_connectionFactory->messageBus()->commonModule();
+    return m_connectionFactory->commonModule();
 }
 
 template<class QueryProcessorType>

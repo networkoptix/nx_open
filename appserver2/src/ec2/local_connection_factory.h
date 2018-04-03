@@ -25,14 +25,13 @@ namespace ec2 {
 	class LocalConnectionFactory:
 		public AbstractECConnectionFactory,
 		public QnStoppable,
-		public QnJoinable,
-		public QnCommonModuleAware
+		public QnJoinable
 	{
 	public:
 		LocalConnectionFactory(
-			Qn::PeerType peerType,
-			nx::utils::TimerManager* const timerManager,
-			QnCommonModule* commonModule,
+            QnCommonModule* commonModule,
+            Qn::PeerType peerType,
+            nx::utils::TimerManager* const timerManager,
 			bool isP2pMode);
 		virtual ~LocalConnectionFactory();
 
@@ -61,7 +60,7 @@ namespace ec2 {
 
 		virtual void setConfParams(std::map<QString, QVariant> confParams) override;
 
-		virtual TransactionMessageBusAdapter* messageBus() const override;
+		TransactionMessageBusAdapter* messageBus() const;
 		QnDistributedMutexManager* distributedMutex() const;
 		virtual TimeSynchronizationManager* timeSyncManager() const override;
 

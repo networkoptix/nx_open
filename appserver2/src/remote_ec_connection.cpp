@@ -15,12 +15,14 @@
 namespace ec2
 {
     RemoteEC2Connection::RemoteEC2Connection(
+        Qn::PeerType peerType,
         const AbstractECConnectionFactory* connectionFactory,
         const QnUuid& remotePeerId,
         const FixedUrlClientQueryProcessorPtr& queryProcessor,
         const QnConnectionInfo& connectionInfo )
     :
         base_type(connectionFactory, queryProcessor.get() ),
+        m_peerType(peerType),
         m_queryProcessor( queryProcessor ),
         m_connectionInfo( connectionInfo ),
         m_remotePeerId(remotePeerId)
@@ -44,9 +46,9 @@ namespace ec2
     void RemoteEC2Connection::startReceivingNotifications()
     {
         if (m_connectionInfo.p2pMode)
-            m_connectionFactory->messageBus()->init<nx::p2p::MessageBus>();
+            m_connectionFactory->messageBus()->init<nx::p2p::MessageBus>(m_peerType);
         else
-            m_connectionFactory->messageBus()->init<ec2::QnTransactionMessageBus>();
+            m_connectionFactory->messageBus()->init<ec2::QnTransactionMessageBus>(m_peerType);
         m_connectionFactory->messageBus()->setHandler(notificationManager());
 
         base_type::startReceivingNotifications();

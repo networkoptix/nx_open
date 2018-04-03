@@ -23,24 +23,31 @@
 namespace ec2 {
 
 RemoteConnectionFactory::RemoteConnectionFactory(
+    QnCommonModule* commonModule,
     Qn::PeerType peerType,
     nx::utils::TimerManager* const timerManager,
-    QnCommonModule* commonModule,
     bool isP2pMode)
 :
-    QnCommonModuleAware(commonModule),
+    AbstractECConnectionFactory(commonModule),
+    m_jsonTranSerializer(new QnJsonTransactionSerializer()),
+    m_ubjsonTranSerializer(new QnUbjsonTransactionSerializer()),
     m_terminated(false),
     m_runningRequests(0),
     m_sslEnabled(false),
-    m_remoteQueryProcessor(new ClientQueryProcessor(commonModule))
+    m_remoteQueryProcessor(new ClientQueryProcessor(commonModule)),
+    m_peerType(peerType)
 {
+    m_bus.reset(new TransactionMessageBusAdapter(
+        commonModule,
+        m_jsonTranSerializer.get(),
+        m_ubjsonTranSerializer.get()));
+
 	// todo: introduce server and client TimeSynchronizationManager
 	m_timeSynchronizationManager.reset(new TimeSynchronizationManager(
+        commonModule,
 		peerType,
 		timerManager,
-		m_bus.get(),
 		&m_settingsInstance));
-	m_timeSynchronizationManager->start(nullptr);
 }
 
 void RemoteConnectionFactory::shutdown()
@@ -314,6 +321,7 @@ void RemoteConnectionFactory::remoteConnectionFinished(
         .arg((int)errorCode).arg(connectionInfoCopy.ecUrl.toString(QUrl::RemovePassword)), cl_logDEBUG2);
 
     AbstractECConnectionPtr connection(new RemoteEC2Connection(
+        m_peerType,
         this,
         connectionInfo.serverId(),
         std::make_shared<FixedUrlClientQueryProcessor>(
@@ -474,14 +482,14 @@ int RemoteConnectionFactory::testRemoteConnection(
     return reqId;
 }
 
-TransactionMessageBusAdapter* RemoteConnectionFactory::messageBus() const
-{
-    return m_bus.get();
-}
-
 TimeSynchronizationManager* RemoteConnectionFactory::timeSyncManager() const
 {
     return m_timeSynchronizationManager.get();
+}
+
+TransactionMessageBusAdapter* RemoteConnectionFactory::messageBus() const
+{
+    return m_bus.get();
 }
 
 } // namespace ec2

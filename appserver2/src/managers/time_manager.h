@@ -25,8 +25,6 @@
 
 #include <nx/utils/thread/mutex.h>
 
-#define USE_MISC_MANAGER_INSTEAD_OF_DIRECT_DB_CALL
-
 /**
  * Time synchronization in cluster.
  * Server system time is never changed. To adjust server times means, adjust server "delta" which server adds to it's time.
@@ -56,9 +54,8 @@
 
 namespace ec2 {
 
-class Ec2DirectConnection;
+class AbstractECConnection;
 class Settings;
-class AbstractTransactionMessageBus;
 
 // TODO: #ak This class should be removed when we can use m_miscManager to save parameters.
 class AbstractWorkAroundMiscDataSaver
@@ -178,6 +175,7 @@ public:
  */
 class TimeSynchronizationManager:
     public QObject,
+    public QnCommonModuleAware,
     public QnStoppable,
     public EnableMultiThreadDirectConnection<TimeSynchronizationManager>,
     public Qn::EnableSafeDirectConnection
@@ -189,9 +187,9 @@ public:
      * TimeSynchronizationManager::start MUST be called before using class instance.
      */
     TimeSynchronizationManager(
-        Qn::PeerType peerType,
+		QnCommonModule* commonModule,
+		Qn::PeerType peerType,
         nx::utils::StandaloneTimerManager* const timerManager,
-        AbstractTransactionMessageBus* messageBus,
         Settings* settings,
         std::shared_ptr<AbstractWorkAroundMiscDataSaver> workAroundMiscDataSaver = nullptr,
         const std::shared_ptr<AbstractSystemClock>& systemClock = nullptr,
@@ -206,7 +204,9 @@ public:
      * @note Cannot do it in constructor to keep valid object destruction order.
      * TODO #ak look like incapsulation failure. Better remove this method.
      */
-    void start(const std::shared_ptr<AbstractMiscManager>& miscManager);
+    void start(
+        AbstractECConnection* connection,
+        const std::shared_ptr<AbstractMiscManager>& miscManager);
 
     /** Returns synchronized time (millis from epoch, UTC). */
     qint64 getSyncTime() const;
@@ -303,7 +303,6 @@ private:
     boost::optional<qint64> m_prevMonotonicClock;
     bool m_terminated;
     std::shared_ptr<AbstractMiscManager> m_miscManager;
-    AbstractTransactionMessageBus* m_messageBus;
     const Qn::PeerType m_peerType;
     nx::utils::StandaloneTimerManager* const m_timerManager;
     std::unique_ptr<AbstractAccurateTimeFetcher> m_timeSynchronizer;
@@ -314,9 +313,6 @@ private:
     Settings* m_settings;
     std::atomic<size_t> m_asyncOperationsInProgress;
     QnWaitCondition m_asyncOperationsWaitCondition;
-#if !defined(USE_MISC_MANAGER_INSTEAD_OF_DIRECT_DB_CALL)
-    std::shared_ptr<AbstractWorkAroundMiscDataSaver> m_workAroundMiscDataSaver;
-#endif
     std::shared_ptr<AbstractSystemClock> m_systemClock;
     std::shared_ptr<AbstractSteadyClock> m_steadyClock;
     /** Using monotonic clock to be proof to local system time change. */

@@ -14,23 +14,24 @@
 #include <nx_ec/ec_api.h>
 
 #include "settings.h"
+#include <transaction/json_transaction_serializer.h>
+#include <transaction/ubjson_transaction_serializer.h>
 
 namespace ec2 {
 
 	class ClientQueryProcessor;
 
 // TODO: #2.4 remove Ec2 prefix to avoid ec2::RemoteConnectionFactory
-    class RemoteConnectionFactory :
+    class RemoteConnectionFactory:
         public AbstractECConnectionFactory,
         public QnStoppable,
-        public QnJoinable,
-        public QnCommonModuleAware
+        public QnJoinable
     {
     public:
         RemoteConnectionFactory(
+            QnCommonModule* commonModule,
             Qn::PeerType peerType,
             nx::utils::TimerManager* const timerManager,
-            QnCommonModule* commonModule,
             bool isP2pMode);
         virtual ~RemoteConnectionFactory();
 
@@ -64,12 +65,15 @@ private:
     Settings m_settingsInstance;
 	std::unique_ptr<TransactionMessageBusAdapter> m_bus;
 	std::unique_ptr<TimeSynchronizationManager> m_timeSynchronizationManager;
+    std::unique_ptr<QnJsonTransactionSerializer> m_jsonTranSerializer;
+    std::unique_ptr<QnUbjsonTransactionSerializer> m_ubjsonTranSerializer;
     bool m_terminated;
     int m_runningRequests;
     bool m_sslEnabled;
 
     std::unique_ptr<ClientQueryProcessor> m_remoteQueryProcessor;
     bool m_p2pMode = false;
+    Qn::PeerType m_peerType = Qn::PeerType::PT_NotDefined;
 private:
     int establishConnectionToRemoteServer(
         const nx::utils::Url& addr, impl::ConnectHandlerPtr handler, const ApiClientInfoData& clientInfo);

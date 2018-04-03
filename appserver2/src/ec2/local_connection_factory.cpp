@@ -49,12 +49,12 @@ namespace ec2 {
 	static const char* const kIncomingTransactionsPath = "ec2/forward_events";
 
 	LocalConnectionFactory::LocalConnectionFactory(
-		Qn::PeerType peerType,
+        QnCommonModule* commonModule,
+        Qn::PeerType peerType,
 		nx::utils::TimerManager* const timerManager,
-		QnCommonModule* commonModule,
 		bool isP2pMode)
 		:
-		QnCommonModuleAware(commonModule),
+        AbstractECConnectionFactory(commonModule),
 		// dbmanager is initialized by direct connection.
 
 		m_jsonTranSerializer(new QnJsonTransactionSerializer()),
@@ -71,25 +71,24 @@ namespace ec2 {
 		}
 
 		m_bus.reset(new TransactionMessageBusAdapter(
-			peerType,
 			commonModule,
 			m_jsonTranSerializer.get(),
 			m_ubjsonTranSerializer.get()));
 
 		m_timeSynchronizationManager.reset(new TimeSynchronizationManager(
+            commonModule,
 			peerType,
 			timerManager,
-			m_bus.get(),
 			&m_settingsInstance));
 
         if (m_p2pMode)
         {
-            auto messageBus = m_bus->init<nx::p2p::ServerMessageBus>();
+            auto messageBus = m_bus->init<nx::p2p::ServerMessageBus>(peerType);
             messageBus->setDatabase(m_dbManager.get());
         }
         else
         {
-            auto messageBus = m_bus->init<ec2::ServerTransactionMessageBus>();
+            auto messageBus = m_bus->init<ec2::ServerTransactionMessageBus>(peerType);
             messageBus->setDatabase(m_dbManager.get());
             m_distributedMutexManager.reset(new QnDistributedMutexManager(messageBus));
         }
@@ -100,8 +99,6 @@ namespace ec2 {
 		m_dbManager->setTimeSyncManager(m_timeSynchronizationManager.get());
 		
 		m_bus->setTimeSyncManager(m_timeSynchronizationManager.get());
-		if (peerType != Qn::PT_Server)
-			m_timeSynchronizationManager->start(nullptr);
 
 		// Cannot be done in TimeSynchronizationManager constructor to keep valid object destruction
 		// order.
@@ -1620,11 +1617,6 @@ namespace ec2 {
 						url));
 				if (m_directConnection->initialized())
 				{
-					if (m_timeSynchronizationManager)
-					{
-						m_timeSynchronizationManager->start(
-							m_directConnection->getMiscManager(Qn::kSystemAccess));
-					}
 				}
 				else
 				{

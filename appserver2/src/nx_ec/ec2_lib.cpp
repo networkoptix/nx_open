@@ -16,7 +16,7 @@ extern "C"
         QnCommonModule* commonModule,
         bool isP2pMode)
     {
-		return new ec2::RemoteConnectionFactory(peerType, timerManager, commonModule, isP2pMode);
+		return new ec2::RemoteConnectionFactory(commonModule, peerType, timerManager, isP2pMode);
     }
 
 	ec2::LocalConnectionFactory* getLocalConnectionFactory(
@@ -25,7 +25,7 @@ extern "C"
 		QnCommonModule* commonModule,
 		bool isP2pMode)
 	{
-		return new ec2::LocalConnectionFactory(peerType, timerManager, commonModule, isP2pMode);
+		return new ec2::LocalConnectionFactory(commonModule, peerType, timerManager, isP2pMode);
 	}
 
 }
