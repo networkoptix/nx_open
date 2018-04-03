@@ -560,9 +560,6 @@ td{
   text-decoration: none !important;
 }
 
-.jumbotron .promo-block{
-  color: $jumbotron-color;
-}
 .promo-block {
   padding: 32px 74px;
   text-align: center;
@@ -571,11 +568,18 @@ td{
   h2 {
     font-weight: bold;
   }
+}
 
-  .promo-block {
-    padding-bottom: 0;
-  }
+@include media-breakpoint-up(sm) {
+    .promo-block {
+        padding: 32px 30px;
+    }
+}
 
+@include media-breakpoint-up(lg) {
+    .promo-block {
+        padding: 32px 74px;
+    }
 }
 
 .input-error {
@@ -603,9 +607,10 @@ td{
   height: 100px;
 }
 
-.welcome-caption{
-  font-size: 36px;
-  color: $brand-primary !important;
+.welcome-caption {
+    font-size: 36px;
+    color: $brand-primary !important;
+    justify-content: center;
 }
 
 h1.process-success{
