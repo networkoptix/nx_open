@@ -46,6 +46,7 @@
     "VIEWER TEXT"                          :    "Viewer",
     "LIVE VIEWER TEXT"                     :    "Live Viewer",    
     "CUSTOM TEXT"                          :    "Custom",
+    "YOUR SYSTEM TEXT"                     :    "Your System",
 
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT"  :    "Activate your account",
     "RESET PASSWORD EMAIL SUBJECT"         :    "Reset your password",
