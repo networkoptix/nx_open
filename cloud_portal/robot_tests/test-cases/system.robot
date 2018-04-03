@@ -241,3 +241,39 @@ should display same user data as showed in user account (stress to cyrillic)
     Log Out
     Log in to Auto Tests System    ${EMAIL OWNER}
     Remove User Permissions    ${email}
+
+should show "your system" for owner and "owner's name" for non-owners
+    Open Browser and go to URL    ${url}
+    Log in to Auto Tests System    ${EMAIL OWNER}
+    Wait Until Element Is Visible    //h2[.='${YOUR SYSTEM TEXT}']
+    Wait Until Element Is Not Visible    //h2[.='${OWNER TEXT}']
+
+    Log Out
+    Validate Log Out
+    Log in to Auto Tests System    ${EMAIL NOT OWNER}
+    Wait Until Element Is Visible    //h2[.='${OWNER TEXT}']
+    Wait Until Element Is Not Visible    //h2[.='${YOUR SYSTEM TEXT}']
+
+    Log Out
+    Validate Log Out
+    Log in to Auto Tests System    ${EMAIL VIEWER}
+    Wait Until Element Is Visible    //h2[.='${OWNER TEXT}']
+    Wait Until Element Is Not Visible    //h2[.='${YOUR SYSTEM TEXT}']
+
+    Log Out
+    Validate Log Out
+    Log in to Auto Tests System    ${EMAIL ADV VIEWER}
+    Wait Until Element Is Visible    //h2[.='${OWNER TEXT}']
+    Wait Until Element Is Not Visible    //h2[.='${YOUR SYSTEM TEXT}']
+
+    Log Out
+    Validate Log Out
+    Log in to Auto Tests System    ${EMAIL LIVE VIEWER}
+    Wait Until Element Is Visible    //h2[.='${OWNER TEXT}']
+    Wait Until Element Is Not Visible    //h2[.='${YOUR SYSTEM TEXT}']
+
+    Log Out
+    Validate Log Out
+    Log in to Auto Tests System    ${EMAIL ADMIN}
+    Wait Until Element Is Visible    //h2[.='${OWNER TEXT}']
+    Wait Until Element Is Not Visible    //h2[.='${YOUR SYSTEM TEXT}']
