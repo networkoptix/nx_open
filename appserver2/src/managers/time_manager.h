@@ -54,7 +54,7 @@
 
 namespace ec2 {
 
-class AbstractECConnection;
+class AbstractTransactionMessageBus;
 class Settings;
 
 // TODO: #ak This class should be removed when we can use m_miscManager to save parameters.
@@ -205,7 +205,7 @@ public:
      * TODO #ak look like incapsulation failure. Better remove this method.
      */
     void start(
-        AbstractECConnection* connection,
+        AbstractTransactionMessageBus* messageBus,
         const std::shared_ptr<AbstractMiscManager>& miscManager);
 
     /** Returns synchronized time (millis from epoch, UTC). */

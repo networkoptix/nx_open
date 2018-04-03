@@ -390,7 +390,7 @@ void TimeSynchronizationManager::pleaseStop()
 }
 
 void TimeSynchronizationManager::start(
-    AbstractECConnection* connection,
+    AbstractTransactionMessageBus* messageBus,
     const std::shared_ptr<AbstractMiscManager>& miscManager)
 {
     m_miscManager = miscManager;
@@ -417,11 +417,11 @@ void TimeSynchronizationManager::start(
     if (m_miscManager)
         onDbManagerInitialized();
 
-    connect(connection->messageBus(), &AbstractTransactionMessageBus::newDirectConnectionEstablished,
+    connect(messageBus, &AbstractTransactionMessageBus::newDirectConnectionEstablished,
         this, &TimeSynchronizationManager::onNewConnectionEstablished,
         Qt::DirectConnection);
 
-    connect(connection->messageBus(), &QnTransactionMessageBus::peerLost,
+    connect(messageBus, &QnTransactionMessageBus::peerLost,
         this, &TimeSynchronizationManager::onPeerLost,
         Qt::DirectConnection);
     Qn::directConnect(commonModule()->globalSettings(), &QnGlobalSettings::timeSynchronizationSettingsChanged,
