@@ -10,7 +10,6 @@ const core_1 = require("@angular/core");
 const common_1 = require("@angular/common");
 const platform_browser_1 = require("@angular/platform-browser");
 const static_1 = require("@angular/upgrade/static");
-const router_1 = require("@angular/router");
 const forms_1 = require("@angular/forms");
 // import { NgbModalModule, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 const core_2 = require("../../app/core");
@@ -18,9 +17,9 @@ const dropdowns_module_1 = require("../dropdowns/dropdowns.module");
 const bar_component_1 = require("./bar.component");
 // import { NxActiveSystemDropdown }    from "../dropdowns/active-system/active-system.component";
 // import { NxSystemsDropdown }         from "../dropdowns/systems/systems.component";
-const appRoutes = [
-    { path: 'bar', component: bar_component_1.BarComponent }
-];
+// const appRoutes: Routes = [
+//     {path: 'bar', component: BarComponent}
+// ];
 let BarModule = class BarModule {
 };
 BarModule = __decorate([
@@ -34,7 +33,6 @@ BarModule = __decorate([
             forms_1.FormsModule,
             forms_1.ReactiveFormsModule,
             dropdowns_module_1.DropdownsModule,
-            router_1.RouterModule.forChild(appRoutes)
         ],
         providers: [
             core_2.QuoteService,

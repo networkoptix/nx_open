@@ -290,6 +290,7 @@ select.form-control{
 }
 
 .btn-primary{
+  background-color: $brand_core;
   &:hover,
   &:focus,
   &.focus {
@@ -304,6 +305,13 @@ select.form-control{
     @include box-shadow(inset 0px 1px 0px 1px $brand_d2);
     outline: none;
   }
+}
+
+.btn-lg {
+  padding: 10px 16px;
+  font-size: 15px;
+  line-height: 1.3333333;
+  border-radius: 4px;
 }
 
 .btn-dropdown-toggle {

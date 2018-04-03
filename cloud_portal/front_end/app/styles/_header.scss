@@ -1,6 +1,6 @@
 $header-height: 48px;
 $logo-height: 32px;
-$line-height: 48px;
+$line-height: 42px;
 $vertical-spacing: 15px;
 $horizontal-spacing: 16px;
 $active-border-width: 3px;
@@ -76,6 +76,7 @@ $header-collapsing-width-1: 1px;
             display: flex;
             flex-direction: row;
             align-items: center;
+            border: $active-border-width solid transparent;
 
             &>span.ellipsis{
                 white-space: nowrap;
@@ -127,13 +128,12 @@ $header-collapsing-width-1: 1px;
 
         &.active{
             background-color: white !important;
-            &>a{
+            & > a{
                 margin:0 $horizontal-spacing;
                 padding-left:0;
                 padding-right:0;
-
                 border-bottom: $active-border-width solid $brand_core;
-                padding-bottom: $vertical-spacing - $active-border-width + 1px;
+
                 &:hover{
                     background-color: transparent !important;
                 }

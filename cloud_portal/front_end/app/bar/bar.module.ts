@@ -18,9 +18,9 @@ import { NxLanguageDropdown }        from "../dropdowns/language/language.compon
 // import { NxSystemsDropdown }         from "../dropdowns/systems/systems.component";
 
 
-const appRoutes: Routes = [
-    {path: 'bar', component: BarComponent}
-];
+// const appRoutes: Routes = [
+//     {path: 'bar', component: BarComponent}
+// ];
 
 @NgModule({
     imports: [
@@ -33,7 +33,7 @@ const appRoutes: Routes = [
         ReactiveFormsModule,
         DropdownsModule,
 
-        RouterModule.forChild(appRoutes)
+        // RouterModule.forChild(appRoutes)
     ],
     providers: [
         QuoteService,

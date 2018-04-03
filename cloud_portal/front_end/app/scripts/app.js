@@ -326,9 +326,6 @@ window.L = {};
                                 templateUrl: CONFIG.viewsDir + 'startPage.html',
                                 controller: 'StartPageCtrl'
                             })
-                            .when('/bar', {
-                                template: ''
-                            })
                             .otherwise({
                                 title: languageServiceProvider.$get().lang.pageTitles.pageNotFound,
                                 templateUrl: CONFIG.viewsDir + '404.html'

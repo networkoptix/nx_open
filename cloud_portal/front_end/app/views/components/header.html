@@ -16,10 +16,10 @@
                 </div>
 
                 <ul ng-if="activeSystem" class="nav navbar-nav auth-visible hidden-collapsed">
-                    <li ng-class="{active:active.view }">
+                    <li ng-class="{ 'active' :active.view }">
                         <a ng-href="/systems/{{activeSystem.id}}/view">View</a>
                     </li>
-                    <li ng-class="{active:active.settings}">
+                    <li ng-class="{ 'active' :active.settings}">
                         <a ng-href="/systems/{{activeSystem.id}}">Settings</a>
                     </li>
                 </ul>
