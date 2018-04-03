@@ -11,6 +11,9 @@
 #include "resource_media_layout.h"
 #include "nx/streaming/abstract_stream_data_provider.h"
 #include <common/common_module.h>
+#include <common/static_common_module.h>
+#include <core/resource/security_cam_resource.h>
+#include <core/resource_management/resource_data_pool.h>
 
 namespace {
     const QString customAspectRatioKey          = lit("overrideAr");
@@ -147,8 +150,15 @@ QnConstResourceAudioLayoutPtr QnMediaResource::getAudioLayout(const QnAbstractSt
 bool QnMediaResource::hasVideo(const QnAbstractStreamDataProvider* dataProvider) const
 {
     Q_UNUSED(dataProvider);
+    const auto cameraResource = toResourcePtr().dynamicCast<QnSecurityCamResource>();
+    if (!cameraResource)
+        return false;
+
     if (!m_hasVideo.is_initialized())
-        m_hasVideo = toResource()->getProperty(Qn::VIDEO_DISABLED_PARAM_NAME).toInt() == 0;
+    {
+        const auto data = qnStaticCommon->dataPool()->data(cameraResource);
+        m_hasVideo = !data.value(Qn::VIDEO_DISABLED_PARAM_NAME, false);
+    }
     return *m_hasVideo;
 }
 
