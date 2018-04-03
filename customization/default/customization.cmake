@@ -49,7 +49,7 @@ set(customization.axBundleUpgradeCode "{f72abad4-21ca-4c1f-845e-fe437f2859e4}")
 
 set(deb.customization.company.name "networkoptix")
 
-set(ax.className "NxWitnes")
+set(ax.className "NxWitness")
 set(ax.classId "{930BF2FA-8BEB-4975-A04E-7FD63A4825AB}")
 set(ax.interfaceId "{5C0BD575-9376-4CF0-B34F-044AC58BD8AB}")
 set(ax.eventsId "{F220AAEC-AE9E-4771-9397-09F6F00C3B89}")
