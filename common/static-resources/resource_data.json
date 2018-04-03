@@ -2376,7 +2376,7 @@
             "ignoreMultisensors": true,
             "shouldAppearAsSingleChannel": true,
             "videoLayout": "width=2;height=2;sensors=0,1,2,3"
-        },        
+        },             
         {
             "keys": ["*|CMD-C244","COMMANDCO|*"],
             "onvifManufacturerReplacement": "Hikvision"
