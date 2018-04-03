@@ -2231,12 +2231,20 @@ QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages(
         {
             qint64 available = fileStorage->getTotalSpace() - fileStorage->getSpaceLimit();
             if (available >= bigStorageThreshold)
+            {
                 result << fileStorage;
-
-            NX_VERBOSE(
-                this,
-                lm("[ApiStorageSpace, Writable storages] candidate: %1 size seems appropriate")
-                    .args(fileStorage->getUrl()));
+                NX_VERBOSE(
+                    this,
+                    lm("[ApiStorageSpace, Writable storages] candidate: %1 size seems appropriate")
+                        .args(fileStorage->getUrl()));
+            }
+            else
+            {
+                NX_VERBOSE(
+                    this,
+                    lm("[ApiStorageSpace, Writable storages] candidate: %1 available size %2 is less than the treshold %3.")
+                        .args(fileStorage->getUrl(), available, bigStorageThreshold));
+            }
         }
     }
 

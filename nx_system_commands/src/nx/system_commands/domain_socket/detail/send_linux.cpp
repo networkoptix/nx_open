@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/socket.h>
@@ -6,12 +5,19 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include "../../system_commands.h"
-#include "fd_send_linux.h"
+#include "../../../system_commands.h"
+#include "send_linux.h"
 
 namespace nx {
 namespace system_commands {
+namespace domain_socket {
 namespace detail {
+
+struct DataContext
+{
+    void* data;
+    ssize_t size;
+};
 
 static int createConnectedSocket(const char* path)
 {
@@ -44,11 +50,12 @@ static int createConnectedSocket(const char* path)
     return fd;
 }
 
-static int sendFdImpl(int socketfd, int sendfd)
+static int sendFdImpl(int transportFd, const void* data)
 {
     struct msghdr msg;
     struct iovec iov[1];
     char buf[1];
+    int fdToSend = (intptr_t) data;
 
     union
     {
@@ -64,9 +71,9 @@ static int sendFdImpl(int socketfd, int sendfd)
     cmptr->cmsg_len = CMSG_LEN(sizeof(int));
     cmptr->cmsg_level = SOL_SOCKET;
     cmptr->cmsg_type = SCM_RIGHTS;
-    *((int *) CMSG_DATA(cmptr)) = sendfd;
+    *((int *) CMSG_DATA(cmptr)) = fdToSend;
 
-    msg.msg_name = NULL;
+    msg.msg_name = nullptr;
     msg.msg_namelen = 0;
 
     iov[0].iov_base = buf;
@@ -74,19 +81,62 @@ static int sendFdImpl(int socketfd, int sendfd)
     msg.msg_iov = iov;
     msg.msg_iovlen = 1;
 
-    return sendmsg(socketfd, &msg, 0);
+    return sendmsg(transportFd, &msg, 0);
+}
+
+static int sendData(int transportFd, const void* context)
+{
+    struct DataContext* dataContext = (struct DataContext*) context;
+    ssize_t written, total = 0;
+
+    if (write(transportFd, &dataContext->size, sizeof(dataContext->size)) <= 0)
+        return -1;
+
+    while (total < dataContext->size)
+    {
+        written = write(transportFd, (char*) dataContext->data + total,
+            dataContext->size - total);
+
+        if (written <= 0)
+            return -1;
+
+        total += written;
+    }
+
+    return total;
+}
+
+static bool sendImpl(const void* context, int (*action)(int, const void*))
+{
+    int transportFd = createConnectedSocket(SystemCommands::kDomainSocket);
+    if (transportFd < 0)
+        return false;
+
+    bool result = action(transportFd, context) > 0;
+    ::close(transportFd);
+
+    return result;
 }
 
 bool sendFd(int fd)
 {
-    int socketfd = createConnectedSocket(SystemCommands::kDomainSocket);
-    if (socketfd < 0)
-        return false;
+    return sendImpl((const void*) fd, &sendFdImpl) > 0;
+}
 
-    return sendFdImpl(socketfd, fd) > 0;
+bool sendInt64(int64_t value)
+{
+    struct DataContext context = {&value, sizeof(value)};
+    return sendImpl(&context, &sendData) > 0;
+}
+
+bool sendBuffer(const void* data, ssize_t size)
+{
+    struct DataContext context = {(void*) data, size};
+    return sendImpl(&context, &sendData) > 0;
 }
 
 } // namespace detail
+} // namespace domain_socket
 } // namespace system_commands
 } // namespace nx
 
