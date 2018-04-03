@@ -3334,8 +3334,8 @@ void MediaServerProcess::run()
             serverResourceProcessor.reset();
 
             mdnsListener.reset();
+            upnpDeviceSearcher->pleaseStop(); //< pleaseStop method is synchronous for this class.
             resourceSearchers.reset();
-            upnpDeviceSearcher.reset();
 
             connectorThread->quit();
             connectorThread->wait();
