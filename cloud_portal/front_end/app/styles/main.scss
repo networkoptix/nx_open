@@ -8,6 +8,7 @@
 
 @import '_header';
 @import '_arrows';
+@import '_checkbox';
 
 @import '../../../../webadmin/app/web_common/styles/common';
 
@@ -583,7 +584,7 @@ td{
 }
 
 .input-error {
-  color: $red_main;
+  color: $error;
 }
 
 .error-page{
