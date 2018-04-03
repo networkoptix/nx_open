@@ -5,15 +5,15 @@ import pytest
 from netaddr import IPAddress
 from pathlib2 import Path
 
-from network_layouts import get_layout
-from framework.access_managers import make_access_manager
 from framework.merging import setup_system
 from framework.networking import setup_networks
-from framework.os_access import LocalAccess
+from framework.os_access.local import LocalAccess
 from framework.pool import Pool
+from framework.registry import Registry
 from framework.serialize import load
-from framework.virtual_box import VirtualBox
-from framework.vm import Factory, Registry, VMConfiguration
+from framework.vms.factory import VMFactory
+from framework.vms.hypervisor.virtual_box import VirtualBox
+from network_layouts import get_layout
 
 DEFAULT_VM_HOST_USER = 'root'
 DEFAULT_VM_HOST_DIR = '/tmp/jenkins-test'
@@ -73,17 +73,19 @@ def hypervisor(configuration, host_os_access):
 
 
 @pytest.fixture(scope='session')
-def vm_factories(request, configuration, hypervisor, host_os_access):
+def vm_registries(configuration, host_os_access):
+    return {
+        vm_type: Registry(host_os_access, vm_configuration['registry_path'])
+        for vm_type, vm_configuration in configuration['vm_types'].items()
+        }
+
+
+@pytest.fixture(scope='session')
+def vm_factories(request, configuration, hypervisor, vm_registries):
     factories = {
-        vm_type: Factory(
-            VMConfiguration(vm_configuration_raw),
-            hypervisor,
-            make_access_manager(**vm_configuration_raw['access']),
-            Registry(
-                host_os_access,
-                host_os_access.expand_path(vm_configuration_raw['registry']),
-                ))
-        for vm_type, vm_configuration_raw in configuration['vm_types'].items()}
+        vm_type: VMFactory(vm_configuration, hypervisor, vm_registries[vm_type])
+        for vm_type, vm_configuration in configuration['vm_types'].items()
+        }
     if request.config.getoption('--clean'):
         for vm_factory in factories.values():
             vm_factory.cleanup()
@@ -92,7 +94,10 @@ def vm_factories(request, configuration, hypervisor, host_os_access):
 
 @pytest.fixture()
 def vm_pools(vm_factories):
-    pools = {vm_type: Pool(vm_factory) for vm_type, vm_factory in vm_factories.items()}
+    pools = {
+        vm_type: Pool(vm_factory)
+        for vm_type, vm_factory in vm_factories.items()
+        }
     yield pools
     for pool in pools.values():
         pool.close()

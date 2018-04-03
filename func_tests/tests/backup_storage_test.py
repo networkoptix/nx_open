@@ -6,8 +6,8 @@ import pytest
 import pytz
 from pathlib2 import Path
 
-import server_api_data_generators as generator
 import framework.utils as utils
+import server_api_data_generators as generator
 from framework.api_shortcuts import get_server_id
 from framework.merging import setup_local_system
 from framework.os_access import NonZeroExitStatus
