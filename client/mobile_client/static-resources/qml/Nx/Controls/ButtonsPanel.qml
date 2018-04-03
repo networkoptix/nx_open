@@ -7,6 +7,7 @@ ListView
     property int pressedStateFilterMs: 500
     property int emptyHeaderSize: 4
     readonly property alias scrollable: d.prefferToBeInteractive
+    property bool blockMouseEvents: false
 
     signal initiallyPressed(int index)
     signal buttonClicked(int index)
@@ -26,12 +27,6 @@ ListView
     rightMargin: emptyHeaderSize
 
     function forceInitialSlideAnimation() { delayedAnimationTimer.restart() }
-
-    onVisibleChanged:
-    {
-        if (visible && interactive)
-            forceInitialSlideAnimation()
-    }
 
     Timer
     {
@@ -64,6 +59,13 @@ ListView
         source: "qrc:///images/bottom_panel_shadow_right.png"
         anchors.right: parent.right
         visible: d.prefferToBeInteractive && (visibleArea.widthRatio + visibleArea.xPosition < 1)
+    }
+
+    MouseArea
+    {
+        anchors.fill: parent
+        enabled: control.blockMouseEvents || showAnimation.running
+        z: 1
     }
 
     delegate: IconButton

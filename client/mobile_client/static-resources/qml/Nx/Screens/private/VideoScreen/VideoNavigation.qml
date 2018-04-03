@@ -394,9 +394,10 @@ Item
             padding: 4
             z: 1
 
-            readonly property bool showButtonsPanel:
-                !liveModeButton.visible && actionButtonsPanel.buttonsCount > 0
-            visible:  videoNavigation.canViewArchive || showButtonsPanel
+            readonly property bool showButtonsPanel: actionButtonsPanel.buttonsCount > 0
+            visible: videoNavigation.canViewArchive || showButtonsPanel
+
+            opacity: d.controlsOpacity
 
             IconButton
             {
@@ -458,12 +459,12 @@ Item
                     videoScreenController.playLive()
                 }
 
-                visible: opacity > 0 && videoNavigation.canViewArchive
+                visible: opacity > 0
                 opacity:
                 {
                     var futurePosition =
                         videoScreenController.mediaPlayer.position > (new Date()).getTime()
-                    return d.liveMode || futurePosition ? 0 : 1
+                    return (d.liveMode || futurePosition) && videoNavigation.canViewArchive ? 0 : 1
                 }
 
                 Behavior on opacity { NumberAnimation { duration: 200 } }
@@ -473,7 +474,7 @@ Item
             {
                 id: actionButtonsPanel
 
-                visible: buttonsPanel.showButtonsPanel
+                visible: opacity > 0 && videoScreenController.dummyState.length == 0
 
                 resourceId: videoScreenController.resourceId
                 anchors.left: buttonsPanel.showZoomControls
@@ -488,10 +489,8 @@ Item
                 {
                     var futurePosition =
                         videoScreenController.mediaPlayer.position > (new Date()).getTime()
-                    var correctState = videoScreenController.dummyState.length == 0
                     var live = d.liveMode || futurePosition
-
-                    return live && correctState ? 1 : 0
+                    return live && buttonsPanel.showButtonsPanel ? 1 : 0
                 }
 
                 onPtzButtonClicked: videoNavigation.ptzButtonClicked()
