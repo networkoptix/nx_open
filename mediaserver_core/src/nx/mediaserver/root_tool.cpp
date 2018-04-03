@@ -11,6 +11,11 @@
 #endif
 #include "root_tool.h"
 
+#if defined(Q_OS_WIN)
+    #include <BaseTsd.h>
+    #define ssize_t SSIZE_T
+#endif
+
 namespace nx {
 namespace mediaserver {
 
