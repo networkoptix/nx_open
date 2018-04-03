@@ -64,14 +64,17 @@ protected:
 	virtual bool sendInitialData(QnTransactionTransport* transport) override;
 	virtual void fillExtraAliveTransactionParams(ApiPeerAliveData* outAliveData) override;
 	virtual void logTransactionState() override;
+    virtual ErrorCode updatePersistentMarker(
+        const QnTransaction<ApiUpdateSequenceData>& tran) override;
 
-	void handleIncomingTransaction(
+	virtual void handleIncomingTransaction(
 		QnTransactionTransport* sender,
 		Qn::SerializationFormat tranFormat,
 		QByteArray serializedTran,
-		const QnTransactionTransportHeader &transportHeader);
+		const QnTransactionTransportHeader &transportHeader) override;
 private:
 	friend struct SendTransactionToTransportFuction;
+    friend struct GotTransactionFuction;
 
 	template <class T>
 	void sendTransactionToTransport(const QnTransaction<T> &tran, QnTransactionTransport* transport, const QnTransactionTransportHeader &transportHeader);
@@ -83,8 +86,11 @@ private:
 		ApiFullInfoData* outData);
 	void printTranState(const QnTranState& tranState);
 
-	ErrorCode writePersistentTransaction(const QnTransaction<ApiUpdateSequenceData> &tran);
-	template <class T> ErrorCode writePersistentTransaction(const QnTransaction<T> &tran);
+    void proxyFillerTransaction(const QnAbstractTransaction& tran, const QnTransactionTransportHeader& transportHeader);
+
+    template <class T>
+    void gotTransaction(const QnTransaction<T> &tran, QnTransactionTransport* sender, const QnTransactionTransportHeader &transportHeader);
+
 private:
 	detail::QnDbManager* m_db = nullptr;
 };

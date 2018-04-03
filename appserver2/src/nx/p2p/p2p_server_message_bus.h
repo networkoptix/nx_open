@@ -54,16 +54,16 @@ protected:
         QnTranState newSubscription,
         bool addImplicitData) override;
 
-	template <class T>
-	bool writeTransactionToPersistantStorage(const QnTransaction<T>& tran);
+    void gotTransaction(
+        const QnTransaction<ApiUpdateSequenceData> &tran,
+        const P2pConnectionPtr& connection,
+        const TransportHeader& transportHeader);
 
+	template <class T>
 	void gotTransaction(
-		const QnTransaction<ApiUpdateSequenceData> &tran,
-		const P2pConnectionPtr& connection,
-		const TransportHeader& transportHeader);
-
-	template <class T>
-	void gotTransaction(const QnTransaction<T>& tran, const P2pConnectionPtr& connection, const TransportHeader& transportHeader);
+        const QnTransaction<T>& tran, 
+        const P2pConnectionPtr& connection, 
+        const TransportHeader& transportHeader);
 private:
     friend struct GotTransactionFuction;
 

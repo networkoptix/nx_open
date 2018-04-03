@@ -1,6 +1,8 @@
 #include "p2p_server_message_bus.h"
 #include <database/db_manager.h>
 #include <common/common_module.h>
+#include "ec_connection_notification_manager.h"
+
 #include <transaction/transaction_message_bus_priv.h>
 
 namespace {
@@ -642,80 +644,85 @@ void ServerMessageBus::resotreAfterDbError()
 	dropConnections();
 }
 
-template <class T>
-bool ServerMessageBus::writeTransactionToPersistantStorage(const QnTransaction<T>& tran)
-{
-	auto transactionDescriptor = getTransactionDescriptorByTransaction(tran);
-	if (transactionDescriptor->isPersistent)
-	{
-		updateOfflineDistance(connection, peerId, tran.persistentInfo.sequence);
-		std::unique_ptr<ec2::detail::QnDbManager::QnLazyTransactionLocker> dbTran;
-		dbTran.reset(new ec2::detail::QnDbManager::QnLazyTransactionLocker(m_db->getTransaction()));
-
-		QByteArray serializedTran =
-			m_ubjsonTranSerializer->serializedTransaction(tran);
-		ErrorCode errorCode = dbManager(m_db, connection.staticCast<Connection>()->userAccessData())
-			.executeTransactionNoLock(tran, serializedTran);
-		switch (errorCode)
-		{
-		case ErrorCode::ok:
-			dbTran->commit();
-			m_peers->updateLocalDistance(peerId, tran.persistentInfo.sequence);
-			break;
-		case ErrorCode::containsBecauseTimestamp:
-			dbTran->commit();
-			m_peers->updateLocalDistance(peerId, tran.persistentInfo.sequence);
-			proxyFillerTransaction(tran, transportHeader);
-			return;
-		case ErrorCode::containsBecauseSequence:
-			dbTran->commit();
-			return; // do not proxy if transaction already exists
-		default:
-			NX_WARNING(
-				this,
-				lit("Can't handle transaction %1: %2. Reopening connection...")
-				.arg(ApiCommand::toString(tran.command))
-				.arg(ec2::toString(errorCode)));
-			dbTran.reset(); //< rollback db data
-			connection->setState(Connection::State::Error);
-			resotreAfterDbError();
-			return;
-		}
-	}
-
-	// Proxy transaction to subscribed peers
-	sendTransaction(tran, transportHeader);
-}
-
 void ServerMessageBus::gotTransaction(
-	const QnTransaction<ApiUpdateSequenceData> &tran,
-	const P2pConnectionPtr& connection,
-	const TransportHeader& transportHeader)
+    const QnTransaction<ApiUpdateSequenceData> &tran,
+    const P2pConnectionPtr& connection,
+    const TransportHeader& transportHeader)
 {
-	base_type::gotTransaction(tran, connection, transportHeader);
+    base_type::gotTransaction(tran, connection, transportHeader);
 
-	ApiPersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
-	auto errCode = m_db->transactionLog()->updateSequence(tran, TransactionLockType::Lazy);
-	switch (errCode)
-	{
-	case ErrorCode::containsBecauseSequence:
-		break;
-	case ErrorCode::ok:
-		// Proxy transaction to subscribed peers
-		m_peers->updateLocalDistance(peerId, tran.persistentInfo.sequence);
-		sendTransaction(tran, transportHeader);
-		break;
-	default:
-		connection->setState(Connection::State::Error);
-		resotreAfterDbError();
-		break;
-	}
+    ApiPersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
+    auto errCode = m_db->transactionLog()->updateSequence(tran, TransactionLockType::Lazy);
+    switch (errCode)
+    {
+    case ErrorCode::containsBecauseSequence:
+        break;
+    case ErrorCode::ok:
+        // Proxy transaction to subscribed peers
+        m_peers->updateLocalDistance(peerId, tran.persistentInfo.sequence);
+        sendTransaction(tran, transportHeader);
+        break;
+    default:
+        connection->setState(Connection::State::Error);
+        resotreAfterDbError();
+        break;
+    }
 }
 
 template <class T>
-void ServerMessageBus::gotTransaction(const QnTransaction<T>& tran, const P2pConnectionPtr& connection, const TransportHeader& transportHeader)
+void ServerMessageBus::gotTransaction(
+    const QnTransaction<T>& tran, 
+    const P2pConnectionPtr& connection, 
+    const TransportHeader& transportHeader)
 {
-	base_type::gotTransaction(tran, connection, transportHeader);
+    if (processSpecialTransaction(tran, connection, transportHeader))
+        return;
+
+    ApiPersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
+    const auto transactionDescriptor = getTransactionDescriptorByTransaction(tran);
+    if (transactionDescriptor->isPersistent)
+    {
+        updateOfflineDistance(connection, peerId, tran.persistentInfo.sequence);
+        std::unique_ptr<ec2::detail::QnDbManager::QnLazyTransactionLocker> dbTran;
+        dbTran.reset(new ec2::detail::QnDbManager::QnLazyTransactionLocker(m_db->getTransaction()));
+
+        auto userAccessData = connection.staticCast<Connection>()->userAccessData();
+        QByteArray serializedTran =
+            m_ubjsonTranSerializer->serializedTransaction(tran);
+        ErrorCode errorCode = dbManager(m_db, userAccessData)
+            .executeTransactionNoLock(tran, serializedTran);
+        switch (errorCode)
+        {
+        case ErrorCode::ok:
+            dbTran->commit();
+            m_peers->updateLocalDistance(peerId, tran.persistentInfo.sequence);
+            break;
+        case ErrorCode::containsBecauseTimestamp:
+            dbTran->commit();
+            m_peers->updateLocalDistance(peerId, tran.persistentInfo.sequence);
+            proxyFillerTransaction(tran, transportHeader);
+            return;
+        case ErrorCode::containsBecauseSequence:
+            dbTran->commit();
+            return; // do not proxy if transaction already exists
+        default:
+            NX_WARNING(
+                this,
+                lit("Can't handle transaction %1: %2. Reopening connection...")
+                .arg(ApiCommand::toString(tran.command))
+                .arg(ec2::toString(errorCode)));
+            dbTran.reset(); //< rollback db data
+            connection->setState(Connection::State::Error);
+            resotreAfterDbError();
+            return;
+        }
+    }
+
+    // Proxy transaction to subscribed peers
+    sendTransaction(tran, transportHeader);
+
+    if (m_handler)
+        m_handler->triggerNotification(tran, NotificationSource::Remote);
 }
 
 bool ServerMessageBus::handlePushTransactionData(

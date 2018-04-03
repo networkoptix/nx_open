@@ -458,20 +458,6 @@ bool QnTransactionMessageBus::checkSequence(const QnTransactionTransportHeader& 
 	return true;
 }
 
-void QnTransactionMessageBus::proxyFillerTransaction(const QnAbstractTransaction& tran, const QnTransactionTransportHeader& transportHeader)
-{
-	// proxy filler transaction to avoid gaps in the persistent sequence
-	QnTransaction<ApiUpdateSequenceData> fillerTran(tran);
-	fillerTran.command = ApiCommand::updatePersistentSequence;
-	ApiSyncMarkerRecord record;
-	record.peerID = tran.peerID;
-	record.dbID = tran.persistentInfo.dbID;
-	record.sequence = tran.persistentInfo.sequence;
-	fillerTran.params.markers.push_back(record);
-	writePersistentTransaction(fillerTran);
-	proxyTransaction(fillerTran, transportHeader);
-}
-
 void QnTransactionMessageBus::updateLastActivity(QnTransactionTransport* sender, const QnTransactionTransportHeader& transportHeader)
 {
     auto itr = m_alivePeers.find(transportHeader.sender);
@@ -482,14 +468,14 @@ void QnTransactionMessageBus::updateLastActivity(QnTransactionTransport* sender,
     peerInfo.routingInfo[gotFromPeer] = RoutingRecord(transportHeader.distance, m_currentTimeTimer.elapsed());
 }
 
-template <class T>
-ErrorCode QnTransactionMessageBus::writePersistentTransaction(const QnTransaction<T> &tran)
+ErrorCode QnTransactionMessageBus::updatePersistentMarker(
+    const QnTransaction<ApiUpdateSequenceData>& tran)
 {
-	return ErrorCode::notImplemented;
+    return ErrorCode::notImplemented;
 }
 
 template <class T>
-void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTransactionTransport* sender, const QnTransactionTransportHeader &transportHeader)
+bool QnTransactionMessageBus::processSpecialTransaction(const QnTransaction<T> &tran, QnTransactionTransport* sender, const QnTransactionTransportHeader &transportHeader)
 {
     QnMutexLocker lock(&m_mutex);
 
@@ -504,7 +490,7 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
             NX_LOG(QnLog::EC2_TRAN_LOG, lit("skip transaction %1 %2 for peers %3").arg(tran.toString()).arg(toString(transportHeader)).arg(dstPeersStr), cl_logDEBUG1);
         }
         proxyTransaction(tran, transportHeader);
-        return;
+        return true;
     }
 
     updateLastActivity(sender, transportHeader);
@@ -513,18 +499,18 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
     auto transactionHash = transactionDescriptor ? transactionDescriptor->getHashFunc(tran.params) : QnUuid();
 
     if (!checkSequence(transportHeader, tran, sender))
-        return;
+        return true;
 
     if (!sender->isReadSync(tran.command))
     {
         NX_LOG(QnLog::EC2_TRAN_LOG, printTransaction("reject transaction (no readSync)", tran, transactionHash, transportHeader, sender), cl_logDEBUG1);
-        return;
+        return true;
     }
 
     if (tran.isLocal() && ApiPeerData::isServer(m_localPeerType))
     {
         NX_LOG(QnLog::EC2_TRAN_LOG, printTransaction("reject local transaction", tran, transactionHash, transportHeader, sender), cl_logDEBUG1);
-        return;
+        return true;
     }
 
     NX_LOG(QnLog::EC2_TRAN_LOG, printTransaction("got transaction", tran, transactionHash, transportHeader, sender), cl_logDEBUG1);
@@ -538,99 +524,83 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
             break;
         case ApiCommand::tranSyncRequest:
             onGotTransactionSyncRequest(sender, tran);
-            return; // do not proxy
+            return true; // do not proxy
         case ApiCommand::tranSyncResponse:
             onGotTransactionSyncResponse(sender, tran);
-            return; // do not proxy
+            return true; // do not proxy
         case ApiCommand::tranSyncDone:
             onGotTransactionSyncDone(sender, tran);
-            return; // do not proxy
+            return true; // do not proxy
         case ApiCommand::peerAliveInfo:
             onGotServerAliveInfo(tran, sender, transportHeader);
-            return; // do not proxy. this call contains built in proxy
+            return true; // do not proxy. this call contains built in proxy
         case ApiCommand::forcePrimaryTimeServer:
             m_timeSyncManager->onGotPrimariTimeServerTran(tran);
             break;
         case ApiCommand::broadcastPeerSyncTime:
             m_timeSyncManager->resyncTimeWithPeer(tran.peerID);
-            return; // do not proxy.
+            return true; // do not proxy.
         case ApiCommand::broadcastPeerSystemTime:
         case ApiCommand::getKnownPeersSystemTime:
-            return; // Ignore deprecated transactions
+            return true; // Ignore deprecated transactions
         case ApiCommand::runtimeInfoChanged:
             if (!onGotServerRuntimeInfo(tran, sender, transportHeader))
-                return; // already processed. do not proxy and ignore transaction
+                return true; // already processed. do not proxy and ignore transaction
             if (m_handler)
                 m_handler->triggerNotification(tran, NotificationSource::Remote);
             break;
         case ApiCommand::updatePersistentSequence:
-			writePersistentTransaction(tran);
+            updatePersistentMarker(tran);
             break;
-        default:
-        {
-            switch (tran.command)
+        case ApiCommand::installUpdate:
+        case ApiCommand::uploadUpdate:
+        case ApiCommand::changeSystemId:
+        {	// Transactions listed here should not go to the DbManager.
+            // We are only interested in relevant notifications triggered.
+            // Also they are allowed only if sender is Admin.
+            if (!commonModule()->resourceAccessManager()->hasGlobalPermission(
+                sender->getUserAccessData(),
+                Qn::GlobalAdminPermission))
             {
-                case ApiCommand::installUpdate:
-                case ApiCommand::uploadUpdate:
-                case ApiCommand::changeSystemId:
-                {	// Transactions listed here should not go to the DbManager.
-                    // We are only interested in relevant notifications triggered.
-                    // Also they are allowed only if sender is Admin.
-                    if (!commonModule()->resourceAccessManager()->hasGlobalPermission(
-                        sender->getUserAccessData(),
-                        Qn::GlobalAdminPermission))
-                    {
-                        NX_LOG(
-                            QnLog::EC2_TRAN_LOG,
-                            lit("Can't handle transaction %1 because of no administrator rights. Reopening connection...")
-                            .arg(ApiCommand::toString(tran.command)),
-                            cl_logWARNING
-                        );
-                        sender->setState(QnTransactionTransport::Error);
-                        return;
-                    }
-                    break;
-                }
-                default:
-                    // These ones are 'general' transactions. They will go through the DbManager
-                    // and also will be notified about via the relevant notification manager.
-                    if (!tran.persistentInfo.isNull())
-                    {
-						ErrorCode errorCode = writePersistentTransaction(tran);
-						switch (errorCode)
-                        {
-                            case ErrorCode::ok:
-							case ErrorCode::notImplemented:
-                                break;
-                            case ErrorCode::containsBecauseTimestamp:
-                                proxyFillerTransaction(tran, transportHeader);
-                            case ErrorCode::containsBecauseSequence:
-                                return; // do not proxy if transaction already exists
-                            default:
-                                NX_LOG(
-                                    QnLog::EC2_TRAN_LOG,
-                                    lit("Can't handle transaction %1: %2. Reopening connection...")
-                                    .arg(ApiCommand::toString(tran.command))
-                                    .arg(ec2::toString(errorCode)),
-                                    cl_logWARNING
-                                );
-                                sender->setState(QnTransactionTransport::Error);
-                                return;
-                        }
-                    }
-                    break;
+                NX_LOG(
+                    QnLog::EC2_TRAN_LOG,
+                    lit("Can't handle transaction %1 because of no administrator rights. Reopening connection...")
+                    .arg(ApiCommand::toString(tran.command)),
+                    cl_logWARNING
+                );
+                sender->setState(QnTransactionTransport::Error);
+                return true;
             }
 
             if (m_handler)
                 m_handler->triggerNotification(tran, NotificationSource::Remote);
-
-            // this is required to allow client place transactions directly into transaction message bus
-            if (tran.command == ApiCommand::getFullInfo)
-                sender->setWriteSync(true);
             break;
         }
+        case ApiCommand::getFullInfo:
+            sender->setWriteSync(true);
+            if (m_handler)
+                m_handler->triggerNotification(tran, NotificationSource::Remote);
+            break;
+        default:
+            return false; // Not a special case transaction.
     }
 
+    proxyTransaction(tran, transportHeader);
+    return true;
+}
+
+template <class T>
+void QnTransactionMessageBus::gotTransaction(
+    const QnTransaction<T> &tran, 
+    QnTransactionTransport* sender, 
+    const QnTransactionTransportHeader &transportHeader)
+{
+    QnMutexLocker lock(&m_mutex);
+    if (processSpecialTransaction(tran, sender, transportHeader))
+        return;
+
+    if (m_handler)
+        m_handler->triggerNotification(tran, NotificationSource::Remote);
     proxyTransaction(tran, transportHeader);
 }
 

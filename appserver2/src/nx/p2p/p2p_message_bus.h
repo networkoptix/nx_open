@@ -274,8 +274,6 @@ protected:
 protected:
 	QMap<ApiPersistentIdData, P2pConnectionPtr> getCurrentSubscription() const;
 
-	template <class T>
-	bool writeTransactionToPersistantStorage(const QnTransaction<T>& tran);
 	template <typename Function>
 	bool handleTransactionWithHeader(const P2pConnectionPtr& connection, const QByteArray& data, Function function);
 
@@ -290,11 +288,19 @@ protected:
 	void startReading(P2pConnectionPtr connection);
 	void sendRuntimeData(const P2pConnectionPtr& connection, const QList<ApiPersistentIdData>& peers);
 
+
+    template <class T>
+    bool processSpecialTransaction(
+        const QnTransaction<T>& tran,
+        const P2pConnectionPtr& connection,
+        const TransportHeader& transportHeader);
+
     void gotTransaction(
         const QnTransaction<ApiUpdateSequenceData> &tran,
         const P2pConnectionPtr& connection,
         const TransportHeader& transportHeader);
-    void gotTransaction(
+
+    void processRuntimeInfo(
         const QnTransaction<ApiRuntimeData> &tran,
         const P2pConnectionPtr& connection,
         const TransportHeader& transportHeader);

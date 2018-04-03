@@ -1,6 +1,7 @@
 #include "server_transaction_message_bus.h"
 
 #include <database/db_manager.h>
+#include "ec_connection_notification_manager.h"
 #include "transaction_message_bus_priv.h"
 
 namespace ec2 {
@@ -489,17 +490,69 @@ bool ServerTransactionMessageBus::gotTransactionFromRemotePeer(
 	return false;
 }
 
-ErrorCode ServerTransactionMessageBus::writePersistentTransaction(const QnTransaction<ApiUpdateSequenceData> &tran)
+ErrorCode ServerTransactionMessageBus::updatePersistentMarker(const QnTransaction<ApiUpdateSequenceData>& tran)
 {
 	return m_db->transactionLog()->updateSequence(tran.params);
 }
 
-template <class T>
-ErrorCode ServerTransactionMessageBus::writePersistentTransaction(const QnTransaction<T> &tran)
+void ServerTransactionMessageBus::proxyFillerTransaction(
+    const QnAbstractTransaction& tran, 
+    const QnTransactionTransportHeader& transportHeader)
 {
-	QByteArray serializedTran = m_ubjsonTranSerializer->serializedTransaction(tran);
-	return dbManager(m_db, sender->getUserAccessData()).executeTransaction(tran, serializedTran);
+    // proxy filler transaction to avoid gaps in the persistent sequence
+    QnTransaction<ApiUpdateSequenceData> fillerTran(tran);
+    fillerTran.command = ApiCommand::updatePersistentSequence;
+    ApiSyncMarkerRecord record;
+    record.peerID = tran.peerID;
+    record.dbID = tran.persistentInfo.dbID;
+    record.sequence = tran.persistentInfo.sequence;
+    fillerTran.params.markers.push_back(record);
+    m_db->transactionLog()->updateSequence(fillerTran.params);
+    proxyTransaction(fillerTran, transportHeader);
 }
+
+template <class T>
+void ServerTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTransactionTransport* sender, const QnTransactionTransportHeader &transportHeader)
+{
+    QnMutexLocker lock(&m_mutex);
+    if (processSpecialTransaction(tran, sender, transportHeader))
+        return;
+
+    // These ones are 'general' transactions. They will go through the DbManager
+    // and also will be notified about via the relevant notification manager.
+    if (!tran.persistentInfo.isNull())
+    {
+        QByteArray serializedTran = m_ubjsonTranSerializer->serializedTransaction(tran);
+        ErrorCode errorCode = 
+            dbManager(m_db, sender->getUserAccessData()).executeTransaction(tran, serializedTran);
+
+        switch (errorCode)
+        {
+        case ErrorCode::ok:
+        case ErrorCode::notImplemented:
+            break;
+        case ErrorCode::containsBecauseTimestamp:
+            proxyFillerTransaction(tran, transportHeader);
+        case ErrorCode::containsBecauseSequence:
+            return; // do not proxy if transaction already exists
+        default:
+            NX_LOG(
+                QnLog::EC2_TRAN_LOG,
+                lit("Can't handle transaction %1: %2. Reopening connection...")
+                .arg(ApiCommand::toString(tran.command))
+                .arg(ec2::toString(errorCode)),
+                cl_logWARNING
+            );
+            sender->setState(QnTransactionTransport::Error);
+            return;
+        }
+    }
+
+    if (m_handler)
+        m_handler->triggerNotification(tran, NotificationSource::Remote);
+    proxyTransaction(tran, transportHeader);
+}
+
 
 void ServerTransactionMessageBus::handleIncomingTransaction(
 	QnTransactionTransport* sender,

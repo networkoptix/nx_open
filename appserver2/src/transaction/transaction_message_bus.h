@@ -200,17 +200,17 @@ protected:
 		Qn::SerializationFormat tranFormat,
 		QByteArray serializedTran,
 		const QnTransactionTransportHeader &transportHeader);
-
+    virtual ErrorCode updatePersistentMarker(const QnTransaction<ApiUpdateSequenceData>& tran);
 protected:
 	void sendRuntimeInfo(QnTransactionTransport* transport, const QnTransactionTransportHeader& transportHeader, const QnTranState& runtimeState);
+    template <class T> void proxyTransaction(const QnTransaction<T> &tran, const QnTransactionTransportHeader &transportHeader);
+    template <class T>
+    bool processSpecialTransaction(const QnTransaction<T> &tran, QnTransactionTransport* sender, const QnTransactionTransportHeader &transportHeader);
 private:
     QnPeerSet connectedServerPeers() const;
 
     void addAlivePeerInfo(const ApiPeerData& peerData, const QnUuid& gotFromPeer, int distance);
     void removeAlivePeer(const QnUuid& id, bool sendTran, bool isRecursive = false);
-    template <class T> void proxyTransaction(const QnTransaction<T> &tran, const QnTransactionTransportHeader &transportHeader);
-    void updatePersistentMarker(const QnTransaction<ApiUpdateSequenceData>& tran, QnTransactionTransport* transport);
-    void proxyFillerTransaction(const QnAbstractTransaction& tran, const QnTransactionTransportHeader& transportHeader);
     void removeTTSequenceForPeer(const QnUuid& id);
     void removePeersWithTimeout(const QSet<QnUuid>& lostPeers);
     QSet<QnUuid> checkAlivePeerRouteTimeout();
@@ -220,8 +220,6 @@ private:
     void reconnectAllPeers(QnMutexLockerBase* const /*lock*/);
     nx::utils::Url updateOutgoingUrl(const nx::utils::Url& srcUrl) const;
 
-	template <class T>
-	ErrorCode writePersistentTransaction(const QnTransaction<T> &tran);
 protected slots:
     void at_stateChanged(QnTransactionTransport::State state);
     void at_gotTransaction(

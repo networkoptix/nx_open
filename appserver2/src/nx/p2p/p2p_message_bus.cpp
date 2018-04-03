@@ -792,19 +792,6 @@ void MessageBus::updateOfflineDistance(
     updateDistance(localPeer());
 }
 
-void MessageBus::gotTransaction(
-    const QnTransaction<ApiUpdateSequenceData> &tran,
-    const P2pConnectionPtr& connection,
-    const TransportHeader& transportHeader)
-{
-    ApiPersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
-
-    if (nx::utils::log::isToBeLogged(cl_logDEBUG2, this))
-        printTran(connection, tran, Connection::Direction::incoming);
-
-    updateOfflineDistance(connection, peerId, tran.persistentInfo.sequence);
-}
-
 void MessageBus::cleanupRuntimeInfo(const ec2::ApiPersistentIdData& peer)
 {
     // If media server was restarted it could get new DB.
@@ -825,6 +812,20 @@ void MessageBus::cleanupRuntimeInfo(const ec2::ApiPersistentIdData& peer)
 }
 
 void MessageBus::gotTransaction(
+    const QnTransaction<ApiUpdateSequenceData> &tran,
+    const P2pConnectionPtr& connection,
+    const TransportHeader& transportHeader)
+{
+    ApiPersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
+
+    if (nx::utils::log::isToBeLogged(cl_logDEBUG2, this))
+        printTran(connection, tran, Connection::Direction::incoming);
+
+    updateOfflineDistance(connection, peerId, tran.persistentInfo.sequence);
+}
+
+
+void MessageBus::processRuntimeInfo(
     const QnTransaction<ApiRuntimeData> &tran,
     const P2pConnectionPtr& connection,
     const TransportHeader& transportHeader)
@@ -847,13 +848,7 @@ void MessageBus::gotTransaction(
 }
 
 template <class T>
-bool MessageBus::writeTransactionToPersistantStorage(const QnTransaction<T>& tran)
-{
-	return true;
-}
-
-template <class T>
-void MessageBus::gotTransaction(
+bool MessageBus::processSpecialTransaction(
     const QnTransaction<T>& tran,
     const P2pConnectionPtr& connection,
     const TransportHeader& transportHeader)
@@ -867,20 +862,30 @@ void MessageBus::gotTransaction(
     switch (tran.command)
     {
         // TODO: move it to the global setting param or emit this data via NotificationManager
-        case ApiCommand::forcePrimaryTimeServer:
-            m_timeSyncManager->onGotPrimariTimeServerTran(tran);
-            if (localPeer().isServer())
-                sendTransaction(tran, transportHeader); //< Proxy
-            return;
-        case ApiCommand::broadcastPeerSyncTime:
-            m_timeSyncManager->resyncTimeWithPeer(tran.peerID);
-            return; // do not proxy.
-        default:
-            break; //< Not a special case
+    case ApiCommand::forcePrimaryTimeServer:
+        m_timeSyncManager->onGotPrimariTimeServerTran(tran);
+        if (localPeer().isServer())
+            sendTransaction(tran, transportHeader); //< Proxy
+        return true;
+    case ApiCommand::broadcastPeerSyncTime:
+        m_timeSyncManager->resyncTimeWithPeer(tran.peerID);
+        return true;
+    case ApiCommand::runtimeInfoChanged:
+        processRuntimeInfo(tran, connection, transportHeader);
+        return true;
+    default:
+        return false;; //< Not a special case
     }
+}
 
-	if (!writeTransactionToPersistantStorage(tran))
-		return;
+template <class T>
+void MessageBus::gotTransaction(
+    const QnTransaction<T>& tran,
+    const P2pConnectionPtr& connection,
+    const TransportHeader& transportHeader)
+{
+    if (processSpecialTransaction(tran, connection, transportHeader))
+        return;
 
     if (m_handler)
         m_handler->triggerNotification(tran, NotificationSource::Remote);
