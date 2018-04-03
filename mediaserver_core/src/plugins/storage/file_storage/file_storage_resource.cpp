@@ -791,9 +791,10 @@ QnAbstractStorageResource::FileInfoList QnFileStorageResource::getFileList(const
 
     QnAbstractStorageResource::FileInfoList ret;
 
-    QDir dir(translateUrlToLocal(dirName));
+    QString path = translateUrlToLocal(dirName);
+    QDir dir(path);
     if (!dir.exists())
-        return rootTool()->fileList(dirName);
+        return rootTool()->fileList(path);
 
     QFileInfoList localList = dir.entryInfoList(
         QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot,

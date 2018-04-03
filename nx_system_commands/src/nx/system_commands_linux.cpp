@@ -334,10 +334,11 @@ int SystemCommands::open(const std::string& path, int mode, bool reportViaSocket
 int64_t SystemCommands::freeSpace(const std::string& path, bool reportViaSocket)
 {
     struct statvfs64 stat;
-    if (statvfs64(path.c_str(), &stat) != 0)
-        return -1;
+    int64_t result = -1;
 
-    int64_t result = stat.f_bavail * (int64_t) stat.f_bsize;
+    if (statvfs64(path.c_str(), &stat) == 0)
+        result = stat.f_bavail * (int64_t) stat.f_bsize;
+
     if (reportViaSocket)
         system_commands::domain_socket::detail::sendInt64(result);
 
@@ -347,10 +348,11 @@ int64_t SystemCommands::freeSpace(const std::string& path, bool reportViaSocket)
 int64_t SystemCommands::totalSpace(const std::string& path, bool reportViaSocket)
 {
     struct statvfs64 stat;
-    if (statvfs64(path.c_str(), &stat) != 0)
-        return -1;
+    int64_t result = -1;
 
-    int64_t result = stat.f_blocks * (int64_t) stat.f_frsize;
+    if (statvfs64(path.c_str(), &stat) == 0)
+        result = stat.f_blocks * (int64_t) stat.f_frsize;
+
     if (reportViaSocket)
         system_commands::domain_socket::detail::sendInt64(result);
 
@@ -378,7 +380,12 @@ std::string SystemCommands::serializedFileList(const std::string& path, bool rep
     ssize_t pathBufLen;
 
     if (!dir)
+    {
+        if (reportViaSocket)
+            system_commands::domain_socket::detail::sendBuffer("", 1);
+
         return "";
+    }
 
     while ((entry = readdir(dir)) != NULL)
     {
@@ -416,13 +423,15 @@ std::string SystemCommands::serializedFileList(const std::string& path, bool rep
 int64_t SystemCommands::fileSize(const std::string& path, bool reportViaSocket)
 {
     struct stat buf;
-    if (stat(path.c_str(), &buf) != 0)
-        return -1;
+    int64_t result = -1;
+
+    if (stat(path.c_str(), &buf) == 0)
+        result = buf.st_size;
 
     if (reportViaSocket)
-        system_commands::domain_socket::detail::sendInt64(buf.st_size);
+        system_commands::domain_socket::detail::sendInt64(result);
 
-    return buf.st_size;
+    return result;
 }
 
 bool SystemCommands::install(const std::string& debPackage)
