@@ -18,6 +18,13 @@ Log in to Auto Tests System
     Run Keyword If    '${email}' == '${EMAIL ADMIN}'    Wait Until Elements Are Visible    ${DISCONNECT FROM MY ACCOUNT}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
     Run Keyword Unless    '${email}' == '${EMAIL OWNER}' or '${email}' == '${EMAIL ADMIN}'    Wait Until Elements Are Visible    ${DISCONNECT FROM MY ACCOUNT}    ${OPEN IN NX BUTTON}
 
+Check System Text
+    Log Out
+    Validate Log Out
+    Log in to Auto Tests System    ${EMAIL NOT OWNER}
+    Wait Until Element Is Visible    //h2[.='${OWNER TEXT}']
+    Wait Until Element Is Not Visible    //h2[.='${YOUR SYSTEM TEXT}']
+
 *** Test Cases ***
 systems dropdown should allow you to go back to the systems page
     Open Browser and go to URL    ${url}
@@ -247,33 +254,5 @@ should show "your system" for owner and "owner's name" for non-owners
     Log in to Auto Tests System    ${EMAIL OWNER}
     Wait Until Element Is Visible    //h2[.='${YOUR SYSTEM TEXT}']
     Wait Until Element Is Not Visible    //h2[.='${OWNER TEXT}']
-
-    Log Out
-    Validate Log Out
-    Log in to Auto Tests System    ${EMAIL NOT OWNER}
-    Wait Until Element Is Visible    //h2[.='${OWNER TEXT}']
-    Wait Until Element Is Not Visible    //h2[.='${YOUR SYSTEM TEXT}']
-
-    Log Out
-    Validate Log Out
-    Log in to Auto Tests System    ${EMAIL VIEWER}
-    Wait Until Element Is Visible    //h2[.='${OWNER TEXT}']
-    Wait Until Element Is Not Visible    //h2[.='${YOUR SYSTEM TEXT}']
-
-    Log Out
-    Validate Log Out
-    Log in to Auto Tests System    ${EMAIL ADV VIEWER}
-    Wait Until Element Is Visible    //h2[.='${OWNER TEXT}']
-    Wait Until Element Is Not Visible    //h2[.='${YOUR SYSTEM TEXT}']
-
-    Log Out
-    Validate Log Out
-    Log in to Auto Tests System    ${EMAIL LIVE VIEWER}
-    Wait Until Element Is Visible    //h2[.='${OWNER TEXT}']
-    Wait Until Element Is Not Visible    //h2[.='${YOUR SYSTEM TEXT}']
-
-    Log Out
-    Validate Log Out
-    Log in to Auto Tests System    ${EMAIL ADMIN}
-    Wait Until Element Is Visible    //h2[.='${OWNER TEXT}']
-    Wait Until Element Is Not Visible    //h2[.='${YOUR SYSTEM TEXT}']
+    :FOR    ${user}    IN    @{EMAILS LIST}
+    \  Run Keyword Unless    "${user}"=="${EMAIL OWNER}"    Check System Text
