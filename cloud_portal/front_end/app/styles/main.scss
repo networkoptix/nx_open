@@ -7,7 +7,6 @@
 @import '_theme_override';
 
 @import '_header';
-@import '_icons';
 @import '_arrows';
 
 @import '../../../../webadmin/app/web_common/styles/common';
@@ -38,6 +37,12 @@ html.webclient-page{
     }
 }
 
+nx-app {
+    .placeholder {
+        position: absolute;
+        background-color: transparent;
+    }
+}
 
 footer {
   position: absolute;
@@ -90,16 +95,16 @@ footer {
             padding: 5px;
         }
     }
-    
+
     .navbar-nav {
         flex-direction : row;
         float          : left;
     }
-    
+
     .navbar-right {
         float : right;
     }
-    
+
     .navbar-right > li > a, .navbar-right > li > span > a{
     color:$light8;
     &:hover{
@@ -477,11 +482,11 @@ td{
 
   .alert {
     margin-bottom: 8px;
-    
+
       @include media-breakpoint-down(sm) {
       min-width: 100%;
     }
-    
+
       @include media-breakpoint-up(sm) {
       min-width: 600px;
     }
@@ -513,11 +518,11 @@ td{
   left:50%;
   transform: translateX(-50%);
   z-index:1100;
-    
+
     @include media-breakpoint-down(sm) {
     min-width: 100%;
   }
-    
+
     @include media-breakpoint-up(sm) {
     min-width: 600px;
   }
