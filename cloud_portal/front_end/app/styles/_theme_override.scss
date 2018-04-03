@@ -43,6 +43,7 @@ h1{
   margin-bottom: $line-height-computed;
   padding: 0 8px;
   font-size: $h1-font-size;
+  display: flex;
 }
 
 h2{
@@ -495,8 +496,7 @@ select {
   }
 
   .badge {
-    font-size: 0.65em;
-    margin-top: 6px;
-    padding: 0.6em;
-    font-weight: 700;
+    border-radius: $border-radius-small;
+    margin-left: 10px;
+    font-weight: normal;
   }

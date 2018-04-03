@@ -18,7 +18,7 @@
                     <div class="card-body" ng-click="openSystem(system)">
                         <h2 ng-bind-html="system.name | escape | highlight:search.value"></h2>
                         <span class="user-name" ng-bind-html="getSystemOwnerName(system, account.email) | escape | highlight:search.value"></span>
-                        <span ng-if="system.stateOfHealth!=$root.C.systemStatuses.onlineStatus" class="label"
+                        <span ng-if="system.stateOfHealth!=$root.C.systemStatuses.onlineStatus" class="badge badge-info"
                               ng-class="$root.C.systemStatuses[system.stateOfHealth].style || $root.C.systemStatuses.default.style"
                               ng-bind-html="$root.L.systemStatuses[system.stateOfHealth]||system.stateOfHealth | escape | highlight:search.value"></span>
 
