@@ -25,11 +25,13 @@
                        maxlength="255"
                        required>
             </div>
-            <div class="checkbox">
-                <label>
-                    <input type="checkbox"
+            <div>
+                <label class="checkbox">Remember me
+                    <input type="checkbox" checked="checked"
                            [(ngModel)]="auth.remember"
-                           name="remember" id="remember"> Remember me
+                           name="remember"
+                           id="remember">
+                    <span class="checkmark"></span>
                 </label>
             </div>
         </div>
