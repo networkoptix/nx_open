@@ -36,6 +36,11 @@ QString AppInfo::cloudName()
     return QStringLiteral("${cloudName}");
 }
 
+QString AppInfo::shortCloudName()
+{
+    return QStringLiteral("${shortCloudName}");
+}
+
 QStringList AppInfo::compatibleCloudHosts()
 {
     const auto hostsString = QString::fromLatin1("${compatibleCloudHosts}");

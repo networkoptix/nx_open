@@ -324,7 +324,9 @@ QString QnDisconnectFromCloudDialogPrivate::disconnectQuestionMessage() const
 
 QString QnDisconnectFromCloudDialogPrivate::allUsersDisabledMessage() const
 {
-    return setWarningStyleHtml(tr("All cloud users will be deleted."));
+    return setWarningStyleHtml(tr("All %1 users will be deleted.",
+        "%1 is the short cloud name (like 'Cloud')")
+        .arg(nx::network::AppInfo::shortCloudName()));
 }
 
 QString QnDisconnectFromCloudDialogPrivate::enterPasswordMessage() const

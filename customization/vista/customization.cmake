@@ -12,7 +12,10 @@ set(product.appName "qulu")
 set(company.name "Vista CCTV")
 set(uri.protocol "qulu-vms")
 set(liteDeviceName "Q")
+
+# Cloud branding
 set(cloudName "Qcloud")
+set(shortCloudName "Qcloud")
 
 # Support section
 set(companyUrl "http://www.vista-cctv.com")

@@ -9,7 +9,10 @@ set(product.name.short "hanwha")
 set(product.appName "wave")
 set(company.name "Hanwha")
 set(uri.protocol "hanwha-vms")
+
+# Cloud branding
 set(cloudName "WAVE Sync")
+set(shortCloudName "WAVE Sync")
 
 # Default settings
 set(defaultWebPages "{\"Home Page\": \"https://www.hanwhasecurity.com\"}")
