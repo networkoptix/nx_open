@@ -22,7 +22,18 @@ namespace ec2 {
         );
 
         template <typename MessageBusType>
-        MessageBusType* init();
+		MessageBusType* init()
+		{
+			reset();
+			m_bus.reset(new MessageBusType(
+				m_peerType,
+				commonModule(),
+				m_jsonTranSerializer,
+				m_ubjsonTranSerializer));
+
+			initInternal();
+			return dynamic_cast<MessageBusType*> (m_bus.get());
+		}
 
         void reset();
 
@@ -91,7 +102,8 @@ namespace ec2 {
             else
                 NX_CRITICAL(false, "Not implemented");
         }
-
+	private:
+		void initInternal();
     private:
         std::unique_ptr<TransactionMessageBusBase> m_bus;
 

@@ -120,7 +120,6 @@ signals:
 private:
     friend class QnTransactionTransport;
     friend struct GotTransactionFuction;
-    friend struct SendTransactionToTransportFuction;
 
     bool isExists(const QnUuid& removeGuid) const;
     bool isConnecting(const QnUuid& removeGuid) const;
@@ -165,9 +164,6 @@ private:
             }
         }
     }
-
-    template <class T>
-    void sendTransactionToTransport(const QnTransaction<T> &tran, QnTransactionTransport* transport, const QnTransactionTransportHeader &transportHeader);
 
     template <class T>
     void gotTransaction(const QnTransaction<T> &tran, QnTransactionTransport* sender, const QnTransactionTransportHeader &transportHeader);

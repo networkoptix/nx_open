@@ -847,6 +847,12 @@ void MessageBus::gotTransaction(
 }
 
 template <class T>
+bool MessageBus::writeTransactionToPersistantStorage(const QnTransaction<T>& tran)
+{
+	return true;
+}
+
+template <class T>
 void MessageBus::gotTransaction(
     const QnTransaction<T>& tran,
     const P2pConnectionPtr& connection,

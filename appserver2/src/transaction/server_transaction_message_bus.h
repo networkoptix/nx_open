@@ -71,6 +71,11 @@ protected:
 		QByteArray serializedTran,
 		const QnTransactionTransportHeader &transportHeader);
 private:
+	friend struct SendTransactionToTransportFuction;
+
+	template <class T>
+	void sendTransactionToTransport(const QnTransaction<T> &tran, QnTransactionTransport* transport, const QnTransactionTransportHeader &transportHeader);
+
 	bool isSyncInProgress() const;
 	bool readApiFullInfoData(
 		const Qn::UserAccessData& userAccess, 
@@ -78,8 +83,8 @@ private:
 		ApiFullInfoData* outData);
 	void printTranState(const QnTranState& tranState);
 
-	template <class T>
-	ErrorCode writePersistentTransaction(const QnTransaction<T> &tran);
+	ErrorCode writePersistentTransaction(const QnTransaction<ApiUpdateSequenceData> &tran);
+	template <class T> ErrorCode writePersistentTransaction(const QnTransaction<T> &tran);
 private:
 	detail::QnDbManager* m_db = nullptr;
 };

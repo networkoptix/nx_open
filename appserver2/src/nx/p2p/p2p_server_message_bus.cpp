@@ -427,6 +427,22 @@ void ServerMessageBus::sendInitialDataToClient(const P2pConnectionPtr& connectio
 	}
 }
 
+bool ServerMessageBus::readApiFullInfoData(
+	const Qn::UserAccessData& userAccess,
+	const ec2::ApiPeerData& remotePeer,
+	ApiFullInfoData* outData)
+{
+	ErrorCode errorCode;
+	if (remotePeer.peerType == Qn::PT_MobileClient)
+		errorCode = dbManager(m_db, userAccess).readApiFullInfoDataForMobileClient(outData, userAccess.userId);
+	else
+		errorCode = dbManager(m_db, userAccess).readApiFullInfoDataComplete(outData);
+
+	if (errorCode != ErrorCode::ok)
+		NX_WARNING(this, lm("Cannot execute query for ApiFullInfoData: %1").arg(errorCode));
+	return errorCode == ErrorCode::ok;
+}
+
 void ServerMessageBus::addOfflinePeersFromDb()
 {
 	const auto localPeer = this->localPeer();
@@ -694,6 +710,12 @@ void ServerMessageBus::gotTransaction(
 		resotreAfterDbError();
 		break;
 	}
+}
+
+template <class T>
+void ServerMessageBus::gotTransaction(const QnTransaction<T>& tran, const P2pConnectionPtr& connection, const TransportHeader& transportHeader)
+{
+	base_type::gotTransaction(tran, connection, transportHeader);
 }
 
 bool ServerMessageBus::handlePushTransactionData(

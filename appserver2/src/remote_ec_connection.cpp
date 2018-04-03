@@ -46,7 +46,7 @@ namespace ec2
         if (m_connectionInfo.p2pMode)
             m_connectionFactory->messageBus()->init<nx::p2p::MessageBus>();
         else
-            m_connectionFactory->messageBus()->init<ec2::TransactionMessageBusBase>();
+            m_connectionFactory->messageBus()->init<ec2::QnTransactionMessageBus>();
         m_connectionFactory->messageBus()->setHandler(notificationManager());
 
         base_type::startReceivingNotifications();

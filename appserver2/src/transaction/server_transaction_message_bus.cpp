@@ -25,7 +25,11 @@ struct SendTransactionToTransportFuction
     typedef void result_type;
 
     template<class T>
-    void operator()(QnTransactionMessageBus *bus, const QnTransaction<T> &transaction, QnTransactionTransport *sender, const QnTransactionTransportHeader &transportHeader) const
+    void operator()(
+		ServerTransactionMessageBus* bus, 
+		const QnTransaction<T> &transaction, 
+		QnTransactionTransport *sender, 
+		const QnTransactionTransportHeader &transportHeader) const
     {
         bus->sendTransactionToTransport(transaction, sender, transportHeader);
     }
@@ -33,7 +37,7 @@ struct SendTransactionToTransportFuction
 
 struct SendTransactionToTransportFastFuction
 {
-    bool operator()(QnTransactionMessageBus* /*bus*/, Qn::SerializationFormat srcFormat, const QByteArray& serializedTran, QnTransactionTransport *sender,
+    bool operator()(ServerTransactionMessageBus* /*bus*/, Qn::SerializationFormat srcFormat, const QByteArray& serializedTran, QnTransactionTransport *sender,
         const QnTransactionTransportHeader &transportHeader) const
     {
         return sender->sendSerializedTransaction(srcFormat, serializedTran, transportHeader);
@@ -49,6 +53,10 @@ ServerTransactionMessageBus::ServerTransactionMessageBus(
     QnUbjsonTransactionSerializer* ubjsonTranSerializer)
     :
     base_type(peerType, commonModule, jsonTranSerializer, ubjsonTranSerializer)
+{
+}
+
+ServerTransactionMessageBus::~ServerTransactionMessageBus()
 {
 }
 
@@ -139,6 +147,16 @@ bool ServerTransactionMessageBus::checkSequence(
 		}
 	}
 	return true;
+}
+
+template <class T>
+void ServerTransactionMessageBus::sendTransactionToTransport(
+	const QnTransaction<T> &tran, 
+	QnTransactionTransport* transport, 
+	const QnTransactionTransportHeader &transportHeader)
+{
+	NX_ASSERT(!tran.isLocal());
+	transport->sendTransaction(tran, transportHeader);
 }
 
 void ServerTransactionMessageBus::onGotTransactionSyncRequest(
@@ -469,6 +487,11 @@ bool ServerTransactionMessageBus::gotTransactionFromRemotePeer(
 	}
 
 	return false;
+}
+
+ErrorCode ServerTransactionMessageBus::writePersistentTransaction(const QnTransaction<ApiUpdateSequenceData> &tran)
+{
+	return m_db->transactionLog()->updateSequence(tran.params);
 }
 
 template <class T>

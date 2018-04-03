@@ -41,11 +41,6 @@ namespace ec2
         virtual void setTimeSyncManager(TimeSynchronizationManager* timeSyncManager) override;
 
     protected:
-        bool readApiFullInfoData(
-            const Qn::UserAccessData& userAccess,
-            const ec2::ApiPeerData& remotePeer,
-            ApiFullInfoData* outData);
-    protected:
         QThread* m_thread = nullptr;
         ECConnectionNotificationManager* m_handler = nullptr;
 

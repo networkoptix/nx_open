@@ -90,6 +90,11 @@ private:
         const QnUuid& remoteId,
         const QVector<ApiPersistentIdData>& subscribedTo,
         const QVector<qint32>& sequences) const;
+
+	bool readApiFullInfoData(
+		const Qn::UserAccessData& userAccess,
+		const ec2::ApiPeerData& remotePeer,
+		ApiFullInfoData* outData);
 private:
 	ec2::detail::QnDbManager* m_db;
 	QElapsedTimer m_dbCommitTimer;

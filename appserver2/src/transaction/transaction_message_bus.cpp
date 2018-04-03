@@ -436,13 +436,6 @@ void QnTransactionMessageBus::onGotTransactionSyncDone(QnTransactionTransport* s
     m_aliveSendTimer.restart();
 }
 
-template <class T>
-void QnTransactionMessageBus::sendTransactionToTransport(const QnTransaction<T> &tran, QnTransactionTransport* transport, const QnTransactionTransportHeader &transportHeader)
-{
-    NX_ASSERT(!tran.isLocal());
-    transport->sendTransaction(tran, transportHeader);
-}
-
 bool QnTransactionMessageBus::checkSequence(const QnTransactionTransportHeader& transportHeader, const QnAbstractTransaction& tran, QnTransactionTransport* transport)
 {
     if (ApiPeerData::isClient(m_localPeerType))
@@ -463,6 +456,20 @@ bool QnTransactionMessageBus::checkSequence(const QnTransactionTransportHeader& 
     m_lastTransportSeq[ttSenderKey] = transportHeader.sequence;
 
 	return true;
+}
+
+void QnTransactionMessageBus::proxyFillerTransaction(const QnAbstractTransaction& tran, const QnTransactionTransportHeader& transportHeader)
+{
+	// proxy filler transaction to avoid gaps in the persistent sequence
+	QnTransaction<ApiUpdateSequenceData> fillerTran(tran);
+	fillerTran.command = ApiCommand::updatePersistentSequence;
+	ApiSyncMarkerRecord record;
+	record.peerID = tran.peerID;
+	record.dbID = tran.persistentInfo.dbID;
+	record.sequence = tran.persistentInfo.sequence;
+	fillerTran.params.markers.push_back(record);
+	writePersistentTransaction(fillerTran);
+	proxyTransaction(fillerTran, transportHeader);
 }
 
 void QnTransactionMessageBus::updateLastActivity(QnTransactionTransport* sender, const QnTransactionTransportHeader& transportHeader)
@@ -557,7 +564,7 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
                 m_handler->triggerNotification(tran, NotificationSource::Remote);
             break;
         case ApiCommand::updatePersistentSequence:
-            updatePersistentMarker(tran, sender);
+			writePersistentTransaction(tran);
             break;
         default:
         {
