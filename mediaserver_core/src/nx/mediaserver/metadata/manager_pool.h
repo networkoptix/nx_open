@@ -2,6 +2,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QSet>
+#include <QtCore/QThread>
 
 #include <map>
 #include <vector>
@@ -49,7 +50,9 @@ class ManagerPool final:
 
     Q_OBJECT
 public:
-    ManagerPool(QnMediaServerModule* commonModule);
+    ManagerPool(
+        QnMediaServerModule* commonModule,
+        QThread* thread);
     ~ManagerPool();
     void init();
     void stop();
@@ -127,6 +130,7 @@ private:
 private:
     ResourceMetadataContextMap m_contexts;
     QnMediaServerModule* m_serverModule;
+    QThread* m_thread;
 };
 
 } // namespace metadata
