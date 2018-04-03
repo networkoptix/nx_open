@@ -1,11 +1,11 @@
 {
     "driverId": "{e177ffa9-9db9-f975-e4c2-760ce7b279da}",
-    "driverName": 
-	{
+    "driverName":
+    {
         "value": "VCA driver",
         "localization": {}
     },
-	"outputEventTypes": 
+    "outputEventTypes":
     [
         {
             "eventTypeId": "D16B2CFB-4DCA-4081-ACB9-F4B454C6873F",
@@ -25,5 +25,5 @@
             "flags": "stateDependent",
             "internalName": "fd"
         }
-	]
+    ]
 }
