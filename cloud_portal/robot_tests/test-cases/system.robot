@@ -19,10 +19,11 @@ Log in to Auto Tests System
     Run Keyword Unless    '${email}' == '${EMAIL OWNER}' or '${email}' == '${EMAIL ADMIN}'    Wait Until Elements Are Visible    ${DISCONNECT FROM MY ACCOUNT}    ${OPEN IN NX BUTTON}
 
 Check System Text
+    [arguments]    ${user}
     Log Out
     Validate Log Out
-    Log in to Auto Tests System    ${EMAIL NOT OWNER}
-    Wait Until Element Is Visible    //h2[.='${OWNER TEXT}']
+    Log in to Auto Tests System    ${user}
+    Wait Until Elements Are Visible    //h2[.='${OWNER TEXT}']    //a[.='${EMAIL OWNER}')]
     Wait Until Element Is Not Visible    //h2[.='${YOUR SYSTEM TEXT}']
 
 *** Test Cases ***
@@ -255,4 +256,4 @@ should show "your system" for owner and "owner's name" for non-owners
     Wait Until Element Is Visible    //h2[.='${YOUR SYSTEM TEXT}']
     Wait Until Element Is Not Visible    //h2[.='${OWNER TEXT}']
     :FOR    ${user}    IN    @{EMAILS LIST}
-    \  Run Keyword Unless    "${user}"=="${EMAIL OWNER}"    Check System Text
+    \  Run Keyword Unless    "${user}"=="${EMAIL OWNER}"    Check System Text    ${user}
