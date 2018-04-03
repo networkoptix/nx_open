@@ -45,7 +45,10 @@
             {
                 var type = d.modelDataAccessor.getData(index, "type")
                 if (type == ActionButtonsModel.PtzButton)
+                {
+                    ptzButtonClicked()
                     return;
+                }
 
                 var text = d.modelDataAccessor.getData(index, "hint")
                 hintControl.showHint(
@@ -71,10 +74,7 @@
             {
                 var type = d.modelDataAccessor.getData(index, "type")
                 if (type == ActionButtonsModel.PtzButton)
-                {
-                    ptzButtonClicked()
                     return
-                }
 
                 hintControl.hideDelayed()
             }
