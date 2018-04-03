@@ -349,7 +349,7 @@ void ClientImplUsingHttpConnect::beginListening(
             httpClientPtr->doConnect(
                 url(),
                 peerName,
-                [this, httpClientPtr, httpClientIter = std::prev(m_activeRequests.end()),
+                [this, httpClientIter = std::prev(m_activeRequests.end()),
                     completionHandler = std::move(completionHandler)]() mutable
                 {
                     processBeginListeningResponse(
