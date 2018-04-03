@@ -65,6 +65,7 @@ void QnResourceHelper::setResourceId(const QString& id)
     emit serverTimeOffsetChanged();
     emit audioSupportedChanged();
     emit isIoModuleChanged();
+    emit hasVideoChanged();
 }
 
 Qn::ResourceStatus QnResourceHelper::resourceStatus() const
@@ -112,6 +113,14 @@ bool QnResourceHelper::isIoModule() const
 {
     if (const auto camera = m_resource.dynamicCast<QnSecurityCamResource>())
         return camera->isIOModule();
+
+    return false;
+}
+
+bool QnResourceHelper::hasVideo() const
+{
+    if (const auto camera = m_resource.dynamicCast<QnSecurityCamResource>())
+        return camera->hasVideo();
 
     return false;
 }
