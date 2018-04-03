@@ -5,7 +5,10 @@
 #include <QtCore/QByteArray>
 
 #include <nx/cloud/cdb/api/auth_provider.h>
+#include <nx/network/aio/timer.h>
+#include <nx/utils/counter.h>
 #include <nx/utils/db/async_sql_query_executor.h>
+#include <nx/utils/thread/mutex.h>
 
 #include "account_manager.h"
 #include "system_sharing_manager.h"
@@ -82,6 +85,10 @@ private:
     const AbstractTemporaryAccountPasswordManager& m_temporaryAccountCredentialsManager;
     std::unique_ptr<dao::AbstractUserAuthentication> m_authenticationDataObject;
     ec2::AbstractVmsP2pCommandBus* m_vmsP2pCommandBus;
+    nx::network::aio::Timer m_updateExpiredAuthTimer;
+    nx::utils::Counter m_ongoingOperationCounter;
+    bool m_terminated = false;
+    mutable QnMutex m_mutex;
 
     boost::optional<AccountWithEffectivePassword>
         getAccountByLogin(const std::string& login) const;
@@ -111,12 +118,33 @@ private:
     api::AuthInfoRecord generateAuthRecord(
         const api::AccountData& account,
         const std::string& nonce);
-    void removeExpiredRecords(api::AuthInfo* userAuthenticationRecords);
     void generateUpdateUserAuthInfoTransaction(
         nx::utils::db::QueryContext* const queryContext,
         const std::string& systemId,
         const std::string& vmsUserId,
         const api::AuthInfo& userAuthenticationRecords);
+
+    //---------------------------------------------------------------------------------------------
+    // Updating expired auth records.
+
+    void checkForExpiredAuthRecordsAsync();
+
+    utils::db::DBResult checkForExpiredAuthRecords(
+        utils::db::QueryContext* queryContext);
+
+    void updateSystemAuth(
+        utils::db::QueryContext* queryContext,
+        const std::string& systemId);
+
+    void updateUserAuthInSystem(
+        nx::utils::db::QueryContext* queryContext,
+        const std::string& systemId,
+        const std::string& nonce,
+        const api::SystemSharingEx& userSharing);
+
+    void startCheckForExpiredAuthRecordsTimer(
+        nx::utils::db::QueryContext* queryContext,
+        utils::db::DBResult result);
 };
 
 } // namespace cdb

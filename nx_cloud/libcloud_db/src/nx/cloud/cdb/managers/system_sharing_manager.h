@@ -46,6 +46,10 @@ public:
         const std::string& accountEmail,
         const std::string& systemId) const = 0;
 
+    virtual std::vector<api::SystemSharingEx> fetchSystemUsers(
+        utils::db::QueryContext* queryContext,
+        const std::string& systemId) = 0;
+
     virtual void addSystemSharingExtension(AbstractSystemSharingExtension* extension) = 0;
     virtual void removeSystemSharingExtension(AbstractSystemSharingExtension* extension) = 0;
 };
