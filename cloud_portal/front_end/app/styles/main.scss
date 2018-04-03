@@ -5,10 +5,12 @@
 @import '_theme_variables';
 @import '~bootstrap/scss/bootstrap';
 @import '_theme_override';
-
+// Components
 @import '_header';
 @import '_arrows';
 @import '_checkbox';
+// Pages
+@import '_faq';
 
 @import '../../../../webadmin/app/web_common/styles/common';
 
