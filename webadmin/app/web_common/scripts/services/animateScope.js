@@ -192,6 +192,9 @@ angular.module('nxCommon')
                 {
                     duration = defaultDuration;
                 }
+                if(isNaN(target)){
+                    throw "Animation target is not a number";
+                }
 
                 var targetAnimation = this.animating(scope, value);
                 if(targetAnimation){
