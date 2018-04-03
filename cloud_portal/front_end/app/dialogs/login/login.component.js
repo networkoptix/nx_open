@@ -68,7 +68,8 @@ __decorate([
 LoginModalContent = __decorate([
     core_1.Component({
         selector: 'ngbd-modal-content',
-        templateUrl: './dialogs/login/login.component.html'
+        templateUrl: './dialogs/login/login.component.html',
+        styleUrls: ['./dialogs/login/login.component.scss']
         // TODO: later
         // templateUrl: this.CONFIG.viewsDir + 'dialogs/login.html'
     }),
@@ -91,7 +92,7 @@ let NxModalLoginComponent = class NxModalLoginComponent {
         };
     }
     open(keepPage) {
-        this.modalRef = this.modalService.open(LoginModalContent);
+        this.modalRef = this.modalService.open(LoginModalContent, { size: 'sm' });
         this.modalRef.componentInstance.auth = this.auth;
         this.modalRef.componentInstance.language = this.language;
         this.modalRef.componentInstance.login = this.login;
