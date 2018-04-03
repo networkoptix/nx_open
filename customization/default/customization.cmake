@@ -1,3 +1,6 @@
+set(build_nxtool ON)
+set(build_paxton ON)
+
 set(defaultSkin "dark_blue")
 set(compatibleCustomizations "default_cn" "default_zh_CN")
 set(enable_hanwha true)
@@ -9,11 +12,9 @@ set(product.name "HD Witness")
 set(product.name.short "hdwitness")
 set(product.appName "hdwitness")
 set(company.name "Network Optix")
-set(short.company.name "Nx")
 set(liteDeviceName "nx1")
 set(cloudName "Nx Cloud")
 set(uri.protocol "nx-vms")
-set(build_nxtool ON)
 
 # Default settings
 set(backgroundImage
@@ -44,8 +45,9 @@ set(customization.serverUpgradeCode "{b4582e3d-c6e1-4f51-806b-ad69417a2584}")
 set(customization.clientBundleUpgradeCode "{4505af3c-b20c-4ae9-b5c4-c1fddbc5db34}")
 set(customization.serverBundleUpgradeCode "{4904f26d-6146-45f4-be37-80a31c15872d}")
 set(customization.fullBundleUpgradeCode "{2c83e785-23e4-4b70-be6c-ed49fa329bb5}")
-set(customization.nxtoolBundleUpgradeCode "{222b19dc-f75f-4096-9cf2-807e309ce06b}")
-set(paxton.bundleUpgradeCode "{f72abad4-21ca-4c1f-845e-fe437f2859e4}")
+
+set(nxtool.company.name "Nx")
+set(nxtool.bundleUpgradeCode "{222b19dc-f75f-4096-9cf2-807e309ce06b}")
 
 set(deb.customization.company.name "networkoptix")
 
@@ -57,6 +59,7 @@ set(paxton.eventsId "{F220AAEC-AE9E-4771-9397-09F6F00C3B89}")
 set(paxton.typeLibId "{534EA078-DCAF-4EF0-B982-95B5656D87B3}")
 set(paxton.appId "{B21774A2-4417-4F07-84DC-37439C9B1063}")
 set(paxton.upgradeCode "{44777DB8-96B1-4B09-9746-6D0390288C84}")
+set(paxton.bundleUpgradeCode "{f72abad4-21ca-4c1f-845e-fe437f2859e4}")
 
 set(ios.skip.sign false)
 set(ios.bundle_identifier "com.networkoptix.HDWitness")

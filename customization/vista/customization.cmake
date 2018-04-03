@@ -1,3 +1,5 @@
+set(build_paxton ON)
+
 set(defaultSkin "dark_green")
 
 # Components Namings
@@ -7,11 +9,9 @@ set(display.mobile.name "qulu2")
 set(product.name.short "qulu")
 set(product.appName "qulu")
 set(company.name "Vista CCTV")
-set(short.company.name "vista")
 set(uri.protocol "qulu-vms")
 set(liteDeviceName "Q")
 set(cloudName "Qcloud")
-set(build_nxtool ON)
 
 # Support section
 set(companyUrl "http://www.vista-cctv.com")
@@ -47,7 +47,10 @@ set(customization.serverUpgradeCode "{16393a07-3da3-4e8d-b755-fe1d29dcf973}")
 set(customization.clientBundleUpgradeCode "{6d44e2f9-55a2-46f1-942c-97b7daf19a93}")
 set(customization.serverBundleUpgradeCode "{f4f70e01-4e4e-4d2c-a9cd-25b3654343d6}")
 set(customization.fullBundleUpgradeCode "{b6dd7f41-90e2-4b84-bcb9-7dd789f3f82e}")
-set(customization.nxtoolBundleUpgradeCode "{c141258e-4d8b-40d8-9957-561a425cddbc}")
+
+set(build_nxtool ON)
+set(nxtool.company.name "vista")
+set(nxtool.bundleUpgradeCode "{c141258e-4d8b-40d8-9957-561a425cddbc}")
 
 set(deb.customization.company.name "vista-qulu")
 

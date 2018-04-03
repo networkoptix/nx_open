@@ -110,7 +110,7 @@
                They are NOT needed for all new projects. Just use single ".name".
         </!-->
 
-        <nxtool.name>${short.company.name} Server Tool</nxtool.name>
+        <nxtool.name>${nxtool.company.name} Server Tool</nxtool.name>
         <applauncher.name>${company.name} ${display.product.name} Launcher</applauncher.name>
         <traytool.name>${display.product.name} Tray Assistant</traytool.name>
         <testcamera.name>${company.name} Test Camera</testcamera.name>

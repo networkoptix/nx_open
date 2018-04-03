@@ -7,7 +7,6 @@ set(product.name "Sefica ProBox")
 set(product.name.short "ras")
 set(product.appName "probox")
 set(company.name "RAS SECURITY")
-set(short.company.name "RAS")
 set(uri.protocol "ras-vms")
 set(cloudName "Pbx Cloud")
 

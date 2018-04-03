@@ -12,7 +12,7 @@
         <?define clientBundleUpgradeCode = "${customization.clientBundleUpgradeCode}"?>
         <?define serverBundleUpgradeCode = "${customization.serverBundleUpgradeCode}"?>
         <?define fullBundleUpgradeCode = "${customization.fullBundleUpgradeCode}"?>
-        <?define nxtoolBundleUpgradeCode = "${customization.nxtoolBundleUpgradeCode}"?>
+        <?define nxtoolBundleUpgradeCode = "${nxtool.bundleUpgradeCode}"?>
         <?define axBundleUpgradeCode = "${paxton.bundleUpgradeCode}"?>
 
         <?define cloudHost = "${cloudHost}"?>
@@ -43,7 +43,7 @@
 
         <?define productExeName = "${product.name}"?>
         <?define clientExeName = "${display.product.name}"?>
-        <?define nxtoolExeName = "${short.company.name} Server Tool"?>
+        <?define nxtoolExeName = "${nxtool.company.name} Server Tool"?>
 
         <?define mirrorListUrl = "${mirrorListUrl}"?>
         <?define quicksync = "${quicksync}"?>
