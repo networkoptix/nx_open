@@ -43,6 +43,76 @@ TEST(TimePriorityKey, common)
     ASSERT_TRUE(key2.hasLessPriorityThan(key1, true));
 }
 
+
+class ECConnectionStub: public AbstractECConnection
+{
+public:
+    ECConnectionStub(TransactionMessageBusAdapter* messageBus)
+    {
+        m_messageBus = messageBus;
+    }
+    
+    virtual QnConnectionInfo connectionInfo() const { return QnConnectionInfo(); }
+
+    /**
+    * Changes url client currently uses to connect to server. Required to handle situations
+    * like user password change, server port change or systems merge.
+    */
+    virtual void updateConnectionUrl(const nx::utils::Url& /*url*/) {}
+
+    //!Calling this method starts notifications delivery by emitting corresponding signals of corresponding manager
+    /*!
+    \note Calling entity MUST connect to all interesting signals prior to calling this method so that received data is consistent
+    */
+    virtual void startReceivingNotifications() {}
+    virtual void stopReceivingNotifications() {}
+
+    virtual void addRemotePeer(const QnUuid& id, const nx::utils::Url& /*_url*/) {}
+    virtual void deleteRemotePeer(const QnUuid& /*id*/) {}
+
+    virtual Timestamp getTransactionLogTime() const { return Timestamp (); }
+    virtual void setTransactionLogTime(Timestamp /*value*/) {}
+
+    virtual AbstractResourceManagerPtr getResourceManager(const Qn::UserAccessData &userAccessData)  { return AbstractResourceManagerPtr(); }
+    virtual AbstractMediaServerManagerPtr getMediaServerManager(const Qn::UserAccessData &userAccessData)  { return AbstractMediaServerManagerPtr(); }
+    virtual AbstractCameraManagerPtr getCameraManager(const Qn::UserAccessData &userAccessData)  { return AbstractCameraManagerPtr(); }
+    virtual AbstractLicenseManagerPtr getLicenseManager(const Qn::UserAccessData &userAccessData)  { return AbstractLicenseManagerPtr(); }
+    virtual AbstractBusinessEventManagerPtr getBusinessEventManager(const Qn::UserAccessData &userAccessData)  { return AbstractBusinessEventManagerPtr(); }
+    virtual AbstractUserManagerPtr getUserManager(const Qn::UserAccessData &userAccessData)  { return AbstractUserManagerPtr(); }
+    virtual AbstractLayoutManagerPtr getLayoutManager(const Qn::UserAccessData &userAccessData)  { return AbstractLayoutManagerPtr(); }
+    virtual AbstractLayoutTourManagerPtr getLayoutTourManager(const Qn::UserAccessData& userAccessData)  { return AbstractLayoutTourManagerPtr(); }
+    virtual AbstractVideowallManagerPtr getVideowallManager(const Qn::UserAccessData &userAccessData)  { return AbstractVideowallManagerPtr(); }
+    virtual AbstractStoredFileManagerPtr getStoredFileManager(const Qn::UserAccessData &userAccessData)  { return AbstractStoredFileManagerPtr(); }
+    virtual AbstractUpdatesManagerPtr getUpdatesManager(const Qn::UserAccessData &userAccessData)  { return AbstractUpdatesManagerPtr(); }
+    virtual AbstractMiscManagerPtr getMiscManager(const Qn::UserAccessData &userAccessData)  { return AbstractMiscManagerPtr(); }
+    virtual AbstractDiscoveryManagerPtr getDiscoveryManager(const Qn::UserAccessData &userAccessData)  { return AbstractDiscoveryManagerPtr(); }
+    virtual AbstractTimeManagerPtr getTimeManager(const Qn::UserAccessData &userAccessData)  { return AbstractTimeManagerPtr(); }
+    virtual AbstractWebPageManagerPtr getWebPageManager(const Qn::UserAccessData &userAccessData)  { return AbstractWebPageManagerPtr(); }
+
+    virtual AbstractLicenseNotificationManagerPtr getLicenseNotificationManager()  { return AbstractLicenseNotificationManagerPtr(); }
+    virtual AbstractTimeNotificationManagerPtr getTimeNotificationManager()  { return AbstractTimeNotificationManagerPtr(); }
+    virtual AbstractResourceNotificationManagerPtr getResourceNotificationManager()  { return AbstractResourceNotificationManagerPtr(); }
+    virtual AbstractMediaServerNotificationManagerPtr getMediaServerNotificationManager()  { return AbstractMediaServerNotificationManagerPtr(); }
+    virtual AbstractCameraNotificationManagerPtr getCameraNotificationManager()  { return AbstractCameraNotificationManagerPtr(); }
+    virtual AbstractBusinessEventNotificationManagerPtr getBusinessEventNotificationManager()  { return AbstractBusinessEventNotificationManagerPtr(); }
+    virtual AbstractUserNotificationManagerPtr getUserNotificationManager()  { return AbstractUserNotificationManagerPtr(); }
+    virtual AbstractLayoutNotificationManagerPtr getLayoutNotificationManager()  { return AbstractLayoutNotificationManagerPtr(); }
+    virtual AbstractLayoutTourNotificationManagerPtr getLayoutTourNotificationManager()  { return AbstractLayoutTourNotificationManagerPtr(); }
+    virtual AbstractWebPageNotificationManagerPtr getWebPageNotificationManager() { return AbstractWebPageNotificationManagerPtr(); }
+    virtual AbstractDiscoveryNotificationManagerPtr getDiscoveryNotificationManager() { return AbstractDiscoveryNotificationManagerPtr(); }
+    virtual AbstractMiscNotificationManagerPtr getMiscNotificationManager() { return AbstractMiscNotificationManagerPtr(); }
+    virtual AbstractUpdatesNotificationManagerPtr getUpdatesNotificationManager() { return AbstractUpdatesNotificationManagerPtr(); }
+    virtual AbstractStoredFileNotificationManagerPtr getStoredFileNotificationManager() { AbstractStoredFileNotificationManagerPtr(); }
+    virtual AbstractVideowallNotificationManagerPtr getVideowallNotificationManager() { return AbstractVideowallNotificationManagerPtr(); }
+
+    virtual QnCommonModule* commonModule() const { return nullptr;  }
+
+    virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const { return QnUuid(); }
+    virtual TransactionMessageBusAdapter* messageBus() const { return m_messageBus;  }
+private:
+    TransactionMessageBusAdapter* m_messageBus = nullptr;
+};
+
 //-------------------------------------------------------------------------------------------------
 
 namespace {
@@ -99,12 +169,13 @@ public:
         m_testSteadyClock(std::make_shared<TestSteadyClock>()),
         m_miscManager(std::make_shared<MiscManagerStub>()),
         m_transactionMessageBus(std::make_unique<TransactionMessageBusStub>(&m_commonModule)),
+        m_connection(std::make_shared<ECConnectionStub>(m_transactionMessageBus.get())),
         m_workAroundMiscDataSaverStub(
             std::make_shared<WorkAroundMiscDataSaverStub>(m_miscManager.get())),
         m_timeSynchronizationManager(std::make_unique<TimeSynchronizationManager>(
+            commonModule(),
             Qn::PeerType::PT_Server,
             &m_timerManager,
-            m_transactionMessageBus.get(),
             &m_settings,
             m_workAroundMiscDataSaverStub,
             m_testSystemClock,
@@ -147,7 +218,7 @@ public:
     {
         if (!startHttpServer())
             return false;
-        m_timeSynchronizationManager->start(m_miscManager);
+        m_timeSynchronizationManager->start(m_connection.get(), m_miscManager);
         return true;
     }
 
@@ -172,14 +243,14 @@ public:
         m_transactionMessageBus =
             std::make_unique<TransactionMessageBusStub>(&m_commonModule);
         m_timeSynchronizationManager = std::make_unique<TimeSynchronizationManager>(
+            commonModule(),
             Qn::PeerType::PT_Server,
             &m_timerManager,
-            m_transactionMessageBus.get(),
             &m_settings,
             m_workAroundMiscDataSaverStub,
             m_testSystemClock,
             m_testSteadyClock);
-        m_timeSynchronizationManager->start(m_miscManager);
+        m_timeSynchronizationManager->start(m_connection.get(), m_miscManager);
     }
 
     void setPrimaryPeerId(const QnUuid& peerId)
@@ -250,6 +321,7 @@ private:
     std::shared_ptr<TestSystemClock> m_testSystemClock;
     std::shared_ptr<TestSteadyClock> m_testSteadyClock;
     std::shared_ptr<MiscManagerStub> m_miscManager;
+    std::shared_ptr<AbstractECConnection> m_connection;
     std::unique_ptr<TransactionMessageBusStub> m_transactionMessageBus;
     std::shared_ptr<WorkAroundMiscDataSaverStub> m_workAroundMiscDataSaverStub;
     std::unique_ptr<TimeSynchronizationManager> m_timeSynchronizationManager;
