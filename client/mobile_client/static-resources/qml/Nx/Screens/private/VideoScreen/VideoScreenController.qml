@@ -25,10 +25,11 @@ Object
     readonly property bool hasDefaultCameraPassword: resourceHelper.hasDefaultCameraPassword
     readonly property bool hasOldFirmware: resourceHelper.hasOldCameraFirmware
     readonly property bool tooManyConnections: mediaPlayer.tooManyConnectionsError
+    readonly property bool noVideo: noVideoStreams || !resourceHelper.hasVideo
     readonly property bool ioModuleWarning:
-        resourceHelper.isIoModule && !resourceHelper.audioSupported
+         noVideo && resourceHelper.isIoModule && !resourceHelper.audioSupported
     readonly property bool ioModuleAudioPlaying:
-        resourceHelper.isIoModule && resourceHelper.audioSupported
+        noVideo && resourceHelper.isIoModule && resourceHelper.audioSupported
 
     readonly property string dummyState:
     {

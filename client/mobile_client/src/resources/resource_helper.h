@@ -19,6 +19,7 @@ class QnResourceHelper: public Connective<QObject>, public QnConnectionContextAw
 
     Q_PROPERTY(bool audioSupported READ audioSupported NOTIFY audioSupportedChanged)
     Q_PROPERTY(bool isIoModule READ isIoModule NOTIFY isIoModuleChanged)
+    Q_PROPERTY(bool hasVideo READ hasVideo NOTIFY hasVideoChanged)
 
     Q_ENUMS(Qn::ResourceStatus)
 
@@ -37,6 +38,7 @@ public:
 
     bool audioSupported() const;
     bool isIoModule() const;
+    bool hasVideo() const;
 
     qint64 serverTimeOffset() const;
 
@@ -49,6 +51,7 @@ signals:
     void serverTimeOffsetChanged();
     void audioSupportedChanged();
     void isIoModuleChanged();
+    void hasVideoChanged();
 
 private:
     bool hasCameraCapability(Qn::CameraCapability capability) const;
