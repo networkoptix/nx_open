@@ -420,7 +420,7 @@ TYPED_TEST_P(DaoUserAuthentication, deleting_every_auth_record_of_an_account)
 TYPED_TEST_P(DaoUserAuthentication, deleting_every_auth_record_of_a_system)
 {
     this->givenMultipleSystemsWithMultipleUsers();
-    const auto systemId = getRandomSystemId();
+    const auto systemId = this->getRandomSystemId();
 
     this->whenDeleteEveryUserAuthInfoInSystem(systemId);
 

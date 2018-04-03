@@ -67,7 +67,7 @@ std::vector<std::string> UserAuthentication::fetchSystemsWithExpiredAuthRecords(
             break;
         }
 
-        if (systems.size() >= systemCountLimit)
+        if (systems.size() >= (unsigned int)systemCountLimit)
             break;
     }
 

@@ -117,7 +117,7 @@ std::vector<std::string> UserAuthentication::fetchSystemsWithExpiredAuthRecords(
         WHERE expiration_time_utc < :curTime
         LIMIT :maxSystemsToReturn
     )sql");
-    query.bindValue(":curTime", currentTime.count());
+    query.bindValue(":curTime", (long long)currentTime.count());
     query.bindValue(":maxSystemsToReturn", systemCountLimit);
     try
     {
