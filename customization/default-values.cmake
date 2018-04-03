@@ -6,6 +6,7 @@ set(help.language "english")
 set(quicksync "false")
 set(dynamic.customization "false")
 set(display.mobile.name "${display.product.name} Mobile")
+set(liteDeviceName "microserver")
 
 set(uri.protocol "nx-vms")
 
@@ -54,3 +55,7 @@ set(compatibleCustomizations "")
 
 # Defaults to ${company.name} in the properties.cmake
 set(windowsInstallPath "")
+
+# Some customizations do not have old mobile application
+set(android.oldPackageName "")
+set(ios.old_app_appstore_id "")

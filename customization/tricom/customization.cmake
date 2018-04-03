@@ -56,8 +56,6 @@ set(deb.customization.company.name "mvss")
 #set(paxton.upgradeCode "{020b6c80-aa3f-459e-8c92-f1b416fbb97e}")
 #set(paxton.bundleUpgradeCode "{B1CAAD54-80CF-48D1-8201-F0C732859028}")
 
-set(ios.skip.sign "false")
-set(ios.bundle_identifier "com.tricom.Mvss")
 set(ios.new_bundle_identifier "com.tricom.MvssMobile")
 set(ios.group_identifier "group.com.tricom.MvssMobile")
 set(ios.sign.identity "iPhone Distribution: Tricom Research Incorporated (H469MR7KD6)")

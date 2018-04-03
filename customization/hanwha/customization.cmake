@@ -49,8 +49,6 @@ set(deb.customization.company.name "hanwha")
 #set(paxton.upgradeCode "{2BEF566D-CB71-44F5-8A77-CEB10C5DA9FA}")
 #set(paxton.bundleUpgradeCode "13FC4A9F-DBBD-4CAF-B139-93894AE82F74")
 
-set(ios.skip.sign "false")
-set(ios.bundle_identifier "com.hanwhasecurity.wave")
 set(ios.new_bundle_identifier "com.hanwhasecurity.wisenetwave")
 set(ios.group_identifier "group.com.hanwhasecurity.wisenetwave")
 set(ios.sign.identity "iPhone Distribution: Samsung Opto-Electronics America, Inc. (TPM6NB485L)")

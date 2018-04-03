@@ -37,7 +37,6 @@ set(customization.fullBundleUpgradeCode "{38c17e44-e9d4-4d1f-b631-51def695cb94}"
 
 set(deb.customization.company.name "ioezio")
 
-set(ios.bundle_identifier "com.ioezio.ezpro")
 set(ios.new_bundle_identifier "com.ioezio.ezpromobile")
 set(ios.group_identifier "group.com.ioezio.ezpro")
 set(ios.sign.identity "iPhone Distribution: ioEZ INC. (MXZQG6QD9L)")

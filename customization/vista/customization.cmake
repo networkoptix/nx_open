@@ -1,4 +1,5 @@
 set(build_paxton ON)
+set(build_nxtool ON)
 
 set(defaultSkin "dark_green")
 
@@ -48,7 +49,6 @@ set(customization.clientBundleUpgradeCode "{6d44e2f9-55a2-46f1-942c-97b7daf19a93
 set(customization.serverBundleUpgradeCode "{f4f70e01-4e4e-4d2c-a9cd-25b3654343d6}")
 set(customization.fullBundleUpgradeCode "{b6dd7f41-90e2-4b84-bcb9-7dd789f3f82e}")
 
-set(build_nxtool ON)
 set(nxtool.company.name "vista")
 set(nxtool.bundleUpgradeCode "{c141258e-4d8b-40d8-9957-561a425cddbc}")
 
@@ -63,7 +63,6 @@ set(paxton.appId "{3248BE1C-BF5C-43B1-B084-49A6F05C1EFB}")
 set(paxton.upgradeCode "{77EC46CB-737C-4BC3-8774-70956550628F}")
 set(paxton.bundleUpgradeCode "{3FAAF04F-2E3F-4B97-96ED-BFAACD6573CC}")
 
-set(ios.bundle_identifier "com.vista.qulu")
 set(ios.new_bundle_identifier "com.vista.quluMobile")
 set(ios.sign.identity "iPhone Distribution: Norbain SD LTD (N3KX2CKR5P)")
 set(ios.group_identifier "group.com.vista.qulu")

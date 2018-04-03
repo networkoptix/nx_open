@@ -31,8 +31,8 @@ set(customization.clientBundleUpgradeCode "{2c88e1bd-34e3-4ee3-9196-76c48ef9084f
 set(customization.serverBundleUpgradeCode "{7ca048d1-9ed1-4a45-be0b-669b7db8f933}")
 set(customization.fullBundleUpgradeCode "{eb1f51b4-7462-4047-906f-5f789648b151}")
 
-set(nxtool.company.name "Cox Communications")
-set(nxtool.bundleUpgradeCode "{fe75d48f-0f7e-4fca-a98e-357a61ae498a}")
+#set(nxtool.company.name "Cox Communications")
+#set(nxtool.bundleUpgradeCode "{fe75d48f-0f7e-4fca-a98e-357a61ae498a}")
 
 set(deb.customization.company.name "cox")
 
@@ -44,7 +44,6 @@ set(mac.protocol_handler_bundle.identifier "com.networkoptix.protocol_handler")
 set(mac.skip.sign "true")
 
 
-set(ios.skip.sign "true")
 set(ios.new_bundle_identifier "com.cox.cb.vms")
 set(ios.group_identifier "group.com.cox.cb.hdsec")
 set(ios.sign.identity "iPhone Developer: Ivan Vigasin (KZ74EE5FP2)")

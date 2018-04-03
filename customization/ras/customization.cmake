@@ -39,8 +39,6 @@ set(customization.fullBundleUpgradeCode "{164BDBC7-B4AE-463D-9D9E-D2731D5E0E54}"
 
 set(deb.customization.company.name "ras")
 
-set(ios.skip.sign "false")
-set(ios.bundle_identifier "com.rassecurity.probox")
 set(ios.new_bundle_identifier "com.rassecurity.proboxmobile")
 set(ios.group_identifier "group.com.rassecurity.probox")
 set(ios.sign.identity "iPhone Distribution: RAS Bvba (CJ7G58V6NE)")

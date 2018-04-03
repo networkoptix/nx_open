@@ -46,7 +46,6 @@ set(customization.fullBundleUpgradeCode "{d68bde62-2804-4429-ac3f-d347ced6ddb6}"
 
 set(deb.customization.company.name "ipera")
 
-set(ios.bundle_identifier "ru.ipera.FlyView")
 set(ios.new_bundle_identifier "ru.ipera.FlyViewMobile")
 set(ios.sign.identity "iPhone Distribution: IPera (32NH529F85)")
 set(ios.group_identifier "group.ru.ipera.FlyView")

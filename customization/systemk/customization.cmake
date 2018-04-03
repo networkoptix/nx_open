@@ -6,6 +6,7 @@ set(product.name.short "systemk")
 set(company.name "SystemK Corporation")
 set(uri.protocol "sk-vms")
 set(cloudName "SK Cloud")
+set(product.appName "skvms")
 
 #set(namespace.major "jp.co")
 #set(namespace.minor "systemk")
@@ -54,8 +55,6 @@ set(deb.customization.company.name "systemk")
 #set(paxton.upgradeCode "{895F5FF0-2CA9-49A6-AA71-29BF9A2B4EAB}")
 #set(paxton.bundleUpgradeCode "{23AE7DBD-2B8E-4FF0-B5FF-975A69F3287A}")
 
-set(ios.skip.sign "false")
-set(ios.bundle_identifier "jp.co.systemk.SkVms")
 set(ios.new_bundle_identifier "jp.co.systemk.SkMobile")
 set(ios.group_identifier "group.jp.co.systemk.SkMobile")
 set(ios.sign.identity "iPhone Distribution: SYSTEMK CORPORATION (22S3ZFXRW5)")
@@ -64,6 +63,7 @@ set(mac.sign.identity "Developer ID Application: SYSTEMK CORPORATION (22S3ZFXRW5
 set(mac.app.sign.identity "3rd Party Mac Developer Application: SYSTEMK CORPORATION (22S3ZFXRW5)")
 set(mac.pkg.sign.identity "3rd Party Mac Developer Installer: SYSTEMK CORPORATION (22S3ZFXRW5)")
 set(mac.bundle.identifier "jp.co.systemk.SkVms2")
+set(mac.protocol_handler_bundle.identifier "jp.co.systemk.SkVms2.protocol_handler")
 
 # Other customizations.
 set(freeLicenseIsTrial "true")

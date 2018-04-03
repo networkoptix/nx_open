@@ -1,3 +1,4 @@
+set(build_nxtool ON)
 set(build_mobile OFF)
 set(enable_hanwha true)
 
