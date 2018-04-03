@@ -198,8 +198,7 @@ qint64 RootTool::freeSpace(const QString& path)
         return SystemCommands().freeSpace(path.toStdString(), /*usePipe*/ false);
 
     QnMutexLocker lock(&m_mutex);
-    utils::concurrent::run(
-        [this, path]() { execute({"freeSpace", path}); });
+    utils::concurrent::run([this, path]() { execute({"freeSpace", path}); });
     int64_t result;
     return system_commands::domain_socket::readInt64(&result) ? result : -1;
 #else
@@ -214,8 +213,7 @@ qint64 RootTool::totalSpace(const QString& path)
         return SystemCommands().totalSpace(path.toStdString(), /*usePipe*/ false);
 
     QnMutexLocker lock(&m_mutex);
-    utils::concurrent::run(
-        [this, path]() { execute({"totalSpace", path}); });
+    utils::concurrent::run([this, path]() { execute({"totalSpace", path}); });
     int64_t result;
     return system_commands::domain_socket::readInt64(&result) ? result : -1;
 #else
