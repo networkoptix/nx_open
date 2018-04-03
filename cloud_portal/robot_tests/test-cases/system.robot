@@ -210,7 +210,6 @@ should display same user data as user provided during registration (stress to cy
     Remove User Permissions    ${email}
 
 should display same user data as showed in user account (stress to cyrillic)
-    [tags]    not-ready
 #create user
     ${email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register

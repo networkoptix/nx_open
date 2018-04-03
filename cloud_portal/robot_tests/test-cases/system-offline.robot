@@ -105,27 +105,14 @@ rename button opens dialog; cancel closes without rename; save renames system wh
     Check For Alert    ${SYSTEM NAME SAVED}
     Verify In System    Auto Tests 2
 
-#This can't really be tested unless I can add to an offline system
 does not show Share button to viewer, advanced viewer, live viewer
-    [tags]    not-ready
     Open Browser and go to URL    ${url}
-    Log in to Auto Tests System    ${EMAIL VIEWER}
-    Register Keyword To Run On Failure    NONE
-    Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
-    Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${RENAME SYSTEM}
-    Register Keyword To Run On Failure    Failure Tasks
-    Element Should Not Be Visible    ${SHARE BUTTON SYSTEMS}
-    Log Out
-    Log in to Auto Tests System    ${EMAIL ADV VIEWER}
-    Register Keyword To Run On Failure    NONE
-    Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
-    Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${RENAME SYSTEM}
-    Register Keyword To Run On Failure    Failure Tasks
-    Element Should Not Be Visible    ${SHARE BUTTON SYSTEMS}
-    Log Out
-    Log in to Auto Tests System    ${EMAIL LIVE VIEWER}
-    Register Keyword To Run On Failure    NONE
-    Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
-    Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${RENAME SYSTEM}
-    Register Keyword To Run On Failure    Failure Tasks
-    Element Should Not Be Visible    ${SHARE BUTTON SYSTEMS}
+    @{emails}    Set Variable    ${EMAIL VIEWER}    ${EMAIL LIVE VIEWER}    ${EMAIL ADV VIEWER}
+    :FOR    ${user}    IN    @{emails}
+    \  Log in to Autotests System    ${user}
+    \  Register Keyword To Run On Failure    NONE
+    \  Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
+    \  Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${RENAME SYSTEM}
+    \  Register Keyword To Run On Failure    Failure Tasks
+    \  Element Should Not Be Visible    ${SHARE BUTTON SYSTEMS}
+    \  Log Out
