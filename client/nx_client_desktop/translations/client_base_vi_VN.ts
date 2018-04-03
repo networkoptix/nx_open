@@ -3266,10 +3266,6 @@ to %1</source>
       <translation>Ngắt kết nối</translation>
     </message>
     <message>
-      <source>All cloud users will be deleted.</source>
-      <translation>Tất cả các tài khoản đám mây sẽ bị xóa.</translation>
-    </message>
-    <message>
       <source>Failed to disconnect System from %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>Kết nối hệ thống lỗi %1</translation>
@@ -3287,6 +3283,11 @@ to %1</source>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>Bạn sẽ không thể kết nối với Hệ thống này %1 sau khi ngắt kết nối %1.</translation>
+    </message>
+    <message>
+      <source>All %1 users will be deleted.</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">All %1 users will be deleted.</translation>
     </message>
   </context>
   <context>
@@ -6770,16 +6771,17 @@ to %1</source>
       <translation>Người dùng cục bộ</translation>
     </message>
     <message>
-      <source>Cloud user</source>
-      <translation>Người dùng đám mây</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>Đăng nhập</translation>
     </message>
     <message>
       <source>Role</source>
       <translation>Vai trò</translation>
+    </message>
+    <message>
+      <source>%1 user</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 user</translation>
     </message>
   </context>
   <context>
@@ -6973,10 +6975,6 @@ to %1</source>
       <translation>Địa phương</translation>
     </message>
     <message>
-      <source>Cloud</source>
-      <translation>Đám mây</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>Đăng nhập</translation>
     </message>
@@ -7017,8 +7015,9 @@ to %1</source>
       <translation>Mật khẩu không khớp.</translation>
     </message>
     <message>
-      <source>Cloud user with specified email already exists.</source>
-      <translation>Đăng nhập người dùng chỉ định đã tồn tại.</translation>
+      <source>%1 user with specified email already exists.</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 user with specified email already exists.</translation>
     </message>
   </context>
   <context>
@@ -7239,10 +7238,6 @@ to %1</source>
       <translation>Tổng số bản quyền sẽ giảm</translation>
     </message>
     <message>
-      <source>Cloud Systems cannot be merged</source>
-      <translation>Không thể hợp nhất Cloud Systems</translation>
-    </message>
-    <message>
       <source>Connecting to the current System...</source>
       <translation>Đang kết nối với hệ thống hiện tại...</translation>
     </message>
@@ -7261,6 +7256,11 @@ to %1</source>
     <message>
       <source>Administrator password</source>
       <translation>Mật khẩu quản trị viên</translation>
+    </message>
+    <message>
+      <source>%1 Systems cannot be merged</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 Systems cannot be merged</translation>
     </message>
   </context>
   <context>

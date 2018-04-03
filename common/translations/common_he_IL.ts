@@ -87,8 +87,9 @@
       <translation>מערכת %1 שהתגלתה אינה תואמת למערכת הנוכחית.</translation>
     </message>
     <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <translation>מערכת ענן מאפשרת למזג רק עם שאינה בענן. שם המערכת והסיסמא נלקחים מהמערכת שבענן.</translation>
+      <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 System can only be merged with non-%1. System name and password are taken from %1 System.</translation>
     </message>
   </context>
   <context>

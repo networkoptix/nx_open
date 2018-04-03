@@ -87,8 +87,9 @@
       <translation>ระบบค้นพบ %1 ไม่สามารถทำงานร่วมกับระบบปัจจุบันได้</translation>
     </message>
     <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <translation>ระบบคลาวด์สามารถเท่าผสานกัน ด้วยเลย ระบบชื่อและรหัสผ่านจะถูกนำจากระบบคลาวด์</translation>
+      <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 System can only be merged with non-%1. System name and password are taken from %1 System.</translation>
     </message>
   </context>
   <context>

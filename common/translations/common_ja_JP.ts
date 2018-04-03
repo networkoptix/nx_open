@@ -87,8 +87,9 @@
       <translation>検出されたシステム%1は、現在のシステムと互換性がありません</translation>
     </message>
     <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <translation>クラウド システムへの統合はクラウドに接続されていないシステムとのみ結合できます　システム名とパスワードはクラウド システムから取得されます。</translation>
+      <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 System can only be merged with non-%1. System name and password are taken from %1 System.</translation>
     </message>
   </context>
   <context>

@@ -755,7 +755,7 @@
     <message>
       <location/>
       <source>Generate</source>
-      <translation type="unfinished">Generate</translation>
+      <translation>生成</translation>
     </message>
     <message>
       <location/>
@@ -765,7 +765,7 @@
     <message>
       <location/>
       <source>Logical Id</source>
-      <translation type="unfinished">Logical Id</translation>
+      <translation>論理ID</translation>
     </message>
   </context>
   <context>
@@ -1804,7 +1804,7 @@
     <message>
       <location/>
       <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+      <translation>&quot;ウェアラブル カメラ&quot; はシステム上の任意のサーバーにビデオをアップロードして、すべてのユーザーがアクセスできるビデオ ファイルの仮想ストレージです</translation>
     </message>
   </context>
   <context>
@@ -3044,12 +3044,12 @@
     <message>
       <location/>
       <source>There are no custom user roles yet.</source>
-      <translation type="unfinished">There are no custom user roles yet.</translation>
+      <translation>カスタムユーザーの役割はまだありません</translation>
     </message>
     <message>
       <location/>
       <source>Click &quot;New role&quot; button to create one.</source>
-      <translation type="unfinished">Click &quot;New role&quot; button to create one.</translation>
+      <translation>&quot;新しい役割&quot; ボタンをクリックして作成します</translation>
     </message>
   </context>
   <context>
