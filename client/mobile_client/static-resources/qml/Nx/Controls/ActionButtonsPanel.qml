@@ -1,196 +1,183 @@
-import QtQuick 2.6
-import Nx.Models 1.0
-import nx.client.mobile 1.0
-import Nx 1.0
+    import QtQuick 2.6
+    import Nx.Models 1.0
+    import nx.client.mobile 1.0
+    import Nx 1.0
 
-import "private"
+    import "private"
 
-Item
-{
-    id: control
-
-    property alias resourceId: buttonModel.resourceId
-    property alias contentWidth: panel.contentWidth
-    property alias buttonsCount: panel.count
-    signal ptzButtonClicked()
-
-    signal twoWayAudioButtonPressed()
-    signal twoWayAudioButtonReleased()
-
-    implicitWidth: panel.implicitWidth
-    implicitHeight: panel.implicitHeight
-
-    onResourceIdChanged:
+    Item
     {
-        hintControl.hide()
-        panel.forceInitialSlideAnimation()
-    }
+        id: control
 
-    Image
-    {
-        id: line
-        source: "qrc:///images/bottom_panel_line.png"
-        visible: panel.scrollable
-    }
+        property alias resourceId: buttonModel.resourceId
+        property alias contentWidth: panel.contentWidth
+        property alias buttonsCount: panel.count
+        signal ptzButtonClicked()
 
-    ButtonsPanel
-    {
-        id: panel
+        signal twoWayAudioButtonPressed()
+        signal twoWayAudioButtonReleased()
 
-        x: 1
-        width: parent.width - 1
-        height: parent.height
-        onPressedChanged:
+        implicitWidth: panel.implicitWidth
+        implicitHeight: panel.implicitHeight
+
+        onResourceIdChanged:
         {
-            var type = d.modelDataAccessor.getData(index, "type")
-            if (type == ActionButtonsModel.TwoWayAudioButton)
-                d.handleTwoWayAudioPressed(index, pressed)
-            else if (type == ActionButtonsModel.SoftTriggerButton)
-                d.handleSoftwareTriggerPressed(index, pressed)
+            hintControl.hide()
+            panel.forceInitialSlideAnimation()
         }
 
-        onButtonClicked:
+        Image
         {
-            var type = d.modelDataAccessor.getData(index, "type")
-            switch (type)
+            id: line
+            source: "qrc:///images/bottom_panel_line.png"
+            visible: panel.scrollable
+        }
+
+        ButtonsPanel
+        {
+            id: panel
+
+            x: 1
+            width: parent.width - 1
+            height: parent.height
+
+            onInitiallyPressed:
             {
-                case ActionButtonsModel.PtzButton:
+                var type = d.modelDataAccessor.getData(index, "type")
+                if (type == ActionButtonsModel.PtzButton)
+                {
                     ptzButtonClicked()
-                    break
-                case ActionButtonsModel.TwoWayAudioButton:
-                    hintControl.showHint(
-                        d.modelDataAccessor.getData(index, "hint"),
-                        d.modelDataAccessor.getData(index, "iconPath"))
-                    break
-                case ActionButtonsModel.SoftTriggerButton:
-                    d.handleSoftwareTriggerClicked(index)
-                    break
-            }
-        }
+                    return;
+                }
 
-        onEnabledChanged:
-        {
-            if (buttonEnabled)
-                return
-
-            var id = d.modelDataAccessor.getData(index, "id")
-            if (d.triggersController.activeTriggerId() == id)
-                d.triggersController.deactivateTrigger()
-        }
-
-        model: ActionButtonsModel { id: buttonModel }
-    }
-
-    QtObject
-    {
-        id: d
-
-        property variant modelDataAccessor: ModelDataAccessor { model: buttonModel }
-
-        property SoftwareTriggersController triggersController: SoftwareTriggersController
-        {
-            resourceId: control.resourceId
-
-            onTriggerActivated:
-            {
-                var index = buttonModel.rowById(id)
                 var text = d.modelDataAccessor.getData(index, "hint")
-                var prolonged = d.modelDataAccessor.getData(index, "allowLongPress")
-
-                if (!success)
-                    hintControl.showFailure(text, prolonged)
-                else if (!prolonged)
-                    hintControl.showSuccess(text, false)
-            }
-
-            onTriggerDeactivated:
-            {
-                var index = buttonModel.rowById(id)
-                var text = d.modelDataAccessor.getData(index, "hint")
-                var prolonged = d.modelDataAccessor.getData(index, "allowLongPress")
-                if (prolonged)
-                    hintControl.showSuccess(text, true)
-            }
-
-            onTriggerCancelled:
-            {
-                hintControl.hide()
-            }
-        }
-
-        function handleTwoWayAudioPressed(index, pressed)
-        {
-            if (pressed)
-            {
-                control.twoWayAudioButtonPressed()
-                hintControl.showCustomProcess(voiceVisualizerComponent,
+                hintControl.showHint(
+                    qsTr("Press and hold to %1").arg(text),
                     d.modelDataAccessor.getData(index, "iconPath"))
             }
-            else
+
+            onPressedChanged:
             {
-                control.twoWayAudioButtonReleased()
+                var type = d.modelDataAccessor.getData(index, "type")
+                if (type == ActionButtonsModel.TwoWayAudioButton)
+                    d.handleTwoWayAudioPressed(index, pressed)
+                else if (type == ActionButtonsModel.SoftTriggerButton)
+                    d.handleSoftwareTriggerPressed(index, pressed)
+            }
+
+            onActionCancelled:
+            {
                 hintControl.hide()
             }
-        }
 
-        function handleSoftwareTriggerClicked(index)
-        {
-            var text = d.modelDataAccessor.getData(index, "hint")
-            var prolonged = d.modelDataAccessor.getData(index, "allowLongPress")
-            if (prolonged)
+            onButtonClicked:
             {
-                var hintText = qsTr("Press and hold to %1").arg(text)
-                hintControl.showHint(hintText, d.modelDataAccessor.getData(index, "iconPath"))
-                return
+                var type = d.modelDataAccessor.getData(index, "type")
+                if (type == ActionButtonsModel.PtzButton)
+                    return
+
+                hintControl.hideDelayed()
             }
 
-            var id = d.modelDataAccessor.getData(index, "id")
-            if (triggersController.activateTrigger(id))
-                hintControl.showPreloader(text)
-            else
-                hintControl.showFailure(text, false)
+            onEnabledChanged:
+            {
+                if (buttonEnabled)
+                    return
+
+                var id = d.modelDataAccessor.getData(index, "id")
+                if (d.triggersController.activeTriggerId() == id)
+                    d.triggersController.deactivateTrigger()
+            }
+
+            model: ActionButtonsModel { id: buttonModel }
         }
 
-        function handleSoftwareTriggerPressed(index, pressed)
+        QtObject
         {
-            var prolonged = d.modelDataAccessor.getData(index, "allowLongPress")
-            if (!prolonged)
-                return
+            id: d
 
-            var id = d.modelDataAccessor.getData(index, "id")
-            if (pressed)
+            property variant modelDataAccessor: ModelDataAccessor { model: buttonModel }
+
+            property SoftwareTriggersController triggersController: SoftwareTriggersController
             {
-                var text = d.modelDataAccessor.getData(index, "hint")
-                if (triggersController.activateTrigger(id))
-                    hintControl.showPreloader(text)
+                resourceId: control.resourceId
+
+                onTriggerActivated:
+                {
+                    var index = buttonModel.rowById(id)
+                    var text = d.modelDataAccessor.getData(index, "hint")
+                    var prolonged = d.modelDataAccessor.getData(index, "allowLongPress")
+                    var icon = d.modelDataAccessor.getData(index, "iconPath")
+                    if (!success)
+                        hintControl.showFailure(text)
+                    else if (prolonged)
+                        hintControl.showActivity(text, icon)
+                    else
+                        hintControl.showSuccess(text)
+                }
+
+                onTriggerDeactivated:
+                {
+                    hintControl.hide()
+                }
+
+                onTriggerCancelled:
+                {
+                    hintControl.hide()
+                }
+            }
+
+            function handleTwoWayAudioPressed(index, pressed)
+            {
+                if (pressed)
+                {
+                    control.twoWayAudioButtonPressed()
+                    hintControl.showCustomProcess(voiceVisualizerComponent,
+                        d.modelDataAccessor.getData(index, "iconPath"))
+                }
                 else
-                    hintControl.showFailure(text, true)
+                {
+                    control.twoWayAudioButtonReleased()
+                    hintControl.hide()
+                }
             }
-            else
+
+            function handleSoftwareTriggerPressed(index, pressed)
             {
-                triggersController.deactivateTrigger(id)
-                hintControl.hide()
+                var prolonged = d.modelDataAccessor.getData(index, "allowLongPress")
+                var id = d.modelDataAccessor.getData(index, "id")
+                if (pressed)
+                {
+                    var text = d.modelDataAccessor.getData(index, "hint")
+                    if (triggersController.activateTrigger(id))
+                        hintControl.showPreloader(text)
+                    else
+                        hintControl.showFailure(text, prolonged)
+                }
+                else if (prolonged)
+                {
+                    triggersController.deactivateTrigger(id)
+                }
+            }
+        }
+
+        ActionButtonsHint
+        {
+            id: hintControl
+
+            x: parent.width - width
+            y: -(height + 4 + 4)
+        }
+
+        Component
+        {
+            id: voiceVisualizerComponent
+
+            VoiceSpectrumItem
+            {
+                height: 36
+                width: 96
+                color: ColorTheme.highlight
             }
         }
     }
-
-    ActionButtonsHint
-    {
-        id: hintControl
-
-        x: parent.width - width
-        y: -(height + 4 + 4)
-    }
-
-    Component
-    {
-        id: voiceVisualizerComponent
-
-        VoiceSpectrumItem
-        {
-            height: 36
-            width: 96
-            color: ColorTheme.highlight
-        }
-    }
-}

@@ -14,63 +14,111 @@ Rectangle
     color: ColorTheme.transparent(ColorTheme.base8, 0.95)
     radius: 2
 
-    visible: false
+    opacity: 0
+    visible: opacity > 0
+
+    states: [
+        State
+        {
+            name: "visible"
+            PropertyChanges { target: control; opacity: 1 }
+        },
+
+        State
+        {
+            name: "hidden"
+            PropertyChanges { target: control; opacity: 0 }
+        }
+    ]
+
+    transitions: [
+        Transition
+        {
+            from: "visible"
+            to: "hidden"
+
+            NumberAnimation
+            {
+                target: control
+                property: "opacity"
+                duration: 80
+            }
+        },
+        Transition
+        {
+            from: "hidden"
+            to: "visible"
+
+            NumberAnimation
+            {
+                target: control
+                property: "opacity"
+                duration: 160
+            }
+        }
+    ]
 
     function showHint(text, iconPath)
     {
-        hideTimer.restart()
-
-        border.color = control.color
+        hideTimer.stop()
 
         loader.sourceComponent = textComponent
         loader.item.text = text
         loader.item.color = ColorTheme.brightText
 
+        activityPreloader.visible = false
+
         visualDataLoader.sourceComponent = imageComponent
         visualDataLoader.item.source = iconPath
 
-        control.visible = true
+        control.state = "visible"
     }
 
     function showCustomProcess(component, iconPath)
     {
         hideTimer.stop()
 
-        border.color = control.color
-
         loader.sourceComponent = component
+
+        activityPreloader.visible = true
 
         visualDataLoader.sourceComponent = imageComponent
         visualDataLoader.item.source = iconPath
 
-        control.visible = true
+        control.state = "visible"
     }
 
     function showPreloader(text)
     {
         hideTimer.stop();
 
-        border.color = control.color
+        activityPreloader.visible = false
 
         loader.sourceComponent = textComponent
         loader.item.text = text
         loader.item.color = ColorTheme.brightText
 
         visualDataLoader.sourceComponent = dotsPreloader
-        control.visible = true
+        control.state = "visible"
     }
 
-    function showSuccess(text, showBorder)
+    function showActivity(text, iconPath)
     {
-        showResult(text, showBorder, true)
+        showHint(text, iconPath)
+        activityPreloader.visible = true
     }
 
-    function showFailure(text, showBorder)
+    function showSuccess(text)
     {
-        showResult(text, showBorder, false)
+        showResult(text, true)
     }
 
-    function showResult(text, showBorder, success)
+    function showFailure(text)
+    {
+        showResult(text, false)
+    }
+
+    function showResult(text, success)
     {
         hideTimer.restart()
 
@@ -78,10 +126,7 @@ Rectangle
             ? ColorTheme.brightText
             : ColorTheme.red_l2
 
-        if (showBorder)
-            border.color = customColor
-        else
-            border.color = control.color
+        activityPreloader.visible = false
 
         loader.sourceComponent = textComponent
         loader.item.text = text
@@ -92,16 +137,27 @@ Rectangle
             ? "qrc:///images/soft_trigger/confirmation_success.png"
             : "qrc:///images/soft_trigger/confirmation_failure.png"
 
-        control.visible = true
+        control.state = "visible"
+    }
+
+    function hideDelayed()
+    {
+        hideTimer.restart();
     }
 
     function hide()
     {
+        hideTimer.stop()
+        control.state = "hidden"
+    }
+
+    onOpacityChanged:
+    {
+        if (opacity > 0)
+            return
+
         loader.sourceComponent = dummyComponent
         visualDataLoader.sourceComponent = dummyComponent
-
-        hideTimer.stop()
-        control.visible = false
     }
 
     Row
@@ -124,6 +180,12 @@ Rectangle
             height: 48
             anchors.verticalCenter: parent.verticalCenter
 
+            ActivityPreloader
+            {
+                id: activityPreloader
+                anchors.centerIn: parent
+            }
+
             Loader
             {
                 id: visualDataLoader
@@ -137,7 +199,7 @@ Rectangle
         id: hideTimer
 
         interval: 3000
-        onTriggered: control.visible = false
+        onTriggered: control.state = "hidden"
     }
 
     Component
