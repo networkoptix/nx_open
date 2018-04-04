@@ -37,10 +37,14 @@ nx::utils::db::DBResult AccountManagerStub::insertAccount(
 
 nx::utils::db::DBResult AccountManagerStub::fetchAccountByEmail(
     nx::utils::db::QueryContext* /*queryContext*/,
-    const std::string& /*accountEmail*/,
-    data::AccountData* const /*accountData*/)
+    const std::string& accountEmail,
+    data::AccountData* const accountData)
 {
-    // TODO
+    auto it = m_emailToAccount.find(accountEmail);
+    if (it == m_emailToAccount.end())
+        return nx::utils::db::DBResult::notFound;
+
+    *accountData = it->second;
     return nx::utils::db::DBResult::ok;
 }
 
