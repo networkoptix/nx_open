@@ -1,7 +1,6 @@
 #include "message_bus_adapter.h"
 #include <nx/p2p/p2p_message_bus.h>
 #include "transaction_message_bus.h"
-#include <database/db_manager.h>
 
 namespace ec2 {
 
