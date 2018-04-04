@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include <nx/network/stun/extension/stun_extension_types.h>
+#include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 
 #include "data/listening_peer.h"
@@ -192,29 +193,49 @@ void PeerRegistrator::listen(
         return;
     }
 
+    const MediaserverData mediaserverConnectionKey(
+        requestData.systemId, requestData.serverId);
     auto peerDataLocker = m_listeningPeerPool->insertAndLockPeerData(
         serverConnection,
-        MediaserverData(requestData.systemId, requestData.serverId));
+        mediaserverConnectionKey);
 
     peerDataLocker.value().isListening = true;
     peerDataLocker.value().cloudConnectVersion = requestData.cloudConnectVersion;
+
+    // TODO: #ak Should not mark as listening before sending LISTEN response.
 
     NX_DEBUG(this, lm("Peer %1.%2 started to listen")
         .args(requestData.serverId, requestData.systemId));
 
     m_relayClusterClient->selectRelayInstanceForListeningPeer(
         lm("%1.%2").arg(requestData.serverId).arg(requestData.systemId).toStdString(),
-        [this, serverConnection, completionHandler = std::move(completionHandler),
+        [this, serverConnectionAioThread = serverConnection->getAioThread(),
+            completionHandler = std::move(completionHandler), mediaserverConnectionKey,
             asyncCallLocker = m_counter.getScopedIncrement()](
                 nx::cloud::relay::api::ResultCode resultCode,
                 QUrl relayInstanceUrl)
         {
-            sendListenResponse(
-                serverConnection,
-                resultCode == nx::cloud::relay::api::ResultCode::ok
-                    ? boost::make_optional(relayInstanceUrl)
-                    : boost::none,
-                std::move(completionHandler));
+            // Sending response from connection's aio thread.
+            auto aioCaller = std::make_unique<nx::network::aio::BasicPollable>();
+            aioCaller->bindToAioThread(serverConnectionAioThread);
+            auto aioCallerPtr = aioCaller.get();
+
+            // TODO: #ak Code here looks like shit. Major refactoring is needed.
+            // Likely, it is needed to get rid of shared connections to simplify it.
+
+            aioCallerPtr->post(
+                [this, aioCaller = std::move(aioCaller), mediaserverConnectionKey,
+                    asyncCallLocker = std::move(asyncCallLocker), resultCode,
+                    relayInstanceUrl, completionHandler = std::move(completionHandler)]() mutable
+                {
+                    sendListenResponse(
+                        resultCode == nx::cloud::relay::api::ResultCode::ok
+                            ? boost::make_optional(relayInstanceUrl)
+                            : boost::none,
+                        std::move(completionHandler));
+
+                    reportClientBind(mediaserverConnectionKey);
+                });
         });
 }
 
@@ -374,7 +395,6 @@ void PeerRegistrator::clientBind(
 }
 
 void PeerRegistrator::sendListenResponse(
-    const ConnectionStrongRef& connection,
     boost::optional<QUrl> trafficRelayInstanceUrl,
     std::function<void(api::ResultCode, api::ListenResponse)> responseSender)
 {
@@ -384,8 +404,18 @@ void PeerRegistrator::sendListenResponse(
     response.tcpConnectionKeepAlive = m_settings.stun().keepAliveOptions;
     response.cloudConnectOptions = m_settings.general().cloudConnectOptions;
     responseSender(api::ResultCode::ok, std::move(response));
+}
 
-    sendClientBindIndications(connection);
+void PeerRegistrator::reportClientBind(
+    const MediaserverData& mediaserverConnectionKey)
+{
+    auto peerLocker = m_listeningPeerPool->findAndLockPeerDataByHostName(
+        mediaserverConnectionKey.hostName());
+    if (!peerLocker)
+        return;
+
+    NX_ASSERT(peerLocker->value().peerConnection->isInSelfAioThread());
+    sendClientBindIndications(peerLocker->value().peerConnection);
 }
 
 void PeerRegistrator::sendClientBindIndications(
