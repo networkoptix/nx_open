@@ -37,6 +37,11 @@ struct ServerQueryProcessorAccess
     {
     }
 
+    virtual ~ServerQueryProcessorAccess()
+    {
+        waitForAsyncTasks();
+    }
+
     void waitForAsyncTasks()
     {
         QnMutexLocker lock(&m_runnigAsyncOperationsMutex);
