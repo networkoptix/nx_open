@@ -58,7 +58,11 @@ QString QnMediaResourceHelper::serverName() const
 qreal QnMediaResourceHelper::customAspectRatio() const
 {
     Q_D(const QnMediaResourceHelper);
-    return d->camera ? d->camera->customAspectRatio().toFloat() : 0.0;
+    if (!d->camera)
+        return 0.0;
+
+    const auto customRatio = d->camera->customAspectRatio();
+    return customRatio.isValid() ? customRatio.toFloat() : 0.0;
 }
 
 int QnMediaResourceHelper::customRotation() const
