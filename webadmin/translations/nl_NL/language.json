@@ -87,7 +87,7 @@
         "maxRecordQueueSizeBytes": "Max record queue size (bytes)",
         "maxRecordQueueSizeElements": "Max record queue size (elements)",
         "maxRemoteArchiveSynchronizationThreads": "Max. externe archief synchronisatie",
-        "maxSceneItems": "Max scene items (0 means default)",
+        "maxSceneItems": "Max. scene items (0 betekent default)",
         "proxyConnectTimeoutSec": "Proxy verbinding timeout (seconden)",
         "rtpTimeoutMs": "RTP timeout (milliseconden)",
         "sequentialFlirOnvifSearcherEnabled": "Gebruik sequentiële Flir Onvif-zoeker",

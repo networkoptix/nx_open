@@ -8032,7 +8032,7 @@ to %1</source>
     </message>
     <message>
       <source>No data exported.</source>
-      <translation>Geen gegevens geëxporteerd.</translation>
+      <translation>Er zijn geen gegevens geëxporteerd.</translation>
     </message>
     <message>
       <source>Internal error</source>

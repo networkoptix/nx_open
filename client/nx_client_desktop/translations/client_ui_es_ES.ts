@@ -1093,7 +1093,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/export_media_settings_widget.ui"/>
       <source>Export Settings</source>
-      <translation>Configuración de exportación</translation>
+      <translation>Exportar Configuración</translation>
     </message>
     <message>
       <location/>
@@ -2993,7 +2993,7 @@ The oldest footage among all cameras on the server will be deleted first.</sourc
     <message>
       <location/>
       <source>Font Size</source>
-      <translation>Tamaño de la fuente</translation>
+      <translation>Tamaño de la letra</translation>
     </message>
     <message>
       <location/>

@@ -384,7 +384,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/bookmark_overlay_settings_widget.ui"/>
       <source>Bookmark Info</source>
-      <translation>책갈피 정보</translation>
+      <translation>북마크 정보</translation>
     </message>
     <message>
       <location/>

@@ -220,49 +220,49 @@
     </message>
     <message>
       <source>Paste</source>
-      <translation type="unfinished">Paste</translation>
+      <translation>Incolla</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Seleziona tutto</translation>
     </message>
   </context>
   <context>
     <name>QCocoaTheme</name>
     <message>
       <source>Don&apos;t Save</source>
-      <translation type="unfinished">Don&apos;t Save</translation>
+      <translation>Don&apos;t Salva</translation>
     </message>
   </context>
   <context>
     <name>QColorDialog</name>
     <message>
       <source>Hu&amp;e:</source>
-      <translation type="unfinished">Hu&amp;e:</translation>
+      <translation>Hu &amp; e:</translation>
     </message>
     <message>
       <source>&amp;Sat:</source>
-      <translation type="unfinished">&amp;Sat:</translation>
+      <translation>&amp;Sat:</translation>
     </message>
     <message>
       <source>&amp;Val:</source>
-      <translation type="unfinished">&amp;Val:</translation>
+      <translation>&amp; Val:</translation>
     </message>
     <message>
       <source>&amp;Red:</source>
-      <translation type="unfinished">&amp;Red:</translation>
+      <translation>&amp;Rosso:</translation>
     </message>
     <message>
       <source>&amp;Green:</source>
-      <translation type="unfinished">&amp;Green:</translation>
+      <translation>&amp;Verde:</translation>
     </message>
     <message>
       <source>Bl&amp;ue:</source>
-      <translation type="unfinished">Bl&amp;ue:</translation>
+      <translation>Blu:</translation>
     </message>
     <message>
       <source>A&amp;lpha channel:</source>
-      <translation type="unfinished">A&amp;lpha channel:</translation>
+      <translation>Canale A&amp;lfa:</translation>
     </message>
     <message>
       <source>&amp;HTML:</source>
@@ -271,187 +271,187 @@
     <message>
       <source>Cursor at %1, %2
 Press ESC to cancel</source>
-      <translation type="unfinished">Cursor at %1, %2
-Press ESC to cancel</translation>
+      <translation>Cursore su %1, %2
+Premere ESC per annullare</translation>
     </message>
     <message>
       <source>&amp;Pick Screen Color</source>
-      <translation type="unfinished">&amp;Pick Screen Color</translation>
+      <translation>&amp; Scegli colore schermo</translation>
     </message>
     <message>
       <source>Select Color</source>
-      <translation type="unfinished">Select Color</translation>
+      <translation>Seleziona colore</translation>
     </message>
     <message>
       <source>&amp;Basic colors</source>
-      <translation type="unfinished">&amp;Basic colors</translation>
+      <translation>&amp; Colori di base</translation>
     </message>
     <message>
       <source>&amp;Custom colors</source>
-      <translation type="unfinished">&amp;Custom colors</translation>
+      <translation>&amp;Colori personalizzati</translation>
     </message>
     <message>
       <source>&amp;Add to Custom Colors</source>
-      <translation type="unfinished">&amp;Add to Custom Colors</translation>
+      <translation>&amp; Aggiungi a colori personalizzati</translation>
     </message>
   </context>
   <context>
     <name>QComboBox</name>
     <message>
       <source>False</source>
-      <translation type="unfinished">False</translation>
+      <translation>Falso</translation>
     </message>
     <message>
       <source>True</source>
-      <translation type="unfinished">True</translation>
+      <translation>Vero</translation>
     </message>
     <message>
       <source>Open the combo box selection popup</source>
-      <translation type="unfinished">Open the combo box selection popup</translation>
+      <translation>Apri il popup della selezione della casella combinata</translation>
     </message>
   </context>
   <context>
     <name>QDateTimeParser</name>
     <message>
       <source>AM</source>
-      <translation type="unfinished">AM</translation>
+      <translation>AM</translation>
     </message>
     <message>
       <source>am</source>
-      <translation type="unfinished">am</translation>
+      <translation>am</translation>
     </message>
     <message>
       <source>PM</source>
-      <translation type="unfinished">PM</translation>
+      <translation>PM</translation>
     </message>
     <message>
       <source>pm</source>
-      <translation type="unfinished">pm</translation>
+      <translation>pm</translation>
     </message>
   </context>
   <context>
     <name>QDialog</name>
     <message>
       <source>What&apos;s This?</source>
-      <translation type="unfinished">What&apos;s This?</translation>
+      <translation>Cosa&apos;s Questo?</translation>
     </message>
   </context>
   <context>
     <name>QDialogButtonBox</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
   </context>
   <context>
     <name>QDirModel</name>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nome</translation>
     </message>
     <message>
       <source>Size</source>
-      <translation type="unfinished">Size</translation>
+      <translation>Dimensione</translation>
     </message>
     <message>
       <source>Kind</source>
       <comment>Match OS X Finder</comment>
-      <translation type="unfinished">Kind</translation>
+      <translation>Genere</translation>
     </message>
     <message>
       <source>Type</source>
       <comment>All other platforms</comment>
-      <translation type="unfinished">Type</translation>
+      <translation>Tipo</translation>
     </message>
     <message>
       <source>Date Modified</source>
-      <translation type="unfinished">Date Modified</translation>
+      <translation>Data modificata</translation>
     </message>
   </context>
   <context>
     <name>QFile</name>
     <message>
       <source>Destination file is the same file.</source>
-      <translation type="unfinished">Destination file is the same file.</translation>
+      <translation>Il file di destinazione è lo stesso file.</translation>
     </message>
     <message>
       <source>Source file does not exist.</source>
-      <translation type="unfinished">Source file does not exist.</translation>
+      <translation>Il file di origine non esiste.</translation>
     </message>
     <message>
       <source>Destination file exists</source>
-      <translation type="unfinished">Destination file exists</translation>
+      <translation>Il file di destinazione esiste</translation>
     </message>
     <message>
       <source>Error while renaming.</source>
-      <translation type="unfinished">Error while renaming.</translation>
+      <translation>Errore durante la ridenominazione.</translation>
     </message>
     <message>
       <source>Unable to restore from %1: %2</source>
-      <translation type="unfinished">Unable to restore from %1: %2</translation>
+      <translation>Impossibile ripristinare da %1: %2</translation>
     </message>
     <message>
       <source>Will not rename sequential file using block copy</source>
-      <translation type="unfinished">Will not rename sequential file using block copy</translation>
+      <translation>Non rinominerà il file sequenziale usando la copia di blocco</translation>
     </message>
     <message>
       <source>Cannot remove source file</source>
-      <translation type="unfinished">Cannot remove source file</translation>
+      <translation>Impossibile rimuovere il file di origine</translation>
     </message>
     <message>
       <source>Cannot open %1 for input</source>
-      <translation type="unfinished">Cannot open %1 for input</translation>
+      <translation>Impossibile aprire %1 per l'input</translation>
     </message>
     <message>
       <source>Cannot open for output</source>
-      <translation type="unfinished">Cannot open for output</translation>
+      <translation>Impossibile aprire per l'output</translation>
     </message>
     <message>
       <source>Failure to write block</source>
-      <translation type="unfinished">Failure to write block</translation>
+      <translation>Mancato blocco di scrittura</translation>
     </message>
     <message>
       <source>Cannot create %1 for output</source>
-      <translation type="unfinished">Cannot create %1 for output</translation>
+      <translation>Impossibile creare %1 per l'output</translation>
     </message>
   </context>
   <context>
     <name>QFileDialog</name>
     <message>
       <source>Look in:</source>
-      <translation type="unfinished">Look in:</translation>
+      <translation>Guarda dentro:</translation>
     </message>
     <message>
       <source>Back</source>
-      <translation type="unfinished">Back</translation>
+      <translation>Indietro</translation>
     </message>
     <message>
       <source>Go back</source>
-      <translation type="unfinished">Go back</translation>
+      <translation>Torna indietro</translation>
     </message>
     <message>
       <source>Forward</source>
-      <translation type="unfinished">Forward</translation>
+      <translation>Avanti</translation>
     </message>
     <message>
       <source>Go forward</source>
-      <translation type="unfinished">Go forward</translation>
+      <translation>Vai avanti</translation>
     </message>
     <message>
       <source>Parent Directory</source>
-      <translation type="unfinished">Parent Directory</translation>
+      <translation>Directory principale</translation>
     </message>
     <message>
       <source>Go to the parent directory</source>
-      <translation type="unfinished">Go to the parent directory</translation>
+      <translation>Vai alla directory principale</translation>
     </message>
     <message>
       <source>Create New Folder</source>
-      <translation type="unfinished">Create New Folder</translation>
+      <translation>Crea nuova cartella</translation>
     </message>
     <message>
       <source>Create a New Folder</source>
-      <translation type="unfinished">Create a New Folder</translation>
+      <translation>Creare una nuova cartella</translation>
     </message>
     <message>
       <source>List View</source>
@@ -671,72 +671,72 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>%1 bytes</source>
-      <translation type="unfinished">%1 bytes</translation>
+      <translation>%1 bytes</translation>
     </message>
     <message>
       <source>Invalid filename</source>
-      <translation type="unfinished">Invalid filename</translation>
+      <translation>Nome file non valido</translation>
     </message>
     <message>
       <source>&lt;b&gt;The name &quot;%1&quot; can not be used.&lt;/b&gt;&lt;p&gt;Try using another name, with fewer characters or no punctuations marks.</source>
-      <translation type="unfinished">&lt;b&gt;The name &quot;%1&quot; can not be used.&lt;/b&gt;&lt;p&gt;Try using another name, with fewer characters or no punctuations marks.</translation>
+      <translation>&lt;b&gt;Non è possibile utilizzare il nome &quot;%1&quot;.&lt;/b&gt;&lt;p&gt;Prova ad usare un altro nome, con meno caratteri o senza segni di punteggiatura.</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nome</translation>
     </message>
     <message>
       <source>Size</source>
-      <translation type="unfinished">Size</translation>
+      <translation>Dimensione</translation>
     </message>
     <message>
       <source>Kind</source>
       <comment>Match OS X Finder</comment>
-      <translation type="unfinished">Kind</translation>
+      <translation>Genere</translation>
     </message>
     <message>
       <source>Type</source>
       <comment>All other platforms</comment>
-      <translation type="unfinished">Type</translation>
+      <translation>Tipo</translation>
     </message>
     <message>
       <source>Date Modified</source>
-      <translation type="unfinished">Date Modified</translation>
+      <translation>Data modificata</translation>
     </message>
     <message>
       <source>My Computer</source>
-      <translation type="unfinished">My Computer</translation>
+      <translation>Il mio computer</translation>
     </message>
     <message>
       <source>Computer</source>
-      <translation type="unfinished">Computer</translation>
+      <translation>Computer</translation>
     </message>
     <message>
       <source>%1 byte(s)</source>
-      <translation type="unfinished">%1 byte(s)</translation>
+      <translation>%1 byte (s)</translation>
     </message>
   </context>
   <context>
     <name>QGnomeTheme</name>
     <message>
       <source>&amp;OK</source>
-      <translation type="unfinished">&amp;OK</translation>
+      <translation>&amp;OK</translation>
     </message>
     <message>
       <source>&amp;Save</source>
-      <translation type="unfinished">&amp;Save</translation>
+      <translation>&amp;Salva</translation>
     </message>
     <message>
       <source>&amp;Cancel</source>
-      <translation type="unfinished">&amp;Cancel</translation>
+      <translation>&amp;Annulla</translation>
     </message>
     <message>
       <source>&amp;Close</source>
-      <translation type="unfinished">&amp;Close</translation>
+      <translation>&amp;Chiudere</translation>
     </message>
     <message>
       <source>Close without Saving</source>
-      <translation type="unfinished">Close without Saving</translation>
+      <translation>Chiudi senza salvare</translation>
     </message>
   </context>
   <context>
@@ -744,90 +744,90 @@ Do you want to delete it anyway?</source>
     <message>
       <source>QT_LAYOUT_DIRECTION</source>
       <comment>Translate this string to the string &apos;LTR&apos; in left-to-right languages or to &apos;RTL&apos; in right-to-left languages (such as Hebrew and Arabic) to get proper widget layout.</comment>
-      <translation type="unfinished">QT_LAYOUT_DIRECTION</translation>
+      <translation>QT_LAYOUT_DIRECTION</translation>
     </message>
   </context>
   <context>
     <name>QIODevice</name>
     <message>
       <source>Permission denied</source>
-      <translation type="unfinished">Permission denied</translation>
+      <translation>Permesso negato</translation>
     </message>
     <message>
       <source>Too many open files</source>
-      <translation type="unfinished">Too many open files</translation>
+      <translation>Troppi file aperti</translation>
     </message>
     <message>
       <source>No such file or directory</source>
-      <translation type="unfinished">No such file or directory</translation>
+      <translation>Nessun file o directory con questo nome</translation>
     </message>
     <message>
       <source>No space left on device</source>
-      <translation type="unfinished">No space left on device</translation>
+      <translation>Nessuno spazio su questo dispositivo</translation>
     </message>
     <message>
       <source>Unknown error</source>
-      <translation type="unfinished">Unknown error</translation>
+      <translation>Errore sconosciuto</translation>
     </message>
     <message>
       <source>file to open is a directory</source>
-      <translation type="unfinished">file to open is a directory</translation>
+      <translation>il file da aprire è una directory</translation>
     </message>
   </context>
   <context>
     <name>QImageReader</name>
     <message>
       <source>Invalid device</source>
-      <translation type="unfinished">Invalid device</translation>
+      <translation>Dispositivo non valido</translation>
     </message>
     <message>
       <source>File not found</source>
-      <translation type="unfinished">File not found</translation>
+      <translation>File non trovato</translation>
     </message>
     <message>
       <source>Unsupported image format</source>
-      <translation type="unfinished">Unsupported image format</translation>
+      <translation>Formato immagine non supportato</translation>
     </message>
     <message>
       <source>Unable to read image data</source>
-      <translation type="unfinished">Unable to read image data</translation>
+      <translation>Impossibile leggere i dati dell'immagine</translation>
     </message>
     <message>
       <source>Unknown error</source>
-      <translation type="unfinished">Unknown error</translation>
+      <translation>Errore sconosciuto</translation>
     </message>
   </context>
   <context>
     <name>QImageWriter</name>
     <message>
       <source>Unknown error</source>
-      <translation type="unfinished">Unknown error</translation>
+      <translation>Errore sconosciuto</translation>
     </message>
     <message>
       <source>Device is not set</source>
-      <translation type="unfinished">Device is not set</translation>
+      <translation>Il dispositivo non è impostato</translation>
     </message>
     <message>
       <source>Device not writable</source>
-      <translation type="unfinished">Device not writable</translation>
+      <translation>Dispositivo non scrivibile</translation>
     </message>
     <message>
       <source>Unsupported image format</source>
-      <translation type="unfinished">Unsupported image format</translation>
+      <translation>Formato immagine non supportato</translation>
     </message>
   </context>
   <context>
     <name>QInputDialog</name>
     <message>
       <source>Enter a value:</source>
-      <translation type="unfinished">Enter a value:</translation>
+      <translation>Immettere un valore:</translation>
     </message>
   </context>
   <context>
     <name>QKeySequenceEdit</name>
     <message>
       <source>Press shortcut</source>
-      <translation type="unfinished">Press shortcut</translation>
+      <translation>Premere scorciatoia</translation>
     </message>
     <message>
       <source>%1, ...</source>
@@ -839,73 +839,73 @@ Do you want to delete it anyway?</source>
     <name>QLineEdit</name>
     <message>
       <source>&amp;Undo</source>
-      <translation type="unfinished">&amp;Undo</translation>
+      <translation>&amp;Annulla</translation>
     </message>
     <message>
       <source>&amp;Redo</source>
-      <translation type="unfinished">&amp;Redo</translation>
+      <translation>&amp;Ripristina</translation>
     </message>
     <message>
       <source>Cu&amp;t</source>
-      <translation type="unfinished">Cu&amp;t</translation>
+      <translation>Ta&amp;gliare</translation>
     </message>
     <message>
       <source>&amp;Copy</source>
-      <translation type="unfinished">&amp;Copy</translation>
+      <translation>&amp;Copia</translation>
     </message>
     <message>
       <source>&amp;Paste</source>
-      <translation type="unfinished">&amp;Paste</translation>
+      <translation>&amp;Incolla</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Elimina</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Seleziona tutto</translation>
     </message>
   </context>
   <context>
     <name>QMessageBox</name>
     <message>
       <source>Show Details...</source>
-      <translation type="unfinished">Show Details...</translation>
+      <translation>Mostra dettagli...</translation>
     </message>
     <message>
       <source>Hide Details...</source>
-      <translation type="unfinished">Hide Details...</translation>
+      <translation>Nascondi Dettagli...</translation>
     </message>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Help</source>
-      <translation type="unfinished">Help</translation>
+      <translation>Guida</translation>
     </message>
   </context>
   <context>
     <name>QPlatformTheme</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Save</source>
-      <translation type="unfinished">Save</translation>
+      <translation>Salvare</translation>
     </message>
     <message>
       <source>Save All</source>
-      <translation type="unfinished">Save All</translation>
+      <translation>Salva tutto</translation>
     </message>
     <message>
       <source>Open</source>
-      <translation type="unfinished">Open</translation>
+      <translation>Aperto</translation>
     </message>
     <message>
       <source>&amp;Yes</source>
-      <translation type="unfinished">&amp;Yes</translation>
+      <translation>&amp;Sì</translation>
     </message>
     <message>
       <source>Yes to &amp;All</source>
@@ -1127,49 +1127,49 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation type="unfinished">Scroll Right</translation>
+      <translation>Scorrere verso destra</translation>
     </message>
   </context>
   <context>
     <name>QWhatsThisAction</name>
     <message>
       <source>What&apos;s This?</source>
-      <translation type="unfinished">What&apos;s This?</translation>
+      <translation>Cosa&apos;s Questo?</translation>
     </message>
   </context>
   <context>
     <name>QWidgetTextControl</name>
     <message>
       <source>&amp;Undo</source>
-      <translation type="unfinished">&amp;Undo</translation>
+      <translation>&amp;Annulla</translation>
     </message>
     <message>
       <source>&amp;Redo</source>
-      <translation type="unfinished">&amp;Redo</translation>
+      <translation>&amp;Ripristina</translation>
     </message>
     <message>
       <source>Cu&amp;t</source>
-      <translation type="unfinished">Cu&amp;t</translation>
+      <translation>Ta&amp;gliare</translation>
     </message>
     <message>
       <source>&amp;Copy</source>
-      <translation type="unfinished">&amp;Copy</translation>
+      <translation>&amp;Copia</translation>
     </message>
     <message>
       <source>Copy &amp;Link Location</source>
-      <translation type="unfinished">Copy &amp;Link Location</translation>
+      <translation>Copia e link posizione</translation>
     </message>
     <message>
       <source>&amp;Paste</source>
-      <translation type="unfinished">&amp;Paste</translation>
+      <translation>&amp;Incolla</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Elimina</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Seleziona tutto</translation>
     </message>
   </context>
 </TS>

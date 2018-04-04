@@ -1129,12 +1129,11 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>Filename should not contain the following reserved characters:
 %1</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Имя файла не должно содержать следующие зарезервированные символы: %1</numerusform>
         <numerusform>Имена файлов не должны содержать следующие зарезервированные символы: %1</numerusform>
         <numerusform>Имена файлов не должны содержать следующие зарезервированные символы: %1</numerusform>
-        <numerusform>Filename should not contain the following reserved characters:
-%1</numerusform>
+        <numerusform>Имена файлов не должны содержать следующие зарезервированные символы: %1</numerusform>
       </translation>
     </message>
     <message>
@@ -1387,11 +1386,11 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>...and %n more</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>...и ещё %n</numerusform>
         <numerusform>...и ещё %n</numerusform>
-        <numerusform>...и еще %n</numerusform>
-        <numerusform>...and %n more</numerusform>
+        <numerusform>...и ещё %n</numerusform>
+        <numerusform>...и ещё %n</numerusform>
       </translation>
     </message>
   </context>
@@ -1518,38 +1517,38 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>These devices are removed from System</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Это устройство было удалено из системы</numerusform>
         <numerusform>Эти устройства были удалены из системы</numerusform>
         <numerusform>Эти устройства были удалены из системы</numerusform>
-        <numerusform>These devices are removed from System</numerusform>
+        <numerusform>Эти устройства были удалены из системы</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These cameras are removed from System</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Эта камера была удалена из системы</numerusform>
         <numerusform>Эти камеры были удалены из системы</numerusform>
         <numerusform>Эти камеры были удалены из системы</numerusform>
-        <numerusform>These cameras are removed from System</numerusform>
+        <numerusform>Эти камеры были удалены из системы</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These servers are removed from System</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Этот сервер был удален из системы</numerusform>
         <numerusform>Эти серверы были удалены из системы</numerusform>
         <numerusform>Эти серверы были удалены из системы</numerusform>
-        <numerusform>These servers are removed from System</numerusform>
+        <numerusform>Эти серверы были удалены из системы</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These users are removed from System</source>
       <translation type="unfinished">
-        <numerusform>Этот сервер был удален из системы</numerusform>
-        <numerusform>Эти серверы были удалены из системы</numerusform>
-        <numerusform>Эти серверы были удалены из системы</numerusform>
-        <numerusform>These users are removed from System</numerusform>
+        <numerusform>Этот пользователь был удален из системы</numerusform>
+        <numerusform>Эти пользователи были удалены из системы</numerusform>
+        <numerusform>Эти пользователи были удалены из системы</numerusform>
+        <numerusform>Эти пользователи были удалены из системы</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1558,7 +1557,7 @@ to view more bookmarks</source>
         <numerusform>Этот ресурс был удален из системы</numerusform>
         <numerusform>Эти ресурсы были удалены из системы</numerusform>
         <numerusform>Эти ресурсы были удалены из системы</numerusform>
-        <numerusform>These resources are removed from System</numerusform>
+        <numerusform>Эти ресурсы были удалены из системы</numerusform>
       </translation>
     </message>
     <message>
@@ -1642,7 +1641,7 @@ to view more bookmarks</source>
         <numerusform>%n действие</numerusform>
         <numerusform>%n действия</numerusform>
         <numerusform>%n действий</numerusform>
-        <numerusform>%n action(s)</numerusform>
+        <numerusform>%n действий</numerusform>
       </translation>
     </message>
     <message>
@@ -1795,7 +1794,7 @@ to view more bookmarks</source>
         <numerusform>У вас %n оповещение</numerusform>
         <numerusform>У вас %n оповещения</numerusform>
         <numerusform>У вас %n оповещений</numerusform>
-        <numerusform>You have %n notifications</numerusform>
+        <numerusform>У вас %n оповещений</numerusform>
       </translation>
     </message>
   </context>
@@ -1857,7 +1856,7 @@ to view more bookmarks</source>
         <numerusform>%1 из %n устройств</numerusform>
         <numerusform>%1 из %n устройств</numerusform>
         <numerusform>%1 из %n устройств</numerusform>
-        <numerusform>%1 of %n devices</numerusform>
+        <numerusform>%1 из %n устройств</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1866,7 +1865,7 @@ to view more bookmarks</source>
         <numerusform>%1 из %n камер</numerusform>
         <numerusform>%1 из %n камер</numerusform>
         <numerusform>%1 из %n камер</numerusform>
-        <numerusform>%1 of %n cameras</numerusform>
+        <numerusform>%1 из %n камер</numerusform>
       </translation>
     </message>
     <message>
@@ -1883,7 +1882,7 @@ to view more bookmarks</source>
         <numerusform>%1 из %n модулей ввода/вывода</numerusform>
         <numerusform>%1 из %n модулей ввода/вывода</numerusform>
         <numerusform>%1 из %n модулей ввода/вывода</numerusform>
-        <numerusform>%1 of %n I/O modules</numerusform>
+        <numerusform>%1 из %n модулей ввода/вывода</numerusform>
       </translation>
     </message>
     <message>
@@ -1910,7 +1909,7 @@ to view more bookmarks</source>
         <numerusform>%n Сервер</numerusform>
         <numerusform>%n Сервера</numerusform>
         <numerusform>%n Серверов</numerusform>
-        <numerusform>%n Server(s)</numerusform>
+        <numerusform>%n Серверов</numerusform>
       </translation>
     </message>
     <message>
@@ -1951,7 +1950,7 @@ to view more bookmarks</source>
         <numerusform>Исходная камера и ещё %n камера</numerusform>
         <numerusform>Исходная камера и ещё %n камеры</numerusform>
         <numerusform>Исходная камера и ещё %n камер</numerusform>
-        <numerusform>Source and %n more cameras</numerusform>
+        <numerusform>Исходная камера и ещё %n камер</numerusform>
       </translation>
     </message>
     <message>
@@ -2158,7 +2157,7 @@ to view more bookmarks</source>
         <numerusform>Найдено %n устройство</numerusform>
         <numerusform>Найдено %n устройства</numerusform>
         <numerusform>Найдено %n устройств</numerusform>
-        <numerusform>%n devices found</numerusform>
+        <numerusform>Найдено %n устройств</numerusform>
       </translation>
     </message>
     <message>
@@ -2209,7 +2208,7 @@ to view more bookmarks</source>
         <numerusform>Не удалось добавить %n устройство</numerusform>
         <numerusform>Не удалось добавить %n устройства</numerusform>
         <numerusform>Не удалось добавить %n устройств</numerusform>
-        <numerusform>Failed to add %n devices</numerusform>
+        <numerusform>Не удалось добавить %n устройств</numerusform>
       </translation>
     </message>
     <message>
@@ -2310,7 +2309,7 @@ to view more bookmarks</source>
         <numerusform>%1 не поддерживает двусторонний звук</numerusform>
         <numerusform>%1 не поддерживают двусторонний звук</numerusform>
         <numerusform>%1 не поддерживают двусторонний звук</numerusform>
-        <numerusform>%1 does not support two-way audio</numerusform>
+        <numerusform>%1 не поддерживают двусторонний звук</numerusform>
       </translation>
     </message>
   </context>
@@ -2431,7 +2430,7 @@ to view more bookmarks</source>
         <numerusform>%1 не имеет тревожных входов</numerusform>
         <numerusform>%1 не имеют тревожных входов</numerusform>
         <numerusform>%1 не имеют тревожных входов</numerusform>
-        <numerusform>%1 have no input ports</numerusform>
+        <numerusform>%1 не имеют тревожных входов</numerusform>
       </translation>
     </message>
   </context>
@@ -2473,7 +2472,7 @@ to view more bookmarks</source>
         <numerusform>Найдено %n устройство</numerusform>
         <numerusform>Найдено %n устройства</numerusform>
         <numerusform>Найдено %n устройств</numerusform>
-        <numerusform>%n devices found</numerusform>
+        <numerusform>Найдено %n устройств</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -2482,7 +2481,7 @@ to view more bookmarks</source>
         <numerusform>Найдено %n камера</numerusform>
         <numerusform>Найдено %n камеры</numerusform>
         <numerusform>Найдено %n камер</numerusform>
-        <numerusform>%n cameras found</numerusform>
+        <numerusform>Найдено %n камер</numerusform>
       </translation>
     </message>
     <message>
@@ -2499,7 +2498,7 @@ to view more bookmarks</source>
         <numerusform>Найдено %n модуль ввода-вывода</numerusform>
         <numerusform>Найдено %n модуля ввода-вывода</numerusform>
         <numerusform>Найдено %n модулей ввода-вывода</numerusform>
-        <numerusform>%n I/O modules found</numerusform>
+        <numerusform>Найдено %n модулей ввода-вывода</numerusform>
       </translation>
     </message>
     <message>
@@ -2595,7 +2594,7 @@ to view more bookmarks</source>
         <numerusform>%1 не имеет тревожных выходов</numerusform>
         <numerusform>%1 не имеют тревожных выходов</numerusform>
         <numerusform>%1 не имеют тревожных выходов</numerusform>
-        <numerusform>%1 have no output relays</numerusform>
+        <numerusform>%1 не имеют тревожных выходов</numerusform>
       </translation>
     </message>
   </context>

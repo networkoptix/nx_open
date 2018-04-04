@@ -166,7 +166,7 @@
     <message>
       <location/>
       <source>Event Type:</source>
-      <translation type="unfinished">Event Type:</translation>
+      <translation>Tipo di evento:</translation>
     </message>
   </context>
   <context>
@@ -384,7 +384,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/bookmark_overlay_settings_widget.ui"/>
       <source>Bookmark Info</source>
-      <translation type="unfinished">Bookmark Info</translation>
+      <translation>Informazioni sui segnalibri</translation>
     </message>
     <message>
       <location/>
@@ -394,17 +394,17 @@
     <message>
       <location/>
       <source>Area Width</source>
-      <translation type="unfinished">Area Width</translation>
+      <translation>Larghezza dell'area</translation>
     </message>
     <message>
       <location/>
       <source>Font Size</source>
-      <translation type="unfinished">Font Size</translation>
+      <translation>Dimensione del font</translation>
     </message>
     <message>
       <location/>
       <source>Include description</source>
-      <translation type="unfinished">Include description</translation>
+      <translation>Includere la descrizione</translation>
     </message>
   </context>
   <context>
@@ -713,42 +713,42 @@
     <message>
       <location/>
       <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-      <translation type="unfinished">Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</translation>
+      <translation>Non modificare queste impostazioni se non si è assolutamente sicuri del loro potenziale impatto sulle prestazioni del sistema.</translation>
     </message>
     <message>
       <location/>
       <source>Camera Settings</source>
-      <translation type="unfinished">Camera Settings</translation>
+      <translation>Impostazioni telecamera</translation>
     </message>
     <message>
       <location/>
       <source>Keep camera stream and profile settings</source>
-      <translation type="unfinished">Keep camera stream and profile settings</translation>
+      <translation>Mantenere le impostazioni di flusso e il profilo della telecamera</translation>
     </message>
     <message>
       <location/>
       <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
-      <translation type="unfinished">Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</translation>
+      <translation>Le impostazioni relative alla qualità e alla frequenza dei fotogrammi (FPS) nel programma di registrazione diventeranno irrilevanti.</translation>
     </message>
     <message>
       <location/>
       <source>Calculate bitrate per GOP instead of bitrate per second</source>
-      <translation type="unfinished">Calculate bitrate per GOP instead of bitrate per second</translation>
+      <translation>Calcola il bitrate per GOP invece del bitrate al secondo</translation>
     </message>
     <message>
       <location/>
       <source>It will increase bitrate for camera.</source>
-      <translation type="unfinished">It will increase bitrate for camera.</translation>
+      <translation>Aumenterà il bitrate per la telecamera.</translation>
     </message>
     <message>
       <location/>
       <source>Secondary Stream</source>
-      <translation type="unfinished">Secondary Stream</translation>
+      <translation>Stream secondario</translation>
     </message>
     <message>
       <location/>
       <source>Disable secondary stream</source>
-      <translation type="unfinished">Disable secondary stream</translation>
+      <translation>Disabilitare il flusso secondario</translation>
     </message>
     <message>
       <location/>
@@ -763,17 +763,17 @@
     <message>
       <location/>
       <source>Archive</source>
-      <translation type="unfinished">Archive</translation>
+      <translation>Archivio</translation>
     </message>
     <message>
       <location/>
       <source>Media Streaming</source>
-      <translation type="unfinished">Media Streaming</translation>
+      <translation>Streaming multimediale</translation>
     </message>
     <message>
       <location/>
       <source>PTZ</source>
-      <translation type="unfinished">PTZ</translation>
+      <translation>PTZ</translation>
     </message>
   </context>
   <context>
@@ -905,7 +905,7 @@
     <message>
       <location/>
       <source>Bitrate</source>
-      <translation type="unfinished">Bitrate</translation>
+      <translation>Bitrate</translation>
     </message>
   </context>
   <context>
@@ -1080,12 +1080,12 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/export_layout_settings_widget.ui"/>
       <source>Export Settings</source>
-      <translation type="unfinished">Export Settings</translation>
+      <translation>Impostazioni di esportazione</translation>
     </message>
     <message>
       <location/>
       <source>Make read-only</source>
-      <translation type="unfinished">Make read-only</translation>
+      <translation>Rendere di sola lettura</translation>
     </message>
   </context>
   <context>
@@ -1093,22 +1093,22 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/export_media_settings_widget.ui"/>
       <source>Export Settings</source>
-      <translation type="unfinished">Export Settings</translation>
+      <translation>Impostazioni di esportazione</translation>
     </message>
     <message>
       <location/>
       <source>Apply Filters</source>
-      <translation type="unfinished">Apply Filters</translation>
+      <translation>Applica filtri</translation>
     </message>
     <message>
       <location/>
       <source>Rotation, Dewarping, Image Enhancement etc.</source>
-      <translation type="unfinished">Rotation, Dewarping, Image Enhancement etc.</translation>
+      <translation>Rotazione, Dewarping, miglioramento dell'immagine, ecc.</translation>
     </message>
     <message>
       <location/>
       <source>Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</source>
-      <translation type="unfinished">Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</translation>
+      <translation>L'applicazione di filtri e l'aggiunta di sovrapposizioni richiedono la transcodifica che aumenterà l'utilizzo della CPU e potrebbe richiedere molto tempo.</translation>
     </message>
   </context>
   <context>
@@ -1144,22 +1144,22 @@
     <message>
       <location filename="../src/nx/client/desktop/export/dialogs/export_settings_dialog.ui"/>
       <source>Export Video</source>
-      <translation type="unfinished">Export Video</translation>
+      <translation>Esporta video</translation>
     </message>
     <message>
       <location/>
       <source>Single Camera</source>
-      <translation type="unfinished">Single Camera</translation>
+      <translation>Singola telecamera</translation>
     </message>
     <message>
       <location/>
       <source>Export Settings</source>
-      <translation type="unfinished">Export Settings</translation>
+      <translation>Impostazioni di esportazione</translation>
     </message>
     <message>
       <location/>
       <source>Multi Video</source>
-      <translation type="unfinished">Multi Video</translation>
+      <translation>Multi Video</translation>
     </message>
   </context>
   <context>
@@ -1337,12 +1337,12 @@
     <message>
       <location/>
       <source>Opacity</source>
-      <translation type="unfinished">Opacity</translation>
+      <translation>Opacità</translation>
     </message>
     <message>
       <location/>
       <source>Default</source>
-      <translation type="unfinished">Default</translation>
+      <translation>Predefinito</translation>
     </message>
     <message>
       <location/>
@@ -2296,32 +2296,32 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/rapid_review_settings_widget.ui"/>
       <source>Rapid Review</source>
-      <translation type="unfinished">Rapid Review</translation>
+      <translation>Revisione rapida</translation>
     </message>
     <message>
       <location/>
       <source>Initial video length</source>
-      <translation type="unfinished">Initial video length</translation>
+      <translation>Lunghezza del video iniziale</translation>
     </message>
     <message>
       <location/>
       <source>Exported video length</source>
-      <translation type="unfinished">Exported video length</translation>
+      <translation>Lunghezza del video esportato</translation>
     </message>
     <message>
       <location/>
       <source>Speed</source>
-      <translation type="unfinished">Speed</translation>
+      <translation>Velocità</translation>
     </message>
     <message>
       <location/>
       <source>Frames interval</source>
-      <translation type="unfinished">Frames interval</translation>
+      <translation>Intervallo tra fotogrammi</translation>
     </message>
     <message>
       <location/>
       <source>Reset Speed</source>
-      <translation type="unfinished">Reset Speed</translation>
+      <translation>Ripristina velocità</translation>
     </message>
   </context>
   <context>
@@ -2984,7 +2984,7 @@ The oldest footage among all cameras on the server will be deleted first.</trans
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/text_overlay_settings_widget.ui"/>
       <source>Text</source>
-      <translation type="unfinished">Text</translation>
+      <translation>Testo</translation>
     </message>
     <message>
       <location/>
@@ -2994,17 +2994,17 @@ The oldest footage among all cameras on the server will be deleted first.</trans
     <message>
       <location/>
       <source>Font Size</source>
-      <translation type="unfinished">Font Size</translation>
+      <translation>Dimensione del font</translation>
     </message>
     <message>
       <location/>
       <source>Enter plain text or HTML</source>
-      <translation type="unfinished">Enter plain text or HTML</translation>
+      <translation>Immettere testo normale o HTML</translation>
     </message>
     <message>
       <location/>
       <source>Area Width</source>
-      <translation type="unfinished">Area Width</translation>
+      <translation>Larghezza dell'area</translation>
     </message>
   </context>
   <context>
@@ -3025,17 +3025,17 @@ The oldest footage among all cameras on the server will be deleted first.</trans
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/timestamp_overlay_settings_widget.ui"/>
       <source>Timestamp</source>
-      <translation type="unfinished">Timestamp</translation>
+      <translation>Data e ora</translation>
     </message>
     <message>
       <location/>
       <source>Font Size</source>
-      <translation type="unfinished">Font Size</translation>
+      <translation>Dimensione del font</translation>
     </message>
     <message>
       <location/>
       <source>Format</source>
-      <translation type="unfinished">Format</translation>
+      <translation>Formato</translation>
     </message>
     <message>
       <location/>
