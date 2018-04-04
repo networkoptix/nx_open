@@ -13,6 +13,7 @@ public:
     static QString defaultCloudPortalUrl(const QString& cloudHost);
     static QString defaultCloudModulesXmlUrl(const QString& cloudHost);
     static QString cloudName();
+    static QString shortCloudName();
     static QStringList compatibleCloudHosts();
 };
 

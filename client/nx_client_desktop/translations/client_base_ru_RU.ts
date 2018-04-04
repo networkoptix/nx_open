@@ -850,11 +850,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Wearable Camera...</source>
-      <translation>Носимая камера...</translation>
+      <translation>Портативная камера...</translation>
     </message>
     <message>
       <source>New Wearable Camera...</source>
-      <translation>Новая носимая камера...</translation>
+      <translation>Новая портативная камера...</translation>
     </message>
     <message>
       <source>Upload File...</source>
@@ -2810,11 +2810,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Cannot edit properties for several wearable and non-wearable cameras.</source>
-      <translation>Свойства для носимых и обычных камер нельзя редактировать одновременно.</translation>
+      <translation>Свойства для портативных и обычных камер нельзя редактировать одновременно.</translation>
     </message>
     <message>
       <source>Cannot edit properties for several wearable cameras.</source>
-      <translation>Свойства для нескольких носимых камер нельзя редактировать одновременно.</translation>
+      <translation>Свойства для нескольких портативных камер нельзя редактировать одновременно.</translation>
     </message>
   </context>
   <context>
@@ -3367,10 +3367,6 @@ to %1</source>
       <translation>Отключить</translation>
     </message>
     <message>
-      <source>All cloud users will be deleted.</source>
-      <translation>Все облачные пользователи будут удалены.</translation>
-    </message>
-    <message>
       <source>Failed to disconnect System from %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>Не удалось отключить систему от %1</translation>
@@ -3388,6 +3384,11 @@ to %1</source>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>Вы не сможете подключиться к этой системе с вашей учетной записью %1, после того, как вы отключите эту систему от %1.</translation>
+    </message>
+    <message>
+      <source>All %1 users will be deleted.</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">All %1 users will be deleted.</translation>
     </message>
   </context>
   <context>
@@ -4782,11 +4783,11 @@ to %1</source>
     <name>QnNewWearableCameraDialog</name>
     <message>
       <source>Wearable Camera</source>
-      <translation>Носимая камера</translation>
+      <translation>Портативная камера</translation>
     </message>
     <message>
       <source>Wearable Camera %1</source>
-      <translation>Носимая камера %1</translation>
+      <translation>Портативная камера %1</translation>
     </message>
     <message>
       <source>Name</source>
@@ -7001,16 +7002,17 @@ to %1</source>
       <translation>Локальный пользователь</translation>
     </message>
     <message>
-      <source>Cloud user</source>
-      <translation>Облачный пользователь</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>Логин</translation>
     </message>
     <message>
       <source>Role</source>
       <translation>Роль</translation>
+    </message>
+    <message>
+      <source>%1 user</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 user</translation>
     </message>
   </context>
   <context>
@@ -7207,10 +7209,6 @@ to %1</source>
       <translation>Локальный</translation>
     </message>
     <message>
-      <source>Cloud</source>
-      <translation>Облачный</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>Логин</translation>
     </message>
@@ -7251,8 +7249,9 @@ to %1</source>
       <translation>Введённые пароли не совпадают.</translation>
     </message>
     <message>
-      <source>Cloud user with specified email already exists.</source>
-      <translation>Облачный пользователь с таким Email уже существует.</translation>
+      <source>%1 user with specified email already exists.</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 user with specified email already exists.</translation>
     </message>
   </context>
   <context>
@@ -7479,10 +7478,6 @@ to %1</source>
       <translation>Общее количество лицензий уменьшится</translation>
     </message>
     <message>
-      <source>Cloud Systems cannot be merged</source>
-      <translation>Облачные системы не могут быть объединены</translation>
-    </message>
-    <message>
       <source>Connecting to the current System...</source>
       <translation>Подключение к текущей системе...</translation>
     </message>
@@ -7501,6 +7496,11 @@ to %1</source>
     <message>
       <source>Administrator password</source>
       <translation>Пароль администратора</translation>
+    </message>
+    <message>
+      <source>%1 Systems cannot be merged</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 Systems cannot be merged</translation>
     </message>
   </context>
   <context>
@@ -7766,7 +7766,7 @@ to %1</source>
     </message>
     <message>
       <source>Open Wearable Camera Recordings...</source>
-      <translation>Открыть записи по носимой камере...</translation>
+      <translation>Открыть записи по портативной камере...</translation>
     </message>
     <message>
       <source>Only video files with correct timestamp are supported.</source>
@@ -7782,7 +7782,7 @@ to %1</source>
     </message>
     <message>
       <source>Failed to add wearable camera</source>
-      <translation>Не удалось добавить носимую камеру</translation>
+      <translation>Не удалось добавить портативную камеру</translation>
     </message>
     <message>
       <source>No video files found in selected folder</source>
@@ -7822,10 +7822,10 @@ to %1</source>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Wearable Camera.</source>
       <translation>
-        <numerusform>Вы можете загрузить этот файл в другой экземпляр носимой камеры.</numerusform>
-        <numerusform>Вы можете загрузить эти файлы в другой экземпляр носимой камеры.</numerusform>
-        <numerusform>Вы можете загрузить эти файлы в другой экземпляр носимой камеры.</numerusform>
-        <numerusform>Вы можете загрузить эти файлы в другой экземпляр носимой камеры.</numerusform>
+        <numerusform>Вы можете загрузить этот файл в другой экземпляр портативной камеры.</numerusform>
+        <numerusform>Вы можете загрузить эти файлы в другой экземпляр портативной камеры.</numerusform>
+        <numerusform>Вы можете загрузить эти файлы в другой экземпляр портативной камеры.</numerusform>
+        <numerusform>Вы можете загрузить эти файлы в другой экземпляр портативной камеры.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -7860,20 +7860,20 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
-      <translation type="unfinished">
-        <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
-        <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
-        <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
-        <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+      <translation>
+        <numerusform>Выбранный файл был записан %1, но могут быть загружены только файлы, записанные за последний %n день. Вы можете изменить это в настройках архива камеры.</numerusform>
+        <numerusform>Выбранны файл был записан %1, но могут быть загружены только файлы, записанные за последние %n дня. Вы можете изменить это в настройках архива камеры.</numerusform>
+        <numerusform>Выбранны файл был записан %1, но могут быть загружены только файлы, записанные за последниq %n дней. Вы можете изменить это в настройках архива камеры.</numerusform>
+        <numerusform>Выбранны файл был записан %1, но могут быть загружены только файлы, записанные за последниq %n дней. Вы можете изменить это в настройках архива камеры.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
-      <translation type="unfinished">
-        <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
-        <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
-        <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
-        <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+      <translation>
+        <numerusform>Выбранны файл был записан между %1 и %2, но могут быть загружены только файлы, записанные за последний %n день. Вы можете изменить это в настройках архива камеры.</numerusform>
+        <numerusform>Выбранны файл был записан между %1 и %2, но могут быть загружены только файлы, записанные за последние %n дня. Вы можете изменить это в настройках архива камеры.</numerusform>
+        <numerusform>Выбранны файл был записан между %1 и %2, но могут быть загружены только файлы, записанные за последние %n дней. Вы можете изменить это в настройках архива камеры.</numerusform>
+        <numerusform>Выбранны файл был записан между %1 и %2, но могут быть загружены только файлы, записанные за последние %n дней. Вы можете изменить это в настройках архива камеры.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -7887,11 +7887,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
-      <translation type="unfinished">
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+      <translation>
+        <numerusform>На сервере почти не осталось свободного места. Чтобы освободить место некоторые старые записи можно удалить. Обратите внимание, что если выбранные файлы являются самыми старыми на сервере, они будут удалены сразу же после их загрузки.</numerusform>
+        <numerusform>На сервере почти не осталось свободного места. Чтобы освободить место некоторые старые записи можно удалить. Обратите внимание, что если выбранные файлы являются самыми старыми на сервере, они будут удалены сразу же после их загрузки.</numerusform>
+        <numerusform>На сервере почти не осталось свободного места. Чтобы освободить место некоторые старые записи можно удалить. Обратите внимание, что если выбранные файлы являются самыми старыми на сервере, они будут удалены сразу же после их загрузки.</numerusform>
+        <numerusform>На сервере почти не осталось свободного места. Чтобы освободить место некоторые старые записи можно удалить. Обратите внимание, что если выбранные файлы являются самыми старыми на сервере, они будут удалены сразу же после их загрузки.</numerusform>
       </translation>
     </message>
     <message>
@@ -8163,11 +8163,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Some video file(s) are still being uploaded to %n wearable cameras:</source>
-      <translation type="unfinished">
-        <numerusform>Some video file(s) are still being uploaded to %n wearable cameras:</numerusform>
-        <numerusform>Some video file(s) are still being uploaded to %n wearable cameras:</numerusform>
-        <numerusform>Some video file(s) are still being uploaded to %n wearable cameras:</numerusform>
-        <numerusform>Some video file(s) are still being uploaded to %n wearable cameras:</numerusform>
+      <translation>
+        <numerusform>Этот видео файл до сих пор загружается в %n портативную камеру:</numerusform>
+        <numerusform>Эти видео файлы до сих пор загружаются в %n портативные камеры:</numerusform>
+        <numerusform>Эти видео файлы до сих пор загружаются в %n портативных камер:</numerusform>
+        <numerusform>Эти видео файлы до сих пор загружаются в %n портативных камер:</numerusform>
       </translation>
     </message>
   </context>
@@ -8952,7 +8952,7 @@ to %1</source>
     </message>
     <message>
       <source>Wearable Cameras cannot be moved between servers</source>
-      <translation>Носимые камеры нельзя перемещать между серверами</translation>
+      <translation>Портативные камеры нельзя перемещать между серверами</translation>
     </message>
     <message>
       <source>Failed to change password</source>

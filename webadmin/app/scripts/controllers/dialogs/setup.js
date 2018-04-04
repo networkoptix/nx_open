@@ -139,7 +139,10 @@ angular.module('webadminApp')
                     if($scope.serverInfo.flags.canSetupNetwork){
                         mediaserver.networkSettings().then(function(r){
                             var settings = r.data.reply;
-                            $scope.IP = settings[0].ipAddr;
+                            var activeSettings = _.find(settings,function(setting){
+                                return !!setting.ipAddr;
+                            }) || settings[0];
+                            $scope.IP = activeSettings.ipAddr;
                             $scope.serverAddress = $scope.IP + ':' + $scope.port;
                         });
                     }

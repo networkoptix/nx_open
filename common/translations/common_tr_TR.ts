@@ -87,8 +87,9 @@
       <translation>Bulunan %1 Sistemi geçerli sistemi ile uyuşmuyor.</translation>
     </message>
     <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <translation>Bukut tabanlı sistemler ancak bulut olmatan bir sistem ile birleştirebilir. Sistem ismi ve şifre bulut sistemden alınacaktır.</translation>
+      <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 System can only be merged with non-%1. System name and password are taken from %1 System.</translation>
     </message>
   </context>
   <context>

@@ -72,6 +72,7 @@ module.exports = {
             '$': 'jquery',
             'jQuery': 'jquery',
             'window.jQuery': 'jquery',
+            'QWebChannel': 'qwebchannel',
             '_': 'underscore',
             'Base64': 'base-64',
             'screenfull': 'screenfull'

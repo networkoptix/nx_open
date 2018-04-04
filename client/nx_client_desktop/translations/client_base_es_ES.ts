@@ -3300,10 +3300,6 @@ a %1</translation>
       <translation>Desconectar</translation>
     </message>
     <message>
-      <source>All cloud users will be deleted.</source>
-      <translation>Se eliminarán todos los usuarios de la nube.</translation>
-    </message>
-    <message>
       <source>Failed to disconnect System from %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>Error al desconectar el sistema de %1</translation>
@@ -3321,6 +3317,11 @@ a %1</translation>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>Usted no será capaz de conectarse a este sistema con su cuenta %1 después de desconectar este sistema de %1.</translation>
+    </message>
+    <message>
+      <source>All %1 users will be deleted.</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">All %1 users will be deleted.</translation>
     </message>
   </context>
   <context>
@@ -6847,16 +6848,17 @@ a %1</translation>
       <translation>Usuario local</translation>
     </message>
     <message>
-      <source>Cloud user</source>
-      <translation>Usuario de Nube</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>Iniciar Sesión</translation>
     </message>
     <message>
       <source>Role</source>
       <translation>Role</translation>
+    </message>
+    <message>
+      <source>%1 user</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 user</translation>
     </message>
   </context>
   <context>
@@ -7051,10 +7053,6 @@ a %1</translation>
       <translation>Local</translation>
     </message>
     <message>
-      <source>Cloud</source>
-      <translation>Nube</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>Usuario</translation>
     </message>
@@ -7095,8 +7093,9 @@ a %1</translation>
       <translation>Las contraseñas no coinciden.</translation>
     </message>
     <message>
-      <source>Cloud user with specified email already exists.</source>
-      <translation>El usuario de la nube con el correo electrónico especificado ya existe.</translation>
+      <source>%1 user with specified email already exists.</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 user with specified email already exists.</translation>
     </message>
   </context>
   <context>
@@ -7319,10 +7318,6 @@ a %1</translation>
       <translation>El monto total de licencias disminuirá</translation>
     </message>
     <message>
-      <source>Cloud Systems cannot be merged</source>
-      <translation>Los Sistemas de la nube no pueden ser combinados</translation>
-    </message>
-    <message>
       <source>Connecting to the current System...</source>
       <translation>Conectando al Sistema actual...</translation>
     </message>
@@ -7341,6 +7336,11 @@ a %1</translation>
     <message>
       <source>Administrator password</source>
       <translation>Contraseña de administrador</translation>
+    </message>
+    <message>
+      <source>%1 Systems cannot be merged</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 Systems cannot be merged</translation>
     </message>
   </context>
   <context>
