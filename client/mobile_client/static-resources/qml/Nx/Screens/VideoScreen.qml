@@ -139,10 +139,10 @@ PageBase
         leftButtonIcon: lp("/images/arrow_back.png")
         onLeftButtonClicked: Workflow.popCurrentScreen()
         background: Image
-        {
+        {            
+            y: -toolBar.statusBarHeight
             width: parent.width
             height: 96
-            anchors.topMargin: -toolBar.statusBarHeight
             source: lp("/images/toolbar_gradient.png")
         }
 
