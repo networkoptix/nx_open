@@ -7,6 +7,7 @@
 #include <QtCore/QStringList>
 #include <QtCore/QUrl>
 #include <common/common_globals.h>
+#include <nx/utils/thread/mutex.h>
 
 namespace nx {
 namespace mediaserver {
@@ -26,12 +27,16 @@ public:
     bool changeOwner(const QString& path);
     bool touchFile(const QString& path);
     bool makeDirectory(const QString& path);
+    bool removePath(const QString& path);
+    bool rename(const QString& oldPath, const QString& newPath);
+    int open(const QString& path, QIODevice::OpenMode mode);
 
 private:
     int execute(const std::vector<QString>& args);
 
 private:
     const QString m_toolPath;
+    QnMutex m_mutex;
 };
 
 /** Finds tool next to a appticationPath. */

@@ -136,7 +136,6 @@ QnSharedResourcePointer<QnAbstractVideoCamera> QnLiveStreamProvider::getOwner() 
 void QnLiveStreamProvider::setRole(Qn::ConnectionRole role)
 {
     QnAbstractMediaStreamDataProvider::setRole(role);
-    QnMutexLocker mtx(&m_liveMutex);
     updateSoftwareMotion();
 
     const auto roleForAnalytics = ini().analyzeSecondaryStream
@@ -152,7 +151,6 @@ void QnLiveStreamProvider::setRole(Qn::ConnectionRole role)
 
 Qn::ConnectionRole QnLiveStreamProvider::getRole() const
 {
-    QnMutexLocker lock(&m_liveMutex);
     return m_role;
 }
 

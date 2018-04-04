@@ -384,7 +384,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/bookmark_overlay_settings_widget.ui"/>
       <source>Bookmark Info</source>
-      <translation>책갈피 정보</translation>
+      <translation>북마크 정보</translation>
     </message>
     <message>
       <location/>
@@ -3044,12 +3044,12 @@
     <message>
       <location/>
       <source>There are no custom user roles yet.</source>
-      <translation type="unfinished">There are no custom user roles yet.</translation>
+      <translation>지정된 사용자 역할은 아직 없습니다.</translation>
     </message>
     <message>
       <location/>
       <source>Click &quot;New role&quot; button to create one.</source>
-      <translation type="unfinished">Click &quot;New role&quot; button to create one.</translation>
+      <translation>&quot;새 역할&quot; 버튼을 클릭하여 만듭니다.</translation>
     </message>
   </context>
   <context>

@@ -1,8 +1,8 @@
 import pytest
 from pathlib2 import Path
 
-from framework.os_access import LocalAccess
 from framework.move_lock import MoveLock
+from framework.os_access.local import LocalAccess
 
 
 @pytest.fixture(scope='session')

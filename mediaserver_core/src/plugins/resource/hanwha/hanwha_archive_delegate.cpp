@@ -141,6 +141,12 @@ QnAbstractMediaDataPtr HanwhaArchiveDelegate::getNextData()
         return rez;
     }
 
+    if (result && result->dataType == QnAbstractMediaData::EMPTY_DATA)
+    {
+        if (auto resource = m_streamReader->getResource())
+            NX_VERBOSE(this, lm("Send empty packet for camera %1").arg(resource->getUrl()));
+    }
+
     return result;
 }
 
@@ -237,7 +243,7 @@ void HanwhaArchiveDelegate::setOverlappedId(nx::core::resource::OverlappedId ove
 void HanwhaArchiveDelegate::setPlaybackMode(PlaybackMode mode)
 {
     m_playbackMode = mode;
-    m_isSeekAlignedByChunkBorder = true;
+    m_isSeekAlignedByChunkBorder = false; //< I expect this variable is not required any more since we can sends empty frames before first video packet.
     auto& rtspClient = m_streamReader->rtspClient();
     switch (mode)
     {

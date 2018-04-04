@@ -112,7 +112,7 @@ def get_server_admin(server):
 
 
 def with_traceback(fn):
-    @wraps(fn)  # critical for Factory.map to work
+    @wraps(fn)  # critical for VMFactory.map to work
     def wrapper(*args, **kw):
         try:
             return fn(*args, **kw)

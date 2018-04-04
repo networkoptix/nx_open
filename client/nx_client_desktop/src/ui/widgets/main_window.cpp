@@ -178,10 +178,13 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     // But with this line Mac OS shows white background in place of QGraphicsView when application enters or
     // exits fullscreen mode.
 //    mac_initFullScreen((void*)winId(), (void*)this);
+
+    // Since we have patch qt563_macos_window_level.patch we have to discard hidesOnDeactivate
+    // flag for main window. Otherwise, each time it looses focus it becomes hidden.
+    setHidesOnDeactivate(winId(), false);
 #endif
 
     setAttribute(Qt::WA_AlwaysShowToolTips);
-
     /* And file open events on Mac. */
     installEventHandler(qApp, QEvent::FileOpen, this, &MainWindow::at_fileOpenSignalizer_activated);
 

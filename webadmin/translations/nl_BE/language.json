@@ -183,7 +183,7 @@
             "collapse all servers": "vouw alle servers samen",
             "collapse server": "collapse server + [server name]",
             "play": "afspelen",
-            "clear search": "zoekopdracht wissen",
+            "clear search": "wis zoekopdracht",
             "live": "go to live | show me live",
             "expand all servers": "vouw alle servers uit",
             "stop listening": "stop met luisteren",
@@ -215,7 +215,7 @@
             "noData": "Geen data",
             "flashRequired": "Gelieve <a href='https://get.adobe.com/flashplayer/' target='_blank'> Adobe Flash</a> te installeren voor het afspelen van video's."
         },
-        "chromeCastWarning": "Chromecast vraagt veel systeem resources en kan problemen veroorzaken op uw server.",
+        "chromeCastWarning": "Een Chromecast vraagt veel resources en kan tot prestatieproblemen lijden op uw server.",
         "resolution": {
             "high": "Hoog",
             "auto": "Automatisch",

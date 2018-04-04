@@ -363,8 +363,7 @@ void MutexLockAnalyzer::afterMutexLocked( const MutexLockKey& mutexLockPosition 
 
             readLock.unlock();
 
-            NX_LOG( deadLockMsg, cl_logALWAYS );
-            std::cerr<<deadLockMsg.toStdString()<<std::endl;
+            std::cerr << deadLockMsg.toStdString() << std::endl;
 
             #if defined(_WIN32)
                 DebugBreak();
