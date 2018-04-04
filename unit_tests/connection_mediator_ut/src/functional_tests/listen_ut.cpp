@@ -13,6 +13,7 @@
 
 #include <listening_peer_pool.h>
 #include <mediator_service.h>
+#include <relay/relay_cluster_client_factory.h>
 #include <test_support/mediaserver_emulator.h>
 
 #include "functional_tests/mediator_functional_test.h"
@@ -47,9 +48,19 @@ public:
     }
 
 protected:
+    // TODO: #ak Get rid of this method.
+    void givenListeningMediaServer()
+    {
+        m_mediaServerEmulator = addRandomServer(system(), boost::none);
+        ASSERT_NE(nullptr, m_mediaServerEmulator);
+        ASSERT_EQ(
+            nx::hpm::api::ResultCode::ok,
+            m_mediaServerEmulator->listen().first);
+    }
+
     void givenListeningServer()
     {
-        establishListeningConnectionToMediator();
+        whenServerEstablishesNewConnection();
     }
 
     void whenStopServer()
@@ -59,7 +70,14 @@ protected:
 
     void whenServerEstablishesNewConnection()
     {
-        establishListeningConnectionToMediator();
+        establishListeningConnectionToMediatorAsync();
+        assertConnectionToMediatorHasBeenEstablished();
+    }
+
+    void whenCloseConnectionToMediator()
+    {
+        m_serverConnections.back()->pleaseStopSync();
+        m_serverConnections.pop_back();
     }
 
     void thenSystemDisappearedFromListeningPeerList()
@@ -106,26 +124,7 @@ protected:
         return m_mediaServerEmulator->serverId() + "." + m_system.id;
     }
 
-private:
-    nx::hpm::AbstractCloudDataProvider::System m_system;
-    std::unique_ptr<MediaServerEmulator> m_mediaServerEmulator;
-    nx::String m_serverId;
-    std::vector<std::shared_ptr<nx::network::stun::AsyncClient>> m_serverConnections;
-    nx::utils::SyncQueue<nx::network::stun::AsyncClient*> m_closeConnectionEvents;
-
-    virtual void SetUp() override
-    {
-        ASSERT_TRUE(startAndWaitUntilStarted());
-
-        m_system = addRandomSystem();
-        m_mediaServerEmulator = addRandomServer(system(), boost::none);
-        ASSERT_NE(nullptr, m_mediaServerEmulator);
-        ASSERT_EQ(
-            nx::hpm::api::ResultCode::ok,
-            m_mediaServerEmulator->listen().first);
-    }
-
-    void establishListeningConnectionToMediator()
+    void establishListeningConnectionToMediatorAsync()
     {
         using namespace std::placeholders;
 
@@ -137,26 +136,44 @@ private:
         auto connection = std::make_unique<nx::hpm::api::MediatorServerTcpConnection>(
             stunClient,
             this);
-        auto connectionGuard = makeScopeGuard(
-            [&connection]() { connection->pleaseStopSync(); });
+        m_serverConnections.push_back(std::move(stunClient));
 
         nx::hpm::api::ListenRequest request;
         request.systemId = m_system.id;
         request.serverId = m_serverId;
-        nx::utils::promise<
-            std::tuple<nx::hpm::api::ResultCode, nx::hpm::api::ListenResponse>> done;
-        connection->listen(
+        auto connectionPtr = connection.get();
+        connectionPtr->listen(
             request,
-            [&done](
+            [this, connection = std::move(connection)](
                 nx::hpm::api::ResultCode resultCode,
-                nx::hpm::api::ListenResponse response)
+                nx::hpm::api::ListenResponse response) mutable
             {
-                done.set_value(std::make_tuple(resultCode, std::move(response)));
+                m_listenResponseQueue.push(
+                    std::make_tuple(resultCode, std::move(response)));
+                connection.reset();
             });
-        const auto result = done.get_future().get();
-        ASSERT_EQ(nx::hpm::api::ResultCode::ok, std::get<0>(result));
+    }
 
-        m_serverConnections.push_back(std::move(stunClient));
+    void assertConnectionToMediatorHasBeenEstablished()
+    {
+        const auto result = m_listenResponseQueue.pop();
+        ASSERT_EQ(nx::hpm::api::ResultCode::ok, std::get<0>(result));
+    }
+
+private:
+    nx::hpm::AbstractCloudDataProvider::System m_system;
+    std::unique_ptr<MediaServerEmulator> m_mediaServerEmulator;
+    nx::String m_serverId;
+    std::vector<std::shared_ptr<nx::stun::AsyncClient>> m_serverConnections;
+    nx::utils::SyncQueue<nx::stun::AsyncClient*> m_closeConnectionEvents;
+    nx::utils::SyncQueue<std::tuple<nx::hpm::api::ResultCode, nx::hpm::api::ListenResponse>>
+        m_listenResponseQueue;
+
+    virtual void SetUp() override
+    {
+        ASSERT_TRUE(startAndWaitUntilStarted());
+
+        m_system = addRandomSystem();
     }
 
     void saveConnectionClosedEvent(
@@ -170,6 +187,8 @@ private:
 TEST_F(ListeningPeer, connection_override)
 {
     using namespace nx::hpm;
+
+    givenListeningMediaServer();
 
     auto server2 = addServer(system(), serverId());
     ASSERT_NE(nullptr, server2);
@@ -213,14 +232,128 @@ TEST_F(ListeningPeer, peer_disconnect)
 {
     using namespace nx::hpm;
 
+    givenListeningServer();
+
     nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::ok;
     api::ListeningPeers listeningPeers;
     std::tie(statusCode, listeningPeers) = getListeningPeers();
     ASSERT_EQ(nx::network::http::StatusCode::ok, statusCode);
     ASSERT_EQ(1U, listeningPeers.systems.size());
 
-    whenStopServer();
+    whenCloseConnectionToMediator();
     thenSystemDisappearedFromListeningPeerList();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+class IteratableRelayClusterClient:
+    public AbstractRelayClusterClient,
+    public nx::network::aio::BasicPollable
+{
+public:
+    virtual ~IteratableRelayClusterClient()
+    {
+        pleaseStopSync();
+    }
+
+    virtual void selectRelayInstanceForListeningPeer(
+        const std::string& /*peerId*/,
+        RelayInstanceSearchCompletionHandler completionHandler) override
+    {
+        post(
+            [this, completionHandler = std::move(completionHandler)]() mutable
+            {
+                m_selectRelayInstanceForListeningPeerHandler =
+                    std::move(completionHandler);
+                m_selectRelayInstanceForListeningPeerRequestQueue.push(0 /*dummy*/);
+            });
+    }
+
+    virtual void findRelayInstancePeerIsListeningOn(
+        const std::string& /*peerId*/,
+        RelayInstanceSearchCompletionHandler /*completionHandler*/) override
+    {
+    }
+
+    void waitNextSelectRelayInstanceForListeningPeerRequest()
+    {
+        m_selectRelayInstanceForListeningPeerRequestQueue.pop();
+    }
+
+    void resume()
+    {
+        post(
+            [this]()
+            {
+                nx::utils::swapAndCall(
+                    m_selectRelayInstanceForListeningPeerHandler,
+                    cloud::relay::api::ResultCode::ok,
+                    QUrl("http://some-relay-instance.com"));
+            });
+    }
+
+private:
+    RelayInstanceSearchCompletionHandler m_selectRelayInstanceForListeningPeerHandler;
+    nx::utils::SyncQueue<int> m_selectRelayInstanceForListeningPeerRequestQueue;
+};
+
+class ListeningPeerStability:
+    public ListeningPeer
+{
+public:
+    ListeningPeerStability()
+    {
+        installIteratableRelayClusterClient();
+    }
+
+    virtual ~ListeningPeerStability()
+    {
+        if (m_factoryFuncBak)
+        {
+            RelayClusterClientFactory::instance()
+                .setCustomFunc(std::move(*m_factoryFuncBak));
+        }
+    }
+
+protected:
+    void waitUntilRequestIsBeingProcessedByMediator()
+    {
+        m_relayClient->waitNextSelectRelayInstanceForListeningPeerRequest();
+    }
+
+    void unpauseRelayClusterClient()
+    {
+        m_relayClient->resume();
+    }
+
+private:
+    boost::optional<RelayClusterClientFactory::Function> m_factoryFuncBak;
+    IteratableRelayClusterClient* m_relayClient = nullptr;
+
+    void installIteratableRelayClusterClient()
+    {
+        m_factoryFuncBak = RelayClusterClientFactory::instance()
+            .setCustomFunc(std::bind(&ListeningPeerStability::createRelayClusterClient, this));
+    }
+
+    std::unique_ptr<AbstractRelayClusterClient> createRelayClusterClient()
+    {
+        auto client = std::make_unique<IteratableRelayClusterClient>();
+        m_relayClient = client.get();
+        return client;
+    }
+};
+
+TEST_F(ListeningPeerStability, listening_peer_breaks_connection_before_receiving_listen_response)
+{
+    establishListeningConnectionToMediatorAsync();
+
+    waitUntilRequestIsBeingProcessedByMediator();
+
+    whenCloseConnectionToMediator();
+    unpauseRelayClusterClient();
+
+    /* Process does not crash. */
 }
 
 } // namespace test
