@@ -8,6 +8,7 @@
 #include <QtCore/QUrl>
 #include <common/common_globals.h>
 #include <nx/utils/thread/mutex.h>
+#include <core/resource/abstract_storage_resource.h>
 
 namespace nx {
 namespace mediaserver {
@@ -30,6 +31,11 @@ public:
     bool removePath(const QString& path);
     bool rename(const QString& oldPath, const QString& newPath);
     int open(const QString& path, QIODevice::OpenMode mode);
+    qint64 freeSpace(const QString& path);
+    qint64 totalSpace(const QString& path);
+    bool isPathExists(const QString& path);
+    QnAbstractStorageResource::FileInfoList fileList(const QString& path);
+    qint64 fileSize(const QString& path);
 
 private:
     int execute(const std::vector<QString>& args);
