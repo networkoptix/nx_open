@@ -21,6 +21,6 @@ then
     config_helper.py /opt/networkoptix/cloud_db/etc/cloud_db.conf "$MODULE_CONFIGURATION"
 fi
 
-tail --pid $$ -n0 -F /opt/networkoptix/cloud_db/var/log/log_file.log &
+tail --pid $$ -n0 -F /opt/networkoptix/cloud_db/var/log/log_file.log | egrep -v 'DEBUG|VERBOSE' &
 
 exec /opt/networkoptix/cloud_db/bin/cloud_db -e

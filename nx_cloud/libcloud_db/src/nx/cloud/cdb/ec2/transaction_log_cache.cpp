@@ -64,13 +64,20 @@ void VmsTransactionLogCache::restoreTransaction(
     ::ec2::ApiPersistentIdData tranStateKey,
     int sequence,
     const nx::Buffer& tranHash,
-    std::uint64_t settingsTimestampHi,
     const ::ec2::Timestamp& timestamp)
 {
     QnMutexLocker lock(&m_mutex);
 
-    *m_committedData.timestampSequence =
-        std::max(*m_committedData.timestampSequence, settingsTimestampHi);
+    if (m_committedData.timestampSequence)
+    {
+        m_committedData.timestampSequence =
+            std::max<std::uint64_t>(*m_committedData.timestampSequence, timestamp.sequence);
+    }
+    else
+    {
+        m_committedData.timestampSequence = timestamp.sequence;
+    }
+
     qint32& persistentSequence = m_committedData.transactionState.values[tranStateKey];
     if (persistentSequence < sequence)
         persistentSequence = sequence;
@@ -114,7 +121,11 @@ void VmsTransactionLogCache::commit(TranId tranId)
     }
 
     if (tranContext.data.timestampSequence)
-        m_committedData.timestampSequence = tranContext.data.timestampSequence;
+    {
+        m_committedData.timestampSequence = std::max(
+            m_committedData.timestampSequence,
+            tranContext.data.timestampSequence);
+    }
 }
 
 void VmsTransactionLogCache::rollback(TranId tranId)
@@ -141,7 +152,11 @@ void VmsTransactionLogCache::insertOrReplaceTransaction(
 
     m_timestampCalculator.shiftTimestampIfNeeded(transaction.persistentInfo.timestamp);
 
-    const ::ec2::ApiPersistentIdData tranKey(transaction.peerID, transaction.persistentInfo.dbID);
+    const ::ec2::ApiPersistentIdData tranKey(
+        transaction.peerID,
+        transaction.persistentInfo.dbID);
+
+    tranContext.data.timestampSequence = transaction.persistentInfo.timestamp.sequence;
     tranContext.data.transactionHashToUpdateAuthor[transactionHash] =
         UpdateHistoryData{
             tranKey,

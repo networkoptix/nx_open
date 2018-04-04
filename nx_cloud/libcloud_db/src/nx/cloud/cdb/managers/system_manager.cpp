@@ -659,6 +659,13 @@ boost::optional<api::SystemSharingEx> SystemManager::getSystemSharingData(
     return resultData;
 }
 
+std::vector<api::SystemSharingEx> SystemManager::fetchSystemUsers(
+    utils::db::QueryContext* queryContext,
+    const std::string& systemId)
+{
+    return m_systemSharingDao.fetchSystemSharings(queryContext, systemId);
+}
+
 std::vector<api::SystemSharingEx> SystemManager::fetchAllSharings() const
 {
     QnMutexLocker lock(&m_mutex);
@@ -1437,7 +1444,7 @@ nx::utils::db::DBResult SystemManager::placeUpdateUserTransactionToEachSystem(
     if (!accountUpdate.fullName)
         return nx::utils::db::DBResult::ok;
 
-    std::deque<api::SystemSharingEx> sharings;
+    std::vector<api::SystemSharingEx> sharings;
     auto dbResult = m_systemSharingDao.fetchUserSharingsByAccountEmail(
         queryContext, accountUpdate.email, &sharings);
     if (dbResult != nx::utils::db::DBResult::ok)
@@ -1827,9 +1834,7 @@ nx::utils::db::DBResult SystemManager::doBlockingDbQuery(Func func)
 nx::utils::db::DBResult SystemManager::fetchSystemToAccountBinder(
     nx::utils::db::QueryContext* queryContext)
 {
-    // TODO: #ak Do it without
-
-    std::deque<api::SystemSharingEx> sharings;
+    std::vector<api::SystemSharingEx> sharings;
     const auto result = m_systemSharingDao.fetchAllUserSharings(
         queryContext, &sharings);
     if (result != nx::utils::db::DBResult::ok)
