@@ -21,6 +21,12 @@ ZoomableFlickable
         return video.getMoveViewportData(mapped)
     }
 
+    Connections
+    {
+        target: resourceHelper
+        onResourceIdChanged: to1xScale()
+    }
+
     minContentWidth: width
     minContentHeight: height
     maxContentWidth:
