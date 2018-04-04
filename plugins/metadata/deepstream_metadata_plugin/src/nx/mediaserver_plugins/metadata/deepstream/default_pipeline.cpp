@@ -1,6 +1,9 @@
 #include "default_pipeline.h"
 
 #include <nx/mediaserver_plugins/metadata/deepstream/deepstream_metadata_plugin_ini.h>
+
+#include <plugins/plugin_tools.h>
+#include <nx/sdk/metadata/compressed_video_packet.h>
 #define NX_PRINT_PREFIX "deepstream::DefaultPipeline::"
 #include <nx/kit/debug.h>
 
@@ -15,9 +18,13 @@ static const int kDefaultTrackingLifetime = 1;
 
 } // namespace
 
-DefaultPipeline::DefaultPipeline(const nx::gstreamer::ElementName& elementName):
+DefaultPipeline::DefaultPipeline(
+    const nx::gstreamer::ElementName& elementName,
+    const std::vector<ObjectClassDescription>& objectClassDescritions)
+    :
     base_type(elementName),
-    m_trackingMapper(kDefaultTrackingLifetime)
+    m_trackingMapper(kDefaultTrackingLifetime),
+    m_objectClassDescriptions(objectClassDescritions)
 {
     NX_OUTPUT << __func__ << " Creating DefaultPipeline...";
 }
@@ -30,9 +37,24 @@ void DefaultPipeline::setMetadataCallback(nx::gstreamer::MetadataCallback metada
 
 bool DefaultPipeline::pushDataPacket(nx::sdk::metadata::DataPacket* dataPacket)
 {
+    if (!dataPacket)
+        return true;
+
     std::lock_guard<std::mutex> guard(m_mutex);
     NX_OUTPUT << __func__ << " Pushing data packet! Queue size is: " << m_packetQueue.size();
+
+    nxpt::ScopedRef<nx::sdk::metadata::CompressedVideoPacket> video(
+        dataPacket->queryInterface(nx::sdk::metadata::IID_CompressedVideoPacket));
+
+    if (video)
+    {
+        m_lastFrameTimestampUs = video->timestampUsec();
+        m_currentFrameWidth = video->width();
+        m_currentFrameHeight = video->height();
+    }
+
     m_packetQueue.push(dataPacket);
+    dataPacket->addRef();
     m_wait.notify_all();
 
     return true;
@@ -98,10 +120,35 @@ TrackingMapper*DefaultPipeline::trackingMapper()
     return &m_trackingMapper;
 }
 
+SimpleLicensePlateTracker *DefaultPipeline::licensePlateTracker()
+{
+    return &m_licensePlateTracker;
+}
+
+bool DefaultPipeline::shouldDropFrame(int64_t frameTimestamp) const
+{
+    return m_lastFrameTimestampUs - frameTimestamp > ini().maxAllowedFrameDelayMs * 1000;
+}
+
 void DefaultPipeline::setMainLoop(LoopPtr loop)
 {
     NX_OUTPUT << __func__ << " Setting main loop";
     m_mainLoop = std::move(loop);
+}
+
+int DefaultPipeline::currentFrameWidth() const
+{
+    return m_currentFrameWidth;
+}
+
+int DefaultPipeline::currentFrameHeight() const
+{
+    return m_currentFrameHeight;
+}
+
+const std::vector<ObjectClassDescription>& DefaultPipeline::objectClassDescriptions() const
+{
+    return m_objectClassDescriptions;
 }
 
 } // namespace deepstream

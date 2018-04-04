@@ -42,8 +42,12 @@ HanwhaResult<HanwhaInformation> HanwhaResourceSearcher::cachedDeviceInfo(const Q
     const auto context = qnServerModule->sharedContextPool()
         ->sharedContext<HanwhaSharedResourceContext>(sharedId);
 
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_sharedContexts[sharedId] = context;
+    }
+
     context->setRecourceAccess(url, auth);
-    m_sharedContext[sharedId] = context;
     return context->information();
 }
 
@@ -382,12 +386,14 @@ template <typename T>
 void HanwhaResourceSearcher::addMultichannelResources(QList<T>& result, const QAuthenticator& auth)
 {
     HanwhaResourcePtr firstResource = result.last().template dynamicCast<HanwhaResource>();
+    const auto physicalId = firstResource->getPhysicalId();
+    auto channels = m_channelsByCamera[physicalId];
+    if (channels == 0)
+    {
+        if (auto info = cachedDeviceInfo(auth, firstResource->getUrl()))
+            channels = m_channelsByCamera[physicalId] = info->channelCount;
+    }
 
-    const auto info = cachedDeviceInfo(auth, firstResource->getUrl());
-    if (!info)
-        return;
-
-    const auto channels = info->channelCount;
     if (channels > 1)
     {
         firstResource->updateToChannel(0);

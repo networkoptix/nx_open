@@ -6,7 +6,6 @@ from email.MIMEImage import MIMEImage  # python 2
 from django.conf import settings
 import json
 import os
-from util.helpers import get_language_for_email
 from cms.models import customization_cache, check_update_cache
 from cms.controllers import filldata 
 from django.core.cache import cache, caches
@@ -44,8 +43,7 @@ def email_cache(customization_name, cache_type, value=None, force=None):
         return data[customization_name][cache_type]
 
 
-def send(email, msg_type, message, customization_name):
-    language_code = get_language_for_email(email, customization_name)
+def send(email, msg_type, message, language_code, customization_name):
 
     config = {
         'portal_url': customization_cache(customization_name, "portal_url")
@@ -74,7 +72,7 @@ def send(email, msg_type, message, customization_name):
     # msg.attach_alternative(email_txt_body, "text/plain")
 
     msg.mixed_subtype = 'related'
-    msg_img = MIMEImage(read_file(customization_name, 'templates/email_logo.png'))
+    msg_img = MIMEImage(read_file(customization_name, 'templates/email_logo.png'), _subtype="png")
     msg_img.add_header('Content-ID', '<logo>')
     msg.attach(msg_img)
     return msg.send()
@@ -85,7 +83,7 @@ def get_email_title(customization_name, language_code, event):
     if language_code not in titles_cache:
         filename = "templates/lang_{{language}}/notifications-language.json"
         data = read_file(customization_name, filename, language_code)
-        titles_cache[language_code] = json.load(data)
+        titles_cache[language_code] = json.loads(data)
         email_cache(customization_name, 'email_titles', titles_cache)
     return titles_cache[language_code][event]["emailSubject"]
 
@@ -98,7 +96,7 @@ def read_template(customization_name, name, language_code, html):
     return read_file(customization_name, filename, language_code)
     
 
-def read_file(customization_name, filename, language_code=None):
+def read_file(customization_name, filename, language_code=""):
     files_cache = email_cache(customization_name, 'files')
     translated_name = filename.replace("{{language}}", language_code)
     if translated_name not in files_cache:

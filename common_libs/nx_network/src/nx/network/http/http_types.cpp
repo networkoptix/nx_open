@@ -280,9 +280,12 @@ bool Method::isMessageBodyAllowed(ValueType method)
     return method != get && method != head && method != delete_ && method != connect;
 }
 
-bool Method::isMessageBodyAllowedInResponse(ValueType method)
+bool Method::isMessageBodyAllowedInResponse(
+    ValueType method,
+    StatusCode::Value statusCode)
 {
-    return method != connect;
+    return method != connect
+        && StatusCode::isMessageBodyAllowed(statusCode);
 }
 
 //-------------------------------------------------------------------------------------------------

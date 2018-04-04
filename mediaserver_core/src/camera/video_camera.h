@@ -53,6 +53,10 @@ public:
         int channel) const = 0;
     virtual QnConstCompressedAudioDataPtr getLastAudioFrame(bool primaryLiveStream) const = 0;
 
+    /**
+     * @return I-frame and the following P-frames up to the desired frame. Can be null but not
+     * empty.
+     */
     virtual std::unique_ptr<QnConstDataPacketQueue> getFrameSequenceByTime(
         bool primaryLiveStream,
         qint64 time,

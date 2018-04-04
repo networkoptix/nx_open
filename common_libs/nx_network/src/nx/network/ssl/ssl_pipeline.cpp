@@ -141,6 +141,13 @@ int Pipeline::bioWrite(const void* buffer, unsigned int bufferLen)
 
 int Pipeline::handleSslIoResult(int result)
 {
+    if (result >= 0)
+    {
+        if (result == 0)
+            m_eof = true;
+        return result;
+    }
+
     const auto sslErrorCode = SSL_get_error(m_ssl.get(), result);
     switch (sslErrorCode)
     {

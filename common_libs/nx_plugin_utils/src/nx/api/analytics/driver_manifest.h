@@ -44,18 +44,31 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(AnalyticsDriverManifestBase::Capability)
 #define AnalyticsDriverManifestBase_Fields (driverId)(driverName)(acceptedDataTypes)(supportedCodecs)\
     (supportedHandleTypes)(supportedPixelFormats)(capabilities)
 
-// TODO: #mike: Eliminate the class.
-struct /*NX_PLUGIN_UTILS_API*/ AnalyticsDriverManifest: AnalyticsDriverManifestBase
+struct AnalyticsManifestObjectAction
 {
-   QList<Analytics::EventType> outputEventTypes;
-   QList<Analytics::EventType> outputObjectTypes;
+    QString id;
+    TranslatableString name;
+    QList<QnUuid> supportedObjectTypeIds;
+    // TODO: Add settings.
 };
-#define AnalyticsDriverManifest_Fields AnalyticsDriverManifestBase_Fields (outputEventTypes)(outputObjectTypes)
+#define AnalyticsManifestObjectAction_Fields \
+    (id)(name)(supportedObjectTypeIds)
+
+struct AnalyticsDriverManifest: AnalyticsDriverManifestBase
+{
+    QList<Analytics::EventType> outputEventTypes;
+    QList<Analytics::EventType> outputObjectTypes;
+    QList<AnalyticsManifestObjectAction> objectActions;
+    // TODO: #mike: Add other fields, see stub_metadata_plugin.
+};
+#define AnalyticsDriverManifest_Fields AnalyticsDriverManifestBase_Fields \
+    (outputEventTypes)(outputObjectTypes)(objectActions)
 
 QN_FUSION_DECLARE_FUNCTIONS(AnalyticsDriverManifest, (json))
 
 } // namespace api
 } // namespace nx
+
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (nx::api::AnalyticsDriverManifestBase::Capability)
     (nx::api::AnalyticsDriverManifestBase::Capabilities),

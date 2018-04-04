@@ -78,11 +78,6 @@
       <translation>Эти системы построены с различными %1 URL. Объединение не допускается.</translation>
     </message>
     <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Облачная система может быть объединена только с локальной. Системное имя и пароль берутся из облачной системы.</translation>
-    </message>
-    <message>
       <source>New System</source>
       <translation>Новая система</translation>
     </message>
@@ -90,6 +85,10 @@
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
       <translation>Обнаружкнная система %1 несовместима с текущей.</translation>
+    </message>
+    <message>
+      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
+      <translation>Облачная система может быть объединена только с локальной. Системное имя и пароль берутся из облачной системы.</translation>
     </message>
   </context>
   <context>
@@ -316,7 +315,7 @@
     </message>
     <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
-      <translation type="unfinished">Please update firmware. Minimal supported version is %1. Current version is %2</translation>
+      <translation>Обновите прошивку. Минимальная поддерживаемая версия - %1. Текущая версия - %2</translation>
     </message>
   </context>
   <context>
@@ -492,7 +491,7 @@
     </message>
     <message>
       <source>Bridge</source>
-      <translation type="unfinished">Bridge</translation>
+      <translation>Bridge</translation>
     </message>
     <message>
       <source>Bridge Licenses</source>
@@ -881,7 +880,7 @@
     <message>
       <source>M</source>
       <comment>Suffix for displaying months</comment>
-      <translation>М</translation>
+      <translation>M</translation>
     </message>
     <message>
       <source>y</source>
@@ -941,10 +940,10 @@
     <message numerus="yes">
       <source>seconds</source>
       <comment>Full suffix for displaying seconds</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>секунды</numerusform>
         <numerusform>секунды</numerusform>
-        <numerusform>seconds</numerusform>
+        <numerusform>секунды</numerusform>
         <numerusform>секунды</numerusform>
       </translation>
     </message>
@@ -971,10 +970,10 @@
     <message numerus="yes">
       <source>days</source>
       <comment>Full suffix for displaying days</comment>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>день</numerusform>
+        <numerusform>дня</numerusform>
         <numerusform>дней</numerusform>
-        <numerusform>дней</numerusform>
-        <numerusform>days</numerusform>
         <numerusform>дней</numerusform>
       </translation>
     </message>
@@ -1156,9 +1155,9 @@
     <message numerus="yes">
       <source>Motion on Cameras</source>
       <translation type="unfinished">
+        <numerusform>Движение на камере</numerusform>
         <numerusform>Движение на камерах</numerusform>
         <numerusform>Движение на камерах</numerusform>
-        <numerusform>Motion on Cameras</numerusform>
         <numerusform>Движение на камерах</numerusform>
       </translation>
     </message>
@@ -1200,19 +1199,19 @@
     </message>
     <message numerus="yes">
       <source>Input Signal on Devices</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>Входной сигнал на устройстве</numerusform>
         <numerusform>Входной сигнал на устройствах</numerusform>
         <numerusform>Входной сигнал на устройствах</numerusform>
-        <numerusform>Input Signal on Devices</numerusform>
         <numerusform>Входной сигнал на устройствах</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Input Signal on Cameras</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>Входной сигнал на камере</numerusform>
         <numerusform>Входной сигнал на камерах</numerusform>
         <numerusform>Входной сигнал на камерах</numerusform>
-        <numerusform>Input Signal on Cameras</numerusform>
         <numerusform>Входной сигнал на камерах</numerusform>
       </translation>
     </message>
@@ -1555,7 +1554,7 @@
     </message>
     <message>
       <source>All Users</source>
-      <translation>Все пользователи</translation>
+      <translation>Всем пользователям</translation>
     </message>
     <message>
       <source>Select at least one user</source>

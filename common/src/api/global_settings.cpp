@@ -781,7 +781,8 @@ bool QnGlobalSettings::takeFromSettings(QSettings* settings, const QnResourcePtr
     {
         static const QString kStatisticsReportAllowed = lit("statisticsReportAllowed");
         /* If user didn't make the decision in the current version, check if he made it in the previous version */
-        if (!isStatisticsAllowedDefined() && mediaServer && mediaServer->hasProperty(kStatisticsReportAllowed))
+        if (!isStatisticsAllowedDefined() && mediaServer &&
+            !mediaServer->getProperty(kStatisticsReportAllowed).isEmpty())
         {
             bool value;
             if (QnLexical::deserialize(mediaServer->getProperty(kStatisticsReportAllowed), &value))
@@ -789,7 +790,8 @@ bool QnGlobalSettings::takeFromSettings(QSettings* settings, const QnResourcePtr
                 changed = true;
                 m_statisticsAllowedAdaptor->setValue(QnOptionalBool(value));
             }
-            propertyDictionary()->removeProperty(mediaServer->getId(), kStatisticsReportAllowed);
+            mediaServer->setProperty(kStatisticsReportAllowed, QString());
+            mediaServer->saveParams();
         }
     }
 

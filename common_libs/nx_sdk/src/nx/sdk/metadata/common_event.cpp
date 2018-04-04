@@ -11,7 +11,6 @@ void* CommonEvent::queryInterface(const nxpl::NX_GUID& interfaceId)
         addRef();
         return static_cast<Event*>(this);
     }
-
     if (interfaceId == nxpl::IID_PluginInterface)
     {
         addRef();

@@ -4,7 +4,9 @@
 
 #include <boost/optional/optional.hpp>
 
+#define NX_PRINT_PREFIX "metadata::tegra_video::NaiveObjectTracker::"
 #include <nx/kit/debug.h>
+
 #include <nx/utils/log/assert.h>
 #include <nx/utils/random.h>
 #include <nx/utils/uuid.h>
@@ -16,8 +18,6 @@
 
 #include "tegra_video_metadata_plugin_ini.h"
 #include <nx/mediaserver_plugins/utils/uuid.h>
-
-#define NX_PRINT_PREFIX "metadata::tegra_video::NaiveObjectTracker::"
 
 namespace nx {
 namespace mediaserver_plugins {

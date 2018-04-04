@@ -33,7 +33,6 @@ namespace {
     const qreal noCustomAspectRatio = 0.0;
 }
 
-
 class QnStreamQualityStrings {
     Q_DECLARE_TR_FUNCTIONS(QnStreamQualityStrings);
 public:
@@ -147,9 +146,8 @@ QnConstResourceAudioLayoutPtr QnMediaResource::getAudioLayout(const QnAbstractSt
     return audioLayout;
 }
 
-bool QnMediaResource::hasVideo(const QnAbstractStreamDataProvider* dataProvider) const
+bool QnMediaResource::hasVideo(const QnAbstractStreamDataProvider* /*dataProvider*/) const
 {
-    Q_UNUSED(dataProvider);
     const auto cameraResource = toResourcePtr().dynamicCast<QnSecurityCamResource>();
     if (!cameraResource)
         return false;
@@ -161,7 +159,6 @@ bool QnMediaResource::hasVideo(const QnAbstractStreamDataProvider* dataProvider)
     }
     return *m_hasVideo;
 }
-
 
 void QnMediaResource::initMediaResource()
 {
@@ -191,25 +188,25 @@ void QnMediaResource::setDewarpingParams(const QnMediaDewarpingParams& params)
     emit toResource()->mediaDewarpingParamsChanged(this->toResourcePtr());
 }
 
-qreal QnMediaResource::customAspectRatio() const
+QnAspectRatio QnMediaResource::customAspectRatio() const
 {
     if (!this->toResource()->hasProperty(::customAspectRatioKey))
-        return noCustomAspectRatio;
+        return QnAspectRatio();
 
     bool ok = true;
     qreal value = this->toResource()->getProperty(::customAspectRatioKey).toDouble(&ok);
     if (!ok || qIsNaN(value) || qIsInf(value) || value < 0)
-        return noCustomAspectRatio;
+        return QnAspectRatio();
 
-    return value;
+    return QnAspectRatio::closestStandardRatio(value);
 }
 
-void QnMediaResource::setCustomAspectRatio(qreal value)
+void QnMediaResource::setCustomAspectRatio(const QnAspectRatio& value)
 {
-    if (qIsNaN(value) || qIsInf(value) || value < 0 || qFuzzyEquals(value, noCustomAspectRatio))
+    if (!value.isValid())
         clearCustomAspectRatio();
     else
-        this->toResource()->setProperty(::customAspectRatioKey, QString::number(value));
+        this->toResource()->setProperty(::customAspectRatioKey, QString::number(value.toFloat()));
 }
 
 void QnMediaResource::clearCustomAspectRatio()

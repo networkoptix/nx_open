@@ -142,10 +142,9 @@ void QnIoModuleOverlayContentsPrivate::PortItem::ensureElidedLabel(qreal width) 
 
 void QnIoModuleOverlayContentsPrivate::PortItem::paint(
     QPainter* painter,
-    const QStyleOptionGraphicsItem* option,
-    QWidget* widget)
+    const QStyleOptionGraphicsItem* /*option*/,
+    QWidget* /*widget*/)
 {
-    QN_UNUSED(option, widget);
     paint(painter);
 }
 

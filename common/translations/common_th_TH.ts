@@ -78,11 +78,6 @@
       <translation>ระบบเหล่านี้สร้างขึ้นด้วย URL %1 ต่างกัน ไม่รวม Merge</translation>
     </message>
     <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>ระบบคลาวด์สามารถเท่าผสานกัน ด้วยเลย ระบบชื่อและรหัสผ่านจะถูกนำจากระบบคลาวด์</translation>
-    </message>
-    <message>
       <source>New System</source>
       <translation>ระบบใหม่</translation>
     </message>
@@ -90,6 +85,10 @@
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
       <translation>ระบบค้นพบ %1 ไม่สามารถทำงานร่วมกับระบบปัจจุบันได้</translation>
+    </message>
+    <message>
+      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
+      <translation>ระบบคลาวด์สามารถเท่าผสานกัน ด้วยเลย ระบบชื่อและรหัสผ่านจะถูกนำจากระบบคลาวด์</translation>
     </message>
   </context>
   <context>
@@ -316,7 +315,7 @@
     </message>
     <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
-      <translation type="unfinished">Please update firmware. Minimal supported version is %1. Current version is %2</translation>
+      <translation>กรุณาอัพเดทเฟิร์มแวร์ เวอร์ชันที่สนับสนุนน้อยที่สุดคือ %1เวอร์ชันปัจจุบันคือ %2</translation>
     </message>
   </context>
   <context>

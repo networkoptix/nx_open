@@ -299,7 +299,8 @@ void initLog(const QString& logLevel)
                 ? QString::fromUtf8(ini().logFile)
                 : QnAppInfo::isAndroid()
                     ? lit("-")
-                    : (QString::fromUtf8(ini().iniFileDir()) + lit("mobile_client")));
+                    : (QString::fromUtf8(nx::kit::IniConfig::iniFilesDir())
+                        + lit("mobile_client")));
         const QString tcpLogAddress(QLatin1String(ini().tcpLogAddress));
         if (!tcpLogAddress.isEmpty())
         {
@@ -323,7 +324,7 @@ void initLog(const QString& logLevel)
             /*baseName*/
                 QnAppInfo::isAndroid()
                 ? lit("-")
-                : (QString::fromUtf8(ini().iniFileDir()) + lit("ec2_tran")),
+                : (QString::fromUtf8(nx::kit::IniConfig::iniFilesDir()) + lit("ec2_tran")),
             ec2logger);
     }
 }

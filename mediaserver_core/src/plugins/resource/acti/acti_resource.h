@@ -49,7 +49,7 @@ public:
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
 
-    virtual bool hasDualStreaming() const override;
+    virtual bool hasDualStreamingInternal() const override;
     virtual int getMaxFps() const override;
 
     QString getRtspUrl(int actiChannelNum) const; // in range 1..N

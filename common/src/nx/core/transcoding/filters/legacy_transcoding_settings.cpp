@@ -9,7 +9,7 @@ namespace transcoding {
 
 bool LegacyTranscodingSettings::isEmpty() const
 {
-    if (!qFuzzyIsNull(forcedAspectRatio))
+    if (forcedAspectRatio.isValid())
         return false;
 
     const auto layout = resource->getVideoLayout();

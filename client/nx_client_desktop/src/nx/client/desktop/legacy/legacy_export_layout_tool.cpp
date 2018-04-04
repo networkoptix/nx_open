@@ -417,8 +417,6 @@ bool ExportLayoutTool::exportMediaResource(const QnMediaResourcePtr& resource) {
     QString uniqId = resource->toResource()->getUniqueId();
     uniqId = uniqId.mid(uniqId.indexOf(L'?')+1); // simplify name if export from existing layout
     auto role = StreamRecorderRole::fileExport;
-    if (resource->toResource()->hasFlags(Qn::utc))
-        role = StreamRecorderRole::fileExportWithEmptyContext;
 
     const auto timeWatcher = context()->instance<nx::client::core::ServerTimeWatcher>();
     qint64 serverTimeZone = timeWatcher->utcOffset(resource, Qn::InvalidUtcOffset);

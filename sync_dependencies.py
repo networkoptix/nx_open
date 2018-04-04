@@ -32,6 +32,9 @@ def determine_package_versions():
 
     if platform == "linux" and box == "none":
         v["qt"] = "5.6.2-2"
+        v["festival"] = "2.4-1"
+        v["festival-vox"] = "2.4"
+        v["sysroot"] = "xenial"
 
     if platform == "macosx":
         v["qt"] = "5.6.3"
@@ -51,6 +54,11 @@ def determine_package_versions():
     if box in ("bpi", "bananapi", "rpi"):
         v["openssl"] = "1.0.2l-deb9"
 
+    if box in ("bpi", "bananapi"):
+        v["qt"] = "5.6.2-1"
+        v["festival"] = "2.4-1"
+        v["festival-vox"] = "2.4"
+        v["sysroot"] = "1"
 
     if box == "bananapi":
         v["ffmpeg"] = "3.1.1-bananapi"
@@ -68,7 +76,8 @@ def determine_package_versions():
         v["festival"] = "2.1x"
         v["openssl"] = "1.0.0j"
 
-    v["festival-vox"] = v["festival"]
+    if not "festival-vox" in v:
+        v["festival-vox"] = v["festival"]
 
     return v
 
@@ -89,18 +98,16 @@ def sync_dependencies(syncher):
 
     sync("ffmpeg")
 
+    if platform == "linux" and box in ("bpi", "bananapi", "rpi", "tx1", "none"):
+        sync("sysroot", path_variable="sysroot_directory")
+
     if box in ("bpi", "bananapi"):
-        sync("sysroot")
         sync("opengl-es-mali")
 
     if box == "rpi":
         sync("cifs-utils")
 
-    if box == "rpi":
-        sync("sysroot")
-
     if box == "tx1":
-        sync("sysroot")
         sync("tegra_video")
         sync("jetpack")
         sync("gstreamer")
@@ -158,8 +165,8 @@ def sync_dependencies(syncher):
                 sync("any/server-external-" + releaseVersion)
 
         if box in ("tx1", "edge1"):
-            sync("tx1-arm/openldap")
-            sync("tx1-arm/sasl2")
+            sync("openldap")
+            sync("sasl2")
 
     if platform == "windows":
         sync("windows/doxygen", path_variable="doxygen_directory")

@@ -9,9 +9,9 @@
 #include "recorder/storage_manager.h"
 #include "core/resource/storage_resource.h"
 
-int QnRebuildArchiveRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
+int QnRebuildArchiveRestHandler::executeGet(const QString& /*path*/, const QnRequestParams& params,
+    QnJsonRestResult& result, const QnRestConnectionProcessor*)
 {
-    Q_UNUSED(path);
     QString method = params.value("action");
     bool useMainPool = !params.contains("mainPool") || params.value("mainPool").toInt() != 0;
     auto storagePool = useMainPool ? QnStorageManager::normalInstance() : QnStorageManager::backupInstance();

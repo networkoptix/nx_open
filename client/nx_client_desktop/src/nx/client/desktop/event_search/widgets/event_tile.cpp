@@ -65,7 +65,9 @@ EventTile::EventTile(QWidget* parent):
     ui->wideHolder->setHidden(true);
     ui->footerLabel->setHidden(true);
 
+    ui->previewWidget->setAutoScaleDown(false);
     ui->previewWidget->setCropMode(AsyncImageWidget::CropMode::notHovered);
+    ui->previewWidget->setReloadMode(AsyncImageWidget::ReloadMode::showPreviousImage);
 
     ui->nameLabel->setForegroundRole(QPalette::Light);
     ui->timestampLabel->setForegroundRole(QPalette::WindowText);
@@ -312,7 +314,8 @@ bool EventTile::event(QEvent* event)
             return true;
 
         case QEvent::MouseButtonRelease:
-            emit clicked();
+            if (static_cast<QMouseEvent*>(event)->button() == Qt::LeftButton)
+                emit clicked();
             break;
 
         default:

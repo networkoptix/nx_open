@@ -15,7 +15,9 @@ namespace detail {
 class UrlWithIpV6AndScopeId
 {
 public:
-    UrlWithIpV6AndScopeId(const QString& url): m_url(url.toLower())
+    UrlWithIpV6AndScopeId(const QString& url):
+        kUrlRx("^[a-z][a-z,\\-+.]+:\\/\\/[^\\]]*(\\[([0-9:a-f]+)%([0-9]+)\\])"),
+        m_url(url.toLower())
     {
         parse();
     }
@@ -36,7 +38,7 @@ public:
     }
 
 private:
-    const static QRegExp kUrlRx;
+    const QRegExp kUrlRx;
 
     const QString m_url;
     mutable QString m_newUrl;
@@ -76,14 +78,13 @@ private:
     }
 };
 
-const QRegExp UrlWithIpV6AndScopeId::kUrlRx(
-    "^[a-z][a-z,\\-+.]+:\\/\\/[^\\]]*(\\[([0-9:a-f]+)%([0-9]+)\\])");
-
-
 class IpWithScopeId
 {
 public:
-    IpWithScopeId(const QString& ip): m_ip(ip)
+    IpWithScopeId(const QString& ip):
+        kIpInBracketsWithScopeIdRx("^\\([[0-9:a-f]+\\])%([0-9]+)$"),
+        kIpWithoutBracketsWithScopeIdRx("^([0-9:a-f]+)%([0-9]+)$"),
+        m_ip(ip)
     {
         if(!parseWith(kIpInBracketsWithScopeIdRx))
             parseWith(kIpWithoutBracketsWithScopeIdRx);
@@ -94,8 +95,8 @@ public:
     bool valid() const { return !m_newIp.isEmpty(); }
 
 private:
-    const static QRegExp kIpInBracketsWithScopeIdRx;
-    const static QRegExp kIpWithoutBracketsWithScopeIdRx;
+    const QRegExp kIpInBracketsWithScopeIdRx;
+    const QRegExp kIpWithoutBracketsWithScopeIdRx;
 
     const QString m_ip;
     mutable QString m_newIp;
@@ -112,9 +113,6 @@ private:
         return true;
     }
 };
-
-const QRegExp IpWithScopeId::kIpInBracketsWithScopeIdRx("^\\([[0-9:a-f]+\\])%([0-9]+)$");
-const QRegExp IpWithScopeId::kIpWithoutBracketsWithScopeIdRx("^([0-9:a-f]+)%([0-9]+)$");
 
 } // namespace detail
 
@@ -565,4 +563,3 @@ bool equal(const nx::utils::Url& lhs, const nx::utils::Url& rhs, ComparisonFlags
 } // namespace url
 } // namespace utils
 } // namespace nx
-

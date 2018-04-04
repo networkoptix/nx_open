@@ -10,6 +10,7 @@
 #endif
 
 #include <nx/utils/crypt/linux_passwd_crypt.h>
+#include <nx/utils/unused.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
@@ -93,7 +94,7 @@ void HostSystemPasswordSynchronizer::syncLocalHostRootPasswordWithAdminIfNeeded(
         }
     }
 #else
-    Q_UNUSED( user );
+    nx::utils::unused(user);
 #endif
 }
 

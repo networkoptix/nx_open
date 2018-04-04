@@ -86,12 +86,11 @@ ServerConflictEvent::ServerConflictEvent(
 ServerConflictEvent::ServerConflictEvent(
     const QnResourcePtr& server,
     qint64 timeStamp,
-    const QnModuleInformation& conflictModule,
+    const QnModuleInformation& /*conflictModule*/,
     const QUrl& conflictUrl)
     :
     base_type(serverConflictEvent, server, timeStamp)
 {
-    Q_UNUSED(conflictModule)
     m_caption = lit("%1:%2").arg(conflictUrl.host()).arg(conflictUrl.port());
 }
 

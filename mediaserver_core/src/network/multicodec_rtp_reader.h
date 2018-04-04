@@ -110,7 +110,9 @@ public:
      * or by RTSP session timeout (usually 1 minute).
      * If callback returns valid packet it is returned from getNextDataTcp, otherwise timeout is skipped.
      */
-    void setOnSocketReadTimeoutCallback(OnSocketReadTimeoutCallback callback);
+    void setOnSocketReadTimeoutCallback(
+        std::chrono::milliseconds timeout,
+        OnSocketReadTimeoutCallback callback);
 signals:
     void networkIssue(
         const QnResourcePtr&,
@@ -187,6 +189,7 @@ private:
     std::atomic<qint64> m_positionUsec{AV_NOPTS_VALUE};
     boost::optional<std::chrono::microseconds> m_lastOnvifNtpExtensionTime;
     OnSocketReadTimeoutCallback m_onSocketReadTimeoutCallback;
+    std::chrono::milliseconds m_callbackTimeout;
 };
 
 #endif // defined(ENABLE_DATA_PROVIDERS)

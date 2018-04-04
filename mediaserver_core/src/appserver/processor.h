@@ -31,7 +31,7 @@ public:
     virtual ~QnAppserverResourceProcessor();
 
     virtual bool isBusy() const override;
-    virtual void processResources(const QnResourceList &resources) override;
+    virtual void processResources(const QnResourceList& resources) override;
 
     static ec2::ErrorCode addAndPropagateCamResource(
         QnCommonModule* commonModule,

@@ -56,7 +56,7 @@ nx::api::Analytics::EventType analyticsEventType(const QnVirtualCameraResourcePt
     const auto eventType = std::find_if(types.cbegin(), types.cend(),
         [eventTypeId](const nx::api::Analytics::EventType eventType)
         {
-            return eventType.eventTypeId == eventTypeId;
+            return eventType.typeId == eventTypeId;
         });
 
     return eventType == types.cend()

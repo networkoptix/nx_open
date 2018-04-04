@@ -18,7 +18,8 @@
 
 // TODO: #gdm move out!
 // <--
-class QnScheduleTask;
+struct QnScheduleTask;
+using QnScheduleTaskList = QList<QnScheduleTask>;
 
 struct QnCameraHistoryItem;
 

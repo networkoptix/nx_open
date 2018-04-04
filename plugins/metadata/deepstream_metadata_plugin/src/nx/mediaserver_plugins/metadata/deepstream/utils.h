@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <string>
+#include <chrono>
 
 #include <plugins/plugin_api.h>
 
@@ -26,7 +27,14 @@ nxpl::NX_GUID makeGuid();
 
 bool isNull(const nxpl::NX_GUID& guid);
 
+std::string makeElementName(
+    const std::string& pipelineName,
+    const std::string& factoryName,
+    const std::string& elementName);
+
+std::chrono::milliseconds now();
+
 } // namespace deepstream
 } // namespace metadata
 } // namespace mediaserver_plugins
-} // nx
+} // namespace nx

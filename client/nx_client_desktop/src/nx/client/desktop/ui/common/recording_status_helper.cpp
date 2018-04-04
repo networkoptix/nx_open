@@ -6,6 +6,7 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/misc/schedule_task.h>
 
 #include <ui/style/skin.h>
 #include <utils/common/synctime.h>
@@ -107,7 +108,7 @@ QIcon RecordingStatusHelper::icon() const
 // TODO: #Elric this should be a resource parameter that is updated from the server.
 int RecordingStatusHelper::currentRecordingMode(const QnVirtualCameraResourcePtr& camera)
 {
-    if (!camera || camera->isScheduleDisabled())
+    if (!camera || !camera->isLicenseUsed())
         return Qn::RT_Never;
 
     const auto dateTime = qnSyncTime->currentDateTime();
@@ -116,10 +117,10 @@ int RecordingStatusHelper::currentRecordingMode(const QnVirtualCameraResourcePtr
 
     for (const auto& task: camera->getScheduleTasks())
     {
-        if (task.getDayOfWeek() == dayOfWeek
-            && qBetween(task.getStartTime(), seconds, task.getEndTime() + 1))
+        if (task.dayOfWeek == dayOfWeek
+            && qBetween(task.startTime, seconds, task.endTime + 1))
         {
-            return task.getRecordingType();
+            return task.recordingType;
         }
     }
 

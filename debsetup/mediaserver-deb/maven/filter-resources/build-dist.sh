@@ -8,7 +8,9 @@ COMPANY_NAME=@deb.customization.company.name@
 VERSION=@release.version@
 ARCHITECTURE=@os.arch@
 
-COMPILER=@CMAKE_CXX_COMPILER@
+COMPILER="@CMAKE_CXX_COMPILER@"
+CFLAGS="@CMAKE_C_FLAGS@"
+LFLAGS="@CMAKE_EXE_LINKER_FLAGS@"
 SOURCE_ROOT_PATH=@root.dir@
 TARGET=/opt/$COMPANY_NAME/mediaserver
 BINTARGET=$TARGET/bin
@@ -19,6 +21,7 @@ ETCTARGET=$TARGET/etc
 INITTARGET=/etc/init
 INITDTARGET=/etc/init.d
 SYSTEMDTARGET=/etc/systemd/system
+ENABLE_HANWHA="@enable_hanwha@"
 
 FINALNAME=@artifact.name.server@
 UPDATE_NAME=@artifact.name.server_update@.zip
@@ -45,11 +48,19 @@ BUILD_INFO_TXT=@libdir@/build_info.txt
 LOGS_DIR="@libdir@/build_logs"
 LOG_FILE="$LOGS_DIR/server-build-dist.log"
 
-# [in] Library name
 # [in] Destination directory
+# [in] Libraries to copy
 cp_sys_lib()
 {
-    "$SOURCE_ROOT_PATH"/build_utils/copy_system_library.sh -c "$COMPILER" "$@"
+    DEST_DIR=$1
+    shift
+
+    "$SOURCE_ROOT_PATH"/build_utils/linux/copy_system_library.py \
+        --compiler="$COMPILER" \
+        --flags="$CFLAGS" \
+        --link-flags="$LFLAGS" \
+        --dest-dir="$DEST_DIR" \
+        "$@"
 }
 
 buildDistribution()
@@ -94,7 +105,7 @@ buildDistribution()
     local PLUGINS=( hikvision_metadata_plugin )
     PLUGINS+=( axis_metadata_plugin )
     PLUGINS+=( vca_metadata_plugin )
-    if [ "$COMPANY_NAME" == "hanwha" ]
+    if [ "$ENABLE_HANWHA" == "true" ]
     then
         PLUGINS+=( hanwha_metadata_plugin )
     fi
@@ -108,7 +119,7 @@ buildDistribution()
     echo "Copying Festival VOX files"
     cp -r $SERVER_VOX_PATH $BINSTAGE
 
-    cp_sys_lib libstdc++.so.6 "$LIBSTAGE"
+    cp_sys_lib "$LIBSTAGE" libstdc++.so.6 libgcc_s.so.1
 
     if [ '@arch@' != 'arm' ]
     then

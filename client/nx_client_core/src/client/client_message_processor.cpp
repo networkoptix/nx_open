@@ -114,6 +114,11 @@ void QnClientMessageProcessor::setHoldConnection(bool holdConnection)
     }
 }
 
+Qt::ConnectionType QnClientMessageProcessor::handlerConnectionType() const
+{
+    return Qt::QueuedConnection;
+}
+
 void QnClientMessageProcessor::connectToConnection(const ec2::AbstractECConnectionPtr &connection)
 {
     base_type::connectToConnection(connection);

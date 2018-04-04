@@ -219,7 +219,6 @@ QList<HostAddress> allLocalAddresses(AddressFilters filter)
     return result;
 }
 
-
 QList<QHostAddress> allLocalIpV4Addresses()
 {
     QList<QHostAddress> rez;
@@ -325,7 +324,6 @@ unsigned char* MACsToByte2(const QString& macs, unsigned char* pbyAddress)
     return pbyAddress;
 }
 
-
 QList<QNetworkAddressEntry> getAllIPv4AddressEntries()
 {
     QList<QNetworkInterface> inter_list = QNetworkInterface::allInterfaces(); // all interfaces
@@ -418,7 +416,6 @@ QList<QHostAddress> pingableAddresses(const QHostAddress& startAddr, const QHost
     quint32 curr = startAddr.toIPv4Address();
     quint32 maxaddr = endAddr.toIPv4Address();
 
-
     QList<PinagableT> hostslist;
 
     while(curr < maxaddr)
@@ -429,7 +426,6 @@ QList<QHostAddress> pingableAddresses(const QHostAddress& startAddr, const QHost
 
         ++curr;
     }
-
 
     QThreadPool* global = QThreadPool::globalInstance();
     for (int i = 0; i < threads; ++i ) global->releaseThread();
@@ -448,8 +444,6 @@ QList<QHostAddress> pingableAddresses(const QHostAddress& startAddr, const QHost
     NX_LOG(lm("Ping results %1").container(result), cl_logINFO);
     return result;
 }
-
-
 
 //{ windows
 #if defined(Q_OS_WIN)
@@ -633,12 +627,10 @@ QHostAddress getGatewayOfIf(const QString& ip)
 */
 
 #else // Linux
-void removeARPrecord(const QHostAddress& ip) {Q_UNUSED(ip)}
+void removeARPrecord(const QHostAddress& /*ip*/) {}
 
-QString getMacByIP(const QHostAddress& ip, bool net)
+QString getMacByIP(const QHostAddress& /*ip*/, bool /*net*/)
 {
-    Q_UNUSED(ip)
-    Q_UNUSED(net)
     return QString();
 }
 
@@ -724,7 +716,6 @@ bool isNewDiscoveryAddressBetter(
     return eq1 > eq2;
 }
 
-
 int getFirstMacAddress(char  MAC_str[MAC_ADDR_LEN], char** host)
 {
     memset(MAC_str, 0, MAC_ADDR_LEN);
@@ -742,7 +733,6 @@ int getFirstMacAddress(char  MAC_str[MAC_ADDR_LEN], char** host)
 
     return -1;
 }
-
 
 #ifdef _WIN32
 

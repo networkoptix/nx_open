@@ -49,7 +49,7 @@ public:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     virtual QString getDriverName() const override;
     virtual void setIframeDistance(int, int) override;
-    virtual bool  hasDualStreaming() const override;
+    virtual bool  hasDualStreamingInternal() const override;
 
 private:
     bool doGetRequestAndCheckResponse(nx::network::http::HttpClient& httpClient, const nx::utils::Url& url);

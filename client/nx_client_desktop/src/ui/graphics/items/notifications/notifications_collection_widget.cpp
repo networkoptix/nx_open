@@ -1,7 +1,8 @@
 #include "notifications_collection_widget.h"
 
-#include <QtGui/QDesktopServices>
+#include <chrono>
 
+#include <QtGui/QDesktopServices>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsLinearLayout>
@@ -262,12 +263,14 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(
         ? Qn::ViewLivePermission
         : Qn::ViewFootagePermission;
 
-    if (accessController()->hasPermissions(camera, requiredPermission))
+    if (!accessController()->hasPermissions(camera, requiredPermission))
         return;
+
+    using namespace std::chrono;
 
     api::CameraImageRequest request;
     request.camera = camera;
-    request.msecSinceEpoch = msecSinceEpoch;
+    request.usecSinceEpoch = microseconds(milliseconds(msecSinceEpoch)).count();
     request.size = kDefaultThumbnailSize;
 
     auto loader = new CameraThumbnailProvider(request, item);
@@ -287,12 +290,14 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(
     for (const auto& camera: cameraList)
     {
         NX_ASSERT(accessController()->hasPermissions(camera, Qn::ViewContentPermission));
-        if (accessController()->hasPermissions(camera, requiredPermission))
+        if (!accessController()->hasPermissions(camera, requiredPermission))
             continue;
+
+        using namespace std::chrono;
 
         api::CameraImageRequest request;
         request.camera = camera;
-        request.msecSinceEpoch = msecSinceEpoch;
+        request.usecSinceEpoch = microseconds(milliseconds(msecSinceEpoch)).count();
         request.size = kDefaultThumbnailSize;
         std::unique_ptr<QnImageProvider> provider(new CameraThumbnailProvider(request));
 

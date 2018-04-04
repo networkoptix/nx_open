@@ -8,6 +8,7 @@
 #include <utils/math/math.h>
 
 #include <nx/utils/app_info.h>
+#include <utils/color_space/yuvconvert.h>
 
 extern "C" {
 #ifdef WIN32
@@ -403,6 +404,37 @@ QImage CLVideoDecoderOutput::toImage() const
     return img;
 }
 
+std::vector<char> CLVideoDecoderOutput::toArgb(int* outLineSize) const
+{
+    NX_ASSERT(outLineSize);
+
+    std::vector<char> result;
+
+    int targetLineSize[4];
+    memset(targetLineSize, 0, sizeof(targetLineSize));
+    targetLineSize[0] = qPower2Ceil((unsigned int) width, 16U) * 4;
+    *outLineSize = targetLineSize[0];
+
+    result.resize(*outLineSize * height);
+
+    uint8_t* targetData[4];
+    memset(targetData, 0, sizeof(targetData));
+    targetData[0] = (uint8_t*) &result.at(0);
+
+    #if defined(__i386) || defined(__amd64) || defined(_WIN32)
+        yuv420_argb32_simd_intr(
+            (uint8_t*) &result[0],
+            data[0], data[1], data[2],
+            width, height, *outLineSize,
+            linesize[0], linesize[1], /*alpha*/ 255);
+    #else
+        convertImageFormat(width, height,
+            data, linesize, (AVPixelFormat) format,
+            targetData, targetLineSize, AV_PIX_FMT_ARGB);
+    #endif
+    return result;
+}
+
 void CLVideoDecoderOutput::assignMiscData(const CLVideoDecoderOutput* other)
 {
     pkt_dts = other->pkt_dts;
@@ -418,7 +450,7 @@ bool CLVideoDecoderOutput::invalidScaleParameters(const QSize& size) const
     return size.width() == 0 || size.height() == 0 || height == 0 || width == 0;
 }
 
-CLVideoDecoderOutput* CLVideoDecoderOutput::scaled(const QSize& newSize, AVPixelFormat newFormat)
+CLVideoDecoderOutput* CLVideoDecoderOutput::scaled(const QSize& newSize, AVPixelFormat newFormat) const
 {
     if (invalidScaleParameters(newSize))
         return nullptr;

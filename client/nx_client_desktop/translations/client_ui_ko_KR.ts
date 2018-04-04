@@ -384,7 +384,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/bookmark_overlay_settings_widget.ui"/>
       <source>Bookmark Info</source>
-      <translation>책갈피 정보</translation>
+      <translation>북마크 정보</translation>
     </message>
     <message>
       <location/>
@@ -751,6 +751,21 @@
       <location/>
       <source>PTZ</source>
       <translation>PTZ</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Generate</source>
+      <translation>생성</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset</source>
+      <translation>초기화</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Logical Id</source>
+      <translation>논리 Id</translation>
     </message>
   </context>
   <context>
@@ -1788,8 +1803,8 @@
     </message>
     <message>
       <location/>
-      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</translation>
+      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation>&quot;웨어러블 카메라&quot;는 서버에 업로드 및 사용자가 접근 할수 있는 가상저장소 입니다.</translation>
     </message>
   </context>
   <context>
@@ -2668,12 +2683,6 @@
       <source>Reset</source>
       <translation>초기화</translation>
     </message>
-    <message>
-      <location/>
-      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage.
-The oldest footage among all cameras on the server will be deleted first.</source>
-      <translation>서버 저장 영역에 여유 공간이 없으면 업로드 된 아카이브를 자동으로 삭제할 수 있습니다. 서버의 모든 카메라 중에서 가장 오래된 장면이 먼저 삭제됩니다.</translation>
-    </message>
   </context>
   <context>
     <name>SmtpAdvancedSettingsWidget</name>
@@ -3029,14 +3038,18 @@ The oldest footage among all cameras on the server will be deleted first.</sourc
     </message>
     <message>
       <location/>
-      <source>There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</source>
-      <translation>사용자 지정 역할이 설정되어 있지 않습니다. New Role 버튼을 눌러 새로 생성하세요</translation>
+      <source>New role</source>
+      <translation>새로운 역할</translation>
     </message>
     <message>
       <location/>
-      <source>New role</source>
-      <translation>새로운 역할</translation>
+      <source>There are no custom user roles yet.</source>
+      <translation>지정된 사용자 역할은 아직 없습니다.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Click &quot;New role&quot; button to create one.</source>
+      <translation>&quot;새 역할&quot; 버튼을 클릭하여 만듭니다.</translation>
     </message>
   </context>
   <context>
@@ -3067,7 +3080,7 @@ Click &quot;New role&quot; button to create one.</source>
     <message>
       <location/>
       <source>Detect motion in uploaded video</source>
-      <translation type="unfinished">Detect motion in uploaded video</translation>
+      <translation>업로드 된 동영상의 움직임 감지</translation>
     </message>
     <message>
       <location/>

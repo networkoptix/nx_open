@@ -2,8 +2,8 @@
 
 #include <QtCore/QObject>
 
+#include <api/model/analytics_actions.h>
 #include <common/common_module_aware.h>
-
 #include <core/resource/resource_fwd.h>
 
 #include <nx/api/analytics/analytics_event.h>
@@ -50,6 +50,14 @@ public:
         const QnUuid& objectTypeId,
         const QString& locale);
 
+    struct PluginActions
+    {
+        QnUuid driverId;
+        QList<api::AnalyticsManifestObjectAction> actions;
+    };
+
+    static QList<PluginActions> availableActions(
+        const QnMediaServerResourceList& servers, const QnUuid& objectTypeId);
 };
 
 } // namespace event

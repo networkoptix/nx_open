@@ -67,7 +67,7 @@ private:
             #if defined(USE_OWN_MUTEX)
                 mutex->lock(file, line);
             #else
-                QN_UNUSED(file, line);
+                nx::utils::unused(file, line);
                 mutex->lock();
             #endif
         }

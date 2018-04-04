@@ -849,19 +849,19 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Wearable Camera...</source>
-      <translation type="unfinished">Wearable Camera...</translation>
+      <translation>เพิ่มกล้องใหม่</translation>
     </message>
     <message>
       <source>New Wearable Camera...</source>
-      <translation type="unfinished">New Wearable Camera...</translation>
+      <translation>เพิ่มกล้องใหม่</translation>
     </message>
     <message>
       <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
+      <translation>อัปโหลดไฟล์</translation>
     </message>
     <message>
       <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
+      <translation>อัปโหลดโฟลเดอร์</translation>
     </message>
     <message>
       <source>Start Analytics...</source>
@@ -1010,7 +1010,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Settings are not available for .NOV and .EXE files.</source>
-      <translation type="unfinished">Settings are not available for .NOV and .EXE files.</translation>
+      <translation>การตั้งค่าไม่พร้อมใช้งานสำหรับไฟล์. NOV และ .EXE</translation>
     </message>
   </context>
   <context>
@@ -1021,7 +1021,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Matroska</source>
-      <translation type="unfinished">Matroska</translation>
+      <translation>Matroska</translation>
     </message>
     <message>
       <source>MPEG-4 Part 14</source>
@@ -1347,7 +1347,7 @@ to view more bookmarks</source>
     <name>QnAbstractPtzDialog</name>
     <message>
       <source>Loading...</source>
-      <translation>กำลังโหลด...</translation>
+      <translation>กำลังโหลด ...</translation>
     </message>
     <message>
       <source>Saving...</source>
@@ -2223,14 +2223,14 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>No settings</source>
-      <translation type="unfinished">No settings</translation>
+      <translation>ไม่มีการตั้งค่า</translation>
     </message>
   </context>
   <context>
     <name>QnCameraAnalyticsPolicy</name>
     <message>
       <source>Analytics is not available for %1</source>
-      <translation type="unfinished">Analytics is not available for %1</translation>
+      <translation>ไม่มีการวิเคราะห์สำหรับ %1</translation>
     </message>
   </context>
   <context>
@@ -2334,6 +2334,12 @@ to view more bookmarks</source>
     <message>
       <source>Edge</source>
       <translation>ขอบ</translation>
+    </message>
+    <message numerus="yes">
+      <source>This Id is already used on the following %n cameras: %1</source>
+      <translation>
+        <numerusform>รหัสนี้ใช้กับกล้อง %n ต่อไปนี้: %1</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -2449,6 +2455,10 @@ to view more bookmarks</source>
       <source>Server</source>
       <translation>เซอร์ฟเวอร์</translation>
     </message>
+    <message>
+      <source>Id</source>
+      <translation>ไอดี</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraMotionMaskWidget</name>
@@ -2485,7 +2495,7 @@ to view more bookmarks</source>
     <name>QnCameraMotionPolicy</name>
     <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation type="unfinished">Recording or motion detection is disabled for %1</translation>
+      <translation>การตรวจสอบการบันทึกหรือการเคลื่อนไหวที่ถูกปิดใช้งานสำหรับ %1</translation>
     </message>
   </context>
   <context>
@@ -2507,10 +2517,6 @@ to view more bookmarks</source>
   <context>
     <name>QnCameraPasswordChangeDialog</name>
     <message>
-      <source>Password shouldn&apos;t be equal to camera&apos;s user name</source>
-      <translation>รหัสผ่าน shouldn&apos;t เท่ากับชื่อผู้ใช้ camera&apos;s</translation>
-    </message>
-    <message>
       <source>New Password</source>
       <translation>สร้างรหัสผ่านใหม่</translation>
     </message>
@@ -2526,12 +2532,16 @@ to view more bookmarks</source>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
       <translation>รหัสผ่านควรมีสัญลักษณ์น้อย 8 ยาว และประกอบด้วยอักขระที่แตกต่างกันไป</translation>
     </message>
+    <message>
+      <source>Password should not be equal to camera&apos;s user name</source>
+      <translation>รหัสผ่านต้องไม่เท่ากับชื่อผู้ใช้ของกล้อง&apos;</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraRecordingPolicy</name>
     <message>
       <source>Recording is disabled for %1</source>
-      <translation type="unfinished">Recording is disabled for %1</translation>
+      <translation>การบันทึกถูกปิดไว้ สำหรับ %1</translation>
     </message>
   </context>
   <context>
@@ -2702,11 +2712,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Cannot edit properties for several wearable and non-wearable cameras.</source>
-      <translation type="unfinished">Cannot edit properties for several wearable and non-wearable cameras.</translation>
+      <translation>ไม่สามารถแก้ไขคุณสมบัติสำหรับเพิ่มกล้องได้หลายแบบ</translation>
     </message>
     <message>
       <source>Cannot edit properties for several wearable cameras.</source>
-      <translation type="unfinished">Cannot edit properties for several wearable cameras.</translation>
+      <translation>ไม่สามารถแก้ไขคุณสมบัติสำหรับเพิ่มกล้องได้หลายแบบ</translation>
     </message>
   </context>
   <context>
@@ -2801,7 +2811,7 @@ to %1</source>
     </message>
     <message>
       <source>Account is not activated. Please check your email and follow provided instructions</source>
-      <translation type="unfinished">Account is not activated. Please check your email and follow provided instructions</translation>
+      <translation>บัญชีไม่ได้เปิดใช้งาน โปรดตรวจสอบอีเมลของคุณและทำตามคำแนะนำที่ระบุไว้</translation>
     </message>
   </context>
   <context>
@@ -3153,11 +3163,9 @@ to %1</source>
       <source>Ask your system administrator to do it.</source>
       <translation>ขอให้ผู้ดูแลระบบของคุณทำเช่นนั้น</translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>Set Password</source>
-      <translation>
-        <numerusform>ตั้งรหัสผ่าน</numerusform>
-      </translation>
+      <translation>ตั้งรหัสผ่าน</translation>
     </message>
   </context>
   <context>
@@ -3512,7 +3520,7 @@ to %1</source>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Select folder...</source>
-      <translation>เลือกโฟลเดอร์...</translation>
+      <translation>เลือกโฟลเดอร์ ...</translation>
     </message>
     <message>
       <source>Folder already added</source>
@@ -4606,11 +4614,11 @@ to %1</source>
     <name>QnNewWearableCameraDialog</name>
     <message>
       <source>Wearable Camera</source>
-      <translation type="unfinished">Wearable Camera</translation>
+      <translation>เพิ่มกล้องใหม่</translation>
     </message>
     <message>
       <source>Wearable Camera %1</source>
-      <translation type="unfinished">Wearable Camera %1</translation>
+      <translation>เพิ่มกล้องใหม่ %1</translation>
     </message>
     <message>
       <source>Name</source>
@@ -4618,7 +4626,7 @@ to %1</source>
     </message>
     <message>
       <source>Name cannot be empty</source>
-      <translation type="unfinished">Name cannot be empty</translation>
+      <translation>ชื่อไม่สามารถเว้นช่องว่างได้</translation>
     </message>
   </context>
   <context>
@@ -4706,16 +4714,16 @@ to %1</source>
   <context>
     <name>QnPerformanceTest</name>
     <message>
-      <source>For full - featured mode, please use another computer</source>
-      <translation>สำหรับโหมดเต็มรูปแบบโปรดใช้คอมพิวเตอร์เครื่องอื่น</translation>
-    </message>
-    <message>
       <source>%1 can work in configuration mode only</source>
       <translation>%1 สามารถทำงานได้เฉพาะในโหมดกำหนดค่าเท่านั้น</translation>
     </message>
     <message>
       <source>Performance of this computer allows running %1 in configuration mode only.</source>
       <translation>ประสิทธิภาพของคอมพิวเตอร์เครื่องนี้ช่วยให้สามารถใช้งานโหมดการตั้งค่าได้ %1 เท่านั้น</translation>
+    </message>
+    <message>
+      <source>For full-featured mode please use another computer</source>
+      <translation>สำหรับโหมดเต็มรูปแบบโปรดใช้คอมพิวเตอร์เครื่องอื่น</translation>
     </message>
   </context>
   <context>
@@ -5837,6 +5845,10 @@ to %1</source>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
       <translation>ไม่สามารถตั้งค่าตัวเลือกการบันทึก &quot;Motion + ต่ำ - Res&quot;</translation>
     </message>
+    <message>
+      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
+      <translation>ที่เก็บข้อมูลที่อัปโหลดจะถูกลบโดยอัตโนมัติหากไม่มีพื้นที่ว่างในที่จัดเก็บข้อมูลเซิร์ฟเวอร์ ภาพที่เก่าที่สุดในบรรดากล้องทั้งหมดบนเซิร์ฟเวอร์จะถูกลบออกก่อน</translation>
+    </message>
   </context>
   <context>
     <name>QnSmtpAdvancedSettingsWidget</name>
@@ -5988,10 +6000,6 @@ to %1</source>
   <context>
     <name>QnStatusOverlayController</name>
     <message>
-      <source>NOT ENOUGH LICENCES</source>
-      <translation>ไม่ได้รับใบอนุญาต</translation>
-    </message>
-    <message>
       <source>NO DATA</source>
       <translation>ไม่มมีข้อมูล</translation>
     </message>
@@ -6045,7 +6053,7 @@ to %1</source>
     </message>
     <message>
       <source>NO LIVE STREAM</source>
-      <translation type="unfinished">NO LIVE STREAM</translation>
+      <translation>ไม่มีสตรีมภาพสด</translation>
     </message>
     <message>
       <source>TOO MANY CONNECTIONS</source>
@@ -6061,7 +6069,11 @@ to %1</source>
     </message>
     <message>
       <source>UNSUPPORTED FIRMWARE VERSION</source>
-      <translation type="unfinished">UNSUPPORTED FIRMWARE VERSION</translation>
+      <translation>รุ่นซอฟต์แวร์ที่ไม่ได้รับอนุญาต</translation>
+    </message>
+    <message>
+      <source>NOT ENOUGH LICENSES</source>
+      <translation>ไม่ได้รับใบอนุญาต</translation>
     </message>
   </context>
   <context>
@@ -6211,7 +6223,7 @@ to %1</source>
     </message>
     <message>
       <source>Recording was enabled on the USB storage</source>
-      <translation type="unfinished">Recording was enabled on the USB storage</translation>
+      <translation>มีการเปิดใช้การบันทึกในที่จัดเก็บข้อมูล USB</translation>
     </message>
   </context>
   <context>
@@ -7078,35 +7090,35 @@ to %1</source>
   <context>
     <name>QnWearableProgressWidget</name>
     <message>
-      <source>Uploading %1... %2	%p%</source>
-      <translation type="unfinished">Uploading %1... %2	%p%</translation>
-    </message>
-    <message>
       <source>Stop uploading?</source>
-      <translation type="unfinished">Stop uploading?</translation>
+      <translation>หยุดการอัปโหลดหรือไม่</translation>
     </message>
     <message>
       <source>Already uploaded files will be kept.</source>
-      <translation type="unfinished">Already uploaded files will be kept.</translation>
-    </message>
-    <message>
-      <source>Finalizing %1... %2	%p%</source>
-      <translation type="unfinished">Finalizing %1... %2	%p%</translation>
+      <translation>อัปโหลดไปแล้วไฟล์จะถูกเก็บไว้</translation>
     </message>
     <message>
       <source>(%1 of %2)</source>
-      <translation type="unfinished">(%1 of %2)</translation>
+      <translation>(%1 ใน %2)</translation>
+    </message>
+    <message>
+      <source>Uploading %1...</source>
+      <translation>กำลังอัปโหลด %1...</translation>
+    </message>
+    <message>
+      <source>Finalizing %1...</source>
+      <translation>กำลังสรุป %1 ...</translation>
     </message>
   </context>
   <context>
     <name>QnWearableUploadWidget</name>
     <message>
       <source>User &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation type="unfinished">User &quot;%1&quot; is currently uploading footage to this camera.</translation>
+      <translation>ผู้ใช้ &quot;%1&quot; กำลังอัปโหลดวิดีโอกับกล้องนี้</translation>
     </message>
     <message>
       <source>Another user is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Another user is currently uploading footage to this camera.</translation>
+      <translation>มีผู้ใช้รายอื่นกำลังอัปโหลดภาพไปยังกล้องนี้</translation>
     </message>
   </context>
   <context>
@@ -7197,6 +7209,10 @@ to %1</source>
     <message>
       <source>Could not connect to server. Video Wall will be closed.</source>
       <translation>ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ กำแพงวิดีโอจะถูกปิด</translation>
+    </message>
+    <message>
+      <source>Video Wall is removed on the server and will be closed.</source>
+      <translation>Video Wall ถูกลบออกจากเซิร์ฟเวอร์และจะถูกปิด</translation>
     </message>
   </context>
   <context>
@@ -7490,111 +7506,143 @@ to %1</source>
     </message>
     <message>
       <source>Video (%1)</source>
-      <translation type="unfinished">Video (%1)</translation>
+      <translation>วิดีโอ (%1)</translation>
     </message>
     <message>
       <source>Open Wearable Camera Recordings...</source>
-      <translation type="unfinished">Open Wearable Camera Recordings...</translation>
+      <translation>เปิดบันทึกกล้อง</translation>
     </message>
     <message>
       <source>Only video files with correct timestamp are supported.</source>
-      <translation type="unfinished">Only video files with correct timestamp are supported.</translation>
-    </message>
-    <message>
-      <source>Not enough space on server storage</source>
-      <translation type="unfinished">Not enough space on server storage</translation>
+      <translation>รองรับเฉพาะไฟล์วิดีโอที่มี timestamp ที่ถูกต้องเท่านั้น</translation>
     </message>
     <message>
       <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</translation>
+      <translation>ผู้ใช้ &quot;%1&quot; กำลังอัปโหลดวิดีโอกับกล้องนี้</translation>
     </message>
     <message>
       <source>Could not start upload as another user is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Could not start upload as another user is currently uploading footage to this camera.</translation>
+      <translation>ไม่สามารถเริ่มอัปโหลดขณะที่ผู้ใช้รายอื่นกำลังอัปโหลดภาพวิดีโอไปยังกล้องนี้</translation>
     </message>
     <message>
       <source>Failed to add wearable camera</source>
-      <translation type="unfinished">Failed to add wearable camera</translation>
+      <translation>ไม่สามารถเพิ่มกล้องได้</translation>
     </message>
     <message>
       <source>No video files found in selected folder</source>
-      <translation type="unfinished">No video files found in selected folder</translation>
+      <translation>ไม่พบไฟล์วิดีโอในโฟลเดอร์ที่เลือก</translation>
     </message>
     <message numerus="yes">
       <source>Selected file formats are not supported</source>
-      <translation type="unfinished">
-        <numerusform>Selected file formats are not supported</numerusform>
+      <translation>
+        <numerusform>ไม่สนับสนุนรูปแบบไฟล์ที่เลือก</numerusform>
       </translation>
     </message>
     <message>
       <source>Use .MKV, .AVI, .MP4 or other video files.</source>
-      <translation type="unfinished">Use .MKV, .AVI, .MP4 or other video files.</translation>
+      <translation>ใช้. MKV, .AVI, .MP4 หรือไฟล์วิดีโออื่น ๆ</translation>
     </message>
     <message numerus="yes">
       <source>Selected files do not have timestamps</source>
-      <translation type="unfinished">
-        <numerusform>Selected files do not have timestamps</numerusform>
+      <translation>
+        <numerusform>ไฟล์ที่เลือกไม่มี timestamps</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos are already being uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+      <translation>
+        <numerusform>ไฟล์ที่เลือกครอบคลุมช่วงเวลาที่วิดีโอกำลังอัปโหลดอยู่</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Wearable Camera.</source>
-      <translation type="unfinished">
-        <numerusform>You can upload these files to a different instance of a Wearable Camera.</numerusform>
+      <translation>
+        <numerusform>คุณสามารถอัปโหลดไฟล์เหล่านี้ไปยังอินสแตนซ์อื่น ๆ ของ Wearable Camera</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos have already been uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+      <translation>
+        <numerusform>ไฟล์ที่เลือกครอบคลุมช่วงเวลาที่วิดีโอกำลังอัปโหลดอยู่</numerusform>
       </translation>
     </message>
     <message>
       <source>Selected files will not be uploaded</source>
-      <translation type="unfinished">Selected files will not be uploaded</translation>
+      <translation>ไฟล์ที่เลือกจะไม่ถูกอัปโหลด</translation>
     </message>
     <message>
       <source>Some files will not be uploaded</source>
-      <translation type="unfinished">Some files will not be uploaded</translation>
+      <translation>ไฟล์บางไฟล์จะไม่ถูกอัปโหลด</translation>
     </message>
     <message>
       <source>No new files to upload in selected folder</source>
-      <translation type="unfinished">No new files to upload in selected folder</translation>
+      <translation>ไม่พบไฟล์วิดีโอในโฟลเดอร์ที่เลือก</translation>
     </message>
     <message numerus="yes">
-      <source>Files size - %2</source>
-      <translation type="unfinished">
-        <numerusform>Files size - %2</numerusform>
+      <source>Selected files are too old</source>
+      <translation>
+        <numerusform>ไฟล์ที่เลือกเก่าเกินไป</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation>
+        <numerusform>ไฟล์ที่เลือกถูกบันทึกไว้ใน %1แต่สามารถอัปโหลดเฉพาะไฟล์ที่บันทึกใน %n วันที่ผ่านมาเท่านั้น คุณสามารถเปลี่ยนแปลงได้ในการตั้งค่าที่เก็บถาวรของกล้อง</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation>
+        <numerusform>ไฟล์ที่เลือกถูกบันทึกระหว่าง %1 และ %2แต่สามารถอัปโหลดไฟล์ที่บันทึกใน %n วันที่ผ่านมาเท่านั้น คุณสามารถเปลี่ยนแปลงได้ในการตั้งค่าที่เก็บถาวรของกล้อง</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Some footage may be deleted after uploading these files</source>
+      <translation>
+        <numerusform>วิดีโอบางอย่างอาจถูกลบหลังจากอัปโหลดไฟล์เหล่านี้</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
+      <translation>
+        <numerusform>พื้นที่เก็บข้อมูลของเซิร์ฟเวอร์ไม่เหลือมากนัก วิดีโอเก่าบางส่วนอาจถูกลบเพื่อเพิ่มพื้นที่ว่าง โปรดทราบว่าหากไฟล์ที่เลือกเป็นไฟล์ที่เก่าที่สุดบนเซิร์ฟเวอร์ไฟล์เหล่านี้จะถูกลบออกทันทีหลังจากอัปโหลด</numerusform>
       </translation>
     </message>
     <message>
-      <source>Free space - %2</source>
-      <translation type="unfinished">Free space - %2</translation>
+      <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
+      <translation>เพื่อป้องกันปัญหานี้คุณสามารถเพิ่มพื้นที่จัดเก็บเพิ่มเติมได้ นอกจากนี้คุณยังสามารถควบคุมว่าภาพใดจะถูกลบก่อนโดยการเปลี่ยนที่เก็บถาวรจะทำให้เวลาในการตั้งค่ากล้อง</translation>
     </message>
     <message>
-      <source>%1 - has unsupported format.</source>
-      <translation type="unfinished">%1 - has unsupported format.</translation>
+      <source>Upload anyway?</source>
+      <translation>อัพโหลดหรือไม่?</translation>
     </message>
     <message>
-      <source>%1 - does not have timestamp.</source>
-      <translation type="unfinished">%1 - does not have timestamp.</translation>
+      <source>Could not finish upload to %1</source>
+      <translation>ไม่สามารถอัปโหลดเสร็จสิ้นไปที่ %1</translation>
     </message>
     <message>
-      <source>%1 - covers period for which video has already been uploaded.</source>
-      <translation type="unfinished">%1 - covers period for which video has already been uploaded.</translation>
+      <source>Make sure there is enough space on server storage.</source>
+      <translation>ตรวจสอบว่ามีพื้นที่ว่างเพียงพอสำหรับการจัดเก็บข้อมูลเซิร์ฟเวอร์</translation>
     </message>
     <message>
-      <source>%1 - covers period for which video is being uploaded.</source>
-      <translation type="unfinished">%1 - covers period for which video is being uploaded.</translation>
+      <source>%1 has unsupported format.</source>
+      <translation>%1 - มีรูปแบบที่ไม่สนับสนุน</translation>
     </message>
     <message>
-      <source>%1 - does not fit on server storage.</source>
-      <translation type="unfinished">%1 - does not fit on server storage.</translation>
+      <source>%1 does not have timestamp.</source>
+      <translation>%1 - ไม่มี timestamp</translation>
+    </message>
+    <message>
+      <source>%1 is older than allowed in camera archive settings.</source>
+      <translation>%1 เก่ากว่าที่อนุญาตในการตั้งค่าที่เก็บถาวรของกล้อง</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video has already been uploaded.</source>
+      <translation>%1 - ครอบคลุมระยะเวลาที่มีการอัปโหลดวิดีโอแล้ว</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video is being uploaded.</source>
+      <translation>%1 - ครอบคลุมระยะเวลาที่ถูกอัพโหลดวิดีโอ</translation>
     </message>
   </context>
   <context>
@@ -7770,7 +7818,7 @@ to %1</source>
     </message>
     <message>
       <source>Stop uploading?</source>
-      <translation type="unfinished">Stop uploading?</translation>
+      <translation>หยุดการอัปโหลดหรือไม่</translation>
     </message>
     <message>
       <source>Stop</source>
@@ -7778,8 +7826,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Some video file(s) are still being uploaded to %n wearable cameras:</source>
-      <translation type="unfinished">
-        <numerusform>Some video file(s) are still being uploaded to %n wearable cameras:</numerusform>
+      <translation>
+        <numerusform>แฟ้มวิดีโอบางจะถูกอัพโหลด %n กล้อง:</numerusform>
       </translation>
     </message>
   </context>
@@ -7944,7 +7992,7 @@ to %1</source>
     </message>
     <message>
       <source>Select folder...</source>
-      <translation>เลือกโฟลเดอร์...</translation>
+      <translation>เลือกโฟลเดอร์ ...</translation>
     </message>
   </context>
   <context>
@@ -8027,34 +8075,34 @@ to %1</source>
     <name>nx::client::desktop::UploadWorker</name>
     <message>
       <source>Could not open file &quot;%1&quot;</source>
-      <translation type="unfinished">Could not open file &quot;%1&quot;</translation>
+      <translation>ไม่สามารถเปิดไฟล์ &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Could not calculate md5 for file &quot;%1&quot;</source>
-      <translation type="unfinished">Could not calculate md5 for file &quot;%1&quot;</translation>
+      <translation>ไม่สามารถคำนวณ md5 สำหรับไฟล์ &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Could not create upload on the server side</source>
-      <translation type="unfinished">Could not create upload on the server side</translation>
+      <translation>ไม่สามารถสร้างการอัปโหลดทางฝั่งเซิร์ฟเวอร์</translation>
     </message>
     <message>
       <source>Could not upload file chunk to the server</source>
-      <translation type="unfinished">Could not upload file chunk to the server</translation>
+      <translation>ไม่สามารถอัปโหลดไฟล์ไปยังเซิร์ฟเวอร์ได้</translation>
     </message>
     <message>
       <source>Could not check uploaded file on the server</source>
-      <translation type="unfinished">Could not check uploaded file on the server</translation>
+      <translation>ไม่สามารถตรวจสอบไฟล์ที่อัปโหลดไว้ในเซิร์ฟเวอร์</translation>
     </message>
     <message>
       <source>File was corrupted while being uploaded to the server</source>
-      <translation type="unfinished">File was corrupted while being uploaded to the server</translation>
+      <translation>ไฟล์เสียหายขณะอัปโหลดไปยังเซิร์ฟเวอร์</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::WearableWorker</name>
     <message>
       <source>Failed to send request to the server.</source>
-      <translation type="unfinished">Failed to send request to the server.</translation>
+      <translation>ไม่สามารถส่งคำขอไปยังเซิร์ฟเวอร์</translation>
     </message>
   </context>
   <context>
@@ -8089,7 +8137,7 @@ to %1</source>
     </message>
     <message>
       <source>Selected period cannot be exported for the current camera.</source>
-      <translation type="unfinished">Selected period cannot be exported for the current camera.</translation>
+      <translation>ไม่สามารถส่งออกระยะเวลาที่เลือกสำหรับกล้องปัจจุบันได้</translation>
     </message>
   </context>
   <context>
@@ -8537,7 +8585,7 @@ to %1</source>
     </message>
     <message>
       <source>Wearable Cameras cannot be moved between servers</source>
-      <translation type="unfinished">Wearable Cameras cannot be moved between servers</translation>
+      <translation>ไม่สามารถย้ายกล้องระหว่างเซิร์ฟเวอร์ได้</translation>
     </message>
     <message>
       <source>Failed to change password</source>

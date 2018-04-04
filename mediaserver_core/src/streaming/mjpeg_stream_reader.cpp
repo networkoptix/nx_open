@@ -44,7 +44,6 @@ int contain_subst(char *data, int datalen, char *subdata, int subdatalen)
     int coincidence_len = 0;
     char *pdata = data;
 
-
     while(1)
     {
         if (*pdata == subdata[coincidence_len])
@@ -148,11 +147,8 @@ QnAbstractMediaDataPtr MJPEGStreamReader::getNextData()
     return videoData;
 }
 
-CameraDiagnostics::Result MJPEGStreamReader::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params)
+CameraDiagnostics::Result MJPEGStreamReader::openStreamInternal(bool /*isCameraControlRequired*/, const QnLiveStreamParams& /*params*/)
 {
-    Q_UNUSED(isCameraControlRequired);
-    Q_UNUSED(params);
-
     if (isStreamOpened())
         return CameraDiagnostics::NoErrorResult();
 

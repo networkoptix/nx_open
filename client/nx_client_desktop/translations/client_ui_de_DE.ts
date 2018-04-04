@@ -752,6 +752,21 @@
       <source>PTZ</source>
       <translation>PTZ</translation>
     </message>
+    <message>
+      <location/>
+      <source>Generate</source>
+      <translation>Erzeugen</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset</source>
+      <translation>Zurücksetzen</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Logical Id</source>
+      <translation>Logical-Id</translation>
+    </message>
   </context>
   <context>
     <name>CameraInputBusinessEventWidget</name>
@@ -1788,7 +1803,7 @@
     </message>
     <message>
       <location/>
-      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
+      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
       <translation>&quot;Tragbare Kamera&quot; ist ein virtueller Speicher für Videodateien, der auf jeden Server auf Ihrem System hochgeladen werden kann und von jedem Benutzer zugänglich ist.</translation>
     </message>
   </context>
@@ -2668,12 +2683,6 @@
       <source>Reset</source>
       <translation>Zurücksetzen</translation>
     </message>
-    <message>
-      <location/>
-      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage.
-The oldest footage among all cameras on the server will be deleted first.</source>
-      <translation>Hochgeladenes Archiv kann automatisch gelöscht werden, wenn auf einem Serverspeicher kein freier Speicherplatz vorhanden ist. Das älteste Material aller Kameras auf dem Server wird zuerst gelöscht.</translation>
-    </message>
   </context>
   <context>
     <name>SmtpAdvancedSettingsWidget</name>
@@ -3029,15 +3038,18 @@ The oldest footage among all cameras on the server will be deleted first.</sourc
     </message>
     <message>
       <location/>
-      <source>There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</source>
-      <translation>Noch gibt es keine benutzerdefinierte Rollen. 
-Klicken Sie auf &quot;Neue Rolle&quot;, um eine zu erstellen.</translation>
+      <source>New role</source>
+      <translation>Neue Rolle</translation>
     </message>
     <message>
       <location/>
-      <source>New role</source>
-      <translation>Neue Rolle</translation>
+      <source>There are no custom user roles yet.</source>
+      <translation>Es gibt noch keine benutzerdefinierten Benutzerrollen.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Click &quot;New role&quot; button to create one.</source>
+      <translation>Klicken Sie auf die Schaltfläche &quot;Neue Rolle&quot;, um eine zu erstellen.</translation>
     </message>
   </context>
   <context>

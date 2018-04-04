@@ -56,7 +56,11 @@ QnSimpleHttpConnectionListener::~QnSimpleHttpConnectionListener()
 QnTCPConnectionProcessor* QnSimpleHttpConnectionListener::createRequestProcessor(
     QSharedPointer<nx::network::AbstractStreamSocket> clientSocket)
 {
-    return new Ec2ConnectionProcessor(clientSocket, this);
+    return new Ec2ConnectionProcessor(
+        clientSocket,
+        m_userDataProvider,
+        m_nonceProvider,
+        this);
 }
 
 bool QnSimpleHttpConnectionListener::needAuth(const nx::network::http::Request& request) const
@@ -76,6 +80,14 @@ bool QnSimpleHttpConnectionListener::needAuth(const nx::network::http::Request& 
 void QnSimpleHttpConnectionListener::disableAuthForPath(const QString& path)
 {
     m_disableAuthPrefixes.insert(path);
+}
+
+void QnSimpleHttpConnectionListener::setAuthenticator(
+    nx::vms::auth::AbstractUserDataProvider* userDataProvider,
+    nx::vms::auth::AbstractNonceProvider* nonceProvider)
+{
+    m_userDataProvider = userDataProvider;
+    m_nonceProvider = nonceProvider;
 }
 
 //-------------------------------------------------------------------------------------------------

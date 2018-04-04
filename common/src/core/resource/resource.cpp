@@ -231,7 +231,6 @@ void QnResource::setParentId(const QnUuid& parent)
         emit this->initializedChanged(toSharedPointer(this));
 }
 
-
 QString QnResource::getName() const
 {
     QnMutexLocker mutexLocker(&m_mutex);
@@ -610,28 +609,6 @@ bool QnResource::setProperty(const QString &key, const QString &value, PropertyO
     return isModified;
 }
 
-bool QnResource::removeProperty(const QString& key)
-{
-    {
-        QnMutexLocker lk(&m_mutex);
-        if (useLocalProperties())
-        {
-            m_locallySavedProperties.erase(key);
-            return false;
-        }
-    }
-
-    NX_ASSERT(!getId().isNull());
-    NX_EXPECT(commonModule());
-    if (!commonModule())
-        return false;
-
-    commonModule()->propertyDictionary()->removeProperty(getId(), key);
-    emitPropertyChanged(key);
-
-    return true;
-}
-
 bool QnResource::setProperty(const QString &key, const QVariant& value, PropertyOptions options)
 {
     return setProperty(key, value.toString(), options);
@@ -814,7 +791,6 @@ private:
     QnResourcePtr m_resource;
 };
 
-
 void QnResource::stopAsyncTasks()
 {
     pleaseStopAsyncTasks();
@@ -884,9 +860,8 @@ bool QnResource::isInitialized() const
     return m_initialized;
 }
 
-void QnResource::setUniqId(const QString& value)
+void QnResource::setUniqId(const QString& /*value*/)
 {
-    Q_UNUSED(value)
     NX_ASSERT(false, Q_FUNC_INFO, "Not implemented");
 }
 

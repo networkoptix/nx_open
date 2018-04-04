@@ -857,15 +857,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
+      <translation>Upload bestand...</translation>
     </message>
     <message>
       <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
+      <translation>Upload map...</translation>
     </message>
     <message>
       <source>Start Analytics...</source>
-      <translation type="unfinished">Start Analytics...</translation>
+      <translation>Start Analytics...</translation>
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
@@ -1010,22 +1010,22 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Settings are not available for .NOV and .EXE files.</source>
-      <translation type="unfinished">Settings are not available for .NOV and .EXE files.</translation>
+      <translation>Instellingen zijn niet beschikbaar voor *.noc- en *.exe-bestanden.</translation>
     </message>
   </context>
   <context>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
-      <translation type="unfinished">Audio Video Interleave</translation>
+      <translation>Audio Video Interleave</translation>
     </message>
     <message>
       <source>Matroska</source>
-      <translation type="unfinished">Matroska</translation>
+      <translation>Matroska</translation>
     </message>
     <message>
       <source>MPEG-4 Part 14</source>
-      <translation type="unfinished">MPEG-4 Part 14</translation>
+      <translation>MPEG-4 Part 14</translation>
     </message>
     <message>
       <source>%1 Media File</source>
@@ -2245,14 +2245,14 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>No settings</source>
-      <translation type="unfinished">No settings</translation>
+      <translation>Geen instellingen</translation>
     </message>
   </context>
   <context>
     <name>QnCameraAnalyticsPolicy</name>
     <message>
       <source>Analytics is not available for %1</source>
-      <translation type="unfinished">Analytics is not available for %1</translation>
+      <translation>Analytics is niet beschikbaar voor %1</translation>
     </message>
   </context>
   <context>
@@ -2356,14 +2356,21 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Edge</source>
-      <translation type="unfinished">Edge</translation>
+      <translation>Edge</translation>
+    </message>
+    <message numerus="yes">
+      <source>This Id is already used on the following %n cameras: %1</source>
+      <translation>
+        <numerusform>Deze ID wordt al gebruikt op de volgende %n camera's: %1</numerusform>
+        <numerusform>Deze ID wordt al gebruikt op de volgende %n camera's: %1</numerusform>
+      </translation>
     </message>
   </context>
   <context>
     <name>QnCameraInputBusinessEventWidget</name>
     <message>
       <source>automatic</source>
-      <translation>automatisch</translation>
+      <translation>Automatisch</translation>
     </message>
   </context>
   <context>
@@ -2476,6 +2483,10 @@ to view more bookmarks</source>
       <source>Server</source>
       <translation>Server</translation>
     </message>
+    <message>
+      <source>Id</source>
+      <translation>Id</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraMotionMaskWidget</name>
@@ -2512,7 +2523,7 @@ to view more bookmarks</source>
     <name>QnCameraMotionPolicy</name>
     <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation type="unfinished">Recording or motion detection is disabled for %1</translation>
+      <translation>Opname of bewegingsdetectie is uitgeschakeld voor %1</translation>
     </message>
   </context>
   <context>
@@ -2535,10 +2546,6 @@ to view more bookmarks</source>
   <context>
     <name>QnCameraPasswordChangeDialog</name>
     <message>
-      <source>Password shouldn&apos;t be equal to camera&apos;s user name</source>
-      <translation>Het wachtwoord mag niet gelijk zijn aan de gebruikersnaam van de camera's</translation>
-    </message>
-    <message>
       <source>New Password</source>
       <translation>Nieuw wachtwoord</translation>
     </message>
@@ -2554,12 +2561,16 @@ to view more bookmarks</source>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
       <translation>Het wachtwoord moet minstens 8 tekens lang zijn en verschillende tekens bevatten.</translation>
     </message>
+    <message>
+      <source>Password should not be equal to camera&apos;s user name</source>
+      <translation>Het wachtwoord mag niet gelijk zijn aan de gebruikersnaam van de camera's</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraRecordingPolicy</name>
     <message>
       <source>Recording is disabled for %1</source>
-      <translation type="unfinished">Recording is disabled for %1</translation>
+      <translation>Opname is uitgeschakeld voor %1</translation>
     </message>
   </context>
   <context>
@@ -2626,7 +2637,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Mbit/s</source>
-      <translation type="unfinished">Mbit/s</translation>
+      <translation>Mbit/s</translation>
     </message>
     <message>
       <source>Less Settings</source>
@@ -2733,11 +2744,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Cannot edit properties for several wearable and non-wearable cameras.</source>
-      <translation type="unfinished">Cannot edit properties for several wearable and non-wearable cameras.</translation>
+      <translation>Kan de eigenschappen voor verschillende draagbare en niet-draagbare camera's niet bewerken.</translation>
     </message>
     <message>
       <source>Cannot edit properties for several wearable cameras.</source>
-      <translation type="unfinished">Cannot edit properties for several wearable cameras.</translation>
+      <translation>Kan de eigenschappen voor verschillende draagbare camera's niet bewerken.</translation>
     </message>
   </context>
   <context>
@@ -2832,7 +2843,7 @@ to %1</source>
     </message>
     <message>
       <source>Account is not activated. Please check your email and follow provided instructions</source>
-      <translation type="unfinished">Account is not activated. Please check your email and follow provided instructions</translation>
+      <translation>Het account is niet geactiveerd. Controleer uw e-mail en volg de instructies</translation>
     </message>
   </context>
   <context>
@@ -3184,12 +3195,9 @@ to %1</source>
       <source>Ask your system administrator to do it.</source>
       <translation>Vraag uw systeembeheerder om dit te doen.</translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>Set Password</source>
-      <translation>
-        <numerusform>Wachtwoord instellen</numerusform>
-        <numerusform>Wachtwoord instellen</numerusform>
-      </translation>
+      <translation>Wachtwoord instellen</translation>
     </message>
   </context>
   <context>
@@ -4761,16 +4769,16 @@ to %1</source>
   <context>
     <name>QnPerformanceTest</name>
     <message>
-      <source>For full - featured mode, please use another computer</source>
-      <translation>Gebruik om gebruik te maken van de volledige functionaliteit een andere computer</translation>
-    </message>
-    <message>
       <source>%1 can work in configuration mode only</source>
       <translation>%1 kan alleen in de configuratie modus werken</translation>
     </message>
     <message>
       <source>Performance of this computer allows running %1 in configuration mode only.</source>
       <translation>De prestaties van deze computer kunnen alleen in de configuratiemodus %1 uitvoeren.</translation>
+    </message>
+    <message>
+      <source>For full-featured mode please use another computer</source>
+      <translation>Gebruik om gebruik te maken van de volledige functionaliteit een andere computer</translation>
     </message>
   </context>
   <context>
@@ -5907,6 +5915,10 @@ to %1</source>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
       <translation>&quot;Motion + Low - Res&quot; opnameoptie kan niet worden ingesteld.</translation>
     </message>
+    <message>
+      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
+      <translation>Het geüploade archief kan automatisch worden verwijderd als er geen vrije ruimte meer is op de serveropslag. De oudste beelden van alle camera's op de server worden eerst verwijderd.</translation>
+    </message>
   </context>
   <context>
     <name>QnSmtpAdvancedSettingsWidget</name>
@@ -6058,10 +6070,6 @@ to %1</source>
   <context>
     <name>QnStatusOverlayController</name>
     <message>
-      <source>NOT ENOUGH LICENCES</source>
-      <translation>ONVOLDOENDE LICENTIES</translation>
-    </message>
-    <message>
       <source>NO DATA</source>
       <translation>GEEN GEGEVENS</translation>
     </message>
@@ -6131,7 +6139,11 @@ to %1</source>
     </message>
     <message>
       <source>UNSUPPORTED FIRMWARE VERSION</source>
-      <translation type="unfinished">UNSUPPORTED FIRMWARE VERSION</translation>
+      <translation>NIET-ONDERSTEUNDE FIRMWAREVERSIE</translation>
+    </message>
+    <message>
+      <source>NOT ENOUGH LICENSES</source>
+      <translation>NIET GENOEG LICENTIES</translation>
     </message>
   </context>
   <context>
@@ -7156,24 +7168,24 @@ to %1</source>
   <context>
     <name>QnWearableProgressWidget</name>
     <message>
-      <source>Uploading %1... %2	%p%</source>
-      <translation>Uploaden %1... %2	%p%</translation>
-    </message>
-    <message>
       <source>Stop uploading?</source>
-      <translation type="unfinished">Stop uploading?</translation>
+      <translation>Stoppen met uploaden?</translation>
     </message>
     <message>
       <source>Already uploaded files will be kept.</source>
-      <translation type="unfinished">Already uploaded files will be kept.</translation>
-    </message>
-    <message>
-      <source>Finalizing %1... %2	%p%</source>
-      <translation type="unfinished">Finalizing %1... %2	%p%</translation>
+      <translation>Reeds geüploade bestanden worden bewaard.</translation>
     </message>
     <message>
       <source>(%1 of %2)</source>
-      <translation type="unfinished">(%1 of %2)</translation>
+      <translation>(%1 van %2)</translation>
+    </message>
+    <message>
+      <source>Uploading %1...</source>
+      <translation>Uploaden %1...</translation>
+    </message>
+    <message>
+      <source>Finalizing %1...</source>
+      <translation>Afronden %1...</translation>
     </message>
   </context>
   <context>
@@ -7276,6 +7288,10 @@ to %1</source>
     <message>
       <source>Could not connect to server. Video Wall will be closed.</source>
       <translation>Kon geen verbinding maken met de server. Videowall wordt afgesloten.</translation>
+    </message>
+    <message>
+      <source>Video Wall is removed on the server and will be closed.</source>
+      <translation>Videomuur is verwijderd op de server en zal worden gesloten.</translation>
     </message>
   </context>
   <context>
@@ -7574,19 +7590,15 @@ to %1</source>
     </message>
     <message>
       <source>Video (%1)</source>
-      <translation type="unfinished">Video (%1)</translation>
+      <translation>Video (%1)</translation>
     </message>
     <message>
       <source>Open Wearable Camera Recordings...</source>
-      <translation type="unfinished">Open Wearable Camera Recordings...</translation>
+      <translation>Open draagbare camera opnames...</translation>
     </message>
     <message>
       <source>Only video files with correct timestamp are supported.</source>
-      <translation type="unfinished">Only video files with correct timestamp are supported.</translation>
-    </message>
-    <message>
-      <source>Not enough space on server storage</source>
-      <translation type="unfinished">Not enough space on server storage</translation>
+      <translation>Alleen videobestanden met de juiste tijdstempel worden ondersteund.</translation>
     </message>
     <message>
       <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
@@ -7598,35 +7610,35 @@ to %1</source>
     </message>
     <message>
       <source>Failed to add wearable camera</source>
-      <translation type="unfinished">Failed to add wearable camera</translation>
+      <translation>Toevoegen van draagbare camera mislukt</translation>
     </message>
     <message>
       <source>No video files found in selected folder</source>
-      <translation type="unfinished">No video files found in selected folder</translation>
+      <translation>Geen videobestanden gevonden in de geselecteerde map</translation>
     </message>
     <message numerus="yes">
       <source>Selected file formats are not supported</source>
-      <translation type="unfinished">
-        <numerusform>Selected file formats are not supported</numerusform>
-        <numerusform>Selected file formats are not supported</numerusform>
+      <translation>
+        <numerusform>De geselecteerde bestandsindelingen worden niet ondersteund</numerusform>
+        <numerusform>De geselecteerde bestandsindelingen worden niet ondersteund</numerusform>
       </translation>
     </message>
     <message>
       <source>Use .MKV, .AVI, .MP4 or other video files.</source>
-      <translation type="unfinished">Use .MKV, .AVI, .MP4 or other video files.</translation>
+      <translation>Gebruik .MKV, .AVI, .MP4 of andere videobestanden.</translation>
     </message>
     <message numerus="yes">
       <source>Selected files do not have timestamps</source>
-      <translation type="unfinished">
-        <numerusform>Selected files do not have timestamps</numerusform>
-        <numerusform>Selected files do not have timestamps</numerusform>
+      <translation>
+        <numerusform>De geselecteerde bestanden hebben geen tijdstempels</numerusform>
+        <numerusform>De geselecteerde bestanden hebben geen tijdstempels</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos are already being uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+      <translation>
+        <numerusform>De geselecteerde bestanden bevatten perioden waarvoor video's al worden geüpload</numerusform>
+        <numerusform>De geselecteerde bestanden bevatten perioden waarvoor video's al worden geüpload</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -7638,53 +7650,93 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos have already been uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+      <translation>
+        <numerusform>De geselecteerde bestanden bevatten perioden waarvoor video's al zijn geüpload</numerusform>
+        <numerusform>De geselecteerde bestanden bevatten perioden waarvoor video's al zijn geüpload</numerusform>
       </translation>
     </message>
     <message>
       <source>Selected files will not be uploaded</source>
-      <translation type="unfinished">Selected files will not be uploaded</translation>
+      <translation>De geselecteerde bestanden worden niet geüpload</translation>
     </message>
     <message>
       <source>Some files will not be uploaded</source>
-      <translation type="unfinished">Some files will not be uploaded</translation>
+      <translation>Sommige bestanden worden niet geüpload</translation>
     </message>
     <message>
       <source>No new files to upload in selected folder</source>
-      <translation type="unfinished">No new files to upload in selected folder</translation>
+      <translation>Geen nieuwe bestanden om te uploaden naar de geselecteerde map</translation>
     </message>
     <message numerus="yes">
-      <source>Files size - %2</source>
-      <translation type="unfinished">
-        <numerusform>Files size - %2</numerusform>
-        <numerusform>Files size - %2</numerusform>
+      <source>Selected files are too old</source>
+      <translation>
+        <numerusform>Geselecteerde bestanden zijn te oud</numerusform>
+        <numerusform>Geselecteerde bestanden zijn te oud</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation>
+        <numerusform>Het geselecteerde bestand is opgenomen op %1, maar alleen bestanden die in de afgelopen %n dagen zijn opgenomen, kunnen worden geüpload. U kunt dit wijzigen in de instellingen van het camera-archief.</numerusform>
+        <numerusform>Het geselecteerde bestand is opgenomen op %1, maar alleen bestanden die in de afgelopen %n dagen zijn opgenomen, kunnen worden geüpload. U kunt dit wijzigen in de instellingen van het camera-archief.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation>
+        <numerusform>Geselecteerde bestanden zijn opgenomen tussen %1 en %2, maar alleen bestanden die in de afgelopen %n dagen zijn opgenomen, kunnen worden geüpload. U kunt dit wijzigen in de instellingen van het camera-archief.</numerusform>
+        <numerusform>Geselecteerde bestanden zijn opgenomen tussen %1 en %2, maar alleen bestanden die in de afgelopen %n dagen zijn opgenomen, kunnen worden geüpload. U kunt dit wijzigen in de instellingen van het camera-archief.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Some footage may be deleted after uploading these files</source>
+      <translation>
+        <numerusform>Sommige beelden kunnen zijn verwijderd na het uploaden van deze bestanden</numerusform>
+        <numerusform>Sommige beelden kunnen zijn verwijderd na het uploaden van deze bestanden</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
+      <translation>
+        <numerusform>Er is niet veel vrije ruimte over op serveropslag. Sommige oude beelden kunnen worden verwijderd om ruimte vrij te maken. Let op, als de geselecteerde bestanden toevallig de oudste op de server zijn, deze meteen na het uploaden worden verwijderd.</numerusform>
+        <numerusform>Er is niet veel vrije ruimte over op serveropslag. Sommige oude beelden kunnen worden verwijderd om ruimte vrij te maken. Let op, als de geselecteerde bestanden toevallig de oudste op de server zijn, deze meteen na het uploaden worden verwijderd.</numerusform>
       </translation>
     </message>
     <message>
-      <source>Free space - %2</source>
-      <translation type="unfinished">Free space - %2</translation>
+      <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
+      <translation>Om dit te voorkomen, kunt u extra opslagruimte toevoegen. U kunt ook bepalen welk beeld eerst wordt verwijderd door de bewaartijd van het archief te wijzigen in camera-instellingen.</translation>
     </message>
     <message>
-      <source>%1 - has unsupported format.</source>
-      <translation type="unfinished">%1 - has unsupported format.</translation>
+      <source>Upload anyway?</source>
+      <translation>Toch uploaden?</translation>
     </message>
     <message>
-      <source>%1 - does not have timestamp.</source>
-      <translation type="unfinished">%1 - does not have timestamp.</translation>
+      <source>Could not finish upload to %1</source>
+      <translation>Kan de upload naar %1 niet voltooien</translation>
     </message>
     <message>
-      <source>%1 - covers period for which video has already been uploaded.</source>
-      <translation type="unfinished">%1 - covers period for which video has already been uploaded.</translation>
+      <source>Make sure there is enough space on server storage.</source>
+      <translation>Zorg dat er voldoende ruimte is op de serveropslag.</translation>
     </message>
     <message>
-      <source>%1 - covers period for which video is being uploaded.</source>
-      <translation type="unfinished">%1 - covers period for which video is being uploaded.</translation>
+      <source>%1 has unsupported format.</source>
+      <translation>%1 heeft een niet-ondersteund format.</translation>
     </message>
     <message>
-      <source>%1 - does not fit on server storage.</source>
-      <translation type="unfinished">%1 - does not fit on server storage.</translation>
+      <source>%1 does not have timestamp.</source>
+      <translation>%1 heeft geen tijdstempel.</translation>
+    </message>
+    <message>
+      <source>%1 is older than allowed in camera archive settings.</source>
+      <translation>%1 is ouder dan toegestaan ​​in de camera-archiefinstellingen.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video has already been uploaded.</source>
+      <translation>%1 bevat de periode waarvoor de video al is geüpload.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video is being uploaded.</source>
+      <translation>%1 bevat de periode waarvoor de video wordt geüpload.</translation>
     </message>
   </context>
   <context>
@@ -7885,9 +7937,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Some video file(s) are still being uploaded to %n wearable cameras:</source>
-      <translation type="unfinished">
-        <numerusform>Some video file(s) are still being uploaded to %n wearable cameras:</numerusform>
-        <numerusform>Some video file(s) are still being uploaded to %n wearable cameras:</numerusform>
+      <translation>
+        <numerusform>Sommige videobestanden worden nog steeds geüpload naar %n draagbare camera's:</numerusform>
+        <numerusform>Sommige videobestanden worden nog steeds geüpload naar %n draagbare camera's:</numerusform>
       </translation>
     </message>
   </context>
@@ -7978,7 +8030,7 @@ to %1</source>
     </message>
     <message>
       <source>Rapid Review</source>
-      <translation type="unfinished">Rapid Review</translation>
+      <translation>Rapid Review</translation>
     </message>
     <message>
       <source>Export Settings</source>
@@ -8164,14 +8216,14 @@ to %1</source>
     <name>nx::client::desktop::WearableWorker</name>
     <message>
       <source>Failed to send request to the server.</source>
-      <translation type="unfinished">Failed to send request to the server.</translation>
+      <translation>Mislukt om een ​​verzoek naar de server te verzenden.</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::WorkbenchAnalyticsController</name>
     <message>
       <source>%1 Analytics</source>
-      <translation type="unfinished">%1 Analytics</translation>
+      <translation>%1 Analytics</translation>
     </message>
   </context>
   <context>
@@ -8199,7 +8251,7 @@ to %1</source>
     </message>
     <message>
       <source>Selected period cannot be exported for the current camera.</source>
-      <translation type="unfinished">Selected period cannot be exported for the current camera.</translation>
+      <translation>De geselecteerde periode kan niet worden geëxporteerd voor de huidige camera.</translation>
     </message>
   </context>
   <context>
@@ -8654,7 +8706,7 @@ to %1</source>
     </message>
     <message>
       <source>Wearable Cameras cannot be moved between servers</source>
-      <translation type="unfinished">Wearable Cameras cannot be moved between servers</translation>
+      <translation>Draagbare camera's kunnen niet tussen servers worden verplaatst</translation>
     </message>
     <message>
       <source>Failed to change password</source>
@@ -8703,7 +8755,7 @@ to %1</source>
     </message>
     <message>
       <source>Delete Showreel %1?</source>
-      <translation>Showreel verwijderen?</translation>
+      <translation>Show Voorbeeld %1 verwijderen?</translation>
     </message>
   </context>
   <context>

@@ -6,7 +6,8 @@
 #include <nx/utils/timer_manager.h>
 
 #include <api/helpers/camera_id_helper.h>
-#include <providers/h264_mp4_to_annexb.h>
+#include <providers/filtered_ondemand_data_provider.h>
+#include <media/filters/h264_mp4_to_annexb.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/security_cam_resource.h>
 #include <recording/time_period.h>
@@ -224,7 +225,7 @@ DataSourceContextPtr StreamingChunkTranscoder::prepareDataSourceContext(
             return nullptr;
 
         dataSourceCtx->mediaDataProvider = AbstractOnDemandDataProviderPtr(
-            new H264Mp4ToAnnexB(mediaDataProvider));
+            new FilteredOnDemandDataProvider(mediaDataProvider, std::make_shared<H264Mp4ToAnnexB>()));
     }
 
     if (!dataSourceCtx->transcoder)

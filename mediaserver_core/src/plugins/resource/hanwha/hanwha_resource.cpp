@@ -1173,7 +1173,7 @@ static QString ptzCapabilityBits(Ptz::Capabilities capabilities)
 
 CameraDiagnostics::Result HanwhaResource::initPtz()
 {
-    removeProperty(Qn::DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME);
+    setProperty(Qn::DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME, QString());
 
     const auto mainDescriptors = isNvr()
         ? kHanwhaNvrPtzCapabilityDescriptors
@@ -1424,6 +1424,13 @@ CameraDiagnostics::Result HanwhaResource::fetchExistingProfiles()
     const auto response = helper.view(
         lit("media/videoprofilepolicy"),
         {{kHanwhaChannelProperty, QString::number(getChannel())}});
+    if (!response.isSuccessful())
+    {
+        return CameraDiagnostics::RequestFailedResult(
+            response.requestUrl(),
+            lit("can't read video profile policy"));
+    }
+
 
     std::set<int> availableProfiles;
     for (const auto& profile: response.response())
@@ -2794,6 +2801,18 @@ QnAbstractArchiveDelegate* HanwhaResource::createArchiveDelegate()
         return new HanwhaArchiveDelegate(toSharedPointer());
 
     return nullptr;
+}
+
+void HanwhaResource::setAnalyticsSupportedEvents(const nx::api::AnalyticsSupportedEvents& eventsList)
+{
+    nx::api::AnalyticsSupportedEvents externalEvents;
+    for (const auto& event: eventsList)
+    {
+        if (event != kHanwhaInputPortEventId)
+            externalEvents.push_back(event);
+    }
+
+    base_type::setAnalyticsSupportedEvents(externalEvents);
 }
 
 QnTimePeriodList HanwhaResource::getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int /*detailLevel*/)

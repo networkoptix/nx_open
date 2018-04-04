@@ -83,7 +83,6 @@ public:
     nx::analytics::storage::AbstractEventsStorage* analyticsEventsStorage() const;
     nx::mediaserver::updates2::ServerUpdates2Manager* updates2Manager() const;
 
-    void initializeRootTool();
     nx::mediaserver::RootTool* rootTool() const;
 
 private:

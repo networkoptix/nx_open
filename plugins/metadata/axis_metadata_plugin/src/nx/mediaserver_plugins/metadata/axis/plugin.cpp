@@ -141,6 +141,12 @@ AnalyticsDriverManifest Plugin::fetchSupportedEvents(const CameraInfo& cameraInf
     for (const auto& topic: m_typedManifest.allowedTopics)
         allowedTopics.push_back(topic.toStdString());
     axisCameraController.filterSupportedEvents(allowedTopics);
+
+    std::vector<std::string> forbiddenDescriptions;
+    for (const auto& description: m_typedManifest.forbiddenDescriptions)
+        forbiddenDescriptions.push_back(description.toStdString());
+    axisCameraController.removeForbiddenEvents(forbiddenDescriptions);
+
     const auto& src = axisCameraController.suppotedEvents();
     std::transform(src.begin(), src.end(), std::back_inserter(result.outputEventTypes),
         [](const nx::axis::SupportedEvent& event) {return AnalyticsEventType(event); });
@@ -151,6 +157,11 @@ AnalyticsDriverManifest Plugin::fetchSupportedEvents(const CameraInfo& cameraInf
     //QString textForManifest = QJson::serialized(result);
 
     return result;
+}
+
+void Plugin::executeAction(Action* /*action*/, Error* /*outError*/)
+{
+    // Do nothing.
 }
 
 } // axis
@@ -166,4 +177,3 @@ NX_PLUGIN_API nxpl::PluginInterface* createNxMetadataPlugin()
 }
 
 } // extern "C"
-

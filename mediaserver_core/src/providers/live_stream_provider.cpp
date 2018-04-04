@@ -138,7 +138,6 @@ QnSharedResourcePointer<QnAbstractVideoCamera> QnLiveStreamProvider::getOwner() 
 void QnLiveStreamProvider::setRole(Qn::ConnectionRole role)
 {
     QnAbstractMediaStreamDataProvider::setRole(role);
-    QnMutexLocker mtx(&m_liveMutex);
     updateSoftwareMotion();
 
     const auto roleForAnalytics = ini().analyzeSecondaryStream
@@ -154,7 +153,6 @@ void QnLiveStreamProvider::setRole(Qn::ConnectionRole role)
 
 Qn::ConnectionRole QnLiveStreamProvider::getRole() const
 {
-    QnMutexLocker lock(&m_liveMutex);
     return m_role;
 }
 
@@ -197,8 +195,9 @@ QnLiveStreamParams QnLiveStreamProvider::mergeWithAdvancedParams(const QnLiveStr
         params.bitrateKbps = advancedLiveStreamParams.bitrateKbps;
     if (params.bitrateKbps == 0)
     {
+        const bool isSecondary = m_role == Qn::CR_SecondaryLiveVideo;
         if (params.quality == Qn::QualityNotDefined)
-            params.quality = Qn::QualityNormal;
+            params.quality = isSecondary ? Qn::QualityLow : Qn::QualityNormal;
 
         params.bitrateKbps = m_cameraRes->suggestBitrateForQualityKbps(
             params.quality, params.resolution, params.fps, m_role);
@@ -243,7 +242,7 @@ Qn::ConnectionRole QnLiveStreamProvider::roleForMotionEstimation()
             m_softMotionRole = Qn::CR_SecondaryLiveVideo;
         else
         {
-            if (m_cameraRes && !m_cameraRes->hasDualStreaming2() && (m_cameraRes->getCameraCapabilities() & Qn::PrimaryStreamSoftMotionCapability))
+            if (m_cameraRes && !m_cameraRes->hasDualStreaming() && (m_cameraRes->getCameraCapabilities() & Qn::PrimaryStreamSoftMotionCapability))
                 m_softMotionRole = Qn::CR_LiveVideo;
             else
                 m_softMotionRole = Qn::CR_SecondaryLiveVideo;
@@ -440,7 +439,7 @@ void QnLiveStreamProvider::onGotVideoFrame(
     }
     else
     {
-        const bool updateResolutionFromPrimaryStream = !m_cameraRes->hasDualStreaming2()
+        const bool updateResolutionFromPrimaryStream = !m_cameraRes->hasDualStreaming()
             && m_role == Qn::CR_LiveVideo
             && (!m_resolutionCheckTimer.isValid()
                 || m_resolutionCheckTimer.elapsed() > PRIMARY_RESOLUTION_CHECK_TIMEOUT_MS);

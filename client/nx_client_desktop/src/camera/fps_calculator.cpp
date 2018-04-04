@@ -8,18 +8,18 @@ namespace Qn {
 
 void calculateMaxFps(
     const QnVirtualCameraResourceList& cameras,
-    int *maxFps,
-    int *maxDualStreamFps,
-    MotionType motionTypeOverride)
+    int* maxFps,
+    int* maxDualStreamFps,
+    bool motionDetectionAllowed)
 {
-    for (const auto &camera : cameras)
+    for (const auto& camera: cameras)
     {
         int cameraFps = camera->getMaxFps();
         int cameraDualStreamingFps = cameraFps;
-        bool shareFps = camera->streamFpsSharingMethod() == Qn::BasicFpsSharing;
-        Qn::MotionType motionType = motionTypeOverride == Qn::MT_Default
+        const bool shareFps = camera->streamFpsSharingMethod() == Qn::BasicFpsSharing;
+        const auto motionType = motionDetectionAllowed
             ? camera->getMotionType()
-            : motionTypeOverride;
+            : Qn::MT_NoMotion;
 
         switch (motionType)
         {
@@ -45,17 +45,21 @@ void calculateMaxFps(
     }
 }
 
-QPair<int, int> calculateMaxFps(const QnVirtualCameraResourceList& cameras, MotionType motionTypeOverride)
+QPair<int, int> calculateMaxFps(
+    const QnVirtualCameraResourceList& cameras,
+    bool motionDetectionAllowed)
 {
     int maxFps = std::numeric_limits<int>::max();
     int maxDualStreamingFps = maxFps;
-    calculateMaxFps(cameras, &maxFps, &maxDualStreamingFps, motionTypeOverride);
+    calculateMaxFps(cameras, &maxFps, &maxDualStreamingFps, motionDetectionAllowed);
     return {maxFps, maxDualStreamingFps};
 }
 
-QPair<int, int> calculateMaxFps(const QnVirtualCameraResourcePtr& camera, MotionType motionTypeOverride)
+QPair<int, int> calculateMaxFps(
+    const QnVirtualCameraResourcePtr& camera,
+    bool motionDetectionAllowed)
 {
-    return calculateMaxFps(QnVirtualCameraResourceList() << camera, motionTypeOverride);
+    return calculateMaxFps(QnVirtualCameraResourceList() << camera, motionDetectionAllowed);
 }
 
 } //namespace Qn

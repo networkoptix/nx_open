@@ -85,6 +85,12 @@ protected:
         return m_outgoingTransactionDispatcher;
     }
 
+    void reinitialiseTransactionLog()
+    {
+        m_transactionLog.reset();
+        initializeTransactionLog();
+    }
+
 private:
     TestOutgoingTransactionDispatcher m_outgoingTransactionDispatcher;
     std::unique_ptr<ec2::TransactionLog> m_transactionLog;
@@ -134,6 +140,18 @@ protected:
     {
         ASSERT_EQ(nx::utils::db::DBResult::ok, m_activeQuery->transaction()->rollback());
         m_activeQuery.reset();
+    }
+
+    void addTransactionsWithIncreasingTimestampSequence()
+    {
+        for (int i = 0; i < 3; ++i)
+        {
+            auto tran = prepareFromOtherPeerWithTimestampDiff(1);
+            tran.persistentInfo.timestamp.sequence =
+                std::max<std::uint64_t>(m_lastUsedSequence + 1, tran.persistentInfo.timestamp.sequence + 1);
+            m_lastUsedSequence = tran.persistentInfo.timestamp.sequence;
+            saveTransaction(tran);
+        }
     }
 
     void whenGeneratedTransactionLocally()
@@ -220,6 +238,12 @@ protected:
         ASSERT_EQ(nx::utils::db::DBResult::cancelled, resultCode);
     }
 
+    void assertMaxTimestampSequenceIsUsed()
+    {
+        const auto timestamp = transactionLog()->generateTransactionTimestamp(m_systemId.c_str());
+        ASSERT_EQ(m_lastUsedSequence, timestamp.sequence);
+    }
+
 private:
     const std::string m_systemId;
     const QnUuid m_otherPeerId;
@@ -229,6 +253,7 @@ private:
     std::shared_ptr<nx::utils::db::QueryContext> m_activeQuery;
     nx::utils::db::DbConnectionHolder m_dbConnectionHolder;
     boost::optional<::ec2::QnTransaction<::ec2::ApiUserData>> m_initialTransaction;
+    std::uint64_t m_lastUsedSequence = 0;
 
     void init()
     {
@@ -319,6 +344,13 @@ private:
 
     void addTransactionFromOtherPeerWithTimestampDiff(int timestampDiff)
     {
+        saveTransaction(
+            prepareFromOtherPeerWithTimestampDiff(timestampDiff));
+    }
+
+    ::ec2::QnTransaction<::ec2::ApiUserData> prepareFromOtherPeerWithTimestampDiff(
+        int timestampDiff)
+    {
         ::ec2::QnTransaction<::ec2::ApiUserData> transaction(m_otherPeerId);
         transaction.command = ::ec2::ApiCommand::saveUser;
         transaction.persistentInfo.dbID = m_otherPeerDbId;
@@ -333,6 +365,11 @@ private:
         if (!m_initialTransaction)
             m_initialTransaction = transaction;
 
+        return transaction;
+    }
+
+    void saveTransaction(::ec2::QnTransaction<::ec2::ApiUserData> transaction)
+    {
         auto queryContext = getQueryContext();
         const auto dbResult = transactionLog()->checkIfNeededAndSaveToLog(
             queryContext.get(),
@@ -413,13 +450,20 @@ TEST_F(TransactionLogSameTransaction, transaction_with_lesser_sequence_is_ignore
     assertThatTransactionAuthorIsLocalPeer();
 }
 
-TEST_F(TransactionLogSameTransaction, /*DISABLED_*/tran_rollback_clears_raw_data)
+TEST_F(TransactionLogSameTransaction, tran_rollback_clears_raw_data)
 {
     whenGeneratedTransactionLocally();
     beginTran();
     whenAddedTransactionLocallyWithGreaterSequence();
     rollbackTran();
     assertIfTransactionHasBeenReplaced();
+}
+
+TEST_F(TransactionLogSameTransaction, max_timestamp_sequence_is_restored_after_restart)
+{
+    addTransactionsWithIncreasingTimestampSequence();
+    reinitialiseTransactionLog();
+    assertMaxTimestampSequenceIsUsed();
 }
 
 //-------------------------------------------------------------------------------------------------

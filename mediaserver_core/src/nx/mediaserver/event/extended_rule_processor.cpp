@@ -81,11 +81,10 @@
 
 namespace {
 
-static const QString tpProductLogoFilename(lit("productLogoFilename"));
-static const QString tpEventLogoFilename(lit("eventLogoFilename"));
 static const QString tpProductLogo(lit("logo"));
 static const QString tpSystemIcon(lit("systemIcon"));
 static const QString tpOwnerIcon(lit("ownerIcon"));
+static const QString tpSourceIcon(lit("sourceIcon"));
 static const QString tpCloudOwner(lit("cloudOwner"));
 static const QString tpCloudOwnerEmail(lit("cloudOwnerEmail"));
 static const QString tpCompanyName(lit("companyName"));
@@ -374,7 +373,7 @@ bool ExtendedRuleProcessor::executePlaySoundAction(
 
 bool ExtendedRuleProcessor::executeSayTextAction(const vms::event::AbstractActionPtr& action)
 {
-#if !defined(EDGE_SERVER)
+#if !defined(EDGE_SERVER) && !defined(__aarch64__)
     const auto params = action->getParams();
     const auto text = params.sayText;
     const auto resource = resourcePool()->getResourceById<nx::mediaserver::resource::Camera>(
@@ -421,27 +420,34 @@ bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractA
 
     nx::utils::Url url(action->getParams().url);
     if ((actionParameters.requestType == nx::network::http::Method::get) ||
+        (actionParameters.requestType == nx::network::http::Method::delete_) ||
         (actionParameters.requestType.isEmpty() && actionParameters.text.isEmpty()))
     {
-        auto callback = [action](SystemError::ErrorCode osErrorCode, int statusCode,
-            nx::network::http::BufferType messageBody, nx::network::http::HttpHeaders /*httpResponseHeaders*/)
-        {
-            if (osErrorCode != SystemError::noError ||
-                statusCode != nx::network::http::StatusCode::ok)
+        auto callback = [action](
+            SystemError::ErrorCode osErrorCode,
+            int statusCode,
+            nx::network::http::StringType, /*content type*/
+            nx::network::http::BufferType messageBody,
+            nx::network::http::HttpHeaders /*httpResponseHeaders*/)
             {
-                qWarning() << "Failed to execute HTTP action for url "
-                    << QUrl(action->getParams().url).toString(QUrl::RemoveUserInfo)
-                    << "osErrorCode:" << osErrorCode
-                    << "HTTP result:" << statusCode
-                    << "message:" << messageBody;
-            }
-        };
+                if (osErrorCode != SystemError::noError ||
+                    statusCode != nx::network::http::StatusCode::ok)
+                {
+                    qWarning() << "Failed to execute HTTP action for url "
+                        << QUrl(action->getParams().url).toString(QUrl::RemoveUserInfo)
+                        << "osErrorCode:" << osErrorCode
+                        << "HTTP result:" << statusCode
+                        << "message:" << messageBody;
+                }
+            };
 
-        nx::network::http::downloadFileAsync(
+        nx::network::http::downloadFileAsyncEx(
             url,
             callback,
             nx::network::http::HttpHeaders(),
-            actionParameters.authType);
+            actionParameters.authType,
+            nx::network::http::AsyncHttpClient::Timeouts(),
+            actionParameters.requestType);
         return true;
     }
     else
@@ -467,7 +473,9 @@ bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractA
             contentType,
             nx::network::http::HttpHeaders(),
             callback,
-            actionParameters.authType);
+            actionParameters.authType,
+            QString(), QString(), //< login/password.
+            actionParameters.requestType);
         return true;
     }
 }
@@ -503,7 +511,7 @@ bool ExtendedRuleProcessor::executeRecordingAction(const vms::event::RecordingAc
                 camera,
                 action->getStreamQuality(),
                 action->getFps(),
-                action->getRecordBeforeSec(), //< Record-before setup is allowed after VMS-7148 is implemented
+                action->getRecordBeforeSec(),
                 action->getRecordAfterSec(),
                 action->getDurationSec());
         }
@@ -573,7 +581,7 @@ ExtendedRuleProcessor::TimespampedFrame ExtendedRuleProcessor::getEventScreensho
 
     api::CameraImageRequest request;
     request.camera = camera;
-    request.msecSinceEpoch = timestampUsec / 1000;
+    request.usecSinceEpoch = timestampUsec;
     request.size = dstSize;
     request.roundMethod = api::CameraImageRequest::RoundMethod::precise;
 
@@ -628,22 +636,41 @@ void ExtendedRuleProcessor::sendEmailAsync(
     QnEmailSettings emailSettings = commonModule()->globalSettings()->emailSettings();
     QString cloudOwnerAccount = commonModule()->globalSettings()->cloudAccountName();
 
+    auto addIcon =
+        [&attachments, &contextMap](const QString& name, const QString& source)
+        {
+            attachments << QnEmailAttachmentPtr(
+                new QnEmailAttachment(
+                    name,
+                    source,
+                    tpImageMimeType));
+            contextMap[name] = lit("cid:") + name;
+        };
+
+
     if (isHtml)
     {
-        attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpProductLogo, lit(":/skin/email_attachments/productLogo.png"), tpImageMimeType)));
-        attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpSystemIcon, lit(":/skin/email_attachments/systemIcon.png"), tpImageMimeType)));
+        addIcon(tpProductLogo, lit(":/skin/email_attachments/productLogo.png"));
+        addIcon(tpSystemIcon, lit(":/skin/email_attachments/systemIcon.png"));
 
-        contextMap[tpProductLogoFilename] = lit("cid:") + tpProductLogo;
-        contextMap[tpSystemIcon] = lit("cid:") + tpSystemIcon;
+        const auto eventType = action->getRuntimeParams().eventType;
+        switch (eventType)
+        {
+            case vms::event::cameraDisconnectEvent:
+            case vms::event::licenseIssueEvent:
+            case vms::event::networkIssueEvent:
+            case vms::event::softwareTriggerEvent:
+                addIcon(tpSourceIcon, lit(":/skin/email_attachments/cameraIcon.png"));
+                break;
+            default:
+                break;
+        }
     }
 
     if (!cloudOwnerAccount.isEmpty())
     {
         if (isHtml)
-        {
-            attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpOwnerIcon, lit(":/skin/email_attachments/ownerIcon.png"), tpImageMimeType)));
-            contextMap[tpOwnerIcon] = lit("cid:") + tpOwnerIcon;
-        }
+            addIcon(tpOwnerIcon, lit(":/skin/email_attachments/ownerIcon.png"));
 
         contextMap[tpCloudOwnerEmail] = cloudOwnerAccount;
 

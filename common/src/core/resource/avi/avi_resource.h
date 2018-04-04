@@ -51,7 +51,7 @@ public:
     virtual QnMediaDewarpingParams getDewarpingParams() const override;
     virtual void setDewarpingParams(const QnMediaDewarpingParams& params) override;
 
-    virtual qreal customAspectRatio() const override;
+    virtual QnAspectRatio customAspectRatio() const override;
 
 private:
     QnStorageResourcePtr m_storage;

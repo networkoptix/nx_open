@@ -7,6 +7,7 @@
 
 #include <QtCore/QSet>
 #include <QtCore/QHash>
+#include <QtCore/QSharedPointer>
 
 #include <api/server_rest_connection_fwd.h>
 #include <analytics/detected_objects_storage/analytics_events_storage.h>
@@ -18,8 +19,11 @@
 
 class QnUuid;
 class QnMediaResourceWidget;
+class QMenu;
 
 namespace nx {
+
+namespace api { struct AnalyticsManifestObjectAction; }
 
 namespace utils { class PendingOperation; }
 
@@ -48,6 +52,8 @@ public:
 
     virtual void clear() override;
 
+    static constexpr int kMaximumItemCount = 1000;
+
 protected:
     virtual rest::Handle requestPrefetch(qint64 fromMs, qint64 toMs) override;
     virtual bool commitPrefetch(qint64 earliestTimeToCommitMs, bool& fetchedAll) override;
@@ -55,7 +61,7 @@ protected:
     virtual bool hasAccessRights() const override;
 
 private:
-    void processMetadata(const QnAbstractCompressedMetadataPtr& metadata);
+    void processMetadata();
     media::SignalingMetadataConsumer* createMetadataSource();
 
     int indexOf(const QnUuid& objectId) const;
@@ -66,7 +72,7 @@ private:
     void emitDataChangedIfNeeded();
 
     void advanceObject(analytics::storage::DetectedObject& object,
-        analytics::storage::ObjectPosition&& position);
+        analytics::storage::ObjectPosition&& position, bool emitDataChanged = true);
 
     using GetCallback = std::function<void(bool, rest::Handle, analytics::storage::LookupResult&&)>;
     rest::Handle getObjects(qint64 startMs, qint64 endMs, GetCallback callback,
@@ -74,16 +80,31 @@ private:
 
     QString description(const analytics::storage::DetectedObject& object) const;
     QString attributes(const analytics::storage::DetectedObject& object) const;
+    QSharedPointer<QMenu> contextMenu(const analytics::storage::DetectedObject& object) const;
     static qint64 startTimeMs(const analytics::storage::DetectedObject& object);
 
     utils::PendingOperation* createUpdateWorkbenchFilterOperation();
+
+    void executePluginAction(const QnUuid& driverId,
+        const api::AnalyticsManifestObjectAction& action,
+        const analytics::storage::DetectedObject& object) const;
+
+    void constrainLength();
+
+    struct PreviewParams
+    {
+        qint64 timestampUs = 0;
+        QRectF boundingBox;
+    };
+
+    static PreviewParams previewParams(const analytics::storage::DetectedObject& object);
 
 private:
     AnalyticsSearchListModel* const q = nullptr;
     QRectF m_filterRect;
     QString m_filterText;
     const QScopedPointer<QTimer> m_updateTimer;
-    const QScopedPointer<QTimer> m_dataChangedTimer;
+    const QScopedPointer<utils::PendingOperation> m_emitDataChanged;
     const QScopedPointer<utils::PendingOperation> m_updateWorkbenchFilter;
     QSet<QnUuid> m_dataChangedObjectIds; //< For which objects delayed dataChanged is queued.
     media::AbstractMetadataConsumerPtr m_metadataSource;
@@ -96,6 +117,10 @@ private:
     bool m_success = true;
 
     QHash<QnUuid, qint64> m_objectIdToTimestampUs;
+
+    const QScopedPointer<QTimer> m_metadataProcessingTimer;
+    QVector<QnAbstractCompressedMetadataPtr> m_metadataPackets;
+    mutable QnMutex m_metadataMutex;
 };
 
 } // namespace desktop

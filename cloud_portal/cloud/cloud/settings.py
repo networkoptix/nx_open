@@ -290,7 +290,8 @@ BROKER_TRANSPORT_OPTIONS = {
 RESULT_PERSISTENT = True
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_SEND_EVENTS = False
-WORKER_PREFETCH_MULTIPLIER = 1
+CELERYD_PREFETCH_MULTIPLIER = 0  # Allows worker to consume as many messages it wants
+BROKER_HEARTBEAT = 10  # Supposed to check connection with broker
 
 # / End of Celery settings section
 

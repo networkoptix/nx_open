@@ -93,6 +93,20 @@ bool isNull(const nxpl::NX_GUID& guid)
     return memcmp(guid.bytes, kNullGuid.bytes, sizeof(nxpl::NX_GUID::bytes)) == 0;
 }
 
+std::string makeElementName(
+    const std::string& pipelineName,
+    const std::string& factoryName,
+    const std::string& elementName)
+{
+    return pipelineName + "_" + factoryName + "_" + elementName;
+}
+
+std::chrono::milliseconds now()
+{
+    auto timePointNow = std::chrono::high_resolution_clock::now();
+    return std::chrono::duration_cast<std::chrono::milliseconds>(timePointNow.time_since_epoch());
+}
+
 } // namespace deepstream
 } // namespace metadata
 } // namespace mediaserver_plugins

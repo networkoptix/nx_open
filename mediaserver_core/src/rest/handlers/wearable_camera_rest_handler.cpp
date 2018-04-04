@@ -223,13 +223,14 @@ int QnWearableCameraRestHandler::executeStatus(const QnRequestParams& params,
         return nx::network::http::StatusCode::internalServerError;
 
     QnWearableLockInfo info = locker->lockInfo(cameraId);
+    WearableArchiveSynchronizationState state = uploader->state(cameraId);
 
     QnWearableStatusReply reply;
     reply.success = true;
     reply.locked = info.locked;
-    reply.consuming = uploader->isConsuming(cameraId);
+    reply.consuming = state.isConsuming();
     reply.userId = info.userId;
-    reply.progress = 0; // TODO: #wearable
+    reply.progress = state.progress();
     result.setReply(reply);
 
     return nx::network::http::StatusCode::ok;

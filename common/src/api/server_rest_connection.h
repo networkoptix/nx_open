@@ -20,6 +20,7 @@
 #include <common/common_module_aware.h>
 #include <api/model/time_reply.h>
 #include <analytics/detected_objects_storage/analytics_events_storage.h>
+#include <api/model/analytics_actions.h>
 #include <api/model/wearable_prepare_data.h>
 #include <api/model/manual_camera_seach_reply.h>
 
@@ -60,19 +61,33 @@ struct RestResultWithData: public RestResultWithDataBase
 using EventLogData = RestResultWithData<nx::vms::event::ActionDataList>;
 using MultiServerTimeData = RestResultWithData<ApiMultiserverServerDateTimeDataList>;
 
+struct ServerConnectionBase
+{
+    template<typename ResultType>
+    struct Result
+    {
+        using type = std::function<void (bool success, Handle requestId, ResultType result)>;
+    };
+};
+
+template<>
+struct ServerConnectionBase::Result<QByteArray>
+{
+    using type = std::function<void(bool success, Handle requestId, QByteArray result,
+        const nx::network::http::HttpHeaders& headers)>;
+};
+
 class ServerConnection:
     public QObject,
     public QnCommonModuleAware,
-    public Qn::EnableSafeDirectConnection
+    public Qn::EnableSafeDirectConnection,
+    public ServerConnectionBase
 {
     Q_OBJECT
+
 public:
     ServerConnection(QnCommonModule* commonModule, const QnUuid& serverId);
     virtual ~ServerConnection();
-
-
-    template <typename ResultType>
-    struct Result { typedef std::function<void (bool /*hasSucceeded*/, Handle /*requestId*/, ResultType)> type; };
 
     struct EmptyResponseType {};
     typedef Result<EmptyResponseType>::type PostCallback;   // use this type for POST requests without result data
@@ -183,6 +198,7 @@ public:
 
     Handle validateFileInformation(
         const QString& url,
+        int expectedSize,
         GetCallback callback,
         QThread* targetThread = nullptr);
 
@@ -350,6 +366,11 @@ public:
         GetCallback callback,
         QThread* targetThread = nullptr);
 
+    Handle executeAnalyticsAction(
+        const AnalyticsAction& action,
+        Result<QnJsonRestResult>::type callback,
+        QThread* targetThread = nullptr);
+
     /**
      * Cancel running request by known requestID. If request is canceled, callback isn't called.
      * If target thread has been used then callback may be called after 'cancelRequest' in case of data already received and queued to a target thread.
@@ -363,11 +384,12 @@ public:
 
 private slots:
     void onHttpClientDone(int requestId, nx::network::http::AsyncHttpClientPtr httpClient);
+
 private:
-    template <typename ResultType> Handle executeGet(
+    template<typename CallbackType> Handle executeGet(
         const QString& path,
         const QnRequestParamList& params,
-        Callback<ResultType> callback,
+        CallbackType callback,
         QThread* targetThread);
 
     template <typename ResultType> Handle executePost(
@@ -398,7 +420,7 @@ private:
         QThread* targetThread);
 
     Handle executeRequest(const nx::network::http::ClientPool::Request& request,
-        Callback<QByteArray> callback,
+        Result<QByteArray>::type callback,
         QThread* targetThread);
 
     Handle executeRequest(const nx::network::http::ClientPool::Request& request,
@@ -413,8 +435,16 @@ private:
         const nx::network::http::StringType& contentType = nx::network::http::StringType(),
         const nx::network::http::StringType& messageBody = nx::network::http::StringType());
 
-    typedef std::function<void (Handle, SystemError::ErrorCode, int, nx::network::http::StringType contentType, nx::network::http::BufferType msgBody)> HttpCompletionFunc;
-    Handle sendRequest(const nx::network::http::ClientPool::Request& request, HttpCompletionFunc callback = HttpCompletionFunc());
+    using HttpCompletionFunc = std::function<void (
+        Handle handle,
+        SystemError::ErrorCode errorCode,
+        int statusCode,
+        nx::network::http::StringType contentType,
+        nx::network::http::BufferType msgBody,
+        const nx::network::http::HttpHeaders& headers)>;
+
+    Handle sendRequest(const nx::network::http::ClientPool::Request& request,
+        HttpCompletionFunc callback = HttpCompletionFunc());
 
     QnMediaServerResourcePtr getServerWithInternetAccess() const;
 

@@ -166,6 +166,7 @@ public:
     ~CLVideoDecoderOutput();
 
     QImage toImage() const;
+    std::vector<char> toArgb(int* outLineSize) const;
 
     static void copy(const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst);
     static bool imagesAreEqual(const CLVideoDecoderOutput* img1, const CLVideoDecoderOutput* img2, unsigned int max_diff);
@@ -183,7 +184,7 @@ public:
     void copyDataFrom(const AVFrame* frame);
     CLVideoDecoderOutput* rotated(int angle);
     /** Scale frame to new size */
-    CLVideoDecoderOutput* scaled(const QSize& newSize, AVPixelFormat newFormat = AV_PIX_FMT_NONE);
+    CLVideoDecoderOutput* scaled(const QSize& newSize, AVPixelFormat newFormat = AV_PIX_FMT_NONE) const;
 
     QSize size() const { return QSize(width, height); }
 

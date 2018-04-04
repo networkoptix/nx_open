@@ -810,7 +810,7 @@ void PlayerPrivate::handleMediaEventChanged()
         return;
 
     const auto event = dataConsumer->mediaEvent();
-    const auto value = event == Qn::MediaStreamEvent::TooManyOpenedConnectionsError;
+    const auto value = event == Qn::MediaStreamEvent::TooManyOpenedConnections;
     if (value == tooManyConnections)
         return;
 

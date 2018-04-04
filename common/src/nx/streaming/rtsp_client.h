@@ -281,7 +281,8 @@ public:
     void setAdditionAttribute(const QByteArray& name, const QByteArray& value);
     void removeAdditionAttribute(const QByteArray& name);
 
-    void setTCPTimeout(int timeout);
+    void setTCPTimeout(std::chrono::milliseconds timeout);
+    std::chrono::milliseconds getTCPTimeout() const;
 
     void parseRangeHeader(const QString& rangeStr);
 
@@ -399,7 +400,7 @@ private:
     qint64 m_openedTime;
     qint64 m_endTime;
     float m_scale;
-    int m_tcpTimeout;
+    std::chrono::milliseconds m_tcpTimeout;
     int m_responseCode;
     bool m_isAudioEnabled;
     int m_numOfPredefinedChannels;

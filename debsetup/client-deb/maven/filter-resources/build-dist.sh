@@ -13,7 +13,9 @@ FULLVERSION=@release.version@.@buildNumber@
 MINORVERSION=@parsedVersion.majorVersion@.@parsedVersion.minorVersion@
 ARCHITECTURE=@os.arch@
 
-COMPILER=@CMAKE_CXX_COMPILER@
+COMPILER="@CMAKE_CXX_COMPILER@"
+CFLAGS="@CMAKE_C_FLAGS@"
+LFLAGS="@CMAKE_EXE_LINKER_FLAGS@"
 SOURCE_ROOT_PATH="@root.dir@"
 TARGET=/opt/$COMPANY_NAME/client/$FULLVERSION
 USRTARGET=/usr
@@ -54,11 +56,19 @@ BUILD_INFO_TXT=@libdir@/build_info.txt
 LOGS_DIR="@libdir@/build_logs"
 LOG_FILE="$LOGS_DIR/client-build-dist.log"
 
-# [in] Library name
 # [in] Destination directory
+# [in] Libraries to copy
 cp_sys_lib()
 {
-    "$SOURCE_ROOT_PATH"/build_utils/copy_system_library.sh -c "$COMPILER" "$@"
+    DEST_DIR=$1
+    shift
+
+    "$SOURCE_ROOT_PATH"/build_utils/linux/copy_system_library.py \
+        --compiler="$COMPILER" \
+        --flags="$CFLAGS" \
+        --link-flags="$LFLAGS" \
+        --dest-dir="$DEST_DIR" \
+        "$@"
 }
 
 buildDistribution()
@@ -161,14 +171,15 @@ buildDistribution()
         cp -P @qt.dir@/lib/$qtlib* $LIBSTAGE
     done
 
-    cp_sys_lib libstdc++.so.6 "$LIBSTAGE"
+    cp_sys_lib "$LIBSTAGE" libstdc++.so.6 libgcc_s.so.1
 
     if [ '@arch@' != 'arm' ]
     then
         echo "Copying additional libs"
-        cp_sys_lib libXss.so.1 "$LIBSTAGE"
-        cp_sys_lib libpng12.so.0 "$LIBSTAGE" || cp_sys_lib libpng.so "$LIBSTAGE"
-        cp_sys_lib libopenal.so.1 "$LIBSTAGE"
+        cp_sys_lib "$LIBSTAGE" \
+            libXss.so.1 \
+            libopenal.so.1
+        cp_sys_lib "$LIBSTAGE" libpng12.so.0 || cp_sys_lib "$LIBSTAGE" libpng.so
         cp -P @qt.dir@/lib/libicu*.so* "$LIBSTAGE"
     fi
 

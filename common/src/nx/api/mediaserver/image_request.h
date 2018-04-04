@@ -46,7 +46,7 @@ struct ImageRequest
      * Timestamp of the image. A negative value means "latest" Can have the special value
      * DATETIME_NOW.
      */
-    qint64 msecSinceEpoch = kLatestThumbnail;
+    qint64 usecSinceEpoch = kLatestThumbnail;
 
     /** Forced rotation. Negative value means take default rotation from the camera settings. */
     int rotation = kDefaultRotation;
@@ -89,6 +89,17 @@ struct CameraImageRequest: ImageRequest
     static const int kMinimumSize = 32;
     static const int kMaximumSize = 4096;
 };
+
+inline QString toString(ImageRequest::RoundMethod value)
+{
+    switch (value)
+    {
+        case ImageRequest::RoundMethod::iFrameBefore: return lit("iFrameBefore");
+        case ImageRequest::RoundMethod::precise: return lit("precise");
+        case ImageRequest::RoundMethod::iFrameAfter: return lit("iFrameAfter");
+        default: return lit("RoundMethod::UNKNOWN");
+    }
+}
 
 } // namespace api
 } // namespace nx

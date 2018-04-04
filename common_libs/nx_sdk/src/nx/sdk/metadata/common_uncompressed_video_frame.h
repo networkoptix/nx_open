@@ -25,7 +25,7 @@ public:
     virtual int width() const override { return m_width; }
     virtual int height() const override { return m_height; }
     virtual Ratio sampleAspectRatio() const override { return {1, 1}; }
-    virtual PixelFormat pixelFormat() const override { return PixelFormat::yuv420; }
+    virtual PixelFormat pixelFormat() const override { return m_pixelFormat; }
     virtual Handle handleType() const override { return Handle::none; }
     virtual int handle() const override { return 0; }
     virtual int planeCount() const override;
@@ -36,7 +36,7 @@ public:
     virtual void unmap() override {}
 
     void setOwnedData(
-        std::vector<std::vector<char>> data, std::vector<int> lineSize)
+        std::vector<std::vector<char>>&& data, std::vector<int>&& lineSize)
     {
         m_externalData.clear();
         m_externalDataSize.clear();
@@ -45,12 +45,17 @@ public:
     }
 
     void setExternalData(
-        std::vector<const char*> data, std::vector<int> dataSize, std::vector<int> lineSize)
+        std::vector<const char*>&& data, std::vector<int>&& dataSize, std::vector<int>&& lineSize)
     {
         m_ownedData.clear();
         m_externalData = std::move(data);
         m_externalDataSize = std::move(dataSize);
         m_lineSize = std::move(lineSize);
+    }
+
+    void setPixelFormat(UncompressedVideoFrame::PixelFormat pixelFormat)
+    {
+        m_pixelFormat = pixelFormat;
     }
 
 private:
@@ -60,6 +65,8 @@ private:
     const int64_t m_timestampUsec = 0;
     const int m_width = 0;
     const int m_height = 0;
+    UncompressedVideoFrame::PixelFormat m_pixelFormat =
+        UncompressedVideoFrame::PixelFormat::yuv420;
 
     std::vector<std::vector<char>> m_ownedData;
     std::vector<const char*> m_externalData;

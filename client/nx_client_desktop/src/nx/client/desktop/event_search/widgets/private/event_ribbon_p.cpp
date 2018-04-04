@@ -22,11 +22,14 @@
 #include <ui/style/nx_style_p.h>
 #include <ui/workaround/hidpi_workarounds.h>
 
+#include <nx/api/mediaserver/image_request.h>
 #include <nx/client/desktop/event_search/widgets/event_tile.h>
 #include <nx/client/desktop/ui/actions/action.h>
-#include <nx/utils/log/assert.h>
-#include <nx/api/mediaserver/image_request.h>
 #include <nx/client/desktop/image_providers/camera_thumbnail_provider.h>
+#include <nx/client/desktop/utils/widget_utils.h>
+#include <nx/utils/log/assert.h>
+
+#include <ini.h>
 
 namespace nx {
 namespace client {
@@ -259,16 +262,13 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
     if (color.isValid())
         tile->setTitleColor(color);
 
-    if (tile->preview())
-        return; //< Don't ever update existing previews.
-
     const auto camera = index.data(Qn::ResourceRole).value<QnResourcePtr>()
         .dynamicCast<QnVirtualCameraResource>();
 
     if (!camera)
         return;
 
-    const auto previewTimeMs = index.data(Qn::PreviewTimeRole).value<qint64>();
+    const auto previewTimeUs = index.data(Qn::PreviewTimeRole).value<qint64>();
     const auto previewCropRect = index.data(Qn::ItemZoomRectRole).value<QRectF>();
     const auto thumbnailWidth = previewCropRect.isEmpty()
         ? kDefaultThumbnailWidth
@@ -276,7 +276,8 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
 
     api::CameraImageRequest request;
     request.camera = camera;
-    request.msecSinceEpoch = previewTimeMs > 0 ? previewTimeMs : nx::api::ImageRequest::kLatestThumbnail;
+    request.usecSinceEpoch =
+        previewTimeUs > 0 ? previewTimeUs : nx::api::ImageRequest::kLatestThumbnail;
     request.rotation = nx::api::ImageRequest::kDefaultRotation;
     request.size = QSize(thumbnailWidth, 0);
     request.imageFormat = nx::api::ImageRequest::ThumbnailFormat::jpg;
@@ -285,10 +286,50 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
         ? nx::api::ImageRequest::RoundMethod::iFrameAfter
         : nx::api::ImageRequest::RoundMethod::precise;
 
-    tile->setPreview(new CameraThumbnailProvider(request, tile));
+    const auto showPreviewTimestamp =
+        [tile](CameraThumbnailProvider* provider)
+        {
+            if (provider->status() == Qn::ThumbnailStatus::Loaded)
+            {
+                tile->setDescription(lit("%1<br>Preview: %2 us").arg(tile->description())
+                    .arg(provider->timestampUs()));
+            }
+        };
 
-    tile->preview()->loadAsync();
-    tile->setPreviewCropRect(previewCropRect);
+    if (tile->preview())
+    {
+        auto provider = qobject_cast<CameraThumbnailProvider*>(tile->preview());
+        NX_ASSERT(provider);
+
+        if (!provider)
+            return;
+
+        if (request.usecSinceEpoch == provider->requestData().usecSinceEpoch)
+        {
+            if (ini().showDebugTimeInformationInRibbon)
+                showPreviewTimestamp(provider);
+        }
+        else
+        {
+            provider->setRequestData(request);
+            provider->loadAsync();
+            tile->setPreviewCropRect(previewCropRect);
+        }
+    }
+    else
+    {
+        auto provider = new CameraThumbnailProvider(request, tile);
+        tile->setPreview(provider);
+
+        if (ini().showDebugTimeInformationInRibbon)
+        {
+            connect(provider, &QnImageProvider::statusChanged, tile,
+                [showPreviewTimestamp, provider]() { showPreviewTimestamp(provider); });
+        }
+
+        tile->preview()->loadAsync();
+        tile->setPreviewCropRect(previewCropRect);
+    }
 }
 
 void EventRibbon::Private::showContextMenu(EventTile* tile, const QPoint& posRelativeToTile)
@@ -308,16 +349,18 @@ void EventRibbon::Private::showContextMenu(EventTile* tile, const QPoint& posRel
 
 void EventRibbon::Private::debugCheckGeometries()
 {
+#if 0
 #if defined(_DEBUG)
     int pos = 0;
     for (int i = 0; i < m_tiles.size(); ++i)
     {
-        NX_ASSERT(pos == m_positions[m_tiles[i]]);
         pos += m_currentShifts.value(i);
+        NX_ASSERT(pos == m_positions[m_tiles[i]]);
         pos += m_tiles[i]->height() + kDefaultTileSpacing;
     }
 
     NX_ASSERT(pos == m_totalHeight);
+#endif
 #endif
 }
 
@@ -353,6 +396,10 @@ void EventRibbon::Private::insertNewTiles(int index, int count, UpdateMode updat
     int nextIndex = index;
 
     const auto oldUnreadCount = unreadCount();
+    const bool viewportVisible = m_viewport->isVisible() && m_viewport->width() > 0;
+
+    if (!viewportVisible)
+        updateMode = UpdateMode::instant;
 
     for (int i = 0; i < count; ++i)
     {
@@ -362,7 +409,7 @@ void EventRibbon::Private::insertNewTiles(int index, int count, UpdateMode updat
         if (!tile)
             continue;
 
-        if (m_viewport->isVisible() && m_viewport->width() > 0)
+        if (viewportVisible)
         {
             static const QPoint kOutside(-10000, 0); //< Somewhere outside of visible area.
             tile->move(kOutside);
@@ -376,12 +423,11 @@ void EventRibbon::Private::insertNewTiles(int index, int count, UpdateMode updat
             tile->setVisible(false);
             tile->resize(qMax(1, m_viewport->width()), kApproximateTileHeight);
             tile->setParent(m_viewport);
-            updateMode = UpdateMode::instant;
         }
 
         m_tiles.insert(nextIndex++, tile);
         m_positions[tile] = currentPosition;
-        currentPosition += kApproximateTileHeight + kDefaultTileSpacing;
+        currentPosition += tile->height() + kDefaultTileSpacing;
     }
 
     const auto delta = currentPosition - position;
@@ -395,7 +441,10 @@ void EventRibbon::Private::insertNewTiles(int index, int count, UpdateMode updat
     m_scrollBar->setMaximum(m_scrollBar->maximum() + delta);
 
     if (position < m_scrollBar->value())
+    {
         m_scrollBar->setValue(m_scrollBar->value() + delta);
+        updateMode = UpdateMode::instant;
+    }
 
     // Correct current animations.
     for (auto& animatedIndex: m_itemShiftAnimations)
@@ -656,40 +705,56 @@ void EventRibbon::Private::doUpdateView()
         return;
     }
 
+    updateCurrentShifts();
+
     const int base = m_scrollBar->isHidden() ? 0 : m_scrollBar->value();
     const int height = m_viewport->height();
 
-    const auto first = std::upper_bound(m_tiles.cbegin(), m_tiles.cend(), base,
-        [this](int left, EventTile* right) { return left < m_positions.value(right); }) - 1;
+    const auto secondInView = std::upper_bound(m_tiles.cbegin(), m_tiles.cend(), base,
+        [this](int left, EventTile* right) { return left < m_positions.value(right); });
 
-    auto iter = first;
-    int currentPosition = m_positions.value(*first);
+    int firstIndexToUpdate = qMax(0, secondInView - m_tiles.cbegin() - 1);
+
+    if (!m_currentShifts.empty())
+        firstIndexToUpdate = qMin(firstIndexToUpdate, m_currentShifts.begin().key());
+
+    int currentPosition = 0;
+    if (firstIndexToUpdate > 0)
+    {
+        const auto prevTile = m_tiles[firstIndexToUpdate - 1];
+        currentPosition = m_positions.value(prevTile) + prevTile->height() + kDefaultTileSpacing;
+    }
+
     const auto positionLimit = base + height;
-
-    QSet<EventTile*> newVisible;
-
-    updateCurrentShifts();
 
     static constexpr int kWidthThreshold = 400;
     const auto mode = m_viewport->width() > kWidthThreshold
         ? EventTile::Mode::wide
         : EventTile::Mode::standard;
 
+    QSet<EventTile*> newVisible;
+
+    auto iter = m_tiles.cbegin() + firstIndexToUpdate;
     while (iter != m_tiles.end() && currentPosition < positionLimit)
     {
         const auto tile = *iter;
-        m_positions[tile] = currentPosition;
         currentPosition += m_currentShifts.value(iter - m_tiles.cbegin());
+        m_positions[tile] = currentPosition;
         tile->setGeometry(0, currentPosition - base, m_viewport->width(), calculateHeight(tile));
         tile->setMode(mode);
-        tile->setVisible(true);
-        newVisible.insert(tile);
-        currentPosition += tile->height() + kDefaultTileSpacing;
+        const auto bottom = currentPosition + tile->height();
+        currentPosition = bottom + kDefaultTileSpacing;
 
-        if (!tile->isRead() && shouldSetTileRead(tile))
+        if (bottom > 0)
         {
-            tile->setRead(true);
-            m_unread.remove(tile);
+            tile->setVisible(true);
+            newVisible.insert(tile);
+
+            if (!tile->isRead() && shouldSetTileRead(tile))
+            {
+                tile->setRead(true);
+                m_unread.remove(tile);
+            }
         }
 
         ++iter;
@@ -697,8 +762,8 @@ void EventRibbon::Private::doUpdateView()
 
     while (iter != m_tiles.end())
     {
-        m_positions[*iter] = currentPosition;
         currentPosition += m_currentShifts.value(iter - m_tiles.cbegin());
+        m_positions[*iter] = currentPosition;
         currentPosition += (*iter)->height() + kDefaultTileSpacing;
         ++iter;
     }
@@ -723,7 +788,7 @@ void EventRibbon::Private::doUpdateView()
     updateScrollRange();
     debugCheckVisibility();
 
-    const auto pos = QnNxStylePrivate::mapFromGlobal(q, QCursor::pos());
+    const auto pos = WidgetUtils::mapFromGlobal(q, QCursor::pos());
     updateHover(q->rect().contains(pos), pos);
 
     if (!m_currentShifts.empty()) //< If has running animations.

@@ -1,5 +1,3 @@
-#include "common_updates2_manager.h"
-#include "detail/update_request_data_factory.h"
 #include <nx/api/updates2/updates2_status_data.h>
 #include <nx/update/info/sync_update_checker.h>
 #include <nx/update/info/update_registry_factory.h>
@@ -12,7 +10,10 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
 #include <api/global_settings.h>
+#include <api/runtime_info_manager.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
+#include "detail/update_request_data_factory.h"
+#include "common_updates2_manager.h"
 
 
 namespace nx {
@@ -30,6 +31,34 @@ static const QString kFileName = "update.status";
 CommonUpdates2Manager::CommonUpdates2Manager(QnCommonModule* commonModule):
     QnCommonModuleAware(commonModule)
 {
+}
+
+void CommonUpdates2Manager::connectToSignals()
+{
+    connect(
+        globalSettings(), &QnGlobalSettings::updates2RegistryChanged,
+        this, &CommonUpdates2Manager::checkForGlobalDictionaryUpdate);
+    connect(
+        downloader(), &Downloader::downloadFinished,
+        this, &CommonUpdates2Manager::onDownloadFinished);
+    connect(
+        downloader(), &Downloader::downloadFailed,
+        this, &CommonUpdates2Manager::onDownloadFailed);
+    connect(
+        downloader(), &Downloader::fileAdded,
+        this, &CommonUpdates2Manager::onFileAdded);
+    connect(
+        downloader(), &Downloader::fileDeleted,
+        this, &CommonUpdates2Manager::onFileDeleted);
+    connect(
+        downloader(), &Downloader::fileInformationChanged,
+        this, &CommonUpdates2Manager::onFileInformationChanged);
+    connect(
+        downloader(), &Downloader::fileStatusChanged,
+        this, &CommonUpdates2Manager::onFileInformationStatusChanged);
+    connect(
+        downloader(), &Downloader::chunkDownloadFailed,
+        this, &CommonUpdates2Manager::onChunkDownloadFailed);
 }
 
 void CommonUpdates2Manager::loadStatusFromFile()
@@ -62,11 +91,13 @@ QnUuid CommonUpdates2Manager::moduleGuid() const
 
 void CommonUpdates2Manager::updateGlobalRegistry(const QByteArray& serializedRegistry)
 {
+    // #TODO #akulikov Return here if called on the client or make up somehow.
+
     globalSettings()->setUpdates2Registry(serializedRegistry);
     globalSettings()->synchronizeNow();
 }
 
-void CommonUpdates2Manager::writeStatusToFile(const detail::Updates2StatusDataEx& statusData)
+void CommonUpdates2Manager::writeStatusToFile(const manager::detail::Updates2StatusDataEx& statusData)
 {
     QFile file(filePath());
     if (!file.open(QIODevice::WriteOnly) || !file.write(QJson::serialized(statusData)))
@@ -74,6 +105,16 @@ void CommonUpdates2Manager::writeStatusToFile(const detail::Updates2StatusDataEx
         NX_WARNING(this, "Failed to save persistent update status data");
         return;
     }
+}
+
+bool CommonUpdates2Manager::isClient() const
+{
+    return commonModule()->runtimeInfoManager()->localInfo().data.peer.isClient();
+}
+
+QnUuid CommonUpdates2Manager::peerId() const
+{
+    return commonModule()->moduleGUID();
 }
 
 } // namespace update

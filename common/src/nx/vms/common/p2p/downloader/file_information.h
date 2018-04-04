@@ -12,6 +12,11 @@ namespace common {
 namespace p2p {
 namespace downloader {
 
+struct PeerSelectionInfo
+{
+
+};
+
 struct FileInformation
 {
     Q_GADGET

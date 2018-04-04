@@ -1,8 +1,8 @@
 #include "common_plugin.h"
-#include <nx/kit/debug.h>
 
 #define NX_DEBUG_ENABLE_OUTPUT m_enableOutput
 #define NX_PRINT_PREFIX (std::string("[") + m_name + "] ")
+#include <nx/kit/debug.h>
 
 namespace nx {
 namespace sdk {
@@ -16,6 +16,8 @@ CommonPlugin::CommonPlugin(const char* name):
 
 std::string CommonPlugin::getParamValue(const char* paramName)
 {
+    if (paramName == nullptr)
+        return "";
     return m_settings[paramName];
 }
 
@@ -69,18 +71,34 @@ void CommonPlugin::setSettings(const nxpl::Setting* /*settings*/, int /*count*/)
    // plugins, thus, do nothing.
 }
 
-void CommonPlugin::setDeclaredSettings(const nxpl::Setting* settings, int count)
+bool CommonPlugin::fillSettingsMap(
+    std::map<std::string, std::string>* map, const nxpl::Setting* settings, int count,
+    const char* func) const
 {
-    NX_OUTPUT << "Received Plugin settings:";
+    if (count > 0 && settings == nullptr)
+    {
+        NX_PRINT << func << "(): INTERNAL ERROR: settings is null and count is " << count;
+        return false;
+    }
+
     NX_OUTPUT << "{";
     for (int i = 0; i < count; ++i)
     {
-        m_settings[settings[i].name] = settings[i].value;
+        (*map)[settings[i].name] = settings[i].value;
         NX_OUTPUT << "    " << nx::kit::debug::toString(settings[i].name)
             << ": " << nx::kit::debug::toString(settings[i].value)
             << ((i < count - 1) ? "," : "");
     }
     NX_OUTPUT << "}";
+
+    return true;
+}
+
+void CommonPlugin::setDeclaredSettings(const nxpl::Setting* settings, int count)
+{
+    NX_OUTPUT << "Received Plugin settings:";
+    if (!fillSettingsMap(&m_settings, settings, count, __func__))
+        return; //< Error is already logged.
 
     settingsChanged();
 }
@@ -95,10 +113,40 @@ void CommonPlugin::setLocale(const char* /*locale*/)
     // Do nothing.
 }
 
-const char* CommonPlugin::capabilitiesManifest(Error* error) const
+const char* CommonPlugin::capabilitiesManifest(Error* /*error*/) const
 {
     m_manifest = capabilitiesManifest();
     return m_manifest.c_str();
+}
+
+void CommonPlugin::executeAction(Action* action, Error* outError)
+{
+    if (!action)
+    {
+        NX_PRINT << __func__ << "(): INTERNAL ERROR: action is null";
+        *outError = Error::unknownError;
+        return;
+    }
+
+    NX_OUTPUT << "Executing action with id [" << action->actionId() << "]";
+
+    std::map<std::string, std::string> params;
+    if (!fillSettingsMap(&params, action->params(), action->paramCount(), __func__))
+    {
+        // Error is already logged.
+        *outError = Error::unknownError;
+        return;
+    }
+
+    std::string actionUrl;
+    std::string messageToUser;
+    executeAction(
+        action->actionId(), action->objectId(), action->cameraId(), action->timestampUs(), params,
+        &actionUrl, &messageToUser, outError);
+
+    const char* const actionUrlPtr = actionUrl.empty() ? nullptr : actionUrl.c_str();
+    const char* const messageToUserPtr = messageToUser.empty() ? nullptr : messageToUser.c_str();
+    action->handleResult(actionUrlPtr, messageToUserPtr);
 }
 
 } // namespace metadata

@@ -35,6 +35,7 @@
 #include <database/migrations/add_default_webpages_migration.h>
 #include <database/migrations/cleanup_removed_transactions.h>
 #include <database/migrations/access_rights_db_migration.h>
+#include <database/migrations/camera_user_attributes_migration.h>
 
 #include <network/system_helpers.h>
 
@@ -125,7 +126,7 @@ void assertSorted(std::vector<T> &data) {
 #ifdef _DEBUG
     assertSorted(data, &T::id);
 #else
-    Q_UNUSED(data);
+    nx::utils::unused(data);
 #endif // DEBUG
 }
 
@@ -229,7 +230,6 @@ bool QnDbManager::QnLazyTransactionLocker::commit()
     m_committed = m_tran->commitLazyTran();
     return m_committed;
 }
-
 
 //-------------------------------------------------------------------------------------------------
 // QnDbManager
@@ -514,7 +514,6 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
         }
         NX_CRITICAL(!m_adminUserID.isNull());
 
-
         if (!setMediaServersStatus(Qn::Offline))
             return false;
 
@@ -682,7 +681,6 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
                 commonModule()->setUseLowPriorityAdminPasswordHack(true);
         }
 
-
         bool updateUserResource = false;
 
         if (!defaultAdminPassword.isEmpty())
@@ -790,7 +788,6 @@ bool QnDbManager::syncLicensesBetweenDB()
         licensesStaticDbSet.end(),
         std::inserter(addToStatic, addToStatic.begin()));
 
-
     for (const auto& license : addToMain)
     {
         if (saveLicense(license, m_sdb) != ErrorCode::ok)
@@ -806,7 +803,6 @@ bool QnDbManager::syncLicensesBetweenDB()
     commonModule()->setDbId(m_dbInstanceId);
     return true;
 }
-
 
 template <typename FilterDataType, class ObjectType, class ObjectListType>
 bool QnDbManager::fillTransactionLogInternal(ApiCommand::Value command, std::function<bool (ObjectType& data)> updater)
@@ -1112,7 +1108,6 @@ bool QnDbManager::updateBusinessActionParameters()
             remapData[id] = remappedData;
         }
     }
-
 
     for(auto iter = remapData.cbegin(); iter != remapData.cend(); ++iter) {
         QSqlQuery query(m_sdb);
@@ -1627,9 +1622,15 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
         }
         return fixDefaultBusinessRuleGuids() && resyncIfNeeded(ResyncRules);
     }
-    
+
     if (updateName.endsWith(lit("/99_20180122_remove_secondary_stream_quality.sql")))
         return resyncIfNeeded(ResyncCameraAttributes);
+
+    if (updateName.endsWith("99_20180329_02_add_record_thresholds_camera_attributes.sql"))
+    {
+        return ec2::db::migrateRecordingThresholds(m_sdb)
+            && resyncIfNeeded(ResyncCameraAttributes);
+    }
 
     NX_LOG(lit("SQL update %1 does not require post-actions.").arg(updateName), cl_logDEBUG1);
     return true;
@@ -1997,7 +1998,9 @@ ErrorCode QnDbManager::insertOrReplaceCameraAttributes(const ApiCameraAttributes
             license_used,
             failover_priority,
             backup_type,
-            logical_id
+            logical_id,
+            record_before_motion_sec,
+            record_after_motion_sec
         ) VALUES (
             :cameraId,
             :cameraName,
@@ -2015,7 +2018,9 @@ ErrorCode QnDbManager::insertOrReplaceCameraAttributes(const ApiCameraAttributes
             :licenseUsed,
             :failoverPriority,
             :backupType,
-            :logicalId
+            :logicalId,
+            :recordBeforeMotionSec,
+            :recordAfterMotionSec
         ))sql");
 
     QnSql::bind(data, query.get());
@@ -2133,11 +2138,11 @@ ErrorCode QnDbManager::updateCameraSchedule(const std::vector<ApiScheduleTaskDat
 
     const auto query = m_insertCameraScheduleQuery.get(m_sdb, R"sql(
         INSERT INTO vms_scheduletask (
-            camera_attrs_id, start_time, end_time, do_record_audio, record_type,
-            day_of_week, before_threshold, after_threshold, stream_quality, fps, bitrate_kbps
+            camera_attrs_id, start_time, end_time, record_type,
+            day_of_week, stream_quality, fps, bitrate_kbps
         ) VALUES (
-            :internalId, :startTime, :endTime, :recordAudio, :recordingType,
-            :dayOfWeek, :beforeThreshold, :afterThreshold, :streamQuality, :fps, :bitrateKbps
+            :internalId, :startTime, :endTime, :recordingType,
+            :dayOfWeek, :streamQuality, :fps, :bitrateKbps
         ))sql");
 
     query->bindValue(":internalId", internalId);
@@ -2780,7 +2785,6 @@ ErrorCode QnDbManager::checkExistingUser(const QString &name, qint32 internalId)
                   JOIN vms_userprofile p on p.resource_ptr_id = r.id \
                   WHERE p.resource_ptr_id != :id and r.name = :name");
 
-
     query.bindValue(":id", internalId);
     query.bindValue(":name", name);
     if (!query.exec()) {
@@ -3415,34 +3419,33 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& storageId, ApiStorageDataList
 
 ErrorCode QnDbManager::getScheduleTasks(std::vector<ApiScheduleTaskWithRefData>& scheduleTaskList)
 {
-    //fetching recording schedule
-    QSqlQuery queryScheduleTask(m_sdb);
-    queryScheduleTask.setForwardOnly(true);
-    queryScheduleTask.prepare(QString("\
-        SELECT\
-            r.camera_guid as sourceId,             \
-            st.start_time as startTime,            \
-            st.end_time as endTime,                \
-            st.do_record_audio as recordAudio,     \
-            st.record_type as recordingType,       \
-            st.day_of_week as dayOfWeek,           \
-            st.before_threshold as beforeThreshold,\
-            st.after_threshold as afterThreshold,  \
-            st.stream_quality as streamQuality,    \
-            st.fps,                                \
-            st.bitrate_kbps as bitrateKbps         \
-        FROM vms_scheduletask st \
-        JOIN vms_camera_user_attributes r on r.id = st.camera_attrs_id \
-        LEFT JOIN vms_resource r2 on r2.guid = r.camera_guid \
-        ORDER BY r.camera_guid\
-    "));
+    // Fetching recording schedule.
+    const auto queryText = R"sql(
+        SELECT
+            r.camera_guid as sourceId,
+            st.start_time as startTime,
+            st.end_time as endTime,
+            st.record_type as recordingType,
+            st.day_of_week as dayOfWeek,
+            st.stream_quality as streamQuality,
+            st.fps,
+            st.bitrate_kbps as bitrateKbps
+        FROM vms_scheduletask st
+        JOIN vms_camera_user_attributes r on r.id = st.camera_attrs_id
+        LEFT JOIN vms_resource r2 on r2.guid = r.camera_guid
+        ORDER BY r.camera_guid
+    )sql";
 
-    if (!queryScheduleTask.exec()) {
-        NX_LOG( lit("Db error in %1: %2").arg(Q_FUNC_INFO).arg(queryScheduleTask.lastError().text()), cl_logERROR);
+    QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
+
+    if (!prepareSQLQuery(&query, queryText, Q_FUNC_INFO))
         return ErrorCode::dbError;
-    }
 
-    QnSql::fetch_many(queryScheduleTask, &scheduleTaskList);
+    if (!execSQLQuery(&query, Q_FUNC_INFO))
+        return ErrorCode::dbError;
+
+    QnSql::fetch_many(query, &scheduleTaskList);
     return ErrorCode::ok;
 }
 
@@ -3456,32 +3459,38 @@ ErrorCode QnDbManager::doQueryNoLock(
     if (!cameraId.isNull())
         filterStr = QString("WHERE camera_guid = %1").arg(guidToSqlString(cameraId));
 
-    queryCameras.prepare(lit("\
-        SELECT                                           \
-            camera_guid as cameraId,                     \
-            camera_name as cameraName,                   \
-            group_name as userDefinedGroupName,          \
-            audio_enabled as audioEnabled,               \
-            control_enabled as controlEnabled,           \
-            region as motionMask,                        \
-            schedule_enabled as scheduleEnabled,         \
-            motion_type as motionType,                   \
-            disable_dual_streaming as disableDualStreaming, \
-            dewarping_params as dewarpingParams,         \
-            coalesce(min_archive_days, %1) as minArchiveDays,             \
-            coalesce(max_archive_days, %2) as maxArchiveDays,             \
-            preferred_server_id as preferredServerId,    \
-            license_used as licenseUsed,                 \
-            failover_priority as failoverPriority,       \
-            backup_type as backupType,                   \
-            logical_id as logicalId                      \
-         FROM vms_camera_user_attributes \
-         LEFT JOIN vms_resource r on r.guid = camera_guid \
-         %3 \
-         ORDER BY camera_guid \
-        ").arg(-ec2::kDefaultMinArchiveDays)
-          .arg(-ec2::kDefaultMaxArchiveDays)
-          .arg(filterStr));
+    const QString queryStr = R"sql(
+        SELECT
+            camera_guid as cameraId,
+            camera_name as cameraName,
+            group_name as userDefinedGroupName,
+            audio_enabled as audioEnabled,
+            control_enabled as controlEnabled,
+            region as motionMask,
+            schedule_enabled as scheduleEnabled,
+            motion_type as motionType,
+            disable_dual_streaming as disableDualStreaming,
+            dewarping_params as dewarpingParams,
+            coalesce(min_archive_days, %1) as minArchiveDays,
+            coalesce(max_archive_days, %2) as maxArchiveDays,
+            preferred_server_id as preferredServerId,
+            license_used as licenseUsed,
+            failover_priority as failoverPriority,
+            backup_type as backupType,
+            logical_id as logicalId,
+            coalesce(record_before_motion_sec, %3)as recordBeforeMotionSec,
+            coalesce(record_after_motion_sec, %4) as recordAfterMotionSec
+         FROM vms_camera_user_attributes
+         LEFT JOIN vms_resource r on r.guid = camera_guid
+         %5
+         ORDER BY camera_guid)sql";
+
+    queryCameras.prepare(queryStr
+        .arg(-ec2::kDefaultMinArchiveDays)
+        .arg(-ec2::kDefaultMaxArchiveDays)
+        .arg(ec2::kDefaultRecordBeforeMotionSec)
+        .arg(ec2::kDefaultRecordAfterMotionSec)
+        .arg(filterStr));
 
     if (!queryCameras.exec()) {
         NX_LOG( lit("Db error in %1: %2").arg(Q_FUNC_INFO).arg(queryCameras.lastError().text()), cl_logERROR);
@@ -3515,35 +3524,40 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiCameraDataExList& came
     if (!id.isNull())
         filterStr = QString("WHERE r.guid = %1").arg(guidToSqlString(id));
 
-    queryCameras.prepare(QString("\
-        SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, \
-            coalesce(nullif(cu.camera_name, \"\"), r.name) as name, r.url, \
-            coalesce(rs.status, 0) as status, \
-            c.vendor, c.manually_added as manuallyAdded, \
-            coalesce(nullif(cu.group_name, \"\"), c.group_name) as groupName, \
-            c.group_id as groupId, c.mac, c.model, \
-            c.status_flags as statusFlags, c.physical_id as physicalId, \
-            cu.audio_enabled as audioEnabled,                  \
-            cu.control_enabled as controlEnabled,              \
-            cu.region as motionMask,                           \
-            cu.schedule_enabled as scheduleEnabled,            \
-            cu.motion_type as motionType,                      \
-            cu.disable_dual_streaming as disableDualStreaming,    \
-            cu.dewarping_params as dewarpingParams,            \
-            coalesce(cu.min_archive_days, %1) as minArchiveDays,             \
-            coalesce(cu.max_archive_days, %2) as maxArchiveDays,             \
-            cu.preferred_server_id as preferredServerId,       \
-            cu.license_used as licenseUsed,                    \
-            cu.failover_priority as failoverPriority,          \
-            cu.backup_type as backupType,                      \
-            cu.logical_id as logicalId                         \
-        FROM vms_resource r \
-        LEFT JOIN vms_resource_status rs on rs.guid = r.guid \
-        JOIN vms_camera c on c.resource_ptr_id = r.id \
-        LEFT JOIN vms_camera_user_attributes cu on cu.camera_guid = r.guid \
-        %3 \
-        ORDER BY r.guid \
-    ").arg(-ec2::kDefaultMinArchiveDays)
+    const QString queryStr = R"sql(
+        SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId,
+            coalesce(nullif(cu.camera_name, ""), r.name) as name, r.url,
+            coalesce(rs.status, 0) as status,
+            c.vendor, c.manually_added as manuallyAdded,
+            coalesce(nullif(cu.group_name, ""), c.group_name) as groupName,
+            c.group_id as groupId, c.mac, c.model,
+            c.status_flags as statusFlags, c.physical_id as physicalId,
+            cu.audio_enabled as audioEnabled,
+            cu.control_enabled as controlEnabled,
+            cu.region as motionMask,
+            cu.schedule_enabled as scheduleEnabled,
+            cu.motion_type as motionType,
+            cu.disable_dual_streaming as disableDualStreaming,
+            cu.dewarping_params as dewarpingParams,
+            coalesce(cu.min_archive_days, %1) as minArchiveDays,
+            coalesce(cu.max_archive_days, %2) as maxArchiveDays,
+            cu.preferred_server_id as preferredServerId,
+            cu.license_used as licenseUsed,
+            cu.failover_priority as failoverPriority,
+            cu.backup_type as backupType,
+            cu.logical_id as logicalId,
+            cu.record_before_motion_sec as recordBeforeMotionSec,
+            cu.record_after_motion_sec as recordAfterMotionSec
+        FROM vms_resource r
+        LEFT JOIN vms_resource_status rs on rs.guid = r.guid
+        JOIN vms_camera c on c.resource_ptr_id = r.id
+        LEFT JOIN vms_camera_user_attributes cu on cu.camera_guid = r.guid
+        %3
+        ORDER BY r.guid
+    )sql";
+
+    queryCameras.prepare(queryStr
+      .arg(-ec2::kDefaultMinArchiveDays)
       .arg(-ec2::kDefaultMaxArchiveDays)
       .arg(filterStr));
 
@@ -3573,7 +3587,6 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiCameraDataExList& came
         &ApiCameraDataEx::scheduleTasks,
         &ApiCameraDataEx::id,
         &ApiScheduleTaskWithRefData::sourceId );
-
 
     return ErrorCode::ok;
 }
@@ -3822,7 +3835,6 @@ ec2::ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiAccessR
 
     return ErrorCode::ok;
 }
-
 
 //getTransactionLog
 ErrorCode QnDbManager::doQueryNoLock(const ApiTranLogFilter& filter, ApiTransactionDataList& tranList)
@@ -4663,8 +4675,6 @@ ErrorCode QnDbManager::insertOrReplaceVideowall(const ApiVideowallData& data, qi
     qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
     return ErrorCode::dbError;
 }
-
-
 
 ErrorCode QnDbManager::saveWebPage(const ApiWebPageData& params)
 {

@@ -1,6 +1,6 @@
 set(defaultSkin "dark_blue")
 set(compatibleCustomizations "default_cn" "default_zh_CN")
-set(enable_hanwha ON)
+set(enable_hanwha true)
 
 # Components Namings
 set(display.product.name "Nx Witness")

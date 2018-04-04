@@ -11,6 +11,7 @@
 #include <core/ptz/ptz_constants.h>
 
 #include <ui/animation/animation_timer_listener.h>
+#include <utils/common/aspect_ratio.h>
 
 class QnResourceWidgetRenderer;
 class QnMediaResourceWidget;
@@ -44,7 +45,7 @@ public:
         const QnMediaDewarpingParams& dewarpingParams,
         const QRectF& rect);
 
-    qreal customAR() const;
+    QnAspectRatio customAR() const;
 
 protected:
     virtual void tick(int deltaMSecs) override;

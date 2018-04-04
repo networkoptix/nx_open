@@ -7,39 +7,19 @@ namespace ec2 {
 
 struct ApiScheduleTaskData: ApiData
 {
-    ApiScheduleTaskData():
-        startTime(0),
-        endTime(0),
-        recordAudio(false),
-        recordingType(Qn::RT_Always),
-        dayOfWeek(1),
-        beforeThreshold(0),
-        afterThreshold(0),
-        streamQuality(Qn::QualityNotDefined),
-        fps(0.0),
-        bitrateKbps(0)
-    {
-    }
-
-    qint32 startTime;
-    qint32 endTime;
-    bool recordAudio;
-    Qn::RecordingType recordingType;
-    qint8 dayOfWeek;
-    qint16 beforeThreshold;
-    qint16 afterThreshold;
-    Qn::StreamQuality streamQuality;
-    qint16 fps;
+    qint32 startTime = 0;
+    qint32 endTime = 0;
+    Qn::RecordingType recordingType = Qn::RT_Always;
+    qint8 dayOfWeek = 1;
+    Qn::StreamQuality streamQuality = Qn::QualityNotDefined;
+    qint16 fps = 0;
     int bitrateKbps = 0;
 };
 #define ApiScheduleTaskData_Fields \
     (startTime) \
     (endTime) \
-    (recordAudio) \
     (recordingType) \
     (dayOfWeek) \
-    (beforeThreshold) \
-    (afterThreshold) \
     (streamQuality) \
     (fps) \
     (bitrateKbps)
@@ -54,25 +34,13 @@ struct ApiScheduleTaskWithRefData: ApiScheduleTaskData
 
 //-------------------------------------------------------------------------------------------------
 
-const int kDefaultMinArchiveDays = 1;
-const int kDefaultMaxArchiveDays = 30;
+static constexpr int kDefaultMinArchiveDays = 1;
+static constexpr int kDefaultMaxArchiveDays = 30;
+static constexpr int kDefaultRecordBeforeMotionSec = 5;
+static constexpr int kDefaultRecordAfterMotionSec = 5;
 
 struct ApiCameraAttributesData: ApiData
 {
-    ApiCameraAttributesData():
-        scheduleEnabled(true),
-        licenseUsed(true),
-        motionType(Qn::MT_Default),
-        audioEnabled(false),
-        disableDualStreaming(false),
-        controlEnabled(true),
-        minArchiveDays(-kDefaultMinArchiveDays),
-        maxArchiveDays(-kDefaultMaxArchiveDays),
-        failoverPriority(Qn::FP_Medium),
-        backupType(Qn::CameraBackup_Default)
-    {
-    }
-
     QnUuid getIdForMerging() const { return cameraId; } //< See ApiIdData::getIdForMerging().
 
     static DeprecatedFieldNames* getDeprecatedFieldNames()
@@ -87,21 +55,23 @@ struct ApiCameraAttributesData: ApiData
     QnUuid cameraId;
     QString cameraName;
     QString userDefinedGroupName;
-    bool scheduleEnabled;
-    bool licenseUsed;
-    Qn::MotionType motionType;
+    bool scheduleEnabled = true;
+    bool licenseUsed = true;       //< TODO: #GDM Field is not used.
+    Qn::MotionType motionType = Qn::MT_Default;
     QnLatin1Array motionMask;
     std::vector<ApiScheduleTaskData> scheduleTasks;
-    bool audioEnabled;
-    bool disableDualStreaming;
-    bool controlEnabled;
+    bool audioEnabled = false;
+    bool disableDualStreaming = false; //< TODO: #GDM Double negation.
+    bool controlEnabled = true;
     QnLatin1Array dewarpingParams;
-    int minArchiveDays;
-    int maxArchiveDays;
+    int minArchiveDays = -kDefaultMinArchiveDays; //< Negative means 'auto'.
+    int maxArchiveDays = -kDefaultMaxArchiveDays; //< Negative means 'auto'.
     QnUuid preferredServerId;
-    Qn::FailoverPriority failoverPriority;
-    Qn::CameraBackupQualities backupType;
+    Qn::FailoverPriority failoverPriority = Qn::FP_Medium;
+    Qn::CameraBackupQualities backupType = Qn::CameraBackup_Default;
     QString logicalId;
+    int recordBeforeMotionSec = kDefaultRecordBeforeMotionSec;
+    int recordAfterMotionSec = kDefaultRecordAfterMotionSec;
 };
 #define ApiCameraAttributesData_Fields_Short \
     (userDefinedGroupName) \
@@ -119,7 +89,10 @@ struct ApiCameraAttributesData: ApiData
     (preferredServerId) \
     (failoverPriority) \
     (backupType) \
-    (logicalId)
+    (logicalId) \
+    (recordBeforeMotionSec) \
+    (recordAfterMotionSec) \
+
 #define ApiCameraAttributesData_Fields (cameraId)(cameraName) ApiCameraAttributesData_Fields_Short
 
 } // namespace ec2

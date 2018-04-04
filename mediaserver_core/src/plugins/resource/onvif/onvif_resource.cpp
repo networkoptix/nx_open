@@ -78,7 +78,6 @@ namespace
     };
 }
 
-
 const QString QnPlOnvifResource::MANUFACTURE(lit("OnvifDevice"));
 //static const quint64 MOTION_INFO_UPDATE_INTERVAL = 1000000ll * 60;
 const char* QnPlOnvifResource::ONVIF_PROTOCOL_PREFIX = "http://";
@@ -447,7 +446,6 @@ const QString QnPlOnvifResource::createOnvifEndpointUrl(const QString& ipAddress
     return QLatin1String(ONVIF_PROTOCOL_PREFIX) + ipAddress + QLatin1String(ONVIF_URL_SUFFIX);
 }
 
-
 typedef GSoapAsyncCallWrapper <
     DeviceSoapWrapper,
     NetIfacesReq,
@@ -673,7 +671,8 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeMedia(
     if (!result)
         return result;
 
-	if (initializeTwoWayAudio())
+    m_audioTransmitter = initializeTwoWayAudio();
+    if (m_audioTransmitter)
         setCameraCapabilities(getCameraCapabilities() | Qn::AudioTransmitCapability);
 
     return result;
@@ -911,11 +910,11 @@ const QString QnPlOnvifResource::getAudioSourceId() const
 
 QString QnPlOnvifResource::getDeviceOnvifUrl() const
 {
-	QnMutexLocker lock(&m_mutex);
-	if (m_serviceUrls.deviceServiceUrl.isEmpty())
-		m_serviceUrls.deviceServiceUrl = getProperty(ONVIF_URL_PARAM_NAME);
+    QnMutexLocker lock(&m_mutex);
+    if (m_serviceUrls.deviceServiceUrl.isEmpty())
+        m_serviceUrls.deviceServiceUrl = getProperty(ONVIF_URL_PARAM_NAME);
 
-	return m_serviceUrls.deviceServiceUrl;
+    return m_serviceUrls.deviceServiceUrl;
 }
 
 void QnPlOnvifResource::setDeviceOnvifUrl(const QString& src)
@@ -1313,16 +1312,16 @@ int QnPlOnvifResource::calcTimeDrift(const QString& deviceUrl, int* outSoapRes, 
 
 QString QnPlOnvifResource::getMediaUrl() const
 {
-	QnMutexLocker lock(&m_mutex);
-	return m_serviceUrls.mediaServiceUrl;
+    QnMutexLocker lock(&m_mutex);
+    return m_serviceUrls.mediaServiceUrl;
 
     //return getProperty(MEDIA_URL_PARAM_NAME);
 }
 
 void QnPlOnvifResource::setMediaUrl(const QString& src)
 {
-	QnMutexLocker lock(&m_mutex);
-	m_serviceUrls.mediaServiceUrl = src;
+    QnMutexLocker lock(&m_mutex);
+    m_serviceUrls.mediaServiceUrl = src;
 
     //setProperty(MEDIA_URL_PARAM_NAME, src);
 }
@@ -1388,7 +1387,6 @@ int QnPlOnvifResource::round(float value)
     float floorVal = floorf(value);
     return floorVal - value < 0.5? (int)value: (int)value + 1;
 }
-
 
 bool QnPlOnvifResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &source)
 {
@@ -1773,7 +1771,6 @@ CameraDiagnostics::Result QnPlOnvifResource::getVideoEncoderTokens(MediaSoapWrap
     if(m_appStopping)
         return CameraDiagnostics::ServerTerminatedResult();
 
-
     int confRangeStart = 0;
     int confRangeEnd = (int) confResponse->Configurations.size();
     if (m_maxChannels > 1)
@@ -1940,11 +1937,12 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(Medi
     NX_LOGX(QString(lit("ONVIF debug: got %1 encoders for camera %2")).arg(optionsList.size()).arg(getHostAddress()), cl_logDEBUG1);
 
     bool dualStreamingAllowed = optionsList.size() >= 2;
+
+    QnMutexLocker lock(&m_mutex);
     m_secondaryStreamCapabilities = VideoOptionsLocal();
     if (dualStreamingAllowed)
     {
         int secondaryIndex = channelProfiles.isEmpty() ? getSecondaryIndex(optionsList) : 1;
-        QnMutexLocker lock( &m_mutex );
         m_secondaryStreamCapabilities = optionsList[secondaryIndex];
     }
 
@@ -2072,7 +2070,6 @@ bool QnPlOnvifResource::fetchAndSetAudioEncoderOptions(MediaSoapWrapper& soapWra
 
     }
 
-
     setAudioCodec(codec);
 
     setAudioEncoderOptions(*options);
@@ -2156,7 +2153,6 @@ CameraDiagnostics::Result QnPlOnvifResource::updateResourceCapabilities()
 
     if (!m_videoSourceSize.isValid())
         return CameraDiagnostics::NoErrorResult();
-
 
     NX_LOGX(QString(lit("ONVIF debug: videoSourceSize is %1x%2 for camera %3")).
         arg(m_videoSourceSize.width()).arg(m_videoSourceSize.height()).arg(getHostAddress()), cl_logDEBUG1);
@@ -2586,7 +2582,6 @@ bool QnPlOnvifResource::setAdvancedParametersUnderLock(const QnCameraAdvancedPar
     return success;
 }
 
-
 //positive number means timeout in seconds
 //negative number - timeout in milliseconds
 void QnPlOnvifResource::setOnvifRequestsRecieveTimeout(int timeout)
@@ -2633,7 +2628,6 @@ bool QnPlOnvifResource::loadXmlParametersInternal(QnCameraAdvancedParams &params
         NX_LOGX(lit("Error while parsing xml (onvif) %1").arg(paramsTemplateFileName), cl_logWARNING);
     }
 
-
     return result;
 }
 
@@ -2671,6 +2665,14 @@ void QnPlOnvifResource::fetchAndSetAdvancedParameters() {
 
     QSet<QString> supportedParams = calculateSupportedAdvancedParameters();
     m_advancedParametersProvider.assign(params.filtered(supportedParams));
+}
+
+CameraDiagnostics::Result QnPlOnvifResource::sendVideoEncoderToCameraEx(
+    VideoEncoder& encoder,
+    Qn::StreamIndex /*streamIndex*/,
+    const QnLiveStreamParams& /*params*/)
+{
+    return sendVideoEncoderToCamera(encoder);
 }
 
 CameraDiagnostics::Result QnPlOnvifResource::sendVideoEncoderToCamera(VideoEncoder& encoder)
@@ -2973,7 +2975,6 @@ void QnPlOnvifResource::stopInputPortMonitoringAsync()
     NX_LOGX(lit("Port monitoring is stopped"), cl_logDEBUG1);
 }
 
-
 //////////////////////////////////////////////////////////
 // QnPlOnvifResource::SubscriptionReferenceParametersParseHandler
 //////////////////////////////////////////////////////////
@@ -3011,7 +3012,6 @@ bool QnPlOnvifResource::SubscriptionReferenceParametersParseHandler::endElement(
         m_readingSubscriptionID = false;
     return true;
 }
-
 
 //////////////////////////////////////////////////////////
 // QnPlOnvifResource::NotificationMessageParseHandler
@@ -3846,10 +3846,10 @@ bool QnPlOnvifResource::isCameraForcedToOnvif(const QString& manufacturer, const
     return false;
 }
 
-bool QnPlOnvifResource::initializeTwoWayAudio()
+QnAudioTransmitterPtr QnPlOnvifResource::initializeTwoWayAudio()
 {
-    if (initializeTwoWayAudioByResourceData())
-        return true;
+    if (auto result = initializeTwoWayAudioByResourceData())
+        return result;
 
     MediaSoapWrapper soapWrapper(getMediaUrl().toStdString(),
         getAuth().user(), getAuth().password(), m_timeDrift);
@@ -3860,7 +3860,7 @@ bool QnPlOnvifResource::initializeTwoWayAudio()
     if (result != SOAP_OK && result != SOAP_MUSTUNDERSTAND)
     {
         NX_VERBOSE(this, lm("Filed to fetch audio outputs from %1").arg(soapWrapper.endpoint()));
-        return false;
+        return QnAudioTransmitterPtr();
     }
 
     if (!response.AudioOutputs.empty())
@@ -3868,26 +3868,26 @@ bool QnPlOnvifResource::initializeTwoWayAudio()
         NX_VERBOSE(this, lm("Detected audio output %1 on %2").args(
             response.AudioOutputs.front()->token, soapWrapper.endpoint()));
 
-        m_audioTransmitter.reset(new nx::mediaserver_core::plugins::OnvifAudioTransmitter(this));
-        return true;
+        return std::make_shared<nx::mediaserver_core::plugins::OnvifAudioTransmitter>(this);
     }
 
     NX_VERBOSE(this, lm("No sutable audio outputs are detected on %1").arg(soapWrapper.endpoint()));
-    return false;
+    return QnAudioTransmitterPtr();
 }
 
-bool QnPlOnvifResource::initializeTwoWayAudioByResourceData()
+QnAudioTransmitterPtr QnPlOnvifResource::initializeTwoWayAudioByResourceData()
 {
+    QnAudioTransmitterPtr result;
     const QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
     TwoWayAudioParams params = resourceData.value<TwoWayAudioParams>(Qn::TWO_WAY_AUDIO_PARAM_NAME);
     if (params.engine.toLower() == QString("onvif"))
     {
-        m_audioTransmitter.reset(new nx::mediaserver_core::plugins::OnvifAudioTransmitter(this));
+        result.reset(new nx::mediaserver_core::plugins::OnvifAudioTransmitter(this));
     }
     else if (params.engine.toLower() == QString("basic") || params.engine.isEmpty())
     {
         if (params.codec.isEmpty() || params.urlPath.isEmpty())
-            return false;
+            return result;
 
         auto audioTransmitter = std::make_unique<QnBasicAudioTransmitter>(this);
         audioTransmitter->setContentType(params.contentType.toUtf8());
@@ -3906,11 +3906,12 @@ bool QnPlOnvifResource::initializeTwoWayAudioByResourceData()
             .arg(params.urlPath));
         audioTransmitter->setTransmissionUrl(url);
 
-        m_audioTransmitter.reset(audioTransmitter.release());
+        result.reset(audioTransmitter.release());
     }
     else
     {
         NX_ASSERT(false, lm("Unsupported 2WayAudio engine: %1").arg(params.engine));
+        return result;
     }
 
     if (!params.codec.isEmpty())
@@ -3919,15 +3920,14 @@ bool QnPlOnvifResource::initializeTwoWayAudioByResourceData()
         format.setCodec(params.codec);
         format.setSampleRate(params.sampleRate * 1000);
         format.setChannelCount(params.channels);
-        m_audioTransmitter->setOutputFormat(format);
+        result->setOutputFormat(format);
     }
 
     if (params.bitrateKbps != 0)
-        m_audioTransmitter->setBitrateKbps(params.bitrateKbps * 1000);
+        result->setBitrateKbps(params.bitrateKbps * 1000);
 
-    return true;
+    return result;
 }
-
 
 void QnPlOnvifResource::setMaxChannels(int value)
 {
@@ -3950,7 +3950,7 @@ void QnPlOnvifResource::updateVideoEncoder(
         bool forcedAR = resourceData.value<bool>(QString("forceArFromPrimaryStream"), false);
         if (forcedAR && params.resolution.height() > 0)
         {
-            qreal ar = params.resolution.width() / (qreal)params.resolution.height();
+            QnAspectRatio ar(params.resolution.width(), params.resolution.height());
             setCustomAspectRatio(ar);
         }
 
@@ -3958,7 +3958,7 @@ void QnPlOnvifResource::updateVideoEncoder(
         QStringList parts = defaultAR.split(L'x');
         if (parts.size() == 2)
         {
-            qreal ar = parts[0].toFloat() / parts[1].toFloat();
+            QnAspectRatio ar(parts[0].toInt(), parts[1].toInt());
             setCustomAspectRatio(ar);
         }
         saveParams();

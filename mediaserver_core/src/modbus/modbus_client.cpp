@@ -8,11 +8,8 @@ const int kSendTimeout = 4000;
 const int kReceiveTimeout = 4000;
 }
 
-namespace nx
-{
-
-namespace modbus
-{
+namespace nx {
+namespace modbus {
 
 QnModbusClient::QnModbusClient():
     m_requestTransactionId(0),
@@ -68,7 +65,7 @@ bool QnModbusClient::connect()
     return m_connected;
 }
 
-ModbusResponse QnModbusClient::doModbusRequest(const ModbusRequest &request, bool* outStatus)
+ModbusResponse QnModbusClient::doModbusRequest(const ModbusRequest& request, bool* outStatus)
 {
     ModbusResponse response;
 
@@ -180,7 +177,8 @@ ModbusResponse QnModbusClient::readHoldingRegisters(
     return doModbusRequest(request, outStatus);
 }
 
-ModbusResponse QnModbusClient::writeHoldingRegisters(quint16 startRegister, const QByteArray &data, bool* outStatus)
+ModbusResponse QnModbusClient::writeHoldingRegisters(quint16 startRegister, const QByteArray& data,
+    bool* outStatus)
 {
     ModbusRequest request;
 
@@ -202,7 +200,8 @@ ModbusResponse QnModbusClient::writeHoldingRegisters(quint16 startRegister, cons
     return doModbusRequest(request, outStatus);
 }
 
-ModbusResponse QnModbusClient::writeSingleCoil(quint16 coilAddress, bool coilState, bool* outStatus)
+ModbusResponse QnModbusClient::writeSingleCoil(quint16 coilAddress, bool coilState,
+    bool* outStatus)
 {
     ModbusRequest request;
 
@@ -298,6 +297,5 @@ ModbusResponse QnModbusClient::readInputRegisters(quint16 startRegister, quint16
     return ModbusResponse();
 }
 
-} //< Closing namespace modbus.
-
-} //< Closing namespace nx.
+} // namespace modbus
+} // namespace nx

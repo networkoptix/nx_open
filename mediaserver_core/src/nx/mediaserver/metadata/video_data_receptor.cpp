@@ -1,6 +1,5 @@
 #include "video_data_receptor.h"
 
-
 #include <nx/kit/debug.h>
 #include <nx/sdk/metadata/common_uncompressed_video_frame.h>
 #include "nx/utils/log/log_main.h"
@@ -43,7 +42,6 @@ using namespace nx::sdk::metadata;
     const CLConstVideoDecoderOutputPtr& frame, bool needDeepCopy)
 {
     // TODO: Consider supporting other decoded video frame formats.
-    const int planeCount = 3;
     const auto expectedFormat = AV_PIX_FMT_YUV420P;
     if (frame->format != expectedFormat)
     {
@@ -53,6 +51,21 @@ using namespace nx::sdk::metadata;
         return nullptr;
     }
 
+    nx::sdk::metadata::UncompressedVideoFrame* uncompressedFrame;
+// TODO: #dmishin take needed pixel format from manifest
+#if 0
+    uncompressedFrame = convertToYuv420pSdkFrame(frame, needDeepCopy);
+#else
+    uncompressedFrame = convertToArgbSdkFrame(frame, needDeepCopy);
+#endif
+    return uncompressedFrame;
+}
+
+/*static*/ nx::sdk::metadata::UncompressedVideoFrame* VideoDataReceptor::convertToYuv420pSdkFrame(
+    CLConstVideoDecoderOutputPtr frame,
+    bool needDeepCopy)
+{
+    const int planeCount = 3;
     const auto packet = new CommonUncompressedVideoFrame(
         frame->pkt_dts, frame->width, frame->height);
 
@@ -65,14 +78,14 @@ using namespace nx::sdk::metadata;
             const int planeLineSize = frame->linesize[i];
             const int planeDataSize = (i == 0)
                 ? (planeLineSize * frame->height) //< Y plane has full resolution.
-                : (planeLineSize * frame->height / 4); //< Cb and Cr planes have half resolution.
+                : (planeLineSize * frame->height / 2); //< Cb and Cr planes have half resolution.
             data[i].resize(planeDataSize);
             if (planeDataSize > 0)
                 memcpy(&data[i].front(), frame->data[i], planeDataSize);
             lineSize[i] = planeLineSize;
         }
 
-        packet->setOwnedData(data, lineSize);
+        packet->setOwnedData(std::move(data), std::move(lineSize));
     }
     else
     {
@@ -81,14 +94,34 @@ using namespace nx::sdk::metadata;
         std::vector<int> lineSize(planeCount);
         for (int i = 0; i < planeCount; ++i)
         {
-            data[i] = (const char*) frame->data[i];
-            dataSize[i] = frame->linesize[i] * frame->height;
+            const int planeLineSize = frame->linesize[i];
+            const int planeDataSize = (i == 0)
+                ? (planeLineSize * frame->height) //< Y plane has full resolution.
+                : (planeLineSize * frame->height / 2); //< Cb and Cr planes have half resolution.
+
+            data[i] = (const char*)frame->data[i];
+            dataSize[i] = planeDataSize;
             lineSize[i] = frame->linesize[i];
         }
 
-        packet->setExternalData(data, dataSize, lineSize);
+        packet->setExternalData(std::move(data), std::move(dataSize), std::move(lineSize));
     }
 
+    return packet;
+}
+
+/*static*/ nx::sdk::metadata::UncompressedVideoFrame* VideoDataReceptor::convertToArgbSdkFrame(
+    CLConstVideoDecoderOutputPtr frame,
+    bool needDeepCopy)
+{
+    const auto packet = new CommonUncompressedVideoFrame(
+        frame->pkt_dts, frame->width, frame->height);
+    packet->setPixelFormat(UncompressedVideoFrame::PixelFormat::argb);
+    std::vector<std::vector<char>> data(1);
+    std::vector<int> lineSize(1);
+    data[0] = frame->toArgb(&lineSize[0]);
+
+    packet->setOwnedData(std::move(data), std::move(lineSize));
     return packet;
 }
 

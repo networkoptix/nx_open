@@ -50,7 +50,7 @@ public:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     virtual QString getDriverName() const override;
     virtual void setIframeDistance(int, int) override;
-    virtual bool  hasDualStreaming() const override;
+    virtual bool  hasDualStreamingInternal() const override;
 
     virtual QnIOPortDataList getRelayOutputList() const override;
     virtual QnIOPortDataList getInputPortList() const override;

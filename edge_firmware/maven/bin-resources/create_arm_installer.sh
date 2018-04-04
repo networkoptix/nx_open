@@ -273,7 +273,7 @@ copyBins()
             local FILE
             for FILE in "$BIN_BUILD_DIR/plugins/"*; do
                 if [ -f $FILE ] && [[ $FILE != *.debug ]]; then
-                    if [ "$CUSTOMIZATION" != "hanwha" ] && [[ "$FILE" == *hanwha* ]]; then
+                    if [ "$ENABLE_HANWHA" != "true" ] && [[ "$FILE" == *hanwha* ]]; then
                         continue
                     fi
 
@@ -427,7 +427,8 @@ copyEdge1SpecificFiles()
 # [in] LIB_INSTALL_DIR
 copyAdditionalSysrootFilesIfNeeded()
 {
-    local -r SYSROOT_LIB_DIR="$PACKAGES_DIR/sysroot/usr/lib/arm-linux-gnueabihf"
+    local -r SYSROOT_LIB_DIR="$SYSROOT_DIR/usr/lib/arm-linux-gnueabihf"
+    local -r SYSROOT_BIN_DIR="$SYSROOT_DIR/usr/bin"
 
     if [ "$BOX" = "bpi" ]; then
         local SYSROOT_LIBS_TO_COPY=(
@@ -445,10 +446,10 @@ copyAdditionalSysrootFilesIfNeeded()
         echo "Copying (sysroot) libglib required for bananapi on Debian 8 \"Jessie\""
         cp -r "$SYSROOT_LIB_DIR/libglib"* "$LIB_INSTALL_DIR/"
         echo "Copying (sysroot) hdparm required for bananapi on Debian 8 \"Jessie\""
-        cp -r "$PACKAGES_DIR/sysroot/usr/bin/hdparm" "$INSTALL_DIR/mediaserver/bin/"
+        cp -r "$SYSROOT_BIN_DIR/hdparm" "$INSTALL_DIR/mediaserver/bin/"
     elif [ "$BOX" = "rpi" ]; then
         echo "Copying (sysroot) hdparm"
-        cp -r "$PACKAGES_DIR/sysroot/usr/bin/hdparm" "$INSTALL_DIR/mediaserver/bin/"
+        cp -r "$SYSROOT_BIN_DIR/hdparm" "$INSTALL_DIR/mediaserver/bin/"
     fi
 }
 
@@ -469,6 +470,7 @@ copyToolchainLibs()
 {
     echo "Copying toolchain libs (libstdc++, libatomic)"
     copy_sys_lib "libstdc++.so.6" "$LIB_INSTALL_DIR"
+    copy_sys_lib "libgcc_s.so.1" "$LIB_INSTALL_DIR"
     copy_sys_lib "libatomic.so.1" "$LIB_INSTALL_DIR"
 }
 

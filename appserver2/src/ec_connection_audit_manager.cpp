@@ -23,77 +23,68 @@ namespace ec2
     {
     }
 
-    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value command,  const ApiCameraAttributesDataList& params, const QnAuthSession& authInfo)
+    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value /*command*/,  const ApiCameraAttributesDataList& params, const QnAuthSession& authInfo)
     {
-        Q_UNUSED(command);
         QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_CameraUpdate);
         for (const auto& value: params)
             auditRecord.resources.push_back(value.cameraId);
         qnAuditManager->addAuditRecord(auditRecord);
     }
 
-    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value command,  const ApiCameraAttributesData& params, const QnAuthSession& authInfo)
+    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value /*command*/,  const ApiCameraAttributesData& params, const QnAuthSession& authInfo)
     {
-        Q_UNUSED(command);
         QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_CameraUpdate);
         auditRecord.resources.push_back(params.cameraId);
         qnAuditManager->addAuditRecord(auditRecord);
     }
 
-    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value command,  const ApiMediaServerUserAttributesData& params, const QnAuthSession& authInfo)
+    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value /*command*/,  const ApiMediaServerUserAttributesData& params, const QnAuthSession& authInfo)
     {
-        Q_UNUSED(command);
         QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_ServerUpdate);
         auditRecord.resources.push_back(params.serverId);
         qnAuditManager->addAuditRecord(auditRecord);
     }
 
-    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value command,  const ApiMediaServerUserAttributesDataList& params, const QnAuthSession& authInfo)
+    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value /*command*/,  const ApiMediaServerUserAttributesDataList& params, const QnAuthSession& authInfo)
     {
-        Q_UNUSED(command);
         QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_ServerUpdate);
         for (const auto& value: params)
             auditRecord.resources.push_back(value.serverId);
         qnAuditManager->addAuditRecord(auditRecord);
     }
 
-    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value command, const ApiStorageData& params, const QnAuthSession& authInfo)
+    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value /*command*/, const ApiStorageData& params, const QnAuthSession& authInfo)
     {
-        Q_UNUSED(command);
         QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_ServerUpdate);
         auditRecord.resources.push_back(params.parentId);
         qnAuditManager->addAuditRecord(auditRecord);
     }
 
-    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value command, const ApiStorageDataList& params, const QnAuthSession& authInfo)
+    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value /*command*/, const ApiStorageDataList& params, const QnAuthSession& authInfo)
     {
-        Q_UNUSED(command);
         QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_ServerUpdate);
         for (const auto& value: params)
             auditRecord.resources.push_back(value.parentId);
         qnAuditManager->addAuditRecord(auditRecord);
     }
 
-    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value command,  const ApiUserDataList& params, const QnAuthSession& authInfo)
+    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value /*command*/,  const ApiUserDataList& params, const QnAuthSession& authInfo)
     {
-        Q_UNUSED(command);
         QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_UserUpdate);
         for (const auto& value: params)
             auditRecord.resources.push_back(value.id);
         qnAuditManager->addAuditRecord(auditRecord);
     }
 
-    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value command,  const ApiUserData& params, const QnAuthSession& authInfo)
+    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value /*command*/,  const ApiUserData& params, const QnAuthSession& authInfo)
     {
-        Q_UNUSED(command);
         QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_UserUpdate);
         auditRecord.resources.push_back(params.id);
         qnAuditManager->addAuditRecord(auditRecord);
     }
 
-    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value command,  const ApiBusinessRuleData& params, const QnAuthSession& authInfo)
+    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value /*command*/,  const ApiBusinessRuleData& params, const QnAuthSession& authInfo)
     {
-        Q_UNUSED(command);
         QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_BEventUpdate);
         auditRecord.resources.push_back(params.id);
         nx::vms::event::RulePtr rule(new nx::vms::event::Rule());
@@ -104,25 +95,22 @@ namespace ec2
         qnAuditManager->addAuditRecord(auditRecord);
     }
 
-    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value command,  const ApiBusinessRuleDataList& params, const QnAuthSession& authInfo)
+    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value /*command*/,  const ApiBusinessRuleDataList& params, const QnAuthSession& authInfo)
     {
-        Q_UNUSED(command);
         QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_BEventUpdate);
         for (const auto& value: params)
             auditRecord.resources.push_back(value.id);
         qnAuditManager->addAuditRecord(auditRecord);
     }
 
-    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value command,  const ApiResourceParamWithRefData& param, const QnAuthSession& authInfo)
+    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value /*command*/,  const ApiResourceParamWithRefData& param, const QnAuthSession& authInfo)
     {
-        Q_UNUSED(command);
         if (QnGlobalSettings::isGlobalSetting(param))
             qnAuditManager->notifySettingsChanged(authInfo, param.name);
     }
 
     void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value command,  const ApiResourceParamWithRefDataList& params, const QnAuthSession& authInfo)
     {
-        Q_UNUSED(command);
         for (const ApiResourceParamWithRefData& param: params)
             addAuditRecord(command, param, authInfo);
     }
@@ -201,17 +189,13 @@ namespace ec2
             addAuditRecord(command, param, authInfo);
     }
 
-    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value command,  const ApiResetBusinessRuleData& params, const QnAuthSession& authInfo)
+    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value /*command*/,  const ApiResetBusinessRuleData& /*params*/, const QnAuthSession& authInfo)
     {
-        Q_UNUSED(command);
-        Q_UNUSED(params);
         qnAuditManager->addAuditRecord(qnAuditManager->prepareRecord(authInfo, Qn::AR_BEventReset));
     }
 
-    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value command,  const ApiDatabaseDumpData& params, const QnAuthSession& authInfo)
+    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value /*command*/,  const ApiDatabaseDumpData& /*params*/, const QnAuthSession& authInfo)
     {
-        Q_UNUSED(command);
-        Q_UNUSED(params);
         qnAuditManager->addAuditRecord(qnAuditManager->prepareRecord(authInfo, Qn::AR_DatabaseRestore));
     }
 

@@ -752,6 +752,21 @@
       <source>PTZ</source>
       <translation>PTZ</translation>
     </message>
+    <message>
+      <location/>
+      <source>Generate</source>
+      <translation type="unfinished">Generate</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset</source>
+      <translation>リセット</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Logical Id</source>
+      <translation type="unfinished">Logical Id</translation>
+    </message>
   </context>
   <context>
     <name>CameraInputBusinessEventWidget</name>
@@ -1418,7 +1433,7 @@
     <message>
       <location/>
       <source>Server URL</source>
-      <translation>サーバーの URL</translation>
+      <translation>サーバー URL</translation>
     </message>
     <message>
       <location/>
@@ -1788,8 +1803,8 @@
     </message>
     <message>
       <location/>
-      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
-      <translation>&quot;ウェアラブル カメラ&quot; はシステム上の任意のサーバーにビデオをアップロードして、すべてのユーザーがアクセスできるビデオ ファイルの仮想ストレージです</translation>
+      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
     </message>
   </context>
   <context>
@@ -2372,7 +2387,7 @@
     <message>
       <location/>
       <source>Resolution</source>
-      <translation>解像度:</translation>
+      <translation>解像度</translation>
     </message>
     <message>
       <location/>
@@ -2667,12 +2682,6 @@
       <location/>
       <source>Reset</source>
       <translation>リセット</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage.
-The oldest footage among all cameras on the server will be deleted first.</source>
-      <translation>アップロードされたアーカイブは、サーバーストレージに空き容量がない場合、自動的に削除されます　サーバー上のすべてのカメラの中で最も古い映像が最初に削除されます</translation>
     </message>
   </context>
   <context>
@@ -3029,14 +3038,18 @@ The oldest footage among all cameras on the server will be deleted first.</sourc
     </message>
     <message>
       <location/>
-      <source>There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</source>
-      <translation>カスタムユーザーの役割はまだありません　 &quot;新しい役割&quot;ボタンをクリックして作成してください</translation>
+      <source>New role</source>
+      <translation>新しい役割</translation>
     </message>
     <message>
       <location/>
-      <source>New role</source>
-      <translation>新しい役割</translation>
+      <source>There are no custom user roles yet.</source>
+      <translation type="unfinished">There are no custom user roles yet.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Click &quot;New role&quot; button to create one.</source>
+      <translation type="unfinished">Click &quot;New role&quot; button to create one.</translation>
     </message>
   </context>
   <context>
@@ -3093,7 +3106,7 @@ Click &quot;New role&quot; button to create one.</source>
     <message>
       <location/>
       <source>Upload File...</source>
-      <translation>ファイルをアップロード</translation>
+      <translation>ファイルをアップロード...</translation>
     </message>
     <message>
       <location/>

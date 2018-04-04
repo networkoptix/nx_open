@@ -9,8 +9,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
-#include <network/auth/generic_user_data_provider.h>
-#include <network/auth/time_based_nonce_provider.h>
+#include <nx/vms/auth/generic_user_data_provider.h>
+#include <nx/vms/auth/time_based_nonce_provider.h>
 #include <rest/handlers/save_cloud_system_credentials.h>
 #include <settings.h>
 

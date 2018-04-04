@@ -78,11 +78,6 @@
       <translation>Ezek a rendszerek különböző %1 URL- használnak. Összevonás nem engedélyezett.</translation>
     </message>
     <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Felhő rendszer csak nem-felhő rendszerrel vonható össze. A rendszer név és jelszó a felhő rendszerből lesz átvéve.</translation>
-    </message>
-    <message>
       <source>New System</source>
       <translation>Új rendszer</translation>
     </message>
@@ -90,6 +85,10 @@
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
       <translation>A felfedezett %1 rendszer nem kompatibilis az aktuális rendszerrel.</translation>
+    </message>
+    <message>
+      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
+      <translation>Felhő rendszer csak nem-felhő rendszerrel vonható össze. A rendszer név és jelszó a felhő rendszerből lesz átvéve.</translation>
     </message>
   </context>
   <context>
@@ -444,7 +443,7 @@
     </message>
     <message>
       <source>Edge Licenses</source>
-      <translation>edge licenc</translation>
+      <translation>Edge licencek</translation>
     </message>
     <message>
       <source>Vmax Licenses</source>
@@ -492,7 +491,7 @@
     </message>
     <message>
       <source>Bridge</source>
-      <translation type="unfinished">Bridge</translation>
+      <translation>Bridge</translation>
     </message>
     <message>
       <source>Bridge Licenses</source>
@@ -562,7 +561,7 @@
     </message>
     <message>
       <source>Server with matching Hardware Id not found</source>
-      <translation>Nem található szerver egyező hardver ID-vel</translation>
+      <translation>Nem található szerver egyező Hardver Id-vel</translation>
     </message>
   </context>
   <context>
@@ -685,7 +684,7 @@
     </message>
     <message>
       <source>Hardware Id: %1</source>
-      <translation>Hardver ID: %1</translation>
+      <translation>Hardver Id: %1</translation>
     </message>
     <message>
       <source>Time License</source>

@@ -178,11 +178,11 @@
     "common": {
         "voiceCommands": {
             "search": "find + [text for searchbar]",
-            "pause": "pause",
+            "pause": "pausa",
             "help": "help | show commands",
             "collapse all servers": "collapse all servers",
             "collapse server": "collapse server + [server name]",
-            "play": "play",
+            "play": "reproduzir",
             "clear search": "clear search",
             "live": "go to live | show me live",
             "expand all servers": "expand all servers",
@@ -200,7 +200,7 @@
             "transcoding": "Transcoding",
             "copyActiveText": "copied to clipboard"
         },
-        "searchCamPlaceholder": "Search",
+        "searchCamPlaceholder": "Pesquisar",
         "cameraStates": {
             "noFormat": "This browser does not support video playback from this camera.",
             "ieWin10": "Please, use Microsoft Edge or Google Chrome browsers.",
@@ -217,9 +217,9 @@
         },
         "chromeCastWarning": "Chromecast is resource intensive and may cause issues on your server.",
         "resolution": {
-            "high": "High",
+            "high": "Alta",
             "auto": "Auto",
-            "low": "Low"
+            "low": "Baixa"
         }
     }
 }

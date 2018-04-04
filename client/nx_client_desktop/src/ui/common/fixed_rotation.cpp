@@ -1,17 +1,9 @@
 #include "fixed_rotation.h"
 
-#include <cmath>
-
 #include <QtCore/QtMath>
 
 #include <QtWidgets/QGraphicsWidget>
-
-Qn::FixedRotation fixedRotationFromDegrees(qreal degrees){
-    qreal result = std::fmod(degrees + 45, 360);
-    if(result < 0)
-        result += 360;
-    return static_cast<Qn::FixedRotation>(qFloor(result / 90) * 90);
-}
+#include <nx/utils/math/fuzzy.h>
 
 QnFixedRotationTransform::QnFixedRotationTransform(QObject *parent):
     base_type(parent)
@@ -48,8 +40,9 @@ void QnFixedRotationTransform::setTarget(QGraphicsWidget *target)
     updateOrigin();
 }
 
-void QnFixedRotationTransform::setAngle(Qn::FixedRotation angle) {
-    setAngle(-1.0 * static_cast<qreal>(angle));
+void QnFixedRotationTransform::setAngle(nx::client::desktop::Rotation angle)
+{
+    setAngle(-1.0 * angle.value());
 }
 
 void QnFixedRotationTransform::updateOrigin() {
@@ -57,25 +50,32 @@ void QnFixedRotationTransform::updateOrigin() {
         return;
 
     QPointF origin;
-    switch(fixedRotationFromDegrees(angle())) {
-    case Qn::Angle0:
+
+    auto standardRotation = nx::client::desktop::Rotation::closestStandardRotation(angle());
+
+    if (qFuzzyEquals(standardRotation.value(), 0))
+    {
         origin = QPointF(0.0, 0.0);
-        break;
-    case Qn::Angle90:
+    }
+    else if (qFuzzyEquals(standardRotation.value(), 90))
+    {
         origin = target()->rect().center();
         origin.setX(origin.y());
-        break;
-    case Qn::Angle180:
+    }
+    else if (qFuzzyEquals(standardRotation.value(), 180))
+    {
         origin = target()->rect().center();
-        break;
-    case Qn::Angle270:
+    }
+    else if (qFuzzyEquals(standardRotation.value(), 270))
+    {
         origin = target()->rect().center();
         origin.setY(origin.x());
-        break;
-    default:
+    }
+    else
+    {
+        NX_ASSERT(false, "Standard rotation is not handled");
         return;
     }
 
     setOrigin(QVector3D(origin));
-    //setOrigin(QVector3D(target()->rect().center()));
 }

@@ -174,7 +174,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
       <source>Fixed Archive Length</source>
-      <translation>מספר הימים לשמירה בארכיון</translation>
+      <translation>אורך ארכיון קבוע</translation>
     </message>
     <message>
       <location/>
@@ -394,7 +394,7 @@
     <message>
       <location/>
       <source>Area Width</source>
-      <translation>רוחב שטח</translation>
+      <translation>רוחב אזור</translation>
     </message>
     <message>
       <location/>
@@ -751,6 +751,21 @@
       <location/>
       <source>PTZ</source>
       <translation>מצלמה ממונעת</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Generate</source>
+      <translation>חולל</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset</source>
+      <translation>אפס</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Logical Id</source>
+      <translation>זיהוי ID לוגי</translation>
     </message>
   </context>
   <context>
@@ -1751,7 +1766,7 @@
     <message>
       <location/>
       <source>Password:</source>
-      <translation>סיסמה:</translation>
+      <translation>סיסמא:</translation>
     </message>
     <message>
       <location/>
@@ -1779,17 +1794,17 @@
     <message>
       <location filename="../src/ui/dialogs/new_wearable_camera_dialog.ui"/>
       <source>New Wearable Camera...</source>
-      <translation type="unfinished">New Wearable Camera...</translation>
+      <translation>מצלמה לבישה חדשה...</translation>
     </message>
     <message>
       <location/>
       <source>To server</source>
-      <translation type="unfinished">To server</translation>
+      <translation>לשרת</translation>
     </message>
     <message>
       <location/>
-      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</translation>
+      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation>&amp;;quot;מצלמה לבישה&amp;;quot; היא אחסון וירטואלי עבור קובצי וידאו, שניתן להעלותם לכל שרת במערכת ולהיכנס אליו על ידי כל משתמש.</translation>
     </message>
   </context>
   <context>
@@ -1974,7 +1989,7 @@
     <message>
       <location/>
       <source>Enter a valid username and password...</source>
-      <translation>הכנס שם משתמש וסיסמה תקינים...</translation>
+      <translation>הכנס שם משתמש וסיסמא תקינים...</translation>
     </message>
   </context>
   <context>
@@ -2041,7 +2056,7 @@
     <message>
       <location/>
       <source>The new System will have password and name from System:</source>
-      <translation>המערכת החדשה תקבל שם וסיסמה ממערכת:</translation>
+      <translation>המערכת החדשה תקבל שם וסיסמא ממערכת:</translation>
     </message>
   </context>
   <context>
@@ -2668,13 +2683,6 @@
       <source>Reset</source>
       <translation>אפס</translation>
     </message>
-    <message>
-      <location/>
-      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage.
-The oldest footage among all cameras on the server will be deleted first.</source>
-      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage.
-The oldest footage among all cameras on the server will be deleted first.</translation>
-    </message>
   </context>
   <context>
     <name>SmtpAdvancedSettingsWidget</name>
@@ -3030,14 +3038,18 @@ The oldest footage among all cameras on the server will be deleted first.</trans
     </message>
     <message>
       <location/>
-      <source>There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</source>
-      <translation>אין עדיין תפקידי משתמש מותאמים אישית. לחץ על &quot;תפקיד חדש&quot; כדי ליצור אחד.</translation>
+      <source>New role</source>
+      <translation>תפקיד חדש</translation>
     </message>
     <message>
       <location/>
-      <source>New role</source>
-      <translation>תפקיד חדש</translation>
+      <source>There are no custom user roles yet.</source>
+      <translation>אין עדיין תפקידי הרשאות משתמש מותאמים אישית.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Click &quot;New role&quot; button to create one.</source>
+      <translation>לחץ על לחצן &amp;;quot;תפקיד הרשאות חדש&amp;;quot; כדי ליצור אחד.</translation>
     </message>
   </context>
   <context>
@@ -3068,7 +3080,7 @@ Click &quot;New role&quot; button to create one.</source>
     <message>
       <location/>
       <source>Detect motion in uploaded video</source>
-      <translation type="unfinished">Detect motion in uploaded video</translation>
+      <translation>זיהוי תנועה בסרטון שהועלה</translation>
     </message>
     <message>
       <location/>
@@ -3089,17 +3101,17 @@ Click &quot;New role&quot; button to create one.</source>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
       <source>Upload Video</source>
-      <translation type="unfinished">Upload Video</translation>
+      <translation>העלאת סרטון</translation>
     </message>
     <message>
       <location/>
       <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
+      <translation>העלה קובץ...</translation>
     </message>
     <message>
       <location/>
       <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
+      <translation>תיקיה להעלאה...</translation>
     </message>
   </context>
   <context>

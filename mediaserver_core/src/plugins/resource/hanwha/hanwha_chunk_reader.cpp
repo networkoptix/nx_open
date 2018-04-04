@@ -182,7 +182,7 @@ boost::optional<int> HanwhaChunkLoader::overlappedId() const
 {
     QnMutexLocker lock(&m_mutex);
     NX_ASSERT(m_isNvr, lit("Method should be called only for NVRs"));
-    if (m_isNvr)
+    if (m_isNvr && !m_overlappedIds.empty())
         return m_overlappedIds.back();
 
     // For cameras we should import all chunks from all overlapped IDs.

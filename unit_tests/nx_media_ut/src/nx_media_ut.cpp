@@ -186,7 +186,7 @@ public:
     /** Either resolution can be empty - the corresponding stream will not be created. */
     void setStreams(QSize highResolution, QSize lowResolution)
     {
-        removeProperty(Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME);
+        setProperty(Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME, QString());
 
         // For mock camera, use a codec that will never match any reasonable transcoding codec.
         static const int kCodec = /*102400*/ AV_CODEC_ID_PROBE;

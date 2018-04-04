@@ -6,6 +6,7 @@
 #include <nx/sdk/metadata/common_compressed_video_packet.h>
 
 #include <nx/mediaserver_plugins/metadata/deepstream/deepstream_common.h>
+#include <nx/mediaserver_plugins/metadata/deepstream/openalpr_common.h>
 #include <nx/mediaserver_plugins/metadata/deepstream/default_pipeline_builder.h>
 #include <nx/mediaserver_plugins/metadata/deepstream/deepstream_metadata_plugin_ini.h>
 
@@ -20,9 +21,13 @@ namespace deepstream {
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 
-Manager::Manager(Plugin* plugin, const std::string& id):
+Manager::Manager(
+    nx::mediaserver_plugins::metadata::deepstream::Plugin* plugin,
+    const std::string& id)
+    :
     m_plugin(plugin),
-    m_pipelineBuilder(std::make_unique<DefaultPipelineBuilder>()),
+    m_pipelineBuilder(
+        std::make_unique<DefaultPipelineBuilder>(m_plugin->objectClassDescritions())),
     m_pipeline(m_pipelineBuilder->build(id))
 {
     NX_OUTPUT << __func__ << "(\"" << plugin->name() << "\") -> " << this;
@@ -118,17 +123,40 @@ Error Manager::stopFetchingMetadata()
 const char* Manager::capabilitiesManifest(Error* error)
 {
     *error = Error::noError;
-    static const auto managerManifest = (R"json(
-        {
-            "supportedObjectTypes": [
-                ")json" + nxpt::NxGuidHelper::toStdString(kCarGuid) + R"json(",
-                ")json" + nxpt::NxGuidHelper::toStdString(kHumanGuid) + R"json(",
-                ")json" + nxpt::NxGuidHelper::toStdString(kRcGuid) + R"json("
-            ]
-        }
-    )json");
 
-    return managerManifest.c_str();
+    static const std::string kManifestPrefix = (R"json(
+        {
+            "supportedObjectTypes": [)json");
+
+    static const std::string kManifestPostfix = "]}";
+
+    if (!m_manifest.empty())
+        return m_manifest.c_str();
+
+    m_manifest = kManifestPrefix;
+    const auto descriptions = m_plugin->objectClassDescritions();
+
+    if (ini().pipelineType == kOpenAlprPipeline)
+    {
+        m_manifest += "\""
+            + nxpt::NxGuidHelper::toStdString(kLicensePlateGuid);
+            +"\"";
+    }
+    else
+    {
+        for (auto i = 0; i < descriptions.size(); ++i)
+        {
+            m_manifest += "\""
+                + nxpt::NxGuidHelper::toStdString(descriptions[i].guid);
+                +"\"";
+
+            if (i < descriptions.size() - 1)
+                m_manifest += ',';
+        }
+    }
+
+    m_manifest += kManifestPostfix;
+    return m_manifest.c_str();
 }
 
 void Manager::freeManifest(const char* data)

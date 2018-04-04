@@ -1,5 +1,7 @@
 #include "export_settings_dialog_p.h"
 
+#include <chrono>
+
 #include <QtCore/QFileInfo>
 #include <QtCore/QScopedValueRollback>
 #include <QtCore/QStandardPaths>
@@ -77,7 +79,7 @@ ExportSettingsDialog::Private::~Private()
 
 void ExportSettingsDialog::Private::updateOverlaysVisibility()
 {
-    if (m_exportMediaPersistentSettings.shouldExportOverlays())
+    if (m_exportMediaPersistentSettings.canExportOverlays())
     {
         for (const auto overlayType: m_exportMediaPersistentSettings.usedOverlays)
         {
@@ -132,7 +134,7 @@ void ExportSettingsDialog::Private::loadSettings()
     refreshMediaPreview();
     updateOverlaysVisibility();
 
-    if (m_exportMediaPersistentSettings.shouldExportOverlays())
+    if (m_exportMediaPersistentSettings.canExportOverlays())
     {
         const auto& used = m_exportMediaPersistentSettings.usedOverlays;
         for (const auto type : used)
@@ -218,7 +220,8 @@ void ExportSettingsDialog::Private::refreshMediaPreview()
         // We do have our own image processor, so we do not bother server with transcoding.
         api::ResourceImageRequest request;
         request.resource = m_exportMediaSettings.mediaResource->toResourcePtr();
-        request.msecSinceEpoch = m_exportMediaSettings.timePeriod.startTimeMs;
+        request.usecSinceEpoch = std::chrono::microseconds(std::chrono::milliseconds(
+            m_exportMediaSettings.timePeriod.startTimeMs)).count();
         request.roundMethod = api::ImageRequest::RoundMethod::iFrameBefore;
         request.rotation = 0;
         request.aspectRatio = api::ImageRequest::AspectRatio::source;
@@ -280,6 +283,8 @@ void ExportSettingsDialog::Private::setMediaResource(const QnMediaResourcePtr& m
     // We land here once, when ExportSettingsDialog is constructed
     m_availableTranscodingSettings = settings;
     m_exportMediaSettings.mediaResource = media;
+    if (!media->hasVideo())
+        m_exportMediaPersistentSettings.hasVideo = false;
 
     refreshMediaPreview();
     updateOverlays();

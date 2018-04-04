@@ -14,7 +14,7 @@
 
     <div ng-if="!data.activateCode && activationSuccess">
         <h1 class="process-success">
-            Your account is successfully activated
+            Uw account is succesvol geactiveerd
         </h1>
         <h1 class="process-success">
             <a class="btn btn-default" href="/login">Aanmelden</a>
@@ -38,7 +38,8 @@
                            required autofocus>
                 </div>
                 <div class="col-sm-4">
-                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required"> E-mailadres is verplicht </span> <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email"> Vul alstublieft een geldige e-mailadres in </span>
+                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required">E-mailadres is verplicht</span>
+                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email"> Vul alstublieft een geldige e-mailadres in</span>
                 </div>
             </div>
             <div class="form-group">
@@ -70,7 +71,8 @@
                            required autofocus>
                 </div>
                 <div class="col-sm-4">
-                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.required"> E-mailadres is verplicht </span> <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.email"> Vul alstublieft een geldige e-mailadres in </span>
+                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.required">E-mailadres is verplicht</span>
+                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.email"> Vul alstublieft een geldige e-mailadres in</span>
                 </div>
             </div>
             <div class="form-group">

@@ -21,7 +21,6 @@ const int kDefaultChannelCount = 4;
 
 } // namespace
 
-
 QnArecontPanoramicResource::QnArecontPanoramicResource(const QString& name)
 {
     setName(name);
@@ -31,7 +30,6 @@ QnArecontPanoramicResource::QnArecontPanoramicResource(const QString& name)
 QnArecontPanoramicResource::~QnArecontPanoramicResource()
 {
 }
-
 
 bool QnArecontPanoramicResource::getDescription()
 {
@@ -53,7 +51,8 @@ QnAbstractStreamDataProvider* QnArecontPanoramicResource::createLiveDataProvider
     }
 }
 
-bool QnArecontPanoramicResource::getParamPhysicalByChannel(int channel, const QString& name, QString &val)
+bool QnArecontPanoramicResource::getParamPhysicalByChannel(int channel, const QString& name,
+    QString& val)
 {
     m_mutex.lock();
     m_mutex.unlock();
@@ -68,7 +67,6 @@ bool QnArecontPanoramicResource::getParamPhysicalByChannel(int channel, const QS
     if (status != CL_HTTP_SUCCESS)
         return false;
 
-
     QByteArray response;
     connection.readAll(response);
     int index = response.indexOf('=');
@@ -80,7 +78,7 @@ bool QnArecontPanoramicResource::getParamPhysicalByChannel(int channel, const QS
     return true;
 }
 
-bool QnArecontPanoramicResource::setApiParameter(const QString &id, const QString &value)
+bool QnArecontPanoramicResource::setApiParameter(const QString& id, const QString& value)
 {
     if (setSpecialParam(id, value))
         return true;
@@ -100,7 +98,7 @@ bool QnArecontPanoramicResource::setApiParameter(const QString &id, const QStrin
     return true;
 }
 
-bool QnArecontPanoramicResource::setSpecialParam(const QString &id, const QString& value)
+bool QnArecontPanoramicResource::setSpecialParam(const QString& id, const QString& value)
 {
     if (id == lit("resolution"))
     {
@@ -229,11 +227,12 @@ void QnArecontPanoramicResource::initializeVideoLayoutUnsafe() const
     m_customVideoLayout = QnCustomResourceVideoLayout::fromString(layoutString);
 }
 
-QnConstResourceVideoLayoutPtr QnArecontPanoramicResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider) const
+QnConstResourceVideoLayoutPtr QnArecontPanoramicResource::getVideoLayout(
+    const QnAbstractStreamDataProvider* /*dataProvider*/) const
 {
-    const auto resourceId = getId();    //saving id before locking m_layoutMutex to avoid potential deadlock
+    // Saving id before locking m_layoutMutex to avoid potential deadlock.
+    const auto resourceId = getId();
 
-    Q_UNUSED(dataProvider)
     QnMutexLocker lock(&m_layoutMutex);
     if (!m_customVideoLayout)
         initializeVideoLayoutUnsafe();

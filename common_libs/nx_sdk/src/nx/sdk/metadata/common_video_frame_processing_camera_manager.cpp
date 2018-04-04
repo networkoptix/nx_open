@@ -1,8 +1,8 @@
 #include "common_video_frame_processing_camera_manager.h"
-#include <nx/kit/debug.h>
 
 #define NX_DEBUG_ENABLE_OUTPUT m_enableOutput
 #define NX_PRINT_PREFIX (std::string("[") + this->plugin()->name() + " CameraManager] ")
+#include <nx/kit/debug.h>
 
 namespace nx {
 namespace sdk {
@@ -132,13 +132,19 @@ void CommonVideoFrameProcessingCameraManager::freeManifest(const char* data)
 void CommonVideoFrameProcessingCameraManager::setDeclaredSettings(
     const nxpl::Setting* settings, int count)
 {
+    if (count > 0 && settings == nullptr)
+    {
+        NX_PRINT << __func__ << "(): INTERNAL ERROR: settings is null and count is " << count;
+        return;
+    }
+
     NX_OUTPUT << "Received CameraManager settings:";
     NX_OUTPUT << "{";
     for (int i = 0; i < count; ++i)
     {
         m_settings[settings[i].name] = settings[i].value;
-        NX_OUTPUT << "    \"" << nx::kit::debug::toString(settings[i].name)
-            << "\": \"" << nx::kit::debug::toString(settings[i].value) << "\""
+        NX_OUTPUT << "    " << nx::kit::debug::toString(settings[i].name)
+            << ": " << nx::kit::debug::toString(settings[i].value)
             << ((i < count - 1) ? "," : "");
     }
     NX_OUTPUT << "}";

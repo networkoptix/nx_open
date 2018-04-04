@@ -20,6 +20,8 @@
 
 #include <nx_ec/data/api_tran_state_data.h>
 
+#include <nx/cloud/cdb/client/data/auth_data.h>
+
 #include "managers/business_event_manager.h"
 #include "managers/camera_manager.h"
 #include "managers/discovery_manager.h"
@@ -722,7 +724,7 @@ struct ModifyCameraAttributesAccess
         }
 
         // Check the license if and only if recording goes from 'off' to 'on' state
-        const bool prevScheduleEnabled = !camera->isScheduleDisabled();
+        const bool prevScheduleEnabled = camera->isLicenseUsed();
         if (prevScheduleEnabled != param.scheduleEnabled)
         {
             licenseUsageHelper.propose(camera, param.scheduleEnabled);
@@ -763,7 +765,7 @@ struct ModifyCameraAttributesListAccess
                 return;
             }
             cameras.push_back(camera);
-            const bool prevScheduleEnabled = !camera->isScheduleDisabled();
+            const bool prevScheduleEnabled = camera->isLicenseUsed();
             if (prevScheduleEnabled != p.scheduleEnabled)
                 licenseUsageHelper.propose(camera, p.scheduleEnabled);
         }
@@ -1116,6 +1118,12 @@ struct SetResourceParamTransactionType
             param.name == nx::settings_names::kNameSystemName)
         {
             // System rename MUST be propagated to Nx Cloud
+            return TransactionType::Cloud;
+        }
+
+        if (param.name == nx::cdb::api::kVmsUserAuthInfoAttributeName ||
+            param.name == Qn::USER_FULL_NAME)
+        {
             return TransactionType::Cloud;
         }
 

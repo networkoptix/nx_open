@@ -2574,7 +2574,11 @@ void QnWorkbenchNavigator::updateSliderBookmarks()
 void QnWorkbenchNavigator::updatePlaybackMask()
 {
     const auto content = selectedExtraContent();
-    const auto mask = content != Qn::RecordingContent
+
+    // TODO: #dmishin setting of playback mask for analytics content makes it impossible.
+    // to play archive in some cases (if analytics periods are very small)
+    // Figure out how to properly fix it.
+    const auto mask = content != Qn::RecordingContent && content != Qn::AnalyticsContent
         ? m_mergedTimePeriods[content]
         : QnTimePeriodList();
 

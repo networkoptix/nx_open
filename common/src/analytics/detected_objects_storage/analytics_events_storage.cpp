@@ -263,16 +263,19 @@ void EventsStorage::prepareLookupQuery(
         sqlLimitStr = lm("LIMIT %1").args(filter.maxObjectsToSelect).toQString();
 
     query->prepare(lm(R"sql(
+        WITH filtered_events AS
+        (SELECT timestamp_usec_utc, object_id, rowid as r
+         FROM %1
+         %2
+         ORDER BY timestamp_usec_utc DESC)
         SELECT timestamp_usec_utc, duration_usec, device_guid,
             object_type_id, object_id, attributes,
             box_top_left_x, box_top_left_y, box_bottom_right_x, box_bottom_right_y
         FROM event e,
-            (SELECT MIN(timestamp_usec_utc) AS matching_track_start_time, rowid as r
-             FROM %1
-             %2
-             GROUP BY object_id
-             ORDER BY matching_track_start_time DESC
-             %3) objects
+            ( SELECT timestamp_usec_utc AS matching_track_start_time, r
+              FROM filtered_events AS t
+              WHERE timestamp_usec_utc=(SELECT MIN(timestamp_usec_utc) FROM event WHERE object_id=t.object_id)
+              %3) objects
         WHERE e.rowid=objects.r
         ORDER BY timestamp_usec_utc %4
     )sql").args(

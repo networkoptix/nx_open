@@ -24,14 +24,18 @@ public:
     virtual ResultCode latestUpdate(
         const UpdateRequestData& updateRequestData,
         QnSoftwareVersion* outSoftwareVersion) const override;
+    virtual void addFileData(const ManualFileData& manualFileData) override;
     virtual QList<QString> alternativeServers() const override;
     virtual QByteArray toByteArray() const override;
     virtual bool fromByteArray(const QByteArray& rawData) override;
     virtual bool equals(AbstractUpdateRegistry* other) const override;
+    virtual void merge(AbstractUpdateRegistry* other) override;
+
 private:
     QString m_baseUrl;
     detail::data_parser::UpdatesMetaData m_metaData;
     detail::CustomizationVersionToUpdate m_customizationVersionToUpdate;
+    QList<ManualFileData> m_manualData;
 
     bool hasUpdateForCustomizationAndVersion(
         const UpdateRequestData& updateRequestData,

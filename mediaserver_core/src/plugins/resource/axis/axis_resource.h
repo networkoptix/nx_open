@@ -47,8 +47,6 @@ public:
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
 
-    AxisResolution getMaxResolution() const;
-    AxisResolution getNearestResolution(const QSize& resolution, float aspectRatio) const;
     float getResolutionAspectRatio(const AxisResolution& resolution) const;
 
     QRect getMotionWindow(int num) const;

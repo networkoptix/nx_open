@@ -11,4 +11,3 @@ networks:
   10.254.4.0/24:
     proxy-2:
     first:
-default_gateways:

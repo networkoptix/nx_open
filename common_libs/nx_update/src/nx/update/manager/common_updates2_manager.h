@@ -8,7 +8,7 @@ namespace update {
 
 class NX_UPDATE_API CommonUpdates2Manager:
     public QnCommonModuleAware,
-    public detail::Updates2ManagerBase
+    public manager::detail::Updates2ManagerBase
 {
 public:
     CommonUpdates2Manager(QnCommonModule* commonModule);
@@ -18,8 +18,12 @@ private:
     virtual update::info::AbstractUpdateRegistryPtr getGlobalRegistry() override;
     virtual QnUuid moduleGuid() const override;
     virtual void updateGlobalRegistry(const QByteArray& serializedRegistry) override;
-    virtual void writeStatusToFile(const detail::Updates2StatusDataEx& statusData) override;
+    virtual void writeStatusToFile(const manager::detail::Updates2StatusDataEx& statusData) override;
     virtual void remoteUpdateCompleted() override {}
+    virtual bool isClient() const override;
+    virtual QnUuid peerId() const override;
+
+    void connectToSignals();
 };
 
 } // namespace update

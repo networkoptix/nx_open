@@ -6,7 +6,7 @@
 #include <api/server_rest_connection_fwd.h>
 #include <common/common_module_aware.h>
 #include <nx/vms/common/p2p/downloader/private/peer_selection/abstract_peer_selector.h>
-#include <nx/network/http/http_async_client.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 
 class QnResourcePool;
 class QnAsyncHttpClientReply;
@@ -79,6 +79,8 @@ public:
     ResourcePoolPeerManagerFactory(QnCommonModule* commonModule);
     virtual AbstractPeerManager* createPeerManager(FileInformation::PeerSelectionPolicy peerPolicy) override;
 };
+
+nx::network::http::AsyncHttpClientPtr createHttpClient();
 
 } // namespace downloader
 } // namespace p2p

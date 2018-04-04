@@ -76,7 +76,7 @@ bool operator<(const DetectionMetadataPacket& first, std::chrono::microseconds s
 
 QString toString(const DetectionMetadataPacket&);
 QnCompressedMetadataPtr toMetadataPacket(const DetectionMetadataPacket&);
-DetectionMetadataPacketPtr fromMetadataPacket(const QnCompressedMetadataPtr&);
+DetectionMetadataPacketPtr fromMetadataPacket(const QnConstCompressedMetadataPtr&);
 ::std::ostream& operator<<(::std::ostream& os, const DetectionMetadataPacket& packet);
 
 } // namespace metadata

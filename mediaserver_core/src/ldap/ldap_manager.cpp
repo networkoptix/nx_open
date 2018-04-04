@@ -60,12 +60,9 @@ namespace {
 }
 
 #ifdef Q_OS_WIN
-static BOOLEAN _cdecl VerifyServerCertificate(PLDAP Connection, PCCERT_CONTEXT *ppServerCert)
+static BOOLEAN _cdecl VerifyServerCertificate(PLDAP /*Connection*/, PCCERT_CONTEXT *ppServerCert)
 {
-    Q_UNUSED(Connection)
-
     CertFreeCertificateContext(*ppServerCert);
-
     return TRUE;
 }
 #endif
@@ -132,6 +129,7 @@ enum LdapVendor
 
 struct DirectoryType
 {
+    virtual ~DirectoryType() = default;
     virtual const QString& UidAttr() const = 0;
     virtual const QString& Filter() const = 0;
     virtual const QString& FullNameAttr() const = 0;
@@ -151,7 +149,7 @@ struct ActiveDirectoryType : DirectoryType
         return attr;
     }
 
-    const QString& FullNameAttr() const
+    const QString& FullNameAttr() const override
     {
         static QString attr(lit("displayName"));
         return attr;
@@ -164,7 +162,7 @@ struct OpenLdapType : DirectoryType
     {
         static QString attr(lit("uid"));
         return attr;
-    };
+    }
 
     const QString& Filter() const override
     {
@@ -172,13 +170,12 @@ struct OpenLdapType : DirectoryType
         return attr;
     }
 
-    const QString& FullNameAttr() const
+    const QString& FullNameAttr() const override
     {
         static QString attr(lit("gecos"));
         return attr;
     }
 };
-
 
 namespace
 {
@@ -227,20 +224,20 @@ QnLdapManager::~QnLdapManager()
 class LdapSession
 {
 public:
-    LdapSession(const QnLdapSettings &settings);
+    LdapSession(const QnLdapSettings& settings);
     ~LdapSession();
 
     bool connect();
-    bool fetchUsers(QnLdapUsers &users, const QString& additionFilter = QString());
+    bool fetchUsers(QnLdapUsers& users, const QString& additionFilter = QString());
     QString getUserDn(const QString& login);
     bool testSettings();
-    Qn::AuthResult authenticate(const QString &dn, const QString &password);
+    Qn::AuthResult authenticate(const QString& dn, const QString& password);
 
     LDAP_RESULT lastErrorCode() const;
     QString lastErrorString() const;
 
 private:
-    bool detectLdapVendor(LdapVendor &);
+    bool detectLdapVendor(LdapVendor&);
 
     const QnLdapSettings& m_settings;
     LDAP_RESULT m_lastErrorCode;
@@ -249,7 +246,7 @@ private:
     LDAP *m_ld;
 };
 
-LdapSession::LdapSession(const QnLdapSettings &settings):
+LdapSession::LdapSession(const QnLdapSettings& settings):
     m_settings(settings),
     m_ld(nullptr)
 {
@@ -319,7 +316,6 @@ bool LdapSession::connect()
     else
         m_dType.reset(new OpenLdapType());
 
-
     return true;
 }
 
@@ -333,7 +329,7 @@ QString LdapSession::getUserDn(const QString& login)
     return users[0].dn;
 }
 
-bool LdapSession::fetchUsers(QnLdapUsers &users, const QString& customFilter)
+bool LdapSession::fetchUsers(QnLdapUsers& users, const QString& customFilter)
 {
     LDAP_RESULT rc = ldap_simple_bind_s(m_ld, QSTOCW(m_settings.adminDn), QSTOCW(m_settings.adminPassword));
     if (rc != LDAP_SUCCESS)
@@ -469,7 +465,7 @@ bool LdapSession::testSettings()
     return true;
 }
 
-Qn::AuthResult LdapSession::authenticate(const QString &dn, const QString &password)
+Qn::AuthResult LdapSession::authenticate(const QString& dn, const QString& password)
 {
     int rc = ldap_simple_bind_s(m_ld, QSTOCW(dn), QSTOCW(password));
     // TODO: vig, check error code to give more detailed error description
@@ -492,7 +488,7 @@ QString LdapSession::lastErrorString() const
     return LdapErrorStr(m_lastErrorCode);
 }
 
-bool LdapSession::detectLdapVendor(LdapVendor &vendor)
+bool LdapSession::detectLdapVendor(LdapVendor& vendor)
 {
     int rc = ldap_simple_bind_s(m_ld, QSTOCW(m_settings.adminDn), QSTOCW(m_settings.adminPassword));
     if (rc != LDAP_SUCCESS)
@@ -529,7 +525,7 @@ bool LdapSession::detectLdapVendor(LdapVendor &vendor)
     return true;
 }
 
-Qn::LdapResult QnLdapManager::fetchUsers(QnLdapUsers &users, const QnLdapSettings& settings)
+Qn::LdapResult QnLdapManager::fetchUsers(QnLdapUsers& users, const QnLdapSettings& settings)
 {
     LdapSession session(settings);
     if (!session.connect())
@@ -547,13 +543,13 @@ Qn::LdapResult QnLdapManager::fetchUsers(QnLdapUsers &users, const QnLdapSetting
     return Qn::Ldap_NoError;
 }
 
-Qn::LdapResult QnLdapManager::fetchUsers(QnLdapUsers &users)
+Qn::LdapResult QnLdapManager::fetchUsers(QnLdapUsers& users)
 {
     QnLdapSettings settings = commonModule()->globalSettings()->ldapSettings();
     return fetchUsers(users, settings);
 }
 
-Qn::AuthResult QnLdapManager::authenticate(const QString &login, const QString &password)
+Qn::AuthResult QnLdapManager::authenticate(const QString& login, const QString& password)
 {
     QnLdapSettings settings = commonModule()->globalSettings()->ldapSettings();
     LdapSession session(settings);

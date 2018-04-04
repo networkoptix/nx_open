@@ -23,14 +23,12 @@ int QnUpdateRestHandler::executeGet(const QString &path, const QnRequestParams &
 }
 
 int QnUpdateRestHandler::executePost(
-    const QString &path,
-    const QnRequestParams &params,
-    const QByteArray &body,
-    QnJsonRestResult &result,
+    const QString& /*path*/,
+    const QnRequestParams& params,
+    const QByteArray& body,
+    QnJsonRestResult& result,
     const QnRestConnectionProcessor* processor)
 {
-    Q_UNUSED(path)
-
     bool remotePeerHasAdminRights = processor->resourceAccessManager()->hasGlobalPermission(
         processor->accessRights(),
         Qn::GlobalAdminPermission);
@@ -43,7 +41,6 @@ int QnUpdateRestHandler::executePost(
         result.setReply(reply);
         return nx::network::http::StatusCode::forbidden;
     }
-
 
     qint64 offset = params.value(lit("offset")).toLongLong();
     QString updateId = params.value(lit("updateId"));

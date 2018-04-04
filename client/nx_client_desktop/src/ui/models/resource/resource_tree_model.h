@@ -89,7 +89,7 @@ private:
     Qn::NodeType rootNodeTypeForScope() const;
 
     /** Cleanup all node references. */
-    void removeNode(const QnResourceTreeModelNodePtr& node);
+    void removeNode(QnResourceTreeModelNodePtr node);
 
     /** Fully rebuild resources tree. */
     void rebuildTree();

@@ -12,13 +12,15 @@
 #include <nx/sdk/metadata/objects_metadata_packet.h>
 #include <nx/sdk/metadata/events_metadata_packet.h>
 
+#include <nx/debugging/abstract_visual_metadata_debugger.h>
+
 class QnAbstractDataReceptor;
 
 namespace nx {
 namespace mediaserver {
 namespace metadata {
 
-class MetadataHandler: 
+class MetadataHandler:
     public QObject,
     public nx::sdk::metadata::MetadataHandler
 {
@@ -36,6 +38,8 @@ public:
 
     void registerDataReceptor(QnAbstractDataReceptor* dataReceptor);
     void removeDataReceptor(QnAbstractDataReceptor* dataReceptor);
+
+    void setVisualDebugger(nx::debugging::AbstractVisualMetadataDebugger* visualDebugger);
 
 signals:
     void sdkEventTriggered(const nx::vms::event::AnalyticsSdkEventPtr& event);
@@ -60,6 +64,7 @@ private:
     nx::api::AnalyticsDriverManifest m_manifest;
     QMap<QnUuid, nx::vms::event::EventState> m_eventStateMap;
     QnAbstractDataReceptor* m_dataReceptor = nullptr;
+    nx::debugging::AbstractVisualMetadataDebugger* m_visualDebugger = nullptr;
 };
 
 } // namespace metadata

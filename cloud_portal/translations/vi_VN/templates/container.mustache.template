@@ -70,7 +70,7 @@
                                 <b>Trang web</b><br>
                                 <a href="{{companyUrl}}">{{companyUrl}}</a>
                             </td>
-                        {{/hệ thống}}
+                        {{/system}}
                         <td class="left-border">
                             <b>Hỗ trợ</b><br>
                             <a href="{{supportLink}}">{{supportLinkText}}</a>

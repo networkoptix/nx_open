@@ -78,11 +78,6 @@
       <translation>Ces systèmes sont construits avec différents %1 URL. Fusion non autorisée.</translation>
     </message>
     <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Système Nuage peut seulement être fusionné avec un non-nuage. Nom Système et mot de passe sont pris du Système Nuage.</translation>
-    </message>
-    <message>
       <source>New System</source>
       <translation>Nouveau Système</translation>
     </message>
@@ -90,6 +85,10 @@
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
       <translation>Le système découvert %1 est incompatible avec le système actuel.</translation>
+    </message>
+    <message>
+      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
+      <translation>Système Nuage peut seulement être fusionné avec un non-nuage. Nom Système et mot de passe sont pris du Système Nuage.</translation>
     </message>
   </context>
   <context>
@@ -316,7 +315,7 @@
     </message>
     <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
-      <translation type="unfinished">Please update firmware. Minimal supported version is %1. Current version is %2</translation>
+      <translation>Veuillez mettre à jour le firmware. La version minimale prise en charge est %1. La version actuelle est %2</translation>
     </message>
   </context>
   <context>
@@ -562,7 +561,7 @@
     </message>
     <message>
       <source>Server with matching Hardware Id not found</source>
-      <translation>Aucun Serveur avec ID matériel correspondant trouvé</translation>
+      <translation>Aucun Serveur avec Id Matériel correspondant trouvé</translation>
     </message>
   </context>
   <context>
@@ -685,7 +684,7 @@
     </message>
     <message>
       <source>Hardware Id: %1</source>
-      <translation>ID Matériel: %1</translation>
+      <translation>Id Matériel: %1</translation>
     </message>
     <message>
       <source>Time License</source>
