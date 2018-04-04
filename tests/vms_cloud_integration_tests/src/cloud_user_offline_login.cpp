@@ -8,6 +8,7 @@
 #include <nx/network/app_info.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/string.h>
+#include <nx/utils/std/optional.h>
 
 #include "mediaserver_cloud_integration_test_setup.h"
 
@@ -115,6 +116,34 @@ protected:
         ASSERT_EQ(
             nx::cdb::api::ResultCode::ok,
             cdb()->activateAccount(*m_prevActivationCode, &accountEmail));
+    }
+
+    void waitForUserCloudAuthInfoToBeUpdated()
+    {
+        std::optional<QString> initialAuthInfo;
+
+        auto mediaServerClient = prepareMediaServerClient();
+        for (;;)
+        {
+            ec2::ApiResourceParamDataList params;
+            ASSERT_EQ(
+                ec2::ErrorCode::ok,
+                mediaServerClient->ec2GetResourceParams(
+                    QnUuid::fromStringSafe(cloudOwnerVmsUserId()),
+                    &params));
+            auto authInfoIter = std::find_if(params.begin(), params.end(),
+                [](auto param) { return param.name == nx::cdb::api::kVmsUserAuthInfoAttributeName; });
+            if (authInfoIter != params.end())
+            {
+                if (!initialAuthInfo)
+                    initialAuthInfo = authInfoIter->value;
+                else if (*initialAuthInfo != authInfoIter->value)
+                    break; //< Auth info has been changed.
+            }
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            continue;
+        }
     }
 
     void thenUserCanStillLogin()
@@ -280,6 +309,35 @@ TEST_P(
     thenInvitedUserCannotLoginToTheSystem();
 }
 
+//-------------------------------------------------------------------------------------------------
+
 INSTANTIATE_TEST_CASE_P(P2pMode, CloudUserOfflineLogin,
+    ::testing::Values(TestParams(false), TestParams(true)
+));
+
+//-------------------------------------------------------------------------------------------------
+
+class CloudUserOfflineLoginAfterAuthInfoUpdate:
+    public CloudUserOfflineLogin
+{
+public:
+    CloudUserOfflineLoginAfterAuthInfoUpdate()
+    {
+        cdb()->addArg("--auth/offlineUserHashValidityPeriod=1s");
+        cdb()->addArg("--auth/checkForExpiredAuthPeriod=100ms");
+        cdb()->addArg("--auth/continueUpdatingExpiredAuthPeriod=100ms");
+    }
+};
+
+TEST_P(CloudUserOfflineLoginAfterAuthInfoUpdate, user_is_able_to_login_after_auth_info_update)
+{
+    waitForUserCloudAuthInfoToBeUpdated();
+    whenVmsLostConnectionToTheCloud();
+    thenUserCanStillLogin();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+INSTANTIATE_TEST_CASE_P(P2pMode, CloudUserOfflineLoginAfterAuthInfoUpdate,
     ::testing::Values(TestParams(false), TestParams(true)
 ));
