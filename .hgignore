@@ -224,6 +224,9 @@ cloud_portal/robot_tests/output*.xml
 cloud_portal/robot_tests/report*.html
 cloud_portal/robot_tests/MicrosoftWebDriver.exe
 cloud_portal/robot_tests/geckodriver.exe
+cloud_portal/robot_tests/test-cases/outputs/*
+cloud_portal/robot_tests/outputs/
+cloud_portal/robot_tests/IEDriverServer.exe
 syntax: regexp
 ^core$
 ^Makefile$

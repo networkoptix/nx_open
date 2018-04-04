@@ -15,7 +15,7 @@
     "template": "{{title}} {{PRODUCT_NAME}}",
     "default": "{{PRODUCT_NAME}}",
     "registerSuccess": "歡迎來到",
-    "register": "新建帳戶",
+    "register": "新建帳號",
     "changePassword": "更改密碼 -",
     "account": "帳號設定 -",
     "systems": "系統 -",
@@ -117,7 +117,7 @@
     "cloudInvalidResponse": "雲端 DB 回覆預期外的回應",
     "notAuthorized": "密碼不正確",
     "wrongParameters": "表單上的一些參數不正確",
-    "brokenAccount": "Unexpected problem with account. <a href=\"/restore_password\">Restore account</a>",
+    "brokenAccount": "帳號出現意外問題. <a href=\"/restore_password\">還原帳號</a>",
     "wrongCode": "帳號已經啟動或確認碼不正確",
     "wrongCodeRestore": "確認代碼已使用或不正確",
     "forbidden": "您沒有權限執行此操作",
@@ -171,7 +171,7 @@
     "confirmUnshareTitle": "刪除使用者?",
     "confirmUnshareAction": "刪除",
     "successDisconnected": "系統成功地斷開 {{PRODUCT_NAME}}",
-    "successDeleted": "從您的帳戶成功刪除系統 {{systemName}}",
+    "successDeleted": "從您的帳號成功刪除系統 {{systemName}}",
     "permissionsRemoved": "權限從 {{email}} 被移除"
   },
   "account": {

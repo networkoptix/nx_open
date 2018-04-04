@@ -43,7 +43,8 @@
                     </div>
                     <div>
                         <h3>시스템에서 서버 분리</h3>
-                        <p>이 작업은 데이터베이스, 로컬 사용자 및 구성을 유지하면서 서버를 시스템에서 분리합니다. 저장된 비디오는 그대로 유지됩니다. <b> 클라우드 사용자는 삭제됩니다. </b></p>
+                        <p>이 작업은 데이터베이스, 로컬 사용자 및 구성을 유지하면서 서버를 시스템에서 분리합니다.
+                            저장된 비디오는 그대로 유지됩니다. <b>클라우드 사용자가 삭제됩니다.</b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">시스템에서 분리</button></p>
                     </div>
                     <div>
@@ -61,7 +62,7 @@
 
                             <div class="col-sm-6">
                                 <button type="button" class="btn btn-primary" ng-disabled="!rootPasswordForm.$valid"
-                                        ng-click="changePassword()">패스워드 변경</button>
+                                        ng-click="changePassword()">암호 변경</button>
                             </div>
                         </form>
                     </div>
@@ -113,7 +114,9 @@
 
                 <tab heading="{{L.settings.tabs.device}}" active="active.device" ng-if="controlDevice">
                     <div ng-if="settings.flags.canSetupNetwork">
-                        <h3>장치 네트워크 설정</h3>                         <network-settings settings="networkSettings[0]" ng-if="networkSettings"> </network-settings> <button class="btn btn-default" ng-click="saveNetworkSettings()"> 설정을 저장 하 고 장치를 재 부팅</button>
+                        <h3>모바일 네트워크 설정</h3>
+                        <network-settings settings="networkSettings[0]" ng-if="networkSettings"></network-settings>
+                        <button class="btn btn-default" ng-click="saveNetworkSettings()">설정 저장후 장치 재부팅</button>
                     </div>
                     <div ng-if="settings.flags.canSetupTime">
                         <h3>날짜와 시간</h3>

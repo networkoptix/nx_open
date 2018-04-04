@@ -42,7 +42,8 @@
                     </div>
                     <div>
                         <h3>Tách máy chủ khỏi hệ thống</h3>
-                        <p>Việc này sẽ tách các máy chủ ra khỏi hệ thống lưu trữ dữ liệu, người dùng, cấu hình nội bộ.                             Video Lưu trữ vẫn tồn tại. <b>Tài khoản người dùng Cloud sẽ bị xóa.</b></p>
+                        <p>Hành động này sẽ tách máy chủ khỏi hệ thống giữ cơ sở dữ liệu, người dùng cục bộ và cấu hình.
+                            Lưu trữ video sẽ vẫn còn nguyên vẹn. Tất cả các tài khoản đám mây sẽ bị xóa</p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Tách máy chủ khỏi hệ thống</button></p>
                     </div>
                     <div>
@@ -114,7 +115,9 @@
 
                 <tab heading="{{L.settings.tabs.device}}" active="active.device" ng-if="controlDevice">
                     <div ng-if="settings.flags.canSetupNetwork">
-                        <h3> Cài đặt mạng thiết bị </h3> <network-settings settings="networkSettings[0]" ng-if="networkSettings"> </network-settings> <button class="btn btn-default" ng-click="saveNetworkSettings()"> Lưu cài đặt và khởi động lại thiết bị </button>
+                        <h3>Cài đặt Mạng Thiết bị</h3>
+                        <network-settings settings="networkSettings[0]" ng-if="networkSettings"></network-settings>
+                        <button class="btn btn-default" ng-click="saveNetworkSettings()">Lưu cài đặt và khởi động lại thiết bị</button>
                     </div>
                     <div ng-if="settings.flags.canSetupTime">
                         <h3>Ngày tháng</h3>

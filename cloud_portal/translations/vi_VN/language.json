@@ -1,5 +1,5 @@
 {
-  "language_name": "Tiếng Việt",
+  "language_name": "TÊN NGÔN NGỮ",
   "productName": "{{PRODUCT_NAME}}",
   "clientProtocol": "{{CLIENT_PROTOCOL}}:",
   "dialogs": {
@@ -117,7 +117,7 @@
     "cloudInvalidResponse": "Có thể DB đã trả một phản hồi bất ngờ",
     "notAuthorized": "Sai mật khẩu",
     "wrongParameters": "Một số thông số trên biểu mẫu không chính xác",
-    "brokenAccount": "Unexpected problem with account. <a href=\"/restore_password\">Restore account</a>",
+    "brokenAccount": "Vấn đề không mong muốn với tài khoản. <a href=\"/restore_password\">Khôi phục tài khoản</a>",
     "wrongCode": "Tài khoản đã được kích hoạt hoặc mã xác nhận không chính xác",
     "wrongCodeRestore": "Mã xác nhận đã được sử dụng hoặc không chính xác",
     "forbidden": "Bạn không có quyền thực hiện công việc này",
@@ -180,7 +180,7 @@
     "passwordChangedSuccess": "Tài khoản của bạn đã được lưu thành công",
     "changePassword": "Đổi mật khẩu",
     "newPasswordLabel": "Mật khẩu mới",
-    "saveChanges": "Lưu"
+    "saveChanges": "Tiết kiệm"
   },
   "downloads": {
     "noClientDetectedTitle": "Cài đặt {{VMS_NAME}} để xem Hệ thống của bạn",

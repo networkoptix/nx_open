@@ -38,7 +38,8 @@
                            required autofocus>
                 </div>
                 <div class="col-sm-4">
-                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required"> E-mailadres is verplicht </span> <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email"> Vul alstublieft een geldige e-mailadres in </span>
+                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required">E-mailadres is verplicht</span>
+                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email"> Vul alstublieft een geldige e-mailadres in</span>
                 </div>
             </div>
             <div class="form-group">
@@ -53,7 +54,7 @@
 
     <div ng-if="restoringSuccess">
         <h1 class="process-success">
-            Wachtwoordherstelinstructies worden verzonden naar het volgende emailadres: <br> {{data.email}}
+            Wachtwoordherstelinstructies worden verzonden naar het volgende emailadres: <br>{{data.email}}
         </h1>
     </div>
 
@@ -70,7 +71,8 @@
                            required autofocus>
                 </div>
                 <div class="col-sm-4">
-                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.required"> E-mailadres is verplicht </span> <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.email"> Vul alstublieft een geldige e-mailadres in </span>
+                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.required">E-mailadres is verplicht</span>
+                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.email"> Vul alstublieft een geldige e-mailadres in</span>
                 </div>
             </div>
             <div class="form-group">
