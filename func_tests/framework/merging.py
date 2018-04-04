@@ -132,19 +132,24 @@ def detach_from_cloud(server, password):
 
 
 def setup_system(servers, scheme):
-    # if config.setup_cloud_account:
-    #     server.setup_cloud_system(config.setup_cloud_account, **config.setup_settings)
-    #     if not config.leave_initial_cloud_host:
-    #         server.api = server.api.with_credentials(DEFAULT_API_USER, DEFAULT_API_PASSWORD)  # TODO: Needed?
-    # else:
-    #     setup_local_system(server, dict((**config.setup_settings)))
     allocated_servers = {}
-    for remote_alias, local_aliases in scheme.items():
-        allocated_servers[remote_alias] = servers.get(remote_alias)  # Create server but don't merge.
-        allocated_servers[remote_alias].start(already_started_ok=True)
-        for local_alias, merge_parameters in (local_aliases or {}).items():
-            allocated_servers[local_alias] = servers.get(local_alias)
-            allocated_servers[local_alias].start(already_started_ok=True)
+
+    def get_mediaserver(alias):
+        """Get running server with local system set up; save it in allocated_servers."""
+        try:
+            return allocated_servers[alias]
+        except KeyError:
+            allocated_servers[alias] = new_mediaserver = servers.get(alias)
+            new_mediaserver.start()
+            setup_local_system(new_mediaserver, {})
+            return new_mediaserver
+
+    # Local is one to which request is sent.
+    # Remote's URL is sent included in request to local.
+    for remote_mediaserver_alias, local_mediaserver_aliases in scheme.items():
+        remote_mediaserver = get_mediaserver(remote_mediaserver_alias)
+        for local_mediaserver_alias, merge_parameters in (local_mediaserver_aliases or {}).items():
+            local_mediaserver = get_mediaserver(local_mediaserver_alias)
             merge_kwargs = {}
             if merge_parameters is not None:
                 try:
@@ -157,5 +162,5 @@ def setup_system(servers, scheme):
                     pass
                 else:
                     merge_kwargs['accessible_ip_net'] = remote_network
-            merge_systems(allocated_servers[local_alias], allocated_servers[remote_alias], **merge_kwargs)
+            merge_systems(local_mediaserver, remote_mediaserver, **merge_kwargs)
     return allocated_servers

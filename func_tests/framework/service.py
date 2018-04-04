@@ -1,6 +1,10 @@
 import abc
+import logging
 
 from framework.os_access import NonZeroExitStatus
+
+
+_logger = logging.getLogger(__name__)
 
 
 class Service(object):
@@ -44,8 +48,8 @@ class UpstartService(Service):
     def make_core_dump(self):
         try:
             self.os_access.run_command(['killall', '--signal', 'SIGTRAP', 'mediaserver-bin'])
-        except NonZeroExitStatus as e:
-            pass
+        except NonZeroExitStatus:
+            _logger.error("Cannot make core dump of process of %s service on %r.", self._service_name, self.os_access)
 
 
 class AdHocService(Service):
