@@ -559,7 +559,7 @@
     </message>
     <message>
       <source>Server with matching Hardware Id not found</source>
-      <translation>Servidor correspondiente al hardware Id no encontrado</translation>
+      <translation>Servidor correspondiente al Hardware Id no encontrado</translation>
     </message>
   </context>
   <context>

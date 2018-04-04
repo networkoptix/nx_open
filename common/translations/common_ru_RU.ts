@@ -937,10 +937,10 @@
     <message numerus="yes">
       <source>seconds</source>
       <comment>Full suffix for displaying seconds</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>секунды</numerusform>
         <numerusform>секунды</numerusform>
-        <numerusform>seconds</numerusform>
+        <numerusform>секунды</numerusform>
         <numerusform>секунды</numerusform>
       </translation>
     </message>
@@ -967,10 +967,10 @@
     <message numerus="yes">
       <source>days</source>
       <comment>Full suffix for displaying days</comment>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>день</numerusform>
+        <numerusform>дня</numerusform>
         <numerusform>дней</numerusform>
-        <numerusform>дней</numerusform>
-        <numerusform>days</numerusform>
         <numerusform>дней</numerusform>
       </translation>
     </message>
@@ -1152,9 +1152,9 @@
     <message numerus="yes">
       <source>Motion on Cameras</source>
       <translation type="unfinished">
+        <numerusform>Движение на камере</numerusform>
         <numerusform>Движение на камерах</numerusform>
         <numerusform>Движение на камерах</numerusform>
-        <numerusform>Motion on Cameras</numerusform>
         <numerusform>Движение на камерах</numerusform>
       </translation>
     </message>
@@ -1196,19 +1196,19 @@
     </message>
     <message numerus="yes">
       <source>Input Signal on Devices</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>Входной сигнал на устройстве</numerusform>
         <numerusform>Входной сигнал на устройствах</numerusform>
         <numerusform>Входной сигнал на устройствах</numerusform>
-        <numerusform>Input Signal on Devices</numerusform>
         <numerusform>Входной сигнал на устройствах</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Input Signal on Cameras</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>Входной сигнал на камере</numerusform>
         <numerusform>Входной сигнал на камерах</numerusform>
         <numerusform>Входной сигнал на камерах</numerusform>
-        <numerusform>Input Signal on Cameras</numerusform>
         <numerusform>Входной сигнал на камерах</numerusform>
       </translation>
     </message>

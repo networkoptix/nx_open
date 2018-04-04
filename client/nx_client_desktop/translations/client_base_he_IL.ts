@@ -854,19 +854,19 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Wearable Camera...</source>
-      <translation type="unfinished">Wearable Camera...</translation>
+      <translation>מצלמה לבישה...</translation>
     </message>
     <message>
       <source>New Wearable Camera...</source>
-      <translation type="unfinished">New Wearable Camera...</translation>
+      <translation>מצלמה לבישה חדשה...</translation>
     </message>
     <message>
       <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
+      <translation>העלה קובץ...</translation>
     </message>
     <message>
       <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
+      <translation>תיקיה להעלאה...</translation>
     </message>
     <message>
       <source>Start Analytics...</source>
@@ -1156,7 +1156,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Password should contain different types of symbols.</source>
-      <translation>הסיסמה צריכה להכיל סוגים שונים של סמלים.</translation>
+      <translation>הסיסמא צריכה להכיל סוגים שונים של סמלים.</translation>
     </message>
     <message>
       <source>Short</source>
@@ -2804,11 +2804,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Cannot edit properties for several wearable and non-wearable cameras.</source>
-      <translation type="unfinished">Cannot edit properties for several wearable and non-wearable cameras.</translation>
+      <translation>לא ניתן לערוך מאפיינים עבור מספר מצלמות לבישות ומספר מצלמות לא לבישות.</translation>
     </message>
     <message>
       <source>Cannot edit properties for several wearable cameras.</source>
-      <translation type="unfinished">Cannot edit properties for several wearable cameras.</translation>
+      <translation>לא ניתן לערוך מאפיינים עבור מספר מצלמות לבישות.</translation>
     </message>
   </context>
   <context>
@@ -3326,7 +3326,7 @@ to %1</source>
     </message>
     <message>
       <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation>תבניות שמע 44.1khz ו- 48Khz אינן נתמכות על-ידי התקן לכידת שמע. בחר התקן שמע אחר או &quot;ללא&quot; בהגדרות הקלטת המסך.</translation>
+      <translation>תבניות שמע 44.1kHz ו- 48kHz אינן נתמכות על-ידי התקן לכידת שמע. בחר התקן שמע אחר או &quot;ללא&quot; בהגדרות הקלטת המסך.</translation>
     </message>
   </context>
   <context>
@@ -4787,11 +4787,11 @@ to %1</source>
     <name>QnNewWearableCameraDialog</name>
     <message>
       <source>Wearable Camera</source>
-      <translation type="unfinished">Wearable Camera</translation>
+      <translation>מצלמה לבישה</translation>
     </message>
     <message>
       <source>Wearable Camera %1</source>
-      <translation type="unfinished">Wearable Camera %1</translation>
+      <translation>מצלמה לבישה %1</translation>
     </message>
     <message>
       <source>Name</source>
@@ -5240,7 +5240,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 TB</source>
-      <translation>%1 Tb</translation>
+      <translation>%1 TB</translation>
     </message>
     <message>
       <source>%1 GB</source>
@@ -6295,7 +6295,7 @@ to %1</source>
     </message>
     <message>
       <source>NO LIVE STREAM</source>
-      <translation type="unfinished">NO LIVE STREAM</translation>
+      <translation>אין צפייה בזרם ישיר</translation>
     </message>
     <message>
       <source>TOO MANY CONNECTIONS</source>
@@ -6460,7 +6460,7 @@ to %1</source>
     </message>
     <message>
       <source>Recording was enabled on the USB storage</source>
-      <translation type="unfinished">Recording was enabled on the USB storage</translation>
+      <translation>ההקלטה אופשרה באחסון ה- USB</translation>
     </message>
   </context>
   <context>
@@ -6503,7 +6503,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation>%1 Gb</translation>
+      <translation>%1 GB</translation>
     </message>
     <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
@@ -7349,34 +7349,34 @@ to %1</source>
     <name>QnWearableProgressWidget</name>
     <message>
       <source>Uploading %1... %2	%p%</source>
-      <translation type="unfinished">Uploading %1... %2	%p%</translation>
+      <translation>מעלה %1... %2	%p%</translation>
     </message>
     <message>
       <source>Stop uploading?</source>
-      <translation type="unfinished">Stop uploading?</translation>
+      <translation>להפסיק את העלאה?</translation>
     </message>
     <message>
       <source>Already uploaded files will be kept.</source>
-      <translation type="unfinished">Already uploaded files will be kept.</translation>
+      <translation>הקבצים שכבר הועלו יישמרו.</translation>
     </message>
     <message>
       <source>Finalizing %1... %2	%p%</source>
-      <translation type="unfinished">Finalizing %1... %2	%p%</translation>
+      <translation>מסתיים %1... %2	%p%</translation>
     </message>
     <message>
       <source>(%1 of %2)</source>
-      <translation type="unfinished">(%1 of %2)</translation>
+      <translation>(%1 מתוך %2)</translation>
     </message>
   </context>
   <context>
     <name>QnWearableUploadWidget</name>
     <message>
       <source>User &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation type="unfinished">User &quot;%1&quot; is currently uploading footage to this camera.</translation>
+      <translation>משתמש אחר מעלה כעת צילומים למצלמה זו.</translation>
     </message>
     <message>
       <source>Another user is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Another user is currently uploading footage to this camera.</translation>
+      <translation>משתמש אחר מעלה כעת צילומים למצלמה זו.</translation>
     </message>
   </context>
   <context>
@@ -7778,36 +7778,36 @@ to %1</source>
     </message>
     <message>
       <source>Video (%1)</source>
-      <translation type="unfinished">Video (%1)</translation>
+      <translation>סרטון (%1)</translation>
     </message>
     <message>
       <source>Open Wearable Camera Recordings...</source>
-      <translation type="unfinished">Open Wearable Camera Recordings...</translation>
+      <translation>פתח את הקלטות המצלמה הלבישה...</translation>
     </message>
     <message>
       <source>Only video files with correct timestamp are supported.</source>
-      <translation type="unfinished">Only video files with correct timestamp are supported.</translation>
+      <translation>רק קבצי וידאו עם חתימת זמן נכונה נתמכים.</translation>
     </message>
     <message>
       <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</translation>
+      <translation>לא ניתן להתחיל בהעלאה כאשר משתמש &amp;; quot;%1&amp;; quot; מעלה כעת צילומים למצלמה זו.</translation>
     </message>
     <message>
       <source>Could not start upload as another user is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Could not start upload as another user is currently uploading footage to this camera.</translation>
+      <translation>לא ניתן להתחיל בהעלאה כשמשתמש אחר מעלה כעת את הסרטון למצלמה הזו.</translation>
     </message>
     <message>
       <source>Failed to add wearable camera</source>
-      <translation type="unfinished">Failed to add wearable camera</translation>
+      <translation>הוספת המצלמה לבישה נכשלה</translation>
     </message>
     <message>
       <source>No video files found in selected folder</source>
-      <translation type="unfinished">No video files found in selected folder</translation>
+      <translation>לא נמצאו קובצי וידאו בתיקייה שנבחרה</translation>
     </message>
     <message numerus="yes">
       <source>Selected file formats are not supported</source>
       <translation type="unfinished">
-        <numerusform>Selected file formats are not supported</numerusform>
+        <numerusform>פורמטים של קבצים שנבחרו אינם נתמכים</numerusform>
         <numerusform>Selected file formats are not supported</numerusform>
         <numerusform>Selected file formats are not supported</numerusform>
         <numerusform>Selected file formats are not supported</numerusform>
@@ -7815,12 +7815,12 @@ to %1</source>
     </message>
     <message>
       <source>Use .MKV, .AVI, .MP4 or other video files.</source>
-      <translation type="unfinished">Use .MKV, .AVI, .MP4 or other video files.</translation>
+      <translation>השתמש .MKV, .AVI, .MP4 או קבצי וידאו אחרים.</translation>
     </message>
     <message numerus="yes">
       <source>Selected files do not have timestamps</source>
       <translation type="unfinished">
-        <numerusform>Selected files do not have timestamps</numerusform>
+        <numerusform>לקבצים שנבחרו אין חותמות זמן</numerusform>
         <numerusform>Selected files do not have timestamps</numerusform>
         <numerusform>Selected files do not have timestamps</numerusform>
         <numerusform>Selected files do not have timestamps</numerusform>
@@ -7829,7 +7829,7 @@ to %1</source>
     <message numerus="yes">
       <source>Selected files cover periods for which videos are already being uploaded</source>
       <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+        <numerusform>הקבצים שנבחרו הם באותם זמנים שעבורן הסרטונים כבר נטענים</numerusform>
         <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
         <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
         <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
@@ -7838,8 +7838,8 @@ to %1</source>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Wearable Camera.</source>
       <translation type="unfinished">
-        <numerusform>You can upload these files to a different instance of a Wearable Camera.</numerusform>
-        <numerusform>You can upload these files to a different instance of a Wearable Camera.</numerusform>
+        <numerusform>תוכל לטעון קבצים אלה למיקום שונה אחר של מצלמה לבישה.</numerusform>
+        <numerusform>תוכל לטעון קבצים אלה למיקום שונה של מצלמה לבישה.</numerusform>
         <numerusform>You can upload these files to a different instance of a Wearable Camera.</numerusform>
         <numerusform>You can upload these files to a different instance of a Wearable Camera.</numerusform>
       </translation>
@@ -7847,45 +7847,45 @@ to %1</source>
     <message numerus="yes">
       <source>Selected files cover periods for which videos have already been uploaded</source>
       <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+        <numerusform>%1 מכסה את הזמן שבו הסרטון כבר הועלה</numerusform>
+        <numerusform>%1 נמצא באותו זמן שבו הסרטון כבר הועלה</numerusform>
         <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
         <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
       </translation>
     </message>
     <message>
       <source>Selected files will not be uploaded</source>
-      <translation type="unfinished">Selected files will not be uploaded</translation>
+      <translation>קבצים מסוימים לא יועלו</translation>
     </message>
     <message>
       <source>Some files will not be uploaded</source>
-      <translation type="unfinished">Some files will not be uploaded</translation>
+      <translation>קבצים מסוימים לא יועלו</translation>
     </message>
     <message>
       <source>No new files to upload in selected folder</source>
-      <translation type="unfinished">No new files to upload in selected folder</translation>
+      <translation>אין קבצים חדשים להעלאה בתיקיה שנבחרה</translation>
     </message>
     <message>
       <source>%1 - has unsupported format.</source>
-      <translation type="unfinished">%1 - has unsupported format.</translation>
+      <translation>%1 כולל פורמט לא נתמך.</translation>
     </message>
     <message>
       <source>%1 - does not have timestamp.</source>
-      <translation type="unfinished">%1 - does not have timestamp.</translation>
+      <translation>ל- %1 אין חותמת זמן.</translation>
     </message>
     <message>
       <source>%1 - covers period for which video has already been uploaded.</source>
-      <translation type="unfinished">%1 - covers period for which video has already been uploaded.</translation>
+      <translation>%1 מכסה את הזמן שבו הסרטון כבר הועלה.</translation>
     </message>
     <message>
       <source>%1 - covers period for which video is being uploaded.</source>
-      <translation type="unfinished">%1 - covers period for which video is being uploaded.</translation>
+      <translation>%1 מכסה את הזמן שבוהסרטון מועלה.</translation>
     </message>
     <message numerus="yes">
       <source>Selected files are too old</source>
       <translation type="unfinished">
-        <numerusform>Selected files are too old</numerusform>
-        <numerusform>Selected files are too old</numerusform>
+        <numerusform>הקבצים שנבחרו ישנים מדי</numerusform>
+        <numerusform>הקבצים שנבחרו ישנים מדי</numerusform>
         <numerusform>Selected files are too old</numerusform>
         <numerusform>Selected files are too old</numerusform>
       </translation>
@@ -7893,7 +7893,7 @@ to %1</source>
     <message numerus="yes">
       <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
       <translation type="unfinished">
-        <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+        <numerusform>הקבצים שנבחרו נרשמו ב- %1, אך ניתן להעלות רק קבצים שנרשמו ב- %n הימים האחרונים. באפשרותך לשנות זאת בהגדרות ארכיון של מצלמה.</numerusform>
         <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
         <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
         <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
@@ -7902,7 +7902,7 @@ to %1</source>
     <message numerus="yes">
       <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
       <translation type="unfinished">
-        <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+        <numerusform>קבצים שנבחריו נרשמו בין %1 ו- %2, אך רק קבצים שנרשמו ב- %n הימים האחרונים ניתנים להעלאה. באפשרותך לשנות זאת בהגדרות ארכיון של מצלמה.</numerusform>
         <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
         <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
         <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
@@ -7911,7 +7911,7 @@ to %1</source>
     <message numerus="yes">
       <source>Some footage may be deleted after uploading these files</source>
       <translation type="unfinished">
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+        <numerusform>ייתכן שחלק מהקטעים יימחקו לאחר העלאת קבצים אלה</numerusform>
         <numerusform>Some footage may be deleted after uploading these files</numerusform>
         <numerusform>Some footage may be deleted after uploading these files</numerusform>
         <numerusform>Some footage may be deleted after uploading these files</numerusform>
@@ -7920,7 +7920,7 @@ to %1</source>
     <message numerus="yes">
       <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
       <translation type="unfinished">
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+        <numerusform>אין הרבה מקום פנוי על אחסון השרתים. כמה הקלטות ישנות עשויות להימחק כדי לפנות מקום. שים לב שאם הקבצים הנבחרים יהיו הישנים ביותר בשרת, הם יימחקו מיד לאחר טעינתם.</numerusform>
         <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
         <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
         <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
@@ -7928,23 +7928,23 @@ to %1</source>
     </message>
     <message>
       <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
-      <translation type="unfinished">To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</translation>
+      <translation>כדי למנוע זאת ניתן להוסיף שטח אחסון נוסף. אתה יכול גם לקבוע איזה מידע יימחק הראשון על ידי שינוי שמירת זמן ארכיון בהגדרות המצלמה.</translation>
     </message>
     <message>
       <source>Upload anyway?</source>
-      <translation type="unfinished">Upload anyway?</translation>
+      <translation>להעלות בכל מקרה?</translation>
     </message>
     <message>
       <source>Could not finish upload to %1</source>
-      <translation type="unfinished">Could not finish upload to %1</translation>
+      <translation>לא ניתן היה לסיים את ההעלאה אל %1</translation>
     </message>
     <message>
       <source>Make sure there is enough space on server storage.</source>
-      <translation type="unfinished">Make sure there is enough space on server storage.</translation>
+      <translation>ודא שיש מספיק שטח אחסון בשרת.</translation>
     </message>
     <message>
       <source>%1 - is older than allowed in camera archive settings.</source>
-      <translation type="unfinished">%1 - is older than allowed in camera archive settings.</translation>
+      <translation>%1 - ישן יותר מהרשאות בהגדרות ארכיון של מצלמה.</translation>
     </message>
   </context>
   <context>
@@ -8171,7 +8171,7 @@ to %1</source>
     </message>
     <message>
       <source>Stop uploading?</source>
-      <translation type="unfinished">Stop uploading?</translation>
+      <translation>להפסיק את ההעלאה?</translation>
     </message>
     <message>
       <source>Stop</source>
@@ -8180,7 +8180,7 @@ to %1</source>
     <message numerus="yes">
       <source>Some video file(s) are still being uploaded to %n wearable cameras:</source>
       <translation type="unfinished">
-        <numerusform>Some video file(s) are still being uploaded to %n wearable cameras:</numerusform>
+        <numerusform>חלק מקובצי הסרטונים עדיין מועלים למצלמות %n לבישות:</numerusform>
         <numerusform>Some video file(s) are still being uploaded to %n wearable cameras:</numerusform>
         <numerusform>Some video file(s) are still being uploaded to %n wearable cameras:</numerusform>
         <numerusform>Some video file(s) are still being uploaded to %n wearable cameras:</numerusform>
@@ -8437,34 +8437,34 @@ to %1</source>
     <name>nx::client::desktop::UploadWorker</name>
     <message>
       <source>Could not open file &quot;%1&quot;</source>
-      <translation type="unfinished">Could not open file &quot;%1&quot;</translation>
+      <translation>לא ניתן לפתוח את הקובץ &amp;; quot;%1&amp;; quot;</translation>
     </message>
     <message>
       <source>Could not calculate md5 for file &quot;%1&quot;</source>
-      <translation type="unfinished">Could not calculate md5 for file &quot;%1&quot;</translation>
+      <translation>לא ניתן לחשב md5 עבור הקובץ &amp;; quot;%1&amp;; quot;</translation>
     </message>
     <message>
       <source>Could not create upload on the server side</source>
-      <translation type="unfinished">Could not create upload on the server side</translation>
+      <translation>לא ניתן ליצור העלאה בצד השרת</translation>
     </message>
     <message>
       <source>Could not upload file chunk to the server</source>
-      <translation type="unfinished">Could not upload file chunk to the server</translation>
+      <translation>לא ניתן להעלות נתחי קבצים לשרת</translation>
     </message>
     <message>
       <source>Could not check uploaded file on the server</source>
-      <translation type="unfinished">Could not check uploaded file on the server</translation>
+      <translation>בדיקת קובץ שהועלה לשרת נכשלה</translation>
     </message>
     <message>
       <source>File was corrupted while being uploaded to the server</source>
-      <translation type="unfinished">File was corrupted while being uploaded to the server</translation>
+      <translation>הקובץ נפגם בעת העלאה לשרת</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::WearableWorker</name>
     <message>
       <source>Failed to send request to the server.</source>
-      <translation type="unfinished">Failed to send request to the server.</translation>
+      <translation>שליחת הבקשה לשרת נכשלה.</translation>
     </message>
   </context>
   <context>
@@ -9075,7 +9075,7 @@ to %1</source>
     </message>
     <message>
       <source>Wearable Cameras cannot be moved between servers</source>
-      <translation type="unfinished">Wearable Cameras cannot be moved between servers</translation>
+      <translation>מצלמות לבישות אינן ניתנות להעברה בין שרתים</translation>
     </message>
     <message>
       <source>Failed to change password</source>

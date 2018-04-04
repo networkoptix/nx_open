@@ -2415,7 +2415,7 @@
     <message>
       <location/>
       <source>Resolution</source>
-      <translation>解像度:</translation>
+      <translation>解像度</translation>
     </message>
     <message>
       <location/>

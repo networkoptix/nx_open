@@ -7127,7 +7127,7 @@ to %1</source>
     </message>
     <message>
       <source>Stop uploading?</source>
-      <translation>是否停止上傳?</translation>
+      <translation>停止上傳?</translation>
     </message>
     <message>
       <source>Already uploaded files will be kept.</source>
@@ -7846,7 +7846,7 @@ to %1</source>
     </message>
     <message>
       <source>Stop uploading?</source>
-      <translation>停止上傳?</translation>
+      <translation>是否停止上傳?</translation>
     </message>
     <message>
       <source>Stop</source>

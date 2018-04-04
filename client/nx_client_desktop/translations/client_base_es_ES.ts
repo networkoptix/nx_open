@@ -5130,7 +5130,7 @@ a %1</translation>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation>%1 GB</translation>
+      <translation>%1 GiB</translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n devices</source>

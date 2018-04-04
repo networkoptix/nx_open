@@ -2234,11 +2234,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>I/O Module Id</source>
-      <translation>I/O-Modul-ID</translation>
+      <translation>I/O-Modul-Id</translation>
     </message>
     <message>
       <source>Camera Id</source>
-      <translation>Kamera-ID</translation>
+      <translation>Kamera-Id</translation>
     </message>
   </context>
   <context>
@@ -3726,7 +3726,7 @@ to %1</source>
     </message>
     <message>
       <source>Id</source>
-      <translation>ID</translation>
+      <translation>Id</translation>
     </message>
   </context>
   <context>

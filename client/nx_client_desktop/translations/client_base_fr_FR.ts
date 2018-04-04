@@ -985,7 +985,7 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
-      <translation>ID matériel du Server avec cette licence ne correspond pas à l'ID matériel sur lequel la licence a été activée.</translation>
+      <translation>Id Matériel du Server avec cette licence ne correspond pas à l'Id Matériel sur lequel la licence a été activée.</translation>
     </message>
   </context>
   <context>
@@ -2235,11 +2235,11 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>I/O Module Id</source>
-      <translation>ID Modules I/O</translation>
+      <translation>Id Modules I/O</translation>
     </message>
     <message>
       <source>Camera Id</source>
-      <translation>ID Caméra</translation>
+      <translation>Id Caméra</translation>
     </message>
   </context>
   <context>
@@ -2970,7 +2970,7 @@ to %1</source>
     </message>
     <message>
       <source>The username or password you have entered is incorrect. Please try again.</source>
-      <translation>L'ID ou le mot de passe que vous avez entré est incorrect, S.V.P. réessayez .</translation>
+      <translation>L'Id ou le mot de passe que vous avez entré est incorrect, S.V.P. réessayez.</translation>
     </message>
     <message>
       <source>Unable to connect to the server</source>
@@ -3731,7 +3731,7 @@ to %1</source>
     </message>
     <message>
       <source>Id</source>
-      <translation>ID</translation>
+      <translation>Id</translation>
     </message>
   </context>
   <context>
@@ -3914,7 +3914,7 @@ to %1</source>
     </message>
     <message>
       <source>Locked to Hardware Id</source>
-      <translation>Verrouillé sur ID Matériel</translation>
+      <translation>Verrouillé sur Id Matériel</translation>
     </message>
   </context>
   <context>
@@ -4190,11 +4190,11 @@ to %1</source>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware Id %1</source>
-      <translation>Cette licence est déjà activée et liée au ID Matériel %1</translation>
+      <translation>Cette licence est déjà activée et liée au Id Matériel %1</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware Id %1 on %2</source>
-      <translation>Cette licence est déjà activée et liée au ID Matériel %1 sur %2</translation>
+      <translation>Cette licence est déjà activée et liée au Id Matériel %1 sur %2</translation>
     </message>
     <message>
       <source>If the problem persists please contact Customer Support.</source>
@@ -4225,11 +4225,11 @@ to %1</source>
     </message>
     <message>
       <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>S.V.P envoyer courriel avec clé de licence et ID matériel fourni à %1 pour obtenir un fichier de clé d’activation.</translation>
+      <translation>S.V.P envoyer courriel avec clé de licence et Id Matériel fourni à %1 pour obtenir un fichier de clé d’activation.</translation>
     </message>
     <message>
       <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>S.V.P envoyer clé de licence et ID matériel fourni à %1 pour obtenir un fichier de clé d’activation.</translation>
+      <translation>S.V.P envoyer clé de licence et Id Matériel fourni à %1 pour obtenir un fichier de clé d’activation.</translation>
     </message>
   </context>
   <context>
