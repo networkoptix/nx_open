@@ -12,9 +12,6 @@
     "AUTOTESTS OFFLINE TEXT": "hors ligne",
     "NEW PERMISSIONS SAVED": "Nouvelles autorisations enregistrées",
     "PERMISSIONS WERE REMOVED FROM": "Autorisations retirées de {{email}}",
-    "FAILED TO ACCESS SYSTEM": "Impossible d’accéder au système",
-    "PAGE NOT FOUND": "Page non trouvée",
-    "TAKE ME HOME": "Me ramener à l'accueil",
     "RESET SUCCESS MESSAGE TEXT": "Mot de passe enregistré avec succès",
     "YOUR ACCOUNT IS SUCCESSFULLY SAVED": "Votre compte est enregistré avec succès",
     "ACCOUNT SUCCESSFULLY ACTIVATED TEXT": "Votre compte est activé avec succès",
@@ -56,5 +53,8 @@
     "PASSWORD SPECIAL CHARS TEXT": "Utilisez uniquement les lettres latines, les chiffres et les symboles du clavier, éviter les espaces de début et de fin",
     "PASSWORD TOO SHORT TEXT": "Mot de passe doit contenir au moins 8 caractères",
     "PASSWORD TOO COMMON TEXT": "Ce mot de passe est en haut de la liste des plus populaires dans le monde",
-    "PASSWORD IS WEAK TEXT": "Utiliser des nombres, majuscules et minuscules et caractères spéciaux pour rendre votre mot de passe plus fort"
+    "PASSWORD IS WEAK TEXT": "Utiliser des nombres, majuscules et minuscules et caractères spéciaux pour rendre votre mot de passe plus fort",
+    "THIS LINK IS BROKEN TEXT": "Ce lien est brisé<br>             Système est peut-être déconnecté de {{PRODUCT_NAME}},<br>             Accès à ce sytème sont peut-être révoqué. <br>             ou vous êtes peut-être connecté à un autre compte",
+    "PAGE NOT FOUND": "Page non trouvée",
+    "TAKE ME HOME": "Me ramener à l'accueil"
 }

@@ -12,9 +12,6 @@
     "AUTOTESTS OFFLINE TEXT": "offline",
     "NEW PERMISSIONS SAVED": "Nye tilladelser gemt",
     "PERMISSIONS WERE REMOVED FROM": "Tilladelser blev fjernet fra {{email}}",
-    "FAILED TO ACCESS SYSTEM": "Failed to access System",
-    "PAGE NOT FOUND": "Page not found",
-    "TAKE ME HOME": "Take me home",
     "RESET SUCCESS MESSAGE TEXT": "Adgangskode med succes gemt",
     "YOUR ACCOUNT IS SUCCESSFULLY SAVED": "Din konto er blevet gemt",
     "ACCOUNT SUCCESSFULLY ACTIVATED TEXT": "Din konto er aktiveret",
@@ -56,5 +53,8 @@
     "PASSWORD SPECIAL CHARS TEXT": "Brug kun latinske bogstaver, tal og tastatursymboler, undgå ledende og efterfølgende mellemrum",
     "PASSWORD TOO SHORT TEXT": "Adgangskoden skal indeholde mindst 8 tegn",
     "PASSWORD TOO COMMON TEXT": "Denne adgangskode er i top mest populære adgangskoder i verden",
-    "PASSWORD IS WEAK TEXT": "Use numbers, upper and lower case letters and special characters to make your password stronger"
+    "PASSWORD IS WEAK TEXT": "Use numbers, upper and lower case letters and special characters to make your password stronger",
+    "THIS LINK IS BROKEN TEXT": "This link is broken,<br>\n            System may be disconnected from {{PRODUCT_NAME}},<br>\n            Access to this System may be revoked, <br>\n            or you may be logged into a different account",
+    "PAGE NOT FOUND": "Page not found",
+    "TAKE ME HOME": "Take me home"
 }

@@ -12,9 +12,6 @@
     "AUTOTESTS OFFLINE TEXT": "offline",
     "NEW PERMISSIONS SAVED": "Uudet käyttöoikeudet tallennetaan",
     "PERMISSIONS WERE REMOVED FROM": "Käyttöoikeudet poistettiin {{email}}",
-    "FAILED TO ACCESS SYSTEM": "Failed to access System",
-    "PAGE NOT FOUND": "Page not found",
-    "TAKE ME HOME": "Take me home",
     "RESET SUCCESS MESSAGE TEXT": "Salasana tallennettiin onnistuneesti",
     "YOUR ACCOUNT IS SUCCESSFULLY SAVED": "Tilisi tallennetaan onnistuneesti",
     "ACCOUNT SUCCESSFULLY ACTIVATED TEXT": "Tilisi aktivoidaan",
@@ -56,5 +53,8 @@
     "PASSWORD SPECIAL CHARS TEXT": "Käytä vain latinalaisia ​​kirjaimia, numeroita ja näppäimistön symboleja, vältä johtavaa ja jäljellä olevaa tilaa",
     "PASSWORD TOO SHORT TEXT": "Salasanan tulee sisältää vähintään 8 merkkiä",
     "PASSWORD TOO COMMON TEXT": "Tämä salasana on maailman suosituimpia salasanoja",
-    "PASSWORD IS WEAK TEXT": "Use numbers, upper and lower case letters and special characters to make your password stronger"
+    "PASSWORD IS WEAK TEXT": "Use numbers, upper and lower case letters and special characters to make your password stronger",
+    "THIS LINK IS BROKEN TEXT": "This link is broken,<br>\n            System may be disconnected from {{PRODUCT_NAME}},<br>\n            Access to this System may be revoked, <br>\n            or you may be logged into a different account",
+    "PAGE NOT FOUND": "Page not found",
+    "TAKE ME HOME": "Take me home"
 }

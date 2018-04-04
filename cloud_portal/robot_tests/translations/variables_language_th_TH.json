@@ -12,9 +12,6 @@
     "AUTOTESTS OFFLINE TEXT": "ออฟไลน์",
     "NEW PERMISSIONS SAVED": "อนุญาตสิทธิ์ใหม่แล้ว",
     "PERMISSIONS WERE REMOVED FROM": "สิทธิ์ถูกนำออกจาก {{email}}",
-    "FAILED TO ACCESS SYSTEM": "ไม่สามารถเข้าถึงระบบ",
-    "PAGE NOT FOUND": "ไม่พบหน้านี้",
-    "TAKE ME HOME": "ไปที่นั่นเลย",
     "RESET SUCCESS MESSAGE TEXT": "บันทึกรหัสผ่านเรียบร้อยแล้ว",
     "YOUR ACCOUNT IS SUCCESSFULLY SAVED": "บันทึกบัญชีของคุณเรียบร้อยแล้ว",
     "ACCOUNT SUCCESSFULLY ACTIVATED TEXT": "เปิดใช้งานบัญชีของคุณเรียบร้อยแล้ว",
@@ -56,5 +53,6 @@
     "PASSWORD SPECIAL CHARS TEXT": "ใช้อักษรละตินตัวเลขและสัญลักษณ์แป้นพิมพ์เท่านั้นหลีกเลี่ยงช่องว่างด้านบนและด้านหลัง",
     "PASSWORD TOO SHORT TEXT": "รหัสผ่านต้องมีอักขระอย่างน้อย 8 ตัว",
     "PASSWORD TOO COMMON TEXT": "รหัสผ่านนี้อยู่ในรหัสผ่านที่ได้รับความนิยมมากที่สุดในโลก",
-    "PASSWORD IS WEAK TEXT": "ใช้ตัวเลขตัวพิมพ์ใหญ่และตัวพิมพ์เล็กและตัวอักษรพิเศษเพื่อทำให้รหัสผ่านของคุณแข็งแกร่งขึ้น"
+    "PASSWORD IS WEAK TEXT": "ใช้ตัวเลขตัวพิมพ์ใหญ่และตัวพิมพ์เล็กและตัวอักษรพิเศษเพื่อทำให้รหัสผ่านของคุณแข็งแกร่งขึ้น",
+    "THIS LINK IS BROKEN TEXT": "ลิงค์นี้เสีย, <br> ระบบอาจถูกตัดการเชื่อมต่อจาก {{PRODUCT_NAME}}, <br> การเข้าถึงระบบนี้อาจถูกเพิกถอนหรือ <br> หรือคุณอาจจะเข้าสู่ระบบบัญชีอื่น"
 }

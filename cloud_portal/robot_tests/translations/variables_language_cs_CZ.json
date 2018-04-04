@@ -12,9 +12,6 @@
     "AUTOTESTS OFFLINE TEXT": "offline",
     "NEW PERMISSIONS SAVED": "Byla uložena nová oprávnění",
     "PERMISSIONS WERE REMOVED FROM": "Oprávnění byla odebrána z {{email}}",
-    "FAILED TO ACCESS SYSTEM": "Failed to access System",
-    "PAGE NOT FOUND": "Page not found",
-    "TAKE ME HOME": "Take me home",
     "RESET SUCCESS MESSAGE TEXT": "Heslo bylo úspěšně uloženo",
     "YOUR ACCOUNT IS SUCCESSFULLY SAVED": "Váš účet byl úspěšně uložen",
     "ACCOUNT SUCCESSFULLY ACTIVATED TEXT": "Váš účet byl úspěšně aktivován",
@@ -56,5 +53,8 @@
     "PASSWORD SPECIAL CHARS TEXT": "Použijte pouze latinská písmena, čísla a symboly klávesnice, vyhněte se předním a koncovým mezerám",
     "PASSWORD TOO SHORT TEXT": "Heslo musí obsahovat alespoň 8 znaků",
     "PASSWORD TOO COMMON TEXT": "Toto heslo je v nejpopulárnějších nejoblíbenějších heslech na světě",
-    "PASSWORD IS WEAK TEXT": "Use numbers, upper and lower case letters and special characters to make your password stronger"
+    "PASSWORD IS WEAK TEXT": "Use numbers, upper and lower case letters and special characters to make your password stronger",
+    "THIS LINK IS BROKEN TEXT": "This link is broken,<br>\n            System may be disconnected from {{PRODUCT_NAME}},<br>\n            Access to this System may be revoked, <br>\n            or you may be logged into a different account",
+    "PAGE NOT FOUND": "Page not found",
+    "TAKE ME HOME": "Take me home"
 }

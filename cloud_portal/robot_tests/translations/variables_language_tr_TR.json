@@ -12,9 +12,6 @@
     "AUTOTESTS OFFLINE TEXT": "çevrimdışı",
     "NEW PERMISSIONS SAVED": "Yeni izin kaydedildi",
     "PERMISSIONS WERE REMOVED FROM": "İzinler {{email}}'den kaldırıldı",
-    "FAILED TO ACCESS SYSTEM": "Sisteme erişim sağlanılamadı",
-    "PAGE NOT FOUND": "Sayfa bulunamadı",
-    "TAKE ME HOME": "Geri Dön",
     "RESET SUCCESS MESSAGE TEXT": "Parola başarıyla kaydedildi",
     "YOUR ACCOUNT IS SUCCESSFULLY SAVED": "Hesabınız başarıyla kaydedildi",
     "ACCOUNT SUCCESSFULLY ACTIVATED TEXT": "Hesabın başarıyla aktif edildi",
@@ -56,5 +53,8 @@
     "PASSWORD SPECIAL CHARS TEXT": "Sadece alfanümerik ve klavye karakterleri kullanın",
     "PASSWORD TOO SHORT TEXT": "Şifre en az 8 karakter içermelidir",
     "PASSWORD TOO COMMON TEXT": "Dünyada en çok kullanılan parolayı seçtiniz",
-    "PASSWORD IS WEAK TEXT": "Parolanın güçlü olması için \nküçük büyük harf ve özel karakterler kullanın"
+    "PASSWORD IS WEAK TEXT": "Parolanın güçlü olması için \nküçük büyük harf ve özel karakterler kullanın",
+    "THIS LINK IS BROKEN TEXT": "Bu bağlantı bozuk,<br>\n            Sistemin {{PRODUCT_NAME}} den bağlantısı kesilmiş olabilir<br>\n            Sisteme erişim engennemiş olabilir,<br>\n            Yada farklı bir hesap ile sisteme girilmiş olabilir",
+    "PAGE NOT FOUND": "Sayfa bulunamadı",
+    "TAKE ME HOME": "Geri Dön"
 }

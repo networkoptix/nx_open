@@ -12,9 +12,6 @@
     "AUTOTESTS OFFLINE TEXT": "offline",
     "NEW PERMISSIONS SAVED": "Új engedélyek mentve",
     "PERMISSIONS WERE REMOVED FROM": "{{email}} engedélyei vissavonva",
-    "FAILED TO ACCESS SYSTEM": "Belépés sikertelen",
-    "PAGE NOT FOUND": "Az oldal nem található",
-    "TAKE ME HOME": "Vigyen haza",
     "RESET SUCCESS MESSAGE TEXT": "A jelszó sikeresen mentve",
     "YOUR ACCOUNT IS SUCCESSFULLY SAVED": "A fiók mentése sikeres",
     "ACCOUNT SUCCESSFULLY ACTIVATED TEXT": "Fiókja sikeresen aktiválva van",
@@ -56,5 +53,8 @@
     "PASSWORD SPECIAL CHARS TEXT": "Csak latin betűket, számokat és billentyűzet szimbólumok használhatók, kerülje a szóközöket",
     "PASSWORD TOO SHORT TEXT": "A jelszónak legalább 8 karakterből kell állnia",
     "PASSWORD TOO COMMON TEXT": "Ez a jelszó a leggyakoribb jelszavak egyike",
-    "PASSWORD IS WEAK TEXT": "Használjon számokat, kis és nagybetűket és speciális karaktereket az erősebb jelszó érdekében"
+    "PASSWORD IS WEAK TEXT": "Használjon számokat, kis és nagybetűket és speciális karaktereket az erősebb jelszó érdekében",
+    "THIS LINK IS BROKEN TEXT": "Nincs kapcsolat,<br>\n            A rendszer és {{PRODUCT_NAME}} között nincs kapcsolat,<br>\n            A rendszerhez való hozzáférést visszavonták, <br>\n            vagy más fiókba van bejelentkezve",
+    "PAGE NOT FOUND": "Az oldal nem található",
+    "TAKE ME HOME": "Vigyen haza"
 }

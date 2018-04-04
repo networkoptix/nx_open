@@ -12,9 +12,6 @@
     "AUTOTESTS OFFLINE TEXT": "deconectat",
     "NEW PERMISSIONS SAVED": "Au fost salvate noi permisiuni",
     "PERMISSIONS WERE REMOVED FROM": "Permisiunile au fost eliminate din {{email}}",
-    "FAILED TO ACCESS SYSTEM": "Failed to access System",
-    "PAGE NOT FOUND": "Page not found",
-    "TAKE ME HOME": "Take me home",
     "RESET SUCCESS MESSAGE TEXT": "Parola salvată cu succes",
     "YOUR ACCOUNT IS SUCCESSFULLY SAVED": "Contul dvs. a fost salvat cu succes",
     "ACCOUNT SUCCESSFULLY ACTIVATED TEXT": "Contul dvs. a fost activat cu succes",
@@ -56,5 +53,8 @@
     "PASSWORD SPECIAL CHARS TEXT": "Utilizați numai litere latine, numere și simboluri de tastatură, evitați spațiile de conducere și de sfârșit",
     "PASSWORD TOO SHORT TEXT": "Parola trebuie să conțină cel puțin 8 caractere",
     "PASSWORD TOO COMMON TEXT": "Această parolă se află în cele mai populare parole din lume",
-    "PASSWORD IS WEAK TEXT": "Use numbers, upper and lower case letters and special characters to make your password stronger"
+    "PASSWORD IS WEAK TEXT": "Use numbers, upper and lower case letters and special characters to make your password stronger",
+    "THIS LINK IS BROKEN TEXT": "This link is broken,<br>\n            System may be disconnected from {{PRODUCT_NAME}},<br>\n            Access to this System may be revoked, <br>\n            or you may be logged into a different account",
+    "PAGE NOT FOUND": "Page not found",
+    "TAKE ME HOME": "Take me home"
 }

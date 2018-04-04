@@ -12,9 +12,6 @@
     "AUTOTESTS OFFLINE TEXT": "извън линия",
     "NEW PERMISSIONS SAVED": "Новите разрешения бяха запазени",
     "PERMISSIONS WERE REMOVED FROM": "Разрешенията бяха премахнати от {{email}}",
-    "FAILED TO ACCESS SYSTEM": "Failed to access System",
-    "PAGE NOT FOUND": "Page not found",
-    "TAKE ME HOME": "Take me home",
     "RESET SUCCESS MESSAGE TEXT": "Паролата бе запазена успешно",
     "YOUR ACCOUNT IS SUCCESSFULLY SAVED": "Профилът ви бе запазен успешно",
     "ACCOUNT SUCCESSFULLY ACTIVATED TEXT": "Вашият профил е активиран успешно",
@@ -56,5 +53,8 @@
     "PASSWORD SPECIAL CHARS TEXT": "Използвайте само латински букви, цифри и символи на клавиатурата, избягвайте водещи и задни интервали",
     "PASSWORD TOO SHORT TEXT": "Паролата трябва да съдържа поне 8 знака",
     "PASSWORD TOO COMMON TEXT": "Тази парола е в най-популярните най-популярни пароли в света",
-    "PASSWORD IS WEAK TEXT": "Use numbers, upper and lower case letters and special characters to make your password stronger"
+    "PASSWORD IS WEAK TEXT": "Use numbers, upper and lower case letters and special characters to make your password stronger",
+    "THIS LINK IS BROKEN TEXT": "This link is broken,<br>\n            System may be disconnected from {{PRODUCT_NAME}},<br>\n            Access to this System may be revoked, <br>\n            or you may be logged into a different account",
+    "PAGE NOT FOUND": "Page not found",
+    "TAKE ME HOME": "Take me home"
 }
