@@ -5,7 +5,6 @@
 
 #include "ec2_lib.h"
 
-#include <ec2/local_connection_factory.h>
 #include <ec2/remote_connection_factory.h>
 
 extern "C"
@@ -18,14 +17,5 @@ extern "C"
     {
 		return new ec2::RemoteConnectionFactory(commonModule, peerType, timerManager, isP2pMode);
     }
-
-	ec2::LocalConnectionFactory* getLocalConnectionFactory(
-		Qn::PeerType peerType,
-		nx::utils::TimerManager* const timerManager,
-		QnCommonModule* commonModule,
-		bool isP2pMode)
-	{
-		return new ec2::LocalConnectionFactory(commonModule, peerType, timerManager, isP2pMode);
-	}
 
 }

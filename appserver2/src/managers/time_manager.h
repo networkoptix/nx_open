@@ -183,6 +183,10 @@ class TimeSynchronizationManager:
     Q_OBJECT
 
 public:
+
+    static const QString kTimeSyncUrlPath;
+    static const QByteArray TIME_SYNC_HEADER_NAME;
+
     /**
      * TimeSynchronizationManager::start MUST be called before using class instance.
      */

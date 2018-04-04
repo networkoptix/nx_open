@@ -14,7 +14,6 @@
 #include <nx/utils/concurrent.h>
 
 #include "compatibility/old_ec_connection.h"
-#include "ec2_connection.h"
 #include "ec2_thread_pool.h"
 #include "remote_ec_connection.h"
 #include <transaction/message_bus_adapter.h>

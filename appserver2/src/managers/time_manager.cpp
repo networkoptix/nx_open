@@ -37,11 +37,14 @@
 
 #include <api/app_server_connection.h>
 #include "ec2_thread_pool.h"
-#include "rest/time_sync_rest_handler.h"
 #include "settings.h"
-#include "ec2_connection.h"
 
 namespace ec2 {
+
+// TODO: remove this constants
+const QString TimeSynchronizationManager::kTimeSyncUrlPath = QString::fromLatin1("ec2/timeSync");
+const QByteArray TimeSynchronizationManager::TIME_SYNC_HEADER_NAME("NX-TIME-SYNC-DATA");
+
 
 namespace {
 
@@ -421,7 +424,7 @@ void TimeSynchronizationManager::start(
         this, &TimeSynchronizationManager::onNewConnectionEstablished,
         Qt::DirectConnection);
 
-    connect(messageBus, &QnTransactionMessageBus::peerLost,
+    connect(messageBus, &AbstractTransactionMessageBus::peerLost,
         this, &TimeSynchronizationManager::onPeerLost,
         Qt::DirectConnection);
     Qn::directConnect(commonModule()->globalSettings(), &QnGlobalSettings::timeSynchronizationSettingsChanged,
@@ -833,7 +836,7 @@ void TimeSynchronizationManager::synchronizeWithPeer(const QnUuid& peerID)
     targetUrl.setScheme(lit("http"));
     targetUrl.setHost(peerIter->second.peerAddress.address.toString());
     targetUrl.setPort(peerIter->second.peerAddress.port);
-    targetUrl.setPath(lit("/") + QnTimeSyncRestHandler::PATH);
+    targetUrl.setPath(lit("/") + kTimeSyncUrlPath);
 
     NX_ASSERT(!peerIter->second.httpClient);
     clientPtr = nx::network::http::AsyncHttpClient::create();
@@ -864,7 +867,7 @@ void TimeSynchronizationManager::synchronizeWithPeer(const QnUuid& peerID)
         //client does not send its time to anyone
         const auto timeSyncInfo = getTimeSyncInfoNonSafe();
         clientPtr->addAdditionalHeader(
-            QnTimeSyncRestHandler::TIME_SYNC_HEADER_NAME,
+            TIME_SYNC_HEADER_NAME,
             timeSyncInfo.toString());
     }
     clientPtr->addAdditionalHeader(Qn::PEER_GUID_HEADER_NAME, commonModule()->moduleGUID().toByteArray());
@@ -896,7 +899,7 @@ void TimeSynchronizationManager::timeSyncRequestDone(
         clientPtr->response()->statusLine.statusCode == nx::network::http::StatusCode::ok)
     {
         //reading time sync information from remote server
-        auto timeSyncHeaderIter = clientPtr->response()->headers.find(QnTimeSyncRestHandler::TIME_SYNC_HEADER_NAME);
+        auto timeSyncHeaderIter = clientPtr->response()->headers.find(TIME_SYNC_HEADER_NAME);
         if (timeSyncHeaderIter != clientPtr->response()->headers.end())
         {
             auto sock = clientPtr->takeSocket();

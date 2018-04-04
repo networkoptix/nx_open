@@ -13,12 +13,14 @@
 #include <api/global_settings.h>
 #include <nx_ec/ec_proto_version.h>
 #include <utils/math/math.h>
-#include <http/p2p_connection_listener.h>
 #include <api/runtime_info_manager.h>
 #include <managers/time_manager.h>
 
 namespace nx {
 namespace p2p {
+
+const QString MessageBus::kUrlPath(lit("/ec2/messageBus"));
+const QString MessageBus::kCloudPathPrefix(lit("/cdb"));
 
 using namespace ec2;
 
@@ -161,9 +163,9 @@ void MessageBus::addOutgoingConnectionToPeer(const QnUuid& peer, const utils::Ur
 
     nx::utils::Url url(_url);
     if (peer == kCloudPeerId)
-        url.setPath(ConnectionProcessor::kCloudPathPrefix + ConnectionProcessor::kUrlPath);
+        url.setPath(kCloudPathPrefix + kUrlPath);
     else
-        url.setPath(ConnectionProcessor::kUrlPath);
+        url.setPath(kUrlPath);
 
     int pos = nx::utils::random::number((int) 0, (int) m_remoteUrls.size());
     m_remoteUrls.insert(m_remoteUrls.begin() + pos, RemoteConnection(peer, url));

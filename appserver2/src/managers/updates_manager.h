@@ -1,5 +1,4 @@
-#ifndef EC2_UPDATES_MANAGER_H
-#define EC2_UPDATES_MANAGER_H
+#pragma once
 
 #include "nx_ec/ec_api.h"
 #include "nx_ec/data/api_update_data.h"
@@ -47,6 +46,62 @@ namespace ec2 {
         TransactionMessageBusAdapter* m_messageBus;
     };
 
-} // namespace ec2
+    ////////////////////////////////////////////////////////////
+    //// class QnUpdatesManager
+    ////////////////////////////////////////////////////////////
 
-#endif // EC2_UPDATES_MANAGER_H
+
+    template<class QueryProcessorType>
+    QnUpdatesManager<QueryProcessorType>::QnUpdatesManager(
+        QueryProcessorType * const queryProcessor,
+        const Qn::UserAccessData &userAccessData,
+        TransactionMessageBusAdapter* messageBus)
+    :
+        m_queryProcessor(queryProcessor),
+        m_userAccessData(userAccessData),
+        m_messageBus(messageBus)
+    {
+    }
+
+    template<class QueryProcessorType>
+    QnUpdatesManager<QueryProcessorType>::~QnUpdatesManager() {}
+
+    template<class QueryProcessorType>
+    int QnUpdatesManager<QueryProcessorType>::sendUpdatePackageChunk(const QString &updateId, const QByteArray &data, qint64 offset, const QnPeerSet& peers, impl::SimpleHandlerPtr handler)
+    {
+        const int reqId = generateRequestID();
+
+        QnTransaction<ApiUpdateUploadData> transaction(
+            ApiCommand::uploadUpdate,
+            m_messageBus->commonModule()->moduleGUID());
+        transaction.params.updateId = updateId;
+        transaction.params.data = data;
+        transaction.params.offset = offset;
+
+        m_messageBus->sendTransaction(transaction, peers);
+        nx::utils::concurrent::run(
+            Ec2ThreadPool::instance(),
+            [handler, reqId]() { handler->done(reqId, ErrorCode::ok); });
+
+        return reqId;
+    }
+
+    template<class QueryProcessorType>
+    int QnUpdatesManager<QueryProcessorType>::sendUpdateUploadResponce(const QString &updateId, const QnUuid &peerId, int chunks, impl::SimpleHandlerPtr handler)
+    {
+        const int reqId = generateRequestID();
+        ApiUpdateUploadResponceData params;
+        params.id = peerId;
+        params.updateId = updateId;
+        params.chunks = chunks;
+
+
+        using namespace std::placeholders;
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+            ApiCommand::uploadUpdateResponce, params,
+            [handler, reqId](ErrorCode errorCode){ handler->done(reqId, errorCode); });
+
+        return reqId;
+    }
+
+} // namespace ec2

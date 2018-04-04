@@ -2,8 +2,6 @@
 
 #include "nx_ec/ec_api.h"
 
-#include <transaction/transaction_log.h>
-
 namespace ec2 {
 
 // TODO: #2.4 remove EC prefix to avoid ec2::ECConnectionNotificationManager

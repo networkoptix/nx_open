@@ -10,11 +10,9 @@
 #include "api/runtime_info_manager.h"
 
 #include "common/common_module.h"
-#include "ec2_connection.h"
 #include "ec_connection_notification_manager.h"
 #include "managers/time_manager.h"
 #include "nx/vms/discovery/manager.h"
-#include "remote_ec_connection.h"
 #include "settings.h"
 
 #include "nx_ec/data/api_camera_data_ex.h"
@@ -36,6 +34,7 @@
 #include "utils/common/warnings.h"
 #include <core/resource/media_server_resource.h>
 #include <nx/utils/random.h>
+#include <core/resource_access/resource_access_manager.h>
 #include "transaction_message_bus_priv.h"
 
 namespace ec2 {

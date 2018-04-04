@@ -43,6 +43,10 @@ class MessageBus: public ec2::TransactionMessageBusBase
     Q_OBJECT;
     using base_type = ec2::TransactionMessageBusBase;
 public:
+
+    const static QString kUrlPath;
+    const static QString kCloudPathPrefix;
+
     MessageBus(
         Qn::PeerType peerType,
         QnCommonModule* commonModule,
