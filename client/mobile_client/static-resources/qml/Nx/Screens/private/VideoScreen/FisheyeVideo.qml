@@ -1,5 +1,4 @@
 import QtQuick 2.6
-import QtQuick 2.6
 import Nx 1.0
 import Nx.Core 1.0
 import Nx.Media 1.0
