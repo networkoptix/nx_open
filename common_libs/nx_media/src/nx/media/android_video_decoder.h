@@ -1,4 +1,5 @@
 #pragma once
+#include <QtCore/QtGlobal>
 #if defined(Q_OS_ANDROID)
 
 #include <QtCore/QObject>
