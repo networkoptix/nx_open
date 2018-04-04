@@ -1,7 +1,9 @@
 *** Settings ***
 Resource          ../resource.robot
 Resource          ../variables.robot
-Test Teardown     Close Browser
+Suite Setup       Open Browser and go to URL    ${url}/register
+Suite Teardown    Close Browser
+Test Teardown     Run Keyword If Test Failed    Test Reset
 Test Template     Test Register Invalid
 
 *** Variables ***
@@ -25,38 +27,41 @@ ${PASSWORD TOO COMMON}         //span[contains(@ng-if,'passwordInput.password.$e
 ${PASSWORD IS WEAK}            //span[contains(@ng-if,'passwordInput.password.$error.common &&') and contains(@ng-if,'!passwordInput.password.$error.pattern &&') and contains(@ng-if,'!passwordInput.password.$error.required') and contains(text(),'${PASSWORD IS WEAK TEXT}')]
 
 *** Test Cases ***      FIRST       LAST        EMAIL                     PASS
-Invalid Email 1        mark        hamill      noptixqagmail.com         ${BASE PASSWORD}
-Invalid Email 2        mark        hamill      @gmail.com                ${BASE PASSWORD}
-Invalid Email 3        mark        hamill      noptixqa@gmail..com       ${BASE PASSWORD}
-Invalid Email 4        mark        hamill      noptixqa@192.168.1.1.0    ${BASE PASSWORD}
-Invalid Email 5        mark        hamill      noptixqa.@gmail.com       ${BASE PASSWORD}
-Invalid Email 6        mark        hamill      noptixq..a@gmail.c        ${BASE PASSWORD}
-Invalid Email 7        mark        hamill      noptixqa@-gmail.com       ${BASE PASSWORD}
-Invalid Email 8        mark        hamill      ${SPACE}                  ${BASE PASSWORD}
-Empty Email            mark        hamill      ${EMPTY}                  ${BASE PASSWORD}
-Registered Email       mark        hamill      ${existing email}         ${BASE PASSWORD}
-Invalid Password 1     mark        hamill      ${valid email}            ${7char password}
-Invalid Password 2     mark        hamill      ${valid email}            ${no upper password}
-Invalid Password 3     mark        hamill      ${valid email}            ${common password}
-Invalid Password 4     mark        hamill      ${valid email}            ${weak password}
-Invalid Password 5     mark        hamill      ${valid email}            ${CYRILLIC TEXT}
-Invalid Password 6     mark        hamill      ${valid email}            ${SMILEY TEXT}
-Invalid Password 7     mark        hamill      ${valid email}            ${GLYPH TEXT}
-Invalid Password 8     mark        hamill      ${valid email}            ${TM TEXT}
-Invalid Password 9     mark        hamill      ${valid email}            ${SPACE}${BASE PASSWORD}
-Invalid Password 10    mark        hamill      ${valid email}            ${BASE PASSWORD}${SPACE}
-Empty Password         mark        hamill      ${valid email}            ${EMPTY}
-Invalid First Name     ${SPACE}    hamill      ${valid email}            ${BASE PASSWORD}
-Empty First Name       ${EMPTY}    hamill      ${valid email}            ${BASE PASSWORD}
-Invalid Last Name      mark        ${SPACE}    ${valid email}            ${BASE PASSWORD}
-Empty Last Name        mark        ${EMPTY}    ${valid email}            ${BASE PASSWORD}
-Invalid All            ${SPACE}    ${SPACE}    noptixqagmail.com         ${7char password}
-Empty All              ${EMPTY}    ${EMPTY}    ${EMPTY}                  ${EMPTY}
+Invalid Email 1         mark        hamill      noptixqagmail.com         ${BASE PASSWORD}
+Invalid Email 2         mark        hamill      @gmail.com                ${BASE PASSWORD}
+Invalid Email 3         mark        hamill      noptixqa@gmail..com       ${BASE PASSWORD}
+Invalid Email 4         mark        hamill      noptixqa@192.168.1.1.0    ${BASE PASSWORD}
+Invalid Email 5         mark        hamill      noptixqa.@gmail.com       ${BASE PASSWORD}
+Invalid Email 6         mark        hamill      noptixq..a@gmail.c        ${BASE PASSWORD}
+Invalid Email 7         mark        hamill      noptixqa@-gmail.com       ${BASE PASSWORD}
+Invalid Email 8         mark        hamill      ${SPACE}                  ${BASE PASSWORD}
+Empty Email             mark        hamill      ${EMPTY}                  ${BASE PASSWORD}
+Registered Email        mark        hamill      ${existing email}         ${BASE PASSWORD}
+Invalid Password 1      mark        hamill      ${valid email}            ${7char password}
+Invalid Password 2      mark        hamill      ${valid email}            ${no upper password}
+Invalid Password 3      mark        hamill      ${valid email}            ${common password}
+Invalid Password 4      mark        hamill      ${valid email}            ${weak password}
+Invalid Password 5      mark        hamill      ${valid email}            ${CYRILLIC TEXT}
+Invalid Password 6      mark        hamill      ${valid email}            ${SMILEY TEXT}
+Invalid Password 7      mark        hamill      ${valid email}            ${GLYPH TEXT}
+Invalid Password 8      mark        hamill      ${valid email}            ${TM TEXT}
+Invalid Password 9      mark        hamill      ${valid email}            ${SPACE}${BASE PASSWORD}
+Invalid Password 10     mark        hamill      ${valid email}            ${BASE PASSWORD}${SPACE}
+Empty Password          mark        hamill      ${valid email}            ${EMPTY}
+Invalid First Name      ${SPACE}    hamill      ${valid email}            ${BASE PASSWORD}
+Empty First Name        ${EMPTY}    hamill      ${valid email}            ${BASE PASSWORD}
+Invalid Last Name       mark        ${SPACE}    ${valid email}            ${BASE PASSWORD}
+Empty Last Name         mark        ${EMPTY}    ${valid email}            ${BASE PASSWORD}
+Invalid All             ${SPACE}    ${SPACE}    noptixqagmail.com         ${7char password}
+Empty All               ${EMPTY}    ${EMPTY}    ${EMPTY}                  ${EMPTY}
 
 *** Keywords ***
+Test Reset
+    Close Browser
+    Open Browser and go to URL    ${url}/register
+
 Test Register Invalid
     [Arguments]    ${first}    ${last}    ${email}    ${pass}
-    Open Browser and go to URL    ${url}/register
     Form Validation    Register    ${first}    ${last}    ${email}    ${pass}
     Run Keyword Unless    "${pass}"=="${BASE PASSWORD}"    Check Password Outline    ${pass}
     Run Keyword Unless    "${email}"=="${valid email}"    Check Email Outline    ${email}

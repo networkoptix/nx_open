@@ -160,9 +160,6 @@ Form Validation
 
 Log In Form Validation
     [Arguments]    ${email}    ${password}
-    Wait Until Elements Are Visible    ${LOG IN NAV BAR}
-    Click Link    ${LOG IN NAV BAR}
-    Wait Until Elements Are Visible    ${EMAIL INPUT}    ${PASSWORD INPUT}    ${LOG IN BUTTON}
     Input Text    ${EMAIL INPUT}    ${email}
     Input Text    ${PASSWORD INPUT}    ${password}
     click button    ${LOG IN BUTTON}
