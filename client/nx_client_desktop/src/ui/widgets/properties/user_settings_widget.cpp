@@ -30,6 +30,8 @@
 #include <utils/common/app_info.h>
 #include <utils/email/email.h>
 
+#include <nx/network/app_info.h>
+
 using namespace nx::client::desktop::ui;
 
 namespace {
