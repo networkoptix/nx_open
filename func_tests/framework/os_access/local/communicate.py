@@ -24,7 +24,13 @@ class _LoggedOutputBuffer(object):
             except UnicodeDecodeError:
                 self._considered_binary = True
             else:
-                self._logger.debug(u'\n%s', decoded)
+                # Potentially expensive.
+                if len(decoded) < 500 and decoded.count('\n') < 5:
+                    self._logger.debug(u'\n%s', decoded)
+                else:
+                    self._logger.debug('%d characters.', len(decoded))
+        if self._considered_binary:  # Property may be changed, and, therefore, both if's may be entered.
+            self._logger.debug('%d bytes.', len(chunk))
 
 
 def communicate(process, input, timeout_sec):
