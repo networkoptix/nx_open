@@ -98,7 +98,8 @@ CameraManager* Plugin::obtainCameraManager(
     Error* outError)
 {
     *outError = Error::noError;
-    const auto vendor = QString(cameraInfo.vendor).toLower();
+    auto vendor = QString(cameraInfo.vendor).toLower().simplified();
+    vendor.replace(" ", "");
     if (vendor.startsWith(kDwMttVendor))
         return new Manager(this, cameraInfo, m_typedManifest);
     else
