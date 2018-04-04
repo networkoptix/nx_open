@@ -31,6 +31,8 @@ static bool resourceParamPresent(
 class CloudUserOfflineLogin:
     public MediaServerCloudIntegrationTest
 {
+    using base_type = MediaServerCloudIntegrationTest;
+
 protected:
     void givenUserInvitedFromDesktopClient()
     {
@@ -154,6 +156,8 @@ private:
 
     virtual void SetUp() override
     {
+        base_type::SetUp();
+
         connectSystemToCloud();
         waitUserCloudAuthInfoToBeSynchronized();
     }
