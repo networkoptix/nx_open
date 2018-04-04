@@ -42,7 +42,8 @@
                     </div>
                     <div>
                         <h3>แยกออกจากระบบเซิร์ฟเวอร์</h3>
-                        <p>การดำเนินการนี้จะแยกเซิร์ฟเวอร์จากระบบที่เก็บรักษาฐานข้อมูลผู้ใช้ภายในและการกำหนดค่า ที่เก็บวิดีโอจะยังคงเดิม <b> ผู้ใช้ระบบคลาวด์จะถูกลบ </b></p>
+                        <p>การดำเนินการนี้จะแยกเซิร์ฟเวอร์จากระบบที่เก็บรักษาฐานข้อมูลผู้ใช้ภายในและการกำหนดค่า
+                            ที่เก็บวิดีโอจะยังคงเดิม <b> ผู้ใช้ระบบคลาวด์จะถูกลบ </b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">แยกออกจากระบบ</button></p>
                     </div>
                     <div>
@@ -114,7 +115,9 @@
 
                 <tab heading="{{L.settings.tabs.device}}" active="active.device" ng-if="controlDevice">
                     <div ng-if="settings.flags.canSetupNetwork">
-                        <h3> การตั้งค่าเครือข่ายอุปกรณ์ </h3> <network-settings settings="networkSettings[0]" ng-if="networkSettings"> </network-settings> <button class="btn btn-default" ng-click="saveNetworkSettings()"> บันทึกการตั้งค่าและรีบูตเครื่อง </button>
+                        <h3>การตั้งค่าเครือข่ายอุปกรณ์</h3>
+                        <network-settings settings="networkSettings[0]" ng-if="networkSettings"></network-settings>
+                        <button class="btn btn-default" ng-click="saveNetworkSettings()">บันทึกการตั้งค่าและรีบูตเครื่อง</button>
                     </div>
                     <div ng-if="settings.flags.canSetupTime">
                         <h3>วันและเวลา</h3>

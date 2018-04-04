@@ -39,6 +39,7 @@
     "VIEWER TEXT": "អ្នកមើល",
     "LIVE VIEWER TEXT": "អ្នកមើលផ្ទាល់",
     "CUSTOM TEXT": "ផ្ទាល់ខ្លួន",
+    "YOUR SYSTEM TEXT": "Your System",
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "ធ្វើឱ្យគណនីរបស់អ្នកសកម្ម",
     "RESET PASSWORD EMAIL SUBJECT": "កំណត់ពាក្យសម្ងាត់របស់អ្នកឡើងវិញ",
     "INVITED TO SYSTEM EMAIL SUBJECT": "{{message.sharer_name}} អញ្ជើញអ្នកទៅ {{PRODUCT_NAME}}",
@@ -51,5 +52,9 @@
     "PASSWORD IS REQUIRED TEXT": "ពាក្យ​សម្ងាត់​គឺ​ត្រូវ​បាន​ទាមទារ",
     "PASSWORD SPECIAL CHARS TEXT": "ប្រើអក្សរឡាតាំងលេខនិងនិមិត្តសញ្ញាក្តារចុចតែប៉ុណ្ណោះជៀសវាងចន្លោះដែលនៅខាងមុខនិងខាងក្រោយ",
     "PASSWORD TOO SHORT TEXT": "ពាក្យសម្ងាត់ត្រូវមានយ៉ាងហោចណាស់ 8 តួអក្សរ",
-    "PASSWORD TOO COMMON TEXT": "ពាក្យសម្ងាត់នេះស្ថិតនៅក្នុងលេខសំងាត់ដែលមានប្រជាប្រិយភាពបំផុតនៅលើពិភពលោក"
+    "PASSWORD TOO COMMON TEXT": "ពាក្យសម្ងាត់នេះស្ថិតនៅក្នុងលេខសំងាត់ដែលមានប្រជាប្រិយភាពបំផុតនៅលើពិភពលោក",
+    "PASSWORD IS WEAK TEXT": "Use numbers, upper and lower case letters and special characters to make your password stronger",
+    "THIS LINK IS BROKEN TEXT": "This link is broken,<br>\n            System may be disconnected from {{PRODUCT_NAME}},<br>\n            Access to this System may be revoked, <br>\n            or you may be logged into a different account",
+    "PAGE NOT FOUND": "Page not found",
+    "TAKE ME HOME": "Take me home"
 }

@@ -5,7 +5,7 @@ Xin chào, {{message.fullName}}
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-Bạn đã được cấp quyền truy cập vào hệ thống quản lý hình ảnh "{{message.system_name}}".
+Bạn đã được cấp quyền truy cập vào hệ thống quản lý video "{{message.system_name}}".
 {{/message.sharer_name}}
 
 Xem ở {{PRODUCT_NAME}} Cổng thông tin: {{config.portal_url}} / systems / {{message.system_id}}

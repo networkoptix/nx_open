@@ -39,6 +39,7 @@
     "VIEWER TEXT": "Viewer",
     "LIVE VIEWER TEXT": "Live Viewer",
     "CUSTOM TEXT": "Tilpasset",
+    "YOUR SYSTEM TEXT": "Your System",
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "Aktiver kontoen din",
     "RESET PASSWORD EMAIL SUBJECT": "Tilbakestill passordet ditt",
     "INVITED TO SYSTEM EMAIL SUBJECT": "{{message.sharer_name}} inviterer deg til {{PRODUCT_NAME}}",
@@ -51,5 +52,9 @@
     "PASSWORD IS REQUIRED TEXT": "Passord er påkrevd",
     "PASSWORD SPECIAL CHARS TEXT": "Bruk bare latinske bokstaver, tall og tastatur symboler, unngå ledende og etterfølgende mellomrom",
     "PASSWORD TOO SHORT TEXT": "Passordet må inneholde minst 8 tegn",
-    "PASSWORD TOO COMMON TEXT": "Dette passordet er i de mest populære passordene i verden"
+    "PASSWORD TOO COMMON TEXT": "Dette passordet er i de mest populære passordene i verden",
+    "PASSWORD IS WEAK TEXT": "Use numbers, upper and lower case letters and special characters to make your password stronger",
+    "THIS LINK IS BROKEN TEXT": "This link is broken,<br>\n            System may be disconnected from {{PRODUCT_NAME}},<br>\n            Access to this System may be revoked, <br>\n            or you may be logged into a different account",
+    "PAGE NOT FOUND": "Page not found",
+    "TAKE ME HOME": "Take me home"
 }

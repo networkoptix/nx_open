@@ -1,5 +1,5 @@
 {
-  "language_name": "LANGUAGE_NAME",
+  "language_name": "简体中文",
   "productName": "{{PRODUCT_NAME}}",
   "clientProtocol": "{{CLIENT_PROTOCOL}}",
   "dialogs": {
@@ -117,7 +117,7 @@
     "cloudInvalidResponse": "云 DB 返回了意外的响应",
     "notAuthorized": "错误的密码。",
     "wrongParameters": "窗体上的一些参数不正确",
-    "brokenAccount": "Unexpected problem with account. <a href=\"/restore_password\">Restore account</a>",
+    "brokenAccount": "帐户出现意外问题。 <a href=\"/restore_password\">恢复帐户</a>",
     "wrongCode": "已经激活帐户或确认码不正确",
     "wrongCodeRestore": "确认代码已使用或不正确",
     "forbidden": "您没有权限执行此操作",

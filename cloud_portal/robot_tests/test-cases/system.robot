@@ -1,7 +1,7 @@
 *** Settings ***
 Resource          ../resource.robot
 Resource          ../variables.robot
-Suite Teardown    Close All Browsers
+Test Teardown     Close Browser
 Force Tags        system
 
 *** Variables ***
@@ -18,6 +18,14 @@ Log in to Auto Tests System
     Run Keyword If    '${email}' == '${EMAIL ADMIN}'    Wait Until Elements Are Visible    ${DISCONNECT FROM MY ACCOUNT}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
     Run Keyword Unless    '${email}' == '${EMAIL OWNER}' or '${email}' == '${EMAIL ADMIN}'    Wait Until Elements Are Visible    ${DISCONNECT FROM MY ACCOUNT}    ${OPEN IN NX BUTTON}
 
+Check System Text
+    [arguments]    ${user}
+    Log Out
+    Validate Log Out
+    Log in to Auto Tests System    ${user}
+    Wait Until Elements Are Visible    //h2[.='${OWNER TEXT}']    //a[.='${EMAIL OWNER}')]
+    Wait Until Element Is Not Visible    //h2[.='${YOUR SYSTEM TEXT}']
+
 *** Test Cases ***
 systems dropdown should allow you to go back to the systems page
     Open Browser and go to URL    ${url}
@@ -27,27 +35,24 @@ systems dropdown should allow you to go back to the systems page
     Wait Until Element Is Visible    ${ALL SYSTEMS}
     Click Link    ${ALL SYSTEMS}
     Location Should Be    ${url}/systems
-    Close Browser
 
 should confirm, if owner deletes system (You are going to disconnect your system from cloud)
     Open Browser and go to URL    ${url}
     Log in to Auto Tests System    ${EMAIL OWNER}
     Click Button    ${DISCONNECT FROM NX}
     Wait Until Elements Are Visible    ${DISCONNECT FORM}    ${DISCONNECT FORM HEADER}
-    Close Browser
 
 should confirm, if not owner deletes system (You will loose access to this system)
     Open Browser and go to URL    ${url}
-    Log In    ${EMAIL NOT OWNER}    ${password}
+    Log In To Auto Tests System    ${EMAIL NOT OWNER}
     Validate Log In
     Wait Until Element Is Visible    ${DISCONNECT FROM MY ACCOUNT}
     Click Button    ${DISCONNECT FROM MY ACCOUNT}
     Wait Until Element Is Visible    ${DISCONNECT MODAL WARNING}
-    Close Browser
 
 Cancel should cancel disconnection and disconnect should remove it when not owner
     Open Browser and go to URL    ${url}
-    Log In    ${EMAIL NOT OWNER}    ${password}
+    Log In To Auto Tests System    ${EMAIL NOT OWNER}
     Validate Log In
     Wait Until Element Is Visible    ${DISCONNECT FROM MY ACCOUNT}
     Click Button    ${DISCONNECT FROM MY ACCOUNT}
@@ -70,7 +75,6 @@ Cancel should cancel disconnection and disconnect should remove it when not owne
     Input Text    ${SHARE EMAIL}    ${EMAIL NOT OWNER}
     Click Button    ${SHARE BUTTON MODAL}
     Check For Alert    ${NEW PERMISSIONS SAVED}
-    Close Browser
 
 has Share button and user list visible for admin and owner
     Open Browser and go to URL    ${url}
@@ -79,7 +83,6 @@ has Share button and user list visible for admin and owner
     Log Out
     Log in to Auto Tests System    ${EMAIL ADMIN}
     Wait Until Element Is Visible    ${USERS LIST}
-    Close Browser
 
 does not show Share button, Rename button, or user list to viewer, advanced viewer, live viewer
 #This allows the expected error to not run the close browser action
@@ -107,7 +110,6 @@ does not show Share button, Rename button, or user list to viewer, advanced view
     Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${USERS LIST}
     Register Keyword To Run On Failure    Failure Tasks
     Element Should Not Be Visible    ${SHARE BUTTON SYSTEMS}
-    Close Browser
 
 does not display edit and remove for owner row
     Open Browser and go to URL    ${url}
@@ -116,20 +118,17 @@ does not display edit and remove for owner row
     Mouse Over    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL OWNER}')]
     Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL OWNER}')]/following-sibling::td/a[@ng-click='unshare(user)']/span['&nbsp&nbspDelete']
     Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL OWNER}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),'Edit')]/..
-    Close Browser
 
 always displays owner on the top of the table
     Open Browser and go to URL    ${url}
     Log in to Auto Tests System    ${EMAIL OWNER}
     Wait Until Element Is Visible    ${FIRST USER OWNER}
-    Close Browser
 
 contains user emails and names
     Open Browser and go to URL    ${url}
     Log in to Auto Tests System    ${EMAIL OWNER}
     Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL ADMIN}')]
     Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${ADMIN FIRST NAME} ${ADMIN LAST NAME}')]
-    Close Browser
 
 rename button opens dialog; cancel closes without rename; save renames system
     Open Browser and go to URL    ${url}
@@ -156,20 +155,17 @@ rename button opens dialog; cancel closes without rename; save renames system
     Click Button    ${RENAME SAVE}
     Check For Alert    ${SYSTEM NAME SAVED}
     Verify In System    Auto Tests
-    Close Browser
 
 should open System page by link to not authorized user and redirect to homepage, if he does not log in
     Open Browser and go to URL    ${url}/systems/${AUTO TESTS SYSTEM ID}
     Wait Until Element Is Visible    ${LOG IN CLOSE BUTTON}
     Click Button    ${LOG IN CLOSE BUTTON}
     Wait Until Element Is Visible    ${JUMBOTRON}
-    Close Browser
 
 should open System page by link to not authorized user and show it, after owner logs in
     Open Browser and go to URL    ${url}/systems/${AUTO TESTS SYSTEM ID}
     Log In    ${EMAIL OWNER}   ${password}    None
     Verify In System    Auto Tests
-    Close Browser
 
 should open System page by link to user without permission and show alert (System info is unavailable: You have no access to this system)
     Open Browser and go to URL    ${url}
@@ -177,18 +173,16 @@ should open System page by link to user without permission and show alert (Syste
     Validate Log In
     Go To    ${url}/systems/${AUTO TESTS SYSTEM ID}
     Wait Until Element Is Visible    ${SYSTEM NO ACCESS}
-    Close Browser
 
 should open System page by link not authorized user, and show alert if logs in and has no permission
     Open Browser and go to URL    ${url}/systems/${AUTO TESTS SYSTEM ID}
     Log In    ${EMAIL NOPERM}   ${password}    None
     Wait Until Element Is Visible    ${SYSTEM NO ACCESS}
-    Close Browser
 
 should display same user data as user provided during registration (stress to cyrillic)
     [tags]    email
 #create user
-    ${email}    Get Random Email
+    ${email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    ${CYRILLIC TEXT}    ${CYRILLIC TEXT}    ${email}    ${password}
     Activate    ${email}
@@ -214,12 +208,10 @@ should display same user data as user provided during registration (stress to cy
     Log Out
     Log in to Auto Tests System    ${EMAIL OWNER}
     Remove User Permissions    ${email}
-    Close Browser
 
 should display same user data as showed in user account (stress to cyrillic)
-    [tags]    not-ready
 #create user
-    ${email}    Get Random Email
+    ${email}    Get Random Email    ${BASE EMAIL}
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${email}    ${password}
     Activate    ${email}
@@ -256,4 +248,11 @@ should display same user data as showed in user account (stress to cyrillic)
     Log Out
     Log in to Auto Tests System    ${EMAIL OWNER}
     Remove User Permissions    ${email}
-    Close Browser
+
+should show "your system" for owner and "owner's name" for non-owners
+    Open Browser and go to URL    ${url}
+    Log in to Auto Tests System    ${EMAIL OWNER}
+    Wait Until Element Is Visible    //h2[.='${YOUR SYSTEM TEXT}']
+    Wait Until Element Is Not Visible    //h2[.='${OWNER TEXT}']
+    :FOR    ${user}    IN    @{EMAILS LIST}
+    \  Run Keyword Unless    "${user}"=="${EMAIL OWNER}"    Check System Text    ${user}

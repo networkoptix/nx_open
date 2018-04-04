@@ -127,7 +127,7 @@
     "alreadyExists": "이 계정이 이미 존재합니다.",
     "unknownError": "예기치 않은 오류가 발생했습니다.",
     "accountAlreadyActivated": "이 계정은 이미 활성화되었습니다.",
-    "emailNotFound": "Account does not exist.",
+    "emailNotFound": "계정이 존재하지 않습니다.",
     "EmailAlreadyExists": "이 전자 메일은 이미 등록되었습니다.",
     "oldPasswordMistmatch": "현재 패스워드가 잘못되었습니다.",
     "passwordMismatch": "패스워드가 틀립니다.",

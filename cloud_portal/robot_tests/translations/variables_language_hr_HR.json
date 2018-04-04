@@ -39,6 +39,7 @@
     "VIEWER TEXT": "Preglednik",
     "LIVE VIEWER TEXT": "Live Viewer",
     "CUSTOM TEXT": "Prilagođen",
+    "YOUR SYSTEM TEXT": "Your System",
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "Aktivirajte svoj račun",
     "RESET PASSWORD EMAIL SUBJECT": "Vraćanje izvorne lozinke",
     "INVITED TO SYSTEM EMAIL SUBJECT": "{{message.sharer_name}} vas poziva na {{PRODUCT_NAME}}",
@@ -51,5 +52,9 @@
     "PASSWORD IS REQUIRED TEXT": "potrebna je lozinka",
     "PASSWORD SPECIAL CHARS TEXT": "Koristite samo latino slova, brojeve i simbole tipkovnice, izbjegavajte vodeće i prateće prostore",
     "PASSWORD TOO SHORT TEXT": "Zaporka mora sadržavati najmanje 8 znakova",
-    "PASSWORD TOO COMMON TEXT": "Ova je lozinka na vrhu najpopularnijih lozinki na svijetu"
+    "PASSWORD TOO COMMON TEXT": "Ova je lozinka na vrhu najpopularnijih lozinki na svijetu",
+    "PASSWORD IS WEAK TEXT": "Use numbers, upper and lower case letters and special characters to make your password stronger",
+    "THIS LINK IS BROKEN TEXT": "This link is broken,<br>\n            System may be disconnected from {{PRODUCT_NAME}},<br>\n            Access to this System may be revoked, <br>\n            or you may be logged into a different account",
+    "PAGE NOT FOUND": "Page not found",
+    "TAKE ME HOME": "Take me home"
 }

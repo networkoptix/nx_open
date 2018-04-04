@@ -268,6 +268,12 @@ angular.module('nxCommon')
 
                                     //If the player stalls give it a chance to recover
                                     scope.vgApi.addEventListener('stalled', resetTimeout);
+                                    scope.vgApi.addEventListener('error', function(e){
+                                        if(e.target.error.code != 4){
+                                            console.log(e.target.error);
+                                            playerErrorHandler(e.target.error);
+                                        }
+                                    });
                                 }
 
                                 scope.vgPlayerReady({$API: scope.vgApi});

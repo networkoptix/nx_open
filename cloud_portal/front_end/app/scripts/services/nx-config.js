@@ -196,7 +196,7 @@
                     useServerTime: true,
                     disableVolume: true,
                     reloadInterval: 5 * 1000,
-                    leftPanelPreviewHeight: 38,
+                    leftPanelPreviewHeight: 128,
                     resetDisplayedTextTimer: 3 * 1000,
                     hlsLoadingTimeout: 90 * 1000,
                     // One minute timeout for manifest:
