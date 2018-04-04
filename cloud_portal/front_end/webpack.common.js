@@ -6,7 +6,7 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 
-const webCommonPath = path.join(__dirname, '../../webadmin/app/web_common');
+const webCommonPath = path.join(__dirname, './app/web_common');
 
 const babelLoader = {
     loader: 'babel-loader',
@@ -53,11 +53,6 @@ module.exports = {
                 from: '',
                 to: '',
                 ignore: ['bower_components/**', 'styles/**', '.*', '*.js', 'index-template.html', 'index.html']
-            },
-            {
-                from: webCommonPath,
-                to: 'web_common',
-                ignore: ['scripts/**', 'styles/**', 'chromeless/**', '*.js']
             }
         ]),
 

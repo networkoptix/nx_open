@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+
+<head>
+<style>
+header {
+  text-align: center;
+}
+#controls
+{
+    width: 70%;
+    min-width: 615px;
+    padding: 3px;
+    margin: 0px auto 20px auto;
+    border: 1px solid #606060;
+    overflow: hidden;
+}
+.innerControls
+{
+    display:block;
+    float: left;
+    width: 99%;
+    margin: 3px;
+    padding-left: 3px;
+    font-size: 8pt
+}
+.innerControlsLeft
+{
+    display:block;
+    float: left;
+    width: 90%;
+    margin: 3px;
+    padding-left: 3px;
+    font-size: 8pt
+}
+.innerControlsRight
+{
+    display:block;
+    float: left;
+    width: 8%;
+    margin: 3px;
+    padding-left: 3px;
+    font-size: 8pt
+}
+.center
+{
+    width: 70%;
+    min-width: 615px;
+    overflow: hidden;
+    margin-left: auto;
+    margin-right: auto;
+    display: block
+}
+
+#customButtons input { width: 25%; display : inline-block; text-align: center; font-size: 8pt;}
+#toggleButtons button { width: 12%; display : inline-block; text-align: center; font-size: 8pt; background-color: #A0A0A0 }
+
+</style>
+  <title>flashls - Chromeless HLS Flash Player</title>
+<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+<meta content="utf-8" http-equiv="encoding">
+<meta name="author" content="mangui">
+<meta name="description" content="flashls is an HLS flash plugin/player">
+<meta name="keywords" content="hls, m3u8, http live streaming, apple hls, plugin, h264, H.264, x264, aac, mp3, flash, flashplayer, flash player, video, audio, mbr, multibitrate, multi bitrate, vod, video on demand, live, live stream, dvr, dvr stream, digital video recorder">
+
+<script type="text/javascript" src="flashlsAPI.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+</head>
+<body>
+  <div class="header-container">
+    <header class="wrapper clearfix">
+      <h1 class="title"><a href="https://github.com/mangui/flashls">flashls</a> - chromeless player</h1>
+    </header>
+  </div>
+
+  <div class="main-container">
+    <header>
+      <p>
+        test with your HLS streams below in any browser with Flash plugin enabled !
+        <br>Advanced controls are also available at the bottom of this page.
+      </p>
+    </header>
+    <div id="controls">
+        <div id="customButtons"></div>
+      <select id="streamSelect" class="innerControls"><option value="" selected>(Enter custom URL below)</option></select>
+      <input id="streamURL" class="innerControlsLeft" type=text value=""/>
+      <button type="button" class="innerControlsRight" onclick="loadStream($('#streamURL').val());">load</button>
+      <br>
+      <div id="StreamPermalink" class="innerControls"></div>
+      <span id="currentResolution" style="float:left;font-size: 8pt;">-</span>
+    </div>
+
+    <div class="center" id="video">
+        <object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"
+         codebase="" id="moviename" width="720" height="480">
+        <param name="movie"  value="/components/flashlsChromeless.swf?inline=1" />
+        <param name="quality" value="autohigh" />
+        <param name="swliveconnect" value="true" />
+        <param name="allowScriptAccess" value="sameDomain" />
+        <param name="bgcolor" value="#0" />
+        <param name="allowFullScreen" value="true" />
+        <param name="wmode" value="window" />
+        <param name="FlashVars" value="callback=flashlsCallback" />
+
+        <embed src="/components/flashlsChromeless.swf?inline=1" width="720" height="480" name="moviename"
+                    quality="autohigh"
+                    bgcolor="#0"
+                    align="middle" allowFullScreen="true"
+                    allowScriptAccess="sameDomain"
+                    type="application/x-shockwave-flash"
+                    swliveconnect="true"
+                    wmode="window"
+                    FlashVars="callback=flashlsCallback"
+                    pluginspage="http://www.macromedia.com/go/getflashplayer" >
+        </embed>
+        </object>
+        <br><br>
+        <canvas id="buffered_c" width="640" height="15" onclick="buffered_seek(event)";></canvas> <br>
+        <br>
+    </div>
+    <div class="center" id="toggleButtons">
+      <button type="button" class="btn btn-sm" onclick="$('#PlaybackInfo').toggle();">playback info</button>
+      <button type="button" class="btn btn-sm" onclick="$('#PlaybackControl').toggle();">playback controls</button>
+      <button type="button" class="btn btn-sm" onclick="$('#QualityLevelControl').toggle();">Quality Level controls</button>
+      <button type="button" class="btn btn-sm" onclick="$('#AdvancedControl').toggle();">advanced controls</button>
+      <button type="button" class="btn btn-sm" onclick="$('#MetricsDisplay').toggle();toggleMetricsDisplay();">Metrics Display</button>
+      <button type="button" class="btn btn-sm" onclick="$('#StatsDisplay').toggle();">Stats Display</button>
+      <button type="button" class="btn btn-sm" onclick="$('#VideoStatus').toggle();">Log Message</button>
+    </div>
+
+    <div id='PlaybackControl'>
+    <h4> Playback Control </h4>
+      <button type="button" class="btn btn-sm btn-info" onclick="api.play(-1)">play</button>
+      <button type="button" class="btn btn-sm btn-info" onclick="api.pause()">pause</button>
+      <button type="button" class="btn btn-sm btn-info" onclick="api.resume()">resume</button>
+      <button type="button" class="btn btn-sm btn-info" onclick="api.seek(api.getPosition()+10)">currentTime+=10</button>
+      <button type="button" class="btn btn-sm btn-info" onclick="api.seek(api.getPosition()-10)">currentTime-=10</button>
+      <button type="button" class="btn btn-sm btn-info" onclick="api.seek($('#seek_pos').val())">seek to </button>
+       <input type="text" id='seek_pos' size="8" onkeydown="if(window.event.keyCode=='13'){api.seek($('#seek_pos').val());}">
+      <button type="button" class="btn btn-sm btn-info" onclick="api.volume($('#vol_val').val())">set volume </button>
+       <input type="text" id='vol_val' size="8" onkeydown="if(window.event.keyCode=='13'){api.volume($('#vol_val').val());}">
+       <table>
+            <tr>
+              <td>selectable audio tracks</td>
+            </tr>
+            <tr>
+              <td> <div id="audioControl" style="display: inline;"></div> </td>
+            </tr>
+        </table>
+    </div>
+
+    <div id='QualityLevelControl'>
+    <h4> Quality Control </h4>
+      <table>
+        <tr>
+          <td>current level</td>
+          <td width=10px></td>
+          <td> <div id="currentLevelControl" style="display: inline;"></div> </td>
+        </tr>
+        <tr>
+          <td> <p>next level</p></td>
+          <td> </td>
+          <td> <div id="nextLevelControl" style="display: inline;"></div> </td>
+        </tr>
+        <tr>
+          <td> <p>load level</p></td>
+          <td> </td>
+          <td> <div id="loadLevelControl" style="display: inline;"></div> </td>
+        </tr>
+        <tr>
+          <td> <p>cap level</p></td>
+          <td> </td>
+          <td> <div id="levelCappingControl" style="display: inline;"></div> </td>
+        </tr>
+      </table>
+    </div>
+
+
+    <div id='PlaybackInfo'>
+    <h4> Playback Info </h4>
+      <table border>
+        <tr>
+          <td>state</td>
+          <td> <div id="currentState" style="display: inline;"></div> </td>
+        </tr>
+        <tr>
+          <td>position</td>
+          <td> <div id="currentPosition" style="display: inline;"></div> </td>
+        </tr>
+        <tr>
+          <td>duration</td>
+          <td> <div id="currentDuration" style="display: inline;"></div> </td>
+        </tr>
+        <tr>
+          <td>buffer length</td>
+          <td> <div id="bufferLength" style="display: inline;"></div> </td>
+        </tr>
+        <tr>
+          <td>back buffer length</td>
+          <td> <div id="backBufferLength" style="display: inline;"></div> </td>
+        </tr>
+        <tr>
+          <td>sliding</td>
+          <td> <div id="sliding" style="display: inline;"></div> </td>
+        </tr>
+        <tr>
+          <td>watched</td>
+          <td> <div id="watched" style="display: inline;"></div> </td>
+        </tr>
+      </table>
+    </div>
+
+
+    <div id='AdvancedControl'>
+    <h4> Advanced Control </h4>
+      <table border>
+        <tr>
+          <td><button type="button" class="btn btn-sm btn-info" onclick="toggleDebugLogs()">toggle debug logs</button></td>
+          <td> <div id="debugLogState" style="display: inline;"></div> </td>
+        </tr>
+        <tr>
+          <td><button type="button" class="btn btn-sm btn-info" onclick="toggleDebug2Logs()">toggle debug2 logs</button></td>
+          <td> <div id="debug2LogState" style="display: inline;"></div> </td>
+        </tr>
+        <tr>
+          <td><button type="button" class="btn btn-sm btn-info" onclick="toggleFlushLiveURLCache()">toggle flush Live URL Cache</button></td>
+          <td> <div id="flushLiveURLState" style="display: inline;"></div> </td>
+        </tr>
+        <tr>
+          <td><button type="button" class="btn btn-sm btn-info" onclick="toggleJSURLStream()">toggle JS URL Loader</button></td>
+          <td> <div id="JSURLStreamState" style="display: inline;"></div> </td>
+        </tr>
+        <tr>
+          <td><button type="button" class="btn btn-sm btn-info" onclick="toggleCapLeveltoStage()">toggle cap Level to Stage</button></td>
+          <td> <div id="capLeveltoStageState" style="display: inline;"></div> </td>
+        </tr>
+        <tr>
+          <td><button type="button" class="btn btn-sm btn-info" onclick="toggleUseHardwareVideoDecoder()">toggle HW decoder</button></td>
+          <td> <div id="hwVideoDecoderState" style="display: inline;"></div> </td>
+        </tr>
+      </table>
+    </div>
+
+    <div id='MetricsDisplay'>
+        <h4 class="title">real time metrics</h4>
+        <div id="metricsButton">
+            <button type="button" class="btn btn-xs btn-info" onclick="refreshCanvas()">toggle sliding/fixed window</button><br>
+            <div id="metricsButtonWindow">
+                <button type="button" class="btn btn-xs btn-info" onclick="timeRangeSetSliding(0)">window ALL</button>
+                <button type="button" class="btn btn-xs btn-info" onclick="timeRangeSetSliding(2000)">2s</button>
+                <button type="button" class="btn btn-xs btn-info" onclick="timeRangeSetSliding(5000)">5s</button>
+                <button type="button" class="btn btn-xs btn-info" onclick="timeRangeSetSliding(10000)">10s</button>
+                <button type="button" class="btn btn-xs btn-info" onclick="timeRangeSetSliding(20000)">20s</button>
+                <button type="button" class="btn btn-xs btn-info" onclick="timeRangeSetSliding(30000)">30s</button>
+                <button type="button" class="btn btn-xs btn-info" onclick="timeRangeSetSliding(60000)">60s</button>
+                <button type="button" class="btn btn-xs btn-info" onclick="timeRangeSetSliding(120000)">120s</button><br>
+                <button type="button" class="btn btn-xs btn-info" onclick="timeRangeZoomIn()">Window Zoom In</button>
+                <button type="button" class="btn btn-xs btn-info" onclick="timeRangeZoomOut()">Window Zoom Out</button><br>
+                <button type="button" class="btn btn-xs btn-info" onclick="timeRangeSlideLeft()"> <<< Window Slide </button>
+                <button type="button" class="btn btn-xs btn-info" onclick="timeRangeSlideRight()">Window Slide >>> </button><br>
+            </div>
+            <div id="metricsButtonFixed">
+                <button type="button" class="btn btn-xs btn-info" onclick="windowStart=$('#windowStart').val()">fixed window start(ms)</button>
+                    <input type="text" id='windowStart' defaultValue="0" size="8" onkeydown="if(window.event.keyCode=='13'){windowStart=$('#windowStart').val();}">
+                <button type="button" class="btn btn-xs btn-info" onclick="windowEnd=$('#windowEnd').val()">fixed window end(ms)</button>
+                    <input type="text" id='windowEnd' defaultValue="10000" size="8" onkeydown="if(window.event.keyCode=='13'){windowEnd=$('#windowEnd').val();}"><br>
+            </div>
+            <button type="button" class="btn btn-xs btn-success" onclick="goToMetrics()" style="font-size:18px">metrics link</button>
+            <button type="button" class="btn btn-xs btn-success" onclick="goToMetricsPermaLink()" style="font-size:18px">metrics permalink</button>
+            <button type="button" class="btn btn-xs btn-success" onclick="copyMetricsToClipBoard()" style="font-size:18px">copy metrics to clipboard</button>
+            <canvas id="bufferTimerange_c" width="640" height="100" style="border:1px solid #000000" onmousedown="timeRangeCanvasonMouseDown(event)" onmousemove="timeRangeCanvasonMouseMove(event)" onmouseup="timeRangeCanvasonMouseUp(event)" onmouseout="timeRangeCanvasonMouseOut(event)";></canvas>
+            <canvas id="bufferWindow_c" width="640" height="100" style="border:1px solid #000000" onmousemove="windowCanvasonMouseMove(event)";></canvas>
+            <canvas id="videoEvent_c" width="640" height="15" style="border:1px solid #000000";></canvas>
+            <canvas id="loadEvent_c" width="640" height="15" style="border:1px solid #000000";></canvas><br>
+        </div>
+    </div>
+    <div id='StatsDisplay'>
+    <h4> Stats Display </h4>
+      <pre id='HlsStats'></pre>
+    </div>
+    <div id="VideoStatus">
+        <h4> Video status messages </h4>
+    </div>
+  </div>
+  <br><br>
+
+<script type="text/javascript">
+$(document).ready(function() {
+   $('#streamSelect').change(function()      { $('#streamURL').val($('#streamSelect').val());loadStream($('#streamURL').val());});
+   $('#streamURL').change(function()           { loadStream($('#streamURL').val());});
+   $("#PlaybackControl").hide();
+   $("#PlaybackInfo").hide();
+   $("#QualityLevelControl").hide();
+   $("#AdvancedControl").hide();
+   $("#MetricsDisplay").hide();
+   $("#StatsDisplay").hide();
+   $("#VideoStatus").hide();
+    var manifest = decodeURIComponent(location.search.split('src=')[1]);
+    if(manifest === 'undefined') {
+      manifest = 'http://www.streambox.fr/playlists/x36xhzz/x36xhzz.m3u8';
+    }
+    $('#streamURL').val(manifest);
+});
+
+
+var events;
+var jsPingDate,flashPingDate, jsLoadDate, flashLoadDate;
+var lastSeekingIdx,lastFragPlayingIdx;
+var api;
+var levels;
+
+
+function loadStream(url) {
+  api.stop();
+  load(url);
+  $('#streamURL').val(url);
+  var hlsLink = document.URL.split('?')[0] +  '?src=' + encodeURIComponent(url);
+  var description = 'permalink: ' + "<a href=\"" + hlsLink + "\">" + hlsLink + "</a>";
+  $("#StreamPermalink").html(description);
+}
+
+function appendLog(txt)
+{
+  var d = new Date();
+  var msg = '[' + d.toString() + '] ' + txt;
+  console.log(msg);
+  $('#VideoStatus').append(msg + "<br>");
+}
+
+function load(url) {
+  jsLoadDate = new Date();
+  flashLoadDate = (jsLoadDate - jsPingDate )+ flashPingDate;
+  lastSeekingIdx = lastFragPlayingIdx = undefined;
+  levels = null;
+  events = { url : url, date : jsLoadDate, load : [], buffer : [], video : []};
+  api.load(url);
+  appendLog("load URL " + url);
+  $('#currentPosition').html(0);
+  $('#currentDuration').html(0);
+  $('#bufferLength').html(0);
+  $('#backBufferLength').html(0);
+  $('#sliding').html(0);
+  $('#watched').html(0);
+}
+
+function toggleDebugLogs() {
+  var state = api.getLogDebug();
+  state = !state;
+  api.playerSetLogDebug(state);
+  $('#debugLogState').html(state.toString());
+}
+
+function toggleDebug2Logs() {
+  var state = api.getLogDebug2();
+  state = !state;
+  $('#debug2LogState').html(state.toString());
+  api.playerSetLogDebug2(state);
+}
+
+function toggleUseHardwareVideoDecoder() {
+  var state = api.getUseHardwareVideoDecoder();
+  state = !state;
+  $('#hwVideoDecoderState').html(state.toString());
+  api.playerSetUseHardwareVideoDecoder(state);
+}
+
+function toggleFlushLiveURLCache() {
+  var state = api.getflushLiveURLCache();
+  state = !state;
+  $('#flushLiveURLState').html(state.toString());
+  api.playerSetflushLiveURLCache(state);
+}
+
+function toggleJSURLStream() {
+  var state = api.getJSURLStream();
+  state = !state;
+  $('#JSURLStreamState').html(state.toString());
+  api.playerSetJSURLStream(state);
+}
+
+function toggleCapLeveltoStage() {
+  var state = api.getCapLeveltoStage();
+  state = !state;
+  $('#capLeveltoStageState').html(state.toString());
+  api.playerCapLeveltoStage(state);
+}
+
+// Create a single global callback function and pass it's name
+// to the SWF with the name `callback` in the FlashVars parameter.
+window.flashlsCallback = function(eventName, args) {
+
+    console.log("flashlsAPI event:", eventName, args);
+  flashlsEvents[eventName].apply(null, args);
+};
+
+function getFlashMovieObject (movieName){
+
+    if (window.document[movieName])
+    {
+        return window.document[movieName];
+    }
+    if (navigator.appName.indexOf('Microsoft Internet')==-1)
+    {
+        if (document.embeds && document.embeds[movieName])
+            return document.embeds[movieName];
+    }
+    else // if (navigator.appName.indexOf('Microsoft Internet')!=-1)
+    {
+        return document.getElementById(movieName);
+    }
+};
+
+var flashlsEvents = {
+   ready: function(flashTime) {
+    flashPingDate = flashTime;
+    jsPingDate = new Date();
+    appendLog("onHLSReady()");
+    api = new flashlsAPI(getFlashMovieObject("moviename"));
+    /*
+        $('#debugLogState').html(api.getLogDebug().toString());
+        $('#debug2LogState').html(api.getLogDebug2().toString());
+        $('#flushLiveURLState').html(api.getflushLiveURLCache().toString());
+        $('#JSURLStreamState').html(api.getJSURLStream().toString());
+        $('#capLeveltoStageState').html(api.getCapLeveltoStage().toString());
+        $('#hwVideoDecoderState').html(api.getUseHardwareVideoDecoder().toString());
+    */
+  },
+  videoSize: function(width, height) {
+    var event = {time : new Date() - jsLoadDate, type : "resize", name : width + 'x' + height};
+    events.video.push(event);
+    $("#currentResolution").html("video resolution:" + width + 'x' + height);
+    var ratio = width / height;
+    if (width > $('#video').innerWidth()-30) {
+        width = $('#video').innerWidth()-30;
+        height = Math.round(width / ratio);
+    }
+   api.flashObject.width = width;
+   api.flashObject.height = height;
+   var canvas = $('#buffered_c')[0];
+   canvas.width = width;
+  },
+  complete: function() {
+    appendLog("onComplete(), playback completed");
+  },
+  error: function(code, url, message) {
+    appendLog("onError():error code:"+ code + " url:" + url + " message:" + message);
+  },
+  manifest: function(duration, levels_, loadmetrics) {
+    appendLog("manifest loaded, playlist duration:"+ duration.toFixed(2));
+    $('#currentDuration').html(duration.toFixed(2));
+    showCanvas();
+    levels = levels_;
+    updateLevelInfo();
+    api.play(-1);
+    api.volume(10);
+    var event = {
+                type : "manifest",
+                name : "",
+                latency : loadmetrics.loading_begin_time - loadmetrics.loading_request_time,
+                load : loadmetrics.loading_end_time - loadmetrics.loading_begin_time,
+                duration : loadmetrics.loading_end_time - loadmetrics.loading_begin_time,
+                bw : Math.round(loadmetrics.bandwidth/1000)
+              };
+    event.time = loadmetrics.loading_request_time - flashLoadDate;
+    events.load.push(event);
+    refreshCanvas();
+  },
+  audioLevelLoaded: function(loadmetrics) {
+    var event = {
+                type : "level audio",
+                id : loadmetrics.level,
+                start : loadmetrics.id,
+                end : loadmetrics.id2,
+                latency : loadmetrics.loading_begin_time - loadmetrics.loading_request_time,
+                load : loadmetrics.loading_end_time - loadmetrics.loading_begin_time,
+                duration : loadmetrics.loading_end_time - loadmetrics.loading_begin_time,
+                bw : Math.round(loadmetrics.bandwidth/1000)
+              };
+    event.time = loadmetrics.loading_request_time - flashLoadDate;
+    events.load.push(event);
+    refreshCanvas();
+  },
+  levelLoaded: function(loadmetrics) {
+    var event = {
+                type : "level",
+                id : loadmetrics.level,
+                start : loadmetrics.id,
+                end : loadmetrics.id2,
+                latency : loadmetrics.loading_begin_time - loadmetrics.loading_request_time,
+                load : loadmetrics.loading_end_time - loadmetrics.loading_begin_time,
+                duration : loadmetrics.loading_end_time - loadmetrics.loading_begin_time,
+                bw : Math.round(loadmetrics.bandwidth/1000)
+              };
+    event.time = loadmetrics.loading_request_time - flashLoadDate;
+    events.load.push(event);
+    refreshCanvas();
+  },
+  fragmentLoaded: function(loadmetrics) {
+    var event = {
+                id : loadmetrics.level,
+                id2 : loadmetrics.id,
+                latency : loadmetrics.loading_begin_time - loadmetrics.loading_request_time,
+                load : loadmetrics.loading_end_time - loadmetrics.loading_begin_time,
+                demux : loadmetrics.parsing_end_time - loadmetrics.loading_end_time,
+                duration : loadmetrics.parsing_end_time - loadmetrics.loading_begin_time,
+                bw : Math.round(loadmetrics.bandwidth/1000)
+              };
+    event.time = loadmetrics.loading_request_time - flashLoadDate;
+    if(loadmetrics.type == 4) {
+      event.type =  'fragment audio'
+    } else {
+      event.type =  'fragment main'
+    }
+    events.load.push(event);
+    updateLevelInfo();
+    document.getElementById("HlsStats").innerHTML = JSON.stringify(sortObject(api.getStats()),null,"\t");
+    refreshCanvas();
+  },
+  fragmentPlaying: function(playmetrics) {
+
+    var currentTime = new Date() - jsLoadDate;
+    if(lastFragPlayingIdx) {
+      // ensure that last frag duration is not exceeding
+      var lastEvent = events.video[lastFragPlayingIdx];
+      if(lastEvent.time+lastEvent.duration > currentTime)
+        lastEvent.duration = currentTime - lastEvent.time;
+    }
+    var event = {time : currentTime, type : "playing frag", name : playmetrics.seqnum + '@' + playmetrics.level, duration : playmetrics.duration*1000};
+    events.video.push(event);
+    lastFragPlayingIdx = events.video.length-1;
+    updateLevelInfo();
+    document.getElementById("HlsStats").innerHTML = JSON.stringify(sortObject(api.getStats()),null,"\t");
+    refreshCanvas();
+  },
+  position: function(timemetrics) {
+    $('#currentPosition').html(timemetrics.position.toFixed(2));
+    $('#currentDuration').html(timemetrics.duration.toFixed(2));
+    $('#bufferLength').html(timemetrics.buffer.toFixed(2));
+    $('#backBufferLength').html(timemetrics.backbuffer.toFixed(2));
+    $('#sliding').html(timemetrics.live_sliding_main.toFixed(2));
+    $('#watched').html(timemetrics.watched.toFixed(2));
+    var event = { time : new Date() - jsLoadDate, buffer : Math.round(1000*timemetrics.buffer), pos: Math.round(1000*timemetrics.position)};
+    var bufEvents = events.buffer, bufEventLen = bufEvents.length;
+    if(bufEventLen > 1) {
+      var event0 = bufEvents[bufEventLen-2],event1 = bufEvents[bufEventLen-1];
+      var slopeBuf0 = (event0.buffer - event1.buffer)/(event0.time-event1.time);
+      var slopeBuf1 = (event1.buffer - event.buffer)/(event1.time-event.time);
+
+      var slopePos0 = (event0.pos - event1.pos)/(event0.time-event1.time);
+      var slopePos1 = (event1.pos - event.pos)/(event1.time-event.time);
+      // compute slopes. if less than 30% difference, remove event1
+      if((slopeBuf0 === slopeBuf1 || Math.abs(slopeBuf0/slopeBuf1 -1) <= 0.3) &&
+         (slopePos0 === slopePos1 || Math.abs(slopePos0/slopePos1 -1) <= 0.3))
+       {
+        bufEvents.pop();
+      }
+    }
+    events.buffer.push(event);
+    updateBufferCanvas(timemetrics.position,timemetrics.duration,timemetrics.buffer, timemetrics.backbuffer);
+    refreshCanvas();
+  },
+  state: function(newState) {
+    var event = {time : new Date() - jsLoadDate, type : newState.toLowerCase(), name : ''};
+    events.video.push(event);
+    $('#currentState').html(newState);
+  },
+  seekState: function(newState) {
+    var currentTime = new Date() - jsLoadDate;
+    var event = {time : currentTime, type : newState.toLowerCase(), name : ''};
+    events.video.push(event);
+
+    if(event.type === 'seeking') {
+      lastSeekingIdx = events.video.length-1;
+      if(lastFragPlayingIdx) {
+        // ensure that last frag duration is not exceeding
+        var lastEvent = events.video[lastFragPlayingIdx];
+        if(lastEvent.time+lastEvent.duration > currentTime)
+          lastEvent.duration = currentTime - lastEvent.time;
+      }
+    }
+    if(event.type === 'seeked') {
+      events.video[lastSeekingIdx].duration = event.time - events.video[lastSeekingIdx].time;
+    }
+  },
+  switch: function(newLevel) {
+    var event = {time : new Date() - jsLoadDate, type : "levelSwitch", name : newLevel.toFixed()};
+    events.video.push(event);
+  },
+  audioTracksListChange: function(trackList) {
+    var d = document.getElementById('audioControl');
+    var html = '';
+    appendLog("new track list");
+    for (var t in trackList) {
+      appendLog("    " + trackList[t].title + " [" + trackList[t].id + "]");
+      html += '<button class="btn btn-sm btn-info" onclick="api.setAudioTrack(' +t+ ')">' + trackList[t].title + '</button>';
+    }
+    d.innerHTML = html;
+  },
+  audioTrackChange: function(trackId) {
+    var event = {time : new Date() - jsLoadDate, type : "audioTrackChange", name : trackId.toFixed()};
+    events.video.push(event);
+  },
+  id3Updated: function(ID3Data) {
+    var event = {time : new Date() - jsLoadDate, type : "ID3Data", id3data: atob(ID3Data)};
+    events.video.push(event);
+  },
+  fpsDrop : function(level) {
+    var event = {time : new Date() - jsLoadDate, type : "fpsDrop", name : level.toFixed()};
+    events.video.push(event);
+  },
+  fpsDropLevelCapping : function(level) {
+    var event = {time : new Date() - jsLoadDate, type : "fpsDropLevelCapping", name : level.toFixed()};
+    events.video.push(event);
+  },
+  fpsDropSmoothLevelSwitch : function() {
+    var event = {time : new Date() - jsLoadDate, type : "fpsDropSmoothLevelSwitch", name : ''};
+    events.video.push(event);
+  }
+};
+
+
+function sortObject(obj) {
+    if(typeof obj !== 'object')
+        return obj
+    var temp = {};
+    var keys = [];
+    for(var key in obj)
+        keys.push(key);
+    keys.sort();
+    for(var index in keys)
+        temp[keys[index]] = sortObject(obj[keys[index]]);
+    return temp;
+}
+
+function showCanvas()  {
+    showMetrics();
+    document.getElementById('buffered_c').style.display="block";
+}
+
+function hideCanvas()  {
+    hideMetrics();
+    document.getElementById('buffered_c').style.display="none";
+}
+
+  function getMetrics() {
+    var json = JSON.stringify(events);
+    var jsonpacked = jsonpack.pack(json);
+    console.log("packing JSON from " + json.length + " to " + jsonpacked.length + " bytes");
+    return btoa(jsonpacked);
+  }
+
+  function copyMetricsToClipBoard() {
+    copyTextToClipboard(getMetrics());
+  }
+
+function copyTextToClipboard(text) {
+  var textArea = document.createElement("textarea");
+  textArea.value = text;
+  document.body.appendChild(textArea);
+  textArea.select();
+
+  try {
+    var successful = document.execCommand('copy');
+    var msg = successful ? 'successful' : 'unsuccessful';
+    console.log('Copying text command was ' + msg);
+  } catch (err) {
+    console.log('Oops, unable to copy');
+  }
+  document.body.removeChild(textArea);
+}
+
+
+  function goToMetrics() {
+    var url = document.URL;
+    url = url.substr(0,url.lastIndexOf("/")+1) + 'metrics.html';
+    console.log(url);
+    window.open(url,'_blank');
+  }
+
+  function goToMetricsPermaLink() {
+    var url = document.URL;
+    var b64 = getMetrics();
+    url = url.substr(0,url.lastIndexOf("/")+1) + 'metrics.html?data=' + b64;
+    console.log(url);
+    window.open(url,'_blank');
+  }
+
+function buffered_seek(event) {
+  var canvas = document.getElementById('buffered_c');
+  var position = (event.clientX - canvas.offsetLeft) / canvas.width * api.getDuration();
+  api.seek(position);
+}
+
+function updateBufferCanvas(position,duration,buffer, backbuffer) {
+  var canvas = document.getElementById('buffered_c');
+  var ctx = canvas.getContext('2d');
+  ctx.fillStyle = "black";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = "gray";
+  var start = (position-backbuffer)/duration * canvas.width;
+  var end = (position+buffer)/duration * canvas.width;
+  ctx.fillRect(start, 3, Math.max(2, end-start), 10);
+  ctx.fillStyle = "blue";
+  var x = position / duration * canvas.width;
+  ctx.fillRect(x, 0, 2, 15);
+}
+
+  function updateLevelInfo() {
+    var button_template = '<button type="button" class="btn btn-sm ';
+    var button_enabled  = 'btn-primary" ';
+    var button_disabled = 'btn-success" ';
+
+    var autoLevel = api.getAutoLevel();
+    var autoLevelCapping = api.getAutoLevelCapping();
+    var currentLevel = api.getCurrentLevel();
+    var nextLevel = api.getNextLevel();
+    var loadLevel = api.getLoadLevel();
+
+    var html1 = button_template;
+    if(autoLevel) {
+      html1 += button_enabled;
+    } else {
+      html1 += button_disabled;
+    }
+    html1 += 'onclick="api.setCurrentLevel(-1);updateLevelInfo()">auto</button>';
+
+
+    var html2 = button_template;
+    if(autoLevel) {
+      html2 += button_enabled;
+    } else {
+      html2 += button_disabled;
+    }
+    html2 += 'onclick="api.setLoadLevel(-1);updateLevelInfo()">auto</button>';
+
+    var html3 = button_template;
+    if(autoLevelCapping === -1) {
+      html3 += button_enabled;
+    } else {
+      html3 += button_disabled;
+    }
+    html3 += 'onclick="api.playerSetAutoLevelCapping(-1);updateLevelInfo()">none</button>';
+
+    var html4 = button_template;
+    if(autoLevel) {
+      html4 += button_enabled;
+    } else {
+      html4 += button_disabled;
+    }
+    html4 += 'onclick="api.setNextLevel(-1);updateLevelInfo()">auto</button>';
+
+    for (var i=0; i < levels.length; i++) {
+      html1 += button_template;
+      if(currentLevel === i) {
+        html1 += button_enabled;
+      } else {
+        html1 += button_disabled;
+      }
+      var levelName = i, label = level2label(i);
+      if(label) {
+        levelName += '(' + level2label(i) + ')';
+      }
+      html1 += 'onclick="api.setCurrentLevel(' + i + ');updateLevelInfo()">' + levelName + '</button>';
+
+
+      html2 += button_template;
+      if(loadLevel === i) {
+        html2 += button_enabled;
+      } else {
+        html2 += button_disabled;
+      }
+      html2 += 'onclick="api.setLoadLevel(' + i + ');updateLevelInfo()">' + levelName + '</button>';
+
+      html3 += button_template;
+      if(autoLevelCapping === i) {
+        html3 += button_enabled;
+      } else {
+        html3 += button_disabled;
+      }
+      html3 += 'onclick="api.playerSetAutoLevelCapping(' + i + ');updateLevelInfo()">' + levelName + '</button>';
+
+      html4 += button_template;
+      if(nextLevel === i) {
+        html4 += button_enabled;
+      } else {
+        html4 += button_disabled;
+      }
+      html4 += 'onclick="api.setNextLevel(' + i + ');updateLevelInfo()">' + levelName + '</button>';
+    }
+    $("#currentLevelControl").html(html1);
+    $("#loadLevelControl").html(html2);
+    $("#levelCappingControl").html(html3);
+    $("#nextLevelControl").html(html4);
+  }
+
+  function level2label(index) {
+    if(levels && levels.length-1 >= index) {
+      var level = levels[index];
+      if (level.name) {
+          return level.name;
+      } else {
+          if (level.height) {
+              return(level.height + 'p / ' + Math.round(level.bitrate / 1024) + 'kb');
+          } else {
+              if(level.bitrate) {
+                return(Math.round(level.bitrate / 1024) + 'kb');
+              } else {
+                return null;
+              }
+          }
+      }
+    }
+  }
+</script>
+</body>
+</html>
