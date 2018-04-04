@@ -210,7 +210,7 @@ int QnMergeSystemsRestHandler::execute(
                 cl_logDEBUG1);
             if (status == nx_http::StatusCode::unauthorized)
                 setMergeError(result, MergeStatus::unauthorized);
-            else if (status == nx_http::StatusCode::unauthorized)
+            else if (status == nx_http::StatusCode::forbidden)
                 setMergeError(result, MergeStatus::forbidden);
             else
                 setMergeError(result, MergeStatus::notFound);
