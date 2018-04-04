@@ -62,9 +62,9 @@ public:
 
     void onReceive(SystemError::ErrorCode, size_t);
 
-    void Manager::onConnect(SystemError::ErrorCode code);
+    void onConnect(SystemError::ErrorCode code);
 
-    void Manager::onSend(SystemError::ErrorCode code, size_t size);
+    void onSend(SystemError::ErrorCode code, size_t size);
 
     virtual nx::sdk::Error startFetchingMetadata(
         nx::sdk::metadata::MetadataHandler* handler,
