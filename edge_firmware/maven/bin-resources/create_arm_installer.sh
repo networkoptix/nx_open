@@ -289,6 +289,10 @@ copyBins()
             done
         fi
     fi
+    if [ "$BOX" = "bpi" ]; then
+        echo "Creating symlink for rpath needed by mediaserver binary"
+        ln -s "../lib" "$INSTALL_DIR/mediaserver/lib"
+    fi
 }
 
 # [in] INSTALL_DIR
@@ -369,9 +373,6 @@ copyBpiLiteClient()
     echo "Creating symlink for rpath needed by mediaserver binary"
     ln -s "../lib" "$INSTALL_DIR/mediaserver/lib"
 
-    echo "Creating symlink for rpath needed by mobile_client binary"
-    ln -s "../lib" "$INSTALL_DIR/lite_client/lib"
-
     echo "Creating symlink for rpath needed by Qt plugins"
     ln -s "../../lib" "$LITE_CLIENT_BIN_DIR/lib"
 
@@ -405,8 +406,8 @@ copyBpiLiteClient()
 # [in] TAR_DIR
 copyBpiSpecificFiles()
 {
-    echo "Copying (bpi) uboot files to root/"
-    cp -r "$BUILD_DIR/root" "$TAR_DIR/"
+    # echo "Copying (bpi) uboot files to root/"
+    # cp -r "$BUILD_DIR/root" "$TAR_DIR/"
 
     echo "Copying (bpi) usr/"
     cp -r "$BUILD_DIR/usr" "$TAR_DIR/"
