@@ -26,8 +26,7 @@
 #include <ui/workaround/widgets_signals_workaround.h>
 
 #include <nx/utils/string.h>
-
-#include <utils/common/app_info.h>
+#include <nx/network/app_info.h>
 #include <utils/email/email.h>
 
 #include <nx/network/app_info.h>
@@ -57,7 +56,6 @@ QString processedEmail(const QString& source)
 }
 
 } // unnamed namespace
-
 
 QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* parent /*= 0*/) :
     base_type(parent),
