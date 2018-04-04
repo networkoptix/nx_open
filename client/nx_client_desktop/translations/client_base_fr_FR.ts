@@ -2486,7 +2486,7 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>Id</source>
-      <translation>ID</translation>
+      <translation>Id</translation>
     </message>
   </context>
   <context>
@@ -2564,7 +2564,7 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>Password should not be equal to camera&apos;s user name</source>
-      <translation type="unfinished">Password should not be equal to camera&apos;s user name</translation>
+      <translation>Mot de passe ne peut être le nom d'utilisateur de la caméra</translation>
     </message>
   </context>
   <context>
@@ -3202,7 +3202,7 @@ to %1</source>
     </message>
     <message>
       <source>Set Password</source>
-      <translation type="unfinished">Set Password</translation>
+      <translation>Définir mot de passe</translation>
     </message>
   </context>
   <context>
@@ -5922,7 +5922,7 @@ to %1</source>
     </message>
     <message>
       <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
-      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</translation>
+      <translation>Les archives envoyées peuvent être supprimées automatiquement s'il n'y a pas d'espace libre sur un stockage de serveur. Les images les plus anciennes parmi toutes les caméras sur le serveur seront supprimées en premier.</translation>
     </message>
   </context>
   <context>
@@ -6148,7 +6148,7 @@ to %1</source>
     </message>
     <message>
       <source>NOT ENOUGH LICENSES</source>
-      <translation type="unfinished">NOT ENOUGH LICENSES</translation>
+      <translation>PAS ASSEZ DE LICENCES</translation>
     </message>
   </context>
   <context>
@@ -7186,11 +7186,11 @@ to %1</source>
     </message>
     <message>
       <source>Uploading %1...</source>
-      <translation type="unfinished">Uploading %1...</translation>
+      <translation>Envoie %1...</translation>
     </message>
     <message>
       <source>Finalizing %1...</source>
-      <translation type="unfinished">Finalizing %1...</translation>
+      <translation>Finalisation %1...</translation>
     </message>
   </context>
   <context>
@@ -7725,23 +7725,23 @@ to %1</source>
     </message>
     <message>
       <source>%1 has unsupported format.</source>
-      <translation type="unfinished">%1 has unsupported format.</translation>
+      <translation>%1 a un format non supporté.</translation>
     </message>
     <message>
       <source>%1 does not have timestamp.</source>
-      <translation type="unfinished">%1 does not have timestamp.</translation>
+      <translation>%1 n'a pas d'horodatage.</translation>
     </message>
     <message>
       <source>%1 is older than allowed in camera archive settings.</source>
-      <translation type="unfinished">%1 is older than allowed in camera archive settings.</translation>
+      <translation>%1 est plus ancien que les paramètres d'archivage de caméra autorisés.</translation>
     </message>
     <message>
       <source>%1 covers period for which video has already been uploaded.</source>
-      <translation type="unfinished">%1 covers period for which video has already been uploaded.</translation>
+      <translation>%1 couvre la période pour laquelle la vidéo a déjà été envoyer.</translation>
     </message>
     <message>
       <source>%1 covers period for which video is being uploaded.</source>
-      <translation type="unfinished">%1 covers period for which video is being uploaded.</translation>
+      <translation>%1 couvre la période pour laquelle la vidéo est envoyer.</translation>
     </message>
   </context>
   <context>

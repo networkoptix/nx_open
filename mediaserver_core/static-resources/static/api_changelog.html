@@ -36,9 +36,24 @@ supported for a while, when noted below.
 <h2>VMS <b>4.0</b> relative to <i>3.2</i></h2>
 
 <!--============================================================================================-->
+<h3>Breaking compatibility</h3>
+
+Params <strong><code><i>scheduleTask.beforeThreshold</i></code></strong> and <strong><code><i>
+scheduleTask.afterThreshold</i></code></strong> were removed in favor of the new <strong><code><b>
+recordBeforeMotionSec</b></code></strong> and <strong><code><b>recordAfterMotionSec</b></code>
+</strong> params in methods:
+<pre>
+    /ec2/saveCameraUserAttributesList
+    /ec2/saveCameraUserAttributes
+    /ec2/getCameraUserAttributesList
+    /ec2/getCamerasEx
+</pre>
+
+
+<!--============================================================================================-->
 <h3>Retaining compatibility</h3>
 
-Removed  param <strong><code><i>scheduleTask.recordAudio</i></code></strong>
+Removed param <strong><code><i>scheduleTask.recordAudio</i></code></strong>
 (was not used) in methods:
 <pre>
     /ec2/saveCameraUserAttributesList

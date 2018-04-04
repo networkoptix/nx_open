@@ -2748,7 +2748,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Cannot edit properties for several wearable cameras.</source>
-      <translation type="unfinished">Cannot edit properties for several wearable cameras.</translation>
+      <translation>Bazı giyilebilir kameraların özellikleri düzenlenemez.</translation>
     </message>
   </context>
   <context>
@@ -5916,7 +5916,7 @@ to %1</source>
     </message>
     <message>
       <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
-      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</translation>
+      <translation>Sunucu depolama alanında yeterli yer yoksa yüklenen arşivler otomatik olarak silinebilir. Tüm kameralar için en eski kayıtların silinmesi önceliklidir.</translation>
     </message>
   </context>
   <context>
@@ -6142,7 +6142,7 @@ to %1</source>
     </message>
     <message>
       <source>NOT ENOUGH LICENSES</source>
-      <translation type="unfinished">NOT ENOUGH LICENSES</translation>
+      <translation>YETERLİ LİSANS YOK</translation>
     </message>
   </context>
   <context>
@@ -6293,7 +6293,7 @@ to %1</source>
     </message>
     <message>
       <source>Recording was enabled on the USB storage</source>
-      <translation type="unfinished">Recording was enabled on the USB storage</translation>
+      <translation>USB depolamada kayıt etkinleştirildi</translation>
     </message>
   </context>
   <context>
@@ -7184,7 +7184,7 @@ to %1</source>
     </message>
     <message>
       <source>Finalizing %1...</source>
-      <translation>%1 tamamlanıyor...</translation>
+      <translation>Tamamlanıyor %1...</translation>
     </message>
   </context>
   <context>
@@ -7290,7 +7290,7 @@ to %1</source>
     </message>
     <message>
       <source>Video Wall is removed on the server and will be closed.</source>
-      <translation type="unfinished">Video Wall is removed on the server and will be closed.</translation>
+      <translation>Video wall bu sunucuda silinir ve kapatılır.</translation>
     </message>
   </context>
   <context>
@@ -7597,7 +7597,7 @@ to %1</source>
     </message>
     <message>
       <source>Only video files with correct timestamp are supported.</source>
-      <translation type="unfinished">Only video files with correct timestamp are supported.</translation>
+      <translation>Sadece doğru zaman damgası olan video dosyaları desteklenir.</translation>
     </message>
     <message>
       <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>

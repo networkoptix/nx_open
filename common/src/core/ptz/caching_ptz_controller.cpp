@@ -163,8 +163,10 @@ bool QnCachingPtzController::getAuxilaryTraits(QnPtzAuxilaryTraitList* auxilaryT
 
 bool QnCachingPtzController::getData(Qn::PtzDataFields query, QnPtzData* data) const
 {
+    // TODO: #GDM There is something really wrong with the thread safety in these classes.
+    const auto base = baseController();
     // TODO: #Elric should be base_type::getData => bad design =(
-    if (!baseController()->getData(query, data))
+    if (!base || !base->getData(query, data))
         return false;
 
     const QnMutexLocker locker(&m_mutex);

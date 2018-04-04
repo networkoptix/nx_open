@@ -6281,7 +6281,7 @@ to %1</source>
     </message>
     <message>
       <source>NOT ENOUGH LICENSES</source>
-      <translation type="unfinished">NOT ENOUGH LICENSES</translation>
+      <translation>BRAKUJE LICENCJI</translation>
     </message>
   </context>
   <context>
@@ -7447,7 +7447,7 @@ to %1</source>
     </message>
     <message>
       <source>Video Wall is removed on the server and will be closed.</source>
-      <translation type="unfinished">Video Wall is removed on the server and will be closed.</translation>
+      <translation>Usunięto ścianę wideo z serwera, dlatego musi zostać zamknięta.</translation>
     </message>
   </context>
   <context>

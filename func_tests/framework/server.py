@@ -10,10 +10,10 @@ import requests.exceptions
 from pathlib2 import Path
 
 from framework.api_shortcuts import get_server_id
+from framework.os_access.local import LocalAccess
 from framework.utils import wait_until
 from .camera import Camera, SampleMediaFile, make_schedule_task
 from .media_stream import open_media_stream
-from .os_access import LocalAccess
 from .utils import datetime_utc_to_timestamp
 
 DEFAULT_HTTP_SCHEMA = 'http'
@@ -138,7 +138,7 @@ class Server(object):
     def storage(self):
         # GET /ec2/getStorages is not always possible: server sometimes is not started.
         storage_path = self.installation.dir / MEDIASERVER_STORAGE_PATH
-        return Storage(self.os_access, storage_path, self.os_access.get_timezone())
+        return Storage(self.machine.os_access, storage_path, self.machine.os_access.get_timezone())
 
     def rebuild_archive(self):
         self.api.api.rebuildArchive.GET(mainPool=1, action='start')

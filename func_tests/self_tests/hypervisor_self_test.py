@@ -1,60 +1,81 @@
 import logging
 from pprint import pformat
-from subprocess import call, check_call, check_output
+from subprocess import call, check_call
 
 import pytest
 
 from framework.utils import wait_until
-from framework.virtual_box import VMInfo
+from framework.vms.hypervisor import VMInfo
 
 logger = logging.getLogger(__name__)
 
-name_prefix = 'func_tests-dummy-'
+name_format = 'func_tests-temp-dummy-{}'
+
+
+def _create_vm(name):
+    logger.debug("Delete %s if exists.", name)
+    call(['VBoxManage', 'controlvm', name, 'poweroff'])
+    call(['VBoxManage', 'unregistervm', name, '--delete'])
+    logger.debug("Create template %s.", name)
+    check_call(['VBoxManage', 'createvm', '--name', name, '--register'])
+    check_call(['VBoxManage', 'modifyvm', name, '--description', 'For testing purposes. Can be deleted.'])
 
 
 @pytest.fixture(scope='session')
 def template():
     """Create VM without tested class."""
-    template_vm = name_prefix + 'template'
-    template_snapshot = 'test_template'
-    for line in check_output(['VBoxManage', 'list', 'vms']).splitlines():
-        name_quoted, _guid = line.rsplit(' ', 1)
-        name = name_quoted[1:-1]  # Always quoted, not escaped.
-        if name.startswith(name_prefix):
-            call(['VBoxManage', 'controlvm', name, 'poweroff'])
-            check_call(['VBoxManage', 'unregistervm', name, '--delete'])
-            logger.debug("Delete %s.", name)
-        else:
-            logger.debug("Skip %s.", name)
-    logger.debug("Create template %s.", template_vm)
-    check_call(['VBoxManage', 'createvm', '--name', template_vm, '--register'])
-    check_call(['VBoxManage', 'modifyvm', template_vm, '--description', 'For testing purposes. Can be deleted.'])
-    check_call(['VBoxManage', 'snapshot', template_vm, 'take', template_snapshot])
-    return {'vm': template_vm, 'snapshot': template_snapshot}
+    vm = name_format.format('template')
+    _create_vm(vm)
+    vm_snapshot = 'test template'
+    check_call(['VBoxManage', 'snapshot', vm, 'take', vm_snapshot])
+    return vm, vm_snapshot
 
 
 @pytest.fixture(scope='session')
-def dummy(hypervisor, template):
-    dummy_name = name_prefix + 'dummy'
-    return hypervisor.clone(dummy_name, 0, template, [('ssh', 'tcp', 65022, 22)])
+def clone_configuration(template):
+    template_vm, template_vm_snapshot = template
+    return {
+        'template_vm': template_vm,
+        'template_vm_snapshot': template_vm_snapshot,
+        'mac_address_format': '0A-00-00-FF-{vm_index:02X}-{nic_index:02X}',
+        'port_forwarding': {
+            'host_ports_base': 65000,
+            'host_ports_per_vm': 5,
+            'forwarded_ports': {
+                'ssh': {'protocol': 'tcp', 'guest_port': 22, 'host_port_offset': 2},
+                'dns': {'protocol': 'udp', 'guest_port': 53, 'host_port_offset': 3},
+                }
+            }
+        }
 
 
-def test_find(hypervisor, template):
-    assert isinstance(hypervisor.find(template['vm']), VMInfo)
+@pytest.fixture(scope='session')
+def dummy():
+    name = name_format.format('dummy')
+    _create_vm(name)
+    return name
 
 
-def test_clone(hypervisor, template):
-    clone_name = name_prefix + 'clone'
-    clone = hypervisor.clone(clone_name, 1, template, [('ssh', 'tcp', 65022, 22), ('dns', 'udp', 65053, 53)])
+@pytest.fixture()
+def clone_name():
+    name = name_format.format('clone')
+    call(['VBoxManage', 'controlvm', name, 'poweroff'])
+    call(['VBoxManage', 'unregistervm', name, '--delete'])
+    return name
+
+
+def test_find(hypervisor, dummy):
+    assert isinstance(hypervisor.find(dummy), VMInfo)
+
+
+def test_clone(hypervisor, clone_name, clone_configuration):
+    clone = hypervisor.clone(clone_name, 1, clone_configuration)
     logger.debug("Clone:\n%s", pformat(clone))
     assert clone.name == clone_name
-    assert not clone.is_running
-    assert clone.ports['tcp', 22] == (hypervisor.hostname, 65022)
-    assert clone.ports['udp', 53] == (hypervisor.hostname, 65053)
 
 
 def test_power(hypervisor, dummy):
-    hypervisor.power_on(dummy.name)
-    assert wait_until(lambda: hypervisor.find(dummy.name).is_running, name='until VM get started')
-    hypervisor.power_off(dummy.name)
-    assert wait_until(lambda: not hypervisor.find(dummy.name).is_running, name='until VM get shut down')
+    hypervisor.power_on(dummy)
+    assert wait_until(lambda: hypervisor.find(dummy).is_running, name='until VM get started')
+    hypervisor.power_off(dummy)
+    assert wait_until(lambda: not hypervisor.find(dummy).is_running, name='until VM get shut down')

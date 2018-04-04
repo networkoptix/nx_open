@@ -1,11 +1,14 @@
-
 #include <QFileInfo>
 #include <QDir>
-
+#include <utils/fs/file.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/system_error.h>
+#include <nx/utils/concurrent.h>
 #include <nx/system_commands.h>
+#if defined (Q_OS_LINUX)
+    #include <nx/system_commands/fd_read_linux.h>
+#endif
 #include "root_tool.h"
 
 namespace nx {
@@ -141,6 +144,51 @@ bool RootTool::makeDirectory(const QString& path)
     }
 
     return execute({"mkdir", path}) == 0;
+}
+
+bool RootTool::removePath(const QString& path)
+{
+    if (m_toolPath.isEmpty())
+    {
+        SystemCommands commands;
+        if (!commands.removePath(path.toStdString()))
+            return false;
+
+        return true;
+    }
+
+    return execute({"rm", path}) == 0;
+}
+
+bool RootTool::rename(const QString& oldPath, const QString& newPath)
+{
+    if (m_toolPath.isEmpty())
+    {
+        SystemCommands commands;
+        if (!commands.rename(oldPath.toStdString(), newPath.toStdString()))
+            return false;
+
+        return true;
+    }
+
+    return execute({"mv", oldPath, newPath}) == 0;
+}
+
+int RootTool::open(const QString& path, QIODevice::OpenMode mode)
+{
+#if defined (Q_OS_LINUX)
+    int sysFlags = makeUnixOpenFlags(mode);
+    if (m_toolPath.isEmpty())
+        return SystemCommands().open(path.toStdString(), sysFlags, /*usePipe*/ false);
+
+    QnMutexLocker lock(&m_mutex);
+    utils::concurrent::run(
+        [this, path, sysFlags]() { execute({"open", path, QString::number(sysFlags)}); });
+    auto result = system_commands::readFd();
+    return result;
+#else
+    return -1;
+#endif
 }
 
 static std::string makeArgsLine(const std::vector<QString>& args)
