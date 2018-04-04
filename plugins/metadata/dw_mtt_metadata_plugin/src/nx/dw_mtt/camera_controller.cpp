@@ -383,7 +383,7 @@ bool CameraController::readPortConfiguration()
 
 nx_http::Request CameraController::makeHttpRequest(const QByteArray& body)
 {
-    nx_http::RequestLine requestLine{ "POST", "/SetSubscribe", { "HTTP", "1.1" } };
+    nx_http::RequestLine requestLine{ "POST", QUrl("/SetSubscribe"), { "HTTP", "1.1" } };
 
     nx_http::header::BasicAuthorization basic(m_user, m_password);
     QByteArray bodyLength = QByteArray::number(body.size());
