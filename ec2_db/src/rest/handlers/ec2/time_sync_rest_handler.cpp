@@ -10,9 +10,6 @@
 
 namespace ec2 {
 
-const QString QnTimeSyncRestHandler::PATH = QString::fromLatin1("ec2/timeSync");
-const QByteArray QnTimeSyncRestHandler::TIME_SYNC_HEADER_NAME("NX-TIME-SYNC-DATA");
-
 QnTimeSyncRestHandler::QnTimeSyncRestHandler(LocalConnectionFactory* connection):
     m_appServerConnection(connection)
 {

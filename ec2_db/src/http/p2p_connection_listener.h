@@ -15,9 +15,6 @@ class P2pConnectionProcessorPrivate;
 class ConnectionProcessor: public QnTCPConnectionProcessor
 {
 public:
-    const static QString kUrlPath;
-    const static QString kCloudPathPrefix;
-
     ConnectionProcessor(
         QSharedPointer<nx::network::AbstractStreamSocket> socket,
         QnTcpListener* owner);

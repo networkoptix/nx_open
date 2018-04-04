@@ -18,9 +18,7 @@ class QnTimeSyncRestHandler:
     public QnRestRequestHandler
 {
 public:
-    static const QString PATH;
     /** Contains peer's time synchronization information. */
-    static const QByteArray TIME_SYNC_HEADER_NAME;
 
     QnTimeSyncRestHandler(LocalConnectionFactory* connection);
 
