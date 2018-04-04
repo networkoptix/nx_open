@@ -11,7 +11,7 @@
 #include <nx/network/http/http_types.h>
 
 #include "ec2_thread_pool.h"
-#include "request_params.h"
+#include <rest/request_params.h>
 #include "server_query_processor.h"
 #include "utils/common/util.h"
 

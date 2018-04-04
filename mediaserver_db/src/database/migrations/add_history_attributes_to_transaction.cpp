@@ -2,7 +2,7 @@
 
 #include <nx/fusion/model_functions.h>
 
-#include "upgrade_serialized_transactions.h"
+#include <database/migrations/upgrade_serialized_transactions.h>
 
 namespace ec2 {
 namespace migration {

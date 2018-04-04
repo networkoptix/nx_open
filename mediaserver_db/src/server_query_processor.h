@@ -28,6 +28,9 @@ namespace detail { class ServerQueryProcessor; }
 
 struct ServerQueryProcessorAccess
 {
+    // TODO: for compatibility with ClientQueryProcessor. It is not need actually. Remove it.
+    QString userName() const { return QString(); }
+
     ServerQueryProcessorAccess(detail::QnDbManager* db, TransactionMessageBusAdapter* messageBus):
         m_db(db),
         m_messageBus(messageBus)
@@ -720,7 +723,10 @@ public:
     {
         NX_ASSERT(ApiCommand::isPersistent(tran.command));
 
-        tran.transactionType = getTransactionDescriptorByTransaction(tran)->getTransactionTypeFunc(m_db.db()->commonModule(), tran.params, m_db.db());
+        tran.transactionType = getTransactionDescriptorByTransaction(tran)->getTransactionTypeFunc(
+            m_db.db()->commonModule(), 
+            tran.params, 
+            &detail::PersistentStorage(m_db.db()));
         if (tran.transactionType == TransactionType::Unknown)
             return ErrorCode::forbidden;
 

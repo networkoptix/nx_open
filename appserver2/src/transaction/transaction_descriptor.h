@@ -18,6 +18,7 @@
 #include <core/resource_access/user_access_data.h>
 
 #include "transaction.h"
+#include "abstract_persistent_storage.h"
 #include "nx_ec/access_helpers.h"
 #include "nx_ec/ec_api.h"
 #include "nx_ec/data/api_business_rule_data.h"
@@ -76,15 +77,6 @@ enum class RemotePeerAccess
 };
 
 namespace detail {
-
-class AbstractPersistentStorage
-{
-public:
-    ~AbstractPersistentStorage() {}
-
-    virtual ec2::ApiMediaServerData getServer(const QnUuid&) = 0;
-    virtual ec2::ApiUserData getUser(const QnUuid&) = 0;
-};
 
 struct NoneType {};
 

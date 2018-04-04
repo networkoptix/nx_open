@@ -1,8 +1,8 @@
 #include "server_transaction_message_bus.h"
+#include "ec_connection_notification_manager.h"
 
 #include <database/db_manager.h>
-#include "ec_connection_notification_manager.h"
-#include "transaction_message_bus_priv.h"
+#include <transaction/transaction_message_bus_priv.h>
 
 namespace ec2 {
 

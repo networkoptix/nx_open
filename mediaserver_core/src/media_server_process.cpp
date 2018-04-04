@@ -303,7 +303,7 @@
 #endif
 
 #include <nx/kit/ini_config.h>
-#include <ec2/local_connection_factory.h>
+#include <local_connection_factory.h>
 
 using namespace nx;
 
@@ -2466,10 +2466,10 @@ void MediaServerProcess::run()
     commonModule()->runtimeInfoManager()->updateLocalItem(runtimeData);    // initializing localInfo
 
     std::unique_ptr<ec2::LocalConnectionFactory> ec2ConnectionFactory(
-        getLocalConnectionFactory(
+        new ec2::LocalConnectionFactory(
+            commonModule(),
             Qn::PT_Server,
             nx::utils::TimerManager::instance(),
-            commonModule(),
             settings->value(nx_ms_conf::P2P_MODE_FLAG).toBool()));
 
     TimeBasedNonceProvider timeBasedNonceProvider;

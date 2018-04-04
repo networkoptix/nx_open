@@ -6,7 +6,7 @@
 
 #include "common/common_module.h"
 #include <database/db_manager.h>
-#include "transaction.h"
+#include <transaction/transaction.h>
 #include "transaction/ubjson_transaction_serializer.h"
 #include <nx/utils/log/log.h>
 #include "utils/common/synctime.h"

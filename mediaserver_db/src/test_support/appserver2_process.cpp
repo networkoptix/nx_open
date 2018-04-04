@@ -56,7 +56,7 @@
 #include "appserver2_process_settings.h"
 #include "cloud_integration/cloud_connector.h"
 #include "ec2_connection_processor.h"
-#include <ec2/local_connection_factory.h>
+#include <local_connection_factory.h>
 
 static int registerQtResources()
 {
@@ -128,10 +128,10 @@ int Appserver2Process::exec()
     AuditManager auditManager(m_commonModule.get());
 
     std::unique_ptr<ec2::LocalConnectionFactory>
-        ec2ConnectionFactory(getLocalConnectionFactory(
+        ec2ConnectionFactory(new ec2::LocalConnectionFactory(
+            m_commonModule.get(),
             Qn::PT_Server,
             nx::utils::TimerManager::instance(),
-            m_commonModule.get(),
             settings.isP2pMode()));
 
     std::map<QString, QVariant> confParams;

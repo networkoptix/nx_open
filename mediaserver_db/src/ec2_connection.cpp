@@ -6,7 +6,7 @@
 #include <nx/utils/std/cpp14.h>
 #include "nx_ec/data/api_conversion_functions.h"
 #include "transaction/transaction_message_bus.h"
-#include <ec2/local_connection_factory.h>
+#include <local_connection_factory.h>
 
 namespace ec2
 {

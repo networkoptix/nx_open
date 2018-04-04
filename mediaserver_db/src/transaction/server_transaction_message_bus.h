@@ -1,6 +1,6 @@
 #pragma once
 
-#include "transaction_message_bus.h"
+#include <transaction/transaction_message_bus.h>
 
 namespace ec2 {
 

@@ -24,9 +24,56 @@ nx_configure_directory(
     ${CMAKE_CURRENT_BINARY_DIR}/resources/static/skin
     COPYONLY)
 
+set(apidoctool_jar "${APIDOCTOOL_PATH}/apidoctool.jar")
 
+set(apidoctool_params "-Dec2RegistrationCpp=/mediaserver_db/src/local_connection_factory.cpp")
 
+execute_process(
+    COMMAND java -jar "${apidoctool_jar}" print-deps "${apidoctool_params}"
+    RESULT_VARIABLE apidoctool_result
+    OUTPUT_VARIABLE apidoctool_deps
+)
 
+if(NOT apidoctool_result EQUAL 0)
+    message(FATAL ERROR "Cannot get dependencies list from apidoctool.")
+endif()
+
+separate_arguments(apidoctool_deps)
+set(apidoctool_deps_absolute)
+foreach(dependency ${apidoctool_deps})
+    list(APPEND apidoctool_deps_absolute "${PROJECT_SOURCE_DIR}/${dependency}")
+endforeach()
+
+add_custom_command(
+    OUTPUT
+        "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.xml"
+        "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.json"
+    MAIN_DEPENDENCY "${apidoctool_jar}"
+    DEPENDS
+        "${CMAKE_CURRENT_SOURCE_DIR}/api/api_template.xml"
+        ${apidoctool_deps_absolute}
+    COMMAND
+        java -jar "${apidoctool_jar}"
+        code-to-xml
+        -vms-path "${PROJECT_SOURCE_DIR}"
+        -template-xml "${CMAKE_CURRENT_SOURCE_DIR}/api/api_template.xml"
+        -output-xml "${CMAKE_CURRENT_BINARY_DIR}/api.xml"
+        -output-json "${CMAKE_CURRENT_BINARY_DIR}/api.json"
+        "${apidoctool_params}"
+    COMMAND
+        ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_CURRENT_BINARY_DIR}/api.xml"
+            "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.xml"
+    COMMAND
+        ${CMAKE_COMMAND} -E remove "${CMAKE_CURRENT_BINARY_DIR}/api.xml"
+    COMMAND
+        ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_CURRENT_BINARY_DIR}/api.json"
+            "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.json"
+    COMMAND
+        ${CMAKE_COMMAND} -E remove "${CMAKE_CURRENT_BINARY_DIR}/api.json"
+)
+ 
 set_source_files_properties(
     "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.xml"
     "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.json"
@@ -52,7 +99,8 @@ nx_add_target(mediaserver_core LIBRARY
         "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.json"
     PUBLIC_LIBS
         Qt5::WebSockets
-        appserver2 
+        appserver2
+        mediaserver_db
 	nx_onvif 
 	nx_email 
 	cloud_db_client 

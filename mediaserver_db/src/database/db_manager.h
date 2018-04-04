@@ -80,6 +80,7 @@ public:
 };
 
 class QnDbManagerAccess;
+class ServerQueryProcessor;
 
 namespace detail
 {
@@ -93,9 +94,8 @@ namespace detail
         Q_OBJECT
 
         friend class ::ec2::QnDbManagerAccess;
-        friend ec2::TransactionType::Value getRemoveUserTransactionTypeFromDb(const QnUuid& id, detail::QnDbManager* db);
-        friend ec2::TransactionType::Value getStatusTransactionTypeFromDb(const QnUuid& id, detail::QnDbManager* db);
         friend bool ::ec2::db::migrateAccessRightsToUbjsonFormat(QSqlDatabase& database, detail::QnDbManager* db);
+        friend class PersistentStorage;
     public:
         QnDbManager(QnCommonModule* commonModule);
         virtual ~QnDbManager();
@@ -739,6 +739,29 @@ namespace detail
         ec2::database::api::QueryCache m_insertCameraScheduleQuery;
         ec2::database::api::QueryCache m_insertKvPairQuery;
         ec2::database::api::QueryContext m_resourceQueries;
+    };
+
+    class PersistentStorage : public AbstractPersistentStorage
+    {
+    public:
+        PersistentStorage(QnDbManager* db) : m_db(db) {}
+
+        virtual ApiMediaServerData getServer(const QnUuid& id) override
+        {
+            ApiMediaServerDataList result;
+            m_db->doQueryNoLock(id, result);
+            return result.empty() ? ApiMediaServerData() : result[0];
+        }
+
+        virtual ec2::ApiUserData getUser(const QnUuid& id) override
+        {
+            ApiUserDataList result;
+            m_db->doQueryNoLock(id, result);
+            return result.empty() ? ApiUserData() : result[0];
+        }
+
+    private:
+        QnDbManager* m_db;
     };
 
 } // namespace detail

@@ -1,11 +1,10 @@
-#ifndef __TRANSACTION_LOG_H_
-#define __TRANSACTION_LOG_H_
+#pragma once
 
 #include <QtCore/QSet>
 #include <QtCore/QElapsedTimer>
 #include <nx/utils/thread/mutex.h>
 
-#include "transaction_descriptor.h"
+#include <transaction/transaction_descriptor.h>
 
 #include <database/api/db_resource_api.h>
 
@@ -153,6 +152,3 @@ namespace ec2
         ec2::database::api::QueryCache m_updateSequenceQuery;
     };
 };
-
-
-#endif // __TRANSACTION_LOG_H_

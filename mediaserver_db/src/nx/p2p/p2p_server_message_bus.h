@@ -1,6 +1,6 @@
 #pragma once
 
-#include "p2p_message_bus.h"
+#include <nx/p2p/p2p_message_bus.h>
 
 namespace ec2 {
 namespace detail {

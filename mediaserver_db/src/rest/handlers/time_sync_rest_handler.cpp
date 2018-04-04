@@ -5,7 +5,7 @@
 
 #include <rest/server/rest_connection_processor.h>
 
-#include <ec2/local_connection_factory.h>
+#include <local_connection_factory.h>
 #include "managers/time_manager.h"
 
 namespace ec2 {
@@ -63,7 +63,7 @@ nx::network::http::StatusCode::Value QnTimeSyncRestHandler::processRequest(
     auto peerGuid = request.headers.find(Qn::PEER_GUID_HEADER_NAME);
     if (peerGuid == request.headers.end())
         return nx::network::http::StatusCode::badRequest;
-    auto timeSyncHeaderIter = request.headers.find(TIME_SYNC_HEADER_NAME);
+    auto timeSyncHeaderIter = request.headers.find(TimeSynchronizationManager::TIME_SYNC_HEADER_NAME);
     if (timeSyncHeaderIter != request.headers.end())
     {
         boost::optional<qint64> rttMillis;
@@ -92,7 +92,7 @@ void QnTimeSyncRestHandler::prepareResponse(
     nx::network::http::Response* response)
 {
     response->headers.emplace(
-        TIME_SYNC_HEADER_NAME,
+        TimeSynchronizationManager::TIME_SYNC_HEADER_NAME,
         timeSynchronizationManager.getTimeSyncInfo().toString());
     response->headers.emplace(
         Qn::PEER_GUID_HEADER_NAME,

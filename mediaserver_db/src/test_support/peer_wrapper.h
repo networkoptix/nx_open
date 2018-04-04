@@ -11,7 +11,7 @@
 #include <api/mediaserver_client.h>
 
 #include "appserver2_process.h"
-#include "../transaction/transaction.h"
+#include <transaction/transaction.h>
 
 namespace ec2 {
 namespace test {

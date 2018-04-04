@@ -18,14 +18,14 @@
 #include <nx_ec/data/api_user_role_data.h>
 #include <nx_ec/data/api_camera_history_data.h>
 
-#include "rest/active_connections_rest_handler.h"
+#include <rest/handlers/active_connections_rest_handler.h>
 #include "compatibility/old_ec_connection.h"
 #include "ec2_connection.h"
 #include "ec2_thread_pool.h"
 #include "remote_ec_connection.h"
-#include "rest/ec2_base_query_http_handler.h"
-#include "rest/ec2_update_http_handler.h"
-#include "rest/time_sync_rest_handler.h"
+#include <rest/handlers/ec2_base_query_http_handler.h>
+#include <rest/handlers/ec2_update_http_handler.h>
+#include <rest/handlers/time_sync_rest_handler.h>
 #include "rest/server/rest_connection_processor.h"
 #include "transaction/transaction.h"
 #include "transaction/transaction_message_bus.h"
@@ -187,7 +187,7 @@ namespace ec2 {
 		else if (auto bus = m_bus->dynamicCast<nx::p2p::MessageBus*>())
 		{
 			httpConnectionListener->addHandler<nx::p2p::ConnectionProcessor>(
-				"HTTP", QnTcpListener::normalizedPath(nx::p2p::ConnectionProcessor::kUrlPath));
+				"HTTP", QnTcpListener::normalizedPath(nx::p2p::MessageBus::kUrlPath));
 		}
 
 		m_sslEnabled = httpConnectionListener->isSslEnabled();
@@ -1581,7 +1581,7 @@ namespace ec2 {
 		});
 
 		p->registerHandler("ec2/activeConnections", new QnActiveConnectionsRestHandler(m_bus.get()));
-		p->registerHandler(QnTimeSyncRestHandler::PATH, new QnTimeSyncRestHandler(this));
+		p->registerHandler(TimeSynchronizationManager::kTimeSyncUrlPath, new QnTimeSyncRestHandler(this));
 
 #if 0 // Using HTTP processor since HTTP REST does not support HTTP interleaving.
 		p->registerHandler(
