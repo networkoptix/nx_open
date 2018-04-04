@@ -1,20 +1,25 @@
-#include <pwd.h>
-#include <grp.h>
-#include <sys/stat.h>
-#include <unistd.h>
 #include <string>
 #include <sstream>
 #include <iomanip>
 #include <iostream>
 #include <set>
 #include <assert.h>
+#include <pwd.h>
+#include <grp.h>
+#include <sys/stat.h>
+#include <sys/socket.h>
+#include <sys/un.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <fcntl.h>
 #include "system_commands.h"
-
+#include "system_commands/detail/fd_send_linux.h"
 
 namespace nx {
 
 static const uid_t kRealUid = getuid();
 static const uid_t kRealGid = getgid();
+const char* const SystemCommands::kDomainSocket = "/tmp/syscmd_socket3f64fa";
 
 namespace {
 
@@ -285,6 +290,42 @@ bool SystemCommands::makeDirectory(const std::string& directoryPath)
 
     assert(false);
     return false;
+}
+
+bool SystemCommands::removePath(const std::string& path)
+{
+    if (!checkOwnerPermissions(path) || !execute("rm -rf '" + path + "'"))
+        return false;
+
+    return true;
+}
+
+bool SystemCommands::rename(const std::string& oldPath, const std::string& newPath)
+{
+    if (!checkOwnerPermissions(oldPath) || !checkOwnerPermissions(newPath)
+        || !execute("mv -f '" + oldPath + "' '" + newPath + "'"))
+    {
+        return false;
+    }
+
+    return true;
+}
+
+int SystemCommands::open(const std::string& path, int mode, bool usePipe)
+{
+    if (mode & O_CREAT)
+    {
+        auto lastSep = path.rfind('/');
+        if (lastSep != std::string::npos && lastSep != 0)
+            makeDirectory(path.substr(0, lastSep));
+    }
+
+    int fd = ::open(path.c_str(), mode, 0660);
+    if (!usePipe)
+        return fd;
+
+    system_commands::detail::sendFd(fd);
+    return fd;
 }
 
 bool SystemCommands::install(const std::string& debPackage)

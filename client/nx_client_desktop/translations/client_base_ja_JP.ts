@@ -3165,7 +3165,7 @@ to %1</source>
     </message>
     <message>
       <source>Set Password</source>
-      <translation type="unfinished">Set Password</translation>
+      <translation>パスワードの設定</translation>
     </message>
   </context>
   <context>
@@ -7104,11 +7104,11 @@ to %1</source>
     </message>
     <message>
       <source>Uploading %1...</source>
-      <translation type="unfinished">Uploading %1...</translation>
+      <translation>アップロード中 %1...</translation>
     </message>
     <message>
       <source>Finalizing %1...</source>
-      <translation type="unfinished">Finalizing %1...</translation>
+      <translation>ファイナライズ %1...</translation>
     </message>
   </context>
   <context>

@@ -9,7 +9,7 @@
 #include "abstract_ondemand_data_provider.h"
 #include <media/filters/abstract_media_data_filter.h>
 
-// Reads stream from specified source and performs some processing
+// Reads stream from specified source and performs some processing.
 class FilteredOnDemandDataProvider: public AbstractOnDemandDataProvider
 {
 public:

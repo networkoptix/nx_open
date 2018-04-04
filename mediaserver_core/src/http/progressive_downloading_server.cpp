@@ -95,29 +95,12 @@ public:
 
     void copyLastGopFromCamera(const QnVideoCameraPtr& camera)
     {
-        QnDataPacketQueue tmpQueue(20);
         camera->copyLastGop(
             /*primaryLiveStream*/ true,
             /*skipTime*/ 0,
-            tmpQueue,
+            m_dataQueue,
             /*cseq*/ 0,
             /*iFramesOnly*/ false);
-
-        auto randomAccess = tmpQueue.lock();
-        if (randomAccess.size() > 0)
-        {
-            qint64 lastTime = randomAccess.last()->timestamp;
-            int timeResolution = (1000000ll / m_owner->getVideoStreamResolution());
-            qint64 firstTime = lastTime - randomAccess.size() * timeResolution;
-            for (int i = 0; i < randomAccess.size(); ++i)
-            {
-                const QnAbstractMediaDataPtr& srcMedia = std::dynamic_pointer_cast<QnAbstractMediaData>(randomAccess.at(i));
-                QnAbstractMediaDataPtr media = QnAbstractMediaDataPtr(srcMedia->clone());
-                media->timestamp = firstTime + i*timeResolution;
-                m_dataQueue.push(media);
-            }
-        }
-
         m_dataQueue.setMaxSize(m_dataQueue.size() + MAX_QUEUE_SIZE);
     }
 
@@ -560,15 +543,6 @@ void QnProgressiveDownloadingConsumer::run()
         Qn::StreamQuality quality = Qn::QualityNormal;
         if( decodedUrlQuery.hasQueryItem(QnCodecParams::quality) )
             quality = QnLexical::deserialized<Qn::StreamQuality>(decodedUrlQuery.queryItemValue(QnCodecParams::quality), Qn::QualityNotDefined);
-        QnCodecParams::Value codecParams;
-        QList<QPair<QString, QString> > queryItems = decodedUrlQuery.queryItems();
-        for( QList<QPair<QString, QString> >::const_iterator
-            it = queryItems.begin();
-            it != queryItems.end();
-            ++it )
-        {
-            codecParams[it->first] = it->second;
-        }
 
         QnResourcePtr resource = nx::camera_id_helper::findCameraByFlexibleId(
             commonModule()->resourcePool(), resId);
@@ -645,8 +619,7 @@ void QnProgressiveDownloadingConsumer::run()
                 transcodeMethod,
                 quality,
                 videoSize,
-                -1,
-                codecParams ) != 0 )
+                -1) != 0 )
         {
             QByteArray msg;
             msg = QByteArray("Transcoding error. Can not setup video codec:") + d->transcoder.getLastErrorMessage().toLatin1();

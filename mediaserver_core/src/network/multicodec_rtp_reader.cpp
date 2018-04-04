@@ -33,6 +33,8 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_data_pool.h>
 
+#include <nx/utils/scope_guard.h>
+
 using namespace nx;
 
 namespace {
@@ -90,7 +92,7 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(
     m_rtpFrameTimeoutMs = globalSettings->rtpFrameTimeoutMs();
     m_maxRtpRetryCount = globalSettings->maxRtpRetryCount();
 
-    m_RtpSession.setTCPTimeout(m_rtpFrameTimeoutMs);
+    m_RtpSession.setTCPTimeout(std::chrono::milliseconds(m_rtpFrameTimeoutMs));
 
     QnMediaResourcePtr mr = qSharedPointerDynamicCast<QnMediaResource>(res);
     m_numberOfVideoChannels = 1;
@@ -260,6 +262,16 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
     int rtpChannelNum = -1;
 
     m_dataTimer.restart();
+
+    const auto tcpTimeout = m_RtpSession.getTCPTimeout();
+    if (m_callbackTimeout.count() > 0)
+        m_RtpSession.setTCPTimeout(m_callbackTimeout);
+    const auto scopeGuard = makeScopeGuard([
+        this, tcpTimeout]()
+        {
+            if (m_callbackTimeout.count() > 0)
+                m_RtpSession.setTCPTimeout(tcpTimeout);
+        });
 
     while (m_RtpSession.isOpened() && !m_pleaseStop && m_dataTimer.elapsed() <= m_rtpFrameTimeoutMs)
     {
@@ -881,8 +893,11 @@ bool QnMulticodecRtpReader::isOnvifNtpExtensionId(uint16_t id) const
         || id == kOnvifNtpExtensionAltId;
 }
 
-void QnMulticodecRtpReader::setOnSocketReadTimeoutCallback(OnSocketReadTimeoutCallback callback)
+void QnMulticodecRtpReader::setOnSocketReadTimeoutCallback(
+    std::chrono::milliseconds timeout,
+    OnSocketReadTimeoutCallback callback)
 {
+    m_callbackTimeout = timeout;
     m_onSocketReadTimeoutCallback = std::move(callback);
 }
 

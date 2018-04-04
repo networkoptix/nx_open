@@ -460,10 +460,6 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         %value 5 Friday
      *         %value 6 Saturday
      *         %value 7 Sunday
-     *     %param scheduleTask.beforeThreshold The number of seconds before a motion event to
-     *         record the video for.
-     *     %param scheduleTask.afterThreshold The number of seconds after a motion event to
-     *         record the video for.
      *     %param scheduleTask.streamQuality Quality of the recording.
      *         %value QualityLowest
      *         %value QualityLow
@@ -490,6 +486,10 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     If the value is less than or equal to zero, it is not used.
      * %param maxArchiveDays Maximum number of days to keep the archive for.
      *     If the value is less than or equal zero, it is not used.
+     * %param recordBeforeMotionSec The number of seconds before a motion event to record the video
+     *     for.
+     * %param recordAfterMotionSec The number of seconds after a motion event to record the video
+     *     for.
      * %param preferredServerId Unique id of a server which has the highest priority of hosting
      *     the camera for failover (if the current server fails).
      * %param failoverPriority Priority for the camera to be moved
@@ -557,10 +557,6 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         %value 5 Friday
      *         %value 6 Saturday
      *         %value 7 Sunday
-     *     %param scheduleTask.beforeThreshold The number of seconds before a motion event to
-     *         record the video for.
-     *     %param scheduleTask.afterThreshold The number of seconds after a motion event to
-     *         record the video for.
      *     %param scheduleTask.streamQuality Quality of the recording.
      *         %value QualityLowest
      *         %value QualityLow
@@ -587,6 +583,10 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     If the value is less than or equal zero, it is not used.
      * %param maxArchiveDays Maximum number of days to keep the archive for.
      *     If the value is less than or equal zero, it is not used.
+     * %param recordBeforeMotionSec The number of seconds before a motion event to record the video
+     *     for.
+     * %param recordAfterMotionSec The number of seconds after a motion event to record the video
+     *     for.
      * %param preferredServerId Unique id of a server which has the highest priority of hosting
      *     the camera for failover (if the current server fails).
      * %param failoverPriority Priority for the camera to be moved
@@ -652,10 +652,6 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *             %value 5 Friday
      *             %value 6 Saturday
      *             %value 7 Sunday
-     *         %param scheduleTask.beforeThreshold The number of seconds before a motion event to
-     *             record the video for.
-     *         %param scheduleTask.afterThreshold The number of seconds after a motion event to
-     *             record the video for.
      *         %param scheduleTask.streamQuality Quality of the recording.
      *             %value QualityLowest
      *             %value QualityLow
@@ -682,6 +678,10 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         If the value is less than or equal zero, it is not used.
      *     %param maxArchiveDays Maximum number of days to keep the archive for.
      *         If the value is less than or equal zero, it is not used.
+     *     %param recordBeforeMotionSec The number of seconds before a motion event to record the
+     *         video for.
+     *     %param recordAfterMotionSec The number of seconds after a motion event to record the
+     *         video for.
      *     %param preferredServerId Unique id of a server which has the highest priority of hosting
      *         the camera for failover (if the current server fails).
      *     %param failoverPriority Priority for the camera to be moved
@@ -785,10 +785,6 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *             %value 5 Friday
      *             %value 6 Saturday
      *             %value 7 Sunday
-     *         %param scheduleTask.beforeThreshold The number of seconds before a motion event to
-     *             record the video for.
-     *         %param scheduleTask.afterThreshold The number of seconds after a motion event to
-     *             record the video for.
      *         %param scheduleTask.streamQuality Quality of the recording.
      *             %value QualityLowest
      *             %value QualityLow
@@ -815,6 +811,10 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         If the value is less than or equal to zero, it is not used.
      *     %param maxArchiveDays Maximum number of days to keep the archive for.
      *         If the value is less than or equal to zero, it is not used.
+     *     %param recordBeforeMotionSec The number of seconds before a motion event to record the
+     *         video for.
+     *     %param recordAfterMotionSec The number of seconds after a motion event to record the
+     *         video for.
      *     %param preferredServerId Unique id of a server which has the highest priority of hosting
      *         the camera for failover (if the current server fails).
      *     %param failoverPriority Priority for the camera to be moved

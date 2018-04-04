@@ -32,6 +32,9 @@ def determine_package_versions():
 
     if platform == "linux" and box == "none":
         v["qt"] = "5.6.2-2"
+        v["festival"] = "2.4-1"
+        v["festival-vox"] = "2.4"
+        v["sysroot"] = "xenial"
 
     if platform == "macosx":
         v["qt"] = "5.6.3"
@@ -55,6 +58,7 @@ def determine_package_versions():
         v["qt"] = "5.6.2-1"
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
+        v["sysroot"] = "1"
 
     if box == "bananapi":
         v["ffmpeg"] = "3.1.1-bananapi"
@@ -94,18 +98,16 @@ def sync_dependencies(syncher):
 
     sync("ffmpeg")
 
+    if platform == "linux" and box in ("bpi", "bananapi", "rpi", "tx1", "none"):
+        sync("sysroot", path_variable="sysroot_directory")
+
     if box in ("bpi", "bananapi"):
-        sync("sysroot-1")
         sync("opengl-es-mali")
 
     if box == "rpi":
         sync("cifs-utils")
 
-    if box == "rpi":
-        sync("sysroot")
-
     if box == "tx1":
-        sync("sysroot")
         sync("tegra_video")
         sync("jetpack")
         sync("gstreamer")

@@ -765,7 +765,7 @@
     <message>
       <location/>
       <source>Logical Id</source>
-      <translation type="unfinished">Logical Id</translation>
+      <translation>Id Lógico</translation>
     </message>
   </context>
   <context>
@@ -1093,7 +1093,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/export_media_settings_widget.ui"/>
       <source>Export Settings</source>
-      <translation>Configuración de exportación</translation>
+      <translation>Exportar Configuración</translation>
     </message>
     <message>
       <location/>
@@ -1804,7 +1804,7 @@
     <message>
       <location/>
       <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+      <translation>&quot;Cámara usable&quot; es un almacenamiento virtual para archivos de video, que podría cargarse en cualquier servidor de su Sistema y acceder a él cualquier usuario.</translation>
     </message>
   </context>
   <context>
@@ -2954,7 +2954,7 @@
     <message>
       <location/>
       <source>Font Size</source>
-      <translation>Tamaño de la fuente</translation>
+      <translation>Tamaño de la letra</translation>
     </message>
     <message>
       <location/>
@@ -3044,12 +3044,12 @@
     <message>
       <location/>
       <source>There are no custom user roles yet.</source>
-      <translation type="unfinished">There are no custom user roles yet.</translation>
+      <translation>Todavía no hay roles de usuario personalizados.</translation>
     </message>
     <message>
       <location/>
       <source>Click &quot;New role&quot; button to create one.</source>
-      <translation type="unfinished">Click &quot;New role&quot; button to create one.</translation>
+      <translation>Haga clic en &quot;Botón de nueva función&quot; para crear uno.</translation>
     </message>
   </context>
   <context>
