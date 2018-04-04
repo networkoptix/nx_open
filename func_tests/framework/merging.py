@@ -141,8 +141,10 @@ def setup_system(servers, scheme):
     allocated_servers = {}
     for remote_alias, local_aliases in scheme.items():
         allocated_servers[remote_alias] = servers.get(remote_alias)  # Create server but don't merge.
+        allocated_servers[remote_alias].start(already_started_ok=True)
         for local_alias, merge_parameters in (local_aliases or {}).items():
             allocated_servers[local_alias] = servers.get(local_alias)
+            allocated_servers[local_alias].start(already_started_ok=True)
             merge_kwargs = {}
             if merge_parameters is not None:
                 try:
