@@ -14,9 +14,9 @@ Check Systems Text
     [arguments]    ${user}
     Log Out
     Validate Log Out
-    Log In    ${user}
+    Log In    ${user}    ${password}
     Validate Log In
-    Wait Until Element Is Visible    //h2[.='${OWNER TEXT}']
+    Wait Until Element Is Visible    ${AUTO TESTS USER}[text()='${TEST FIRST NAME} ${TEST LAST NAME}']
     Wait Until Element Is Not Visible    //h2[.='${YOUR SYSTEM TEXT}']
 
 *** Test Cases ***
@@ -72,12 +72,21 @@ should update owner name in systems list, if it's changed
     Input Text    ${ACCOUNT LAST NAME}    newLastName
     Click Button    ${ACCOUNT SAVE}
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
+    Log Out
+    Validate Log Out
+    Log In    ${EMAIL ADMIN}    ${password}
+    Validate Log In
     Go To    ${url}/systems
-    Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
+    Wait Until Elements Are Visible    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
     Element Text Should Be    ${AUTO TESTS USER}    newFirstName newLastName
 
+    Log Out
+    Validate Log Out
+    Log In    ${EMAIL OWNER}    ${password}
+    Validate Log In
     Go To    ${url}/account
     Wait Until Elements Are Visible    ${ACCOUNT FIRST NAME}    ${ACCOUNT LAST NAME}    ${ACCOUNT SAVE}
+    Wait Until Textfield Contains    ${ACCOUNT FIRST NAME}    newFirstName
     Clear Element Text    ${ACCOUNT FIRST NAME}
     Input Text    ${ACCOUNT FIRST NAME}    testFirstName
     Clear Element Text    ${ACCOUNT LAST NAME}
@@ -85,7 +94,6 @@ should update owner name in systems list, if it's changed
     Click Button    ${ACCOUNT SAVE}
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
 
-#CLOUD-1748
 Should show your system for owner and owner name for non-owners
     [tags]    not-ready
     Open Browser and go to URL    ${url}
