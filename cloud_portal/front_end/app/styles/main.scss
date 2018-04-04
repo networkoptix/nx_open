@@ -281,23 +281,19 @@ a.disabled {
 .light-color{
   color:    $gray-light;
 }
-.no-data-panel
-{
-  width:100%;
-  z-index:100;
 
-  height: 100px;
+.no-data-panel {
+    width: 100%;
+    z-index: 100;
+    text-align: center;
+    background-color: $body-bg;
+    font-weight: lighter;
+    font-size: $h2-font-size;
+}
 
-  text-align: center;
-
-  background-color: $body-bg;
-  font-weight: lighter;
-  font-size: $h2-font-size;
-  display: table;
-
-    .no-data-panel-body{
-      display: table-cell;
-      vertical-align: middle;
+@include media-breakpoint-down(sm) {
+    .no-data-panel .right-arrow {
+        transform: rotate(90deg);
     }
 }
 
@@ -309,7 +305,7 @@ a.disabled {
     background-image: url('/static/images/tutorial_arrow.png') !important;
     background-repeat: no-repeat;
     background-size: 40px 40px;
-    background-position: right 8px center;
+    background-position: right 0 center;
 
     @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
         background-image: url('/static/images/tutorial_arrow@2x.png') !important;
@@ -591,6 +587,10 @@ td{
 
 .error-page{
     color:$dark10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
     h1{
         font-size:40px;
     }
@@ -599,6 +599,47 @@ td{
     }
     a{
         text-decoration: underline;
+        font-weight: 200;
+    }
+    img:hover {
+        animation: shake 0.5s;
+        animation-iteration-count: infinite;
+    }
+
+    @keyframes shake {
+        0% {
+            transform: translate(1px, 1px) rotate(0deg);
+        }
+        10% {
+            transform: translate(-1px, -2px) rotate(-1deg);
+        }
+        20% {
+            transform: translate(-3px, 0px) rotate(1deg);
+        }
+        30% {
+            transform: translate(3px, 2px) rotate(0deg);
+        }
+        40% {
+            transform: translate(1px, -1px) rotate(1deg);
+        }
+        50% {
+            transform: translate(-1px, 2px) rotate(-1deg);
+        }
+        60% {
+            transform: translate(-3px, 1px) rotate(0deg);
+        }
+        70% {
+            transform: translate(3px, 1px) rotate(-1deg);
+        }
+        80% {
+            transform: translate(-1px, -1px) rotate(1deg);
+        }
+        90% {
+            transform: translate(1px, 2px) rotate(0deg);
+        }
+        100% {
+            transform: translate(1px, -2px) rotate(-1deg);
+        }
     }
 }
 
