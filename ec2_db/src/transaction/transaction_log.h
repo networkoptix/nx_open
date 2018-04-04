@@ -11,8 +11,6 @@
 
 namespace ec2
 {
-    static const char ADD_HASH_DATA[] = "$$_HASH_$$";
-
     namespace detail { class QnDbManager; }
     enum class TransactionLockType;
 
@@ -77,7 +75,8 @@ namespace ec2
             NX_ASSERT(td, "Downcast to TransactionDescriptor<TransactionParams>* failed");
             if (td == nullptr)
                 return ErrorCode::notImplemented;
-            return td->saveFunc(tran, this);
+            QByteArray serializedTran = serializer()->serializedTransaction(tran);
+            return saveToDB(tran, td->getHashFunc(tran.params), serializedTran);
         }
 
         template <typename T>
@@ -88,7 +87,7 @@ namespace ec2
             NX_ASSERT(td, "Downcast to TransactionDescriptor<TransactionParams>* failed");
             if (td == nullptr)
                 return ErrorCode::notImplemented;
-            return td->saveSerializedFunc(tran, serializedTran, this);
+            return saveToDB(tran, td->getHashFunc(tran.params), serializedTran);
             return ErrorCode::ok;
         }
 
@@ -97,8 +96,6 @@ namespace ec2
         bool clear();
 
         int getLatestSequence(const ApiPersistentIdData& key) const;
-        static QnUuid makeHash(const QByteArray& data1, const QByteArray& data2 = QByteArray());
-        static QnUuid makeHash(const QByteArray &extraData, const ApiDiscoveryData &data);
 
         ErrorCode updateSequence(const ApiUpdateSequenceData& data);
         ErrorCode updateSequence(const QnAbstractTransaction& tran, TransactionLockType lockType);

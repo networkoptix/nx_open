@@ -1,5 +1,4 @@
-#ifndef __TRANSACTION_DESCRIPTOR_H__
-#define __TRANSACTION_DESCRIPTOR_H__
+#pragma once
 
 #include <utility>
 #include <functional>
@@ -53,8 +52,6 @@ class QnCommonModule;
 
 namespace ec2 {
 
-class QnTransactionLog;
-
 class AbstractECConnection;
 class QnLicenseNotificationManager;
 class QnResourceNotificationManager;
@@ -70,10 +67,6 @@ class QnStoredFileNotificationManager;
 class QnUpdatesNotificationManager;
 class QnMiscNotificationManager;
 class QnDiscoveryNotificationManager;
-namespace detail
-{
-    class QnDbManager;
-}
 
 enum class RemotePeerAccess
 {
@@ -83,6 +76,15 @@ enum class RemotePeerAccess
 };
 
 namespace detail {
+
+class AbstractPersistentStorage
+{
+public:
+    ~AbstractPersistentStorage() {}
+
+    virtual ec2::ApiMediaServerData getServer(const QnUuid&) = 0;
+    virtual ec2::ApiUserData getUser(const QnUuid&) = 0;
+};
 
 struct NoneType {};
 
@@ -102,16 +104,10 @@ template<typename ParamType>
 using CheckRemotePeerAccessFuncType = std::function<RemotePeerAccess(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ParamType&)>;
 
 template<typename ParamType>
-using GetTransactionTypeFuncType = std::function<ec2::TransactionType::Value(QnCommonModule*, const ParamType&, detail::QnDbManager*)>;
+using GetTransactionTypeFuncType = std::function<ec2::TransactionType::Value(QnCommonModule*, const ParamType&, AbstractPersistentStorage*)>;
 
 template<typename ParamType>
 using GetHashFuncType = std::function<QnUuid(ParamType const &)>;
-
-template<typename ParamType>
-using SaveTranFuncType = std::function<ErrorCode(const QnTransaction<ParamType>&, QnTransactionLog*)>;
-
-template<typename ParamType>
-using SaveSerializedTranFuncType = std::function<ErrorCode(const QnTransaction<ParamType> &, const QByteArray&, QnTransactionLog*)>;
 
 template<typename ParamType>
 using CreateTransactionFromAbstractTransactionFuncType = std::function<QnTransaction<ParamType>(const QnAbstractTransaction& tran)>;
@@ -165,8 +161,6 @@ struct TransactionDescriptor : TransactionDescriptorBase
     typedef ParamType paramType;
 
     GetHashFuncType<ParamType> getHashFunc;
-    SaveTranFuncType<ParamType> saveFunc;
-    SaveSerializedTranFuncType<ParamType> saveSerializedFunc;
     CreateTransactionFromAbstractTransactionFuncType<ParamType> createTransactionFromAbstractTransactionFunc;
     TriggerNotificationFuncType<ParamType> triggerNotificationFunc;
     CheckSavePermissionFuncType<ParamType> checkSavePermissionFunc;
@@ -178,8 +172,6 @@ struct TransactionDescriptor : TransactionDescriptorBase
 
     template<
 		typename GetHashF,
-		typename SaveF,
-		typename SaveSerializedF,
 		typename CreateTranF,
 		typename TriggerNotificationF,
 		typename CheckSavePermissionFunc,
@@ -194,8 +186,6 @@ struct TransactionDescriptor : TransactionDescriptorBase
         bool isSystem,
         const char* name,
         GetHashF&& getHashFunc,
-        SaveF&& saveFunc,
-        SaveSerializedF&& saveSerializedFunc,
         CreateTranF&& createTransactionFromAbstractTransactionFunc,
         TriggerNotificationF&& triggerNotificationFunc,
         CheckSavePermissionFunc&& checkSavePermissionFunc,
@@ -207,8 +197,6 @@ struct TransactionDescriptor : TransactionDescriptorBase
         :
         TransactionDescriptorBase(value, isPersistent, isSystem, name),
         getHashFunc(std::forward<GetHashF>(getHashFunc)),
-        saveFunc(std::forward<SaveF>(saveFunc)),
-        saveSerializedFunc(std::forward<SaveSerializedF>(saveSerializedFunc)),
         createTransactionFromAbstractTransactionFunc(std::forward<CreateTranF>(createTransactionFromAbstractTransactionFunc)),
         triggerNotificationFunc(std::forward<TriggerNotificationF>(triggerNotificationFunc)),
         checkSavePermissionFunc(std::forward<CheckSavePermissionFunc>(checkSavePermissionFunc)),
@@ -310,5 +298,3 @@ static QnUuid transactionHash(ApiCommand::Value command, const Param &param)
 }
 
 } //namespace ec2
-
-#endif

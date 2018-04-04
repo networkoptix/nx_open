@@ -2,6 +2,10 @@
 
 namespace ec2 {
 
+QnUpdatesNotificationManager::QnUpdatesNotificationManager()
+{
+}
+
 void QnUpdatesNotificationManager::triggerNotification(const QnTransaction<ApiUpdateUploadData> &transaction, NotificationSource /*source*/)
 {
     NX_ASSERT(transaction.command == ApiCommand::uploadUpdate);

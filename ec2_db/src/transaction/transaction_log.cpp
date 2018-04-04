@@ -186,24 +186,6 @@ int QnTransactionLog::currentSequenceNoLock() const
     return qMax(m_state.values.value(key), m_commitData.state.values.value(key));
 }
 
-QnUuid QnTransactionLog::makeHash(const QByteArray& data1, const QByteArray& data2)
-{
-    QCryptographicHash hash(QCryptographicHash::Md5);
-    hash.addData(data1);
-    if (!data2.isEmpty())
-        hash.addData(data2);
-    return QnUuid::fromRfc4122(hash.result());
-}
-
-QnUuid QnTransactionLog::makeHash(const QByteArray &extraData, const ApiDiscoveryData &data)
-{
-    QCryptographicHash hash(QCryptographicHash::Md5);
-    hash.addData(extraData);
-    hash.addData(data.url.toUtf8());
-    hash.addData(data.id.toString().toUtf8());
-    return QnUuid::fromRfc4122(hash.result());
-}
-
 ErrorCode QnTransactionLog::updateSequence(const ApiUpdateSequenceData& data)
 {
     detail::QnDbManager::QnDbTransactionLocker

@@ -3,14 +3,13 @@
 #include <atomic>
 
 #include "common/common_module.h"
-#include <database/db_manager.h>
 #include "utils/common/synctime.h"
 
 #include "nx/fusion/model_functions.h"
 #include "transaction_descriptor.h"
 
 namespace ec2 {
-
+    
 namespace ApiCommand
 {
     QString toString(Value val) { return getTransactionDescriptorByValue(val)->getName(); }
@@ -53,5 +52,25 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (json)(ubjson)(xml)(csv_record),
     _Fields,
     (optional, true))
+
+
+QnUuid QnAbstractTransaction::makeHash(const QByteArray& data1, const QByteArray& data2)
+{
+    QCryptographicHash hash(QCryptographicHash::Md5);
+    hash.addData(data1);
+    if (!data2.isEmpty())
+        hash.addData(data2);
+    return QnUuid::fromRfc4122(hash.result());
+}
+
+QnUuid QnAbstractTransaction::makeHash(const QByteArray &extraData, const ApiDiscoveryData &data)
+{
+    QCryptographicHash hash(QCryptographicHash::Md5);
+    hash.addData(extraData);
+    hash.addData(data.url.toUtf8());
+    hash.addData(data.id.toString().toUtf8());
+    return QnUuid::fromRfc4122(hash.result());
+}
+
 
 } // namespace ec2

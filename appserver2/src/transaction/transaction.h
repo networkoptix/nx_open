@@ -71,6 +71,8 @@
 namespace ec2
 {
 
+static const char ADD_HASH_DATA[] = "$$_HASH_$$";
+
 struct NotDefinedApiData {};
 
 #define TRANSACTION_DESCRIPTOR_LIST(APPLY)  \
@@ -881,7 +883,7 @@ APPLY(802, removeEventRule, ApiIdData, \
 APPLY(803, resetEventRules, ApiResetBusinessRuleData, \
                        true, \
                        false, \
-                       [] (const ApiResetBusinessRuleData&) { return QnTransactionLog::makeHash("reset_brule", ADD_HASH_DATA); }, \
+                       [] (const ApiResetBusinessRuleData&) { return QnAbstractTransaction::makeHash("reset_brule", ADD_HASH_DATA); }, \
                        BusinessEventNotificationManagerHelper(), \
                        AdminOnlyAccess(), /* save permission checker */ \
                        AllowForAllAccess(), /* read permission checker */ \
@@ -914,7 +916,7 @@ APPLY(805, execAction, ApiBusinessActionData, \
 APPLY(904, removeStoredFile, ApiStoredFilePath, \
                        true, \
                        false, \
-                       [] (const ApiStoredFilePath &params) { return QnTransactionLog::makeHash(params.path.toUtf8()); }, \
+                       [] (const ApiStoredFilePath &params) { return QnAbstractTransaction::makeHash(params.path.toUtf8()); }, \
                        [] (const QnTransaction<ApiStoredFilePath> &tran, const NotificationParams &notificationParams) \
                         { \
                             NX_ASSERT(tran.command == ApiCommand::removeStoredFile); \
@@ -1460,6 +1462,9 @@ APPLY(10201, getSystemMergeHistory, ApiSystemMergeHistoryRecordList, \
     {
     public:
         typedef Timestamp TimestampType;
+
+        static QnUuid makeHash(const QByteArray& data1, const QByteArray& data2 = QByteArray());
+        static QnUuid makeHash(const QByteArray &extraData, const ApiDiscoveryData &data);
 
         /**
          * Sets \a QnAbstractTransaction::peerID to \a commonModule()->moduleGUID().

@@ -4,7 +4,6 @@
 #include <common/common_module.h>
 #include <utils/media/bitStream.h>
 #include <utils/common/synctime.h>
-#include <database/db_manager.h>
 #include "ec_connection_notification_manager.h"
 #include <transaction/transaction_message_bus_priv.h>
 #include <nx/utils/random.h>
