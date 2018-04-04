@@ -440,7 +440,7 @@ default_sequence () {
         /etc/init.d/nx1led boot_hdd
     fi
     start_server
-    start_lite_client
+    #start_lite_client
 }
 
 case "$1" in
