@@ -7,6 +7,7 @@
 #include <nx/network/url/url_builder.h>
 
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/std/optional.h>
 #include <nx/utils/string.h>
 #include <nx/utils/sync_call.h>
 #include <nx/utils/thread/sync_queue.h>
@@ -164,8 +165,8 @@ private:
     nx::hpm::AbstractCloudDataProvider::System m_system;
     std::unique_ptr<MediaServerEmulator> m_mediaServerEmulator;
     nx::String m_serverId;
-    std::vector<std::shared_ptr<nx::stun::AsyncClient>> m_serverConnections;
-    nx::utils::SyncQueue<nx::stun::AsyncClient*> m_closeConnectionEvents;
+    std::vector<std::shared_ptr<nx::network::stun::AsyncClient>> m_serverConnections;
+    nx::utils::SyncQueue<nx::network::stun::AsyncClient*> m_closeConnectionEvents;
     nx::utils::SyncQueue<std::tuple<nx::hpm::api::ResultCode, nx::hpm::api::ListenResponse>>
         m_listenResponseQueue;
 
@@ -327,7 +328,7 @@ protected:
     }
 
 private:
-    boost::optional<RelayClusterClientFactory::Function> m_factoryFuncBak;
+    std::optional<RelayClusterClientFactory::Function> m_factoryFuncBak;
     IteratableRelayClusterClient* m_relayClient = nullptr;
 
     void installIteratableRelayClusterClient()
