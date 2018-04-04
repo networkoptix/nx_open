@@ -12,9 +12,12 @@ IMAGES_EXTENSIONS = ('ico', 'png', 'bmp', 'icns')
 
 
 def image_meta(data, extension):
-    with Image.open(io.BytesIO(data)) as img:
-        width, height = img.size
-    return OrderedDict([('width', width), ('height', height), ('format', extension)])
+    try:
+        with Image.open(io.BytesIO(data)) as img:
+            width, height = img.size
+        return OrderedDict([('width', width), ('height', height), ('format', extension)])
+    except:
+        return None
 
 
 def find_context(name, file_path, structure, product_name):
@@ -104,6 +107,8 @@ def read_data(data, short_name, context, cms_structure, product_name):
     structure_type = 'file'
     if extension in IMAGES_EXTENSIONS:
         meta = image_meta(data, extension)
+        if not meta:
+            return {'file': short_name, 'extension': extension}
         structure_type = 'image'
     elif check_if_customizable(data, short_name, cms_structure, product_name):
         return
@@ -164,12 +169,15 @@ def iterate_contexts(file_iterator):
 
 
 def process_files(file_iterator, product):
+    log_errors = []
     structure = OrderedDict([('product', product.name), ('canPreview', product.can_preview), ('contexts', [])])
     root_context = find_context('root', '.', structure, product.name)
     for short_name, context_name, data in iterate_contexts(file_iterator):
         context = find_context(context_name, context_name, structure, product.name)
-        read_data(data, short_name, context, structure, product.name)
-    return [structure]
+        error = read_data(data, short_name, context, structure, product.name)
+        if error:
+            log_errors.append(error)
+    return [structure], log_errors
 
 
 def from_zip(file_descriptor, product_name):

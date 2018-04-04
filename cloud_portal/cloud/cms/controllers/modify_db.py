@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from notifications.engines.email_engine import send
+from notifications.api import send
 from django.contrib.auth.models import Permission
 from django.db.models import Q
 
@@ -38,7 +38,7 @@ def notify_version_ready(customization, version_id, product_name, exclude_user):
 
 
 def save_unrevisioned_records(context, customization, language, data_structures,
-                              request_data, request_files, user):
+                              request_data, request_files, user, version_id=None):
     upload_errors = []
     for data_structure in data_structures:
         data_structure_name = data_structure.name
@@ -64,7 +64,7 @@ def save_unrevisioned_records(context, customization, language, data_structures,
                         (data_structure_name,
                          "Invalid file type. Uploaded file is {}. It should be {}."\
                          .format(request_files[data_structure_name].content_type,
-                                 " or ".join(data_structure.meta_settings['format'].split(',')))))
+                                 data_structure.meta_settings['format'].replace(',', ' or '))))
                     continue
 
                 # Gets the meta_settings form the DataStructure to check if the sizes are valid
@@ -131,8 +131,10 @@ def save_unrevisioned_records(context, customization, language, data_structures,
         record.save()
 
     fill_content(customization_name=customization.name,
+                 product_name=context.product.name,
                  preview=True,
                  incremental=True,
+                 version_id=version_id,
                  changed_context=context)
 
     return upload_errors
@@ -183,11 +185,12 @@ def generate_preview_link(context=None):
     return context.url + "?preview" if context else "/content/about?preview"
 
 
-def generate_preview(context=None, send_to_review=False):
+def generate_preview(context=None, version_id=None, send_to_review=False):
     fill_content(customization_name=settings.CUSTOMIZATION,
                  preview=True,
                  incremental=True,
                  changed_context=context,
+                 version_id=version_id,
                  send_to_review=send_to_review)
     return generate_preview_link(context)
 
@@ -195,26 +198,27 @@ def generate_preview(context=None, send_to_review=False):
 def publish_latest_version(customization, version_id, user):
     publish_errors = accept_latest_draft(customization, version_id, user)
     if not publish_errors:
-        fill_content(customization_name=customization.name, preview=False, incremental=True)
+        product = Product.objects.get(contentversion__id=version_id)
+        fill_content(customization_name=customization.name, product_name=product.name, preview=False, incremental=True)
     return publish_errors
 
 
 def send_version_for_review(context, customization, language, data_structures,
                             product, request_data, request_files, user):
-    old_versions = ContentVersion.objects.filter(accepted_date=None, name=product.name)
+    old_versions = ContentVersion.objects.filter(accepted_date=None, product=product)
 
     if old_versions.exists():
         old_version = old_versions.latest('created_date')
         strip_version_from_records(old_version, product)
         old_version.delete()
 
+    version = ContentVersion(customization=customization,
+                             product=product, created_by=user)
+    version.save()
+
     upload_errors = save_unrevisioned_records(context,
         customization, language, data_structures,
-        request_data, request_files, user)
-
-    version = ContentVersion(customization=customization,
-                             name=product.name, created_by=user)
-    version.save()
+        request_data, request_files, user, version_id=version.id)
 
     update_records_to_version(Context.objects.filter(
         product=product), customization, version)
@@ -238,7 +242,6 @@ def get_records_for_version(version):
 
 
 def is_valid_file_type(file_type, meta_types):
-    print meta_types.split(',')
     for meta_type in meta_types.split(','):
         if meta_type in file_type:
             return False
