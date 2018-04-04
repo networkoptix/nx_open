@@ -83,10 +83,6 @@ include(compiler_options)
 include(output_directories)
 include(distribution_names)
 
-if(MACOSX OR IOS)
-    include(macosx_keychain)
-endif()
-
 if(WINDOWS OR ANDROID OR IOS)
     set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
 else()
@@ -96,6 +92,10 @@ endif()
 include(dependencies)
 include(maven_compatibility)
 include(generate_current_config)
+
+if(MACOSX OR IOS)
+    include(macosx_keychain)
+endif()
 
 if(WINDOWS)
     include(windows_signing)

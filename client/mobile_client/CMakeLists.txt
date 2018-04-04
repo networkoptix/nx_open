@@ -169,6 +169,10 @@ if(IOS)
         Qt5WebView
     )
 
+    if(NOT ios.skip.sign)
+        prepare_mac_keychain(mobile_client)
+    endif()
+
     set(ipa_file_name "${distribution_output_dir}/${mobile_client_distribution_name}.ipa")
 
     add_ios_ipa(mobile_client_ipa TARGET mobile_client FILE_NAME ${ipa_file_name})
