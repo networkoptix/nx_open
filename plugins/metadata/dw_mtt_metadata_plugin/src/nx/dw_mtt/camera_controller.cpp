@@ -246,7 +246,7 @@ public:
         m_cgiPreamble = kProtocol + ip + kPath;
     }
 
-    void setUserPassword(const QByteArray& user, const QByteArray& password)
+    void setCredentials(const QByteArray& user, const QByteArray& password)
     {
         m_client.setUserName(user);
         m_client.setUserPassword(password);
@@ -323,7 +323,7 @@ CameraController::CameraController(const QByteArray& ip,
     m_impl(new CameraControllerImpl)
 {
     m_impl->setCgiPreamble(m_ip);
-    m_impl->setUserPassword(m_user, m_password);
+    m_impl->setCredentials(m_user, m_password);
 }
 
 void CameraController::setIp(const QByteArray& ip)
@@ -332,11 +332,11 @@ void CameraController::setIp(const QByteArray& ip)
     m_impl->setCgiPreamble(m_ip);
 }
 
-void CameraController::setUserPassword(const QByteArray& user, const QByteArray& password)
+void CameraController::setCredentials(const QByteArray& user, const QByteArray& password)
 {
     m_user = user;
     m_password = password;
-    m_impl->setUserPassword(m_user, m_password);
+    m_impl->setCredentials(m_user, m_password);
 }
 
 void CameraController::setReadTimeout(std::chrono::seconds readTimeout)

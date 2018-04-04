@@ -10,8 +10,7 @@
 namespace nx {
 namespace mediaserver_plugins {
 namespace metadata {
-namespace dw_mtt
-{
+namespace dw_mtt {
 
 /** Description of the DwMtt analytics event. */
 struct AnalyticsEventType: nx::api::Analytics::EventType
@@ -25,9 +24,11 @@ struct AnalyticsEventType: nx::api::Analytics::EventType
 
 struct AnalyticsDriverManifest: nx::api::AnalyticsDriverManifestBase
 {
+    QList<QString> supportedCameraModels; //< Camera models supported by this plugin.
     QList<AnalyticsEventType> outputEventTypes;
+    bool supportsModel(const QString& model) const noexcept;
 };
-#define DwMttAnalyticsDriverManifest_Fields AnalyticsDriverManifestBase_Fields (outputEventTypes)
+#define DwMttAnalyticsDriverManifest_Fields AnalyticsDriverManifestBase_Fields (supportedCameraModels)(outputEventTypes)
 
 QN_FUSION_DECLARE_FUNCTIONS(AnalyticsEventType, (json))
 QN_FUSION_DECLARE_FUNCTIONS(AnalyticsDriverManifest, (json))

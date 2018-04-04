@@ -5,6 +5,10 @@
         "value": "DW_MTT driver",
         "localization": {}
     },
+    "supportedCameraModels":
+    [
+        "DWC-MTT4Wi36"
+    ],
     "outputEventTypes":
     [
         {

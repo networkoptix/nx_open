@@ -60,6 +60,7 @@ public:
 
     void reconnectSocket();
 
+    /** When some bytes received from notification server or when connection was broken/closed. */
     void onReceive(SystemError::ErrorCode, size_t);
 
     void onConnect(SystemError::ErrorCode code);

@@ -304,13 +304,13 @@ void Manager::reconnectSocket()
     m_reconnectTimer.pleaseStop(
         [this]()
         {
-
+            using namespace std::chrono;
             m_tcpSocket.reset();
             m_tcpSocket = std::make_unique<nx::network::TCPSocket>();
             m_tcpSocket->setNonBlockingMode(true);
             m_tcpSocket->bindToAioThread(m_reconnectTimer.getAioThread());
-            m_tcpSocket->setSendTimeout(kSendTimeout.count() * 1000);
-            m_tcpSocket->setRecvTimeout(kReceiveTimeout.count() * 1000);
+            m_tcpSocket->setSendTimeout(duration_cast<milliseconds>(kSendTimeout).count());
+            m_tcpSocket->setRecvTimeout(duration_cast<milliseconds>(kReceiveTimeout).count());
 
             m_tcpSocket->connectAsync(
                 m_cameraAddress,
@@ -328,7 +328,7 @@ nx::sdk::Error Manager::startFetchingMetadata(nx::sdk::metadata::MetadataHandler
 
     const QByteArray host = m_url.host().toLatin1();
     m_cameraController.setIp(m_url.host().toLatin1());
-    m_cameraController.setUserPassword(m_auth.user().toLatin1(), m_auth.password().toLatin1());
+    m_cameraController.setCredentials(m_auth.user().toLatin1(), m_auth.password().toLatin1());
 
     for (int i = 0; i < eventTypeListSize; ++i)
     {

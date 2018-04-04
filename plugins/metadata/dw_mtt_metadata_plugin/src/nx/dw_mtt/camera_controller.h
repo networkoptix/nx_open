@@ -30,7 +30,7 @@ public:
     ~CameraController() = default;
 
     void setIp(const QByteArray& ip);
-    void setUserPassword(const QByteArray& user, const QByteArray& password);
+    void setCredentials(const QByteArray& user, const QByteArray& password);
     void setReadTimeout(std::chrono::seconds readTimeout);
 
     QByteArray ip() const noexcept { return m_ip; }

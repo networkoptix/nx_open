@@ -7,6 +7,7 @@
 
 #include <QtCore/QString>
 #include <QtCore/QUrlQuery>
+#include <QtCore/QFileInfo>
 #include <QtCore/QFile>
 
 #include <nx/network/http/http_client.h>
@@ -16,6 +17,7 @@
 #include <nx/network/http/asynchttpclient.h>
 
 #include "manager.h"
+#include "log.h"
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -28,6 +30,13 @@ static const char* const kPluginName = "DW MTT metadata plugin";
 static const QString kDwMttVendor("digitalwatchdog");
 // Just for information: DW VCA camera's vendor string is "cap".
 
+QString normalize(const QString& name)
+{
+    QString result = name.toLower().simplified();
+    result.replace(" ", "");
+    return result;
+}
+
 } // namespace
 
 using namespace nx::sdk;
@@ -36,10 +45,22 @@ using namespace nx::sdk::metadata;
 Plugin::Plugin()
 {
     static const char* const kResourceName=":/dw_mtt/manifest.json";
+    static const char* const kFileName = "plugins/dw_mtt/manifest.json";
     QFile f(kResourceName);
     if (f.open(QFile::ReadOnly))
         m_manifest = f.readAll();
+    {
+        QFile file(kFileName);
+        if (file.open(QFile::ReadOnly))
+        {
+            NX_PRINT << "Switch to external manifest file "
+                << QFileInfo(file).absoluteFilePath().toStdString();
+            m_manifest = file.readAll();
+        }
+    }
     m_typedManifest = QJson::deserialized<AnalyticsDriverManifest>(m_manifest);
+    for (auto& model: m_typedManifest.supportedCameraModels)
+        model = normalize(model);
 }
 
 void* Plugin::queryInterface(const nxpl::NX_GUID& interfaceId)
@@ -81,26 +102,25 @@ const char* Plugin::name() const
     return kPluginName;
 }
 
-void Plugin::setSettings(const nxpl::Setting* settings, int count)
+void Plugin::setSettings(const nxpl::Setting* /*settings*/, int /*count*/)
 {
 }
 
-void Plugin::setPluginContainer(nxpl::PluginInterface* pluginContainer)
+void Plugin::setPluginContainer(nxpl::PluginInterface* /*pluginContainer*/)
 {
 }
 
-void Plugin::setLocale(const char* locale)
+void Plugin::setLocale(const char* /*locale*/)
 {
 }
 
-CameraManager* Plugin::obtainCameraManager(
-    const CameraInfo& cameraInfo,
-    Error* outError)
+CameraManager* Plugin::obtainCameraManager(const CameraInfo& cameraInfo, Error* outError)
 {
     *outError = Error::noError;
-    auto vendor = QString(cameraInfo.vendor).toLower().simplified();
-    vendor.replace(" ", "");
-    if (vendor.startsWith(kDwMttVendor))
+    auto vendor = normalize(QString(cameraInfo.vendor));
+    auto model = normalize(QString(cameraInfo.model));
+
+    if (vendor.startsWith(kDwMttVendor) && m_typedManifest.supportsModel(model))
         return new Manager(this, cameraInfo, m_typedManifest);
     else
         return nullptr;
