@@ -66,12 +66,13 @@ if(box STREQUAL "bpi")
 endif()
 
 if(ANDROID)
-    file(COPY "maven/bin-resources/android" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
-    file(COPY "${customization_dir}/icons/android/android"
-        DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
-    configure_file("maven/filter-resources/android/AndroidManifest.xml"
+    nx_copy(${CMAKE_CURRENT_SOURCE_DIR}/maven/bin-resources/android
+        DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+    nx_copy(${customization_dir}/icons/android/android
+        DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+    nx_configure_file("maven/filter-resources/android/AndroidManifest.xml"
         "${CMAKE_CURRENT_BINARY_DIR}/android/AndroidManifest.xml")
-    configure_file("./maven/filter-resources/android/res/values/strings.xml"
+    nx_configure_file("maven/filter-resources/android/res/values/strings.xml"
         "${CMAKE_CURRENT_BINARY_DIR}/android/res/values/strings.xml")
 
     get_target_property(OPENSSL_LIBS openssl INTERFACE_LINK_LIBRARIES)

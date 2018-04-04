@@ -58,6 +58,7 @@ function(add_android_apk target)
 
     set(settings_file "${CMAKE_CURRENT_BINARY_DIR}/android-deployment-settings.json")
     file(GENERATE OUTPUT "${settings_file}" CONTENT "${settings}")
+    nx_store_known_file(${settings_file})
 
     if(CMAKE_BUILD_TYPE STREQUAL "Release")
         set(build_type --release)
@@ -121,4 +122,5 @@ function(add_android_apk target)
 
     set(pro_file "${CMAKE_CURRENT_BINARY_DIR}/${APK_TARGET}.pro")
     file(GENERATE OUTPUT "${pro_file}" CONTENT "${pro_file_content}")
+    nx_store_known_file(${pro_file})
 endfunction()
