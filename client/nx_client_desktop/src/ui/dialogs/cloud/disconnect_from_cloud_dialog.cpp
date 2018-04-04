@@ -19,12 +19,14 @@
 #include <ui/help/help_topics.h>
 #include <ui/style/custom_style.h>
 #include <ui/style/skin.h>
-#include <ui/widgets/common/busy_indicator_button.h>
-#include <ui/widgets/common/input_field.h>
+#include <nx/client/desktop/common/widgets/busy_indicator_button.h>
+#include <nx/client/desktop/common/widgets/input_field.h>
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/common/app_info.h>
 #include <utils/common/delayed.h>
+
+using namespace nx::client::desktop;
 
 class QnDisconnectFromCloudDialogPrivate : public QObject, public QnWorkbenchContextAware
 {
@@ -78,12 +80,12 @@ private:
 public:
     const Scenario scenario;
     QWidget* authorizeWidget;
-    QnInputField* authorizePasswordField;
+    InputField* authorizePasswordField;
     QWidget* resetPasswordWidget;
-    QnInputField* resetPasswordField;
-    QnInputField* confirmPasswordField;
-    QnBusyIndicatorButton* nextButton;
-    QnBusyIndicatorButton* okButton;
+    InputField* resetPasswordField;
+    InputField* confirmPasswordField;
+    BusyIndicatorButton* nextButton;
+    BusyIndicatorButton* okButton;
     bool unlinkedSuccessfully;
 
 private:
@@ -250,11 +252,11 @@ void QnDisconnectFromCloudDialogPrivate::setupUi()
     Q_Q(QnDisconnectFromCloudDialog);
     q->setStandardButtons(QDialogButtonBox::Cancel);
 
-    okButton = new QnBusyIndicatorButton(q);
+    okButton = new BusyIndicatorButton(q);
     okButton->setText(tr("Disconnect"));
     q->addButton(okButton, QDialogButtonBox::AcceptRole);
 
-    nextButton = new QnBusyIndicatorButton(q);
+    nextButton = new BusyIndicatorButton(q);
     nextButton->setText(tr("Next")); // Title from OS theme
     q->addButton(nextButton, QDialogButtonBox::ActionRole);
 
@@ -444,13 +446,13 @@ void QnDisconnectFromCloudDialogPrivate::createAuthorizeWidget()
     layout->setSpacing(style::Metrics::kDefaultLayoutSpacing.height());
     layout->setContentsMargins(style::Metrics::kDefaultTopLevelMargins);
 
-    auto loginField = new QnInputField();
+    auto loginField = new InputField();
     loginField->setReadOnly(true);
     loginField->setTitle(tr("Login"));
     loginField->setText(context()->user()->getName());
     layout->addWidget(loginField);
 
-    authorizePasswordField = new QnInputField();
+    authorizePasswordField = new InputField();
     authorizePasswordField->setTitle(tr("Password"));
     authorizePasswordField->setEchoMode(QLineEdit::Password);
     authorizePasswordField->setValidator(
@@ -459,7 +461,7 @@ void QnDisconnectFromCloudDialogPrivate::createAuthorizeWidget()
             auto user = context()->user();
             NX_ASSERT(user);
             if (!user)
-                return Qn::ValidationResult(tr("Internal Error"));
+                return ValidationResult(tr("Internal Error"));
 
             switch (scenario)
             {
@@ -467,25 +469,25 @@ void QnDisconnectFromCloudDialogPrivate::createAuthorizeWidget()
                 {
                     NX_ASSERT(user->isLocal());
                     return user->checkLocalUserPassword(password)
-                        ? Qn::kValidResult
-                        : Qn::ValidationResult(tr("Wrong Password"));
+                        ? ValidationResult::kValid
+                        : ValidationResult(tr("Wrong Password"));
                 }
                 case Scenario::CloudOwner:
                 case Scenario::CloudOwnerOnly:
                 {
                     NX_ASSERT(user->isCloud());
                     if (!m_cloudPasswordCache.contains(password))
-                        return Qn::kValidResult;
+                        return ValidationResult::kValid;
 
                     return m_cloudPasswordCache[password]
-                        ? Qn::kValidResult
-                        : Qn::ValidationResult(tr("Wrong Password"));
+                        ? ValidationResult::kValid
+                        : ValidationResult(tr("Wrong Password"));
                 }
                 default:
                     break;
             }
             NX_ASSERT(false, "Should never get here");
-            return Qn::ValidationResult(tr("Internal Error"));
+            return ValidationResult(tr("Internal Error"));
         });
 
     authorizeWidget->setFocusPolicy(Qt::TabFocus);
@@ -494,7 +496,7 @@ void QnDisconnectFromCloudDialogPrivate::createAuthorizeWidget()
     layout->addWidget(authorizePasswordField);
 
     QnAligner* aligner = new QnAligner(authorizeWidget);
-    aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
+    aligner->registerTypeAccessor<InputField>(InputField::createLabelWidthAccessor());
     aligner->addWidget(loginField);
     aligner->addWidget(authorizePasswordField);
 }
@@ -509,42 +511,42 @@ void QnDisconnectFromCloudDialogPrivate::createResetPasswordWidget()
     auto owner = resourcePool()->getAdministrator();
     NX_ASSERT(owner);
 
-    auto loginField = new QnInputField(resetPasswordWidget);
+    auto loginField = new InputField(resetPasswordWidget);
     loginField->setTitle(tr("Login"));
     loginField->setReadOnly(true);
     loginField->setText(owner->getName());
     layout->addWidget(loginField);
     layout->addSpacing(style::Metrics::kDefaultLayoutSpacing.height());
 
-    resetPasswordField = new QnInputField();
+    resetPasswordField = new InputField();
     resetPasswordField->setTitle(tr("Password"));
     resetPasswordField->setEchoMode(QLineEdit::Password);
     resetPasswordField->setPasswordIndicatorEnabled(true);
-    resetPasswordField->setValidator(Qn::defaultPasswordValidator(false));
+    resetPasswordField->setValidator(defaultPasswordValidator(false));
     layout->addWidget(resetPasswordField);
 
-    confirmPasswordField = new QnInputField();
+    confirmPasswordField = new InputField();
     confirmPasswordField->setTitle(tr("Confirm Password"));
     confirmPasswordField->setEchoMode(QLineEdit::Password);
-    confirmPasswordField->setValidator(Qn::defaultConfirmationValidator(
+    confirmPasswordField->setValidator(defaultConfirmationValidator(
         [this]() { return resetPasswordField->text(); },
         tr("Passwords do not match.")));
     layout->addWidget(confirmPasswordField);
 
-    connect(resetPasswordField, &QnInputField::textChanged, this, [this]()
+    connect(resetPasswordField, &InputField::textChanged, this, [this]()
     {
         if (!confirmPasswordField->text().isEmpty())
             confirmPasswordField->validate();
     });
 
-    connect(resetPasswordField, &QnInputField::editingFinished,
-        confirmPasswordField, &QnInputField::validate);
+    connect(resetPasswordField, &InputField::editingFinished,
+        confirmPasswordField, &InputField::validate);
 
     resetPasswordWidget->setFocusPolicy(Qt::TabFocus);
     resetPasswordWidget->setFocusProxy(resetPasswordField);
 
     QnAligner* aligner = new QnAligner(resetPasswordWidget);
-    aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
+    aligner->registerTypeAccessor<InputField>(InputField::createLabelWidthAccessor());
     aligner->addWidgets({
         loginField,
         resetPasswordField,

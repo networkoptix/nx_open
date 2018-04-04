@@ -47,10 +47,10 @@ CameraInfoWidget::CameraInfoWidget(QWidget* parent):
             updatePageSwitcher();
         });
 
-    connect(ui->primaryStreamCopyButton, &ui::ClipboardButton::clicked, this,
-        [this] { ui::ClipboardButton::setClipboardText(ui->primaryStreamLabel->text()); });
-    connect(ui->secondaryStreamCopyButton, &ui::ClipboardButton::clicked, this,
-        [this] { ui::ClipboardButton::setClipboardText(ui->secondaryStreamLabel->text()); });
+    connect(ui->primaryStreamCopyButton, &ClipboardButton::clicked, this,
+        [this] { ClipboardButton::setClipboardText(ui->primaryStreamLabel->text()); });
+    connect(ui->secondaryStreamCopyButton, &ClipboardButton::clicked, this,
+        [this] { ClipboardButton::setClipboardText(ui->secondaryStreamLabel->text()); });
 
 
 
@@ -93,7 +93,7 @@ void CameraInfoWidget::setStore(CameraSettingsDialogStore* store)
 {
     connect(store, &CameraSettingsDialogStore::stateChanged, this, &CameraInfoWidget::loadState);
 
-    connect(ui->nameLabel, &QnEditableLabel::textChanged, store,
+    connect(ui->nameLabel, &EditableLabel::textChanged, store,
         [store](const QString& text)
         {
             store->setSingleCameraUserName(text);

@@ -28,7 +28,7 @@
 #include <core/resource_management/resource_runtime_data.h>
 
 #include <nx/client/core/utils/geometry.h>
-#include <nx/client/desktop/ui/common/painter_transform_scale_stripper.h>
+#include <nx/client/desktop/common/utils/painter_transform_scale_stripper.h>
 #include <nx/client/desktop/ui/graphics/items/overlays/selection_overlay_widget.h>
 #include <ui/common/cursor_cache.h>
 #include <ui/common/palette.h>
@@ -60,7 +60,7 @@
 #include <ui/style/nx_style.h>
 #include <nx/utils/string.h>
 
-using namespace nx::client::desktop::ui;
+using namespace nx::client::desktop;
 using nx::client::core::Geometry;
 
 namespace {
@@ -247,7 +247,7 @@ void QnResourceWidget::setupHud()
 
 void QnResourceWidget::setupSelectionOverlay()
 {
-    addOverlayWidget(new SelectionWidget(this), {Visible, false, false, SelectionLayer});
+    addOverlayWidget(new ui::SelectionWidget(this), {Visible, false, false, SelectionLayer});
 }
 
 void QnResourceWidget::createButtons()

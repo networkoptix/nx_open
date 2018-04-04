@@ -36,13 +36,13 @@ FilenamePanel::FilenamePanel(QWidget* parent):
     ui->extensionsComboBox->setCustomTextRole(Qn::ShortTextRole);
 
     const auto aligner = new QnAligner(this);
-    aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
+    aligner->registerTypeAccessor<InputField>(InputField::createLabelWidthAccessor());
     aligner->addWidgets({ui->folderInputField, ui->nameInputField});
 
     ui->folderInputField->setTitle(tr("Folder"));
     ui->folderInputField->setReadOnly(true);
     ui->nameInputField->setTitle(tr("Name"));
-    ui->nameInputField->setValidator(Qn::defaultNonEmptyValidator(tr("Name cannot be empty.")));
+    ui->nameInputField->setValidator(defaultNonEmptyValidator(tr("Name cannot be empty.")));
 
     connect(this, &FilenamePanel::filenameChanged, this,
         [this](const Filename& filename)
@@ -50,7 +50,7 @@ FilenamePanel::FilenamePanel(QWidget* parent):
             ui->nameInputField->setToolTip(filename.completeFileName());
         });
 
-    connect(ui->nameInputField, &QnInputField::textChanged, this,
+    connect(ui->nameInputField, &InputField::textChanged, this,
         [this](const QString& text)
         {
             d->filename.name = text;
