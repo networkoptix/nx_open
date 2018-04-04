@@ -191,7 +191,7 @@
 /* Adjustments for paragraphs */
 .lang-lg,
 .lang-lg:after       { top:   0px; position: relative; }
-.lang-sm             { top:   1px; position: relative; }
+// not needed as buttons should be using flexbox --TT  //.lang-sm             { top:   1px; position: relative; }
 .lang-sm:after       { top:  -1px; position: relative; }
 .lang-xs             { top:   4px; position: relative; }
 .lang-xs:after       { top:  -4px; position: relative; }
@@ -248,7 +248,7 @@ h6>.lang-xs       { top:   1px; }
 h6>.lang-xs:after { top:  -1px; }
 
 /* Adjustments for buttons */
-.btn>.lang-sm              { top:   2px; }
+// not needed as buttons should be using flexbox --TT  //.btn>.lang-sm              { top:   2px; }
 .btn>.lang-sm:after        { top:  -2px; }
 .btn>.lang-xs              { top:   4px; }
 .btn>.lang-xs:after        { top:  -4px; }

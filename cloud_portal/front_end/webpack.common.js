@@ -2,7 +2,6 @@ const path = require('path');
 const minimist = require('minimist');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 
@@ -27,7 +26,6 @@ module.exports = {
     },
     plugins: [
         //Development plugins
-        new CleanWebpackPlugin(['dist']),
 
         new webpack.ContextReplacementPlugin(
             // The (\\|\/) piece accounts for path separators in *nix and Windows
@@ -52,7 +50,7 @@ module.exports = {
             {
                 from: '',
                 to: '',
-                ignore: ['bower_components/**', 'styles/**', '.*', '*.js', 'index-template.html', 'index.html']
+                ignore: ['styles/**', '.*', '*.js', 'index-template.html', 'index.html']
             }
         ]),
 
