@@ -67,6 +67,17 @@ const std::chrono::seconds kDefaultIntermediateResponseValidityPeriod = std::chr
 const QLatin1String kOfflineUserHashValidityPeriod("auth/offlineUserHashValidityPeriod");
 const std::chrono::minutes kDefaultOfflineUserHashValidityPeriod = 14 * std::chrono::hours(24);
 
+const QLatin1String kCheckForExpiredAuthPeriod("auth/checkForExpiredAuthPeriod");
+constexpr std::chrono::milliseconds kDefaultCheckForExpiredAuthPeriod =
+    std::chrono::minutes(10);
+
+const QLatin1String kContinueUpdatingExpiredAuthPeriod("auth/continueUpdatingExpiredAuthPeriod");
+constexpr std::chrono::milliseconds kDefaultContinueUpdatingExpiredAuthPeriod =
+    std::chrono::minutes(1);
+
+const QLatin1String kMaxSystemsToUpdateAtATime("auth/maxSystemsToUpdateAtATime");
+constexpr int kDefaultMaxSystemsToUpdateAtATime = 11;
+
 //-------------------------------------------------------------------------------------------------
 // Event manager settings
 const QLatin1String kMediaServerConnectionIdlePeriod("eventManager/mediaServerConnectionIdlePeriod");
@@ -106,7 +117,10 @@ Auth::Auth():
     rulesXmlPath(kDefaultAuthXmlPath),
     nonceValidityPeriod(kDefaultNonceValidityPeriod),
     intermediateResponseValidityPeriod(kDefaultIntermediateResponseValidityPeriod),
-    offlineUserHashValidityPeriod(kDefaultOfflineUserHashValidityPeriod)
+    offlineUserHashValidityPeriod(kDefaultOfflineUserHashValidityPeriod),
+    checkForExpiredAuthPeriod(),
+    continueUpdatingExpiredAuthPeriod(),
+    maxSystemsToUpdateAtATime()
 {
 }
 
@@ -322,20 +336,7 @@ void Settings::loadSettings()
             kControlSystemStatusByDb,
             kDefaultControlSystemStatusByDb ? "true" : "false").toString() == "true";
 
-    //auth
-    m_auth.rulesXmlPath = settings().value(kAuthXmlPath, kDefaultAuthXmlPath).toString();
-    m_auth.nonceValidityPeriod = duration_cast<seconds>(
-        nx::utils::parseTimerDuration(
-            settings().value(kNonceValidityPeriod).toString(),
-            kDefaultNonceValidityPeriod));
-    m_auth.intermediateResponseValidityPeriod = duration_cast<seconds>(
-        nx::utils::parseTimerDuration(
-            settings().value(kIntermediateResponseValidityPeriod).toString(),
-            kDefaultIntermediateResponseValidityPeriod));
-    m_auth.offlineUserHashValidityPeriod = duration_cast<minutes>(
-        nx::utils::parseTimerDuration(
-            settings().value(kOfflineUserHashValidityPeriod).toString(),
-            kDefaultOfflineUserHashValidityPeriod));
+    loadAuth();
 
     //event manager
     m_eventManager.mediaServerConnectionIdlePeriod = duration_cast<seconds>(
@@ -366,6 +367,39 @@ void Settings::loadSettings()
         nx::utils::parseTimerDuration(
             settings().value(kVmsGatewayRequestTimeout).toString(),
             kDefaultVmsGatewayRequestTimeout);
+}
+
+void Settings::loadAuth()
+{
+    using namespace std::chrono;
+
+    m_auth.rulesXmlPath = settings().value(kAuthXmlPath, kDefaultAuthXmlPath).toString();
+
+    m_auth.nonceValidityPeriod = duration_cast<seconds>(
+        nx::utils::parseTimerDuration(
+            settings().value(kNonceValidityPeriod).toString(),
+            kDefaultNonceValidityPeriod));
+
+    m_auth.intermediateResponseValidityPeriod = duration_cast<seconds>(
+        nx::utils::parseTimerDuration(
+            settings().value(kIntermediateResponseValidityPeriod).toString(),
+            kDefaultIntermediateResponseValidityPeriod));
+
+    m_auth.offlineUserHashValidityPeriod = duration_cast<seconds>(
+        nx::utils::parseTimerDuration(
+            settings().value(kOfflineUserHashValidityPeriod).toString(),
+            kDefaultOfflineUserHashValidityPeriod));
+
+    m_auth.checkForExpiredAuthPeriod = nx::utils::parseTimerDuration(
+        settings().value(kCheckForExpiredAuthPeriod).toString(),
+        kDefaultCheckForExpiredAuthPeriod);
+
+    m_auth.continueUpdatingExpiredAuthPeriod = nx::utils::parseTimerDuration(
+        settings().value(kContinueUpdatingExpiredAuthPeriod).toString(),
+        kDefaultContinueUpdatingExpiredAuthPeriod);
+
+    m_auth.maxSystemsToUpdateAtATime = settings().value(
+        kMaxSystemsToUpdateAtATime, kDefaultMaxSystemsToUpdateAtATime).toInt();
 }
 
 } // namespace conf
