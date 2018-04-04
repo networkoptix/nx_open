@@ -2,8 +2,7 @@ nx_option(hardwareSigning
     "Sign windows binaries with hardware smart card key"
     OFF)
 
-# Alternative to http://tsa.startssl.com/rfc3161
-set(signing_timestamp_server "http://timestamp.digicert.com")
+set(signing_timestamp_server "http://tsa.startssl.com/rfc3161")
 
 function(nx_sign_windows_executable target)
     find_program(SIGNTOOL_EXECUTABLE signtool.exe

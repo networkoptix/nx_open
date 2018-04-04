@@ -1428,7 +1428,7 @@ CameraDiagnostics::Result HanwhaResource::fetchExistingProfiles()
     {
         return CameraDiagnostics::RequestFailedResult(
             response.requestUrl(),
-            lit("can't read video profile policy"));
+            lit("Can't read video profile policy"));
     }
 
 

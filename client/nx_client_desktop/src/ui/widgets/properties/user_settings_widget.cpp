@@ -79,7 +79,7 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
         ui->cloudEmailInputField };
 
     ui->userTypeComboBox->insertItem(kLocalIndex, tr("Local"));
-    ui->userTypeComboBox->insertItem(kCloudIndex, tr("Cloud"));
+    ui->userTypeComboBox->insertItem(kCloudIndex, nx::network::AppInfo::shortCloudName());
     ui->userTypeComboBox->setMinimumWidth(qMax(kUserTypeComboMinimumWidth,
         ui->userTypeComboBox->minimumSizeHint().width()));
 
@@ -462,7 +462,10 @@ void QnUserSettingsWidget::setupInputFields()
                 if (user->getEmail().toLower() != email)
                     continue;
 
-                return Qn::ValidationResult(tr("Cloud user with specified email already exists."));
+                return Qn::ValidationResult(
+                    tr("%1 user with specified email already exists.",
+                        "%1 is the short cloud name (like 'Cloud')")
+                    .arg(nx::network::AppInfo::shortCloudName()));
             }
 
             result = Qn::defaultEmailValidator()(text);

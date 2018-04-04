@@ -42,7 +42,7 @@ angular.module('nxCommon')
 
         Animation.prototype.linear = function(start,stop,time,duration){
             var result = start + (stop-start)*time/duration;
-            if(Number.isNaN(result)){
+            if(isNaN(result)){
                 console.error('linear-error',result,start,stop,time,duration);
                 throw "Animation value is not a number";
             }
@@ -51,7 +51,7 @@ angular.module('nxCommon')
         Animation.prototype.smooth = function(start,stop,time,duration){
             var delta = (Math.sin(time/duration * Math.PI - Math.PI / 2) + 1)/2;
             var result =start + (stop - start) * delta;
-            if(Number.isNaN(result)){
+            if(isNaN(result)){
                 throw "Animation value is not a number";
             }
             return  result;
@@ -77,7 +77,7 @@ angular.module('nxCommon')
             var proportion = time/duration;
             var delta = proportion * (2 - proportion);
             var result =start + (stop - start) * delta;
-            if(Number.isNaN(result)){
+            if(isNaN(result)){
                 console.error('dryResistance-error',result,start,stop,time,duration);
                 throw "Animation value is not a number";
             }
@@ -192,10 +192,10 @@ angular.module('nxCommon')
                 {
                     duration = defaultDuration;
                 }
-
-                if(Number.isNaN(value)){
-                    throw 'Animation target is not a number';
+                if(isNaN(target)){
+                    throw "Animation target is not a number";
                 }
+
                 var targetAnimation = this.animating(scope, value);
                 if(targetAnimation){
                     targetAnimation.breakAnimation();

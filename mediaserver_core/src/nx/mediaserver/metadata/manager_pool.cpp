@@ -51,11 +51,13 @@ using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 using namespace nx::debugging;
 
-ManagerPool::ManagerPool(QnMediaServerModule* serverModule):
+ManagerPool::ManagerPool(QnMediaServerModule* serverModule, QThread* thread):
     m_serverModule(serverModule),
     m_visualMetadataDebugger(
-        VisualMetadataDebuggerFactory::makeDebugger(DebuggerType::managerPool))
+        VisualMetadataDebuggerFactory::makeDebugger(DebuggerType::managerPool)),
+    m_thread(thread)
 {
+    NX_ASSERT(thread);
 }
 
 ManagerPool::~ManagerPool()
@@ -67,6 +69,7 @@ ManagerPool::~ManagerPool()
 void ManagerPool::stop()
 {
     disconnect(this);
+    m_thread->quit();
     m_contexts.clear();
 }
 
