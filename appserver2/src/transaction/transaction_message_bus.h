@@ -13,7 +13,6 @@
 #include "transaction.h"
 #include <nx/network/deprecated/asynchttpclient.h>
 #include "transaction_transport.h"
-#include <transaction/transaction_log.h>
 #include "runtime_transaction_log.h"
 #include "transport_connection_info.h"
 

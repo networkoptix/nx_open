@@ -1,4 +1,5 @@
-#include "license_manager.h"
+#include "license_notification_manager.h"
+#include "nx_ec/data/api_conversion_functions.h"
 
 namespace ec2 {
 

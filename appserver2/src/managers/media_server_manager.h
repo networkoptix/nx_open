@@ -6,27 +6,6 @@
 
 namespace ec2
 {
-    class QnMediaServerNotificationManager: public AbstractMediaServerNotificationManager
-    {
-    public:
-        QnMediaServerNotificationManager();
-
-        void triggerNotification( const QnTransaction<ApiMediaServerData>& tran, NotificationSource source);
-
-        void triggerNotification( const QnTransaction<ApiStorageData>& tran, NotificationSource source);
-
-        void triggerNotification( const QnTransaction<ApiStorageDataList>& tran, NotificationSource source);
-
-        void triggerNotification( const QnTransaction<ApiIdData>& tran, NotificationSource source);
-
-        void triggerNotification( const QnTransaction<ApiIdDataList>& tran, NotificationSource source);
-
-        void triggerNotification( const QnTransaction<ApiMediaServerUserAttributesData>& tran, NotificationSource source);
-
-        void triggerNotification( const QnTransaction<ApiMediaServerUserAttributesDataList>& tran, NotificationSource source);
-    };
-
-    typedef std::shared_ptr<QnMediaServerNotificationManager> QnMediaServerNotificationManagerPtr;
 
     template<class QueryProcessorType>
     class QnMediaServerManager: public AbstractMediaServerManager

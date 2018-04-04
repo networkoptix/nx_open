@@ -10,60 +10,6 @@
 
 namespace ec2
 {
-    class QnResourceNotificationManager : public AbstractResourceNotificationManager
-    {
-    public:
-        QnResourceNotificationManager() {}
-
-        void triggerNotification( const QnTransaction<ApiResourceStatusData>& tran, NotificationSource source)
-        {
-            NX_LOG(lit("%1 Emit statusChanged signal for resource %2")
-                    .arg(QString::fromLatin1(Q_FUNC_INFO))
-                    .arg(tran.params.id.toString()), cl_logDEBUG2);
-            emit statusChanged( QnUuid(tran.params.id), tran.params.status, source);
-        }
-
-        void triggerNotification( const QnTransaction<ApiLicenseOverflowData>& /*tran*/, NotificationSource /*source*/) {
-            // nothing to do
-        }
-
-        void triggerNotification(const QnTransaction<ApiCleanupDatabaseData>& /*tran*/, NotificationSource /*source*/) {
-            // nothing to do
-        }
-
-        void triggerNotification( const QnTransaction<ApiResourceParamWithRefData>& tran, NotificationSource /*source*/) {
-            if (tran.command == ApiCommand::setResourceParam)
-                emit resourceParamChanged(tran.params);
-            else if (tran.command == ApiCommand::removeResourceParam)
-                emit resourceParamRemoved(tran.params);
-        }
-
-        void triggerNotification( const QnTransaction<ApiResourceParamWithRefDataList>& tran, NotificationSource /*source*/) {
-            for (const ec2::ApiResourceParamWithRefData& param : tran.params)
-            {
-                if (tran.command == ApiCommand::setResourceParams)
-                    emit resourceParamChanged(param);
-                else if (tran.command == ApiCommand::removeResourceParams)
-                    emit resourceParamRemoved(param);
-            }
-        }
-
-        void triggerNotification( const QnTransaction<ApiIdData>& tran, NotificationSource /*source*/)
-        {
-            if (tran.command == ApiCommand::removeResourceStatus)
-                emit resourceStatusRemoved(tran.params.id);
-            else
-                emit resourceRemoved(tran.params.id);
-        }
-
-        void triggerNotification( const QnTransaction<ApiIdDataList>& tran, NotificationSource /*source*/) {
-            for(const ApiIdData& id: tran.params)
-                emit resourceRemoved( id.id );
-        }
-    };
-
-    typedef std::shared_ptr<QnResourceNotificationManager> QnResourceNotificationManagerPtr;
-
 
     template<class QueryProcessorType>
     class QnResourceManager : public AbstractResourceManager

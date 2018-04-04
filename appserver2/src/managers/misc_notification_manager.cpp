@@ -1,4 +1,4 @@
-#include "misc_manager.h"
+#include "misc_notification_manager.h"
 
 namespace ec2 {
 

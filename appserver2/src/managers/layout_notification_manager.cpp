@@ -1,4 +1,4 @@
-#include "layout_manager.h"
+#include "layout_notification_manager.h"
 
 namespace ec2 {
 

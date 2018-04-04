@@ -5,21 +5,6 @@
 
 namespace ec2
 {
-    class QnCameraNotificationManager: public AbstractCameraNotificationManager
-    {
-    public:
-        QnCameraNotificationManager();
-
-        void triggerNotification(const QnTransaction<ApiCameraData>& tran, NotificationSource source);
-        void triggerNotification(const QnTransaction<ApiCameraDataList>& tran, NotificationSource source);
-        void triggerNotification(const QnTransaction<ApiCameraAttributesData>& tran, NotificationSource source);
-        void triggerNotification(const QnTransaction<ApiCameraAttributesDataList>& tran, NotificationSource source);
-        void triggerNotification(const QnTransaction<ApiIdData>& tran, NotificationSource source);
-        void triggerNotification(const QnTransaction<ApiServerFootageData>& tran, NotificationSource source);
-    };
-
-    typedef std::shared_ptr<QnCameraNotificationManager> QnCameraNotificationManagerPtr;
-
     template<class QueryProcessorType>
     class QnCameraManager: public AbstractCameraManager
     {

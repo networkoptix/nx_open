@@ -6,16 +6,6 @@ namespace ec2
 {
     class TimeSynchronizationManager;
 
-    template<typename QueryProcessorType>
-    class QnTimeNotificationManager : public AbstractTimeNotificationManager
-    {
-    public:
-        QnTimeNotificationManager(TimeSynchronizationManager* timeSyncManager);
-        ~QnTimeNotificationManager();
-    private:
-        QPointer<TimeSynchronizationManager> m_timeSyncManager;
-    };
-
     template<class QueryProcessorType>
     class QnTimeManager
     :
@@ -40,24 +30,6 @@ namespace ec2
         TimeSynchronizationManager* m_timeSyncManager;
         Qn::UserAccessData m_userAccessData;
     };
-
-    template<typename QueryProcessorType>
-    QnTimeNotificationManager<QueryProcessorType>::QnTimeNotificationManager(
-        TimeSynchronizationManager* timeSyncManager):
-        m_timeSyncManager(timeSyncManager)
-    {
-        connect(timeSyncManager, &TimeSynchronizationManager::timeChanged,
-            this, &QnTimeNotificationManager<QueryProcessorType>::timeChanged,
-            Qt::DirectConnection);
-    }
-
-    template<typename QueryProcessorType>
-    QnTimeNotificationManager<QueryProcessorType>::~QnTimeNotificationManager()
-    {
-        //safely disconnecting from TimeSynchronizationManager
-        if (m_timeSyncManager)
-            m_timeSyncManager->disconnectAndJoin( this );
-    }
 
     template<class QueryProcessorType>
     QnTimeManager<QueryProcessorType>::QnTimeManager(

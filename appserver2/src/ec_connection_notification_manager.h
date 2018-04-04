@@ -2,6 +2,22 @@
 
 #include "nx_ec/ec_api.h"
 
+#include <managers/license_notification_manager.h>
+#include <managers/resource_notification_manager.h>
+#include <managers/media_server_notification_manager.h>
+#include <managers/camera_notification_manager.h>
+#include <managers/user_notification_manager.h>
+#include <managers/business_event_notification_manager.h>
+#include <managers/layout_notification_manager.h>
+#include <managers/layout_tour_notification_manager.h>
+#include <managers/videowall_notification_manager.h>
+#include <managers/webpage_notification_manager.h>
+#include <managers/stored_file_notification_manager.h>
+#include <managers/updates_notification_manager.h>
+#include <managers/misc_notification_manager.h>
+#include <managers/discovery_notification_manager.h>
+#include <managers/time_notification_manager.h>
+
 namespace ec2 {
 
 // TODO: #2.4 remove EC prefix to avoid ec2::ECConnectionNotificationManager

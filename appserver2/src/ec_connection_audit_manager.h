@@ -1,15 +1,8 @@
-/**********************************************************
-* 28 may 2014
-* a.kolesnikov
-***********************************************************/
-
-#ifndef EC_CONNECTION_AUDIT_MANAGER_H
-#define EC_CONNECTION_AUDIT_MANAGER_H
+#pragma once
 
 #include "nx_ec/ec_api.h"
 
 #include "transaction/transaction.h"
-#include <transaction/transaction_log.h>
 #include "api/model/audit/auth_session.h"
 
 namespace ec2
@@ -52,5 +45,3 @@ namespace ec2
     };
 
 }
-
-#endif  //EC_CONNECTION_AUDIT_MANAGER_H

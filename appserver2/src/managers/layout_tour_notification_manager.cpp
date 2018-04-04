@@ -1,4 +1,4 @@
-#include "layout_tour_manager.h"
+#include "layout_tour_notification_manager.h"
 
 namespace ec2 {
 

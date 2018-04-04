@@ -4,38 +4,8 @@
 #include "nx_ec/data/api_stored_file_data.h"
 #include "transaction/transaction.h"
 
-
 namespace ec2
 {
-    class QnStoredFileNotificationManager : public AbstractStoredFileNotificationManager
-    {
-    public:
-        QnStoredFileNotificationManager() {}
-
-        void triggerNotification( const QnTransaction<ApiStoredFileData>& tran, NotificationSource /*source*/)
-        {
-            if( tran.command == ApiCommand::addStoredFile )
-            {
-                emit added( tran.params.path );
-            }
-            else if( tran.command == ApiCommand::updateStoredFile )
-            {
-                emit updated( tran.params.path );
-            }
-            else
-            {
-                NX_ASSERT( false );
-            }
-        }
-
-        void triggerNotification( const QnTransaction<ApiStoredFilePath>& tran, NotificationSource /*source*/)
-        {
-            NX_ASSERT( tran.command == ApiCommand::removeStoredFile );
-            emit removed( tran.params.path );
-        }
-    };
-
-    typedef std::shared_ptr<QnStoredFileNotificationManager> QnStoredFileNotificationManagerPtr;
 
     template<class QueryProcessorType>
     class QnStoredFileManager : public AbstractStoredFileManager

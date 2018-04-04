@@ -5,25 +5,6 @@
 
 namespace ec2 {
 
-class QnUserNotificationManager: public AbstractUserNotificationManager
-{
-public:
-    QnUserNotificationManager();
-
-    void triggerNotification(const QnTransaction<ApiUserData>& tran,
-        NotificationSource source);
-    void triggerNotification(const QnTransaction<ApiUserDataList>& tran,
-        NotificationSource source);
-    void triggerNotification(const QnTransaction<ApiIdData>& tran,
-        NotificationSource source);
-    void triggerNotification(const QnTransaction<ApiAccessRightsData>& tran,
-        NotificationSource source);
-    void triggerNotification(const QnTransaction<ApiUserRoleData>& tran,
-        NotificationSource source);
-};
-
-using QnUserNotificationManagerPtr = std::shared_ptr<QnUserNotificationManager>;
-
 template<class QueryProcessorType>
 class QnUserManager: public AbstractUserManager
 {
@@ -218,6 +199,5 @@ int QnUserManager<QueryProcessorType>::setAccessRights(const ec2::ApiAccessRight
         });
     return reqID;
 }
-
 
 } // namespace ec2

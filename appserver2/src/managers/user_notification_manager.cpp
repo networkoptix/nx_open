@@ -1,4 +1,4 @@
-#include "user_manager.h"
+#include "user_notification_manager.h"
 
 namespace ec2 {
 
