@@ -14,6 +14,9 @@ bool operator==(const AnalyticsEventType& lh, const AnalyticsEventType& rh)
 
 bool AnalyticsDriverManifest::supportsModel(const QString& model) const noexcept
 {
+    if (supportedCameraModels.isEmpty())
+        return true;
+
     return std::find(supportedCameraModels.cbegin(), supportedCameraModels.cend(), model)
         != supportedCameraModels.cend();
 }
