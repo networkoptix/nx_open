@@ -4,7 +4,7 @@ set(box "android")
 if(NOT "$ENV{ANDROID_NDK}" STREQUAL "")
     set(CMAKE_ANDROID_NDK "$ENV{ANDROID_NDK}")
 else()
-    set(CMAKE_ANDROID_NDK "${PACKAGES_DIR}/android/android-ndk-r16")
+    set(CMAKE_ANDROID_NDK "${PACKAGES_DIR}/android/android-ndk-r17")
 endif()
 
 if(NOT $ENV{ANDROID_HOME} STREQUAL "")
