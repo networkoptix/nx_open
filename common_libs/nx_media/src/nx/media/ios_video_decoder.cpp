@@ -1,6 +1,5 @@
-#if defined (Q_OS_IOS)
-
 #include "ios_video_decoder.h"
+#if defined (Q_OS_IOS)
 
 extern "C" {
 #include <libavformat/avformat.h>
@@ -32,7 +31,7 @@ namespace nx {
 namespace media {
 
 namespace {
-    
+
     bool isValidFrameSize(const QSize& size)
     {
         static const auto kMinimumFrameSize = QSize(64, 64);
@@ -250,7 +249,7 @@ void IOSVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr& fr
         codecContext->width = frameSize.width();
         codecContext->height = frameSize.height();
     }
-    
+
     codecContext->thread_count = 1;
     codecContext->opaque = this;
     codecContext->get_format = get_format;
