@@ -192,12 +192,20 @@ public:
         nx::utils::db::QueryContext* const queryContext,
         const std::string& systemId) override;
 
+    //---------------------------------------------------------------------------------------------
+    // AbstractSystemSharingManager overrides.
+
     virtual api::SystemAccessRole getAccountRightsForSystem(
         const std::string& accountEmail,
         const std::string& systemId) const override;
+
     virtual boost::optional<api::SystemSharingEx> getSystemSharingData(
         const std::string& accountEmail,
         const std::string& systemId) const override;
+
+    virtual std::vector<api::SystemSharingEx> fetchSystemUsers(
+        utils::db::QueryContext* queryContext,
+        const std::string& systemId) override;
 
     std::vector<api::SystemSharingEx> fetchAllSharings() const;
 
