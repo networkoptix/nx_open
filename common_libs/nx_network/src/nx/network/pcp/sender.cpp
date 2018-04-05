@@ -28,13 +28,12 @@ void Sender::send(std::shared_ptr<QByteArray> request)
         {
             if (result != SystemError::noError || size != (size_t)request->size())
             {
-                NX_LOG(lm("PCP Send (size=%1) error: %2")
-                    .arg(size).arg(SystemError::toString(result)), cl_logDEBUG1);
+                NX_DEBUG(this, lm("PCP Send (size=%1) error: %2")
+                    .arg(size).arg(SystemError::toString(result)));
             }
             else
             {
-                NX_LOG(lm("PCP Sent (size=%1): %2")
-                    .arg(size).arg(request->toHex()), cl_logDEBUG2);
+                NX_VERBOSE(this, lm("PCP Sent (size=%1): %2").arg(size).arg(request->toHex()));
             }
         });
 }

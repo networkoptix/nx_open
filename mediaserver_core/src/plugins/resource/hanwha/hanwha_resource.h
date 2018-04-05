@@ -257,6 +257,10 @@ private:
 
     bool setRelayOutputStateInternal(const QString& outputId, bool activate);
 
+    const HanwhaAttributes& attributes() const;
+    const HanwhaCgiParameters& cgiParameters() const;
+    int bypassChannel() const;
+
 private:
     using AdvancedParameterId = QString;
 

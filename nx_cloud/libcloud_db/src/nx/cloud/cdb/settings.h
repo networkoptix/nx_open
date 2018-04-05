@@ -26,7 +26,11 @@ public:
     QString rulesXmlPath;
     std::chrono::seconds nonceValidityPeriod;
     std::chrono::seconds intermediateResponseValidityPeriod;
-    std::chrono::minutes offlineUserHashValidityPeriod;
+    std::chrono::seconds offlineUserHashValidityPeriod;
+
+    std::chrono::milliseconds checkForExpiredAuthPeriod;
+    std::chrono::milliseconds continueUpdatingExpiredAuthPeriod;
+    int maxSystemsToUpdateAtATime;
 
     Auth();
 };
@@ -160,6 +164,8 @@ private:
     VmsGateway m_vmsGateway;
 
     virtual void loadSettings() override;
+
+    void loadAuth();
 };
 
 } // namespace conf

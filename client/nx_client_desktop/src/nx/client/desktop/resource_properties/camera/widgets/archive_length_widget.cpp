@@ -6,7 +6,7 @@
 #include <ui/help/help_topics.h>
 
 #include <ui/workaround/widgets_signals_workaround.h>
-#include <nx/client/desktop/ui/common/checkbox_utils.h>
+#include <nx/client/desktop/common/utils/checkbox_utils.h>
 
 #include "../redux/camera_settings_dialog_state.h"
 #include "../redux/camera_settings_dialog_store.h"
@@ -81,7 +81,7 @@ void ArchiveLengthWidget::loadState(const CameraSettingsDialogState& state)
     const auto load =
         [](QCheckBox* check, QSpinBox* value, const RecordingDays& data)
         {
-            ui::CheckboxUtils::setupTristateCheckbox(check, data.same, data.automatic);
+            CheckboxUtils::setupTristateCheckbox(check, data.same, data.automatic);
             value->setValue(data.absoluteValue);
             value->setEnabled(data.same && !data.automatic);
         };

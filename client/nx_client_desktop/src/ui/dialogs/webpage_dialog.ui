@@ -30,10 +30,10 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
-       <widget class="QnInputField" name="nameInputField" native="true"/>
+       <widget class="nx::client::desktop::InputField" name="nameInputField" native="true"/>
       </item>
       <item>
-       <widget class="QnInputField" name="urlInputField" native="true"/>
+       <widget class="nx::client::desktop::InputField" name="urlInputField" native="true"/>
       </item>
      </layout>
     </widget>
@@ -59,9 +59,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnInputField</class>
+   <class>nx::client::desktop::InputField</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/input_field.h</header>
+   <header location="global">nx/client/desktop/common/widgets/input_field.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

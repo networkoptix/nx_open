@@ -3337,10 +3337,6 @@ to %1</translation>
       <translation type="unfinished">Disconnect</translation>
     </message>
     <message>
-      <source>All cloud users will be deleted.</source>
-      <translation type="unfinished">All cloud users will be deleted.</translation>
-    </message>
-    <message>
       <source>Failed to disconnect System from %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation type="unfinished">Failed to disconnect System from %1</translation>
@@ -3358,6 +3354,11 @@ to %1</translation>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation type="unfinished">You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</translation>
+    </message>
+    <message>
+      <source>All %1 users will be deleted.</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">All %1 users will be deleted.</translation>
     </message>
   </context>
   <context>
@@ -6928,16 +6929,17 @@ to %1</translation>
       <translation type="unfinished">Local user</translation>
     </message>
     <message>
-      <source>Cloud user</source>
-      <translation type="unfinished">Cloud user</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation type="unfinished">Login</translation>
     </message>
     <message>
       <source>Role</source>
       <translation type="unfinished">Role</translation>
+    </message>
+    <message>
+      <source>%1 user</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 user</translation>
     </message>
   </context>
   <context>
@@ -7133,10 +7135,6 @@ to %1</translation>
       <translation type="unfinished">Local</translation>
     </message>
     <message>
-      <source>Cloud</source>
-      <translation type="unfinished">Cloud</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation type="unfinished">Login</translation>
     </message>
@@ -7177,8 +7175,9 @@ to %1</translation>
       <translation type="unfinished">Passwords do not match.</translation>
     </message>
     <message>
-      <source>Cloud user with specified email already exists.</source>
-      <translation type="unfinished">Cloud user with specified email already exists.</translation>
+      <source>%1 user with specified email already exists.</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 user with specified email already exists.</translation>
     </message>
   </context>
   <context>
@@ -7403,10 +7402,6 @@ to %1</translation>
       <translation type="unfinished">Total amount of licenses will decrease</translation>
     </message>
     <message>
-      <source>Cloud Systems cannot be merged</source>
-      <translation type="unfinished">Cloud Systems cannot be merged</translation>
-    </message>
-    <message>
       <source>Connecting to the current System...</source>
       <translation type="unfinished">Connecting to the current System...</translation>
     </message>
@@ -7425,6 +7420,11 @@ to %1</translation>
     <message>
       <source>Administrator password</source>
       <translation type="unfinished">Administrator password</translation>
+    </message>
+    <message>
+      <source>%1 Systems cannot be merged</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 Systems cannot be merged</translation>
     </message>
   </context>
   <context>

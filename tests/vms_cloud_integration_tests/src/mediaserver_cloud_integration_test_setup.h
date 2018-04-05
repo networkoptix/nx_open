@@ -52,6 +52,9 @@ public:
     ::ec2::ApiUserData inviteRandomCloudUser();
     void waitForUserToAppearInCloud(const std::string& email);
 
+protected:
+    virtual void SetUp() override;
+
 private:
     nx::cdb::CdbLauncher m_cdb;
     MediaServerLauncher m_mediaServerLauncher;
@@ -64,6 +67,5 @@ private:
     std::string m_cloudSystemId;
     std::string m_cloudSystemAuthKey;
 
-    void init();
     std::unique_ptr<MediaServerClient> allocateMediaServerClient();
 };

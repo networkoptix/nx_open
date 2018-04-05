@@ -511,7 +511,9 @@ QnStorageManager::QnStorageManager(
                     if (!storage->hasFlags(Qn::storage_fastscan))
                     {
                         auto storageIndex = qnStorageDbPool->getStorageIndex(storage);
-                        m_spaceInfo.storageRebuilded(storageIndex, storage->getFreeSpace(),
+                        m_spaceInfo.storageChanged(
+                            storageIndex,
+                            storage->getFreeSpace(),
                             calculateNxOccupiedSpace(storageIndex), storage->getSpaceLimit());
                     }
                 }
@@ -1089,7 +1091,21 @@ void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
     connect(storage.data(), SIGNAL(archiveRangeChanged(const QnStorageResourcePtr &, qint64, qint64)),
             this, SLOT(at_archiveRangeChanged(const QnStorageResourcePtr &, qint64, qint64)), Qt::DirectConnection);
     connect(storage.data(), &QnStorageResource::isUsedForWritingChanged,
-        this, [this]() { m_warnSended = false; });
+        this, [this]()
+        {
+            m_warnSended = false;
+        });
+    connect(storage.data(), &QnStorageResource::spaceLimitChanged, this,
+        [this, storageIndex](const QnResourcePtr& storageResource)
+        {
+            auto storage = storageResource.dynamicCast<QnStorageResource>();
+            NX_ASSERT(storage);
+            if (!storage)
+                return;
+            m_spaceInfo.storageChanged(storageIndex, storage->getFreeSpace(),
+                calculateNxOccupiedSpace(storageIndex), storage->getSpaceLimit());
+        });
+
     m_warnSended = false;
 }
 
@@ -2236,12 +2252,20 @@ QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages(
         {
             qint64 available = fileStorage->getTotalSpace() - fileStorage->getSpaceLimit();
             if (available >= bigStorageThreshold)
+            {
                 result << fileStorage;
-
-            NX_VERBOSE(
-                this,
-                lm("[ApiStorageSpace, Writable storages] candidate: %1 size seems appropriate")
-                    .args(fileStorage->getUrl()));
+                NX_VERBOSE(
+                    this,
+                    lm("[ApiStorageSpace, Writable storages] candidate: %1 size seems appropriate")
+                        .args(fileStorage->getUrl()));
+            }
+            else
+            {
+                NX_VERBOSE(
+                    this,
+                    lm("[ApiStorageSpace, Writable storages] candidate: %1 available size %2 is less than the treshold %3.")
+                        .args(fileStorage->getUrl(), available, bigStorageThreshold));
+            }
         }
     }
 

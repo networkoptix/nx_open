@@ -16,7 +16,7 @@
 #include <ui/common/palette.h>
 #include <ui/style/globals.h>
 #include <ui/style/helper.h>
-#include <ui/widgets/common/autoscaled_plain_text.h>
+#include <nx/client/desktop/common/widgets/autoscaled_plain_text.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
 
 #include <nx/utils/log/log.h>
@@ -107,8 +107,8 @@ struct LayoutThumbnailLoader::Private
         layout(layout),
         maximumSize(maximumSize),
         msecSinceEpoch(msecSinceEpoch),
-        noDataWidget(new QnAutoscaledPlainText()),
-        nonCameraWidget(new QnAutoscaledPlainText())
+        noDataWidget(new AutoscaledPlainText()),
+        nonCameraWidget(new AutoscaledPlainText())
     {
         noDataWidget->setText(tr("NO DATA"));
         noDataWidget->setProperty(style::Properties::kDontPolishFontProperty, true);
@@ -400,8 +400,8 @@ struct LayoutThumbnailLoader::Private
     api::ImageRequest::RoundMethod roundMethod = api::ImageRequest::RoundMethod::precise;
 
     // We need this widgets to draw special states, like 'NoData'.
-    QScopedPointer<QnAutoscaledPlainText> noDataWidget;
-    QScopedPointer<QnAutoscaledPlainText> nonCameraWidget;
+    QScopedPointer<AutoscaledPlainText> noDataWidget;
+    QScopedPointer<AutoscaledPlainText> nonCameraWidget;
 };
 
 LayoutThumbnailLoader::LayoutThumbnailLoader(

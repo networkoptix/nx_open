@@ -44,7 +44,7 @@ protected:
     {
         using namespace std::placeholders;
 
-        std::deque<api::SystemSharingEx> sharings;
+        std::vector<api::SystemSharingEx> sharings;
         const auto dbResult = executeSelectQuerySync(
             std::bind(&dao::rdb::SystemSharingDataObject::fetchAllUserSharings,
                 systemSharingDao(), _1, &sharings));

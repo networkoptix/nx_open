@@ -51,7 +51,7 @@
        <number>16</number>
       </property>
       <item>
-       <widget class="QnEditableLabel" name="systemNameLabel" native="true"/>
+       <widget class="nx::client::desktop::EditableLabel" name="systemNameLabel" native="true"/>
       </item>
       <item>
        <widget class="QWidget" name="buttonWidget" native="true">
@@ -173,9 +173,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QnEditableLabel</class>
+   <class>nx::client::desktop::EditableLabel</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/editable_label.h</header>
+   <header location="global">nx/client/desktop/common/widgets/editable_label.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

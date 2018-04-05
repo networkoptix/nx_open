@@ -51,7 +51,7 @@
        <widget class="QnSearchLineEdit" name="searchLineEdit" native="true"/>
       </item>
       <item>
-       <widget class="nx::client::desktop::ui::CheckableLineWidget" name="allUsersCheckableLine" native="true"/>
+       <widget class="nx::client::desktop::CheckableLineWidget" name="allUsersCheckableLine" native="true"/>
       </item>
       <item>
        <widget class="QScrollArea" name="scrollArea">
@@ -260,7 +260,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QnAlertBar" name="alertBar" native="true"/>
+    <widget class="nx::client::desktop::AlertBar" name="alertBar" native="true"/>
    </item>
    <item>
     <widget class="Line" name="line">
@@ -317,14 +317,14 @@
    <header location="global">ui/widgets/common/tree_view.h</header>
   </customwidget>
   <customwidget>
-   <class>QnAlertBar</class>
+   <class>nx::client::desktop::AlertBar</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/alert_bar.h</header>
+   <header location="global">nx/client/desktop/common/widgets/message_bar.h</header>
   </customwidget>
   <customwidget>
-   <class>nx::client::desktop::ui::CheckableLineWidget</class>
+   <class>nx::client::desktop::CheckableLineWidget</class>
    <extends>QWidget</extends>
-   <header location="global">nx/client/desktop/ui/common/checkable_line_widget.h</header>
+   <header location="global">nx/client/desktop/common/widgets/checkable_line_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

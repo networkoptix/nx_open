@@ -11,7 +11,7 @@
 #include <ui/help/help_topics.h>
 
 #include <ui/workaround/widgets_signals_workaround.h>
-#include <nx/client/desktop/ui/common/checkbox_utils.h>
+#include <nx/client/desktop/common/utils/checkbox_utils.h>
 #include <core/resource/device_dependent_strings.h>
 #include <nx_ec/data/api_camera_attributes_data.h>
 
@@ -20,7 +20,7 @@ static const int kDangerousMinArchiveDays = 5;
 static const int kRecordedDaysDontChange = std::numeric_limits<int>::max();
 }
 
-using namespace nx::client::desktop::ui;
+using namespace nx::client::desktop;
 
 QnArchiveLengthWidget::QnArchiveLengthWidget(QWidget* parent):
     base_type(parent),

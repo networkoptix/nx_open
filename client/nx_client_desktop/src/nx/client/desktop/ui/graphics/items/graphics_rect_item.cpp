@@ -1,7 +1,7 @@
 #include "graphics_rect_item.h"
 
 #include <utils/common/scoped_painter_rollback.h>
-#include <nx/client/desktop/ui/common/painter_transform_scale_stripper.h>
+#include <nx/client/desktop/common/utils/painter_transform_scale_stripper.h>
 
 namespace nx {
 namespace client {
@@ -18,7 +18,7 @@ void GraphicsRectItem::paint(
     QnScopedPainterPenRollback penRollback(painter, pen());
     QnScopedPainterBrushRollback brushRollback(painter, brush());
 
-    const ui::PainterTransformScaleStripper scaleStripper(painter);
+    const PainterTransformScaleStripper scaleStripper(painter);
 
     auto rect = scaleStripper.mapRect(this->rect());
     if ((pen().width() & 1) == 1)

@@ -13,7 +13,7 @@
 #include <core/resource/client_camera.h>
 #include <core/misc/schedule_task.h>
 
-#include <nx/client/desktop/ui/common/checkbox_utils.h>
+#include <nx/client/desktop/common/utils/checkbox_utils.h>
 #include <ui/common/read_only.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/help/help_topics.h>

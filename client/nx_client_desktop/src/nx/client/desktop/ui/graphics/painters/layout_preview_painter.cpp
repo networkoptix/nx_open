@@ -9,16 +9,14 @@
 #include <ui/style/helper.h>
 #include <ui/style/nx_style.h>
 #include <ui/style/skin.h>
-#include <ui/widgets/common/busy_indicator.h>
-#include <ui/widgets/common/autoscaled_plain_text.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
-
-#include <nx/client/desktop/image_providers/camera_thumbnail_manager.h>
-#include <nx/client/desktop/image_providers/layout_thumbnail_loader.h>
+#include <utils/common/scoped_painter_rollback.h>
 
 #include <nx/client/core/utils/geometry.h>
-
-#include <utils/common/scoped_painter_rollback.h>
+#include <nx/client/desktop/common/widgets/autoscaled_plain_text.h>
+#include <nx/client/desktop/common/widgets/busy_indicator.h>
+#include <nx/client/desktop/image_providers/camera_thumbnail_manager.h>
+#include <nx/client/desktop/image_providers/layout_thumbnail_loader.h>
 
 using nx::client::core::Geometry;
 
@@ -40,7 +38,7 @@ LayoutPreviewPainter::LayoutPreviewPainter(QnResourcePool* resourcePool,
     m_backgroundColor(Qt::darkGray),
     m_itemBackgroundColor(Qt::black),
     m_fontColor(Qt::white),
-    m_busyIndicator(new QnBusyIndicator()),
+    m_busyIndicator(new BusyIndicator()),
     m_resourcePool(resourcePool)
 {
     NX_EXPECT(m_resourcePool);

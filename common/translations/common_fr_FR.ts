@@ -87,8 +87,9 @@
       <translation>Le système découvert %1 est incompatible avec le système actuel.</translation>
     </message>
     <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <translation>Système Nuage peut seulement être fusionné avec un non-nuage. Nom Système et mot de passe sont pris du Système Nuage.</translation>
+      <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 System can only be merged with non-%1. System name and password are taken from %1 System.</translation>
     </message>
   </context>
   <context>

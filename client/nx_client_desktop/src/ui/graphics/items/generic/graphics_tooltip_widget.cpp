@@ -7,7 +7,7 @@
 #include <ui/processors/clickable.h>
 #include <ui/style/helper.h>
 #include <ui/widgets/common/text_edit_label.h>
-#include <ui/widgets/common/busy_indicator.h>
+#include <nx/client/desktop/common/widgets/busy_indicator.h>
 #include <nx/client/desktop/common/widgets/async_image_widget.h>
 
 namespace {

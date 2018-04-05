@@ -9,7 +9,7 @@
 #include <core/resource/resource_fwd.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/customization/customized.h>
-#include <ui/utils/validators.h>
+#include <nx/client/desktop/common/utils/validators.h>
 
 class QnResourceListModel;
 class QnUuid;

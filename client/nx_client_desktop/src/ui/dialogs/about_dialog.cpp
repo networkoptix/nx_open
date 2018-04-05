@@ -39,9 +39,9 @@
 #include <nx/audio/audiodevice.h>
 #include <utils/common/app_info.h>
 #include <utils/common/html.h>
-#include <nx/client/desktop/ui/common/clipboard_button.h>
+#include <nx/client/desktop/common/widgets/clipboard_button.h>
 
-using namespace nx::client::desktop::ui;
+using namespace nx::client::desktop;
 
 namespace {
     QString versionString(const QString &version) {

@@ -3300,10 +3300,6 @@ to %1</source>
       <translation>Szétkapcsolás</translation>
     </message>
     <message>
-      <source>All cloud users will be deleted.</source>
-      <translation>Minden felhő felhasználó törlésre kerül.</translation>
-    </message>
-    <message>
       <source>Failed to disconnect System from %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>Kijelentkezés a %1 felhőről sikertelen</translation>
@@ -3321,6 +3317,11 @@ to %1</source>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>Ehhez a rendszerhez nem lehet %1 fiókkal csatlakozni miután kijelentkezett %1 rendszerből.</translation>
+    </message>
+    <message>
+      <source>All %1 users will be deleted.</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">All %1 users will be deleted.</translation>
     </message>
   </context>
   <context>
@@ -6848,16 +6849,17 @@ to %1</source>
       <translation>Helyi felhasználó</translation>
     </message>
     <message>
-      <source>Cloud user</source>
-      <translation>Felhő felhasználó</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>Bejelentkezés</translation>
     </message>
     <message>
       <source>Role</source>
       <translation>Szerepkör</translation>
+    </message>
+    <message>
+      <source>%1 user</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 user</translation>
     </message>
   </context>
   <context>
@@ -7052,10 +7054,6 @@ to %1</source>
       <translation>Helyi</translation>
     </message>
     <message>
-      <source>Cloud</source>
-      <translation>Felhő</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>Bejelentkezés</translation>
     </message>
@@ -7096,8 +7094,9 @@ to %1</source>
       <translation>A jelszavak nem egyeznek.</translation>
     </message>
     <message>
-      <source>Cloud user with specified email already exists.</source>
-      <translation>A felhő felhasználó a megadott email címmel már létezik.</translation>
+      <source>%1 user with specified email already exists.</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 user with specified email already exists.</translation>
     </message>
   </context>
   <context>
@@ -7320,10 +7319,6 @@ to %1</source>
       <translation>A licencek száma csökkenni fog</translation>
     </message>
     <message>
-      <source>Cloud Systems cannot be merged</source>
-      <translation>Felhő rendszerek nem vonhatók össze</translation>
-    </message>
-    <message>
       <source>Connecting to the current System...</source>
       <translation>Csatlakozás a jelenlegi rendszerhez...</translation>
     </message>
@@ -7342,6 +7337,11 @@ to %1</source>
     <message>
       <source>Administrator password</source>
       <translation>Adminisztrátor jelszó</translation>
+    </message>
+    <message>
+      <source>%1 Systems cannot be merged</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 Systems cannot be merged</translation>
     </message>
   </context>
   <context>
