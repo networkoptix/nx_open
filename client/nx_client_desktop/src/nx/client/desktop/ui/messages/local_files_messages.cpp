@@ -40,8 +40,12 @@ void LocalFiles::fileCannotBeWritten(QWidget* parent, const QString& filename)
 
 void LocalFiles::invalidChars(QWidget* parent, const QString& invalidSet)
 {
-    QnMessageBox::warning(parent,
-        tr("Filename should not contain the following reserved characters:\n%1", "", invalidSet.size())
+    QnMessageBox::warning(
+        parent,
+        tr(
+            "Filename should not contain the following reserved characters:\n%1",
+            "Multiple form must concern characters count, not filenames!",
+            invalidSet.size())
         .arg(invalidSet));
 }
 
