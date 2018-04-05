@@ -3271,10 +3271,6 @@ to %1</source>
       <translation>斷線</translation>
     </message>
     <message>
-      <source>All cloud users will be deleted.</source>
-      <translation>雲端上的所有使用者都將被刪除.</translation>
-    </message>
-    <message>
       <source>Failed to disconnect System from %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>未能從 %1 斷開系統</translation>
@@ -3292,6 +3288,11 @@ to %1</source>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>在您從 %1 斷開系統連線後你將不能使用 %1 帳號連接到此系統.</translation>
+    </message>
+    <message>
+      <source>All %1 users will be deleted.</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">All %1 users will be deleted.</translation>
     </message>
   </context>
   <context>
@@ -6776,16 +6777,17 @@ to %1</source>
       <translation>本地使用者</translation>
     </message>
     <message>
-      <source>Cloud user</source>
-      <translation>雲帳號</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>登入</translation>
     </message>
     <message>
       <source>Role</source>
       <translation>角色</translation>
+    </message>
+    <message>
+      <source>%1 user</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 user</translation>
     </message>
   </context>
   <context>
@@ -6979,10 +6981,6 @@ to %1</source>
       <translation>本地</translation>
     </message>
     <message>
-      <source>Cloud</source>
-      <translation>雲端</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>登入</translation>
     </message>
@@ -7023,8 +7021,9 @@ to %1</source>
       <translation>密碼不匹配.</translation>
     </message>
     <message>
-      <source>Cloud user with specified email already exists.</source>
-      <translation>使用此 Email 的雲帳號已存在.</translation>
+      <source>%1 user with specified email already exists.</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 user with specified email already exists.</translation>
     </message>
   </context>
   <context>
@@ -7245,10 +7244,6 @@ to %1</source>
       <translation>授權的總數量將減少</translation>
     </message>
     <message>
-      <source>Cloud Systems cannot be merged</source>
-      <translation>雲端系統不能合併</translation>
-    </message>
-    <message>
       <source>Connecting to the current System...</source>
       <translation>連線至目前的系統...</translation>
     </message>
@@ -7267,6 +7262,11 @@ to %1</source>
     <message>
       <source>Administrator password</source>
       <translation>管理者密碼</translation>
+    </message>
+    <message>
+      <source>%1 Systems cannot be merged</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 Systems cannot be merged</translation>
     </message>
   </context>
   <context>

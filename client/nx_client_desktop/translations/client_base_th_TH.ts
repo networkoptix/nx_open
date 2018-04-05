@@ -3265,10 +3265,6 @@ to %1</source>
       <translation>ตัดการเชื่อมต่อ</translation>
     </message>
     <message>
-      <source>All cloud users will be deleted.</source>
-      <translation>ผู้ใช้ระบบคลาวด์ทั้งหมดจะถูกลบ</translation>
-    </message>
-    <message>
       <source>Failed to disconnect System from %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>ไม่สามารถเชื่อมต่อระบบกับ %1</translation>
@@ -3286,6 +3282,11 @@ to %1</source>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>คุณจะไม่สามารถเชื่อมต่อกับระบบนี้กับบัญชี %1 หลังจากที่คุณยกเลิกการเชื่อมต่อระบบนี้จาก %1</translation>
+    </message>
+    <message>
+      <source>All %1 users will be deleted.</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">All %1 users will be deleted.</translation>
     </message>
   </context>
   <context>
@@ -6769,16 +6770,17 @@ to %1</source>
       <translation>ผู้ใช้ท้องถิ่น</translation>
     </message>
     <message>
-      <source>Cloud user</source>
-      <translation>ผู้ใช้ระบบคลาวด์</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>ชื่อผู้ใช้</translation>
     </message>
     <message>
       <source>Role</source>
       <translation>สิทธิพิเศษ</translation>
+    </message>
+    <message>
+      <source>%1 user</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 user</translation>
     </message>
   </context>
   <context>
@@ -6972,10 +6974,6 @@ to %1</source>
       <translation>ท้องถิ่น</translation>
     </message>
     <message>
-      <source>Cloud</source>
-      <translation>คลาวด์</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>ชื่อผู้ใช้</translation>
     </message>
@@ -7016,8 +7014,9 @@ to %1</source>
       <translation>รหัสผ่านไม่ตรงกัน.</translation>
     </message>
     <message>
-      <source>Cloud user with specified email already exists.</source>
-      <translation>ผู้ใช้ระบบคลาวด์กับอีเมลที่ระบุแล้ว</translation>
+      <source>%1 user with specified email already exists.</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 user with specified email already exists.</translation>
     </message>
   </context>
   <context>
@@ -7238,10 +7237,6 @@ to %1</source>
       <translation>จำนวนใบอนุญาตจะลดลง</translation>
     </message>
     <message>
-      <source>Cloud Systems cannot be merged</source>
-      <translation>ไม่สามารถผสานระบบคลาวด์</translation>
-    </message>
-    <message>
       <source>Connecting to the current System...</source>
       <translation>กำลังเชื่อมต่อกับระบบปัจจุบัน...</translation>
     </message>
@@ -7260,6 +7255,11 @@ to %1</source>
     <message>
       <source>Administrator password</source>
       <translation>รหัสผ่านผู้ดูแลระบบ</translation>
+    </message>
+    <message>
+      <source>%1 Systems cannot be merged</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 Systems cannot be merged</translation>
     </message>
   </context>
   <context>
