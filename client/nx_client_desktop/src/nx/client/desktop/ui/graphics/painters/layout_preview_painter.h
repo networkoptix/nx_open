@@ -9,13 +9,13 @@
 #include <ui/customization/customized.h>
 
 class QnCameraThumbnailManager;
-class QnBusyIndicator;
 class QnResourcePool;
 
 namespace nx {
 namespace client {
 namespace desktop {
 
+class BusyIndicator;
 class LayoutThumbnailLoader;
 
 namespace ui {
@@ -61,7 +61,7 @@ private:
     QColor m_backgroundColor;
     QColor m_itemBackgroundColor;
     QColor m_fontColor;
-    QScopedPointer<QnBusyIndicator> m_busyIndicator;
+    QScopedPointer<BusyIndicator> m_busyIndicator;
 
     QPixmap m_layoutThumbnail;
 

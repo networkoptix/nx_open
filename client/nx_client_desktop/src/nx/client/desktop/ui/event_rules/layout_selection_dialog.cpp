@@ -21,7 +21,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <nx/client/desktop/ui/common/item_view_utils.h>
+#include <nx/client/desktop/common/utils/item_view_utils.h>
 #include <nx/client/desktop/common/models/natural_string_sort_proxy_model.h>
 
 namespace nx {
@@ -113,7 +113,8 @@ LayoutSelectionDialog::LayoutSelectionDialog(bool singlePick, QWidget* parent, Q
 
     // Lambda will keep the reference to filterLocalLayouts and filterSharedLayouts
 
-    auto setupTreeView = [this, radioButtonDelegate](QnTreeView* treeView)
+    auto setupTreeView =
+        [this, radioButtonDelegate](QnTreeView* treeView)
         {
             const QnIndents kIndents(1, 0);
             treeView->header()->setStretchLastSection(false);
@@ -123,7 +124,7 @@ LayoutSelectionDialog::LayoutSelectionDialog(bool singlePick, QWidget* parent, Q
             treeView->setProperty(style::Properties::kSideIndentation,
                 QVariant::fromValue(kIndents));
             treeView->setIgnoreDefaultSpace(true);
-            ui::ItemViewUtils::autoToggleOnRowClick(treeView, QnResourceListModel::CheckColumn);
+            ItemViewUtils::autoToggleOnRowClick(treeView, QnResourceListModel::CheckColumn);
             treeView->setItemDelegateForColumn(QnResourceListModel::CheckColumn, radioButtonDelegate);
         };
 
@@ -135,7 +136,7 @@ LayoutSelectionDialog::LayoutSelectionDialog(bool singlePick, QWidget* parent, Q
     scrollBar->setUseMaximumSpace(true);
     ui->scrollArea->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
-    const auto updateFilter = 
+    const auto updateFilter =
         [this, filterLocalLayouts, filterSharedLayouts]()
         {
             const auto filter = ui->searchLineEdit->text().trimmed();

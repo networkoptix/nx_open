@@ -156,15 +156,15 @@
     </widget>
    </item>
    <item>
-    <widget class="QnAlertBar" name="alertBar" native="true"/>
+    <widget class="nx::client::desktop::AlertBar" name="alertBar" native="true"/>
    </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnAlertBar</class>
+   <class>nx::client::desktop::AlertBar</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/alert_bar.h</header>
+   <header location="global">nx/client/desktop/common/widgets/message_bar.h</header>
   </customwidget>
   <customwidget>
    <class>nx::client::desktop::CameraExpertSettingsWidget</class>

@@ -17,12 +17,14 @@
 #include <ui/help/help_topics.h>
 #include <ui/style/custom_style.h>
 #include <ui/style/skin.h>
-#include <ui/widgets/common/input_field.h>
+#include <nx/client/desktop/common/widgets/input_field.h>
 
 #include <watchers/cloud_status_watcher.h>
 
 #include <utils/common/app_info.h>
 #include <utils/common/html.h>
+
+using namespace nx::client::desktop;
 
 namespace
 {
@@ -62,17 +64,17 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
         .arg(nx::network::AppInfo::cloudName()));
 
     ui->loginInputField->setTitle(tr("Email"));
-    ui->loginInputField->setValidator(Qn::defaultEmailValidator(false));
+    ui->loginInputField->setValidator(defaultEmailValidator(false));
 
     ui->passwordInputField->setTitle(tr("Password"));
     ui->passwordInputField->setEchoMode(QLineEdit::Password);
-    ui->passwordInputField->setValidator(Qn::defaultPasswordValidator(false));
+    ui->passwordInputField->setValidator(defaultPasswordValidator(false));
 
     setWarningStyle(ui->invalidCredentialsLabel);
 
     connect(ui->loginButton,        &QPushButton::clicked,      d, &QnLoginToCloudDialogPrivate::at_loginButton_clicked);
-    connect(ui->loginInputField,    &QnInputField::textChanged, d, &QnLoginToCloudDialogPrivate::updateUi);
-    connect(ui->passwordInputField, &QnInputField::textChanged, d, &QnLoginToCloudDialogPrivate::updateUi);
+    connect(ui->loginInputField,    &InputField::textChanged, d, &QnLoginToCloudDialogPrivate::updateUi);
+    connect(ui->passwordInputField, &InputField::textChanged, d, &QnLoginToCloudDialogPrivate::updateUi);
 
     using nx::vms::utils::SystemUri;
     QnCloudUrlHelper urlHelper(
@@ -97,7 +99,7 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
     setPaletteColor(ui->cloudWelcomeLabel, QPalette::WindowText, nxColor);
 
     auto aligner = new QnAligner(this);
-    aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
+    aligner->registerTypeAccessor<InputField>(InputField::createLabelWidthAccessor());
     aligner->addWidgets({ ui->loginInputField, ui->passwordInputField, ui->spacer });
 
     auto opacityEffect = new QGraphicsOpacityEffect(this);

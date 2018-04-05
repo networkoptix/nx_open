@@ -192,22 +192,22 @@ QnSearchLineEdit* UnifiedSearchWidget::filterEdit() const
     return m_searchLineEdit;
 }
 
-ui::SelectableTextButton* UnifiedSearchWidget::typeButton() const
+SelectableTextButton* UnifiedSearchWidget::typeButton() const
 {
     return ui->typeButton;
 }
 
-ui::SelectableTextButton* UnifiedSearchWidget::areaButton() const
+SelectableTextButton* UnifiedSearchWidget::areaButton() const
 {
     return ui->areaButton;
 }
 
-ui::SelectableTextButton* UnifiedSearchWidget::timeButton() const
+SelectableTextButton* UnifiedSearchWidget::timeButton() const
 {
     return ui->timeButton;
 }
 
-ui::SelectableTextButton* UnifiedSearchWidget::cameraButton() const
+SelectableTextButton* UnifiedSearchWidget::cameraButton() const
 {
     return ui->cameraButton;
 }
@@ -324,8 +324,8 @@ void UnifiedSearchWidget::setupTimeSelection()
                 {
                     ui->timeButton->setText(action->text());
                     ui->timeButton->setState(period == UnifiedSearchWidget::Period::all
-                        ? ui::SelectableTextButton::State::deactivated
-                        : ui::SelectableTextButton::State::unselected);
+                        ? SelectableTextButton::State::deactivated
+                        : SelectableTextButton::State::unselected);
 
                     setSelectedPeriod(period);
                 });
@@ -339,10 +339,10 @@ void UnifiedSearchWidget::setupTimeSelection()
     addMenuAction(tr("Last 30 days"), UnifiedSearchWidget::Period::month);
     addMenuAction(tr("Selected on Timeline"), UnifiedSearchWidget::Period::selection);
 
-    connect(ui->timeButton, &ui::SelectableTextButton::stateChanged, this,
-        [defaultAction](ui::SelectableTextButton::State state)
+    connect(ui->timeButton, &SelectableTextButton::stateChanged, this,
+        [defaultAction](SelectableTextButton::State state)
         {
-            if (state == ui::SelectableTextButton::State::deactivated)
+            if (state == SelectableTextButton::State::deactivated)
                 defaultAction->trigger();
         });
 

@@ -7,9 +7,14 @@
 #include <nx/utils/concurrent.h>
 #include <nx/system_commands.h>
 #if defined (Q_OS_LINUX)
-    #include <nx/system_commands/fd_read_linux.h>
+    #include <nx/system_commands/domain_socket/read_linux.h>
 #endif
 #include "root_tool.h"
+
+#if defined(Q_OS_WIN)
+    #include <BaseTsd.h>
+    #define ssize_t SSIZE_T
+#endif
 
 namespace nx {
 namespace mediaserver {
@@ -184,11 +189,154 @@ int RootTool::open(const QString& path, QIODevice::OpenMode mode)
     QnMutexLocker lock(&m_mutex);
     utils::concurrent::run(
         [this, path, sysFlags]() { execute({"open", path, QString::number(sysFlags)}); });
-    auto result = system_commands::readFd();
+    auto result = system_commands::domain_socket::readFd();
     return result;
 #else
     return -1;
 #endif
+}
+
+qint64 RootTool::freeSpace(const QString& path)
+{
+#if defined (Q_OS_LINUX)
+    if (m_toolPath.isEmpty())
+        return SystemCommands().freeSpace(path.toStdString(), /*usePipe*/ false);
+
+    QnMutexLocker lock(&m_mutex);
+    utils::concurrent::run([this, path]() { execute({"freeSpace", path}); });
+    int64_t result;
+    return system_commands::domain_socket::readInt64(&result) ? result : -1;
+#else
+    return -1;
+#endif
+}
+
+qint64 RootTool::totalSpace(const QString& path)
+{
+#if defined (Q_OS_LINUX)
+    if (m_toolPath.isEmpty())
+        return SystemCommands().totalSpace(path.toStdString(), /*usePipe*/ false);
+
+    QnMutexLocker lock(&m_mutex);
+    utils::concurrent::run([this, path]() { execute({"totalSpace", path}); });
+    int64_t result;
+    return system_commands::domain_socket::readInt64(&result) ? result : -1;
+#else
+    return -1;
+#endif
+}
+
+bool RootTool::isPathExists(const QString& path)
+{
+#if defined (Q_OS_LINUX)
+    if (m_toolPath.isEmpty())
+        return SystemCommands().isPathExists(path.toStdString(), /*usePipe*/ false);
+
+    QnMutexLocker lock(&m_mutex);
+    utils::concurrent::run([this, path]() { execute({"exists", path}); });
+    int64_t result;
+    return system_commands::domain_socket::readInt64(&result) ? (bool) result : false;
+#else
+    return -1;
+#endif
+}
+
+static void* readBufferReallocCallback(void* context, ssize_t size)
+{
+    std::vector<char>* buf = reinterpret_cast<std::vector<char>*>(context);
+    buf->resize(size);
+    return buf->data();
+}
+
+struct StringRef
+{
+    const char* data;
+    ssize_t size;
+};
+
+static bool extractSubstring(const char** pdata, StringRef* stringRef)
+{
+    const char* current = *pdata;
+    while (*current && *current != ',')
+        ++current;
+
+    if (current == *pdata)
+        return false;
+
+    stringRef->data = *pdata;
+    stringRef->size = current - *pdata;
+
+    if (*current)
+        *pdata = current + 1;
+
+    return true;
+}
+
+static QnAbstractStorageResource::FileInfoList fileListFromSerialized(const char* data)
+{
+    QnAbstractStorageResource::FileInfoList result;
+    StringRef stringRef;
+
+    while (true)
+    {
+        if (!extractSubstring(&data, &stringRef))
+            break;
+
+        std::string name(stringRef.data, stringRef.size);
+
+        if (!extractSubstring(&data, &stringRef))
+            break;
+
+        int64_t size = strtoll(stringRef.data, nullptr, 10);
+
+        if (!extractSubstring(&data, &stringRef))
+            break;
+
+        bool isDir = strtol(stringRef.data, nullptr, 10);
+
+        result.append(QnAbstractStorageResource::FileInfo(QString::fromStdString(name), size, isDir));
+    }
+
+    return result;
+}
+
+QnAbstractStorageResource::FileInfoList RootTool::fileList(const QString& path)
+{
+    QnAbstractStorageResource::FileInfoList result;
+#if defined (Q_OS_LINUX)
+    if (m_toolPath.isEmpty())
+    {
+        return fileListFromSerialized(
+            SystemCommands().serializedFileList(path.toStdString(), /*usePipe*/ false).c_str());
+    }
+
+    QnMutexLocker lock(&m_mutex);
+    utils::concurrent::run([this, path]() { execute({"ll", path}); });
+
+    std::vector<char> buf;
+    if (!system_commands::domain_socket::readBuffer(&readBufferReallocCallback, &buf))
+        return result;
+
+    return fileListFromSerialized(buf.data());
+#else
+    return result;
+#endif
+}
+
+qint64 RootTool::fileSize(const QString& path)
+{
+#if defined (Q_OS_LINUX)
+    if (m_toolPath.isEmpty())
+        return SystemCommands().fileSize(path.toStdString(), /*usePipe*/ false);
+
+    QnMutexLocker lock(&m_mutex);
+    utils::concurrent::run([this, path]() { execute({"size", path}); });
+    int64_t result;
+    return system_commands::domain_socket::readInt64(&result) ? result : -1;
+#else
+    return -1;
+#endif
+
 }
 
 static std::string makeArgsLine(const std::vector<QString>& args)

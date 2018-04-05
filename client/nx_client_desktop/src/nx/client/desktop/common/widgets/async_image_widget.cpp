@@ -16,8 +16,8 @@
 
 #include <ui/common/widget_anchor.h>
 #include <ui/style/helper.h>
-#include <ui/widgets/common/autoscaled_plain_text.h>
-#include <ui/widgets/common/busy_indicator.h>
+#include <nx/client/desktop/common/widgets/autoscaled_plain_text.h>
+#include <nx/client/desktop/common/widgets/busy_indicator.h>
 
 #include <utils/common/scoped_painter_rollback.h>
 
@@ -33,11 +33,11 @@ namespace
     static const QSize kDefaultThumbnailSize(1920, 1080);
 }
 
-/* QnBusyIndicatorWidget draws dots snapped to the pixel grid.
+/* BusyIndicatorWidget draws dots snapped to the pixel grid.
  * This descendant when it is downscaled draws dots generally not snapped. */
-class QnAutoscaledBusyIndicatorWidget: public QnBusyIndicatorWidget
+class QnAutoscaledBusyIndicatorWidget: public BusyIndicatorWidget
 {
-    using base_type = QnBusyIndicatorWidget;
+    using base_type = BusyIndicatorWidget;
 
 public:
     QnAutoscaledBusyIndicatorWidget(QWidget* parent = nullptr):
@@ -67,7 +67,7 @@ public:
 
 AsyncImageWidget::AsyncImageWidget(QWidget* parent):
     base_type(parent),
-    m_placeholder(new QnAutoscaledPlainText(this)),
+    m_placeholder(new AutoscaledPlainText(this)),
     m_indicator(new QnAutoscaledBusyIndicatorWidget(this))
 {
     retranslateUi();
@@ -130,7 +130,7 @@ void AsyncImageWidget::setImageProvider(QnImageProvider* provider)
     invalidateGeometry();
 }
 
-QnBusyIndicatorWidget* AsyncImageWidget::busyIndicator() const
+BusyIndicatorWidget* AsyncImageWidget::busyIndicator() const
 {
     return m_indicator;
 }

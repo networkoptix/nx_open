@@ -14,7 +14,7 @@ static boost::optional<std::string> getOptionalArg(const char**& argv)
     return value;
 }
 
-void regCommands(CommandsFactory& factory, nx::SystemCommands* systemCommands)
+void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemCommands)
 {
     using namespace std::placeholders;
 
@@ -89,8 +89,65 @@ void regCommands(CommandsFactory& factory, nx::SystemCommands* systemCommands)
             if (!mode)
                 return Result::invalidArg;
 
-            return systemCommands->open(*path, std::stoi(*mode), /*usePipe*/ true)
-                ? Result::ok : Result::execFailed;
+            return systemCommands->open(*path, std::stoi(*mode), /*usePipe*/ true) == -1
+                ? Result::execFailed : Result::ok;
+        });
+
+    factory.reg({"freeSpace"}, {"path"},
+        [systemCommands](const char** argv)
+        {
+            const auto path = getOptionalArg(argv);
+            if (!path)
+                return Result::invalidArg;
+
+            return systemCommands->freeSpace(*path, /*usePipe*/ true) == -1
+                ? Result::execFailed : Result::ok;
+        });
+
+    factory.reg({"totalSpace"}, {"path"},
+        [systemCommands](const char** argv)
+        {
+            const auto path = getOptionalArg(argv);
+            if (!path)
+                return Result::invalidArg;
+
+            return systemCommands->totalSpace(*path, /*usePipe*/ true) == -1
+                ? Result::execFailed : Result::ok;
+        });
+
+    factory.reg({"exists"}, {"path"},
+        [systemCommands](const char** argv)
+        {
+            const auto path = getOptionalArg(argv);
+            if (!path)
+                return Result::invalidArg;
+
+            systemCommands->isPathExists(*path, /*usePipe*/ true);
+
+            return Result::ok;
+        });
+
+    factory.reg({"ll"}, {"path"},
+        [systemCommands](const char** argv)
+        {
+            const auto path = getOptionalArg(argv);
+            if (!path)
+                return Result::invalidArg;
+
+            systemCommands->serializedFileList(*path, /*usePipe*/ true);
+
+            return Result::ok;
+        });
+
+    factory.reg({"size"}, {"path"},
+        [systemCommands](const char** argv)
+        {
+            const auto path = getOptionalArg(argv);
+            if (!path)
+                return Result::invalidArg;
+
+            return systemCommands->fileSize(*path, /*usePipe*/ true) == -1
+                ? Result::execFailed : Result::ok;
         });
 
     factory.reg({"help"}, {},
@@ -119,7 +176,7 @@ int main(int /*argc*/, const char** argv)
         return -1;
     }
 
-    regCommands(commandsFactory, &systemCommands);
+    registerCommands(commandsFactory, &systemCommands);
 
     if (auto command = commandsFactory.get(&argv))
     {

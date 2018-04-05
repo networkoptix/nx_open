@@ -351,7 +351,7 @@ void PeerRegistrator::sendListenResponse(
 void PeerRegistrator::reportClientBind(
     const MediaserverData& mediaserverConnectionKey)
 {
-    std::shared_ptr<nx::stun::ServerConnection> peerConnection;
+    std::shared_ptr<network::stun::ServerConnection> peerConnection;
 
     {
         auto peerLocker = m_listeningPeerPool->findAndLockPeerDataByHostName(

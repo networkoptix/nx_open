@@ -16,7 +16,7 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <nx/utils/string.h>
 
-#include <nx/client/desktop/ui/common/item_view_utils.h>
+#include <nx/client/desktop/common/utils/item_view_utils.h>
 #include <nx/client/desktop/common/models/natural_string_sort_proxy_model.h>
 
 namespace nx {
@@ -216,14 +216,14 @@ void SubjectSelectionDialog::showAllUsersChanged(bool value)
     layout()->activate();
 }
 
-void SubjectSelectionDialog::setUserValidator(Qn::UserValidator userValidator)
+void SubjectSelectionDialog::setUserValidator(UserValidator userValidator)
 {
     m_users->setUserValidator(userValidator);
     m_roles->setUserValidator(userValidator);
     validateAllUsers();
 }
 
-void SubjectSelectionDialog::setRoleValidator(Qn::RoleValidator roleValidator)
+void SubjectSelectionDialog::setRoleValidator(RoleValidator roleValidator)
 {
     m_roles->setRoleValidator(roleValidator);
 }

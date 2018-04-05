@@ -10,7 +10,7 @@ class QnPermissionsWidget;
 class QnAccessibleResourcesWidget;
 class QnAbstractPermissionsModel;
 class QnUserSettingsModel;
-class QnAlertBar;
+class AlertBar;
 
 namespace Ui
 {

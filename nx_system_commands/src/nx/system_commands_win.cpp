@@ -83,4 +83,29 @@ bool SystemCommands::rename(const std::string& /*oldPath*/, const std::string& /
     return false;
 }
 
+int64_t SystemCommands::freeSpace(const std::string& /*path*/, bool /*reportViaSocket*/)
+{
+    return -1;
+}
+
+int64_t SystemCommands::totalSpace(const std::string& /*path*/, bool /*reportViaSocket*/)
+{
+    return -1;
+}
+
+bool SystemCommands::isPathExists(const std::string& path, bool reportViaSocket)
+{
+    return false;
+}
+
+std::string SystemCommands::serializedFileList(const std::string& path, bool reportViaSocket)
+{
+    return "";
+}
+
+int64_t SystemCommands::fileSize(const std::string& path, bool reportViaSocket)
+{
+    return -1;
+}
+
 } // namespace nx

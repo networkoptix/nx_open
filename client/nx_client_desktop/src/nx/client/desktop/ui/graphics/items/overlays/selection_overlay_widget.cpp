@@ -2,7 +2,7 @@
 
 #include <QtGui/QPainter>
 
-#include <nx/client/desktop/ui/common/painter_transform_scale_stripper.h>
+#include <nx/client/desktop/common/utils/painter_transform_scale_stripper.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/style/nx_style.h>
 #include <ui/workbench/workbench_item.h>
