@@ -2,6 +2,7 @@
 
 #include <transaction/transaction.h>
 #include <nx_ec/managers/abstract_user_manager.h>
+#include <api/app_server_connection.h>
 
 namespace ec2 {
 

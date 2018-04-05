@@ -10,6 +10,8 @@
 #include "nx_ec/data/api_videowall_data.h"
 #include "nx_ec/data/api_conversion_functions.h"
 
+#include <transaction/message_bus_adapter.h>
+
 #include "managers/business_event_manager.h"
 #include "managers/camera_manager.h"
 #include "managers/layout_manager.h"

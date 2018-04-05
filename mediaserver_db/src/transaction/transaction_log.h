@@ -5,6 +5,7 @@
 #include <nx/utils/thread/mutex.h>
 
 #include <transaction/transaction_descriptor.h>
+#include <transaction/ubjson_transaction_serializer.h>
 
 #include <database/api/db_resource_api.h>
 

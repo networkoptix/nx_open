@@ -123,8 +123,8 @@ private:
     bool isExists(const QnUuid& removeGuid) const;
     bool isConnecting(const QnUuid& removeGuid) const;
 
+protected:
     typedef QMap<QnUuid, QnTransactionTransport*> QnConnectionMap;
-
 private:
     template<class T>
     void sendTransactionInternal(const QnTransaction<T>& tran, const QnTransactionTransportHeader &header)
@@ -232,7 +232,7 @@ protected slots:
     void onEc2ConnectionSettingsChanged(const QString& key);
 protected:
 	QnConnectionMap m_connections;
-	std::unique_ptr<QnRuntimeTransactionLog> m_runtimeTransactionLog;
+	std::shared_ptr<QnRuntimeTransactionLog> m_runtimeTransactionLog;
 	bool m_restartPending = false;
 	QVector<QnTransactionTransport*> m_connectingConnections;
 private:
@@ -250,7 +250,7 @@ private:
     };
 
     QMap<nx::utils::Url, RemoteUrlConnectInfo> m_remoteUrls;
-    QTimer* m_timer;
+    QTimer* m_timer = nullptr;
 
     QMap<ApiPersistentIdData, int> m_lastTransportSeq;
 

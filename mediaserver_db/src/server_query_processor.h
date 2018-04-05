@@ -727,11 +727,13 @@ public:
         int /*dummy*/ = 0)
     {
         NX_ASSERT(ApiCommand::isPersistent(tran.command));
-
+        
+        detail::PersistentStorage persistentDb(m_db.db());
         tran.transactionType = getTransactionDescriptorByTransaction(tran)->getTransactionTypeFunc(
-            m_db.db()->commonModule(), 
-            tran.params, 
-            &detail::PersistentStorage(m_db.db()));
+            m_db.db()->commonModule(),
+            tran.params,
+            &persistentDb);
+        
         if (tran.transactionType == TransactionType::Unknown)
             return ErrorCode::forbidden;
 

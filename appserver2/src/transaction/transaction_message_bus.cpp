@@ -70,10 +70,8 @@ QnTransactionMessageBus::QnTransactionMessageBus(
     QnCommonModule* commonModule,
     QnJsonTransactionSerializer* jsonTranSerializer,
     QnUbjsonTransactionSerializer* ubjsonTranSerializer)
-
 :
     TransactionMessageBusBase(peerType, commonModule, jsonTranSerializer, ubjsonTranSerializer),
-    m_timer(nullptr),
     m_runtimeTransactionLog(new QnRuntimeTransactionLog(commonModule))
 {
     m_thread->setObjectName("QnTransactionMessageBusThread");

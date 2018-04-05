@@ -2,7 +2,9 @@
 
 #include "nx_ec/ec_api.h"
 
-#include "transaction/transaction.h"
+#include <nx/utils/concurrent.h>
+#include <ec2_thread_pool.h>
+#include <transaction/transaction.h>
 #include <nx/vms/event/rule.h>
 
 using namespace nx;

@@ -818,9 +818,10 @@ bool QnDbManager::fillTransactionLogInternal(ApiCommand::Value command, std::fun
             commonModule()->moduleGUID(),
             object);
         auto transactionDescriptor = ec2::getActualTransactionDescriptorByValue<ObjectType>(command);
-
+        
+        PersistentStorage persistentStorage(this);
         if (transactionDescriptor)
-            transaction.transactionType = transactionDescriptor->getTransactionTypeFunc(commonModule(), object, &PersistentStorage(this));
+            transaction.transactionType = transactionDescriptor->getTransactionTypeFunc(commonModule(), object, &persistentStorage);
         else
             transaction.transactionType = ec2::TransactionType::Unknown;
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nx_ec/ec_api.h>
+#include <nx/utils/concurrent.h>
 
 namespace ec2
 {

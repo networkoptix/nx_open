@@ -18,6 +18,8 @@
 #include <managers/discovery_notification_manager.h>
 #include <managers/time_notification_manager.h>
 
+#include <transaction/transaction_descriptor.h>
+
 namespace ec2 {
 
 // TODO: #2.4 remove EC prefix to avoid ec2::ECConnectionNotificationManager
