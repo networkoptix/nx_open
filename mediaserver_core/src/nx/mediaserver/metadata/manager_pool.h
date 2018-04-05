@@ -84,7 +84,8 @@ public slots:
     void initExistingResources();
 
 private:
-    void loadSettingsFromFile(std::vector<nxpl::Setting>* settings, const QString& filename);
+    std::vector<nxpl::Setting> loadSettingsFromFile(
+        const char* fileDescription, const QString& filename);
 
     void setCameraManagerDeclaredSettings(
         sdk::metadata::CameraManager* manager,
