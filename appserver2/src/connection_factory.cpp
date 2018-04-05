@@ -1265,9 +1265,43 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     regUpdate<ApiIdData>(p, ApiCommand::removeVideowall);
     regUpdate<ApiVideowallControlMessageData>(p, ApiCommand::videowallControl);
 
+    /**%apidoc GET /ec2/getWebPages
+     * Return list of web pages
+     * %param[default] format
+     * %return List of web page objects in the requested format.
+     * %// AbstractWebPageManager::getWebPages
+     */
     regGet<QnUuid, ApiWebPageDataList>(p, ApiCommand::getWebPages);
+
+    /**%apidoc POST /ec2/saveWebPage
+     * <p>
+     * Parameters should be passed as a JSON object in POST message body with
+     * content type "application/json". Example of such object can be seen in
+     * the result of the corresponding GET function.
+     * </p>
+     * %permissions Administrator.
+     * %param[opt] id Web page unique id. Can be omitted when creating a new object. If such object
+     *     exists, omitted fields will not be changed.
+     * %param[proprietary] typeId Should have fixed value.
+     *     %value {57d7112a-b9c3-247b-c045-1660250adae5}
+     * %param name Web page name.
+     * %param url Web page url.
+     * %// AbstractWebPageManager::save
+     */
     regUpdate<ApiWebPageData>(p, ApiCommand::saveWebPage);
-    // AbstractWebPageManager::remove
+
+
+    /**%apidoc POST /ec2/removeUser
+     * Delete the specified web page.
+     * <p>
+     * Parameters should be passed as a JSON object in POST message body with
+     * content type "application/json". Example of such object can be seen in
+     * the result of the corresponding GET function.
+     * </p>
+     * %permissions Administrator.
+     * %param id Web page unique id.
+     * %// AbstractWebPageManager::remove
+     */
     regUpdate<ApiIdData>(p, ApiCommand::removeWebPage);
 
     /**%apidoc GET /ec2/getLayouts
