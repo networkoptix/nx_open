@@ -1089,14 +1089,15 @@ void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
         QnMutexLocker lk(&m_mutexStorages);
         m_storageRoots.insert(storageIndex, storage);
     }
-    connect(storage.data(), SIGNAL(archiveRangeChanged(const QnStorageResourcePtr &, qint64, qint64)),
-            this, SLOT(at_archiveRangeChanged(const QnStorageResourcePtr &, qint64, qint64)), Qt::DirectConnection);
-    connect(storage.data(), &QnStorageResource::isUsedForWritingChanged,
-        this, [this]()
-        {
-            m_warnSended = false;
-        });
-    connect(storage.data(), &QnStorageResource::spaceLimitChanged, this,
+    connect(
+        storage.data(), SIGNAL(archiveRangeChanged(const QnStorageResourcePtr &, qint64, qint64)),
+        this, SLOT(at_archiveRangeChanged(const QnStorageResourcePtr &, qint64, qint64)),
+        Qt::DirectConnection);
+    connect(
+        storage.data(), &QnStorageResource::isUsedForWritingChanged,
+        this, [this]() { m_warnSended = false; });
+    connect
+        (storage.data(), &QnStorageResource::spaceLimitChanged, this,
         [this, storageIndex](const QnResourcePtr& storageResource)
         {
             auto storage = storageResource.dynamicCast<QnStorageResource>();
@@ -1106,6 +1107,9 @@ void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
             m_spaceInfo.storageChanged(storageIndex, storage->getFreeSpace(),
                 calculateNxOccupiedSpace(storageIndex), storage->getSpaceLimit());
         });
+    connect(
+        storage.data(), &QnStorageResource::isBackupChanged,
+        this, &QnStorageManager::at_storageRoleChanged);
 
     m_warnSended = false;
 }
@@ -1130,7 +1134,6 @@ void QnStorageManager::onNewResource(const QnResourcePtr &resource)
             fileStorage->setMounted(false);
 
         m_warnSended = false;
-        connect(storage.data(), &QnStorageResource::isBackupChanged, this, &QnStorageManager::at_storageChanged);
         if (checkIfMyStorage(storage))
             addStorage(storage);
     }
@@ -1198,7 +1201,7 @@ void QnStorageManager::removeStorage(const QnStorageResourcePtr &storage)
     disconnect(storage.data(), nullptr, this, nullptr);
 }
 
-void QnStorageManager::at_storageChanged(const QnResourcePtr &resource)
+void QnStorageManager::at_storageRoleChanged(const QnResourcePtr &resource)
 {
     QnStorageResourcePtr storage = qSharedPointerDynamicCast<QnStorageResource>(resource);
     if (!storage)
@@ -1209,13 +1212,15 @@ void QnStorageManager::at_storageChanged(const QnResourcePtr &resource)
             .arg(m_role == QnServer::StoragePool::Normal ? "Main" : "Backup")
             .arg(storage->isBackup() ? "Backup" : "Main"), cl_logDEBUG1);
 
-    if (checkIfMyStorage(storage)) {
-        if (!hasStorage(storage))
-            addStorage(storage);
-    }
-    else {
-        if (hasStorage(storage))
-            removeStorage(storage);
+    if (hasStorage(storage))
+    {
+        NX_ASSERT(!checkIfMyStorage(storage));
+        removeStorage(storage);
+        QnStorageManager* other = m_role == QnServer::StoragePool::Backup
+            ? qnNormalStorageMan : qnBackupStorageMan;
+        NX_ASSERT(other);
+        if (other)
+            other->addStorage(storage);
     }
 }
 
