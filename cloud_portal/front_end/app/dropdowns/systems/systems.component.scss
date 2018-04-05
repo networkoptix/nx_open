@@ -26,5 +26,9 @@
 }
 
 .dropdown .dropdown-menu li > a .system-owner {
-    color: $blue10; // TODO: SASS doesn't work here!
+    color: #2FA2DB; // $blue10; // TODO: vars not available here ... Hmmmm
+}
+
+.dropdown .arrow::after {
+    border-top-color: white; //$light1;
 }

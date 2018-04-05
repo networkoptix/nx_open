@@ -1,3 +1,7 @@
+.dropdown-toggle {
+    height: 46px; // hardcode the height as hamburger span's mess up flexbox
+}
+
 .dropdown-toggle::after {
     border: none;
 }

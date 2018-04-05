@@ -39,15 +39,18 @@
 
                 <ul class="nav navbar-nav navbar-right auth-visible">
                     <li ng-if="singleSystem" class="no-hover collapse-second hidden-collapse">
-                        <a href="">
+                        <button class="btn btn-dropdown-toggle">
                             <span class="glyphicon glyphicon-home"></span>
                             <span class="ellipsis">{{activeSystem.name}}</span>
-                        </a>
+                        </button>
                     </li>
+
                     <li ng-if="systemCounter && !singleSystem" class="collapse-second">
                         <nx-systems [activeSystem]="activeSystem" [systems]="systems" [active]="active"></nx-systems>
                     </li>
+
                     <li class="vertical-bar"></li>
+
                     <li class="collapse-first">
                         <nx-account-settings-select [account]="account"></nx-account-settings-select>
                     </li>

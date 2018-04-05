@@ -19,3 +19,11 @@
     top: 2px; // vertical alignment is off when using 'placement'
 }
 
+.dropdown-toggle {
+    height: 42px; // hardcode the height as flexbox is confused by icon
+}
+
+.dropdown .arrow::after {
+    border-top-color: white; //$light1;
+}
+
