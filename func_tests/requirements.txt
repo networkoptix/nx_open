@@ -17,3 +17,4 @@ pyyaml
 pathlib2==2.3.0
 pylru==1.0.9
 datadiff==2.0.0
+pywinrm==0.3.0
