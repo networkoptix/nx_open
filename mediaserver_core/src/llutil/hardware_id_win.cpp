@@ -27,7 +27,7 @@
 
 #include <nx/utils/log/log.h>
 
-#include "util.h"
+#include <nx/utils/license/util.h>
 #include "licensing/hardware_info.h"
 #include "hardware_id.h"
 #include "hardware_id_p.h"
@@ -399,7 +399,7 @@ typedef QString (*ExecQueryFunction)(IWbemServices* pSvc, const BSTR fieldName, 
 static void fillHardwareInfo(IWbemServices* pSvc, ExecQueryFunction execQuery, QnHardwareInfo& hardwareInfo)
 {
     hardwareInfo.compatibilityBoardUUID = execQuery(pSvc, _T("UUID"), _T("Win32_ComputerSystemProduct"));
-    hardwareInfo.boardUUID = changedGuidByteOrder(hardwareInfo.compatibilityBoardUUID);
+    hardwareInfo.boardUUID = nx::utils::license::changedGuidByteOrder(hardwareInfo.compatibilityBoardUUID);
 
     hardwareInfo.boardID = execQuery(pSvc, _T("SerialNumber"), _T("Win32_BaseBoard"));
     hardwareInfo.boardManufacturer = execQuery(pSvc, _T("Manufacturer"), _T("Win32_BaseBoard"));

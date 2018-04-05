@@ -61,7 +61,6 @@ namespace ec2
     class ECConnectionNotificationManager;
     class TransactionMessageBusAdapter;
     class P2pMessageBus;
-    class QnDistributedMutexManager;
     class TimeSynchronizationManager;
     class QnAbstractTransactionTransport;
 
