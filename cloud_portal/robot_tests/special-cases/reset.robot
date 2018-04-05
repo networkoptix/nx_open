@@ -21,6 +21,15 @@ Find and remove emails
     \  Check For Alert    ${PERMISSIONS WERE REMOVED FROM EMAIL}
     \  Wait Until Element Is Not Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${email}')]
 
+Add notowner
+    Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
+    Click Button    ${SHARE BUTTON SYSTEMS}
+    Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE BUTTON MODAL}
+    Input Text    ${SHARE EMAIL}    ${EMAIL NOT OWNER}
+    Click Button    ${SHARE BUTTON MODAL}
+    Check For Alert    ${NEW PERMISSIONS SAVED}
+    Check User Permissions    ${EMAIL NOT OWNER}    ${CUSTOM TEXT}
+
 *** Test Cases ***
 Clean up email noperm
     Register Keyword To Run On Failure    None
@@ -40,6 +49,17 @@ Clean up random emails
     ${status}    Run Keyword And Return Status    Wait Until Element Is Visible    //div[@process-loading='gettingSystemUsers']//tbody//tr//td[contains(text(), 'noptixautoqa+15')]
     Run Keyword If    ${status}    Find and remove emails
     Close Browser
+
+Make sure notowner is in the system
+    Register Keyword To Run On Failure    None/
+    Open Browser and Go To URL    ${url}
+    Log In    ${EMAIL OWNER}    ${password}
+    Validate Log In
+    Go To    ${url}/systems/${AUTO_TESTS SYSTEM ID}
+    ${status}    Run Keyword And Return Status    Wait Until Element Is Visible    //div[@process-loading='gettingSystemUsers']//tbody//tr//td[contains(text(), 'noptixautoqa+notowner@gmail.com')]
+    Run Keyword Unless    ${status}    Add notowner
+
+
 
 Clean up noperm first/last name
     Register Keyword To Run On Failure    None

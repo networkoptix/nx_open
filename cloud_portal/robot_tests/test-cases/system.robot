@@ -23,7 +23,7 @@ Check System Text
     Log Out
     Validate Log Out
     Log in to Auto Tests System    ${user}
-    Wait Until Elements Are Visible    //h2[.='${OWNER TEXT}']    //a[.='${EMAIL OWNER}')]
+    Wait Until Elements Are Visible    //h2[.='${OWNER TEXT}']    //a[.='${EMAIL OWNER}']
     Wait Until Element Is Not Visible    //h2[.='${YOUR SYSTEM TEXT}']
 
 *** Test Cases ***

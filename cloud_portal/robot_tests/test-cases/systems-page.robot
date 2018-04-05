@@ -79,20 +79,9 @@ should update owner name in systems list, if it's changed
     Go To    ${url}/systems
     Wait Until Elements Are Visible    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
     Element Text Should Be    ${AUTO TESTS USER}    newFirstName newLastName
+    Close Browser
 
-    Log Out
-    Validate Log Out
-    Log In    ${EMAIL OWNER}    ${password}
-    Validate Log In
-    Go To    ${url}/account
-    Wait Until Elements Are Visible    ${ACCOUNT FIRST NAME}    ${ACCOUNT LAST NAME}    ${ACCOUNT SAVE}
-    Wait Until Textfield Contains    ${ACCOUNT FIRST NAME}    newFirstName
-    Clear Element Text    ${ACCOUNT FIRST NAME}
-    Input Text    ${ACCOUNT FIRST NAME}    testFirstName
-    Clear Element Text    ${ACCOUNT LAST NAME}
-    Input Text    ${ACCOUNT LAST NAME}    testLastName
-    Click Button    ${ACCOUNT SAVE}
-    Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
+    Clean up owner first/last name
 
 Should show your system for owner and owner name for non-owners
     [tags]    not-ready
