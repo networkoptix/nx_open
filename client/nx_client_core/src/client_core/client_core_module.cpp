@@ -15,7 +15,6 @@
 
 #include <utils/media/ffmpeg_initializer.h>
 
-#include <nx_ec/ec2_lib.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/client/core/watchers/known_server_connections.h>
@@ -34,8 +33,9 @@ QnClientCoreModule::QnClientCoreModule(QObject* parent):
     m_commonModule->store(new QnFfmpegInitializer());
 
     NX_ASSERT(nx::utils::TimerManager::instance());
-    m_connectionFactory.reset(getRemoteConnectionFactory(qnStaticCommon->localPeerType(),
-        nx::utils::TimerManager::instance(), m_commonModule, false));
+    m_connectionFactory.reset(new ec2::RemoteConnectionFactory(
+        m_commonModule, qnStaticCommon->localPeerType(),
+        nx::utils::TimerManager::instance(), false));
 
     m_commonModule->instance<QnResourcesChangesManager>();
     m_commonModule->instance<QnClientPtzControllerPool>();
