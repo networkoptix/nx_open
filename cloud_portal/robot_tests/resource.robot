@@ -173,6 +173,8 @@ Register Form Validation
     Input Text    ${REGISTER PASSWORD INPUT}    ${password}
     click button    ${CREATE ACCOUNT BUTTON}
 
+
+#Reset resources
 Clean up email noperm
     Register Keyword To Run On Failure    None
     Open Browser and Go To URL    ${url}
@@ -236,3 +238,22 @@ Clean up owner first/last name
     Click Button    ${ACCOUNT SAVE}
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
     Close Browser
+
+Add notowner
+    Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
+    Click Button    ${SHARE BUTTON SYSTEMS}
+    Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE BUTTON MODAL}
+    Input Text    ${SHARE EMAIL}    ${EMAIL NOT OWNER}
+    Click Button    ${SHARE BUTTON MODAL}
+    Check For Alert    ${NEW PERMISSIONS SAVED}
+    Check User Permissions    ${EMAIL NOT OWNER}    ${CUSTOM TEXT}
+    Close Browser
+
+Make sure notowner is in the system
+    Register Keyword To Run On Failure    None/
+    Open Browser and Go To URL    ${url}
+    Log In    ${EMAIL OWNER}    ${password}
+    Validate Log In
+    Go To    ${url}/systems/${AUTO_TESTS SYSTEM ID}
+    ${status}    Run Keyword And Return Status    Wait Until Element Is Visible    //div[@process-loading='gettingSystemUsers']//tbody//tr//td[contains(text(), 'noptixautoqa+notowner@gmail.com')]
+    Run Keyword Unless    ${status}    Add notowner

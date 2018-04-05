@@ -1,7 +1,7 @@
 *** Settings ***
 Resource          ../resource.robot
 Resource          ../variables.robot
-Test Teardown     Close Browser
+Test Teardown     System Failure
 Force Tags        system
 
 *** Variables ***
@@ -9,6 +9,10 @@ ${password}    ${BASE PASSWORD}
 ${url}         ${ENV}
 
 *** Keywords ***
+System Failure
+    Close Browser
+    Run Keyword If Test Failed    Make sure notowner is in the system
+
 Log in to Auto Tests System
     [arguments]    ${email}
     Go To    ${url}/systems/${AUTO TESTS SYSTEM ID}
