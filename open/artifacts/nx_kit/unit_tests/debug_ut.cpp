@@ -201,7 +201,7 @@ TEST(debug, toString_char)
 TEST(debug, toString_char_ptr)
 {
     ASSERT_STREQ("\"str\"", nx::kit::debug::toString("str"));
-    ASSERT_STREQ("\"str\"with_quote\"", nx::kit::debug::toString("str\"with_quote"));
+    ASSERT_STREQ("\"str\\\"with_quote\"", nx::kit::debug::toString("str\"with_quote"));
     ASSERT_STREQ(R"("str\\with_backslash")", nx::kit::debug::toString("str\\with_backslash"));
     ASSERT_STREQ(R"("str\twith_tab")", nx::kit::debug::toString("str\twith_tab"));
     ASSERT_STREQ(R"("str\nwith_newline")", nx::kit::debug::toString("str\nwith_newline"));
