@@ -204,6 +204,9 @@ TEST_F(DiscoveryModuleConnector, ActivateDiactivate)
 
 TEST_F(DiscoveryModuleConnector, EndpointPriority)
 {
+    NX_DEBUG(this) "Remove this line and change line blow to true in 4.0:";
+    static bool kIsEndpointPrioritizedSwitchSupported = false;
+
     HostAddress interfaceIp;
     const auto interfaceIpsV4 = getLocalIpV4AddressList();
     if (interfaceIpsV4.empty())
@@ -224,7 +227,8 @@ TEST_F(DiscoveryModuleConnector, EndpointPriority)
 
     const auto newLocalEndpoint = addMediaserver(id);
     connector.newEndpoints({newLocalEndpoint}, id);
-    expectConnect(id, newLocalEndpoint);  //< Expected switch to a new local endpoint.
+    if (kIsEndpointPrioritizedSwitchSupported)
+        expectConnect(id, newLocalEndpoint);  //< Expected switch to a new local endpoint.
 
     const auto dnsRealEndpoint = addMediaserver(id);
     const auto cloudRealEndpoint = addMediaserver(id);
@@ -233,7 +237,10 @@ TEST_F(DiscoveryModuleConnector, EndpointPriority)
     connector.newEndpoints({dnsEndpoint, cloudEndpoint}, id);
 
     removeMediaserver(networkEndpoint);
-    expectNoChanges(); // Not any reconnects are expected.
+    if (kIsEndpointPrioritizedSwitchSupported)
+        expectNoChanges(); //< Not any reconnects are expected.
+    else
+        expectConnect(id, newLocalEndpoint); //< The switch that did not happen erlier.
 
     removeMediaserver(newLocalEndpoint);
     expectConnect(id, dnsEndpoint);  //< DNS is the most prioritized now.
@@ -244,7 +251,9 @@ TEST_F(DiscoveryModuleConnector, EndpointPriority)
     const auto newDnsRealEndpoint = addMediaserver(id);
     const SocketAddress newDnsEndpoint(kLocalDnsHost, newDnsRealEndpoint.port);
     connector.newEndpoints({newDnsEndpoint}, id);
-    expectConnect(id, newDnsEndpoint);  //< Expected switch to DNS as better choise than cloud.
+    NX_DEBUG(this) "Remove this line and uncomment line below in 4.0:";
+    if (kIsEndpointPrioritizedSwitchSupported)
+        expectConnect(id, newDnsEndpoint); //< Expected switch to DNS as better choise than cloud.
 
     removeMediaserver(cloudRealEndpoint);
     removeMediaserver(newDnsRealEndpoint);
