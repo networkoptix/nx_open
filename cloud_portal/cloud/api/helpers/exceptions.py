@@ -58,7 +58,8 @@ class ErrorCodes(Enum):
                     ErrorCodes.account_not_activated):
             return logging.INFO
         if self in (ErrorCodes.forbidden,
-                    ErrorCodes.wrong_code):
+                    ErrorCodes.wrong_code,
+                    ErrorCodes.wrong_parameters):
             return logging.WARNING
         return logging.ERROR
 
