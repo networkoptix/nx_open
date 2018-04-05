@@ -24,7 +24,7 @@ void Sender::send(std::shared_ptr<QByteArray> request)
     auto& buffer = *request;
     m_socket->sendAsync(
         buffer,
-        [request = std::move(request)](SystemError::ErrorCode result, size_t size)
+        [this, request = std::move(request)](SystemError::ErrorCode result, size_t size)
         {
             if (result != SystemError::noError || size != (size_t)request->size())
             {
