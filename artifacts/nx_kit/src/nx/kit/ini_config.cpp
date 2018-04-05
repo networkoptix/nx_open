@@ -99,10 +99,12 @@ static std::string determineIniFilesDir()
             static const char kSeparator = '\\';
             static const char* const kEnvVar = "LOCALAPPDATA";
             static const std::string extraDir = "";
+            static const std::string defaultDir = ""; //< Current directory.
         #else
             static const char kSeparator = '/';
             static const char* const kEnvVar = "HOME";
             static const std::string extraDir = std::string(".config") + kSeparator;
+            static const std::string defaultDir = "/etc/nx_ini/";
         #endif
 
         const char* const env_NX_INI_DIR = getenv("NX_INI_DIR");
@@ -113,8 +115,7 @@ static std::string determineIniFilesDir()
         if (env != nullptr)
             return std::string(env) + kSeparator + extraDir + "nx_ini" + kSeparator;
 
-        // If the path cannot be determined, use empty string.
-        return "";
+        return defaultDir;
     #endif
 
     #if 0 // Using OS temp dir has been abandoned.
@@ -288,7 +289,7 @@ bool Param<double>::reload(const std::string* value, std::ostream* output)
         if (errno == ERANGE || *pEnd != '\0')
             error = " [invalid value]";
         else
-            *pValue = (double) v;
+            *pValue = v;
     }
     printValueLine(output, *pValue, " = ", error, *pValue == defaultValue);
     return oldValue != *pValue;

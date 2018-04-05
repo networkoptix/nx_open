@@ -16,7 +16,8 @@ namespace kit {
  * are defined in the code and lead to the nominal behavior, which can be overridden by creating
  * .ini files (with name=value lines) in the directory determined by the platform:
  * - Windows: "%NX_INI_DIR%\" (if env var defined), or "%LOCALAPPDATA%\nx_ini\" (otherwise).
- * - Unix-like: "$NX_INI_DIR/" (if env var defined), or "$HOME/.config/nx_ini/" (otherwise).
+ * - Unix-like: "$NX_INI_DIR/" (if env var defined), or "$HOME/.config/nx_ini/" (if $HOME defined),
+ *     "/etc/nx_ini/" (otherwise).
  * - Android: "/sdcard/".
  * - iOS: Not supported yet.
  *

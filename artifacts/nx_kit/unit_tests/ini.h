@@ -5,21 +5,18 @@
 #include <stdlib.h>
 #include <time.h>
 
+#if defined(__cplusplus)
+    extern "C" {
+#endif
+
 /**
  * Generate a unique .ini file name to avoid collisions in this test.
  */
-static const char* ini_detail_uniqueIniFileName()
-{
-    static char iniFileName[100];
-    static bool firstTime = true;
-    if (firstTime)
-    {
-        firstTime = false;
-        srand((unsigned int) time(0));
-        snprintf(iniFileName, sizeof(iniFileName), "%d_test.ini", rand());
-    }
-    return iniFileName;
-}
+const char* ini_detail_uniqueIniFileName();
+
+#if defined(__cplusplus)
+    } // extern "C"
+#endif
 
 #define NX_INI_FILE ini_detail_uniqueIniFileName()
 #define NX_INI_STRUCT \
