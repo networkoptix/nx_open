@@ -8,12 +8,12 @@ import argparse
 import shutil
 
 
-def get_lib_dirs_from_compiler(compiler, compiler_flags=[]):
+def get_lib_dirs_from_compiler(compiler, compiler_flags=""):
     try:
         output = subprocess.check_output(
             "{} --print-search-dirs {}".format(compiler, compiler_flags),
             universal_newlines=True,
-            shell=True) #< Compiler can be provided without a path, so using shell=True.
+            shell=True) #< Using shell=True to avoid mess with splitting compiler_flags.
     except subprocess.CalledProcessError as e:
         print("Could not get library search dirs from the compiler.", file=sys.stderr)
         print("Command failed:", e.cmd, file=sys.stderr)
@@ -53,9 +53,9 @@ def get_lib_dirs_from_link_flags(flags):
 
 def find_library(lib, lib_dirs):
     for lib_dir in lib_dirs:
-        if os.path.isdir(lib_dir):
-            if lib in os.listdir(lib_dir):
-                return os.path.join(lib_dir, lib)
+        file_name = os.path.join(lib_dir, lib)
+        if os.path.isfile(file_name):
+            return file_name
     return None
 
 
@@ -82,7 +82,7 @@ def copy_library(file_name, target_dir):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-c", "--compiler", help="Compiler executable")
-    parser.add_argument("-f", "--flags", help="Compiler flags")
+    parser.add_argument("-f", "--flags", help="Compiler flags", default="")
     parser.add_argument("-o", "--dest-dir", help="Destination directory", default=os.getcwd())
     parser.add_argument("-L", "--lib-dir", dest="lib_dirs", action="append", default=[],
         help="Additional library directory")

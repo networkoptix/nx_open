@@ -45,6 +45,10 @@
 
 #include <nx/utils/log/log.h>
 
+#ifdef Q_OS_MACX
+#include <ui/workaround/mac_utils.h>
+#endif
+
 using namespace nx::client::desktop::ui;
 
 namespace
@@ -83,6 +87,13 @@ QWidget* createMainView(QObject* context, QQuickView* quickView)
 
     // Async load of qml data
     executeDelayedParented(loadQmlData, 0, quickView);
+
+#if defined(Q_OS_MACX)
+    // Since we have patch qt563_macos_window_level.patch we have to discard hidesOnDeactivate
+    // flag for main window. Otherwise, each time it looses focus it becomes hidden.
+    setHidesOnDeactivate(holder->winId(), false);
+#endif
+
     return holder;
 }
 

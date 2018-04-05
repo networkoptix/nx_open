@@ -127,7 +127,7 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
             return Result::ok;
         });
 
-    factory.reg({"ll"}, {"path"},
+    factory.reg({"list"}, {"path"},
         [systemCommands](const char** argv)
         {
             const auto path = getOptionalArg(argv);

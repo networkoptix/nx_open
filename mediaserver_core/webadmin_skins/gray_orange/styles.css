@@ -77,7 +77,7 @@ a{
     color:#FF6C00;
 }
 
-a:visited{
+a:visited:not(.btn){
     color:#F06200;
 }
 

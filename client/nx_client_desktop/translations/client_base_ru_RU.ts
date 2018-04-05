@@ -1121,20 +1121,20 @@ to view more bookmarks</source>
       <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
       <translation>Файл &quot;%1&quot; не может быть записан. Попробуйте другое имя.</translation>
     </message>
-    <message numerus="yes">
-      <source>Filename should not contain the following reserved characters:
-%1</source>
-      <translation type="unfinished">
-        <numerusform>Имя файла не должно содержать следующие зарезервированные символы: %1</numerusform>
-        <numerusform>Имена файлов не должны содержать следующие зарезервированные символы: %1</numerusform>
-        <numerusform>Имена файлов не должны содержать следующие зарезервированные символы: %1</numerusform>
-        <numerusform>Filename should not contain the following reserved characters:
-%1</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
       <translation>Файл &quot;%1&quot; зарезервирован операционной системой. Попробуйте другое имя.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Filename should not contain the following reserved characters:
+%1</source>
+      <comment>Multiple form must concern characters count, not filenames!</comment>
+      <translation>
+        <numerusform>Имя файла не должно содержать следующий зарезервированный символ: %1</numerusform>
+        <numerusform>Имя файла не должно содержать следующие зарезервированные символы: %1</numerusform>
+        <numerusform>Имя файла не должно содержать следующие зарезервированные символы: %1</numerusform>
+        <numerusform>Имя файла не должно содержать следующие зарезервированные символы: %1</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -1177,19 +1177,19 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
-      <translation type="unfinished">
-        <numerusform>Пароль должен содержать %n различных комбинаций букв, символов или цифр</numerusform>
+      <translation>
+        <numerusform>Пароль должен содержать %n различную комбинацию букв, символов или цифр</numerusform>
         <numerusform>Пароль должен содержать %n различные комбинации букв, символов или цифр</numerusform>
-        <numerusform>Password should contain %n different combinations of either characters, symbols, or digits</numerusform>
+        <numerusform>Пароль должен содержать %n различных комбинаций букв, символов или цифр</numerusform>
         <numerusform>Пароль должен содержать %n различных комбинаций букв, символов или цифр</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password must be at least %n characters long.</source>
-      <translation type="unfinished">
-        <numerusform>Пароль должен содержать минимум %n символов.</numerusform>
+      <translation>
+        <numerusform>Пароль должен содержать минимум %n символ.</numerusform>
         <numerusform>Пароль должен содержать минимум %n символа.</numerusform>
-        <numerusform>Password must be at least %n characters long.</numerusform>
+        <numerusform>Пароль должен содержать минимум %n символов.</numerusform>
         <numerusform>Пароль должен содержать минимум %n символов.</numerusform>
       </translation>
     </message>
@@ -1199,28 +1199,28 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Password must be no longer than %n characters.</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>Пароль должен быть длиной не более %n символа.</numerusform>
         <numerusform>Пароль должен быть длиной не более %n символов.</numerusform>
         <numerusform>Пароль должен быть длиной не более %n символов.</numerusform>
-        <numerusform>Password must be no longer than %n characters.</numerusform>
         <numerusform>Пароль должен быть длиной не более %n символов.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more consecutive characters together.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Пароль не должен содержать %n или более последовательных символов.</numerusform>
-        <numerusform>Пароль не должен содержать %n или более последовательных символа.</numerusform>
-        <numerusform>Password should not contain %n or more consecutive characters together.</numerusform>
+        <numerusform>Пароль не должен содержать %n или более последовательных символов.</numerusform>
+        <numerusform>Пароль не должен содержать %n или более последовательных символов.</numerusform>
         <numerusform>Пароль не должен содержать %n или более последовательных символов.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Пароль не должен содержать %n или более повторяющихся символов.</numerusform>
-        <numerusform>Пароль не должен содержать %n или более повторяющихся символа.</numerusform>
-        <numerusform>Password should not contain %n or more repeating characters.</numerusform>
+        <numerusform>Пароль не должен содержать %n или более повторяющихся символов.</numerusform>
+        <numerusform>Пароль не должен содержать %n или более повторяющихся символов.</numerusform>
         <numerusform>Пароль не должен содержать %n или более повторяющихся символов.</numerusform>
       </translation>
     </message>
@@ -1382,11 +1382,11 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>...and %n more</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>...и ещё %n</numerusform>
         <numerusform>...и ещё %n</numerusform>
-        <numerusform>...и еще %n</numerusform>
-        <numerusform>...and %n more</numerusform>
+        <numerusform>...и ещё %n</numerusform>
+        <numerusform>...и ещё %n</numerusform>
       </translation>
     </message>
   </context>
@@ -1513,38 +1513,38 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>These devices are removed from System</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Это устройство было удалено из системы</numerusform>
         <numerusform>Эти устройства были удалены из системы</numerusform>
         <numerusform>Эти устройства были удалены из системы</numerusform>
-        <numerusform>These devices are removed from System</numerusform>
+        <numerusform>Эти устройства были удалены из системы</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These cameras are removed from System</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Эта камера была удалена из системы</numerusform>
         <numerusform>Эти камеры были удалены из системы</numerusform>
         <numerusform>Эти камеры были удалены из системы</numerusform>
-        <numerusform>These cameras are removed from System</numerusform>
+        <numerusform>Эти камеры были удалены из системы</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These servers are removed from System</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Этот сервер был удален из системы</numerusform>
         <numerusform>Эти серверы были удалены из системы</numerusform>
         <numerusform>Эти серверы были удалены из системы</numerusform>
-        <numerusform>These servers are removed from System</numerusform>
+        <numerusform>Эти серверы были удалены из системы</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These users are removed from System</source>
       <translation type="unfinished">
-        <numerusform>Этот сервер был удален из системы</numerusform>
-        <numerusform>Эти серверы были удалены из системы</numerusform>
-        <numerusform>Эти серверы были удалены из системы</numerusform>
-        <numerusform>These users are removed from System</numerusform>
+        <numerusform>Этот пользователь был удален из системы</numerusform>
+        <numerusform>Эти пользователи были удалены из системы</numerusform>
+        <numerusform>Эти пользователи были удалены из системы</numerusform>
+        <numerusform>Эти пользователи были удалены из системы</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1553,7 +1553,7 @@ to view more bookmarks</source>
         <numerusform>Этот ресурс был удален из системы</numerusform>
         <numerusform>Эти ресурсы были удалены из системы</numerusform>
         <numerusform>Эти ресурсы были удалены из системы</numerusform>
-        <numerusform>These resources are removed from System</numerusform>
+        <numerusform>Эти ресурсы были удалены из системы</numerusform>
       </translation>
     </message>
     <message>
@@ -1637,7 +1637,7 @@ to view more bookmarks</source>
         <numerusform>%n действие</numerusform>
         <numerusform>%n действия</numerusform>
         <numerusform>%n действий</numerusform>
-        <numerusform>%n action(s)</numerusform>
+        <numerusform>%n действий</numerusform>
       </translation>
     </message>
     <message>
@@ -1790,7 +1790,7 @@ to view more bookmarks</source>
         <numerusform>У вас %n оповещение</numerusform>
         <numerusform>У вас %n оповещения</numerusform>
         <numerusform>У вас %n оповещений</numerusform>
-        <numerusform>You have %n notifications</numerusform>
+        <numerusform>У вас %n оповещений</numerusform>
       </translation>
     </message>
   </context>
@@ -1852,7 +1852,7 @@ to view more bookmarks</source>
         <numerusform>%1 из %n устройств</numerusform>
         <numerusform>%1 из %n устройств</numerusform>
         <numerusform>%1 из %n устройств</numerusform>
-        <numerusform>%1 of %n devices</numerusform>
+        <numerusform>%1 из %n устройств</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1861,7 +1861,7 @@ to view more bookmarks</source>
         <numerusform>%1 из %n камер</numerusform>
         <numerusform>%1 из %n камер</numerusform>
         <numerusform>%1 из %n камер</numerusform>
-        <numerusform>%1 of %n cameras</numerusform>
+        <numerusform>%1 из %n камер</numerusform>
       </translation>
     </message>
     <message>
@@ -1878,7 +1878,7 @@ to view more bookmarks</source>
         <numerusform>%1 из %n модулей ввода/вывода</numerusform>
         <numerusform>%1 из %n модулей ввода/вывода</numerusform>
         <numerusform>%1 из %n модулей ввода/вывода</numerusform>
-        <numerusform>%1 of %n I/O modules</numerusform>
+        <numerusform>%1 из %n модулей ввода/вывода</numerusform>
       </translation>
     </message>
     <message>
@@ -1905,7 +1905,7 @@ to view more bookmarks</source>
         <numerusform>%n Сервер</numerusform>
         <numerusform>%n Сервера</numerusform>
         <numerusform>%n Серверов</numerusform>
-        <numerusform>%n Server(s)</numerusform>
+        <numerusform>%n Серверов</numerusform>
       </translation>
     </message>
     <message>
@@ -1946,7 +1946,7 @@ to view more bookmarks</source>
         <numerusform>Исходная камера и ещё %n камера</numerusform>
         <numerusform>Исходная камера и ещё %n камеры</numerusform>
         <numerusform>Исходная камера и ещё %n камер</numerusform>
-        <numerusform>Source and %n more cameras</numerusform>
+        <numerusform>Исходная камера и ещё %n камер</numerusform>
       </translation>
     </message>
     <message>
@@ -2153,7 +2153,7 @@ to view more bookmarks</source>
         <numerusform>Найдено %n устройство</numerusform>
         <numerusform>Найдено %n устройства</numerusform>
         <numerusform>Найдено %n устройств</numerusform>
-        <numerusform>%n devices found</numerusform>
+        <numerusform>Найдено %n устройств</numerusform>
       </translation>
     </message>
     <message>
@@ -2204,7 +2204,7 @@ to view more bookmarks</source>
         <numerusform>Не удалось добавить %n устройство</numerusform>
         <numerusform>Не удалось добавить %n устройства</numerusform>
         <numerusform>Не удалось добавить %n устройств</numerusform>
-        <numerusform>Failed to add %n devices</numerusform>
+        <numerusform>Не удалось добавить %n устройств</numerusform>
       </translation>
     </message>
     <message>
@@ -2317,7 +2317,7 @@ to view more bookmarks</source>
         <numerusform>%1 не поддерживает двусторонний звук</numerusform>
         <numerusform>%1 не поддерживают двусторонний звук</numerusform>
         <numerusform>%1 не поддерживают двусторонний звук</numerusform>
-        <numerusform>%1 does not support two-way audio</numerusform>
+        <numerusform>%1 не поддерживают двусторонний звук</numerusform>
       </translation>
     </message>
   </context>
@@ -2431,7 +2431,7 @@ to view more bookmarks</source>
         <numerusform>%1 не имеет тревожных входов</numerusform>
         <numerusform>%1 не имеют тревожных входов</numerusform>
         <numerusform>%1 не имеют тревожных входов</numerusform>
-        <numerusform>%1 have no input ports</numerusform>
+        <numerusform>%1 не имеют тревожных входов</numerusform>
       </translation>
     </message>
   </context>
@@ -2473,7 +2473,7 @@ to view more bookmarks</source>
         <numerusform>Найдено %n устройство</numerusform>
         <numerusform>Найдено %n устройства</numerusform>
         <numerusform>Найдено %n устройств</numerusform>
-        <numerusform>%n devices found</numerusform>
+        <numerusform>Найдено %n устройств</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -2482,7 +2482,7 @@ to view more bookmarks</source>
         <numerusform>Найдено %n камера</numerusform>
         <numerusform>Найдено %n камеры</numerusform>
         <numerusform>Найдено %n камер</numerusform>
-        <numerusform>%n cameras found</numerusform>
+        <numerusform>Найдено %n камер</numerusform>
       </translation>
     </message>
     <message>
@@ -2499,7 +2499,7 @@ to view more bookmarks</source>
         <numerusform>Найдено %n модуль ввода-вывода</numerusform>
         <numerusform>Найдено %n модуля ввода-вывода</numerusform>
         <numerusform>Найдено %n модулей ввода-вывода</numerusform>
-        <numerusform>%n I/O modules found</numerusform>
+        <numerusform>Найдено %n модулей ввода-вывода</numerusform>
       </translation>
     </message>
     <message>
@@ -2599,7 +2599,7 @@ to view more bookmarks</source>
         <numerusform>%1 не имеет тревожных выходов</numerusform>
         <numerusform>%1 не имеют тревожных выходов</numerusform>
         <numerusform>%1 не имеют тревожных выходов</numerusform>
-        <numerusform>%1 have no output relays</numerusform>
+        <numerusform>%1 не имеют тревожных выходов</numerusform>
       </translation>
     </message>
   </context>
@@ -2867,41 +2867,41 @@ devices</source>
     </message>
     <message>
       <source>Disconnect System from %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Отключить систему от %1</translation>
     </message>
     <message>
       <source>Open %1 Portal</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Открыть портал %1</translation>
     </message>
     <message>
       <source>Create %1 Account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Создать учётную запись %1</translation>
     </message>
     <message>
       <source>Connect System to %1...</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Подключить систему к %1...</translation>
     </message>
     <message>
       <source>Create %1
 account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Создать учётную 
 запись %1</translation>
     </message>
     <message>
       <source>Connect System
 to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Подключить 
 систему к %1</translation>
     </message>
     <message>
       <source>Learn more about %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Подробнее о %1</translation>
     </message>
   </context>
@@ -2928,7 +2928,7 @@ to %1</source>
     </message>
     <message>
       <source>Cannot connect to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Не удаётся подключиться к %1</translation>
     </message>
   </context>
@@ -2959,12 +2959,12 @@ to %1</source>
     </message>
     <message>
       <source>Connect to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Подключиться к %1</translation>
     </message>
     <message>
       <source>Enter %1 Account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Введите учётную запись %1</translation>
     </message>
   </context>
@@ -2976,12 +2976,12 @@ to %1</source>
     </message>
     <message>
       <source>System connected to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Система подключена к %1</translation>
     </message>
     <message>
       <source>Failed to connect System to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Не удалось подключить систему к %1</translation>
     </message>
   </context>
@@ -3133,17 +3133,17 @@ to %1</source>
       <translation>Операция не может быть выполнена. Это может произойти из-за того что сервер сейчас перезагружается. Пожалуйста, повторите попытку позже.</translation>
     </message>
     <message>
-      <source>Connection to %1 is not ready yet. Check server Internet connection or try again later.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Подключение к %1 ещё не установлено. Проверьте, что сервер подключен к сети Интернет или повторите попытку позже.</translation>
-    </message>
-    <message>
       <source>Connection to Server could not be established.</source>
       <translation>Невозвожно подключиться к серверу.</translation>
     </message>
     <message>
       <source>This user is disabled by system administrator.</source>
       <translation>Этот пользователь отключен системным администратором.</translation>
+    </message>
+    <message>
+      <source>Connection to %1 is not ready yet. Check server Internet connection or try again later.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Подключение к %1 ещё не установлено. Проверьте, что сервер подключен к сети Интернет или повторите попытку позже.</translation>
     </message>
   </context>
   <context>
@@ -3367,28 +3367,28 @@ to %1</source>
       <translation>Отключить</translation>
     </message>
     <message>
-      <source>Failed to disconnect System from %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Не удалось отключить систему от %1</translation>
-    </message>
-    <message>
-      <source>Disconnect System from %1?</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Отключить систему от %1?</translation>
-    </message>
-    <message>
       <source>You will be disconnected from this System and able to login again through local network with local account</source>
       <translation>Вы будете отключены от этой системы и сможете снова войти через локальную сеть с локальной учётной записью</translation>
     </message>
     <message>
-      <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Вы не сможете подключиться к этой системе с вашей учетной записью %1, после того, как вы отключите эту систему от %1.</translation>
+      <source>Failed to disconnect System from %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Не удалось отключить систему от %1</translation>
+    </message>
+    <message>
+      <source>Disconnect System from %1?</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Отключить систему от %1?</translation>
     </message>
     <message>
       <source>All %1 users will be deleted.</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation type="unfinished">All %1 users will be deleted.</translation>
+    </message>
+    <message>
+      <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Вы не сможете подключиться к этой системе с вашей учетной записью %1, после того, как вы отключите эту систему от %1.</translation>
     </message>
   </context>
   <context>
@@ -4353,10 +4353,10 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Use licenses to view these %n cameras</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>Использовать лицензию для %n выбранной камеры</numerusform>
         <numerusform>Использовать лицензии для %n выбранных камер</numerusform>
         <numerusform>Использовать лицензии для %n выбранных камер</numerusform>
-        <numerusform>Use licenses to view these %n cameras</numerusform>
         <numerusform>Использовать лицензии для %n выбранных камер</numerusform>
       </translation>
     </message>
@@ -4365,7 +4365,7 @@ to %1</source>
     <name>QnLinkToCloudDialogPrivate</name>
     <message>
       <source>Failed to login to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Не удалось войти в %1</translation>
     </message>
   </context>
@@ -4483,12 +4483,12 @@ to %1</source>
     </message>
     <message>
       <source>Log in to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Войти в %1</translation>
     </message>
     <message>
       <source>Welcome to %1!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Добро пожаловать в %1!</translation>
     </message>
   </context>
@@ -4604,10 +4604,10 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Set for all %n Cameras</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>Установить для %n камеры</numerusform>
         <numerusform>Установить для всех %n камер</numerusform>
         <numerusform>Установить для всех %n камер</numerusform>
-        <numerusform>Set for all %n Cameras</numerusform>
         <numerusform>Установить для всех %n камер</numerusform>
       </translation>
     </message>
@@ -6655,16 +6655,6 @@ to %1</source>
       <translation>Соединение</translation>
     </message>
     <message>
-      <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Подключите свою систему к %1 &amp;mdash;, чтобы сделать ее доступной отовсюду!</translation>
-    </message>
-    <message>
-      <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Узнать больше о %1 &amp;mdash; подключение к системе из любого места!</translation>
-    </message>
-    <message>
       <source>Some users have not set their email addresses</source>
       <translation>У некоторых пользователей не настроен адрес Email</translation>
     </message>
@@ -6715,6 +6705,16 @@ to %1</source>
     <message>
       <source>Archive integrity problem detected</source>
       <translation>Обнаружена проблема целостности архива</translation>
+    </message>
+    <message>
+      <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Подключите свою систему к %1 &amp;mdash;, чтобы сделать ее доступной отовсюду!</translation>
+    </message>
+    <message>
+      <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Узнать больше о %1 &amp;mdash; подключение к системе из любого места!</translation>
     </message>
   </context>
   <context>
@@ -7011,7 +7011,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 user</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation type="unfinished">%1 user</translation>
     </message>
   </context>
@@ -7198,7 +7198,7 @@ to %1</source>
     </message>
     <message>
       <source>This user has not yet signed up for %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Этот пользователь еще не зарегистрировался в %1</translation>
     </message>
   </context>
@@ -7250,7 +7250,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 user with specified email already exists.</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation type="unfinished">%1 user with specified email already exists.</translation>
     </message>
   </context>
@@ -7499,7 +7499,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 Systems cannot be merged</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation type="unfinished">%1 Systems cannot be merged</translation>
     </message>
   </context>
@@ -8398,10 +8398,10 @@ to %1</source>
     <name>nx::client::desktop::RapidReviewSettingsWidget</name>
     <message numerus="yes">
       <source>For exporting as Rapid Review video length should be at least %n seconds.</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>Для экспорта с быстрой прокруткой длина видео должна быть не менее %n секунды.</numerusform>
         <numerusform>Для экспорта с быстрой прокруткой длина видео должна быть не менее %n секунд.</numerusform>
         <numerusform>Для экспорта с быстрой прокруткой длина видео должна быть не менее %n секунд.</numerusform>
-        <numerusform>For exporting as Rapid Review video length should be at least %n seconds.</numerusform>
         <numerusform>Для экспорта с быстрой прокруткой длина видео должна быть не менее %n секунд.</numerusform>
       </translation>
     </message>
@@ -8863,11 +8863,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Are you sure you want to permanently delete these %n files?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Вы уверены, что хотите навсегда удалить %n файл?</numerusform>
         <numerusform>Вы уверены, что хотите навсегда удалить эти %n файла?</numerusform>
         <numerusform>Вы уверены, что хотите навсегда удалить эти %n файлов?</numerusform>
-        <numerusform>Are you sure you want to permanently delete these %n files?</numerusform>
+        <numerusform>Вы уверены, что хотите навсегда удалить эти %n файлов?</numerusform>
       </translation>
     </message>
     <message>

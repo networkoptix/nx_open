@@ -53,11 +53,6 @@
       <translation>검색 된 시스템 %1는 호환 되지 않는 버전 %2.</translation>
     </message>
     <message>
-      <source>Cannot connect to the other System because current System is already connected to %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>현재 시스템 %1에 이미 연결 되어 있기 때문에 다른 시스템에 연결할 수 없습니다.</translation>
-    </message>
-    <message>
       <source>The discovered System %1 is in safe mode.</source>
       <comment>%1 is name of System</comment>
       <translation>검색 된 시스템 %1 안전 모드입니다.</translation>
@@ -66,16 +61,6 @@
       <source>Could not configure the remote System %1.</source>
       <comment>%1 is name of System</comment>
       <translation>원격 시스템 %1를 구성할 수 없습니다.</translation>
-    </message>
-    <message>
-      <source>Both Systems are connected to %1. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>두 시스템은 %1에 연결 됩니다. 병합 허용 되지 않습니다.</translation>
-    </message>
-    <message>
-      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>이러한 시스템은 다른 %1 URL로 연결됩니다. 병합할 수 없습니다.</translation>
     </message>
     <message>
       <source>New System</source>
@@ -87,9 +72,24 @@
       <translation>발견 된 시스템 %1이 (가) 현재 시스템과 호환되지 않습니다.</translation>
     </message>
     <message>
+      <source>Cannot connect to the other System because current System is already connected to %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>현재 시스템 %1에 이미 연결 되어 있기 때문에 다른 시스템에 연결할 수 없습니다.</translation>
+    </message>
+    <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation type="unfinished">%1 System can only be merged with non-%1. System name and password are taken from %1 System.</translation>
+    </message>
+    <message>
+      <source>Both Systems are connected to %1. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>두 시스템은 %1에 연결 됩니다. 병합 허용 되지 않습니다.</translation>
+    </message>
+    <message>
+      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>이러한 시스템은 다른 %1 URL로 연결됩니다. 병합할 수 없습니다.</translation>
     </message>
   </context>
   <context>

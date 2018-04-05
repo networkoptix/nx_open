@@ -38,11 +38,19 @@ public:
     qint64 fileSize(const QString& path);
 
 private:
-    int execute(const std::vector<QString>& args);
-
-private:
     const QString m_toolPath;
     QnMutex m_mutex;
+
+    template<typename R, typename DefaultAction, typename SocketAction, typename... Args>
+    R commandHelper(
+        R defaultValue, const QString& path, const char* command,
+        DefaultAction defaultAction, SocketAction socketAction, Args&&... args);
+
+    template<typename DefaultAction>
+    qint64 int64SingleArgCommandHelper(
+        const QString& path, const char* command, DefaultAction defaultAction);
+
+    int execute(const std::vector<QString>& args);
 };
 
 /** Finds tool next to a appticationPath. */
