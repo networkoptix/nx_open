@@ -31,7 +31,7 @@
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
-     <widget class="QnPanel" name="leftPanel" native="true">
+     <widget class="nx::client::desktop::Panel" name="leftPanel" native="true">
       <layout class="QVBoxLayout" name="verticalLayout">
        <property name="leftMargin">
         <number>16</number>
@@ -99,9 +99,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QnPanel</class>
+   <class>nx::client::desktop::Panel</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/panel.h</header>
+   <header location="global">nx/client/desktop/common/widgets/panel.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

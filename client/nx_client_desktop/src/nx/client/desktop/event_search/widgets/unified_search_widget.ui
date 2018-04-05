@@ -182,7 +182,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QnToolButton" name="showInfoButton">
+          <widget class="nx::client::desktop::ToolButton" name="showInfoButton">
            <property name="toolTip">
             <string>Show/hide information</string>
            </property>
@@ -195,7 +195,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QnToolButton" name="showPreviewsButton">
+          <widget class="nx::client::desktop::ToolButton" name="showPreviewsButton">
            <property name="toolTip">
             <string>Show/hide thumbnails</string>
            </property>
@@ -335,9 +335,9 @@
    <header location="global">nx/client/desktop/common/widgets/selectable_text_button.h</header>
   </customwidget>
   <customwidget>
-   <class>QnToolButton</class>
+   <class>nx::client::desktop::ToolButton</class>
    <extends>QToolButton</extends>
-   <header location="global">ui/widgets/common/tool_button.h</header>
+   <header location="global">nx/client/desktop/common/widgets/tool_button.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

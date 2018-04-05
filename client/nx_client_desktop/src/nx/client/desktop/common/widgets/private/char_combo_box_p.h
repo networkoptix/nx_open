@@ -9,6 +9,7 @@
 // -------------------------------------------------------------------------- //
 // QComboBoxListView
 // -------------------------------------------------------------------------- //
+// TODO: #vkutin #gdm #common Get rid of this porn.
 /**
  * Combo box list view as implemented in <tt>qcombobox_p.h</tt>.
  *
@@ -64,16 +65,19 @@ private:
     QComboBox *combo;
 };
 
+namespace nx {
+namespace client {
+namespace desktop {
 
 // -------------------------------------------------------------------------- //
-// QnCharComboBoxListView
+// CharComboBoxListView
 // -------------------------------------------------------------------------- //
-class QnCharComboBoxListView: public QComboBoxListView {
+class CharComboBoxListView: public QComboBoxListView {
     Q_OBJECT
     typedef QComboBoxListView base_type;
 
 public:
-    QnCharComboBoxListView(QComboBox *comboBox = NULL): QComboBoxListView(comboBox) {}
+    CharComboBoxListView(QComboBox *comboBox = NULL): QComboBoxListView(comboBox) {}
 
     virtual void keyboardSearch(const QString &search) override {
         if(!search.isEmpty()) {
@@ -85,3 +89,7 @@ public:
         base_type::keyboardSearch(search);
     }
 };
+
+} // namespace desktop
+} // namespace client
+} // namespace nx

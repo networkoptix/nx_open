@@ -2,17 +2,21 @@
 
 #include <QtWidgets/QPlainTextEdit>
 
+namespace nx {
+namespace client {
+namespace desktop {
+
 /*
 * QLabel supports text wrapping at word boundary but not any arbitrary place.
 * This QTextEdit descendant serves to overcome that limitation.
 */
-class QnTextEditLabel : public QTextEdit
+class TextEditLabel : public QTextEdit
 {
     Q_OBJECT
     using base_type = QTextEdit;
 
 public:
-    QnTextEditLabel(QWidget* parent = nullptr);
+    TextEditLabel(QWidget* parent = nullptr);
 
     virtual QSize sizeHint() const override;
     virtual QSize minimumSizeHint() const override;
@@ -22,3 +26,7 @@ public:
 private:
     QSize m_documentSize;
 };
+
+} // namespace desktop
+} // namespace client
+} // namespace nx

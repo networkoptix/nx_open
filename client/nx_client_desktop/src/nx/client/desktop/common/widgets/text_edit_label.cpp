@@ -2,7 +2,11 @@
 
 #include <ui/style/helper.h>
 
-QnTextEditLabel::QnTextEditLabel(QWidget* parent) :
+namespace nx {
+namespace client {
+namespace desktop {
+
+TextEditLabel::TextEditLabel(QWidget* parent):
     base_type(parent),
     m_documentSize(0, 0)
 {
@@ -38,7 +42,7 @@ QnTextEditLabel::QnTextEditLabel(QWidget* parent) :
         });
 }
 
-bool QnTextEditLabel::isAutoWrapped() const
+bool TextEditLabel::isAutoWrapped() const
 {
     switch (wordWrapMode())
     {
@@ -52,12 +56,16 @@ bool QnTextEditLabel::isAutoWrapped() const
     }
 }
 
-QSize QnTextEditLabel::sizeHint() const
+QSize TextEditLabel::sizeHint() const
 {
     return m_documentSize;
 }
 
-QSize QnTextEditLabel::minimumSizeHint() const
+QSize TextEditLabel::minimumSizeHint() const
 {
     return QSize(0, m_documentSize.height());
 }
+
+} // namespace desktop
+} // namespace client
+} // namespace nx

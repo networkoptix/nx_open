@@ -1,7 +1,10 @@
-#ifndef QN_CHAR_COMBO_BOX_H
-#define QN_CHAR_COMBO_BOX_H
+#pragma once
 
-#include "combo_box.h"
+#include <QtWidgets/QComboBox>
+
+namespace nx {
+namespace client {
+namespace desktop {
 
 /**
  * Combo box that is better suitable for displaying lists where most of the items
@@ -9,14 +12,15 @@
  * it disregards <tt>QApplication::keyboardInputInterval</tt>.
  * Note that this is implemented by replacing the combo box's default item view.
  */
-class QnCharComboBox: public QnComboBox {
+class CharComboBox: public QComboBox
+{
     Q_OBJECT
-    typedef QnComboBox base_type;
+    using base_type = QComboBox;
 
 public:
-    QnCharComboBox(QWidget *parent = NULL);
-    virtual ~QnCharComboBox();
+    explicit CharComboBox(QWidget* parent = nullptr);
 };
 
-
-#endif // QN_CHAR_COMBO_BOX_H
+} // namespace desktop
+} // namespace client
+} // namespace nx

@@ -143,8 +143,8 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget* parent) :
     enum { kUpdateFilterDelayMs = 200 };
     ui->filterLineEdit->setTextChangedSignalFilterMs(kUpdateFilterDelayMs);
 
-    connect(ui->filterLineEdit, &QnSearchLineEdit::enterKeyPressed, this, &QnAuditLogDialog::at_filterChanged);
-    connect(ui->filterLineEdit, &QnSearchLineEdit::textChanged, this, &QnAuditLogDialog::at_filterChanged);
+    connect(ui->filterLineEdit, &SearchLineEdit::enterKeyPressed, this, &QnAuditLogDialog::at_filterChanged);
+    connect(ui->filterLineEdit, &SearchLineEdit::textChanged, this, &QnAuditLogDialog::at_filterChanged);
 
     ui->gridMaster->horizontalHeader()->setSortIndicator(1, Qt::DescendingOrder);
     ui->gridCameras->horizontalHeader()->setSortIndicator(1, Qt::AscendingOrder);

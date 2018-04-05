@@ -57,7 +57,7 @@
 #include <ui/style/custom_style.h>
 #include <ui/style/helper.h>
 #include <nx/client/desktop/common/widgets/busy_indicator.h>
-#include <ui/widgets/common/text_edit_label.h>
+#include <nx/client/desktop/common/widgets/text_edit_label.h>
 #include <ui/widgets/resource_tree_widget.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_item.h>
@@ -76,6 +76,7 @@
 
 #include <ini.h>
 
+using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
 
 namespace {
@@ -179,7 +180,7 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
 
     *m_disconnectHelper << connect(ui->typeComboBox, QnComboboxCurrentIndexChanged,
         this, [this]() { updateFilter(false); });
-    *m_disconnectHelper << connect(ui->filterLineEdit, &QnSearchLineEdit::textChanged,
+    *m_disconnectHelper << connect(ui->filterLineEdit, &SearchLineEdit::textChanged,
         this, [this]() { updateFilter(false); });
     *m_disconnectHelper << connect(ui->filterLineEdit->lineEdit(), &QLineEdit::editingFinished,
         this, [this]() { updateFilter(true); });

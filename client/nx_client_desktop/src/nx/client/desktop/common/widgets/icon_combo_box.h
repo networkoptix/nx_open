@@ -2,17 +2,21 @@
 
 #include <QtWidgets/QComboBox>
 
+namespace nx {
+namespace client {
+namespace desktop {
+
 /**
 A combo box class that allows selection of an icon from a multi-column dropdown list.
 */
-class QnIconSelectionComboBox: public QComboBox
+class IconComboBox: public QComboBox
 {
     Q_OBJECT
     using base_type = QComboBox;
 
 public:
-    QnIconSelectionComboBox(QWidget* parent = nullptr);
-    virtual ~QnIconSelectionComboBox();
+    IconComboBox(QWidget* parent = nullptr);
+    virtual ~IconComboBox();
 
     /**
     Specifies icons to choose from. All icons must reside
@@ -65,12 +69,13 @@ protected:
     virtual void adjustPopupParameters();
 
 private:
-    void createModel();
-
-private:
-    int m_columnCount = 0; //< automatic by default
+    int m_columnCount = 0; //< Automatic by default.
     int m_maxVisibleRows = 5;
 
     class Delegate;
     const QScopedPointer<Delegate> m_delegate;
 };
+
+} // namespace desktop
+} // namespace client
+} // namespace nx

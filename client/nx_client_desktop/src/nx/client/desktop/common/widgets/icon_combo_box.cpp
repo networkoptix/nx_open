@@ -1,4 +1,4 @@
-#include "icon_selection_combo_box.h"
+#include "icon_combo_box.h"
 
 #include <QtCore/QtMath>
 
@@ -17,7 +17,11 @@ static constexpr auto kIconNameRole = Qt::AccessibleTextRole;
 
 } // namespace
 
-class QnIconSelectionComboBox::Delegate: public QnStyledComboBoxDelegate
+namespace nx {
+namespace client {
+namespace desktop {
+
+class IconComboBox::Delegate: public QnStyledComboBoxDelegate
 {
 public:
     using QnStyledComboBoxDelegate::QnStyledComboBoxDelegate;
@@ -36,7 +40,7 @@ public:
     QSize m_itemSize;
 };
 
-QnIconSelectionComboBox::QnIconSelectionComboBox(QWidget* parent) :
+IconComboBox::IconComboBox(QWidget* parent) :
     base_type(parent),
     m_delegate(new Delegate())
 {
@@ -53,11 +57,11 @@ QnIconSelectionComboBox::QnIconSelectionComboBox(QWidget* parent) :
     setView(listView);
 }
 
-QnIconSelectionComboBox::~QnIconSelectionComboBox()
+IconComboBox::~IconComboBox()
 {
 }
 
-void QnIconSelectionComboBox::setIcons(const QString& path,
+void IconComboBox::setIcons(const QString& path,
     const QStringList& names, const QString& extension)
 {
     const QString ext = extension.startsWith(L'.')
@@ -78,7 +82,7 @@ void QnIconSelectionComboBox::setIcons(const QString& path,
     setIcons(icons);
 }
 
-void QnIconSelectionComboBox::setPixmaps(const QString& path,
+void IconComboBox::setPixmaps(const QString& path,
     const QStringList& names, const QString& extension)
 {
     const QString ext = extension.startsWith(L'.')
@@ -99,7 +103,7 @@ void QnIconSelectionComboBox::setPixmaps(const QString& path,
     setPixmaps(pixmaps);
 }
 
-void QnIconSelectionComboBox::setIcons(const QVector<QPair<QString, QIcon>>& icons)
+void IconComboBox::setIcons(const QVector<QPair<QString, QIcon>>& icons)
 {
     auto model = new QStandardItemModel(icons.size(), 1, this);
 
@@ -115,10 +119,10 @@ void QnIconSelectionComboBox::setIcons(const QVector<QPair<QString, QIcon>>& ico
     }
 
     setIconSize(iconSize);
-    setModel(model); //< will delete old model if it was owned
+    setModel(model); //< Will delete old model if it was owned.
 }
 
-void QnIconSelectionComboBox::setPixmaps(const QVector<QPair<QString, QPixmap>>& pixmaps)
+void IconComboBox::setPixmaps(const QVector<QPair<QString, QPixmap>>& pixmaps)
 {
     QVector<QPair<QString, QIcon>> icons;
     icons.reserve(pixmaps.size());
@@ -135,49 +139,49 @@ void QnIconSelectionComboBox::setPixmaps(const QVector<QPair<QString, QPixmap>>&
     setIcons(icons);
 }
 
-int QnIconSelectionComboBox::columnCount() const
+int IconComboBox::columnCount() const
 {
     return m_columnCount;
 }
 
-void QnIconSelectionComboBox::setColumnCount(int count)
+void IconComboBox::setColumnCount(int count)
 {
     m_columnCount = count;
 }
 
-int QnIconSelectionComboBox::maxVisibleRows() const
+int IconComboBox::maxVisibleRows() const
 {
     return m_maxVisibleRows;
 }
 
-void QnIconSelectionComboBox::setMaxVisibleRows(int count)
+void IconComboBox::setMaxVisibleRows(int count)
 {
     m_maxVisibleRows = count;
 }
 
-QSize QnIconSelectionComboBox::itemSize() const
+QSize IconComboBox::itemSize() const
 {
     return m_delegate->m_itemSize;
 }
 
-void QnIconSelectionComboBox::setItemSize(const QSize& size)
+void IconComboBox::setItemSize(const QSize& size)
 {
     m_delegate->m_itemSize = size;
 }
 
-QString QnIconSelectionComboBox::currentIcon() const
+QString IconComboBox::currentIcon() const
 {
     return currentData(kIconNameRole).toString();
 }
 
-void QnIconSelectionComboBox::setCurrentIcon(const QString& name)
+void IconComboBox::setCurrentIcon(const QString& name)
 {
     const auto indices = model()->match(model()->index(0, 0), kIconNameRole, name);
     if (!indices.empty())
         setCurrentIndex(indices.front().row());
 }
 
-void QnIconSelectionComboBox::adjustPopupParameters()
+void IconComboBox::adjustPopupParameters()
 {
     auto listView = qobject_cast<QListView*>(view());
     if (!listView || listView->viewMode() != QListView::IconMode)
@@ -208,20 +212,24 @@ void QnIconSelectionComboBox::adjustPopupParameters()
         ? listView->style()->pixelMetric(QStyle::PM_ScrollBarExtent, nullptr, this)
         : 0;
 
-    /* We must explicitly switch scroll bar policy or items will be incorrectly laid out. */
+    // We must explicitly switch scroll bar policy or items will be incorrectly laid out.
     listView->setVerticalScrollBarPolicy(showScrollBar
         ? Qt::ScrollBarAlwaysOn
         : Qt::ScrollBarAlwaysOff);
 
     const auto margins = listView->parentWidget()->contentsMargins();
     const int popupWidth = gridSize.width() * columns + scrollBarExtra
-        + margins.left() + margins.right() + 1; //< without "+1" items lay out incorrectly.
+        + margins.left() + margins.right() + 1; //< Without "+1" items lay out incorrectly.
 
     setProperty(style::Properties::kComboBoxPopupWidth, popupWidth);
 }
 
-void QnIconSelectionComboBox::showPopup()
+void IconComboBox::showPopup()
 {
     adjustPopupParameters();
     base_type::showPopup();
 }
+
+} // namespace desktop
+} // namespace client
+} // namespace nx

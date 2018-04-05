@@ -2,13 +2,17 @@
 
 #include <QtWidgets/QToolButton>
 
-class QnToolButton: public QToolButton
+namespace nx {
+namespace client {
+namespace desktop {
+
+class ToolButton: public QToolButton
 {
     Q_OBJECT
     using base_type = QToolButton;
 
 public:
-    QnToolButton(QWidget* parent = nullptr);
+    ToolButton(QWidget* parent = nullptr);
     void adjustIconSize();
 
     enum Background
@@ -36,4 +40,8 @@ private:
     Backgrounds m_drawnBackgrounds = AllBackgrounds;
 };
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(QnToolButton::Backgrounds);
+Q_DECLARE_OPERATORS_FOR_FLAGS(ToolButton::Backgrounds);
+
+} // namespace desktop
+} // namespace client
+} // namespace nx

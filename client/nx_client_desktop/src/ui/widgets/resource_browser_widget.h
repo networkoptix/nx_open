@@ -32,7 +32,7 @@ class HoverFocusProcessor;
 class QnResourceTreeModel;
 class QnResourceSearchSynchronizer;
 class QnResourceTreeWidget;
-class QnTextEditLabel;
+class TextEditLabel;
 class QnGraphicsToolTipWidget;
 class QnCameraThumbnailManager;
 

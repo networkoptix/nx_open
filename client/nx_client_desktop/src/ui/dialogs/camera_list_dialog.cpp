@@ -26,6 +26,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workaround/hidpi_workarounds.h>
 
+using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
 
 QnCameraListDialog::QnCameraListDialog(QWidget *parent):
@@ -60,7 +61,7 @@ QnCameraListDialog::QnCameraListDialog(QWidget *parent):
 
     ui->camerasView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->camerasView->setModel(m_resourceSearch);
-    connect(ui->filterLineEdit, &QnSearchLineEdit::textChanged,                 this,   &QnCameraListDialog::updateCriterion);
+    connect(ui->filterLineEdit, &SearchLineEdit::textChanged,                 this,   &QnCameraListDialog::updateCriterion);
     connect(ui->camerasView,    &QTableView::customContextMenuRequested,        this,   &QnCameraListDialog::at_camerasView_customContextMenuRequested);
     connect(ui->camerasView,    &QTableView::doubleClicked,                     this,   &QnCameraListDialog::at_camerasView_doubleClicked);
 

@@ -6,22 +6,26 @@
 #include <ui/style/skin.h>
 #include <utils/common/delayed.h>
 
-QnToolButton::QnToolButton(QWidget* parent): base_type(parent)
+namespace nx {
+namespace client {
+namespace desktop {
+
+ToolButton::ToolButton(QWidget* parent): base_type(parent)
 {
 }
 
-void QnToolButton::adjustIconSize()
+void ToolButton::adjustIconSize()
 {
     if (!icon().isNull())
        setIconSize(calculateIconSize());
 }
 
-QSize QnToolButton::calculateIconSize() const
+QSize ToolButton::calculateIconSize() const
 {
     return QnSkin::maximumSize(icon());
 }
 
-void QnToolButton::mousePressEvent(QMouseEvent* event)
+void ToolButton::mousePressEvent(QMouseEvent* event)
 {
     base_type::mousePressEvent(event);
 
@@ -32,7 +36,7 @@ void QnToolButton::mousePressEvent(QMouseEvent* event)
     executeDelayedParented(emitJustPressed, 0, this);
 }
 
-void QnToolButton::paintEvent(QPaintEvent* event)
+void ToolButton::paintEvent(QPaintEvent* event)
 {
     QStylePainter p(this);
     QStyleOptionToolButton option;
@@ -53,12 +57,12 @@ void QnToolButton::paintEvent(QPaintEvent* event)
     p.drawComplexControl(QStyle::CC_ToolButton, option);
 }
 
-QnToolButton::Backgrounds QnToolButton::drawnBackgrounds() const
+ToolButton::Backgrounds ToolButton::drawnBackgrounds() const
 {
     return m_drawnBackgrounds;
 }
 
-void QnToolButton::setDrawnBackgrounds(Backgrounds value)
+void ToolButton::setDrawnBackgrounds(Backgrounds value)
 {
     if (m_drawnBackgrounds == value)
         return;
@@ -66,3 +70,7 @@ void QnToolButton::setDrawnBackgrounds(Backgrounds value)
     m_drawnBackgrounds = value;
     update();
 }
+
+} // namespace desktop
+} // namespace client
+} // namespace nx

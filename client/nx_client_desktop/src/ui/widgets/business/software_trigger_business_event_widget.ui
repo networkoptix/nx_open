@@ -83,7 +83,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QnIconSelectionComboBox" name="iconComboBox"/>
+      <widget class="nx::client::desktop::IconComboBox" name="iconComboBox"/>
      </item>
      <item>
       <spacer name="horizontalSpacer">
@@ -104,9 +104,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnIconSelectionComboBox</class>
+   <class>nx::client::desktop::IconComboBox</class>
    <extends>QComboBox</extends>
-   <header location="global">ui/widgets/common/icon_selection_combo_box.h</header>
+   <header location="global">nx/client/desktop/common/widgets/icon_combo_box.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

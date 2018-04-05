@@ -2,7 +2,7 @@
 
 #include <QtWidgets/QWidget>
 
-#include <ui/widgets/common/panel.h>
+#include <nx/client/desktop/common/widgets/panel.h>
 
 namespace Ui {
 class CloudUserPanelWidget;
@@ -11,10 +11,10 @@ class CloudUserPanelWidget;
 class AbstractAccessor;
 
 /** Widget for displaying cloud user heading. */
-class QnCloudUserPanelWidget: public QnPanel
+class QnCloudUserPanelWidget: public nx::client::desktop::Panel
 {
     Q_OBJECT
-    using base_type = QnPanel;
+    using base_type = nx::client::desktop::Panel;
 
 public:
     QnCloudUserPanelWidget(QWidget* parent = nullptr);
