@@ -256,7 +256,7 @@ void initLog(const QString& logLevel)
                 ? QString::fromUtf8(ini().logFile)
                 : QnAppInfo::isAndroid()
                     ? lit("-")
-                    : (QString::fromUtf8(ini().iniFileDir()) + lit("mobile_client")));
+                    : (QString::fromUtf8(ini().iniFilesDir()) + lit("mobile_client")));
     }
 
     const auto ec2logger = nx::utils::log::addLogger({QnLog::EC2_TRAN_LOG});
@@ -269,7 +269,7 @@ void initLog(const QString& logLevel)
             /*baseName*/
                 QnAppInfo::isAndroid()
                 ? lit("-")
-                : (QString::fromUtf8(ini().iniFileDir()) + lit("ec2_tran")),
+                : (QString::fromUtf8(ini().iniFilesDir()) + lit("ec2_tran")),
             ec2logger);
     }
 }
