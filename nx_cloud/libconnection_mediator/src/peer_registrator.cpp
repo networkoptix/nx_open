@@ -351,13 +351,18 @@ void PeerRegistrator::sendListenResponse(
 void PeerRegistrator::reportClientBind(
     const MediaserverData& mediaserverConnectionKey)
 {
-    auto peerLocker = m_listeningPeerPool->findAndLockPeerDataByHostName(
-        mediaserverConnectionKey.hostName());
-    if (!peerLocker)
-        return;
+    std::shared_ptr<nx::stun::ServerConnection> peerConnection;
 
-    NX_ASSERT(peerLocker->value().peerConnection->isInSelfAioThread());
-    sendClientBindIndications(peerLocker->value().peerConnection);
+    {
+        auto peerLocker = m_listeningPeerPool->findAndLockPeerDataByHostName(
+            mediaserverConnectionKey.hostName());
+        if (!peerLocker)
+            return;
+        peerConnection = peerLocker->value().peerConnection;
+    }
+
+    NX_ASSERT(peerConnection->isInSelfAioThread());
+    sendClientBindIndications(peerConnection);
 }
 
 void PeerRegistrator::sendClientBindIndications(
