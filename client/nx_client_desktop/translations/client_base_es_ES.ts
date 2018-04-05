@@ -1120,17 +1120,18 @@ to view more bookmarks</source>
       <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
       <translation>El archivo &quot;%1&quot; no puede escribirse. Intenta otro nombre.</translation>
     </message>
+    <message>
+      <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
+      <translation>El nombre de archivo &quot;%1&quot; está reservado por el sistema operativo. Intenta otro nombre.</translation>
+    </message>
     <message numerus="yes">
       <source>Filename should not contain the following reserved characters:
 %1</source>
+      <comment>Multiple form must concern characters count, not filenames!</comment>
       <translation>
         <numerusform>El nombre de archivo no debe contener los siguientes caracteres reservados: %1</numerusform>
         <numerusform>El nombre de archivo no debe contener los siguientes caracteres reservados: %1</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation>El nombre de archivo &quot;%1&quot; está reservado por el sistema operativo. Intenta otro nombre.</translation>
     </message>
   </context>
   <context>
@@ -2801,40 +2802,40 @@ dispositivos</translation>
     </message>
     <message>
       <source>Disconnect System from %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>¿Desconectar el Sistema de %1</translation>
     </message>
     <message>
       <source>Open %1 Portal</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Abrir el %1 Portal</translation>
     </message>
     <message>
       <source>Create %1 Account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Crear cuenta %1</translation>
     </message>
     <message>
       <source>Connect System to %1...</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Conectar el sistema a %1...</translation>
     </message>
     <message>
       <source>Create %1
 account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Crear %1</translation>
     </message>
     <message>
       <source>Connect System
 to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Conectar el sistema
 a %1</translation>
     </message>
     <message>
       <source>Learn more about %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Más información acerca de %1</translation>
     </message>
   </context>
@@ -2861,7 +2862,7 @@ a %1</translation>
     </message>
     <message>
       <source>Cannot connect to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>No se puede conectar a %1</translation>
     </message>
   </context>
@@ -2892,12 +2893,12 @@ a %1</translation>
     </message>
     <message>
       <source>Connect to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Conectarse a %1</translation>
     </message>
     <message>
       <source>Enter %1 Account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Ingrese la cuenta %1</translation>
     </message>
   </context>
@@ -2909,12 +2910,12 @@ a %1</translation>
     </message>
     <message>
       <source>System connected to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Sistema conectado a %1</translation>
     </message>
     <message>
       <source>Failed to connect System to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Error al conectar el sistema a %1</translation>
     </message>
   </context>
@@ -3066,17 +3067,17 @@ a %1</translation>
       <translation>Operación no se permite ahora. Puede ocurrir debido al reinicio del servidor. Por favor Inténtelo más tarde.</translation>
     </message>
     <message>
-      <source>Connection to %1 is not ready yet. Check server Internet connection or try again later.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>La conexión con %1 aún no está lista. Compruebe la conexión a internet del servidor o intente otra vez más tarde.</translation>
-    </message>
-    <message>
       <source>Connection to Server could not be established.</source>
       <translation>Conexión con el servidor no pudo ser establecida.</translation>
     </message>
     <message>
       <source>This user is disabled by system administrator.</source>
       <translation>Este usuario está deshabilitado por el administrador del sistema.</translation>
+    </message>
+    <message>
+      <source>Connection to %1 is not ready yet. Check server Internet connection or try again later.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>La conexión con %1 aún no está lista. Compruebe la conexión a internet del servidor o intente otra vez más tarde.</translation>
     </message>
   </context>
   <context>
@@ -3300,28 +3301,28 @@ a %1</translation>
       <translation>Desconectar</translation>
     </message>
     <message>
-      <source>Failed to disconnect System from %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Error al desconectar el sistema de %1</translation>
-    </message>
-    <message>
-      <source>Disconnect System from %1?</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>¿Desconectar el Sistema de %1?</translation>
-    </message>
-    <message>
       <source>You will be disconnected from this System and able to login again through local network with local account</source>
       <translation>Se desconectará del sistema y podrá acceder otra vez a través de red local con cuenta local</translation>
     </message>
     <message>
-      <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Usted no será capaz de conectarse a este sistema con su cuenta %1 después de desconectar este sistema de %1.</translation>
+      <source>Failed to disconnect System from %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Error al desconectar el sistema de %1</translation>
+    </message>
+    <message>
+      <source>Disconnect System from %1?</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>¿Desconectar el Sistema de %1?</translation>
     </message>
     <message>
       <source>All %1 users will be deleted.</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation>Todos los %1 usuarios serán eliminados.</translation>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">All %1 users will be deleted.</translation>
+    </message>
+    <message>
+      <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Usted no será capaz de conectarse a este sistema con su cuenta %1 después de desconectar este sistema de %1.</translation>
     </message>
   </context>
   <context>
@@ -4256,7 +4257,7 @@ a %1</translation>
     <name>QnLinkToCloudDialogPrivate</name>
     <message>
       <source>Failed to login to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Error al iniciar sesión en %1</translation>
     </message>
   </context>
@@ -4374,12 +4375,12 @@ a %1</translation>
     </message>
     <message>
       <source>Log in to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Iniciando sesión en %1</translation>
     </message>
     <message>
       <source>Welcome to %1!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Bienvenido/a a %1!</translation>
     </message>
   </context>
@@ -6511,16 +6512,6 @@ a %1</translation>
       <translation>Conexión</translation>
     </message>
     <message>
-      <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Conecta tu sistema a %1 &amp;mdash; ¡hazlo accesible desde cualquier lugar!</translation>
-    </message>
-    <message>
-      <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Echa un vistazo a %1 &amp;mdash; !Conecte su sistema desde cualquier lugar!</translation>
-    </message>
-    <message>
       <source>Some users have not set their email addresses</source>
       <translation>Algunos usuarios no han establecido sus direcciones de correo</translation>
     </message>
@@ -6571,6 +6562,16 @@ a %1</translation>
     <message>
       <source>Archive integrity problem detected</source>
       <translation>Problema de integridad del archivo</translation>
+    </message>
+    <message>
+      <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Conecta tu sistema a %1 &amp;mdash; ¡hazlo accesible desde cualquier lugar!</translation>
+    </message>
+    <message>
+      <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Echa un vistazo a %1 &amp;mdash; !Conecte su sistema desde cualquier lugar!</translation>
     </message>
   </context>
   <context>
@@ -6857,8 +6858,8 @@ a %1</translation>
     </message>
     <message>
       <source>%1 user</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation>%1 usuario</translation>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">%1 user</translation>
     </message>
   </context>
   <context>
@@ -7042,7 +7043,7 @@ a %1</translation>
     </message>
     <message>
       <source>This user has not yet signed up for %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Este usuario aún no está registrado en %1</translation>
     </message>
   </context>
@@ -7094,8 +7095,8 @@ a %1</translation>
     </message>
     <message>
       <source>%1 user with specified email already exists.</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation>%1 usuario con el correo electrónico especificado ya existe.</translation>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">%1 user with specified email already exists.</translation>
     </message>
   </context>
   <context>
@@ -7339,8 +7340,8 @@ a %1</translation>
     </message>
     <message>
       <source>%1 Systems cannot be merged</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation>%1 Sistemas no se pueden fusionar</translation>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">%1 Systems cannot be merged</translation>
     </message>
   </context>
   <context>

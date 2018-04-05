@@ -53,11 +53,6 @@
       <translation>The discovered System %1 has an incompatible version %2.</translation>
     </message>
     <message>
-      <source>Cannot connect to the other System because current System is already connected to %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Cannot connect to the other System because current System is already connected to %1.</translation>
-    </message>
-    <message>
       <source>The discovered System %1 is in safe mode.</source>
       <comment>%1 is name of System</comment>
       <translation>The discovered System %1 is in safe mode.</translation>
@@ -66,16 +61,6 @@
       <source>Could not configure the remote System %1.</source>
       <comment>%1 is name of System</comment>
       <translation>Could not configure the remote System %1.</translation>
-    </message>
-    <message>
-      <source>Both Systems are connected to %1. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Both Systems are connected to %1. Merge is not allowed.</translation>
-    </message>
-    <message>
-      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>These Systems are built with different %1 URL. Merge is not allowed.</translation>
     </message>
     <message>
       <source>New System</source>
@@ -87,9 +72,24 @@
       <translation>The discovered System %1 is incompatible with the current System.</translation>
     </message>
     <message>
+      <source>Cannot connect to the other System because current System is already connected to %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Cannot connect to the other System because current System is already connected to %1.</translation>
+    </message>
+    <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation type="unfinished">%1 System can only be merged with non-%1. System name and password are taken from %1 System.</translation>
+    </message>
+    <message>
+      <source>Both Systems are connected to %1. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Both Systems are connected to %1. Merge is not allowed.</translation>
+    </message>
+    <message>
+      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>These Systems are built with different %1 URL. Merge is not allowed.</translation>
     </message>
   </context>
   <context>

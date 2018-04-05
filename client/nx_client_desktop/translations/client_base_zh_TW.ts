@@ -1121,17 +1121,18 @@ to view more bookmarks</source>
       <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
       <translation>檔案 &quot;%1&quot; 無法儲存. 請嘗試另一個名稱.</translation>
     </message>
+    <message>
+      <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
+      <translation>檔名 &quot;%1&quot; 被作業系統保留. 請嘗試另一個檔名.</translation>
+    </message>
     <message numerus="yes">
       <source>Filename should not contain the following reserved characters:
 %1</source>
+      <comment>Multiple form must concern characters count, not filenames!</comment>
       <translation>
         <numerusform>檔名不可包含以下字元:
 %1</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation>檔名 &quot;%1&quot; 被作業系統保留. 請嘗試另一個檔名.</translation>
     </message>
   </context>
   <context>
@@ -2771,41 +2772,41 @@ devices</source>
     </message>
     <message>
       <source>Disconnect System from %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>是否從 %1 中斷開系統?</translation>
     </message>
     <message>
       <source>Open %1 Portal</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>開啟 %1 入口</translation>
     </message>
     <message>
       <source>Create %1 Account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>新建 %1 帳號</translation>
     </message>
     <message>
       <source>Connect System to %1...</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>將系統連接到 %1...</translation>
     </message>
     <message>
       <source>Create %1
 account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>新建 %1
 帳號</translation>
     </message>
     <message>
       <source>Connect System
 to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>將系統連接
 到 %1</translation>
     </message>
     <message>
       <source>Learn more about %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>瞭解更多 %1</translation>
     </message>
   </context>
@@ -2832,7 +2833,7 @@ to %1</source>
     </message>
     <message>
       <source>Cannot connect to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>無法連接到 %1</translation>
     </message>
   </context>
@@ -2863,12 +2864,12 @@ to %1</source>
     </message>
     <message>
       <source>Connect to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>連接到 %1</translation>
     </message>
     <message>
       <source>Enter %1 Account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>輸入 %1 帳號</translation>
     </message>
   </context>
@@ -2880,12 +2881,12 @@ to %1</source>
     </message>
     <message>
       <source>System connected to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>系統連接到 %1</translation>
     </message>
     <message>
       <source>Failed to connect System to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>未能將系統連接到 %1</translation>
     </message>
   </context>
@@ -3037,17 +3038,17 @@ to %1</source>
       <translation>現在不允許操作. 這可能是由於伺服器現正在重新啟動. 請稍後再試.</translation>
     </message>
     <message>
-      <source>Connection to %1 is not ready yet. Check server Internet connection or try again later.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>到 %1 的連線還沒有準備好. 檢查伺服器的網路連接或稍後再試.</translation>
-    </message>
-    <message>
       <source>Connection to Server could not be established.</source>
       <translation>無法建立與伺服器的連線.</translation>
     </message>
     <message>
       <source>This user is disabled by system administrator.</source>
       <translation>此用戶已被系統管理員停用.</translation>
+    </message>
+    <message>
+      <source>Connection to %1 is not ready yet. Check server Internet connection or try again later.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>到 %1 的連線還沒有準備好. 檢查伺服器的網路連接或稍後再試.</translation>
     </message>
   </context>
   <context>
@@ -3271,28 +3272,28 @@ to %1</source>
       <translation>斷線</translation>
     </message>
     <message>
-      <source>Failed to disconnect System from %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>未能從 %1 斷開系統</translation>
-    </message>
-    <message>
-      <source>Disconnect System from %1?</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>是否從 %1 中斷開系統?</translation>
-    </message>
-    <message>
       <source>You will be disconnected from this System and able to login again through local network with local account</source>
       <translation>您將會從這系統中被斷線, 然後您可以使用本地帳號透過本地網路進行登入</translation>
     </message>
     <message>
-      <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>在您從 %1 斷開系統連線後你將不能使用 %1 帳號連接到此系統.</translation>
+      <source>Failed to disconnect System from %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>未能從 %1 斷開系統</translation>
+    </message>
+    <message>
+      <source>Disconnect System from %1?</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>是否從 %1 中斷開系統?</translation>
     </message>
     <message>
       <source>All %1 users will be deleted.</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation type="unfinished">All %1 users will be deleted.</translation>
+    </message>
+    <message>
+      <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>在您從 %1 斷開系統連線後你將不能使用 %1 帳號連接到此系統.</translation>
     </message>
   </context>
   <context>
@@ -4206,7 +4207,7 @@ to %1</source>
     <name>QnLinkToCloudDialogPrivate</name>
     <message>
       <source>Failed to login to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>未能登錄到 %1</translation>
     </message>
   </context>
@@ -4324,12 +4325,12 @@ to %1</source>
     </message>
     <message>
       <source>Log in to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>登入到 %1</translation>
     </message>
     <message>
       <source>Welcome to %1!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>歡迎使用 %1</translation>
     </message>
   </context>
@@ -6445,16 +6446,6 @@ to %1</source>
       <translation>連線</translation>
     </message>
     <message>
-      <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>將您的系統連接至 %1 &amp;mdash; 使其可從任何地方被登入!</translation>
-    </message>
-    <message>
-      <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>來看看 %1 &amp;mdash; 讓您能從任何地方登入您的系統!</translation>
-    </message>
-    <message>
       <source>Some users have not set their email addresses</source>
       <translation>有些使用者尚未設置電子郵件地址</translation>
     </message>
@@ -6505,6 +6496,16 @@ to %1</source>
     <message>
       <source>Archive integrity problem detected</source>
       <translation>已刪除錄影完整性問題</translation>
+    </message>
+    <message>
+      <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>將您的系統連接至 %1 &amp;mdash; 使其可從任何地方被登入!</translation>
+    </message>
+    <message>
+      <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>來看看 %1 &amp;mdash; 讓您能從任何地方登入您的系統!</translation>
     </message>
   </context>
   <context>
@@ -6786,7 +6787,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 user</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation type="unfinished">%1 user</translation>
     </message>
   </context>
@@ -6970,7 +6971,7 @@ to %1</source>
     </message>
     <message>
       <source>This user has not yet signed up for %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>此用戶尚未註冊 %1</translation>
     </message>
   </context>
@@ -7022,7 +7023,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 user with specified email already exists.</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation type="unfinished">%1 user with specified email already exists.</translation>
     </message>
   </context>
@@ -7265,7 +7266,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 Systems cannot be merged</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation type="unfinished">%1 Systems cannot be merged</translation>
     </message>
   </context>
