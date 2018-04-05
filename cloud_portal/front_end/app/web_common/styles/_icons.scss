@@ -123,7 +123,7 @@
   background-position: -50px -26px;
 }
 
-/*.glyphicon-info-sign{
+.glyphicon-info-sign{
   @include kill-glyphicon;
   &{
     background-position: -74px -26px;
@@ -131,7 +131,7 @@
   &.active{
     background-position: -98px -26px;
   }
-}*/
+}
 
 .glyphicon-arrow-left{
   @include kill-glyphicon;

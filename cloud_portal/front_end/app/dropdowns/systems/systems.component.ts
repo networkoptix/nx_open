@@ -10,6 +10,7 @@ import { NgbDropdownModule }                                   from '@ng-bootstr
 export class NxSystemsDropdown implements OnInit {
     @Input() activeSystem: any;
     @Input() systems: any;
+    @Input() active: any;
 
     systemCounter: number;
 
@@ -22,6 +23,10 @@ export class NxSystemsDropdown implements OnInit {
     }
 
     ngOnInit(): void {
+
+        console.log('systems');
+        console.log('activeSystem');
+
         this.systemCounter = this.systems.length;
     }
 

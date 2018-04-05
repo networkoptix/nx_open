@@ -1,20 +1,26 @@
-<div ngbDropdown class="d-inline-block">
+<div ngbDropdown class="d-inline-block"
+     placement="up-right">
 
-    <a ngbDropdownToggle [href]="'/systems/' + system.id">
+    <button class="btn btn-dropdown-toggle"
+            id="systemsDropdown"
+            ngbDropdownToggle>
         <span [ngClass]="{'hidden-expanded':!activeSystem}" class="glyphicon glyphicon-home"></span>
-        <span class="ellipsis">{{activeSystem?activeSystem.name:systemCounter + ' ' + language.lang.header.systems}}</span>
-        <span class="icon-caret"></span>
-    </a>
+        <span class="ellipsis">{{activeSystem ? activeSystem.name : systemCounter + ' ' + language.lang.header.systems}}</span>
+    </button>
 
     <ul ngbDropdownMenu aria-labelledby="systemsDropdown">
+        <div class="arrow up"></div>
+
         <li *ngIf="activeSystem" class="hidden-expanded active">
             <a [href]>{{activeSystem.name}}</a>
         </li>
         <li *ngIf="activeSystem" class="hidden-expanded nav-divider" role="separator"></li>
 
         <li *ngFor="let system of systems | slice:0:config.maxSystemsForHeader; trackBy: trackByFn;">
-            <a *ngIf="system!=activeSystem" [href]="'/systems/' + system.id + '/' + active.view ? 'view':''">{{system.name}}
-                <span class="system-owner"> &mdash; {{system.ownerFullName}}</span>
+            <a *ngIf="system!=activeSystem" [href]="'/systems/' + system.id + '/' + active.view ? 'view':''">
+                <span class="glyphicon glyphicon-home"></span>
+                <span class="system-name">{{system.name}}</span>
+                <span class="system-owner">&nbsp;&mdash;&nbsp;{{system.ownerFullName}}</span>
             </a>
         </li>
         <li role="separator" class="nav-divider"></li>
@@ -23,26 +29,3 @@
         </li>
     </ul>
 </div>
-
-<!--<a uib-dropdown-toggle ng-href="/systems/{{system.id}}">-->
-<!--<span ng-class="{'hidden-expanded':!activeSystem}" class="glyphicon glyphicon-home"></span>-->
-<!--<span class="ellipsis">{{activeSystem?activeSystem.name:systemCounter + ' ' + L.header.systems}}</span>-->
-<!--<span class="icon-caret"></span>-->
-<!--</a>-->
-<!--<ul uib-dropdown-menu class="dropdown-menu-left">-->
-<!--<li ng-if="activeSystem" class="hidden-expanded active">-->
-<!--<a href="">{{activeSystem.name}}</a>-->
-<!--</li>-->
-<!--<li ng-if="activeSystem" class="hidden-expanded nav-divider" role="separator"></li>-->
-
-<!--<li ng-repeat="system in systems | limitTo: config.maxSystemsForHeader"-->
-<!--ng-if="system!=activeSystem">-->
-<!--<a ng-href="/systems/{{system.id}}/{{active.view?'view':''}}">{{system.name}}-->
-<!--<span class="system-owner"> &mdash; {{system.ownerFullName}}</span>-->
-<!--</a>-->
-<!--</li>-->
-<!--<li role="separator" class="nav-divider"></li>-->
-<!--<li>-->
-<!--<a ng-href="/systems">{{$root.L.header.allSystems}}</a>-->
-<!--</li>-->
-<!--</ul>-->

@@ -44,9 +44,8 @@
                             <span class="ellipsis">{{activeSystem.name}}</span>
                         </a>
                     </li>
-                    <li class="vertical-bar" ng-if="systemCounter && !singleSystem"></li>
                     <li ng-if="systemCounter && !singleSystem" class="collapse-second">
-                        <nx-systems [activeSystem]="activeSystem" [systems]="systems"></nx-systems>
+                        <nx-systems [activeSystem]="activeSystem" [systems]="systems" [active]="active"></nx-systems>
                     </li>
                     <li class="vertical-bar"></li>
                     <li class="collapse-first">

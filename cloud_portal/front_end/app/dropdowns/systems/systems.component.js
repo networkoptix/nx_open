@@ -22,6 +22,8 @@ let NxSystemsDropdown = class NxSystemsDropdown {
         return item.id;
     }
     ngOnInit() {
+        console.log('systems');
+        console.log('activeSystem');
         this.systemCounter = this.systems.length;
     }
     ngOnDestroy() {
@@ -35,6 +37,10 @@ __decorate([
     core_1.Input(),
     __metadata("design:type", Object)
 ], NxSystemsDropdown.prototype, "systems", void 0);
+__decorate([
+    core_1.Input(),
+    __metadata("design:type", Object)
+], NxSystemsDropdown.prototype, "active", void 0);
 NxSystemsDropdown = __decorate([
     core_1.Component({
         selector: 'nx-systems',

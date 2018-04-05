@@ -15,14 +15,7 @@
     }
 }
 
-.arrow {
-    &.up {
-        &:after {
-            top: 1px;
-            margin-left: -$arrow-width;
-            border-top-width: 1px;
-            border-bottom-color: $arrow-color;
-        }
-    }
+.dropdown {
+    top: 2px; // vertical alignment is off when using 'placement'
 }
 
