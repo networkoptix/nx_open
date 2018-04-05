@@ -701,12 +701,6 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
         {
             RtpHeader* packet = (RtpHeader*) (rtpHeaderPtr);
             isRtcp = packet->payloadType >= 72 && packet->payloadType <= 76;
-            if (isRtcp && m_owner->getTracksCount() == 1)
-            {
-                // skip RTCP packets is no audio. some clients have problem with it. I don't know why.
-                m_sendBuffer.resize(dataStartIndex);
-                continue;
-            }
         }
         else {
             const qint64 packetTime = av_rescale_q(media->timestamp, r, time_base);
