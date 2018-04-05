@@ -9,6 +9,29 @@
 #include <utils/common/delayed.h>
 #include <ui/models/resource/resource_tree_model.h>
 
+namespace {
+
+const QnResourceTreeModel* treeModel(const QAbstractItemModel* topLevelModel)
+{
+    for (;;)
+    {
+        if (!topLevelModel)
+            return nullptr;
+
+        const auto model = qobject_cast<const QnResourceTreeModel*>(topLevelModel);
+        if (model)
+            return model;
+
+        const auto proxyModel = qobject_cast<const QAbstractProxyModel*>(topLevelModel);
+        if (!proxyModel)
+            return nullptr;
+
+        topLevelModel = proxyModel->sourceModel();
+    }
+}
+
+} // namespace
+
 QnResourceSearchProxyModel::QnResourceSearchProxyModel(QObject* parent):
     base_type(parent)
 {
@@ -68,7 +91,7 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(
     int sourceRow,
     const QModelIndex& sourceParent) const
 {
-    const auto model = qobject_cast<QnResourceTreeModel*>(sourceModel());
+    const auto model = treeModel(sourceModel());
     if (!model)
         return false;
 
