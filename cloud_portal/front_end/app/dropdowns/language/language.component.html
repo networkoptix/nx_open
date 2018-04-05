@@ -7,6 +7,7 @@
             ngbDropdownToggle>
         <span class="lang-sm" lang="{{activeLanguage.language}}"></span>
         <span *ngIf="accountMode">{{activeLanguage.name}}</span>
+        <div class="arrow" [ngClass]="{ 'down': accountMode, 'up' : !accountMode}"></div>
     </button>
 
     <div ngbDropdownMenu aria-labelledby="languageSelect"

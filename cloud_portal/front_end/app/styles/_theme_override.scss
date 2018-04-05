@@ -261,6 +261,39 @@ select.form-control{
 
   &.dropdown-toggle{
     display: flex;
+
+    &::after {
+      display: none;
+    }
+
+    .arrow {
+      position: relative;
+      bottom: auto;
+      right: 0;
+      margin-left: 10px !important;
+      margin-top: 6px;
+      border-top-color: $dark_core;
+      border-width: 6px;
+
+      &:after {
+        bottom: 2px;
+        border-top-color: $light2;
+      }
+
+      &.up {
+        top: auto;
+        left: auto;
+        border-top-width: 0;
+        border-bottom-color: $dark_core;
+        margin-top: 0;
+
+        &:after {
+          bottom: 2px;
+          border-bottom-color: $light2;
+          border-top-color: transparent;
+        }
+      }
+    }
   }
 }
 
