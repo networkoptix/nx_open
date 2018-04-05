@@ -12,14 +12,12 @@
 #include <nx/utils/string.h>
 
 int QnAuditLogRestHandler::executeGet(
-    const QString& path,
+    const QString& /*path*/,
     const QnRequestParamList& params,
     QByteArray& contentBody,
     QByteArray& contentType,
     const QnRestConnectionProcessor* owner)
 {
-    Q_UNUSED(path);
-
     QnUuid sessionId = QnUuid(params.value("sessionId"));
     QnTimePeriod period;
     period.startTimeMs = nx::utils::parseDateTime(params.value("from")) / 1000;
@@ -38,7 +36,6 @@ int QnAuditLogRestHandler::executeGet(
         if (endTimeMs > 0)
             period.durationMs = endTimeMs - period.startTimeMs;
     }
-
 
     QnAuditRecordList outputData = qnServerDb->getAuditData(period, sessionId);
     for(QnAuditRecord& record: outputData)

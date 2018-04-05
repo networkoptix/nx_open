@@ -201,20 +201,6 @@ int runApplication(QtSingleApplication* application, const QnStartupParameters& 
             mainWindow->move(targetPosition);
         }
     }
-    bool debugScreensGeometry = startupParams.screen != QnStartupParameters::kInvalidScreen
-        && startupParams.screen >= desktop->screenCount();
-    if (debugScreensGeometry)
-    {
-        NX_INFO(kMainWindow) << "System screen configuration:";
-        for (int i = 0; i < desktop->screenCount(); ++i)
-        {
-            const auto screen = QGuiApplication::screens().value(i);
-            NX_INFO(kMainWindow) << "Screen" << i << "geometry is" << screen->geometry();
-            if (desktop->screenGeometry(i) != screen->geometry())
-                NX_INFO(kMainWindow) << "Alternative screen" << i << "geometry is" << desktop->screenGeometry(i);
-        }
-    }
-
 
     mainWindow->show();
     joystickManager->start();

@@ -49,7 +49,7 @@
     },
     "Owner": {
       "label": "所有者",
-      "description": "不受限制地的访问包括共享和连接断开系统从云的能力"
+      "description": "不受限制地的访问包括共享和从云连接或断开系统的能力"
     },
     "Viewer": {
       "label": "操作员",
@@ -57,7 +57,7 @@
     },
     "Live Viewer": {
       "label": "实时操作员",
-      "description": "只可以查看视频直播"
+      "description": "只能查看实时视频"
     },
     "Advanced Viewer": {
       "label": "高级操作员",
@@ -69,7 +69,7 @@
     },
     "Custom": {
       "label": "自定义",
-      "description": "使用 {{PRODUCT_NAME}} 客户端应用程序可以设置自定义权限"
+      "description": "使用 {{PRODUCT_NAME}} 客户端应用程序设置自定义权限"
     },
     "cloudAdmin": {
       "label": "管理员",
@@ -81,23 +81,23 @@
     },
     "owner": {
       "label": "所有者",
-      "description": "不受限制地的访问包括共享和连接断开系统从云的能力"
+      "description": "不受限制地的访问包括共享和从云连接或断开系统的能力"
     },
     "viewer": {
-      "label": "操作员",
+      "label": "浏览者",
       "description": "可以查看实时视频和浏览存档"
     },
     "liveViewer": {
-      "label": "实时操作员",
-      "description": "只可以查看视频直播"
+      "label": "实时浏览者",
+      "description": "只能查看实时视频"
     },
     "advancedViewer": {
-      "label": "高级操作员",
+      "label": "高级浏览者",
       "description": "可以查看实时视频，浏览存档，配置摄像头，控制云台等"
     },
     "custom": {
       "label": "自定义",
-      "description": "使用 {{PRODUCT_NAME}} 客户端应用程序可以设置自定义权限"
+      "description": "使用 {{PRODUCT_NAME}} 客户端应用程序设置自定义权限"
     }
   },
   "errorCodes": {
@@ -127,9 +127,9 @@
     "alreadyExists": "此帐户已存在",
     "unknownError": "发生意外的错误",
     "accountAlreadyActivated": "此帐户已激活",
-    "emailNotFound": "帐户不存在",
+    "emailNotFound": "帐户不存在.",
     "EmailAlreadyExists": "此电子邮件已被注册",
-    "oldPasswordMistmatch": "当前密码不正确",
+    "oldPasswordMistmatch": "当前密码不正确.",
     "passwordMismatch": "错误的密码。",
     "cantEditYourself": "不允许更改自己的权限",
     "cantEditAdmin": "此用户具有管理员权限",

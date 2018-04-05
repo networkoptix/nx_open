@@ -420,27 +420,34 @@ bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractA
 
     nx::utils::Url url(action->getParams().url);
     if ((actionParameters.requestType == nx::network::http::Method::get) ||
+        (actionParameters.requestType == nx::network::http::Method::delete_) ||
         (actionParameters.requestType.isEmpty() && actionParameters.text.isEmpty()))
     {
-        auto callback = [action](SystemError::ErrorCode osErrorCode, int statusCode,
-            nx::network::http::BufferType messageBody, nx::network::http::HttpHeaders /*httpResponseHeaders*/)
-        {
-            if (osErrorCode != SystemError::noError ||
-                statusCode != nx::network::http::StatusCode::ok)
+        auto callback = [action](
+            SystemError::ErrorCode osErrorCode,
+            int statusCode,
+            nx::network::http::StringType, /*content type*/
+            nx::network::http::BufferType messageBody,
+            nx::network::http::HttpHeaders /*httpResponseHeaders*/)
             {
-                qWarning() << "Failed to execute HTTP action for url "
-                    << QUrl(action->getParams().url).toString(QUrl::RemoveUserInfo)
-                    << "osErrorCode:" << osErrorCode
-                    << "HTTP result:" << statusCode
-                    << "message:" << messageBody;
-            }
-        };
+                if (osErrorCode != SystemError::noError ||
+                    statusCode != nx::network::http::StatusCode::ok)
+                {
+                    qWarning() << "Failed to execute HTTP action for url "
+                        << QUrl(action->getParams().url).toString(QUrl::RemoveUserInfo)
+                        << "osErrorCode:" << osErrorCode
+                        << "HTTP result:" << statusCode
+                        << "message:" << messageBody;
+                }
+            };
 
-        nx::network::http::downloadFileAsync(
+        nx::network::http::downloadFileAsyncEx(
             url,
             callback,
             nx::network::http::HttpHeaders(),
-            actionParameters.authType);
+            actionParameters.authType,
+            nx::network::http::AsyncHttpClient::Timeouts(),
+            actionParameters.requestType);
         return true;
     }
     else
@@ -466,7 +473,9 @@ bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractA
             contentType,
             nx::network::http::HttpHeaders(),
             callback,
-            actionParameters.authType);
+            actionParameters.authType,
+            QString(), QString(), //< login/password.
+            actionParameters.requestType);
         return true;
     }
 }
@@ -502,7 +511,7 @@ bool ExtendedRuleProcessor::executeRecordingAction(const vms::event::RecordingAc
                 camera,
                 action->getStreamQuality(),
                 action->getFps(),
-                action->getRecordBeforeSec(), //< Record-before setup is allowed after VMS-7148 is implemented
+                action->getRecordBeforeSec(),
                 action->getRecordAfterSec(),
                 action->getDurationSec());
         }

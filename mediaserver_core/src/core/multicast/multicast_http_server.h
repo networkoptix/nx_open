@@ -3,9 +3,8 @@
 
 #include "core/multicast/multicast_http_fwd.h"
 #include "core/multicast/multicast_http_transport.h"
-#include <QSet>
 #include <memory>
-#include <nx/network/deprecated/asynchttpclient.h>
+#include <nx/network/http/http_async_client.h>
 
 class QThread;
 class QnTcpListener;
@@ -19,13 +18,15 @@ namespace QnMulticast
     {
         Q_OBJECT
     public:
-  
+
         HttpServer(const QUuid& localGuid, QnTcpListener* tcpListener);
+        virtual ~HttpServer() override;
     private:
         void at_gotRequest(const QUuid& requestId, const QUuid& clientId, const Request& request);
     private:
+        mutable QnMutex m_mutex;
         std::unique_ptr<Transport> m_transport;
-        QSet<nx::network::http::AsyncHttpClientPtr> m_requests;
+        std::map<QnUuid, std::unique_ptr<nx::network::http::AsyncClient>> m_requests;
         QnTcpListener* m_tcpListener;
     };
 }

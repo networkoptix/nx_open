@@ -60,7 +60,6 @@ protected:
 protected:
     QList<QnAbstractMediaDataReceptor*> m_dataprocessors;
     mutable QnMutex m_mutex;
-    QHash<QByteArray, QVariant> m_streamParam;
     Qn::ConnectionRole m_role;
 };
 

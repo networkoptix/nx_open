@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
 set(CMAKE_SUPPRESS_REGENERATION true)
 include(cmake/option.cmake)
+include(cmake/default_target.cmake)
 
 set(customization "default" CACHE STRING "Product customization")
 nx_option(beta "Is this build is beta build" ON)
@@ -20,7 +21,8 @@ set(CMAKE_BUILD_TYPE ${default_cmake_build_type} CACHE STRING
     "One of [Debug Release RelWithDebInfo MinSizeRel].")
 set(CMAKE_VS_PLATFORM_TOOLSET_HOST_ARCHITECTURE "x64" CACHE INTERNAL "")
 
-set(targetDevice "" CACHE STRING "Target device. For the list see cmake/toolchains.")
+set(targetDevice ${default_target_device} CACHE STRING
+    "Target device. For the list see cmake/toolchains.")
 set(box "none")
 
 if(targetDevice STREQUAL "none")
@@ -62,7 +64,6 @@ include(CMakeParseArguments)
 include(CMakeDependentOption)
 include(ExternalProject)
 include(target_detection)
-include(parameters_validation)
 include(utils)
 include(find_sources)
 include(moc_utils)
@@ -87,6 +88,12 @@ if(MACOSX OR IOS)
     include(macosx_keychain)
 endif()
 
+if(WINDOWS)
+    include(windows_signing)
+endif()
+
+include(parameters_validation)
+
 if(WINDOWS OR ANDROID OR IOS)
     set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
 else()
@@ -96,10 +103,6 @@ endif()
 include(dependencies)
 include(maven_compatibility)
 include(generate_current_config)
-
-if(WINDOWS)
-    include(windows_signing)
-endif()
 include(project_utils)
 include(test_utils)
 
@@ -194,6 +197,7 @@ if(withMediaServer)
     add_subdirectory(mediaserver)
     add_subdirectory(plugins)
     add_subdirectory(storage_plugins)
+    add_subdirectory(nx_system_commands)
 
     if(withDistributions)
         # TODO: Combine all SDKs (nx_storage_sdk, nx_sdk, nx_metadata_sdk) into one like this.
@@ -206,7 +210,8 @@ if(withMediaServer)
 endif()
 
 #add_subdirectory(_axis_controller)
-#add_subdirectory(_vca_controller)
+#add_subdirectory(_dw_vca_controller)
+#add_subdirectory(_dw_mtt_controller)
 
 if(withTestCamera)
     add_subdirectory(testcamera)

@@ -14,6 +14,7 @@
 #include <utils/common/writer_pool.h>
 #include <nx/fusion/serialization/lexical.h>
 #include <media_server/media_server_module.h>
+#include <nx/system_commands.h>
 #include <nx/mediaserver/root_tool.h>
 
 #ifndef _WIN32
@@ -28,7 +29,6 @@
 #include <recorder/storage_manager.h>
 
 #ifndef _WIN32
-#   include <sys/mount.h>
 #   include <sys/types.h>
 #   include <sys/stat.h>
 #   include <fcntl.h>
@@ -132,7 +132,7 @@ const QString& sysDrivePath()
 
 const QString& getDevicePath(const QString& path)
 {
-    return path;
+    return "";
 }
 
 const QString& sysDrivePath()
@@ -142,23 +142,13 @@ const QString& sysDrivePath()
 
 #endif
 
+QString genLocalPath(const QString &url, const QString &prefix = "/tmp/")
+{
+    return prefix + NX_TEMP_FOLDER_NAME + QString::number(qHash(url), 16);
+}
+
 } // namespace <anonymous>
 
-
-namespace aux
-{
-    QString genLocalPath(const QString &url, const QString &prefix = "/tmp/")
-    {
-        return prefix + NX_TEMP_FOLDER_NAME + QString::number(qHash(url), 16);
-    }
-
-    QString passwordFromUrl(const QUrl &url)
-    {   // On some linux distribution (nx1) mount chokes on
-        // empty password. So let's give it a non-empty one.
-        QString password = url.password();
-        return password.isEmpty() ? "123" : password;
-    }
-}
 
 QIODevice* QnFileStorageResource::open(const QString& fileName, QIODevice::OpenMode openMode)
 {
@@ -217,26 +207,32 @@ QIODevice* QnFileStorageResource::open(
     std::unique_ptr<QBufferedFile> rez(
         new QBufferedFile(
             std::shared_ptr<IQnFile>(new QnFile(fileName)),
-                ioBlockSize,
-                ffmpegBufferSize,
-                ffmpegMaxBufferSize,
-                getId()));
+            ioBlockSize,
+            ffmpegBufferSize,
+            ffmpegMaxBufferSize,
+            getId()));
     rez->setSystemFlags(systemFlags);
 
     if (rez->open(openMode))
         return rez.release();
 
-    const auto rootTool = qnServerModule->rootTool();
-    if (rootTool)
+    int fd = rootTool()->open(fileName, openMode);
+    if (fd <= 0)
     {
-        if (rootTool->touchFile(fileName) && rez->open(openMode))
-            return rez.release();
+        NX_ERROR(this, lm("[open] failed to open file %1").args(fileName));
+        return nullptr;
     }
 
-    NX_ERROR(this, lm("[open] failed to open file %1 root_tool is present: %2")
-        .args(fileName, (bool) rootTool));
+    auto result = new QBufferedFile(
+        std::make_shared<QnFile>(fd), ioBlockSize, ffmpegBufferSize, ffmpegMaxBufferSize, getId());
+    result->open(openMode);
 
-    return nullptr;
+    return result;
+}
+
+nx::mediaserver::RootTool* QnFileStorageResource::rootTool() const
+{
+    return qnServerModule->rootTool();
 }
 
 void QnFileStorageResource::setLocalPathSafe(const QString &path)
@@ -261,29 +257,25 @@ QString QnFileStorageResource::getPath() const
         return QUrl(url).path();
 }
 
-qint64 getLocalPossiblyNonExistingPathSize(const QString &path)
+static qint64 getDeviceSizeByLocalPossiblyNonExistingPath(const QString &path)
 {
     qint64 result;
 
-    const auto rootTool = qnServerModule->rootTool();
     if (QDir(path).exists())
     {
-        if (rootTool)
-            rootTool->changeOwner(path);
-        return getDiskTotalSpace(path);
+        qnServerModule->rootTool()->changeOwner(path);
+        result = getDiskTotalSpace(path);
+        return result< 0 ? qnServerModule->rootTool()->totalSpace(path) : result;
     }
 
-    if (!QDir().mkpath(path))
-    {
-        if (rootTool && !rootTool->makeDirectory(path))
-            return -1;
-        if (rootTool)
-            rootTool->changeOwner(path);
-    }
+    if (!QDir().mkpath(path) && !qnServerModule->rootTool()->makeDirectory(path))
+        return -1;
 
     result = getDiskTotalSpace(path);
-    QDir(path).removeRecursively();
+    if (result < 0)
+        result = qnServerModule->rootTool()->totalSpace(path);
 
+    QDir(path).removeRecursively() || qnServerModule->rootTool()->removePath(path);
     return result;
 }
 
@@ -315,7 +307,7 @@ qint64 QnFileStorageResource::calculateAndSetTotalSpaceWithoutInit()
         return getTotalSpace();
     }
     // local storage
-    result = getLocalPossiblyNonExistingPathSize(url);
+    result = getDeviceSizeByLocalPossiblyNonExistingPath(url);
     {
         QnMutexLocker locker(&m_writeTestMutex);
         m_cachedTotalSpace = result;
@@ -349,18 +341,15 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdateInternal()
     }
     else
     {
-        const auto rootTool = qnServerModule->rootTool();
         QDir storageDir(url);
         if (storageDir.exists() || storageDir.mkpath(url))
         {
-            if (rootTool)
-                rootTool->changeOwner(url); //< Just in case it was not ours.
-
+            rootTool()->changeOwner(url); //< Just in case it was not ours.
             result = Qn::StorageInit_Ok;
         }
         else
         {
-            if (rootTool && rootTool->makeDirectory(url))
+            if (rootTool()->makeDirectory(url))
             {
                 result = Qn::StorageInit_Ok;
             }
@@ -498,21 +487,18 @@ void QnFileStorageResource::removeOldDirs()
 
     const QString prefix = lit("/tmp/") + NX_TEMP_FOLDER_NAME;
 
-    for (const QFileInfo &entry : tmpEntries)
+    for (const QFileInfo &entry: tmpEntries)
     {
         if (entry.absoluteFilePath().indexOf(prefix) == -1)
             continue;
 
 #if __linux__
-        int ecode = umount(entry.absoluteFilePath().toLatin1().constData());
-        if (ecode != 0)
-        {
-            if (const auto rootTool = qnServerModule->rootTool())
-            {
-                if (rootTool->unmount(entry.absoluteFilePath()))
-                    ecode = 0;
-            }
-        }
+        bool result = qnServerModule->rootTool()->unmount(entry.absoluteFilePath());
+        NX_VERBOSE(
+            typeid(QnFileStorageResource),
+            lm("[mount, removeOldDirs] Unmounting temporary directory %1, result: %2")
+                .args(entry.absoluteFilePath(), result));
+        int ecode = result ? 0 : -1;
 #elif __APPLE__
         int ecode = unmount(entry.absoluteFilePath().toLatin1().constData(), 0);
 #endif
@@ -531,10 +517,9 @@ void QnFileStorageResource::removeOldDirs()
 
             if (!safeToRemove)
             {
-                NX_LOG(
-                    lit("QnFileStorageResource::removeOldDirs: umount %1 failed").arg(entry.absoluteFilePath()),
-                    cl_logDEBUG1
-                );
+                NX_WARNING(typeid(QnFileStorageResource),
+                    lm("[mount, removeOldDirs] Won't remove %1 since unmount failed")
+                        .args(entry.absoluteFilePath()));
                 continue;
             }
         }
@@ -542,70 +527,16 @@ void QnFileStorageResource::removeOldDirs()
         if (rmdir(entry.absoluteFilePath().toLatin1().constData()) == 0)
             continue;
 
-        if (const auto rootTool = qnServerModule->rootTool())
+        if (!qnServerModule->rootTool()->removePath(entry.absoluteFilePath()))
         {
-            if (rootTool->changeOwner(entry.absoluteFilePath())
-                && rmdir(entry.absoluteFilePath().toLatin1().constData()))
-            {
-                continue;
-            }
+            NX_ERROR(typeid(QnFileStorageResource),
+                lm("[removeOldDirs] Remove %1 failed").args(entry.absoluteFilePath()));
         }
-
-        NX_LOG(
-            lit("QnFileStorageResource::removeOldDirs: remove %1 failed").arg(entry.absoluteFilePath()),
-            cl_logDEBUG1
-        );
     }
 #endif
 }
 
-#ifndef _WIN32
-
-namespace {
-QString prepareCommandString(const QUrl& url, const QString& localPath)
-{
-    QString cifsOptionsString = lit("rsize=8192,wsize=8192");
-    if (!url.userName().isEmpty())
-        cifsOptionsString +=
-            lit(",username=%2,password=%3")
-                .arg(url.userName())
-                .arg(aux::passwordFromUrl(url));
-    else
-        cifsOptionsString += lit(",password=");
-
-    QString srcString = lit("//") + url.host() + url.path();
-    return lit("mount -t cifs -o %1 %2 %3 2>&1")
-                .arg(cifsOptionsString)
-                .arg(srcString)
-                .arg(localPath);
-}
-
-int callMount(const QString& commandString)
-{
-    FILE* pipe;
-    char buf[BUFSIZ];
-    int retCode = -1;
-
-    if ((pipe = popen(commandString.toLatin1().constData(), "r")) == NULL)
-    {
-        NX_LOG(lit("%1 'mount' call failed").arg(Q_FUNC_INFO), cl_logWARNING);
-        return -1;
-    }
-
-    while (fgets(buf, BUFSIZ, pipe) != NULL)
-    {
-        QString outputString = QString::fromUtf8(buf);
-        if (outputString.contains(lit("mount error")) && outputString.contains(lit("13")))
-        {
-            retCode = EACCES;
-            break;
-        }
-    }
-
-    int processReturned = pclose(pipe);
-    return retCode == -1 ? processReturned : retCode;
-}
-}
+#if !defined(Q_OS_WIN)
 
 Qn::StorageInitResult QnFileStorageResource::mountTmpDrive(const QString& urlString)
 {
@@ -613,43 +544,12 @@ Qn::StorageInitResult QnFileStorageResource::mountTmpDrive(const QString& urlStr
     if (!url.isValid())
         return Qn::StorageInit_WrongPath;
 
-    QString localPath = aux::genLocalPath(getUrl());
+    QString localPath = genLocalPath(getUrl());
     setLocalPathSafe(localPath);
-    if (const auto rootTool = qnServerModule->rootTool())
-    {
-        if (rootTool->remount(url, localPath))
-            return Qn::StorageInit_Ok;
 
-        NX_WARNING(this, lm("Failed to mount '%1' to '%2' by root tool").args(url, localPath));
-    }
-
-    umount(localPath.toLatin1().constData());
-    rmdir(localPath.toLatin1().constData());
-
-    int retCode = mkdir(localPath.toLatin1().constData(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-    if (retCode != 0)
-    {
-        NX_LOG(lit("%1 mkdir %2 failed").arg(Q_FUNC_INFO).arg(localPath), cl_logWARNING);
-        return Qn::StorageInit_WrongPath;
-    }
-
-#if __linux__
-    retCode = callMount(prepareCommandString(url, localPath));
-#elif __APPLE__
-#error "TODO BSD-style mount call"
-#endif
-
-    if (retCode != 0)
-    {
-        NX_LOG(lit("Mount SMB resource call with options '%1' failed with retCode %2")
-                .arg(prepareCommandString(url, localPath))
-                .arg(retCode),
-               cl_logWARNING);
-        return retCode == EACCES ? Qn::StorageInit_WrongAuth : Qn::StorageInit_WrongPath;
-    }
-
-    return Qn::StorageInit_Ok;
+    return rootTool()->remount(url, localPath);
 }
+
 #else
 
 Qn::StorageInitResult QnFileStorageResource::updatePermissionsHelper(
@@ -781,24 +681,11 @@ QnFileStorageResource::~QnFileStorageResource()
     if (!m_localPath.isEmpty())
     {
 #if __linux__
-        const auto rootTool = qnServerModule->rootTool();
-        if (rootTool)
-        {
-            bool result = rootTool->unmount(m_localPath);
-            NX_VERBOSE(
-                this,
-                lm("[mount] unmounting folder %1 while destructing object result: %2")
-                    .args(m_localPath, result));
-        }
-        else
-        {
-            int result = umount(m_localPath.toLatin1().constData());
-            NX_VERBOSE(
-                this,
-                lm("[mount] unmounting folder %1 while destructing object result: %2")
-                    .args(m_localPath, result));
-        }
-
+        bool result = rootTool()->unmount(m_localPath);
+        NX_VERBOSE(
+            this,
+            lm("[mount] unmounting folder %1 while destructing object result: %2")
+                .args(m_localPath, result));
 #elif __APPLE__
         unmount(m_localPath.toLatin1().constData(), 0);
 #endif
@@ -823,18 +710,12 @@ bool QnFileStorageResource::renameFile(const QString& oldName, const QString& ne
 
     const auto oldPath = translateUrlToLocal(oldName);
     const auto newPath = translateUrlToLocal(newName);
-    if (QFile::rename(oldPath, newPath))
+    if (QFile::rename(oldPath, newPath) || rootTool()->rename(oldPath, newPath))
         return true;
 
-    if (const auto rootTool = qnServerModule->rootTool())
-    {
-        if (rootTool->changeOwner(oldPath) && rootTool->touchFile(newPath))
-            return QFile::rename(oldPath, newPath);
-    }
-
+    NX_ERROR(this, lm("Rename %1 to %2 failed").args(oldName, newName));
     return false;
 }
-
 
 bool QnFileStorageResource::removeDir(const QString& url)
 {
@@ -843,13 +724,11 @@ bool QnFileStorageResource::removeDir(const QString& url)
 
     const auto path = removeProtocolPrefix(translateUrlToLocal(url));
     QDir dir;
-    if (dir.rmdir(path))
+    if (dir.rmdir(path) || rootTool()->removePath(path))
         return true;
 
-    if (const auto rootTool = qnServerModule->rootTool())
-        return rootTool->changeOwner(path);
-
-    return dir.rmdir(path);
+    NX_ERROR(this, lm("removeDir failed for %1").args(path));
+    return false;
 }
 
 bool QnFileStorageResource::isDirExists(const QString& url)
@@ -858,7 +737,8 @@ bool QnFileStorageResource::isDirExists(const QString& url)
         return false;
 
     QDir d(translateUrlToLocal(url));
-    return d.exists(removeProtocolPrefix(translateUrlToLocal(url)));
+    QString path = removeProtocolPrefix(translateUrlToLocal(url));
+    return d.exists(path) || rootTool()->isPathExists(path);
 }
 
 bool QnFileStorageResource::isFileExists(const QString& url)
@@ -866,7 +746,8 @@ bool QnFileStorageResource::isFileExists(const QString& url)
     if (!m_valid)
         return false;
 
-    return QFile::exists(removeProtocolPrefix(translateUrlToLocal(url)));
+    QString path = removeProtocolPrefix(translateUrlToLocal(url));
+    return QFile::exists(path) || rootTool()->isPathExists(path);
 }
 
 qint64 QnFileStorageResource::getFreeSpace()
@@ -876,7 +757,10 @@ qint64 QnFileStorageResource::getFreeSpace()
     if (!m_valid)
         return QnStorageResource::kUnknownSize;
 
-    return getDiskFreeSpace(localPathCopy.isEmpty() ?  getPath() : localPathCopy);
+    QString path = localPathCopy.isEmpty() ?  getPath() : localPathCopy;
+    qint64 result = getDiskFreeSpace(path);
+
+    return result < 0 ? rootTool()->freeSpace(path) : result;
 }
 
 qint64 QnFileStorageResource::getTotalSpace() const
@@ -892,7 +776,10 @@ qint64 QnFileStorageResource::getTotalSpace() const
 
     QnMutexLocker locker(&m_writeTestMutex);
     if (m_cachedTotalSpace <= 0)
-        m_cachedTotalSpace = getDiskTotalSpace(path);
+    {
+        qint64 result = getDiskTotalSpace(path);
+        m_cachedTotalSpace = (result < 0 ? rootTool()->totalSpace(path) : result);
+    }
 
     return m_cachedTotalSpace;
 }
@@ -904,9 +791,10 @@ QnAbstractStorageResource::FileInfoList QnFileStorageResource::getFileList(const
 
     QnAbstractStorageResource::FileInfoList ret;
 
-    QDir dir(translateUrlToLocal(dirName));
+    QString path = translateUrlToLocal(dirName);
+    QDir dir(path);
     if (!dir.exists())
-        return ret;
+        return rootTool()->fileList(path);
 
     QFileInfoList localList = dir.entryInfoList(
         QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot,
@@ -920,9 +808,7 @@ QnAbstractStorageResource::FileInfoList QnFileStorageResource::getFileList(const
             QnAbstractStorageResource::FileInfo(
                 translateUrlToRemote(entry.absoluteFilePath()),
                 entry.size(),
-                entry.isDir()
-            )
-        );
+                entry.isDir()));
     }
     return ret;
 }
@@ -932,7 +818,9 @@ qint64 QnFileStorageResource::getFileSize(const QString& url) const
     if (!m_valid)
         return -1;
 
-    return QnFile::getFileSize(translateUrlToLocal(url));
+    QString path = translateUrlToLocal(url);
+    qint64 result = QnFile::getFileSize(path);
+    return result == -1 ? rootTool()->fileSize(path) : result;
 }
 
 bool QnFileStorageResource::testWriteCapInternal() const
@@ -946,26 +834,19 @@ bool QnFileStorageResource::testWriteCapInternal() const
     if (file.open(QIODevice::WriteOnly))
         return true;
 
-    if (const auto rootTool = qnServerModule->rootTool())
+    int rootToolFd = rootTool()->open(fileName, QIODevice::WriteOnly);
+    if (rootToolFd > 0)
     {
-        bool result = rootTool->touchFile(fileName);
-        NX_VERBOSE(
-           this,
-           lm("[initOrUpdate, WriteTest] root_tool touch file %1 result %2").args(fileName, result));
-
-        if (!result)
-            return false;
-
-        result = QFile::remove(fileName);
-        NX_VERBOSE(
-           this,
-           lm("[initOrUpdate, WriteTest] Remove file %1 result %2").args(fileName, result));
-
-        if (!result)
-            return false;
+#if !defined(Q_OS_WIN)
+        ::close(rootToolFd);
+#endif
+        return true;
     }
 
-    return true;
+    NX_ERROR(
+        this, lm("[initOrUpdate, WriteTest] Open file %1 for writing failed").args(fileName));
+
+    return false;
 }
 
 Qn::StorageInitResult QnFileStorageResource::initOrUpdate()
@@ -1007,7 +888,10 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdate()
         return Qn::StorageInit_WrongPath;
     }
     QString localPath = getLocalPathSafe();
-    m_cachedTotalSpace = getDiskTotalSpace(localPath.isEmpty() ? getPath() : localPath); // update cached value periodically
+    QString path = localPath.isEmpty() ? getPath() : localPath;
+    m_cachedTotalSpace = getDiskTotalSpace(path); // update cached value periodically
+    if (m_cachedTotalSpace < 0)
+        m_cachedTotalSpace = rootTool()->totalSpace(path);
     NX_VERBOSE(
         this,
         lm("QnFileStorageResource::initOrUpdate successfully completed for %1").args(getUrl()));

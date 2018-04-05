@@ -77,6 +77,8 @@ signals:
     void discoveredServerChanged(const ec2::ApiDiscoveredServerData &discoveredServer);
 
 protected:
+    virtual Qt::ConnectionType handlerConnectionType() const;
+
     virtual void connectToConnection(const ec2::AbstractECConnectionPtr &connection);
     virtual void disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection);
 

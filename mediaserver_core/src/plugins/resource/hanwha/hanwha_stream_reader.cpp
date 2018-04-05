@@ -21,8 +21,8 @@ namespace {
 
 static const QString kLive4NvrProfileName = lit("Live4NVR");
 static const int kHanwhaDefaultPrimaryStreamProfile = 2;
-static const int kNvrSocketReadTimeoutMs = 500;
-static const std::chrono::milliseconds kTimeoutToExtrapolateTimeMs(1000 * 3);
+static const std::chrono::milliseconds kNvrSocketReadTimeout(500);
+static const std::chrono::milliseconds kTimeoutToExtrapolateTime(1000 * 3);
 
 } // namespace
 
@@ -80,8 +80,9 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
     m_rtpReader.setRole(role);
     if (m_hanwhaResource->isNvr() && m_sessionType == HanwhaSessionType::archive)
     {
-        m_rtpReader.rtspClient().setTCPTimeout(kNvrSocketReadTimeoutMs);
-        m_rtpReader.setOnSocketReadTimeoutCallback([this](){ return createEmptyPacket(); });
+        m_rtpReader.setOnSocketReadTimeoutCallback(
+            kNvrSocketReadTimeout,
+            [this](){ return createEmptyPacket(); });
         m_rtpReader.setRtpFrameTimeoutMs(std::numeric_limits<int>::max()); //< Media frame timeout
     }
 
@@ -322,6 +323,8 @@ QString HanwhaStreamReader::rtpTransport() const
 
 void HanwhaStreamReader::setPositionUsec(qint64 value)
 {
+    m_lastTimestampUsec = value;
+    m_timeSinceLastFrame.invalidate();
     m_rtpReader.setPositionUsec(value);
 }
 
@@ -372,12 +375,12 @@ QnAbstractMediaDataPtr HanwhaStreamReader::createEmptyPacket()
     if (!m_hanwhaResource->isNvr())
         return QnAbstractMediaDataPtr();
 
-    if (!m_timeSinceLastFrame.isValid())
-        return QnAbstractMediaDataPtr();
 
     const auto context = m_hanwhaResource->sharedContext();
     const int speed = m_rtpReader.rtspClient().getScale();
-    qint64 currentTimeMs = m_lastTimestampUsec / 1000 + m_timeSinceLastFrame.elapsedMs() * speed;
+    qint64 currentTimeMs = m_lastTimestampUsec / 1000;
+    if (m_timeSinceLastFrame.isValid())
+        currentTimeMs += m_timeSinceLastFrame.elapsedMs() * speed;
     const bool isForwardSearch = speed >= 0;
     const auto timeline = context->overlappedTimeline(m_hanwhaResource->getChannel());
     NX_ASSERT(timeline.size() <= 1, lit("There should be only one overlapped ID for NVRs"));
@@ -387,8 +390,11 @@ QnAbstractMediaDataPtr HanwhaStreamReader::createEmptyPacket()
     const auto chunks = timeline.cbegin()->second;
     if (chunks.containTime(currentTimeMs))
     {
-        if (m_timeSinceLastFrame.elapsed() < kTimeoutToExtrapolateTimeMs)
+        if (m_timeSinceLastFrame.isValid()
+            && m_timeSinceLastFrame.elapsed() < kTimeoutToExtrapolateTime)
+        {
             return QnAbstractMediaDataPtr(); //< Don't forecast position too fast.
+        }
     }
     else
     {

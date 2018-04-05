@@ -19,10 +19,11 @@
     <link rel="stylesheet" href="fonts/roboto/roboto_regular/stylesheet.css" />
     <link rel="stylesheet" href="fonts/roboto/roboto_medium/stylesheet.css" />
 
-    <link rel="stylesheet" href="skin/styles.css">
     <% for (key in htmlWebpackPlugin.files.css) { %>
     <link rel="stylesheet" href="<%= htmlWebpackPlugin.files.css[key] %>" />
     <% } %>
+
+    <link rel="stylesheet" href="skin/styles.css">
 </head>
 <body>
 <!--[if lt IE 7]>

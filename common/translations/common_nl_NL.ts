@@ -87,8 +87,9 @@
       <translation>Het gevonden systeem %1 is niet samen te voegen met het huidige systeem.</translation>
     </message>
     <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <translation>Cloud Systeem kan alleen met non-cloud worden samengevoegd. Systeemnaam en wachtwoord worden afkomstig van Cloud Systeem.</translation>
+      <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 System can only be merged with non-%1. System name and password are taken from %1 System.</translation>
     </message>
   </context>
   <context>
@@ -315,7 +316,7 @@
     </message>
     <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
-      <translation type="unfinished">Please update firmware. Minimal supported version is %1. Current version is %2</translation>
+      <translation>Werk de firmware bij. Minimale ondersteunde versie is %1. De huidige versie is %2</translation>
     </message>
   </context>
   <context>

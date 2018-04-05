@@ -10,12 +10,9 @@
 
 static const int READ_BLOCK_SIZE = 1024*512;
 
-int QnFavIconRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
+int QnFavIconRestHandler::executeGet(const QString& /*path*/, const QnRequestParamList& /*params*/,
+    QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
 {
-    Q_UNUSED(params)
-    Q_UNUSED(path)
-    Q_UNUSED(contentType)
-
     QFile f(":/favicon.ico");
     if (f.open(QFile::ReadOnly))
     {
@@ -28,7 +25,7 @@ int QnFavIconRestHandler::executeGet(const QString& path, const QnRequestParamLi
     }
 }
 
-int QnFavIconRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& /*body*/, const QByteArray& /*srcBodyContentType*/, QByteArray& result, 
+int QnFavIconRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& /*body*/, const QByteArray& /*srcBodyContentType*/, QByteArray& result,
                                       QByteArray& contentType, const QnRestConnectionProcessor* owner)
 {
     return executeGet(path, params, result, contentType, owner);

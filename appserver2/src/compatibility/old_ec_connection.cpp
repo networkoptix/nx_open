@@ -11,7 +11,6 @@
 #include "ec2_thread_pool.h"
 #include "transaction/transaction.h"
 
-
 namespace ec2
 {
     OldEcConnection::OldEcConnection(const QnConnectionInfo& connectionInfo)
@@ -218,7 +217,6 @@ namespace ec2
 
     }
 
-
     void OldEcConnection::startReceivingNotifications()
     {
     }
@@ -227,9 +225,8 @@ namespace ec2
     {
     }
 
-    QnUuid OldEcConnection::routeToPeerVia(const QnUuid& uuid, int* ) const
+    QnUuid OldEcConnection::routeToPeerVia(const QnUuid& /*uuid*/, int* ) const
     {
-        Q_UNUSED(uuid);
         return QnUuid();
     }
 

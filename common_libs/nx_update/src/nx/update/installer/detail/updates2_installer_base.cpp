@@ -3,9 +3,11 @@
 #include <utils/common/process.h>
 #include <nx/utils/raii_guard.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/literal.h>
 
 namespace nx {
 namespace update {
+namespace installer {
 namespace detail {
 
 void Updates2InstallerBase::prepareAsync(const QString& path, PrepareUpdateCompletionHandler handler)
@@ -15,6 +17,7 @@ void Updates2InstallerBase::prepareAsync(const QString& path, PrepareUpdateCompl
         if (!m_extractor)
             m_extractor = createZipExtractor();
 
+        NX_ASSERT(handler, "PrepareUpdateCompletionHandler should not be NULL");
         if (m_running)
             return handler(PrepareResult::alreadyStarted);
 
@@ -167,5 +170,6 @@ Updates2InstallerBase::~Updates2InstallerBase()
 }
 
 } // namespace detail
+} // namespace installer
 } // namespace update
 } // namespace nx

@@ -6,11 +6,15 @@ set(help.language "english")
 set(quicksync "false")
 set(dynamic.customization "false")
 set(display.mobile.name "${display.product.name} Mobile")
+set(liteDeviceName "microserver")
+set(shortCloudName "Cloud")
 
 set(uri.protocol "nx-vms")
 
-set(nxtoolUpgradeCode "cc740987-5070-4750-b853-327417176031")
+# Build submodules
 set(build_nxtool OFF)
+set(build_paxton OFF)
+set(build_mobile ON)
 
 set(backgroundImage "{}")
 set(defaultWebPages "{}")
@@ -36,14 +40,23 @@ set(mac_certificate_file_password "qweasd123")
 
 # Additional Features
 set(vmax false)
-set(enable_hanwha OFF)
+set(enable_hanwha false)
 
 # if true, you can use --customization=<path> to specify customization
 set(dynamic.customization false)
 
 # Localization
-set(additionalTranslations)
+set(additionalTranslations "")
 set(installer.language "en_US")
 set(installer.cultures "en-us")
 
 set(customization.defines "")
+
+set(compatibleCustomizations "")
+
+# Defaults to ${company.name} in the properties.cmake
+set(windowsInstallPath "")
+
+# Some customizations do not have old mobile application
+set(android.oldPackageName "")
+set(ios.old_app_appstore_id "")

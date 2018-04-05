@@ -30,7 +30,7 @@
                 <link rel="stylesheet" href="skin/styles.css"/>
             </head>
             <body class="api-xml">
-                <header class="navbar navbar-static-top bs-docs-nav" id="top" role="banner">
+                <header class="navbar navbar-static-top bs-docs-nav navbar-default" id="top" role="banner">
                     <div class="container">
                         <div class="navbar-header">
                             <a class="navbar-brand" data-toggle="tooltip" data-placement="bottom" href="index.html">

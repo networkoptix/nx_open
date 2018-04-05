@@ -2,6 +2,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QSet>
+#include <QtCore/QThread>
 
 #include <map>
 #include <vector>
@@ -42,7 +43,9 @@ class ManagerPool final:
 
     Q_OBJECT
 public:
-    ManagerPool(QnMediaServerModule* commonModule);
+    ManagerPool(
+        QnMediaServerModule* commonModule,
+        QThread* thread);
     ~ManagerPool();
     void init();
     void stop();
@@ -135,7 +138,7 @@ private:
         const nx::api::AnalyticsDriverManifest& manifest,
         const QnMediaServerResourcePtr& server);
 
-    void mergePluginManifestToServer(
+    nx::api::AnalyticsDriverManifest mergePluginManifestToServer(
         const nx::api::AnalyticsDriverManifest& manifest,
         const QnMediaServerResourcePtr& server);
 
@@ -169,6 +172,7 @@ private:
     bool m_compressedFrameWarningIssued = false;
     bool m_uncompressedFrameWarningIssued = false;
     nx::debugging::VisualMetadataDebuggerPtr m_visualMetadataDebugger;
+    QThread* m_thread;
 };
 
 } // namespace metadata

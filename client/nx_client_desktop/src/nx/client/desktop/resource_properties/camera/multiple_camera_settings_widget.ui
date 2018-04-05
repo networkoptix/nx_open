@@ -79,7 +79,7 @@
         </widget>
        </item>
        <item>
-        <widget class="nx::client::desktop::ImageControlWidget" name="imageControlWidget" native="true"/>
+        <widget class="nx::client::desktop::LegacyImageControlWidget" name="imageControlWidget" native="true"/>
        </item>
        <item>
         <widget class="QnLicensesProposeWidget" name="licensingWidget" native="true"/>
@@ -127,7 +127,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="nx::client::desktop::CameraScheduleWidget" name="cameraScheduleWidget" native="true"/>
+        <widget class="nx::client::desktop::LegacyCameraScheduleWidget" name="cameraScheduleWidget" native="true"/>
        </item>
       </layout>
      </widget>
@@ -156,15 +156,15 @@
     </widget>
    </item>
    <item>
-    <widget class="QnAlertBar" name="alertBar" native="true"/>
+    <widget class="nx::client::desktop::AlertBar" name="alertBar" native="true"/>
    </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnAlertBar</class>
+   <class>nx::client::desktop::AlertBar</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/alert_bar.h</header>
+   <header location="global">nx/client/desktop/common/widgets/message_bar.h</header>
   </customwidget>
   <customwidget>
    <class>nx::client::desktop::CameraExpertSettingsWidget</class>
@@ -173,9 +173,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>nx::client::desktop::ImageControlWidget</class>
+   <class>nx::client::desktop::LegacyImageControlWidget</class>
    <extends>QWidget</extends>
-   <header location="global">nx/client/desktop/resource_properties/camera/image_control_widget.h</header>
+   <header location="global">nx/client/desktop/resource_properties/camera/legacy_image_control_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
@@ -185,9 +185,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>nx::client::desktop::CameraScheduleWidget</class>
+   <class>nx::client::desktop::LegacyCameraScheduleWidget</class>
    <extends>QWidget</extends>
-   <header location="global">nx/client/desktop/resource_properties/camera/camera_schedule_widget.h</header>
+   <header location="global">nx/client/desktop/resource_properties/camera/legacy_camera_schedule_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

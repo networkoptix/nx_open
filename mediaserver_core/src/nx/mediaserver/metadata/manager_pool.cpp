@@ -51,11 +51,13 @@ using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 using namespace nx::debugging;
 
-ManagerPool::ManagerPool(QnMediaServerModule* serverModule):
+ManagerPool::ManagerPool(QnMediaServerModule* serverModule, QThread* thread):
     m_serverModule(serverModule),
     m_visualMetadataDebugger(
-        VisualMetadataDebuggerFactory::makeDebugger(DebuggerType::managerPool))
+        VisualMetadataDebuggerFactory::makeDebugger(DebuggerType::managerPool)),
+    m_thread(thread)
 {
+    NX_ASSERT(thread);
 }
 
 ManagerPool::~ManagerPool()
@@ -67,6 +69,7 @@ ManagerPool::~ManagerPool()
 void ManagerPool::stop()
 {
     disconnect(this);
+    m_thread->quit();
     m_contexts.clear();
 }
 
@@ -300,7 +303,7 @@ void ManagerPool::createCameraManagersForResourceUnsafe(const QnSecurityCamResou
         if (auxiliaryPluginManifest)
         {
             auxiliaryPluginManifest->driverId = pluginManifest->driverId;
-            mergePluginManifestToServer(*auxiliaryPluginManifest, server);
+            pluginManifest = mergePluginManifestToServer(*auxiliaryPluginManifest, server);
         }
 
         setCameraManagerDeclaredSettings(manager.get(), camera, pluginLibName);
@@ -548,10 +551,11 @@ void ManagerPool::assignPluginManifestToServer(
     server->saveParams();
 }
 
-void ManagerPool::mergePluginManifestToServer(
+nx::api::AnalyticsDriverManifest ManagerPool::mergePluginManifestToServer(
     const nx::api::AnalyticsDriverManifest& manifest,
     const QnMediaServerResourcePtr& server)
 {
+    nx::api::AnalyticsDriverManifest* result = nullptr;
     auto existingManifests = server->analyticsDrivers();
     auto it = std::find_if(existingManifests.begin(), existingManifests.end(),
         [&manifest](const nx::api::AnalyticsDriverManifest& m)
@@ -562,13 +566,14 @@ void ManagerPool::mergePluginManifestToServer(
     if (it == existingManifests.cend())
     {
         existingManifests.push_back(manifest);
+        result = &existingManifests.back();
     }
     else
     {
         it->outputEventTypes = it->outputEventTypes.toSet().
             unite(manifest.outputEventTypes.toSet()).toList();
+        result = &*it;
     }
-
 
 #if defined _DEBUG
     // Sometimes in debug purposes we need do clean existingManifest.outputEventTypes list.
@@ -581,6 +586,8 @@ void ManagerPool::mergePluginManifestToServer(
 
     server->setAnalyticsDrivers(existingManifests);
     server->saveParams();
+    NX_ASSERT(result);
+    return *result;
 }
 
 std::pair<
@@ -855,4 +862,3 @@ QString toString(const nx::sdk::CameraInfo& cameraInfo)
 
 } // namespace sdk
 } // namespace nx
-

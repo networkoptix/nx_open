@@ -163,9 +163,8 @@ QHash<int, QByteArray> QnLayoutsModelUnsorted::roleNames() const
     return roleNames;
 }
 
-int QnLayoutsModelUnsorted::rowCount(const QModelIndex& parent) const
+int QnLayoutsModelUnsorted::rowCount(const QModelIndex& /*parent*/) const
 {
-    QN_UNUSED(parent);
     return m_itemsList.size();
 }
 

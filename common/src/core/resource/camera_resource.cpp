@@ -179,16 +179,16 @@ CameraMediaStreams QnVirtualCameraResource::mediaStreams() const
     return supportedMediaStreams;
 }
 
-CameraMediaStreamInfo QnVirtualCameraResource::defaultStream() const
+CameraMediaStreamInfo QnVirtualCameraResource::streamInfo(Qn::StreamIndex index) const
 {
     const auto streams = mediaStreams().streams;
-    auto defaultStream = std::find_if(streams.cbegin(), streams.cend(),
-        [](const CameraMediaStreamInfo& stream)
+    auto stream = std::find_if(streams.cbegin(), streams.cend(),
+        [index](const CameraMediaStreamInfo& stream)
         {
-            return (Qn::StreamIndex) stream.encoderIndex == Qn::StreamIndex::primary;
+            return (Qn::StreamIndex) stream.encoderIndex == index;
         });
-    if (defaultStream != streams.cend())
-        return *defaultStream;
+    if (stream != streams.cend())
+        return *stream;
 
     return CameraMediaStreamInfo();
 }
@@ -197,12 +197,24 @@ QnAspectRatio QnVirtualCameraResource::aspectRatio() const
 {
     using nx::vms::common::core::resource::SensorDescription;
 
-    qreal customAr = customAspectRatio();
-    if (!qFuzzyIsNull(customAr))
-        return QnAspectRatio::closestStandardRatio(static_cast<float>(customAr));
+    const auto customAr = customAspectRatio();
 
-    const auto stream = defaultStream();
-    const QSize size = stream.getResolution();
+    if (customAr.isValid())
+        return customAr;
+
+    // The rest of the code deals with auto aspect ratio.
+    // Aspect ration should be forced to AS of the first stream. Note: primary stream AR could be
+    // changed on the fly and a camera may not have a primary stream. In this case natural
+    // secondary stream AS should be used.
+    const auto stream = streamInfo(Qn::StreamIndex::primary);
+    QSize size = stream.getResolution();
+    if (size.isEmpty())
+    {
+        // Trying to use size from secondary stream
+        const auto secondary = streamInfo(Qn::StreamIndex::secondary);
+        size = secondary.getResolution();
+    }
+
     if (size.isEmpty())
         return QnAspectRatio();
 
@@ -240,7 +252,7 @@ static const bool transcodingAvailable = false;
 bool QnVirtualCameraResource::saveMediaStreamInfoIfNeeded( const CameraMediaStreamInfo& mediaStreamInfo )
 {
     //saving hasDualStreaming flag before locking mutex
-    const auto hasDualStreamingLocal = hasDualStreaming2();
+    const auto hasDualStreamingLocal = hasDualStreaming();
 
     //TODO #ak remove m_mediaStreamsMutex lock, use resource mutex
     QnMutexLocker lk( &m_mediaStreamsMutex );

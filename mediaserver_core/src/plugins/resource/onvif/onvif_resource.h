@@ -277,7 +277,10 @@ public:
 
     virtual CameraDiagnostics::Result fetchChannelCount(bool limitedByEncoders = true);
 
-    CameraDiagnostics::Result sendVideoEncoderToCamera(VideoEncoder& encoder);
+    virtual CameraDiagnostics::Result sendVideoEncoderToCameraEx(
+        VideoEncoder& encoder,
+        Qn::StreamIndex streamIndex,
+        const QnLiveStreamParams& params);
     virtual int suggestBitrateKbps(const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const override;
 
     QnMutex* getStreamConfMutex();
@@ -293,6 +296,11 @@ public:
 
     VideoOptionsLocal primaryVideoCapabilities() const;
     VideoOptionsLocal secondaryVideoCapabilities() const;
+
+    void updateVideoEncoder(
+        VideoEncoder& encoder,
+        Qn::StreamIndex streamIndex,
+        const QnLiveStreamParams& streamParams);
 signals:
     void advancedParameterChanged(const QString &id, const QString &value);
 
@@ -334,14 +342,8 @@ protected:
     void setPrimaryVideoCapabilities(const VideoOptionsLocal& capabilities) { m_primaryStreamCapabilities = capabilities; }
     void setSecondaryVideoCapabilities(const VideoOptionsLocal& capabilities) { m_secondaryStreamCapabilities = capabilities; }
     boost::optional<onvifXsd__H264Profile> getH264StreamProfile(const VideoOptionsLocal& videoOptionsLocal);
-
-    virtual void updateVideoEncoder(
-        VideoEncoder& encoder,
-        Qn::StreamIndex streamIndex,
-        const QnLiveStreamParams& streamParams);
+    CameraDiagnostics::Result sendVideoEncoderToCamera(VideoEncoder& encoder);
 private:
-    friend class QnOnvifStreamReader;
-
     CameraDiagnostics::Result fetchAndSetResourceOptions();
     CameraDiagnostics::Result fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWrapper);
     bool fetchAndSetAudioEncoderOptions(MediaSoapWrapper& soapWrapper);
@@ -584,8 +586,8 @@ private:
     void fillFullUrlInfo( const CapabilitiesResp& response );
     CameraDiagnostics::Result getVideoEncoderTokens(MediaSoapWrapper& soapWrapper, QStringList* result, VideoConfigsResp *confResponse);
     QString getInputPortNumberFromString(const QString& portName);
-    bool initializeTwoWayAudio();
-    bool initializeTwoWayAudioByResourceData();
+    virtual QnAudioTransmitterPtr initializeTwoWayAudio();
+    QnAudioTransmitterPtr initializeTwoWayAudioByResourceData();
 
     mutable QnMutex m_physicalParamsMutex;
     std::unique_ptr<QnOnvifImagingProxy> m_imagingParamsProxy;

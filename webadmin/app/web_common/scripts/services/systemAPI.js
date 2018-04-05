@@ -301,9 +301,8 @@ angular.module('nxCommon')
         ServerConnection.prototype.previewUrl = function(cameraId, time, width, height){
             var data = {
                     cameraId:cleanId(cameraId),
-                    time:time  || 'LATEST'
+                    time: time || 'LATEST'
                 };
-
             if(width){
                 data.width = width;
             }

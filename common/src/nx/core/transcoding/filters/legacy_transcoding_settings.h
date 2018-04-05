@@ -8,6 +8,7 @@
 
 #include <transcoding/timestamp_params.h>
 
+#include <utils/common/aspect_ratio.h>
 #include <utils/color_space/image_correction.h>
 
 namespace nx {
@@ -18,7 +19,7 @@ struct LegacyTranscodingSettings
 {
     QnMediaResourcePtr resource;
 
-    qreal forcedAspectRatio = 0.0;
+    QnAspectRatio forcedAspectRatio;
     int rotation = 0;
     QRectF zoomWindow;
     QnItemDewarpingParams itemDewarpingParams;

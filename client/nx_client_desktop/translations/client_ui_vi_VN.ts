@@ -755,7 +755,7 @@
     <message>
       <location/>
       <source>Generate</source>
-      <translation type="unfinished">Generate</translation>
+      <translation>Tạo</translation>
     </message>
     <message>
       <location/>
@@ -765,7 +765,7 @@
     <message>
       <location/>
       <source>Logical Id</source>
-      <translation type="unfinished">Logical Id</translation>
+      <translation>Id hợp lý</translation>
     </message>
   </context>
   <context>
@@ -1794,17 +1794,17 @@
     <message>
       <location filename="../src/ui/dialogs/new_wearable_camera_dialog.ui"/>
       <source>New Wearable Camera...</source>
-      <translation type="unfinished">New Wearable Camera...</translation>
+      <translation>Camera đeo người mới...</translation>
     </message>
     <message>
       <location/>
       <source>To server</source>
-      <translation type="unfinished">To server</translation>
+      <translation>Đến máy chủ</translation>
     </message>
     <message>
       <location/>
       <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+      <translation>&quot;Máy ảnh Wearable&quot; là một lưu trữ ảo cho các tệp video, có thể được tải lên bất kỳ máy chủ nào trong hệ thống của bạn và được truy cập bởi bất kỳ người dùng nào.</translation>
     </message>
   </context>
   <context>
@@ -2683,13 +2683,6 @@
       <source>Reset</source>
       <translation>Thiết lập lại</translation>
     </message>
-    <message>
-      <location/>
-      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage.
-The oldest footage among all cameras on the server will be deleted first.</source>
-      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage.
-The oldest footage among all cameras on the server will be deleted first.</translation>
-    </message>
   </context>
   <context>
     <name>SmtpAdvancedSettingsWidget</name>
@@ -3045,14 +3038,18 @@ The oldest footage among all cameras on the server will be deleted first.</trans
     </message>
     <message>
       <location/>
-      <source>There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</source>
-      <translation>Chưa có vai trò người dùng tùy chỉnh nào được nêu ra. Nhấp vào nút &quot;Nhiệm vụ mới&quot; để tạo một role mới.</translation>
+      <source>New role</source>
+      <translation>Vai trò mới</translation>
     </message>
     <message>
       <location/>
-      <source>New role</source>
-      <translation>Vai trò mới</translation>
+      <source>There are no custom user roles yet.</source>
+      <translation>Vẫn chưa có người dùng nào dùng role này.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Click &quot;New role&quot; button to create one.</source>
+      <translation>Nhấp vào nút &quot;Vai trò mới&quot; để tạo.</translation>
     </message>
   </context>
   <context>
@@ -3083,7 +3080,7 @@ Click &quot;New role&quot; button to create one.</source>
     <message>
       <location/>
       <source>Detect motion in uploaded video</source>
-      <translation type="unfinished">Detect motion in uploaded video</translation>
+      <translation>Phát hiện chuyển động trong video đã tải lên</translation>
     </message>
     <message>
       <location/>
@@ -3104,17 +3101,17 @@ Click &quot;New role&quot; button to create one.</source>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
       <source>Upload Video</source>
-      <translation type="unfinished">Upload Video</translation>
+      <translation>Tải video lên</translation>
     </message>
     <message>
       <location/>
       <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
+      <translation>Tải lên tập tin...</translation>
     </message>
     <message>
       <location/>
       <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
+      <translation>Tải lên tập tin...</translation>
     </message>
   </context>
   <context>

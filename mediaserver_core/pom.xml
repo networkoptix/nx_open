@@ -20,7 +20,7 @@
         <template>lib</template>
 
         <qt.libs>core network xml xmlpatterns sql concurrent multimedia websockets</qt.libs>
-        <global.libs>-lcommon -lappserver2 -lcloud_db_client -ludt -lnx_email -lnx_network -lnx_speech_synthesizer -lnx_fusion -lnx_utils -lnx_kit -lnx_update</global.libs>
+        <global.libs>-lcommon -lappserver2 -lcloud_db_client -ludt -lnx_email -lnx_network -lnx_speech_synthesizer -lnx_fusion -lnx_utils -lnx_kit -lnx_update -lnx_system_commands</global.libs>
         <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm</windows.oslibs>
         <linux.oslibs>-ldl -lldap</linux.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
@@ -102,6 +102,15 @@
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_speech_synthesizer/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_system_commands</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/nx_system_commands/pom.xml</systemPath>
         </dependency>
     </dependencies>
 

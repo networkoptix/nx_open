@@ -68,7 +68,8 @@ bool PeerWrapper::configureAsLocalSystem()
 {
     auto mediaServerClient = prepareMediaServerClient();
 
-    const auto password = nx::utils::generateRandomName(7);
+    // TODO: #ak Using random password requires some fixes in merge tests.
+    const auto password = "qweasd123"; //nx::utils::generateRandomName(7);
 
     SetupLocalSystemData request;
     request.systemName = nx::utils::generateRandomName(7);
@@ -106,6 +107,13 @@ bool PeerWrapper::saveCloudSystemCredentials(
     m_cloudCredentials.serverId = id().toSimpleByteArray();
 
     return true;
+}
+
+bool PeerWrapper::detachFromCloud()
+{
+    auto mserverClient = prepareMediaServerClient();
+    DetachFromCloudData data;
+    return mserverClient->detachFromCloud(data).error == QnRestResult::Error::NoError;
 }
 
 QnRestResult::Error PeerWrapper::mergeTo(const PeerWrapper& remotePeer)

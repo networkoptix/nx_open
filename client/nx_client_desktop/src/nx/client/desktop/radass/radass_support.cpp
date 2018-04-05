@@ -74,7 +74,7 @@ bool isRadassSupported(const QnLayoutItemIndex& item)
 
 bool isRadassSupported(const QnVirtualCameraResourcePtr& camera)
 {
-    return camera && camera->hasDualStreaming2();
+    return camera && camera->hasDualStreaming();
 }
 
 bool isRadassSupported(const QnVirtualCameraResourceList& cameras, MatchMode match)

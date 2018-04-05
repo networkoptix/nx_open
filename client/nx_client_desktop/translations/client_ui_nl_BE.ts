@@ -755,7 +755,7 @@
     <message>
       <location/>
       <source>Generate</source>
-      <translation>Genereren</translation>
+      <translation>Genereer</translation>
     </message>
     <message>
       <location/>
@@ -765,7 +765,7 @@
     <message>
       <location/>
       <source>Logical Id</source>
-      <translation type="unfinished">Logical Id</translation>
+      <translation>Logische ID</translation>
     </message>
   </context>
   <context>
@@ -1804,7 +1804,7 @@
     <message>
       <location/>
       <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+      <translation>&quot;Draagbare camera&quot; is een virtuele opslag voor videobestanden, die kan worden geüpload naar elke server binnen uw systeem en toegankelijk is voor elke gebruiker.</translation>
     </message>
   </context>
   <context>
@@ -2683,12 +2683,6 @@
       <source>Reset</source>
       <translation>Reset</translation>
     </message>
-    <message>
-      <location/>
-      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage.
-The oldest footage among all cameras on the server will be deleted first.</source>
-      <translation>Het geüploade archief kan automatisch worden verwijderd als er geen vrije ruimte meer is op de serveropslag. De oudste beelden van alle camera's op de server worden eerst verwijderd.</translation>
-    </message>
   </context>
   <context>
     <name>SmtpAdvancedSettingsWidget</name>
@@ -3044,14 +3038,18 @@ The oldest footage among all cameras on the server will be deleted first.</sourc
     </message>
     <message>
       <location/>
-      <source>There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</source>
-      <translation>Er zijn nog geen aangepaste gebruikersrollen. Klik op de &quot;Nieuwe rol&quot; knop om deze aan ​​te maken.</translation>
+      <source>New role</source>
+      <translation>Nieuwe rol</translation>
     </message>
     <message>
       <location/>
-      <source>New role</source>
-      <translation>Nieuwe rol</translation>
+      <source>There are no custom user roles yet.</source>
+      <translation>Er zijn nog geen aangepaste gebruikersprofielen.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Click &quot;New role&quot; button to create one.</source>
+      <translation>Klik op de &quot;Nieuw profiel&quot; -knop om er een te maken.</translation>
     </message>
   </context>
   <context>
@@ -3082,7 +3080,7 @@ Click &quot;New role&quot; button to create one.</source>
     <message>
       <location/>
       <source>Detect motion in uploaded video</source>
-      <translation>Beweging detecteren in geüploade video</translation>
+      <translation>Beweging detecteren in de geüploade video</translation>
     </message>
     <message>
       <location/>

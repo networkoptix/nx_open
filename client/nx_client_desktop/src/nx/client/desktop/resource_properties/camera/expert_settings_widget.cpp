@@ -18,14 +18,15 @@
 
 #include <utils/common/scoped_value_rollback.h>
 
-#include <nx/client/desktop/ui/common/checkbox_utils.h>
+#include <nx/client/desktop/common/utils/checkbox_utils.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
-using namespace nx::client::desktop::ui;
+
+using namespace nx::client::desktop;
 
 namespace {
 
@@ -190,10 +191,10 @@ void CameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraResour
         if (!camera->supportedMotionType().testFlag(Qn::MT_SoftwareGrid))
             allCamerasSupportForceMotion = false;
 
-        m_hasDualStreaming |= camera->hasDualStreaming();
+        m_hasDualStreaming |= camera->hasDualStreamingInternal();
         m_hasRemoteArchiveCapability |= camera->hasCameraCapabilities(Qn::RemoteArchiveCapability);
 
-        if (camera->hasDualStreaming())
+        if (camera->hasDualStreamingInternal())
         {
             if (isDualStreamingDisabled.is_initialized())
             {
@@ -381,7 +382,7 @@ void CameraExpertSettingsWidget::submitToResources(const QnVirtualCameraResource
                 camera->setCameraControlDisabled(false);
         }
 
-        if (globalControlEnabled && enableControls && camera->hasDualStreaming())
+        if (globalControlEnabled && enableControls && camera->hasDualStreamingInternal())
         {
             if (ui->secondStreamDisableCheckBox->checkState() != Qt::PartiallyChecked)
                 camera->setDisableDualStreaming(
@@ -392,7 +393,7 @@ void CameraExpertSettingsWidget::submitToResources(const QnVirtualCameraResource
             camera->setProperty(QnMediaResource::dontRecordPrimaryStreamKey(), ui->checkBoxPrimaryRecorder->isChecked() ? lit("1") : lit("0"));
         if (ui->bitratePerGopCheckBox->checkState() != Qt::PartiallyChecked)
             camera->setProperty(Qn::FORCE_BITRATE_PER_GOP, ui->bitratePerGopCheckBox->isChecked() ? lit("1") : lit("0"));
-        if (ui->checkBoxSecondaryRecorder->checkState() != Qt::PartiallyChecked && camera->hasDualStreaming())
+        if (ui->checkBoxSecondaryRecorder->checkState() != Qt::PartiallyChecked && camera->hasDualStreamingInternal())
             camera->setProperty(QnMediaResource::dontRecordSecondaryStreamKey(), ui->checkBoxSecondaryRecorder->isChecked() ? lit("1") : lit("0"));
 
         if (ui->comboBoxTransport->currentIndex() >= 0) {
@@ -444,7 +445,7 @@ bool CameraExpertSettingsWidget::isArecontCamera(const QnVirtualCameraResourcePt
 
 bool CameraExpertSettingsWidget::isMdPolicyAllowedForCamera(const QnVirtualCameraResourcePtr& camera, const QString& mdPolicy) const
 {
-    const bool hasDualStreaming  = camera->hasDualStreaming();
+    const bool hasDualStreaming  = camera->hasDualStreamingInternal();
     const bool hasRemoteArchive = camera->hasCameraCapabilities(Qn::RemoteArchiveCapability);
 
     return mdPolicy.isEmpty() //< Do not force MD policy
@@ -503,10 +504,7 @@ void CameraExpertSettingsWidget::updateLogicalIdControls()
     ui->logicalIdWarningLabel->setVisible(!duplicateCameras.isEmpty());
     ui->logicalIdWarningLabel->setText(errorMessage);
 
-    if (duplicateCameras.isEmpty())
-        resetStyle(ui->logicalIdSpinBox);
-    else
-        setWarningStyle(ui->logicalIdSpinBox);
+    setWarningStyleOn(ui->logicalIdSpinBox, !duplicateCameras.isEmpty());
 }
 
 void CameraExpertSettingsWidget::at_dataChanged()

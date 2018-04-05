@@ -980,7 +980,7 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
-      <translation>ID matériel du Server avec cette licence ne correspond pas à l'ID matériel sur lequel la licence a été activée.</translation>
+      <translation>Id Matériel du Server avec cette licence ne correspond pas à l'Id Matériel sur lequel la licence a été activée.</translation>
     </message>
   </context>
   <context>
@@ -2230,11 +2230,11 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>I/O Module Id</source>
-      <translation>ID Modules I/O</translation>
+      <translation>Id Modules I/O</translation>
     </message>
     <message>
       <source>Camera Id</source>
-      <translation>ID Caméra</translation>
+      <translation>Id Caméra</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -2485,8 +2485,8 @@ pour afficher plus de signets</translation>
       <translation>Serveur</translation>
     </message>
     <message>
-      <source>Logical Id</source>
-      <translation type="unfinished">Logical Id</translation>
+      <source>Id</source>
+      <translation>Id</translation>
     </message>
   </context>
   <context>
@@ -2564,7 +2564,7 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>Password should not be equal to camera&apos;s user name</source>
-      <translation type="unfinished">Password should not be equal to camera&apos;s user name</translation>
+      <translation>Mot de passe ne peut être le nom d'utilisateur de la caméra</translation>
     </message>
   </context>
   <context>
@@ -2963,7 +2963,7 @@ to %1</source>
     </message>
     <message>
       <source>The username or password you have entered is incorrect. Please try again.</source>
-      <translation>L'ID ou le mot de passe que vous avez entré est incorrect, S.V.P. réessayez .</translation>
+      <translation>L'Id ou le mot de passe que vous avez entré est incorrect, S.V.P. réessayez.</translation>
     </message>
     <message>
       <source>Unable to connect to the server</source>
@@ -3202,7 +3202,7 @@ to %1</source>
     </message>
     <message>
       <source>Set Password</source>
-      <translation type="unfinished">Set Password</translation>
+      <translation>Définir mot de passe</translation>
     </message>
   </context>
   <context>
@@ -3302,10 +3302,6 @@ to %1</source>
       <translation>Déconnecter</translation>
     </message>
     <message>
-      <source>All cloud users will be deleted.</source>
-      <translation>Tous les usagers de nuages seront supprimés.</translation>
-    </message>
-    <message>
       <source>Failed to disconnect System from %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>Impossible de déconnecter le système de %1</translation>
@@ -3323,6 +3319,11 @@ to %1</source>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>Vous ne serez pas capable de connecter à ce système avec votre compte %1 , après que vous déconnectez ce système de %1.</translation>
+    </message>
+    <message>
+      <source>All %1 users will be deleted.</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">All %1 users will be deleted.</translation>
     </message>
   </context>
   <context>
@@ -3721,7 +3722,7 @@ to %1</source>
     </message>
     <message>
       <source>Id</source>
-      <translation>ID</translation>
+      <translation>Id</translation>
     </message>
   </context>
   <context>
@@ -3904,7 +3905,7 @@ to %1</source>
     </message>
     <message>
       <source>Locked to Hardware Id</source>
-      <translation>Verrouillé sur ID Matériel</translation>
+      <translation>Verrouillé sur Id Matériel</translation>
     </message>
   </context>
   <context>
@@ -4180,11 +4181,11 @@ to %1</source>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware Id %1</source>
-      <translation>Cette licence est déjà activée et liée au ID Matériel %1</translation>
+      <translation>Cette licence est déjà activée et liée au Id Matériel %1</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware Id %1 on %2</source>
-      <translation>Cette licence est déjà activée et liée au ID Matériel %1 sur %2</translation>
+      <translation>Cette licence est déjà activée et liée au Id Matériel %1 sur %2</translation>
     </message>
     <message>
       <source>If the problem persists please contact Customer Support.</source>
@@ -4215,11 +4216,11 @@ to %1</source>
     </message>
     <message>
       <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>S.V.P envoyer courriel avec clé de licence et ID matériel fourni à %1 pour obtenir un fichier de clé d’activation.</translation>
+      <translation>S.V.P envoyer courriel avec clé de licence et Id Matériel fourni à %1 pour obtenir un fichier de clé d’activation.</translation>
     </message>
     <message>
       <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>S.V.P envoyer clé de licence et ID matériel fourni à %1 pour obtenir un fichier de clé d’activation.</translation>
+      <translation>S.V.P envoyer clé de licence et Id Matériel fourni à %1 pour obtenir un fichier de clé d’activation.</translation>
     </message>
   </context>
   <context>
@@ -5920,6 +5921,10 @@ to %1</source>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
       <translation>Enregistrement &quot; Mouv. + Basse-Res.&quot; ne peut pas être définie.</translation>
     </message>
+    <message>
+      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
+      <translation>Les archives envoyées peuvent être supprimées automatiquement s'il n'y a pas d'espace libre sur un stockage de serveur. Les images les plus anciennes parmi toutes les caméras sur le serveur seront supprimées en premier.</translation>
+    </message>
   </context>
   <context>
     <name>QnSmtpAdvancedSettingsWidget</name>
@@ -6071,10 +6076,6 @@ to %1</source>
   <context>
     <name>QnStatusOverlayController</name>
     <message>
-      <source>NOT ENOUGH LICENCES</source>
-      <translation>PAS ASSEZ DE LICENCES</translation>
-    </message>
-    <message>
       <source>NO DATA</source>
       <translation>AUCUNE DONNÉE</translation>
     </message>
@@ -6145,6 +6146,10 @@ to %1</source>
     <message>
       <source>UNSUPPORTED FIRMWARE VERSION</source>
       <translation>VERSION DU FIRMWARE INCOMPATIBLE</translation>
+    </message>
+    <message>
+      <source>NOT ENOUGH LICENSES</source>
+      <translation>PAS ASSEZ DE LICENCES</translation>
     </message>
   </context>
   <context>
@@ -6846,16 +6851,17 @@ to %1</source>
       <translation>Usager local</translation>
     </message>
     <message>
-      <source>Cloud user</source>
-      <translation>Usager Nuage</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>Identifiant</translation>
     </message>
     <message>
       <source>Role</source>
       <translation>Rôle</translation>
+    </message>
+    <message>
+      <source>%1 user</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 user</translation>
     </message>
   </context>
   <context>
@@ -7050,10 +7056,6 @@ to %1</source>
       <translation>Locale</translation>
     </message>
     <message>
-      <source>Cloud</source>
-      <translation>Nuage</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>Identifiant</translation>
     </message>
@@ -7094,8 +7096,9 @@ to %1</source>
       <translation>Le mot de passe ne correspond pas.</translation>
     </message>
     <message>
-      <source>Cloud user with specified email already exists.</source>
-      <translation>Usager nuage avec courriel spécifié existe déjà.</translation>
+      <source>%1 user with specified email already exists.</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 user with specified email already exists.</translation>
     </message>
   </context>
   <context>
@@ -7169,10 +7172,6 @@ to %1</source>
   <context>
     <name>QnWearableProgressWidget</name>
     <message>
-      <source>Uploading %1... %2	%p%</source>
-      <translation>Envoie %1... %2	%p%</translation>
-    </message>
-    <message>
       <source>Stop uploading?</source>
       <translation>Arrêter l'envoie?</translation>
     </message>
@@ -7181,12 +7180,16 @@ to %1</source>
       <translation>Fichiers déjà envoyés seront conservés.</translation>
     </message>
     <message>
-      <source>Finalizing %1... %2	%p%</source>
-      <translation>Finalisation %1... %2	%p%</translation>
-    </message>
-    <message>
       <source>(%1 of %2)</source>
       <translation>(%1 sur %2)</translation>
+    </message>
+    <message>
+      <source>Uploading %1...</source>
+      <translation>Envoie %1...</translation>
+    </message>
+    <message>
+      <source>Finalizing %1...</source>
+      <translation>Finalisation %1...</translation>
     </message>
   </context>
   <context>
@@ -7290,6 +7293,10 @@ to %1</source>
       <source>Could not connect to server. Video Wall will be closed.</source>
       <translation>Impossible de se connecter au serveur. Mur vidéo sera fermé.</translation>
     </message>
+    <message>
+      <source>Video Wall is removed on the server and will be closed.</source>
+      <translation type="unfinished">Video Wall is removed on the server and will be closed.</translation>
+    </message>
   </context>
   <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
@@ -7314,10 +7321,6 @@ to %1</source>
       <translation>Montant total de licences diminuera</translation>
     </message>
     <message>
-      <source>Cloud Systems cannot be merged</source>
-      <translation>Systèmes nuage ne peuvent pas être fusionnées</translation>
-    </message>
-    <message>
       <source>Connecting to the current System...</source>
       <translation>Connexion sur le système actuel...</translation>
     </message>
@@ -7336,6 +7339,11 @@ to %1</source>
     <message>
       <source>Administrator password</source>
       <translation>Mot de passe Administrateur</translation>
+    </message>
+    <message>
+      <source>%1 Systems cannot be merged</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 Systems cannot be merged</translation>
     </message>
   </context>
   <context>
@@ -7717,23 +7725,23 @@ to %1</source>
     </message>
     <message>
       <source>%1 has unsupported format.</source>
-      <translation type="unfinished">%1 has unsupported format.</translation>
+      <translation>%1 a un format non supporté.</translation>
     </message>
     <message>
       <source>%1 does not have timestamp.</source>
-      <translation type="unfinished">%1 does not have timestamp.</translation>
+      <translation>%1 n'a pas d'horodatage.</translation>
     </message>
     <message>
       <source>%1 is older than allowed in camera archive settings.</source>
-      <translation type="unfinished">%1 is older than allowed in camera archive settings.</translation>
+      <translation>%1 est plus ancien que les paramètres d'archivage de caméra autorisés.</translation>
     </message>
     <message>
       <source>%1 covers period for which video has already been uploaded.</source>
-      <translation type="unfinished">%1 covers period for which video has already been uploaded.</translation>
+      <translation>%1 couvre la période pour laquelle la vidéo a déjà été envoyer.</translation>
     </message>
     <message>
       <source>%1 covers period for which video is being uploaded.</source>
-      <translation type="unfinished">%1 covers period for which video is being uploaded.</translation>
+      <translation>%1 couvre la période pour laquelle la vidéo est envoyer.</translation>
     </message>
   </context>
   <context>

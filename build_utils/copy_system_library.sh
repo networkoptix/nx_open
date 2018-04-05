@@ -3,6 +3,7 @@
 set -e
 
 COMPILER=gcc
+FLAGS=
 
 HELP_MESSAGE="Usage: $(basename $0) <library> <destination> [options]
 Copy system library to a destination directory and create the nesessary symlinks.
@@ -10,6 +11,7 @@ Copy system library to a destination directory and create the nesessary symlinks
 Options:
   -c, --compiler    Compiler executable (default $COMPILER)
                     Used to determine system library location with <compiler> --print-file-name.
+  -f, --flags       Compiler flags
   -h, --help        Print this message"
 
 function run_with_echo()
@@ -22,28 +24,33 @@ while [[ $# -gt 0 ]]
 do
     case $1 in
         -c|--compiler)
-        COMPILER="$2"
-        shift
-        shift
-        ;;
+            COMPILER="$2"
+            shift
+            shift
+            ;;
+        -f|--flags)
+            FLAGS="$2"
+            shift
+            shift
+            ;;
         -h|--help)
-        echo "$HELP_MESSAGE"
-        exit
-        ;;
-        *)
-        if [ -z $LIBRARY ]
-        then
-            LIBRARY="$1"
-        elif [ -z $DESTINATION ]
-        then
-            DESTINATION="$1"
-        else
-            echo "Unknown argument $1"
             echo "$HELP_MESSAGE"
-            exit 1
-        fi
-        shift
-        ;;
+            exit
+            ;;
+        *)
+            if [ -z $LIBRARY ]
+            then
+                LIBRARY="$1"
+            elif [ -z $DESTINATION ]
+            then
+                DESTINATION="$1"
+            else
+                echo "Unknown argument $1"
+                echo "$HELP_MESSAGE"
+                exit 1
+            fi
+            shift
+            ;;
     esac
 done
 
@@ -53,7 +60,7 @@ then
     exit 1
 fi
 
-FILE=$("$COMPILER" --print-file-name "$LIBRARY")
+FILE=$("$COMPILER" $FLAGS --print-file-name "$LIBRARY")
 
 if [ $FILE = $LIBRARY ]
 then

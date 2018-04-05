@@ -41,6 +41,7 @@ void P2pMessageBusTestBase::createData(
     int userCount)
 {
     const auto connection = server->moduleInstance()->ecConnection();
+    ASSERT_TRUE(connection != nullptr);
     auto messageProcessor = server->moduleInstance()->commonModule()->messageProcessor();
 
     initResourceTypes(connection);
@@ -162,6 +163,9 @@ Appserver2Ptr P2pMessageBusTestBase::createAppserver(
     result->addArg(instanceArg.toStdString().c_str());
     const QString guidArg = lit("--moduleGuid=%1").arg(guid.toString());
     result->addArg(guidArg.toStdString().c_str());
+
+    // Some p2p synchronization tests rely on broken authentication in appserver2.
+    result->addArg("--disableAuth");
 
     if (baseTcpPort)
     {

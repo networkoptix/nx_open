@@ -41,7 +41,7 @@ private:
         Qn::ConnectionRole role,
         hikvision::ChannelCapabilities* outCapabilities);
 
-    CameraDiagnostics::Result initialize2WayAudio();
+    virtual QnAudioTransmitterPtr initializeTwoWayAudio() override;
     std::unique_ptr<nx::network::http::HttpClient> getHttpClient();
     void setResolutionList(
         const hikvision::ChannelCapabilities& channelCapabilities,

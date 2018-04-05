@@ -70,7 +70,7 @@
                                 <b>เว็บไซต์</b><br>
                                 <a href="{{companyUrl}}">{{companyUrl}}</a>
                             </td>
-                        {{/ระบบ}}
+                        {{/system}}
                         <td class="left-border">
                             <b>การสนับสนุน</b><br>
                             <a href="{{supportLink}}">{{supportLinkText}}</a>

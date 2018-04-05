@@ -229,18 +229,7 @@
              <widget class="QWidget" name="wearableInfoPage">
               <layout class="QVBoxLayout" name="verticalLayout_12">
                <item>
-                <widget class="QLabel" name="wearableInfoLabel">
-                 <property name="text">
-                  <string>Uploaded archive can be deleted automatically, if there is no free space on a server storage.
-The oldest footage among all cameras on the server will be deleted first.</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-                 </property>
-                 <property name="wordWrap">
-                  <bool>true</bool>
-                 </property>
-                </widget>
+                <widget class="QnWordWrappedLabel" name="wearableInfoLabel" native="true"/>
                </item>
               </layout>
              </widget>
@@ -379,7 +368,7 @@ The oldest footage among all cameras on the server will be deleted first.</strin
             </widget>
            </item>
            <item row="0" column="1">
-            <widget class="nx::client::desktop::ImageControlWidget" name="imageControlWidget" native="true">
+            <widget class="nx::client::desktop::LegacyImageControlWidget" name="imageControlWidget" native="true">
              <property name="focusPolicy">
               <enum>Qt::TabFocus</enum>
              </property>
@@ -482,7 +471,7 @@ The oldest footage among all cameras on the server will be deleted first.</strin
         <number>0</number>
        </property>
        <item>
-        <widget class="nx::client::desktop::CameraScheduleWidget" name="cameraScheduleWidget" native="true"/>
+        <widget class="nx::client::desktop::LegacyCameraScheduleWidget" name="cameraScheduleWidget" native="true"/>
        </item>
       </layout>
      </widget>
@@ -693,7 +682,7 @@ The oldest footage among all cameras on the server will be deleted first.</strin
     </widget>
    </item>
    <item>
-    <widget class="QnAlertBar" name="alertBar" native="true">
+    <widget class="nx::client::desktop::AlertBar" name="alertBar" native="true">
      <property name="text" stdset="0">
       <string/>
      </property>
@@ -705,13 +694,13 @@ The oldest footage among all cameras on the server will be deleted first.</strin
   <customwidget>
    <class>QnArchiveLengthWidget</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/properties/archive_length_widget.h</header>
+   <header location="global">ui/widgets/properties/legacy_archive_length_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QnAlertBar</class>
+   <class>nx::client::desktop::AlertBar</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/alert_bar.h</header>
+   <header location="global">nx/client/desktop/common/widgets/message_bar.h</header>
   </customwidget>
   <customwidget>
    <class>nx::client::desktop::FisheyeSettingsWidget</class>
@@ -726,9 +715,9 @@ The oldest footage among all cameras on the server will be deleted first.</strin
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>nx::client::desktop::ImageControlWidget</class>
+   <class>nx::client::desktop::LegacyImageControlWidget</class>
    <extends>QWidget</extends>
-   <header location="global">nx/client/desktop/resource_properties/camera/image_control_widget.h</header>
+   <header location="global">nx/client/desktop/resource_properties/camera/legacy_image_control_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
@@ -750,9 +739,9 @@ The oldest footage among all cameras on the server will be deleted first.</strin
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>nx::client::desktop::CameraScheduleWidget</class>
+   <class>nx::client::desktop::LegacyCameraScheduleWidget</class>
    <extends>QWidget</extends>
-   <header location="global">nx/client/desktop/resource_properties/camera/camera_schedule_widget.h</header>
+   <header location="global">nx/client/desktop/resource_properties/camera/legacy_camera_schedule_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
@@ -771,6 +760,12 @@ The oldest footage among all cameras on the server will be deleted first.</strin
    <class>QnWearableMotionWidget</class>
    <extends>QWidget</extends>
    <header location="global">ui/widgets/properties/wearable_motion_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnWordWrappedLabel</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/word_wrapped_label.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

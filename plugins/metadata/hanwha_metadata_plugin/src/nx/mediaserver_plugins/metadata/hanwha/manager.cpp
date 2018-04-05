@@ -97,7 +97,6 @@ Error Manager::startFetchingMetadata(nxpl::NX_GUID* /*typeList*/, int /*typeList
                 packet->addItem(event);
             }
 
-            NX_PRINT;
             m_handler->handleMetadata(Error::noError, packet);
             packet->releaseRef();
         };

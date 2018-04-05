@@ -87,8 +87,9 @@
       <translation>ระบบค้นพบ %1 ไม่สามารถทำงานร่วมกับระบบปัจจุบันได้</translation>
     </message>
     <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <translation>ระบบคลาวด์สามารถเท่าผสานกัน ด้วยเลย ระบบชื่อและรหัสผ่านจะถูกนำจากระบบคลาวด์</translation>
+      <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 System can only be merged with non-%1. System name and password are taken from %1 System.</translation>
     </message>
   </context>
   <context>
@@ -315,7 +316,7 @@
     </message>
     <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
-      <translation type="unfinished">Please update firmware. Minimal supported version is %1. Current version is %2</translation>
+      <translation>กรุณาอัพเดทเฟิร์มแวร์ เวอร์ชันที่สนับสนุนน้อยที่สุดคือ %1เวอร์ชันปัจจุบันคือ %2</translation>
     </message>
   </context>
   <context>

@@ -69,7 +69,7 @@
     },
     "Custom": {
       "label": "Egyéni",
-      "description": "Egyéni engedélyek konfigurálásához használja a {{PRODUCT_NAME}} klienst"
+      "description": "Egyéni engedélyek konfigurálásához használjon {{PRODUCT_NAME}} klienst"
     },
     "cloudAdmin": {
       "label": "Adminisztrátor",
@@ -97,7 +97,7 @@
     },
     "custom": {
       "label": "Egyéni",
-      "description": "Egyéni engedélyek konfigurálásához használja a {{PRODUCT_NAME}} klienst"
+      "description": "Egyéni engedélyek konfigurálásához használjon {{PRODUCT_NAME}} klienst"
     }
   },
   "errorCodes": {
@@ -127,9 +127,9 @@
     "alreadyExists": "Ez a fiük már létezik",
     "unknownError": "Váratlan hiba történt",
     "accountAlreadyActivated": "Ez a fiók már aktiválva van",
-    "emailNotFound": "A fiók nem létezik",
+    "emailNotFound": "A fiók nem létezik.",
     "EmailAlreadyExists": "Ez az e-mail már regisztrálva van",
-    "oldPasswordMistmatch": "A jelenlegi jelszó helytelen",
+    "oldPasswordMistmatch": "A jelenlegi jelszó helytelen.",
     "passwordMismatch": "Hibás jelszó",
     "cantEditYourself": "Saját engedélyek módosítása nem engedélyezett",
     "cantEditAdmin": "Ez a felhasználó rendszergazdai jogokkal rendelkezik",
@@ -157,7 +157,7 @@
     "mySystemSearch": "IMeMyMine",
     "unavailable": "Rendszer nem elérhető",
     "offline": "A rendszer offline",
-    "openClient": "Megnyitás {{VMS_NAME}} alkalmazással",
+    "openClient": "Megnyitás {{VMS_NAME}}",
     "openClientNoSystem": "{{VMS_NAME}} Megnyitása",
     "confirmRenameTitle": "Rendszer neve",
     "confirmRenameAction": "Mentés",

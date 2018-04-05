@@ -22,13 +22,11 @@ namespace
 }
 
 int QnPingSystemRestHandler::executeGet(
-        const QString &path,
-        const QnRequestParams &params,
-        QnJsonRestResult &result,
+        const QString& /*path*/,
+        const QnRequestParams& params,
+        QnJsonRestResult& result,
         const QnRestConnectionProcessor* owner)
 {
-    Q_UNUSED(path)
-
     nx::utils::Url url = params.value(lit("url"));
     QString getKey = params.value(lit("getKey"));
 
@@ -68,7 +66,6 @@ int QnPingSystemRestHandler::executeGet(
             return CODE_OK;
         }
     }
-
 
     if (moduleInformation.systemName.isEmpty())
     {

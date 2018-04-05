@@ -8,14 +8,14 @@
 
 class QLabel;
 class QStackedWidget;
-class QnBusyIndicatorWidget;
-class QnAutoscaledPlainText;
 class QnImageProvider;
-
 
 namespace nx {
 namespace client {
 namespace desktop {
+
+class BusyIndicatorWidget;
+class AutoscaledPlainText;
 
 /**
  * The widget shows image from QnImageProvider
@@ -32,7 +32,7 @@ public:
     QnImageProvider* imageProvider() const;
     void setImageProvider(QnImageProvider* provider);
 
-    QnBusyIndicatorWidget* busyIndicator() const;
+    BusyIndicatorWidget* busyIndicator() const;
 
     virtual QSize sizeHint() const override;
 
@@ -90,8 +90,8 @@ private:
 
 private:
     mutable QSize m_cachedSizeHint;
-    QnAutoscaledPlainText* const m_placeholder = nullptr;
-    QnBusyIndicatorWidget* const m_indicator = nullptr;
+    AutoscaledPlainText* const m_placeholder = nullptr;
+    BusyIndicatorWidget* const m_indicator = nullptr;
     QPixmap m_preview;
     QPointer<QnImageProvider> m_imageProvider;
     QPalette::ColorRole m_borderRole = QPalette::Shadow;

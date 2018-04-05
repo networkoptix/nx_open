@@ -1,6 +1,7 @@
 #include <nx/update/manager/detail/update_request_data_factory.h>
 #include <nx/update/installer/detail/abstract_updates2_installer.h>
 #include <nx/update/info/abstract_update_registry.h>
+#include <nx/update/info/manual_file_data.h>
 #include <nx/update/manager/detail/updates2_manager_base.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <nx/utils/thread/long_runnable.h>
@@ -13,6 +14,7 @@
 
 namespace nx {
 namespace update {
+namespace manager {
 namespace detail {
 namespace test {
 
@@ -35,6 +37,10 @@ public:
     MOCK_CONST_METHOD0(toByteArray, QByteArray());
     MOCK_METHOD1(fromByteArray, bool(const QByteArray& rawData));
     MOCK_CONST_METHOD1(equals, bool(AbstractUpdateRegistry* other));
+    MOCK_METHOD2(addFileData, void(const update::info::UpdateFileRequestData&,
+        const update::info::FileData&));
+    MOCK_METHOD1(merge, void(AbstractUpdateRegistry* other));
+    MOCK_METHOD1(addFileData, void(const info::ManualFileData& fileData));
 };
 
 using namespace vms::common::p2p;
@@ -73,12 +79,12 @@ enum class PrepareExpectedOutcome
 
 const static QString kFileName = "test.file.name";
 
-class TestInstaller: public detail::AbstractUpdates2Installer, public QnLongRunnable
+class TestInstaller: public installer::detail::AbstractUpdates2Installer, public QnLongRunnable
 {
 public:
     virtual void prepareAsync(
         const QString& /*path*/,
-        PrepareUpdateCompletionHandler handler) override
+        installer::detail::PrepareUpdateCompletionHandler handler) override
     {
         put(handler);
     }
@@ -101,7 +107,7 @@ private:
     const static int s_timeoutBeforeTaskMs = 300;
     QnMutex m_mutex;
     QnWaitCondition m_condition;
-    QQueue<PrepareUpdateCompletionHandler> m_queue;
+    QQueue<installer::detail::PrepareUpdateCompletionHandler> m_queue;
     PrepareExpectedOutcome m_expectedOutcome = PrepareExpectedOutcome::success;
 
     virtual void run() override
@@ -124,10 +130,10 @@ private:
             switch (m_expectedOutcome)
             {
                 case PrepareExpectedOutcome::success:
-                    handler(PrepareResult::ok);
+                    handler(installer::detail::PrepareResult::ok);
                     break;
                 case PrepareExpectedOutcome::fail_noFreeSpace:
-                    handler(PrepareResult::noFreeSpace);
+                    handler(installer::detail::PrepareResult::noFreeSpace);
                     break;
             }
 
@@ -142,7 +148,7 @@ private:
         m_condition.wakeOne();
     }
 
-    void put(PrepareUpdateCompletionHandler taskFunc)
+    void put(installer::detail::PrepareUpdateCompletionHandler taskFunc)
     {
         QnMutexLocker lock(&m_mutex);
         m_queue.push_back(taskFunc);
@@ -233,7 +239,7 @@ public:
     }
 
     MOCK_METHOD0(downloader, vms::common::p2p::downloader::AbstractDownloader*());
-    MOCK_METHOD0(installer, AbstractUpdates2Installer*());
+    MOCK_METHOD0(installer, installer::detail::AbstractUpdates2Installer*());
 
     virtual void remoteUpdateCompleted() override
     {
@@ -241,6 +247,9 @@ public:
         m_remoteUpdateFinished = true;
         m_remoteUpdateCondition.wakeOne();
     }
+
+    MOCK_CONST_METHOD0(isClient, bool());
+    MOCK_CONST_METHOD0(peerId, QnUuid());
 
 private:
     std::function<update::info::AbstractUpdateRegistryPtr()> m_globalRegistryFactoryFunc;
@@ -285,9 +294,8 @@ protected:
         detail::UpdateFileRequestDataFactory::setFactoryFunc(
             []()
             {
-                return update::info::UpdateFileRequestData(
-                    kCloudHost, kCustomization, kVersion,
-                    update::info::OsVersion(kPlatform, kArch, kModification));
+                return update::info::UpdateFileRequestData(kCloudHost, kCustomization, kVersion,
+                    update::info::OsVersion(kPlatform, kArch, kModification), false);
             });
         m_testInstaller.start();
     }
@@ -850,7 +858,10 @@ TEST_F(Updates2Manager, Prepare_failedNoFreeSpace)
     thenStateShouldBe(api::Updates2StatusData::StatusCode::available);
 }
 
+// #TODO: #akulikov: Add tests regarding manual file data.
+
 } // namespace test
 } // namespace detail
+} // namespace manager
 } // namespace update
 } // namespace nx

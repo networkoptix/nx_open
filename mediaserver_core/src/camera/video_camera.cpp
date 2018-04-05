@@ -88,7 +88,7 @@ private:
     qint64 m_nextMinTryTime;
 };
 
-QnVideoCameraGopKeeper::QnVideoCameraGopKeeper(QnVideoCamera* camera, const QnResourcePtr &resource, QnServer::ChunksCatalog catalog):
+QnVideoCameraGopKeeper::QnVideoCameraGopKeeper(QnVideoCamera* camera, const QnResourcePtr& resource, QnServer::ChunksCatalog catalog):
     QnResourceConsumer(resource),
     QnAbstractDataConsumer(100),
     m_lastKeyFrameChannel(0),
@@ -501,7 +501,6 @@ void QnVideoCamera::stop()
         m_secondaryReader->stop();
 }
 
-
 QnVideoCamera::~QnVideoCamera()
 {
     beforeStop();
@@ -518,15 +517,15 @@ void QnVideoCamera::at_camera_resourceChanged()
         dynamic_cast<QnSecurityCamResource*>(m_resource.data());
     if (cameraResource)
     {
-    if (!cameraResource->hasDualStreaming2() && m_secondaryReader)
-    {
-        if (m_secondaryReader->isRunning())
-                m_secondaryReader->pleaseStop();
-    }
-
-        if( cameraResource->flags() & Qn::foreigner )
+        if (!cameraResource->hasDualStreaming() && m_secondaryReader)
         {
-            //clearing saved key frames
+            if (m_secondaryReader->isRunning())
+                m_secondaryReader->pleaseStop();
+        }
+
+        if (cameraResource->flags() & Qn::foreigner)
+        {
+            // Clearing saved key frames.
             if (m_primaryGopKeeper)
                 m_primaryGopKeeper->clearVideoData();
             if (m_secondaryGopKeeper)
@@ -546,7 +545,7 @@ void QnVideoCamera::createReader(QnServer::ChunksCatalog catalog)
     if (reader == 0)
     {
         QnAbstractStreamDataProvider* dataProvider = NULL;
-        if ( primaryLiveStream || (cameraResource && cameraResource->hasDualStreaming2()) )
+        if ( primaryLiveStream || (cameraResource && cameraResource->hasDualStreaming()) )
             dataProvider = m_resource->createDataProvider(role);
 
         if ( dataProvider )
@@ -601,7 +600,7 @@ void QnVideoCamera::startLiveCacheIfNeeded()
         // If the camera has one stream only and it is suitable for motion, then cache the primary
         // stream.
         bool needToCachePrimaryStream =
-            !cameraResource->hasDualStreaming2()
+            !cameraResource->hasDualStreaming()
             && cameraResource->hasCameraCapabilities(Qn::PrimaryStreamSoftMotionCapability);
 
         if (ini().forceLiveCacheForPrimaryStream || needToCachePrimaryStream)
@@ -758,7 +757,7 @@ void QnVideoCamera::stopIfNoActivity()
             const QnSecurityCamResource* cameraResource = dynamic_cast<QnSecurityCamResource*>(m_resource.data());
             const bool isSingleStreamCameraAndHiSuitableForCaching =
                 cameraResource &&
-                !cameraResource->hasDualStreaming2() &&
+                !cameraResource->hasDualStreaming() &&
                 cameraResource->hasCameraCapabilities( Qn::PrimaryStreamSoftMotionCapability );
             if( !isSingleStreamCameraAndHiSuitableForCaching || !isSomeActivity() )
             {
@@ -870,8 +869,9 @@ QnLiveStreamProviderPtr QnVideoCamera::getLiveReaderNonSafe(QnServer::ChunksCata
     }
 
     const QnSecurityCamResource* cameraResource = dynamic_cast<QnSecurityCamResource*>(m_resource.data());
-    if ( cameraResource && !cameraResource->hasDualStreaming2() && catalog == QnServer::LowQualityCatalog )
+    if ( cameraResource && !cameraResource->hasDualStreaming() && catalog == QnServer::LowQualityCatalog )
         return QnLiveStreamProviderPtr();
+
     return catalog == QnServer::HiQualityCatalog ? m_primaryReader : m_secondaryReader;
 }
 
@@ -897,7 +897,6 @@ bool QnVideoCamera::ensureLiveCacheStarted(
         int removedChunksToKeepCount = m_settings.roSettings()->value(
             nx_ms_conf::HLS_REMOVED_LIVE_CHUNKS_TO_KEEP,
             nx_ms_conf::DEFAULT_HLS_REMOVED_LIVE_CHUNKS_TO_KEEP).toInt();
-
 
         m_hlsLivePlaylistManager[streamQuality] =
             std::make_shared<nx::mediaserver::hls::LivePlaylistManager>(

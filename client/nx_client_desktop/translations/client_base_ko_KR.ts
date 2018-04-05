@@ -2456,8 +2456,8 @@ to view more bookmarks</source>
       <translation>서버</translation>
     </message>
     <message>
-      <source>Logical Id</source>
-      <translation>논리 Id</translation>
+      <source>Id</source>
+      <translation>Id</translation>
     </message>
   </context>
   <context>
@@ -3265,10 +3265,6 @@ to %1</source>
       <translation>연결 해제</translation>
     </message>
     <message>
-      <source>All cloud users will be deleted.</source>
-      <translation>모든 클라우드 사용자 삭제 됩니다.</translation>
-    </message>
-    <message>
       <source>Failed to disconnect System from %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>%1에서 시스템을 분리 하지 못했습니다.</translation>
@@ -3286,6 +3282,11 @@ to %1</source>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</translation>
+    </message>
+    <message>
+      <source>All %1 users will be deleted.</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">All %1 users will be deleted.</translation>
     </message>
   </context>
   <context>
@@ -5846,6 +5847,10 @@ to %1</source>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
       <translation>"모션 + 낮은-해상도" 녹화 옵션을 설정할 수 없습니다.</translation>
     </message>
+    <message>
+      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
+      <translation>서버 저장 영역에 여유 공간이 없으면 업로드 된 아카이브를 자동으로 삭제할 수 있습니다. 서버의 모든 카메라 중에서 가장 오래된 장면이 먼저 삭제됩니다.</translation>
+    </message>
   </context>
   <context>
     <name>QnSmtpAdvancedSettingsWidget</name>
@@ -5997,10 +6002,6 @@ to %1</source>
   <context>
     <name>QnStatusOverlayController</name>
     <message>
-      <source>NOT ENOUGH LICENCES</source>
-      <translation>라인센스 부족</translation>
-    </message>
-    <message>
       <source>NO DATA</source>
       <translation>데이터 없음</translation>
     </message>
@@ -6071,6 +6072,10 @@ to %1</source>
     <message>
       <source>UNSUPPORTED FIRMWARE VERSION</source>
       <translation>지원되지 않는 펌웨어 버전</translation>
+    </message>
+    <message>
+      <source>NOT ENOUGH LICENSES</source>
+      <translation>라인센스 부족</translation>
     </message>
   </context>
   <context>
@@ -6766,16 +6771,17 @@ to %1</source>
       <translation>로컬 사용자</translation>
     </message>
     <message>
-      <source>Cloud user</source>
-      <translation>클라우드 사용자</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>로그인</translation>
     </message>
     <message>
       <source>Role</source>
       <translation>역할</translation>
+    </message>
+    <message>
+      <source>%1 user</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 user</translation>
     </message>
   </context>
   <context>
@@ -6969,10 +6975,6 @@ to %1</source>
       <translation>내부</translation>
     </message>
     <message>
-      <source>Cloud</source>
-      <translation>클라우드</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>로그인</translation>
     </message>
@@ -7013,8 +7015,9 @@ to %1</source>
       <translation>비밀번호가 일치하지 않습니다.</translation>
     </message>
     <message>
-      <source>Cloud user with specified email already exists.</source>
-      <translation>지정 된 이메일 주소를 가진 클라우드 사용자는 이미 존재합니다.</translation>
+      <source>%1 user with specified email already exists.</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 user with specified email already exists.</translation>
     </message>
   </context>
   <context>
@@ -7087,10 +7090,6 @@ to %1</source>
   <context>
     <name>QnWearableProgressWidget</name>
     <message>
-      <source>Uploading %1... %2	%p%</source>
-      <translation>업로드 중 %1... %2	%p%</translation>
-    </message>
-    <message>
       <source>Stop uploading?</source>
       <translation>전송을 중지 하겠습니까?</translation>
     </message>
@@ -7099,12 +7098,16 @@ to %1</source>
       <translation>이미 업로드 된 파일은 보관됩니다.</translation>
     </message>
     <message>
-      <source>Finalizing %1... %2	%p%</source>
-      <translation>마무리중 %1... %2	%p%</translation>
-    </message>
-    <message>
       <source>(%1 of %2)</source>
       <translation>(%2 의 %1)</translation>
+    </message>
+    <message>
+      <source>Uploading %1...</source>
+      <translation>업로드중 %1...</translation>
+    </message>
+    <message>
+      <source>Finalizing %1...</source>
+      <translation>마무리중 %1...</translation>
     </message>
   </context>
   <context>
@@ -7207,6 +7210,10 @@ to %1</source>
       <source>Could not connect to server. Video Wall will be closed.</source>
       <translation>서버에 연결할 수 없습니다. 비디오월이 닫힘니다.</translation>
     </message>
+    <message>
+      <source>Video Wall is removed on the server and will be closed.</source>
+      <translation>비디오월이 서버에서 제거되어 종료합니다.</translation>
+    </message>
   </context>
   <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
@@ -7231,10 +7238,6 @@ to %1</source>
       <translation>총 라이센스 수량은 줄어듭니다.</translation>
     </message>
     <message>
-      <source>Cloud Systems cannot be merged</source>
-      <translation>클라우드 시스템을 병합할 수 없습니다.</translation>
-    </message>
-    <message>
       <source>Connecting to the current System...</source>
       <translation>현재 시스템에 연결 중...</translation>
     </message>
@@ -7253,6 +7256,11 @@ to %1</source>
     <message>
       <source>Administrator password</source>
       <translation>관리자 암호</translation>
+    </message>
+    <message>
+      <source>%1 Systems cannot be merged</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 Systems cannot be merged</translation>
     </message>
   </context>
   <context>
@@ -7619,23 +7627,23 @@ to %1</source>
     </message>
     <message>
       <source>%1 has unsupported format.</source>
-      <translation type="unfinished">%1 has unsupported format.</translation>
+      <translation>%1 은 지원하지 않는 형식입니다.</translation>
     </message>
     <message>
       <source>%1 does not have timestamp.</source>
-      <translation type="unfinished">%1 does not have timestamp.</translation>
+      <translation>%1 은 타임스탬프가 없습니다.</translation>
     </message>
     <message>
       <source>%1 is older than allowed in camera archive settings.</source>
-      <translation type="unfinished">%1 is older than allowed in camera archive settings.</translation>
+      <translation>%1 은 카메라 보관 설정에서 허용 된 것보다 오래되었습니다.</translation>
     </message>
     <message>
       <source>%1 covers period for which video has already been uploaded.</source>
-      <translation type="unfinished">%1 covers period for which video has already been uploaded.</translation>
+      <translation>%1 커버 기간은 동영상 이미 업로드 된 기간입니다.</translation>
     </message>
     <message>
       <source>%1 covers period for which video is being uploaded.</source>
-      <translation type="unfinished">%1 covers period for which video is being uploaded.</translation>
+      <translation>%1 커버 기간은 동영상 이미 업로드 되는 기간입니다.</translation>
     </message>
   </context>
   <context>
@@ -8072,7 +8080,7 @@ to %1</source>
     </message>
     <message>
       <source>Could not calculate md5 for file &quot;%1&quot;</source>
-      <translation> &quot;%1&quot; 파일에 대한 md5를 계산할 수 없습니다</translation>
+      <translation>&quot;%1&quot; 파일에 대한 md5를 계산할 수 없습니다</translation>
     </message>
     <message>
       <source>Could not create upload on the server side</source>

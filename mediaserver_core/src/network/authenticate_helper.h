@@ -91,8 +91,6 @@ public:
         nx::network::http::Response& response,
         Qn::UserAccessData* accessRights = nullptr) const;
 
-    bool checkUserPassword(const QnUserResourcePtr& user, const QString& password);
-
     QnLdapManager* ldapManager() const;
 
 signals:

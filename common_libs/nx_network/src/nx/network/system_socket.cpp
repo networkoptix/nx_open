@@ -8,6 +8,7 @@
 #include <nx/utils/system_error.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/platform/win32_syscall_resolver.h>
+#include <nx/utils/unused.h>
 
 #ifdef _WIN32
 #  include <iphlpapi.h>
@@ -56,7 +57,6 @@ namespace network {
     static std::atomic<qint64> m_totalSocketBytesSent;
     qint64 totalSocketBytesSent() { return m_totalSocketBytesSent; }
 #endif
-
 
 //-------------------------------------------------------------------------------------------------
 // Socket implementation
@@ -482,8 +482,20 @@ bool Socket<SocketInterfaceToImplement>::createSocket(int type, int protocol)
 namespace {
 
 template<class Func>
-int doInterruptableSystemCallWithTimeout(const Func& func, unsigned int timeout)
+int doInterruptableSystemCallWithTimeout(
+    AbstractCommunicatingSocket* socket,
+    const Func& func,
+    unsigned int timeout,
+    int flags)
 {
+    bool isNonBlocking = false;
+    if (flags & MSG_DONTWAIT)
+        isNonBlocking = true;
+    else if (flags & MSG_WAITALL)
+        isNonBlocking = false;
+    else if (!socket->getNonBlockingMode(&isNonBlocking))
+        return -1;
+
     QElapsedTimer et;
     et.start();
 
@@ -493,16 +505,24 @@ int doInterruptableSystemCallWithTimeout(const Func& func, unsigned int timeout)
     for (;; )
     {
         int result = func();
-        if (result == -1 && errno == EINTR)
+        if (result == -1)
         {
-            if (timeout == 0 ||  //< No timeout
-                !waitStartTimeActual)  //< Cannot check timeout expiration
+            if (errno == EINTR)
             {
-                continue;
+                if (timeout == 0 ||  //< No timeout
+                    !waitStartTimeActual)  //< Cannot check timeout expiration
+                {
+                    continue;
+                }
+                if (et.elapsed() < timeout)
+                    continue;
+                errno = ETIMEDOUT;
             }
-            if (et.elapsed() < timeout)
-                continue;
-            errno = ETIMEDOUT;
+            else if (!isNonBlocking && (errno == EWOULDBLOCK || errno == EAGAIN))
+            {
+                // Returning ETIMEDOUT on timeout to make error codes consistent across platforms.
+                errno = ETIMEDOUT;
+            }
         }
         return result;
     }
@@ -668,8 +688,10 @@ int CommunicatingSocket<SocketInterfaceToImplement>::recv(
         return -1;
 
     int bytesRead = doInterruptableSystemCallWithTimeout<>(
+        this,
         std::bind(&::recv, this->m_fd, (void*)buffer, (size_t)bufferLen, flags),
-        recvTimeout);
+        recvTimeout,
+        flags);
 #endif
     if (bytesRead < 0)
     {
@@ -696,6 +718,7 @@ int CommunicatingSocket<SocketInterfaceToImplement>::send(
         return -1;
 
     int sended = doInterruptableSystemCallWithTimeout<>(
+        this,
         std::bind(&::send, this->m_fd, (const void*)buffer, (size_t)bufferLen,
 #ifdef __linux
             MSG_NOSIGNAL
@@ -703,7 +726,8 @@ int CommunicatingSocket<SocketInterfaceToImplement>::send(
             0
 #endif
         ),
-        sendTimeout);
+        sendTimeout,
+        0);
 #endif
 
     if (sended < 0)
@@ -1060,7 +1084,6 @@ bool TCPSocket::toggleStatisticsCollection(bool val)
     if (SetPerTcpConnectionEStatsAddr == NULL)
         return false;
 
-
     Win32TcpSocketImpl* d = static_cast<Win32TcpSocketImpl*>(impl());
 
     if (GetTcpRow(
@@ -1095,10 +1118,10 @@ bool TCPSocket::toggleStatisticsCollection(bool val)
     }
     return true;
 #elif defined(__linux__)
-    Q_UNUSED(val);
+    nx::utils::unused(val);
     return true;
 #else
-    Q_UNUSED(val);
+    nx::utils::unused(val);
     return false;
 #endif
 }
@@ -1125,7 +1148,7 @@ bool TCPSocket::getConnectionStatistics(StreamSocketInfo* info)
     info->rttVar = tcpinfo.tcpi_rttvar / USEC_PER_MSEC;
     return true;
 #else
-    Q_UNUSED(info);
+    nx::utils::unused(info);
     return false;
 #endif
 }
@@ -1589,10 +1612,12 @@ bool UDPSocket::sendTo(const void *buffer, int bufferLen)
 #endif
 
     return doInterruptableSystemCallWithTimeout<>(
+        this,
         std::bind(
             &::sendto, handle(), (const void*)buffer, (size_t)bufferLen, flags,
             m_destAddr.get(), m_destAddr.length()),
-        sendTimeout) == bufferLen;
+        sendTimeout,
+        flags) == bufferLen;
 #endif
 }
 
@@ -1701,11 +1726,13 @@ int UDPSocket::send(const void* buffer, unsigned int bufferLen)
         return -1;
 
     return doInterruptableSystemCallWithTimeout<>(
+        this,
         std::bind(
             &::sendto, handle(),
             (const void*)buffer, (size_t)bufferLen, 0,
             m_destAddr.get(), m_destAddr.length()),
-        sendTimeout);
+        sendTimeout,
+        0);
 #endif
 }
 
@@ -1900,8 +1927,10 @@ int UDPSocket::recvFrom(
         return -1;
 
     int rtn = doInterruptableSystemCallWithTimeout<>(
+        this,
         std::bind(&::recvfrom, handle(), (void*)buffer, (size_t)bufferLen, 0, address.get(), &address.length()),
-        recvTimeout);
+        recvTimeout,
+        0);
 #endif
 
     if (rtn >= 0)

@@ -68,29 +68,31 @@ void QnFileDeletor::init(const QString& tmpRoot)
 
 bool QnFileDeletor::internalDeleteFile(const QString& fileName)
 {
-    if (std::remove(fileName.toLatin1().constData()) == 0)
-        return true;
-
-    if (const auto rootTool = qnServerModule->rootTool())
+    if (std::remove(fileName.toLatin1().constData()) == 0
+        || qnServerModule->rootTool()->removePath(fileName))
     {
-        if (rootTool->changeOwner(fileName) && std::remove(fileName.toLatin1().constData()))
-            return true;
+        return true;
     }
 
-    auto lastErr = SystemError::getLastOSErrorCode();
-    return lastErr == SystemError::fileNotFound || lastErr == SystemError::pathNotFound;
+    bool isFileExists = QFile::exists(fileName);
+    if (isFileExists)
+        NX_ERROR(this, lm("[Cleanup, FileStorage] Failed to remove file %1").args(fileName));
+    else
+        NX_DEBUG(this, lm("[Cleanup, FileStorage] File to remove not found: %1").args(fileName));
+
+    return !isFileExists;
 }
 
 void QnFileDeletor::deleteFile(const QString& fileName, const QnUuid &storageId)
 {
     if (!internalDeleteFile(fileName))
     {
-        NX_LOG(lit("Cleanup. Can't delete file right now. Postpone deleting. Name=%1").arg(fileName), cl_logWARNING);
+        NX_DEBUG(this, lm("[Cleanup, FileStorage]. Postponing file %1").arg(fileName));
         postponeFile(fileName, storageId);
         return;
     }
 
-    NX_LOG(lit("Cleanup. File %1 removed successfully.").arg(fileName), cl_logDEBUG1);
+    NX_VERBOSE(this, lm("[Cleanup, FileStorage]. File %1 removed successfully").arg(fileName));
 }
 
 void QnFileDeletor::postponeFile(const QString& fileName, const QnUuid &storageId)

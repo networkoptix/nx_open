@@ -15,7 +15,6 @@
 #include <core/dataprovider/data_provider_factory.h>
 
 #include "camera/video_camera.h"
-#include "core/misc/schedule_task.h"
 #include <nx/utils/singleton.h>
 #include <common/common_module_aware.h>
 

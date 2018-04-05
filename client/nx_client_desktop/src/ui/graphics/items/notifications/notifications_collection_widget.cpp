@@ -263,7 +263,7 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(
         ? Qn::ViewLivePermission
         : Qn::ViewFootagePermission;
 
-    if (accessController()->hasPermissions(camera, requiredPermission))
+    if (!accessController()->hasPermissions(camera, requiredPermission))
         return;
 
     using namespace std::chrono;
@@ -290,7 +290,7 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(
     for (const auto& camera: cameraList)
     {
         NX_ASSERT(accessController()->hasPermissions(camera, Qn::ViewContentPermission));
-        if (accessController()->hasPermissions(camera, requiredPermission))
+        if (!accessController()->hasPermissions(camera, requiredPermission))
             continue;
 
         using namespace std::chrono;

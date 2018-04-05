@@ -2360,9 +2360,9 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>This Id is already used on the following %n cameras: %1</source>
-      <translation type="unfinished">
-        <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
-        <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
+      <translation>
+        <numerusform>Esta identificación ya se usa en las siguientes cámaras %n: %1</numerusform>
+        <numerusform>Esta identificación ya se usa en las siguientes cámaras %n: %1</numerusform>
       </translation>
     </message>
   </context>
@@ -2484,8 +2484,8 @@ to view more bookmarks</source>
       <translation>Servidor</translation>
     </message>
     <message>
-      <source>Logical Id</source>
-      <translation type="unfinished">Logical Id</translation>
+      <source>Id</source>
+      <translation>Id</translation>
     </message>
   </context>
   <context>
@@ -2563,7 +2563,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Password should not be equal to camera&apos;s user name</source>
-      <translation type="unfinished">Password should not be equal to camera&apos;s user name</translation>
+      <translation>La contraseña no debe ser igual al nombre de usuario de la cámara&amp;apos</translation>
     </message>
   </context>
   <context>
@@ -3200,7 +3200,7 @@ a %1</translation>
     </message>
     <message>
       <source>Set Password</source>
-      <translation type="unfinished">Set Password</translation>
+      <translation>Configurar contraseña</translation>
     </message>
   </context>
   <context>
@@ -3300,10 +3300,6 @@ a %1</translation>
       <translation>Desconectar</translation>
     </message>
     <message>
-      <source>All cloud users will be deleted.</source>
-      <translation>Se eliminarán todos los usuarios de la nube.</translation>
-    </message>
-    <message>
       <source>Failed to disconnect System from %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>Error al desconectar el sistema de %1</translation>
@@ -3321,6 +3317,11 @@ a %1</translation>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>Usted no será capaz de conectarse a este sistema con su cuenta %1 después de desconectar este sistema de %1.</translation>
+    </message>
+    <message>
+      <source>All %1 users will be deleted.</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">All %1 users will be deleted.</translation>
     </message>
   </context>
   <context>
@@ -5100,11 +5101,11 @@ a %1</translation>
     </message>
     <message>
       <source>%1 TB</source>
-      <translation>%1 Tb</translation>
+      <translation>%1 TB</translation>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation>%1 Gb</translation>
+      <translation>%1 GiB</translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n devices</source>
@@ -5917,6 +5918,10 @@ a %1</translation>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
       <translation>&quot;Movimiento + Baja - Res&quot; opción de grabación no se puede establecer.</translation>
     </message>
+    <message>
+      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
+      <translation>El archivo cargado se puede eliminar automáticamente, si no hay espacio libre en el almacenamiento del servidor. Primero se eliminará el metraje más antiguo entre todas las cámaras del servidor.</translation>
+    </message>
   </context>
   <context>
     <name>QnSmtpAdvancedSettingsWidget</name>
@@ -6068,10 +6073,6 @@ a %1</translation>
   <context>
     <name>QnStatusOverlayController</name>
     <message>
-      <source>NOT ENOUGH LICENCES</source>
-      <translation>NO HAY LICENCIAS SUFICIENTES</translation>
-    </message>
-    <message>
       <source>NO DATA</source>
       <translation>NO HAY DATOS</translation>
     </message>
@@ -6142,6 +6143,10 @@ a %1</translation>
     <message>
       <source>UNSUPPORTED FIRMWARE VERSION</source>
       <translation>VERSIÓN DE FIRMWARE NO COMPATIBLE</translation>
+    </message>
+    <message>
+      <source>NOT ENOUGH LICENSES</source>
+      <translation>NO HAY SUFICIENTES LICENCIAS</translation>
     </message>
   </context>
   <context>
@@ -6335,7 +6340,7 @@ a %1</translation>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation>%1 Gb</translation>
+      <translation>%1 GB</translation>
     </message>
     <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
@@ -6843,16 +6848,17 @@ a %1</translation>
       <translation>Usuario local</translation>
     </message>
     <message>
-      <source>Cloud user</source>
-      <translation>Usuario de Nube</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>Iniciar Sesión</translation>
     </message>
     <message>
       <source>Role</source>
       <translation>Role</translation>
+    </message>
+    <message>
+      <source>%1 user</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 user</translation>
     </message>
   </context>
   <context>
@@ -7047,10 +7053,6 @@ a %1</translation>
       <translation>Local</translation>
     </message>
     <message>
-      <source>Cloud</source>
-      <translation>Nube</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>Usuario</translation>
     </message>
@@ -7091,8 +7093,9 @@ a %1</translation>
       <translation>Las contraseñas no coinciden.</translation>
     </message>
     <message>
-      <source>Cloud user with specified email already exists.</source>
-      <translation>El usuario de la nube con el correo electrónico especificado ya existe.</translation>
+      <source>%1 user with specified email already exists.</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 user with specified email already exists.</translation>
     </message>
   </context>
   <context>
@@ -7166,10 +7169,6 @@ a %1</translation>
   <context>
     <name>QnWearableProgressWidget</name>
     <message>
-      <source>Uploading %1... %2	%p%</source>
-      <translation>Cargando %1... %2%p%</translation>
-    </message>
-    <message>
       <source>Stop uploading?</source>
       <translation>Detener la subida?</translation>
     </message>
@@ -7178,12 +7177,16 @@ a %1</translation>
       <translation>Se mantendrán los archivos ya subidos.</translation>
     </message>
     <message>
-      <source>Finalizing %1... %2	%p%</source>
-      <translation>Finalizando %1... %2%p%</translation>
-    </message>
-    <message>
       <source>(%1 of %2)</source>
       <translation>(%1 de %2)</translation>
+    </message>
+    <message>
+      <source>Uploading %1...</source>
+      <translation>Subiendo %1...</translation>
+    </message>
+    <message>
+      <source>Finalizing %1...</source>
+      <translation>Finalizando %1...</translation>
     </message>
   </context>
   <context>
@@ -7287,6 +7290,10 @@ a %1</translation>
       <source>Could not connect to server. Video Wall will be closed.</source>
       <translation>No se pudo conectar al servidor. La pared de vídeo se cerrará.</translation>
     </message>
+    <message>
+      <source>Video Wall is removed on the server and will be closed.</source>
+      <translation>Video Wall se elimina en el servidor y se cerrará.</translation>
+    </message>
   </context>
   <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
@@ -7311,10 +7318,6 @@ a %1</translation>
       <translation>El monto total de licencias disminuirá</translation>
     </message>
     <message>
-      <source>Cloud Systems cannot be merged</source>
-      <translation>Los Sistemas de la nube no pueden ser combinados</translation>
-    </message>
-    <message>
       <source>Connecting to the current System...</source>
       <translation>Conectando al Sistema actual...</translation>
     </message>
@@ -7333,6 +7336,11 @@ a %1</translation>
     <message>
       <source>Administrator password</source>
       <translation>Contraseña de administrador</translation>
+    </message>
+    <message>
+      <source>%1 Systems cannot be merged</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 Systems cannot be merged</translation>
     </message>
   </context>
   <context>
@@ -7714,23 +7722,23 @@ a %1</translation>
     </message>
     <message>
       <source>%1 has unsupported format.</source>
-      <translation type="unfinished">%1 has unsupported format.</translation>
+      <translation>%1 tiene formato no compatible.</translation>
     </message>
     <message>
       <source>%1 does not have timestamp.</source>
-      <translation type="unfinished">%1 does not have timestamp.</translation>
+      <translation>%1 no tiene marca de tiempo.</translation>
     </message>
     <message>
       <source>%1 is older than allowed in camera archive settings.</source>
-      <translation type="unfinished">%1 is older than allowed in camera archive settings.</translation>
+      <translation>%1 es anterior a la permitida en la configuración del archivo de la cámara.</translation>
     </message>
     <message>
       <source>%1 covers period for which video has already been uploaded.</source>
-      <translation type="unfinished">%1 covers period for which video has already been uploaded.</translation>
+      <translation>%1 cubre el período para el cual el video ya se ha subido.</translation>
     </message>
     <message>
       <source>%1 covers period for which video is being uploaded.</source>
-      <translation type="unfinished">%1 covers period for which video is being uploaded.</translation>
+      <translation>%1 cubre el período durante el cual se sube el video.</translation>
     </message>
   </context>
   <context>

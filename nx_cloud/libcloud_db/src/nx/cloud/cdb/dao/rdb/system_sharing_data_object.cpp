@@ -39,7 +39,7 @@ nx::utils::db::DBResult SystemSharingDataObject::insertOrReplaceSharing(
 
 nx::utils::db::DBResult SystemSharingDataObject::fetchAllUserSharings(
     nx::utils::db::QueryContext* const queryContext,
-    std::deque<api::SystemSharingEx>* const sharings)
+    std::vector<api::SystemSharingEx>* const sharings)
 {
     return fetchUserSharings(
         queryContext,
@@ -50,7 +50,7 @@ nx::utils::db::DBResult SystemSharingDataObject::fetchAllUserSharings(
 nx::utils::db::DBResult SystemSharingDataObject::fetchUserSharingsByAccountEmail(
     nx::utils::db::QueryContext* const queryContext,
     const std::string& accountEmail,
-    std::deque<api::SystemSharingEx>* const sharings)
+    std::vector<api::SystemSharingEx>* const sharings)
 {
     return fetchUserSharings(
         queryContext,
@@ -88,7 +88,7 @@ nx::utils::db::DBResult SystemSharingDataObject::fetchSharing(
     const nx::utils::db::InnerJoinFilterFields& filterFields,
     api::SystemSharingEx* const sharing)
 {
-    std::deque<api::SystemSharingEx> sharings;
+    std::vector<api::SystemSharingEx> sharings;
     const auto result = fetchUserSharings(
         queryContext,
         filterFields,
@@ -102,6 +102,23 @@ nx::utils::db::DBResult SystemSharingDataObject::fetchSharing(
     *sharing = std::move(sharings[0]);
 
     return nx::utils::db::DBResult::ok;
+}
+
+std::vector<api::SystemSharingEx> SystemSharingDataObject::fetchSystemSharings(
+    utils::db::QueryContext* queryContext,
+    const std::string& systemId)
+{
+    std::vector<api::SystemSharingEx> systemSharings;
+
+    const auto dbResult = fetchUserSharings(
+        queryContext,
+        { nx::utils::db::SqlFilterFieldEqual(
+            "system_id", ":systemId", QnSql::serialized_field(systemId)) },
+        &systemSharings);
+    if (dbResult != utils::db::DBResult::ok)
+        throw utils::db::Exception(dbResult);
+
+    return systemSharings;
 }
 
 nx::utils::db::DBResult SystemSharingDataObject::deleteSharing(
@@ -203,7 +220,7 @@ nx::utils::db::DBResult SystemSharingDataObject::updateUserLoginStatistics(
 nx::utils::db::DBResult SystemSharingDataObject::fetchUserSharings(
     nx::utils::db::QueryContext* const queryContext,
     const nx::utils::db::InnerJoinFilterFields& filterFields,
-    std::deque<api::SystemSharingEx>* const sharings)
+    std::vector<api::SystemSharingEx>* const sharings)
 {
     QString sqlRequestStr = R"sql(
         SELECT a.id as accountId,

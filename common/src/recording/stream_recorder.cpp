@@ -131,7 +131,6 @@ QnStreamRecorder::QnStreamRecorder(const QnResourcePtr& dev):
     m_startDateTimeUs(AV_NOPTS_VALUE),
     m_currentTimeZone(-1),
     m_waitEOF(false),
-    m_forceDefaultCtx(false),
     m_packetWrited(false),
     m_currentChunkLen(0),
     m_prebufferingUsec(0),
@@ -707,6 +706,20 @@ void QnStreamRecorder::endOfRun()
     close();
 }
 
+bool QnStreamRecorder::isCodecsCompatible(const StreamRecorderContext& context) const
+{
+    for (unsigned int i = 0; i < context.formatCtx->nb_streams; ++i)
+    {
+        const auto stream = context.formatCtx->streams[i];
+        if (stream && stream->codec && stream->codec->codec_id == AV_CODEC_ID_H265)
+        {
+            if (context.fileFormat == QnAviArchiveMetadata::Format::avi)
+                return false;
+        }
+    }
+    return true;
+}
+
 bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& mediaData)
 {
     m_mediaProvider = dynamic_cast<QnAbstractMediaStreamDataProvider*> (mediaData->dataProvider);
@@ -769,8 +782,6 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
 
         const QnMediaResourcePtr mediaDev = m_device.dynamicCast<QnMediaResource>();
 
-        // m_forceDefaultCtx: for server archive, if file is recreated - we need to use default context.
-        // for exporting AVI files we must use original context, so need to reset "force" for exporting purpose
         const bool isTranscode =
             (m_transcodeFilters.is_initialized()
                 && m_transcodeFilters->isTranscodingRequired(mediaDev))
@@ -784,7 +795,8 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
         {
             context.metadata.videoLayoutSize = layout->size();
             context.metadata.videoLayoutChannels = layout->getChannels();
-            context.metadata.overridenAr = mediaDev->customAspectRatio();
+            if (mediaDev->customAspectRatio().isValid())
+                context.metadata.overridenAr = mediaDev->customAspectRatio().toFloat();
         }
 
         if (isUtcOffsetAllowed())
@@ -864,11 +876,11 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
 
                     QnFfmpegHelper::copyAvCodecContex(videoStream->codec, m_videoTranscoder->getCodecContext());
                 }
-                else if (!m_forceDefaultCtx && mediaData->context && mediaData->context->getWidth() > 0)
+                else if (mediaData->context && mediaData->context->getWidth() > 0)
                 {
                     QnFfmpegHelper::mediaContextToAvCodecContext(videoCodecCtx, mediaData->context);
                 }
-                else if (m_role == StreamRecorderRole::fileExport || m_role == StreamRecorderRole::fileExportWithEmptyContext)
+                else if (m_role == StreamRecorderRole::fileExport)
                 {
                     // determine real width and height
                     QSharedPointer<CLVideoDecoderOutput> outFrame(new CLVideoDecoderOutput());
@@ -946,9 +958,15 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                 // codec_tag from another source container can cause an issue. Reset value.
                 audioStream->codec->codec_tag = 0;
 
-                // avoid FFMPEG bug for MP3 mono. block_align hardcoded inside ffmpeg for stereo channels and it is cause problem
-                if (srcAudioCodec == AV_CODEC_ID_MP3 && audioStream->codec->channels == 1)
-                    audioStream->codec->block_align = 0;
+                if (srcAudioCodec == AV_CODEC_ID_MP3)
+                {
+                    // avoid FFMPEG bug for MP3 mono. block_align hardcoded inside ffmpeg for stereo channels and it is cause problem
+                    if (audioStream->codec->channels == 1)
+                        audioStream->codec->block_align = 0;
+                    // Fill frame_size for MP3 (it is a constant). AVI container works wrong without it.
+                    if (audioStream->codec->frame_size == 0)
+                        audioStream->codec->frame_size = QnFfmpegHelper::getDefaultFrameSize(audioStream->codec);
+                }
             }
             else
             {
@@ -978,7 +996,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
         }
 
         int rez = avformat_write_header(context.formatCtx, 0);
-        if (rez < 0)
+        if (rez < 0 || !isCodecsCompatible(context))
         {
             QnFfmpegHelper::closeFfmpegIOContext(context.formatCtx->pb);
             context.formatCtx->pb = nullptr;
@@ -1177,9 +1195,6 @@ bool QnStreamRecorder::addSignatureFrame()
 void QnStreamRecorder::setRole(StreamRecorderRole role)
 {
     m_role = role;
-    // TODO: it seems we don't need to force default context either for client or server.
-    // Get rid of this field and fileExportWithEmptyContext enum value (need to recheck NOV export/double export).
-    m_forceDefaultCtx = (m_role == StreamRecorderRole::fileExportWithEmptyContext);
 }
 
 #ifdef SIGN_FRAME_ENABLED

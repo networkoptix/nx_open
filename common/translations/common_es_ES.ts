@@ -87,8 +87,9 @@
       <translation>El Sistema descubierto %1 es incompatible con el Sistema actual.</translation>
     </message>
     <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <translation>El Sistema de la nube sólo puede ser combinado con la no nube. El nombre del sistema y la contraseña son tomados del Sistema de la Nube.</translation>
+      <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 System can only be merged with non-%1. System name and password are taken from %1 System.</translation>
     </message>
   </context>
   <context>
@@ -562,7 +563,7 @@
     </message>
     <message>
       <source>Server with matching Hardware Id not found</source>
-      <translation>Servidor correspondiente al hardware Id no encontrado</translation>
+      <translation>Servidor correspondiente al Hardware Id no encontrado</translation>
     </message>
   </context>
   <context>

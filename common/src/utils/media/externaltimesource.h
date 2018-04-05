@@ -1,8 +1,6 @@
 #ifndef QnExternalTimeSource_h_1919
 #define QnExternalTimeSource_h_1919
 
-#include <QtCore/QtGlobal> /* For Q_UNUSED. */
-
 class QnlTimeSource
 {
 public:
@@ -31,14 +29,13 @@ public:
     */
     virtual qint64 expectedTime() const { return getCurrentTime(); }
 
-
-    virtual void onBufferingStarted(QnlTimeSource* src, qint64 firstTime) { Q_UNUSED(src); Q_UNUSED(firstTime);}
-    virtual void onBufferingFinished(QnlTimeSource* src) { Q_UNUSED(src); }
-    virtual void onEofReached(QnlTimeSource* src, bool value) { Q_UNUSED(src); Q_UNUSED(value); }
+    virtual void onBufferingStarted(QnlTimeSource* /*src*/, qint64 /*firstTime*/) {}
+    virtual void onBufferingFinished(QnlTimeSource* /*src*/) {}
+    virtual void onEofReached(QnlTimeSource* /*src*/, bool /*value*/) {}
     virtual bool isEnabled() const { return true; }
 
-    virtual void reinitTime(qint64 newTime) { Q_UNUSED(newTime); }
-  
+    virtual void reinitTime(qint64 /*newTime*/) {}
+
     virtual bool isBuffering() const { return false; }
 };
 

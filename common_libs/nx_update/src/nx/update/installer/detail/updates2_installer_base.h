@@ -8,6 +8,7 @@
 
 namespace nx {
 namespace update {
+namespace installer {
 namespace detail {
 
 class NX_UPDATE_API Updates2InstallerBase: public AbstractUpdates2Installer
@@ -43,5 +44,6 @@ private:
 };
 
 } // namespace detail
-} // namespace updates2
+} // namespace installer
+} // namespace update
 } // namespace nx

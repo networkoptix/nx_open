@@ -45,6 +45,9 @@ public:
     boost::optional<QString> filePath() const;
 
 private:
+    void handleLevelChange(QnMutexLockerBase* lock) const;
+
+private:
     mutable QnMutex m_mutex;
     const OnLevelChanged m_onLevelChanged;
     Level m_defaultLevel;

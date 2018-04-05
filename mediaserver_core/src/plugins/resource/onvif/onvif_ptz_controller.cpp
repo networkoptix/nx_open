@@ -75,8 +75,6 @@ static QString fromLatinStdString(const std::string& value)
     }
 }
 
-
-
 // -------------------------------------------------------------------------- //
 // QnOnvifPtzController
 // -------------------------------------------------------------------------- //
@@ -117,7 +115,6 @@ QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource)
     if(data.value(Qn::PTZ_CAPABILITIES_PARAM_NAME, &overridedCaps))
         m_capabilities = overridedCaps;
 
-
     m_capabilities |= initMove();
     if(absoluteMoveBroken)
         m_capabilities &= ~(Ptz::AbsolutePtzCapabilities | Ptz::DevicePositioningPtzCapability);
@@ -149,7 +146,7 @@ Ptz::Capabilities QnOnvifPtzController::initMove() {
     if(response.PTZConfiguration.empty() || !response.PTZConfiguration[0])
         return Ptz::NoPtzCapabilities;
 
-	// TODO: #PTZ #Elric we can init caps by examining spaces in response!
+    // TODO: #PTZ #Elric we can init caps by examining spaces in response!
 
     Ptz::Capabilities configCapabilities;
     if(response.PTZConfiguration[0]->DefaultContinuousPanTiltVelocitySpace)
@@ -157,7 +154,7 @@ Ptz::Capabilities QnOnvifPtzController::initMove() {
     if(response.PTZConfiguration[0]->DefaultContinuousZoomVelocitySpace)
         configCapabilities |= Ptz::ContinuousZoomCapability;
     if(response.PTZConfiguration[0]->DefaultAbsolutePantTiltPositionSpace)
-	    configCapabilities |= Ptz::AbsolutePanCapability | Ptz::AbsoluteTiltCapability;
+        configCapabilities |= Ptz::AbsolutePanCapability | Ptz::AbsoluteTiltCapability;
     if(response.PTZConfiguration[0]->DefaultAbsoluteZoomPositionSpace)
         configCapabilities |= Ptz::AbsoluteZoomCapability;
 

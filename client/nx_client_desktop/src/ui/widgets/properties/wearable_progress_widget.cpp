@@ -119,6 +119,7 @@ bool QnWearableProgressWidget::calculateCancelable(const WearableState& state)
 
 QString QnWearableProgressWidget::calculateMessage(const WearableState& state)
 {
+    const QString queueMessage = lit(" %1\t%p%").arg(calculateQueueMessage(state));
     switch (state.status)
     {
     case WearableState::Unlocked:
@@ -126,13 +127,10 @@ QString QnWearableProgressWidget::calculateMessage(const WearableState& state)
         return QString();
     case WearableState::Locked:
     case WearableState::Uploading:
-        return tr("Uploading %1... %2\t%p%")
-            .arg(calculateFileName(state))
-            .arg(calculateQueueMessage(state));
+        return tr("Uploading %1...").arg(calculateFileName(state)) + queueMessage;
+
     case WearableState::Consuming:
-        return tr("Finalizing %1... %2\t%p%")
-            .arg(calculateFileName(state))
-            .arg(calculateQueueMessage(state));
+        return tr("Finalizing %1...").arg(calculateFileName(state)) + queueMessage;
     default:
         return QString();
     }

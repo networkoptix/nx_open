@@ -765,7 +765,7 @@
     <message>
       <location/>
       <source>Logical Id</source>
-      <translation type="unfinished">Logical Id</translation>
+      <translation>Id Lógico</translation>
     </message>
   </context>
   <context>
@@ -1093,7 +1093,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/export_media_settings_widget.ui"/>
       <source>Export Settings</source>
-      <translation>Configuración de exportación</translation>
+      <translation>Exportar Configuración</translation>
     </message>
     <message>
       <location/>
@@ -1804,7 +1804,7 @@
     <message>
       <location/>
       <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+      <translation>&quot;Cámara usable&quot; es un almacenamiento virtual para archivos de video, que podría cargarse en cualquier servidor de su Sistema y acceder a él cualquier usuario.</translation>
     </message>
   </context>
   <context>
@@ -2683,12 +2683,6 @@
       <source>Reset</source>
       <translation>Reiniciar</translation>
     </message>
-    <message>
-      <location/>
-      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage.
-The oldest footage among all cameras on the server will be deleted first.</source>
-      <translation>El archivo cargado se puede eliminar automáticamente, si no hay espacio libre en el almacenamiento del servidor. Primero se eliminará el metraje más antiguo entre todas las cámaras del servidor.</translation>
-    </message>
   </context>
   <context>
     <name>SmtpAdvancedSettingsWidget</name>
@@ -2960,7 +2954,7 @@ The oldest footage among all cameras on the server will be deleted first.</sourc
     <message>
       <location/>
       <source>Font Size</source>
-      <translation>Tamaño de la fuente</translation>
+      <translation>Tamaño de la letra</translation>
     </message>
     <message>
       <location/>
@@ -3044,14 +3038,18 @@ The oldest footage among all cameras on the server will be deleted first.</sourc
     </message>
     <message>
       <location/>
-      <source>There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</source>
-      <translation>Todavía no hay roles de usuario personalizados. Cliquee &quot;Nuevo rol&quot; para crear uno.</translation>
+      <source>New role</source>
+      <translation>Nuevo rol</translation>
     </message>
     <message>
       <location/>
-      <source>New role</source>
-      <translation>Nuevo rol</translation>
+      <source>There are no custom user roles yet.</source>
+      <translation>Todavía no hay roles de usuario personalizados.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Click &quot;New role&quot; button to create one.</source>
+      <translation>Haga clic en &quot;Botón de nueva función&quot; para crear uno.</translation>
     </message>
   </context>
   <context>

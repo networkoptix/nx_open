@@ -63,14 +63,6 @@ int IsolatedStreamReaderResource::saveAsync()
     return 0;
 }
 
-bool IsolatedStreamReaderResource::removeProperty(const QString& key)
-{
-    QnMutexLocker lock(&m_propertyMutex);
-    m_properties.erase(key);
-    return true;
-}
-
-
 } // namespace utils
 } // namespace plugins
 } // namespace nx

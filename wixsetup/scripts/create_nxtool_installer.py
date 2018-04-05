@@ -7,8 +7,7 @@ import yaml
 from heat_interface import harvest_dir
 from light_interface import light
 from candle_interface import candle
-from signtool_interface import sign
-#from insignia_interface import extract_engine, reattach_engine
+from signtool_interface import sign_software, sign_hardware
 
 engine_tmp_folder = 'obj'
 
@@ -91,24 +90,20 @@ def build_msi(
         installer_language=installer_language)
 
     if code_signing['enabled']:
-        sign(
-            signtool_directory=code_signing['signtool_directory'],
-            target_file=output_file,
-            sign_description=code_signing['sign_description'],
-            sign_password=code_signing['sign_password'],
-            certificate=code_signing['certificate'])
-
-'''
-def build_exe(project, filename, components, candle_variables):
-    candle_and_light(project, filename, components, candle_variables)
-    if sign_binaries:
-        engine_filename = project + '.engine.exe'
-        engine_path = os.path.join(engine_tmp_folder, engine_filename)
-        extract_engine(filename, engine_path),             # Extract engine
-        sign(engine_path),                                 # Sign it
-        reattach_engine(engine_path, filename, filename),  # Reattach signed engine
-        sign(filename)                                     # Sign the bundle
-'''
+        signtool_directory = code_signing['signtool_directory']
+        timestamp_server = code_signing['timestamp_server']
+        if code_signing['hardware']:
+            sign_hardware(
+                signtool_directory=signtool_directory,
+                target_file=output_file,
+                timestamp_server=timestamp_server)
+        else:
+            sign_software(
+                signtool_directory=signtool_directory,
+                target_file=output_file,
+                sign_password=code_signing['sign_password'],
+                certificate=code_signing['certificate'],
+                timestamp_server=timestamp_server)
 
 
 def create_nxtool_installer(
@@ -152,18 +147,6 @@ def create_nxtool_installer(
         installer_cultures=installer_cultures,
         installer_language=installer_language,
         code_signing=code_signing)
-'''
-    candle_exe_variables = {
-        'InstallerTargetDir': installer_target_dir,
-        'NxtoolMsiName': nxtool_msi_name,
-        'NxToolMsiFile': nxtool_msi_file
-    }
-    build_exe(
-        'nxtool-exe',
-        nxtool_exe_file,
-        nxtool_exe_components,
-        candle_exe_variables)
-'''
 
 
 def main():
@@ -183,15 +166,10 @@ def main():
     installer_cultures = config['installer_cultures']
     installer_language = installer_language_pattern.format(config['installer_language'])
 
-#    nxtool_msi_name = config['servertool_distribution_name'] + '.msi'
-#    nxtool_msi_file = os.path.join(engine_tmp_folder, 'nxtool.msi')
-#    nxtool_exe_name = config['servertool_distribution_name'] + '.exe'
-#    nxtool_exe_file = os.path.join(installer_target_dir, nxtool_exe_name)
-
     create_nxtool_installer(
         wix_directory=config['wix_directory'],
         qml_directory=args.qml_dir,
-        vcredist_directory=config['vcredist_directory'],
+        vcredist_directory=os.path.join(config['vcredist_directory'], 'bin'),
         sources_directory=args.sources_dir,
         arch=config['arch'],
         installer_cultures=installer_cultures,

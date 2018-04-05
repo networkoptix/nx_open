@@ -102,7 +102,6 @@ bool QnDbHelper::tuneDBAfterOpen(QSqlDatabase* const sqlDb)
     return true;
 }
 
-
 void QnDbHelper::QnDbTransaction::rollback()
 {
     m_database.rollback();
@@ -228,7 +227,6 @@ bool QnDbHelper::applyUpdates(const QString &dirName) {
     while (existsUpdatesQuery.next())
         existUpdates << existsUpdatesQuery.value(0).toString();
 
-
     QDir dir(dirName);
     for(const QFileInfo& entry: dir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files, QDir::Name))
     {
@@ -260,14 +258,12 @@ bool QnDbHelper::applyUpdates(const QString &dirName) {
     return true;
 }
 
-bool QnDbHelper::beforeInstallUpdate(const QString& updateName)
+bool QnDbHelper::beforeInstallUpdate(const QString& /*updateName*/)
 {
-    Q_UNUSED(updateName);
     return true;
 }
 
-bool QnDbHelper::afterInstallUpdate(const QString& updateName)
+bool QnDbHelper::afterInstallUpdate(const QString& /*updateName*/)
 {
-    Q_UNUSED(updateName);
     return true;
 }

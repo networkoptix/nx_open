@@ -81,7 +81,7 @@
 
 #include <motion/motion_helper.h>
 
-#include <network/auth/time_based_nonce_provider.h>
+#include <nx/vms/auth/time_based_nonce_provider.h>
 #include <network/authenticate_helper.h>
 #include <network/connection_validator.h>
 #include <network/default_tcp_connection_processor.h>
@@ -325,7 +325,6 @@ static MediaServerProcess* serviceMainInstance = 0;
 void stopServer(int signal);
 bool restartFlag = false;
 
-
 namespace {
 const QString YES = lit("yes");
 const QString NO = lit("no");
@@ -449,7 +448,6 @@ QString defaultLocalAddress(const QHostAddress& target)
         if (result.length()>0)
             return result;
     }
-
 
     {
         // if nothing else works use first enabled hostaddr
@@ -591,7 +589,6 @@ QnStorageResourceList getSmallStorages(const QnStorageResourceList& storages)
     }
     return result;
 }
-
 
 QnStorageResourceList createStorages(
     QnCommonModule* commonModule,
@@ -1188,7 +1185,6 @@ void MediaServerProcess::stopAsync()
     QTimer::singleShot(0, this, SLOT(stopSync()));
 }
 
-
 int MediaServerProcess::getTcpPort() const
 {
     return m_universalTcpListener ? m_universalTcpListener->getPort() : 0;
@@ -1269,7 +1265,6 @@ void MediaServerProcess::updateAddressesList()
 
     ec2::ApiMediaServerData prevValue;
     fromResourceToApi(m_mediaServer, prevValue);
-
 
     nx::network::AddressFilters addressMask =
         nx::network::AddressFilter::ipV4
@@ -1809,6 +1804,14 @@ void MediaServerProcess::initializeCloudConnect()
 
 void MediaServerProcess::changeSystemUser(const QString& userName)
 {
+    // Ini config files are for debug/experimental purposes only, so we do not care about security.
+    const auto command = lm("chmod 777 -R '%1'").args(nx::kit::IniConfig::iniFilesDir());
+    if (::system(command.toUtf8().data()) != 0) //< Let the errors reach stdout and stderr.
+    {
+        qWarning().noquote() << "WARNING: Unable to:" << command;
+        return; //< Server will not be able to run without access to these files.
+    }
+
     // Change owner of all data files, so mediaserver can use them as different user.
     const std::vector<QString> chmodPaths =
     {
@@ -2289,7 +2292,6 @@ void MediaServerProcess::run()
         this, &MediaServerProcess::started,
         [&serverModule]() {serverModule->findInstance<Downloader>()->atServerStart(); });
 
-
     qnServerModule->runTimeSettings()->remove("rebuild");
 
     if (m_serviceMode)
@@ -2303,7 +2305,6 @@ void MediaServerProcess::run()
     if (m_serviceMode)
     {
         initializeLogging();
-        qnServerModule->initializeRootTool();
     }
 
     updateAllowedInterfaces();
@@ -2715,13 +2716,11 @@ void MediaServerProcess::run()
             } while (appserverHost.toIPv4Address() == 0);
         }
 
-
         server->setPrimaryAddress(
             nx::network::SocketAddress(defaultLocalAddress(appserverHost), m_universalTcpListener->getPort()));
         server->setSslAllowed(sslAllowed);
         cloudIntegrationManager->cloudManagerGroup().connectionManager.setProxyVia(
             nx::network::SocketAddress(nx::network::HostAddress::localhost, m_universalTcpListener->getPort()));
-
 
         // used for statistics reported
         server->setSystemInfo(QnSystemInformation::currentSystemInformation());
@@ -2868,8 +2867,6 @@ void MediaServerProcess::run()
     auto serverMessageProcessor = dynamic_cast<QnServerMessageProcessor*> (commonModule()->messageProcessor());
     serverMessageProcessor->startReceivingLocalNotifications(ec2Connection);
 
-
-
     qnServerModule->metadataManagerPool()->init();
     at_runtimeInfoChanged(runtimeManager->localInfo());
 
@@ -2955,7 +2952,6 @@ void MediaServerProcess::run()
 
     std::unique_ptr<QnLdapManager> ldapManager(new QnLdapManager(commonModule()));
 
-
     commonModule()->resourceDiscoveryManager()->setReady(true);
     const bool isDiscoveryDisabled =
         qnServerModule->roSettings()->value(QnServer::kNoResourceDiscovery, false).toBool();
@@ -2963,7 +2959,6 @@ void MediaServerProcess::run()
         commonModule()->resourceDiscoveryManager()->start();
     //else
     //    we are not able to add cameras to DB anyway, so no sense to do discover
-
 
     connect(
         commonModule()->resourceDiscoveryManager(),
@@ -3101,6 +3096,7 @@ void MediaServerProcess::run()
 
             commonModule()->resourceDiscoveryManager()->stop();
             qnServerModule->metadataManagerPool()->stop(); //< Stop processing analytics events.
+            auditManager->stop();
             QnResource::stopAsyncTasks();
 
             //since mserverResourceDiscoveryManager instance is dead no events can be delivered to serverResourceProcessor: can delete it now
@@ -3108,8 +3104,8 @@ void MediaServerProcess::run()
             serverResourceProcessor.reset();
 
             mdnsListener.reset();
+            upnpDeviceSearcher->pleaseStop(); //< pleaseStop method is synchronous for this class.
             resourceSearchers.reset();
-            upnpDeviceSearcher.reset();
 
             connectorThread->quit();
             connectorThread->wait();
@@ -3225,11 +3221,11 @@ void MediaServerProcess::at_emptyDigestDetected(const QnUserResourcePtr& user, c
 
         QnUuid userId = user->getId();
         m_updateUserRequests << userId;
-        appServerConnection->getUserManager(Qn::kSystemAccess)->save(userData, password, this, [this, userId]( int reqID, ec2::ErrorCode errorCode )
-        {
-            QN_UNUSED(reqID, errorCode);
-            m_updateUserRequests.remove(userId);
-        } );
+        appServerConnection->getUserManager(Qn::kSystemAccess)->save(userData, password, this,
+            [this, userId]( int /*reqID*/, ec2::ErrorCode /*errorCode*/ )
+            {
+                m_updateUserRequests.remove(userId);
+            });
     }
 }
 
@@ -3395,7 +3391,6 @@ int MediaServerProcess::main(int argc, char* argv[])
 #ifdef __linux__
     signal( SIGUSR1, SIGUSR1_handler );
 #endif
-
 
 #if !defined(EDGE_SERVER) && !defined(__aarch64__)
     std::unique_ptr<TextToWaveServer> textToWaveServer = std::make_unique<TextToWaveServer>(

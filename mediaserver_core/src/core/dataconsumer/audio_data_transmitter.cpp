@@ -30,7 +30,7 @@ void QnAbstractAudioTransmitter::makeRealTimeDelay(const QnConstCompressedAudioD
         QnSleep::msleep(diff);
 }
 
-bool QnAbstractAudioTransmitter::processData(const QnAbstractDataPacketPtr &data)
+bool QnAbstractAudioTransmitter::processData(const QnAbstractDataPacketPtr& data)
 {
     QnConstAbstractMediaDataPtr media = std::dynamic_pointer_cast<const QnAbstractMediaData>(data);
     if (!media)
@@ -137,9 +137,6 @@ void QnAbstractAudioTransmitter::subscribe(
     }
 
     m_providers.emplace(priority, dataProvider);
-
-    if (m_providers.begin()->second == dataProvider)
-        m_dataQueue.clear();
 
     dataProvider->addDataProcessor(this);
     if (auto owner = dataProvider->getOwner())

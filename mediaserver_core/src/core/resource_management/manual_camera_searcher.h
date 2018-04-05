@@ -15,7 +15,6 @@
 #include <nx/network/ip_range_checker_async.h>
 #include <common/common_module_aware.h>
 
-
 class QnSearchTask
 {
 
@@ -64,7 +63,6 @@ private:
     SearcherList m_searchers;
 };
 
-
 //!Scans different addresses simultaneously (using aio or concurrent operations)
 class QnManualCameraSearcher: public QnCommonModuleAware
 {
@@ -88,7 +86,8 @@ public:
     /*!
         \param pool Thread pool to use for running concurrent operations
     */
-    bool run( QThreadPool* pool, const QString &startAddr, const QString &endAddr, const QAuthenticator& auth, int port );
+    bool run(QThreadPool* pool, const QString& startAddr, const QString& endAddr,
+        const QAuthenticator& auth, int port);
     void cancel();
     QnManualCameraSearchProcessStatus status() const;
 

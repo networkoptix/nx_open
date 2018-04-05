@@ -6,13 +6,13 @@
 #include <core/resource/camera_bookmark.h>
 
 #include <ui/style/custom_style.h>
-#include <ui/utils/validators.h>
+#include <nx/client/desktop/common/utils/validators.h>
 
 namespace {
     const int defaultTimeoutIdx = 0;
 }
 
-using namespace nx::client::desktop::ui;
+using namespace nx::client::desktop;
 
 QnBookmarkWidget::QnBookmarkWidget(QWidget *parent):
     QWidget(parent),
@@ -39,10 +39,10 @@ QnBookmarkWidget::QnBookmarkWidget(QWidget *parent):
         updateTagsList();
     });
 
-    const auto validator = Qn::defaultNonEmptyValidator(tr("Name cannot be empty."));
+    const auto validator = defaultNonEmptyValidator(tr("Name cannot be empty."));
     ui->nameInputField->setValidator(validator);
 
-    connect(ui->nameInputField, &QnInputField::isValidChanged,
+    connect(ui->nameInputField, &InputField::isValidChanged,
         this, &QnBookmarkWidget::validChanged);
     connect(ui->descriptionTextEdit, &TextEditField::isValidChanged,
         this, &QnBookmarkWidget::validChanged);
@@ -124,8 +124,8 @@ void QnBookmarkWidget::updateTagsList() {
 void QnBookmarkWidget::setDescriptionMandatory(bool mandatory)
 {
     const auto validator = mandatory
-        ? Qn::defaultNonEmptyValidator(tr("Description cannot be empty"))
-        : Qn::TextValidateFunction();
+        ? defaultNonEmptyValidator(tr("Description cannot be empty"))
+        : TextValidateFunction();
 
     ui->descriptionTextEdit->setValidator(validator);
 }

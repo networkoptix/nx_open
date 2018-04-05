@@ -369,7 +369,7 @@ void Worker::validateFileInformation()
         {
             NX_VERBOSE(
                 this,
-                lm("[Downloader, validate] Issuing validateFileInformation request for %1 to peer %1")
+                lm("[Downloader, validate] Issuing validateFileInformation request for %1 to peer %2")
                     .args(fileInfo.name, peerId));
 
             auto handle = m_peerManager->validateFileInformation(peerId, fileInfo,
@@ -547,11 +547,11 @@ void Worker::handleFileInformationReply(
     QnMutexLocker lock(&m_mutex);
 
     auto requestContext = m_contextByHandle.take(handle);
-    NX_ASSERT(!requestContext.peerId.isNull());
-    NX_ASSERT(requestContext.type == State::requestingFileInformation);
-
     if (requestContext.cancelled)
         return;
+
+    NX_ASSERT(!requestContext.peerId.isNull());
+    NX_ASSERT(requestContext.type == State::requestingFileInformation);
 
     NX_VERBOSE(m_logTag,
         lm("Got %3 reply from %1: %2")
@@ -676,11 +676,11 @@ void Worker::handleChecksumsReply(
     QnMutexLocker lock(&m_mutex);
 
     auto requestContext = m_contextByHandle.take(handle);
-    NX_ASSERT(!requestContext.peerId.isNull());
-    NX_ASSERT(requestContext.type == State::requestingChecksums);
-
     if (requestContext.cancelled)
         return;
+
+    NX_ASSERT(!requestContext.peerId.isNull());
+    NX_ASSERT(requestContext.type == State::requestingChecksums);
 
     NX_VERBOSE(m_logTag,
         lm("Got %1 from %2: %3")
@@ -826,6 +826,7 @@ void Worker::downloadNextChunk()
                 .arg(chunkIndex).arg(m_peerManager->peerString(peerId)));
     }
 
+    NX_VERBOSE(m_logTag, lm("Issued download request. Handle: %1, peerId: %2").args(handle, peerId));
     if (handle > 0)
         m_contextByHandle[handle] = RequestContext(peerId, State::downloadingChunks);
 }
@@ -835,12 +836,15 @@ void Worker::handleDownloadChunkReply(
 {
     QnMutexLocker lock(&m_mutex);
 
-    auto requestContext = m_contextByHandle.take(handle);
-    NX_ASSERT(!requestContext.peerId.isNull());
-    NX_ASSERT(requestContext.type == State::downloadingChunks);
+    NX_VERBOSE(m_logTag, lm("handleDownloadChunkReply: handle: %1, chunk: %2, success: %3")
+        .args(handle, chunkIndex, success));
 
+    auto requestContext = m_contextByHandle.take(handle);
     if (requestContext.cancelled)
         return;
+
+    NX_ASSERT(!requestContext.peerId.isNull());
+    NX_ASSERT(requestContext.type == State::downloadingChunks);
 
     auto exitGuard = QnRaiiGuard::createDestructible(
         [this, &success, &lock]()

@@ -264,45 +264,43 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
             return CopyError::TargetFileError;
         }
 
-        int bitrate = m_schedule.backupBitrate;
-        if (bitrate <= 0) // not capped
+        const int bitrateMBps = m_schedule.backupBitrate; //< Megabytes per second.
+        if (bitrateMBps <= 0) // not capped
         {
             auto data = fromFile->readAll();
             toFile->write(data);
         }
         else
         {
-            NX_ASSERT(bitrate > 0);
-            qint64 fileSize = fromFile->size();
-            const qint64 timeToWrite = (fileSize / bitrate) * 1000;
+            const qint64 fileSize = fromFile->size();
 
+            const qint64 timeToFileMs = (fileSize * 1000) / bitrateMBps;
             const qint64 CHUNK_SIZE = 4096;
-            const qint64 chunksInFile = std::max((qint64) 1, fileSize / CHUNK_SIZE);
-            const qint64 timeOnChunk = timeToWrite / chunksInFile;
+            QElapsedTimer writeTimeMs;
+            writeTimeMs.restart();
 
-            while (fileSize > 0)
+            qint64 dataProcessed = 0;
+            while (dataProcessed < fileSize)
             {
-                if (m_interrupted || m_needStop) {
+                if (m_interrupted || m_needStop)
                     return CopyError::Interrupted;
+
+                auto data = fromFile->read(CHUNK_SIZE);
+                if (data.isEmpty())
+                {
+                    NX_WARNING(this, lm("file %1 read error").arg(newFileName));
+                    return CopyError::SourceFileError;
                 }
-                qint64 startTime = qnSyncTime->currentMSecsSinceEpoch();
-                const qint64 writeSize = CHUNK_SIZE < fileSize ? CHUNK_SIZE : fileSize;
-                auto data = fromFile->read(writeSize);
                 if (toFile->write(data) == -1)
                 {
-                    NX_LOG(
-                        lit("[QnScheduleSync::synchronize] file %1 write error")
-                            .arg(newFileName),
-                        cl_logDEBUG1
-                    );
+                    NX_WARNING(this, lm("file %1 write error").arg(newFileName));
                     return CopyError::TargetFileError;
                 }
-                fileSize -= writeSize;
-                qint64 now = qnSyncTime->currentMSecsSinceEpoch();
-                if (now - startTime < timeOnChunk)
-                    std::this_thread::sleep_for(
-                        std::chrono::milliseconds(timeOnChunk - (now - startTime))
-                    );
+                dataProcessed += data.size();
+                int intervalMs = (timeToFileMs * dataProcessed) / fileSize;
+                int needToSleepMs = intervalMs - writeTimeMs.elapsed();
+                if (needToSleepMs > 0)
+                    std::this_thread::sleep_for(std::chrono::milliseconds(needToSleepMs));
             }
         }
 

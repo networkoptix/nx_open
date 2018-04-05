@@ -20,6 +20,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/misc/schedule_task.h>
 
 #include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
@@ -50,7 +51,7 @@
 #include <utils/common/html.h>
 #include <utils/license_usage_helper.h>
 
-#include "camera_schedule_widget.h"
+#include "legacy_camera_schedule_widget.h"
 #include "camera_motion_mask_widget.h"
 
 using nx::client::core::Geometry;
@@ -133,11 +134,11 @@ SingleCameraSettingsWidget::SingleCameraSettingsWidget(QWidget *parent) :
     connect(ui->cameraScheduleWidget, &QnAbstractPreferencesWidget::hasChangesChanged, this,
         &SingleCameraSettingsWidget::at_dbDataChanged);
 
-    connect(ui->cameraScheduleWidget, &CameraScheduleWidget::scheduleEnabledChanged,
+    connect(ui->cameraScheduleWidget, &LegacyCameraScheduleWidget::scheduleEnabledChanged,
         this, &SingleCameraSettingsWidget::at_cameraScheduleWidget_scheduleEnabledChanged);
-    connect(ui->cameraScheduleWidget, &CameraScheduleWidget::scheduleEnabledChanged,
+    connect(ui->cameraScheduleWidget, &LegacyCameraScheduleWidget::scheduleEnabledChanged,
         this, &SingleCameraSettingsWidget::at_dbDataChanged);
-    connect(ui->cameraScheduleWidget, &CameraScheduleWidget::alert, this,
+    connect(ui->cameraScheduleWidget, &LegacyCameraScheduleWidget::alert, this,
         [this](const QString& text) { m_recordingAlert = text; updateAlertBar(); });
 
     connect(ui->webPageLink, &QLabel::linkActivated,
@@ -181,7 +182,7 @@ SingleCameraSettingsWidget::SingleCameraSettingsWidget(QWidget *parent) :
     connect(ui->fisheyeSettingsWidget, &FisheyeSettingsWidget::dataChanged,
         this, &SingleCameraSettingsWidget::at_fisheyeSettingsChanged);
 
-    connect(ui->imageControlWidget, &ImageControlWidget::changed,
+    connect(ui->imageControlWidget, &LegacyImageControlWidget::changed,
         this, &SingleCameraSettingsWidget::at_dbDataChanged);
 
     connect(ui->ioPortSettingsWidget, &IoPortSettingsWidget::dataChanged,
@@ -226,6 +227,10 @@ SingleCameraSettingsWidget::~SingleCameraSettingsWidget()
 
 void SingleCameraSettingsWidget::retranslateUi()
 {
+    ui->wearableInfoLabel->setText(tr("Uploaded archive can be deleted automatically, "
+        "if there is no free space on a server storage. "
+        "The oldest footage among all cameras on the server will be deleted first."));
+
     setWindowTitle(QnDeviceDependentStrings::getNameFromSet(
         resourcePool(),
         QnCameraDeviceStringSet(
@@ -406,8 +411,8 @@ void SingleCameraSettingsWidget::submitToResource()
         loginEditAuth.setPassword(ui->passwordEdit->text().trimmed());
         if (m_camera->getAuth() != loginEditAuth)
         {
-            if (m_camera->isMultiSensorCamera())
-                QnClientCameraResource::setAuthToMultisensorCamera(m_camera, loginEditAuth);
+            if (m_camera->isMultiSensorCamera() || m_camera->isNvr())
+                QnClientCameraResource::setAuthToCameraGroup(m_camera, loginEditAuth);
             else
                 m_camera->setAuth(loginEditAuth);
         }
@@ -534,11 +539,8 @@ void SingleCameraSettingsWidget::updateFromResource(bool silent)
             auto supported = m_camera->supportedMotionType();
             auto motionType = m_camera->getMotionType();
             auto mdEnabled = supported.testFlag(motionType) && motionType != Qn::MT_NoMotion;
-            if (!mdEnabled)
-                motionType = Qn::MT_NoMotion;
             ui->motionDetectionCheckBox->setChecked(mdEnabled);
-
-            ui->cameraScheduleWidget->overrideMotionType(motionType);
+            ui->cameraScheduleWidget->setMotionDetectionAllowed(mdEnabled);
 
             updateMotionCapabilities();
             updateMotionWidgetFromResource();
@@ -699,18 +701,18 @@ void SingleCameraSettingsWidget::showMaxFpsWarningIfNeeded()
     int maxFps = -1;
     int maxDualStreamFps = -1;
 
-    for (const QnScheduleTask& scheduleTask : m_camera->getScheduleTasks())
+    for (const QnScheduleTask& scheduleTask: m_camera->getScheduleTasks())
     {
-        switch (scheduleTask.getRecordingType())
+        switch (scheduleTask.recordingType)
         {
             case Qn::RT_Never:
                 continue;
             case Qn::RT_MotionAndLowQuality:
-                maxDualStreamFps = qMax(maxDualStreamFps, scheduleTask.getFps());
+                maxDualStreamFps = qMax(maxDualStreamFps, scheduleTask.fps);
                 break;
             case Qn::RT_Always:
             case Qn::RT_MotionOnly:
-                maxFps = qMax(maxFps, scheduleTask.getFps());
+                maxFps = qMax(maxFps, scheduleTask.fps);
                 break;
             default:
                 break;
@@ -828,17 +830,17 @@ bool SingleCameraSettingsWidget::isValidSecondStream()
     if (!ui->cameraScheduleWidget->isScheduleEnabled())
         return true;
 
-    if (!m_camera->hasDualStreaming())
+    if (!m_camera->hasDualStreamingInternal())
         return true;
 
     auto filteredTasks = ui->cameraScheduleWidget->scheduleTasks();
     bool usesSecondStream = false;
     for (auto& task : filteredTasks)
     {
-        if (task.getRecordingType() == Qn::RT_MotionAndLowQuality)
+        if (task.recordingType == Qn::RT_MotionAndLowQuality)
         {
             usesSecondStream = true;
-            task.setRecordingType(Qn::RT_Always);
+            task.recordingType = Qn::RT_Always;
         }
     }
 
@@ -949,7 +951,8 @@ void SingleCameraSettingsWidget::at_motionTypeChanged()
 
     at_dbDataChanged();
     updateMotionWidgetNeedControlMaxRect();
-    ui->cameraScheduleWidget->overrideMotionType(selectedMotionType());
+    ui->cameraScheduleWidget->setMotionDetectionAllowed(
+        m_camera && ui->motionDetectionCheckBox->isChecked());
 }
 
 void SingleCameraSettingsWidget::updateIpAddressText()

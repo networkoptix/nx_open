@@ -29,7 +29,7 @@ public:
         QnDiscoveryNotificationManager* discoveryManager);
 
     template<typename T>
-    void triggerNotification(const QnTransaction<T> &tran, NotificationSource source)
+    void triggerNotification(const QnTransaction<T> &tran, ec2::NotificationSource source)
     {
         ec2::detail::NotificationParams notificationParams = {
             m_ecConnection,

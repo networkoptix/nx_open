@@ -82,7 +82,7 @@ void AbstractCommunicatingSocket::pleaseStopSync(bool checkForLocks)
                 MutexLockAnalyzer::instance()->expectNoLocks();
         }
     #else
-        QN_UNUSED(checkForLocks);
+        nx::utils::unused(checkForLocks);
     #endif
 
     cancelIOSync(nx::network::aio::EventType::etNone);

@@ -2337,8 +2337,8 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>This Id is already used on the following %n cameras: %1</source>
-      <translation type="unfinished">
-        <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
+      <translation>
+        <numerusform>このIDは次の %n カメラで既に使用されています： %1</numerusform>
       </translation>
     </message>
   </context>
@@ -2456,8 +2456,8 @@ to view more bookmarks</source>
       <translation>サーバー</translation>
     </message>
     <message>
-      <source>Logical Id</source>
-      <translation type="unfinished">Logical Id</translation>
+      <source>Id</source>
+      <translation>Id</translation>
     </message>
   </context>
   <context>
@@ -2534,7 +2534,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Password should not be equal to camera&apos;s user name</source>
-      <translation type="unfinished">Password should not be equal to camera&apos;s user name</translation>
+      <translation>パスワードはカメラのユーザー名と同じにできません</translation>
     </message>
   </context>
   <context>
@@ -3165,7 +3165,7 @@ to %1</source>
     </message>
     <message>
       <source>Set Password</source>
-      <translation type="unfinished">Set Password</translation>
+      <translation>パスワードの設定</translation>
     </message>
   </context>
   <context>
@@ -3265,10 +3265,6 @@ to %1</source>
       <translation>切断</translation>
     </message>
     <message>
-      <source>All cloud users will be deleted.</source>
-      <translation>クラウドのすべてのユーザーが削除されます</translation>
-    </message>
-    <message>
       <source>Failed to disconnect System from %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>%1 からのシステム切断に失敗しました</translation>
@@ -3286,6 +3282,11 @@ to %1</source>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>%1 からこのシステムを切断した後 %1 アカウントでシステムに接続することはできません</translation>
+    </message>
+    <message>
+      <source>All %1 users will be deleted.</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">All %1 users will be deleted.</translation>
     </message>
   </context>
   <context>
@@ -4723,7 +4724,7 @@ to %1</source>
     </message>
     <message>
       <source>For full-featured mode please use another computer</source>
-      <translation type="unfinished">For full-featured mode please use another computer</translation>
+      <translation>フル機能モードの場合は別のコンピューターを使用してください</translation>
     </message>
   </context>
   <context>
@@ -5846,6 +5847,10 @@ to %1</source>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
       <translation>&quot;モーション+低解像度&quot;録画オプションを設定できません</translation>
     </message>
+    <message>
+      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
+      <translation>アップロードされたアーカイブは、サーバーストレージに空き容量がない場合、自動的に削除されます　サーバー上のすべてのカメラの中で最も古い映像が最初に削除されます</translation>
+    </message>
   </context>
   <context>
     <name>QnSmtpAdvancedSettingsWidget</name>
@@ -5997,10 +6002,6 @@ to %1</source>
   <context>
     <name>QnStatusOverlayController</name>
     <message>
-      <source>NOT ENOUGH LICENCES</source>
-      <translation>ライセンスが不足しています</translation>
-    </message>
-    <message>
       <source>NO DATA</source>
       <translation>データがありません</translation>
     </message>
@@ -6071,6 +6072,10 @@ to %1</source>
     <message>
       <source>UNSUPPORTED FIRMWARE VERSION</source>
       <translation>サポートされていないファームウェアバージョン</translation>
+    </message>
+    <message>
+      <source>NOT ENOUGH LICENSES</source>
+      <translation>ライセンスが不足しています</translation>
     </message>
   </context>
   <context>
@@ -6766,16 +6771,17 @@ to %1</source>
       <translation>ローカル ユーザー</translation>
     </message>
     <message>
-      <source>Cloud user</source>
-      <translation>クラウド ユーザー</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>ログイン</translation>
     </message>
     <message>
       <source>Role</source>
       <translation>役割</translation>
+    </message>
+    <message>
+      <source>%1 user</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 user</translation>
     </message>
   </context>
   <context>
@@ -6969,10 +6975,6 @@ to %1</source>
       <translation>ローカル</translation>
     </message>
     <message>
-      <source>Cloud</source>
-      <translation>クラウド</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>ログイン</translation>
     </message>
@@ -7013,8 +7015,9 @@ to %1</source>
       <translation>パスワードが一致しません</translation>
     </message>
     <message>
-      <source>Cloud user with specified email already exists.</source>
-      <translation>そのEmailのクラウド ユーザーは既に存在します</translation>
+      <source>%1 user with specified email already exists.</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 user with specified email already exists.</translation>
     </message>
   </context>
   <context>
@@ -7087,10 +7090,6 @@ to %1</source>
   <context>
     <name>QnWearableProgressWidget</name>
     <message>
-      <source>Uploading %1... %2	%p%</source>
-      <translation>アップロード中 %1... %2	%p%</translation>
-    </message>
-    <message>
       <source>Stop uploading?</source>
       <translation>アップロードを停止しますか？</translation>
     </message>
@@ -7099,12 +7098,16 @@ to %1</source>
       <translation>既にアップロードされたファイルは保管されます</translation>
     </message>
     <message>
-      <source>Finalizing %1... %2	%p%</source>
-      <translation>ファイナライズ %1... %2	%p%</translation>
-    </message>
-    <message>
       <source>(%1 of %2)</source>
       <translation>(%1 / %2)</translation>
+    </message>
+    <message>
+      <source>Uploading %1...</source>
+      <translation>アップロード中 %1...</translation>
+    </message>
+    <message>
+      <source>Finalizing %1...</source>
+      <translation>ファイナライズ %1...</translation>
     </message>
   </context>
   <context>
@@ -7207,6 +7210,10 @@ to %1</source>
       <source>Could not connect to server. Video Wall will be closed.</source>
       <translation>サーバーに接続できませんでした　ビデオウォールが閉じられます</translation>
     </message>
+    <message>
+      <source>Video Wall is removed on the server and will be closed.</source>
+      <translation>ビデオウォールは削除され、終了します</translation>
+    </message>
   </context>
   <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
@@ -7231,10 +7238,6 @@ to %1</source>
       <translation>ライセンスの合計数が減少します</translation>
     </message>
     <message>
-      <source>Cloud Systems cannot be merged</source>
-      <translation>クラウド システムを統合することはできません</translation>
-    </message>
-    <message>
       <source>Connecting to the current System...</source>
       <translation>システムに接続...</translation>
     </message>
@@ -7253,6 +7256,11 @@ to %1</source>
     <message>
       <source>Administrator password</source>
       <translation>管理者のパスワード</translation>
+    </message>
+    <message>
+      <source>%1 Systems cannot be merged</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 Systems cannot be merged</translation>
     </message>
   </context>
   <context>
@@ -7619,23 +7627,23 @@ to %1</source>
     </message>
     <message>
       <source>%1 has unsupported format.</source>
-      <translation type="unfinished">%1 has unsupported format.</translation>
+      <translation>%1 - サポートされていないフォーマット</translation>
     </message>
     <message>
       <source>%1 does not have timestamp.</source>
-      <translation type="unfinished">%1 does not have timestamp.</translation>
+      <translation>%1 - タイムスタンプがありません</translation>
     </message>
     <message>
       <source>%1 is older than allowed in camera archive settings.</source>
-      <translation type="unfinished">%1 is older than allowed in camera archive settings.</translation>
+      <translation>%1 - カメラのアーカイブ設定より古いです</translation>
     </message>
     <message>
       <source>%1 covers period for which video has already been uploaded.</source>
-      <translation type="unfinished">%1 covers period for which video has already been uploaded.</translation>
+      <translation>ファイル %1 は既にアップロードされているビデオの期間と重複します</translation>
     </message>
     <message>
       <source>%1 covers period for which video is being uploaded.</source>
-      <translation type="unfinished">%1 covers period for which video is being uploaded.</translation>
+      <translation>ファイル %1 は既にアップロードされているビデオの期間と重複します</translation>
     </message>
   </context>
   <context>

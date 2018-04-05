@@ -56,7 +56,7 @@
 #include <ui/processors/hover_processor.h>
 #include <ui/style/custom_style.h>
 #include <ui/style/helper.h>
-#include <ui/widgets/common/busy_indicator.h>
+#include <nx/client/desktop/common/widgets/busy_indicator.h>
 #include <ui/widgets/common/text_edit_label.h>
 #include <ui/widgets/resource_tree_widget.h>
 #include <ui/workbench/workbench.h>

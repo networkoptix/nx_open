@@ -8,6 +8,7 @@
 #include "utils/common/from_this_to_shared.h"
 
 #include <core/ptz/media_dewarping_params.h>
+#include <utils/common/aspect_ratio.h>
 
 class QnAbstractStreamDataProvider;
 class QnResourceVideoLayout;
@@ -51,9 +52,8 @@ public:
     virtual QnMediaDewarpingParams getDewarpingParams() const;
     virtual void setDewarpingParams(const QnMediaDewarpingParams& params);
 
-    // TODO: #dklychkov change to QnAspectRatio in 2.4
-    virtual qreal customAspectRatio() const;
-    void setCustomAspectRatio(qreal value);
+    virtual QnAspectRatio customAspectRatio() const;
+    void setCustomAspectRatio(const QnAspectRatio& value);
     void clearCustomAspectRatio();
 
     /** Name of the resource property key intended for the CustomAspectRatio value storage. */

@@ -2540,8 +2540,8 @@ to view more bookmarks</source>
       <translation>Serwer</translation>
     </message>
     <message>
-      <source>Logical Id</source>
-      <translation>Identyfikator logiczny</translation>
+      <source>Id</source>
+      <translation>ID</translation>
     </message>
   </context>
   <context>
@@ -3361,10 +3361,6 @@ to %1</source>
       <translation>Rozłącz</translation>
     </message>
     <message>
-      <source>All cloud users will be deleted.</source>
-      <translation>Wszyscy użytkownicy chmury zostaną usunięci.</translation>
-    </message>
-    <message>
       <source>Failed to disconnect System from %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>Nie można odłączyć systemu od %1</translation>
@@ -3382,6 +3378,11 @@ to %1</source>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>Po odłączeniu tego systemu od %1 nie będziesz mógł połączyć się z tym systemem za pomocą konta %1.</translation>
+    </message>
+    <message>
+      <source>All %1 users will be deleted.</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">All %1 users will be deleted.</translation>
     </message>
   </context>
   <context>
@@ -6053,6 +6054,10 @@ to %1</source>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
       <translation>Nie można ustawić opcji nagrywania &quot;Ruch + Niska rozdzielczość&quot;.</translation>
     </message>
+    <message>
+      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
+      <translation>Przesłane archiwum można usunąć automatycznie, jeśli nie ma wolnego miejsca na serwerze. Najstarszy materiał spośród wszystkich kamer na serwerze zostanie usunięty jako pierwszy.</translation>
+    </message>
   </context>
   <context>
     <name>QnSmtpAdvancedSettingsWidget</name>
@@ -6204,10 +6209,6 @@ to %1</source>
   <context>
     <name>QnStatusOverlayController</name>
     <message>
-      <source>NOT ENOUGH LICENCES</source>
-      <translation>ZA MAŁO LICENCJI</translation>
-    </message>
-    <message>
       <source>NO DATA</source>
       <translation>BRAK DANYCH</translation>
     </message>
@@ -6278,6 +6279,10 @@ to %1</source>
     <message>
       <source>UNSUPPORTED FIRMWARE VERSION</source>
       <translation>NIEOBSŁUGIWANA WERSJA FIRMWARE</translation>
+    </message>
+    <message>
+      <source>NOT ENOUGH LICENSES</source>
+      <translation>BRAKUJE LICENCJI</translation>
     </message>
   </context>
   <context>
@@ -6991,16 +6996,17 @@ to %1</source>
       <translation>Użytkownik lokalny</translation>
     </message>
     <message>
-      <source>Cloud user</source>
-      <translation>Użytkownik chmury</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>Login</translation>
     </message>
     <message>
       <source>Role</source>
       <translation>Grupa</translation>
+    </message>
+    <message>
+      <source>%1 user</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 user</translation>
     </message>
   </context>
   <context>
@@ -7197,10 +7203,6 @@ to %1</source>
       <translation>Lokalny</translation>
     </message>
     <message>
-      <source>Cloud</source>
-      <translation>Chmura</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>Login</translation>
     </message>
@@ -7241,8 +7243,9 @@ to %1</source>
       <translation>Hasła nie są takie same.</translation>
     </message>
     <message>
-      <source>Cloud user with specified email already exists.</source>
-      <translation>Użytkownik o podanym adresie e-mail już istnieje w chmurze.</translation>
+      <source>%1 user with specified email already exists.</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 user with specified email already exists.</translation>
     </message>
   </context>
   <context>
@@ -7318,10 +7321,6 @@ to %1</source>
   <context>
     <name>QnWearableProgressWidget</name>
     <message>
-      <source>Uploading %1... %2	%p%</source>
-      <translation>Przesyłanie %1... %2	%p%</translation>
-    </message>
-    <message>
       <source>Stop uploading?</source>
       <translation>Zatrzymać przesyłanie?</translation>
     </message>
@@ -7330,12 +7329,16 @@ to %1</source>
       <translation>Już przesłane pliki zostaną zachowane.</translation>
     </message>
     <message>
-      <source>Finalizing %1... %2	%p%</source>
-      <translation>Finalizowanie %1... %2	%p%</translation>
-    </message>
-    <message>
       <source>(%1 of %2)</source>
       <translation>(%1 z %2)</translation>
+    </message>
+    <message>
+      <source>Uploading %1...</source>
+      <translation>Przesyłanie %1...</translation>
+    </message>
+    <message>
+      <source>Finalizing %1...</source>
+      <translation>Finalizowanie %1...</translation>
     </message>
   </context>
   <context>
@@ -7441,6 +7444,10 @@ to %1</source>
       <source>Could not connect to server. Video Wall will be closed.</source>
       <translation>Nie można połączyć się z serwerem. Ściana wideo zostanie zamknięta.</translation>
     </message>
+    <message>
+      <source>Video Wall is removed on the server and will be closed.</source>
+      <translation>Usunięto ścianę wideo z serwera, dlatego musi zostać zamknięta.</translation>
+    </message>
   </context>
   <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
@@ -7465,10 +7472,6 @@ to %1</source>
       <translation>Całkowita liczba licencji zmniejszy się</translation>
     </message>
     <message>
-      <source>Cloud Systems cannot be merged</source>
-      <translation>Systemy w chmurze nie mogą zostać złączone</translation>
-    </message>
-    <message>
       <source>Connecting to the current System...</source>
       <translation>Łączenie z bieżącym systemem...</translation>
     </message>
@@ -7487,6 +7490,11 @@ to %1</source>
     <message>
       <source>Administrator password</source>
       <translation>Hasło administratora</translation>
+    </message>
+    <message>
+      <source>%1 Systems cannot be merged</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 Systems cannot be merged</translation>
     </message>
   </context>
   <context>
@@ -7898,23 +7906,23 @@ to %1</source>
     </message>
     <message>
       <source>%1 has unsupported format.</source>
-      <translation type="unfinished">%1 has unsupported format.</translation>
+      <translation>%1 ma nieobsługiwany format.</translation>
     </message>
     <message>
       <source>%1 does not have timestamp.</source>
-      <translation type="unfinished">%1 does not have timestamp.</translation>
+      <translation>%1 nie ma znacznika czasu.</translation>
     </message>
     <message>
       <source>%1 is older than allowed in camera archive settings.</source>
-      <translation type="unfinished">%1 is older than allowed in camera archive settings.</translation>
+      <translation>%1 jest starsze niż dozwolony w ustawieniach archiwizacji kamery.</translation>
     </message>
     <message>
       <source>%1 covers period for which video has already been uploaded.</source>
-      <translation type="unfinished">%1 covers period for which video has already been uploaded.</translation>
+      <translation>%1 obejmuje okres, z którego nagranie zostało już przesłane.</translation>
     </message>
     <message>
       <source>%1 covers period for which video is being uploaded.</source>
-      <translation type="unfinished">%1 covers period for which video is being uploaded.</translation>
+      <translation>%1 obejmuje okres, z którego nagranie jest w trakcie przesyłania.</translation>
     </message>
   </context>
   <context>

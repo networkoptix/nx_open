@@ -24,10 +24,9 @@ namespace utils { class PendingOperation; }
 namespace client {
 namespace desktop {
 
-namespace ui { class SelectableTextButton; }
-
-class UnifiedAsyncSearchListModel;
 class EventTile;
+class SelectableTextButton;
+class UnifiedAsyncSearchListModel;
 
 class UnifiedSearchWidget:
     public QWidget,
@@ -44,10 +43,10 @@ public:
     void setModel(UnifiedAsyncSearchListModel* value);
 
     QnSearchLineEdit* filterEdit() const;
-    ui::SelectableTextButton* typeButton() const;
-    ui::SelectableTextButton* areaButton() const;
-    ui::SelectableTextButton* timeButton() const;
-    ui::SelectableTextButton* cameraButton() const;
+    SelectableTextButton* typeButton() const;
+    SelectableTextButton* areaButton() const;
+    SelectableTextButton* timeButton() const;
+    SelectableTextButton* cameraButton() const;
 
     QToolButton* showInfoButton() const;
     QToolButton* showPreviewsButton() const;

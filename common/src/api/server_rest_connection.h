@@ -198,6 +198,7 @@ public:
 
     Handle validateFileInformation(
         const QString& url,
+        int expectedSize,
         GetCallback callback,
         QThread* targetThread = nullptr);
 

@@ -6,6 +6,8 @@
 #include <ui/common/aligner.h>
 #include <utils/update/update_utils.h>
 
+using namespace nx::client::desktop;
+
 namespace {
 
 bool checkPassword(const QString& build, const QString& password)
@@ -38,14 +40,14 @@ QnBuildNumberDialog::QnBuildNumberDialog(QWidget* parent) :
         {
             const auto buildOrChangeset = changeset();
             if (buildOrChangeset.isEmpty())
-                return Qn::kValidResult;
+                return ValidationResult::kValid;
 
             return checkPassword(buildOrChangeset, password)
-                ? Qn::kValidResult
-                : Qn::ValidationResult(tr("The password is incorrect."));
+                ? ValidationResult::kValid
+                : ValidationResult(tr("The password is incorrect."));
         });
 
-    connect(ui->buildNumberInputField, &QnInputField::textChanged, this,
+    connect(ui->buildNumberInputField, &InputField::textChanged, this,
         [this, okButton](const QString& text)
         {
             if (!ui->passwordInputField->text().isEmpty())
@@ -57,7 +59,7 @@ QnBuildNumberDialog::QnBuildNumberDialog(QWidget* parent) :
     okButton->setEnabled(false);
 
     auto aligner = new QnAligner(this);
-    aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
+    aligner->registerTypeAccessor<InputField>(InputField::createLabelWidthAccessor());
     aligner->addWidgets({
         ui->buildNumberInputField,
         ui->passwordInputField });

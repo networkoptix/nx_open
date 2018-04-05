@@ -2363,7 +2363,7 @@ to view more bookmarks</source>
     <message numerus="yes">
         <source>This Id is already used on the following %n cameras: %1</source>
         <translation>
-            <numerusform>This Id is already used on the following camera: %1</numerusform>
+            <numerusform>This Id is already used on camera: %1</numerusform>
             <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
         </translation>
     </message>
@@ -2486,8 +2486,8 @@ to view more bookmarks</source>
         <translation></translation>
     </message>
     <message>
-        <source>Logical Id</source>
-        <translation></translation>
+        <source>Id</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3299,10 +3299,6 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>All cloud users will be deleted.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Failed to disconnect System from %1</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation></translation>
@@ -3320,6 +3316,11 @@ to %1</source>
         <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation></translation>
+    </message>
+    <message>
+        <source>All %1 users will be deleted.</source>
+        <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5916,6 +5917,10 @@ to %1</source>
         <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnSmtpAdvancedSettingsWidget</name>
@@ -6067,10 +6072,6 @@ to %1</source>
 <context>
     <name>QnStatusOverlayController</name>
     <message>
-        <source>NOT ENOUGH LICENCES</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>NO DATA</source>
         <translation></translation>
     </message>
@@ -6141,6 +6142,10 @@ to %1</source>
     <message>
         <source>UNSUPPORTED FIRMWARE VERSION</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>NOT ENOUGH LICENSES</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6842,16 +6847,17 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Cloud user</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Login</source>
         <translation></translation>
     </message>
     <message>
         <source>Role</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>%1 user</source>
+        <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7046,10 +7052,6 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Cloud</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Login</source>
         <translation></translation>
     </message>
@@ -7090,8 +7092,9 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Cloud user with specified email already exists.</source>
-        <translation></translation>
+        <source>%1 user with specified email already exists.</source>
+        <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7165,10 +7168,6 @@ to %1</source>
 <context>
     <name>QnWearableProgressWidget</name>
     <message>
-        <source>Uploading %1... %2	%p%</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Stop uploading?</source>
         <translation></translation>
     </message>
@@ -7177,12 +7176,16 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Finalizing %1... %2	%p%</source>
+        <source>(%1 of %2)</source>
         <translation></translation>
     </message>
     <message>
-        <source>(%1 of %2)</source>
-        <translation></translation>
+        <source>Uploading %1...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Finalizing %1...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7286,6 +7289,10 @@ to %1</source>
         <source>Could not connect to server. Video Wall will be closed.</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Video Wall is removed on the server and will be closed.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
@@ -7310,10 +7317,6 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Cloud Systems cannot be merged</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Connecting to the current System...</source>
         <translation></translation>
     </message>
@@ -7332,6 +7335,11 @@ to %1</source>
     <message>
         <source>Administrator password</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>%1 Systems cannot be merged</source>
+        <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

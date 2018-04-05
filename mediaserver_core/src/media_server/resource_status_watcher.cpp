@@ -33,7 +33,7 @@ void QnResourceStatusWatcher::updateResourceStatus(const QnResourcePtr& resource
     emit statusChanged(resource);
 }
 
-bool QnResourceStatusWatcher::isSetStatusInProgress(const QnResourcePtr &resource)
+bool QnResourceStatusWatcher::isSetStatusInProgress(const QnResourcePtr& resource)
 {
     return m_setStatusInProgress.contains(resource->getId());
 }
@@ -78,7 +78,8 @@ void QnResourceStatusWatcher::at_timer()
         m_checkStatusTimer.stop();
 }
 
-void QnResourceStatusWatcher::at_resource_statusChanged(const QnResourcePtr &resource, Qn::StatusChangeReason reason)
+void QnResourceStatusWatcher::at_resource_statusChanged(const QnResourcePtr& resource,
+    Qn::StatusChangeReason reason)
 {
     if (reason == Qn::StatusChangeReason::Local)
         updateResourceStatusInternal(resource);
@@ -114,7 +115,7 @@ void QnResourceStatusWatcher::updateResourceStatusInternal(const QnResourcePtr& 
         m_awaitingSetStatus << resource->getId();
 }
 
-void QnResourceStatusWatcher::updateResourceStatusAsync(const QnResourcePtr &resource)
+void QnResourceStatusWatcher::updateResourceStatusAsync(const QnResourcePtr& resource)
 {
     if (!resource)
         return;
@@ -129,7 +130,8 @@ void QnResourceStatusWatcher::updateResourceStatusAsync(const QnResourcePtr &res
         &QnResourceStatusWatcher::requestFinished2);
 }
 
-void QnResourceStatusWatcher::requestFinished2(int /*reqID*/, ec2::ErrorCode errCode, const QnUuid& id)
+void QnResourceStatusWatcher::requestFinished2(int /*reqID*/, ec2::ErrorCode errCode,
+    const QnUuid& id)
 {
     if (errCode != ec2::ErrorCode::ok)
         qCritical() << "Failed to update resource status" << id.toString();

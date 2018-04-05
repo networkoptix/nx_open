@@ -980,7 +980,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
-      <translation>A licenchez adott média szerver hardver ID nem egyezik meg az eszköz hardver ID-vel melyhez a licencet aktiválták.</translation>
+      <translation>A licenchez adott média szerver Hardver Id nem egyezik meg az eszköz Hardver Id-vel melyhez a licencet aktiválták.</translation>
     </message>
   </context>
   <context>
@@ -2230,11 +2230,11 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>I/O Module Id</source>
-      <translation>I/O modul ID</translation>
+      <translation>I/O modul Id</translation>
     </message>
     <message>
       <source>Camera Id</source>
-      <translation>Kamera ID</translation>
+      <translation>Kamera Id</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -2485,8 +2485,8 @@ több könyvjelző megjelenítéséhez</translation>
       <translation>Szerver</translation>
     </message>
     <message>
-      <source>Logical Id</source>
-      <translation type="unfinished">Logical Id</translation>
+      <source>Id</source>
+      <translation>Id</translation>
     </message>
   </context>
   <context>
@@ -2977,7 +2977,7 @@ to %1</source>
     </message>
     <message>
       <source>Incorrect username or password</source>
-      <translation>Hibás Email cím vagy jelszó</translation>
+      <translation>Hibás felhasználónév cím vagy jelszó</translation>
     </message>
     <message>
       <source>Server may be restarting now. Please try again later.</source>
@@ -3200,7 +3200,7 @@ to %1</source>
     </message>
     <message>
       <source>Set Password</source>
-      <translation type="unfinished">Set Password</translation>
+      <translation>Jelszó beállítása</translation>
     </message>
   </context>
   <context>
@@ -3300,10 +3300,6 @@ to %1</source>
       <translation>Szétkapcsolás</translation>
     </message>
     <message>
-      <source>All cloud users will be deleted.</source>
-      <translation>Minden felhő felhasználó törlésre kerül.</translation>
-    </message>
-    <message>
       <source>Failed to disconnect System from %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>Kijelentkezés a %1 felhőről sikertelen</translation>
@@ -3321,6 +3317,11 @@ to %1</source>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>Ehhez a rendszerhez nem lehet %1 fiókkal csatlakozni miután kijelentkezett %1 rendszerből.</translation>
+    </message>
+    <message>
+      <source>All %1 users will be deleted.</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">All %1 users will be deleted.</translation>
     </message>
   </context>
   <context>
@@ -3719,7 +3720,7 @@ to %1</source>
     </message>
     <message>
       <source>Id</source>
-      <translation>ID</translation>
+      <translation>Id</translation>
     </message>
   </context>
   <context>
@@ -3902,7 +3903,7 @@ to %1</source>
     </message>
     <message>
       <source>Locked to Hardware Id</source>
-      <translation>Hardver ID-hez rendelve</translation>
+      <translation>Hardver Id-hez rendelve</translation>
     </message>
   </context>
   <context>
@@ -4178,11 +4179,11 @@ to %1</source>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware Id %1</source>
-      <translation>Ez a licenc már aktiválva van %1 hardver ID-hoz</translation>
+      <translation>Ez a licenc már aktiválva van %1 Hardver Id-hoz</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware Id %1 on %2</source>
-      <translation>Ez a licenc már aktiválva van %1 hardver ID-hoz (%2)</translation>
+      <translation>Ez a licenc már aktiválva van %1 Hardver Id-hoz (%2)</translation>
     </message>
     <message>
       <source>If the problem persists please contact Customer Support.</source>
@@ -4213,11 +4214,11 @@ to %1</source>
     </message>
     <message>
       <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>Az aktivációs kulcs megküldéséhez, kérjük e-mailben küldje el a licenc kulcsot és a hardver ID-t %1 címre.</translation>
+      <translation>Az aktivációs kulcs megküldéséhez, kérjük e-mailben küldje el a licenc kulcsot és a Hardver Id-t %1 címre.</translation>
     </message>
     <message>
       <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>Az aktivációs kulcs megküldéséhez, kérjük küldje el a licenc kulcsot és a hardver ID-t %1 címre.</translation>
+      <translation>Az aktivációs kulcs megküldéséhez, kérjük küldje el a licenc kulcsot és a Hardver Id-t %1 címre.</translation>
     </message>
   </context>
   <context>
@@ -5918,6 +5919,10 @@ to %1</source>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
       <translation>&quot;Mozgás + Alacsony felbontás&quot; opció nem állítható be.</translation>
     </message>
+    <message>
+      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
+      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</translation>
+    </message>
   </context>
   <context>
     <name>QnSmtpAdvancedSettingsWidget</name>
@@ -6069,10 +6074,6 @@ to %1</source>
   <context>
     <name>QnStatusOverlayController</name>
     <message>
-      <source>NOT ENOUGH LICENCES</source>
-      <translation>NINCS ELÉG LICENC</translation>
-    </message>
-    <message>
       <source>NO DATA</source>
       <translation>NINCS ADAT</translation>
     </message>
@@ -6143,6 +6144,10 @@ to %1</source>
     <message>
       <source>UNSUPPORTED FIRMWARE VERSION</source>
       <translation type="unfinished">UNSUPPORTED FIRMWARE VERSION</translation>
+    </message>
+    <message>
+      <source>NOT ENOUGH LICENSES</source>
+      <translation type="unfinished">NOT ENOUGH LICENSES</translation>
     </message>
   </context>
   <context>
@@ -6844,16 +6849,17 @@ to %1</source>
       <translation>Helyi felhasználó</translation>
     </message>
     <message>
-      <source>Cloud user</source>
-      <translation>Felhő felhasználó</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>Bejelentkezés</translation>
     </message>
     <message>
       <source>Role</source>
       <translation>Szerepkör</translation>
+    </message>
+    <message>
+      <source>%1 user</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 user</translation>
     </message>
   </context>
   <context>
@@ -7048,10 +7054,6 @@ to %1</source>
       <translation>Helyi</translation>
     </message>
     <message>
-      <source>Cloud</source>
-      <translation>Felhő</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>Bejelentkezés</translation>
     </message>
@@ -7077,7 +7079,7 @@ to %1</source>
     </message>
     <message>
       <source>Email cannot be empty.</source>
-      <translation>Az Email mező nem lehet üres.</translation>
+      <translation>Az email mező nem lehet üres.</translation>
     </message>
     <message>
       <source>Password</source>
@@ -7092,19 +7094,20 @@ to %1</source>
       <translation>A jelszavak nem egyeznek.</translation>
     </message>
     <message>
-      <source>Cloud user with specified email already exists.</source>
-      <translation>A felhő felhasználó a megadott e-mail címmel már létezik.</translation>
+      <source>%1 user with specified email already exists.</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 user with specified email already exists.</translation>
     </message>
   </context>
   <context>
     <name>QnValidatorStrings</name>
     <message>
       <source>Email cannot be empty.</source>
-      <translation>Az e-mail mező nem lehet üres.</translation>
+      <translation>Az email mező nem lehet üres.</translation>
     </message>
     <message>
       <source>Email is not valid.</source>
-      <translation>Nem érvényes Email.</translation>
+      <translation>Nem érvényes email.</translation>
     </message>
     <message>
       <source>Password cannot be empty.</source>
@@ -7167,10 +7170,6 @@ to %1</source>
   <context>
     <name>QnWearableProgressWidget</name>
     <message>
-      <source>Uploading %1... %2	%p%</source>
-      <translation>Feltöltés %1... %2	%p%</translation>
-    </message>
-    <message>
       <source>Stop uploading?</source>
       <translation>Leállítja a feltöltés?</translation>
     </message>
@@ -7179,12 +7178,16 @@ to %1</source>
       <translation type="unfinished">Already uploaded files will be kept.</translation>
     </message>
     <message>
-      <source>Finalizing %1... %2	%p%</source>
-      <translation>Befejezés %1... %2%p%</translation>
-    </message>
-    <message>
       <source>(%1 of %2)</source>
       <translation type="unfinished">(%1 of %2)</translation>
+    </message>
+    <message>
+      <source>Uploading %1...</source>
+      <translation>Feltöltés %1...</translation>
+    </message>
+    <message>
+      <source>Finalizing %1...</source>
+      <translation type="unfinished">Finalizing %1...</translation>
     </message>
   </context>
   <context>
@@ -7288,6 +7291,10 @@ to %1</source>
       <source>Could not connect to server. Video Wall will be closed.</source>
       <translation>Nem sikerült csatlakozni a szerverhez. A videofal be lesz zárva.</translation>
     </message>
+    <message>
+      <source>Video Wall is removed on the server and will be closed.</source>
+      <translation type="unfinished">Video Wall is removed on the server and will be closed.</translation>
+    </message>
   </context>
   <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
@@ -7312,10 +7319,6 @@ to %1</source>
       <translation>A licencek száma csökkenni fog</translation>
     </message>
     <message>
-      <source>Cloud Systems cannot be merged</source>
-      <translation>Felhő rendszerek nem vonhatók össze</translation>
-    </message>
-    <message>
       <source>Connecting to the current System...</source>
       <translation>Csatlakozás a jelenlegi rendszerhez...</translation>
     </message>
@@ -7334,6 +7337,11 @@ to %1</source>
     <message>
       <source>Administrator password</source>
       <translation>Adminisztrátor jelszó</translation>
+    </message>
+    <message>
+      <source>%1 Systems cannot be merged</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 Systems cannot be merged</translation>
     </message>
   </context>
   <context>

@@ -54,7 +54,8 @@ QnMServerResourceDiscoveryManager::~QnMServerResourceDiscoveryManager()
     stop();
 }
 
-QnResourcePtr QnMServerResourceDiscoveryManager::createResource(const QnUuid &resourceTypeId, const QnResourceParams &params)
+QnResourcePtr QnMServerResourceDiscoveryManager::createResource(const QnUuid& resourceTypeId,
+    const QnResourceParams& params)
 {
     QnResourcePtr res = QnResourceDiscoveryManager::createResource( resourceTypeId, params );
     if( res )
@@ -110,7 +111,8 @@ void QnMServerResourceDiscoveryManager::sortForeignResources(QList<QnSecurityCam
     });
 }
 
-bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceList& resources, SearchType searchType)
+bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceList& resources,
+    SearchType searchType)
 {
     // fill camera's ID
 
@@ -171,7 +173,6 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
     // Assemble list of existing ip.
     QMap<quint32, QSet<QnNetworkResourcePtr> > ipsList;
 
-
     // Excluding already existing resources.
     QnResourceList::iterator it = resources.begin();
     while (it != resources.end())
@@ -204,22 +205,22 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
             continue;
         }
 
-		if (rpResource->hasFlags(Qn::foreigner))
-		{
-			if (!canTakeForeignCamera(rpResource.dynamicCast<QnSecurityCamResource>(), extraResources.size()))
-			{
+        if (rpResource->hasFlags(Qn::foreigner))
+        {
+            if (!canTakeForeignCamera(rpResource.dynamicCast<QnSecurityCamResource>(), extraResources.size()))
+            {
                 NX_VERBOSE(this, lit("Can't take foreign resource %1 now").arg(NetResString(newNetRes)));
-				it = resources.erase(it); // do not touch foreign resource
-				continue;
-			}
-		}
+                it = resources.erase(it); // do not touch foreign resource
+                continue;
+            }
+        }
 
-		if (newCamRes)
-		{
-			quint32 ips = nx::network::resolveAddress(newNetRes->getHostAddress()).toIPv4Address();
-			if (ips)
-				ipsList[ips].insert(newNetRes);
-		}
+        if (newCamRes)
+        {
+            quint32 ips = nx::network::resolveAddress(newNetRes->getHostAddress()).toIPv4Address();
+            if (ips)
+                ipsList[ips].insert(newNetRes);
+        }
 
         QnNetworkResourcePtr rpNetRes = rpResource.dynamicCast<QnNetworkResource>();
 
@@ -230,7 +231,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
             QnUuid newTypeId = newNetRes->getTypeId();
             bool updateTypeId = existCamRes->getTypeId() != newNetRes->getTypeId();
 
-            NX_VERBOSE(this, lm("%1 Found existing cam res %1 for new resource %2")
+            NX_VERBOSE(this, lm("%1 Found existing cam res %2 for new resource %3")
                     .arg(FL1(Q_FUNC_INFO))
                     .arg(NetResString(rpNetRes))
                     .arg(NetResString(newNetRes)));
@@ -348,7 +349,7 @@ bool QnMServerResourceDiscoveryManager::hasIpConflict(const QSet<QnNetworkResour
         if (!camera || !camera->needCheckIpConflicts())
             continue;
 
-        QString groupId = camera->getGroupId().isEmpty() ? camera->getId().toString() : camera->getGroupId();
+        QString groupId = camera->getGroupId().isEmpty() ? camera->getPhysicalId() : camera->getGroupId();
         cameraGroups << groupId;
         portList << QUrl(camera->getUrl()).port();
 
@@ -392,11 +393,10 @@ void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& disco
             // resource is not found
             m_resourceDiscoveryCounter[uniqId]++;
 
-
             if (m_resourceDiscoveryCounter[uniqId] >= kRetryCountToMakeCamOffline)
             {
                 QnVirtualCameraResource* camRes = dynamic_cast<QnVirtualCameraResource*>(netRes);
-                if (QnLiveStreamProvider::hasRunningLiveProvider(netRes)  || (camRes && !camRes->isScheduleDisabled()))
+                if (QnLiveStreamProvider::hasRunningLiveProvider(netRes)  || (camRes && camRes->isLicenseUsed()))
                 {
                     if (res->getStatus() == Qn::Offline && !m_disconnectSended[uniqId]) {
                         QnVirtualCameraResourcePtr cam = res.dynamicCast<QnVirtualCameraResource>();

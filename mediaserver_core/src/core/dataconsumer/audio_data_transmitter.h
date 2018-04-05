@@ -21,7 +21,7 @@ public:
 
     QnAbstractAudioTransmitter();
 
-    virtual bool processData(const QnAbstractDataPacketPtr &data) override;
+    virtual bool processData(const QnAbstractDataPacketPtr& data) override;
     virtual bool processAudioData(const QnConstCompressedAudioDataPtr& data) = 0;
 
     /**
@@ -45,7 +45,6 @@ public:
      * Set output bitrate. Optional. If not set default bitrate will be used.
      */
     virtual void setBitrateKbps(int /*value*/) {}
-
 
     virtual void prepare() {}
 

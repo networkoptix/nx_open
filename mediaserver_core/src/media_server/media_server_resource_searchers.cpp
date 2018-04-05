@@ -24,7 +24,6 @@
 #endif
 #include <plugins/resource/isd/isd_resource_searcher.h>
 #include <plugins/resource/onvif/onvif_resource_searcher.h>
-#include <plugins/resource/stardot/stardot_resource_searcher.h>
 #include <plugins/resource/third_party/third_party_resource_searcher.h>
 #include <plugins/resource/wearable/wearable_camera_resource_searcher.h>
 #include <plugins/resource/archive_camera/archive_camera.h>
@@ -71,9 +70,6 @@ QnMediaServerResourceSearchers::QnMediaServerResourceSearchers(QnCommonModule* c
     #endif
     #ifdef ENABLE_ACTI
         m_searchers << new QnActiResourceSearcher(commonModule);
-    #endif
-    #ifdef ENABLE_STARDOT
-        m_searchers << new QnStardotResourceSearcher(commonModule);
     #endif
     #ifdef ENABLE_IQINVISION
         m_searchers << new QnPlIqResourceSearcher(commonModule);

@@ -90,9 +90,9 @@ QSize QnGetImageHelper::updateDstSize(
 
     if (aspectRatio == nx::api::ImageRequest::AspectRatio::custom)
     {
-        const qreal customAr = camera->customAspectRatio();
-        if (!qFuzzyIsNull(customAr))
-            dstSize.setWidth(dstSize.height() * customAr);
+        const auto customAr = camera->customAspectRatio();
+        if (customAr.isValid())
+            dstSize.setWidth(dstSize.height() * customAr.toFloat());
     }
 
     return QnCodecTranscoder::roundSize(dstSize);

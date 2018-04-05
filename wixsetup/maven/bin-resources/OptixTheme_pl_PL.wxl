@@ -17,7 +17,7 @@
   <String Id="ClientOnly">Tylko klient</String>
   <String Id="ClientOnlyDesc">Aplikacja klienta służy do podglądu wideo i zarządzania systemem</String>
   <String Id="ServerOnly">Tylko serwer</String>
-  <String Id="ServerOnlyDesc">Aplikacja serwera służy do nagrywania, przechowywania i udostępniania archiwum wideo</String>
+  <String Id="ServerOnlyDesc">Aplikacja serwera służy do przechowywania informacji systemowych i archiwum</String>
   <String Id="HelpHeader">Pomoc instalacji</String>
   <String Id="HelpCloseButton">Zamknij</String>
   <String Id="InstallAcceptCheckbox">Zgadzam się na warunki licencji</String>

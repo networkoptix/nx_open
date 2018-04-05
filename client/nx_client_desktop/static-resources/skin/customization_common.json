@@ -255,20 +255,20 @@
         }
     },
 
-    "QnAlertBar": {
-        "palette": {
-            "default": {
-                "window": "#61282b"
-            }
-        }
-    },
-
-    "QnPromoBar": {
+    "nx::client::desktop::MessageBar": {
         "palette": {
             "default": {
                 "window": "brand_d5",
                 "link": "light4",
                 "linkVisited": "light1"
+            }
+        }
+    },
+
+    "nx::client::desktop::AlertBar": {
+        "palette": {
+            "default": {
+                "window": "#61282b"
             }
         }
     },
@@ -325,7 +325,7 @@
         }
     },
 
-    "QnPasswordStrengthIndicator": {
+    "nx::client::desktop::PasswordStrengthIndicator": {
         "colors": {
             "inacceptable":      "red_core",
             "acceptable":        "yellow_core",
@@ -828,7 +828,7 @@
         "palette": { "default": { "window": "dark8" } }
     },
 
-    "nx::client::desktop::ui::SelectableTextButton": {
+    "nx::client::desktop::SelectableTextButton": {
         "palette": {
             "_1": "selected",
             "active": {

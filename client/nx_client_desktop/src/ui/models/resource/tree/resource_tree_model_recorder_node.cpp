@@ -36,6 +36,14 @@ void QnResourceTreeModelRecorderNode::addChildInternal(const QnResourceTreeModel
             {
                 updateName(camera);
             });
+
+        connect(camera, &QnVirtualCameraResource::propertyChanged, this,
+            [this, camera](const QnResourcePtr& /*resource*/, const QString& name)
+            {
+                if (name == Qn::DTS_PARAM_NAME || name == Qn::ANALOG_PARAM_NAME)
+                    updateIcon();
+            });
+
         updateIcon();
     }
     updateCameraExtraStatus();

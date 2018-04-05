@@ -39,7 +39,7 @@ static QFileInfoList readCrashes(const QString& prefix = QString())
         const QDir crashDir(QString::fromStdString(linux_exception::getCrashDirectory()));
         const auto crashFilter = prefix + QString::fromStdString(linux_exception::getCrashPattern());
     #else
-        Q_UNUSED(prefix)
+        nx::utils::unused(prefix);
         const QDir crashDir;
         const QString crashFilter;
         return QFileInfoList(); // do nothing. not implemented

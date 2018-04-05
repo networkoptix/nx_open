@@ -367,9 +367,6 @@ bool QnPlAxisResource::readMotionInfo()
         m_lastMotionReadTime = time;
     }
 
-
-
-
     // read motion windows coordinates
     CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), getAuth());
     CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=list&group=Motion"));
@@ -382,8 +379,6 @@ bool QnPlAxisResource::readMotionInfo()
     http.readAll(body);
     QList<QByteArray> lines = body.split('\n');
     QMap<int,WindowInfo> windows;
-
-
 
     for (int i = 0; i < lines.size(); ++i)
     {
@@ -410,7 +405,6 @@ bool QnPlAxisResource::readMotionInfo()
                 windows[windowNum].rectType = WindowInfo::MotionMask;
         }
     }
-
 
     QnMutexLocker lock( &m_mutex );
 
@@ -613,7 +607,6 @@ CameraDiagnostics::Result QnPlAxisResource::initializeCameraDriver()
         std::sort(m_resolutionList.begin(), m_resolutionList.end(), resolutionGreatThan);
     }
 
-
     //root.Image.MotionDetection=no
     //root.Image.I0.TriggerData.MotionDetectionEnabled=yes
     //root.Image.I1.TriggerData.MotionDetectionEnabled=yes
@@ -622,7 +615,6 @@ CameraDiagnostics::Result QnPlAxisResource::initializeCameraDriver()
     CLSimpleHTTPClient httpClient(getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), getAuth());
     if (!initializeIOPorts( &httpClient))
         return CameraDiagnostics::CameraInvalidParams(tr("Can't initialize IO port settings"));
-
 
     if(!initializeAudio(&httpClient))
         return CameraDiagnostics::UnknownErrorResult();
@@ -661,7 +653,6 @@ QMap<int, QRect> QnPlAxisResource::getMotionWindows() const
 {
     return m_motionWindows;
 }
-
 
 bool QnPlAxisResource::removeMotionWindow(int wndNum)
 {
@@ -727,7 +718,6 @@ void QnPlAxisResource::setMotionMaskPhysical(int /*channel*/)
 
     if (readMotion)
         readMotionInfo();
-
 
     m_mutex.lock();
 
@@ -1354,7 +1344,6 @@ void QnPlAxisResource::notificationReceived( const nx::network::http::ConstBuffe
         return;
     }
 
-
     QString portDisplayName = QString::fromLatin1(notification.mid(0, sepPos));
     int portIndex = portDisplayNameToIndex(portDisplayName);
     if (portIndex == -1) {
@@ -1472,7 +1461,7 @@ void QnPlAxisResource::updateIOSettings()
         setStatus(Qn::Offline); // reinit
 }
 
-void QnPlAxisResource::at_propertyChanged(const QnResourcePtr & res, const QString & key)
+void QnPlAxisResource::at_propertyChanged(const QnResourcePtr& res, const QString& key)
 {
     if (key == Qn::IO_SETTINGS_PARAM_NAME && res && !res->hasFlags(Qn::foreigner))
     {
@@ -1504,7 +1493,8 @@ QString QnPlAxisResource::getAdvancedParametersTemplate() const
     return lit("axis.xml");
 }
 
-bool QnPlAxisResource::loadAdvancedParametersTemplateFromFile(QnCameraAdvancedParams& params, const QString& templateFilename)
+bool QnPlAxisResource::loadAdvancedParametersTemplateFromFile(QnCameraAdvancedParams& params,
+    const QString& templateFilename)
 {
     QFile paramsTemplateFile(templateFilename);
 
@@ -1518,7 +1508,8 @@ bool QnPlAxisResource::loadAdvancedParametersTemplateFromFile(QnCameraAdvancedPa
     return result;
 }
 
-QSet<QString> QnPlAxisResource::calculateSupportedAdvancedParameters(const QnCameraAdvancedParams& allParams)
+QSet<QString> QnPlAxisResource::calculateSupportedAdvancedParameters(
+    const QnCameraAdvancedParams& allParams)
 {
     QSet<QString> supported;
     QList<QnCameraAdvancedParameter> paramList;
@@ -1567,12 +1558,13 @@ void QnPlAxisResource::fetchAndSetAdvancedParameters()
     m_advancedParametersProvider.assign(params.filtered(supportedParams));
 }
 
-bool QnPlAxisResource::isMaintenanceParam(const QnCameraAdvancedParameter &param) const
+bool QnPlAxisResource::isMaintenanceParam(const QnCameraAdvancedParameter& param) const
 {
     return  param.dataType == QnCameraAdvancedParameter::DataType::Button;
 }
 
-QMap<QString, QString> QnPlAxisResource::executeParamsQueries(const QSet<QString> &queries, bool &isSuccessful) const
+QMap<QString, QString> QnPlAxisResource::executeParamsQueries(const QSet<QString>& queries,
+    bool& isSuccessful) const
 {
     QMap<QString, QString> result;
     CLHttpStatus status;
@@ -1654,7 +1646,8 @@ QnCameraAdvancedParamValueList QnPlAxisResource::parseParamsQueriesResult(
     return result;
 }
 
-QSet<QString> QnPlAxisResource::buildGetParamsQueries(const QList<QnCameraAdvancedParameter> &params) const
+QSet<QString> QnPlAxisResource::buildGetParamsQueries(
+    const QList<QnCameraAdvancedParameter> &params) const
 {
     QSet<QString> result;
     for (const auto& param: params)
@@ -1669,7 +1662,7 @@ QSet<QString> QnPlAxisResource::buildGetParamsQueries(const QList<QnCameraAdvanc
     return result;
 }
 
-QString QnPlAxisResource::buildSetParamsQuery(const QnCameraAdvancedParamValueList &params) const
+QString QnPlAxisResource::buildSetParamsQuery(const QnCameraAdvancedParamValueList& params) const
 {
     const QString kPrefix = lit("axis-cgi/admin/param.cgi?");
     QUrlQuery query;

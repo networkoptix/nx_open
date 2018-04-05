@@ -21,7 +21,7 @@
 #include <nx/client/desktop/common/widgets/compact_tab_bar.h>
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
-#include <nx/client/desktop/ui/common/selectable_text_button.h>
+#include <nx/client/desktop/common/widgets/selectable_text_button.h>
 #include <nx/client/desktop/event_search/models/unified_async_search_list_model.h>
 #include <nx/client/desktop/event_search/models/analytics_search_list_model.h>
 #include <nx/client/desktop/event_search/models/bookmark_search_list_model.h>
@@ -41,7 +41,7 @@ namespace {
 
 static constexpr int kPermanentTabCount = 1;
 
-using ButtonState = ui::SelectableTextButton::State;
+using ButtonState = SelectableTextButton::State;
 
 } // namespace
 
@@ -180,7 +180,7 @@ void EventPanel::Private::setupEventSearch()
             addMenuAction(m_helper->eventName(type), type);
     }
 
-    connect(m_eventsTab->typeButton(), &ui::SelectableTextButton::stateChanged, this,
+    connect(m_eventsTab->typeButton(), &SelectableTextButton::stateChanged, this,
         [defaultAction](ButtonState state)
         {
             if (state == ButtonState::deactivated)
@@ -269,7 +269,7 @@ void EventPanel::Private::setupAnalyticsSearch()
     button->setDeactivatedText(tr("Anywhere on the video"));
     button->show();
 
-    connect(button, &ui::SelectableTextButton::stateChanged, this,
+    connect(button, &SelectableTextButton::stateChanged, this,
         [this, button](ButtonState state)
         {
             if (!m_currentMediaWidget)

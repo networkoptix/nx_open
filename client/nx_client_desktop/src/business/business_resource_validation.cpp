@@ -182,7 +182,7 @@ QString QnExecPtzPresetPolicy::getText(const QnResourceList &resources, const bo
 
 bool QnCameraMotionPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera)
 {
-    return !camera->isScheduleDisabled() && camera->hasMotion();
+    return camera->isLicenseUsed() && camera->hasMotion();
 }
 
 QString QnCameraMotionPolicy::getText(const QnResourceList &resources, const bool detailed)
@@ -221,7 +221,7 @@ QString QnCameraAudioTransmitPolicy::getText(const QnResourceList &resources, co
 
 bool QnCameraRecordingPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera)
 {
-    return !camera->isScheduleDisabled();
+    return camera->isLicenseUsed();
 }
 
 QString QnCameraRecordingPolicy::getText(const QnResourceList &resources, const bool detailed)

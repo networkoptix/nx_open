@@ -3,12 +3,12 @@
 #include <QtWidgets/QGraphicsLinearLayout>
 
 #include <ui/animation/opacity_animator.h>
-#include <nx/client/desktop/ui/common/painter_transform_scale_stripper.h>
+#include <nx/client/desktop/common/utils/painter_transform_scale_stripper.h>
 #include <ui/common/palette.h>
 #include <ui/graphics/items/standard/graphics_label.h>
 #include <ui/graphics/items/generic/image_button_bar.h>
 
-using namespace nx::client::desktop::ui;
+using namespace nx::client::desktop;
 
 namespace {
 

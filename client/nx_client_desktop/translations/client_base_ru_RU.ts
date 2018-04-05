@@ -850,19 +850,19 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Wearable Camera...</source>
-      <translation type="unfinished">Wearable Camera...</translation>
+      <translation>Портативная камера...</translation>
     </message>
     <message>
       <source>New Wearable Camera...</source>
-      <translation type="unfinished">New Wearable Camera...</translation>
+      <translation>Новая портативная камера...</translation>
     </message>
     <message>
       <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
+      <translation>Загрузить файл...</translation>
     </message>
     <message>
       <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
+      <translation>Загрузить папку...</translation>
     </message>
     <message>
       <source>Start Analytics...</source>
@@ -2291,7 +2291,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>No settings</source>
-      <translation type="unfinished">No settings</translation>
+      <translation>Нет настроек</translation>
     </message>
   </context>
   <context>
@@ -2408,11 +2408,11 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>This Id is already used on the following %n cameras: %1</source>
-      <translation type="unfinished">
-        <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
-        <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
-        <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
-        <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
+      <translation>
+        <numerusform>Этот идентификатор уже используется для следующей %n камере: %1</numerusform>
+        <numerusform>Этот идентификатор уже используется для следующих %n камер: %1</numerusform>
+        <numerusform>Этот идентификатор уже используется для следующих %n камер: %1</numerusform>
+        <numerusform>Этот идентификатор уже используется для следующих %n камер: %1</numerusform>
       </translation>
     </message>
   </context>
@@ -2542,8 +2542,8 @@ to view more bookmarks</source>
       <translation>Сервер</translation>
     </message>
     <message>
-      <source>Logical Id</source>
-      <translation type="unfinished">Logical Id</translation>
+      <source>Id</source>
+      <translation>Идентификатор</translation>
     </message>
   </context>
   <context>
@@ -2623,7 +2623,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Password should not be equal to camera&apos;s user name</source>
-      <translation type="unfinished">Password should not be equal to camera&apos;s user name</translation>
+      <translation>Пароль на камере не должен быть такой же как имя пользователя</translation>
     </message>
   </context>
   <context>
@@ -2810,11 +2810,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Cannot edit properties for several wearable and non-wearable cameras.</source>
-      <translation type="unfinished">Cannot edit properties for several wearable and non-wearable cameras.</translation>
+      <translation>Свойства для портативных и обычных камер нельзя редактировать одновременно.</translation>
     </message>
     <message>
       <source>Cannot edit properties for several wearable cameras.</source>
-      <translation type="unfinished">Cannot edit properties for several wearable cameras.</translation>
+      <translation>Свойства для нескольких портативных камер нельзя редактировать одновременно.</translation>
     </message>
   </context>
   <context>
@@ -2913,7 +2913,7 @@ to %1</source>
     </message>
     <message>
       <source>Account is not activated. Please check your email and follow provided instructions</source>
-      <translation type="unfinished">Account is not activated. Please check your email and follow provided instructions</translation>
+      <translation>Аккаунт не активирован. Пожалуйста, проверьте вашу электронную почту и следуйте инструкциям</translation>
     </message>
   </context>
   <context>
@@ -3267,7 +3267,7 @@ to %1</source>
     </message>
     <message>
       <source>Set Password</source>
-      <translation type="unfinished">Set Password</translation>
+      <translation>Установить пароли</translation>
     </message>
   </context>
   <context>
@@ -3367,10 +3367,6 @@ to %1</source>
       <translation>Отключить</translation>
     </message>
     <message>
-      <source>All cloud users will be deleted.</source>
-      <translation>Все облачные пользователи будут удалены.</translation>
-    </message>
-    <message>
       <source>Failed to disconnect System from %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>Не удалось отключить систему от %1</translation>
@@ -3388,6 +3384,11 @@ to %1</source>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>Вы не сможете подключиться к этой системе с вашей учетной записью %1, после того, как вы отключите эту систему от %1.</translation>
+    </message>
+    <message>
+      <source>All %1 users will be deleted.</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">All %1 users will be deleted.</translation>
     </message>
   </context>
   <context>
@@ -4782,11 +4783,11 @@ to %1</source>
     <name>QnNewWearableCameraDialog</name>
     <message>
       <source>Wearable Camera</source>
-      <translation type="unfinished">Wearable Camera</translation>
+      <translation>Портативная камера</translation>
     </message>
     <message>
       <source>Wearable Camera %1</source>
-      <translation type="unfinished">Wearable Camera %1</translation>
+      <translation>Портативная камера %1</translation>
     </message>
     <message>
       <source>Name</source>
@@ -6059,6 +6060,10 @@ to %1</source>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
       <translation>Режим записи &quot;Движение + Низкое Разрешение&quot; не может быть установлен.</translation>
     </message>
+    <message>
+      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
+      <translation>Загруженный архив будет удаоен автоматически, как только свободное место на сервере закончится. Сначала будут удалены самые старые кадры среди всех камер на сервере.</translation>
+    </message>
   </context>
   <context>
     <name>QnSmtpAdvancedSettingsWidget</name>
@@ -6210,10 +6215,6 @@ to %1</source>
   <context>
     <name>QnStatusOverlayController</name>
     <message>
-      <source>NOT ENOUGH LICENCES</source>
-      <translation>НЕ ХВАТАЕТ ЛИЦЕНЗИЙ</translation>
-    </message>
-    <message>
       <source>NO DATA</source>
       <translation>НЕТ ДАННЫХ</translation>
     </message>
@@ -6267,7 +6268,7 @@ to %1</source>
     </message>
     <message>
       <source>NO LIVE STREAM</source>
-      <translation type="unfinished">NO LIVE STREAM</translation>
+      <translation>НЕТ ЖИВОГО ВИДЕО</translation>
     </message>
     <message>
       <source>TOO MANY CONNECTIONS</source>
@@ -6283,7 +6284,11 @@ to %1</source>
     </message>
     <message>
       <source>UNSUPPORTED FIRMWARE VERSION</source>
-      <translation type="unfinished">UNSUPPORTED FIRMWARE VERSION</translation>
+      <translation>ВЕРСИЯ ПРОШИВКИ НЕ ПОДДЕРЖИВАЕТСЯ</translation>
+    </message>
+    <message>
+      <source>NOT ENOUGH LICENSES</source>
+      <translation>НЕ ХВАТАЕТ ЛИЦЕНЗИЙ</translation>
     </message>
   </context>
   <context>
@@ -6436,7 +6441,7 @@ to %1</source>
     </message>
     <message>
       <source>Recording was enabled on the USB storage</source>
-      <translation type="unfinished">Recording was enabled on the USB storage</translation>
+      <translation>Запись была включена на USB-накопителе</translation>
     </message>
   </context>
   <context>
@@ -6997,16 +7002,17 @@ to %1</source>
       <translation>Локальный пользователь</translation>
     </message>
     <message>
-      <source>Cloud user</source>
-      <translation>Облачный пользователь</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>Логин</translation>
     </message>
     <message>
       <source>Role</source>
       <translation>Роль</translation>
+    </message>
+    <message>
+      <source>%1 user</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 user</translation>
     </message>
   </context>
   <context>
@@ -7203,10 +7209,6 @@ to %1</source>
       <translation>Локальный</translation>
     </message>
     <message>
-      <source>Cloud</source>
-      <translation>Облачный</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>Логин</translation>
     </message>
@@ -7247,8 +7249,9 @@ to %1</source>
       <translation>Введённые пароли не совпадают.</translation>
     </message>
     <message>
-      <source>Cloud user with specified email already exists.</source>
-      <translation>Облачный пользователь с таким Email уже существует.</translation>
+      <source>%1 user with specified email already exists.</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 user with specified email already exists.</translation>
     </message>
   </context>
   <context>
@@ -7324,35 +7327,35 @@ to %1</source>
   <context>
     <name>QnWearableProgressWidget</name>
     <message>
-      <source>Uploading %1... %2	%p%</source>
-      <translation type="unfinished">Uploading %1... %2	%p%</translation>
-    </message>
-    <message>
       <source>Stop uploading?</source>
-      <translation type="unfinished">Stop uploading?</translation>
+      <translation>Остановить загрузку?</translation>
     </message>
     <message>
       <source>Already uploaded files will be kept.</source>
-      <translation type="unfinished">Already uploaded files will be kept.</translation>
-    </message>
-    <message>
-      <source>Finalizing %1... %2	%p%</source>
-      <translation type="unfinished">Finalizing %1... %2	%p%</translation>
+      <translation>Уже загруженные файлы будут сохранены.</translation>
     </message>
     <message>
       <source>(%1 of %2)</source>
-      <translation type="unfinished">(%1 of %2)</translation>
+      <translation>(%1 из %2)</translation>
+    </message>
+    <message>
+      <source>Uploading %1...</source>
+      <translation>Загрузка %1...</translation>
+    </message>
+    <message>
+      <source>Finalizing %1...</source>
+      <translation>Завершение %1...</translation>
     </message>
   </context>
   <context>
     <name>QnWearableUploadWidget</name>
     <message>
       <source>User &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation type="unfinished">User &quot;%1&quot; is currently uploading footage to this camera.</translation>
+      <translation>Пользователь &quot;%1&quot; в настоящее время загружает архив на эту камеру.</translation>
     </message>
     <message>
       <source>Another user is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Another user is currently uploading footage to this camera.</translation>
+      <translation>Другой пользователь в настоящее время загружает архив на эту камеру.</translation>
     </message>
   </context>
   <context>
@@ -7447,6 +7450,10 @@ to %1</source>
       <source>Could not connect to server. Video Wall will be closed.</source>
       <translation>Не удалось подключиться к серверу. Видеостена будет закрыта.</translation>
     </message>
+    <message>
+      <source>Video Wall is removed on the server and will be closed.</source>
+      <translation>Видеостена удалена на сервере и будет закрыта.</translation>
+    </message>
   </context>
   <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
@@ -7471,10 +7478,6 @@ to %1</source>
       <translation>Общее количество лицензий уменьшится</translation>
     </message>
     <message>
-      <source>Cloud Systems cannot be merged</source>
-      <translation>Облачные системы не могут быть объединены</translation>
-    </message>
-    <message>
       <source>Connecting to the current System...</source>
       <translation>Подключение к текущей системе...</translation>
     </message>
@@ -7493,6 +7496,11 @@ to %1</source>
     <message>
       <source>Administrator password</source>
       <translation>Пароль администратора</translation>
+    </message>
+    <message>
+      <source>%1 Systems cannot be merged</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 Systems cannot be merged</translation>
     </message>
   </context>
   <context>
@@ -7754,173 +7762,173 @@ to %1</source>
     </message>
     <message>
       <source>Video (%1)</source>
-      <translation type="unfinished">Video (%1)</translation>
+      <translation>Видео (%1)</translation>
     </message>
     <message>
       <source>Open Wearable Camera Recordings...</source>
-      <translation type="unfinished">Open Wearable Camera Recordings...</translation>
+      <translation>Открыть записи по портативной камере...</translation>
     </message>
     <message>
       <source>Only video files with correct timestamp are supported.</source>
-      <translation type="unfinished">Only video files with correct timestamp are supported.</translation>
+      <translation>Поддерживаются только видеофайлы с правильными отметками времени.</translation>
     </message>
     <message>
       <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</translation>
+      <translation>Невозможно начать загрузку, так как пользователь &quot;%1&quot; в настоящее время загружает архив на эту камеру.</translation>
     </message>
     <message>
       <source>Could not start upload as another user is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Could not start upload as another user is currently uploading footage to this camera.</translation>
+      <translation>Невозможно начать загрузку, так как другой пользователь в настоящее время загружает архив на эту камеру.</translation>
     </message>
     <message>
       <source>Failed to add wearable camera</source>
-      <translation type="unfinished">Failed to add wearable camera</translation>
+      <translation>Не удалось добавить портативную камеру</translation>
     </message>
     <message>
       <source>No video files found in selected folder</source>
-      <translation type="unfinished">No video files found in selected folder</translation>
+      <translation>В выбранной папке нет видеофайлов</translation>
     </message>
     <message numerus="yes">
       <source>Selected file formats are not supported</source>
-      <translation type="unfinished">
-        <numerusform>Selected file formats are not supported</numerusform>
-        <numerusform>Selected file formats are not supported</numerusform>
-        <numerusform>Selected file formats are not supported</numerusform>
-        <numerusform>Selected file formats are not supported</numerusform>
+      <translation>
+        <numerusform>Формат выбранного файла не поддерживается</numerusform>
+        <numerusform>Формат выбранноых файлов не поддерживается</numerusform>
+        <numerusform>Формат выбранноых файлов не поддерживается</numerusform>
+        <numerusform>Формат выбранноых файлов не поддерживается</numerusform>
       </translation>
     </message>
     <message>
       <source>Use .MKV, .AVI, .MP4 or other video files.</source>
-      <translation type="unfinished">Use .MKV, .AVI, .MP4 or other video files.</translation>
+      <translation>Используйте .MKV, .AVI, .MP4 или другие видеофайлы.</translation>
     </message>
     <message numerus="yes">
       <source>Selected files do not have timestamps</source>
-      <translation type="unfinished">
-        <numerusform>Selected files do not have timestamps</numerusform>
-        <numerusform>Selected files do not have timestamps</numerusform>
-        <numerusform>Selected files do not have timestamps</numerusform>
-        <numerusform>Selected files do not have timestamps</numerusform>
+      <translation>
+        <numerusform>Выбранный файл не имеет временных меток</numerusform>
+        <numerusform>Выбранные файлы не имеют временных меток</numerusform>
+        <numerusform>Выбранные файлы не имеют временных меток</numerusform>
+        <numerusform>Выбранные файлы не имеют временных меток</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos are already being uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+      <translation>
+        <numerusform>Выбранный файл охватывает период, для которого видео уже присутствует</numerusform>
+        <numerusform>Выбранные файлы охватывают периоды, для которых видео уже присутствуют</numerusform>
+        <numerusform>Выбранные файлы охватывают периоды, для которых видео уже присутствуют</numerusform>
+        <numerusform>Выбранные файлы охватывают периоды, для которых видео уже присутствуют</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Wearable Camera.</source>
-      <translation type="unfinished">
-        <numerusform>You can upload these files to a different instance of a Wearable Camera.</numerusform>
-        <numerusform>You can upload these files to a different instance of a Wearable Camera.</numerusform>
-        <numerusform>You can upload these files to a different instance of a Wearable Camera.</numerusform>
-        <numerusform>You can upload these files to a different instance of a Wearable Camera.</numerusform>
+      <translation>
+        <numerusform>Вы можете загрузить этот файл в другой экземпляр портативной камеры.</numerusform>
+        <numerusform>Вы можете загрузить эти файлы в другой экземпляр портативной камеры.</numerusform>
+        <numerusform>Вы можете загрузить эти файлы в другой экземпляр портативной камеры.</numerusform>
+        <numerusform>Вы можете загрузить эти файлы в другой экземпляр портативной камеры.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos have already been uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+      <translation>
+        <numerusform>Выбранный файл охватывает период, для которог видео уже загружено</numerusform>
+        <numerusform>Выбранные файлы охватывают периоды, для которых видео уже загружено</numerusform>
+        <numerusform>Выбранные файлы охватывают периоды, для которых видео уже загружено</numerusform>
+        <numerusform>Выбранные файлы охватывают периоды, для которых видео уже загружено</numerusform>
       </translation>
     </message>
     <message>
       <source>Selected files will not be uploaded</source>
-      <translation type="unfinished">Selected files will not be uploaded</translation>
+      <translation>Выбранные файлы не будут загружены</translation>
     </message>
     <message>
       <source>Some files will not be uploaded</source>
-      <translation type="unfinished">Some files will not be uploaded</translation>
+      <translation>Некоторые файлы не будут загружены</translation>
     </message>
     <message>
       <source>No new files to upload in selected folder</source>
-      <translation type="unfinished">No new files to upload in selected folder</translation>
+      <translation>Нет новых файлов для загрузки в выбранной папке</translation>
     </message>
     <message numerus="yes">
       <source>Selected files are too old</source>
-      <translation type="unfinished">
-        <numerusform>Selected files are too old</numerusform>
-        <numerusform>Selected files are too old</numerusform>
-        <numerusform>Selected files are too old</numerusform>
-        <numerusform>Selected files are too old</numerusform>
+      <translation>
+        <numerusform>Выбранный файл слишком старый</numerusform>
+        <numerusform>Выбранные файлы слишком старые</numerusform>
+        <numerusform>Выбранные файлы слишком старые</numerusform>
+        <numerusform>Выбранные файлы слишком старые</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
-      <translation type="unfinished">
-        <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
-        <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
-        <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
-        <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+      <translation>
+        <numerusform>Выбранный файл был записан %1, но могут быть загружены только файлы, записанные за последний %n день. Вы можете изменить это в настройках архива камеры.</numerusform>
+        <numerusform>Выбранны файл был записан %1, но могут быть загружены только файлы, записанные за последние %n дня. Вы можете изменить это в настройках архива камеры.</numerusform>
+        <numerusform>Выбранны файл был записан %1, но могут быть загружены только файлы, записанные за последниq %n дней. Вы можете изменить это в настройках архива камеры.</numerusform>
+        <numerusform>Выбранны файл был записан %1, но могут быть загружены только файлы, записанные за последниq %n дней. Вы можете изменить это в настройках архива камеры.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
-      <translation type="unfinished">
-        <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
-        <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
-        <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
-        <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+      <translation>
+        <numerusform>Выбранны файл был записан между %1 и %2, но могут быть загружены только файлы, записанные за последний %n день. Вы можете изменить это в настройках архива камеры.</numerusform>
+        <numerusform>Выбранны файл был записан между %1 и %2, но могут быть загружены только файлы, записанные за последние %n дня. Вы можете изменить это в настройках архива камеры.</numerusform>
+        <numerusform>Выбранны файл был записан между %1 и %2, но могут быть загружены только файлы, записанные за последние %n дней. Вы можете изменить это в настройках архива камеры.</numerusform>
+        <numerusform>Выбранны файл был записан между %1 и %2, но могут быть загружены только файлы, записанные за последние %n дней. Вы можете изменить это в настройках архива камеры.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Some footage may be deleted after uploading these files</source>
-      <translation type="unfinished">
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+      <translation>
+        <numerusform>Некоторые фрагменты архива могут быть удалены после загрузки этого файла</numerusform>
+        <numerusform>Некоторые фрагменты архива могут быть удалены после загрузки этих файлов</numerusform>
+        <numerusform>Некоторые фрагменты архива могут быть удалены после загрузки этих файлов</numerusform>
+        <numerusform>Некоторые фрагменты архива могут быть удалены после загрузки этих файлов</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
-      <translation type="unfinished">
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+      <translation>
+        <numerusform>На сервере почти не осталось свободного места. Чтобы освободить место некоторые старые записи можно удалить. Обратите внимание, что если выбранные файлы являются самыми старыми на сервере, они будут удалены сразу же после их загрузки.</numerusform>
+        <numerusform>На сервере почти не осталось свободного места. Чтобы освободить место некоторые старые записи можно удалить. Обратите внимание, что если выбранные файлы являются самыми старыми на сервере, они будут удалены сразу же после их загрузки.</numerusform>
+        <numerusform>На сервере почти не осталось свободного места. Чтобы освободить место некоторые старые записи можно удалить. Обратите внимание, что если выбранные файлы являются самыми старыми на сервере, они будут удалены сразу же после их загрузки.</numerusform>
+        <numerusform>На сервере почти не осталось свободного места. Чтобы освободить место некоторые старые записи можно удалить. Обратите внимание, что если выбранные файлы являются самыми старыми на сервере, они будут удалены сразу же после их загрузки.</numerusform>
       </translation>
     </message>
     <message>
       <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
-      <translation type="unfinished">To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</translation>
+      <translation>Чтобы предотвратить это, вы можете добавить дополнительное хранилище. Вы также можете контролировать, какие фрагменты архива будут удалены сначала, изменив время сохранения архива в настройках камеры.</translation>
     </message>
     <message>
       <source>Upload anyway?</source>
-      <translation type="unfinished">Upload anyway?</translation>
+      <translation>Загрузить в любом случае?</translation>
     </message>
     <message>
       <source>Could not finish upload to %1</source>
-      <translation type="unfinished">Could not finish upload to %1</translation>
+      <translation>Не удалось завершить загрузку на %1</translation>
     </message>
     <message>
       <source>Make sure there is enough space on server storage.</source>
-      <translation type="unfinished">Make sure there is enough space on server storage.</translation>
+      <translation>Убедитесь, что на сервере достаточно места.</translation>
     </message>
     <message>
       <source>%1 has unsupported format.</source>
-      <translation type="unfinished">%1 has unsupported format.</translation>
+      <translation>Формат файла %1 не поддерживается.</translation>
     </message>
     <message>
       <source>%1 does not have timestamp.</source>
-      <translation type="unfinished">%1 does not have timestamp.</translation>
+      <translation>Файл %1 не содержит временных меток.</translation>
     </message>
     <message>
       <source>%1 is older than allowed in camera archive settings.</source>
-      <translation type="unfinished">%1 is older than allowed in camera archive settings.</translation>
+      <translation>Файл %1 старше, чем разрешено в настройках архива камеры.</translation>
     </message>
     <message>
       <source>%1 covers period for which video has already been uploaded.</source>
-      <translation type="unfinished">%1 covers period for which video has already been uploaded.</translation>
+      <translation>%1 охватывает период, за который видео уже загружено.</translation>
     </message>
     <message>
       <source>%1 covers period for which video is being uploaded.</source>
-      <translation type="unfinished">%1 covers period for which video is being uploaded.</translation>
+      <translation>%1 охватывает период, за который загружается видео.</translation>
     </message>
   </context>
   <context>
@@ -8147,7 +8155,7 @@ to %1</source>
     </message>
     <message>
       <source>Stop uploading?</source>
-      <translation type="unfinished">Stop uploading?</translation>
+      <translation>Остановить загрузку?</translation>
     </message>
     <message>
       <source>Stop</source>
@@ -8155,11 +8163,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Some video file(s) are still being uploaded to %n wearable cameras:</source>
-      <translation type="unfinished">
-        <numerusform>Some video file(s) are still being uploaded to %n wearable cameras:</numerusform>
-        <numerusform>Some video file(s) are still being uploaded to %n wearable cameras:</numerusform>
-        <numerusform>Some video file(s) are still being uploaded to %n wearable cameras:</numerusform>
-        <numerusform>Some video file(s) are still being uploaded to %n wearable cameras:</numerusform>
+      <translation>
+        <numerusform>Этот видео файл до сих пор загружается в %n портативную камеру:</numerusform>
+        <numerusform>Эти видео файлы до сих пор загружаются в %n портативные камеры:</numerusform>
+        <numerusform>Эти видео файлы до сих пор загружаются в %n портативных камер:</numerusform>
+        <numerusform>Эти видео файлы до сих пор загружаются в %n портативных камер:</numerusform>
       </translation>
     </message>
   </context>
@@ -8413,34 +8421,34 @@ to %1</source>
     <name>nx::client::desktop::UploadWorker</name>
     <message>
       <source>Could not open file &quot;%1&quot;</source>
-      <translation type="unfinished">Could not open file &quot;%1&quot;</translation>
+      <translation>Не удалось открыть файл &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Could not calculate md5 for file &quot;%1&quot;</source>
-      <translation type="unfinished">Could not calculate md5 for file &quot;%1&quot;</translation>
+      <translation>Не удалось вычислить md5 для файла &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Could not create upload on the server side</source>
-      <translation type="unfinished">Could not create upload on the server side</translation>
+      <translation>Не удалось создать загрузку на стороне сервера</translation>
     </message>
     <message>
       <source>Could not upload file chunk to the server</source>
-      <translation type="unfinished">Could not upload file chunk to the server</translation>
+      <translation>Не удалось загрузить фрагмент файла на сервер</translation>
     </message>
     <message>
       <source>Could not check uploaded file on the server</source>
-      <translation type="unfinished">Could not check uploaded file on the server</translation>
+      <translation>Не удалось проверить загруженный файл на сервере</translation>
     </message>
     <message>
       <source>File was corrupted while being uploaded to the server</source>
-      <translation type="unfinished">File was corrupted while being uploaded to the server</translation>
+      <translation>Файл был поврежден при загрузке на сервер</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::WearableWorker</name>
     <message>
       <source>Failed to send request to the server.</source>
-      <translation type="unfinished">Failed to send request to the server.</translation>
+      <translation>Не удалось отправить запрос на сервер.</translation>
     </message>
   </context>
   <context>
@@ -8475,7 +8483,7 @@ to %1</source>
     </message>
     <message>
       <source>Selected period cannot be exported for the current camera.</source>
-      <translation type="unfinished">Selected period cannot be exported for the current camera.</translation>
+      <translation>Выбранный период не может быть экспортирован для текущей камеры.</translation>
     </message>
   </context>
   <context>
@@ -8944,7 +8952,7 @@ to %1</source>
     </message>
     <message>
       <source>Wearable Cameras cannot be moved between servers</source>
-      <translation type="unfinished">Wearable Cameras cannot be moved between servers</translation>
+      <translation>Портативные камеры нельзя перемещать между серверами</translation>
     </message>
     <message>
       <source>Failed to change password</source>

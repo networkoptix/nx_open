@@ -62,7 +62,6 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
         QnSleep::msleep(1000);
     }
 
-
     QSet<QHostAddress> foundDevSet; // to avoid duplicates
     QMap<QString, QnResourcePtr> resources;
     QSet<QString> processedMac;
@@ -150,13 +149,12 @@ QString QnTestCameraResourceSearcher::manufacture() const
     return QLatin1String(QnTestCameraResource::kManufacturer);
 }
 
-QList<QnResourcePtr> QnTestCameraResourceSearcher::checkHostAddr(const nx::utils::Url& url, const QAuthenticator& auth, bool isSearchAction)
+QList<QnResourcePtr> QnTestCameraResourceSearcher::checkHostAddr(const nx::utils::Url& url,
+    const QAuthenticator& /*auth*/, bool isSearchAction)
 {
     if( !url.scheme().isEmpty() && isSearchAction )
         return QList<QnResourcePtr>();  //searching if only host is present, not specific protocol
 
-    Q_UNUSED(url)
-    Q_UNUSED(auth)
     return QList<QnResourcePtr>();
 }
 

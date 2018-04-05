@@ -25,7 +25,7 @@
 
 #include <ini.h>
 #include <nx/client/core/utils/human_readable.h>
-#include <nx/client/desktop/common/widgets/web_view_dialog.h>
+#include <nx/client/desktop/common/dialogs/web_view_dialog.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/pending_operation.h>
 #include <nx/vms/event/analytics_helper.h>

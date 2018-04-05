@@ -159,7 +159,6 @@ private:
     QString                     m_cameraUniqueId;
 };
 
-
 class ScanMediaFilesTask: public QnLongRunnable
 {
 private:
@@ -459,7 +458,6 @@ private:
 
 // -------------------- QnStorageManager --------------------
 
-
 static QnStorageManager* QnNormalStorageManager_instance = nullptr;
 static QnStorageManager* QnBackupStorageManager_instance = nullptr;
 
@@ -513,7 +511,9 @@ QnStorageManager::QnStorageManager(
                     if (!storage->hasFlags(Qn::storage_fastscan))
                     {
                         auto storageIndex = qnStorageDbPool->getStorageIndex(storage);
-                        m_spaceInfo.storageRebuilded(storageIndex, storage->getFreeSpace(),
+                        m_spaceInfo.storageChanged(
+                            storageIndex,
+                            storage->getFreeSpace(),
                             calculateNxOccupiedSpace(storageIndex), storage->getSpaceLimit());
                     }
                 }
@@ -525,7 +525,6 @@ QnStorageManager::QnStorageManager(
         m_scheduleSync.reset(new QnScheduleSync(commonModule));
         connect(m_scheduleSync.get(), &QnScheduleSync::backupFinished, this, &QnStorageManager::backupFinished, Qt::DirectConnection);
     }
-
 
     m_rebuildArchiveThread = new ScanMediaFilesTask(this);
     m_rebuildArchiveThread->start();
@@ -825,7 +824,6 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
             .arg(Q_FUNC_INFO)
             .arg(fileName), cl_logWARNING);
 
-
     auto sdb = qnStorageDbPool->getSDB(storage);
     if (!sdb)
       return;
@@ -1081,19 +1079,34 @@ QString QnStorageManager::toCanonicalPath(const QString& path)
 
 void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
 {
-    {
-        int storageIndex = qnStorageDbPool->getStorageIndex(storage);
-        NX_LOG(QString("Adding storage. Path: %1").arg(storage->getUrl()), cl_logINFO);
+    int storageIndex = qnStorageDbPool->getStorageIndex(storage);
+    NX_LOG(QString("Adding storage. Path: %1").arg(storage->getUrl()), cl_logINFO);
 
-        removeStorage(storage); // remove existing storage record if exists
-        storage->setStatus(Qn::Offline); // we will check status after
-        {
-            QnMutexLocker lk(&m_mutexStorages);
-            m_storageRoots.insert(storageIndex, storage);
-        }
-        connect(storage.data(), SIGNAL(archiveRangeChanged(const QnStorageResourcePtr &, qint64, qint64)),
-                this, SLOT(at_archiveRangeChanged(const QnStorageResourcePtr &, qint64, qint64)), Qt::DirectConnection);
+    removeStorage(storage); // remove existing storage record if exists
+    storage->setStatus(Qn::Offline); // we will check status after
+    {
+        QnMutexLocker lk(&m_mutexStorages);
+        m_storageRoots.insert(storageIndex, storage);
     }
+    connect(storage.data(), SIGNAL(archiveRangeChanged(const QnStorageResourcePtr &, qint64, qint64)),
+            this, SLOT(at_archiveRangeChanged(const QnStorageResourcePtr &, qint64, qint64)), Qt::DirectConnection);
+    connect(storage.data(), &QnStorageResource::isUsedForWritingChanged,
+        this, [this]()
+        {
+            m_warnSended = false;
+        });
+    connect(storage.data(), &QnStorageResource::spaceLimitChanged, this,
+        [this, storageIndex](const QnResourcePtr& storageResource)
+        {
+            auto storage = storageResource.dynamicCast<QnStorageResource>();
+            NX_ASSERT(storage);
+            if (!storage)
+                return;
+            m_spaceInfo.storageChanged(storageIndex, storage->getFreeSpace(),
+                calculateNxOccupiedSpace(storageIndex), storage->getSpaceLimit());
+        });
+
+    m_warnSended = false;
 }
 
 bool QnStorageManager::checkIfMyStorage(const QnStorageResourcePtr &storage) const
@@ -1181,6 +1194,7 @@ void QnStorageManager::removeStorage(const QnStorageResourcePtr &storage)
         }
     }
     m_spaceInfo.storageRemoved(storageIndex);
+    disconnect(storage.data(), nullptr, this, nullptr);
 }
 
 void QnStorageManager::at_storageChanged(const QnResourcePtr &resource)
@@ -1424,7 +1438,6 @@ QnRecordingStatsData QnStorageManager::mergeStatsFromCatalogs(qint64 bitrateAnal
     bitrateThreshold = bitrateAnalizePeriodMs ? bitrateThreshold - bitrateAnalizePeriodMs : 0;
     result.archiveDurationSecs = qMax(0ll, (qnSyncTime->currentMSecsSinceEpoch() - archiveStartTimeMs) / 1000);
 
-
     //auto itrHiLeft = std::lower_bound(catalogHi->m_chunks.cbegin(), catalogHi->m_chunks.cend(), startTime);
     //auto itrHiRight = std::upper_bound(itrHiLeft, catalogHi->m_chunks.cend(), endTime);
     auto itrHiLeft = catalogHi->m_chunks.cbegin();
@@ -1508,7 +1521,6 @@ QnRecordingStatsData QnStorageManager::mergeStatsFromCatalogs(qint64 bitrateAnal
     NX_ASSERT(result.averageBitrate >= 0);
     return result;
 }
-
 
 void QnStorageManager::removeEmptyDirs(const QnStorageResourcePtr &storage)
 {
@@ -2147,9 +2159,9 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
     return toDelete <= 0;
 }
 
-void QnStorageManager::at_archiveRangeChanged(const QnStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs)
+void QnStorageManager::at_archiveRangeChanged(const QnStorageResourcePtr &resource,
+    qint64 newStartTimeMs, qint64 /*newEndTimeMs*/)
 {
-    Q_UNUSED(newEndTimeMs)
     int storageIndex = qnStorageDbPool->getStorageIndex(resource);
     QnMutexLocker lock(&m_mutexCatalog);
     for(const DeviceFileCatalogPtr& catalogHi: m_devFileCatalog[QnServer::HiQualityCatalog])
@@ -2240,12 +2252,20 @@ QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages(
         {
             qint64 available = fileStorage->getTotalSpace() - fileStorage->getSpaceLimit();
             if (available >= bigStorageThreshold)
+            {
                 result << fileStorage;
-
-            NX_VERBOSE(
-                this,
-                lm("[ApiStorageSpace, Writable storages] candidate: %1 size seems appropriate")
-                    .args(fileStorage->getUrl()));
+                NX_VERBOSE(
+                    this,
+                    lm("[ApiStorageSpace, Writable storages] candidate: %1 size seems appropriate")
+                        .args(fileStorage->getUrl()));
+            }
+            else
+            {
+                NX_VERBOSE(
+                    this,
+                    lm("[ApiStorageSpace, Writable storages] candidate: %1 available size %2 is less than the treshold %3.")
+                        .args(fileStorage->getUrl(), available, bigStorageThreshold));
+            }
         }
     }
 
@@ -2366,7 +2386,7 @@ void QnStorageManager::stopAsyncTasks()
 
     m_rebuildCancelled = true;
     {
-        QnMutexLocker lock(&m_mutexRebuild);
+        //QnMutexLocker lock(&m_mutexRebuild);
         if (m_rebuildArchiveThread)
         {
             m_rebuildArchiveThread->stop();
@@ -2835,7 +2855,6 @@ bool QnStorageManager::isStorageAvailable(int storage_index) const {
 bool QnStorageManager::isStorageAvailable(const QnStorageResourcePtr& storage) const {
     return storage && storage->getStatus() == Qn::Online;
 }
-
 
 std::vector<QnUuid> QnStorageManager::getCamerasWithArchiveHelper() const
 {

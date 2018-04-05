@@ -88,8 +88,19 @@ mkdir -p $TMP
 
 hdiutil attach "raw-$DMG_FILE" -mountpoint "$TMP"
 SetFile -a C "$TMP"
-hdiutil detach "$TMP"
+
+# Try detach multiple times because something in MacOS can sometimes hold the directory.
+DETACHED=0
+for i in {1..20}
+do
+    hdiutil detach "$TMP" && DETACHED=1 && break
+    echo "Cannot detach $TMP" >&2
+    sleep 1
+done
+[ $DETACHED -ne 1 ] && exit 1
+
 rm -rf "$TMP"
 rm -f "$DMG_FILE"
+lsof -t "raw-$DMG_FILE" | xargs kill -9
 hdiutil convert "raw-$DMG_FILE" -format UDZO -o "$DMG_FILE"
 rm -f "raw-$DMG_FILE"

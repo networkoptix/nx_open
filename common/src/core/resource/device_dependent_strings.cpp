@@ -151,17 +151,25 @@ QString QnDeviceDependentStrings::getNumericName(
     const QnVirtualCameraResourceList &devices,
     bool capitalize /*= true*/)
 {
-    QnCameraDeviceType deviceType = calculateDeviceType(resPool, devices);
-    switch (deviceType) {
+    return getNumericName(calculateDeviceType(resPool, devices), devices.size(), capitalize);
+}
+
+QString QnDeviceDependentStrings::getNumericName(
+    QnCameraDeviceType deviceType,
+    int count,
+    bool capitalize)
+{
+    switch (deviceType)
+    {
     case Camera:
-        return QnResourceNameStrings::numericCameras(devices.size(), capitalize);
+        return QnResourceNameStrings::numericCameras(count, capitalize);
     case IOModule:
-        return QnResourceNameStrings::numericIoModules(devices.size(), capitalize);
+        return QnResourceNameStrings::numericIoModules(count, capitalize);
     default:
         break;
     }
     NX_ASSERT(deviceType == Mixed, Q_FUNC_INFO, "All fixed device types should be handled");
-    return QnResourceNameStrings::numericDevices(devices.size(), capitalize);
+    return QnResourceNameStrings::numericDevices(count, capitalize);
 }
 
 QString QnDeviceDependentStrings::getNameFromSet(

@@ -2458,8 +2458,8 @@ to view more bookmarks</source>
       <translation>伺服器</translation>
     </message>
     <message>
-      <source>Logical Id</source>
-      <translation type="unfinished">Logical Id</translation>
+      <source>Id</source>
+      <translation>Id</translation>
     </message>
   </context>
   <context>
@@ -3171,7 +3171,7 @@ to %1</source>
     </message>
     <message>
       <source>Set Password</source>
-      <translation type="unfinished">Set Password</translation>
+      <translation>設定密碼</translation>
     </message>
   </context>
   <context>
@@ -3271,10 +3271,6 @@ to %1</source>
       <translation>斷線</translation>
     </message>
     <message>
-      <source>All cloud users will be deleted.</source>
-      <translation>雲端上的所有使用者都將被刪除.</translation>
-    </message>
-    <message>
       <source>Failed to disconnect System from %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>未能從 %1 斷開系統</translation>
@@ -3292,6 +3288,11 @@ to %1</source>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>在您從 %1 斷開系統連線後你將不能使用 %1 帳號連接到此系統.</translation>
+    </message>
+    <message>
+      <source>All %1 users will be deleted.</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">All %1 users will be deleted.</translation>
     </message>
   </context>
   <context>
@@ -5852,6 +5853,10 @@ to %1</source>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
       <translation>&quot;位移主串流+全時次串流&quot; 選項無法使用.</translation>
     </message>
+    <message>
+      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
+      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</translation>
+    </message>
   </context>
   <context>
     <name>QnSmtpAdvancedSettingsWidget</name>
@@ -6003,10 +6008,6 @@ to %1</source>
   <context>
     <name>QnStatusOverlayController</name>
     <message>
-      <source>NOT ENOUGH LICENCES</source>
-      <translation>沒有足夠的授權</translation>
-    </message>
-    <message>
       <source>NO DATA</source>
       <translation>無資料</translation>
     </message>
@@ -6077,6 +6078,10 @@ to %1</source>
     <message>
       <source>UNSUPPORTED FIRMWARE VERSION</source>
       <translation>不支援的韌體版本</translation>
+    </message>
+    <message>
+      <source>NOT ENOUGH LICENSES</source>
+      <translation type="unfinished">NOT ENOUGH LICENSES</translation>
     </message>
   </context>
   <context>
@@ -6772,16 +6777,17 @@ to %1</source>
       <translation>本地使用者</translation>
     </message>
     <message>
-      <source>Cloud user</source>
-      <translation>雲帳號</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>登入</translation>
     </message>
     <message>
       <source>Role</source>
       <translation>角色</translation>
+    </message>
+    <message>
+      <source>%1 user</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 user</translation>
     </message>
   </context>
   <context>
@@ -6975,10 +6981,6 @@ to %1</source>
       <translation>本地</translation>
     </message>
     <message>
-      <source>Cloud</source>
-      <translation>雲端</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>登入</translation>
     </message>
@@ -7019,8 +7021,9 @@ to %1</source>
       <translation>密碼不匹配.</translation>
     </message>
     <message>
-      <source>Cloud user with specified email already exists.</source>
-      <translation>使用此 Email 的雲帳號已存在.</translation>
+      <source>%1 user with specified email already exists.</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 user with specified email already exists.</translation>
     </message>
   </context>
   <context>
@@ -7093,24 +7096,24 @@ to %1</source>
   <context>
     <name>QnWearableProgressWidget</name>
     <message>
-      <source>Uploading %1... %2	%p%</source>
-      <translation>正在上傳 %1... %2 %p%</translation>
-    </message>
-    <message>
       <source>Stop uploading?</source>
-      <translation>是否停止上傳?</translation>
+      <translation>停止上傳?</translation>
     </message>
     <message>
       <source>Already uploaded files will be kept.</source>
       <translation>已經上傳的檔案將被保存.</translation>
     </message>
     <message>
-      <source>Finalizing %1... %2	%p%</source>
-      <translation>正在完成 %1... %2 %p%</translation>
-    </message>
-    <message>
       <source>(%1 of %2)</source>
       <translation>(%1 of %2)</translation>
+    </message>
+    <message>
+      <source>Uploading %1...</source>
+      <translation type="unfinished">Uploading %1...</translation>
+    </message>
+    <message>
+      <source>Finalizing %1...</source>
+      <translation type="unfinished">Finalizing %1...</translation>
     </message>
   </context>
   <context>
@@ -7213,6 +7216,10 @@ to %1</source>
       <source>Could not connect to server. Video Wall will be closed.</source>
       <translation>無法連接到伺服器. 電視牆將會關閉.</translation>
     </message>
+    <message>
+      <source>Video Wall is removed on the server and will be closed.</source>
+      <translation type="unfinished">Video Wall is removed on the server and will be closed.</translation>
+    </message>
   </context>
   <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
@@ -7237,10 +7244,6 @@ to %1</source>
       <translation>授權的總數量將減少</translation>
     </message>
     <message>
-      <source>Cloud Systems cannot be merged</source>
-      <translation>雲端系統不能合併</translation>
-    </message>
-    <message>
       <source>Connecting to the current System...</source>
       <translation>連線至目前的系統...</translation>
     </message>
@@ -7259,6 +7262,11 @@ to %1</source>
     <message>
       <source>Administrator password</source>
       <translation>管理者密碼</translation>
+    </message>
+    <message>
+      <source>%1 Systems cannot be merged</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 Systems cannot be merged</translation>
     </message>
   </context>
   <context>
@@ -7817,7 +7825,7 @@ to %1</source>
     </message>
     <message>
       <source>Stop uploading?</source>
-      <translation>停止上傳?</translation>
+      <translation>是否停止上傳?</translation>
     </message>
     <message>
       <source>Stop</source>
