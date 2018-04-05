@@ -129,6 +129,16 @@ if(IOS)
         message(FATAL_ERROR "Cannot get provisioning profile id from \"${provisioning_profile}\"")
     endif()
 
+    set(system_provisioning_profiles_dir "$ENV{HOME}/Library/MobileDevice/Provisioning Profiles")
+    execute_process(
+        COMMAND ${CMAKE_COMMAND} -E copy "${provisioning_profile}"
+            "${system_provisioning_profiles_dir}/${provisioning_profile_id}.mobileprovision"
+        RESULT_VARIABLE result
+    )
+    if(NOT result EQUAL 0)
+        message(FATAL_ERROR "Cannot install provisioning profile \"${provisioning_profile}\"")
+    endif()
+
     set_target_properties(mobile_client PROPERTIES
         MACOSX_BUNDLE TRUE
         MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_LIST_DIR}/maven/filter-resources/Info.plist"
