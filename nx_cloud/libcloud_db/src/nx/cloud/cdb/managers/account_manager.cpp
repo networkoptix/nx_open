@@ -61,11 +61,17 @@ void AccountManager::authenticateByName(
     nx::utils::stree::ResourceContainer* const authProperties,
     nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler)
 {
+    api::ResultCode accountAuthResult = api::ResultCode::notAuthorized;
+
     {
         QnMutexLocker lk(&m_mutex);
 
-        auto account = m_cache.find(toStdString(username));
-        if (account && validateHa1Func(account->passwordHa1.c_str()))
+        const auto account = m_cache.find(toStdString(username));
+        if (!account)
+        {
+            accountAuthResult = api::ResultCode::badUsername;
+        }
+        else if (validateHa1Func(account->passwordHa1.c_str()))
         {
             authProperties->put(
                 cdb::attr::authAccountEmail,
@@ -84,10 +90,11 @@ void AccountManager::authenticateByName(
         std::move(validateHa1Func),
         authSearchInputData,
         authProperties,
-        [username, authProperties, completionHandler = std::move(completionHandler), this](
-            api::ResultCode authResult) mutable
+        [this, username, authProperties, accountAuthResult,
+            completionHandler = std::move(completionHandler)](
+                api::ResultCode tempPwdAuthResult) mutable
         {
-            if (authResult == api::ResultCode::ok)
+            if (tempPwdAuthResult == api::ResultCode::ok)
             {
                 const auto authenticatedByEmailCode =
                     authProperties->get<bool>(attr::authenticatedByEmailCode);
@@ -105,7 +112,16 @@ void AccountManager::authenticateByName(
                         });
                 }
             }
-            completionHandler(authResult);
+
+            if (tempPwdAuthResult == api::ResultCode::badUsername)
+            {
+                return completionHandler(
+                    accountAuthResult == api::ResultCode::badUsername
+                    ? api::ResultCode::badUsername
+                    : api::ResultCode::notAuthorized);
+            }
+
+            completionHandler(tempPwdAuthResult);
         });
 }
 

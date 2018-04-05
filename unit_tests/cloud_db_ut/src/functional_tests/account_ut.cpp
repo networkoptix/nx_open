@@ -15,6 +15,7 @@
 #include <nx/utils/app_info.h>
 #include <nx/utils/test_support/utils.h>
 #include <nx/utils/time.h>
+#include <nx/utils/std/optional.h>
 #include <nx/utils/sync_call.h>
 
 #include <nx/cloud/cdb/api/cloud_nonce.h>
@@ -388,18 +389,18 @@ TEST_F(Account, request_query_decode)
     //ASSERT_TRUE(!activationCode.code.empty());
 
     std::string activatedAccountEmail;
-    result = activateAccount(activationCode, &activatedAccountEmail);
-    ASSERT_EQ(result, api::ResultCode::ok);
+    ASSERT_EQ(api::ResultCode::ok, activateAccount(activationCode, &activatedAccountEmail));
     ASSERT_EQ(
         nx::utils::Url::fromPercentEncoding(account1.email.c_str()).toStdString(),
         activatedAccountEmail);
 
-    result = getAccount(account1.email, account1Password, &account1);
-    ASSERT_EQ(result, api::ResultCode::notAuthorized);  //test%40yandex.ru MUST be unknown email
+    // test%40yandex.ru MUST be unknown email.
+    ASSERT_EQ(
+        api::ResultCode::badUsername,
+        getAccount(account1.email, account1Password, &account1));
 
     account1.email = "test@yandex.ru";
-    result = getAccount(account1.email, account1Password, &account1);
-    ASSERT_EQ(result, api::ResultCode::ok);
+    ASSERT_EQ(api::ResultCode::ok, getAccount(account1.email, account1Password, &account1));
     ASSERT_EQ(account1.customization, nx::utils::AppInfo::customizationName().toStdString());
     ASSERT_EQ(account1.statusCode, api::AccountStatus::activated);
     ASSERT_EQ(account1.email, "test@yandex.ru");
@@ -888,6 +889,22 @@ protected:
             nx::utils::floor<std::chrono::milliseconds>(nx::utils::utcTime());
     }
 
+    void givenActivatedAccount()
+    {
+        givenNotActivatedAccount();
+        whenActivateAccount();
+    }
+
+    void useWrongAccountPassword()
+    {
+        m_passwordToUse = nx::utils::generateRandomName(7);
+    }
+
+    void useUnknownAccountLogin()
+    {
+        m_usernameToUse = BusinessDataGenerator::generateRandomEmailAddress();
+    }
+
     void whenShiftedSystemTime()
     {
         m_timeShift.applyRelativeShift(kTimeShift);
@@ -912,7 +929,10 @@ protected:
     void whenRequestAccountInfo()
     {
         api::AccountData accountData;
-        m_prevResultCode = getAccount(m_account.email, m_account.password, &accountData);
+        m_prevResultCode = getAccount(
+            m_usernameToUse ? *m_usernameToUse : m_account.email,
+            m_passwordToUse ? *m_passwordToUse : m_account.password,
+            &accountData);
     }
 
     void whenRequestSystemList()
@@ -977,7 +997,9 @@ private:
     api::AccountConfirmationCode m_activationCode;
     TimeRange m_registrationTimeRange;
     TimeRange m_activationTimeRange;
-    boost::optional<api::ResultCode> m_prevResultCode;
+    std::optional<api::ResultCode> m_prevResultCode;
+    std::optional<std::string> m_usernameToUse;
+    std::optional<std::string> m_passwordToUse;
 
     api::AccountData getFreshAccountCopy()
     {
@@ -1007,7 +1029,16 @@ TEST_F(AccountNewTest, account_timestamps)
     assertActivationTimestampIsCorrect();
 }
 
-TEST_F(AccountNewTest, proper_error_code_is_reported_when_using_not_activated_account)
+//-------------------------------------------------------------------------------------------------
+
+class AccountFailedAuthenticationResultCodes:
+    public AccountNewTest
+{
+};
+
+TEST_F(
+    AccountFailedAuthenticationResultCodes,
+    proper_error_code_is_reported_when_using_not_activated_account)
 {
     givenNotActivatedAccount();
 
@@ -1016,6 +1047,27 @@ TEST_F(AccountNewTest, proper_error_code_is_reported_when_using_not_activated_ac
 
     whenRequestSystemList();
     thenResultCodeIs(api::ResultCode::accountNotActivated);
+}
+
+TEST_F(
+    AccountFailedAuthenticationResultCodes,
+    unauthorized_is_reported_when_existing_user_uses_wrong_password)
+{
+    givenActivatedAccount();
+
+    useWrongAccountPassword();
+    whenRequestAccountInfo();
+
+    thenResultCodeIs(api::ResultCode::notAuthorized);
+}
+
+TEST_F(
+    AccountFailedAuthenticationResultCodes,
+    badUsername_is_reported_when_using_unknown_username)
+{
+    useUnknownAccountLogin();
+    whenRequestAccountInfo();
+    thenResultCodeIs(api::ResultCode::badUsername);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1226,13 +1278,13 @@ TEST_F(AccountInvite, invite_code_contains_email)
     assertInviteCodeContainsEmail();
 }
 
-TEST_F(AccountInvite, invite_code_from_multiple_systems_match)
+TEST_F(AccountInvite, inviting_same_user_to_different_systems_produce_same_invite_link)
 {
     whenInvitedSameNotRegisteredUserToMultipleSystems();
     thenSameInviteCodeHasBeenDelivered();
 }
 
-TEST_F(AccountInvite, repeated_invite_after_last_invite_link_expiration)
+TEST_F(AccountInvite, repeating_invite_after_previous_invite_link_has_expired_is_ok)
 {
     inviteUser();
     waitForInviteLinkToExpire();
