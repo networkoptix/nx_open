@@ -52,12 +52,10 @@ TEST(ExecActionAccessRightsTest, main) //< Crash on QnDbManager nullptr
         ec2::QnJsonTransactionSerializer jsonTranSerializer;
         ec2::QnUbjsonTransactionSerializer ubjsonTranSerializer;
         ec2::TransactionMessageBusAdapter messageBus(
-            nullptr/*QnDbManager*/,
-            Qn::PT_Server,
             launcher.commonModule(),
             &jsonTranSerializer,
             &ubjsonTranSerializer);
-        messageBus.init(ec2::MessageBusType::LegacyMode);
+        messageBus.init<ec2::QnTransactionMessageBus>(Qn::PeerType::PT_Server);
 
         ec2::ServerQueryProcessorAccess access(nullptr/*QnDbManager*/, &messageBus);
         access.getAccess(userAccess).processUpdateAsync(

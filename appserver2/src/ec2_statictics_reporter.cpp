@@ -14,8 +14,10 @@
 #include <utils/common/app_info.h>
 #include <network/system_helpers.h>
 
-#include "ec2_connection.h"
 #include <licensing/license_validator.h>
+#include <nx_ec/data/api_conversion_functions.h>
+#include <common/common_module.h>
+#include <nx/fusion/serialization/json.h>
 
 static const std::chrono::hours kDefaultSendCycleTime(30 * 24); //< About a month.
 static const std::chrono::hours kSendAfterUpdateTime(3);

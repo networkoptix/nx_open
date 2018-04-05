@@ -87,7 +87,6 @@
 #include <network/default_tcp_connection_processor.h>
 #include <network/system_helpers.h>
 
-#include <nx_ec/ec2_lib.h>
 #include <nx_ec/ec_api.h>
 #include <nx_ec/ec_proto_version.h>
 #include <nx_ec/data/api_user_data.h>
@@ -303,6 +302,7 @@
 #endif
 
 #include <nx/kit/ini_config.h>
+#include <local_connection_factory.h>
 
 using namespace nx;
 
@@ -2472,11 +2472,11 @@ void MediaServerProcess::run()
     runtimeData.hardwareIds = m_hardwareGuidList;
     commonModule()->runtimeInfoManager()->updateLocalItem(runtimeData);    // initializing localInfo
 
-    std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(
-        getConnectionFactory(
+    std::unique_ptr<ec2::LocalConnectionFactory> ec2ConnectionFactory(
+        new ec2::LocalConnectionFactory(
+            commonModule(),
             Qn::PT_Server,
             nx::utils::TimerManager::instance(),
-            commonModule(),
             settings->value(nx_ms_conf::P2P_MODE_FLAG).toBool()));
 
     TimeBasedNonceProvider timeBasedNonceProvider;

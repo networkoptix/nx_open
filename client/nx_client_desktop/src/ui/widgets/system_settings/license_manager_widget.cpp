@@ -33,8 +33,6 @@
 #include <licensing/license.h>
 #include <licensing/license_validator.h>
 
-#include <llutil/hardware_id.h>
-
 #include <nx/fusion/serialization/json_functions.h>
 
 #include <ui/common/widget_anchor.h>
@@ -54,6 +52,7 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/delayed.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/license/util.h>
 
 #include <nx/client/desktop/license/license_helpers.h>
 #include <nx/client/desktop/ui/dialogs/license_deactivation_reason.h>
@@ -462,7 +461,7 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool
 
     for (const QString& hwid: hardwareIds)
     {
-        int version = LLUtil::hardwareIdVersion(hwid);
+        int version = nx::utils::license::hardwareIdVersion(hwid);
 
         QString name;
         if (version == 0)

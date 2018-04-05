@@ -8,15 +8,6 @@
 
 namespace ec2 {
 
-class QnLayoutTourNotificationManager: public AbstractLayoutTourNotificationManager
-{
-public:
-    void triggerNotification(const QnTransaction<ApiIdData>& tran, NotificationSource source);
-    void triggerNotification(const QnTransaction<ApiLayoutTourData>& tran, NotificationSource source);
-};
-
-typedef std::shared_ptr<QnLayoutTourNotificationManager> QnLayoutTourNotificationManagerPtr;
-
 template<class QueryProcessorType>
 class QnLayoutTourManager: public AbstractLayoutTourManager
 {
@@ -31,5 +22,57 @@ private:
     QueryProcessorType* const m_queryProcessor;
     Qn::UserAccessData m_userAccessData;
 };
+
+template<typename QueryProcessorType>
+QnLayoutTourManager<QueryProcessorType>::QnLayoutTourManager(
+    QueryProcessorType* const queryProcessor,
+    const Qn::UserAccessData &userAccessData)
+    :
+    m_queryProcessor(queryProcessor),
+    m_userAccessData(userAccessData)
+{
+}
+
+template<class QueryProcessorType>
+int QnLayoutTourManager<QueryProcessorType>::getLayoutTours(impl::GetLayoutToursHandlerPtr handler)
+{
+    const int reqID = generateRequestID();
+    auto queryDoneHandler =
+        [reqID, handler](ErrorCode errorCode, const ApiLayoutTourDataList& tours)
+        {
+            handler->done(reqID, errorCode, tours);
+        };
+    m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync
+        <std::nullptr_t, ApiLayoutTourDataList, decltype(queryDoneHandler)>
+        (ApiCommand::getLayoutTours, nullptr, queryDoneHandler);
+    return reqID;
+}
+
+template<class QueryProcessorType>
+int QnLayoutTourManager<QueryProcessorType>::save(const ec2::ApiLayoutTourData& tour, impl::SimpleHandlerPtr handler)
+{
+    const int reqID = generateRequestID();
+    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+        ApiCommand::saveLayoutTour,
+        tour,
+        [handler, reqID](ec2::ErrorCode errorCode)
+        {
+            handler->done(reqID, errorCode);
+        });
+    return reqID;
+}
+
+template<class QueryProcessorType>
+int QnLayoutTourManager<QueryProcessorType>::remove(const QnUuid& id, impl::SimpleHandlerPtr handler)
+{
+    const int reqID = generateRequestID();
+    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+        ApiCommand::removeLayoutTour, ApiIdData(id),
+        [handler, reqID](ec2::ErrorCode errorCode)
+        {
+            handler->done(reqID, errorCode);
+        });
+    return reqID;
+}
 
 } // namespace ec2
