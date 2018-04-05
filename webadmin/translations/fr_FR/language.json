@@ -86,7 +86,7 @@
         "cloudHost": "Hôte Nuage",
         "cloudAuthKey": "Clé d'authentification Nuage",
         "cloudSystemID": "Id système nuage",
-        "systemName": "Nom Système",
+        "systemName": "Nom système",
         "newSystem": "Le serveur est \"Nouveau\"",
         "proxyConnectTimeoutSec": "Délai de connexion du proxy (secondes)",
         "crossdomainEnabled": "Activer le client Web",
@@ -95,7 +95,7 @@
         "statisticsReportServerApi": "Serveur de statistiques api",
         "statisticsReportTimeCycle": "Intervalle de rapport de statistiques",
         "systemId": "ID Système",
-        "systemNameForId": "Nom Système",
+        "systemNameForId": "Nom système",
         "takeCameraOwnershipWithoutLock": "Prendre propriété des caméras sans verrou",
         "timeSynchronizationEnabled": "Synchronisation de l'heure activée",
         "upnpPortMappingEnabled": "Mappage de port UPNP activé"

@@ -46,6 +46,7 @@
     "VIEWER TEXT"                          :    "Viewer",
     "LIVE VIEWER TEXT"                     :    "Live Viewer",    
     "CUSTOM TEXT"                          :    "Custom",
+    "YOUR SYSTEM TEXT"                     :    "Your System",
 
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT"  :    "Activate your account",
     "RESET PASSWORD EMAIL SUBJECT"         :    "Reset your password",
@@ -61,5 +62,11 @@
     "PASSWORD IS REQUIRED TEXT"            :    "Password is required",
     "PASSWORD SPECIAL CHARS TEXT"          :    "Use only latin letters, numbers and keyboard symbols, avoid leading and trailing spaces",
     "PASSWORD TOO SHORT TEXT"              :    "Password must contain at least 8 characters",
-    "PASSWORD TOO COMMON TEXT"             :    "This password is in top most popular passwords in the world"
+    "PASSWORD TOO COMMON TEXT"             :    "This password is in top most popular passwords in the world",
+    "PASSWORD IS WEAK TEXT"                :    "Use numbers, upper and lower case letters and special characters to make your password stronger",
+
+    "THIS LINK IS BROKEN TEXT"             :    "This link is broken,<br>\n            System may be disconnected from {{PRODUCT_NAME}},<br>\n            Access to this System may be revoked, <br>\n            or you may be logged into a different account",
+
+    "PAGE NOT FOUND"                       :    "Page not found",
+    "TAKE ME HOME"                         :    "Take me home"
 }

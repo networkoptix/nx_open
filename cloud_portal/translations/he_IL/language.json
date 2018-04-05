@@ -117,7 +117,7 @@
     "cloudInvalidResponse": "בסיס הנתונים בענן החזיר תגובה לא צפויה",
     "notAuthorized": "סיסמה שגויה",
     "wrongParameters": "פרמטרים מסוימים בטופס אינם נכונים",
-    "brokenAccount": "בעיה לא צפויה עם החשבון. <; a href=\";/restore_password\";>; שחזר את החשבון<;/a>",
+    "brokenAccount": "בעיה לא צפויה עם החשבון. <a href=\"/restore_password\">שחזר את החשבון</a>",
     "wrongCode": "החשבון כבר הופעל או שקוד האישור שגוי",
     "wrongCodeRestore": "קוד האישור כבר בשימוש או שגוי",
     "forbidden": "אין לך הרשאות לביצוע פעולה זו",

@@ -39,6 +39,7 @@
     "VIEWER TEXT": "ビューアー",
     "LIVE VIEWER TEXT": "ライブビューアー",
     "CUSTOM TEXT": "カスタム",
+    "YOUR SYSTEM TEXT": "ご利用のシステム",
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "アカウントの有効化",
     "RESET PASSWORD EMAIL SUBJECT": "パスワードをリセット",
     "INVITED TO SYSTEM EMAIL SUBJECT": "{{message.sharer_name}}さんがあなたを{{PRODUCT_NAME}}に招待しています",
@@ -51,5 +52,9 @@
     "PASSWORD IS REQUIRED TEXT": "パスワードが必要",
     "PASSWORD SPECIAL CHARS TEXT": "英数字とキーボードの記号のみを使用して、先頭と末尾の空白を避けます",
     "PASSWORD TOO SHORT TEXT": "パスワードは8文字以上必要です",
-    "PASSWORD TOO COMMON TEXT": "このパスワードは、世界で最も人気のあるパスワード"
+    "PASSWORD TOO COMMON TEXT": "このパスワードは、世界で最も人気のあるパスワード",
+    "PASSWORD IS WEAK TEXT": "大文字と小文字の文字、特殊記号を使用して、強固なパスワードを作る",
+    "THIS LINK IS BROKEN TEXT": "このリンクは壊れています<br>\n            システムは{{PRODUCT_NAME}} から切断します<br>\n            このシステムへのアクセスは取り消されたか<br>\n            または別のアカウントにログインしている可能性があります",
+    "PAGE NOT FOUND": "ページが見つかりません",
+    "TAKE ME HOME": "ホームに移動する"
 }

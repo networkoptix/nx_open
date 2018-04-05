@@ -1,7 +1,8 @@
 *** Settings ***
 Resource          ../resource.robot
 Resource          ../variables.robot
-Suite Teardown    Close All Browsers
+Test Teardown     Close Browser
+Suite Teardown    Run Keyword If Any Tests Failed    Clean up noperm first/last name
 
 *** Variables ***
 ${password}    ${BASE PASSWORD}
@@ -24,7 +25,6 @@ Can access the account page from dropdown
     Wait Until Element Is Visible    ${ACCOUNT SETTINGS BUTTON}
     Click Link    ${ACCOUNT SETTINGS BUTTON}
     Verify in account page
-    Close Browser
 
 Can access the account page from direct link while logged in
     Open Browser and go to URL    ${url}
@@ -32,21 +32,18 @@ Can access the account page from direct link while logged in
     Validate Log In
     Go To    ${url}/account
     Verify in account page
-    Close Browser
 
 Accessing the account page from a direct link while logged out asks for login, closing log in takes you to main page
     Open Browser and go to URL    ${url}/account
     Wait Until Element Is Visible    ${LOG IN CLOSE BUTTON}
     Click Button    ${LOG IN CLOSE BUTTON}
     Location Should Be    ${url}/
-    Close Browser
 
 Accessing the account page from a direct link while logged out asks for login, on valid login takes you to account page
     Open Browser and go to URL    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
     Verify in account page
-    Close Browser
 
 Check box is checked when registering with it checked
     [tags]    email
@@ -60,7 +57,6 @@ Check box is checked when registering with it checked
     Verify In Account Page
     ${checked}    Get Element Attribute    ${ACCOUNT SUBSCRIBE CHECKBOX}    checked
     Should Be True    "${checked}"
-    Close Browser
 
 Check box is not checked when registering with it not checked
     [tags]    email
@@ -74,7 +70,6 @@ Check box is not checked when registering with it not checked
     Verify In Account Page
     ${checked}    Get Element Attribute    ${ACCOUNT SUBSCRIBE CHECKBOX}    checked
     Should Not Be True    ${checked}
-    Close Browser
 
 Unchecking check box and saving maintains that setting
     [tags]    email
@@ -95,7 +90,6 @@ Unchecking check box and saving maintains that setting
     Validate Log In
     ${checked}    Get Element Attribute    ${ACCOUNT SUBSCRIBE CHECKBOX}    checked
     Should Not Be True    ${checked}
-    Close Browser
 
 
 Checking check box and saving maintains that setting
@@ -117,7 +111,6 @@ Checking check box and saving maintains that setting
     Validate Log In
     ${checked}    Get Element Attribute    ${ACCOUNT SUBSCRIBE CHECKBOX}    checked
     Should Be True    "${checked}"
-    Close Browser
 
 Changing first name and saving maintains that setting
     Open Browser and go to URL    ${url}/account
@@ -138,7 +131,6 @@ Changing first name and saving maintains that setting
     Input Text    ${ACCOUNT FIRST NAME}    ${TEST FIRST NAME}
     Click Button    ${ACCOUNT SAVE}
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
-    Close Browser
 
 
 Changing last name and saving maintains that setting
@@ -155,10 +147,9 @@ Changing last name and saving maintains that setting
     Validate Log In
     Verify In Account Page
     Wait Until Textfield Contains    ${ACCOUNT LAST NAME}    nameChanged
-    Input Text    ${ACCOUNT LAST NAME}    ${TEST FIRST NAME}
+    Input Text    ${ACCOUNT LAST NAME}    ${TEST LAST NAME}
     Click Button    ${ACCOUNT SAVE}
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
-    Close Browser
 
 First name is required
     Open Browser and go to URL    ${url}/account
@@ -169,7 +160,6 @@ First name is required
     Click Button    ${ACCOUNT SAVE}
     Wait Until Element Is Visible    ${ACCOUNT FIRST NAME}/parent::div/parent::div[contains(@class, "has-error")]
     Element Should Be Visible    ${FIRST NAME IS REQUIRED}
-    Close Browser
 
 Last name is required
     Open Browser and go to URL    ${url}/account
@@ -180,7 +170,6 @@ Last name is required
     Click Button    ${ACCOUNT SAVE}
     Wait Until Element Is Visible    ${ACCOUNT LAST NAME}/parent::div/parent::div[contains(@class, "has-error")]
     Element Should Be Visible    ${LAST NAME IS REQUIRED}
-    Close Browser
 
 SPACE for first name is not valid
     Open Browser and go to URL    ${url}/account
@@ -191,7 +180,6 @@ SPACE for first name is not valid
     Click Button    ${ACCOUNT SAVE}
     Wait Until Element Is Visible    ${ACCOUNT FIRST NAME}/parent::div/parent::div[contains(@class, "has-error")]
     Element Should Be Visible    ${FIRST NAME IS REQUIRED}
-    Close Browser
 
 SPACE for last name is not valid
     Open Browser and go to URL    ${url}/account
@@ -202,7 +190,6 @@ SPACE for last name is not valid
     Click Button    ${ACCOUNT SAVE}
     Wait Until Element Is Visible    ${ACCOUNT LAST NAME}/parent::div/parent::div[contains(@class, "has-error")]
     Element Should Be Visible    ${LAST NAME IS REQUIRED}
-    Close Browser
 
 Email field is un-editable
     Open Browser and go to URL    ${url}/account
@@ -211,7 +198,6 @@ Email field is un-editable
     Verify In Account Page
     ${read only}    Get Element Attribute    ${ACCOUNT EMAIL}    readOnly
     Should Be True    "${read only}"
-    Close Browser
 
 Langauge is changeable on the account page
     Open Browser and go to URL    ${url}/account
@@ -232,4 +218,3 @@ Langauge is changeable on the account page
     Click Button    ${ACCOUNT SAVE}
     Verify In Account Page
     Wait Until Element Is Visible    //h1['${ACCOUNT TEXT}']
-    Close Browser

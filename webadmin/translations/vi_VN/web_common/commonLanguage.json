@@ -41,7 +41,7 @@
     "collapse server": "collapse server + [server name]",
     "expand all servers": "mở rộng tất cả các máy chủ",
     "collapse all servers": "tất cả máy chủ mất ổn định",
-    "stop listening": "ngừng lắng nghe",
+    "stop listening": "dừng nghe",
     "help": "help | show commands"
   }
 }
