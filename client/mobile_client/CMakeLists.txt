@@ -161,6 +161,7 @@ if(IOS)
         set_target_properties(mobile_client PROPERTIES
             XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "${ios.sign.identity}"
             XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS "${CMAKE_CURRENT_BINARY_DIR}/mobile_client.entitlements"
+            XCODE_ATTRIBUTE_OTHER_CODE_SIGN_FLAGS "--keychain ${codeSigningKeychainName}"
             XCODE_ATTRIBUTE_PROVISIONING_PROFILE "${provisioning_profile_id}"
         )
     endif()
