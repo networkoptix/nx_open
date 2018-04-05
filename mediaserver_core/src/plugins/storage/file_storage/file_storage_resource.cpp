@@ -936,7 +936,8 @@ qint64 QnFileStorageResource::calcSpaceLimit(QnPlatformMonitor::PartitionType pt
         nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE
     ).toLongLong();
 
-    const bool isLocal = QnPlatformMonitor::LocalDiskPartition
+    const bool isLocal =
+        ptype == QnPlatformMonitor::LocalDiskPartition
         || ptype == QnPlatformMonitor::RemovableDiskPartition;
 
     return isLocal ? defaultStorageSpaceLimit : kNasStorageLimit;
