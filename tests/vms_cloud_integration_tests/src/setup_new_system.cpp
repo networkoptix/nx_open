@@ -9,13 +9,16 @@
 class FtConfiguringNewSystem:
     public MediaServerCloudIntegrationTest
 {
-public:
-    FtConfiguringNewSystem()
-    {
-        init();
-    }
+    using base_type = MediaServerCloudIntegrationTest;
 
 protected:
+    void SetUp() override
+    {
+        base_type::SetUp();
+
+        ASSERT_TRUE(registerRandomCloudAccount());
+    }
+
     void givenSystemCredentialsRegisteredInCloud()
     {
         ASSERT_TRUE(registerCloudSystem());
@@ -102,12 +105,6 @@ protected:
             if (moduleInformation.serverFlags.testFlag(Qn::ServerFlag::SF_NewSystem))
                 break;
         }
-    }
-
-private:
-    void init()
-    {
-        ASSERT_TRUE(registerRandomCloudAccount());
     }
 };
 

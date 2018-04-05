@@ -30,9 +30,11 @@
 
 #include <api/global_settings.h>
 
+using namespace nx::client::desktop;
+
 namespace {
 
-bool isUrlEqual(const nx::utils::Url &l, const nx::utils::Url &r, QUrl::FormattingOptions ignored = QUrl::RemovePassword | QUrl::RemoveScheme) 
+bool isUrlEqual(const nx::utils::Url &l, const nx::utils::Url &r, QUrl::FormattingOptions ignored = QUrl::RemovePassword | QUrl::RemoveScheme)
 {
     nx::utils::Url lc(l), rc(r);
     if (ignored & QUrl::RemovePassword) {
@@ -66,11 +68,11 @@ QnUserProfileWidget::QnUserProfileWidget(QnUserSettingsModel* model, QWidget* pa
     ui->groupInputField->setTitle(tr("Role"));
 
     ui->emailInputField->setTitle(tr("Email"));
-    ui->emailInputField->setValidator(Qn::defaultEmailValidator());
+    ui->emailInputField->setValidator(defaultEmailValidator());
 
-    connect(ui->nameInputField, &QnInputField::textChanged, this,
+    connect(ui->nameInputField, &InputField::textChanged, this,
         &QnUserProfileWidget::hasChangesChanged);
-    connect(ui->emailInputField, &QnInputField::textChanged, this,
+    connect(ui->emailInputField, &InputField::textChanged, this,
         &QnUserProfileWidget::hasChangesChanged);
 
     connect(ui->changePasswordButton, &QPushButton::clicked, this, [this]()
@@ -89,7 +91,7 @@ QnUserProfileWidget::QnUserProfileWidget(QnUserSettingsModel* model, QWidget* pa
         m_newPassword = dialog->newPassword();
     });
 
-    m_aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
+    m_aligner->registerTypeAccessor<InputField>(InputField::createLabelWidthAccessor());
     m_aligner->registerTypeAccessor<QnCloudUserPanelWidget>(
         QnCloudUserPanelWidget::createIconWidthAccessor());
     m_aligner->setSkipInvisible(true);

@@ -2,18 +2,22 @@
 #include <sstream>
 #include <iomanip>
 #include <iostream>
+#include <sstream>
 #include <set>
 #include <assert.h>
+#include <string.h>
 #include <pwd.h>
 #include <grp.h>
 #include <sys/stat.h>
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <sys/types.h>
+#include <sys/statvfs.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <dirent.h>
 #include "system_commands.h"
-#include "system_commands/detail/fd_send_linux.h"
+#include "system_commands/domain_socket/detail/send_linux.h"
 
 namespace nx {
 
@@ -311,7 +315,7 @@ bool SystemCommands::rename(const std::string& oldPath, const std::string& newPa
     return true;
 }
 
-int SystemCommands::open(const std::string& path, int mode, bool usePipe)
+int SystemCommands::open(const std::string& path, int mode, bool reportViaSocket)
 {
     if (mode & O_CREAT)
     {
@@ -321,11 +325,113 @@ int SystemCommands::open(const std::string& path, int mode, bool usePipe)
     }
 
     int fd = ::open(path.c_str(), mode, 0660);
-    if (!usePipe)
-        return fd;
+    if (reportViaSocket)
+        system_commands::domain_socket::detail::sendFd(fd);;
 
-    system_commands::detail::sendFd(fd);
     return fd;
+}
+
+int64_t SystemCommands::freeSpace(const std::string& path, bool reportViaSocket)
+{
+    struct statvfs64 stat;
+    int64_t result = -1;
+
+    if (statvfs64(path.c_str(), &stat) == 0)
+        result = stat.f_bavail * (int64_t) stat.f_bsize;
+
+    if (reportViaSocket)
+        system_commands::domain_socket::detail::sendInt64(result);
+
+    return result;
+}
+
+int64_t SystemCommands::totalSpace(const std::string& path, bool reportViaSocket)
+{
+    struct statvfs64 stat;
+    int64_t result = -1;
+
+    if (statvfs64(path.c_str(), &stat) == 0)
+        result = stat.f_blocks * (int64_t) stat.f_frsize;
+
+    if (reportViaSocket)
+        system_commands::domain_socket::detail::sendInt64(result);
+
+    return result;
+}
+
+bool SystemCommands::isPathExists(const std::string& path, bool reportViaSocket)
+{
+    struct stat buf;
+    bool result = stat(path.c_str(), &buf) == 0;
+
+    if (reportViaSocket)
+        system_commands::domain_socket::detail::sendInt64((int64_t) result);
+
+    return result;
+}
+
+std::string SystemCommands::serializedFileList(const std::string& path, bool reportViaSocket)
+{
+    DIR *dir = opendir(path.c_str());
+    struct dirent *entry;
+    struct stat statBuf;
+    std::stringstream out;
+    char pathBuf[2048];
+    ssize_t pathBufLen;
+
+    if (!dir)
+    {
+        if (reportViaSocket)
+            system_commands::domain_socket::detail::sendBuffer("", 1);
+
+        return "";
+    }
+
+    while ((entry = readdir(dir)) != NULL)
+    {
+        if (strcmp(entry->d_name, "..") == 0 || strcmp(entry->d_name, ".") == 0)
+            continue;
+
+        strncpy(pathBuf, path.c_str(), sizeof(pathBuf));
+        pathBufLen = strlen(pathBuf);
+        if (pathBufLen > 0 && pathBufLen < (ssize_t) sizeof(pathBuf)
+            && pathBuf[pathBufLen - 1] != '/')
+        {
+            strcat(pathBuf, "/");
+            pathBufLen += 1;
+        }
+
+        strncpy(pathBuf + pathBufLen, entry->d_name,
+            std::max<int>((ssize_t) sizeof(pathBuf) - pathBufLen, 0));
+
+        if (stat(pathBuf, &statBuf) != 0)
+            continue;
+
+        out << pathBuf << "," << (S_ISDIR(statBuf.st_mode) ? statBuf.st_size : 0) << ","
+            << S_ISDIR(statBuf.st_mode) << ",";
+    }
+
+    closedir(dir);
+
+    std::string result = out.str();
+    if (reportViaSocket)
+        system_commands::domain_socket::detail::sendBuffer(result.data(), result.size() + 1);
+
+    return result;
+}
+
+int64_t SystemCommands::fileSize(const std::string& path, bool reportViaSocket)
+{
+    struct stat buf;
+    int64_t result = -1;
+
+    if (stat(path.c_str(), &buf) == 0)
+        result = buf.st_size;
+
+    if (reportViaSocket)
+        system_commands::domain_socket::detail::sendInt64(result);
+
+    return result;
 }
 
 bool SystemCommands::install(const std::string& debPackage)

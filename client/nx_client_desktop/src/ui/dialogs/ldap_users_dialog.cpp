@@ -26,6 +26,8 @@
 #include <utils/common/ldap.h>
 #include <common/common_module.h>
 
+using namespace nx::client::desktop;
+
 namespace {
 
 // TODO: #GDM move timeout constant to more common module
@@ -33,7 +35,7 @@ static const int testLdapTimeoutMSec = 30 * 1000; //ec2::RESPONSE_WAIT_TIMEOUT_M
 
 static const int kUpdateFilterDelayMs = 200;
 
-}
+} // namespace
 
 QnLdapUsersDialog::QnLdapUsersDialog(QWidget* parent):
     base_type(parent),
@@ -367,7 +369,7 @@ void QnLdapUsersDialog::setupUsersTable(const QnLdapUsers& filteredUsers)
     sortModel->setFilterKeyColumn(-1);
 
     ui->filterLineEdit->setTextChangedSignalFilterMs(kUpdateFilterDelayMs);
-    connect(ui->filterLineEdit, &QnSearchLineEdit::textChanged, this,
+    connect(ui->filterLineEdit, &SearchLineEdit::textChanged, this,
         [sortModel](const QString &text)
         {
             sortModel->setFilterWildcard(text);

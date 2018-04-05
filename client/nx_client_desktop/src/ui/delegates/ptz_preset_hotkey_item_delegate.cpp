@@ -2,8 +2,11 @@
 
 #include <QtCore/QEvent>
 
-#include <ui/widgets/common/char_combo_box.h>
 #include <ui/models/ptz_manage_model.h>
+
+#include <nx/client/desktop/common/widgets/char_combo_box.h>
+
+using namespace nx::client::desktop;
 
 // -------------------------------------------------------------------------- //
 // QnComboBoxContainerEventFilter
@@ -41,7 +44,7 @@ QnPtzPresetHotkeyItemDelegate::~QnPtzPresetHotkeyItemDelegate() {
 }
 
 QWidget *QnPtzPresetHotkeyItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &, const QModelIndex &) const {
-    QnCharComboBox *result = new QnCharComboBox(parent);
+    CharComboBox *result = new CharComboBox(parent);
 
     result->addItem(tr("None"), -1);
     for(int i = 1; i <= 9; i++)
@@ -66,7 +69,7 @@ QWidget *QnPtzPresetHotkeyItemDelegate::createEditor(QWidget *parent, const QSty
 }
 
 void QnPtzPresetHotkeyItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const {
-    QnCharComboBox *comboBox = dynamic_cast<QnCharComboBox *>(editor);
+    CharComboBox *comboBox = dynamic_cast<CharComboBox *>(editor);
     if(!comboBox)
         return;
 
@@ -86,7 +89,7 @@ void QnPtzPresetHotkeyItemDelegate::setModelData(
     if(!model)
         return;
 
-    QnCharComboBox* const comboBox = qobject_cast<QnCharComboBox*>(editor);
+    CharComboBox* const comboBox = qobject_cast<CharComboBox*>(editor);
     if(!comboBox)
         return;
 

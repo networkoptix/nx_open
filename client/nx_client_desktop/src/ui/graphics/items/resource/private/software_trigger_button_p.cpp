@@ -13,13 +13,13 @@
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
 #include <ui/style/software_trigger_pixmaps.h>
-#include <ui/widgets/common/busy_indicator.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
-#include <nx/client/core/utils/geometry.h>
-
 #include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_painter_rollback.h>
+
+#include <nx/client/core/utils/geometry.h>
+#include <nx/client/desktop/common/widgets/busy_indicator.h>
 
 namespace {
 
@@ -342,7 +342,7 @@ void SoftwareTriggerButtonPrivate::setState(SoftwareTriggerButton::State state)
                 [this]()
                 {
                     Q_Q(SoftwareTriggerButton);
-                    m_busyIndicator.reset(new QnBusyIndicatorGraphicsWidget(q));
+                    m_busyIndicator.reset(new BusyIndicatorGraphicsWidget(q));
                     m_busyIndicator->setPreferredSize(q->size());
                     m_busyIndicator->dots()->setDotRadius(kBusyIndicatorDotRadius);
                     m_busyIndicator->dots()->setDotSpacing(kBusyIndicatorDotSpacing);

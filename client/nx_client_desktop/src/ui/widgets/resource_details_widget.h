@@ -2,19 +2,19 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <ui/widgets/common/panel.h>
+#include <nx/client/desktop/common/widgets/panel.h>
 
 #include <utils/common/connective.h>
 
 class QLabel;
-class QnTextEditLabel;
 class QnCameraThumbnailManager;
-namespace nx { namespace client { namespace desktop { class AsyncImageWidget; } } }
+namespace nx { namespace client { namespace desktop { class AsyncImageWidget; }}}
+namespace nx { namespace client { namespace desktop { class TextEditLabel; }}}
 
-class QnResourceDetailsWidget : public Connective<QnPanel>
+class QnResourceDetailsWidget: public Connective<nx::client::desktop::Panel>
 {
     Q_OBJECT
-    typedef Connective<QnPanel> base_type;
+    using base_type = Connective<nx::client::desktop::Panel>;
 
 public:
     explicit QnResourceDetailsWidget(QWidget* parent = nullptr);
@@ -32,6 +32,6 @@ public:
 private:
     QScopedPointer<QnCameraThumbnailManager> m_thumbnailManager;
     nx::client::desktop::AsyncImageWidget* m_preview;
-    QnTextEditLabel* m_nameTextEdit;
+    nx::client::desktop::TextEditLabel* m_nameTextEdit;
     QLabel* m_descriptionLabel;
 };

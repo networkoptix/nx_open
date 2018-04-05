@@ -21,13 +21,13 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QnPanel" name="panelWidget" native="true">
+    <widget class="nx::client::desktop::Panel" name="panelWidget" native="true">
      <layout class="QGridLayout" name="gridLayout">
       <item row="0" column="0">
        <widget class="QnDateRangeWidget" name="dateRangeWidget" native="true"/>
       </item>
       <item row="0" column="1">
-       <widget class="QnSearchLineEdit" name="filterLineEdit" native="true">
+       <widget class="nx::client::desktop::SearchLineEdit" name="filterLineEdit" native="true">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
           <horstretch>0</horstretch>
@@ -697,15 +697,15 @@
    <header location="global">ui/widgets/common/table_view.h</header>
   </customwidget>
   <customwidget>
-   <class>QnSearchLineEdit</class>
+   <class>nx::client::desktop::SearchLineEdit</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/search_line_edit.h</header>
+   <header location="global">nx/client/desktop/common/widgets/search_line_edit.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QnPanel</class>
+   <class>nx::client::desktop::Panel</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/panel.h</header>
+   <header location="global">nx/client/desktop/common/widgets/panel.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

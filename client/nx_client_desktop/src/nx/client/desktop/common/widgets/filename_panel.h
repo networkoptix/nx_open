@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ui/widgets/common/panel.h>
+#include <nx/client/desktop/common/widgets/panel.h>
 
 #include <nx/client/desktop/common/utils/filesystem.h>
 
@@ -12,10 +12,10 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-class FilenamePanel: public QnPanel
+class FilenamePanel: public Panel
 {
     Q_OBJECT
-    using base_type = QnPanel;
+    using base_type = Panel;
 
 public:
     explicit FilenamePanel(QWidget *parent = 0);

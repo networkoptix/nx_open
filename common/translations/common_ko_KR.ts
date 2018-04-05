@@ -87,8 +87,9 @@
       <translation>발견 된 시스템 %1이 (가) 현재 시스템과 호환되지 않습니다.</translation>
     </message>
     <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <translation>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</translation>
+      <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 System can only be merged with non-%1. System name and password are taken from %1 System.</translation>
     </message>
   </context>
   <context>

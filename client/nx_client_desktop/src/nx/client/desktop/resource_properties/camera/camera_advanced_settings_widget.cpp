@@ -24,7 +24,7 @@
 
 #include <vms_gateway_embeddable.h>
 
-#include <nx/client/desktop/ui/common/clipboard_button.h>
+#include <nx/client/desktop/common/widgets/clipboard_button.h>
 
 #include "camera_advanced_settings_web_page.h"
 
@@ -40,8 +40,6 @@ bool isStatusValid(Qn::ResourceStatus status)
 namespace nx {
 namespace client {
 namespace desktop {
-
-using namespace ui;
 
 CameraAdvancedSettingsWidget::CameraAdvancedSettingsWidget(QWidget* parent /* = 0*/):
     base_type(parent),
@@ -67,7 +65,7 @@ CameraAdvancedSettingsWidget::CameraAdvancedSettingsWidget(QWidget* parent /* = 
     ClipboardButton::createInline(secondaryLineEdit, ClipboardButton::StandardType::copy);
 
     QnAligner* aligner = new QnAligner(this);
-    aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
+    aligner->registerTypeAccessor<InputField>(InputField::createLabelWidthAccessor());
     aligner->addWidgets({
         ui->cameraIdInputField,
         ui->primaryStreamUrlInputField,

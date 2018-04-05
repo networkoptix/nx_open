@@ -12,16 +12,13 @@
 #include <ui/models/storage_model_info.h>
 
 struct QnStorageStatusReply;
-class QnBusyIndicatorButton;
+namespace nx { namespace client { namespace desktop { class BusyIndicatorButton; }}}
+namespace Ui { class StorageUrlDialog; }
 
-namespace Ui {
-    class StorageUrlDialog;
-}
-
-class QnStorageUrlDialog: public QnSessionAwareButtonBoxDialog {
+class QnStorageUrlDialog: public QnSessionAwareButtonBoxDialog
+{
     Q_OBJECT
-
-    typedef QnSessionAwareButtonBoxDialog base_type;
+    using base_type = QnSessionAwareButtonBoxDialog;
 
 public:
     QnStorageUrlDialog(const QnMediaServerResourcePtr& server, QWidget* parent = nullptr, Qt::WindowFlags windowFlags = 0);
@@ -72,7 +69,7 @@ private:
     QString m_lastProtocol;
     QnStorageModelInfo m_storage;
     QnStorageModelInfoList m_currentServerStorages;
-    QnBusyIndicatorButton* m_okButton;
+    nx::client::desktop::BusyIndicatorButton* const m_okButton = nullptr;
 };
 
 #endif // QN_STORAGE_URL_DIALOG_H

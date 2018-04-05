@@ -155,7 +155,7 @@ bool CloudStreamSocket::connect(
 
     connectAsync(
         remoteAddress,
-        [this, &promise](SystemError::ErrorCode code)
+        [this](SystemError::ErrorCode code)
         {
             // We use post to ensure that socket is not used by aio sub-system anymore.
             m_writeIoBinder.post(

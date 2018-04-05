@@ -4,10 +4,9 @@ import logging
 import uuid
 
 from framework.rest_api import RestApi
-from .os_access import SshAccessConfig
 from .server import Server
-from .service import AdHocService
 from .server_installation import MEDIASERVER_CONFIG_PATH, MEDIASERVER_CONFIG_PATH_INITIAL, ServerInstallation
+from .service import AdHocService
 from .template_renderer import TemplateRenderer
 from .utils import is_list_inst
 
@@ -28,7 +27,7 @@ class PhysicalInstallationHostConfig(object):
         if hostname == 'localhost':
             location = None
         else:
-            location = SshAccessConfig.from_dict(d)
+            raise NotImplementedError()
         root_dir = d.get('dir')
         assert root_dir, '"dir" is required parameter for "hosts" elements'
         limit = d.get('limit')

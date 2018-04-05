@@ -9,14 +9,11 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include <utils/common/connective.h>
 
-namespace Ui
-{
-    class UserSettingsWidget;
-}
+namespace Ui { class UserSettingsWidget; }
+namespace nx { namespace client { namespace desktop { class InputField; }}}
 
 class QnUserSettingsModel;
 class QnUserRolesModel;
-class QnInputField;
 class QnAligner;
 
 class QnUserSettingsWidget : public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware
@@ -43,11 +40,10 @@ signals:
 
 private:
     void setupInputFields();
-    QList<QnInputField*> inputFields() const;
-    QList<QnInputField*> localInputFields() const;
-    QList<QnInputField*> cloudInputFields() const;
-
-    QList<QnInputField*> relevantInputFields() const;
+    QList<nx::client::desktop::InputField*> inputFields() const;
+    QList<nx::client::desktop::InputField*> localInputFields() const;
+    QList<nx::client::desktop::InputField*> cloudInputFields() const;
+    QList<nx::client::desktop::InputField*> relevantInputFields() const;
 
     QString passwordPlaceholder() const;
     void updatePasswordPlaceholders();
@@ -61,8 +57,8 @@ private:
     QScopedPointer<Ui::UserSettingsWidget> ui;
     QnUserSettingsModel* const m_model;
     QnUserRolesModel* const m_rolesModel;
-    QList<QnInputField*> m_localInputFields;
-    QList<QnInputField*> m_cloudInputFields;
+    QList<nx::client::desktop::InputField*> m_localInputFields;
+    QList<nx::client::desktop::InputField*> m_cloudInputFields;
     QnAligner* const m_aligner;
     int m_lastUserTypeIndex;
 };

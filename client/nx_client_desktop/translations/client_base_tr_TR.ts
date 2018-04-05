@@ -3297,10 +3297,6 @@ to %1</source>
       <translation>Bağlantıyı kes</translation>
     </message>
     <message>
-      <source>All cloud users will be deleted.</source>
-      <translation>Tüm Cloud kullanıcılar silinecek.</translation>
-    </message>
-    <message>
       <source>Failed to disconnect System from %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>%1 den bağlantı kesilemedi</translation>
@@ -3318,6 +3314,11 @@ to %1</source>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>%1 hesabı ile bu sistemden bağlantınızı keserseniz tekrar %1 hesabı ile bağlanamayabilirsiniz.</translation>
+    </message>
+    <message>
+      <source>All %1 users will be deleted.</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">All %1 users will be deleted.</translation>
     </message>
   </context>
   <context>
@@ -6844,16 +6845,17 @@ to %1</source>
       <translation>Yerel kullanıcı</translation>
     </message>
     <message>
-      <source>Cloud user</source>
-      <translation>Bulut kullanıcısı</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>Giriş</translation>
     </message>
     <message>
       <source>Role</source>
       <translation>Yetki</translation>
+    </message>
+    <message>
+      <source>%1 user</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 user</translation>
     </message>
   </context>
   <context>
@@ -7048,10 +7050,6 @@ to %1</source>
       <translation>Yerel</translation>
     </message>
     <message>
-      <source>Cloud</source>
-      <translation>Bulut</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>Giriş</translation>
     </message>
@@ -7092,8 +7090,9 @@ to %1</source>
       <translation>Parolalar eşleşmiyor.</translation>
     </message>
     <message>
-      <source>Cloud user with specified email already exists.</source>
-      <translation>Bu isimde zaten bir bulut kullanıcı var.</translation>
+      <source>%1 user with specified email already exists.</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 user with specified email already exists.</translation>
     </message>
   </context>
   <context>
@@ -7316,10 +7315,6 @@ to %1</source>
       <translation>Toplam lisans miktarını azalacaktır</translation>
     </message>
     <message>
-      <source>Cloud Systems cannot be merged</source>
-      <translation>Bulut sistemler birleştirilemez</translation>
-    </message>
-    <message>
       <source>Connecting to the current System...</source>
       <translation>Mevcut Sisteme Bağlanıyor...</translation>
     </message>
@@ -7338,6 +7333,11 @@ to %1</source>
     <message>
       <source>Administrator password</source>
       <translation>Yönetici parolası</translation>
+    </message>
+    <message>
+      <source>%1 Systems cannot be merged</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 Systems cannot be merged</translation>
     </message>
   </context>
   <context>

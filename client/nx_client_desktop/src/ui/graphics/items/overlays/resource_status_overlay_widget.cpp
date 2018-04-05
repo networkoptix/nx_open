@@ -6,19 +6,19 @@
 #include <QtWidgets/QGraphicsLinearLayout>
 #include <QtWidgets/QPushButton>
 
-#include <nx/client/desktop/ui/common/painter_transform_scale_stripper.h>
 #include <ui/style/nx_style.h>
 #include <ui/graphics/items/standard/graphics_label.h>
 #include <ui/graphics/items/generic/masked_proxy_widget.h>
 #include <ui/common/palette.h>
 #include <ui/widgets/word_wrapped_label.h>
-#include <ui/widgets/common/busy_indicator.h>
-
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/instruments/transform_listener_instrument.h>
 #include <utils/math/color_transformations.h>
 
-using namespace nx::client::desktop::ui;
+#include <nx/client/desktop/common/utils/painter_transform_scale_stripper.h>
+#include <nx/client/desktop/common/widgets/busy_indicator.h>
+
+using namespace nx::client::desktop;
 
 namespace {
 
@@ -210,7 +210,7 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget* parent):
     m_extrasHolder(new QnViewportBoundWidget(this)),
     m_centralContainer(new QWidget()),
     m_extrasContainer(new QWidget()),
-    m_preloader(new QnBusyIndicatorGraphicsWidget()),
+    m_preloader(new BusyIndicatorGraphicsWidget()),
     m_imageItem(new QGraphicsPixmapItem(this)),
     m_centralAreaImage(new QLabel()),
     m_caption(new QLabel()),

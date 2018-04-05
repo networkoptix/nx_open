@@ -3265,10 +3265,6 @@ to %1</source>
       <translation>연결 해제</translation>
     </message>
     <message>
-      <source>All cloud users will be deleted.</source>
-      <translation>모든 클라우드 사용자 삭제 됩니다.</translation>
-    </message>
-    <message>
       <source>Failed to disconnect System from %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>%1에서 시스템을 분리 하지 못했습니다.</translation>
@@ -3286,6 +3282,11 @@ to %1</source>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</translation>
+    </message>
+    <message>
+      <source>All %1 users will be deleted.</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">All %1 users will be deleted.</translation>
     </message>
   </context>
   <context>
@@ -6770,16 +6771,17 @@ to %1</source>
       <translation>로컬 사용자</translation>
     </message>
     <message>
-      <source>Cloud user</source>
-      <translation>클라우드 사용자</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>로그인</translation>
     </message>
     <message>
       <source>Role</source>
       <translation>역할</translation>
+    </message>
+    <message>
+      <source>%1 user</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 user</translation>
     </message>
   </context>
   <context>
@@ -6973,10 +6975,6 @@ to %1</source>
       <translation>내부</translation>
     </message>
     <message>
-      <source>Cloud</source>
-      <translation>클라우드</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>로그인</translation>
     </message>
@@ -7017,8 +7015,9 @@ to %1</source>
       <translation>비밀번호가 일치하지 않습니다.</translation>
     </message>
     <message>
-      <source>Cloud user with specified email already exists.</source>
-      <translation>지정 된 이메일 주소를 가진 클라우드 사용자는 이미 존재합니다.</translation>
+      <source>%1 user with specified email already exists.</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 user with specified email already exists.</translation>
     </message>
   </context>
   <context>
@@ -7239,10 +7238,6 @@ to %1</source>
       <translation>총 라이센스 수량은 줄어듭니다.</translation>
     </message>
     <message>
-      <source>Cloud Systems cannot be merged</source>
-      <translation>클라우드 시스템을 병합할 수 없습니다.</translation>
-    </message>
-    <message>
       <source>Connecting to the current System...</source>
       <translation>현재 시스템에 연결 중...</translation>
     </message>
@@ -7261,6 +7256,11 @@ to %1</source>
     <message>
       <source>Administrator password</source>
       <translation>관리자 암호</translation>
+    </message>
+    <message>
+      <source>%1 Systems cannot be merged</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 Systems cannot be merged</translation>
     </message>
   </context>
   <context>

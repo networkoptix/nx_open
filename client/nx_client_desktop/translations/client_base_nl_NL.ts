@@ -3297,10 +3297,6 @@ to %1</source>
       <translation>Verbinding verbreken</translation>
     </message>
     <message>
-      <source>All cloud users will be deleted.</source>
-      <translation>Alle cloud gebruikers zullen worden verwijderd.</translation>
-    </message>
-    <message>
       <source>Failed to disconnect System from %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>Kon het verbinding met het systeem niet verbreken vanaf %1</translation>
@@ -3318,6 +3314,11 @@ to %1</source>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>U kunt niet verbinden met dit systeem met uw %1 account nadat u dit systeem hebt verbroken van %1.</translation>
+    </message>
+    <message>
+      <source>All %1 users will be deleted.</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">All %1 users will be deleted.</translation>
     </message>
   </context>
   <context>
@@ -6845,16 +6846,17 @@ to %1</source>
       <translation>Lokale gebruiker</translation>
     </message>
     <message>
-      <source>Cloud user</source>
-      <translation>Cloud gebruiker</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>Login</translation>
     </message>
     <message>
       <source>Role</source>
       <translation>Profiel</translation>
+    </message>
+    <message>
+      <source>%1 user</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 user</translation>
     </message>
   </context>
   <context>
@@ -7049,10 +7051,6 @@ to %1</source>
       <translation>Lokaal</translation>
     </message>
     <message>
-      <source>Cloud</source>
-      <translation>Cloud</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>Login</translation>
     </message>
@@ -7093,8 +7091,9 @@ to %1</source>
       <translation>Wachtwoorden komen niet overeen.</translation>
     </message>
     <message>
-      <source>Cloud user with specified email already exists.</source>
-      <translation>Cloud gebruiker met dit e-mailadres bestaat al.</translation>
+      <source>%1 user with specified email already exists.</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 user with specified email already exists.</translation>
     </message>
   </context>
   <context>
@@ -7317,10 +7316,6 @@ to %1</source>
       <translation>Totaal aantal licenties zal afnemen</translation>
     </message>
     <message>
-      <source>Cloud Systems cannot be merged</source>
-      <translation>Cloud systemen kunnen niet worden samengevoegd</translation>
-    </message>
-    <message>
       <source>Connecting to the current System...</source>
       <translation>Verbinding maken met het huidige systeem...</translation>
     </message>
@@ -7339,6 +7334,11 @@ to %1</source>
     <message>
       <source>Administrator password</source>
       <translation>Admin wachtwoord</translation>
+    </message>
+    <message>
+      <source>%1 Systems cannot be merged</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 Systems cannot be merged</translation>
     </message>
   </context>
   <context>

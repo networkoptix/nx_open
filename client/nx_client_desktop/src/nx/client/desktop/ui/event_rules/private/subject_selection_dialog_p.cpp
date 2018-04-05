@@ -42,14 +42,14 @@ SubjectSelectionDialog::RoleListModel::RoleListModel(QObject* parent):
     setPredefinedRoleIdsEnabled(true);
 }
 
-void SubjectSelectionDialog::RoleListModel::setRoleValidator(Qn::RoleValidator roleValidator)
+void SubjectSelectionDialog::RoleListModel::setRoleValidator(RoleValidator roleValidator)
 {
     m_roleValidator = roleValidator;
     m_validationStates.clear();
     emitDataChanged();
 }
 
-void SubjectSelectionDialog::RoleListModel::setUserValidator(Qn::UserValidator userValidator)
+void SubjectSelectionDialog::RoleListModel::setUserValidator(UserValidator userValidator)
 {
     m_userValidator = userValidator;
     if (!m_roleValidator)
@@ -336,7 +336,7 @@ QnUserResourcePtr SubjectSelectionDialog::UserListModel::getUser(const QModelInd
         .data(Qn::ResourceRole).value<QnResourcePtr>().dynamicCast<QnUserResource>();
 }
 
-void SubjectSelectionDialog::UserListModel::setUserValidator(Qn::UserValidator userValidator)
+void SubjectSelectionDialog::UserListModel::setUserValidator(UserValidator userValidator)
 {
     m_userValidator = userValidator;
     columnsChanged(0, columnCount() - 1);

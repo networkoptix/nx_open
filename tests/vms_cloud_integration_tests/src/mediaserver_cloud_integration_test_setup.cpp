@@ -19,7 +19,6 @@ using namespace nx::cdb;
 MediaServerCloudIntegrationTest::MediaServerCloudIntegrationTest():
     m_defaultOwnerCredentials({ "admin", "admin" })
 {
-    init();
 }
 
 MediaServerCloudIntegrationTest::~MediaServerCloudIntegrationTest()
@@ -259,7 +258,7 @@ void MediaServerCloudIntegrationTest::waitForUserToAppearInCloud(const std::stri
     }
 }
 
-void MediaServerCloudIntegrationTest::init()
+void MediaServerCloudIntegrationTest::SetUp()
 {
     ASSERT_TRUE(startCloudDB());
     ASSERT_TRUE(startMediaServer());

@@ -57,9 +57,9 @@
 #include <nx/client/desktop/license/license_helpers.h>
 #include <nx/client/desktop/ui/dialogs/license_deactivation_reason.h>
 
-#include <nx/client/desktop/ui/common/clipboard_button.h>
+#include <nx/client/desktop/common/widgets/clipboard_button.h>
 
-using namespace nx::client::desktop::ui;
+using namespace nx::client::desktop;
 
 namespace {
 

@@ -16,7 +16,7 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <nx/utils/string.h>
 
-#include <nx/client/desktop/ui/common/item_view_utils.h>
+#include <nx/client/desktop/common/utils/item_view_utils.h>
 #include <nx/client/desktop/common/models/natural_string_sort_proxy_model.h>
 
 namespace nx {
@@ -111,9 +111,9 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
             ui->allUsersCheckableLine->setVisible(m_allUsersSelectorEnabled && filter.isEmpty());
         };
 
-    connect(ui->searchLineEdit, &QnSearchLineEdit::textChanged, this, updateFilter);
-    connect(ui->searchLineEdit, &QnSearchLineEdit::enterKeyPressed, this, updateFilter);
-    connect(ui->searchLineEdit, &QnSearchLineEdit::escKeyPressed, this,
+    connect(ui->searchLineEdit, &SearchLineEdit::textChanged, this, updateFilter);
+    connect(ui->searchLineEdit, &SearchLineEdit::enterKeyPressed, this, updateFilter);
+    connect(ui->searchLineEdit, &SearchLineEdit::escKeyPressed, this,
         [this, updateFilter]()
         {
             ui->searchLineEdit->clear();
@@ -216,14 +216,14 @@ void SubjectSelectionDialog::showAllUsersChanged(bool value)
     layout()->activate();
 }
 
-void SubjectSelectionDialog::setUserValidator(Qn::UserValidator userValidator)
+void SubjectSelectionDialog::setUserValidator(UserValidator userValidator)
 {
     m_users->setUserValidator(userValidator);
     m_roles->setUserValidator(userValidator);
     validateAllUsers();
 }
 
-void SubjectSelectionDialog::setRoleValidator(Qn::RoleValidator roleValidator)
+void SubjectSelectionDialog::setRoleValidator(RoleValidator roleValidator)
 {
     m_roles->setRoleValidator(roleValidator);
 }

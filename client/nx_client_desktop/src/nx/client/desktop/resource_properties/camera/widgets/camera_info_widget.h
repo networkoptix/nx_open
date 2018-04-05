@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ui/widgets/common/panel.h>
+#include <nx/client/desktop/common/widgets/panel.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 
 namespace Ui { class CameraInfoWidget; }
@@ -12,10 +12,10 @@ namespace desktop {
 struct CameraSettingsDialogState;
 class CameraSettingsDialogStore;
 
-class CameraInfoWidget: public QnPanel
+class CameraInfoWidget: public Panel
 {
     Q_OBJECT
-    using base_type = QnPanel;
+    using base_type = Panel;
 
 public:
     explicit CameraInfoWidget(QWidget* parent = nullptr);
