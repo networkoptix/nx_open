@@ -93,15 +93,12 @@ function openResourcesScreen(systemName)
 function openVideoScreen(resourceId, screenshotUrl, xHint, yHint)
 {
     stackView.setScaleTransitionHint(xHint, yHint)
-    var operation = stackView.busy ? Controls.StackView.Immediate : Controls.StackView.Transition
     var item = stackView.safePush(
         Qt.resolvedUrl("Screens/VideoScreen.qml"),
         {
             "resourceId": resourceId,
             "initialScreenshot": screenshotUrl
-        },
-        operation
-    )
+        })
     return item
 }
 
@@ -120,9 +117,14 @@ function openCloudWelcomeScreen()
     stackView.safeReplace(null, Qt.resolvedUrl("Screens/Cloud/WelcomeScreen.qml"))
 }
 
-function openCloudScreen()
+function openCloudScreen(user, password, forceLoginScreen)
 {
-    stackView.safePush(Qt.resolvedUrl("Screens/Cloud/CloudScreen.qml"))
+    stackView.safePush(Qt.resolvedUrl("Screens/Cloud/CloudScreen.qml"),
+        {
+            "targetEmail": user,
+            "targetPassword": password,
+            "forceLoginScreen": forceLoginScreen
+        })
 }
 
 function openLiteClientControlScreen(clientId)

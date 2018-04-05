@@ -17,6 +17,10 @@ Page
     title: qsTr("Cloud Account")
     onLeftButtonClicked: Workflow.popCurrentScreen()
 
+    property string targetEmail
+    property string targetPassword
+    property bool forceLoginScreen: false
+
     Flickable
     {
         id: flickable
@@ -57,10 +61,17 @@ Page
 
     Component.onCompleted:
     {
-        content.sourceComponent =
+        var showSummary = !cloudScreen.forceLoginScreen &&
             (cloudStatusWatcher.status == QnCloudStatusWatcher.Online
-                || cloudStatusWatcher.status == QnCloudStatusWatcher.Offline)
-                ? summaryComponent
-                : credentialsComponent;
+            || cloudStatusWatcher.status == QnCloudStatusWatcher.Offline)
+
+        cloudScreen.forceLoginScreen = false;
+        content.sourceComponent = showSummary ? summaryComponent : credentialsComponent;
+        if (showSummary)
+            return
+
+        content.item.email = cloudScreen.targetEmail
+        content.item.password = cloudScreen.targetPassword
+        content.item.focusCredentialFields()
     }
 }

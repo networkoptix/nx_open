@@ -11,15 +11,86 @@
 
 using nx::vms::utils::SystemUri;
 
+struct QnMobileClientUriHandler::Private
+{
+    void handleLogInToCloudCommand(const SystemUri& uri);
+    void handleClientCommand(const SystemUri& uri);
+
+    QPointer<QnMobileClientUiController> uiController;
+};
+
+void QnMobileClientUriHandler::Private::handleLogInToCloudCommand(const SystemUri& uri)
+{
+    if (!uiController || uri.clientCommand() != SystemUri::ClientCommand::LoginToCloud)
+        return;
+
+    const auto user = uri.authenticator().user;
+    const auto password = uri.authenticator().password;
+    if (!user.isEmpty() && !password.isEmpty())
+    {
+        uiController->disconnectFromSystem();
+        qnCloudStatusWatcher->setCredentials(QnEncodedCredentials(user, password));
+        return;
+    }
+
+    if (user.isEmpty())
+    {
+        if (!password.isEmpty())
+        {
+            NX_EXPECT(false, "We dont support password without user");
+        }
+        else if (qnCloudStatusWatcher->status() == QnCloudStatusWatcher::LoggedOut)
+        {
+            uiController->disconnectFromSystem();
+            uiController->openLoginToCloudScreen(user, password);
+        }
+        return;
+    }
+
+    if (user == qnCloudStatusWatcher->credentials().user)
+        return; // We logged in already.
+
+    // We don't reset current cloud credentials to give user opportunity to cancel requested
+    // login to cloud action.
+    uiController->disconnectFromSystem();
+    uiController->openLoginToCloudScreen(user, password);
+}
+
+void QnMobileClientUriHandler::Private::handleClientCommand(const SystemUri& uri)
+{
+    if (!uiController || uri.systemId().isEmpty()
+        || uri.clientCommand() != SystemUri::ClientCommand::Client)
+    {
+        return;
+    }
+
+    uiController->disconnectFromSystem();
+    if (!uri.authenticator().user.isEmpty() && !uri.authenticator().password.isEmpty())
+    {
+        qnCloudStatusWatcher->setCredentials(QnEncodedCredentials(
+            uri.authenticator().user, uri.authenticator().password));
+    }
+
+    const auto url = uri.connectionUrl();
+    if (url.isValid())
+        uiController->connectToSystem(url);
+}
+
+//-------------------------------------------------------------------------------------------------
+
 QnMobileClientUriHandler::QnMobileClientUriHandler(QObject* parent) :
     QObject(parent),
-    m_uiController(nullptr)
+    d(new Private())
+{
+}
+
+QnMobileClientUriHandler::~QnMobileClientUriHandler()
 {
 }
 
 void QnMobileClientUriHandler::setUiController(QnMobileClientUiController* uiController)
 {
-    m_uiController = uiController;
+    d->uiController = uiController;
 }
 
 QStringList QnMobileClientUriHandler::supportedSchemes()
@@ -77,28 +148,10 @@ void QnMobileClientUriHandler::handleUrl(const nx::utils::Url& url)
         case SystemUri::ClientCommand::None:
             break;
         case SystemUri::ClientCommand::Client:
-            if (m_uiController && !uri.systemId().isEmpty())
-            {
-                m_uiController->disconnectFromSystem();
-
-                if (!uri.authenticator().user.isEmpty() && !uri.authenticator().password.isEmpty())
-                {
-                    qnCloudStatusWatcher->setCredentials(QnEncodedCredentials(
-                        uri.authenticator().user, uri.authenticator().password));
-                }
-
-                const auto url = uri.connectionUrl();
-                if (url.isValid())
-                    m_uiController->connectToSystem(url);
-            }
+            d->handleClientCommand(uri);
             break;
         case SystemUri::ClientCommand::LoginToCloud:
-            if (m_uiController)
-            {
-                m_uiController->disconnectFromSystem();
-                qnCloudStatusWatcher->setCredentials(QnEncodedCredentials(
-                    uri.authenticator().user, uri.authenticator().password));
-            }
+            d->handleLogInToCloudCommand(uri);
             break;
         case SystemUri::ClientCommand::OpenOnPortal:
             break;

@@ -11,6 +11,7 @@ class QnMobileClientUriHandler : public QObject
 
 public:
     explicit QnMobileClientUriHandler(QObject* parent = nullptr);
+    virtual ~QnMobileClientUriHandler() override;
 
     void setUiController(QnMobileClientUiController* uiController);
 
@@ -21,5 +22,6 @@ public slots:
     void handleUrl(const nx::utils::Url& url);
 
 private:
-    QPointer<QnMobileClientUiController> m_uiController;
+    struct Private;
+    const QScopedPointer<Private> d;
 };

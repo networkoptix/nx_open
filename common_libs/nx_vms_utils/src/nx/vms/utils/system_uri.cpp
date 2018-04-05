@@ -273,16 +273,18 @@ public:
 private:
     bool isValidGenericUri() const
     {
-        bool hasDomain = !domain.isEmpty();
-        bool hasAuth = !authenticator.user.isEmpty() && !authenticator.password.isEmpty();
-        bool hasSystemId = !systemId.isEmpty();
+        const bool hasDomain = !domain.isEmpty();
+        const bool hasAuth = !authenticator.user.isEmpty() && !authenticator.password.isEmpty();
+        const bool hasSystemId = !systemId.isEmpty();
+        const bool hasOnlyPassword =
+            authenticator.user.isEmpty() && !authenticator.password.isEmpty();
 
         switch (clientCommand)
         {
             case SystemUri::ClientCommand::Client:
                 return hasDomain && (hasSystemId ? hasAuth && isValidSystemId() : !hasAuth );
             case SystemUri::ClientCommand::LoginToCloud:
-                return hasDomain && hasAuth;
+                return hasDomain && !hasOnlyPassword;
             case SystemUri::ClientCommand::OpenOnPortal:
                 return hasDomain
                     && hasAuth

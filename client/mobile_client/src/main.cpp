@@ -62,6 +62,46 @@ extern "C"
 using namespace nx::mobile_client;
 using namespace std::chrono;
 
+/////
+
+
+#include <utils/common/delayed.h>
+#include <nx/network/app_info.h>
+#include <nx/vms/utils/system_uri.h>
+
+using nx::vms::utils::SystemUri;
+
+QString authString(const QString& user, const QString& password)
+{
+    return lit("auth=%1").arg(SystemUri::Auth({user, password}).encode());
+}
+
+nx::utils::Url loginToCloudUrl(
+    const QString& user = QString(),
+    const QString& password = QString())
+{
+    static const auto kBase =
+        []()
+        {
+            SystemUri result;
+            result.setDomain(nx::network::AppInfo::defaultCloudHostName());
+            result.setClientCommand(SystemUri::ClientCommand::LoginToCloud);
+            return result.toString();
+        }();
+    const auto result = lit("%1?%2").arg(kBase, authString(user, password));
+    return nx::utils::Url(result);
+}
+
+void testUrlHandler(QnMobileClientUriHandler* handler)
+{
+    const auto url = loginToCloudUrl(lit("ynikitenkov@networkoptix.com"));
+    const auto callback = [url, handler]() { handler->handleUrl(url); };
+
+    executeDelayed(callback, 5 * 1000);
+}
+
+////
+
 int runUi(QtSingleGuiApplication* application)
 {
     QScopedPointer<QnCameraThumbnailCache> thumbnailsCache(new QnCameraThumbnailCache());
@@ -82,6 +122,7 @@ int runUi(QtSingleGuiApplication* application)
 
     QScopedPointer<QnMobileClientUriHandler> uriHandler(new QnMobileClientUriHandler());
     uriHandler->setUiController(context.uiController());
+    testUrlHandler(uriHandler.data());
     for (const auto& scheme: uriHandler->supportedSchemes())
         QDesktopServices::setUrlHandler(scheme, uriHandler.data(), uriHandler->handlerMethodName());
 

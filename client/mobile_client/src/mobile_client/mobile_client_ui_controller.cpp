@@ -61,3 +61,9 @@ void QnMobileClientUiController::openVideoScreen(const QnUuid& cameraId)
 {
     emit videoScreenRequested(uuidString(cameraId));
 }
+
+void QnMobileClientUiController::openLoginToCloudScreen(
+    const QString& user, const QString& password)
+{
+    emit loginToCloudScreenRequested(user, password);
+}

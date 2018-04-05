@@ -20,8 +20,10 @@ public:
 public slots:
     void disconnectFromSystem();
     void connectToSystem(const nx::utils::Url &url);
+
     void openResourcesScreen();
     void openVideoScreen(const QnUuid& cameraId);
+    void openLoginToCloudScreen(const QString& user, const QString& password);
 
 signals:
     void connectRequested(const nx::utils::Url& url);
@@ -29,6 +31,7 @@ signals:
     void layoutIdChanged();
     void resourcesScreenRequested();
     void videoScreenRequested(const QString& cameraId);
+    void loginToCloudScreenRequested(const QString& user, const QString& password);
 
 private:
     QScopedPointer<QnMobileClientUiControllerPrivate> d_ptr;

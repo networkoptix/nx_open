@@ -254,10 +254,18 @@ Item
         notActivatedWarningPanel.opened = false
     }
 
+    function focusCredentialFields()
+    {
+        if (emailField.text.length)
+            passwordField.forceActiveFocus()
+        else
+            emailField.forceActiveFocus()
+    }
+
     Component.onCompleted:
     {
         d.initialLogin = cloudStatusWatcher.effectiveUserName
         emailField.text = d.initialLogin
-        emailField.forceActiveFocus()
+        focusCredentialFields()
     }
 }
