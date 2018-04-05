@@ -3318,7 +3318,7 @@ to %1</source>
     <message>
       <source>All %1 users will be deleted.</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">All %1 users will be deleted.</translation>
+      <translation>Alle %1benutzer werden gelöscht.</translation>
     </message>
   </context>
   <context>
@@ -6856,7 +6856,7 @@ to %1</source>
     <message>
       <source>%1 user</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">%1 user</translation>
+      <translation>%1benutzer</translation>
     </message>
   </context>
   <context>
@@ -7093,7 +7093,7 @@ to %1</source>
     <message>
       <source>%1 user with specified email already exists.</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">%1 user with specified email already exists.</translation>
+      <translation>%1benutzer mit angegebener Email existiert bereits.</translation>
     </message>
   </context>
   <context>
@@ -7338,7 +7338,7 @@ to %1</source>
     <message>
       <source>%1 Systems cannot be merged</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">%1 Systems cannot be merged</translation>
+      <translation>%1systeme können nicht zusammengeführt werden</translation>
     </message>
   </context>
   <context>

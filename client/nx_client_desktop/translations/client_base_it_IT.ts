@@ -7676,54 +7676,54 @@ to %1</translation>
     </message>
     <message numerus="yes">
       <source>Selected files are too old</source>
-      <translation type="unfinished">
-        <numerusform>Selected files are too old</numerusform>
-        <numerusform>Selected files are too old</numerusform>
+      <translation>
+        <numerusform>I file selezionati sono troppo vecchi</numerusform>
+        <numerusform>I file selezionati sono troppo vecchi</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
-      <translation type="unfinished">
-        <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
-        <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+      <translation>
+        <numerusform>File selezionato è stato registrato su %1, ma possono essere caricati solo i file che sono stati registrati negli ultimi giorni %n. È possibile modificare il periodo nelle impostazioni archivio della telecamera.</numerusform>
+        <numerusform>File selezionato è stato registrato su %1, ma possono essere caricati solo i file che sono stati registrati negli ultimi giorni %n. È possibile modificare il periodo nelle impostazioni archivio della telecamera.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
-      <translation type="unfinished">
-        <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
-        <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+      <translation>
+        <numerusform>I file selezionati sono stati registrati tra %1 e %2, ma è possibile caricare solo i file che sono stati registrati negli ultimi %n giorni. È possibile modificare il periodo nelle impostazioni archivio della telecamera.</numerusform>
+        <numerusform>I file selezionati sono stati registrati tra %1 e %2, ma è possibile caricare solo i file che sono stati registrati negli ultimi %n giorni. È possibile modificare il periodo nelle impostazioni archivio della telecamera.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Some footage may be deleted after uploading these files</source>
-      <translation type="unfinished">
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+      <translation>
+        <numerusform>Alcuni filmati possono essere eliminati dopo aver caricato questi file</numerusform>
+        <numerusform>Alcuni filmati possono essere eliminati dopo aver caricato questi file</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
-      <translation type="unfinished">
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+      <translation>
+        <numerusform>Non c'è molto spazio libero lasciato per l'archiviazione sul server. Alcuni vecchi filmati possono essere eliminati per liberare spazio. Si noti che se i file selezionati risultano essere i piu' antichi sul server, verranno cancellati subito dopo la fase di caricamento.</numerusform>
+        <numerusform>Non c'è molto spazio libero lasciato per l'archiviazione sul server. Alcuni vecchi filmati possono essere eliminati per liberare spazio. Si noti che se i file selezionati risultano essere i piu' antichi sul server, verranno cancellati subito dopo la fase di caricamento.</numerusform>
       </translation>
     </message>
     <message>
       <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
-      <translation type="unfinished">To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</translation>
+      <translation>Per evitare questo problema è possibile aggiungere ulteriore spazio di archiviazione. È inoltre possibile controllare quali filmati verranno eliminati in primo luogo modificando il periodo nelle impostazioni archivio della telecamera.</translation>
     </message>
     <message>
       <source>Upload anyway?</source>
-      <translation type="unfinished">Upload anyway?</translation>
+      <translation>Caricare comunque?</translation>
     </message>
     <message>
       <source>Could not finish upload to %1</source>
-      <translation type="unfinished">Could not finish upload to %1</translation>
+      <translation>Impossibile completare il caricamento su %1</translation>
     </message>
     <message>
       <source>Make sure there is enough space on server storage.</source>
-      <translation type="unfinished">Make sure there is enough space on server storage.</translation>
+      <translation>Assicurarsi che ci sia spazio di archiviazione sufficiente sul server.</translation>
     </message>
     <message>
       <source>%1 has unsupported format.</source>
