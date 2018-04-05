@@ -104,6 +104,7 @@ buildDistribution()
     local PLUGIN_FILENAME
     local PLUGINS=( hikvision_metadata_plugin )
     PLUGINS+=( axis_metadata_plugin )
+    PLUGINS+=( dw_mtt_metadata_plugin )
     PLUGINS+=( vca_metadata_plugin )
     if [ "$ENABLE_HANWHA" == "true" ]
     then
