@@ -9,7 +9,7 @@ from framework.config import SingleTestConfig, TestParameter, TestsConfig
 from framework.mediaserverdeb import MediaserverDeb
 from framework.metrics_saver import MetricsSaver
 
-pytest_plugins = ['fixtures.vms', 'fixtures.servers', 'fixtures.cloud']
+pytest_plugins = ['fixtures.vms', 'fixtures.mediaservers', 'fixtures.cloud']
 
 JUNK_SHOP_PLUGIN_NAME = 'junk-shop-db-capture'
 

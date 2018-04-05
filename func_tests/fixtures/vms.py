@@ -110,10 +110,10 @@ def linux_vm_pool(vm_factories):
 
 
 @pytest.fixture()
-def network(vm_pools, hypervisor, linux_servers_pool, layout_file):
+def network(vm_pools, hypervisor, linux_mediaservers_pool, layout_file):
     layout = get_layout(layout_file)
     vms, _ = setup_networks(vm_pools, hypervisor, layout.networks, {})
-    servers = setup_system(linux_servers_pool, layout.mergers)
+    servers = setup_system(linux_mediaservers_pool, layout.mergers)
     return vms, servers
 
 

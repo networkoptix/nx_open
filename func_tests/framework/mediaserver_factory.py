@@ -2,10 +2,10 @@ import logging
 
 from framework.core_file_traceback import create_core_file_traceback
 from framework.rest_api import RestApi
-from framework.server_installation import install_mediaserver
+from framework.mediaserver_installation import install_mediaserver
 from framework.service import UpstartService
 from .artifact import ArtifactType
-from .server import Server
+from .mediaserver import Mediaserver
 
 log = logging.getLogger(__name__)
 
@@ -15,17 +15,18 @@ SERVER_LOG_ARTIFACT_TYPE = ArtifactType(name='log', ext='.log')
 
 
 def make_dirty_mediaserver(mediaserver_name, machine, mediaserver_deb):
-    """Mediaserver must be installed i"""
+    """Install mediaserver if needed and construct its object. Nothing else."""
     service = UpstartService(machine.os_access, mediaserver_deb.customization.service)
     installation = install_mediaserver(machine.os_access, mediaserver_deb)
     original_port = 7001
     hostname_from_here, port_from_here = machine.ports['tcp', original_port]
     api = RestApi(mediaserver_name, hostname_from_here, port_from_here)
-    server = Server(mediaserver_name, service, installation, api, machine, original_port)
+    server = Mediaserver(mediaserver_name, service, installation, api, machine, original_port)
     return server
 
 
 def cleanup_mediaserver(mediaserver, ca):
+    """Stop and remove everything produced by previous runs. Make installation "fresh"."""
     mediaserver.stop(already_stopped_ok=True)
     mediaserver.installation.cleanup_core_files()
     mediaserver.installation.cleanup_var_dir()
@@ -39,6 +40,7 @@ def cleanup_mediaserver(mediaserver, ca):
 
 
 def setup_clean_mediaserver(mediaserver_name, machine, mediaserver_deb, ca):
+    """Get mediaserver as if it hasn't run before."""
     mediaserver = make_dirty_mediaserver(mediaserver_name, machine, mediaserver_deb)
     cleanup_mediaserver(mediaserver, ca)
     return mediaserver
@@ -72,40 +74,40 @@ def examine_mediaserver(mediaserver, stopped_ok=False):
             raise MediaserverStopped("{!r} is stopped.".format(mediaserver))
 
 
-def collect_logs_from_mediaserver(server, root_artifact_factory):
-    log_contents = server.installation.read_log()
+def collect_logs_from_mediaserver(mediaserver, root_artifact_factory):
+    log_contents = mediaserver.installation.read_log()
     if log_contents:
         mediaserver_logs_artifact_factory = root_artifact_factory(
-            ['server', server.name], name='server-%s' % server.name, artifact_type=SERVER_LOG_ARTIFACT_TYPE)
+            ['server', mediaserver.name], name='server-%s' % mediaserver.name, artifact_type=SERVER_LOG_ARTIFACT_TYPE)
         log_path = mediaserver_logs_artifact_factory.produce_file_path().write_bytes(log_contents)
-        log.debug('log file for server %s, %s is stored to %s', server.name, server, log_path)
+        log.debug('log file for server %s, %s is stored to %s', mediaserver.name, mediaserver, log_path)
 
 
-def collect_core_dumps_from_mediaserver(server, root_artifact_factory):
-    for core_dump in server.installation.list_core_dumps():
+def collect_core_dumps_from_mediaserver(mediaserver, root_artifact_factory):
+    for core_dump in mediaserver.installation.list_core_dumps():
         code_dumps_artifact_factory = root_artifact_factory(
-            ['server', server.name.lower(), core_dump.name],
-            name='%s-%s' % (server.name.lower(), core_dump.name),
+            ['server', mediaserver.name.lower(), core_dump.name],
+            name='%s-%s' % (mediaserver.name.lower(), core_dump.name),
             is_error=True,
             artifact_type=CORE_FILE_ARTIFACT_TYPE)
         local_core_dump_path = code_dumps_artifact_factory.produce_file_path()
-        server.machine.os_access.get_file(core_dump, local_core_dump_path)
+        mediaserver.machine.os_access.get_file(core_dump, local_core_dump_path)
         traceback = create_core_file_traceback(
-            server.machine.os_access,
-            server.installation.binary,
-            server.dir / 'lib',
+            mediaserver.machine.os_access,
+            mediaserver.installation.binary,
+            mediaserver.installation.dir / 'lib',
             core_dump)
         code_dumps_artifact_factory = root_artifact_factory(
-            ['server', server.name.lower(), core_dump.name, 'traceback'],
-            name='%s-%s-tb' % (server.name.lower(), core_dump.name),
+            ['server', mediaserver.name.lower(), core_dump.name, 'traceback'],
+            name='%s-%s-tb' % (mediaserver.name.lower(), core_dump.name),
             is_error=True,
             artifact_type=TRACEBACK_ARTIFACT_TYPE)
         local_traceback_path = code_dumps_artifact_factory.produce_file_path()
         local_traceback_path.write_bytes(traceback)
-        log.warning('Core dump on %r: %s, %s.', server.name, server, local_core_dump_path, local_traceback_path)
+        log.warning('Core dump on %r: %s, %s.', mediaserver.name, mediaserver, local_core_dump_path, local_traceback_path)
 
 
-class ServerFactory(object):
+class MediaserverFactory(object):
     def __init__(self, artifact_factory, machines, mediaserver_deb, ca):
         self._artifact_factory = artifact_factory
         self._machines = machines

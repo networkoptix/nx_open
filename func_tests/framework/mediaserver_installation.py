@@ -36,7 +36,7 @@ MEDIASERVER_CLOUDHOST_TAG = 'this_is_cloud_host_name'
 MEDIASERVER_CLOUDHOST_SIZE = 76  # MEDIASERVER_CLOUDHOST_TAG + ' ' + cloud_host + '\0' * required paddings count to 76
 
 
-class ServerInstallation(object):
+class MediaserverInstallation(object):
     """One of potentially multiple installations"""
 
     def __init__(self, host, dir):
@@ -101,7 +101,7 @@ class ServerInstallation(object):
 
     def patch_binary_set_cloud_host(self, new_host):
         if self._current_cloud_host and new_host == self._current_cloud_host:
-            log.debug('Server binary at %s already has %r in it', self.os_access, new_host)
+            log.debug('Mediaserver binary at %s already has %r in it', self.os_access, new_host)
             return
         path_to_patch = None
         data = None
@@ -123,7 +123,7 @@ class ServerInstallation(object):
         if self._current_cloud_host:
             assert old_host == self._current_cloud_host, repr((old_host, self._current_cloud_host))
         if new_host == old_host:
-            log.debug('Server binary %s at %s already has %r in it', path_to_patch, self.os_access, new_host)
+            log.debug('Mediaserver binary %s at %s already has %r in it', path_to_patch, self.os_access, new_host)
             self._current_cloud_host = new_host
             return
         old_str_len = len(MEDIASERVER_CLOUDHOST_TAG + ' ' + old_host)
@@ -152,7 +152,7 @@ def find_all_installations(os_access, installation_root=DEFAULT_INSTALLATION_ROO
         for path_str in paths_raw_output.splitlines(False)]
     installed_customizations = customizations_from_paths(paths, installation_root)
     for customization in installed_customizations:
-        installation = ServerInstallation(os_access, installation_root / customization.installation_subdir)
+        installation = MediaserverInstallation(os_access, installation_root / customization.installation_subdir)
         if installation.is_valid():
             yield installation
         else:
@@ -202,7 +202,7 @@ def install_mediaserver(os_access, mediaserver_deb, installation_root=DEFAULT_IN
         '--assume-yes',
         'install'])
 
-    installation = ServerInstallation(os_access, installation_root / customization.installation_subdir)
+    installation = MediaserverInstallation(os_access, installation_root / customization.installation_subdir)
 
     assert installation.is_valid
     service = UpstartService(os_access, customization.service)
@@ -212,7 +212,7 @@ def install_mediaserver(os_access, mediaserver_deb, installation_root=DEFAULT_IN
 
     installation.backup_mediaserver_conf()
 
-    # Server may crash several times during one test, all cores are kept.
+    # Mediaserver may crash several times during one test, all cores are kept.
     # Legend: %t is timestamp, %p is pid.
     core_pattern_path = PurePosixPath('/etc/sysctl.d/60-core-pattern.conf')
     os_access.write_file(core_pattern_path, 'kernel.core_pattern=core.%t.%p')

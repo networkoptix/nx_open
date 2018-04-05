@@ -50,7 +50,7 @@ def check_media_stream_transports(server):
                 transports = set()
                 for codec_rec in value['streams']:
                     transports |= set(codec_rec['transports'])
-                log.info('Server %s returned following transports for camera %s: %s',
+                log.info('Mediaserver %s returned following transports for camera %s: %s',
                          server, camera_info['physicalId'], ', '.join(sorted(transports)))
                 assert transports == EXPECTED_TRANSPORT_LIST, repr(transports)
                 break
@@ -60,9 +60,9 @@ def check_media_stream_transports(server):
 # https://networkoptix.atlassian.net/browse/TEST-178
 # https://networkoptix.atlassian.net/wiki/spaces/SD/pages/77234376/Camera+history+test
 @pytest.mark.testcam
-def test_camera_switching_should_be_represented_in_history(artifact_factory, linux_servers_pool, camera):
-    one = linux_servers_pool.get('one')
-    two = linux_servers_pool.get('two')
+def test_camera_switching_should_be_represented_in_history(artifact_factory, linux_mediaservers_pool, camera):
+    one = linux_mediaservers_pool.get('one')
+    two = linux_mediaservers_pool.get('two')
     merge_systems(one, two)
 
     camera.start_streaming()

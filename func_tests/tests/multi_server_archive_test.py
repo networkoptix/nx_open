@@ -6,17 +6,17 @@ import pytz
 
 from framework.api_shortcuts import get_local_system_id, set_local_system_id
 from framework.merging import merge_systems
-from framework.server import TimePeriod
+from framework.mediaserver import TimePeriod
 from framework.utils import log_list
 
 log = logging.getLogger(__name__)
 
 
-def test_merged_archive(linux_servers_pool, camera, sample_media_file):
+def test_merged_archive(linux_mediaservers_pool, camera, sample_media_file):
     log.debug('camera: %r, sample media file: %r', camera, sample_media_file)
 
-    one = linux_servers_pool.get('one')
-    two = linux_servers_pool.get('two')
+    one = linux_mediaservers_pool.get('one')
+    two = linux_mediaservers_pool.get('two')
     merge_systems(one, two)
 
     one.add_camera(camera)
@@ -55,8 +55,8 @@ def test_merged_archive(linux_servers_pool, camera, sample_media_file):
     return one, two, expected_periods_one, expected_periods_two
 
 
-def test_separated_archive(linux_servers_pool, camera, sample_media_file):
-    one, two, expected_periods_one, expected_periods_two = test_merged_archive(linux_servers_pool, camera, sample_media_file)
+def test_separated_archive(linux_mediaservers_pool, camera, sample_media_file):
+    one, two, expected_periods_one, expected_periods_two = test_merged_archive(linux_mediaservers_pool, camera, sample_media_file)
     new_id = '{%s}' % uuid.uuid4()
     set_local_system_id(one.api, new_id)
     assert get_local_system_id(one) == new_id

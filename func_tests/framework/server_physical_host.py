@@ -4,8 +4,8 @@ import logging
 import uuid
 
 from framework.rest_api import RestApi
-from .server import Server
-from .server_installation import MEDIASERVER_CONFIG_PATH, MEDIASERVER_CONFIG_PATH_INITIAL, ServerInstallation
+from .mediaserver import Mediaserver
+from .mediaserver_installation import MEDIASERVER_CONFIG_PATH, MEDIASERVER_CONFIG_PATH_INITIAL, MediaserverInstallation
 from .service import AdHocService
 from .template_renderer import TemplateRenderer
 from .utils import is_list_inst
@@ -108,8 +108,8 @@ class PhysicalInstallationHost(object):
         self._template_renderer = TemplateRenderer()
         self._dist_unpacked = self.os_access.dir_exists(self.unpacked_mediaserver_dir)
         self._ensure_root_dir_exists()
-        self._installations = list(self._read_installations())  # ServerInstallation list
-        self._available_installations = self._installations[:]  # ServerInstallation list, set up but yet unallocated
+        self._installations = list(self._read_installations())  # MediaserverInstallation list
+        self._available_installations = self._installations[:]  # MediaserverInstallation list, set up but yet unallocated
         self._allocated_server_list = []
         self.timezone = os_access.get_timezone()
         self._ensure_servers_are_stopped()  # expected initial state, we may reset_installations after this, so pids will be lost
@@ -144,7 +144,7 @@ class PhysicalInstallationHost(object):
         server_port = self._installation_server_port(self._installations.index(installation))
         api = RestApi(config.name, config.http_schema, server_port)
         service = AdHocService(self.os_access, installation.dir)
-        server = Server(config.name, service, installation, api, self, port=server_port)
+        server = Mediaserver(config.name, service, installation, api, self, port=server_port)
         self._allocated_server_list.append(server)
         return server
 
@@ -179,7 +179,7 @@ class PhysicalInstallationHost(object):
 
     def _read_installations(self):
         for dir in sorted(self.os_access.expand_glob(self.root_dir / 'server-*')):
-            yield ServerInstallation(self.os_access, dir)
+            yield MediaserverInstallation(self.os_access, dir)
 
     def _ensure_servers_are_stopped(self):
         for installation in self._installations:
@@ -193,7 +193,7 @@ class PhysicalInstallationHost(object):
         idx = len(self._installations)
         dir = self.root_dir / ('server-%03d' % (idx + 1))
         self._prepare_installation_dir(dir, self._installation_server_port(idx))
-        installation = ServerInstallation(self.os_access, dir)
+        installation = MediaserverInstallation(self.os_access, dir)
         self._installations.append(installation)
         return installation
 

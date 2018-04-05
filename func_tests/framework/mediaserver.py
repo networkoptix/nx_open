@@ -46,7 +46,7 @@ class TimePeriod(object):
                 and other.duration == self.duration)
 
 
-class Server(object):
+class Mediaserver(object):
     """Mediaserver, same for physical and virtual machines"""
 
     def __init__(self, name, service, installation, api, machine, port):
@@ -58,7 +58,7 @@ class Server(object):
         self.port = port
 
     def __repr__(self):
-        return '<Server {} at {}>'.format(self.name, self.api.url(''))
+        return '<Mediaserver {} at {}>'.format(self.name, self.api.url(''))
 
     def is_online(self):
         try:
@@ -98,7 +98,7 @@ class Server(object):
                 response = self.api.api.moduleInformation.GET()
             except requests.ConnectionError as e:
                 if datetime.datetime.now(pytz.utc) - started_at > timeout:
-                    assert False, "Server hasn't started, caught %r, timed out." % e
+                    assert False, "Mediaserver hasn't started, caught %r, timed out." % e
                 log.debug("Expected failed connection: %r", e)
                 failed_connections += 1
                 time.sleep(sleep_time_sec)
@@ -108,11 +108,11 @@ class Server(object):
                 if failed_connections > 0:
                     assert False, "Runtime id remains same after failed connections."
                 if datetime.datetime.now(pytz.utc) - started_at > timeout:
-                    assert False, "Server hasn't stopped, timed out."
-                log.warning("Server hasn't stopped yet, delay is acceptable.")
+                    assert False, "Mediaserver hasn't stopped, timed out."
+                log.warning("Mediaserver hasn't stopped yet, delay is acceptable.")
                 time.sleep(sleep_time_sec)
                 continue
-            log.info("Server restarted successfully, new runtime id is %s", new_runtime_id)
+            log.info("Mediaserver restarted successfully, new runtime id is %s", new_runtime_id)
             break
 
     def add_camera(self, camera):
@@ -154,7 +154,7 @@ class Server(object):
         periods = [TimePeriod(datetime.datetime.utcfromtimestamp(int(d['startTimeMs'])/1000.).replace(tzinfo=pytz.utc),
                               datetime.timedelta(seconds=int(d['durationMs']) / 1000.))
                    for d in self.api.ec2.recordedTimePeriods.GET(cameraId=camera.id, flat=True)]
-        log.info('Server %r returned %d recorded periods:', self.name, len(periods))
+        log.info('Mediaserver %r returned %d recorded periods:', self.name, len(periods))
         for period in periods:
             log.info('\t%s', period)
         return periods

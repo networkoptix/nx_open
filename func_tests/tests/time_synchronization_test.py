@@ -43,10 +43,10 @@ def get_internet_time(address='time.rfc868server.com', port=37):
 
 
 @pytest.fixture()
-def system(two_vms, linux_servers_pool):
+def system(two_vms, linux_mediaservers_pool):
     servers = {}
     for vm in two_vms:
-        server = linux_servers_pool.get(vm.alias, vm=vm)
+        server = linux_mediaservers_pool.get(vm.alias, vm=vm)
         if server.service.is_running():
             server.stop()
         # Reset server without internet access.

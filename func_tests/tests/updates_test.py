@@ -27,13 +27,13 @@ def install_updates_server(os_access, python_path):
     wait_until(lambda: os_access.run_command(['curl', '-I', ROOT_URL + '/updates.json']))
 
 
-def test_running_linux_server(running_linux_server):
-    api = running_linux_server.api.api.updates2
+def test_running_linux_mediaserver(running_linux_mediaserver):
+    api = running_linux_mediaserver.api.api.updates2
     assert holds_long_enough(lambda: api.status.GET()['status'] in {'notAvailable', 'checking'})
-    python_path = prepare_virtual_environment(running_linux_server.machine.os_access)
-    install_updates_server(running_linux_server.machine.os_access, python_path)
-    running_linux_server.stop(already_stopped_ok=True)
-    running_linux_server.installation.update_mediaserver_conf({'checkForUpdateUrl': ROOT_URL})
-    running_linux_server.start(already_started_ok=False)
+    python_path = prepare_virtual_environment(running_linux_mediaserver.machine.os_access)
+    install_updates_server(running_linux_mediaserver.machine.os_access, python_path)
+    running_linux_mediaserver.stop(already_stopped_ok=True)
+    running_linux_mediaserver.installation.update_mediaserver_conf({'checkForUpdateUrl': ROOT_URL})
+    running_linux_mediaserver.start(already_started_ok=False)
     assert wait_until(lambda: api.status.GET()['status'] == 'available')
-    assert not running_linux_server.installation.list_core_dumps()
+    assert not running_linux_mediaserver.installation.list_core_dumps()

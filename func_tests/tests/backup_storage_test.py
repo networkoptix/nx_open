@@ -78,9 +78,9 @@ def second_camera_backup_type(request):
 
 
 @pytest.fixture
-def server(linux_servers_pool, system_backup_type):
+def server(linux_mediaservers_pool, system_backup_type):
     config_file_params = dict(minStorageSpace=1024*1024)  # 1M
-    server = linux_servers_pool.get('server')
+    server = linux_mediaservers_pool.get('server')
     server.update_mediaserver_conf(config_file_params)
     server.machine.os_access.run_command(['rm', '-rfv', str(BACKUP_STORAGE_PATH / '*')])
     server.start()
@@ -118,7 +118,7 @@ def change_and_assert_server_backup_type(server, expected_backup_type):
 def add_backup_storage(server):
     storage_list = [s for s in server.api.ec2.getStorages.GET()
                     if str(BACKUP_STORAGE_PATH) in s['url'] and s['usedForWriting']]
-    assert len(storage_list) == 1, 'Server did not accept storage %r' % BACKUP_STORAGE_PATH
+    assert len(storage_list) == 1, 'Mediaserver did not accept storage %r' % BACKUP_STORAGE_PATH
     storage = storage_list[0]
     storage['isBackup'] = True
     server.api.ec2.saveStorage.POST(**storage)
