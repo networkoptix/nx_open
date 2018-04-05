@@ -265,9 +265,10 @@ nx::utils::Url HanwhaRequestHelper::makeBypassUrl(const nx::utils::Url& url) con
     bypassQuery.addQueryItem(lit("Channel"), QString::number(m_bypassChannel));
 
     QString bypassUriString = url.path();
-    auto query = url.query();
+    QUrlQuery query(url.query());
+    query.removeQueryItem(kHanwhaChannelProperty);
     if (!query.isEmpty())
-        bypassUriString.append(lit("?")).append(query);
+        bypassUriString.append(lit("?")).append(query.toString());
 
     bypassQuery.addQueryItem(lit("BypassURI"), bypassUriString);
 

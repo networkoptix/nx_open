@@ -132,7 +132,7 @@ const QString& sysDrivePath()
 
 const QString& getDevicePath(const QString& path)
 {
-    return path;
+    return "";
 }
 
 const QString& sysDrivePath()
@@ -257,22 +257,25 @@ QString QnFileStorageResource::getPath() const
         return QUrl(url).path();
 }
 
-qint64 getDeviceSizeByLocalPossiblyNonExistingPath(const QString &path)
+static qint64 getDeviceSizeByLocalPossiblyNonExistingPath(const QString &path)
 {
     qint64 result;
 
     if (QDir(path).exists())
     {
         qnServerModule->rootTool()->changeOwner(path);
-        return getDiskTotalSpace(path);
+        result = getDiskTotalSpace(path);
+        return result< 0 ? qnServerModule->rootTool()->totalSpace(path) : result;
     }
 
     if (!QDir().mkpath(path) && !qnServerModule->rootTool()->makeDirectory(path))
         return -1;
 
     result = getDiskTotalSpace(path);
-    QDir(path).removeRecursively() || qnServerModule->rootTool()->removePath(path);
+    if (result < 0)
+        result = qnServerModule->rootTool()->totalSpace(path);
 
+    QDir(path).removeRecursively() || qnServerModule->rootTool()->removePath(path);
     return result;
 }
 
@@ -734,7 +737,8 @@ bool QnFileStorageResource::isDirExists(const QString& url)
         return false;
 
     QDir d(translateUrlToLocal(url));
-    return d.exists(removeProtocolPrefix(translateUrlToLocal(url)));
+    QString path = removeProtocolPrefix(translateUrlToLocal(url));
+    return d.exists(path) || rootTool()->isPathExists(path);
 }
 
 bool QnFileStorageResource::isFileExists(const QString& url)
@@ -742,7 +746,8 @@ bool QnFileStorageResource::isFileExists(const QString& url)
     if (!m_valid)
         return false;
 
-    return QFile::exists(removeProtocolPrefix(translateUrlToLocal(url)));
+    QString path = removeProtocolPrefix(translateUrlToLocal(url));
+    return QFile::exists(path) || rootTool()->isPathExists(path);
 }
 
 qint64 QnFileStorageResource::getFreeSpace()
@@ -752,7 +757,10 @@ qint64 QnFileStorageResource::getFreeSpace()
     if (!m_valid)
         return QnStorageResource::kUnknownSize;
 
-    return getDiskFreeSpace(localPathCopy.isEmpty() ?  getPath() : localPathCopy);
+    QString path = localPathCopy.isEmpty() ?  getPath() : localPathCopy;
+    qint64 result = getDiskFreeSpace(path);
+
+    return result < 0 ? rootTool()->freeSpace(path) : result;
 }
 
 qint64 QnFileStorageResource::getTotalSpace() const
@@ -768,7 +776,10 @@ qint64 QnFileStorageResource::getTotalSpace() const
 
     QnMutexLocker locker(&m_writeTestMutex);
     if (m_cachedTotalSpace <= 0)
-        m_cachedTotalSpace = getDiskTotalSpace(path);
+    {
+        qint64 result = getDiskTotalSpace(path);
+        m_cachedTotalSpace = (result < 0 ? rootTool()->totalSpace(path) : result);
+    }
 
     return m_cachedTotalSpace;
 }
@@ -780,9 +791,10 @@ QnAbstractStorageResource::FileInfoList QnFileStorageResource::getFileList(const
 
     QnAbstractStorageResource::FileInfoList ret;
 
-    QDir dir(translateUrlToLocal(dirName));
+    QString path = translateUrlToLocal(dirName);
+    QDir dir(path);
     if (!dir.exists())
-        return ret;
+        return rootTool()->fileList(path);
 
     QFileInfoList localList = dir.entryInfoList(
         QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot,
@@ -806,7 +818,9 @@ qint64 QnFileStorageResource::getFileSize(const QString& url) const
     if (!m_valid)
         return -1;
 
-    return QnFile::getFileSize(translateUrlToLocal(url));
+    QString path = translateUrlToLocal(url);
+    qint64 result = QnFile::getFileSize(path);
+    return result == -1 ? rootTool()->fileSize(path) : result;
 }
 
 bool QnFileStorageResource::testWriteCapInternal() const
@@ -874,7 +888,10 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdate()
         return Qn::StorageInit_WrongPath;
     }
     QString localPath = getLocalPathSafe();
-    m_cachedTotalSpace = getDiskTotalSpace(localPath.isEmpty() ? getPath() : localPath); // update cached value periodically
+    QString path = localPath.isEmpty() ? getPath() : localPath;
+    m_cachedTotalSpace = getDiskTotalSpace(path); // update cached value periodically
+    if (m_cachedTotalSpace < 0)
+        m_cachedTotalSpace = rootTool()->totalSpace(path);
     NX_VERBOSE(
         this,
         lm("QnFileStorageResource::initOrUpdate successfully completed for %1").args(getUrl()));

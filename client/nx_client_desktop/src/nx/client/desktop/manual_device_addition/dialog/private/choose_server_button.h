@@ -2,7 +2,7 @@
 
 #include "server_online_status_watcher.h"
 
-#include <ui/widgets/common/dropdown_button.h>
+#include <nx/client/desktop/common/widgets/dropdown_button.h>
 #include <core/resource/resource_fwd.h>
 #include <common/common_module_aware.h>
 #include <utils/common/connective.h>
@@ -10,10 +10,10 @@
 class QMenu;
 class QnUuid;
 
-class QnChooseServerButton: public Connective<QnDropdownButton>, public QnCommonModuleAware
+class QnChooseServerButton: public Connective<DropdownButton>, public QnCommonModuleAware
 {
     Q_OBJECT
-    using base_type = Connective<QnDropdownButton>;
+    using base_type = Connective<DropdownButton>;
 
 public:
     QnChooseServerButton(QWidget* parent = nullptr);

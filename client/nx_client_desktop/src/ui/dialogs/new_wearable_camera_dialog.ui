@@ -67,7 +67,7 @@
        </layout>
       </item>
       <item>
-       <widget class="QnInputField" name="nameField" native="true"/>
+       <widget class="nx::client::desktop::InputField" name="nameField" native="true"/>
       </item>
      </layout>
     </widget>
@@ -99,9 +99,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QnInputField</class>
+   <class>nx::client::desktop::InputField</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/input_field.h</header>
+   <header location="global">nx/client/desktop/common/widgets/input_field.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

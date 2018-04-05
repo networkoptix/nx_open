@@ -66,6 +66,8 @@ def determine_package_versions():
 
     if box == "rpi":
         v["qt"] = "5.6.3"
+        v["festival"] = "2.4-1"
+        v["festival-vox"] = "2.4"
 
     if box == "edge1":
         v["qt"] = "5.6.3"

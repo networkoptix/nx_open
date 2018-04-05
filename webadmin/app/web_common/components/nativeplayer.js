@@ -12,14 +12,16 @@ window.NativePlayer = function(){
 }
 
 NativePlayer.prototype.play = function(){
-    this.video.play().catch(function(error){
-        var errorString = error.toString();
-        //error.name is for Safari which returns an actual object. The errorString is used for chrome
-        if(error.name != 'AbortError' && errorString.indexOf('pause') < 0 && errorString.indexOf('load') < 0){
-            console.log(error);
-            throw error;
-        }
-    });
+    var playPromise = this.video.play();
+    if(playPromise) {
+        playPromise.catch(function (error) {
+            var errorString = error.toString();
+            //We use a string because chrome does not return an object with things such as code and name
+            if (error.name != 'AbortError' && errorString.indexOf('pause') < 0 && errorString.indexOf('load') < 0) {
+                throw error;
+            }
+        });
+    }
 };
 
 NativePlayer.prototype.pause = function(){

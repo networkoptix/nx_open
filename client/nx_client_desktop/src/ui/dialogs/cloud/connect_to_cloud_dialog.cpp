@@ -29,8 +29,8 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/custom_style.h>
-#include <ui/widgets/common/busy_indicator_button.h>
-#include <ui/widgets/common/input_field.h>
+#include <nx/client/desktop/common/widgets/busy_indicator_button.h>
+#include <nx/client/desktop/common/widgets/input_field.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 
 #include <watchers/cloud_status_watcher.h>
@@ -38,7 +38,7 @@
 #include <utils/common/app_info.h>
 
 using namespace nx::cdb;
-using namespace nx::client::desktop::ui;
+using namespace nx::client::desktop;
 
 namespace {
 
@@ -86,7 +86,7 @@ private:
 public:
     std::unique_ptr<api::Connection> cloudConnection;
     bool linkedSuccessfully;
-    QnBusyIndicatorButton* indicatorButton;
+    BusyIndicatorButton* indicatorButton;
 };
 
 QnConnectToCloudDialog::QnConnectToCloudDialog(QWidget* parent) :
@@ -124,17 +124,17 @@ QnConnectToCloudDialog::QnConnectToCloudDialog(QWidget* parent) :
     ui->enterCloudAccountLabel->setForegroundRole(QPalette::Light);
 
     ui->loginInputField->setTitle(tr("Email"));
-    ui->loginInputField->setValidator(Qn::defaultEmailValidator(false));
+    ui->loginInputField->setValidator(defaultEmailValidator(false));
 
     ui->passwordInputField->setTitle(tr("Password"));
     ui->passwordInputField->setEchoMode(QLineEdit::Password);
-    ui->passwordInputField->setValidator(Qn::defaultPasswordValidator(false));
+    ui->passwordInputField->setValidator(defaultPasswordValidator(false));
 
     ui->createAccountLabel->setText(makeHref(tr("Create account"), urlHelper.createAccountUrl()));
     ui->forgotPasswordLabel->setText(makeHref(tr("Forgot password?"), urlHelper.restorePasswordUrl()));
 
     auto aligner = new QnAligner(this);
-    aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
+    aligner->registerTypeAccessor<InputField>(InputField::createLabelWidthAccessor());
     aligner->addWidgets({ ui->loginInputField, ui->passwordInputField, ui->spacer });
 
     auto opacityEffect = new QGraphicsOpacityEffect(this);
@@ -146,8 +146,8 @@ QnConnectToCloudDialog::QnConnectToCloudDialog(QWidget* parent) :
     auto effectiveName = qnCloudStatusWatcher->effectiveUserName();
     ui->loginInputField->setText(effectiveName);
 
-    connect(ui->loginInputField,    &QnInputField::textChanged, d, &QnConnectToCloudDialogPrivate::updateUi);
-    connect(ui->passwordInputField, &QnInputField::textChanged, d, &QnConnectToCloudDialogPrivate::updateUi);
+    connect(ui->loginInputField,    &InputField::textChanged, d, &QnConnectToCloudDialogPrivate::updateUi);
+    connect(ui->passwordInputField, &InputField::textChanged, d, &QnConnectToCloudDialogPrivate::updateUi);
     connect(this, &QnConnectToCloudDialog::bindFinished,
         d, &QnConnectToCloudDialogPrivate::at_bindFinished, Qt::QueuedConnection);
     setWarningStyle(ui->invalidCredentialsLabel);
@@ -187,7 +187,7 @@ QnConnectToCloudDialogPrivate::QnConnectToCloudDialogPrivate(QnConnectToCloudDia
     QObject(parent),
     q_ptr(parent),
     linkedSuccessfully(false),
-    indicatorButton(new QnBusyIndicatorButton(parent))
+    indicatorButton(new BusyIndicatorButton(parent))
 {
 }
 
@@ -273,7 +273,7 @@ void QnConnectToCloudDialogPrivate::showSuccess(const QString& /*cloudLogin*/)
     Q_Q(QnConnectToCloudDialog);
 
     linkedSuccessfully = true;
-    q->menu()->trigger(action::HideCloudPromoAction);
+    q->menu()->trigger(ui::action::HideCloudPromoAction);
 
     QnMessageBox::success(q->parentWidget(),
         tr("System connected to %1", "%1 is the cloud name (like 'Nx Cloud')")

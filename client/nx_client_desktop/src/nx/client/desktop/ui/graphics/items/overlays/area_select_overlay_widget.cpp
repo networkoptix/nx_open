@@ -7,7 +7,7 @@
 #include <utils/common/scoped_painter_rollback.h>
 
 #include <nx/client/core/utils/geometry.h>
-#include <nx/client/desktop/ui/common/painter_transform_scale_stripper.h>
+#include <nx/client/desktop/common/utils/painter_transform_scale_stripper.h>
 
 namespace nx {
 namespace client {
@@ -151,7 +151,7 @@ void AreaSelectOverlayWidget::paint(
     QnScopedPainterPenRollback penRollback(painter, QPen(palette().highlight(), kLineWidth));
     QnScopedPainterBrushRollback brushRollback(painter, Qt::NoBrush);
 
-    const ui::PainterTransformScaleStripper scaleStripper(painter);
+    const PainterTransformScaleStripper scaleStripper(painter);
     painter->drawRect(scaleStripper.mapRect(absoluteRect));
 }
 

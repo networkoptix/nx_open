@@ -9,8 +9,8 @@
 #include <ui/workbench/workbench_access_controller.h>
 
 QnDefaultPasswordAlertBar::QnDefaultPasswordAlertBar(QWidget* parent):
-    QnAlertBar(parent),
     base_type(parent),
+    QnWorkbenchContextAware(parent),
     m_setPasswordButton(new QPushButton(this))
 {
     m_setPasswordButton->setFlat(true);

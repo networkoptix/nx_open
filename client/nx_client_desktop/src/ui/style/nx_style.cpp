@@ -40,8 +40,8 @@
 
 #include <QtWidgets/private/qabstractitemview_p.h>
 
-#include <nx/client/desktop/ui/common/detail/base_input_field.h>
-#include <nx/client/desktop/ui/common/painter_transform_scale_stripper.h>
+#include <nx/client/desktop/common/widgets/detail/base_input_field.h>
+#include <nx/client/desktop/common/utils/painter_transform_scale_stripper.h>
 #include <nx/client/desktop/utils/widget_utils.h>
 
 #include <ui/common/indents.h>
@@ -49,7 +49,7 @@
 #include <ui/common/link_hover_processor.h>
 #include <ui/delegates/styled_combo_box_delegate.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
-#include <ui/widgets/common/input_field.h>
+#include <nx/client/desktop/common/widgets/input_field.h>
 #include <ui/widgets/common/scroll_bar_proxy.h>
 #include <ui/widgets/calendar_widget.h>
 
@@ -66,7 +66,6 @@
 
 using namespace style;
 using namespace nx::client::desktop;
-using namespace nx::client::desktop::ui;
 using nx::client::core::Geometry;
 
 namespace
@@ -811,7 +810,7 @@ void QnNxStyle::drawPrimitive(
 
             if (option->state.testFlag(State_Enabled))
             {
-                using InputField = ui::detail::BaseInputField;
+                using InputField = nx::client::desktop::detail::BaseInputField;
                 if (auto inputTextField = qobject_cast<const InputField*>(widget->parentWidget()))
                 {
                     readOnly = inputTextField->isReadOnly();

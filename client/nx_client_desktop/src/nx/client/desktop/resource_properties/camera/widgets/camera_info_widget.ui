@@ -27,7 +27,7 @@
     <number>12</number>
    </property>
    <item>
-    <widget class="QnEditableLabel" name="nameLabel" native="true"/>
+    <widget class="nx::client::desktop::EditableLabel" name="nameLabel" native="true"/>
    </item>
    <item>
     <widget class="QStackedWidget" name="stackedWidget">
@@ -403,7 +403,7 @@
              </widget>
             </item>
             <item>
-             <widget class="nx::client::desktop::ui::ClipboardButton" name="secondaryStreamCopyButton">
+             <widget class="nx::client::desktop::ClipboardButton" name="secondaryStreamCopyButton">
               <property name="text">
                <string notr="true">&lt;Copy&gt;</string>
               </property>
@@ -469,7 +469,7 @@
              </widget>
             </item>
             <item>
-             <widget class="nx::client::desktop::ui::ClipboardButton" name="primaryStreamCopyButton">
+             <widget class="nx::client::desktop::ClipboardButton" name="primaryStreamCopyButton">
               <property name="text">
                <string notr="true">&lt;Copy&gt;</string>
               </property>
@@ -548,7 +548,7 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QnEditableLabel" name="multipleNameLabel" native="true"/>
+          <widget class="nx::client::desktop::EditableLabel" name="multipleNameLabel" native="true"/>
          </item>
         </layout>
        </widget>
@@ -603,15 +603,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnEditableLabel</class>
+   <class>nx::client::desktop::EditableLabel</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/editable_label.h</header>
+   <header location="global">nx/client/desktop/common/widgets/editable_label.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>nx::client::desktop::ui::ClipboardButton</class>
+   <class>nx::client::desktop::ClipboardButton</class>
    <extends>QPushButton</extends>
-   <header location="global">nx/client/desktop/ui/common/clipboard_button.h</header>
+   <header location="global">nx/client/desktop/common/widgets/clipboard_button.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

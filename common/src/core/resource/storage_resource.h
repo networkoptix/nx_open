@@ -77,10 +77,13 @@ signals:
      * @param newStartTime - new archive start time point
      * @param newEndTime - Not used now, reserved for future use
      */
-    void archiveRangeChanged(const QnStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs);
+    void archiveRangeChanged(const QnStorageResourcePtr& resource, qint64 newStartTimeMs,
+        qint64 newEndTimeMs);
 
-    void isUsedForWritingChanged(const QnResourcePtr &resource);
-    void isBackupChanged(const QnResourcePtr &resource);
+    void isUsedForWritingChanged(const QnResourcePtr& resource);
+    void isBackupChanged(const QnResourcePtr& resource);
+    void spaceLimitChanged(const QnResourcePtr& resource);
+
 private:
     qint64 m_spaceLimit;
     int m_maxStoreTime; // in seconds

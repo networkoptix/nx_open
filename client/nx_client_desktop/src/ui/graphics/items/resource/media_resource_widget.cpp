@@ -61,7 +61,7 @@
 #include <nx/client/desktop/utils/entropix_image_enhancer.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
-#include <nx/client/desktop/ui/common/painter_transform_scale_stripper.h>
+#include <nx/client/desktop/common/utils/painter_transform_scale_stripper.h>
 #include <nx/client/desktop/ui/graphics/items/overlays/area_highlight_overlay_widget.h>
 #include <nx/client/desktop/ui/graphics/items/overlays/area_select_overlay_widget.h>
 #include <nx/client/desktop/scene/resource_widget/private/media_resource_widget_p.h>
