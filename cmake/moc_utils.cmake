@@ -57,8 +57,12 @@ function(nx_add_qt_mocables target)
     _generate_moc_parameters(${target} ${moc_parameters_file}
         INCLUDE_DIRS ${MOC_INCLUDE_DIRS})
 
+    set(moc_dirs)
+
     foreach(file ${MOC_UNPARSED_ARGUMENTS})
         _get_moc_file_name(moc_file ${file})
+        get_filename_component(path ${moc_file} PATH)
+        list(APPEND moc_dirs ${path})
 
         add_custom_command(
             OUTPUT ${moc_file}
@@ -74,5 +78,10 @@ function(nx_add_qt_mocables target)
             get_filename_component(path ${moc_file} PATH)
             set_property(SOURCE ${file} APPEND PROPERTY COMPILE_FLAGS " -I${path}")
         endif()
+    endforeach()
+
+    list(REMOVE_DUPLICATES moc_dirs)
+    foreach(dir IN LISTS moc_dirs)
+        file(MAKE_DIRECTORY ${dir})
     endforeach()
 endfunction()

@@ -466,7 +466,7 @@ QnCameraAdvancedParamValueMap HanwhaResource::getApiParameters(const QSet<QStrin
         for (const auto& submenuEntry: submenuMap)
         {
             auto submenu = submenuEntry.first;
-            HanwhaRequestHelper helper(sharedContext());
+            HanwhaRequestHelper helper(sharedContext(), bypassChannel());
             auto response = helper.view(
                 lit("%1/%2").arg(cgi).arg(submenu),
                 {{kHanwhaChannelProperty, QString::number(getChannel())}});
@@ -490,7 +490,11 @@ QnCameraAdvancedParamValueMap HanwhaResource::getApiParameters(const QSet<QStrin
                         continue;
 
                     if (!info->isChannelIndependent())
-                        parameterString += kHanwhaChannelPropertyTemplate.arg(getChannel());
+                    {
+                        // TODO: #dmishin most likely here will be issues with multisensor cameras. Fix it.
+                        parameterString += kHanwhaChannelPropertyTemplate.arg(
+                            isNvr() && isConnectedViaSunapi() ? 0 : getChannel());
+                    }
 
                     auto profile = profileByRole(info->profileDependency());
                     if (profile != kHanwhaInvalidProfile)
@@ -610,7 +614,7 @@ QSet<QString> HanwhaResource::setApiParameters(const QnCameraAdvancedParamValueM
                 = QString::number(requestCommon.profile);
         }
 
-        HanwhaRequestHelper helper(sharedContext());
+        HanwhaRequestHelper helper(sharedContext(), bypassChannel());
         const auto response = helper.doRequest(
             requestCommon.cgi,
             requestCommon.submenu,
@@ -1271,7 +1275,7 @@ CameraDiagnostics::Result HanwhaResource::initAlternativePtz()
 
 CameraDiagnostics::Result HanwhaResource::initAdvancedParameters()
 {
-    if (isNvr())
+    if (isNvr() && !isConnectedViaSunapi())
         return CameraDiagnostics::NoErrorResult();
 
     QnCameraAdvancedParams parameters;
@@ -1293,7 +1297,7 @@ CameraDiagnostics::Result HanwhaResource::initAdvancedParameters()
         m_advancedParameterInfos.emplace(id, info);
     }
 
-    bool success = fillRanges(&parameters, m_cgiParameters);
+    bool success = fillRanges(&parameters, cgiParameters());
     if (!success)
         return CameraDiagnostics::NoErrorResult();
 
@@ -2068,11 +2072,12 @@ QnCameraAdvancedParams HanwhaResource::filterParameters(
         if (needToCheck && parameter.range.isEmpty())
             continue;
 
+        const auto& cgiParams = cgiParameters();
         boost::optional<HanwhaCgiParameter> cgiParameter;
         const auto rangeParameter = info->rangeParameter();
         if (rangeParameter.isEmpty())
         {
-            cgiParameter = m_cgiParameters.parameter(
+            cgiParameter = cgiParams.parameter(
                 info->cgi(),
                 info->submenu(),
                 info->updateAction(),
@@ -2080,7 +2085,7 @@ QnCameraAdvancedParams HanwhaResource::filterParameters(
         }
         else
         {
-            cgiParameter = m_cgiParameters.parameter(rangeParameter);
+            cgiParameter = cgiParams.parameter(rangeParameter);
         }
 
         if (!cgiParameter)
@@ -2089,20 +2094,21 @@ QnCameraAdvancedParams HanwhaResource::filterParameters(
         bool isSupported = true;
         auto supportAttribute = info->supportAttribute();
 
+        const auto& attrs = attributes();
         if (!supportAttribute.isEmpty())
         {
             isSupported = false;
             if (!info->isChannelIndependent())
                 supportAttribute += lit("/%1").arg(getChannel());
 
-            const auto boolAttribute = m_attributes.attribute<bool>(supportAttribute);
+            const auto boolAttribute = attrs.attribute<bool>(supportAttribute);
             if (boolAttribute != boost::none)
             {
                 isSupported = boolAttribute.get();
             }
             else
             {
-                const auto intAttribute = m_attributes.attribute<int>(supportAttribute);
+                const auto intAttribute = attrs.attribute<int>(supportAttribute);
                 if (intAttribute != boost::none)
                     isSupported = intAttribute.get() > 0;
             }
@@ -2765,6 +2771,29 @@ bool HanwhaResource::setRelayOutputStateInternal(const QString& outputId, bool a
     return response.isSuccessful();
 }
 
+const HanwhaAttributes& HanwhaResource::attributes() const
+{
+    if (!isNvr() || !isConnectedViaSunapi())
+        return m_attributes;
+
+    return m_bypassDeviceAttributes;
+}
+
+const HanwhaCgiParameters& HanwhaResource::cgiParameters() const
+{
+    if (!isNvr() || !isConnectedViaSunapi())
+        return m_cgiParameters;
+
+    return m_bypassDeviceCgiParameters;
+}
+
+int HanwhaResource::bypassChannel() const
+{
+    return isNvr() && isConnectedViaSunapi()
+        ? getChannel()
+        : kHanwhaNoBypassChannel;
+}
+
 bool HanwhaResource::isNvr() const
 {
     return m_isNvr;
@@ -2772,7 +2801,7 @@ bool HanwhaResource::isNvr() const
 
 QString HanwhaResource::nxProfileName(Qn::ConnectionRole role) const
 {
-    const auto nxProfileNameParameter = m_cgiParameters
+    const auto nxProfileNameParameter = cgiParameters()
         .parameter(lit("media/videoprofile/add_update/Name"));
 
     const auto maxLength = nxProfileNameParameter && nxProfileNameParameter->maxLength() > 0

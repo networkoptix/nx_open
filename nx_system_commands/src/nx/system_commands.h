@@ -31,7 +31,22 @@ public:
     bool rename(const std::string& oldPath, const std::string& newPath);
 
     /** Returns file descriptor for the given path. */
-    int open(const std::string& path, int mode, bool usePipe);
+    int open(const std::string& path, int mode, bool reportViaSocket);
+
+    /** Returns free space on the device which given path belongs to */
+    int64_t freeSpace(const std::string& path, bool reportViaSocket);
+
+    /** Returns total space on the device which given path belongs to */
+    int64_t totalSpace(const std::string& path, bool reportViaSocket);
+
+    /** Returns the given path exists */
+    bool isPathExists(const std::string& path, bool reportViaSocket);
+
+    /** Returns CSV list of file entries - "fileName,fileSize,isDir" */
+    std::string serializedFileList(const std::string& path, bool reportViaSocket);
+
+    /** Returns file size. */
+    int64_t fileSize(const std::string& path, bool reportViaSocket);
 
     /** Installs deb package to system. */
     bool install(const std::string& debPackage);
