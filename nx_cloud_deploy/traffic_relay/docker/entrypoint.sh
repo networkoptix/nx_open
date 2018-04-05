@@ -11,7 +11,7 @@ then
     config_helper.py /opt/networkoptix/traffic_relay/etc/traffic_relay.conf "$MODULE_CONFIGURATION"
 fi
 
-tail --pid $$ -n0 -F /opt/networkoptix/traffic_relay/var/log/log_file.log  | egrep -v 'DEBUG|VERBOSE' &
+tail --pid $$ -n0 -F /opt/networkoptix/traffic_relay/var/log/log_file.log | egrep -v 'DEBUG|VERBOSE'  &
 
 sleep 30
 

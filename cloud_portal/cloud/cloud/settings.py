@@ -160,6 +160,7 @@ CACHES = {
         }
     }
 }
+PRIMARY_PRODUCT = "cloud_portal"
 
 if LOCAL_ENVIRONMENT:
     conf["cloud_db"]["url"] = 'https://cloud-dev.hdw.mx/cdb'
@@ -366,6 +367,9 @@ NOTIFICATIONS_CONFIG = {
         'engine': 'email'
     },
     'system_shared': {
+        'engine': 'email'
+    },
+    "review_version": {
         'engine': 'email'
     },
     'cloud_notification':{

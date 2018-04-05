@@ -78,3 +78,11 @@ img.preview-image{
     white-space: nowrap;
     width: 95px;
 }
+
+.submit-row input[type=checkbox]{
+    margin-top: -1px !important;
+}
+
+.module h2{
+    background: #212A2F;
+}

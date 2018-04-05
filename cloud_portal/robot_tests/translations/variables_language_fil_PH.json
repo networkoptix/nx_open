@@ -39,6 +39,7 @@
     "VIEWER TEXT": "Viewer",
     "LIVE VIEWER TEXT": "Live Viewer",
     "CUSTOM TEXT": "Pasadya",
+    "YOUR SYSTEM TEXT": "Your System",
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "Isaaktibo ang iyong account",
     "RESET PASSWORD EMAIL SUBJECT": "I-reset ang iyong password",
     "INVITED TO SYSTEM EMAIL SUBJECT": "Iniimbitahan ka ng {{message.sharer_name}} sa {{PRODUCT_NAME}}",
@@ -51,5 +52,9 @@
     "PASSWORD IS REQUIRED TEXT": "Kinakailangan ang password",
     "PASSWORD SPECIAL CHARS TEXT": "Gumamit lamang ng mga liham na latin, numero at mga simbolo ng keyboard, iwasan ang mga nangungunang at sumusunod na mga puwang",
     "PASSWORD TOO SHORT TEXT": "Ang password ay dapat maglaman ng hindi bababa sa 8 mga character",
-    "PASSWORD TOO COMMON TEXT": "Ang password na ito ay nasa itaas ng pinaka-popular na mga password sa mundo"
+    "PASSWORD TOO COMMON TEXT": "Ang password na ito ay nasa itaas ng pinaka-popular na mga password sa mundo",
+    "PASSWORD IS WEAK TEXT": "Use numbers, upper and lower case letters and special characters to make your password stronger",
+    "THIS LINK IS BROKEN TEXT": "This link is broken,<br>\n            System may be disconnected from {{PRODUCT_NAME}},<br>\n            Access to this System may be revoked, <br>\n            or you may be logged into a different account",
+    "PAGE NOT FOUND": "Page not found",
+    "TAKE ME HOME": "Take me home"
 }

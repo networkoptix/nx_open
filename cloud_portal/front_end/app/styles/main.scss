@@ -354,7 +354,7 @@ a.disabled {
 }
 td{
     &.user-name{
-      max-width: 200px;
+      max-width: 175px;
     }
     &.user-email{
       @include ellipsis;

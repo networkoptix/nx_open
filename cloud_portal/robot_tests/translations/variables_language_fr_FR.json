@@ -39,6 +39,7 @@
     "VIEWER TEXT": "Visualisateur",
     "LIVE VIEWER TEXT": "Visualiseur en direct",
     "CUSTOM TEXT": "Personnalisé",
+    "YOUR SYSTEM TEXT": "Votre système",
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "Activez votre compte",
     "RESET PASSWORD EMAIL SUBJECT": "Réinitialisez votre mot de passe",
     "INVITED TO SYSTEM EMAIL SUBJECT": "{{message.sharer_name}} vous invite à {{PRODUCT_NAME}}",
@@ -51,5 +52,9 @@
     "PASSWORD IS REQUIRED TEXT": "Mot de passe requis",
     "PASSWORD SPECIAL CHARS TEXT": "Utilisez uniquement les lettres latines, les chiffres et les symboles du clavier, éviter les espaces de début et de fin",
     "PASSWORD TOO SHORT TEXT": "Mot de passe doit contenir au moins 8 caractères",
-    "PASSWORD TOO COMMON TEXT": "Ce mot de passe est en haut de la liste des plus populaires dans le monde"
+    "PASSWORD TOO COMMON TEXT": "Ce mot de passe est en haut de la liste des plus populaires dans le monde",
+    "PASSWORD IS WEAK TEXT": "Utiliser des nombres, majuscules et minuscules et caractères spéciaux pour rendre votre mot de passe plus fort",
+    "THIS LINK IS BROKEN TEXT": "Ce lien est brisé<br>             Système est peut-être déconnecté de {{PRODUCT_NAME}},<br>             Accès à ce sytème sont peut-être révoqué. <br>             ou vous êtes peut-être connecté à un autre compte",
+    "PAGE NOT FOUND": "Page non trouvée",
+    "TAKE ME HOME": "Me ramener à l'accueil"
 }
