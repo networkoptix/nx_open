@@ -35,8 +35,7 @@ def log_error(error, user_email, type, message, lang, customization, queue, atte
                 attempt,
                 traceback.format_exc())
 
-    if isinstance(error, SMTPException) or isinstance(error, SMTPServerDisconnected)\
-                                        or isinstance(error, MaxResendException):
+    if isinstance(error, SMTPException) or isinstance(error, SMTPServerDisconnected):
         logger.warning(error_formatted)
     else:
         logger.error(error_formatted)
