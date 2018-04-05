@@ -87,7 +87,6 @@
 #include <network/default_tcp_connection_processor.h>
 #include <network/system_helpers.h>
 
-#include <nx_ec/ec2_lib.h>
 #include <nx_ec/ec_api.h>
 #include <nx_ec/ec_proto_version.h>
 #include <nx_ec/data/api_user_data.h>

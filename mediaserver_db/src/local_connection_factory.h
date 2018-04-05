@@ -4,22 +4,19 @@
 #include <map>
 
 #include <common/common_module_aware.h>
-
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/timer_manager.h>
-
 #include <nx/utils/thread/joinable.h>
 #include <nx/utils/thread/stoppable.h>
-
 #include <nx_ec/ec_api.h>
-#include <nx_ec/data/api_connection_data.h>
 
 #include "ec2_connection.h"
 #include "settings.h"
 
 namespace ec2 {
 
-	class ServerQueryProcessorAccess;
+	struct ServerQueryProcessorAccess;
+    class QnDistributedMutexManager;
 
 	// TODO: #2.4 remove Ec2 prefix to avoid ec2::LocalConnectionFactory
 	class LocalConnectionFactory:

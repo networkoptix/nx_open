@@ -38,11 +38,10 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
-#include <llutil/hardware_id.h>
+#include <nx/utils/license/util.h>
 #include <network/tcp_connection_priv.h>
 #include <nx1/info.h>
 #include <nx_ec/data/api_conversion_functions.h>
-#include <nx_ec/ec2_lib.h>
 #include <rest/server/json_rest_result.h>
 #include <rest/server/rest_connection_processor.h>
 #include <utils/common/app_info.h>
