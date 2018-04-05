@@ -21,7 +21,7 @@
     #include <QtCore/QCryptographicHash>
 #endif
 
-#include "util.h"
+#include <nx/utils/license/util.h>
 #include "licensing/hardware_info.h"
 #include "hardware_id.h"
 #include "hardware_id_p.h"
