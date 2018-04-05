@@ -53,7 +53,7 @@ def work_dir(request):
 
 @pytest.fixture(scope='session')
 def bin_dir(request):
-    bin_dir = request.config.getoption('--bin-dir').expanduser()
+    bin_dir = request.config.getoption('--bin-dir')
     assert bin_dir, 'Argument --bin-dir is required'
     return bin_dir
 
