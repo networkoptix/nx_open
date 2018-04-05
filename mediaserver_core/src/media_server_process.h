@@ -55,7 +55,6 @@ public:
     QString permissionsLogLevel;
 
     QString rebuildArchive;
-    QString devModeKey;
     QString allowedDiscoveryPeers;
     QString ifListFilter;
     bool cleanupDb;
