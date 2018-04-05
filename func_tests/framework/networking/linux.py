@@ -3,16 +3,24 @@ import logging
 from pprint import pformat
 
 from netaddr import EUI
+from pylru import lrudecorator
 
+from framework.networking.interface import Networking
 from framework.os_access import NonZeroExitStatus
 from framework.utils import wait_until
 
 logger = logging.getLogger(__name__)
 
 
-class LinuxNetworking(object):
+class LinuxNetworking(Networking):
     def __init__(self, os_access, macs):
+        super(LinuxNetworking, self).__init__()
+        self._macs = macs
         self._os_access = os_access
+
+    @property
+    @lrudecorator(1)
+    def interfaces(self):
         output = self._os_access.run_command(
             '''
             mkdir -p /tmp/func_tests/networking
@@ -21,13 +29,14 @@ class LinuxNetworking(object):
             xargs -t -a interfaces.txt -I {} cat /sys/class/net/{}/address > macs.txt
             paste interfaces.txt macs.txt
             ''')
-        self.interfaces = {
+        interfaces = {
             EUI(raw_mac): interface
             for interface, raw_mac
             in csv.reader(output.splitlines(), delimiter='\t')
-            if EUI(raw_mac) in macs}
-        assert set(macs) == set(self.interfaces.keys())
-        logger.info("Interfaces on %r:\n%s", self._os_access, pformat(self.interfaces))
+            if EUI(raw_mac) in self._macs}
+        assert set(self._macs) == set(interfaces.keys())
+        logger.info("Interfaces on %r:\n%s", self._os_access, pformat(interfaces))
+        return interfaces
 
     def reset(self):
         """Don't touch localhost, host-bound interface and interfaces unknown to VM."""

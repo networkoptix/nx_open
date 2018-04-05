@@ -1,38 +1,27 @@
-from contextlib import closing
-
 import pytest
 
-from framework.merging import setup_local_system, merge_systems
-from framework.pool import Pool
 from framework.mediaserver_factory import MediaserverFactory
+from framework.merging import merge_systems, setup_local_system
 
 
 @pytest.fixture()
-def linux_mediaserver_factory(mediaserver_deb, ca, artifact_factory, vm_pools):
-    return MediaserverFactory(artifact_factory, vm_pools['linux'], mediaserver_deb, ca)
+def mediaserver_factory(artifact_factory, mediaserver_deb, ca, cloud_host):
+    return MediaserverFactory(artifact_factory, mediaserver_deb, ca, cloud_host)
 
 
 @pytest.fixture()
-def linux_mediaservers_pool(linux_mediaserver_factory):
-    with closing(Pool(linux_mediaserver_factory)) as pool:
-        yield pool
-
-
-@pytest.fixture()
-def two_linux_mediaservers(artifact_factory, two_linux_vms, mediaserver_deb, ca, cloud_host):
-    factory = MediaserverFactory(artifact_factory, two_linux_vms, mediaserver_deb, ca)
-    with closing(Pool(factory)) as pool:
-        servers = pool.get('first'), pool.get('second')
-        for server in servers:
-            server.installation.patch_binary_set_cloud_host(cloud_host)
-        yield servers
+def two_linux_mediaservers(mediaserver_factory, two_linux_vms):
+    first_vm, second_vm = two_linux_vms
+    with mediaserver_factory.allocated_mediaserver('first', first_vm) as first_mediaserver:
+        with mediaserver_factory.allocated_mediaserver('second', second_vm) as second_mediaserver:
+            yield first_mediaserver, second_mediaserver
 
 
 @pytest.fixture()
 def two_running_linux_mediaservers(two_linux_mediaservers):
-    for server in two_linux_mediaservers:
-        server.start()
-        setup_local_system(server, {})
+    for mediaserver in two_linux_mediaservers:
+        mediaserver.start()
+        setup_local_system(mediaserver, {})
     return two_linux_mediaservers
 
 
@@ -43,12 +32,9 @@ def two_merged_linux_mediaservers(two_running_linux_mediaservers):
 
 
 @pytest.fixture()
-def linux_mediaserver(linux_vm, artifact_factory, mediaserver_deb, ca, cloud_host):
-    factory = MediaserverFactory(artifact_factory, linux_vm, mediaserver_deb, ca)
-    with closing(Pool(factory)) as pool:
-        server = pool.get('single')
-        server.installation.patch_binary_set_cloud_host(cloud_host)
-        yield server
+def linux_mediaserver(linux_vm, mediaserver_factory):
+    with mediaserver_factory.allocated_mediaserver('single', linux_vm) as mediaserver:
+        yield mediaserver
 
 
 @pytest.fixture()

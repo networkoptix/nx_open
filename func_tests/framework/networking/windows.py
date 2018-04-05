@@ -2,6 +2,7 @@
 import logging
 from subprocess import check_output
 
+from framework.networking.interface import Networking
 from framework.windows_cmd_path import make_windows_cmd_path
 
 log = logging.getLogger(__name__)
@@ -13,20 +14,18 @@ class VBox(object):
         self._credentials = credentials
 
     def _ps_commands(self):
-        """
-        ConvertTo-Json
-        Get-NetConnectionProfile
-        Get-WmiObject -Class Win32_NetworkAdapter
-        Get-WmiObject -Class Win32_NetworkAdapterConfiguration
-        Get-NetIPAddress
-        Get-NetAdapter
-        Get-NetAdapterAdvancedProperty
-        Test-WSMan -ComputerName 10.5.0.10
-        Winrm enumerate windows_remoting/config/listener
-        winrs -r:10.5.0.10 -u:Administrator –p:qweasd123 ipconfig
-        windows_remoting set windows_remoting/config/service/auth '@{Basic="true"}'
-        windows_remoting set windows_remoting/config/service '@{AllowUnencrypted="true"}'
-        """
+        # ConvertTo-Json
+        # Get-NetConnectionProfile
+        # Get-WmiObject -Class Win32_NetworkAdapter
+        # Get-WmiObject -Class Win32_NetworkAdapterConfiguration
+        # Get-NetIPAddress
+        # Get-NetAdapter
+        # Get-NetAdapterAdvancedProperty
+        # Test-WSMan -ComputerName 10.5.0.10
+        # Winrm enumerate windows_remoting/config/listener
+        # winrs -r:10.5.0.10 -u:Administrator -p:qweasd123 ipconfig
+        # windows_remoting set windows_remoting/config/service/auth '@{Basic="true"}'
+        # windows_remoting set windows_remoting/config/service '@{AllowUnencrypted="true"}'
         pass
 
     def get_property(self, property_name):
@@ -89,3 +88,35 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
+class WindowsNetworking(Networking):
+    def __init__(self, os_access, macs):
+        super(WindowsNetworking, self).__init__()
+        self._macs = macs
+        self._os_access = os_access
+
+    def can_reach(self, ip, timeout_sec):
+        raise NotImplementedError()
+
+    def route(self, destination_ip_net, gateway_bound_mac, gateway_ip):
+        raise NotImplementedError()
+
+    def setup_ip(self, mac, ip, prefix_length):
+        raise NotImplementedError()
+
+    def disable_internet(self):
+        raise NotImplementedError()
+
+    def enable_internet(self):
+        raise NotImplementedError()
+
+    def reset(self):
+        raise NotImplementedError()
+
+    @property
+    def interfaces(self):
+        raise NotImplementedError()
+
+    def setup_nat(self, outer_mac):
+        raise NotImplementedError()

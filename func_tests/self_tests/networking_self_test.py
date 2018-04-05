@@ -1,12 +1,17 @@
+import pytest
 from netaddr import IPAddress, IPNetwork
-from pathlib2 import Path
 
 from framework.networking import setup_networks
+from framework.pool import ClosingPool
 
-SAMPLES_DIR = Path(__file__).parent / 'framework' / 'networking'
+
+@pytest.fixture()
+def machines(vm_factory):
+    with ClosingPool(vm_factory.allocated_vm, {}, 'linux') as machines:
+        yield machines
 
 
-def test_setup_basic(vm_pools, hypervisor):
+def test_setup_basic(machines, hypervisor):
     structure = {
         '10.254.1.0/24': {
             'first': None,
@@ -19,7 +24,8 @@ def test_setup_basic(vm_pools, hypervisor):
         '10.254.1.0/24': {
             'first': {
                 'second': None}}}
-    nodes, ip_addresses = setup_networks(vm_pools, hypervisor, structure, reachability)
+
+    nodes, ip_addresses = setup_networks(machines, hypervisor, structure, reachability)
 
     assert IPNetwork('10.254.1.0/24') in ip_addresses['first']
     assert IPNetwork('10.254.2.0/24') not in ip_addresses['first']

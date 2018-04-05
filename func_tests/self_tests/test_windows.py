@@ -1,39 +1,33 @@
 import logging
-from contextlib import closing
 import socket
+import struct
+from contextlib import closing
 from pprint import pformat
 
 import pytest
 import requests
-import struct
 
 from framework.os_access.windows_remoting.winrm_access import WinRMAccess
 from framework.utils import Wait
+from framework.vms.hypervisor import obtain_running_vm
 
 _logger = logging.getLogger(__name__)
 
 
 @pytest.fixture()
-def vm(vm_pools):
-    return vm_pools['windows'].get('single')
-
-
-@pytest.fixture(scope='session')
-def vm_factory(vm_factories):
-    return vm_factories['windows']
-
-
-@pytest.fixture(scope='session')
-def vm_registry(vm_registries):
-    return vm_registries['windows']
+def vm(vm_factory):
+    vm = vm_factory.allocate('single-windows-vm', vm_type='windows')
+    yield vm
+    vm_factory.release(vm)
 
 
 @pytest.fixture()
-def vm_info(vm_registry, vm_factory):
-    index = vm_registry.reserve('windows-test-connection')
-    info = vm_factory.find_or_clone(index)
-    yield info
-    vm_registry.relinquish(index)
+def vm_info(configuration, hypervisor, vm_registries):
+    windows_vm_registry = vm_registries['windows']
+    vm_index, vm_name = windows_vm_registry.take('raw-windows')
+    vm_info = obtain_running_vm(hypervisor, vm_name, vm_index, configuration['vm_types'])
+    yield vm_info
+    windows_vm_registry.free(vm_name)
 
 
 def test_connection(vm_info):

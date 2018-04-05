@@ -1,6 +1,6 @@
 from contextlib import closing
 
-from framework.pool import Pool
+from framework.pool import ProducingPool
 
 
 def test_get(linux_vms_pool):
@@ -13,10 +13,10 @@ def test_get(linux_vms_pool):
 
 
 def test_close(vm_factories):
-    with closing(Pool(vm_factories['linux'])) as pool:
+    with closing(ProducingPool(vm_factories['linux'])) as pool:
         first = pool.get('first')
         first_name = first.name
-    with closing(Pool(vm_factories['linux'])) as pool:
+    with closing(ProducingPool(vm_factories['linux'])) as pool:
         second = pool.get('second')
         second_name = second.name
     assert first_name == second_name

@@ -9,7 +9,7 @@ from framework.config import SingleTestConfig, TestParameter, TestsConfig
 from framework.mediaserverdeb import MediaserverDeb
 from framework.metrics_saver import MetricsSaver
 
-pytest_plugins = ['fixtures.vms', 'fixtures.mediaservers', 'fixtures.cloud']
+pytest_plugins = ['fixtures.vms', 'fixtures.mediaservers', 'fixtures.cloud', 'fixtures.layouts', 'fixtures.media']
 
 JUNK_SHOP_PLUGIN_NAME = 'junk-shop-db-capture'
 
@@ -55,7 +55,7 @@ def work_dir(request):
 def bin_dir(request):
     bin_dir = request.config.getoption('--bin-dir')
     assert bin_dir, 'Argument --bin-dir is required'
-    return bin_dir
+    return bin_dir.expanduser()
 
 
 @pytest.fixture(scope='session')

@@ -1,5 +1,7 @@
 import logging
 
+from decorator import contextmanager
+
 from framework.core_file_traceback import create_core_file_traceback
 from framework.rest_api import RestApi
 from framework.mediaserver_installation import install_mediaserver
@@ -108,19 +110,18 @@ def collect_core_dumps_from_mediaserver(mediaserver, root_artifact_factory):
 
 
 class MediaserverFactory(object):
-    def __init__(self, artifact_factory, machines, mediaserver_deb, ca):
+    def __init__(self, artifact_factory, mediaserver_deb, ca, cloud_host):
         self._artifact_factory = artifact_factory
-        self._machines = machines
         self._allocated_servers = []
         self._ca = ca
         self._mediaserver_deb = mediaserver_deb
+        self._cloud_host = cloud_host
 
-    def allocate(self, name, vm=None):
-        if vm is None:
-            vm = self._machines.get(name)
-        return setup_clean_mediaserver(name, vm, self._mediaserver_deb, self._ca)
-
-    def release(self, mediaserver):
+    @contextmanager
+    def allocated_mediaserver(self, name, vm):
+        mediaserver = setup_clean_mediaserver(name, vm, self._mediaserver_deb, self._ca)
+        mediaserver.installation.patch_binary_set_cloud_host(self._cloud_host)  # TODO: Call this in appropriate place.
+        yield mediaserver
         examine_mediaserver(mediaserver)
         collect_logs_from_mediaserver(mediaserver, self._artifact_factory)
         collect_core_dumps_from_mediaserver(mediaserver, self._artifact_factory)

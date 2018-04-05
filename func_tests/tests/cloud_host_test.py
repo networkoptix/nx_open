@@ -2,6 +2,7 @@ import logging
 
 import pytest
 
+from framework.mediaserver_factory import cleanup_mediaserver
 from framework.merging import IncompatibleServersMerge, merge_systems, setup_cloud_system, setup_local_system
 from framework.rest_api import HttpError, RestApi
 from framework.mediaserver import Mediaserver
@@ -68,19 +69,10 @@ def original_cloud_host_server(linux_vm, mediaserver_deb, ca):
     service = UpstartService(linux_vm.os_access, mediaserver_deb.customization.service)
     name = 'original-cloud-host'
     api = RestApi(name, *linux_vm.ports['tcp', 7001])
-    server = Mediaserver(name, service, installation, api, linux_vm, 7001)
-    server.stop()
-    server.installation.cleanup_core_files()
-    server.installation.cleanup_var_dir()
-    server.installation.put_key_and_cert(ca.generate_key_and_cert())
-    server.installation.restore_mediaserver_conf()
-    server.installation.update_mediaserver_conf({
-        'logLevel': 'DEBUG2',
-        'tranLogLevel': 'DEBUG2',
-        'checkForUpdateUrl': 'http://127.0.0.1:8080',  # TODO: Use fake server responding with small updates.
-        })
-    server.start()
-    return server
+    mediaserver = Mediaserver(name, service, installation, api, linux_vm, 7001)
+    cleanup_mediaserver(mediaserver, ca)
+    mediaserver.start()
+    return mediaserver
 
 
 # https://networkoptix.atlassian.net/wiki/spaces/SD/pages/85204446/Cloud+test

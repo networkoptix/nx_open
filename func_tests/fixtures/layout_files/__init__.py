@@ -3,7 +3,6 @@ from collections import namedtuple
 import yaml
 from pathlib2 import Path
 
-LAYOUTS_DIR = Path(__file__).parent
 Layout = namedtuple('Layout', ['networks', 'mergers'])
 
 
