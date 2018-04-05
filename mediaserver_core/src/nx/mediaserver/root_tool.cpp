@@ -179,12 +179,43 @@ bool RootTool::rename(const QString& oldPath, const QString& newPath)
     return execute({"mv", oldPath, newPath}) == 0;
 }
 
+template<typename R, typename DefaultAction, typename SocketAction, typename... Args>
+R RootTool::commandHelper(
+    R defaultValue, const QString& path, const char* command,
+    DefaultAction defaultAction, SocketAction socketAction, Args&&... args)
+{
+    if (m_toolPath.isEmpty())
+        return defaultAction();
+
+    QnMutexLocker lock(&m_mutex);
+    utils::concurrent::run([this, path, command, args...]() { execute({command, path, args...}); });
+
+    return socketAction();
+}
+
+template<typename DefaultAction>
+qint64 RootTool::int64SingleArgCommandHelper(
+    const QString& path, const char* command, DefaultAction defaultAction)
+{
+#if defined (Q_OS_LINUX)
+    return commandHelper(
+        -1LL, path, command, defaultAction,
+        []()
+        {
+            int64_t result;
+            return system_commands::domain_socket::readInt64(&result) ? result : -1;
+        });
+#else
+    return -1;
+#endif
+}
+
 int RootTool::open(const QString& path, QIODevice::OpenMode mode)
 {
 #if defined (Q_OS_LINUX)
     int sysFlags = makeUnixOpenFlags(mode);
     if (m_toolPath.isEmpty())
-        return SystemCommands().open(path.toStdString(), sysFlags, /*usePipe*/ false);
+        return SystemCommands().open(path.toStdString(), sysFlags, /*reportViaSocket*/ false);
 
     QnMutexLocker lock(&m_mutex);
     utils::concurrent::run(
@@ -198,44 +229,29 @@ int RootTool::open(const QString& path, QIODevice::OpenMode mode)
 
 qint64 RootTool::freeSpace(const QString& path)
 {
-#if defined (Q_OS_LINUX)
-    if (m_toolPath.isEmpty())
-        return SystemCommands().freeSpace(path.toStdString(), /*usePipe*/ false);
-
-    QnMutexLocker lock(&m_mutex);
-    utils::concurrent::run([this, path]() { execute({"freeSpace", path}); });
-    int64_t result;
-    return system_commands::domain_socket::readInt64(&result) ? result : -1;
-#else
-    return -1;
-#endif
+    return int64SingleArgCommandHelper(
+        path, "freeSpace",
+        [path]() { return SystemCommands().freeSpace(path.toStdString(), /*reportViaSocket*/ false); });
 }
 
 qint64 RootTool::totalSpace(const QString& path)
 {
-#if defined (Q_OS_LINUX)
-    if (m_toolPath.isEmpty())
-        return SystemCommands().totalSpace(path.toStdString(), /*usePipe*/ false);
-
-    QnMutexLocker lock(&m_mutex);
-    utils::concurrent::run([this, path]() { execute({"totalSpace", path}); });
-    int64_t result;
-    return system_commands::domain_socket::readInt64(&result) ? result : -1;
-#else
-    return -1;
-#endif
+    return int64SingleArgCommandHelper(
+        path, "totalSpace",
+        [path]() { return SystemCommands().totalSpace(path.toStdString(), /*reportViaSocket*/ false); });
 }
 
 bool RootTool::isPathExists(const QString& path)
 {
 #if defined (Q_OS_LINUX)
-    if (m_toolPath.isEmpty())
-        return SystemCommands().isPathExists(path.toStdString(), /*usePipe*/ false);
-
-    QnMutexLocker lock(&m_mutex);
-    utils::concurrent::run([this, path]() { execute({"exists", path}); });
-    int64_t result;
-    return system_commands::domain_socket::readInt64(&result) ? (bool) result : false;
+    return commandHelper(
+        false, path, "exists",
+        [path]() { return SystemCommands().isPathExists(path.toStdString(), /*reportViaSocket*/ false); },
+        []()
+        {
+            int64_t result;
+            return system_commands::domain_socket::readInt64(&result) ? (bool) result : false;
+        });
 #else
     return -1;
 #endif
@@ -307,11 +323,11 @@ QnAbstractStorageResource::FileInfoList RootTool::fileList(const QString& path)
     if (m_toolPath.isEmpty())
     {
         return fileListFromSerialized(
-            SystemCommands().serializedFileList(path.toStdString(), /*usePipe*/ false).c_str());
+            SystemCommands().serializedFileList(path.toStdString(), /*reportViaSocket*/ false).c_str());
     }
 
     QnMutexLocker lock(&m_mutex);
-    utils::concurrent::run([this, path]() { execute({"ll", path}); });
+    utils::concurrent::run([this, path]() { execute({"list", path}); });
 
     std::vector<char> buf;
     if (!system_commands::domain_socket::readBuffer(&readBufferReallocCallback, &buf))
@@ -325,18 +341,9 @@ QnAbstractStorageResource::FileInfoList RootTool::fileList(const QString& path)
 
 qint64 RootTool::fileSize(const QString& path)
 {
-#if defined (Q_OS_LINUX)
-    if (m_toolPath.isEmpty())
-        return SystemCommands().fileSize(path.toStdString(), /*usePipe*/ false);
-
-    QnMutexLocker lock(&m_mutex);
-    utils::concurrent::run([this, path]() { execute({"size", path}); });
-    int64_t result;
-    return system_commands::domain_socket::readInt64(&result) ? result : -1;
-#else
-    return -1;
-#endif
-
+    return int64SingleArgCommandHelper(
+        path, "size",
+        [path]() { return SystemCommands().fileSize(path.toStdString(), /*reportViaSocket*/ false); });
 }
 
 static std::string makeArgsLine(const std::vector<QString>& args)
