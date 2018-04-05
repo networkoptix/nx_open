@@ -1291,7 +1291,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     regUpdate<ApiWebPageData>(p, ApiCommand::saveWebPage);
 
 
-    /**%apidoc POST /ec2/removeUser
+    /**%apidoc POST /ec2/removeWebPage
      * Delete the specified web page.
      * <p>
      * Parameters should be passed as a JSON object in POST message body with
