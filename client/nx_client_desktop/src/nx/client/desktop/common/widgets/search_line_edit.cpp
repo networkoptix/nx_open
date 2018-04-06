@@ -1,6 +1,5 @@
 #include "search_line_edit.h"
 
-#include <QtCore/QTimer>
 #include <QtGui/QFocusEvent>
 #include <QtWidgets/QCompleter>
 #include <QtWidgets/QLineEdit>
@@ -15,7 +14,9 @@ namespace desktop {
 
 SearchLineEdit::SearchLineEdit(QWidget* parent):
     QWidget(parent),
-    m_lineEdit(new QLineEdit(this))
+    m_lineEdit(new QLineEdit(this)),
+    m_emitTextChanged(new utils::PendingOperation(
+        [this]() { emit textChanged(m_lineEdit->text()); }, 0, this))
 {
     setFocusPolicy(m_lineEdit->focusPolicy());
     setAttribute(Qt::WA_InputMethodEnabled);
@@ -39,27 +40,12 @@ SearchLineEdit::SearchLineEdit(QWidget* parent):
     m_lineEdit->addAction(qnSkin->icon("theme/input_search.png"), QLineEdit::LeadingPosition);
     m_lineEdit->setClearButtonEnabled(true);
 
+    m_emitTextChanged->setFlags(utils::PendingOperation::FireOnlyWhenIdle);
+
     connect(m_lineEdit, &QLineEdit::returnPressed, this, &SearchLineEdit::enterKeyPressed);
 
-    connect(m_lineEdit, &QLineEdit::textChanged, this,
-        [this](const QString &text)
-        {
-            const auto emitTextChanged =
-                [this, text]()
-                {
-                    emit textChanged(text);
-                    m_filterTimer.reset();
-                };
-
-            if (m_textChangedSignalFilterMs <= 0)
-            {
-                emitTextChanged();
-                return;
-            }
-
-            m_filterTimer.reset(executeDelayedParented(
-                emitTextChanged, m_textChangedSignalFilterMs, this));
-        });
+    connect(m_lineEdit, &QLineEdit::textChanged,
+        m_emitTextChanged.data(), &utils::PendingOperation::requestOperation);
 
     QSizePolicy policy = sizePolicy();
     setSizePolicy(QSizePolicy::Preferred, policy.verticalPolicy());
@@ -158,12 +144,12 @@ QVariant SearchLineEdit::inputMethodQuery(Qt::InputMethodQuery property) const
 
 int SearchLineEdit::textChangedSignalFilterMs() const
 {
-    return m_textChangedSignalFilterMs;
+    return m_emitTextChanged->intervalMs();
 }
 
 void SearchLineEdit::setTextChangedSignalFilterMs(int filterMs)
 {
-    m_textChangedSignalFilterMs = filterMs;
+    m_emitTextChanged->setIntervalMs(filterMs);
 }
 
 void SearchLineEdit::clear()

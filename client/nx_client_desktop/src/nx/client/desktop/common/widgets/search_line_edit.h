@@ -4,7 +4,8 @@
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QStyleOption>
 
-class QTimer;
+#include <nx/utils/pending_operation.h>
+
 class QLineEdit;
 
 namespace nx {
@@ -51,8 +52,7 @@ protected:
 
 private:
     QLineEdit* const m_lineEdit = nullptr;
-    int m_textChangedSignalFilterMs = 0;
-    QScopedPointer<QTimer> m_filterTimer;
+    const QScopedPointer<utils::PendingOperation> m_emitTextChanged;
 };
 
 } // namespace desktop
