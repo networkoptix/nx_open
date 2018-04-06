@@ -59,8 +59,6 @@ Make sure notowner is in the system
     ${status}    Run Keyword And Return Status    Wait Until Element Is Visible    //div[@process-loading='gettingSystemUsers']//tbody//tr//td[contains(text(), 'noptixautoqa+notowner@gmail.com')]
     Run Keyword Unless    ${status}    Add notowner
 
-
-
 Clean up noperm first/last name
     Register Keyword To Run On Failure    None
     Open Browser and go to URL    ${url}/account

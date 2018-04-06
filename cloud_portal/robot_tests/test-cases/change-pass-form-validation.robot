@@ -1,11 +1,11 @@
 *** Settings ***
 Resource          ../resource.robot
 Resource          ../variables.robot
-Resource          ../form-validation-resource.robot
 Suite Setup       Open Change Password Dialog
 Suite Teardown    Close Browser
 Test Teardown     Run Keyword If Test Failed    Test Reset
 Test Template     Test Passwords Invalid
+Force Tags        form
 
 *** Variables ***
 ${url}    ${ENV}
@@ -52,10 +52,16 @@ Open Change Password Dialog
 Test Passwords Invalid
     [Arguments]    ${old pw}    ${new pw}
     Wait Until Elements Are Visible    ${CURRENT PASSWORD INPUT}    ${NEW PASSWORD INPUT}    ${CHANGE PASSWORD BUTTON}
-    Form Validation    Change Password    password=${old pw}    password2=${new pw}
+    Change Password Form Validation    ${old pw}    ${new pw}
     Run Keyword Unless    "${old pw}" == "${BASE PASSWORD}" or "${old pw}" == "${7char password}"    Check Old Password Outline
     Run Keyword Unless    "${new pw}" == "${BASE PASSWORD}"    Check New Password Outline    ${new pw}
     Run Keyword If    "${old pw}" == "${7char password}"    Check Old Password Alert
+
+Change Password Form Validation
+    [arguments]    ${old password}    ${new password}
+    Input Text    ${CURRENT PASSWORD INPUT}    ${old password}
+    Input Text    ${NEW PASSWORD INPUT}    ${new password}
+    Click Button    ${CHANGE PASSWORD BUTTON}
 
 Check Old Password Outline
     Wait Until Element Is Visible    ${CURRENT PASSWORD INPUT}/parent::div/parent::div[contains(@class,'has-error')]
