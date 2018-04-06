@@ -377,6 +377,12 @@ Item
 
             propagateComposedEvents: true
 
+            onDoubleTapDownPosChanged:
+            {
+                // doubleTapDownPos can be "undefined".
+                flick.interactive = doubleTapDownPos ? false : true
+            }
+
             onDoubleTapScaleModeChanged:
             {
                 if (doubleTapScaleMode)
@@ -411,7 +417,7 @@ Item
                     return
 
                 var sideSize = Math.max(rootItem.width, rootItem.height)
-                var targetScale = 1 + currentVector.y / sideSize * 4
+                var targetScale = 1 - currentVector.y / sideSize * 4
                 pinchArea.updatePinch(doubleTapDownPos, doubleTapDownPos, targetScale)
             }
 
@@ -428,11 +434,16 @@ Item
                 }
             }
 
-            onCanceled: doubleTapScaleMode = false
+            onCanceled:
+            {
+                doubleTapScaleMode = false
+                doubleTapDownPos = undefined
+            }
 
             onReleased:
             {
                 doubleTapScaleMode = false
+                doubleTapDownPos = undefined
                 if (!doubleClickFilter.running)
                     return
 
