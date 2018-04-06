@@ -39,11 +39,13 @@
 #include <utils/intent_listener_android.h>
 #include <handlers/lite_client_handler.h>
 
-#include <nx/media/decoder_registrar.h>
 #include <resource_allocator.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/utils/std/cpp14.h>
 
+#include <nx/media/media_fwd.h>
+#include <nx/media/decoder_registrar.h>
+#include <nx/media/video_decoder_registry.h>
 #include <nx/mobile_client/webchannel/web_channel_server.h>
 #include <nx/mobile_client/controllers/web_admin_controller.h>
 #include <nx/mobile_client/helpers/inter_client_message.h>
@@ -155,28 +157,16 @@ int runUi(QtSingleGuiApplication* application)
     QObject::connect(engine, &QQmlEngine::quit, application, &QGuiApplication::quit);
 
     prepareWindow();
-    std::shared_ptr<nx::media::AbstractResourceAllocator> allocator(new ResourceAllocator(
-        mainWindow));
 
     QSize maxFfmpegResolution = qnSettings->maxFfmpegResolution();
     if (maxFfmpegResolution.isEmpty())
-    {
-        // Use platform-dependent defaults.
-
-        if (QnAppInfo::isArm())
-        {
-            if (QnAppInfo::isBpi())
-                maxFfmpegResolution = QSize(1280, 720);
-            else
-                maxFfmpegResolution = QSize(1920, 1080);
-
-            if (QnAppInfo::isMobile())
-                maxFfmpegResolution = QSize(1920, 1080);
-        }
-    }
+        maxFfmpegResolution = nx::media::VideoDecoderRegistry::platformMaxFfmpegResolution();
 
     nx::media::DecoderRegistrar::registerDecoders(
-        allocator, maxFfmpegResolution, /*isTranscodingEnabled*/ !context.liteMode());
+        maxFfmpegResolution, /*isTranscodingEnabled*/ !context.liteMode());
+
+    nx::media::VideoDecoderRegistry::instance()->setDefaultResourceAllocator(
+        nx::media::ResourceAllocatorPtr(new ResourceAllocator(mainWindow)));
 
     #if defined(Q_OS_ANDROID)
         QUrl initialIntentData = getInitialIntentData();

@@ -22,7 +22,5 @@ public:
     }
 };
 
-typedef std::shared_ptr<AbstractResourceAllocator> ResourceAllocatorPtr;
-
 } // namespace media
 } // namespace nx
