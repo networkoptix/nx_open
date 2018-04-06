@@ -35,3 +35,9 @@ def get_time(api):
     time_response = api.get('/ec2/getCurrentTime')
     received = datetime.fromtimestamp(float(time_response['value']) / 1000., utc)
     return RunningTime(received, datetime.now(utc) - started_at)
+
+
+def is_primary_time_server(api):
+    response = api.get('ec2/getCurrentTime')
+    is_primary = response['isPrimaryTimeServer']
+    return is_primary

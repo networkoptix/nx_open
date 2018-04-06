@@ -109,6 +109,11 @@ def collect_core_dumps_from_mediaserver(mediaserver, root_artifact_factory):
         log.warning('Core dump on %r: %s, %s.', mediaserver.name, mediaserver, local_core_dump_path, local_traceback_path)
 
 
+def collect_artifacts_from_mediaserver(mediaserver, root_artifact_factory):
+    collect_logs_from_mediaserver(mediaserver, root_artifact_factory)
+    collect_core_dumps_from_mediaserver(mediaserver, root_artifact_factory)
+
+
 class MediaserverFactory(object):
     def __init__(self, artifact_factory, mediaserver_deb, ca, cloud_host):
         self._artifact_factory = artifact_factory
@@ -123,5 +128,4 @@ class MediaserverFactory(object):
         mediaserver.installation.patch_binary_set_cloud_host(self._cloud_host)  # TODO: Call this in appropriate place.
         yield mediaserver
         examine_mediaserver(mediaserver)
-        collect_logs_from_mediaserver(mediaserver, self._artifact_factory)
-        collect_core_dumps_from_mediaserver(mediaserver, self._artifact_factory)
+        collect_artifacts_from_mediaserver(mediaserver, self._artifact_factory)
