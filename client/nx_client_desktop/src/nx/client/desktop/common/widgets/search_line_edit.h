@@ -4,11 +4,12 @@
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QStyleOption>
 
-#include <nx/utils/pending_operation.h>
-
 class QLineEdit;
 
 namespace nx {
+
+namespace utils { class PendingOperation; }
+
 namespace client {
 namespace desktop {
 
@@ -19,6 +20,7 @@ class SearchLineEdit: public QWidget
 
 public:
     explicit SearchLineEdit(QWidget* parent = nullptr);
+    virtual ~SearchLineEdit() override;
 
     inline QLineEdit* lineEdit() const { return m_lineEdit; }
 

@@ -8,6 +8,8 @@
 #include <ui/style/skin.h>
 #include <utils/common/delayed.h>
 
+#include <nx/utils/pending_operation.h>
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -49,6 +51,10 @@ SearchLineEdit::SearchLineEdit(QWidget* parent):
 
     QSizePolicy policy = sizePolicy();
     setSizePolicy(QSizePolicy::Preferred, policy.verticalPolicy());
+}
+
+SearchLineEdit::~SearchLineEdit()
+{
 }
 
 void SearchLineEdit::initStyleOption(QStyleOptionFrameV2* option) const
