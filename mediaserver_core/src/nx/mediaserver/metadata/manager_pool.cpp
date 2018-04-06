@@ -199,11 +199,11 @@ static void freeSettings(std::vector<nxpl::Setting>* settings)
 
 /** @return Empty settings if the file does not exist, or on error. */
 std::vector<nxpl::Setting> ManagerPool::loadSettingsFromFile(
-    const char* const fileDescription, const QString& filename)
+    const QString& fileDescription, const QString& filename)
 {
     using nx::utils::log::Level;
     auto log = //< Can be used to return empty settings: return log(...)
-        [&](Level level, const char* const message)
+        [&](Level level, const QString& message)
         {
             NX_UTILS_LOG(level, this) << lm("Metadata %1 settings: %2: [%3]")
                 .args(fileDescription, message, filename);
@@ -211,41 +211,41 @@ std::vector<nxpl::Setting> ManagerPool::loadSettingsFromFile(
         };
 
     if (!QFileInfo::exists(filename))
-        return log(Level::info, "File does not exist");
+        return log(Level::info, lit("File does not exist"));
 
-    log(Level::info, "Loading from file");
+    log(Level::info, lit("Loading from file"));
 
     QFile f(filename);
     if (!f.open(QFile::ReadOnly))
-        return log(Level::error, "Unable to open file");
+        return log(Level::error, lit("Unable to open file"));
 
     const QString& settingsStr = f.readAll();
     if (settingsStr.isEmpty())
-        return log(Level::error, "Unable to read from file");
+        return log(Level::error, lit("Unable to read from file"));
 
     bool success = false;
     const auto& settingsFromJson = QJson::deserialized<QList<PluginSetting>>(
         settingsStr.toUtf8(), /*defaultValue*/ {}, &success);
     if (!success)
-        return log(Level::error, "Invalid JSON in file");
+        return log(Level::error, lit("Invalid JSON in file"));
 
     std::vector<nxpl::Setting> settings(settingsFromJson.size());
     for (auto i = 0; i < settingsFromJson.size(); ++i)
     {
         // Memory will be deallocated by freeSettings().
-        settings.at(i).name = strdup(settingsFromJson.at(i).name.toUtf8().data());
-        settings.at(i).value = strdup(settingsFromJson.at(i).value.toUtf8().data());
+        settings[i].name = strdup(settingsFromJson.at(i).name.toUtf8().data());
+        settings[i].value = strdup(settingsFromJson.at(i).value.toUtf8().data());
     }
     return settings;
 }
 
 /** If path is empty, the path to ini_config .ini files is used. */
 static QString settingsFilename(
-    const char* const path, const QString& pluginLibName, const char* const extraSuffix = "")
+    const char* const path, const QString& pluginLibName, const QString& extraSuffix = "")
 {
     return QDir::cleanPath( //< Normalize to use forward slashes, as required by QFile.
         QString::fromUtf8(path[0] ? path : nx::kit::IniConfig::iniFilesDir()) + lit("/")
-        + pluginLibName + QLatin1String(extraSuffix) + lit(".json"));
+        + pluginLibName + extraSuffix + lit(".json"));
 }
 
 void ManagerPool::setCameraManagerDeclaredSettings(
@@ -254,8 +254,9 @@ void ManagerPool::setCameraManagerDeclaredSettings(
     const QString& pluginLibName)
 {
     // TODO: Stub. Implement storing the settings in the database.
-    auto settings = loadSettingsFromFile("Plugin Camera Manager", settingsFilename(
-        pluginsIni().metadataPluginCameraManagerSettingsPath, pluginLibName, "_camera_manager"));
+    auto settings = loadSettingsFromFile(lit("Plugin Camera Manager"), settingsFilename(
+        pluginsIni().metadataPluginCameraManagerSettingsPath,
+        pluginLibName, lit("_camera_manager")));
     manager->setDeclaredSettings(
         settings.empty() ? nullptr : &settings.front(), (int) settings.size());
     freeSettings(&settings);
@@ -264,7 +265,7 @@ void ManagerPool::setCameraManagerDeclaredSettings(
 void ManagerPool::setPluginDeclaredSettings(Plugin* plugin, const QString& pluginLibName)
 {
     // TODO: Stub. Implement storing the settings in the database.
-    auto settings = loadSettingsFromFile("Plugin", settingsFilename(
+    auto settings = loadSettingsFromFile(lit("Plugin"), settingsFilename(
         pluginsIni().metadataPluginSettingsPath, pluginLibName));
     plugin->setDeclaredSettings(
         settings.empty() ? nullptr : &settings.front(), (int) settings.size());
