@@ -1,7 +1,7 @@
 #import <UiKit/UiKit.h>
 
 #import <QtCore/QUrl>
-#import <QtGUi/QDesktopServices>
+#import <QtGui/QDesktopServices>
 
 @interface QIOSApplicationDelegate
 @end
