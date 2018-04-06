@@ -15,22 +15,22 @@ log = logging.getLogger(__name__)
 
 
 @pytest.mark.parametrize(('layout_file', 'target_alias', 'proxy_alias'), [
-    # ('unrouted-merge_toward_proxy-request_proxy.yaml', 'first', 'second'),
-    # ('unrouted-merge_toward_proxy-request_sides.yaml', 'first', 'second'),
-    # ('unrouted-merge_toward_sides-request_sides.yaml', 'first', 'second'),
-    # ('direct-merge_toward_requested.yaml', 'first', 'second'),
-    # ('direct-merge_toward_requested.yaml', 'second', 'first'),
-    # ('nat-merge_toward_inner.yaml', 'inner', 'outer'),
+    ('unrouted-merge_toward_proxy-request_proxy.yaml', 'first', 'second'),
+    ('unrouted-merge_toward_proxy-request_sides.yaml', 'first', 'second'),
+    ('unrouted-merge_toward_sides-request_sides.yaml', 'first', 'second'),
+    ('direct-merge_toward_requested.yaml', 'first', 'second'),
+    ('direct-merge_toward_requested.yaml', 'second', 'first'),
+    ('nat-merge_toward_inner.yaml', 'inner', 'outer'),
     ('nat-merge_toward_inner.yaml', 'outer', 'inner'),
     ])
 @pytest.mark.parametrize('api_endpoint', [
     'api/moduleInformation',
-    # 'ec2/getMediaServersEx',
-    # 'ec2/testConnection',
-    # 'ec2/getStorages',
-    # 'ec2/getResourceParams',
-    # 'ec2/getCamerasEx',
-    # 'ec2/getUsers',
+    'ec2/getMediaServersEx',
+    'ec2/testConnection',
+    'ec2/getStorages',
+    'ec2/getResourceParams',
+    'ec2/getCamerasEx',
+    'ec2/getUsers',
     ])
 def test_responses_are_equal(system, target_alias, proxy_alias, api_endpoint):
     wait = Wait("until responses become equal")
