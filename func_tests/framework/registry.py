@@ -1,7 +1,7 @@
 import logging
 from collections import OrderedDict
 
-from decorator import contextmanager
+from contextlib import contextmanager
 
 from framework.move_lock import MoveLock
 from framework.serialize import dump, load

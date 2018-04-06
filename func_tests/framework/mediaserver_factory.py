@@ -1,6 +1,6 @@
 import logging
 
-from decorator import contextmanager
+from contextlib import contextmanager
 
 from framework.core_file_traceback import create_core_file_traceback
 from framework.rest_api import RestApi
