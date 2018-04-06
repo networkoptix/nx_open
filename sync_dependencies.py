@@ -191,6 +191,7 @@ def sync_dependencies(syncher):
         sync("uboot-2014.04-10733-gbb5691c-dirty-vanilla")
 
     sync("any/certificates-" + customization, path_variable="certificates_path")
+    sync("any/root-certificates", path_variable="root_certificates_path")
 
 
 def main():

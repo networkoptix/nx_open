@@ -16,7 +16,11 @@ if(NOT useLoginKeychain AND NOT (mac.skip.sign AND ios.skip.sign))
     endif()
 
     add_custom_target(prepare_mac_keychain
-        ${CMAKE_SOURCE_DIR}/build_utils/macos/prepare_build_keychain.sh
+        COMMAND ${CMAKE_SOURCE_DIR}/build_utils/macos/prepare_build_keychain.sh
+            --keychain ${codeSigningKeychainName}
+            --keychain-password ${codeSigningKeychainPassword}
+            --certificate ${root_certificates_path}/apple/AppleWWDRCA.cer
+        COMMAND ${CMAKE_SOURCE_DIR}/build_utils/macos/prepare_build_keychain.sh
             --keychain ${codeSigningKeychainName}
             --keychain-password ${codeSigningKeychainPassword}
             --certificate ${certificate}
