@@ -24,10 +24,9 @@ def vm(vm_factory):
 @pytest.fixture()
 def vm_info(configuration, hypervisor, vm_registries):
     windows_vm_registry = vm_registries['windows']
-    vm_index, vm_name = windows_vm_registry.take('raw-windows')
-    vm_info = obtain_running_vm(hypervisor, vm_name, vm_index, configuration['vm_types'])
-    yield vm_info
-    windows_vm_registry.free(vm_name)
+    with windows_vm_registry.taken('raw-windows') as (vm_index, vm_name):
+        vm_info = obtain_running_vm(hypervisor, vm_name, vm_index, configuration['vm_types'])
+        yield vm_info
 
 
 def test_connection(vm_info):
