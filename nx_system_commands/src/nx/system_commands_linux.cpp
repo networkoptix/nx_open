@@ -13,6 +13,7 @@
 #include <sys/un.h>
 #include <sys/types.h>
 #include <sys/statvfs.h>
+#include <sys/mount.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <dirent.h>
@@ -239,13 +240,45 @@ bool SystemCommands::mount(const std::string& url, const std::string& directory,
     return false;
 }
 
-bool SystemCommands::unmount(const std::string& directory)
+SystemCommands::UnmountCode SystemCommands::unmount(
+    const std::string& directory, bool reportViaSocket)
 {
-    if (!checkMountPermissions(directory))
-        return false;
+    UnmountCode result;
 
-    // TODO: Check if it is mounted by cifs.
-    return execute("umount '" + directory + "'");
+    if (!checkMountPermissions(directory))
+    {
+        result = noPermissions;
+        goto end;
+    }
+
+    if (umount(directory.c_str()) == 0)
+    {
+        result = ok;
+        goto end;
+    }
+
+    switch(errno)
+    {
+        case EINVAL:
+        case ENOENT:
+            result = notExists;
+            break;
+        case ENOMEM:
+        case EBUSY:
+            result = busy;
+            break;
+        case EPERM:
+            result = noPermissions;
+            break;
+        default:
+            assert(0);
+    }
+
+end:
+    if (reportViaSocket)
+        system_commands::domain_socket::detail::sendInt64((int64_t) result);
+
+    return result;
 }
 
 bool SystemCommands::changeOwner(const std::string& path)
@@ -326,7 +359,7 @@ int SystemCommands::open(const std::string& path, int mode, bool reportViaSocket
 
     int fd = ::open(path.c_str(), mode, 0660);
     if (reportViaSocket)
-        system_commands::domain_socket::detail::sendFd(fd);;
+        system_commands::domain_socket::detail::sendFd(fd);
 
     return fd;
 }
@@ -470,6 +503,19 @@ bool SystemCommands::setupIds()
 std::string SystemCommands::lastError() const
 {
     return m_lastError;
+}
+
+const char* SystemCommands::unmountCodeToString(UnmountCode code)
+{
+    switch (code)
+    {
+        case ok: return "ok";
+        case busy: return "resource is busy";
+        case notExists: return "path not exists";
+        case noPermissions: return "no permissions";
+    }
+
+    return "";
 }
 
 } // namespace nx

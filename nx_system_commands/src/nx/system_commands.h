@@ -1,3 +1,5 @@
+#pragma once
+
 #include <string>
 #include <boost/optional.hpp>
 
@@ -8,12 +10,21 @@ class SystemCommands
 public:
     static const char* const kDomainSocket;
 
+    enum UnmountCode
+    {
+        ok,
+        busy,
+        notExists,
+        noPermissions
+    };
+
     /** Mounts NAS from url to directory for real UID and GID. */
-    bool mount(const std::string& url, const std::string& directory,
+    bool mount(
+        const std::string& url, const std::string& directory,
         const boost::optional<std::string>& username, const boost::optional<std::string>& password);
 
     /** Unounts NAS from directory. */
-    bool unmount(const std::string& directory);
+    UnmountCode unmount(const std::string& directory, bool reportViaSocket);
 
     /** Changes path ownership to real UID and GID. */
     bool changeOwner(const std::string& path);
@@ -58,6 +69,8 @@ public:
     bool setupIds();
 
     std::string lastError() const;
+
+    static const char* unmountCodeToString(UnmountCode code);
 
 private:
     enum class CheckOwnerResult

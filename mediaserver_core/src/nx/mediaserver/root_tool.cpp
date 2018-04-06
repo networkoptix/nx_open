@@ -5,7 +5,6 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/system_error.h>
 #include <nx/utils/concurrent.h>
-#include <nx/system_commands.h>
 #if defined (Q_OS_LINUX)
     #include <nx/system_commands/domain_socket/read_linux.h>
 #endif
@@ -82,10 +81,11 @@ Qn::StorageInitResult RootTool::mount(const QUrl& url, const QString& path)
 
 Qn::StorageInitResult RootTool::remount(const QUrl& url, const QString& path)
 {
-    bool result = unmount(path);
+    SystemCommands::UnmountCode result = unmount(path);
     NX_VERBOSE(
         this,
-        lm("[initOrUpdate, mount] root_tool unmount %1 result %2").args(path, result));
+        lm("[initOrUpdate, mount] root_tool unmount %1 result %2")
+            .args(path, SystemCommands::unmountCodeToString(result)));
 
     auto mountResult = mount(url, path);
     NX_VERBOSE(
@@ -95,18 +95,22 @@ Qn::StorageInitResult RootTool::remount(const QUrl& url, const QString& path)
     return mountResult;
 }
 
-bool RootTool::unmount(const QString& path)
+SystemCommands::UnmountCode RootTool::unmount(const QString& path)
 {
-    if (m_toolPath.isEmpty())
-    {
-        SystemCommands commands;
-        if (!commands.unmount(path.toStdString()))
-            return false;
+#if defined (Q_OS_LINUX)
+    return commandHelper(
+        SystemCommands::noPermissions, path, "unmount",
+        [path]() { return SystemCommands().unmount(path.toStdString(), /*reportViaSocket*/ false); },
+        []()
+        {
+            int64_t result;
+            return system_commands::domain_socket::readInt64(&result)
+                ? (SystemCommands::UnmountCode) result : SystemCommands::noPermissions;
+        });
+#else
+    return SystemCommands::noPermissions;
+#endif
 
-        return true;
-    }
-
-    return execute({"unmount", path}) == 0;
 }
 
 bool RootTool::changeOwner(const QString& path)
