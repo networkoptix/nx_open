@@ -156,7 +156,7 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
                 return Result::invalidArg;
 
             return systemCommands->unmount(*path, /*usePipe*/ true) ==
-                nx::SystemCommands::UnmountCode::ok ? Result::execFailed : Result::ok;
+                nx::SystemCommands::UnmountCode::ok ? Result::ok : Result::execFailed;
         });
 
     factory.reg({"help"}, {},
