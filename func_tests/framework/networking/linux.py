@@ -9,7 +9,7 @@ from framework.networking.interface import Networking
 from framework.os_access import NonZeroExitStatus
 from framework.utils import wait_until
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)  # TODO: Rename all such vars to `_logger`.
 
 
 class LinuxNetworking(Networking):
@@ -72,11 +72,19 @@ class LinuxNetworking(Networking):
             ['ip', 'route', 'replace', destination_ip_net, 'dev', interface, 'via', gateway_ip, 'proto', 'static'])
 
     def enable_internet(self):
-        self._os_access.run_command(['iptables', '-D', 'OUTPUT', '-j', 'REJECT'])
+        while True:
+            try:
+                self._os_access.run_command(['iptables', '-D', 'OUTPUT', '-j', 'REJECT'])
+            except NonZeroExitStatus:
+                logger.debug("No more internet restricting rules in iptables.")
+                break
         assert wait_until(lambda: self.can_reach('8.8.8.8'), name="until internet is on")
 
     def disable_internet(self):
-        self._os_access.run_command(['iptables', '-A', 'OUTPUT', '-j', 'REJECT'])
+        try:
+            self._os_access.run_command(['iptables', '-C', 'OUTPUT', '-j', 'REJECT'])
+        except NonZeroExitStatus:
+            self._os_access.run_command(['iptables', '-A', 'OUTPUT', '-j', 'REJECT'])
         assert wait_until(lambda: not self.can_reach('8.8.8.8'), name="until internet is off")
 
     def setup_nat(self, outer_mac):
