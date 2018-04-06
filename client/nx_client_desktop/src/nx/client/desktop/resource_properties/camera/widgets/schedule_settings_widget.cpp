@@ -44,65 +44,10 @@ namespace desktop {
 
 ScheduleSettingsWidget::ScheduleSettingsWidget(QWidget* parent):
     base_type(parent),
-    ui(new Ui::ScheduleSettingsWidget())
+    ui(new Ui::ScheduleSettingsWidget()),
+    paintFunctions(new SchedulePaintFunctions())
 {
-    ui->setupUi(this);
-
-    QFont labelFont;
-    labelFont.setPixelSize(kRecordingTypeLabelFontSize);
-    labelFont.setWeight(kRecordingTypeLabelFontWeight);
-
-    for (auto label: {
-        ui->labelAlways, ui->labelMotionOnly, ui->labelMotionPlusLQ, ui->labelNoRecord
-    })
-    {
-        label->setFont(labelFont);
-        label->setProperty(style::Properties::kDontPolishFontProperty, true);
-    }
-
-    // Quality combo box contains Qn::StreamQuality constants as user data for normal visible items
-    // (Low, Medium, High, Best), and those constants + customQualityOffset for invisible items
-    // with asterisks (Low*, Medium*, High*, Best*).
-    const auto addQualityItem =
-        [this](Qn::StreamQuality quality)
-        {
-            const auto text = toDisplayString(quality);
-            ui->qualityComboBox->addItem(text, quality);
-            const auto index = ui->qualityComboBox->count();
-            ui->qualityComboBox->addItem(text + lit(" *"), kCustomQualityOffset + quality);
-            qobject_cast<QListView*>(ui->qualityComboBox->view())->setRowHidden(index, true);
-            if (auto model = qobject_cast<QStandardItemModel*>(ui->qualityComboBox->model()))
-                model->item(index)->setFlags(Qt::NoItemFlags);
-        };
-
-    addQualityItem(Qn::QualityLow);
-    addQualityItem(Qn::QualityNormal);
-    addQualityItem(Qn::QualityHigh);
-    addQualityItem(Qn::QualityHighest);
-    ui->qualityComboBox->setCurrentIndex(ui->qualityComboBox->findData(Qn::QualityHigh));
-
-    ui->bitrateSpinBox->setSuffix(lit(" ") + tr("Mbit/s"));
-
-    ui->bitrateSlider->setProperty(
-        style::Properties::kSliderFeatures,
-        static_cast<int>(style::SliderFeature::FillingUp));
-
-    /*
-    installEventHandler(
-        {ui->recordMotionButton, ui->recordMotionPlusLQButton},
-        QEvent::MouseButtonRelease,
-        this,
-        &ScheduleSettingsWidget::at_releaseSignalizer_activated);
-    */
-
-    auto aligner = new Aligner(this);
-    aligner->addWidgets({ui->fpsLabel, ui->qualityLabel, ui->bitrateLabel});
-
-    // Reset group box bottom margin to zero. Sub-widget margins defined in the ui-file rely on it.
-    ui->settingsGroupBox->ensurePolished();
-    auto margins = ui->settingsGroupBox->contentsMargins();
-    margins.setBottom(0);
-    ui->settingsGroupBox->setContentsMargins(margins);
+    setupUi();
 }
 
 ScheduleSettingsWidget::~ScheduleSettingsWidget() = default;
@@ -183,6 +128,77 @@ void ScheduleSettingsWidget::setStore(CameraSettingsDialogStore* store)
             store->setCustomRecordingBitrateNormalized(
                 normalizedValue(ui->bitrateSlider));
         });
+}
+
+void ScheduleSettingsWidget::setupUi()
+{
+    ui->setupUi(this);
+
+    QFont labelFont;
+    labelFont.setPixelSize(kRecordingTypeLabelFontSize);
+    labelFont.setWeight(kRecordingTypeLabelFontWeight);
+
+    for (auto label: {
+        ui->labelAlways, ui->labelMotionOnly, ui->labelMotionPlusLQ, ui->labelNoRecord
+    })
+    {
+        label->setFont(labelFont);
+        label->setProperty(style::Properties::kDontPolishFontProperty, true);
+    }
+
+    // Quality combo box contains Qn::StreamQuality constants as user data for normal visible items
+    // (Low, Medium, High, Best), and those constants + customQualityOffset for invisible items
+    // with asterisks (Low*, Medium*, High*, Best*).
+    const auto addQualityItem =
+        [this](Qn::StreamQuality quality)
+        {
+            const auto text = toDisplayString(quality);
+            ui->qualityComboBox->addItem(text, quality);
+            const auto index = ui->qualityComboBox->count();
+            ui->qualityComboBox->addItem(text + lit(" *"), kCustomQualityOffset + quality);
+            qobject_cast<QListView*>(ui->qualityComboBox->view())->setRowHidden(index, true);
+            if (auto model = qobject_cast<QStandardItemModel*>(ui->qualityComboBox->model()))
+                model->item(index)->setFlags(Qt::NoItemFlags);
+        };
+
+    addQualityItem(Qn::QualityLow);
+    addQualityItem(Qn::QualityNormal);
+    addQualityItem(Qn::QualityHigh);
+    addQualityItem(Qn::QualityHighest);
+    ui->qualityComboBox->setCurrentIndex(ui->qualityComboBox->findData(Qn::QualityHigh));
+
+    ui->bitrateSpinBox->setSuffix(lit(" ") + tr("Mbit/s"));
+
+    ui->bitrateSlider->setProperty(
+        style::Properties::kSliderFeatures,
+        static_cast<int>(style::SliderFeature::FillingUp));
+
+    /*
+    installEventHandler(
+        {ui->recordMotionButton, ui->recordMotionPlusLQButton},
+        QEvent::MouseButtonRelease,
+        this,
+        &ScheduleSettingsWidget::at_releaseSignalizer_activated);
+    */
+
+    auto aligner = new Aligner(this);
+    aligner->addWidgets({ui->fpsLabel, ui->qualityLabel, ui->bitrateLabel});
+
+    // Reset group box bottom margin to zero. Sub-widget margins defined in the ui-file rely on it.
+    ui->settingsGroupBox->ensurePolished();
+    auto margins = ui->settingsGroupBox->contentsMargins();
+    margins.setBottom(0);
+    ui->settingsGroupBox->setContentsMargins(margins);
+
+    ui->recordAlwaysButton->setCustomPaintFunction(
+        paintFunctions->paintCellFunction(Qn::RT_Always));
+    ui->recordMotionButton->setCustomPaintFunction(
+        paintFunctions->paintCellFunction(Qn::RT_MotionOnly));
+    ui->recordMotionPlusLQButton->setCustomPaintFunction(
+        paintFunctions->paintCellFunction(Qn::RT_MotionAndLowQuality));
+    ui->noRecordButton->setCustomPaintFunction(
+        paintFunctions->paintCellFunction(Qn::RT_Never));
+
 }
 
 void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)

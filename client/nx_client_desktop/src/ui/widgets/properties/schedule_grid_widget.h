@@ -10,7 +10,7 @@
 #include <client/client_color_types.h>
 
 #include <nx/client/desktop/common/utils/custom_painted.h>
-
+#include <nx/client/desktop/resource_properties/camera/utils/schedule_paint_functions.h>
 
 class QnScheduleGridWidget : public QWidget
 {
@@ -70,14 +70,10 @@ public:
     const QnScheduleGridColors& colors() const;
     void setColors(const QnScheduleGridColors& colors);
 
-    nx::client::desktop::CustomPaintedBase::PaintFunction paintFunction(Qn::RecordingType type) const;
-
 signals:
     void cellActivated(const QPoint& cell);
     void cellValueChanged(const QPoint& cell);
     void cellValuesChanged();
-
-    void colorsChanged();
 
 protected:
     virtual void mouseMoveEvent(QMouseEvent* event) override;
@@ -107,13 +103,12 @@ private:
 
     void updateSelectedCellsRect();
 
-    void updateCellColors();
-
     QRectF horizontalHeaderCell(int x) const;
     QRectF verticalHeaderCell(int y) const;
     QRectF cornerHeaderCell() const;
 
 private:
+    nx::client::desktop::SchedulePaintFunctions paintFunctions;
     CellParams m_brushParams; /**< Params which we are using for user input. */
     GridParams m_gridParams;
     bool m_showFps = true;
@@ -133,12 +128,6 @@ private:
     QFont m_labelsFont;
     QFont m_gridFont;
     QnScheduleGridColors m_colors;
-
-    using TypeColors = std::array<QColor, Qn::RT_Count>;
-    TypeColors m_cellColors;
-    TypeColors m_cellColorsHovered;
-    TypeColors m_insideColors;
-    TypeColors m_insideColorsHovered;
 
     bool m_readOnly = false;
     bool m_active = true;

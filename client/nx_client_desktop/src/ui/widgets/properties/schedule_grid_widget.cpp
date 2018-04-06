@@ -3,7 +3,6 @@
 #include <cassert>
 
 #include <QtCore/QDate>
-#include <QtCore/QtMath>
 
 #include <QtGui/QPainter>
 #include <QtGui/QMouseEvent>
@@ -13,7 +12,6 @@
 #include <client/client_settings.h>
 #include <core/resource/media_resource.h>
 #include <utils/common/scoped_painter_rollback.h>
-#include <utils/math/color_transformations.h>
 #include <ui/style/globals.h>
 #include <ui/style/helper.h>
 #include <nx/utils/math/fuzzy.h>
@@ -60,8 +58,6 @@ bool QnScheduleGridWidget::CellParams::isAutomaticBitrate() const
 QnScheduleGridWidget::QnScheduleGridWidget(QWidget* parent):
     QWidget(parent)
 {
-    updateCellColors();
-
     resetCellValues();
 
     QDate date(2010, 1, 1);
@@ -224,43 +220,6 @@ QRectF QnScheduleGridWidget::cornerHeaderCell() const
         m_cornerSize.height());
 }
 
-CustomPaintedBase::PaintFunction QnScheduleGridWidget::paintFunction(Qn::RecordingType type) const
-{
-    return
-        [this, type](QPainter* painter, const QStyleOption* option, const QWidget* widget) -> bool
-        {
-            Q_UNUSED(widget);
-            bool hovered = option->state.testFlag(QStyle::State_MouseOver);
-
-            QColor color((hovered ? m_cellColorsHovered : m_cellColors)[type]);
-            QColor colorInside((hovered ? m_insideColorsHovered : m_insideColors)[type]);
-
-            painter->fillRect(option->rect, color);
-
-            if (colorInside.toRgb() != color.toRgb())
-            {
-                QnScopedPainterBrushRollback brushRollback(painter, colorInside);
-                QnScopedPainterPenRollback penRollback(painter, QPen(m_colors.border, 0));
-                QnScopedPainterTransformRollback transformRollback(painter);
-                painter->translate(option->rect.topLeft());
-                painter->scale(option->rect.width(), option->rect.height());
-
-                static const qreal trOffset = 1.0 / 6.0;
-                static const qreal trSize = 1.0 / 10.0;
-                static const std::array<QPointF, 4> points({
-                    QPointF(1.0 - trOffset - trSize, trOffset),
-                    QPointF(1.0 - trOffset, trOffset + trSize),
-                    QPointF(trOffset + trSize, 1.0 - trOffset),
-                    QPointF(trOffset, 1.0 - trSize - trOffset)});
-
-                painter->drawLine(0.0, 1.0, 1.0, 0.0);
-                painter->drawPolygon(points.data(), static_cast<int>(points.size()));
-            }
-
-            return true;
-        };
-}
-
 void QnScheduleGridWidget::paintEvent(QPaintEvent* event)
 {
     Q_UNUSED(event);
@@ -313,35 +272,33 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent* event)
 
     p.translate(m_gridLeftOffset, m_gridTopOffset);
 
-    QStyleOption option;
-    option.initFrom(this);
-    option.rect = QRect(0, 0, cellSize - 1, cellSize - 1);
+    const QRect rect = QRect(0, 0, cellSize - 1, cellSize - 1);
 
     for (int x = 0; x < columnCount(); ++x)
     {
         for (int y = 0; y < rowCount(); ++y)
         {
             auto cellParams = m_gridParams[x][y];
-            option.state &= ~QStyle::State_MouseOver;
+            bool hovered = false;
 
             if (!m_mousePressed)
             {
                 if ((x == m_mouseMoveCell.x() || m_mouseMoveCell.x() == -1) &&
                     (y == m_mouseMoveCell.y() || m_mouseMoveCell.y() == -1))
                 {
-                    option.state |= QStyle::State_MouseOver;
+                    hovered = true;
                 }
             }
             else if (m_selectedCellsRect.normalized().contains(x, y))
             {
                 cellParams = m_brushParams;
-                option.state |= QStyle::State_MouseOver;
+                hovered = true;
             }
 
-            QTransform transform = p.transform();
+            QnScopedPainterTransformRollback transformRollback(&p);
             p.translate(x * cellSize + 1, y * cellSize + 1);
 
-            paintFunction(cellParams.recordingType)(&p, &option, this);
+            paintFunctions.paintCell(&p, rect, hovered, cellParams.recordingType);
 
             const auto suffix = qFuzzyIsNull(cellParams.bitrateMbps) ? QString() : lit("*");
 
@@ -379,8 +336,6 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent* event)
                         Qt::AlignCenter, toShortDisplayString(quality) + suffix);
                 }
             }
-
-            p.setTransform(transform);
         }
     }
 
@@ -405,14 +360,7 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent* event)
 
     // draw selection
     if (!m_selectedRect.isEmpty())
-    {
-        QColor defColor = m_cellColors[kDefaultRecordingType];
-        QColor brushColor = subColor(defColor, qnGlobals->selectionOpacityDelta());
-
-        p.setPen(subColor(defColor, qnGlobals->selectionBorderDelta()));
-        p.setBrush(brushColor);
-        p.drawRect(m_selectedRect);
-    }
+        paintFunctions.paintSelection(&p, m_selectedRect);
 }
 
 void QnScheduleGridWidget::resizeEvent(QResizeEvent *event)
@@ -720,11 +668,7 @@ const QnScheduleGridColors &QnScheduleGridWidget::colors() const
 void QnScheduleGridWidget::setColors(const QnScheduleGridColors& colors)
 {
     m_colors = colors;
-    updateCellColors();
-
     update();
-
-    emit colorsChanged();
 }
 
 void QnScheduleGridWidget::updateSelectedCellsRect()
@@ -739,21 +683,4 @@ void QnScheduleGridWidget::updateSelectedCellsRect()
         qSwap(topLeft.ry(), bottomRight.ry());
 
     m_selectedCellsRect = QRect(topLeft, bottomRight);
-}
-
-void QnScheduleGridWidget::updateCellColors()
-{
-    m_insideColors[Qn::RT_Never] = m_cellColors[Qn::RT_Never] = m_colors.recordNever;
-    m_insideColors[Qn::RT_MotionOnly] = m_cellColors[Qn::RT_MotionOnly] = m_colors.recordMotion;
-    m_insideColors[Qn::RT_Always] = m_cellColors[Qn::RT_Always] = m_colors.recordAlways;
-
-    m_insideColorsHovered[Qn::RT_Never] = m_cellColorsHovered[Qn::RT_Never] = m_colors.recordNeverHovered;
-    m_insideColorsHovered[Qn::RT_MotionOnly] = m_cellColorsHovered[Qn::RT_MotionOnly] = m_colors.recordMotionHovered;
-    m_insideColorsHovered[Qn::RT_Always] = m_cellColorsHovered[Qn::RT_Always] = m_colors.recordAlwaysHovered;
-
-    m_cellColors[Qn::RT_MotionAndLowQuality] = m_colors.recordMotion;
-    m_insideColors[Qn::RT_MotionAndLowQuality] = m_colors.recordAlways;
-
-    m_cellColorsHovered[Qn::RT_MotionAndLowQuality] = m_colors.recordMotionHovered;
-    m_insideColorsHovered[Qn::RT_MotionAndLowQuality] = m_colors.recordAlwaysHovered;
 }

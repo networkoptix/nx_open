@@ -53,7 +53,6 @@ using boost::algorithm::any_of;
 
 namespace {
 
-
 void setLayoutEnabled(QLayout* layout, bool enabled)
 {
     const auto count = layout->count();
@@ -66,10 +65,6 @@ void setLayoutEnabled(QLayout* layout, bool enabled)
             setLayoutEnabled(childLayout, enabled);
     }
 }
-
-
-
-
 
 } // namespace
 
@@ -329,17 +324,6 @@ CameraScheduleWidget::~CameraScheduleWidget() = default;
 
 
 /*
-void CameraScheduleWidget::overrideMotionType(Qn::MotionType motionTypeOverride)
-{
-    if (m_motionTypeOverride == motionTypeOverride)
-        return;
-
-    m_motionTypeOverride = motionTypeOverride;
-
-    updateMotionAvailable();
-    updateMaxFPS();
-}
-
 void CameraScheduleWidget::afterContextInitialized()
 {
 
@@ -424,30 +408,6 @@ void CameraScheduleWidget::applyChanges()
         setScheduleAlert(QString());
         updateLicensesLabelText();
     }
-}
-
-void CameraScheduleWidget::updateMotionAvailable()
-{
-    using boost::algorithm::all_of;
-
-    bool available = all_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera)
-        { return !camera->isDtsBased(); });
-    if (m_motionTypeOverride != Qn::MT_Default)
-    {
-        available &= m_motionTypeOverride != Qn::MT_NoMotion;
-    }
-    else
-    {
-        available &= all_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera)
-            { return camera->hasMotion(); });
-    }
-
-    if (m_motionAvailable == available)
-        return;
-
-    m_motionAvailable = available;
-
-    updateMotionButtons();
 }
 
 void CameraScheduleWidget::setExportScheduleButtonEnabled(bool enabled)

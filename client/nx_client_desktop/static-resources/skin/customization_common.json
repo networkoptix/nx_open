@@ -757,18 +757,11 @@
         "colors": {
             "normalLabel": "light10",
             "weekendLabel": "red_core",
+            "gridLabel": "light4",
             "allLabel": "light16",
-            "recordNever": "dark5",
-            "recordAlways": "green_core",
-            "recordMotion": "red_d1",
-            "recordNeverHovered": "dark6",
-            "recordAlwaysHovered": "green_l1",
-            "recordMotionHovered": "red_core",
             "hoveredBackground": "dark9",
             "pressedBackground": "dark6",
-            "gridLine": "dark7",
-            "gridLabel": "light4",
-            "border": "dark4"
+            "gridLine": "dark7"
         }
     },
 
