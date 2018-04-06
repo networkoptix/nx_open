@@ -6,12 +6,13 @@
 
 namespace nx {
 namespace client {
-namespace mobile {
+namespace core {
 
 MediaPlayer::MediaPlayer(QObject* parent):
     base_type(parent)
 {
-    auto updateState = [this]
+    const auto updateState =
+        [this]
         {
             const auto state = playbackState();
             const auto status = mediaStatus();
@@ -103,6 +104,6 @@ QnCommonModule* MediaPlayer::commonModule() const
     return qnClientCoreModule->commonModule();
 }
 
-} // namespace mobile
+} // namespace core
 } // namespace client
 } // namespace nx

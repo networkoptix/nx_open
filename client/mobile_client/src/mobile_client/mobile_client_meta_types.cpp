@@ -20,7 +20,6 @@
 #include <camera/camera_chunk_provider.h>
 #include <camera/active_camera_thumbnail_loader.h>
 #include <camera/thumbnail_cache_accessor.h>
-#include <nx/mobile_client/media/media_player.h>
 #include <watchers/cloud_status_watcher.h>
 #include <watchers/cloud_system_information_watcher.h>
 #include <watchers/user_watcher.h>
@@ -49,7 +48,6 @@ void QnMobileClientMetaTypes::initialize()
 
 void QnMobileClientMetaTypes::registerMetaTypes()
 {
-    qRegisterMetaType<nx::media::PlayerStatistics>();
     QnJsonSerializer::registerSerializer<InterClientMessage::Command>();
 }
 
@@ -74,10 +72,6 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterType<QnCloudStatusWatcher>("com.networkoptix.qml", 1, 0, "QnCloudStatusWatcher");
     qmlRegisterType<QnCloudSystemInformationWatcher>("com.networkoptix.qml", 1, 0, "QnCloudSystemInformationWatcher");
     qmlRegisterType<QnUserWatcher>("com.networkoptix.qml", 1, 0, "QnUserWatcher");
-    /* NxMediaPlayer should not be used.
-       It is here only to allow assignments of MediaPlayer to properties of this type. */
-    qmlRegisterType<MediaPlayer>("Nx.Media", 1, 0, "MediaPlayer");
-    qmlRegisterUncreatableType<nx::media::Player>("Nx.Media", 1, 0, "NxMediaPlayer", lit("Cannot create an instance of abstract class."));
     qmlRegisterType<QnActiveCameraThumbnailLoader>("com.networkoptix.qml", 1, 0, "QnActiveCameraThumbnailLoader");
     qmlRegisterType<QnThumbnailCacheAccessor>("com.networkoptix.qml", 1, 0, "QnThumbnailCacheAccessor");
     qmlRegisterType<QnQuickTextInput>("Nx.Controls", 1, 0, "TextInput");

@@ -4,7 +4,7 @@
 
 namespace nx {
 namespace client {
-namespace mobile {
+namespace core {
 
 class MediaPlayer: public nx::media::Player
 {
@@ -50,6 +50,6 @@ private:
     bool m_noVideoStreams = false;
 };
 
-} // namespace mobile
+} // namespace core
 } // namespace client
 } // namespace nx

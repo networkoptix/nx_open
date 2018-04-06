@@ -18,7 +18,9 @@
 #include <utils/common/app_info.h>
 #include <helpers/nx_globals_object.h>
 #include <helpers/url_helper.h>
+
 #include <nx/client/core/animation/kinetic_animation.h>
+#include <nx/client/core/media/media_player.h>
 #include <nx/client/core/ui/frame_section.h>
 #include <nx/client/core/utils/geometry.h>
 #include <nx/client/core/utils/quick_item_mouse_tracker.h>
@@ -45,6 +47,8 @@ void initializeMetaTypes()
 {
     qRegisterMetaType<QnStringSet>();
     qRegisterMetaTypeStreamOperators<QnStringSet>();
+
+    qRegisterMetaType<nx::media::PlayerStatistics>();
 
     qmlRegisterType<QnQmlTestHelper>("Nx.Test", 1, 0, "QmlTestHelper");
     qmlRegisterType<QnScenePositionListener>("com.networkoptix.qml", 1, 0, "QnScenePositionListener");
@@ -75,6 +79,11 @@ void initializeMetaTypes()
     FrameSection::registedQmlType();
     Geometry::registerQmlType();
     QuickItemMouseTracker::registerQmlType();
+
+    /* NxMediaPlayer should not be used.
+    It is here only to allow assignments of MediaPlayer to properties of this type. */
+    qmlRegisterType<MediaPlayer>("Nx.Media", 1, 0, "MediaPlayer");
+    qmlRegisterUncreatableType<nx::media::Player>("Nx.Media", 1, 0, "NxMediaPlayer", lit("Cannot create an instance of abstract class."));
 
     qmlRegisterUncreatableType<QnMediaDewarpingParams>("Nx.Media", 1, 0, "MediaDewarpingParams",
         QLatin1String("Cannot create an instance of QnMediaDewarpingParams."));
