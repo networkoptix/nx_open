@@ -65,7 +65,7 @@ public:
 
     void onConnect(SystemError::ErrorCode code);
 
-    void onSend(SystemError::ErrorCode code, size_t size);
+    void onSendSubscriptionQuery(SystemError::ErrorCode code, size_t size);
 
     virtual nx::sdk::Error startFetchingMetadata(
         nx::sdk::metadata::MetadataHandler* handler,

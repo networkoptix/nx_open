@@ -109,6 +109,7 @@ void* Manager::queryInterface(const nxpl::NX_GUID& interfaceId)
  */
 void Manager::treatMessage(QByteArray message)
 {
+    NX_PRINT << "Treating notification message " << message;
     const QString internalName = QString::fromLatin1(message);
 
     auto it = std::find_if(m_eventsToCatch.begin(), m_eventsToCatch.end(),
@@ -222,34 +223,44 @@ void Manager::onConnect(SystemError::ErrorCode code)
 {
     if (code != SystemError::noError)
     {
-        NX_PRINT << "Failed to connect to camera notification server";
+        NX_PRINT << "Failed to connect to DW MTT camera notification server. Next connection attempt in"
+            << std::chrono::seconds(kReconnectTimeout).count() << " seconds.";
         m_reconnectTimer.start(kReconnectTimeout, [this]() { reconnectSocket(); });
         return;
     }
+    NX_PRINT << "Connection to DW MTT camera notification server established";
 
     QList<QByteArray> names = internalNamesToCatch();
     const QByteArray subscriptionXml = nx::dw_mtt::makeSubscriptionXml(names);
     const nx_http::Request subscriptionRequest = m_cameraController.makeHttpRequest(subscriptionXml);
     m_subscriptionRequest = subscriptionRequest.toString();
 
+    QByteArray eventNames;
+    for (const auto& eventName : names)
+    {
+        eventNames = eventNames + eventName + " ";
+    }
+    NX_PRINT << "Trying to subscribe events: " << eventNames.toStdString();
+
     m_tcpSocket->sendAsync(
         m_subscriptionRequest,
         [this](SystemError::ErrorCode code, size_t size)
         {
-            this->onSend(code, size);
+            this->onSendSubscriptionQuery(code, size);
         });
 }
 
-void Manager::onSend(SystemError::ErrorCode code, size_t size)
+void Manager::onSendSubscriptionQuery(SystemError::ErrorCode code, size_t size)
 {
     if (code != SystemError::noError || size <= 0)
     {
-        NX_PRINT << "Failed to subscribe to events";
+        NX_PRINT << "Failed to send subscription query. Connection will be reconnected in"
+            << std::chrono::seconds(kReconnectTimeout).count() << " seconds.";
         m_reconnectTimer.start(kReconnectTimeout, [this]() { reconnectSocket(); });
         return;
     }
 
-    NX_PRINT << "Connection to camera tcp notification server established";
+    NX_PRINT << "Subscription query sent successfully. Ready to receive data";
     m_tcpSocket->readSomeAsync(
         &m_buffer,
         [this](SystemError::ErrorCode errorCode, size_t size)
@@ -266,9 +277,13 @@ void Manager::onReceive(SystemError::ErrorCode code, size_t size)
 {
     if (code != SystemError::noError || size == 0) //< connection broken or closed
     {
+        NX_PRINT << "Receive failed. Connection broken or closed. Next connection attempt in"
+            << std::chrono::seconds(kReconnectTimeout).count() << " seconds.";
         m_reconnectTimer.start(kReconnectTimeout, [this]() { reconnectSocket(); });
         return;
     }
+
+    NX_PRINT << size << "byte(s) received";
 
     const QByteArray alarmTagOpen = R"(<smartType type="openAlramObj">)";
     const QByteArray alarmTagClose = R"(</smartType>)";
@@ -341,11 +356,21 @@ nx::sdk::Error Manager::startFetchingMetadata(nx::sdk::metadata::MetadataHandler
             m_eventsToCatch.emplace_back(*eventType);
         }
     }
+
+    QByteArray eventNames;
+    for (const auto& event: m_eventsToCatch)
+    {
+        eventNames = eventNames + event.type.internalName.toUtf8() + " ";
+    }
+    NX_PRINT << "Server demanded to start fetching event(s): " << eventNames;
+
+    NX_PRINT << "Trying to get DW MTT-camera tcp notification server port.";
     if (!m_cameraController.readPortConfiguration())
     {
         NX_PRINT << "Failed to get DW MTT-camera tcp notification server port.";
         return nx::sdk::Error::networkError;
     }
+    NX_PRINT << "DW MTT-camera tcp notification port = " << m_cameraController.longPollingPort();
 
     const  QString kAddressPattern("%1:%2");
     QString ipPort = kAddressPattern.arg(
