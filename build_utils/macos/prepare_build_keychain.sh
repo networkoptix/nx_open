@@ -6,6 +6,7 @@ KEYCHAIN="nx_build"
 KEYCHAIN_PASSWORD="qweasd123"
 CERT=""
 CERT_PASSWORD=""
+IGNORE_IMPORT_ERRORS=0
 
 HELP_MESSAGE="Usage: $(basename $0) [options]
 Prepare a keychain for codesigning the project.
@@ -40,6 +41,10 @@ do
             shift
             shift
             ;;
+        -q|--ignore-import-errors)
+            IGNORE_IMPORT_ERRORS=1
+            shift
+            ;;
         -h|--help)
             echo "$HELP_MESSAGE"
             exit
@@ -67,6 +72,7 @@ fi
 
 echo "Unlocking keychain $KEYCHAIN"
 
+security default-keychain -s "$KEYCHAIN"
 security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
 security set-keychain-settings "$KEYCHAIN"
 
@@ -74,9 +80,12 @@ if [ -n "$CERT" ]
 then
     echo "Importing certificates from $CERT"
 
-    security import "$CERT" -k "$KEYCHAIN" -P "$CERT_PASSWORD" -T "/usr/bin/codesign"
+    ERROR_FLAG="-e"
+    [ $IGNORE_IMPORT_ERRORS = 1 ] && ERROR_FLAG="+e"
+    (set $ERROR_FLAG; \
+        security import "$CERT" -k "$KEYCHAIN" -P "$CERT_PASSWORD" -T "/usr/bin/codesign"; \
+        true)
 fi
 
 security set-key-partition-list -S apple: -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN" \
     > /dev/null 2> /dev/null || true
-
