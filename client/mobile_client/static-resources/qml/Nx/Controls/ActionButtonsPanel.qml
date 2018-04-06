@@ -55,10 +55,7 @@ Item
         {
             var type = d.modelDataAccessor.getData(index, "type")
             if (type == ActionButtonsModel.PtzButton)
-            {
-                ptzButtonClicked()
                 return;
-            }
 
             var text = d.modelDataAccessor.getData(index, "hint")
             hintControl.showHint(
@@ -84,7 +81,10 @@ Item
         {
             var type = d.modelDataAccessor.getData(index, "type")
             if (type == ActionButtonsModel.PtzButton)
+            {
+                control.ptzButtonClicked()
                 return
+            }
 
             hintControl.hideDelayed()
         }
@@ -118,7 +118,7 @@ Item
             {
                 var index = buttonModel.rowById(id)
                 var text = d.modelDataAccessor.getData(index, "hint")
-                var prolonged = d.modelDataAccessor.getData(index, "allowLongPress")
+                var prolonged = d.modelDataAccessor.getData(index, "prolongedAction")
                 var icon = d.modelDataAccessor.getData(index, "iconPath")
                 if (!success)
                     hintControl.showFailure(text)
@@ -156,7 +156,7 @@ Item
 
         function handleSoftwareTriggerPressed(index, pressed)
         {
-            var prolonged = d.modelDataAccessor.getData(index, "allowLongPress")
+            var prolonged = d.modelDataAccessor.getData(index, "prolongedAction")
             var id = d.modelDataAccessor.getData(index, "id")
             if (pressed)
             {

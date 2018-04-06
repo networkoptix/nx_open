@@ -106,7 +106,8 @@ ListView
         {
             button.active = true
             control.initiallyPressed(index)
-            pressedStateFilterTimer.restart()
+            if (!model.disableLongPress)
+                pressedStateFilterTimer.restart()
         }
 
         onReleased:

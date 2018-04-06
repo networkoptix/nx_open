@@ -15,7 +15,8 @@ enum Roles
     typeRoleId,
     iconPathRoleId,
     hintRoleId,
-    allowLongPressRoleId,
+    prolongedActionRoleId,
+    disableLongPressRoleId,
     enabledRoleId
 };
 
@@ -24,7 +25,8 @@ const QHash<int, QByteArray> kRoleNames = {
     {typeRoleId, "type"},
     {iconPathRoleId, "iconPath"},
     {hintRoleId, "hint"},
-    {allowLongPressRoleId, "allowLongPress"},
+    {prolongedActionRoleId, "prolongedAction"},
+    {disableLongPressRoleId, "disableLongPress"},
     {enabledRoleId, "enabled"}};
 
 } // namespace
@@ -42,7 +44,8 @@ struct ActionButtonsModel::Button
         ActionButtonsModel::ButtonType type,
         const QString& iconPath,
         const QString& hint,
-        bool allowLongPress,
+        bool prolongedAction,
+        bool disableLongPress,
         bool enabled);
 
     virtual ~Button();
@@ -51,7 +54,8 @@ struct ActionButtonsModel::Button
     ActionButtonsModel::ButtonType type;
     QString iconPath;
     QString hint;
-    bool allowLongPress = false;
+    bool prolongedAction = false;
+    bool disableLongPress = false;
     bool enabled = true;
 
     static ActionButtonsModel::ButtonPtr createFakeSoftButton(const QnUuid& id);
@@ -70,14 +74,16 @@ ActionButtonsModel::Button::Button(
     ActionButtonsModel::ButtonType type,
     const QString& iconPath,
     const QString& hint,
-    bool allowLongPress,
+    bool prolongedAction,
+    bool disableLongPress,
     bool enabled)
     :
     id(id),
     type(type),
     iconPath(iconPath),
     hint(hint),
-    allowLongPress(allowLongPress),
+    prolongedAction(prolongedAction),
+    disableLongPress(disableLongPress),
     enabled(enabled)
 {
 }
@@ -90,14 +96,14 @@ ActionButtonsModel::ActionButtonsModel::ButtonPtr
 ActionButtonsModel::Button::createFakeSoftButton(const QnUuid& id)
 {
     return ButtonPtr(new Button(id, ActionButtonsModel::SoftTriggerButton,
-        QString(), QString(), true, true));
+        QString(), QString(), true, true, true));
 }
 
 ActionButtonsModel::ButtonPtr ActionButtonsModel::Button::createPtzButton()
 {
     return ButtonPtr(new Button(
         QnUuid(), ActionButtonsModel::PtzButton,
-        lit("qrc:///images/ptz/ptz.png"), QString(), false, true));
+        lit("qrc:///images/ptz/ptz.png"), QString(), false, true, true));
 }
 
 ActionButtonsModel::ButtonPtr ActionButtonsModel::Button::createTwoWayAudioButton()
@@ -105,7 +111,7 @@ ActionButtonsModel::ButtonPtr ActionButtonsModel::Button::createTwoWayAudioButto
     return ButtonPtr(new Button(
         QnUuid(), ActionButtonsModel::TwoWayAudioButton,
         lit("qrc:///images/two_way_audio/mic.png"),
-        ActionButtonsModel::twoWayButtonHint(), true, true));
+        ActionButtonsModel::twoWayButtonHint(), true, false, true));
 }
 
 ActionButtonsModel::ButtonPtr ActionButtonsModel::Button::createSoftwareTriggerButton(
@@ -117,7 +123,7 @@ ActionButtonsModel::ButtonPtr ActionButtonsModel::Button::createSoftwareTriggerB
 {
     return ButtonPtr(new Button(
         id, ActionButtonsModel::SoftTriggerButton,
-        iconPath, name, prolonged, enabled));
+        iconPath, name, prolonged, false, enabled));
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -211,8 +217,10 @@ QVariant ActionButtonsModel::data(const QModelIndex& index, int role) const
             return button->hint;
         case iconPathRoleId:
             return button->iconPath;
-        case allowLongPressRoleId:
-            return button->allowLongPress;
+        case prolongedActionRoleId:
+            return button->prolongedAction;
+        case disableLongPressRoleId:
+            return button->disableLongPress;
         case enabledRoleId:
             return button->enabled;
         return QVariant();
@@ -395,10 +403,10 @@ void ActionButtonsModel::updateTriggerFields(
     }
 
     if (fields.testFlag(SoftwareTriggersWatcher::ProlongedField)
-        && button->allowLongPress != m_softwareTriggeresWatcher->prolongedTrigger(id))
+        && button->prolongedAction != m_softwareTriggeresWatcher->prolongedTrigger(id))
     {
-        button->allowLongPress = !button->allowLongPress;
-        changedDataIndicies << allowLongPressRoleId;
+        button->prolongedAction = !button->prolongedAction;
+        changedDataIndicies << prolongedActionRoleId;
     }
 
     if (fields.testFlag(SoftwareTriggersWatcher::NameField))
