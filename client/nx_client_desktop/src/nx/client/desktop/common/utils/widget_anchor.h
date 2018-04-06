@@ -42,7 +42,7 @@ private:
     void updateGeometry();
 
 private:
-    Qt::Edges m_edges = Qt::LeftEdge | Qt::TopEdge | Qt::RightEdge | Qt::BottomEdge;
+    Qt::Edges m_edges = Qt::Edges(Qt::LeftEdge | Qt::TopEdge | Qt::RightEdge | Qt::BottomEdge);
     QMargins m_margins = QMargins(0, 0, 0, 0);
     QPointer<QWidget> m_widget;
 };
