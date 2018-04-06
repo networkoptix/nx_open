@@ -56,11 +56,7 @@ class Registry(object):
         index_str = str(index).zfill(digits)
         return self._name_format.format(index=index_str)
 
-    def possible_entries(self):
-        for index in range(1, self._limit + 1):
-            yield index, self._make_name(index)
-
-    def take(self, alias):  # TODO: Rename alias: it's used merely as reminder or comment in file.
+    def _take(self, alias):  # TODO: Rename alias: it's used merely as reminder or comment in file.
         with self._reservations_locked() as reservations:
             for index, name in self.possible_entries():
                 try:
@@ -76,7 +72,7 @@ class Registry(object):
                     return index, name
         raise RegistryLimitReached("Cannot find vacant reservation in {!r} for {!r}".format(self, alias))
 
-    def free(self, name):
+    def _free(self, name):
         with self._reservations_locked() as reservations:
             try:
                 alias = reservations[name]
@@ -86,6 +82,18 @@ class Registry(object):
                 reservations[name] = None
             except KeyError:
                 raise RegistryError("%r: %r is not even known.", self, name)
+
+    def possible_entries(self):
+        for index in range(1, self._limit + 1):
+            yield index, self._make_name(index)
+
+    @contextmanager
+    def taken(self, alias):
+        index, name = self._take(alias)
+        try:
+            yield index, name
+        finally:
+            self._free(name)
 
     def for_each(self, procedure):
         with self._reservations_locked() as reservations:

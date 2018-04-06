@@ -34,30 +34,29 @@ class VMFactory(object):
 
     @contextmanager
     def allocated_vm(self, alias, vm_type='linux'):
-        vm_index, name = self._registries[vm_type].take(alias)
-        vm_type_configuration = self._vm_configuration[vm_type]
-        info = obtain_running_vm(self._hypervisor, name, vm_index, vm_type_configuration['vm'])
-        if vm_type_configuration['os_family'] == 'linux':
-            hostname, port = info.ports['tcp', 22]
-            os_access = SSHAccess(hostname, port)
-            networking = LinuxNetworking(os_access, info.macs.values())
-        elif vm_type_configuration['os_family'] == 'windows':
-            hostname, port = info.ports['tcp', 5985]
-            os_access = WinRMAccess(hostname, port)
-            networking = WindowsNetworking(os_access, info.macs.values())
-        else:
-            raise UnknownOsFamily("Expected 'linux' or 'windows', got %r", vm_type_configuration['os_family'])
-        if not wait_until(
-                os_access.is_working,
-                name='until {} ({}) can be accesses via {!r}'.format(alias, info.name, os_access),
-                timeout_sec=vm_type_configuration['power_on_timeout_sec']):
-            raise VMNotResponding(alias, info.name)
-        vm = VM(alias, vm_index, vm_type, info.name, info.ports, networking, os_access)
-        self._hypervisor.unplug_all(vm.name)
-        vm.networking.reset()
-        vm.networking.enable_internet()
-        yield vm
-        self._registries[vm.type].free(vm.name)
+        with self._registries[vm_type].taken(alias) as (vm_index, name):
+            vm_type_configuration = self._vm_configuration[vm_type]
+            info = obtain_running_vm(self._hypervisor, name, vm_index, vm_type_configuration['vm'])
+            if vm_type_configuration['os_family'] == 'linux':
+                hostname, port = info.ports['tcp', 22]
+                os_access = SSHAccess(hostname, port)
+                networking = LinuxNetworking(os_access, info.macs.values())
+            elif vm_type_configuration['os_family'] == 'windows':
+                hostname, port = info.ports['tcp', 5985]
+                os_access = WinRMAccess(hostname, port)
+                networking = WindowsNetworking(os_access, info.macs.values())
+            else:
+                raise UnknownOsFamily("Expected 'linux' or 'windows', got %r", vm_type_configuration['os_family'])
+            if not wait_until(
+                    os_access.is_working,
+                    name='until {} ({}) can be accesses via {!r}'.format(alias, info.name, os_access),
+                    timeout_sec=vm_type_configuration['power_on_timeout_sec']):
+                raise VMNotResponding(alias, info.name)
+            vm = VM(alias, vm_index, vm_type, info.name, info.ports, networking, os_access)
+            self._hypervisor.unplug_all(vm.name)
+            vm.networking.reset()
+            vm.networking.enable_internet()
+            yield vm
 
     def cleanup(self):
         def destroy(vm_index, vm_alias):
