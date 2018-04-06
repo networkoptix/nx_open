@@ -10,9 +10,8 @@ Force Tags        email    form
 *** Variables ***
 ${url}    ${ENV}
 ${password}     ${BASE PASSWORD}
-${EMAIL IS REQUIRED}           //span[@ng-if='registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required' and contains(text(),'${EMAIL IS REQUIRED TEXT}')]
-${EMAIL ALREADY REGISTERED}    //span[@ng-if='registerForm.registerEmail.$error.alreadyExists' and contains(text(),'${EMAIL ALREADY REGISTERED TEXT}')]
-${EMAIL INVALID}               //span[@ng-if='registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email' and contains(text(),'${EMAIL INVALID TEXT}')]
+${EMAIL IS REQUIRED}           //span[@ng-if='restorePassword.email.$touched && restorePassword.email.$error.required' and contains(text(),'${EMAIL IS REQUIRED TEXT}')]
+${EMAIL INVALID}               //span[@ng-if='restorePassword.email.$touched && restorePassword.email.$error.email' and contains(text(),'${EMAIL INVALID TEXT}')]
 
 *** Test Cases ***      EMAIL
 Invalid Email 1         noptixqagmail.com
@@ -24,7 +23,6 @@ Invalid Email 6         noptixq..a@gmail.c
 Invalid Email 7         noptixqa@-gmail.com
 Invalid Email 8         ${SPACE}
 Empty Email             ${EMPTY}
-Registered Email        ${existing email}
 
 *** Keywords ***
 Test Reset
@@ -48,7 +46,6 @@ Test Email Invalid
 
 Check Email Outline
     [Arguments]    ${email}
-    Wait Until Element Is Visible    ${REGISTER EMAIL INPUT}/parent::div/parent::div[contains(@class,'has-error')]
+    Wait Until Element Is Visible    ${RESTORE PASSWORD EMAIL INPUT}/parent::div/parent::div[contains(@class,'has-error')]
     Run Keyword If    "${email}"=="${EMPTY}" or "${email}"=="${SPACE}"    Element Should Be Visible    ${EMAIL IS REQUIRED}
-    Run Keyword If    "${email}"=="${existing email}"    Element Should Be Visible    ${EMAIL ALREADY REGISTERED}
-    Run Keyword Unless    "${email}"=="${EMPTY}" or "${email}"=="${SPACE}" or "${email}"=="${existing email}"    Element Should Be Visible    ${EMAIL INVALID}
+    Run Keyword Unless    "${email}"=="${EMPTY}" or "${email}"=="${SPACE}"    Element Should Be Visible    ${EMAIL INVALID}
