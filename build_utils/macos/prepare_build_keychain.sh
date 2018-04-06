@@ -72,7 +72,6 @@ fi
 
 echo "Unlocking keychain $KEYCHAIN"
 
-security default-keychain -s "$KEYCHAIN"
 security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
 security set-keychain-settings "$KEYCHAIN"
 
