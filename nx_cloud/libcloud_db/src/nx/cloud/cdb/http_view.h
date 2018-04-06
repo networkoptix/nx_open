@@ -11,6 +11,7 @@
 
 #include "http_handlers/get_cloud_modules_xml.h"
 #include "managers/managers_types.h"
+#include "stree/cdb_ns.h"
 
 namespace nx {
 namespace cdb {
