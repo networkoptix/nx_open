@@ -1,11 +1,11 @@
-<div ngbDropdown class="d-inline-block">
+<div ngbDropdown class="">
 
     <button class="btn btn-dropdown-toggle"
             id="accountSettingsSelect"
             ngbDropdownToggle>
         <span class="glyphicon glyphicon-user"></span>
         <span class="ellipsis" [innerHTML]="settings.email"></span>
-        <div class="arrow down"></div>
+        <div class="arrow down d-none d-md-block"></div>
     </button>
 
     <ul ngbDropdownMenu aria-labelledby="accountSettingsSelect">
@@ -15,7 +15,7 @@
         <li><a [href]="'/account/password/'">Change Password</a></li>
         <li><a href (click)="logout()">Log Out</a></li>
 
-        <li class="nav-divider" role="separator" *ngIf="settings.is_staff"></li>
+        <li class="dropdown-divider" role="separator" *ngIf="settings.is_staff"></li>
         <li><a [href]="'/admin/'" target="_blank" *ngIf="settings.is_staff">Portal management</a></li>
     </ul>
 </div>

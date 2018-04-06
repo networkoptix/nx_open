@@ -1,6 +1,6 @@
 $header-height: 48px;
 $logo-height: 32px;
-$line-height: 42px;
+$line-height: 44px;
 $vertical-spacing: 15px;
 $horizontal-spacing: 16px;
 $active-border-width: 3px;
@@ -16,6 +16,7 @@ $collapse-second-width-max: $collapse-second-width - 1px;
 $header-collapsing-width-1: 1px;
 
 .navbar{
+    height: $header-height;
     border-top:none;
     border-left:none;
     border-right:none;
@@ -76,7 +77,7 @@ $header-collapsing-width-1: 1px;
             display: flex;
             flex-direction: row;
             align-items: center;
-            border: $active-border-width solid transparent;
+            border-bottom: $active-border-width solid transparent;
 
             &>span.ellipsis{
                 white-space: nowrap;

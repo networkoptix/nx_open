@@ -37,6 +37,9 @@
                     scope.systems = scope.systemsProvider.systems;
                     scope.singleSystem = (scope.systems.length == 1);
                     scope.systemCounter = scope.systems.length;
+
+                    scope.activeSystem = { id : 'TSANKO'};
+
                     updateActiveSystem();
                 });
 
@@ -50,6 +53,7 @@
                 }
 
                 scope.active = {};
+                // scope.activeSystem = {};
 
                 function updateActive() {
                     scope.active.register = isActive('/register');
@@ -61,6 +65,7 @@
                     if (!scope.systems) {
                         return;
                     }
+
                     scope.activeSystem = _.find(scope.systems, function (system) {
                         return $route.current.params.systemId == system.id;
                     });

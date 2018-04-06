@@ -1,5 +1,7 @@
-import { Component, OnInit, Input, ChangeDetectorRef, Inject } from '@angular/core';
-import { NgbDropdownModule }                                   from '@ng-bootstrap/ng-bootstrap';
+import { Component, OnInit, Input, SimpleChanges, Inject, OnChanges, OnDestroy } from '@angular/core';
+import { NgbDropdownModule }                                                     from '@ng-bootstrap/ng-bootstrap';
+import { ActivatedRoute, Params }                                                from "@angular/router";
+import { Location }                                                              from "@angular/common";
 
 @Component({
     selector: 'nx-systems',
@@ -7,30 +9,65 @@ import { NgbDropdownModule }                                   from '@ng-bootstr
     styleUrls: ['./dropdowns/systems/systems.component.scss']
 })
 
-export class NxSystemsDropdown implements OnInit {
-    @Input() activeSystem: any;
+export class NxSystemsDropdown implements OnInit, OnDestroy, OnChanges {
     @Input() systems: any;
-    @Input() active: any;
+    @Input() activeSystem: any;
 
     systemCounter: number;
+    active = {
+        register: false,
+        view: false,
+        settings: false
+    };
+    routeSystemId: string;
+    params: any;
 
     constructor(@Inject('languageService') private language: any,
-                @Inject('configService') private config: any) {
+                @Inject('configService') private config: any,
+                private location: Location,
+                private route: ActivatedRoute,) {
+
+    }
+
+    private isActive(val) {
+        const currentPath = this.location.path();
+
+        return (currentPath.indexOf(val) >= 0)
+    }
+
+    private updateActive() {
+        this.active.register = this.isActive('/register');
+        this.active.view = this.isActive('/view');
+        this.active.settings = this.activeSystem.id && !this.isActive('/view');
     }
 
     trackByFn(index, item) {
         return item.id;
     }
 
+    getUrlFor(sid) {
+        let url = '/systems/' + sid;
+
+        if (this.active.view) {
+            url += '/view';
+        }
+
+        return url;
+    }
+
     ngOnInit(): void {
-
-        console.log('systems');
-        console.log('activeSystem');
-
+        this.updateActive();
         this.systemCounter = this.systems.length;
     }
 
     ngOnDestroy() {
+    }
 
+    ngOnChanges(changes: SimpleChanges) {
+        this.updateActive();
+
+        this.systems = changes.systems.currentValue;
+        this.activeSystem = changes.activeSystem.currentValue;
+        this.systemCounter = this.systems.length;
     }
 }

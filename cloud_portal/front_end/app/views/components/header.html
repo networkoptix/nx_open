@@ -5,7 +5,7 @@
             <div class="app-header-left">
                 <ul ng-if="activeSystem" class="nav navbar-nav navbar-left auth-visible hidden-expanded">
                     <li>
-                        <nx-active-system [system]="activeSystem"></nx-active-system>
+                        <nx-active-system [active-system]="activeSystem"></nx-active-system>
                     </li>
                 </ul>
 
@@ -46,7 +46,7 @@
                     </li>
 
                     <li ng-if="systemCounter && !singleSystem" class="collapse-second">
-                        <nx-systems [activeSystem]="activeSystem" [systems]="systems" [active]="active"></nx-systems>
+                        <nx-systems [systems]="systems" [active-system]="activeSystem"></nx-systems>
                     </li>
 
                     <li class="vertical-bar"></li>

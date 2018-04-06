@@ -1,17 +1,29 @@
 .arrow {
     right: 50px;
     left: auto;
+    z-index: 9;
 }
 
-.dropdown {
-    top: -2px; // vertical alignment is off when using 'placement'
+@media (max-width: 768px) {
+    .arrow {
+        right: 18px;
+        left: auto;
+    }
+}
+
+.dropdown-toggle {
+    height: 43px;
 }
 
 .dropdown .dropdown-menu {
-    top: 32px !important;
+    top: 43px !important;
     right: 0 !important;
     left: auto !important;
     width: auto !important;
+}
+
+.dropdown .dropdown-menu .arrow::after {
+    border-top-color: transparent !important;
 }
 
 .dropdown .dropdown-menu li > a {
@@ -29,6 +41,11 @@
     color: #2FA2DB; // $blue10; // TODO: vars not available here ... Hmmmm
 }
 
+.dropdown .dropdown-menu li > a:hover .system-owner {
+    color: white;
+}
+
 .dropdown .arrow::after {
     border-top-color: white; //$light1;
 }
+

@@ -1,7 +1,7 @@
-import { Component, OnInit, Input, ChangeDetectorRef, Inject } from '@angular/core';
-import { Location }                                            from '@angular/common';
-import { Params, ActivatedRoute }                              from '@angular/router';
-import { NgbDropdownModule }                                   from '@ng-bootstrap/ng-bootstrap';
+import { Component, OnInit, Input, OnDestroy, SimpleChanges, OnChanges } from '@angular/core';
+import { Location }                                                      from '@angular/common';
+import { Params, ActivatedRoute }                                        from '@angular/router';
+import { NgbDropdownModule }                                             from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
     selector: 'nx-active-system',
@@ -9,20 +9,21 @@ import { NgbDropdownModule }                                   from '@ng-bootstr
     styleUrls: ['./dropdowns/active-system/active-system.component.scss']
 })
 
-export class NxActiveSystemDropdown implements OnInit {
-    @Input() system: any;
+export class NxActiveSystemDropdown implements OnInit, OnDestroy, OnChanges {
+    // @Input() system: any;
+    @Input() activeSystem: any;
 
     active = {
         register: false,
         view: false,
         settings: false
     };
-    activeSystem = {};
     routeSystemId: string;
     params: any;
 
     constructor(private location: Location,
                 private route: ActivatedRoute,) {
+
     }
 
     private isActive(val) {
@@ -38,15 +39,21 @@ export class NxActiveSystemDropdown implements OnInit {
     }
 
     ngOnInit(): void {
-        this.params = this.route.queryParams.subscribe((params: Params) => {
-            this.routeSystemId = params['systemId'];
-        });
+        // this.params = this.route.queryParams.subscribe((params: Params) => {
+        //     this.routeSystemId = params['systemId'];
+        //     console.log(this.route.queryParams);
+        // });
 
-        this.activeSystem = this.system;
+        // this.activeSystem = this.system;
         this.updateActive();
     }
 
     ngOnDestroy() {
-        this.params.unsubscribe();
+        // this.params.unsubscribe();
+    }
+
+    ngOnChanges(changes: SimpleChanges) {
+        // this.activeSystem = this.system;
+        this.updateActive();
     }
 }

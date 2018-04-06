@@ -13,26 +13,52 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@angular/core");
+const router_1 = require("@angular/router");
+const common_1 = require("@angular/common");
 let NxSystemsDropdown = class NxSystemsDropdown {
-    constructor(language, config) {
+    constructor(language, config, location, route) {
         this.language = language;
         this.config = config;
+        this.location = location;
+        this.route = route;
+        this.active = {
+            register: false,
+            view: false,
+            settings: false
+        };
+    }
+    isActive(val) {
+        const currentPath = this.location.path();
+        return (currentPath.indexOf(val) >= 0);
+    }
+    updateActive() {
+        this.active.register = this.isActive('/register');
+        this.active.view = this.isActive('/view');
+        this.active.settings = this.activeSystem.id && !this.isActive('/view');
     }
     trackByFn(index, item) {
         return item.id;
     }
+    getUrlFor(sid) {
+        let url = '/systems/' + sid;
+        if (this.active.view) {
+            url += '/view';
+        }
+        return url;
+    }
     ngOnInit() {
-        console.log('systems');
-        console.log('activeSystem');
+        this.updateActive();
         this.systemCounter = this.systems.length;
     }
     ngOnDestroy() {
     }
+    ngOnChanges(changes) {
+        this.updateActive();
+        this.systems = changes.systems.currentValue;
+        this.activeSystem = changes.activeSystem.currentValue;
+        this.systemCounter = this.systems.length;
+    }
 };
-__decorate([
-    core_1.Input(),
-    __metadata("design:type", Object)
-], NxSystemsDropdown.prototype, "activeSystem", void 0);
 __decorate([
     core_1.Input(),
     __metadata("design:type", Object)
@@ -40,7 +66,7 @@ __decorate([
 __decorate([
     core_1.Input(),
     __metadata("design:type", Object)
-], NxSystemsDropdown.prototype, "active", void 0);
+], NxSystemsDropdown.prototype, "activeSystem", void 0);
 NxSystemsDropdown = __decorate([
     core_1.Component({
         selector: 'nx-systems',
@@ -49,7 +75,8 @@ NxSystemsDropdown = __decorate([
     }),
     __param(0, core_1.Inject('languageService')),
     __param(1, core_1.Inject('configService')),
-    __metadata("design:paramtypes", [Object, Object])
+    __metadata("design:paramtypes", [Object, Object, common_1.Location,
+        router_1.ActivatedRoute])
 ], NxSystemsDropdown);
 exports.NxSystemsDropdown = NxSystemsDropdown;
 //# sourceMappingURL=systems.component.js.map

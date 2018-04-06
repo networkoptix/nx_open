@@ -328,6 +328,7 @@ table.webclient-window>tbody>tr>td{
     line-height: 40px;
     cursor: pointer;
     width: 100%;
+    margin-top: 8px;
 
     &:hover{
       background-color: $additional_light3 !important;

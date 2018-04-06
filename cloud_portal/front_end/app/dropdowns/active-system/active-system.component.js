@@ -21,7 +21,6 @@ let NxActiveSystemDropdown = class NxActiveSystemDropdown {
             view: false,
             settings: false
         };
-        this.activeSystem = {};
     }
     isActive(val) {
         const currentPath = this.location.path();
@@ -33,20 +32,25 @@ let NxActiveSystemDropdown = class NxActiveSystemDropdown {
         this.active.settings = this.routeSystemId && !this.isActive('/view');
     }
     ngOnInit() {
-        this.params = this.route.queryParams.subscribe((params) => {
-            this.routeSystemId = params['systemId'];
-        });
-        this.activeSystem = this.system;
+        // this.params = this.route.queryParams.subscribe((params: Params) => {
+        //     this.routeSystemId = params['systemId'];
+        //     console.log(this.route.queryParams);
+        // });
+        // this.activeSystem = this.system;
         this.updateActive();
     }
     ngOnDestroy() {
-        this.params.unsubscribe();
+        // this.params.unsubscribe();
+    }
+    ngOnChanges(changes) {
+        // this.activeSystem = this.system;
+        this.updateActive();
     }
 };
 __decorate([
     core_1.Input(),
     __metadata("design:type", Object)
-], NxActiveSystemDropdown.prototype, "system", void 0);
+], NxActiveSystemDropdown.prototype, "activeSystem", void 0);
 NxActiveSystemDropdown = __decorate([
     core_1.Component({
         selector: 'nx-active-system',

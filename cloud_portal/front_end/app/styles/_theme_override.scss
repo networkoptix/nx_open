@@ -362,6 +362,11 @@ select.form-control{
   background-color: transparent;
 }
 
+.dropdown-divider {
+  margin: 4px 12px;
+  border-top: 1px solid $light6;
+}
+
 .alert {
   font-size: $h4-font-size;
   padding-top: 8px;

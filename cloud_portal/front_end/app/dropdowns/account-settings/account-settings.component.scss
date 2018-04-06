@@ -1,4 +1,5 @@
-@media (max-width: 920px) {
+
+@media (max-width: 922px) {
 
     .dropdown-menu {
         right: 0;
@@ -10,20 +11,36 @@
     }
 
     .arrow {
-        right: 32px;
+        right: 40px;
         left: auto;
     }
 }
 
-.dropdown {
-    top: 2px; // vertical alignment is off when using 'placement'
+@media (max-width: 768px) {
+    .arrow {
+        right: 18px;
+        left: auto;
+    }
+
+    .dropdown-menu {
+        right: 0;
+        left: auto !important;
+    }
+
+    .dropdown-menu li > a {
+        text-align: right;
+    }
 }
 
 .dropdown-toggle {
-    height: 42px; // hardcode the height as flexbox is confused by icon
+    height: 43px;
 }
 
 .dropdown .arrow::after {
     border-top-color: white; //$light1;
+}
+
+.dropdown .dropdown-menu .arrow::after {
+    border-top-color: transparent !important;
 }
 
