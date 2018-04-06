@@ -42,12 +42,10 @@ ZoomableFlickable
                 : content.sourceSize.height,
             height)
 
-    readonly property bool zoomed: contentWidth > width * 1.05 || contentHeight > height * 1.05
-
-    allowedLeftMargin: zoomed ? width / 4 - content.leftPadding : 0
-    allowedRightMargin: zoomed ? width / 4 - content.rightPadding : 0
-    allowedTopMargin: zoomed ? height / 4 - content.topPadding : 0
-    allowedBottomMargin: zoomed ? height / 4 - content.bottomPadding : 0
+    allowedLeftMargin: d.allowedLeftMargin(contentWidth, contentHeight)
+    allowedRightMargin: d.allowedRightMargin(contentWidth, contentHeight)
+    allowedTopMargin: d.allowedTopMargin(contentWidth, contentHeight)
+    allowedBottomMargin: d.allowedBottomMargin(contentWidth, contentHeight)
 
     clip: true
 
@@ -80,6 +78,32 @@ ZoomableFlickable
     {
         id: d
 
+        function allowedMargin(targetWidth, targetHeight, size, padding)
+        {
+            var zoomed = targetWidth > width * 1.05 || targetHeight > height * 1.05;
+            return zoomed ? size / 4 - padding : 0
+        }
+
+        function allowedLeftMargin(targetWidth, targetHeight)
+        {
+            return allowedMargin(targetWidth, targetHeight, width, leftPadding)
+        }
+
+        function allowedRightMargin(targetWidth, targetHeight)
+        {
+            return allowedMargin(targetWidth, targetHeight, width, rightPadding)
+        }
+
+        function allowedTopMargin(targetWidth, targetHeight)
+        {
+            return allowedMargin(targetWidth, targetHeight, height, topPadding)
+        }
+
+        function allowedBottomMargin(targetWidth, targetHeight)
+        {
+            return allowedMargin(targetWidth, targetHeight, height, bottomPadding)
+        }
+
         function toggleScale(to2x, mouseX, mouseY)
         {
             var targetScale = to2x ? 2 : 1
@@ -94,26 +118,29 @@ ZoomableFlickable
             var dx = point.x / zf.contentScale
             var dy = point.y / zf.contentScale
 
-            contentWidth = baseWidth * targetScale
-            contentHeight = baseHeight * targetScale
+            var newContentWidth = baseWidth * targetScale
+            var newContentHeight = baseHeight * targetScale
 
-            var x = to2x ? (width / 2 - targetScale * dx) : (width - baseWidth) / 2
-            var y = to2x ? (height / 2 - targetScale * dy) : (height - baseHeight) / 2
+            var newX = to2x ? (width / 2 - targetScale * dx) : (width - newContentWidth) / 2
+            var newY = to2x ? (height / 2 - targetScale * dy) : (height - newContentHeight) / 2
 
-            if (x > allowedLeftMargin)
-                x = allowedLeftMargin - 1
-            else if (x + contentWidth < width - allowedRightMargin)
-                x = width - contentWidth - allowedRightMargin + 1
+            var leftMargin = Math.abs(d.allowedLeftMargin(newContentWidth, newContentHeight))
+            var rightMargin = Math.abs(d.allowedRightMargin(newContentWidth, newContentHeight))
+            var topMargin = Math.abs(d.allowedTopMargin(newContentWidth, newContentHeight))
+            var bottomMargin = Math.abs(d.allowedBottomMargin(newContentWidth, newContentHeight))
 
-            if (y > allowedTopMargin)
-                y = allowedTopMargin - 1
-            else if (y + contentHeight < height - allowedBottomMargin)
-                y = height - contentHeight - allowedBottomMargin + 1
+            if (newX > leftMargin)
+                newX = leftMargin - 1
+            if (newX + newContentWidth < width - rightMargin)
+                newX = width - newContentWidth - rightMargin + 1
 
-            contentX = -x
-            contentY = -y
+            if (newY > topMargin)
+                newY = topMargin - 1
+            if (newY + newContentHeight < height - bottomMargin)
+                newY = height - newContentHeight - bottomMargin + 1
 
-            flickable.animateToBounds()
+            var easing = newContentWidth > contentWidth ? Easing.InOutCubic : Easing.OutCubic
+            flickable.animateTo(-newX, -newY, newContentWidth, newContentHeight, easing)
         }
     }
 

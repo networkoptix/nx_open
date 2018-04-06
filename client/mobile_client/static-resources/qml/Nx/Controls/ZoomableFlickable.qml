@@ -212,13 +212,8 @@ Item
 
             if (animate)
             {
-                widthAnimation.to = w
-                heightAnimation.to = h
-                xAnimation.to = x
-                yAnimation.to = y
-
+                setAnimationParameters(x, y , w, h, Easing.Linear)
                 fixMargins()
-
                 boundsAnimation.start()
             }
             else
@@ -232,6 +227,26 @@ Item
 
                 bindMargins()
             }
+        }
+
+        function setAnimationParameters(x, y, width, height, easing)
+        {
+            widthAnimation.easing.type = easing
+            heightAnimation.easing.type = easing
+            xAnimation.easing.type = easing
+            yAnimation.easing.type = easing
+
+            widthAnimation.to = width
+            heightAnimation.to = height
+            xAnimation.to = x
+            yAnimation.to = y
+        }
+
+        function animateTo(x, y, width, height, easing)
+        {
+            boundsAnimation.stop()
+            setAnimationParameters(x,y, width, height, easing)
+            boundsAnimation.start()
         }
 
         Component.onCompleted:
@@ -356,9 +371,6 @@ Item
         {
             id: mouseArea
 
-            readonly property real zoomFactor: 1.1
-            readonly property real wheelStep: 120
-
             property var doubleTapDownPos: undefined
             property bool doubleTapScaleMode: false
             property real initialDoubleTapScale: 0
@@ -452,10 +464,7 @@ Item
                 var cx = wheel.x + flick.contentX
                 var cy = wheel.y + flick.contentY
 
-                var scale = wheel.angleDelta.y / wheelStep * zoomFactor
-                if (scale < 0)
-                    scale = 1 / -scale
-
+                var scale = wheel.angleDelta.y > 0 ? 1.1 : 0.9
                 var w = flick.contentWidth * scale
                 var h = flick.contentHeight * scale
 
