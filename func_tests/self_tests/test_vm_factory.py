@@ -19,7 +19,7 @@ def registry(hypervisor):
     for index, name in registry.possible_entries():
         try:
             hypervisor.destroy(name)
-        except  VMNotFound:
+        except VMNotFound:
             _logger.info("VM %r doesn't exist in %r.", name, hypervisor)
         else:
             _logger.info("VM %r removed from %r.", name, hypervisor)
