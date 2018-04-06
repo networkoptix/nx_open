@@ -61,28 +61,16 @@ def vm_factory(hypervisor, vm_type_configuration, registry):
 
 @pytest.mark.parallel_unsafe
 def test_allocate(vm_factory):
-    vm_alias = 'test_factory-test_allocate'
-    vm = vm_factory.allocated_vm(vm_alias, vm_type=_vm_type).__enter__()
-    assert vm.alias == vm_alias
-    assert vm.index in {1, 2}
-    assert vm.os_access.is_working()
+    vm_alias = 'single'
+    with vm_factory.allocated_vm(vm_alias, vm_type=_vm_type) as vm:
+        assert vm.alias == vm_alias
+        assert vm.index in {1, 2}
+        assert vm.os_access.is_working()
 
 
 @pytest.mark.parallel_unsafe
 def test_allocate_two(vm_factory):
-    a = vm_factory.allocated_vm('a', vm_type=_vm_type).__enter__()
-    b = vm_factory.allocated_vm('b', vm_type=_vm_type).__enter__()
-    assert a.name != b.name
-    assert a.index != b.index
-
-
-@pytest.fixture()
-def entered_allocation(vm_factory):
-    allocation = vm_factory.allocated_vm('a', vm_type=_vm_type)
-    _ = allocation.__enter__()
-    return allocation
-
-
-@pytest.mark.parallel_unsafe
-def test_release(entered_allocation):
-    entered_allocation.__exit__(None, None, None)
+    with vm_factory.allocated_vm('a', vm_type=_vm_type) as a:
+        with vm_factory.allocated_vm('b', vm_type=_vm_type) as b:
+            assert a.name != b.name
+            assert a.index != b.index
