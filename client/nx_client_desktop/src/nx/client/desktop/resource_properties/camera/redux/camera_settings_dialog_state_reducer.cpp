@@ -125,7 +125,7 @@ State loadMinMaxCustomBitrate(State state)
 
 State fillBitrateFromFixedQuality(State state)
 {
-    state.recording.brush.bitrateMbps = QnScheduleGridWidget::CellParams::kAutomaticBitrate;
+    state.recording.brush.bitrateMbps = ScheduleCellParams::kAutomaticBitrate;
     state.recording.bitrateMbps = calculateBitrateForQualityMbps(
         state,
         state.recording.brush.quality);
@@ -400,7 +400,7 @@ State CameraSettingsDialogStateReducer::setSingleCameraUserName(State state, con
 
 State CameraSettingsDialogStateReducer::setScheduleBrush(
     State state,
-    const QnScheduleGridWidget::CellParams& brush)
+    const ScheduleCellParams& brush)
 {
     state.recording.brush = brush;
     const auto fps = qBound(

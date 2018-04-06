@@ -14,7 +14,6 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <ui/style/globals.h>
 #include <ui/style/helper.h>
-#include <nx/utils/math/fuzzy.h>
 
 using namespace nx::client::desktop;
 
@@ -29,31 +28,7 @@ const qreal kMaximumGridFontSize = 12.0;
 
 const qreal kFontIncreaseStep = 0.5;
 
-static const int kDefaultFps = 10;
-static const Qn::RecordingType kDefaultRecordingType = Qn::RT_Always;
-
 } // anonymous namespace
-
-QnScheduleGridWidget::CellParams::CellParams():
-    fps(kDefaultFps),
-    quality(Qn::QualityNormal),
-    recordingType(kDefaultRecordingType),
-    bitrateMbps(0.0)
-{
-}
-
-bool QnScheduleGridWidget::CellParams::operator==(const CellParams& other) const
-{
-    return fps == other.fps
-        && quality == other.quality
-        && recordingType == other.recordingType
-        && qFuzzyIsNull(bitrateMbps - other.bitrateMbps);
-}
-
-bool QnScheduleGridWidget::CellParams::isAutomaticBitrate() const
-{
-    return qFuzzyEquals(bitrateMbps, kAutomaticBitrate);
-}
 
 QnScheduleGridWidget::QnScheduleGridWidget(QWidget* parent):
     QWidget(parent)
@@ -74,9 +49,7 @@ QnScheduleGridWidget::QnScheduleGridWidget(QWidget* parent):
     m_labelsFont = font();
 }
 
-QnScheduleGridWidget::~QnScheduleGridWidget()
-{
-}
+QnScheduleGridWidget::~QnScheduleGridWidget() = default;
 
 int QnScheduleGridWidget::cellSize() const
 {

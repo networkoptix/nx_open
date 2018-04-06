@@ -10,13 +10,14 @@
 #include <ui/common/read_only.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
+#include <ui/style/custom_style.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
 #include <utils/common/event_processors.h>
 
 #include "../redux/camera_settings_dialog_state.h"
 #include "../redux/camera_settings_dialog_store.h"
-#include <ui/style/custom_style.h>
+#include "../utils/schedule_paint_functions.h"
 
 namespace {
 

@@ -1,25 +1,12 @@
 #include "camera_schedule_widget.h"
 #include "ui_camera_schedule_widget.h"
 
-#include <QtCore/QCoreApplication>
-#include <QtCore/QScopedValueRollback>
-#include <QtWidgets/QListView>
-
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_server_resource.h>
-#include <nx_ec/data/api_camera_attributes_data.h>
 #include <core/misc/schedule_task.h>
 
-#include <camera/fps_calculator.h>
-
-#include <licensing/license.h>
-
-#include <text/time_strings.h>
-
-#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/common/utils/checkbox_utils.h>
 #include <nx/client/desktop/common/utils/aligner.h>
 #include <ui/common/palette.h>
@@ -32,11 +19,8 @@
 #include <ui/style/skin.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
-#include <ui/widgets/properties/legacy_archive_length_widget.h>
-#include <ui/workbench/watchers/workbench_panic_watcher.h>
-#include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_access_controller.h>
 
+#include <utils/camera/camera_bitrate_calculator.h>
 #include <utils/common/event_processors.h>
 #include <utils/math/color_transformations.h>
 #include <utils/math/math.h>
@@ -46,10 +30,6 @@
 
 #include "../redux/camera_settings_dialog_state.h"
 #include "../redux/camera_settings_dialog_store.h"
-#include <utils/camera/camera_bitrate_calculator.h>
-
-using boost::algorithm::all_of;
-using boost::algorithm::any_of;
 
 namespace {
 
@@ -84,12 +64,6 @@ CameraScheduleWidget::CameraScheduleWidget(
     setupUi();
     setStore(store);
 
-    /*
-    // init buttons
-    connect(ui->gridWidget, &QnScheduleGridWidget::colorsChanged, this,
-        &CameraScheduleWidget::updateColors);
-    updateColors();
-    */
     /*
     QnCamLicenseUsageHelper helper(commonModule());
     ui->licensesUsageWidget->init(&helper);
@@ -428,16 +402,6 @@ int CameraScheduleWidget::getGridMaxFps(bool motionPlusLqOnly)
     return ui->gridWidget->getMaxFps(motionPlusLqOnly);
 }
 
-void CameraScheduleWidget::setScheduleEnabled(bool enabled)
-{
-    ui->enableRecordingCheckBox->setCheckState(enabled ? Qt::Checked : Qt::Unchecked);
-}
-
-bool CameraScheduleWidget::isScheduleEnabled() const
-{
-    return ui->enableRecordingCheckBox->checkState() != Qt::Unchecked;
-}
-
 void CameraScheduleWidget::updateLicensesLabelText()
 {
     QnCamLicenseUsageHelper helper(commonModule());
@@ -486,24 +450,6 @@ void CameraScheduleWidget::updateMotionButtons()
             }
         }
     }
-}
-
-void CameraScheduleWidget::updateRecordingParamsAvailable()
-{
-    updateGridEnabledState();
-
-    ui->fpsSpinBox->setEnabled(state.recording.parametersAvailable);
-    ui->qualityComboBox->setEnabled(state.recording.parametersAvailable);
-    ui->displayQualityCheckBox->setEnabled(state.recording.parametersAvailable);
-    ui->displayFpsCheckBox->setEnabled(state.recording.parametersAvailable);
-}
-
-void CameraScheduleWidget::updateColors()
-{
-    ui->recordAlwaysButton->setCustomPaintFunction(ui->gridWidget->paintFunction(Qn::RT_Always));
-    ui->recordMotionButton->setCustomPaintFunction(ui->gridWidget->paintFunction(Qn::RT_MotionOnly));
-    ui->recordMotionPlusLQButton->setCustomPaintFunction(ui->gridWidget->paintFunction(Qn::RT_MotionAndLowQuality));
-    ui->noRecordButton->setCustomPaintFunction(ui->gridWidget->paintFunction(Qn::RT_Never));
 }
 
 void CameraScheduleWidget::at_licensesButton_clicked()

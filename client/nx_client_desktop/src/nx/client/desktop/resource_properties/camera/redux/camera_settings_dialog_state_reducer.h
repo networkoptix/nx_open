@@ -18,7 +18,7 @@ public:
     static State setPanicMode(State state, bool value);
     static State loadCameras(State state, const QnVirtualCameraResourceList& cameras);
     static State setSingleCameraUserName(State state, const QString& text);
-    static State setScheduleBrush(State state, const QnScheduleGridWidget::CellParams& brush);
+    static State setScheduleBrush(State state, const ScheduleCellParams& brush);
     static State setScheduleBrushRecordingType(State state, Qn::RecordingType value);
     static State setScheduleBrushFps(State state, int value);
     static State setScheduleBrushQuality(State state, Qn::StreamQuality value);

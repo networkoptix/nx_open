@@ -11,6 +11,7 @@
 
 #include <nx/client/desktop/common/utils/custom_painted.h>
 #include <nx/client/desktop/resource_properties/camera/utils/schedule_paint_functions.h>
+#include <nx/client/desktop/resource_properties/camera/utils/schedule_cell_params.h>
 
 class QnScheduleGridWidget : public QWidget
 {
@@ -22,6 +23,8 @@ class QnScheduleGridWidget : public QWidget
     static constexpr int kHoursPerDay = 24;
 
 public:
+    using CellParams = nx::client::desktop::ScheduleCellParams;
+
     explicit QnScheduleGridWidget(QWidget* parent = nullptr);
     virtual ~QnScheduleGridWidget();
 
@@ -30,21 +33,6 @@ public:
 
     inline int rowCount() const { return kDaysPerWeek; }
     inline int columnCount() const { return kHoursPerDay; }
-
-    struct CellParams
-    {
-        static constexpr auto kAutomaticBitrate = 0.0;
-
-        int fps;
-        Qn::StreamQuality quality;
-        Qn::RecordingType recordingType;
-        qreal bitrateMbps; //< 0 means auto.
-
-        CellParams();
-        bool operator==(const CellParams& other) const;
-
-        bool isAutomaticBitrate() const;
-    };
 
     CellParams brush() const;
     void setBrush(const CellParams& params);
