@@ -8,6 +8,10 @@
 #include <QtWidgets/QStyleOption>
 #include <QtWidgets/QWidget>
 
+namespace nx {
+namespace client {
+namespace desktop {
+
 class CustomPaintedBase
 {
 public:
@@ -30,11 +34,10 @@ class CustomPainted : public Base, public CustomPaintedBase
     static_assert(std::is_base_of<QWidget, Base>::value, "Base must be derived from QWidget");
 
 public:
-    CustomPainted(QWidget* parent = nullptr) : Base(parent) {}
+    CustomPainted(QWidget* parent = nullptr): Base(parent) {}
 
     virtual void paintEvent(QPaintEvent* event) override
     {
-        Q_UNUSED(event);
         QPainter painter(this);
         QStyleOption option;
         option.initFrom(this);
@@ -43,3 +46,7 @@ public:
             Base::paintEvent(event);
     }
 };
+
+} // namespace desktop
+} // namespace client
+} // namespace nx

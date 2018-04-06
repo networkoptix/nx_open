@@ -80,6 +80,7 @@ extern "C"
 #include "workbench_item.h"
 #include "workbench_layout.h"
 
+using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
 
 namespace {

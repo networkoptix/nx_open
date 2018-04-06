@@ -1,28 +1,33 @@
 #pragma once
 
+#include <QtCore/QHash>
 #include <QtCore/QEvent>
+#include <QtCore/QPointer>
 #include <QtWidgets/QTableView>
 
-class QnItemViewHoverTracker;
+namespace nx {
+namespace client {
+namespace desktop {
+
+class ItemViewHoverTracker;
 
 /**
  * This class fixes a bug in <tt>QTableView</tt> related to editor triggers
  *  and implements entire row hovering behavior.
  */
-class QnTableView : public QTableView
+class TableView: public QTableView
 {
     Q_OBJECT
-
-    typedef QTableView base_type;
+    using base_type = QTableView;
 
 public:
-    explicit QnTableView(QWidget* parent = nullptr);
-    virtual ~QnTableView();
+    explicit TableView(QWidget* parent = nullptr);
+    virtual ~TableView() override = default;
 
     virtual QSize viewportSizeHint() const override;
     virtual void setModel(QAbstractItemModel* newModel) override;
 
-    QnItemViewHoverTracker* hoverTracker() const;
+    ItemViewHoverTracker* hoverTracker() const;
 
     // Takes ownership of delegate.
     void setPersistentDelegateForColumn(int column, QAbstractItemDelegate* delegate);
@@ -38,8 +43,12 @@ private:
     void openEditorsForColumn(int column, int firstRow, int lastRow);
 
 private:
-    QnItemViewHoverTracker* m_tracker;
+    ItemViewHoverTracker* const m_tracker = nullptr;
 
     using ColumnDelegateHash = QHash<int, QPointer<QAbstractItemDelegate>>;
     ColumnDelegateHash m_delegates;
 };
+
+} // namespace desktop
+} // namespace client
+} // namespace nx

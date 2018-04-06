@@ -6,7 +6,7 @@
 #include <QtWidgets/QStackedWidget>
 
 #include <ui/style/helper.h>
-#include <ui/widgets/common/table_view.h>
+#include <nx/client/desktop/common/widgets/table_view.h>
 
 #include <utils/common/connective.h>
 #include <utils/common/event_processors.h>

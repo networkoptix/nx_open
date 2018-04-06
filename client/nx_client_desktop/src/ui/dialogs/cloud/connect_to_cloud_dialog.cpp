@@ -24,7 +24,7 @@
 
 #include <utils/common/html.h>
 
-#include <ui/common/aligner.h>
+#include <nx/client/desktop/common/utils/aligner.h>
 #include <ui/dialogs/cloud/cloud_result_messages.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -133,7 +133,7 @@ QnConnectToCloudDialog::QnConnectToCloudDialog(QWidget* parent) :
     ui->createAccountLabel->setText(makeHref(tr("Create account"), urlHelper.createAccountUrl()));
     ui->forgotPasswordLabel->setText(makeHref(tr("Forgot password?"), urlHelper.restorePasswordUrl()));
 
-    auto aligner = new QnAligner(this);
+    auto aligner = new Aligner(this);
     aligner->registerTypeAccessor<InputField>(InputField::createLabelWidthAccessor());
     aligner->addWidgets({ ui->loginInputField, ui->passwordInputField, ui->spacer });
 

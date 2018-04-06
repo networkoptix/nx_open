@@ -79,7 +79,7 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
     ItemViewUtils::setupDefaultAutoToggle(ui->usersTreeView, UserListModel::CheckColumn);
 
     auto setupTreeView =
-        [this](QnTreeView* treeView)
+        [this](TreeView* treeView)
         {
             const QnIndents kIndents(1, 0);
             treeView->header()->setStretchLastSection(false);

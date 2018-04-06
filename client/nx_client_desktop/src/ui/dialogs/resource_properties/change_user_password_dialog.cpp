@@ -4,7 +4,7 @@
 #include <QtWidgets/QLineEdit>
 
 #include <core/resource/user_resource.h>
-#include <ui/common/aligner.h>
+#include <nx/client/desktop/common/utils/aligner.h>
 #include <ui/workbench/workbench_context.h>
 
 #include <nx/client/desktop/common/widgets/password_strength_indicator.h>
@@ -43,7 +43,7 @@ QnChangeUserPasswordDialog::QnChangeUserPasswordDialog(QWidget* parent):
         return ValidationResult::kValid;
     });
 
-    QnAligner* aligner = new QnAligner(this);
+    Aligner* aligner = new Aligner(this);
     aligner->registerTypeAccessor<InputField>(InputField::createLabelWidthAccessor());
 
     aligner->addWidgets({

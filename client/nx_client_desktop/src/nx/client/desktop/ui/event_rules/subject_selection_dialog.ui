@@ -117,7 +117,7 @@
               <number>0</number>
              </property>
              <item>
-              <widget class="QnTreeView" name="rolesTreeView">
+              <widget class="nx::client::desktop::TreeView" name="rolesTreeView">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -184,7 +184,7 @@
               <number>0</number>
              </property>
              <item>
-              <widget class="QnTreeView" name="usersTreeView">
+              <widget class="nx::client::desktop::TreeView" name="usersTreeView">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -312,9 +312,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QnTreeView</class>
+   <class>nx::client::desktop::TreeView</class>
    <extends>QTreeView</extends>
-   <header location="global">ui/widgets/common/tree_view.h</header>
+   <header location="global">nx/client/desktop/common/widgets/tree_view.h</header>
   </customwidget>
   <customwidget>
    <class>nx::client::desktop::AlertBar</class>

@@ -3,8 +3,11 @@
 #include <QtCore/QPointer>
 #include <QtWidgets/QWidget>
 
+namespace nx {
+namespace client {
+namespace desktop {
 
-class QnWidgetLimitsBackup
+class WidgetLimitsBackup
 {
 public:
     void backup(QWidget* widget)
@@ -31,3 +34,7 @@ private:
     QSize m_minimumSize;
     QSize m_maximumSize;
 };
+
+} // namespace desktop
+} // namespace client
+} // namespace nx

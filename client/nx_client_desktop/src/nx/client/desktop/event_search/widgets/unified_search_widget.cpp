@@ -6,9 +6,9 @@
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QScrollBar>
 
-#include <ui/common/custom_painted.h>
+#include <nx/client/desktop/common/utils/custom_painted.h>
 #include <ui/common/palette.h>
-#include <ui/common/widget_anchor.h>
+#include <nx/client/desktop/common/utils/widget_anchor.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
 #include <nx/client/desktop/common/widgets/search_line_edit.h>
@@ -75,7 +75,7 @@ UnifiedSearchWidget::UnifiedSearchWidget(QWidget* parent):
 
     ui->placeholder->setParent(ui->ribbonContainer);
     ui->placeholder->hide();
-    new QnWidgetAnchor(ui->placeholder);
+    new WidgetAnchor(ui->placeholder);
 
     QFont font;
     font.setPixelSize(kPlaceholderFontPixelSize);

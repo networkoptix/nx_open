@@ -5,8 +5,8 @@
 #include <core/resource/resource_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
 
-class QnAligner;
 namespace Ui { class WearableMotionWidget; }
+namespace nx { namespace client { namespace desktop { class Aligner; }}}
 
 class QnWearableMotionWidget : public QWidget, public QnWorkbenchContextAware
 {
@@ -19,7 +19,7 @@ public:
     explicit QnWearableMotionWidget(QWidget* parent = nullptr);
     virtual ~QnWearableMotionWidget() override;
 
-    QnAligner* aligner() const;
+    nx::client::desktop::Aligner* aligner() const;
 
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
@@ -39,6 +39,6 @@ private:
 private:
     QScopedPointer<Ui::WearableMotionWidget> ui;
     QnVirtualCameraResourcePtr m_camera;
-    QnAligner* m_aligner = nullptr;
+    nx::client::desktop::Aligner* m_aligner = nullptr;
     bool m_readOnly = false;
 };

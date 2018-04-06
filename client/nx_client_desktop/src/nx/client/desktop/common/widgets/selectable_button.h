@@ -2,15 +2,19 @@
 
 #include <QtWidgets/QToolButton>
 
-#include <ui/common/custom_painted.h>
+#include <nx/client/desktop/common/utils/custom_painted.h>
 
-class QnSelectableButton: public CustomPainted<QToolButton>
+namespace nx {
+namespace client {
+namespace desktop {
+
+class SelectableButton: public CustomPainted<QToolButton>
 {
     Q_OBJECT
     using base_type = CustomPainted<QToolButton>;
 
 public:
-    QnSelectableButton(QWidget* parent = nullptr);
+    SelectableButton(QWidget* parent = nullptr);
 
     int markerFrameWidth() const;
     void setMarkerFrameWidth(int width);
@@ -29,7 +33,11 @@ private:
     void paintMarker(QPainter* painter, const QBrush& brush);
 
 private:
-    int m_markerFrameWidth;
-    int m_markerMargin;
-    qreal m_roundingRadius;
+    int m_markerFrameWidth = 2;
+    int m_markerMargin = 1;
+    qreal m_roundingRadius = 2.0;
 };
+
+} // namespace desktop
+} // namespace client
+} // namespace nx

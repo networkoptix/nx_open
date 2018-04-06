@@ -163,16 +163,16 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
             return !resource || !resource->hasFlags(Qn::layout);
         });
 
-    connect(ui->resourcesTreeView, &QnTreeView::enterPressed, this,
+    connect(ui->resourcesTreeView, &TreeView::enterPressed, this,
         [this](const QModelIndex& index){emit activated(index, false); });
-    connect(ui->resourcesTreeView, &QnTreeView::doubleClicked, this,
+    connect(ui->resourcesTreeView, &TreeView::doubleClicked, this,
         [this](const QModelIndex& index){emit activated(index, true); });
 
-    connect(ui->resourcesTreeView, &QnTreeView::spacePressed, this,
+    connect(ui->resourcesTreeView, &TreeView::spacePressed, this,
         &QnResourceTreeWidget::at_treeView_spacePressed);
-    connect(ui->resourcesTreeView, &QnTreeView::clicked, this,
+    connect(ui->resourcesTreeView, &TreeView::clicked, this,
         &QnResourceTreeWidget::at_treeView_clicked);
-    connect(ui->resourcesTreeView, &QnTreeView::verticalScrollbarVisibilityChanged,
+    connect(ui->resourcesTreeView, &TreeView::verticalScrollbarVisibilityChanged,
         this, &QnResourceTreeWidget::updateShortcutHintVisibility);
 
     ui->resourcesTreeView->installEventFilter(this);

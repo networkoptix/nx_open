@@ -1,13 +1,20 @@
 #pragma once
 
+#include <QtCore/QObject>
+#include <QtCore/QMargins>
 #include <QtCore/QPointer>
+#include <QtCore/qnamespace.h>
 
 class QWidget;
+
+namespace nx {
+namespace client {
+namespace desktop {
 
 /**
  * Common class to anchor a widget to edges of its parent.
  */
-class QnWidgetAnchor : public QObject
+class WidgetAnchor: public QObject
 {
     Q_OBJECT
     typedef QObject base_type;
@@ -19,7 +26,7 @@ class QnWidgetAnchor : public QObject
     Q_PROPERTY(QMargins margins READ margins WRITE setMargins)
 
 public:
-    explicit QnWidgetAnchor(QWidget* widget);
+    explicit WidgetAnchor(QWidget* widget);
 
     void setEdges(Qt::Edges anchors);
     Qt::Edges edges() const;
@@ -35,7 +42,11 @@ private:
     void updateGeometry();
 
 private:
-    Qt::Edges m_edges;
-    QMargins m_margins;
+    Qt::Edges m_edges = Qt::LeftEdge | Qt::TopEdge | Qt::RightEdge | Qt::BottomEdge;
+    QMargins m_margins = QMargins(0, 0, 0, 0);
     QPointer<QWidget> m_widget;
 };
+
+} // namespace desktop
+} // namespace client
+} // namespace nx

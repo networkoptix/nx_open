@@ -16,8 +16,8 @@
 
 class QStateMachine;
 class QStandardItemModel;
-class QnAligner;
 namespace nx { namespace client { namespace desktop { class MimeData; }}}
+namespace nx { namespace client { namespace desktop { class Aligner; }}}
 namespace Ui { class BusinessRuleWidget; }
 
 class QnBusinessRuleWidget:
@@ -83,6 +83,6 @@ private:
 
     bool m_updating;
 
-    QnAligner* const m_eventAligner;
-    QnAligner* const m_actionAligner;
+    nx::client::desktop::Aligner* const m_eventAligner;
+    nx::client::desktop::Aligner* const m_actionAligner;
 };

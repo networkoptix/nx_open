@@ -6,7 +6,7 @@
 
 #include <core/resource/media_resource.h>
 
-#include <ui/common/aligner.h>
+#include <nx/client/desktop/common/utils/aligner.h>
 #include <ui/common/read_only.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
@@ -95,7 +95,7 @@ ScheduleSettingsWidget::ScheduleSettingsWidget(QWidget* parent):
         &ScheduleSettingsWidget::at_releaseSignalizer_activated);
     */
 
-    auto aligner = new QnAligner(this);
+    auto aligner = new Aligner(this);
     aligner->addWidgets({ui->fpsLabel, ui->qualityLabel, ui->bitrateLabel});
 
     // Reset group box bottom margin to zero. Sub-widget margins defined in the ui-file rely on it.

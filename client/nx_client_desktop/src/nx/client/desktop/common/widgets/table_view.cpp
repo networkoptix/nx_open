@@ -5,23 +5,24 @@
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QScrollBar>
 
-#include <ui/common/item_view_hover_tracker.h>
 #include <ui/style/helper.h>
 
-QnTableView::QnTableView(QWidget* parent):
+#include <nx/client/desktop/common/utils/item_view_hover_tracker.h>
+
+namespace nx {
+namespace client {
+namespace desktop {
+
+TableView::TableView(QWidget* parent):
     base_type(parent),
-    m_tracker(new QnItemViewHoverTracker(this))
+    m_tracker(new ItemViewHoverTracker(this))
 {
     /* Make the defaults consistent with QTreeView: */
     horizontalHeader()->setHighlightSections(false);
     verticalHeader()->setHighlightSections(false);
 }
 
-QnTableView::~QnTableView()
-{
-}
-
-QSize QnTableView::viewportSizeHint() const
+QSize TableView::viewportSizeHint() const
 {
     /* Fix for QTableView bug
      *  QTableView adjusts sizeHint if scrollBar.isVisible()
@@ -43,12 +44,12 @@ QSize QnTableView::viewportSizeHint() const
     return size;
 }
 
-QnItemViewHoverTracker* QnTableView::hoverTracker() const
+ItemViewHoverTracker* TableView::hoverTracker() const
 {
     return m_tracker;
 }
 
-bool QnTableView::edit(const QModelIndex& index, EditTrigger trigger, QEvent* event)
+bool TableView::edit(const QModelIndex& index, EditTrigger trigger, QEvent* event)
 {
     if (trigger == QAbstractItemView::SelectedClicked && this->editTriggers().testFlag(QAbstractItemView::DoubleClicked))
         return base_type::edit(index, QAbstractItemView::DoubleClicked, event);
@@ -56,7 +57,7 @@ bool QnTableView::edit(const QModelIndex& index, EditTrigger trigger, QEvent* ev
     return base_type::edit(index, trigger, event);
 }
 
-void QnTableView::paintEvent(QPaintEvent* event)
+void TableView::paintEvent(QPaintEvent* event)
 {
     if (selectionBehavior() == SelectRows)
     {
@@ -87,7 +88,7 @@ void QnTableView::paintEvent(QPaintEvent* event)
     base_type::paintEvent(event);
 }
 
-void QnTableView::currentChanged(const QModelIndex& current, const QModelIndex& previous)
+void TableView::currentChanged(const QModelIndex& current, const QModelIndex& previous)
 {
     base_type::currentChanged(current, previous);
 
@@ -109,7 +110,7 @@ void QnTableView::currentChanged(const QModelIndex& current, const QModelIndex& 
     }
 }
 
-QRect QnTableView::rowRect(int row) const
+QRect TableView::rowRect(int row) const
 {
     int lastColumn = horizontalHeader()->count() - 1;
     int rowStart = columnViewportPosition(0);
@@ -117,7 +118,7 @@ QRect QnTableView::rowRect(int row) const
     return QRect(rowStart, rowViewportPosition(row), rowWidth, rowHeight(row));
 }
 
-void QnTableView::setModel(QAbstractItemModel* newModel)
+void TableView::setModel(QAbstractItemModel* newModel)
 {
     const auto currentModel = model();
     if (currentModel == newModel)
@@ -154,7 +155,7 @@ void QnTableView::setModel(QAbstractItemModel* newModel)
     handleModelReset();
 }
 
-void QnTableView::setPersistentDelegateForColumn(int column, QAbstractItemDelegate* delegate)
+void TableView::setPersistentDelegateForColumn(int column, QAbstractItemDelegate* delegate)
 {
     const auto it = m_delegates.find(column);
     if (it != m_delegates.end())
@@ -169,7 +170,7 @@ void QnTableView::setPersistentDelegateForColumn(int column, QAbstractItemDelega
     setItemDelegateForColumn(column, delegate);
 }
 
-void QnTableView::openEditorsForColumn(int column, int firstRow, int lastRow)
+void TableView::openEditorsForColumn(int column, int firstRow, int lastRow)
 {
     const auto currentModel = model();
     if (!currentModel)
@@ -178,3 +179,7 @@ void QnTableView::openEditorsForColumn(int column, int firstRow, int lastRow)
     for (int row = firstRow; row <= lastRow; ++row)
         openPersistentEditor(currentModel->index(row, column));
 }
+
+} // namespace desktop
+} // namespace client
+} // namespace nx

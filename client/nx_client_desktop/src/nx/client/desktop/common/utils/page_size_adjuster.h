@@ -1,15 +1,24 @@
 #pragma once
 
 #include <QtCore/QEvent>
+#include <QtCore/QObject>
+#include <QtWidgets/QWidget>
 
-#include <ui/common/widget_limits_backup.h>
-#include <utils/common/object_companion.h>
+#include <nx/client/desktop/common/utils/object_companion.h>
+#include <nx/client/desktop/common/utils/widget_limits_backup.h>
+
+class QStackedWidget;
+class QTabWidget;
+
+namespace nx {
+namespace client {
+namespace desktop {
 
 /*
 * This helper class improves minimum/maximum size calculation of QTabWidget and QStackedWidget.
 */
 template<class Pages>
-class QnPageSizeAdjuster: public QObject
+class PageSizeAdjuster: public QObject
 {
 public:
     /*
@@ -25,24 +34,24 @@ public:
     * Optional extraHandler will be called after every adjustment of size limits,
     *  it can be used for extra layout processing (e.g. dialog shrinking to content).
     */
-    static QnPageSizeAdjuster* install(
+    static PageSizeAdjuster* install(
         Pages* pages,
         QSizePolicy visiblePagePolicy,
         bool resizeToVisible,
         std::function<void()> extraHandler = std::function<void()>())
     {
-        auto adjuster = new QnPageSizeAdjuster(
+        auto adjuster = new PageSizeAdjuster(
             pages,
             visiblePagePolicy,
             resizeToVisible,
             extraHandler);
 
-        QnObjectCompanionManager::attach(pages, adjuster, "resizePagesToContents");
+        ObjectCompanionManager::attach(pages, adjuster, "resizePagesToContents");
         return adjuster;
     }
 
 private:
-    QnPageSizeAdjuster(
+    PageSizeAdjuster(
         Pages* pages,
         QSizePolicy visiblePagePolicy,
         bool resizeToVisible,
@@ -54,7 +63,7 @@ private:
         m_resizeToVisible(resizeToVisible),
         m_extraHandler(extraHandler)
     {
-        connect(m_pages, &Pages::currentChanged, this, &QnPageSizeAdjuster::updatePageSizes);
+        connect(m_pages, &Pages::currentChanged, this, &PageSizeAdjuster::updatePageSizes);
         m_pages->installEventFilter(this);
 
         updatePageSizes(m_pages->currentIndex());
@@ -105,7 +114,7 @@ private:
     }
 
 public:
-    virtual ~QnPageSizeAdjuster()
+    virtual ~PageSizeAdjuster()
     {
         m_widgetLimitsBackup.restore();
     }
@@ -136,9 +145,12 @@ private:
     QSizePolicy m_visiblePagePolicy;
     bool m_resizeToVisible;
     std::function<void()> m_extraHandler;
-    QnWidgetLimitsBackup m_widgetLimitsBackup;
+    WidgetLimitsBackup m_widgetLimitsBackup;
 };
 
+using StackedWidgetPageSizeAdjuster = PageSizeAdjuster<QStackedWidget>;
+using TabWidgetPageSizeAdjuster = PageSizeAdjuster<QTabWidget>;
 
-using QnStackedWidgetPageSizeAdjuster = QnPageSizeAdjuster<QStackedWidget>;
-using QnTabWidgetPageSizeAdjuster = QnPageSizeAdjuster<QTabWidget>;
+} // namespace desktop
+} // namespace client
+} // namespace nx

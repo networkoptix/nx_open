@@ -1,16 +1,16 @@
 #include "widget_anchor.h"
 
 #include <QtCore/QEvent>
-
 #include <QtWidgets/QWidget>
 
 #include <nx/utils/log/assert.h>
 
+namespace nx {
+namespace client {
+namespace desktop {
 
-QnWidgetAnchor::QnWidgetAnchor(QWidget* widget) :
+WidgetAnchor::WidgetAnchor(QWidget* widget):
     base_type(widget),
-    m_edges(Qt::LeftEdge | Qt::TopEdge | Qt::RightEdge | Qt::BottomEdge),
-    m_margins(0, 0, 0, 0),
     m_widget(widget)
 {
     if (!widget)
@@ -26,7 +26,7 @@ QnWidgetAnchor::QnWidgetAnchor(QWidget* widget) :
         parentWidget->installEventFilter(this);
 }
 
-void QnWidgetAnchor::setEdges(Qt::Edges edges)
+void WidgetAnchor::setEdges(Qt::Edges edges)
 {
     if (m_edges == edges)
         return;
@@ -35,12 +35,12 @@ void QnWidgetAnchor::setEdges(Qt::Edges edges)
     updateGeometry();
 }
 
-Qt::Edges QnWidgetAnchor::edges() const
+Qt::Edges WidgetAnchor::edges() const
 {
     return m_edges;
 }
 
-void QnWidgetAnchor::setMargins(const QMargins& margins)
+void WidgetAnchor::setMargins(const QMargins& margins)
 {
     if (m_margins == margins)
         return;
@@ -49,17 +49,17 @@ void QnWidgetAnchor::setMargins(const QMargins& margins)
     updateGeometry();
 }
 
-void QnWidgetAnchor::setMargins(int left, int top, int right, int bottom)
+void WidgetAnchor::setMargins(int left, int top, int right, int bottom)
 {
     setMargins(QMargins(left, top, right, bottom));
 }
 
-const QMargins& QnWidgetAnchor::margins() const
+const QMargins& WidgetAnchor::margins() const
 {
     return m_margins;
 }
 
-bool QnWidgetAnchor::eventFilter(QObject* object, QEvent* event)
+bool WidgetAnchor::eventFilter(QObject* object, QEvent* event)
 {
     if (object == m_widget)
     {
@@ -103,7 +103,7 @@ bool QnWidgetAnchor::eventFilter(QObject* object, QEvent* event)
     return base_type::eventFilter(object, event);
 }
 
-void QnWidgetAnchor::updateGeometry()
+void WidgetAnchor::updateGeometry()
 {
     if (!m_edges || !m_widget)
         return;
@@ -148,3 +148,6 @@ void QnWidgetAnchor::updateGeometry()
     m_widget->setGeometry(geometry);
 }
 
+} // namespace desktop
+} // namespace client
+} // namespace nx

@@ -2,27 +2,26 @@
 
 #include <QtGui/QHoverEvent>
 
-#include <client/client_globals.h>
-#include <nx/utils/log/assert.h>
 #include <ui/style/helper.h>
 #include <utils/common/event_processors.h>
 
+#include <nx/utils/log/assert.h>
 
-QnItemViewHoverTracker::QnItemViewHoverTracker(QAbstractItemView* parent) :
+namespace nx {
+namespace client {
+namespace desktop {
+
+ItemViewHoverTracker::ItemViewHoverTracker(QAbstractItemView* parent):
     QObject(parent),
-    m_itemView(parent),
-    m_hoveredIndex(),
-    m_automaticMouseCursor(false)
+    m_itemView(parent)
 {
     NX_ASSERT(m_itemView);
     m_itemView->setMouseTracking(true);
     m_itemView->setAttribute(Qt::WA_Hover);
 
     installEventHandler(m_itemView, { QEvent::HoverEnter, QEvent::HoverLeave, QEvent::HoverMove }, this,
-        [this](QObject* object, QEvent* event)
+        [this](QObject* /*object*/, QEvent* event)
         {
-            Q_UNUSED(object);
-
             static const QModelIndex kNoHover;
 
             if (!m_itemView->isEnabled() || !m_itemView->model() || !m_itemView->viewport())
@@ -52,36 +51,36 @@ QnItemViewHoverTracker::QnItemViewHoverTracker(QAbstractItemView* parent) :
         });
 }
 
-const QModelIndex& QnItemViewHoverTracker::hoveredIndex() const
+const QModelIndex& ItemViewHoverTracker::hoveredIndex() const
 {
     return m_hoveredIndex;
 }
 
-bool QnItemViewHoverTracker::automaticMouseCursor() const
+int ItemViewHoverTracker::mouseCursorRole() const
 {
-    return m_automaticMouseCursor;
+    return m_mouseCursorRole;
 }
 
-void QnItemViewHoverTracker::setAutomaticMouseCursor(bool value)
+void ItemViewHoverTracker::setMouseCursorRole(int value)
 {
-    if (value == m_automaticMouseCursor)
+    if (value == m_mouseCursorRole)
         return;
 
-    m_automaticMouseCursor = value;
+    m_mouseCursorRole = value;
 
-    if (m_automaticMouseCursor)
+    if (m_mouseCursorRole != kNoMouseCursorRole)
         updateMouseCursor();
     else
         m_itemView->unsetCursor();
 }
 
-void QnItemViewHoverTracker::updateMouseCursor()
+void ItemViewHoverTracker::updateMouseCursor()
 {
     if (m_hoveredIndex.isValid())
     {
-        bool ok;
-        auto shape = static_cast<Qt::CursorShape>(m_hoveredIndex.data(Qn::ItemMouseCursorRole).toInt(&ok));
-        if (ok)
+        bool ok = false;
+        auto shape = static_cast<Qt::CursorShape>(m_hoveredIndex.data(m_mouseCursorRole).toInt(&ok));
+        if (ok && shape >= 0 && shape <= Qt::LastCursor)
         {
             m_itemView->setCursor(shape);
             return;
@@ -91,7 +90,7 @@ void QnItemViewHoverTracker::updateMouseCursor()
     m_itemView->unsetCursor();
 }
 
-void QnItemViewHoverTracker::changeHover(const QModelIndex& index)
+void ItemViewHoverTracker::changeHover(const QModelIndex& index)
 {
     bool selectRows = m_itemView->selectionBehavior() == QAbstractItemView::SelectRows;
     bool selectColumns = m_itemView->selectionBehavior() == QAbstractItemView::SelectColumns;
@@ -125,7 +124,7 @@ void QnItemViewHoverTracker::changeHover(const QModelIndex& index)
         m_hoveredIndex = index;
         m_itemView->setProperty(style::Properties::kHoveredIndexProperty, QVariant::fromValue(m_hoveredIndex));
 
-        if (m_automaticMouseCursor)
+        if (m_mouseCursorRole != kNoMouseCursorRole)
             updateMouseCursor();
 
         if (index.isValid())
@@ -157,7 +156,7 @@ void QnItemViewHoverTracker::changeHover(const QModelIndex& index)
     }
 }
 
-QRect QnItemViewHoverTracker::columnRect(const QModelIndex& index) const
+QRect ItemViewHoverTracker::columnRect(const QModelIndex& index) const
 {
     QRect rect = m_itemView->visualRect(index);
     rect.setTop(0);
@@ -165,7 +164,7 @@ QRect QnItemViewHoverTracker::columnRect(const QModelIndex& index) const
     return rect;
 }
 
-QRect QnItemViewHoverTracker::rowRect(const QModelIndex& index) const
+QRect ItemViewHoverTracker::rowRect(const QModelIndex& index) const
 {
     QRect rect = m_itemView->visualRect(index);
     rect.setLeft(0);
@@ -173,3 +172,6 @@ QRect QnItemViewHoverTracker::rowRect(const QModelIndex& index) const
     return rect;
 }
 
+} // namespace desktop
+} // namespace client
+} // namespace nx

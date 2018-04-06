@@ -4,11 +4,8 @@
 
 #include <nx/client/desktop/common/widgets/panel.h>
 
-namespace Ui {
-class CloudUserPanelWidget;
-}
-
-class AbstractAccessor;
+namespace Ui { class CloudUserPanelWidget; }
+namespace nx { namespace client { namespace desktop { class AbstractAccessor; }}}
 
 /** Widget for displaying cloud user heading. */
 class QnCloudUserPanelWidget: public nx::client::desktop::Panel
@@ -29,7 +26,7 @@ public:
     QString fullName() const;
     void setFullName(const QString& value);
 
-    static AbstractAccessor* createIconWidthAccessor();
+    static nx::client::desktop::AbstractAccessor* createIconWidthAccessor();
 
 private:
     void updateManageAccountLink();

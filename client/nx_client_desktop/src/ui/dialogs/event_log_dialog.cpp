@@ -29,7 +29,7 @@
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/actions/actions.h>
-#include <ui/common/item_view_hover_tracker.h>
+#include <nx/client/desktop/common/utils/item_view_hover_tracker.h>
 #include <ui/utils/table_export_helper.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -129,7 +129,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     m_model->setColumns(columns);
     ui->gridEvents->setModel(m_model);
 
-    ui->gridEvents->hoverTracker()->setAutomaticMouseCursor(true);
+    ui->gridEvents->hoverTracker()->setMouseCursorRole(Qn::ItemMouseCursorRole);
 
     //ui->gridEvents->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 

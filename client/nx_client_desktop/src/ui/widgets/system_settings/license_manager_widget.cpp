@@ -35,7 +35,7 @@
 
 #include <nx/fusion/serialization/json_functions.h>
 
-#include <ui/common/widget_anchor.h>
+#include <nx/client/desktop/common/utils/widget_anchor.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/custom_style.h>
@@ -201,7 +201,7 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     ui->alertBar->setVisible(false);
 
     m_exportLicensesButton = new QPushButton(ui->licensesGroupBox);
-    auto anchor = new QnWidgetAnchor(m_exportLicensesButton);
+    auto anchor = new WidgetAnchor(m_exportLicensesButton);
     anchor->setEdges(Qt::TopEdge | Qt::RightEdge);
     static const int kButtonTopAdjustment = -4;
     anchor->setMargins(0, kButtonTopAdjustment, 0, 0);

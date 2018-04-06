@@ -2,13 +2,17 @@
 
 #include <QtWidgets/QHeaderView>
 
-class QnCheckBoxedHeaderView: public QHeaderView
+namespace nx {
+namespace client {
+namespace desktop {
+
+class CheckableHeaderView: public QHeaderView
 {
     Q_OBJECT
     typedef QHeaderView base_type;
 
 public:
-    explicit QnCheckBoxedHeaderView(int checkboxColumn, QWidget* parent = nullptr);
+    explicit CheckableHeaderView(int checkboxColumn, QWidget* parent = nullptr);
 
     Qt::CheckState checkState() const;
     void setCheckState(Qt::CheckState state);
@@ -29,3 +33,7 @@ private:
     int m_checkBoxColumn;
     Qt::CheckState m_checkState;
 };
+
+} // namespace desktop
+} // namespace client
+} // namespace nx

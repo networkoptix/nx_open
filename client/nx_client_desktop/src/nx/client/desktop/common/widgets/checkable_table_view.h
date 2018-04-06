@@ -4,12 +4,15 @@
 
 #include "table_view.h"
 
+namespace nx {
+namespace client {
+namespace desktop {
+
 /*
-* This class extend QnTableView for better checkboxes behavior
+* This class extend TableView for better checkboxes behavior
 *  Checkboxes are kept synchronized with selection
 */
-
-class QnCheckableTableView : public QnTableView
+class CheckableTableView: public TableView
 {
     Q_OBJECT
 
@@ -23,10 +26,10 @@ class QnCheckableTableView : public QnTableView
     */
     Q_PROPERTY(bool wholeModelChange READ wholeModelChange WRITE setWholeModelChange)
 
-    typedef QnTableView base_type;
+    using base_type = TableView;
 
 public:
-    explicit QnCheckableTableView(QWidget* parent = nullptr);
+    explicit CheckableTableView(QWidget* parent = nullptr);
 
     virtual void reset() override;
 
@@ -46,11 +49,15 @@ private:
     void modelDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles);
 
 private:
-    int m_checkboxColumn;
-    bool m_wholeModelChange;
+    int m_checkboxColumn = 0;
+    bool m_wholeModelChange = false;
 
     QMetaObject::Connection m_dataChangedConnection;
-    bool m_synchronizingWithModel;
+    bool m_synchronizingWithModel = false;
 
-    mutable bool m_mousePressedOnCheckbox;
+    mutable bool m_mousePressedOnCheckbox = false;
 };
+
+} // namespace desktop
+} // namespace client
+} // namespace nx

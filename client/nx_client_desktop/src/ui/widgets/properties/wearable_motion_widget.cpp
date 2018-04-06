@@ -3,9 +3,11 @@
 
 #include <core/resource/camera_resource.h>
 
-#include <ui/common/aligner.h>
+#include <nx/client/desktop/common/utils/aligner.h>
 #include <ui/common/read_only.h>
 #include <ui/workaround/widgets_signals_workaround.h>
+
+using namespace nx::client::desktop;
 
 QnWearableMotionWidget::QnWearableMotionWidget(QWidget* parent):
     QWidget(parent),
@@ -17,7 +19,7 @@ QnWearableMotionWidget::QnWearableMotionWidget(QWidget* parent):
     for (int i = 1; i < QnMotionRegion::kSensitivityLevelCount; i++)
         ui->sensitivityComboBox->addItem(QString::number(i));
 
-    m_aligner = new QnAligner(this);
+    m_aligner = new Aligner(this);
     m_aligner->addWidget(ui->sensitivityLabel);
 
     connect(ui->motionDetectionCheckBox, &QCheckBox::stateChanged, this,
@@ -35,7 +37,7 @@ QnWearableMotionWidget::~QnWearableMotionWidget()
 {
 }
 
-QnAligner* QnWearableMotionWidget::aligner() const
+Aligner* QnWearableMotionWidget::aligner() const
 {
     return m_aligner;
 }

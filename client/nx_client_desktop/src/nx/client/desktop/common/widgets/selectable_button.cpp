@@ -1,24 +1,17 @@
 #include "selectable_button.h"
 
-#include <utils/common/scoped_painter_rollback.h>
 #include <ui/style/helper.h>
+#include <utils/common/scoped_painter_rollback.h>
+
 #include <nx/client/core/utils/geometry.h>
 
 using nx::client::core::Geometry;
 
-namespace {
+namespace nx {
+namespace client {
+namespace desktop {
 
-    const int kDefaultMarkerFrameWidth = 2;
-    const qreal kDefaultRoundingRadius = 2.0;
-    const int kDefaultMarkerMargin = 1;
-
-} // unnamed namespace
-
-QnSelectableButton::QnSelectableButton(QWidget* parent) :
-    base_type(parent),
-    m_markerFrameWidth(kDefaultMarkerFrameWidth),
-    m_markerMargin(kDefaultMarkerMargin),
-    m_roundingRadius(kDefaultRoundingRadius)
+SelectableButton::SelectableButton(QWidget* parent): base_type(parent)
 {
     setFocusPolicy(Qt::TabFocus);
     setCheckable(true);
@@ -26,12 +19,12 @@ QnSelectableButton::QnSelectableButton(QWidget* parent) :
     updateContentsMargins();
 }
 
-int QnSelectableButton::markerFrameWidth() const
+int SelectableButton::markerFrameWidth() const
 {
     return m_markerFrameWidth;
 }
 
-void QnSelectableButton::setMarkerFrameWidth(int width)
+void SelectableButton::setMarkerFrameWidth(int width)
 {
     if (width == m_markerFrameWidth)
         return;
@@ -41,12 +34,12 @@ void QnSelectableButton::setMarkerFrameWidth(int width)
     update();
 }
 
-int QnSelectableButton::markerMargin() const
+int SelectableButton::markerMargin() const
 {
     return m_markerMargin;
 }
 
-void QnSelectableButton::setMarkerMargin(int margin)
+void SelectableButton::setMarkerMargin(int margin)
 {
     if (margin == m_markerMargin)
         return;
@@ -56,12 +49,12 @@ void QnSelectableButton::setMarkerMargin(int margin)
     update();
 }
 
-qreal QnSelectableButton::roundingRadius() const
+qreal SelectableButton::roundingRadius() const
 {
     return m_roundingRadius;
 }
 
-void QnSelectableButton::setRoundingRadius(int width)
+void SelectableButton::setRoundingRadius(int width)
 {
     if (width == m_markerFrameWidth)
         return;
@@ -70,10 +63,8 @@ void QnSelectableButton::setRoundingRadius(int width)
     update();
 }
 
-void QnSelectableButton::paintEvent(QPaintEvent* event)
+void SelectableButton::paintEvent(QPaintEvent* /*event*/)
 {
-    Q_UNUSED(event);
-
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
@@ -111,7 +102,7 @@ void QnSelectableButton::paintEvent(QPaintEvent* event)
     }
 }
 
-void QnSelectableButton::paintMarker(QPainter* painter, const QBrush& brush)
+void SelectableButton::paintMarker(QPainter* painter, const QBrush& brush)
 {
     QRectF frameRect(rect());
 
@@ -123,8 +114,12 @@ void QnSelectableButton::paintMarker(QPainter* painter, const QBrush& brush)
         m_roundingRadius, m_roundingRadius);
 }
 
-void QnSelectableButton::updateContentsMargins()
+void SelectableButton::updateContentsMargins()
 {
     int margin = m_markerFrameWidth + m_markerMargin;
     setContentsMargins(margin, margin, margin, margin);
 }
+
+} // namespace desktop
+} // namespace client
+} // namespace nx

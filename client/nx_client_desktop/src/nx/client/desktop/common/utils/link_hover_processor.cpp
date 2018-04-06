@@ -1,7 +1,6 @@
 #include "link_hover_processor.h"
 
 #include <QtGui/QMouseEvent>
-
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QLabel>
 
@@ -13,7 +12,11 @@
 
 #include <nx/utils/log/assert.h>
 
-QnLinkHoverProcessor::QnLinkHoverProcessor(QLabel* parent) :
+namespace nx {
+namespace client {
+namespace desktop {
+
+LinkHoverProcessor::LinkHoverProcessor(QLabel* parent):
     QObject(parent),
     m_label(parent)
 {
@@ -84,10 +87,10 @@ QnLinkHoverProcessor::QnLinkHoverProcessor(QLabel* parent) :
     auto tabstopListener = new QnLabelFocusListener(this);
     m_label->installEventFilter(tabstopListener);
 
-    connect(m_label, &QLabel::linkHovered, this, &QnLinkHoverProcessor::linkHovered);
+    connect(m_label, &QLabel::linkHovered, this, &LinkHoverProcessor::linkHovered);
 }
 
-bool QnLinkHoverProcessor::updateOriginalText()
+bool LinkHoverProcessor::updateOriginalText()
 {
     const QString text = m_label->text();
     if (m_alteredText == text)
@@ -97,7 +100,7 @@ bool QnLinkHoverProcessor::updateOriginalText()
     return true;
 }
 
-void QnLinkHoverProcessor::changeLabelState(const QString& text, bool hovered)
+void LinkHoverProcessor::changeLabelState(const QString& text, bool hovered)
 {
     m_alteredText = text;
 
@@ -110,14 +113,14 @@ void QnLinkHoverProcessor::changeLabelState(const QString& text, bool hovered)
         m_label->unsetCursor();
 }
 
-void QnLinkHoverProcessor::linkHovered(const QString& href)
+void LinkHoverProcessor::linkHovered(const QString& href)
 {
     m_hoveredLink = href;
     updateOriginalText();
     updateColors(UpdateTime::Later);
 }
 
-void QnLinkHoverProcessor::updateColors(UpdateTime when)
+void LinkHoverProcessor::updateColors(UpdateTime when)
 {
     /* Find anchor position: */
     const bool hovered = !m_hoveredLink.isEmpty();
@@ -151,3 +154,7 @@ void QnLinkHoverProcessor::updateColors(UpdateTime when)
         executeDelayedParented(changer, 0, this);
     }
 }
+
+} // namespace desktop
+} // namespace client
+} // namespace nx

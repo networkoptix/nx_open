@@ -21,7 +21,7 @@
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/common/utils/checkbox_utils.h>
-#include <ui/common/aligner.h>
+#include <nx/client/desktop/common/utils/aligner.h>
 #include <ui/common/palette.h>
 #include <ui/common/read_only.h>
 #include <ui/dialogs/resource_selection_dialog.h>
@@ -248,7 +248,7 @@ LegacyCameraScheduleWidget::LegacyCameraScheduleWidget(QWidget* parent, bool sna
     connect(ui->advancedSettingsButton, &QPushButton::clicked, this,
         [this]() { setAdvancedSettingsVisible(!m_advancedSettingsVisible); });
 
-    auto aligner = new QnAligner(this);
+    auto aligner = new Aligner(this);
     aligner->addWidgets({ ui->fpsLabel, ui->qualityLabel, ui->bitrateLabel });
 
     // Reset group box bottom margin to zero. Sub-widget margins defined in the ui-file rely on it.

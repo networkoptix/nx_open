@@ -1,17 +1,24 @@
 #pragma once
 
 #include <QtCore/QObject>
+#include <QtCore/QPoint>
+#include <QtGui/QColor>
 
-class QnPopupShadowPrivate;
+class QWidget;
+class QEvent;
+
+namespace nx {
+namespace client {
+namespace desktop {
 
 /**
  * Common class to display a shadow cast by a rectangular popup widget.
  *  Shadow is implemented as another semi-transparent popup widget.
  */
-class QnPopupShadow : public QObject
+class PopupShadow: public QObject
 {
     Q_OBJECT
-    typedef QObject base_type;
+    using base_type = QObject;
 
     /** Shadow color and transparency: */
     Q_PROPERTY(QColor color READ color WRITE setColor)
@@ -26,10 +33,10 @@ class QnPopupShadow : public QObject
     Q_PROPERTY(int spread READ spread WRITE setSpread)
 
 public:
-    explicit QnPopupShadow(QWidget* popup);
-    virtual ~QnPopupShadow();
+    explicit PopupShadow(QWidget* popup);
+    virtual ~PopupShadow();
 
-    const QColor& color() const;
+    QColor color() const;
     void setColor(const QColor& color);
 
     QPoint offset() const;
@@ -46,6 +53,10 @@ protected:
     virtual bool eventFilter(QObject* object, QEvent* event) override;
 
 private:
-    QScopedPointer<QnPopupShadowPrivate> d_ptr;
-    Q_DECLARE_PRIVATE(QnPopupShadow)
+    struct Private;
+    const QScopedPointer<Private> d;
 };
+
+} // namespace desktop
+} // namespace client
+} // namespace nx

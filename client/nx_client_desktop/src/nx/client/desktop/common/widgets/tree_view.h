@@ -1,8 +1,11 @@
-#ifndef QN_TREE_VIEW_H
-#define QN_TREE_VIEW_H
+#pragma once
 
 #include <QtCore/QBasicTimer>
 #include <QtWidgets/QTreeView>
+
+namespace nx {
+namespace client {
+namespace desktop {
 
 /**
  * This class fixes some bugs in <tt>QTreeView</tt> related to drag and drop
@@ -10,14 +13,14 @@
  *
  * It also adds several features that the QTreeView is lacking.
  */
-class QnTreeView: public QTreeView
+class TreeView: public QTreeView
 {
     Q_OBJECT
-    typedef QTreeView base_type;
+    using base_type = QTreeView;
 
 public:
-    explicit QnTreeView(QWidget* parent = nullptr);
-    virtual ~QnTreeView();
+    explicit TreeView(QWidget* parent = nullptr);
+    virtual ~TreeView() override = default;
 
     using base_type::rowHeight;
 
@@ -82,15 +85,13 @@ private:
 private:
     QBasicTimer m_openTimer;
     QPoint m_dragMovePos;
-
-    bool m_ignoreDefaultSpace;
-    bool m_dropOnBranchesAllowed;
-    bool m_inDragDropEvent;
-
+    bool m_ignoreDefaultSpace = false;
+    bool m_dropOnBranchesAllowed = true;
+    bool m_inDragDropEvent = false;
     bool m_verticalScrollBarVisible = false;
-
     ConfirmExpandDelegate m_confirmExpand;
 };
 
-
-#endif // QN_TREE_VIEW_H
+} // namespace desktop
+} // namespace client
+} // namespace nx

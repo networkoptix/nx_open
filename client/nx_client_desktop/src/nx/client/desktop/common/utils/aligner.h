@@ -1,18 +1,29 @@
 #pragma once
 
+#include <initializer_list>
+
+#include <QtCore/QObject>
+#include <QtCore/QHash>
 #include <QtCore/QPointer>
+#include <QtCore/QScopedPointer>
+
+class QWidget;
+
+namespace nx {
+namespace client {
+namespace desktop {
 
 class AbstractAccessor;
 
 /** Helper class to make several widgets always have the same width (yet). */
-class QnAligner : public QObject
+class Aligner: public QObject
 {
     Q_OBJECT
-    typedef QObject base_type;
+    using base_type = QObject;
 
 public:
-    explicit QnAligner(QObject* parent = nullptr);
-    virtual ~QnAligner();
+    explicit Aligner(QObject* parent = nullptr);
+    virtual ~Aligner();
 
     /** Add widget to align. Does not retain ownership. */
     void addWidget(QWidget* widget);
@@ -21,7 +32,7 @@ public:
     void addWidgets(std::initializer_list<QWidget*> widgets);
 
     /** Add linked aligner to align with. Does not retain ownership. */
-    void addAligner(QnAligner* aligner);
+    void addAligner(Aligner* aligner);
 
     /** Use custom accessor for the given widgets type. Takes ownership of an accessor. */
     void registerTypeAccessor(const QLatin1String& className, AbstractAccessor* accessor);
@@ -55,10 +66,14 @@ private:
 
 private:
     QList<QWidget*> m_widgets;
-    QList<QnAligner*> m_aligners;
+    QList<Aligner*> m_aligners;
     QHash<QLatin1String, AbstractAccessor *> m_accessorByClassName;
     QScopedPointer<AbstractAccessor> m_defaultAccessor;
-    QPointer<QnAligner> m_masterAligner;
-    bool m_skipInvisible;
-    int m_minimumWidth;
+    QPointer<Aligner> m_masterAligner;
+    bool m_skipInvisible = false;
+    int m_minimumWidth = 0;
 };
+
+} // namespace desktop
+} // namespace client
+} // namespace nx

@@ -2,15 +2,19 @@
 
 class QLabel;
 
+namespace nx {
+namespace client {
+namespace desktop {
+
 /*
  * Class to dynamically change hovered/unhovered label links color and cursor.
  *  Color is changed to style::linkColor(m_label, isHovered).
  *  It uses Link and LinkVisited palette entries.
  */
-class QnLinkHoverProcessor : public QObject
+class LinkHoverProcessor: public QObject
 {
 public:
-    explicit QnLinkHoverProcessor(QLabel* parent);
+    explicit LinkHoverProcessor(QLabel* parent);
 
 private:
     enum class UpdateTime { Now, Later };
@@ -20,8 +24,12 @@ private:
     bool updateOriginalText();
 
 private:
-    QLabel* m_label;
+    QLabel* const m_label = nullptr;
     QString m_originalText;
     QString m_alteredText;
     QString m_hoveredLink;
 };
+
+} // namespace desktop
+} // namespace client
+} // namespace nx

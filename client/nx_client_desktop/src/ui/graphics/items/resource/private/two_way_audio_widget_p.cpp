@@ -10,7 +10,7 @@
 
 #include <ui/animation/variant_animator.h>
 #include <ui/animation/opacity_animator.h>
-#include <ui/common/accessor.h>
+#include <nx/client/desktop/common/utils/accessor.h>
 #include <ui/common/palette.h>
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
@@ -23,6 +23,8 @@
 #include <utils/common/delayed.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/license_usage_helper.h>
+
+using namespace nx::client::desktop;
 
 namespace
 {

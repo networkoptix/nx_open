@@ -114,7 +114,7 @@ LayoutSelectionDialog::LayoutSelectionDialog(bool singlePick, QWidget* parent, Q
     // Lambda will keep the reference to filterLocalLayouts and filterSharedLayouts
 
     auto setupTreeView =
-        [this, radioButtonDelegate](QnTreeView* treeView)
+        [this, radioButtonDelegate](TreeView* treeView)
         {
             const QnIndents kIndents(1, 0);
             treeView->header()->setStretchLastSection(false);

@@ -14,7 +14,7 @@
 #include <client/client_settings.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
-#include <ui/common/aligner.h>
+#include <nx/client/desktop/common/utils/aligner.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/custom_style.h>
@@ -495,7 +495,7 @@ void QnDisconnectFromCloudDialogPrivate::createAuthorizeWidget()
 
     layout->addWidget(authorizePasswordField);
 
-    QnAligner* aligner = new QnAligner(authorizeWidget);
+    Aligner* aligner = new Aligner(authorizeWidget);
     aligner->registerTypeAccessor<InputField>(InputField::createLabelWidthAccessor());
     aligner->addWidget(loginField);
     aligner->addWidget(authorizePasswordField);
@@ -545,7 +545,7 @@ void QnDisconnectFromCloudDialogPrivate::createResetPasswordWidget()
     resetPasswordWidget->setFocusPolicy(Qt::TabFocus);
     resetPasswordWidget->setFocusProxy(resetPasswordField);
 
-    QnAligner* aligner = new QnAligner(resetPasswordWidget);
+    Aligner* aligner = new Aligner(resetPasswordWidget);
     aligner->registerTypeAccessor<InputField>(InputField::createLabelWidthAccessor());
     aligner->addWidgets({
         loginField,

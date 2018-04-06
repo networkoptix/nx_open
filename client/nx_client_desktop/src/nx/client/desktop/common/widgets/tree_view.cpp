@@ -3,20 +3,16 @@
 #include <QtCore/QTimerEvent>
 #include <QtCore/QScopedValueRollback>
 #include <QtGui/QDragMoveEvent>
-
 #include <QtWidgets/QScrollBar>
 
+#include <ui/help/help_topic_accessor.h>
 #include <utils/common/variant.h>
 
-#include <client/client_globals.h>
-#include <ui/help/help_topic_accessor.h>
+namespace nx {
+namespace client {
+namespace desktop {
 
-
-QnTreeView::QnTreeView(QWidget *parent):
-    base_type(parent),
-    m_ignoreDefaultSpace(false),
-    m_dropOnBranchesAllowed(true),
-    m_inDragDropEvent(false)
+TreeView::TreeView(QWidget* parent): base_type(parent)
 {
     setDragDropOverwriteMode(true);
 
@@ -24,11 +20,7 @@ QnTreeView::QnTreeView(QWidget *parent):
     handleVerticalScrollbarVisibilityChanged();
 }
 
-QnTreeView::~QnTreeView()
-{
-}
-
-void QnTreeView::scrollContentsBy(int dx, int dy)
+void TreeView::scrollContentsBy(int dx, int dy)
 {
     base_type::scrollContentsBy(dx, dy);
 
@@ -38,7 +30,7 @@ void QnTreeView::scrollContentsBy(int dx, int dy)
         currentChanged(currentIndex(), currentIndex());
 }
 
-void QnTreeView::keyPressEvent(QKeyEvent* event)
+void TreeView::keyPressEvent(QKeyEvent* event)
 {
     if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
     {
@@ -68,7 +60,7 @@ void QnTreeView::keyPressEvent(QKeyEvent* event)
     base_type::keyPressEvent(event);
 }
 
-bool QnTreeView::eventFilter(QObject* object, QEvent* event)
+bool TreeView::eventFilter(QObject* object, QEvent* event)
 {
     if ((event->type() == QEvent::Show || event->type() == QEvent::Hide)
         && object == verticalScrollBar())
@@ -79,7 +71,7 @@ bool QnTreeView::eventFilter(QObject* object, QEvent* event)
     return base_type::eventFilter(object, event);
 }
 
-void QnTreeView::handleVerticalScrollbarVisibilityChanged()
+void TreeView::handleVerticalScrollbarVisibilityChanged()
 {
     const auto scrollBar = verticalScrollBar();
     const bool visible = scrollBar && scrollBar->isVisible();
@@ -90,12 +82,12 @@ void QnTreeView::handleVerticalScrollbarVisibilityChanged()
     emit verticalScrollbarVisibilityChanged();
 }
 
-bool QnTreeView::verticalScrollBarIsVisible() const
+bool TreeView::verticalScrollBarIsVisible() const
 {
     return m_verticalScrollBarVisible;
 }
 
-void QnTreeView::dragMoveEvent(QDragMoveEvent* event)
+void TreeView::dragMoveEvent(QDragMoveEvent* event)
 {
     if (autoExpandDelay() >= 0)
     {
@@ -108,19 +100,19 @@ void QnTreeView::dragMoveEvent(QDragMoveEvent* event)
     QAbstractItemView::dragMoveEvent(event);
 }
 
-void QnTreeView::dragLeaveEvent(QDragLeaveEvent* event)
+void TreeView::dragLeaveEvent(QDragLeaveEvent* event)
 {
     m_openTimer.stop();
     base_type::dragLeaveEvent(event);
 }
 
-void QnTreeView::dropEvent(QDropEvent* event)
+void TreeView::dropEvent(QDropEvent* event)
 {
     QScopedValueRollback<bool> guard(m_inDragDropEvent, true);
     base_type::dropEvent(event);
 }
 
-void QnTreeView::timerEvent(QTimerEvent* event)
+void TreeView::timerEvent(QTimerEvent* event)
 {
     if (event->timerId() == m_openTimer.timerId())
     {
@@ -138,7 +130,7 @@ void QnTreeView::timerEvent(QTimerEvent* event)
     base_type::timerEvent(event);
 }
 
-void QnTreeView::mouseDoubleClickEvent(QMouseEvent* event)
+void TreeView::mouseDoubleClickEvent(QMouseEvent* event)
 {
     // Delegate can occasionally change the model, so keeping persistent index
     const QPersistentModelIndex persistent = indexAt(event->pos());
@@ -148,7 +140,7 @@ void QnTreeView::mouseDoubleClickEvent(QMouseEvent* event)
         emit doubleClicked(persistent);
 }
 
-QSize QnTreeView::viewportSizeHint() const
+QSize TreeView::viewportSizeHint() const
 {
     /*
      * Fix for Qt 5.6 bug: viewportSizeHint() returns size hint for visible area only.
@@ -159,27 +151,27 @@ QSize QnTreeView::viewportSizeHint() const
     return base_type::viewportSizeHint() + QSize(horizontalOffset(), verticalOffset());
 }
 
-bool QnTreeView::ignoreDefaultSpace() const
+bool TreeView::ignoreDefaultSpace() const
 {
     return m_ignoreDefaultSpace;
 }
 
-void QnTreeView::setIgnoreDefaultSpace(bool value)
+void TreeView::setIgnoreDefaultSpace(bool value)
 {
     m_ignoreDefaultSpace = value;
 }
 
-bool QnTreeView::dropOnBranchesAllowed() const
+bool TreeView::dropOnBranchesAllowed() const
 {
     return m_dropOnBranchesAllowed;
 }
 
-void QnTreeView::setDropOnBranchesAllowed(bool value)
+void TreeView::setDropOnBranchesAllowed(bool value)
 {
     m_dropOnBranchesAllowed = value;
 }
 
-QRect QnTreeView::visualRect(const QModelIndex& index) const
+QRect TreeView::visualRect(const QModelIndex& index) const
 {
     QRect result = base_type::visualRect(index);
     if (!m_inDragDropEvent)
@@ -191,15 +183,19 @@ QRect QnTreeView::visualRect(const QModelIndex& index) const
     return result;
 }
 
-void QnTreeView::setConfirmExpandDelegate(ConfirmExpandDelegate value)
+void TreeView::setConfirmExpandDelegate(ConfirmExpandDelegate value)
 {
     m_confirmExpand = value;
 }
 
-QItemSelectionModel::SelectionFlags QnTreeView::selectionCommand(
+QItemSelectionModel::SelectionFlags TreeView::selectionCommand(
     const QModelIndex& index, const QEvent* event) const
 {
     const auto result = base_type::selectionCommand(index, event);
     emit selectionChanging(result, index, event);
     return result;
 }
+
+} // namespace desktop
+} // namespace client
+} // namespace nx

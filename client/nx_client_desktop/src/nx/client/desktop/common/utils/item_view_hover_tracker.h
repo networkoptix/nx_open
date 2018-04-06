@@ -3,17 +3,22 @@
 #include <QtCore/QObject>
 #include <QtWidgets/QAbstractItemView>
 
-class QnItemViewHoverTracker : public QObject
+namespace nx {
+namespace client {
+namespace desktop {
+
+class ItemViewHoverTracker: public QObject
 {
     Q_OBJECT
 
 public:
-    explicit QnItemViewHoverTracker(QAbstractItemView* parent);
+    explicit ItemViewHoverTracker(QAbstractItemView* parent);
 
     const QModelIndex& hoveredIndex() const;
 
-    bool automaticMouseCursor() const;
-    void setAutomaticMouseCursor(bool value);
+    int mouseCursorRole() const;
+    void setMouseCursorRole(int value);
+    static constexpr int kNoMouseCursorRole = -1;
 
 signals:
     void itemEnter(const QModelIndex& index);
@@ -31,7 +36,11 @@ private:
     void updateMouseCursor();
 
 private:
-    QAbstractItemView* m_itemView;
+    QAbstractItemView* const m_itemView = nullptr;
     QPersistentModelIndex m_hoveredIndex;
-    bool m_automaticMouseCursor;
+    int m_mouseCursorRole = kNoMouseCursorRole;
 };
+
+} // namespace desktop
+} // namespace client
+} // namespace nx

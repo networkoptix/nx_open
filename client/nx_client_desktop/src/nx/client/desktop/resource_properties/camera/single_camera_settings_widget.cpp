@@ -25,7 +25,7 @@
 #include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/core/utils/geometry.h>
-#include <ui/common/aligner.h>
+#include <nx/client/desktop/common/utils/aligner.h>
 #include <ui/common/read_only.h>
 
 
@@ -36,7 +36,7 @@
 #include <ui/help/help_topics.h>
 #include <ui/style/custom_style.h>
 
-#include <ui/widgets/common/selectable_button.h>
+#include <nx/client/desktop/common/widgets/selectable_button.h>
 
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -87,7 +87,7 @@ SingleCameraSettingsWidget::SingleCameraSettingsWidget(QWidget *parent) :
 
     for (int i = 0; i < QnMotionRegion::kSensitivityLevelCount; ++i)
     {
-        auto button = new QnSelectableButton(ui->motionSensitivityGroupBox);
+        auto button = new SelectableButton(ui->motionSensitivityGroupBox);
         button->setText(lit("%1").arg(i));
         button->setFixedSize(kSensitivityButtonSize);
         ui->motionSensitivityGroupBox->layout()->addWidget(button);
@@ -203,7 +203,7 @@ SingleCameraSettingsWidget::SingleCameraSettingsWidget(QWidget *parent) :
     updateFromResource(true);
     retranslateUi();
 
-    QnAligner* leftAligner = new QnAligner(this);
+    Aligner* leftAligner = new Aligner(this);
     leftAligner->addWidgets({
         ui->nameLabel,
         ui->modelLabel,
@@ -216,7 +216,7 @@ SingleCameraSettingsWidget::SingleCameraSettingsWidget(QWidget *parent) :
         ui->passwordLabel });
     leftAligner->addAligner(ui->wearableArchiveLengthWidget->aligner());
 
-    QnAligner* rightAligner = new QnAligner(this);
+    Aligner* rightAligner = new Aligner(this);
     rightAligner->addAligner(ui->imageControlWidget->aligner());
     rightAligner->addAligner(ui->wearableMotionWidget->aligner());
 }
@@ -1054,7 +1054,7 @@ void SingleCameraSettingsWidget::at_tabWidget_currentChanged()
             const auto& buttons = m_sensitivityButtons->buttons();
             for (int i = 0; i < buttons.size(); ++i)
             {
-                static_cast<QnSelectableButton*>(buttons[i])->setCustomPaintFunction(
+                static_cast<SelectableButton*>(buttons[i])->setCustomPaintFunction(
                     [this, i](QPainter* painter, const QStyleOption* option, const QWidget* widget) -> bool
                     {
                         auto colors = m_motionWidget->motionSensitivityColors();

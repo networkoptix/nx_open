@@ -8,26 +8,28 @@
 
 #include <utils/common/delayed.h>
 
-namespace
-{
-    const QVector<int> kCheckRoles({ Qt::CheckStateRole });
+namespace nx {
+namespace client {
+namespace desktop {
 
-    QItemSelectionModel::SelectionFlags entireRow(QItemSelectionModel::SelectionFlags flags)
-    {
-        return (flags != QItemSelectionModel::NoUpdate) ? (flags | QItemSelectionModel::Rows) : QItemSelectionModel::NoUpdate;
-    }
+namespace {
+
+const QVector<int> kCheckRoles({ Qt::CheckStateRole });
+
+QItemSelectionModel::SelectionFlags entireRow(QItemSelectionModel::SelectionFlags flags)
+{
+    return flags != QItemSelectionModel::NoUpdate
+        ? (flags | QItemSelectionModel::Rows)
+        : QItemSelectionModel::NoUpdate;
 }
 
-QnCheckableTableView::QnCheckableTableView(QWidget* parent):
-    QnTableView(parent),
-    m_checkboxColumn(0),
-    m_wholeModelChange(false),
-    m_synchronizingWithModel(false),
-    m_mousePressedOnCheckbox(false)
+} // namespace
+
+CheckableTableView::CheckableTableView(QWidget* parent): TableView(parent)
 {
 }
 
-void QnCheckableTableView::reset()
+void CheckableTableView::reset()
 {
     /* Disable visual updates: */
     setUpdatesEnabled(false);
@@ -60,7 +62,7 @@ void QnCheckableTableView::reset()
         }
 
         /* Connect to model's dataChanged: */
-        m_dataChangedConnection = connect(dataModel, &QAbstractItemModel::dataChanged, this, &QnCheckableTableView::modelDataChanged);
+        m_dataChangedConnection = connect(dataModel, &QAbstractItemModel::dataChanged, this, &CheckableTableView::modelDataChanged);
     }
 
     /* Re-enable visual updates if synchronization wasn't queued, and mark entire widget for update: */
@@ -71,7 +73,7 @@ void QnCheckableTableView::reset()
     }
 }
 
-void QnCheckableTableView::synchronizeWithModel()
+void CheckableTableView::synchronizeWithModel()
 {
     if (auto dataModel = model())
     {
@@ -110,7 +112,7 @@ void QnCheckableTableView::synchronizeWithModel()
     }
 }
 
-void QnCheckableTableView::modelDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles)
+void CheckableTableView::modelDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles)
 {
     if (auto dataModel = model())
     {
@@ -170,7 +172,7 @@ void QnCheckableTableView::modelDataChanged(const QModelIndex& topLeft, const QM
     }
 }
 
-void QnCheckableTableView::selectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
+void CheckableTableView::selectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
 {
     base_type::selectionChanged(selected, deselected);
 
@@ -232,11 +234,11 @@ void QnCheckableTableView::selectionChanged(const QItemSelection& selected, cons
         }
 
         /* Connect to model's dataChanged: */
-        m_dataChangedConnection = connect(dataModel, &QAbstractItemModel::dataChanged, this, &QnCheckableTableView::modelDataChanged);
+        m_dataChangedConnection = connect(dataModel, &QAbstractItemModel::dataChanged, this, &CheckableTableView::modelDataChanged);
     }
 }
 
-QItemSelectionModel::SelectionFlags QnCheckableTableView::selectionCommand(const QModelIndex& index, const QEvent* event) const
+QItemSelectionModel::SelectionFlags CheckableTableView::selectionCommand(const QModelIndex& index, const QEvent* event) const
 {
     /* Avoid drag-selecting operations originating from checkbox column items: */
     if (m_mousePressedOnCheckbox)
@@ -275,7 +277,7 @@ QItemSelectionModel::SelectionFlags QnCheckableTableView::selectionCommand(const
     return entireRow(base_type::selectionCommand(index, event));
 }
 
-void QnCheckableTableView::mouseReleaseEvent(QMouseEvent* event)
+void CheckableTableView::mouseReleaseEvent(QMouseEvent* event)
 {
     /* If left mouse button is released: */
     if (static_cast<const QMouseEvent*>(event)->button() == Qt::LeftButton)
@@ -283,3 +285,7 @@ void QnCheckableTableView::mouseReleaseEvent(QMouseEvent* event)
 
     base_type::mouseReleaseEvent(event);
 }
+
+} // namespace desktop
+} // namespace client
+} // namespace nx

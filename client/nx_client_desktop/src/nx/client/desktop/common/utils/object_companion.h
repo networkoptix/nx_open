@@ -1,15 +1,20 @@
 #pragma once
 
-#include <QtCore/QObject>
 #include <type_traits>
 #include <utility>
 #include <memory>
+
+#include <QtCore/QObject>
+
+namespace nx {
+namespace client {
+namespace desktop {
 
 /*
  *  A set of static methods to attach/detach a companion object to/from another object.
  *   A companion is identified by string id. Pointer to companion is stored in a dynamic property.
  */
-class QnObjectCompanionManager
+class ObjectCompanionManager
 {
 public:
     /** Returns an attached companion: */
@@ -31,15 +36,18 @@ public:
  * Generic object with static methods to create an instance and attach it as a companion to another object.
  */
 template<class Base>
-class QnObjectCompanion : public Base, public QnObjectCompanionManager
+class ObjectCompanion:
+    public Base,
+    public ObjectCompanionManager
 {
-    static_assert(std::is_base_of<QObject, Base>::value, "QnObjectCompanion must be specialized with a class derived from QObject");
+    static_assert(std::is_base_of<QObject, Base>::value,
+        "ObjectCompanion must be specialized with a class derived from QObject");
 
-    QnObjectCompanion() = delete;
+    ObjectCompanion() = delete;
 
 public:
     template<class ParentType>
-    explicit QnObjectCompanion(ParentType* parent) : Base(parent) {}
+    explicit ObjectCompanion(ParentType* parent): Base(parent) {}
 
     /** Creates and attaches a new companion and returns a pointer to it.
     * Parent takes ownership of the companion.
@@ -47,13 +55,17 @@ public:
     * or keeps it and returns nullptr if `unique` is true.
     */
     template<class ParentType>
-    static QnObjectCompanion<Base>* install(ParentType* parent, const char* id, bool unique)
+    static ObjectCompanion<Base>* install(ParentType* parent, const char* id, bool unique)
     {
-        if (unique && QnObjectCompanionManager::companion(parent, id))
+        if (unique && ObjectCompanionManager::companion(parent, id))
             return nullptr;
 
-        auto result = new QnObjectCompanion<Base>(parent);
-        QnObjectCompanionManager::attach(parent, result, id);
+        auto result = new ObjectCompanion<Base>(parent);
+        ObjectCompanionManager::attach(parent, result, id);
         return result;
     }
 };
+
+} // namespace desktop
+} // namespace client
+} // namespace nx

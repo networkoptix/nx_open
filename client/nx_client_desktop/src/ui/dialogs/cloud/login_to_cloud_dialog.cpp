@@ -10,7 +10,7 @@
 
 #include <helpers/cloud_url_helper.h>
 
-#include <ui/common/aligner.h>
+#include <nx/client/desktop/common/utils/aligner.h>
 #include <ui/common/palette.h>
 #include <ui/dialogs/cloud/cloud_result_messages.h>
 #include <ui/help/help_topic_accessor.h>
@@ -98,7 +98,7 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
     const QColor nxColor(qApp->palette().color(QPalette::Normal, QPalette::BrightText));
     setPaletteColor(ui->cloudWelcomeLabel, QPalette::WindowText, nxColor);
 
-    auto aligner = new QnAligner(this);
+    auto aligner = new Aligner(this);
     aligner->registerTypeAccessor<InputField>(InputField::createLabelWidthAccessor());
     aligner->addWidgets({ ui->loginInputField, ui->passwordInputField, ui->spacer });
 

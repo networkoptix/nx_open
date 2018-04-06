@@ -2,21 +2,25 @@
 
 #include <QtWidgets/QWidget>
 
-QnScopedCursorRollback::QnScopedCursorRollback(QWidget* widget):
+namespace nx {
+namespace client {
+namespace desktop {
+
+ScopedCursorRollback::ScopedCursorRollback(QWidget* widget):
     m_widget(widget),
     m_hadCursor(widget ? widget->testAttribute(Qt::WA_SetCursor) : false),
     m_oldCursor(m_hadCursor ? widget->cursor() : QCursor())
 {
 }
 
-QnScopedCursorRollback::QnScopedCursorRollback(QWidget* widget, const QCursor& cursor):
-    QnScopedCursorRollback(widget)
+ScopedCursorRollback::ScopedCursorRollback(QWidget* widget, const QCursor& cursor):
+    ScopedCursorRollback(widget)
 {
     if (widget)
         widget->setCursor(cursor);
 }
 
-QnScopedCursorRollback::~QnScopedCursorRollback()
+ScopedCursorRollback::~ScopedCursorRollback()
 {
     if (!m_widget)
         return;
@@ -26,3 +30,7 @@ QnScopedCursorRollback::~QnScopedCursorRollback()
     else
         m_widget->unsetCursor();
 }
+
+} // namespace desktop
+} // namespace client
+} // namespace nx

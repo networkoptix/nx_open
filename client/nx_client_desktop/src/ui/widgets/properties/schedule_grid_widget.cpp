@@ -18,6 +18,8 @@
 #include <ui/style/helper.h>
 #include <nx/utils/math/fuzzy.h>
 
+using namespace nx::client::desktop;
+
 namespace {
 
 const int kTextSpacing = 6;

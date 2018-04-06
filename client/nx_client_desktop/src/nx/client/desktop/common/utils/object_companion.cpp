@@ -1,5 +1,10 @@
-#include <QtCore/QPointer>
 #include "object_companion.h"
+
+#include <QtCore/QPointer>
+
+namespace nx {
+namespace client {
+namespace desktop {
 
 namespace {
 
@@ -26,12 +31,12 @@ static QByteArray companionId(const char* id)
 
 } // namespace
 
-QObject* QnObjectCompanionManager::companion(QObject* parent, const char* id)
+QObject* ObjectCompanionManager::companion(QObject* parent, const char* id)
 {
     return getCompanion(parent, companionId(id));
 }
 
-std::unique_ptr<QObject> QnObjectCompanionManager::detach(QObject* parent, const char* id)
+std::unique_ptr<QObject> ObjectCompanionManager::detach(QObject* parent, const char* id)
 {
     const QByteArray internalId = companionId(id);
     std::unique_ptr<QObject> result(getCompanion(parent, internalId));
@@ -42,12 +47,13 @@ std::unique_ptr<QObject> QnObjectCompanionManager::detach(QObject* parent, const
     return result;
 }
 
-bool QnObjectCompanionManager::uninstall(QObject* parent, const char* id)
+bool ObjectCompanionManager::uninstall(QObject* parent, const char* id)
 {
     return detach(parent, id) != nullptr;
 }
 
-std::unique_ptr<QObject> QnObjectCompanionManager::attach(QObject* parent, QObject* companion, const char* id)
+std::unique_ptr<QObject> ObjectCompanionManager::attach(
+    QObject* parent, QObject* companion, const char* id)
 {
     const QByteArray internalId = companionId(id);
     std::unique_ptr<QObject> previousCompanion(getCompanion(parent, internalId));
@@ -55,3 +61,7 @@ std::unique_ptr<QObject> QnObjectCompanionManager::attach(QObject* parent, QObje
     companion->setParent(parent);
     return previousCompanion;
 }
+
+} // namespace desktop
+} // namespace client
+} // namespace nx
