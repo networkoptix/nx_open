@@ -1,6 +1,7 @@
 *** Settings ***
 Resource          ../resource.robot
 Resource          ../variables.robot
+Resource          ../form-validation-resource.robot
 Suite Setup       Open Browser and go to URL    ${url}/register
 Suite Teardown    Close Browser
 Test Teardown     Run Keyword If Test Failed    Test Reset
@@ -62,6 +63,7 @@ Test Reset
 
 Test Register Invalid
     [Arguments]    ${first}    ${last}    ${email}    ${pass}
+    Wait Until Elements Are Visible    ${REGISTER FIRST NAME INPUT}    ${REGISTER LAST NAME INPUT}    ${REGISTER EMAIL INPUT}    ${REGISTER PASSWORD INPUT}    ${CREATE ACCOUNT BUTTON}
     Form Validation    Register    ${first}    ${last}    ${email}    ${pass}
     Run Keyword Unless    "${pass}"=="${BASE PASSWORD}"    Check Password Outline    ${pass}
     Run Keyword Unless    "${email}"=="${valid email}"    Check Email Outline    ${email}

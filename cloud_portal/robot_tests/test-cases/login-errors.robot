@@ -1,6 +1,7 @@
 *** Settings ***
 Resource          ../resource.robot
 Resource          ../variables.robot
+Resource          ../form-validation-resource.robot
 Suite Setup       Open Log In Dialog
 Suite Teardown    Close Browser
 Test Teardown     Run Keyword If Test Failed    Test Reset
@@ -43,7 +44,7 @@ Open Log In Dialog
 Test Login Invalid
     [Arguments]    ${email}    ${pass}    ${expected}
     Form Validation    Log In    email=${email}    password=${pass}
-    Run Keyword If    "${expected} "== "outline"    Outline Error    ${email}    ${pass}
+    Run Keyword If    "${expected}" == "outline"    Outline Error    ${email}    ${pass}
     Run Keyword If    "${expected}" == "alert"    Alert Error    ${email}    ${pass}
     Run Keyword If    "${expected}" == "neither"    Validate Login
 

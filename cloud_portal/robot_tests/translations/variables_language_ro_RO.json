@@ -50,6 +50,7 @@
     "EMAIL ALREADY REGISTERED TEXT": "Acest e-mail a fost deja înregistrat în {{PRODUCT_NAME}}",
     "EMAIL INVALID TEXT": "Te rog introdu un email valid",
     "PASSWORD IS REQUIRED TEXT": "Parola este necesara",
+    "CURRENT PASSWORD IS REQUIRED TEXT": "Current password is required",
     "PASSWORD SPECIAL CHARS TEXT": "Utilizați numai litere latine, numere și simboluri de tastatură, evitați spațiile de conducere și de sfârșit",
     "PASSWORD TOO SHORT TEXT": "Parola trebuie să conțină cel puțin 8 caractere",
     "PASSWORD TOO COMMON TEXT": "Această parolă se află în cele mai populare parole din lume",

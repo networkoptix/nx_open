@@ -50,6 +50,7 @@
     "EMAIL ALREADY REGISTERED TEXT": "Den här e-posten har redan registrerats i {{PRODUCT_NAME}}",
     "EMAIL INVALID TEXT": "Var god ange ett giltigt e-postmeddelande",
     "PASSWORD IS REQUIRED TEXT": "lösenord krävs",
+    "CURRENT PASSWORD IS REQUIRED TEXT": "Current password is required",
     "PASSWORD SPECIAL CHARS TEXT": "Använd endast latinska bokstäver, siffror och tangentbordssymboler, undvik ledande och efterföljande utrymmen",
     "PASSWORD TOO SHORT TEXT": "Lösenordet måste innehålla minst 8 tecken",
     "PASSWORD TOO COMMON TEXT": "Detta lösenord är i topp populäraste lösenord i världen",

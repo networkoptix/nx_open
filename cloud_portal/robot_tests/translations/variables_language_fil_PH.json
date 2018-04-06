@@ -50,6 +50,7 @@
     "EMAIL ALREADY REGISTERED TEXT": "Nakarehistro na ang Email na ito sa {{PRODUCT_NAME}}",
     "EMAIL INVALID TEXT": "Mangyaring magpasok ng wastong Email",
     "PASSWORD IS REQUIRED TEXT": "Kinakailangan ang password",
+    "CURRENT PASSWORD IS REQUIRED TEXT": "Current password is required",
     "PASSWORD SPECIAL CHARS TEXT": "Gumamit lamang ng mga liham na latin, numero at mga simbolo ng keyboard, iwasan ang mga nangungunang at sumusunod na mga puwang",
     "PASSWORD TOO SHORT TEXT": "Ang password ay dapat maglaman ng hindi bababa sa 8 mga character",
     "PASSWORD TOO COMMON TEXT": "Ang password na ito ay nasa itaas ng pinaka-popular na mga password sa mundo",

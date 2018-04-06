@@ -50,6 +50,7 @@
     "EMAIL ALREADY REGISTERED TEXT": "Email ini sudah terdaftar di {{PRODUCT_NAME}}",
     "EMAIL INVALID TEXT": "Tolong masukkan email yang benar",
     "PASSWORD IS REQUIRED TEXT": "katakunci dibutuhkan",
+    "CURRENT PASSWORD IS REQUIRED TEXT": "Current password is required",
     "PASSWORD SPECIAL CHARS TEXT": "Gunakan hanya huruf latin, simbol angka dan keyboard, hindari memimpin dan membuntuti spasi",
     "PASSWORD TOO SHORT TEXT": "Kata sandi minimal harus terdiri dari 8 karakter",
     "PASSWORD TOO COMMON TEXT": "Kata sandi ini berada di atas kata sandi terpopuler di dunia",

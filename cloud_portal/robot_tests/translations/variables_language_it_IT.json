@@ -50,6 +50,7 @@
     "EMAIL ALREADY REGISTERED TEXT": "Questa E-mail è già stata registrata in {{PRODUCT_NAME}}",
     "EMAIL INVALID TEXT": "Immetti un'indirizzo E-mail valido",
     "PASSWORD IS REQUIRED TEXT": "È richiesta la password",
+    "CURRENT PASSWORD IS REQUIRED TEXT": "La password corrente è richiesta",
     "PASSWORD SPECIAL CHARS TEXT": "Usa solo lettere latine, numeri e simboli della tastiera, evita spazi iniziali e finali",
     "PASSWORD TOO SHORT TEXT": "La password deve contenere almeno 8 caratteri",
     "PASSWORD TOO COMMON TEXT": "Questa password è nelle migliori e più popolari password utilizzate nel mondo",
