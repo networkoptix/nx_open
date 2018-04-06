@@ -21,8 +21,6 @@
 #include "transaction_transport.h"
 #include "transaction_transport_header.h"
 #include "websocket_transaction_transport.h"
-#include "../access_control/authorization_manager.h"
-#include "../stree/cdb_ns.h"
 
 namespace nx {
 namespace cdb {
@@ -85,7 +83,7 @@ ConnectionManager::~ConnectionManager()
 
 void ConnectionManager::createTransactionConnection(
     nx::network::http::HttpServerConnection* const connection,
-    nx::utils::stree::ResourceContainer authInfo,
+    const std::string& systemId,
     nx::network::http::Request request,
     nx::network::http::Response* const response,
     nx::network::http::RequestProcessedHandler completionHandler)
@@ -94,8 +92,7 @@ void ConnectionManager::createTransactionConnection(
     //  runtime-guid=%7B0eac9718-4e37-4459-8799-c3023d4f7cb5%7D&system-identity-time=0&isClient
     // TODO: #ak
 
-    std::string systemId;
-    if (!authInfo.get(attr::authSystemId, &systemId))
+    if (systemId.empty())
     {
         NX_LOGX(QnLog::EC2_TRAN_LOG,
             lm("Ignoring createTransactionConnection request without systemId from %1")
@@ -170,7 +167,7 @@ void ConnectionManager::createTransactionConnection(
 
 void ConnectionManager::createWebsocketTransactionConnection(
     nx::network::http::HttpServerConnection* const connection,
-    nx::utils::stree::ResourceContainer authInfo,
+    const std::string& systemId,
     nx::network::http::Request request,
     nx::network::http::Response* const response,
     nx::network::http::RequestProcessedHandler completionHandler)
@@ -180,16 +177,13 @@ void ConnectionManager::createWebsocketTransactionConnection(
 
     auto remotePeerInfo = ::ec2::deserializeFromRequest(request);
 
-    std::string systemId;
-    if (!authInfo.get(attr::authSystemId, &systemId))
+    if (systemId.empty())
     {
         NX_LOGX(QnLog::EC2_TRAN_LOG,
             lm("Ignoring createWebsocketTransactionConnection request without systemId from peer %1")
             .arg(connection->socket()->getForeignAddress()), cl_logDEBUG1);
         return completionHandler(nx::network::http::StatusCode::badRequest);
     }
-    const nx::String systemIdLocal(systemId.c_str());
-
 
     ::ec2::ApiPeerDataEx localPeer;
     localPeer.assign(m_localPeerData);
@@ -209,13 +203,13 @@ void ConnectionManager::createWebsocketTransactionConnection(
     nx::network::http::RequestResult result(nx::network::http::StatusCode::switchingProtocols);
     result.connectionEvents.onResponseHasBeenSent =
         std::bind(&ConnectionManager::onHttpConnectionUpgraded, this,
-            _1, std::move(remotePeerInfo), std::move(authInfo), std::move(systemIdLocal));
+            _1, std::move(remotePeerInfo), systemId.c_str());
     completionHandler(std::move(result));
 }
 
 void ConnectionManager::pushTransaction(
     nx::network::http::HttpServerConnection* const connection,
-    nx::utils::stree::ResourceContainer /*authInfo*/,
+    const std::string& /*systemId*/,
     nx::network::http::Request request,
     nx::network::http::Response* const /*response*/,
     nx::network::http::RequestProcessedHandler completionHandler)
@@ -761,7 +755,6 @@ nx::network::http::RequestResult ConnectionManager::prepareOkResponseToCreateTra
 void ConnectionManager::onHttpConnectionUpgraded(
     nx::network::http::HttpServerConnection* connection,
     ::ec2::ApiPeerDataEx remotePeerInfo,
-    nx::utils::stree::ResourceContainer /*authInfo*/,
     const nx::String systemId)
 {
     const auto remoteAddress = connection->socket()->getForeignAddress();

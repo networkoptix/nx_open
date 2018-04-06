@@ -49,7 +49,7 @@ private:
     public:
         typedef void (ManagerType::*ManagerFuncType)(
             nx::network::http::HttpServerConnection* const connection,
-            nx::utils::stree::ResourceContainer authInfo,
+            const std::string& systemId,
             nx::network::http::Request request,
             nx::network::http::Response* const response,
             nx::network::http::RequestProcessedHandler completionHandler);
@@ -71,9 +71,12 @@ private:
             nx::network::http::Response* const response,
             nx::network::http::RequestProcessedHandler completionHandler) override
         {
+            std::string systemId;
+            authInfo.get(attr::authSystemId, &systemId);
+
             (m_manager->*m_managerFuncPtr)(
                 connection,
-                std::move(authInfo),
+                systemId,
                 std::move(request),
                 response,
                 std::move(completionHandler));

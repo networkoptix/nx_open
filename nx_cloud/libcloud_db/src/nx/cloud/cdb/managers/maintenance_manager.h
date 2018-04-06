@@ -62,7 +62,7 @@ private:
     void onTransactionLogRead(
         nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
         const std::string& systemId,
-        api::ResultCode resultCode,
+        ec2::ResultCode resultCode,
         std::vector<ec2::dao::TransactionLogRecord> serializedTransactions,
         ::ec2::QnTranState readedUpTo,
         std::function<void(

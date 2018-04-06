@@ -27,11 +27,8 @@
 #include "transaction_transport_header.h"
 
 namespace nx {
-namespace db {
 
-class AsyncSqlQueryExecutor;
-
-} // namespace db
+namespace db { class AsyncSqlQueryExecutor; } // namespace db
 
 namespace cdb {
 namespace ec2 {
@@ -39,6 +36,17 @@ namespace ec2 {
 class AbstractOutgoingTransactionDispatcher;
 
 QString toString(const ::ec2::QnAbstractTransaction& tran);
+
+enum class ResultCode
+{
+    ok = 0,
+    partialContent,
+    dbError,
+    retryLater,
+    notFound,
+};
+
+std::string toString(ResultCode);
 
 /**
  * Supports multiple transactions related to a single system at the same time.
@@ -52,7 +60,7 @@ class TransactionLog
 public:
     typedef nx::utils::MoveOnlyFunc<void()> NewTransactionHandler;
     typedef nx::utils::MoveOnlyFunc<void(
-        api::ResultCode /*resultCode*/,
+        ResultCode /*resultCode*/,
         std::vector<dao::TransactionLogRecord> /*serializedTransactions*/,
         ::ec2::QnTranState /*readedUpTo*/)> TransactionsReadHandler;
 
@@ -222,9 +230,9 @@ public:
      * @param to State (transaction source id, sequence) to read up to. Boundary is inclusive
      * @param completionHandler is called within unspecified DB connection thread.
      * In case of high load request can be cancelled internaly.
-     * In this case api::ResultCode::retryLater will be reported
+     * In this case ResultCode::retryLater will be reported
      * @note If there more transactions then maxTransactionsToReturn then
-     *      api::ResultCode::partialContent result code will be reported
+     *      ResultCode::partialContent result code will be reported
      *      to the completionHandler.
      */
     void readTransactions(
@@ -278,7 +286,7 @@ private:
 
     struct TransactionReadResult
     {
-        api::ResultCode resultCode;
+        ResultCode resultCode;
         std::vector<dao::TransactionLogRecord> transactions;
         /** (Read start state) + (readed transactions). */
         ::ec2::QnTranState state;
@@ -359,6 +367,8 @@ private:
         nx::utils::db::QueryContext* queryContext,
         const nx::String& systemId,
         quint64 newValue);
+
+    static ResultCode dbResultToApiResult(nx::utils::db::DBResult dbResult);
 };
 
 } // namespace ec2

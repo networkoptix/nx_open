@@ -125,7 +125,7 @@ private:
         ::ec2::QnTransactionTransportBase::State newState);
 
     void onTransactionsReadFromLog(
-        api::ResultCode resultCode,
+        ResultCode resultCode,
         std::vector<dao::TransactionLogRecord> serializedTransaction,
         ::ec2::QnTranState readedUpTo);
 

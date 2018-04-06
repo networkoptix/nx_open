@@ -28,7 +28,6 @@
 #include "transaction_processor.h"
 #include "transaction_transport_header.h"
 #include "transaction_transport.h"
-#include "../access_control/auth_types.h"
 
 namespace nx {
 namespace network {
@@ -86,13 +85,13 @@ public:
      */
     void createTransactionConnection(
         nx::network::http::HttpServerConnection* const connection,
-        nx::utils::stree::ResourceContainer authInfo,
+        const std::string& systemId,
         nx::network::http::Request request,
         nx::network::http::Response* const response,
         nx::network::http::RequestProcessedHandler completionHandler);
     void createWebsocketTransactionConnection(
         nx::network::http::HttpServerConnection* const connection,
-        nx::utils::stree::ResourceContainer authInfo,
+        const std::string& systemId,
         nx::network::http::Request request,
         nx::network::http::Response* const response,
         nx::network::http::RequestProcessedHandler completionHandler);
@@ -101,7 +100,7 @@ public:
      */
     void pushTransaction(
         nx::network::http::HttpServerConnection* const connection,
-        nx::utils::stree::ResourceContainer authInfo,
+        const std::string& systemId,
         nx::network::http::Request request,
         nx::network::http::Response* const response,
         nx::network::http::RequestProcessedHandler completionHandler);
@@ -232,7 +231,6 @@ private:
     void onHttpConnectionUpgraded(
         nx::network::http::HttpServerConnection* connection,
         ::ec2::ApiPeerDataEx remotePeerInfo,
-        nx::utils::stree::ResourceContainer authInfo,
         const nx::String systemId);
 };
 

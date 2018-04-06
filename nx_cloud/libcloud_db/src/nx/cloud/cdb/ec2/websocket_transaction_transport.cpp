@@ -122,20 +122,19 @@ void WebSocketTransactionTransport::readTransactions()
 }
 
 void WebSocketTransactionTransport::onTransactionsReadFromLog(
-    api::ResultCode resultCode,
+    ResultCode resultCode,
     std::vector<dao::TransactionLogRecord> serializedTransactions,
     ::ec2::QnTranState readedUpTo)
 {
     m_tranLogRequestInProgress = false;
-    if ((resultCode != api::ResultCode::ok) && (resultCode != api::ResultCode::partialContent))
+    if ((resultCode != ResultCode::ok) && (resultCode != ResultCode::partialContent))
     {
         NX_DEBUG(
             this,
             lm("systemId %1. Error reading transaction log (%2). "
                 "Closing connection to the peer %3")
-            .arg(m_transactionLogReader->systemId())
-            .arg(api::toString(resultCode))
-            .arg(remoteSocketAddr()));
+            .args(m_transactionLogReader->systemId(),
+                toString(resultCode), remoteSocketAddr()));
         setState(State::Error);   //closing connection
         return;
     }
@@ -150,7 +149,7 @@ void WebSocketTransactionTransport::onTransactionsReadFromLog(
                 highestProtocolVersionCompatibleWithRemotePeer()));
     }
     m_remoteSubscription = readedUpTo;
-    if (resultCode == api::ResultCode::ok)
+    if (resultCode == ResultCode::ok)
         m_sendHandshakeDone = true; //< All data are sent.
 }
 

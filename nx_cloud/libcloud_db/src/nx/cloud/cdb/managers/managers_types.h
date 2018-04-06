@@ -8,11 +8,14 @@
 #include <nx/utils/db/types.h>
 
 #include <nx/cloud/cdb/api/result_code.h>
+#include <nx/cloud/cdb/ec2/transaction_log.h>
 
 namespace nx {
 namespace cdb {
 
 api::ResultCode dbResultToApiResult(nx::utils::db::DBResult);
+
+api::ResultCode ec2ResultToResult(ec2::ResultCode resultCode);
 
 enum class EntityType
 {

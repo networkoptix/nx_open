@@ -2,6 +2,8 @@
 
 #include <nx/utils/log/log.h>
 
+#include <nx/cloud/cdb/managers/managers_types.h>
+
 #include "../ec2/synchronization_engine.h"
 
 namespace nx {
@@ -85,13 +87,15 @@ void MaintenanceManager::getStatistics(
 void MaintenanceManager::onTransactionLogRead(
     nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
     const std::string& systemId,
-    api::ResultCode resultCode,
+    ec2::ResultCode ec2ResultCode,
     std::vector<ec2::dao::TransactionLogRecord> serializedTransactions,
     ::ec2::QnTranState /*readedUpTo*/,
     std::function<void(
         api::ResultCode,
         ::ec2::ApiTransactionDataList)> completionHandler)
 {
+    api::ResultCode resultCode = ec2ResultToResult(ec2ResultCode);
+
     NX_LOGX(QnLog::EC2_TRAN_LOG,
         lm("system %1. Read %2 transactions. Result code %3")
             .arg(systemId).arg(serializedTransactions.size()).arg(api::toString(resultCode)),

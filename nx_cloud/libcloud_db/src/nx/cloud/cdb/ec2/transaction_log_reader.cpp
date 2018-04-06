@@ -46,7 +46,7 @@ void TransactionLogReader::readTransactions(
         [this,
             sharedGuard = m_asyncOperationGuard.sharedGuard(),
             completionHandler = std::move(completionHandler)](
-                api::ResultCode resultCode,
+                ResultCode resultCode,
                 std::vector<dao::TransactionLogRecord> serializedTransactions,
                 ::ec2::QnTranState readedUpTo) mutable
         {
@@ -73,7 +73,7 @@ void TransactionLogReader::readTransactions(
 }
 
 void TransactionLogReader::onTransactionsRead(
-    api::ResultCode resultCode,
+    ResultCode resultCode,
     std::vector<dao::TransactionLogRecord> serializedTransactions,
     ::ec2::QnTranState readedUpTo,
     TransactionsReadHandler completionHandler)

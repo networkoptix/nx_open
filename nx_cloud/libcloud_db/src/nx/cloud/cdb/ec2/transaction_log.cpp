@@ -5,7 +5,6 @@
 #include <nx/utils/time.h>
 
 #include "outgoing_transaction_dispatcher.h"
-#include "../managers/managers_types.h"
 
 namespace nx {
 namespace cdb {
@@ -15,6 +14,25 @@ QString toString(const ::ec2::QnAbstractTransaction& tran)
 {
     return lm("seq %1, ts %2")
         .arg(tran.persistentInfo.sequence).arg(tran.persistentInfo.timestamp);
+}
+
+std::string toString(ResultCode resultCode)
+{
+    switch (resultCode)
+    {
+        case ResultCode::ok:
+            return "ok";
+        case ResultCode::partialContent:
+            return "partialContent";
+        case ResultCode::dbError:
+            return "dbError";
+        case ResultCode::retryLater:
+            return "retryLater";
+        case ResultCode::notFound:
+            return "notFound";
+        default:
+            return "unknownError";
+    }
 }
 
 TransactionLog::TransactionLog(
@@ -38,7 +56,7 @@ void TransactionLog::startDbTransaction(
     nx::utils::MoveOnlyFunc<nx::utils::db::DBResult(nx::utils::db::QueryContext*)> dbOperationsFunc,
     nx::utils::MoveOnlyFunc<void(nx::utils::db::QueryContext*, nx::utils::db::DBResult)> onDbUpdateCompleted)
 {
-    // TODO: monitoring request queue size and returning api::ResultCode::retryLater if exceeded
+    // TODO: monitoring request queue size and returning ResultCode::retryLater if exceeded
 
     m_dbManager->executeUpdate(
         [this, systemId, dbOperationsFunc = std::move(dbOperationsFunc)](
@@ -254,7 +272,7 @@ nx::utils::db::DBResult TransactionLog::fetchTransactions(
         currentState = transactionLogBySystem->cache.committedTransactionState();
     }
 
-    outputData->resultCode = api::ResultCode::dbError;
+    outputData->resultCode = ResultCode::dbError;
 
     for (auto it = currentState.values.begin();
          it != currentState.values.end();
@@ -274,7 +292,7 @@ nx::utils::db::DBResult TransactionLog::fetchTransactions(
 
     // TODO #ak currentState is not correct here since it can be limited by "to" and "maxTransactionsToReturn"
     outputData->state = currentState;
-    outputData->resultCode = api::ResultCode::ok;
+    outputData->resultCode = ResultCode::ok;
 
     return nx::utils::db::DBResult::ok;
 }
@@ -431,6 +449,34 @@ void TransactionLog::updateTimestampHiInCache(
     QnMutexLocker lock(&m_mutex);
     getTransactionLogContext(lock, systemId)->cache.updateTimestampSequence(
         getDbTransactionContext(lock, queryContext, systemId).cacheTranId, newValue);
+}
+
+ResultCode TransactionLog::dbResultToApiResult(
+    nx::utils::db::DBResult dbResult)
+{
+    switch (dbResult)
+    {
+        case nx::utils::db::DBResult::ok:
+        case nx::utils::db::DBResult::endOfData:
+            return ResultCode::ok;
+
+        case nx::utils::db::DBResult::notFound:
+            return ResultCode::notFound;
+
+        case nx::utils::db::DBResult::cancelled:
+            return ResultCode::retryLater;
+
+        case nx::utils::db::DBResult::ioError:
+        case nx::utils::db::DBResult::statementError:
+        case nx::utils::db::DBResult::connectionError:
+            return ResultCode::dbError;
+
+        case nx::utils::db::DBResult::retryLater:
+            return ResultCode::retryLater;
+
+        default:
+            return ResultCode::dbError;
+    }
 }
 
 } // namespace ec2

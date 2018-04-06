@@ -57,7 +57,7 @@ private:
         nx::p2p::MessageType messageType,
         const QByteArray& payload);
     void onTransactionsReadFromLog(
-        api::ResultCode resultCode,
+        ResultCode resultCode,
         std::vector<dao::TransactionLogRecord> serializedTransactions,
         ::ec2::QnTranState readedUpTo);
     void readTransactions();

@@ -324,11 +324,11 @@ private:
         nx::utils::promise<std::vector<dao::TransactionLogRecord>> transactionsReadPromise;
         auto completionHandler =
             [&transactionsReadPromise](
-                api::ResultCode resultCode,
+                ResultCode resultCode,
                 std::vector<dao::TransactionLogRecord> serializedTransactions,
                 ::ec2::QnTranState /*readedUpTo*/)
             {
-                ASSERT_EQ(api::ResultCode::ok, resultCode);
+                ASSERT_EQ(ResultCode::ok, resultCode);
                 transactionsReadPromise.set_value(std::move(serializedTransactions));
             };
 

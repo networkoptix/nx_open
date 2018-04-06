@@ -373,19 +373,19 @@ void TransactionTransport::forwardStateChangedEvent(
 }
 
 void TransactionTransport::onTransactionsReadFromLog(
-    api::ResultCode resultCode,
+    ResultCode resultCode,
     std::vector<dao::TransactionLogRecord> serializedTransactions,
     ::ec2::QnTranState readedUpTo)
 {
     using namespace std::placeholders;
     // TODO: handle api::ResultCode::tryLater result code
 
-    if ((resultCode != api::ResultCode::ok) && (resultCode != api::ResultCode::partialContent))
+    if ((resultCode != ResultCode::ok) && (resultCode != ResultCode::partialContent))
     {
         NX_LOGX(QnLog::EC2_TRAN_LOG,
             lm("systemId %1. Error reading transaction log (%2). "
                "Closing connection to the peer %3")
-                .arg(m_systemId).arg(api::toString(resultCode))
+                .arg(m_systemId).arg(toString(resultCode))
                 .arg(m_commonTransportHeaderOfRemoteTransaction),
             cl_logDEBUG1);
         m_baseTransactionTransport.setState(::ec2::QnTransactionTransportBase::Closed);   //closing connection
@@ -395,7 +395,7 @@ void TransactionTransport::onTransactionsReadFromLog(
     NX_LOGX(QnLog::EC2_TRAN_LOG,
         lm("systemId %1. Read %2 transactions from transaction log (result %3). "
            "Posting them to the send queue to %4")
-            .arg(m_systemId).arg(serializedTransactions.size()).arg(api::toString(resultCode))
+            .arg(m_systemId).arg(serializedTransactions.size()).arg(toString(resultCode))
             .arg(m_commonTransportHeaderOfRemoteTransaction),
         cl_logDEBUG1);
 
@@ -417,10 +417,10 @@ void TransactionTransport::onTransactionsReadFromLog(
 
     m_remotePeerTranState = readedUpTo;
 
-    if (resultCode == api::ResultCode::partialContent
+    if (resultCode == ResultCode::partialContent
         || m_tranStateToSynchronizeTo > m_remotePeerTranState)
     {
-        if (resultCode != api::ResultCode::partialContent)
+        if (resultCode != ResultCode::partialContent)
         {
             // TODO: Printing remote and local states.
         }
