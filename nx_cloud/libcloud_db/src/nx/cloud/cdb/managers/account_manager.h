@@ -242,9 +242,7 @@ private:
         nx::utils::db::QueryContext* const tran,
         const data::AccountUpdateDataWithEmail& accountData);
     bool isValidInput(const data::AccountUpdateDataWithEmail& accountData) const;
-    void updateAccountCache(
-        bool activateAccountIfNotActive,
-        data::AccountUpdateDataWithEmail accountData);
+    void updateAccountCache(data::AccountUpdateDataWithEmail accountData);
 
     nx::utils::db::DBResult issueRestorePasswordCode(
         nx::utils::db::QueryContext* const queryContext,

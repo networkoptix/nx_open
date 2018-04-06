@@ -488,7 +488,7 @@ TEST_F(Account, reset_password_general)
         result = getAccount(account1.email, account1Password, &account1);
         ASSERT_EQ(api::ResultCode::ok, result);
 
-        if (i == 1)
+        if (i > 0)
         {
             ASSERT_TRUE(restart());  //checking that code is valid after cloud_db restart
         }
@@ -566,7 +566,7 @@ TEST_F(Account, reset_password_expiration)
 
     for (int i = 0; i < 2; ++i)
     {
-        if (i == 1)
+        if (i > 0)
         {
             ASSERT_TRUE(restart());
         }
@@ -682,7 +682,7 @@ TEST_F(Account, reset_password_authorization)
 
     for (int i = 0; i < 2; ++i)
     {
-        if (i == 1)
+        if (i > 0)
         {
             ASSERT_TRUE(restart());
         }
@@ -743,53 +743,6 @@ TEST_F(Account, reset_password_authorization)
     ASSERT_EQ(api::ResultCode::notAuthorized, result);  //tmpPassword is removed
 }
 
-TEST_F(Account, reset_password_activates_account)
-{
-    ASSERT_TRUE(startAndWaitUntilStarted());
-
-    //adding account
-    api::AccountData account1;
-    std::string account1Password;
-    api::AccountConfirmationCode activationCode;
-    api::ResultCode result = addAccount(&account1, &account1Password, &activationCode);
-    ASSERT_EQ(result, api::ResultCode::ok);
-    ASSERT_EQ(account1.customization, nx::utils::AppInfo::customizationName().toStdString());
-    ASSERT_TRUE(!activationCode.code.empty());
-
-    //user did not activate account and forgot password
-
-    //resetting password
-    std::string confirmationCode;
-    result = resetAccountPassword(account1.email, &confirmationCode);
-    ASSERT_EQ(api::ResultCode::ok, result);
-
-    //confirmation code has format base64(tmp_password:email)
-    const auto tmpPasswordAndEmail = QByteArray::fromBase64(
-        QByteArray::fromRawData(confirmationCode.data(), confirmationCode.size()));
-    const std::string tmpPassword = tmpPasswordAndEmail.mid(0, tmpPasswordAndEmail.indexOf(':')).constData();
-
-    //setting new password
-    std::string account1NewPassword = "new_password";
-
-    api::AccountUpdateData update;
-    update.passwordHa1 = nx::network::http::calcHa1(
-        account1.email.c_str(),
-        moduleInfo().realm.c_str(),
-        account1NewPassword.c_str()).constData();
-    result = updateAccount(account1.email, tmpPassword, update);
-    ASSERT_EQ(api::ResultCode::ok, result);
-
-    result = getAccount(account1.email, account1NewPassword, &account1);
-    ASSERT_EQ(api::ResultCode::ok, result);
-    ASSERT_EQ(api::AccountStatus::activated, account1.statusCode);
-
-    ASSERT_TRUE(restart());
-
-    result = getAccount(account1.email, account1NewPassword, &account1);
-    ASSERT_EQ(api::ResultCode::ok, result);
-    ASSERT_EQ(api::AccountStatus::activated, account1.statusCode);
-}
-
 TEST_F(Account, created_while_sharing)
 {
     EmailManagerMocked mockedEmailManager;
@@ -837,7 +790,7 @@ TEST_F(Account, created_while_sharing)
 
     for (int i = 0; i < 2; ++i)
     {
-        if (i == 1)
+        if (i > 0)
         {
             ASSERT_TRUE(restart());
         }
@@ -919,6 +872,32 @@ protected:
         ASSERT_EQ(api::ResultCode::ok, result);
         m_activationTimeRange.second =
             nx::utils::floor<std::chrono::milliseconds>(nx::utils::utcTime());
+    }
+
+    void whenRestoreAccountPassword()
+    {
+        std::string confirmationCode;
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            resetAccountPassword(m_account.email, &confirmationCode));
+
+        // Confirmation code has format base64(tmp_password:email).
+        const auto tmpPasswordAndEmail = QByteArray::fromBase64(
+            QByteArray::fromRawData(confirmationCode.data(), confirmationCode.size()));
+        const std::string tmpPassword =
+            tmpPasswordAndEmail.mid(0, tmpPasswordAndEmail.indexOf(':')).constData();
+
+        const std::string newPassword = nx::utils::generateRandomName(7).toStdString();
+
+        api::AccountUpdateData update;
+        update.passwordHa1 = nx::network::http::calcHa1(
+            m_account.email.c_str(),
+            moduleInfo().realm.c_str(),
+            newPassword.c_str()).constData();
+        ASSERT_EQ(api::ResultCode::ok, updateAccount(m_account.email, tmpPassword, update));
+
+        m_account.password = newPassword;
+        m_account.passwordHa1 = *update.passwordHa1;
     }
 
     void whenRestartedCloudDb()
@@ -1109,11 +1088,21 @@ protected:
 
     void thenAccountIsActivated()
     {
-        api::AccountData accountData;
-        ASSERT_EQ(
-            api::ResultCode::ok,
-            getAccount(account().email, account().password, &accountData));
-        ASSERT_EQ(api::AccountStatus::activated, accountData.statusCode);
+        for (int i = 0; i < 2; ++i)
+        {
+            if (i > 0)
+                whenRestartedCloudDb();
+
+            api::AccountData accountData;
+            ASSERT_EQ(
+                api::ResultCode::ok,
+                getAccount(account().email, account().password, &accountData));
+            ASSERT_EQ(api::AccountStatus::activated, accountData.statusCode);
+
+            constexpr auto maxAllowedDiff = std::chrono::hours(1);
+            ASSERT_GT(accountData.activationTime, nx::utils::utcTime() - maxAllowedDiff);
+            ASSERT_LT(accountData.activationTime, nx::utils::utcTime() + maxAllowedDiff);
+        }
     }
 };
 
@@ -1131,6 +1120,13 @@ TEST_F(
 {
     givenNotActivatedAccount();
     whenUpdateAccountUsingActivationCode();
+    thenAccountIsActivated();
+}
+
+TEST_F(AccountActivation, account_can_be_activated_by_password_reset)
+{
+    givenNotActivatedAccount();
+    whenRestoreAccountPassword();
     thenAccountIsActivated();
 }
 

@@ -29,17 +29,15 @@ nx::utils::db::DBResult AccountDataObject::update(
     return nx::utils::db::DBResult::ok;
 }
 
-nx::utils::db::DBResult AccountDataObject::fetchAccountByEmail(
+std::optional<data::AccountData> AccountDataObject::fetchAccountByEmail(
     nx::utils::db::QueryContext* /*queryContext*/,
-    const std::string& accountEmail,
-    data::AccountData* const accountData)
+    const std::string& accountEmail)
 {
     auto it = m_emailToAccount.find(accountEmail);
     if (it == m_emailToAccount.end())
-        return nx::utils::db::DBResult::notFound;
+        return std::nullopt;
 
-    *accountData = it->second;
-    return nx::utils::db::DBResult::ok;
+    return it->second;
 }
 
 nx::utils::db::DBResult AccountDataObject::fetchAccounts(
@@ -59,7 +57,7 @@ void AccountDataObject::insertEmailVerificationCode(
     m_verificationCodeToEmail[emailVerificationCode] = accountEmail;
 }
 
-boost::optional<std::string> AccountDataObject::getVerificationCodeByAccountEmail(
+std::optional<std::string> AccountDataObject::getVerificationCodeByAccountEmail(
     nx::utils::db::QueryContext* /*queryContext*/,
     const std::string& accountEmail)
 {
@@ -69,7 +67,7 @@ boost::optional<std::string> AccountDataObject::getVerificationCodeByAccountEmai
             return val.first;
     }
 
-    return boost::none;
+    return std::nullopt;
 }
 
 nx::utils::db::DBResult AccountDataObject::getAccountEmailByVerificationCode(
@@ -105,8 +103,7 @@ nx::utils::db::DBResult AccountDataObject::updateAccountToActiveStatus(
 void AccountDataObject::updateAccount(
     nx::utils::db::QueryContext* /*queryContext*/,
     const std::string& accountEmail,
-    const api::AccountUpdateData& accountUpdateData,
-    bool /*activateAccountIfNotActive*/)
+    const api::AccountUpdateData& accountUpdateData)
 {
     auto accountIter = m_emailToAccount.find(accountEmail);
     if (accountIter == m_emailToAccount.end())
