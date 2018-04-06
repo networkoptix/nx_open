@@ -4,6 +4,7 @@
 #include <nx/utils/subscription.h>
 
 #include "connection_manager.h"
+#include "dao/rdb/structure_updater.h"
 #include "incoming_transaction_dispatcher.h"
 #include "outgoing_transaction_dispatcher.h"
 #include "transaction_log.h"
@@ -42,6 +43,7 @@ public:
 
 private:
     OutgoingTransactionDispatcher m_outgoingTransactionDispatcher;
+    dao::rdb::StructureUpdater m_structureUpdater;
     TransactionLog m_transactionLog;
     IncomingTransactionDispatcher m_incomingTransactionDispatcher;
     ConnectionManager m_connectionManager;

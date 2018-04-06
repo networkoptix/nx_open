@@ -9,6 +9,7 @@ SyncronizationEngine::SyncronizationEngine(
     const Settings& settings,
     nx::utils::db::AsyncSqlQueryExecutor* const dbManager)
     :
+    m_structureUpdater(dbManager),
     m_transactionLog(
         moduleGuid,
         dbManager,
