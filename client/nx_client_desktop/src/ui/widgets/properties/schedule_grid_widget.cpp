@@ -10,7 +10,11 @@
 #include <QtWidgets/QApplication>
 
 #include <client/client_settings.h>
+
 #include <core/resource/media_resource.h>
+
+#include <nx/client/desktop/common/utils/stream_quality_strings.h>
+
 #include <utils/common/scoped_painter_rollback.h>
 #include <ui/style/globals.h>
 #include <ui/style/helper.h>
@@ -133,7 +137,7 @@ void QnScheduleGridWidget::initMetrics()
         // checking all variants of quality string
         if (m_showQuality)
             for (int i = 0; i < Qn::StreamQualityCount && !tooBig; i++)
-                tooBig |= (metrics.width(Qn::toShortDisplayString(static_cast<Qn::StreamQuality>(i))) > maxLength);
+                tooBig |= (metrics.width(toShortDisplayString(static_cast<Qn::StreamQuality>(i))) > maxLength);
 
         // checking numbers like 11, 22, .. 99
         if (m_showFps)

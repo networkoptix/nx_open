@@ -2,11 +2,12 @@
 #include "ui_schedule_settings_widget.h"
 
 #include <QtGui/QStandardItemModel>
+
 #include <QtWidgets/QListView>
 
-#include <core/resource/media_resource.h>
-
 #include <nx/client/desktop/common/utils/aligner.h>
+#include <nx/client/desktop/common/utils/stream_quality_strings.h>
+
 #include <ui/common/read_only.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>

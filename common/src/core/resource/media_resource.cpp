@@ -1,7 +1,7 @@
 #include "media_resource.h"
 
 #include <QtGui/QImage>
-#include <QtCore/QCoreApplication>
+
 
 #include <utils/common/warnings.h>
 #include <nx/fusion/serialization/lexical.h>
@@ -28,64 +28,6 @@ namespace {
 
     /** Special value for absent custom aspect ratio. Should not be changed without a reason because a lot of modules check it as qFuzzyIsNull. */
     const qreal noCustomAspectRatio = 0.0;
-}
-
-class QnStreamQualityStrings {
-    Q_DECLARE_TR_FUNCTIONS(QnStreamQualityStrings);
-public:
-    static QString displayString(Qn::StreamQuality value)
-    {
-        switch(value) {
-        case Qn::QualityLowest:       return tr("Lowest");
-        case Qn::QualityLow:          return tr("Low");
-        case Qn::QualityNormal:       return tr("Medium");
-        case Qn::QualityHigh:         return tr("High");
-        case Qn::QualityHighest:      return tr("Best");
-        case Qn::QualityPreSet:       return tr("Preset");
-        case Qn::QualityNotDefined:   return tr("Undefined");
-        default:
-            qnWarning("Invalid stream quality value '%1'.", static_cast<int>(value));
-            return QString();
-        }
-    }
-
-    static QString shortDisplayString(Qn::StreamQuality value)
-    {
-        /* Note that '//:' are comments for translators. */
-        switch(value) {
-        case Qn::QualityLowest:
-            //: Short for 'Lowest'
-            return tr("Lst");
-        case Qn::QualityLow:
-            //: Short for 'Low'
-            return tr("Lo");
-        case Qn::QualityNormal:
-            //: Short for 'Medium'
-            return tr("Me");
-        case Qn::QualityHigh:
-            //: Short for 'High'
-            return tr("Hi");
-        case Qn::QualityHighest:
-            //: Short for 'Best'
-            return tr("Bst");
-        case Qn::QualityPreSet:
-            //: Short for 'Preset'
-            return tr("Ps");
-        case Qn::QualityNotDefined:
-            return lit("-");
-        default:
-            qnWarning("Invalid stream quality value '%1'.", static_cast<int>(value));
-            return QString();
-        }
-    }
-};
-
-QString Qn::toDisplayString(Qn::StreamQuality value) {
-    return QnStreamQualityStrings::displayString(value);
-}
-
-QString Qn::toShortDisplayString(Qn::StreamQuality value) {
-    return QnStreamQualityStrings::shortDisplayString(value);
 }
 
 // -------------------------------------------------------------------------- //

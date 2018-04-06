@@ -5,7 +5,6 @@
 #include <QtCore/QSize>
 #include "resource.h"
 #include "resource_media_layout.h"
-#include "utils/common/from_this_to_shared.h"
 
 #include <core/ptz/media_dewarping_params.h>
 #include <utils/common/aspect_ratio.h>
@@ -14,14 +13,6 @@ class QnAbstractStreamDataProvider;
 class QnResourceVideoLayout;
 class QnResourceAudioLayout;
 class QnCameraUserAttributePool;
-
-namespace Qn {
-
-    // TODO: #Elric move out!
-
-    QString toDisplayString(Qn::StreamQuality value);
-    QString toShortDisplayString(Qn::StreamQuality value);
-}
 
 /*!
     \note Derived class MUST call \a initMediaResource() just after object instantiation
