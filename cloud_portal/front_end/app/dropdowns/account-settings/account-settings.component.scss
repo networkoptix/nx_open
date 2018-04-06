@@ -1,3 +1,4 @@
+@import '../../styles/native-theme/theme_palette';
 
 @media (max-width: 922px) {
 
@@ -37,7 +38,7 @@
 }
 
 .dropdown .arrow::after {
-    border-top-color: white; //$light1;
+    border-top-color: $light1;
 }
 
 .dropdown .dropdown-menu .arrow::after {

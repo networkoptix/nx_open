@@ -34,7 +34,7 @@ let NxSystemsDropdown = class NxSystemsDropdown {
     updateActive() {
         this.active.register = this.isActive('/register');
         this.active.view = this.isActive('/view');
-        this.active.settings = this.activeSystem.id && !this.isActive('/view');
+        this.active.settings = this.activeSystem && this.activeSystem.id && !this.isActive('/view');
     }
     trackByFn(index, item) {
         return item.id;

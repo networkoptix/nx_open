@@ -1,3 +1,6 @@
+
+@import '../../styles/native-theme/theme_palette';
+
 .arrow {
     right: 50px;
     left: auto;
@@ -38,7 +41,7 @@
 }
 
 .dropdown .dropdown-menu li > a .system-owner {
-    color: #2FA2DB; // $blue10; // TODO: vars not available here ... Hmmmm
+    color: $blue10; // TODO: vars not available here ... Hmmmm
 }
 
 .dropdown .dropdown-menu li > a:hover .system-owner {
@@ -46,6 +49,6 @@
 }
 
 .dropdown .arrow::after {
-    border-top-color: white; //$light1;
+    border-top-color: $light1;
 }
 

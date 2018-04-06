@@ -1,5 +1,18 @@
+@import '../../styles/theme_palette';
+
+.dropdown {
+    &-toggle {
+        border-color: red;
+    }
+}
+
+.dropdown-toggle {
+    border-color: $error;
+}
+
 .dropdown-menu {
     background-color: #FFF;
     border-radius: 2px;
     width: auto;
 }
+

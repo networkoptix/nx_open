@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef, Inject } from '@angular/core';
-import { NgbDropdownModule }                            from '@ng-bootstrap/ng-bootstrap';
+import { NgbDropdownModule }                                               from '@ng-bootstrap/ng-bootstrap';
 
 export interface activeLanguage {
     language: string;

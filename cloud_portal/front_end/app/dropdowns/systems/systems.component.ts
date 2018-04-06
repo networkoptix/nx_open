@@ -26,7 +26,6 @@ export class NxSystemsDropdown implements OnInit, OnDestroy, OnChanges {
                 @Inject('configService') private config: any,
                 private location: Location,
                 private route: ActivatedRoute,) {
-
     }
 
     private isActive(val) {
@@ -38,7 +37,7 @@ export class NxSystemsDropdown implements OnInit, OnDestroy, OnChanges {
     private updateActive() {
         this.active.register = this.isActive('/register');
         this.active.view = this.isActive('/view');
-        this.active.settings = this.activeSystem.id && !this.isActive('/view');
+        this.active.settings = this.activeSystem && this.activeSystem.id && !this.isActive('/view');
     }
 
     trackByFn(index, item) {
