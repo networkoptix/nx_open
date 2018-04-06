@@ -9,9 +9,10 @@ bool SystemCommands::mount(const std::string& /*url*/, const std::string& /*dire
     return false;
 }
 
-bool SystemCommands::unmount(const std::string& /*directory*/)
+SystemCommands::UnmountCode SystemCommands::unmount(
+    const std::string& /*directory*/, bool /*reportViaSocket*/)
 {
-    return false;
+    return noPermissions;
 }
 
 bool SystemCommands::changeOwner(const std::string& /*path*/)
