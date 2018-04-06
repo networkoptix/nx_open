@@ -37,11 +37,10 @@ struct SchedulePaintFunctions
     void paintSelection(QPainter* painter, const QRectF& rect) const;
 
 private:
-    using TypeColors = std::array<QColor, Qn::RT_Count>;
-    TypeColors m_cell;
-    TypeColors m_cellHovered;
-    TypeColors m_inside;
-    TypeColors m_insideHovered;
+    // Color by hovered state
+    using HoveredColors = std::array<QColor, 2>;
+    using TypeColors = std::array<HoveredColors, Qn::RT_Count>;
+    TypeColors m_cellColor;
 };
 
 } // namespace desktop
