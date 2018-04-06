@@ -91,8 +91,8 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(
     int sourceRow,
     const QModelIndex& sourceParent) const
 {
-    const auto model = treeModel(sourceModel());
-    if (!model)
+    const auto sourceTreeModel = treeModel(sourceModel());
+    if (!sourceTreeModel)
         return false;
 
     const bool searchMode = !m_query.text.isEmpty();
@@ -105,7 +105,7 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(
         ? sourceParent.sibling(sourceParent.row(), Qn::NameColumn)
         : sourceParent;
 
-    QModelIndex index = model->index(sourceRow, 0, root);
+    QModelIndex index = sourceModel()->index(sourceRow, 0, root);
     if (!index.isValid())
         return true;
 
@@ -152,7 +152,7 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(
 
         // We don't show servers and videowalls in case of search.
         const auto resource = this->resource(index);
-        if (resource && model->scope() == QnResourceTreeModel::FullScope)
+        if (resource && sourceTreeModel->scope() == QnResourceTreeModel::FullScope)
         {
             const auto parentNodeType = sourceParent.data(Qn::NodeTypeRole).value<Qn::NodeType>();
             if (parentNodeType != Qn::FilteredServersNode && resource->hasFlags(Qn::server))
@@ -179,7 +179,7 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(
             break;
     }
 
-    const int childCount = model->rowCount(index);
+    const int childCount = sourceModel()->rowCount(index);
     const bool hasChildren = childCount > 0;
     if (hasChildren)
     {
