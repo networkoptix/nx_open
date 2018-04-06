@@ -10,21 +10,22 @@
 #include <nx/utils/system_utils.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/time.h>
+#include <nx/utils/scope_guard.h>
+#include <nx/utils/sync_call.h>
 
 #include <api/global_settings.h>
 #include <core/resource/param.h>
 #include <core/resource/user_resource.h>
-#include <nx/utils/scope_guard.h>
 #include <utils/common/id.h>
-#include <nx/utils/sync_call.h>
+
+#include <nx/data_sync_engine/data_conversion.h>
+#include <nx/data_sync_engine/synchronization_engine.h>
 
 #include "account_manager.h"
 #include "email_manager.h"
 #include "system_health_info_provider.h"
 #include "../access_control/authentication_manager.h"
 #include "../access_control/authorization_manager.h"
-#include "../ec2/data_conversion.h"
-#include "../ec2/synchronization_engine.h"
 #include "../settings.h"
 #include "../stree/cdb_ns.h"
 

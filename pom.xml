@@ -75,6 +75,7 @@
         <nx_network_ut.guid>{f7dfa168-fa41-4d4a-b475-e785acb4ff45}</nx_network_ut.guid>
         <nx_update_ut.guid>{F6D33EC2-B123-43F2-9FB3-BE01DE189B90}</nx_update_ut.guid>
         <libcloud_db.guid>{BBA5BB95-B669-42C4-8074-EE0E361C094E}></libcloud_db.guid>
+        <nx_data_sync_engine.guid>{93FF9310-19B4-4256-B0EA-B657927264E0}</nx_data_sync_engine.guid>
         <time_server.guid>{5640EBAF-8312-4C7C-851E-A48F0B5E2208}</time_server.guid>
         <cloud_db.guid>{44ADCF67-21B0-403D-A771-C138B11CDB83}></cloud_db.guid>
         <cloud_db_ut.guid>{626088EE-4911-4676-9152-F49BA62E1729}</cloud_db_ut.guid>
@@ -706,6 +707,7 @@
                 <module>nx_cloud/cloud_db</module>
                 <module>nx_cloud/connection_mediator</module>
                 <module>nx_cloud/cloud_connect_test_util</module>
+                <module>nx_cloud/nx_data_sync_engine</module>
                 <module>nx_cloud/libcloud_db</module>
                 <module>nx_cloud/libconnection_mediator</module>
                 <module>nx_cloud/libvms_gateway_core</module>
@@ -831,6 +833,7 @@
                 <module>common_libs/nx_email</module>
                 <module>common_libs/nx_speech_synthesizer</module>
                 <!-- <module>macsetup/client-dmg</module> -->
+                <module>nx_cloud/nx_data_sync_engine</module>
                 <module>nx_cloud/libcloud_db</module>
                 <module>nx_cloud/libconnection_mediator</module>
                 <module>common_libs/nx_cassandra</module>
@@ -858,6 +861,7 @@
                 <module>nx_cloud/connection_mediator</module>
                 <module>nx_cloud/traffic_relay</module>
                 <module>nx_cloud/cloud_connect_test_util</module>
+                <module>nx_cloud/nx_data_sync_engine</module>
                 <module>nx_cloud/libcloud_db</module>
                 <module>nx_cloud/libconnection_mediator</module>
                 <module>nx_cloud/librelaying</module>

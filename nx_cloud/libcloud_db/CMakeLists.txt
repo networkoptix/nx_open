@@ -9,7 +9,7 @@ nx_add_target(libcloud_db LIBRARY
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/libcloud_db_app_info_impl.cpp"
     PUBLIC_LIBS
-        cloud_db_client appserver2 nx_email)
+        cloud_db_client nx_data_sync_engine appserver2 nx_email)
 
 set_target_properties(libcloud_db PROPERTIES PREFIX "")
 

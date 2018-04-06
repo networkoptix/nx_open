@@ -15,7 +15,7 @@
 #include <nx/cloud/cdb/client/data/auth_data.h>
 #include <nx/cloud/cdb/dao/user_authentication_data_object_factory.h>
 #include <nx/cloud/cdb/dao/memory/dao_memory_user_authentication.h>
-#include <nx/cloud/cdb/ec2/synchronization_engine.h>
+#include <nx/data_sync_engine/synchronization_engine.h>
 #include <nx/cloud/cdb/managers/authentication_provider.h>
 #include <nx/cloud/cdb/settings.h>
 #include <nx/cloud/cdb/stree/cdb_ns.h>

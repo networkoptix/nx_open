@@ -24,6 +24,7 @@
         <module>cloud_db_client</module>
         <module>connection_mediator</module>
         <module>libconnection_mediator</module>
+        <module>nx_cloud/nx_data_sync_engine</module>
         <module>libcloud_db</module>
     </modules>
 

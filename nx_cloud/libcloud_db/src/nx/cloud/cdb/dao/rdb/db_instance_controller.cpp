@@ -3,7 +3,7 @@
 #include <nx/utils/log/log.h>
 
 #include "structure_update_statements.h"
-#include "../../ec2/db/migration/add_history_to_transaction.h"
+#include <nx/data_sync_engine/db/migration/add_history_to_transaction.h>
 
 namespace nx {
 namespace cdb {

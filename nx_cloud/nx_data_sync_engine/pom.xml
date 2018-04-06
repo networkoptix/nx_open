@@ -9,20 +9,21 @@
     <groupId>com.networkoptix.hdwitness</groupId>
     <version>4.0.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>libcloud_db</artifactId>
+    <artifactId>nx_data_sync_engine</artifactId>
     <packaging>pom</packaging>
-    <name>Nx CloudDb Library</name>
+    <name>Nx P2p Data Sync Engine</name>
 
     <properties>
-        <guid>${libcloud_db.guid}</guid>
+        <guid>${nx_data_sync_engine.guid}</guid>
         <release.version>${parsedVersion.majorVersion}${parsedVersion.minorVersion}${parsedVersion.incrementalVersion}</release.version>
-        <product.title>${company.name} libcloud_db</product.title>
-        <product.display.title>${company.name} Cloud Database</product.display.title>
+        <product.title>${company.name} nx_data_sync_engine</product.title>
+        <product.display.title>${company.name} P2p Data Synchronization Engine</product.display.title>
         <template>lib</template>
-        <targetName>cloud_db</targetName>
+        <buildLib>sharedlib</buildLib>
+        <targetName>nx_data_sync_engine</targetName>
 
         <qt.libs>core network concurrent sql xml</qt.libs>
-        <global.libs>-lnx_data_sync_engine -lcommon -lnx_network -ludt -lcloud_db_client -lappserver2 -lnx_utils -lnx_fusion</global.libs>
+        <global.libs>-lcommon -lnx_network -ludt -lcloud_db_client -lappserver2 -lnx_utils -lnx_fusion</global.libs>
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm</windows.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices -lcrypto</mac.oslibs>
 
@@ -50,39 +51,12 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>nx_data_sync_engine</artifactId>
+            <artifactId>appserver2</artifactId>
             <version>${project.version}</version>
             <type>pom</type>
             <scope>system</scope>
-            <systemPath>${root.dir}/nx_cloud/nx_data_sync_engine/pom.xml</systemPath>
+            <systemPath>${root.dir}/appserver2/pom.xml</systemPath>
         </dependency>
     </dependencies>
-
-    <profiles>
-        <profile>
-            <id>windows</id>
-            <activation>
-                <os>
-                    <family>Windows</family>
-                </os>
-            </activation>
-            <properties>
-                <buildLib>staticlib</buildLib>
-            </properties>
-        </profile>
-
-        <profile>
-            <id>unix</id>
-            <activation>
-                <os>
-                    <family>unix</family>
-                </os>
-            </activation>
-            <properties>
-                <buildLib>sharedlib</buildLib>
-            </properties>
-        </profile>
-
-    </profiles>
 
 </project>

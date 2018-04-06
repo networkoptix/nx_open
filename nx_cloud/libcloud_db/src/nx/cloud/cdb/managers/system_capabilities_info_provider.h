@@ -3,8 +3,9 @@
 #include <nx/utils/subscription.h>
 #include <nx/utils/thread/mutex.h>
 
+#include <nx/data_sync_engine/connection_manager.h>
+
 #include "system_manager.h"
-#include "../ec2/connection_manager.h"
 
 namespace nx {
 namespace cdb {

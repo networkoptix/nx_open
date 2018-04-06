@@ -8,7 +8,7 @@
 #include <nx/utils/db/types.h>
 
 #include <nx/cloud/cdb/api/result_code.h>
-#include <nx/cloud/cdb/ec2/transaction_log.h>
+#include <nx/data_sync_engine/transaction_log.h>
 
 namespace nx {
 namespace cdb {

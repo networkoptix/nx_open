@@ -9,12 +9,12 @@
 #include <nx/utils/log/log_settings.h>
 #include <nx/utils/settings.h>
 #include <nx/utils/basic_service_settings.h>
+#include <nx/utils/db/types.h>
+
+#include <nx/data_sync_engine/p2p_sync_settings.h>
 
 #include <utils/common/command_line_parser.h>
-#include <nx/utils/db/types.h>
 #include <utils/email/email.h>
-
-#include "ec2/p2p_sync_settings.h"
 
 namespace nx {
 namespace cdb {

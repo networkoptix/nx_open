@@ -9,10 +9,11 @@
 #include <nx/utils/db/async_sql_query_executor.h>
 #include <nx/utils/subscription.h>
 
+#include <nx/data_sync_engine/connection_manager.h>
+
 #include "../access_control/auth_types.h"
 #include "../dao/rdb/system_health_history_data_object.h"
 #include "../data/system_data.h"
-#include "../ec2/connection_manager.h"
 
 namespace nx {
 namespace cdb {

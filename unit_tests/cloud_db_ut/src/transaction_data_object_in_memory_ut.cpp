@@ -6,8 +6,8 @@
 #include <transaction/transaction_descriptor.h>
 #include <nx/utils/db/request_execution_thread.h>
 
-#include <nx/cloud/cdb/ec2/dao/memory/transaction_data_object_in_memory.h>
-#include <nx/cloud/cdb/ec2/data_conversion.h>
+#include <nx/data_sync_engine/dao/memory/transaction_data_object_in_memory.h>
+#include <nx/data_sync_engine/data_conversion.h>
 #include <nx/cloud/cdb/test_support/business_data_generator.h>
 
 #include "base_persistent_data_test.h"

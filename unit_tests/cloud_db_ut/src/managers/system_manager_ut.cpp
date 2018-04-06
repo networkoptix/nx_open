@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <nx/cloud/cdb/ec2/synchronization_engine.h>
+#include <nx/data_sync_engine/synchronization_engine.h>
 #include <nx/cloud/cdb/managers/system_manager.h>
 #include <nx/cloud/cdb/stree/stree_manager.h>
 #include <nx/utils/std/cpp14.h>

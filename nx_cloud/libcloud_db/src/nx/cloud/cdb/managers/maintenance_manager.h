@@ -8,10 +8,11 @@
 #include <nx/utils/counter.h>
 #include <nx/utils/db/db_instance_controller.h>
 
+#include <nx/data_sync_engine/serialization/transaction_serializer.h>
+#include <nx/data_sync_engine/transaction_log.h>
+
 #include "../data/statistics_data.h"
 #include "../data/system_data.h"
-#include "../ec2/serialization/transaction_serializer.h"
-#include "../ec2/transaction_log.h"
 
 namespace nx {
 namespace cdb {

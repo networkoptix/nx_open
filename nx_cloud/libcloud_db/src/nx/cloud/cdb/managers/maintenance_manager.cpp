@@ -3,8 +3,7 @@
 #include <nx/utils/log/log.h>
 
 #include <nx/cloud/cdb/managers/managers_types.h>
-
-#include "../ec2/synchronization_engine.h"
+#include <nx/data_sync_engine/synchronization_engine.h>
 
 namespace nx {
 namespace cdb {
