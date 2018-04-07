@@ -4,7 +4,6 @@
 
 #include <nx/network/websocket/websocket.h>
 
-#include <nx/cloud/cdb/api/result_code.h>
 #include <nx/p2p/p2p_connection_base.h>
 #include <nx/p2p/connection_context.h>
 

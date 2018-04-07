@@ -51,6 +51,8 @@ api::ResultCode ec2ResultToResult(ec2::ResultCode resultCode)
             return api::ResultCode::retryLater;
         case ec2::ResultCode::notFound:
             return api::ResultCode::notFound;
+        case ec2::ResultCode::badRequest:
+            return api::ResultCode::badRequest;
         default:
             return api::ResultCode::unknownError;
     }

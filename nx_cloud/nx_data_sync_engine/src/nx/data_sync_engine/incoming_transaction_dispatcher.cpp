@@ -51,7 +51,7 @@ void IncomingTransactionDispatcher::dispatchTransaction(
     else
     {
         m_aioTimer.post(
-            [handler = std::move(handler)]{ handler(api::ResultCode::badRequest); });
+            [handler = std::move(handler)]{ handler(ResultCode::badRequest); });
     }
 }
 
@@ -73,7 +73,7 @@ void IncomingTransactionDispatcher::dispatchUbjsonTransaction(
             .arg(transportHeader.systemId).arg(transportHeader.endpoint.toString())
             .arg(dataSource->serializedTransaction.size()), cl_logDEBUG1);
         m_aioTimer.post(
-            [handler = std::move(handler)]{ handler(api::ResultCode::badRequest); });
+            [handler = std::move(handler)]{ handler(ResultCode::badRequest); });
         return;
     }
 
@@ -99,7 +99,7 @@ void IncomingTransactionDispatcher::dispatchJsonTransaction(
             .arg(transportHeader.systemId).arg(transportHeader.endpoint.toString())
             .arg(serializedTransaction.size()), cl_logDEBUG1);
         m_aioTimer.post(
-            [handler = std::move(handler)]{ handler(api::ResultCode::badRequest); });
+            [handler = std::move(handler)]{ handler(ResultCode::badRequest); });
         return;
     }
     if (!QJson::deserialize(tranObject["tran"], &transactionHeader))
@@ -109,7 +109,7 @@ void IncomingTransactionDispatcher::dispatchJsonTransaction(
             .arg(transportHeader.systemId).arg(transportHeader.endpoint.toString())
             .arg(serializedTransaction.size()), cl_logDEBUG1);
         m_aioTimer.post(
-            [handler = std::move(handler)]{ handler(api::ResultCode::badRequest); });
+            [handler = std::move(handler)]{ handler(ResultCode::badRequest); });
         return;
     }
 
@@ -140,7 +140,7 @@ void IncomingTransactionDispatcher::dispatchTransaction(
         m_aioTimer.post(
             [completionHandler = std::move(completionHandler)]
             {
-                completionHandler(api::ResultCode::notFound);
+                completionHandler(ResultCode::notFound);
             });
         return;
     }
@@ -155,7 +155,7 @@ void IncomingTransactionDispatcher::dispatchTransaction(
         std::move(transactionHeader),
         std::move(dataSource),
         [it, completionHandler = std::move(completionHandler)](
-            api::ResultCode resultCode)
+            ResultCode resultCode)
         {
             --it->second->usageCount;
             it->second->usageCountDecreased.wakeAll();

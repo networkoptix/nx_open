@@ -16,25 +16,6 @@ QString toString(const ::ec2::QnAbstractTransaction& tran)
         .arg(tran.persistentInfo.sequence).arg(tran.persistentInfo.timestamp);
 }
 
-std::string toString(ResultCode resultCode)
-{
-    switch (resultCode)
-    {
-        case ResultCode::ok:
-            return "ok";
-        case ResultCode::partialContent:
-            return "partialContent";
-        case ResultCode::dbError:
-            return "dbError";
-        case ResultCode::retryLater:
-            return "retryLater";
-        case ResultCode::notFound:
-            return "notFound";
-        default:
-            return "unknownError";
-    }
-}
-
 TransactionLog::TransactionLog(
     const QnUuid& peerId,
     nx::utils::db::AsyncSqlQueryExecutor* const dbManager,

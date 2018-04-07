@@ -13,13 +13,13 @@
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/sync_call.h>
 
+#include <nx/cloud/cdb/ec2/data_conversion.h>
+#include <nx/data_sync_engine/synchronization_engine.h>
+
 #include <api/global_settings.h>
 #include <core/resource/param.h>
 #include <core/resource/user_resource.h>
 #include <utils/common/id.h>
-
-#include <nx/data_sync_engine/data_conversion.h>
-#include <nx/data_sync_engine/synchronization_engine.h>
 
 #include "account_manager.h"
 #include "email_manager.h"

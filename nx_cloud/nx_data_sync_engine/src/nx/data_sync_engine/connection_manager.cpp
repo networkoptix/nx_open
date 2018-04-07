@@ -593,7 +593,7 @@ void ConnectionManager::onGotTransaction(
         tranFormat,
         std::move(serializedTransaction),
         [this, locker = m_startedAsyncCallsCounter.getScopedIncrement(), connectionId](
-            api::ResultCode resultCode)
+            ResultCode resultCode)
         {
             onTransactionDone(connectionId, resultCode);
         });
@@ -601,14 +601,14 @@ void ConnectionManager::onGotTransaction(
 
 void ConnectionManager::onTransactionDone(
     const nx::String& connectionId,
-    api::ResultCode resultCode)
+    ResultCode resultCode)
 {
-    if (resultCode != api::ResultCode::ok)
+    if (resultCode != ResultCode::ok)
     {
         NX_LOGX(
             QnLog::EC2_TRAN_LOG,
             lm("Closing connection %1 due to failed transaction (result code %2)")
-                .arg(connectionId).arg(api::toString(resultCode)),
+                .arg(connectionId).arg(toString(resultCode)),
             cl_logDEBUG1);
 
         // Closing connection in case of failure.

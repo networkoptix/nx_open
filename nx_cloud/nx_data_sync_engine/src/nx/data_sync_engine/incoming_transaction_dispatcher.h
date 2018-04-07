@@ -9,7 +9,6 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 
-#include <nx/cloud/cdb/api/result_code.h>
 #include <transaction/transaction_transport_header.h>
 #include <transaction/transaction.h>
 

@@ -10,8 +10,8 @@
 #include <boost/multi_index/member.hpp>
 
 #include <nx/cloud/cdb/api/maintenance_manager.h>
-#include <nx/cloud/cdb/api/result_code.h>
 #include <nx/cloud/cdb/api/system_data.h>
+
 #include <nx/network/http/abstract_msg_body_source.h>
 #include <nx/network/http/server/abstract_http_request_handler.h>
 #include <nx/utils/move_only_func.h>
@@ -211,7 +211,7 @@ private:
         QByteArray serializedTransaction,
         TransactionTransportHeader transportHeader);
 
-    void onTransactionDone(const nx::String& connectionId, api::ResultCode resultCode);
+    void onTransactionDone(const nx::String& connectionId, ResultCode resultCode);
 
     bool fetchDataFromConnectRequest(
         const nx::network::http::Request& request,

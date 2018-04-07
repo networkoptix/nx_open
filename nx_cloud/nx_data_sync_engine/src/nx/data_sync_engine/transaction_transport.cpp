@@ -254,7 +254,7 @@ void TransactionTransport::processSpecialTransaction(
         kMaxTransactionsPerIteration,
         std::bind(&TransactionTransport::onTransactionsReadFromLog, this, _1, _2, _3));
 
-    handler(api::ResultCode::ok);
+    handler(ResultCode::ok);
 }
 
 void TransactionTransport::processSpecialTransaction(

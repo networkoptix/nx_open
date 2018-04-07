@@ -4,7 +4,6 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/log/log.h>
 
-#include <nx/cloud/cdb/api/result_code.h>
 #include <transaction/transaction_transport_header.h>
 #include <transaction/transaction.h>
 #include <nx/utils/db/async_sql_query_executor.h>
@@ -21,7 +20,7 @@ namespace ec2 {
 
 class TransactionLog;
 
-typedef nx::utils::MoveOnlyFunc<void(api::ResultCode)> TransactionProcessedHandler;
+typedef nx::utils::MoveOnlyFunc<void(ResultCode)> TransactionProcessedHandler;
 
 class AbstractTransactionProcessor
 {
@@ -139,7 +138,7 @@ private:
             m_aioTimer.post(
                 [completionHandler = std::move(completionHandler)]
                 {
-                    completionHandler(api::ResultCode::badRequest);
+                    completionHandler(ResultCode::badRequest);
                 });
             return;
         }
@@ -162,7 +161,7 @@ private:
         m_aioTimer.post(
             [completionHandler = std::move(completionHandler)]
             {
-                completionHandler(api::ResultCode::badRequest);
+                completionHandler(ResultCode::badRequest);
             });
     }
 };
@@ -355,12 +354,12 @@ private:
         {
             case nx::utils::db::DBResult::ok:
             case nx::utils::db::DBResult::cancelled:
-                return completionHandler(api::ResultCode::ok);
+                return completionHandler(ResultCode::ok);
             default:
                 return completionHandler(
                     dbResult == nx::utils::db::DBResult::retryLater
-                    ? api::ResultCode::retryLater
-                    : api::ResultCode::dbError);
+                    ? ResultCode::retryLater
+                    : ResultCode::dbError);
         }
     }
 };

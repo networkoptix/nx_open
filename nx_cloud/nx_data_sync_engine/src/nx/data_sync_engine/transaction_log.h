@@ -11,7 +11,6 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/mutex.h>
 
-#include <nx/cloud/cdb/api/result_code.h>
 #include <nx_ec/ec_proto_version.h>
 #include <utils/common/id.h>
 #include <nx/utils/db/async_sql_query_executor.h>
@@ -21,6 +20,7 @@
 
 #include "dao/abstract_transaction_data_object.h"
 #include "outgoing_transaction_sorter.h"
+#include "result_code.h"
 #include "serialization/transaction_serializer.h"
 #include "serialization/ubjson_serialized_transaction.h"
 #include "transaction_log_cache.h"
@@ -36,17 +36,6 @@ namespace ec2 {
 class AbstractOutgoingTransactionDispatcher;
 
 QString toString(const ::ec2::QnAbstractTransaction& tran);
-
-enum class ResultCode
-{
-    ok = 0,
-    partialContent,
-    dbError,
-    retryLater,
-    notFound,
-};
-
-std::string toString(ResultCode);
 
 /**
  * Supports multiple transactions related to a single system at the same time.
