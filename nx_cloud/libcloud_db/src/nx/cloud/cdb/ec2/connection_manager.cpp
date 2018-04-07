@@ -203,7 +203,7 @@ void ConnectionManager::createWebsocketTransactionConnection(
     nx::network::http::RequestResult result(nx::network::http::StatusCode::switchingProtocols);
     result.connectionEvents.onResponseHasBeenSent =
         std::bind(&ConnectionManager::onHttpConnectionUpgraded, this,
-            _1, std::move(remotePeerInfo), systemId.c_str());
+            _1, std::move(remotePeerInfo), systemId);
     completionHandler(std::move(result));
 }
 
@@ -755,7 +755,7 @@ nx::network::http::RequestResult ConnectionManager::prepareOkResponseToCreateTra
 void ConnectionManager::onHttpConnectionUpgraded(
     nx::network::http::HttpServerConnection* connection,
     ::ec2::ApiPeerDataEx remotePeerInfo,
-    const nx::String systemId)
+    const std::string& systemId)
 {
     const auto remoteAddress = connection->socket()->getForeignAddress();
     auto webSocket = std::make_unique<network::websocket::WebSocket>(
@@ -768,7 +768,7 @@ void ConnectionManager::onHttpConnectionUpgraded(
     auto transactionTransport = std::make_unique<WebSocketTransactionTransport>(
         connection->getAioThread(),
         m_transactionLog,
-        systemId,
+        systemId.c_str(),
         connectionId,
         std::move(webSocket),
         localPeerData,
@@ -777,7 +777,7 @@ void ConnectionManager::onHttpConnectionUpgraded(
     ConnectionContext context{
         std::move(transactionTransport),
         connectionId.toSimpleByteArray(),
-        { systemId, remotePeerInfo.id.toByteArray() } };
+        { systemId.c_str(), remotePeerInfo.id.toByteArray() } };
 
     if (!addNewConnection(std::move(context), remotePeerInfo))
     {
