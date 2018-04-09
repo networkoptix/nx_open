@@ -365,6 +365,7 @@ Item
         onPinchUpdated: updatePinch(pinch.center, pinch.previousCenter, pinch.scale)
         onPinchFinished: finishPinch()
 
+        enabled: !flick.dragging
         MouseArea
         {
             id: mouseArea
