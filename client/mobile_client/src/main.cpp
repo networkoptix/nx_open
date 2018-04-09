@@ -39,7 +39,7 @@
 #include <utils/intent_listener_android.h>
 #include <handlers/lite_client_handler.h>
 
-#include <resource_allocator.h>
+#include <gl_context_synchronizer.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/utils/std/cpp14.h>
 
@@ -165,8 +165,8 @@ int runUi(QtSingleGuiApplication* application)
     nx::media::DecoderRegistrar::registerDecoders(
         maxFfmpegResolution, /*isTranscodingEnabled*/ !context.liteMode());
 
-    nx::media::VideoDecoderRegistry::instance()->setDefaultResourceAllocator(
-        nx::media::ResourceAllocatorPtr(new ResourceAllocator(mainWindow)));
+    nx::media::VideoDecoderRegistry::instance()->setDefaultRenderContextSynchronizer(
+        nx::media::RenderContextSynchronizerPtr(new GlContextSynchronizer(mainWindow)));
 
     #if defined(Q_OS_ANDROID)
         QUrl initialIntentData = getInitialIntentData();

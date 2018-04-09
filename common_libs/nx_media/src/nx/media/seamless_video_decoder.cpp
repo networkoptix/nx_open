@@ -54,7 +54,7 @@ class SeamlessVideoDecoderPrivate: public QObject
 
 public:
     SeamlessVideoDecoderPrivate(
-        SeamlessVideoDecoder* parent, ResourceAllocatorPtr resourceAllocator);
+        SeamlessVideoDecoder* parent, RenderContextSynchronizerPtr renderContextSynchronizer);
 
     void addMetadata(const QnConstCompressedVideoDataPtr& frame);
     const FrameMetadata findMetadata(int frameNum);
@@ -76,19 +76,19 @@ public:
     bool allowOverlay;
     SeamlessVideoDecoder::VideoGeometryAccessor videoGeometryAccessor;
 
-    ResourceAllocatorPtr resourceAllocator;
+    RenderContextSynchronizerPtr renderContextSynchronizer;
 };
 
 SeamlessVideoDecoderPrivate::SeamlessVideoDecoderPrivate(
     SeamlessVideoDecoder* parent,
-    ResourceAllocatorPtr resourceAllocator)
+    RenderContextSynchronizerPtr renderContextSynchronizer)
     :
     QObject(parent),
     q_ptr(parent),
     videoDecoder(nullptr, nullptr),
     frameNumber(0),
     decoderFrameOffset(0),
-    resourceAllocator(resourceAllocator)
+    renderContextSynchronizer(renderContextSynchronizer)
 {
 }
 
@@ -126,9 +126,9 @@ int SeamlessVideoDecoderPrivate::decoderFrameNumToLocalNum(int value) const
 //-------------------------------------------------------------------------------------------------
 // SeamlessVideoDecoder
 
-SeamlessVideoDecoder::SeamlessVideoDecoder(ResourceAllocatorPtr resourceAllocator):
+SeamlessVideoDecoder::SeamlessVideoDecoder(RenderContextSynchronizerPtr renderContextSynchronizer):
     QObject(),
-    d_ptr(new SeamlessVideoDecoderPrivate(this, resourceAllocator))
+    d_ptr(new SeamlessVideoDecoderPrivate(this, renderContextSynchronizer))
 {
 }
 
@@ -195,7 +195,7 @@ bool SeamlessVideoDecoder::decode(
         d->videoDecoder.reset();
 
         d->videoDecoder = VideoDecoderRegistry::instance()->createCompatibleDecoder(
-            frame->compressionType, frameInfo.size, d->allowOverlay, d->resourceAllocator);
+            frame->compressionType, frameInfo.size, d->allowOverlay, d->renderContextSynchronizer);
         if (d->videoDecoder)
             d->videoDecoder->setVideoGeometryAccessor(d->videoGeometryAccessor);
         d->decoderFrameOffset = d->frameNumber;

@@ -4,19 +4,19 @@
 #include <QtGui/QOpenGLFunctions>
 #include <QtQuick/QQuickWindow>
 
-#include <nx/media/abstract_resource_allocator.h>
+#include <nx/media/abstract_render_context_synchronizer.h>
 #include <memory>
 #include <deque>
 
 class GlContextThreadExecutor;
 
-class ResourceAllocator: public QObject, public nx::media::AbstractResourceAllocator
+class GlContextSynchronizer: public QObject, public nx::media::AbstractRenderContextSynchronizer
 {
 public:
-    ResourceAllocator(QQuickWindow *window);
+    GlContextSynchronizer(QQuickWindow* window);
 
-    virtual void execAtGlThread(std::function<void (void*)> lambda, void* opaque) override;
-    virtual void execAtGlThreadAsync(std::function<void ()> lambda) override;
+    virtual void execInRenderContext(std::function<void (void*)> lambda, void* opaque) override;
+    virtual void execInRenderContextAsync(std::function<void ()> lambda) override;
 
 private:
     void at_execLambda();

@@ -16,8 +16,8 @@ using ConstAudioFramePtr = std::shared_ptr<const AudioFrame>;
 
 namespace media {
 
-class AbstractResourceAllocator;
-using ResourceAllocatorPtr = std::shared_ptr<AbstractResourceAllocator>;
+struct AbstractRenderContextSynchronizer;
+using RenderContextSynchronizerPtr = std::shared_ptr<AbstractRenderContextSynchronizer>;
 
 static const int kMediaAlignment = 32;
 

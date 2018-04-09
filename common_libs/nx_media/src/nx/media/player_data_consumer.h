@@ -36,7 +36,7 @@ public:
 
 public:
     PlayerDataConsumer(const std::unique_ptr<QnArchiveStreamReader>& archiveReader,
-        ResourceAllocatorPtr resourceAllocator);
+        RenderContextSynchronizerPtr renderContextSynchronizer);
     virtual ~PlayerDataConsumer();
 
     QVideoFramePtr dequeueVideoFrame();
@@ -190,7 +190,7 @@ private:
     std::atomic<bool> m_needToResetAudio;
     std::atomic<bool> m_allowOverlay;
 
-    ResourceAllocatorPtr m_resourceAllocator;
+    RenderContextSynchronizerPtr m_renderContextSynchronizer;
 };
 
 } // namespace media

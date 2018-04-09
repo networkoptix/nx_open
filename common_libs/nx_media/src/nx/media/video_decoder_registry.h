@@ -31,7 +31,7 @@ public:
      * pointer if no compatible decoder is found.
      */
     VideoDecoderPtr createCompatibleDecoder(const AVCodecID codec, const QSize& resolution,
-        bool allowOverlay, ResourceAllocatorPtr resourceAllocator);
+        bool allowOverlay, RenderContextSynchronizerPtr renderContextSynchronizer);
 
     /**
      * @return Whether a compatible video decoder is found.
@@ -69,8 +69,8 @@ public:
     /** For tests. */
     void reinitialize();
 
-    ResourceAllocatorPtr defaultResourceAllocator() const;
-    void setDefaultResourceAllocator(ResourceAllocatorPtr value);
+    RenderContextSynchronizerPtr defaultRenderContextSynchronizer() const;
+    void setDefaultRenderContextSynchronizer(RenderContextSynchronizerPtr value);
 
     static QSize platformMaxFfmpegResolution();
 
@@ -78,7 +78,7 @@ private:
     struct Metadata
     {
         std::function<AbstractVideoDecoder*(
-            const ResourceAllocatorPtr& allocator, const QSize& resolution)> createVideoDecoder;
+            const RenderContextSynchronizerPtr& allocator, const QSize& resolution)> createVideoDecoder;
         std::function<bool(
             const AVCodecID codec, const QSize& resolution, bool allowOverlay)> isCompatible;
         std::function<QSize(const AVCodecID codec)> maxResolution;
@@ -94,7 +94,7 @@ private:
         MetadataImpl(int maxUseCount)
         {
             createVideoDecoder =
-                [](const ResourceAllocatorPtr& allocator, const QSize& resolution)
+                [](const RenderContextSynchronizerPtr& allocator, const QSize& resolution)
                 {
                     return new Decoder(allocator, resolution);
                 };
@@ -110,7 +110,7 @@ private:
 
     bool m_isTranscodingEnabled;
 
-    ResourceAllocatorPtr m_defaultResourceAllocator;
+    RenderContextSynchronizerPtr m_defaultRenderContextSynchronizer;
 };
 
 } // namespace media

@@ -223,8 +223,8 @@ public:
     bool isAudioEnabled() const;
     void setAudioEnabled(bool value);
 
-    ResourceAllocatorPtr resourceAllocator() const;
-    void setResourceAllocator(ResourceAllocatorPtr value);
+    RenderContextSynchronizerPtr renderContextSynchronizer() const;
+    void setRenderContextSynchronizer(RenderContextSynchronizerPtr value);
 
 public slots:
     void play();

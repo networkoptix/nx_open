@@ -25,7 +25,7 @@ public:
     typedef std::function<QRect()> VideoGeometryAccessor;
 
 public:
-    SeamlessVideoDecoder(ResourceAllocatorPtr resourceAllocator);
+    SeamlessVideoDecoder(RenderContextSynchronizerPtr renderContextSynchronizer);
 
     virtual ~SeamlessVideoDecoder();
 

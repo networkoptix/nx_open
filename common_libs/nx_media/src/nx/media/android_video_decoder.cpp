@@ -176,7 +176,7 @@ class AndroidVideoDecoderPrivate: public QObject
     AndroidVideoDecoder *q_ptr;
 
 public:
-    AndroidVideoDecoderPrivate(const ResourceAllocatorPtr& allocator):
+    AndroidVideoDecoderPrivate(const RenderContextSynchronizerPtr& allocator):
         frameNumber(0),
         initialized(false),
         javaDecoder("com/networkoptix/nxwitness/media/QnVideoDecoder"),
@@ -237,7 +237,7 @@ private:
     qint64 frameNumber;
     bool initialized;
     QAndroidJniObject javaDecoder;
-    ResourceAllocatorPtr allocator;
+    RenderContextSynchronizerPtr allocator;
     QSize frameSize;
 
     std::unique_ptr<FboManager> fboManager;
@@ -398,7 +398,7 @@ void AndroidVideoDecoderPrivate::createGlResources()
 // AndroidVideoDecoder
 
 AndroidVideoDecoder::AndroidVideoDecoder(
-    const ResourceAllocatorPtr& allocator, const QSize& /*resolution*/)
+    const RenderContextSynchronizerPtr& allocator, const QSize& /*resolution*/)
     :
     AbstractVideoDecoder(),
     d(new AndroidVideoDecoderPrivate(allocator))
@@ -574,7 +574,7 @@ int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVid
         }
         else
         {
-            d->allocator->execAtGlThread(
+            d->allocator->execInRenderContext(
                 [&fboToRender, this](void*)
                 {
                     fboToRender = d->renderFrameToFbo();

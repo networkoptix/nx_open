@@ -25,7 +25,7 @@ VideoDecoderRegistry* VideoDecoderRegistry::instance()
 }
 
 VideoDecoderPtr VideoDecoderRegistry::createCompatibleDecoder(const AVCodecID codec,
-    const QSize& resolution, bool allowOverlay, ResourceAllocatorPtr resourceAllocator)
+    const QSize& resolution, bool allowOverlay, RenderContextSynchronizerPtr renderContextSynchronizer)
 {
     QMutexLocker lock(&mutex);
 
@@ -36,7 +36,7 @@ VideoDecoderPtr VideoDecoderRegistry::createCompatibleDecoder(const AVCodecID co
             && plugin.isCompatible(codec, resolution, allowOverlay))
         {
             auto videoDecoder = VideoDecoderPtr(
-                plugin.createVideoDecoder(resourceAllocator, resolution),
+                plugin.createVideoDecoder(renderContextSynchronizer, resolution),
                 [](AbstractVideoDecoder* decoder)
                 {
                     QMutexLocker lock(&mutex);
@@ -128,21 +128,21 @@ void VideoDecoderRegistry::setTranscodingEnabled(bool transcodingEnabled)
     m_isTranscodingEnabled = transcodingEnabled;
 }
 
-ResourceAllocatorPtr VideoDecoderRegistry::defaultResourceAllocator() const
+RenderContextSynchronizerPtr VideoDecoderRegistry::defaultRenderContextSynchronizer() const
 {
-    return m_defaultResourceAllocator;
+    return m_defaultRenderContextSynchronizer;
 }
 
-void VideoDecoderRegistry::setDefaultResourceAllocator(ResourceAllocatorPtr value)
+void VideoDecoderRegistry::setDefaultRenderContextSynchronizer(RenderContextSynchronizerPtr value)
 {
-    m_defaultResourceAllocator = value;
+    m_defaultRenderContextSynchronizer = value;
 }
 
 void VideoDecoderRegistry::reinitialize()
 {
     m_plugins.clear();
     m_isTranscodingEnabled = false;
-    m_defaultResourceAllocator = ResourceAllocatorPtr();
+    m_defaultRenderContextSynchronizer = RenderContextSynchronizerPtr();
 }
 
 QSize VideoDecoderRegistry::platformMaxFfmpegResolution()
