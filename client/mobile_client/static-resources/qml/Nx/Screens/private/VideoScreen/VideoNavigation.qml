@@ -13,7 +13,6 @@ Item
 {
     id: videoNavigation
 
-    property string resourceId
     property var videoScreenController
     property bool paused: true
     property bool ptzAvailable: false
@@ -29,6 +28,17 @@ Item
     implicitWidth: parent ? parent.width : 0
     implicitHeight: navigator.height + buttonsPanel.height
     anchors.bottom: parent ? parent.bottom : undefined
+
+    Connections
+    {
+        target: videoScreenController
+        onResourceIdChanged:
+        {
+            actionButtonsPanelOpacityBehaviour.enabled = false
+            actionButtonsPanel.opacity = 0
+            actionButtonsPanelOpacityBehaviour.enabled = true
+        }
+    }
 
     Connections
     {
@@ -485,19 +495,30 @@ Item
 
                 anchors.verticalCenter: parent.verticalCenter
 
-                opacity:
+
+                Binding
                 {
-                    var futurePosition =
-                        videoScreenController.mediaPlayer.position > (new Date()).getTime()
-                    var live = d.liveMode || futurePosition
-                    return live && buttonsPanel.showButtonsPanel ? 1 : 0
+                    target: actionButtonsPanel
+                    property: "opacity"
+                    value:
+                    {
+                        var futurePosition =
+                            videoScreenController.mediaPlayer.position > (new Date()).getTime()
+                        var live = d.liveMode || futurePosition
+                        return live && buttonsPanel.showButtonsPanel ? 1 : 0
+                    }
                 }
 
                 onPtzButtonClicked: videoNavigation.ptzButtonClicked()
                 onTwoWayAudioButtonPressed: twoWayAudioController.start()
                 onTwoWayAudioButtonReleased: twoWayAudioController.stop()
 
-                Behavior on opacity { NumberAnimation { duration: 200 } }
+                Behavior on opacity
+                {
+                    id: actionButtonsPanelOpacityBehaviour
+
+                    NumberAnimation { duration: 200 }
+                }
 
                 Binding
                 {
@@ -682,8 +703,6 @@ Item
             d.playbackStarted = true
         }
     }
-
-    onResourceIdChanged: d.playbackStarted = false
 
     Component.onCompleted: d.updateNavigatorPosition()
 }

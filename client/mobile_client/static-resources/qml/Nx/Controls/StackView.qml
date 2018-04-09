@@ -17,6 +17,10 @@ StackView
             ? component.createObject(null, properties)
             : component.createObject(null)
 
+        var error = component.errorString()
+        if (error.length)
+            console.log("Error whilte creating component:", error)
+
         if (currentItem && currentItem.objectName == item.objectName)
         {
             item.destroy()
