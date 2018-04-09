@@ -248,33 +248,31 @@ SystemCommands::UnmountCode SystemCommands::unmount(
     if (!checkMountPermissions(directory))
     {
         result = noPermissions;
-        goto end;
     }
-
-    if (umount(directory.c_str()) == 0)
+    else if (umount(directory.c_str()) == 0)
     {
         result = ok;
-        goto end;
     }
-
-    switch(errno)
+    else
     {
-        case EINVAL:
-        case ENOENT:
-            result = notExists;
-            break;
-        case ENOMEM:
-        case EBUSY:
-            result = busy;
-            break;
-        case EPERM:
-            result = noPermissions;
-            break;
-        default:
-            assert(0);
+        switch(errno)
+        {
+            case EINVAL:
+            case ENOENT:
+                result = notExists;
+                break;
+            case ENOMEM:
+            case EBUSY:
+                result = busy;
+                break;
+            case EPERM:
+                result = noPermissions;
+                break;
+            default:
+                assert(false);
+        }
     }
 
-end:
     if (reportViaSocket)
         system_commands::domain_socket::detail::sendInt64((int64_t) result);
 

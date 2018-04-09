@@ -483,7 +483,7 @@ void QnFileStorageResource::removeOldDirs()
 #ifndef _WIN32
 
     const QString prefix = lit("/tmp/") + NX_TEMP_FOLDER_NAME;
-    QFileInfoList tmpEntries = QDir("/tmp").entryInfoList(QDir::AllDirs | QDir::NoDotAndDotDot);
+    const QFileInfoList tmpEntries = QDir("/tmp").entryInfoList(QDir::AllDirs | QDir::NoDotAndDotDot);
 
     for (const QFileInfo &entry: tmpEntries)
     {
