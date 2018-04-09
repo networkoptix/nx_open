@@ -475,7 +475,8 @@ std::string SystemCommands::devicePath(const std::string& path, bool reportViaSo
         std::ifstream partitionsFile("/proc/partitions");
         if (partitionsFile.is_open())
         {
-            while (int c = partitionsFile.get())
+            std::ifstream::traits_type::int_type c;
+            while ((c = partitionsFile.get()) != std::ifstream::traits_type::eof())
             {
                 if (isdigit(c))
                 {
