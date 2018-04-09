@@ -1,20 +1,12 @@
 ﻿#include "plugin.h"
 
-#include <array>
-#include <fstream>
-#include <string>
-#include <memory>
-
 #include <QtCore/QString>
-#include <QtCore/QUrlQuery>
-#include <QtCore/QFileInfo>
 #include <QtCore/QFile>
+#include <QtCore/QFileInfo>
 
-#include <nx/network/http/http_client.h>
 #include <nx/fusion/model_functions.h>
-#include <nx/mediaserver_plugins/utils/uuid.h>
 
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/mediaserver_plugins/utils/uuid.h>
 
 #include "manager.h"
 #include "log.h"

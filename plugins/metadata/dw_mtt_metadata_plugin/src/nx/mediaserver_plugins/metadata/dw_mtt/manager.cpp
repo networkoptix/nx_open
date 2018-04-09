@@ -2,17 +2,20 @@
 
 #include <chrono>
 
-#include <QtCore/QUrl>
+#include <QtCore/QString>
 
-#include <nx/mediaserver_plugins/utils/uuid.h>
+#include <nx/utils/std/cppnx.h>
+#include <nx/utils/std/future.h>
+#include <nx/utils/unused.h>
+
+#include <nx/fusion/serialization/json.h>
+
+#include <nx/api/analytics/device_manifest.h>
 
 #include <nx/sdk/metadata/common_event.h>
 #include <nx/sdk/metadata/common_event_metadata_packet.h>
-#include <nx/api/analytics/device_manifest.h>
-#include <nx/fusion/serialization/json.h>
-#include <nx/utils/std/cppnx.h>
-#include <nx/utils/unused.h>
 
+#include <nx/mediaserver_plugins/utils/uuid.h>
 #include "log.h"
 
 namespace nx {
@@ -22,12 +25,13 @@ namespace dw_mtt {
 
 namespace {
 
-static const std::chrono::seconds kConnectTimeout(5);
 static const std::chrono::seconds kSendTimeout(15);
 static const std::chrono::seconds kReceiveTimeout(15);
 static const std::chrono::seconds kReconnectTimeout(30);
 
 static const std::chrono::milliseconds kMinTimeBetweenEvents = std::chrono::seconds(3);
+
+static const int kBufferCapacity = 4096;
 
 nx::sdk::metadata::CommonEvent* createCommonEvent(
     const AnalyticsEventType& event, bool active)
@@ -78,8 +82,6 @@ Manager::Manager(Plugin* plugin,
     }
     m_cameraManifest = QJson::serialized(typedCameraManifest);
 
-    static const int kBufferCapacity = 4096;
-    m_buffer.reserve(kBufferCapacity);
     NX_PRINT << "DW MTT metadata manager created";
 }
 
@@ -241,6 +243,9 @@ void Manager::onConnect(SystemError::ErrorCode code)
         eventNames = eventNames + eventName + " ";
     }
     NX_PRINT << "Trying to subscribe events: " << eventNames.toStdString();
+
+    m_buffer.clear();
+    m_buffer.reserve(kBufferCapacity);
 
     m_tcpSocket->sendAsync(
         m_subscriptionRequest,

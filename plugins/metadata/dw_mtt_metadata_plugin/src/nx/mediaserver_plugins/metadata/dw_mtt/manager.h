@@ -1,20 +1,23 @@
 #pragma once
 
-#include <chrono>
+#include <memory>
 
-#include <QtCore/QObject>
 #include <QtCore/QUrl>
-#include <QtCore/QString>
 #include <QtNetwork/QAuthenticator>
 
-#include <nx/utils/thread/mutex.h>
-#include <plugins/plugin_tools.h>
-#include <nx/sdk/metadata/camera_manager.h>
 #include <nx/utils/elapsed_timer_thread_safe.h>
+#include <nx/utils/system_error.h>
 
+#include <nx/network/aio/timer.h>
+#include <nx/network/socket_global.h>
+
+#include <plugins/plugin_tools.h>
+
+#include <nx/sdk/metadata/camera_manager.h>
+
+#include "nx/dw_mtt/camera_controller.h"
 #include "common.h"
 #include "plugin.h"
-#include "nx/dw_mtt/camera_controller.h"
 
 namespace nx {
 namespace mediaserver_plugins {
