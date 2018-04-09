@@ -652,7 +652,6 @@ void QnTimeline::finishZoom(qreal scale)
     d->zoomKineticHelper.finish(d->startZoom * scale);
     d->tryFitInBounds();
 
-
     if (d->dragWasInterruptedByZoom)
     {
         d->dragWasInterruptedByZoom = false;
