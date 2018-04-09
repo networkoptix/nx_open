@@ -86,7 +86,7 @@ def determine_package_versions():
 
 def sync_dependencies(syncher):
     def sync(package, **kwargs):
-        return syncher.sync(package, **kwargs)
+        return syncher.sync(package, use_local=not rdepSync, **kwargs)
 
     sync("qt", path_variable="QT_DIR")
     sync("any/boost")
