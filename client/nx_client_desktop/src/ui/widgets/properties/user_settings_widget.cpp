@@ -457,7 +457,7 @@ void QnUserSettingsWidget::setupInputFields()
 
                 return ValidationResult(
                     tr("%1 user with specified email already exists.",
-                        "%1 is the short cloud name (like 'Cloud')")
+                        "%1 is the short cloud name (like Cloud)")
                     .arg(nx::network::AppInfo::shortCloudName()));
             }
 

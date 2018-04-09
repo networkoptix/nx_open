@@ -481,58 +481,53 @@ QString QnFileStorageResource::translateUrlToRemote(const QString &url) const
 void QnFileStorageResource::removeOldDirs()
 {
 #ifndef _WIN32
-    QFileInfoList tmpEntries = QDir("/tmp").entryInfoList(
-        QDir::AllDirs | QDir::NoDotAndDotDot
-    );
 
     const QString prefix = lit("/tmp/") + NX_TEMP_FOLDER_NAME;
+    const QFileInfoList tmpEntries = QDir("/tmp").entryInfoList(QDir::AllDirs | QDir::NoDotAndDotDot);
 
     for (const QFileInfo &entry: tmpEntries)
     {
         if (entry.absoluteFilePath().indexOf(prefix) == -1)
             continue;
 
-#if __linux__
-        bool result = qnServerModule->rootTool()->unmount(entry.absoluteFilePath());
+        nx::SystemCommands::UnmountCode result =
+                qnServerModule->rootTool()->unmount(entry.absoluteFilePath());
+
         NX_VERBOSE(
             typeid(QnFileStorageResource),
             lm("[mount, removeOldDirs] Unmounting temporary directory %1, result: %2")
-                .args(entry.absoluteFilePath(), result));
-        int ecode = result ? 0 : -1;
-#elif __APPLE__
-        int ecode = unmount(entry.absoluteFilePath().toLatin1().constData(), 0);
-#endif
-        if (ecode != 0)
-        {
-            bool safeToRemove = true;
+                .args(entry.absoluteFilePath(), nx::SystemCommands::unmountCodeToString(result)));
 
-            switch (errno)
-            {
-            case EBUSY:
-            case ENOMEM:
-            case EPERM:
-                safeToRemove = false;
+        switch (result)
+        {
+            case nx::SystemCommands::ok:
+                if (rmdir(entry.absoluteFilePath().toLatin1().constData()) == 0)
+                    break;
+
+                if (!qnServerModule->rootTool()->removePath(entry.absoluteFilePath()))
+                {
+                    NX_ERROR(typeid(QnFileStorageResource),
+                        lm("[removeOldDirs] Remove %1 failed").args(entry.absoluteFilePath()));
+                }
                 break;
-            }
-
-            if (!safeToRemove)
-            {
+            case nx::SystemCommands::busy:
                 NX_WARNING(typeid(QnFileStorageResource),
-                    lm("[mount, removeOldDirs] Won't remove %1 since unmount failed")
+                    lm("[mount, removeOldDirs] Won't remove %1 since resource is busy")
                         .args(entry.absoluteFilePath()));
-                continue;
-            }
-        }
-
-        if (rmdir(entry.absoluteFilePath().toLatin1().constData()) == 0)
-            continue;
-
-        if (!qnServerModule->rootTool()->removePath(entry.absoluteFilePath()))
-        {
-            NX_ERROR(typeid(QnFileStorageResource),
-                lm("[removeOldDirs] Remove %1 failed").args(entry.absoluteFilePath()));
+                break;
+            case nx::SystemCommands::noPermissions:
+                NX_WARNING(typeid(QnFileStorageResource),
+                    lm("[mount, removeOldDirs] NO permissions to remove %1")
+                        .args(entry.absoluteFilePath()));
+                break;
+            case nx::SystemCommands::UnmountCode::notExists:
+                NX_VERBOSE(typeid(QnFileStorageResource),
+                    lm("[mount, removeOldDirs] Won't remove %1 since it doesn't exist")
+                        .args(entry.absoluteFilePath()));
+                break;
         }
     }
+
 #endif
 }
 
@@ -936,7 +931,8 @@ qint64 QnFileStorageResource::calcSpaceLimit(QnPlatformMonitor::PartitionType pt
         nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE
     ).toLongLong();
 
-    const bool isLocal = QnPlatformMonitor::LocalDiskPartition
+    const bool isLocal =
+        ptype == QnPlatformMonitor::LocalDiskPartition
         || ptype == QnPlatformMonitor::RemovableDiskPartition;
 
     return isLocal ? defaultStorageSpaceLimit : kNasStorageLimit;

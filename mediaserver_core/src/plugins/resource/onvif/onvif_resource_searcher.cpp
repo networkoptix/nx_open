@@ -95,14 +95,10 @@ int OnvifResourceSearcher::autoDetectDevicePort(const nx::utils::Url& url)
         _onvifDevice__GetSystemDateAndTimeResponse
     > GSoapDeviceGetSystemDateAndTimeAsyncWrapper;
 
+    QnMutex mutex;
+    QnWaitCondition waitCond;
     std::vector<std::unique_ptr<GSoapDeviceGetSystemDateAndTimeAsyncWrapper>> requestList;
     int result = -1;
-
-    QnMutex mutex;
-
-    QnWaitCondition waitCond;
-    QnMutexLocker lock(&mutex);
-
     int workers = kOnvifDeviceAltPorts.size();
     for (auto port: kOnvifDeviceAltPorts)
     {
@@ -120,23 +116,33 @@ int OnvifResourceSearcher::autoDetectDevicePort(const nx::utils::Url& url)
         asyncWrapper->callAsync(
             request,
             [&, port](int soapResultCode)
-        {
-            QnMutexLocker lock(&mutex);
-            if (soapResultCode == SOAP_OK && result == -1)
-                result = port;
-            --workers;
-            waitCond.wakeAll();
-        }
-        );
+            {
+                QnMutexLocker lock(&mutex);
+                if (soapResultCode == SOAP_OK && result == -1)
+                    result = port;
+
+                --workers;
+                waitCond.wakeAll();
+            });
+
         requestList.push_back(std::move(asyncWrapper));
     }
 
-    while (workers > 0 && result == -1)
-        waitCond.wait(&mutex);
+    QnMutexLocker lock(&mutex);
+    const auto deadline = std::chrono::steady_clock::now() + kManualDiscoveryConnectTimeout;
+    while (workers > 0)
+    {
+        const auto timeLeftMs = std::chrono::duration_cast<std::chrono::milliseconds>(
+            deadline - std::chrono::steady_clock::now()).count();
 
-    lock.unlock();
-    requestList.clear();
-    return result > 0 ? result : kDefaultOnvifPort;
+        if (timeLeftMs <= 0 || !waitCond.wait(&mutex, (unsigned long) timeLeftMs))
+            break;
+
+        if (result != -1)
+            return result;
+    }
+
+    return kDefaultOnvifPort;
 }
 
 QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddr(const nx::utils::Url& _url, const QAuthenticator& auth, bool isSearchAction)

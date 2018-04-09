@@ -317,7 +317,7 @@ QVariant QnUserListModel::data(const QModelIndex& index, int role) const
                         case QnUserType::Local:
                             return tr("Local user");
                         case QnUserType::Cloud:
-                            return tr("%1 user", "%1 is the short cloud name (like 'Cloud')")
+                            return tr("%1 user", "%1 is the short cloud name (like Cloud)")
                                 .arg(nx::network::AppInfo::shortCloudName());
                         case QnUserType::Ldap:
                             return tr("LDAP user");

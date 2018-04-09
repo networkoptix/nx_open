@@ -2521,9 +2521,11 @@ void QnMediaResourceWidget::updateFisheye()
 
     bool fisheyeEnabled = enabled && m_dewarpingParams.enabled;
 
-    setOption(ControlPtz, fisheyeEnabled && zoomRect().isEmpty());
-    setOption(DisplayCrosshair, fisheyeEnabled && zoomRect().isEmpty());
+    const bool showFisheyeOverlay = fisheyeEnabled && !isZoomWindow();
+    setOption(ControlPtz, showFisheyeOverlay);
+    setOption(DisplayCrosshair, showFisheyeOverlay);
     setOption(DisplayDewarped, fisheyeEnabled);
+
     if (fisheyeEnabled && titleBar()->rightButtonsBar()->button(Qn::FishEyeButton))
         titleBar()->rightButtonsBar()->button(Qn::FishEyeButton)->setChecked(fisheyeEnabled);
     if (enabled)
@@ -2546,8 +2548,11 @@ void QnMediaResourceWidget::updateFisheye()
 
     emit fisheyeChanged();
 
-    if (titleBar()->rightButtonsBar()->visibleButtons() & Qn::PtzButton)
-        at_ptzButton_toggled(titleBar()->rightButtonsBar()->checkedButtons() & Qn::PtzButton); // TODO: #Elric doesn't belong here, hack
+    // TODO: #Elric doesn't belong here, hack.
+    const bool hasPtz = titleBar()->rightButtonsBar()->visibleButtons() & Qn::PtzButton;
+    const bool ptzEnabled = titleBar()->rightButtonsBar()->checkedButtons() & Qn::PtzButton;
+    if (hasPtz && ptzEnabled)
+        at_ptzButton_toggled(true);
 }
 
 void QnMediaResourceWidget::updateCustomAspectRatio()

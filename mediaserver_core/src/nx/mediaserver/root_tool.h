@@ -8,6 +8,7 @@
 #include <QtCore/QUrl>
 #include <common/common_globals.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/system_commands.h>
 #include <core/resource/abstract_storage_resource.h>
 
 namespace nx {
@@ -23,8 +24,7 @@ public:
 
     Qn::StorageInitResult mount(const QUrl& url, const QString& path);
     Qn::StorageInitResult remount(const QUrl& url, const QString& path);
-    bool unmount(const QString& path);
-
+    SystemCommands::UnmountCode unmount(const QString& path);
     bool changeOwner(const QString& path);
     bool touchFile(const QString& path);
     bool makeDirectory(const QString& path);
@@ -38,11 +38,19 @@ public:
     qint64 fileSize(const QString& path);
 
 private:
-    int execute(const std::vector<QString>& args);
-
-private:
     const QString m_toolPath;
     QnMutex m_mutex;
+
+    template<typename R, typename DefaultAction, typename SocketAction, typename... Args>
+    R commandHelper(
+        R defaultValue, const QString& path, const char* command,
+        DefaultAction defaultAction, SocketAction socketAction, Args&&... args);
+
+    template<typename DefaultAction>
+    qint64 int64SingleArgCommandHelper(
+        const QString& path, const char* command, DefaultAction defaultAction);
+
+    int execute(const std::vector<QString>& args);
 };
 
 /** Finds tool next to a appticationPath. */

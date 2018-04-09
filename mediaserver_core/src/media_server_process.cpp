@@ -302,6 +302,8 @@
 #endif
 
 #include <nx/kit/ini_config.h>
+#include <mediaserver_ini.h>
+
 #include <local_connection_factory.h>
 
 using namespace nx;
@@ -1061,7 +1063,6 @@ void MediaServerProcess::parseCommandLineParameters(int argc, char* argv[])
 
     commandLineParser.addParameter(&m_cmdLineArguments.rebuildArchive, "--rebuild", NULL,
         lit("Rebuild archive index. Supported values: all (high & low quality), hq (only high), lq (only low)"), "all");
-    commandLineParser.addParameter(&m_cmdLineArguments.devModeKey, "--dev-mode-key", NULL, QString());
     commandLineParser.addParameter(&m_cmdLineArguments.allowedDiscoveryPeers, "--allowed-peers", NULL, QString());
     commandLineParser.addParameter(&m_cmdLineArguments.ifListFilter, "--if", NULL,
         "Strict media server network interface list (comma delimited list)");
@@ -1807,10 +1808,7 @@ void MediaServerProcess::changeSystemUser(const QString& userName)
     // Ini config files are for debug/experimental purposes only, so we do not care about security.
     const auto command = lm("chmod 777 -R '%1'").args(nx::kit::IniConfig::iniFilesDir());
     if (::system(command.toUtf8().data()) != 0) //< Let the errors reach stdout and stderr.
-    {
-        qWarning().noquote() << "WARNING: Unable to:" << command;
-        return; //< Server will not be able to run without access to these files.
-    }
+        qWarning().noquote() << "Unable to:" << command;
 
     // Change owner of all data files, so mediaserver can use them as different user.
     const std::vector<QString> chmodPaths =
@@ -1896,11 +1894,8 @@ Qn::ServerFlags MediaServerProcess::calcServerFlags()
         serverFlags |= Qn::SF_HasLiteClient;
     }
 
-    bool compatibilityMode = m_cmdLineArguments.devModeKey == lit("razrazraz");
-    if (compatibilityMode) // check compatibilityMode here for testing purpose
-    {
+    if (ini().forceLiteClient)
         serverFlags |= Qn::SF_HasLiteClient;
-    }
 
 #ifdef __arm__
     serverFlags |= Qn::SF_ArmServer;
@@ -2445,7 +2440,6 @@ void MediaServerProcess::run()
 
     initializeCloudConnect();
 
-    bool compatibilityMode = m_cmdLineArguments.devModeKey == lit("razrazraz");
     const QString appserverHostString = qnServerModule->roSettings()->value("appserverHost").toString();
 
     commonModule()->setSystemIdentityTime(nx::ServerSetting::getSysIdTime(), commonModule()->moduleGUID());
@@ -2458,7 +2452,7 @@ void MediaServerProcess::run()
     runtimeData.peer.peerType = Qn::PT_Server;
     runtimeData.box = QnAppInfo::armBox();
     runtimeData.brand = QnAppInfo::productNameShort();
-    runtimeData.customization = compatibilityMode ? QString() : QnAppInfo::customizationName();
+    runtimeData.customization = QnAppInfo::customizationName();
     runtimeData.platform = QnAppInfo::applicationPlatform();
 
 #ifdef __arm__
@@ -2780,11 +2774,6 @@ void MediaServerProcess::run()
         moduleName = moduleName.mid( qApp->organizationName().length() ).trimmed();
 
     QnModuleInformation selfInformation = commonModule()->moduleInformation();
-    if (compatibilityMode)
-    {
-        selfInformation.brand = QString();
-        selfInformation.customization = QString();
-    }
     selfInformation.version = qnStaticCommon->engineVersion();
     selfInformation.sslAllowed = sslAllowed;
     selfInformation.serverFlags = m_mediaServer->getServerFlags();

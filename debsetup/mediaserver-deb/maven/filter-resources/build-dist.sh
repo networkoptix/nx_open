@@ -102,9 +102,18 @@ buildDistribution()
 
     # Copy mediaserver plugins.
     local PLUGIN_FILENAME
-    local PLUGINS=( hikvision_metadata_plugin )
-    PLUGINS+=( axis_metadata_plugin )
-    PLUGINS+=( vca_metadata_plugin )
+    local PLUGINS=(
+        generic_multicast_plugin
+        genericrtspplugin
+        image_library_plugin
+        it930x_plugin
+        mjpg_link
+    )
+    PLUGINS+=(
+        hikvision_metadata_plugin
+        axis_metadata_plugin
+        vca_metadata_plugin
+    )
     if [ "$ENABLE_HANWHA" == "true" ]
     then
         PLUGINS+=( hanwha_metadata_plugin )

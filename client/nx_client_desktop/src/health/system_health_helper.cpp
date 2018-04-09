@@ -66,9 +66,9 @@ QString QnSystemHealthStringsHelper::messageText(QnSystemHealth::MessageType mes
             const QString kCloudNameText = lit("<b>%1</b>").arg(nx::network::AppInfo::cloudName());
             const QString kMessage = isLoggedIntoCloud
                 ? tr("Connect your System to %1 &mdash; make it accessible from anywhere!",
-                    "%1 is the cloud name (like 'Nx Cloud')").arg(kCloudNameText)
+                    "%1 is the cloud name (like Nx Cloud)").arg(kCloudNameText)
                 : tr("Check out %1 &mdash; connect to your System from anywhere!",
-                    "%1 is the cloud name (like 'Nx Cloud')").arg(kCloudNameText);
+                    "%1 is the cloud name (like Nx Cloud)").arg(kCloudNameText);
 
             using nx::vms::utils::SystemUri;
             QnCloudUrlHelper urlHelper(
