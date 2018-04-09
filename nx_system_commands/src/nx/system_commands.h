@@ -70,7 +70,19 @@ public:
 
     std::string lastError() const;
 
-    static const char* unmountCodeToString(UnmountCode code);
+    static const char* unmountCodeToString(UnmountCode code)
+    {
+        switch (code)
+        {
+            case ok: return "ok";
+            case busy: return "resource is busy";
+            case notExists: return "path not exists";
+            case noPermissions: return "no permissions";
+        }
+
+        return "";
+    }
+
 
 private:
     enum class CheckOwnerResult

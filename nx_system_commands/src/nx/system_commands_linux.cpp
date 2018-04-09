@@ -505,17 +505,4 @@ std::string SystemCommands::lastError() const
     return m_lastError;
 }
 
-const char* SystemCommands::unmountCodeToString(UnmountCode code)
-{
-    switch (code)
-    {
-        case ok: return "ok";
-        case busy: return "resource is busy";
-        case notExists: return "path not exists";
-        case noPermissions: return "no permissions";
-    }
-
-    return "";
-}
-
 } // namespace nx
