@@ -52,7 +52,7 @@ class Registry(object):
                 self._os_access.write_file(self._path, dump(reservations))
 
     def _make_name(self, index):
-        digits = min(len(str(self._limit)), 3)
+        digits = max(len(str(self._limit)), 3)
         index_str = str(index).zfill(digits)
         return self._name_format.format(index=index_str)
 
