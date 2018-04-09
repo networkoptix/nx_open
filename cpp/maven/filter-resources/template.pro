@@ -225,11 +225,12 @@ win* {
 
 ## BOTH LINUX AND MAC
 unix: {
+  QMAKE_CXXFLAGS -= -std=c++11
+  QMAKE_CXXFLAGS -= -std=c++1y
+  QMAKE_CXXFLAGS -= -std=gnu++1y
+
   clang {
     QMAKE_CXXFLAGS += -Wno-c++14-extensions -Wno-inconsistent-missing-override
-  } else {
-    QMAKE_CXXFLAGS -= -std=c++11
-    QMAKE_CXXFLAGS -= -std=c++1y
   }
   QMAKE_CXXFLAGS += -Werror=enum-compare -Werror=reorder -Werror=delete-non-virtual-dtor -Werror=return-type -Werror=conversion-null -Wuninitialized
 
@@ -318,7 +319,7 @@ CONFIG(debug, debug|release) {
   include(dependencies.pri)
 }
 
-linux {
+unix: {
   QMAKE_CXXFLAGS_CXX14 = -std=c++17
   QMAKE_CXXFLAGS_GNUCXX14 = -std=c++17
 }
