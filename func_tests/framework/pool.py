@@ -22,7 +22,15 @@ class CachingPool(object):
             return new_value
 
 
-class ClosingPool(object):
+class ClosingPoolNotEntered(Exception):
+    pass
+
+
+class ClosingPoolAlreadyEntered(Exception):
+    pass
+
+
+class ClosingPool(object):  # TODO: Consider renaming to ResourcePool or similar.
     def __init__(self, allocate, second_args, default_second_arg):  # TODO: Concise and flexible way of passing args.
         self._allocate = allocate
         self._second_args = second_args
@@ -31,6 +39,11 @@ class ClosingPool(object):
         self._entered_allocations = []
 
     def __enter__(self):
+        if self._entered:
+            raise ClosingPoolAlreadyEntered(
+                "Cannot use same ClosingPool in nested `with` clause\n"
+                "While it's possible to implement, it'd have too complex "
+                "behavior and implementation and controversial added value.")
         assert not self._entered
         self._entered = True
         return self
@@ -44,7 +57,10 @@ class ClosingPool(object):
         self._entered = False
 
     def get(self, key):
-        assert self._entered
+        if not self._entered:
+            raise ClosingPoolNotEntered(
+                "Use ClosingPool with `with` clause\n"
+                "__exit__ method of allocated resources are called in __exit__ of ClosingPool.")
         allocation = self._allocate(key, self._second_args.get(key, self._default_second_arg))
         resource = allocation.__enter__()
         self._entered_allocations.append((resource, allocation))
