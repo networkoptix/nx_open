@@ -2,6 +2,7 @@
 Resource          ../resource.robot
 Resource          ../variables.robot
 Suite Teardown    Close All Browsers
+Test Teardown     Close Browser
 
 *** Variables ***
 ${password}    ${BASE PASSWORD}
@@ -38,7 +39,6 @@ Clean up email noperm
     Validate Log In
     Go To    ${url}/systems/${AUTO_TESTS SYSTEM ID}
     Run Keyword And Ignore Error    Remove User Permissions    ${EMAIL NOPERM}
-    Close Browser
 
 Clean up random emails
     Register Keyword To Run On Failure    None
@@ -48,7 +48,6 @@ Clean up random emails
     Go To    ${url}/systems/${AUTO_TESTS SYSTEM ID}
     ${status}    Run Keyword And Return Status    Wait Until Element Is Visible    //div[@process-loading='gettingSystemUsers']//tbody//tr//td[contains(text(), 'noptixautoqa+15')]
     Run Keyword If    ${status}    Find and remove emails
-    Close Browser
 
 Make sure notowner is in the system
     Register Keyword To Run On Failure    None/
@@ -73,7 +72,6 @@ Clean up noperm first/last name
     Input Text    ${ACCOUNT LAST NAME}    ${TEST LAST NAME}
     Click Button    ${ACCOUNT SAVE}
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
-    Close Browser
 
 Clean up owner first/last name
     Register Keyword To Run On Failure    None
@@ -89,4 +87,3 @@ Clean up owner first/last name
     Input Text    ${ACCOUNT LAST NAME}    ${TEST LAST NAME}
     Click Button    ${ACCOUNT SAVE}
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
-    Close Browser
