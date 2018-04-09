@@ -20,7 +20,6 @@ namespace {
         color.setBlueF(color.blueF() * color.alphaF());
         return color;
     }
-
 }
 
 std::array<QColor, Qn::TimePeriodContentCount + 1> QnTimelineChunkPainter::colors() const {
