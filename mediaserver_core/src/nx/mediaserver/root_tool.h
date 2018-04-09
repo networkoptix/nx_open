@@ -36,6 +36,7 @@ public:
     bool isPathExists(const QString& path);
     QnAbstractStorageResource::FileInfoList fileList(const QString& path);
     qint64 fileSize(const QString& path);
+    QString devicePath(const QString& fsPath);
 
 private:
     const QString m_toolPath;
@@ -49,6 +50,9 @@ private:
     template<typename DefaultAction>
     qint64 int64SingleArgCommandHelper(
         const QString& path, const char* command, DefaultAction defaultAction);
+
+    template<typename DefaultAction>
+    std::string stringCommandHelper(const QString& path, const char* command, DefaultAction action);
 
     int execute(const std::vector<QString>& args);
 };

@@ -109,4 +109,9 @@ int64_t SystemCommands::fileSize(const std::string& path, bool reportViaSocket)
     return -1;
 }
 
+std::string SystemCommands::devicePath(const std::string& path, bool reportViaSocket)
+{
+    return "";
+}
+
 } // namespace nx

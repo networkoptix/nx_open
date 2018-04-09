@@ -59,6 +59,9 @@ public:
     /** Returns file size. */
     int64_t fileSize(const std::string& path, bool reportViaSocket);
 
+    /** Gets device path by file system path */
+    std::string devicePath(const std::string& path, bool reportViaSocket);
+
     /** Installs deb package to system. */
     bool install(const std::string& debPackage);
 
