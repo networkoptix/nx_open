@@ -5,7 +5,7 @@ import {EmailValidator} from '@angular/forms';
 
 @Component({
     selector: 'nx-modal-general-content',
-    templateUrl: './dialogs/general/general.component.html'
+    templateUrl: './src/dialogs/general/general.component.html'
     // TODO: later
     // templateUrl: this.CONFIG.viewsDir + 'components/dialog.html'
 })

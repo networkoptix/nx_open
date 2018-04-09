@@ -5,8 +5,8 @@ import { NgbDropdownModule }                                             from '@
 
 @Component({
     selector: 'nx-active-system',
-    templateUrl: './dropdowns/active-system/active-system.component.html',
-    styleUrls: ['./dropdowns/active-system/active-system.component.scss']
+    templateUrl: './src/dropdowns/active-system/active-system.component.html',
+    styleUrls: ['./src/dropdowns/active-system/active-system.component.scss']
 })
 
 export class NxActiveSystemDropdown implements OnInit, OnDestroy, OnChanges {

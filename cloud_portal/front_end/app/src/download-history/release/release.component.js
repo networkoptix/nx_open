@@ -28,7 +28,7 @@ __decorate([
 ReleaseComponent = __decorate([
     core_1.Component({
         selector: 'nx-release',
-        templateUrl: './download-history/release/release.component.html',
+        templateUrl: './src/download-history/release/release.component.html',
     }),
     __param(0, core_1.Inject('languageService')),
     __param(1, core_1.Inject('configService')),

@@ -71,7 +71,7 @@ __decorate([
 NxProcessButtonComponent = __decorate([
     core_1.Component({
         selector: 'nx-process-button',
-        templateUrl: './components/process-button/process-button.component.html',
+        templateUrl: './src/components/process-button/process-button.component.html',
         styleUrls: []
     }),
     __metadata("design:paramtypes", [])

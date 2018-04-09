@@ -70,8 +70,8 @@ __decorate([
 NxSystemsDropdown = __decorate([
     core_1.Component({
         selector: 'nx-systems',
-        templateUrl: './dropdowns/systems/systems.component.html',
-        styleUrls: ['./dropdowns/systems/systems.component.scss']
+        templateUrl: './src/dropdowns/systems/systems.component.html',
+        styleUrls: ['./src/dropdowns/systems/systems.component.scss']
     }),
     __param(0, core_1.Inject('languageService')),
     __param(1, core_1.Inject('configService')),

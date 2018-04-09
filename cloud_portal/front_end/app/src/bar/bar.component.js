@@ -65,7 +65,7 @@ let BarComponent = class BarComponent {
 BarComponent = __decorate([
     core_1.Component({
         selector: 'bar-component',
-        templateUrl: './bar/bar.component.html'
+        templateUrl: './src/bar/bar.component.html'
     }),
     __param(0, core_1.Inject('uuid2Service')),
     __param(1, core_1.Inject('languageService')),

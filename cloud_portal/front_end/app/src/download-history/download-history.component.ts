@@ -11,7 +11,7 @@ import { DeviceDetectorService }        from 'ngx-device-detector';
 
 @Component({
     selector: 'download-history-component',
-    templateUrl: './download-history/download-history.component.html'
+    templateUrl: './src/download-history/download-history.component.html'
 })
 
 export class DownloadHistoryComponent implements OnInit, OnDestroy, AfterViewChecked {

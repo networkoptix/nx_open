@@ -7,7 +7,7 @@ import { NxModalLoginComponent } from "../../src/dialogs/login/login.component";
 
 @Component({
     selector: 'bar-component',
-    templateUrl: './bar/bar.component.html'
+    templateUrl: './src/bar/bar.component.html'
 })
 
 export class BarComponent implements OnInit {

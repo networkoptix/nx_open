@@ -81,7 +81,7 @@ __decorate([
 DownloadHistoryComponent = __decorate([
     core_1.Component({
         selector: 'download-history-component',
-        templateUrl: './download-history/download-history.component.html'
+        templateUrl: './src/download-history/download-history.component.html'
     }),
     __param(0, core_1.Inject('languageService')),
     __param(1, core_1.Inject('cloudApiService')),

@@ -3,7 +3,7 @@ import { FormControl } from '@angular/forms';
 
 @Component({
     selector: 'nx-process-button',
-    templateUrl: './components/process-button/process-button.component.html',
+    templateUrl: './src/components/process-button/process-button.component.html',
     styleUrls: []
 })
 export class NxProcessButtonComponent implements OnInit {

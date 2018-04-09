@@ -5,8 +5,8 @@ import {EmailValidator} from '@angular/forms';
 
 @Component({
     selector: 'ngbd-modal-content',
-    templateUrl: './dialogs/login/login.component.html',
-    styleUrls: ['./dialogs/login/login.component.scss']
+    templateUrl: './src/dialogs/login/login.component.html',
+    styleUrls: ['./src/dialogs/login/login.component.scss']
     // TODO: later
     // templateUrl: this.CONFIG.viewsDir + 'dialogs/login.html'
 })

@@ -53,7 +53,7 @@ module.exports = {
                 from: '',
                 to: '',
                 ignore: [
-                    'src/**',
+                    'src/**/*.ts',
                     'web_common/styles/**',
                     'scripts/**',
                     'styles/**',

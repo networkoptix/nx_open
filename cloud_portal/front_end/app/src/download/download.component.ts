@@ -11,7 +11,7 @@ import { DeviceDetectorService }        from 'ngx-device-detector';
 
 @Component({
     selector: 'download-component',
-    templateUrl: './download/download.component.html'
+    templateUrl: './src/download/download.component.html'
 })
 
 export class DownloadComponent implements OnInit, OnDestroy, AfterViewChecked {
