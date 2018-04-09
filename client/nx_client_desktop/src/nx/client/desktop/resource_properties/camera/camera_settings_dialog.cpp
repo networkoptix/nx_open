@@ -56,7 +56,21 @@ struct CameraSettingsDialog::Private
 
         store->applyChanges();
         const auto& state = store->state();
-        CameraSettingsDialogStateConversionFunctions::applyStateToCameras(state, cameras);
+
+        const auto apply =
+            [this, &state]
+            {
+                CameraSettingsDialogStateConversionFunctions::applyStateToCameras(state, cameras);
+            };
+
+        const auto backout =
+            [this, camerasCopy = cameras](bool success)
+            {
+                if (!success && camerasCopy == cameras)
+                    resetChanges();
+            };
+
+        qnResourcesChangesManager->saveCamerasBatch(cameras, apply, backout);
     }
 
     void resetChanges()
