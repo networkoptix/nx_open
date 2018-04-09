@@ -128,6 +128,7 @@ public:
     qint64 previousCorrectionTime = -1;
     qint64 previousCorrectedPosition = 0;
 
+    qint64 initialWindowStartTime = -1;
     qint64 startBoundTime = -1;
     qint64 endBoundTime = -1;
     qint64 targetPosition = -1;
@@ -448,6 +449,7 @@ qint64 QnTimeline::windowSize() const
 void QnTimeline::setWindowSize(qint64 windowSize)
 {
     const auto windowStart = position() - windowSize / 2;
+    d->initialWindowStartTime = windowStart;
     setWindow(windowStart, windowStart + windowSize);
 }
 
@@ -649,6 +651,7 @@ void QnTimeline::finishZoom(qreal scale)
 {
     d->zoomKineticHelper.finish(d->startZoom * scale);
     d->tryFitInBounds();
+
 
     if (d->dragWasInterruptedByZoom)
     {
@@ -1381,9 +1384,14 @@ void QnTimelinePrivate::updateStripesTextures()
 qint64 QnTimelinePrivate::startBoundTimeValue() const
 {
     const auto liveTime = QDateTime::currentMSecsSinceEpoch();
-    return startBoundTime == -1
+    const auto startBound = startBoundTime == -1
         ? liveTime - kDefaultWindowSize / 2
         : startBoundTime;
+    const auto initialWindowStart = initialWindowStartTime > 0
+        ? initialWindowStartTime
+        : startBound;
+
+    return std::min(startBound, initialWindowStart);
 }
 
 qint64 QnTimelinePrivate::endBoundTimeValue() const
