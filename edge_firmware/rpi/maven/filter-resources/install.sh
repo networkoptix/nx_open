@@ -143,16 +143,16 @@ upgradeVms()
         callMounted vfat "/dev/mmcblk0p1" "/mnt/boot" copyToBootPartition
 
         installDebs libvdpau 0.4.1
-        installDebs fontconfig 2.11
-        installDebs fonts-takao-mincho
-        installDebs fonts-baekmuk
-        installDebs fonts-arphic-ukai
-        installDebs fonts-thai-tlwg
+        #installDebs fontconfig 2.11
+        #installDebs fonts-takao-mincho
+        #installDebs fonts-baekmuk
+        #installDebs fonts-arphic-ukai
+        #installDebs fonts-thai-tlwg
 
-        touch "/dev/cedar_dev"
-        chmod 777 "/dev/disp"
-        chmod 777 "/dev/cedar_dev"
-        usermod -aG video root
+        #touch "/dev/cedar_dev"
+        #chmod 777 "/dev/disp"
+        #chmod 777 "/dev/cedar_dev"
+        #usermod -aG video root
 
         callMounted ext4 "/dev/mmcblk0p2" "/mnt/data" copyToDataPartition
 
