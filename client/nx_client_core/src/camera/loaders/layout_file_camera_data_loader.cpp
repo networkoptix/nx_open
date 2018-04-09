@@ -82,24 +82,31 @@ int QnLayoutFileCameraDataLoader::loadMotion(const QList<QRegion> &motionRegions
     return sendDataDelayed(result);
 }
 
-int QnLayoutFileCameraDataLoader::load(const QString &filter, const qint64 resolutionMs) {
-    Q_UNUSED(resolutionMs)
-
-    switch (m_dataType) {
-    case Qn::RecordingContent:
-        return sendDataDelayed(m_data);
-    case Qn::MotionContent:
+int QnLayoutFileCameraDataLoader::load(const QString& filter, const qint64 /*resolutionMs*/)
+{
+    switch (m_dataType)
+    {
+        case Qn::RecordingContent:
         {
-            QList<QRegion> motionRegions = QJson::deserialized<QList<QRegion>>(filter.toUtf8());
-            for (const QRegion &region: motionRegions)
+            return sendDataDelayed(m_data);
+        }
+        case Qn::MotionContent:
+        {
+            const auto motionRegions = QJson::deserialized<QList<QRegion>>(filter.toUtf8());
+            for (const QRegion& region: motionRegions)
             {
                 if (!region.isEmpty())
                     return loadMotion(motionRegions);
             }
-            qWarning() << "empty motion region";
+            NX_EXPECT(false, "Empty motion region in exported video.");
         }
-    default:
-        NX_ASSERT(false, Q_FUNC_INFO, "Should never get here");
-        return 0;
+        case Qn::AnalyticsContent:
+        {
+            // Analytics export is not supported yet.
+            return 0;
+        }
+        default:
+            NX_ASSERT(false, "Should never get here");
+            return 0;
     }
 }
