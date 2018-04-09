@@ -3,7 +3,7 @@
 
 #include <memory>
 
-#include <plugins/camera_plugin.h>
+#include <camera/camera_plugin.h>
 #include <plugins/plugin_tools.h>
 
 #include "ref_counter.h"
