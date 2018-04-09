@@ -1121,15 +1121,14 @@ to view more bookmarks</source>
       <translation>"%1" 파일을 쓸 수 없습니다. 다른 이름으로 해 보십시요.</translation>
     </message>
     <message>
-      <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
+      <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
       <translation>파일 이름 &quot;%1&quot; 은 운영 체제에 지정되어 있습니다. 다른 이름을 사용해보십시오.</translation>
     </message>
     <message numerus="yes">
-      <source>Filename should not contain the following reserved characters:
-%1</source>
-      <comment>Multiple form must concern characters count, not filenames!</comment>
+      <source>File name must not contain the following reserved characters:</source>
+      <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
       <translation>
-        <numerusform>파일 이름에는 다음 지정된 문자가 포함되어서는 안됩니다. %1</numerusform>
+        <numerusform>파일 이름에는 다음 지정된 문자가 포함되어서는 안됩니다:</numerusform>
       </translation>
     </message>
   </context>
@@ -3282,7 +3281,7 @@ to %1</source>
     <message>
       <source>All %1 users will be deleted.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">All %1 users will be deleted.</translation>
+      <translation>모든 %1 사용자가 삭제됩니다.</translation>
     </message>
     <message>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
@@ -6782,7 +6781,7 @@ to %1</source>
     <message>
       <source>%1 user</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user</translation>
+      <translation>%1 사용자</translation>
     </message>
   </context>
   <context>
@@ -7018,7 +7017,7 @@ to %1</source>
     <message>
       <source>%1 user with specified email already exists.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user with specified email already exists.</translation>
+      <translation>지정된 이메일의 %1 사용자가 존재합니다.</translation>
     </message>
   </context>
   <context>
@@ -7261,7 +7260,7 @@ to %1</source>
     <message>
       <source>%1 Systems cannot be merged</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 Systems cannot be merged</translation>
+      <translation>%1 시스템은 병합 할 수 없습니다.</translation>
     </message>
   </context>
   <context>

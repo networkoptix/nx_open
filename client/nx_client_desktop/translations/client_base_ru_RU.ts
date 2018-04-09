@@ -1122,18 +1122,17 @@ to view more bookmarks</source>
       <translation>Файл &quot;%1&quot; не может быть записан. Попробуйте другое имя.</translation>
     </message>
     <message>
-      <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
+      <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
       <translation>Файл &quot;%1&quot; зарезервирован операционной системой. Попробуйте другое имя.</translation>
     </message>
     <message numerus="yes">
-      <source>Filename should not contain the following reserved characters:
-%1</source>
-      <comment>Multiple form must concern characters count, not filenames!</comment>
+      <source>File name must not contain the following reserved characters:</source>
+      <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
       <translation>
-        <numerusform>Имя файла не должно содержать следующий зарезервированный символ: %1</numerusform>
-        <numerusform>Имя файла не должно содержать следующие зарезервированные символы: %1</numerusform>
-        <numerusform>Имя файла не должно содержать следующие зарезервированные символы: %1</numerusform>
-        <numerusform>Имя файла не должно содержать следующие зарезервированные символы: %1</numerusform>
+        <numerusform>Имя файла не должно содержать следующий зарезервированный символ: </numerusform>
+        <numerusform>Имя файла не должно содержать следующие зарезервированные символы: </numerusform>
+        <numerusform>Имя файла не должно содержать следующие зарезервированные символы: </numerusform>
+        <numerusform>Имя файла не должно содержать следующие зарезервированные символы: </numerusform>
       </translation>
     </message>
   </context>
@@ -2187,11 +2186,11 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n devices added.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n device added.</numerusform>
         <numerusform>Добавлено %n устройства.</numerusform>
         <numerusform>Добавлено %n устройств.</numerusform>
-        <numerusform>%n devices added.</numerusform>
+        <numerusform>%n device added.</numerusform>
       </translation>
     </message>
     <message>
@@ -2768,29 +2767,29 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n devices are not saved:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Changes to the following %n device are not saved:</numerusform>
         <numerusform>Изменения для следующих %n устройств не сохранены:</numerusform>
         <numerusform>Изменения для следующих %n устройств не сохранены:</numerusform>
-        <numerusform>Changes to the following %n devices are not saved:</numerusform>
+        <numerusform>Changes to the following %n device are not saved:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n cameras are not saved:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Changes to the following %n camera are not saved:</numerusform>
         <numerusform>Изменения для следующих %n камер не сохранены:</numerusform>
         <numerusform>Изменения для следующих %n камер не сохранены:</numerusform>
-        <numerusform>Changes to the following %n cameras are not saved:</numerusform>
+        <numerusform>Changes to the following %n camera are not saved:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n I/O Modules are not saved:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Changes to the following %n I/O Module are not saved:</numerusform>
         <numerusform>Изменения для следующих %n модулей ввода-вывода не сохранены:</numerusform>
         <numerusform>Изменения для следующих %n модулей ввода-вывода не сохранены:</numerusform>
-        <numerusform>Changes to the following %n I/O Modules are not saved:</numerusform>
+        <numerusform>Changes to the following %n I/O Module are not saved:</numerusform>
       </translation>
     </message>
     <message>
@@ -3383,7 +3382,7 @@ to %1</source>
     <message>
       <source>All %1 users will be deleted.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">All %1 users will be deleted.</translation>
+      <translation>Все %1 пользователи будут удалены.</translation>
     </message>
     <message>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
@@ -3415,20 +3414,20 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n event(s) found</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Журнал событий за период с %1 по %2 - найдено %n событие</numerusform>
         <numerusform>Журнал событий за период с %1 по %2 - найдено %n события</numerusform>
         <numerusform>Журнал событий за период с %1 по %2 - найдено %n событий</numerusform>
-        <numerusform>Event log for period from %1 to %2 - %n event(s) found</numerusform>
+        <numerusform>Журнал событий за период с %1 по %2 - найдено %n события</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n event(s) found</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Журнал событий за %1 - найдено %n событие</numerusform>
         <numerusform>Журнал событий за %1 - найдено %n события</numerusform>
         <numerusform>Журнал событий за %1 - найдено %n событий</numerusform>
-        <numerusform>Event log for %1 - %n event(s) found</numerusform>
+        <numerusform>Журнал событий за %1 - найдено %n события</numerusform>
       </translation>
     </message>
     <message>
@@ -3481,11 +3480,11 @@ to %1</source>
     <message numerus="yes">
       <source>%1 (%n times)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 из (%n раза)</numerusform>
         <numerusform>%1 из (%n раз)</numerusform>
         <numerusform>%1 из (%n раз)</numerusform>
-        <numerusform>%1 (%n times)</numerusform>
+        <numerusform>%1 из (%n раза)</numerusform>
       </translation>
     </message>
     <message>
@@ -3494,29 +3493,29 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>and %n users more...</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>and %n more user...</numerusform>
         <numerusform>and %n more users...</numerusform>
         <numerusform>и ещё %n пользователей...</numerusform>
-        <numerusform>and %n users more...</numerusform>
+        <numerusform>and %n more users...</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>and %n more...</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>и ещё %n...</numerusform>
         <numerusform>и ещё %n...</numerusform>
         <numerusform>и ещё %n...</numerusform>
-        <numerusform>and %n more...</numerusform>
+        <numerusform>и ещё %n...</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Removed subjects</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n удаленный объект</numerusform>
         <numerusform>%n удаленных объекта</numerusform>
         <numerusform>%n удаленных объектов</numerusform>
-        <numerusform>%n Removed subjects</numerusform>
+        <numerusform>%n удаленных объектов</numerusform>
       </translation>
     </message>
     <message>
@@ -3879,11 +3878,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Test completed successfully: %n users found.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Проверка завершилась успешно: найден %n пользователь.</numerusform>
         <numerusform>Проверка завершилась успешно: найдены %n пользователя.</numerusform>
         <numerusform>Проверка завершилась успешно: найдено %n пользователей.</numerusform>
-        <numerusform>Test completed successfully: %n users found.</numerusform>
+        <numerusform>Проверка завершилась успешно: найден %n пользователь.</numerusform>
       </translation>
     </message>
   </context>
@@ -4051,11 +4050,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>License expires in %n days</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>License expires in %n day</numerusform>
         <numerusform>Срок действия истекает через %n дня</numerusform>
         <numerusform>Срок действия истекает через %n дней</numerusform>
-        <numerusform>License expires in %n days</numerusform>
+        <numerusform>License expires in %n day</numerusform>
       </translation>
     </message>
     <message>
@@ -4147,20 +4146,20 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>At least %n %1 are required</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Требуется по крайней мере %n %1</numerusform>
         <numerusform>Требуется по крайней мере %n %1</numerusform>
         <numerusform>Требуется по крайней мере %n %1</numerusform>
-        <numerusform>At least %n %1 are required</numerusform>
+        <numerusform>Требуется по крайней мере %n %1</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n %1 are currently in use</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n %1 используeтся</numerusform>
         <numerusform>%n %1 используeтся</numerusform>
         <numerusform>%n %1 используeтся</numerusform>
-        <numerusform>%n %1 are currently in use</numerusform>
+        <numerusform>%n %1 используeтся</numerusform>
       </translation>
     </message>
     <message>
@@ -4169,11 +4168,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Деактивировать лицензию?</numerusform>
         <numerusform>Деактивировать лицензии?</numerusform>
         <numerusform>Деактивировать лицензии?</numerusform>
-        <numerusform>Deactivate licenses?</numerusform>
+        <numerusform>Деактивировать лицензии?</numerusform>
       </translation>
     </message>
     <message>
@@ -4182,29 +4181,29 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Failed to deactivate %n licenses</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Не удалось деактивировать %n лицензию</numerusform>
         <numerusform>Не удалось деактивировать %n лицензии</numerusform>
         <numerusform>Не удалось деактивировать %n лицензий</numerusform>
-        <numerusform>Failed to deactivate %n licenses</numerusform>
+        <numerusform>Не удалось деактивировать %n лицензий</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n licenses cannot be deactivated</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 из %n лицензий не может быть деактивирована</numerusform>
         <numerusform>%1 из %n лицензий не могут быть деактивированы</numerusform>
         <numerusform>%1 из %n лицензий не могут быть деактивированы</numerusform>
-        <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
+        <numerusform>%1 из %n лицензий не могут быть деактивированы</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cannot deactivate licenses</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Не удалось деактивировать лицензию</numerusform>
         <numerusform>Не удалось деактивировать лицензии</numerusform>
         <numerusform>Не удалось деактивировать лицензии</numerusform>
-        <numerusform>Cannot deactivate licenses</numerusform>
+        <numerusform>Не удалось деактивировать лицензии</numerusform>
       </translation>
     </message>
     <message>
@@ -4225,11 +4224,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n licenses deactivated</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n лицензия деактивирована</numerusform>
         <numerusform>%n лицензии деактивировано</numerusform>
         <numerusform>%n лицензий деактивировано</numerusform>
-        <numerusform>%n licenses deactivated</numerusform>
+        <numerusform>%n лицензий деактивировано</numerusform>
       </translation>
     </message>
     <message>
@@ -4242,11 +4241,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n channels.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n канал.</numerusform>
         <numerusform>%n канала.</numerusform>
         <numerusform>%n каналов.</numerusform>
-        <numerusform>%n channels.</numerusform>
+        <numerusform>%n каналов.</numerusform>
       </translation>
     </message>
     <message>
@@ -4255,11 +4254,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Deactivate %n Other</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Деактивировать еще %n</numerusform>
         <numerusform>Деактивировать еще %n</numerusform>
         <numerusform>Деактивировать еще %n</numerusform>
-        <numerusform>Deactivate %n Other</numerusform>
+        <numerusform>Деактивировать еще %n</numerusform>
       </translation>
     </message>
     <message>
@@ -4326,29 +4325,29 @@ to %1</source>
     <name>QnLicensesProposeWidget</name>
     <message numerus="yes">
       <source>Use licenses for selected %n devices</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Использовать лицензии для %n выбранного устройства</numerusform>
         <numerusform>Использовать лицензии для %n выбранных устройств</numerusform>
         <numerusform>Использовать лицензии для %n выбранных устройств</numerusform>
-        <numerusform>Use licenses for selected %n devices</numerusform>
+        <numerusform>Использовать лицензии для %n выбранных устройств</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses for selected %n cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Использовать лицензии для %n выбранной камеры</numerusform>
         <numerusform>Использовать лицензии для %n выбранных камер</numerusform>
         <numerusform>Использовать лицензии для %n выбранных камер</numerusform>
-        <numerusform>Use licenses for selected %n cameras</numerusform>
+        <numerusform>Использовать лицензии для %n выбранной камеры</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses for selected %n I/O modules</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Использовать лицензии для %n выбранного модуля ввода-вывода</numerusform>
         <numerusform>Использовать лицензии для %n выбранный модулей ввода-вывода</numerusform>
         <numerusform>Использовать лицензии для %n выбранный модулей ввода-вывода</numerusform>
-        <numerusform>Use licenses for selected %n I/O modules</numerusform>
+        <numerusform>Использовать лицензии для %n выбранный модулей ввода-вывода</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -4802,11 +4801,11 @@ to %1</source>
     <name>QnNotificationListWidget</name>
     <message numerus="yes">
       <source>%n more notifications</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n more notification</numerusform>
         <numerusform>Ещё %n уведомления</numerusform>
         <numerusform>Ещё %n уведомлений</numerusform>
-        <numerusform>%n more notifications</numerusform>
+        <numerusform>%n more notification</numerusform>
       </translation>
     </message>
   </context>
@@ -5002,29 +5001,29 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>This preset will be activated after %n minutes of inactivity</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Будет активирована после %n минуту бездействия</numerusform>
         <numerusform>Будет активирована после %n минуты бездействия</numerusform>
         <numerusform>Будет активирована после %n минут бездействия</numerusform>
-        <numerusform>This preset will be activated after %n minutes of inactivity</numerusform>
+        <numerusform>Будет активирована после %n минуту бездействия</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Tour has %n identical positions</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>В маршруте обхода %n идентичная позиция</numerusform>
         <numerusform>В маршруте обхода %n идентичные позиции</numerusform>
         <numerusform>В маршруте обхода %n идентичных позиций</numerusform>
-        <numerusform>Tour has %n identical positions</numerusform>
+        <numerusform>В маршруте обхода %n идентичные позиции</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>about %n minute(s)</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Около %n минуты</numerusform>
         <numerusform>Около %n минут</numerusform>
         <numerusform>Около %n минут</numerusform>
-        <numerusform>about %n minute(s)</numerusform>
+        <numerusform>Около %n минут</numerusform>
       </translation>
     </message>
     <message>
@@ -5229,31 +5228,31 @@ to %1</source>
     <message numerus="yes">
       <source>Total %1 %n devices</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Total %1 %n device</numerusform>
         <numerusform>Всего %1 %n устройства</numerusform>
         <numerusform>Всего %1 %n устройств</numerusform>
-        <numerusform>Total %1 %n devices</numerusform>
+        <numerusform>Total %1 %n device</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n cameras</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Total %1 %n camera</numerusform>
         <numerusform>Всего %1 %n камеры</numerusform>
         <numerusform>Всего %1 %n камер</numerusform>
-        <numerusform>Total %1 %n cameras</numerusform>
+        <numerusform>Total %1 %n camera</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n I/O modules</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Total %1 %n I/O module</numerusform>
         <numerusform>Всего %1 %n модуля ввода-вывода</numerusform>
         <numerusform>Всего %1 %n модулей ввода-вывода</numerusform>
-        <numerusform>Total %1 %n I/O modules</numerusform>
+        <numerusform>Total %1 %n I/O module</numerusform>
       </translation>
     </message>
     <message>
@@ -5307,11 +5306,11 @@ to %1</source>
     <message numerus="yes">
       <source>%n of %1 selected roles have no %2 permission</source>
       <comment>%1 is number of selected roles, %2 is permission name</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n выбранная роль из %1 не имеет полномочий на %2</numerusform>
         <numerusform>%n выбранные роли из %1 не имеют полномочий на %2</numerusform>
         <numerusform>%n выбранных ролей из %1 не имеют полномочий на %2</numerusform>
-        <numerusform>%n of %1 selected roles have no %2 permission</numerusform>
+        <numerusform>%n выбранных ролей из %1 не имеют полномочий на %2</numerusform>
       </translation>
     </message>
     <message>
@@ -5327,11 +5326,11 @@ to %1</source>
     <message numerus="yes">
       <source>%n of %1 selected users have no %2 permission</source>
       <comment>%1 is number of selected users, %2 is permission name</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n выбранный пользователь из %1 не имеет разрешения %2</numerusform>
         <numerusform>%n выбранных пользователя из %1 не имеют разрешения %2</numerusform>
         <numerusform>%n выбранных пользователей из %1 не имеют разрешения %2</numerusform>
-        <numerusform>%n of %1 selected users have no %2 permission</numerusform>
+        <numerusform>%n выбранных пользователей из %1 не имеют разрешения %2</numerusform>
       </translation>
     </message>
   </context>
@@ -5579,11 +5578,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Server</numerusform>
         <numerusform>%n сервера</numerusform>
         <numerusform>%n серверов</numerusform>
-        <numerusform>%n Servers</numerusform>
+        <numerusform>%n Server</numerusform>
       </translation>
     </message>
   </context>
@@ -5603,11 +5602,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n User</numerusform>
         <numerusform>%n пользователя</numerusform>
         <numerusform>%n пользователей</numerusform>
-        <numerusform>%n Users</numerusform>
+        <numerusform>%n пользователь</numerusform>
       </translation>
     </message>
   </context>
@@ -5615,11 +5614,11 @@ to %1</source>
     <name>QnSendEmailActionDelegate</name>
     <message numerus="yes">
       <source>%n additional</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>ещё %n</numerusform>
         <numerusform>ещё %n</numerusform>
         <numerusform>ещё %n</numerusform>
-        <numerusform>%n additional</numerusform>
+        <numerusform>ещё %n</numerusform>
       </translation>
     </message>
     <message>
@@ -5632,7 +5631,7 @@ to %1</source>
         <numerusform>У %n из %1 пользователя некорректный Email</numerusform>
         <numerusform>У %n из %1 пользователя некорректный Email</numerusform>
         <numerusform>У %n из %1 пользователя некорректный Email</numerusform>
-        <numerusform>%n of %1 users have invalid email address</numerusform>
+        <numerusform>У %n из %1 пользователя некорректный Email</numerusform>
       </translation>
     </message>
     <message>
@@ -5645,7 +5644,7 @@ to %1</source>
         <numerusform>%n из %1 дополнительных адресов некорректен</numerusform>
         <numerusform>%n из %1 дополнительных адресов некорректен</numerusform>
         <numerusform>%n из %1 дополнительных адресов некорректен</numerusform>
-        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
+        <numerusform>%n из %1 дополнительных адресов некорректен</numerusform>
       </translation>
     </message>
     <message>
@@ -5896,11 +5895,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Not enough free space at %n Servers:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Not enough free space at %n Server:</numerusform>
         <numerusform>Недостаточно свободного места на %n серверах:</numerusform>
         <numerusform>Недостаточно свободного места на %n серверах:</numerusform>
-        <numerusform>Not enough free space at %n Servers:</numerusform>
+        <numerusform>Not enough free space at %n Server:</numerusform>
       </translation>
     </message>
     <message>
@@ -6316,11 +6315,11 @@ to %1</source>
     <message numerus="yes">
       <source>%n TB</source>
       <comment>TB - terabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n ТБ</numerusform>
         <numerusform>%n ТБ</numerusform>
         <numerusform>%n ТБ</numerusform>
-        <numerusform>%n TB</numerusform>
+        <numerusform>%n ТБ</numerusform>
       </translation>
     </message>
     <message>
@@ -6931,7 +6930,7 @@ to %1</source>
         <numerusform>The problem is caused by %n server:</numerusform>
         <numerusform>Проблема вызвана %n серверами:</numerusform>
         <numerusform>Проблема вызвана %n серверами:</numerusform>
-        <numerusform>The problem is caused by %n servers:</numerusform>
+        <numerusform>The problem is caused by %n server:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -6940,7 +6939,7 @@ to %1</source>
         <numerusform>No free space left on %n server:</numerusform>
         <numerusform>Не осталось места на жестких дисках %n серверов:</numerusform>
         <numerusform>Не осталось места на жестких дисках %n серверов:</numerusform>
-        <numerusform>No free space left on %n servers:</numerusform>
+        <numerusform>No free space left on %n server:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -6949,7 +6948,7 @@ to %1</source>
         <numerusform>%n server is not responding:</numerusform>
         <numerusform>%n сервера не отвечает:</numerusform>
         <numerusform>%n серверов не отвечает:</numerusform>
-        <numerusform>%n servers are not responding:</numerusform>
+        <numerusform>%n server is not responding:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -6958,7 +6957,7 @@ to %1</source>
         <numerusform>%n server has gone offline:</numerusform>
         <numerusform>%n сервера вышло из сети:</numerusform>
         <numerusform>%n серверов вышло из сети:</numerusform>
-        <numerusform>%n servers have gone offline:</numerusform>
+        <numerusform>%n server has gone offline:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -6967,7 +6966,7 @@ to %1</source>
         <numerusform>Authentication failed for %n server:</numerusform>
         <numerusform>Ошибка аутентификации на %n серверах:</numerusform>
         <numerusform>Ошибка аутентификации на %n серверах:</numerusform>
-        <numerusform>Authentication failed for %n servers:</numerusform>
+        <numerusform>Authentication failed for %n server:</numerusform>
       </translation>
     </message>
     <message>
@@ -7012,7 +7011,7 @@ to %1</source>
     <message>
       <source>%1 user</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user</translation>
+      <translation>%1 пользователь</translation>
     </message>
   </context>
   <context>
@@ -7115,11 +7114,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Please select an action to perform on %n users with this role</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Пожалуйста, выберите действие для выполнения с %n пользователем с этой ролью</numerusform>
         <numerusform>Пожалуйста, выберите действие для выполнения с %n пользователями с этой ролью</numerusform>
         <numerusform>Пожалуйста, выберите действие для выполнения с %n пользователями с этой ролью</numerusform>
-        <numerusform>Please select an action to perform on %n users with this role</numerusform>
+        <numerusform>Пожалуйста, выберите действие для выполнения с %n пользователями с этой ролью</numerusform>
       </translation>
     </message>
   </context>
@@ -7251,7 +7250,7 @@ to %1</source>
     <message>
       <source>%1 user with specified email already exists.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user with specified email already exists.</translation>
+      <translation>%1 пользователь с таким Email уже существует.</translation>
     </message>
   </context>
   <context>
@@ -7309,11 +7308,11 @@ to %1</source>
     <message numerus="yes">
       <source>PC %1 - Displays %2</source>
       <comment>%2 will be substituted by _list_ of displays</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>ПК %1 - дисплей %2</numerusform>
         <numerusform>ПК %1 - дисплеи %2</numerusform>
         <numerusform>ПК %1 - дисплеи %2</numerusform>
-        <numerusform>PC %1 - Displays %2</numerusform>
+        <numerusform>ПК %1 - дисплеи %2</numerusform>
       </translation>
     </message>
   </context>
@@ -7423,11 +7422,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n bookmarks?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Удалить %n закладку?</numerusform>
         <numerusform>Удалить %n закладки?</numerusform>
         <numerusform>Удалить %n закладок?</numerusform>
-        <numerusform>Delete %n bookmarks?</numerusform>
+        <numerusform>Удалить %n закладок?</numerusform>
       </translation>
     </message>
   </context>
@@ -7500,18 +7499,18 @@ to %1</source>
     <message>
       <source>%1 Systems cannot be merged</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 Systems cannot be merged</translation>
+      <translation>%1 системы не могут быть объединены</translation>
     </message>
   </context>
   <context>
     <name>QnWorkbenchResourcesChangesWatcher</name>
     <message numerus="yes">
       <source>The following %n items are not saved:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n элемент не сохранен:</numerusform>
         <numerusform>%n элемента не сохранено:</numerusform>
         <numerusform>%n элементов не сохранено:</numerusform>
-        <numerusform>The following %n items are not saved:</numerusform>
+        <numerusform>%n элементов не сохранено:</numerusform>
       </translation>
     </message>
     <message>
@@ -7524,11 +7523,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>The following %n items are not deleted:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n элемент не удален:</numerusform>
         <numerusform>%n элемента не удалено:</numerusform>
         <numerusform>%n элементов не удалено:</numerusform>
-        <numerusform>The following %n items are not deleted:</numerusform>
+        <numerusform>%n элементов не удалено:</numerusform>
       </translation>
     </message>
     <message>
@@ -7537,11 +7536,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Failed to delete %n items:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Failed to delete %n item:</numerusform>
         <numerusform>Не удалось удалить %n элемента:</numerusform>
         <numerusform>Не удалось удалить %n элементов:</numerusform>
-        <numerusform>Failed to delete %n items:</numerusform>
+        <numerusform>Failed to delete %n item:</numerusform>
       </translation>
     </message>
     <message>
@@ -7697,11 +7696,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Удалить %n элемент?</numerusform>
         <numerusform>Удалить %n элемента?</numerusform>
         <numerusform>Удалить %n элементов?</numerusform>
-        <numerusform>Delete %n items?</numerusform>
+        <numerusform>Удалить %n элементов?</numerusform>
       </translation>
     </message>
     <message>
@@ -7718,11 +7717,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n matrices?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Удалить %n матрицу?</numerusform>
         <numerusform>Удалить %n матрицы?</numerusform>
         <numerusform>Удалить %n матриц?</numerusform>
-        <numerusform>Delete %n matrices?</numerusform>
+        <numerusform>Удалить %n матриц?</numerusform>
       </translation>
     </message>
     <message>
@@ -7962,11 +7961,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>User will still have access to %n removed resources:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>User will still have access to %n removed resource:</numerusform>
         <numerusform>User will still have access to %n removed resource:</numerusform>
         <numerusform>User will still have access to %n removed resource:</numerusform>
-        <numerusform>User will still have access to %n removed resources:</numerusform>
+        <numerusform>User will still have access to %n removed resource:</numerusform>
       </translation>
     </message>
     <message>
@@ -7975,11 +7974,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>All users with this role will get access to %n resources:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>All users with this role will get access to %n resource:</numerusform>
         <numerusform>All users with this role will get access to %n resource:</numerusform>
         <numerusform>All users with this role will get access to %n resource:</numerusform>
-        <numerusform>All users with this role will get access to %n resources:</numerusform>
+        <numerusform>All users with this role will get access to %n resource:</numerusform>
       </translation>
     </message>
     <message>
@@ -7988,11 +7987,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>All users with this role will still have access to %n removed resources:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>All users with this role will still have access to %n removed resource:</numerusform>
         <numerusform>All users with this role will still have access to %n removed resource:</numerusform>
         <numerusform>All users with this role will still have access to %n removed resource:</numerusform>
-        <numerusform>All users with this role will still have access to %n removed resources:</numerusform>
+        <numerusform>All users with this role will still have access to %n removed resource:</numerusform>
       </translation>
     </message>
     <message>
@@ -8005,47 +8004,47 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>User will lose access to %n resources:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>User will lose access to %n resource:</numerusform>
         <numerusform>User will lose access to %n resource:</numerusform>
         <numerusform>User will lose access to %n resource:</numerusform>
-        <numerusform>User will lose access to %n resources:</numerusform>
+        <numerusform>User will lose access to %n resource:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>All users with this role will lose access to %n resources:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>All users with this role will lose access to %n resource:</numerusform>
         <numerusform>All users with this role will lose access to %n resource:</numerusform>
         <numerusform>All users with this role will lose access to %n resource:</numerusform>
-        <numerusform>All users with this role will lose access to %n resources:</numerusform>
+        <numerusform>All users with this role will lose access to %n resource:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n shared layouts?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Удалить %n общую раскладку?</numerusform>
         <numerusform>Удалить %n общую раскладку?</numerusform>
         <numerusform>Удалить %n общую раскладку?</numerusform>
-        <numerusform>Delete %n shared layouts?</numerusform>
+        <numerusform>Удалить %n общую раскладку?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These %n layouts are shared with other users, so you delete it for them too.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Эти %n раскладок используются совместно с другими пользователями, поэтому удаление коснется также и их.</numerusform>
         <numerusform>Эти %n раскладок используются совместно с другими пользователями, поэтому удаление коснется также и их.</numerusform>
         <numerusform>Эти %n раскладок используются совместно с другими пользователями, поэтому удаление коснется также и их.</numerusform>
-        <numerusform>These %n layouts are shared with other users, so you delete it for them too.</numerusform>
+        <numerusform>Эти %n раскладок используются совместно с другими пользователями, поэтому удаление коснется также и их.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Remove %n items from layout?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Remove %n item from layout?</numerusform>
         <numerusform>Remove %n item from layout?</numerusform>
         <numerusform>Remove %n item from layout?</numerusform>
-        <numerusform>Remove %n items from layout?</numerusform>
+        <numerusform>Remove %n item from layout?</numerusform>
       </translation>
     </message>
     <message>
@@ -8062,38 +8061,38 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n users?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Delete %n user?</numerusform>
         <numerusform>Delete %n user?</numerusform>
         <numerusform>Delete %n user?</numerusform>
-        <numerusform>Delete %n users?</numerusform>
+        <numerusform>Delete %n user?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n devices?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Delete %n device?</numerusform>
         <numerusform>Delete %n device?</numerusform>
         <numerusform>Delete %n device?</numerusform>
-        <numerusform>Delete %n devices?</numerusform>
+        <numerusform>Delete %n device?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n cameras?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Delete %n camera?</numerusform>
         <numerusform>Delete %n camera?</numerusform>
         <numerusform>Delete %n camera?</numerusform>
-        <numerusform>Delete %n cameras?</numerusform>
+        <numerusform>Delete %n camera?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n I/O Modules?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Delete %n I/O Module?</numerusform>
         <numerusform>Delete %n I/O Module?</numerusform>
         <numerusform>Delete %n I/O Module?</numerusform>
-        <numerusform>Delete %n I/O Modules?</numerusform>
+        <numerusform>Delete %n I/O Module?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -8102,34 +8101,34 @@ to %1</source>
         <numerusform>Удалить %n элемент?</numerusform>
         <numerusform>Удалить %n элемент?</numerusform>
         <numerusform>Удалить %n элемент?</numerusform>
-        <numerusform>Delete %n items?</numerusform>
+        <numerusform>Удалить %n элемента?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n of them are auto-discovered.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n of them is auto-discovered.</numerusform>
         <numerusform>%n of them is auto-discovered.</numerusform>
         <numerusform>%n of them is auto-discovered.</numerusform>
-        <numerusform>%n of them are auto-discovered.</numerusform>
+        <numerusform>%n of them is auto-discovered.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras are auto-discovered.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n camera is auto-discovered.</numerusform>
         <numerusform>%n camera is auto-discovered.</numerusform>
         <numerusform>%n camera is auto-discovered.</numerusform>
-        <numerusform>%n cameras are auto-discovered.</numerusform>
+        <numerusform>%n camera is auto-discovered.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules are auto-discovered.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n I/O module is auto-discovered.</numerusform>
         <numerusform>%n I/O module is auto-discovered.</numerusform>
         <numerusform>%n I/O module is auto-discovered.</numerusform>
-        <numerusform>%n I/O modules are auto-discovered.</numerusform>
+        <numerusform>%n I/O module is auto-discovered.</numerusform>
       </translation>
     </message>
     <message>
@@ -8146,11 +8145,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Remove %n items from showreel?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Удалить %n элемент из прокрутки?</numerusform>
         <numerusform>Удалить %n элемента из прокрутки?</numerusform>
         <numerusform>Удалить %n элементов из прокрутки?</numerusform>
-        <numerusform>Remove %n items from showreel?</numerusform>
+        <numerusform>Удалить %n элементов из прокрутки?</numerusform>
       </translation>
     </message>
     <message>
@@ -8179,7 +8178,7 @@ to %1</source>
         <numerusform>%n user</numerusform>
         <numerusform>%n пользователя</numerusform>
         <numerusform>%n пользователей</numerusform>
-        <numerusform>%n users</numerusform>
+        <numerusform>%n user</numerusform>
       </translation>
     </message>
   </context>
@@ -8757,7 +8756,7 @@ to %1</source>
         <numerusform>Failed to move %n device</numerusform>
         <numerusform>Не удалось переместить %n устройства</numerusform>
         <numerusform>Не удалось переместить %n устройств</numerusform>
-        <numerusform>Failed to move %n devices</numerusform>
+        <numerusform>Failed to move %n device</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -8766,7 +8765,7 @@ to %1</source>
         <numerusform>Failed to move %n camera</numerusform>
         <numerusform>Не удалось переместить %n камеры</numerusform>
         <numerusform>Не удалось переместить %n камер</numerusform>
-        <numerusform>Failed to move %n cameras</numerusform>
+        <numerusform>Failed to move %n camera</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -8775,7 +8774,7 @@ to %1</source>
         <numerusform>Failed to move %n I/O Module</numerusform>
         <numerusform>Не удалось переместить %n модуля ввода-вывода</numerusform>
         <numerusform>Не удалось переместить %n модулей ввода-вывода</numerusform>
-        <numerusform>Failed to move %n I/O Modules</numerusform>
+        <numerusform>Failed to move %n I/O Module</numerusform>
       </translation>
     </message>
     <message>
@@ -8788,7 +8787,7 @@ to %1</source>
         <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n устройствам. Переместить их в любом случае?</numerusform>
         <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n устройствам. Переместить их в любом случае?</numerusform>
         <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n устройствам. Переместить их в любом случае?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
+        <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n устройствам. Переместить их в любом случае?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -8797,7 +8796,7 @@ to %1</source>
         <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n камерам. Переместить их в любом случае?</numerusform>
         <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n камерам. Переместить их в любом случае?</numerusform>
         <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n камерам. Переместить их в любом случае?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
+        <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n камерам. Переместить их в любом случае?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -8806,7 +8805,7 @@ to %1</source>
         <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n устройствам. Переместить их в любом случае?</numerusform>
         <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n устройствам. Переместить их в любом случае?</numerusform>
         <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n устройствам. Переместить их в любом случае?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
+        <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n устройствам. Переместить их в любом случае?</numerusform>
       </translation>
     </message>
     <message>

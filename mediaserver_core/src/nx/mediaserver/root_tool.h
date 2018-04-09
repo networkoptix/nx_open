@@ -8,6 +8,7 @@
 #include <QtCore/QUrl>
 #include <common/common_globals.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/system_commands.h>
 #include <core/resource/abstract_storage_resource.h>
 
 namespace nx {
@@ -23,8 +24,7 @@ public:
 
     Qn::StorageInitResult mount(const QUrl& url, const QString& path);
     Qn::StorageInitResult remount(const QUrl& url, const QString& path);
-    bool unmount(const QString& path);
-
+    SystemCommands::UnmountCode unmount(const QString& path);
     bool changeOwner(const QString& path);
     bool touchFile(const QString& path);
     bool makeDirectory(const QString& path);

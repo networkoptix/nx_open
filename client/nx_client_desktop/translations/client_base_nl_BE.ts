@@ -1121,16 +1121,15 @@ to view more bookmarks</source>
       <translation>Bestand &quot;%1&quot; kan niet worden weggeschreven. Probeer een andere naam.</translation>
     </message>
     <message>
-      <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
+      <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
       <translation>De bestandsnaam &quot;%1&quot; is gereserveerd door het besturingssysteem. Probeer een andere naam.</translation>
     </message>
     <message numerus="yes">
-      <source>Filename should not contain the following reserved characters:
-%1</source>
-      <comment>Multiple form must concern characters count, not filenames!</comment>
+      <source>File name must not contain the following reserved characters:</source>
+      <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
       <translation>
-        <numerusform>De bestandsnaam mag de volgende tekens niet bevatten: %1</numerusform>
-        <numerusform>De bestandsnaam mag de volgende tekens niet bevatten: %1</numerusform>
+        <numerusform>De bestandsnaam mag de volgende tekens niet bevatten:</numerusform>
+        <numerusform>De bestandsnaam mag de volgende tekens niet bevatten:</numerusform>
       </translation>
     </message>
   </context>
@@ -3314,7 +3313,7 @@ to %1</source>
     <message>
       <source>All %1 users will be deleted.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">All %1 users will be deleted.</translation>
+      <translation>Alle %1 gebruikers zullen worden verwijderd.</translation>
     </message>
     <message>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
@@ -6857,7 +6856,7 @@ to %1</source>
     <message>
       <source>%1 user</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user</translation>
+      <translation>%1 gebruikers</translation>
     </message>
   </context>
   <context>
@@ -7094,7 +7093,7 @@ to %1</source>
     <message>
       <source>%1 user with specified email already exists.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user with specified email already exists.</translation>
+      <translation>%1 gebruiker met opgegeven email bestaat al.</translation>
     </message>
   </context>
   <context>
@@ -7339,7 +7338,7 @@ to %1</source>
     <message>
       <source>%1 Systems cannot be merged</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 Systems cannot be merged</translation>
+      <translation>%1 Systemen kunnen niet worden samengevoegd</translation>
     </message>
   </context>
   <context>

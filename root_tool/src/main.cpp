@@ -32,8 +32,6 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
                 };
         };
 
-    factory.reg({"umount", "unmount"}, {"path"},
-        oneArgAction(std::bind(&nx::SystemCommands::unmount, systemCommands, _1)));
     factory.reg({"chown"}, {"path"},
         oneArgAction(std::bind(&nx::SystemCommands::changeOwner, systemCommands, _1)));
     factory.reg({"touch"}, {"file_path"},
@@ -148,6 +146,17 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
 
             return systemCommands->fileSize(*path, /*usePipe*/ true) == -1
                 ? Result::execFailed : Result::ok;
+        });
+
+    factory.reg({"umount", "unmount"}, {"path"},
+        [systemCommands](const char** argv)
+        {
+            const auto path = getOptionalArg(argv);
+            if (!path)
+                return Result::invalidArg;
+
+            return systemCommands->unmount(*path, /*usePipe*/ true) ==
+                nx::SystemCommands::UnmountCode::ok ? Result::ok : Result::execFailed;
         });
 
     factory.reg({"help"}, {},

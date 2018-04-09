@@ -677,7 +677,7 @@
     </message>
     <message>
       <source>Licensed To: %1</source>
-      <translation>Concesso in licenza a: %s</translation>
+      <translation>Concesso in licenza a: %1</translation>
     </message>
     <message>
       <source>Watermark: %1</source>

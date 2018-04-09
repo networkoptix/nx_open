@@ -1121,16 +1121,15 @@ to view more bookmarks</source>
       <translation>El archivo &quot;%1&quot; no puede escribirse. Intenta otro nombre.</translation>
     </message>
     <message>
-      <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation>El nombre de archivo &quot;%1&quot; está reservado por el sistema operativo. Intenta otro nombre.</translation>
+      <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
+      <translation>El nombre del archivo &quot;%1&quot; está reservado por el sistema operativo. Por favor prueba con otro nombre.</translation>
     </message>
     <message numerus="yes">
-      <source>Filename should not contain the following reserved characters:
-%1</source>
-      <comment>Multiple form must concern characters count, not filenames!</comment>
+      <source>File name must not contain the following reserved characters:</source>
+      <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
       <translation>
-        <numerusform>El nombre de archivo no debe contener los siguientes caracteres reservados: %1</numerusform>
-        <numerusform>El nombre de archivo no debe contener los siguientes caracteres reservados: %1</numerusform>
+        <numerusform>El nombre de archivo no debe contener los siguientes caracteres reservados:</numerusform>
+        <numerusform>El nombre de archivo no debe contener los siguientes caracteres reservados:</numerusform>
       </translation>
     </message>
   </context>
@@ -3317,7 +3316,7 @@ a %1</translation>
     <message>
       <source>All %1 users will be deleted.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">All %1 users will be deleted.</translation>
+      <translation>Todos los %1 usuarios serán eliminados.</translation>
     </message>
     <message>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
@@ -6859,7 +6858,7 @@ a %1</translation>
     <message>
       <source>%1 user</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user</translation>
+      <translation>%1 usuario</translation>
     </message>
   </context>
   <context>
@@ -7096,7 +7095,7 @@ a %1</translation>
     <message>
       <source>%1 user with specified email already exists.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user with specified email already exists.</translation>
+      <translation>%1 usuario con el correo electrónico especificado ya existe.</translation>
     </message>
   </context>
   <context>
@@ -7341,7 +7340,7 @@ a %1</translation>
     <message>
       <source>%1 Systems cannot be merged</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 Systems cannot be merged</translation>
+      <translation>%1 Sistemas no se pueden fusionar</translation>
     </message>
   </context>
   <context>

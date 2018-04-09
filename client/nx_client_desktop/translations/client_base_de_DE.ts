@@ -1121,16 +1121,15 @@ to view more bookmarks</source>
       <translation>Die Datei &quot;%1&quot; kann nicht beschrieben werden. Bitte versuchen Sie einen anderen Namen.</translation>
     </message>
     <message>
-      <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
+      <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
       <translation>Der Dateiname &quot;%1&quot; ist vom Betriebssystem reserviert. Bitte versuchen Sie einen anderen Namen.</translation>
     </message>
     <message numerus="yes">
-      <source>Filename should not contain the following reserved characters:
-%1</source>
-      <comment>Multiple form must concern characters count, not filenames!</comment>
+      <source>File name must not contain the following reserved characters:</source>
+      <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
       <translation>
-        <numerusform>Dateiname sollte nicht die folgenden reservierten Zeichen enthalten: %1</numerusform>
-        <numerusform>Dateiname sollte nicht die folgenden reservierten Zeichen enthalten: %1</numerusform>
+        <numerusform>Der Dateiname darf das folgende Zeichen nicht enthalten:</numerusform>
+        <numerusform>Der Dateiname darf die folgenden Zeichen nicht enthalten:</numerusform>
       </translation>
     </message>
   </context>
@@ -3314,7 +3313,7 @@ to %1</source>
     <message>
       <source>All %1 users will be deleted.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">All %1 users will be deleted.</translation>
+      <translation>Alle %1benutzer werden gelöscht.</translation>
     </message>
     <message>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
@@ -6857,7 +6856,7 @@ to %1</source>
     <message>
       <source>%1 user</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user</translation>
+      <translation>%1benutzer</translation>
     </message>
   </context>
   <context>
@@ -7094,7 +7093,7 @@ to %1</source>
     <message>
       <source>%1 user with specified email already exists.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user with specified email already exists.</translation>
+      <translation>%1benutzer mit angegebener Email existiert bereits.</translation>
     </message>
   </context>
   <context>
@@ -7339,7 +7338,7 @@ to %1</source>
     <message>
       <source>%1 Systems cannot be merged</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 Systems cannot be merged</translation>
+      <translation>%1systeme können nicht zusammengeführt werden</translation>
     </message>
   </context>
   <context>
