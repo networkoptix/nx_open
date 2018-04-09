@@ -54,8 +54,8 @@ let NxSystemsDropdown = class NxSystemsDropdown {
     }
     ngOnChanges(changes) {
         this.updateActive();
-        this.systems = changes.systems.currentValue;
-        this.activeSystem = changes.activeSystem.currentValue;
+        this.systems = (changes.systems) ? changes.systems.currentValue : this.systems;
+        this.activeSystem = (changes.activeSystem) ? changes.activeSystem.currentValue : this.activeSystem;
         this.systemCounter = this.systems.length;
     }
 };
