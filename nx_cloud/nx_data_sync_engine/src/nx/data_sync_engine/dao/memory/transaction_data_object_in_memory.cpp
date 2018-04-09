@@ -84,8 +84,8 @@ nx::utils::db::DBResult TransactionDataObject::fetchTransactionsOfAPeerQuery(
 {
     QnMutexLocker lk(&m_mutex);
 
-    const TransactionKey from{systemId, peerId, dbInstanceId, minSequence};
-    const TransactionKey to{systemId, peerId, dbInstanceId, maxSequence};
+    const TransactionKey from{{systemId, peerId, dbInstanceId}, minSequence};
+    const TransactionKey to{{systemId, peerId, dbInstanceId}, maxSequence};
     const auto& indexBySourceAndSequence = m_transactions.get<kIndexBySourceAndSequence>();
     auto tranIter = indexBySourceAndSequence.lower_bound(from);
     for (;

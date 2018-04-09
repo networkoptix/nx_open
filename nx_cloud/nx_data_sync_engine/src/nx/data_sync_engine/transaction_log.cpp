@@ -49,7 +49,7 @@ void TransactionLog::startDbTransaction(
             }
             return dbOperationsFunc(queryContext);
         },
-        [this, systemId, onDbUpdateCompleted = std::move(onDbUpdateCompleted)](
+        [systemId, onDbUpdateCompleted = std::move(onDbUpdateCompleted)](
             nx::utils::db::QueryContext* queryContext,
             nx::utils::db::DBResult dbResult)
         {
