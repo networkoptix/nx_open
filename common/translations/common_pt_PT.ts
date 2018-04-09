@@ -1477,7 +1477,7 @@
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Users</numerusform>
         <numerusform>%n Users</numerusform>
       </translation>

@@ -6,12 +6,12 @@
     <message>
       <location filename="../src/ui/dialogs/about_dialog.ui"/>
       <source>About</source>
-      <translation type="unfinished">About</translation>
+      <translation>Informazioni su</translation>
     </message>
     <message>
       <location/>
       <source>Information</source>
-      <translation type="unfinished">Information</translation>
+      <translation>Informazioni</translation>
     </message>
     <message>
       <location/>
@@ -62,7 +62,7 @@
     <message>
       <location/>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Automatico</translation>
     </message>
     <message>
       <location/>
@@ -184,7 +184,7 @@
     <message>
       <location/>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Automatico</translation>
     </message>
     <message>
       <location/>
@@ -295,7 +295,7 @@
     <message>
       <location/>
       <source>Mbit/s</source>
-      <translation type="unfinished">Mbit/s</translation>
+      <translation>Mbit / s</translation>
     </message>
     <message>
       <location/>
@@ -310,7 +310,7 @@
     <message>
       <location/>
       <source>Start</source>
-      <translation type="unfinished">Start</translation>
+      <translation>Avvio</translation>
     </message>
   </context>
   <context>
@@ -361,7 +361,7 @@
     <message>
       <location/>
       <source>seconds</source>
-      <translation type="unfinished">seconds</translation>
+      <translation>secondi</translation>
     </message>
     <message>
       <location/>
@@ -389,7 +389,7 @@
     <message>
       <location/>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Elimina</translation>
     </message>
     <message>
       <location/>
@@ -417,7 +417,7 @@
     <message>
       <location/>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nome</translation>
     </message>
     <message>
       <location/>
@@ -463,7 +463,7 @@
     <message>
       <location filename="../src/ui/widgets/business/business_rule_widget.ui"/>
       <source>Event</source>
-      <translation type="unfinished">Event</translation>
+      <translation>Evento</translation>
     </message>
     <message>
       <location/>
@@ -493,7 +493,7 @@
     <message>
       <location/>
       <source>At</source>
-      <translation type="unfinished">At</translation>
+      <translation>A</translation>
     </message>
   </context>
   <context>
@@ -506,7 +506,7 @@
     <message>
       <location/>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Elimina</translation>
     </message>
     <message>
       <location/>
@@ -539,7 +539,7 @@
     <message>
       <location/>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Automatico</translation>
     </message>
     <message>
       <location/>
@@ -554,7 +554,7 @@
     <message>
       <location/>
       <source>Stop</source>
-      <translation type="unfinished">Stop</translation>
+      <translation>Stop</translation>
     </message>
     <message>
       <location/>
@@ -609,12 +609,12 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <location/>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Accesso</translation>
     </message>
     <message>
       <location/>
@@ -660,7 +660,7 @@
     <message>
       <location/>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Automatico</translation>
     </message>
     <message>
       <location/>
@@ -675,7 +675,7 @@
     <message>
       <location/>
       <source>Restore Defaults</source>
-      <translation type="unfinished">Restore Defaults</translation>
+      <translation>Ripristinare le impostazioni Predefinite</translation>
     </message>
     <message>
       <location/>
@@ -760,7 +760,7 @@
     <message>
       <location/>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>Reset</translation>
     </message>
     <message>
       <location/>
@@ -794,7 +794,7 @@
     <message>
       <location/>
       <source>seconds</source>
-      <translation type="unfinished">seconds</translation>
+      <translation>secondi</translation>
     </message>
     <message>
       <location/>
@@ -905,7 +905,7 @@
     <message>
       <location filename="../src/ui/dialogs/resource_properties/change_user_password_dialog.ui"/>
       <source>Change password</source>
-      <translation type="unfinished">Change password</translation>
+      <translation>Cambia Password</translation>
     </message>
   </context>
   <context>
@@ -931,7 +931,7 @@
     <message>
       <location/>
       <source>Save password</source>
-      <translation type="unfinished">Save password</translation>
+      <translation>Salva password</translation>
     </message>
   </context>
   <context>
@@ -1034,7 +1034,7 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Accesso</translation>
     </message>
     <message>
       <location/>
@@ -1044,7 +1044,7 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <location/>
@@ -1187,7 +1187,7 @@
     <message>
       <location/>
       <source>Size</source>
-      <translation type="unfinished">Size</translation>
+      <translation>Dimensione</translation>
     </message>
     <message>
       <location/>
@@ -1225,7 +1225,7 @@
     <message>
       <location/>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Rimuovere</translation>
     </message>
     <message>
       <location/>
@@ -1294,17 +1294,17 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/image_overlay_settings_widget.ui"/>
       <source>Image</source>
-      <translation type="unfinished">Image</translation>
+      <translation>Immagine</translation>
     </message>
     <message>
       <location/>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Elimina</translation>
     </message>
     <message>
       <location/>
       <source>Size</source>
-      <translation type="unfinished">Size</translation>
+      <translation>Dimensione</translation>
     </message>
     <message>
       <location/>
@@ -1337,7 +1337,7 @@
     <message>
       <location/>
       <source>No image</source>
-      <translation type="unfinished">No image</translation>
+      <translation>Nessuna immagine</translation>
     </message>
   </context>
   <context>
@@ -1405,7 +1405,7 @@
     <message>
       <location/>
       <source>Opacity:</source>
-      <translation type="unfinished">Opacity:</translation>
+      <translation>Opacità:</translation>
     </message>
   </context>
   <context>
@@ -1443,7 +1443,7 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <location/>
@@ -1466,7 +1466,7 @@
     <message>
       <location/>
       <source>Loading...</source>
-      <translation type="unfinished">Loading...</translation>
+      <translation>Caricamento in corso...</translation>
     </message>
     <message>
       <location/>
@@ -1527,7 +1527,7 @@
     <message>
       <location/>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Rimuovere</translation>
     </message>
     <message>
       <location/>
@@ -1613,7 +1613,7 @@
     <message>
       <location/>
       <source>Hardware Id</source>
-      <translation type="unfinished">Hardware Id</translation>
+      <translation>Id hardware</translation>
     </message>
   </context>
   <context>
@@ -1647,7 +1647,7 @@
     <message>
       <location/>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Elimina</translation>
     </message>
     <message>
       <location/>
@@ -1667,12 +1667,12 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Accesso</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <location/>
@@ -1715,7 +1715,7 @@
     <message>
       <location/>
       <source>Image</source>
-      <translation type="unfinished">Image</translation>
+      <translation>Immagine</translation>
     </message>
     <message>
       <location/>
@@ -1735,7 +1735,7 @@
     <message>
       <location/>
       <source>seconds</source>
-      <translation type="unfinished">seconds</translation>
+      <translation>secondi</translation>
     </message>
     <message>
       <location/>
@@ -1766,12 +1766,12 @@
     <message>
       <location/>
       <source>Password:</source>
-      <translation type="unfinished">Password:</translation>
+      <translation>Password:</translation>
     </message>
     <message>
       <location/>
       <source>Login:</source>
-      <translation type="unfinished">Login:</translation>
+      <translation>Accesso:</translation>
     </message>
     <message>
       <location/>
@@ -1891,7 +1891,7 @@
     <message>
       <location/>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Elimina</translation>
     </message>
     <message>
       <location/>
@@ -1929,7 +1929,7 @@
     <message>
       <location/>
       <source>Name:</source>
-      <translation type="unfinished">Name:</translation>
+      <translation>Nome:</translation>
     </message>
     <message>
       <location/>
@@ -1963,7 +1963,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui"/>
       <source>Bookmark</source>
-      <translation type="unfinished">Bookmark</translation>
+      <translation>Segnalibro</translation>
     </message>
   </context>
   <context>
@@ -1984,7 +1984,7 @@
     <message>
       <location/>
       <source>Password:</source>
-      <translation type="unfinished">Password:</translation>
+      <translation>Password:</translation>
     </message>
     <message>
       <location/>
@@ -2010,7 +2010,7 @@
     <message>
       <location filename="../src/ui/dialogs/cloud/login_to_cloud_dialog.ui"/>
       <source>Log in</source>
-      <translation type="unfinished">Log in</translation>
+      <translation>Accesso</translation>
     </message>
     <message>
       <location/>
@@ -2041,7 +2041,7 @@
     <message>
       <location/>
       <source>Password:</source>
-      <translation type="unfinished">Password:</translation>
+      <translation>Password:</translation>
     </message>
     <message>
       <location/>
@@ -2051,7 +2051,7 @@
     <message>
       <location/>
       <source>Login:</source>
-      <translation type="unfinished">Login:</translation>
+      <translation>Accesso:</translation>
     </message>
     <message>
       <location/>
@@ -2069,7 +2069,7 @@
     <message>
       <location/>
       <source>Play</source>
-      <translation type="unfinished">Play</translation>
+      <translation>Riproduci</translation>
     </message>
     <message>
       <location/>
@@ -2105,7 +2105,7 @@
     <message>
       <location/>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Rimuovere</translation>
     </message>
     <message>
       <location/>
@@ -2123,7 +2123,7 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/server_updates_widget.ui"/>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Annulla</translation>
     </message>
     <message>
       <location/>
@@ -2169,7 +2169,7 @@
     <message>
       <location filename="../src/ui/dialogs/two_step_file_dialog.ui"/>
       <source>Folder:</source>
-      <translation type="unfinished">Folder:</translation>
+      <translation>Cartella:</translation>
     </message>
     <message>
       <location/>
@@ -2184,12 +2184,12 @@
     <message>
       <location/>
       <source>Format:</source>
-      <translation type="unfinished">Format:</translation>
+      <translation>Formato:</translation>
     </message>
     <message>
       <location/>
       <source>Options</source>
-      <translation type="unfinished">Options</translation>
+      <translation>Opzioni</translation>
     </message>
     <message>
       <location/>
@@ -2324,7 +2324,7 @@
     <message>
       <location/>
       <source>s</source>
-      <translation type="unfinished">s</translation>
+      <translation>s</translation>
     </message>
     <message>
       <location/>
@@ -2349,7 +2349,7 @@
     <message>
       <location/>
       <source>seconds</source>
-      <translation type="unfinished">seconds</translation>
+      <translation>secondi</translation>
     </message>
   </context>
   <context>
@@ -2397,7 +2397,7 @@
     <message>
       <location/>
       <source>Source</source>
-      <translation type="unfinished">Source</translation>
+      <translation>Fonte</translation>
     </message>
     <message>
       <location/>
@@ -2415,7 +2415,7 @@
     <message>
       <location/>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Ricerca</translation>
     </message>
   </context>
   <context>
@@ -2479,7 +2479,7 @@
     <message>
       <location/>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nome</translation>
     </message>
     <message>
       <location/>
@@ -2515,7 +2515,7 @@
     <message>
       <location filename="../src/ui/widgets/business/show_text_overlay_action_widget.ui"/>
       <source>seconds</source>
-      <translation type="unfinished">seconds</translation>
+      <translation>secondi</translation>
     </message>
     <message>
       <location/>
@@ -2626,7 +2626,7 @@
     <message>
       <location/>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nome</translation>
     </message>
     <message>
       <location/>
@@ -2651,12 +2651,12 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Accesso</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <location/>
@@ -2681,7 +2681,7 @@
     <message>
       <location/>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>Reset</translation>
     </message>
   </context>
   <context>
@@ -2765,12 +2765,12 @@
     <message>
       <location/>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>Ok</translation>
     </message>
     <message>
       <location/>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Annulla</translation>
     </message>
   </context>
   <context>
@@ -2783,7 +2783,7 @@
     <message>
       <location/>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nome</translation>
     </message>
     <message>
       <location/>
@@ -2819,7 +2819,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/storage_config_widget.ui"/>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Annulla</translation>
     </message>
     <message>
       <location/>
@@ -2862,7 +2862,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/storage_rebuild_widget.ui"/>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Annulla</translation>
     </message>
   </context>
   <context>
@@ -2885,12 +2885,12 @@
     <message>
       <location/>
       <source>Login:</source>
-      <translation type="unfinished">Login:</translation>
+      <translation>Accesso:</translation>
     </message>
     <message>
       <location/>
       <source>Password:</source>
-      <translation type="unfinished">Password:</translation>
+      <translation>Password:</translation>
     </message>
   </context>
   <context>
@@ -2898,7 +2898,7 @@
     <message>
       <location filename="../src/nx/client/desktop/ui/event_rules/subject_selection_dialog.ui"/>
       <source>Roles</source>
-      <translation type="unfinished">Roles</translation>
+      <translation>Ruoli</translation>
     </message>
     <message>
       <location/>
@@ -2949,7 +2949,7 @@
     <message>
       <location/>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Elimina</translation>
     </message>
     <message>
       <location/>
@@ -3000,7 +3000,7 @@
     <message>
       <location/>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Elimina</translation>
     </message>
   </context>
   <context>
@@ -3016,12 +3016,12 @@
     <message>
       <location filename="../src/ui/widgets/properties/user_role_settings_widget.ui"/>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nome</translation>
     </message>
     <message>
       <location/>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Utenti</translation>
     </message>
     <message>
       <location/>
@@ -3062,7 +3062,7 @@
     <message>
       <location/>
       <source>Role</source>
-      <translation type="unfinished">Role</translation>
+      <translation>Ruolo</translation>
     </message>
     <message>
       <location/>
@@ -3093,7 +3093,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Annulla</translation>
     </message>
   </context>
   <context>
@@ -3132,7 +3132,7 @@
     <message>
       <location/>
       <source>On</source>
-      <translation type="unfinished">On</translation>
+      <translation>Sul</translation>
     </message>
     <message>
       <location/>

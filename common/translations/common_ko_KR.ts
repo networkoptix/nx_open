@@ -79,7 +79,7 @@
     <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 System can only be merged with non-%1. System name and password are taken from %1 System.</translation>
+      <translation>%1시스템은 %1이외의 항목과 만 병합 할 수 있습니다. 시스템 이름과 암호는 %1 시스템에서 가져옵니다.</translation>
     </message>
     <message>
       <source>Both Systems are connected to %1. Merge is not allowed.</source>

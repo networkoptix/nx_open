@@ -1122,16 +1122,14 @@ to view more bookmarks</source>
       <translation>檔案 &quot;%1&quot; 無法儲存. 請嘗試另一個名稱.</translation>
     </message>
     <message>
-      <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation>檔名 &quot;%1&quot; 被作業系統保留. 請嘗試另一個檔名.</translation>
+      <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
+      <translation type="unfinished">File name &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
     </message>
     <message numerus="yes">
-      <source>Filename should not contain the following reserved characters:
-%1</source>
-      <comment>Multiple form must concern characters count, not filenames!</comment>
-      <translation>
-        <numerusform>檔名不可包含以下字元:
-%1</numerusform>
+      <source>File name must not contain the following reserved characters:</source>
+      <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
+      <translation type="unfinished">
+        <numerusform>File name must not contain the following reserved characters:</numerusform>
       </translation>
     </message>
   </context>

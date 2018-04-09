@@ -1121,18 +1121,17 @@ to view more bookmarks</source>
       <translation>לא ניתן לכתוב את הקובץ &quot;%1&quot;. נסה שם אחר.</translation>
     </message>
     <message>
-      <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation>שם הקובץ &quot;%1&quot; שמור על ידי מערכת ההפעלה. נסה שם אחר.</translation>
+      <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
+      <translation type="unfinished">File name &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
     </message>
     <message numerus="yes">
-      <source>Filename should not contain the following reserved characters:
-%1</source>
-      <comment>Multiple form must concern characters count, not filenames!</comment>
-      <translation>
-        <numerusform>שם הקובץ לא אמור להכיל את התווים השמורים הבאים: %1</numerusform>
-        <numerusform>שם הקובץ לא אמור להכיל את התווים השמורים הבאים: %1</numerusform>
-        <numerusform>שם הקובץ לא אמור להכיל את התווים השמורים הבאים: %1</numerusform>
-        <numerusform>שם הקובץ לא אמור להכיל את התווים השמורים הבאים: %1</numerusform>
+      <source>File name must not contain the following reserved characters:</source>
+      <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
+      <translation type="unfinished">
+        <numerusform>File name must not contain the following reserved characters:</numerusform>
+        <numerusform>File name must not contain the following reserved characters:</numerusform>
+        <numerusform>File name must not contain the following reserved characters:</numerusform>
+        <numerusform>File name must not contain the following reserved characters:</numerusform>
       </translation>
     </message>
   </context>
@@ -1201,8 +1200,8 @@ to view more bookmarks</source>
       <translation type="unfinished">
         <numerusform>הסיסמה חייבת להיות פחות מ %n תווים.</numerusform>
         <numerusform>הסיסמה חייבת להיות פחות מ %n תווים.</numerusform>
-        <numerusform>Password must be no longer than %n characters.</numerusform>
-        <numerusform>Password must be no longer than %n characters.</numerusform>
+        <numerusform>הסיסמה חייבת להיות פחות מ %n תווים.</numerusform>
+        <numerusform>הסיסמה חייבת להיות פחות מ %n תווים.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1211,16 +1210,16 @@ to view more bookmarks</source>
         <numerusform>הסיסמה לא תכיל %n תווים או יותר רצופים ביחד.</numerusform>
         <numerusform>הסיסמה לא צריכה להכיל %n תווים או יותר רצופים ביחד.</numerusform>
         <numerusform>הסיסמה לאי כולה להכיל %n תווים או יותר רצופים ביחד.</numerusform>
-        <numerusform>Password should not contain %n or more consecutive characters together.</numerusform>
+        <numerusform>הסיסמה לא תכיל %n תווים או יותר רצופים ביחד.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters.</source>
       <translation type="unfinished">
         <numerusform>הסיסמה לא תכיל %n תווים חוזרים או יותר.</numerusform>
-        <numerusform>Password should not contain %n or more repeating characters.</numerusform>
-        <numerusform>Password should not contain %n or more repeating characters.</numerusform>
-        <numerusform>Password should not contain %n or more repeating characters.</numerusform>
+        <numerusform>הסיסמה לא תכיל %n תווים חוזרים או יותר.</numerusform>
+        <numerusform>הסיסמה לא תכיל %n תווים חוזרים או יותר.</numerusform>
+        <numerusform>הסיסמה לא תכיל %n תווים חוזרים או יותר.</numerusform>
       </translation>
     </message>
     <message>
@@ -4351,9 +4350,9 @@ to %1</source>
       <source>Use licenses to view these %n cameras</source>
       <translation type="unfinished">
         <numerusform>השתמש ברישיונות עבור צפיה %n במצלמות שנבחרו</numerusform>
-        <numerusform>Use licenses to view these %n cameras</numerusform>
-        <numerusform>Use licenses to view these %n cameras</numerusform>
-        <numerusform>Use licenses to view these %n cameras</numerusform>
+        <numerusform>השתמש ברישיונות עבור צפיה %n במצלמות שנבחרו</numerusform>
+        <numerusform>השתמש ברישיונות עבור צפיה %n במצלמות שנבחרו</numerusform>
+        <numerusform>השתמש ברישיונות עבור צפיה %n במצלמות שנבחרו</numerusform>
       </translation>
     </message>
   </context>
@@ -4602,9 +4601,9 @@ to %1</source>
       <source>Set for all %n Cameras</source>
       <translation type="unfinished">
         <numerusform>הגדר עבור כל %n מצלמות</numerusform>
-        <numerusform>Set for all %n Cameras</numerusform>
-        <numerusform>Set for all %n Cameras</numerusform>
-        <numerusform>Set for all %n Cameras</numerusform>
+        <numerusform>הגדר עבור כל %n מצלמות</numerusform>
+        <numerusform>הגדר עבור כל %n מצלמות</numerusform>
+        <numerusform>הגדר עבור כל %n מצלמות</numerusform>
       </translation>
     </message>
   </context>
@@ -7827,7 +7826,7 @@ to %1</source>
     <message numerus="yes">
       <source>Selected files cover periods for which videos have already been uploaded</source>
       <translation type="unfinished">
-        <numerusform>%1 מכסה את הזמן שבו הסרטון כבר הועלה</numerusform>
+        <numerusform>מכסה את הזמן שבו הסרטון כבר הועלה</numerusform>
         <numerusform>%1 נמצא באותו זמן שבו הסרטון כבר הועלה</numerusform>
         <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
         <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
@@ -8396,9 +8395,9 @@ to %1</source>
       <source>For exporting as Rapid Review video length should be at least %n seconds.</source>
       <translation type="unfinished">
         <numerusform>עבור ייצוא כ Rapid Review אורך וידאו צריך להיות לפחות %n שניות.</numerusform>
-        <numerusform>For exporting as Rapid Review video length should be at least %n seconds.</numerusform>
-        <numerusform>For exporting as Rapid Review video length should be at least %n seconds.</numerusform>
-        <numerusform>For exporting as Rapid Review video length should be at least %n seconds.</numerusform>
+        <numerusform>עבור ייצוא כ Rapid Review אורך וידאו צריך להיות לפחות %n שניות.</numerusform>
+        <numerusform>עבור ייצוא כ Rapid Review אורך וידאו צריך להיות לפחות %n שניות.</numerusform>
+        <numerusform>עבור ייצוא כ Rapid Review אורך וידאו צריך להיות לפחות %n שניות.</numerusform>
       </translation>
     </message>
   </context>

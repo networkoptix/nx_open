@@ -873,7 +873,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Export Video...</source>
-      <translation>ส่งออกวิดีโอ </translation>
+      <translation>ส่งออกวิดีโอ</translation>
     </message>
     <message>
       <source>Export Bookmark...</source>
@@ -881,7 +881,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Resolution...</source>
-      <translation>ความละเอียด </translation>
+      <translation>ความละเอียด</translation>
     </message>
     <message>
       <source>Cell Aspect Ratio...</source>
@@ -1121,15 +1121,14 @@ to view more bookmarks</source>
       <translation>ไฟล์ "%1" อยู่แล้ว โปรดลองใช้ชื่ออื่น</translation>
     </message>
     <message>
-      <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation>ชื่อไฟล์ &quot;%1&quot; สงวนไว้สำหรับระบบปฏิบัติการ โปรดลองชื่ออื่น</translation>
+      <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
+      <translation type="unfinished">File name &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
     </message>
     <message numerus="yes">
-      <source>Filename should not contain the following reserved characters:
-%1</source>
-      <comment>Multiple form must concern characters count, not filenames!</comment>
-      <translation>
-        <numerusform>ชื่อไฟล์ไม่ควรมีอักขระสงวนไว้ต่อไปนี้: %1</numerusform>
+      <source>File name must not contain the following reserved characters:</source>
+      <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
+      <translation type="unfinished">
+        <numerusform>File name must not contain the following reserved characters:</numerusform>
       </translation>
     </message>
   </context>

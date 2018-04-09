@@ -986,11 +986,11 @@
     </message>
     <message>
       <source>Advanced Viewer</source>
-      <translation>進階瀏覽</translation>
+      <translation>進階瀏覽者</translation>
     </message>
     <message>
       <source>Viewer</source>
-      <translation>瀏覽</translation>
+      <translation>瀏覽者</translation>
     </message>
     <message>
       <source>Live Viewer</source>

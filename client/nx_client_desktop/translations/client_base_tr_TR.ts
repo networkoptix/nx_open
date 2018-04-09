@@ -1121,16 +1121,15 @@ to view more bookmarks</source>
       <translation>"%1" dosyası zaten var. Lütfen başka bir ad deneyin.</translation>
     </message>
     <message>
-      <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation>&quot;%1&quot; dosyası başka bir işlem tarafından kullanılıyor. Lütfen başka bir isim deneyin.</translation>
+      <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
+      <translation type="unfinished">File name &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
     </message>
     <message numerus="yes">
-      <source>Filename should not contain the following reserved characters:
-%1</source>
-      <comment>Multiple form must concern characters count, not filenames!</comment>
-      <translation>
-        <numerusform>Dosya adı ayrılmış şu karakterler içermemelidir: %1</numerusform>
-        <numerusform>Dosya adı ayrılmış şu karakterleri içermemelidir: %1</numerusform>
+      <source>File name must not contain the following reserved characters:</source>
+      <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
+      <translation type="unfinished">
+        <numerusform>File name must not contain the following reserved characters:</numerusform>
+        <numerusform>File name must not contain the following reserved characters:</numerusform>
       </translation>
     </message>
   </context>
@@ -1183,7 +1182,7 @@ to view more bookmarks</source>
       <source>Password must be at least %n characters long.</source>
       <translation type="unfinished">
         <numerusform>Şifre en az %n karakterden oluşmalıdır.</numerusform>
-        <numerusform>Password must be at least %n characters long.</numerusform>
+        <numerusform>Şifre en az %n karakterden oluşmalıdır.</numerusform>
       </translation>
     </message>
     <message>
@@ -1193,21 +1192,21 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>Password must be no longer than %n characters.</source>
       <translation type="unfinished">
-        <numerusform>Password must be no longer than %n characters.</numerusform>
+        <numerusform>Parola %n karakterden uzun olmak zorundadır.</numerusform>
         <numerusform>Parola %n karakterden uzun olmak zorundadır.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more consecutive characters together.</source>
       <translation type="unfinished">
-        <numerusform>Password should not contain %n or more consecutive characters together.</numerusform>
+        <numerusform>Parola %n veya daha fazla ardışık karakter içermemelidir.</numerusform>
         <numerusform>Parola %n veya daha fazla ardışık karakter içermemelidir.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters.</source>
       <translation type="unfinished">
-        <numerusform>Password should not contain %n or more repeating characters.</numerusform>
+        <numerusform>Parola %n veya daha fazla ardışık karakter içermemelidir.</numerusform>
         <numerusform>Parola %n veya daha fazla ardışık karakter içermemelidir.</numerusform>
       </translation>
     </message>

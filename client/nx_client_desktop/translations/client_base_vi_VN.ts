@@ -1122,15 +1122,14 @@ to view more bookmarks</source>
       <translation>Không thể ghi tệp &quot;%1&quot;. Hãy thử với tên khác.</translation>
     </message>
     <message>
-      <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation>Tên tệp &quot;%1&quot; được dành riêng cho hệ điều hành. Hãy thử lại với tên khác.</translation>
+      <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
+      <translation type="unfinished">File name &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
     </message>
     <message numerus="yes">
-      <source>Filename should not contain the following reserved characters:
-%1</source>
-      <comment>Multiple form must concern characters count, not filenames!</comment>
-      <translation>
-        <numerusform>Tên tệp không được chứa các ký tự dự sau: %1</numerusform>
+      <source>File name must not contain the following reserved characters:</source>
+      <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
+      <translation type="unfinished">
+        <numerusform>File name must not contain the following reserved characters:</numerusform>
       </translation>
     </message>
   </context>
@@ -4621,7 +4620,7 @@ to %1</source>
     </message>
     <message>
       <source>Wearable Camera %1</source>
-      <translation>Camera đeo người</translation>
+      <translation>Camera đeo người %1</translation>
     </message>
     <message>
       <source>Name</source>
@@ -7595,7 +7594,7 @@ to %1</source>
     <message numerus="yes">
       <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
       <translation>
-        <numerusform>Tệp đã chọn đã được ghi lại trên %1, nhưng chỉ có thể tải lên các tệp được ghi lại trong %n ngày qua. Bạn có thể thay đổi điều này trong cài đặt lưu trữ trên camera.</numerusform>
+        <numerusform>Tệp đã chọn đã được ghi lại trên %1 và %2, nhưng chỉ có thể tải lên các tệp được ghi lại trong %n ngày qua. Bạn có thể thay đổi điều này trong cài đặt lưu trữ trên camera.</numerusform>
       </translation>
     </message>
     <message numerus="yes">

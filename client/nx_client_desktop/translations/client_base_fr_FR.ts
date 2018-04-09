@@ -1122,16 +1122,15 @@ pour afficher plus de signets</translation>
       <translation>Fichier &quot;%1&quot; ne peut pas être écrit. Veuillez essayer un autre nom.</translation>
     </message>
     <message>
-      <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation>Nom de fichier &quot;%1&quot; est réservé par le système d'exploitation. Veuillez essayer un autre nom.</translation>
+      <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
+      <translation type="unfinished">File name &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
     </message>
     <message numerus="yes">
-      <source>Filename should not contain the following reserved characters:
-%1</source>
-      <comment>Multiple form must concern characters count, not filenames!</comment>
-      <translation>
-        <numerusform>Nom du fichier ne doit pas contenir les caractères réservés suivants: %1</numerusform>
-        <numerusform>Nom du fichier ne doit pas contenir les caractères réservés suivants: %1</numerusform>
+      <source>File name must not contain the following reserved characters:</source>
+      <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
+      <translation type="unfinished">
+        <numerusform>File name must not contain the following reserved characters:</numerusform>
+        <numerusform>File name must not contain the following reserved characters:</numerusform>
       </translation>
     </message>
   </context>

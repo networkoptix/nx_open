@@ -919,7 +919,7 @@
     <message numerus="yes">
       <source>seconds</source>
       <comment>Full suffix for displaying seconds</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>seconds</numerusform>
         <numerusform>seconds</numerusform>
       </translation>
@@ -927,7 +927,7 @@
     <message numerus="yes">
       <source>minutes</source>
       <comment>Full suffix for displaying minutes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>minutes</numerusform>
         <numerusform>minutes</numerusform>
       </translation>
@@ -1477,7 +1477,7 @@
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Users</numerusform>
         <numerusform>%n Users</numerusform>
       </translation>
