@@ -523,6 +523,8 @@
                 "BOSCH|VJT-X40XF-E",
                 "CAP|NVN4100",
                 "DS-6701HWI|Embedded Net DVS",
+                "DS-6716HQHI-SATA|Embedded_Net_DVR", 
+                "Hangzhou Hikvision Digital Technology Co., Ltd|DS-6716HQHI-SATA",
                 "GrandStream|GXV3504",
                 "Hikvision|DS-6701*",
                 "Hikvision|DS-6704*",
@@ -2477,6 +2479,33 @@
                         "space": "35MmEquiv"
                     }
                 }
+            }
+        },
+        {
+            "keys": [
+                "DS-6716HQHI-SATA|Embedded_Net_DVR", "Hangzhou Hikvision Digital Technology Co., Ltd|DS-6716HQHI-SATA"
+            ],
+            "forcedOnvifParams":
+            {
+                "videoEncoders":
+                [
+                    "VideoEncoderConfigurationToken001,VideoEncoderConfigurationToken017",
+                    "VideoEncoderConfigurationToken002,VideoEncoderConfigurationToken018",
+                    "VideoEncoderConfigurationToken003,VideoEncoderConfigurationToken019",
+                    "VideoEncoderConfigurationToken004,VideoEncoderConfigurationToken020",
+                    "VideoEncoderConfigurationToken005,VideoEncoderConfigurationToken021",
+                    "VideoEncoderConfigurationToken006,VideoEncoderConfigurationToken022",
+                    "VideoEncoderConfigurationToken007,VideoEncoderConfigurationToken023",
+                    "VideoEncoderConfigurationToken008,VideoEncoderConfigurationToken024",
+                    "VideoEncoderConfigurationToken009,VideoEncoderConfigurationToken025",
+                    "VideoEncoderConfigurationToken010,VideoEncoderConfigurationToken026",
+                    "VideoEncoderConfigurationToken011,VideoEncoderConfigurationToken027",
+                    "VideoEncoderConfigurationToken012,VideoEncoderConfigurationToken028",
+                    "VideoEncoderConfigurationToken013,VideoEncoderConfigurationToken029",
+                    "VideoEncoderConfigurationToken014,VideoEncoderConfigurationToken030",
+                    "VideoEncoderConfigurationToken015,VideoEncoderConfigurationToken031",
+                    "VideoEncoderConfigurationToken016,VideoEncoderConfigurationToken032"
+                ]
             }
         }        
     ]
