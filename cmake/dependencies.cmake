@@ -14,6 +14,7 @@ function(_nx_create_vms_configuration)
 
     set(content "def cmake_to_bool(value): return value.lower() in ('on', 'true')\n\n")
     string(APPEND content "PACKAGES_DIR = '${PACKAGES_DIR}'\n")
+    string(APPEND content "rdepSync = cmake_to_bool('${rdepSync}')\n")
     string(APPEND content "prefer_debug_packages = ${prefer_debug_packages}\n")
     string(APPEND content "cmake_include_file = '${CMAKE_BINARY_DIR}/dependencies.cmake'\n")
     string(APPEND content "platform = '${platform}'\n")
