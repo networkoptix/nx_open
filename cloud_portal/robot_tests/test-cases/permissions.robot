@@ -72,7 +72,7 @@ After closing dialog, called by link - clear link
 #Check Background Click
     Go To    ${location}/share
     Wait Until Elements Are Visible    ${SHARE MODAL}    //div[@uib-modal-window="modal-window"]
-    Click Element At Coordinates    //div[@uib-modal-window="modal-window"]    100    100
+    Click Element At Coordinates    //div[@uib-modal-window="modal-window"]    50    50
     Wait Until Page Does Not Contain Element    ${SHARE MODAL}
     Location Should Be    ${location}
 
