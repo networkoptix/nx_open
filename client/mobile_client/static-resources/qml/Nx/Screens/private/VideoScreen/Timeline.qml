@@ -60,7 +60,7 @@ Item
         property bool moving: false
         property bool dragging: false
 
-        textColor: ColorTheme.transparent(ColorTheme.contrast16, 0.7)
+        textColor: ColorTheme.transparent(ColorTheme.contrast4, 0.4)
         chunkColor: ColorTheme.green_main
         chunkBarColor: ColorTheme.transparent(ColorTheme.green_d2, 0.4)
 

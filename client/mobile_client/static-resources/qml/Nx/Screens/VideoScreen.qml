@@ -406,16 +406,6 @@ PageBase
             }
         }
 
-        Rectangle
-        {
-            id: bottomControlsBackground
-
-            color: Qt.rgba(0, 0, 0, 0.63)
-            width: mainWindow.width
-            anchors.top: controlsShadowGradient.bottom
-            anchors.bottom: parent.bottom
-        }
-
         PtzPanel
         {
             id: ptzPanel
@@ -542,6 +532,16 @@ PageBase
                         || camerasModel.nextResourceId(""))
             }
         }
+    }
+
+    Rectangle
+    {
+        id: bottomControlsBackground
+
+        color: videoScreen.backgroundColor
+        width: mainWindow.width
+        height: mainWindow.height - videoScreen.height
+        anchors.top: content.bottom
     }
 
     Rectangle
