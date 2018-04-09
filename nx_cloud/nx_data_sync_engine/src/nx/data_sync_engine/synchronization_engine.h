@@ -15,7 +15,7 @@ namespace ec2 {
 
 class Settings;
 
-class SyncronizationEngine
+class NX_DATA_SYNC_ENGINE_API SyncronizationEngine
 {
 public:
     SyncronizationEngine(

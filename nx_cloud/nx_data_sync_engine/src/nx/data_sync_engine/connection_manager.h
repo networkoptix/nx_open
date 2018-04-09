@@ -66,7 +66,7 @@ struct SystemStatusDescriptor
 /**
  * Manages ec2 transaction connections from mediaservers.
  */
-class ConnectionManager
+class NX_DATA_SYNC_ENGINE_API ConnectionManager
 {
 public:
     using SystemStatusChangedSubscription =

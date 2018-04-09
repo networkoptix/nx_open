@@ -35,7 +35,7 @@ struct TransactionLogRecord
  * - {system_id, tran_hash}
  * If unique indexes has been violated, transaction gets silently replaced.
  */
-class AbstractTransactionDataObject
+class NX_DATA_SYNC_ENGINE_API AbstractTransactionDataObject
 {
 public:
     virtual ~AbstractTransactionDataObject() = default;
@@ -66,7 +66,7 @@ enum class DataObjectType
     ram
 };
 
-class TransactionDataObjectFactory
+class NX_DATA_SYNC_ENGINE_API TransactionDataObjectFactory
 {
 public:
     using FactoryFunc = nx::utils::MoveOnlyFunc<std::unique_ptr<AbstractTransactionDataObject>()>;

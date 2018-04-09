@@ -18,7 +18,8 @@ namespace after {
 typedef ::ec2::migration::add_history::after::QnAbstractTransaction QnAbstractTransaction;
 } // namespace before
 
-nx::utils::db::DBResult migrate(nx::utils::db::QueryContext* const queryContext);
+NX_DATA_SYNC_ENGINE_API nx::utils::db::DBResult migrate(
+    nx::utils::db::QueryContext* const queryContext);
 
 } // namespace addHistoryToTransaction
 } // namespace migration

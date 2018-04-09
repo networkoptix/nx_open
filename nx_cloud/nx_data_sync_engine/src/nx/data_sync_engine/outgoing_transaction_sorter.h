@@ -21,7 +21,7 @@ class AbstractOutgoingTransactionDispatcher;
  * Postpones outgoing transaction delivery to ensure transactions are sent with
  *     monotonically increasing sequence.
  */
-class OutgoingTransactionSorter
+class NX_DATA_SYNC_ENGINE_API OutgoingTransactionSorter
 {
 public:
     using TransactionSequence = decltype(::ec2::QnAbstractTransaction::PersistentInfo::sequence);

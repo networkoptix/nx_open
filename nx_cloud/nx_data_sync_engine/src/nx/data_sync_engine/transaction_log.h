@@ -44,7 +44,7 @@ QString toString(const ::ec2::QnAbstractTransaction& tran);
  *
  * @note Calls with the same nx::utils::db::QueryContext object MUST happen within single thread.
  */
-class TransactionLog
+class NX_DATA_SYNC_ENGINE_API TransactionLog
 {
 public:
     typedef nx::utils::MoveOnlyFunc<void()> NewTransactionHandler;

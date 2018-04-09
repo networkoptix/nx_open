@@ -6,7 +6,7 @@ namespace nx {
 namespace cdb {
 namespace ec2 {
 
-class Settings
+class NX_DATA_SYNC_ENGINE_API Settings
 {
 public:
     unsigned int maxConcurrentConnectionsFromSystem;

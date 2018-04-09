@@ -31,7 +31,7 @@ struct UpdateHistoryData
  * @note Calls with same tran id are expected to be serialized by caller.
  *     Otherwise, behavior is undefined.
  */
-class VmsTransactionLogCache
+class NX_DATA_SYNC_ENGINE_API VmsTransactionLogCache
 {
 public:
     using TranId = int;

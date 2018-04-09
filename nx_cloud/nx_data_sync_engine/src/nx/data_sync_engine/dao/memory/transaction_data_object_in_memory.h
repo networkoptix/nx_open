@@ -20,7 +20,7 @@ namespace ec2 {
 namespace dao {
 namespace memory {
 
-class TransactionDataObject:
+class NX_DATA_SYNC_ENGINE_API TransactionDataObject:
     public AbstractTransactionDataObject
 {
 public:
