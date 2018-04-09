@@ -366,6 +366,7 @@ Item
         onPinchFinished: finishPinch()
 
         enabled: !flick.dragging
+
         MouseArea
         {
             id: mouseArea
