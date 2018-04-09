@@ -1,6 +1,6 @@
 {
   "activate_account": {
-    "emailSubject": "귀하의 계정을 활성화합니다"
+    "emailSubject": "귀하의 계정을 활성화 합니다"
   },
   "restore_password": {
     "emailSubject": "사용자 암호 초기화"

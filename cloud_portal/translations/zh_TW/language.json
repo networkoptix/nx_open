@@ -52,15 +52,15 @@
       "description": "不受限權限包括共用及從雲端連接/斷開系統的能力"
     },
     "Viewer": {
-      "label": "瀏覽",
+      "label": "瀏覽者",
       "description": "可以瀏覽即時影像和回放錄影資料"
     },
     "Live Viewer": {
-      "label": "即時影像瀏覽",
+      "label": "即時影像瀏覽者",
       "description": "只能瀏覽即時影像"
     },
     "Advanced Viewer": {
-      "label": "進階瀏覽",
+      "label": "進階瀏覽者",
       "description": "可以瀏覽即時影像, 回放錄影資料, 設定攝影機, 控制 PTZ 等"
     },
     "Administrator": {
@@ -142,7 +142,8 @@
     "requiredMessage": "只能使用拉丁字母, 數字和符號鍵盤, 避免前後空格",
     "weakMessage": "使用數字, 大寫和小寫字母及特殊字元使您密碼更強",
     "strongMessage": "理想的密碼!",
-    "commonMessage": "此密碼是很常用的組合"
+    "commonMessage": "此密碼是很常用的組合",
+    "missingMessage": "Password is required"
   },
   "sharing": {
     "confirmOwner": "如果您更改系統擁有者, 您將註銷目前此帳號的所有權. 此操作是不可逆的, 是否確定?",
