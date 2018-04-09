@@ -311,8 +311,8 @@ std::unique_ptr<gstreamer::Bin> DefaultPipelineBuilder::buildOpenAlprBin(
 
     converter->linkAfter(inputQueue.get());
     capsFilter->linkAfter(converter.get());
-#endif
     openAlpr->linkAfter(inputQueue.get());
+#endif
 
 #if 0
     outputQueue->linkAfter(openAlpr.get());
