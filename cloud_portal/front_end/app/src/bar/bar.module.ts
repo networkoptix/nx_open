@@ -7,13 +7,13 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 // import { NgbModalModule, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 
-import { QuoteService } from "../../app/core";
+import { QuoteService } from "../core/index";
 
-import { DropdownsModule } from "../dropdowns/dropdowns.module";
+import { DropdownsModule } from "../../src/dropdowns/dropdowns.module";
 
-import { BarComponent }              from './bar.component';
+import { BarComponent }       from './bar.component';
 // import { NxAccountSettingsDropdown } from "../dropdowns/account-settings/account-settings.component";
-import { NxLanguageDropdown }        from "../dropdowns/language/language.component";
+import { NxLanguageDropdown } from "../../src/dropdowns/language/language.component";
 // import { NxActiveSystemDropdown }    from "../dropdowns/active-system/active-system.component";
 // import { NxSystemsDropdown }         from "../dropdowns/systems/systems.component";
 

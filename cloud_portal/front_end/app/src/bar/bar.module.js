@@ -12,8 +12,8 @@ const platform_browser_1 = require("@angular/platform-browser");
 const static_1 = require("@angular/upgrade/static");
 const forms_1 = require("@angular/forms");
 // import { NgbModalModule, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
-const core_2 = require("../../app/core");
-const dropdowns_module_1 = require("../dropdowns/dropdowns.module");
+const index_1 = require("../core/index");
+const dropdowns_module_1 = require("../../src/dropdowns/dropdowns.module");
 const bar_component_1 = require("./bar.component");
 // import { NxActiveSystemDropdown }    from "../dropdowns/active-system/active-system.component";
 // import { NxSystemsDropdown }         from "../dropdowns/systems/systems.component";
@@ -35,7 +35,7 @@ BarModule = __decorate([
             dropdowns_module_1.DropdownsModule,
         ],
         providers: [
-            core_2.QuoteService,
+            index_1.QuoteService,
             dropdowns_module_1.DropdownsModule
         ],
         declarations: [

@@ -1,5 +1,5 @@
-import { Component, OnInit, ChangeDetectorRef, Inject } from '@angular/core';
-import { NgbDropdownModule }                                               from '@ng-bootstrap/ng-bootstrap';
+import { Component, OnInit, Inject } from '@angular/core';
+import { NgbDropdownModule }                            from '@ng-bootstrap/ng-bootstrap';
 
 export interface activeLanguage {
     language: string;
@@ -23,8 +23,7 @@ export class NxLanguageDropdown implements OnInit {
 
     constructor(@Inject('cloudApiService') private cloudApi: any,
                 @Inject('languageService') private language: any,
-                private dropdown: NgbDropdownModule,
-                private changeDetector: ChangeDetectorRef) {
+                private dropdown: NgbDropdownModule) {
     }
 
     changeLanguage(lang: activeLanguage) {

@@ -14,8 +14,8 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@angular/core");
 const http_1 = require("@angular/common/http");
-const index_1 = require("../../app/core/index");
-const login_component_1 = require("../dialogs/login/login.component");
+const index_1 = require("../core/index");
+const login_component_1 = require("../../src/dialogs/login/login.component");
 let BarComponent = class BarComponent {
     constructor(uuid2, language, cloudApi, http, quoteService, loginModal, changeDetector) {
         this.uuid2 = uuid2;

@@ -5,30 +5,40 @@ const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 
 module.exports = merge(common, {
-    plugins:[
+    plugins: [
         new CleanWebpackPlugin([ 'dist' ]),
-        new UglifyJSPlugin({
-        })
+        new UglifyJSPlugin({})
     ],
-    module: {
+    module : {
         rules: [
             {
-                test: /\.(scss|css)$/,
+                test: /\.s?css$/,
                 use : ExtractTextPlugin.extract({
-                    use: [ {
-                        loader : "css-loader",
-                        options: {
-                            url      : false,
-                            sourceMap: true
-                        }
-                    },
+                    fallback: "style-loader",
+                    use     : [
                         {
-                            loader : "sass-loader",
+                            loader : 'css-loader',
                             options: {
                                 url      : false,
-                                sourceMap: true
+                                //minimize : true,
+                                sourceMap: false
                             }
-                        } ]
+                        },
+                        {
+                            loader : 'postcss-loader',
+                            options: {
+                                url      : false,
+                                sourceMap: false
+                            }
+                        },
+                        {
+                            loader : 'sass-loader',
+                            options: {
+                                url      : false,
+                                sourceMap: false
+                            }
+                        }
+                    ]
                 })
             }
         ]

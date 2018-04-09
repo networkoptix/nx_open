@@ -6,7 +6,7 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
-import { ReleaseComponent } from './release/release.component';
+import { ReleaseComponent }         from './release/release.component';
 import { DownloadHistoryComponent } from './download-history.component';
 
 const appRoutes: Routes = [

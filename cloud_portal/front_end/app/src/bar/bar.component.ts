@@ -2,8 +2,8 @@ import { Component, OnInit, ChangeDetectorRef, Inject } from '@angular/core';
 import { HttpErrorResponse } from "@angular/common/http";
 import { HttpClient } from '@angular/common/http';
 
-import { QuoteService } from '../../app/core/index';
-import { NxModalLoginComponent } from "../dialogs/login/login.component";
+import { QuoteService }          from '../core/index';
+import { NxModalLoginComponent } from "../../src/dialogs/login/login.component";
 
 @Component({
     selector: 'bar-component',

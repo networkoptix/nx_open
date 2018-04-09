@@ -45,12 +45,25 @@ module.exports = {
             chunks: ['commons', 'app', 'webcommon', 'polyfills','vendor','appnew'],
             chunksSortMode: 'manual'
         }),
+
         new ExtractTextPlugin("styles/main.css"),
+
         new CopyWebpackPlugin([
             {
                 from: '',
                 to: '',
-                ignore: ['styles/**', '.*', '*.js', 'index-template.html', 'index.html']
+                ignore: [
+                    'src/**',
+                    'web_common/styles/**',
+                    'scripts/**',
+                    'styles/**',
+                    '.*',
+                    '*.ts',
+                    '*.map',
+                    '*.js',
+                    'index-template.html',
+                    'index.html'
+                ]
             }
         ]),
 

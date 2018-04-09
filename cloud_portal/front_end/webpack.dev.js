@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 const webpack = require('webpack');
 const merge = require('webpack-merge');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
@@ -49,29 +50,33 @@ module.exports = merge(common, {
     module   : {
         rules: [
             {
-                test: /\.(scss|css)$/,
+                test: /\.s?css$/,
                 use : ExtractTextPlugin.extract({
-                    fallback: 'style-loader',
+                    fallback: "style-loader",
                     use     : [
-                        { loader: 'css-loader', options: { url: false, sourceMap: true } },
-                        { loader: 'postcss-loader', options: { url: false, sourceMap: 'inline' } },
-                        { loader: 'sass-loader', options: { url: false, sourceMap: true } }
+                        {
+                            loader : 'css-loader',
+                            options: {
+                                url      : false,
+                                //minimize : true,
+                                sourceMap: true
+                            }
+                        },
+                        {
+                            loader : 'postcss-loader',
+                            options: {
+                                url      : false,
+                                sourceMap: 'inline'
+                            }
+                        },
+                        {
+                            loader : 'sass-loader',
+                            options: {
+                                url      : false,
+                                sourceMap: true
+                            }
+                        }
                     ]
-                    // use: [
-                    //     {
-                    //         loader : "css-loader?sourceMap",
-                    //         options: {
-                    //             url      : false,
-                    //             sourceMap: true
-                    //         }
-                    //     },
-                    //     {
-                    //         loader : "sass-loader?sourceMap",
-                    //         options: {
-                    //             url      : false,
-                    //             sourceMap: true
-                    //         }
-                    //     } ]
                 })
             }
         ]

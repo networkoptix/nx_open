@@ -15,11 +15,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@angular/core");
 const ng_bootstrap_1 = require("@ng-bootstrap/ng-bootstrap");
 let NxLanguageDropdown = class NxLanguageDropdown {
-    constructor(cloudApi, language, dropdown, changeDetector) {
+    constructor(cloudApi, language, dropdown) {
         this.cloudApi = cloudApi;
         this.language = language;
         this.dropdown = dropdown;
-        this.changeDetector = changeDetector;
         this.activeLanguage = {
             language: '',
             name: ''
@@ -53,8 +52,7 @@ NxLanguageDropdown = __decorate([
     }),
     __param(0, core_1.Inject('cloudApiService')),
     __param(1, core_1.Inject('languageService')),
-    __metadata("design:paramtypes", [Object, Object, ng_bootstrap_1.NgbDropdownModule,
-        core_1.ChangeDetectorRef])
+    __metadata("design:paramtypes", [Object, Object, ng_bootstrap_1.NgbDropdownModule])
 ], NxLanguageDropdown);
 exports.NxLanguageDropdown = NxLanguageDropdown;
 //# sourceMappingURL=language.component.js.map

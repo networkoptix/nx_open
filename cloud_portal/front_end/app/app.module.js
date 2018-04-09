@@ -18,7 +18,7 @@ const ng_bootstrap_1 = require("@ng-bootstrap/ng-bootstrap");
 const ng_bootstrap_2 = require("@ng-bootstrap/ng-bootstrap");
 const ngx_order_pipe_1 = require("ngx-order-pipe");
 const ngx_device_detector_1 = require("ngx-device-detector");
-const index_1 = require("./core/index");
+const index_1 = require("./src/core/index");
 const ajs_upgraded_providers_1 = require("./ajs-upgraded-providers");
 const ajs_upgraded_providers_2 = require("./ajs-upgraded-providers");
 const ajs_upgraded_providers_3 = require("./ajs-upgraded-providers");
@@ -29,19 +29,19 @@ const ajs_upgraded_providers_7 = require("./ajs-upgraded-providers");
 const ajs_upgraded_providers_8 = require("./ajs-upgraded-providers");
 const ajs_upgraded_providers_9 = require("./ajs-upgraded-providers");
 const app_component_1 = require("./app.component");
-const bar_module_1 = require("./bar/bar.module");
-const download_module_1 = require("./download/download.module");
-const download_history_module_1 = require("./download-history/download-history.module");
-const dropdowns_module_1 = require("./dropdowns/dropdowns.module");
-const login_component_1 = require("./dialogs/login/login.component");
-const process_button_component_1 = require("./components/process-button/process-button.component");
-const dialogs_service_1 = require("./dialogs/dialogs.service");
-const general_component_1 = require("./dialogs/general/general.component");
+const bar_module_1 = require("./src/bar/bar.module");
+const download_module_1 = require("./src/download/download.module");
+const download_history_module_1 = require("./src/download-history/download-history.module");
+const dropdowns_module_1 = require("./src/dropdowns/dropdowns.module");
+const login_component_1 = require("./src/dialogs/login/login.component");
+const process_button_component_1 = require("./src/components/process-button/process-button.component");
+const dialogs_service_1 = require("./src/dialogs/dialogs.service");
+const general_component_1 = require("./src/dialogs/general/general.component");
 class HybridUrlHandlingStrategy {
-    // use only process the `/bar` url
     shouldProcessUrl(url) {
         return url.toString().startsWith('/bar') ||
-            url.toString().startsWith('/download');
+            url.toString().startsWith('/download') ||
+            url.toString().startsWith('/downloads');
     }
     extract(url) {
         return url;

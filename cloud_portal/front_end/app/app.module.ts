@@ -13,8 +13,7 @@ import { NgbModal }             from '@ng-bootstrap/ng-bootstrap';
 import { OrderModule }          from 'ngx-order-pipe';
 import { DeviceDetectorModule } from 'ngx-device-detector';
 
-import { CoreModule } from './core/index';
-
+import { CoreModule }                      from './src/core/index';
 import { cloudApiServiceModule }           from './ajs-upgraded-providers';
 import { systemsModule }                   from './ajs-upgraded-providers';
 import { languageServiceModule }           from './ajs-upgraded-providers';
@@ -26,20 +25,20 @@ import { configServiceModule }             from './ajs-upgraded-providers';
 import { authorizationCheckServiceModule } from './ajs-upgraded-providers';
 
 import { AppComponent }                                 from './app.component';
-import { BarModule }                                    from './bar/bar.module';
-import { DownloadModule }                               from './download/download.module';
-import { DownloadHistoryModule }                        from './download-history/download-history.module';
-import { DropdownsModule }                              from './dropdowns/dropdowns.module';
-import { NxModalLoginComponent, LoginModalContent }     from "./dialogs/login/login.component";
-import { NxProcessButtonComponent }                     from './components/process-button/process-button.component';
-import { nxDialogsService }                             from "./dialogs/dialogs.service";
-import { GeneralModalContent, NxModalGeneralComponent } from "./dialogs/general/general.component";
+import { BarModule }                                    from './src/bar/bar.module';
+import { DownloadModule }                               from './src/download/download.module';
+import { DownloadHistoryModule }                        from './src/download-history/download-history.module';
+import { DropdownsModule }                              from './src/dropdowns/dropdowns.module';
+import { NxModalLoginComponent, LoginModalContent }     from "./src/dialogs/login/login.component";
+import { NxProcessButtonComponent }                     from './src/components/process-button/process-button.component';
+import { nxDialogsService }                             from "./src/dialogs/dialogs.service";
+import { GeneralModalContent, NxModalGeneralComponent } from "./src/dialogs/general/general.component";
 
 class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
-    // use only process the `/bar` url
     shouldProcessUrl(url: UrlTree) {
         return url.toString().startsWith('/bar') ||
-            url.toString().startsWith('/download');
+            url.toString().startsWith('/download') ||
+            url.toString().startsWith('/downloads');
     }
 
     extract(url: UrlTree) {
