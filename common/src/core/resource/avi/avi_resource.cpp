@@ -186,7 +186,7 @@ void QnAviResource::setDewarpingParams(const QnMediaDewarpingParams& params)
 QnAspectRatio QnAviResource::customAspectRatio() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_aviMetadata
+    return m_aviMetadata && !qFuzzyIsNull(m_aviMetadata->overridenAr)
         ? QnAspectRatio::closestStandardRatio(m_aviMetadata->overridenAr)
         : base_type::customAspectRatio();
 }
