@@ -12,8 +12,6 @@
 #include <nx_ec/data/api_fwd.h>
 #include <nx_ec/ec_proto_version.h>
 
-#include <nx/cloud/cdb/api/ec2_request_paths.h>
-
 #include "compatible_ec2_protocol_version.h"
 #include "incoming_transaction_dispatcher.h"
 #include "outgoing_transaction_dispatcher.h"
@@ -214,14 +212,6 @@ void ConnectionManager::pushTransaction(
     nx::network::http::Response* const /*response*/,
     nx::network::http::RequestProcessedHandler completionHandler)
 {
-    const auto path = request.requestLine.url.path();
-    if (!path.startsWith(api::kPushEc2TransactionPath + lit("/")) &&
-        // TODO: #ak remove (together with the constant) after 3.0 release.
-        !path.startsWith(api::kDeprecatedPushEc2TransactionPath + lit("/")))
-    {
-        return completionHandler(nx::network::http::StatusCode::notFound);
-    }
-
     auto connectionIdIter = request.headers.find(Qn::EC2_CONNECTION_GUID_HEADER_NAME);
     if (connectionIdIter == request.headers.end())
     {
@@ -458,7 +448,7 @@ bool ConnectionManager::addNewConnection(
         lock.unlock();
         m_systemStatusChangedSubscription.notify(
             systemId,
-            { api::SystemHealth::online, remotePeerInfo.protoVersion });
+            { true /*online*/, remotePeerInfo.protoVersion });
     }
 
     return true;
@@ -571,7 +561,7 @@ void ConnectionManager::sendSystemOfflineNotificationIfNeeded(
         return;
 
     m_systemStatusChangedSubscription.notify(
-        systemId.toStdString(), { api::SystemHealth::offline });
+        systemId.toStdString(), { false /*offline*/ });
 }
 
 void ConnectionManager::removeConnection(const nx::String& connectionId)

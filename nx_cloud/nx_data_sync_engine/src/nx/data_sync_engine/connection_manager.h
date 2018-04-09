@@ -10,7 +10,6 @@
 #include <boost/multi_index/member.hpp>
 
 #include <nx/cloud/cdb/api/maintenance_manager.h>
-#include <nx/cloud/cdb/api/system_data.h>
 
 #include <nx/network/http/abstract_msg_body_source.h>
 #include <nx/network/http/server/abstract_http_request_handler.h>
@@ -57,7 +56,7 @@ class TransactionTransportHeader;
 
 struct SystemStatusDescriptor
 {
-    api::SystemHealth health;
+    bool isOnline = false;
     int protoVersion = nx_ec::INITIAL_EC2_PROTO_VERSION;
 
     SystemStatusDescriptor() = default;
