@@ -532,10 +532,12 @@ bool QnTransactionMessageBus::processSpecialTransaction(const QnTransaction<T> &
             onGotServerAliveInfo(tran, sender, transportHeader);
             return true; // do not proxy. this call contains built in proxy
         case ApiCommand::forcePrimaryTimeServer:
-            m_timeSyncManager->onGotPrimariTimeServerTran(tran);
+            if (m_timeSyncManager)
+                m_timeSyncManager->onGotPrimariTimeServerTran(tran);
             break;
         case ApiCommand::broadcastPeerSyncTime:
-            m_timeSyncManager->resyncTimeWithPeer(tran.peerID);
+            if (m_timeSyncManager)
+                m_timeSyncManager->resyncTimeWithPeer(tran.peerID);
             return true; // do not proxy.
         case ApiCommand::broadcastPeerSystemTime:
         case ApiCommand::getKnownPeersSystemTime:
@@ -588,8 +590,8 @@ bool QnTransactionMessageBus::processSpecialTransaction(const QnTransaction<T> &
 
 template <class T>
 void QnTransactionMessageBus::gotTransaction(
-    const QnTransaction<T> &tran, 
-    QnTransactionTransport* sender, 
+    const QnTransaction<T> &tran,
+    QnTransactionTransport* sender,
     const QnTransactionTransportHeader &transportHeader)
 {
     QnMutexLocker lock(&m_mutex);
