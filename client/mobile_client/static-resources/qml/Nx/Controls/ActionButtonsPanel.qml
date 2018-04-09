@@ -177,8 +177,8 @@ Item
     {
         id: hintControl
 
-        x: parent.width - width
-        y: -(height + 4 + 4)
+        x: parent.width - width - 4
+        y: -(height + 4)
     }
 
     Component
