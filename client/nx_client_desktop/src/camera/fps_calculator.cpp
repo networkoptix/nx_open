@@ -12,6 +12,11 @@ void calculateMaxFps(
     int* maxDualStreamFps,
     bool motionDetectionAllowed)
 {
+    if (maxFps)
+        *maxFps = std::numeric_limits<int>::max();
+    if (maxDualStreamFps)
+        *maxDualStreamFps = std::numeric_limits<int>::max();
+
     for (const auto& camera: cameras)
     {
         int cameraFps = camera->getMaxFps();
