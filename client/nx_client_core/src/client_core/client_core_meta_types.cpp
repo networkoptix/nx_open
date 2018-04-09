@@ -21,6 +21,8 @@
 
 #include <nx/client/core/animation/kinetic_animation.h>
 #include <nx/client/core/media/media_player.h>
+#include <nx/client/core/resource/resource_helper.h>
+#include <nx/client/core/resource/media_resource_helper.h>
 #include <nx/client/core/ui/frame_section.h>
 #include <nx/client/core/utils/geometry.h>
 #include <nx/client/core/utils/quick_item_mouse_tracker.h>
@@ -54,6 +56,8 @@ void initializeMetaTypes()
     qmlRegisterType<QnScenePositionListener>("com.networkoptix.qml", 1, 0, "QnScenePositionListener");
     qmlRegisterType<QnAppInfo>("com.networkoptix.qml", 1, 0, "QnAppInfo");
     qmlRegisterType<QnVideoOutput>("Nx.Media", 1, 0, "VideoOutput");
+    qmlRegisterType<ResourceHelper>("Nx.Core", 1, 0, "ResourceHelper");
+    qmlRegisterType<MediaResourceHelper>("Nx.Core", 1, 0, "MediaResourceHelper");
 
     qmlRegisterType<AuthenticationDataModel>("Nx.Models", 1, 0, "AuthenticationDataModel");
     qmlRegisterType<QnSystemHostsModel>("Nx.Models", 1, 0, "SystemHostsModel");
