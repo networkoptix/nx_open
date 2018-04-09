@@ -154,6 +154,7 @@ displays pencil and cross links for each user only on hover
     Mouse Over    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]
     Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]/following-sibling::td/a[@ng-click='unshare(user)']/span['&nbsp&nbspDelete']
     Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),'${EDIT USER BUTTON TEXT}')]/..
+    Remove User Permissions    ${random email}
 
 Edit permission works
     Open Browser and go to URL    ${url}
