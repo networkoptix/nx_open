@@ -304,17 +304,17 @@ State CameraSettingsDialogStateReducer::loadCameras(
     state.hasChanges = false;
     state.singleCameraProperties = {};
     state.singleCameraSettings = {};
-    state.devicesProperties = {};
+    state.devicesDescription = {};
     state.recording = {};
     state.devicesCount = cameras.size();
 
-    state.devicesProperties.isDtsBased = combinedValue(cameras,
+    state.devicesDescription.isDtsBased = combinedValue(cameras,
         [](const Camera& camera) { return camera->isDtsBased(); });
-    state.devicesProperties.isWearable = combinedValue(cameras,
+    state.devicesDescription.isWearable = combinedValue(cameras,
         [](const Camera& camera) { return camera->hasFlags(Qn::wearable_camera); });
-    state.devicesProperties.hasMotion = combinedValue(cameras,
+    state.devicesDescription.hasMotion = combinedValue(cameras,
         [](const Camera& camera) { return camera->hasMotion(); });
-    state.devicesProperties.hasDualStreaming = combinedValue(cameras,
+    state.devicesDescription.hasDualStreaming = combinedValue(cameras,
         [](const Camera& camera) { return camera->hasDualStreaming(); });
 
     if (firstCamera)
@@ -354,8 +354,8 @@ State CameraSettingsDialogStateReducer::loadCameras(
 
      Qn::calculateMaxFps(
             cameras,
-            &state.devicesProperties.maxFps,
-            &state.devicesProperties.maxDualStreamingFps,
+            &state.devicesDescription.maxFps,
+            &state.devicesDescription.maxDualStreamingFps,
             false);
 
     state.recording.schedule = {};

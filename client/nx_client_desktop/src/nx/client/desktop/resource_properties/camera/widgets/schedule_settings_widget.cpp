@@ -175,14 +175,6 @@ void ScheduleSettingsWidget::setupUi()
         style::Properties::kSliderFeatures,
         static_cast<int>(style::SliderFeature::FillingUp));
 
-    /*
-    installEventHandler(
-        {ui->recordMotionButton, ui->recordMotionPlusLQButton},
-        QEvent::MouseButtonRelease,
-        this,
-        &ScheduleSettingsWidget::at_releaseSignalizer_activated);
-    */
-
     auto aligner = new Aligner(this);
     aligner->addWidgets({ui->fpsLabel, ui->qualityLabel, ui->bitrateLabel});
 
@@ -223,6 +215,11 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
     {
         ui->recordMotionButton->setChecked(brush.recordingType == Qn::RT_MotionOnly);
         setReadOnly(ui->recordMotionButton, state.readOnly);
+        ui->recordMotionButton->setToolTip({});
+    }
+    else
+    {
+        ui->recordMotionButton->setToolTip(motionOptionHint(state));
     }
 
     const bool hasDualStreaming = state.hasDualStreaming();
@@ -232,6 +229,11 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
     {
         ui->recordMotionPlusLQButton->setChecked(brush.recordingType == Qn::RT_MotionAndLowQuality);
         setReadOnly(ui->recordMotionPlusLQButton, state.readOnly);
+        ui->recordMotionPlusLQButton->setToolTip({});
+    }
+    else
+    {
+        ui->recordMotionPlusLQButton->setToolTip(motionOptionHint(state));
     }
 
     ui->noRecordButton->setChecked(brush.recordingType == Qn::RT_Never);
@@ -242,8 +244,7 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
     ui->fpsSpinBox->setValue(brush.fps);
     setReadOnly(ui->fpsSpinBox, state.readOnly);
 
-    const bool automaticBitrate = brush.isAutomaticBitrate()
-        /* && recording.customBitrateAvailable */;
+    const bool automaticBitrate = brush.isAutomaticBitrate();
     ui->qualityComboBox->setEnabled(recordingParamsEnabled);
     setReadOnly(ui->qualityComboBox, state.readOnly);
     ui->qualityComboBox->setCurrentIndex(
@@ -293,50 +294,42 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
     }
 }
 
-/*
-void ScheduleSettingsWidget::at_releaseSignalizer_activated(QObject *target)
+QString ScheduleSettingsWidget::motionOptionHint(const CameraSettingsDialogState& state)
 {
-    QWidget *widget = qobject_cast<QWidget *>(target);
-    if (!widget)
-        return;
+    using CombinedValue = CameraSettingsDialogState::CombinedValue;
+    const bool devicesHaveMotion = state.devicesDescription.hasMotion == CombinedValue::All;
+    const bool devicesHaveDS = state.devicesDescription.hasDualStreaming == CombinedValue::All;
 
-    if (m_cameras.isEmpty() || widget->isEnabled() || (widget->parentWidget() && !widget->parentWidget()->isEnabled()))
-        return;
-
-    using boost::algorithm::all_of;
-
-    if (m_cameras.size() > 1)
+    if (state.isSingleCamera())
     {
-        QnMessageBox::warning(this,
-            tr("Motion detection disabled or not supported"),
-            tr("To ensure it is supported and to enable it, go to the \"Motion\" tab in Camera Settings."));
+        if (devicesHaveMotion && !devicesHaveDS)
+            return tr("Dual-Streaming not supported for this camera");
+
+        if (!devicesHaveMotion && !devicesHaveDS)
+            return tr("Dual-Streaming and motion detection not supported for this camera");
+
+        const bool motionDetectionEnabled = state.singleCameraSettings.enableMotionDetection();
+        if (!motionDetectionEnabled)
+        {
+            return tr("Motion detection disabled")
+                + L'\n'
+                + tr("To enable or adjust it, go to the \"Motion\" tab in Camera Settings");
+        }
+
+        return QString();
     }
-    else // One camera.
+
+    if (!devicesHaveMotion || !devicesHaveDS)
     {
-        NX_ASSERT(m_cameras.size() == 1, Q_FUNC_INFO, "Following options are valid only for singular camera");
-        QnVirtualCameraResourcePtr camera = m_cameras.first();
-
-        // TODO: #GDM #Common duplicate code.
-        bool hasDualStreaming = all_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) { return camera->hasDualStreaming2(); });
-        bool hasMotion = all_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) { return camera->hasMotion(); });
-
-        if (hasMotion && !hasDualStreaming)
-        {
-            QnMessageBox::warning(this, tr("Dual-Streaming not supported for this camera"));
-        }
-        else if (!hasMotion && !hasDualStreaming)
-        {
-            QnMessageBox::warning(this, tr("Dual-Streaming and motion detection not supported for this camera"));
-        }
-        else /// Has dual streaming but not motion.
-        {
-            QnMessageBox::warning(this,
-                tr("Motion detection disabled"),
-                tr("To enable or adjust it, go to the \"Motion\" tab in Camera Settings."));
-        }
+        return tr("Motion detection disabled or not supported")
+            + L'\n'
+            + tr("To ensure it is supported and to enable it, "
+                "go to the \"Motion\" tab in Camera Settings.");
     }
+
+    return QString();
 }
-*/
+
 
 } // namespace desktop
 } // namespace client

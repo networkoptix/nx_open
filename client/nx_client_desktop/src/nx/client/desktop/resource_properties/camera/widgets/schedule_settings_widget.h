@@ -27,6 +27,8 @@ private:
     void setupUi();
     void loadState(const CameraSettingsDialogState& state);
 
+    static QString motionOptionHint(const CameraSettingsDialogState& state);
+
 private:
     QScopedPointer<Ui::ScheduleSettingsWidget> ui;
     QScopedPointer<SchedulePaintFunctions> paintFunctions;

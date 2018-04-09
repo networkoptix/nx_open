@@ -108,7 +108,7 @@ struct CameraSettingsDialogState
         int maxFps = 0;
         int maxDualStreamingFps = 0;
     };
-    CombinedProperties devicesProperties;
+    CombinedProperties devicesDescription;
 
     struct RecordingDays
     {
@@ -188,13 +188,13 @@ struct CameraSettingsDialogState
             return singleCameraProperties.maxFpsWithoutMotion;
 
         return recording.brush.recordingType == Qn::RT_MotionAndLowQuality
-            ? devicesProperties.maxDualStreamingFps
-            : devicesProperties.maxFps;
+            ? devicesDescription.maxDualStreamingFps
+            : devicesDescription.maxFps;
     }
 
     bool hasMotion() const
     {
-        bool result = devicesProperties.hasMotion == CombinedValue::All;
+        bool result = devicesDescription.hasMotion == CombinedValue::All;
         if (isSingleCamera())
             result &= singleCameraSettings.enableMotionDetection();
         return result;
@@ -202,13 +202,13 @@ struct CameraSettingsDialogState
 
     bool hasDualStreaming() const
     {
-        return hasMotion() && devicesProperties.hasDualStreaming == CombinedValue::All;
+        return hasMotion() && devicesDescription.hasDualStreaming == CombinedValue::All;
     }
 
     bool supportsSchedule() const
     {
-        return devicesProperties.isDtsBased == CombinedValue::None
-            && devicesProperties.isWearable == CombinedValue::None;
+        return devicesDescription.isDtsBased == CombinedValue::None
+            && devicesDescription.isWearable == CombinedValue::None;
     }
 };
 
