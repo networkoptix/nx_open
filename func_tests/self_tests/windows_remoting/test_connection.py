@@ -4,34 +4,16 @@ import struct
 from contextlib import closing
 from pprint import pformat
 
-import pytest
 import requests
 
-from framework.os_access.windows_remoting.winrm_access import WinRMAccess
 from framework.utils import Wait
-from framework.vms.hypervisor import obtain_running_vm
 
 _logger = logging.getLogger(__name__)
 
 
-@pytest.fixture()
-def vm(vm_factory):
-    vm = vm_factory.allocate('single-windows-vm', vm_type='windows')
-    yield vm
-    vm_factory.release(vm)
-
-
-@pytest.fixture()
-def vm_info(configuration, hypervisor, vm_registries):
-    windows_vm_registry = vm_registries['windows']
-    with windows_vm_registry.taken('raw-windows') as (vm_index, vm_name):
-        vm_info = obtain_running_vm(hypervisor, vm_name, vm_index, configuration['vm_types'])
-        yield vm_info
-
-
-def test_connection(vm_info):
+def test_port_open(windows_vm_info):
     """Port is open even if OS is still booting."""
-    hostname, port = vm_info.ports['tcp', 5985]
+    hostname, port = windows_vm_info.ports['tcp', 5985]
     client = socket.socket()
     # Forcefully reset connection when closed.
     # Otherwise, there are FIN-ACK and ACK from other connection before normal handshake in Wireshark.
@@ -51,8 +33,8 @@ def test_connection(vm_info):
                 break
 
 
-def test_http(vm_info):
-    hostname, port = vm_info.ports['tcp', 5985]
+def test_http_is_understood(windows_vm_info):
+    hostname, port = windows_vm_info.ports['tcp', 5985]
     wait = Wait('for HTTP response', timeout_sec=600)
     while True:
         try:
@@ -68,13 +50,3 @@ def test_http(vm_info):
                 response.content)
             assert 100 <= response.status_code < 600
             break
-
-
-def test_winrm_works(vm_info):
-    hostname, port = vm_info.ports['tcp', 5985]
-    access = WinRMAccess(hostname, port)
-    assert access.is_working()
-
-
-def test_api_ping(vm):
-    vm.api.get('api/ping')

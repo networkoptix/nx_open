@@ -7,9 +7,9 @@ from framework.os_access.windows_remoting.cmd import Shell, receive_stdout_and_s
 log = logging.getLogger(__name__)
 
 
-@pytest.fixture(name='shell')
-def make_shell(protocol):
-    with Shell(protocol) as shell:
+@pytest.fixture()
+def shell(pywinrm_protocol):
+    with Shell(pywinrm_protocol) as shell:
         yield shell
 
 

@@ -100,3 +100,9 @@ def two_linux_vms(vm_factory, hypervisor):
 def linux_vm(vm_factory):
     with vm_factory.allocated_vm('single-linux-vm') as vm:
         yield vm
+
+
+@pytest.fixture(scope='session')
+def windows_vm(vm_factory):
+    with vm_factory.allocated_vm('single-windows-vm', vm_type='windows') as vm:
+        yield vm

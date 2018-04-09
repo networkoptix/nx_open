@@ -11,21 +11,21 @@ log = logging.getLogger(__name__)
 
 
 @pytest.mark.parametrize('name', ['defaultMediaServer'])
-def test_service(protocol, name):
-    service = Service(protocol, name)
+def test_service(pywinrm_protocol, name):
+    service = Service(pywinrm_protocol, name)
     log.debug(pformat(service.get()))
     log.debug(pformat(service.stop()))
     log.debug(pformat(service.start()))
 
 
 @pytest.mark.parametrize('path', ['C:\\oi.txt'])
-def test_file(protocol, path):
+def test_file(pywinrm_protocol, path):
     path_moved_to = path + '.moved'
-    log.debug(pformat(get_file_info(protocol, path)))
-    rename_file(protocol, path, path_moved_to)
-    rename_file(protocol, path_moved_to, path)
+    log.debug(pformat(get_file_info(pywinrm_protocol, path)))
+    rename_file(pywinrm_protocol, path, path_moved_to)
+    rename_file(pywinrm_protocol, path_moved_to, path)
 
 
-def test_user_profiles(protocol):
-    log.debug(pformat(enumerate_user_profiles(protocol)))
-    log.debug(pformat(get_system_user_profile(protocol)))
+def test_user_profiles(pywinrm_protocol):
+    log.debug(pformat(enumerate_user_profiles(pywinrm_protocol)))
+    log.debug(pformat(get_system_user_profile(pywinrm_protocol)))
