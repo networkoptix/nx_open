@@ -3,7 +3,6 @@
 #include <map>
 #include <string>
 
-#include <nx/fusion/model_functions_fwd.h>
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/utils/move_only_func.h>
 
@@ -12,30 +11,12 @@
 #include <api/mediaserver_client.h>
 
 #include "account_manager.h"
+#include "vms_request_result.h"
 
 namespace nx {
 namespace cdb {
 
 namespace conf { class Settings; }
-
-enum class VmsResultCode
-{
-    ok,
-    invalidData,
-    networkError,
-    forbidden,
-    logicalError,
-    unreachable,
-};
-
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(VmsResultCode)
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((VmsResultCode), (lexical))
-
-struct VmsRequestResult
-{
-    VmsResultCode resultCode = VmsResultCode::ok;
-    std::string vmsErrorDescription;
-};
 
 using VmsRequestCompletionHandler = nx::utils::MoveOnlyFunc<void(VmsRequestResult)>;
 
