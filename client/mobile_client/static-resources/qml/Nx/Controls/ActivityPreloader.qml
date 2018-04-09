@@ -1,4 +1,5 @@
 import QtQuick 2.6
+import QtQuick.Window 2.0
 import Nx 1.0
 
 Item
@@ -20,15 +21,19 @@ Item
         {
             id: linesControl
 
-            anchors.fill: parent
+            width: parent.width * Screen.devicePixelRatio
+            height: parent.height * Screen.devicePixelRatio
+            anchors.centerIn: parent
+            scale: 1.0 / Screen.devicePixelRatio
 
             onPaint:
             {
                 var ctx = getContext("2d")
                 ctx.reset()
+                ctx.scale(Screen.devicePixelRatio, Screen.devicePixelRatio)
 
-                var centerX = width / 2
-                var centerY = height / 2
+                var centerX = control.width / 2
+                var centerY = control.height / 2
 
                 for (var i = 0; i < 4; ++i)
                 {
