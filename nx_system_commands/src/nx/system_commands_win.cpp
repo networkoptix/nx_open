@@ -3,8 +3,10 @@
 namespace nx {
 
 
-bool SystemCommands::mount(const std::string& /*url*/, const std::string& /*directory*/,
-    const boost::optional<std::string>& /*username*/, const boost::optional<std::string>& /*password*/)
+bool SystemCommands::mount(
+    const std::string& /*url*/, const std::string& /*directory*/,
+    const boost::optional<std::string>& /*username*/,
+    const boost::optional<std::string>& /*password*/)
 {
     return false;
 }
