@@ -59,6 +59,30 @@ struct CameraSettingsDialogState
         All
     };
 
+    enum class Alert
+    {
+        // Brush was changed (mode, fps, quality).
+        BrushChanged,
+
+        // Recording was enabled, while schedule is empty.
+        EmptySchedule,
+
+        // Not enough licenses to enable recording.
+        NotEnoughLicenses,
+
+        // License limit exceeded, recording will not be enabled.
+        LicenseLimitExceeded,
+
+        // Schedule was changed but recording is not enabled.
+        RecordingIsNotEnabled,
+
+        // High minimal archive length value selected.
+        HighArchiveLength,
+
+        // Motion detection was enabled while recording was not.
+        MotionDetectionRequiresRecording,
+    };
+
     CameraSettingsDialogState() = default;
     CameraSettingsDialogState(const CameraSettingsDialogState& other) = delete;
     CameraSettingsDialogState(CameraSettingsDialogState&& other) = default;
@@ -168,6 +192,8 @@ struct CameraSettingsDialogState
 
     };
     RecordingSettings recording;
+
+    std::optional<Alert> alert;
 
     struct ImageControlSettings
     {

@@ -307,6 +307,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
     state.devicesDescription = {};
     state.recording = {};
     state.devicesCount = cameras.size();
+    state.alert = {};
 
     state.devicesDescription.isDtsBased = combinedValue(cameras,
         [](const Camera& camera) { return camera->isDtsBased(); });
@@ -409,6 +410,7 @@ State CameraSettingsDialogStateReducer::setScheduleBrush(
         state.maxRecordingBrushFps());
 
     state = setScheduleBrushFps(std::move(state), fps);
+    state.alert = State::Alert::BrushChanged;
 
     return state;
 }
@@ -427,6 +429,8 @@ State CameraSettingsDialogStateReducer::setScheduleBrushRecordingType(
             state.recording.brush.fps,
             state.maxRecordingBrushFps());
     }
+    state.alert = State::Alert::BrushChanged;
+
     return state;
 }
 
@@ -447,6 +451,7 @@ State CameraSettingsDialogStateReducer::setScheduleBrushFps(State state, int val
         state = loadMinMaxCustomBitrate(std::move(state));
         state = setCustomRecordingBitrateNormalized(std::move(state), normalizedBitrate);
     }
+    state.alert = State::Alert::BrushChanged;
 
     return state;
 }
@@ -457,6 +462,8 @@ State CameraSettingsDialogStateReducer::setScheduleBrushQuality(
 {
     state.recording.brush.quality = value;
     state = fillBitrateFromFixedQuality(std::move(state));
+    state.alert = State::Alert::BrushChanged;
+
     return state;
 }
 
@@ -472,6 +479,8 @@ State CameraSettingsDialogStateReducer::setSchedule(State state, const ScheduleT
     }
 
     state.recording.schedule.setUser(processed);
+    state.alert = {};
+
     return state;
 }
 

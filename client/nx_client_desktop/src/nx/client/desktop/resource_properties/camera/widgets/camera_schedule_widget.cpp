@@ -81,8 +81,7 @@ CameraScheduleWidget::CameraScheduleWidget(
 
     connect(ui->enableRecordingCheckBox, &QCheckBox::stateChanged, this,
         &CameraScheduleWidget::updateLicensesLabelText);
-    connect(ui->enableRecordingCheckBox, &QCheckBox::stateChanged, this,
-        &CameraScheduleWidget::updateGridEnabledState);
+
     connect(ui->enableRecordingCheckBox, &QCheckBox::stateChanged, this,
         notifyAboutScheduleEnabledChanged);
 
@@ -568,13 +567,6 @@ bool CameraScheduleWidget::hasDualStreamingMotionOnGrid() const
     return false;
 }
 
-void CameraScheduleWidget::setScheduleAlert(const QString& scheduleAlert)
-{
-    // We want to force update - emit a signal - even if the text didn't change:
-    m_scheduleAlert = scheduleAlert;
-    emit alert(m_scheduleAlert);
-}
-
 void CameraScheduleWidget::setArchiveLengthAlert(const QString& archiveLengthAlert)
 {
     if (!m_scheduleAlert.isEmpty())
@@ -596,11 +588,11 @@ void CameraScheduleWidget::updateAlert(AlertReason when)
             {
                 case Qt::Unchecked:
                 case Qt::PartiallyChecked:
-                    setScheduleAlert(tr("Not enough licenses to enable recording"));
+                    setScheduleAlert(Alert::NotEnoughLicenses);
                     break;
 
                 case Qt::Checked:
-                    setScheduleAlert(tr("License limit exceeded, recording will not be enabled."));
+                    setScheduleAlert(Alert::LicenseLimitExceeded);
                     break;
 
                 default:
@@ -616,7 +608,7 @@ void CameraScheduleWidget::updateAlert(AlertReason when)
         case CurrentParamsChange:
         {
             if (checkCanEnableRecording() && !isRecordingScheduled())
-                setScheduleAlert(tr("Select areas on the schedule to apply chosen parameters to."));
+                setScheduleAlert(Alert::BrushChanged);
             break;
         }
 
@@ -630,7 +622,7 @@ void CameraScheduleWidget::updateAlert(AlertReason when)
 
                 if (!isScheduleEnabled())
                 {
-                    setScheduleAlert(tr("Turn on selector at the top of the window to enable recording."));
+                    setScheduleAlert(Alert::RecordingIsNotEnabled);
                     break;
                 }
             }
@@ -649,7 +641,7 @@ void CameraScheduleWidget::updateAlert(AlertReason when)
 
                 if (!isRecordingScheduled())
                 {
-                    setScheduleAlert(tr("Set recording parameters and select areas on the schedule grid to apply them to."));
+                    setScheduleAlert(Alert::EmptySchedule);
                     break;
                 }
             }
