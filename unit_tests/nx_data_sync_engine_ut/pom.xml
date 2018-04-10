@@ -19,7 +19,7 @@
     <properties>
         <guid>${nx_data_sync_engine_ut.guid}</guid>
         <qt.libs>core network concurrent xml xmlpatterns sql multimedia</qt.libs>
-        <global.libs>-lcloud_db -lnx_data_sync_engine -lappserver2 -lcloud_db_client -lnx_network -ludt -lnx_fusion -lnx_utils</global.libs>
+        <global.libs>-lcloud_db -lnx_data_sync_engine -lappserver2 -lcommon -lcloud_db_client -lnx_network -ludt -lnx_fusion -lnx_utils</global.libs>
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm Wldap32.lib</windows.oslibs>
 
         <windows.defines>_VARIADIC_MAX=10</windows.defines>
