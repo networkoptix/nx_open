@@ -1,7 +1,7 @@
 *** Settings ***
 Resource          ../resource.robot
 Resource          ../variables.robot
-Test Setup        Reset Stuff
+Test Setup        Reset
 Test Teardown     Run Keyword If Test Failed    Login Dialog Failure
 Suite Setup       Open Browser and go to URL    ${url}
 Suite Teardown    Close All Browsers
@@ -17,7 +17,7 @@ Login Dialog Failure
     Close Browser
     Open Browser and go to URL    ${url}
 
-Reset stuff
+Reset
     ${status}    Run Keyword And Return Status    Validate Log Out
     Run Keyword Unless    ${status}    Log Out
     Go To    ${url}

@@ -3,7 +3,7 @@ Resource          ../resource.robot
 Resource          ../variables.robot
 Suite Setup       Open Change Password Dialog
 Suite Teardown    Close Browser
-Test Teardown     Run Keyword If Test Failed    Test Reset
+Test Teardown     Run Keyword If Test Failed    Reset
 Test Template     Test Passwords Invalid
 Force Tags        form
 
@@ -38,7 +38,7 @@ Empty New Password            ${BASE PASSWORD}          ${EMPTY}
 Empty Both                    ${EMPTY}                  ${EMPTY}
 
 *** Keywords ***
-Test Reset
+Reset
     Close Browser
     Open Change Password Dialog
 

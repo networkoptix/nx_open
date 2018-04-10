@@ -3,7 +3,7 @@ Resource          ../resource.robot
 Resource          ../variables.robot
 Suite Setup       Open Log In Dialog
 Suite Teardown    Close Browser
-Test Teardown     Run Keyword If Test Failed    Test Reset
+Test Teardown     Run Keyword If Test Failed    Reset
 Test Template     Test Login Invalid
 Force Tags        form
 
@@ -31,7 +31,7 @@ Empty Email and Password      ${EMPTY}                      ${EMPTY}            
 Valid Email and password      ${good email}                 ${good password}    neither
 
 *** Keywords ***
-Test Reset
+Reset
     Close Browser
     Open Log In Dialog
 
