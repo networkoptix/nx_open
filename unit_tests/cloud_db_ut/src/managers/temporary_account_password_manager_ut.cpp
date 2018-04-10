@@ -7,9 +7,8 @@
 
 #include <nx/cloud/cdb/managers/temporary_account_password_manager.h>
 #include <nx/cloud/cdb/stree/cdb_ns.h>
+#include <nx/cloud/cdb/test_support/base_persistent_data_test.h>
 #include <nx/cloud/cdb/test_support/business_data_generator.h>
-
-#include "base_persistent_data_test.h"
 
 namespace nx {
 namespace cdb {

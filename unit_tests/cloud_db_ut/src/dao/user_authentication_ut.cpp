@@ -8,8 +8,7 @@
 
 #include <nx/cloud/cdb/dao/rdb/dao_rdb_user_authentication.h>
 #include <nx/cloud/cdb/dao/memory/dao_memory_user_authentication.h>
-
-#include "base_persistent_data_test.h"
+#include <nx/cloud/cdb/test_support/base_persistent_data_test.h>
 
 namespace nx {
 namespace cdb {

@@ -70,10 +70,10 @@ void SystemHealthInfoProvider::onSystemStatusChanged(
     using namespace std::placeholders;
 
     NX_VERBOSE(this, lm("System %1 changed health state to %2")
-        .args(systemId, QnLexical::serialized(statusDescription.health)));
+        .args(systemId, statusDescription.isOnline ? "online" : "offline"));
 
     api::SystemHealthHistoryItem healthHistoryItem;
-    healthHistoryItem.state = statusDescription.health;
+    healthHistoryItem.state = statusDescription.isOnline ? api::SystemHealth::online : api::SystemHealth::offline;
     healthHistoryItem.timestamp = nx::utils::utcTime();
 
     m_dbManager->executeUpdate(

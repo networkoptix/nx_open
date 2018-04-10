@@ -3,7 +3,7 @@
 #include <nx/utils/log/log.h>
 
 #include "structure_update_statements.h"
-#include "../../ec2/db/migration/add_history_to_transaction.h"
+#include <nx/data_sync_engine/db/migration/add_history_to_transaction.h>
 
 namespace nx {
 namespace cdb {
@@ -90,6 +90,9 @@ void DbInstanceController::initializeStructureMigration()
     // Version 17.2.
     dbStructureUpdater().addUpdateScript(db::kAddBeingMergedState);
     dbStructureUpdater().addUpdateScript(db::kAddMergeInformation);
+
+    // Version 18.1.
+    dbStructureUpdater().addUpdateScript(db::kSetDataSyncModuleDbStructureVersion);
 }
 
 } // namespace rdb

@@ -25,6 +25,8 @@
 #include <nx/utils/db/async_sql_query_executor.h>
 #include <nx/utils/db/filter.h>
 
+#include <nx/data_sync_engine/transaction_log.h>
+
 #include "account_manager.h"
 #include "cache.h"
 #include "data_view.h"
@@ -38,7 +40,6 @@
 #include "../data/account_data.h"
 #include "../data/data_filter.h"
 #include "../data/system_data.h"
-#include "../ec2/transaction_log.h"
 
 namespace nx {
 namespace cdb {

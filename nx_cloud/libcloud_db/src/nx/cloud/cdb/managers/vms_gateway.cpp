@@ -1,6 +1,5 @@
 #include "vms_gateway.h"
 
-#include <nx/fusion/model_functions.h>
 #include <nx/network/http/rest/http_rest_client.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/log/log.h>
@@ -13,17 +12,6 @@
 
 namespace nx {
 namespace cdb {
-
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb, VmsResultCode,
-    (nx::cdb::VmsResultCode::ok, "ok")
-    (nx::cdb::VmsResultCode::invalidData, "invalidData")
-    (nx::cdb::VmsResultCode::networkError, "networkError")
-    (nx::cdb::VmsResultCode::forbidden, "forbidden")
-    (nx::cdb::VmsResultCode::logicalError, "logicalError")
-    (nx::cdb::VmsResultCode::unreachable, "unreachable")
-)
-
-//-------------------------------------------------------------------------------------------------
 
 VmsGateway::VmsGateway(
     const conf::Settings& settings,
