@@ -16,6 +16,8 @@
 #include <nx/client/desktop/ui/actions/action_types.h>
 #include <nx/client/desktop/ui/actions/action_parameter_types.h>
 
+#include <nx/client/desktop/resource_views/data/node_type.h>
+
 class QnWorkbenchContext;
 
 namespace nx {
@@ -609,8 +611,8 @@ ConditionWrapper isSafeMode();
 /** Allowed only for resource parameters with corresponding flags. */
 ConditionWrapper hasFlags(Qn::ResourceFlags flags, MatchMode matchMode);
 
-ConditionWrapper treeNodeType(QSet<Qn::NodeType> types);
-inline ConditionWrapper treeNodeType(Qn::NodeType type) { return treeNodeType({{type}}); }
+ConditionWrapper treeNodeType(QSet<ResourceTreeNodeType> types);
+inline ConditionWrapper treeNodeType(ResourceTreeNodeType type) { return treeNodeType({{type}}); }
 
 /** Visible in layout tour preview mode only. */
 ConditionWrapper isLayoutTourReviewMode();

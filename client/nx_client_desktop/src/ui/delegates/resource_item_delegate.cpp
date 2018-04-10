@@ -25,6 +25,7 @@
 #include <client/client_module.h>
 
 #include <nx/client/desktop/resource_views/data/camera_extra_status.h>
+#include <nx/client/desktop/resource_views/data/node_type.h>
 
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
@@ -356,8 +357,8 @@ void QnResourceItemDelegate::initStyleOption(QStyleOptionViewItem* option, const
     if (option->icon.isNull())
         option->decorationSize = defaultDecorationSize;
 
-    Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
-    if (Qn::isSeparatorNode(nodeType))
+    const auto nodeType = index.data(Qn::NodeTypeRole).value<ResourceTreeNodeType>();
+    if (isSeparatorNode(nodeType))
         option->features = QStyleOptionViewItem::None;
     else
         option->features |= QStyleOptionViewItem::HasDisplay;
@@ -453,12 +454,12 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemState(const QModel
     if (!workbench())
         return ItemState::normal;
 
-    Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
+    const auto nodeType = index.data(Qn::NodeTypeRole).value<ResourceTreeNodeType>();
 
     switch (nodeType)
     {
-        case Qn::CurrentSystemNode:
-        case Qn::CurrentUserNode:
+        case ResourceTreeNodeType::currentSystem:
+        case ResourceTreeNodeType::currentUser:
             return ItemState::selected;
 
         /*
@@ -470,10 +471,10 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemState(const QModel
          * Videowall is Selected when we are in videowall review or control mode.
         */
 
-        case Qn::ResourceNode:
-        case Qn::SharedLayoutNode:
-        case Qn::EdgeNode:
-        case Qn::SharedResourceNode:
+        case ResourceTreeNodeType::resource:
+        case ResourceTreeNodeType::sharedLayout:
+        case ResourceTreeNodeType::edge:
+        case ResourceTreeNodeType::sharedResource:
         {
             QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
             NX_ASSERT(resource);
@@ -489,16 +490,16 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemState(const QModel
             return itemStateForMediaResource(index);
         }
 
-        case Qn::RecorderNode:
+        case ResourceTreeNodeType::recorder:
             return itemStateForRecorder(index);
 
-        case Qn::LayoutItemNode:
+        case ResourceTreeNodeType::layoutItem:
             return itemStateForLayoutItem(index);
 
-        case Qn::VideoWallItemNode:
+        case ResourceTreeNodeType::videoWallItem:
             return itemStateForVideoWallItem(index);
 
-        case Qn::LayoutTourNode:
+        case ResourceTreeNodeType::layoutTour:
             return itemStateForLayoutTour(index);
 
         default:
@@ -694,13 +695,13 @@ void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& b
     if (infoLevel == Qn::RI_NameOnly)
         return;
 
-    Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
+    const auto nodeType = index.data(Qn::NodeTypeRole).value<ResourceTreeNodeType>();
 
-    if (nodeType == Qn::VideoWallItemNode)
+    if (nodeType == ResourceTreeNodeType::videoWallItem)
     {
         // skip videowall screens
     }
-    else if (nodeType == Qn::RecorderNode)
+    else if (nodeType == ResourceTreeNodeType::recorder)
     {
         auto firstChild = index.model()->index(0, 0, index);
         if (!firstChild.isValid()) /* This can happen in rows deleting */
@@ -713,7 +714,8 @@ void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& b
         if (!resource)
             return;
 
-        if ((nodeType == Qn::LayoutItemNode || nodeType == Qn::SharedResourceNode)
+        if ((nodeType == ResourceTreeNodeType::layoutItem
+                || nodeType == ResourceTreeNodeType::sharedResource)
             && resource->hasFlags(Qn::server)
             && !resource->hasFlags(Qn::fake))
         {

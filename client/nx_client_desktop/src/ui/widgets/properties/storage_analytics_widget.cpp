@@ -1,6 +1,7 @@
 #include "storage_analytics_widget.h"
 #include "ui_storage_analytics_widget.h"
 
+#include <set>
 #include <chrono>
 
 #include <QtCore/QMimeData>
@@ -20,6 +21,7 @@
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/common/utils/widget_anchor.h>
+#include <nx/client/desktop/resource_views/data/node_type.h>
 #include <ui/customization/customized.h>
 #include <ui/delegates/recording_stats_item_delegate.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
@@ -38,7 +40,6 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/synctime.h>
-#include <set>
 
 using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
@@ -457,7 +458,7 @@ void QnStorageAnalyticsWidget::at_eventsGrid_customContextMenuRequested(const QP
         if (resource)
         {
             action::Parameters parameters(resource);
-            parameters.setArgument(Qn::NodeTypeRole, Qn::ResourceNode);
+            parameters.setArgument(Qn::NodeTypeRole, ResourceTreeNodeType::resource);
 
             menu.reset(manager->newMenu(action::TreeScope, nullptr, parameters));
             foreach(QAction* action, menu->actions())

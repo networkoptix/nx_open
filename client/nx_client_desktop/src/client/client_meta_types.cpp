@@ -31,6 +31,7 @@
 #include <nx/client/desktop/utils/server_file_cache.h>
 #include <nx/client/desktop/export/settings/export_media_persistent_settings.h>
 #include <nx/client/desktop/layout_templates/layout_template.h>
+#include <nx/client/desktop/resource_views/data/node_type.h>
 #include <nx/client/desktop/utils/upload_state.h>
 #include <nx/client/desktop/utils/wearable_payload.h>
 #include <nx/client/desktop/utils/wearable_state.h>
@@ -79,7 +80,7 @@ void QnClientMetaTypes::initialize() {
 
     qRegisterMetaTypeStreamOperators<QList<QUrl>>();
 
-    qRegisterMetaType<Qn::NodeType>();
+    qRegisterMetaType<ResourceTreeNodeType>();
     qRegisterMetaType<Qn::ItemRole>();
     qRegisterMetaType<QnThumbnail>();
     qRegisterMetaType<QnLicenseWarningState>();

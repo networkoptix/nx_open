@@ -11,7 +11,7 @@ class QnResourceTreeModelLayoutNode: public QnResourceTreeModelNode
 
 public:
     QnResourceTreeModelLayoutNode(QnResourceTreeModel* model, const QnResourcePtr& resource,
-        Qn::NodeType nodeType = Qn::ResourceNode);
+        NodeType nodeType = NodeType::resource);
     virtual ~QnResourceTreeModelLayoutNode();
 
     virtual void updateRecursive() override;

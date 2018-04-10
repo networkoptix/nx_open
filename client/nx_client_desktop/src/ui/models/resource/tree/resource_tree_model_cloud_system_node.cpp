@@ -6,7 +6,7 @@ QnResourceTreeModelCloudSystemNode::QnResourceTreeModelCloudSystemNode(
     const QnSystemDescriptionPtr& system,
     QnResourceTreeModel* model)
     :
-    base_type(model, Qn::CloudSystemNode, QnUuid()),
+    base_type(model, NodeType::cloudSystem, QnUuid()),
     m_system(system)
 {
 
