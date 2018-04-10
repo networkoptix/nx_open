@@ -37,6 +37,8 @@ public:
     static State setCustomAspectRatio(State state, const QnAspectRatio& value);
     static State setCustomRotation(State state, const Rotation& value);
     static State setRecordingEnabled(State state, bool value);
+    static State setMotionDetectionEnabled(State state, bool value);
+    static State setMotionRegionList(State state, const QList<QnMotionRegion>& value);
 };
 
 } // namespace desktop

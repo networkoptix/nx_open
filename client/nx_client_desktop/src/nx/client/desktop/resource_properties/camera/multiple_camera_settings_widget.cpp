@@ -23,7 +23,6 @@
 #include <ui/workbench/workbench_context.h>
 
 #include "legacy_camera_schedule_widget.h"
-#include "camera_motion_mask_widget.h"
 
 namespace nx {
 namespace client {

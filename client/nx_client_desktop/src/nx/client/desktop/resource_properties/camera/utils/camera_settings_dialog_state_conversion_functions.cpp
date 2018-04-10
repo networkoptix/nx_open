@@ -126,8 +126,19 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
 {
     if (state.isSingleCamera())
     {
-        cameras.first()->setName(state.singleCameraProperties.name());
+        auto camera = cameras.first();
+        camera->setName(state.singleCameraProperties.name());
+
+        if (state.devicesDescription.hasMotion == CameraSettingsDialogState::CombinedValue::All)
+        {
+            camera->setMotionType(state.singleCameraSettings.enableMotionDetection()
+                ? camera->getDefaultMotionType()
+                : Qn::MT_NoMotion);
+
+            camera->setMotionRegionList(state.singleCameraSettings.motionRegionList());
+        }
     }
+
     setMinRecordingDays(state.recording.minDays, cameras);
     setMaxRecordingDays(state.recording.maxDays, cameras);
 

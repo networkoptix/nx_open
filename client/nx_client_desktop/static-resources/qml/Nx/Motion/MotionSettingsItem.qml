@@ -1,0 +1,232 @@
+import QtQuick 2.6
+import QtQuick.Controls 1.2
+
+import Nx 1.0
+import Nx.Core 1.0
+import Nx.Common 1.0
+import Nx.Media 1.0
+import Nx.Items 1.0
+import com.networkoptix.qml 1.0
+import nx.client.core 1.0
+import nx.client.desktop 1.0
+
+/* Required context properties:
+property VirtualCameraResource cameraResource
+property CameraMotionHelper cameraMotionHelper
+property int currentSensitivity
+property color sensitivityColors[]
+*/
+
+Rectangle
+{
+    id: videoContainer
+
+    color: ColorTheme.window
+
+    readonly property int kMotionGridWidth: 44
+    readonly property int kMotionGridHeight: 32
+
+    readonly property real kMotionGridOpacity: 0.06
+    readonly property real kMotionRegionOpacity: 0.3
+    readonly property real kSelectionOpacity: 0.2
+
+    readonly property string cameraResourceId:
+        cameraResource ? cameraResource.id.toString() : ""
+
+    readonly property var motionSensitivityColors: sensitivityColors
+
+    MediaResourceHelper
+    {
+        id: helper
+        resourceId: cameraResourceId
+    }
+
+    VideoPositioner
+    {
+        id: content
+        anchors.fill: videoContainer
+
+        sourceSize: Qt.size(video.implicitWidth, video.implicitHeight)
+
+        item: video
+
+        MultiVideoOutput
+        {
+            id: video
+            resourceHelper: helper
+            mediaPlayer: player
+
+            MouseArea
+            {
+                id: mouseArea
+                anchors.fill: parent
+                acceptedButtons: Qt.LeftButton | Qt.RightButton
+                cursorShape: Qt.CrossCursor
+
+                readonly property rect selectionRect: Qt.rect(
+                    Math.min(x1, x2), Math.min(y1, y2), Math.abs(x2 - x1), Math.abs(y2 - y1))
+
+                signal selectionFinished()
+
+                property int x1: 0
+                property int y1: 0
+                property int x2: 0
+                property int y2: 0
+                property bool selectionStarted: false
+
+                function startSelection(x, y)
+                {
+                    x1 = x2 = x
+                    y1 = y2 = y
+                    selectionStarted = true
+                }
+
+                function continueSelection(x, y)
+                {
+                    x2 = x
+                    y2 = y
+                }
+
+                function stopSelection()
+                {
+                    x1 = x2 = 0
+                    y1 = y2 = 0
+                    selectionStarted = false
+                }
+
+                onPressed:
+                {
+                    if (mouse.button == Qt.LeftButton)
+                        startSelection(mouse.x, mouse.y)
+                    else if (mouse.button == Qt.RightButton)
+                        stopSelection()
+                }
+
+                onReleased:
+                {
+                    if (selectionStarted && mouse.button == Qt.LeftButton)
+                    {
+                        continueSelection(mouse.x, mouse.y)
+                        selectionFinished()
+                        stopSelection()
+                    }
+                }
+
+                onPositionChanged:
+                {
+                    if (selectionStarted)
+                        continueSelection(mouse.x, mouse.y)
+                }
+            }
+
+            channelOverlay: Item
+            {
+                id: channelOverlay
+                property int index: 0
+
+                readonly property rect selectionRect:
+                {
+                    var mapped = mapFromItem(mouseArea,
+                        mouseArea.selectionRect.x,
+                        mouseArea.selectionRect.y,
+                        mouseArea.selectionRect.width,
+                        mouseArea.selectionRect.height)
+
+                    var x = MathUtils.bound(0, mapped.left, width);
+                    var y = MathUtils.bound(0, mapped.top, height);
+
+                    return Qt.rect(x, y,
+                        MathUtils.bound(x, mapped.right, width) - x,
+                        MathUtils.bound(y, mapped.bottom, height) - y);
+                }
+
+                readonly property bool selectionValid: mouseArea.selectionStarted
+                    && selectionRect.width > 0 && selectionRect.height > 0
+
+                readonly property rect selectionMotionRect: itemToMotionRect(selectionRect)
+
+                readonly property vector2d motionCellSize:
+                    Qt.vector2d(width / kMotionGridWidth, height / kMotionGridHeight)
+
+                function motionToItemRect(motionRect)
+                {
+                    return Qt.rect(
+                        motionRect.x * motionCellSize.x,
+                        motionRect.y * motionCellSize.y,
+                        motionRect.width * motionCellSize.x,
+                        motionRect.height * motionCellSize.y)
+                }
+
+                function itemToMotionRect(itemRect)
+                {
+                    var p1 = itemToMotionPoint(itemRect.left, itemRect.top)
+                    var p2 = itemToMotionPoint(itemRect.right, itemRect.bottom)
+                    return Qt.rect(p1.x, p1.y, p2.x - p1.x + 1, p2.y - p1.y + 1)
+                }
+
+                function itemToMotionPoint(x, y)
+                {
+                    return Qt.vector2d(
+                        MathUtils.bound(0, Math.floor(x / motionCellSize.x), kMotionGridWidth - 1),
+                        MathUtils.bound(0, Math.floor(y / motionCellSize.y), kMotionGridHeight - 1))
+                }
+
+                Rectangle
+                {
+                    id: selectionMarker
+
+                    readonly property rect currentRect: motionToItemRect(selectionMotionRect)
+
+                    x: currentRect.x
+                    y: currentRect.y
+                    width: currentRect.width
+                    height: currentRect.height
+
+                    color: "white"
+                    opacity: kSelectionOpacity
+                    visible: selectionValid
+                }
+
+                MotionRegions
+                {
+                    id: motionRegions
+                    anchors.fill: parent
+                    motionHelper: cameraMotionHelper
+                    channel: index
+                    fillOpacity: kMotionRegionOpacity
+                    borderColor: ColorTheme.window
+                    labelsColor: ColorTheme.shadow
+                    sensitivityColors: motionSensitivityColors
+
+                    Connections
+                    {
+                        target: mouseArea
+
+                        onSelectionFinished:
+                        {
+                            if (selectionValid)
+                                motionRegions.userAddRect(currentSensitivity, selectionMotionRect)
+                        }
+                    }
+                }
+
+                UniformGrid
+                {
+                    id: grid
+                    anchors.fill: parent
+                    opacity: kMotionGridOpacity
+                    cellCountX: kMotionGridWidth
+                    cellCountY: kMotionGridHeight
+                }
+            }
+        }
+    }
+
+    MediaPlayer
+    {
+        id: player
+        resourceId: helper.resourceId
+
+        onSourceChanged: playLive()
+    }
+}

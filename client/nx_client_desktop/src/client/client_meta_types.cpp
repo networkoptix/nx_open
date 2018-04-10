@@ -40,6 +40,7 @@
 #include <nx/cloud/cdb/api/system_data.h>
 #include <api/server_rest_connection.h>
 
+#include <nx/client/desktop/resource_properties/camera/widgets/motion_regions_item.h>
 #include <nx/client/desktop/ui/common/color_theme.h>
 #include <nx/client/desktop/ui/common/recording_status_helper.h>
 #include <nx/client/desktop/ui/common/focus_frame_item.h>
@@ -201,5 +202,6 @@ void QnClientMetaTypes::registerQmlTypes()
     CursorManager::registerQmlType();
     RecordingStatusHelper::registerQmlType();
     FocusFrameItem::registerQmlType();
+    MotionRegionsItem::registerQmlType();
 }
 

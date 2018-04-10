@@ -26,15 +26,15 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-class CameraMotionMaskWidget: public Connective<QWidget>, protected QnWorkbenchContextAware
+class LegacyCameraMotionMaskWidget: public Connective<QWidget>, protected QnWorkbenchContextAware
 {
     Q_OBJECT
     Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
     typedef Connective<QWidget> base_type;
 
 public:
-    CameraMotionMaskWidget(QWidget *parent = 0);
-    virtual ~CameraMotionMaskWidget();
+    LegacyCameraMotionMaskWidget(QWidget *parent = 0);
+    virtual ~LegacyCameraMotionMaskWidget();
 
     QnResourcePtr camera() const;
     void setCamera(const QnResourcePtr &resource);
