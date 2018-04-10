@@ -76,6 +76,7 @@
         <nx_update_ut.guid>{F6D33EC2-B123-43F2-9FB3-BE01DE189B90}</nx_update_ut.guid>
         <libcloud_db.guid>{BBA5BB95-B669-42C4-8074-EE0E361C094E}></libcloud_db.guid>
         <nx_data_sync_engine.guid>{93FF9310-19B4-4256-B0EA-B657927264E0}</nx_data_sync_engine.guid>
+        <nx_data_sync_engine_ut.guid>{28C4630B-795D-4682-BB60-D48CFD1B0516}</nx_data_sync_engine_ut.guid>
         <time_server.guid>{5640EBAF-8312-4C7C-851E-A48F0B5E2208}</time_server.guid>
         <cloud_db.guid>{44ADCF67-21B0-403D-A771-C138B11CDB83}></cloud_db.guid>
         <cloud_db_ut.guid>{626088EE-4911-4676-9152-F49BA62E1729}</cloud_db_ut.guid>

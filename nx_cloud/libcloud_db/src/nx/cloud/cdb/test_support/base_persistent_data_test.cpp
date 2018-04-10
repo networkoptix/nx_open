@@ -1,12 +1,12 @@
 #include "base_persistent_data_test.h"
 
-#include <gtest/gtest.h>
-
 #include <nx/fusion/serialization/sql.h>
 #include <nx/fusion/serialization/sql_functions.h>
 #include <nx/utils/test_support/utils.h>
 
-#include <nx/cloud/cdb/test_support/business_data_generator.h>
+#include <utils/common/id.h>
+
+#include "business_data_generator.h"
 
 namespace nx {
 namespace cdb {
@@ -40,10 +40,9 @@ api::AccountData DaoHelper::insertRandomAccount()
     using namespace std::placeholders;
 
     auto account = cdb::test::BusinessDataGenerator::generateRandomAccount();
-    const auto dbResult = executeUpdateQuerySync(
+    executeUpdateQuerySyncThrow(
         std::bind(&AccountDataObject::insert, &m_accountDbController,
             _1, account));
-    NX_GTEST_ASSERT_EQ(nx::utils::db::DBResult::ok, dbResult);
     m_accounts.push_back(account);
     return account;
 }
@@ -59,10 +58,9 @@ void DaoHelper::insertSystem(const api::AccountData& account, const data::System
 {
     using namespace std::placeholders;
 
-    auto dbResult = executeUpdateQuerySync(
+    executeUpdateQuerySyncThrow(
         std::bind(&SystemDataObject::insert, &m_systemDbController,
             _1, system, account.id));
-    NX_GTEST_ASSERT_EQ(nx::utils::db::DBResult::ok, dbResult);
 
     api::SystemSharingEx sharing;
     sharing.systemId = system.id;
@@ -70,11 +68,10 @@ void DaoHelper::insertSystem(const api::AccountData& account, const data::System
     sharing.accessRole = api::SystemAccessRole::owner;
     sharing.isEnabled = true;
     sharing.vmsUserId = guidFromArbitraryData(account.email).toSimpleByteArray().toStdString();
-    dbResult = executeUpdateQuerySync(
+    executeUpdateQuerySyncThrow(
         std::bind(&SystemSharingDataObject::insertOrReplaceSharing, &m_systemSharingController,
             _1, sharing));
 
-    NX_GTEST_ASSERT_EQ(nx::utils::db::DBResult::ok, dbResult);
     m_systems.push_back(system);
 }
 
@@ -82,10 +79,9 @@ void DaoHelper::insertSystemSharing(const api::SystemSharingEx& sharing)
 {
     using namespace std::placeholders;
 
-    const auto dbResult = executeUpdateQuerySync(
+    executeUpdateQuerySyncThrow(
         std::bind(&SystemSharingDataObject::insertOrReplaceSharing,
             &m_systemSharingController, _1, sharing));
-    ASSERT_EQ(nx::utils::db::DBResult::ok, dbResult);
 }
 
 void DaoHelper::deleteSystemSharing(const api::SystemSharingEx& sharing)
@@ -96,10 +92,9 @@ void DaoHelper::deleteSystemSharing(const api::SystemSharingEx& sharing)
         {nx::utils::db::SqlFilterFieldEqual("account_id", ":accountId",
             QnSql::serialized_field(sharing.accountId))};
 
-    const auto dbResult = executeUpdateQuerySync(
+    executeUpdateQuerySyncThrow(
         std::bind(&SystemSharingDataObject::deleteSharing,
             &m_systemSharingController, _1, sharing.systemId, sqlFilter));
-    ASSERT_EQ(nx::utils::db::DBResult::ok, dbResult);
 }
 
 const api::AccountData& DaoHelper::getAccount(std::size_t index) const
