@@ -142,7 +142,8 @@
     "requiredMessage": "Chỉ sử dụng chữ cái Latin, số và ký hiệu bàn phím, tránh các khoảng trống đầu và cuối",
     "weakMessage": "Sử dụng số, chữ hoa và chữ thường và ký tự đặc biệt để làm cho mật khẩu của bạn mạnh mẽ hơn",
     "strongMessage": "Mật khẩu mạnh!",
-    "commonMessage": "Mật khẩu này nằm trong mật khẩu phổ biến nhất trên thế giới"
+    "commonMessage": "Mật khẩu này nằm trong mật khẩu phổ biến nhất trên thế giới",
+    "missingMessage": "Password is required"
   },
   "sharing": {
     "confirmOwner": "Nếu bạn thay sở hữu hệ thống, bạn sẽ thu hồi quyền sở hữu hiện tại của mình. Không thể phục hồi sở hữu cũ. Bạn có chắc không?",

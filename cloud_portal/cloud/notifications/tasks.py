@@ -2,7 +2,7 @@ from __future__ import absolute_import
 from celery import shared_task
 from .engines import email_engine
 
-from smtplib import SMTPException, SMTPConnectError
+from smtplib import SMTPException, SMTPConnectError, SMTPServerDisconnected
 from ssl import SSLError
 from celery.exceptions import Ignore
 
@@ -15,6 +15,12 @@ from util.helpers import get_language_for_email
 import traceback
 import logging
 logger = logging.getLogger(__name__)
+
+
+class MaxResendException(Exception):
+    def __str__(self):
+        return "Emails was not sent because it hit max retry limit!!!"
+
 
 def log_error(error, user_email, type, message, lang, customization, queue, attempt):
     error_formatted = '\n{}:{}\nTarget Email: {}\nType: {}\nMessage:{}\nLanguage: {}\nCustomization: {}\nQueue: {}\nAttempt: {}\nCall Stack: {}'\
@@ -29,7 +35,7 @@ def log_error(error, user_email, type, message, lang, customization, queue, atte
                 attempt,
                 traceback.format_exc())
 
-    if isinstance(error, SMTPException):
+    if isinstance(error, SMTPException) or isinstance(error, SMTPServerDisconnected):
         logger.warning(error_formatted)
     else:
         logger.error(error_formatted)
@@ -45,6 +51,8 @@ def send_email(user_email, type, message, customization, queue="", attempt=1):
         if (isinstance(error, SMTPException) or isinstance(error, SSLError)) and attempt < settings.MAX_RETRIES:
             send_email.apply_async(args=[user_email, type, message, customization, queue, attempt+1],
                                    queue=queue)
+        elif attempt >= settings.MAX_RETRIES:
+            error = MaxResendException()
 
         log_error(error, user_email, type, message, lang, customization, queue, attempt)
 
