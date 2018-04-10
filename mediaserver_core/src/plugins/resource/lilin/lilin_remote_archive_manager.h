@@ -9,9 +9,9 @@
 
 #include <boost/optional/optional.hpp>
 
-#include <core/resource/resource_fwd.h>
 #include <core/resource/abstract_remote_archive_manager.h>
 #include <nx/network/http/http_client.h>
+#include <nx/mediaserver/resource/resource_fwd.h>
 
 namespace nx {
 namespace mediaserver_core {

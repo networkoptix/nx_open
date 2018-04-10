@@ -119,6 +119,4 @@ private:
     void inputPortStateRequestDone(nx::network::http::AsyncHttpClientPtr client);
 };
 
-typedef QnSharedResourcePointer<QnPlAreconVisionResource> QnPlAreconVisionResourcePtr;
-
 #endif

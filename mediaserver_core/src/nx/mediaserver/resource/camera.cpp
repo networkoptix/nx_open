@@ -541,6 +541,17 @@ QnAudioTransmitterPtr Camera::getAudioTransmitter()
     return m_audioTransmitter;
 }
 
+void Camera::setLastMediaIssue(const CameraDiagnostics::Result& issue)
+{
+    QnMutexLocker lk(&m_mutex);
+    m_lastMediaIssue = issue;
+}
+
+CameraDiagnostics::Result Camera::getLastMediaIssue() const
+{
+    QnMutexLocker lk(&m_mutex);
+    return m_lastMediaIssue;
+}
 
 } // namespace resource
 } // namespace mediaserver

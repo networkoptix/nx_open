@@ -31,7 +31,7 @@ public:
     static const char* NETOPTIX_SECONDARY_TOKEN;
     */
 
-    QnOnvifStreamReader(const QnResourcePtr& res);
+    QnOnvifStreamReader(const QnPlOnvifResourcePtr& res);
     virtual ~QnOnvifStreamReader();
     virtual QnConstResourceAudioLayoutPtr getDPAudioLayout() const override;
     virtual void pleaseStop() override;
@@ -102,7 +102,7 @@ private:
     QString m_streamUrl;
     QElapsedTimer m_cachedTimer;
     QnLiveStreamParams m_previousStreamParams;
-    bool m_mustNotConfigureResource;
+    bool m_mustNotConfigureResource = false;
 };
 
 #endif //ENABLE_ONVIF

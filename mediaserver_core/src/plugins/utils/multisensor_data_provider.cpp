@@ -22,9 +22,9 @@ namespace nx {
 namespace plugins {
 namespace utils {
 
-MultisensorDataProvider::MultisensorDataProvider(const QnResourcePtr& res):
+MultisensorDataProvider::MultisensorDataProvider(const QnPlOnvifResourcePtr& res):
     CLServerPushStreamReader(res),
-    m_onvifRes(res.dynamicCast<QnPlOnvifResource>())
+    m_onvifRes(res)
 {
 
 }

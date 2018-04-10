@@ -58,7 +58,6 @@ QnResource::QnResource(const QnResource& right):
     m_initialized(right.m_initialized),
     m_lastInitTime(right.m_lastInitTime),
     m_prevInitializationResult(right.m_prevInitializationResult),
-    m_lastMediaIssue(right.m_lastMediaIssue),
     m_initializationAttemptCount(right.m_initializationAttemptCount),
     m_locallySavedProperties(right.m_locallySavedProperties),
     m_initInProgress(right.m_initInProgress),
@@ -751,18 +750,6 @@ bool QnResource::init()
         emit initializedChanged(toSharedPointer(this));
 
     return true;
-}
-
-void QnResource::setLastMediaIssue(const CameraDiagnostics::Result& issue)
-{
-    QnMutexLocker lk(&m_mutex);
-    m_lastMediaIssue = issue;
-}
-
-CameraDiagnostics::Result QnResource::getLastMediaIssue() const
-{
-    QnMutexLocker lk(&m_mutex);
-    return m_lastMediaIssue;
 }
 
 void QnResource::blockingInit()

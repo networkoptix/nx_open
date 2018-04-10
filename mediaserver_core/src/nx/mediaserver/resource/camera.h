@@ -5,6 +5,8 @@
 #include <core/resource/media_stream_capability.h>
 #include <core/dataconsumer/audio_data_transmitter.h>
 
+#include "resource_fwd.h"
+
 typedef std::shared_ptr<QnAbstractAudioTransmitter> QnAudioTransmitterPtr;
 
 namespace nx {
@@ -127,6 +129,10 @@ public:
     virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const override;
 
     virtual QnAudioTransmitterPtr getAudioTransmitter();
+
+    void setLastMediaIssue(const CameraDiagnostics::Result& issue);
+    CameraDiagnostics::Result getLastMediaIssue() const;
+
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
 
@@ -153,8 +159,8 @@ private:
     AdvancedParametersProvider* m_defaultAdvancedParametersProvider = nullptr;
     std::map<QString, AdvancedParametersProvider*> m_advancedParametersProvidersByParameterId;
     std::map<Qn::StreamIndex, std::unique_ptr<StreamCapabilityAdvancedParametersProvider>> m_streamCapabilityAdvancedProviders;
+    CameraDiagnostics::Result m_lastMediaIssue = CameraDiagnostics::NoErrorResult();
 };
-using CameraPtr = QSharedPointer<Camera>;
 
 } // namespace resource
 } // namespace mediaserver

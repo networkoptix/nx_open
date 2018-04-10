@@ -251,7 +251,7 @@ QSize QnPlIsdResource::getSecondaryResolution() const
 
 QnAbstractStreamDataProvider* QnPlIsdResource::createLiveDataProvider()
 {
-    return new QnISDStreamReader(toSharedPointer());
+    return new QnISDStreamReader(toSharedPointer(this));
 }
 
 void QnPlIsdResource::setCroppingPhysical(QRect /*cropping*/)

@@ -11,9 +11,9 @@
 #include <nx/utils/log/log.h>
 #include <plugins/resource/arecontvision/resource/av_panoramic.h>
 
-
-QnArecontRtspStreamReader::QnArecontRtspStreamReader(const QnResourcePtr& res)
-:
+QnArecontRtspStreamReader::QnArecontRtspStreamReader(
+    const QnPlAreconVisionResourcePtr& res)
+    :
     parent_type(res),
     m_rtpStreamParser(res)
 {
@@ -35,14 +35,12 @@ CameraDiagnostics::Result QnArecontRtspStreamReader::openStreamInternal(
     const Qn::ConnectionRole role = getRole();
     m_rtpStreamParser.setRole(role);
 
-    auto res = getResource().dynamicCast<QnPlAreconVisionResource>();
-
     QString requestStr;
     {
         QnMutexLocker lk(&m_mutex);
-        requestStr = res->generateRequestString(
+        requestStr = m_camera->generateRequestString(
             m_streamParam,
-            res->isH264(),
+            m_camera->isH264(),
             role != Qn::CR_SecondaryLiveVideo,
             false,  //blackWhite
             NULL,   //outQuality,
@@ -61,7 +59,7 @@ CameraDiagnostics::Result QnArecontRtspStreamReader::openStreamInternal(
     {
         params.resolution = QSize(maxResolution.width() / 2, maxResolution.height() / 2);
         requestStr += lit("&FPS=%1").arg((int)params.fps);
-        const int desiredBitrateKbps = res->suggestBitrateKbps(
+        const int desiredBitrateKbps = m_camera->suggestBitrateKbps(
             params,
             getRole());
         requestStr += lit("&Ratelimit=%1").arg(desiredBitrateKbps);
@@ -70,18 +68,19 @@ CameraDiagnostics::Result QnArecontRtspStreamReader::openStreamInternal(
     {
         requestStr += lit("&FPS=%1").arg((int)params.fps);
         params.resolution = QSize(maxResolution.width(), maxResolution.height());
-        const int desiredBitrateKbps = res->suggestBitrateKbps(
+        const int desiredBitrateKbps = m_camera->suggestBitrateKbps(
             params,
             getRole());
         requestStr += lit("&Ratelimit=%1").arg(desiredBitrateKbps);
     }
-    if (res->isAudioEnabled())
+    if (m_camera->isAudioEnabled())
         requestStr += lit("&MIC=on");
 
-    const QString url = lit("rtsp://%1:%2/%3").arg(res->getHostAddress()).arg(nx_rtsp::DEFAULT_RTSP_PORT).arg(requestStr);
+    const QString url = lit("rtsp://%1:%2/%3").arg(m_camera->getHostAddress()).arg(
+        nx_rtsp::DEFAULT_RTSP_PORT).arg(requestStr);
 
     m_rtpStreamParser.setRequest(url);
-	res->updateSourceUrl(m_rtpStreamParser.getCurrentStreamUrl(), getRole());
+	m_camera->updateSourceUrl(m_rtpStreamParser.getCurrentStreamUrl(), getRole());
     return m_rtpStreamParser.openStream();
 }
 

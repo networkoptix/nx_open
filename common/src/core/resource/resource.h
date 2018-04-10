@@ -81,9 +81,6 @@ public:
     */
     bool init();
 
-    void setLastMediaIssue(const CameraDiagnostics::Result& issue);
-    CameraDiagnostics::Result getLastMediaIssue() const;
-
     /*!
         Calls \a QnResource::init. If \a QnResource::init is already running in another thread, this method waits for it to complete
     */
@@ -345,7 +342,7 @@ private:
     qint64 m_lastInitTime = 0;
     CameraDiagnostics::Result m_prevInitializationResult = CameraDiagnostics::Result(
         CameraDiagnostics::ErrorCode::unknown);
-    CameraDiagnostics::Result m_lastMediaIssue = CameraDiagnostics::NoErrorResult();
+
     QAtomicInt m_initializationAttemptCount;
     //!map<key, <value, isDirty>>
     std::map<QString, LocalPropertyValue> m_locallySavedProperties;

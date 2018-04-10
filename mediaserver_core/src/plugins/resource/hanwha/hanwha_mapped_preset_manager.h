@@ -2,6 +2,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/mediaserver/ptz/mapped_preset_manager.h>
+#include <nx/mediaserver/resource/resource_fwd.h>
 
 namespace nx {
 namespace mediaserver_core {

@@ -11,6 +11,8 @@ class QnResourceDataPool: public QObject
 {
     Q_OBJECT;
 public:
+    using QnConstSecurityCamResourcePtr = QnSharedResourcePointer<const QnSecurityCamResource>;
+
     QnResourceDataPool(QObject *parent = NULL);
     virtual ~QnResourceDataPool();
 

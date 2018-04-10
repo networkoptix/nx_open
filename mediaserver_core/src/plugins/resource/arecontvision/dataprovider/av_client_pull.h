@@ -24,7 +24,7 @@ class QnPlAVClinetPullStreamReader
     typedef QnBasicAvStreamReader<QnClientPullMediaStreamProvider> parent_type;
 
 public:
-    QnPlAVClinetPullStreamReader(const QnResourcePtr& res);
+    QnPlAVClinetPullStreamReader(const QnPlAreconVisionResourcePtr& res);
     virtual ~QnPlAVClinetPullStreamReader();
 
 protected:

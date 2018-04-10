@@ -11,11 +11,11 @@
 #include "acti_resource.h"
 #include "acti_stream_reader.h"
 
-QnActiStreamReader::QnActiStreamReader(const QnResourcePtr& res):
+QnActiStreamReader::QnActiStreamReader(const QnActiResourcePtr& res):
     CLServerPushStreamReader(res),
-    m_multiCodec(res)
+    m_multiCodec(res),
+    m_actiRes(res)
 {
-    m_actiRes = res.dynamicCast<QnActiResource>();
 }
 
 QnActiStreamReader::~QnActiStreamReader()

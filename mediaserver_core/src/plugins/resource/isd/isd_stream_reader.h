@@ -13,7 +13,7 @@ class QnISDStreamReader: public CLServerPushStreamReader
 public:
     static const int ISD_HTTP_REQUEST_TIMEOUT_MS;
 
-    QnISDStreamReader(const QnResourcePtr& res);
+    QnISDStreamReader(const QnPlIsdResourcePtr& res);
     virtual ~QnISDStreamReader();
 
     virtual QnConstResourceAudioLayoutPtr getDPAudioLayout() const override;
@@ -26,13 +26,15 @@ protected:
     virtual void pleaseStop() override;
 
 private:
-    QnMulticodecRtpReader m_rtpStreamParser;
-
     virtual QnMetaDataV1Ptr getCameraMetadata() override;
 
     QString serializeStreamParams(
         const QnLiveStreamParams& params,
         int profileIndex) const;
+
+private:
+    QnMulticodecRtpReader m_rtpStreamParser;
+    QnPlIsdResourcePtr m_isdCam;
 };
 
 #endif // #ifdef ENABLE_ISD

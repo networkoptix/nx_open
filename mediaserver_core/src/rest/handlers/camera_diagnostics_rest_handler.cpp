@@ -5,13 +5,14 @@
 #include <api/model/camera_diagnostics_reply.h>
 #include <providers/spush_media_stream_provider.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource/security_cam_resource.h>
 #include <nx/network/http/http_types.h>
 #include <camera/camera_pool.h>
 #include <api/helpers/camera_id_helper.h>
 #include <nx/utils/log/log.h>
 #include <rest/server/rest_connection_processor.h>
 #include <common/common_module.h>
+
+#include <nx/mediaserver/resource/camera.h>
 
 namespace {
 
@@ -45,8 +46,10 @@ int QnCameraDiagnosticsRestHandler::executeGet(
     }
 
     QString notFoundCameraId = QString::null;
-    QnSecurityCamResourcePtr camera = nx::camera_id_helper::findCameraByFlexibleIds(
-        owner->commonModule()->resourcePool(), &notFoundCameraId, params, kCameraIdParams);
+    const auto camera = nx::camera_id_helper::findCameraByFlexibleIds(
+        owner->commonModule()->resourcePool(), &notFoundCameraId, params, kCameraIdParams)
+        .dynamicCast<nx::mediaserver::resource::Camera>();
+
     if (!camera)
     {
         if (!notFoundCameraId.isNull())
@@ -134,7 +137,7 @@ CameraDiagnostics::Result QnCameraDiagnosticsRestHandler::tryAcquireCameraMediaS
 }
 
 CameraDiagnostics::Result QnCameraDiagnosticsRestHandler::checkCameraMediaStreamForErrors(
-    const QnResourcePtr& res)
+    const nx::mediaserver::resource::CameraPtr& camera)
 {
-    return res->getLastMediaIssue();
+    return camera->getLastMediaIssue();
 }

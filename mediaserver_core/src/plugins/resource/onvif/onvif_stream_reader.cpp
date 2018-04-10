@@ -40,12 +40,11 @@ struct CameraInfoParams
 // QnOnvifStreamReader
 //
 
-QnOnvifStreamReader::QnOnvifStreamReader(const QnResourcePtr& res):
+QnOnvifStreamReader::QnOnvifStreamReader(const QnPlOnvifResourcePtr& res):
     CLServerPushStreamReader(res),
     m_multiCodec(res),
-    m_mustNotConfigureResource(false)
+    m_onvifRes(res)
 {
-    m_onvifRes = getResource().dynamicCast<QnPlOnvifResource>();
 }
 
 QnOnvifStreamReader::~QnOnvifStreamReader()
@@ -166,13 +165,9 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl(
         m_onvifRes->getTimeDrift());
 
     auto proxy = soapWrapper.getProxy();
-    auto onvifRes = m_resource.dynamicCast<QnPlOnvifResource>();
 
-    if (onvifRes)
-    {
-        proxy->soap->recv_timeout = onvifRes->getOnvifRequestsRecieveTimeout();
-        proxy->soap->send_timeout = onvifRes->getOnvifRequestsSendTimeout();
-    }
+    proxy->soap->recv_timeout = m_onvifRes->getOnvifRequestsRecieveTimeout();
+    proxy->soap->send_timeout = m_onvifRes->getOnvifRequestsSendTimeout();
 
     CameraInfoParams info;
 

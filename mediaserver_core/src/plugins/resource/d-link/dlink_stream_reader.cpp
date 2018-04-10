@@ -33,9 +33,10 @@ struct ACS_VideoHeader
 
 #pragma pack(pop)
 
-PlDlinkStreamReader::PlDlinkStreamReader(const QnResourcePtr& res):
+PlDlinkStreamReader::PlDlinkStreamReader(const QnPlDlinkResourcePtr& res):
     CLServerPushStreamReader(res),
-    m_rtpReader(res)
+    m_rtpReader(res),
+    m_dlinkRes(res)
 {
 
 }
@@ -49,9 +50,14 @@ QString PlDlinkStreamReader::getRTPurl(int profileId) const
 {
     CLHttpStatus status;
 
-    QnPlDlinkResourcePtr res = getResource().dynamicCast<QnPlDlinkResource>();
-    QAuthenticator auth = res->getAuth();
-    QByteArray reply = downloadFile(status, QString(lit("config/rtspurl.cgi?profileid=%1")).arg(profileId),  res->getHostAddress(), 80, 1000, auth);
+    QAuthenticator auth = m_dlinkRes->getAuth();
+    QByteArray reply = downloadFile(
+        status,
+        QString(lit("config/rtspurl.cgi?profileid=%1")).arg(profileId),
+        m_dlinkRes->getHostAddress(),
+        80,
+        1000,
+        auth);
 
     if (status != CL_HTTP_SUCCESS || reply.isEmpty())
         return QString();
@@ -81,7 +87,6 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStreamInternal(bool isCameraC
 
     // ==== init if needed
     Qn::ConnectionRole role = getRole();
-    QnPlDlinkResourcePtr res = getResource().dynamicCast<QnPlDlinkResource>();
 
     // ==== profile setup
     QString prifileStr = composeVideoProfile(isCameraControlRequired, params);
@@ -92,20 +97,26 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStreamInternal(bool isCameraC
             qWarning() << "No dualstreaming for DLink camera " << m_resource->getUrl() << ". Ignore second url request";
 
         QUrl requestedUrl;
-        requestedUrl.setHost( res->getHostAddress() );
+        requestedUrl.setHost( m_dlinkRes->getHostAddress() );
         requestedUrl.setPort( 80 );
         requestedUrl.setScheme( QLatin1String("http") );
         return CameraDiagnostics::NoMediaTrackResult( requestedUrl.toString() );
     }
 
     QUrl requestedUrl;
-    requestedUrl.setHost( res->getHostAddress() );
+    requestedUrl.setHost( m_dlinkRes->getHostAddress() );
     requestedUrl.setPort( 80 );
     requestedUrl.setScheme( QLatin1String("http") );
     requestedUrl.setPath( prifileStr );
 
     CLHttpStatus status;
-    QByteArray cam_info_file = downloadFile(status, prifileStr,  res->getHostAddress(), 80, 1000, res->getAuth()); // setup video profile
+    QByteArray cam_info_file = downloadFile(
+        status,
+        prifileStr,
+        m_dlinkRes->getHostAddress(),
+        80,
+        1000,
+        m_dlinkRes->getAuth()); // setup video profile
 
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
@@ -119,12 +130,12 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStreamInternal(bool isCameraC
     }
 
     if (isCameraControlRequired) {
-        if (role != Qn::CR_SecondaryLiveVideo && res->getMotionType() != Qn::MT_SoftwareGrid)
-            res->setMotionMaskPhysical(0);
+        if (role != Qn::CR_SecondaryLiveVideo && m_dlinkRes->getMotionType() != Qn::MT_SoftwareGrid)
+            m_dlinkRes->setMotionMaskPhysical(0);
     }
 
     // =====requesting a video
-    QnDlink_cam_info info = res->getCamInfo();
+    QnDlink_cam_info info = m_dlinkRes->getCamInfo();
     const int profileIndex = role == Qn::CR_SecondaryLiveVideo ? 1 : 0;
     if (profileIndex >= info.profiles.size() )
         return CameraDiagnostics::NoMediaTrackResult( requestedUrl.toString() );
@@ -144,22 +155,22 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStreamInternal(bool isCameraC
             rtspUrl = getRTPurl(m_profile.number); //< DLink with old firmware. profile url contains some string, but it can't be passed to the RTSP
 
         m_rtpReader.setRequest(rtspUrl);
-        res->updateSourceUrl(m_rtpReader.getCurrentStreamUrl(), getRole());
+        m_dlinkRes->updateSourceUrl(m_rtpReader.getCurrentStreamUrl(), getRole());
         return m_rtpReader.openStream();
     }
     else
     {
         // mpeg4 or jpeg
-        m_HttpClient.reset(new CLSimpleHTTPClient(res->getHostAddress(), 80, 2000, res->getAuth()));
+        m_HttpClient.reset(new CLSimpleHTTPClient(m_dlinkRes->getHostAddress(), 80, 2000, m_dlinkRes->getAuth()));
         const CLHttpStatus status = m_HttpClient->doGET(m_profile.url);
 		if (status == CL_HTTP_SUCCESS)
 		{
 			QUrl httpStreamUrl;
 			httpStreamUrl.setScheme("http");
-			httpStreamUrl.setHost(res->getHostAddress());
+			httpStreamUrl.setHost(m_dlinkRes->getHostAddress());
 			httpStreamUrl.setPort(80);
 			httpStreamUrl.setPath(m_profile.url);
-			res->updateSourceUrl(httpStreamUrl.toString(), getRole());
+			m_dlinkRes->updateSourceUrl(httpStreamUrl.toString(), getRole());
 			return CameraDiagnostics::NoErrorResult();
 		}
 		else
@@ -221,8 +232,7 @@ bool PlDlinkStreamReader::isTextQualities(const QList<QByteArray>& qualities) co
 
 QByteArray PlDlinkStreamReader::getQualityString(const QnLiveStreamParams& params) const
 {
-    QnPlDlinkResourcePtr res = getResource().dynamicCast<QnPlDlinkResource>();
-    QnDlink_cam_info info = res->getCamInfo();
+    QnDlink_cam_info info = m_dlinkRes->getCamInfo();
 
     if (info.possibleQualities.isEmpty())
     {
@@ -265,8 +275,7 @@ QString PlDlinkStreamReader::composeVideoProfile(bool isCameraControlRequired, c
 {
     QnLiveStreamParams params = streamParams;
 
-    QnPlDlinkResourcePtr res = getResource().dynamicCast<QnPlDlinkResource>();
-    QnDlink_cam_info info = res->getCamInfo();
+    QnDlink_cam_info info = m_dlinkRes->getCamInfo();
 
     Qn::ConnectionRole role = getRole();
     QnDlink_ProfileInfo profile;
@@ -300,7 +309,7 @@ QString PlDlinkStreamReader::composeVideoProfile(bool isCameraControlRequired, c
     {
         t << "&resolution=" << resolution.width() << "x" << resolution.height() << "&";
 
-        params.fps = info.frameRateCloseTo( qMin((int)params.fps, res->getMaxFps()) );
+        params.fps = info.frameRateCloseTo( qMin((int)params.fps, m_dlinkRes->getMaxFps()) );
         t << "framerate=" << params.fps << "&";
         t << "codec=" << profile.codec.toLower() << "&";
         bool useCBR = (profile.codec.contains("264") || profile.codec == "MPEG4");
@@ -308,7 +317,7 @@ QString PlDlinkStreamReader::composeVideoProfile(bool isCameraControlRequired, c
         {
             // just CBR fo mpeg so far
             t << "qualitymode=CBR" << "&";
-            t << "bitrate=" <<  info.bitrateCloseTo(res->suggestBitrateKbps(params, getRole()));
+            t << "bitrate=" <<  info.bitrateCloseTo(m_dlinkRes->suggestBitrateKbps(params, getRole()));
         }
         else
         {
@@ -437,16 +446,18 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMJPEG()
 
 QnMetaDataV1Ptr PlDlinkStreamReader::getCameraMetadata()
 {
-
-    QnPlDlinkResourcePtr res = getResource().dynamicCast<QnPlDlinkResource>();
-
-
     CLHttpStatus status;
-    QByteArray cam_info_file = downloadFile(status, QLatin1String("config/notify.cgi"),  res->getHostAddress(), 80, 1000, res->getAuth());
+    QByteArray cam_info_file = downloadFile(
+        status,
+        QLatin1String("config/notify.cgi"),
+        m_dlinkRes->getHostAddress(),
+        80,
+        1000,
+        m_dlinkRes->getAuth());
 
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
-        res->setStatus(Qn::Unauthorized);
+        m_dlinkRes->setStatus(Qn::Unauthorized);
         return QnMetaDataV1Ptr(0);
     }
 
