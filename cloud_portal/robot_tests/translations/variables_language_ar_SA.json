@@ -48,7 +48,7 @@
     "LAST NAME IS REQUIRED TEXT": "اسم العائلة مطلوب",
     "EMAIL IS REQUIRED TEXT": "البريد الالكتروني مطلوب",
     "EMAIL ALREADY REGISTERED TEXT": "تم تسجيل هذا البريد الإلكتروني من قبل في {{PRODUCT_NAME}}",
-    "EMAIL INVALID TEXT": "يرجى إدخال البريد الإلكتروني الصحيح",
+    "EMAIL INVALID TEXT": "Please enter a valid Email",
     "PASSWORD IS REQUIRED TEXT": "كلمة المرور مطلوبة",
     "CURRENT PASSWORD IS REQUIRED TEXT": "Current password is required",
     "PASSWORD SPECIAL CHARS TEXT": "استخدم فقط الأحرف اللاتينية والأرقام ورموز لوحة المفاتيح، وتجنب المسافات الرائدة والزائدة",

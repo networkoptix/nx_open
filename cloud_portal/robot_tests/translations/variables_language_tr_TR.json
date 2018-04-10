@@ -48,7 +48,7 @@
     "LAST NAME IS REQUIRED TEXT": "Soyad girmek zorunludur",
     "EMAIL IS REQUIRED TEXT": "E-posta zorunludur",
     "EMAIL ALREADY REGISTERED TEXT": "Bu e-posta, {{PRODUCT_NAME}}'de zaten kayıtlı",
-    "EMAIL INVALID TEXT": "Lütfen geçerli bir e-posta girin",
+    "EMAIL INVALID TEXT": "Lütfen geçerli bir Eposta girin",
     "PASSWORD IS REQUIRED TEXT": "Parola gerekmektedir",
     "CURRENT PASSWORD IS REQUIRED TEXT": "Geçerli şifre gerekiyor",
     "PASSWORD SPECIAL CHARS TEXT": "Sadece alfanümerik ve klavye karakterleri kullanın",

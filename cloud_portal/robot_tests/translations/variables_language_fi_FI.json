@@ -48,7 +48,7 @@
     "LAST NAME IS REQUIRED TEXT": "Sukunimi on pakollinen",
     "EMAIL IS REQUIRED TEXT": "Sähköposti on pakollinen",
     "EMAIL ALREADY REGISTERED TEXT": "Tämä sähköposti on jo rekisteröity {{PRODUCT_NAME}}",
-    "EMAIL INVALID TEXT": "Anna kelvollinen sähköpostiosoite",
+    "EMAIL INVALID TEXT": "Please enter a valid Email",
     "PASSWORD IS REQUIRED TEXT": "salasana tarvitaan",
     "CURRENT PASSWORD IS REQUIRED TEXT": "Current password is required",
     "PASSWORD SPECIAL CHARS TEXT": "Käytä vain latinalaisia ​​kirjaimia, numeroita ja näppäimistön symboleja, vältä johtavaa ja jäljellä olevaa tilaa",

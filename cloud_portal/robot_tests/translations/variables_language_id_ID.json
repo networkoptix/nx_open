@@ -48,7 +48,7 @@
     "LAST NAME IS REQUIRED TEXT": "Nama belakang diperlukan",
     "EMAIL IS REQUIRED TEXT": "Email diperlukan",
     "EMAIL ALREADY REGISTERED TEXT": "Email ini sudah terdaftar di {{PRODUCT_NAME}}",
-    "EMAIL INVALID TEXT": "Tolong masukkan email yang benar",
+    "EMAIL INVALID TEXT": "Please enter a valid Email",
     "PASSWORD IS REQUIRED TEXT": "katakunci dibutuhkan",
     "CURRENT PASSWORD IS REQUIRED TEXT": "Current password is required",
     "PASSWORD SPECIAL CHARS TEXT": "Gunakan hanya huruf latin, simbol angka dan keyboard, hindari memimpin dan membuntuti spasi",

@@ -48,7 +48,7 @@
     "LAST NAME IS REQUIRED TEXT": "Kinakailangan ang huling pangalan",
     "EMAIL IS REQUIRED TEXT": "Kinakailangan ang email",
     "EMAIL ALREADY REGISTERED TEXT": "Nakarehistro na ang Email na ito sa {{PRODUCT_NAME}}",
-    "EMAIL INVALID TEXT": "Mangyaring magpasok ng wastong Email",
+    "EMAIL INVALID TEXT": "Please enter a valid Email",
     "PASSWORD IS REQUIRED TEXT": "Kinakailangan ang password",
     "CURRENT PASSWORD IS REQUIRED TEXT": "Current password is required",
     "PASSWORD SPECIAL CHARS TEXT": "Gumamit lamang ng mga liham na latin, numero at mga simbolo ng keyboard, iwasan ang mga nangungunang at sumusunod na mga puwang",

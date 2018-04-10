@@ -48,7 +48,7 @@
     "LAST NAME IS REQUIRED TEXT": "Изисква се фамилно име",
     "EMAIL IS REQUIRED TEXT": "Изисква се имейл",
     "EMAIL ALREADY REGISTERED TEXT": "Този имейл вече е регистриран в {{PRODUCT_NAME}}",
-    "EMAIL INVALID TEXT": "Моля, въведете валиден имейл",
+    "EMAIL INVALID TEXT": "Please enter a valid Email",
     "PASSWORD IS REQUIRED TEXT": "изисква се парола",
     "CURRENT PASSWORD IS REQUIRED TEXT": "Current password is required",
     "PASSWORD SPECIAL CHARS TEXT": "Използвайте само латински букви, цифри и символи на клавиатурата, избягвайте водещи и задни интервали",

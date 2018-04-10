@@ -48,7 +48,7 @@
     "LAST NAME IS REQUIRED TEXT": "Họ là bắt buộc",
     "EMAIL IS REQUIRED TEXT": "Email là bắt buộc",
     "EMAIL ALREADY REGISTERED TEXT": "Email này đã được đăng ký trong {{PRODUCT_NAME}}",
-    "EMAIL INVALID TEXT": "Vui lòng nhập email hợp lệ",
+    "EMAIL INVALID TEXT": "Vui lòng nhập Email hợp lệ",
     "PASSWORD IS REQUIRED TEXT": "Mật khẩu là bắt buộc",
     "CURRENT PASSWORD IS REQUIRED TEXT": "Mật khẩu hiện tại là bắt buộc",
     "PASSWORD SPECIAL CHARS TEXT": "Chỉ sử dụng chữ cái Latin, số và ký hiệu bàn phím, tránh các khoảng trống đầu và cuối",

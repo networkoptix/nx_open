@@ -48,7 +48,7 @@
     "LAST NAME IS REQUIRED TEXT": "Je vyžadováno příjmení",
     "EMAIL IS REQUIRED TEXT": "Je vyžadován e-mail",
     "EMAIL ALREADY REGISTERED TEXT": "Tento e-mail byl již zaregistrován v {{PRODUCT_NAME}}",
-    "EMAIL INVALID TEXT": "Prosím zadejte platný email",
+    "EMAIL INVALID TEXT": "Please enter a valid Email",
     "PASSWORD IS REQUIRED TEXT": "Heslo je vyžadováno",
     "CURRENT PASSWORD IS REQUIRED TEXT": "Current password is required",
     "PASSWORD SPECIAL CHARS TEXT": "Použijte pouze latinská písmena, čísla a symboly klávesnice, vyhněte se předním a koncovým mezerám",

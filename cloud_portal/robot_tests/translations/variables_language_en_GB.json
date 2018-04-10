@@ -48,7 +48,7 @@
     "LAST NAME IS REQUIRED TEXT": "Surname is required",
     "EMAIL IS REQUIRED TEXT": "Email is required",
     "EMAIL ALREADY REGISTERED TEXT": "This Email has been already registered in {{PRODUCT_NAME}}",
-    "EMAIL INVALID TEXT": "Please, enter a valid Email",
+    "EMAIL INVALID TEXT": "Please enter a valid Email",
     "PASSWORD IS REQUIRED TEXT": "Password is required",
     "CURRENT PASSWORD IS REQUIRED TEXT": "Current password is required",
     "PASSWORD SPECIAL CHARS TEXT": "Use only latin letters, numbers and keyboard symbols, avoid leading and trailing spaces",

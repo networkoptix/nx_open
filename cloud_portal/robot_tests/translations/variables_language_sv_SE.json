@@ -48,7 +48,7 @@
     "LAST NAME IS REQUIRED TEXT": "Efternamn krävs",
     "EMAIL IS REQUIRED TEXT": "E-post krävs",
     "EMAIL ALREADY REGISTERED TEXT": "Den här e-posten har redan registrerats i {{PRODUCT_NAME}}",
-    "EMAIL INVALID TEXT": "Var god ange ett giltigt e-postmeddelande",
+    "EMAIL INVALID TEXT": "Please enter a valid Email",
     "PASSWORD IS REQUIRED TEXT": "lösenord krävs",
     "CURRENT PASSWORD IS REQUIRED TEXT": "Current password is required",
     "PASSWORD SPECIAL CHARS TEXT": "Använd endast latinska bokstäver, siffror och tangentbordssymboler, undvik ledande och efterföljande utrymmen",

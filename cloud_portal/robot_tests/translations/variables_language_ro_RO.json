@@ -48,7 +48,7 @@
     "LAST NAME IS REQUIRED TEXT": "Numele de familie este obligatoriu",
     "EMAIL IS REQUIRED TEXT": "E-mailul este necesar",
     "EMAIL ALREADY REGISTERED TEXT": "Acest e-mail a fost deja înregistrat în {{PRODUCT_NAME}}",
-    "EMAIL INVALID TEXT": "Te rog introdu un email valid",
+    "EMAIL INVALID TEXT": "Please enter a valid Email",
     "PASSWORD IS REQUIRED TEXT": "Parola este necesara",
     "CURRENT PASSWORD IS REQUIRED TEXT": "Current password is required",
     "PASSWORD SPECIAL CHARS TEXT": "Utilizați numai litere latine, numere și simboluri de tastatură, evitați spațiile de conducere și de sfârșit",
