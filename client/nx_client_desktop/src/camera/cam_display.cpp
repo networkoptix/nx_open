@@ -1551,7 +1551,7 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
                 }
             }
 
-            if (isForcedBufferingEnabled() && !isDataQueueFull())
+            if (m_isRealTimeSource && (isForcedBufferingEnabled() && !isDataQueueFull()))
                 return false;
 
             m_lastVideoPacketTime = vd->timestamp;
