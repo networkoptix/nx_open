@@ -104,6 +104,7 @@ namespace Qn
 
         /* Tree-based. */
         NodeTypeRole,                               /**< Role for node type, see <tt>Qn::NodeType</tt>. */
+        ResourceTreeScopeRole, //< Role for ResourceTreeScope.
 
         /* Resource-based. */
         ResourceRole,                               /**< Role for QnResourcePtr. */

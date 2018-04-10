@@ -9,37 +9,12 @@
 #include <utils/common/delayed.h>
 #include <ui/models/resource/resource_tree_model.h>
 
-namespace {
-
-const QnResourceTreeModel* treeModel(const QAbstractItemModel* topLevelModel)
-{
-    for (;;)
-    {
-        if (!topLevelModel)
-            return nullptr;
-
-        const auto model = qobject_cast<const QnResourceTreeModel*>(topLevelModel);
-        if (model)
-            return model;
-
-        const auto proxyModel = qobject_cast<const QAbstractProxyModel*>(topLevelModel);
-        if (!proxyModel)
-            return nullptr;
-
-        topLevelModel = proxyModel->sourceModel();
-    }
-}
-
-} // namespace
-
 QnResourceSearchProxyModel::QnResourceSearchProxyModel(QObject* parent):
     base_type(parent)
 {
 }
 
-QnResourceSearchProxyModel::~QnResourceSearchProxyModel()
-{
-}
+QnResourceSearchProxyModel::~QnResourceSearchProxyModel() = default;
 
 QnResourceSearchQuery QnResourceSearchProxyModel::query() const
 {
@@ -91,10 +66,6 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(
     int sourceRow,
     const QModelIndex& sourceParent) const
 {
-    const auto sourceTreeModel = treeModel(sourceModel());
-    if (!sourceTreeModel)
-        return false;
-
     const bool searchMode = !m_query.text.isEmpty();
     if (!searchMode && m_defaultBehavior != DefaultBehavior::showAll)
         return false;
@@ -152,7 +123,8 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(
 
         // We don't show servers and videowalls in case of search.
         const auto resource = this->resource(index);
-        if (resource && sourceTreeModel->scope() == QnResourceTreeModel::FullScope)
+        const auto scope = index.data(Qn::ResourceTreeScopeRole).value<QnResourceTreeModel::Scope>();
+        if (resource && scope == QnResourceTreeModel::FullScope)
         {
             const auto parentNodeType = sourceParent.data(Qn::NodeTypeRole).value<Qn::NodeType>();
             if (parentNodeType != Qn::FilteredServersNode && resource->hasFlags(Qn::server))
@@ -200,7 +172,7 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(
         return true;
 
     // Show only resources with given flags.
-    const auto resource = this->resource(index);
+    const auto resource = QnResourceSearchProxyModel::resource(index);
     return resource && resource->hasFlags(m_query.flags);
 }
 

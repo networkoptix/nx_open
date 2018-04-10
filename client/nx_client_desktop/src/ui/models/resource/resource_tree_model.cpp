@@ -640,6 +640,9 @@ QVariant QnResourceTreeModel::data(const QModelIndex& index, int role) const
     if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
         return QVariant();
 
+    if (role == Qn::ResourceTreeScopeRole)
+        return qVariantFromValue(m_scope);
+
     /* Only standard QT roles are subject to reimplement. Otherwise we may go to recursion, getting resource for example. */
     if (index.column() == Qn::CustomColumn && role <= Qt::UserRole)
         return m_customColumnDelegate ? m_customColumnDelegate->data(index, role) : QVariant();

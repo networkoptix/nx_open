@@ -164,3 +164,5 @@ private:
     QnResourceTreeModelNodeManager* const m_nodeManager;
     QnResourceTreeModelLayoutNodeManager* const m_layoutNodeManager;
 };
+
+Q_DECLARE_METATYPE(QnResourceTreeModel::Scope)
