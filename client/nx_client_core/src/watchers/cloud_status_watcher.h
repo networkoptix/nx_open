@@ -32,7 +32,8 @@ public:
     enum ErrorCode
     {
         NoError,
-        InvalidCredentials,
+        InvalidEmail,
+        InvalidPassword,
         AccountNotActivated,
         UnknownError
     };
