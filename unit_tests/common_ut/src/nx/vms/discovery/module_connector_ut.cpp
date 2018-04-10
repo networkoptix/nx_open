@@ -206,7 +206,7 @@ TEST_F(DiscoveryModuleConnector, ActivateDiactivate)
 
 TEST_F(DiscoveryModuleConnector, EndpointPriority)
 {
-    NX_DEBUG(this) "Remove this line and change line blow to true in 4.0:";
+    NX_DEBUG(this) << "Remove this line and change line blow to true in 4.0:";
     static bool kIsEndpointPrioritizedSwitchSupported = false;
 
     nx::network::HostAddress interfaceIp;
@@ -253,7 +253,7 @@ TEST_F(DiscoveryModuleConnector, EndpointPriority)
     const auto newDnsRealEndpoint = addMediaserver(id);
     const nx::network::SocketAddress newDnsEndpoint(kLocalDnsHost, newDnsRealEndpoint.port);
     connector.newEndpoints({newDnsEndpoint}, id);
-    NX_DEBUG(this) "Remove this line and uncomment line below in 4.0:";
+    NX_DEBUG(this) << "Remove this line and uncomment line below in 4.0:";
     if (kIsEndpointPrioritizedSwitchSupported)
         expectConnect(id, newDnsEndpoint); //< Expected switch to DNS as better choise than cloud.
 
