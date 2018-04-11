@@ -95,7 +95,7 @@ private:
     std::unique_ptr<nx::network::TCPSocket> m_tcpSocket;
     nx::network::aio::Timer m_stopEventTimer;
     nx::network::aio::Timer m_reconnectTimer;
-    SocketAddress m_cameraAddress;
+    network::SocketAddress m_cameraAddress;
 };
 
 } // namespace vca
