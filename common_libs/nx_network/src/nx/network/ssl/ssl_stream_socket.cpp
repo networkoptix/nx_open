@@ -19,14 +19,33 @@ StreamSocketToTwoWayPipelineAdapter::~StreamSocketToTwoWayPipelineAdapter()
 
 int StreamSocketToTwoWayPipelineAdapter::read(void* data, size_t count)
 {
-    const int bytesRead = m_streamSocket->recv(data, static_cast<int>(count));
+    const int bytesRead = m_streamSocket->recv(
+        data, static_cast<int>(count), getFlagsForCurrentThread());
     return bytesTransferredToPipelineReturnCode(bytesRead);
+}
+
+int StreamSocketToTwoWayPipelineAdapter::getFlagsForCurrentThread() const
+{
+    QnMutexLocker lock(&m_mutex);
+    auto it = m_threadIdToFlags.find(std::this_thread::get_id());
+    return it != m_threadIdToFlags.end() ? it->second : 0;
 }
 
 int StreamSocketToTwoWayPipelineAdapter::write(const void* data, size_t count)
 {
     const int bytesWritten = m_streamSocket->send(data, static_cast<int>(count));
     return bytesTransferredToPipelineReturnCode(bytesWritten);
+}
+
+void StreamSocketToTwoWayPipelineAdapter::setFlagsForCallsInThread(
+    std::thread::id threadId,
+    int flags)
+{
+    QnMutexLocker lock(&m_mutex);
+    if (flags == 0)
+        m_threadIdToFlags.erase(threadId);
+    else
+        m_threadIdToFlags[threadId] = flags;
 }
 
 int StreamSocketToTwoWayPipelineAdapter::bytesTransferredToPipelineReturnCode(
@@ -83,10 +102,16 @@ void StreamSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
     m_delegatee->bindToAioThread(aioThread);
 }
 
-int StreamSocket::recv(void* buffer, unsigned int bufferLen, int /*flags*/)
+int StreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 {
     switchToSyncModeIfNeeded();
+    // TODO: #ak setFlagsForCallsInThread is a hack. Have to pass flags
+    // via m_sslPipeline->read call or get rid of flags in StreamSocket::recv at all.
+    if (flags != 0)
+        m_socketToPipelineAdapter.setFlagsForCallsInThread(std::this_thread::get_id(), flags);
     const int result = m_sslPipeline->read(buffer, bufferLen);
+    if (flags != 0)
+        m_socketToPipelineAdapter.setFlagsForCallsInThread(std::this_thread::get_id(), 0);
     if (result >= 0)
         return result;
     handleSslError(result);
@@ -133,7 +158,22 @@ void StreamSocket::cancelIOAsync(
 
 void StreamSocket::cancelIOSync(nx::network::aio::EventType eventType)
 {
-    m_asyncTransformingChannel->cancelIOSync(eventType);
+    if (isInSelfAioThread())
+    {
+        m_delegatee->cancelIOSync(eventType);
+        m_asyncTransformingChannel->cancelIOSync(eventType);
+    }
+    else
+    {
+        std::promise<void> cancelled;
+        post(
+            [this, eventType, &cancelled]()
+            {
+                cancelIOSync(eventType);
+                cancelled.set_value();
+            });
+        cancelled.get_future().wait();
+    }
 }
 
 void StreamSocket::stopWhileInAioThread()
