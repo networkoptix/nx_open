@@ -1,5 +1,4 @@
 #include "monitor_linux.h"
-
 #include <iostream>
 #include <map>
 #include <memory>
@@ -25,6 +24,8 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/concurrent.h>
 #include <utils/fs/dir.h>
+#include <media_server/media_server_module.h>
+#include <nx/mediaserver/root_tool.h>
 
 static const int BYTES_PER_MB = 1024*1024;
 //static const int NET_STAT_CALCULATION_PERIOD_SEC = 10;
@@ -552,23 +553,65 @@ static QnPlatformMonitor::PartitionType fsNameToType( const QString& fsName )
         return QnPlatformMonitor::UnknownPartition;
 }
 
+class ServerSystemInfoProvider: public AbstractSystemInfoProvider
+{
+public:
+    virtual QByteArray fileContent() const override
+    {
+        QFile mountsFile(m_commonSystemInfoProvider.fileName());
+        int fd = qnServerModule->rootTool()->open(
+            m_commonSystemInfoProvider.fileName(), QIODevice::ReadOnly);
+
+        if (fd > 0)
+            mountsFile.open(fd, QIODevice::ReadOnly);
+        else
+            mountsFile.open(QIODevice::ReadOnly);
+
+        if (!mountsFile.isOpen())
+            return QByteArray();
+
+        return mountsFile.readAll();
+    }
+
+    virtual bool scanfLongPattern() const override
+    {
+        return m_commonSystemInfoProvider.scanfLongPattern();
+    }
+
+    virtual qint64 totalSpace(const QByteArray& fsPath) const override
+    {
+        return qnServerModule->rootTool()->totalSpace(QString::fromLatin1(fsPath));
+    }
+
+    virtual qint64 freeSpace(const QByteArray& fsPath) const override
+    {
+        return qnServerModule->rootTool()->freeSpace(QString::fromLatin1(fsPath));
+    }
+
+private:
+    CommonSystemInfoProvider m_commonSystemInfoProvider;
+};
+
 /*!
     \note If same device mounted to multiple points, returns mount point with shortest name
 */
 static QList<QnPlatformMonitor::PartitionSpace> readPartitionsAndSizes()
 {
+    ServerSystemInfoProvider serverSystemInfoProvider;
     std::list<PartitionInfo> partitions;
     QList<QnPlatformMonitor::PartitionSpace> result;
-    const auto errCode = readPartitions(&partitions);
 
+    const auto errCode = readPartitions(&serverSystemInfoProvider, &partitions);
     if (errCode != SystemError::noError)
         return result;
+
     for (const auto& data: partitions)
     {
         QnPlatformMonitor::PartitionSpace partitionInfo;
         partitionInfo.devName = data.devName;
         partitionInfo.path = data.path;
-        partitionInfo.type = data.isUsb ? QnPlatformMonitor::RemovableDiskPartition : fsNameToType(data.fsName);
+        partitionInfo.type = data.isUsb
+            ? QnPlatformMonitor::RemovableDiskPartition : fsNameToType(data.fsName);
         partitionInfo.sizeBytes = data.sizeBytes;
         partitionInfo.freeBytes = data.freeBytes;
         result.push_back(partitionInfo);
