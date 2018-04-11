@@ -13,15 +13,15 @@ logger = logging.getLogger(__name__)  # TODO: Rename all such vars to `_logger`.
 
 
 class LinuxNetworking(Networking):
-    def __init__(self, os_access, macs):
+    def __init__(self, ssh_access, macs):
         super(LinuxNetworking, self).__init__()
         self._macs = macs
-        self._os_access = os_access
+        self._ssh_access = ssh_access
 
     @property
     @lrudecorator(1)
     def interfaces(self):
-        output = self._os_access.run_command(
+        output = self._ssh_access.run_command(
             '''
             mkdir -p /tmp/func_tests/networking
             cd /tmp/func_tests/networking
@@ -35,12 +35,12 @@ class LinuxNetworking(Networking):
             in csv.reader(output.splitlines(), delimiter='\t')
             if EUI(raw_mac) in self._macs}
         assert set(self._macs) == set(interfaces.keys())
-        logger.info("Interfaces on %r:\n%s", self._os_access, pformat(interfaces))
+        logger.info("Interfaces on %r:\n%s", self._ssh_access, pformat(interfaces))
         return interfaces
 
     def reset(self):
         """Don't touch localhost, host-bound interface and interfaces unknown to VM."""
-        self._os_access.run_command(
+        self._ssh_access.run_command(
             '''
             echo "${AVAILABLE_INTERFACES}" | xargs -t -I {} ip addr flush dev {}
             echo "${AVAILABLE_INTERFACES}" | xargs -t -I {} ip link set dev {} down
@@ -58,23 +58,23 @@ class LinuxNetworking(Networking):
 
     def setup_ip(self, mac, ip, prefix_length):
         interface = self.interfaces[mac]
-        self._os_access.run_command(
+        self._ssh_access.run_command(
             '''
             ip addr replace ${ADDRESS}/${PREFIX_LENGTH} dev ${INTERFACE} 
             ip link set dev ${INTERFACE} up
             ''',
             env={'INTERFACE': interface, 'ADDRESS': ip, 'PREFIX_LENGTH': prefix_length})
-        logger.info("Machine %r has IP %s/%d on %s (%s).", self._os_access, ip, prefix_length, interface, mac)
+        logger.info("Machine %r has IP %s/%d on %s (%s).", self._ssh_access, ip, prefix_length, interface, mac)
 
     def route(self, destination_ip_net, gateway_bound_mac, gateway_ip):
         interface = self.interfaces[gateway_bound_mac]
-        self._os_access.run_command(
+        self._ssh_access.run_command(
             ['ip', 'route', 'replace', destination_ip_net, 'dev', interface, 'via', gateway_ip, 'proto', 'static'])
 
     def enable_internet(self):
         while True:
             try:
-                self._os_access.run_command(['iptables', '-D', 'OUTPUT', '-j', 'REJECT'])
+                self._ssh_access.run_command(['iptables', '-D', 'OUTPUT', '-j', 'REJECT'])
             except NonZeroExitStatus:
                 logger.debug("No more internet restricting rules in iptables.")
                 break
@@ -82,14 +82,14 @@ class LinuxNetworking(Networking):
 
     def disable_internet(self):
         try:
-            self._os_access.run_command(['iptables', '-C', 'OUTPUT', '-j', 'REJECT'])
+            self._ssh_access.run_command(['iptables', '-C', 'OUTPUT', '-j', 'REJECT'])
         except NonZeroExitStatus:
-            self._os_access.run_command(['iptables', '-A', 'OUTPUT', '-j', 'REJECT'])
+            self._ssh_access.run_command(['iptables', '-A', 'OUTPUT', '-j', 'REJECT'])
         assert wait_until(lambda: not self.can_reach('8.8.8.8'), name="until internet is off")
 
     def setup_nat(self, outer_mac):
         """Connection can be initiated from inner_net_nodes only. Addresses are masqueraded."""
-        self._os_access.run_command(
+        self._ssh_access.run_command(
             '''
             sysctl net.ipv4.ip_forward=1
             iptables -t nat -A POSTROUTING -o ${OUTER_INTERFACE} -j MASQUERADE
@@ -98,7 +98,7 @@ class LinuxNetworking(Networking):
 
     def can_reach(self, ip, timeout_sec=4):
         try:
-            self._os_access.run_command(['ping', '-c', 1, '-W', timeout_sec, ip])
+            self._ssh_access.run_command(['ping', '-c', 1, '-W', timeout_sec, ip])
         except NonZeroExitStatus as e:
             if e.exit_status == 1:  # See man page.
                 return False

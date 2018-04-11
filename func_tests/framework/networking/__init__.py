@@ -72,7 +72,7 @@ def setup_networks(machines, hypervisor, networks_tree, reachability):
     return allocated_machines, nodes_ips
 
 
-def setup_flat_network(machines, network_ip, hypervisor):
+def setup_flat_network(machines, network_ip, hypervisor):  # TODO: Use in setup networks.
     network_uuid = '{} {} flat'.format(uuid1(), network_ip)
     ips_iter = islice(network_ip.iter_hosts(), 1, None)  # First IP is usually reserved for router.
     for machine, ip in zip(machines, ips_iter):

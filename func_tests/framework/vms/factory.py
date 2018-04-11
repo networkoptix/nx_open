@@ -39,12 +39,14 @@ class VMFactory(object):
             info = obtain_running_vm(self._hypervisor, name, vm_index, vm_type_configuration['vm'])
             if vm_type_configuration['os_family'] == 'linux':
                 hostname, port = info.ports['tcp', 22]
-                os_access = SSHAccess(hostname, port)
-                networking = LinuxNetworking(os_access, info.macs.values())
+                ssh_access = SSHAccess(hostname, port)
+                networking = LinuxNetworking(ssh_access, info.macs.values())
+                os_access = ssh_access  # Lose type information.
             elif vm_type_configuration['os_family'] == 'windows':
                 hostname, port = info.ports['tcp', 5985]
-                os_access = WinRMAccess(hostname, port)
-                networking = WindowsNetworking(os_access, info.macs.values())
+                winrm_access = WinRMAccess(hostname, port)
+                networking = WindowsNetworking(winrm_access, info.macs)
+                os_access = winrm_access  # Lose type information.
             else:
                 raise UnknownOsFamily("Expected 'linux' or 'windows', got %r", vm_type_configuration['os_family'])
             if not wait_until(
