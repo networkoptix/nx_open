@@ -69,7 +69,6 @@ public:
 
     virtual QnIOStateDataList ioStates() const override;
 
-
     QString resolutionToString(const QSize& resolution);
     static QString toAxisCodecString(AVCodecID codecId);
 public slots:
@@ -138,7 +137,6 @@ private:
     nx::network::aio::Timer m_timer;
     nx_http::AsyncHttpClientPtr m_inputPortStateReader;
     QVector<QString> m_ioPortIdList;
-
 
     nx_http::AsyncHttpClientPtr m_inputPortHttpMonitor;
     nx_http::BufferType m_currentMonitorData;
@@ -232,7 +230,6 @@ private:
     QString getAdvancedParametersTemplate() const;
     bool loadAdvancedParametersTemplateFromFile(QnCameraAdvancedParams& params, const QString& filename);
     QSet<QString> calculateSupportedAdvancedParameters(const QnCameraAdvancedParams& allParams);
-
 
     QString getParamCmd(const QnCameraAdvancedParameter& param) const;
     QSet<QString> buildGetParamsQueries(const QList<QnCameraAdvancedParameter>& params) const;

@@ -53,7 +53,6 @@ QnResourcePtr QnPlAxisResourceSearcher::createResource(const QnUuid &resourceTyp
 
     NX_LOG(lit("Create Axis camera resource. TypeID %1.").arg(resourceTypeId.toString()), cl_logDEBUG1);
 
-
     return result;
 
 }
@@ -62,7 +61,6 @@ QString QnPlAxisResourceSearcher::manufacture() const
 {
     return QnPlAxisResource::MANUFACTURE;
 }
-
 
 QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool isSearchAction)
 {
@@ -77,7 +75,6 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
 
     int timeout = 4000; // TODO: #Elric we should probably increase this one. In some cases 4 secs is not enough.
 
-
     if (port < 0)
         port = nx_http::DEFAULT_HTTP_PORT;
 
@@ -91,7 +88,6 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
         return QList<QnResourcePtr>();
     QString response = QString(QLatin1String(response1.append(response2)));
     QStringList lines = response.split(QLatin1String("\n"), QString::SkipEmptyParts);
-
 
     QString name;
     QString mac;
@@ -114,10 +110,8 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
     name = name.left(name.lastIndexOf(QLatin1Char('-')));
     name.replace(QLatin1Char('-'), QString());
 
-
     if (mac.isEmpty() || name.isEmpty())
         return QList<QnResourcePtr>();
-
 
     QnUuid typeId = qnResTypePool->getLikeResourceTypeId(manufacture(), name);
     if (typeId.isNull())
@@ -167,7 +161,6 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
 
     int iqpos = responseData.indexOf("AXIS");
 
-
     if (iqpos<0)
         return local_results;
 
@@ -201,17 +194,13 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
     if (macpos+12 > responseData.size())
         return local_results;
 
-
     //macpos++; // -
 
     while(responseData.at(macpos)==' ')
         ++macpos;
 
-
     if (macpos+12 > responseData.size())
         return local_results;
-
-
 
     for (int i = 0; i < 12; i++)
     {
@@ -220,7 +209,6 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
 
         smac += QLatin1Char(responseData[macpos + i]);
     }
-
 
     //response.fromDatagram(responseData);
 

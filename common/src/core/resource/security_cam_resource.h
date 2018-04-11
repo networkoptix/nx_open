@@ -283,14 +283,14 @@ public:
     void setIOPorts(const QnIOPortDataList& ports);
 
     virtual bool setProperty(
-		const QString &key,
-		const QString &value,
-		PropertyOptions options = DEFAULT_OPTIONS) override;
+        const QString &key,
+        const QString &value,
+        PropertyOptions options = DEFAULT_OPTIONS) override;
 
     virtual bool setProperty(
-		const QString &key,
-		const QVariant& value,
-		PropertyOptions options = DEFAULT_OPTIONS) override;
+        const QString &key,
+        const QVariant& value,
+        PropertyOptions options = DEFAULT_OPTIONS) override;
 
     //!Returns list if IO ports
     QnIOPortDataList getIOPorts() const;
