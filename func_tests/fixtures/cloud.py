@@ -19,7 +19,7 @@ def pytest_addoption(parser):
 @pytest.fixture()
 def cloud_host(request, mediaserver_deb):
     cloud_group = request.config.getoption('--cloud-group')
-    return resolve_cloud_host_from_registry(cloud_group, mediaserver_deb.customization.company)
+    return resolve_cloud_host_from_registry(cloud_group, mediaserver_deb.customization.name)
 
 
 @pytest.fixture()
