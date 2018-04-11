@@ -84,6 +84,7 @@ BaseInputFieldPrivate::BaseInputFieldPrivate(
 
     lastResult(QValidator::Intermediate)
 {
+    hint->setOpenExternalLinks(true);
     input->installEventFilter(this);
     parent->setFocusProxy(input);
 }

@@ -10,18 +10,17 @@ import shutil
 
 def get_lib_dirs_from_compiler(compiler, compiler_flags=""):
     try:
-        output = subprocess.check_output(
+        lines = subprocess.check_output(
             "{} --print-search-dirs {}".format(compiler, compiler_flags),
             universal_newlines=True,
-            shell=True) #< Using shell=True to avoid mess with splitting compiler_flags.
+            shell=True).split() #< Using shell=True to avoid mess with splitting compiler_flags.
     except subprocess.CalledProcessError as e:
         print("Could not get library search dirs from the compiler.", file=sys.stderr)
         print("Command failed:", e.cmd, file=sys.stderr)
         return None
 
-    output = output.split()
     try:
-        libs = output[output.index("libraries:") + 1]
+        libs = lines[lines.index("libraries:") + 1]
     except (ValueError, IndexError):
         return []
 

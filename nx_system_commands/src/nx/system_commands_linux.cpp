@@ -3,6 +3,7 @@
 #include <iomanip>
 #include <iostream>
 #include <sstream>
+#include <fstream>
 #include <set>
 #include <assert.h>
 #include <string.h>
@@ -461,6 +462,46 @@ int64_t SystemCommands::fileSize(const std::string& path, bool reportViaSocket)
 
     if (reportViaSocket)
         system_commands::domain_socket::detail::sendInt64(result);
+
+    return result;
+}
+
+std::string SystemCommands::devicePath(const std::string& path, bool reportViaSocket)
+{
+    struct stat statBuf;
+    std::string result;
+    if (stat(path.c_str(), &statBuf) == 0)
+    {
+        std::ifstream partitionsFile("/proc/partitions");
+        if (partitionsFile.is_open())
+        {
+            std::ifstream::traits_type::int_type c;
+            while ((c = partitionsFile.get()) != std::ifstream::traits_type::eof())
+            {
+                if (isdigit(c))
+                {
+                    partitionsFile.unget();
+                    break;
+                }
+            }
+
+            while (!partitionsFile.eof() && !partitionsFile.bad())
+            {
+                unsigned int majorVer, minorVer;
+                int64_t size;
+                partitionsFile >> majorVer >> minorVer >> size >> result;
+
+                if (major(statBuf.st_dev) == majorVer && minor(statBuf.st_dev) == minorVer)
+                {
+                    result = "/dev/" + result;
+                    break;
+                }
+            }
+        }
+    }
+
+    if (reportViaSocket)
+        system_commands::domain_socket::detail::sendBuffer(result.data(), result.size());
 
     return result;
 }

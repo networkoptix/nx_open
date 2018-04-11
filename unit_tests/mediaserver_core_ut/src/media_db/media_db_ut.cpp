@@ -963,36 +963,39 @@ TEST_F(MediaDbTest, StorageDB)
             switch (diceRoll)
             {
             case 0:
-                {
-                    QnMutexLocker lk(&mutex);
-                    std::pair<TestChunkManager::Catalog, std::deque<DeviceFileCatalog::Chunk>> p;
-                    p = tcm.generateReplaceOperation(nx::utils::random::number(10, 100));
-                    sdb.replaceChunks(p.first.cameraUniqueId, p.first.quality, p.second);
-                }
+            {
+                std::pair<TestChunkManager::Catalog, std::deque<DeviceFileCatalog::Chunk>> p;
+                QnMutexLocker lk(&mutex);
+                p = tcm.generateReplaceOperation(nx::utils::random::number(10, 100));
+                sdb.replaceChunks(p.first.cameraUniqueId, p.first.quality, p.second);
                 break;
+            }
             case 1:
             case 2:
+            {
+                TestChunkManager::TestChunk *chunk;
+                QnMutexLocker lk(&mutex);
+                chunk = tcm.generateRemoveOperation();
+                if (chunk)
                 {
-                    QnMutexLocker lk(&mutex);
-                    TestChunkManager::TestChunk *chunk;
-                    chunk = tcm.generateRemoveOperation();
-                    if (chunk)
-                    {
-                        sdb.deleteRecords(chunk->catalog->cameraUniqueId, chunk->catalog->quality,
-                            chunk->chunk.startTimeMs);
-                    }
+                    sdb.deleteRecords(
+                        chunk->catalog->cameraUniqueId,
+                        chunk->catalog->quality, chunk->chunk.startTimeMs);
                 }
                 break;
+            }
             default:
-                {
-                    QnMutexLocker lk(&mutex);
-                    boost::optional<TestChunkManager::TestChunk> chunk = tcm.generateAddOperation();
-                    if (!(bool)chunk)
-                        break;
-                    sdb.addRecord(chunk->catalog->cameraUniqueId, chunk->catalog->quality,
-                        chunk->chunk);
-                }
+            {
+                boost::optional<TestChunkManager::TestChunk> chunk;
+                QnMutexLocker lk(&mutex);
+                chunk = tcm.generateAddOperation();
+                if (!(bool)chunk)
+                    break;
+                sdb.addRecord(
+                    chunk->catalog->cameraUniqueId,
+                    chunk->catalog->quality, chunk->chunk);
                 break;
+            }
             }
             std::this_thread::sleep_for(std::chrono::milliseconds(7));
         }
@@ -1049,8 +1052,8 @@ TEST_F(MediaDbTest, StorageDB)
                                    });
     if (!allVisited)
     {
-        std::cout << errorStream.stream->str() << std::endl;
-        errorStream.reset();
+//        std::cout << errorStream.stream->str() << std::endl;
+//        errorStream.reset();
         size_t notVisited = std::count_if(
                 tcm.get().cbegin(),
                 tcm.get().cend(),

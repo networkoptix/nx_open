@@ -21,7 +21,8 @@ public:
     /** Mounts NAS from url to directory for real UID and GID. */
     bool mount(
         const std::string& url, const std::string& directory,
-        const boost::optional<std::string>& username, const boost::optional<std::string>& password);
+        const boost::optional<std::string>& username,
+        const boost::optional<std::string>& password);
 
     /** Unounts NAS from directory. */
     UnmountCode unmount(const std::string& directory, bool reportViaSocket);
@@ -58,6 +59,9 @@ public:
 
     /** Returns file size. */
     int64_t fileSize(const std::string& path, bool reportViaSocket);
+
+    /** Gets device path by file system path */
+    std::string devicePath(const std::string& path, bool reportViaSocket);
 
     /** Installs deb package to system. */
     bool install(const std::string& debPackage);

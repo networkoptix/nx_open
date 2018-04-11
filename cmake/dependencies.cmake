@@ -75,3 +75,13 @@ foreach(package_dir ${synched_package_dirs})
 endforeach()
 
 file(TO_CMAKE_PATH "${QT_DIR}" QT_DIR)
+
+if(targetDevice MATCHES "linux-x64|linux-x86")
+    execute_process(COMMAND
+        ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/build_utils/linux/copy_system_library.py
+            --compiler ${CMAKE_CXX_COMPILER}
+            --flags "${CMAKE_CXX_FLAGS}"
+            --dest-dir ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
+            libstdc++.so.6 libatomic.so.1 libgcc_s.so.1
+    )
+endif()

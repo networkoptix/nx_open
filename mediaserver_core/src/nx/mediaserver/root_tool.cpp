@@ -263,9 +263,9 @@ bool RootTool::isPathExists(const QString& path)
 
 static void* readBufferReallocCallback(void* context, ssize_t size)
 {
-    std::vector<char>* buf = reinterpret_cast<std::vector<char>*>(context);
+    std::string* buf = reinterpret_cast<std::string*>(context);
     buf->resize(size);
-    return buf->data();
+    return (void*) buf->data();
 }
 
 struct StringRef
@@ -320,27 +320,36 @@ static QnAbstractStorageResource::FileInfoList fileListFromSerialized(const char
     return result;
 }
 
-QnAbstractStorageResource::FileInfoList RootTool::fileList(const QString& path)
+template<typename DefaultAction>
+std::string RootTool::stringCommandHelper(
+    const QString& path, const char* command, DefaultAction action)
 {
-    QnAbstractStorageResource::FileInfoList result;
 #if defined (Q_OS_LINUX)
     if (m_toolPath.isEmpty())
-    {
-        return fileListFromSerialized(
-            SystemCommands().serializedFileList(path.toStdString(), /*reportViaSocket*/ false).c_str());
-    }
+        return action();
 
     QnMutexLocker lock(&m_mutex);
-    utils::concurrent::run([this, path]() { execute({"list", path}); });
+    utils::concurrent::run([this, path, command]() { execute({command, path}); });
 
-    std::vector<char> buf;
+    std::string buf;
     if (!system_commands::domain_socket::readBuffer(&readBufferReallocCallback, &buf))
-        return result;
+        return "";
 
-    return fileListFromSerialized(buf.data());
+    return buf;
 #else
-    return result;
+    return "";
 #endif
+}
+
+QnAbstractStorageResource::FileInfoList RootTool::fileList(const QString& path)
+{
+    return fileListFromSerialized(
+        stringCommandHelper(
+            path, "list",
+            [path]()
+            {
+                return SystemCommands().serializedFileList(path.toStdString(), false).c_str();
+            }).c_str());
 }
 
 qint64 RootTool::fileSize(const QString& path)
@@ -348,6 +357,19 @@ qint64 RootTool::fileSize(const QString& path)
     return int64SingleArgCommandHelper(
         path, "size",
         [path]() { return SystemCommands().fileSize(path.toStdString(), /*reportViaSocket*/ false); });
+}
+
+QString RootTool::devicePath(const QString& fsPath)
+{
+    auto result = QString::fromStdString(
+        stringCommandHelper(
+            fsPath, "devicePath",
+            [fsPath]()
+            {
+                return SystemCommands().devicePath(fsPath.toStdString(), false).c_str();
+            }));
+
+    return result;
 }
 
 static std::string makeArgsLine(const std::vector<QString>& args)

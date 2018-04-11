@@ -22,8 +22,7 @@
 
 static const size_t MAX_LINE_LENGTH = 512;
 
-SystemError::ErrorCode readPartitions(
-    std::list<PartitionInfo>* const partitionInfoList)
+SystemError::ErrorCode readPartitions(std::list<PartitionInfo>* const partitionInfoList)
 {
 #if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
     std::string mountsFile("/proc/mounts");

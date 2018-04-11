@@ -67,12 +67,12 @@ const qint64 kMaxLocalStorageSpaceLimit = 30ll * 1024 * 1024 * 1024; // 30 Gb
 const int kMaxSpaceLimitRatio = 10; // i.e. max space limit <= totalSpace / 10
 
 #if defined(Q_OS_WIN)
-const QString& getDevicePath(const QString& path)
+QString getDevicePath(const QString& path)
 {
     return path;
 }
 
-const QString& sysDrivePath()
+QString sysDrivePath()
 {
     static QString deviceString;
 
@@ -90,50 +90,13 @@ const QString& sysDrivePath()
 
 #elif defined(Q_OS_LINUX)
 
-const QString getDevicePath(const QString& path)
+QString sysDrivePath()
 {
-    QString command = lit("df '") + path + lit("'");
-    FILE* pipe;
-    char buf[BUFSIZ];
-
-    if ((pipe = popen(command.toLatin1().constData(), "r")) == NULL)
-    {
-        NX_LOG(lit("%1 'df' call failed").arg(Q_FUNC_INFO), cl_logWARNING);
-        return QString();
-    }
-
-    if (fgets(buf, BUFSIZ, pipe) == NULL) // header line
-    {
-        pclose(pipe);
-        return QString();
-    }
-
-    if (fgets(buf, BUFSIZ, pipe) == NULL) // data
-    {
-        pclose(pipe);
-        return QString();
-    }
-
-    auto dataString = QString::fromUtf8(buf);
-    QString deviceString = dataString.section(QRegularExpression("\\s+"), 0, 0);
-
-    pclose(pipe);
-
-    return deviceString;
-}
-
-const QString& sysDrivePath()
-{
-    static QString devicePath = getDevicePath(lit("/"));
+    static QString devicePath = qnServerModule->rootTool()->devicePath("/");
     return devicePath;
 }
 
 #else // Unsupported OS so far
-
-const QString& getDevicePath(const QString& path)
-{
-    return "";
-}
 
 const QString& sysDrivePath()
 {
@@ -363,7 +326,7 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdateInternal()
 
     QString sysPath = sysDrivePath();
     if (!sysPath.isNull())
-        m_isSystem = getDevicePath(url).startsWith(sysPath);
+        m_isSystem = rootTool()->devicePath(url).startsWith(sysPath);
     else
         m_isSystem = false;
 

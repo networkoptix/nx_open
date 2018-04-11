@@ -6,6 +6,7 @@ import argparse
 import os
 from cmake_config import read_cmake_config
 from semantic_output import *
+from sources_parser import parse_sources_cached, clear_sources_cache
 
 
 customizable_projects = [
@@ -159,12 +160,27 @@ def validate_skins(root_dir):
     return all_files
 
 
+def validate_desktop_client_icons(root_dir, skin_files):
+    client_dir = os.path.join(root_dir, 'client', 'nx_client_desktop')
+    sources = [
+        os.path.join(client_dir, 'src'),
+        os.path.join(client_dir, 'static-resources', 'src', 'qml')
+    ]
+    for dir in sources:
+        for icon, location in parse_sources_cached(dir):
+            if icon in intro_files:
+                continue
+            if icon not in skin_files:
+                warn('Icon {0} is not found in skin (used in {1})'.format(icon, location))
+
+
 def validate_customizations(root_dir):
     if verbose:
         separator()
         info("Validating customizations")
 
     skin_files = validate_skins(root_dir)
+    validate_desktop_client_icons(root_dir, skin_files)
 
     customizations_dir = os.path.join(root_dir, "customization")
     customizations = list(read_customizations(customizations_dir))
@@ -190,7 +206,8 @@ def validate_customizations(root_dir):
         if c == default:
             continue
 
-        info('Customization: {0}'.format(c.name))
+        if verbose:
+            info('Customization: {0}'.format(c.name))
 
         config = read_cmake_config(c.config)
         skipped_modules = set()
@@ -205,7 +222,9 @@ def validate_customizations(root_dir):
                 mandatory_files=default_project_files[project],
                 skipped_modules=skipped_modules,
                 skin_files=skin_files)
-        separator()
+
+        if verbose:
+            separator()
 
     return True
 

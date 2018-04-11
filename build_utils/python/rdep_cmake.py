@@ -28,16 +28,16 @@ class RdepSyncher:
 
         full_package_name = pack + "-" + version if version else pack
 
-        sync_func = Rdep.locate_package if use_local else Rdep.sync_package
+        sync_func = self.rdep.locate_package if use_local else self.rdep.sync_package
 
         package_found = False
         if self.prefer_debug_packages:
-            if sync_func(self.rdep, full_package_name + "-debug"):
+            if sync_func(full_package_name + "-debug"):
                 package_found = True
                 full_package_name += "-debug"
 
         if not package_found:
-            package_found = sync_func(self.rdep, full_package_name)
+            package_found = sync_func(full_package_name)
 
         if not package_found:
             if not optional:

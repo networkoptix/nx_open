@@ -6,3 +6,5 @@
         nx::utils::log::Level::debug, "vca_metadata_plugin") NX_PRINT_PREFIX
     #include <nx/kit/debug.h>
 #endif
+
+//#include <nx/kit/debug.h>
