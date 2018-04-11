@@ -8,6 +8,7 @@ class QnMobileClientUiController;
 class QnMobileClientUriHandler : public QObject
 {
     Q_OBJECT
+    using base_type = QObject;
 
 public:
     explicit QnMobileClientUriHandler(QObject* parent = nullptr);
@@ -22,6 +23,6 @@ public slots:
     void handleUrl(const nx::utils::Url& url);
 
 private:
-    struct Private;
+    class Private;
     const QScopedPointer<Private> d;
 };

@@ -117,13 +117,13 @@ function openCloudWelcomeScreen()
     stackView.safeReplace(null, Qt.resolvedUrl("Screens/Cloud/WelcomeScreen.qml"))
 }
 
-function openCloudScreen(user, password, forceLoginScreen)
+function openCloudScreen(user, password, connectOperationId)
 {
     stackView.safePush(Qt.resolvedUrl("Screens/Cloud/CloudScreen.qml"),
         {
             "targetEmail": user,
             "targetPassword": password,
-            "forceLoginScreen": forceLoginScreen
+            "connectOperationId": connectOperationId
         })
 }
 

@@ -15,11 +15,11 @@ Page
     topPadding: 0
 
     title: qsTr("Cloud Account")
-    onLeftButtonClicked: Workflow.popCurrentScreen()
+    onLeftButtonClicked: completeConnectOperation(false)
 
     property string targetEmail
     property string targetPassword
-    property bool forceLoginScreen: false
+    property string connectOperationId
 
     Flickable
     {
@@ -45,7 +45,7 @@ Page
         {
             id: credentialsEditor
             learnMoreLinkVisible: false
-            onLoggedIn: Workflow.popCurrentScreen()
+            onLoggedIn: completeConnectOperation(true)
         }
     }
 
@@ -59,13 +59,22 @@ Page
         }
     }
 
+    function completeConnectOperation(success)
+    {
+        Workflow.popCurrentScreen()
+        if (connectOperationId.length)
+            operationManager.finishOperation(connectOperationId, success)
+
+        connectOperationId = ""
+    }
+
     Component.onCompleted:
     {
-        var showSummary = !cloudScreen.forceLoginScreen &&
+        var showSummary = !cloudScreen.connectOperationId.length &&
             (cloudStatusWatcher.status == QnCloudStatusWatcher.Online
             || cloudStatusWatcher.status == QnCloudStatusWatcher.Offline)
 
-        cloudScreen.forceLoginScreen = false;
+        cloudScreen.connectOperationId = ""
         content.sourceComponent = showSummary ? summaryComponent : credentialsComponent;
         if (showSummary)
             return

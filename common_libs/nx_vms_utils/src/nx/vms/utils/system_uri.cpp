@@ -78,6 +78,16 @@ void splitString(const QString& source, QChar separator, QString& left, QString&
     }
 }
 
+bool isCloudHostname(const QString& hostname)
+{
+    if (hostname.length() != kUuidLength)
+        return false;
+
+    QnUuid uuid = QnUuid::fromStringSafe(hostname);
+    return !uuid.isNull();
+}
+
+
 } // namespace
 
 class nx::vms::utils::SystemUriPrivate
@@ -282,7 +292,7 @@ private:
         switch (clientCommand)
         {
             case SystemUri::ClientCommand::Client:
-                return hasDomain && (hasSystemId ? hasAuth && isValidSystemId() : !hasAuth );
+                return hasDomain && (hasSystemId ? isValidSystemId() : !hasAuth);
             case SystemUri::ClientCommand::LoginToCloud:
                 return hasDomain && !hasOnlyPassword;
             case SystemUri::ClientCommand::OpenOnPortal:
@@ -344,15 +354,6 @@ private:
     static bool isLocalHostname(const QString& hostname)
     {
         return isLocalHostname(parseLocalHostname(hostname));
-    }
-
-    static bool isCloudHostname(const QString& hostname)
-    {
-        if (hostname.length() != kUuidLength)
-            return false;
-
-        QnUuid uuid = QnUuid::fromStringSafe(hostname);
-        return !uuid.isNull();
     }
 
     bool isValidSystemId() const
@@ -504,6 +505,12 @@ void SystemUri::setSystemId(const QString& value)
 {
     Q_D(SystemUri);
     d->systemId = value;
+}
+
+bool SystemUri::hasCloudSystemId() const
+{
+    Q_D(const SystemUri);
+    return d->isValid() && isCloudHostname(d->systemId);
 }
 
 SystemUri::SystemAction SystemUri::systemAction() const

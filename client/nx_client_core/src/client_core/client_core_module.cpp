@@ -19,6 +19,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/client/core/watchers/known_server_connections.h>
+#include <nx/client/core/utils/async_operation_manager.h>
 
 using namespace nx::client::core;
 
@@ -41,6 +42,7 @@ QnClientCoreModule::QnClientCoreModule(QObject* parent):
     m_commonModule->instance<QnLayoutTourStateManager>();
 
     m_commonModule->store(new watchers::KnownServerConnections(m_commonModule));
+    m_commonModule->store(new OperationManager());
 
     m_qmlEngine = new QQmlEngine(this);
 }

@@ -278,7 +278,7 @@ void QnCloudStatusWatcher::resetCredentials()
     setCredentials(QnEncodedCredentials());
 }
 
-void QnCloudStatusWatcher::setCredentials(const QnEncodedCredentials& credentials, bool initial)
+bool QnCloudStatusWatcher::setCredentials(const QnEncodedCredentials& credentials, bool initial)
 {
     Q_D(QnCloudStatusWatcher);
 
@@ -286,7 +286,7 @@ void QnCloudStatusWatcher::setCredentials(const QnEncodedCredentials& credential
         QnEncodedCredentials(credentials.user.toLower(), credentials.password.value());
 
     if (d->credentials == loweredCredentials)
-        return;
+        return false;
 
     const bool userChanged = (d->credentials.user != loweredCredentials.user);
     const bool passwordChanged = (d->credentials.password != loweredCredentials.password);
@@ -301,6 +301,8 @@ void QnCloudStatusWatcher::setCredentials(const QnEncodedCredentials& credential
         emit this->loginChanged();
     if (passwordChanged)
         emit this->passwordChanged();
+
+    return true;
 }
 
 QnEncodedCredentials QnCloudStatusWatcher::createTemporaryCredentials()

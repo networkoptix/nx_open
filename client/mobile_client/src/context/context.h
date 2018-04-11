@@ -19,6 +19,7 @@ namespace core {
 
 class UserWatcher;
 class TwoWayAudioController;
+class OperationManager;
 
 } // namespace core
 
@@ -57,6 +58,9 @@ class QnContext: public QObject, public QnConnectionContextAware
     Q_PROPERTY(int deviceStatusBarHeight READ deviceStatusBarHeight
         NOTIFY deviceStatusBarHeightChanged)
 
+    Q_PROPERTY(nx::client::core::OperationManager* operationManager
+        READ operationManager CONSTANT)
+
 public:
     QnContext(QObject *parent = NULL);
     virtual ~QnContext();
@@ -65,6 +69,7 @@ public:
     QnCloudStatusWatcher* cloudStatusWatcher() const;
     nx::client::core::UserWatcher* userWatcher() const;
     nx::client::core::TwoWayAudioController* twoWayAudioController() const;
+    nx::client::core::OperationManager* operationManager() const;
     QmlSettingsAdaptor* settings() const;
 
     Q_INVOKABLE void quitApplication();
@@ -109,7 +114,7 @@ public:
     Q_INVOKABLE bool isCloudConnectionUrl(const nx::utils::Url& url);
     Q_INVOKABLE nx::utils::Url getWebSocketUrl() const;
 
-    Q_INVOKABLE void setCloudCredentials(const QString& login, const QString& password);
+    Q_INVOKABLE bool setCloudCredentials(const QString& login, const QString& password);
 
     Q_INVOKABLE QString lp(const QString& path) const;
     void setLocalPrefix(const QString& prefix);

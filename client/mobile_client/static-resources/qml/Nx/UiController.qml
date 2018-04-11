@@ -30,6 +30,6 @@ Object
         }
         onResourcesScreenRequested: Workflow.openResourcesScreen(connectionManager.systemName)
         onVideoScreenRequested: Workflow.openVideoScreen(resourceId)
-        onLoginToCloudScreenRequested: Workflow.openCloudScreen(user, password, true)
+        onLoginToCloudScreenRequested: Workflow.openCloudScreen(user, password, connectOperationId)
     }
 }

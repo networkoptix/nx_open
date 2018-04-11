@@ -71,6 +71,10 @@ using namespace std::chrono;
 
 using nx::vms::utils::SystemUri;
 
+static constexpr int kDelay = 5 * 1000;
+static const auto cloudUser = lit("ynikitenkov@networkoptix.com");
+static const auto password = lit("qweasd123");
+
 QString authString(const QString& user, const QString& password)
 {
     return lit("auth=%1").arg(SystemUri::Auth({user, password}).encode());
@@ -92,12 +96,60 @@ nx::utils::Url loginToCloudUrl(
     return nx::utils::Url(result);
 }
 
+void testUrl(QnMobileClientUriHandler* handler, const nx::utils::Url& url)
+{
+    const auto callback = [url, handler]() { handler->handleUrl(url); };
+    executeDelayed(callback, kDelay);
+}
+
+void testConnectToCloudCommand(QnMobileClientUriHandler* handler)
+{
+//    const auto cloudConnectionUrlWithUserOnly = loginToCloudUrl(cloudUser);
+//    testUrl(handler, cloudConnectionUrlWithUserOnly);
+
+    //    const auto cloudConnectionUrlWithPasswordOnly = loginToCloudUrl(QString(), password);
+    //    testUrl(handler, cloudConnectionUrlWithPasswordOnly);
+
+    //    const auto cloudConnectionUrlWithAuth = loginToCloudUrl(cloudUser, password);
+    //    testUrl(handler, cloudConnectionUrlWithAuth);
+
+    const auto cloudConnectionUrlWithWrongAuth = loginToCloudUrl(cloudUser, lit("123"));
+    testUrl(handler, cloudConnectionUrlWithWrongAuth);
+}
+
+//================
+
+nx::utils::Url clientCommandUrl(
+    const QString& systemId = QString(),
+    const QString& user = QString(),
+    const QString& password = QString())
+{
+    const auto kBase =
+        [systemId]()
+        {
+            SystemUri result;
+            result.setDomain(nx::network::AppInfo::defaultCloudHostName());
+            result.setClientCommand(SystemUri::ClientCommand::Client);
+            result.setSystemId(systemId);
+            return result.toString();
+        }();
+
+    const auto result = lit("%1?%2").arg(kBase, authString(user, password));
+    return nx::utils::Url(result);
+}
+
+void testClientCommand(QnMobileClientUriHandler* handler)
+{
+    static const auto systemId = lit("76386686-379d-4c4e-909b-19b03bb87dab");
+    static const auto systemHost = lit("10.0.3.198:7001");
+    const auto clientCommandWithoutAuth = clientCommandUrl(systemId, cloudUser, lit("333"));
+    testUrl(handler, clientCommandWithoutAuth);
+}
+
 void testUrlHandler(QnMobileClientUriHandler* handler)
 {
-    const auto url = loginToCloudUrl(lit("ynikitenkov@networkoptix.com"));
-    const auto callback = [url, handler]() { handler->handleUrl(url); };
-
-    executeDelayed(callback, 5 * 1000);
+//    testConnectToCloudCommand(handler);
+    testClientCommand(handler);
 }
 
 ////

@@ -96,6 +96,8 @@ public:
     QString systemId() const;
     void setSystemId(const QString& value);
 
+    bool hasCloudSystemId() const;
+
     SystemAction systemAction() const;
     void setSystemAction(SystemAction value);
 

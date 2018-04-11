@@ -52,7 +52,7 @@ public:
 
     QnEncodedCredentials credentials() const;
     void resetCredentials();
-    void setCredentials(const QnEncodedCredentials& credentials, bool initial = false);
+    bool setCredentials(const QnEncodedCredentials& credentials, bool initial = false);
 
     // These getters are for qml
     Q_INVOKABLE QString cloudLogin() const;
