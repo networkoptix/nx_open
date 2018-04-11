@@ -453,7 +453,7 @@ TEST_F(SslSocketSwitchIoMode, from_sync_to_async)
 #if 0
 
 NX_NETWORK_BOTH_SOCKET_TEST_CASE(
-    TEST, SslSocketNotEncryptedConnection,
+    TEST, SslSocketNotEncryptedConnectionAutoDetected,
     []()
     {
         return std::make_unique<ssl::StreamServerSocket>(
@@ -461,6 +461,8 @@ NX_NETWORK_BOTH_SOCKET_TEST_CASE(
             EncryptionUse::autoDetectByReceivedData);
     },
     []() { return std::make_unique<TCPSocket>(AF_INET); });
+
+#endif
 
 NX_NETWORK_BOTH_SOCKET_TEST_CASE(
     TEST, SslSocketEncryptedConnection,
@@ -470,19 +472,25 @@ NX_NETWORK_BOTH_SOCKET_TEST_CASE(
             std::make_unique<TCPServerSocket>(AF_INET),
             EncryptionUse::always);
     },
-    []() { return std::make_unique<ssl::StreamSocket>(std::make_unique<TCPSocket>(AF_INET), false); });
+    []()
+    {
+        return std::make_unique<ssl::StreamSocket>(
+            std::make_unique<TCPSocket>(AF_INET), false);
+    });
 
 NX_NETWORK_BOTH_SOCKET_TEST_CASE(
-    TEST, SslSocketNotEncryptedConnection2,
+    TEST, SslSocketEncryptedConnectionAutoDetected,
     []()
     {
         return std::make_unique<ssl::StreamServerSocket>(
             std::make_unique<TCPServerSocket>(AF_INET),
             EncryptionUse::autoDetectByReceivedData);
     },
-    []() { return std::make_unique<ssl::StreamSocket>(std::make_unique<TCPSocket>(AF_INET), false); });
-
-#endif
+    []()
+    {
+        return std::make_unique<ssl::StreamSocket>(
+            std::make_unique<TCPSocket>(AF_INET), false);
+    });
 
 } // namespace test
 } // namespace ssl

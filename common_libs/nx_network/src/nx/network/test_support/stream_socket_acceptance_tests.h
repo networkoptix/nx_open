@@ -9,8 +9,12 @@
 #include <nx/network/socket_global.h>
 #include <nx/network/system_socket.h>
 #include <nx/utils/random.h>
+#include <nx/utils/test_support/test_pipeline.h>
 #include <nx/utils/thread/sync_queue.h>
 #include <nx/utils/std/thread.h>
+#include <nx/utils/string.h>
+
+#include "synchronous_tcp_server.h"
 
 namespace nx {
 namespace network {
@@ -241,11 +245,16 @@ public:
     ~StreamSocketAcceptance()
     {
         if (m_connection)
+        {
             m_connection->pleaseStopSync();
+            m_connection.reset();
+        }
         if (m_serverSocket)
             m_serverSocket->pleaseStopSync();
         if (m_server)
             m_server->pleaseStopSync();
+        if (m_synchronousServer)
+            m_synchronousServer->stop();
 
         for (const auto& connectionContext: m_clientConnections)
             connectionContext->connection.pleaseStopSync();
@@ -260,6 +269,15 @@ protected:
         ASSERT_TRUE(m_serverSocket->setNonBlockingMode(true));
         ASSERT_TRUE(m_serverSocket->bind(SocketAddress::anyPrivateAddress));
         ASSERT_TRUE(m_serverSocket->listen());
+    }
+
+    void givenListeningSynchronousServer()
+    {
+        m_synchronousServer = std::make_unique<SynchronousReceivingServer>(
+            std::make_unique<typename SocketTypeSet::ServerSocket>(),
+            &m_synchronousServerReceivedData);
+        ASSERT_TRUE(m_synchronousServer->bindAndListen(SocketAddress::anyPrivateAddress));
+        m_synchronousServer->start();
     }
 
     void givenSilentServer()
@@ -300,21 +318,18 @@ protected:
             serverEndpoint(), nx::network::kNoTimeout));
     }
 
-    void startAsyncConnect()
-    {
-        using namespace std::placeholders;
-
-        m_connection = std::make_unique<typename SocketTypeSet::ClientSocket>();
-        ASSERT_TRUE(m_connection->setNonBlockingMode(true));
-        m_connection->connectAsync(
-            serverEndpoint(),
-            std::bind(&StreamSocketAcceptance::saveConnectResult, this, _1));
-    }
-
     void givenPingPongServer()
     {
         givenMessageServer();
         m_server->setRequest(m_clientMessage);
+    }
+
+    void givenSocketInConnectStage()
+    {
+        givenListeningServer();
+        givenRandomNameMappedToServerHostIp();
+
+        whenConnectUsingHostName();
     }
 
     void whenReceivedMessageFromServerAsync(
@@ -337,6 +352,15 @@ protected:
         m_connection->connectAsync(
             m_mappedEndpoint,
             std::bind(&StreamSocketAcceptance::saveConnectResult, this, _1));
+    }
+
+    void whenSendRandomDataToServer()
+    {
+        m_sentData = nx::utils::generateRandomName(256);
+        ASSERT_EQ(
+            m_sentData.size(),
+            m_connection->send(m_sentData.constData(), m_sentData.size()))
+            << SystemError::getLastOSErrorText().toStdString();
     }
 
     void continueReceiving()
@@ -394,17 +418,22 @@ protected:
 
     void whenReadSocketInBlockingWay()
     {
+        whenReadSocketInBlockingWayWithFlags(0);
+    }
+
+    void whenReadSocketInBlockingWayWithFlags(int flags)
+    {
         nx::Buffer readBuf;
-        readBuf.resize(64*1024);
-        int bytesRead = m_connection->recv(readBuf.data(), readBuf.capacity(), 0);
+        readBuf.resize(64 * 1024);
+        int bytesRead = m_connection->recv(readBuf.data(), readBuf.capacity(), flags);
         if (bytesRead >= 0)
         {
             readBuf.resize(bytesRead);
-            m_recvResultQueue.push({SystemError::noError, readBuf});
+            m_recvResultQueue.push({ SystemError::noError, readBuf });
         }
         else
         {
-            m_recvResultQueue.push({SystemError::getLastOSErrorCode(), readBuf});
+            m_recvResultQueue.push({ SystemError::getLastOSErrorCode(), readBuf });
         }
     }
 
@@ -431,10 +460,15 @@ protected:
         ASSERT_EQ(m_serverMessage, std::get<1>(prevRecvResult));
     }
 
-    void thenClientSocketReportedTimedout()
+    void thenClientSocketReported(SystemError::ErrorCode expected)
     {
         const auto prevRecvResult = m_recvResultQueue.pop();
-        ASSERT_EQ(SystemError::timedOut, std::get<0>(prevRecvResult));
+        ASSERT_EQ(expected, std::get<0>(prevRecvResult));
+    }
+
+    void thenClientSocketReportedTimedout()
+    {
+        thenClientSocketReported(SystemError::timedOut);
     }
 
     void thenPongIsReceivedViaEachConnection()
@@ -445,6 +479,16 @@ protected:
             ASSERT_EQ(SystemError::noError, std::get<0>(recvResult));
             ASSERT_EQ(m_serverMessage, std::get<1>(recvResult));
         }
+    }
+
+    void thenSocketCanBeSafelyRemoved()
+    {
+        m_connection.reset();
+    }
+
+    void thenServerReceivedData()
+    {
+        m_synchronousServerReceivedData.waitForReceivedDataToMatch(m_sentData);
     }
 
     SocketAddress mappedEndpoint() const
@@ -458,6 +502,8 @@ protected:
             return SocketAddress(m_server->address().toString());
         else if (m_serverSocket)
             return m_serverSocket->getLocalAddress();
+        else if (m_synchronousServer)
+            return m_synchronousServer->endpoint();
         else
             return SocketAddress();
     }
@@ -465,6 +511,11 @@ protected:
     typename SocketTypeSet::ClientSocket* connection()
     {
         return m_connection.get();
+    }
+
+    typename SocketTypeSet::ServerSocket* serverSocket()
+    {
+        return m_serverSocket.get();
     }
 
 private:
@@ -488,6 +539,10 @@ private:
     std::unique_ptr<server::SimpleMessageServer> m_server;
     nx::utils::MoveOnlyFunc<void()> m_auxiliaryRecvHandler;
     std::vector<std::unique_ptr<ClientConnectionContext>> m_clientConnections;
+
+    std::unique_ptr<SynchronousReceivingServer> m_synchronousServer;
+    nx::Buffer m_sentData;
+    nx::utils::bstream::test::NotifyingOutput m_synchronousServerReceivedData;
 
     void saveConnectResult(SystemError::ErrorCode connectResult)
     {
@@ -627,6 +682,16 @@ TYPED_TEST_P(StreamSocketAcceptance, transfer_async)
     this->thenPongIsReceivedViaEachConnection();
 }
 
+TYPED_TEST_P(StreamSocketAcceptance, transfer_sync)
+{
+    this->givenListeningSynchronousServer();
+    this->givenConnectedSocket();
+
+    this->whenSendRandomDataToServer();
+
+    this->thenServerReceivedData();
+}
+
 TYPED_TEST_P(StreamSocketAcceptance, recv_timeout_is_reported)
 {
     this->givenSilentServer();
@@ -637,15 +702,23 @@ TYPED_TEST_P(StreamSocketAcceptance, recv_timeout_is_reported)
     this->thenClientSocketReportedTimedout();
 }
 
-TYPED_TEST_P(StreamSocketAcceptance, async_connect_can_be_cancelled_with_cancel_io_call)
+TYPED_TEST_P(StreamSocketAcceptance, msg_dont_wait_flag_makes_recv_call_nonblocking)
 {
-    this->givenListeningServer();
+    this->givenSilentServer();
+    this->givenConnectedSocket();
 
-    this->whenConnectUsingHostName();
+    this->whenReadSocketInBlockingWayWithFlags(MSG_DONTWAIT);
+
+    this->thenClientSocketReported(SystemError::wouldBlock);
+}
+
+TYPED_TEST_P(StreamSocketAcceptance, async_connect_is_cancelled_by_cancelling_write)
+{
+    this->givenSocketInConnectStage();
 
     this->connection()->cancelIOSync(aio::etWrite);
 
-    // On failure there will be an assert in socket destructor.
+    this->thenSocketCanBeSafelyRemoved();
 }
 
 REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
@@ -657,8 +730,10 @@ REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     randomly_stopping_multiple_simultaneous_connections,
     receive_timeout_change_is_not_ignored,
     transfer_async,
+    transfer_sync,
     recv_timeout_is_reported,
-    async_connect_can_be_cancelled_with_cancel_io_call);
+    msg_dont_wait_flag_makes_recv_call_nonblocking,
+    async_connect_is_cancelled_by_cancelling_write);
 
 } // namespace test
 } // namespace network
