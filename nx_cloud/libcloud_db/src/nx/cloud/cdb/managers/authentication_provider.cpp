@@ -12,13 +12,13 @@
 #include <nx/utils/uuid.h>
 
 #include <nx/cloud/cdb/client/data/auth_data.h>
+#include <nx/data_sync_engine/transaction_log.h>
 
 #include "temporary_account_password_manager.h"
 #include "../dao/user_authentication_data_object_factory.h"
 #include "../settings.h"
 #include "../stree/cdb_ns.h"
 #include "../access_control/authentication_manager.h"
-#include "../ec2/transaction_log.h"
 #include "../ec2/vms_p2p_command_bus.h"
 
 namespace nx {

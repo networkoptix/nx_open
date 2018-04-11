@@ -1,14 +1,12 @@
-import codecs
 import pystache
 from django.core.mail import EmailMultiAlternatives
 # from email.mime.image import MIMEImage  # python 3
 from email.MIMEImage import MIMEImage  # python 2
-from django.conf import settings
 import json
 import os
 from cms.models import customization_cache, check_update_cache
 from cms.controllers import filldata 
-from django.core.cache import cache, caches
+from django.core.cache import cache
 
 
 def email_cache(customization_name, cache_type, value=None, force=None):
@@ -39,7 +37,6 @@ def email_cache(customization_name, cache_type, value=None, force=None):
         data[customization_name][cache_type] = value
         cache.set('email_cache', data)
     else:
-        cache.set('email_cache', data)
         return data[customization_name][cache_type]
 
 

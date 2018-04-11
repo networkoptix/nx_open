@@ -5,9 +5,8 @@
 #include <nx/utils/db/async_sql_query_executor.h>
 #include <nx/utils/db/test_support/test_with_db_helper.h>
 
+#include <nx/cloud/cdb/test_support/base_persistent_data_test.h>
 #include <nx/cloud/cdb/controller.h>
-
-#include "base_persistent_data_test.h"
 
 namespace nx {
 namespace cdb {

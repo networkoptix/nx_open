@@ -5,10 +5,11 @@
 #include <nx/network/http/auth_restriction_list.h>
 #include <nx/utils/timer_manager.h>
 
+#include <nx/data_sync_engine/synchronization_engine.h>
+
 #include "access_control/authentication_manager.h"
 #include "access_control/authorization_manager.h"
 #include "dao/rdb/db_instance_controller.h"
-#include "ec2/synchronization_engine.h"
 #include "ec2/vms_p2p_command_bus.h"
 #include "managers/account_manager.h"
 #include "managers/authentication_provider.h"

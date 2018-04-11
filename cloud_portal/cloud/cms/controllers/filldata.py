@@ -176,7 +176,7 @@ def fill_content(customization_name='default', product_name='cloud_portal',
                     return  # When previewing awaiting version and state is review - do nothing
                 pass
         else:  # draft
-            if customization.preview_status != Customization.PREVIEW_STATUS.review:
+            if customization.preview_status == Customization.PREVIEW_STATUS.review:
                 # When saving draft and state is review - do incremental update
                 # applying all drafted changes and change state to draft
                 # incremental = True
@@ -232,6 +232,14 @@ def fill_content(customization_name='default', product_name='cloud_portal',
             incremental = False
         else:
             changed_contexts = [changed_context]
+            changed_records = DataRecord.objects.filter(version_id=version_id, customization_id=customization.id)
+            if not version_id:
+                changed_records_ids = [DataRecord.objects.
+                                           filter(language_id=record.language_id,
+                                                  data_structure_id=record.data_structure_id,
+                                                  customization_id=customization.id).
+                                           latest('created_date').id for record in changed_records]
+                changed_records = changed_records.filter(id__in=changed_records_ids)
 
     if not incremental:  # If not incremental - iterate all contexts and all languages
         changed_contexts = Context.objects.filter(product_id=product_id).all()

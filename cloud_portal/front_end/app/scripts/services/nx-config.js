@@ -206,7 +206,7 @@
                 useServerTime: true,
                 disableVolume: true,
                 reloadInterval: 5 * 1000,
-                leftPanelPreviewHeight: 38, // 38px is the height for previews in the left panel
+                leftPanelPreviewHeight: 128, // 128px is the height for previews in the left panel
                 resetDisplayedTextTimer: 3 * 1000,
                 hlsLoadingTimeout: 90 * 1000,
                 // One minute timeout for manifest:

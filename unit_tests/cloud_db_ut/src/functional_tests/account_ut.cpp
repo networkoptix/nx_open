@@ -8,6 +8,7 @@
 #include <QtCore/QFile>
 
 #include <nx/fusion/model_functions.h>
+#include <nx/network/app_info.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/http/http_client.h>

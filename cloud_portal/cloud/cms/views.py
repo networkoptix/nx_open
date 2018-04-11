@@ -173,7 +173,7 @@ def version_action(request, version_id=None):
         defaults.bad_request("Version does not exist")
 
     if "Preview" in request.POST:
-        generate_preview(send_to_review=True)
+        generate_preview(version_id=version_id, send_to_review=True)
         preview_flag = "?preview"
 
     elif "Publish" in request.POST:
@@ -258,8 +258,10 @@ def product_settings(request, product_id):
             if not file.name.endswith('zip'):
                 return HttpResponseBadRequest('zip archive is expected')
             if generate_json:
-                data = generate_structure.from_zip(file, product)
+                data, log_messages = generate_structure.from_zip(file, product)
                 content = json.dumps(data, ensure_ascii=False, indent=4, separators=(',', ': '))
+                for error in log_messages:
+                    messages.error(request, "Error with {} problem with {}".format(error['file'], error['extension']))
                 return response_attachment(content, 'structure.json', 'application/json')
             log_messages = structure.process_zip(file, request.user, update_structure, update_content)
             for item in log_messages:

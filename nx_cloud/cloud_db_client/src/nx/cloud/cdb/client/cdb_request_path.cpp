@@ -30,10 +30,8 @@ const char* const kSubscribeToSystemEventsPath = "/cdb/event/subscribe";
 
 const char* const kPingPath = "/cdb/ping";
 
-// TODO: These values are coupled with nx::cdb::api::kEc2EventsPath in "ec2_request_paths.h".
-const char* const kEstablishEc2TransactionConnectionPath = "/cdb/ec2/events/ConnectingStage1";
-const char* const kDeprecatedEstablishEc2TransactionConnectionPath = "/ec2/events/ConnectingStage1";
-const char* const kEstablishEc2P2pTransactionConnectionPath = "/cdb/ec2/messageBus";
+const char* const kEc2TransactionConnectionPathPrefix = "/ec2/";
+const char* const kDeprecatedEc2TransactionConnectionPathPrefix = "/cdb/ec2/";
 
 const char* const kMaintenanceGetVmsConnections = "/cdb/maintenance/vmsConnections";
 const char* const kMaintenanceGetTransactionLog = "/cdb/maintenance/transactionLog";

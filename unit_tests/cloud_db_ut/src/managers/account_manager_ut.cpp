@@ -13,8 +13,8 @@
 #include <nx/cloud/cdb/managers/temporary_account_password_manager.h>
 #include <nx/cloud/cdb/stree/stree_manager.h>
 #include <nx/cloud/cdb/test_support/business_data_generator.h>
+#include <nx/cloud/cdb/test_support/base_persistent_data_test.h>
 
-#include "base_persistent_data_test.h"
 #include "temporary_account_password_manager_stub.h"
 #include "../functional_tests/test_email_manager.h"
 
