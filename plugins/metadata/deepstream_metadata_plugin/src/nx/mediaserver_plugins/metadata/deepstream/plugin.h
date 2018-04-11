@@ -2,8 +2,12 @@
 
 #include <vector>
 #include <string>
+#include <memory>
+#include <functional>
+#include <chrono>
 
 #include <plugins/plugin_tools.h>
+#include <plugins/plugin_container_api.h>
 #include <nx/sdk/metadata/plugin.h>
 #include <nx/sdk/metadata/camera_manager.h>
 
@@ -41,6 +45,8 @@ public:
 
     std::vector<ObjectClassDescription> objectClassDescritions() const;
 
+    std::chrono::microseconds currentTimeUs() const;
+
 private:
     std::vector<ObjectClassDescription> loadObjectClasses() const;
     std::vector<std::string> loadLabels(const std::string& labelFilePath) const;
@@ -51,6 +57,9 @@ private:
 private:
     mutable std::vector<ObjectClassDescription> m_objectClassDescritions;
     mutable std::string m_manifest;
+    std::unique_ptr<
+        nxpl::TimeProvider,
+        std::function<void(nxpl::TimeProvider*)>> m_timeProvider;
 };
 
 } // namespace deepstream

@@ -26,8 +26,7 @@ Manager::Manager(
     const std::string& id)
     :
     m_plugin(plugin),
-    m_pipelineBuilder(
-        std::make_unique<DefaultPipelineBuilder>(m_plugin->objectClassDescritions())),
+    m_pipelineBuilder(std::make_unique<DefaultPipelineBuilder>(m_plugin)),
     m_pipeline(m_pipelineBuilder->build(id))
 {
     NX_OUTPUT << __func__ << "(\"" << plugin->name() << "\") -> " << this;

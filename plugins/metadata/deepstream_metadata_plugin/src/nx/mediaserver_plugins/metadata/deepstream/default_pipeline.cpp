@@ -3,6 +3,7 @@
 #include <nx/mediaserver_plugins/metadata/deepstream/deepstream_metadata_plugin_ini.h>
 
 #include <plugins/plugin_tools.h>
+#include <nx/sdk/metadata/data_packet.h>
 #include <nx/sdk/metadata/compressed_video_packet.h>
 #define NX_PRINT_PREFIX "deepstream::DefaultPipeline::"
 #include <nx/kit/debug.h>
@@ -20,11 +21,12 @@ static const int kDefaultTrackingLifetime = 1;
 
 DefaultPipeline::DefaultPipeline(
     const nx::gstreamer::ElementName& elementName,
-    const std::vector<ObjectClassDescription>& objectClassDescritions)
+    nx::mediaserver_plugins::metadata::deepstream::Plugin* plugin)
     :
     base_type(elementName),
+    m_plugin(plugin),
     m_trackingMapper(kDefaultTrackingLifetime),
-    m_objectClassDescriptions(objectClassDescritions)
+    m_objectClassDescriptions(m_plugin->objectClassDescritions())
 {
     NX_OUTPUT << __func__ << " Creating DefaultPipeline...";
 }
@@ -86,7 +88,7 @@ GstState DefaultPipeline::state() const
     return GST_STATE(nativeElement());
 }
 
-sdk::metadata::DataPacket*DefaultPipeline::nextDataPacket()
+sdk::metadata::DataPacket* DefaultPipeline::nextDataPacket()
 {
     NX_OUTPUT << __func__ << " Fetching next data packet...";
     std::unique_lock<std::mutex> lock(m_mutex);
@@ -110,17 +112,17 @@ void DefaultPipeline::handleMetadata(sdk::metadata::MetadataPacket* packet)
     packet->releaseRef();
 }
 
-GMainLoop*DefaultPipeline::mainLoop()
+GMainLoop* DefaultPipeline::mainLoop()
 {
     return m_mainLoop.get();
 }
 
-TrackingMapper*DefaultPipeline::trackingMapper()
+TrackingMapper* DefaultPipeline::trackingMapper()
 {
     return &m_trackingMapper;
 }
 
-SimpleLicensePlateTracker *DefaultPipeline::licensePlateTracker()
+SimpleLicensePlateTracker* DefaultPipeline::licensePlateTracker()
 {
     return &m_licensePlateTracker;
 }
@@ -149,6 +151,11 @@ int DefaultPipeline::currentFrameHeight() const
 const std::vector<ObjectClassDescription>& DefaultPipeline::objectClassDescriptions() const
 {
     return m_objectClassDescriptions;
+}
+
+std::chrono::microseconds DefaultPipeline::currentTimeUs() const
+{
+    return m_plugin->currentTimeUs();
 }
 
 } // namespace deepstream

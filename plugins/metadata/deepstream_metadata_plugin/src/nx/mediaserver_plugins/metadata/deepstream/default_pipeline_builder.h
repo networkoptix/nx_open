@@ -1,5 +1,6 @@
 #pragma once
 
+#include <nx/mediaserver_plugins/metadata/deepstream/plugin.h>
 #include <nx/mediaserver_plugins/metadata/deepstream/default_pipeline.h>
 #include <nx/mediaserver_plugins/metadata/deepstream/object_class_description.h>
 #include <nx/mediaserver_plugins/metadata/deepstream/pipeline_builder.h>
@@ -19,7 +20,7 @@ class DefaultPipelineBuilder: public PipelineBuilder
 
 public:
     DefaultPipelineBuilder(
-        const std::vector<ObjectClassDescription>& objectClassDescritions);
+        nx::mediaserver_plugins::metadata::deepstream::Plugin* plugin);
 
     virtual std::unique_ptr<nx::gstreamer::Pipeline> build(
         const nx::gstreamer::ElementName& pipeleineName) override;
@@ -71,7 +72,7 @@ private:
     RawLabels parseLabelFile(const std::string& path) const;
 
 private:
-    std::vector<ObjectClassDescription> m_objectClassDescritions;
+    nx::mediaserver_plugins::metadata::deepstream::Plugin* m_plugin;
 };
 
 } // namespace deepstream

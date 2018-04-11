@@ -20,9 +20,9 @@ namespace metadata {
 namespace deepstream {
 
 DefaultPipelineBuilder::DefaultPipelineBuilder(
-    const std::vector<ObjectClassDescription>& objectClassDescritions)
+    nx::mediaserver_plugins::metadata::deepstream::Plugin* plugin)
     :
-    m_objectClassDescritions(objectClassDescritions)
+    m_plugin(plugin)
 {
     ini().reload();
 }
@@ -41,7 +41,7 @@ std::unique_ptr<gstreamer::Pipeline> DefaultPipelineBuilder::buildDefaultDeepStr
 {
     NX_OUTPUT << __func__ << " Building pipeline " << pipelineName;
     auto pipeline =
-        std::make_unique<DefaultPipeline>(pipelineName, m_objectClassDescritions);
+        std::make_unique<DefaultPipeline>(pipelineName, m_plugin);
 
     NX_OUTPUT << __func__ << " Creating elements and bins for " << pipelineName;
     auto appSource = createAppSource(pipeline.get(), pipelineName);
@@ -84,7 +84,7 @@ std::unique_ptr<gstreamer::Pipeline> DefaultPipelineBuilder::buildOpenAlprDeepSt
 {
     NX_OUTPUT << __func__ << " (OpenALPR) Building pipeline " << pipelineName;
     auto pipeline =
-        std::make_unique<DefaultPipeline>(pipelineName, m_objectClassDescritions);
+        std::make_unique<DefaultPipeline>(pipelineName, m_plugin);
 
     NX_OUTPUT << __func__ << " (OpenALPR) Creating elements and bins for " << pipelineName;
     auto appSource = createAppSource(pipeline.get(), pipelineName);

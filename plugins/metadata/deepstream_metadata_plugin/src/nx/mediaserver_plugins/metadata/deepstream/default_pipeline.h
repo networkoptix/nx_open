@@ -3,8 +3,10 @@
 #include <queue>
 #include <mutex>
 #include <condition_variable>
+#include <chrono>
 
 #include <nx/gstreamer/pipeline.h>
+#include <nx/mediaserver_plugins/metadata/deepstream/plugin.h>
 #include <nx/mediaserver_plugins/metadata/deepstream/tracking_mapper.h>
 #include <nx/mediaserver_plugins/metadata/deepstream/simple_license_plate_tracker.h>
 #include <nx/mediaserver_plugins/metadata/deepstream/object_class_description.h>
@@ -23,7 +25,7 @@ class DefaultPipeline: public nx::gstreamer::Pipeline
 public:
     DefaultPipeline(
         const nx::gstreamer::ElementName& elementName,
-        const std::vector<ObjectClassDescription>& objectClassDescritions);
+        nx::mediaserver_plugins::metadata::deepstream::Plugin* plugin);
 
     virtual void setMetadataCallback(nx::gstreamer::MetadataCallback metadataCallback) override;
 
@@ -57,7 +59,10 @@ public:
 
     const std::vector<ObjectClassDescription>& objectClassDescriptions() const;
 
+    std::chrono::microseconds currentTimeUs() const;
+
 private:
+    nx::mediaserver_plugins::metadata::deepstream::Plugin* m_plugin;
     nx::gstreamer::MetadataCallback m_metadataCallback;
     std::queue<nx::sdk::metadata::DataPacket*> m_packetQueue;
     LoopPtr m_mainLoop;
