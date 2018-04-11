@@ -119,18 +119,9 @@ std::unique_ptr<gstreamer::Pipeline> DefaultPipelineBuilder::buildOpenAlprDeepSt
     createMainLoop(pipeline.get(), pipelineName);
 
     //-- HANDLE METADATA
-    auto outputProbePad = gst_element_get_static_pad(
-        openAlprBin->nativeElement(),
-        kSourcePadName);
-
-    gst_pad_add_probe(
-        outputProbePad,
-        GST_PAD_PROBE_TYPE_BUFFER,
-        processOpenAlprResult,
-        pipeline.get(),
-        NULL);
-
-    gst_object_unref(GST_OBJECT(outputProbePad));
+    openAlprBin
+        ->pad(kSourcePadName)
+        ->addProbe(processOpenAlprResult, GST_PAD_PROBE_TYPE_BUFFER, pipeline.get());
 
     return pipeline;
 }
@@ -223,18 +214,8 @@ std::unique_ptr<nx::gstreamer::Bin> DefaultPipelineBuilder::buildPrimaryGieBin(
 
     if (ini().pipelineType == kOpenAlprPipeline)
     {
-        auto probePad = gst_element_get_static_pad(
-            bin->nativeElement(),
-            kSinkPadName);
-
-        gst_pad_add_probe(
-            probePad,
-            GST_PAD_PROBE_TYPE_BUFFER,
-            dropOpenAlprFrames,
-            pipeline,
-            NULL);
-
-        gst_object_unref(GST_OBJECT(probePad));
+        bin->pad(kSinkPadName)
+            ->addProbe(dropOpenAlprFrames, GST_PAD_PROBE_TYPE_BUFFER, pipeline);
     }
 
     return bin;

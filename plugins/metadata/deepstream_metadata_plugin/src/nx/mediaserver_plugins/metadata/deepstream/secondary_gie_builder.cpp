@@ -77,18 +77,8 @@ std::unique_ptr<gstreamer::Bin> SecondaryGieBuilder::buildSecondaryGie(
     bin->createGhostPad(tee.get(), kSinkPadName);
     bin->createGhostPad(outputQueue.get(), kSourcePadName);
 
-    auto probePad = gst_element_get_static_pad(
-        bin->nativeElement(),
-        kSourcePadName);
-
-    gst_pad_add_probe(
-        probePad,
-        GST_PAD_PROBE_TYPE_BUFFER,
-        waitForSecondaryGieDoneBufProbe,
-        pipeline,
-        NULL);
-
-    gst_object_unref(GST_OBJECT(probePad));
+    bin->pad(kSourcePadName)
+        ->addProbe(waitForSecondaryGieDoneBufProbe, GST_PAD_PROBE_TYPE_BUFFER, pipeline);
 
     return bin;
 }
