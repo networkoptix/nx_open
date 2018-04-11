@@ -155,10 +155,10 @@ if(LINUX)
     set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
     set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
 
-    set(CMAKE_EXE_LINKER_FLAGS
-        "${CMAKE_EXE_LINKER_FLAGS} -Wl,--disable-new-dtags")
-    set(CMAKE_SHARED_LINKER_FLAGS
-        "${CMAKE_SHARED_LINKER_FLAGS} -rdynamic -Wl,--allow-shlib-undefined")
+    string(APPEND CMAKE_EXE_LINKER_FLAGS " -Wl,--disable-new-dtags")
+    string(APPEND CMAKE_SHARED_LINKER_FLAGS " -rdynamic -Wl,--allow-shlib-undefined")
+    string(APPEND CMAKE_EXE_LINKER_FLAGS " -Wl,--as-needed")
+    string(APPEND CMAKE_SHARED_LINKER_FLAGS " -Wl,--as-needed")
 
     if(NOT ANDROID AND CMAKE_BUILD_TYPE STREQUAL "Release")
         add_compile_options(-ggdb1 -fno-omit-frame-pointer)

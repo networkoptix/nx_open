@@ -3,8 +3,10 @@
 namespace nx {
 
 
-bool SystemCommands::mount(const std::string& /*url*/, const std::string& /*directory*/,
-    const boost::optional<std::string>& /*username*/, const boost::optional<std::string>& /*password*/)
+bool SystemCommands::mount(
+    const std::string& /*url*/, const std::string& /*directory*/,
+    const boost::optional<std::string>& /*username*/,
+    const boost::optional<std::string>& /*password*/)
 {
     return false;
 }
@@ -107,6 +109,11 @@ std::string SystemCommands::serializedFileList(const std::string& path, bool rep
 int64_t SystemCommands::fileSize(const std::string& path, bool reportViaSocket)
 {
     return -1;
+}
+
+std::string SystemCommands::devicePath(const std::string& path, bool reportViaSocket)
+{
+    return "";
 }
 
 } // namespace nx

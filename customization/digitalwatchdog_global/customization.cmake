@@ -1,5 +1,4 @@
 set(build_mobile OFF)
-set(build_paxton ON)
 
 set(defaultSkin "dark_orange")
 
@@ -37,15 +36,6 @@ set(customization.serverBundleUpgradeCode "{70281bc5-b4e0-443e-a735-4ed91eefd236
 set(customization.fullBundleUpgradeCode "{c8464c92-10c9-4076-95ba-fa540111acda}")
 
 set(deb.customization.company.name "digitalwatchdog")
-
-set(paxton.className "DWSpectrum")
-set(paxton.classId "{34e43591-29d8-4a2f-83b9-a87cd9330900}")
-set(paxton.interfaceId "{c58805c3-5e21-480e-8bf1-b4379ea98951}")
-set(paxton.eventsId "{07a315f7-9e15-444e-a054-8ed37b0e5f70}")
-set(paxton.typeLibId "{eb280827-1a8c-43a5-a02f-14e6afa183b2}")
-set(paxton.appId "{7ac9bc98-c0a9-48b8-8dbe-85ee6552e24f}")
-set(paxton.upgradeCode "{fd11dd52-f4cc-4036-b6c1-254c29402ee1}")
-set(paxton.bundleUpgradeCode "{E2B27295-C3C9-4601-B1EE-10A1D94CA10C}")
 
 set(mac.sign.identity "Developer ID Application: Kaltec Electronics, INC (HW58JB7FUF)")
 set(mac.app.sign.identity "3rd Party Mac Developer Application: Kaltec Electronics, INC (HW58JB7FUF)")

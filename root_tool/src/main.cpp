@@ -137,6 +137,18 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
             return Result::ok;
         });
 
+    factory.reg({"devicePath"}, {"path"},
+        [systemCommands](const char** argv)
+        {
+            const auto path = getOptionalArg(argv);
+            if (!path)
+                return Result::invalidArg;
+
+            systemCommands->devicePath(*path, /*usePipe*/ true);
+
+            return Result::ok;
+        });
+
     factory.reg({"size"}, {"path"},
         [systemCommands](const char** argv)
         {

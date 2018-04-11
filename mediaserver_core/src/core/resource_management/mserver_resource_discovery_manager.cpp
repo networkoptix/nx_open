@@ -204,22 +204,22 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
             continue;
         }
 
-		if (rpResource->hasFlags(Qn::foreigner))
-		{
-			if (!canTakeForeignCamera(rpResource.dynamicCast<QnSecurityCamResource>(), extraResources.size()))
-			{
+        if (rpResource->hasFlags(Qn::foreigner))
+        {
+            if (!canTakeForeignCamera(rpResource.dynamicCast<QnSecurityCamResource>(), extraResources.size()))
+            {
                 NX_VERBOSE(this, lit("Can't take foreign resource %1 now").arg(NetResString(newNetRes)));
-				it = resources.erase(it); // do not touch foreign resource
-				continue;
-			}
-		}
+                it = resources.erase(it); // do not touch foreign resource
+                continue;
+            }
+        }
 
-		if (newCamRes)
-		{
-			quint32 ips = resolveAddress(newNetRes->getHostAddress()).toIPv4Address();
-			if (ips)
-				ipsList[ips].insert(newNetRes);
-		}
+        if (newCamRes)
+        {
+            quint32 ips = resolveAddress(newNetRes->getHostAddress()).toIPv4Address();
+            if (ips)
+                ipsList[ips].insert(newNetRes);
+        }
 
         QnNetworkResourcePtr rpNetRes = rpResource.dynamicCast<QnNetworkResource>();
 

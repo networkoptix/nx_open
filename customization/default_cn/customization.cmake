@@ -1,4 +1,3 @@
-set(build_nxtool ON)
 set(build_mobile OFF)
 set(enable_hanwha true)
 
@@ -37,9 +36,6 @@ set(customization.serverUpgradeCode "{43b8cd49-50a7-43f4-a669-bcbb80891e88}")
 set(customization.clientBundleUpgradeCode "{147fb03d-5f8d-400f-84c1-fe03f6084b9d}")
 set(customization.serverBundleUpgradeCode "{797d9453-ce53-4851-bf52-f97439c1708f}")
 set(customization.fullBundleUpgradeCode "{0fa82b11-c467-4a97-b3d3-b9e811e9e432}")
-
-set(nxtool.company.name "Nx")
-set(nxtool.bundleUpgradeCode "{aad72622-10ee-40e5-b52c-a7305ec0aa05}")
 
 set(deb.customization.company.name "networkoptix")
 
