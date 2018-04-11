@@ -1,9 +1,11 @@
 *** Settings ***
 Resource          ../resource.robot
 Resource          ../variables.robot
-Test Teardown     Close Browser
-Suite Teardown    Run Keyword If Any Tests Failed    Permissions Failure
-Force Tags        system
+Test Setup        Reset
+Test Teardown     Run Keyword If Test Failed    Permissions Failure
+Suite Setup       Open Browser and go to URL    ${url}
+Suite Teardown    Close All Browsers
+Force Tags        System
 
 *** Variables ***
 ${email}           ${EMAIL OWNER}
@@ -21,36 +23,50 @@ Log in to Auto Tests System
     Run Keyword If    '${email}' == '${EMAIL ADMIN}'    Wait Until Elements Are Visible    ${DISCONNECT FROM MY ACCOUNT}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
     Run Keyword Unless    '${email}' == '${EMAIL OWNER}' or '${email}' == '${EMAIL ADMIN}'    Wait Until Elements Are Visible    ${DISCONNECT FROM MY ACCOUNT}    ${OPEN IN NX BUTTON}
 
+Check Log In
+    Log In    ${EMAIL UNREGISTERED}    ${password}
+    Check For Alert    ${ACCOUNT DOES NOT EXIST}
+    Log In    ${email}    ${password}    None
+    Validate Log In
+
+Reset
+    ${status}    Run Keyword And Return Status    Validate Log In
+    Run Keyword If    ${status}    Log Out
+    Go To    ${url}
+
 Permissions Failure
+    Close Browser
     Clean up random emails
     Clean up email noperm
 
 *** Test Cases ***
 Share button - opens dialog
-    Open Browser and go to URL    ${url}
     Log in to Auto Tests System    ${email}
     Wait Until Elements Are Visible    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}
     Click Button    ${SHARE BUTTON SYSTEMS}
     Wait Until Element Is Visible    ${SHARE MODAL}
+    Click Button    ${SHARE CLOSE}
+    Wait Until Page Does Not Contain Element    ${SHARE MODAL}
 
 Sharing link /systems/{system_id}/share - opens dialog
-    Open Browser and go to URL    ${url}
     Log in to Auto Tests System    ${email}
     ${location}    Get Location
     Go To    ${location}/share
     Wait Until Element Is Visible    ${SHARE MODAL}
+    Click Button    ${SHARE CLOSE}
+    Wait Until Page Does Not Contain Element    ${SHARE MODAL}
 
 Sharing link for anonymous - first ask login, then show share dialog
-    Open Browser and go to URL    ${url}
     Log in to Auto Tests System    ${email}
     ${location}    Get Location
     Log Out
     Go To    ${location}/share
     Log In    ${email}    ${password}    button=None
     Wait Until Element Is Visible    ${SHARE MODAL}
+    Click Button    ${SHARE CLOSE}
+    Wait Until Page Does Not Contain Element    ${SHARE MODAL}
 
 After closing dialog, called by link - clear link
-    Open Browser and go to URL    ${url}
     Log in to Auto Tests System    ${email}
     ${location}    Get Location
 
@@ -77,16 +93,16 @@ After closing dialog, called by link - clear link
     Location Should Be    ${location}
 
 Sharing roles are ordered: more access is on top of the list with options
-    Open Browser and go to URL    ${url}
     Log in to Auto Tests System    ${email}
     Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
     Click Button    ${SHARE BUTTON SYSTEMS}
     Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
     Click Element    ${SHARE PERMISSIONS DROPDOWN}
     Element Text Should Be    ${SHARE PERMISSIONS DROPDOWN}    ${ADMIN TEXT}\n${ADV VIEWER TEXT}\n${VIEWER TEXT}\n${LIVE VIEWER TEXT}\n${CUSTOM TEXT}
+    Click Button    ${SHARE CLOSE}
+    Wait Until Page Does Not Contain Element    ${SHARE MODAL}
 
 When user selects role - special hint appears
-    Open Browser and go to URL    ${url}
     Log in to Auto Tests System    ${email}
     Click Button    ${SHARE BUTTON SYSTEMS}
 #Adminstrator check
@@ -124,9 +140,10 @@ When user selects role - special hint appears
     Click Element    ${SHARE PERMISSIONS CUSTOM}
     Wait Until Element Is Visible    ${SHARE PERMISSIONS HINT}
     Element Text Should Be    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT CUSTOM}
+    Click Button    ${SHARE CLOSE}
+    Wait Until Page Does Not Contain Element    ${SHARE MODAL}
 
 Sharing works
-    Open Browser and go to URL    ${url}
     Log in to Auto Tests System    ${email}
     Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
     Click Button    ${SHARE BUTTON SYSTEMS}
@@ -139,7 +156,6 @@ Sharing works
     Remove User Permissions    ${random email}
 
 displays pencil and cross links for each user only on hover
-    Open Browser and go to URL    ${url}
     Maximize Browser Window
     Log in to Auto Tests System    ${email}
     Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
@@ -157,7 +173,6 @@ displays pencil and cross links for each user only on hover
     Remove User Permissions    ${random email}
 
 Edit permission works
-    Open Browser and go to URL    ${url}
     Maximize Browser Window
     Log in to Auto Tests System    ${email}
     Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
@@ -175,7 +190,7 @@ Edit permission works
 
 Delete user works
     [tags]    email
-    Open Browser and go to URL    ${url}/register
+    Go To    ${url}/register
     ${random email}    Get Random Email    ${BASE EMAIL}
     Register    mark    harmill    ${random email}    ${password}
     Activate    ${random email}
@@ -201,7 +216,6 @@ Delete user works
 
 Share with registered user - sends him notification
     [tags]    email
-    Open Browser and go to URL    ${url}
     Log In    ${EMAIL NOPERM}    ${password}
     Validate Log In
     Log Out
