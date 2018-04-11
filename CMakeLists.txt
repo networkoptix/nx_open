@@ -192,9 +192,12 @@ if (withMediaServer OR withTestCamera OR withTrayTool OR withDesktopClient OR wi
     add_subdirectory(nx_cloud)
 endif()
 
+if(withMediaServer OR withClouds)
+    add_subdirectory(mediaserver_db)
+endif()
+
 if(withMediaServer)
     add_subdirectory(mediaserver_core)
-    add_subdirectory(mediaserver_db)
     add_subdirectory(mediaserver)
     add_subdirectory(plugins)
     add_subdirectory(storage_plugins)
