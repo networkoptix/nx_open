@@ -54,18 +54,18 @@ std::string toString(const T& value)
     return os.str();
 }
 
-static void stringReplaceChars(std::string* s, char sample, char replacement)
+static void stringReplaceAllChars(std::string* s, char sample, char replacement)
 {
     std::transform(s->cbegin(), s->cend(), s->begin(),
         [=](char c) { return c == sample ? replacement : c; });
 }
 
-static void stringInsertAfter(std::string* s, char sample, const char* const insertion)
+static void stringInsertAfterAll(std::string* s, char sample, const char* const insertion)
 {
     for (int i = (int) s->size() - 1; i >= 0; --i)
     {
         if ((*s)[i] == sample)
-            s->insert(i + 1, insertion);
+            s->insert((size_t) (i + 1), insertion);
     }
 }
 
@@ -187,7 +187,7 @@ struct AbstractParam
             if (description[0])
             {
                 descriptionStr = std::string(" # ") + description;
-                stringReplaceChars(&descriptionStr, '\n', ' ');
+                stringReplaceAllChars(&descriptionStr, '\n', ' ');
             }
             *output << prefix << value << valueNameSeparator << name << error << descriptionStr
                 << std::endl;
@@ -529,7 +529,7 @@ void IniConfig::Impl::createDefaultIniFile(std::ostream* output)
         if (!description.empty())
         {
             description += " ";
-            stringInsertAfter(&description, '\n', "# ");
+            stringInsertAfterAll(&description, '\n', "# ");
         }
 
         file << "# " << description << "Default: " << param->defaultValueStr() << "\n";
