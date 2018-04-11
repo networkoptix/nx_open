@@ -99,8 +99,6 @@ Unchecking check box and saving maintains that setting
     Go To    ${url}/account
     Verify In Account Page
 
-
-
     Click Element    ${ACCOUNT SUBSCRIBE CHECKBOX}
     Click Button    ${ACCOUNT SAVE}
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
