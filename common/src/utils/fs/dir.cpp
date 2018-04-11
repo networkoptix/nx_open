@@ -26,6 +26,7 @@ SystemError::ErrorCode readPartitions(
     AbstractSystemInfoProvider* systemInfoProvider,
     std::list<PartitionInfo>* const partitionInfoList)
 {
+#if defined (Q_OS_LINUX)
     struct PathInfo
     {
         QByteArray fsPath;
@@ -92,6 +93,9 @@ SystemError::ErrorCode readPartitions(
     }
 
     return SystemError::noError;
+#else
+    return SystemError::notImplemented;
+#endif
 }
 
 void decodeOctalEncodedPath(char* path)
@@ -115,6 +119,8 @@ void decodeOctalEncodedPath(char* path)
         }
     }
 }
+
+#if defined (Q_OS_LINUX)
 
 CommonSystemInfoProvider::CommonSystemInfoProvider()
 {
@@ -174,3 +180,5 @@ QString CommonSystemInfoProvider::fileName() const
 {
     return m_fileName;
 }
+
+#endif
