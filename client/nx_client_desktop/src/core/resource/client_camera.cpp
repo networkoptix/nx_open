@@ -46,6 +46,21 @@ void QnClientCameraResource::setAuthToCameraGroup(
     }
 }
 
+QnAbstractStreamDataProvider* QnClientCameraResource::createDataProvider(
+    const QnResourcePtr& resource,
+    Qn::ConnectionRole role)
+{
+    const auto camera = resource.dynamicCast<QnClientCameraResource>();
+    NX_EXPECT(camera && role == Qn::CR_Default);
+    if (!camera)
+        return nullptr;
+
+     QnAbstractStreamDataProvider* result = camera->createLiveDataProvider();
+     if (result)
+         result->setRole(role);
+     return result;
+}
+
 QnConstResourceVideoLayoutPtr QnClientCameraResource::getVideoLayout(const QnAbstractStreamDataProvider *dataProvider) const {
     return QnVirtualCameraResource::getVideoLayout(dataProvider);
 }

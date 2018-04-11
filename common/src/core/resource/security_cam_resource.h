@@ -22,7 +22,6 @@
 #include <core/dataprovider/live_stream_params.h>
 
 class QnAbstractArchiveDelegate;
-class QnDataProviderFactory;
 
 class QnSecurityCamResource : public QnNetworkResource, public QnMediaResource
 {
@@ -66,8 +65,6 @@ public:
 
     /** sets the distance between I frames */
     virtual void setIframeDistance(int /*frames*/, int /*timems*/) {}
-
-    void setDataProviderFactory(QnDataProviderFactory* dpFactory);
 
     QList<QnMotionRegion> getMotionRegionList() const;
     void setMotionRegionList(const QList<QnMotionRegion>& maskList);
@@ -394,10 +391,6 @@ protected slots:
 protected:
     virtual void updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers) override;
 
-#ifdef ENABLE_DATA_PROVIDERS
-    virtual QnAbstractStreamDataProvider* createDataProviderInternal(Qn::ConnectionRole role) override;
-#endif
-
     virtual void initializationDone() override;
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() = 0;
@@ -419,8 +412,8 @@ protected:
     virtual bool isInputPortMonitored() const;
 
     virtual Qn::LicenseType calculateLicenseType() const;
+
 private:
-    QnDataProviderFactory *m_dpFactory;
     QAtomicInt m_inputPortListenerCount;
     int m_recActionCnt;
     QString m_groupName;

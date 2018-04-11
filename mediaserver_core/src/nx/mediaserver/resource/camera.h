@@ -133,6 +133,10 @@ public:
     void setLastMediaIssue(const CameraDiagnostics::Result& issue);
     CameraDiagnostics::Result getLastMediaIssue() const;
 
+    static QnAbstractStreamDataProvider* createDataProvider(
+        const QnResourcePtr& resource,
+        Qn::ConnectionRole role);
+
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
 

@@ -19,6 +19,8 @@
 #include "live_media_cache_reader.h"
 #include "streaming_chunk_cache_key.h"
 #include "streaming_chunk_transcoder_thread.h"
+#include <media_server/media_server_module.h>
+#include <core/dataprovider/data_provider_factory.h>
 
 /**
  * Maximum time offset (in micros) requested chunk can be ahead of current live position.
@@ -298,7 +300,7 @@ AbstractOnDemandDataProviderPtr StreamingChunkTranscoder::createArchiveReader(
 
     // Creating archive reader.
     QSharedPointer<QnAbstractStreamDataProvider> dp(
-        cameraResource->createDataProvider(Qn::CR_Archive));
+        qnServerModule->dataProviderFactory()->createDataProvider(cameraResource, Qn::CR_Archive));
     if (!dp)
     {
         NX_LOGX(lm("StreamingChunkTranscoder::transcodeAsync. "

@@ -78,6 +78,8 @@
 #include <nx/utils/concurrent.h>
 #include <utils/camera/bookmark_helpers.h>
 #include "nx/mediaserver/resource/camera.h"
+#include <media_server/media_server_module.h>
+#include <core/dataprovider/data_provider_factory.h>
 
 namespace {
 
@@ -340,7 +342,7 @@ bool ExtendedRuleProcessor::executePlaySoundAction(
         resource->setCommonModule(commonModule());
         resource->setStatus(Qn::Online);
         QnAbstractStreamDataProviderPtr provider(
-            resource->createDataProvider(Qn::ConnectionRole::CR_Default));
+            qnServerModule->dataProviderFactory()->createDataProvider(resource));
 
         provider.dynamicCast<QnAbstractArchiveStreamReader>()->setCycleMode(false);
 

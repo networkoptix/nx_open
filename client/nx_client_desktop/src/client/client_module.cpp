@@ -42,6 +42,8 @@
 
 #include <cloud/cloud_connection.h>
 
+#include <core/resource/client_camera.h>
+#include <core/resource/avi/avi_resource.h>
 #include <core/resource/client_camera_factory.h>
 #include <core/resource/storage_plugin_factory.h>
 #include <core/resource/resource_directory_browser.h>
@@ -49,6 +51,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_runtime_data.h>
 #include <core/resource_management/layout_tour_manager.h>
+#include <core/dataprovider/data_provider_factory.h>
 
 #include <decoders/video/abstract_video_decoder.h>
 
@@ -68,6 +71,11 @@
 
 #include <plugins/plugin_manager.h>
 #include <plugins/resource/desktop_camera/desktop_resource_searcher.h>
+#include <plugins/resource/desktop_audio_only/desktop_audio_only_resource.h>
+#if defined(Q_OS_WIN)
+    #include <plugins/resource/desktop_win/desktop_resource.h>
+#endif
+
 #include <core/storage/file_storage/qtfile_storage_resource.h>
 #include <core/storage/file_storage/layout_storage_resource.h>
 
@@ -115,6 +123,7 @@
 #include <watchers/cloud_status_watcher.h>
 
 #include <ini.h>
+
 
 using namespace nx::client::desktop;
 
@@ -398,6 +407,9 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 
     m_analyticsMetadataProviderFactory.reset(new AnalyticsMetadataProviderFactory());
     m_analyticsMetadataProviderFactory->registerMetadataProviders();
+
+    m_resourceDataProviderFactory.reset(new QnDataProviderFactory());
+    registerResourceDataProviders();
 }
 
 void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
@@ -649,6 +661,11 @@ QnCameraDataManager* QnClientModule::cameraDataManager() const
     return m_cameraDataManager;
 }
 
+QnDataProviderFactory* QnClientModule::dataProviderFactory() const
+{
+    return m_resourceDataProviderFactory.data();
+}
+
 nx::client::desktop::RadassController* QnClientModule::radassController() const
 {
     return m_radassController;
@@ -685,4 +702,14 @@ void QnClientModule::initLocalInfo(const QnStartupParameters& startupParams)
     runtimeData.customization = qnRuntime->isDevMode() ? QString() : QnAppInfo::customizationName();
     runtimeData.videoWallInstanceGuid = startupParams.videoWallItemGuid;
     commonModule->runtimeInfoManager()->updateLocalItem(runtimeData); // initializing localInfo
+}
+
+void QnClientModule::registerResourceDataProviders()
+{
+    m_resourceDataProviderFactory->registerResourceType<QnAviResource>();
+    m_resourceDataProviderFactory->registerResourceType<QnClientCameraResource>();
+    m_resourceDataProviderFactory->registerResourceType<QnDesktopAudioOnlyResource>();
+    #if defined(Q_OS_WIN)
+        m_resourceDataProviderFactory->registerResourceType<QnWinDesktopResource>();
+    #endif
 }

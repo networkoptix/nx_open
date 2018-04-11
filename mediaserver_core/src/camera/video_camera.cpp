@@ -23,6 +23,8 @@
 #include <media_server/settings.h>
 
 #include "mediaserver_ini.h"
+#include <media_server/media_server_module.h>
+#include <core/dataprovider/data_provider_factory.h>
 
 using nx::api::ImageRequest;
 
@@ -546,7 +548,7 @@ void QnVideoCamera::createReader(QnServer::ChunksCatalog catalog)
     {
         QnAbstractStreamDataProvider* dataProvider = NULL;
         if ( primaryLiveStream || (cameraResource && cameraResource->hasDualStreaming()) )
-            dataProvider = m_resource->createDataProvider(role);
+            dataProvider = qnServerModule->dataProviderFactory()->createDataProvider(m_resource, role);
 
         if ( dataProvider )
         {

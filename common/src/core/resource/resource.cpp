@@ -6,25 +6,20 @@
 #include <QtCore/QRunnable>
 
 #include <nx_ec/data/api_resource_data.h>
-#include <nx/fusion/model_functions.h>
-#include <nx/streaming/abstract_stream_data_provider.h>
 #include <nx/utils/log/log.h>
 
 #include <core/resource/camera_advanced_param.h>
-#include <utils/common/warnings.h>
 #include "core/resource_management/resource_pool.h"
 
 #include "resource_command_processor.h"
 #include "resource_consumer.h"
 #include "resource_property.h"
 
-#include "utils/common/synctime.h"
 #include "utils/common/util.h"
 #include "resource_command.h"
 #include "../resource_management/resource_properties.h"
 #include "../resource_management/status_dictionary.h"
 
-#include <core/resource/security_cam_resource.h>
 #include <common/common_module.h>
 
 #include <nx/utils/log/assert.h>
@@ -413,8 +408,7 @@ void QnResource::setId(const QnUuid& id)
     QnMutexLocker mutexLocker(&m_mutex);
 
     // TODO: #dmishin it seems really wrong. Think about how to do it in another way.
-    NX_ASSERT(
-        dynamic_cast<QnSecurityCamResource*>(this) || m_locallySavedProperties.empty(),
+    NX_ASSERT(this->inherits("QnSecurityCamResource") || m_locallySavedProperties.empty(),
         lit("Only camera resources are allowed to set properties if id is not set."));
 
     m_id = id;
@@ -489,23 +483,6 @@ void QnResource::disconnectAllConsumers()
 
     m_consumers.clear();
 }
-
-#ifdef ENABLE_DATA_PROVIDERS
-QnAbstractStreamDataProvider* QnResource::createDataProvider(Qn::ConnectionRole role)
-{
-    QnAbstractStreamDataProvider* dataProvider = createDataProviderInternal(role);
-
-    if (dataProvider != NULL && dataProvider->getResource() != this)
-        qnCritical("createDataProviderInternal() returned a data provider that is not associated with current resource."); /* This may cause hard to debug problems. */
-
-    return dataProvider;
-}
-
-QnAbstractStreamDataProvider *QnResource::createDataProviderInternal(Qn::ConnectionRole)
-{
-    return NULL;
-}
-#endif
 
 CameraDiagnostics::Result QnResource::initInternal()
 {

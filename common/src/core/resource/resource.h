@@ -22,7 +22,6 @@
 #include "resource_fwd.h"
 #include "resource_type.h"
 
-class QnAbstractStreamDataProvider;
 class QnResourceConsumer;
 class QnResourcePool;
 class QnCommonModule;
@@ -131,10 +130,6 @@ public:
     // ==================================================
 
     bool hasParam(const QString &name) const;
-
-#ifdef ENABLE_DATA_PROVIDERS
-    QnAbstractStreamDataProvider* createDataProvider(Qn::ConnectionRole role);
-#endif
 
     virtual QString getUrl() const;
     virtual void setUrl(const QString &url);
@@ -247,10 +242,6 @@ public:
 
 protected:
     virtual void updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers);
-
-#ifdef ENABLE_DATA_PROVIDERS
-    virtual QnAbstractStreamDataProvider* createDataProviderInternal(Qn::ConnectionRole role);
-#endif
 
     virtual CameraDiagnostics::Result initInternal();
     //!Called just after successful \a initInternal()

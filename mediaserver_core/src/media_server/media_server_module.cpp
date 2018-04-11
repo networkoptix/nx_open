@@ -31,19 +31,25 @@
 #include <streaming/streaming_chunk_cache.h>
 #include "streaming/streaming_chunk_transcoder.h"
 #include <recorder/file_deletor.h>
+
+#include <core/resource/avi/avi_resource.h>
 #include <core/ptz/server_ptz_controller_pool.h>
+#include <core/dataprovider/data_provider_factory.h>
+
 #include <recorder/storage_db_pool.h>
 #include <recorder/storage_manager.h>
 #include <recorder/archive_integrity_watcher.h>
 #include <recorder/wearable_archive_synchronizer.h>
 #include <common/static_common_module.h>
 #include <utils/common/app_info.h>
+
 #include <nx/mediaserver/event/event_message_bus.h>
 #include <nx/mediaserver/unused_wallpapers_watcher.h>
 #include <nx/mediaserver/license_watcher.h>
 #include <nx/mediaserver/metadata/manager_pool.h>
 #include <nx/mediaserver/metadata/event_rule_watcher.h>
 #include <nx/mediaserver/resource/shared_context_pool.h>
+#include <nx/mediaserver/resource/camera.h>
 #include <nx/mediaserver/root_tool.h>
 
 #include <nx/core/access/access_types.h>
@@ -57,6 +63,7 @@
 
 #include "wearable_lock_manager.h"
 #include "wearable_upload_manager.h"
+
 
 namespace {
 
@@ -197,6 +204,8 @@ QnMediaServerModule::QnMediaServerModule(
     m_updates2Manager = store(
         new nx::mediaserver::updates2::ServerUpdates2Manager(this->commonModule()));
     m_rootTool = nx::mediaserver::findRootTool(qApp->applicationFilePath());
+    m_resourceDataProviderFactory.reset(new QnDataProviderFactory());
+    registerResourceDataProviders();
 
     store(new nx::mediaserver_core::recorder::WearableArchiveSynchronizer(this));
 
@@ -309,7 +318,18 @@ nx::mediaserver::RootTool* QnMediaServerModule::rootTool() const
     return m_rootTool.get();
 }
 
+void QnMediaServerModule::registerResourceDataProviders()
+{
+    m_resourceDataProviderFactory->registerResourceType<QnAviResource>();
+    m_resourceDataProviderFactory->registerResourceType<nx::mediaserver::resource::Camera>();
+}
+
 nx::mediaserver::updates2::ServerUpdates2Manager* QnMediaServerModule::updates2Manager() const
 {
     return m_updates2Manager;
+}
+
+QnDataProviderFactory* QnMediaServerModule::dataProviderFactory() const
+{
+    return m_resourceDataProviderFactory.data();
 }

@@ -28,9 +28,6 @@ public:
     static QString calculateUniqueId(const QnUuid& moduleId, const QnUuid& userId);
 
 protected:
-    virtual QnAbstractStreamDataProvider* createDataProviderInternal(
-        Qn::ConnectionRole role) = 0;
-
     std::map<QnUuid, QnDesktopCameraConnectionPtr> m_connectionPool;
 };
 
