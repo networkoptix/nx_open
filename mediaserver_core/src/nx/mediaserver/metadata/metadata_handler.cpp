@@ -166,7 +166,7 @@ void MetadataHandler::handleMetadataEvent(
         return;
     }
 
-    qnEventRuleConnector->at_analyticsSdkEvent(sdkEvent);
+    emit sdkEventTriggered(sdkEvent);
 }
 
 void MetadataHandler::setResource(const QnSecurityCamResourcePtr& resource)
