@@ -267,7 +267,7 @@
             "ignoreONVIF": true
         },
         {
-            "__comment": "Onvif probe matches for Flir FC-Series cameras has such manufacturers",
+            "_comment": "Onvif probe matches for Flir FC-Series cameras has such manufacturers",
             "keys":[
                 "FC-Series-R|*", "FC-Series-S|*"
             ],
@@ -276,6 +276,12 @@
         {
             "keys":[
                 "Axis|P7216*"
+            ],
+            "ignoreONVIF": true
+        },
+        {
+            "keys":[
+                "Axis|Axis F44 Dual Audio*"
             ],
             "ignoreONVIF": true
         },
