@@ -38,8 +38,10 @@ Plugin::Plugin()
         QFile file(kFileName);
         if (file.open(QFile::ReadOnly))
         {
+            /*
             NX_PRINT << "Switch to external manifest file "
                 << QFileInfo(file).absoluteFilePath().toStdString();
+            */
             m_manifest = file.readAll();
         }
     }
