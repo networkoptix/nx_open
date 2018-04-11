@@ -563,7 +563,7 @@ public:
             m_commonSystemInfoProvider.fileName(), QIODevice::ReadOnly);
 
         if (fd > 0)
-            mountsFile.open(fd, QIODevice::ReadOnly);
+            mountsFile.open(fd, QIODevice::ReadOnly, QFileDevice::AutoCloseHandle);
         else
             mountsFile.open(QIODevice::ReadOnly);
 
