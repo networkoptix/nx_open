@@ -74,7 +74,10 @@ def setup_networks(machines, hypervisor, networks_tree, reachability):
 
 def setup_flat_network(machines, network_ip, hypervisor):  # TODO: Use in setup networks.
     network_uuid = '{} {} flat'.format(uuid1(), network_ip)
-    ips_iter = islice(network_ip.iter_hosts(), 1, None)  # First IP is usually reserved for router.
-    for machine, ip in zip(machines, ips_iter):
+    iter_ips = network_ip.iter_hosts()
+    next(iter_ips)  # First IP is usually reserved for router.
+    host_ips = dict(zip((machine.alias for machine in machines), iter_ips))
+    for machine in machines:
         mac = hypervisor.plug(machine.name, network_uuid)
-        machine.networking.setup_ip(mac, ip, network_ip.prefixlen)
+        machine.networking.setup_ip(mac, host_ips[machine.alias], network_ip.prefixlen)
+    return host_ips

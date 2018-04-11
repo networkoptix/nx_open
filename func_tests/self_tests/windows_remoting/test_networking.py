@@ -39,10 +39,10 @@ def test_ip_addresses(networking, macs):
 
     macs_iter = iter(macs.values())
     random_mac_1 = next(macs_iter)
-    networking.setup_ip('10.254.252.2', 28, random_mac_1)
+    networking.setup_ip(random_mac_1, '10.254.252.2', 28)
     assert len(networking.list_ips()) == 1
     random_mac_2 = next(macs_iter)
-    networking.setup_ip('10.254.252.18', 28, random_mac_2)
+    networking.setup_ip(random_mac_2, '10.254.252.18', 28)
     assert len(networking.list_ips()) == 2
 
     networking.remove_ips()

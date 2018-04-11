@@ -114,7 +114,7 @@ class WindowsNetworking(Networking):
             '''Get-NetFirewallProfile | select DefaultOutboundAction | ConvertTo-Json''')
         return not all(profile['DefaultOutboundAction'] == 'Block' for profile in all_profiles)
 
-    def setup_ip(self, ip, prefix_length, mac):
+    def setup_ip(self, mac, ip, prefix_length):
         self._winrm_access.run_powershell_script(
             # language=PowerShell
             '''
@@ -123,7 +123,7 @@ class WindowsNetworking(Networking):
                     -IPAddress:$ipAddress `
                     -PrefixLength:$prefixLength
                 ''',
-            {'interfaceAlias': self.interfaces[mac], 'ipAddress': ip, 'prefixLength': prefix_length})
+            {'interfaceAlias': self.interfaces[mac], 'ipAddress': str(ip), 'prefixLength': prefix_length})
 
     def list_ips(self):
         result = self._winrm_access.run_powershell_script(

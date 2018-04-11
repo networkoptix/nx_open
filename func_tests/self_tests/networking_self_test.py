@@ -1,8 +1,9 @@
 import pytest
 from netaddr import IPAddress, IPNetwork
 
-from framework.networking import setup_networks
+from framework.networking import setup_networks, setup_flat_network
 from framework.pool import ClosingPool
+from framework.utils import wait_until
 
 
 @pytest.fixture()
@@ -53,3 +54,9 @@ def test_setup_basic(machines, hypervisor):
     assert not nodes['first'].networking.can_reach(ip_addresses['router-1'][IPNetwork('10.254.2.0/24')], timeout_sec=2)
     assert not nodes['first'].networking.can_reach(ip_addresses['router-2'][IPNetwork('10.254.2.0/24')], timeout_sec=2)
     assert not nodes['first'].networking.can_reach(ip_addresses['second'][IPNetwork('10.254.3.0/24')], timeout_sec=2)
+
+
+def test_linux_and_windows(linux_vm, windows_vm, hypervisor):
+    ips = setup_flat_network((linux_vm, windows_vm), IPNetwork('10.254.0.0/28'), hypervisor)
+    assert wait_until(lambda: linux_vm.networking.can_reach(ips[windows_vm.alias], timeout_sec=2))
+    assert wait_until(lambda: windows_vm.networking.can_reach(ips[linux_vm.alias], timeout_sec=2))
