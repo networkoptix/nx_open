@@ -17,7 +17,7 @@ namespace test {
 namespace {
 
 class TestTcpServer:
-    public network::test::SynchronousTcpServer
+    public network::test::SynchronousStreamSocketServer
 {
 protected:
     virtual void processConnection(AbstractStreamSocket* connection) override
