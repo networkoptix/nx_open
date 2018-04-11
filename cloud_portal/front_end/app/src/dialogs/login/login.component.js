@@ -68,8 +68,8 @@ __decorate([
 LoginModalContent = __decorate([
     core_1.Component({
         selector: 'ngbd-modal-content',
-        templateUrl: './src/dialogs/login/login.component.html',
-        styleUrls: ['./src/dialogs/login/login.component.scss']
+        templateUrl: 'login.component.html',
+        styleUrls: ['login.component.scss']
         // TODO: later
         // templateUrl: this.CONFIG.viewsDir + 'dialogs/login.html'
     }),

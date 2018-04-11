@@ -6,6 +6,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 const webCommonPath = path.join(__dirname, './app/web_common');
+const ENV = process.env.ENV = process.env.NODE_ENV = 'dev';
 
 const babelLoader = {
     loader: 'babel-loader',
@@ -14,6 +15,24 @@ const babelLoader = {
         presets: ['babel-preset-env']
     }
 };
+
+let thingsToIgnore = [
+    'src/**/*.ts',
+    'web_common/styles/**',
+    'scripts/**',
+    'styles/**',
+    '.*',
+    '*.ts',
+    '*.map',
+    '*.js',
+    'index-template.html',
+    'index.html'
+];
+
+let targetEnv = process.argv[ 3 ].split('.')[ 1 ]; // keep 3rd arg as env configuration
+if (targetEnv === 'prod') {
+    thingsToIgnore.push('src/**/*.scss');
+}
 
 module.exports = {
     context: path.resolve(__dirname + '/app'),
@@ -52,18 +71,7 @@ module.exports = {
             {
                 from: '',
                 to: '',
-                ignore: [
-                    'src/**/*.ts',
-                    'web_common/styles/**',
-                    'scripts/**',
-                    'styles/**',
-                    '.*',
-                    '*.ts',
-                    '*.map',
-                    '*.js',
-                    'index-template.html',
-                    'index.html'
-                ]
+                ignore: thingsToIgnore
             }
         ]),
 
@@ -99,15 +107,11 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.ts(x?)$/,
+                test   : /\.ts$/,
                 exclude: /node_modules/,
-                use: [
-                    babelLoader,
-                    {
-                        loader: 'ts-loader'
-                    }
-                ]
-            }, {
+                loaders: [ 'ts-loader', 'angular2-template-loader' ]
+            },
+            {
                 test: /\.js$/,
                 exclude: /node_modules/,
                 use: [

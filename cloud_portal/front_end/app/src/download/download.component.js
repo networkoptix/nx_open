@@ -116,7 +116,7 @@ __decorate([
 DownloadComponent = __decorate([
     core_1.Component({
         selector: 'download-component',
-        templateUrl: './src/download/download.component.html'
+        templateUrl: 'download.component.html'
     }),
     __param(0, core_1.Inject('languageService')),
     __param(1, core_1.Inject('cloudApiService')),

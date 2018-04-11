@@ -36,8 +36,8 @@ let NxAccountSettingsDropdown = class NxAccountSettingsDropdown {
 NxAccountSettingsDropdown = __decorate([
     core_1.Component({
         selector: 'nx-account-settings-select',
-        templateUrl: './src/dropdowns/account-settings/account-settings.component.html',
-        styleUrls: ['./src/dropdowns/account-settings/account-settings.component.scss']
+        templateUrl: 'account-settings.component.html',
+        styleUrls: ['account-settings.component.scss']
     }),
     __param(0, core_1.Inject('account')),
     __metadata("design:paramtypes", [Object])

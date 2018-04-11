@@ -8,8 +8,8 @@ export interface activeLanguage {
 
 @Component({
     selector: 'nx-language-select',
-    templateUrl: './src/dropdowns/language/language.component.html',
-    styleUrls: ['./src/dropdowns/language/language.component.scss'],
+    templateUrl: 'language.component.html',
+    styleUrls: ['language.component.scss'],
     inputs: ['accountMode'],
 })
 

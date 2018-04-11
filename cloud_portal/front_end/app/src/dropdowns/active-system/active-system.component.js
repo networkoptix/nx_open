@@ -54,8 +54,8 @@ __decorate([
 NxActiveSystemDropdown = __decorate([
     core_1.Component({
         selector: 'nx-active-system',
-        templateUrl: './src/dropdowns/active-system/active-system.component.html',
-        styleUrls: ['./src/dropdowns/active-system/active-system.component.scss']
+        templateUrl: 'active-system.component.html',
+        styleUrls: ['active-system.component.scss']
     }),
     __metadata("design:paramtypes", [common_1.Location,
         router_1.ActivatedRoute])

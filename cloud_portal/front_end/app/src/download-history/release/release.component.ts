@@ -7,7 +7,7 @@ import {
 
 @Component({
     selector: 'nx-release',
-    templateUrl: './src/download-history/release/release.component.html',
+    templateUrl: 'release.component.html',
     // TODO: Load language tailored template
     // templateUrl: this.CONFIG.viewsDir + 'components/downloadRelease.html'
 })

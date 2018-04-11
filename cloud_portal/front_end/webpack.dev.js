@@ -7,6 +7,8 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 const common = require('./webpack.common.js');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 
+const ENV = process.env.ENV = process.env.NODE_ENV = 'dev';
+
 module.exports = merge(common, {
     devtool  : 'cheap-module-eval-source-map',
     devServer: {
@@ -40,17 +42,17 @@ module.exports = merge(common, {
         new webpack.HotModuleReplacementPlugin(),
         // new BundleAnalyzerPlugin({analyzerHost:'0.0.0.0', analyzerPort:9001})
 
-        new CopyWebpackPlugin([
-            {
-                from: 'images',
-                to  : 'static/images'
-            }
-        ])
     ],
     module   : {
         rules: [
             {
+                test   : /\.scss$/,
+                include: /src/,
+                loaders: [ 'raw-loader', 'sass-loader' ]
+            },
+            {
                 test: /\.s?css$/,
+                exclude: /src/,
                 use : ExtractTextPlugin.extract({
                     fallback: "style-loader",
                     use     : [

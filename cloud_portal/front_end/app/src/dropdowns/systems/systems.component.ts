@@ -5,8 +5,8 @@ import { Location }                                                             
 
 @Component({
     selector: 'nx-systems',
-    templateUrl: './src/dropdowns/systems/systems.component.html',
-    styleUrls: ['./src/dropdowns/systems/systems.component.scss']
+    templateUrl: 'systems.component.html',
+    styleUrls: ['systems.component.scss']
 })
 
 export class NxSystemsDropdown implements OnInit, OnDestroy, OnChanges {

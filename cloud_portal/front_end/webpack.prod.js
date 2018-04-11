@@ -4,6 +4,8 @@ const common = require('./webpack.common.js');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 
+const ENV = process.env.ENV = process.env.NODE_ENV = 'prod';
+
 module.exports = merge(common, {
     plugins: [
         new CleanWebpackPlugin([ 'dist' ]),
@@ -12,8 +14,14 @@ module.exports = merge(common, {
     module : {
         rules: [
             {
-                test: /\.s?css$/,
-                use : ExtractTextPlugin.extract({
+                test   : /\.scss$/,
+                include: /src/,
+                loaders: [ 'raw-loader', 'sass-loader' ]
+            },
+            {
+                test   : /\.s?css$/,
+                exclude: /src/,
+                use    : ExtractTextPlugin.extract({
                     fallback: "style-loader",
                     use     : [
                         {
