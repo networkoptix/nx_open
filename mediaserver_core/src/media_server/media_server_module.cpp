@@ -179,13 +179,7 @@ QnMediaServerModule::QnMediaServerModule(
         new nx::mediaserver::metadata::EventRuleWatcher(
             commonModule()->eventRuleManager()));
 
-    m_metadataManagerPoolThread = new QThread(this);
-    m_metadataManagerPoolThread->setObjectName(lit("MetadataManagerPool"));
-    m_metadataManagerPool = store(new nx::mediaserver::metadata::ManagerPool(
-        this,
-        m_metadataManagerPoolThread));
-    m_metadataManagerPool->moveToThread(m_metadataManagerPoolThread);
-    m_metadataManagerPoolThread->start();
+    m_metadataManagerPool = store(new nx::mediaserver::metadata::ManagerPool(this));
 
     m_sharedContextPool = store(new nx::mediaserver::resource::SharedContextPool(this));
     m_archiveIntegrityWatcher = store(new nx::mediaserver::ServerArchiveIntegrityWatcher);
@@ -205,8 +199,6 @@ QnMediaServerModule::QnMediaServerModule(
 QnMediaServerModule::~QnMediaServerModule()
 {
     m_context.reset();
-    m_metadataManagerPoolThread->exit();
-    m_metadataManagerPoolThread->wait();
     m_commonModule->resourcePool()->clear();
     clear();
 }

@@ -50,9 +50,7 @@ class ManagerPool final:
 
     Q_OBJECT
 public:
-    ManagerPool(
-        QnMediaServerModule* commonModule,
-        QThread* thread);
+    ManagerPool(QnMediaServerModule* commonModule);
     ~ManagerPool();
     void init();
     void stop();
