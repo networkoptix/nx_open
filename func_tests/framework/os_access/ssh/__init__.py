@@ -1,6 +1,7 @@
 from textwrap import dedent
 
 import pytz
+import subprocess
 from pathlib2 import Path, PurePosixPath
 
 from framework.os_access import FileNotFound, NonZeroExitStatus, OsAccess, args_to_command
@@ -17,8 +18,10 @@ class SSHAccess(OsAccess):
         self.port = port
         self.private_key_path = private_key_path
         self._username_and_hostname = self.username + '@' + self.hostname
-        self._private_key_args = [] if self.private_key_path is None else ['-i', self.private_key_path]
-        self._args = ['ssh', '-F', SSH_CONFIG_PATH, '-p', self.port] + self._private_key_args
+        self._private_key_args = ['-F', SSH_CONFIG_PATH]
+        if self.private_key_path:
+            self._private_key_args = ['-i', self.private_key_path]
+        self._args = ['ssh', '-p', self.port] + self._private_key_args
 
     def __repr__(self):
         return '<SSHAccess {} {}>'.format(args_to_command(self._args), self._username_and_hostname)
@@ -30,13 +33,14 @@ class SSHAccess(OsAccess):
             if cwd:
                 script = 'cd "{}"\n'.format(cwd) + script
             script = "set -euxo pipefail\n" + script
-            args = ['\n' + script]
+            prepared_args = ['\n' + script]
         else:
             args = [str(arg) for arg in args]
             args = env_to_args(env) + args
             if cwd:
                 args = ['cd', str(cwd), ';'] + args
-        return LocalAccess().run_command(self._args + [self._username_and_hostname] + args, input)
+            prepared_args = [subprocess.list2cmdline(args)]
+        return LocalAccess().run_command(self._args + [self._username_and_hostname] + prepared_args, input)
 
     def is_working(self):
         try:

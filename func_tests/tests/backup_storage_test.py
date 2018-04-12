@@ -4,6 +4,7 @@ from datetime import datetime
 
 import pytest
 import pytz
+import os
 from pathlib2 import Path
 
 import framework.utils as utils
@@ -15,7 +16,7 @@ from framework.os_access import NonZeroExitStatus
 log = logging.getLogger(__name__)
 
 
-BACKUP_STORAGE_PATH = Path('/mnt/disk2')
+BACKUP_STORAGE_PATH = Path('/mnt/backup')
 BACKUP_STORAGE_READY_TIMEOUT_SEC = 60  # seconds
 BACKUP_SCHEDULE_TIMEOUT_SEC = 60       # seconds
 
@@ -39,6 +40,28 @@ BACKUP_DURATION_NOT_SET = -1  # -1 means not set.
 
 # Maximum backup bitrate in bytes per second.
 BACKUP_BITRATE_NOT_LIMITED = -1  # -1 means not limited.
+
+# Backup volume settings
+
+# Default size for backup storage volume
+DEFAULT_VOLUME_SIZE = 10*1024*1024*1024  # 10 Gb
+
+
+class LinuxVolumeFactory(object):
+    def __init__(self, os_access):
+        self._os_access = os_access  # SSHAccess
+
+    def create_volume_if_not_exists(self, mount_point, size=DEFAULT_VOLUME_SIZE):
+        image_path = os.path.join('/', os.path.basename(mount_point) + '.image')
+        try:
+            self._os_access.run_command(['grep', mount_point, '/proc/mounts'])
+        except NonZeroExitStatus:
+            if self._os_access.file_exists(image_path):
+                self._os_access.rm_tree(image_path)
+            self._os_access.run_command(['fallocate', '-l', size, image_path])
+            self._os_access.run_command(['/sbin/mke2fs', '-F', '-t', 'ext4', image_path])
+            self._os_access.mk_dir(mount_point)
+            self._os_access.run_command(['mount', image_path, mount_point])
 
 
 # Global system 'backupQualities' setting parametrization:
@@ -78,15 +101,20 @@ def second_camera_backup_type(request):
 
 
 @pytest.fixture
-def server(linux_mediaservers_pool, system_backup_type):
+def linux_volume_factory(linux_mediaserver):
+    return LinuxVolumeFactory(linux_mediaserver.machine.os_access)
+
+
+@pytest.fixture
+def server(linux_mediaserver, linux_volume_factory, system_backup_type):
     config_file_params = dict(minStorageSpace=1024*1024)  # 1M
-    server = linux_mediaservers_pool.get('server')
-    server.update_mediaserver_conf(config_file_params)
-    server.machine.os_access.run_command(['rm', '-rfv', str(BACKUP_STORAGE_PATH / '*')])
-    server.start()
-    setup_local_system(server, {})
-    server.api.api.systemSettings.GET(backupQualities=system_backup_type)
-    return server
+    linux_mediaserver.installation.update_mediaserver_conf(config_file_params)
+    linux_volume_factory.create_volume_if_not_exists(str(BACKUP_STORAGE_PATH))
+    linux_mediaserver.machine.os_access.run_command(['rm', '-rfv', str(BACKUP_STORAGE_PATH / '*')])
+    linux_mediaserver.start()
+    setup_local_system(linux_mediaserver, {})
+    linux_mediaserver.api.api.systemSettings.GET(backupQualities=system_backup_type)
+    return linux_mediaserver
 
 
 def wait_storage_ready(server, storage_guid):
@@ -167,8 +195,10 @@ def assert_paths_are_equal(server, path_1, path_2):
     server.machine.os_access.run_command(['diff', '--recursive', '--report-identical-files', path_1, path_2])
 
 
-def assert_backup_equal_to_archive(server, backup_storage_path, camera, system_backup_type, backup_new_camera, camera_backup_type):
-    hi_quality_backup_path = backup_storage_path / HI_QUALITY_PATH /camera.mac_addr
+def assert_backup_equal_to_archive(
+        server, backup_storage_path, camera,
+        system_backup_type, backup_new_camera, camera_backup_type):
+    hi_quality_backup_path = backup_storage_path / HI_QUALITY_PATH / camera.mac_addr
     hi_quality_server_archive_path = server.storage.dir / HI_QUALITY_PATH / camera.mac_addr
     low_quality_backup_path = backup_storage_path / LOW_QUALITY_PATH / camera.mac_addr
     low_quality_server_archive_path = server.storage.dir / LOW_QUALITY_PATH / camera.mac_addr
@@ -187,8 +217,9 @@ def assert_backup_equal_to_archive(server, backup_storage_path, camera, system_b
         assert_paths_are_equal(server, low_quality_backup_path, low_quality_server_archive_path)
 
 
-def test_backup_by_request(server, camera_factory, sample_media_file, system_backup_type, backup_new_camera,
-                           second_camera_backup_type):
+def test_backup_by_request(
+        server, camera_factory, sample_media_file,
+        system_backup_type, backup_new_camera, second_camera_backup_type):
     backup_storage_path = add_backup_storage(server)
     server.api.api.systemSettings.GET(
         backupNewCamerasByDefault=backup_new_camera)
@@ -225,5 +256,7 @@ def test_backup_by_schedule(server, camera_factory, sample_media_file, system_ba
     expected_backup_time = start_time_2 + sample_media_file.duration
     wait_backup_finish(server, expected_backup_time)
     assert_backup_equal_to_archive(
-        server, backup_storage_path, camera, system_backup_type, backup_new_camera=False, camera_backup_type=BACKUP_BOTH)
+        server, backup_storage_path, camera, system_backup_type,
+        backup_new_camera=False,
+        camera_backup_type=BACKUP_BOTH)
     assert not server.installation.list_core_dumps()

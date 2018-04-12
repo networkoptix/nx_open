@@ -13,7 +13,6 @@ def get_server_id(api):
 
 def get_system_settings(api):
     settings = api.get('/api/systemSettings')['settings']
-    del settings['updateStatus']
     return settings
 
 
