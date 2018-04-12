@@ -11,7 +11,7 @@
 #include <nx/sdk/metadata/plugin.h>
 #include <nx/sdk/metadata/camera_manager.h>
 
-#include <nx/mediaserver_plugins/metadata/deepstream/object_class_description.h>
+#include <nx/mediaserver_plugins/metadata/deepstream/default/object_class_description.h>
 
 namespace nx {
 namespace mediaserver_plugins {

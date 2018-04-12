@@ -1,6 +1,6 @@
 #include "secondary_gie_common.h"
 
-#include "deepstream_metadata_plugin_ini.h"
+#include <nx/mediaserver_plugins/metadata/deepstream/deepstream_metadata_plugin_ini.h>
 
 namespace nx {
 namespace mediaserver_plugins {

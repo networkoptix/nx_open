@@ -3,8 +3,8 @@
 #include "secondary_gie_common.h"
 #include "default_pipeline_callbacks.h"
 
-#include "utils.h"
-#include "deepstream_metadata_plugin_ini.h"
+#include <nx/mediaserver_plugins/metadata/deepstream/utils.h>
+#include <nx/mediaserver_plugins/metadata/deepstream/deepstream_metadata_plugin_ini.h>
 #define NX_PRINT_PREFIX "deepstream::DefaultPipelineBuilder::"
 #include <nx/kit/debug.h>
 

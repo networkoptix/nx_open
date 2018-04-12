@@ -1,15 +1,14 @@
 #pragma once
 
 #include <queue>
+#include <chrono>
+#include <memory>
 #include <mutex>
 #include <condition_variable>
-#include <chrono>
 
+#include <nx/sdk/metadata/data_packet.h>
 #include <nx/gstreamer/pipeline.h>
 #include <nx/mediaserver_plugins/metadata/deepstream/plugin.h>
-#include <nx/mediaserver_plugins/metadata/deepstream/tracking_mapper.h>
-#include <nx/mediaserver_plugins/metadata/deepstream/simple_license_plate_tracker.h>
-#include <nx/mediaserver_plugins/metadata/deepstream/object_class_description.h>
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -18,18 +17,20 @@ namespace deepstream {
 
 using LoopPtr = std::unique_ptr<GMainLoop, std::function<void(GMainLoop*)>>;
 
-class DefaultPipeline: public nx::gstreamer::Pipeline
+class BasePipeline: public nx::gstreamer::Pipeline
 {
     using base_type = nx::gstreamer::Pipeline;
 
 public:
-    DefaultPipeline(
-        const nx::gstreamer::ElementName& elementName,
+    BasePipeline(
+        const nx::gstreamer::ElementName& pipelineName,
         nx::mediaserver_plugins::metadata::deepstream::Plugin* plugin);
 
     virtual void setMetadataCallback(nx::gstreamer::MetadataCallback metadataCallback) override;
 
     virtual bool pushDataPacket(nx::sdk::metadata::DataPacket* dataPacket) override;
+
+    virtual nx::sdk::metadata::DataPacket* nextDataPacket();
 
     virtual bool start() override;
 
@@ -39,38 +40,24 @@ public:
 
     virtual GstState state() const override;
 
-    nx::sdk::metadata::DataPacket* nextDataPacket();
+    virtual void handleMetadata(nx::sdk::metadata::MetadataPacket* packet);
 
-    void handleMetadata(nx::sdk::metadata::MetadataPacket* packet);
+    virtual GMainLoop* mainLoop();
 
-    GMainLoop* mainLoop();
+    virtual void setMainLoop(LoopPtr loop);
 
-    TrackingMapper* trackingMapper();
+    virtual int currentFrameWidth() const;
 
-    SimpleLicensePlateTracker* licensePlateTracker();
+    virtual int currentFrameHeight() const;
 
-    bool shouldDropFrame(int64_t frameTimestamp) const;
+    virtual std::chrono::microseconds currentTimeUs() const;
 
-    void setMainLoop(LoopPtr loop);
-
-    int currentFrameWidth() const;
-
-    int currentFrameHeight() const;
-
-    const std::vector<ObjectClassDescription>& objectClassDescriptions() const;
-
-    std::chrono::microseconds currentTimeUs() const;
-
-private:
-    nx::mediaserver_plugins::metadata::deepstream::Plugin* m_plugin;
+protected:
+    deepstream::Plugin* m_plugin;
     nx::gstreamer::MetadataCallback m_metadataCallback;
     std::queue<nx::sdk::metadata::DataPacket*> m_packetQueue;
     LoopPtr m_mainLoop;
 
-    TrackingMapper m_trackingMapper;
-    SimpleLicensePlateTracker m_licensePlateTracker;
-
-    std::vector<ObjectClassDescription> m_objectClassDescriptions;
     int m_currentFrameWidth = 0;
     int m_currentFrameHeight = 0;
     int64_t m_lastFrameTimestampUs = 0;
@@ -81,5 +68,5 @@ private:
 
 } // namespace deepstream
 } // namespace metadata
-} // namespace mediserver_plugins
+} // namespace mediaserver_plugins
 } // namespace nx

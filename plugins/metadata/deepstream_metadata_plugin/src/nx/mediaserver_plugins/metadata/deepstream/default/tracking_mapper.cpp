@@ -1,6 +1,6 @@
 #include "tracking_mapper.h"
 
-#include "deepstream_metadata_plugin_ini.h"
+#include <nx/mediaserver_plugins/metadata/deepstream/deepstream_metadata_plugin_ini.h>
 #define NX_PRINT_PREFIX "metadata::deepstream::TrackingMapper"
 #include <nx/kit/debug.h>
 
