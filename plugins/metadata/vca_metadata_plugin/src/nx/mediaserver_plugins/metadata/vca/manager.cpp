@@ -462,9 +462,7 @@ nx::sdk::Error Manager::startFetchingMetadata(nxpl::NX_GUID* typeList, int typeL
     {
         eventNames = eventNames + event.type.internalName.toUtf8() + " ";
     }
-    /*
-    NX_PRINT << "Server demanded to start fetching event(s): " << eventNames;
-    */
+    NX_PRINT << "Server demanded to start fetching event(s): " << eventNames.toStdString();
 
     if (!vcaCameraConrtoller.readTcpServerPort())
     {
