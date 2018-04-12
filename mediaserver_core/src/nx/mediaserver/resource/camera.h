@@ -8,6 +8,7 @@
 #include "resource_fwd.h"
 
 typedef std::shared_ptr<QnAbstractAudioTransmitter> QnAudioTransmitterPtr;
+class QnAbstractPtzController;
 
 namespace nx {
 namespace mediaserver {

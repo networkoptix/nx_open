@@ -146,6 +146,29 @@ void QnMediaResource::clearCustomAspectRatio()
     this->toResource()->setProperty(::customAspectRatioKey, QString());
 }
 
+Ptz::Capabilities QnMediaResource::getPtzCapabilities() const
+{
+    return Ptz::Capabilities(toResource()->getProperty(Qn::PTZ_CAPABILITIES_PARAM_NAME).toInt());
+}
+
+bool QnMediaResource::hasAnyOfPtzCapabilities(Ptz::Capabilities capabilities) const
+{
+    return getPtzCapabilities() & capabilities;
+}
+
+void QnMediaResource::setPtzCapabilities(Ptz::Capabilities capabilities)
+{
+    if (toResource()->hasParam(Qn::PTZ_CAPABILITIES_PARAM_NAME))
+        toResource()->setProperty(Qn::PTZ_CAPABILITIES_PARAM_NAME, static_cast<int>(capabilities));
+}
+
+void QnMediaResource::setPtzCapability(Ptz::Capabilities capability, bool value)
+{
+    setPtzCapabilities(value
+        ? (getPtzCapabilities() | capability)
+        : (getPtzCapabilities() & ~capability));
+}
+
 QString QnMediaResource::customAspectRatioKey()
 {
     return ::customAspectRatioKey;

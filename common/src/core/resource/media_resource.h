@@ -3,10 +3,13 @@
 
 #include <QtCore/QMap>
 #include <QtCore/QSize>
+
 #include "resource.h"
 #include "resource_media_layout.h"
 
+#include <core/ptz/ptz_constants.h>
 #include <core/ptz/media_dewarping_params.h>
+
 #include <utils/common/aspect_ratio.h>
 
 class QnAbstractStreamDataProvider;
@@ -46,6 +49,16 @@ public:
     virtual QnAspectRatio customAspectRatio() const;
     void setCustomAspectRatio(const QnAspectRatio& value);
     void clearCustomAspectRatio();
+
+    /**
+        Control PTZ flags.
+    */
+    Ptz::Capabilities getPtzCapabilities() const;
+
+    /** Check if camera has any of provided capabilities. */
+    bool hasAnyOfPtzCapabilities(Ptz::Capabilities capabilities) const;
+    void setPtzCapabilities(Ptz::Capabilities capabilities);
+    void setPtzCapability(Ptz::Capabilities capability, bool value);
 
     /** Name of the resource property key intended for the CustomAspectRatio value storage. */
     static QString customAspectRatioKey();

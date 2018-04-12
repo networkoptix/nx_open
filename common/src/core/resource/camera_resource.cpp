@@ -405,6 +405,13 @@ bool QnVirtualCameraResource::saveBitrateIfNeeded( const CameraBitrateInfo& bitr
     return true;
 }
 
+void QnVirtualCameraResource::emitPropertyChanged(const QString& key)
+{
+    if (key == Qn::PTZ_CAPABILITIES_PARAM_NAME)
+        emit ptzCapabilitiesChanged(::toSharedPointer(this));
+    base_type::emitPropertyChanged(key);
+}
+
 void QnVirtualCameraResource::saveResolutionList( const CameraMediaStreams& supportedNativeStreams )
 {
     static const char* RTSP_TRANSPORT_NAME = "rtsp";

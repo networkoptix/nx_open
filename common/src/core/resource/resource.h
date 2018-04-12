@@ -14,9 +14,6 @@
 #include <utils/common/id.h>
 #include <utils/common/functional.h>
 
-#include <core/ptz/ptz_fwd.h>
-#include <core/ptz/ptz_constants.h>
-
 #include <common/common_globals.h>
 #include "shared_resource_pointer.h"
 #include "resource_fwd.h"
@@ -35,7 +32,6 @@ class QnResource: public QObject, public QnFromThisToShared<QnResource>
 {
     Q_OBJECT
     Q_FLAGS(Qn::ResourceFlags)
-    Q_FLAGS(Ptz::Capabilities)
     Q_FLAGS(Qn::ResourceFlags)
     Q_PROPERTY(QnUuid id READ getId CONSTANT)
     Q_PROPERTY(QnUuid typeId READ getTypeId CONSTANT)
@@ -45,8 +41,6 @@ class QnResource: public QObject, public QnFromThisToShared<QnResource>
     Q_PROPERTY(QnUuid parentId READ getParentId WRITE setParentId NOTIFY parentIdChanged)
     Q_PROPERTY(Qn::ResourceFlags flags READ flags WRITE setFlags NOTIFY flagsChanged)
     Q_PROPERTY(QString url READ getUrl WRITE setUrl NOTIFY urlChanged)
-    Q_PROPERTY(Ptz::Capabilities ptzCapabilities
-        READ getPtzCapabilities WRITE setPtzCapabilities NOTIFY ptzCapabilitiesChanged)
 public:
 
     QnResource(QnCommonModule* commonModule = nullptr);
@@ -141,17 +135,6 @@ public:
     static void stopAsyncTasks();
     static void pleaseStopAsyncTasks();
 
-    /**
-        Control PTZ flags. Better place is mediaResource but no signals allowed in MediaResource
-    */
-    Ptz::Capabilities getPtzCapabilities() const;
-
-    /** Check if camera has any of provided capabilities. */
-    bool hasAnyOfPtzCapabilities(Ptz::Capabilities capabilities) const;
-    void setPtzCapabilities(Ptz::Capabilities capabilities);
-    void setPtzCapability(Ptz::Capabilities capability, bool value);
-
-
     /* Note that these functions hide property API inherited from QObject.
      * This is intended as this API cannot be used with QnResource anyway
      * because of threading issues. */
@@ -208,7 +191,6 @@ signals:
     void flagsChanged(const QnResourcePtr &resource);
     void urlChanged(const QnResourcePtr &resource);
     void resourceChanged(const QnResourcePtr &resource);
-    void ptzCapabilitiesChanged(const QnResourcePtr &resource);
     void mediaDewarpingParamsChanged(const QnResourcePtr &resource);
     void propertyChanged(const QnResourcePtr &resource, const QString &key);
     void initializedChanged(const QnResourcePtr &resource);
@@ -238,6 +220,8 @@ protected:
         Inherited class implementation MUST call base class method first
     */
     virtual void initializationDone();
+
+    virtual void emitPropertyChanged(const QString& key);
 private:
     /* The following consumer-related API is private as it is supposed to be used from QnResourceConsumer instances only.
      * Using it from other places may break invariants. */
@@ -250,7 +234,6 @@ private:
 
     bool emitDynamicSignal(const char *signal, void **arguments);
 
-    void emitPropertyChanged(const QString& key);
     void doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason);
 
     bool useLocalProperties() const;
