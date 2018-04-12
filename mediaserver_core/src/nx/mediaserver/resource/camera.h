@@ -69,6 +69,7 @@ public:
 
     /** Returns ids of successfully set parameters. */
     QSet<QString> setAdvancedParameters(const QnCameraAdvancedParamValueMap& values);
+    bool setAdvancedParameter(const QString& id, const QString& value);
 
     virtual QnAdvancedStreamParams advancedLiveStreamParams() const override;
 

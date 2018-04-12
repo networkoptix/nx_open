@@ -202,6 +202,13 @@ QSet<QString> Camera::setAdvancedParameters(const QnCameraAdvancedParamValueMap&
     return result;
 }
 
+bool Camera::setAdvancedParameter(const QString& id, const QString& value)
+{
+    QnCameraAdvancedParamValueMap parameters;
+    parameters.insert(id, value);
+    return setAdvancedParameters(parameters).contains(id);
+}
+
 QnAdvancedStreamParams Camera::advancedLiveStreamParams() const
 {
     const auto getStreamParameters =
