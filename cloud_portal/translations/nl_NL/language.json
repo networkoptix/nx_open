@@ -143,7 +143,7 @@
     "weakMessage": "Gebruik cijfers, hoofdletters, kleine letters en speciale tekens om uw wachtwoord sterker te maken",
     "strongMessage": "Sterk wachtwoord!",
     "commonMessage": "Dit wachtwoord bevind zich in de top van de meest populaire wachtwoorden in de wereld",
-    "missingMessage": "Password is required"
+    "missingMessage": "Wachtwoord is vereist"
   },
   "sharing": {
     "confirmOwner": "Als u de eigenaar van het systeem wijzigt, trekt u het eigendom in van het uw account voor dit systeem. Deze actie is onomkeerbaar. Weet je het zeker?",

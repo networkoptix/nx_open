@@ -6,7 +6,7 @@
     "emailSubject": "重設您的密碼"
   },
   "system_invite": {
-    "emailSubject": "{{message.sharer_name}} 邀請您至 {{PRODUCT_NAME}}"
+    "emailSubject": "有人分享影像 {{message.system_name}} 給您"
   },
   "system_shared": {
     "emailSubject": "{{message.sharer_name}} 邀請您至 {{PRODUCT_NAME}}"

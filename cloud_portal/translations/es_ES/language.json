@@ -143,7 +143,7 @@
     "weakMessage": "Uso de números, letras mayúsculas y minúsculas y caracteres especiales para hacer su contraseña más fuerte",
     "strongMessage": "¡Contraseña segura!",
     "commonMessage": "Esta contraseña se encuentra entre los más populares en el mundo",
-    "missingMessage": "Password is required"
+    "missingMessage": "Se requiere contraseña"
   },
   "sharing": {
     "confirmOwner": "Si se cambia el dueño del sistema, revocará la titularidad de esta cuenta. Esta acción es irreversible. ¿Está seguro?",
