@@ -2902,12 +2902,21 @@ to %1</source>
   <context>
     <name>QnCloudResultMessages</name>
     <message>
-      <source>Incorrect email or password</source>
-      <translation>Nieprawidłowy e-mail lub hasło</translation>
+      <source>Account not found</source>
+      <translation type="unfinished">Account not found</translation>
     </message>
     <message>
-      <source>Account is not activated. Please check your email and follow provided instructions</source>
-      <translation>Konto nie zostało aktywowane. Proszę sprawdzić swój e-mail i postępować zgodnie z instrukcjami</translation>
+      <source>Account is not activated.</source>
+      <translation type="unfinished">Account is not activated.</translation>
+    </message>
+    <message>
+      <source>Please log in to %1 and follow the provided instructions.</source>
+      <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
+      <translation type="unfinished">Please log in to %1 and follow the provided instructions.</translation>
+    </message>
+    <message>
+      <source>Invalid password</source>
+      <translation type="unfinished">Invalid password</translation>
     </message>
   </context>
   <context>
@@ -3243,6 +3252,10 @@ to %1</source>
     <message>
       <source>You can create a backup for System configurations that can be restored in case of failure.</source>
       <translation>Można utworzyć kopię konfiguracji systemu, aby móc ją przywrócić w razie awarii.</translation>
+    </message>
+    <message>
+      <source>Database Backup Files</source>
+      <translation type="unfinished">Database Backup Files</translation>
     </message>
   </context>
   <context>
@@ -4300,10 +4313,6 @@ to %1</source>
       <translation>Otwórz plik licencyjny</translation>
     </message>
     <message>
-      <source>All files (*.*)</source>
-      <translation>Wszystkie pliki (*.*)</translation>
-    </message>
-    <message>
       <source>Failed to open file</source>
       <translation>Nie można otworzyć pliku</translation>
     </message>
@@ -4314,6 +4323,10 @@ to %1</source>
     <message>
       <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
       <translation>W celu uzyskania pliku z kluczem aktywacyjnym prosimy o przesłanie klucza licencyjnego oraz ID sprzętu do %1.</translation>
+    </message>
+    <message>
+      <source>All files</source>
+      <translation type="unfinished">All files</translation>
     </message>
   </context>
   <context>
@@ -5765,10 +5778,6 @@ to %1</source>
       <translation>Wybierz plik aktualizacji...</translation>
     </message>
     <message>
-      <source>Update Files (*.zip)</source>
-      <translation>Pliki aktualizacji (* .zip)</translation>
-    </message>
-    <message>
       <source>Release notes</source>
       <translation>Informacje o wersji</translation>
     </message>
@@ -5953,6 +5962,10 @@ to %1</source>
       <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
       <translation>Niezgodna instancja %1. Aby zaktualizować system, odłącz go od %1.</translation>
+    </message>
+    <message>
+      <source>Update Files</source>
+      <translation type="unfinished">Update Files</translation>
     </message>
   </context>
   <context>

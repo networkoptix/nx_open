@@ -14,7 +14,7 @@
     <form name="cloudForm" disable-autocomplete>
         <div class="form-group" validate-field>
             <input ng-model="settings.cloudEmail" name="cloudEmail" class="form-control" ng-readonly="!connect"
-                   type="email" placeholder="อีเมล Cloud" required auto-focus autocomplete="new-password">
+                   type="email" placeholder="อีเมล Cloud" required auto-focus autocomplete="new-password" validate-email>
         </div>
         <div class="form-group" validate-field>
             <input ng-model="settings.cloudPassword" name="cloudPassword" class="form-control"
