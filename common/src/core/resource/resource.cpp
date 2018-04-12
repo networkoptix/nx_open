@@ -669,27 +669,13 @@ bool QnResource::init()
     return true;
 }
 
-void QnResource::blockingInit()
-{
-    if (!init())
-    {
-        //init is running in another thread, waiting for it to complete...
-        QnMutexLocker lk(&m_initMutex);
-    }
-}
-
-void QnResource::initAndEmit()
-{
-    init();
-}
-
 class InitAsyncTask: public QRunnable
 {
 public:
     InitAsyncTask(QnResourcePtr resource): m_resource(resource) {}
     void run()
     {
-        m_resource->initAndEmit();
+        m_resource->init();
     }
 private:
     QnResourcePtr m_resource;

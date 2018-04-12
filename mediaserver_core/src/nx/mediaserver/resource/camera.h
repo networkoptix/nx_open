@@ -47,6 +47,11 @@ public:
     Camera(QnCommonModule* commonModule = nullptr);
     virtual ~Camera() override;
 
+    /*!
+        Calls \a QnResource::init. If \a QnResource::init is already running in another thread, this method waits for it to complete
+    */
+    void blockingInit();
+
     /**
      * The difference between desired and real is that camera can have multiple clients we do not
      * know about or big exposure time.

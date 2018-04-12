@@ -85,7 +85,7 @@ int QnCameraDiagnosticsRestHandler::executeGet(
             checkResult = checkCameraAvailability(camera);
             break;
         case CameraDiagnostics::Step::mediaStreamAvailability:
-            checkResult = tryAcquireCameraMediaStream(camera, videoCamera);
+            checkResult = tryAcquireCameraMediaStream(videoCamera);
             break;
         case CameraDiagnostics::Step::mediaStreamIntegrity:
             checkResult = checkCameraMediaStreamForErrors(camera);
@@ -107,7 +107,7 @@ int QnCameraDiagnosticsRestHandler::executeGet(
 }
 
 CameraDiagnostics::Result QnCameraDiagnosticsRestHandler::checkCameraAvailability(
-    const QnSecurityCamResourcePtr& cameraRes)
+    const nx::mediaserver::resource::CameraPtr& cameraRes)
 {
     if (!cameraRes->ping())
         return CameraDiagnostics::CannotEstablishConnectionResult(cameraRes->httpPort());
@@ -122,7 +122,6 @@ CameraDiagnostics::Result QnCameraDiagnosticsRestHandler::checkCameraAvailabilit
 }
 
 CameraDiagnostics::Result QnCameraDiagnosticsRestHandler::tryAcquireCameraMediaStream(
-    const QnSecurityCamResourcePtr& /*cameraRes*/,
     const QnVideoCameraPtr& videoCamera)
 {
     QnAbstractMediaStreamDataProviderPtr streamReader =

@@ -38,6 +38,15 @@ Camera::~Camera()
     // Needed because of the forward declaration.
 }
 
+void Camera::blockingInit()
+{
+    if (!init())
+    {
+        //init is running in another thread, waiting for it to complete...
+        QnMutexLocker lk(&m_initMutex);
+    }
+}
+
 int Camera::getChannel() const
 {
     QnMutexLocker lock( &m_mutex );

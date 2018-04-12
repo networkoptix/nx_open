@@ -74,11 +74,6 @@ public:
     */
     bool init();
 
-    /*!
-        Calls \a QnResource::init. If \a QnResource::init is already running in another thread, this method waits for it to complete
-    */
-    void blockingInit();
-
     /**
      * Initialize camera sync. This function can omit initialization if recently call was failed.
      * It init camera not often then some time period.
@@ -230,7 +225,6 @@ private:
     void addConsumer(QnResourceConsumer *consumer);
     void removeConsumer(QnResourceConsumer *consumer);
     void disconnectAllConsumers();
-    void initAndEmit();
 
     bool emitDynamicSignal(const char *signal, void **arguments);
 

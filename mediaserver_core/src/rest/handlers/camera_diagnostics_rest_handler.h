@@ -23,10 +23,9 @@ public:
 
 private:
     static CameraDiagnostics::Result checkCameraAvailability(
-        const QnSecurityCamResourcePtr& cameraRes);
+        const nx::mediaserver::resource::CameraPtr& cameraRes);
 
     static CameraDiagnostics::Result tryAcquireCameraMediaStream(
-        const QnSecurityCamResourcePtr& cameraRes,
         const QnVideoCameraPtr& videoCamera);
 
     static CameraDiagnostics::Result checkCameraMediaStreamForErrors(
