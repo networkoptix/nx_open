@@ -13,6 +13,7 @@ namespace {
 const QString kAuthKey = "auth";
 const QString kReferralSourceKey = "from";
 const QString kReferralContextKey = "context";
+const QString kResourceIdsKey = "resources";
 
 const int kDefaultPort = 80;
 const int kMaxPort = 65535;
@@ -48,8 +49,7 @@ const QMap<SystemUri::SystemAction, QString> systemActionToString
 const QMap<SystemUri::ReferralSource, QString> referralSourceToString
 {
     {SystemUri::ReferralSource::None,           ""},
-    {SystemUri::ReferralSource::DesktopClient,  "client"},
-    {SystemUri::ReferralSource::MobileClient,   "mobile"},
+    {SystemUri::ReferralSource::DesktopClient,  "client"}, {SystemUri::ReferralSource::MobileClient,   "mobile"},
     {SystemUri::ReferralSource::CloudPortal,    "portal"},
     {SystemUri::ReferralSource::WebAdmin,       "webadmin"}
 };
@@ -62,6 +62,28 @@ const QMap<SystemUri::ReferralContext, QString> referralContextToString
     {SystemUri::ReferralContext::WelcomePage,   "startpage"},
     {SystemUri::ReferralContext::CloudMenu,     "menu"}
 };
+
+QString resourceIdsToString(const SystemUri::ResourceIdList& ids)
+{
+    QStringList result;
+    for (const auto& id: ids)
+        result.push_back(id.toSimpleString());
+
+    return result.join(L':');
+}
+
+SystemUri::ResourceIdList resourceIdsFromString(const QString& string)
+{
+    SystemUri::ResourceIdList result;
+    const auto values = string.split(L':');
+    for (const auto& value: values)
+    {
+        const auto uuid = QnUuid::fromStringSafe(value);
+        if (!uuid.isNull())
+            result.push_back(uuid);
+    }
+    return result;
+}
 
 void splitString(const QString& source, QChar separator, QString& left, QString& right)
 {
@@ -102,6 +124,7 @@ public:
     SystemUri::Auth authenticator;
     SystemUri::Referral referral;
     SystemUri::Parameters parameters;
+    SystemUri::ResourceIdList resourceIds;
 
     SystemUriPrivate()
     {}
@@ -115,7 +138,8 @@ public:
         systemAction(other.systemAction),
         authenticator(other.authenticator),
         referral(other.referral),
-        parameters(other.parameters)
+        parameters(other.parameters),
+        resourceIds(other.resourceIds)
     {}
 
     void parse(const nx::utils::Url& url)
@@ -206,6 +230,9 @@ public:
             query.addQueryItem(kAuthKey, authenticator.encode());
         }
 
+        if (systemAction == SystemUri::SystemAction::View && !resourceIds.isEmpty())
+            query.addQueryItem(kResourceIdsKey, resourceIdsToString(resourceIds));
+
         if (referral.source != SystemUri::ReferralSource::None)
             query.addQueryItem(kReferralSourceKey, SystemUri::toString(referral.source));
 
@@ -252,6 +279,7 @@ public:
             && authenticator.password.isEmpty()
             && referral.source == SystemUri::ReferralSource::None
             && referral.context == SystemUri::ReferralContext::None
+            && resourceIds.isEmpty()
             && parameters.isEmpty();
     }
 
@@ -277,7 +305,8 @@ public:
             && systemId == other.systemId
             && authenticator.user == other.authenticator.user
             && authenticator.password == other.authenticator.password
-            && parameters == other.parameters;
+            && parameters == other.parameters
+            && resourceIds == other.resourceIds;
     }
 
 private:
@@ -388,13 +417,15 @@ private:
             splitString(auth, ':', authenticator.user, authenticator.password);
         }
 
+        const auto resourceIdParameters = parameters.take(kResourceIdsKey);
+        resourceIds = resourceIdsFromString(resourceIdParameters);
+
         QString referralFrom = parameters.take(kReferralSourceKey).toLower();
         referral.source = referralSourceToString.key(referralFrom);
 
         QString referralContext = parameters.take(kReferralContextKey).toLower();
         referral.context = referralContextToString.key(referralContext);
     }
-
 };
 
 SystemUri::SystemUri() :
@@ -543,6 +574,19 @@ void SystemUri::setAuthenticator(const QString& user, const QString& password)
     d->authenticator.user = user;
     d->authenticator.password = password;
 }
+
+void SystemUri::setResourceIds(const ResourceIdList& resourceIds)
+{
+    Q_D(SystemUri);
+    d->resourceIds = resourceIds;
+}
+
+SystemUri::ResourceIdList SystemUri::resourceIds() const
+{
+    Q_D(const SystemUri);
+    return d->resourceIds;
+}
+
 
 SystemUri::Referral SystemUri::referral() const
 {

@@ -3,6 +3,7 @@
 #include <QtCore/QObject>
 #include <nx/utils/uuid.h>
 #include <nx/utils/url.h>
+#include <nx/vms/utils/system_uri.h>
 
 class QnMobileClientUiControllerPrivate;
 class QnMobileClientUiController : public QObject
@@ -17,10 +18,13 @@ public:
     QString layoutId() const;
     void setLayoutId(const QString& layoutId);
 
+    using ResourceIdList = nx::vms::utils::SystemUri::ResourceIdList;
+
 public slots:
     void disconnectFromSystem();
     void connectToSystem(const nx::utils::Url &url);
 
+    void openResources(const ResourceIdList& resourceIds = ResourceIdList());
     void openResourcesScreen();
     void openVideoScreen(const QnUuid& cameraId);
     void openLoginToCloudScreen(

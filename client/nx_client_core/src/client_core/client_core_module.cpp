@@ -19,7 +19,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/client/core/watchers/known_server_connections.h>
-#include <nx/client/core/utils/async_operation_manager.h>
+#include <nx/client/core/utils/operation_manager.h>
 
 using namespace nx::client::core;
 

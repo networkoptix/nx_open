@@ -52,6 +52,11 @@ void QnMobileClientUiController::connectToSystem(const nx::utils::Url& url)
     emit connectRequested(url);
 }
 
+void QnMobileClientUiController::openResources(const ResourceIdList& resourceIds)
+{
+    qWarning() << "=============================== open resources: " << resourceIds.size();
+}
+
 void QnMobileClientUiController::openResourcesScreen()
 {
     emit resourcesScreenRequested();

@@ -7,6 +7,7 @@
 #include <QtCore/QString>
 
 #include <nx/utils/url.h>
+#include <nx/utils/uuid.h>
 
 namespace nx {
 namespace vms {
@@ -111,6 +112,10 @@ public:
     Auth authenticator() const;
     void setAuthenticator(const Auth& value);
     void setAuthenticator(const QString& user, const QString& password);
+
+    using ResourceIdList = QList<QnUuid>;
+    void setResourceIds(const ResourceIdList& resourceIds);
+    ResourceIdList resourceIds() const;
 
     struct Referral
     {

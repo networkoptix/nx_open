@@ -98,7 +98,11 @@ nx::utils::Url loginToCloudUrl(
 
 void testUrl(QnMobileClientUriHandler* handler, const nx::utils::Url& url)
 {
-    const auto callback = [url, handler]() { handler->handleUrl(url); };
+    const auto callback = [url, handler]()
+    {
+        qWarning() << url.toString();
+        handler->handleUrl(url);
+    };
     executeDelayed(callback, kDelay);
 }
 
@@ -125,17 +129,23 @@ nx::utils::Url clientCommandUrl(
     const QString& password = QString())
 {
     const auto kBase =
-        [systemId]()
+        [systemId, user, password]()
         {
             SystemUri result;
             result.setDomain(nx::network::AppInfo::defaultCloudHostName());
             result.setClientCommand(SystemUri::ClientCommand::Client);
             result.setSystemId(systemId);
+            result.setSystemAction(SystemUri::SystemAction::View);
+            result.setResourceIds({
+                QnUuid::fromStringSafe("04762367-751f-2727-25ca-9ae0dc6727de"),
+                QnUuid::fromStringSafe("052c6604-e7a1-f8df-7cbe-891c9235d5e2"),
+                QnUuid::fromStringSafe("0d118584-3d2d-ed7e-71da-bc08499daeaa")});
+            result.setAuthenticator(user, password);
             return result.toString();
         }();
 
-    const auto result = lit("%1?%2").arg(kBase, authString(user, password));
-    return nx::utils::Url(result);
+    const auto result = lit("%1&%2").arg(kBase);
+    return nx::utils::Url(kBase);
 }
 
 void testClientCommand(QnMobileClientUriHandler* handler)
@@ -172,8 +182,7 @@ int runUi(QtSingleGuiApplication* application)
 
     QnContext context;
 
-    QScopedPointer<QnMobileClientUriHandler> uriHandler(new QnMobileClientUriHandler());
-    uriHandler->setUiController(context.uiController());
+    QScopedPointer<QnMobileClientUriHandler> uriHandler(new QnMobileClientUriHandler(&context));
     testUrlHandler(uriHandler.data());
     for (const auto& scheme: uriHandler->supportedSchemes())
         QDesktopServices::setUrlHandler(scheme, uriHandler.data(), uriHandler->handlerMethodName());

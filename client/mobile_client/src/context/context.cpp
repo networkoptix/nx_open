@@ -26,7 +26,7 @@
 #include <nx/network/address_resolver.h>
 #include <nx/client/core/two_way_audio/two_way_audio_mode_controller.h>
 #include <nx/client/core/watchers/user_watcher.h>
-#include <nx/client/core/utils/async_operation_manager.h>
+#include <nx/client/core/utils/operation_manager.h>
 
 using namespace nx::vms::utils;
 
@@ -99,6 +99,11 @@ QnContext::~QnContext() {}
 QnCloudStatusWatcher* QnContext::cloudStatusWatcher() const
 {
     return qnMobileClientModule->cloudStatusWatcher();
+}
+
+QnConnectionManager* QnContext::connectionManager() const
+{
+    return m_connectionManager;
 }
 
 nx::client::core::TwoWayAudioController* QnContext::twoWayAudioController() const

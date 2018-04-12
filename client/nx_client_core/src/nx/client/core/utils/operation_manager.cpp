@@ -1,4 +1,4 @@
-#include "async_operation_manager.h"
+#include "operation_manager.h"
 
 #include <QtCore/QUuid>
 #include <QtQml/QtQml>

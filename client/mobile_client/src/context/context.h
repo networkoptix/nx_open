@@ -67,6 +67,8 @@ public:
 
     QnMobileClientUiController* uiController() const { return m_uiController; }
     QnCloudStatusWatcher* cloudStatusWatcher() const;
+    QnConnectionManager* connectionManager() const;
+
     nx::client::core::UserWatcher* userWatcher() const;
     nx::client::core::TwoWayAudioController* twoWayAudioController() const;
     nx::client::core::OperationManager* operationManager() const;

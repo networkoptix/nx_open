@@ -70,6 +70,7 @@ public:
     bool restoringConnection() const;
 
 signals:
+    void connected(bool initialConnection);
     void connectionFailed(Qn::ConnectionResult status, const QVariant &infoParameter);
     void systemNameChanged(const QString &systemName);
     void connectionStateChanged();
