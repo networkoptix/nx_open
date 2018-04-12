@@ -57,6 +57,8 @@ $header-collapsing-width-1: 1px;
         margin:0;
         padding:0;
         font-size: $font-size-lg;
+        display: flex;
+        align-items: center;
 
         &.vertical-bar{
             border-right: 1px solid $common-border-color;
@@ -65,7 +67,8 @@ $header-collapsing-width-1: 1px;
         }
 
         & > span {
-            display: inline-block;
+            // display: inline-block;
+            margin-left: 10px;
         }
 
         & > a {

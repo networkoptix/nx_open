@@ -42,6 +42,12 @@ module.exports = merge(common, {
         new webpack.HotModuleReplacementPlugin(),
         // new BundleAnalyzerPlugin({analyzerHost:'0.0.0.0', analyzerPort:9001})
 
+        new CopyWebpackPlugin([
+            {
+                from: 'images',
+                to  : 'static/images'
+            }
+        ])
     ],
     module   : {
         rules: [
