@@ -653,7 +653,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
             bool ignoreVideo = vd->flags & QnAbstractMediaData::MediaFlags_Ignore;
             bool draw = !ignoreVideo && (sleep || (m_displayLasts * 1000 < needToSleep)); // do not draw if computer is very slow and we still wanna sync with audio
 
-            if (draw)
+            if (draw && !nx::client::desktop::ini().allowOsScreenSaver)
                 updateActivity();
 
             if (!(vd->flags & QnAbstractMediaData::MediaFlags_Ignore))

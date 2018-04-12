@@ -27,7 +27,6 @@ public:
     QnResourceData data(const QnConstSecurityCamResourcePtr &camera) const;
     QnResourceData data(const QString& _vendor, const QString& model, const QString& firmware = QString()) const;
 
-
     bool load(const QString &fileName);
 
 private:
@@ -41,6 +40,5 @@ private:
     mutable QHash<QString, QnResourceData> m_cachedResultByKey;
     mutable QnMutex m_cachedDataMtx;
 };
-
 
 #endif // QN_RESOURCE_DATA_POOL_H

@@ -257,7 +257,7 @@ bool RootTool::isPathExists(const QString& path)
             return system_commands::domain_socket::readInt64(&result) ? (bool) result : false;
         });
 #else
-    return -1;
+    return false;
 #endif
 }
 
