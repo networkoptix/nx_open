@@ -5,7 +5,6 @@
 #include <core/ptz/abstract_ptz_controller.h>
 #include <core/resource/camera_advanced_param.h>
 #include <core/resource_management/resource_data_pool.h>
-#include <core/resource/resource_command.h>
 #include <providers/live_stream_provider.h>
 
 #include <nx/utils/log/log.h>
@@ -23,81 +22,6 @@ namespace nx {
 namespace mediaserver {
 namespace resource {
 
-namespace {
-
-class GetAdvancedParametersCommand: public QnResourceCommand
-{
-public:
-    GetAdvancedParametersCommand(
-        const QnResourcePtr& resource,
-        const QSet<QString>& ids,
-        std::function<void(const QnCameraAdvancedParamValueMap&)> handler)
-    :
-        QnResourceCommand(resource),
-        m_ids(ids),
-        m_handler(std::move(handler))
-    {
-    }
-
-    bool execute() override
-    {
-        const auto camera = m_resource.dynamicCast<Camera>();
-        NX_CRITICAL(camera);
-
-        QnCameraAdvancedParamValueMap values;
-        if (isConnectedToTheResource())
-            values = camera->getAdvancedParameters(m_ids);
-
-        m_handler(values);
-        return true;
-    }
-
-    void beforeDisconnectFromResource() override
-    {
-    }
-
-private:
-    QSet<QString> m_ids;
-    std::function<void(const QnCameraAdvancedParamValueMap&)> m_handler;
-};
-
-class SetAdvancedParametersCommand: public QnResourceCommand
-{
-public:
-    SetAdvancedParametersCommand(
-        const QnResourcePtr& resource,
-        const QnCameraAdvancedParamValueMap& values,
-        std::function<void(const QSet<QString>&)> handler)
-    :
-        QnResourceCommand(resource),
-        m_values(values),
-        m_handler(std::move(handler))
-    {
-    }
-
-    bool execute() override
-    {
-        const auto camera = m_resource.dynamicCast<Camera>();
-        NX_CRITICAL(camera);
-
-        QSet<QString> ids;
-        if (isConnectedToTheResource())
-            ids = camera->setAdvancedParameters(m_values);
-
-        m_handler(ids);
-        return true;
-    }
-
-    void beforeDisconnectFromResource() override
-    {
-    }
-
-private:
-    QnCameraAdvancedParamValueMap m_values;
-    std::function<void(const QSet<QString>&)> m_handler;
-};
-
-} // namespace
 
 const float Camera::kMaxEps = 0.01f;
 
@@ -267,29 +191,6 @@ QSet<QString> Camera::setAdvancedParameters(const QnCameraAdvancedParamValueMap&
     }
 
     return result;
-}
-
-bool Camera::setAdvancedParameter(const QString& id, const QString& value)
-{
-    QnCameraAdvancedParamValueMap parameters;
-    parameters.insert(id, value);
-    return setAdvancedParameters(parameters).contains(id);
-}
-
-void Camera::getAdvancedParametersAsync(
-    const QSet<QString>& ids,
-    std::function<void(const QnCameraAdvancedParamValueMap&)> handler)
-{
-    addCommandToProc(std::make_shared<GetAdvancedParametersCommand>(
-        toSharedPointer(this), ids, std::move(handler)));
-}
-
-void Camera::setAdvancedParametersAsync(
-    const QnCameraAdvancedParamValueMap& values,
-    std::function<void(const QSet<QString>&)> handler)
-{
-    addCommandToProc(std::make_shared<SetAdvancedParametersCommand>(
-        toSharedPointer(this), values, std::move(handler)));
 }
 
 QnAdvancedStreamParams Camera::advancedLiveStreamParams() const

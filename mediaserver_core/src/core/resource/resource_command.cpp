@@ -12,9 +12,4 @@ QnResourceCommand::~QnResourceCommand()
     disconnectFromResource();
 };
 
-void QnResourceCommand::beforeDisconnectFromResource()
-{
-    disconnectFromResource();
-}
-
 #endif // ENABLE_DATA_PROVIDERS

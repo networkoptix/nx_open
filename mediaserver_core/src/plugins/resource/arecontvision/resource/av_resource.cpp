@@ -94,39 +94,6 @@ CLHttpStatus QnPlAreconVisionResource::setRegister(int page, int num, int val)
 
 }
 
-class QnPlArecontResourceSetRegCommand : public QnResourceCommand
-{
-public:
-    QnPlArecontResourceSetRegCommand(const QnResourcePtr& res, int page, int reg, int val):
-      QnResourceCommand(res),
-          m_page(page),
-          m_reg(reg),
-          m_val(val)
-      {}
-
-      bool execute()
-      {
-          if (!isConnectedToTheResource())
-              return false;
-
-          return getResource().dynamicCast<QnPlAreconVisionResource>()->setRegister(m_page,m_reg,m_val);
-      }
-private:
-    int m_page;
-    int m_reg;
-    int m_val;
-};
-
-typedef std::shared_ptr<QnPlArecontResourceSetRegCommand> QnPlArecontResourceSetRegCommandPtr;
-
-CLHttpStatus QnPlAreconVisionResource::setRegister_asynch(int page, int num, int val)
-{
-    QnPlArecontResourceSetRegCommandPtr command ( new QnPlArecontResourceSetRegCommand(toSharedPointer(), page, num, val) );
-    addCommandToProc(command);
-    return CL_HTTP_SUCCESS;
-
-}
-
 void QnPlAreconVisionResource::setHostAddress(const QString& hostAddr)
 {
     QnNetworkResource::setHostAddress(hostAddr);

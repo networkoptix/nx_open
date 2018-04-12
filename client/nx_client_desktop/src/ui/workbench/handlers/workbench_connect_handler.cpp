@@ -594,7 +594,6 @@ void QnWorkbenchConnectHandler::establishConnection(ec2::AbstractECConnectionPtr
     qnClientMessageProcessor->init(connection);
 
     commonModule()->sessionManager()->start();
-    QnResource::startCommandProc();
 
     context()->setUserName(
         connectionInfo.effectiveUserName.isEmpty()
@@ -1154,8 +1153,6 @@ void QnWorkbenchConnectHandler::clearConnection()
     QnAppServerConnectionFactory::setEc2Connection(nullptr);
 
     commonModule()->sessionManager()->stop();
-    QnResource::stopCommandProc();
-
     context()->setUserName(QString());
 
     /* Get ready for the next connection. */

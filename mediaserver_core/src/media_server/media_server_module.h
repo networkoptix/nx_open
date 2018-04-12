@@ -17,6 +17,7 @@ class CommonPluginContainer;
 class QThread;
 class AbstractArchiveIntegrityWatcher;
 class QnDataProviderFactory;
+class QnResourceCommandProcessor;
 
 namespace nx {
 
@@ -84,6 +85,7 @@ public:
     nx::analytics::storage::AbstractEventsStorage* analyticsEventsStorage() const;
     nx::mediaserver::updates2::ServerUpdates2Manager* updates2Manager() const;
     QnDataProviderFactory* dataProviderFactory() const;
+    QnResourceCommandProcessor* resourceCommandProcessor() const;
 
     nx::mediaserver::RootTool* rootTool() const;
 
@@ -116,6 +118,7 @@ private:
     std::unique_ptr<nx::mediaserver::RootTool> m_rootTool;
     nx::mediaserver::updates2::ServerUpdates2Manager* m_updates2Manager;
     QScopedPointer<QnDataProviderFactory> m_resourceDataProviderFactory;
+    QScopedPointer<QnResourceCommandProcessor> m_resourceCommandProcessor;
 };
 
 #define qnServerModule QnMediaServerModule::instance()

@@ -1,9 +1,8 @@
-#ifndef QN_RESOURCE_COMMAND_PROCESSOR
-#define QN_RESOURCE_COMMAND_PROCESSOR
+#pragma once
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-#include "resource_fwd.h"
+#include <core/resource/resource_fwd.h>
 
 #include <nx/streaming/abstract_data_consumer.h>
 
@@ -15,7 +14,7 @@ public:
     QnResourceCommandProcessor();
     ~QnResourceCommandProcessor();
 
-    virtual void putData(const QnAbstractDataPacketPtr& data) override;
+    bool hasCommandsForResource(const QnResourcePtr& resource) const;
 
 protected:
     virtual bool processData(const QnAbstractDataPacketPtr& data) override;
@@ -23,5 +22,3 @@ protected:
 };
 
 #endif // ENABLE_DATA_PROVIDERS
-
-#endif //QN_RESOURCE_COMMAND_PROCESSOR

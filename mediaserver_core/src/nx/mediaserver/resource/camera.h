@@ -63,17 +63,6 @@ public:
 
     /** Returns ids of successfully set parameters. */
     QSet<QString> setAdvancedParameters(const QnCameraAdvancedParamValueMap& values);
-    bool setAdvancedParameter(const QString& id, const QString& value);
-
-    /** Gets advanced parameters async, handler is called when it's done. */
-    void getAdvancedParametersAsync(
-        const QSet<QString>& ids,
-        std::function<void(const QnCameraAdvancedParamValueMap&)> handler = nullptr);
-
-    /** Sets advanced parameters async, handler is called when it's done. */
-    void setAdvancedParametersAsync(
-        const QnCameraAdvancedParamValueMap& values,
-        std::function<void(const QSet<QString>&)> handler = nullptr);
 
     virtual QnAdvancedStreamParams advancedLiveStreamParams() const override;
 

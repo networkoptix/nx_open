@@ -135,9 +135,6 @@ public:
     virtual void setUrl(const QString &url);
 
     bool hasConsumer(QnResourceConsumer *consumer) const;
-#ifdef ENABLE_DATA_PROVIDERS
-    bool hasUnprocessedCommands() const;
-#endif
 
     virtual bool isInitialized() const;
 
@@ -218,14 +215,6 @@ signals:
     void videoLayoutChanged(const QnResourcePtr &resource);
 
 public:
-#ifdef ENABLE_DATA_PROVIDERS
-    // this is thread to process commands like setparam
-    static void startCommandProc();
-    static void stopCommandProc();
-    static void addCommandToProc(const QnResourceCommandPtr &command);
-    static int commandProcQueueSize();
-#endif
-
     void update(const QnResourcePtr& other);
 
     // Need use lock/unlock consumers before this call!

@@ -11,12 +11,10 @@
 #include <core/resource/camera_advanced_param.h>
 #include "core/resource_management/resource_pool.h"
 
-#include "resource_command_processor.h"
 #include "resource_consumer.h"
 #include "resource_property.h"
 
 #include "utils/common/util.h"
-#include "resource_command.h"
 #include "../resource_management/resource_properties.h"
 #include "../resource_management/status_dictionary.h"
 
@@ -145,12 +143,6 @@ void QnResource::updateInternal(const QnResourcePtr &other, Qn::NotifierList& no
 
 void QnResource::update(const QnResourcePtr& other)
 {
-    {
-        QnMutexLocker locker(&m_consumersMtx);
-        for (QnResourceConsumer *consumer : m_consumers)
-            consumer->beforeUpdate();
-    }
-
     Qn::NotifierList notifiers;
     {
         QnMutex *m1 = &m_mutex, *m2 = &other->m_mutex;
@@ -191,10 +183,6 @@ void QnResource::update(const QnResourcePtr& other)
     //silently ignoring missing properties because of removeProperty method lack
     for (const ec2::ApiResourceParamData &param : other->getRuntimeProperties())
         emitPropertyChanged(param.name);   //here "propertyChanged" will be called
-
-    QnMutexLocker locker(&m_consumersMtx);
-    for (QnResourceConsumer *consumer : m_consumers)
-        consumer->afterUpdate();
 }
 
 QnUuid QnResource::getParentId() const
@@ -457,20 +445,6 @@ bool QnResource::hasConsumer(QnResourceConsumer *consumer) const
     return m_consumers.contains(consumer);
 }
 
-#ifdef ENABLE_DATA_PROVIDERS
-bool QnResource::hasUnprocessedCommands() const
-{
-    QnMutexLocker locker(&m_consumersMtx);
-    for (QnResourceConsumer* consumer : m_consumers)
-    {
-        if (dynamic_cast<QnResourceCommand*>(consumer))
-            return true;
-    }
-
-    return false;
-}
-#endif
-
 void QnResource::disconnectAllConsumers()
 {
     QnMutexLocker locker(&m_consumersMtx);
@@ -657,38 +631,6 @@ QnInitResPool* QnResource::initAsyncPoolInstance()
     return initResPool();
 }
 // -----------------------------------------------------------------------------
-
-#ifdef ENABLE_DATA_PROVIDERS
-Q_GLOBAL_STATIC(QnResourceCommandProcessor, QnResourceCommandProcessor_instance)
-static bool qnResourceCommandProcessorInitialized = false;
-
-void QnResource::startCommandProc()
-{
-    QnResourceCommandProcessor_instance()->start();
-    qnResourceCommandProcessorInitialized = true;
-}
-
-void QnResource::stopCommandProc()
-{
-    if (qnResourceCommandProcessorInitialized)
-        QnResourceCommandProcessor_instance()->stop();
-}
-
-void QnResource::addCommandToProc(const QnResourceCommandPtr& command)
-{
-    NX_ASSERT(qnResourceCommandProcessorInitialized, Q_FUNC_INFO, "Processor is not started");
-    if (qnResourceCommandProcessorInitialized)
-        QnResourceCommandProcessor_instance()->putData(command);
-}
-
-int QnResource::commandProcQueueSize()
-{
-    NX_ASSERT(qnResourceCommandProcessorInitialized, Q_FUNC_INFO, "Processor is not started");
-    if (qnResourceCommandProcessorInitialized)
-        return QnResourceCommandProcessor_instance()->queueSize();
-    return 0;
-}
-#endif // ENABLE_DATA_PROVIDERS
 
 bool QnResource::init()
 {

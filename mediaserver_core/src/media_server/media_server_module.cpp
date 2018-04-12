@@ -63,7 +63,7 @@
 
 #include "wearable_lock_manager.h"
 #include "wearable_upload_manager.h"
-
+#include <core/resource/resource_command_processor.h>
 
 namespace {
 
@@ -206,6 +206,7 @@ QnMediaServerModule::QnMediaServerModule(
     m_rootTool = nx::mediaserver::findRootTool(qApp->applicationFilePath());
     m_resourceDataProviderFactory.reset(new QnDataProviderFactory());
     registerResourceDataProviders();
+    m_resourceCommandProcessor.reset(new QnResourceCommandProcessor());
 
     store(new nx::mediaserver_core::recorder::WearableArchiveSynchronizer(this));
 
@@ -332,4 +333,9 @@ nx::mediaserver::updates2::ServerUpdates2Manager* QnMediaServerModule::updates2M
 QnDataProviderFactory* QnMediaServerModule::dataProviderFactory() const
 {
     return m_resourceDataProviderFactory.data();
+}
+
+QnResourceCommandProcessor* QnMediaServerModule::resourceCommandProcessor() const
+{
+    return m_resourceCommandProcessor.data();
 }

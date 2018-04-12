@@ -305,6 +305,7 @@
 #include <mediaserver_ini.h>
 
 #include <local_connection_factory.h>
+#include <core/resource/resource_command_processor.h>
 
 using namespace nx;
 
@@ -2646,7 +2647,7 @@ void MediaServerProcess::run()
     if (qnServerModule->roSettings()->value("disableTranscoding").toBool())
         commonModule()->setTranscodeDisabled(true);
 
-    QnResource::startCommandProc();
+    qnServerModule->resourceCommandProcessor()->start();
 
     auto hlsSessionPool = std::make_unique<nx::mediaserver::hls::SessionPool>();
 
@@ -3067,7 +3068,7 @@ void MediaServerProcess::run()
             multicastHttp.reset();
             stopObjects();
 
-            QnResource::stopCommandProc();
+            qnServerModule->resourceCommandProcessor()->stop();
             if (m_initStoragesAsyncPromise)
                 m_initStoragesAsyncPromise->get_future().wait();
             // todo: #rvasilenko some undeleted resources left in the QnMain event loop. I stopped TimerManager as temporary solution for it.
