@@ -343,12 +343,12 @@ RuleList Rule::getRulesUpd48()
     };
 }
 
-RuleList Rule::getDisabledRulesUpd48()
+RuleList Rule::getDisabledRulesUpd43()
 {
-    // Removing extra business rule, that was added through Rule::getRulesUpd48()
+    // Removing extra business rule, that was added through Rule::getRulesUpd43()
     // Required to implement 'Omit db logging' feature.
     return {//           Id      period isSystem actionType         eventType            subjects allUsers
-        RulePtr(new Rule(900024, 0,     true,    diagnosticsAction, backupFinishedEvent))
+        RulePtr(new Rule(900022, 0,     true,    diagnosticsAction, userDefinedEvent))
     };
 }
 

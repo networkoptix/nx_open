@@ -818,7 +818,7 @@ bool QnDbManager::fillTransactionLogInternal(ApiCommand::Value command, std::fun
             commonModule()->moduleGUID(),
             object);
         auto transactionDescriptor = ec2::getActualTransactionDescriptorByValue<ObjectType>(command);
-        
+
         PersistentStorage persistentStorage(this);
         if (transactionDescriptor)
             transaction.transactionType = transactionDescriptor->getTransactionTypeFunc(commonModule(), object, &persistentStorage);
@@ -1615,15 +1615,6 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     if (updateName.endsWith(lit("/99_20171214_update_http_action_enum_values.sql")))
         return updateDefaultRules(vms::event::Rule::getDefaultRules()) && resyncIfNeeded(ResyncRules);
 
-    if (updateName.endsWith(lit("/99_20171218_remove_extra_buisiness_rules.sql")))
-    {
-        for (const auto& rule: vms::event::Rule::getDisabledRulesUpd48())
-        {
-            removeBusinessRule(rule->id());
-        }
-        return fixDefaultBusinessRuleGuids() && resyncIfNeeded(ResyncRules);
-    }
-
     if (updateName.endsWith(lit("/99_20180122_remove_secondary_stream_quality.sql")))
         return resyncIfNeeded(ResyncCameraAttributes);
 
@@ -1631,6 +1622,15 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     {
         return ec2::db::migrateRecordingThresholds(m_sdb)
             && resyncIfNeeded(ResyncCameraAttributes);
+    }
+
+    if (updateName.endsWith(lit("/99_20180413_remove_extra_buisiness_rules.sql")))
+    {
+        for (const auto& rule : vms::event::Rule::getDisabledRulesUpd43())
+        {
+            removeBusinessRule(rule->id());
+        }
+        return fixDefaultBusinessRuleGuids() && resyncIfNeeded(ResyncRules);
     }
 
     NX_LOG(lit("SQL update %1 does not require post-actions.").arg(updateName), cl_logDEBUG1);
