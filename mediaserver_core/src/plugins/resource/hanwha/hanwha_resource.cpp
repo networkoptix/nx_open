@@ -1552,7 +1552,7 @@ CameraDiagnostics::Result HanwhaResource::setUpProfilePolicies(
         lit("media/videoprofilepolicy"),
         {
             {kHanwhaChannelProperty, QString::number(getChannel())},
-            {lit("LiveProfile"), QString::number(primaryProfile)},
+            {lit("LiveProfile"), QString::number(secondaryProfile)},
             {lit("RecordProfile"), QString::number(primaryProfile)},
             {lit("NetworkProfile"), QString::number(secondaryProfile)}
         });
