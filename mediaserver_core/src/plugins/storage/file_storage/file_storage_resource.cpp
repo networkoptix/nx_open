@@ -463,7 +463,7 @@ void QnFileStorageResource::removeOldDirs()
 
         switch (result)
         {
-            case nx::SystemCommands::ok:
+            case nx::SystemCommands::UnmountCode::ok:
                 if (rmdir(entry.absoluteFilePath().toLatin1().constData()) == 0)
                     break;
 
@@ -473,12 +473,12 @@ void QnFileStorageResource::removeOldDirs()
                         lm("[removeOldDirs] Remove %1 failed").args(entry.absoluteFilePath()));
                 }
                 break;
-            case nx::SystemCommands::busy:
+            case nx::SystemCommands::UnmountCode::busy:
                 NX_WARNING(typeid(QnFileStorageResource),
                     lm("[mount, removeOldDirs] Won't remove %1 since resource is busy")
                         .args(entry.absoluteFilePath()));
                 break;
-            case nx::SystemCommands::noPermissions:
+            case nx::SystemCommands::UnmountCode::noPermissions:
                 NX_WARNING(typeid(QnFileStorageResource),
                     lm("[mount, removeOldDirs] NO permissions to remove %1")
                         .args(entry.absoluteFilePath()));
@@ -639,11 +639,11 @@ QnFileStorageResource::~QnFileStorageResource()
     if (!m_localPath.isEmpty())
     {
 #if __linux__
-        bool result = rootTool()->unmount(m_localPath);
+        auto result = rootTool()->unmount(m_localPath);
         NX_VERBOSE(
             this,
             lm("[mount] unmounting folder %1 while destructing object result: %2")
-                .args(m_localPath, result));
+                .args(m_localPath, nx::SystemCommands::unmountCodeToString(result)));
 #elif __APPLE__
         unmount(m_localPath.toLatin1().constData(), 0);
 #endif
