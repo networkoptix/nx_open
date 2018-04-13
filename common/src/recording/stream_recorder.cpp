@@ -654,7 +654,7 @@ void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int stre
         }
 
         auto startWriteTime = std::chrono::high_resolution_clock::now();
-        int ret = av_write_frame(
+        int ret = av_interleaved_write_frame(
             m_recordingContextVector[i].formatCtx,
             &avPkt
         );
