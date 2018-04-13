@@ -22,10 +22,11 @@ public:
 
 public slots:
     void disconnectFromSystem();
-    void connectToSystem(const nx::utils::Url &url);
+    void connectToSystem(
+        const nx::utils::Url &url,
+        const ResourceIdList& filterIds = ResourceIdList());
 
-    void openResources(const ResourceIdList& resourceIds = ResourceIdList());
-    void openResourcesScreen();
+    void openResourcesScreen(const ResourceIdList& filterIds = ResourceIdList());
     void openVideoScreen(const QnUuid& cameraId);
     void openLoginToCloudScreen(
         const QString& user,
@@ -33,10 +34,13 @@ public slots:
         const QUuid& connectOperationId);
 
 signals:
-    void connectRequested(const nx::utils::Url& url);
+    void connectRequested(
+        const nx::utils::Url& url,
+        const QVariant& filterIds);
+
     void disconnectRequested();
     void layoutIdChanged();
-    void resourcesScreenRequested();
+    void resourcesScreenRequested(const QVariant& filterIds);
     void videoScreenRequested(const QString& cameraId);
 
     void loginToCloudScreenRequested(

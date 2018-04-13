@@ -70,11 +70,12 @@ function openSavedSession(systemId, localSystemId, systemName, address, login, p
     item.focusCredentialsField()
 }
 
-function openResourcesScreen(systemName)
+function openResourcesScreen(systemName, filterIds)
 {
     var item = stackView.get(0, Controls.StackView.ForceLoad)
     if (item && item.objectName == "resourcesScreen")
     {
+        item.filterIds = filterIds
         if (stackView.depth > 1)
             stackView.pop(item)
     }
@@ -84,7 +85,8 @@ function openResourcesScreen(systemName)
             null,
             Qt.resolvedUrl("Screens/ResourcesScreen.qml"),
             {
-                "title": systemName
+                "title": systemName,
+                "filterIds": filterIds
             }
         )
     }

@@ -10,7 +10,7 @@ Object
         onConnectRequested:
         {
             sideNavigation.close()
-            Workflow.openResourcesScreen()
+            Workflow.openResourcesScreen("", filterIds)
             connectionManager.connectToServer(url)
         }
 
@@ -28,7 +28,8 @@ Object
             else
                 Workflow.openSessionsScreen()
         }
-        onResourcesScreenRequested: Workflow.openResourcesScreen(connectionManager.systemName)
+
+        onResourcesScreenRequested: Workflow.openResourcesScreen(connectionManager.systemName, filterIds)
         onVideoScreenRequested: Workflow.openVideoScreen(resourceId)
         onLoginToCloudScreenRequested: Workflow.openCloudScreen(user, password, connectOperationId)
     }

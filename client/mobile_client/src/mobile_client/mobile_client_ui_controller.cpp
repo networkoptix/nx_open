@@ -47,19 +47,16 @@ void QnMobileClientUiController::disconnectFromSystem()
     setLayoutId(QString());
 }
 
-void QnMobileClientUiController::connectToSystem(const nx::utils::Url& url)
+void QnMobileClientUiController::connectToSystem(
+    const nx::utils::Url& url,
+    const ResourceIdList& filterIds)
 {
-    emit connectRequested(url);
+    emit connectRequested(url, QVariant::fromValue(filterIds));
 }
 
-void QnMobileClientUiController::openResources(const ResourceIdList& resourceIds)
+void QnMobileClientUiController::openResourcesScreen(const ResourceIdList& filterIds)
 {
-    qWarning() << "=============================== open resources: " << resourceIds.size();
-}
-
-void QnMobileClientUiController::openResourcesScreen()
-{
-    emit resourcesScreenRequested();
+    emit resourcesScreenRequested(QVariant::fromValue(filterIds));
 }
 
 void QnMobileClientUiController::openVideoScreen(const QnUuid& cameraId)
