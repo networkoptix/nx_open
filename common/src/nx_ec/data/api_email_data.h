@@ -1,5 +1,4 @@
-#ifndef QN_API_EMAIL_DATA_H
-#define QN_API_EMAIL_DATA_H
+#pragma once
 
 #include "api_globals.h"
 #include "api_data.h"
@@ -9,22 +8,10 @@
 #include <utils/email/email_fwd.h>
 #include <utils/common/ldap_fwd.h>
 
+#include <nx/vms/api/data/email_settings_data.h>
+
 namespace ec2
 {
-    struct ApiEmailSettingsData: ApiData
-    {
-        ApiEmailSettingsData(): port(0), connectionType(QnEmail::Unsecure) {}
-
-        QString host;
-        int port;
-        QString user;
-        QString from;
-        QString password;
-        QnEmail::ConnectionType connectionType;
-    };
-#define ApiEmailSettingsData_Fields (host)(port)(user)(from)(password)(connectionType)
-	
-
     struct ApiEmailData: ApiData
     {
         ApiEmailData() {}
@@ -49,5 +36,3 @@ namespace ec2
 #define ApiEmailData_Fields (to)(subject)(body)(plainBody)(timeout)
 
 } // namespace ec2
-
-#endif // QN_API_EMAIL_DATA_H

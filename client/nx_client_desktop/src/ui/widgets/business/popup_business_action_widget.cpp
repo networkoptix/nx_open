@@ -47,7 +47,7 @@ void QnPopupBusinessActionWidget::at_model_dataChanged(Fields fields)
         const auto sourceCameraRequired =
             nx::vms::event::isSourceCameraRequired(model()->eventType());
         const auto allowForceAcknoledgement = sourceCameraRequired
-            || model()->eventType() >= nx::vms::event::userDefinedEvent;
+            || model()->eventType() >= nx::vms::api::EventType::userDefinedEvent;
         ui->forceAcknoledgementCheckBox->setEnabled(allowForceAcknoledgement);
         ui->hintLabel->setEnabled(allowForceAcknoledgement);
     }

@@ -35,8 +35,8 @@ public:
 
     virtual void setCamera(const QnVirtualCameraResourcePtr& camera) override;
 
-    vms::event::EventType selectedEventType() const;
-    void setSelectedEventType(vms::event::EventType value);
+    vms::api::EventType selectedEventType() const;
+    void setSelectedEventType(vms::api::EventType value);
 
     virtual int count() const override;
     virtual QVariant data(const QModelIndex& index, int role, bool& handled) const override;
@@ -58,15 +58,15 @@ private:
     rest::Handle getEvents(qint64 startMs, qint64 endMs, GetCallback callback,
         int limit = std::numeric_limits<int>::max());
 
-    QString title(vms::event::EventType eventType) const;
+    QString title(vms::api::EventType eventType) const;
     QString description(const vms::event::EventParameters& parameters) const;
     static QPixmap pixmap(const vms::event::EventParameters& parameters);
-    static QColor color(vms::event::EventType eventType);
-    static bool hasPreview(vms::event::EventType eventType);
+    static QColor color(vms::api::EventType eventType);
+    static bool hasPreview(vms::api::EventType eventType);
 
 private:
     EventSearchListModel* const q = nullptr;
-    vms::event::EventType m_selectedEventType = vms::event::undefinedEvent;
+    vms::api::EventType m_selectedEventType = vms::api::undefinedEvent;
     QScopedPointer<QTimer> m_updateTimer;
     mutable QScopedPointer<vms::event::StringsHelper> m_helper;
     qint64 m_latestTimeMs = 0;

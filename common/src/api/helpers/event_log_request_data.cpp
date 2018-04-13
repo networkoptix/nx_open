@@ -46,13 +46,13 @@ void QnEventLogFilterData::loadFromParams(QnResourcePool* resourcePool,
         ? QnTimePeriod::infiniteDuration()
         : nx::utils::parseDateTimeMsec(endTimeUs) - period.startTimeMs;
 
-    eventType = QnLexical::deserialized<nx::vms::event::EventType>(
+    eventType = QnLexical::deserialized<nx::vms::api::EventType>(
         params.value(kEventTypeParam),
         eventType);
 
     eventSubtype = QnLexical::deserialized<QnUuid>(params.value(kEventSubtypeParam));
 
-    actionType = QnLexical::deserialized<nx::vms::event::ActionType>(
+    actionType = QnLexical::deserialized<nx::vms::api::ActionType>(
         params.value(kActionTypeParam),
         actionType);
 
@@ -71,13 +71,13 @@ QnRequestParamList QnEventLogFilterData::toParams() const
     if (!period.isInfinite())
         result.insert(kEndPeriodParam, QnLexical::serialized(period.endTimeMs()));
 
-    if (eventType != nx::vms::event::undefinedEvent)
+    if (eventType != nx::vms::api::EventType::undefinedEvent)
         result.insert(kEventTypeParam, QnLexical::serialized(eventType));
 
     if (!eventSubtype.isNull())
         result.insert(kEventSubtypeParam, QnLexical::serialized(eventSubtype));
 
-    if (actionType != nx::vms::event::undefinedAction)
+    if (actionType != nx::vms::api::ActionType::undefinedAction)
         result.insert(kActionTypeParam, QnLexical::serialized(actionType));
 
     if (!ruleId.isNull())
@@ -99,14 +99,14 @@ bool QnEventLogFilterData::isValid(QString* errorString) const
     if (period.startTimeMs == kInvalidStartTime)
         return error(lit("Parameter %1 MUST be specified").arg(kStartPeriodParam));
 
-    if (eventType != nx::vms::event::undefinedEvent
+    if (eventType != nx::vms::api::EventType::undefinedEvent
         && !nx::vms::event::allEvents().contains(eventType)
         && !nx::vms::event::hasChild(eventType))
     {
         return error(lit("Invalid event type"));
     }
 
-    if (actionType != nx::vms::event::undefinedAction
+    if (actionType != nx::vms::api::ActionType::undefinedAction
         && !nx::vms::event::allActions().contains(actionType))
     {
         return error(lit("Invalid action type"));

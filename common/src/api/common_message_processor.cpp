@@ -288,17 +288,18 @@ void QnCommonMessageProcessor::on_remotePeerLost(QnUuid data, Qn::PeerType peerT
 
 void QnCommonMessageProcessor::on_resourceStatusChanged(
     const QnUuid& resourceId,
-    Qn::ResourceStatus status,
+    nx::vms::api::ResourceStatus status,
     ec2::NotificationSource source)
 {
     if (source == ec2::NotificationSource::Local)
         return; //< ignore local setStatus call. Data already in the resourcePool
 
+    const auto localStatus = static_cast<Qn::ResourceStatus>(status);
     QnResourcePtr resource = resourcePool()->getResourceById(resourceId);
     if (resource)
-        onResourceStatusChanged(resource, status, source);
+        onResourceStatusChanged(resource, localStatus, source);
     else
-        statusDictionary()->setValue(resourceId, status);
+        statusDictionary()->setValue(resourceId, localStatus);
 }
 
 void QnCommonMessageProcessor::on_resourceParamChanged(const ec2::ApiResourceParamWithRefData& param )
@@ -384,7 +385,7 @@ void QnCommonMessageProcessor::on_userRoleRemoved(const QnUuid& userRoleId)
 void QnCommonMessageProcessor::on_cameraUserAttributesChanged(const ec2::ApiCameraAttributesData& attrs)
 {
     QnCameraUserAttributesPtr userAttributes(new QnCameraUserAttributes());
-    fromApiToResource(attrs, userAttributes);
+    ec2::fromApiToResource(attrs, userAttributes);
 
     QSet<QByteArray> modifiedFields;
     {
@@ -475,7 +476,7 @@ void QnCommonMessageProcessor::on_businessActionBroadcasted( const vms::event::A
 void QnCommonMessageProcessor::on_businessRuleReset(const ec2::ApiBusinessRuleDataList& rules)
 {
     vms::event::RuleList ruleList;
-    fromApiToResourceList(rules, ruleList);
+    ec2::fromApiToResourceList(rules, ruleList);
     eventRuleManager()->resetRules(ruleList);
 }
 
@@ -625,7 +626,7 @@ void QnCommonMessageProcessor::resetCameraUserAttributesList( const ec2::ApiCame
     for( const auto & cameraAttrs: cameraUserAttributesList )
     {
         QnCameraUserAttributesPtr dstElement(new QnCameraUserAttributes());
-        fromApiToResource(cameraAttrs, dstElement);
+        ec2::fromApiToResource(cameraAttrs, dstElement);
 
         QnCameraUserAttributePool::ScopedLock userAttributesLock( cameraUserAttributesPool(), cameraAttrs.cameraId );
         *(*userAttributesLock) = *dstElement;
@@ -667,8 +668,13 @@ void QnCommonMessageProcessor::resetStatusList(const ec2::ApiResourceStatusDataL
         }
     }
 
-    for(const ec2::ApiResourceStatusData& statusData: params)
-        on_resourceStatusChanged(statusData.id, statusData.status, ec2::NotificationSource::Remote);
+    for (const ec2::ApiResourceStatusData& statusData: params)
+    {
+        on_resourceStatusChanged(
+            statusData.id,
+            statusData.status,
+            ec2::NotificationSource::Remote);
+    }
 }
 
 void QnCommonMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoData& fullData)
@@ -748,7 +754,7 @@ void QnCommonMessageProcessor::updateResource(const ec2::ApiCameraData& camera, 
     if (qnCamera)
     {
         qnCamera->setCommonModule(commonModule());
-        fromApiToResource(camera, qnCamera);
+        ec2::fromApiToResource(camera, qnCamera);
         NX_ASSERT(camera.id == QnVirtualCameraResource::physicalIdToId(qnCamera->getUniqueId()),
             Q_FUNC_INFO,
             "You must fill camera ID as md5 hash of unique id");

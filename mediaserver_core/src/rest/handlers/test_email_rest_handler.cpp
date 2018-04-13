@@ -21,7 +21,7 @@ int QnTestEmailSettingsHandler::executePost(
     QnTestEmailSettingsReply reply;
     ec2::ApiEmailSettingsData apiData = QJson::deserialized(body, ec2::ApiEmailSettingsData());
     QnEmailSettings settings;
-    fromApiToResource(apiData, settings);
+    ec2::fromApiToResource(apiData, settings);
     EmailManagerImpl emailManagerImpl(owner->commonModule());
 
     SmtpOperationResult smtpResult = emailManagerImpl.testConnection(settings);

@@ -29,7 +29,7 @@ namespace ec2
         QnLatin1Array dewarpingParams;
         bool displayInfo;                   /**< Should info be displayed on the item. */
     };
-#define ApiLayoutItemData_Fields ApiIdData_Fields (flags)(left)(top)(right)(bottom)(rotation)(resourceId)(resourcePath) \
+#define ApiLayoutItemData_Fields IdData_Fields (flags)(left)(top)(right)(bottom)(rotation)(resourceId)(resourcePath) \
                                     (zoomLeft)(zoomTop)(zoomRight)(zoomBottom)(zoomTargetId)(contrastParams)(dewarpingParams) \
                                     (displayInfo)
 
@@ -54,7 +54,7 @@ namespace ec2
         qint32  backgroundHeight = 0;
         float backgroundOpacity = 0;
     };
-#define ApiLayoutData_Fields ApiResourceData_Fields (cellAspectRatio)(horizontalSpacing)(verticalSpacing)(items)(locked) \
+#define ApiLayoutData_Fields ResourceData_Fields (cellAspectRatio)(horizontalSpacing)(verticalSpacing)(items)(locked) \
                                 (backgroundImageFilename)(backgroundWidth)(backgroundHeight)(backgroundOpacity)
 
 }

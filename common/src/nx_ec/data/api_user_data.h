@@ -68,10 +68,8 @@ struct ApiUserData: ApiResourceData
 
     /** Full user name. */
     QString fullName;
-
-    bool operator==(const ApiUserData& rhs) const;
 };
-#define ApiUserData_Fields ApiResourceData_Fields \
+#define ApiUserData_Fields ResourceData_Fields \
     (isAdmin) \
     (permissions) \
     (email) \

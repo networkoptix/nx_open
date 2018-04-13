@@ -20,8 +20,8 @@ namespace {
 
 static constexpr int kMinFps = 1;
 
-static constexpr auto kMinQuality = Qn::QualityLow;
-static constexpr auto kMaxQuality = Qn::QualityHighest;
+static constexpr auto kMinQuality = Qn::StreamQuality::low;
+static constexpr auto kMaxQuality = Qn::StreamQuality::highest;
 
 template<class Data>
 void fetchFromCameras(
@@ -70,7 +70,8 @@ QString calculateWebPage(const Camera& camera)
 bool isMotionDetectionEnabled(const Camera& camera)
 {
     const auto motionType = camera->getMotionType();
-    return motionType != Qn::MT_NoMotion && camera->supportedMotionType().testFlag(motionType);
+    return motionType != Qn::MotionType::MT_NoMotion
+        && camera->supportedMotionType().testFlag(motionType);
 }
 
 bool calculateRecordingParametersAvailable(const Cameras& cameras)
@@ -101,7 +102,7 @@ Qn::StreamQuality calculateQualityForBitrateMbps(const State& state, float bitra
     auto current = kMinQuality;
     auto currentBr = calculateBitrateForQualityMbps(state, current);
 
-    for (int i = current + 1; i <= kMaxQuality; ++i)
+    for (int i = (int)current + 1; i <= (int)kMaxQuality; ++i)
     {
         const auto next = Qn::StreamQuality(i);
         const auto nextBr = calculateBitrateForQualityMbps(state, next);
@@ -118,8 +119,10 @@ Qn::StreamQuality calculateQualityForBitrateMbps(const State& state, float bitra
 
 State loadMinMaxCustomBitrate(State state)
 {
-    state.recording.minBitrateMbps = calculateBitrateForQualityMbps(state, Qn::QualityLowest);
-    state.recording.maxBitrateMpbs = calculateBitrateForQualityMbps(state, Qn::QualityHighest);
+    state.recording.minBitrateMbps = calculateBitrateForQualityMbps(state,
+        Qn::StreamQuality::lowest);
+    state.recording.maxBitrateMpbs = calculateBitrateForQualityMbps(state,
+        Qn::StreamQuality::highest);
     return state;
 }
 
@@ -156,10 +159,10 @@ State loadNetworkInfo(State state, const Camera& camera)
 State::RecordingDays calculateMinRecordingDays(const Cameras& cameras)
 {
     if (cameras.empty())
-        return {ec2::kDefaultMinArchiveDays, true, true};
+        return {vms::api::kDefaultMinArchiveDays, true, true};
 
     // Any negative min days value means 'auto'. Storing absolute value to keep previous one.
-    auto calcMinDays = [](int d) { return d == 0 ? ec2::kDefaultMinArchiveDays : qAbs(d); };
+    auto calcMinDays = [](int d) { return d == 0 ? vms::api::kDefaultMinArchiveDays : qAbs(d); };
 
     const int minDays = (*std::min_element(
         cameras.cbegin(),
@@ -187,10 +190,10 @@ State::RecordingDays calculateMinRecordingDays(const Cameras& cameras)
 State::RecordingDays calculateMaxRecordingDays(const Cameras& cameras)
 {
     if (cameras.empty())
-        return {ec2::kDefaultMaxArchiveDays, true, true};
+        return {vms::api::kDefaultMaxArchiveDays, true, true};
 
     /* Any negative max days value means 'auto'. Storing absolute value to keep previous one. */
-    auto calcMaxDays = [](int d) { return d == 0 ? ec2::kDefaultMaxArchiveDays : qAbs(d); };
+    auto calcMaxDays = [](int d) { return d == 0 ? vms::api::kDefaultMaxArchiveDays : qAbs(d); };
 
     const int maxDays = (*std::max_element(
         cameras.cbegin(),
@@ -263,13 +266,13 @@ QnScheduleTaskList calculateRecordingSchedule(const Camera& camera)
 int calculateRecordingThresholdBefore(const Camera& camera)
 {
     const auto value = camera->recordBeforeMotionSec();
-    return value > 0 ? value : ec2::kDefaultRecordBeforeMotionSec;
+    return value > 0 ? value : vms::api::kDefaultRecordBeforeMotionSec;
 }
 
 int calculateRecordingThresholdAfter(const Camera& camera)
 {
     const auto value = camera->recordAfterMotionSec();
-    return value > 0 ? value : ec2::kDefaultRecordAfterMotionSec;
+    return value > 0 ? value : vms::api::kDefaultRecordAfterMotionSec;
 }
 
 } // namespace
@@ -419,10 +422,10 @@ State CameraSettingsDialogStateReducer::setScheduleBrushRecordingType(
     State state,
     Qn::RecordingType value)
 {
-    NX_EXPECT(value != Qn::RT_MotionOnly || state.hasMotion());
-    NX_EXPECT(value != Qn::RT_MotionAndLowQuality || state.hasDualStreaming());
+    NX_EXPECT(value != Qn::RecordingType::motionOnly || state.hasMotion());
+    NX_EXPECT(value != Qn::RecordingType::motionAndLow || state.hasDualStreaming());
     state.recording.brush.recordingType = value;
-    if (value == Qn::RT_MotionAndLowQuality)
+    if (value == Qn::RecordingType::motionAndLow)
     {
         state.recording.brush.fps = qBound(
             kMinFps,

@@ -60,7 +60,7 @@ void QnDiscoveryMonitor::serverLost(QnUuid id)
     auto s = it->second;
     m_serverCache.erase(it);
 
-    s.status = Qn::ResourceStatus::Offline;
+    s.status = nx::vms::api::ResourceStatus::offline;
     send(ApiCommand::discoveredServerChanged, s, m_messageBus->directlyConnectedClientPeers());
 }
 

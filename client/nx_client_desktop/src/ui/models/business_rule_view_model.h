@@ -77,8 +77,8 @@ public:
     bool isModified() const;
     void setModified(bool value);
 
-    nx::vms::event::EventType eventType() const;
-    void setEventType(const nx::vms::event::EventType value);
+    nx::vms::api::EventType eventType() const;
+    void setEventType(const nx::vms::api::EventType value);
 
     QSet<QnUuid> eventResources() const;
     void setEventResources(const QSet<QnUuid>& value);
@@ -86,11 +86,11 @@ public:
     nx::vms::event::EventParameters eventParams() const;
     void setEventParams(const nx::vms::event::EventParameters& params);
 
-    nx::vms::event::EventState eventState() const;
-    void setEventState(nx::vms::event::EventState state);
+    nx::vms::api::EventState eventState() const;
+    void setEventState(nx::vms::api::EventState state);
 
-    nx::vms::event::ActionType actionType() const;
-    void setActionType(const nx::vms::event::ActionType value);
+    nx::vms::api::ActionType actionType() const;
+    void setActionType(const nx::vms::api::ActionType value);
 
     QSet<QnUuid> actionResources() const;
     void setActionResources(const QSet<QnUuid>& value);
@@ -143,18 +143,18 @@ private:
 
     QString getAggregationText() const;
 
-    static QString toggleStateToModelString(nx::vms::event::EventState value);
+    static QString toggleStateToModelString(nx::vms::api::EventState value);
     Fields updateEventClassRelatedParams();
 private:
     QnUuid m_id;
     bool m_modified;
 
-    nx::vms::event::EventType m_eventType;
+    nx::vms::api::EventType m_eventType;
     QSet<QnUuid> m_eventResources;
     nx::vms::event::EventParameters m_eventParams;
-    nx::vms::event::EventState m_eventState;
+    nx::vms::api::EventState m_eventState;
 
-    nx::vms::event::ActionType m_actionType;
+    nx::vms::api::ActionType m_actionType;
     QSet<QnUuid> m_actionResources;
     nx::vms::event::ActionParameters m_actionParams;
 

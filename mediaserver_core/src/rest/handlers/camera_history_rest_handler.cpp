@@ -8,6 +8,8 @@
 #include <core/resource/camera_history.h>
 #include <rest/server/rest_connection_processor.h>
 
+#include <nx_ec/data/api_camera_history_data.h>
+
 namespace {
 
 static const int kHistoryCacheTimeoutMs = 1000 * 60 * 10;

@@ -69,7 +69,7 @@ namespace ec2
         const int reqID = generateRequestID();
         ApiResourceStatusData params;
         params.id = resourceId;
-        params.status = status;
+        params.status = static_cast<nx::vms::api::ResourceStatus>(status);
 
         using namespace std::placeholders;
         m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(

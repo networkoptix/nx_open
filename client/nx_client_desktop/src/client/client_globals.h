@@ -190,9 +190,9 @@ namespace Qn
         ShortTextRole,                              /**< Role for short text. Value of type QString. */
         PriorityRole,                               /**< Role for priority value. Value of type quint64. */
 
-        EventTypeRole,                              /**< Role for business event type. Value of type nx::vms::event::EventType. */
+        EventTypeRole,                              /**< Role for business event type. Value of type nx::vms::api::EventType. */
         EventResourcesRole,                         /**< Role for business event resources list. Value of type QSet<QnUuid>. */
-        ActionTypeRole,                             /**< Role for business action type. Value of type nx::vms::event::ActionType. */
+        ActionTypeRole,                             /**< Role for business action type. Value of type nx::vms::api::ActionType. */
         ActionResourcesRole,                        /**< Role for business action resources list. Value of type QSet<QnUuid>. */
         ActionDataRole,                             /**< Role for business action. Value of type vms::event::AbstractActionPtr. */
         RuleModelRole, /* #deprecate #3.2 */        /**< Role for business rule caching model. Value of type QnBusinessRuleViewModelPtr. */

@@ -21,7 +21,7 @@ namespace ec2
         std::vector<QnUuid> parentId;
         std::vector<ApiPropertyTypeData> propertyTypes;
     };
-#define ApiResourceTypeData_Fields ApiIdData_Fields (name)(vendor)(parentId)(propertyTypes)
+#define ApiResourceTypeData_Fields IdData_Fields (name)(vendor)(parentId)(propertyTypes)
 
 }
 

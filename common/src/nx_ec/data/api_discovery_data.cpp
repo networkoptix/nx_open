@@ -32,13 +32,13 @@ ApiDiscoveredServerData makeServer(
     serverData.setEndpoints(std::vector<nx::network::SocketAddress>{module.endpoint});
     if (QnConnectionValidator::validateConnection(module) != Qn::SuccessConnectionResult)
     {
-        serverData.status = Qn::ResourceStatus::Incompatible;
+        serverData.status = nx::vms::api::ResourceStatus::incompatible;
     }
     else
     {
         serverData.status = (!localSystemId.isNull() && module.localSystemId == localSystemId)
-            ? Qn::ResourceStatus::Online
-            : Qn::ResourceStatus::Unauthorized;
+            ? nx::vms::api::ResourceStatus::online
+            : nx::vms::api::ResourceStatus::unauthorized;
     }
 
     return serverData;

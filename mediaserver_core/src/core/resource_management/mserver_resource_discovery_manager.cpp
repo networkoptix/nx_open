@@ -264,7 +264,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                         .arg(NetResString(rpNetRes)));
 
                     ec2::ApiCameraData apiCamera;
-                    fromResourceToApi(existCamRes, apiCamera);
+                    ec2::fromResourceToApi(existCamRes, apiCamera);
                     apiCamera.id = ec2::ApiCameraData::physicalIdToId(apiCamera.physicalId);
 
                     ec2::AbstractECConnectionPtr connect = commonModule()->ec2Connection();

@@ -25,7 +25,7 @@ struct ApiUserRoleData: ApiIdData
 
     bool isNull() const;
 };
-#define ApiUserRoleData_Fields ApiIdData_Fields (name)(permissions)
+#define ApiUserRoleData_Fields IdData_Fields (name)(permissions)
 
 /* Struct is not inherited from ApiUserRoleData as it has no 'id' field. */
 struct ApiPredefinedRoleData: ApiData

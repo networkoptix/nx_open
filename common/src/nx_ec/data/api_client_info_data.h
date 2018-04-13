@@ -27,7 +27,7 @@ struct ApiClientInfoData: ApiIdData
     }
 };
 #define ApiClientInfoData_Fields \
-    ApiIdData_Fields \
+    IdData_Fields \
     (parentId) \
     (skin) \
     (fullVersion) \

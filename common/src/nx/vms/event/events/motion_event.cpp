@@ -13,7 +13,7 @@ MotionEvent::MotionEvent(
     qint64 timeStamp,
     QnConstAbstractDataPacketPtr metadata)
     :
-    base_type(cameraMotionEvent, resource, toggleState, timeStamp),
+    base_type(EventType::cameraMotionEvent, resource, toggleState, timeStamp),
     m_metadata(metadata)
 {
 }

@@ -14,7 +14,7 @@ QnClientCameraResource::QnClientCameraResource(const QnUuid &resourceTypeId)
 
 Qn::ResourceFlags QnClientCameraResource::flags() const {
     Qn::ResourceFlags result = base_type::flags();
-    if (!isDtsBased() && supportedMotionType() != Qn::MT_NoMotion)
+    if (!isDtsBased() && supportedMotionType() != Qn::MotionType::MT_NoMotion)
         result |= Qn::motion;
 
     return result;

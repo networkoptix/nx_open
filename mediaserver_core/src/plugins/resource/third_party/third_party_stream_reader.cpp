@@ -99,7 +99,7 @@ static int sensitivityToMask[10] =
 
 void ThirdPartyStreamReader::updateSoftwareMotion()
 {
-    if( m_thirdPartyRes->getMotionType() != Qn::MT_HardwareGrid )
+    if( m_thirdPartyRes->getMotionType() != Qn::MotionType::MT_HardwareGrid )
         return base_type::updateSoftwareMotion();
 
     if( m_thirdPartyRes->getVideoLayout()->channelCount() == 0 )
@@ -183,7 +183,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
             config.height = resolution.height;
             config.framerate = params.fps;
             config.bitrateKbps = bitrateKbps;
-            config.quality = params.quality;
+            config.quality = (int16_t)params.quality;
             if( (m_cameraCapabilities & nxcip::BaseCameraManager::audioCapability) && m_thirdPartyRes->isAudioEnabled() )
                 config.flags |= nxcip::LiveStreamConfig::LIVE_STREAM_FLAG_AUDIO_ENABLED;
 

@@ -23,7 +23,7 @@ void setMinRecordingDays(
     int actualValue = value.absoluteValue;
     NX_ASSERT(actualValue > 0);
     if (actualValue == 0)
-        actualValue = ec2::kDefaultMinArchiveDays;
+        actualValue = nx::vms::api::kDefaultMinArchiveDays;
     if (value.automatic)
         actualValue = -actualValue;
 
@@ -40,7 +40,7 @@ void setMaxRecordingDays(
     int actualValue = value.absoluteValue;
     NX_ASSERT(actualValue > 0);
     if (actualValue == 0)
-        actualValue = ec2::kDefaultMaxArchiveDays;
+        actualValue = nx::vms::api::kDefaultMaxArchiveDays;
     if (value.automatic)
         actualValue = -actualValue;
 

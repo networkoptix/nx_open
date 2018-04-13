@@ -18,7 +18,7 @@ public:
     QString updateId;
     int chunks;
 };
-#define ApiUpdateUploadResponceData_Fields ApiIdData_Fields (updateId)(chunks)
+#define ApiUpdateUploadResponceData_Fields IdData_Fields (updateId)(chunks)
 
 struct ApiUpdateInstallData: ApiData
 {

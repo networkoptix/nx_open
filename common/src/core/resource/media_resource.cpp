@@ -41,6 +41,11 @@ QnMediaResource::~QnMediaResource()
 {
 }
 
+Qn::StreamQuality QnMediaResource::getBestQualityForSuchOnScreenSize(const QSize&) const
+{
+    return Qn::StreamQuality::normal;
+}
+
 QImage QnMediaResource::getImage(int /*channel*/, QDateTime /*time*/, Qn::StreamQuality /*quality*/) const
 {
     return QImage();

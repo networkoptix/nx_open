@@ -125,7 +125,7 @@ public:
         QThread* targetThread = nullptr);
 
     Handle softwareTriggerCommand(const QnUuid& cameraId, const QString& triggerId,
-            nx::vms::event::EventState toggleState, GetCallback callback, QThread* targetThread = nullptr);
+            nx::vms::api::EventState toggleState, GetCallback callback, QThread* targetThread = nullptr);
 
     Handle getStatisticsSettingsAsync(Result<QByteArray>::type callback
         , QThread *targetThread = nullptr);
@@ -246,7 +246,7 @@ public:
         Result<MultiServerTimeData>::type callback,
         QThread *targetThread = nullptr);
 
-    Handle testEventRule(const QnUuid& ruleId, nx::vms::event::EventState toggleState,
+    Handle testEventRule(const QnUuid& ruleId, nx::vms::api::EventState toggleState,
         GetCallback callback, QThread* targetThread = nullptr);
 
     Handle getEvents(QnEventLogRequestData request,

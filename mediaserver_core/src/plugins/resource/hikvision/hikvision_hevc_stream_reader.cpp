@@ -188,7 +188,7 @@ boost::optional<int> HikvisionHevcStreamReader::chooseQuality(
     const ChannelCapabilities& channelCapabilities) const
 {
     const int kStreamQualityCount = 5;
-    if (quality > Qn::StreamQuality::QualityHighest)
+    if (quality > Qn::StreamQuality::highest)
         return boost::none;
 
     return rescaleQuality(

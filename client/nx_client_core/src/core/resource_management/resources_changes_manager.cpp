@@ -276,7 +276,7 @@ void QnResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceLi
         applyChanges();
     auto changes = pool->getAttributesList(idList);
     ec2::ApiCameraAttributesDataList apiAttributes;
-    fromResourceListToApi(changes, apiAttributes);
+    ec2::fromResourceListToApi(changes, apiAttributes);
     connection->getCameraManager(Qn::kSystemAccess)->saveUserAttributes(apiAttributes, this,
         makeReplyProcessor(this, handler));
 

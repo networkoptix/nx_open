@@ -59,7 +59,7 @@ struct ApiVideowallMatrixData: ApiIdData
     QString name;
     std::vector<ApiVideowallMatrixItemData> items;
 };
-#define ApiVideowallMatrixData_Fields ApiIdData_Fields (name)(items)
+#define ApiVideowallMatrixData_Fields IdData_Fields (name)(items)
 
 
 struct ApiVideowallData: ApiResourceData
@@ -72,7 +72,7 @@ struct ApiVideowallData: ApiResourceData
     std::vector<ApiVideowallScreenData> screens;
     std::vector<ApiVideowallMatrixData> matrices;
 };
-#define ApiVideowallData_Fields ApiResourceData_Fields (autorun)(items)(screens)(matrices)
+#define ApiVideowallData_Fields ResourceData_Fields (autorun)(items)(screens)(matrices)
 
 
 struct ApiVideowallControlMessageData: ApiData

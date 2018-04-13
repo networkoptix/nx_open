@@ -76,8 +76,8 @@ private:
     QnAbstractBusinessParamsWidget *m_eventParameters;
     QnAbstractBusinessParamsWidget *m_actionParameters;
 
-    QMap<nx::vms::event::EventType, QnAbstractBusinessParamsWidget*> m_eventWidgetsByType;
-    QMap<nx::vms::event::ActionType, QnAbstractBusinessParamsWidget*> m_actionWidgetsByType;
+    QMap<nx::vms::api::EventType, QnAbstractBusinessParamsWidget*> m_eventWidgetsByType;
+    QMap<nx::vms::api::ActionType, QnAbstractBusinessParamsWidget*> m_actionWidgetsByType;
 
     std::unique_ptr<nx::client::desktop::MimeData> m_mimeData;
 

@@ -362,12 +362,14 @@ static const std::vector<QnLiveStreamParams> calculateRecomendedOptions(
                 option.resolution.width() * option.resolution.height() >= kIsBigSecondaryResolution;
 
             // Setup low fps if secondary resolution is large and there is no Hardware motion detector to save CPU usage
-            option.fps = secondaryResolutionIsLarge && !camera->supportedMotionType().testFlag(Qn::MT_HardwareGrid)
-                ? QnSecurityCamResource::kDefaultSecondStreamFpsLow : QnSecurityCamResource::kDefaultSecondStreamFpsMedium;
+            option.fps = secondaryResolutionIsLarge
+                && !camera->supportedMotionType().testFlag(Qn::MotionType::MT_HardwareGrid)
+                    ? QnSecurityCamResource::kDefaultSecondStreamFpsLow
+                    : QnSecurityCamResource::kDefaultSecondStreamFpsMedium;
         }
 
         option.bitrateKbps = static_cast<int>(QnSecurityCamResource::rawSuggestBitrateKbps(
-            Qn::QualityNormal, option.resolution, option.fps));
+            Qn::StreamQuality::normal, option.resolution, option.fps));
 
         optionsByCodec[option.codec].push_back(option);
     }

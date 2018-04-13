@@ -14,10 +14,10 @@ SystemHealthAction::SystemHealthAction(
     QnSystemHealth::MessageType message,
     const QnUuid& eventResourceId)
     :
-    base_type(showPopupAction, EventParameters())
+    base_type(ActionType::showPopupAction, EventParameters())
 {
     EventParameters runtimeParams;
-    runtimeParams.eventType = EventType(systemHealthEvent + message);
+    runtimeParams.eventType = EventType(EventType::systemHealthEvent + message);
     runtimeParams.eventTimestampUsec = qnSyncTime->currentUSecsSinceEpoch();
     runtimeParams.eventResourceId = eventResourceId;
     setRuntimeParams(runtimeParams);

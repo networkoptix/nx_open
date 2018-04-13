@@ -90,7 +90,7 @@ namespace ec2
         RuntimeFlags flags;
     };
 
-#define ApiRuntimeData_Fields ApiDataWithVersion_Fields (peer)(platform)(box)(brand)(publicIP)(prematureLicenseExperationDate)\
+#define ApiRuntimeData_Fields DataWithVersion_Fields (peer)(platform)(box)(brand)(publicIP)(prematureLicenseExperationDate)\
                                                         (videoWallInstanceGuid)(videoWallControlSession)(serverTimePriority)\
                                                         (hardwareIds)(updateStarted)(nx1mac)(nx1serial)\
                                                         (userId)(flags)(customization)

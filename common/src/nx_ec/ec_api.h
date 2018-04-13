@@ -82,7 +82,10 @@ namespace ec2
         Q_OBJECT
     public:
     signals:
-        void statusChanged( const QnUuid& resourceId, Qn::ResourceStatus status, ec2::NotificationSource source);
+        void statusChanged(
+            const QnUuid& resourceId,
+            nx::vms::api::ResourceStatus status,
+            ec2::NotificationSource source);
         void resourceParamChanged( const ApiResourceParamWithRefData& param );
         void resourceParamRemoved( const ApiResourceParamWithRefData& param );
         void resourceRemoved(const QnUuid& resourceId);

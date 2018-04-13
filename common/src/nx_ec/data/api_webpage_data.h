@@ -4,9 +4,8 @@
 
 namespace ec2
 {
-    struct ApiWebPageData: ApiResourceData
+    struct ApiWebPageData: nx::vms::api::ResourceData
     {
-        ApiWebPageData() {}
     };
-#define ApiWebPageData_Fields ApiResourceData_Fields
+#define ApiWebPageData_Fields ResourceData_Fields
 }

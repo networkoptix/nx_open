@@ -208,7 +208,7 @@ void CameraMotionMaskWidget::showTooManyWindowsMessage(const QnMotionRegion& reg
         {
             // Handle case when user can set different settings for each sensor of the camera.
             const bool isPanoramicCamera = m_camera->getVideoLayout()->channelCount() > 1;
-            const bool isHardwareMotion = m_camera->getMotionType() == Qn::MT_HardwareGrid;
+            const bool isHardwareMotion = m_camera->getMotionType() == Qn::MotionType::MT_HardwareGrid;
 
             const QString message = isPanoramicCamera && isHardwareMotion
                 ? tr("Maximum number of motion sensitivity settings for any sensor of the current"

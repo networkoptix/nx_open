@@ -90,11 +90,11 @@ QnBackupSettingsDialog::QnBackupSettingsDialog(QWidget* parent):
         });
 
     ui->qualityComboBox->addItem(tr("Lo-Res Streams", "Cameras Backup"),
-        QVariant::fromValue<Qn::CameraBackupQualities>(Qn::CameraBackup_LowQuality));
+        QVariant::fromValue<Qn::CameraBackupQualities>(Qn::CameraBackupQuality::CameraBackup_LowQuality));
     ui->qualityComboBox->addItem(tr("Hi-Res Streams", "Cameras Backup"),
-        QVariant::fromValue<Qn::CameraBackupQualities>(Qn::CameraBackup_HighQuality));
+        QVariant::fromValue<Qn::CameraBackupQualities>(Qn::CameraBackupQuality::CameraBackup_HighQuality));
     ui->qualityComboBox->addItem(tr("All Streams", "Cameras Backup"),
-        QVariant::fromValue<Qn::CameraBackupQualities>(Qn::CameraBackup_Both));
+        QVariant::fromValue<Qn::CameraBackupQualities>(Qn::CameraBackupQuality::CameraBackup_Both));
 
     setHelpTopic(this, Qn::ServerSettings_StoragesBackup_Help);
 

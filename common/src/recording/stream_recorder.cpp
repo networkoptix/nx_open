@@ -870,7 +870,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
 
                     m_transcodeFilters->prepare(mediaDev, m_videoTranscoder->getResolution());
                     m_videoTranscoder->setFilterList(*m_transcodeFilters);
-                    m_videoTranscoder->setQuality(Qn::QualityHighest);
+                    m_videoTranscoder->setQuality(Qn::StreamQuality::highest);
                     m_videoTranscoder->open(videoData); // reopen again for new size
 
                     QnFfmpegHelper::copyAvCodecContex(videoStream->codec, m_videoTranscoder->getCodecContext());

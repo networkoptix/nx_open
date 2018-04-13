@@ -117,7 +117,10 @@ private slots:
     void on_remotePeerFound(QnUuid data, Qn::PeerType peerType);
     void on_remotePeerLost(QnUuid data, Qn::PeerType peerType);
 
-    void on_resourceStatusChanged(const QnUuid &resourceId, Qn::ResourceStatus status, ec2::NotificationSource source);
+    void on_resourceStatusChanged(
+        const QnUuid& resourceId,
+        nx::vms::api::ResourceStatus status,
+        ec2::NotificationSource source);
     void on_resourceParamChanged(const ec2::ApiResourceParamWithRefData& param );
     void on_resourceParamRemoved(const ec2::ApiResourceParamWithRefData& param );
     void on_resourceRemoved(const QnUuid& resourceId );

@@ -174,8 +174,8 @@ struct CameraSettingsDialogState
         bool showQuality = true;
         bool showFps = true;
 
-        RecordingDays minDays{ec2::kDefaultMinArchiveDays, true, true};
-        RecordingDays maxDays{ec2::kDefaultMaxArchiveDays, true, true};
+        RecordingDays minDays{nx::vms::api::kDefaultMinArchiveDays, true, true};
+        RecordingDays maxDays{nx::vms::api::kDefaultMaxArchiveDays, true, true};
 
         bool isCustomBitrate() const
         {
@@ -213,7 +213,7 @@ struct CameraSettingsDialogState
         if (isSingleCamera() && !singleCameraSettings.enableMotionDetection())
             return singleCameraProperties.maxFpsWithoutMotion;
 
-        return recording.brush.recordingType == Qn::RT_MotionAndLowQuality
+        return recording.brush.recordingType == Qn::RecordingType::motionAndLow
             ? devicesDescription.maxDualStreamingFps
             : devicesDescription.maxFps;
     }

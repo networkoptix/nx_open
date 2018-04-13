@@ -1221,24 +1221,28 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetResourceOptions()
 
 int QnPlOnvifResource::innerQualityToOnvif(Qn::StreamQuality quality, int minQuality, int maxQuality) const
 {
-    if (quality > Qn::QualityHighest)
+    if (quality > Qn::StreamQuality::highest)
     {
-        NX_VERBOSE(this, lm("QnPlOnvifResource::innerQualityToOnvif: got unexpected quality (too big): %1").arg(quality));
+        NX_VERBOSE(this, lm("QnPlOnvifResource::innerQualityToOnvif: got unexpected quality (too big): %1").arg((int)quality));
         return maxQuality;
     }
-    if (quality < Qn::QualityLowest)
+    if (quality < Qn::StreamQuality::lowest)
     {
-        NX_VERBOSE(this, lm("QnPlOnvifResource::innerQualityToOnvif: got unexpected quality (too small): %1").arg(quality));
+        NX_VERBOSE(this, lm("QnPlOnvifResource::innerQualityToOnvif: got unexpected quality (too small): %1").arg((int)quality));
         return minQuality;
     }
 
+    int onvifQuality = minQuality
+        + (maxQuality - minQuality)
+        * ((int)quality - (int)Qn::StreamQuality::lowest)
+        / ((int)Qn::StreamQuality::highest - (int)Qn::StreamQuality::lowest);
     NX_LOGX(QString(lit("QnPlOnvifResource::innerQualityToOnvif: in quality = %1, out qualty = %2, minOnvifQuality = %3, maxOnvifQuality = %4"))
-            .arg(quality)
-            .arg(minQuality + (maxQuality - minQuality) * (quality - Qn::QualityLowest) / (Qn::QualityHighest - Qn::QualityLowest))
+            .arg((int)quality)
+            .arg(onvifQuality)
             .arg(minQuality)
             .arg(maxQuality), cl_logDEBUG1);
 
-    return minQuality + (maxQuality - minQuality) * (quality - Qn::QualityLowest) / (Qn::QualityHighest - Qn::QualityLowest);
+    return onvifQuality;
 }
 
 /*
@@ -4009,7 +4013,7 @@ void QnPlOnvifResource::updateVideoEncoder(
         encoder.RateControl->BitrateLimit = params.bitrateKbps;
     }
 
-    if (quality != Qn::QualityPreSet)
+    if (quality != Qn::StreamQuality::preset)
         encoder.Quality = innerQualityToOnvif(quality, capabilities.minQ, capabilities.maxQ);
 
     if (!encoder.Resolution)

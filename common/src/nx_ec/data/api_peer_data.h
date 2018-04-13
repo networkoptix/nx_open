@@ -45,7 +45,7 @@ struct ApiPersistentIdData: ApiIdData
     }
 };
 
-#define ApiPersistentIdData_Fields ApiIdData_Fields (persistentId)
+#define ApiPersistentIdData_Fields IdData_Fields (persistentId)
 
 struct ApiPeerData: ApiPersistentIdData
 {

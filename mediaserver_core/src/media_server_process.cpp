@@ -1445,7 +1445,7 @@ void MediaServerProcess::at_connectionOpened()
         qnEventRuleConnector->at_serverFailure(
             resPool->getResourceById<QnMediaServerResource>(serverGuid()),
             m_firstRunningTime * 1000,
-            nx::vms::event::EventReason::serverStarted,
+            nx::vms::api::EventReason::serverStarted,
             QString());
     }
     if (!m_startMessageSent)
@@ -1493,7 +1493,7 @@ void MediaServerProcess::at_storageManager_noStoragesAvailable() {
 }
 
 void MediaServerProcess::at_storageManager_storageFailure(const QnResourcePtr& storage,
-    nx::vms::event::EventReason reason)
+    nx::vms::api::EventReason reason)
 {
     if (isStopping())
         return;
@@ -1508,7 +1508,7 @@ void MediaServerProcess::at_storageManager_rebuildFinished(QnSystemHealth::Messa
 
 void MediaServerProcess::at_archiveBackupFinished(
     qint64                      backedUpToMs,
-    nx::vms::event::EventReason code
+    nx::vms::api::EventReason code
 )
 {
     if (isStopping())
@@ -2031,7 +2031,7 @@ void MediaServerProcess::moveHandlingCameras()
         if (!servers.contains(camera->getParentId()))
         {
             ec2::ApiCameraData apiCameraData;
-            fromResourceToApi(camera, apiCameraData);
+            ec2::fromResourceToApi(camera, apiCameraData);
             apiCameraData.parentId = commonModule()->moduleGUID(); //< move camera
             camerasToUpdate.push_back(apiCameraData);
         }

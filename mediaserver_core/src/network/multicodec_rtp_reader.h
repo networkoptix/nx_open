@@ -117,7 +117,7 @@ signals:
     void networkIssue(
         const QnResourcePtr&,
         qint64 timeStamp,
-        nx::vms::event::EventReason reasonCode,
+        nx::vms::api::EventReason reasonCode,
         const QString& reasonParamsEncoded);
 
 private:

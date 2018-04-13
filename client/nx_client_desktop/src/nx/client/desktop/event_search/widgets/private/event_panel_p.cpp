@@ -155,14 +155,14 @@ void EventPanel::Private::setupEventSearch()
     eventFilterMenu->setWindowFlags(eventFilterMenu->windowFlags() | Qt::BypassGraphicsProxyWidget);
 
     auto addMenuAction =
-        [this, eventFilterMenu](const QString& title, vms::event::EventType type)
+        [this, eventFilterMenu](const QString& title, vms::api::EventType type)
         {
             auto action = eventFilterMenu->addAction(title);
             connect(action, &QAction::triggered, this,
                 [this, title, type]()
                 {
                     m_eventsTab->typeButton()->setText(title);
-                    m_eventsTab->typeButton()->setState(type == vms::event::undefinedEvent
+                    m_eventsTab->typeButton()->setState(type == vms::api::EventType::undefinedEvent
                         ? ButtonState::deactivated
                         : ButtonState::unselected);
 
@@ -173,7 +173,7 @@ void EventPanel::Private::setupEventSearch()
             return action;
         };
 
-    auto defaultAction = addMenuAction(tr("Any type"), vms::event::undefinedEvent);
+    auto defaultAction = addMenuAction(tr("Any type"), vms::api::EventType::undefinedEvent);
     for (const auto type: vms::event::allEvents())
     {
         if (vms::event::isSourceCameraRequired(type))

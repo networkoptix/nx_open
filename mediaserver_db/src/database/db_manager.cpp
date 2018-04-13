@@ -739,7 +739,7 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
                 commonModule()->moduleGUID());
             m_tranLog->fillPersistentInfo(tran);
             tran.params.id = QnUuid::fromRfc4122(queryCameras.value(0).toByteArray());
-            tran.params.status = Qn::Offline;
+            tran.params.status = nx::vms::api::ResourceStatus::offline;
             if (executeTransactionNoLock(tran, QnUbjson::serialized(tran)) != ErrorCode::ok)
                 return false;
         }
@@ -818,7 +818,7 @@ bool QnDbManager::fillTransactionLogInternal(ApiCommand::Value command, std::fun
             commonModule()->moduleGUID(),
             object);
         auto transactionDescriptor = ec2::getActualTransactionDescriptorByValue<ObjectType>(command);
-        
+
         PersistentStorage persistentStorage(this);
         if (transactionDescriptor)
             transaction.transactionType = transactionDescriptor->getTransactionTypeFunc(commonModule(), object, &persistentStorage);
@@ -2191,7 +2191,7 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiResourc
     QSqlQuery query(m_sdb);
     query.prepare("INSERT OR REPLACE INTO vms_resource_status values (?, ?)");
     query.addBindValue(tran.params.id.toRfc4122());
-    query.addBindValue(tran.params.status);
+    query.addBindValue((int)tran.params.status);
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::dbError;
@@ -3487,10 +3487,10 @@ ErrorCode QnDbManager::doQueryNoLock(
          ORDER BY camera_guid)sql";
 
     queryCameras.prepare(queryStr
-        .arg(-ec2::kDefaultMinArchiveDays)
-        .arg(-ec2::kDefaultMaxArchiveDays)
-        .arg(ec2::kDefaultRecordBeforeMotionSec)
-        .arg(ec2::kDefaultRecordAfterMotionSec)
+        .arg(-nx::vms::api::kDefaultMinArchiveDays)
+        .arg(-nx::vms::api::kDefaultMaxArchiveDays)
+        .arg(nx::vms::api::kDefaultRecordBeforeMotionSec)
+        .arg(nx::vms::api::kDefaultRecordAfterMotionSec)
         .arg(filterStr));
 
     if (!queryCameras.exec()) {
@@ -3558,8 +3558,8 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiCameraDataExList& came
     )sql";
 
     queryCameras.prepare(queryStr
-      .arg(-ec2::kDefaultMinArchiveDays)
-      .arg(-ec2::kDefaultMaxArchiveDays)
+      .arg(-nx::vms::api::kDefaultMinArchiveDays)
+      .arg(-nx::vms::api::kDefaultMaxArchiveDays)
       .arg(filterStr));
 
     if (!queryCameras.exec()) {

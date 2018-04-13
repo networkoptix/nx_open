@@ -157,7 +157,7 @@ void QnAppserverResourceProcessor::readDefaultUserAttrs()
         return;
     userAttrsData.preferredServerId = commonModule()->moduleGUID();
     m_defaultUserAttrs = QnCameraUserAttributesPtr(new QnCameraUserAttributes());
-    fromApiToResource(userAttrsData, m_defaultUserAttrs);
+    ec2::fromApiToResource(userAttrsData, m_defaultUserAttrs);
 }
 
 ec2::ErrorCode QnAppserverResourceProcessor::addAndPropagateCamResource(
@@ -204,7 +204,7 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
     cameraResource->setFlags(cameraResource->flags() & ~Qn::parent_change);
 
     ec2::ApiCameraData apiCameraData;
-    fromResourceToApi(cameraResource, apiCameraData);
+    ec2::fromResourceToApi(cameraResource, apiCameraData);
     apiCameraData.id = cameraResource->physicalIdToId(uniqueId);
 
     ec2::ErrorCode errCode = addAndPropagateCamResource(
@@ -227,7 +227,7 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
         userAttrCopy->cameraId = apiCameraData.id;
 
         ec2::ApiCameraAttributesDataList attrsList;
-        fromResourceListToApi(QnCameraUserAttributesList() << userAttrCopy, attrsList);
+        ec2::fromResourceListToApi(QnCameraUserAttributesList() << userAttrCopy, attrsList);
 
         errCode =  commonModule()->ec2Connection()->getCameraManager(Qn::kSystemAccess)->saveUserAttributesSync(attrsList);
         if (errCode != ec2::ErrorCode::ok)

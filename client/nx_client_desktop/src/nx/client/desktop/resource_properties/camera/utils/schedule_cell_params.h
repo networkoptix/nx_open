@@ -12,10 +12,10 @@ struct ScheduleCellParams
 {
     static constexpr auto kAutomaticBitrate = 0.0;
     static constexpr auto kDefaultFps = 10;
-    static constexpr auto kDefaultRecordingType = Qn::RT_Always;
+    static constexpr auto kDefaultRecordingType = Qn::RecordingType::always;
 
     int fps = kDefaultFps;
-    Qn::StreamQuality quality = Qn::QualityNormal;
+    Qn::StreamQuality quality = Qn::StreamQuality::normal;
     Qn::RecordingType recordingType = kDefaultRecordingType;
     qreal bitrateMbps = kAutomaticBitrate;
 

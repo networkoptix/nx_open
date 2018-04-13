@@ -47,7 +47,7 @@ namespace ec2
         bool            isBackup;              // is storage used for backup
     };
 #define ApiStorageData_Fields   \
-    ApiResourceData_Fields      \
+    ResourceData_Fields      \
     (spaceLimit)                \
     (usedForWriting)            \
     (storageType)               \
@@ -69,7 +69,7 @@ namespace ec2
         QString         systemInfo;
         QString         authKey;
     };
-#define ApiMediaServerData_Fields ApiResourceData_Fields (networkAddresses)(flags)(version)(systemInfo)(authKey)
+#define ApiMediaServerData_Fields ResourceData_Fields (networkAddresses)(flags)(version)(systemInfo)(authKey)
 
     QN_FUSION_DECLARE_FUNCTIONS(ApiMediaServerData, (eq))
 
@@ -122,23 +122,25 @@ namespace ec2
         ApiMediaServerData,
         ApiMediaServerUserAttributesData
     {
-        ApiMediaServerDataEx(): ApiMediaServerData(), ApiMediaServerUserAttributesData(), status(Qn::Offline) {}
+        ApiMediaServerDataEx():
+            ApiMediaServerData(),
+            ApiMediaServerUserAttributesData()
+        {
+        }
 
-        Qn::ResourceStatus status;
+        nx::vms::api::ResourceStatus status = nx::vms::api::ResourceStatus::offline;
         std::vector<ApiResourceParamData> addParams;
         ApiStorageDataList storages;
 
         ApiMediaServerDataEx( const ApiMediaServerDataEx& mediaServerData )
         :
-            ApiMediaServerData(mediaServerData),
-            status( Qn::Offline )
+            ApiMediaServerData(mediaServerData)
         {
         }
 
         ApiMediaServerDataEx( ApiMediaServerData&& mediaServerData )
         :
-            ApiMediaServerData( std::move( mediaServerData ) ),
-            status( Qn::Offline )
+            ApiMediaServerData( std::move( mediaServerData ) )
         {
         }
 

@@ -212,7 +212,7 @@ void QnArchiveLengthWidget::updateMinDays(const QnVirtualCameraResourceList& cam
         return;
 
     /* Any negative min days value means 'auto'. Storing absolute value to keep previous one. */
-    auto calcMinDays = [](int d) { return d == 0 ? ec2::kDefaultMinArchiveDays : qAbs(d); };
+    auto calcMinDays = [](int d) { return d == 0 ? nx::vms::api::kDefaultMinArchiveDays : qAbs(d); };
 
     const int minDays = (*std::min_element(cameras.cbegin(), cameras.cend(),
         [calcMinDays](const QnVirtualCameraResourcePtr& l,
@@ -242,7 +242,7 @@ void QnArchiveLengthWidget::updateMaxDays(const QnVirtualCameraResourceList& cam
         return;
 
     /* Any negative max days value means 'auto'. Storing absolute value to keep previous one. */
-    auto calcMaxDays = [](int d) { return d == 0 ? ec2::kDefaultMaxArchiveDays : qAbs(d); };
+    auto calcMaxDays = [](int d) { return d == 0 ? nx::vms::api::kDefaultMaxArchiveDays : qAbs(d); };
 
     const int maxDays = (*std::max_element(cameras.cbegin(),
         cameras.cend(),
