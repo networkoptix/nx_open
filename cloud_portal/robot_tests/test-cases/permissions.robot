@@ -32,12 +32,12 @@ Check Log In
 Reset
     ${status}    Run Keyword And Return Status    Validate Log In
     Run Keyword If    ${status}    Log Out
-    Go To    ${url}
 
 Permissions Failure
     Close Browser
     Clean up random emails
     Clean up email noperm
+    Open Browser and go to URL    ${url}
 
 *** Test Cases ***
 Share button - opens dialog
