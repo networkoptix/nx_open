@@ -128,7 +128,7 @@ def sync_dependencies(syncher):
         sync("windows/signtool", path_variable="signtool_directory")
 
     if box == "edge1":
-        sync("cpro-1.0.0-1")
+        sync("cpro-1.0.0-2")
         sync("gdb")
 
     if withDesktopClient:
