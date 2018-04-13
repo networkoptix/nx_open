@@ -70,7 +70,7 @@ class Registry(object):
                     logger.info("%r: %r taken with %r.", self, name, alias)
                     reservations[name] = alias
                     return index, name
-        raise RegistryLimitReached("Cannot find vacant reservation in {!r} for {!r}".format(self, alias))
+        raise RegistryLimitReached("Cannot find vacant reservation in {} for {}".format(self, alias))
 
     def _free(self, name):
         with self._reservations_locked() as reservations:

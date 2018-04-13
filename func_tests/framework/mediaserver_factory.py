@@ -68,12 +68,12 @@ def examine_mediaserver(mediaserver, stopped_ok=False):
             examination_logger.info("%r is online.", mediaserver)
         else:
             mediaserver.service.make_core_dump()
-            raise MediaserverUnresponsive('{!r} is not online; core dump made.'.format(mediaserver))
+            raise MediaserverUnresponsive('{} is not online; core dump made.'.format(mediaserver))
     else:
         if stopped_ok:
             examination_logger.info("%r is stopped; it's OK.", mediaserver)
         else:
-            raise MediaserverStopped("{!r} is stopped.".format(mediaserver))
+            raise MediaserverStopped("{} is stopped.".format(mediaserver))
 
 
 def collect_logs_from_mediaserver(mediaserver, root_artifact_factory):

@@ -21,7 +21,7 @@ class SimpleNamespace:
 
     def __repr__(self):
         keys = sorted(self.__dict__)
-        items = ("{}={!r}".format(k, self.__dict__[k]) for k in keys)
+        items = ("{}={}".format(k, self.__dict__[k]) for k in keys)
         return "dict({})".format(type(self).__name__, ", ".join(items))
 
     def __eq__(self, other):
