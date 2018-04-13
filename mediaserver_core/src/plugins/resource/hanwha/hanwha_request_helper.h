@@ -2,6 +2,8 @@
 
 #include <QtCore/QUrl>
 
+#include <boost/optional.hpp>
+
 #include <nx/utils/thread/semaphore.h>
 
 #include <core/resource/resource_fwd.h>
@@ -25,7 +27,7 @@ public:
 
     HanwhaRequestHelper(
         const std::shared_ptr<HanwhaSharedResourceContext>& resourceContext,
-        int bypassChannel = kHanwhaNoBypassChannel);
+        boost::optional<int> bypassChannel = boost::none);
 
     HanwhaAttributes fetchAttributes(const QString& attributesPath);
 
@@ -107,7 +109,7 @@ private:
 private:
     const std::shared_ptr<HanwhaSharedResourceContext> m_resourceContext;
     bool m_ignoreMutexAnalyzer = false;
-    int m_bypassChannel;
+    boost::optional<int> m_bypassChannel;
 };
 
 } // namespace plugins

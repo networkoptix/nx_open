@@ -1,5 +1,7 @@
 #pragma once
 
+#include <boost/optional.hpp>
+
 #include <core/ptz/ptz_limits.h>
 
 #include <plugins/resource/hanwha/hanwha_advanced_parameter_info.h>
@@ -259,7 +261,7 @@ private:
 
     const HanwhaAttributes& attributes() const;
     const HanwhaCgiParameters& cgiParameters() const;
-    int bypassChannel() const;
+    boost::optional<int> bypassChannel() const;
 
 private:
     using AdvancedParameterId = QString;
