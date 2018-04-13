@@ -9,32 +9,18 @@ StackView
 
     function safePush(url, properties, operation)
     {
-        if (busy)
-            return undefined
-
-        var component = Qt.createComponent(url)
-        var item = properties
-            ? component.createObject(null, properties)
-            : component.createObject(null)
-
-        var error = component.errorString()
-        if (error.length)
-            console.log("Error whilte creating component:", error)
-
-        if (currentItem && currentItem.objectName == item.objectName)
-        {
-            item.destroy()
-            return undefined
-        }
-
-        return push(item, properties, operation)
+        var item = d.safeCreatePageComponent(url, properties)
+        return item
+            ? push(item, properties, d.safafeOperation(operation))
+            : undefined
     }
 
-    function safeReplace(target, item, properties, operation)
+    function safeReplace(target, url, properties, operation)
     {
-        return busy
-            ? undefined
-            : replace(target, item, properties, operation)
+        var item = d.safeCreatePageComponent(url, properties)
+        return item
+            ? replace(target, item, properties, d.safafeOperation(operation))
+            : undefined
     }
 
     onBusyChanged:
@@ -78,6 +64,32 @@ StackView
             var dy = scaleInYHint - stackView.height / 2
             var normalized = Math.max(Math.abs(dy), maxShift)
             return dy > 0 ? normalized : -normalized
+        }
+
+        function safafeOperation(operation)
+        {
+            return busy ? StackView.Immediate : operation
+        }
+
+        function safeCreatePageComponent(url, properties)
+        {
+            var component = Qt.createComponent(url)
+            var item = properties
+                ? component.createObject(null, properties)
+                : component.createObject(null)
+
+            var error = component.errorString();
+            if (error.length)
+            {
+                console.log(error);
+            }
+
+            if (currentItem && currentItem.objectName == item.objectName)
+            {
+                item.destroy()
+                return undefined
+            }
+            return item
         }
     }
 

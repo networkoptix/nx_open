@@ -70,11 +70,12 @@ function openSavedSession(systemId, localSystemId, systemName, address, login, p
     item.focusCredentialsField()
 }
 
-function openResourcesScreen(systemName)
+function openResourcesScreen(systemName, filterIds)
 {
     var item = stackView.get(0, Controls.StackView.ForceLoad)
     if (item && item.objectName == "resourcesScreen")
     {
+        item.filterIds = filterIds
         if (stackView.depth > 1)
             stackView.pop(item)
     }
@@ -84,7 +85,8 @@ function openResourcesScreen(systemName)
             null,
             Qt.resolvedUrl("Screens/ResourcesScreen.qml"),
             {
-                "title": systemName
+                "title": systemName,
+                "filterIds": filterIds
             }
         )
     }
@@ -93,15 +95,12 @@ function openResourcesScreen(systemName)
 function openVideoScreen(resourceId, screenshotUrl, xHint, yHint)
 {
     stackView.setScaleTransitionHint(xHint, yHint)
-    var operation = stackView.busy ? Controls.StackView.Immediate : Controls.StackView.Transition
     var item = stackView.safePush(
         Qt.resolvedUrl("Screens/VideoScreen.qml"),
         {
             "resourceId": resourceId,
             "initialScreenshot": screenshotUrl
-        },
-        operation
-    )
+        })
     return item
 }
 
@@ -120,9 +119,14 @@ function openCloudWelcomeScreen()
     stackView.safeReplace(null, Qt.resolvedUrl("Screens/Cloud/WelcomeScreen.qml"))
 }
 
-function openCloudScreen()
+function openCloudScreen(user, password, connectOperationId)
 {
-    stackView.safePush(Qt.resolvedUrl("Screens/Cloud/CloudScreen.qml"))
+    stackView.safePush(Qt.resolvedUrl("Screens/Cloud/CloudScreen.qml"),
+        {
+            "targetEmail": user,
+            "targetPassword": password,
+            "connectOperationId": connectOperationId
+        })
 }
 
 function openLiteClientControlScreen(clientId)

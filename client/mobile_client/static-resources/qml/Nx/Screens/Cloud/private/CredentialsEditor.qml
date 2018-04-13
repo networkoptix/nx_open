@@ -182,39 +182,42 @@ Item
             d.reactivationRequested = false
         }
 
-        onErrorChanged:
-        {
-            if (error == QnCloudStatusWatcher.NoError)
-                return
+        onErrorChanged: handleConnectStatusChanged()
+        onStatusChanged: handleConnectStatusChanged()
+    }
 
+    function handleConnectStatusChanged()
+    {
+        var status = cloudStatusWatcher.status
+        if (status == QnCloudStatusWatcher.Online)
+        {
+            loggedIn()
             d.connecting = false
-            if (error == QnCloudStatusWatcher.InvalidCredentials)
-            {
-                d.invalidCredentials = true
-                showWarning(qsTr("Incorrect email or password"))
-            }
-            else if (error = QnCloudStatusWatcher.AccountNotActivated)
-            {
-                d.lastNotActivatedAccount = emailField.text
-                showNotActivatedAccoundWarning()
-            }
-            else
-            {
-                showWarning(qsTr("Cannot connect to %1").arg(applicationInfo.cloudName()))
-            }
-            setCloudCredentials(d.initialLogin, "")
+            d.reactivationRequested = false
+            return
         }
 
-        onStatusChanged:
+        var error = cloudStatusWatcher.error
+        if (error == QnCloudStatusWatcher.NoError)
+            return
+
+        d.connecting = false
+        if (error == QnCloudStatusWatcher.InvalidCredentials)
         {
-            if (status == QnCloudStatusWatcher.Online)
-            {
-                loggedIn()
-                d.connecting = false
-                d.reactivationRequested = false
-                return
-            }
+            d.invalidCredentials = true
+            showWarning(qsTr("Incorrect email or password"))
         }
+        else if (error = QnCloudStatusWatcher.AccountNotActivated)
+        {
+            d.lastNotActivatedAccount = emailField.text
+            showNotActivatedAccoundWarning()
+        }
+        else
+        {
+            showWarning(qsTr("Cannot connect to %1").arg(applicationInfo.cloudName()))
+        }
+        setCloudCredentials(d.initialLogin, "")
+
     }
 
     function login()
@@ -232,7 +235,9 @@ Item
         d.invalidCredentials = false
         d.connecting = true
         d.reactivationRequested = false
-        setCloudCredentials(email, password)
+        if (!setCloudCredentials(email, password))
+            handleConnectStatusChanged();
+
     }
 
     function showNotActivatedAccoundWarning()
@@ -254,10 +259,18 @@ Item
         notActivatedWarningPanel.opened = false
     }
 
+    function focusCredentialFields()
+    {
+        if (emailField.text.length)
+            passwordField.forceActiveFocus()
+        else
+            emailField.forceActiveFocus()
+    }
+
     Component.onCompleted:
     {
         d.initialLogin = cloudStatusWatcher.effectiveUserName
         emailField.text = d.initialLogin
-        emailField.forceActiveFocus()
+        focusCredentialFields()
     }
 }

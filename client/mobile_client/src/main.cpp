@@ -80,8 +80,7 @@ int runUi(QtSingleGuiApplication* application)
 
     QnContext context;
 
-    QScopedPointer<QnMobileClientUriHandler> uriHandler(new QnMobileClientUriHandler());
-    uriHandler->setUiController(context.uiController());
+    QScopedPointer<QnMobileClientUriHandler> uriHandler(new QnMobileClientUriHandler(&context));
     for (const auto& scheme: uriHandler->supportedSchemes())
         QDesktopServices::setUrlHandler(scheme, uriHandler.data(), uriHandler->handlerMethodName());
 

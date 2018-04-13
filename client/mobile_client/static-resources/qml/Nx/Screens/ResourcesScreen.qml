@@ -16,6 +16,7 @@ Page
     leftButtonIcon: lp("/images/menu.png")
     onLeftButtonClicked: sideNavigation.open()
     sideNavigationEnabled: !searchToolBar.visible
+    property alias filterIds: camerasGrid.filterIds
 
     titleControls:
     [

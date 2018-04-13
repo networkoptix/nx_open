@@ -26,6 +26,7 @@
 #include <nx/network/address_resolver.h>
 #include <nx/client/core/two_way_audio/two_way_audio_mode_controller.h>
 #include <nx/client/core/watchers/user_watcher.h>
+#include <nx/client/core/utils/operation_manager.h>
 
 using namespace nx::vms::utils;
 
@@ -100,9 +101,19 @@ QnCloudStatusWatcher* QnContext::cloudStatusWatcher() const
     return qnMobileClientModule->cloudStatusWatcher();
 }
 
+QnConnectionManager* QnContext::connectionManager() const
+{
+    return m_connectionManager;
+}
+
 nx::client::core::TwoWayAudioController* QnContext::twoWayAudioController() const
 {
     return commonModule()->instance<nx::client::core::TwoWayAudioController>();
+}
+
+nx::client::core::OperationManager* QnContext::operationManager() const
+{
+    return commonModule()->instance<nx::client::core::OperationManager>();
 }
 
 nx::client::core::UserWatcher* QnContext::userWatcher() const
@@ -274,13 +285,14 @@ nx::utils::Url QnContext::getWebSocketUrl() const
         .setPort(port);
 }
 
-void QnContext::setCloudCredentials(const QString& login, const QString& password)
+bool QnContext::setCloudCredentials(const QString& login, const QString& password)
 {
     // TODO: #GDM do we need store temporary credentials here?
     qnClientCoreSettings->setCloudLogin(login);
     qnClientCoreSettings->setCloudPassword(password);
-    cloudStatusWatcher()->setCredentials(QnEncodedCredentials(login, password));
+    const bool result = cloudStatusWatcher()->setCredentials(QnEncodedCredentials(login, password));
     qnClientCoreSettings->save();
+    return result;
 }
 
 QString QnContext::lp(const QString& path) const

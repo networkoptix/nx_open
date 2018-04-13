@@ -10,6 +10,8 @@ class QnMobileClientUiController : public QObject
     Q_OBJECT
     Q_PROPERTY(QString layoutId READ layoutId WRITE setLayoutId NOTIFY layoutIdChanged)
 
+    using ResourceIdList = QList<QnUuid>;
+
 public:
     QnMobileClientUiController(QObject* parent = nullptr);
     ~QnMobileClientUiController();
@@ -19,16 +21,31 @@ public:
 
 public slots:
     void disconnectFromSystem();
-    void connectToSystem(const nx::utils::Url &url);
-    void openResourcesScreen();
+    void connectToSystem(
+        const nx::utils::Url &url,
+        const ResourceIdList& filterIds = ResourceIdList());
+
+    void openResourcesScreen(const ResourceIdList& filterIds = ResourceIdList());
     void openVideoScreen(const QnUuid& cameraId);
+    void openLoginToCloudScreen(
+        const QString& user,
+        const QString& password,
+        const QUuid& connectOperationId);
 
 signals:
-    void connectRequested(const nx::utils::Url& url);
+    void connectRequested(
+        const nx::utils::Url& url,
+        const QVariant& filterIds);
+
     void disconnectRequested();
     void layoutIdChanged();
-    void resourcesScreenRequested();
+    void resourcesScreenRequested(const QVariant& filterIds);
     void videoScreenRequested(const QString& cameraId);
+
+    void loginToCloudScreenRequested(
+        const QString& user,
+        const QString& password,
+        const QString& connectOperationId);
 
 private:
     QScopedPointer<QnMobileClientUiControllerPrivate> d_ptr;

@@ -21,6 +21,7 @@
 #include <nx/client/core/ui/frame_section.h>
 #include <nx/client/core/utils/geometry.h>
 #include <nx/client/core/utils/quick_item_mouse_tracker.h>
+#include <nx/client/core/utils/operation_manager.h>
 #include <nx/client/core/two_way_audio/two_way_audio_mode_controller.h>
 
 namespace nx {
@@ -88,6 +89,7 @@ void initializeMetaTypes()
         QLatin1String("Cannot create an instance of LayoutResource."));
 
     nx::client::core::TwoWayAudioController::registerQmlType();
+    nx::client::core::OperationManager::registerQmlType();
 }
 
 } // namespace core

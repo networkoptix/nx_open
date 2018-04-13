@@ -8,6 +8,7 @@
 
 #include <nx/utils/thread/mutex.h>
 #include <nx/network/http/auth_tools.h>
+#include <nx/network/address_resolver.h>
 #include <nx/network/deprecated/simple_http_client.h>
 
 #include <utils/common/app_info.h>
@@ -1835,6 +1836,13 @@ void Ec2DirectConnectionFactory::remoteConnectionFinished(
     connectionInfoCopy.ecUrl.setScheme(
         connectionInfoCopy.allowSslConnections ? lit("https") : lit("http"));
     connectionInfoCopy.ecUrl.setQuery(QUrlQuery()); /*< Cleanup 'format' parameter. */
+    if (nx::network::SocketGlobals::addressResolver().isCloudHostName(ecUrl.host()))
+    {
+        NX_EXPECT(ecUrl.host() == connectionInfo.cloudSystemId, "Unexpected cloud host!");
+        const auto fullHost =
+            connectionInfo.serverId().toSimpleString() + L'.' + connectionInfo.cloudSystemId;
+        connectionInfoCopy.ecUrl.setHost(fullHost);
+    }
 
     NX_LOG(QnLog::EC2_TRAN_LOG, lit(
         "Ec2DirectConnectionFactory::remoteConnectionFinished (2). errorCode = %1, ecUrl = %2")
