@@ -188,7 +188,8 @@ Find and remove emails
 
 Clean up noperm first/last name
     Register Keyword To Run On Failure    None
-    Open Browser and go to URL    ${url}/account
+    Open Browser and go to URL    ${url}
+    Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
     Run Keyword And Ignore Error    Wait Until Textfield Contains    ${ACCOUNT FIRST NAME}    nameChanged
@@ -236,3 +237,4 @@ Make sure notowner is in the system
     Go To    ${url}/systems/${AUTO_TESTS SYSTEM ID}
     ${status}    Run Keyword And Return Status    Wait Until Element Is Visible    //div[@process-loading='gettingSystemUsers']//tbody//tr//td[contains(text(), 'noptixautoqa+notowner@gmail.com')]
     Run Keyword Unless    ${status}    Add notowner
+    Close Browser

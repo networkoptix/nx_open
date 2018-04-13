@@ -30,7 +30,7 @@ Reset
 
 *** Test Cases ***
 works at registration page before submit
-    Go To   ${url}/registdsgtg
+    Go To   ${url}/register
     Check Log In
 
 works at registration page after submit success

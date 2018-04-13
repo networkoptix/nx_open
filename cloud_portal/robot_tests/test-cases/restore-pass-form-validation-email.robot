@@ -22,6 +22,7 @@ Invalid Email 5         noptixqa.@gmail.com
 Invalid Email 6         noptixq..a@gmail.c
 Invalid Email 7         noptixqa@-gmail.com
 Invalid Email 8         ${SPACE}
+Invalid Email 9         ${EMAIL UNREGISTERED}
 Empty Email             ${EMPTY}
 
 *** Keywords ***
@@ -42,7 +43,8 @@ Test Email Invalid
     [Arguments]   ${email}
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
     Click Button    ${RESET PASSWORD BUTTON}
-    Check Email Outline    ${email}
+    Run Keyword Unless    '${email}'=='${EMAIL UNREGISTERED}'    Check Email Outline    ${email}
+    Run Keyword If    '${email}'=='${EMAIL UNREGISTERED}'    Check For Alert Dismissable    ${CANNOT SEND CONFIRMATION EMAIL} ${ACCOUNT DOES NOT EXIST}
 
 Check Email Outline
     [Arguments]    ${email}

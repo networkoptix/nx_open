@@ -102,6 +102,7 @@ ${SYSTEM NO ACCESS}                   //div[@ng-if='systemNoAccess']/h1[contains
 
 #Disconnect from cloud portal
 ${DISCONNECT FORM}                    //form[@name='disconnectForm']
+${DISCONNECT FORM CANCEL}             //form[@name='disconnectForm']//button[@ng-click='close()']
 ${DISCONNECT FORM HEADER}             //h1['${DISCONNECT FORM HEADER TEXT}']
 
 #Disconnect from my account

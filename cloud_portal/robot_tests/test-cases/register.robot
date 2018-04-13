@@ -48,7 +48,6 @@ should open register page from register success page by clicking Register button
     Location Should Be    ${url}/register
 
 should open register page in anonymous state by clicking Register button on homepage
-    Go To    ${url}
     Wait Until Element Is Visible    ${CREATE ACCOUNT BODY}
     Click Link    ${CREATE ACCOUNT BODY}
     Location Should Be    ${url}/register
@@ -106,7 +105,6 @@ should respond to Enter key and save data
     Validate Register Success
 
 should respond to Tab key
-    Go To    ${url}
     Wait Until Element Is Visible    ${CREATE ACCOUNT HEADER}
     Click Link    ${CREATE ACCOUNT HEADER}
     Wait Until Elements Are Visible    ${REGISTER FIRST NAME INPUT}    ${REGISTER LAST NAME INPUT}    ${REGISTER EMAIL INPUT}    ${REGISTER PASSWORD INPUT}
@@ -132,7 +130,6 @@ should open Terms and conditions in a new page
     Location Should Be    ${url}/content/eula
 
 should suggest user to log out, if he was logged in and goes to registration link
-    Go To    ${url}
     Log In    ${EMAIL VIEWER}    ${password}
     Validate Log In
     Go To    ${url}/register

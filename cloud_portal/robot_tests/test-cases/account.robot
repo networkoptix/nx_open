@@ -34,7 +34,6 @@ Account Failure
 
 *** Test Cases ***
 Can access the account page from dropdown
-    Go To    ${url}
     Log In    ${EMAIL NOPERM}    ${password}
     Validate Log In
     Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
@@ -44,7 +43,6 @@ Can access the account page from dropdown
     Verify in account page
 
 Can access the account page from direct link while logged in
-    Go To    ${url}
     Log In    ${EMAIL NOPERM}    ${password}
     Validate Log In
     Go To    ${url}/account
