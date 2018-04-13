@@ -27,9 +27,11 @@ public:
 
     /** Mounts NAS from url to directory for real UID and GID. */
     MountCode mount(
-        const std::string& url, const std::string& directory,
+        const std::string& url,
+        const std::string& directory,
         const boost::optional<std::string>& username,
-        const boost::optional<std::string>& password, bool reportViaSocket);
+        const boost::optional<std::string>& password,
+        bool reportViaSocket);
 
     /** Unounts NAS from directory. */
     UnmountCode unmount(const std::string& directory, bool reportViaSocket);

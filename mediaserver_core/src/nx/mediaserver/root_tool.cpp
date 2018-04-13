@@ -26,6 +26,7 @@ RootTool::RootTool(const QString& toolPath):
 
 Qn::StorageInitResult RootTool::mount(const QUrl& url, const QString& path)
 {
+#if defined(Q_OS_LINUX)
     makeDirectory(path);
     auto mountResultToStorageInitResult =
         [&](SystemCommands::MountCode mountResult)
@@ -102,6 +103,9 @@ Qn::StorageInitResult RootTool::mount(const QUrl& url, const QString& path)
     logMountResult((SystemCommands::MountCode) result, true);
 
     return mountResultToStorageInitResult((SystemCommands::MountCode) result);
+#else
+    return Qn::StorageInitResult::StorageInit_WrongPath;
+#endif
 }
 
 Qn::StorageInitResult RootTool::remount(const QUrl& url, const QString& path)

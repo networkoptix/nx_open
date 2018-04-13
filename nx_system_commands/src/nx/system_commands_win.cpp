@@ -3,18 +3,20 @@
 namespace nx {
 
 
-bool SystemCommands::mount(
-    const std::string& /*url*/, const std::string& /*directory*/,
+SystemCommands::MountCode SystemCommands::mount(
+    const std::string& /*url*/,
+    const std::string& /*directory*/,
     const boost::optional<std::string>& /*username*/,
-    const boost::optional<std::string>& /*password*/)
+    const boost::optional<std::string>& /*password*/,
+    bool /*reportViaSocket*/)
 {
-    return false;
+    return MountCode::otherError;
 }
 
 SystemCommands::UnmountCode SystemCommands::unmount(
     const std::string& /*directory*/, bool /*reportViaSocket*/)
 {
-    return noPermissions;
+    return UnmountCode::noPermissions;
 }
 
 bool SystemCommands::changeOwner(const std::string& /*path*/)
