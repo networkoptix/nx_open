@@ -959,6 +959,9 @@ CameraDiagnostics::Result HanwhaResource::initSystem()
             HanwhaRequestHelper helper(sharedContext(), /*bypassChannel*/ getChannel());
             m_bypassDeviceAttributes = helper.fetchAttributes(lit("attributes"));
             m_bypassDeviceCgiParameters = helper.fetchCgiParameters(lit("cgis"));
+
+            const auto proxiedDeviceInfo = helper.view(lit("system/deviceinfo"));
+            handleProxiedDeviceInfo(proxiedDeviceInfo);
         }
     }
     else
@@ -1353,6 +1356,27 @@ CameraDiagnostics::Result HanwhaResource::initRemoteArchive()
     return CameraDiagnostics::NoErrorResult();
 }
 
+CameraDiagnostics::Result HanwhaResource::handleProxiedDeviceInfo(
+    const HanwhaResponse & deviceInfoResponse)
+{
+    if (deviceInfoResponse.isSuccessful())
+    {
+        const auto proxiedIdParameter = deviceInfoResponse.parameter<QString>(
+            lit("ConnectedMACAddress"));
+
+        if (proxiedIdParameter == boost::none)
+            return CameraDiagnostics::NoErrorResult();
+
+        const auto proxiedId = proxiedIdParameter->trimmed();
+        if (proxiedId != getProxiedId())
+        {
+            cleanUpOnProxiedDeviceChange();
+            setProxiedId(proxiedId);
+        }
+    }
+    return CameraDiagnostics::NoErrorResult();
+}
+
 CameraDiagnostics::Result HanwhaResource::createNxProfiles()
 {
     int nxPrimaryProfileNumber = kHanwhaInvalidProfile;
@@ -1729,6 +1753,11 @@ CameraDiagnostics::Result HanwhaResource::fetchPtzLimits(QnPtzLimits* outPtzLimi
     outPtzLimits->maxPresetNumber;
 
     return CameraDiagnostics::NoErrorResult();
+}
+
+void HanwhaResource::cleanUpOnProxiedDeviceChange()
+{
+    // TODO: #dmishin implement it.
 }
 
 AVCodecID HanwhaResource::streamCodec(Qn::ConnectionRole role) const

@@ -131,6 +131,7 @@ private:
     CameraDiagnostics::Result initTwoWayAudio();
     CameraDiagnostics::Result initRemoteArchive();
 
+    CameraDiagnostics::Result handleProxiedDeviceInfo(const HanwhaResponse& deviceInfoResponse);
     CameraDiagnostics::Result createNxProfiles();
     CameraDiagnostics::Result fetchExistingProfiles();
     CameraDiagnostics::Result createNxProfile(
@@ -148,6 +149,8 @@ private:
         int secondaryProfile);
 
     CameraDiagnostics::Result fetchPtzLimits(QnPtzLimits* outPtzLimits);
+
+    void cleanUpOnProxiedDeviceChange();
 
     AVCodecID defaultCodecForStream(Qn::ConnectionRole role) const;
     QSize defaultResolutionForStream(Qn::ConnectionRole role) const;
