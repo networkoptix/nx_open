@@ -1,6 +1,5 @@
 #include "relay_api_client.h"
 
-#include <nx/fusion/model_functions.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/cloud_connect_settings.h>
 #include <nx/network/http/rest/http_rest_client.h>
