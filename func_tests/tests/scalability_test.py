@@ -12,15 +12,15 @@ from multiprocessing.dummy import Pool as ThreadPool
 import pytest
 from requests.exceptions import ReadTimeout
 
+import framework.utils as utils
 import resource_synchronization_test as resource_test
 import server_api_data_generators as generator
-import framework.utils as utils
 import transaction_log
-from memory_usage_metrics import load_host_memory_usage
 from framework.api_shortcuts import get_server_id, get_system_settings
 from framework.compare import compare_values
 from framework.mediaserver import MEDIASERVER_MERGE_TIMEOUT
 from framework.utils import GrowingSleep
+from memory_usage_metrics import load_host_memory_usage
 
 log = logging.getLogger(__name__)
 

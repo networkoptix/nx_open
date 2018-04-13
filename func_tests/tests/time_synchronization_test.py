@@ -13,7 +13,7 @@ from framework.mediaserver_factory import (
     make_dirty_mediaserver,
     )
 from framework.merging import merge_systems, setup_local_system
-from framework.utils import get_internet_time, RunningTime
+from framework.utils import RunningTime, get_internet_time
 from framework.waiting import ensure_persistence, wait_for_true
 
 log = logging.getLogger(__name__)

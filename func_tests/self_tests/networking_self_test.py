@@ -1,7 +1,7 @@
 import pytest
 from netaddr import IPAddress, IPNetwork
 
-from framework.networking import setup_networks, setup_flat_network
+from framework.networking import setup_flat_network, setup_networks
 from framework.pool import ClosingPool
 from framework.waiting import wait_for_true
 

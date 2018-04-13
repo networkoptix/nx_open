@@ -3,7 +3,6 @@ import logging
 
 from framework.os_access import NonZeroExitStatus
 
-
 _logger = logging.getLogger(__name__)
 
 

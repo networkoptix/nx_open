@@ -16,10 +16,9 @@ import time
 
 import pytest
 
-from framework.merging import merge_systems, setup_local_system
 from framework.mediaserver import MEDIASERVER_MERGE_TIMEOUT
-from framework.utils import SimpleNamespace, datetime_utc_now, bool_to_str
-
+from framework.merging import merge_systems, setup_local_system
+from framework.utils import SimpleNamespace, bool_to_str, datetime_utc_now
 
 SERVER_CONFIG = dict(
     one=SimpleNamespace(

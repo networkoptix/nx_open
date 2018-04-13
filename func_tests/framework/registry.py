@@ -1,6 +1,5 @@
 import logging
 from collections import OrderedDict
-
 from contextlib import contextmanager
 
 from framework.move_lock import MoveLock

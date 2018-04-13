@@ -8,7 +8,7 @@ from textwrap import dedent
 import tzlocal
 from pathlib2 import Path
 
-from framework.os_access import FileNotFound, NonZeroExitStatus, args_to_command, OsAccess, Timeout
+from framework.os_access import FileNotFound, NonZeroExitStatus, OsAccess, Timeout, args_to_command
 from framework.os_access.local.communicate import communicate
 
 _logger = logging.getLogger(__name__)

@@ -1,5 +1,6 @@
-import requests
 import base64
+
+import requests
 
 
 def test_auth_key(running_linux_mediaserver):

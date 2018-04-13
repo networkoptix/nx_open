@@ -3,7 +3,7 @@ from pprint import pformat
 
 import pytest
 
-from framework.os_access.windows_remoting.dot_net.files import rename_file, get_file_info
+from framework.os_access.windows_remoting.dot_net.files import get_file_info, rename_file
 from framework.os_access.windows_remoting.dot_net.services import Service
 from framework.os_access.windows_remoting.dot_net.users import enumerate_user_profiles, get_system_user_profile
 

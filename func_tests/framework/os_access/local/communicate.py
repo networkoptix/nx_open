@@ -1,8 +1,8 @@
 import errno
 import logging
+import math
 import os
 import select
-import math
 
 from framework.waiting import Wait
 

@@ -13,8 +13,8 @@ import pytest
 
 import server_api_data_generators as generator
 from framework.api_shortcuts import get_server_id, get_system_settings
-from framework.merging import merge_systems
 from framework.mediaserver import MEDIASERVER_MERGE_TIMEOUT
+from framework.merging import merge_systems
 from framework.utils import bool_to_str, datetime_utc_now, str_to_bool
 from framework.waiting import wait_for_true
 

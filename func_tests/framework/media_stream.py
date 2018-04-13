@@ -10,8 +10,8 @@ from datetime import datetime, timedelta
 import requests
 from requests.auth import HTTPDigestAuth
 
-from .utils import datetime_utc_to_timestamp
 from .artifact import ArtifactType
+from .utils import datetime_utc_to_timestamp
 
 log = logging.getLogger(__name__)
 

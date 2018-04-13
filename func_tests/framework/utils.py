@@ -3,7 +3,6 @@ import logging
 import socket
 import struct
 import time
-import timeit
 from contextlib import closing
 from datetime import datetime, timedelta
 

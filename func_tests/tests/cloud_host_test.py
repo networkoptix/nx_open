@@ -2,11 +2,11 @@ import logging
 
 import pytest
 
+from framework.mediaserver import Mediaserver
 from framework.mediaserver_factory import cleanup_mediaserver
+from framework.mediaserver_installation import install_mediaserver
 from framework.merging import IncompatibleServersMerge, merge_systems, setup_cloud_system, setup_local_system
 from framework.rest_api import HttpError, RestApi
-from framework.mediaserver import Mediaserver
-from framework.mediaserver_installation import install_mediaserver
 from framework.service import UpstartService
 
 pytest_plugins = ['fixtures.cloud']

@@ -5,15 +5,15 @@ import logging
 
 from requests.exceptions import ReadTimeout
 
+from framework.mediaserver_factory import CORE_FILE_ARTIFACT_TYPE, SERVER_LOG_ARTIFACT_TYPE, TRACEBACK_ARTIFACT_TYPE
 from framework.rest_api import RestApi
-from framework.mediaserver_factory import SERVER_LOG_ARTIFACT_TYPE, CORE_FILE_ARTIFACT_TYPE, TRACEBACK_ARTIFACT_TYPE
 from framework.waiting import wait_for_true
 from . import utils
-from .utils import GrowingSleep
 from .core_file_traceback import create_core_file_traceback
 from .mediaserver import Mediaserver
 from .service import AdHocService
 from .template_renderer import TemplateRenderer
+from .utils import GrowingSleep
 
 log = logging.getLogger(__name__)
 

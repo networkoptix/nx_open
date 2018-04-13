@@ -1,11 +1,11 @@
+import subprocess
 from textwrap import dedent
 
 import pytz
-import subprocess
 from pathlib2 import Path, PurePosixPath
 
 from framework.os_access import FileNotFound, NonZeroExitStatus, OsAccess, args_to_command
-from framework.os_access.args import env_to_args, quote
+from framework.os_access.args import env_to_args
 from framework.os_access.local import LocalAccess
 
 SSH_CONFIG_PATH = Path(__file__).with_name('config')

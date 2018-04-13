@@ -1,4 +1,3 @@
-from itertools import islice
 from uuid import uuid1
 
 from netaddr import IPNetwork

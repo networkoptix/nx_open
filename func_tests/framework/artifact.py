@@ -1,7 +1,7 @@
 """Produce file names for storing artifacts."""
 
-import logging
 import json
+import logging
 
 from .utils import is_list_inst
 

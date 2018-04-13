@@ -1,4 +1,4 @@
-from framework.os_access.windows_remoting.dot_net import get_cim_instance, enumerate_cim_instances
+from framework.os_access.windows_remoting.dot_net import enumerate_cim_instances, get_cim_instance
 
 
 def enumerate_user_profiles(protocol):
