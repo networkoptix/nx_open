@@ -16,11 +16,10 @@ class SSHAccess(OsAccess):
         self.username = username
         self.hostname = hostname
         self.port = port
-        self.private_key_path = private_key_path
         self._username_and_hostname = self.username + '@' + self.hostname
         self._args = ['ssh', '-p', self.port, '-F', SSH_CONFIG_PATH]
-        if self.private_key_path:
-            self._args += ['-i', self.private_key_path]
+        if private_key_path:
+            self._args += ['-i', private_key_path]
 
     def __repr__(self):
         return '<SSHAccess {} {}>'.format(args_to_command(self._args), self._username_and_hostname)
