@@ -10,8 +10,6 @@
 #include <common/common_module.h>
 #include <context/context.h>
 #include <client_core/client_core_module.h>
-#include <core/resource/camera_resource.h>
-#include <core/resource_management/resource_pool.h>
 
 #include "mobile_client_ui_controller.h"
 #include "mobile_client_settings.h"

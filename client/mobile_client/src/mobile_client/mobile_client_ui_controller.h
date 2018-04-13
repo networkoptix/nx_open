@@ -3,7 +3,6 @@
 #include <QtCore/QObject>
 #include <nx/utils/uuid.h>
 #include <nx/utils/url.h>
-#include <nx/vms/utils/system_uri.h>
 
 class QnMobileClientUiControllerPrivate;
 class QnMobileClientUiController : public QObject
@@ -11,14 +10,14 @@ class QnMobileClientUiController : public QObject
     Q_OBJECT
     Q_PROPERTY(QString layoutId READ layoutId WRITE setLayoutId NOTIFY layoutIdChanged)
 
+    using ResourceIdList = QList<QnUuid>;
+
 public:
     QnMobileClientUiController(QObject* parent = nullptr);
     ~QnMobileClientUiController();
 
     QString layoutId() const;
     void setLayoutId(const QString& layoutId);
-
-    using ResourceIdList = nx::vms::utils::SystemUri::ResourceIdList;
 
 public slots:
     void disconnectFromSystem();
