@@ -20,6 +20,7 @@ using UserIoHandler = IoCompletionHandler;
  *   moving data through utils::bstream::Converter first.
  * WARNING: Converter MUST NOT generate wouldBlock error by itself before
  *   invoking underlying input/output. Otherwise, behavior is undefined.
+ *   Effectively, that means conversion cannot change size of data.
  */
 class NX_NETWORK_API StreamTransformingAsyncChannel:
     public AbstractAsyncChannel
