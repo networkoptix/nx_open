@@ -252,7 +252,8 @@ bool QnStreamMixer::isStreamOpened() const
         {
             NX_DEBUG(
                 this,
-                lit("StreamMixer::isStreamOpened(), couldn't cast to QnAbstractMediaStreamProvider"));
+                lit("StreamMixer::isStreamOpened(), "
+                    "couldn't cast to QnAbstractMediaStreamProvider"));
             continue;
         }
 
