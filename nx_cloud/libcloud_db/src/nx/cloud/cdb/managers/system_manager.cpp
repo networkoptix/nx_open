@@ -135,10 +135,12 @@ void SystemManager::authenticateByName(
     QnMutexLocker lock(&m_mutex);
 
     auto& systemByIdIndex = m_systems.get<kSystemByIdIndex>();
-    const auto systemIter = systemByIdIndex.find(
-        std::string(username.constData(), username.size()));
+    const auto systemIter = systemByIdIndex.find(username.toStdString());
     if (systemIter == systemByIdIndex.end())
+    {
+        result = api::ResultCode::badUsername;
         return;
+    }
 
     if (systemIter->status == api::SystemStatus::deleted_)
     {
