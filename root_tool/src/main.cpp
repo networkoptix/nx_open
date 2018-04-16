@@ -160,6 +160,16 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
                 ? Result::execFailed : Result::ok;
         });
 
+    factory.reg({"kill"}, {"pid"},
+        [systemCommands](const char** argv)
+        {
+            const auto pid = getOptionalArg(argv);
+            if (!pid)
+                return Result::invalidArg;
+
+            return systemCommands->kill(std::stoi(*pid)) ? Result::ok : Result::execFailed;
+        });
+
     factory.reg({"umount", "unmount"}, {"path"},
         [systemCommands](const char** argv)
         {

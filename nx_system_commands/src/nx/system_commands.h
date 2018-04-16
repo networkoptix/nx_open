@@ -72,6 +72,8 @@ public:
     /** Gets device path by file system path */
     std::string devicePath(const std::string& path, bool reportViaSocket);
 
+    bool kill(int pid);
+
     /** Installs deb package to system. */
     bool install(const std::string& debPackage);
 

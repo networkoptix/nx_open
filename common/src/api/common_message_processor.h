@@ -139,8 +139,7 @@ private slots:
     void on_businessRuleReset(const ec2::ApiBusinessRuleDataList& rules);
     void on_broadcastBusinessAction(const nx::vms::event::AbstractActionPtr& action);
     void on_execBusinessAction( const nx::vms::event::AbstractActionPtr& action );
-private:
-    template <class Datatype> void updateResources(const std::vector<Datatype>& resList, QHash<QnUuid, QnResourcePtr>& remoteResources);
+
 protected:
     ec2::AbstractECConnectionPtr m_connection;
 };

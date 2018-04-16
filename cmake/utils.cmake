@@ -31,6 +31,12 @@ function(nx_store_known_file file_name)
     set_property(GLOBAL APPEND_STRING PROPERTY known_files "${file}\n")
 endfunction()
 
+function(nx_store_known_files)
+    foreach(file_name ${ARGV})
+        nx_store_known_file(${file_name})
+    endforeach()
+endfunction()
+
 function(nx_save_known_files)
     get_property(files GLOBAL PROPERTY known_files)
     file(WRITE ${CMAKE_BINARY_DIR}/known_files.txt ${files})

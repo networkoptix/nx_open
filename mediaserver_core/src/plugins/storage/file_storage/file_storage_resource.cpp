@@ -312,7 +312,7 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdateInternal()
         }
         else
         {
-            if (rootTool()->makeDirectory(url))
+            if (rootTool()->isPathExists(url) || rootTool()->makeDirectory(url))
             {
                 result = Qn::StorageInit_Ok;
             }

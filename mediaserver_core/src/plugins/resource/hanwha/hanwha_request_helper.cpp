@@ -231,7 +231,7 @@ HanwhaResponse HanwhaRequestHelper::splitAndDoRequest(
     if (!m_resourceContext)
     {
         return HanwhaResponse(nx_http::StatusCode::serviceUnavailable,
-            lit("Resource is not initilized, try different server"));
+            lit("Resource is not initialized, try different server"));
     }
 
     auto split = path.split(L'/');

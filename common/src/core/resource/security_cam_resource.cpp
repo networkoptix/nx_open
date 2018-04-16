@@ -1193,9 +1193,9 @@ int QnSecurityCamResource::defaultSecondaryFps(Qn::StreamQuality quality) const
     {
         case Qn::QualityLowest:
         case Qn::QualityLow:
-            return kDefaultSecondStreamFpsMedium;
-        case Qn::QualityNormal:
             return kDefaultSecondStreamFpsLow;
+        case Qn::QualityNormal:
+            return kDefaultSecondStreamFpsMedium;
         case Qn::QualityHigh:
         case Qn::QualityHighest:
             return kDefaultSecondStreamFpsHigh;

@@ -2839,20 +2839,20 @@ to %1</source>
     <name>QnCloudResultMessages</name>
     <message>
       <source>Account not found</source>
-      <translation type="unfinished">Account not found</translation>
+      <translation>Account niet gevonden</translation>
     </message>
     <message>
       <source>Account is not activated.</source>
-      <translation type="unfinished">Account is not activated.</translation>
+      <translation>Account is niet geactiveerd.</translation>
     </message>
     <message>
       <source>Please log in to %1 and follow the provided instructions.</source>
       <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
-      <translation type="unfinished">Please log in to %1 and follow the provided instructions.</translation>
+      <translation>Meld u aan bij %1 en volg de instructies.</translation>
     </message>
     <message>
       <source>Invalid password</source>
-      <translation type="unfinished">Invalid password</translation>
+      <translation>Ongeldig wachtwoord</translation>
     </message>
   </context>
   <context>
@@ -3191,7 +3191,7 @@ to %1</source>
     </message>
     <message>
       <source>Database Backup Files</source>
-      <translation type="unfinished">Database Backup Files</translation>
+      <translation>Database Backup Bestanden</translation>
     </message>
   </context>
   <context>
@@ -4228,7 +4228,7 @@ to %1</source>
     </message>
     <message>
       <source>All files</source>
-      <translation type="unfinished">All files</translation>
+      <translation>Alle bestanden</translation>
     </message>
   </context>
   <context>
@@ -5827,7 +5827,7 @@ to %1</source>
     </message>
     <message>
       <source>Update Files</source>
-      <translation type="unfinished">Update Files</translation>
+      <translation>Bestanden bijwerken</translation>
     </message>
   </context>
   <context>

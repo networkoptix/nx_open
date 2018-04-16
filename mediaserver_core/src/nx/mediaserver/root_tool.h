@@ -42,10 +42,10 @@ private:
     const QString m_toolPath;
     QnMutex m_mutex;
 
-    template<typename R, typename DefaultAction, typename SocketAction, typename... Args>
+    template<typename R, typename DefaultAction, typename SocketAction>
     R commandHelper(
         R defaultValue, const QString& path, const char* command,
-        DefaultAction defaultAction, SocketAction socketAction, Args&&... args);
+        DefaultAction defaultAction, SocketAction socketAction);
 
     template<typename DefaultAction>
     qint64 int64SingleArgCommandHelper(
@@ -54,7 +54,12 @@ private:
     template<typename DefaultAction>
     std::string stringCommandHelper(const QString& path, const char* command, DefaultAction action);
 
-    int execute(const std::vector<QString>& args);
+    template<typename Action>
+    void execAndReadResult(const std::vector<QString>& args, Action action);
+
+    bool waitForProc(int childPid);
+    int forkRoolTool(const std::vector<QString>& args);
+    bool execAndWait(const std::vector<QString>& args);
 };
 
 /** Finds tool next to a appticationPath. */
