@@ -6,7 +6,7 @@
     "emailSubject": "אפס את סיסמתך"
   },
   "system_invite": {
-    "emailSubject": "{{message.sharer_name}} מזמין אותך אל {{PRODUCT_NAME}}"
+    "emailSubject": "מערכת הווידאו {{message.system_name}} שותפה איתך"
   },
   "system_shared": {
     "emailSubject": "{{message.sharer_name}} מזמין אותך אל {{PRODUCT_NAME}}"

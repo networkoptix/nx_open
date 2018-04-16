@@ -153,26 +153,7 @@ Wait Until Elements Are Visible
     :FOR     ${element}  IN  @{elements}
     \  Wait Until Element Is Visible    ${element}
 
-Form Validation
-    [arguments]    ${form name}    ${first name}=mark    ${last name}=hamill    ${email}=${EMAIL OWNER}    ${password}=${BASE PASSWORD}
-    Run Keyword If    "${form name}"=="Log In"    Log In Form Validation   ${email}    ${password}
-    Run Keyword If    "${form name}"=="Register"    Register Form Validation    ${first name}    ${last name}    ${email}    ${password}
-
-Log In Form Validation
-    [Arguments]    ${email}    ${password}
-    Input Text    ${EMAIL INPUT}    ${email}
-    Input Text    ${PASSWORD INPUT}    ${password}
-    click button    ${LOG IN BUTTON}
-
-Register Form Validation
-    [arguments]    ${first name}    ${last name}    ${email}    ${password}
-    Wait Until Elements Are Visible    ${REGISTER FIRST NAME INPUT}    ${REGISTER LAST NAME INPUT}    ${REGISTER EMAIL INPUT}    ${REGISTER PASSWORD INPUT}    ${CREATE ACCOUNT BUTTON}
-    Input Text    ${REGISTER FIRST NAME INPUT}    ${first name}
-    Input Text    ${REGISTER LAST NAME INPUT}    ${last name}
-    Input Text    ${REGISTER EMAIL INPUT}    ${email}
-    Input Text    ${REGISTER PASSWORD INPUT}    ${password}
-    click button    ${CREATE ACCOUNT BUTTON}
-
+#Reset resources
 Clean up email noperm
     Register Keyword To Run On Failure    None
     Open Browser and Go To URL    ${url}
@@ -207,7 +188,8 @@ Find and remove emails
 
 Clean up noperm first/last name
     Register Keyword To Run On Failure    None
-    Open Browser and go to URL    ${url}/account
+    Open Browser and go to URL    ${url}
+    Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
     Run Keyword And Ignore Error    Wait Until Textfield Contains    ${ACCOUNT FIRST NAME}    nameChanged
@@ -235,4 +217,24 @@ Clean up owner first/last name
     Input Text    ${ACCOUNT LAST NAME}    ${TEST LAST NAME}
     Click Button    ${ACCOUNT SAVE}
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
+    Close Browser
+
+Add notowner
+    Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
+    Click Button    ${SHARE BUTTON SYSTEMS}
+    Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE BUTTON MODAL}
+    Input Text    ${SHARE EMAIL}    ${EMAIL NOT OWNER}
+    Click Button    ${SHARE BUTTON MODAL}
+    Check For Alert    ${NEW PERMISSIONS SAVED}
+    Check User Permissions    ${EMAIL NOT OWNER}    ${CUSTOM TEXT}
+    Close Browser
+
+Make sure notowner is in the system
+    Register Keyword To Run On Failure    None/
+    Open Browser and Go To URL    ${url}
+    Log In    ${EMAIL OWNER}    ${password}
+    Validate Log In
+    Go To    ${url}/systems/${AUTO_TESTS SYSTEM ID}
+    ${status}    Run Keyword And Return Status    Wait Until Element Is Visible    //div[@process-loading='gettingSystemUsers']//tbody//tr//td[contains(text(), 'noptixautoqa+notowner@gmail.com')]
+    Run Keyword Unless    ${status}    Add notowner
     Close Browser

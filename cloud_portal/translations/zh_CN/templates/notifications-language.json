@@ -6,7 +6,7 @@
     "emailSubject": "重新设置密码"
   },
   "system_invite": {
-    "emailSubject": "{{message.sharer_name}}邀请您前往{{PRODUCT_NAME}}"
+    "emailSubject": "与你分享了视频系统 {{message.system_name}}"
   },
   "system_shared": {
     "emailSubject": "{{message.sharer_name}}邀请您前往{{PRODUCT_NAME}}"
