@@ -2838,12 +2838,21 @@ to %1</source>
   <context>
     <name>QnCloudResultMessages</name>
     <message>
-      <source>Incorrect email or password</source>
-      <translation>Hatalı e-posta yada şifre</translation>
+      <source>Account not found</source>
+      <translation>Hesap bulunamadı</translation>
     </message>
     <message>
-      <source>Account is not activated. Please check your email and follow provided instructions</source>
-      <translation>Kullanıcı aktif değil. Lütfen e postanıza kontrol edin ve gönderilen yönergeleri izleyin</translation>
+      <source>Account is not activated.</source>
+      <translation>Hesap etkin değil.</translation>
+    </message>
+    <message>
+      <source>Please log in to %1 and follow the provided instructions.</source>
+      <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
+      <translation>Lütfen %1 'e giriş yapın ve verilen talimatları izleyin.</translation>
+    </message>
+    <message>
+      <source>Invalid password</source>
+      <translation>Geçersiz parola</translation>
     </message>
   </context>
   <context>
@@ -3179,6 +3188,10 @@ to %1</source>
     <message>
       <source>You can create a backup for System configurations that can be restored in case of failure.</source>
       <translation>Herhangi bir aksilik olmasına karşın sistem konfigürasyonunu yedekleyebilir ve daha sonra tekrar yükleyebilirsiniz.</translation>
+    </message>
+    <message>
+      <source>Database Backup Files</source>
+      <translation>Veritabanı yedekleme dosyası</translation>
     </message>
   </context>
   <context>
@@ -4202,10 +4215,6 @@ to %1</source>
       <translation>Lisans Dosyasını Aç</translation>
     </message>
     <message>
-      <source>All files (*.*)</source>
-      <translation>Tüm Dosyalar (*.*)</translation>
-    </message>
-    <message>
       <source>Failed to open file</source>
       <translation>Dosya açılamadı</translation>
     </message>
@@ -4216,6 +4225,10 @@ to %1</source>
     <message>
       <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
       <translation>Aktivasyon dosyasını almak için Lütfen %1 e ait lisans anahtarını ve donanım kimliğini gönderin.</translation>
+    </message>
+    <message>
+      <source>All files</source>
+      <translation>Tüm Dosyalar</translation>
     </message>
   </context>
   <context>
@@ -5629,10 +5642,6 @@ to %1</source>
       <translation>Güncelleme Dosyasını Seç...</translation>
     </message>
     <message>
-      <source>Update Files (*.zip)</source>
-      <translation>Güncelleme Dosyaları (*.zip)</translation>
-    </message>
-    <message>
       <source>Release notes</source>
       <translation>Yayıncı Notları</translation>
     </message>
@@ -5815,6 +5824,10 @@ to %1</source>
       <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
       <translation>%1 ile uyumsuzluk. Öncelikle %1 in bağlantısını kesin.</translation>
+    </message>
+    <message>
+      <source>Update Files</source>
+      <translation>Dosyaları Güncelle</translation>
     </message>
   </context>
   <context>

@@ -491,7 +491,8 @@ QnCameraAdvancedParamValueMap HanwhaResource::getApiParameters(const QSet<QStrin
 
                     if (!info->isChannelIndependent())
                     {
-                        // TODO: #dmishin most likely here will be issues with multisensor cameras. Fix it.
+                        // TODO: #dmishin most likely here will be issues with multisensor cameras
+                        // (we will be always read from the first channel only). Fix it.
                         parameterString += kHanwhaChannelPropertyTemplate.arg(
                             isNvr() && isConnectedViaSunapi() ? 0 : getChannel());
                     }
@@ -958,6 +959,9 @@ CameraDiagnostics::Result HanwhaResource::initSystem()
             HanwhaRequestHelper helper(sharedContext(), /*bypassChannel*/ getChannel());
             m_bypassDeviceAttributes = helper.fetchAttributes(lit("attributes"));
             m_bypassDeviceCgiParameters = helper.fetchCgiParameters(lit("cgis"));
+
+            const auto proxiedDeviceInfo = helper.view(lit("system/deviceinfo"));
+            handleProxiedDeviceInfo(proxiedDeviceInfo);
         }
     }
     else
@@ -1352,6 +1356,27 @@ CameraDiagnostics::Result HanwhaResource::initRemoteArchive()
     return CameraDiagnostics::NoErrorResult();
 }
 
+CameraDiagnostics::Result HanwhaResource::handleProxiedDeviceInfo(
+    const HanwhaResponse & deviceInfoResponse)
+{
+    if (deviceInfoResponse.isSuccessful())
+    {
+        const auto proxiedIdParameter = deviceInfoResponse.parameter<QString>(
+            lit("ConnectedMACAddress"));
+
+        if (proxiedIdParameter == boost::none)
+            return CameraDiagnostics::NoErrorResult();
+
+        const auto proxiedId = proxiedIdParameter->trimmed();
+        if (proxiedId != getProxiedId())
+        {
+            cleanUpOnProxiedDeviceChange();
+            setProxiedId(proxiedId);
+        }
+    }
+    return CameraDiagnostics::NoErrorResult();
+}
+
 CameraDiagnostics::Result HanwhaResource::createNxProfiles()
 {
     int nxPrimaryProfileNumber = kHanwhaInvalidProfile;
@@ -1552,7 +1577,7 @@ CameraDiagnostics::Result HanwhaResource::setUpProfilePolicies(
         lit("media/videoprofilepolicy"),
         {
             {kHanwhaChannelProperty, QString::number(getChannel())},
-            {lit("LiveProfile"), QString::number(primaryProfile)},
+            {lit("LiveProfile"), QString::number(secondaryProfile)},
             {lit("RecordProfile"), QString::number(primaryProfile)},
             {lit("NetworkProfile"), QString::number(secondaryProfile)}
         });
@@ -1728,6 +1753,11 @@ CameraDiagnostics::Result HanwhaResource::fetchPtzLimits(QnPtzLimits* outPtzLimi
     outPtzLimits->maxPresetNumber;
 
     return CameraDiagnostics::NoErrorResult();
+}
+
+void HanwhaResource::cleanUpOnProxiedDeviceChange()
+{
+    // TODO: #dmishin implement it.
 }
 
 AVCodecID HanwhaResource::streamCodec(Qn::ConnectionRole role) const
@@ -2787,11 +2817,12 @@ const HanwhaCgiParameters& HanwhaResource::cgiParameters() const
     return m_bypassDeviceCgiParameters;
 }
 
-int HanwhaResource::bypassChannel() const
+boost::optional<int> HanwhaResource::bypassChannel() const
 {
-    return isNvr() && isConnectedViaSunapi()
-        ? getChannel()
-        : kHanwhaNoBypassChannel;
+    if (isNvr() && isConnectedViaSunapi())
+        return getChannel();
+
+    return boost::none;
 }
 
 bool HanwhaResource::isNvr() const

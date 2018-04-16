@@ -2903,12 +2903,21 @@ to %1</source>
   <context>
     <name>QnCloudResultMessages</name>
     <message>
-      <source>Incorrect email or password</source>
-      <translation>דוא"ל או סיסמה שגויים</translation>
+      <source>Account not found</source>
+      <translation type="unfinished">Account not found</translation>
     </message>
     <message>
-      <source>Account is not activated. Please check your email and follow provided instructions</source>
-      <translation>החשבון לא הופעל. בדוק את האימייל שלך ובצע את ההוראות המצורפות</translation>
+      <source>Account is not activated.</source>
+      <translation type="unfinished">Account is not activated.</translation>
+    </message>
+    <message>
+      <source>Please log in to %1 and follow the provided instructions.</source>
+      <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
+      <translation type="unfinished">Please log in to %1 and follow the provided instructions.</translation>
+    </message>
+    <message>
+      <source>Invalid password</source>
+      <translation type="unfinished">Invalid password</translation>
     </message>
   </context>
   <context>
@@ -3244,6 +3253,10 @@ to %1</source>
     <message>
       <source>You can create a backup for System configurations that can be restored in case of failure.</source>
       <translation>אתה יכול ליצור גיבוי להגדרות המערכת אותו תוכל לשחזר במקרה של כשלון.</translation>
+    </message>
+    <message>
+      <source>Database Backup Files</source>
+      <translation type="unfinished">Database Backup Files</translation>
     </message>
   </context>
   <context>
@@ -4301,10 +4314,6 @@ to %1</source>
       <translation>פתח קובץ רשיון</translation>
     </message>
     <message>
-      <source>All files (*.*)</source>
-      <translation>כל הקבצים (*.*)</translation>
-    </message>
-    <message>
       <source>Failed to open file</source>
       <translation>פתיחת קובץ נכשלה</translation>
     </message>
@@ -4315,6 +4324,10 @@ to %1</source>
     <message>
       <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
       <translation>אנא שלח את מפתח הרישיון ואת מזהה החומרה שסופקו ל- %1 כדי לקבל קובץ הפעלה של מפתח.</translation>
+    </message>
+    <message>
+      <source>All files</source>
+      <translation type="unfinished">All files</translation>
     </message>
   </context>
   <context>
@@ -5766,10 +5779,6 @@ to %1</source>
       <translation>בחר קובץ עדכון...</translation>
     </message>
     <message>
-      <source>Update Files (*.zip)</source>
-      <translation>קבצי עדכון (*.zip)</translation>
-    </message>
-    <message>
       <source>Release notes</source>
       <translation>הערות מוצר</translation>
     </message>
@@ -5954,6 +5963,10 @@ to %1</source>
       <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
       <translation>מופע לא תואם %1. כדי לעדכן נתק את המערכת מ- %1 תחילה.</translation>
+    </message>
+    <message>
+      <source>Update Files</source>
+      <translation type="unfinished">Update Files</translation>
     </message>
   </context>
   <context>

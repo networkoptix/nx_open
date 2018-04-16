@@ -1149,7 +1149,7 @@
                                 <name>actionParams.userGroup</name>
                                 <description>Popups and System Health.</description>
                                 <values>
-                                    <value><name>EveryOne></name></value>
+                                    <value><name>EveryOne</name></value>
                                     <value><name>AdminOnly</name></value>
                                 </values>
                             </param>
@@ -1902,13 +1902,6 @@ content type "application/json". Example of such object:
                     </result>
                   </function>
                   <function proprietary="true">
-                    <name>installUpdate</name>
-                    <description>Install update from zip package which should be in the request body.</description>
-                    <method>POST</method>
-                    <params/>
-                    <result/>
-                  </function>
-                  <function proprietary="true">
                     <name>onEvent</name>
                     <description>
                       Process an event from an external system. Reserved for future
@@ -1926,13 +1919,6 @@ content type "application/json". Example of such object:
                     <result>
                       <caption>JSON with a list of the discovered peers.</caption>
                     </result>
-                  </function>
-                  <function proprietary="true">
-                    <name>restart</name>
-                    <description>Restart the server.</description>
-                    <method>GET</method>
-                    <params/>
-                    <result/>
                   </function>
                   <function>
                     <name>moduleInformation</name>

@@ -226,6 +226,7 @@ public:
     void setAuth(const AuthInfo& auth);
     void setProxyVia(const SocketAddress& proxyEndpoint);
     void setConnectionHeader(const StringType& value);
+    void setMaxNumberOfRedirects(int maxNumberOfRedirects);
 
     /** If set to \a true client will not try to add Authorization header to the first request.
      * false by default.
@@ -358,6 +359,7 @@ private:
     int m_numberOfRedirectsTried;
 
     bool m_expectOnlyBody;
+    int m_maxNumberOfRedirects = 5;
 
     AsyncHttpClient();
 

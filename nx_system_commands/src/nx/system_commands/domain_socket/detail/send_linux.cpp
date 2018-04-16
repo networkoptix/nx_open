@@ -22,8 +22,7 @@ struct DataContext
 static int createConnectedSocket(const char* path)
 {
     struct sockaddr_un addr;
-    int fd, tries = 0;
-    static const int maxTries = 5;
+    int fd;
 
     if ((fd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1)
     {
@@ -36,16 +35,7 @@ static int createConnectedSocket(const char* path)
     strncpy(addr.sun_path, path, sizeof(addr.sun_path)-1);
 
     while (connect(fd, (struct sockaddr*)&addr, sizeof(addr)) == -1)
-    {
-        if (tries > maxTries)
-        {
-            perror("connect error");
-            return -1;
-        }
-
         usleep(10 * 1000); /*< 10ms */
-        tries++;
-    }
 
     return fd;
 }

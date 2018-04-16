@@ -26,32 +26,64 @@ RootTool::RootTool(const QString& toolPath):
 
 Qn::StorageInitResult RootTool::mount(const QUrl& url, const QString& path)
 {
+#if defined(Q_OS_LINUX)
     makeDirectory(path);
+    auto mountResultToStorageInitResult =
+        [&](SystemCommands::MountCode mountResult)
+        {
+            switch (mountResult)
+            {
+                case SystemCommands::MountCode::ok:
+                    return Qn::StorageInitResult::StorageInit_Ok;
+                    break;
+                case SystemCommands::MountCode::otherError:
+                    return Qn::StorageInitResult::StorageInit_WrongPath;
+                    break;
+                case SystemCommands::MountCode::wrongCredentials:
+                    return Qn::StorageInitResult::StorageInit_WrongAuth;
+                    break;
+            }
+            return Qn::StorageInitResult::StorageInit_WrongPath;
+        };
+
+    auto logMountResult =
+        [&](SystemCommands::MountCode mountResult, bool viaSocket)
+        {
+            QString viaString = viaSocket ? "via call to the root tool" : "via direct command";
+            switch (mountResult)
+            {
+            case SystemCommands::MountCode::ok:
+                NX_VERBOSE(
+                    this, lm("[mount] Successfully mounted %1 to %2 %3").args(url, path, viaString));
+                break;
+            case SystemCommands::MountCode::otherError:
+                NX_WARNING(
+                    this, lm("[mount] Failed to mount %1 to %2 %3").args(url, path, viaString));
+                break;
+            case SystemCommands::MountCode::wrongCredentials:
+                NX_WARNING(
+                    this,
+                    lm("[mount] Failed to mount %1 to %2 %3 due to WRONG credentials")
+                        .args(url, path, viaString));
+                break;
+            }
+        };
+
+    using namespace boost;
 
     auto uncString = "//" + url.host() + url.path();
     if (m_toolPath.isEmpty())
     {
-        SystemCommands commands;
-        if (!commands.mount(
-                uncString.toStdString(),
-                path.toStdString(),
-                url.userName().isEmpty() ? boost::none : boost::make_optional(url.userName().toStdString()),
-                url.password().isEmpty() ? boost::none : boost::make_optional(url.password().toStdString())))
-        {
-            NX_WARNING(this, lm("[mount] Mount via SystemCommands failed. url: %1, path: %2")
-                .args(url.toString(), path));
+        auto userName = url.userName().toStdString();
+        auto password = url.password().toStdString();
+        auto mountResult = SystemCommands().mount(
+            uncString.toStdString(), path.toStdString(),
+            userName.empty() ? none : boost::optional<std::string>(userName),
+            password.empty() ? none : boost::optional<std::string>(password),
+            false);
 
-            auto output = commands.lastError();
-            if (output.find("13") != std::string::npos)
-                return Qn::StorageInit_WrongAuth;
-
-            return Qn::StorageInit_WrongPath;
-        }
-
-        NX_VERBOSE(this, lm("[mount] Mount via SystemCommands successful. url: %1, path: %2")
-            .args(url.toString(), path));
-
-        return Qn::StorageInit_Ok;
+        logMountResult(mountResult, false);
+        return mountResultToStorageInitResult(mountResult);
     }
 
     std::vector<QString> args = {"mount", uncString, path};
@@ -62,21 +94,18 @@ Qn::StorageInitResult RootTool::mount(const QUrl& url, const QString& path)
     if (!url.password().isEmpty())
         args.push_back(url.password());
 
-    int retCode = execute(args);
-    if (retCode != 0)
-    {
-        NX_WARNING(this, lm("[mount] Mount via root_tool application failed. url: %1, path: %2, retCode: %3")
-            .args(url.toString(), path, retCode));
 
-        if (retCode == 13)
-            return Qn::StorageInit_WrongAuth;
-        return Qn::StorageInit_WrongPath;
-    }
+    QnMutexLocker lock(&m_mutex);
+    utils::concurrent::run([&]() { execute(args); });
 
-    NX_VERBOSE(this, lm("[mount] Mount via root_tool application successful. url: %1, path: %2")
-        .args(url.toString(), path));
+    int64_t result = (int64_t) SystemCommands::MountCode::otherError;
+    system_commands::domain_socket::readInt64(&result);
+    logMountResult((SystemCommands::MountCode) result, true);
 
-    return Qn::StorageInit_Ok;
+    return mountResultToStorageInitResult((SystemCommands::MountCode) result);
+#else
+    return Qn::StorageInitResult::StorageInit_WrongPath;
+#endif
 }
 
 Qn::StorageInitResult RootTool::remount(const QUrl& url, const QString& path)
@@ -90,7 +119,7 @@ Qn::StorageInitResult RootTool::remount(const QUrl& url, const QString& path)
     auto mountResult = mount(url, path);
     NX_VERBOSE(
         this,
-        lm("[initOrUpdate, mount] root_tool mount %1 to %2 result %3").args(url, path, result));
+        lm("[initOrUpdate, mount] root_tool mount %1 to %2 result %3").args(url, path, mountResult));
 
     return mountResult;
 }
@@ -99,18 +128,17 @@ SystemCommands::UnmountCode RootTool::unmount(const QString& path)
 {
 #if defined (Q_OS_LINUX)
     return commandHelper(
-        SystemCommands::noPermissions, path, "unmount",
+        SystemCommands::UnmountCode::noPermissions, path, "unmount",
         [path]() { return SystemCommands().unmount(path.toStdString(), /*reportViaSocket*/ false); },
         []()
         {
             int64_t result;
             return system_commands::domain_socket::readInt64(&result)
-                ? (SystemCommands::UnmountCode) result : SystemCommands::noPermissions;
+                ? (SystemCommands::UnmountCode) result : SystemCommands::UnmountCode::noPermissions;
         });
 #else
-    return SystemCommands::noPermissions;
+    return SystemCommands::UnmountCode::noPermissions;
 #endif
-
 }
 
 bool RootTool::changeOwner(const QString& path)

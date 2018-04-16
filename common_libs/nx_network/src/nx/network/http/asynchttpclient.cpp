@@ -42,8 +42,6 @@ constexpr const std::chrono::seconds AsyncHttpClient::Timeouts::kDefaultSendTime
 constexpr const std::chrono::seconds AsyncHttpClient::Timeouts::kDefaultResponseReadTimeout;
 constexpr const std::chrono::seconds AsyncHttpClient::Timeouts::kDefaultMessageBodyReadTimeout;
 
-constexpr int kMaxNumberOfRedirects = 5;
-
 AsyncHttpClient::Timeouts::Timeouts(
     std::chrono::milliseconds send,
     std::chrono::milliseconds recv,
@@ -484,6 +482,11 @@ void AsyncHttpClient::setProxyVia(const SocketAddress& proxyEndpoint)
         NX_ASSERT(proxyEndpoint.port > 0);
         m_proxyEndpoint = proxyEndpoint;
     }
+}
+
+void AsyncHttpClient::setMaxNumberOfRedirects(int maxNumberOfRedirects)
+{
+    m_maxNumberOfRedirects = maxNumberOfRedirects;
 }
 
 void AsyncHttpClient::setDisablePrecalculatedAuthorization(bool val)
@@ -1056,7 +1059,7 @@ bool AsyncHttpClient::repeatRequestIfNeeded(const Response& response)
 
 bool AsyncHttpClient::sendRequestToNewLocation(const Response& response)
 {
-    if (m_numberOfRedirectsTried >= kMaxNumberOfRedirects)
+    if (m_numberOfRedirectsTried >= m_maxNumberOfRedirects)
         return false;
     ++m_numberOfRedirectsTried;
 

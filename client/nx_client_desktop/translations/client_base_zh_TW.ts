@@ -2811,12 +2811,21 @@ to %1</source>
   <context>
     <name>QnCloudResultMessages</name>
     <message>
-      <source>Incorrect email or password</source>
-      <translation>不正確的電子郵件或密碼</translation>
+      <source>Account not found</source>
+      <translation type="unfinished">Account not found</translation>
     </message>
     <message>
-      <source>Account is not activated. Please check your email and follow provided instructions</source>
-      <translation>帳號未啟動. 請檢查您的電子郵件並按照提供的說明操作</translation>
+      <source>Account is not activated.</source>
+      <translation type="unfinished">Account is not activated.</translation>
+    </message>
+    <message>
+      <source>Please log in to %1 and follow the provided instructions.</source>
+      <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
+      <translation type="unfinished">Please log in to %1 and follow the provided instructions.</translation>
+    </message>
+    <message>
+      <source>Invalid password</source>
+      <translation type="unfinished">Invalid password</translation>
     </message>
   </context>
   <context>
@@ -3152,6 +3161,10 @@ to %1</source>
     <message>
       <source>You can create a backup for System configurations that can be restored in case of failure.</source>
       <translation>您可將系統的設定建立成備份檔, 可在系統故障後還原.</translation>
+    </message>
+    <message>
+      <source>Database Backup Files</source>
+      <translation type="unfinished">Database Backup Files</translation>
     </message>
   </context>
   <context>
@@ -4158,10 +4171,6 @@ to %1</source>
       <translation>開啟授權檔案</translation>
     </message>
     <message>
-      <source>All files (*.*)</source>
-      <translation>全部檔案(*.*)</translation>
-    </message>
-    <message>
       <source>Failed to open file</source>
       <translation>開啟檔案失敗</translation>
     </message>
@@ -4172,6 +4181,10 @@ to %1</source>
     <message>
       <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
       <translation>請將授權及硬體 Id 提供到 %1 以取得離線授權檔.</translation>
+    </message>
+    <message>
+      <source>All files</source>
+      <translation type="unfinished">All files</translation>
     </message>
   </context>
   <context>
@@ -5566,10 +5579,6 @@ to %1</source>
       <translation>選擇更新檔案...</translation>
     </message>
     <message>
-      <source>Update Files (*.zip)</source>
-      <translation>更新檔 (*.zip)</translation>
-    </message>
-    <message>
       <source>Release notes</source>
       <translation>更新說明</translation>
     </message>
@@ -5751,6 +5760,10 @@ to %1</source>
       <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
       <translation>不相容 %1 案例. 先從 %1 更新斷線系統.</translation>
+    </message>
+    <message>
+      <source>Update Files</source>
+      <translation type="unfinished">Update Files</translation>
     </message>
   </context>
   <context>

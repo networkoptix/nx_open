@@ -10,7 +10,7 @@ class SystemCommands
 public:
     static const char* const kDomainSocket;
 
-    enum UnmountCode
+    enum class UnmountCode
     {
         ok,
         busy,
@@ -18,11 +18,20 @@ public:
         noPermissions
     };
 
+    enum class MountCode
+    {
+        ok,
+        wrongCredentials,
+        otherError
+    };
+
     /** Mounts NAS from url to directory for real UID and GID. */
-    bool mount(
-        const std::string& url, const std::string& directory,
+    MountCode mount(
+        const std::string& url,
+        const std::string& directory,
         const boost::optional<std::string>& username,
-        const boost::optional<std::string>& password);
+        const boost::optional<std::string>& password,
+        bool reportViaSocket);
 
     /** Unounts NAS from directory. */
     UnmountCode unmount(const std::string& directory, bool reportViaSocket);
@@ -78,10 +87,22 @@ public:
     {
         switch (code)
         {
-            case ok: return "ok";
-            case busy: return "resource is busy";
-            case notExists: return "path not exists";
-            case noPermissions: return "no permissions";
+            case UnmountCode::ok: return "ok";
+            case UnmountCode::busy: return "resource is busy";
+            case UnmountCode::notExists: return "path not exists";
+            case UnmountCode::noPermissions: return "no permissions";
+        }
+
+        return "";
+    }
+
+    static const char* mountCodeToString(MountCode code)
+    {
+        switch (code)
+        {
+            case MountCode::ok: return "ok";
+            case MountCode::wrongCredentials: return "wrong credentials";
+            case MountCode::otherError: return "error";
         }
 
         return "";
