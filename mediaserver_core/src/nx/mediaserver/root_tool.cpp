@@ -128,7 +128,6 @@ Qn::StorageInitResult RootTool::mount(const QUrl& url, const QString& path)
 }
 
 #if defined (Q_OS_LINUX)
-
 template<typename Action>
 void RootTool::execAndReadResult(const std::vector<QString>& args, Action action)
 {
@@ -139,16 +138,22 @@ void RootTool::execAndReadResult(const std::vector<QString>& args, Action action
     action();
     waitForProc(childPid);
 }
+#endif
 
 bool RootTool::execAndWait(const std::vector<QString>& args)
 {
+#if defined (Q_OS_LINUX)
     int childPid = forkRoolTool(args);
     if (childPid < 0)
         return false;
 
     return waitForProc(childPid);
+#else
+    return false;
+#endif
 }
 
+#if defined (Q_OS_LINUX)
 bool RootTool::waitForProc(int childPid)
 {
     int result, status;
@@ -202,7 +207,6 @@ bool RootTool::waitForProc(int childPid)
 
     return false;
 }
-
 #endif
 
 Qn::StorageInitResult RootTool::remount(const QUrl& url, const QString& path)
