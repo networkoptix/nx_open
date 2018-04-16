@@ -41,12 +41,12 @@ RemoteConnectionFactory::RemoteConnectionFactory(
         m_jsonTranSerializer.get(),
         m_ubjsonTranSerializer.get()));
 
-	// todo: introduce server and client TimeSynchronizationManager
 	m_timeSynchronizationManager.reset(new TimeSynchronizationManager(
         commonModule,
 		peerType,
 		timerManager,
 		&m_settingsInstance));
+    m_bus->setTimeSyncManager(m_timeSynchronizationManager.get());
 }
 
 void RemoteConnectionFactory::shutdown()
