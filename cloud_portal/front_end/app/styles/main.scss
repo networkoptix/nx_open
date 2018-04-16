@@ -174,19 +174,23 @@ footer {
 	padding-right: 0;
 	padding-left: 0;
 
-    span{
-        display: inline-block;
-        width: 8px;
-        height: 8px;
-        margin: auto 3px;
-        background: $brand_contrast;
-        border-radius: 8px;
-        animation: bubblingG 650ms infinite alternate;
-            -o-animation: bubblingG 650ms infinite alternate;
-            -ms-animation: bubblingG 650ms infinite alternate;
-            -webkit-animation: bubblingG 650ms infinite alternate;
-            -moz-animation: bubblingG 650ms infinite alternate;
-    }
+      div {
+          margin: 0 auto;
+
+          span {
+              display: inline-block;
+              width: 8px;
+              height: 8px;
+              margin: auto 3px;
+              background: $brand_contrast;
+              border-radius: 8px;
+              animation: bubblingG 650ms infinite alternate;
+              -o-animation: bubblingG 650ms infinite alternate;
+              -ms-animation: bubblingG 650ms infinite alternate;
+              -webkit-animation: bubblingG 650ms infinite alternate;
+              -moz-animation: bubblingG 650ms infinite alternate;
+          }
+      }
 
     &.btn-default span{
         background: $light16;
