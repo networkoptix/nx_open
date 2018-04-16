@@ -39,7 +39,7 @@ static const int TCP_CONNECT_TIMEOUT_MS = 1000 * 5;
 static const int SDP_TRACK_STEP = 2;
 static const int METADATA_TRACK_NUM = 7;
 static const double kMaxRtcpJitterSeconds = 0.15; //< 150 ms
-static const double TIME_RESYNC_THRESHOLD_S = 10.0;
+static const int TIME_RESYNC_THRESHOLD_S = 10;
 static const double IGNORE_CAMERA_TIME_THRESHOLD_S = 7.0;
 static const double LOCAL_TIME_RESYNC_THRESHOLD_MS = 500;
 static const int DRIFT_STATS_WINDOW_SIZE = 1000;
@@ -226,7 +226,6 @@ QMap<QString, QPair<QSharedPointer<QnRtspTimeHelper::CamSyncInfo>, int>>
 
 QnRtspTimeHelper::QnRtspTimeHelper(const QString& resourceId):
     m_localStartTime(0),
-    m_rtcpReportTimeDiff(INT_MAX),
     m_resourceId(resourceId)
 {
     {
@@ -301,18 +300,36 @@ bool QnRtspTimeHelper::isLocalTimeChanged()
 }
 
 
-bool QnRtspTimeHelper::isCameraTimeChanged(const QnRtspStatistic& statistics)
+bool QnRtspTimeHelper::isCameraTimeChanged(const QnRtspStatistic& statistics, double* outCameraTimeDriftSeconds)
 {
     if (statistics.isEmpty())
         return false; //< No camera time provided yet.
 
     double diff = statistics.localTime - statistics.ntpTime;
-    if (m_rtcpReportTimeDiff == INT_MAX)
+    if (!m_rtcpReportTimeDiff.is_initialized())
         m_rtcpReportTimeDiff = diff;
-    bool rez = qAbs(diff - m_rtcpReportTimeDiff) > kMaxRtcpJitterSeconds;
-    if (rez)
-        m_rtcpReportTimeDiff = INT_MAX;
-    return rez;
+    
+    *outCameraTimeDriftSeconds = qAbs(diff - *m_rtcpReportTimeDiff);
+    bool result = false;
+    if (*outCameraTimeDriftSeconds > TIME_RESYNC_THRESHOLD_S)
+    {
+        result = true; //< Quite big delta. Report time change immidiatly.
+    }
+    else if (*outCameraTimeDriftSeconds > kMaxRtcpJitterSeconds)
+    {
+        if (!m_rtcpJitterTimer.isValid())
+            m_rtcpJitterTimer.restart();  //< Low delta. Start monitoring for a camera time drift.
+        else if (m_rtcpJitterTimer.hasExpired(std::chrono::seconds(TIME_RESYNC_THRESHOLD_S)))
+            result = true;
+    }
+    else
+    {
+        m_rtcpJitterTimer.invalidate(); //< Jitter back to normal.
+    }
+
+    if (result)
+        m_rtcpReportTimeDiff.reset();
+    return result;
 }
 
 #if defined(DEBUG_TIMINGS)
@@ -402,7 +419,8 @@ qint64 QnRtspTimeHelper::getUsecTime(
     const double resultSeconds = cameraTimeToLocalTime(cameraSeconds, currentSeconds);
     const double jitterSeconds = qAbs(resultSeconds - currentSeconds);
     const bool gotInvalidTime = jitterSeconds > TIME_RESYNC_THRESHOLD_S;
-    const bool cameraTimeChanged = isCameraTimeChanged(statistics);
+    double cameraTimeDriftSeconds = 0;
+    const bool cameraTimeChanged = isCameraTimeChanged(statistics, &cameraTimeDriftSeconds);
     const bool localTimeChanged = isLocalTimeChanged();
 
     VERBOSE(lm("BEGIN: "
@@ -439,9 +457,9 @@ qint64 QnRtspTimeHelper::getUsecTime(
             if (cameraTimeChanged)
             {
                 NX_DEBUG(this, lm(
-                    "Camera time has been changed or receiving latency > %1 seconds. "
-                    "Resync time for camera %2")
-                    .args(kMaxRtcpJitterSeconds, m_resourceId));
+                    "Camera time has been changed or receiving latency %1 > %2 seconds. "
+                    "Resync time for camera %3")
+                    .args(cameraTimeDriftSeconds, kMaxRtcpJitterSeconds, m_resourceId));
             }
             else if (localTimeChanged)
             {
