@@ -3,11 +3,6 @@ set -e
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR
 
-echo "pip install requirements"
-virtualenv ../env
-. ../env/bin/activate
-pip install -r requirements.txt
-
 
 echo "npm install"
 pushd ../front_end
