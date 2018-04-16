@@ -32,14 +32,17 @@ const angular = require("angular");
                 },
                 common: {}
             };
+            // config phaze accessible functions **************
             this.setLanguage = function (language) {
                 lang = language;
             };
             this.setCommonLanguage = function (language) {
                 lang.common = language;
             };
+            // ************************************************
             this.$get = function () {
                 return {
+                    // runtime accessible
                     lang: lang
                 };
             };

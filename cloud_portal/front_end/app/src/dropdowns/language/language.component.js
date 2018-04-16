@@ -26,7 +26,14 @@ let NxLanguageDropdown = class NxLanguageDropdown {
         this.languages = [];
     }
     changeLanguage(lang) {
-        this.activeLanguage = lang;
+        if (this.activeLanguage === lang) {
+            return;
+        }
+        this.cloudApi
+            .changeLanguage(lang)
+            .then(function () {
+            window.location.reload();
+        });
     }
     ngOnInit() {
         this.accountMode = this.accountMode || false;

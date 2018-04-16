@@ -1,5 +1,5 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { NgbDropdownModule }                            from '@ng-bootstrap/ng-bootstrap';
+import { NgbDropdownModule }         from '@ng-bootstrap/ng-bootstrap';
 
 export interface activeLanguage {
     language: string;
@@ -27,7 +27,15 @@ export class NxLanguageDropdown implements OnInit {
     }
 
     changeLanguage(lang: activeLanguage) {
-        this.activeLanguage = lang;
+        if (this.activeLanguage === lang) {
+            return;
+        }
+
+        this.cloudApi
+            .changeLanguage(lang)
+            .then(function () {
+                window.location.reload();
+            });
     }
 
     ngOnInit(): void {
