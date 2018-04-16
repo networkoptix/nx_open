@@ -308,7 +308,7 @@ class VagrantBox(object):
         try:
             old_setting_line_index = settings.index(old_setting)
         except ValueError:
-            assert False, "Wanted to replace %s with %s but couldn't fine latter" % (old_setting, new_setting)
+            assert new_settings in settings, "Wanted to replace %r with %r but couldn't find it" % (old_setting, new_setting)
         settings[old_setting_line_index] = new_setting
         root_ssh_host.write_file(sshd_config_path, '\n'.join(settings))
         root_ssh_host.run_command(['service', 'ssh', 'reload'])
