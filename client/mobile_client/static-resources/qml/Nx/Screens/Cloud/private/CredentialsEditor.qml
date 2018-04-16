@@ -22,7 +22,9 @@ Item
     {
         id: d
 
-        property bool invalidCredentials: false
+        property bool invalidUser: false
+        property bool invalidPassword: false
+        property bool notActivated: false
         property bool connecting: false
         property bool reactivationRequested: false
         property string initialLogin
@@ -51,7 +53,7 @@ Item
                 id: emailField
                 placeholderText: qsTr("Email")
                 width: parent.availableWidth
-                showError: d.invalidCredentials || notActivatedWarningPanel.opened
+                showError: d.invalidUser || d.notActivated
                 activeFocusOnTab: true
                 inputMethodHints:
                     Qt.ImhSensitiveData
@@ -62,26 +64,22 @@ Item
                 onAccepted: nextItemInFocusChain(true).forceActiveFocus()
                 onActiveFocusChanged:
                 {
-                    if (activeFocus && d.invalidCredentials)
-                    {
-                        d.invalidCredentials = false
-                        hideWarning()
-                    }
+                    if (activeFocus && (d.invalidUser || d.notActivated))
+                        hideWarnings()
                 }
             }
 
             FieldWarning
             {
-                id: notActivatedWarningPanel
+                id: accountWarningPanel
 
                 width: parent.availableWidth
-                text: qsTr("Account not activated")
             }
 
             LinkButton
             {
                 width: parent.width
-                visible: notActivatedWarningPanel.opened && d.lastNotActivatedAccount.length > 0
+                visible: d.notActivated && d.lastNotActivatedAccount.length > 0
                 enabled: !d.connecting && !d.reactivationRequested
                 opacity: enabled ? 1.0 : 0.3
 
@@ -101,24 +99,21 @@ Item
                 passwordMaskDelay: 1500
                 placeholderText: qsTr("Password")
                 width: parent.availableWidth
-                showError: d.invalidCredentials
+                showError: d.invalidPassword
                 activeFocusOnTab: true
                 inputMethodHints: Qt.ImhSensitiveData | Qt.ImhPreferLatin
 
                 onAccepted: login()
                 onActiveFocusChanged:
                 {
-                    if (activeFocus && d.invalidCredentials)
-                    {
-                        d.invalidCredentials = false
-                        hideWarning()
-                    }
+                    if (activeFocus && d.invalidPassword)
+                        hideWarnings()
                 }
             }
 
             FieldWarning
             {
-                id: warningPanel
+                id: bottomWarningPanel
                 width: parent.availableWidth
             }
         }
@@ -202,61 +197,79 @@ Item
             return
 
         d.connecting = false
-        if (error == QnCloudStatusWatcher.InvalidCredentials)
+        if (error == QnCloudStatusWatcher.InvalidUser)
         {
-            d.invalidCredentials = true
-            showWarning(qsTr("Incorrect email or password"))
+            d.invalidUser = true
+            showAccountWarning(qsTr("Account not found"))
+            passwordField.text = ""
         }
-        else if (error = QnCloudStatusWatcher.AccountNotActivated)
+        else if (error == QnCloudStatusWatcher.InvalidPassword)
         {
+            d.invalidPassword = true
+            showBottomWarning(qsTr("Wrong password"))
+            passwordField.text = ""
+        }
+        else if (error == QnCloudStatusWatcher.AccountNotActivated)
+        {
+            d.notActivated = true
             d.lastNotActivatedAccount = emailField.text
-            showNotActivatedAccoundWarning()
+            showAccountWarning(qsTr("Account not activated"))
+            passwordField.text = ""
         }
         else
         {
-            showWarning(qsTr("Cannot connect to %1").arg(applicationInfo.cloudName()))
+            showBottomWarning(qsTr("Cannot connect to %1").arg(applicationInfo.cloudName()))
         }
-        setCloudCredentials(d.initialLogin, "")
-
     }
 
     function login()
     {
+        hideWarnings()
         loginButton.forceActiveFocus()
 
-        if (!emailField.text || !passwordField.text)
+        if (!emailField.text.trim())
         {
-            d.invalidCredentials = true
-            showWarning(qsTr("Email and password cannot be empty"))
+            d.invalidUser = true
+            showAccountWarning(qsTr("Email cannot be empty"))
             return
         }
 
-        hideWarning()
-        d.invalidCredentials = false
+        if (!passwordField.text.trim())
+        {
+            d.invalidPassword = true
+            showBottomWarning(qsTr("Password cannot be empty"))
+            return
+        }
+
         d.connecting = true
         d.reactivationRequested = false
         if (!setCloudCredentials(email, password))
-            handleConnectStatusChanged();
-
+            handleConnectStatusChanged()
     }
 
-    function showNotActivatedAccoundWarning()
+    function showAccountWarning(text)
     {
-        warningPanel.opened = false
-        notActivatedWarningPanel.opened = true
+        bottomWarningPanel.opened = false
+
+        accountWarningPanel.text = text
+        accountWarningPanel.opened = true
     }
 
-    function showWarning(text)
+    function showBottomWarning(text)
     {
-        notActivatedWarningPanel.opened = false
-        warningPanel.text = text
-        warningPanel.opened = true
+        accountWarningPanel.opened = false
+
+        bottomWarningPanel.text = text
+        bottomWarningPanel.opened = true
     }
 
-    function hideWarning()
+    function hideWarnings()
     {
-        warningPanel.opened = false
-        notActivatedWarningPanel.opened = false
+        bottomWarningPanel.opened = false
+        accountWarningPanel.opened = false
+        d.invalidUser = false
+        d.invalidPassword = false
+        d.notActivated = false
     }
 
     function focusCredentialFields()

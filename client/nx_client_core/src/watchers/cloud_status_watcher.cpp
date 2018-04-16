@@ -373,9 +373,13 @@ void QnCloudStatusWatcher::updateSystems()
                             d->setStatus(QnCloudStatusWatcher::Online,
                                 QnCloudStatusWatcher::NoError);
                             break;
+                        case api::ResultCode::badUsername:
+                            d->setStatus(QnCloudStatusWatcher::LoggedOut,
+                                QnCloudStatusWatcher::InvalidUser);
+                            break;
                         case api::ResultCode::notAuthorized:
                             d->setStatus(QnCloudStatusWatcher::LoggedOut,
-                                QnCloudStatusWatcher::InvalidCredentials);
+                                QnCloudStatusWatcher::InvalidPassword);
                             break;
                         case api::ResultCode::accountNotActivated:
                             d->setStatus(QnCloudStatusWatcher::LoggedOut,
@@ -486,7 +490,7 @@ void QnCloudStatusWatcherPrivate::updateConnection(bool initial)
     {
         const auto error = (initial || credentials.isEmpty())
             ? QnCloudStatusWatcher::NoError
-            : QnCloudStatusWatcher::InvalidCredentials;
+            : QnCloudStatusWatcher::InvalidUser;
         setStatus(QnCloudStatusWatcher::LoggedOut, error);
         setCloudSystems(QnCloudSystemList());
         q->setEffectiveUserName(QString());

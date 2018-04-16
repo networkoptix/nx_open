@@ -233,7 +233,8 @@ void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_error()
         case QnCloudStatusWatcher::NoError:
             break;
 
-        case QnCloudStatusWatcher::InvalidCredentials:
+        case QnCloudStatusWatcher::InvalidUser:
+        case QnCloudStatusWatcher::InvalidPassword:
             showCredentialsError(QnCloudResultMessages::invalidCredentials());
             break;
 
