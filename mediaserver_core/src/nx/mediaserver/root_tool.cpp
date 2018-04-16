@@ -528,20 +528,25 @@ int RootTool::forkRoolTool(const std::vector<QString>& args)
         execArgs.push_back(stringArg.c_str());
 
     execArgs.push_back(nullptr);
+    char** pdata = (char**) execArgs.data();
+    char* exePath = (char*) malloc(m_toolPath.toStdString().size() + 1);
+    memcpy(exePath, m_toolPath.toStdString().c_str(), m_toolPath.size() + 1);
 
-    int childPid = fork();
+    int childPid = ::fork();
     if (childPid < 0)
     {
         NX_WARNING(this, lm("Failed to fork with command %1").args(commandLine));
+        free(exePath);
         return -1;
     }
     else if (childPid == 0)
     {
-        char** pdata = (char**) execArgs.data();
-        execvp(m_toolPath.toStdString().c_str(), pdata);
-        NX_ASSERT(false); /* If fork successful shouldn't get here. */
+
+        execvp(exePath, pdata);
+        NX_CRITICAL(false); /* If fork successful shouldn't get here. */
         return -1;
     }
+    free(exePath);
 
     NX_VERBOSE(this, lm("Starting child %1 with command line %2").args(childPid, makeArgsLine(args)));
 
