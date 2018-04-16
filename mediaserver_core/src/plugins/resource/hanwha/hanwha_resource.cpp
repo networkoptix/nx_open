@@ -1039,12 +1039,15 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
         if (!result)
             return result;
 
-        result = setUpProfilePolicies(
-            profileByRole(Qn::ConnectionRole::CR_LiveVideo),
-            profileByRole(Qn::ConnectionRole::CR_SecondaryLiveVideo));
+        if (isNvr())
+        {
+            result = setUpProfilePolicies(
+                profileByRole(Qn::ConnectionRole::CR_LiveVideo),
+                profileByRole(Qn::ConnectionRole::CR_SecondaryLiveVideo));
 
-        if (!result)
-            return result;
+            if (!result)
+                return result;
+        }
     }
     else
     {
