@@ -190,6 +190,14 @@ copyBuildLibs()
         )
     fi
 
+    # OpenSSL (for latest debians).
+    if [ "$BOX" = "rpi" ] || [ "$BOX" = "bpi" ] || [ "$BOX" = "bananapi" ]; then
+        LIBS_TO_COPY+=(
+            libssl
+            libcrypto
+        )
+    fi
+
     local LIB
     for LIB in "${LIBS_TO_COPY[@]}"; do
         local FILE
