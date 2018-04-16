@@ -1,6 +1,8 @@
 #pragma once
 
 #include <QtCore/QSize>
+#include <QtCore/QPoint>
+#include <QtCore/QString>
 #include <QtCore/QScopedPointer>
 
 #include <core/ptz/media_dewarping_params.h>
