@@ -37,18 +37,11 @@ protected:
 
     friend class HanwhaArchiveDelegate;
 private:
-    HanwhaProfileParameters makeProfileParameters(
-        int profileNumber,
-        const QnLiveStreamParams& parameters,
-        bool isAudioSupported) const;
-
-    CameraDiagnostics::Result updateProfile(
-        int profileNumber,
-        const QnLiveStreamParams& parameters);
+    CameraDiagnostics::Result updateProfile(const QnLiveStreamParams& parameters);
 
     bool isCorrectProfile(int profileNumber) const;
 
-    CameraDiagnostics::Result streamUri(int profileNumber, QString* outUrl);
+    CameraDiagnostics::Result streamUri(QString* outUrl);
 
     QString rtpTransport() const;
     QnRtspClient& rtspClient();

@@ -110,6 +110,11 @@ public:
 
     bool isConnectedViaSunapi() const;
 
+    HanwhaProfileParameters makeProfileParameters(
+        Qn::ConnectionRole role,
+        const QnLiveStreamParams& parameters,
+        bool isAudioSupported) const;
+
 protected:
     virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
         Qn::StreamIndex streamIndex) override;
@@ -149,6 +154,8 @@ private:
         int secondaryProfile);
 
     CameraDiagnostics::Result fetchPtzLimits(QnPtzLimits* outPtzLimits);
+
+    CameraDiagnostics::Result updateNvrChannelProfiles();
 
     void cleanUpOnProxiedDeviceChange();
 

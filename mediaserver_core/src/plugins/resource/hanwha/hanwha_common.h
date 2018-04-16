@@ -203,6 +203,8 @@ static const QString kHanwhaAutoFocusTrait("AutoFocusTrait");
 static const QString kHanwhaAlternativeZoomTrait("AlternativeZoomTrait");
 static const QString kHanwhaAlternativeFocusTrait("AlternativeFocusTrait");
 
+static const int kMaxPossibleFps = 1000;
+
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
