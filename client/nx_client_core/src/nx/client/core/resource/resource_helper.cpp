@@ -3,18 +3,22 @@
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
 
-QnResourceHelper::QnResourceHelper(QObject* parent):
+namespace nx {
+namespace client {
+namespace core {
+
+ResourceHelper::ResourceHelper(QObject* parent):
     base_type(parent),
     QnConnectionContextAware()
 {
 }
 
-QString QnResourceHelper::resourceId() const
+QString ResourceHelper::resourceId() const
 {
     return m_resource ? m_resource->getId().toString() : QString();
 }
 
-void QnResourceHelper::setResourceId(const QString& id)
+void ResourceHelper::setResourceId(const QString& id)
 {
     if (resourceId() == id)
         return;
@@ -27,27 +31,34 @@ void QnResourceHelper::setResourceId(const QString& id)
 
     m_resource = resource;
 
-    connect(m_resource, &QnResource::nameChanged,
-        this, &QnResourceHelper::resourceNameChanged);
-    connect(m_resource, &QnResource::statusChanged,
-        this, &QnResourceHelper::resourceStatusChanged);
+    if (m_resource)
+    {
+        connect(m_resource, &QnResource::nameChanged,
+            this, &ResourceHelper::resourceNameChanged);
+        connect(m_resource, &QnResource::statusChanged,
+            this, &ResourceHelper::resourceStatusChanged);
+    }
 
     emit resourceIdChanged();
     emit resourceNameChanged();
     emit resourceStatusChanged();
 }
 
-Qn::ResourceStatus QnResourceHelper::resourceStatus() const
+Qn::ResourceStatus ResourceHelper::resourceStatus() const
 {
     return m_resource ? m_resource->getStatus() : Qn::NotDefined;
 }
 
-QString QnResourceHelper::resourceName() const
+QString ResourceHelper::resourceName() const
 {
     return m_resource ? m_resource->getName() : QString();
 }
 
-QnResourcePtr QnResourceHelper::resource() const
+QnResourcePtr ResourceHelper::resource() const
 {
     return m_resource;
 }
+
+} // namespace core
+} // namespace client
+} // namespace nx

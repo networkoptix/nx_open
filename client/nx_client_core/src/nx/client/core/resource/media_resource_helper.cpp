@@ -6,97 +6,87 @@
 #include <nx/fusion/model_functions.h>
 #include <utils/common/connective.h>
 
+namespace nx {
+namespace client {
+namespace core {
+
 namespace {
 
 static constexpr bool kFisheyeDewarpingFeatureEnabled = true;
 
 } // namespace
 
-class QnMediaResourceHelperPrivate : public Connective<QObject>
+class MediaResourceHelper::Private: public Connective<QObject>
 {
-    QnMediaResourceHelper* q_ptr;
-    Q_DECLARE_PUBLIC(QnMediaResourceHelper)
+    MediaResourceHelper* const q = nullptr;
 
 public:
     QnVirtualCameraResourcePtr camera;
     QnMediaServerResourcePtr server;
 
-    QnMediaResourceHelperPrivate(QnMediaResourceHelper* parent);
+    Private(MediaResourceHelper* q);
 
     void handlePropertyChanged(const QnResourcePtr& resource, const QString& key);
     void updateServer();
     void handleResourceChanged();
 };
 
-
-QnMediaResourceHelper::QnMediaResourceHelper(QObject* parent):
+MediaResourceHelper::MediaResourceHelper(QObject* parent):
     base_type(parent),
-    d_ptr(new QnMediaResourceHelperPrivate(this))
+    d(new Private(this))
 {
-    Q_D(QnMediaResourceHelper);
-
-    connect(this, &QnResourceHelper::resourceIdChanged,
-        d, &QnMediaResourceHelperPrivate::handleResourceChanged);
+    connect(this, &ResourceHelper::resourceIdChanged, d, &Private::handleResourceChanged);
 }
 
-QnMediaResourceHelper::~QnMediaResourceHelper()
+MediaResourceHelper::~MediaResourceHelper()
 {
 }
 
-QString QnMediaResourceHelper::serverName() const
+QString MediaResourceHelper::serverName() const
 {
-    Q_D(const QnMediaResourceHelper);
     return d->server ? d->server->getName() : QString();
 }
 
-qreal QnMediaResourceHelper::customAspectRatio() const
+qreal MediaResourceHelper::customAspectRatio() const
 {
-    Q_D(const QnMediaResourceHelper);
     return d->camera ? d->camera->customAspectRatio().toFloat() : 0.0;
 }
 
-int QnMediaResourceHelper::customRotation() const
+int MediaResourceHelper::customRotation() const
 {
-    Q_D(const QnMediaResourceHelper);
     return d->camera ? d->camera->getProperty(QnMediaResource::rotationKey()).toInt() : 0;
 }
 
-int QnMediaResourceHelper::channelCount() const
+int MediaResourceHelper::channelCount() const
 {
-    Q_D(const QnMediaResourceHelper);
     return d->camera ? d->camera->getVideoLayout()->channelCount() : 0;
 }
 
-QSize QnMediaResourceHelper::layoutSize() const
+QSize MediaResourceHelper::layoutSize() const
 {
-    Q_D(const QnMediaResourceHelper);
     return d->camera ? d->camera->getVideoLayout()->size() : QSize(1, 1);
 }
 
-QPoint QnMediaResourceHelper::channelPosition(int channel) const
+QPoint MediaResourceHelper::channelPosition(int channel) const
 {
-    Q_D(const QnMediaResourceHelper);
     return d->camera ? d->camera->getVideoLayout()->position(channel) : QPoint();
 }
 
-QnMediaDewarpingParams QnMediaResourceHelper::fisheyeParams() const
+QnMediaDewarpingParams MediaResourceHelper::fisheyeParams() const
 {
-    Q_D(const QnMediaResourceHelper);
     return (d->camera && kFisheyeDewarpingFeatureEnabled)
         ? d->camera->getDewarpingParams()
         : QnMediaDewarpingParams();
 }
 
-QnMediaResourceHelperPrivate::QnMediaResourceHelperPrivate(QnMediaResourceHelper* parent):
-    q_ptr(parent)
+MediaResourceHelper::Private::Private(MediaResourceHelper* q):
+    q(q)
 {
 }
 
-void QnMediaResourceHelperPrivate::handlePropertyChanged(
+void MediaResourceHelper::Private::handlePropertyChanged(
     const QnResourcePtr& resource, const QString& key)
 {
-    Q_Q(QnMediaResourceHelper);
-
     if (camera != resource)
         return;
 
@@ -106,10 +96,8 @@ void QnMediaResourceHelperPrivate::handlePropertyChanged(
         emit q->customRotationChanged();
 }
 
-void QnMediaResourceHelperPrivate::updateServer()
+void MediaResourceHelper::Private::updateServer()
 {
-    Q_Q(QnMediaResourceHelper);
-
     if (server)
     {
         server->disconnect(this);
@@ -123,17 +111,15 @@ void QnMediaResourceHelperPrivate::updateServer()
         if (server)
         {
             connect(server.data(), &QnMediaServerResource::nameChanged,
-                q, &QnMediaResourceHelper::serverNameChanged);
+                q, &MediaResourceHelper::serverNameChanged);
         }
     }
 
     emit q->serverNameChanged();
 }
 
-void QnMediaResourceHelperPrivate::handleResourceChanged()
+void MediaResourceHelper::Private::handleResourceChanged()
 {
-    Q_Q(QnMediaResourceHelper);
-
     const auto currentResource = q->resource();
     const auto cameraResource = currentResource.dynamicCast<QnVirtualCameraResource>();
     if (currentResource && !cameraResource)
@@ -151,15 +137,13 @@ void QnMediaResourceHelperPrivate::handleResourceChanged()
 
     if (camera)
     {
-        connect(camera, &QnResource::propertyChanged,
-            this, &QnMediaResourceHelperPrivate::handlePropertyChanged);
-        connect(camera, &QnResource::parentIdChanged,
-            this, &QnMediaResourceHelperPrivate::updateServer);
+        connect(camera, &QnResource::propertyChanged, this, &Private::handlePropertyChanged);
+        connect(camera, &QnResource::parentIdChanged, this, &Private::updateServer);
 
         connect(camera, &QnResource::videoLayoutChanged,
-            q, &QnMediaResourceHelper::videoLayoutChanged);
+            q, &MediaResourceHelper::videoLayoutChanged);
         connect(camera, &QnResource::mediaDewarpingParamsChanged,
-            q, &QnMediaResourceHelper::fisheyeParamsChanged);
+            q, &MediaResourceHelper::fisheyeParamsChanged);
 
         updateServer();
     }
@@ -170,3 +154,7 @@ void QnMediaResourceHelperPrivate::handleResourceChanged()
     emit q->videoLayoutChanged();
     emit q->fisheyeParamsChanged();
 }
+
+} // namespace core
+} // namespace client
+} // namespace nx

@@ -1,10 +1,19 @@
 #pragma once
 
-#include <resources/resource_helper.h>
+#include <QtCore/QSize>
+#include <QtCore/QPoint>
+#include <QtCore/QString>
+#include <QtCore/QScopedPointer>
+
 #include <core/ptz/media_dewarping_params.h>
 
-class QnMediaResourceHelperPrivate;
-class QnMediaResourceHelper: public QnResourceHelper
+#include <nx/client/core/resource/resource_helper.h>
+
+namespace nx {
+namespace client {
+namespace core {
+
+class MediaResourceHelper: public ResourceHelper
 {
     Q_OBJECT
 
@@ -17,11 +26,11 @@ class QnMediaResourceHelper: public QnResourceHelper
 
     Q_ENUMS(Qn::ResourceStatus)
 
-    using base_type = QnResourceHelper;
+    using base_type = ResourceHelper;
 
 public:
-    explicit QnMediaResourceHelper(QObject* parent = nullptr);
-    virtual ~QnMediaResourceHelper();
+    explicit MediaResourceHelper(QObject* parent = nullptr);
+    virtual ~MediaResourceHelper();
 
     QString serverName() const;
     qreal customAspectRatio() const;
@@ -39,6 +48,10 @@ signals:
     void fisheyeParamsChanged();
 
 private:
-    QScopedPointer<QnMediaResourceHelperPrivate> d_ptr;
-    Q_DECLARE_PRIVATE(QnMediaResourceHelper)
+    class Private;
+    const QScopedPointer<Private> d;
 };
+
+} // namespace core
+} // namespace client
+} // namespace nx

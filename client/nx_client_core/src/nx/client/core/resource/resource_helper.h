@@ -1,10 +1,15 @@
 #pragma once
 
+#include <common/common_globals.h>
 #include <utils/common/connective.h>
 #include <core/resource/resource_fwd.h>
 #include <client_core/connection_context_aware.h>
 
-class QnResourceHelper: public Connective<QObject>, public QnConnectionContextAware
+namespace nx {
+namespace client {
+namespace core {
+
+class ResourceHelper: public Connective<QObject>, public QnConnectionContextAware
 {
     Q_OBJECT
 
@@ -17,7 +22,7 @@ class QnResourceHelper: public Connective<QObject>, public QnConnectionContextAw
     using base_type = Connective<QObject>;
 
 public:
-    QnResourceHelper(QObject* parent = nullptr);
+    ResourceHelper(QObject* parent = nullptr);
 
     QString resourceId() const;
     void setResourceId(const QString& id);
@@ -36,3 +41,7 @@ signals:
 private:
     QnResourcePtr m_resource;
 };
+
+} // namespace core
+} // namespace client
+} // namespace nx
