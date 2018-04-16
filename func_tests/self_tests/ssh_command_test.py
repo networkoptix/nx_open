@@ -1,3 +1,4 @@
+
 import pytest
 import getpass
 import logging
@@ -12,7 +13,7 @@ _logger = logging.getLogger(__name__)
 
 class TempFileFactory(object):
     def __init__(self, ssh_access):
-        self._ssh_access = ssh_access
+        self._ssh_access = ssh_access  # SSHAccess
         self._temp_dir = os.path.join(
             tempfile.gettempdir(), str(uuid.uuid4()))
         self._ssh_access.mk_dir(self._temp_dir)
@@ -27,27 +28,22 @@ class TempFileFactory(object):
 
 
 @pytest.fixture
-def localhost():
-    user_private_key = os.path.join(
-           os.environ['HOME'], '.ssh', 'id_rsa')
-    return SSHAccess(
-        'localhost', 22,
-        username=getpass.getuser(),
-        private_key_path=user_private_key)
-
-
-@pytest.fixture
-def localhost_files(localhost):
-    temp_file_catory = TempFileFactory(localhost)
+def linux_vm_files(linux_vm):
+    temp_file_catory = TempFileFactory(linux_vm.os_access)
     yield temp_file_catory
     temp_file_catory.release()
 
 
-def test_commands(localhost, localhost_files):
-    localhost.run_command(['/bin/echo', 'Hello'])
-    localhost.run_command(['/bin/echo', 'Hello, world!'])
-    path_1 = localhost_files.write_file('My test file 1', 'Test')
-    path_2 = localhost_files.write_file('My test file 2', 'Test')
-    assert localhost.file_exists(path_1)
-    assert localhost.file_exists(path_2)
-    localhost.run_command(['diff', '--recursive', '--report-identical-files', path_1, path_2])
+def test_echo(linux_vm):
+    assert linux_vm.os_access.run_command(['/bin/echo', '-n', 'Hello']) == 'Hello'
+    assert linux_vm.os_access.run_command(['/bin/echo', '-n', 'Hello, world!']) == 'Hello, world!'
+
+
+def test_diff_files(linux_vm, linux_vm_files):
+    '''There was a bug in the SSHAccess with quoting,
+    following diff command  illuminated it in tests.'''
+    path_1 = linux_vm_files.write_file('My test file 1', 'Test')
+    path_2 = linux_vm_files.write_file('My test file 2', 'Test')
+    assert linux_vm.os_access.file_exists(path_1)
+    assert linux_vm.os_access.file_exists(path_2)
+    linux_vm.os_access.run_command(['diff', '--recursive', '--report-identical-files', path_1, path_2])
