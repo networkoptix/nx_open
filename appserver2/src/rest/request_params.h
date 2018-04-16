@@ -12,8 +12,8 @@ bool parseHttpRequestParams(
     const QString& command, const QnRequestParamList& params, QString* value);
 
 bool parseHttpRequestParams(
-    const QString& command, const QnRequestParamList& params, ApiStoredFilePath* value);
-void toUrlParams(const ApiStoredFilePath& id, QUrlQuery* query);
+    const QString& command, const QnRequestParamList& params, nx::vms::api::StoredFilePath* value);
+void toUrlParams(const nx::vms::api::StoredFilePath& id, QUrlQuery* query);
 
 bool parseHttpRequestParams(
     const QString& command, const QnRequestParamList& params, QnUuid* id);

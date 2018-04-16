@@ -92,12 +92,12 @@ namespace ec2 {
             messageBus->setDatabase(m_dbManager.get());
             m_distributedMutexManager.reset(new QnDistributedMutexManager(messageBus));
         }
-        
+
 		m_serverQueryProcessor.reset(new ServerQueryProcessorAccess(m_dbManager.get(), m_bus.get()));
 
 		m_dbManager->setTransactionLog(m_transactionLog.get());
 		m_dbManager->setTimeSyncManager(m_timeSynchronizationManager.get());
-		
+
 		m_bus->setTimeSyncManager(m_timeSynchronizationManager.get());
 
 		// Cannot be done in TimeSynchronizationManager constructor to keep valid object destruction
@@ -196,6 +196,7 @@ namespace ec2 {
 	void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
 	{
 		using namespace std::placeholders;
+        using namespace nx::vms::api;
 
 		/**%apidoc GET /ec2/getResourceTypes
 		* Read all resource types. Resource type contains object type such as
@@ -1507,7 +1508,7 @@ namespace ec2 {
 		*    %// TODO: Describe params.
 		* %// AbstractStoredFileManager::listDirectory
 		*/
-		regGet<ApiStoredFilePath, ApiStoredDirContents>(p, ApiCommand::listDirectory);
+		regGet<StoredFilePath, StoredFilePathList>(p, ApiCommand::listDirectory);
 
 		/**%apidoc GET /ec2/getStoredFile
 		* Read file data from a virtual FS
@@ -1516,14 +1517,14 @@ namespace ec2 {
 		* %return Object in the requested format.
 		* %// AbstractStoredFileManager::getStoredFile
 		*/
-		regGet<ApiStoredFilePath, ApiStoredFileData>(p, ApiCommand::getStoredFile);
+		regGet<StoredFilePath,StoredFileData>(p, ApiCommand::getStoredFile);
 
 		// AbstractStoredFileManager::addStoredFile
-		regUpdate<ApiStoredFileData>(p, ApiCommand::addStoredFile);
+		regUpdate<StoredFileData>(p, ApiCommand::addStoredFile);
 		// AbstractStoredFileManager::updateStoredFile
-		regUpdate<ApiStoredFileData>(p, ApiCommand::updateStoredFile);
+		regUpdate<StoredFileData>(p, ApiCommand::updateStoredFile);
 		// AbstractStoredFileManager::deleteStoredFile
-		regUpdate<ApiStoredFilePath>(p, ApiCommand::removeStoredFile);
+		regUpdate<StoredFilePath>(p, ApiCommand::removeStoredFile);
 
 		// AbstractUpdatesManager::uploadUpdate
 		regUpdate<ApiUpdateUploadData>(p, ApiCommand::uploadUpdate);
@@ -1580,7 +1581,7 @@ namespace ec2 {
 		regGet<nullptr_t, ApiLicenseDataList>(p, ApiCommand::getLicenses);
 
 		regGet<nullptr_t, ApiDatabaseDumpData>(p, ApiCommand::dumpDatabase);
-		regGet<ApiStoredFilePath, ApiDatabaseDumpToFileData>(p, ApiCommand::dumpDatabaseToFile);
+		regGet<StoredFilePath, ApiDatabaseDumpToFileData>(p, ApiCommand::dumpDatabaseToFile);
 
 		// AbstractECConnectionFactory
 		regFunctorWithResponse<ApiLoginData, QnConnectionInfo>(p, ApiCommand::connect,

@@ -582,8 +582,14 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
             }
             if (m_resyncFlags.testFlag(ResyncFiles))
             {
-                if (!fillTransactionLogInternal<nullptr_t, ApiStoredFileData, ApiStoredFileDataList>(ApiCommand::addStoredFile))
+                if (!fillTransactionLogInternal<
+                        nullptr_t,
+                        nx::vms::api::StoredFileData,
+                        nx::vms::api::StoredFileDataList>(
+                            ApiCommand::addStoredFile))
+                {
                     return false;
+                }
             }
             if (m_resyncFlags.testFlag(ResyncCameraAttributes))
             {
@@ -863,8 +869,14 @@ bool QnDbManager::resyncTransactionLog()
     if (!fillTransactionLogInternal<nullptr_t, ApiLicenseData, ApiLicenseDataList>(ApiCommand::addLicense))
         return false;
 
-    if (!fillTransactionLogInternal<nullptr_t, ApiStoredFileData, ApiStoredFileDataList>(ApiCommand::addStoredFile))
+    if (!fillTransactionLogInternal<
+            nullptr_t,
+            nx::vms::api::StoredFileData,
+            nx::vms::api::StoredFileDataList>(
+                ApiCommand::addStoredFile))
+    {
         return false;
+    }
 
     if (!fillTransactionLogInternal<QnUuid, ApiResourceStatusData, ApiResourceStatusDataList>(ApiCommand::setResourceStatus))
         return false;
@@ -2759,19 +2771,21 @@ ErrorCode QnDbManager::removeLayout(const QnUuid& id)
         : ErrorCode::dbError;
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiStoredFileData>& tran) {
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<nx::vms::api::StoredFileData>& tran) {
     NX_ASSERT( tran.command == ApiCommand::addStoredFile || tran.command == ApiCommand::updateStoredFile );
     return insertOrReplaceStoredFile(tran.params.path, tran.params.data);
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiStoredFilePath>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(
+    const QnTransaction<nx::vms::api::StoredFilePath>& tran)
 {
     NX_ASSERT(tran.command == ApiCommand::removeStoredFile);
 
     QSqlQuery query(m_sdb);
     query.prepare("DELETE FROM vms_storedFiles WHERE path = :path");
     query.bindValue(":path", tran.params.path);
-    if (!query.exec()) {
+    if (!query.exec())
+    {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::dbError;
     }
@@ -4089,7 +4103,9 @@ ErrorCode QnDbManager::doQuery(const nullptr_t& /*dummy*/, ApiDatabaseDumpData& 
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::doQuery(const ApiStoredFilePath& dumpFilePath, ApiDatabaseDumpToFileData& databaseDumpToFileData)
+ErrorCode QnDbManager::doQuery(
+    const nx::vms::api::StoredFilePath& dumpFilePath,
+    ApiDatabaseDumpToFileData& databaseDumpToFileData)
 {
     QnWriteLocker lock(&m_mutex);
     m_tran->physicalCommitLazyData();
@@ -4387,7 +4403,9 @@ bool QnDbManager::resyncIfNeeded(ResyncFlags flags)
     return true;
 }
 
-ErrorCode QnDbManager::doQueryNoLock(const ApiStoredFilePath& _path, ApiStoredDirContents& data)
+ErrorCode QnDbManager::doQueryNoLock(
+    const nx::vms::api::StoredFilePath& _path,
+    nx::vms::api::StoredFilePathList& data)
 {
     QSqlQuery query(m_sdb);
     QString path;
@@ -4414,7 +4432,9 @@ ErrorCode QnDbManager::doQueryNoLock(const ApiStoredFilePath& _path, ApiStoredDi
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::doQueryNoLock(const ApiStoredFilePath& path, ApiStoredFileData& data)
+ErrorCode QnDbManager::doQueryNoLock(
+    const nx::vms::api::StoredFilePath& path,
+    nx::vms::api::StoredFileData& data)
 {
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
@@ -4431,7 +4451,9 @@ ErrorCode QnDbManager::doQueryNoLock(const ApiStoredFilePath& path, ApiStoredFil
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::doQueryNoLock(const ApiStoredFilePath& path, ApiStoredFileDataList& data)
+ErrorCode QnDbManager::doQueryNoLock(
+    const nx::vms::api::StoredFilePath& path,
+    nx::vms::api::StoredFileDataList& data)
 {
     QString filter;
     if (!path.path.isEmpty())

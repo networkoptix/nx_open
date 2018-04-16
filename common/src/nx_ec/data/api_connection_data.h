@@ -11,7 +11,7 @@
 namespace ec2
 {
     //!Parameters of connect request
-    struct ApiLoginData: ApiData 
+    struct ApiLoginData: nx::vms::api::Data 
     {
         QString login;
         QByteArray passwordHash;

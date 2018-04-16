@@ -12,8 +12,12 @@ class QnStoredFileNotificationManager : public AbstractStoredFileNotificationMan
 public:
     QnStoredFileNotificationManager();
 
-    void triggerNotification(const QnTransaction<ApiStoredFileData>& tran, NotificationSource /*source*/);
-    void triggerNotification(const QnTransaction<ApiStoredFilePath>& tran, NotificationSource /*source*/);
+    void triggerNotification(
+        const QnTransaction<nx::vms::api::StoredFileData>& tran,
+        NotificationSource /*source*/);
+    void triggerNotification(
+        const QnTransaction<nx::vms::api::StoredFilePath>& tran,
+        NotificationSource /*source*/);
 };
 
 typedef std::shared_ptr<QnStoredFileNotificationManager> QnStoredFileNotificationManagerPtr;

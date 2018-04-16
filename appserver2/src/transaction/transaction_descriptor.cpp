@@ -175,7 +175,7 @@ QnUuid createHashForApiMediaServerUserAttributesDataHelper(const ApiMediaServerU
     return QnAbstractTransaction::makeHash(params.serverId.toRfc4122(), "server_attributes");
 }
 
-QnUuid createHashForApiStoredFileDataHelper(const ApiStoredFileData &params)
+QnUuid createHashForApiStoredFileDataHelper(const nx::vms::api::StoredFileData& params)
 {
     return QnAbstractTransaction::makeHash(params.path.toUtf8());
 }

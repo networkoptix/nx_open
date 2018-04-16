@@ -4,11 +4,11 @@
 
 namespace ec2 {
 
-struct ApiUpdateUploadData: ApiData
+struct ApiUpdateUploadData: nx::vms::api::Data
 {
     QString updateId;
     QByteArray data;
-    qint64 offset;
+    qint64 offset = 0;
 };
 #define ApiUpdateUploadData_Fields (updateId)(data)(offset)
 
@@ -20,9 +20,9 @@ public:
 };
 #define ApiUpdateUploadResponceData_Fields IdData_Fields (updateId)(chunks)
 
-struct ApiUpdateInstallData: ApiData
+struct ApiUpdateInstallData: nx::vms::api::Data
 {
-    ApiUpdateInstallData() {}
+    ApiUpdateInstallData() = default;
     ApiUpdateInstallData(const QString &updateId): updateId(updateId) {}
 
     QString updateId;

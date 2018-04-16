@@ -74,7 +74,7 @@ namespace ec2
     QN_FUSION_DECLARE_FUNCTIONS(ApiMediaServerData, (eq))
 
 
-    struct ApiMediaServerUserAttributesData: ApiData
+    struct ApiMediaServerUserAttributesData: nx::vms::api::Data
     {
         QnUuid serverId;
         QString serverName;

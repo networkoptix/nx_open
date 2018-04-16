@@ -6,7 +6,8 @@
 
 namespace ec2
 {
-    struct ApiPropertyTypeData: ApiData {
+    struct ApiPropertyTypeData: nx::vms::api::Data
+    {
         QnUuid resourceTypeId;
 
         QString name;

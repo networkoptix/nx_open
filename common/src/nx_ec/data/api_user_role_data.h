@@ -28,14 +28,9 @@ struct ApiUserRoleData: ApiIdData
 #define ApiUserRoleData_Fields IdData_Fields (name)(permissions)
 
 /* Struct is not inherited from ApiUserRoleData as it has no 'id' field. */
-struct ApiPredefinedRoleData: ApiData
+struct ApiPredefinedRoleData: nx::vms::api::Data
 {
-    ApiPredefinedRoleData():
-        name(),
-        permissions(Qn::NoGlobalPermissions),
-        isOwner(false)
-    {
-    }
+    ApiPredefinedRoleData() = default;
 
     ApiPredefinedRoleData(const QString& name, Qn::GlobalPermissions permissions, bool isOwner = false):
         name(name),
@@ -45,8 +40,8 @@ struct ApiPredefinedRoleData: ApiData
     }
 
     QString name;
-    Qn::GlobalPermissions permissions;
-    bool isOwner;
+    Qn::GlobalPermissions permissions = Qn::NoGlobalPermissions;
+    bool isOwner = false;
 };
 #define ApiPredefinedRoleData_Fields (name)(permissions)(isOwner)
 

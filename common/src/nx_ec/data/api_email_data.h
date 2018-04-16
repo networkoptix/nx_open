@@ -12,9 +12,9 @@
 
 namespace ec2
 {
-    struct ApiEmailData: ApiData
+    struct ApiEmailData: nx::vms::api::Data
     {
-        ApiEmailData() {}
+        ApiEmailData() = default;
 
         ApiEmailData (const QStringList& to_, const QString& subject_, const QString& body_, const QString& plainBody_, int timeout_, const QnEmailAttachmentList& attachments_)
             : to(to_),
@@ -29,7 +29,7 @@ namespace ec2
         QString subject;
         QString body;
         QString plainBody;
-        int timeout;
+        int timeout = 0;
 
         QnEmailAttachmentList attachments;
     };

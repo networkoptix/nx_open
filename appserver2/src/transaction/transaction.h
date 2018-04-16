@@ -913,11 +913,11 @@ APPLY(805, execAction, ApiBusinessActionData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(904, removeStoredFile, ApiStoredFilePath, \
+APPLY(904, removeStoredFile, nx::vms::api::StoredFilePath, \
                        true, \
                        false, \
-                       [] (const ApiStoredFilePath &params) { return QnAbstractTransaction::makeHash(params.path.toUtf8()); }, \
-                       [] (const QnTransaction<ApiStoredFilePath> &tran, const NotificationParams &notificationParams) \
+                       [] (const nx::vms::api::StoredFilePath &params) { return QnAbstractTransaction::makeHash(params.path.toUtf8()); }, \
+                       [] (const QnTransaction<nx::vms::api::StoredFilePath> &tran, const NotificationParams &notificationParams) \
                         { \
                             NX_ASSERT(tran.command == ApiCommand::removeStoredFile); \
                             notificationParams.storedFileNotificationManager->triggerNotification(tran, notificationParams.source); \
@@ -928,7 +928,7 @@ APPLY(904, removeStoredFile, ApiStoredFilePath, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(901, getStoredFile, ApiStoredFileData, \
+APPLY(901, getStoredFile, nx::vms::api::StoredFileData, \
                        false, \
                        false, \
                        &createHashForApiStoredFileDataHelper, \
@@ -939,7 +939,7 @@ APPLY(901, getStoredFile, ApiStoredFileData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(902, addStoredFile, ApiStoredFileData, \
+APPLY(902, addStoredFile, nx::vms::api::StoredFileData, \
                        true, \
                        false, \
                        &createHashForApiStoredFileDataHelper, \
@@ -950,7 +950,7 @@ APPLY(902, addStoredFile, ApiStoredFileData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(903, updateStoredFile, ApiStoredFileData, \
+APPLY(903, updateStoredFile, nx::vms::api::StoredFileData, \
                        true, \
                        false, \
                        &createHashForApiStoredFileDataHelper, \
@@ -961,7 +961,7 @@ APPLY(903, updateStoredFile, ApiStoredFileData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(900, listDirectory, ApiStoredDirContents, \
+APPLY(900, listDirectory, nx::vms::api::StoredFilePathList, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
@@ -972,7 +972,7 @@ APPLY(900, listDirectory, ApiStoredDirContents, \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(905, getStoredFiles, ApiStoredFileDataList, \
+APPLY(905, getStoredFiles, nx::vms::api::StoredFileDataList, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
@@ -1637,7 +1637,7 @@ APPLY(10201, getSystemMergeHistory, ApiSystemMergeHistoryRecordList, \
         ApiTranLogFilter(): cloudOnly(false) {}
     };
 
-    struct ApiTransactionData: public ApiData
+    struct ApiTransactionData: public nx::vms::api::Data
     {
         QnUuid tranGuid;
         QnAbstractTransaction tran;

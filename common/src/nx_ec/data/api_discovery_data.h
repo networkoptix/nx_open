@@ -21,7 +21,7 @@ namespace ec2 {
 
 #define ApiDiscoveryData_Fields IdData_Fields(url)(ignore)(id)
 
-    struct ApiDiscoverPeerData : ApiData
+    struct ApiDiscoverPeerData: nx::vms::api::Data
     {
         QString url;
         QnUuid id;

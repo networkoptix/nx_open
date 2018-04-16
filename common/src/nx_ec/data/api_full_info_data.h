@@ -4,7 +4,7 @@
 
 namespace ec2 {
 
-struct ApiFullInfoData: ApiData
+struct ApiFullInfoData: nx::vms::api::Data
 {
     ApiResourceTypeDataList resourceTypes;
     ApiMediaServerDataList servers;

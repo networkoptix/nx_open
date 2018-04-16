@@ -171,7 +171,7 @@ namespace detail
 
         //dumpDatabase
         ErrorCode doQuery(const nullptr_t& /*dummy*/, ApiDatabaseDumpData& data);
-        ErrorCode doQuery(const ApiStoredFilePath& path, ApiDatabaseDumpToFileData& dumpFileSize);
+        ErrorCode doQuery(const nx::vms::api::StoredFilePath& path, ApiDatabaseDumpToFileData& dumpFileSize);
 
         // --------- misc -----------------------------
         QnUuid getID() const;
@@ -228,13 +228,23 @@ namespace detail
         ErrorCode doQueryNoLock(nullptr_t /*dummy*/, ApiResourceParamDataList& data);
 
         //listDirectory
-        ErrorCode doQueryNoLock(const ApiStoredFilePath& path, ApiStoredDirContents& data);
+        ErrorCode doQueryNoLock(
+            const nx::vms::api::StoredFilePath& path,
+            nx::vms::api::StoredFilePathList& data);
         //getStorageData
-        ErrorCode doQueryNoLock(const ApiStoredFilePath& path, ApiStoredFileData& data);
+        ErrorCode doQueryNoLock(
+            const nx::vms::api::StoredFilePath& path,
+            nx::vms::api::StoredFileData& data);
 
         //getStoredFiles
-        ErrorCode doQueryNoLock(const ApiStoredFilePath& path, ApiStoredFileDataList& data);
-        ErrorCode doQueryNoLock(const nullptr_t&, ApiStoredFileDataList& data) { return doQueryNoLock(ApiStoredFilePath(), data); }
+        ErrorCode doQueryNoLock(
+            const nx::vms::api::StoredFilePath& path,
+            nx::vms::api::StoredFileDataList& data);
+
+        ErrorCode doQueryNoLock(const nullptr_t&, nx::vms::api::StoredFileDataList& data)
+        {
+            return doQueryNoLock(nx::vms::api::StoredFilePath(), data);
+        }
 
         ErrorCode doQueryNoLock(const QByteArray &paramName, ApiMiscData& miscData);
         ErrorCode doQueryNoLock(const QByteArray& /*dummy*/, ApiSystemMergeHistoryRecordList& systemMergeHistory);
@@ -340,8 +350,8 @@ namespace detail
         ErrorCode executeTransactionInternal(const QnTransaction<ApiResourceStatusData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiResourceParamWithRefData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiServerFootageData>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiStoredFileData>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiStoredFilePath> &tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::StoredFileData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::StoredFilePath> &tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiBusinessRuleData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiUserData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiUserRoleData>& tran);

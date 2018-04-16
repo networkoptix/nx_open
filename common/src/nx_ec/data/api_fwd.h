@@ -8,7 +8,6 @@ class QString;
 
 namespace ec2 {
 
-using ApiData = nx::vms::api::Data;
 using ApiIdData = nx::vms::api::IdData;
 using ApiIdDataList = nx::vms::api::IdDataList;
 using ApiDataWithVersion = nx::vms::api::DataWithVersion;
@@ -70,8 +69,6 @@ using ApiUpdateSequenceData = nx::vms::api::UpdateSequenceData;
     struct ApiPeerAliveData;
     struct ApiReverseConnectionData;
     struct ApiStorageData;
-    struct ApiStoredFileData;
-    struct ApiStoredFilePath;
     struct ApiUserData;
     struct ApiUserRoleData;
     struct ApiPredefinedRoleData;
@@ -117,7 +114,6 @@ using ApiUpdateSequenceData = nx::vms::api::UpdateSequenceData;
     struct ApiP2pStatisticsData;
 
     typedef std::vector<ApiTransactionData> ApiTransactionDataList;
-    typedef std::vector<ApiStoredFileData> ApiStoredFileDataList;
 
     typedef std::vector<ApiLayoutData> ApiLayoutDataList;
     using ApiLayoutTourDataList = std::vector<ApiLayoutTourData>;
@@ -136,7 +132,6 @@ using ApiUpdateSequenceData = nx::vms::api::UpdateSequenceData;
     typedef std::vector<ApiAccessRightsData> ApiAccessRightsDataList;
     typedef std::vector<ApiVideowallData> ApiVideowallDataList;
     typedef std::vector<ApiDiscoveryData> ApiDiscoveryDataList;
-    typedef std::vector<ApiStoredFilePath> ApiStoredDirContents;
     typedef std::vector<ApiStorageData> ApiStorageDataList;
     typedef std::vector<ApiWebPageData> ApiWebPageDataList;
     typedef std::vector<ApiDiscoveredServerData> ApiDiscoveredServerDataList;
@@ -181,9 +176,7 @@ using ApiUpdateSequenceData = nx::vms::api::UpdateSequenceData;
     (QnTranStateResponse)\
     (ApiTranSyncDoneData)\
     (ApiPeerAliveData)\
-    (ApiStoredFilePath)\
     (ApiStorageData)\
-    (ApiStoredFileData)\
     (ApiUserData)\
     (ApiUserRoleData)\
     (ApiPredefinedRoleData)\

@@ -6,13 +6,11 @@
 
 namespace ec2
 {
-    struct ApiLockData: ApiData
+    struct ApiLockData: nx::vms::api::Data
     {
-        ApiLockData(): timestamp(0) {}
-
         QString name;
         QnUuid peer;
-        qint64 timestamp;
+        qint64 timestamp = 0;
         QByteArray userData;
     };
 #define ApiLockData_Fields (name)(peer)(timestamp)(userData)

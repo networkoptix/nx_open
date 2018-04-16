@@ -8,7 +8,7 @@
 
 namespace ec2 {
 
-struct ApiLayoutTourItemData: ApiData
+struct ApiLayoutTourItemData: nx::vms::api::Data
 {
     QnUuid resourceId;
     int delayMs = 0;
@@ -22,7 +22,7 @@ struct ApiLayoutTourItemData: ApiData
 
 #define ApiLayoutTourItemData_Fields (resourceId)(delayMs)
 
-struct ApiLayoutTourSettings: ApiData
+struct ApiLayoutTourSettings: nx::vms::api::Data
 {
     bool manual = false;
 
@@ -31,7 +31,7 @@ struct ApiLayoutTourSettings: ApiData
 };
 #define ApiLayoutTourSettings_Fields (manual)
 
-struct ApiLayoutTourData: ApiData
+struct ApiLayoutTourData: nx::vms::api::Data
 {
     QnUuid id;
     QnUuid parentId;

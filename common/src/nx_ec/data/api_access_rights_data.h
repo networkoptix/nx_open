@@ -4,7 +4,7 @@
 
 namespace ec2
 {
-    struct ApiAccessRightsData: ApiData
+    struct ApiAccessRightsData: nx::vms::api::Data
     {
         QnUuid userId;
         std::vector<QnUuid> resourceIds;

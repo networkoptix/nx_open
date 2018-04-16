@@ -451,7 +451,7 @@ namespace ec2
     {
         const int reqID = generateRequestID();
 
-        ApiStoredFilePath dumpFilePathData;
+        nx::vms::api::StoredFilePath dumpFilePathData;
         dumpFilePathData.path = dumpFilePath;
 
         auto queryDoneHandler =
@@ -460,7 +460,7 @@ namespace ec2
             handler->done(reqID, errorCode);
         };
         m_queryProcessor->getAccess(Qn::kSystemAccess).template processQueryAsync<
-            ApiStoredFilePath, ApiDatabaseDumpToFileData, decltype(queryDoneHandler)>(
+            nx::vms::api::StoredFilePath, ApiDatabaseDumpToFileData, decltype(queryDoneHandler)>(
                 ApiCommand::dumpDatabaseToFile, dumpFilePathData, queryDoneHandler);
         return reqID;
     }

@@ -6,47 +6,39 @@
 
 namespace ec2 {
 
-struct ApiVideowallItemData: ApiData
+struct ApiVideowallItemData: nx::vms::api::Data
 {
-    ApiVideowallItemData(): ApiData(), snapLeft(0), snapTop(0), snapRight(0), snapBottom(0) {}
-
     QnUuid guid;
     QnUuid pcGuid;
     QnUuid layoutGuid;
     QString name;
-    int snapLeft;
-    int snapTop;
-    int snapRight;
-    int snapBottom;
+    int snapLeft = 0;
+    int snapTop = 0;
+    int snapRight = 0;
+    int snapBottom = 0;
 };
 #define ApiVideowallItemData_Fields \
     (guid)(pcGuid)(layoutGuid)(name)(snapLeft)(snapTop)(snapRight)(snapBottom)
 
-struct ApiVideowallScreenData: ApiData
+struct ApiVideowallScreenData: nx::vms::api::Data
 {
-    ApiVideowallScreenData():
-        ApiData(), pcIndex(0), desktopLeft(0), desktopTop(0), desktopWidth(0), desktopHeight(0),
-        layoutLeft(0), layoutTop(0), layoutWidth(0), layoutHeight(0)
-    {
-    }
-
     QnUuid pcGuid;
-    int pcIndex;
-    int desktopLeft;
-    int desktopTop;
-    int desktopWidth;
-    int desktopHeight;
-    int layoutLeft;
-    int layoutTop;
-    int layoutWidth;
-    int layoutHeight;
+    int pcIndex = 0;
+    int desktopLeft = 0;
+    int desktopTop = 0;
+    int desktopWidth = 0;
+    int desktopHeight = 0;
+    int layoutLeft = 0;
+    int layoutTop = 0;
+    int layoutWidth = 0;
+    int layoutHeight = 0;
 };
 #define ApiVideowallScreenData_Fields \
     (pcGuid)(pcIndex)(desktopLeft)(desktopTop)(desktopWidth)(desktopHeight) \
     (layoutLeft)(layoutTop)(layoutWidth)(layoutHeight)
 
 
-struct ApiVideowallMatrixItemData: ApiData
+struct ApiVideowallMatrixItemData: nx::vms::api::Data
 {
     QnUuid itemGuid;
     QnUuid layoutGuid;
@@ -64,9 +56,7 @@ struct ApiVideowallMatrixData: ApiIdData
 
 struct ApiVideowallData: ApiResourceData
 {
-    ApiVideowallData(): autorun(false) {}
-
-    bool autorun;
+    bool autorun = false;
 
     std::vector<ApiVideowallItemData> items;
     std::vector<ApiVideowallScreenData> screens;
@@ -75,11 +65,9 @@ struct ApiVideowallData: ApiResourceData
 #define ApiVideowallData_Fields ResourceData_Fields (autorun)(items)(screens)(matrices)
 
 
-struct ApiVideowallControlMessageData: ApiData
+struct ApiVideowallControlMessageData: nx::vms::api::Data
 {
-    ApiVideowallControlMessageData(): operation(0) {}
-
-    int operation;
+    int operation = 0;
     QnUuid videowallGuid;
     QnUuid instanceGuid;
     std::map<QString, QString> params;
