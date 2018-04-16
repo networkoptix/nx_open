@@ -11,8 +11,8 @@ ARG VERSION
 ARG MODULES
 
 RUN set -ex \
-    && pip install -U pip \
-    && pip3 install --no-cache-dir docker-compose==1.21.0 nxcloud==${NXCLOUD_VERSION} \
+    && pip install --no-cache-dir --force-reinstall pip==9.0.1 \
+    && pip install --no-cache-dir docker-compose==1.21.0 nxcloud==${NXCLOUD_VERSION} \
     && rm -rf /usr/local/share/.cache \
     && apk add --no-cache tini wget curl ca-certificates docker \
         libffi \
