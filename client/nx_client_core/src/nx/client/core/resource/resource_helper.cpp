@@ -31,10 +31,13 @@ void ResourceHelper::setResourceId(const QString& id)
 
     m_resource = resource;
 
-    connect(m_resource, &QnResource::nameChanged,
-        this, &ResourceHelper::resourceNameChanged);
-    connect(m_resource, &QnResource::statusChanged,
-        this, &ResourceHelper::resourceStatusChanged);
+    if (m_resource)
+    {
+        connect(m_resource, &QnResource::nameChanged,
+            this, &ResourceHelper::resourceNameChanged);
+        connect(m_resource, &QnResource::statusChanged,
+            this, &ResourceHelper::resourceStatusChanged);
+    }
 
     emit resourceIdChanged();
     emit resourceNameChanged();
