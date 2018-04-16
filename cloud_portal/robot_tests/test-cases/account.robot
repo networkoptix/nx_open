@@ -217,6 +217,7 @@ Email field is un-editable
 Langauge is changeable on the account page
     Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
+    Validate Log In
     :FOR    ${lang}    ${account}   IN ZIP    ${LANGUAGES LIST}    ${LANGUAGES ACCOUNT TEXT LIST}
     \  Sleep    1
     \  Verify In Account Page

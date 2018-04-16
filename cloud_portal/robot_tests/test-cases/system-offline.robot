@@ -34,14 +34,19 @@ System Offline Failure
 should confirm, if owner deletes system (You are going to disconnect your system from cloud)
     Log in to Autotests System    ${EMAIL OWNER}
     Click Button    ${DISCONNECT FROM NX}
-    Wait Until Elements Are Visible    ${DISCONNECT FORM}    ${DISCONNECT FORM HEADER}
+    Wait Until Elements Are Visible    ${DISCONNECT FORM}    ${DISCONNECT FORM HEADER}    ${DISCONNECT FORM CANCEL}
+    Click Button    ${DISCONNECT FORM CANCEL}
+    Wait Until Page Does Not Contain Element    ${DELETE USER MODAL}
+
 
 should confirm, if not owner deletes system (You will loose access to this system)
     Log in to Autotests System    ${EMAIL OWNER}
     Validate Log In
     Wait Until Element Is Visible    ${DISCONNECT FROM NX}
     Click Button    ${DISCONNECT FROM NX}
-    Wait Until Elements Are Visible    ${DISCONNECT FORM}    ${DISCONNECT FORM HEADER}
+    Wait Until Elements Are Visible    ${DISCONNECT FORM}    ${DISCONNECT FORM HEADER}    ${DISCONNECT FORM CANCEL}
+    Click Button    ${DISCONNECT FORM CANCEL}
+    Wait Until Page Does Not Contain Element    ${DELETE USER MODAL}
 
 share button should be disabled
     Log in to Autotests System    ${EMAIL OWNER}
