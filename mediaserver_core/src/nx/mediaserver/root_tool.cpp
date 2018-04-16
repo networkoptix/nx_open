@@ -547,7 +547,7 @@ int RootTool::forkRoolTool(const std::vector<QString>& args)
     {
 
         execvp(exePath, pdata);
-        NX_CRITICAL(false); /* If fork successful shouldn't get here. */
+        NX_CRITICAL(false); /* If exec() was successful shouldn't get here. */
         return -1;
     }
     free(exePath);
