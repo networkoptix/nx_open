@@ -48,10 +48,19 @@ void QnMobileClientUiController::disconnectFromSystem()
 }
 
 void QnMobileClientUiController::connectToSystem(
-    const nx::utils::Url& url,
-    const ResourceIdList& filterIds)
+    const nx::utils::Url& url)
 {
-    emit connectRequested(url, QVariant::fromValue(filterIds));
+    emit connectRequested(url);
+}
+
+void QnMobileClientUiController::openConnectToServerScreen(
+    const nx::utils::Url& url,
+    const QString& operationId)
+{
+    const auto port = url.port(-1);
+    const auto host = lit("%1%2").arg(url.host(),
+        port > 0 ? lit(":1").arg(QString::number(port)) : QString());
+    emit connectToServerScreenRequested(host, url.userName(), url.password(), operationId);
 }
 
 void QnMobileClientUiController::openResourcesScreen(const ResourceIdList& filterIds)
@@ -59,9 +68,9 @@ void QnMobileClientUiController::openResourcesScreen(const ResourceIdList& filte
     emit resourcesScreenRequested(QVariant::fromValue(filterIds));
 }
 
-void QnMobileClientUiController::openVideoScreen(const QnUuid& cameraId)
+void QnMobileClientUiController::openVideoScreen(const QnUuid& cameraId, qint64 timestamp)
 {
-    emit videoScreenRequested(uuidString(cameraId));
+    emit videoScreenRequested(uuidString(cameraId), timestamp);
 }
 
 void QnMobileClientUiController::openLoginToCloudScreen(

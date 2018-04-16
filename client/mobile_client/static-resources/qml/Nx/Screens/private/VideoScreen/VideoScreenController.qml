@@ -196,13 +196,21 @@ Object
 
     Component.onDestruction: setKeepScreenOn(false)
 
-    function start()
+    function start(timestamp)
     {
         if (cameraOffline || cameraUnauthorized || resourceId === "")
             return
 
         mediaPlayer.maxTextureSize = getMaxTextureSize()
-        playLive()
+        if (timestamp && timestamp > 0)
+        {
+            setPosition(timestamp, true)
+            play()
+        }
+        else
+        {
+            playLive()
+        }
     }
 
     function play()
