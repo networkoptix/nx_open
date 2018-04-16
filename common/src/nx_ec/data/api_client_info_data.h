@@ -5,7 +5,7 @@
 
 namespace ec2 {
 
-struct ApiClientInfoData: ApiIdData
+struct ApiClientInfoData: nx::vms::api::IdData
 {
     QnUuid parentId;
 

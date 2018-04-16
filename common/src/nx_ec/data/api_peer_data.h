@@ -10,15 +10,15 @@
 
 namespace ec2 {
 
-struct ApiPersistentIdData: ApiIdData
+struct ApiPersistentIdData: nx::vms::api::IdData
 {
-    ApiPersistentIdData(): ApiIdData() {}
+    ApiPersistentIdData() = default;
 
     ApiPersistentIdData(
         const QnUuid& id,
         const QnUuid& persistentId)
     :
-        ApiIdData(id),
+        nx::vms::api::IdData(id),
         persistentId(persistentId)
     {
     }

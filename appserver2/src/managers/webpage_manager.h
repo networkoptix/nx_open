@@ -59,7 +59,7 @@ namespace ec2
     {
         const int reqID = generateRequestID();
         m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
-            ApiCommand::removeWebPage, ApiIdData(id),
+            ApiCommand::removeWebPage, nx::vms::api::IdData(id),
             [handler, reqID](ec2::ErrorCode errorCode)
         {
             handler->done(reqID, errorCode);

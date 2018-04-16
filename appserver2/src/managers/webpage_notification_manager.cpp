@@ -3,10 +3,11 @@
 namespace ec2 {
 
 QnWebPageNotificationManager::QnWebPageNotificationManager()
-{}
+{
+}
 
 void QnWebPageNotificationManager::triggerNotification(
-    const QnTransaction<ApiWebPageData> &tran, 
+    const QnTransaction<ApiWebPageData>& tran,
     NotificationSource source)
 {
     NX_ASSERT(tran.command == ApiCommand::saveWebPage);
@@ -14,7 +15,7 @@ void QnWebPageNotificationManager::triggerNotification(
 }
 
 void QnWebPageNotificationManager::triggerNotification(
-    const QnTransaction<ApiIdData> &tran, 
+    const QnTransaction<nx::vms::api::IdData>& tran,
     NotificationSource /*source*/)
 {
     NX_ASSERT(tran.command == ApiCommand::removeWebPage);

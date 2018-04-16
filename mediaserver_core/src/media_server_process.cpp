@@ -781,7 +781,7 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
 
         if (!storagesToRemove.isEmpty())
         {
-            ec2::ApiIdDataList idList;
+            nx::vms::api::IdDataList idList;
             for (const auto& value: storagesToRemove)
                 idList.push_back(value->getId());
             if (ec2Connection->getMediaServerManager(Qn::kSystemAccess)->removeStoragesSync(idList) != ec2::ErrorCode::ok)

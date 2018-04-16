@@ -12,7 +12,7 @@ struct ApiUpdateUploadData: nx::vms::api::Data
 };
 #define ApiUpdateUploadData_Fields (updateId)(data)(offset)
 
-struct ApiUpdateUploadResponceData: ApiIdData
+struct ApiUpdateUploadResponceData: nx::vms::api::IdData
 {
 public:
     QString updateId;

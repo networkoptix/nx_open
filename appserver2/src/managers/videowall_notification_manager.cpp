@@ -2,10 +2,12 @@
 
 namespace ec2 {
 
-QnVideowallNotificationManager::QnVideowallNotificationManager() {}
+QnVideowallNotificationManager::QnVideowallNotificationManager()
+{
+}
 
 void QnVideowallNotificationManager::triggerNotification(
-    const QnTransaction<ApiVideowallData>& tran, 
+    const QnTransaction<ApiVideowallData>& tran,
     NotificationSource source)
 {
     NX_ASSERT(tran.command == ApiCommand::saveVideowall);
@@ -13,7 +15,7 @@ void QnVideowallNotificationManager::triggerNotification(
 }
 
 void QnVideowallNotificationManager::triggerNotification(
-    const QnTransaction<ApiIdData>& tran, 
+    const QnTransaction<nx::vms::api::IdData>& tran,
     NotificationSource /*source*/)
 {
     NX_ASSERT(tran.command == ApiCommand::removeVideowall);
@@ -21,7 +23,7 @@ void QnVideowallNotificationManager::triggerNotification(
 }
 
 void QnVideowallNotificationManager::triggerNotification(
-    const QnTransaction<ApiVideowallControlMessageData>& tran, 
+    const QnTransaction<ApiVideowallControlMessageData>& tran,
     NotificationSource /*source*/)
 {
     NX_ASSERT(tran.command == ApiCommand::videowallControl);

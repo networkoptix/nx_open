@@ -70,6 +70,7 @@ static const QString RES_TYPE_CAMERA = "camera";
 static const QString RES_TYPE_STORAGE = "storage";
 
 using namespace nx;
+using namespace nx::vms::api;
 
 namespace ec2
 {
@@ -584,8 +585,8 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
             {
                 if (!fillTransactionLogInternal<
                         nullptr_t,
-                        nx::vms::api::StoredFileData,
-                        nx::vms::api::StoredFileDataList>(
+                        StoredFileData,
+                        StoredFileDataList>(
                             ApiCommand::addStoredFile))
                 {
                     return false;
@@ -745,7 +746,7 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
                 commonModule()->moduleGUID());
             m_tranLog->fillPersistentInfo(tran);
             tran.params.id = QnUuid::fromRfc4122(queryCameras.value(0).toByteArray());
-            tran.params.status = nx::vms::api::ResourceStatus::offline;
+            tran.params.status = ResourceStatus::offline;
             if (executeTransactionNoLock(tran, QnUbjson::serialized(tran)) != ErrorCode::ok)
                 return false;
         }
@@ -871,8 +872,8 @@ bool QnDbManager::resyncTransactionLog()
 
     if (!fillTransactionLogInternal<
             nullptr_t,
-            nx::vms::api::StoredFileData,
-            nx::vms::api::StoredFileDataList>(
+            StoredFileData,
+            StoredFileDataList>(
                 ApiCommand::addStoredFile))
     {
         return false;
@@ -2771,13 +2772,13 @@ ErrorCode QnDbManager::removeLayout(const QnUuid& id)
         : ErrorCode::dbError;
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<nx::vms::api::StoredFileData>& tran) {
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<StoredFileData>& tran) {
     NX_ASSERT( tran.command == ApiCommand::addStoredFile || tran.command == ApiCommand::updateStoredFile );
     return insertOrReplaceStoredFile(tran.params.path, tran.params.data);
 }
 
 ErrorCode QnDbManager::executeTransactionInternal(
-    const QnTransaction<nx::vms::api::StoredFilePath>& tran)
+    const QnTransaction<StoredFilePath>& tran)
 {
     NX_ASSERT(tran.command == ApiCommand::removeStoredFile);
 
@@ -3068,7 +3069,7 @@ ErrorCode QnDbManager::readSettings(ApiResourceParamDataList& settings)
     return rez;
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiIdData>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<IdData>& tran)
 {
     switch(tran.command)
     {
@@ -3501,10 +3502,10 @@ ErrorCode QnDbManager::doQueryNoLock(
          ORDER BY camera_guid)sql";
 
     queryCameras.prepare(queryStr
-        .arg(-nx::vms::api::kDefaultMinArchiveDays)
-        .arg(-nx::vms::api::kDefaultMaxArchiveDays)
-        .arg(nx::vms::api::kDefaultRecordBeforeMotionSec)
-        .arg(nx::vms::api::kDefaultRecordAfterMotionSec)
+        .arg(-kDefaultMinArchiveDays)
+        .arg(-kDefaultMaxArchiveDays)
+        .arg(kDefaultRecordBeforeMotionSec)
+        .arg(kDefaultRecordAfterMotionSec)
         .arg(filterStr));
 
     if (!queryCameras.exec()) {
@@ -3572,8 +3573,8 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiCameraDataExList& came
     )sql";
 
     queryCameras.prepare(queryStr
-      .arg(-nx::vms::api::kDefaultMinArchiveDays)
-      .arg(-nx::vms::api::kDefaultMaxArchiveDays)
+      .arg(-kDefaultMinArchiveDays)
+      .arg(-kDefaultMaxArchiveDays)
       .arg(filterStr));
 
     if (!queryCameras.exec()) {
@@ -4104,7 +4105,7 @@ ErrorCode QnDbManager::doQuery(const nullptr_t& /*dummy*/, ApiDatabaseDumpData& 
 }
 
 ErrorCode QnDbManager::doQuery(
-    const nx::vms::api::StoredFilePath& dumpFilePath,
+    const StoredFilePath& dumpFilePath,
     ApiDatabaseDumpToFileData& databaseDumpToFileData)
 {
     QnWriteLocker lock(&m_mutex);
@@ -4404,8 +4405,8 @@ bool QnDbManager::resyncIfNeeded(ResyncFlags flags)
 }
 
 ErrorCode QnDbManager::doQueryNoLock(
-    const nx::vms::api::StoredFilePath& _path,
-    nx::vms::api::StoredFilePathList& data)
+    const StoredFilePath& _path,
+    StoredFilePathList& data)
 {
     QSqlQuery query(m_sdb);
     QString path;
@@ -4433,8 +4434,8 @@ ErrorCode QnDbManager::doQueryNoLock(
 }
 
 ErrorCode QnDbManager::doQueryNoLock(
-    const nx::vms::api::StoredFilePath& path,
-    nx::vms::api::StoredFileData& data)
+    const StoredFilePath& path,
+    StoredFileData& data)
 {
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
@@ -4452,8 +4453,8 @@ ErrorCode QnDbManager::doQueryNoLock(
 }
 
 ErrorCode QnDbManager::doQueryNoLock(
-    const nx::vms::api::StoredFilePath& path,
-    nx::vms::api::StoredFileDataList& data)
+    const StoredFilePath& path,
+    StoredFileDataList& data)
 {
     QString filter;
     if (!path.path.isEmpty())
@@ -4827,7 +4828,7 @@ bool QnDbManager::rebuildUserAccessRightsTransactions()
         return false;
 
     QVector<QnUuid> recordsToDelete;
-    QVector<ApiIdData> recordsToAdd;
+    QVector<IdData> recordsToAdd;
     while (query.next())
     {
         QnUuid tranGuid = QnSql::deserialized_field<QnUuid>(query.value(0));
@@ -4848,7 +4849,7 @@ bool QnDbManager::rebuildUserAccessRightsTransactions()
         else if (abstractTran.command == ApiCommand::removeUser
             || abstractTran.command == ApiCommand::removeUserRole)
         {
-            ApiIdData data;
+            IdData data;
             if (!QnUbjson::deserialize(&stream, &data))
             {
                 NX_WARNING(this, "Can't deserialize transaction from transaction log");
@@ -4876,7 +4877,7 @@ bool QnDbManager::rebuildUserAccessRightsTransactions()
 
     for (const auto& data: recordsToAdd)
     {
-        QnTransaction<ApiIdData> transaction(
+        QnTransaction<IdData> transaction(
             ApiCommand::removeAccessRights,
             commonModule()->moduleGUID(),
             data);
@@ -4923,9 +4924,9 @@ ApiObjectInfoList QnDbManagerAccess::getObjectsNoLock(const ApiObjectType& objec
     return m_dbManager->getObjectsNoLock(objectType);
 }
 
-ApiIdDataList QnDbManagerAccess::getLayoutToursNoLock(const QnUuid& parentId)
+IdDataList QnDbManagerAccess::getLayoutToursNoLock(const QnUuid& parentId)
 {
-    ApiIdDataList result;
+    IdDataList result;
     ApiLayoutTourDataList tours;
     database::api::fetchLayoutTours(m_dbManager->getDB(), tours);
     for (const auto& tour: tours)

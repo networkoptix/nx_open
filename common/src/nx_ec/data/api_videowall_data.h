@@ -46,7 +46,7 @@ struct ApiVideowallMatrixItemData: nx::vms::api::Data
 #define ApiVideowallMatrixItemData_Fields (itemGuid)(layoutGuid)
 
 
-struct ApiVideowallMatrixData: ApiIdData
+struct ApiVideowallMatrixData: nx::vms::api::IdData
 {
     QString name;
     std::vector<ApiVideowallMatrixItemData> items;

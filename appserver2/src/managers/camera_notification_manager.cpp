@@ -42,7 +42,7 @@ void QnCameraNotificationManager::triggerNotification(
 }
 
 void QnCameraNotificationManager::triggerNotification(
-    const QnTransaction<ApiIdData>& tran, 
+    const QnTransaction<nx::vms::api::IdData>& tran, 
     NotificationSource /*source*/)
 {
     NX_ASSERT(tran.command == ApiCommand::removeCamera ||

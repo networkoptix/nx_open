@@ -189,15 +189,15 @@ public:
      * @param handler Called upon request completion. Functor(ErrorCode).
      */
     template<class HandlerType>
-    void processUpdateAsync(QnTransaction<ApiIdDataList>& tran, HandlerType handler)
+    void processUpdateAsync(QnTransaction<nx::vms::api::IdDataList>& tran, HandlerType handler)
     {
         switch (tran.command)
         {
             case ApiCommand::removeStorages:
-                return processMultiUpdateAsync<ApiIdDataList, ApiIdData>(
+                return processMultiUpdateAsync<nx::vms::api::IdDataList, nx::vms::api::IdData>(
                     tran, handler, ApiCommand::removeStorage);
             case ApiCommand::removeResources:
-                return processMultiUpdateAsync<ApiIdDataList, ApiIdData>(
+                return processMultiUpdateAsync<nx::vms::api::IdDataList, nx::vms::api::IdData>(
                     tran, handler, ApiCommand::removeResource);
             default:
                 NX_ASSERT(false, "Not implemented", Q_FUNC_INFO);
@@ -210,7 +210,7 @@ public:
      * @param handler Called upon request completion. Functor(ErrorCode).
      */
     template<class HandlerType>
-    void processUpdateAsync(QnTransaction<ApiIdData>& tran, HandlerType handler)
+    void processUpdateAsync(QnTransaction<nx::vms::api::IdData>& tran, HandlerType handler)
     {
         return processUpdateAsync(tran, handler, 0); //< call default handler
     }
@@ -447,7 +447,7 @@ private:
 
     template<class HandlerType>
     void removeResourceAsync(
-        QnTransaction<ApiIdData>& tran,
+        QnTransaction<nx::vms::api::IdData>& tran,
         ApiObjectType resourceType,
         HandlerType handler)
     {
@@ -470,7 +470,7 @@ private:
         PostProcessList* const transactionsPostProcessList);
 
     ErrorCode removeObjParamsHelper(
-        const QnTransaction<ApiIdData>& tran,
+        const QnTransaction<nx::vms::api::IdData>& tran,
         const AbstractECConnectionPtr& connection,
         PostProcessList* const transactionsPostProcessList);
 
@@ -506,7 +506,7 @@ private:
     };
 
     ErrorCode removeResourceSync(
-        QnTransaction<ApiIdData>& tran,
+        QnTransaction<nx::vms::api::IdData>& tran,
         ApiObjectType resourceType,
         PostProcessList* const transactionsPostProcessList)
     {
@@ -517,7 +517,7 @@ private:
     }
 
     ErrorCode removeResourceNestedObjectsSync(
-        QnTransaction<ApiIdData>& tran,
+        QnTransaction<nx::vms::api::IdData>& tran,
         ApiObjectType resourceType,
         PostProcessList* const transactionsPostProcessList)
     {
@@ -753,7 +753,7 @@ public:
     }
 
     ErrorCode processUpdateSync(
-        QnTransaction<ApiIdData>& tran,
+        QnTransaction<nx::vms::api::IdData>& tran,
         PostProcessList* const transactionsPostProcessList)
     {
         switch (tran.command)
@@ -772,7 +772,7 @@ public:
                 return removeResourceSync(tran, ApiObjectUserRole, transactionsPostProcessList);
             case ApiCommand::removeResource:
             {
-                QnTransaction<ApiIdData> updatedTran = tran;
+                QnTransaction<nx::vms::api::IdData> updatedTran = tran;
                 switch(m_db.getObjectTypeNoLock(tran.params.id))
                 {
                     case ApiObject_Server:

@@ -216,8 +216,8 @@ public:
     qint64 getSyncTime() const;
     ApiTimeData getTimeInfo() const;
     /** Called when primary time server has been changed by user. */
-    void onGotPrimariTimeServerTran(const QnTransaction<ApiIdData>& tran);
-    void primaryTimeServerChanged(const ApiIdData& serverId);
+    void onGotPrimariTimeServerTran(const QnTransaction<nx::vms::api::IdData>& tran);
+    void primaryTimeServerChanged(const nx::vms::api::IdData& serverId);
     /** Returns synchronized time with time priority key (not local, but the one used). */
     TimeSyncInfo getTimeSyncInfo() const;
     /** Returns value of internal monotonic clock. */

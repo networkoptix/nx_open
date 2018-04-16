@@ -4,24 +4,19 @@
 
 namespace ec2 {
 
-struct ApiUserRoleData: ApiIdData
+struct ApiUserRoleData: nx::vms::api::IdData
 {
-    ApiUserRoleData():
-        ApiIdData(),
-        name(),
-        permissions(Qn::NoGlobalPermissions)
-    {
-    }
+    ApiUserRoleData() = default;
 
     ApiUserRoleData(const QnUuid& id, const QString& name, Qn::GlobalPermissions permissions):
-        ApiIdData(id),
+        nx::vms::api::IdData(id),
         name(name),
         permissions(permissions)
     {
     }
 
     QString name;
-    Qn::GlobalPermissions permissions;
+    Qn::GlobalPermissions permissions = Qn::NoGlobalPermissions;
 
     bool isNull() const;
 };

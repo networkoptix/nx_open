@@ -16,7 +16,7 @@ namespace ec2
 #define ApiPropertyTypeData_Fields (resourceTypeId)(name)(defaultValue)
 
 
-    struct ApiResourceTypeData: ApiIdData {
+    struct ApiResourceTypeData: nx::vms::api::IdData {
         QString name;
         QString vendor;
         std::vector<QnUuid> parentId;

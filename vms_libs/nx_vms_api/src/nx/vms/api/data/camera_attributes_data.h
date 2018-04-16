@@ -48,7 +48,7 @@ static constexpr int kDefaultRecordAfterMotionSec = 5;
 
 struct NX_VMS_API CameraAttributesData: Data
 {
-    QnUuid getIdForMerging() const { return cameraId; } //< See ApiIdData::getIdForMerging().
+    QnUuid getIdForMerging() const { return cameraId; } //< See IdData::getIdForMerging().
 
     static DeprecatedFieldNames* getDeprecatedFieldNames();
 

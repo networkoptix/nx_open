@@ -26,7 +26,7 @@ struct ApiUserData: ApiResourceData
     }
 
     /**
-     * See fillId() in ApiIdData.
+     * See fillId() in IdData.
      */
     void fillId()
     {

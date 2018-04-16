@@ -94,7 +94,7 @@ int QnBusinessEventManager<T>::deleteRule(QnUuid ruleId, impl::SimpleHandlerPtr 
     const int reqID = generateRequestID();
     using namespace std::placeholders;
     m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
-        ApiCommand::removeEventRule, ApiIdData(ruleId),
+        ApiCommand::removeEventRule, nx::vms::api::IdData(ruleId),
         std::bind(std::mem_fn(&impl::SimpleHandler::done), handler, reqID, _1));
     return reqID;
 }

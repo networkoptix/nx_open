@@ -120,7 +120,7 @@ int QnUserManager<QueryProcessorType>::remove(const QnUuid& id, impl::SimpleHand
 {
     const int reqID = generateRequestID();
     m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
-        ApiCommand::removeUser, ApiIdData(id),
+        ApiCommand::removeUser, nx::vms::api::IdData(id),
         [handler, reqID](ec2::ErrorCode errorCode)
         {
             handler->done(reqID, errorCode);
@@ -163,7 +163,7 @@ int ec2::QnUserManager<QueryProcessorType>::removeUserRole(const QnUuid& id,
 {
     const int reqID = generateRequestID();
     m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
-        ApiCommand::removeUserRole, ApiIdData(id),
+        ApiCommand::removeUserRole, nx::vms::api::IdData(id),
         [handler, reqID](ec2::ErrorCode errorCode)
     {
         handler->done(reqID, errorCode);

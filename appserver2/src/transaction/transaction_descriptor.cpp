@@ -112,35 +112,59 @@ struct CreateHashForResourceParamWithRefDataHelper
     }
 };
 
-void apiIdDataTriggerNotificationHelper(const QnTransaction<ApiIdData> &tran, const NotificationParams &notificationParams)
+void apiIdDataTriggerNotificationHelper(
+    const QnTransaction<nx::vms::api::IdData>& tran,
+    const NotificationParams& notificationParams)
 {
     switch (tran.command)
     {
         case ApiCommand::removeServerUserAttributes:
-            return notificationParams.mediaServerNotificationManager->triggerNotification(tran, notificationParams.source);
+            return notificationParams.mediaServerNotificationManager->triggerNotification(
+                tran,
+                notificationParams.source);
         case ApiCommand::removeResource:
         case ApiCommand::removeResourceStatus:
-            return notificationParams.resourceNotificationManager->triggerNotification(tran, notificationParams.source);
+            return notificationParams.resourceNotificationManager->triggerNotification(
+                tran,
+                notificationParams.source);
         case ApiCommand::removeCamera:
-            return notificationParams.cameraNotificationManager->triggerNotification(tran, notificationParams.source);
+            return notificationParams.cameraNotificationManager->triggerNotification(
+                tran,
+                notificationParams.source);
         case ApiCommand::removeMediaServer:
         case ApiCommand::removeStorage:
-            return notificationParams.mediaServerNotificationManager->triggerNotification(tran, notificationParams.source);
+            return notificationParams.mediaServerNotificationManager->triggerNotification(
+                tran,
+                notificationParams.source);
         case ApiCommand::removeUser:
         case ApiCommand::removeUserRole:
-            return notificationParams.userNotificationManager->triggerNotification(tran, notificationParams.source);
+            return notificationParams.userNotificationManager->triggerNotification(
+                tran,
+                notificationParams.source);
         case ApiCommand::removeEventRule:
-            return notificationParams.businessEventNotificationManager->triggerNotification(tran, notificationParams.source);
+            return notificationParams.businessEventNotificationManager->triggerNotification(
+                tran,
+                notificationParams.source);
         case ApiCommand::removeLayout:
-            return notificationParams.layoutNotificationManager->triggerNotification(tran, notificationParams.source);
+            return notificationParams.layoutNotificationManager->triggerNotification(
+                tran,
+                notificationParams.source);
         case ApiCommand::removeLayoutTour:
-            return notificationParams.layoutTourNotificationManager->triggerNotification(tran, notificationParams.source);
+            return notificationParams.layoutTourNotificationManager->triggerNotification(
+                tran,
+                notificationParams.source);
         case ApiCommand::removeVideowall:
-            return notificationParams.videowallNotificationManager->triggerNotification(tran, notificationParams.source);
+            return notificationParams.videowallNotificationManager->triggerNotification(
+                tran,
+                notificationParams.source);
         case ApiCommand::removeWebPage:
-            return notificationParams.webPageNotificationManager->triggerNotification(tran, notificationParams.source);
+            return notificationParams.webPageNotificationManager->triggerNotification(
+                tran,
+                notificationParams.source);
         case ApiCommand::removeCameraUserAttributes:
-            return notificationParams.cameraNotificationManager->triggerNotification(tran, notificationParams.source);
+            return notificationParams.cameraNotificationManager->triggerNotification(
+                tran,
+                notificationParams.source);
         case ApiCommand::forcePrimaryTimeServer:
         case ApiCommand::removeAccessRights:
             //#ak no notification needed
@@ -308,14 +332,20 @@ struct EmptyNotificationHelper
     void operator ()(const QnTransaction<Param> &, const NotificationParams &) {}
 };
 
-void apiIdDataListTriggerNotificationHelper(const QnTransaction<ApiIdDataList> &tran, const NotificationParams &notificationParams)
+void apiIdDataListTriggerNotificationHelper(
+    const QnTransaction<nx::vms::api::IdDataList>& tran,
+    const NotificationParams& notificationParams)
 {
     switch (tran.command)
     {
         case ApiCommand::removeStorages:
-            return notificationParams.mediaServerNotificationManager->triggerNotification(tran, notificationParams.source);
+            return notificationParams.mediaServerNotificationManager->triggerNotification(
+                tran,
+                notificationParams.source);
         case ApiCommand::removeResources:
-            return notificationParams.resourceNotificationManager->triggerNotification(tran, notificationParams.source);
+            return notificationParams.resourceNotificationManager->triggerNotification(
+                tran,
+                notificationParams.source);
         default:
             NX_ASSERT(false);
     }
@@ -777,7 +807,7 @@ struct AdminOnlyAccessOut
 
 struct RemoveUserRoleAccess
 {
-    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ApiIdData& param)
+    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const nx::vms::api::IdData& param)
     {
         if (!AdminOnlyAccess()(commonModule, accessData, param))
         {
@@ -837,7 +867,7 @@ struct LayoutTourAccessById
     bool operator()(
         QnCommonModule* commonModule,
         const Qn::UserAccessData& accessData,
-        const ApiIdData& tourId)
+        const nx::vms::api::IdData& tourId)
     {
         const auto tour = commonModule->layoutTourManager()->tour(tourId.id);
         return !tour.isValid() //< Allow everyone to work with tours which are already deleted.
@@ -1064,7 +1094,7 @@ ec2::TransactionType::Value getRemoveUserTransactionTypeFromDb(
 
 struct RemoveUserTransactionType
 {
-    ec2::TransactionType::Value operator()(QnCommonModule* commonModule, const ApiIdData& params, AbstractPersistentStorage* db)
+    ec2::TransactionType::Value operator()(QnCommonModule* commonModule, const nx::vms::api::IdData& params, AbstractPersistentStorage* db)
     {
         const auto& resPool = commonModule->resourcePool();
         auto user = resPool->getResourceById<QnUserResource>(params.id);

@@ -8,7 +8,7 @@
 namespace ec2
 {
 
-    struct ApiLayoutItemData: ApiIdData
+    struct ApiLayoutItemData: nx::vms::api::IdData
     {
         ApiLayoutItemData();
 

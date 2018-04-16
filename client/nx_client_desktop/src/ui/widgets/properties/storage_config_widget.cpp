@@ -655,7 +655,7 @@ void QnStorageConfigWidget::applyChanges()
         return;
 
     QnStorageResourceList storagesToUpdate;
-    ec2::ApiIdDataList storagesToRemove;
+    nx::vms::api::IdDataList storagesToRemove;
 
     applyCamerasToBackup(m_camerasToBackup, m_quality);
     applyStoragesChanges(storagesToUpdate, m_model->storages());

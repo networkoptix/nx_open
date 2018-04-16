@@ -116,7 +116,7 @@ namespace ec2
             addAuditRecord(command, param, authInfo);
     }
 
-    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value command,  const ApiIdData& params, const QnAuthSession& authInfo)
+    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value command,  const nx::vms::api::IdData& params, const QnAuthSession& authInfo)
     {
         const auto& resPool = m_connection->commonModule()->resourcePool();
         Qn::AuditRecordType eventType = Qn::AR_NotDefined;
@@ -184,11 +184,14 @@ namespace ec2
         }
     }
 
-    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value command,  const ApiIdDataList& params, const QnAuthSession& authInfo)
-    {
-        for (const ApiIdData& param: params)
-            addAuditRecord(command, param, authInfo);
-    }
+void ECConnectionAuditManager::addAuditRecord(
+    ApiCommand::Value command,
+    const nx::vms::api::IdDataList& params,
+    const QnAuthSession& authInfo)
+{
+    for (const nx::vms::api::IdData& param: params)
+        addAuditRecord(command, param, authInfo);
+}
 
     void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value /*command*/,  const ApiResetBusinessRuleData& /*params*/, const QnAuthSession& authInfo)
     {

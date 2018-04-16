@@ -89,7 +89,7 @@ namespace ec2
         int backupBitrate; //< Bitrate cap in bytes per second. Negative value if not capped. Not capped by default.
 
         ApiMediaServerUserAttributesData();
-        QnUuid getIdForMerging() const { return serverId; } //< See ApiIdData::getIdForMerging().
+        QnUuid getIdForMerging() const { return serverId; } //< See IdData::getIdForMerging().
 
         static DeprecatedFieldNames* getDeprecatedFieldNames()
         {

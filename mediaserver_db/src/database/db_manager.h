@@ -69,12 +69,12 @@ struct ApiObjectInfo
 class ApiObjectInfoList: public std::vector<ApiObjectInfo>
 {
 public:
-    std::vector<ApiIdData> toIdList() const
+    std::vector<nx::vms::api::IdData> toIdList() const
     {
-        std::vector<ApiIdData> result;
+        std::vector<nx::vms::api::IdData> result;
         result.reserve(size());
         for (size_t i = 0; i < size(); ++i)
-            result.push_back(ApiIdData(at(i).id));
+            result.push_back(nx::vms::api::IdData(at(i).id));
         return result;
     }
 };
@@ -372,12 +372,12 @@ namespace detail
         ErrorCode executeTransactionInternal(const QnTransaction<ApiSystemMergeHistoryRecord>& tran);
 
         // delete camera, server, layout, any resource, etc.
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiIdData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::IdData>& tran);
 
         ErrorCode executeTransactionInternal(const QnTransaction<ApiLicenseDataList>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiLicenseData>& tran);
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiIdDataList>& /*tran*/)
+        ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::IdDataList>& /*tran*/)
         {
             NX_ASSERT(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
@@ -829,7 +829,7 @@ public:
     ApiObjectType getObjectTypeNoLock(const QnUuid& objectId);
     ApiObjectInfoList getNestedObjectsNoLock(const ApiObjectInfo& parentObject);
     ApiObjectInfoList getObjectsNoLock(const ApiObjectType& objectType);
-    ApiIdDataList getLayoutToursNoLock(const QnUuid& parentId);
+    nx::vms::api::IdDataList getLayoutToursNoLock(const QnUuid& parentId);
 
     void getResourceParamsNoLock(const QnUuid& resourceId, ApiResourceParamWithRefDataList& resourceParams);
 

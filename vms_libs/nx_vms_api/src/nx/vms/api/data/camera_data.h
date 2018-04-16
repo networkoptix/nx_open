@@ -11,7 +11,7 @@ namespace api {
 struct NX_VMS_API CameraData: ResourceData
 {
     /**
-     * See fillId() in ApiIdData
+     * See fillId() in IdData
      */
     void fillId();
 

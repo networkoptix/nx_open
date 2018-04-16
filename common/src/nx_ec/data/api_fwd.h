@@ -8,8 +8,6 @@ class QString;
 
 namespace ec2 {
 
-using ApiIdData = nx::vms::api::IdData;
-using ApiIdDataList = nx::vms::api::IdDataList;
 using ApiDataWithVersion = nx::vms::api::DataWithVersion;
 using ApiDatabaseDumpData = nx::vms::api::DatabaseDumpData;
 using ApiDatabaseDumpToFileData = nx::vms::api::DatabaseDumpToFileData;

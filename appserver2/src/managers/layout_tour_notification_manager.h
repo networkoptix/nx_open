@@ -7,14 +7,17 @@
 
 namespace ec2 {
 
-class QnLayoutTourNotificationManager : public AbstractLayoutTourNotificationManager
+class QnLayoutTourNotificationManager: public AbstractLayoutTourNotificationManager
 {
 public:
-    void triggerNotification(const QnTransaction<ApiIdData>& tran, NotificationSource source);
-    void triggerNotification(const QnTransaction<ApiLayoutTourData>& tran, NotificationSource source);
+    void triggerNotification(
+        const QnTransaction<nx::vms::api::IdData>& tran,
+        NotificationSource source);
+    void triggerNotification(
+        const QnTransaction<ApiLayoutTourData>& tran,
+        NotificationSource source);
 };
 
 typedef std::shared_ptr<QnLayoutTourNotificationManager> QnLayoutTourNotificationManagerPtr;
-
 
 } // namespace ec2

@@ -236,7 +236,7 @@ namespace ec2 {
 		* %param id Unique id of the resource.
 		* %// AbstractResourceManager::remove
 		*/
-		regUpdate<ApiIdData>(p, ApiCommand::removeResource);
+		regUpdate<IdData>(p, ApiCommand::removeResource);
 
 		/**%apidoc GET /ec2/getStatusList
 		* Read current status of the resources: cameras, servers and storages.
@@ -359,7 +359,7 @@ namespace ec2 {
 		regGet<QnUuid, ApiMediaServerUserAttributesDataList>(p, ApiCommand::getMediaServerUserAttributesList);
 
 		// AbstractMediaServerManager::remove
-		regUpdate<ApiIdData>(p, ApiCommand::removeMediaServer);
+		regUpdate<IdData>(p, ApiCommand::removeMediaServer);
 
 		/**%apidoc GET /ec2/getMediaServersEx
 		* Return server list.
@@ -402,9 +402,9 @@ namespace ec2 {
 		*/
 		regUpdate<ApiStorageData>(p, ApiCommand::saveStorage);
 
-		regUpdate<ApiIdDataList>(p, ApiCommand::removeStorages);
-		regUpdate<ApiIdData>(p, ApiCommand::removeStorage);
-		regUpdate<ApiIdDataList>(p, ApiCommand::removeResources);
+		regUpdate<IdDataList>(p, ApiCommand::removeStorages);
+		regUpdate<IdData>(p, ApiCommand::removeStorage);
+		regUpdate<IdDataList>(p, ApiCommand::removeResources);
 
 		// AbstractCameraManager::addCamera
 		regUpdate<ApiCameraData>(p, ApiCommand::saveCamera);
@@ -1030,7 +1030,7 @@ namespace ec2 {
 		regUpdate<ApiBusinessRuleData>(p, ApiCommand::saveEventRule);
 
 		// AbstractBusinessEventManager::deleteRule
-		regUpdate<ApiIdData>(p, ApiCommand::removeEventRule);
+		regUpdate<IdData>(p, ApiCommand::removeEventRule);
 
 		regUpdate<ApiResetBusinessRuleData>(p, ApiCommand::resetEventRules);
 		regUpdate<ApiBusinessActionData>(p, ApiCommand::broadcastAction);
@@ -1204,7 +1204,7 @@ namespace ec2 {
 		* %param id User unique id.
 		* %// AbstractUserManager::remove
 		*/
-		regUpdate<ApiIdData>(p, ApiCommand::removeUser);
+		regUpdate<IdData>(p, ApiCommand::removeUser);
 
 		/**%apidoc POST /ec2/saveUserRole
 		* <p>
@@ -1241,7 +1241,7 @@ namespace ec2 {
 		* %param id User role unique id.
 		* %// AbstractUserManager::removeUserRole
 		*/
-		regUpdate<ApiIdData>(p, ApiCommand::removeUserRole);
+		regUpdate<IdData>(p, ApiCommand::removeUserRole);
 
 		/**%apidoc GET /ec2/getPredefinedRoles
 		* Return list of predefined user roles.
@@ -1260,7 +1260,7 @@ namespace ec2 {
 		// AbstractVideowallManager::save
 		regUpdate<ApiVideowallData>(p, ApiCommand::saveVideowall);
 		// AbstractVideowallManager::remove
-		regUpdate<ApiIdData>(p, ApiCommand::removeVideowall);
+		regUpdate<IdData>(p, ApiCommand::removeVideowall);
 		regUpdate<ApiVideowallControlMessageData>(p, ApiCommand::videowallControl);
 
         /**%apidoc GET /ec2/getWebPages
@@ -1300,7 +1300,7 @@ namespace ec2 {
          * %param id Web page unique id.
          * // AbstractWebPageManager::remove
          */
-		regUpdate<ApiIdData>(p, ApiCommand::removeWebPage);
+		regUpdate<IdData>(p, ApiCommand::removeWebPage);
 
 		/**%apidoc GET /ec2/getLayouts
 		* Return list of user layout
@@ -1457,7 +1457,7 @@ namespace ec2 {
 		* %param id Unique id of the layout to be deleted.
 		* %// AbstractLayoutManager::remove
 		*/
-		regUpdate<ApiIdData>(p, ApiCommand::removeLayout);
+		regUpdate<IdData>(p, ApiCommand::removeLayout);
 
 		/**%apidoc GET /ec2/getLayoutTours
 		* Return list of layout tours
@@ -1496,7 +1496,7 @@ namespace ec2 {
 		* %param id Unique id of the layout tour to be deleted.
 		* %// AbstractLayoutTourManager::remove
 		*/
-		regUpdate<ApiIdData>(p, ApiCommand::removeLayoutTour);
+		regUpdate<IdData>(p, ApiCommand::removeLayoutTour);
 
 		/**%apidoc GET /ec2/listDirectory
 		* Return list of folders and files in a virtual FS stored inside
@@ -1562,7 +1562,7 @@ namespace ec2 {
 		regGet<nullptr_t, ApiTimeData>(p, ApiCommand::getCurrentTime);
 
 		// AbstractTimeManager::forcePrimaryTimeServer
-		regUpdate<ApiIdData>(p, ApiCommand::forcePrimaryTimeServer,
+		regUpdate<IdData>(p, ApiCommand::forcePrimaryTimeServer,
 			std::bind(&TimeSynchronizationManager::primaryTimeServerChanged,
 				m_timeSynchronizationManager.get(), _1));
 

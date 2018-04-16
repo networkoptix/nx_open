@@ -3,16 +3,17 @@
 #include <transaction/transaction.h>
 #include <nx_ec/managers/abstract_webpage_manager.h>
 
-namespace ec2
-{
+namespace ec2 {
 
-class QnWebPageNotificationManager : public AbstractWebPageNotificationManager
+class QnWebPageNotificationManager: public AbstractWebPageNotificationManager
 {
 public:
     QnWebPageNotificationManager();
 
     void triggerNotification(const QnTransaction<ApiWebPageData>& tran, NotificationSource source);
-    void triggerNotification(const QnTransaction<ApiIdData>& tran, NotificationSource source);
+    void triggerNotification(
+        const QnTransaction<nx::vms::api::IdData>& tran,
+        NotificationSource source);
 };
 
 typedef std::shared_ptr<QnWebPageNotificationManager> QnWebPageNotificationManagerPtr;
