@@ -12,7 +12,7 @@ def determine_package_versions():
         "qt": "5.6.2",
         "boost": "1.66.0",
         "openssl": "1.0.2e",
-        "ffmpeg": "3.1.9",
+        "ffmpeg": "3.1.1",
         "quazip": "0.7.1",
         "sigar": "1.7",
         "openldap": "2.4.42",
@@ -100,11 +100,6 @@ def sync_dependencies(syncher):
         sync("openssl")
 
     sync("ffmpeg")
-
-    if arch in ("x64", "x86"):
-        sync("libmp3lame-3.100")
-        sync("libvpx-1.7.0")
-        sync("vorbis-1.3.5")
 
     if platform == "linux" and box in ("bpi", "bananapi", "rpi", "tx1", "none"):
         sync("sysroot", path_variable="sysroot_directory")
