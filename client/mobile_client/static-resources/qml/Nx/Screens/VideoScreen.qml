@@ -20,6 +20,7 @@ PageBase
     property alias resourceId: videoScreenController.resourceId
     property alias initialScreenshot: screenshot.source
     property QnCameraListModel camerasModel: null
+    property real targetTimestamp: -1
 
     backgroundColor: "black"
 
@@ -601,7 +602,7 @@ PageBase
     onActivePageChanged:
     {
         if (activePage)
-            videoScreenController.start()
+            videoScreenController.start(targetTimestamp)
     }
 
     Component.onDestruction: exitFullscreen()

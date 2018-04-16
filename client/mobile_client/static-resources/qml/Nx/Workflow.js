@@ -39,6 +39,20 @@ function openNewSessionScreen()
     item.focusHostField()
 }
 
+function openConnectToServerScreen(host, user, password, operationId)
+{
+    var item = stackView.safePush(
+            Qt.resolvedUrl("Screens/CustomConnectionScreen.qml"),
+            {
+                "address": address,
+                "login": user,
+                "passowrd": password,
+                "operationId": operationId
+            }
+    )
+    item.focusCredentialsField()
+}
+
 function openDiscoveredSession(systemId, localSystemId, systemName, address)
 {
     var item = stackView.safePush(
@@ -92,16 +106,17 @@ function openResourcesScreen(systemName, filterIds)
     }
 }
 
-function openVideoScreen(resourceId, screenshotUrl, xHint, yHint)
+function openVideoScreen(resourceId, screenshotUrl, xHint, yHint, timestamp)
 {
-    stackView.setScaleTransitionHint(xHint, yHint)
-    var item = stackView.safePush(
-        Qt.resolvedUrl("Screens/VideoScreen.qml"),
+    var targetTimestamp = timestamp > 0 ? timestamp : -1
+    var properties =
         {
             "resourceId": resourceId,
-            "initialScreenshot": screenshotUrl
-        })
-    return item
+            "initialScreenshot": screenshotUrl,
+            "targetTimestamp": targetTimestamp
+        }
+    stackView.setScaleTransitionHint(xHint, yHint)
+    return stackView.safePush(Qt.resolvedUrl("Screens/VideoScreen.qml"), properties)
 }
 
 function openSettingsScreen()

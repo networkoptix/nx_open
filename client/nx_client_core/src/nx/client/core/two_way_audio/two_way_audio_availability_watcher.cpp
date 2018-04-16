@@ -45,7 +45,7 @@ void TwoWayAudioAvailabilityWatcher::setResourceId(const QnUuid& uuid)
         m_camera->disconnect(this);
 
     const auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(uuid);
-    m_camera = camera->hasTwoWayAudio() ? camera : QnVirtualCameraResourcePtr();
+    m_camera = camera && camera->hasTwoWayAudio() ? camera : QnVirtualCameraResourcePtr();
     m_licenseHelper.reset(m_camera && m_camera->isIOModule()
         ? new QnSingleCamLicenseStatusHelper(m_camera)
         : nullptr);

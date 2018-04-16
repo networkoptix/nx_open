@@ -9,6 +9,7 @@
 
 #include <common/common_module.h>
 #include <context/context.h>
+#include <context/connection_manager.h>
 #include <client_core/client_core_module.h>
 
 #include "mobile_client_ui_controller.h"
@@ -32,32 +33,53 @@ public:
 public:
     const QPointer<OperationManager> operationManager;
     const QPointer<QnMobileClientUiController> uiController;
+    const QPointer<QnConnectionManager> connectionManager;
     const QPointer<QnCloudStatusWatcher> cloudStatusWatcher;
 
 private:
-    void handleClientCommandConnectionPrepared(
-        const SystemUri& uri,
-        bool success);
+    void connectToServerDirectly(const SystemUri& uri);
 
     void handleCloudStatusChanged();
+    void handleConnectionStateChanged(bool connected);
 
     void loginToCloudDirectlyInternal(
         const SystemUri::Auth& aguth,
         const QString& connectOperationId);
 
+    void connectedCallback(const SystemUri& uri);
+
+    using SuccessConnectionCallback = std::function<void ()>;
+    void showConnectToServerByHostScreen(const SystemUri& uri,
+        const SuccessConnectionCallback& successConnectionCallback);
+
 private:
     QString directCloudConnectionOperationId;
+    QString connectToServerOperationId;
 };
 
 QnMobileClientUriHandler::Private::Private(QnContext* context):
     operationManager(context->operationManager()),
     uiController(context->uiController()),
+    connectionManager(context->connectionManager()),
     cloudStatusWatcher(context->cloudStatusWatcher())
 {
     connect(cloudStatusWatcher, &QnCloudStatusWatcher::statusChanged,
         this, &Private::handleCloudStatusChanged);
     connect(cloudStatusWatcher, &QnCloudStatusWatcher::errorChanged,
         this, &Private::handleCloudStatusChanged);
+
+    const auto connectionManager = context->connectionManager();
+    connect(connectionManager, &QnConnectionManager::connectionFailed, this,
+        [this](Qn::ConnectionResult /*status*/, const QVariant &/*infoParameter*/)
+        {
+            handleConnectionStateChanged(false);
+        });
+    connect(connectionManager, &QnConnectionManager::connected, this,
+        [this](bool initialConnect)
+        {
+            if (initialConnect)
+                handleConnectionStateChanged(true);
+        });
 }
 
 void QnMobileClientUriHandler::Private::handleCloudStatusChanged()
@@ -69,6 +91,16 @@ void QnMobileClientUriHandler::Private::handleCloudStatusChanged()
     const auto tmpId = directCloudConnectionOperationId;
     directCloudConnectionOperationId.clear();
     operationManager->finishOperation(tmpId, success);
+}
+
+void QnMobileClientUriHandler::Private::handleConnectionStateChanged(bool connected)
+{
+    if (connectToServerOperationId.isEmpty())
+        return;
+
+    const auto tmpId = connectToServerOperationId;
+    connectToServerOperationId.clear();
+    operationManager->finishOperation(tmpId, connected);
 }
 
 void QnMobileClientUriHandler::Private::loginToCloudDirectlyInternal(
@@ -97,6 +129,9 @@ void QnMobileClientUriHandler::Private::loginToCloud(
     bool forceLoginScreen,
     const QString& connectOperationId)
 {
+    if (!uiController)
+        return;
+
     const auto user = auth.user;
     const auto password = auth.password;
     const bool loggedInWithSameCredentials =
@@ -140,17 +175,58 @@ void QnMobileClientUriHandler::Private::loginToCloud(
     uiController->openLoginToCloudScreen(user, password, connectOperationId);
 }
 
-void QnMobileClientUriHandler::Private::handleClientCommandConnectionPrepared(
-    const SystemUri& uri,
-    bool success)
+void QnMobileClientUriHandler::Private::connectedCallback(const SystemUri& uri)
 {
     if (!uiController)
         return;
 
+    const auto resourceIds = uri.resourceIds();
+    if (resourceIds.isEmpty() || uri.systemAction() != SystemUri::SystemAction::View)
+        return;
+
+    const auto timestamp = uri.timestamp();
+    if (timestamp != -1)
+        uiController->openVideoScreen(resourceIds.first(), timestamp);
+    else
+        uiController->openResourcesScreen(resourceIds);
+}
+
+void QnMobileClientUriHandler::Private::showConnectToServerByHostScreen(const SystemUri& uri,
+    const SuccessConnectionCallback& successConnectionCallback)
+{
+    if (!uiController)
+        return;
+
+    const auto callback =
+        [successConnectionCallback](bool success)
+        {
+            if (success)
+                successConnectionCallback();
+        };
+
+    const auto operationId = operationManager->startOperation(callback);
+    uiController->openConnectToServerScreen(uri.connectionUrl(), operationId);
+}
+
+void QnMobileClientUriHandler::Private::connectToServerDirectly(const SystemUri& uri)
+{
+    if (!uiController)
+        return;
+
+    NX_EXPECT(connectToServerOperationId.isEmpty(),
+        "Double connect-to-server operation requested.");
+
     auto url = uri.connectionUrl();
     uiController->disconnectFromSystem();
-    if (!success || !url.isValid())
+    if (!url.isValid())
         return;
+
+    const auto auth = uri.authenticator();
+    if (auth.password.isEmpty() || auth.user.isEmpty())
+    {
+        showConnectToServerByHostScreen(uri, [this, uri]() { connectedCallback(uri); });
+        return;
+    }
 
     if (uri.hasCloudSystemId())
     {
@@ -158,11 +234,22 @@ void QnMobileClientUriHandler::Private::handleClientCommandConnectionPrepared(
         url.setPassword(cloudStatusWatcher->cloudPassword());
     }
 
-    const auto resourceIds = uri.systemAction() == SystemUri::SystemAction::View
-        ? uri.resourceIds()
-        : SystemUri::ResourceIdList();
+    const auto resourceIds = uri.resourceIds();
+    if (!resourceIds.isEmpty() && uri.systemAction() == SystemUri::SystemAction::View)
+    {
+        const auto callback =
+            [this, uri](bool success)
+            {
+                if (success)
+                    connectedCallback(uri);
+                else
+                    showConnectToServerByHostScreen(uri, [this, uri]() { connectedCallback(uri); });
+            };
 
-    uiController->connectToSystem(url, resourceIds);
+        connectToServerOperationId = operationManager->startOperation(callback);
+    }
+
+    uiController->connectToSystem(url);
 }
 
 void QnMobileClientUriHandler::Private::handleClientCommand(const SystemUri& uri)
@@ -174,17 +261,21 @@ void QnMobileClientUriHandler::Private::handleClientCommand(const SystemUri& uri
         return;
 
     const auto auth = uri.authenticator();
-    const bool cloudConnection = uri.hasCloudSystemId();
-    const auto connectToSystemCallback =
-        [this, uri](bool success) { handleClientCommandConnectionPrepared(uri, success); };
-
-    if (cloudConnection)
+    if (uri.hasCloudSystemId())
     {
-        const auto operationId = operationManager->startOperation(connectToSystemCallback);
+        const auto connectToServerCallback =
+            [this, uri](bool success)
+            {
+                if (success)
+                    connectToServerDirectly(uri);
+            };
+        const auto operationId = operationManager->startOperation(connectToServerCallback);
         loginToCloud(uri.authenticator(), false, operationId);
     }
-    else if (!auth.user.isEmpty() && !auth.password.isEmpty())
-        connectToSystemCallback(true);
+    else
+    {
+        connectToServerDirectly(uri);
+    }
 }
 
 //-------------------------------------------------------------------------------------------------

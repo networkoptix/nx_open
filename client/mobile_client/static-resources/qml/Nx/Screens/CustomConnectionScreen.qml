@@ -12,7 +12,7 @@ Page
     objectName: "customConnectionScreen"
 
     title: systemName ? systemName : qsTr("Connect to Server")
-    onLeftButtonClicked: Workflow.popCurrentScreen()
+    onLeftButtonClicked: cancelScreen();
 
     property alias systemId: systemHostsModel.systemId
     property alias localSystemId: authenticationDataModel.systemId
@@ -21,6 +21,7 @@ Page
     property alias login: credentialsEditor.login
     property alias password: credentialsEditor.password
     property bool saved: false
+    property string operationId
 
     QtObject
     {
@@ -124,7 +125,7 @@ Page
 
                             if (lastCredentials)
                             {
-                                Workflow.popCurrentScreen()
+                                cancelScreen()
                                 return
                             }
 
@@ -149,8 +150,11 @@ Page
 
         onConnectionStateChanged:
         {
-            if (connectionManager.connectionState === QnConnectionManager.Connected)
-                Workflow.openResourcesScreen(connectionManager.systemName || systemName)
+            if (connectionManager.connectionState != QnConnectionManager.Connected)
+                return;
+
+            Workflow.openResourcesScreen(connectionManager.systemName || systemName)
+            finishOperation(true)
         }
 
         onConnectionFailed:
@@ -230,5 +234,20 @@ Page
     function focusCredentialsField()
     {
         credentialsEditor.focusCredentialsField()
+    }
+
+    function cancelScreen()
+    {
+        Workflow.popCurrentScreen()
+        finishOperation(false)
+    }
+
+    function finishOperation(success)
+    {
+        if (!operationId.length)
+            return;
+
+        operationManager.finishOperation(operationId, false)
+        operationId = ""
     }
 }

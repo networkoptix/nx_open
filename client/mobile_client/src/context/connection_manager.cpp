@@ -123,8 +123,9 @@ QnConnectionManager::QnConnectionManager(QObject* parent):
         });
 
     connect(qnClientMessageProcessor, &QnMobileClientMessageProcessor::initialResourcesReceived, d,
-        [d]()
+        [this, d]()
         {
+            emit connected(!d->wasConnected);
             d->wasConnected = true;
             d->updateConnectionState();
             d->updateRestoringConnectionValue();
@@ -469,6 +470,7 @@ bool QnConnectionManagerPrivate::doConnect(bool restoringConnection)
 
             connectionVersion = connectionInfo.version;
             emit q->connectionVersionChanged();
+//            emit q->connected(!restoringConnection);
         });
 
     NX_LOG(lm("doConnect() END"), cl_logDEBUG1);

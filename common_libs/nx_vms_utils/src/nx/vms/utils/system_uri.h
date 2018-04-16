@@ -117,6 +117,9 @@ public:
     void setResourceIds(const ResourceIdList& resourceIds);
     ResourceIdList resourceIds() const;
 
+    void setTimestamp(qint64 value);
+    qint64 timestamp() const;
+
     struct Referral
     {
         ReferralContext context = ReferralContext::None;

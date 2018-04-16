@@ -14,6 +14,7 @@ const QString kAuthKey = "auth";
 const QString kReferralSourceKey = "from";
 const QString kReferralContextKey = "context";
 const QString kResourceIdsKey = "resources";
+const QString kTimestampKey = "timestamp";
 
 const int kDefaultPort = 80;
 const int kMaxPort = 65535;
@@ -125,6 +126,7 @@ public:
     SystemUri::Referral referral;
     SystemUri::Parameters parameters;
     SystemUri::ResourceIdList resourceIds;
+    qint64 timestamp = -1;
 
     SystemUriPrivate()
     {}
@@ -139,7 +141,8 @@ public:
         authenticator(other.authenticator),
         referral(other.referral),
         parameters(other.parameters),
-        resourceIds(other.resourceIds)
+        resourceIds(other.resourceIds),
+        timestamp(other.timestamp)
     {}
 
     void parse(const nx::utils::Url& url)
@@ -230,8 +233,14 @@ public:
             query.addQueryItem(kAuthKey, authenticator.encode());
         }
 
-        if (systemAction == SystemUri::SystemAction::View && !resourceIds.isEmpty())
-            query.addQueryItem(kResourceIdsKey, resourceIdsToString(resourceIds));
+        if (systemAction == SystemUri::SystemAction::View)
+        {
+            if (!resourceIds.isEmpty())
+                query.addQueryItem(kResourceIdsKey, resourceIdsToString(resourceIds));
+
+            if (timestamp != -1)
+                query.addQueryItem(kTimestampKey, QString::number(timestamp));
+        }
 
         if (referral.source != SystemUri::ReferralSource::None)
             query.addQueryItem(kReferralSourceKey, SystemUri::toString(referral.source));
@@ -280,7 +289,8 @@ public:
             && referral.source == SystemUri::ReferralSource::None
             && referral.context == SystemUri::ReferralContext::None
             && resourceIds.isEmpty()
-            && parameters.isEmpty();
+            && parameters.isEmpty()
+            && timestamp == -1;
     }
 
     bool isValid() const
@@ -306,7 +316,8 @@ public:
             && authenticator.user == other.authenticator.user
             && authenticator.password == other.authenticator.password
             && parameters == other.parameters
-            && resourceIds == other.resourceIds;
+            && resourceIds == other.resourceIds
+            && timestamp == other.timestamp;
     }
 
 private:
@@ -419,6 +430,9 @@ private:
 
         const auto resourceIdParameters = parameters.take(kResourceIdsKey);
         resourceIds = resourceIdsFromString(resourceIdParameters);
+
+        const auto timestampParameter = parameters.take(kTimestampKey);
+        timestamp = timestampParameter.isEmpty() ? -1 : timestampParameter.toLongLong();
 
         QString referralFrom = parameters.take(kReferralSourceKey).toLower();
         referral.source = referralSourceToString.key(referralFrom);
@@ -587,6 +601,17 @@ SystemUri::ResourceIdList SystemUri::resourceIds() const
     return d->resourceIds;
 }
 
+void SystemUri::setTimestamp(qint64 value)
+{
+    Q_D(SystemUri);
+    d->timestamp = value;
+}
+
+qint64 SystemUri::timestamp() const
+{
+    Q_D(const SystemUri);
+    return d->timestamp;
+}
 
 SystemUri::Referral SystemUri::referral() const
 {
