@@ -38,6 +38,7 @@ static const quint32 CSRC_CONST = 0xe8a9552a;
 static const int TCP_CONNECT_TIMEOUT_MS = 1000 * 5;
 static const int SDP_TRACK_STEP = 2;
 static const int METADATA_TRACK_NUM = 7;
+static const double kMaxRtcpJitterSeconds = 0.15; //< 150 ms
 static const double TIME_RESYNC_THRESHOLD_S = 10.0;
 static const double IGNORE_CAMERA_TIME_THRESHOLD_S = 7.0;
 static const double LOCAL_TIME_RESYNC_THRESHOLD_MS = 500;
@@ -308,7 +309,7 @@ bool QnRtspTimeHelper::isCameraTimeChanged(const QnRtspStatistic& statistics)
     double diff = statistics.localTime - statistics.ntpTime;
     if (m_rtcpReportTimeDiff == INT_MAX)
         m_rtcpReportTimeDiff = diff;
-    bool rez = qAbs(diff - m_rtcpReportTimeDiff) > TIME_RESYNC_THRESHOLD_S;
+    bool rez = qAbs(diff - m_rtcpReportTimeDiff) > kMaxRtcpJitterSeconds;
     if (rez)
         m_rtcpReportTimeDiff = INT_MAX;
     return rez;
@@ -440,7 +441,7 @@ qint64 QnRtspTimeHelper::getUsecTime(
                 NX_DEBUG(this, lm(
                     "Camera time has been changed or receiving latency > %1 seconds. "
                     "Resync time for camera %2")
-                    .args(TIME_RESYNC_THRESHOLD_S, m_resourceId));
+                    .args(kMaxRtcpJitterSeconds, m_resourceId));
             }
             else if (localTimeChanged)
             {
