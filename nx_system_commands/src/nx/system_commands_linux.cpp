@@ -15,6 +15,8 @@
 #include <sys/types.h>
 #include <sys/statvfs.h>
 #include <sys/mount.h>
+#include <sys/wait.h>
+#include <signal.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <dirent.h>
@@ -529,6 +531,18 @@ std::string SystemCommands::devicePath(const std::string& path, bool reportViaSo
         system_commands::domain_socket::detail::sendBuffer(result.data(), result.size());
 
     return result;
+}
+
+bool SystemCommands::kill(int pid)
+{
+    int result = ::kill(pid, SIGKILL);
+    if (result != 0)
+    {
+        m_lastError = format("Kill failed for %", pid);
+        return false;
+    }
+
+    return true;
 }
 
 bool SystemCommands::install(const std::string& debPackage)
