@@ -134,6 +134,7 @@ namespace nx_hls
         response->headers.emplace("Date", currentTimeInHttpFormat);
         response->headers.emplace(nx_http::header::Server::NAME, nx_http::serverString());
         response->headers.emplace("Cache-Control", "no-cache");
+        response->headers.emplace("Access-Control-Allow-Origin", "*");
 
         if (request.requestLine.version == nx_http::http_1_1)
         {
