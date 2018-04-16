@@ -9,6 +9,8 @@
 #include <nx/core/access/access_types.h>
 #include <core/resource_access/user_access_data.h>
 #include <api/model/audit/auth_session.h>
+
+#include <nx_ec/data/api_fwd.h>
 #include <nx_ec/data/api_data.h>
 
 #include "mock_stream_socket.h"
@@ -78,7 +80,7 @@ struct ApiMockData: ApiIdData
     ApiMockInnerData inner;
     ApiMockInnerDataList array;
 };
-#define ApiMockData_Fields ApiIdData_Fields (i)(array)(inner)
+#define ApiMockData_Fields IdData_Fields (i)(array)(inner)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((ApiMockData), (ubjson)(json), _Fields)
 typedef std::vector<ApiMockData> ApiMockDataList;
 
@@ -135,7 +137,7 @@ struct ApiMockDataJson
 class MockConnection
 {
 public:
-    typedef std::function<void(ErrorCode, ApiMockDataList)> QueryHandler;
+    typedef std::function<void(ec2::ErrorCode, ApiMockDataList)> QueryHandler;
     typedef std::function<void(
         ApiCommand::Value cmdCode, QnUuid input, QueryHandler handler)> QueryCallback;
 

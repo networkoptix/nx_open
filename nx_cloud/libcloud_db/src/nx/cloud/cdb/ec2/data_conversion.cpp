@@ -3,6 +3,9 @@
 #include <nx_ec/data/api_user_data.h>
 #include <nx/fusion/serialization/lexical.h>
 
+#include <nx_ec/data/api_fwd.h>
+#include <nx/vms/api/data/id_data.h>
+
 namespace nx {
 namespace cdb {
 namespace ec2 {

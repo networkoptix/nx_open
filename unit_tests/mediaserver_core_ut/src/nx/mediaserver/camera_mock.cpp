@@ -150,7 +150,7 @@ bool CameraMock::isCameraControlDisabled() const
 
 Qn::MotionType CameraMock::getMotionType() const
 {
-    return Qn::MT_SoftwareGrid;
+    return Qn::MotionType::MT_SoftwareGrid;
 }
 
 bool CameraMock::saveParams()

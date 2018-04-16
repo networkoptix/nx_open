@@ -1,15 +1,10 @@
 #pragma once
 
+#include <nx_ec/data/api_fwd.h>
+
 #include <nx/cloud/cdb/api/system_data.h>
 
 #include <common/common_globals.h>
-
-namespace ec2 {
-
-struct ApiUserData;
-struct ApiIdData;
-
-} // namespace ec2
 
 namespace nx {
 
