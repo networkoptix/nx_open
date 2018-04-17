@@ -313,7 +313,7 @@ bool QnRtspTimeHelper::isCameraTimeChanged(const QnRtspStatistic& statistics, do
     bool result = false;
     if (*outCameraTimeDriftSeconds > TIME_RESYNC_THRESHOLD_S)
     {
-        result = true; //< Quite big delta. Report time change immidiatly.
+        result = true; //< Quite big delta. Report time change immediately.
     }
     else if (*outCameraTimeDriftSeconds > kMaxRtcpJitterSeconds)
     {

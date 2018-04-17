@@ -316,7 +316,7 @@ boost::optional<QnModuleInformation> ModuleConnector::Module::getInformation(
 {
     if (!client->hasRequestSuccesed())
     {
-        NX_DEBUG(this, lm("Request to %1 has failed").args(client->url()));
+        NX_VERBOSE(this, lm("Request to %1 has failed").args(client->url()));
         return boost::none;
     }
 
@@ -325,7 +325,7 @@ boost::optional<QnModuleInformation> ModuleConnector::Module::getInformation(
 
     if (Qn::serializationFormatFromHttpContentType(contentType) != Qn::JsonFormat)
     {
-        NX_DEBUG(this, lm("Unexpected Content-Type %2 from %3")
+        NX_VERBOSE(this, lm("Unexpected Content-Type %2 from %3")
             .args(contentType, client->url()));
         return boost::none;
     }
@@ -334,7 +334,7 @@ boost::optional<QnModuleInformation> ModuleConnector::Module::getInformation(
     if (!QJson::deserialize(client->fetchMessageBodyBuffer(), &restResult)
         || restResult.error != QnRestResult::Error::NoError)
     {
-        NX_DEBUG(this, lm("Error response '%2' from %3")
+        NX_VERBOSE(this, lm("Error response '%2' from %3")
             .args(restResult.errorString, client->url()));
         return boost::none;
     }
@@ -343,7 +343,7 @@ boost::optional<QnModuleInformation> ModuleConnector::Module::getInformation(
     if (!QJson::deserialize<QnModuleInformation>(restResult.reply, &moduleInformation)
         || moduleInformation.id.isNull())
     {
-        NX_DEBUG(this, lm("Can not deserialize rsponse from %1")
+        NX_VERBOSE(this, lm("Can not deserialize rsponse from %1")
             .args(moduleInformation.id));
         return boost::none;
     }

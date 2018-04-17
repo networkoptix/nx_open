@@ -442,7 +442,7 @@ void AsyncClient::asyncConnectDone(SystemError::ErrorCode errorCode)
     }
 
     NX_LOGX(lm("Failed to establish tcp connection to %1. %2")
-        .arg(m_contentLocationUrl).arg(SystemError::toString(errorCode)), cl_logDEBUG1);
+        .arg(m_contentLocationUrl).arg(SystemError::toString(errorCode)), cl_logDEBUG2);
     m_lastSysErrorCode = errorCode;
 
     m_state = sFailed;
@@ -469,7 +469,7 @@ void AsyncClient::asyncSendDone(SystemError::ErrorCode errorCode, size_t bytesWr
         if (reconnectIfAppropriate())
             return;
         NX_LOGX(lm("Error sending (1) http request to %1. %2")
-            .arg(m_contentLocationUrl).arg(SystemError::toString(errorCode)), cl_logDEBUG1);
+            .arg(m_contentLocationUrl).arg(SystemError::toString(errorCode)), cl_logDEBUG2);
         m_state = sFailed;
         m_lastSysErrorCode = errorCode;
         const auto requestSequenceBak = m_requestSequence;
@@ -516,7 +516,7 @@ void AsyncClient::asyncSendDone(SystemError::ErrorCode errorCode, size_t bytesWr
         NX_LOGX(lm("Url %1. Error setting receive timeout to %2 ms. %3")
             .arg(m_contentLocationUrl).arg(m_responseReadTimeout)
             .arg(SystemError::toString(sysErrorCode)),
-            cl_logDEBUG1);
+            cl_logDEBUG2);
         m_state = sFailed;
         const auto requestSequenceBak = m_requestSequence;
         if (emitDone() == Result::thisDestroyed)
@@ -558,7 +558,7 @@ void AsyncClient::onSomeBytesReadAsync(
 
         NX_LOGX(lm("Error reading (state %1) http response from %2. %3")
             .arg(stateBak).arg(m_contentLocationUrl).arg(SystemError::toString(errorCode)),
-            cl_logDEBUG1);
+            cl_logDEBUG2);
         m_lastSysErrorCode = errorCode;
         const auto requestSequenceBak = m_requestSequence;
         if (emitDone() == Result::thisDestroyed)
@@ -705,7 +705,7 @@ size_t AsyncClient::parseReceivedBytes(size_t bytesRead)
     if (!m_httpStreamReader.parseBytes(m_responseBuffer, bytesRead, &bytesProcessed))
     {
         NX_LOGX(lm("Error parsing http response from %1. %2")
-            .arg(m_contentLocationUrl).arg(m_httpStreamReader.errorText()), cl_logDEBUG1);
+            .arg(m_contentLocationUrl).arg(m_httpStreamReader.errorText()), cl_logDEBUG2);
         m_state = sFailed;
         return -1;
     }
@@ -812,7 +812,7 @@ AsyncClient::Result AsyncClient::processResponseHeadersBytes(
                 return Result::proceed;
 
             NX_LOGX(lm("Failed to read (1) response from %1. %2")
-                .arg(m_contentLocationUrl).arg(SystemError::connectionReset), cl_logDEBUG1);
+                .arg(m_contentLocationUrl).arg(SystemError::connectionReset), cl_logDEBUG2);
             m_state = sFailed;
             return emitDone();
         }
@@ -893,7 +893,7 @@ AsyncClient::Result AsyncClient::processResponseHeadersBytes(
         {
             NX_LOGX(lm("Failed to read (1) response from %1. %2")
                 .arg(m_contentLocationUrl).arg(SystemError::getLastOSErrorText()),
-                cl_logDEBUG1);
+                cl_logDEBUG2);
 
             m_state = sFailed;
             return emitDone();
@@ -920,7 +920,7 @@ bool AsyncClient::isMalformed(const nx_http::Response& response) const
             NX_LOGX(lm("Received malformed response from %1. "
                 "Status code is %2 and no Upgrade header present")
                 .arg(m_contentLocationUrl).arg(response.statusLine.statusCode),
-                cl_logDEBUG1);
+                cl_logDEBUG2);
             return true;
         }
     }
