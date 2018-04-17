@@ -282,6 +282,14 @@ namespace
         drawCroppedData(painter, target, cropTarget, image, source, drawnTarget);
     }
 
+    int qBoundWorkaround(int min, int value, int max)
+    {
+        // We can't use qBound here since it looks like an error exist in MacOs compiler
+        // which causes exception. Thus we have to use this wrokaround function to
+        // avoid crash.
+        return std::max(min, std::min(max, value));
+    }
+
 } // anonymous namespace
 
 
@@ -1487,7 +1495,8 @@ QColor QnTimeSlider::tickmarkTextColor(int level) const
     if (m_colors.tickmarkText.empty())
         return QColor(255, 255, 255, 255);
 
-    return m_colors.tickmarkText[qBound(0, level, static_cast<int>(m_colors.tickmarkText.size() - 1))];
+    const int maxIndex = m_colors.tickmarkText.size() - 1;
+    return m_colors.tickmarkText[qBoundWorkaround(0, level, maxIndex)];
 }
 
 QRectF QnTimeSlider::thumbnailsRect() const
