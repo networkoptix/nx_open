@@ -3,6 +3,24 @@ set -e
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR
 
+if [ "$DIR" != "$PWD" ]
+then
+    echo "pip install requirements"
+    virtualenv env
+    . ./env/bin/activate
+    pip install -r requirements.txt
+
+
+    echo "npm install"
+    pushd ../front_end
+    npm install
+    popd
+
+    pushd ../../webadmin
+    npm install
+    popd
+fi
+
 TARGET_DIR="../cloud/static"
 
 echo "Clear $TARGET_DIR"
