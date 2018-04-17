@@ -8,7 +8,7 @@ QnCameraNotificationManager::QnCameraNotificationManager()
 }
 
 void QnCameraNotificationManager::triggerNotification(
-    const QnTransaction<ApiCameraData>& tran, 
+    const QnTransaction<nx::vms::api::CameraData>& tran, 
     NotificationSource source)
 {
     NX_ASSERT(tran.command == ApiCommand::saveCamera);
@@ -20,7 +20,7 @@ void QnCameraNotificationManager::triggerNotification(
     NotificationSource source)
 {
     NX_ASSERT(tran.command == ApiCommand::saveCameras);
-    for (const ApiCameraData& camera : tran.params)
+    for (const auto& camera: tran.params)
         emit addedOrUpdated(camera, source);
 }
 

@@ -11,7 +11,7 @@
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_server_resource.h>
 #include <core/misc/schedule_task.h>
-#include <nx_ec/data/api_camera_attributes_data.h>
+#include <nx/vms/api/data/camera_attributes_data.h>
 
 #include <camera/fps_calculator.h>
 

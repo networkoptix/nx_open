@@ -6,7 +6,7 @@
 #include <core/resource_management/resource_properties.h>
 #include <core/resource/param.h>
 
-#include <nx_ec/data/api_camera_data.h>
+#include <nx/vms/api/data/camera_data.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_camera_manager.h>
 
@@ -132,7 +132,7 @@ void QnVirtualCameraResource::updateSourceUrl(const QString& url, Qn::Connection
 
 int QnVirtualCameraResource::saveAsync()
 {
-    ec2::ApiCameraData apiCamera;
+    nx::vms::api::CameraData apiCamera;
     ec2::fromResourceToApi(toSharedPointer(this), apiCamera);
 
     ec2::AbstractECConnectionPtr conn = commonModule()->ec2Connection();

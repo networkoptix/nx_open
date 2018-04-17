@@ -329,11 +329,14 @@ bool ServerTransactionMessageBus::sendInitialData(QnTransactionTransport* transp
 		// Filter out desktop cameras.
 		// Usually, there are only a few desktop cameras relatively to total cameras count.
 		tranCameras.params.reserve(cameras.size());
-		std::copy_if(cameras.cbegin(), cameras.cend(), std::back_inserter(tranCameras.params),
-			[](const ec2::ApiCameraData& camera)
-		{
-			return camera.typeId != QnResourceTypePool::kDesktopCameraTypeUuid;
-		});
+	    std::copy_if(
+	        cameras.cbegin(),
+	        cameras.cend(),
+	        std::back_inserter(tranCameras.params),
+	        [](const nx::vms::api::CameraData& camera)
+	        {
+	            return camera.typeId != QnResourceTypePool::kDesktopCameraTypeUuid;
+	        });
 
 		QnTransaction<ApiUserDataList> tranUsers;
 		tranUsers.command = ApiCommand::getUsers;
@@ -490,7 +493,8 @@ bool ServerTransactionMessageBus::gotTransactionFromRemotePeer(
 	return false;
 }
 
-ErrorCode ServerTransactionMessageBus::updatePersistentMarker(const QnTransaction<ApiUpdateSequenceData>& tran)
+ErrorCode ServerTransactionMessageBus::updatePersistentMarker(
+    const QnTransaction<nx::vms::api::UpdateSequenceData>& tran)
 {
 	return m_db->transactionLog()->updateSequence(tran.params);
 }
@@ -500,9 +504,9 @@ void ServerTransactionMessageBus::proxyFillerTransaction(
     const QnTransactionTransportHeader& transportHeader)
 {
     // proxy filler transaction to avoid gaps in the persistent sequence
-    QnTransaction<ApiUpdateSequenceData> fillerTran(tran);
+    QnTransaction<nx::vms::api::UpdateSequenceData> fillerTran(tran);
     fillerTran.command = ApiCommand::updatePersistentSequence;
-    ApiSyncMarkerRecord record;
+    nx::vms::api::SyncMarkerRecordData record;
     record.peerID = tran.peerID;
     record.dbID = tran.persistentInfo.dbID;
     record.sequence = tran.persistentInfo.sequence;

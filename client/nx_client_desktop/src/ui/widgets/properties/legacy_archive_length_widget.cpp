@@ -13,7 +13,7 @@
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <nx/client/desktop/common/utils/checkbox_utils.h>
 #include <core/resource/device_dependent_strings.h>
-#include <nx_ec/data/api_camera_attributes_data.h>
+#include <nx/vms/api/data/camera_attributes_data.h>
 
 namespace {
 static const int kDangerousMinArchiveDays = 5;

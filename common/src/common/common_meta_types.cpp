@@ -93,6 +93,7 @@
 #include <nx_ec/data/api_resource_data.h>
 #include <nx_ec/data/api_reverse_connection_data.h>
 #include <nx_ec/data/api_full_info_data.h>
+#include <nx/vms/api/data/event_rule_data.h> //< Required for the FullInfoData
 #include <nx_ec/data/api_webpage_data.h>
 #include <nx_ec/data/api_videowall_data.h>
 #include <nx_ec/data/api_user_data.h>
@@ -100,8 +101,6 @@
 #include <nx_ec/data/api_license_data.h>
 #include <nx_ec/data/api_layout_data.h>
 #include <nx_ec/data/api_layout_tour_data.h>
-#include <nx_ec/data/api_camera_data.h>
-#include <nx_ec/data/api_business_rule_data.h>
 #include <nx_ec/data/api_access_rights_data.h>
 #include <nx_ec/transaction_timestamp.h>
 
@@ -117,6 +116,7 @@
 #include <core/dataprovider/stream_mixer_data.h>
 
 #include <nx/vms/common/p2p/downloader/file_information.h>
+#include <nx/vms/api/metatypes.h>
 
 namespace {
     bool qn_commonMetaTypes_initialized = false;
@@ -124,7 +124,10 @@ namespace {
 
 QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::ResourceInfoLevel);
 
-void QnCommonMetaTypes::initialize() {
+void QnCommonMetaTypes::initialize()
+{
+    nx::vms::api::Metatypes::initialize();
+
     /* Note that running the code twice is perfectly OK,
      * so we don't need heavyweight synchronization here. */
     if(qn_commonMetaTypes_initialized)
@@ -316,14 +319,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<ec2::ApiDiscoveredServerDataList>("ApiDiscoveredServerDataList");
     qRegisterMetaType<ec2::ApiReverseConnectionData>( "ApiReverseConnectionData" );
     qRegisterMetaType<ec2::ApiRuntimeData>( "ApiRuntimeData" );
-    qRegisterMetaType<ec2::ApiDatabaseDumpData>( "ApiDatabaseDumpData" );
-    qRegisterMetaType<ec2::ApiDatabaseDumpToFileData>( "ApiDatabaseDumpToFileData" );
     qRegisterMetaType<ec2::ApiLockData>( "ApiLockData" );
-    qRegisterMetaType<ec2::ApiResourceParamWithRefData>( "ApiResourceParamWithRefData" );
-    qRegisterMetaType<ec2::ApiResourceParamWithRefDataList>("ApiResourceParamWithRefDataList");
-
-    qRegisterMetaType<ec2::ApiResourceParamData>("ApiResourceParamData");
-    qRegisterMetaType<ec2::ApiResourceParamDataList>("ApiResourceParamDataList");
 
     qRegisterMetaType<ec2::ApiServerFootageData>("ApiServerFootageData");
     qRegisterMetaType<ec2::ApiServerFootageDataList>("ApiServerFootageDataList");
@@ -343,12 +339,11 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<ec2::ApiVideowallData>("ec2::ApiVideowallData");
     qRegisterMetaType<ec2::ApiVideowallControlMessageData>("ec2::ApiVideowallControlMessageData");
     qRegisterMetaType<ec2::ApiWebPageData>("ec2::ApiWebPageData");
-    qRegisterMetaType<ec2::ApiCameraData>("ec2::ApiCameraData");
+    
     qRegisterMetaType<ec2::ApiCameraAttributesData>("ec2::ApiCameraAttributesData");
     qRegisterMetaType<ec2::ApiMediaServerData>("ec2::ApiMediaServerData");
     qRegisterMetaType<ec2::ApiMediaServerUserAttributesData>("ec2::ApiMediaServerUserAttributesData");
     qRegisterMetaType<ec2::ApiStorageData>("ec2::ApiStorageData");
-    qRegisterMetaType<ec2::ApiResourceParamWithRefDataList>("ec2::ApiResourceParamWithRefDataList");
     qRegisterMetaType<ec2::ApiLayoutTourData>("ec2::ApiLayoutTourData");
 
     qRegisterMetaType<QnUuid>();

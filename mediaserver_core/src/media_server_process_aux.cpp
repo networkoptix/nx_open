@@ -360,9 +360,9 @@ void makeFakeData(const QString& fakeDataString,
         users.push_back(userData);
     }
 
-    std::vector<ec2::ApiCameraData> cameras;
-    std::vector<ec2::ApiCameraAttributesData> userAttrs;
-    ec2::ApiResourceParamWithRefDataList cameraParams;
+    nx::vms::api::CameraDataList cameras;
+    nx::vms::api::CameraAttributesDataList userAttrs;
+    nx::vms::api::ResourceParamWithRefDataList cameraParams;
     auto resTypePtr = qnResTypePool->getResourceTypeByName("Camera");
     NX_ASSERT(!resTypePtr.isNull());
     for (int i = 0; i < camerasCount; ++i)
@@ -382,8 +382,8 @@ void makeFakeData(const QString& fakeDataString,
 
         for (int j = 0; j < propertiesPerCamera; ++j)
         {
-            cameraParams.push_back(ec2::ApiResourceParamWithRefData(
-                cameraData.id, lit("property%1").arg(j), lit("value%1").arg(j)));
+            cameraParams.emplace_back(
+                cameraData.id, lit("property%1").arg(j), lit("value%1").arg(j));
         }
     }
 

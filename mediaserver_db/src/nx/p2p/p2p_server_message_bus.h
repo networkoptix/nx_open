@@ -55,14 +55,14 @@ protected:
         bool addImplicitData) override;
 
     void gotTransaction(
-        const QnTransaction<ApiUpdateSequenceData> &tran,
+        const QnTransaction<nx::vms::api::UpdateSequenceData>& tran,
         const P2pConnectionPtr& connection,
         const TransportHeader& transportHeader);
 
 	template <class T>
 	void gotTransaction(
-        const QnTransaction<T>& tran, 
-        const P2pConnectionPtr& connection, 
+        const QnTransaction<T>& tran,
+        const P2pConnectionPtr& connection,
         const TransportHeader& transportHeader);
 private:
     friend struct GotTransactionFuction;

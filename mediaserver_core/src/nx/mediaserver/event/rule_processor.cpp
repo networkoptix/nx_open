@@ -17,7 +17,7 @@
 #include <database/server_db.h>
 #include <utils/common/synctime.h>
 #include <utils/common/app_info.h>
-#include <nx_ec/data/api_business_rule_data.h>
+#include <nx/vms/api/data/event_rule_data.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/event/action_factory.h>
@@ -153,7 +153,7 @@ void RuleProcessor::doProxyAction(const vms::event::AbstractActionPtr& action,
     if (routeToServer)
     {
         // TODO: #rvasilenko It is better to use action.clone() here.
-        ec2::ApiBusinessActionData actionData;
+        nx::vms::api::EventActionData actionData;
         vms::event::AbstractActionPtr actionToSend;
 
         ec2::fromResourceToApi(action, actionData);

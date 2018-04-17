@@ -90,10 +90,13 @@ void loadResourcesFromEcs(
         }
 
         // read resource status
-        ec2::ApiResourceStatusDataList statusList;
-        while ((rez = ec2Connection->getResourceManager(Qn::kSystemAccess)->getStatusListSync(QnUuid(), &statusList)) != ec2::ErrorCode::ok)
+        nx::vms::api::ResourceStatusDataList statusList;
+        while ((rez = ec2Connection->getResourceManager(Qn::kSystemAccess)->getStatusListSync(
+            QnUuid(),
+            &statusList)) != ec2::ErrorCode::ok)
         {
-            NX_LOG(lit("QnMain::run(): Can't get properties dictionary. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1);
+            NX_LOG(lit("QnMain::run(): Can't get properties dictionary. Reason: %1").arg(ec2::
+                toString(rez)), cl_logDEBUG1);
             std::this_thread::sleep_for(kAppServerRequestErrorTimeout);
             if (needToStop())
                 return;
@@ -137,7 +140,7 @@ void loadResourcesFromEcs(
         messageProcessor->resetCameraUserAttributesList(cameraUserAttributesList);
 
         // read properties dictionary
-        ec2::ApiResourceParamWithRefDataList kvPairs;
+        nx::vms::api::ResourceParamWithRefDataList kvPairs;
         while ((rez = ec2Connection->getResourceManager(Qn::kSystemAccess)->getKvPairsSync(QnUuid(), &kvPairs)) != ec2::ErrorCode::ok)
         {
             NX_LOG(lit("QnMain::run(): Can't get properties dictionary. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1);

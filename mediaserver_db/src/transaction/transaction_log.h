@@ -97,7 +97,7 @@ namespace ec2
 
         int getLatestSequence(const ApiPersistentIdData& key) const;
 
-        ErrorCode updateSequence(const ApiUpdateSequenceData& data);
+        ErrorCode updateSequence(const nx::vms::api::UpdateSequenceData& data);
         ErrorCode updateSequence(const QnAbstractTransaction& tran, TransactionLockType lockType);
         void fillPersistentInfo(QnAbstractTransaction& tran);
 

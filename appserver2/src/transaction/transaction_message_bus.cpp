@@ -15,8 +15,8 @@
 #include "nx/vms/discovery/manager.h"
 #include "settings.h"
 
-#include "nx_ec/data/api_camera_data_ex.h"
-#include "nx_ec/data/api_camera_data.h"
+#include <nx/vms/api/data/camera_data.h>
+#include <nx/vms/api/data/camera_data_ex.h>
 #include "nx_ec/data/api_resource_data.h"
 #include "nx_ec/data/api_resource_type_data.h"
 #include "nx_ec/data/api_reverse_connection_data.h"
@@ -466,7 +466,7 @@ void QnTransactionMessageBus::updateLastActivity(QnTransactionTransport* sender,
 }
 
 ErrorCode QnTransactionMessageBus::updatePersistentMarker(
-    const QnTransaction<ApiUpdateSequenceData>& tran)
+    const QnTransaction<nx::vms::api::UpdateSequenceData>& tran)
 {
     return ErrorCode::notImplemented;
 }

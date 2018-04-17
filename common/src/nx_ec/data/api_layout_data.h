@@ -37,7 +37,7 @@ namespace ec2
 
 
 
-    struct ApiLayoutData: ApiResourceData
+    struct ApiLayoutData: nx::vms::api::ResourceData
     {
         ApiLayoutData()
         {

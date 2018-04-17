@@ -201,7 +201,7 @@ APPLY(201, removeResource, nx::vms::api::IdData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(202, setResourceStatus, ApiResourceStatusData, \
+APPLY(202, setResourceStatus, nx::vms::api::ResourceStatusData, \
                        true,  /* persistent*/ \
                        false, /* system*/ \
                        CreateHashByIdRfc4122Helper("status"), /* getHash*/ \
@@ -223,7 +223,7 @@ APPLY(213, removeResourceStatus, nx::vms::api::IdData, /* Remove records from vm
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(),                     \
                        RegularTransactionType()) /* local transaction type is set manually in  server query processor via removeResourceStatusHelper call*/ \
-APPLY(204, setResourceParams, ApiResourceParamWithRefDataList, \
+APPLY(204, setResourceParams, nx::vms::api::ResourceParamWithRefDataList, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
@@ -234,7 +234,7 @@ APPLY(204, setResourceParams, ApiResourceParamWithRefDataList, \
                        FilterListByAccess<ReadResourceParamAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadResourceParamAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(203, getResourceParams, ApiResourceParamWithRefDataList, \
+APPLY(203, getResourceParams, nx::vms::api::ResourceParamWithRefDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
@@ -272,7 +272,7 @@ APPLY(206, getFullInfo, ApiFullInfoData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(208, setResourceParam, ApiResourceParamWithRefData, \
+APPLY(208, setResourceParam, nx::vms::api::ResourceParamWithRefData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        CreateHashForResourceParamWithRefDataHelper(), /* getHash*/ \
@@ -283,7 +283,7 @@ APPLY(208, setResourceParam, ApiResourceParamWithRefData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        ReadResourceParamAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        SetResourceParamTransactionType()) \
-APPLY(209, removeResourceParam, ApiResourceParamWithRefData, \
+APPLY(209, removeResourceParam, nx::vms::api::ResourceParamWithRefData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        CreateHashForResourceParamWithRefDataHelper(), /* getHash*/ \
@@ -294,7 +294,7 @@ APPLY(209, removeResourceParam, ApiResourceParamWithRefData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        SetResourceParamTransactionType()) /* regular transaction type */ \
-APPLY(210, removeResourceParams, ApiResourceParamWithRefDataList, \
+APPLY(210, removeResourceParams, nx::vms::api::ResourceParamWithRefDataList, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
@@ -305,7 +305,7 @@ APPLY(210, removeResourceParams, ApiResourceParamWithRefDataList, \
                        FilterListByAccess<ReadResourceParamAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(211, getStatusList, ApiResourceStatusDataList, \
+APPLY(211, getStatusList, nx::vms::api::ResourceStatusDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
@@ -338,7 +338,7 @@ APPLY(300, getCameras, ApiCameraDataList, \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadResourceAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(301, saveCamera, ApiCameraData, \
+APPLY(301, saveCamera, nx::vms::api::CameraData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
@@ -847,7 +847,7 @@ APPLY(703, videowallControl, ApiVideowallControlMessageData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(800, getEventRules, ApiBusinessRuleDataList, \
+APPLY(800, getEventRules, nx::vms::api::EventRuleDataList, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
@@ -858,7 +858,7 @@ APPLY(800, getEventRules, ApiBusinessRuleDataList, \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(801, saveEventRule, ApiBusinessRuleData, \
+APPLY(801, saveEventRule, nx::vms::api::EventRuleData, \
                        true, \
                        false, \
                        CreateHashByIdHelper(), \
@@ -880,10 +880,10 @@ APPLY(802, removeEventRule, nx::vms::api::IdData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(803, resetEventRules, ApiResetBusinessRuleData, \
+APPLY(803, resetEventRules, nx::vms::api::ResetEventRulesData, \
                        true, \
                        false, \
-                       [] (const ApiResetBusinessRuleData&) { return QnAbstractTransaction::makeHash("reset_brule", ADD_HASH_DATA); }, \
+                       [] (const nx::vms::api::ResetEventRulesData&) { return QnAbstractTransaction::makeHash("reset_brule", ADD_HASH_DATA); }, \
                        BusinessEventNotificationManagerHelper(), \
                        AdminOnlyAccess(), /* save permission checker */ \
                        AllowForAllAccess(), /* read permission checker */ \
@@ -891,7 +891,7 @@ APPLY(803, resetEventRules, ApiResetBusinessRuleData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(804, broadcastAction, ApiBusinessActionData, \
+APPLY(804, broadcastAction, nx::vms::api::EventActionData, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
@@ -902,7 +902,7 @@ APPLY(804, broadcastAction, ApiBusinessActionData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(805, execAction, ApiBusinessActionData, \
+APPLY(805, execAction, nx::vms::api::EventActionData, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
@@ -1226,7 +1226,7 @@ APPLY(2006, markLicenseOverflow, ApiLicenseOverflowData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        LocalTransactionType()) /* local transaction type */ \
-APPLY(2007, getSettings, ApiResourceParamDataList, \
+APPLY(2007, getSettings, nx::vms::api::ResourceParamDataList, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
@@ -1298,11 +1298,11 @@ APPLY(9004, runtimeInfoChanged, ApiRuntimeData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(9005, dumpDatabase, ApiDatabaseDumpData, \
+APPLY(9005, dumpDatabase, nx::vms::api::DatabaseDumpData, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
-                       [] (const QnTransaction<ApiDatabaseDumpData> &, const NotificationParams &notificationParams) \
+                       [] (const QnTransaction<nx::vms::api::DatabaseDumpData> &, const NotificationParams &notificationParams) \
                         { \
                             emit notificationParams.ecConnection->databaseDumped(); \
                         }, \
@@ -1312,11 +1312,11 @@ APPLY(9005, dumpDatabase, ApiDatabaseDumpData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        LocalTransactionType()) /* local transaction type */ \
-APPLY(9006, restoreDatabase, ApiDatabaseDumpData, \
+APPLY(9006, restoreDatabase, nx::vms::api::DatabaseDumpData, \
                        true, \
                        false, \
                        InvalidGetHashHelper(), \
-                       [] (const QnTransaction<ApiDatabaseDumpData> &, const NotificationParams &notificationParams) \
+                       [] (const QnTransaction<nx::vms::api::DatabaseDumpData> &, const NotificationParams &notificationParams) \
                         { \
                             emit notificationParams.ecConnection->databaseDumped(); \
                         }, \
@@ -1326,7 +1326,7 @@ APPLY(9006, restoreDatabase, ApiDatabaseDumpData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        LocalTransactionType()) /* local transaction type */ \
-APPLY(9009, updatePersistentSequence, ApiUpdateSequenceData, \
+APPLY(9009, updatePersistentSequence, nx::vms::api::UpdateSequenceData, \
                        true, /* persistent*/ \
                        false,  /* system*/ \
                        InvalidGetHashHelper(), \
@@ -1337,7 +1337,7 @@ APPLY(9009, updatePersistentSequence, ApiUpdateSequenceData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(9010, dumpDatabaseToFile, ApiDatabaseDumpToFileData, \
+APPLY(9010, dumpDatabaseToFile, nx::vms::api::DatabaseDumpToFileData, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \

@@ -170,9 +170,9 @@ namespace ec2
             void onSaveResourceDone             (int reqID, const ec2::ErrorCode, const QnResourcePtr&);
             void onGetResourcesDone             (int reqID, const ec2::ErrorCode, const QnResourceList&);
             void onGetResourceDone              (int reqID, const ec2::ErrorCode, const QnResourcePtr&);
-            void onGetKvPairsDone               (int reqID, const ec2::ErrorCode, const ec2::ApiResourceParamWithRefDataList&);
-            void onGetStatusListDone            (int reqID, const ec2::ErrorCode, const ec2::ApiResourceStatusDataList&);
-            void onSaveKvPairsDone              (int reqID, const ec2::ErrorCode, const ec2::ApiResourceParamWithRefDataList&);
+            void onGetKvPairsDone               (int reqID, const ec2::ErrorCode, const nx::vms::api::ResourceParamWithRefDataList&);
+            void onGetStatusListDone            (int reqID, const ec2::ErrorCode, const nx::vms::api::ResourceStatusDataList&);
+            void onSaveKvPairsDone              (int reqID, const ec2::ErrorCode, const nx::vms::api::ResourceParamWithRefDataList&);
             void onGetMiscParamDone             (int reqID, const ec2::ErrorCode, const ec2::ApiMiscData&);
             void onSaveBusinessRuleDone         (int reqID, const ec2::ErrorCode, const nx::vms::event::RulePtr&);
             void onGetServersDone               (int reqID, const ec2::ErrorCode, const ec2::ApiMediaServerDataList&);
@@ -192,8 +192,7 @@ namespace ec2
             void onGetStoredFileDone            (int reqID, const ec2::ErrorCode, const QByteArray&);
             void onListDirectoryDone            (int reqID, const ec2::ErrorCode, const QStringList&);
             void onCurrentTimeDone              (int reqID, const ec2::ErrorCode, const qint64&);
-            void onDumpDatabaseDone             (int reqID, const ec2::ErrorCode, const ec2::ApiDatabaseDumpData&);
-            void onDumpDatabaseToFileDone		(int reqID, const ec2::ErrorCode, const ec2::ApiDatabaseDumpToFileData&);
+            void onDumpDatabaseDone             (int reqID, const ec2::ErrorCode, const nx::vms::api::DatabaseDumpData&);
             void onGetDiscoveryDataDone         (int reqID, const ec2::ErrorCode, const ec2::ApiDiscoveryDataList&);
             void onTestConnectionDone           (int reqID, const ec2::ErrorCode, const QnConnectionInfo&);
             void onConnectDone                  (int reqID, const ec2::ErrorCode, const AbstractECConnectionPtr &);
@@ -220,9 +219,9 @@ namespace ec2
         DEFINE_TWO_ARG_HANDLER(GetResources,                ec2::ErrorCode, QnResourceList)
         DEFINE_TWO_ARG_HANDLER(GetResource,                 ec2::ErrorCode, QnResourcePtr)
         DEFINE_TWO_ARG_HANDLER(SaveResource,                ec2::ErrorCode, QnResourcePtr)
-        DEFINE_TWO_ARG_HANDLER(GetKvPairs,                  ec2::ErrorCode, ec2::ApiResourceParamWithRefDataList)
-        DEFINE_TWO_ARG_HANDLER(GetStatusList,               ec2::ErrorCode, ec2::ApiResourceStatusDataList)
-        DEFINE_TWO_ARG_HANDLER(SaveKvPairs,                 ec2::ErrorCode, ec2::ApiResourceParamWithRefDataList)
+        DEFINE_TWO_ARG_HANDLER(GetKvPairs,                  ec2::ErrorCode, nx::vms::api::ResourceParamWithRefDataList)
+        DEFINE_TWO_ARG_HANDLER(GetStatusList,               ec2::ErrorCode, nx::vms::api::ResourceStatusDataList)
+        DEFINE_TWO_ARG_HANDLER(SaveKvPairs,                 ec2::ErrorCode, nx::vms::api::ResourceParamWithRefDataList)
         DEFINE_TWO_ARG_HANDLER(GetMiscParam,                ec2::ErrorCode, ec2::ApiMiscData)
         DEFINE_TWO_ARG_HANDLER(GetSystemMergeHistory,       ec2::ErrorCode, ec2::ApiSystemMergeHistoryRecordList)
 
@@ -302,7 +301,7 @@ namespace ec2
         ///////// Handlers for AbstractECConnection
         //////////////////////////////////////////////////////////
         DEFINE_TWO_ARG_HANDLER(CurrentTime, ec2::ErrorCode, qint64)
-        DEFINE_TWO_ARG_HANDLER(DumpDatabase, ec2::ErrorCode, ec2::ApiDatabaseDumpData)
+        DEFINE_TWO_ARG_HANDLER(DumpDatabase, ec2::ErrorCode, nx::vms::api::DatabaseDumpData)
 
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractECConnectionFactory

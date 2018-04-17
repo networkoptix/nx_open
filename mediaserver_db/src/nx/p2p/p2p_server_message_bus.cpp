@@ -619,7 +619,7 @@ void ServerMessageBus::proxyFillerTransaction(
 	const TransportHeader& transportHeader)
 {
 	// proxy filler transaction to avoid gaps in the persistent sequence
-	ec2::QnTransaction<ApiUpdateSequenceData> fillerTran(tran);
+	ec2::QnTransaction<nx::vms::api::UpdateSequenceData> fillerTran(tran);
 	fillerTran.command = ApiCommand::updatePersistentSequence;
 
 	auto errCode = m_db->transactionLog()->updateSequence(fillerTran, TransactionLockType::Lazy);
@@ -645,7 +645,7 @@ void ServerMessageBus::resotreAfterDbError()
 }
 
 void ServerMessageBus::gotTransaction(
-    const QnTransaction<ApiUpdateSequenceData> &tran,
+    const QnTransaction<nx::vms::api::UpdateSequenceData>& tran,
     const P2pConnectionPtr& connection,
     const TransportHeader& transportHeader)
 {

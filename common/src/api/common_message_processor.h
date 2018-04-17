@@ -41,14 +41,14 @@ public:
     virtual void updateResource(const ec2::ApiLayoutData& layout, ec2::NotificationSource source);
     virtual void updateResource(const ec2::ApiVideowallData& videowall, ec2::NotificationSource source);
     virtual void updateResource(const ec2::ApiWebPageData& webpage, ec2::NotificationSource source);
-    virtual void updateResource(const ec2::ApiCameraData& camera, ec2::NotificationSource source);
+    virtual void updateResource(const nx::vms::api::CameraData& camera, ec2::NotificationSource source);
     virtual void updateResource(const ec2::ApiMediaServerData& server, ec2::NotificationSource source);
     virtual void updateResource(const ec2::ApiStorageData& storage, ec2::NotificationSource source);
 
     void resetServerUserAttributesList( const ec2::ApiMediaServerUserAttributesDataList& serverUserAttributesList );
     void resetCameraUserAttributesList( const ec2::ApiCameraAttributesDataList& cameraUserAttributesList );
-    void resetPropertyList(const ec2::ApiResourceParamWithRefDataList& params);
-    void resetStatusList(const ec2::ApiResourceStatusDataList& params);
+    void resetPropertyList(const nx::vms::api::ResourceParamWithRefDataList& params);
+    void resetStatusList(const nx::vms::api::ResourceStatusDataList& params);
     void resetAccessRights(const ec2::ApiAccessRightsDataList& accessRights);
     void resetUserRoles(const ec2::ApiUserRoleDataList& roles);
 
@@ -121,8 +121,8 @@ private slots:
         const QnUuid& resourceId,
         nx::vms::api::ResourceStatus status,
         ec2::NotificationSource source);
-    void on_resourceParamChanged(const ec2::ApiResourceParamWithRefData& param );
-    void on_resourceParamRemoved(const ec2::ApiResourceParamWithRefData& param );
+    void on_resourceParamChanged(const nx::vms::api::ResourceParamWithRefData& param );
+    void on_resourceParamRemoved(const nx::vms::api::ResourceParamWithRefData& param );
     void on_resourceRemoved(const QnUuid& resourceId );
     void on_resourceStatusRemoved(const QnUuid& resourceId);
 
@@ -139,7 +139,7 @@ private slots:
 
     void on_businessEventRemoved(const QnUuid &id);
     void on_businessActionBroadcasted(const nx::vms::event::AbstractActionPtr& businessAction);
-    void on_businessRuleReset(const ec2::ApiBusinessRuleDataList& rules);
+    void on_businessRuleReset(const nx::vms::api::EventRuleDataList& rules);
     void on_broadcastBusinessAction(const nx::vms::event::AbstractActionPtr& action);
     void on_execBusinessAction( const nx::vms::event::AbstractActionPtr& action );
 private:

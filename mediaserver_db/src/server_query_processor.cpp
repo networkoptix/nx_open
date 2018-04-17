@@ -41,7 +41,7 @@ ErrorCode detail::ServerQueryProcessor::removeObjParamsHelper(
     const AbstractECConnectionPtr& /*connection*/,
     PostProcessList* const transactionsToSend)
 {
-    ApiResourceParamWithRefDataList resourceParams;
+    nx::vms::api::ResourceParamWithRefDataList resourceParams;
     m_db.getResourceParamsNoLock(tran.params.id, resourceParams);
 
     return processMultiUpdateSync(

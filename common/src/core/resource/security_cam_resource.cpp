@@ -46,7 +46,7 @@ const int QnSecurityCamResource::kDefaultSecondStreamFpsHigh = 12;
 
 QnUuid QnSecurityCamResource::makeCameraIdFromUniqueId(const QString& uniqueId)
 {
-    // ATTENTION: This logic is similar to the one in ApiCameraData::fillId().
+    // ATTENTION: This logic is similar to the one in nx::vms::api::CameraData::fillId().
     if (uniqueId.isEmpty())
         return QnUuid();
     return guidFromArbitraryData(uniqueId);

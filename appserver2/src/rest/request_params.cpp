@@ -3,7 +3,7 @@
 #include <QtCore/QUrlQuery>
 
 #include <nx_ec/data/api_connection_data.h>
-#include <nx_ec/data/api_stored_file_data.h>
+#include <nx/vms/api/data/stored_file_data.h>
 #include <nx/fusion/serialization/lexical_functions.h>
 #include <transaction/transaction.h>
 

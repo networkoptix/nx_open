@@ -12,7 +12,7 @@ public:
     QnResourceNotificationManager();
 
     void triggerNotification(
-        const QnTransaction<ApiResourceStatusData>& tran,
+        const QnTransaction<nx::vms::api::ResourceStatusData>& tran,
         NotificationSource source);
     void triggerNotification(
         const QnTransaction<ApiLicenseOverflowData>& /*tran*/,
@@ -21,10 +21,10 @@ public:
         const QnTransaction<ApiCleanupDatabaseData>& /*tran*/,
         NotificationSource /*source*/);
     void triggerNotification(
-        const QnTransaction<ApiResourceParamWithRefData>& tran,
+        const QnTransaction<nx::vms::api::ResourceParamWithRefData>& tran,
         NotificationSource /*source*/);
     void triggerNotification(
-        const QnTransaction<ApiResourceParamWithRefDataList>& tran,
+        const QnTransaction<nx::vms::api::ResourceParamWithRefDataList>& tran,
         NotificationSource /*source*/);
     void triggerNotification(
         const QnTransaction<nx::vms::api::IdData>& tran,

@@ -2025,12 +2025,12 @@ void MediaServerProcess::moveHandlingCameras()
     const auto& resPool = commonModule()->resourcePool();
     for (const auto& server: resPool->getResources<QnMediaServerResource>())
         servers << server->getId();
-    ec2::ApiCameraDataList camerasToUpdate;
+    nx::vms::api::CameraDataList camerasToUpdate;
     for (const auto& camera: resPool->getAllCameras(/*all*/ QnResourcePtr()))
     {
         if (!servers.contains(camera->getParentId()))
         {
-            ec2::ApiCameraData apiCameraData;
+            nx::vms::api::CameraData apiCameraData;
             ec2::fromResourceToApi(camera, apiCameraData);
             apiCameraData.parentId = commonModule()->moduleGUID(); //< move camera
             camerasToUpdate.push_back(apiCameraData);

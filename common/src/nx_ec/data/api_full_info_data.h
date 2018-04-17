@@ -16,13 +16,13 @@ struct ApiFullInfoData: nx::vms::api::Data
     ApiAccessRightsDataList accessRights;
     ApiLayoutDataList layouts;
     ApiVideowallDataList videowalls;
-    ApiBusinessRuleDataList rules;
+    nx::vms::api::EventRuleDataList rules;
     ApiServerFootageDataList cameraHistory;
     ApiLicenseDataList licenses;
     ApiDiscoveryDataList discoveryData;
-    ApiResourceParamWithRefDataList allProperties;
+    nx::vms::api::ResourceParamWithRefDataList allProperties;
     ApiStorageDataList storages;
-    ApiResourceStatusDataList resStatusList;
+    nx::vms::api::ResourceStatusDataList resStatusList;
     ApiWebPageDataList webPages;
     ApiLayoutTourDataList layoutTours;
 };

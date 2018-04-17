@@ -15,7 +15,7 @@
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/data/api_resource_type_data.h>
 #include <nx_ec/data/api_license_data.h>
-#include <nx_ec/data/api_business_rule_data.h>
+#include <nx/vms/api/data/event_rule_data.h>
 #include <nx_ec/data/api_access_rights_data.h>
 
 #include <api/app_server_connection.h>
@@ -302,7 +302,8 @@ void QnCommonMessageProcessor::on_resourceStatusChanged(
         statusDictionary()->setValue(resourceId, localStatus);
 }
 
-void QnCommonMessageProcessor::on_resourceParamChanged(const ec2::ApiResourceParamWithRefData& param )
+void QnCommonMessageProcessor::on_resourceParamChanged(
+    const nx::vms::api::ResourceParamWithRefData& param)
 {
     QnResourcePtr resource = resourcePool()->getResourceById(param.resourceId);
     if (resource)
@@ -311,7 +312,8 @@ void QnCommonMessageProcessor::on_resourceParamChanged(const ec2::ApiResourcePar
         propertyDictionary()->setValue(param.resourceId, param.name, param.value, false);
 }
 
-void QnCommonMessageProcessor::on_resourceParamRemoved(const ec2::ApiResourceParamWithRefData& param )
+void QnCommonMessageProcessor::on_resourceParamRemoved(
+    const nx::vms::api::ResourceParamWithRefData& param)
 {
     propertyDictionary()->on_resourceParamRemoved(param.resourceId, param.name);
 }
@@ -473,7 +475,7 @@ void QnCommonMessageProcessor::on_businessActionBroadcasted( const vms::event::A
     // nothing to do for a while
 }
 
-void QnCommonMessageProcessor::on_businessRuleReset(const ec2::ApiBusinessRuleDataList& rules)
+void QnCommonMessageProcessor::on_businessRuleReset(const nx::vms::api::EventRuleDataList& rules)
 {
     vms::event::RuleList ruleList;
     ec2::fromApiToResourceList(rules, ruleList);
@@ -633,26 +635,33 @@ void QnCommonMessageProcessor::resetCameraUserAttributesList( const ec2::ApiCame
     }
 }
 
-void QnCommonMessageProcessor::resetPropertyList(const ec2::ApiResourceParamWithRefDataList& params) {
+void QnCommonMessageProcessor::resetPropertyList(
+    const nx::vms::api::ResourceParamWithRefDataList& params)
+{
     /* Store existing parameter keys. */
     auto existingProperties = propertyDictionary()->allPropertyNamesByResource();
 
     /* Update changed values. */
-    for(const ec2::ApiResourceParamWithRefData& param: params) {
+    for (const auto& param: params)
+    {
         on_resourceParamChanged(param);
         if (existingProperties.contains(param.resourceId))
             existingProperties[param.resourceId].remove(param.name);
     }
 
     /* Clean values that are not in the list anymore. */
-    for (auto iter = existingProperties.constBegin(); iter != existingProperties.constEnd(); ++iter) {
+    for (auto iter = existingProperties.constBegin(); iter != existingProperties.constEnd(); ++iter)
+    {
         QnUuid resourceId = iter.key();
         for (auto paramName: iter.value())
-            on_resourceParamChanged(ec2::ApiResourceParamWithRefData(resourceId, paramName, QString()));
+        {
+            on_resourceParamChanged(
+                nx::vms::api::ResourceParamWithRefData(resourceId, paramName, QString()));
+        }
     }
 }
 
-void QnCommonMessageProcessor::resetStatusList(const ec2::ApiResourceStatusDataList& params)
+void QnCommonMessageProcessor::resetStatusList(const nx::vms::api::ResourceStatusDataList& params)
 {
     auto keys = statusDictionary()->values().keys();
     statusDictionary()->clear();
@@ -668,7 +677,7 @@ void QnCommonMessageProcessor::resetStatusList(const ec2::ApiResourceStatusDataL
         }
     }
 
-    for (const ec2::ApiResourceStatusData& statusData: params)
+    for (const nx::vms::api::ResourceStatusData& statusData: params)
     {
         on_resourceStatusChanged(
             statusData.id,
@@ -744,7 +753,7 @@ void QnCommonMessageProcessor::updateResource(const ec2::ApiWebPageData& webpage
     updateResource(qnWebpage, source);
 }
 
-void QnCommonMessageProcessor::updateResource(const ec2::ApiCameraData& camera, ec2::NotificationSource source)
+void QnCommonMessageProcessor::updateResource(const nx::vms::api::CameraData& camera, ec2::NotificationSource source)
 {
     QnVirtualCameraResourcePtr qnCamera = getResourceFactory()->createResource(camera.typeId,
             QnResourceParams(camera.id, camera.url, camera.vendor))

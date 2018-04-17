@@ -11,7 +11,7 @@ QnResourceNotificationManager::QnResourceNotificationManager()
 }
 
 void QnResourceNotificationManager::triggerNotification(
-    const QnTransaction<ApiResourceStatusData>& tran,
+    const QnTransaction<nx::vms::api::ResourceStatusData>& tran,
     NotificationSource source)
 {
     NX_LOG(lit("%1 Emit statusChanged signal for resource %2")
@@ -33,7 +33,7 @@ void QnResourceNotificationManager::triggerNotification(
 }
 
 void QnResourceNotificationManager::triggerNotification(
-    const QnTransaction<ApiResourceParamWithRefData>& tran,
+    const QnTransaction<nx::vms::api::ResourceParamWithRefData>& tran,
     NotificationSource /*source*/)
 {
     if (tran.command == ApiCommand::setResourceParam)
@@ -43,10 +43,10 @@ void QnResourceNotificationManager::triggerNotification(
 }
 
 void QnResourceNotificationManager::triggerNotification(
-    const QnTransaction<ApiResourceParamWithRefDataList>& tran,
+    const QnTransaction<nx::vms::api::ResourceParamWithRefDataList>& tran,
     NotificationSource /*source*/)
 {
-    for (const ec2::ApiResourceParamWithRefData& param: tran.params)
+    for (const auto& param: tran.params)
     {
         if (tran.command == ApiCommand::setResourceParams)
             emit resourceParamChanged(param);

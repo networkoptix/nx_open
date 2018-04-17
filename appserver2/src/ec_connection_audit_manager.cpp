@@ -14,7 +14,7 @@
 #include <api/global_settings.h>
 #include <common/common_module.h>
 #include <nx_ec/ec_api.h>
-#include <nx_ec/data/api_business_rule_data.h>
+#include <nx/vms/api/data/event_rule_data.h>
 
 namespace ec2
 {
@@ -84,37 +84,49 @@ namespace ec2
         qnAuditManager->addAuditRecord(auditRecord);
     }
 
-    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value /*command*/,  const ApiBusinessRuleData& params, const QnAuthSession& authInfo)
-    {
-        QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_BEventUpdate);
-        auditRecord.resources.push_back(params.id);
-        nx::vms::event::RulePtr rule(new nx::vms::event::Rule());
-        fromApiToResource(params, rule);
-        nx::vms::event::StringsHelper helper(m_connection->commonModule());
-        auditRecord.addParam("description", helper.ruleDescriptionText(rule).toUtf8());
+void ECConnectionAuditManager::addAuditRecord(
+    ApiCommand::Value /*command*/,
+    const nx::vms::api::EventRuleData& params,
+    const QnAuthSession& authInfo)
+{
+    QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_BEventUpdate);
+    auditRecord.resources.push_back(params.id);
+    nx::vms::event::RulePtr rule(new nx::vms::event::Rule());
+    fromApiToResource(params, rule);
+    nx::vms::event::StringsHelper helper(m_connection->commonModule());
+    auditRecord.addParam("description", helper.ruleDescriptionText(rule).toUtf8());
 
-        qnAuditManager->addAuditRecord(auditRecord);
-    }
+    qnAuditManager->addAuditRecord(auditRecord);
+}
 
-    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value /*command*/,  const ApiBusinessRuleDataList& params, const QnAuthSession& authInfo)
-    {
-        QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_BEventUpdate);
-        for (const auto& value: params)
-            auditRecord.resources.push_back(value.id);
-        qnAuditManager->addAuditRecord(auditRecord);
-    }
+void ECConnectionAuditManager::addAuditRecord(
+    ApiCommand::Value /*command*/,
+    const nx::vms::api::EventRuleDataList& params,
+    const QnAuthSession& authInfo)
+{
+    QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_BEventUpdate);
+    for (const auto& value: params)
+        auditRecord.resources.push_back(value.id);
+    qnAuditManager->addAuditRecord(auditRecord);
+}
 
-    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value /*command*/,  const ApiResourceParamWithRefData& param, const QnAuthSession& authInfo)
-    {
-        if (QnGlobalSettings::isGlobalSetting(param))
-            qnAuditManager->notifySettingsChanged(authInfo, param.name);
-    }
+void ECConnectionAuditManager::addAuditRecord(
+    ApiCommand::Value /*command*/,
+    const nx::vms::api::ResourceParamWithRefData& param,
+    const QnAuthSession& authInfo)
+{
+    if (QnGlobalSettings::isGlobalSetting(param))
+        qnAuditManager->notifySettingsChanged(authInfo, param.name);
+}
 
-    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value command,  const ApiResourceParamWithRefDataList& params, const QnAuthSession& authInfo)
-    {
-        for (const ApiResourceParamWithRefData& param: params)
-            addAuditRecord(command, param, authInfo);
-    }
+void ECConnectionAuditManager::addAuditRecord(
+    ApiCommand::Value command,
+    const nx::vms::api::ResourceParamWithRefDataList& params,
+    const QnAuthSession& authInfo)
+{
+    for (const auto& param: params)
+        addAuditRecord(command, param, authInfo);
+}
 
     void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value command,  const nx::vms::api::IdData& params, const QnAuthSession& authInfo)
     {
@@ -193,18 +205,26 @@ void ECConnectionAuditManager::addAuditRecord(
         addAuditRecord(command, param, authInfo);
 }
 
-    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value /*command*/,  const ApiResetBusinessRuleData& /*params*/, const QnAuthSession& authInfo)
-    {
-        qnAuditManager->addAuditRecord(qnAuditManager->prepareRecord(authInfo, Qn::AR_BEventReset));
-    }
-
-    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value /*command*/,  const ApiDatabaseDumpData& /*params*/, const QnAuthSession& authInfo)
-    {
-        qnAuditManager->addAuditRecord(qnAuditManager->prepareRecord(authInfo, Qn::AR_DatabaseRestore));
-    }
-
-    AbstractECConnection* ECConnectionAuditManager::ec2Connection() const
-    {
-        return m_connection;
-    }
+void ECConnectionAuditManager::addAuditRecord(
+    ApiCommand::Value /*command*/,
+    const nx::vms::api::ResetEventRulesData& /*params*/,
+    const QnAuthSession& authInfo)
+{
+    qnAuditManager->addAuditRecord(qnAuditManager->prepareRecord(authInfo, Qn::AR_BEventReset));
 }
+
+void ECConnectionAuditManager::addAuditRecord(
+    ApiCommand::Value /*command*/,
+    const nx::vms::api::DatabaseDumpData& /*params*/,
+    const QnAuthSession& authInfo)
+{
+    qnAuditManager->addAuditRecord(
+            qnAuditManager->prepareRecord(authInfo, Qn::AR_DatabaseRestore));
+}
+
+AbstractECConnection* ECConnectionAuditManager::ec2Connection() const
+{
+    return m_connection;
+}
+
+} // namespace ec2

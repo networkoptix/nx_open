@@ -4,7 +4,7 @@
 #include <core/resource/media_stream_capability.h>
 #include <core/misc/schedule_task.h>
 
-#include <nx_ec/data/api_camera_attributes_data.h>
+#include <nx/vms/api/data/camera_attributes_data.h>
 
 #include <nx/client/desktop/common/data/rotation.h>
 #include <nx/client/desktop/resource_properties/camera/utils/schedule_cell_params.h>

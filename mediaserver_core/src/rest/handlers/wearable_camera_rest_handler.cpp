@@ -106,7 +106,7 @@ int QnWearableCameraRestHandler::executeAdd(
     if (!requireParameter(params, lit("name"), result, &name))
         return nx::network::http::StatusCode::invalidParameter;
 
-    ec2::ApiCameraData apiCamera;
+    nx::vms::api::CameraData apiCamera;
     apiCamera.physicalId = QnUuid::createUuid().toSimpleString();
     apiCamera.fillId();
     apiCamera.manuallyAdded = true;

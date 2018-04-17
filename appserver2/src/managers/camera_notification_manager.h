@@ -11,9 +11,11 @@ class QnCameraNotificationManager: public AbstractCameraNotificationManager
 public:
     QnCameraNotificationManager();
 
-    void triggerNotification(const QnTransaction<ApiCameraData>& tran, NotificationSource source);
     void triggerNotification(
-        const QnTransaction<ApiCameraDataList>& tran,
+        const QnTransaction<nx::vms::api::CameraData>& tran,
+        NotificationSource source);
+    void triggerNotification(
+        const QnTransaction<nx::vms::api::CameraDataList>& tran,
         NotificationSource source);
     void triggerNotification(
         const QnTransaction<ApiCameraAttributesData>& tran,

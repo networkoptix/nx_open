@@ -102,7 +102,7 @@ private:
 
 struct CreateHashForResourceParamWithRefDataHelper
 {
-    QnUuid operator ()(const ApiResourceParamWithRefData &param)
+    QnUuid operator ()(const nx::vms::api::ResourceParamWithRefData& param)
     {
         QCryptographicHash hash(QCryptographicHash::Md5);
         hash.addData("res_params");
@@ -481,13 +481,16 @@ struct ModifyResourceAccess
 
 struct ModifyCameraDataAccess
 {
-    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ApiCameraData& param)
+    bool operator()(
+        QnCommonModule* commonModule,
+        const Qn::UserAccessData& accessData,
+        const nx::vms::api::CameraData& param)
     {
         if (!hasSystemAccess(accessData))
         {
             if (!param.physicalId.isEmpty() && !param.id.isNull())
             {
-                auto expectedId = ApiCameraData::physicalIdToId(param.physicalId);
+                auto expectedId = nx::vms::api::CameraData::physicalIdToId(param.physicalId);
                 if (expectedId != param.id)
                     return false;
             }
@@ -544,21 +547,33 @@ struct ReadResourceAccessOut
 
 struct ReadResourceParamAccess
 {
-    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, ApiResourceParamWithRefData& param)
+    bool operator()(
+        QnCommonModule* commonModule,
+        const Qn::UserAccessData& accessData,
+        nx::vms::api::ResourceParamWithRefData& param)
     {
         if (resourceAccessHelper(commonModule, accessData, param.resourceId, Qn::ReadPermission))
         {
-            operator()(commonModule, accessData, static_cast<ApiResourceParamData&>(param));
+            operator()(
+                commonModule,
+                accessData,
+                static_cast<nx::vms::api::ResourceParamData&>(param));
             return true;
         }
         return false;
     }
 
-    bool operator()(QnCommonModule*, const Qn::UserAccessData& accessData, ApiResourceParamData& param)
+    bool operator()(
+        QnCommonModule*,
+        const Qn::UserAccessData& accessData,
+        nx::vms::api::ResourceParamData& param)
     {
         namespace ahlp = access_helpers;
         ahlp::FilterFunctorListType filters = {
-            static_cast<bool (*)(ahlp::Mode, const Qn::UserAccessData&, ahlp::KeyValueFilterType*)>(&ahlp::kvSystemOnlyFilter)
+            static_cast<bool (*)(
+                ahlp::Mode,
+                const Qn::UserAccessData&,
+                ahlp::KeyValueFilterType*)>(&ahlp::kvSystemOnlyFilter)
         };
 
         bool allowed;
@@ -574,7 +589,10 @@ struct ReadResourceParamAccess
 
 struct ReadResourceParamAccessOut
 {
-    RemotePeerAccess operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ApiResourceParamWithRefData& param)
+    RemotePeerAccess operator()(
+        QnCommonModule* commonModule,
+        const Qn::UserAccessData& accessData,
+        const nx::vms::api::ResourceParamWithRefData& param)
     {
         return resourceAccessHelper(commonModule, accessData, param.resourceId, Qn::ReadPermission)
             ? RemotePeerAccess::Allowed
@@ -586,7 +604,10 @@ struct ModifyResourceParamAccess
 {
     ModifyResourceParamAccess(bool isRemove): isRemove(isRemove) {}
 
-    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ApiResourceParamWithRefData& param)
+    bool operator()(
+        QnCommonModule* commonModule,
+        const Qn::UserAccessData& accessData,
+        const nx::vms::api::ResourceParamWithRefData& param)
     {
         if (hasSystemAccess(accessData))
             return true;
@@ -594,7 +615,8 @@ struct ModifyResourceParamAccess
         if (isRemove)
         {
             const auto& resPool = commonModule->resourcePool();
-            commonModule->resourceAccessManager()->hasPermission(resPool->getResourceById<QnUserResource>(accessData.userId),
+            commonModule->resourceAccessManager()->hasPermission(
+                resPool->getResourceById<QnUserResource>(accessData.userId),
                 resPool->getResourceById(param.resourceId),
                 Qn::RemovePermission);
         }
@@ -936,15 +958,28 @@ struct FilterListByAccess<ModifyResourceAccess>
 template<>
 struct FilterListByAccess<ModifyResourceParamAccess>
 {
-    FilterListByAccess(bool isRemove): isRemove(isRemove) {}
-
-    void operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, ApiResourceParamWithRefDataList& outList)
+    FilterListByAccess(bool isRemove): isRemove(isRemove)
     {
-        outList.erase(std::remove_if(outList.begin(), outList.end(),
-            [&accessData, commonModule, this](const ApiResourceParamWithRefData &param)
-        {
-            return !ModifyResourceParamAccess(isRemove)(commonModule, accessData, param);
-        }), outList.end());
+    }
+
+    void operator()(
+        QnCommonModule* commonModule,
+        const Qn::UserAccessData& accessData,
+        nx::vms::api::ResourceParamWithRefDataList& outList)
+    {
+        outList.erase(
+            std::remove_if(
+                outList.begin(),
+                outList.end(),
+                [&accessData, commonModule, this](
+                const nx::vms::api::ResourceParamWithRefData& param)
+                    {
+                        return !ModifyResourceParamAccess(isRemove)(
+                            commonModule,
+                            accessData,
+                            param);
+                    }),
+            outList.end());
     }
 
     bool isRemove;
@@ -1036,13 +1071,16 @@ ec2::TransactionType::Value getStatusTransactionTypeFromDb(const QnUuid& id, Abs
 
 struct SetStatusTransactionType
 {
-    ec2::TransactionType::Value operator()(QnCommonModule* commonModule, const ApiResourceStatusData& params, AbstractPersistentStorage* db)
+    ec2::TransactionType::Value operator()(
+        QnCommonModule* commonModule,
+        const nx::vms::api::ResourceStatusData& params,
+        AbstractPersistentStorage* db)
     {
         const auto& resPool = commonModule->resourcePool();
         QnResourcePtr resource = resPool->getResourceById<QnResource>(params.id);
         if (!resource)
             return getStatusTransactionTypeFromDb(params.id, db);
-        if(resource.dynamicCast<QnMediaServerResource>())
+        if (resource.dynamicCast<QnMediaServerResource>())
             return TransactionType::Local;
         else
             return TransactionType::Regular;
@@ -1061,7 +1099,7 @@ struct SetResourceParamTransactionType
 {
     ec2::TransactionType::Value operator()(
 		QnCommonModule*,
-        const ApiResourceParamWithRefData& param,
+        const nx::vms::api::ResourceParamWithRefData& param,
         AbstractPersistentStorage* /*db*/)
     {
         if (param.resourceId == QnUserResource::kAdminGuid &&

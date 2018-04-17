@@ -23,11 +23,11 @@
 
 #include <nx_ec/ec_api.h>
 
-#include "api_business_rule_data.h"
-#include "api_camera_data.h"
-#include "api_camera_attributes_data.h"
-#include "api_camera_data_ex.h"
-#include "api_camera_history_data.h"
+#include <nx/vms/api/data/event_rule_data.h>
+#include <nx/vms/api/data/camera_data.h>
+#include <nx/vms/api/data/camera_attributes_data.h>
+#include <nx/vms/api/data/camera_data_ex.h>
+#include <nx/vms/api/data/camera_history_data.h>
 #include "api_email_data.h"
 #include "api_layout_data.h"
 #include "api_license_data.h"
@@ -47,12 +47,13 @@
 #include <nx/utils/log/assert.h>
 
 using namespace nx;
+using namespace nx::vms::api;
 
 namespace ec2 {
 
 struct overload_tag {};
 
-void fromApiToResource(const ApiBusinessRuleData& src, vms::event::RulePtr& dst)
+void fromApiToResource(const EventRuleData& src, vms::event::RulePtr& dst)
 {
     dst->setId(src.id);
     dst->setEventType(src.eventType);
@@ -75,7 +76,7 @@ void fromApiToResource(const ApiBusinessRuleData& src, vms::event::RulePtr& dst)
     dst->setSystem(src.system);
 }
 
-void fromResourceToApi(const vms::event::RulePtr& src, ApiBusinessRuleData& dst)
+void fromResourceToApi(const vms::event::RulePtr& src, EventRuleData& dst)
 {
     dst.id = src->id();
     dst.eventType = src->eventType();
@@ -95,27 +96,27 @@ void fromResourceToApi(const vms::event::RulePtr& src, ApiBusinessRuleData& dst)
     dst.system = src->isSystem();
 }
 
-void fromApiToResourceList(const ApiBusinessRuleDataList& src, vms::event::RuleList& dst)
+void fromApiToResourceList(const EventRuleDataList& src, vms::event::RuleList& dst)
 {
     dst.reserve(dst.size() + (int)src.size());
-    for (const ApiBusinessRuleData& srcRule: src)
+    for (const EventRuleData& srcRule: src)
     {
         dst.push_back(vms::event::RulePtr(new vms::event::Rule()));
         fromApiToResource(srcRule, dst.back());
     }
 }
 
-void fromResourceListToApi(const vms::event::RuleList& src, ApiBusinessRuleDataList& dst)
+void fromResourceListToApi(const vms::event::RuleList& src, EventRuleDataList& dst)
 {
     dst.reserve(dst.size() + src.size());
     for (const vms::event::RulePtr& srcRule: src)
     {
-        dst.push_back(ApiBusinessRuleData());
+        dst.push_back(EventRuleData());
         fromResourceToApi(srcRule, dst.back());
     }
 }
 
-void fromResourceToApi(const vms::event::AbstractActionPtr& src, ApiBusinessActionData& dst)
+void fromResourceToApi(const vms::event::AbstractActionPtr& src, EventActionData& dst)
 {
     dst.actionType = src->actionType();
     dst.toggleState = src->getToggleState();
@@ -129,7 +130,7 @@ void fromResourceToApi(const vms::event::AbstractActionPtr& src, ApiBusinessActi
     dst.aggregationCount = src->getAggregationCount();
 }
 
-void fromApiToResource(const ApiBusinessActionData& src, vms::event::AbstractActionPtr& dst)
+void fromApiToResource(const EventActionData& src, vms::event::AbstractActionPtr& dst)
 {
     dst = vms::event::ActionFactory::createAction(src.actionType, QJson::deserialized<vms::event::EventParameters>(src.runtimeParams));
 
@@ -146,12 +147,12 @@ void fromApiToResource(const ApiBusinessActionData& src, vms::event::AbstractAct
 
 
 ////////////////////////////////////////////////////////////
-//// ApiCameraData
+//// CameraData
 ////////////////////////////////////////////////////////////
 
-void fromApiToResource(const ApiCameraData& src, QnVirtualCameraResourcePtr& dst)
+void fromApiToResource(const CameraData& src, QnVirtualCameraResourcePtr& dst)
 {
-    fromApiToResource(static_cast<const ApiResourceData&>(src), dst.data());
+    fromApiToResource(static_cast<const ResourceData&>(src), dst.data());
 
     // test if the camera is desktop camera
     if (src.typeId == QnResourceTypePool::kDesktopCameraTypeUuid)
@@ -182,9 +183,9 @@ void fromApiToResource(const ApiCameraData& src, QnVirtualCameraResourcePtr& dst
     NX_ASSERT(false, "fromApiToResource()", message);
 }
 
-void fromResourceToApi(const QnVirtualCameraResourcePtr& src, ApiCameraData& dst)
+void fromResourceToApi(const QnVirtualCameraResourcePtr& src, CameraData& dst)
 {
-    fromResourceToApi(src, static_cast<ApiResourceData&>(dst));
+    fromResourceToApi(src, static_cast<ResourceData&>(dst));
 
     dst.mac = src->getMAC().toString().toLatin1();
     dst.physicalId = src->getPhysicalId();
@@ -196,12 +197,12 @@ void fromResourceToApi(const QnVirtualCameraResourcePtr& src, ApiCameraData& dst
     dst.vendor = src->getVendor();
 }
 
-void fromResourceListToApi(const QnVirtualCameraResourceList& src, ApiCameraDataList& dst)
+void fromResourceListToApi(const QnVirtualCameraResourceList& src, CameraDataList& dst)
 {
     dst.reserve(dst.size() + src.size());
     for (const QnVirtualCameraResourcePtr& srcCamera: src)
     {
-        dst.push_back(ApiCameraData());
+        dst.push_back(CameraData());
         fromResourceToApi(srcCamera, dst.back());
     }
 }
@@ -324,46 +325,46 @@ void fromResourceListToApi(const QnCameraUserAttributesList& src, ApiCameraAttri
 
 
 ////////////////////////////////////////////////////////////
-//// ApiCameraDataEx
+//// CameraDataEx
 ////////////////////////////////////////////////////////////
 
 void fromApiToResource(
-    const ApiCameraDataEx& src,
+    const CameraDataEx& src,
     QnVirtualCameraResourcePtr& dst,
     QnCameraUserAttributePool* attributesPool)
 {
-    fromApiToResource(static_cast<const ApiCameraData&>(src), dst);
+    fromApiToResource(static_cast<const CameraData&>(src), dst);
     //TODO #ak using QnCameraUserAttributePool here is not good
     QnCameraUserAttributePool::ScopedLock userAttributesLock(attributesPool, dst->getId());
     fromApiToResource(static_cast<const ApiCameraAttributesData&>(src), *userAttributesLock);
 
-    for (const ApiResourceParamData& srcParam: src.addParams)
+    for (const auto& srcParam: src.addParams)
         dst->setProperty(srcParam.name, srcParam.value, QnResource::NO_MARK_DIRTY);
 }
 
 void fromResourceToApi(
     const QnVirtualCameraResourcePtr& src,
-    ApiCameraDataEx& dst,
+    CameraDataEx& dst,
     QnCameraUserAttributePool* attributesPool)
 {
-    fromResourceToApi(src, static_cast<ApiCameraData&>(dst));
+    fromResourceToApi(src, static_cast<CameraData&>(dst));
     //TODO #ak using QnCameraUserAttributePool here is not good
     QnCameraUserAttributePool::ScopedLock userAttributesLock(attributesPool, src->getId());
     fromResourceToApi(*userAttributesLock, static_cast<ApiCameraAttributesData&>(dst));
 
-    for (const ec2::ApiResourceParamData& srcParam: src->getRuntimeProperties())
+    for (const auto& srcParam: src->getRuntimeProperties())
         dst.addParams.push_back(srcParam);
 }
 
 void fromResourceListToApi(
     const QnVirtualCameraResourceList& src,
-    ApiCameraDataExList& dst,
+    CameraDataExList& dst,
     QnCameraUserAttributePool* attributesPool)
 {
     dst.reserve(dst.size() + src.size());
     for (const QnVirtualCameraResourcePtr& srcCamera: src)
     {
-        dst.push_back(ApiCameraDataEx());
+        dst.push_back(CameraDataEx());
         fromResourceToApi(srcCamera, dst.back(), attributesPool);
     }
 }
@@ -426,7 +427,7 @@ void fromResourceToApi(const QnLayoutItemData& src, ApiLayoutItemData& dst)
 
 void fromApiToResource(const ApiLayoutData& src, QnLayoutResourcePtr& dst)
 {
-    fromApiToResource(static_cast<const ApiResourceData&>(src), dst.data());
+    fromApiToResource(static_cast<const ResourceData&>(src), dst.data());
 
     dst->setCellAspectRatio(src.cellAspectRatio);
     dst->setCellSpacing(src.horizontalSpacing);
@@ -446,7 +447,7 @@ void fromApiToResource(const ApiLayoutData& src, QnLayoutResourcePtr& dst)
 
 void fromResourceToApi(const QnLayoutResourcePtr& src, ApiLayoutData& dst)
 {
-    fromResourceToApi(src, static_cast<ApiResourceData&>(dst));
+    fromResourceToApi(src, static_cast<ResourceData&>(dst));
 
     dst.cellAspectRatio = src->cellAspectRatio();
     dst.horizontalSpacing = src->cellSpacing();
@@ -569,7 +570,7 @@ static QString serializeNetAddrList(const QList<nx::network::SocketAddress>& net
 
 void fromResourceToApi(const QnStorageResourcePtr& src, ApiStorageData& dst)
 {
-    fromResourceToApi(src, static_cast<ApiResourceData&>(dst));
+    fromResourceToApi(src, static_cast<ResourceData&>(dst));
 
     dst.spaceLimit = src->getSpaceLimit();
     dst.usedForWriting = src->isUsedForWriting();
@@ -589,7 +590,7 @@ void fromResourceListToApi(const QnStorageResourceList& src, ApiStorageDataList&
 
 void fromApiToResource(const ApiStorageData& src, QnStorageResourcePtr& dst)
 {
-    fromApiToResource(static_cast<const ApiResourceData&>(src), dst.data());
+    fromApiToResource(static_cast<const ResourceData&>(src), dst.data());
 
     dst->setSpaceLimit(src.spaceLimit);
     dst->setUsedForWriting(src.usedForWriting);
@@ -599,7 +600,7 @@ void fromApiToResource(const ApiStorageData& src, QnStorageResourcePtr& dst)
 
 void fromResourceToApi(const QnMediaServerResourcePtr& src, ApiMediaServerData& dst)
 {
-    fromResourceToApi(src, static_cast<ApiResourceData&>(dst));
+    fromResourceToApi(src, static_cast<ResourceData&>(dst));
 
     dst.networkAddresses = serializeNetAddrList(src->getNetAddrList());
     dst.flags = src->getServerFlags();
@@ -610,7 +611,7 @@ void fromResourceToApi(const QnMediaServerResourcePtr& src, ApiMediaServerData& 
 
 void fromApiToResource(const ApiMediaServerData& src, QnMediaServerResourcePtr& dst)
 {
-    fromApiToResource(static_cast<const ApiResourceData&>(src), dst.data());
+    fromApiToResource(static_cast<const ResourceData&>(src), dst.data());
 
     QList<nx::network::SocketAddress> resNetAddrList;
     deserializeNetAddrList(src.networkAddresses, resNetAddrList, QUrl(src.url).port());
@@ -698,10 +699,10 @@ void fromResourceListToApi(const QnMediaServerUserAttributesList& src, ApiMediaS
 
 
 ////////////////////////////////////////////////////////////
-//// ApiResourceData
+//// ResourceData
 ////////////////////////////////////////////////////////////
 
-void fromResourceToApi(const QnResourcePtr& src, ApiResourceData& dst)
+void fromResourceToApi(const QnResourcePtr& src, ResourceData& dst)
 {
     //NX_ASSERT(!src->getId().isNull());
     NX_ASSERT(!src->getTypeId().isNull());
@@ -716,7 +717,7 @@ void fromResourceToApi(const QnResourcePtr& src, ApiResourceData& dst)
 }
 
 
-void fromApiToResource(const ApiResourceData& src, QnResource* dst) {
+void fromApiToResource(const ResourceData& src, QnResource* dst) {
     dst->setId(src.id);
     //dst->setGuid(guid);
     dst->QnResource::setName(src.name); //setting resource name, but not camera name or server name
@@ -772,7 +773,7 @@ void fromApiToResource(const ApiUserData& src, QnUserResourcePtr& dst)
 {
     NX_ASSERT(dst->userType() == userResourceType(src.isLdap, src.isCloud), Q_FUNC_INFO, "Unexpected user type");
 
-    fromApiToResource(static_cast<const ApiResourceData&>(src), dst.data());
+    fromApiToResource(static_cast<const ResourceData&>(src), dst.data());
 
     dst->setOwner(src.isAdmin);
 	dst->setEnabled(src.isEnabled);
@@ -790,7 +791,7 @@ void fromApiToResource(const ApiUserData& src, QnUserResourcePtr& dst)
 void fromResourceToApi(const QnUserResourcePtr& src, ApiUserData& dst)
 {
     QnUserType userType = src->userType();
-    fromResourceToApi(src, static_cast<ApiResourceData&>(dst));
+    fromResourceToApi(src, static_cast<ResourceData&>(dst));
     dst.hash = src->getHash();
     dst.digest = src->getDigest();
     dst.isAdmin = src->isOwner();
@@ -895,7 +896,7 @@ void fromResourceToApi(const QnVideoWallPcData::PcScreen& src, ApiVideowallScree
 
 void fromApiToResource(const ApiVideowallData& src, QnVideoWallResourcePtr& dst)
 {
-    fromApiToResource(static_cast<const ApiResourceData&>(src), dst.data());
+    fromApiToResource(static_cast<const ResourceData&>(src), dst.data());
 
     dst->setAutorun(src.autorun);
     QnVideoWallItemList outItems;
@@ -929,7 +930,7 @@ void fromApiToResource(const ApiVideowallData& src, QnVideoWallResourcePtr& dst)
 
 void fromResourceToApi(const QnVideoWallResourcePtr& src, ApiVideowallData& dst)
 {
-    fromResourceToApi(src, static_cast<ApiResourceData&>(dst));
+    fromResourceToApi(src, static_cast<ResourceData&>(dst));
 
     dst.autorun = src->isAutorun();
 
@@ -1016,12 +1017,12 @@ void fromResourceToApi(const QnVideoWallControlMessage& message, ApiVideowallCon
 
 void fromApiToResource(const ApiWebPageData& src, QnWebPageResourcePtr& dst)
 {
-    fromApiToResource(static_cast<const ApiResourceData&>(src), dst.data());
+    fromApiToResource(static_cast<const ResourceData&>(src), dst.data());
 }
 
 void fromResourceToApi(const QnWebPageResourcePtr& src, ApiWebPageData& dst)
 {
-    fromResourceToApi(src, static_cast<ApiResourceData&>(dst));
+    fromResourceToApi(src, static_cast<ResourceData&>(dst));
 }
 
 template<class List>

@@ -260,10 +260,10 @@ public:
      * @param handler Called upon request completion. Functor(ErrorCode).
      */
     template<class HandlerType>
-    void processUpdateAsync(QnTransaction<ApiCameraDataList>& tran, HandlerType handler)
+    void processUpdateAsync(QnTransaction<nx::vms::api::CameraDataList>& tran, HandlerType handler)
     {
         NX_ASSERT(tran.command == ApiCommand::saveCameras);
-        return processMultiUpdateAsync<ApiCameraDataList, ApiCameraData>(
+        return processMultiUpdateAsync<nx::vms::api::CameraDataList, nx::vms::api::CameraData>(
             tran, handler, ApiCommand::saveCamera);
     }
 
@@ -315,18 +315,25 @@ public:
      */
     template<class HandlerType>
     void processUpdateAsync(
-        QnTransaction<ApiResourceParamWithRefDataList>& tran, HandlerType handler)
+        QnTransaction<nx::vms::api::ResourceParamWithRefDataList>& tran,
+        HandlerType handler)
     {
         switch (tran.command)
         {
             case ApiCommand::setResourceParams:
                 return processMultiUpdateAsync<
-                    ApiResourceParamWithRefDataList, ApiResourceParamWithRefData>(
-                        tran, handler, ApiCommand::setResourceParam);
+                    nx::vms::api::ResourceParamWithRefDataList,
+                    nx::vms::api::ResourceParamWithRefData>(
+                    tran,
+                    handler,
+                    ApiCommand::setResourceParam);
             case ApiCommand::removeResourceParams:
                 return processMultiUpdateAsync<
-                    ApiResourceParamWithRefDataList, ApiResourceParamWithRefData>(
-                        tran, handler, ApiCommand::removeResourceParam);
+                    nx::vms::api::ResourceParamWithRefDataList,
+                    nx::vms::api::ResourceParamWithRefData>(
+                    tran,
+                    handler,
+                    ApiCommand::removeResourceParam);
             default:
                 NX_ASSERT(0, "Not implemented!", Q_FUNC_INFO);
         }
@@ -697,7 +704,7 @@ private:
 
 public:
     ErrorCode processUpdateSync(
-        QnTransaction<ApiResetBusinessRuleData>& tran,
+        QnTransaction<nx::vms::api::ResetEventRulesData>& tran,
         PostProcessList* const transactionsPostProcessList,
         int /*dummy*/ = 0)
     {
@@ -710,7 +717,7 @@ public:
         if (errorCode != ErrorCode::ok)
             return errorCode;
 
-        ApiBusinessRuleDataList defaultRules;
+        nx::vms::api::EventRuleDataList defaultRules;
         fromResourceListToApi(nx::vms::event::Rule::getDefaultRules(), defaultRules);
 
         return processMultiUpdateSync(
@@ -727,13 +734,13 @@ public:
         int /*dummy*/ = 0)
     {
         NX_ASSERT(ApiCommand::isPersistent(tran.command));
-        
+
         detail::PersistentStorage persistentDb(m_db.db());
         tran.transactionType = getTransactionDescriptorByTransaction(tran)->getTransactionTypeFunc(
             m_db.db()->commonModule(),
             tran.params,
             &persistentDb);
-        
+
         if (tran.transactionType == TransactionType::Unknown)
             return ErrorCode::forbidden;
 

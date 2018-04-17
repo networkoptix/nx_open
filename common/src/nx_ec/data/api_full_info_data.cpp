@@ -1,6 +1,6 @@
 #include "api_full_info_data.h"
 
-#include <nx_ec/data/api_stored_file_data.h>
+#include <nx/vms/api/data/stored_file_data.h>
 #include <nx_ec/data/api_user_data.h>
 #include <nx_ec/data/api_videowall_data.h>
 #include <nx_ec/data/api_webpage_data.h>
@@ -15,10 +15,10 @@
 #include <nx_ec/data/api_media_server_data.h>
 #include <nx_ec/data/api_resource_type_data.h>
 #include <nx_ec/data/api_license_data.h>
-#include <nx_ec/data/api_business_rule_data.h>
-#include <nx_ec/data/api_camera_data.h>
-#include <nx_ec/data/api_camera_attributes_data.h>
-#include <nx_ec/data/api_camera_history_data.h>
+#include <nx/vms/api/data/event_rule_data.h>
+#include <nx/vms/api/data/camera_data.h>
+#include <nx/vms/api/data/camera_attributes_data.h>
+#include <nx/vms/api/data/camera_history_data.h>
 #include <nx_ec/data/api_email_data.h>
 #include <nx_ec/data/api_layout_data.h>
 #include <nx_ec/data/api_layout_tour_data.h>

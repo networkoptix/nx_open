@@ -6,10 +6,10 @@
 #include "api_globals.h"
 #include "api_resource_data.h"
 #include "api_media_server_data.h"
-#include "api_camera_data_ex.h"
+#include <nx/vms/api/data/camera_data_ex.h>
 #include "api_client_info_data.h"
 #include "api_license_data.h"
-#include "api_business_rule_data.h"
+#include <nx/vms/api/data/event_rule_data.h>
 #include "api_layout_data.h"
 #include "api_user_data.h"
 #include "api_videowall_data.h"
@@ -80,10 +80,10 @@ namespace ec2 {
 #define ApiLicenseStatistics_Fields (name)(key)(cameraCount)(licenseType)(version)(brand)(expiration)(validation)
 
 	struct ApiBusinessRuleStatistics
-		: ApiBusinessRuleData
+		: nx::vms::api::EventRuleData
 	{
         ApiBusinessRuleStatistics();
-        ApiBusinessRuleStatistics(ApiBusinessRuleData&& data);
+        ApiBusinessRuleStatistics(nx::vms::api::EventRuleData&& data);
 	};
 #define ApiBusinessRuleStatistics_Fields (id)(eventType)(eventResourceIds)(eventCondition)(eventState) \
 	(actionType)(actionResourceIds)(actionParams)(aggregationPeriod)(disabled)(schedule)(system)

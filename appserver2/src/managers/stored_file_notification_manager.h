@@ -1,7 +1,7 @@
 #pragma once
 
 #include "nx_ec/ec_api.h"
-#include "nx_ec/data/api_stored_file_data.h"
+#include <nx/vms/api/data/stored_file_data.h>
 #include "transaction/transaction.h"
 
 namespace ec2

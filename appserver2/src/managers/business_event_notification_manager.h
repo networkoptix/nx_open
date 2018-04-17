@@ -13,16 +13,16 @@ public:
     }
 
     void triggerNotification(
-        const QnTransaction<ApiBusinessActionData>& tran,
+        const QnTransaction<nx::vms::api::EventActionData>& tran,
         NotificationSource /*source*/);
     void triggerNotification(
         const QnTransaction<nx::vms::api::IdData>& tran,
         NotificationSource /*source*/);
     void triggerNotification(
-        const QnTransaction<ApiBusinessRuleData>& tran,
+        const QnTransaction<nx::vms::api::EventRuleData>& tran,
         NotificationSource source);
     void triggerNotification(
-        const QnTransaction<ApiResetBusinessRuleData>& tran,
+        const QnTransaction<nx::vms::api::ResetEventRulesData>& tran,
         NotificationSource /*source*/);
 };
 

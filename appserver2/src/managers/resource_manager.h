@@ -35,7 +35,7 @@ public:
 
     //!Implementation of AbstractResourceManager::save
     virtual int save(
-        const ec2::ApiResourceParamWithRefDataList& kvPairs,
+        const nx::vms::api::ResourceParamWithRefDataList& kvPairs,
         impl::SimpleHandlerPtr handler) override;
     //!Implementation of AbstractResourceManager::remove
     virtual int remove(const QnUuid& id, impl::SimpleHandlerPtr handler) override;
@@ -61,15 +61,16 @@ int QnResourceManager<T>::getResourceTypes(impl::GetResourceTypesHandlerPtr hand
 {
     const int reqID = generateRequestID();
 
-    auto queryDoneHandler = [reqID, handler](
+    auto queryDoneHandler =
+        [reqID, handler](
         ErrorCode errorCode,
         const ApiResourceTypeDataList& resTypeList)
-    {
-        QnResourceTypeList outResTypeList;
-        if (errorCode == ErrorCode::ok)
-            fromApiToResourceList(resTypeList, outResTypeList);
-        handler->done(reqID, errorCode, outResTypeList);
-    };
+        {
+            QnResourceTypeList outResTypeList;
+            if (errorCode == ErrorCode::ok)
+                fromApiToResourceList(resTypeList, outResTypeList);
+            handler->done(reqID, errorCode, outResTypeList);
+        };
     m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<std::nullptr_t,
         ApiResourceTypeDataList, decltype(queryDoneHandler)>(
         ApiCommand::getResourceTypes,
@@ -85,7 +86,7 @@ int QnResourceManager<T>::setResourceStatus(
     impl::SetResourceStatusHandlerPtr handler)
 {
     const int reqID = generateRequestID();
-    ApiResourceStatusData params;
+    nx::vms::api::ResourceStatusData params;
     params.id = resourceId;
     params.status = static_cast<nx::vms::api::ResourceStatus>(status);
 
@@ -107,17 +108,18 @@ int QnResourceManager<T>::getKvPairs(const QnUuid& resourceId, impl::GetKvPairsH
 {
     const int reqID = generateRequestID();
 
-    auto queryDoneHandler = [reqID, handler, resourceId](
+    auto queryDoneHandler =
+        [reqID, handler, resourceId](
         ErrorCode errorCode,
-        const ApiResourceParamWithRefDataList& params)
-    {
-        ApiResourceParamWithRefDataList outData;
-        if (errorCode == ErrorCode::ok)
-            outData = params;
-        handler->done(reqID, errorCode, outData);
-    };
+        const nx::vms::api::ResourceParamWithRefDataList& params)
+        {
+            nx::vms::api::ResourceParamWithRefDataList outData;
+            if (errorCode == ErrorCode::ok)
+                outData = params;
+            handler->done(reqID, errorCode, outData);
+        };
     m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QnUuid,
-        ApiResourceParamWithRefDataList, decltype(queryDoneHandler)>(
+        nx::vms::api::ResourceParamWithRefDataList, decltype(queryDoneHandler)>(
         ApiCommand::getResourceParams,
         resourceId,
         queryDoneHandler);
@@ -131,17 +133,18 @@ int QnResourceManager<T>::getStatusList(
 {
     const int reqID = generateRequestID();
 
-    auto queryDoneHandler = [reqID, handler, resourceId](
+    auto queryDoneHandler =
+        [reqID, handler, resourceId](
         ErrorCode errorCode,
-        const ApiResourceStatusDataList& params)
-    {
-        ApiResourceStatusDataList outData;
-        if (errorCode == ErrorCode::ok)
-            outData = params;
-        handler->done(reqID, errorCode, outData);
-    };
+        const nx::vms::api::ResourceStatusDataList& params)
+        {
+            nx::vms::api::ResourceStatusDataList outData;
+            if (errorCode == ErrorCode::ok)
+                outData = params;
+            handler->done(reqID, errorCode, outData);
+        };
     m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QnUuid,
-        ApiResourceStatusDataList, decltype(queryDoneHandler)>(
+        nx::vms::api::ResourceStatusDataList, decltype(queryDoneHandler)>(
         ApiCommand::getStatusList,
         resourceId,
         queryDoneHandler);
@@ -150,7 +153,7 @@ int QnResourceManager<T>::getStatusList(
 
 template<class T>
 int QnResourceManager<T>::save(
-    const ec2::ApiResourceParamWithRefDataList& kvPairs,
+    const nx::vms::api::ResourceParamWithRefDataList& kvPairs,
     impl::SimpleHandlerPtr handler)
 {
     const int reqID = generateRequestID();

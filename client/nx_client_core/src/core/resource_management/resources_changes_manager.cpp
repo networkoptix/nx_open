@@ -308,7 +308,7 @@ void QnResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceLi
              if (errorCode == ec2::ErrorCode::ok)
                  return;
 
-             for (const ec2::ApiCameraData& data: backup)
+             for (const auto& data: backup)
              {
                  auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(data.id);
                  if (camera)

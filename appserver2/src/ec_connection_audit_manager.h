@@ -6,6 +6,7 @@
 #include "api/model/audit/auth_session.h"
 
 namespace ec2 {
+
 class AbstractECConnection;
 
 class ECConnectionAuditManager
@@ -26,56 +27,67 @@ public:
         ApiCommand::Value command,
         const ApiCameraAttributesData& params,
         const QnAuthSession& authInfo);
+
     void addAuditRecord(
         ApiCommand::Value command,
         const ApiCameraAttributesDataList& params,
         const QnAuthSession& authInfo);
+
     void addAuditRecord(
         ApiCommand::Value command,
         const ApiMediaServerUserAttributesData& params,
         const QnAuthSession& authInfo);
+
     void addAuditRecord(
         ApiCommand::Value command,
         const ApiMediaServerUserAttributesDataList& params,
         const QnAuthSession& authInfo);
+
     void addAuditRecord(
         ApiCommand::Value command,
         const ApiStorageData& params,
         const QnAuthSession& authInfo);
+
     void addAuditRecord(
         ApiCommand::Value command,
         const ApiStorageDataList& params,
         const QnAuthSession& authInfo);
+
     void addAuditRecord(
         ApiCommand::Value command,
         const ApiUserData& params,
         const QnAuthSession& authInfo);
+
     void addAuditRecord(
         ApiCommand::Value command,
         const ApiUserDataList& params,
         const QnAuthSession& authInfo);
+
     void addAuditRecord(
         ApiCommand::Value command,
-        const ApiBusinessRuleData& params,
-        const QnAuthSession& authInfo);
-    void addAuditRecord(
-        ApiCommand::Value command,
-        const ApiBusinessRuleDataList& params,
+        const nx::vms::api::EventRuleData& params,
         const QnAuthSession& authInfo);
 
     void addAuditRecord(
         ApiCommand::Value command,
-        const ApiResourceParamWithRefData& params,
+        const nx::vms::api::EventRuleDataList& params,
         const QnAuthSession& authInfo);
+
     void addAuditRecord(
         ApiCommand::Value command,
-        const ApiResourceParamWithRefDataList& params,
+        const nx::vms::api::ResourceParamWithRefData& params,
+        const QnAuthSession& authInfo);
+
+    void addAuditRecord(
+        ApiCommand::Value command,
+        const nx::vms::api::ResourceParamWithRefDataList& params,
         const QnAuthSession& authInfo);
 
     void addAuditRecord(
         ApiCommand::Value command,
         const nx::vms::api::IdData& params,
         const QnAuthSession& authInfo);
+
     void addAuditRecord(
         ApiCommand::Value command,
         const nx::vms::api::IdDataList& params,
@@ -83,11 +95,12 @@ public:
 
     void addAuditRecord(
         ApiCommand::Value command,
-        const ApiResetBusinessRuleData& params,
+        const nx::vms::api::ResetEventRulesData& params,
         const QnAuthSession& authInfo);
+
     void addAuditRecord(
         ApiCommand::Value command,
-        const ApiDatabaseDumpData& params,
+        const nx::vms::api::DatabaseDumpData& params,
         const QnAuthSession& authInfo);
 
     AbstractECConnection* ec2Connection() const;
@@ -95,4 +108,5 @@ private:
     AbstractECConnection* m_connection;
 };
 
-}
+} // namespace ec2
+

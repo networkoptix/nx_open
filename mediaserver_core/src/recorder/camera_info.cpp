@@ -227,7 +227,7 @@ void Reader::operator()(ArchiveCameraDataList* outArchiveCameraList)
 
 bool Reader::initArchiveCamData()
 {
-    ec2::ApiCameraData& coreData = m_archiveCamData.coreData;
+    nx::vms::api::CameraData& coreData = m_archiveCamData.coreData;
 
     coreData.physicalId = m_fileInfo->fileName();
     if (coreData.physicalId.isEmpty())
@@ -355,7 +355,7 @@ Reader::ParseResult Reader::parseLine(const QString& line) const
 
 void Reader::addProperty(const ParseResult& result)
 {
-    ec2::ApiCameraData& coreData = m_archiveCamData.coreData;
+    nx::vms::api::CameraData& coreData = m_archiveCamData.coreData;
 
     if (result.key().contains(kArchiveCameraNameKey))
         coreData.name = result.value();

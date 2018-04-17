@@ -8,22 +8,6 @@ class QString;
 
 namespace ec2 {
 
-using ApiDataWithVersion = nx::vms::api::DataWithVersion;
-using ApiDatabaseDumpData = nx::vms::api::DatabaseDumpData;
-using ApiDatabaseDumpToFileData = nx::vms::api::DatabaseDumpToFileData;
-using ApiSyncMarkerRecord = nx::vms::api::SyncMarkerRecordData;
-using ApiBusinessRuleData = nx::vms::api::EventRuleData;
-using ApiBusinessRuleDataList = nx::vms::api::EventRuleDataList;
-using ApiBusinessActionData = nx::vms::api::EventActionData;
-using ApiResetBusinessRuleData = nx::vms::api::ResetEventRulesData;
-using ApiResourceData = nx::vms::api::ResourceData;
-using ApiResourceDataList = nx::vms::api::ResourceDataList;
-using ApiResourceParamData = nx::vms::api::ResourceParamData;
-using ApiResourceParamDataList = nx::vms::api::ResourceParamDataList;
-using ApiResourceParamWithRefData = nx::vms::api::ResourceParamWithRefData;
-using ApiResourceParamWithRefDataList = nx::vms::api::ResourceParamWithRefDataList;
-using ApiResourceStatusData = nx::vms::api::ResourceStatusData;
-using ApiResourceStatusDataList = nx::vms::api::ResourceStatusDataList;
 using ApiCameraData = nx::vms::api::CameraData;
 using ApiCameraDataList = nx::vms::api::CameraDataList;
 using ApiScheduleTaskData = nx::vms::api::ScheduleTaskData;
@@ -39,8 +23,6 @@ using ApiCameraHistoryItemDataList = nx::vms::api::CameraHistoryItemDataList;
 using ApiCameraHistoryData = nx::vms::api::CameraHistoryData;
 using ApiCameraHistoryDataList = nx::vms::api::CameraHistoryDataList;
 using ApiEmailSettingsData = nx::vms::api::EmailSettingsData;
-using ApiUpdateSequenceData = nx::vms::api::UpdateSequenceData;
-
 
     struct ApiFullInfoData;
     struct ApiLayoutItemData;

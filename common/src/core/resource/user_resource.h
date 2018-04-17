@@ -81,7 +81,7 @@ public:
     QString fullName() const;
     void setFullName(const QString& value);
 
-    ec2::ApiResourceParamWithRefDataList params() const;
+    nx::vms::api::ResourceParamWithRefDataList params() const;
 
     virtual Qn::ResourceStatus getStatus() const override;
 

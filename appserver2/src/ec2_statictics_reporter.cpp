@@ -103,7 +103,7 @@ namespace ec2
 
         for (auto& br: bRules)
         {
-            ApiBusinessRuleData apiData;
+            nx::vms::api::EventRuleData apiData;
             fromResourceToApi(br, apiData);
             outData->businessRules.push_back(std::move(apiData));
         }

@@ -8,7 +8,6 @@
 
 #include "utils/common/util.h"
 #include "managers/time_manager.h"
-#include "nx_ec/data/api_business_rule_data.h"
 #include "nx_ec/data/api_discovery_data.h"
 #include <nx/vms/event/event_fwd.h>
 #include "utils/common/synctime.h"
@@ -39,17 +38,17 @@
 
 #include <network/system_helpers.h>
 
-#include "nx_ec/data/api_camera_data.h"
+#include <nx/vms/api/data/camera_data.h>
 #include "nx_ec/data/api_resource_type_data.h"
-#include "nx_ec/data/api_stored_file_data.h"
+#include <nx/vms/api/data/stored_file_data.h>
 #include "nx_ec/data/api_user_data.h"
 #include "nx_ec/data/api_layout_data.h"
 #include "nx_ec/data/api_videowall_data.h"
 #include "nx_ec/data/api_webpage_data.h"
 #include "nx_ec/data/api_license_data.h"
-#include "nx_ec/data/api_business_rule_data.h"
+#include <nx/vms/api/data/event_rule_data.h>
 #include "nx_ec/data/api_full_info_data.h"
-#include "nx_ec/data/api_camera_history_data.h"
+#include <nx/vms/api/data/camera_history_data.h>
 #include "nx_ec/data/api_media_server_data.h"
 #include "nx_ec/data/api_update_data.h"
 #include <nx_ec/data/api_time_data.h>
@@ -57,7 +56,7 @@
 #include <nx_ec/data/api_access_rights_data.h>
 #include "api/runtime_info_manager.h"
 #include <nx/utils/log/log.h>
-#include "nx_ec/data/api_camera_data_ex.h"
+#include <nx/vms/api/data/camera_data_ex.h>
 #include "restype_xml_parser.h"
 #include <nx/vms/event/rule.h>
 #include "settings.h"
@@ -135,7 +134,7 @@ void assertSorted(std::vector<T> &data) {
  * Updaters are used to update object fields which are stored as raw json strings.
  * @return True if the object is updated.
  */
-bool businessRuleObjectUpdater(ApiBusinessRuleData& data)
+bool businessRuleObjectUpdater(EventRuleData& data)
 {
     if (data.actionParams.size() <= 4) //< keep empty json
         return false;
@@ -614,8 +613,11 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
             }
             if (m_resyncFlags.testFlag(ResyncRules))
             {
-                if (!fillTransactionLogInternal<QnUuid, ApiBusinessRuleData, ApiBusinessRuleDataList>(ApiCommand::saveEventRule, businessRuleObjectUpdater))
+                if (!fillTransactionLogInternal<QnUuid, EventRuleData, EventRuleDataList>(
+                        ApiCommand::saveEventRule, businessRuleObjectUpdater))
+                {
                     return false;
+                }
             }
             if (m_resyncFlags.testFlag(ResyncUsers))
             {
@@ -741,7 +743,7 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
         }
         while (queryCameras.next())
         {
-            QnTransaction<ApiResourceStatusData> tran(
+            QnTransaction<nx::vms::api::ResourceStatusData> tran(
                 ApiCommand::setResourceStatus,
                 commonModule()->moduleGUID());
             m_tranLog->fillPersistentInfo(tran);
@@ -847,61 +849,156 @@ bool QnDbManager::fillTransactionLogInternal(ApiCommand::Value command, std::fun
 
 bool QnDbManager::resyncTransactionLog()
 {
-    if (!fillTransactionLogInternal<QnUuid, ApiUserData, ApiUserDataList>(ApiCommand::saveUser))
-        return false;
-    if (!fillTransactionLogInternal<QnUuid, ApiMediaServerData, ApiMediaServerDataList>(ApiCommand::saveMediaServer))
-        return false;
-    if (!fillTransactionLogInternal<QnUuid, ApiMediaServerUserAttributesData, ApiMediaServerUserAttributesDataList>(ApiCommand::saveMediaServerUserAttributes))
-        return false;
-    if (!fillTransactionLogInternal<QnUuid, ApiCameraData, ApiCameraDataList>(ApiCommand::saveCamera))
-        return false;
-    if (!fillTransactionLogInternal<QnUuid, ApiCameraAttributesData, ApiCameraAttributesDataList>(ApiCommand::saveCameraUserAttributes))
-        return false;
-    if (!fillTransactionLogInternal<QnUuid, ApiLayoutData, ApiLayoutDataList>(ApiCommand::saveLayout))
-        return false;
-    if (!fillTransactionLogInternal<QnUuid, ApiBusinessRuleData, ApiBusinessRuleDataList>(ApiCommand::saveEventRule, businessRuleObjectUpdater))
-        return false;
-    if (!fillTransactionLogInternal<QnUuid, ApiResourceParamWithRefData, ApiResourceParamWithRefDataList>(ApiCommand::setResourceParam))
-        return false;
-
-    if (!fillTransactionLogInternal<QnUuid, ApiStorageData, ApiStorageDataList>(ApiCommand::saveStorage))
-        return false;
-
-    if (!fillTransactionLogInternal<nullptr_t, ApiLicenseData, ApiLicenseDataList>(ApiCommand::addLicense))
-        return false;
-
     if (!fillTransactionLogInternal<
-            nullptr_t,
-            StoredFileData,
-            StoredFileDataList>(
-                ApiCommand::addStoredFile))
+        QnUuid,
+        ApiUserData,
+        ApiUserDataList>(ApiCommand::saveUser))
     {
         return false;
     }
 
-    if (!fillTransactionLogInternal<QnUuid, ApiResourceStatusData, ApiResourceStatusDataList>(ApiCommand::setResourceStatus))
+    if (!fillTransactionLogInternal<
+        QnUuid,
+        ApiMediaServerData,
+        ApiMediaServerDataList>(ApiCommand::saveMediaServer))
+    {
         return false;
+    }
 
-    if (!fillTransactionLogInternal<QnUuid, ApiVideowallData, ApiVideowallDataList>(ApiCommand::saveVideowall))
+    if (!fillTransactionLogInternal<
+        QnUuid,
+        ApiMediaServerUserAttributesData,
+        ApiMediaServerUserAttributesDataList>(ApiCommand::saveMediaServerUserAttributes))
+    {
         return false;
+    }
 
-    if (!fillTransactionLogInternal<nullptr_t, ApiAccessRightsData, ApiAccessRightsDataList>(ApiCommand::setAccessRights))
+    if (!fillTransactionLogInternal<
+        QnUuid,
+        CameraData,
+        CameraDataList>(ApiCommand::saveCamera))
+    {
         return false;
+    }
 
-    if (!fillTransactionLogInternal<QnUuid, ApiUserRoleData, ApiUserRoleDataList>(ApiCommand::saveUserRole))
+    if (!fillTransactionLogInternal<
+        QnUuid,
+        CameraAttributesData,
+        CameraAttributesDataList>(ApiCommand::saveCameraUserAttributes))
+    {
         return false;
+    }
 
-    if (!fillTransactionLogInternal<QnUuid, ApiWebPageData, ApiWebPageDataList>(ApiCommand::saveWebPage))
+    if (!fillTransactionLogInternal<
+        QnUuid,
+        ApiLayoutData,
+        ApiLayoutDataList>(ApiCommand::saveLayout))
+    {
         return false;
+    }
 
-    if (!fillTransactionLogInternal<nullptr_t, ApiLayoutTourData, ApiLayoutTourDataList>(ApiCommand::saveLayoutTour))
+    if (!fillTransactionLogInternal<
+        QnUuid,
+        EventRuleData,
+        EventRuleDataList>(ApiCommand::saveEventRule, businessRuleObjectUpdater))
+    {
         return false;
+    }
 
-    if (!fillTransactionLogInternal<QnUuid, ApiDiscoveryData, ApiDiscoveryDataList>(ApiCommand::addDiscoveryInformation))
+    if (!fillTransactionLogInternal<
+        QnUuid,
+        ResourceParamWithRefData,
+        ResourceParamWithRefDataList>(ApiCommand::setResourceParam))
+    {
         return false;
+    }
 
-    if (!fillTransactionLogInternal<nullptr_t, ApiServerFootageData, ApiServerFootageDataList>(ApiCommand::addCameraHistoryItem))
+    if (!fillTransactionLogInternal<
+        QnUuid,
+        ApiStorageData,
+        ApiStorageDataList>(ApiCommand::saveStorage))
+    {
         return false;
+    }
+
+    if (!fillTransactionLogInternal<
+        nullptr_t,
+        ApiLicenseData,
+        ApiLicenseDataList>(ApiCommand::addLicense))
+    {
+        return false;
+    }
+
+    if (!fillTransactionLogInternal<
+            nullptr_t,
+            StoredFileData,
+            StoredFileDataList>(ApiCommand::addStoredFile))
+    {
+        return false;
+    }
+
+    if (!fillTransactionLogInternal<
+        QnUuid,
+        nx::vms::api::ResourceStatusData,
+        ResourceStatusDataList>(ApiCommand::setResourceStatus))
+    {
+        return false;
+    }
+
+    if (!fillTransactionLogInternal<
+        QnUuid,
+        ApiVideowallData,
+        ApiVideowallDataList>(ApiCommand::saveVideowall))
+    {
+        return false;
+    }
+
+    if (!fillTransactionLogInternal<
+        nullptr_t,
+        ApiAccessRightsData,
+        ApiAccessRightsDataList>(ApiCommand::setAccessRights))
+    {
+        return false;
+    }
+
+    if (!fillTransactionLogInternal<QnUuid,
+        ApiUserRoleData,
+        ApiUserRoleDataList>(ApiCommand::saveUserRole))
+    {
+        return false;
+    }
+
+    if (!fillTransactionLogInternal<
+        QnUuid,
+        ApiWebPageData,
+        ApiWebPageDataList>(ApiCommand::saveWebPage))
+    {
+        return false;
+    }
+
+    if (!fillTransactionLogInternal<
+        nullptr_t,
+        ApiLayoutTourData,
+        ApiLayoutTourDataList>(ApiCommand::saveLayoutTour))
+    {
+        return false;
+    }
+
+    if (!fillTransactionLogInternal<
+        QnUuid,
+        ApiDiscoveryData,
+        ApiDiscoveryDataList>(ApiCommand::addDiscoveryInformation))
+    {
+        return false;
+    }
+
+    if (!fillTransactionLogInternal<
+        nullptr_t,
+        ApiServerFootageData,
+        ApiServerFootageDataList>(ApiCommand::addCameraHistoryItem))
+    {
+        return false;
+    }
 
     return true;
 }
@@ -1210,7 +1307,7 @@ bool QnDbManager::removeServerStatusFromTransactionLog()
     QSqlQuery delQuery(m_sdb);
     delQuery.prepare("DELETE from transaction_log WHERE tran_guid = ?");
     while (query.next()) {
-        ApiResourceStatusData data;
+        ResourceStatusData data;
         data.id = QnUuid::fromRfc4122(query.value(0).toByteArray());
         QnUuid hash = transactionHash(ApiCommand::removeResourceStatus, data);
         delQuery.bindValue(0, QnSql::serialized_field(hash));
@@ -1308,7 +1405,7 @@ bool QnDbManager::removeWrongSupportedMotionTypeForONVIF()
         }
         if (abstractTran.command != ApiCommand::setResourceParam)
             continue;
-        ApiResourceParamWithRefData data;
+        ResourceParamWithRefData data;
         if (!QnUbjson::deserialize(&stream, &data))
         {
             qWarning() << Q_FUNC_INFO << "Can' deserialize transaction from transaction log";
@@ -1425,7 +1522,7 @@ bool QnDbManager::updateDefaultRules(const nx::vms::event::RuleList& rules)
     // TODO: #GDM move to migration
     for (const auto& rule: rules)
     {
-        ApiBusinessRuleData ruleData;
+        EventRuleData ruleData;
         fromResourceToApi(rule, ruleData);
         if (updateBusinessRule(ruleData) != ErrorCode::ok)
             return false;
@@ -1468,7 +1565,7 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
         // TODO: #GDM move to migration
         for (const auto& rule: vms::event::Rule::getSystemRules())
         {
-            ApiBusinessRuleData ruleData;
+            EventRuleData ruleData;
             fromResourceToApi(rule, ruleData);
             if (updateBusinessRule(ruleData) != ErrorCode::ok)
                 return false;
@@ -1775,7 +1872,7 @@ QnDbManager::~QnDbManager()
     }
 }
 
-ErrorCode QnDbManager::insertAddParam(const ApiResourceParamWithRefData& param)
+ErrorCode QnDbManager::insertAddParam(const ResourceParamWithRefData& param)
 {
     const auto query = m_insertKvPairQuery.get(m_sdb,
         "INSERT OR REPLACE INTO vms_kvpair(resource_guid, name, value) VALUES(?, ?, ?)");
@@ -1793,7 +1890,8 @@ ErrorCode QnDbManager::insertAddParam(const ApiResourceParamWithRefData& param)
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::fetchResourceParams( const QnQueryFilter& filter, ApiResourceParamWithRefDataList& params )
+ErrorCode QnDbManager::fetchResourceParams( const QnQueryFilter& filter,
+    ResourceParamWithRefDataList& params )
 {
     const QnUuid resID = filter.fields.value( RES_ID_FIELD ).value<QnUuid>();
     const QnUuid resParentID = resID.isNull() ? filter.fields.value( RES_PARENT_ID_FIELD ).value<QnUuid>() : QnUuid();
@@ -1860,7 +1958,7 @@ QnUuid QnDbManager::getResourceGuid(const qint32 &internalId) {
     return QnUuid::fromRfc4122(query.value(0).toByteArray());
 }
 
-ErrorCode QnDbManager::insertOrReplaceResource(const ApiResourceData& data, qint32* internalId)
+ErrorCode QnDbManager::insertOrReplaceResource(const ResourceData& data, qint32* internalId)
 {
     if (!database::api::insertOrReplaceResource(&m_resourceQueries, data, internalId))
         return ErrorCode::dbError;
@@ -1956,7 +2054,7 @@ ErrorCode QnDbManager::insertOrReplaceUserRole(const ApiUserRoleData& data)
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::insertOrReplaceCamera(const ApiCameraData& data, qint32 internalId)
+ErrorCode QnDbManager::insertOrReplaceCamera(const CameraData& data, qint32 internalId)
 {
     const auto query = m_insertCameraQuery.get(m_sdb, R"sql(
         INSERT OR REPLACE INTO vms_camera (
@@ -2172,7 +2270,8 @@ ErrorCode QnDbManager::updateCameraSchedule(const std::vector<ApiScheduleTaskDat
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiDatabaseDumpData>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(
+    const QnTransaction<DatabaseDumpData>& tran)
 {
     QFile f(m_sdb.databaseName() + QString(lit(".backup")));
     if (!f.open(QFile::WriteOnly))
@@ -2199,7 +2298,7 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiDatabas
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiResourceStatusData>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ResourceStatusData>& tran)
 {
     QSqlQuery query(m_sdb);
     query.prepare("INSERT OR REPLACE INTO vms_resource_status values (?, ?)");
@@ -2227,7 +2326,7 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiSetReso
 }
 */
 
-ErrorCode QnDbManager::saveCamera(const ApiCameraData& params)
+ErrorCode QnDbManager::saveCamera(const CameraData& params)
 {
     if (params.physicalId.isEmpty())
         return ec2::ErrorCode::forbidden;
@@ -2240,7 +2339,7 @@ ErrorCode QnDbManager::saveCamera(const ApiCameraData& params)
     return insertOrReplaceCamera(params, internalId);
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiCameraData>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<CameraData>& tran)
 {
     return saveCamera(tran.params);
 }
@@ -2286,7 +2385,7 @@ ErrorCode QnDbManager::insertBRuleResource(const QString& tableName, const QnUui
     }
 }
 
-ErrorCode QnDbManager::updateBusinessRule(const ApiBusinessRuleData& rule)
+ErrorCode QnDbManager::updateBusinessRule(const EventRuleData& rule)
 {
     ErrorCode rez = insertOrReplaceBusinessRuleTable(rule);
     if (rez != ErrorCode::ok)
@@ -2315,7 +2414,7 @@ ErrorCode QnDbManager::updateBusinessRule(const ApiBusinessRuleData& rule)
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiBusinessRuleData>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<EventRuleData>& tran)
 {
     return updateBusinessRule(tran.params);
 }
@@ -2453,7 +2552,7 @@ ErrorCode QnDbManager::removeUserRole(const QnUuid& userRoleId)
     return deleteTableRecord(userRoleId, "vms_user_roles", "id");
 }
 
-ErrorCode QnDbManager::insertOrReplaceBusinessRuleTable( const ApiBusinessRuleData& businessRule)
+ErrorCode QnDbManager::insertOrReplaceBusinessRuleTable( const EventRuleData& businessRule)
 {
     QSqlQuery query(m_sdb);
     query.prepare(QString("\
@@ -2591,7 +2690,7 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiUpdateU
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiResourceParamWithRefData>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ResourceParamWithRefData>& tran)
 {
     if (tran.command == ApiCommand::setResourceParam)
         return insertAddParam(tran.params);
@@ -2601,7 +2700,7 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiResourc
         return ErrorCode::notImplemented;
 }
 
-ErrorCode QnDbManager::removeParam(const ApiResourceParamWithRefData& data)
+ErrorCode QnDbManager::removeParam(const ResourceParamWithRefData& data)
 {
     QSqlQuery query(m_sdb);
     query.prepare("DELETE FROM vms_kvpair WHERE resource_guid = :id AND name = :name");
@@ -3057,14 +3156,15 @@ bool QnDbManager::readMiscParam( const QByteArray& name, QByteArray* value )
     return false;
 }
 
-ErrorCode QnDbManager::readSettings(ApiResourceParamDataList& settings)
+ErrorCode QnDbManager::readSettings(ResourceParamDataList& settings)
 {
-    ApiResourceParamWithRefDataList params;
+    ResourceParamWithRefDataList params;
     ErrorCode rez = doQueryNoLock(m_adminUserID, params);
     settings.reserve( params.size() );
-    if (rez == ErrorCode::ok) {
-        for(ec2::ApiResourceParamWithRefData& param: params)
-            settings.push_back(ApiResourceParamData(std::move(param.name), std::move(param.value)));
+    if (rez == ErrorCode::ok)
+    {
+        for (auto&& param: params)
+            settings.emplace_back(std::move(param.name), std::move(param.value));
     }
     return rez;
 }
@@ -3228,7 +3328,7 @@ ErrorCode QnDbManager::doQueryNoLock(
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::doQueryNoLock(nullptr_t /*dummy*/, ApiResourceParamDataList& data)
+ErrorCode QnDbManager::doQueryNoLock(nullptr_t /*dummy*/, ResourceParamDataList& data)
 {
     return readSettings(data);
 }
@@ -3306,7 +3406,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiLayoutDataList& layout
 /**
  * /ec2/getCameras
  */
-ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiCameraDataList& cameraList)
+ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, CameraDataList& cameraList)
 {
     QString filterStr;
     if (!id.isNull())
@@ -3336,7 +3436,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiCameraDataList& camera
 /**
  * /ec2/getResourceStatus
  */
-ErrorCode QnDbManager::doQueryNoLock(const QnUuid& resId, ApiResourceStatusDataList& statusList)
+ErrorCode QnDbManager::doQueryNoLock(const QnUuid& resId, ResourceStatusDataList& statusList)
 {
     QString filterStr;
     if (!resId.isNull())
@@ -3388,7 +3488,7 @@ ErrorCode QnDbManager::getStorages(const QString& filterStr, ApiStorageDataList&
     QnQueryFilter filter;
     filter.fields.insert(RES_TYPE_FIELD, RES_TYPE_STORAGE);
 
-    ApiResourceParamWithRefDataList params;
+    ResourceParamWithRefDataList params;
     const auto result = fetchResourceParams(filter, params);
     if (result != ErrorCode::ok)
         return result;
@@ -3396,7 +3496,7 @@ ErrorCode QnDbManager::getStorages(const QString& filterStr, ApiStorageDataList&
     mergeObjectListData<ApiStorageData>(
         storageList, params,
         &ApiStorageData::addParams,
-        &ApiResourceParamWithRefData::resourceId);
+        &ResourceParamWithRefData::resourceId);
 
     // Storages are generally bound to mediaservers, so it's required to be sorted by parent id.
     std::sort(storageList.begin(), storageList.end(),
@@ -3531,7 +3631,7 @@ ErrorCode QnDbManager::doQueryNoLock(
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiCameraDataExList& cameraExList)
+ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, CameraDataExList& cameraExList)
 {
     QSqlQuery queryCameras( m_sdb );
     queryCameras.setForwardOnly(true);
@@ -3586,11 +3686,11 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiCameraDataExList& came
     //reading resource properties
     QnQueryFilter filter;
     filter.fields.insert( RES_TYPE_FIELD, RES_TYPE_CAMERA );
-    ApiResourceParamWithRefDataList params;
+    ResourceParamWithRefDataList params;
     ErrorCode result = fetchResourceParams( filter, params );
     if( result != ErrorCode::ok )
         return result;
-    mergeObjectListData<ApiCameraDataEx>(cameraExList, params, &ApiCameraDataEx::addParams, &ApiResourceParamWithRefData::resourceId);
+    mergeObjectListData<CameraDataEx>(cameraExList, params, &CameraDataEx::addParams, &ResourceParamWithRefData::resourceId);
 
     std::vector<ApiScheduleTaskWithRefData> scheduleTaskList;
     ErrorCode errCode = getScheduleTasks(scheduleTaskList);
@@ -3600,8 +3700,8 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiCameraDataExList& came
     mergeObjectListData(
         cameraExList,
         scheduleTaskList,
-        &ApiCameraDataEx::scheduleTasks,
-        &ApiCameraDataEx::id,
+        &CameraDataEx::scheduleTasks,
+        &CameraDataEx::id,
         &ApiScheduleTaskWithRefData::sourceId );
 
     return ErrorCode::ok;
@@ -3685,14 +3785,14 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiMediaServerDataExList&
     //reading properties
     QnQueryFilter filter;
     filter.fields.insert( RES_TYPE_FIELD, RES_TYPE_MSERVER );
-    ApiResourceParamWithRefDataList params;
+    ResourceParamWithRefDataList params;
     result = fetchResourceParams( filter, params );
     if( result != ErrorCode::ok )
         return result;
-    mergeObjectListData<ApiMediaServerDataEx>(serverExList, params, &ApiMediaServerDataEx::addParams, &ApiResourceParamWithRefData::resourceId);
+    mergeObjectListData<ApiMediaServerDataEx>(serverExList, params, &ApiMediaServerDataEx::addParams, &ResourceParamWithRefData::resourceId);
 
     //reading status info
-    ApiResourceStatusDataList statusList;
+    ResourceStatusDataList statusList;
     result = doQueryNoLock( id, statusList );
     if( result != ErrorCode::ok )
         return result;
@@ -3701,8 +3801,8 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiMediaServerDataExList&
         serverExList,
         statusList,
         &ApiMediaServerDataEx::id,
-        &ApiResourceStatusData::id,
-        []( ApiMediaServerDataEx& server, ApiResourceStatusData& statusData ) { server.status = statusData.status; } );
+        &ResourceStatusData::id,
+        []( ApiMediaServerDataEx& server, ResourceStatusData& statusData ) { server.status = statusData.status; } );
 
     return ErrorCode::ok;
 }
@@ -4007,7 +4107,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiWebPageDataList& webPa
 }
 
 //getEventRules
-ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiBusinessRuleDataList& businessRuleList)
+ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, EventRuleDataList& businessRuleList)
 {
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
@@ -4044,14 +4144,14 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiBusinessRuleDataList& 
 
     // merge data
 
-    mergeIdListData<ApiBusinessRuleData>(queryRuleEventRes, businessRuleList, &ApiBusinessRuleData::eventResourceIds);
-    mergeIdListData<ApiBusinessRuleData>(queryRuleActionRes, businessRuleList, &ApiBusinessRuleData::actionResourceIds);
+    mergeIdListData<EventRuleData>(queryRuleEventRes, businessRuleList, &EventRuleData::eventResourceIds);
+    mergeIdListData<EventRuleData>(queryRuleActionRes, businessRuleList, &EventRuleData::actionResourceIds);
 
     return ErrorCode::ok;
 }
 
 // getKVPairs
-ErrorCode QnDbManager::doQueryNoLock(const QnUuid& resourceId, ApiResourceParamWithRefDataList& params)
+ErrorCode QnDbManager::doQueryNoLock(const QnUuid& resourceId, ResourceParamWithRefDataList& params)
 {
     QnQueryFilter filter;
     if( !resourceId.isNull() )
@@ -4067,7 +4167,7 @@ ErrorCode QnDbManager::doQuery(const nullptr_t& /*dummy*/, ApiTimeData& currentT
 }
 
 // dumpDatabase
-ErrorCode QnDbManager::doQuery(const nullptr_t& /*dummy*/, ApiDatabaseDumpData& data)
+ErrorCode QnDbManager::doQuery(const nullptr_t& /*dummy*/, DatabaseDumpData& data)
 {
     QnWriteLocker lock(&m_mutex);
 
@@ -4106,7 +4206,7 @@ ErrorCode QnDbManager::doQuery(const nullptr_t& /*dummy*/, ApiDatabaseDumpData& 
 
 ErrorCode QnDbManager::doQuery(
     const StoredFilePath& dumpFilePath,
-    ApiDatabaseDumpToFileData& databaseDumpToFileData)
+    DatabaseDumpToFileData& databaseDumpToFileData)
 {
     QnWriteLocker lock(&m_mutex);
     m_tran->physicalCommitLazyData();
@@ -4937,7 +5037,7 @@ IdDataList QnDbManagerAccess::getLayoutToursNoLock(const QnUuid& parentId)
     return result;
 }
 
-void QnDbManagerAccess::getResourceParamsNoLock(const QnUuid& resourceId, ApiResourceParamWithRefDataList& resourceParams)
+void QnDbManagerAccess::getResourceParamsNoLock(const QnUuid& resourceId, ResourceParamWithRefDataList& resourceParams)
 {
     m_dbManager->doQueryNoLock(resourceId, resourceParams);
 }

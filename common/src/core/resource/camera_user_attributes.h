@@ -8,7 +8,7 @@
 #include <core/ptz/media_dewarping_params.h>
 #include <core/misc/schedule_task.h>
 
-#include <nx_ec/data/api_camera_attributes_data.h>
+#include <nx/vms/api/data/camera_attributes_data.h>
 
 #include "motion_window.h"
 

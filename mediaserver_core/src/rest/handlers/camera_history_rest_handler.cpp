@@ -8,7 +8,7 @@
 #include <core/resource/camera_history.h>
 #include <rest/server/rest_connection_processor.h>
 
-#include <nx_ec/data/api_camera_history_data.h>
+#include <nx/vms/api/data/camera_history_data.h>
 
 namespace {
 

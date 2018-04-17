@@ -30,7 +30,7 @@ namespace ec2
         backup::DaysOfWeek fromQtDOW(QList<Qt::DayOfWeek> days);
     }
 
-    struct ApiStorageData: ApiResourceData
+    struct ApiStorageData: nx::vms::api::ResourceData
     {
         ApiStorageData():
             spaceLimit(0),
@@ -43,7 +43,7 @@ namespace ec2
         qint64          spaceLimit;
         bool            usedForWriting;
         QString         storageType;
-        std::vector<ApiResourceParamData> addParams;
+        nx::vms::api::ResourceParamDataList addParams;
         bool            isBackup;              // is storage used for backup
     };
 #define ApiStorageData_Fields   \
@@ -55,7 +55,7 @@ namespace ec2
     (isBackup)
 
 
-    struct ApiMediaServerData: ApiResourceData
+    struct ApiMediaServerData: nx::vms::api::ResourceData
     {
         ApiMediaServerData():
             flags(Qn::SF_None)
@@ -129,7 +129,7 @@ namespace ec2
         }
 
         nx::vms::api::ResourceStatus status = nx::vms::api::ResourceStatus::offline;
-        std::vector<ApiResourceParamData> addParams;
+        nx::vms::api::ResourceParamDataList addParams;
         ApiStorageDataList storages;
 
         ApiMediaServerDataEx( const ApiMediaServerDataEx& mediaServerData )

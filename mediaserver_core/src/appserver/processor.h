@@ -35,8 +35,8 @@ public:
 
     static ec2::ErrorCode addAndPropagateCamResource(
         QnCommonModule* commonModule,
-        const ec2::ApiCameraData& apiCameraData,
-        const ec2::ApiResourceParamDataList& properties
+        const nx::vms::api::CameraData& apiCameraData,
+        const nx::vms::api::ResourceParamDataList& properties
     );
 
 private:

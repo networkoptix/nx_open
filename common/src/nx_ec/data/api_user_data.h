@@ -9,7 +9,7 @@
 
 namespace ec2 {
 
-struct ApiUserData: ApiResourceData
+struct ApiUserData: nx::vms::api::ResourceData
 {
     static constexpr const char* kCloudPasswordStub = "password_is_in_cloud";
 

@@ -4,7 +4,7 @@
 
 #include <common/common_module.h>
 
-#include <nx_ec/data/api_camera_history_data.h>
+#include <nx/vms/api/data/camera_history_data.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/network_resource.h>

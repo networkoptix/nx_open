@@ -85,7 +85,7 @@ void QnDatabaseManagementWidget::backupDb()
     QByteArray databaseData;
     auto dumpDatabaseHandler =
         [&dialog, &errorCode, &databaseData]
-        (int /*reqID*/, ec2::ErrorCode _errorCode, const ec2::ApiDatabaseDumpData& dbData)
+        (int /*reqID*/, ec2::ErrorCode _errorCode, const nx::vms::api::DatabaseDumpData& dbData)
         {
             errorCode = _errorCode;
             databaseData = dbData.data;
@@ -146,7 +146,7 @@ void QnDatabaseManagementWidget::restoreDb()
         return;
     }
 
-    ec2::ApiDatabaseDumpData data;
+    nx::vms::api::DatabaseDumpData data;
     data.data = file.readAll();
     file.close();
 

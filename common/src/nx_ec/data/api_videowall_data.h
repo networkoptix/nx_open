@@ -54,7 +54,7 @@ struct ApiVideowallMatrixData: nx::vms::api::IdData
 #define ApiVideowallMatrixData_Fields IdData_Fields (name)(items)
 
 
-struct ApiVideowallData: ApiResourceData
+struct ApiVideowallData: nx::vms::api::ResourceData
 {
     bool autorun = false;
 

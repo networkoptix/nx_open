@@ -199,8 +199,10 @@ protected:
 		Qn::SerializationFormat tranFormat,
 		QByteArray serializedTran,
 		const QnTransactionTransportHeader &transportHeader);
-    virtual ErrorCode updatePersistentMarker(const QnTransaction<ApiUpdateSequenceData>& tran);
-protected:
+
+    virtual ErrorCode updatePersistentMarker(
+        const QnTransaction<nx::vms::api::UpdateSequenceData>& tran);
+
 	void sendRuntimeInfo(QnTransactionTransport* transport, const QnTransactionTransportHeader& transportHeader, const QnTranState& runtimeState);
     template <class T> void proxyTransaction(const QnTransaction<T> &tran, const QnTransactionTransportHeader &transportHeader);
     template <class T>

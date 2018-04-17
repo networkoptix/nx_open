@@ -25,10 +25,10 @@
 #include <nx_ec/data/api_time_data.h>
 #include <nx_ec/data/api_license_overflow_data.h>
 #include <nx_ec/data/api_discovery_data.h>
-#include <nx_ec/data/api_camera_history_data.h>
+#include <nx/vms/api/data/camera_history_data.h>
 #include <nx_ec/data/api_reverse_connection_data.h>
 #include <nx_ec/data/api_client_info_data.h>
-#include <nx_ec/data/api_camera_attributes_data.h>
+#include <nx/vms/api/data/camera_attributes_data.h>
 #include <nx_ec/data/api_media_server_data.h>
 #include <nx_ec/data/api_access_rights_data.h>
 #include <nx_ec/data/api_user_role_data.h>
@@ -86,8 +86,8 @@ namespace ec2
             const QnUuid& resourceId,
             nx::vms::api::ResourceStatus status,
             ec2::NotificationSource source);
-        void resourceParamChanged( const ApiResourceParamWithRefData& param );
-        void resourceParamRemoved( const ApiResourceParamWithRefData& param );
+        void resourceParamChanged( const nx::vms::api::ResourceParamWithRefData& param );
+        void resourceParamRemoved( const nx::vms::api::ResourceParamWithRefData& param );
         void resourceRemoved(const QnUuid& resourceId);
         void resourceStatusRemoved(const QnUuid& resourceId);
     };
@@ -133,66 +133,93 @@ namespace ec2
         }
 
         /*!
-            \param handler Functor with params: (ErrorCode, const ApiResourceParamWithRefDataList&)
+            \param handler Functor with params: (ErrorCode, const nx::vms::api::ResourceParamWithRefDataList&)
         */
         template<class TargetType, class HandlerType>
-        int getKvPairs( const QnUuid& resourceId, TargetType* target, HandlerType handler )
+        int getKvPairs(const QnUuid& resourceId, TargetType* target, HandlerType handler)
         {
-            return getKvPairs( resourceId, std::static_pointer_cast<impl::GetKvPairsHandler>(std::make_shared<impl::CustomGetKvPairsHandler<TargetType, HandlerType>>(target, handler)) );
+            return getKvPairs(
+                resourceId,
+                std::static_pointer_cast<impl::GetKvPairsHandler>(
+                    std::make_shared<impl::CustomGetKvPairsHandler<TargetType, HandlerType>>(
+                        target,
+                        handler)));
         }
 
-        ErrorCode getKvPairsSync(const QnUuid& resourceId, ApiResourceParamWithRefDataList* const outData)
+        ErrorCode getKvPairsSync(
+            const QnUuid& resourceId,
+            nx::vms::api::ResourceParamWithRefDataList* const outData)
         {
             return impl::doSyncCall<impl::GetKvPairsHandler>(
-                [=](const impl::GetKvPairsHandlerPtr &handler) {
-                    return this->getKvPairs(resourceId, handler);
-                },
+                [=](const impl::GetKvPairsHandlerPtr& handler)
+                    {
+                        return this->getKvPairs(resourceId, handler);
+                    },
                 outData
             );
         }
 
         /*!
-            \param handler Functor with params: (ErrorCode, const ApiResourceStatusDataList&)
+            \param handler Functor with params: (ErrorCode, const nx::vms::api::ResourceStatusDataList&)
         */
         template<class TargetType, class HandlerType>
-        int getStatusList( const QnUuid& resourceId, TargetType* target, HandlerType handler ) {
-            return getStatusList( resourceId, std::static_pointer_cast<impl::GetStatusListHandler>(std::make_shared<impl::CustomGetStatusListHandler<TargetType, HandlerType>>(target, handler)) );
+        int getStatusList(const QnUuid& resourceId, TargetType* target, HandlerType handler)
+        {
+            return getStatusList(
+                resourceId,
+                std::static_pointer_cast<impl::GetStatusListHandler>(
+                    std::make_shared<impl::CustomGetStatusListHandler<TargetType, HandlerType>>(
+                        target,
+                        handler)));
         }
 
-        ErrorCode getStatusListSync(const QnUuid& resourceId, ApiResourceStatusDataList* const outData)
+        ErrorCode getStatusListSync(
+            const QnUuid& resourceId,
+            nx::vms::api::ResourceStatusDataList* const outData)
         {
             return impl::doSyncCall<impl::GetStatusListHandler>(
-                [=](const impl::GetStatusListHandlerPtr &handler) {
-                    return this->getStatusList(resourceId, handler);
-                },
+                [=](const impl::GetStatusListHandlerPtr& handler)
+                    {
+                        return this->getStatusList(resourceId, handler);
+                    },
                 outData
             );
         }
 
         /*!
-            \param handler Functor with params: (ErrorCode, const ApiResourceParamWithRefDataList&)
+            \param handler Functor with params: (ErrorCode, const nx::vms::api::ResourceParamWithRefDataList&)
         */
         template<class TargetType, class HandlerType>
-        int save(const ec2::ApiResourceParamWithRefDataList& kvPairs, TargetType* target, HandlerType handler )
+        int save(
+            const nx::vms::api::ResourceParamWithRefDataList& kvPairs,
+            TargetType* target,
+            HandlerType handler)
         {
-            return save(kvPairs, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
+            return save(
+                kvPairs,
+                std::static_pointer_cast<impl::SimpleHandler>(
+                    std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(
+                        target,
+                        handler)));
         }
 
-        ErrorCode saveSync(const ec2::ApiResourceParamWithRefDataList& kvPairs)
+        ErrorCode saveSync(const nx::vms::api::ResourceParamWithRefDataList& kvPairs)
         {
             return impl::doSyncCall<impl::SimpleHandler>(
-                [=](const impl::SimpleHandlerPtr &handler)
-                {
-                    return this->save(kvPairs, handler);
-                }
+                [=](const impl::SimpleHandlerPtr& handler)
+                    {
+                        return this->save(kvPairs, handler);
+                    }
             );
         }
 
-        ErrorCode saveSync(const QnUuid& resourceId, const ec2::ApiResourceParamDataList& properties)
+        ErrorCode saveSync(
+            const QnUuid& resourceId,
+            const nx::vms::api::ResourceParamDataList& properties)
         {
-            ApiResourceParamWithRefDataList kvPairs;
+            nx::vms::api::ResourceParamWithRefDataList kvPairs;
             for (const auto& p: properties)
-                kvPairs.push_back(ApiResourceParamWithRefData(resourceId, p.name, p.value));
+                kvPairs.emplace_back(resourceId, p.name, p.value);
             return saveSync(kvPairs);
         }
 
@@ -211,13 +238,22 @@ namespace ec2
         }
 
     protected:
-        virtual int getResourceTypes( impl::GetResourceTypesHandlerPtr handler ) = 0;
-        virtual int setResourceStatus( const QnUuid& resourceId, Qn::ResourceStatus status, impl::SetResourceStatusHandlerPtr handler ) = 0;
-        virtual int getKvPairs( const QnUuid &resourceId, impl::GetKvPairsHandlerPtr handler ) = 0;
-        virtual int getStatusList( const QnUuid &resourceId, impl::GetStatusListHandlerPtr handler ) = 0;
-        virtual int save(const ec2::ApiResourceParamWithRefDataList& kvPairs, impl::SimpleHandlerPtr handler ) = 0;
-        virtual int remove( const QnUuid& resource, impl::SimpleHandlerPtr handler ) = 0;
-        virtual int remove( const QVector<QnUuid>& resourceList, impl::SimpleHandlerPtr handler ) = 0;
+        virtual int getResourceTypes(impl::GetResourceTypesHandlerPtr handler) = 0;
+        virtual int setResourceStatus(
+            const QnUuid& resourceId,
+            Qn::ResourceStatus status,
+            impl::SetResourceStatusHandlerPtr handler) = 0;
+        virtual int getKvPairs(const QnUuid& resourceId, impl::GetKvPairsHandlerPtr handler) = 0;
+        virtual int getStatusList(
+            const QnUuid& resourceId,
+            impl::GetStatusListHandlerPtr handler) = 0;
+        virtual int save(
+            const nx::vms::api::ResourceParamWithRefDataList& kvPairs,
+            impl::SimpleHandlerPtr handler) = 0;
+        virtual int remove(const QnUuid& resource, impl::SimpleHandlerPtr handler) = 0;
+        virtual int remove(
+            const QVector<QnUuid>& resourceList,
+            impl::SimpleHandlerPtr handler) = 0;
     };
 
     class AbstractLicenseNotificationManager : public QObject
@@ -292,7 +328,7 @@ namespace ec2
         void addedOrUpdated(nx::vms::event::RulePtr businessRule, ec2::NotificationSource source);
         void removed( QnUuid id );
         void businessActionBroadcasted( const nx::vms::event::AbstractActionPtr& businessAction );
-        void businessRuleReset( const ec2::ApiBusinessRuleDataList& rules );
+        void businessRuleReset( const nx::vms::api::EventRuleDataList& rules );
         void gotBroadcastAction(const nx::vms::event::AbstractActionPtr& action);
         void execBusinessAction(const nx::vms::event::AbstractActionPtr& action);
     };
@@ -802,10 +838,18 @@ namespace ec2
         /*!
             \param handler Functor with params: (requestID, ErrorCode)
         */
-        template<class TargetType, class HandlerType> int restoreDatabaseAsync( const ec2::ApiDatabaseDumpData& data, TargetType* target, HandlerType handler ) {
-            return restoreDatabaseAsync( data,
+        template<class TargetType, class HandlerType>
+        int restoreDatabaseAsync(
+            const nx::vms::api::DatabaseDumpData& data,
+            TargetType* target,
+            HandlerType handler)
+        {
+            return restoreDatabaseAsync(
+                data,
                 std::static_pointer_cast<impl::SimpleHandler>(
-                    std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
+                    std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(
+                        target,
+                        handler)));
         }
 
         //!Cancel running async request
@@ -834,14 +878,18 @@ namespace ec2
         void remotePeerUnauthorized(const QnUuid& id);
         void newDirectConnectionEstablished(QnAbstractTransactionTransport* transport);
 
-        void settingsChanged(ec2::ApiResourceParamDataList settings);
+        void settingsChanged(nx::vms::api::ResourceParamDataList settings);
 
         void databaseDumped();
 
     protected:
-        virtual int dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler ) = 0;
-        virtual int dumpDatabaseToFileAsync( const QString& dumpFilePath, impl::SimpleHandlerPtr handler ) = 0;
-        virtual int restoreDatabaseAsync( const ec2::ApiDatabaseDumpData& data, impl::SimpleHandlerPtr handler ) = 0;
+        virtual int dumpDatabaseAsync(impl::DumpDatabaseHandlerPtr handler) = 0;
+        virtual int dumpDatabaseToFileAsync(
+            const QString& dumpFilePath,
+            impl::SimpleHandlerPtr handler) = 0;
+        virtual int restoreDatabaseAsync(
+            const nx::vms::api::DatabaseDumpData& data,
+            impl::SimpleHandlerPtr handler) = 0;
     };
 
     /*!
