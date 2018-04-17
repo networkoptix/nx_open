@@ -156,7 +156,7 @@ def sync_dependencies(syncher):
         sync("any/nx_storage_sdk-1.7.1")
         sync("sigar")
 
-        sync("any/apidoctool", path_variable="APIDOCTOOL_PATH")
+        sync("any/apidoctool-2.0", path_variable="APIDOCTOOL_PATH")
 
         if customWebAdminPackageDirectory:
             pass
