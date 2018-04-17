@@ -339,3 +339,21 @@ TEST_F(AuthReturnCodeTest, manualDigestWrongMethod)
     auto client = manualDigestClient("POST", "/api/getUsers");
     testServerReturnCode(std::move(client), 401, Qn::AuthResult::Auth_WrongDigest);
 }
+
+TEST_F(AuthReturnCodeTest, manualDigest_onGateway)
+{
+    auto client = manualDigestClient("GET", "/gateway/c6901e5b-4884-41f4-ab80-73e078341252/ec2/getUsers");
+    testServerReturnCode(std::move(client), 200);
+}
+
+TEST_F(AuthReturnCodeTest, manualDigestWrongUri_onGateway)
+{
+    auto client = manualDigestClient("GET", "/gateway/c6901e5b-4884-41f4-ab80-73e078341252/api/getCameras");
+    testServerReturnCode(std::move(client), 401, Qn::AuthResult::Auth_WrongDigest);
+}
+
+TEST_F(AuthReturnCodeTest, manualDigestWrongMethod_onGateway)
+{
+    auto client = manualDigestClient("POST", "/api/getUsers");
+    testServerReturnCode(std::move(client), 401, Qn::AuthResult::Auth_WrongDigest);
+}
