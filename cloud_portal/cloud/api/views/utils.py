@@ -130,11 +130,13 @@ def download_build(request, build):
         raise APIForbiddenException("Not authorized!!!", ErrorCodes.forbidden)
 
     if re.search(r'\D+', build):
-        raise APIForbiddenException("Invalid build id!!!", ErrorCodes.forbidden)
+        raise APINotFoundException("Invalid build number!!!", ErrorCodes.bad_request)
 
     downloads_url = settings.DOWNLOADS_VERSION_JSON.replace('{{customization}}', customization).replace('{{build}}', build)
     downloads_json = requests.get(downloads_url)
-    downloads_json.raise_for_status()
+
+    if downloads_json.status_code == 403:
+        raise APINotFoundException("Build number does not exist!!!", ErrorCodes.not_found, error_data=request.query_params)
     downloads_json = downloads_json.json()
 
     if 'releaseNotes' not in downloads_json:
