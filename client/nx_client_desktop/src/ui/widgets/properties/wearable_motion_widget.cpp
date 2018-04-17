@@ -2,10 +2,11 @@
 #include "ui_wearable_motion_widget.h"
 
 #include <core/resource/camera_resource.h>
-
-#include <nx/client/desktop/common/utils/aligner.h>
 #include <ui/common/read_only.h>
 #include <ui/workaround/widgets_signals_workaround.h>
+
+#include <nx/client/core/motion/motion_grid.h>
+#include <nx/client/desktop/common/utils/aligner.h>
 
 using namespace nx::client::desktop;
 
@@ -100,6 +101,7 @@ int QnWearableMotionWidget::calculateSensitivity(const QnVirtualCameraResourcePt
 void QnWearableMotionWidget::submitSensitivity(const QnVirtualCameraResourcePtr &camera, int sensitivity) const
 {
     QnMotionRegion region;
-    region.addRect(sensitivity, QRect(0, 0, Qn::kMotionGridWidth, Qn::kMotionGridHeight));
+    using nx::client::core::MotionGrid;
+    region.addRect(sensitivity, QRect(0, 0, MotionGrid::kWidth, MotionGrid::kHeight));
     camera->setMotionRegion(region, 0);
 }
