@@ -35,7 +35,7 @@ def determine_package_versions():
 
     if platform == "macosx":
         v["qt"] = "5.6.3"
-        v["ffmpeg"] = "3.1.1-2"
+        v["ffmpeg"] = "3.1.9"
         v["openssl"] = "1.0.2e-2"
         v["quazip"] = "0.7.3"
         v["festival"] = "2.1"
@@ -102,7 +102,7 @@ def sync_dependencies(syncher):
 
     sync("ffmpeg")
 
-    if platform == "linux" and arch in ("x64", "x86"):
+    if platform in ("linux", "macosx") and arch in ("x64", "x86"):
         sync("libmp3lame-3.100")
         sync("libvpx-1.7.0")
         sync("vorbis-1.3.5")
