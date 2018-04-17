@@ -18,6 +18,17 @@ function(nx_set_variable_if_empty variable value)
     endif()
 endfunction()
 
+function(nx_split_string var string)
+    cmake_parse_arguments(SPLIT "" "SEPARATOR" "" ${ARGN})
+
+    if(NOT SPLIT_SEPARATOR)
+        set(SPLIT_SEPARATOR "[\n| |\t]+")
+    endif()
+
+    string(REGEX REPLACE "${SPLIT_SEPARATOR}" ";" result "${string}")
+    set(${var} ${result} PARENT_SCOPE)
+endfunction()
+
 function(nx_init_known_files_list)
     get_property(property_set GLOBAL PROPERTY known_files SET)
 
