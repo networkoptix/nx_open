@@ -152,7 +152,7 @@ void QnAppserverResourceProcessor::readDefaultUserAttrs()
     if (!f.open(QFile::ReadOnly))
         return;
     QByteArray data = f.readAll();
-    ec2::ApiCameraAttributesData userAttrsData;
+    nx::vms::api::CameraAttributesData userAttrsData;
     if (!QJson::deserialize(data, &userAttrsData))
         return;
     userAttrsData.preferredServerId = commonModule()->moduleGUID();
@@ -226,7 +226,7 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
         }
         userAttrCopy->cameraId = apiCameraData.id;
 
-        ec2::ApiCameraAttributesDataList attrsList;
+        nx::vms::api::CameraAttributesDataList attrsList;
         ec2::fromResourceListToApi(QnCameraUserAttributesList() << userAttrCopy, attrsList);
 
         errCode =  commonModule()->ec2Connection()->getCameraManager(Qn::kSystemAccess)->saveUserAttributesSync(attrsList);

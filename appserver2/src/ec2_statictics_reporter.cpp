@@ -72,14 +72,16 @@ namespace ec2
         for (auto& ms : mediaServers) outData->mediaservers.push_back(std::move(ms));
 
 
-        ApiCameraDataExList cameras;
+        nx::vms::api::CameraDataExList cameras;
         errCode = m_ec2Connection->getCameraManager(Qn::kSystemAccess)->getCamerasExSync(&cameras);
         if (errCode != ErrorCode::ok)
             return errCode;
 
-        for (ApiCameraDataEx& cam: cameras)
+        for (auto& cam: cameras)
+        {
             if (cam.typeId != QnResourceTypePool::kDesktopCameraTypeUuid)
                 outData->cameras.push_back(std::move(cam));
+        }
 
         QnLicenseList licenses;
         errCode = m_ec2Connection->getLicenseManager(Qn::kSystemAccess)->getLicensesSync(&licenses);

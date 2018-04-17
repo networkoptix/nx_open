@@ -625,7 +625,7 @@ void QnRecordingManager::at_licenseMutexLocked()
             idList << camera->getId();
 
             QnCameraUserAttributesList userAttributes = commonModule()->cameraUserAttributesPool()->getAttributesList(idList);
-            ec2::ApiCameraAttributesDataList apiAttributes;
+            nx::vms::api::CameraAttributesDataList apiAttributes;
             ec2::fromResourceListToApi(userAttributes, apiAttributes);
 
             ec2::ErrorCode errCode =  commonModule()->ec2Connection()->getCameraManager(Qn::kSystemAccess)->saveUserAttributesSync(apiAttributes);

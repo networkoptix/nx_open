@@ -77,7 +77,10 @@ ServerConnection::~ServerConnection()
         httpPool->terminate(handle);
 }
 
-rest::Handle ServerConnection::cameraHistoryAsync(const QnChunksRequestData &request, Result<ec2::ApiCameraHistoryDataList>::type callback, QThread* targetThread)
+rest::Handle ServerConnection::cameraHistoryAsync(
+    const QnChunksRequestData& request,
+    Result<nx::vms::api::CameraHistoryDataList>::type callback,
+    QThread* targetThread)
 {
     return executeGet(lit("/ec2/cameraHistory"), request.toParams(), callback, targetThread);
 }

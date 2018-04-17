@@ -209,10 +209,10 @@ void fromResourceListToApi(const QnVirtualCameraResourceList& src, CameraDataLis
 
 
 ////////////////////////////////////////////////////////////
-//// ApiCameraAttributesData
+//// CameraAttributesData
 ////////////////////////////////////////////////////////////
 
-void fromResourceToApi(const QnScheduleTask& src, ApiScheduleTaskData& dst)
+void fromResourceToApi(const QnScheduleTask& src, ScheduleTaskData& dst)
 {
     dst.startTime = src.startTime;
     dst.endTime = src.endTime;
@@ -223,7 +223,7 @@ void fromResourceToApi(const QnScheduleTask& src, ApiScheduleTaskData& dst)
     dst.bitrateKbps = src.bitrateKbps;
 }
 
-void fromApiToResource(const ApiScheduleTaskData& src, QnScheduleTask& dst)
+void fromApiToResource(const ScheduleTaskData& src, QnScheduleTask& dst)
 {
     dst.startTime = src.startTime;
     dst.endTime = src.endTime;
@@ -234,7 +234,7 @@ void fromApiToResource(const ApiScheduleTaskData& src, QnScheduleTask& dst)
     dst.bitrateKbps = src.bitrateKbps;
 }
 
-void fromApiToResource(const ApiCameraAttributesData& src, const QnCameraUserAttributesPtr& dst)
+void fromApiToResource(const CameraAttributesData& src, const QnCameraUserAttributesPtr& dst)
 {
     dst->cameraId = src.cameraId;
     dst->name = src.cameraName;
@@ -248,7 +248,7 @@ void fromApiToResource(const ApiCameraAttributesData& src, const QnCameraUserAtt
 
     QnScheduleTaskList tasks;
     tasks.reserve((int)src.scheduleTasks.size());
-    for (const ApiScheduleTaskData& srcTask: src.scheduleTasks)
+    for (const auto& srcTask: src.scheduleTasks)
     {
         tasks.push_back(QnScheduleTask());
         fromApiToResource(srcTask, tasks.back());
@@ -270,7 +270,7 @@ void fromApiToResource(const ApiCameraAttributesData& src, const QnCameraUserAtt
     dst->recordAfterMotionSec = src.recordAfterMotionSec;
 }
 
-void fromResourceToApi(const QnCameraUserAttributesPtr& src, ApiCameraAttributesData& dst)
+void fromResourceToApi(const QnCameraUserAttributesPtr& src, CameraAttributesData& dst)
 {
     dst.cameraId = src->cameraId;
     dst.cameraName = src->name;
@@ -302,10 +302,10 @@ void fromResourceToApi(const QnCameraUserAttributesPtr& src, ApiCameraAttributes
     dst.recordAfterMotionSec = src->recordAfterMotionSec;
 }
 
-void fromApiToResourceList(const ApiCameraAttributesDataList& src, QnCameraUserAttributesList& dst)
+void fromApiToResourceList(const CameraAttributesDataList& src, QnCameraUserAttributesList& dst)
 {
     dst.reserve(dst.size() + static_cast<int>(src.size()));
-    for (const ApiCameraAttributesData& cameraAttrs: src)
+    for (const auto& cameraAttrs: src)
     {
         QnCameraUserAttributesPtr dstElement(new QnCameraUserAttributes());
         fromApiToResource(cameraAttrs, dstElement);
@@ -313,12 +313,12 @@ void fromApiToResourceList(const ApiCameraAttributesDataList& src, QnCameraUserA
     }
 }
 
-void fromResourceListToApi(const QnCameraUserAttributesList& src, ApiCameraAttributesDataList& dst)
+void fromResourceListToApi(const QnCameraUserAttributesList& src, CameraAttributesDataList& dst)
 {
     dst.reserve(dst.size() + src.size());
-    for (const QnCameraUserAttributesPtr& camerAttrs: src)
+    for (const auto& camerAttrs: src)
     {
-        dst.push_back(ApiCameraAttributesData());
+        dst.push_back({});
         fromResourceToApi(camerAttrs, dst.back());
     }
 }
@@ -336,7 +336,7 @@ void fromApiToResource(
     fromApiToResource(static_cast<const CameraData&>(src), dst);
     //TODO #ak using QnCameraUserAttributePool here is not good
     QnCameraUserAttributePool::ScopedLock userAttributesLock(attributesPool, dst->getId());
-    fromApiToResource(static_cast<const ApiCameraAttributesData&>(src), *userAttributesLock);
+    fromApiToResource(static_cast<const CameraAttributesData&>(src), *userAttributesLock);
 
     for (const auto& srcParam: src.addParams)
         dst->setProperty(srcParam.name, srcParam.value, QnResource::NO_MARK_DIRTY);
@@ -350,7 +350,7 @@ void fromResourceToApi(
     fromResourceToApi(src, static_cast<CameraData&>(dst));
     //TODO #ak using QnCameraUserAttributePool here is not good
     QnCameraUserAttributePool::ScopedLock userAttributesLock(attributesPool, src->getId());
-    fromResourceToApi(*userAttributesLock, static_cast<ApiCameraAttributesData&>(dst));
+    fromResourceToApi(*userAttributesLock, static_cast<CameraAttributesData&>(dst));
 
     for (const auto& srcParam: src->getRuntimeProperties())
         dst.addParams.push_back(srcParam);
@@ -369,7 +369,7 @@ void fromResourceListToApi(
     }
 }
 
-void fromResourceToApi(const QnEmailSettings& src, ApiEmailSettingsData& dst)
+void fromResourceToApi(const QnEmailSettings& src, EmailSettingsData& dst)
 {
     dst.host = src.server;
     dst.port = src.port;
@@ -379,7 +379,7 @@ void fromResourceToApi(const QnEmailSettings& src, ApiEmailSettingsData& dst)
     dst.connectionType = src.connectionType;
 }
 
-void fromApiToResource(const ApiEmailSettingsData& src, QnEmailSettings& dst)
+void fromApiToResource(const EmailSettingsData& src, QnEmailSettings& dst)
 {
     dst.server = src.host;
     dst.port = src.port;

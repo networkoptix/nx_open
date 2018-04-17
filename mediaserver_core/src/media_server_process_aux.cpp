@@ -367,16 +367,16 @@ void makeFakeData(const QString& fakeDataString,
     NX_ASSERT(!resTypePtr.isNull());
     for (int i = 0; i < camerasCount; ++i)
     {
-        ec2::ApiCameraData cameraData;
+        nx::vms::api::CameraData cameraData;
         cameraData.typeId = resTypePtr->getId();
         cameraData.parentId = serverId;
         cameraData.vendor = "Invalid camera";
         cameraData.physicalId = QnUuid::createUuid().toString();
-        cameraData.id = ec2::ApiCameraData::physicalIdToId(cameraData.physicalId);
+        cameraData.id = nx::vms::api::CameraData::physicalIdToId(cameraData.physicalId);
         cameraData.name = lm("Camera %1").arg(cameraData.id);
         cameras.push_back(std::move(cameraData));
 
-        ec2::ApiCameraAttributesData userAttr;
+        nx::vms::api::CameraAttributesData userAttr;
         userAttr.cameraId = cameraData.id;
         userAttrs.push_back(userAttr);
 

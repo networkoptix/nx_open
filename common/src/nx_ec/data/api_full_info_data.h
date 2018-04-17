@@ -9,15 +9,15 @@ struct ApiFullInfoData: nx::vms::api::Data
     ApiResourceTypeDataList resourceTypes;
     ApiMediaServerDataList servers;
     ApiMediaServerUserAttributesDataList serversUserAttributesList;
-    ApiCameraDataList cameras;
-    ApiCameraAttributesDataList cameraUserAttributesList;
+    nx::vms::api::CameraDataList cameras;
+    nx::vms::api::CameraAttributesDataList cameraUserAttributesList;
     ApiUserDataList users;
     ApiUserRoleDataList userRoles;
     ApiAccessRightsDataList accessRights;
     ApiLayoutDataList layouts;
     ApiVideowallDataList videowalls;
     nx::vms::api::EventRuleDataList rules;
-    ApiServerFootageDataList cameraHistory;
+    nx::vms::api::ServerFootageDataList cameraHistory;
     ApiLicenseDataList licenses;
     ApiDiscoveryDataList discoveryData;
     nx::vms::api::ResourceParamWithRefDataList allProperties;

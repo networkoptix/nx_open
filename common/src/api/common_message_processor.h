@@ -35,18 +35,30 @@ public:
      * @param resource resource to update
      * @param peerId peer what modified resource.
      */
-    virtual void updateResource(const QnResourcePtr &resource, ec2::NotificationSource source);
+    virtual void updateResource(const QnResourcePtr& resource, ec2::NotificationSource source);
 
     virtual void updateResource(const ec2::ApiUserData& user, ec2::NotificationSource source);
     virtual void updateResource(const ec2::ApiLayoutData& layout, ec2::NotificationSource source);
-    virtual void updateResource(const ec2::ApiVideowallData& videowall, ec2::NotificationSource source);
-    virtual void updateResource(const ec2::ApiWebPageData& webpage, ec2::NotificationSource source);
-    virtual void updateResource(const nx::vms::api::CameraData& camera, ec2::NotificationSource source);
-    virtual void updateResource(const ec2::ApiMediaServerData& server, ec2::NotificationSource source);
-    virtual void updateResource(const ec2::ApiStorageData& storage, ec2::NotificationSource source);
+    virtual void updateResource(
+        const ec2::ApiVideowallData& videowall,
+        ec2::NotificationSource source);
+    virtual void updateResource(
+        const ec2::ApiWebPageData& webpage,
+        ec2::NotificationSource source);
+    virtual void updateResource(
+        const nx::vms::api::CameraData& camera,
+        ec2::NotificationSource source);
+    virtual void updateResource(
+        const ec2::ApiMediaServerData& server,
+        ec2::NotificationSource source);
+    virtual void updateResource(
+        const ec2::ApiStorageData& storage,
+        ec2::NotificationSource source);
 
-    void resetServerUserAttributesList( const ec2::ApiMediaServerUserAttributesDataList& serverUserAttributesList );
-    void resetCameraUserAttributesList( const ec2::ApiCameraAttributesDataList& cameraUserAttributesList );
+    void resetServerUserAttributesList(
+        const ec2::ApiMediaServerUserAttributesDataList& serverUserAttributesList);
+    void resetCameraUserAttributesList(
+        const nx::vms::api::CameraAttributesDataList& cameraUserAttributesList);
     void resetPropertyList(const nx::vms::api::ResourceParamWithRefDataList& params);
     void resetStatusList(const nx::vms::api::ResourceStatusDataList& params);
     void resetAccessRights(const ec2::ApiAccessRightsDataList& accessRights);
@@ -97,7 +109,7 @@ protected:
     void resetResourceTypes(const ec2::ApiResourceTypeDataList& resTypes);
     void resetResources(const ec2::ApiFullInfoData& fullData);
     void resetLicenses(const ec2::ApiLicenseDataList& licenses);
-    void resetCamerasWithArchiveList(const ec2::ApiServerFootageDataList& cameraHistoryList);
+    void resetCamerasWithArchiveList(const nx::vms::api::ServerFootageDataList& cameraHistoryList);
     void resetTime();
 
     virtual bool canRemoveResource(const QnUuid& resourceId);
@@ -130,9 +142,9 @@ private slots:
     void on_userRoleChanged(const ec2::ApiUserRoleData& userRole);
     void on_userRoleRemoved(const QnUuid& userRoleId);
 
-    void on_cameraUserAttributesChanged(const ec2::ApiCameraAttributesData& userAttributes);
+    void on_cameraUserAttributesChanged(const nx::vms::api::CameraAttributesData& userAttributes);
     void on_cameraUserAttributesRemoved(const QnUuid& cameraId);
-    void on_cameraHistoryChanged(const ec2::ApiServerFootageData &cameraHistory);
+    void on_cameraHistoryChanged(const nx::vms::api::ServerFootageData& cameraHistory);
 
     void on_mediaServerUserAttributesChanged(const ec2::ApiMediaServerUserAttributesData& userAttributes);
     void on_mediaServerUserAttributesRemoved(const QnUuid& serverId);

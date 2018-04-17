@@ -256,7 +256,7 @@ namespace detail
         ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceTypeDataList& resourceTypeList);
 
         //getCameras
-        ErrorCode doQueryNoLock(const QnUuid& id, ApiCameraDataList& cameraList);
+        ErrorCode doQueryNoLock(const QnUuid& id, nx::vms::api::CameraDataList& cameraList);
 
         //getStorages
         ErrorCode getStorages(const QString& filterStr, ApiStorageDataList& storageList);
@@ -272,10 +272,10 @@ namespace detail
         //getCameraUserAttributesList
         ErrorCode doQueryNoLock(
             const QnUuid& cameraId,
-            ApiCameraAttributesDataList& cameraUserAttributesList);
+            nx::vms::api::CameraAttributesDataList& cameraUserAttributesList);
 
         //getCamerasEx
-        ErrorCode doQueryNoLock(const QnUuid& id, ApiCameraDataExList& cameraList);
+        ErrorCode doQueryNoLock(const QnUuid& id, nx::vms::api::CameraDataExList& cameraList);
 
         //getServers
         ErrorCode doQueryNoLock(const QnUuid& id, ApiMediaServerDataList& serverList);
@@ -284,7 +284,9 @@ namespace detail
         ErrorCode doQueryNoLock(const QnUuid& id, ApiMediaServerDataExList& serverList);
 
         //getCameraServerItems
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiServerFootageDataList& historyList);
+        ErrorCode doQueryNoLock(
+            const nullptr_t& /*dummy*/,
+            nx::vms::api::ServerFootageDataList& historyList);
 
         //getUserList
         ErrorCode doQueryNoLock(const QnUuid& id, ApiUserDataList& userList);
@@ -349,9 +351,10 @@ namespace detail
         }
 
         ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::CameraData>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraAttributesData>& tran);
         ErrorCode executeTransactionInternal(
-            const QnTransaction<ApiCameraAttributesDataList>& tran);
+            const QnTransaction<nx::vms::api::CameraAttributesData>& tran);
+        ErrorCode executeTransactionInternal(
+            const QnTransaction<nx::vms::api::CameraAttributesDataList>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiMediaServerData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiStorageData>& tran);
         ErrorCode executeTransactionInternal(
@@ -363,7 +366,8 @@ namespace detail
             const QnTransaction<nx::vms::api::ResourceStatusData>& tran);
         ErrorCode executeTransactionInternal(
             const QnTransaction<nx::vms::api::ResourceParamWithRefData>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiServerFootageData>& tran);
+        ErrorCode executeTransactionInternal(
+            const QnTransaction<nx::vms::api::ServerFootageData>& tran);
         ErrorCode executeTransactionInternal(
             const QnTransaction<nx::vms::api::StoredFileData>& tran);
         ErrorCode executeTransactionInternal(
@@ -399,27 +403,30 @@ namespace detail
         ErrorCode executeTransactionInternal(const QnTransaction<ApiLicenseDataList>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiLicenseData>& tran);
 
-        ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::IdDataList>& /*tran*/)
+        ErrorCode executeTransactionInternal(
+            const QnTransaction<nx::vms::api::IdDataList>& /*tran*/)
         {
-            NX_ASSERT(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiMediaServerUserAttributesDataList>& /*tran*/)
+        ErrorCode executeTransactionInternal(
+            const QnTransaction<ApiMediaServerUserAttributesDataList>& /*tran*/)
         {
-            NX_ASSERT(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraDataList>& /*tran*/)
+        ErrorCode executeTransactionInternal(
+            const QnTransaction<nx::vms::api::CameraDataList>& /*tran*/)
         {
-            NX_ASSERT(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
         ErrorCode executeTransactionInternal(const QnTransaction<ApiStorageDataList>& /*tran*/)
         {
-            NX_ASSERT(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
@@ -437,16 +444,21 @@ namespace detail
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiEmailSettingsData>&) {
-            NX_ASSERT(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+        ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::EmailSettingsData>&)
+        {
+            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiEmailData>&) {
-            NX_ASSERT(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiEmailData>&)
+        {
+            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiFullInfoData>&) {
-            NX_ASSERT(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiFullInfoData>&)
+        {
+            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
@@ -456,77 +468,91 @@ namespace detail
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiVideowallControlMessageData> &) {
-            NX_ASSERT(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiVideowallControlMessageData>&)
+        {
+            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiUpdateUploadData> &) {
-            NX_ASSERT(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiUpdateUploadData>&)
+        {
+            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiDiscoveredServerData> &) {
-            NX_ASSERT(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiDiscoveredServerData>&)
+        {
+            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiDiscoveredServerDataList> &) {
-            NX_ASSERT(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiDiscoveredServerDataList>&)
+        {
+            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiDiscoverPeerData> &) {
-            NX_ASSERT(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiDiscoverPeerData>&)
+        {
+            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiSystemIdData> &) {
-            NX_ASSERT(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiSystemIdData>&)
+        {
+            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiLockData> &) {
-           NX_ASSERT(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiLockData>&)
+        {
+            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiRuntimeData> &) {
-            NX_ASSERT(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiRuntimeData>&)
+        {
+            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiPeerAliveData> &) {
-            NX_ASSERT(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiPeerAliveData>&)
+        {
+            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiUpdateInstallData> &) {
-            NX_ASSERT(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiUpdateInstallData>&)
+        {
+            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiSyncRequestData> &) {
-            NX_ASSERT(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiSyncRequestData>&)
+        {
+            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<QnTranStateResponse> &) {
-            NX_ASSERT(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+        ErrorCode executeTransactionInternal(const QnTransaction<QnTranStateResponse>&)
+        {
+            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiPeerSystemTimeData> &) {
-            NX_ASSERT(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiPeerSystemTimeData>&)
+        {
+            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiPeerSystemTimeDataList> &) {
-            NX_ASSERT(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiPeerSystemTimeDataList>&)
+        {
+            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiLicenseOverflowData> &);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiLicenseOverflowData>&);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiCleanupDatabaseData>& tran);
 
         ErrorCode executeTransactionInternal(
@@ -536,18 +562,21 @@ namespace detail
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiTranSyncDoneData> &) {
-            NX_ASSERT(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiTranSyncDoneData>&)
+        {
+            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiDiscoveryDataList> &) {
-            NX_ASSERT(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiDiscoveryDataList>&)
+        {
+            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiReverseConnectionData> &) {
-            NX_ASSERT(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiReverseConnectionData>&)
+        {
+            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
@@ -569,11 +598,15 @@ namespace detail
 
         ErrorCode saveCamera(const nx::vms::api::CameraData& params);
         ErrorCode insertOrReplaceCamera(const nx::vms::api::CameraData& data, qint32 internalId);
-        ErrorCode saveCameraUserAttributes( const ApiCameraAttributesData& attrs );
-        ErrorCode insertOrReplaceCameraAttributes(const ApiCameraAttributesData& data, qint32* const internalId);
+        ErrorCode saveCameraUserAttributes(const nx::vms::api::CameraAttributesData& attrs);
+        ErrorCode insertOrReplaceCameraAttributes(
+            const nx::vms::api::CameraAttributesData& data,
+            qint32* const internalId);
         ErrorCode removeCameraAttributes(const QnUuid& id);
         ErrorCode removeResourceStatus(const QnUuid& id);
-        ErrorCode updateCameraSchedule(const std::vector<ApiScheduleTaskData>& scheduleTasks, qint32 internalId);
+        ErrorCode updateCameraSchedule(
+            const std::vector<nx::vms::api::ScheduleTaskData>& scheduleTasks,
+            qint32 internalId);
         ErrorCode removeCameraSchedule(qint32 internalId);
         ErrorCode removeCamera(const QnUuid& guid);
         ErrorCode removeStorage(const QnUuid& guid);
@@ -722,9 +755,9 @@ namespace detail
         virtual bool beforeInstallUpdate(const QString& updateName) override;
         virtual bool afterInstallUpdate(const QString& updateName) override;
 
-        ErrorCode addCameraHistory(const ApiServerFootageData& params);
+        ErrorCode addCameraHistory(const nx::vms::api::ServerFootageData& params);
         ErrorCode removeCameraHistory(const QnUuid& serverId);
-        ErrorCode getScheduleTasks(std::vector<ApiScheduleTaskWithRefData>& scheduleTaskList);
+        ErrorCode getScheduleTasks(std::vector<nx::vms::api::ScheduleTaskWithRefData>& scheduleTaskList);
         void addResourceTypesFromXML(ApiResourceTypeDataList& data);
         void loadResourceTypeXML(const QString& fileName, ApiResourceTypeDataList& data);
         bool removeServerStatusFromTransactionLog();

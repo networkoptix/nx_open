@@ -137,7 +137,7 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     connect(mediaServerManager, &ec2::AbstractMediaServerNotificationManager::userAttributesRemoved, this, &QnCommonMessageProcessor::on_mediaServerUserAttributesRemoved, Qt::DirectConnection);
 
     auto cameraManager = connection->getCameraNotificationManager();
-    connect(cameraManager, &ec2::AbstractCameraNotificationManager::addedOrUpdated,             this, on_resourceUpdated(ec2::ApiCameraData), Qt::DirectConnection);
+    connect(cameraManager, &ec2::AbstractCameraNotificationManager::addedOrUpdated,             this, on_resourceUpdated(nx::vms::api::CameraData), Qt::DirectConnection);
     connect(cameraManager, &ec2::AbstractCameraNotificationManager::userAttributesChanged,      this, &QnCommonMessageProcessor::on_cameraUserAttributesChanged, Qt::DirectConnection);
     connect(cameraManager, &ec2::AbstractCameraNotificationManager::userAttributesRemoved,      this, &QnCommonMessageProcessor::on_cameraUserAttributesRemoved, Qt::DirectConnection);
     connect(cameraManager, &ec2::AbstractCameraNotificationManager::cameraHistoryChanged,       this, &QnCommonMessageProcessor::on_cameraHistoryChanged, Qt::DirectConnection);
@@ -384,7 +384,8 @@ void QnCommonMessageProcessor::on_userRoleRemoved(const QnUuid& userRoleId)
     }
 }
 
-void QnCommonMessageProcessor::on_cameraUserAttributesChanged(const ec2::ApiCameraAttributesData& attrs)
+void QnCommonMessageProcessor::on_cameraUserAttributesChanged(
+    const nx::vms::api::CameraAttributesData& attrs)
 {
     QnCameraUserAttributesPtr userAttributes(new QnCameraUserAttributes());
     ec2::fromApiToResource(attrs, userAttributes);
@@ -393,12 +394,12 @@ void QnCommonMessageProcessor::on_cameraUserAttributesChanged(const ec2::ApiCame
     {
         QnCameraUserAttributePool::ScopedLock userAttributesLock(
             cameraUserAttributesPool(),
-            userAttributes->cameraId );
-        (*userAttributesLock)->assign( *userAttributes, &modifiedFields );
+            userAttributes->cameraId);
+        (*userAttributesLock)->assign(*userAttributes, &modifiedFields);
     }
     const QnResourcePtr& res = resourcePool()->getResourceById(userAttributes->cameraId);
-    if( res )   //it is OK if resource is missing
-        res->emitModificationSignals( modifiedFields );
+    if (res) //it is OK if resource is missing
+        res->emitModificationSignals(modifiedFields);
 }
 
 void QnCommonMessageProcessor::on_cameraUserAttributesRemoved(const QnUuid& cameraId)
@@ -447,7 +448,8 @@ void QnCommonMessageProcessor::on_mediaServerUserAttributesRemoved(const QnUuid&
         res->emitModificationSignals( modifiedFields );
 }
 
-void QnCommonMessageProcessor::on_cameraHistoryChanged(const ec2::ApiServerFootageData &serverFootageData)
+void QnCommonMessageProcessor::on_cameraHistoryChanged(
+    const nx::vms::api::ServerFootageData& serverFootageData)
 {
     cameraHistoryPool()->setServerFootageData(serverFootageData);
 }
@@ -559,7 +561,8 @@ void QnCommonMessageProcessor::resetLicenses(const ec2::ApiLicenseDataList& lice
     licensePool()->replaceLicenses(licenses);
 }
 
-void QnCommonMessageProcessor::resetCamerasWithArchiveList(const ec2::ApiServerFootageDataList& cameraHistoryList)
+void QnCommonMessageProcessor::resetCamerasWithArchiveList(
+    const nx::vms::api::ServerFootageDataList& cameraHistoryList)
 {
     cameraHistoryPool()->resetServerFootageData(cameraHistoryList);
 }
@@ -622,15 +625,18 @@ void QnCommonMessageProcessor::resetServerUserAttributesList( const ec2::ApiMedi
     }
 }
 
-void QnCommonMessageProcessor::resetCameraUserAttributesList( const ec2::ApiCameraAttributesDataList& cameraUserAttributesList )
+void QnCommonMessageProcessor::resetCameraUserAttributesList(
+    const nx::vms::api::CameraAttributesDataList& cameraUserAttributesList)
 {
     cameraUserAttributesPool()->clear();
-    for( const auto & cameraAttrs: cameraUserAttributesList )
+    for (const auto& cameraAttrs: cameraUserAttributesList)
     {
         QnCameraUserAttributesPtr dstElement(new QnCameraUserAttributes());
         ec2::fromApiToResource(cameraAttrs, dstElement);
 
-        QnCameraUserAttributePool::ScopedLock userAttributesLock( cameraUserAttributesPool(), cameraAttrs.cameraId );
+        QnCameraUserAttributePool::ScopedLock userAttributesLock(
+            cameraUserAttributesPool(),
+            cameraAttrs.cameraId);
         *(*userAttributesLock) = *dstElement;
     }
 }

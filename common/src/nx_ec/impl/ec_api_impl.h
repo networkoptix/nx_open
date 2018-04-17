@@ -179,10 +179,10 @@ namespace ec2
             void onGetServerUserAttributesDone  (int reqID, const ec2::ErrorCode, const ec2::ApiMediaServerUserAttributesDataList&);
             void onGetServersExDone             (int reqID, const ec2::ErrorCode, const ec2::ApiMediaServerDataExList&);
             void onGetStoragesDone              (int reqID, const ec2::ErrorCode, const ec2::ApiStorageDataList&);
-            void onGetCamerasDone               (int reqID, const ec2::ErrorCode, const ec2::ApiCameraDataList&);
-            void onGetCameraUserAttributesDone  (int reqID, const ec2::ErrorCode, const ec2::ApiCameraAttributesDataList&);
-            void onGetCamerasExDone             (int reqID, const ec2::ErrorCode, const ec2::ApiCameraDataExList&);
-            void onGetCamerasHistoryDone        (int reqID, const ec2::ErrorCode, const ec2::ApiServerFootageDataList&);
+            void onGetCamerasDone               (int reqID, const ec2::ErrorCode, const nx::vms::api::CameraDataList&);
+            void onGetCameraUserAttributesDone  (int reqID, const ec2::ErrorCode, const nx::vms::api::CameraAttributesDataList&);
+            void onGetCamerasExDone             (int reqID, const ec2::ErrorCode, const nx::vms::api::CameraDataExList&);
+            void onGetCamerasHistoryDone        (int reqID, const ec2::ErrorCode, const nx::vms::api::ServerFootageDataList&);
             void onGetUsersDone                 (int reqID, const ec2::ErrorCode, const ec2::ApiUserDataList&);
             void onGetUserRolesDone             (int reqID, const ec2::ErrorCode, const ec2::ApiUserRoleDataList&);
             void onGetBusinessRulesDone         (int reqID, const ec2::ErrorCode, const nx::vms::event::RuleList&);
@@ -236,10 +236,10 @@ namespace ec2
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractCameraManager
         //////////////////////////////////////////////////////////
-        DEFINE_TWO_ARG_HANDLER(GetCameras,                  ec2::ErrorCode, ec2::ApiCameraDataList)
-        DEFINE_TWO_ARG_HANDLER(GetCamerasEx,                ec2::ErrorCode, ec2::ApiCameraDataExList)
-        DEFINE_TWO_ARG_HANDLER(GetCameraUserAttributes,     ec2::ErrorCode, ec2::ApiCameraAttributesDataList)
-        DEFINE_TWO_ARG_HANDLER(GetCamerasHistory,           ec2::ErrorCode, ec2::ApiServerFootageDataList)
+        DEFINE_TWO_ARG_HANDLER(GetCameras,                  ec2::ErrorCode, nx::vms::api::CameraDataList)
+        DEFINE_TWO_ARG_HANDLER(GetCamerasEx,                ec2::ErrorCode, nx::vms::api::CameraDataExList)
+        DEFINE_TWO_ARG_HANDLER(GetCameraUserAttributes,     ec2::ErrorCode, nx::vms::api::CameraAttributesDataList)
+        DEFINE_TWO_ARG_HANDLER(GetCamerasHistory,           ec2::ErrorCode, nx::vms::api::ServerFootageDataList)
 
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractLayoutManager

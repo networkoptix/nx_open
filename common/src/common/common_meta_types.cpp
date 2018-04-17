@@ -321,14 +321,6 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<ec2::ApiRuntimeData>( "ApiRuntimeData" );
     qRegisterMetaType<ec2::ApiLockData>( "ApiLockData" );
 
-    qRegisterMetaType<ec2::ApiServerFootageData>("ApiServerFootageData");
-    qRegisterMetaType<ec2::ApiServerFootageDataList>("ApiServerFootageDataList");
-    qRegisterMetaType<ec2::ApiCameraHistoryItemData>("ApiCameraHistoryItemData");
-    qRegisterMetaType<ec2::ApiCameraHistoryItemDataList>("ApiCameraHistoryItemDataList");
-    qRegisterMetaType<ec2::ApiCameraHistoryData>("ApiCameraHistoryData");
-    qRegisterMetaType<ec2::ApiCameraHistoryDataList>("ApiCameraHistoryDataList");
-    qRegisterMetaType<ec2::ApiCameraHistoryDataList>("ec2::ApiCameraHistoryDataList");
-
     qRegisterMetaType<ec2::ApiFullInfoData>("ec2::ApiFullInfoData");
     qRegisterMetaType<ec2::ApiUserData>("ec2::ApiUserData");
     qRegisterMetaType<ec2::ApiUserRoleData>("ec2::ApiUserRoleData");
@@ -339,8 +331,7 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<ec2::ApiVideowallData>("ec2::ApiVideowallData");
     qRegisterMetaType<ec2::ApiVideowallControlMessageData>("ec2::ApiVideowallControlMessageData");
     qRegisterMetaType<ec2::ApiWebPageData>("ec2::ApiWebPageData");
-    
-    qRegisterMetaType<ec2::ApiCameraAttributesData>("ec2::ApiCameraAttributesData");
+
     qRegisterMetaType<ec2::ApiMediaServerData>("ec2::ApiMediaServerData");
     qRegisterMetaType<ec2::ApiMediaServerUserAttributesData>("ec2::ApiMediaServerUserAttributesData");
     qRegisterMetaType<ec2::ApiStorageData>("ec2::ApiStorageData");

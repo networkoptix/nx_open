@@ -6,6 +6,8 @@
 #include "data/database_dump_to_file_data.h"
 #include "data/resource_data.h"
 #include "data/camera_data.h"
+#include "data/camera_attributes_data.h"
+#include "data/camera_history_data.h"
 
 namespace {
 
@@ -34,7 +36,13 @@ void Metatypes::initialize()
     qRegisterMetaType<nx::vms::api::ResourceParamWithRefData>();
     qRegisterMetaType<nx::vms::api::ResourceParamWithRefDataList>();
     qRegisterMetaType<nx::vms::api::CameraData>();
-
+    qRegisterMetaType<nx::vms::api::CameraAttributesData>();
+    qRegisterMetaType<nx::vms::api::ServerFootageData>();
+    qRegisterMetaType<nx::vms::api::ServerFootageDataList>();
+    qRegisterMetaType<nx::vms::api::CameraHistoryItemData>();
+    qRegisterMetaType<nx::vms::api::CameraHistoryItemDataList>();
+    qRegisterMetaType<nx::vms::api::CameraHistoryData>();
+    qRegisterMetaType<nx::vms::api::CameraHistoryDataList>();
 };
 
 } // namespace api

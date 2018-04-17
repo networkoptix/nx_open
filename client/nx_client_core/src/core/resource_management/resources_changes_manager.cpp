@@ -275,7 +275,7 @@ void QnResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceLi
     if (applyChanges)
         applyChanges();
     auto changes = pool->getAttributesList(idList);
-    ec2::ApiCameraAttributesDataList apiAttributes;
+    nx::vms::api::CameraAttributesDataList apiAttributes;
     ec2::fromResourceListToApi(changes, apiAttributes);
     connection->getCameraManager(Qn::kSystemAccess)->saveUserAttributes(apiAttributes, this,
         makeReplyProcessor(this, handler));
@@ -298,7 +298,7 @@ void QnResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceLi
      if (!connection)
          return;
 
-     ec2::ApiCameraDataList backup;
+     nx::vms::api::CameraDataList backup;
      ec2::fromResourceListToApi(cameras, backup);
 
      auto handler =
@@ -321,7 +321,7 @@ void QnResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceLi
      for (const auto& camera: cameras)
          applyChanges(camera);
 
-     ec2::ApiCameraDataList apiCameras;
+     nx::vms::api::CameraDataList apiCameras;
      ec2::fromResourceListToApi(cameras, apiCameras);
      connection->getCameraManager(Qn::kSystemAccess)->save(apiCameras, this,
          makeReplyProcessor(this, handler));

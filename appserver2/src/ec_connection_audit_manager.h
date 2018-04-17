@@ -25,12 +25,12 @@ public:
 
     void addAuditRecord(
         ApiCommand::Value command,
-        const ApiCameraAttributesData& params,
+        const nx::vms::api::CameraAttributesData& params,
         const QnAuthSession& authInfo);
 
     void addAuditRecord(
         ApiCommand::Value command,
-        const ApiCameraAttributesDataList& params,
+        const nx::vms::api::CameraAttributesDataList& params,
         const QnAuthSession& authInfo);
 
     void addAuditRecord(

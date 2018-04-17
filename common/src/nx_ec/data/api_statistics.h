@@ -34,10 +34,10 @@ namespace std
 namespace ec2 {
 
     struct ApiCameraDataStatistics
-		: ApiCameraDataEx
+		: nx::vms::api::CameraDataEx
     {
         ApiCameraDataStatistics();
-        ApiCameraDataStatistics(ApiCameraDataEx&& data);
+        ApiCameraDataStatistics(nx::vms::api::CameraDataEx&& data);
 
 		const static std::set<QString> EXCEPT_PARAMS;
         const static std::set<QString> RESOURCE_PARAMS;

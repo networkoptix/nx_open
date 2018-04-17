@@ -33,6 +33,7 @@ struct NX_VMS_API ScheduleTaskData: Data
 
 //-------------------------------------------------------------------------------------------------
 
+// TODO: #GDM Move this class to DbManager.
 struct NX_VMS_API ScheduleTaskWithRefData: ScheduleTaskData
 {
     QnUuid sourceId;
@@ -98,3 +99,5 @@ struct NX_VMS_API CameraAttributesData: Data
 } // namespace api
 } // namespace vms
 } // namespace nx
+
+Q_DECLARE_METATYPE(nx::vms::api::CameraAttributesData)

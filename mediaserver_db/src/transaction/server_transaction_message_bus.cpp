@@ -316,13 +316,13 @@ bool ServerTransactionMessageBus::sendInitialData(QnTransactionTransport* transp
 			return false;
 		}
 
-		ec2::ApiCameraDataExList cameras;
+		nx::vms::api::CameraDataExList cameras;
 		if (dbManager(m_db, transport->getUserAccessData()).doQuery(QnUuid(), cameras) != ErrorCode::ok)
 		{
 			qWarning() << "Can't execute query for sync with client peer!";
 			return false;
 		}
-		QnTransaction<ApiCameraDataExList> tranCameras;
+		QnTransaction<nx::vms::api::CameraDataExList> tranCameras;
 		tranCameras.command = ApiCommand::getCamerasEx;
 		tranCameras.peerID = commonModule()->moduleGUID();
 
@@ -356,7 +356,7 @@ bool ServerTransactionMessageBus::sendInitialData(QnTransactionTransport* transp
 			return false;
 		}
 
-		QnTransaction<ApiServerFootageDataList> tranCameraHistory;
+		QnTransaction<nx::vms::api::ServerFootageDataList> tranCameraHistory;
 		tranCameraHistory.command = ApiCommand::getCameraHistoryItems;
 		tranCameraHistory.peerID = commonModule()->moduleGUID();
 		if (dbManager(m_db, transport->getUserAccessData()).doQuery(nullptr, tranCameraHistory.params) != ErrorCode::ok)

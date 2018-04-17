@@ -15,5 +15,6 @@ public:
 
 private:
     friend struct BuildHistoryDataAccess;
-    ec2::ApiCameraHistoryItemDataList buildHistoryData(const MultiServerPeriodDataList& chunks);
+    nx::vms::api::CameraHistoryItemDataList buildHistoryData(
+        const MultiServerPeriodDataList& chunks);
 };

@@ -119,7 +119,7 @@ void loadResourcesFromEcs(
 
     {
         // read camera list
-        ec2::ApiCameraDataList cameras;
+        nx::vms::api::CameraDataList cameras;
         while ((rez = ec2Connection->getCameraManager(Qn::kSystemAccess)->getCamerasSync(&cameras)) != ec2::ErrorCode::ok)
         {
             NX_LOG(lit("QnMain::run(): Can't get cameras. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1);
@@ -129,7 +129,7 @@ void loadResourcesFromEcs(
         }
 
         //reading camera attributes
-        ec2::ApiCameraAttributesDataList cameraUserAttributesList;
+        nx::vms::api::CameraAttributesDataList cameraUserAttributesList;
         while ((rez = ec2Connection->getCameraManager(Qn::kSystemAccess)->getUserAttributesSync(&cameraUserAttributesList)) != ec2::ErrorCode::ok)
         {
             NX_LOG(lit("QnMain::run(): Can't get camera user attributes list. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1);
@@ -178,7 +178,7 @@ void loadResourcesFromEcs(
     }
 
     {
-        ec2::ApiServerFootageDataList serverFootageData;
+        nx::vms::api::ServerFootageDataList serverFootageData;
         while ((rez = ec2Connection->getCameraManager(Qn::kSystemAccess)->getServerFootageDataSync(&serverFootageData)) != ec2::ErrorCode::ok)
         {
             qDebug() << "QnMain::run(): Can't get cameras history. Reason: " << ec2::toString(rez);

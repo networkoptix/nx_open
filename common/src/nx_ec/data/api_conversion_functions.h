@@ -44,35 +44,40 @@ void fromResourceToApi(
     nx::vms::api::CameraData& dst);
 void fromResourceListToApi(
     const QnVirtualCameraResourceList& src,
-    ApiCameraDataList& dst);
+    nx::vms::api::CameraDataList& dst);
 
-void fromResourceToApi(const QnScheduleTask& src, ApiScheduleTaskData& dst);
-void fromApiToResource(const ApiScheduleTaskData& src, QnScheduleTask& dst);
+void fromResourceToApi(const QnScheduleTask& src, nx::vms::api::ScheduleTaskData& dst);
+void fromApiToResource(const nx::vms::api::ScheduleTaskData& src, QnScheduleTask& dst);
 
-void fromApiToResource(const ApiCameraAttributesData& src, const QnCameraUserAttributesPtr& dst);
-void fromResourceToApi(const QnCameraUserAttributesPtr& src, ApiCameraAttributesData& dst);
+void fromApiToResource(
+    const nx::vms::api::CameraAttributesData& src,
+    const QnCameraUserAttributesPtr& dst);
+void fromResourceToApi(
+    const QnCameraUserAttributesPtr& src,
+    nx::vms::api::CameraAttributesData& dst);
+
 void fromApiToResourceList(
-    const ApiCameraAttributesDataList& src,
+    const nx::vms::api::CameraAttributesDataList& src,
     QnCameraUserAttributesList& dst);
 void fromResourceListToApi(
     const QnCameraUserAttributesList& src,
-    ApiCameraAttributesDataList& dst);
+    nx::vms::api::CameraAttributesDataList& dst);
 
 void fromApiToResource(
-    const ApiCameraDataEx& src,
+    const nx::vms::api::CameraDataEx& src,
     QnVirtualCameraResourcePtr& dst,
     QnCameraUserAttributePool* attributesPool);
 void fromResourceToApi(
     const QnVirtualCameraResourcePtr& src,
-    ApiCameraDataEx& dst,
+    nx::vms::api::CameraDataEx& dst,
     QnCameraUserAttributePool* attributesPool);
 void fromResourceListToApi(
     const QnVirtualCameraResourceList& src,
-    ApiCameraDataExList& dst,
+    nx::vms::api::CameraDataExList& dst,
     QnCameraUserAttributePool* attributesPool);
 
-void fromResourceToApi(const QnEmailSettings& src, ApiEmailSettingsData& dst);
-void fromApiToResource(const ApiEmailSettingsData& src, QnEmailSettings& dst);
+void fromResourceToApi(const QnEmailSettings& src, nx::vms::api::EmailSettingsData& dst);
+void fromApiToResource(const nx::vms::api::EmailSettingsData& src, QnEmailSettings& dst);
 
 void fromApiToResource(const ApiLayoutItemData& src, QnLayoutItemData& dst);
 void fromResourceToApi(const QnLayoutItemData& src, ApiLayoutItemData& dst);

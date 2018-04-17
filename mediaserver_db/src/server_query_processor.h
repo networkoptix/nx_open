@@ -286,11 +286,17 @@ public:
      * @param handler Called upon request completion. Functor(ErrorCode).
      */
     template<class HandlerType>
-    void processUpdateAsync(QnTransaction<ApiCameraAttributesDataList>& tran, HandlerType handler)
+    void processUpdateAsync(
+        QnTransaction<nx::vms::api::CameraAttributesDataList>& tran,
+        HandlerType handler)
     {
         NX_ASSERT(tran.command == ApiCommand::saveCameraUserAttributesList);
-        return processMultiUpdateAsync<ApiCameraAttributesDataList, ApiCameraAttributesData>(
-            tran, handler, ApiCommand::saveCameraUserAttributes);
+        return processMultiUpdateAsync<
+            nx::vms::api::CameraAttributesDataList,
+            nx::vms::api::CameraAttributesData>(
+                tran,
+                handler,
+                ApiCommand::saveCameraUserAttributes);
     }
 
     /**

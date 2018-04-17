@@ -12,14 +12,14 @@ namespace ec2 {
 
 class AbstractCameraNotificationManager: public QObject
 {
-Q_OBJECT
-public:
-signals :
+    Q_OBJECT
+
+signals:
     void addedOrUpdated(const nx::vms::api::CameraData& camera, ec2::NotificationSource source);
-    void cameraHistoryChanged(const ec2::ApiServerFootageData& cameraHistory);
+    void cameraHistoryChanged(const nx::vms::api::ServerFootageData& cameraHistory);
     void removed(const QnUuid& id);
 
-    void userAttributesChanged(const ec2::ApiCameraAttributesData& attributes);
+    void userAttributesChanged(const nx::vms::api::CameraAttributesData& attributes);
     void userAttributesRemoved(const QnUuid& id);
 };
 
@@ -36,7 +36,7 @@ public:
     }
 
     /*!
-    \param handler Functor with params: (ErrorCode, const ec2::ApiCameraDataList& cameras)
+    \param handler Functor with params: (ErrorCode, const nx::vms::api::CameraDataList& cameras)
     */
     template<class TargetType, class HandlerType>
     int getCameras(TargetType* target, HandlerType handler)
@@ -48,7 +48,7 @@ public:
                     handler)));
     }
 
-    ErrorCode getCamerasSync(ec2::ApiCameraDataList* const cameraList)
+    ErrorCode getCamerasSync(nx::vms::api::CameraDataList* const cameraList)
     {
         return impl::doSyncCall<impl::GetCamerasHandler>(
             [this](impl::GetCamerasHandlerPtr handler)
@@ -58,7 +58,7 @@ public:
             cameraList);
     }
 
-    ErrorCode getCamerasExSync(ec2::ApiCameraDataExList* const cameraList)
+    ErrorCode getCamerasExSync(nx::vms::api::CameraDataExList* const cameraList)
     {
         return impl::doSyncCall<impl::GetCamerasExHandler>(
             [this](impl::GetCamerasExHandlerPtr handler)
@@ -94,7 +94,7 @@ public:
             });
     }
 
-    ErrorCode addCamerasSync(const ec2::ApiCameraDataList& cameras)
+    ErrorCode addCamerasSync(const nx::vms::api::CameraDataList& cameras)
     {
         return impl::doSyncCall<impl::SimpleHandler>(
             [this, cameras](impl::SimpleHandlerPtr handler)
@@ -107,7 +107,7 @@ public:
     \param handler Functor with params: (ErrorCode)
     */
     template<class TargetType, class HandlerType>
-    int save(const ec2::ApiCameraDataList& cameras, TargetType* target, HandlerType handler)
+    int save(const nx::vms::api::CameraDataList& cameras, TargetType* target, HandlerType handler)
     {
         return save(
             cameras,
@@ -133,7 +133,7 @@ public:
     }
 
     /*!
-    \param handler Functor with params: (ErrorCode, const ApiServerFootageDataList& cameras)
+    \param handler Functor with params: (ErrorCode, const nx::vms::api::ServerFootageDataList& cameras)
     */
     template<class TargetType, class HandlerType>
     int getServerFootageData(TargetType* target, HandlerType handler)
@@ -145,7 +145,7 @@ public:
                     handler)));
     }
 
-    ErrorCode getServerFootageDataSync(ApiServerFootageDataList* const serverFootageData)
+    ErrorCode getServerFootageDataSync(nx::vms::api::ServerFootageDataList* const serverFootageData)
     {
         return impl::doSyncCall<impl::GetCamerasHistoryHandler>(
             [this](impl::GetCamerasHistoryHandlerPtr handler)
@@ -197,7 +197,7 @@ public:
                 >>(target, handler)));
     }
 
-    ErrorCode getUserAttributesSync(ec2::ApiCameraAttributesDataList* const attributesList)
+    ErrorCode getUserAttributesSync(nx::vms::api::CameraAttributesDataList* const attributesList)
     {
         return impl::doSyncCall<impl::GetCameraUserAttributesHandler>(
             [this](impl::GetCameraUserAttributesHandlerPtr handler)
@@ -212,7 +212,7 @@ public:
     */
     template<class TargetType, class HandlerType>
     int saveUserAttributes(
-        const ec2::ApiCameraAttributesDataList& attributes,
+        const nx::vms::api::CameraAttributesDataList& attributes,
         TargetType* target,
         HandlerType handler)
     {
@@ -224,7 +224,7 @@ public:
                     handler)));
     }
 
-    ErrorCode saveUserAttributesSync(const ec2::ApiCameraAttributesDataList& attributes)
+    ErrorCode saveUserAttributesSync(const nx::vms::api::CameraAttributesDataList& attributes)
     {
         return impl::doSyncCall<impl::SimpleHandler>(
             [this, attributes](impl::SimpleHandlerPtr handler)

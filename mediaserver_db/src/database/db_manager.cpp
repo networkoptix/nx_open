@@ -577,83 +577,139 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
         {
             if (m_resyncFlags.testFlag(ResyncLicences))
             {
-                if (!fillTransactionLogInternal<nullptr_t, ApiLicenseData, ApiLicenseDataList>(ApiCommand::addLicense))
+                if (!fillTransactionLogInternal<
+                    nullptr_t,
+                    ApiLicenseData,
+                    ApiLicenseDataList>(ApiCommand::addLicense))
+                {
                     return false;
+                }
             }
             if (m_resyncFlags.testFlag(ResyncFiles))
             {
                 if (!fillTransactionLogInternal<
-                        nullptr_t,
-                        StoredFileData,
-                        StoredFileDataList>(
-                            ApiCommand::addStoredFile))
+                    nullptr_t,
+                    StoredFileData,
+                    StoredFileDataList>(ApiCommand::addStoredFile))
                 {
                     return false;
                 }
             }
             if (m_resyncFlags.testFlag(ResyncCameraAttributes))
             {
-                if (!fillTransactionLogInternal<QnUuid, ApiCameraAttributesData, ApiCameraAttributesDataList>(ApiCommand::saveCameraUserAttributes))
+                if (!fillTransactionLogInternal<
+                    QnUuid,
+                    CameraAttributesData,
+                    CameraAttributesDataList>(ApiCommand::saveCameraUserAttributes))
+                {
                     return false;
+                }
             }
             if (m_resyncFlags.testFlag(ResyncServerAttributes))
             {
-                if (!fillTransactionLogInternal<QnUuid, ApiMediaServerUserAttributesData, ApiMediaServerUserAttributesDataList>(ApiCommand::saveMediaServerUserAttributes))
+                if (!fillTransactionLogInternal<
+                    QnUuid,
+                    ApiMediaServerUserAttributesData,
+                    ApiMediaServerUserAttributesDataList>(ApiCommand::saveMediaServerUserAttributes))
+                {
                     return false;
+                }
             }
             if (m_resyncFlags.testFlag(ResyncServers))
             {
-                if (!fillTransactionLogInternal<QnUuid, ApiMediaServerData, ApiMediaServerDataList>(ApiCommand::saveMediaServer))
+                if (!fillTransactionLogInternal<
+                    QnUuid,
+                    ApiMediaServerData,
+                    ApiMediaServerDataList>(ApiCommand::saveMediaServer))
                     return false;
             }
             if (m_resyncFlags.testFlag(ResyncLayouts))
             {
-                if (!fillTransactionLogInternal<QnUuid, ApiLayoutData, ApiLayoutDataList>(ApiCommand::saveLayout))
+                if (!fillTransactionLogInternal<
+                    QnUuid,
+                    ApiLayoutData,
+                    ApiLayoutDataList>(ApiCommand::saveLayout))
+                {
                     return false;
+                }
             }
             if (m_resyncFlags.testFlag(ResyncRules))
             {
-                if (!fillTransactionLogInternal<QnUuid, EventRuleData, EventRuleDataList>(
-                        ApiCommand::saveEventRule, businessRuleObjectUpdater))
+                if (!fillTransactionLogInternal<
+                    QnUuid,
+                    EventRuleData,
+                    EventRuleDataList>(ApiCommand::saveEventRule, businessRuleObjectUpdater))
                 {
                     return false;
                 }
             }
             if (m_resyncFlags.testFlag(ResyncUsers))
             {
-                if (!fillTransactionLogInternal<QnUuid, ApiUserData, ApiUserDataList>(ApiCommand::saveUser))
+                if (!fillTransactionLogInternal<
+                    QnUuid,
+                    ApiUserData,
+                    ApiUserDataList>(ApiCommand::saveUser))
+                {
                     return false;
+                }
             }
             if (m_resyncFlags.testFlag(ResyncStorages))
             {
-                if (!fillTransactionLogInternal<QnUuid, ApiStorageData, ApiStorageDataList>(ApiCommand::saveStorage))
+                if (!fillTransactionLogInternal<
+                    QnUuid,
+                    ApiStorageData,
+                    ApiStorageDataList>(ApiCommand::saveStorage))
+                {
                     return false;
+                }
             }
             if (m_resyncFlags.testFlag(ResyncVideoWalls))
             {
-                if (!fillTransactionLogInternal<QnUuid, ApiVideowallData, ApiVideowallDataList>(ApiCommand::saveVideowall))
+                if (!fillTransactionLogInternal<
+                    QnUuid,
+                    ApiVideowallData,
+                    ApiVideowallDataList>(ApiCommand::saveVideowall))
+                {
                     return false;
+                }
             }
             if (m_resyncFlags.testFlag(ResyncWebPages))
             {
-                if (!fillTransactionLogInternal<QnUuid, ApiWebPageData, ApiWebPageDataList>(ApiCommand::saveWebPage))
+                if (!fillTransactionLogInternal<
+                    QnUuid,
+                    ApiWebPageData,
+                    ApiWebPageDataList>(ApiCommand::saveWebPage))
+                {
                     return false;
+                }
             }
 
             if (m_resyncFlags.testFlag(ResyncUserAccessRights))
             {
                 if (!rebuildUserAccessRightsTransactions())
                     return false;
-                if (!fillTransactionLogInternal<nullptr_t, ApiAccessRightsData, ApiAccessRightsDataList>(ApiCommand::setAccessRights))
+
+                if (!fillTransactionLogInternal<
+                    nullptr_t,
+                    ApiAccessRightsData,
+                    ApiAccessRightsDataList>(ApiCommand::setAccessRights))
+                {
                     return false;
+                }
             }
 
             if (m_resyncFlags.testFlag(ResyncUserAccessRights))
             {
                 if (!rebuildUserAccessRightsTransactions())
                     return false;
-                if (!fillTransactionLogInternal<nullptr_t, ApiAccessRightsData, ApiAccessRightsDataList>(ApiCommand::setAccessRights))
+
+                if (!fillTransactionLogInternal<
+                    nullptr_t,
+                    ApiAccessRightsData,
+                    ApiAccessRightsDataList>(ApiCommand::setAccessRights))
+                {
                     return false;
+                }
             }
 
         }
@@ -994,8 +1050,8 @@ bool QnDbManager::resyncTransactionLog()
 
     if (!fillTransactionLogInternal<
         nullptr_t,
-        ApiServerFootageData,
-        ApiServerFootageDataList>(ApiCommand::addCameraHistoryItem))
+        ServerFootageData,
+        ServerFootageDataList>(ApiCommand::addCameraHistoryItem))
     {
         return false;
     }
@@ -2090,7 +2146,7 @@ ErrorCode QnDbManager::removeCameraAttributes(const QnUuid& id)
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::insertOrReplaceCameraAttributes(const ApiCameraAttributesData& data, qint32* const internalId)
+ErrorCode QnDbManager::insertOrReplaceCameraAttributes(const CameraAttributesData& data, qint32* const internalId)
 {
     const auto query = m_insertCameraUserAttrQuery.get(m_sdb, R"sql(
         INSERT OR REPLACE INTO vms_camera_user_attributes (
@@ -2242,7 +2298,9 @@ ErrorCode QnDbManager::removeCameraSchedule(qint32 internalId)
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::updateCameraSchedule(const std::vector<ApiScheduleTaskData>& scheduleTasks, qint32 internalId)
+ErrorCode QnDbManager::updateCameraSchedule(
+    const std::vector<ScheduleTaskData>& scheduleTasks,
+    qint32 internalId)
 {
     ErrorCode errCode = removeCameraSchedule(internalId);
     if (errCode != ErrorCode::ok)
@@ -2258,7 +2316,7 @@ ErrorCode QnDbManager::updateCameraSchedule(const std::vector<ApiScheduleTaskDat
         ))sql");
 
     query->bindValue(":internalId", internalId);
-    for(const ApiScheduleTaskData& task: scheduleTasks)
+    for(const auto& task: scheduleTasks)
     {
         QnSql::bind(task, query.get());
         if (!query->exec())
@@ -2344,14 +2402,14 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<CameraData
     return saveCamera(tran.params);
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiCameraAttributesData>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<CameraAttributesData>& tran)
 {
     return saveCameraUserAttributes(tran.params);
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiCameraAttributesDataList>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<CameraAttributesDataList>& tran)
 {
-    for(const ApiCameraAttributesData& attrs: tran.params)
+    for(const CameraAttributesData& attrs: tran.params)
     {
         const ErrorCode result = saveCameraUserAttributes(attrs);
         if (result != ErrorCode::ok)
@@ -2360,7 +2418,7 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiCameraA
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::saveCameraUserAttributes( const ApiCameraAttributesData& attrs )
+ErrorCode QnDbManager::saveCameraUserAttributes( const CameraAttributesData& attrs )
 {
     qint32 internalId = 0;
     ErrorCode result = insertOrReplaceCameraAttributes(attrs, &internalId);
@@ -2714,7 +2772,7 @@ ErrorCode QnDbManager::removeParam(const ResourceParamWithRefData& data)
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::addCameraHistory(const ApiServerFootageData& params)
+ErrorCode QnDbManager::addCameraHistory(const ServerFootageData& params)
 {
     QSqlQuery query(m_sdb);
     query.prepare("INSERT OR REPLACE INTO vms_used_cameras (server_guid, cameras) VALUES(?, ?)");
@@ -2741,7 +2799,7 @@ ErrorCode QnDbManager::removeCameraHistory(const QnUuid& serverId)
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiServerFootageData>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ServerFootageData>& tran)
 {
     if (tran.command == ApiCommand::addCameraHistoryItem)
         return addCameraHistory(tran.params);
@@ -3533,7 +3591,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& storageId, ApiStorageDataList
     return getStorages(filterStr, storageList);
 }
 
-ErrorCode QnDbManager::getScheduleTasks(std::vector<ApiScheduleTaskWithRefData>& scheduleTaskList)
+ErrorCode QnDbManager::getScheduleTasks(std::vector<ScheduleTaskWithRefData>& scheduleTaskList)
 {
     // Fetching recording schedule.
     const auto queryText = R"sql(
@@ -3566,7 +3624,7 @@ ErrorCode QnDbManager::getScheduleTasks(std::vector<ApiScheduleTaskWithRefData>&
 }
 
 ErrorCode QnDbManager::doQueryNoLock(
-    const QnUuid& cameraId, ApiCameraAttributesDataList& cameraUserAttributesList)
+    const QnUuid& cameraId, CameraAttributesDataList& cameraUserAttributesList)
 {
     //fetching camera user attributes
     QSqlQuery queryCameras(m_sdb);
@@ -3615,7 +3673,7 @@ ErrorCode QnDbManager::doQueryNoLock(
 
     QnSql::fetch_many(queryCameras, &cameraUserAttributesList);
 
-    std::vector<ApiScheduleTaskWithRefData> scheduleTaskList;
+    std::vector<ScheduleTaskWithRefData> scheduleTaskList;
     ErrorCode errCode = getScheduleTasks(scheduleTaskList);
     if (errCode != ErrorCode::ok)
         return errCode;
@@ -3624,9 +3682,9 @@ ErrorCode QnDbManager::doQueryNoLock(
     mergeObjectListData(
         cameraUserAttributesList,
         scheduleTaskList,
-        &ApiCameraAttributesData::scheduleTasks,
-        &ApiCameraAttributesData::cameraId,
-        &ApiScheduleTaskWithRefData::sourceId );
+        &CameraAttributesData::scheduleTasks,
+        &CameraAttributesData::cameraId,
+        &ScheduleTaskWithRefData::sourceId );
 
     return ErrorCode::ok;
 }
@@ -3692,7 +3750,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, CameraDataExList& cameraE
         return result;
     mergeObjectListData<CameraDataEx>(cameraExList, params, &CameraDataEx::addParams, &ResourceParamWithRefData::resourceId);
 
-    std::vector<ApiScheduleTaskWithRefData> scheduleTaskList;
+    std::vector<ScheduleTaskWithRefData> scheduleTaskList;
     ErrorCode errCode = getScheduleTasks(scheduleTaskList);
     if (errCode != ErrorCode::ok)
         return errCode;
@@ -3702,7 +3760,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, CameraDataExList& cameraE
         scheduleTaskList,
         &CameraDataEx::scheduleTasks,
         &CameraDataEx::id,
-        &ApiScheduleTaskWithRefData::sourceId );
+        &ScheduleTaskWithRefData::sourceId );
 
     return ErrorCode::ok;
 }
@@ -3841,7 +3899,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiMediaServerUser
 }
 
 //getCameraHistoryItems
-ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiServerFootageDataList& historyList)
+ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ServerFootageDataList& historyList)
 {
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
@@ -3851,7 +3909,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiServerFootag
         return ErrorCode::dbError;
     }
     while (query.next()) {
-        ApiServerFootageData data;
+        ServerFootageData data;
         data.serverGuid = QnUuid::fromRfc4122(query.value(0).toByteArray());
         data.archivedCameras = QnUbjson::deserialized<std::vector<QnUuid>>(query.value(1).toByteArray());
         historyList.push_back(std::move(data));

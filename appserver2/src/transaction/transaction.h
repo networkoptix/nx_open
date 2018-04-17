@@ -327,7 +327,7 @@ APPLY(212, removeResources, nx::vms::api::IdDataList, \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(300, getCameras, ApiCameraDataList, \
+APPLY(300, getCameras, nx::vms::api::CameraDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
@@ -349,11 +349,11 @@ APPLY(301, saveCamera, nx::vms::api::CameraData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        ReadResourceAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(302, saveCameras, ApiCameraDataList, \
+APPLY(302, saveCameras, nx::vms::api::CameraDataList, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
-                       [] (const QnTransaction<ApiCameraDataList> &tran, const NotificationParams &notificationParams) \
+                       [] (const QnTransaction<nx::vms::api::CameraDataList> &tran, const NotificationParams &notificationParams) \
                          { \
                             notificationParams.cameraNotificationManager->triggerNotification(tran, notificationParams.source); \
                          }, \
@@ -374,7 +374,7 @@ APPLY(303, removeCamera, nx::vms::api::IdData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(304, getCameraHistoryItems, ApiServerFootageDataList, \
+APPLY(304, getCameraHistoryItems, nx::vms::api::ServerFootageDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
@@ -385,7 +385,7 @@ APPLY(304, getCameraHistoryItems, ApiServerFootageDataList, \
                        FilterListByAccess<ReadFootageDataAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadFootageDataAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(305, addCameraHistoryItem, ApiServerFootageData, \
+APPLY(305, addCameraHistoryItem, nx::vms::api::ServerFootageData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        &createHashForServerFootageDataHelper, /* getHash*/ \
@@ -396,7 +396,7 @@ APPLY(305, addCameraHistoryItem, ApiServerFootageData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        ReadFootageDataAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(309, removeCameraHistoryItem, ApiServerFootageData, \
+APPLY(309, removeCameraHistoryItem, nx::vms::api::ServerFootageData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        &createHashForServerFootageDataHelper, /* getHash*/ \
@@ -407,7 +407,7 @@ APPLY(309, removeCameraHistoryItem, ApiServerFootageData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(310, saveCameraUserAttributes, ApiCameraAttributesData, \
+APPLY(310, saveCameraUserAttributes, nx::vms::api::CameraAttributesData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        &createHashForApiCameraAttributesDataHelper, /* getHash*/ \
@@ -418,7 +418,7 @@ APPLY(310, saveCameraUserAttributes, ApiCameraAttributesData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        ReadCameraAttributesAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(311, saveCameraUserAttributesList, ApiCameraAttributesDataList, \
+APPLY(311, saveCameraUserAttributesList, nx::vms::api::CameraAttributesDataList, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
@@ -429,7 +429,7 @@ APPLY(311, saveCameraUserAttributesList, ApiCameraAttributesDataList, \
                        FilterListByAccess<ReadCameraAttributesAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadCameraAttributesAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(312, getCameraUserAttributesList, ApiCameraAttributesDataList, \
+APPLY(312, getCameraUserAttributesList, nx::vms::api::CameraAttributesDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
@@ -440,7 +440,7 @@ APPLY(312, getCameraUserAttributesList, ApiCameraAttributesDataList, \
                        FilterListByAccess<ReadCameraAttributesAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadCameraAttributesAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(313, getCamerasEx, ApiCameraDataExList, \
+APPLY(313, getCamerasEx, nx::vms::api::CameraDataExList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \

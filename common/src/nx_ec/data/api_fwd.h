@@ -8,22 +8,6 @@ class QString;
 
 namespace ec2 {
 
-using ApiCameraData = nx::vms::api::CameraData;
-using ApiCameraDataList = nx::vms::api::CameraDataList;
-using ApiScheduleTaskData = nx::vms::api::ScheduleTaskData;
-using ApiScheduleTaskWithRefData = nx::vms::api::ScheduleTaskWithRefData;
-using ApiCameraAttributesData = nx::vms::api::CameraAttributesData;
-using ApiCameraAttributesDataList = nx::vms::api::CameraAttributesDataList;
-using ApiCameraDataEx = nx::vms::api::CameraDataEx;
-using ApiCameraDataExList = nx::vms::api::CameraDataExList;
-using ApiServerFootageData = nx::vms::api::ServerFootageData;
-using ApiServerFootageDataList = nx::vms::api::ServerFootageDataList;
-using ApiCameraHistoryItemData = nx::vms::api::CameraHistoryItemData;
-using ApiCameraHistoryItemDataList = nx::vms::api::CameraHistoryItemDataList;
-using ApiCameraHistoryData = nx::vms::api::CameraHistoryData;
-using ApiCameraHistoryDataList = nx::vms::api::CameraHistoryDataList;
-using ApiEmailSettingsData = nx::vms::api::EmailSettingsData;
-
     struct ApiFullInfoData;
     struct ApiLayoutItemData;
     struct ApiLayoutData;
@@ -132,7 +116,6 @@ using ApiEmailSettingsData = nx::vms::api::EmailSettingsData;
 
 #define QN_EC2_API_DATA_TYPES \
     (ApiEmailData)\
-    (ApiEmailSettingsData)\
     (ApiFullInfoData)\
     (ApiLayoutItemData)\
     (ApiLayoutData)\

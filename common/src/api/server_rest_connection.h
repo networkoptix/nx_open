@@ -100,7 +100,10 @@ public:
     * @param targetThread execute callback in a target thread if specified. It convenient for UI purpose.
     * By default callback is called in IO thread.
     */
-    Handle cameraHistoryAsync(const QnChunksRequestData &request, Result<ec2::ApiCameraHistoryDataList>::type callback, QThread* targetThread = 0);
+    Handle cameraHistoryAsync(
+        const QnChunksRequestData& request,
+        Result<nx::vms::api::CameraHistoryDataList>::type callback,
+        QThread* targetThread = 0);
 
     Handle getServerLocalTime(Result<QnJsonRestResult>::type callback, QThread* targetThread = nullptr);
 

@@ -125,7 +125,7 @@ int QnWearableCameraRestHandler::executeAdd(
         return nx::network::http::StatusCode::internalServerError;
     }
 
-    ec2::ApiCameraAttributesData apiAttributes;
+    nx::vms::api::CameraAttributesData apiAttributes;
     {
         QnCameraUserAttributePool::ScopedLock attributesLock(
             owner->commonModule()->cameraUserAttributesPool(), apiCamera.id);

@@ -18,16 +18,16 @@ public:
         const QnTransaction<nx::vms::api::CameraDataList>& tran,
         NotificationSource source);
     void triggerNotification(
-        const QnTransaction<ApiCameraAttributesData>& tran,
+        const QnTransaction<nx::vms::api::CameraAttributesData>& tran,
         NotificationSource source);
     void triggerNotification(
-        const QnTransaction<ApiCameraAttributesDataList>& tran,
+        const QnTransaction<nx::vms::api::CameraAttributesDataList>& tran,
         NotificationSource source);
     void triggerNotification(
         const QnTransaction<nx::vms::api::IdData>& tran,
         NotificationSource source);
     void triggerNotification(
-        const QnTransaction<ApiServerFootageData>& tran,
+        const QnTransaction<nx::vms::api::ServerFootageData>& tran,
         NotificationSource source);
 };
 

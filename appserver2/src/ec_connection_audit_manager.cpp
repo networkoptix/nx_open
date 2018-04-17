@@ -16,77 +16,102 @@
 #include <nx_ec/ec_api.h>
 #include <nx/vms/api/data/event_rule_data.h>
 
-namespace ec2
+namespace ec2 {
+
+using namespace nx::vms::api;
+
+ECConnectionAuditManager::ECConnectionAuditManager(AbstractECConnection* ecConnection):
+    m_connection(ecConnection)
 {
-
-    ECConnectionAuditManager::ECConnectionAuditManager(AbstractECConnection* ecConnection):
-        m_connection(ecConnection)
-    {
-    }
-
-    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value /*command*/,  const ApiCameraAttributesDataList& params, const QnAuthSession& authInfo)
-    {
-        QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_CameraUpdate);
-        for (const auto& value: params)
-            auditRecord.resources.push_back(value.cameraId);
-        qnAuditManager->addAuditRecord(auditRecord);
-    }
-
-    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value /*command*/,  const ApiCameraAttributesData& params, const QnAuthSession& authInfo)
-    {
-        QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_CameraUpdate);
-        auditRecord.resources.push_back(params.cameraId);
-        qnAuditManager->addAuditRecord(auditRecord);
-    }
-
-    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value /*command*/,  const ApiMediaServerUserAttributesData& params, const QnAuthSession& authInfo)
-    {
-        QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_ServerUpdate);
-        auditRecord.resources.push_back(params.serverId);
-        qnAuditManager->addAuditRecord(auditRecord);
-    }
-
-    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value /*command*/,  const ApiMediaServerUserAttributesDataList& params, const QnAuthSession& authInfo)
-    {
-        QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_ServerUpdate);
-        for (const auto& value: params)
-            auditRecord.resources.push_back(value.serverId);
-        qnAuditManager->addAuditRecord(auditRecord);
-    }
-
-    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value /*command*/, const ApiStorageData& params, const QnAuthSession& authInfo)
-    {
-        QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_ServerUpdate);
-        auditRecord.resources.push_back(params.parentId);
-        qnAuditManager->addAuditRecord(auditRecord);
-    }
-
-    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value /*command*/, const ApiStorageDataList& params, const QnAuthSession& authInfo)
-    {
-        QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_ServerUpdate);
-        for (const auto& value: params)
-            auditRecord.resources.push_back(value.parentId);
-        qnAuditManager->addAuditRecord(auditRecord);
-    }
-
-    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value /*command*/,  const ApiUserDataList& params, const QnAuthSession& authInfo)
-    {
-        QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_UserUpdate);
-        for (const auto& value: params)
-            auditRecord.resources.push_back(value.id);
-        qnAuditManager->addAuditRecord(auditRecord);
-    }
-
-    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value /*command*/,  const ApiUserData& params, const QnAuthSession& authInfo)
-    {
-        QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_UserUpdate);
-        auditRecord.resources.push_back(params.id);
-        qnAuditManager->addAuditRecord(auditRecord);
-    }
+}
 
 void ECConnectionAuditManager::addAuditRecord(
     ApiCommand::Value /*command*/,
-    const nx::vms::api::EventRuleData& params,
+    const CameraAttributesDataList& params,
+    const QnAuthSession& authInfo)
+{
+    QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_CameraUpdate);
+    for (const auto& value: params)
+        auditRecord.resources.push_back(value.cameraId);
+    qnAuditManager->addAuditRecord(auditRecord);
+}
+
+void ECConnectionAuditManager::addAuditRecord(
+    ApiCommand::Value /*command*/,
+    const CameraAttributesData& params,
+    const QnAuthSession& authInfo)
+{
+    QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_CameraUpdate);
+    auditRecord.resources.push_back(params.cameraId);
+    qnAuditManager->addAuditRecord(auditRecord);
+}
+
+void ECConnectionAuditManager::addAuditRecord(
+    ApiCommand::Value /*command*/,
+    const ApiMediaServerUserAttributesData& params,
+    const QnAuthSession& authInfo)
+{
+    QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_ServerUpdate);
+    auditRecord.resources.push_back(params.serverId);
+    qnAuditManager->addAuditRecord(auditRecord);
+}
+
+void ECConnectionAuditManager::addAuditRecord(
+    ApiCommand::Value /*command*/,
+    const ApiMediaServerUserAttributesDataList& params,
+    const QnAuthSession& authInfo)
+{
+    QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_ServerUpdate);
+    for (const auto& value: params)
+        auditRecord.resources.push_back(value.serverId);
+    qnAuditManager->addAuditRecord(auditRecord);
+}
+
+void ECConnectionAuditManager::addAuditRecord(
+    ApiCommand::Value /*command*/,
+    const ApiStorageData& params,
+    const QnAuthSession& authInfo)
+{
+    QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_ServerUpdate);
+    auditRecord.resources.push_back(params.parentId);
+    qnAuditManager->addAuditRecord(auditRecord);
+}
+
+void ECConnectionAuditManager::addAuditRecord(
+    ApiCommand::Value /*command*/,
+    const ApiStorageDataList& params,
+    const QnAuthSession& authInfo)
+{
+    QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_ServerUpdate);
+    for (const auto& value: params)
+        auditRecord.resources.push_back(value.parentId);
+    qnAuditManager->addAuditRecord(auditRecord);
+}
+
+void ECConnectionAuditManager::addAuditRecord(
+    ApiCommand::Value /*command*/,
+    const ApiUserDataList& params,
+    const QnAuthSession& authInfo)
+{
+    QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_UserUpdate);
+    for (const auto& value: params)
+        auditRecord.resources.push_back(value.id);
+    qnAuditManager->addAuditRecord(auditRecord);
+}
+
+void ECConnectionAuditManager::addAuditRecord(
+    ApiCommand::Value /*command*/,
+    const ApiUserData& params,
+    const QnAuthSession& authInfo)
+{
+    QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_UserUpdate);
+    auditRecord.resources.push_back(params.id);
+    qnAuditManager->addAuditRecord(auditRecord);
+}
+
+void ECConnectionAuditManager::addAuditRecord(
+    ApiCommand::Value /*command*/,
+    const EventRuleData& params,
     const QnAuthSession& authInfo)
 {
     QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_BEventUpdate);
@@ -101,7 +126,7 @@ void ECConnectionAuditManager::addAuditRecord(
 
 void ECConnectionAuditManager::addAuditRecord(
     ApiCommand::Value /*command*/,
-    const nx::vms::api::EventRuleDataList& params,
+    const EventRuleDataList& params,
     const QnAuthSession& authInfo)
 {
     QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_BEventUpdate);
@@ -112,7 +137,7 @@ void ECConnectionAuditManager::addAuditRecord(
 
 void ECConnectionAuditManager::addAuditRecord(
     ApiCommand::Value /*command*/,
-    const nx::vms::api::ResourceParamWithRefData& param,
+    const ResourceParamWithRefData& param,
     const QnAuthSession& authInfo)
 {
     if (QnGlobalSettings::isGlobalSetting(param))
@@ -121,93 +146,99 @@ void ECConnectionAuditManager::addAuditRecord(
 
 void ECConnectionAuditManager::addAuditRecord(
     ApiCommand::Value command,
-    const nx::vms::api::ResourceParamWithRefDataList& params,
+    const ResourceParamWithRefDataList& params,
     const QnAuthSession& authInfo)
 {
     for (const auto& param: params)
         addAuditRecord(command, param, authInfo);
 }
 
-    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value command,  const nx::vms::api::IdData& params, const QnAuthSession& authInfo)
+void ECConnectionAuditManager::addAuditRecord(
+    ApiCommand::Value command,
+    const IdData& params,
+    const QnAuthSession& authInfo)
+{
+    const auto& resPool = m_connection->commonModule()->resourcePool();
+    Qn::AuditRecordType eventType = Qn::AR_NotDefined;
+    QString description;
+    QnUuid resourceId;
+    switch (command)
     {
-        const auto& resPool = m_connection->commonModule()->resourcePool();
-        Qn::AuditRecordType eventType = Qn::AR_NotDefined;
-        QString description;
-        QnUuid resourceId;
-        switch(command)
+        case ApiCommand::removeStorage:
+            if (QnResourcePtr res = resPool->getResourceById(params.id))
+            {
+                eventType = Qn::AR_ServerUpdate;
+                resourceId = res->getParentId();
+            }
+            break;
+        case ApiCommand::removeResource:
+        case ApiCommand::removeResources:
+        case ApiCommand::removeCamera:
+        case ApiCommand::removeMediaServer:
+        case ApiCommand::removeUser:
         {
-            case ApiCommand::removeStorage:
-                if (QnResourcePtr res = resPool->getResourceById(params.id))
+            if (QnResourcePtr res = resPool->getResourceById(params.id))
+            {
+                description = res->getName();
+                if (res.dynamicCast<QnUserResource>())
+                    eventType = Qn::AR_UserRemove;
+                else if (res.dynamicCast<QnSecurityCamResource>())
                 {
-                    eventType = Qn::AR_ServerUpdate;
-                    resourceId = res->getParentId();
+                    eventType = Qn::AR_CameraRemove;
+                    if (QnSecurityCamResourcePtr camRes = res.dynamicCast<QnSecurityCamResource>())
+                        description = lit("%1 (%2)").arg(description).arg(
+                            camRes->getHostAddress());
                 }
-                break;
-            case ApiCommand::removeResource:
-            case ApiCommand::removeResources:
-            case ApiCommand::removeCamera:
-            case ApiCommand::removeMediaServer:
-            case ApiCommand::removeUser:
-            {
-                if (QnResourcePtr res = resPool->getResourceById(params.id))
-                {
-                    description = res->getName();
-                    if (res.dynamicCast<QnUserResource>())
-                        eventType = Qn::AR_UserRemove;
-                    else if (res.dynamicCast<QnSecurityCamResource>()) {
-                        eventType = Qn::AR_CameraRemove;
-                        if (QnSecurityCamResourcePtr camRes = res.dynamicCast<QnSecurityCamResource>())
-                            description = lit("%1 (%2)").arg(description).arg(camRes->getHostAddress());
-                    }
-                    else if (res.dynamicCast<QnMediaServerResource>())
-                        eventType = Qn::AR_ServerRemove;
-                }
-                break;
+                else if (res.dynamicCast<QnMediaServerResource>())
+                    eventType = Qn::AR_ServerRemove;
             }
-            case ApiCommand::removeEventRule:
-            {
-                eventType = Qn::AR_BEventRemove;
-                auto ruleManager = m_connection->commonModule()->eventRuleManager();
-                if (ruleManager) {
-                    nx::vms::event::RulePtr rule = ruleManager->rule(params.id);
-                    if (rule)
-                    {
-                        nx::vms::event::StringsHelper helper(m_connection->commonModule());
-                        description = helper.ruleDescriptionText(rule);
-                    }
-                }
-                break;
-            }
-            default:
-            {
-                // do not audit these commands
-                break;
-            }
+            break;
         }
-
-        if (eventType != Qn::AR_NotDefined)
+        case ApiCommand::removeEventRule:
         {
-            auto auditRecord = qnAuditManager->prepareRecord(authInfo, eventType);
-            if (!description.isEmpty())
-                auditRecord.addParam("description", description.toUtf8());
-            if (!resourceId.isNull())
-                auditRecord.resources.push_back(resourceId);
-            qnAuditManager->addAuditRecord(auditRecord);
+            eventType = Qn::AR_BEventRemove;
+            auto ruleManager = m_connection->commonModule()->eventRuleManager();
+            if (ruleManager)
+            {
+                nx::vms::event::RulePtr rule = ruleManager->rule(params.id);
+                if (rule)
+                {
+                    nx::vms::event::StringsHelper helper(m_connection->commonModule());
+                    description = helper.ruleDescriptionText(rule);
+                }
+            }
+            break;
+        }
+        default:
+        {
+            // do not audit these commands
+            break;
         }
     }
 
+    if (eventType != Qn::AR_NotDefined)
+    {
+        auto auditRecord = qnAuditManager->prepareRecord(authInfo, eventType);
+        if (!description.isEmpty())
+            auditRecord.addParam("description", description.toUtf8());
+        if (!resourceId.isNull())
+            auditRecord.resources.push_back(resourceId);
+        qnAuditManager->addAuditRecord(auditRecord);
+    }
+}
+
 void ECConnectionAuditManager::addAuditRecord(
     ApiCommand::Value command,
-    const nx::vms::api::IdDataList& params,
+    const IdDataList& params,
     const QnAuthSession& authInfo)
 {
-    for (const nx::vms::api::IdData& param: params)
+    for (const IdData& param: params)
         addAuditRecord(command, param, authInfo);
 }
 
 void ECConnectionAuditManager::addAuditRecord(
     ApiCommand::Value /*command*/,
-    const nx::vms::api::ResetEventRulesData& /*params*/,
+    const ResetEventRulesData& /*params*/,
     const QnAuthSession& authInfo)
 {
     qnAuditManager->addAuditRecord(qnAuditManager->prepareRecord(authInfo, Qn::AR_BEventReset));
@@ -215,7 +246,7 @@ void ECConnectionAuditManager::addAuditRecord(
 
 void ECConnectionAuditManager::addAuditRecord(
     ApiCommand::Value /*command*/,
-    const nx::vms::api::DatabaseDumpData& /*params*/,
+    const DatabaseDumpData& /*params*/,
     const QnAuthSession& authInfo)
 {
     qnAuditManager->addAuditRecord(

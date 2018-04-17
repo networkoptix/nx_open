@@ -509,7 +509,7 @@ namespace ec2 {
 		*     %value CameraBackup_Default A default value is used for backup options.
 		* %// AbstractCameraManager::saveUserAttributes
 		*/
-		regUpdate<ApiCameraAttributesDataList>(p, ApiCommand::saveCameraUserAttributesList);
+		regUpdate<CameraAttributesDataList>(p, ApiCommand::saveCameraUserAttributesList);
 
 		/**%apidoc POST /ec2/saveCameraUserAttributes
 		* Save additional camera attributes for a single camera.
@@ -606,7 +606,7 @@ namespace ec2 {
 		*     %value CameraBackup_Default A default value is used for backup options.
 		* %// AbstractCameraManager::saveUserAttributes
 		*/
-		regUpdate<ApiCameraAttributesData>(p, ApiCommand::saveCameraUserAttributes);
+		regUpdate<CameraAttributesData>(p, ApiCommand::saveCameraUserAttributes);
 
 		/**%apidoc GET /ec2/getCameraUserAttributesList
 		* Read additional camera attributes.
@@ -701,10 +701,10 @@ namespace ec2 {
 		*         %value CameraBackup_Default A default value is used for backup options.
 		* %// AbstractCameraManager::getUserAttributes
 		*/
-		regGet<QnUuid, ApiCameraAttributesDataList>(p, ApiCommand::getCameraUserAttributesList);
+		regGet<QnUuid, CameraAttributesDataList>(p, ApiCommand::getCameraUserAttributesList);
 
 		// AbstractCameraManager::addCameraHistoryItem
-		regUpdate<ApiServerFootageData>(p, ApiCommand::addCameraHistoryItem);
+		regUpdate<ServerFootageData>(p, ApiCommand::addCameraHistoryItem);
 
 		/**%apidoc GET /ec2/getCameraHistoryItems
 		* Read information about which server was hosting the camera at which period.
@@ -714,7 +714,7 @@ namespace ec2 {
 		* %return List of camera history items in the requested format.
 		* %// AbstractCameraManager::getCameraHistoryItems
 		*/
-		regGet<nullptr_t, ApiServerFootageDataList>(p, ApiCommand::getCameraHistoryItems);
+		regGet<nullptr_t, ServerFootageDataList>(p, ApiCommand::getCameraHistoryItems);
 
 		/**%apidoc GET /ec2/getCamerasEx
 		* Read camera list.
@@ -746,7 +746,7 @@ namespace ec2 {
 		*          is causing a lot of network issues.
 		*     %param vendor Camera manufacturer.
 		*
-		*     %// From struct ApiCameraAttributesData:
+		*     %// From struct CameraAttributesData:
 		*     %param cameraId Camera unique id. If such object exists, omitted fields will not be changed.
 		*     %param cameraName Camera name.
 		*     %param userDefinedGroupName Name of the user-defined camera group.
@@ -833,7 +833,7 @@ namespace ec2 {
 		*             Equivalent of "CameraBackup_HighQuality|CameraBackup_LowQuality".
 		*         %value CameraBackup_Default A default value is used for backup options.
 		*
-		*     %// From ApiCameraDataEx:
+		*     %// From CameraDataEx:
 		*     %param status Camera status.
 		*         %value Offline
 		*         %value Online
@@ -842,7 +842,7 @@ namespace ec2 {
 		*         such information as full ONVIF URL, camera maximum FPS, etc.
 		* %// AbstractCameraManager::getCamerasEx
 		*/
-		regGet<QnUuid, ApiCameraDataExList>(p, ApiCommand::getCamerasEx);
+		regGet<QnUuid, CameraDataExList>(p, ApiCommand::getCamerasEx);
 
 		/**%apidoc GET /ec2/getStorages
 		* Read the list of current storages.

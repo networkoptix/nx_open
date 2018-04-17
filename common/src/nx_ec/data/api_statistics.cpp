@@ -33,14 +33,14 @@ namespace ec2 {
 
     ApiCameraDataStatistics::ApiCameraDataStatistics() {}
 
-    ApiCameraDataStatistics::ApiCameraDataStatistics(ApiCameraDataEx&& data)
-        : ApiCameraDataEx(std::move(data))
+    ApiCameraDataStatistics::ApiCameraDataStatistics(nx::vms::api::CameraDataEx&& data)
+        : nx::vms::api::CameraDataEx(std::move(data))
     {
         // find out if default password worked
         const auto& defCred = Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME;
         const auto it = std::find_if(addParams.begin(), addParams.end(),
             [&defCred](const auto& param) { return param.name == defCred; });
-        const bool isDefCred = (it != ApiCameraDataEx::addParams.end()) && !it->value.isEmpty();
+        const bool isDefCred = (it != nx::vms::api::CameraDataEx::addParams.end()) && !it->value.isEmpty();
 
         // remove confidential information
         auto rm = std::remove_if(addParams.begin(), addParams.end(),
