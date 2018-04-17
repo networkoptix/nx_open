@@ -19,6 +19,11 @@ public:
     static constexpr int kCellCount = kWidth * kHeight;
 
 public:
+    // Construction & assignment.
+    MotionGrid() = default;
+    MotionGrid(const MotionGrid& other) = default;
+    MotionGrid& operator=(const MotionGrid& other) = default;
+
     // Item access.
     int operator[](const QPoint& pos) const;
     int& operator[](const QPoint& pos);
@@ -34,6 +39,10 @@ public:
 
     // Fill consecutive region containing specified point with zeros.
     void clearRegion(const QPoint& at);
+
+    // Equality comparison.
+    bool operator==(const MotionGrid& other) const;
+    bool operator!=(const MotionGrid& other) const;
 
 private:
     using Row = std::array<int, kWidth>;

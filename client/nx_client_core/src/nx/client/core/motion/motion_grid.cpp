@@ -94,6 +94,16 @@ void MotionGrid::clearRegion(const QPoint& at)
     fillRegion(at, 0);
 }
 
+bool MotionGrid::operator==(const MotionGrid& other) const
+{
+    return m_grid == other.m_grid;
+}
+
+bool MotionGrid::operator!=(const MotionGrid& other) const
+{
+    return m_grid != other.m_grid;
+}
+
 } // namespace core
 } // namespace client
 } // namespace nx
