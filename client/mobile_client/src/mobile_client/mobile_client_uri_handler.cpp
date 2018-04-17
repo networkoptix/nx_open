@@ -309,8 +309,9 @@ const char*QnMobileClientUriHandler::handlerMethodName()
     return "handleUrl";
 }
 
-void QnMobileClientUriHandler::handleUrl(const nx::utils::Url& url)
+void QnMobileClientUriHandler::handleUrl(const QUrl& nativeUrl)
 {
+    const auto url = nx::utils::Url::fromQUrl(nativeUrl);
     SystemUri uri(url);
 
     if (!uri.isValid())

@@ -18,7 +18,7 @@ public:
     static const char* handlerMethodName();
 
 public slots:
-    void handleUrl(const nx::utils::Url& url);
+    void handleUrl(const QUrl& url);
 
 private:
     class Private;
