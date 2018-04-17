@@ -1,3 +1,5 @@
+const path = require('path');
+const webpack = require('webpack');
 const merge = require('webpack-merge');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const common = require('./webpack.common.js');
@@ -9,8 +11,14 @@ const ENV = process.env.ENV = process.env.NODE_ENV = 'prod';
 module.exports = merge(common, {
     plugins: [
         new CleanWebpackPlugin([ 'dist' ]),
-        new UglifyJSPlugin({})
+        new UglifyJSPlugin({}),
+        new webpack.HashedModuleIdsPlugin(),
     ],
+    output: {
+        filename  : 'scripts/[name].[chunkhash].js',
+        path      : path.resolve(__dirname, 'dist'),
+        publicPath: '/'
+    },
     module : {
         rules: [
             {
@@ -28,7 +36,7 @@ module.exports = merge(common, {
                             loader : 'css-loader',
                             options: {
                                 url      : false,
-                                //minimize : true,
+                                // minimize : true,
                                 sourceMap: false
                             }
                         },

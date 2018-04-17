@@ -10,9 +10,6 @@ import * as angular from 'angular';
     CloudApi.$inject = ['$http', '$q', 'configService'];
 
     function CloudApi($http, $q, configService) {
-
-        console.log (configService);
-
         const CONFIG = configService.config;
 
         let apiBase = CONFIG.apiBase;

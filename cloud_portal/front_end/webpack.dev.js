@@ -42,13 +42,32 @@ module.exports = merge(common, {
         new webpack.HotModuleReplacementPlugin(),
         // new BundleAnalyzerPlugin({analyzerHost:'0.0.0.0', analyzerPort:9001})
 
+        // make some resources available while serve the project locally
         new CopyWebpackPlugin([
             {
                 from: 'images',
                 to  : 'static/images'
+            },
+            {
+                from: '../../translations/es_ES',
+                to  : 'static/lang_es_ES'
+            },
+            {
+                from: '../../translations/ru_RU/',
+                to  : 'static/lang_ru_RU/'
             }
+            // ,
+            // {
+            //     from: '../../translations/ru_RU/views/dialogs/login.html',
+            //     to  : 'translations/lang_ru_RU/views/dialogs/login.html'
+            // }
         ])
     ],
+    output: {
+        filename  : 'scripts/[name].js',
+        // path      : path.resolve(__dirname, 'dist'),
+        publicPath: '/'
+    },
     module   : {
         rules: [
             {

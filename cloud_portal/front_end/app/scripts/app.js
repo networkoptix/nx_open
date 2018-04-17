@@ -82,12 +82,15 @@ window.L = {};
                     dataType: 'json'
                 })
                     .done(function (response) {
-                        //console.log(response);
+                        console.log(response);
                         languageServiceProvider.setLanguage(response);// Set current language
 
                         // set local variables as providers cannot get values in config phase
-                        appState.viewsDir = 'static/lang_' + languageServiceProvider.$get().lang.language + '/views/'; //'static/lang_' + lang + '/views/';
-                        appState.viewsDirCommon = 'static/lang_' + languageServiceProvider.$get().lang.language + '/web_common/views/';
+                        appState.viewsDir = 'static/lang_' + response.language + '/views/'; //'static/lang_' + lang + '/views/';
+                        appState.viewsDirCommon = 'static/lang_' + response.language + '/web_common/views/';
+
+                        console.log(appState);
+                        console.log(response.language);
 
                         // detect preview mode
                         var preview = window.location.href.indexOf('preview') >= 0;

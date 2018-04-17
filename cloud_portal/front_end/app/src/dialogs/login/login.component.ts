@@ -6,9 +6,9 @@ import {EmailValidator} from '@angular/forms';
 @Component({
     selector: 'ngbd-modal-content',
     templateUrl: 'login.component.html',
-    styleUrls: ['login.component.scss']
+    styleUrls: ['login.component.scss'],
     // TODO: later
-    // templateUrl: this.CONFIG.viewsDir + 'dialogs/login.html'
+    // templateUrl: 'translations/lang_ru_RU/views/dialogs/login.html'
 })
 export class LoginModalContent {
     @Input() auth;
@@ -17,9 +17,16 @@ export class LoginModalContent {
     @Input() cancellable;
     @Input() closable;
 
+    CONFIG: any;
+
     constructor(public activeModal: NgbActiveModal,
                 @Inject('account') private account: any,
-                @Inject('process') private process: any,) {
+                @Inject('process') private process: any,
+                @Inject('configService') private configService: any,) {
+
+        this.CONFIG = configService.config;
+
+        console.log(this.CONFIG.viewsDir + 'dialogs/login.html');
     }
 
     ngOnInit() {

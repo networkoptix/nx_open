@@ -5,7 +5,7 @@ angular.module('cloudApp').run([ '$http', '$templateCache', 'configService', fun
 
         const CONFIG = configService.config;
 
-        $http.get(CONFIG.viewsDir + 'dialogs/login.html', { cache: $templateCache });
+        // $http.get(CONFIG.viewsDir + 'dialogs/login.html', { cache: $templateCache });
         $http.get(CONFIG.viewsDir + 'dialogs/share.html', { cache: $templateCache });
         $http.get(CONFIG.viewsDir + 'components/dialog.html', { cache: $templateCache });
     } ])

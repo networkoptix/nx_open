@@ -65,7 +65,7 @@ module.exports = {
             chunksSortMode: 'manual'
         }),
 
-        new ExtractTextPlugin("styles/main.css"),
+        new ExtractTextPlugin("styles/main.[chunkhash].css", { allChunks:true }),
 
         new CopyWebpackPlugin([
             {
@@ -87,15 +87,10 @@ module.exports = {
         }),
         new webpack.optimize.CommonsChunkPlugin({
             name: "commons",
-            filename: "scripts/commons.js",
+            filename: "scripts/commons.[hash].js",
             minChunks: 2
         })
     ],
-    output: {
-        filename: 'scripts/[name].js',
-        path: path.resolve(__dirname, 'dist'),
-        publicPath: '/'
-    },
     resolve: {
         extensions: ['.ts', '.js'],
         alias: {

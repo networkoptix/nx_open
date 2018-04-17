@@ -33,15 +33,18 @@ def generate_languages_files():
         language_json_filename = os.path.join("../../../..", "translations", lang, 'language.json')
 
         print("Load: " + language_json_filename)
-        with codecs.open(language_json_filename, 'r', 'utf-8') as file_descriptor:
-            data = json.load(file_descriptor)
-            name = data["language_name"] if "language_name" in data else data["name"]
-            if name == 'LANGUAGE_NAME':
-                name = lang
-            languages_json.append({
-                "language": lang,
-                "name": name
-            })
+
+        if '.DS_Store' not in language_json_filename:
+            with codecs.open(language_json_filename, 'r', 'utf-8') as file_descriptor:
+                data = json.load(file_descriptor)
+                name = data["language_name"] if "language_name" in data else data["name"]
+                if name == 'LANGUAGE_NAME':
+                    name = lang
+                languages_json.append({
+                    "language": lang,
+                    "name": name
+                })
+
     print(languages_json)
     save_content('static/languages.json', json.dumps(languages_json, ensure_ascii=False))
 
