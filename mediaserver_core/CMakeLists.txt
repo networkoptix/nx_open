@@ -26,12 +26,13 @@ nx_configure_directory(
 
 set(apidoctool_jar "${APIDOCTOOL_PATH}/apidoctool.jar")
 
-set(apidoctool_params 
+set(apidoctool_params
     "-DtemplateRegistrationCpp=/mediaserver_db/src/local_connection_factory.cpp"
+    "-DhandlerRegistrationCpp=/mediaserver_core/src/media_server_process.cpp"
 )
 
 execute_process(
-    COMMAND java -jar "${apidoctool_jar}" print-deps "${apidoctool_params}"
+    COMMAND java -jar "${apidoctool_jar}" print-deps ${apidoctool_params}
     RESULT_VARIABLE apidoctool_result
     OUTPUT_VARIABLE apidoctool_deps
 )
@@ -61,7 +62,7 @@ add_custom_command(
         -template-xml "${CMAKE_CURRENT_SOURCE_DIR}/api/api_template.xml"
         -output-xml "${CMAKE_CURRENT_BINARY_DIR}/api.xml"
         -output-json "${CMAKE_CURRENT_BINARY_DIR}/api.json"
-        "${apidoctool_params}"
+        ${apidoctool_params}
     COMMAND
         ${CMAKE_COMMAND} -E copy_if_different
             "${CMAKE_CURRENT_BINARY_DIR}/api.xml"
@@ -75,7 +76,7 @@ add_custom_command(
     COMMAND
         ${CMAKE_COMMAND} -E remove "${CMAKE_CURRENT_BINARY_DIR}/api.json"
 )
- 
+
 set_source_files_properties(
     "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.xml"
     "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.json"
@@ -103,11 +104,11 @@ nx_add_target(mediaserver_core LIBRARY
         Qt5::WebSockets
         appserver2
         mediaserver_db
-	nx_onvif 
-	nx_email 
-	cloud_db_client 
-	nx_update
-	nx_system_commands
+        nx_onvif
+        nx_email
+        cloud_db_client
+        nx_update
+        nx_system_commands
     PRIVATE_LIBS ${private_libs}
 )
 
