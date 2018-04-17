@@ -334,6 +334,11 @@ void AsyncHttpClient::setProxyVia(const SocketAddress& proxyEndpoint)
     m_delegate.setProxyVia(proxyEndpoint);
 }
 
+void AsyncHttpClient::setMaxNumberOfRedirects(int maxNumberOfRedirects)
+{
+    m_delegate.setMaxNumberOfRedirects(maxNumberOfRedirects);
+}
+
 void AsyncHttpClient::setDisablePrecalculatedAuthorization(bool val)
 {
     m_delegate.setDisablePrecalculatedAuthorization(val);

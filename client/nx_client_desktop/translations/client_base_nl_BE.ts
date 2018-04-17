@@ -2838,12 +2838,21 @@ to %1</source>
   <context>
     <name>QnCloudResultMessages</name>
     <message>
-      <source>Incorrect email or password</source>
-      <translation>Incorrecte email of wachtwoord</translation>
+      <source>Account not found</source>
+      <translation>Account niet gevonden</translation>
     </message>
     <message>
-      <source>Account is not activated. Please check your email and follow provided instructions</source>
-      <translation>Het account is niet geactiveerd. Controleer uw e-mail en volg de instructies</translation>
+      <source>Account is not activated.</source>
+      <translation>Account is niet geactiveerd.</translation>
+    </message>
+    <message>
+      <source>Please log in to %1 and follow the provided instructions.</source>
+      <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
+      <translation>Meld u aan bij %1 en volg de instructies.</translation>
+    </message>
+    <message>
+      <source>Invalid password</source>
+      <translation>Ongeldig wachtwoord</translation>
     </message>
   </context>
   <context>
@@ -3179,6 +3188,10 @@ to %1</source>
     <message>
       <source>You can create a backup for System configurations that can be restored in case of failure.</source>
       <translation>U kunt een backup maken voor de systeemconfiguraties die kunnen worden hersteld bij storingen.</translation>
+    </message>
+    <message>
+      <source>Database Backup Files</source>
+      <translation>Database Backup Bestanden</translation>
     </message>
   </context>
   <context>
@@ -4202,10 +4215,6 @@ to %1</source>
       <translation>Open Licentiebestand</translation>
     </message>
     <message>
-      <source>All files (*.*)</source>
-      <translation>Alle bestanden (*.*)</translation>
-    </message>
-    <message>
       <source>Failed to open file</source>
       <translation>Kan het bestand niet openen</translation>
     </message>
@@ -4216,6 +4225,10 @@ to %1</source>
     <message>
       <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
       <translation>Stuur alsjeblieft een e-mail met de licentiecode en het Hardware-Id dat is verstrekt aan %1 om een ​​activatie bestand te verkrijgen.</translation>
+    </message>
+    <message>
+      <source>All files</source>
+      <translation>Alle bestanden</translation>
     </message>
   </context>
   <context>
@@ -5629,10 +5642,6 @@ to %1</source>
       <translation>Selecteer Update bestand...</translation>
     </message>
     <message>
-      <source>Update Files (*.zip)</source>
-      <translation>Updatebestanden (*.zip)</translation>
-    </message>
-    <message>
       <source>Release notes</source>
       <translation>Versiewijzigingen</translation>
     </message>
@@ -5815,6 +5824,10 @@ to %1</source>
       <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
       <translation>Incompatibele %1 versie. Voor het updaten eerst de verbinding verbreken vanaf %1.</translation>
+    </message>
+    <message>
+      <source>Update Files</source>
+      <translation>Bestanden bijwerken</translation>
     </message>
   </context>
   <context>

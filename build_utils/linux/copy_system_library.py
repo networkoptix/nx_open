@@ -58,21 +58,27 @@ def find_library(lib, lib_dirs):
     return None
 
 
-def copy_library(file_name, target_dir):
+def copy_library(file_name, target_dir, list_files=False):
     required_name = os.path.basename(file_name)
 
     real_file = os.path.realpath(file_name)
     real_basename = os.path.basename(real_file)
 
     target_file_name = os.path.join(target_dir, real_basename)
-    print("Copying {} -> {}".format(real_file, target_file_name))
+    if list_files:
+        print(target_file_name)
+    else:
+        print("Copying {} -> {}".format(real_file, target_file_name))
     if os.path.exists(target_file_name):
         os.remove(target_file_name)
     shutil.copy2(real_file, target_file_name)
 
     if required_name != real_basename:
         target_symlink_name = os.path.join(target_dir, required_name)
-        print("Symlink {} -> {}".format(real_basename, target_symlink_name))
+        if list_files:
+            print(target_symlink_name)
+        else:
+            print("Symlink {} -> {}".format(real_basename, target_symlink_name))
         if os.path.exists(target_symlink_name):
             os.remove(target_symlink_name)
         os.symlink(real_basename, target_symlink_name)
@@ -86,6 +92,7 @@ def main():
     parser.add_argument("-L", "--lib-dir", dest="lib_dirs", action="append", default=[],
         help="Additional library directory")
     parser.add_argument("-lf", "--link-flags", help="Link flags")
+    parser.add_argument("-l", "--list", action="store_true", help="List created files")
     parser.add_argument("libs", nargs="+", help="Libraries to copy")
 
     args = parser.parse_args()
@@ -115,7 +122,7 @@ def main():
         libs.append(file_name)
 
     for lib in libs:
-        copy_library(lib, args.dest_dir)
+        copy_library(lib, args.dest_dir, list_files=args.list)
 
 
 if __name__ == "__main__":

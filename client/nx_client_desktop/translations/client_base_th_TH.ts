@@ -2806,12 +2806,21 @@ to %1</source>
   <context>
     <name>QnCloudResultMessages</name>
     <message>
-      <source>Incorrect email or password</source>
-      <translation>อีเมลหรือรหัสผ่านไม่ถูกต้อง</translation>
+      <source>Account not found</source>
+      <translation type="unfinished">Account not found</translation>
     </message>
     <message>
-      <source>Account is not activated. Please check your email and follow provided instructions</source>
-      <translation>บัญชีไม่ได้เปิดใช้งาน โปรดตรวจสอบอีเมลของคุณและทำตามคำแนะนำที่ระบุไว้</translation>
+      <source>Account is not activated.</source>
+      <translation type="unfinished">Account is not activated.</translation>
+    </message>
+    <message>
+      <source>Please log in to %1 and follow the provided instructions.</source>
+      <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
+      <translation type="unfinished">Please log in to %1 and follow the provided instructions.</translation>
+    </message>
+    <message>
+      <source>Invalid password</source>
+      <translation type="unfinished">Invalid password</translation>
     </message>
   </context>
   <context>
@@ -3147,6 +3156,10 @@ to %1</source>
     <message>
       <source>You can create a backup for System configurations that can be restored in case of failure.</source>
       <translation>คุณสามารถสร้างการสำรองข้อมูลสำหรับการกำหนดค่าระบบที่สามารถเรียกคืนได้ในกรณีของความล้มเหลว.</translation>
+    </message>
+    <message>
+      <source>Database Backup Files</source>
+      <translation type="unfinished">Database Backup Files</translation>
     </message>
   </context>
   <context>
@@ -4153,10 +4166,6 @@ to %1</source>
       <translation>เปิดใช้งานใบอนุญาต</translation>
     </message>
     <message>
-      <source>All files (*.*)</source>
-      <translation>ทุกไฟล์ (*.*)</translation>
-    </message>
-    <message>
       <source>Failed to open file</source>
       <translation>ไม่สามารถเปิดไฟล์นี้</translation>
     </message>
@@ -4167,6 +4176,10 @@ to %1</source>
     <message>
       <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
       <translation>โปรดส่ง Id คีย์ใบอนุญาตและฮาร์ดแวร์ให้กับ %1 เพื่อรับไฟล์ Activation Key</translation>
+    </message>
+    <message>
+      <source>All files</source>
+      <translation type="unfinished">All files</translation>
     </message>
   </context>
   <context>
@@ -5561,10 +5574,6 @@ to %1</source>
       <translation>เลือกไฟล์อัพเดต...</translation>
     </message>
     <message>
-      <source>Update Files (*.zip)</source>
-      <translation>ไฟล์อัพเดต (*.zip)</translation>
-    </message>
-    <message>
       <source>Release notes</source>
       <translation>หมายเหตุการเผยแพร่</translation>
     </message>
@@ -5746,6 +5755,10 @@ to %1</source>
       <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
       <translation>อินสแตนซ์ %1 ที่ไม่สามารถใช้ร่วมกันได้ ในการยกเลิกการเชื่อมต่อระบบจาก %1 ก่อน</translation>
+    </message>
+    <message>
+      <source>Update Files</source>
+      <translation type="unfinished">Update Files</translation>
     </message>
   </context>
   <context>

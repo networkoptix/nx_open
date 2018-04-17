@@ -66,7 +66,7 @@ protected:
                 NX_LOGX(lm("Error performing %1 request to connection_mediator. %2").
                     arg(network::stun::extension::methods::toString(method)).
                     arg(SystemError::toString(code)),
-                    cl_logDEBUG1);
+                    cl_logDEBUG2);
                 return completionHandler(
                     std::move(message.transportHeader),
                     ResultCode::networkError,
@@ -81,7 +81,7 @@ protected:
 
             if (const auto error = message.hasError(code))
             {
-                NX_LOGX(*error, cl_logDEBUG1);
+                NX_LOGX(*error, cl_logDEBUG2);
                 //TODO #ak get detailed error from response
                 return completionHandler(
                     std::move(message.transportHeader),
@@ -94,7 +94,7 @@ protected:
             {
                 NX_LOGX(lm("Failed to parse %1 response: %2").
                     arg(network::stun::extension::methods::toString(method)).
-                    arg(responseData.errorText()), cl_logDEBUG1);
+                    arg(responseData.errorText()), cl_logDEBUG2);
                 return completionHandler(
                     std::move(message.transportHeader),
                     ResultCode::responseParseError,
@@ -144,7 +144,7 @@ protected:
             {
                 NX_LOGX(lm("Error performing %1 request to connection_mediator. %2").
                     arg(network::stun::extension::methods::toString(method)).
-                    arg(SystemError::toString(code)), cl_logDEBUG1);
+                    arg(SystemError::toString(code)), cl_logDEBUG2);
                 return completionHandler(std::move(message.transportHeader), ResultCode::networkError);
             }
 
@@ -156,7 +156,7 @@ protected:
 
             if (const auto error = message.hasError(code))
             {
-                NX_LOGX(*error, cl_logDEBUG1);
+                NX_LOGX(*error, cl_logDEBUG2);
                 //TODO #ak get detailed error from response
                 return completionHandler(
                     std::move(message.transportHeader),

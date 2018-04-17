@@ -2806,12 +2806,21 @@ to %1</source>
   <context>
     <name>QnCloudResultMessages</name>
     <message>
-      <source>Incorrect email or password</source>
-      <translation>이메일 또는 패스워드가 잘못 되었습니다</translation>
+      <source>Account not found</source>
+      <translation type="unfinished">Account not found</translation>
     </message>
     <message>
-      <source>Account is not activated. Please check your email and follow provided instructions</source>
-      <translation>계정이 활성화 되었 있지 않습니다. 이메일을 확인하고 제공된 지침을 따르십시오.</translation>
+      <source>Account is not activated.</source>
+      <translation type="unfinished">Account is not activated.</translation>
+    </message>
+    <message>
+      <source>Please log in to %1 and follow the provided instructions.</source>
+      <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
+      <translation type="unfinished">Please log in to %1 and follow the provided instructions.</translation>
+    </message>
+    <message>
+      <source>Invalid password</source>
+      <translation type="unfinished">Invalid password</translation>
     </message>
   </context>
   <context>
@@ -3147,6 +3156,10 @@ to %1</source>
     <message>
       <source>You can create a backup for System configurations that can be restored in case of failure.</source>
       <translation>오류가 발생할 경우 복원할 수 있는 시스템 구성에 대 한 백업을 만들 수 있습니다.</translation>
+    </message>
+    <message>
+      <source>Database Backup Files</source>
+      <translation type="unfinished">Database Backup Files</translation>
     </message>
   </context>
   <context>
@@ -4153,10 +4166,6 @@ to %1</source>
       <translation>인증키 파일 열기</translation>
     </message>
     <message>
-      <source>All files (*.*)</source>
-      <translation>모든 파일형식</translation>
-    </message>
-    <message>
       <source>Failed to open file</source>
       <translation>파일 열기 실패!</translation>
     </message>
@@ -4167,6 +4176,10 @@ to %1</source>
     <message>
       <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
       <translation>활성화 키 파일을 얻으려면 라이센스 키와 %1에 제공된 하드웨어 Id를 보내주십시오.</translation>
+    </message>
+    <message>
+      <source>All files</source>
+      <translation type="unfinished">All files</translation>
     </message>
   </context>
   <context>
@@ -5561,10 +5574,6 @@ to %1</source>
       <translation>업데이트 파일 선택...</translation>
     </message>
     <message>
-      <source>Update Files (*.zip)</source>
-      <translation>업데이트 파일 (*.zip)</translation>
-    </message>
-    <message>
       <source>Release notes</source>
       <translation>업데이트 내용</translation>
     </message>
@@ -5746,6 +5755,10 @@ to %1</source>
       <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
       <translation>Incompatible %1 instance. To update disconnect System from %1 first.</translation>
+    </message>
+    <message>
+      <source>Update Files</source>
+      <translation type="unfinished">Update Files</translation>
     </message>
   </context>
   <context>

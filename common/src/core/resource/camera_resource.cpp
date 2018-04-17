@@ -70,7 +70,7 @@ bool QnVirtualCameraResource::isForcedAudioSupported() const {
 
 void QnVirtualCameraResource::forceEnableAudio()
 {
-	if (isForcedAudioSupported())
+    if (isForcedAudioSupported())
         return;
     setProperty(Qn::FORCED_IS_AUDIO_SUPPORTED_PARAM_NAME, 1);
     saveParams();

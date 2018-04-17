@@ -1123,13 +1123,13 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation type="unfinished">File name &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
+      <translation>Tên tệp &quot;%1&quot; được dành riêng cho hệ điều hành. Hãy thử lại với tên khác.</translation>
     </message>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
       <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
-      <translation type="unfinished">
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
+      <translation>
+        <numerusform>Tên tệp không được chứa các ký tự dự sau:</numerusform>
       </translation>
     </message>
   </context>
@@ -2807,12 +2807,21 @@ to %1</source>
   <context>
     <name>QnCloudResultMessages</name>
     <message>
-      <source>Incorrect email or password</source>
-      <translation>Email hoặc mật khẩu không chính xác</translation>
+      <source>Account not found</source>
+      <translation type="unfinished">Account not found</translation>
     </message>
     <message>
-      <source>Account is not activated. Please check your email and follow provided instructions</source>
-      <translation>Đã kích hoạt tài khoản. Vui lòng kiểm tra email của bạn và làm theo các bước như hướng dẫn</translation>
+      <source>Account is not activated.</source>
+      <translation type="unfinished">Account is not activated.</translation>
+    </message>
+    <message>
+      <source>Please log in to %1 and follow the provided instructions.</source>
+      <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
+      <translation type="unfinished">Please log in to %1 and follow the provided instructions.</translation>
+    </message>
+    <message>
+      <source>Invalid password</source>
+      <translation type="unfinished">Invalid password</translation>
     </message>
   </context>
   <context>
@@ -3148,6 +3157,10 @@ to %1</source>
     <message>
       <source>You can create a backup for System configurations that can be restored in case of failure.</source>
       <translation>Bạn có thể tạo một bản sao lưu cho cấu hình Hệ thống để khôi phục trong trường hợp lỗi.</translation>
+    </message>
+    <message>
+      <source>Database Backup Files</source>
+      <translation type="unfinished">Database Backup Files</translation>
     </message>
   </context>
   <context>
@@ -4154,10 +4167,6 @@ to %1</source>
       <translation>Phép mở tài liệu lưu trữ</translation>
     </message>
     <message>
-      <source>All files (*.*)</source>
-      <translation>Tất cả các file(*.*)</translation>
-    </message>
-    <message>
       <source>Failed to open file</source>
       <translation>Không thể mở tập tin</translation>
     </message>
@@ -4168,6 +4177,10 @@ to %1</source>
     <message>
       <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
       <translation>Vui lòng gửi email với key và Id phần cứng %1 đã kích hoạt.</translation>
+    </message>
+    <message>
+      <source>All files</source>
+      <translation type="unfinished">All files</translation>
     </message>
   </context>
   <context>
@@ -5562,10 +5575,6 @@ to %1</source>
       <translation>Chọn tập tin cập nhật...</translation>
     </message>
     <message>
-      <source>Update Files (*.zip)</source>
-      <translation>Cập nhật các tập tin (*.zip)</translation>
-    </message>
-    <message>
       <source>Release notes</source>
       <translation>Ghi chú Phát hành</translation>
     </message>
@@ -5747,6 +5756,10 @@ to %1</source>
       <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
       <translation>Trường hợp không tương thích %1. Để cập nhật hay ngắt kêt nối hệ thống %1 trước.</translation>
+    </message>
+    <message>
+      <source>Update Files</source>
+      <translation type="unfinished">Update Files</translation>
     </message>
   </context>
   <context>
@@ -6075,7 +6088,7 @@ to %1</source>
     </message>
     <message>
       <source>NOT ENOUGH LICENSES</source>
-      <translation type="unfinished">NOT ENOUGH LICENSES</translation>
+      <translation>KHÔNG CẤP BẢN QUYỀN</translation>
     </message>
   </context>
   <context>
@@ -6781,7 +6794,7 @@ to %1</source>
     <message>
       <source>%1 user</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user</translation>
+      <translation>%1 người dùng</translation>
     </message>
   </context>
   <context>

@@ -112,7 +112,7 @@ CameraDiagnostics::Result CLServerPushStreamReader::openStreamWithErrChecking(bo
 
         setNeedKeyData();
         if (isInitialized)
-		{
+        {
             mFramesLost++;
             m_stat[0].onData(0, false);
             m_stat[0].onEvent(CL_STAT_FRAME_LOST);

@@ -2841,12 +2841,21 @@ a %1</translation>
   <context>
     <name>QnCloudResultMessages</name>
     <message>
-      <source>Incorrect email or password</source>
-      <translation>Correo electrónico o contraseña incorrecta</translation>
+      <source>Account not found</source>
+      <translation type="unfinished">Account not found</translation>
     </message>
     <message>
-      <source>Account is not activated. Please check your email and follow provided instructions</source>
-      <translation>La cuenta no está activada Por favor revise su correo electrónico y siga las instrucciones proporcionadas</translation>
+      <source>Account is not activated.</source>
+      <translation type="unfinished">Account is not activated.</translation>
+    </message>
+    <message>
+      <source>Please log in to %1 and follow the provided instructions.</source>
+      <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
+      <translation type="unfinished">Please log in to %1 and follow the provided instructions.</translation>
+    </message>
+    <message>
+      <source>Invalid password</source>
+      <translation type="unfinished">Invalid password</translation>
     </message>
   </context>
   <context>
@@ -3182,6 +3191,10 @@ a %1</translation>
     <message>
       <source>You can create a backup for System configurations that can be restored in case of failure.</source>
       <translation>Puede crear una copia de seguridad de las configuraciones del sistema que pueden ser restaurados en caso de fallo.</translation>
+    </message>
+    <message>
+      <source>Database Backup Files</source>
+      <translation type="unfinished">Database Backup Files</translation>
     </message>
   </context>
   <context>
@@ -4205,10 +4218,6 @@ a %1</translation>
       <translation>Abrir el archivo de licencia</translation>
     </message>
     <message>
-      <source>All files (*.*)</source>
-      <translation>Todos los archivos (*. *)</translation>
-    </message>
-    <message>
       <source>Failed to open file</source>
       <translation>Fallo al abrir el archivo</translation>
     </message>
@@ -4219,6 +4228,10 @@ a %1</translation>
     <message>
       <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
       <translation>Envíe la Clave de Licencia y el Id de hardware proporcionados a %1 para obtener un archivo de Clave de Activación.</translation>
+    </message>
+    <message>
+      <source>All files</source>
+      <translation type="unfinished">All files</translation>
     </message>
   </context>
   <context>
@@ -5632,10 +5645,6 @@ a %1</translation>
       <translation>Seleccione Archivo de actualización...</translation>
     </message>
     <message>
-      <source>Update Files (*.zip)</source>
-      <translation>Actualizar los archivos (* zip)</translation>
-    </message>
-    <message>
       <source>Release notes</source>
       <translation>Notas de la versión</translation>
     </message>
@@ -5818,6 +5827,10 @@ a %1</translation>
       <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
       <translation>Instancia %1 incompatible. Para actualizar, desconecte primero el sistema de %1.</translation>
+    </message>
+    <message>
+      <source>Update Files</source>
+      <translation type="unfinished">Update Files</translation>
     </message>
   </context>
   <context>

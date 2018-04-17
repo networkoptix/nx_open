@@ -109,7 +109,6 @@ private:
     nx::mediaserver::LicenseWatcher* m_licenseWatcher = nullptr;
     nx::mediaserver::metadata::ManagerPool* m_metadataManagerPool = nullptr;
     nx::mediaserver::metadata::EventRuleWatcher* m_metadataRuleWatcher = nullptr;
-    QThread* m_metadataManagerPoolThread = nullptr;
     nx::mediaserver::resource::SharedContextPool* m_sharedContextPool = nullptr;
     AbstractArchiveIntegrityWatcher* m_archiveIntegrityWatcher;
     mutable boost::optional<std::chrono::milliseconds> m_lastRunningTimeBeforeRestart;

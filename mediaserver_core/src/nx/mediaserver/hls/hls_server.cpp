@@ -146,6 +146,7 @@ void HttpLiveStreamingProcessor::prepareResponse(
     response->headers.emplace("Date", currentTimeInHttpFormat);
     response->headers.emplace(nx::network::http::header::Server::NAME, nx::network::http::serverString());
     response->headers.emplace("Cache-Control", "no-cache");
+    response->headers.emplace("Access-Control-Allow-Origin", "*");
 
     if (request.requestLine.version == nx::network::http::http_1_1)
     {

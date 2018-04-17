@@ -1122,14 +1122,14 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation type="unfinished">File name &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
+      <translation>Bestandsnaam &quot;%1&quot; is gereserveerd door het besturingssysteem. Probeer alstublieft een andere naam.</translation>
     </message>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
       <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
-      <translation type="unfinished">
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
+      <translation>
+        <numerusform>Bestandsnaam mag niet de volgende gereserveerde tekens bevatten:</numerusform>
+        <numerusform>Bestandsnaam mag niet de volgende gereserveerde tekens bevatten:</numerusform>
       </translation>
     </message>
   </context>
@@ -2838,12 +2838,21 @@ to %1</source>
   <context>
     <name>QnCloudResultMessages</name>
     <message>
-      <source>Incorrect email or password</source>
-      <translation>Incorrecte email of wachtwoord</translation>
+      <source>Account not found</source>
+      <translation>Account niet gevonden</translation>
     </message>
     <message>
-      <source>Account is not activated. Please check your email and follow provided instructions</source>
-      <translation>Het account is niet geactiveerd. Controleer uw e-mail en volg de instructies</translation>
+      <source>Account is not activated.</source>
+      <translation>Account is niet geactiveerd.</translation>
+    </message>
+    <message>
+      <source>Please log in to %1 and follow the provided instructions.</source>
+      <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
+      <translation>Meld u aan bij %1 en volg de instructies.</translation>
+    </message>
+    <message>
+      <source>Invalid password</source>
+      <translation>Ongeldig wachtwoord</translation>
     </message>
   </context>
   <context>
@@ -3180,6 +3189,10 @@ to %1</source>
       <source>You can create a backup for System configurations that can be restored in case of failure.</source>
       <translation>U kunt een backup maken voor de systeemconfiguraties die kunnen worden hersteld bij storingen.</translation>
     </message>
+    <message>
+      <source>Database Backup Files</source>
+      <translation>Database Backup Bestanden</translation>
+    </message>
   </context>
   <context>
     <name>QnDefaultPasswordAlertBar</name>
@@ -3313,7 +3326,7 @@ to %1</source>
     <message>
       <source>All %1 users will be deleted.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">All %1 users will be deleted.</translation>
+      <translation>Alle %1 gebruikers worden verwijderd.</translation>
     </message>
     <message>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
@@ -4202,10 +4215,6 @@ to %1</source>
       <translation>Open Licentiebestand</translation>
     </message>
     <message>
-      <source>All files (*.*)</source>
-      <translation>Alle bestanden (*.*)</translation>
-    </message>
-    <message>
       <source>Failed to open file</source>
       <translation>Kan het bestand niet openen</translation>
     </message>
@@ -4216,6 +4225,10 @@ to %1</source>
     <message>
       <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
       <translation>Stuurt u alstublieft een e-mail met de licentiecode en het bovenstaande Hardware Id aan %1 en u ontvangt zo spoedig mogelijk een ​​activatiebestand waarmee u de licenties kunt valideren.</translation>
+    </message>
+    <message>
+      <source>All files</source>
+      <translation>Alle bestanden</translation>
     </message>
   </context>
   <context>
@@ -5629,10 +5642,6 @@ to %1</source>
       <translation>Selecteer Update bestand...</translation>
     </message>
     <message>
-      <source>Update Files (*.zip)</source>
-      <translation>Updatebestanden (*.zip)</translation>
-    </message>
-    <message>
       <source>Release notes</source>
       <translation>Versiewijzigingen</translation>
     </message>
@@ -5815,6 +5824,10 @@ to %1</source>
       <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
       <translation>Incompatibele %1 versie. Voor het updaten eerst de verbinding verbreken vanaf %1.</translation>
+    </message>
+    <message>
+      <source>Update Files</source>
+      <translation>Bestanden bijwerken</translation>
     </message>
   </context>
   <context>
@@ -6856,7 +6869,7 @@ to %1</source>
     <message>
       <source>%1 user</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user</translation>
+      <translation>%1 gebruiker</translation>
     </message>
   </context>
   <context>
@@ -6902,7 +6915,7 @@ to %1</source>
     <name>QnUserManagementWidget</name>
     <message>
       <source>Edit</source>
-      <translation>Aanpassen</translation>
+      <translation>Bewerken</translation>
     </message>
   </context>
   <context>
@@ -7093,7 +7106,7 @@ to %1</source>
     <message>
       <source>%1 user with specified email already exists.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user with specified email already exists.</translation>
+      <translation>%1 gebruiker met opgegeven e-mailadres bestaat al.</translation>
     </message>
   </context>
   <context>
@@ -7338,7 +7351,7 @@ to %1</source>
     <message>
       <source>%1 Systems cannot be merged</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 Systems cannot be merged</translation>
+      <translation>%1 Systemen kunnen niet worden samengevoegd</translation>
     </message>
   </context>
   <context>

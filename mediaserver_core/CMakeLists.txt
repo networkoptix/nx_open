@@ -26,7 +26,9 @@ nx_configure_directory(
 
 set(apidoctool_jar "${APIDOCTOOL_PATH}/apidoctool.jar")
 
-set(apidoctool_params "-Dec2RegistrationCpp=/mediaserver_db/src/local_connection_factory.cpp")
+set(apidoctool_params 
+    "-DtemplateRegistrationCpp=/mediaserver_db/src/local_connection_factory.cpp"
+)
 
 execute_process(
     COMMAND java -jar "${apidoctool_jar}" print-deps "${apidoctool_params}"
@@ -35,10 +37,10 @@ execute_process(
 )
 
 if(NOT apidoctool_result EQUAL 0)
-    message(FATAL ERROR "Cannot get dependencies list from apidoctool.")
+    message(FATAL_ERROR "Cannot get dependencies list from apidoctool.")
 endif()
 
-separate_arguments(apidoctool_deps)
+nx_split_string(apidoctool_deps "${apidoctool_deps}")
 set(apidoctool_deps_absolute)
 foreach(dependency ${apidoctool_deps})
     list(APPEND apidoctool_deps_absolute "${PROJECT_SOURCE_DIR}/${dependency}")
