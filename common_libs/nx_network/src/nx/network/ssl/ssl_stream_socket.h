@@ -64,11 +64,7 @@ public:
         const nx::Buffer& buffer,
         IoCompletionHandler handler) override;
 
-    virtual void cancelIOAsync(
-        nx::network::aio::EventType eventType,
-        nx::utils::MoveOnlyFunc<void()> handler) override;
-
-    virtual void cancelIOSync(nx::network::aio::EventType eventType) override;
+    virtual void cancelIoInAioThread(nx::network::aio::EventType eventType) override;
 
 private:
     std::unique_ptr<aio::StreamTransformingAsyncChannel> m_asyncTransformingChannel;

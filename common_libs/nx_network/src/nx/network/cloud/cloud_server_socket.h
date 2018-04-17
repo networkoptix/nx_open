@@ -64,8 +64,7 @@ public:
     void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
     virtual void acceptAsync(AcceptCompletionHandler handler) override;
-    virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) override;
-    virtual void cancelIOSync() override;
+    virtual void cancelIoInAioThread() override;
 
     virtual bool isInSelfAioThread() const override;
 
@@ -106,7 +105,6 @@ protected:
     void onNewConnectionHasBeenAccepted(
         SystemError::ErrorCode sysErrorCode,
         std::unique_ptr<AbstractStreamSocket> socket);
-    void cancelAccept();
 
     void issueRegistrationRequest();
     void onConnectionRequested(hpm::api::ConnectionRequestedEvent event);

@@ -41,10 +41,7 @@ public:
         std::chrono::milliseconds timeout) override;
 
     virtual SocketAddress getForeignAddress() const override;
-    virtual void cancelIOAsync(
-        aio::EventType eventType,
-        nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler) override;
-    virtual void cancelIOSync(aio::EventType eventType) override;
+    virtual void cancelIoInAioThread(aio::EventType eventType) override;
 
     virtual bool setNoDelay( bool value ) override;
     virtual bool getNoDelay( bool* value ) const override;

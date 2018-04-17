@@ -1,5 +1,7 @@
 #include "abstract_socket.h"
 
+#include <future>
+
 #include <nx/utils/thread/mutex_lock_analyzer.h>
 #include <nx/utils/unused.h>
 
@@ -88,6 +90,37 @@ void AbstractCommunicatingSocket::pleaseStopSync(bool checkForLocks)
     cancelIOSync(nx::network::aio::EventType::etNone);
 }
 
+void AbstractCommunicatingSocket::cancelIOAsync(
+    nx::network::aio::EventType eventType,
+    nx::utils::MoveOnlyFunc<void()> handler)
+{
+    this->post(
+        [this, eventType, handler = std::move(handler)]()
+        {
+            cancelIoInAioThread(eventType);
+            handler();
+        });
+}
+
+void AbstractCommunicatingSocket::cancelIOSync(nx::network::aio::EventType eventType)
+{
+    if (isInSelfAioThread())
+    {
+        cancelIoInAioThread(eventType);
+    }
+    else
+    {
+        std::promise<void> promise;
+        post(
+            [this, eventType, &promise]()
+            {
+                cancelIoInAioThread(eventType);
+                promise.set_value();
+            });
+        promise.get_future().wait();
+    }
+}
+
 QString AbstractCommunicatingSocket::idForToStringFromPtr() const
 {
     return lm("%1->%2").args(getLocalAddress(), getForeignAddress());
@@ -117,10 +150,42 @@ void AbstractCommunicatingSocket::readAsyncAtLeastImpl(
 
 //-------------------------------------------------------------------------------------------------
 
+void AbstractStreamServerSocket::cancelIOAsync(
+    nx::utils::MoveOnlyFunc<void()> handler)
+{
+    post(
+        [this, handler = std::move(handler)]()
+        {
+            cancelIoInAioThread();
+            handler();
+        });
+}
+
+void AbstractStreamServerSocket::cancelIOSync()
+{
+    if (isInSelfAioThread())
+    {
+        cancelIoInAioThread();
+    }
+    else
+    {
+        std::promise<void> promise;
+        post(
+            [this, &promise]()
+            {
+                cancelIoInAioThread();
+                promise.set_value();
+            });
+        promise.get_future().wait();
+    }
+}
+
 QString AbstractStreamServerSocket::idForToStringFromPtr() const
 {
     return lm("%1").args(getLocalAddress());
 }
+
+//-------------------------------------------------------------------------------------------------
 
 bool AbstractDatagramSocket::setDestAddr(
     const QString& foreignAddress,

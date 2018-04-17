@@ -74,14 +74,9 @@ void StreamServerSocketDelegate::acceptAsync(AcceptCompletionHandler handler)
     return m_target->acceptAsync(std::move(handler));
 }
 
-void StreamServerSocketDelegate::cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler)
+void StreamServerSocketDelegate::cancelIoInAioThread()
 {
-    return m_target->cancelIOAsync(std::move(handler));
-}
-
-void StreamServerSocketDelegate::cancelIOSync()
-{
-    return m_target->cancelIOSync();
+    return m_target->cancelIoInAioThread();
 }
 
 } // namespace network

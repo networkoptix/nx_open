@@ -144,36 +144,10 @@ void StreamSocket::sendAsync(
     m_asyncTransformingChannel->sendAsync(buffer, std::move(handler));
 }
 
-void StreamSocket::cancelIOAsync(
-    nx::network::aio::EventType eventType,
-    nx::utils::MoveOnlyFunc<void()> handler)
+void StreamSocket::cancelIoInAioThread(nx::network::aio::EventType eventType)
 {
-    post(
-        [this, eventType, handler = std::move(handler)]()
-        {
-            cancelIOSync(eventType);
-            handler();
-        });
-}
-
-void StreamSocket::cancelIOSync(nx::network::aio::EventType eventType)
-{
-    if (isInSelfAioThread())
-    {
-        m_delegatee->cancelIOSync(eventType);
-        m_asyncTransformingChannel->cancelIOSync(eventType);
-    }
-    else
-    {
-        std::promise<void> cancelled;
-        post(
-            [this, eventType, &cancelled]()
-            {
-                cancelIOSync(eventType);
-                cancelled.set_value();
-            });
-        cancelled.get_future().wait();
-    }
+    m_delegatee->cancelIOSync(eventType);
+    m_asyncTransformingChannel->cancelIOSync(eventType);
 }
 
 void StreamSocket::stopWhileInAioThread()

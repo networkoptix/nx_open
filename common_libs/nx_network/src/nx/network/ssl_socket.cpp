@@ -1490,31 +1490,11 @@ static void cancelIoFromAioThread(SslSocketPrivate* socket, aio::EventType event
         socket->asyncSslHelper->clear();
 }
 
-void SslSocket::cancelIOAsync(aio::EventType eventType, utils::MoveOnlyFunc<void()> handler)
+void SslSocket::cancelIoInAioThread(nx::network::aio::EventType eventType)
 {
     Q_D(SslSocket);
-    d->wrappedSocket->cancelIOAsync(
-        eventType,
-        [d, eventType, handler = move(handler)]()
-        {
-            cancelIoFromAioThread(d, eventType);
-            handler();
-        });
-}
-
-void SslSocket::cancelIOSync(nx::network::aio::EventType eventType)
-{
-    Q_D(SslSocket);
-    if (isInSelfAioThread())
-    {
-        d->wrappedSocket->cancelIOSync(eventType);
-        cancelIoFromAioThread(d, eventType);
-    }
-    else
-    {
-        utils::BarrierWaiter waiter;
-        cancelIOAsync(eventType, waiter.fork());
-    }
+    d->wrappedSocket->cancelIOSync(eventType);
+    cancelIoFromAioThread(d, eventType);
 }
 
 bool SslSocket::setNonBlockingMode(bool value)
@@ -1547,9 +1527,11 @@ bool SslSocket::shutdown()
     }
 
     utils::promise<void> promise;
-    d->wrappedSocket->pleaseStop(
+    d->wrappedSocket->dispatch(
         [this, d, &promise]()
         {
+            d->wrappedSocket->pleaseStopSync();
+
             NX_VERBOSE(this, "Shutdown: notify send");
             if (auto promisePtr = d->syncSendPromise.exchange(nullptr))
                 promisePtr->set_value({SystemError::interrupted, 0});
@@ -1787,15 +1769,13 @@ bool MixedSslSocket::setNonBlockingMode(bool val)
     return true;
 }
 
-void MixedSslSocket::cancelIOAsync(
-    nx::network::aio::EventType eventType,
-    nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler)
+void MixedSslSocket::cancelIoInAioThread(
+    nx::network::aio::EventType eventType)
 {
     Q_D(MixedSslSocket);
-    if (d->useSSL)
-        SslSocket::cancelIOAsync(eventType, std::move(cancellationDoneHandler));
-    else
-        d->wrappedSocket->cancelIOAsync(eventType, std::move(cancellationDoneHandler));
+
+    d->wrappedSocket->cancelIoInAioThread(eventType);
+    SslSocket::cancelIoInAioThread(eventType);
 }
 
 void MixedSslSocket::connectAsync(
@@ -1965,12 +1945,7 @@ void SslServerSocket::acceptAsync(AcceptCompletionHandler handler)
         std::bind(&SslServerSocket::connectionAccepted, this, _1, _2));
 }
 
-void SslServerSocket::cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler)
-{
-    m_delegateSocket->cancelIOAsync(std::move(handler));
-}
-
-void SslServerSocket::cancelIOSync()
+void SslServerSocket::cancelIoInAioThread()
 {
     m_delegateSocket->cancelIOSync();
 }

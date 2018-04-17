@@ -132,11 +132,6 @@ public:
     //  What's difference between foreign address with peer address
     virtual SocketAddress getForeignAddress() const override;
     virtual bool isConnected() const override;
-    //!Implementation of AbstractCommunicatingSocket::cancelAsyncIO
-    virtual void cancelIOAsync(
-        nx::network::aio::EventType eventType,
-        nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler) override;
-    virtual void cancelIOSync(nx::network::aio::EventType eventType) override;
 
     // AbstractStreamSocket ------ interface
     virtual bool setNoDelay(bool value) override;
@@ -158,6 +153,9 @@ public:
     virtual void registerTimer(
         std::chrono::milliseconds timeoutMillis,
         nx::utils::MoveOnlyFunc<void()> handler) override;
+
+protected:
+    virtual void cancelIoInAioThread(nx::network::aio::EventType eventType) override;
 
 private:
     bool connectToIp(
@@ -194,11 +192,12 @@ public:
     virtual bool listen(int queueLen = 128) override;
     virtual AbstractStreamSocket* accept() override;
     virtual void acceptAsync(AcceptCompletionHandler handler) override;
-    virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) override;
-    virtual void cancelIOSync() override;
 
     /** This method is for use by AsyncServerSocketHelper only. It just calls system call accept */
     AbstractStreamSocket* systemAccept();
+
+protected:
+    virtual void cancelIoInAioThread() override;
 
 private:
     std::unique_ptr<aio::AsyncServerSocketHelper<UdtStreamServerSocket>> m_aioHelper;

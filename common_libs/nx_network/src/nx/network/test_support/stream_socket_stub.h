@@ -32,7 +32,7 @@ public:
     virtual bool setKeepAlive(boost::optional<KeepAliveOptions> info) override;
     virtual bool getKeepAlive(boost::optional<KeepAliveOptions>* result) const override;
 
-    virtual void cancelIOSync(nx::network::aio::EventType eventType) override;
+    virtual void cancelIoInAioThread(nx::network::aio::EventType eventType) override;
 
     QByteArray read();
     void setConnectionToClosedState();

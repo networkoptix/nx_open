@@ -63,8 +63,7 @@ public:
     virtual bool setKeepAlive(boost::optional< KeepAliveOptions > info) override;
     virtual bool getKeepAlive(boost::optional< KeepAliveOptions >* result) const override;
 
-    virtual void cancelIOAsync(aio::EventType eventType, utils::MoveOnlyFunc<void()> handler) override;
-    virtual void cancelIOSync(nx::network::aio::EventType eventType) override;
+    virtual void cancelIoInAioThread(nx::network::aio::EventType eventType) override;
 
     virtual bool setNonBlockingMode(bool val) override;
     virtual bool getNonBlockingMode(bool* val) const override;
@@ -137,9 +136,8 @@ public:
     virtual int send(const void* buffer, unsigned int bufferLen) override;
     virtual bool setNonBlockingMode(bool val) override;
 
-    virtual void cancelIOAsync(
-        nx::network::aio::EventType eventType,
-        nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler) override;
+    virtual void cancelIoInAioThread(
+        nx::network::aio::EventType eventType) override;
 
     virtual void connectAsync(
         const SocketAddress& addr,
@@ -176,8 +174,7 @@ public:
 
     virtual void acceptAsync(AcceptCompletionHandler handler) override;
 
-    virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) override;
-    virtual void cancelIOSync() override;
+    virtual void cancelIoInAioThread() override;
 
 private:
     const bool m_allowNonSecureConnect;

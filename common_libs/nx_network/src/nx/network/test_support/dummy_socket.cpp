@@ -134,14 +134,7 @@ SocketAddress DummySocket::getForeignAddress() const
     return m_remotePeerAddress;
 }
 
-void DummySocket::cancelIOAsync(
-    aio::EventType /*eventType*/,
-    nx::utils::MoveOnlyFunc< void() > cancellationDoneHandler)
-{
-    cancellationDoneHandler();
-}
-
-void DummySocket::cancelIOSync(aio::EventType /*eventType*/)
+void DummySocket::cancelIoInAioThread(aio::EventType /*eventType*/)
 {
 }
 
