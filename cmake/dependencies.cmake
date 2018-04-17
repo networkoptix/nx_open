@@ -92,7 +92,7 @@ function(copy_linux_cpp_runtime)
         message(FATAL_ERROR "Cannot copy C++ runtime libraries.")
     endif()
 
-    string(REPLACE "\n" ";" files "${output}")
+    nx_split_string(files "${output}")
     nx_store_known_files(${files})
 endfunction()
 

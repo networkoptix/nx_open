@@ -67,12 +67,12 @@ const qint64 kMaxLocalStorageSpaceLimit = 30ll * 1024 * 1024 * 1024; // 30 Gb
 const int kMaxSpaceLimitRatio = 10; // i.e. max space limit <= totalSpace / 10
 
 #if defined(Q_OS_WIN)
-QString getDevicePath(const QString& path)
+static QString getDevicePath(const QString& path)
 {
     return path;
 }
 
-QString sysDrivePath()
+static QString sysDrivePath()
 {
     static QString deviceString;
 
@@ -90,15 +90,20 @@ QString sysDrivePath()
 
 #elif defined(Q_OS_LINUX)
 
-QString sysDrivePath()
+static QString sysDrivePath()
 {
     static QString devicePath = qnServerModule->rootTool()->devicePath("/");
     return devicePath;
 }
 
+static QString getDevicePath(const QString& path)
+{
+    return qnServerModule->rootTool()->devicePath(path);
+}
+
 #else // Unsupported OS so far
 
-const QString& sysDrivePath()
+static const QString& sysDrivePath()
 {
     return QString();
 }
@@ -326,7 +331,7 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdateInternal()
 
     QString sysPath = sysDrivePath();
     if (!sysPath.isNull())
-        m_isSystem = rootTool()->devicePath(url).startsWith(sysPath);
+        m_isSystem = getDevicePath(url).startsWith(sysPath);
     else
         m_isSystem = false;
 

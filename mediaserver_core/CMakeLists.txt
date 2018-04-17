@@ -36,7 +36,7 @@ if(NOT apidoctool_result EQUAL 0)
     message(FATAL ERROR "Cannot get dependencies list from apidoctool.")
 endif()
 
-separate_arguments(apidoctool_deps)
+nx_split_string(apidoctool_deps "${apidoctool_deps}")
 set(apidoctool_deps_absolute)
 foreach(dependency ${apidoctool_deps})
     list(APPEND apidoctool_deps_absolute "${PROJECT_SOURCE_DIR}/${dependency}")

@@ -991,6 +991,11 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
     bool hasDualStreaming = false;
     const auto channel = getChannel();
 
+    const bool hasAudio = m_attributes.attribute<int>(
+        lit("Media/MaxAudioInput/%1").arg(channel)) > 0;
+
+    m_capabilities.hasAudio = hasAudio;
+
     if (isConnectedViaSunapi())
     {
         HanwhaRequestHelper helper(sharedContext());
@@ -1021,44 +1026,36 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
         }
 
         m_maxProfileCount = *maxProfileCount;
-        hasDualStreaming = m_maxProfileCount - fixedProfileCount > 1;
+        m_capabilities.hasDualStreaming = m_maxProfileCount - fixedProfileCount > 1;
 
         auto codecInfo = sharedContext()->videoCodecInfo();
         if (!codecInfo)
             return codecInfo.diagnostics;
 
         m_codecInfo = codecInfo.value;
+        initMediaStreamCapabilities();
 
         auto result = createNxProfiles();
         if (!result)
             return result;
+
+        if (isNvr())
+        {
+            result = setUpProfilePolicies(
+                profileByRole(Qn::ConnectionRole::CR_LiveVideo),
+                profileByRole(Qn::ConnectionRole::CR_SecondaryLiveVideo));
+
+            if (!result)
+                return result;
+        }
     }
     else
     {
         fetchExistingProfiles();
-        hasDualStreaming = (profileByRole(Qn::CR_SecondaryLiveVideo) != kHanwhaInvalidProfile);
-    }
+        m_capabilities.hasDualStreaming
+            = (profileByRole(Qn::CR_SecondaryLiveVideo) != kHanwhaInvalidProfile);
 
-    const bool hasAudio = m_attributes.attribute<int>(
-        lit("Media/MaxAudioInput/%1").arg(channel)) > 0;
-
-    m_capabilities.hasAudio = hasAudio;
-    m_capabilities.hasDualStreaming = hasDualStreaming;
-
-    initMediaStreamCapabilities();
-
-    if (isNvr() && isConnectedViaSunapi())
-    {
-        auto result = updateNvrChannelProfiles();
-        if (!result)
-            return result;
-
-        result = setUpProfilePolicies(
-            profileByRole(Qn::ConnectionRole::CR_LiveVideo),
-            profileByRole(Qn::ConnectionRole::CR_SecondaryLiveVideo));
-
-        if (!result)
-            return result;
+        initMediaStreamCapabilities();
     }
 
     return CameraDiagnostics::NoErrorResult();
@@ -1126,7 +1123,7 @@ CameraDiagnostics::Result HanwhaResource::initIo()
         HanwhaRequestHelper helper(sharedContext());
         helper.set(
             lit("eventsources/alarminput"),
-            {{lit("AlaramInput.%1.Enabled").arg(getChannel()), kHanwhaTrue}});
+            {{lit("AlarmInput.%1.Enable").arg(getChannel()), kHanwhaTrue}});
     }
 
     if (maxAlarmOutputs.is_initialized() && *maxAlarmOutputs > 0)
@@ -1680,14 +1677,27 @@ CameraDiagnostics::Result HanwhaResource::createProfile(
             lit("Create profile: output profile number is null"));
     }
 
-    HanwhaRequestHelper helper(sharedContext());
+    QnLiveStreamParams streamParameters;
+    const auto fps = role == Qn::ConnectionRole::CR_LiveVideo
+        ? kMaxPossibleFps
+        : QnSecurityCamResource::kDefaultSecondStreamFpsMedium;
+
+    streamParameters.codec = streamCodec(role);
+    streamParameters.fps = streamFrameRate(role, fps);
+    streamParameters.resolution = streamResolution(role);
+    streamParameters.quality = Qn::StreamQuality::QualityHigh;
+    streamParameters.bitrateKbps = streamBitrate(role, streamParameters);
+
+    const auto profileParameters = makeProfileParameters(
+        role,
+        streamParameters,
+        isAudioSupported(),
+        /*isNewProfile*/ true);
+
+    HanwhaRequestHelper helper(sharedContext(), bypassChannel());
     const auto response = helper.add(
         lit("media/videoprofile"),
-        {
-            {kHanwhaProfileNameProperty, nxProfileName(role)},
-            {kHanwhaEncodingTypeProperty, toHanwhaString(streamCodec(role))},
-            {kHanwhaChannelProperty, QString::number(getChannel())}
-        });
+        profileParameters);
 
     if (!response.isSuccessful())
     {
@@ -1744,51 +1754,6 @@ CameraDiagnostics::Result HanwhaResource::fetchPtzLimits(QnPtzLimits* outPtzLimi
 
     // TODO: #dmishin don't forget it
     outPtzLimits->maxPresetNumber;
-
-    return CameraDiagnostics::NoErrorResult();
-}
-
-CameraDiagnostics::Result HanwhaResource::updateNvrChannelProfiles()
-{
-    const bool isCorrectDevice = isNvr() && isConnectedViaSunapi();
-    NX_ASSERT(isCorrectDevice);
-    if (!isCorrectDevice)
-        return CameraDiagnostics::NoErrorResult();
-
-    static const std::map<Qn::ConnectionRole, int> fpsByRole = {
-        {Qn::ConnectionRole::CR_LiveVideo, kMaxPossibleFps},
-        {Qn::ConnectionRole::CR_SecondaryLiveVideo,
-            QnSecurityCamResource::kDefaultSecondStreamFpsMedium }
-    };
-
-    HanwhaRequestHelper helper(sharedContext(), getChannel());
-    for (const auto& entry: fpsByRole)
-    {
-        const auto role = entry.first;
-        const auto fps = entry.second;
-
-        QnLiveStreamParams streamParameters;
-
-        streamParameters.codec = streamCodec(role);
-        streamParameters.fps = streamFrameRate(role, fps);
-        streamParameters.resolution = streamResolution(role);
-        streamParameters.quality = Qn::StreamQuality::QualityHigh;
-        streamParameters.bitrateKbps = streamBitrate(role, streamParameters);
-
-        const auto profileParameters = makeProfileParameters(
-            role,
-            streamParameters,
-            isAudioSupported());
-
-        const auto response = helper.update(lit("media/videoprofile"), profileParameters);
-
-        if (!response.isSuccessful())
-        {
-            return CameraDiagnostics::RequestFailedResult(
-                response.requestUrl(),
-                lit("Can not update NVR channel profile"));
-        }
-    }
 
     return CameraDiagnostics::NoErrorResult();
 }
@@ -3010,10 +2975,14 @@ bool HanwhaResource::isConnectedViaSunapi() const
 
 HanwhaProfileParameters HanwhaResource::makeProfileParameters(
     Qn::ConnectionRole role,
-    const QnLiveStreamParams & parameters,
-    bool isAudioSupported) const
+    const QnLiveStreamParams& parameters,
+    bool isAudioSupported,
+    bool isNewProfile) const
 {
-    const auto profileNumber = profileByRole(role);
+    NX_ASSERT(isConnectedViaSunapi());
+    if (!isConnectedViaSunapi())
+        return {};
+
     const auto codec = streamCodec(role);
     const auto codecProfile = streamCodecProfile(codec, role);
     const auto resolution = streamResolution(role);
@@ -3031,15 +3000,17 @@ HanwhaProfileParameters HanwhaResource::makeProfileParameters(
     const bool isH26x = codec == AVCodecID::AV_CODEC_ID_H264
         || codec == AVCodecID::AV_CODEC_ID_HEVC;
 
-    const auto channel = isNvr() && isConnectedViaSunapi() ? 0 : getChannel();
-
     HanwhaProfileParameters result =
     {
         { kHanwhaChannelProperty, QString::number(getChannel()) },
-        { kHanwhaProfileNumberProperty, QString::number(profileNumber) },
         { kHanwhaEncodingTypeProperty, toHanwhaString(codec) },
         { kHanwhaResolutionProperty, toHanwhaString(resolution) }
     };
+
+    if (isNewProfile)
+        result.emplace(kHanwhaProfileNameProperty, nxProfileName(role));
+    else
+        result.emplace(kHanwhaProfileNumberProperty, QString::number(profileByRole(role)));
 
     if (isAudioSupported)
         result.emplace(kHanwhaAudioInputEnableProperty, toHanwhaString(isAudioEnabled()));

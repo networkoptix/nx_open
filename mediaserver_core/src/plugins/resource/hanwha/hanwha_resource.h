@@ -113,7 +113,8 @@ public:
     HanwhaProfileParameters makeProfileParameters(
         Qn::ConnectionRole role,
         const QnLiveStreamParams& parameters,
-        bool isAudioSupported) const;
+        bool isAudioSupported,
+        bool isNewProfile = false) const;
 
 protected:
     virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
@@ -154,8 +155,6 @@ private:
         int secondaryProfile);
 
     CameraDiagnostics::Result fetchPtzLimits(QnPtzLimits* outPtzLimits);
-
-    CameraDiagnostics::Result updateNvrChannelProfiles();
 
     void cleanUpOnProxiedDeviceChange();
 

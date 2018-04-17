@@ -31,6 +31,7 @@ def determine_package_versions():
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
         v["sysroot"] = "xenial"
+        v["ffmpeg"] = "3.1.9"
 
     if platform == "macosx":
         v["qt"] = "5.6.3"
@@ -100,6 +101,11 @@ def sync_dependencies(syncher):
         sync("openssl")
 
     sync("ffmpeg")
+
+    if platform == "linux" and arch in ("x64", "x86"):
+        sync("libmp3lame-3.100")
+        sync("libvpx-1.7.0")
+        sync("vorbis-1.3.5")
 
     if platform == "linux" and box in ("bpi", "bananapi", "rpi", "tx1", "none"):
         sync("sysroot", path_variable="sysroot_directory")
