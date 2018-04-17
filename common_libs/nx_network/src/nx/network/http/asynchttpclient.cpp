@@ -540,7 +540,7 @@ void AsyncHttpClient::asyncConnectDone(SystemError::ErrorCode errorCode)
     }
 
     NX_LOGX(lm("Failed to establish TCP connection to %1. %2")
-        .arg(m_contentLocationUrl).arg(SystemError::toString(errorCode)), cl_logDEBUG1);
+        .arg(m_contentLocationUrl).arg(SystemError::toString(errorCode)), cl_logDEBUG2);
     m_lastSysErrorCode = errorCode;
 
     m_state = sFailed;
@@ -568,7 +568,7 @@ void AsyncHttpClient::asyncSendDone(SystemError::ErrorCode errorCode, size_t byt
         if (reconnectIfAppropriate())
             return;
         NX_LOGX(lm("Error sending (1) http request to %1. %2")
-            .arg(m_contentLocationUrl).arg(SystemError::toString(errorCode)), cl_logDEBUG1);
+            .arg(m_contentLocationUrl).arg(SystemError::toString(errorCode)), cl_logDEBUG2);
         m_state = sFailed;
         m_lastSysErrorCode = errorCode;
         const auto requestSequenceBak = m_requestSequence;
@@ -613,7 +613,7 @@ void AsyncHttpClient::asyncSendDone(SystemError::ErrorCode errorCode, size_t byt
         NX_LOGX(lm("Url %1. Error setting receive timeout to %2 ms. %3")
             .arg(m_contentLocationUrl).arg(m_responseReadTimeoutMs)
             .arg(SystemError::toString(sysErrorCode)),
-            cl_logDEBUG1);
+            cl_logDEBUG2);
         m_state = sFailed;
         const auto requestSequenceBak = m_requestSequence;
         emit done(sharedThis);
@@ -656,7 +656,7 @@ void AsyncHttpClient::onSomeBytesReadAsync(
 
         NX_LOGX(lm("Error reading (state %1) http response from %2. %3")
             .arg(stateBak).arg(m_contentLocationUrl).arg(SystemError::toString(errorCode)),
-            cl_logDEBUG1);
+            cl_logDEBUG2);
         m_lastSysErrorCode = errorCode;
         const auto requestSequenceBak = m_requestSequence;
         emit done(sharedThis);
@@ -806,7 +806,7 @@ size_t AsyncHttpClient::parseReceivedBytes(size_t bytesRead)
     if (!m_httpStreamReader.parseBytes(m_responseBuffer, bytesRead, &bytesProcessed))
     {
         NX_LOGX(lm("Error parsing http response from %1. %2")
-            .arg(m_contentLocationUrl).arg(m_httpStreamReader.errorText()), cl_logDEBUG1);
+            .arg(m_contentLocationUrl).arg(m_httpStreamReader.errorText()), cl_logDEBUG2);
         m_state = sFailed;
         return -1;
     }
@@ -917,7 +917,7 @@ void AsyncHttpClient::processResponseHeadersBytes(
                 return;
 
             NX_LOGX(lm("Failed to read (1) response from %1. %2")
-                .arg(m_contentLocationUrl).arg(SystemError::connectionReset), cl_logDEBUG1);
+                .arg(m_contentLocationUrl).arg(SystemError::connectionReset), cl_logDEBUG2);
             m_state = sFailed;
             emit done(sharedThis);
             return;
@@ -993,7 +993,7 @@ void AsyncHttpClient::processResponseHeadersBytes(
         {
             NX_LOGX(lm("Failed to read (1) response from %1. %2")
                 .arg(m_contentLocationUrl).arg(SystemError::getLastOSErrorText()),
-                cl_logDEBUG1);
+                cl_logDEBUG2);
 
             m_state = sFailed;
             emit done(sharedThis);
