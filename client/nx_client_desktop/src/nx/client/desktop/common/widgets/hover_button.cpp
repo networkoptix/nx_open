@@ -9,13 +9,7 @@
 #include <ui/style/nx_style.h>
 #include <ui/style/helper.h>
 
-namespace {
-    const QString kIconPlus(lit("buttons/arythmetic_plus.png"));
-    const QString kIconPlusHovered(lit("buttons/arythmetic_plus_hovered.png"));
-    const QString kIconMinus(lit("buttons/arythmetic_minus.png"));
-    const QString kIconMinusHovered(lit("buttons/arythmetic_minus_hovered.png"));
-    const QSize kButtonSize(20, 20);
-    const int kSliderHeight = 120;
+namespace{
     const int kControlBtn = Qt::LeftButton;
 }
 
@@ -26,7 +20,7 @@ namespace desktop {
 HoverButton::HoverButton(const QString& normal, const QString& highligthed, QWidget* parent)
     :QAbstractButton(parent)
 {
-    m_normal = qnSkin->pixmap(normal, true); 
+    m_normal = qnSkin->pixmap(normal, true);
     m_highlighted = qnSkin->pixmap(highligthed, true);
     installEventFilter(this);
 
@@ -40,26 +34,6 @@ QSize HoverButton::sizeHint() const
     return m_normal.size();
 }
 
-static void drawDebugRhombus(QPainter& painter, const QRect& rect)
-{
-    QPoint center = rect.center();
-
-    QPen pen(QColor(255, 255, 255));
-    painter.setPen(pen);
-
-    QBrush brush(QColor(127, 170, 80, 80));
-    // Rhombus shape to debug layouts
-    QPoint points[] =
-    {
-        QPoint(rect.left(), center.y()),
-        QPoint(center.x(), rect.top()),
-        QPoint(rect.right()-1, center.y()),
-        QPoint(center.x(), rect.bottom()-1),
-    };
-    painter.setBrush(brush);
-
-    painter.drawConvexPolygon(points, 4);
-}
 
 void HoverButton::paintEvent(QPaintEvent* event)
 {
@@ -71,8 +45,6 @@ void HoverButton::paintEvent(QPaintEvent* event)
         highlighted = m_isHovered;
 
     QPixmap& pixmap = highlighted ? m_highlighted : m_normal;
-    //if (highlighted)
-    //    drawDebugRhombus(painter, rect());
     if (!pixmap.isNull())
     {
         auto icon = pixmap.rect();

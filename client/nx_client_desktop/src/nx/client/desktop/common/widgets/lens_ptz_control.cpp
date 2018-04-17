@@ -112,7 +112,6 @@ void LensPtzControl::resizeEvent(QResizeEvent* event)
     base_type::resizeEvent(event);
 
     QPoint center(width() / 2, height() / 2);
-    
     m_radius = std::min(center.x(), center.y()) - kLineWidth - kLineBorderWidth - kHandlerDiameter;
     m_ptzHandler.maxDistance = m_radius;
     m_rotationHandler.maxDistance = m_radius;
@@ -127,7 +126,6 @@ void LensPtzControl::resizeEvent(QResizeEvent* event)
     // Adjusting internal buttons
     QRect centerRect(0, 0, kButtonSize, kButtonSize);
     centerRect.moveCenter(center);
-    
     m_buttons[ButtonLeft].rect = centerRect.translated(-kButtonOffset, 0);
     m_buttons[ButtonRight].rect = centerRect.translated(kButtonOffset, 0);
     m_buttons[ButtonUp].rect = centerRect.translated(0, -kButtonOffset);
@@ -137,7 +135,7 @@ void LensPtzControl::resizeEvent(QResizeEvent* event)
 void LensPtzControl::changeEvent(QEvent *event)
 {
     if(event->type() == QEvent::FontChange)
-        updateGeometry(); 
+        updateGeometry();
 
     base_type::changeEvent(event);
 }
@@ -145,10 +143,7 @@ void LensPtzControl::changeEvent(QEvent *event)
 void LensPtzControl::paintEvent(QPaintEvent *event)
 {
     base_type::paintEvent(event);
-    // I want to keep this stylish lines here for some time
-    //const QRect sliderRect = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle, this);
-    //initStyleOption(&opt);
-    //QStyleOptionSlider opt;
+
     QRectF rect(QPointF(0,0), size());
 
     QPainter painter(this);
@@ -228,10 +223,7 @@ void LensPtzControl::mouseMoveEvent(QMouseEvent *event)
         {
             // TODO: Reset to initial state
         }
-        else
-        {
-            
-        }
+
         float distance = sqrt(QPointF::dotProduct(m_rotationHandler.position, m_rotationHandler.position));
         // We should get angle from [-180; 180]. Base axis is negative Y
         if (distance > 0.f)
@@ -269,7 +261,7 @@ void LensPtzControl::drawRotationCircle(QPainter& painter, const QRectF& rect, f
     QPointF center = rect.center();
     QRectF centered(QPointF(0.f, 0.f), QSizeF(m_radius, m_radius) * 2);
     centered.moveCenter(center);
-    
+
     // Drawing circle with border color.
     QnPaletteColor borderColor = m_palette.color(lit("dark"), 5);
     QPen reallyWide(QBrush(borderColor), kLineWidth + 2 * kLineBorderWidth, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
@@ -319,7 +311,7 @@ void LensPtzControl::drawHandler(QPainter& painter, const Handler& handler) cons
 
     QPointF center(width() / 2, height() / 2);
     QPointF handlerScreenPos = center + handler.position;
-    
+
     QRectF rect(0, 0, kHandlerDiameter, kHandlerDiameter);
     rect.moveCenter(handlerScreenPos);
     painter.drawEllipse(rect);
@@ -382,11 +374,8 @@ bool LensPtzControl::Handler::dragTo(const QPointF& point)
             position = position * minDistance / distance;
         }
     }
-    else
-    {
-        if (minDistance > 0)
-            return false;
-    }
+    else if (minDistance > 0)
+        return false;
 
     return true;
 }
