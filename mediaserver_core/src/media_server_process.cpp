@@ -1923,10 +1923,10 @@ void MediaServerProcess::registerRestHandlers(
      *         %value VideoLinkExists
      */
     reg("api/getEvents", new QnEventLog2RestHandler(), kViewLogs); //< new version
-    
+
 	// TODO: add API doc tool comments here
 	reg("ec2/getEvents", new QnMultiserverEventsRestHandler(lit("ec2/getEvents")), kViewLogs);
-	
+
     /**%apidoc GET /api/showLog
      * Return tail of the server log file
      * %param[opt] lines Display last N log lines.
@@ -2102,10 +2102,10 @@ void MediaServerProcess::registerRestHandlers(
         &cloudManagerGroup->connectionManager, messageBus), kAdmin);
 
     /**%apidoc[proprietary] POST /api/restoreState
-     * Restore server state to default. Cleans database and system name.
+     * Restore initial server state, i.e. <b>delete server's database</b>.
+     * <br/>Server will restart after executing this command.
      * %permissions Administrator.
-     * %param oldPassword Current admin password
-     * %return JSON result with an error code and an error string.
+     * %return JSON result with error code
      */
     reg("api/restoreState", new QnRestoreStateRestHandler(), kAdmin);
 
@@ -2329,10 +2329,65 @@ void MediaServerProcess::registerRestHandlers(
 
     reg("ec2/statistics", new QnMultiserverStatisticsRestHandler("ec2/statistics"));
 
+    /**%apidoc GET /api/analyticsLookupDetectedObjects
+     * Search analytics DB for objects that match filter specified.
+     * %param[opt] deviceId Id of camera.
+     * %param[opt] objectTypeId Analytics object type id.
+     * %param[opt] objectId Analytics object id.
+     * %param[opt] startTime Milliseconds since epoch (1970-01-01 00:00, UTC).
+     * %param[opt] endTime Milliseconds since epoch (1970-01-01 00:00, UTC).
+     * %param[opt] x1 Top left "x" coordinate of picture bounding box to search within. In range
+     *     [0.0; 1.0].
+     * %param[opt] y1 Top left "y" coordinate of picture bounding box to search within. In range
+     *     [0.0; 1.0].
+     * %param[opt] x2 Bottom right "x" coordinate of picture bounding box to search within. In
+     *     range [0.0; 1.0].
+     * %param[opt] y2 Bottom right "y" coordinate of picture bounding box to search within. In
+     *     range [0.0; 1.0].
+     * %param[opt] freeText Text to match within object's properties.
+     * %param[opt] limit Maximum number of objects to return.
+     * %param[opt] maxTrackSize Maximum length of elements of object's track.
+     * %param[opt] sortOrder Sort order of objects by track start timestamp.
+     *     %value asc Ascending order.
+     *     %value desc Descending order.
+     * %param[opt] isLocal If "false" then request is forwarded to every other online server and
+     *     results are merged. Otherwise, request is processed on receiving server only.
+     * %return JSON data.
+     */
     reg("ec2/analyticsLookupDetectedObjects", new QnMultiserverAnalyticsLookupDetectedObjects(
         commonModule(), qnServerModule->analyticsEventsStorage()));
+
+    /**%apidoc GET /api/getAnalyticsActions
+     * Get analytics actions from all metadata plugins on the current server which are applicable
+     *     to the specified metadata object type.
+     * %param objectTypeId Id of an object type to which an action should be applicable.
+     * %return JSON with an error code, error message and a JSON object in "reply" field:
+     *     %param actions List of JSON objects, each describing a set of actions from a particular
+     *         metadata plugin.
+     *     %param actions[].actionIds List of action ids (strings).
+     *     %param actions[].driverId Id of a metadata plugin which offers the actions.
+     */
     reg("api/getAnalyticsActions", new QnGetAnalyticsActionsRestHandler());
+
+    /**%apidoc POST /api/executeAnalyticsAction
+     * Execute analytics action from the particular metadata plugin on this server. The action is
+     * applied to the specified metadata object.
+     * %param driverId Id of a metadata plugin which offers the action.
+     * %param actionId Id of an action to execute.
+     * %param objectId Id of a metadata object to which the action is applied.
+     * %param cameraId Id of a camera from which the action was triggered.
+     * %param timestampUs Timestamp (microseconds) of the video frame from which the action was
+     *     triggered.
+     * %param params JSON object with key-value pairs containing values for the action params
+     *     described in the plugin manifest.
+     * %return JSON with an error code, error message and a JSON object in "reply" field:
+     *     %param actionUrl If not empty, provides a URL composed by the plugin, to be opened by
+     *         Client in an embedded browser.
+     *     %param messageToUser If not empty, provides a message composed by the plugin, to be
+     *         shown to the user who triggered the action.
+     */
     reg("api/executeAnalyticsAction", new QnExecuteAnalyticsActionRestHandler());
+
     /**%apidoc POST /api/saveCloudSystemCredentials
      * Sets or resets cloud credentials (systemId and authorization key) to be used by system
      * %param[opt] cloudSystemId
