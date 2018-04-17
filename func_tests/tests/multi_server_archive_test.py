@@ -60,9 +60,9 @@ def test_merged_archive(two_merged_linux_mediaservers, camera, sample_media_file
 def test_separated_archive(two_merged_linux_mediaservers, camera, sample_media_file):
     one, two, expected_periods_one, expected_periods_two = test_merged_archive(
         two_merged_linux_mediaservers, camera, sample_media_file)
-    new_id = str(uuid.uuid4())
+    new_id = uuid.uuid4()
     set_local_system_id(one.api, new_id)
-    assert str(get_local_system_id(one.api)) == new_id
+    assert get_local_system_id(one.api) == new_id
     assert expected_periods_one == one.get_recorded_time_periods(camera)
     assert expected_periods_two == two.get_recorded_time_periods(camera)
     assert not one.installation.list_core_dumps()
