@@ -217,7 +217,7 @@ protected:
 
     virtual QnResourceFactory* getResourceFactory() const override
     {
-        return nx::TestResourceFactory::instance();
+        return m_factory.get();
     }
 
     virtual void updateResource(

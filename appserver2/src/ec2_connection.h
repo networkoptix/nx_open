@@ -10,6 +10,8 @@
 
 #include "base_ec2_connection.h"
 #include "ec2_statictics_reporter.h"
+#include "nx/appserver/orphan_camera_watcher.h"
+
 #include "server_query_processor.h"
 
 namespace ec2
@@ -35,6 +37,7 @@ namespace ec2
         bool initialized() const;
 
         Ec2StaticticsReporter* getStaticticsReporter();
+        nx::appserver::OrphanCameraWatcher* orphanCameraWatcher();
 
         virtual Timestamp getTransactionLogTime() const override;
         virtual void setTransactionLogTime(Timestamp value) override;
@@ -42,8 +45,10 @@ namespace ec2
         const QnConnectionInfo m_connectionInfo;
         bool m_isInitialized;
         std::unique_ptr<Ec2StaticticsReporter> m_staticticsReporter;
+        std::unique_ptr<nx::appserver::OrphanCameraWatcher> m_orphanCameraWatcher;
     };
     typedef std::shared_ptr<Ec2DirectConnection> Ec2DirectConnectionPtr;
+    typedef std::shared_ptr<nx::appserver::OrphanCameraWatcher> OrphanCameraWatcherPtr;
 }
 
 #endif  //EC2_CONNECTION_H

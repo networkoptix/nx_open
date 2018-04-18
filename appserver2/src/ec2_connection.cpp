@@ -31,6 +31,8 @@ namespace ec2
         {
             m_staticticsReporter = std::make_unique<Ec2StaticticsReporter>(this);
         }
+
+        m_orphanCameraWatcher = std::make_unique<nx::appserver::OrphanCameraWatcher>(commonModule());
     }
 
     Ec2DirectConnection::~Ec2DirectConnection()
@@ -56,6 +58,11 @@ namespace ec2
     Ec2StaticticsReporter* Ec2DirectConnection::getStaticticsReporter()
     {
         return m_staticticsReporter.get();
+    }
+
+    nx::appserver::OrphanCameraWatcher* Ec2DirectConnection::orphanCameraWatcher()
+    {
+        return m_orphanCameraWatcher.get();
     }
 
     Timestamp Ec2DirectConnection::getTransactionLogTime() const
