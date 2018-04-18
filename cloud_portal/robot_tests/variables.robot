@@ -160,7 +160,7 @@ ${255CHARS}                           QWErtyuiopasdfghhkljzxcvbnmqwertyuiopasdfg
 
 #Emails
 ${BASE EMAIL}                         noptixautoqa@gmail.com
-${BASE EMAIL PASSWORD}                qweasd!@#$
+${BASE EMAIL PASSWORD}                qweasd!@#$%
 ${BASE HOST}                          imap.gmail.com
 ${BASE PORT}                          993
 ${EMAIL VIEWER}                       noptixautoqa+viewer@gmail.com
