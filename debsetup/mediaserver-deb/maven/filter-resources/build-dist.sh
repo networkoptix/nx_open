@@ -128,7 +128,7 @@ buildDistribution()
     echo "Copying Festival VOX files"
     cp -r $SERVER_VOX_PATH $BINSTAGE
 
-    cp_sys_lib "$LIBSTAGE" libstdc++.so.6 libgcc_s.so.1 libatomic.so.1
+    cp_sys_lib "$LIBSTAGE" libstdc++.so.6 libgcc_s.so.1 libatomic.so.1 libmvec.so.1
 
     if [ '@arch@' != 'arm' ]
     then

@@ -534,9 +534,6 @@ void QnCommonMessageProcessor::on_resourceRemoved( const QnUuid& resourceId )
     {
         if (QnResourcePtr ownResource = resourcePool()->getResourceById(resourceId))
         {
-            // delete dependent objects
-            for(const QnResourcePtr& subRes: resourcePool()->getResourcesByParentId(resourceId))
-                resourcePool()->removeResource(subRes);
             resourcePool()->removeResource(ownResource);
         }
     }

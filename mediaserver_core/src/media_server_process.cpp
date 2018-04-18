@@ -1879,18 +1879,18 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc GET /api/createEvent
      * Using this method it is possible to trigger a generic event in the system from a 3rd party
-     *     system. Such event will be handled and logged according to current event rules.
-     *     Parameters of the generated event, such as "source", "caption" and "description", are
-     *     intended to be analyzed by these rules.
-     *     <tt>
-     *        <br/>Example:
-     *        <pre><![CDATA[
+     * system. Such event will be handled and logged according to current event rules.
+     * Parameters of the generated event, such as "source", "caption" and "description", are
+     * intended to be analyzed by these rules.
+     * <tt>
+     *    <br/>Example:
+     *    <pre><![CDATA[
      * http://127.0.0.1:7001/api/createEvent?timestamp=2016-09-16T16:02:41Z&caption=CreditCardUsed&metadata={"cameraRefs":["3A4AD4EA-9269-4B1F-A7AA-2CEC537D0248","3A4AD4EA-9269-4B1F-A7AA-2CEC537D0240"]}
-     *        ]]></pre>
-     *        This example triggers a generic event informing the system that a
-     *        credit card has been used on September 16, 2016 at 16:03:41 UTC in a POS
-     *        terminal being watched by the two specified cameras.
-     *     </tt>
+     *    ]]></pre>
+     *    This example triggers a generic event informing the system that a
+     *    credit card has been used on September 16, 2016 at 16:03:41 UTC in a POS
+     *    terminal being watched by the two specified cameras.
+     * </tt>
      * %param[opt] timestamp Event date and time (as a string containing time in milliseconds since
      *     epoch, or a local time formatted like
      *     <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code>
@@ -1924,7 +1924,7 @@ void MediaServerProcess::registerRestHandlers(
     static const char kGetTimePath[] = "api/gettime";
     /**%apidoc GET /api/gettime
      * Return server time (in milliseconds since epoch), time zone and authentication realm (realm
-     *     is added for convenience)
+     * is added for convenience)
      * %return JSON data.
      */
     reg(kGetTimePath, new QnTimeRestHandler());
@@ -2238,8 +2238,8 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc GET /api/iflist
      * Get network settings (list of interfaces) for the server. Can be called only if server flags
-     *     include "SF_IfListCtrl" (server flags can be obtained via /ec2/getMediaServersEx in
-     *     "flags" field).
+     * include "SF_IfListCtrl" (server flags can be obtained via /ec2/getMediaServersEx in
+     * "flags" field).
      * %return List of objects with interface parameters.
      *     %param name Interface name.
      *     %param ipAddr IP address with dot-separated decimal components.
@@ -2260,7 +2260,7 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc GET /api/aggregator
      * This function allows to execute several requests with json content type and returns result
-     *     as a single JSON object
+     * as a single JSON object
      * %param[opt] exec_cmd HTTP url path to execute. This parameter could be repeated several
      *     times to execute several nested methods. All additions parameters after current
      *     "exec_cmd" and before next "exec_cmd" are passed as parameters to the nested method.
@@ -2270,10 +2270,10 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc POST /api/ifconfig
      * Set new network settings (list of interfaces) for the server. Can be called only if server
-     *     flags include "SF_IfListCtrl" (server flags can be obtained via /ec2/getMediaServersEx
-     *     in "flags" field). <p> Parameters should be passed as a JSON array of objects in POST
-     *     message body with content type "application/json". Example of such object can be seen in
-     *     the result of GET /api/iflist function. </p>
+     * flags include "SF_IfListCtrl" (server flags can be obtained via /ec2/getMediaServersEx
+     * in "flags" field). <p> Parameters should be passed as a JSON array of objects in POST
+     * message body with content type "application/json". Example of such object can be seen in
+     * the result of GET /api/iflist function. </p>
      * %permissions Administrator.
      * %param name Interface name.
      * %param ipAddr IP address with dot-separated decimal components.
@@ -2297,8 +2297,8 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc[proprietary] GET /api/settime
      * Set current time on the server machine. Can be called only if server flags include
-     *     "SF_timeCtrl" (server flags can be obtained via /ec2/getMediaServersEx in "flags"
-     *     field).
+     * "SF_timeCtrl" (server flags can be obtained via /ec2/getMediaServersEx in "flags"
+     * field).
      * %permissions Administrator.
      * %param[opt] timezone Time zone identifier, can be obtained via /api/getTimeZones.
      * %param datetime System date and time (as a string containing time in milliseconds since
@@ -2310,19 +2310,19 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc POST /api/setTime
      *  Set current time on the server machine.
-     *      Can be called only if server flags include "SF_timeCtrl"
-     *      (server flags can be obtained via /ec2/getMediaServersEx in "flags" field).
-     *      <p>
-     *          Parameters should be passed as a JSON object in POST message body with
-     *          content type "application/json". Example of such object:
-     *      <pre><code>
-     *      {
-     *          "dateTime": "2015-02-28T16:37:00",
-     *          "timeZoneId": "Europe/Moscow"
-     *      }
-     *      </code>
-     *      </pre>
-     *      </p>
+     *  Can be called only if server flags include "SF_timeCtrl"
+     *  (server flags can be obtained via /ec2/getMediaServersEx in "flags" field).
+     *  <p>
+     *      Parameters should be passed as a JSON object in POST message body with
+     *      content type "application/json". Example of such object:
+     *  <pre><code>
+     *  {
+     *      "dateTime": "2015-02-28T16:37:00",
+     *      "timeZoneId": "Europe/Moscow"
+     *  }
+     *  </code>
+     *  </pre>
+     *  </p>
      * %permissions Administrator.
      * %param[opt] timeZoneId Time zone identifier, can be obtained via /api/getTimeZones.
      * %param dateTime Date and time (as string containing time in milliseconds since epoch, or a
@@ -2364,8 +2364,8 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc POST /api/setupLocalSystem
      * Configure server system name and password. This function can be called for server with
-     *     default system name. Otherwise function returns error. This method requires owner
-     *     permissions.
+     * default system name. Otherwise function returns error. This method requires owner
+     * permissions.
      * %permissions Administrator.
      * %param password New password for admin user
      * %param systemName New system name
@@ -2375,8 +2375,8 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc POST /api/setupCloudSystem
      * Configure server system name and attach it to cloud. This function can be called for server
-     *     with default system name. Otherwise function returns error. This method requires owner
-     *     permissions.
+     * with default system name. Otherwise function returns error. This method requires owner
+     * permissions.
      * %permissions Administrator.
      * %param systemName New system name
      * %param cloudAuthKey could authentication key
@@ -2387,15 +2387,15 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc POST /api/mergeSystems
      * Merge two Systems. <br/> The System that joins another System is called the current System,
-     *     the joinable System is called the target System. The <b>URL</b> parameter sets the
-     *     target Server which should be joined with the current System. Other servers, that are
-     *     merged with the target Server will be joined if parameter <b>mergeOneServer</b> is set
-     *     to false. <br/> The method uses digest authentication. Two hashes should be previouly
-     *     calculated: <b>getKey</b> and <b>postKey</b>. Both are mandatory. The calculation
-     *     algorithm is described in <b>Calculating authentication hash</b> section (in the bootom
-     *     of the page). While calculating hashes, username and password of the target Server are
-     *     needed. Digest authentication needs realm and nonce, both can be obtained with <code>GET
-     *     /api/getNonce call</code> call. The lifetime of a nonce is about a few minutes.
+     * the joinable System is called the target System. The <b>URL</b> parameter sets the
+     * target Server which should be joined with the current System. Other servers, that are
+     * merged with the target Server will be joined if parameter <b>mergeOneServer</b> is set
+     * to false. <br/> The method uses digest authentication. Two hashes should be previouly
+     * calculated: <b>getKey</b> and <b>postKey</b>. Both are mandatory. The calculation
+     * algorithm is described in <b>Calculating authentication hash</b> section (in the bootom
+     * of the page). While calculating hashes, username and password of the target Server are
+     * needed. Digest authentication needs realm and nonce, both can be obtained with <code>GET
+     * /api/getNonce call</code> call. The lifetime of a nonce is about a few minutes.
      * %permissions Administrator.
      * %param url URL of one Server in the System to join.
      * %param getKey Authentication hash of the target Server for GET requests.
@@ -2459,8 +2459,8 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc[proprietary] GET /api/execute
      * Execute any script from subfolder "scripts" of media server. Script name provides directly
-     *     in a URL path like "/api/execute/script1.sh". All URL parameters are passed directly to
-     *     a script as an parameters.
+     * in a URL path like "/api/execute/script1.sh". All URL parameters are passed directly to
+     * a script as an parameters.
      * %permissions Administrator.
      * %return JSON with error code.
      */
@@ -2612,7 +2612,7 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc GET /ec2/getHardwareIdsOfServers
      * Return the list of Hardware Ids for each server in the system which is online at the moment
-     *     of executing this function.
+     * of executing this function.
      * %return JSON with an error code, error message and a list of JSON objects in "reply" field:
      *     %param serverId Id of a server.
      *     %param hardwareIds All Hardware Ids of the server, as a list of strings.
