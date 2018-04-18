@@ -330,7 +330,7 @@ void ActionButtonsModel::updateTwoWayAudioButtonVisibility()
             return button->type == ActionButtonsModel::TwoWayAudioButton;
         });
 
-    const bool twoWayAudioButtonVisible = it != m_buttons.end();
+    const bool twoWayAudioButtonVisible = it != itEnd;
     const bool twoWayAudioAvailable = m_twoWayAudioAvailabilityWatcher->available();
     if (twoWayAudioButtonVisible == twoWayAudioAvailable)
         return;
