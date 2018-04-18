@@ -291,6 +291,9 @@ public:
     bool hanwhaDeleteProfilesOnInitIfNeeded() const;
     void setHanwhaDeleteProfilesOnInitIfNeeded(bool deleteProfiles);
 
+    bool showHanwhaAlternativePtzControlsOnTile() const;
+    void setShowHanwhaAlternativePtzControlsOnTile(bool showPtzControls);
+
     bool isEdgeRecordingEnabled() const;
     void setEdgeRecordingEnabled(bool enabled);
 
@@ -425,6 +428,7 @@ private:
     QnResourcePropertyAdaptor<bool>* m_cloudConnectRelayingEnabledAdaptor = nullptr;
 
     QnResourcePropertyAdaptor<bool>* m_hanwhaDeleteProfilesOnInitIfNeeded = nullptr;
+    QnResourcePropertyAdaptor<bool>* m_showHanwhaAlternativePtzControlsOnTile = nullptr;
 
     QnResourcePropertyAdaptor<bool>* m_edgeRecordingEnabledAdaptor = nullptr;
 

@@ -1186,16 +1186,16 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
 
     if (isNvr() && m_isChannelConnectedViaSunapi)
     {
-        const auto pypassPtzCapabilities = calculateSupportedPtzCapabilities(
+        const auto bypassPtzCapabilities = calculateSupportedPtzCapabilities(
             kHanwhaCameraPtzCapabilityDescriptors,
             m_bypassDeviceAttributes,
             0); //< TODO: #dmishin is it correct for multichannel resources connected to a NVR?
 
         NX_VERBOSE(this, lm("%1: Supported PTZ capabilities bypass: %2")
-            .args(getPhysicalId(), ptzCapabilityBits(pypassPtzCapabilities)));
+            .args(getPhysicalId(), ptzCapabilityBits(bypassPtzCapabilities)));
 
         // We consider capability is true if it's supported both by a NVR and a camera.
-        m_ptzCapabilities &= pypassPtzCapabilities;
+        m_ptzCapabilities &= bypassPtzCapabilities;
         NX_VERBOSE(this, lm("%1: Supported PTZ capabilities both: %2")
             .args(getPhysicalId(), ptzCapabilityBits(m_ptzCapabilities)));
     }
@@ -1258,7 +1258,9 @@ CameraDiagnostics::Result HanwhaResource::initAlternativePtz()
             continue;
 
         m_ptzTraits.append(traitName);
-        m_ptzCapabilities |= trait.capabilities;
+        if (qnGlobalSettings->showHanwhaAlternativePtzControlsOnTile())
+            m_ptzCapabilities |= trait.capabilities;
+
         m_alternativePtzRanges[split.last()] = std::move(possibleValues);
     }
 

@@ -85,6 +85,10 @@ namespace
     const QString kHanwhaDeleteProfilesOnInitIfNeeded(lit("hanwhaDeleteProfilesOnInitIfNeeded"));
     const bool kHanwhaDeleteProfilesOnInitIfNeededDefault = false;
 
+    const QString kShowHanwhaAlternativePtzControlsOnTile(
+        lit("showHanwhaAlternativePtzControlsOnTile"));
+    const bool kShowHanwhaAlternativePtzControlsOnTileDefault = false;
+
     const QString kEnableEdgeRecording(lit("enableEdgeRecording"));
     const bool kEnableEdgeRecordingDefault(true);
 
@@ -440,6 +444,11 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
             kHanwhaDeleteProfilesOnInitIfNeeded,
             kHanwhaDeleteProfilesOnInitIfNeededDefault,
             this);
+
+        m_showHanwhaAlternativePtzControlsOnTile = new QnLexicalResourcePropertyAdaptor<bool>(
+            kShowHanwhaAlternativePtzControlsOnTile,
+            kShowHanwhaAlternativePtzControlsOnTileDefault,
+            this);
     }
 
     m_edgeRecordingEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
@@ -520,6 +529,9 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
 
     if (m_hanwhaDeleteProfilesOnInitIfNeeded)
         result << m_hanwhaDeleteProfilesOnInitIfNeeded;
+
+    if (m_showHanwhaAlternativePtzControlsOnTile)
+        result << m_showHanwhaAlternativePtzControlsOnTile;
 
     return result;
 }
@@ -1148,6 +1160,22 @@ void QnGlobalSettings::setHanwhaDeleteProfilesOnInitIfNeeded(bool deleteProfiles
         return;
 
     m_hanwhaDeleteProfilesOnInitIfNeeded->setValue(deleteProfiles);
+}
+
+bool QnGlobalSettings::showHanwhaAlternativePtzControlsOnTile() const
+{
+    if (!m_showHanwhaAlternativePtzControlsOnTile)
+        return kShowHanwhaAlternativePtzControlsOnTileDefault;
+
+    return m_showHanwhaAlternativePtzControlsOnTile->value();
+}
+
+void QnGlobalSettings::setShowHanwhaAlternativePtzControlsOnTile(bool showPtzControls)
+{
+    if (!m_showHanwhaAlternativePtzControlsOnTile)
+        return;
+
+    m_showHanwhaAlternativePtzControlsOnTile->setValue(showPtzControls);
 }
 
 bool QnGlobalSettings::isEdgeRecordingEnabled() const
