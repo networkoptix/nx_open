@@ -1688,11 +1688,14 @@ CameraDiagnostics::Result HanwhaResource::createProfile(
     streamParameters.quality = Qn::StreamQuality::QualityHigh;
     streamParameters.bitrateKbps = streamBitrate(role, streamParameters);
 
+    HanwhaProfileParameterFlags profileParameterFlags = HanwhaProfileParameterFlag::newProfile;
+    if (isAudioSupported())
+        profileParameterFlags |= HanwhaProfileParameterFlag::audioSupported;
+
     const auto profileParameters = makeProfileParameters(
         role,
         streamParameters,
-        isAudioSupported(),
-        /*isNewProfile*/ true);
+        profileParameterFlags);
 
     HanwhaRequestHelper helper(sharedContext(), bypassChannel());
     const auto response = helper.add(
@@ -2978,8 +2981,7 @@ bool HanwhaResource::isConnectedViaSunapi() const
 HanwhaProfileParameters HanwhaResource::makeProfileParameters(
     Qn::ConnectionRole role,
     const QnLiveStreamParams& parameters,
-    bool isAudioSupported,
-    bool isNewProfile) const
+    HanwhaProfileParameterFlags flags) const
 {
     NX_ASSERT(isConnectedViaSunapi());
     if (!isConnectedViaSunapi())
@@ -3009,12 +3011,12 @@ HanwhaProfileParameters HanwhaResource::makeProfileParameters(
         { kHanwhaResolutionProperty, toHanwhaString(resolution) }
     };
 
-    if (isNewProfile)
+    if (flags.testFlag(HanwhaProfileParameterFlag::newProfile))
         result.emplace(kHanwhaProfileNameProperty, nxProfileName(role));
     else
         result.emplace(kHanwhaProfileNumberProperty, QString::number(profileByRole(role)));
 
-    if (isAudioSupported)
+    if (flags.testFlag(HanwhaProfileParameterFlag::audioSupported))
         result.emplace(kHanwhaAudioInputEnableProperty, toHanwhaString(isAudioEnabled()));
 
     if (isH26x)

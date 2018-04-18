@@ -26,6 +26,14 @@ namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
+enum class HanwhaProfileParameterFlag
+{
+    newProfile = 1,
+    audioSupported = 1 << 1
+};
+
+Q_DECLARE_FLAGS(HanwhaProfileParameterFlags, HanwhaProfileParameterFlag);
+
 class HanwhaResource: public QnPlOnvifResource
 {
     using base_type = QnPlOnvifResource;
@@ -113,8 +121,7 @@ public:
     HanwhaProfileParameters makeProfileParameters(
         Qn::ConnectionRole role,
         const QnLiveStreamParams& parameters,
-        bool isAudioSupported,
-        bool isNewProfile = false) const;
+        HanwhaProfileParameterFlags flags) const;
 
 protected:
     virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
