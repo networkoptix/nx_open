@@ -143,7 +143,7 @@ class CloudAccountFactory(object):
                     cloud_account.register_user(cloud_email.first_name, cloud_email.last_name)
                 else:
                     cloud_account.resend_activation_code()
-                code = imap_connection.fetch_activation_code(cloud_account.host, cloud_email.email, FETCH_ACTIVATION_EMAIL_TIMEOUT)
+                code = imap_connection.fetch_activation_code(cloud_account.hostname, cloud_email.email, FETCH_ACTIVATION_EMAIL_TIMEOUT)
             cloud_account.activate_user(code)
             user_info = cloud_account.get_user_info()
         assert user_info.get('statusCode') == 'activated'

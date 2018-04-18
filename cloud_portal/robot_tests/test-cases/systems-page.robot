@@ -1,41 +1,48 @@
 *** Settings ***
 Resource          ../resource.robot
 Resource          ../variables.robot
-Suite Teardown    Close All Browsers
+Test Teardown     Close Browser
+Suite Teardown    Run Keyword If Any Tests Failed    Clean up owner first/last name
 Force Tags        system
 
 *** Variables ***
 ${password}    ${BASE PASSWORD}
 ${url}         ${ENV}
 
+*** Keywords ***
+Check Systems Text
+    [arguments]    ${user}
+    Log Out
+    Validate Log Out
+    Log In    ${user}
+    Validate Log In
+    Wait Until Element Is Visible    //h2[.='${OWNER TEXT}']
+    Wait Until Element Is Not Visible    //h2[.='${YOUR SYSTEM TEXT}']
+
 *** Test Cases ***
 should show list of Systems
     Open Browser and go to URL    ${url}
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
-    Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${SYSTEMS TILE}
-    Close Browser
+    Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${ACCOUNT DROPDOWN}    ${SYSTEMS TILE}
 
 has system name, owner and OpenInNx button visible on systems page
     Open Browser and go to URL    ${url}
     Log In    ${EMAIL OWNER}    ${password}
     Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
     Element Text Should Be    ${AUTO TESTS TITLE}    Auto Tests
-    Close Browser
 
 should show Open in NX client button for online system
     Open Browser and go to URL    ${url}
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
     Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
-    Close Browser
 
 should not show Open in NX client button for offline system
     Open Browser and go to URL    ${url}
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
     Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTOTESTS OFFLINE}
-    Close Browser
 
 should show system's state for systems if they are offline. Otherwise - button Open in Nx
     Open Browser and go to URL    ${url}
@@ -44,7 +51,6 @@ should show system's state for systems if they are offline. Otherwise - button O
     Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
     ${systems}    Get WebElements    //div[@ng-repeat='system in systems | filter:searchSystems as filtered']
     Check Online Or Offline    ${systems}    ${AUTOTESTS OFFLINE TEXT}
-    Close Browser
 
 should open system page (users list) when clicked on system
     Open Browser and go to URL    ${url}
@@ -53,7 +59,6 @@ should open system page (users list) when clicked on system
     Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
     Click Element    ${AUTO TESTS TITLE}
     Verify In System    Auto Tests
-    Close Browser
 
 should update owner name in systems list, if it's changed
     Open Browser and go to URL    ${url}/account
@@ -79,4 +84,14 @@ should update owner name in systems list, if it's changed
     Input Text    ${ACCOUNT LAST NAME}    testLastName
     Click Button    ${ACCOUNT SAVE}
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
-    Close Browser
+
+#CLOUD-1748
+Should show your system for owner and owner name for non-owners
+    [tags]    not-ready
+    Open Browser and go to URL    ${url}
+    Log In    ${EMAIL OWNER}    ${password}
+    Validate Log In
+    Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
+    Element Text Should Be    ${AUTO TESTS USER}    ${YOUR SYSTEM TEXT}
+    :FOR    ${user}    IN    @{EMAILS LIST}
+    \  Run Keyword Unless    "${user}"=="${EMAIL OWNER}"    Check Systems Text    ${user}

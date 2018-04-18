@@ -1,15 +1,17 @@
 #pragma once
 
 #include <core/resource/device_dependent_strings.h>
-#include <ui/widgets/properties/schedule_grid_widget.h>
 #include <core/resource/media_stream_capability.h>
+#include <core/misc/schedule_task.h>
+
 #include <nx_ec/data/api_camera_attributes_data.h>
 
 #include <nx/client/desktop/common/data/rotation.h>
+#include <nx/client/desktop/resource_properties/camera/utils/schedule_cell_params.h>
+
+#include <utils/common/aspect_ratio.h>
 
 #include <nx/utils/std/optional.h>
-#include <utils/common/aspect_ratio.h>
-#include <core/misc/schedule_task.h>
 
 namespace nx {
 namespace client {
@@ -55,6 +57,30 @@ struct CameraSettingsDialogState
         None,
         Some,
         All
+    };
+
+    enum class Alert
+    {
+        // Brush was changed (mode, fps, quality).
+        BrushChanged,
+
+        // Recording was enabled, while schedule is empty.
+        EmptySchedule,
+
+        // Not enough licenses to enable recording.
+        NotEnoughLicenses,
+
+        // License limit exceeded, recording will not be enabled.
+        LicenseLimitExceeded,
+
+        // Schedule was changed but recording is not enabled.
+        RecordingIsNotEnabled,
+
+        // High minimal archive length value selected.
+        HighArchiveLength,
+
+        // Motion detection was enabled while recording was not.
+        MotionDetectionRequiresRecording,
     };
 
     CameraSettingsDialogState() = default;
@@ -106,7 +132,7 @@ struct CameraSettingsDialogState
         int maxFps = 0;
         int maxDualStreamingFps = 0;
     };
-    CombinedProperties devicesProperties;
+    CombinedProperties devicesDescription;
 
     struct RecordingDays
     {
@@ -119,8 +145,7 @@ struct CameraSettingsDialogState
     {
         UserEditableMultiple<bool> enabled;
 
-        // TODO: #GDM Refactor QnScheduleGridWidget.
-        QnScheduleGridWidget::CellParams brush;
+        ScheduleCellParams brush;
 
         media::CameraStreamCapability mediaStreamCapability;
         Qn::BitratePerGopType bitratePerGopType = Qn::BPG_None;
@@ -168,6 +193,8 @@ struct CameraSettingsDialogState
     };
     RecordingSettings recording;
 
+    std::optional<Alert> alert;
+
     struct ImageControlSettings
     {
         bool aspectRatioAvailable = true;
@@ -187,13 +214,13 @@ struct CameraSettingsDialogState
             return singleCameraProperties.maxFpsWithoutMotion;
 
         return recording.brush.recordingType == Qn::RT_MotionAndLowQuality
-            ? devicesProperties.maxDualStreamingFps
-            : devicesProperties.maxFps;
+            ? devicesDescription.maxDualStreamingFps
+            : devicesDescription.maxFps;
     }
 
     bool hasMotion() const
     {
-        bool result = devicesProperties.hasMotion == CombinedValue::All;
+        bool result = devicesDescription.hasMotion == CombinedValue::All;
         if (isSingleCamera())
             result &= singleCameraSettings.enableMotionDetection();
         return result;
@@ -201,13 +228,13 @@ struct CameraSettingsDialogState
 
     bool hasDualStreaming() const
     {
-        return hasMotion() && devicesProperties.hasDualStreaming == CombinedValue::All;
+        return hasMotion() && devicesDescription.hasDualStreaming == CombinedValue::All;
     }
 
     bool supportsSchedule() const
     {
-        return devicesProperties.isDtsBased == CombinedValue::None
-            && devicesProperties.isWearable == CombinedValue::None;
+        return devicesDescription.isDtsBased == CombinedValue::None
+            && devicesDescription.isWearable == CombinedValue::None;
     }
 };
 

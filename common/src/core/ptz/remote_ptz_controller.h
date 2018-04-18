@@ -12,7 +12,7 @@ class QnRemotePtzController: public QnAbstractPtzController {
     typedef QnAbstractPtzController base_type;
 
 public:
-    QnRemotePtzController(const QnNetworkResourcePtr &resource);
+    QnRemotePtzController(const QnVirtualCameraResourcePtr& camera);
     virtual ~QnRemotePtzController();
 
     virtual Ptz::Capabilities getCapabilities() const override;
@@ -79,7 +79,7 @@ private:
         QVariant value;
     };
 
-    QnNetworkResourcePtr m_resource; // TODO: #GDM check if it is a camera
+    QnVirtualCameraResourcePtr m_camera;
     QnUuid m_sequenceId;
     QAtomicInt m_sequenceNumber;
 

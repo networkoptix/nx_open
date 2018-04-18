@@ -17,10 +17,10 @@ namespace plugins {
 
 using namespace nx::mediaserver_core::plugins::hikvision;
 
-HikvisionHevcStreamReader::HikvisionHevcStreamReader(const QnResourcePtr& resource):
-    QnRtpStreamReader(resource)
+HikvisionHevcStreamReader::HikvisionHevcStreamReader(const HikvisionResourcePtr& resource):
+    QnRtpStreamReader(resource),
+    m_hikvisionResource(resource)
 {
-    m_hikvisionResource = resource.dynamicCast<HikvisionResource>();
 }
 
 CameraDiagnostics::Result HikvisionHevcStreamReader::openStreamInternal(

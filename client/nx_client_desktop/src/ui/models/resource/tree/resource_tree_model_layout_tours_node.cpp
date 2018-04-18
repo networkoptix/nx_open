@@ -8,7 +8,7 @@
 #include <ui/workbench/workbench_context.h>
 
 QnResourceTreeModelLayoutToursNode::QnResourceTreeModelLayoutToursNode(QnResourceTreeModel* model):
-    base_type(model, Qn::LayoutToursNode)
+    base_type(model, NodeType::layoutTours)
 {
 }
 
@@ -64,7 +64,10 @@ QnResourceTreeModelNodePtr QnResourceTreeModelLayoutToursNode::ensureLayoutTourN
     auto iter = m_nodes.find(tour.id);
     if (iter == m_nodes.end())
     {
-        auto node = QnResourceTreeModelNodeFactory::createNode(Qn::LayoutTourNode, tour.id, model());
+        auto node = QnResourceTreeModelNodeFactory::createNode(
+            NodeType::layoutTour,
+            tour.id,
+            model());
         node->setParent(toSharedPointer());
         iter = m_nodes.insert(tour.id, node);
     }
@@ -85,7 +88,7 @@ void QnResourceTreeModelLayoutToursNode::removeNode(QnResourceTreeModelNodePtr n
 
     switch (node->type())
     {
-        case Qn::LayoutTourNode:
+        case NodeType::layoutTour:
             NX_EXPECT(m_nodes.key(node) == node->uuid());
             m_nodes.remove(node->uuid());
             break;

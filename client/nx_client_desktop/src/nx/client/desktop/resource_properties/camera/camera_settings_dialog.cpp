@@ -56,7 +56,21 @@ struct CameraSettingsDialog::Private
 
         store->applyChanges();
         const auto& state = store->state();
-        CameraSettingsDialogStateConversionFunctions::applyStateToCameras(state, cameras);
+
+        const auto apply =
+            [this, &state]
+            {
+                CameraSettingsDialogStateConversionFunctions::applyStateToCameras(state, cameras);
+            };
+
+        const auto backout =
+            [this, camerasCopy = cameras](bool success)
+            {
+                if (!success && camerasCopy == cameras)
+                    resetChanges();
+            };
+
+        qnResourcesChangesManager->saveCamerasBatch(cameras, apply, backout);
     }
 
     void resetChanges()
@@ -255,6 +269,52 @@ void CameraSettingsDialog::loadState(const CameraSettingsDialogState& state)
         if (applyButton)
             applyButton->setEnabled(!state.readOnly && state.hasChanges);
     }
+
+   ui->alertBar->setText(getAlertText(state));
+}
+
+QString CameraSettingsDialog::getAlertText(const CameraSettingsDialogState& state)
+{
+    if (!state.alert)
+        return QString();
+
+    using Alert = CameraSettingsDialogState::Alert;
+    switch (*state.alert)
+    {
+        case Alert::BrushChanged:
+            return tr("Select areas on the schedule to apply chosen parameters to.");
+
+        case Alert::EmptySchedule:
+            return tr(
+                "Set recording parameters and select areas "
+                "on the schedule grid to apply them to.");
+
+        case Alert::NotEnoughLicenses:
+            return tr("Not enough licenses to enable recording.");
+
+        case Alert::LicenseLimitExceeded:
+            return tr("License limit exceeded, recording will not be enabled.");
+
+        case Alert::RecordingIsNotEnabled:
+            return tr("Turn on selector at the top of the window to enable recording.");
+
+        case Alert::HighArchiveLength:
+            return QnCameraDeviceStringSet(
+                    tr("High minimum value can lead to archive length decrease on other devices."),
+                    tr("High minimum value can lead to archive length decrease on other cameras."))
+                .getString(state.deviceType);
+
+        case Alert::MotionDetectionRequiresRecording:
+            return tr(
+                "Motion detection will work only when camera is being viewed. "
+                "Enable recording to make it work all the time.");
+
+        default:
+            NX_EXPECT(false, "Unhandled enum value");
+            break;
+    }
+
+    return QString();
 }
 
 } // namespace desktop

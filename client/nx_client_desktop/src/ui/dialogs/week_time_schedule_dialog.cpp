@@ -19,7 +19,6 @@ QnWeekTimeScheduleDialog::QnWeekTimeScheduleDialog(QWidget *parent):
     setHelpTopic(this, Qn::EventsActions_Schedule_Help);
 
     // init buttons
-    connect(ui->gridWidget, &QnScheduleGridWidget::colorsChanged, this, &QnWeekTimeScheduleDialog::updateColors);
     updateColors();
 
     connect(ui->valueOnButton, SIGNAL(toggled(bool)), this, SLOT(updateGridParams()));
@@ -147,8 +146,9 @@ void QnWeekTimeScheduleDialog::updateGridParams(bool fromUserInput)
 
 void QnWeekTimeScheduleDialog::updateColors()
 {
-    ui->valueOnButton->setColor(ui->gridWidget->colors().recordAlways);
-    ui->valueOffButton->setColor(ui->gridWidget->colors().recordNever);
+    const nx::client::desktop::SchedulePaintFunctions paintFunctions;
+    ui->valueOnButton->setColor(paintFunctions.recordAlways);
+    ui->valueOffButton->setColor(paintFunctions.recordNever);
 }
 
 // -------------------------------------------------------------------------- //

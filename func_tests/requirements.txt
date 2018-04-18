@@ -5,7 +5,6 @@ pytest-cpp
 pytz
 tzlocal
 requests>=2.18.4
-python-vagrant
 Jinja2
 python-debian>=0.1.28
 netaddr
@@ -17,3 +16,4 @@ pyyaml
 pathlib2==2.3.0
 pylru==1.0.9
 datadiff==2.0.0
+pywinrm==0.3.0

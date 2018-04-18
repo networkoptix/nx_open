@@ -21,24 +21,21 @@ def check_update_cache(customization, version_id):
     global_cache = caches['global']
     global_id = global_cache.get(customization)
 
-    if version_id != global_id:
-        return True, global_id
-    else:
-        return False, 0
+    return version_id != global_id, global_id
 
 
 def customization_cache(customization_name, value=None, force=False):
     data = cache.get(customization_name)
 
     if data and 'version_id' in data and not force:
-        force = check_update_cache(customization_name,data['version_id'])[0]
+        force = check_update_cache(customization_name, data['version_id'])[0]
 
     if not data or force:
         customization = Customization.objects.get(name=customization_name)
         custom_config = get_config(customization.name)
 
         data = {
-            'version_id': customization.version_id,
+            'version_id': customization.version_id(),
             'languages': customization.languages_list,
             'default_language': customization.default_language.code,
             'mail_from_name': customization.read_global_value('%MAIL_FROM_NAME%'),
@@ -123,6 +120,7 @@ class DataStructure(models.Model):
     def get_type(name):
         return getattr(DataStructure.DATA_TYPES, name, DataStructure.DATA_TYPES.text)
 
+
     def find_actual_value(self, customization, language=None, version_id=None):
         content_value = ""
         content_record = None
@@ -158,7 +156,8 @@ class DataStructure(models.Model):
                 if content_record.exists():
                     content_value = content_record.latest('version_id').value
 
-        if not content_value and not self.optional:  # if no value - use default value from structure
+        # if no value or optional and type file - use default value from structure
+        if not content_value and (not self.optional or self.optional and self.type == DataStructure.DATA_TYPES.file):
             content_value = self.default
 
         return content_value
@@ -186,9 +185,9 @@ class Customization(models.Model):
     def __str__(self):
         return self.name
 
-    @property
-    def version_id(self):
-        return self.contentversion_set.latest('accepted_date').id if self.contentversion_set.exists() else 0
+    def version_id(self, product_name=settings.PRIMARY_PRODUCT):
+        versions = ContentVersion.objects.filter(product__name=product_name)
+        return versions.latest('accepted_date').id if versions.exists() else 0
 
     @property
     def languages_list(self):
@@ -212,7 +211,7 @@ class Customization(models.Model):
             # TODO: need to update all static right here
 
     def read_global_value(self, record_name):
-        product = Product.objects.get(name='cloud_portal')
+        product = Product.objects.get(name=settings.PRIMARY_PRODUCT)
         global_contexts = product.context_set.filter(is_global=True)
         data_structure = None
         for context in global_contexts:
@@ -223,7 +222,7 @@ class Customization(models.Model):
 
         if not data_structure:
             return None
-        return data_structure.find_actual_value(self, version_id=self.version_id)
+        return data_structure.find_actual_value(self, version_id=self.version_id(product.name))
 
 # CMS data. Partners can change that
 
@@ -239,6 +238,7 @@ class ContentVersion(models.Model):
         )
 
     customization = models.ForeignKey(Customization)
+    product = models.ForeignKey(Product, default=1)
     name = models.CharField(max_length=1024)
 
     created_date = models.DateTimeField(auto_now_add=True)
@@ -259,10 +259,10 @@ class ContentVersion(models.Model):
         if self.accepted_by == None:
             return 'in review'
 
-        version_id = customization_cache(self.customization.name, 'version_id')
+        version_id = self.customization.version_id(self.product.name)
 
         if version_id > self.id:
-                return 'old'
+            return 'old'
 
         return 'current'
 

@@ -14,6 +14,7 @@
 #include <api/global_settings.h>
 #include <common/common_module.h>
 #include <nx_ec/ec_api.h>
+#include <nx_ec/data/api_business_rule_data.h>
 
 namespace ec2
 {

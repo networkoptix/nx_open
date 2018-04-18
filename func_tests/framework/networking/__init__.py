@@ -1,3 +1,4 @@
+from itertools import islice
 from uuid import uuid1
 
 from netaddr import IPNetwork
@@ -6,6 +7,19 @@ from framework.utils import wait_until
 
 
 def setup_networks(machines, hypervisor, networks_tree, reachability):
+    """Assign IP addresses on all machines and setup NAT on router machines
+
+    Doesn't know what machines are given. Used OS-agnostic interfaces only.
+    Doesn't know whether machines are created and given as dict or are created as requested.
+
+    :param machines: Dict or dynamic pool with .get(alias).
+    :param hypervisor: Hypervisor interface, e.g. VirtualBox.
+    :param networks_tree: Nested dict of specific format.
+    :param reachability: Check what is expected to be reachable from what.
+    :return: Machines which actually participated and their addresses.
+    """
+
+    # TODO: Consistent and sensible names.
     nodes_ips = {}
     allocated_machines = {}
     setup_uuid = uuid1()  # Network identifiers are unique to avoid clashes between tests and runs.
@@ -20,8 +34,10 @@ def setup_networks(machines, hypervisor, networks_tree, reachability):
             if router_alias is not None:
                 nodes[router_alias] = router_ip_address
             for alias, ip in nodes.items():
-                machine = machines['linux'].get(alias)  # TODO: Specify OS (generally, VM type) of interest.
-                allocated_machines[alias] = machine
+                try:
+                    machine = allocated_machines[alias]
+                except KeyError:
+                    allocated_machines[alias] = machine = machines.get(alias)
                 mac = hypervisor.plug(machine.name, network_uuid)
                 machine.networking.setup_ip(mac, ip, network_ip.prefixlen)
                 if alias != router_alias:
@@ -54,3 +70,14 @@ def setup_networks(machines, hypervisor, networks_tree, reachability):
                     timeout_sec=60)
 
     return allocated_machines, nodes_ips
+
+
+def setup_flat_network(machines, network_ip, hypervisor):  # TODO: Use in setup networks.
+    network_uuid = '{} {} flat'.format(uuid1(), network_ip)
+    iter_ips = network_ip.iter_hosts()
+    next(iter_ips)  # First IP is usually reserved for router.
+    host_ips = dict(zip((machine.alias for machine in machines), iter_ips))
+    for machine in machines:
+        mac = hypervisor.plug(machine.name, network_uuid)
+        machine.networking.setup_ip(mac, host_ips[machine.alias], network_ip.prefixlen)
+    return host_ips

@@ -3,25 +3,19 @@
 
 #include <QtCore/QMap>
 #include <QtCore/QSize>
+
 #include "resource.h"
 #include "resource_media_layout.h"
-#include "utils/common/from_this_to_shared.h"
 
+#include <core/ptz/ptz_constants.h>
 #include <core/ptz/media_dewarping_params.h>
+
 #include <utils/common/aspect_ratio.h>
 
 class QnAbstractStreamDataProvider;
 class QnResourceVideoLayout;
 class QnResourceAudioLayout;
 class QnCameraUserAttributePool;
-
-namespace Qn {
-
-    // TODO: #Elric move out!
-
-    QString toDisplayString(Qn::StreamQuality value);
-    QString toShortDisplayString(Qn::StreamQuality value);
-}
 
 /*!
     \note Derived class MUST call \a initMediaResource() just after object instantiation
@@ -55,6 +49,16 @@ public:
     virtual QnAspectRatio customAspectRatio() const;
     void setCustomAspectRatio(const QnAspectRatio& value);
     void clearCustomAspectRatio();
+
+    /**
+        Control PTZ flags.
+    */
+    Ptz::Capabilities getPtzCapabilities() const;
+
+    /** Check if camera has any of provided capabilities. */
+    bool hasAnyOfPtzCapabilities(Ptz::Capabilities capabilities) const;
+    void setPtzCapabilities(Ptz::Capabilities capabilities);
+    void setPtzCapability(Ptz::Capabilities capability, bool value);
 
     /** Name of the resource property key intended for the CustomAspectRatio value storage. */
     static QString customAspectRatioKey();

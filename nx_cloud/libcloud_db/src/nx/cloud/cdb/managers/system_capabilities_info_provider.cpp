@@ -48,7 +48,7 @@ void SystemCapabilitiesProvider::onSystemStatusChanged(
 {
     QnMutexLocker lock(&m_mutex);
 
-    if (statusDescription.health == api::SystemHealth::online)
+    if (statusDescription.isOnline)
         m_systemIdToProtoVersion[systemId] = statusDescription.protoVersion;
     else
         m_systemIdToProtoVersion.erase(systemId);

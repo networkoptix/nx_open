@@ -9,8 +9,6 @@
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <core/dataprovider/data_provider_factory.h>
-
 #include "user_resource.h"
 #include "common/common_module.h"
 
@@ -59,7 +57,6 @@ QnUuid QnSecurityCamResource::makeCameraIdFromUniqueId(const QString& uniqueId)
 
 QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
     base_type(commonModule),
-    m_dpFactory(0),
     m_recActionCnt(0),
     m_statusFlags(Qn::CSF_NoFlags),
     m_manuallyAdded(false),
@@ -255,46 +252,6 @@ bool QnSecurityCamResource::isEnoughFpsToRunSecondStream(int currentFps) const
     return streamFpsSharingMethod() != Qn::BasicFpsSharing || getMaxFps() - currentFps >= kDefaultSecondStreamFpsLow;
 }
 
-#ifdef ENABLE_DATA_PROVIDERS
-QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(Qn::ConnectionRole role)
-{
-    if (role == Qn::CR_SecondaryLiveVideo && !hasDualStreaming())
-        return nullptr;
-
-    switch (role)
-    {
-        case Qn::CR_SecondaryLiveVideo:
-        case Qn::CR_Default:
-        case Qn::CR_LiveVideo:
-        {
-            QnAbstractStreamDataProvider* result = createLiveDataProvider();
-            if (result)
-                result->setRole(role);
-            return result;
-        }
-        case Qn::CR_Archive:
-        {
-            if (QnAbstractStreamDataProvider* result = createArchiveDataProvider())
-                return result;
-
-            /* This is the only legal break. */
-            break;
-        }
-        default:
-            NX_ASSERT(false, "There are no other roles");
-            break;
-    }
-
-    NX_ASSERT(role == Qn::CR_Archive);
-    /* The one and only QnDataProviderFactory now is the QnServerDataProviderFactory class
-     * which handles only Qn::CR_Archive role. */
-    if (m_dpFactory)
-        return m_dpFactory->createDataProviderInternal(toSharedPointer(), role);
-
-    return nullptr;
-}
-#endif // ENABLE_DATA_PROVIDERS
-
 void QnSecurityCamResource::initializationDone()
 {
     //m_initMutex is locked down the stack
@@ -353,11 +310,6 @@ bool QnSecurityCamResource::isRemoteArchiveMotionDetectionEnabled() const
 {
     return QnMediaResource::edgeStreamValue()
         == getProperty(QnMediaResource::motionStreamKey()).toLower();
-}
-
-void QnSecurityCamResource::setDataProviderFactory(QnDataProviderFactory* dpFactory)
-{
-    m_dpFactory = dpFactory;
 }
 
 QList<QnMotionRegion> QnSecurityCamResource::getMotionRegionList() const
@@ -873,6 +825,16 @@ QString QnSecurityCamResource::getSharedId() const
     return getUniqueId();
 }
 
+QString QnSecurityCamResource::getProxiedId() const
+{
+    return getProperty(Qn::kProxiedIdParamName);
+}
+
+void QnSecurityCamResource::setProxiedId(const QString& proxiedId)
+{
+    setProperty(Qn::kProxiedIdParamName, proxiedId);
+}
+
 QString QnSecurityCamResource::getModel() const
 {
     SAFE(return m_model)
@@ -1169,9 +1131,9 @@ int QnSecurityCamResource::defaultSecondaryFps(Qn::StreamQuality quality) const
     {
         case Qn::QualityLowest:
         case Qn::QualityLow:
-            return kDefaultSecondStreamFpsMedium;
-        case Qn::QualityNormal:
             return kDefaultSecondStreamFpsLow;
+        case Qn::QualityNormal:
+            return kDefaultSecondStreamFpsMedium;
         case Qn::QualityHigh:
         case Qn::QualityHighest:
             return kDefaultSecondStreamFpsHigh;

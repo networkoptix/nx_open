@@ -5,7 +5,6 @@
 #include <core/ptz/abstract_ptz_controller.h>
 #include <core/resource/camera_advanced_param.h>
 #include <core/resource_management/resource_data_pool.h>
-#include <core/resource/resource_command.h>
 #include <providers/live_stream_provider.h>
 
 #include <nx/utils/log/log.h>
@@ -15,86 +14,14 @@
 #include <nx/fusion/serialization/json.h>
 
 #include "camera_advanced_parameters_providers.h"
+#include <plugins/resource/server_archive/server_archive_delegate.h>
+#include <media_server/media_server_module.h>
+#include <nx/streaming/archive_stream_reader.h>
 
 namespace nx {
 namespace mediaserver {
 namespace resource {
 
-namespace {
-
-class GetAdvancedParametersCommand: public QnResourceCommand
-{
-public:
-    GetAdvancedParametersCommand(
-        const QnResourcePtr& resource,
-        const QSet<QString>& ids,
-        std::function<void(const QnCameraAdvancedParamValueMap&)> handler)
-    :
-        QnResourceCommand(resource),
-        m_ids(ids),
-        m_handler(std::move(handler))
-    {
-    }
-
-    bool execute() override
-    {
-        const auto camera = m_resource.dynamicCast<Camera>();
-        NX_CRITICAL(camera);
-
-        QnCameraAdvancedParamValueMap values;
-        if (isConnectedToTheResource())
-            values = camera->getAdvancedParameters(m_ids);
-
-        m_handler(values);
-        return true;
-    }
-
-    void beforeDisconnectFromResource() override
-    {
-    }
-
-private:
-    QSet<QString> m_ids;
-    std::function<void(const QnCameraAdvancedParamValueMap&)> m_handler;
-};
-
-class SetAdvancedParametersCommand: public QnResourceCommand
-{
-public:
-    SetAdvancedParametersCommand(
-        const QnResourcePtr& resource,
-        const QnCameraAdvancedParamValueMap& values,
-        std::function<void(const QSet<QString>&)> handler)
-    :
-        QnResourceCommand(resource),
-        m_values(values),
-        m_handler(std::move(handler))
-    {
-    }
-
-    bool execute() override
-    {
-        const auto camera = m_resource.dynamicCast<Camera>();
-        NX_CRITICAL(camera);
-
-        QSet<QString> ids;
-        if (isConnectedToTheResource())
-            ids = camera->setAdvancedParameters(m_values);
-
-        m_handler(ids);
-        return true;
-    }
-
-    void beforeDisconnectFromResource() override
-    {
-    }
-
-private:
-    QnCameraAdvancedParamValueMap m_values;
-    std::function<void(const QSet<QString>&)> m_handler;
-};
-
-} // namespace
 
 const float Camera::kMaxEps = 0.01f;
 
@@ -109,6 +36,15 @@ Camera::Camera(QnCommonModule* commonModule):
 Camera::~Camera()
 {
     // Needed because of the forward declaration.
+}
+
+void Camera::blockingInit()
+{
+    if (!init())
+    {
+        //init is running in another thread, waiting for it to complete...
+        QnMutexLocker lk(&m_initMutex);
+    }
 }
 
 int Camera::getChannel() const
@@ -271,22 +207,6 @@ bool Camera::setAdvancedParameter(const QString& id, const QString& value)
     QnCameraAdvancedParamValueMap parameters;
     parameters.insert(id, value);
     return setAdvancedParameters(parameters).contains(id);
-}
-
-void Camera::getAdvancedParametersAsync(
-    const QSet<QString>& ids,
-    std::function<void(const QnCameraAdvancedParamValueMap&)> handler)
-{
-    addCommandToProc(std::make_shared<GetAdvancedParametersCommand>(
-        toSharedPointer(this), ids, std::move(handler)));
-}
-
-void Camera::setAdvancedParametersAsync(
-    const QnCameraAdvancedParamValueMap& values,
-    std::function<void(const QSet<QString>&)> handler)
-{
-    addCommandToProc(std::make_shared<SetAdvancedParametersCommand>(
-        toSharedPointer(this), values, std::move(handler)));
 }
 
 QnAdvancedStreamParams Camera::advancedLiveStreamParams() const
@@ -541,6 +461,63 @@ QnAudioTransmitterPtr Camera::getAudioTransmitter()
     return m_audioTransmitter;
 }
 
+void Camera::setLastMediaIssue(const CameraDiagnostics::Result& issue)
+{
+    QnMutexLocker lk(&m_mutex);
+    m_lastMediaIssue = issue;
+}
+
+CameraDiagnostics::Result Camera::getLastMediaIssue() const
+{
+    QnMutexLocker lk(&m_mutex);
+    return m_lastMediaIssue;
+}
+
+QnAbstractStreamDataProvider* Camera::createDataProvider(
+    const QnResourcePtr& resource,
+    Qn::ConnectionRole role)
+{
+    const auto camera = resource.dynamicCast<Camera>();
+    NX_EXPECT(camera);
+    if (!camera)
+        return nullptr;
+
+    if (role == Qn::CR_SecondaryLiveVideo && !camera->hasDualStreaming())
+        return nullptr;
+
+    switch (role)
+    {
+        case Qn::CR_SecondaryLiveVideo:
+        case Qn::CR_Default:
+        case Qn::CR_LiveVideo:
+        {
+            QnAbstractStreamDataProvider* result = camera->createLiveDataProvider();
+            if (result)
+                result->setRole(role);
+            return result;
+        }
+        case Qn::CR_Archive:
+        {
+            if (QnAbstractStreamDataProvider* result = camera->createArchiveDataProvider())
+                return result;
+
+            QnAbstractArchiveDelegate* archiveDelegate = camera->createArchiveDelegate();
+            if (!archiveDelegate)
+                archiveDelegate = new QnServerArchiveDelegate(qnServerModule); // default value
+            if (!archiveDelegate)
+                return nullptr;
+
+            auto archiveReader = new QnArchiveStreamReader(camera);
+            archiveReader->setCycleMode(false);
+            archiveReader->setArchiveDelegate(archiveDelegate);
+            return archiveReader;
+        }
+        default:
+            NX_ASSERT(false, "There are no other roles");
+            break;
+    }
+    return nullptr;
+}
 
 } // namespace resource
 } // namespace mediaserver

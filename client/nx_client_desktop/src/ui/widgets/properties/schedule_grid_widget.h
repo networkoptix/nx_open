@@ -1,16 +1,17 @@
 #pragma once
 
 #include <array>
+
 #include <QtCore/QVariant>
 #include <QtGui/QColor>
 #include <QtWidgets/QWidget>
 
 #include <common/common_globals.h>
-
 #include <client/client_color_types.h>
 
-#include <ui/common/custom_painted.h>
-
+#include <nx/client/desktop/common/utils/custom_painted.h>
+#include <nx/client/desktop/resource_properties/camera/utils/schedule_paint_functions.h>
+#include <nx/client/desktop/resource_properties/camera/utils/schedule_cell_params.h>
 
 class QnScheduleGridWidget : public QWidget
 {
@@ -22,6 +23,8 @@ class QnScheduleGridWidget : public QWidget
     static constexpr int kHoursPerDay = 24;
 
 public:
+    using CellParams = nx::client::desktop::ScheduleCellParams;
+
     explicit QnScheduleGridWidget(QWidget* parent = nullptr);
     virtual ~QnScheduleGridWidget();
 
@@ -30,21 +33,6 @@ public:
 
     inline int rowCount() const { return kDaysPerWeek; }
     inline int columnCount() const { return kHoursPerDay; }
-
-    struct CellParams
-    {
-        static constexpr auto kAutomaticBitrate = 0.0;
-
-        int fps;
-        Qn::StreamQuality quality;
-        Qn::RecordingType recordingType;
-        qreal bitrateMbps; //< 0 means auto.
-
-        CellParams();
-        bool operator==(const CellParams& other) const;
-
-        bool isAutomaticBitrate() const;
-    };
 
     CellParams brush() const;
     void setBrush(const CellParams& params);
@@ -70,14 +58,10 @@ public:
     const QnScheduleGridColors& colors() const;
     void setColors(const QnScheduleGridColors& colors);
 
-    CustomPaintedBase::PaintFunction paintFunction(Qn::RecordingType type) const;
-
 signals:
     void cellActivated(const QPoint& cell);
     void cellValueChanged(const QPoint& cell);
     void cellValuesChanged();
-
-    void colorsChanged();
 
 protected:
     virtual void mouseMoveEvent(QMouseEvent* event) override;
@@ -107,13 +91,12 @@ private:
 
     void updateSelectedCellsRect();
 
-    void updateCellColors();
-
     QRectF horizontalHeaderCell(int x) const;
     QRectF verticalHeaderCell(int y) const;
     QRectF cornerHeaderCell() const;
 
 private:
+    nx::client::desktop::SchedulePaintFunctions paintFunctions;
     CellParams m_brushParams; /**< Params which we are using for user input. */
     GridParams m_gridParams;
     bool m_showFps = true;
@@ -133,12 +116,6 @@ private:
     QFont m_labelsFont;
     QFont m_gridFont;
     QnScheduleGridColors m_colors;
-
-    using TypeColors = std::array<QColor, Qn::RT_Count>;
-    TypeColors m_cellColors;
-    TypeColors m_cellColorsHovered;
-    TypeColors m_insideColors;
-    TypeColors m_insideColorsHovered;
 
     bool m_readOnly = false;
     bool m_active = true;

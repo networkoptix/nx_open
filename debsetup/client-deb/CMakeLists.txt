@@ -34,12 +34,8 @@ nx_copy(${CMAKE_SOURCE_DIR}/common/maven/bin-resources/resources/qt/etc/qt.conf
 # Variables used by build-dist.sh.
 set(ClientHelpSourceDir "${help_directory}/bin/help")
 set(common_depends
-    "libstdc++6 (>= 4.1.1)"
     "zlib1g (>= 1:1.1.4)"
     "debconf (>= 0.5) | debconf-2.0"
-    "upstart-job"
-    "psmisc"
-    "upstart (>= 0.6.5-8)"
     "libgstreamer-plugins-base0.10-0"
     "libxi6"
     "libxrender1"

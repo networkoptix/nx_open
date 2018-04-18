@@ -80,7 +80,7 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemActio
              kStatus, moduleInformation).prepend(lit("\n"));
         QnMessageBox::warning(
             mainWindowWidget(),
-            tr("%1 Systems cannot be merged", "%1 is the short cloud name (like 'Cloud')")
+            tr("%1 Systems cannot be merged", "%1 is the short cloud name (like Cloud)")
             .arg(nx::network::AppInfo::shortCloudName()),
             message);
         return;

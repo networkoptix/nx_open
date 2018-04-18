@@ -6,6 +6,8 @@
 
 #include <nx/utils/disconnect_helper.h>
 
+#include <core/resource/client_resource_fwd.h>
+
 /**
  * Node which displays cloud systems, accessible to the client, and local systems, accessible to
  * the server.

@@ -115,7 +115,7 @@ void QnDatabaseManagementWidget::restoreDb()
         this,
         tr("Open Database Backup..."),
         qnSettings->lastDatabaseBackupDir(),
-        tr("Database Backup Files (*.db)"),
+        tr("Database Backup Files") + lit( "(*.db)"),
         NULL,
         QnCustomFileDialog::fileDialogOptions());
     if (fileName.isEmpty())

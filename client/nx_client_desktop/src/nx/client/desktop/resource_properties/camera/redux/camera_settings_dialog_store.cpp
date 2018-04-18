@@ -74,7 +74,7 @@ void CameraSettingsDialogStore::setSingleCameraUserName(const QString& text)
         [&](State state) { return Reducer::setSingleCameraUserName(std::move(state), text); });
 }
 
-void CameraSettingsDialogStore::setScheduleBrush(const QnScheduleGridWidget::CellParams& brush)
+void CameraSettingsDialogStore::setScheduleBrush(const ScheduleCellParams& brush)
 {
     d->executeAction(
         [&](State state) { return Reducer::setScheduleBrush(std::move(state), brush); });

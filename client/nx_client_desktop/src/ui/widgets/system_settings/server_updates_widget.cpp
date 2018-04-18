@@ -295,8 +295,9 @@ void QnServerUpdatesWidget::initDropdownActions()
         {
             m_localFileName = QnFileDialog::getOpenFileName(this,
                 tr("Select Update File..."),
-                QString(), tr("Update Files (*.zip)"),
-                0,
+                QString(),
+                tr("Update Files") + lit(" (*.zip)"),
+                nullptr,
                 QnCustomFileDialog::fileDialogOptions());
 
             if (m_localFileName.isEmpty())

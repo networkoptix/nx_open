@@ -152,7 +152,7 @@
            <item row="0" column="0">
             <layout class="QHBoxLayout" name="horizontalLayout_5">
              <item>
-              <widget class="QnSelectableButton" name="recordAlwaysButton">
+              <widget class="nx::client::desktop::SelectableButton" name="recordAlwaysButton">
                <property name="minimumSize">
                 <size>
                  <width>48</width>
@@ -196,7 +196,7 @@
            <item row="0" column="1">
             <layout class="QHBoxLayout" name="horizontalLayout_6">
              <item>
-              <widget class="QnSelectableButton" name="recordMotionButton">
+              <widget class="nx::client::desktop::SelectableButton" name="recordMotionButton">
                <property name="minimumSize">
                 <size>
                  <width>48</width>
@@ -234,7 +234,7 @@
            <item row="0" column="2">
             <layout class="QHBoxLayout" name="horizontalLayout_7">
              <item>
-              <widget class="QnSelectableButton" name="recordMotionPlusLQButton">
+              <widget class="nx::client::desktop::SelectableButton" name="recordMotionPlusLQButton">
                <property name="minimumSize">
                 <size>
                  <width>48</width>
@@ -272,7 +272,7 @@
            <item row="0" column="3">
             <layout class="QHBoxLayout" name="horizontalLayout_8">
              <item>
-              <widget class="QnSelectableButton" name="noRecordButton">
+              <widget class="nx::client::desktop::SelectableButton" name="noRecordButton">
                <property name="minimumSize">
                 <size>
                  <width>48</width>
@@ -588,9 +588,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnSelectableButton</class>
+   <class>nx::client::desktop::SelectableButton</class>
    <extends>QToolButton</extends>
-   <header location="global">ui/widgets/common/selectable_button.h</header>
+   <header location="global">nx/client/desktop/common/widgets/selectable_button.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -55,6 +55,7 @@
                 </property>
             </activation>
             <modules>
+                <module>nx_data_sync_engine_ut</module>
                 <module>cloud_db_ut</module>
                 <module>connection_mediator_ut</module>
                 <module>traffic_relay_ut</module>

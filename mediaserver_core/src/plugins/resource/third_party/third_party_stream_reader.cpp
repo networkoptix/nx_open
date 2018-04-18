@@ -64,14 +64,13 @@ namespace
 
 
 ThirdPartyStreamReader::ThirdPartyStreamReader(
-    QnResourcePtr res,
+    QnThirdPartyResourcePtr res,
     nxcip::BaseCameraManager* camManager )
 :
     CLServerPushStreamReader( res ),
-    m_camManager( camManager ),
-    m_cameraCapabilities( 0 )
+    m_thirdPartyRes(res),
+    m_camManager(camManager)
 {
-    m_thirdPartyRes = getResource().dynamicCast<QnThirdPartyResource>();
     NX_ASSERT( m_thirdPartyRes );
 
     m_audioLayout.reset( new QnResourceCustomAudioLayout() );
@@ -304,7 +303,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
         {
             QnMutexLocker lock(&m_streamReaderMutex);
             m_builtinStreamReader.reset(new MJPEGStreamReader(
-                m_resource,
+                m_thirdPartyRes,
                 mediaUrl.path() + (!mediaUrl.query().isEmpty() ? lit("?") + mediaUrl.query() : QString())));
         }
         else

@@ -1120,17 +1120,17 @@ to view more bookmarks</source>
       <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
       <translation>"%1" dosyası zaten var. Lütfen başka bir ad deneyin.</translation>
     </message>
-    <message numerus="yes">
-      <source>Filename should not contain the following reserved characters:
-%1</source>
-      <translation>
-        <numerusform>Dosya adı ayrılmış şu karakterler içermemelidir: %1</numerusform>
-        <numerusform>Dosya adı ayrılmış şu karakterleri içermemelidir: %1</numerusform>
-      </translation>
-    </message>
     <message>
-      <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation>&quot;%1&quot; dosyası başka bir işlem tarafından kullanılıyor. Lütfen başka bir isim deneyin.</translation>
+      <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
+      <translation type="unfinished">File name &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
+    </message>
+    <message numerus="yes">
+      <source>File name must not contain the following reserved characters:</source>
+      <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
+      <translation type="unfinished">
+        <numerusform>File name must not contain the following reserved characters:</numerusform>
+        <numerusform>File name must not contain the following reserved characters:</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -1182,7 +1182,7 @@ to view more bookmarks</source>
       <source>Password must be at least %n characters long.</source>
       <translation type="unfinished">
         <numerusform>Şifre en az %n karakterden oluşmalıdır.</numerusform>
-        <numerusform>Password must be at least %n characters long.</numerusform>
+        <numerusform>Şifre en az %n karakterden oluşmalıdır.</numerusform>
       </translation>
     </message>
     <message>
@@ -1192,21 +1192,21 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>Password must be no longer than %n characters.</source>
       <translation type="unfinished">
-        <numerusform>Password must be no longer than %n characters.</numerusform>
+        <numerusform>Parola %n karakterden uzun olmak zorundadır.</numerusform>
         <numerusform>Parola %n karakterden uzun olmak zorundadır.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more consecutive characters together.</source>
       <translation type="unfinished">
-        <numerusform>Password should not contain %n or more consecutive characters together.</numerusform>
+        <numerusform>Parola %n veya daha fazla ardışık karakter içermemelidir.</numerusform>
         <numerusform>Parola %n veya daha fazla ardışık karakter içermemelidir.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters.</source>
       <translation type="unfinished">
-        <numerusform>Password should not contain %n or more repeating characters.</numerusform>
+        <numerusform>Parola %n veya daha fazla ardışık karakter içermemelidir.</numerusform>
         <numerusform>Parola %n veya daha fazla ardışık karakter içermemelidir.</numerusform>
       </translation>
     </message>
@@ -2799,51 +2799,60 @@ devices</source>
     </message>
     <message>
       <source>Disconnect System from %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Sistem %1 den bağlantıyı kes</translation>
     </message>
     <message>
       <source>Open %1 Portal</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1 portalını aç</translation>
     </message>
     <message>
       <source>Create %1 Account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1 hesabı oluştur</translation>
     </message>
     <message>
       <source>Connect System to %1...</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Sistem %1 e bağlan...</translation>
     </message>
     <message>
       <source>Create %1
 account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1 hesabı oluştur</translation>
     </message>
     <message>
       <source>Connect System
 to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Sistem %1 e bağlan</translation>
     </message>
     <message>
       <source>Learn more about %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1 hakkında daha fazla bilgi</translation>
     </message>
   </context>
   <context>
     <name>QnCloudResultMessages</name>
     <message>
-      <source>Incorrect email or password</source>
-      <translation>Hatalı e-posta yada şifre</translation>
+      <source>Account not found</source>
+      <translation>Hesap bulunamadı</translation>
     </message>
     <message>
-      <source>Account is not activated. Please check your email and follow provided instructions</source>
-      <translation>Kullanıcı aktif değil. Lütfen e postanıza kontrol edin ve gönderilen yönergeleri izleyin</translation>
+      <source>Account is not activated.</source>
+      <translation>Hesap etkin değil.</translation>
+    </message>
+    <message>
+      <source>Please log in to %1 and follow the provided instructions.</source>
+      <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
+      <translation>Lütfen %1 'e giriş yapın ve verilen talimatları izleyin.</translation>
+    </message>
+    <message>
+      <source>Invalid password</source>
+      <translation>Geçersiz parola</translation>
     </message>
   </context>
   <context>
@@ -2858,7 +2867,7 @@ to %1</source>
     </message>
     <message>
       <source>Cannot connect to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1 e bağlanılamıyor</translation>
     </message>
   </context>
@@ -2889,12 +2898,12 @@ to %1</source>
     </message>
     <message>
       <source>Connect to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1'e bağlan</translation>
     </message>
     <message>
       <source>Enter %1 Account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1'in hesabını girin</translation>
     </message>
   </context>
@@ -2906,12 +2915,12 @@ to %1</source>
     </message>
     <message>
       <source>System connected to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Sistem %1 e bağlı</translation>
     </message>
     <message>
       <source>Failed to connect System to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1 e bağlanılamadı</translation>
     </message>
   </context>
@@ -3063,17 +3072,17 @@ to %1</source>
       <translation>Bu işleme izin verilmedi. Sunucu yeniden başlıyor olabilir. Lütfen tekrar deneyin.</translation>
     </message>
     <message>
-      <source>Connection to %1 is not ready yet. Check server Internet connection or try again later.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>%1 in bağlantısı hazır değil. Sunucu bağlantısnı kontrol edip tekrar deneyin.</translation>
-    </message>
-    <message>
       <source>Connection to Server could not be established.</source>
       <translation>Sunucuya bağlantı kurulamadı.</translation>
     </message>
     <message>
       <source>This user is disabled by system administrator.</source>
       <translation>Bu kullanıcı sistem yöneticisi tarafından devre dışı bırakıldı.</translation>
+    </message>
+    <message>
+      <source>Connection to %1 is not ready yet. Check server Internet connection or try again later.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>%1 in bağlantısı hazır değil. Sunucu bağlantısnı kontrol edip tekrar deneyin.</translation>
     </message>
   </context>
   <context>
@@ -3179,6 +3188,10 @@ to %1</source>
     <message>
       <source>You can create a backup for System configurations that can be restored in case of failure.</source>
       <translation>Herhangi bir aksilik olmasına karşın sistem konfigürasyonunu yedekleyebilir ve daha sonra tekrar yükleyebilirsiniz.</translation>
+    </message>
+    <message>
+      <source>Database Backup Files</source>
+      <translation>Veritabanı yedekleme dosyası</translation>
     </message>
   </context>
   <context>
@@ -3297,28 +3310,28 @@ to %1</source>
       <translation>Bağlantıyı kes</translation>
     </message>
     <message>
-      <source>Failed to disconnect System from %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>%1 den bağlantı kesilemedi</translation>
-    </message>
-    <message>
-      <source>Disconnect System from %1?</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>%1 den bağlantıyı kesmek istiyor musunuz?</translation>
-    </message>
-    <message>
       <source>You will be disconnected from this System and able to login again through local network with local account</source>
       <translation>Bu sistem ile bağlanıtınızı keseceksiniz ve tekrar yerel ağdan yerel kullanıcı ile giriş yapabileceksiniz</translation>
     </message>
     <message>
-      <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>%1 hesabı ile bu sistemden bağlantınızı keserseniz tekrar %1 hesabı ile bağlanamayabilirsiniz.</translation>
+      <source>Failed to disconnect System from %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>%1 den bağlantı kesilemedi</translation>
+    </message>
+    <message>
+      <source>Disconnect System from %1?</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>%1 den bağlantıyı kesmek istiyor musunuz?</translation>
     </message>
     <message>
       <source>All %1 users will be deleted.</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation type="unfinished">All %1 users will be deleted.</translation>
+    </message>
+    <message>
+      <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>%1 hesabı ile bu sistemden bağlantınızı keserseniz tekrar %1 hesabı ile bağlanamayabilirsiniz.</translation>
     </message>
   </context>
   <context>
@@ -4202,10 +4215,6 @@ to %1</source>
       <translation>Lisans Dosyasını Aç</translation>
     </message>
     <message>
-      <source>All files (*.*)</source>
-      <translation>Tüm Dosyalar (*.*)</translation>
-    </message>
-    <message>
       <source>Failed to open file</source>
       <translation>Dosya açılamadı</translation>
     </message>
@@ -4216,6 +4225,10 @@ to %1</source>
     <message>
       <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
       <translation>Aktivasyon dosyasını almak için Lütfen %1 e ait lisans anahtarını ve donanım kimliğini gönderin.</translation>
+    </message>
+    <message>
+      <source>All files</source>
+      <translation>Tüm Dosyalar</translation>
     </message>
   </context>
   <context>
@@ -4253,7 +4266,7 @@ to %1</source>
     <name>QnLinkToCloudDialogPrivate</name>
     <message>
       <source>Failed to login to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1 e bağlanırken hata oluştu</translation>
     </message>
   </context>
@@ -4371,12 +4384,12 @@ to %1</source>
     </message>
     <message>
       <source>Log in to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1 e giriş yapın</translation>
     </message>
     <message>
       <source>Welcome to %1!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1'e hoş geldiniz!</translation>
     </message>
   </context>
@@ -5629,10 +5642,6 @@ to %1</source>
       <translation>Güncelleme Dosyasını Seç...</translation>
     </message>
     <message>
-      <source>Update Files (*.zip)</source>
-      <translation>Güncelleme Dosyaları (*.zip)</translation>
-    </message>
-    <message>
       <source>Release notes</source>
       <translation>Yayıncı Notları</translation>
     </message>
@@ -5815,6 +5824,10 @@ to %1</source>
       <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
       <translation>%1 ile uyumsuzluk. Öncelikle %1 in bağlantısını kesin.</translation>
+    </message>
+    <message>
+      <source>Update Files</source>
+      <translation>Dosyaları Güncelle</translation>
     </message>
   </context>
   <context>
@@ -6508,16 +6521,6 @@ to %1</source>
       <translation>Bağlan</translation>
     </message>
     <message>
-      <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Sisteminizi %1 &amp;mdash; ile her yerden erişilebilir hale getirin!</translation>
-    </message>
-    <message>
-      <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Kontrol edin %1&amp;mdash; Sisteminize her yerden bağlanın!</translation>
-    </message>
-    <message>
       <source>Some users have not set their email addresses</source>
       <translation>Bazı kullanıcılar için e-posta adresleri ayarlı değil</translation>
     </message>
@@ -6568,6 +6571,16 @@ to %1</source>
     <message>
       <source>Archive integrity problem detected</source>
       <translation>Arşiv bütünlüğü sorunu tespit edildi</translation>
+    </message>
+    <message>
+      <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Sisteminizi %1 &amp;mdash; ile her yerden erişilebilir hale getirin!</translation>
+    </message>
+    <message>
+      <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Kontrol edin %1&amp;mdash; Sisteminize her yerden bağlanın!</translation>
     </message>
   </context>
   <context>
@@ -6854,7 +6867,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 user</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation type="unfinished">%1 user</translation>
     </message>
   </context>
@@ -7039,7 +7052,7 @@ to %1</source>
     </message>
     <message>
       <source>This user has not yet signed up for %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Bu kullanıcı henüz %1 için kaydolmadı</translation>
     </message>
   </context>
@@ -7091,7 +7104,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 user with specified email already exists.</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation type="unfinished">%1 user with specified email already exists.</translation>
     </message>
   </context>
@@ -7336,7 +7349,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 Systems cannot be merged</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation type="unfinished">%1 Systems cannot be merged</translation>
     </message>
   </context>

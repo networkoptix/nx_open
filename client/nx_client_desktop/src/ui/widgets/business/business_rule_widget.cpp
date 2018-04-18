@@ -20,7 +20,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <ui/common/aligner.h>
+#include <nx/client/desktop/common/utils/aligner.h>
 #include <ui/common/palette.h>
 #include <ui/dialogs/resource_selection_dialog.h>
 #include <ui/dialogs/week_time_schedule_dialog.h>
@@ -66,8 +66,8 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent) :
     m_eventParameters(NULL),
     m_actionParameters(NULL),
     m_updating(false),
-    m_eventAligner(new QnAligner(this)),
-    m_actionAligner(new QnAligner(this))
+    m_eventAligner(new Aligner(this)),
+    m_actionAligner(new Aligner(this))
 {
     ui->setupUi(this);
 
@@ -283,7 +283,7 @@ void QnBusinessRuleWidget::initEventParameters()
         m_eventParameters->setVisible(true);
         m_eventParameters->setModel(m_model);
 
-        if (const auto aligner = m_eventParameters->findChild<QnAligner*>())
+        if (const auto aligner = m_eventParameters->findChild<Aligner*>())
             m_eventAligner->addAligner(aligner);
     }
     else
@@ -334,7 +334,7 @@ void QnBusinessRuleWidget::initActionParameters()
         m_actionParameters->setVisible(true);
         m_actionParameters->setModel(m_model);
 
-        if (const auto aligner = m_actionParameters->findChild<QnAligner*>())
+        if (const auto aligner = m_actionParameters->findChild<Aligner*>())
             m_actionAligner->addAligner(aligner);
     }
     else

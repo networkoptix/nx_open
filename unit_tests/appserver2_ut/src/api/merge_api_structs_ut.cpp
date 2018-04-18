@@ -4,7 +4,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/std/cpp14.h>
 
-#include <rest/ec2_update_http_handler.h>
+#include <rest/handlers/ec2_update_http_handler.h>
 
 #include <nx/core/access/access_types.h>
 #include <core/resource_access/user_access_data.h>

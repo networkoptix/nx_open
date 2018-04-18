@@ -97,7 +97,10 @@ Error Manager::startFetchingMetadata(nxpl::NX_GUID* /*typeList*/, int /*typeList
                 packet->addItem(event);
             }
 
-            m_handler->handleMetadata(Error::noError, packet);
+            NX_ASSERT(m_handler, "Handler should exist");
+            if (m_handler)
+                m_handler->handleMetadata(Error::noError, packet);
+
             packet->releaseRef();
         };
 
@@ -122,7 +125,6 @@ Error Manager::stopFetchingMetadata()
         m_plugin->managerStoppedToUseMonitor(m_sharedId);
 
     m_monitor = nullptr;
-    m_handler = nullptr;
 
     return Error::noError;
 }

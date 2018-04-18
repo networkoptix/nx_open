@@ -6,12 +6,12 @@ import logging
 from requests.exceptions import ReadTimeout
 
 from framework.rest_api import RestApi
-from framework.server_factory import SERVER_LOG_ARTIFACT_TYPE, CORE_FILE_ARTIFACT_TYPE, TRACEBACK_ARTIFACT_TYPE
+from framework.mediaserver_factory import SERVER_LOG_ARTIFACT_TYPE, CORE_FILE_ARTIFACT_TYPE, TRACEBACK_ARTIFACT_TYPE
 from framework.utils import wait_until
 from . import utils
 from .utils import GrowingSleep
 from .core_file_traceback import create_core_file_traceback
-from .server import Server
+from .mediaserver import Mediaserver
 from .service import AdHocService
 from .template_renderer import TemplateRenderer
 
@@ -103,7 +103,7 @@ class LightweightServersInstallation(object):
         assert False, 'This operation is not supported by lightweight server'
 
 
-class LightweightServer(Server):
+class LightweightServer(Mediaserver):
     def __init__(self, name, os_access, service, installation, api, port=None):
         super(LightweightServer, self).__init__(name, service, installation, api, None, port=port)
         self.internal_ip_address = os_access.hostname

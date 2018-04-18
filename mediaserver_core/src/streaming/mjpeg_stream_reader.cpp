@@ -2,8 +2,9 @@
 #if defined(ENABLE_DATA_PROVIDERS)
 
 #include "nx/streaming/video_data_packet.h"
-#include <core/resource/camera_resource.h>
-#include "core/resource/network_resource.h"
+
+#include <nx/mediaserver/resource/camera.h>
+
 #include "utils/common/synctime.h"
 #include <nx/network/http/http_types.h>
 #include "utils/media/jpeg_utils.h"
@@ -63,10 +64,12 @@ int contain_subst(char *data, int datalen, char *subdata, int subdatalen)
 }
 */
 
-MJPEGStreamReader::MJPEGStreamReader(const QnResourcePtr& res, const QString& streamHttpPath)
+MJPEGStreamReader::MJPEGStreamReader(const nx::mediaserver::resource::CameraPtr& res,
+    const QString& streamHttpPath)
 :
     CLServerPushStreamReader(res),
-    m_request(streamHttpPath)
+    m_request(streamHttpPath),
+    m_camera(res)
 {
 
 }
@@ -153,20 +156,22 @@ CameraDiagnostics::Result MJPEGStreamReader::openStreamInternal(bool /*isCameraC
         return CameraDiagnostics::NoErrorResult();
 
     //QString request = QLatin1String("now.jpg?snap=spush?dummy=1305868336917");
-    auto nres = getResource().dynamicCast<QnNetworkResource>();
-	auto virtRes = getResource().dynamicCast<QnVirtualCameraResource>();
 
-    mHttpClient.reset( new CLSimpleHTTPClient(nres->getHostAddress(), nres->httpPort() , 2000, nres->getAuth()) );
+    mHttpClient.reset(
+        new CLSimpleHTTPClient(
+            m_camera->getHostAddress(),
+            m_camera->httpPort(),
+            2000,
+            m_camera->getAuth()));
     CLHttpStatus httpStatus = mHttpClient->doGET(m_request);
 
 	QUrl requestedUrl;
-	requestedUrl.setHost(nres->getHostAddress());
-	requestedUrl.setPort(nres->httpPort());
+	requestedUrl.setHost(m_camera->getHostAddress());
+	requestedUrl.setPort(m_camera->httpPort());
 	requestedUrl.setScheme(QLatin1String("http"));
 	requestedUrl.setPath(m_request);
 
-	if (virtRes)
-		virtRes->updateSourceUrl(requestedUrl.toString(), getRole());
+    m_camera->updateSourceUrl(requestedUrl.toString(), getRole());
 
     switch( httpStatus )
     {

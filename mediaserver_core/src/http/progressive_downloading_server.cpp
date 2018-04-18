@@ -40,6 +40,7 @@
 #include <media_server/media_server_module.h>
 #include "rest/server/json_rest_result.h"
 #include <api/helpers/camera_id_helper.h>
+#include <core/dataprovider/data_provider_factory.h>
 
 static const int CONNECTION_TIMEOUT = 1000 * 5;
 static const int MAX_QUEUE_SIZE = 30;
@@ -770,7 +771,8 @@ void QnProgressiveDownloadingConsumer::run()
                 return;
             }
 
-            d->archiveDP = QSharedPointer<QnArchiveStreamReader> (dynamic_cast<QnArchiveStreamReader*> (resource->createDataProvider(Qn::CR_Archive)));
+            d->archiveDP = QSharedPointer<QnArchiveStreamReader> (dynamic_cast<QnArchiveStreamReader*> (
+                qnServerModule->dataProviderFactory()->createDataProvider(resource, Qn::CR_Archive)));
             d->archiveDP->open(qnServerModule->archiveIntegrityWatcher());
             d->archiveDP->jumpTo( timeUSec, timeUSec );
 

@@ -4,7 +4,11 @@
 
 #include <common/common_module.h>
 
+#include <client/client_module.h>
+
 #include "core/resource/media_server_resource.h"
+#include <core/dataprovider/data_provider_factory.h>
+
 #include "network/tcp_connection_priv.h"
 #include "api/app_server_connection.h"
 #include "rtsp/rtsp_ffmpeg_encoder.h"
@@ -15,7 +19,6 @@
 #include <nx/streaming/abstract_stream_data_provider.h>
 #include <nx/streaming/config.h>
 #include <nx/network/buffered_stream_socket.h>
-
 
 static const int CONNECT_TIMEOUT = 1000 * 5;
 static const int KEEP_ALIVE_TIMEOUT = 1000 * 120;
@@ -101,7 +104,7 @@ private:
 class QnDesktopCameraConnectionProcessorPrivate: public QnTCPConnectionProcessorPrivate
 {
 public:
-    QnDesktopResource* desktop;
+    QnDesktopResourcePtr desktop;
     QnAbstractStreamDataProvider* dataProvider;
     QnDesktopCameraDataConsumer* dataConsumer;
     QnMutex sendMutex;
@@ -110,7 +113,7 @@ public:
 QnDesktopCameraConnectionProcessor::QnDesktopCameraConnectionProcessor(
     QSharedPointer<nx::network::AbstractStreamSocket> socket,
     void* sslContext,
-    QnDesktopResource* desktop)
+    QnDesktopResourcePtr desktop)
     :
     QnTCPConnectionProcessor(new QnDesktopCameraConnectionProcessorPrivate(),
         socket,
@@ -139,9 +142,9 @@ void QnDesktopCameraConnectionProcessor::processRequest()
     QByteArray method = d->request.requestLine.method;
     if (method == "PLAY")
     {
-        if (d->dataProvider == 0)
+        if (!d->dataProvider)
         {
-            d->dataProvider = d->desktop->createDataProvider(Qn::CR_Default);
+            d->dataProvider = qnClientModule->dataProviderFactory()->createDataProvider(d->desktop);
             d->dataConsumer = new QnDesktopCameraDataConsumer(this);
             d->dataProvider->addDataProcessor(d->dataConsumer);
             d->dataConsumer->start();
@@ -218,7 +221,7 @@ void QnDesktopCameraConnectionProcessor::sendData(const char* data, int len)
 // --------------- QnDesktopCameraconnection ------------------
 
 QnDesktopCameraConnection::QnDesktopCameraConnection(
-    QnDesktopResource* owner,
+    QnDesktopResourcePtr owner,
     const QnMediaServerResourcePtr& server,
     const QnUuid& userId)
     :

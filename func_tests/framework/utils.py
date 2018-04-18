@@ -1,10 +1,15 @@
 import calendar
 import logging
+import socket
+import struct
 import time
 import timeit
+from contextlib import closing
 from datetime import datetime, timedelta
 
 import pytz
+from pylru import lrudecorator
+from pytz import utc
 
 log = logging.getLogger(__name__)
 
@@ -86,34 +91,52 @@ class RunningTime(object):
     >>> ours = RunningTime(datetime(2017, 11, 5, 0, 0, 10, tzinfo=pytz.utc), timedelta(seconds=4))
     >>> ours, str(ours)  # doctest: +ELLIPSIS
     (RunningTime(...2017-11-05...+/-...), '2017-11-05 ... +/- 2...')
-    >>> ours.is_close_to(datetime(2017, 11, 5, 0, 0, 5, tzinfo=pytz.utc), threshold=timedelta(seconds=2))
+    >>> ours.is_close_to(RunningTime(datetime(2017, 11, 5, 0, 0, 5, tzinfo=pytz.utc)), threshold=timedelta(seconds=2))
     False
     >>> theirs = RunningTime(datetime(2017, 11, 5, 0, 0, 5, tzinfo=pytz.utc), timedelta(seconds=4))
     >>> ours.is_close_to(theirs, threshold=timedelta(seconds=2))
     True
     """
 
-    def __init__(self, received_time, network_round_trip):
+    def __init__(self, received_time, network_round_trip=timedelta()):
         half_network_round_trip = timedelta(seconds=network_round_trip.total_seconds() / 2)
         self._received_at = datetime.now(pytz.utc)
         self._initial = received_time + half_network_round_trip
-        self._error = half_network_round_trip  # Doesn't change significantly during runtime.
+        self.error = half_network_round_trip  # Doesn't change significantly during runtime.
 
     @property
-    def _current(self):
+    def current(self):
         return self._initial + (datetime.now(pytz.utc) - self._received_at)
 
     def is_close_to(self, other, threshold=timedelta(seconds=2)):
-        if isinstance(other, self.__class__):
-            return abs(self._current - other._current) <= threshold + self._error + other._error
-        else:
-            return abs(self._current - other) <= threshold + self._error
+        return abs(self.current - other.current) <= threshold + self.error + other.error
 
     def __str__(self):
-        return '{} +/- {}'.format(self._current.strftime('%Y-%m-%d %H:%M:%S.%f %Z'), self._error.total_seconds())
+        return '{} +/- {}'.format(self.current.strftime('%Y-%m-%d %H:%M:%S.%f %Z'), self.error.total_seconds())
 
     def __repr__(self):
         return '{self.__class__.__name__}({self:s})'.format(self=self)
+
+
+@lrudecorator(1)
+def get_internet_time(address='time.rfc868server.com', port=37):
+    """Get time from RFC868 time server wrap into Python's datetime.
+    >>> import timeit
+    >>> get_internet_time()  # doctest: +ELLIPSIS
+    RunningTime(...)
+    >>> timeit.timeit(get_internet_time, number=1) < 1e-4
+    True
+    """
+    with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
+        started_at = datetime.now(utc)
+        s.connect((address, port))
+        time_data = s.recv(4)
+        request_duration = datetime.now(utc) - started_at
+    remote_as_rfc868_timestamp, = struct.unpack('!I', time_data)
+    posix_to_rfc868_diff = datetime.fromtimestamp(0, utc) - datetime(1900, 1, 1, tzinfo=utc)
+    remote_as_posix_timestamp = remote_as_rfc868_timestamp - posix_to_rfc868_diff.total_seconds()
+    remote_as_datetime = datetime.fromtimestamp(remote_as_posix_timestamp, utc)
+    return RunningTime(remote_as_datetime, request_duration)
 
 
 class Timeout(Exception):
@@ -160,7 +183,7 @@ class Wait(object):
         return False
 
 
-def wait_until(condition_is_true, name=None, timeout_sec=30):
+def wait_until(condition_is_true, name=None, timeout_sec=30):  # TODO: Throw exception, doesn't return anything.
     name = name or "until %s returns True" % condition_is_true.__name__
     wait = Wait(name=name, timeout_sec=timeout_sec)
     while True:
@@ -180,5 +203,3 @@ def holds_long_enough(condition_is_true, name=None, timeout_sec=10):
         if not wait.sleep_and_continue():
             return True
     return False
-
-

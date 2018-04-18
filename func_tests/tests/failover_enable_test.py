@@ -14,7 +14,7 @@ import pytest
 import server_api_data_generators as generator
 from framework.api_shortcuts import get_server_id, get_system_settings
 from framework.merging import merge_systems
-from framework.server import MEDIASERVER_MERGE_TIMEOUT
+from framework.mediaserver import MEDIASERVER_MERGE_TIMEOUT
 from framework.utils import bool_to_str, datetime_utc_now, str_to_bool, wait_until
 
 CAMERA_SWITCHING_PERIOD_SEC = 4*60
@@ -44,12 +44,12 @@ ServerRec = namedtuple('ServerRec', 'server camera_mac_set')
 # After that we merge servers and wait until preferred cameras settle down on destined servers.
 
 
-def create_cameras_and_servers(linux_servers_pool, camera_factory, counter, server_name_list):
+def create_cameras_and_servers(linux_mediaservers_pool, camera_factory, counter, server_name_list):
     server_count = len(server_name_list)
     # we always use 2 cameras per server
     all_camera_mac_set = set(create_cameras(camera_factory, counter, count=server_count*2))
     server_list = [
-        create_server(linux_servers_pool, server_name, all_camera_mac_set)
+        create_server(linux_mediaservers_pool, server_name, all_camera_mac_set)
         for server_name in server_name_list]
     for server in server_list[1:]:
         server_list[0].merge_systems(server)
@@ -64,8 +64,8 @@ def create_cameras_and_servers(linux_servers_pool, camera_factory, counter, serv
     return server_rec_list
 
 
-def create_server(linux_servers_pool, name, all_camera_mac_set, setup_settings=None):
-    server = linux_servers_pool.get(name, setup_settings=setup_settings)
+def create_server(linux_mediaservers_pool, name, all_camera_mac_set, setup_settings=None):
+    server = linux_mediaservers_pool.get(name, setup_settings=setup_settings)
     wait_until_cameras_are_online(server, all_camera_mac_set)
     return server
 
@@ -151,8 +151,8 @@ def get_server_camera_macs(server):
 # Based on testrail C744 Check "Enable failover" for server
 # https://networkoptix.testrail.net/index.php?/cases/view/744
 @pytest.mark.testcam
-def test_enable_failover_on_one_server(linux_servers_pool, camera_factory, counter):
-    one, two, three = create_cameras_and_servers(linux_servers_pool, camera_factory, counter, ['one', 'two', 'three'])
+def test_enable_failover_on_one_server(linux_mediaservers_pool, camera_factory, counter):
+    one, two, three = create_cameras_and_servers(linux_mediaservers_pool, camera_factory, counter, ['one', 'two', 'three'])
     two.server.api.ec2.saveMediaServerUserAttributes.POST(
         serverId=get_server_id(two.server.api),
         maxCameras=4,
@@ -171,8 +171,8 @@ def test_enable_failover_on_one_server(linux_servers_pool, camera_factory, count
 
 
 @pytest.mark.testcam
-def test_enable_failover_on_two_servers(linux_servers_pool, camera_factory, counter):
-    one, two, three = create_cameras_and_servers(linux_servers_pool, camera_factory, counter, ['one', 'two', 'three'])
+def test_enable_failover_on_two_servers(linux_mediaservers_pool, camera_factory, counter):
+    one, two, three = create_cameras_and_servers(linux_mediaservers_pool, camera_factory, counter, ['one', 'two', 'three'])
     one.server.api.ec2.saveMediaServerUserAttributes.POST(
         serverId=get_server_id(one.server.api),
         maxCameras=3,
@@ -185,10 +185,10 @@ def test_enable_failover_on_two_servers(linux_servers_pool, camera_factory, coun
     two.server.stop()
     wait_until_camera_count_is_online(one.server, 3)
     assert len(online_camera_macs_on_server(one.server)) == 3, (
-        'Server "one" maxCameras limit (3) does not work - it got more than 3 cameras')
+        'Mediaserver "one" maxCameras limit (3) does not work - it got more than 3 cameras')
     wait_until_camera_count_is_online(three.server, 3)
     assert len(online_camera_macs_on_server(three.server)) == 3, (
-        'Server "three" maxCameras limit (3) does not work - it got more than 3 cameras')
+        'Mediaserver "three" maxCameras limit (3) does not work - it got more than 3 cameras')
     # start server two back; cameras must return to their original owners
     two.server.start()
     wait_until_camera_count_is_online(two.server, 2)
@@ -206,10 +206,10 @@ def discovery(request):
 # Based on testrail C745 Check "Enable failover" for server
 # https://networkoptix.testrail.net/index.php?/cases/view/745
 @pytest.mark.testcam
-def test_failover_and_auto_discovery(linux_servers_pool, camera_factory, counter, discovery):
+def test_failover_and_auto_discovery(linux_mediaservers_pool, camera_factory, counter, discovery):
     camera_mac_set = set(create_cameras(camera_factory, counter, count=2))
-    one = create_server(linux_servers_pool, 'one', camera_mac_set)
-    two = create_server(linux_servers_pool, 'two', set(), setup_settings=dict(
+    one = create_server(linux_mediaservers_pool, 'one', camera_mac_set)
+    two = create_server(linux_mediaservers_pool, 'two', set(), setup_settings=dict(
         systemSettings=dict(autoDiscoveryEnabled=bool_to_str(discovery))))
     assert str_to_bool(get_system_settings(two.api)['autoDiscoveryEnabled']) == discovery
     attach_cameras_to_server(one, camera_mac_set)
@@ -234,8 +234,8 @@ def test_failover_and_auto_discovery(linux_servers_pool, camera_factory, counter
 # Based on testrail C747 Check "Enable failover" for server
 # https://networkoptix.testrail.net/index.php?/cases/view/747
 @pytest.mark.testcam
-def test_max_camera_settings(linux_servers_pool, camera_factory, counter):
-    one, two = create_cameras_and_servers(linux_servers_pool, camera_factory, counter, ['one', 'two'])
+def test_max_camera_settings(linux_mediaservers_pool, camera_factory, counter):
+    one, two = create_cameras_and_servers(linux_mediaservers_pool, camera_factory, counter, ['one', 'two'])
     one.server.api.ec2.saveMediaServerUserAttributes.POST(
         serverId=get_server_id(one.server.api),
         maxCameras=3,
@@ -248,13 +248,13 @@ def test_max_camera_settings(linux_servers_pool, camera_factory, counter):
     two.server.stop()
     wait_until_camera_count_is_online(one.server, 3)
     assert len(online_camera_macs_on_server(one.server)) == 3, (
-        'Server "one" maxCameras limit (3) does not work - it got more than 3 cameras')
+        'Mediaserver "one" maxCameras limit (3) does not work - it got more than 3 cameras')
     # stop server one, and start two; no additional cameras must go to server two
     one.server.stop()
     two.server.start()
     wait_until_camera_count_is_online(two.server, 2)
     assert len(online_camera_macs_on_server(two.server)) == 2, (
-        'Server "two" maxCameras limit (2) does not work - '
+        'Mediaserver "two" maxCameras limit (2) does not work - '
         'it got cameras from server one, while already has 2 own cameras')
     # start server one again; all cameras must go back to their original owners
     one.server.start()

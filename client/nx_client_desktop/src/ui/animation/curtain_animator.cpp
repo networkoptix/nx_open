@@ -13,12 +13,14 @@
 #include <ui/animation/opacity_animator.h>
 #include <ui/animation/variant_animator.h>
 
+using namespace nx::client::desktop;
+
 namespace
 {
     const qreal kTransparent = 0.0;
     const qreal kOpaque = 1.0;
 
-}
+} // namespace
 
 QnCurtainAnimator::QnCurtainAnimator(QObject *parent):
     AnimatorGroup(parent),

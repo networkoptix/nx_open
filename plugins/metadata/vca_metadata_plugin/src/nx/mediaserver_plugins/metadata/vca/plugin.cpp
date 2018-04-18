@@ -1,19 +1,15 @@
 #include "plugin.h"
 
-#include <array>
-#include <fstream>
-#include <string>
-#include <memory>
-
 #include <QtCore/QString>
-#include <QtCore/QUrlQuery>
 #include <QtCore/QFile>
+#include <QtCore/QFileInfo>
 
-#include <nx/network/http/http_client.h>
 #include <nx/fusion/model_functions.h>
+
 #include <nx/mediaserver_plugins/utils/uuid.h>
 
 #include "manager.h"
+#include "log.h"
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -32,10 +28,23 @@ using namespace nx::sdk::metadata;
 
 Plugin::Plugin()
 {
-    static const char* const kResourceName=":/vca/manifest.json";
+    static const char* const kResourceName = ":/vca/manifest.json";
+    static const char* const kFileName = "plugins/vca/manifest.json";
+
     QFile f(kResourceName);
     if (f.open(QFile::ReadOnly))
         m_manifest = f.readAll();
+    {
+        QFile file(kFileName);
+        if (file.open(QFile::ReadOnly))
+        {
+
+            NX_PRINT << "Switch to external manifest file "
+                << QFileInfo(file).absoluteFilePath().toStdString();
+
+            m_manifest = file.readAll();
+        }
+    }
     m_typedManifest = QJson::deserialized<AnalyticsDriverManifest>(m_manifest);
 }
 
@@ -90,9 +99,7 @@ void Plugin::setLocale(const char* locale)
 {
 }
 
-CameraManager* Plugin::obtainCameraManager(
-    const CameraInfo& cameraInfo,
-    Error* outError)
+CameraManager* Plugin::obtainCameraManager(const CameraInfo& cameraInfo, Error* outError)
 {
     *outError = Error::noError;
     const auto vendor = QString(cameraInfo.vendor).toLower();

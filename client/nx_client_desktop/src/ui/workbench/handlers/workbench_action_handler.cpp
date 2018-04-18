@@ -69,6 +69,7 @@
 #include <nx/client/desktop/ui/messages/videowall_messages.h>
 #include <nx/client/desktop/ui/messages/local_files_messages.h>
 #include <nx/client/desktop/resource_views/functional_delegate_utilities.h>
+#include <nx/client/desktop/resource_views/data/node_type.h>
 
 #include <nx/network/http/http_types.h>
 #include <nx/network/socket_global.h>
@@ -2012,18 +2013,21 @@ bool ActionHandler::validateResourceName(const QnResourcePtr& resource, const QS
 
 void ActionHandler::at_renameAction_triggered()
 {
+    using NodeType = ResourceTreeNodeType;
+
     const auto parameters = menu()->currentParameters(sender());
+
+    const auto nodeType = parameters.argument<NodeType>(Qn::NodeTypeRole, NodeType::resource);
 
     QnResourcePtr resource;
 
-    Qn::NodeType nodeType = parameters.argument<Qn::NodeType>(Qn::NodeTypeRole, Qn::ResourceNode);
     switch (nodeType)
     {
-        case Qn::ResourceNode:
-        case Qn::EdgeNode:
-        case Qn::RecorderNode:
-        case Qn::SharedLayoutNode:
-        case Qn::SharedResourceNode:
+        case NodeType::resource:
+        case NodeType::edge:
+        case NodeType::recorder:
+        case NodeType::sharedLayout:
+        case NodeType::sharedResource:
             resource = parameters.resource();
             break;
         default:
@@ -2033,7 +2037,7 @@ void ActionHandler::at_renameAction_triggered()
         return;
 
     QnVirtualCameraResourcePtr camera;
-    if (nodeType == Qn::RecorderNode)
+    if (nodeType == NodeType::recorder)
     {
         camera = resource.dynamicCast<QnVirtualCameraResource>();
         if (!camera)
@@ -2041,7 +2045,7 @@ void ActionHandler::at_renameAction_triggered()
     }
 
     QString name = parameters.argument<QString>(Qn::ResourceNameRole).trimmed();
-    QString oldName = nodeType == Qn::RecorderNode
+    QString oldName = nodeType == NodeType::recorder
         ? camera->getGroupName()
         : resource->getName();
 
@@ -2075,7 +2079,7 @@ void ActionHandler::at_renameAction_triggered()
         else
             context()->instance<LayoutsHandler>()->renameLayout(layout, name);
     }
-    else if (nodeType == Qn::RecorderNode)
+    else if (nodeType == NodeType::recorder)
     {
         /* Recorder name should not be validated. */
         QString groupId = camera->getGroupId();

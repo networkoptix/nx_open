@@ -1,3 +1,5 @@
+#pragma once
+
 #include <string>
 #include <boost/optional.hpp>
 
@@ -8,12 +10,31 @@ class SystemCommands
 public:
     static const char* const kDomainSocket;
 
+    enum class UnmountCode
+    {
+        ok,
+        busy,
+        notExists,
+        noPermissions
+    };
+
+    enum class MountCode
+    {
+        ok,
+        wrongCredentials,
+        otherError
+    };
+
     /** Mounts NAS from url to directory for real UID and GID. */
-    bool mount(const std::string& url, const std::string& directory,
-        const boost::optional<std::string>& username, const boost::optional<std::string>& password);
+    MountCode mount(
+        const std::string& url,
+        const std::string& directory,
+        const boost::optional<std::string>& username,
+        const boost::optional<std::string>& password,
+        bool reportViaSocket);
 
     /** Unounts NAS from directory. */
-    bool unmount(const std::string& directory);
+    UnmountCode unmount(const std::string& directory, bool reportViaSocket);
 
     /** Changes path ownership to real UID and GID. */
     bool changeOwner(const std::string& path);
@@ -48,6 +69,11 @@ public:
     /** Returns file size. */
     int64_t fileSize(const std::string& path, bool reportViaSocket);
 
+    /** Gets device path by file system path */
+    std::string devicePath(const std::string& path, bool reportViaSocket);
+
+    bool kill(int pid);
+
     /** Installs deb package to system. */
     bool install(const std::string& debPackage);
 
@@ -58,6 +84,32 @@ public:
     bool setupIds();
 
     std::string lastError() const;
+
+    static const char* unmountCodeToString(UnmountCode code)
+    {
+        switch (code)
+        {
+            case UnmountCode::ok: return "ok";
+            case UnmountCode::busy: return "resource is busy";
+            case UnmountCode::notExists: return "path not exists";
+            case UnmountCode::noPermissions: return "no permissions";
+        }
+
+        return "";
+    }
+
+    static const char* mountCodeToString(MountCode code)
+    {
+        switch (code)
+        {
+            case MountCode::ok: return "ok";
+            case MountCode::wrongCredentials: return "wrong credentials";
+            case MountCode::otherError: return "error";
+        }
+
+        return "";
+    }
+
 
 private:
     enum class CheckOwnerResult

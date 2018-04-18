@@ -6,11 +6,15 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 
+#include <nx/client/desktop/common/utils/stream_quality_strings.h>
+
 #include <utils/common/scoped_value_rollback.h>
 #include <ui/common/read_only.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
 static constexpr int kMsecPerSecond = 1000;
+
+using namespace nx::client::desktop;
 
 QnRecordingBusinessActionWidget::QnRecordingBusinessActionWidget(QWidget *parent) :
     base_type(parent),
@@ -19,7 +23,7 @@ QnRecordingBusinessActionWidget::QnRecordingBusinessActionWidget(QWidget *parent
     ui->setupUi(this);
 
     for (int i = Qn::QualityLowest; i <= Qn::QualityHighest; i++) {
-        ui->qualityComboBox->addItem(Qn::toDisplayString((Qn::StreamQuality)i), i);
+        ui->qualityComboBox->addItem(toDisplayString((Qn::StreamQuality)i), i);
     }
 
     static constexpr int kMaxPreRecordingSecs = 60;

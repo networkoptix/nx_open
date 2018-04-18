@@ -1,7 +1,7 @@
 *** Settings ***
 Resource          ../resource.robot
 Resource          ../variables.robot
-Suite Teardown    Close All Browsers
+Test Teardown     Close Browser
 
 *** Variables ***
 ${password}    ${BASE PASSWORD}
@@ -22,7 +22,6 @@ password can be changed
     Input Text    ${NEW PASSWORD INPUT}    ${password}
     Click Button    ${CHANGE PASSWORD BUTTON}
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
-    Close Browser
 
 password is actually changed, so login works with new password
     Log In To Change Password Page
@@ -42,7 +41,6 @@ password is actually changed, so login works with new password
     Input Text    ${NEW PASSWORD INPUT}    ${password}
     Click Button    ${CHANGE PASSWORD BUTTON}
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
-    Close Browser
 
 password change is not possible if old password is wrong
     Log In To Change Password Page
@@ -50,7 +48,6 @@ password change is not possible if old password is wrong
     Input Text    ${NEW PASSWORD INPUT}    ${ALT PASSWORD}
     Click Button    ${CHANGE PASSWORD BUTTON}
     Check For Alert    ${CANNOT SAVE PASSWORD} ${PASSWORD INCORRECT}
-    Close Browser
 
 more than 255 symbols can be entered in new password field and then are cut to 255
     Log In To Change Password Page
@@ -58,7 +55,6 @@ more than 255 symbols can be entered in new password field and then are cut to 2
     Input Text    ${NEW PASSWORD INPUT}    ${300CHARS}
     Textfield Should Contain    ${CURRENT PASSWORD INPUT}    ${255CHARS}
     Textfield Should Contain    ${NEW PASSWORD INPUT}    ${255CHARS}
-    Close Browser
 
 pressing Enter key saves data
     Log In To Change Password Page
@@ -66,7 +62,6 @@ pressing Enter key saves data
     Input Text    ${NEW PASSWORD INPUT}    ${password}
     Press Key    ${NEW PASSWORD INPUT}    ${ENTER}
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
-    Close Browser
 
 pressing Tab key moves focus to the next element
     Log In To Change Password Page
@@ -76,4 +71,3 @@ pressing Tab key moves focus to the next element
     Input Text    ${NEW PASSWORD INPUT}    ${password}
     Press Key    ${NEW PASSWORD INPUT}    ${TAB}
     Element Should Be Focused    ${CHANGE PASSWORD BUTTON}
-    Close Browser

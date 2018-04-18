@@ -1,6 +1,6 @@
 #include "vms_p2p_command_bus.h"
 
-#include "synchronization_engine.h"
+#include <nx/data_sync_engine/synchronization_engine.h>
 
 namespace nx {
 namespace cdb {

@@ -13,11 +13,13 @@
 #include <ui/style/nx_style.h>
 #include <ui/style/helper.h>
 #include <ui/common/palette.h>
-#include <ui/common/page_size_adjuster.h>
 #include <ui/style/globals.h>
-
-#include <utils/common/object_companion.h>
 #include <utils/math/color_transformations.h>
+
+#include <nx/client/desktop/common/utils/object_companion.h>
+#include <nx/client/desktop/common/utils/page_size_adjuster.h>
+
+using namespace nx::client::desktop;
 
 // TODO: #vkutin Default disabledOpacity to style::Hints::kDisabledItemOpacity in new versions.
 void setWarningStyle(QWidget* widget, qreal disabledOpacity)
@@ -93,7 +95,7 @@ void autoResizePagesToContents(QStackedWidget* pages,
     bool resizeToVisible,
     std::function<void()> extraHandler)
 {
-    QnStackedWidgetPageSizeAdjuster::install(pages, visiblePagePolicy, resizeToVisible, extraHandler);
+    StackedWidgetPageSizeAdjuster::install(pages, visiblePagePolicy, resizeToVisible, extraHandler);
 }
 
 void autoResizePagesToContents(QTabWidget* pages,
@@ -101,7 +103,7 @@ void autoResizePagesToContents(QTabWidget* pages,
     bool resizeToVisible,
     std::function<void()> extraHandler)
 {
-    QnTabWidgetPageSizeAdjuster::install(pages, visiblePagePolicy, resizeToVisible, extraHandler);
+    TabWidgetPageSizeAdjuster::install(pages, visiblePagePolicy, resizeToVisible, extraHandler);
 }
 
 void fadeWidget(

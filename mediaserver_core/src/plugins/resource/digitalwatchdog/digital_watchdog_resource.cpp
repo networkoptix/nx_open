@@ -362,7 +362,8 @@ QSet<QString> QnDigitalWatchdogResource::calculateSupportedAdvancedParameters() 
     return result;
 }
 
-void QnDigitalWatchdogResource::fetchAndSetAdvancedParameters() {
+void QnDigitalWatchdogResource::fetchAndSetAdvancedParameters()
+{
     base_type::fetchAndSetAdvancedParameters();
     if (useOnvifAdvancedParameterProviders())
         return;
@@ -371,7 +372,8 @@ void QnDigitalWatchdogResource::fetchAndSetAdvancedParameters() {
     m_hasZoom = modelHasZoom(cameraModel);
 }
 
-QString QnDigitalWatchdogResource::fetchCameraModel() {
+QString QnDigitalWatchdogResource::fetchCameraModel()
+{
     QAuthenticator auth = getAuth();
     // TODO: #vasilenko UTF unuse StdString
     DeviceSoapWrapper soapWrapper(getDeviceOnvifUrl().toStdString(), auth.user(), auth.password(), getTimeDrift());

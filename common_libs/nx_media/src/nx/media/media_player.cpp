@@ -225,6 +225,8 @@ public:
     // Turn on / turn off audio
     bool isAudioEnabled;
 
+    RenderContextSynchronizerPtr renderContextSynchronizer;
+
     void applyVideoQuality();
 
 private:
@@ -281,7 +283,8 @@ PlayerPrivate::PlayerPrivate(Player *parent):
     overflowCounter(0),
     videoQuality(Player::HighVideoQuality),
     allowOverlay(true),
-    isAudioEnabled(true)
+    isAudioEnabled(true),
+    renderContextSynchronizer(VideoDecoderRegistry::instance()->defaultRenderContextSynchronizer())
 {
     connect(execTimer, &QTimer::timeout, this, &PlayerPrivate::presentNextFrame);
     execTimer->setSingleShot(true);
@@ -746,7 +749,7 @@ bool PlayerPrivate::initDataProvider()
     if (!archiveReader)
         return false;
 
-    dataConsumer.reset(new PlayerDataConsumer(archiveReader));
+    dataConsumer.reset(new PlayerDataConsumer(archiveReader, renderContextSynchronizer));
     dataConsumer->setAudioEnabled(isAudioEnabled);
     dataConsumer->setAllowOverlay(allowOverlay);
 
@@ -1291,6 +1294,18 @@ PlayerStatistics Player::currentStatistics() const
         result.codec = codecContext->getCodecName();
 
     return result;
+}
+
+RenderContextSynchronizerPtr Player::renderContextSynchronizer() const
+{
+    Q_D(const Player);
+    return d->renderContextSynchronizer;
+}
+
+void Player::setRenderContextSynchronizer(RenderContextSynchronizerPtr value)
+{
+    Q_D(Player);
+    d->renderContextSynchronizer = value;
 }
 
 void Player::testSetOwnedArchiveReader(QnArchiveStreamReader* archiveReader)

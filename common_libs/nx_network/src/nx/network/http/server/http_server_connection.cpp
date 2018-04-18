@@ -388,9 +388,9 @@ void HttpServerConnection::fullMessageHasBeenSent()
     NX_ASSERT(!m_responseQueue.empty());
     if (m_responseQueue.front().connectionEvents.onResponseHasBeenSent)
     {
-        auto handler =
-            std::move(m_responseQueue.front().connectionEvents.onResponseHasBeenSent);
-        handler(this);
+        nx::utils::swapAndCall(
+            m_responseQueue.front().connectionEvents.onResponseHasBeenSent,
+            this);
     }
     m_responseQueue.pop_front();
 

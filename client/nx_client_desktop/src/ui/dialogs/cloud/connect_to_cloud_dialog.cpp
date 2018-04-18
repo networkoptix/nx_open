@@ -24,7 +24,7 @@
 
 #include <utils/common/html.h>
 
-#include <ui/common/aligner.h>
+#include <nx/client/desktop/common/utils/aligner.h>
 #include <ui/dialogs/cloud/cloud_result_messages.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -96,7 +96,7 @@ QnConnectToCloudDialog::QnConnectToCloudDialog(QWidget* parent) :
 {
     ui->setupUi(this);
     setWindowTitle(tr("Connect to %1",
-        "%1 is the cloud name (like 'Nx Cloud')").arg(nx::network::AppInfo::cloudName()));
+        "%1 is the cloud name (like Nx Cloud)").arg(nx::network::AppInfo::cloudName()));
 
     Q_D(QnConnectToCloudDialog);
 
@@ -120,7 +120,7 @@ QnConnectToCloudDialog::QnConnectToCloudDialog(QWidget* parent) :
     ui->enterCloudAccountLabel->setFont(font);
     ui->enterCloudAccountLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
     ui->enterCloudAccountLabel->setText(tr("Enter %1 Account",
-        "%1 is the cloud name (like 'Nx Cloud')").arg(nx::network::AppInfo::cloudName()));
+        "%1 is the cloud name (like Nx Cloud)").arg(nx::network::AppInfo::cloudName()));
     ui->enterCloudAccountLabel->setForegroundRole(QPalette::Light);
 
     ui->loginInputField->setTitle(tr("Email"));
@@ -133,7 +133,7 @@ QnConnectToCloudDialog::QnConnectToCloudDialog(QWidget* parent) :
     ui->createAccountLabel->setText(makeHref(tr("Create account"), urlHelper.createAccountUrl()));
     ui->forgotPasswordLabel->setText(makeHref(tr("Forgot password?"), urlHelper.restorePasswordUrl()));
 
-    auto aligner = new QnAligner(this);
+    auto aligner = new Aligner(this);
     aligner->registerTypeAccessor<InputField>(InputField::createLabelWidthAccessor());
     aligner->addWidgets({ ui->loginInputField, ui->passwordInputField, ui->spacer });
 
@@ -276,7 +276,7 @@ void QnConnectToCloudDialogPrivate::showSuccess(const QString& /*cloudLogin*/)
     q->menu()->trigger(ui::action::HideCloudPromoAction);
 
     QnMessageBox::success(q->parentWidget(),
-        tr("System connected to %1", "%1 is the cloud name (like 'Nx Cloud')")
+        tr("System connected to %1", "%1 is the cloud name (like Nx Cloud)")
             .arg(nx::network::AppInfo::cloudName()));
 
     // Since we have QTBUG-40585 event loops of dialogs shouldn't be intersected.
@@ -288,7 +288,7 @@ void QnConnectToCloudDialogPrivate::showFailure(const QString &message)
     Q_Q(QnConnectToCloudDialog);
 
     QnMessageBox::critical(q,
-        tr("Failed to connect System to %1", "%1 is the cloud name (like 'Nx Cloud')")
+        tr("Failed to connect System to %1", "%1 is the cloud name (like Nx Cloud)")
             .arg(nx::network::AppInfo::cloudName()),
         message);
 
@@ -308,7 +308,7 @@ void QnConnectToCloudDialogPrivate::at_bindFinished(
         {
             case api::ResultCode::badUsername:
             case api::ResultCode::notAuthorized:
-                showCredentialsError(QnCloudResultMessages::invalidCredentials());
+                showCredentialsError(QnCloudResultMessages::invalidPassword());
                 break;
 
             case api::ResultCode::accountNotActivated:

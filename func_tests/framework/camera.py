@@ -105,7 +105,7 @@ class Camera(object):
         return make_camera_info(parent_id, self.name, self.mac_addr)
 
     def wait_until_discovered_by_server(self, server_list, timeout=CAMERA_DISCOVERY_WAIT_TIMEOUT):
-        #assert is_list_inst(server_list, Server), repr(server_list)
+        #assert is_list_inst(server_list, Mediaserver), repr(server_list)
         log.info('Waiting for camera %s to be discovered by servers %s', self, ', '.join(map(str, server_list)))
         start_time = datetime_utc_now()
         while datetime_utc_now() - start_time < timeout:
@@ -132,7 +132,7 @@ class Camera(object):
         assert d['parentId'] == server_guid
 
     def start_streaming(self):
-        # assert isinstance(server, Server), repr(server)  # import circular dependency
+        # assert isinstance(server, Mediaserver), repr(server)  # import circular dependency
         self._discovery_listener.stream_to(self, self._vm_address)
 
 

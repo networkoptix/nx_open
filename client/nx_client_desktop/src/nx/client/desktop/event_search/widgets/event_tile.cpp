@@ -9,7 +9,7 @@
 
 #include <client/client_globals.h>
 #include <ui/common/palette.h>
-#include <ui/common/widget_anchor.h>
+#include <nx/client/desktop/common/utils/widget_anchor.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
 #include <ui/widgets/common/elided_label.h>
@@ -51,7 +51,7 @@ EventTile::EventTile(QWidget* parent):
     m_closeButton->setFixedSize(m_closeButton->iconSize());
     m_closeButton->setFlat(true);
     m_closeButton->setHidden(true);
-    auto anchor = new QnWidgetAnchor(m_closeButton);
+    auto anchor = new WidgetAnchor(m_closeButton);
     anchor->setEdges(Qt::RightEdge | Qt::TopEdge);
 
     auto sizePolicy = ui->timestampLabel->sizePolicy();
@@ -118,7 +118,7 @@ EventTile::EventTile(QWidget* parent):
     m_progressLabel->setForegroundRole(QPalette::Highlight);
 
     static constexpr int kProgressLabelShift = 8;
-    auto progressLabelAnchor = new QnWidgetAnchor(m_progressLabel);
+    auto progressLabelAnchor = new WidgetAnchor(m_progressLabel);
     progressLabelAnchor->setMargins(0, 0, 0, kProgressLabelShift);
 
     connect(m_closeButton, &QPushButton::clicked, this, &EventTile::closeRequested);

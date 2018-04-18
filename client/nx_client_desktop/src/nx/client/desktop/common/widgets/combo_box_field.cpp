@@ -4,7 +4,7 @@
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QListView>
 
-#include <ui/common/accessor.h>
+#include <nx/client/desktop/common/utils/accessor.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <utils/math/math.h>
 

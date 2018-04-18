@@ -27,7 +27,7 @@
 
 #include <server/server_storage_manager.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
-#include <ui/common/item_view_hover_tracker.h>
+#include <nx/client/desktop/common/utils/item_view_hover_tracker.h>
 #include <ui/delegates/switch_item_delegate.h>
 #include <ui/dialogs/storage_url_dialog.h>
 #include <ui/dialogs/backup_settings_dialog.h>
@@ -54,6 +54,8 @@
 #include <utils/math/color_transformations.h>
 
 #include <common/common_globals.h>
+
+using namespace nx::client::desktop;
 
 namespace
 {
@@ -87,7 +89,7 @@ namespace
         typedef QStyledItemDelegate base_type;
 
     public:
-        explicit StorageTableItemDelegate(QnItemViewHoverTracker* hoverTracker, QObject* parent = nullptr) :
+        explicit StorageTableItemDelegate(ItemViewHoverTracker* hoverTracker, QObject* parent = nullptr) :
             base_type(parent),
             m_hoverTracker(hoverTracker),
             m_editedRow(-1)
@@ -178,7 +180,7 @@ namespace
         }
 
     private:
-        QPointer<QnItemViewHoverTracker> m_hoverTracker;
+        QPointer<ItemViewHoverTracker> m_hoverTracker;
         int m_editedRow;
     };
 
@@ -255,8 +257,8 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
     setHelpTopic(this, Qn::ServerSettings_Storages_Help);
     setHelpTopic(ui->backupGroupBox, Qn::ServerSettings_StoragesBackup_Help);
 
-    auto hoverTracker = new QnItemViewHoverTracker(ui->storageView);
-    hoverTracker->setAutomaticMouseCursor(true);
+    auto hoverTracker = new ItemViewHoverTracker(ui->storageView);
+    hoverTracker->setMouseCursorRole(Qn::ItemMouseCursorRole);
 
     auto itemDelegate = new StorageTableItemDelegate(hoverTracker, this);
     ui->storageView->setItemDelegate(itemDelegate);
@@ -284,7 +286,7 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
         ui->storageView->update(index);
     };
 
-    connect(ui->storageView, &QnTreeView::clicked, this, itemClicked);
+    connect(ui->storageView, &TreeView::clicked, this, itemClicked);
 
     connect(ui->backupPages, &QStackedWidget::currentChanged,
         this, &QnStorageConfigWidget::updateRealtimeBackupMovieStatus);

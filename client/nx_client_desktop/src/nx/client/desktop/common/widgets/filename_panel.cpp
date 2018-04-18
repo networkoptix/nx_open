@@ -3,7 +3,7 @@
 
 #include <client/client_settings.h>
 
-#include <ui/common/aligner.h>
+#include <nx/client/desktop/common/utils/aligner.h>
 #include <ui/dialogs/common/file_dialog.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <nx/utils/app_info.h>
@@ -35,7 +35,7 @@ FilenamePanel::FilenamePanel(QWidget* parent):
     ui->extensionsComboBox->setMaximumWidth(kFilterComboBoxWidth);
     ui->extensionsComboBox->setCustomTextRole(Qn::ShortTextRole);
 
-    const auto aligner = new QnAligner(this);
+    const auto aligner = new Aligner(this);
     aligner->registerTypeAccessor<InputField>(InputField::createLabelWidthAccessor());
     aligner->addWidgets({ui->folderInputField, ui->nameInputField});
 

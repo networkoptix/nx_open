@@ -17,7 +17,7 @@ import time
 import pytest
 
 from framework.merging import merge_systems, setup_local_system
-from framework.server import MEDIASERVER_MERGE_TIMEOUT
+from framework.mediaserver import MEDIASERVER_MERGE_TIMEOUT
 from framework.utils import SimpleNamespace, datetime_utc_now, bool_to_str
 
 
@@ -43,15 +43,15 @@ def db_version(request):
 
 
 @pytest.fixture
-def one(linux_servers_pool, bin_dir, db_version):
-    return server('one', linux_servers_pool, bin_dir, db_version)
+def one(linux_mediaservers_pool, bin_dir, db_version):
+    return server('one', linux_mediaservers_pool, bin_dir, db_version)
 
 @pytest.fixture
-def two(linux_servers_pool, bin_dir, db_version):
-    return server('two', linux_servers_pool, bin_dir, db_version)
+def two(linux_mediaservers_pool, bin_dir, db_version):
+    return server('two', linux_mediaservers_pool, bin_dir, db_version)
 
 
-def server(name, linux_servers_pool, bin_dir, db_version):
+def server(name, linux_mediaservers_pool, bin_dir, db_version):
     server_config = SERVER_CONFIG[name]
     if db_version == '2.4':
         config_file_params = dict(
@@ -59,10 +59,10 @@ def server(name, linux_servers_pool, bin_dir, db_version):
             serverGuid=server_config.SERVER_GUID,
             minStorageSpace=1024*1024,  # 1M
             )
-        server = linux_servers_pool.get(name, config_file_params=config_file_params)
+        server = linux_mediaservers_pool.get(name, config_file_params=config_file_params)
         copy_database_file(server, bin_dir, server_config.DATABASE_FILE_V_2_4)
     else:
-        server = linux_servers_pool.get(name)
+        server = linux_mediaservers_pool.get(name)
     server.start()
     system_settings = dict(autoDiscoveryEnabled=bool_to_str(False))
     setup_local_system(server, {'systemSettings': system_settings})

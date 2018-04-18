@@ -6,6 +6,8 @@
 
 #include "camera/video_camera.h"
 
+#include <nx/mediaserver/resource/resource_fwd.h>
+
 class QnCameraDiagnosticsRestHandler: public QnJsonRestHandler
 {
     Q_OBJECT
@@ -21,11 +23,11 @@ public:
 
 private:
     static CameraDiagnostics::Result checkCameraAvailability(
-        const QnSecurityCamResourcePtr& cameraRes);
+        const nx::mediaserver::resource::CameraPtr& cameraRes);
 
     static CameraDiagnostics::Result tryAcquireCameraMediaStream(
-        const QnSecurityCamResourcePtr& cameraRes,
         const QnVideoCameraPtr& videoCamera);
 
-    static CameraDiagnostics::Result checkCameraMediaStreamForErrors(const QnResourcePtr& res);
+    static CameraDiagnostics::Result checkCameraMediaStreamForErrors(
+        const nx::mediaserver::resource::CameraPtr& camera);
 };

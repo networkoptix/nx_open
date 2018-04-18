@@ -19,7 +19,7 @@ import transaction_log
 from memory_usage_metrics import load_host_memory_usage
 from framework.api_shortcuts import get_server_id, get_system_settings
 from framework.compare import compare_values
-from framework.server import MEDIASERVER_MERGE_TIMEOUT
+from framework.mediaserver import MEDIASERVER_MERGE_TIMEOUT
 from framework.utils import GrowingSleep
 
 log = logging.getLogger(__name__)
@@ -63,7 +63,7 @@ def lightweight_servers(metrics_saver, lightweight_servers_factory, config):
     return lws_list
 
 @pytest.fixture
-def servers(metrics_saver, linux_servers_pool, lightweight_servers, config):
+def servers(metrics_saver, linux_mediaservers_pool, lightweight_servers, config):
     server_count = config.SERVER_COUNT - len(lightweight_servers)
     log.info('Creating %d servers:', server_count)
     setup_settings = dict(systemSettings=dict(
@@ -71,7 +71,7 @@ def servers(metrics_saver, linux_servers_pool, lightweight_servers, config):
         synchronizeTimeWithInternet=utils.bool_to_str(False),
         ))
     start_time = utils.datetime_utc_now()
-    server_list = [linux_servers_pool.get('server_%04d' % (idx + 1),
+    server_list = [linux_mediaservers_pool.get('server_%04d' % (idx + 1),
                                            setup_settings=setup_settings)
                        for idx in range(server_count)]
     metrics_saver.save('server_init_duration', utils.datetime_utc_now() - start_time)

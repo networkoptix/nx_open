@@ -125,7 +125,7 @@ State loadMinMaxCustomBitrate(State state)
 
 State fillBitrateFromFixedQuality(State state)
 {
-    state.recording.brush.bitrateMbps = QnScheduleGridWidget::CellParams::kAutomaticBitrate;
+    state.recording.brush.bitrateMbps = ScheduleCellParams::kAutomaticBitrate;
     state.recording.bitrateMbps = calculateBitrateForQualityMbps(
         state,
         state.recording.brush.quality);
@@ -304,17 +304,18 @@ State CameraSettingsDialogStateReducer::loadCameras(
     state.hasChanges = false;
     state.singleCameraProperties = {};
     state.singleCameraSettings = {};
-    state.devicesProperties = {};
+    state.devicesDescription = {};
     state.recording = {};
     state.devicesCount = cameras.size();
+    state.alert = {};
 
-    state.devicesProperties.isDtsBased = combinedValue(cameras,
+    state.devicesDescription.isDtsBased = combinedValue(cameras,
         [](const Camera& camera) { return camera->isDtsBased(); });
-    state.devicesProperties.isWearable = combinedValue(cameras,
+    state.devicesDescription.isWearable = combinedValue(cameras,
         [](const Camera& camera) { return camera->hasFlags(Qn::wearable_camera); });
-    state.devicesProperties.hasMotion = combinedValue(cameras,
+    state.devicesDescription.hasMotion = combinedValue(cameras,
         [](const Camera& camera) { return camera->hasMotion(); });
-    state.devicesProperties.hasDualStreaming = combinedValue(cameras,
+    state.devicesDescription.hasDualStreaming = combinedValue(cameras,
         [](const Camera& camera) { return camera->hasDualStreaming(); });
 
     if (firstCamera)
@@ -354,8 +355,8 @@ State CameraSettingsDialogStateReducer::loadCameras(
 
      Qn::calculateMaxFps(
             cameras,
-            &state.devicesProperties.maxFps,
-            &state.devicesProperties.maxDualStreamingFps,
+            &state.devicesDescription.maxFps,
+            &state.devicesDescription.maxDualStreamingFps,
             false);
 
     state.recording.schedule = {};
@@ -400,7 +401,7 @@ State CameraSettingsDialogStateReducer::setSingleCameraUserName(State state, con
 
 State CameraSettingsDialogStateReducer::setScheduleBrush(
     State state,
-    const QnScheduleGridWidget::CellParams& brush)
+    const ScheduleCellParams& brush)
 {
     state.recording.brush = brush;
     const auto fps = qBound(
@@ -409,6 +410,7 @@ State CameraSettingsDialogStateReducer::setScheduleBrush(
         state.maxRecordingBrushFps());
 
     state = setScheduleBrushFps(std::move(state), fps);
+    state.alert = State::Alert::BrushChanged;
 
     return state;
 }
@@ -427,6 +429,8 @@ State CameraSettingsDialogStateReducer::setScheduleBrushRecordingType(
             state.recording.brush.fps,
             state.maxRecordingBrushFps());
     }
+    state.alert = State::Alert::BrushChanged;
+
     return state;
 }
 
@@ -447,6 +451,7 @@ State CameraSettingsDialogStateReducer::setScheduleBrushFps(State state, int val
         state = loadMinMaxCustomBitrate(std::move(state));
         state = setCustomRecordingBitrateNormalized(std::move(state), normalizedBitrate);
     }
+    state.alert = State::Alert::BrushChanged;
 
     return state;
 }
@@ -457,6 +462,8 @@ State CameraSettingsDialogStateReducer::setScheduleBrushQuality(
 {
     state.recording.brush.quality = value;
     state = fillBitrateFromFixedQuality(std::move(state));
+    state.alert = State::Alert::BrushChanged;
+
     return state;
 }
 
@@ -472,6 +479,8 @@ State CameraSettingsDialogStateReducer::setSchedule(State state, const ScheduleT
     }
 
     state.recording.schedule.setUser(processed);
+    state.alert = {};
+
     return state;
 }
 

@@ -2,10 +2,11 @@ import logging
 
 import pytest
 
+from framework.mediaserver_factory import cleanup_mediaserver
 from framework.merging import IncompatibleServersMerge, merge_systems, setup_cloud_system, setup_local_system
 from framework.rest_api import HttpError, RestApi
-from framework.server import Server
-from framework.server_installation import install_mediaserver
+from framework.mediaserver import Mediaserver
+from framework.mediaserver_installation import install_mediaserver
 from framework.service import UpstartService
 
 pytest_plugins = ['fixtures.cloud']
@@ -25,8 +26,8 @@ def check_user_exists(server, is_cloud):
 
 # https://networkoptix.atlassian.net/browse/VMS-3730
 # https://networkoptix.atlassian.net/wiki/display/SD/Merge+systems+test#Mergesystemstest-test_with_different_cloud_hosts_must_not_be_able_to_merge
-def test_with_different_cloud_hosts_must_not_be_able_to_merge(two_linux_servers, cloud_account):
-    test_cloud_server, wrong_cloud_server = two_linux_servers
+def test_with_different_cloud_hosts_must_not_be_able_to_merge(two_linux_mediaservers, cloud_account):
+    test_cloud_server, wrong_cloud_server = two_linux_mediaservers
 
     test_cloud_server.start()
     setup_cloud_system(test_cloud_server, cloud_account, {})
@@ -44,8 +45,8 @@ def test_with_different_cloud_hosts_must_not_be_able_to_merge(two_linux_servers,
     assert not wrong_cloud_server.installation.list_core_dumps()
 
 
-def test_server_should_be_able_to_merge_local_to_cloud_one(two_linux_servers, cloud_account):
-    cloud_bound_server, local_server = two_linux_servers
+def test_server_should_be_able_to_merge_local_to_cloud_one(two_linux_mediaservers, cloud_account):
+    cloud_bound_server, local_server = two_linux_mediaservers
 
     cloud_bound_server.start()
     setup_cloud_system(cloud_bound_server, cloud_account, {})
@@ -68,19 +69,10 @@ def original_cloud_host_server(linux_vm, mediaserver_deb, ca):
     service = UpstartService(linux_vm.os_access, mediaserver_deb.customization.service)
     name = 'original-cloud-host'
     api = RestApi(name, *linux_vm.ports['tcp', 7001])
-    server = Server(name, service, installation, api, linux_vm, 7001)
-    server.stop()
-    server.installation.cleanup_core_files()
-    server.installation.cleanup_var_dir()
-    server.installation.put_key_and_cert(ca.generate_key_and_cert())
-    server.installation.restore_mediaserver_conf()
-    server.installation.update_mediaserver_conf({
-        'logLevel': 'DEBUG2',
-        'tranLogLevel': 'DEBUG2',
-        'checkForUpdateUrl': 'http://127.0.0.1:8080',  # TODO: Use fake server responding with small updates.
-        })
-    server.start()
-    return server
+    mediaserver = Mediaserver(name, service, installation, api, linux_vm, 7001)
+    cleanup_mediaserver(mediaserver, ca)
+    mediaserver.start()
+    return mediaserver
 
 
 # https://networkoptix.atlassian.net/wiki/spaces/SD/pages/85204446/Cloud+test
@@ -89,7 +81,7 @@ def test_server_with_hardcoded_cloud_host_should_be_able_to_setup_with_cloud(ori
         setup_cloud_system(original_cloud_host_server, cloud_account, {})
     except HttpError as x:
         if x.reason == 'Could not connect to cloud: notAuthorized':
-            pytest.fail('Server is incompatible with this cloud host/customization')
+            pytest.fail('Mediaserver is incompatible with this cloud host/customization')
         else:
             raise
     check_user_exists(original_cloud_host_server, is_cloud=True)

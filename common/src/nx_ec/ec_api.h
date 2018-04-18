@@ -61,8 +61,8 @@ namespace ec2
     class ECConnectionNotificationManager;
     class TransactionMessageBusAdapter;
     class P2pMessageBus;
-    class QnDistributedMutexManager;
     class TimeSynchronizationManager;
+    class QnAbstractTransactionTransport;
 
     struct QnPeerTimeInfo {
 
@@ -829,6 +829,7 @@ namespace ec2
         void remotePeerFound(QnUuid data, Qn::PeerType peerType);
         void remotePeerLost(QnUuid data, Qn::PeerType peerType);
         void remotePeerUnauthorized(const QnUuid& id);
+        void newDirectConnectionEstablished(QnAbstractTransactionTransport* transport);
 
         void settingsChanged(ec2::ApiResourceParamDataList settings);
 
@@ -843,13 +844,12 @@ namespace ec2
     /*!
         \note All methods are asynchronous if other not specified
     */
-    class AbstractECConnectionFactory: public QObject
+    class AbstractECConnectionFactory: public QObject, public QnCommonModuleAware
     {
         Q_OBJECT
 
     public:
-        AbstractECConnectionFactory()
-        {}
+        AbstractECConnectionFactory(QnCommonModule* commonModule);
         virtual ~AbstractECConnectionFactory() {}
 
         /*!
@@ -872,11 +872,8 @@ namespace ec2
             return impl::doSyncCall<impl::ConnectHandler>(call, connection);
         }
 
-        virtual void registerRestHandlers( QnRestProcessorPool* const restProcessorPool ) = 0;
-        virtual void registerTransactionListener(QnHttpConnectionListener* httpConnectionListener) = 0;
         virtual void setConfParams( std::map<QString, QVariant> confParams ) = 0;
         virtual TransactionMessageBusAdapter* messageBus() const = 0;
-        virtual QnDistributedMutexManager* distributedMutex() const = 0;
         virtual TimeSynchronizationManager* timeSyncManager() const = 0;
         virtual void shutdown() {}
     protected:

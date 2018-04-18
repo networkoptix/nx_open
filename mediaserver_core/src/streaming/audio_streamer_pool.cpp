@@ -9,6 +9,8 @@
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <nx/mediaserver/resource/camera.h>
+#include <media_server/media_server_module.h>
+#include <core/dataprovider/data_provider_factory.h>
 
 namespace
 {
@@ -169,7 +171,7 @@ QnAbstractStreamDataProviderPtr QnAudioStreamerPool::getActionDataProvider(const
         QnAviResourcePtr resource(new QnAviResource(filePath));
         resource->setCommonModule(commonModule());
         resource->setStatus(Qn::Online);
-        provider.reset(resource->createDataProvider(Qn::ConnectionRole::CR_Default));
+        provider.reset(qnServerModule->dataProviderFactory()->createDataProvider(resource));
     }
     else
     {

@@ -18,6 +18,8 @@ namespace nx {
 namespace client {
 namespace desktop {
 
+struct SchedulePaintFunctions;
+
 class LegacyCameraScheduleWidget: public Connective<QnAbstractPreferencesWidget>,
     public QnWorkbenchContextAware
 {
@@ -136,6 +138,7 @@ private:
     Q_DISABLE_COPY(LegacyCameraScheduleWidget)
 
     QScopedPointer<Ui::LegacyCameraScheduleWidget> ui;
+    QScopedPointer<SchedulePaintFunctions> paintFunctions;
 
     QnVirtualCameraResourceList m_cameras;
     bool m_disableUpdateGridParams = false;

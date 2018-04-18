@@ -160,6 +160,13 @@ QString QnProxyConnectionProcessor::connectToRemoteHost(const QnRoute& route, co
             return QString();
 #endif
 
+        if (url.host().isEmpty())
+        {
+            NX_DEBUG(this, lm("Empty target host detected. Cannot connect"));
+            d->socket->close();
+            return QString();
+        }
+
         d->dstSocket = QSharedPointer<nx::network::AbstractStreamSocket>(
             nx::network::SocketFactory::createStreamSocket(url.scheme() == lit("https"))
             .release());

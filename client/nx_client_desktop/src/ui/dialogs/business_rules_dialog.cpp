@@ -57,6 +57,7 @@
 using boost::algorithm::any_of;
 
 using namespace nx;
+using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
 
 namespace {
@@ -248,7 +249,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     sortModel->setDynamicSortFilter(false);
     sortModel->setSourceModel(m_rulesViewModel);
     sortModel->sort(int(kSortColumn));
-    connect(ui->filterLineEdit, &QnSearchLineEdit::textChanged, sortModel, &SortRulesProxyModel::setText);
+    connect(ui->filterLineEdit, &SearchLineEdit::textChanged, sortModel, &SortRulesProxyModel::setText);
 
     enum { kUpdateFilterDelayMs = 200 };
     ui->filterLineEdit->setTextChangedSignalFilterMs(kUpdateFilterDelayMs);
@@ -311,7 +312,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
                 action::Parameters().withArgument(Qn::ParentWidgetRole, QPointer<QWidget>(this)));
         });
 
-    connect(ui->filterLineEdit, &QnSearchLineEdit::textChanged, this,
+    connect(ui->filterLineEdit, &SearchLineEdit::textChanged, this,
         &QnBusinessRulesDialog::updateFilter);
 
     updateFilter();

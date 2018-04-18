@@ -21,7 +21,9 @@
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/common/utils/checkbox_utils.h>
-#include <ui/common/aligner.h>
+#include <nx/client/desktop/common/utils/aligner.h>
+#include <nx/client/desktop/common/utils/stream_quality_strings.h>
+
 #include <ui/common/palette.h>
 #include <ui/common/read_only.h>
 #include <ui/dialogs/resource_selection_dialog.h>
@@ -92,7 +94,8 @@ using namespace ui;
 LegacyCameraScheduleWidget::LegacyCameraScheduleWidget(QWidget* parent, bool snapScrollbarToParent):
     base_type(parent),
     QnWorkbenchContextAware(parent, InitializationMode::lazy),
-    ui(new Ui::LegacyCameraScheduleWidget)
+    ui(new Ui::LegacyCameraScheduleWidget),
+    paintFunctions(new SchedulePaintFunctions())
 {
     ui->setupUi(this);
     ui->recordBeforeSpinBox->setSuffix(L' ' + QnTimeStrings::suffix(QnTimeStrings::Suffix::Seconds));
@@ -131,8 +134,6 @@ LegacyCameraScheduleWidget::LegacyCameraScheduleWidget(QWidget* parent, bool sna
     setHelpTopic(ui->exportScheduleButton, Qn::CameraSettings_Recording_Export_Help);
 
     // init buttons
-    connect(ui->gridWidget, &QnScheduleGridWidget::colorsChanged, this,
-        &LegacyCameraScheduleWidget::updateColors);
     updateColors();
 
     QnCamLicenseUsageHelper helper(commonModule());
@@ -248,7 +249,7 @@ LegacyCameraScheduleWidget::LegacyCameraScheduleWidget(QWidget* parent, bool sna
     connect(ui->advancedSettingsButton, &QPushButton::clicked, this,
         [this]() { setAdvancedSettingsVisible(!m_advancedSettingsVisible); });
 
-    auto aligner = new QnAligner(this);
+    auto aligner = new Aligner(this);
     aligner->addWidgets({ ui->fpsLabel, ui->qualityLabel, ui->bitrateLabel });
 
     // Reset group box bottom margin to zero. Sub-widget margins defined in the ui-file rely on it.
@@ -1080,10 +1081,14 @@ void LegacyCameraScheduleWidget::updateRecordingParamsAvailable()
 
 void LegacyCameraScheduleWidget::updateColors()
 {
-    ui->recordAlwaysButton->setCustomPaintFunction(ui->gridWidget->paintFunction(Qn::RT_Always));
-    ui->recordMotionButton->setCustomPaintFunction(ui->gridWidget->paintFunction(Qn::RT_MotionOnly));
-    ui->recordMotionPlusLQButton->setCustomPaintFunction(ui->gridWidget->paintFunction(Qn::RT_MotionAndLowQuality));
-    ui->noRecordButton->setCustomPaintFunction(ui->gridWidget->paintFunction(Qn::RT_Never));
+    ui->recordAlwaysButton->setCustomPaintFunction(
+        paintFunctions->paintCellFunction(Qn::RT_Always));
+    ui->recordMotionButton->setCustomPaintFunction(
+        paintFunctions->paintCellFunction(Qn::RT_MotionOnly));
+    ui->recordMotionPlusLQButton->setCustomPaintFunction(
+        paintFunctions->paintCellFunction(Qn::RT_MotionAndLowQuality));
+    ui->noRecordButton->setCustomPaintFunction(
+        paintFunctions->paintCellFunction(Qn::RT_Never));
 }
 
 // -------------------------------------------------------------------------- //

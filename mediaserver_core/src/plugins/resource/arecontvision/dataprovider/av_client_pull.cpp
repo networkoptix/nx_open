@@ -8,7 +8,7 @@
 #include "../resource/av_resource.h"
 #include <nx/streaming/config.h>
 
-QnPlAVClinetPullStreamReader::QnPlAVClinetPullStreamReader(const QnResourcePtr& res)
+QnPlAVClinetPullStreamReader::QnPlAVClinetPullStreamReader(const QnPlAreconVisionResourcePtr& res)
 :
     parent_type(res),
     m_videoFrameBuff(CL_MEDIA_ALIGNMENT, 1024*1024)
@@ -16,9 +16,8 @@ QnPlAVClinetPullStreamReader::QnPlAVClinetPullStreamReader(const QnResourcePtr& 
     /**/
     //setQuality(getQuality());  // to update stream params
 
-    QnPlAreconVisionResourcePtr avRes = res.dynamicCast<QnPlAreconVisionResource>();
-    m_panoramic = avRes->isPanoramic();
-    m_dualsensor = avRes->isDualSensor();
+    m_panoramic = m_camera->isPanoramic();
+    m_dualsensor = m_camera->isDualSensor();
 }
 
 QnPlAVClinetPullStreamReader::~QnPlAVClinetPullStreamReader()

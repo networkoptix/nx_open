@@ -32,8 +32,6 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
                 };
         };
 
-    factory.reg({"umount", "unmount"}, {"path"},
-        oneArgAction(std::bind(&nx::SystemCommands::unmount, systemCommands, _1)));
     factory.reg({"chown"}, {"path"},
         oneArgAction(std::bind(&nx::SystemCommands::changeOwner, systemCommands, _1)));
     factory.reg({"touch"}, {"file_path"},
@@ -60,8 +58,8 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
             const auto user = getOptionalArg(argv);
             const auto password = getOptionalArg(argv);
 
-            return systemCommands->mount(*url, *directory, user, password)
-                ? Result::ok : Result::execFailed;
+            return systemCommands->mount(*url, *directory, user, password, true)
+                == nx::SystemCommands::MountCode::ok ? Result::ok : Result::execFailed;
         });
 
     factory.reg({"mv"}, {"source_path", "target_path"},
@@ -127,7 +125,7 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
             return Result::ok;
         });
 
-    factory.reg({"ll"}, {"path"},
+    factory.reg({"list"}, {"path"},
         [systemCommands](const char** argv)
         {
             const auto path = getOptionalArg(argv);
@@ -135,6 +133,18 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
                 return Result::invalidArg;
 
             systemCommands->serializedFileList(*path, /*usePipe*/ true);
+
+            return Result::ok;
+        });
+
+    factory.reg({"devicePath"}, {"path"},
+        [systemCommands](const char** argv)
+        {
+            const auto path = getOptionalArg(argv);
+            if (!path)
+                return Result::invalidArg;
+
+            systemCommands->devicePath(*path, /*usePipe*/ true);
 
             return Result::ok;
         });
@@ -148,6 +158,27 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
 
             return systemCommands->fileSize(*path, /*usePipe*/ true) == -1
                 ? Result::execFailed : Result::ok;
+        });
+
+    factory.reg({"kill"}, {"pid"},
+        [systemCommands](const char** argv)
+        {
+            const auto pid = getOptionalArg(argv);
+            if (!pid)
+                return Result::invalidArg;
+
+            return systemCommands->kill(std::stoi(*pid)) ? Result::ok : Result::execFailed;
+        });
+
+    factory.reg({"umount", "unmount"}, {"path"},
+        [systemCommands](const char** argv)
+        {
+            const auto path = getOptionalArg(argv);
+            if (!path)
+                return Result::invalidArg;
+
+            return systemCommands->unmount(*path, /*usePipe*/ true) ==
+                nx::SystemCommands::UnmountCode::ok ? Result::ok : Result::execFailed;
         });
 
     factory.reg({"help"}, {},

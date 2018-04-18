@@ -70,7 +70,7 @@ bool QnVirtualCameraResource::isForcedAudioSupported() const {
 
 void QnVirtualCameraResource::forceEnableAudio()
 {
-	if (isForcedAudioSupported())
+    if (isForcedAudioSupported())
         return;
     setProperty(Qn::FORCED_IS_AUDIO_SUPPORTED_PARAM_NAME, 1);
     saveParams();
@@ -403,6 +403,13 @@ bool QnVirtualCameraResource::saveBitrateIfNeeded( const CameraBitrateInfo& bitr
                 QString::fromUtf8(QJson::serialized(bitrateInfos)));
 
     return true;
+}
+
+void QnVirtualCameraResource::emitPropertyChanged(const QString& key)
+{
+    if (key == Qn::PTZ_CAPABILITIES_PARAM_NAME)
+        emit ptzCapabilitiesChanged(::toSharedPointer(this));
+    base_type::emitPropertyChanged(key);
 }
 
 void QnVirtualCameraResource::saveResolutionList( const CameraMediaStreams& supportedNativeStreams )

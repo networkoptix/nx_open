@@ -175,6 +175,22 @@ QnSharedResourcePointer<CameraMock> CameraTest::newCamera(std::function<void(Cam
     return camera->initInternal() ? camera : QnSharedResourcePointer<CameraMock>();
 }
 
+void CameraTest::SetUp()
+{
+    m_dataProviderFactory.reset(new QnDataProviderFactory());
+    m_dataProviderFactory->registerResourceType<nx::mediaserver::resource::Camera>();
+}
+
+void CameraTest::TearDown()
+{
+    m_dataProviderFactory.reset();
+}
+
+QnDataProviderFactory* CameraTest::dataProviderFactory() const
+{
+    return m_dataProviderFactory.data();
+}
+
 } // namespace test
 } // namespace resource
 } // namespace mediaserver

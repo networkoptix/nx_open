@@ -80,6 +80,7 @@
 
 #include <nx/client/desktop/ui/messages/resources_messages.h>
 #include <nx/client/desktop/ui/messages/videowall_messages.h>
+#include <nx/client/desktop/resource_views/data/node_type.h>
 
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/json_functions.h>
@@ -1667,18 +1668,20 @@ void QnWorkbenchVideoWallHandler::at_delayedOpenVideoWallItemAction_triggered()
 
 void QnWorkbenchVideoWallHandler::at_renameAction_triggered()
 {
+    using NodeType = ResourceTreeNodeType;
+
     const auto parameters = menu()->currentParameters(sender());
 
-    Qn::NodeType nodeType = parameters.argument<Qn::NodeType>(Qn::NodeTypeRole, Qn::ResourceNode);
+    const auto nodeType = parameters.argument<NodeType>(Qn::NodeTypeRole, NodeType::resource);
     QString name = parameters.argument<QString>(Qn::ResourceNameRole).trimmed();
 
     bool valid = false;
     switch (nodeType)
     {
-        case Qn::VideoWallItemNode:
+        case NodeType::videoWallItem:
             valid = parameters.videoWallItems().size() == 1 && parameters.videoWallItems().first().isValid();
             break;
-        case Qn::VideoWallMatrixNode:
+        case NodeType::videoWallMatrix:
             valid = parameters.videoWallMatrices().size() == 1 && parameters.videoWallMatrices().first().isValid();
             break;
         default:
@@ -1693,10 +1696,10 @@ void QnWorkbenchVideoWallHandler::at_renameAction_triggered()
     QString oldName;
     switch (nodeType)
     {
-        case Qn::VideoWallItemNode:
+        case NodeType::videoWallItem:
             oldName = parameters.videoWallItems().first().item().name;
             break;
-        case Qn::VideoWallMatrixNode:
+        case NodeType::videoWallMatrix:
             oldName = parameters.videoWallMatrices().first().matrix().name;
             break;
         default:
@@ -1709,7 +1712,7 @@ void QnWorkbenchVideoWallHandler::at_renameAction_triggered()
 
     switch (nodeType)
     {
-        case Qn::VideoWallItemNode:
+        case NodeType::videoWallItem:
         {
             QnVideoWallItemIndex index = parameters.videoWallItems().first();
             QnVideoWallItem existingItem = index.item();
@@ -1719,7 +1722,7 @@ void QnWorkbenchVideoWallHandler::at_renameAction_triggered()
         }
         break;
 
-        case Qn::VideoWallMatrixNode:
+        case NodeType::videoWallMatrix:
         {
             QnVideoWallMatrixIndex index = parameters.videoWallMatrices().first();
             QnVideoWallMatrix existingMatrix = index.matrix();

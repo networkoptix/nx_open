@@ -4,7 +4,7 @@
 #include <QtCore/QScopedValueRollback>
 
 #include <ui/common/read_only.h>
-#include <ui/common/aligner.h>
+#include <nx/client/desktop/common/utils/aligner.h>
 #include <nx/client/desktop/common/utils/validators.h>
 
 #include <utils/common/app_info.h>
@@ -75,7 +75,7 @@ QnSmtpSimpleSettingsWidget::QnSmtpSimpleSettingsWidget(QWidget* parent /*= nullp
     ui->supportInputField->setTitle(tr("Support Signature"));
     ui->supportInputField->setPlaceholderText(QnAppInfo::supportUrl());
 
-    QnAligner* aligner = new QnAligner(this);
+    Aligner* aligner = new Aligner(this);
     aligner->registerTypeAccessor<InputField>(InputField::createLabelWidthAccessor());
 
     for (auto field : {

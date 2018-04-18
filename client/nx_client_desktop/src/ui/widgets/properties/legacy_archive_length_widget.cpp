@@ -6,7 +6,7 @@
 #include <core/resource/camera_resource.h>
 
 #include <ui/common/read_only.h>
-#include <ui/common/aligner.h>
+#include <nx/client/desktop/common/utils/aligner.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
@@ -80,7 +80,7 @@ QnArchiveLengthWidget::QnArchiveLengthWidget(QWidget* parent):
 
     updateArchiveRangeEnabledState();
 
-    m_aligner = new QnAligner(this);
+    m_aligner = new Aligner(this);
     m_aligner->addWidgets({
         ui->labelMinDays,
         ui->labelMaxDays });
@@ -90,7 +90,7 @@ QnArchiveLengthWidget::~QnArchiveLengthWidget()
 {
 }
 
-QnAligner* QnArchiveLengthWidget::aligner() const
+Aligner* QnArchiveLengthWidget::aligner() const
 {
     return m_aligner;
 }

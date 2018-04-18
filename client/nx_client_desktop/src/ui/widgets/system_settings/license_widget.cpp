@@ -236,7 +236,7 @@ void QnLicenseWidget::at_browseLicenseFileButton_clicked()
     QString fileName = QnFileDialog::getOpenFileName(this,
                                                      tr("Open License File"),
                                                      QString(),
-                                                     tr("All files (*.*)"),
+                                                     tr("All files") + lit(" (*.*)"),
                                                      0,
                                                      QnCustomFileDialog::fileDialogOptions());
     if (fileName.isEmpty())

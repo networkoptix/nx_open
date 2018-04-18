@@ -6,6 +6,7 @@
 
 #include <QtOpenGL/QGLWidget>
 
+#include <client/client_module.h>
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 
@@ -26,6 +27,7 @@
 #include <recording/stream_recorder.h>
 #include <core/resource/file_processor.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/dataprovider/data_provider_factory.h>
 
 #include <utils/common/delayed.h>
 
@@ -218,7 +220,7 @@ void QnWorkbenchScreenRecordingHandler::startRecordingInternal()
     }
 
     m_dataProvider.reset(dynamic_cast<QnDesktopDataProviderWrapper*>(
-        res->createDataProvider(Qn::CR_Default)));
+        qnClientModule->dataProviderFactory()->createDataProvider(res)));
     m_recorder.reset(new QnStreamRecorder(res->toResourcePtr()));
     m_dataProvider->addDataProcessor(m_recorder.data());
     m_recorder->addRecordingContext(filePath);

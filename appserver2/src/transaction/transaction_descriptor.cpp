@@ -15,45 +15,18 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource/param.h>
-
+#include <core/resource_management/resource_pool.h>
 #include <utils/license_usage_helper.h>
 
 #include <nx_ec/data/api_tran_state_data.h>
 
 #include <nx/cloud/cdb/client/data/auth_data.h>
 
-#include "managers/business_event_manager.h"
-#include "managers/camera_manager.h"
-#include "managers/discovery_manager.h"
-#include "managers/layout_manager.h"
-#include <managers/layout_tour_manager.h>
-#include "managers/license_manager.h"
-#include "managers/media_server_manager.h"
-#include "managers/misc_manager.h"
-#include "managers/resource_manager.h"
-#include "managers/stored_file_manager.h"
-#include "managers/updates_manager.h"
-#include "managers/user_manager.h"
-#include "managers/videowall_manager.h"
-#include "managers/webpage_manager.h"
-#include <database/db_manager.h>
+#include "ec_connection_notification_manager.h"
 
 namespace ec2 {
 
 namespace detail {
-
-template<typename T, typename F>
-ErrorCode saveTransactionImpl(const QnTransaction<T>& tran, ec2::QnTransactionLog *tlog, F f)
-{
-    QByteArray serializedTran = tlog->serializer()->serializedTransaction(tran);
-    return tlog->saveToDB(tran, f(tran.params), serializedTran);
-}
-
-template<typename T, typename F>
-ErrorCode saveSerializedTransactionImpl(const QnTransaction<T>& tran, const QByteArray& serializedTran, QnTransactionLog *tlog, F f)
-{
-    return tlog->saveToDB(tran, f(tran.params), serializedTran);
-}
 
 struct InvalidGetHashHelper
 {
@@ -62,56 +35,6 @@ struct InvalidGetHashHelper
     {
         // NX_ASSERT(0, Q_FUNC_INFO, "Invalid transaction for hash!");
         return QnUuid();
-    }
-};
-
-template<typename GetHash>
-struct DefaultSaveTransactionHelper
-{
-    template<typename Param>
-    ErrorCode operator ()(const QnTransaction<Param>& tran, QnTransactionLog* tlog)
-    {
-        return saveTransactionImpl(tran, tlog, m_getHash);
-    }
-
-    DefaultSaveTransactionHelper(GetHash getHash): m_getHash(getHash) {}
-private:
-    GetHash m_getHash;
-};
-
-template<typename GetHash>
-constexpr auto createDefaultSaveTransactionHelper(GetHash getHash)
-{
-    return DefaultSaveTransactionHelper<GetHash>(getHash);
-}
-
-template<typename GetHash>
-struct DefaultSaveSerializedTransactionHelper
-{
-    template<typename Param>
-    ErrorCode operator ()(const QnTransaction<Param> &tran, const QByteArray &serializedTran, QnTransactionLog *tlog)
-    {
-        return saveSerializedTransactionImpl(tran, serializedTran, tlog, m_getHash);
-    }
-
-    DefaultSaveSerializedTransactionHelper(GetHash getHash): m_getHash(getHash) {}
-private:
-    GetHash m_getHash;
-};
-
-template<typename GetHash>
-constexpr auto createDefaultSaveSerializedTransactionHelper(GetHash getHash)
-{
-    return DefaultSaveSerializedTransactionHelper<GetHash>(getHash);
-}
-
-struct InvalidSaveSerializedTransactionHelper
-{
-    template<typename Param>
-    ErrorCode operator ()(const QnTransaction<Param> &, const QByteArray &, QnTransactionLog *)
-    {
-        NX_ASSERT(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
-        return ErrorCode::notImplemented;
     }
 };
 
@@ -169,8 +92,8 @@ struct CreateHashByIdRfc4122Helper
     QnUuid operator ()(const Param &param) \
     {
         if (m_additionalData.isNull())
-            return QnTransactionLog::makeHash(param.id.toRfc4122());
-        return QnTransactionLog::makeHash(param.id.toRfc4122(), m_additionalData);
+            return QnAbstractTransaction::makeHash(param.id.toRfc4122());
+        return QnAbstractTransaction::makeHash(param.id.toRfc4122(), m_additionalData);
     }
 
 private:
@@ -229,37 +152,37 @@ void apiIdDataTriggerNotificationHelper(const QnTransaction<ApiIdData> &tran, co
 
 QnUuid createHashForServerFootageDataHelper(const ApiServerFootageData &params)
 {
-    return QnTransactionLog::makeHash(params.serverGuid.toRfc4122(), "history");
+    return QnAbstractTransaction::makeHash(params.serverGuid.toRfc4122(), "history");
 }
 
 QnUuid createHashForApiCameraAttributesDataHelper(const ApiCameraAttributesData &params)
 {
-    return QnTransactionLog::makeHash(params.cameraId.toRfc4122(), "camera_attributes");
+    return QnAbstractTransaction::makeHash(params.cameraId.toRfc4122(), "camera_attributes");
 }
 
 QnUuid createHashForApiAccessRightsDataHelper(const ApiAccessRightsData& params)
 {
-    return QnTransactionLog::makeHash(params.userId.toRfc4122(), "access_rights");
+    return QnAbstractTransaction::makeHash(params.userId.toRfc4122(), "access_rights");
 }
 
 QnUuid createHashForApiLicenseDataHelper(const ApiLicenseData &params)
 {
-    return QnTransactionLog::makeHash(params.key, "ApiLicense");
+    return QnAbstractTransaction::makeHash(params.key, "ApiLicense");
 }
 
 QnUuid createHashForApiMediaServerUserAttributesDataHelper(const ApiMediaServerUserAttributesData &params)
 {
-    return QnTransactionLog::makeHash(params.serverId.toRfc4122(), "server_attributes");
+    return QnAbstractTransaction::makeHash(params.serverId.toRfc4122(), "server_attributes");
 }
 
 QnUuid createHashForApiStoredFileDataHelper(const ApiStoredFileData &params)
 {
-    return QnTransactionLog::makeHash(params.path.toUtf8());
+    return QnAbstractTransaction::makeHash(params.path.toUtf8());
 }
 
 QnUuid createHashForApiDiscoveryDataHelper(const ApiDiscoveryData& params)
 {
-    return QnTransactionLog::makeHash("discovery_data", params);
+    return QnAbstractTransaction::makeHash("discovery_data", params);
 }
 
 struct CameraNotificationManagerHelper
@@ -1049,7 +972,7 @@ struct ReadListAccessOut
 struct RegularTransactionType
 {
     template<typename Param>
-    ec2::TransactionType::Value operator()(QnCommonModule*, const Param&, detail::QnDbManager*)
+    ec2::TransactionType::Value operator()(QnCommonModule*, const Param&, AbstractPersistentStorage*)
     {
         return TransactionType::Regular;
     }
@@ -1058,7 +981,7 @@ struct RegularTransactionType
 struct CloudTransactionType
 {
     template<typename Param>
-    ec2::TransactionType::Value operator()(QnCommonModule*, const Param&, detail::QnDbManager*)
+    ec2::TransactionType::Value operator()(QnCommonModule*, const Param&, AbstractPersistentStorage*)
     {
         return TransactionType::Cloud;
     }
@@ -1067,26 +990,23 @@ struct CloudTransactionType
 struct LocalTransactionType
 {
     template<typename Param>
-    ec2::TransactionType::Value operator()(QnCommonModule*, const Param&, detail::QnDbManager*)
+    ec2::TransactionType::Value operator()(QnCommonModule*, const Param&, AbstractPersistentStorage*)
     {
         return TransactionType::Local;
     }
 };
 
-ec2::TransactionType::Value getStatusTransactionTypeFromDb(const QnUuid& id, detail::QnDbManager* db)
+ec2::TransactionType::Value getStatusTransactionTypeFromDb(const QnUuid& id, AbstractPersistentStorage* db)
 {
-    ApiMediaServerDataList serverDataList;
-    ec2::ErrorCode errorCode = db->doQueryNoLock(id, serverDataList);
-
-    if (errorCode != ErrorCode::ok || serverDataList.empty())
+    ApiMediaServerData server = db->getServer(id);
+    if (server.id.isNull())
         return ec2::TransactionType::Unknown;
-
     return TransactionType::Local;
 }
 
 struct SetStatusTransactionType
 {
-    ec2::TransactionType::Value operator()(QnCommonModule* commonModule, const ApiResourceStatusData& params, detail::QnDbManager* db)
+    ec2::TransactionType::Value operator()(QnCommonModule* commonModule, const ApiResourceStatusData& params, AbstractPersistentStorage* db)
     {
         const auto& resPool = commonModule->resourcePool();
         QnResourcePtr resource = resPool->getResourceById<QnResource>(params.id);
@@ -1101,7 +1021,7 @@ struct SetStatusTransactionType
 
 struct SaveUserTransactionType
 {
-    ec2::TransactionType::Value operator()(QnCommonModule*, const ApiUserData& params, detail::QnDbManager* /*db*/)
+    ec2::TransactionType::Value operator()(QnCommonModule*, const ApiUserData& params, AbstractPersistentStorage* /*db*/)
     {
         return params.isCloud ? TransactionType::Cloud : TransactionType::Regular;
     }
@@ -1112,7 +1032,7 @@ struct SetResourceParamTransactionType
     ec2::TransactionType::Value operator()(
 		QnCommonModule*,
         const ApiResourceParamWithRefData& param,
-        detail::QnDbManager* /*db*/)
+        AbstractPersistentStorage* /*db*/)
     {
         if (param.resourceId == QnUserResource::kAdminGuid &&
             param.name == nx::settings_names::kNameSystemName)
@@ -1133,20 +1053,18 @@ struct SetResourceParamTransactionType
 
 ec2::TransactionType::Value getRemoveUserTransactionTypeFromDb(
     const QnUuid& id,
-    detail::QnDbManager* db)
+    AbstractPersistentStorage* db)
 {
-    ApiUserDataList userDataList;
-    ec2::ErrorCode errorCode = db->doQueryNoLock(id, userDataList);
-
-    if (errorCode != ErrorCode::ok || userDataList.empty())
+    ApiUserData userData = db->getUser(id);
+    if (userData.id.isNull())
         return ec2::TransactionType::Unknown;
 
-    return userDataList[0].isCloud ? TransactionType::Cloud : TransactionType::Regular;
+    return userData.isCloud ? TransactionType::Cloud : TransactionType::Regular;
 }
 
 struct RemoveUserTransactionType
 {
-    ec2::TransactionType::Value operator()(QnCommonModule* commonModule, const ApiIdData& params, detail::QnDbManager* db)
+    ec2::TransactionType::Value operator()(QnCommonModule* commonModule, const ApiIdData& params, AbstractPersistentStorage* db)
     {
         const auto& resPool = commonModule->resourcePool();
         auto user = resPool->getResourceById<QnUserResource>(params.id);
@@ -1177,8 +1095,6 @@ struct RemoveUserTransactionType
         isSystem, \
         #Key, \
         getHashFunc, \
-        createDefaultSaveTransactionHelper(getHashFunc), \
-        createDefaultSaveSerializedTransactionHelper(getHashFunc), \
         [](const QnAbstractTransaction &tran) { return QnTransaction<ParamType>(tran); },  \
         triggerNotificationFunc, \
         checkSavePermissionFunc, \

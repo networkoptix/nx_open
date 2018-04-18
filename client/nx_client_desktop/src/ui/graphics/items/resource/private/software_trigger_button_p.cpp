@@ -584,7 +584,7 @@ void SoftwareTriggerButtonPrivate::ensureImages()
         q->palette().color(QPalette::Text),
         QPixmap());
 
-    auto goToLivePixmap = qnSkin->pixmap("soft_triggers/go-to-live.png");
+    const auto goToLivePixmap = qnSkin->pixmap("soft_triggers/go_to_live.png");
 
     m_goToLivePixmap = generatePixmap(
         q->palette().color(QPalette::Midlight),

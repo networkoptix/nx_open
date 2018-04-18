@@ -5,7 +5,6 @@
 #include <common/common_globals.h>
 
 #include <core/resource/resource_fwd.h>
-#include <ui/widgets/properties/schedule_grid_widget.h>
 
 class QnAspectRatio;
 
@@ -15,6 +14,7 @@ namespace desktop {
 
 class Rotation;
 struct CameraSettingsDialogState;
+struct ScheduleCellParams;
 
 class CameraSettingsDialogStore: public QObject
 {
@@ -33,7 +33,7 @@ public:
     void setPanicMode(bool value);
     void loadCameras(const QnVirtualCameraResourceList& cameras);
     void setSingleCameraUserName(const QString& text);
-    void setScheduleBrush(const QnScheduleGridWidget::CellParams& brush);
+    void setScheduleBrush(const ScheduleCellParams& brush);
     void setScheduleBrushRecordingType(Qn::RecordingType value);
     void setScheduleBrushFps(int value);
     void setScheduleBrushQuality(Qn::StreamQuality value);

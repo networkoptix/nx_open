@@ -60,6 +60,7 @@
 #include <client/client_module.h>
 #include <camera/camera_data_manager.h>
 #include <camera/loaders/caching_camera_data_loader.h>
+#include <nx/client/desktop/resource_views/data/node_type.h>
 
 using boost::algorithm::any_of;
 using boost::algorithm::all_of;
@@ -486,9 +487,15 @@ ActionVisibility ClearMotionSelectionCondition::check(const QnResourceWidgetList
 
 ActionVisibility ResourceRemovalCondition::check(const Parameters& parameters, QnWorkbenchContext* context)
 {
-    Qn::NodeType nodeType = parameters.argument<Qn::NodeType>(Qn::NodeTypeRole, Qn::ResourceNode);
-    if (nodeType == Qn::SharedLayoutNode || nodeType == Qn::SharedResourceNode)
+    const auto nodeType = parameters.argument<ResourceTreeNodeType>(
+        Qn::NodeTypeRole,
+        ResourceTreeNodeType::resource);
+
+    if (nodeType == ResourceTreeNodeType::sharedLayout
+        || nodeType == ResourceTreeNodeType::sharedResource)
+    {
         return InvisibleAction;
+    }
 
     QnUserResourcePtr owner = parameters.argument<QnUserResourcePtr>(Qn::UserResourceRole);
     bool ownResources = owner && owner == context->user();
@@ -536,8 +543,9 @@ ActionVisibility StopSharingCondition::check(const Parameters& parameters, QnWor
     if (context->commonModule()->isReadOnly())
         return InvisibleAction;
 
-    Qn::NodeType nodeType = parameters.argument<Qn::NodeType>(Qn::NodeTypeRole, Qn::ResourceNode);
-    if (nodeType != Qn::SharedLayoutNode)
+    const auto nodeType = parameters.argument<ResourceTreeNodeType>(Qn::NodeTypeRole,
+        ResourceTreeNodeType::resource);
+    if (nodeType != ResourceTreeNodeType::sharedLayout)
         return InvisibleAction;
 
     auto user = parameters.argument<QnUserResourcePtr>(Qn::UserResourceRole);
@@ -563,13 +571,14 @@ ActionVisibility StopSharingCondition::check(const Parameters& parameters, QnWor
 
 ActionVisibility RenameResourceCondition::check(const Parameters& parameters, QnWorkbenchContext* /*context*/)
 {
-    Qn::NodeType nodeType = parameters.argument<Qn::NodeType>(Qn::NodeTypeRole, Qn::ResourceNode);
+    const auto nodeType = parameters.argument<ResourceTreeNodeType>(Qn::NodeTypeRole,
+        ResourceTreeNodeType::resource);
 
     switch (nodeType)
     {
-        case Qn::ResourceNode:
-        case Qn::SharedLayoutNode:
-        case Qn::SharedResourceNode:
+        case ResourceTreeNodeType::resource:
+        case ResourceTreeNodeType::sharedLayout:
+        case ResourceTreeNodeType::sharedResource:
         {
             if (parameters.resources().size() != 1)
                 return InvisibleAction;
@@ -592,8 +601,8 @@ ActionVisibility RenameResourceCondition::check(const Parameters& parameters, Qn
 
             return EnabledAction;
         }
-        case Qn::EdgeNode:
-        case Qn::RecorderNode:
+        case ResourceTreeNodeType::edge:
+        case ResourceTreeNodeType::recorder:
             return EnabledAction;
         default:
             break;
@@ -1030,13 +1039,13 @@ ActionVisibility NewUserLayoutCondition::check(const Parameters& parameters, QnW
     if (!parameters.hasArgument(Qn::NodeTypeRole))
         return InvisibleAction;
 
-    const auto nodeType = parameters.argument(Qn::NodeTypeRole).value<Qn::NodeType>();
+    const auto nodeType = parameters.argument(Qn::NodeTypeRole).value<ResourceTreeNodeType>();
     const auto user = parameters.hasArgument(Qn::UserResourceRole)
         ? parameters.argument(Qn::UserResourceRole).value<QnUserResourcePtr>()
         : parameters.resource().dynamicCast<QnUserResource>();
 
     /* Create layout for self. */
-    if (nodeType == Qn::LayoutsNode)
+    if (nodeType == ResourceTreeNodeType::layouts)
         return EnabledAction;
 
     // No other nodes must provide a way to create own layout.
@@ -1044,11 +1053,11 @@ ActionVisibility NewUserLayoutCondition::check(const Parameters& parameters, QnW
         return InvisibleAction;
 
     // Create layout for the custom user, but not for role.
-    if (nodeType == Qn::SharedLayoutsNode && user)
+    if (nodeType == ResourceTreeNodeType::sharedLayouts && user)
         return EnabledAction;
 
     // Create layout for other user is allowed on this user's node.
-    if (nodeType != Qn::ResourceNode)
+    if (nodeType != ResourceTreeNodeType::resource)
         return InvisibleAction;
 
     return context->accessController()->canCreateLayout(user->getId())
@@ -1705,14 +1714,14 @@ ConditionWrapper hasFlags(Qn::ResourceFlags flags, MatchMode matchMode)
         }, matchMode);
 }
 
-ConditionWrapper treeNodeType(QSet<Qn::NodeType> types)
+ConditionWrapper treeNodeType(QSet<ResourceTreeNodeType> types)
 {
     return new CustomBoolCondition(
         [types](const Parameters& parameters, QnWorkbenchContext* /*context*/)
         {
             // Actions, triggered manually or from scene, must not check node type
             return !parameters.hasArgument(Qn::NodeTypeRole)
-                || types.contains(parameters.argument(Qn::NodeTypeRole).value<Qn::NodeType>());
+                || types.contains(parameters.argument(Qn::NodeTypeRole).value<ResourceTreeNodeType>());
         });
 }
 

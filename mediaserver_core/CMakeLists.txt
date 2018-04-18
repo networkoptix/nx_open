@@ -26,17 +26,22 @@ nx_configure_directory(
 
 set(apidoctool_jar "${APIDOCTOOL_PATH}/apidoctool.jar")
 
+set(apidoctool_params
+    "-DtemplateRegistrationCpp=/mediaserver_db/src/local_connection_factory.cpp"
+    "-DhandlerRegistrationCpp=/mediaserver_core/src/media_server_process.cpp"
+)
+
 execute_process(
-    COMMAND java -jar "${apidoctool_jar}" print-deps
+    COMMAND java -jar "${apidoctool_jar}" print-deps ${apidoctool_params}
     RESULT_VARIABLE apidoctool_result
     OUTPUT_VARIABLE apidoctool_deps
 )
 
 if(NOT apidoctool_result EQUAL 0)
-    message(FATAL ERROR "Cannot get dependencies list from apidoctool.")
+    message(FATAL_ERROR "Cannot get dependencies list from apidoctool.")
 endif()
 
-separate_arguments(apidoctool_deps)
+nx_split_string(apidoctool_deps "${apidoctool_deps}")
 set(apidoctool_deps_absolute)
 foreach(dependency ${apidoctool_deps})
     list(APPEND apidoctool_deps_absolute "${PROJECT_SOURCE_DIR}/${dependency}")
@@ -57,6 +62,7 @@ add_custom_command(
         -template-xml "${CMAKE_CURRENT_SOURCE_DIR}/api/api_template.xml"
         -output-xml "${CMAKE_CURRENT_BINARY_DIR}/api.xml"
         -output-json "${CMAKE_CURRENT_BINARY_DIR}/api.json"
+        ${apidoctool_params}
     COMMAND
         ${CMAKE_COMMAND} -E copy_if_different
             "${CMAKE_CURRENT_BINARY_DIR}/api.xml"
@@ -96,12 +102,13 @@ nx_add_target(mediaserver_core LIBRARY
         "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.json"
     PUBLIC_LIBS
         Qt5::WebSockets
-        appserver2 
-	nx_onvif 
-	nx_email 
-	cloud_db_client 
-	nx_update
-	nx_system_commands
+        appserver2
+        mediaserver_db
+        nx_onvif
+        nx_email
+        cloud_db_client
+        nx_update
+        nx_system_commands
     PRIVATE_LIBS ${private_libs}
 )
 

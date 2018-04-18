@@ -173,12 +173,12 @@
         {
             "typeId": "{02567E19-33AC-440B-8647-16D95EF6B295}",
             "name": {
-                "value": "Sound - Gun shot",
+                "value": "Sound - Gunshot",
                 "localization": {
                 }
             },
             "internalName": "AudioAnalytics.Gunshot",
-            "description": "Gun shot %1",
+            "description": "Gunshot %1",
             "positiveState": "has been detected"
         },
         {

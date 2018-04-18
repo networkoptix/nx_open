@@ -51,15 +51,13 @@
 #include <core/ptz/viewport_ptz_controller.h>
 #include <core/ptz/fisheye_home_ptz_controller.h>
 
-#include <motion/motion_detection.h>
-
 #include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/abstract_archive_stream_reader.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/collection.h>
 
+#include <nx/client/core/motion/motion_grid.h>
 #include <nx/client/desktop/utils/entropix_image_enhancer.h>
-
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/common/utils/painter_transform_scale_stripper.h>
 #include <nx/client/desktop/ui/graphics/items/overlays/area_highlight_overlay_widget.h>
@@ -127,6 +125,7 @@ using namespace client::desktop;
 using namespace ui;
 
 using nx::client::core::Geometry;
+using nx::client::core::MotionGrid;
 
 namespace {
 
@@ -204,79 +203,6 @@ bool getPtzObjectName(const QnPtzControllerPtr &controller, const QnPtzObject &o
             return false;
     }
 }
-
-/* Motion sensitivity grid: */
-using MotionGrid = std::array<std::array<int, Qn::kMotionGridWidth>, Qn::kMotionGridHeight>;
-
-/* Fill entire motion grid with zeros: */
-void resetMotionGrid(MotionGrid& grid)
-{
-    for (auto& row : grid)
-        row.fill(0);
-}
-
-/* Fill specified rectangle of motion grid with specified value: */
-void fillMotionRect(MotionGrid& grid, const QRect& rect, int value)
-{
-    NX_ASSERT(rect.top() >= 0 && rect.bottom() < (int) grid.size());
-    NX_ASSERT(rect.left() >= 0 && rect.right() < (int) grid[0].size());
-
-    for (int row = rect.top(); row <= rect.bottom(); ++row)
-        std::fill(grid[row].begin() + rect.left(), grid[row].begin() + rect.right() + 1, value);
-}
-
-/* Fill sensitivity region that contains specified position with zeros: */
-void clearSensitivityRegion(MotionGrid& grid, const QPoint& at)
-{
-    NX_ASSERT(at.y() >= 0 && at.y() < (int) grid.size());
-    NX_ASSERT(at.x() >= 0 && at.x() < (int) grid[0].size());
-
-    int value = grid[at.y()][at.x()];
-    if (value == 0)
-        return;
-
-    QVarLengthArray<QPoint> pointStack;
-    grid[at.y()][at.x()] = 0;
-    pointStack.push_back(at);
-
-    while (!pointStack.empty())
-    {
-        QPoint p = pointStack.back();
-        pointStack.pop_back();
-
-        /* Spread left: */
-        int x = p.x() - 1;
-        if (x >= 0 && grid[p.y()][x] == value)
-        {
-            grid[p.y()][x] = 0;
-            pointStack.push_back({ x, p.y() });
-        }
-
-        /* Spread right: */
-        x = p.x() + 1;
-        if (x < (int) grid[0].size() && grid[p.y()][x] == value)
-        {
-            grid[p.y()][x] = 0;
-            pointStack.push_back({ x, p.y() });
-        }
-
-        /* Spread up: */
-        int y = p.y() - 1;
-        if (y >= 0 && grid[y][p.x()] == value)
-        {
-            grid[y][p.x()] = 0;
-            pointStack.push_back({ p.x(), y });
-        }
-
-        /* Spread down: */
-        y = p.y() + 1;
-        if (y < (int) grid.size() && grid[y][p.x()] == value)
-        {
-            grid[y][p.x()] = 0;
-            pointStack.push_back({ p.x(), y });
-        }
-    }
-};
 
 bool tourIsRunning(QnWorkbenchContext* context)
 {
@@ -988,13 +914,13 @@ QPointF QnMediaResourceWidget::mapFromMotionGrid(const QPoint &gridPos)
 QSize QnMediaResourceWidget::motionGridSize() const
 {
     return Geometry::cwiseMul(
-        channelLayout()->size(), QSize(Qn::kMotionGridWidth, Qn::kMotionGridHeight));
+        channelLayout()->size(), QSize(MotionGrid::kWidth, MotionGrid::kHeight));
 }
 
 QPoint QnMediaResourceWidget::channelGridOffset(int channel) const
 {
     return Geometry::cwiseMul(
-        channelLayout()->position(channel), QSize(Qn::kMotionGridWidth, Qn::kMotionGridHeight));
+        channelLayout()->position(channel), QSize(MotionGrid::kWidth, MotionGrid::kHeight));
 }
 
 void QnMediaResourceWidget::suspendHomePtzController()
@@ -1185,7 +1111,7 @@ void QnMediaResourceWidget::addToMotionSelection(const QRect &gridRect)
 
     for (int i = 0; i < channelCount(); ++i)
     {
-        QRect rect = gridRect.translated(-channelGridOffset(i)).intersected(QRect(0, 0, Qn::kMotionGridWidth, Qn::kMotionGridHeight));
+        QRect rect = gridRect.translated(-channelGridOffset(i)).intersected(QRect(0, 0, MotionGrid::kWidth, MotionGrid::kHeight));
         if (rect.isEmpty())
             continue;
 
@@ -1288,7 +1214,7 @@ bool QnMediaResourceWidget::addToMotionSensitivity(const QRect &gridRect, int se
 
         for (int i = 0; i < layout->channelCount(); ++i)
         {
-            QRect r(0, 0, Qn::kMotionGridWidth, Qn::kMotionGridHeight);
+            QRect r(0, 0, MotionGrid::kWidth, MotionGrid::kHeight);
             r.translate(channelGridOffset(i));
             r = gridRect.intersected(r);
             r.translate(-channelGridOffset(i));
@@ -1320,7 +1246,7 @@ bool QnMediaResourceWidget::setMotionSensitivityFilled(const QPoint &gridPos, in
 
         for (int i = 0; i < layout->channelCount(); ++i)
         {
-            QRect r(channelGridOffset(i), QSize(Qn::kMotionGridWidth, Qn::kMotionGridHeight));
+            QRect r(channelGridOffset(i), QSize(MotionGrid::kWidth, MotionGrid::kHeight));
             if (r.contains(channelPos))
             {
                 channelPos -= r.topLeft();
@@ -1410,38 +1336,38 @@ void QnMediaResourceWidget::ensureMotionLabelPositions() const
     for (int channel = 0; channel < m_motionSensitivity.size(); ++channel)
     {
         /* Clear grid initially: */
-        resetMotionGrid(grid);
+        grid.reset();
 
         /* Fill grid with sensitivity numbers: */
         for (int sensitivity = 1; sensitivity < QnMotionRegion::kSensitivityLevelCount; ++sensitivity)
         {
             for (const auto& rect : m_motionSensitivity[channel].getRectsBySens(sensitivity))
-                fillMotionRect(grid, rect, sensitivity);
+                grid.fillRect(rect, sensitivity);
         }
 
         /* Label takes 1x2 cells. Find good areas to fit labels in,
          * going from the top to the bottom, from the left to the right:
          */
-        for (int y = 0; y < (int) grid.size() - 1; ++y)
+        for (int y = 0; y < MotionGrid::kHeight - 1; ++y)
         {
-            for (int x = 0; x < (int) grid[0].size(); ++x)
+            for (int x = 0; x < MotionGrid::kWidth; ++x)
             {
-                int sensitivity = grid[y][x];
+                QPoint pos(x, y);
+                int sensitivity = grid[pos];
 
                 /* If there's no motion detection region, or we already labeled it: */
                 if (sensitivity == 0)
                     continue;
 
                 /* If a label doesn't fit: */
-                if (grid[y + 1][x] != sensitivity)
+                if (grid[{x, y + 1}] != sensitivity)
                     continue;
 
                 /* Add label position: */
-                QPoint pos(x, y);
                 m_motionLabelPositions[channel][sensitivity] << pos;
 
                 /* Clear processed region: */
-                clearSensitivityRegion(grid, pos);
+                grid.clearRegion(pos);
             }
         }
     }
@@ -1682,8 +1608,8 @@ void QnMediaResourceWidget::paintMotionGrid(QPainter *painter, int channel, cons
 
     ensureMotionSensitivity();
 
-    qreal xStep = rect.width() / Qn::kMotionGridWidth;
-    qreal yStep = rect.height() / Qn::kMotionGridHeight;
+    qreal xStep = rect.width() / MotionGrid::kWidth;
+    qreal yStep = rect.height() / MotionGrid::kHeight;
 
     QVector<QPointF> gridLines[2];
 
@@ -1695,17 +1621,17 @@ void QnMediaResourceWidget::paintMotionGrid(QPainter *painter, int channel, cons
         motion->removeMotion(m_binaryMotionMask[channel]);
 
         /* Horizontal lines. */
-        for (int y = 1; y < Qn::kMotionGridHeight; ++y)
+        for (int y = 1; y < MotionGrid::kHeight; ++y)
         {
             bool isMotion = motion->isMotionAt(0, y - 1) || motion->isMotionAt(0, y);
             gridLines[isMotion] << QPointF(0, y * yStep);
             int x = 1;
-            while (x < Qn::kMotionGridWidth)
+            while (x < MotionGrid::kWidth)
             {
-                while (x < Qn::kMotionGridWidth && isMotion == (motion->isMotionAt(x, y - 1) || motion->isMotionAt(x, y)))
+                while (x < MotionGrid::kWidth && isMotion == (motion->isMotionAt(x, y - 1) || motion->isMotionAt(x, y)))
                     x++;
                 gridLines[isMotion] << QPointF(x * xStep, y * yStep);
-                if (x < Qn::kMotionGridWidth)
+                if (x < MotionGrid::kWidth)
                 {
                     isMotion = !isMotion;
                     gridLines[isMotion] << QPointF(x * xStep, y * yStep);
@@ -1714,17 +1640,17 @@ void QnMediaResourceWidget::paintMotionGrid(QPainter *painter, int channel, cons
         }
 
         /* Vertical lines. */
-        for (int x = 1; x < Qn::kMotionGridWidth; ++x)
+        for (int x = 1; x < MotionGrid::kWidth; ++x)
         {
             bool isMotion = motion->isMotionAt(x - 1, 0) || motion->isMotionAt(x, 0);
             gridLines[isMotion] << QPointF(x * xStep, 0);
             int y = 1;
-            while (y < Qn::kMotionGridHeight)
+            while (y < MotionGrid::kHeight)
             {
-                while (y < Qn::kMotionGridHeight && isMotion == (motion->isMotionAt(x - 1, y) || motion->isMotionAt(x, y)))
+                while (y < MotionGrid::kHeight && isMotion == (motion->isMotionAt(x - 1, y) || motion->isMotionAt(x, y)))
                     y++;
                 gridLines[isMotion] << QPointF(x * xStep, y * yStep);
-                if (y < Qn::kMotionGridHeight)
+                if (y < MotionGrid::kHeight)
                 {
                     isMotion = !isMotion;
                     gridLines[isMotion] << QPointF(x * xStep, y * yStep);
@@ -1734,9 +1660,9 @@ void QnMediaResourceWidget::paintMotionGrid(QPainter *painter, int channel, cons
     }
     else
     {
-        for (int x = 1; x < Qn::kMotionGridWidth; ++x)
+        for (int x = 1; x < MotionGrid::kWidth; ++x)
             gridLines[0] << QPointF(x * xStep, 0.0) << QPointF(x * xStep, rect.height());
-        for (int y = 1; y < Qn::kMotionGridHeight; ++y)
+        for (int y = 1; y < MotionGrid::kHeight; ++y)
             gridLines[0] << QPointF(0.0, y * yStep) << QPointF(rect.width(), y * yStep);
     }
 
@@ -1761,7 +1687,7 @@ void QnMediaResourceWidget::paintFilledRegionPath(QPainter *painter, const QRect
     QnScopedPainterPenRollback penRollback(painter); Q_UNUSED(penRollback);
 
     painter->translate(rect.topLeft());
-    painter->scale(rect.width() / Qn::kMotionGridWidth, rect.height() / Qn::kMotionGridHeight);
+    painter->scale(rect.width() / MotionGrid::kWidth, rect.height() / MotionGrid::kHeight);
     painter->setPen(QPen(penColor, 0.0));
     painter->drawPath(path);
 }
@@ -1792,8 +1718,8 @@ void QnMediaResourceWidget::paintMotionSensitivityIndicators(QPainter* painter, 
 {
     QPoint channelOffset = channelGridOffset(channel);
 
-    qreal xStep = rect.width() / Qn::kMotionGridWidth;
-    qreal yStep = rect.height() / Qn::kMotionGridHeight;
+    qreal xStep = rect.width() / MotionGrid::kWidth;
+    qreal yStep = rect.height() / MotionGrid::kHeight;
     qreal xOffset = channelOffset.x() + 0.1;
     qreal yOffset = channelOffset.y();
     qreal fontIncrement = 1.2;
@@ -1937,8 +1863,8 @@ void QnMediaResourceWidget::channelLayoutChangedNotify()
     }
     while (m_binaryMotionMask.size() < channelCount())
     {
-        m_binaryMotionMask.push_back(static_cast<simd128i *>(qMallocAligned(Qn::kMotionGridWidth * Qn::kMotionGridHeight / 8, 32)));
-        memset(m_binaryMotionMask.back(), 0, Qn::kMotionGridWidth * Qn::kMotionGridHeight / 8);
+        m_binaryMotionMask.push_back(static_cast<simd128i *>(qMallocAligned(MotionGrid::kWidth * MotionGrid::kHeight / 8, 32)));
+        memset(m_binaryMotionMask.back(), 0, MotionGrid::kWidth * MotionGrid::kHeight / 8);
     }
 
     updateAspectRatio();
@@ -2521,9 +2447,11 @@ void QnMediaResourceWidget::updateFisheye()
 
     bool fisheyeEnabled = enabled && m_dewarpingParams.enabled;
 
-    setOption(ControlPtz, fisheyeEnabled && zoomRect().isEmpty());
-    setOption(DisplayCrosshair, fisheyeEnabled && zoomRect().isEmpty());
+    const bool showFisheyeOverlay = fisheyeEnabled && !isZoomWindow();
+    setOption(ControlPtz, showFisheyeOverlay);
+    setOption(DisplayCrosshair, showFisheyeOverlay);
     setOption(DisplayDewarped, fisheyeEnabled);
+
     if (fisheyeEnabled && titleBar()->rightButtonsBar()->button(Qn::FishEyeButton))
         titleBar()->rightButtonsBar()->button(Qn::FishEyeButton)->setChecked(fisheyeEnabled);
     if (enabled)
@@ -2546,8 +2474,11 @@ void QnMediaResourceWidget::updateFisheye()
 
     emit fisheyeChanged();
 
-    if (titleBar()->rightButtonsBar()->visibleButtons() & Qn::PtzButton)
-        at_ptzButton_toggled(titleBar()->rightButtonsBar()->checkedButtons() & Qn::PtzButton); // TODO: #Elric doesn't belong here, hack
+    // TODO: #Elric doesn't belong here, hack.
+    const bool hasPtz = titleBar()->rightButtonsBar()->visibleButtons() & Qn::PtzButton;
+    const bool ptzEnabled = titleBar()->rightButtonsBar()->checkedButtons() & Qn::PtzButton;
+    if (hasPtz && ptzEnabled)
+        at_ptzButton_toggled(true);
 }
 
 void QnMediaResourceWidget::updateCustomAspectRatio()

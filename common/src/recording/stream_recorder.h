@@ -78,8 +78,6 @@ public:
 
     virtual bool processData(const QnAbstractDataPacketPtr& data) override;
 
-    QnResourcePtr getResource() const { return m_device; }
-
     QString fixedFileName() const;
     void setProgressBounds(qint64 bof, qint64 eof);
 
@@ -196,7 +194,6 @@ private:
      */
     bool isCodecsCompatible(const StreamRecorderContext& context) const;
 protected:
-    QnResourcePtr m_device;
     bool m_firstTime;
     bool m_gotKeyFrame[CL_MAX_CHANNELS];
     qint64 m_truncateInterval;

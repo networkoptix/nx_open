@@ -6,7 +6,7 @@
 #include <nx/cloud/cdb/api/result_code.h>
 #include <nx/cloud/cdb/api/system_data.h>
 
-#include "../managers/vms_gateway.h"
+#include "../managers/vms_request_result.h"
 
 namespace nx {
 namespace cdb {

@@ -136,7 +136,7 @@ def generate_user_data(user_id, **kw):
 
 def generate_mediaserver_data(server_id, **kw):
     server_address = kw.get('networkAddresses', generate_ip_v4_endpoint(server_id))
-    server_name = kw.get('name', generate_name('Server', server_id))
+    server_name = kw.get('name', generate_name('Mediaserver', server_id))
     default_server_data = dict(
         apiUrl=server_address,
         url='rtsp://%s' % server_address,

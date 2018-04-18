@@ -9,33 +9,23 @@
 #include <ui/models/business_rules_view_model.h>
 
 #include <ui/widgets/business/abstract_business_params_widget.h>
-#include <ui/widgets/common/panel.h>
+#include <nx/client/desktop/common/widgets/panel.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 #include <utils/common/connective.h>
 
-namespace Ui {
-    class BusinessRuleWidget;
-}
-
 class QStateMachine;
 class QStandardItemModel;
-class QnAligner;
+namespace nx { namespace client { namespace desktop { class MimeData; }}}
+namespace nx { namespace client { namespace desktop { class Aligner; }}}
+namespace Ui { class BusinessRuleWidget; }
 
-namespace nx {
-namespace client {
-namespace desktop {
-
-class MimeData;
-
-} // namespace desktop
-} // namespace client
-} // namespace nx
-
-class QnBusinessRuleWidget : public Connective<QnPanel>, public QnWorkbenchContextAware
+class QnBusinessRuleWidget:
+    public Connective<nx::client::desktop::Panel>,
+    public QnWorkbenchContextAware
 {
     Q_OBJECT
-    typedef Connective<QnPanel> base_type;
+    typedef Connective<nx::client::desktop::Panel> base_type;
 
 public:
     explicit QnBusinessRuleWidget(QWidget *parent = 0);
@@ -93,6 +83,6 @@ private:
 
     bool m_updating;
 
-    QnAligner* const m_eventAligner;
-    QnAligner* const m_actionAligner;
+    nx::client::desktop::Aligner* const m_eventAligner;
+    nx::client::desktop::Aligner* const m_actionAligner;
 };

@@ -12,7 +12,7 @@
 
 #include <translation/translation_manager.h>
 
-#include <ui/common/aligner.h>
+#include <nx/client/desktop/common/utils/aligner.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/file_dialog.h>
 #include <ui/dialogs/common/progress_dialog.h>
@@ -61,7 +61,7 @@ QnLookAndFeelPreferencesWidget::QnLookAndFeelPreferencesWidget(QWidget *parent) 
     setHelpTopic(ui->tourCycleTimeLabel,      ui->tourCycleTimeSpinBox,       Qn::SystemSettings_General_TourCycleTime_Help);
     setHelpTopic(ui->showIpInTreeCheckBox,                                    Qn::SystemSettings_General_ShowIpInTree_Help);
 
-    auto aligner = new QnAligner(this);
+    auto aligner = new Aligner(this);
     aligner->addWidgets({
         ui->languageLabel,
         ui->timeModeLabel,

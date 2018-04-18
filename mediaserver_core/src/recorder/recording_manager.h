@@ -12,7 +12,6 @@
 #include <server/server_globals.h>
 
 #include <core/resource/resource_fwd.h>
-#include <core/dataprovider/data_provider_factory.h>
 
 #include "camera/video_camera.h"
 #include <nx/utils/singleton.h>

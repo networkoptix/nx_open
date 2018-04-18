@@ -4,7 +4,7 @@
 #include <QtCore/QScopedValueRollback>
 
 #include <ui/common/read_only.h>
-#include <ui/common/aligner.h>
+#include <nx/client/desktop/common/utils/aligner.h>
 #include <nx/client/desktop/common/utils/validators.h>
 
 #include <ui/workaround/widgets_signals_workaround.h>
@@ -92,7 +92,7 @@ QnSmtpAdvancedSettingsWidget::QnSmtpAdvancedSettingsWidget(QWidget* parent /*= n
     }
     ui->portComboBox->setValidator(new QnPortNumberValidator(autoPort, this));
 
-    QnAligner* aligner = new QnAligner(this);
+    Aligner* aligner = new Aligner(this);
     aligner->registerTypeAccessor<InputField>(InputField::createLabelWidthAccessor());
 
     for (auto field : {

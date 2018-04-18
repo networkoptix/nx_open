@@ -1120,16 +1120,16 @@ to view more bookmarks</source>
       <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
       <translation>ファイル&quot;%1&quot; は書き込めません。別の名前をお試しください</translation>
     </message>
-    <message numerus="yes">
-      <source>Filename should not contain the following reserved characters:
-%1</source>
-      <translation>
-        <numerusform>ファイル名には次の予約文字を含めることはできません：%1</numerusform>
-      </translation>
-    </message>
     <message>
-      <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
+      <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
       <translation>ファイル名&quot;%1&quot; は、オペレーティングシステムによって予約されています。別の名前をお試しください</translation>
+    </message>
+    <message numerus="yes">
+      <source>File name must not contain the following reserved characters:</source>
+      <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
+      <translation>
+        <numerusform>ファイル名には次の予約文字を含めることはできません：</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -2767,51 +2767,60 @@ devices</source>
     </message>
     <message>
       <source>Disconnect System from %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1 からシステムを切断</translation>
     </message>
     <message>
       <source>Open %1 Portal</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1 ポータルを開く</translation>
     </message>
     <message>
       <source>Create %1 Account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1 アカウントを作成</translation>
     </message>
     <message>
       <source>Connect System to %1...</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>システムを %1 に接続...</translation>
     </message>
     <message>
       <source>Create %1
 account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1 アカウントを作成</translation>
     </message>
     <message>
       <source>Connect System
 to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>システムを %1 に接続</translation>
     </message>
     <message>
       <source>Learn more about %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1 について</translation>
     </message>
   </context>
   <context>
     <name>QnCloudResultMessages</name>
     <message>
-      <source>Incorrect email or password</source>
-      <translation>Emailまたはパスワードが間違っています</translation>
+      <source>Account not found</source>
+      <translation type="unfinished">Account not found</translation>
     </message>
     <message>
-      <source>Account is not activated. Please check your email and follow provided instructions</source>
-      <translation>アカウントは有効化されていません。メールを確認して、指示に従ってください</translation>
+      <source>Account is not activated.</source>
+      <translation type="unfinished">Account is not activated.</translation>
+    </message>
+    <message>
+      <source>Please log in to %1 and follow the provided instructions.</source>
+      <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
+      <translation type="unfinished">Please log in to %1 and follow the provided instructions.</translation>
+    </message>
+    <message>
+      <source>Invalid password</source>
+      <translation type="unfinished">Invalid password</translation>
     </message>
   </context>
   <context>
@@ -2826,7 +2835,7 @@ to %1</source>
     </message>
     <message>
       <source>Cannot connect to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1 に接続できません</translation>
     </message>
   </context>
@@ -2857,12 +2866,12 @@ to %1</source>
     </message>
     <message>
       <source>Connect to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1 へ接続</translation>
     </message>
     <message>
       <source>Enter %1 Account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1 アカウントに接続します</translation>
     </message>
   </context>
@@ -2874,12 +2883,12 @@ to %1</source>
     </message>
     <message>
       <source>System connected to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1 に接続されたシステム</translation>
     </message>
     <message>
       <source>Failed to connect System to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>システムを %1 に接続できませんでした</translation>
     </message>
   </context>
@@ -3031,17 +3040,17 @@ to %1</source>
       <translation>操作は現在許可されていません　再起動後にもう一度試してください</translation>
     </message>
     <message>
-      <source>Connection to %1 is not ready yet. Check server Internet connection or try again later.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>%1 への接続がまだできていません　サーバーのインターネット接続を確認または後でもう一度試してください</translation>
-    </message>
-    <message>
       <source>Connection to Server could not be established.</source>
       <translation>サーバーへの接続を確立できませんでした</translation>
     </message>
     <message>
       <source>This user is disabled by system administrator.</source>
       <translation>このユーザーはシステム管理者によって無効になっています</translation>
+    </message>
+    <message>
+      <source>Connection to %1 is not ready yet. Check server Internet connection or try again later.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>%1 への接続がまだできていません　サーバーのインターネット接続を確認または後でもう一度試してください</translation>
     </message>
   </context>
   <context>
@@ -3147,6 +3156,10 @@ to %1</source>
     <message>
       <source>You can create a backup for System configurations that can be restored in case of failure.</source>
       <translation>障害発生時に復元可能なシステム構成のバックアップを作成できます</translation>
+    </message>
+    <message>
+      <source>Database Backup Files</source>
+      <translation type="unfinished">Database Backup Files</translation>
     </message>
   </context>
   <context>
@@ -3265,28 +3278,28 @@ to %1</source>
       <translation>切断</translation>
     </message>
     <message>
-      <source>Failed to disconnect System from %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>%1 からのシステム切断に失敗しました</translation>
-    </message>
-    <message>
-      <source>Disconnect System from %1?</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>%1 からシステムを切断しますか？</translation>
-    </message>
-    <message>
       <source>You will be disconnected from this System and able to login again through local network with local account</source>
       <translation>このシステムから切断し、再びローカル アカウントでローカル ネットワークを介してログインすることができます</translation>
     </message>
     <message>
-      <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>%1 からこのシステムを切断した後 %1 アカウントでシステムに接続することはできません</translation>
+      <source>Failed to disconnect System from %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>%1 からのシステム切断に失敗しました</translation>
+    </message>
+    <message>
+      <source>Disconnect System from %1?</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>%1 からシステムを切断しますか？</translation>
     </message>
     <message>
       <source>All %1 users will be deleted.</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation type="unfinished">All %1 users will be deleted.</translation>
+    </message>
+    <message>
+      <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>%1 からこのシステムを切断した後 %1 アカウントでシステムに接続することはできません</translation>
     </message>
   </context>
   <context>
@@ -4153,10 +4166,6 @@ to %1</source>
       <translation>ライセンスファイルを開く</translation>
     </message>
     <message>
-      <source>All files (*.*)</source>
-      <translation>すべてのファイル (*.*)</translation>
-    </message>
-    <message>
       <source>Failed to open file</source>
       <translation>ファイルが開けませんでした</translation>
     </message>
@@ -4167,6 +4176,10 @@ to %1</source>
     <message>
       <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
       <translation>アクティベーションキー ファイルを取得するにはライセンス キーと %1 で提供されたハードウェア Id を送信してください</translation>
+    </message>
+    <message>
+      <source>All files</source>
+      <translation type="unfinished">All files</translation>
     </message>
   </context>
   <context>
@@ -4200,7 +4213,7 @@ to %1</source>
     <name>QnLinkToCloudDialogPrivate</name>
     <message>
       <source>Failed to login to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1 へのログインに失敗しました</translation>
     </message>
   </context>
@@ -4318,12 +4331,12 @@ to %1</source>
     </message>
     <message>
       <source>Log in to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1 にログイン</translation>
     </message>
     <message>
       <source>Welcome to %1!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1へようこそ</translation>
     </message>
   </context>
@@ -5561,10 +5574,6 @@ to %1</source>
       <translation>更新ファイル選択...</translation>
     </message>
     <message>
-      <source>Update Files (*.zip)</source>
-      <translation>更新ファイル (*.zip)</translation>
-    </message>
-    <message>
       <source>Release notes</source>
       <translation>リリースノート</translation>
     </message>
@@ -5746,6 +5755,10 @@ to %1</source>
       <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
       <translation>互換性のない %1 インスタンス　更新は最初に %1 からシステムを切断します</translation>
+    </message>
+    <message>
+      <source>Update Files</source>
+      <translation type="unfinished">Update Files</translation>
     </message>
   </context>
   <context>
@@ -6439,16 +6452,6 @@ to %1</source>
       <translation>接続</translation>
     </message>
     <message>
-      <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>%1にシステムを接続&amp;mdash; どこからでもアクセスできます！</translation>
-    </message>
-    <message>
-      <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>%1 をチェックしてください &amp;mdash; 何処からでもサーバーに接続可能!</translation>
-    </message>
-    <message>
       <source>Some users have not set their email addresses</source>
       <translation>一部のユーザーにメール アドレスが設定されていません</translation>
     </message>
@@ -6499,6 +6502,16 @@ to %1</source>
     <message>
       <source>Archive integrity problem detected</source>
       <translation>アーカイブの整合性の問題が検出されました</translation>
+    </message>
+    <message>
+      <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>%1にシステムを接続&amp;mdash; どこからでもアクセスできます！</translation>
+    </message>
+    <message>
+      <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>%1 をチェックしてください &amp;mdash; 何処からでもサーバーに接続可能!</translation>
     </message>
   </context>
   <context>
@@ -6780,7 +6793,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 user</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation type="unfinished">%1 user</translation>
     </message>
   </context>
@@ -6964,7 +6977,7 @@ to %1</source>
     </message>
     <message>
       <source>This user has not yet signed up for %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>このユーザーはまだ%1にサインアップしていません</translation>
     </message>
   </context>
@@ -7016,7 +7029,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 user with specified email already exists.</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation type="unfinished">%1 user with specified email already exists.</translation>
     </message>
   </context>
@@ -7259,7 +7272,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 Systems cannot be merged</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation type="unfinished">%1 Systems cannot be merged</translation>
     </message>
   </context>

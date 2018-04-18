@@ -39,6 +39,7 @@
     "VIEWER TEXT": "İzleyici",
     "LIVE VIEWER TEXT": "Canlı İzleme",
     "CUSTOM TEXT": "Özel Ayarlar",
+    "YOUR SYSTEM TEXT": "Sistem",
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "Hesabınızı Aktifleştirin",
     "RESET PASSWORD EMAIL SUBJECT": "Parolanızı sıfırlayın",
     "INVITED TO SYSTEM EMAIL SUBJECT": "{{message.sharer_name}} sizi {{PRODUCT_NAME}} e davet ediyor",
@@ -51,5 +52,9 @@
     "PASSWORD IS REQUIRED TEXT": "Parola gerekmektedir",
     "PASSWORD SPECIAL CHARS TEXT": "Sadece alfanümerik ve klavye karakterleri kullanın",
     "PASSWORD TOO SHORT TEXT": "Şifre en az 8 karakter içermelidir",
-    "PASSWORD TOO COMMON TEXT": "Dünyada en çok kullanılan parolayı seçtiniz"
+    "PASSWORD TOO COMMON TEXT": "Dünyada en çok kullanılan parolayı seçtiniz",
+    "PASSWORD IS WEAK TEXT": "Parolanın güçlü olması için \nküçük büyük harf ve özel karakterler kullanın",
+    "THIS LINK IS BROKEN TEXT": "Bu bağlantı bozuk,<br>\n            Sistemin {{PRODUCT_NAME}} den bağlantısı kesilmiş olabilir<br>\n            Sisteme erişim engennemiş olabilir,<br>\n            Yada farklı bir hesap ile sisteme girilmiş olabilir",
+    "PAGE NOT FOUND": "Sayfa bulunamadı",
+    "TAKE ME HOME": "Geri Dön"
 }
