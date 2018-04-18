@@ -818,7 +818,7 @@ public:
         else
         {
             nx::utils::promise<void> promise;
-            post(
+            this->post(
                 [this, &promise]()
                 {
                     this->cancelIoWhileInAioThread();
