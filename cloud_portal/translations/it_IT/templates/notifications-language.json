@@ -6,10 +6,10 @@
     "emailSubject": "Reimpostare la password"
   },
   "system_invite": {
-    "emailSubject": "Video system {{message.system_name}} was shared with you"
+    "emailSubject": "{{message.sharer_name}} ti invita a {{PRODUCT_NAME}}"
   },
   "system_shared": {
-    "emailSubject": "{{message.sharer_name}} ti invita a {{PRODUCT_NAME}}"
+    "emailSubject": "Video system {{message.system_name}} was shared with you"
   },
   "review_version": {
     "emailSubject": "Versione {{message.id}} è pronto per essere rivisto"

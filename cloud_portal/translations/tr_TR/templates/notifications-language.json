@@ -6,10 +6,10 @@
     "emailSubject": "Parolanızı sıfırlayın"
   },
   "system_invite": {
-    "emailSubject": "Video sistemi {{message.system_name}} sizinle paylaşılan yapıldı"
+    "emailSubject": "{{message.sharer_name}} sizi {{PRODUCT_NAME}} e davet ediyor"
   },
   "system_shared": {
-    "emailSubject": "{{message.sharer_name}} sizi {{PRODUCT_NAME}} e davet ediyor"
+    "emailSubject": "Video system {{message.system_name}} was shared with you"
   },
   "review_version": {
     "emailSubject": "Sürüm {{message.id}} incelenmeye hazır"
