@@ -512,7 +512,6 @@ PageBase
 
             visible: opacity > 0 && d.mode === VideoScreenUtils.VideoScreenMode.Navigation
             opacity: Math.min(d.uiOpacity, d.controlsOpacity)
-
             onSwitchToPreviousCamera:
             {
                 if (!camerasModel)
@@ -602,7 +601,10 @@ PageBase
     onActivePageChanged:
     {
         if (activePage)
+        {
             videoScreenController.start(targetTimestamp)
+            targetTimestamp = -1
+        }
     }
 
     Component.onDestruction: exitFullscreen()

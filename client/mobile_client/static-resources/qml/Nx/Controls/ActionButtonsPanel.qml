@@ -28,7 +28,7 @@ Item
 
     onOpacityChanged:
     {
-        if (d.previousOpacity == 0 && opacity > 0 && panel.interactive)
+        if (d.previousOpacity == 0 && opacity > 0)
             panel.forceInitialSlideAnimation()
 
         d.previousOpacity = opacity

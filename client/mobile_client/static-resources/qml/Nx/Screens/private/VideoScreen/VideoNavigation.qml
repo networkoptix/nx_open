@@ -470,11 +470,19 @@ Item
                 }
 
                 visible: opacity > 0
-                opacity:
+                opacity: 0
+                Binding
                 {
-                    var futurePosition =
-                        videoScreenController.mediaPlayer.position > (new Date()).getTime()
-                    return (d.liveMode || futurePosition) && videoNavigation.canViewArchive ? 0 : 1
+                    target: liveModeButton
+                    property: "opacity"
+                    value:
+                    {
+                        var currentTime = (new Date()).getTime()
+                        var playerPosition = videoScreenController.mediaPlayer.position
+                        var futurePosition = playerPosition > currentTime
+                        var canViewArchive = videoNavigation.canViewArchive
+                        return (d.liveMode || futurePosition) && canViewArchive ? 0 : 1
+                    }
                 }
 
                 Behavior on opacity { NumberAnimation { duration: 200 } }
@@ -494,7 +502,6 @@ Item
                 anchors.rightMargin: -4
 
                 anchors.verticalCenter: parent.verticalCenter
-
 
                 Binding
                 {
@@ -704,5 +711,9 @@ Item
         }
     }
 
-    Component.onCompleted: d.updateNavigatorPosition()
+    Component.onCompleted:
+    {
+        d.updateNavigatorPosition()
+        liveModeButton.opacity = 0
+    }
 }

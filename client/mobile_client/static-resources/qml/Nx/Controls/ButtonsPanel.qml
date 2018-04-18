@@ -26,14 +26,22 @@ ListView
     leftMargin: emptyHeaderSize
     rightMargin: emptyHeaderSize
 
-    function forceInitialSlideAnimation() { delayedAnimationTimer.restart() }
+    function forceInitialSlideAnimation()
+    {
+        if (!interactive)
+            return
+
+        delayedAnimationTimer.restart()
+        contentX = -width - height + emptyHeaderSize
+    }
 
     Timer
     {
         id: delayedAnimationTimer
 
-        interval: 30
+        interval: 200
         onTriggered: showAnimation.restart()
+
     }
 
     PropertyAnimation
@@ -44,7 +52,6 @@ ListView
         easing.type: Easing.OutQuad
         target: control
         properties: "contentX"
-        from: -width - height + emptyHeaderSize
         to: -width + emptyHeaderSize
     }
 
