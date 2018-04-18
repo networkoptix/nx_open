@@ -197,7 +197,7 @@ namespace ec2
             void onTestConnectionDone           (int reqID, const ec2::ErrorCode, const QnConnectionInfo&);
             void onConnectDone                  (int reqID, const ec2::ErrorCode, const AbstractECConnectionPtr &);
             void onGetVideowallsDone            (int reqID, const ec2::ErrorCode, const ec2::ApiVideowallDataList&);
-            void onGetWebPagesDone              (int reqID, const ec2::ErrorCode, const ec2::ApiWebPageDataList&);
+            void onGetWebPagesDone              (int reqID, const ec2::ErrorCode, const nx::vms::api::WebPageDataList&);
             void onGetAccessRightsDone          (int reqID, const ec2::ErrorCode, const ec2::ApiAccessRightsDataList&);
             void onGetSystemMergeHistoryDone    (int reqID, const ec2::ErrorCode, const ec2::ApiSystemMergeHistoryRecordList&);
         };
@@ -257,7 +257,7 @@ namespace ec2
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractWebPageManager
         //////////////////////////////////////////////////////////
-        DEFINE_TWO_ARG_HANDLER(GetWebPages,                 ec2::ErrorCode, ec2::ApiWebPageDataList)
+        DEFINE_TWO_ARG_HANDLER(GetWebPages,                 ec2::ErrorCode, nx::vms::api::WebPageDataList)
 
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractUserManager

@@ -1269,7 +1269,7 @@ namespace ec2 {
          * %return List of web page objects in the requested format.
          * %// AbstractWebPageManager::getWebPages
          */
-		regGet<QnUuid, ApiWebPageDataList>(p, ApiCommand::getWebPages);
+		regGet<QnUuid, WebPageDataList>(p, ApiCommand::getWebPages);
 
         /**%apidoc POST /ec2/saveWebPage
          * <p>
@@ -1286,7 +1286,7 @@ namespace ec2 {
          * %param url Web page url.
          * %// AbstractWebPageManager::save
          */
-		regUpdate<ApiWebPageData>(p, ApiCommand::saveWebPage);
+		regUpdate<WebPageData>(p, ApiCommand::saveWebPage);
 
 
         /**%apidoc POST /ec2/removeWebPage

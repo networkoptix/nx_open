@@ -642,12 +642,13 @@ void QnResourcesChangesManager::saveWebPage(const QnWebPageResourcePtr& webPage,
     if (!connection)
         return;
 
-    auto replyProcessor = makeSaveResourceReplyProcessor<QnWebPageResource, ec2::ApiWebPageData>(this,
-        webPage, callback);
+    auto replyProcessor = makeSaveResourceReplyProcessor<
+        QnWebPageResource,
+        nx::vms::api::WebPageData>(this, webPage, callback);
 
     if (applyChanges)
         applyChanges(webPage);
-    ec2::ApiWebPageData apiWebpage;
+    nx::vms::api::WebPageData apiWebpage;
     ec2::fromResourceToApi(webPage, apiWebpage);
 
     connection->getWebPageManager(Qn::kSystemAccess)->save(apiWebpage, this, replyProcessor);

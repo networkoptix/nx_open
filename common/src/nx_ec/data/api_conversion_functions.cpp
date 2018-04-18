@@ -1015,22 +1015,22 @@ void fromResourceToApi(const QnVideoWallControlMessage& message, ApiVideowallCon
     }
 }
 
-void fromApiToResource(const ApiWebPageData& src, QnWebPageResourcePtr& dst)
+void fromApiToResource(const WebPageData& src, QnWebPageResourcePtr& dst)
 {
     fromApiToResource(static_cast<const ResourceData&>(src), dst.data());
 }
 
-void fromResourceToApi(const QnWebPageResourcePtr& src, ApiWebPageData& dst)
+void fromResourceToApi(const QnWebPageResourcePtr& src, WebPageData& dst)
 {
     fromResourceToApi(src, static_cast<ResourceData&>(dst));
 }
 
 template<class List>
-void fromApiToResourceList(const ApiWebPageDataList& src, List& dst, const overload_tag&)
+void fromApiToResourceList(const WebPageDataList& src, List& dst, const overload_tag&)
 {
     dst.reserve(dst.size() + (int)src.size());
 
-    for (const ApiWebPageData& srcPage: src)
+    for (const auto& srcPage: src)
     {
         QnWebPageResourcePtr dstPage(new QnWebPageResource());
         fromApiToResource(srcPage, dstPage);
@@ -1038,12 +1038,12 @@ void fromApiToResourceList(const ApiWebPageDataList& src, List& dst, const overl
     }
 }
 
-void fromApiToResourceList(const ApiWebPageDataList& src, QnResourceList& dst)
+void fromApiToResourceList(const WebPageDataList& src, QnResourceList& dst)
 {
     fromApiToResourceList(src, dst, overload_tag());
 }
 
-void fromApiToResourceList(const ApiWebPageDataList& src, QnWebPageResourceList& dst)
+void fromApiToResourceList(const WebPageDataList& src, QnWebPageResourceList& dst)
 {
     fromApiToResourceList(src, dst, overload_tag());
 }

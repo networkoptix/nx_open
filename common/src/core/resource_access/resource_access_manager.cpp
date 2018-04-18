@@ -25,7 +25,7 @@
 #include <nx_ec/data/api_media_server_data.h>
 #include <nx_ec/data/api_user_data.h>
 #include <nx_ec/data/api_videowall_data.h>
-#include <nx_ec/data/api_webpage_data.h>
+#include <nx/vms/api/data/webpage_data.h>
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
@@ -264,7 +264,7 @@ bool QnResourceAccessManager::canCreateResource(const QnResourceAccessSubject& s
 }
 
 bool QnResourceAccessManager::canCreateResource(const QnResourceAccessSubject& subject,
-    const ec2::ApiWebPageData& /*data*/) const
+    const nx::vms::api::WebPageData& /*data*/) const
 {
     NX_EXPECT(!isUpdating());
     return canCreateWebPage(subject);

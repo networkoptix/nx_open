@@ -1126,7 +1126,7 @@ APPLY(1404, getDiscoveryData, ApiDiscoveryDataList, \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(1500, getWebPages, ApiWebPageDataList, \
+APPLY(1500, getWebPages, nx::vms::api::WebPageDataList, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
@@ -1137,7 +1137,7 @@ APPLY(1500, getWebPages, ApiWebPageDataList, \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadResourceAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(1501, saveWebPage, ApiWebPageData, \
+APPLY(1501, saveWebPage, nx::vms::api::WebPageData, \
                        true, \
                        false, \
                        CreateHashByIdHelper(), \

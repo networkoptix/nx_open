@@ -149,10 +149,10 @@ void fromResourceToApi(
     const QnVideoWallControlMessage& message,
     ApiVideowallControlMessageData& data);
 
-void fromApiToResource(const ApiWebPageData& src, QnWebPageResourcePtr& dst);
-void fromResourceToApi(const QnWebPageResourcePtr& src, ApiWebPageData& dst);
-void fromApiToResourceList(const ApiWebPageDataList& src, QnResourceList& dst);
-void fromApiToResourceList(const ApiWebPageDataList& src, QnWebPageResourceList& dst);
+void fromApiToResource(const nx::vms::api::WebPageData& src, QnWebPageResourcePtr& dst);
+void fromResourceToApi(const QnWebPageResourcePtr& src, nx::vms::api::WebPageData& dst);
+void fromApiToResourceList(const nx::vms::api::WebPageDataList& src, QnResourceList& dst);
+void fromApiToResourceList(const nx::vms::api::WebPageDataList& src, QnWebPageResourceList& dst);
 
 void deserializeNetAddrList(
     const QString& source,

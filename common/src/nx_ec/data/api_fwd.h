@@ -54,7 +54,6 @@ namespace ec2 {
     struct ApiSystemIdData;
     struct ApiTransactionData;
     struct ApiTranLogFilter;
-    struct ApiWebPageData;
     struct ApiDiscoveredServerData;
 
     struct ApiTimeData;
@@ -91,8 +90,6 @@ namespace ec2 {
     typedef std::vector<ApiAccessRightsData> ApiAccessRightsDataList;
     typedef std::vector<ApiVideowallData> ApiVideowallDataList;
     typedef std::vector<ApiDiscoveryData> ApiDiscoveryDataList;
-    typedef std::vector<ApiStorageData> ApiStorageDataList;
-    typedef std::vector<ApiWebPageData> ApiWebPageDataList;
     typedef std::vector<ApiDiscoveredServerData> ApiDiscoveredServerDataList;
     typedef std::vector<ApiUpdateUploadResponceData> ApiUpdateUploadResponceDataList;
     typedef std::vector<ApiSystemMergeHistoryRecord> ApiSystemMergeHistoryRecordList;
@@ -163,7 +160,6 @@ namespace ec2 {
     (ApiRuntimeData)\
     (ApiLicenseOverflowData)\
     (ApiCleanupDatabaseData)\
-    (ApiWebPageData)\
     (ApiDiscoveredServerData)\
     (ApiP2pStatisticsData)\
 

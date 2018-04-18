@@ -10,7 +10,9 @@ class QnWebPageNotificationManager: public AbstractWebPageNotificationManager
 public:
     QnWebPageNotificationManager();
 
-    void triggerNotification(const QnTransaction<ApiWebPageData>& tran, NotificationSource source);
+    void triggerNotification(
+        const QnTransaction<nx::vms::api::WebPageData>& tran,
+        NotificationSource source);
     void triggerNotification(
         const QnTransaction<nx::vms::api::IdData>& tran,
         NotificationSource source);

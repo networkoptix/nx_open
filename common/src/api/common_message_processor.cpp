@@ -58,6 +58,7 @@
 #include <nx_ec/dummy_handler.h>
 
 using namespace nx;
+using namespace nx::vms::api;
 
 QnCommonMessageProcessor::QnCommonMessageProcessor(QObject *parent):
     base_type(parent),
@@ -501,7 +502,7 @@ void QnCommonMessageProcessor::on_remotePeerLost(QnUuid data, Qn::PeerType peerT
 
 void QnCommonMessageProcessor::on_resourceStatusChanged(
     const QnUuid& resourceId,
-    nx::vms::api::ResourceStatus status,
+    ResourceStatus status,
     ec2::NotificationSource source)
 {
     if (source == ec2::NotificationSource::Local)
@@ -516,7 +517,7 @@ void QnCommonMessageProcessor::on_resourceStatusChanged(
 }
 
 void QnCommonMessageProcessor::on_resourceParamChanged(
-    const nx::vms::api::ResourceParamWithRefData& param)
+    const ResourceParamWithRefData& param)
 {
     QnResourcePtr resource = resourcePool()->getResourceById(param.resourceId);
     if (resource)
@@ -526,7 +527,7 @@ void QnCommonMessageProcessor::on_resourceParamChanged(
 }
 
 void QnCommonMessageProcessor::on_resourceParamRemoved(
-    const nx::vms::api::ResourceParamWithRefData& param)
+    const ResourceParamWithRefData& param)
 {
     propertyDictionary()->on_resourceParamRemoved(param.resourceId, param.name);
 }
@@ -598,7 +599,7 @@ void QnCommonMessageProcessor::on_userRoleRemoved(const QnUuid& userRoleId)
 }
 
 void QnCommonMessageProcessor::on_cameraUserAttributesChanged(
-    const nx::vms::api::CameraAttributesData& attrs)
+    const CameraAttributesData& attrs)
 {
     QnCameraUserAttributesPtr userAttributes(new QnCameraUserAttributes());
     ec2::fromApiToResource(attrs, userAttributes);
@@ -662,7 +663,7 @@ void QnCommonMessageProcessor::on_mediaServerUserAttributesRemoved(const QnUuid&
 }
 
 void QnCommonMessageProcessor::on_cameraHistoryChanged(
-    const nx::vms::api::ServerFootageData& serverFootageData)
+    const ServerFootageData& serverFootageData)
 {
     cameraHistoryPool()->setServerFootageData(serverFootageData);
 }
@@ -690,7 +691,7 @@ void QnCommonMessageProcessor::on_businessActionBroadcasted( const vms::event::A
     // nothing to do for a while
 }
 
-void QnCommonMessageProcessor::on_businessRuleReset(const nx::vms::api::EventRuleDataList& rules)
+void QnCommonMessageProcessor::on_businessRuleReset(const EventRuleDataList& rules)
 {
     vms::event::RuleList ruleList;
     ec2::fromApiToResourceList(rules, ruleList);
@@ -712,7 +713,7 @@ void QnCommonMessageProcessor::handleTourAddedOrUpdated(const ec2::ApiLayoutTour
     layoutTourManager()->addOrUpdateTour(tour);
 }
 
-void QnCommonMessageProcessor::resetResourceTypes(const nx::vms::api::ResourceTypeDataList& resTypes)
+void QnCommonMessageProcessor::resetResourceTypes(const ResourceTypeDataList& resTypes)
 {
     QnResourceTypeList qnResTypes;
     ec2::fromApiToResourceList(resTypes, qnResTypes);
@@ -759,7 +760,7 @@ void QnCommonMessageProcessor::resetLicenses(const ec2::ApiLicenseDataList& lice
 }
 
 void QnCommonMessageProcessor::resetCamerasWithArchiveList(
-    const nx::vms::api::ServerFootageDataList& cameraHistoryList)
+    const ServerFootageDataList& cameraHistoryList)
 {
     cameraHistoryPool()->resetServerFootageData(cameraHistoryList);
 }
@@ -823,7 +824,7 @@ void QnCommonMessageProcessor::resetServerUserAttributesList( const ec2::ApiMedi
 }
 
 void QnCommonMessageProcessor::resetCameraUserAttributesList(
-    const nx::vms::api::CameraAttributesDataList& cameraUserAttributesList)
+    const CameraAttributesDataList& cameraUserAttributesList)
 {
     cameraUserAttributesPool()->clear();
     for (const auto& cameraAttrs: cameraUserAttributesList)
@@ -839,7 +840,7 @@ void QnCommonMessageProcessor::resetCameraUserAttributesList(
 }
 
 void QnCommonMessageProcessor::resetPropertyList(
-    const nx::vms::api::ResourceParamWithRefDataList& params)
+    const ResourceParamWithRefDataList& params)
 {
     /* Store existing parameter keys. */
     auto existingProperties = propertyDictionary()->allPropertyNamesByResource();
@@ -859,12 +860,12 @@ void QnCommonMessageProcessor::resetPropertyList(
         for (auto paramName: iter.value())
         {
             on_resourceParamChanged(
-                nx::vms::api::ResourceParamWithRefData(resourceId, paramName, QString()));
+                ResourceParamWithRefData(resourceId, paramName, QString()));
         }
     }
 }
 
-void QnCommonMessageProcessor::resetStatusList(const nx::vms::api::ResourceStatusDataList& params)
+void QnCommonMessageProcessor::resetStatusList(const ResourceStatusDataList& params)
 {
     auto keys = statusDictionary()->values().keys();
     statusDictionary()->clear();
@@ -880,7 +881,7 @@ void QnCommonMessageProcessor::resetStatusList(const nx::vms::api::ResourceStatu
         }
     }
 
-    for (const nx::vms::api::ResourceStatusData& statusData: params)
+    for (const ResourceStatusData& statusData: params)
     {
         on_resourceStatusChanged(
             statusData.id,
@@ -949,14 +950,16 @@ void QnCommonMessageProcessor::updateResource(const ec2::ApiVideowallData& video
     updateResource(qnVideowall, source);
 }
 
-void QnCommonMessageProcessor::updateResource(const ec2::ApiWebPageData& webpage, ec2::NotificationSource source)
+void QnCommonMessageProcessor::updateResource(
+    const WebPageData& webpage,
+    ec2::NotificationSource source)
 {
     QnWebPageResourcePtr qnWebpage(new QnWebPageResource(commonModule()));
-    fromApiToResource(webpage, qnWebpage);
+    ec2::fromApiToResource(webpage, qnWebpage);
     updateResource(qnWebpage, source);
 }
 
-void QnCommonMessageProcessor::updateResource(const nx::vms::api::CameraData& camera, ec2::NotificationSource source)
+void QnCommonMessageProcessor::updateResource(const CameraData& camera, ec2::NotificationSource source)
 {
     QnVirtualCameraResourcePtr qnCamera = getResourceFactory()->createResource(camera.typeId,
             QnResourceParams(camera.id, camera.url, camera.vendor))

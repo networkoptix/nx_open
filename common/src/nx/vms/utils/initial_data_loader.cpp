@@ -237,7 +237,7 @@ void loadResourcesFromEcs(
 
     {
         //loading webpages
-        ec2::ApiWebPageDataList webpages;
+        nx::vms::api::WebPageDataList webpages;
         while ((rez = ec2Connection->getWebPageManager(Qn::kSystemAccess)->getWebPagesSync(&webpages)) != ec2::ErrorCode::ok)
         {
             qDebug() << "QnMain::run(): Can't get webpages. Reason: " << ec2::toString(rez);

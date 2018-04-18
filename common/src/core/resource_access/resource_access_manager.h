@@ -96,19 +96,35 @@ public:
         return hasGlobalPermission(subject, Qn::GlobalAdminPermission);
     }
 
-    bool canCreateResource  (const QnResourceAccessSubject& subject, const ec2::ApiStorageData& data) const;
-    bool canCreateResource  (const QnResourceAccessSubject& subject, const ec2::ApiLayoutData& data) const;
-    bool canCreateResource  (const QnResourceAccessSubject& subject, const ec2::ApiUserData& data) const;
-    bool canCreateResource  (const QnResourceAccessSubject& subject, const ec2::ApiVideowallData& data) const;
-    bool canCreateResource  (const QnResourceAccessSubject& subject, const ec2::ApiWebPageData& data) const;
+    bool canCreateResource(
+        const QnResourceAccessSubject& subject,
+        const ec2::ApiStorageData& data) const;
+    bool canCreateResource(
+        const QnResourceAccessSubject& subject,
+        const ec2::ApiLayoutData& data) const;
+    bool canCreateResource(
+        const QnResourceAccessSubject& subject,
+        const ec2::ApiUserData& data) const;
+    bool canCreateResource(
+        const QnResourceAccessSubject& subject,
+        const ec2::ApiVideowallData& data) const;
+    bool canCreateResource(
+        const QnResourceAccessSubject& subject,
+        const nx::vms::api::WebPageData& data) const;
 
-    bool canCreateStorage   (const QnResourceAccessSubject& subject, const QnUuid& storageParentId) const;
-    bool canCreateLayout    (const QnResourceAccessSubject& subject, const QnUuid& layoutParentId) const;
-    bool canCreateUser      (const QnResourceAccessSubject& subject,
-        Qn::GlobalPermissions targetPermissions, bool isOwner) const;
+    bool canCreateStorage(
+        const QnResourceAccessSubject& subject,
+        const QnUuid& storageParentId) const;
+    bool canCreateLayout(
+        const QnResourceAccessSubject& subject,
+        const QnUuid& layoutParentId) const;
+    bool canCreateUser(
+        const QnResourceAccessSubject& subject,
+        Qn::GlobalPermissions targetPermissions,
+        bool isOwner) const;
     bool canCreateUser(const QnResourceAccessSubject& subject, Qn::UserRole role) const;
-    bool canCreateVideoWall (const QnResourceAccessSubject& subject) const;
-    bool canCreateWebPage   (const QnResourceAccessSubject& subject) const;
+    bool canCreateVideoWall(const QnResourceAccessSubject& subject) const;
+    bool canCreateWebPage(const QnResourceAccessSubject& subject) const;
 
     template <typename ResourceSharedPointer, typename ApiDataType>
     bool canModifyResource(const QnResourceAccessSubject& subject,

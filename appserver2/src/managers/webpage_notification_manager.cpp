@@ -7,7 +7,7 @@ QnWebPageNotificationManager::QnWebPageNotificationManager()
 }
 
 void QnWebPageNotificationManager::triggerNotification(
-    const QnTransaction<ApiWebPageData>& tran,
+    const QnTransaction<nx::vms::api::WebPageData>& tran,
     NotificationSource source)
 {
     NX_ASSERT(tran.command == ApiCommand::saveWebPage);

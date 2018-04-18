@@ -9,7 +9,7 @@
 
 #include <database/api/db_webpage_api.h>
 
-#include <nx_ec/data/api_webpage_data.h>
+#include <nx/vms/api/data/webpage_data.h>
 
 #include <nx/utils/log/log.h>
 
@@ -27,7 +27,7 @@ bool addDefaultWebpages(ec2::database::api::QueryContext* context)
                 return false;
 
             // keeping consistency with QnWebPageResource
-            ApiWebPageData webPage;
+            nx::vms::api::WebPageData webPage;
             webPage.id = guidFromArbitraryData(url);
             webPage.typeId = qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kWebPageTypeId);
             webPage.url = url;

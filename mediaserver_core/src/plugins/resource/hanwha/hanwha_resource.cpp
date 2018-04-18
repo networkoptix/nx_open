@@ -1685,7 +1685,7 @@ CameraDiagnostics::Result HanwhaResource::createProfile(
     streamParameters.codec = streamCodec(role);
     streamParameters.fps = streamFrameRate(role, fps);
     streamParameters.resolution = streamResolution(role);
-    streamParameters.quality = Qn::StreamQuality::QualityHigh;
+    streamParameters.quality = Qn::StreamQuality::high;
     streamParameters.bitrateKbps = streamBitrate(role, streamParameters);
 
     const auto profileParameters = makeProfileParameters(

@@ -43,7 +43,7 @@ public:
         const ec2::ApiVideowallData& videowall,
         ec2::NotificationSource source);
     virtual void updateResource(
-        const ec2::ApiWebPageData& webpage,
+        const nx::vms::api::WebPageData& webpage,
         ec2::NotificationSource source);
     virtual void updateResource(
         const nx::vms::api::CameraData& camera,

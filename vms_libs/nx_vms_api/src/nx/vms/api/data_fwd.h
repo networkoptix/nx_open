@@ -50,6 +50,8 @@ DECLARE_STRUCT(StoredFilePath)
 DECLARE_STRUCT(PropertyTypeData)
 DECLARE_STRUCT(ResourceTypeData)
 
+DECLARE_STRUCT(WebPageData)
+
 #undef DECLARE_STRUCT
 
 } // namespace api

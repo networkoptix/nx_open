@@ -44,7 +44,7 @@
 #include "nx_ec/data/api_user_data.h"
 #include "nx_ec/data/api_layout_data.h"
 #include "nx_ec/data/api_videowall_data.h"
-#include "nx_ec/data/api_webpage_data.h"
+#include "nx/vms/api/data/webpage_data.h"
 #include "nx_ec/data/api_license_data.h"
 #include <nx/vms/api/data/event_rule_data.h>
 #include "nx_ec/data/api_full_info_data.h"
@@ -677,8 +677,8 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
             {
                 if (!fillTransactionLogInternal<
                     QnUuid,
-                    ApiWebPageData,
-                    ApiWebPageDataList>(ApiCommand::saveWebPage))
+                    WebPageData,
+                    WebPageDataList>(ApiCommand::saveWebPage))
                 {
                     return false;
                 }
@@ -1026,8 +1026,8 @@ bool QnDbManager::resyncTransactionLog()
 
     if (!fillTransactionLogInternal<
         QnUuid,
-        ApiWebPageData,
-        ApiWebPageDataList>(ApiCommand::saveWebPage))
+        WebPageData,
+        WebPageDataList>(ApiCommand::saveWebPage))
     {
         return false;
     }
@@ -2703,15 +2703,15 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiVideowa
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiWebPageData>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<WebPageData>& tran)
 {
     ErrorCode result = saveWebPage(tran.params);
     return result;
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiWebPageDataList>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<WebPageDataList>& tran)
 {
-    for(const ApiWebPageData& webPage: tran.params)
+    for(const WebPageData& webPage: tran.params)
     {
         ErrorCode err = saveWebPage(webPage);
         if (err != ErrorCode::ok)
@@ -4142,7 +4142,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiVideowallDataList& vid
 }
 
 //getWebPageList
-ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiWebPageDataList& webPageList)
+ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, WebPageDataList& webPageList)
 {
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
@@ -4858,7 +4858,7 @@ ErrorCode QnDbManager::insertOrReplaceVideowall(const ApiVideowallData& data, qi
     return ErrorCode::dbError;
 }
 
-ErrorCode QnDbManager::saveWebPage(const ApiWebPageData& params)
+ErrorCode QnDbManager::saveWebPage(const WebPageData& params)
 {
     if (!database::api::saveWebPage(&m_resourceQueries, params))
         return ErrorCode::dbError;
@@ -4880,7 +4880,7 @@ ErrorCode QnDbManager::removeWebPage(const QnUuid& guid)
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::insertOrReplaceWebPage(const ApiWebPageData& data, qint32 internalId)
+ErrorCode QnDbManager::insertOrReplaceWebPage(const WebPageData& data, qint32 internalId)
 {
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare("INSERT OR REPLACE INTO vms_webpage (resource_ptr_id) VALUES (:internalId)");

@@ -306,7 +306,7 @@ namespace detail
         ErrorCode doQueryNoLock(const QnUuid& id, ApiVideowallDataList& videowallList);
 
         //getWebPageList
-        ErrorCode doQueryNoLock(const QnUuid& id, ApiWebPageDataList& webPageList);
+        ErrorCode doQueryNoLock(const QnUuid& id, nx::vms::api::WebPageDataList& webPageList);
 
         //getBusinessRuleList
         ErrorCode doQueryNoLock(const QnUuid& id, nx::vms::api::EventRuleDataList& userList);
@@ -388,11 +388,13 @@ namespace detail
         }
 
         ErrorCode executeTransactionInternal(const QnTransaction<ApiVideowallData>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiUpdateUploadResponceData>& tran);
+        ErrorCode executeTransactionInternal(
+            const QnTransaction<ApiUpdateUploadResponceData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiVideowallDataList>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiWebPageData>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiWebPageDataList>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiDiscoveryData> &tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::WebPageData>& tran);
+        ErrorCode executeTransactionInternal(
+            const QnTransaction<nx::vms::api::WebPageDataList>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiDiscoveryData>& tran);
         ErrorCode executeTransactionInternal(
             const QnTransaction<nx::vms::api::DatabaseDumpData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiClientInfoData>& tran);
@@ -646,9 +648,9 @@ namespace detail
         ErrorCode deleteVideowallMatrices(const QnUuid &videowall_guid);
         ErrorCode updateVideowallMatrices(const ApiVideowallData &data);
 
-        ErrorCode saveWebPage(const ApiWebPageData &params);
+        ErrorCode saveWebPage(const nx::vms::api::WebPageData& params);
         ErrorCode removeWebPage(const QnUuid &id);
-        ErrorCode insertOrReplaceWebPage(const ApiWebPageData &data, qint32 internalId);
+        ErrorCode insertOrReplaceWebPage(const nx::vms::api::WebPageData& data, qint32 internalId);
 
         ErrorCode insertOrReplaceBusinessRuleTable( const nx::vms::api::EventRuleData& businessRule);
         ErrorCode insertBRuleResource(const QString& tableName, const QnUuid& ruleGuid, const QnUuid& resourceGuid);

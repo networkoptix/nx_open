@@ -2,6 +2,8 @@
 
 #include <nx_ec/data/api_data.h>
 
+#include <nx/vms/api/data/data.h>
+
 namespace ec2 {
 
 struct ApiFullInfoData: nx::vms::api::Data
@@ -23,7 +25,7 @@ struct ApiFullInfoData: nx::vms::api::Data
     nx::vms::api::ResourceParamWithRefDataList allProperties;
     ApiStorageDataList storages;
     nx::vms::api::ResourceStatusDataList resStatusList;
-    ApiWebPageDataList webPages;
+    nx::vms::api::WebPageDataList webPages;
     ApiLayoutTourDataList layoutTours;
 };
 #define ApiFullInfoData_Fields (resourceTypes)(servers)(serversUserAttributesList)(cameras)(cameraUserAttributesList)(users)(layouts)(videowalls)(rules)\

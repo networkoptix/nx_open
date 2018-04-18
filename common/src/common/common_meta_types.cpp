@@ -95,7 +95,7 @@
 #include <nx_ec/data/api_full_info_data.h>
 #include <nx/vms/api/data/event_rule_data.h> //< Required for the FullInfoData
 #include <nx/vms/api/data/resource_type_data.h> //< Required for the FullInfoData
-#include <nx_ec/data/api_webpage_data.h>
+#include <nx/vms/api/data/webpage_data.h> //< Required for the FullInfoData
 #include <nx_ec/data/api_videowall_data.h>
 #include <nx_ec/data/api_user_data.h>
 #include <nx_ec/data/api_license_data.h>
@@ -329,7 +329,6 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<ec2::ApiLayoutItemData>("ec2::ApiLayoutItemData");
     qRegisterMetaType<ec2::ApiVideowallData>("ec2::ApiVideowallData");
     qRegisterMetaType<ec2::ApiVideowallControlMessageData>("ec2::ApiVideowallControlMessageData");
-    qRegisterMetaType<ec2::ApiWebPageData>("ec2::ApiWebPageData");
 
     qRegisterMetaType<ec2::ApiMediaServerData>("ec2::ApiMediaServerData");
     qRegisterMetaType<ec2::ApiMediaServerUserAttributesData>("ec2::ApiMediaServerUserAttributesData");

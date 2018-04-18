@@ -4,7 +4,7 @@
 
 #include <database/api/db_resource_api.h>
 
-#include <nx_ec/data/api_webpage_data.h>
+#include <nx/vms/api/data/webpage_data.h>
 
 #include <utils/db/db_helper.h>
 
@@ -35,7 +35,9 @@ bool insertOrReplaceWebPage(
     return nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO);
 }
 
-bool saveWebPage(ec2::database::api::QueryContext* resourceContext, const ApiWebPageData& webPage)
+bool saveWebPage(
+    ec2::database::api::QueryContext* resourceContext,
+    const nx::vms::api::WebPageData& webPage)
 {
     qint32 internalId;
     if (!insertOrReplaceResource(resourceContext, webPage, &internalId))
