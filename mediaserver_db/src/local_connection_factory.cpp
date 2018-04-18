@@ -1594,7 +1594,7 @@ namespace ec2 {
 		* %param[default] format
 		* %return List of objects in the requested format.
 		*/
-		regFunctor<nullptr_t, nx::vms::api::ResourceParamDataList>(p, ApiCommand::getSettings,
+		regFunctor<nullptr_t, ResourceParamDataList>(p, ApiCommand::getSettings,
 			std::bind(&LocalConnectionFactory::getSettings, this, _1, _2, _3));
 
 		// Ec2StaticticsReporter
