@@ -156,10 +156,11 @@ QRectF AsyncImageWidget::highlightRect() const
 
 void AsyncImageWidget::setHighlightRect(const QRectF& relativeRect)
 {
-    if (m_highlightRect == relativeRect)
+    const auto newRect = relativeRect.intersected(QRectF(0, 0, 1, 1));
+    if (m_highlightRect == newRect)
         return;
 
-    m_highlightRect = relativeRect;
+    m_highlightRect = newRect;
     update();
 }
 

@@ -407,6 +407,18 @@ qint64 QnRtspTimeHelper::getUsecTime(
     const double currentSeconds = currentMs / 1000.0;
     const int rtpTimeDiff = rtpTime - statistics.timestamp;
     const double cameraSeconds = statistics.ntpTime + rtpTimeDiff / (double) frequency;
+
+    const bool gotNewStatistics = !qFuzzyEquals(statistics.ntpTime, m_statistics.ntpTime)
+        || statistics.timestamp != m_statistics.timestamp
+        || m_statistics.isEmpty();
+
+    if (gotNewStatistics)
+    {
+        m_statistics = statistics;
+        QnMutexLocker lock(&m_cameraClockToLocalDiff->mutex);
+        m_cameraClockToLocalDiff->timeDiff = currentSeconds - cameraSeconds;
+    }
+
     if (m_timePolicy == TimePolicy::forceCameraTime)
     {
         VERBOSE(lm("-> %2 (%3), resourceId: %1")

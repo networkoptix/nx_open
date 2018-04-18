@@ -5,7 +5,7 @@
 #include <QtCore/QUrl>
 #include <QtCore/QIODevice>
 
-#include <plugins/camera_plugin.h>
+#include <camera/camera_plugin.h>
 #include <plugins/plugin_tools.h>
 
 #include <nx/network/abstract_socket.h>

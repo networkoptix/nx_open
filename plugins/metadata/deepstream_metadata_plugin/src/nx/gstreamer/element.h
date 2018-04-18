@@ -14,6 +14,7 @@ extern "C" {
 } // extern "C"
 
 #include <nx/gstreamer/property.h>
+#include <nx/gstreamer/pad.h>
 
 namespace nx {
 namespace gstreamer {
@@ -45,6 +46,8 @@ public:
         const std::string& sinkPadName);
 
     void unlink(Element* otherElement);
+
+    std::unique_ptr<Pad> pad(const PadName& padName);
 
     void setProperties(const std::vector<Property>& properties);
 

@@ -7,8 +7,9 @@
 
 #include <nx/mediaserver_plugins/metadata/deepstream/deepstream_common.h>
 #include <nx/mediaserver_plugins/metadata/deepstream/openalpr_common.h>
-#include <nx/mediaserver_plugins/metadata/deepstream/default_pipeline_builder.h>
 #include <nx/mediaserver_plugins/metadata/deepstream/deepstream_metadata_plugin_ini.h>
+#include <nx/mediaserver_plugins/metadata/deepstream/default/default_pipeline_builder.h>
+#include <nx/mediaserver_plugins/metadata/deepstream/openalpr/openalpr_pipeline_builder.h>
 
 #define NX_PRINT_PREFIX "metadata::deepstream::Manager::"
 #include <nx/kit/debug.h>
@@ -25,12 +26,19 @@ Manager::Manager(
     nx::mediaserver_plugins::metadata::deepstream::Plugin* plugin,
     const std::string& id)
     :
-    m_plugin(plugin),
-    m_pipelineBuilder(
-        std::make_unique<DefaultPipelineBuilder>(m_plugin->objectClassDescritions())),
-    m_pipeline(m_pipelineBuilder->build(id))
+    m_plugin(plugin)
+
 {
     NX_OUTPUT << __func__ << "(\"" << plugin->name() << "\") -> " << this;
+
+    std::unique_ptr<BasePipelineBuilder> builder;
+
+    if (ini().pipelineType == kOpenAlprPipeline)
+        builder = std::make_unique<OpenAlprPipelineBuilder>(plugin);
+    else
+        builder = std::make_unique<DefaultPipelineBuilder>(plugin);
+
+    m_pipeline = builder->build(id);
     m_pipeline->start();
 }
 

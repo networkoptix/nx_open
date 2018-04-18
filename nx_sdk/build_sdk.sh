@@ -30,8 +30,9 @@ cp -f readme.txt $TARGET_DIR
 #Copying integration headers
 cp -f ../common_libs/nx_sdk/src/plugins/plugin_api.h $TARGET_DIR/include/plugins/
 cp -f ../common_libs/nx_sdk/src/plugins/plugin_tools.h $TARGET_DIR/include/plugins/
-cp -f ../common/src/plugins/camera_plugin.h $TARGET_DIR/include/plugins/
-cp -f ../common/src/plugins/camera_plugin_types.h $TARGET_DIR/include/plugins/
+cp -f ../common_libs/nx_sdk/src/plugins/plugin_container_api.h $TARGET_DIR/include/plugins/
+cp -f ../common_libs/nx_sdk/src/camera/camera_plugin.h $TARGET_DIR/include/plugins/
+cp -f ../common_libs/nx_sdk/src/camera/camera_plugin_types.h $TARGET_DIR/include/plugins/
 
 PLUGINS=(axiscamplugin image_library_plugin rpi_cam)
 
