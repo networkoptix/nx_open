@@ -892,13 +892,19 @@ struct RemoveUserRoleAccess
 
 struct VideoWallControlAccess
 {
-    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ApiVideowallControlMessageData&)
+    bool operator()(
+        QnCommonModule* commonModule,
+        const Qn::UserAccessData& accessData,
+        const nx::vms::api::VideowallControlMessageData&)
     {
         if (hasSystemAccess(accessData))
             return true;
         const auto& resPool = commonModule->resourcePool();
-        auto userResource = resPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
-        bool result = commonModule->resourceAccessManager()->hasGlobalPermission(userResource, Qn::GlobalControlVideoWallPermission);
+        auto userResource = resPool->getResourceById(accessData.userId).dynamicCast<QnUserResource
+        >();
+        bool result = commonModule->resourceAccessManager()->hasGlobalPermission(
+            userResource,
+            Qn::GlobalControlVideoWallPermission);
         if (!result)
         {
             QString userName = userResource ? userResource->fullName() : lit("Unknown user");

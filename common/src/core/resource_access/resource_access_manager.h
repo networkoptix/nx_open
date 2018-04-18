@@ -107,7 +107,7 @@ public:
         const ec2::ApiUserData& data) const;
     bool canCreateResource(
         const QnResourceAccessSubject& subject,
-        const ec2::ApiVideowallData& data) const;
+        const nx::vms::api::VideowallData& data) const;
     bool canCreateResource(
         const QnResourceAccessSubject& subject,
         const nx::vms::api::WebPageData& data) const;
@@ -141,7 +141,7 @@ public:
     bool canModifyResource(const QnResourceAccessSubject& subject, const QnResourcePtr& target,
         const ec2::ApiUserData& update) const;
     bool canModifyResource(const QnResourceAccessSubject& subject, const QnResourcePtr& target,
-        const ec2::ApiVideowallData& update) const;
+        const nx::vms::api::VideowallData& update) const;
 
 signals:
     void permissionsChanged(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,

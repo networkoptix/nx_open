@@ -35,7 +35,7 @@
 #include "api_resource_data.h"
 #include <nx/vms/api/data/resource_type_data.h>
 #include "api_user_data.h"
-#include "api_videowall_data.h"
+#include <nx/vms/api/data/videowall_data.h>
 #include "api_peer_data.h"
 #include "api_runtime_data.h"
 #include "api_webpage_data.h"
@@ -825,7 +825,7 @@ void fromApiToResourceList(const ApiUserDataList& src, QnUserResourceList& dst)
     fromApiToResourceList(src, dst, overload_tag());
 }
 
-void fromApiToResource(const ApiVideowallItemData& src, QnVideoWallItem& dst)
+void fromApiToResource(const VideowallItemData& src, QnVideoWallItem& dst)
 {
     dst.uuid       = src.guid;
     dst.layout     = src.layoutGuid;
@@ -837,7 +837,7 @@ void fromApiToResource(const ApiVideowallItemData& src, QnVideoWallItem& dst)
     dst.screenSnaps.bottom() = QnScreenSnap::decode(src.snapBottom);
 }
 
-void fromResourceToApi(const QnVideoWallItem& src, ApiVideowallItemData& dst)
+void fromResourceToApi(const QnVideoWallItem& src, VideowallItemData& dst)
 {
     dst.guid        = src.uuid;
     dst.layoutGuid  = src.layout;
@@ -849,16 +849,16 @@ void fromResourceToApi(const QnVideoWallItem& src, ApiVideowallItemData& dst)
     dst.snapBottom  = src.screenSnaps.bottom().encode();
 }
 
-void fromApiToResource(const ApiVideowallMatrixData& src, QnVideoWallMatrix& dst)
+void fromApiToResource(const VideowallMatrixData& src, QnVideoWallMatrix& dst)
 {
     dst.uuid       = src.id;
     dst.name       = src.name;
     dst.layoutByItem.clear();
-    for (const ApiVideowallMatrixItemData& item: src.items)
+    for (const VideowallMatrixItemData& item: src.items)
         dst.layoutByItem[item.itemGuid] = item.layoutGuid;
 }
 
-void fromResourceToApi(const QnVideoWallMatrix& src, ApiVideowallMatrixData& dst)
+void fromResourceToApi(const QnVideoWallMatrix& src, VideowallMatrixData& dst)
 {
     dst.id          = src.uuid;
     dst.name        = src.name;
@@ -866,7 +866,7 @@ void fromResourceToApi(const QnVideoWallMatrix& src, ApiVideowallMatrixData& dst
     dst.items.reserve(src.layoutByItem.size());
     for (auto it = src.layoutByItem.constBegin(); it != src.layoutByItem.constEnd(); ++it)
     {
-        ApiVideowallMatrixItemData item;
+        VideowallMatrixItemData item;
         item.itemGuid = it.key();
         item.layoutGuid = it.value();
         dst.items.push_back(item);
@@ -874,14 +874,14 @@ void fromResourceToApi(const QnVideoWallMatrix& src, ApiVideowallMatrixData& dst
 }
 
 
-void fromApiToResource(const ApiVideowallScreenData& src, QnVideoWallPcData::PcScreen& dst)
+void fromApiToResource(const VideowallScreenData& src, QnVideoWallPcData::PcScreen& dst)
 {
     dst.index            = src.pcIndex;
     dst.desktopGeometry  = QRect(src.desktopLeft, src.desktopTop, src.desktopWidth, src.desktopHeight);
     dst.layoutGeometry   = QRect(src.layoutLeft, src.layoutTop, src.layoutWidth, src.layoutHeight);
 }
 
-void fromResourceToApi(const QnVideoWallPcData::PcScreen& src, ApiVideowallScreenData& dst)
+void fromResourceToApi(const QnVideoWallPcData::PcScreen& src, VideowallScreenData& dst)
 {
     dst.pcIndex         = src.index;
     dst.desktopLeft     = src.desktopGeometry.x();
@@ -894,13 +894,13 @@ void fromResourceToApi(const QnVideoWallPcData::PcScreen& src, ApiVideowallScree
     dst.layoutHeight    = src.layoutGeometry.height();
 }
 
-void fromApiToResource(const ApiVideowallData& src, QnVideoWallResourcePtr& dst)
+void fromApiToResource(const VideowallData& src, QnVideoWallResourcePtr& dst)
 {
     fromApiToResource(static_cast<const ResourceData&>(src), dst.data());
 
     dst->setAutorun(src.autorun);
     QnVideoWallItemList outItems;
-    for (const ApiVideowallItemData& item: src.items)
+    for (const VideowallItemData& item: src.items)
     {
         outItems << QnVideoWallItem();
         fromApiToResource(item, outItems.last());
@@ -908,7 +908,7 @@ void fromApiToResource(const ApiVideowallData& src, QnVideoWallResourcePtr& dst)
     dst->items()->setItems(outItems);
 
     QnVideoWallPcDataMap pcs;
-    for (const ApiVideowallScreenData& screen: src.screens)
+    for (const VideowallScreenData& screen: src.screens)
     {
         QnVideoWallPcData::PcScreen outScreen;
         fromApiToResource(screen, outScreen);
@@ -919,7 +919,7 @@ void fromApiToResource(const ApiVideowallData& src, QnVideoWallResourcePtr& dst)
     dst->pcs()->setItems(pcs);
 
     QnVideoWallMatrixList outMatrices;
-    for (const ApiVideowallMatrixData& matrixData: src.matrices)
+    for (const VideowallMatrixData& matrixData: src.matrices)
     {
         outMatrices << QnVideoWallMatrix();
         fromApiToResource(matrixData, outMatrices.last());
@@ -928,7 +928,7 @@ void fromApiToResource(const ApiVideowallData& src, QnVideoWallResourcePtr& dst)
 
 }
 
-void fromResourceToApi(const QnVideoWallResourcePtr& src, ApiVideowallData& dst)
+void fromResourceToApi(const QnVideoWallResourcePtr& src, VideowallData& dst)
 {
     fromResourceToApi(src, static_cast<ResourceData&>(dst));
 
@@ -939,7 +939,7 @@ void fromResourceToApi(const QnVideoWallResourcePtr& src, ApiVideowallData& dst)
     dst.items.reserve(resourceItems.size());
     for (const QnVideoWallItem& item: resourceItems)
     {
-        ApiVideowallItemData itemData;
+        VideowallItemData itemData;
         fromResourceToApi(item, itemData);
         dst.items.push_back(itemData);
     }
@@ -949,7 +949,7 @@ void fromResourceToApi(const QnVideoWallResourcePtr& src, ApiVideowallData& dst)
     {
         for (const QnVideoWallPcData::PcScreen& screen: pc.screens)
         {
-            ApiVideowallScreenData screenData;
+            VideowallScreenData screenData;
             fromResourceToApi(screen, screenData);
             screenData.pcGuid = pc.uuid;
             dst.screens.push_back(screenData);
@@ -961,18 +961,18 @@ void fromResourceToApi(const QnVideoWallResourcePtr& src, ApiVideowallData& dst)
     dst.matrices.reserve(matrices.size());
     for (const QnVideoWallMatrix& matrix: matrices)
     {
-        ApiVideowallMatrixData matrixData;
+        VideowallMatrixData matrixData;
         fromResourceToApi(matrix, matrixData);
         dst.matrices.push_back(matrixData);
     }
 }
 
 template<class List>
-void fromApiToResourceList(const ApiVideowallDataList& src, List& dst, const overload_tag&)
+void fromApiToResourceList(const VideowallDataList& src, List& dst, const overload_tag&)
 {
     dst.reserve(dst.size() + (int)src.size());
 
-    for (const ApiVideowallData& srcVideowall: src)
+    for (const VideowallData& srcVideowall: src)
     {
         QnVideoWallResourcePtr dstVideowall(new QnVideoWallResource());
         fromApiToResource(srcVideowall, dstVideowall);
@@ -980,17 +980,17 @@ void fromApiToResourceList(const ApiVideowallDataList& src, List& dst, const ove
     }
 }
 
-void fromApiToResourceList(const ApiVideowallDataList& src, QnResourceList& dst)
+void fromApiToResourceList(const VideowallDataList& src, QnResourceList& dst)
 {
     fromApiToResourceList(src, dst, overload_tag());
 }
 
-void fromApiToResourceList(const ApiVideowallDataList& src, QnVideoWallResourceList& dst)
+void fromApiToResourceList(const VideowallDataList& src, QnVideoWallResourceList& dst)
 {
     fromApiToResourceList(src, dst, overload_tag());
 }
 
-void fromApiToResource(const ApiVideowallControlMessageData& data, QnVideoWallControlMessage& message)
+void fromApiToResource(const VideowallControlMessageData& data, QnVideoWallControlMessage& message)
 {
     message.operation = static_cast<QnVideoWallControlMessage::Operation>(data.operation);
     message.videoWallGuid = data.videowallGuid;
@@ -1000,7 +1000,7 @@ void fromApiToResource(const ApiVideowallControlMessageData& data, QnVideoWallCo
         message.params[pair.first] = pair.second;
 }
 
-void fromResourceToApi(const QnVideoWallControlMessage& message, ApiVideowallControlMessageData& data)
+void fromResourceToApi(const QnVideoWallControlMessage& message, VideowallControlMessageData& data)
 {
     data.operation = static_cast<int>(message.operation);
     data.videowallGuid = message.videoWallGuid;

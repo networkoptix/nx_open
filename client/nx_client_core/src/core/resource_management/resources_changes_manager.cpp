@@ -593,12 +593,13 @@ void QnResourcesChangesManager::saveVideoWall(const QnVideoWallResourcePtr& vide
     if (!connection)
         return;
 
-    auto replyProcessor = makeSaveResourceReplyProcessor<QnVideoWallResource, ec2::ApiVideowallData>(this,
-        videoWall, callback);
+    auto replyProcessor = makeSaveResourceReplyProcessor<
+        QnVideoWallResource,
+        nx::vms::api::VideowallData>(this, videoWall, callback);
 
     if (applyChanges)
         applyChanges(videoWall);
-    ec2::ApiVideowallData apiVideowall;
+    nx::vms::api::VideowallData apiVideowall;
     ec2::fromResourceToApi(videoWall, apiVideowall);
 
     connection->getVideowallManager(Qn::kSystemAccess)->save(apiVideowall, this,

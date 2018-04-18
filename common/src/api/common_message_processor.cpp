@@ -949,10 +949,12 @@ void QnCommonMessageProcessor::updateResource(
     updateResource(qnLayout, source);
 }
 
-void QnCommonMessageProcessor::updateResource(const ec2::ApiVideowallData& videowall, ec2::NotificationSource source)
+void QnCommonMessageProcessor::updateResource(
+    const nx::vms::api::VideowallData& videowall,
+    ec2::NotificationSource source)
 {
     QnVideoWallResourcePtr qnVideowall(new QnVideoWallResource(commonModule()));
-    fromApiToResource(videowall, qnVideowall);
+    ec2::fromApiToResource(videowall, qnVideowall);
     updateResource(qnVideowall, source);
 }
 

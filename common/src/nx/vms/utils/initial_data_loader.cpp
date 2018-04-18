@@ -207,7 +207,7 @@ void loadResourcesFromEcs(
 
     {
         //loading videowalls
-        ec2::ApiVideowallDataList videowalls;
+        nx::vms::api::VideowallDataList videowalls;
         while ((rez = ec2Connection->getVideowallManager(Qn::kSystemAccess)->getVideowallsSync(&videowalls)) != ec2::ErrorCode::ok)
         {
             qDebug() << "QnMain::run(): Can't get videowalls. Reason: " << ec2::toString(rez);
@@ -216,7 +216,7 @@ void loadResourcesFromEcs(
                 return;
         }
 
-        for (const ec2::ApiVideowallData& videowall : videowalls)
+        for (const auto& videowall: videowalls)
             messageProcessor->updateResource(videowall, ec2::NotificationSource::Local);
     }
 

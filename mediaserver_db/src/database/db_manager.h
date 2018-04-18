@@ -303,7 +303,7 @@ namespace detail
         ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiAccessRightsDataList& accessRightsList);
 
         //getVideowallList
-        ErrorCode doQueryNoLock(const QnUuid& id, ApiVideowallDataList& videowallList);
+        ErrorCode doQueryNoLock(const QnUuid& id, nx::vms::api::VideowallDataList& videowallList);
 
         //getWebPageList
         ErrorCode doQueryNoLock(const QnUuid& id, nx::vms::api::WebPageDataList& webPageList);
@@ -391,10 +391,12 @@ namespace detail
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiVideowallData>& tran);
+        ErrorCode executeTransactionInternal(
+            const QnTransaction<nx::vms::api::VideowallData>& tran);
         ErrorCode executeTransactionInternal(
             const QnTransaction<ApiUpdateUploadResponceData>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiVideowallDataList>& tran);
+        ErrorCode executeTransactionInternal(
+            const QnTransaction<nx::vms::api::VideowallDataList>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::WebPageData>& tran);
         ErrorCode executeTransactionInternal(
             const QnTransaction<nx::vms::api::WebPageDataList>& tran);
@@ -477,7 +479,8 @@ namespace detail
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiVideowallControlMessageData>&)
+        ErrorCode executeTransactionInternal(
+            const QnTransaction<nx::vms::api::VideowallControlMessageData>&)
         {
             NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
@@ -642,15 +645,17 @@ namespace detail
         ErrorCode setAccessRights(const ApiAccessRightsData& data);
         ErrorCode cleanAccessRights(const QnUuid& userOrRoleId);
 
-        ErrorCode saveVideowall(const ApiVideowallData& params);
+        ErrorCode saveVideowall(const nx::vms::api::VideowallData& params);
         ErrorCode removeVideowall(const QnUuid& id);
-        ErrorCode insertOrReplaceVideowall(const ApiVideowallData& data, qint32 internalId);
-        ErrorCode deleteVideowallPcs(const QnUuid &videowall_guid);
-        ErrorCode deleteVideowallItems(const QnUuid &videowall_guid);
-        ErrorCode updateVideowallItems(const ApiVideowallData& data);
-        ErrorCode updateVideowallScreens(const ApiVideowallData& data);
-        ErrorCode deleteVideowallMatrices(const QnUuid &videowall_guid);
-        ErrorCode updateVideowallMatrices(const ApiVideowallData &data);
+        ErrorCode insertOrReplaceVideowall(
+            const nx::vms::api::VideowallData& data,
+            qint32 internalId);
+        ErrorCode deleteVideowallPcs(const QnUuid& videowall_guid);
+        ErrorCode deleteVideowallItems(const QnUuid& videowall_guid);
+        ErrorCode updateVideowallItems(const nx::vms::api::VideowallData& data);
+        ErrorCode updateVideowallScreens(const nx::vms::api::VideowallData& data);
+        ErrorCode deleteVideowallMatrices(const QnUuid& videowall_guid);
+        ErrorCode updateVideowallMatrices(const nx::vms::api::VideowallData& data);
 
         ErrorCode saveWebPage(const nx::vms::api::WebPageData& params);
         ErrorCode removeWebPage(const QnUuid &id);

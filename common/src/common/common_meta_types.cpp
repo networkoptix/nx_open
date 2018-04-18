@@ -95,7 +95,7 @@
 #include <nx/vms/api/data/event_rule_data.h> //< Required for the FullInfoData
 #include <nx/vms/api/data/resource_type_data.h> //< Required for the FullInfoData
 #include <nx/vms/api/data/webpage_data.h> //< Required for the FullInfoData
-#include <nx_ec/data/api_videowall_data.h>
+#include <nx/vms/api/data/videowall_data.h> //< Required for the FullInfoData
 #include <nx_ec/data/api_user_data.h>
 #include <nx_ec/data/api_license_data.h>
 #include <nx/vms/api/data/layout_data.h>    //< Required for the FullInfoData
@@ -317,15 +317,12 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<ec2::ApiDiscoveredServerDataList>("ApiDiscoveredServerDataList");
     qRegisterMetaType<ec2::ApiReverseConnectionData>( "ApiReverseConnectionData" );
     qRegisterMetaType<ec2::ApiRuntimeData>( "ApiRuntimeData" );
-   
 
     qRegisterMetaType<ec2::ApiFullInfoData>("ec2::ApiFullInfoData");
     qRegisterMetaType<ec2::ApiUserData>("ec2::ApiUserData");
     qRegisterMetaType<ec2::ApiUserRoleData>("ec2::ApiUserRoleData");
     qRegisterMetaType<ec2::ApiPredefinedRoleData>("ec2::ApiPredefinedRoleData");
-    qRegisterMetaType<ec2::ApiAccessRightsData>("ec2::ApiAccessRightsData");
-    qRegisterMetaType<ec2::ApiVideowallData>("ec2::ApiVideowallData");
-    qRegisterMetaType<ec2::ApiVideowallControlMessageData>("ec2::ApiVideowallControlMessageData");
+    qRegisterMetaType<ec2::ApiAccessRightsData>("ec2::ApiAccessRightsData");  
 
     qRegisterMetaType<ec2::ApiMediaServerData>("ec2::ApiMediaServerData");
     qRegisterMetaType<ec2::ApiMediaServerUserAttributesData>("ec2::ApiMediaServerUserAttributesData");

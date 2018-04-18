@@ -43,7 +43,7 @@
 #include <nx/vms/api/data/stored_file_data.h>
 #include "nx_ec/data/api_user_data.h"
 #include "nx/vms/api/data/layout_data.h"
-#include "nx_ec/data/api_videowall_data.h"
+#include <nx/vms/api/data/videowall_data.h>
 #include "nx/vms/api/data/webpage_data.h"
 #include "nx_ec/data/api_license_data.h"
 #include <nx/vms/api/data/event_rule_data.h>
@@ -70,6 +70,42 @@ static const QString RES_TYPE_STORAGE = "storage";
 
 using namespace nx;
 using namespace nx::vms::api;
+
+namespace {
+
+struct VideowallItemWithRefData: VideowallItemData
+{
+    QnUuid videowallGuid;
+};
+#define VideowallItemWithRefData_Fields VideowallItemData_Fields (videowallGuid)
+
+struct VideowallScreenWithRefData: VideowallScreenData
+{
+    QnUuid videowallGuid;
+};
+#define VideowallScreenWithRefData_Fields VideowallScreenData_Fields (videowallGuid)
+
+struct VideowallMatrixItemWithRefData: VideowallMatrixItemData
+{
+    QnUuid matrixGuid;
+};
+#define VideowallMatrixItemWithRefData_Fields VideowallMatrixItemData_Fields (matrixGuid)
+
+struct VideowallMatrixWithRefData: VideowallMatrixData
+{
+    QnUuid videowallGuid;
+};
+#define VideowallMatrixWithRefData_Fields VideowallMatrixData_Fields (videowallGuid)
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (VideowallItemWithRefData) \
+    (VideowallScreenWithRefData) \
+    (VideowallMatrixItemWithRefData) \
+    (VideowallMatrixWithRefData),
+    (sql_record),
+    _Fields)
+
+} // namespace
 
 namespace ec2
 {
@@ -667,8 +703,8 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
             {
                 if (!fillTransactionLogInternal<
                     QnUuid,
-                    ApiVideowallData,
-                    ApiVideowallDataList>(ApiCommand::saveVideowall))
+                    VideowallData,
+                    VideowallDataList>(ApiCommand::saveVideowall))
                 {
                     return false;
                 }
@@ -1003,8 +1039,8 @@ bool QnDbManager::resyncTransactionLog()
 
     if (!fillTransactionLogInternal<
         QnUuid,
-        ApiVideowallData,
-        ApiVideowallDataList>(ApiCommand::saveVideowall))
+        VideowallData,
+        VideowallDataList>(ApiCommand::saveVideowall))
     {
         return false;
     }
@@ -2688,13 +2724,13 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<LayoutTour
     return saveLayoutTour(tran.params);
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiVideowallData>& tran) {
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<VideowallData>& tran) {
     ErrorCode result = saveVideowall(tran.params);
     return result;
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiVideowallDataList>& tran) {
-    for(const ApiVideowallData& videowall: tran.params)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<VideowallDataList>& tran) {
+    for(const VideowallData& videowall: tran.params)
     {
         ErrorCode err = saveVideowall(videowall);
         if (err != ErrorCode::ok)
@@ -4043,7 +4079,7 @@ ErrorCode QnDbManager::doQueryNoLock(const ApiTranLogFilter& filter, ApiTransact
 }
 
 //getVideowallList
-ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiVideowallDataList& videowallList) {
+ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, VideowallDataList& videowallList) {
     QSqlQuery query(m_sdb);
     QString filterStr;
     if (!id.isNull())
@@ -4072,10 +4108,11 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiVideowallDataList& vid
         qWarning() << Q_FUNC_INFO << queryItems.lastError().text();
         return ErrorCode::dbError;
     }
-    std::vector<ApiVideowallItemWithRefData> items;
+    std::vector<VideowallItemWithRefData> items;
     QnSql::fetch_many(queryItems, &items);
 
-    mergeObjectListData(videowallList, items, &ApiVideowallData::items, &ApiVideowallItemWithRefData::videowallGuid);
+    mergeObjectListData(videowallList, items, &VideowallData::items, 
+        &VideowallItemWithRefData::videowallGuid);
 
     QSqlQuery queryScreens(m_sdb);
     queryScreens.setForwardOnly(true);
@@ -4094,9 +4131,10 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiVideowallDataList& vid
         qWarning() << Q_FUNC_INFO << queryScreens.lastError().text();
         return ErrorCode::dbError;
     }
-    std::vector<ApiVideowallScreenWithRefData> screens;
+    std::vector<VideowallScreenWithRefData> screens;
     QnSql::fetch_many(queryScreens, &screens);
-    mergeObjectListData(videowallList, screens, &ApiVideowallData::screens, &ApiVideowallScreenWithRefData::videowallGuid);
+    mergeObjectListData(videowallList, screens, &VideowallData::screens,
+        &VideowallScreenWithRefData::videowallGuid);
 
     QSqlQuery queryMatrixItems(m_sdb);
     queryMatrixItems.setForwardOnly(true);
@@ -4114,7 +4152,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiVideowallDataList& vid
         qWarning() << Q_FUNC_INFO << queryMatrixItems.lastError().text();
         return ErrorCode::dbError;
     }
-    std::vector<ApiVideowallMatrixItemWithRefData> matrixItems;
+    std::vector<VideowallMatrixItemWithRefData> matrixItems;
     QnSql::fetch_many(queryMatrixItems, &matrixItems);
 
     QSqlQuery queryMatrices(m_sdb);
@@ -4130,13 +4168,13 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiVideowallDataList& vid
         qWarning() << Q_FUNC_INFO << queryMatrices.lastError().text();
         return ErrorCode::dbError;
     }
-    std::vector<ApiVideowallMatrixWithRefData> matrices;
+    std::vector<VideowallMatrixWithRefData> matrices;
     QnSql::fetch_many(queryMatrices, &matrices);
-    mergeObjectListData(matrices, matrixItems, &ApiVideowallMatrixData::items, &ApiVideowallMatrixItemWithRefData::matrixGuid);
-    std::sort(matrices.begin(), matrices.end(), [] (const ApiVideowallMatrixWithRefData& data1, const ApiVideowallMatrixWithRefData& data2) {
+    mergeObjectListData(matrices, matrixItems, &VideowallMatrixData::items, &VideowallMatrixItemWithRefData::matrixGuid);
+    std::sort(matrices.begin(), matrices.end(), [] (const VideowallMatrixWithRefData& data1, const VideowallMatrixWithRefData& data2) {
         return data1.videowallGuid.toRfc4122() < data2.videowallGuid.toRfc4122();
     });
-    mergeObjectListData(videowallList, matrices, &ApiVideowallData::matrices, &ApiVideowallMatrixWithRefData::videowallGuid);
+    mergeObjectListData(videowallList, matrices, &VideowallData::matrices, &VideowallMatrixWithRefData::videowallGuid);
 
     return ErrorCode::ok;
 }
@@ -4642,7 +4680,7 @@ ec2::ErrorCode QnDbManager::doQueryNoLock(
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::saveVideowall(const ApiVideowallData& params) {
+ErrorCode QnDbManager::saveVideowall(const VideowallData& params) {
     qint32 internalId;
 
     ErrorCode result = insertOrReplaceResource(params, &internalId);
@@ -4665,7 +4703,7 @@ ErrorCode QnDbManager::saveVideowall(const ApiVideowallData& params) {
     return result;
 }
 
-ErrorCode QnDbManager::updateVideowallItems(const ApiVideowallData& data) {
+ErrorCode QnDbManager::updateVideowallItems(const VideowallData& data) {
     ErrorCode result = deleteVideowallItems(data.id);
     if (result != ErrorCode::ok)
         return result;
@@ -4675,7 +4713,7 @@ ErrorCode QnDbManager::updateVideowallItems(const ApiVideowallData& data) {
                      (guid, pc_guid, layout_guid, videowall_guid, name, snap_left, snap_top, snap_right, snap_bottom) \
                      VALUES \
                      (:guid, :pcGuid, :layoutGuid, :videowall_guid, :name, :snapLeft, :snapTop, :snapRight, :snapBottom)");
-    for(const ApiVideowallItemData& item: data.items)
+    for(const VideowallItemData& item: data.items)
     {
         QnSql::bind(item, &insQuery);
         insQuery.bindValue(":videowall_guid", data.id.toRfc4122());
@@ -4688,7 +4726,7 @@ ErrorCode QnDbManager::updateVideowallItems(const ApiVideowallData& data) {
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::updateVideowallScreens(const ApiVideowallData& data) {
+ErrorCode QnDbManager::updateVideowallScreens(const VideowallData& data) {
     if (data.screens.size() == 0)
         return ErrorCode::ok;
 
@@ -4705,7 +4743,7 @@ ErrorCode QnDbManager::updateVideowallScreens(const ApiVideowallData& data) {
                       :desktopLeft, :desktopTop, :desktopWidth, :desktopHeight, \
                       :layoutLeft, :layoutTop, :layoutWidth, :layoutHeight)");
 
-        for(const ApiVideowallScreenData& screen: data.screens)
+        for(const VideowallScreenData& screen: data.screens)
         {
             QnSql::bind(screen, &query);
             pcUuids << screen.pcGuid;
@@ -4732,7 +4770,7 @@ ErrorCode QnDbManager::updateVideowallScreens(const ApiVideowallData& data) {
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::updateVideowallMatrices(const ApiVideowallData &data) {
+ErrorCode QnDbManager::updateVideowallMatrices(const VideowallData &data) {
     ErrorCode result = deleteVideowallMatrices(data.id);
     if (result != ErrorCode::ok)
         return result;
@@ -4749,7 +4787,7 @@ ErrorCode QnDbManager::updateVideowallMatrices(const ApiVideowallData &data) {
                      VALUES \
                      (:matrix_guid, :itemGuid, :layoutGuid)");
 
-    for(const ApiVideowallMatrixData &matrix: data.matrices) {
+    for(const VideowallMatrixData &matrix: data.matrices) {
         QnSql::bind(matrix, &insQuery);
         insQuery.bindValue(":videowall_guid", data.id.toRfc4122());
 
@@ -4759,7 +4797,7 @@ ErrorCode QnDbManager::updateVideowallMatrices(const ApiVideowallData &data) {
         }
 
         insItemsQuery.bindValue(":matrix_guid", matrix.id.toRfc4122());
-        for(const ApiVideowallMatrixItemData &item: matrix.items) {
+        for(const VideowallMatrixItemData &item: matrix.items) {
             QnSql::bind(item, &insItemsQuery);
             if (!insItemsQuery.exec()) {
                 qWarning() << Q_FUNC_INFO << insItemsQuery.lastError().text();
@@ -4847,7 +4885,7 @@ ErrorCode QnDbManager::removeVideowall(const QnUuid& guid) {
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::insertOrReplaceVideowall(const ApiVideowallData& data, qint32 internalId) {
+ErrorCode QnDbManager::insertOrReplaceVideowall(const VideowallData& data, qint32 internalId) {
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare("INSERT OR REPLACE INTO vms_videowall (autorun, resource_ptr_id) VALUES\
                      (:autorun, :internalId)");

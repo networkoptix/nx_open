@@ -12,7 +12,7 @@
 #include <nx/vms/api/data/event_rule_data.h>
 #include <nx/vms/api/data/layout_data.h>
 #include "api_user_data.h"
-#include "api_videowall_data.h"
+#include <nx/vms/api/data/videowall_data.h>
 
 #include <nx/fusion/model_functions_fwd.h>
 
@@ -116,7 +116,7 @@ namespace ec2 {
         std::vector<ApiMediaServerDataStatistics> mediaservers;
         nx::vms::api::LayoutDataList layouts;
         std::vector<ApiUserDataStatistics> users;
-        std::vector<ApiVideowallData> videowalls;
+        nx::vms::api::VideowallDataList videowalls;
     };
 #define ApiSystemStatistics_Fields (systemId) \
     (mediaservers)(cameras)(licenses)(businessRules)(layouts)(users)(videowalls) \

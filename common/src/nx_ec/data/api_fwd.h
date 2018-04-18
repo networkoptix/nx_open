@@ -27,16 +27,6 @@ namespace ec2 {
     struct ApiUserRoleData;
     struct ApiPredefinedRoleData;
     struct ApiAccessRightsData;
-    struct ApiVideowallControlMessageData;
-    struct ApiVideowallData;
-    struct ApiVideowallItemData;
-    struct ApiVideowallItemWithRefData;
-    struct ApiVideowallScreenData;
-    struct ApiVideowallScreenWithRefData;
-    struct ApiVideowallMatrixData;
-    struct ApiVideowallMatrixWithRefData;
-    struct ApiVideowallMatrixItemData;
-    struct ApiVideowallMatrixItemWithRefData;
     struct ApiUpdateUploadData;
     struct ApiUpdateUploadResponceData;
     struct ApiSystemMergeHistoryRecord;
@@ -78,7 +68,6 @@ namespace ec2 {
     typedef std::vector<ApiUserRoleData> ApiUserRoleDataList;
     typedef std::vector<ApiPredefinedRoleData> ApiPredefinedRoleDataList;
     typedef std::vector<ApiAccessRightsData> ApiAccessRightsDataList;
-    typedef std::vector<ApiVideowallData> ApiVideowallDataList;
     typedef std::vector<ApiDiscoveryData> ApiDiscoveryDataList;
     typedef std::vector<ApiDiscoveredServerData> ApiDiscoveredServerDataList;
     typedef std::vector<ApiUpdateUploadResponceData> ApiUpdateUploadResponceDataList;
@@ -118,16 +107,6 @@ namespace ec2 {
     (ApiUserRoleData)\
     (ApiPredefinedRoleData)\
     (ApiAccessRightsData)\
-    (ApiVideowallControlMessageData)\
-    (ApiVideowallData)\
-    (ApiVideowallItemData)\
-    (ApiVideowallItemWithRefData)\
-    (ApiVideowallScreenData)\
-    (ApiVideowallScreenWithRefData)\
-    (ApiVideowallMatrixData)\
-    (ApiVideowallMatrixWithRefData)\
-    (ApiVideowallMatrixItemData)\
-    (ApiVideowallMatrixItemWithRefData)\
     (ApiUpdateInstallData)\
     (ApiUpdateUploadData)\
     (ApiUpdateUploadResponceData)\

@@ -10,13 +10,13 @@ class QnVideowallNotificationManager: public AbstractVideowallNotificationManage
 public:
     QnVideowallNotificationManager();
     void triggerNotification(
-        const QnTransaction<ApiVideowallData>& tran,
+        const QnTransaction<nx::vms::api::VideowallData>& tran,
         NotificationSource source);
     void triggerNotification(
         const QnTransaction<nx::vms::api::IdData>& tran,
         NotificationSource source);
     void triggerNotification(
-        const QnTransaction<ApiVideowallControlMessageData>& tran,
+        const QnTransaction<nx::vms::api::VideowallControlMessageData>& tran,
         NotificationSource source);
 };
 

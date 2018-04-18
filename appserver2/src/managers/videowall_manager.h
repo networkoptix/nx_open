@@ -18,12 +18,12 @@ public:
 protected:
     virtual int getVideowalls(impl::GetVideowallsHandlerPtr handler) override;
     virtual int save(
-        const ec2::ApiVideowallData& resource,
+        const nx::vms::api::VideowallData& resource,
         impl::SimpleHandlerPtr handler) override;
     virtual int remove(const QnUuid& id, impl::SimpleHandlerPtr handler) override;
 
     virtual int sendControlMessage(
-        const ec2::ApiVideowallControlMessageData& message,
+        const nx::vms::api::VideowallControlMessageData& message,
         impl::SimpleHandlerPtr handler) override;
 
 private:
@@ -47,12 +47,12 @@ int QnVideowallManager<QueryProcessorType>::getVideowalls(impl::GetVideowallsHan
     const int reqID = generateRequestID();
     auto queryDoneHandler = [reqID, handler](
         ErrorCode errorCode,
-        const ApiVideowallDataList& videowalls)
+        const nx::vms::api::VideowallDataList& videowalls)
     {
         handler->done(reqID, errorCode, videowalls);
     };
     m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QnUuid,
-        ApiVideowallDataList, decltype(queryDoneHandler)>(
+        nx::vms::api::VideowallDataList, decltype(queryDoneHandler)>(
         ApiCommand::getVideowalls,
         QnUuid(),
         queryDoneHandler);
@@ -61,7 +61,7 @@ int QnVideowallManager<QueryProcessorType>::getVideowalls(impl::GetVideowallsHan
 
 template<class T>
 int QnVideowallManager<T>::save(
-    const ec2::ApiVideowallData& videowall,
+    const nx::vms::api::VideowallData& videowall,
     impl::SimpleHandlerPtr handler)
 {
     const int reqID = generateRequestID();
@@ -91,7 +91,7 @@ int QnVideowallManager<T>::remove(const QnUuid& id, impl::SimpleHandlerPtr handl
 
 template<class T>
 int QnVideowallManager<T>::sendControlMessage(
-    const ec2::ApiVideowallControlMessageData& message,
+    const nx::vms::api::VideowallControlMessageData& message,
     impl::SimpleHandlerPtr handler)
 {
     const int reqID = generateRequestID();

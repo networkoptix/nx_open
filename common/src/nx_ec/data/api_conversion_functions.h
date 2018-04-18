@@ -137,17 +137,17 @@ void fromResourceToApi(const QnUserResourcePtr& resource, ApiUserData& data);
 void fromApiToResourceList(const ApiUserDataList& src, QnResourceList& dst);
 void fromApiToResourceList(const ApiUserDataList& src, QnUserResourceList& dst);
 
-void fromApiToResource(const ApiVideowallData& src, QnVideoWallResourcePtr& dst);
-void fromResourceToApi(const QnVideoWallResourcePtr& src, ApiVideowallData& dst);
-void fromApiToResourceList(const ApiVideowallDataList& src, QnResourceList& dst);
-void fromApiToResourceList(const ApiVideowallDataList& src, QnVideoWallResourceList& dst);
+void fromApiToResource(const nx::vms::api::VideowallData& src, QnVideoWallResourcePtr& dst);
+void fromResourceToApi(const QnVideoWallResourcePtr& src, nx::vms::api::VideowallData& dst);
+void fromApiToResourceList(const nx::vms::api::VideowallDataList& src, QnResourceList& dst);
+void fromApiToResourceList(const nx::vms::api::VideowallDataList& src, QnVideoWallResourceList& dst);
 
 void fromApiToResource(
-    const ApiVideowallControlMessageData& data,
+    const nx::vms::api::VideowallControlMessageData& data,
     QnVideoWallControlMessage& message);
 void fromResourceToApi(
     const QnVideoWallControlMessage& message,
-    ApiVideowallControlMessageData& data);
+    nx::vms::api::VideowallControlMessageData& data);
 
 void fromApiToResource(const nx::vms::api::WebPageData& src, QnWebPageResourcePtr& dst);
 void fromResourceToApi(const QnWebPageResourcePtr& src, nx::vms::api::WebPageData& dst);

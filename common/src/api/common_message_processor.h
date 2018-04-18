@@ -42,7 +42,7 @@ public:
         const nx::vms::api::LayoutData& layout,
         ec2::NotificationSource source);
     virtual void updateResource(
-        const ec2::ApiVideowallData& videowall,
+        const nx::vms::api::VideowallData& videowall,
         ec2::NotificationSource source);
     virtual void updateResource(
         const nx::vms::api::WebPageData& webpage,
@@ -80,7 +80,7 @@ signals:
     void businessActionReceived(const nx::vms::event::AbstractActionPtr& action);
     void execBusinessAction(const nx::vms::event::AbstractActionPtr& action);
 
-    void videowallControlMessageReceived(const ec2::ApiVideowallControlMessageData& message);
+    void videowallControlMessageReceived(const nx::vms::api::VideowallControlMessageData& message);
 
     void runtimeInfoChanged(const ec2::ApiRuntimeData &runtimeInfo);
     void remotePeerFound(QnUuid data, Qn::PeerType peerType);

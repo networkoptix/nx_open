@@ -7,7 +7,7 @@
 #include "ec_connection_audit_manager.h"
 #include "nx_ec/data/api_media_server_data.h"
 #include "nx_ec/data/api_full_info_data.h"
-#include "nx_ec/data/api_videowall_data.h"
+#include <nx/vms/api/data/videowall_data.h>
 #include "nx_ec/data/api_conversion_functions.h"
 
 #include <transaction/message_bus_adapter.h>

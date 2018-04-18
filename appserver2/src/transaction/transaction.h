@@ -803,7 +803,7 @@ APPLY(606, removeLayoutTour, nx::vms::api::IdData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(700, getVideowalls, ApiVideowallDataList, \
+APPLY(700, getVideowalls, nx::vms::api::VideowallDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
@@ -814,7 +814,7 @@ APPLY(700, getVideowalls, ApiVideowallDataList, \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadResourceAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(701, saveVideowall, ApiVideowallData, \
+APPLY(701, saveVideowall, nx::vms::api::VideowallData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
@@ -836,7 +836,7 @@ APPLY(702, removeVideowall, nx::vms::api::IdData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(703, videowallControl, ApiVideowallControlMessageData, \
+APPLY(703, videowallControl, nx::vms::api::VideowallControlMessageData, \
                        false, /* persistent*/\
                        false, /* system*/ \
                        InvalidGetHashHelper(), \

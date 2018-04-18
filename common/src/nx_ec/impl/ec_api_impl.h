@@ -196,7 +196,7 @@ namespace ec2
             void onGetDiscoveryDataDone         (int reqID, const ec2::ErrorCode, const ec2::ApiDiscoveryDataList&);
             void onTestConnectionDone           (int reqID, const ec2::ErrorCode, const QnConnectionInfo&);
             void onConnectDone                  (int reqID, const ec2::ErrorCode, const AbstractECConnectionPtr &);
-            void onGetVideowallsDone            (int reqID, const ec2::ErrorCode, const ec2::ApiVideowallDataList&);
+            void onGetVideowallsDone            (int reqID, const ec2::ErrorCode, const nx::vms::api::VideowallDataList&);
             void onGetWebPagesDone              (int reqID, const ec2::ErrorCode, const nx::vms::api::WebPageDataList&);
             void onGetAccessRightsDone          (int reqID, const ec2::ErrorCode, const ec2::ApiAccessRightsDataList&);
             void onGetSystemMergeHistoryDone    (int reqID, const ec2::ErrorCode, const ec2::ApiSystemMergeHistoryRecordList&);
@@ -252,7 +252,7 @@ namespace ec2
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractVideowallManager
         //////////////////////////////////////////////////////////
-        DEFINE_TWO_ARG_HANDLER(GetVideowalls,               ec2::ErrorCode, ec2::ApiVideowallDataList)
+        DEFINE_TWO_ARG_HANDLER(GetVideowalls,               ec2::ErrorCode, nx::vms::api::VideowallDataList)
 
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractWebPageManager

@@ -181,7 +181,7 @@ void QnLiteClientController::stopLiteClient()
 
     d->setClientState(State::Stopping);
 
-    ec2::ApiVideowallControlMessageData message;
+    nx::vms::api::VideowallControlMessageData message;
     message.operation = QnVideoWallControlMessage::Exit;
     message.videowallGuid = d->serverId;
 

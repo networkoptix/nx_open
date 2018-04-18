@@ -24,7 +24,7 @@
 #include <nx/vms/api/data/layout_data.h>
 #include <nx_ec/data/api_media_server_data.h>
 #include <nx_ec/data/api_user_data.h>
-#include <nx_ec/data/api_videowall_data.h>
+#include <nx/vms/api/data/videowall_data.h>
 #include <nx/vms/api/data/webpage_data.h>
 
 #include <nx/utils/log/assert.h>
@@ -257,7 +257,7 @@ bool QnResourceAccessManager::canCreateResource(const QnResourceAccessSubject& s
 }
 
 bool QnResourceAccessManager::canCreateResource(const QnResourceAccessSubject& subject,
-    const ec2::ApiVideowallData& /*data*/) const
+    const nx::vms::api::VideowallData& /*data*/) const
 {
     NX_EXPECT(!isUpdating());
     return canCreateVideoWall(subject);
@@ -962,7 +962,7 @@ bool QnResourceAccessManager::canModifyResource(const QnResourceAccessSubject& s
 }
 
 bool QnResourceAccessManager::canModifyResource(const QnResourceAccessSubject& subject,
-    const QnResourcePtr& target, const ec2::ApiVideowallData& update) const
+    const QnResourcePtr& target, const nx::vms::api::VideowallData& update) const
 {
     if (!subject.isValid() || commonModule()->isReadOnly())
         return false;

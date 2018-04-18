@@ -64,6 +64,13 @@ DECLARE_STRUCT(LayoutTourData)
 
 DECLARE_STRUCT(LockData)
 
+DECLARE_STRUCT(VideowallItemData)
+DECLARE_STRUCT(VideowallScreenData)
+DECLARE_STRUCT(VideowallMatrixItemData)
+DECLARE_STRUCT(VideowallMatrixData)
+DECLARE_STRUCT(VideowallData)
+DECLARE_STRUCT(VideowallControlMessageData)
+
 #undef DECLARE_STRUCT
 
 } // namespace api

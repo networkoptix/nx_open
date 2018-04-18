@@ -1257,12 +1257,12 @@ namespace ec2 {
 		* %return List of video wall objects in the requested format.
 		* %// AbstractVideowallManager::getVideowalls
 		*/
-		regGet<QnUuid, ApiVideowallDataList>(p, ApiCommand::getVideowalls);
+		regGet<QnUuid, VideowallDataList>(p, ApiCommand::getVideowalls);
 		// AbstractVideowallManager::save
-		regUpdate<ApiVideowallData>(p, ApiCommand::saveVideowall);
+		regUpdate<VideowallData>(p, ApiCommand::saveVideowall);
 		// AbstractVideowallManager::remove
 		regUpdate<IdData>(p, ApiCommand::removeVideowall);
-		regUpdate<ApiVideowallControlMessageData>(p, ApiCommand::videowallControl);
+		regUpdate<VideowallControlMessageData>(p, ApiCommand::videowallControl);
 
         /**%apidoc GET /ec2/getWebPages
          * Return list of web pages

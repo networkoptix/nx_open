@@ -17,7 +17,7 @@ struct ApiFullInfoData: nx::vms::api::Data
     ApiUserRoleDataList userRoles;
     ApiAccessRightsDataList accessRights;
     nx::vms::api::LayoutDataList layouts;
-    ApiVideowallDataList videowalls;
+    nx::vms::api::VideowallDataList videowalls;
     nx::vms::api::EventRuleDataList rules;
     nx::vms::api::ServerFootageDataList cameraHistory;
     ApiLicenseDataList licenses;

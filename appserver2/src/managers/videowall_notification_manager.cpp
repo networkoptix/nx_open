@@ -7,7 +7,7 @@ QnVideowallNotificationManager::QnVideowallNotificationManager()
 }
 
 void QnVideowallNotificationManager::triggerNotification(
-    const QnTransaction<ApiVideowallData>& tran,
+    const QnTransaction<nx::vms::api::VideowallData>& tran,
     NotificationSource source)
 {
     NX_ASSERT(tran.command == ApiCommand::saveVideowall);
@@ -23,7 +23,7 @@ void QnVideowallNotificationManager::triggerNotification(
 }
 
 void QnVideowallNotificationManager::triggerNotification(
-    const QnTransaction<ApiVideowallControlMessageData>& tran,
+    const QnTransaction<nx::vms::api::VideowallControlMessageData>& tran,
     NotificationSource /*source*/)
 {
     NX_ASSERT(tran.command == ApiCommand::videowallControl);

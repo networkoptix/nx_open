@@ -12,6 +12,7 @@
 #include "data/layout_data.h"
 #include "data/layout_tour_data.h"
 #include "data/lock_data.h"
+#include "data/videowall_data.h"
 
 namespace {
 
@@ -52,6 +53,8 @@ void Metatypes::initialize()
     qRegisterMetaType<nx::vms::api::LayoutData>();
     qRegisterMetaType<nx::vms::api::LayoutTourData>();
     qRegisterMetaType<nx::vms::api::LockData>();
+    qRegisterMetaType<nx::vms::api::VideowallData>();
+    qRegisterMetaType<nx::vms::api::VideowallControlMessageData>();
 
 };
 

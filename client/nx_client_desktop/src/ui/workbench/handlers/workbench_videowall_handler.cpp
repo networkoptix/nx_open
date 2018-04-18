@@ -47,7 +47,7 @@
 
 #include <recording/time_period.h>
 
-#include <nx_ec/data/api_videowall_data.h>
+#include <nx/vms/api/data/videowall_data.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_videowall_manager.h>
 
@@ -727,8 +727,8 @@ void QnWorkbenchVideoWallHandler::sendMessage(const QnVideoWallControlMessage& m
     localMessage[sequenceKey] = QString::number(m_controlMode.sequence++);
     localMessage[pcUuidKey] = m_controlMode.pcUuid;
 
-    ec2::ApiVideowallControlMessageData apiMessage;
-    fromResourceToApi(localMessage, apiMessage);
+    nx::vms::api::VideowallControlMessageData apiMessage;
+    ec2::fromResourceToApi(localMessage, apiMessage);
 
 #ifdef SENDER_DEBUG
     qDebug() << "SENDER: sending message" << message;
@@ -1647,7 +1647,7 @@ void QnWorkbenchVideoWallHandler::at_stopVideoWallAction_triggered()
     if (dialog.exec() == QDialogButtonBox::Cancel)
         return;
 
-    ec2::ApiVideowallControlMessageData message;
+    nx::vms::api::VideowallControlMessageData message;
     message.operation = QnVideoWallControlMessage::Exit;
     message.videowallGuid = videoWall->getId();
 
@@ -1757,7 +1757,7 @@ void QnWorkbenchVideoWallHandler::at_identifyVideoWallAction_triggered()
         }
     }
 
-    ec2::ApiVideowallControlMessageData message;
+    nx::vms::api::VideowallControlMessageData message;
     message.operation = QnVideoWallControlMessage::Identify;
     for (const QnVideoWallItemIndex &item : indices)
     {
@@ -2380,13 +2380,14 @@ void QnWorkbenchVideoWallHandler::at_videoWall_itemRemoved_activeMode(const QnVi
     closeInstanceDelayed();
 }
 
-void QnWorkbenchVideoWallHandler::at_eventManager_controlMessageReceived(const ec2::ApiVideowallControlMessageData& apiMessage)
+void QnWorkbenchVideoWallHandler::at_eventManager_controlMessageReceived(
+    const nx::vms::api::VideowallControlMessageData& apiMessage)
 {
     if (apiMessage.instanceGuid != m_videoWallMode.instanceGuid)
         return;
 
     QnVideoWallControlMessage message;
-    fromApiToResource(apiMessage, message);
+    ec2::fromApiToResource(apiMessage, message);
 
     // Ignore order for broadcast messages such as Exit or Identify
     if (!message.params.contains(sequenceKey))
@@ -2846,8 +2847,8 @@ bool QnWorkbenchVideoWallHandler::saveReviewLayout(QnWorkbenchLayout *layout, st
     // TODO: #GDM SafeMode
     for (const QnVideoWallResourcePtr &videowall : videowalls)
     {
-        ec2::ApiVideowallData apiVideowall;
-        fromResourceToApi(videowall, apiVideowall);
+        nx::vms::api::VideowallData apiVideowall;
+        ec2::fromResourceToApi(videowall, apiVideowall);
         connection2()->getVideowallManager(Qn::kSystemAccess)->save(apiVideowall, this,
             [this, callback](int reqID, ec2::ErrorCode errorCode)
         {
