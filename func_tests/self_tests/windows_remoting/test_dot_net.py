@@ -23,7 +23,8 @@ def test_service(pywinrm_protocol, name):
 @pytest.mark.parametrize('path', ['C:\\oi.txt'])
 def test_file(pywinrm_protocol, path):
     path_moved_to = path + '.moved'
-    log.debug(pformat(get_file_info(pywinrm_protocol, path)))
+    file_info = get_file_info(pywinrm_protocol, path)
+    log.debug(pformat(file_info))
     rename_file(pywinrm_protocol, path, path_moved_to)
     rename_file(pywinrm_protocol, path_moved_to, path)
 
