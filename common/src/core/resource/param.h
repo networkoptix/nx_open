@@ -62,7 +62,6 @@ namespace Qn
     static const QString kCombinedSensorsDescriptionParamName = lit("combinedSensorsDescription");
     static const QString kAnalyticsDriversParamName = lit("analyticsDrivers");
     static const QString kGroupPlayParamName = lit("groupplay");
-    static const QString kProxiedIdParamName = lit("proxiedId");
 
     static const QString ADVANCED_PARAMETER_OVERLOADS_PARAM_NAME = lit("advancedParameterOverloads");
 

@@ -205,6 +205,8 @@ static const QString kHanwhaAlternativeFocusTrait("AlternativeFocusTrait");
 
 static const int kMaxPossibleFps = 1000;
 
+static const QString kHanwhaProxiedIdParamName = lit("proxiedId");
+
 // TODO: #dmishin get rid of the properties below and move Hanwha driver to the standard
 // profile configuration mechanism.
 static const QString kPrimaryStreamResolutionParamName = lit("primaryStreamResolution");

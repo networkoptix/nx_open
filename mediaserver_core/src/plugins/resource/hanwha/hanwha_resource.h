@@ -272,6 +272,10 @@ private:
     const HanwhaCgiParameters& cgiParameters() const;
     boost::optional<int> bypassChannel() const;
 
+    // Proxied id is an id of a device connected to some proxy (e.g. NVR)
+    virtual QString proxiedId() const;
+    virtual void setProxiedId(const QString& proxiedId);
+
 private:
     using AdvancedParameterId = QString;
 

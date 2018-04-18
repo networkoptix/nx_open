@@ -176,10 +176,6 @@ public:
 
     virtual QString getSharedId() const;
 
-    // Proxied id is an id of a device connected to some proxy (e.g. NVR)
-    virtual QString getProxiedId() const;
-    virtual void setProxiedId(const QString& proxiedId);
-
     void setScheduleDisabled(bool value);
     bool isScheduleDisabled() const;
 

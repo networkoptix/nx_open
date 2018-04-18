@@ -1357,11 +1357,11 @@ CameraDiagnostics::Result HanwhaResource::handleProxiedDeviceInfo(
         if (proxiedIdParameter == boost::none)
             return CameraDiagnostics::NoErrorResult();
 
-        const auto proxiedId = proxiedIdParameter->trimmed();
-        if (proxiedId != getProxiedId())
+        const auto proxiedDeviceId = proxiedIdParameter->trimmed();
+        if (proxiedDeviceId != proxiedId())
         {
             cleanUpOnProxiedDeviceChange();
-            setProxiedId(proxiedId);
+            setProxiedId(proxiedDeviceId);
         }
     }
     return CameraDiagnostics::NoErrorResult();
@@ -3035,6 +3035,16 @@ HanwhaProfileParameters HanwhaResource::makeProfileParameters(
         result.emplace(kHanwhaFrameRatePriority, QString::number(frameRate));
 
     return result;
+}
+
+QString HanwhaResource::proxiedId() const
+{
+    return getProperty(kHanwhaProxiedIdParamName);
+}
+
+void HanwhaResource::setProxiedId(const QString& proxiedId)
+{
+    setProperty(kHanwhaProxiedIdParamName, proxiedId);
 }
 
 } // namespace plugins
