@@ -98,8 +98,8 @@ public:
     int profileByRole(Qn::ConnectionRole role) const;
 
     CameraDiagnostics::Result findProfiles(
-        int* outPrimaryProfileNumber,
-        int* outSecondaryProfileNumber,
+        boost::optional<HanwhaVideoProfile>* outPrimaryProfileNumber,
+        boost::optional<HanwhaVideoProfile>* outSecondaryProfileNumber,
         int* totalProfileNumber,
         std::set<int>* profilesToRemoveIfProfilesExhausted);
 
@@ -107,10 +107,16 @@ public:
 
     CameraDiagnostics::Result createProfile(int* outProfileNumber, Qn::ConnectionRole role);
 
+    CameraDiagnostics::Result updateProfileNameIfNeeded(
+        Qn::ConnectionRole role,
+        const HanwhaVideoProfile& profile);
+
     void updateToChannel(int value);
 
     bool isNvr() const;
-    QString nxProfileName(Qn::ConnectionRole role) const;
+    QString nxProfileName(
+        Qn::ConnectionRole role,
+        boost::optional<int> forcedProfileNameLength = boost::none) const;
 
     std::shared_ptr<HanwhaSharedResourceContext> sharedContext() const;
 
