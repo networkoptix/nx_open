@@ -25,6 +25,7 @@
 #include "nx_ec/data/api_peer_alive_data.h"
 #include "nx_ec/data/api_discovery_data.h"
 #include <nx_ec/data/api_access_rights_data.h>
+#include <nx/cloud/cdb/api/ec2_request_paths.h>
 
 #include "transaction/runtime_transaction_log.h"
 #include <transaction/transaction_transport.h>
@@ -1507,10 +1508,13 @@ bool QnTransactionMessageBus::gotTransactionFromRemotePeer(
     return false;
 }
 
-QUrl QnTransactionMessageBus::updateOutgoingUrl(const QUrl& srcUrl) const
+QUrl QnTransactionMessageBus::updateOutgoingUrl(const QnUuid& peer, const QUrl& srcUrl) const
 {
     QUrl url(srcUrl);
-    url.setPath("/ec2/events");
+    if (peer == ::ec2::kCloudPeerId)
+        url.setPath(nx::cdb::api::kEc2EventsPath);
+    else
+        url.setPath("/ec2/events");
     QUrlQuery q(url.query());
 
     q.addQueryItem("guid", commonModule()->moduleGUID().toString());
@@ -1523,7 +1527,7 @@ QUrl QnTransactionMessageBus::updateOutgoingUrl(const QUrl& srcUrl) const
 void QnTransactionMessageBus::addOutgoingConnectionToPeer(const QnUuid& id, const QUrl& _url)
 {
     removeOutgoingConnectionFromPeer(id);
-    QUrl url = updateOutgoingUrl(_url);
+    QUrl url = updateOutgoingUrl(id, _url);
     QnMutexLocker lock(&m_mutex);
     if (!m_remoteUrls.contains(url))
     {

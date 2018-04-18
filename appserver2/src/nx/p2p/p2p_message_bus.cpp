@@ -16,6 +16,7 @@
 #include <http/p2p_connection_listener.h>
 #include <api/runtime_info_manager.h>
 #include <managers/time_manager.h>
+#include <nx/cloud/cdb/api/ec2_request_paths.h>
 
 namespace {
     int commitIntervalMs = 1000;
@@ -178,7 +179,10 @@ void MessageBus::addOutgoingConnectionToPeer(const QnUuid& peer, const QUrl& _ur
     deleteRemoveUrlById(peer);
 
     QUrl url(_url);
-    url.setPath(ConnectionProcessor::kUrlPath);
+    if (peer == ::ec2::kCloudPeerId)
+        url.setPath(nx::cdb::api::kEc2EventsPath);
+    else
+        url.setPath(ConnectionProcessor::kUrlPath);
 
     int pos = nx::utils::random::number((int) 0, (int) m_remoteUrls.size());
     m_remoteUrls.insert(m_remoteUrls.begin() + pos, RemoteConnection(peer, url));

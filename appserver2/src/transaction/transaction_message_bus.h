@@ -235,7 +235,7 @@ private:
     void sendDelayedAliveTran();
     void reconnectAllPeers(QnMutexLockerBase* const /*lock*/);
 
-    QUrl updateOutgoingUrl(const QUrl& srcUrl) const;
+    QUrl updateOutgoingUrl(const QnUuid& peer, const QUrl& srcUrl) const;
 private slots:
     void at_stateChanged(QnTransactionTransport::State state);
     void at_gotTransaction(
