@@ -22,7 +22,6 @@ namespace network {
 
 PublicIPDiscovery::PublicIPDiscovery(QStringList primaryUrls):
     m_stage(Stage::idle),
-    m_replyInProgress(0),
     m_primaryUrls(std::move(primaryUrls))
 {
     if (m_primaryUrls.isEmpty())
@@ -35,8 +34,8 @@ PublicIPDiscovery::PublicIPDiscovery(QStringList primaryUrls):
         m_secondaryUrls.clear();
     }
 
-    NX_LOG(lit("Primary urls: %1").arg(m_primaryUrls.join(lit("; "))), cl_logDEBUG2);
-    NX_LOG(lit("Secondary urls: %1").arg(m_secondaryUrls.join(lit("; "))), cl_logDEBUG2);
+    NX_VERBOSE(this, lit("Primary urls: %1").arg(m_primaryUrls.join(lit("; "))));
+    NX_VERBOSE(this, lit("Secondary urls: %1").arg(m_secondaryUrls.join(lit("; "))));
 
     NX_ASSERT(
         !m_primaryUrls.isEmpty(),
@@ -60,8 +59,16 @@ void PublicIPDiscovery::bindToAioThread(
 void PublicIPDiscovery::update()
 {
     m_stage = Stage::primaryUrlsRequesting;
+    
+    QnMutexLocker lock(&m_mutex);
     for (const QString &url : m_primaryUrls)
-        sendRequest(url);
+        sendRequestUnsafe(url);
+}
+
+int PublicIPDiscovery::requestsInProgress() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_httpRequests.size();
 }
 
 void PublicIPDiscovery::waitForFinished()
@@ -71,7 +78,7 @@ void PublicIPDiscovery::waitForFinished()
         {
             QTime t;
             t.start();
-            while (t.elapsed() < timeout && m_publicIP.isNull() && m_replyInProgress > 0)
+            while (t.elapsed() < timeout && m_publicIP.isNull() && requestsInProgress() > 0)
             {
                 std::this_thread::sleep_for(std::chrono::milliseconds(1));
                 qApp->processEvents();
@@ -87,7 +94,7 @@ void PublicIPDiscovery::waitForFinished()
     /* Give additional timeout for secondary servers. */
     if (m_stage == Stage::secondaryUrlsRequesting)
     {
-        NX_LOG(lit("Giving additional timeout"), cl_logDEBUG2);
+        NX_VERBOSE(this, lit("Giving additional timeout"));
         waitFunc(kRequestTimeoutMs);
     }
 }
@@ -125,8 +132,9 @@ void PublicIPDiscovery::handleReply(const nx_http::AsyncHttpClientPtr& httpClien
     QHostAddress newAddress = QHostAddress(result);
     if (!newAddress.isNull())
     {
+        NX_VERBOSE(this, lit("Found public IP address %1").arg(newAddress.toString()));
         m_stage = Stage::publicIpFound;
-        NX_LOG(lit("Set stage to %1").arg(toString(m_stage)), cl_logDEBUG2);
+        NX_VERBOSE(this, lit("Set stage to %1").arg(toString(m_stage)));
         if (newAddress != m_publicIP)
         {
             m_publicIP = newAddress;
@@ -135,22 +143,23 @@ void PublicIPDiscovery::handleReply(const nx_http::AsyncHttpClientPtr& httpClien
     }
 }
 
-void PublicIPDiscovery::sendRequest(const QString &url)
+void PublicIPDiscovery::sendRequestUnsafe(const QString &url)
 {
     nx_http::AsyncHttpClientPtr httpRequest = nx_http::AsyncHttpClient::create();
     httpRequest->bindToAioThread(getAioThread());
-    {
-        QnMutexLocker lock(&m_mutex);
-        m_httpRequests.insert(httpRequest);
-    }
+    m_httpRequests.insert(httpRequest);
 
     auto at_reply_finished =
         [this](const nx_http::AsyncHttpClientPtr& httpClient) mutable
         {
             handleReply(httpClient);
             httpClient->disconnect();
-            m_replyInProgress--;
-            if (m_replyInProgress == 0)
+
+            {
+                QnMutexLocker lock(&m_mutex);
+                m_httpRequests.erase(httpClient);
+            }
+            if (requestsInProgress() == 0)
                 nextStage();
 
             /* If no public ip found, clean existing. */
@@ -159,13 +168,9 @@ void PublicIPDiscovery::sendRequest(const QString &url)
                 m_publicIP.clear();
                 emit found(m_publicIP);
             }
-
-            QnMutexLocker lock(&m_mutex);
-            m_httpRequests.erase(httpClient);
         };
 
-    NX_LOG(lit("Sending request to %1").arg(url), cl_logDEBUG2);
-    m_replyInProgress++;
+    NX_VERBOSE(this, lit("Sending request to %1").arg(url));
 
     httpRequest->setResponseReadTimeoutMs(kRequestTimeoutMs);
     httpRequest->doGet(url, at_reply_finished);
@@ -173,21 +178,23 @@ void PublicIPDiscovery::sendRequest(const QString &url)
 
 void PublicIPDiscovery::nextStage()
 {
-    NX_LOG(lit("Next stage from %1").arg(toString(m_stage)), cl_logDEBUG2);
+    NX_VERBOSE(this, lit("Next stage from %1").arg(toString(m_stage)));
     if (m_stage == Stage::publicIpFound)
         return;
 
     if (m_stage == Stage::primaryUrlsRequesting && !m_secondaryUrls.isEmpty())
     {
         m_stage = Stage::secondaryUrlsRequesting;
-        NX_LOG(lit("Set stage to %1").arg(toString(m_stage)), cl_logDEBUG2);
+        NX_VERBOSE(this, lit("Set stage to %1").arg(toString(m_stage)));
+
+        QnMutexLocker lock(&m_mutex);
         for (const QString &url : m_secondaryUrls)
-            sendRequest(url);
+            sendRequestUnsafe(url);
     }
     else
     {
         m_stage = Stage::idle;
-        NX_LOG(lit("Set stage to %1").arg(toString(m_stage)), cl_logDEBUG2);
+        NX_VERBOSE(this, lit("Set stage to %1").arg(toString(m_stage)));
     }
 }
 
