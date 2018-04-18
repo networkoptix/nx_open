@@ -64,6 +64,7 @@ public:
         const nx::Buffer& buffer,
         IoCompletionHandler handler) override;
 
+protected:
     virtual void cancelIoInAioThread(nx::network::aio::EventType eventType) override;
 
 private:

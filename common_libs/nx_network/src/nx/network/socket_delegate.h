@@ -250,9 +250,10 @@ public:
         return this->m_target->registerTimer(timeout, std::move(handler));
     }
 
+protected:
     virtual void cancelIoInAioThread(nx::network::aio::EventType eventType) override
     {
-        return this->m_target->cancelIoInAioThread(eventType);
+        return this->m_target->cancelIOSync(eventType);
     }
 };
 
@@ -289,6 +290,7 @@ public:
     virtual AbstractStreamSocket* accept() override;
     virtual void acceptAsync(AcceptCompletionHandler handler) override;
 
+protected:
     virtual void cancelIoInAioThread() override;
 };
 

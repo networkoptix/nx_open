@@ -363,6 +363,7 @@ public:
 
     virtual QString idForToStringFromPtr() const; //< Used by toString(const T*).
 
+protected:
     virtual void cancelIoInAioThread(nx::network::aio::EventType eventType) = 0;
 
 private:
@@ -494,6 +495,7 @@ public:
 
     virtual QString idForToStringFromPtr() const; //< Used by toString(const T*).
 
+protected:
     virtual void cancelIoInAioThread() = 0;
 };
 

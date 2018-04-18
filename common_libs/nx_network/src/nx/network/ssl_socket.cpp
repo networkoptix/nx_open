@@ -1774,7 +1774,7 @@ void MixedSslSocket::cancelIoInAioThread(
 {
     Q_D(MixedSslSocket);
 
-    d->wrappedSocket->cancelIoInAioThread(eventType);
+    d->wrappedSocket->cancelIOSync(eventType);
     SslSocket::cancelIoInAioThread(eventType);
 }
 

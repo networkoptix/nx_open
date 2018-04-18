@@ -64,7 +64,6 @@ public:
     void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
     virtual void acceptAsync(AcceptCompletionHandler handler) override;
-    virtual void cancelIoInAioThread() override;
 
     virtual bool isInSelfAioThread() const override;
 
@@ -90,6 +89,8 @@ protected:
         registeringOnMediator,
         listening
     };
+
+    virtual void cancelIoInAioThread() override;
 
     void initTunnelPool(int queueLen);
     void startAcceptor(std::unique_ptr<AbstractTunnelAcceptor> acceptor);

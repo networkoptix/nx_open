@@ -63,8 +63,6 @@ public:
     virtual bool setKeepAlive(boost::optional< KeepAliveOptions > info) override;
     virtual bool getKeepAlive(boost::optional< KeepAliveOptions >* result) const override;
 
-    virtual void cancelIoInAioThread(nx::network::aio::EventType eventType) override;
-
     virtual bool setNonBlockingMode(bool val) override;
     virtual bool getNonBlockingMode(bool* val) const override;
     virtual bool shutdown() override;
@@ -98,6 +96,8 @@ protected:
         std::unique_ptr<AbstractStreamSocket> wrappedSocket,
         bool isServerSide,
         bool encriptionEnforced);
+
+    virtual void cancelIoInAioThread(nx::network::aio::EventType eventType) override;
 
     int recvInternal(void* buffer, unsigned int bufferLen, int flags);
     int sendInternal(const void* buffer, unsigned int bufferLen);
@@ -136,9 +136,6 @@ public:
     virtual int send(const void* buffer, unsigned int bufferLen) override;
     virtual bool setNonBlockingMode(bool val) override;
 
-    virtual void cancelIoInAioThread(
-        nx::network::aio::EventType eventType) override;
-
     virtual void connectAsync(
         const SocketAddress& addr,
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
@@ -150,6 +147,10 @@ public:
     virtual void sendAsync(
         const nx::Buffer& buf,
         IoCompletionHandler handler) override;
+
+protected:
+    virtual void cancelIoInAioThread(
+        nx::network::aio::EventType eventType) override;
 
 private:
     bool updateInternalBlockingMode();

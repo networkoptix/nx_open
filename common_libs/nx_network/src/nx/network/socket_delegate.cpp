@@ -76,7 +76,7 @@ void StreamServerSocketDelegate::acceptAsync(AcceptCompletionHandler handler)
 
 void StreamServerSocketDelegate::cancelIoInAioThread()
 {
-    return m_target->cancelIoInAioThread();
+    return m_target->cancelIOSync();
 }
 
 } // namespace network

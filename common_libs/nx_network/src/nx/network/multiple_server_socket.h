@@ -68,8 +68,6 @@ public:
     virtual AbstractStreamSocket* accept() override;
     virtual void acceptAsync(AcceptCompletionHandler handler) override;
 
-    virtual void cancelIoInAioThread() override;
-
     /**
      * These methods can be called concurrently with MultipleServerSocket::accept.
      * NOTE: Blocks until completion.
@@ -87,6 +85,8 @@ protected:
     std::vector<AbstractStreamServerSocket*> m_serverSockets;
     AcceptCompletionHandler m_acceptHandler;
     AggregateAcceptor m_aggregateAcceptor;
+
+    virtual void cancelIoInAioThread() override;
 
 private:
     void stopWhileInAioThread();
