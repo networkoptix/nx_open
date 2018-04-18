@@ -1,6 +1,6 @@
 {
   "cameraLinks": {
-    "highStream": "Nagy stream",
+    "highStream": "Elsődleges stream",
     "lowStream": "Másodlagos stream",
     "transcoding": "Transzkódolás",
     "unknown": "Ismeretlen",

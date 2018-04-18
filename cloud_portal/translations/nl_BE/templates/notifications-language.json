@@ -6,7 +6,7 @@
     "emailSubject": "Uw wachtwoord opnieuw instellen"
   },
   "system_invite": {
-    "emailSubject": "{{message.sharer_name}} nodigt je uit voor {{PRODUCT_NAME}}"
+    "emailSubject": "{{message.sharer_name}} nodigt u uit voor {{PRODUCT_NAME}}"
   },
   "system_shared": {
     "emailSubject": "{{message.sharer_name}} nodigt u uit voor {{PRODUCT_NAME}}"

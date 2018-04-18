@@ -2,7 +2,7 @@
     <div ng-if="systemNoAccess" class="text-center">
         <h1>Truy cập hệ thống bị lỗi</h1>
         <p>Kiểm tra các lỗi dưới đây,<br>
-Hệ thống truy nhập có thể bị mất kết nối khỏi{{PRODUCT_NAME}}<br>
+Hệ thống truy nhập có thể bị mất kết nối khỏi%PRODUCT_NAME%<br>
 Truy cập vào hệ thống này có thể bị thu hồi,<br>
 Hoặc bạn có thể đăng nhập vào bằng một tài khoản khác</p>
         <p>
@@ -12,10 +12,10 @@ Hoặc bạn có thể đăng nhập vào bằng một tài khoản khác</p>
 
     <ng-include ng-if="gettingSystem.success" src="$root.C.viewsDir + 'components/system-header.html'"></ng-include>
     <div class="row"  ng-if="gettingSystem.success">
-        <div class="col-md-4 col-md-push-8">
+        <div class="col-lg-4 order-1 order-lg-2">
             <ng-include src="$root.C.viewsDir + 'components/system-card.html'"></ng-include>
         </div>
-        <div class="col-md-8 col-md-pull-4">
+        <div class="col-lg-8 order-2 order-lg-1 mt-3 mt-lg-0">
             <div class="no-data-panel light-color border-top border-bottom" ng-if="!system.permissions.editUsers" >
                 <span class="no-data-panel-body">
                     Bạn không có quyền truy cập thông tin hệ thống.

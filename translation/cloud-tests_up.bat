@@ -1,1 +1,1 @@
-crowdin upload sources -b cloud --config crowdin-cloud-autotests.yaml
+crowdin upload sources -b cloud_17.1.2_bootstrap4 --config crowdin-cloud-autotests.yaml
