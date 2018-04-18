@@ -62,7 +62,7 @@ const QLatin1String kAllowIpTarget("cloudConnect/allowIpTarget");
 const QLatin1String kDefaultAllowIpTarget("false");
 
 const QLatin1String kFetchPublicIpUrl("cloudConnect/fetchPublicIpUrl");
-const QLatin1String kDefaultFetchPublicIpUrl("http://nx.networkoptix.com/myip");
+const QLatin1String kDefaultFetchPublicIpUrl("http://tools.vmsproxy.com/myip");
 
 const QLatin1String kPublicIpAddress("cloudConnect/publicIpAddress");
 const QLatin1String kDefaultPublicIpAddress("");
