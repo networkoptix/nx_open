@@ -14,7 +14,8 @@ Page
     padding: 8
     topPadding: 0
 
-    title: qsTr("Cloud Account")
+    title: qsTr("%1 Account", "%1 is the short cloud name (like 'Cloud')")
+        .arg(applicationInfo.shortCloudName())
     onLeftButtonClicked: completeConnectOperation(false)
 
     property string targetEmail
