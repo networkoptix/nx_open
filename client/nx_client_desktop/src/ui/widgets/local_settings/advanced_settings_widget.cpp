@@ -39,10 +39,12 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget *parent) :
 
     setHelpTopic(ui->browseLogsButton,          Qn::SystemSettings_General_Logs_Help);
     setHelpTopic(ui->doubleBufferCheckbox,      Qn::SystemSettings_General_DoubleBuffering_Help);
-    setHelpTopic(ui->doubleBufferWarningLabel,  Qn::SystemSettings_General_DoubleBuffering_Help);
-
-    setWarningStyle(ui->doubleBufferWarningLabel);
-    ui->doubleBufferWarningLabel->setVisible(false);
+    ui->doubleBufferCheckboxHint->setHint(tr("Helps avoid problems with OpenGL drawing which result in 100% CPU load."));
+    ui->maximumLiveBufferLengthLabelHint->setHint(tr("Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters."));
+    // Being replaced by new HintButton
+    //setHelpTopic(ui->doubleBufferWarningLabel,  Qn::SystemSettings_General_DoubleBuffering_Help);
+    //setWarningStyle(ui->doubleBufferWarningLabel);
+    //ui->doubleBufferWarningLabel->setVisible(false);
 
     connect(ui->browseLogsButton, &QPushButton::clicked, this,
         &QnAdvancedSettingsWidget::at_browseLogsButton_clicked);
@@ -58,7 +60,8 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget *parent) :
         [this](bool toggled)
         {
             /* Show warning message if the user disables double buffering. */
-            ui->doubleBufferWarningLabel->setVisible(!toggled && qnSettings->isGlDoubleBuffer());
+            // TODO: Being replaced by HintButton
+            //ui->doubleBufferWarningLabel->setVisible(!toggled && qnSettings->isGlDoubleBuffer());
             emit hasChangesChanged();
         });
 

@@ -7,14 +7,14 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
-
+#include <ui/help/help_topics.h>
 #include <utils/common/scoped_value_rollback.h>
 
 namespace {
 
-static const QString kDocumentationScheme = lit("http");
-static const QString kApiDocPath = lit("/static/api.xml");
-static const QString kApiDocFragment = lit("group_Server_API_method_createEvent");
+    static const QString kDocumentationScheme = lit("http");
+    static const QString kApiDocPath = lit("/static/api.xml");
+    static const QString kApiDocFragment = lit("group_Server_API_method_createEvent");
 
 } // namespace
 
@@ -24,8 +24,8 @@ QnCustomBusinessEventWidget::QnCustomBusinessEventWidget(QWidget* parent):
 {
     ui->setupUi(this);
 
-    connect(ui->deviceNameEdit,  &QLineEdit::textChanged, this, &QnCustomBusinessEventWidget::paramsChanged);
-    connect(ui->captionEdit,     &QLineEdit::textChanged, this, &QnCustomBusinessEventWidget::paramsChanged);
+    connect(ui->deviceNameEdit, &QLineEdit::textChanged, this, &QnCustomBusinessEventWidget::paramsChanged);
+    connect(ui->captionEdit, &QLineEdit::textChanged, this, &QnCustomBusinessEventWidget::paramsChanged);
     connect(ui->descriptionEdit, &QLineEdit::textChanged, this, &QnCustomBusinessEventWidget::paramsChanged);
 
     const QString description = tr("Event will trigger only if Generic Event meets all the above conditions. "
@@ -38,19 +38,32 @@ QnCustomBusinessEventWidget::QnCustomBusinessEventWidget(QWidget* parent):
 
     ui->hintLabel->setTextFormat(Qt::RichText);
     ui->hintLabel->setText(lit("%1<hr/>%2").arg(description, documentationHint));
-    connect(ui->hintLabel,  &QnWordWrappedLabel::linkActivated, this,
-        [this]
-        {
-            auto server = commonModule()->currentServer();
-            if (!server)
-                return;
 
-            QUrl targetUrl(server->getApiUrl());
-            targetUrl.setScheme(kDocumentationScheme);
-            targetUrl.setPath(kApiDocPath);
-            targetUrl.setFragment(kApiDocFragment);
-            QDesktopServices::openUrl(targetUrl);
-        });
+    ui->sourceLabelHint->addHintLine(tr("Event will trigger only if there are matches in caption with any of entered keywords."));
+    ui->sourceLabelHint->addHintLine(tr("If the field is empty, event will always trigger."));
+    ui->sourceLabelHint->setHelpTopic(Qn::EventsActions_Generic_Help);
+
+    ui->captionLabelHint->addHintLine(tr("Event will trigger only if there are matches in caption with any of entered keywords."));
+    ui->captionLabelHint->addHintLine(tr("If the field is empty, event will always trigger."));
+    ui->captionLabelHint->setHelpTopic(Qn::EventsActions_Generic_Help);
+
+    ui->descriptionLabelHint->addHintLine(tr("Event will trigger only if there are matches in caption with any of entered keywords."));
+    ui->descriptionLabelHint->addHintLine(tr("If the field is empty, event will always trigger."));
+    ui->descriptionLabelHint->setHelpTopic(Qn::EventsActions_Generic_Help);
+
+    connect(ui->hintLabel, &QnWordWrappedLabel::linkActivated, this,
+        [this]
+    {
+        auto server = commonModule()->currentServer();
+        if (!server)
+            return;
+
+        QUrl targetUrl(server->getApiUrl());
+        targetUrl.setScheme(kDocumentationScheme);
+        targetUrl.setPath(kApiDocPath);
+        targetUrl.setFragment(kApiDocFragment);
+        QDesktopServices::openUrl(targetUrl);
+    });
 }
 
 QnCustomBusinessEventWidget::~QnCustomBusinessEventWidget()

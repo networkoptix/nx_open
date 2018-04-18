@@ -13,10 +13,11 @@ class QnEmptyBusinessActionWidget : public QnAbstractBusinessParamsWidget
 {
     Q_OBJECT
     typedef QnAbstractBusinessParamsWidget base_type;
-    
+
 public:
-    explicit QnEmptyBusinessActionWidget(QWidget *parent = 0);
+    explicit QnEmptyBusinessActionWidget(nx::vms::event::ActionType actionType, QWidget *parent = 0);
     ~QnEmptyBusinessActionWidget();
+
 private:
     QScopedPointer<Ui::EmptyBusinessActionWidget> ui;
 };
