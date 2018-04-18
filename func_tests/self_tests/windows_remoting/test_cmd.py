@@ -29,3 +29,10 @@ def test_run_command(shell):
     assert exit_code == 0
     assert stdout_bytes == b'123\r\n'
     assert stderr_bytes == b''
+
+
+def test_run_command_with_stdin(shell):
+    exit_code, stdout_bytes, stderr_bytes = run_command(shell, ['more'], b'123')
+    assert exit_code == 0
+    assert stdout_bytes == b'123\r\n'
+    assert stderr_bytes == b''
