@@ -56,9 +56,15 @@ void PublicIPDiscovery::bindToAioThread(
         httpRequest->bindToAioThread(aioThread);
 }
 
+void PublicIPDiscovery::setStage(PublicIPDiscovery::Stage value)
+{
+    m_stage = value;
+    NX_VERBOSE(this, lit("Set stage to %1").arg(toString(m_stage)));
+}
+
 void PublicIPDiscovery::update()
 {
-    m_stage = Stage::primaryUrlsRequesting;
+    setStage(Stage::primaryUrlsRequesting);
     
     QnMutexLocker lock(&m_mutex);
     for (const QString &url : m_primaryUrls)
@@ -133,8 +139,7 @@ void PublicIPDiscovery::handleReply(const nx_http::AsyncHttpClientPtr& httpClien
     if (!newAddress.isNull())
     {
         NX_VERBOSE(this, lit("Found public IP address %1").arg(newAddress.toString()));
-        m_stage = Stage::publicIpFound;
-        NX_VERBOSE(this, lit("Set stage to %1").arg(toString(m_stage)));
+        setStage(Stage::publicIpFound);
         if (newAddress != m_publicIP)
         {
             m_publicIP = newAddress;
@@ -165,6 +170,7 @@ void PublicIPDiscovery::sendRequestUnsafe(const QString &url)
             /* If no public ip found, clean existing. */
             if (m_stage == Stage::idle && !m_publicIP.isNull())
             {
+                NX_VERBOSE(this, lit("Public IP address is not found"));
                 m_publicIP.clear();
                 emit found(m_publicIP);
             }
@@ -178,14 +184,12 @@ void PublicIPDiscovery::sendRequestUnsafe(const QString &url)
 
 void PublicIPDiscovery::nextStage()
 {
-    NX_VERBOSE(this, lit("Next stage from %1").arg(toString(m_stage)));
     if (m_stage == Stage::publicIpFound)
         return;
 
     if (m_stage == Stage::primaryUrlsRequesting && !m_secondaryUrls.isEmpty())
     {
-        m_stage = Stage::secondaryUrlsRequesting;
-        NX_VERBOSE(this, lit("Set stage to %1").arg(toString(m_stage)));
+        setStage(Stage::secondaryUrlsRequesting);
 
         QnMutexLocker lock(&m_mutex);
         for (const QString &url : m_secondaryUrls)
@@ -193,8 +197,7 @@ void PublicIPDiscovery::nextStage()
     }
     else
     {
-        m_stage = Stage::idle;
-        NX_VERBOSE(this, lit("Set stage to %1").arg(toString(m_stage)));
+        setStage(Stage::idle);
     }
 }
 
