@@ -21,7 +21,7 @@
 
 #include <nx/streaming/abstract_archive_resource.h>
 
-#include <nx_ec/data/api_layout_data.h>
+#include <nx/vms/api/data/layout_data.h>
 #include <nx_ec/data/api_media_server_data.h>
 #include <nx_ec/data/api_user_data.h>
 #include <nx_ec/data/api_videowall_data.h>
@@ -240,7 +240,7 @@ bool QnResourceAccessManager::canCreateResource(const QnResourceAccessSubject& s
 }
 
 bool QnResourceAccessManager::canCreateResource(const QnResourceAccessSubject& subject,
-    const ec2::ApiLayoutData& data) const
+    const nx::vms::api::LayoutData& data) const
 {
     NX_EXPECT(!isUpdating());
     return canCreateLayout(subject, data.parentId);
@@ -908,7 +908,7 @@ bool QnResourceAccessManager::canModifyResource(const QnResourceAccessSubject& s
 }
 
 bool QnResourceAccessManager::canModifyResource(const QnResourceAccessSubject& subject,
-    const QnResourcePtr& target, const ec2::ApiLayoutData& update) const
+    const QnResourcePtr& target, const nx::vms::api::LayoutData& update) const
 {
     NX_ASSERT(target.dynamicCast<QnLayoutResource>());
 

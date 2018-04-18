@@ -187,7 +187,7 @@ namespace ec2
             void onGetUserRolesDone             (int reqID, const ec2::ErrorCode, const ec2::ApiUserRoleDataList&);
             void onGetBusinessRulesDone         (int reqID, const ec2::ErrorCode, const nx::vms::event::RuleList&);
             void onGetLicensesDone              (int reqID, const ec2::ErrorCode, const QnLicenseList&);
-            void onGetLayoutsDone               (int reqID, const ec2::ErrorCode, const ec2::ApiLayoutDataList&);
+            void onGetLayoutsDone               (int reqID, const ec2::ErrorCode, const nx::vms::api::LayoutDataList&);
             void onGetLayoutToursDone           (int reqID, const ec2::ErrorCode, const ec2::ApiLayoutTourDataList&);
             void onGetStoredFileDone            (int reqID, const ec2::ErrorCode, const QByteArray&);
             void onListDirectoryDone            (int reqID, const ec2::ErrorCode, const QStringList&);
@@ -244,7 +244,7 @@ namespace ec2
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractLayoutManager
         //////////////////////////////////////////////////////////
-        DEFINE_TWO_ARG_HANDLER(GetLayouts,                  ec2::ErrorCode, ec2::ApiLayoutDataList)
+        DEFINE_TWO_ARG_HANDLER(GetLayouts,                  ec2::ErrorCode, nx::vms::api::LayoutDataList)
 
         // Handlers for AbstractLayoutTourManager.
         DEFINE_TWO_ARG_HANDLER(GetLayoutTours, ec2::ErrorCode, ec2::ApiLayoutTourDataList)

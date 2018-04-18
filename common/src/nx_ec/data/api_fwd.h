@@ -9,8 +9,6 @@ class QString;
 namespace ec2 {
 
     struct ApiFullInfoData;
-    struct ApiLayoutItemData;
-    struct ApiLayoutData;
     struct ApiLayoutTourItemData;
     struct ApiLayoutTourData;
     struct ApiLayoutTourSettings;
@@ -74,7 +72,6 @@ namespace ec2 {
 
     typedef std::vector<ApiTransactionData> ApiTransactionDataList;
 
-    typedef std::vector<ApiLayoutData> ApiLayoutDataList;
     using ApiLayoutTourDataList = std::vector<ApiLayoutTourData>;
     using ApiLayoutTourItemDataList = std::vector<ApiLayoutTourItemData>;
     typedef std::vector<ApiLicenseData> ApiLicenseDataList;
@@ -109,8 +106,6 @@ namespace ec2 {
 #define QN_EC2_API_DATA_TYPES \
     (ApiEmailData)\
     (ApiFullInfoData)\
-    (ApiLayoutItemData)\
-    (ApiLayoutData)\
     (ApiLayoutTourItemData)\
     (ApiLayoutTourData)\
     (ApiLayoutTourSettings)\

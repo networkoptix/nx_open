@@ -52,6 +52,9 @@ DECLARE_STRUCT(ResourceTypeData)
 
 DECLARE_STRUCT(WebPageData)
 
+DECLARE_STRUCT(LayoutItemData)
+DECLARE_STRUCT(LayoutData)
+
 #undef DECLARE_STRUCT
 
 } // namespace api

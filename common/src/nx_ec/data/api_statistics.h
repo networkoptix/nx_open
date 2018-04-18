@@ -10,7 +10,7 @@
 #include "api_client_info_data.h"
 #include "api_license_data.h"
 #include <nx/vms/api/data/event_rule_data.h>
-#include "api_layout_data.h"
+#include <nx/vms/api/data/layout_data.h>
 #include "api_user_data.h"
 #include "api_videowall_data.h"
 
@@ -114,7 +114,7 @@ namespace ec2 {
         std::vector<ApiCameraDataStatistics> cameras;
         std::vector<ApiLicenseStatistics> licenses;
         std::vector<ApiMediaServerDataStatistics> mediaservers;
-        std::vector<ApiLayoutData> layouts;
+        nx::vms::api::LayoutDataList layouts;
         std::vector<ApiUserDataStatistics> users;
         std::vector<ApiVideowallData> videowalls;
     };

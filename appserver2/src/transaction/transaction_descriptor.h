@@ -27,7 +27,7 @@
 #include "nx_ec/data/api_media_server_data.h"
 #include "nx_ec/data/api_user_data.h"
 #include "nx_ec/data/api_tran_state_data.h"
-#include "nx_ec/data/api_layout_data.h"
+#include "nx/vms/api/data/layout_data.h"
 #include "nx_ec/data/api_videowall_data.h"
 #include <nx/vms/api/data/camera_history_data.h>
 #include <nx/vms/api/data/stored_file_data.h>

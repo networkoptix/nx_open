@@ -81,14 +81,14 @@ void fromResourceListToApi(
 void fromResourceToApi(const QnEmailSettings& src, nx::vms::api::EmailSettingsData& dst);
 void fromApiToResource(const nx::vms::api::EmailSettingsData& src, QnEmailSettings& dst);
 
-void fromApiToResource(const ApiLayoutItemData& src, QnLayoutItemData& dst);
-void fromResourceToApi(const QnLayoutItemData& src, ApiLayoutItemData& dst);
+void fromApiToResource(const nx::vms::api::LayoutItemData& src, QnLayoutItemData& dst);
+void fromResourceToApi(const QnLayoutItemData& src, nx::vms::api::LayoutItemData& dst);
 
-void fromApiToResource(const ApiLayoutData& src, QnLayoutResourcePtr& dst);
-void fromResourceToApi(const QnLayoutResourcePtr& src, ApiLayoutData& dst);
-void fromApiToResourceList(const ApiLayoutDataList& src, QnResourceList& dst);
-void fromApiToResourceList(const ApiLayoutDataList& src, QnLayoutResourceList& dst);
-void fromResourceListToApi(const QnLayoutResourceList& src, ApiLayoutDataList& dst);
+void fromApiToResource(const nx::vms::api::LayoutData& src, QnLayoutResourcePtr& dst);
+void fromResourceToApi(const QnLayoutResourcePtr& src, nx::vms::api::LayoutData& dst);
+void fromApiToResourceList(const nx::vms::api::LayoutDataList& src, QnResourceList& dst);
+void fromApiToResourceList(const nx::vms::api::LayoutDataList& src, QnLayoutResourceList& dst);
+void fromResourceListToApi(const QnLayoutResourceList& src, nx::vms::api::LayoutDataList& dst);
 
 void fromResourceToApi(const QnLicensePtr& src, ApiLicenseData& dst);
 void fromApiToResource(const ApiLicenseData& src, QnLicensePtr& dst);

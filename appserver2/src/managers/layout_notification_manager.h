@@ -1,7 +1,7 @@
 #pragma once
 
 #include <transaction/transaction.h>
-#include <nx_ec/data/api_layout_data.h>
+#include <nx/vms/api/data/layout_data.h>
 #include <nx_ec/managers/abstract_layout_manager.h>
 
 namespace ec2 {
@@ -12,9 +12,11 @@ public:
     void triggerNotification(
         const QnTransaction<nx::vms::api::IdData>& tran,
         NotificationSource source);
-    void triggerNotification(const QnTransaction<ApiLayoutData>& tran, NotificationSource source);
     void triggerNotification(
-        const QnTransaction<ApiLayoutDataList>& tran,
+        const QnTransaction<nx::vms::api::LayoutData>& tran,
+        NotificationSource source);
+    void triggerNotification(
+        const QnTransaction<nx::vms::api::LayoutDataList>& tran,
         NotificationSource source);
 };
 

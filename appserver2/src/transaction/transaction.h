@@ -726,7 +726,7 @@ APPLY(510, saveUsers,  ApiUserDataList, \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadResourceAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(600, getLayouts, ApiLayoutDataList, \
+APPLY(600, getLayouts, nx::vms::api::LayoutDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
@@ -737,7 +737,7 @@ APPLY(600, getLayouts, ApiLayoutDataList, \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadResourceAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(601, saveLayout, ApiLayoutData, \
+APPLY(601, saveLayout, nx::vms::api::LayoutData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
@@ -748,7 +748,7 @@ APPLY(601, saveLayout, ApiLayoutData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        ReadResourceAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(602, saveLayouts, ApiLayoutDataList, \
+APPLY(602, saveLayouts, nx::vms::api::LayoutDataList, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \

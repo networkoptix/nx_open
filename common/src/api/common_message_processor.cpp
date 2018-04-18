@@ -916,17 +916,23 @@ void QnCommonMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoDa
     emit initialResourcesReceived();
 }
 
-void QnCommonMessageProcessor::updateResource(const QnResourcePtr&, ec2::NotificationSource /*source*/)
+void QnCommonMessageProcessor::updateResource(
+    const QnResourcePtr&,
+    ec2::NotificationSource /*source*/)
 {
 }
 
-void QnCommonMessageProcessor::updateResource(const ec2::ApiUserData& user, ec2::NotificationSource source)
+void QnCommonMessageProcessor::updateResource(
+    const ec2::ApiUserData& user,
+    ec2::NotificationSource source)
 {
     QnUserResourcePtr qnUser(fromApiToResource(user, commonModule()));
     updateResource(qnUser, source);
 }
 
-void QnCommonMessageProcessor::updateResource(const ec2::ApiLayoutData& layout, ec2::NotificationSource source)
+void QnCommonMessageProcessor::updateResource(
+    const LayoutData& layout,
+    ec2::NotificationSource source)
 {
     QnLayoutResourcePtr qnLayout(new QnLayoutResource(commonModule()));
     if (!layout.url.isEmpty())
@@ -934,11 +940,11 @@ void QnCommonMessageProcessor::updateResource(const ec2::ApiLayoutData& layout, 
         NX_LOG(lit("Invalid server layout with url %1").arg(layout.url), cl_logWARNING);
         auto fixed = layout;
         fixed.url = QString();
-        fromApiToResource(fixed, qnLayout);
+        ec2::fromApiToResource(fixed, qnLayout);
     }
     else
     {
-        fromApiToResource(layout, qnLayout);
+        ec2::fromApiToResource(layout, qnLayout);
     }
     updateResource(qnLayout, source);
 }

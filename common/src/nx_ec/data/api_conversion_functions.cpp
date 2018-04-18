@@ -29,7 +29,7 @@
 #include <nx/vms/api/data/camera_data_ex.h>
 #include <nx/vms/api/data/camera_history_data.h>
 #include "api_email_data.h"
-#include "api_layout_data.h"
+#include <nx/vms/api/data/layout_data.h>
 #include "api_license_data.h"
 #include "api_media_server_data.h"
 #include "api_resource_data.h"
@@ -389,7 +389,7 @@ void fromApiToResource(const EmailSettingsData& src, QnEmailSettings& dst)
     dst.connectionType = src.connectionType;
 }
 
-void fromApiToResource(const ApiLayoutItemData& src, QnLayoutItemData& dst)
+void fromApiToResource(const LayoutItemData& src, QnLayoutItemData& dst)
 {
     dst.uuid = src.id;
     dst.flags = src.flags;
@@ -404,7 +404,7 @@ void fromApiToResource(const ApiLayoutItemData& src, QnLayoutItemData& dst)
     dst.displayInfo = src.displayInfo;
 }
 
-void fromResourceToApi(const QnLayoutItemData& src, ApiLayoutItemData& dst)
+void fromResourceToApi(const QnLayoutItemData& src, LayoutItemData& dst)
 {
     dst.id = src.uuid;
     dst.flags = src.flags;
@@ -425,7 +425,7 @@ void fromResourceToApi(const QnLayoutItemData& src, ApiLayoutItemData& dst)
     dst.displayInfo = src.displayInfo;
 }
 
-void fromApiToResource(const ApiLayoutData& src, QnLayoutResourcePtr& dst)
+void fromApiToResource(const LayoutData& src, QnLayoutResourcePtr& dst)
 {
     fromApiToResource(static_cast<const ResourceData&>(src), dst.data());
 
@@ -437,7 +437,7 @@ void fromApiToResource(const ApiLayoutData& src, QnLayoutResourcePtr& dst)
     dst->setBackgroundOpacity(src.backgroundOpacity);
 
     QnLayoutItemDataList dstItems;
-    for (const ApiLayoutItemData& srcItem: src.items)
+    for (const LayoutItemData& srcItem: src.items)
     {
         dstItems.push_back(QnLayoutItemData());
         fromApiToResource(srcItem, dstItems.back());
@@ -445,7 +445,7 @@ void fromApiToResource(const ApiLayoutData& src, QnLayoutResourcePtr& dst)
     dst->setItems(dstItems);
 }
 
-void fromResourceToApi(const QnLayoutResourcePtr& src, ApiLayoutData& dst)
+void fromResourceToApi(const QnLayoutResourcePtr& src, LayoutData& dst)
 {
     fromResourceToApi(src, static_cast<ResourceData&>(dst));
 
@@ -464,16 +464,16 @@ void fromResourceToApi(const QnLayoutResourcePtr& src, ApiLayoutData& dst)
 
     for (const QnLayoutItemData& item: srcItems)
     {
-        dst.items.push_back(ApiLayoutItemData());
+        dst.items.push_back(LayoutItemData());
         fromResourceToApi(item, dst.items.back());
     }
 }
 
 template<class List>
-void fromApiToResourceList(const ApiLayoutDataList& src, List& dst, const overload_tag&)
+void fromApiToResourceList(const LayoutDataList& src, List& dst, const overload_tag&)
 {
     dst.reserve(dst.size() + (int)src.size());
-    for (const ApiLayoutData& srcLayout: src)
+    for (const LayoutData& srcLayout: src)
     {
         QnLayoutResourcePtr dstLayout(new QnLayoutResource());
         fromApiToResource(srcLayout, dstLayout);
@@ -481,22 +481,22 @@ void fromApiToResourceList(const ApiLayoutDataList& src, List& dst, const overlo
     }
 }
 
-void fromApiToResourceList(const ApiLayoutDataList& src, QnResourceList& dst)
+void fromApiToResourceList(const LayoutDataList& src, QnResourceList& dst)
 {
     fromApiToResourceList(src, dst, overload_tag());
 }
 
-void fromApiToResourceList(const ApiLayoutDataList& src, QnLayoutResourceList& dst)
+void fromApiToResourceList(const LayoutDataList& src, QnLayoutResourceList& dst)
 {
     fromApiToResourceList(src, dst, overload_tag());
 }
 
-void fromResourceListToApi(const QnLayoutResourceList& src, ApiLayoutDataList& dst)
+void fromResourceListToApi(const QnLayoutResourceList& src, LayoutDataList& dst)
 {
     dst.reserve(dst.size() + src.size());
     for (const QnLayoutResourcePtr& layout: src)
     {
-        dst.push_back(ApiLayoutData());
+        dst.push_back(LayoutData());
         fromResourceToApi(layout, dst.back());
     }
 }

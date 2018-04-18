@@ -11,7 +11,7 @@ void QnLayoutNotificationManager::triggerNotification(
 }
 
 void QnLayoutNotificationManager::triggerNotification(
-    const QnTransaction<ApiLayoutData>& tran,
+    const QnTransaction<nx::vms::api::LayoutData>& tran,
     NotificationSource source)
 {
     NX_ASSERT(tran.command == ApiCommand::saveLayout);
@@ -19,11 +19,11 @@ void QnLayoutNotificationManager::triggerNotification(
 }
 
 void QnLayoutNotificationManager::triggerNotification(
-    const QnTransaction<ApiLayoutDataList>& tran,
+    const QnTransaction<nx::vms::api::LayoutDataList>& tran,
     NotificationSource source)
 {
     NX_ASSERT(tran.command == ApiCommand::saveLayouts);
-    for (const ApiLayoutData& layout: tran.params)
+    for (const auto& layout: tran.params)
         emit addedOrUpdated(layout, source);
 }
 

@@ -234,11 +234,13 @@ public:
      * @param handler Called upon request completion. Functor(ErrorCode).
      */
     template<class HandlerType>
-    void processUpdateAsync(QnTransaction<ApiLayoutDataList>& tran, HandlerType handler)
+    void processUpdateAsync(QnTransaction<nx::vms::api::LayoutDataList>& tran, HandlerType handler)
     {
         NX_ASSERT(tran.command == ApiCommand::saveLayouts);
-        return processMultiUpdateAsync<ApiLayoutDataList, ApiLayoutData>(
-            tran, handler, ApiCommand::saveLayout);
+        return processMultiUpdateAsync<nx::vms::api::LayoutDataList, nx::vms::api::LayoutData>(
+            tran,
+            handler,
+            ApiCommand::saveLayout);
     }
 
     /**

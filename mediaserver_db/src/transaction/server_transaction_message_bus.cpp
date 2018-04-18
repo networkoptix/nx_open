@@ -347,7 +347,7 @@ bool ServerTransactionMessageBus::sendInitialData(QnTransactionTransport* transp
 			return false;
 		}
 
-		QnTransaction<ApiLayoutDataList> tranLayouts;
+		QnTransaction<nx::vms::api::LayoutDataList> tranLayouts;
 		tranLayouts.command = ApiCommand::getLayouts;
 		tranLayouts.peerID = commonModule()->moduleGUID();
 		if (dbManager(m_db, transport->getUserAccessData()).doQuery(QnUuid(), tranLayouts.params) != ErrorCode::ok)

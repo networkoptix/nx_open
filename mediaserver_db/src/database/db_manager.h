@@ -312,7 +312,7 @@ namespace detail
         ErrorCode doQueryNoLock(const QnUuid& id, nx::vms::api::EventRuleDataList& userList);
 
         //getBusinessRuleList
-        ErrorCode doQueryNoLock(const QnUuid& id, ApiLayoutDataList& layoutList);
+        ErrorCode doQueryNoLock(const QnUuid& id, nx::vms::api::LayoutDataList& layoutList);
 
         //getResourceParams
         ErrorCode doQueryNoLock(
@@ -361,9 +361,10 @@ namespace detail
         ErrorCode executeTransactionInternal(const QnTransaction<ApiStorageData>& tran);
         ErrorCode executeTransactionInternal(
             const QnTransaction<ApiMediaServerUserAttributesData>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiLayoutData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::LayoutData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiLayoutTourData>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiLayoutDataList>& tran);
+        ErrorCode executeTransactionInternal(
+            const QnTransaction<nx::vms::api::LayoutDataList>& tran);
         ErrorCode executeTransactionInternal(
             const QnTransaction<nx::vms::api::ResourceStatusData>& tran);
         ErrorCode executeTransactionInternal(
@@ -623,7 +624,7 @@ namespace detail
         ErrorCode removeMediaServerUserAttributes(const QnUuid& guid);
 
         ErrorCode removeLayout(const QnUuid& id);
-        ErrorCode saveLayout(const ApiLayoutData& params);
+        ErrorCode saveLayout(const nx::vms::api::LayoutData& params);
 
         ErrorCode removeLayoutTour(const QnUuid& id);
         ErrorCode saveLayoutTour(const ApiLayoutTourData& params);
@@ -644,7 +645,6 @@ namespace detail
         ErrorCode deleteVideowallItems(const QnUuid &videowall_guid);
         ErrorCode updateVideowallItems(const ApiVideowallData& data);
         ErrorCode updateVideowallScreens(const ApiVideowallData& data);
-        ErrorCode removeLayoutFromVideowallItems(const QnUuid &layout_id);
         ErrorCode deleteVideowallMatrices(const QnUuid &videowall_guid);
         ErrorCode updateVideowallMatrices(const ApiVideowallData &data);
 

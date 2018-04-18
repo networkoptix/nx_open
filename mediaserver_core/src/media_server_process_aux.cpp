@@ -387,19 +387,19 @@ void makeFakeData(const QString& fakeDataString,
         }
     }
 
-    std::vector<ec2::ApiLayoutData> layouts;
+    std::vector<nx::vms::api::LayoutData> layouts;
     if (camerasPerLayout)
     {
         for (int minCameraOnLayout = 0; minCameraOnLayout < camerasCount;
              minCameraOnLayout += camerasPerLayout)
         {
-            ec2::ApiLayoutData layout;
+            nx::vms::api::LayoutData layout;
             layout.id = QnUuid::createUuid();
             for (int cameraIndex = minCameraOnLayout;
                  cameraIndex < minCameraOnLayout + camerasPerLayout && cameraIndex < camerasCount;
                  ++cameraIndex)
             {
-                ec2::ApiLayoutItemData item;
+                nx::vms::api::LayoutItemData item;
                 item.id = cameras[cameraIndex].id;
                 layout.items.push_back(item);
             }

@@ -42,7 +42,7 @@
 #include <nx/vms/api/data/resource_type_data.h>
 #include <nx/vms/api/data/stored_file_data.h>
 #include "nx_ec/data/api_user_data.h"
-#include "nx_ec/data/api_layout_data.h"
+#include "nx/vms/api/data/layout_data.h"
 #include "nx_ec/data/api_videowall_data.h"
 #include "nx/vms/api/data/webpage_data.h"
 #include "nx_ec/data/api_license_data.h"
@@ -627,8 +627,8 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
             {
                 if (!fillTransactionLogInternal<
                     QnUuid,
-                    ApiLayoutData,
-                    ApiLayoutDataList>(ApiCommand::saveLayout))
+                    LayoutData,
+                    LayoutDataList>(ApiCommand::saveLayout))
                 {
                     return false;
                 }
@@ -947,8 +947,8 @@ bool QnDbManager::resyncTransactionLog()
 
     if (!fillTransactionLogInternal<
         QnUuid,
-        ApiLayoutData,
-        ApiLayoutDataList>(ApiCommand::saveLayout))
+        LayoutData,
+        LayoutDataList>(ApiCommand::saveLayout))
     {
         return false;
     }
@@ -2646,7 +2646,7 @@ ErrorCode QnDbManager::removeBusinessRule( const QnUuid& guid )
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::saveLayout(const ApiLayoutData& params)
+ErrorCode QnDbManager::saveLayout(const LayoutData& params)
 {
     if (!database::api::saveLayout(&m_resourceQueries, params))
         return ErrorCode::dbError;
@@ -2667,14 +2667,14 @@ ec2::ErrorCode QnDbManager::saveLayoutTour(const ApiLayoutTourData& params)
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLayoutData>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<LayoutData>& tran)
 {
     return saveLayout(tran.params);
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLayoutDataList>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<LayoutDataList>& tran)
 {
-    for(const ApiLayoutData& layout: tran.params)
+    for(const auto& layout: tran.params)
     {
         ErrorCode err = saveLayout(layout);
         if (err != ErrorCode::ok)
@@ -3454,7 +3454,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ResourceTypeDat
 /**
  * /ec2/getLayouts
  */
-ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiLayoutDataList& layouts)
+ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, LayoutDataList& layouts)
 {
     if (!database::api::fetchLayouts(m_sdb, id, layouts))
         return ErrorCode::dbError;
@@ -4374,7 +4374,7 @@ ErrorCode QnDbManager::readApiFullInfoDataForMobileClient(
             serverIds.insert(server.id);
 
         data->layouts.erase(std::remove_if(data->layouts.begin(), data->layouts.end(),
-            [user, &serverIds](const ApiLayoutData& layout)
+            [user, &serverIds](const auto& layout)
             {
                 return !layout.parentId.isNull()
                     && layout.parentId != user->id

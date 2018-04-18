@@ -99,7 +99,7 @@
 #include <nx_ec/data/api_videowall_data.h>
 #include <nx_ec/data/api_user_data.h>
 #include <nx_ec/data/api_license_data.h>
-#include <nx_ec/data/api_layout_data.h>
+#include <nx/vms/api/data/layout_data.h>    //< Required for the FullInfoData
 #include <nx_ec/data/api_layout_tour_data.h>
 #include <nx_ec/data/api_access_rights_data.h>
 #include <nx_ec/transaction_timestamp.h>
@@ -325,8 +325,6 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<ec2::ApiUserRoleData>("ec2::ApiUserRoleData");
     qRegisterMetaType<ec2::ApiPredefinedRoleData>("ec2::ApiPredefinedRoleData");
     qRegisterMetaType<ec2::ApiAccessRightsData>("ec2::ApiAccessRightsData");
-    qRegisterMetaType<ec2::ApiLayoutData>("ec2::ApiLayoutData");
-    qRegisterMetaType<ec2::ApiLayoutItemData>("ec2::ApiLayoutItemData");
     qRegisterMetaType<ec2::ApiVideowallData>("ec2::ApiVideowallData");
     qRegisterMetaType<ec2::ApiVideowallControlMessageData>("ec2::ApiVideowallControlMessageData");
 

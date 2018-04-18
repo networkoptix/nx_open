@@ -2,7 +2,7 @@
 
 #include <nx/fusion/serialization/proto_message.h>
 
-#include <nx_ec/data/api_layout_data.h>
+#include <nx/vms/api/data/layout_data.h>
 
 namespace QnLayoutProto {
 
@@ -132,7 +132,8 @@ namespace QnLayoutProto {
         return true;
     }
 
-    bool deserialize(const QnProtoValue &value, ec2::ApiLayoutItemData *target) {
+    bool deserialize(const QnProtoValue &value, nx::vms::api::LayoutItemData* target) 
+    {
         QnProtoMessage message;
         if(!deserialize(value, &message))
             return false;
@@ -221,7 +222,8 @@ namespace QnLayoutProto {
         return true;
     }
 
-    bool deserialize(const QnProtoValue &value, ec2::ApiLayoutData *target) {
+    bool deserialize(const QnProtoValue &value, nx::vms::api::LayoutData* target) 
+    {
         QnProtoMessage message;
         if(!deserialize(value, &message))
             return false;
@@ -262,7 +264,7 @@ namespace QnLayoutProto {
                             return false;
                         break;
                     case Layout::ItemField: {
-                        ec2::ApiLayoutItemData item;
+                        nx::vms::api::LayoutItemData item;
 
                         /* Initializing optional fields. */
                         item.zoomLeft = 0.0;
@@ -333,11 +335,11 @@ namespace QnLayoutProto {
 
 namespace QnProto {
 
-    bool deserialize(const QByteArray &value, Message<ec2::ApiLayoutData> *target) {
+    bool deserialize(const QByteArray &value, Message<nx::vms::api::LayoutData> *target) {
         return QnLayoutProto::deserialize(value, target);
     }
 
-    bool deserialize(const QnProtoValue &value, Message<ec2::ApiLayoutData> *target) {
+    bool deserialize(const QnProtoValue &value, Message<nx::vms::api::LayoutData> *target) {
         return QnLayoutProto::deserialize(value, target);
     }
 

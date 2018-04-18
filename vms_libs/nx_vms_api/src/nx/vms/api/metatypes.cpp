@@ -9,6 +9,7 @@
 #include "data/camera_attributes_data.h"
 #include "data/camera_history_data.h"
 #include "data/webpage_data.h"
+#include "data/layout_data.h"
 
 namespace {
 
@@ -45,6 +46,8 @@ void Metatypes::initialize()
     qRegisterMetaType<nx::vms::api::CameraHistoryData>();
     qRegisterMetaType<nx::vms::api::CameraHistoryDataList>();
     qRegisterMetaType<nx::vms::api::WebPageData>();
+    qRegisterMetaType<nx::vms::api::LayoutItemData>();
+    qRegisterMetaType<nx::vms::api::LayoutData>();
 
 };
 

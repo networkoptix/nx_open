@@ -1309,7 +1309,7 @@ namespace ec2 {
 		* %return List of layout objects in the requested format.
 		* %// AbstractLayoutManager::getLayouts
 		*/
-		regGet<QnUuid, ApiLayoutDataList>(p, ApiCommand::getLayouts);
+		regGet<QnUuid, LayoutDataList>(p, ApiCommand::getLayouts);
 
 		/**%apidoc POST /ec2/saveLayout
 		* Save layout.
@@ -1377,7 +1377,7 @@ namespace ec2 {
 		*     0..1).
 		* %// AbstractLayoutManager::save
 		*/
-		regUpdate<ApiLayoutData>(p, ApiCommand::saveLayout);
+		regUpdate<LayoutData>(p, ApiCommand::saveLayout);
 
 		/**%apidoc POST /ec2/saveLayouts
 		* Save the list of layouts.
@@ -1444,7 +1444,7 @@ namespace ec2 {
 		*     0..1).
 		* %// AbstractLayoutManager::save
 		*/
-		regUpdate<ApiLayoutDataList>(p, ApiCommand::saveLayouts);
+		regUpdate<LayoutDataList>(p, ApiCommand::saveLayouts);
 
 		/**%apidoc POST /ec2/removeLayout
 		* Delete the specified layout.

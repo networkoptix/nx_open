@@ -222,7 +222,7 @@ void loadResourcesFromEcs(
 
     {
         //loading layouts
-        ec2::ApiLayoutDataList layouts;
+        nx::vms::api::LayoutDataList layouts;
         while ((rez = ec2Connection->getLayoutManager(Qn::kSystemAccess)->getLayoutsSync(&layouts)) != ec2::ErrorCode::ok)
         {
             qDebug() << "QnMain::run(): Can't get layouts. Reason: " << ec2::toString(rez);

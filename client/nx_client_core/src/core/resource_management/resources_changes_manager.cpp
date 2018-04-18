@@ -620,11 +620,12 @@ void QnResourcesChangesManager::saveLayout(const QnLayoutResourcePtr& layout,
     if (!connection)
         return;
 
-    auto replyProcessor = makeSaveResourceReplyProcessor<QnLayoutResource, ec2::ApiLayoutData>(this,
-        layout, callback);
+    auto replyProcessor = makeSaveResourceReplyProcessor<
+        QnLayoutResource,
+        nx::vms::api::LayoutData>(this, layout, callback);
 
     applyChanges(layout);
-    ec2::ApiLayoutData apiLayout;
+    nx::vms::api::LayoutData apiLayout;
     ec2::fromResourceToApi(layout, apiLayout);
 
     connection->getLayoutManager(Qn::kSystemAccess)->save(apiLayout, this, replyProcessor);
