@@ -93,7 +93,8 @@ struct QnCameraAdvancedParameter
         Enumeration,
         Button,
         String,
-        Separator
+        Separator,
+        LensControl,
     };
 
     QString id;

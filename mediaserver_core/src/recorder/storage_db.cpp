@@ -489,7 +489,10 @@ bool QnStorageDb::vacuum(QVector<DeviceFileCatalogPtr> *data)
                 *data = buildReadResult();
             return true;
         }
-        NX_LOG(lit("%1 temporary DB remove file error").arg(Q_FUNC_INFO), cl_logWARNING);
+    }
+    else
+    {
+        NX_LOG(lit("%1 DB remove file error").arg(Q_FUNC_INFO), cl_logWARNING);
     }
 
     startDbFile();

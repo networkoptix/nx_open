@@ -163,7 +163,7 @@ private:
     bool m_isSearchRecordingPeriodRetrievalEnabled = true;
     bool m_isUtcEnabled = true;
 
-    std::chrono::milliseconds m_lastTimelineUpdate;
+    std::chrono::milliseconds m_lastTimelineUpdate{0};
 };
 
 } // namespace plugins

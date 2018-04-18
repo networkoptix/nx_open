@@ -124,7 +124,9 @@
                 "Sony|SNC-EM642R",
                 "Sony|SNC-VM642R",
                 "Sony|SNC-WR632R",
-                "Sony|SNC-WR602C"
+                "Sony|SNC-WR602C",
+                "Sony|SNC-WR630",
+                "Sony|SNC-EM641"
             ],
 
             "2WayAudio":
@@ -334,7 +336,7 @@
             "ignoreONVIF": true
         },
         {
-            "__comment": "Onvif probe matches for Flir FC-Series cameras has such manufacturers",
+            "_comment": "Onvif probe matches for Flir FC-Series cameras has such manufacturers",
             "keys":[
                 "FC-Series-R|*", "FC-Series-S|*"
             ],
@@ -343,6 +345,12 @@
         {
             "keys":[
                 "Axis|P7216*"
+            ],
+            "ignoreONVIF": true
+        },
+        {
+            "keys":[
+                "Axis|Axis F44 Dual Audio*"
             ],
             "ignoreONVIF": true
         },
@@ -746,7 +754,6 @@
                 "VISTA|VK2-ENCODER",
                 "VISTA|VK2-1080PTZ",
                 "VISTA|VK2-600PTZ",
-                "VISTA|VK2-HD30LRIR-PM",
                 "*|DW-CP04",
                 "Cellinx|STH795",
                 "Honeywell Security Group|HISD-2201WE", "MESSOA|SPD970",
@@ -2210,7 +2217,7 @@
         },
         {
             "keys": [
-                "UNIVIEW|IPC6253SR-X33*", "Securicorp|SCL-SDM03MVIR-WD3533X"
+                "UNIVIEW|IPC6253SR-X33*", "Securicorp|SCL-SDM03MVIR-WD3533X", "NONE|SDM03MVIR-WD3533X"
             ],
             "ptzMapper": {
                 "fromCamera": {
@@ -2513,6 +2520,32 @@
                     "VideoEncoderConfigurationToken015,VideoEncoderConfigurationToken031",
                     "VideoEncoderConfigurationToken016,VideoEncoderConfigurationToken032"
                 ]
+            }
+        },
+        {
+            "keys": [
+                "HIKVISION|DS-2DP1636ZIX-D*", "Hikvision|DS-2DP1636ZIX-D*"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [  -1,1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [-1, 1],
+                        "logical": [-15, -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.06, 0.1, 0.13, 0.15, 0.2, 0.3, 0.4, 0.5, 0.7, 1],
+                        "logical": [1, 2, 2.5, 3.0, 3.3, 3.7, 4.0, 5.5, 6.5, 7.5, 8],
+                        "logicalMultiplier": 37,
+                        "space": "35MmEquiv"
+                    }
+                }
             }
         }        
     ]

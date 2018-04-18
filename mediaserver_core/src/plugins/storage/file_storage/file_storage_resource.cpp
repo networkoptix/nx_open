@@ -67,12 +67,12 @@ const qint64 kMaxLocalStorageSpaceLimit = 30ll * 1024 * 1024 * 1024; // 30 Gb
 const int kMaxSpaceLimitRatio = 10; // i.e. max space limit <= totalSpace / 10
 
 #if defined(Q_OS_WIN)
-QString getDevicePath(const QString& path)
+static QString getDevicePath(const QString& path)
 {
     return path;
 }
 
-QString sysDrivePath()
+static QString sysDrivePath()
 {
     static QString deviceString;
 
@@ -90,15 +90,20 @@ QString sysDrivePath()
 
 #elif defined(Q_OS_LINUX)
 
-QString sysDrivePath()
+static QString sysDrivePath()
 {
     static QString devicePath = qnServerModule->rootTool()->devicePath("/");
     return devicePath;
 }
 
+static QString getDevicePath(const QString& path)
+{
+    return qnServerModule->rootTool()->devicePath(path);
+}
+
 #else // Unsupported OS so far
 
-const QString& sysDrivePath()
+static const QString& sysDrivePath()
 {
     return QString();
 }
@@ -312,7 +317,7 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdateInternal()
         }
         else
         {
-            if (rootTool()->makeDirectory(url))
+            if (rootTool()->isPathExists(url) || rootTool()->makeDirectory(url))
             {
                 result = Qn::StorageInit_Ok;
             }
@@ -326,7 +331,7 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdateInternal()
 
     QString sysPath = sysDrivePath();
     if (!sysPath.isNull())
-        m_isSystem = rootTool()->devicePath(url).startsWith(sysPath);
+        m_isSystem = getDevicePath(url).startsWith(sysPath);
     else
         m_isSystem = false;
 
@@ -463,7 +468,7 @@ void QnFileStorageResource::removeOldDirs()
 
         switch (result)
         {
-            case nx::SystemCommands::ok:
+            case nx::SystemCommands::UnmountCode::ok:
                 if (rmdir(entry.absoluteFilePath().toLatin1().constData()) == 0)
                     break;
 
@@ -473,12 +478,12 @@ void QnFileStorageResource::removeOldDirs()
                         lm("[removeOldDirs] Remove %1 failed").args(entry.absoluteFilePath()));
                 }
                 break;
-            case nx::SystemCommands::busy:
+            case nx::SystemCommands::UnmountCode::busy:
                 NX_WARNING(typeid(QnFileStorageResource),
                     lm("[mount, removeOldDirs] Won't remove %1 since resource is busy")
                         .args(entry.absoluteFilePath()));
                 break;
-            case nx::SystemCommands::noPermissions:
+            case nx::SystemCommands::UnmountCode::noPermissions:
                 NX_WARNING(typeid(QnFileStorageResource),
                     lm("[mount, removeOldDirs] NO permissions to remove %1")
                         .args(entry.absoluteFilePath()));
@@ -639,11 +644,11 @@ QnFileStorageResource::~QnFileStorageResource()
     if (!m_localPath.isEmpty())
     {
 #if __linux__
-        bool result = rootTool()->unmount(m_localPath);
+        auto result = rootTool()->unmount(m_localPath);
         NX_VERBOSE(
             this,
             lm("[mount] unmounting folder %1 while destructing object result: %2")
-                .args(m_localPath, result));
+                .args(m_localPath, nx::SystemCommands::unmountCodeToString(result)));
 #elif __APPLE__
         unmount(m_localPath.toLatin1().constData(), 0);
 #endif

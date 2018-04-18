@@ -405,7 +405,11 @@ void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& disco
                         emit cameraDisconnected(res, qnSyncTime->currentUSecsSinceEpoch());
                         m_disconnectSended[uniqId] = true;
                     }
-                } else {
+                } else 
+                {
+                    NX_VERBOSE(this,
+                        lm("Mark resource %1 as offline because it doesn't response to discovery any more.").arg(NetResString(camRes)));
+
                     res->setStatus(Qn::Offline);
                     m_resourceDiscoveryCounter[uniqId] = 0;
                 }

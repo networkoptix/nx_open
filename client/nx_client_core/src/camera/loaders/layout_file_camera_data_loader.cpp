@@ -6,13 +6,11 @@
 #include <core/resource/avi/avi_resource.h>
 #include <core/storage/file_storage/layout_storage_resource.h>
 
-#include <motion/motion_detection.h>
-
 #include <recording/time_period_list.h>
 
+#include <nx/client/core/motion/motion_grid.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/json_functions.h>
-
 #include <nx/streaming/config.h>
 
 namespace {
@@ -52,9 +50,11 @@ int QnLayoutFileCameraDataLoader::loadMotion(const QList<QRegion> &motionRegions
     if (!m_aviResource)
         return -1;
 
+    using nx::client::core::MotionGrid;
+
     QVector<char*> masks;
     for (int i = 0; i < motionRegions.size(); ++i) {
-        masks << (char*) qMallocAligned(Qn::kMotionGridWidth * Qn::kMotionGridHeight / 8, CL_MEDIA_ALIGNMENT);
+        masks << (char*) qMallocAligned(MotionGrid::kCellCount / 8, CL_MEDIA_ALIGNMENT);
         QnMetaDataV1::createMask(motionRegions[i], masks.last());
     }
 

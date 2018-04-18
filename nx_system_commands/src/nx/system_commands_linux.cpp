@@ -15,6 +15,8 @@
 #include <sys/types.h>
 #include <sys/statvfs.h>
 #include <sys/mount.h>
+#include <sys/wait.h>
+#include <signal.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <dirent.h>
@@ -180,16 +182,27 @@ SystemCommands::CheckOwnerResult SystemCommands::checkCurrentOwner(const std::st
     return CheckOwnerResult::other;
 }
 
-bool SystemCommands::mount(const std::string& url, const std::string& directory,
-    const boost::optional<std::string>& username, const boost::optional<std::string>& password)
+SystemCommands::MountCode SystemCommands::mount(
+    const std::string& url, const std::string& directory,
+    const boost::optional<std::string>& username,
+    const boost::optional<std::string>& password, bool reportViaSocket)
 {
+    MountCode result= MountCode::otherError;
     if (!checkMountPermissions(directory))
-        return false;
+    {
+        if (reportViaSocket)
+            system_commands::domain_socket::detail::sendInt64((int64_t) result);
+
+        return result;
+    }
 
     if (url.find("//") != 0)
     {
         m_lastError = format("% is not an SMB url", url);
-        return false;
+        if (reportViaSocket)
+            system_commands::domain_socket::detail::sendInt64((int64_t) result);
+
+        return result;
     }
 
     auto makeCommandString =
@@ -226,6 +239,7 @@ bool SystemCommands::mount(const std::string& url, const std::string& directory,
     if (!userProvidedDomain.empty())
         domains.push_back(userProvidedDomain);
 
+    bool gotWrongCredentialsError = false;
     for (const auto& domain: domains)
     {
         for (const auto& passwordCandidate: {passwordString, std::string("123")})
@@ -233,12 +247,25 @@ bool SystemCommands::mount(const std::string& url, const std::string& directory,
             for (const auto& dialect: {"", "2.0", "1.0"})
             {
                 if (execute(makeCommandString(userNameString, passwordCandidate, domain, dialect)))
-                    return true;
+                {
+                    result = MountCode::ok;
+                    break;
+                }
+                else if (m_lastError.find("13") != std::string::npos)
+                {
+                    gotWrongCredentialsError = true;
+                }
             }
         }
     }
 
-    return false;
+    if (gotWrongCredentialsError && result != MountCode::ok)
+        result = MountCode::wrongCredentials;
+
+    if (reportViaSocket)
+        system_commands::domain_socket::detail::sendInt64((int64_t) result);
+
+    return result;
 }
 
 SystemCommands::UnmountCode SystemCommands::unmount(
@@ -248,11 +275,11 @@ SystemCommands::UnmountCode SystemCommands::unmount(
 
     if (!checkMountPermissions(directory))
     {
-        result = noPermissions;
+        result = UnmountCode::noPermissions;
     }
     else if (umount(directory.c_str()) == 0)
     {
-        result = ok;
+        result = UnmountCode::ok;
     }
     else
     {
@@ -260,14 +287,14 @@ SystemCommands::UnmountCode SystemCommands::unmount(
         {
             case EINVAL:
             case ENOENT:
-                result = notExists;
+                result = UnmountCode::notExists;
                 break;
             case ENOMEM:
             case EBUSY:
-                result = busy;
+                result = UnmountCode::busy;
                 break;
             case EPERM:
-                result = noPermissions;
+                result = UnmountCode::noPermissions;
                 break;
             default:
                 assert(false);
@@ -504,6 +531,18 @@ std::string SystemCommands::devicePath(const std::string& path, bool reportViaSo
         system_commands::domain_socket::detail::sendBuffer(result.data(), result.size());
 
     return result;
+}
+
+bool SystemCommands::kill(int pid)
+{
+    int result = ::kill(pid, SIGKILL);
+    if (result != 0)
+    {
+        m_lastError = format("Kill failed for %", pid);
+        return false;
+    }
+
+    return true;
 }
 
 bool SystemCommands::install(const std::string& debPackage)

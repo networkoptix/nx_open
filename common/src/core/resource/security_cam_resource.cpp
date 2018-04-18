@@ -826,6 +826,16 @@ QString QnSecurityCamResource::getSharedId() const
     return getUniqueId();
 }
 
+QString QnSecurityCamResource::getProxiedId() const
+{
+    return getProperty(Qn::kProxiedIdParamName);
+}
+
+void QnSecurityCamResource::setProxiedId(const QString& proxiedId)
+{
+    setProperty(Qn::kProxiedIdParamName, proxiedId);
+}
+
 QString QnSecurityCamResource::getModel() const
 {
     SAFE(return m_model)
@@ -1122,9 +1132,9 @@ int QnSecurityCamResource::defaultSecondaryFps(Qn::StreamQuality quality) const
     {
         case Qn::StreamQuality::lowest:
         case Qn::StreamQuality::low:
-            return kDefaultSecondStreamFpsMedium;
-        case Qn::StreamQuality::normal:
             return kDefaultSecondStreamFpsLow;
+        case Qn::StreamQuality::normal:
+            return kDefaultSecondStreamFpsMedium;
         case Qn::StreamQuality::high:
         case Qn::StreamQuality::highest:
             return kDefaultSecondStreamFpsHigh;

@@ -158,7 +158,7 @@ OutgoingTunnelPool::TunnelContext&
     NX_LOGX(
         lm("Creating outgoing tunnel to host %1").
             arg(targetHostAddress.host.toString()),
-        cl_logDEBUG1);
+        cl_logDEBUG2);
 
     auto tunnel = OutgoingTunnelFactory::instance().create(targetHostAddress);
     tunnel->bindToAioThread(SocketGlobals::aioService().getRandomAioThread());
@@ -215,7 +215,7 @@ void OutgoingTunnelPool::onTunnelClosed(AbstractOutgoingTunnel* tunnelPtr)
         if (m_stopping)
             return; //tunnel is being cancelled?
 
-        NX_LOGX(lm("Removing tunnel to host %1").arg(tunnelIter->first), cl_logDEBUG1);
+        NX_LOGX(lm("Removing tunnel to host %1").arg(tunnelIter->first), cl_logDEBUG2);
         tunnel.swap(tunnelIter->second->tunnel);
         userHandlers.swap(tunnelIter->second->handlers);
         remoteHostName = tunnelIter->first;

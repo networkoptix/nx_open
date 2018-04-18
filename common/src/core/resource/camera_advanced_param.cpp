@@ -32,6 +32,7 @@ const QString kEnumerationDataType = lit("Enumeration");
 const QString kButtonDataType = lit("Button");
 const QString kStringDataType = lit("String");
 const QString kSeparatorDataType = lit("Separator");
+const QString kSeparatorLensControl = lit("LensControlDebug");
 
 } //< anonymous namespace
 
@@ -155,6 +156,8 @@ QString QnCameraAdvancedParameter::dataTypeToString(DataType value)
             return kStringDataType;
         case DataType::Separator:
             return kSeparatorDataType;
+        case DataType::LensControl:
+            return kSeparatorLensControl;
         default:
             return QString();
     }
@@ -168,7 +171,8 @@ QnCameraAdvancedParameter::DataType QnCameraAdvancedParameter::stringToDataType(
 		<< DataType::Enumeration
 		<< DataType::Button
 		<< DataType::String
-        << DataType::Separator;
+        << DataType::Separator
+        << DataType::LensControl;
 
 	for (auto dataType: allDataTypes)
 		if (dataTypeToString(dataType) == value)

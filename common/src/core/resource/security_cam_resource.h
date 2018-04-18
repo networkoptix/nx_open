@@ -168,6 +168,10 @@ public:
 
     virtual QString getSharedId() const;
 
+    // Proxied id is an id of a device connected to some proxy (e.g. NVR)
+    virtual QString getProxiedId() const;
+    virtual void setProxiedId(const QString& proxiedId);
+
     /** Check if a license is used for the current camera. */
     bool isLicenseUsed() const;
     void setLicenseUsed(bool value);
@@ -275,14 +279,14 @@ public:
     void setIOPorts(const QnIOPortDataList& ports);
 
     virtual bool setProperty(
-		const QString &key,
-		const QString &value,
-		PropertyOptions options = DEFAULT_OPTIONS) override;
+        const QString &key,
+        const QString &value,
+        PropertyOptions options = DEFAULT_OPTIONS) override;
 
     virtual bool setProperty(
-		const QString &key,
-		const QVariant& value,
-		PropertyOptions options = DEFAULT_OPTIONS) override;
+        const QString &key,
+        const QVariant& value,
+        PropertyOptions options = DEFAULT_OPTIONS) override;
 
     //!Returns list if IO ports
     QnIOPortDataList getIOPorts() const;

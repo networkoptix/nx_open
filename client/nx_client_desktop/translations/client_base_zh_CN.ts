@@ -1123,13 +1123,13 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation type="unfinished">File name &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
+      <translation>文件名&quot;%1&quot; 由作业系统保留。请尝试另一个名字。</translation>
     </message>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
       <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
-      <translation type="unfinished">
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
+      <translation>
+        <numerusform>文件名不应包含下列字符：</numerusform>
       </translation>
     </message>
   </context>
@@ -2535,7 +2535,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Password should not be equal to camera&apos;s user name</source>
-      <translation type="unfinished">Password should not be equal to camera&apos;s user name</translation>
+      <translation>密码不得与摄像机的用户名称相同</translation>
     </message>
   </context>
   <context>
@@ -2807,12 +2807,21 @@ to %1</source>
   <context>
     <name>QnCloudResultMessages</name>
     <message>
-      <source>Incorrect email or password</source>
-      <translation>不正确的邮箱或密码</translation>
+      <source>Account not found</source>
+      <translation type="unfinished">Account not found</translation>
     </message>
     <message>
-      <source>Account is not activated. Please check your email and follow provided instructions</source>
-      <translation>帐户无法激活。请检查您的电子邮件并遵循提供的说明操作</translation>
+      <source>Account is not activated.</source>
+      <translation type="unfinished">Account is not activated.</translation>
+    </message>
+    <message>
+      <source>Please log in to %1 and follow the provided instructions.</source>
+      <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
+      <translation type="unfinished">Please log in to %1 and follow the provided instructions.</translation>
+    </message>
+    <message>
+      <source>Invalid password</source>
+      <translation type="unfinished">Invalid password</translation>
     </message>
   </context>
   <context>
@@ -3148,6 +3157,10 @@ to %1</source>
     <message>
       <source>You can create a backup for System configurations that can be restored in case of failure.</source>
       <translation>请创建系统配置备份，以便在系统出错时可还原。</translation>
+    </message>
+    <message>
+      <source>Database Backup Files</source>
+      <translation type="unfinished">Database Backup Files</translation>
     </message>
   </context>
   <context>
@@ -4154,10 +4167,6 @@ to %1</source>
       <translation>打开授权许可文件</translation>
     </message>
     <message>
-      <source>All files (*.*)</source>
-      <translation>所有文件(*.*)</translation>
-    </message>
-    <message>
       <source>Failed to open file</source>
       <translation>打开文件失败</translation>
     </message>
@@ -4168,6 +4177,10 @@ to %1</source>
     <message>
       <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
       <translation>请以将硬件ID及授权发送給 %1 来获取离线激活档。</translation>
+    </message>
+    <message>
+      <source>All files</source>
+      <translation type="unfinished">All files</translation>
     </message>
   </context>
   <context>
@@ -5562,10 +5575,6 @@ to %1</source>
       <translation>请选择升级文件...</translation>
     </message>
     <message>
-      <source>Update Files (*.zip)</source>
-      <translation>升级文件（*.zip）</translation>
-    </message>
-    <message>
       <source>Release notes</source>
       <translation>版本说明</translation>
     </message>
@@ -5748,6 +5757,10 @@ to %1</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
       <translation>不兼容 %1 实例。先从 %1 更新断开系统。</translation>
     </message>
+    <message>
+      <source>Update Files</source>
+      <translation type="unfinished">Update Files</translation>
+    </message>
   </context>
   <context>
     <name>QnSessionAwareTabbedDialog</name>
@@ -5850,7 +5863,7 @@ to %1</source>
     </message>
     <message>
       <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
-      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</translation>
+      <translation>如果服务器存储上没有可用空间，则上传的存档会自动删除。服务器上所有摄像机中最老的文件将首先被删除。</translation>
     </message>
   </context>
   <context>
@@ -6076,7 +6089,7 @@ to %1</source>
     </message>
     <message>
       <source>NOT ENOUGH LICENSES</source>
-      <translation type="unfinished">NOT ENOUGH LICENSES</translation>
+      <translation>没有足够的授权</translation>
     </message>
   </context>
   <context>
@@ -6782,7 +6795,7 @@ to %1</source>
     <message>
       <source>%1 user</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user</translation>
+      <translation>%1 用户</translation>
     </message>
   </context>
   <context>
@@ -7104,11 +7117,11 @@ to %1</source>
     </message>
     <message>
       <source>Uploading %1...</source>
-      <translation type="unfinished">Uploading %1...</translation>
+      <translation>上传 %1...</translation>
     </message>
     <message>
       <source>Finalizing %1...</source>
-      <translation type="unfinished">Finalizing %1...</translation>
+      <translation>正在完成 %1...</translation>
     </message>
   </context>
   <context>
@@ -7628,23 +7641,23 @@ to %1</source>
     </message>
     <message>
       <source>%1 has unsupported format.</source>
-      <translation type="unfinished">%1 has unsupported format.</translation>
+      <translation>%1 格式不受支持。</translation>
     </message>
     <message>
       <source>%1 does not have timestamp.</source>
-      <translation type="unfinished">%1 does not have timestamp.</translation>
+      <translation>%1 没有时间戳。</translation>
     </message>
     <message>
       <source>%1 is older than allowed in camera archive settings.</source>
-      <translation type="unfinished">%1 is older than allowed in camera archive settings.</translation>
+      <translation>%1 比相机存档设置中允许的时间早。</translation>
     </message>
     <message>
       <source>%1 covers period for which video has already been uploaded.</source>
-      <translation type="unfinished">%1 covers period for which video has already been uploaded.</translation>
+      <translation>%1 涵盖已上传视频的时间段。</translation>
     </message>
     <message>
       <source>%1 covers period for which video is being uploaded.</source>
-      <translation type="unfinished">%1 covers period for which video is being uploaded.</translation>
+      <translation>%1 涵盖已上传视频的时间段。</translation>
     </message>
   </context>
   <context>

@@ -22,8 +22,7 @@ struct DataContext
 static int createConnectedSocket(const char* path)
 {
     struct sockaddr_un addr;
-    int fd, tries = 0;
-    static const int maxTries = 5;
+    int fd;
 
     if ((fd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1)
     {
@@ -36,16 +35,7 @@ static int createConnectedSocket(const char* path)
     strncpy(addr.sun_path, path, sizeof(addr.sun_path)-1);
 
     while (connect(fd, (struct sockaddr*)&addr, sizeof(addr)) == -1)
-    {
-        if (tries > maxTries)
-        {
-            perror("connect error");
-            return -1;
-        }
-
         usleep(10 * 1000); /*< 10ms */
-        tries++;
-    }
 
     return fd;
 }
@@ -55,7 +45,7 @@ static int sendFdImpl(int transportFd, const void* data)
     struct msghdr msg;
     struct iovec iov[1];
     char buf[1];
-    int fdToSend = (intptr_t) data;
+    int fdToSend = (intptr_t) data, result;
 
     union
     {
@@ -81,7 +71,11 @@ static int sendFdImpl(int transportFd, const void* data)
     msg.msg_iov = iov;
     msg.msg_iovlen = 1;
 
-    return sendmsg(transportFd, &msg, 0);
+    result = sendmsg(transportFd, &msg, 0);
+    if (result < 0)
+        perror("sendmsg");
+
+    return result;
 }
 
 static int sendData(int transportFd, const void* context)
@@ -90,7 +84,10 @@ static int sendData(int transportFd, const void* context)
     ssize_t written, total = 0;
 
     if (write(transportFd, &dataContext->size, sizeof(dataContext->size)) <= 0)
+    {
+        perror("sendData");
         return -1;
+    }
 
     while (total < dataContext->size)
     {
@@ -98,7 +95,10 @@ static int sendData(int transportFd, const void* context)
             dataContext->size - total);
 
         if (written <= 0)
+        {
+            perror("write");
             return -1;
+        }
 
         total += written;
     }

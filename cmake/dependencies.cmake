@@ -76,12 +76,26 @@ endforeach()
 
 file(TO_CMAKE_PATH "${QT_DIR}" QT_DIR)
 
-if(targetDevice MATCHES "linux-x64|linux-x86")
+function(copy_linux_cpp_runtime)
     execute_process(COMMAND
         ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/build_utils/linux/copy_system_library.py
             --compiler ${CMAKE_CXX_COMPILER}
             --flags "${CMAKE_CXX_FLAGS}"
             --dest-dir ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
+            --list
             libstdc++.so.6 libatomic.so.1 libgcc_s.so.1
+        RESULT_VARIABLE result
+        OUTPUT_VARIABLE output
     )
+
+    if(NOT result EQUAL 0)
+        message(FATAL_ERROR "Cannot copy C++ runtime libraries.")
+    endif()
+
+    nx_split_string(files "${output}")
+    nx_store_known_files(${files})
+endfunction()
+
+if(targetDevice MATCHES "linux-x64|linux-x86")
+    copy_linux_cpp_runtime()
 endif()

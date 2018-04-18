@@ -58,8 +58,8 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
             const auto user = getOptionalArg(argv);
             const auto password = getOptionalArg(argv);
 
-            return systemCommands->mount(*url, *directory, user, password)
-                ? Result::ok : Result::execFailed;
+            return systemCommands->mount(*url, *directory, user, password, true)
+                == nx::SystemCommands::MountCode::ok ? Result::ok : Result::execFailed;
         });
 
     factory.reg({"mv"}, {"source_path", "target_path"},
@@ -158,6 +158,16 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
 
             return systemCommands->fileSize(*path, /*usePipe*/ true) == -1
                 ? Result::execFailed : Result::ok;
+        });
+
+    factory.reg({"kill"}, {"pid"},
+        [systemCommands](const char** argv)
+        {
+            const auto pid = getOptionalArg(argv);
+            if (!pid)
+                return Result::invalidArg;
+
+            return systemCommands->kill(std::stoi(*pid)) ? Result::ok : Result::execFailed;
         });
 
     factory.reg({"umount", "unmount"}, {"path"},
