@@ -100,7 +100,7 @@
 #include <nx_ec/data/api_user_data.h>
 #include <nx_ec/data/api_license_data.h>
 #include <nx/vms/api/data/layout_data.h>    //< Required for the FullInfoData
-#include <nx_ec/data/api_layout_tour_data.h>
+#include <nx/vms/api/data/layout_tour_data.h>  //< Required for the FullInfoData
 #include <nx_ec/data/api_access_rights_data.h>
 #include <nx_ec/transaction_timestamp.h>
 
@@ -331,7 +331,6 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<ec2::ApiMediaServerData>("ec2::ApiMediaServerData");
     qRegisterMetaType<ec2::ApiMediaServerUserAttributesData>("ec2::ApiMediaServerUserAttributesData");
     qRegisterMetaType<ec2::ApiStorageData>("ec2::ApiStorageData");
-    qRegisterMetaType<ec2::ApiLayoutTourData>("ec2::ApiLayoutTourData");
 
     qRegisterMetaType<QnUuid>();
     qRegisterMetaTypeStreamOperators<QnUuid>();

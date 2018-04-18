@@ -19,7 +19,7 @@
  * APPLY(                   -- macro header
  * 604,                     -- integer enum id
  * getLayoutTours,          -- transaction name
- * ApiLayoutTourDataList,   -- passed data structure
+ * LayoutTourDataList,      -- passed data structure
  * false,                   -- transaction is not persistent (does not save anything to database)
  * false,                   -- transaction is not system (handled common way)
  * InvalidGetHashHelper(),  -- Calculates hash for persistent transaction.
@@ -48,7 +48,7 @@
  * APPLY(                   -- macro header
  * 605,                     -- integer enum id
  * saveLayoutTour,          -- transaction name
- * ApiLayoutTourData,       -- passed data structure
+ * LayoutTourData,          -- passed data structure
  * true,                    -- transaction is persistent
  * false,                   -- transaction is not system (handled common way)
  * CreateHashByIdHelper(),  -- id is enough to generate hash
@@ -770,7 +770,7 @@ APPLY(603, removeLayout, nx::vms::api::IdData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(604, getLayoutTours, ApiLayoutTourDataList, \
+APPLY(604, getLayoutTours, nx::vms::api::LayoutTourDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), \
@@ -781,7 +781,7 @@ APPLY(604, getLayoutTours, ApiLayoutTourDataList, \
                        FilterListByAccess<LayoutTourAccess>(), \
                        AllowForAllAccessOut(), /* not actual for non-persistent */ \
                        RegularTransactionType()) \
-APPLY(605, saveLayoutTour, ApiLayoutTourData, \
+APPLY(605, saveLayoutTour, nx::vms::api::LayoutTourData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \

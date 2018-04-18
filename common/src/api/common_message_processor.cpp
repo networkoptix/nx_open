@@ -708,7 +708,7 @@ void QnCommonMessageProcessor::on_execBusinessAction( const vms::event::Abstract
     execBusinessActionInternal(action);
 }
 
-void QnCommonMessageProcessor::handleTourAddedOrUpdated(const ec2::ApiLayoutTourData& tour)
+void QnCommonMessageProcessor::handleTourAddedOrUpdated(const nx::vms::api::LayoutTourData& tour)
 {
     layoutTourManager()->addOrUpdateTour(tour);
 }

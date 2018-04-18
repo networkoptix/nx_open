@@ -341,7 +341,9 @@ namespace detail
         ErrorCode doQueryNoLock(const QnUuid& /*id*/, ApiUpdateUploadResponceDataList& data);
 
         // getLayoutTours
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiLayoutTourDataList& data);
+        ErrorCode doQueryNoLock(
+            const QnUuid& id,
+            nx::vms::api::LayoutTourDataList& data);
 
         // ------------ transactions --------------------------------------
 
@@ -362,7 +364,8 @@ namespace detail
         ErrorCode executeTransactionInternal(
             const QnTransaction<ApiMediaServerUserAttributesData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::LayoutData>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiLayoutTourData>& tran);
+        ErrorCode executeTransactionInternal(
+            const QnTransaction<nx::vms::api::LayoutTourData>& tran);
         ErrorCode executeTransactionInternal(
             const QnTransaction<nx::vms::api::LayoutDataList>& tran);
         ErrorCode executeTransactionInternal(
@@ -628,7 +631,7 @@ namespace detail
         ErrorCode saveLayout(const nx::vms::api::LayoutData& params);
 
         ErrorCode removeLayoutTour(const QnUuid& id);
-        ErrorCode saveLayoutTour(const ApiLayoutTourData& params);
+        ErrorCode saveLayoutTour(const nx::vms::api::LayoutTourData& params);
 
         ErrorCode deleteUserProfileTable(const qint32 id);
         ErrorCode removeUser( const QnUuid& guid );

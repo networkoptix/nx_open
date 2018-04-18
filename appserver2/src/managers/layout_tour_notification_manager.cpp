@@ -11,7 +11,7 @@ void QnLayoutTourNotificationManager::triggerNotification(
 }
 
 void QnLayoutTourNotificationManager::triggerNotification(
-    const QnTransaction<ApiLayoutTourData>& tran,
+    const QnTransaction<nx::vms::api::LayoutTourData>& tran,
     NotificationSource source)
 {
     NX_ASSERT(tran.command == ApiCommand::saveLayoutTour);

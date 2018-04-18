@@ -1463,10 +1463,11 @@ namespace ec2 {
 		/**%apidoc GET /ec2/getLayoutTours
 		* Return list of layout tours
 		* %param[default] format
+		* %param[opt] id Layout tour unique id. If omitted, return data for all tours.
 		* %return List of layout tour objects in the requested format.
 		* %// AbstractLayoutManager::getLayoutTours
 		*/
-		regGet<nullptr_t, ApiLayoutTourDataList>(p, ApiCommand::getLayoutTours);
+		regGet<QnUuid, LayoutTourDataList>(p, ApiCommand::getLayoutTours);
 
 		/**%apidoc POST /ec2/saveLayoutTour
 		* Save layout tour.
@@ -1484,7 +1485,7 @@ namespace ec2 {
 		* %param item.delayMs Delay between layouts switching in milliseconds.
 		* %// AbstractLayoutTourManager::save
 		*/
-		regUpdate<ApiLayoutTourData>(p, ApiCommand::saveLayoutTour);
+		regUpdate<LayoutTourData>(p, ApiCommand::saveLayoutTour);
 
 		/**%apidoc POST /ec2/removeLayoutTour
 		* Delete the specified layout tour.

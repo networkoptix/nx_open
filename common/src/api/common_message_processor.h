@@ -106,7 +106,7 @@ protected:
         ec2::NotificationSource source) = 0;
     virtual void execBusinessActionInternal(const nx::vms::event::AbstractActionPtr& /*action*/) {}
 
-    virtual void handleTourAddedOrUpdated(const ec2::ApiLayoutTourData& tour);
+    virtual void handleTourAddedOrUpdated(const nx::vms::api::LayoutTourData& tour);
 
     void resetResourceTypes(const nx::vms::api::ResourceTypeDataList& resTypes);
     void resetResources(const ec2::ApiFullInfoData& fullData);

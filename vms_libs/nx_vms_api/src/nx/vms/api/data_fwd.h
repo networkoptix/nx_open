@@ -58,6 +58,10 @@ DECLARE_STRUCT(LayoutData)
 DECLARE_STRUCT(ClientInfoData)
 DECLARE_STRUCT(ConnectionData)
 
+DECLARE_STRUCT(LayoutTourItemData)
+DECLARE_STRUCT(LayoutTourSettings)
+DECLARE_STRUCT(LayoutTourData)
+
 #undef DECLARE_STRUCT
 
 } // namespace api

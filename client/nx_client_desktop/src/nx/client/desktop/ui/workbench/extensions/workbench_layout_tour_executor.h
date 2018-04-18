@@ -34,8 +34,8 @@ public:
     LayoutTourExecutor(QObject* parent = nullptr);
     virtual ~LayoutTourExecutor() override;
 
-    void startTour(const ec2::ApiLayoutTourData& tour);
-    void updateTour(const ec2::ApiLayoutTourData& tour);
+    void startTour(const nx::vms::api::LayoutTourData& tour);
+    void updateTour(const nx::vms::api::LayoutTourData& tour);
 
     /** Stop tour with given id if it is running. */
     void stopTour(const QnUuid& id);
@@ -55,7 +55,7 @@ protected:
     virtual void timerEvent(QTimerEvent* event) override;
 
 private:
-    void resetTourItems(const ec2::ApiLayoutTourItemDataList& items);
+    void resetTourItems(const nx::vms::api::LayoutTourItemDataList& items);
     void processTourStepInternal(bool forward, bool force);
 
     void clearWorkbenchState();

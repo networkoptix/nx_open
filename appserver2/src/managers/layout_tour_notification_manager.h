@@ -2,7 +2,8 @@
 
 #include <transaction/transaction.h>
 
-#include <nx_ec/data/api_layout_tour_data.h>
+#include <nx/vms/api/data/layout_tour_data.h>
+
 #include <nx_ec/managers/abstract_layout_tour_manager.h>
 
 namespace ec2 {
@@ -14,7 +15,7 @@ public:
         const QnTransaction<nx::vms::api::IdData>& tran,
         NotificationSource source);
     void triggerNotification(
-        const QnTransaction<ApiLayoutTourData>& tran,
+        const QnTransaction<nx::vms::api::LayoutTourData>& tran,
         NotificationSource source);
 };
 

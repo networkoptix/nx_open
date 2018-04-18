@@ -26,7 +26,7 @@ struct ApiFullInfoData: nx::vms::api::Data
     ApiStorageDataList storages;
     nx::vms::api::ResourceStatusDataList resStatusList;
     nx::vms::api::WebPageDataList webPages;
-    ApiLayoutTourDataList layoutTours;
+    nx::vms::api::LayoutTourDataList layoutTours;
 };
 #define ApiFullInfoData_Fields (resourceTypes)(servers)(serversUserAttributesList)(cameras)(cameraUserAttributesList)(users)(layouts)(videowalls)(rules)\
                                (cameraHistory)(licenses)(discoveryData)(allProperties)(storages)(resStatusList)(webPages)(accessRights)(userRoles)\

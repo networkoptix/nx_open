@@ -799,7 +799,7 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
         }
         while (queryCameras.next())
         {
-            QnTransaction<nx::vms::api::ResourceStatusData> tran(
+            QnTransaction<ResourceStatusData> tran(
                 ApiCommand::setResourceStatus,
                 commonModule()->moduleGUID());
             m_tranLog->fillPersistentInfo(tran);
@@ -995,7 +995,7 @@ bool QnDbManager::resyncTransactionLog()
 
     if (!fillTransactionLogInternal<
         QnUuid,
-        nx::vms::api::ResourceStatusData,
+        ResourceStatusData,
         ResourceStatusDataList>(ApiCommand::setResourceStatus))
     {
         return false;
@@ -1033,9 +1033,9 @@ bool QnDbManager::resyncTransactionLog()
     }
 
     if (!fillTransactionLogInternal<
-        nullptr_t,
-        ApiLayoutTourData,
-        ApiLayoutTourDataList>(ApiCommand::saveLayoutTour))
+        QnUuid,
+        LayoutTourData,
+        LayoutTourDataList>(ApiCommand::saveLayoutTour))
     {
         return false;
     }
@@ -2660,7 +2660,7 @@ ec2::ErrorCode QnDbManager::removeLayoutTour(const QnUuid& id)
     return ErrorCode::ok;
 }
 
-ec2::ErrorCode QnDbManager::saveLayoutTour(const ApiLayoutTourData& params)
+ec2::ErrorCode QnDbManager::saveLayoutTour(const LayoutTourData& params)
 {
     if (!database::api::saveLayoutTour(m_sdb, params))
         return ErrorCode::dbError;
@@ -2683,7 +2683,7 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<LayoutData
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLayoutTourData>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<LayoutTourData>& tran)
 {
     return saveLayoutTour(tran.params);
 }
@@ -4343,7 +4343,7 @@ ErrorCode QnDbManager::readApiFullInfoDataComplete(ApiFullInfoData* data)
     DB_LOAD(QnUuid(), data->storages);
     DB_LOAD(QnUuid(), data->resStatusList);
     DB_LOAD(nullptr, data->accessRights);
-    DB_LOAD(nullptr, data->layoutTours);
+    DB_LOAD(QnUuid(), data->layoutTours);
 
     return ErrorCode::ok;
 }
@@ -4633,9 +4633,11 @@ ErrorCode QnDbManager::doQueryNoLock(
 /**
 * /ec2/getLayouts
 */
-ec2::ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiLayoutTourDataList& data)
+ec2::ErrorCode QnDbManager::doQueryNoLock(
+    const QnUuid& id,
+    nx::vms::api::LayoutTourDataList& data)
 {
-    if (!database::api::fetchLayoutTours(m_sdb, data))
+    if (!database::api::fetchLayoutTours(m_sdb, id, data))
         return ErrorCode::dbError;
     return ErrorCode::ok;
 }
@@ -5085,8 +5087,8 @@ ApiObjectInfoList QnDbManagerAccess::getObjectsNoLock(const ApiObjectType& objec
 IdDataList QnDbManagerAccess::getLayoutToursNoLock(const QnUuid& parentId)
 {
     IdDataList result;
-    ApiLayoutTourDataList tours;
-    database::api::fetchLayoutTours(m_dbManager->getDB(), tours);
+    nx::vms::api::LayoutTourDataList tours;
+    database::api::fetchLayoutTours(m_dbManager->getDB(), QnUuid(), tours);
     for (const auto& tour: tours)
     {
         if (tour.parentId == parentId)

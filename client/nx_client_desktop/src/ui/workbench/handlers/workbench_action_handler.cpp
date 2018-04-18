@@ -581,7 +581,7 @@ void ActionHandler::submitDelayedDrops()
     QScopedValueRollback<bool> guard(m_delayedDropGuard, true);
 
     QnResourceList resources;
-    ec2::ApiLayoutTourDataList tours;
+    nx::vms::api::LayoutTourDataList tours;
 
     for (const auto& data: m_delayedDrops)
     {

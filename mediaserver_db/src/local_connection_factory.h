@@ -97,7 +97,7 @@ namespace ec2 {
 		* Called on server side to handle connection request from remote host.
 		*/
 		ErrorCode fillConnectionInfo(
-			const ConnectionData& loginInfo,
+			const nx::vms::api::ConnectionData& loginInfo,
 			QnConnectionInfo* const connectionInfo,
 			nx::network::http::Response* response = nullptr);
 

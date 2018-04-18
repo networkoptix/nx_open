@@ -56,7 +56,7 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
             for (const auto& tour: layoutTourManager()->tours())
                 usedNames << tour.name;
 
-            ec2::ApiLayoutTourData tour;
+            nx::vms::api::LayoutTourData tour;
             tour.id = QnUuid::createUuid();
             tour.parentId = context()->user()->getId();
             tour.name = nx::utils::generateUniqueString(
@@ -241,7 +241,7 @@ void LayoutToursHandler::submitState(QnWorkbenchState* state)
         state->runningTourId = m_tourExecutor->runningTour();
 }
 
-void LayoutToursHandler::saveTourToServer(const ec2::ApiLayoutTourData& tour)
+void LayoutToursHandler::saveTourToServer(const nx::vms::api::LayoutTourData& tour)
 {
     NX_EXPECT(layoutTourManager()->tour(tour.id).isValid());
     auto stateManager = qnClientCoreModule->layoutTourStateManager();

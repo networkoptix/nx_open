@@ -915,7 +915,7 @@ struct LayoutTourAccess
     bool operator()(
         QnCommonModule* /*commonModule*/,
         const Qn::UserAccessData& accessData,
-        const ApiLayoutTourData& tour)
+        const nx::vms::api::LayoutTourData& tour)
     {
         return hasSystemAccess(accessData)
             || tour.parentId.isNull()
