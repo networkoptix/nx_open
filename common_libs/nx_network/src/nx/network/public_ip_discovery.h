@@ -46,6 +46,7 @@ private:
         secondaryUrlsRequesting,
         publicIpFound
     };
+    void setStage(Stage value);
 
     QHostAddress m_publicIP;
     Stage m_stage;
