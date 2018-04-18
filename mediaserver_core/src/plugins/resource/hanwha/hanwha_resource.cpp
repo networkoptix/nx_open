@@ -306,36 +306,36 @@ static const QnUuid kHanwhaInputPortEventId =
 static const std::map<QString, std::map<Qn::ConnectionRole, QString>> kStreamProperties = {
     {kEncodingTypeProperty,
     {
-        {Qn::ConnectionRole::CR_LiveVideo, Qn::kPrimaryStreamCodecParamName},
-        {Qn::ConnectionRole::CR_SecondaryLiveVideo, Qn::kSecondaryStreamCodecParamName}
+        {Qn::ConnectionRole::CR_LiveVideo, kPrimaryStreamCodecParamName},
+        {Qn::ConnectionRole::CR_SecondaryLiveVideo, kSecondaryStreamCodecParamName}
     }},
     {kResolutionProperty,
     {
-        {Qn::ConnectionRole::CR_LiveVideo, Qn::kPrimaryStreamResolutionParamName},
-        {Qn::ConnectionRole::CR_SecondaryLiveVideo, Qn::kSecondaryStreamResolutionParamName}
+        {Qn::ConnectionRole::CR_LiveVideo, kPrimaryStreamResolutionParamName},
+        {Qn::ConnectionRole::CR_SecondaryLiveVideo, kSecondaryStreamResolutionParamName}
     }},
     {kBitrateControlTypeProperty,
     {
-        {Qn::ConnectionRole::CR_LiveVideo, Qn::kPrimaryStreamBitrateControlParamName},
+        {Qn::ConnectionRole::CR_LiveVideo, kPrimaryStreamBitrateControlParamName},
         {
             Qn::ConnectionRole::CR_SecondaryLiveVideo,
-            Qn::kSecondaryStreamBitrateControlParamName
+            kSecondaryStreamBitrateControlParamName
         }
     }},
     {kGovLengthProperty,
     {
-        {Qn::ConnectionRole::CR_LiveVideo, Qn::kPrimaryStreamGovLengthParamName},
-        {Qn::ConnectionRole::CR_SecondaryLiveVideo, Qn::kSecondaryStreamGovLengthParamName}
+        {Qn::ConnectionRole::CR_LiveVideo, kPrimaryStreamGovLengthParamName},
+        {Qn::ConnectionRole::CR_SecondaryLiveVideo, kSecondaryStreamGovLengthParamName}
     }},
     {kCodecProfileProperty,
     {
-        {Qn::ConnectionRole::CR_LiveVideo, Qn::kPrimaryStreamCodecProfileParamName},
-        {Qn::ConnectionRole::CR_SecondaryLiveVideo, Qn::kSecondaryStreamCodecProfileParamName}
+        {Qn::ConnectionRole::CR_LiveVideo, kPrimaryStreamCodecProfileParamName},
+        {Qn::ConnectionRole::CR_SecondaryLiveVideo, kSecondaryStreamCodecProfileParamName}
     }},
     {kEntropyCodingProperty,
     {
-        {Qn::ConnectionRole::CR_LiveVideo, Qn::kPrimaryStreamEntropyCodingParamName},
-        {Qn::ConnectionRole::CR_SecondaryLiveVideo, Qn::kSecondaryStreamEntropyCodingParamName}
+        {Qn::ConnectionRole::CR_LiveVideo, kPrimaryStreamEntropyCodingParamName},
+        {Qn::ConnectionRole::CR_SecondaryLiveVideo, kSecondaryStreamEntropyCodingParamName}
     }}
 };
 
@@ -1760,28 +1760,28 @@ CameraDiagnostics::Result HanwhaResource::fetchPtzLimits(QnPtzLimits* outPtzLimi
 
 void HanwhaResource::cleanUpOnProxiedDeviceChange()
 {
-    setProperty(Qn::kPrimaryStreamResolutionParamName, QString());
-    setProperty(Qn::kSecondaryStreamResolutionParamName, QString());
-    setProperty(Qn::kPrimaryStreamCodecParamName, QString());
-    setProperty(Qn::kPrimaryStreamCodecProfileParamName, QString());
-    setProperty(Qn::kSecondaryStreamCodecParamName, QString());
-    setProperty(Qn::kSecondaryStreamCodecProfileParamName, QString());
-    setProperty(Qn::kPrimaryStreamGovLengthParamName, QString());
-    setProperty(Qn::kSecondaryStreamGovLengthParamName, QString());
-    setProperty(Qn::kPrimaryStreamBitrateControlParamName, QString());
-    setProperty(Qn::kSecondaryStreamBitrateControlParamName, QString());
-    setProperty(Qn::kPrimaryStreamBitrateParamName, QString());
-    setProperty(Qn::kSecondaryStreamBitrateParamName, QString());
-    setProperty(Qn::kPrimaryStreamEntropyCodingParamName, QString());
-    setProperty(Qn::kSecondaryStreamEntropyCodingParamName, QString());
-    setProperty(Qn::kSecondaryStreamFpsParamName, QString());
+    setProperty(kPrimaryStreamResolutionParamName, QString());
+    setProperty(kSecondaryStreamResolutionParamName, QString());
+    setProperty(kPrimaryStreamCodecParamName, QString());
+    setProperty(kPrimaryStreamCodecProfileParamName, QString());
+    setProperty(kSecondaryStreamCodecParamName, QString());
+    setProperty(kSecondaryStreamCodecProfileParamName, QString());
+    setProperty(kPrimaryStreamGovLengthParamName, QString());
+    setProperty(kSecondaryStreamGovLengthParamName, QString());
+    setProperty(kPrimaryStreamBitrateControlParamName, QString());
+    setProperty(kSecondaryStreamBitrateControlParamName, QString());
+    setProperty(kPrimaryStreamBitrateParamName, QString());
+    setProperty(kSecondaryStreamBitrateParamName, QString());
+    setProperty(kPrimaryStreamEntropyCodingParamName, QString());
+    setProperty(kSecondaryStreamEntropyCodingParamName, QString());
+    setProperty(kSecondaryStreamFpsParamName, QString());
 }
 
 AVCodecID HanwhaResource::streamCodec(Qn::ConnectionRole role) const
 {
     const auto propertyName = role == Qn::ConnectionRole::CR_LiveVideo
-        ? Qn::kPrimaryStreamCodecParamName
-        : Qn::kSecondaryStreamCodecParamName;
+        ? kPrimaryStreamCodecParamName
+        : kSecondaryStreamCodecParamName;
 
     QString codecString = getProperty(propertyName);
     if (codecString.isEmpty())
@@ -1797,8 +1797,8 @@ AVCodecID HanwhaResource::streamCodec(Qn::ConnectionRole role) const
 QString HanwhaResource::streamCodecProfile(AVCodecID codec, Qn::ConnectionRole role) const
 {
     const auto propertyName = role == Qn::ConnectionRole::CR_LiveVideo
-        ? Qn::kPrimaryStreamCodecProfileParamName
-        : Qn::kSecondaryStreamCodecProfileParamName;
+        ? kPrimaryStreamCodecProfileParamName
+        : kSecondaryStreamCodecProfileParamName;
 
     const QString profile = getProperty(propertyName);
     return suggestCodecProfile(codec, role, profile);
@@ -1807,8 +1807,8 @@ QString HanwhaResource::streamCodecProfile(AVCodecID codec, Qn::ConnectionRole r
 QSize HanwhaResource::streamResolution(Qn::ConnectionRole role) const
 {
     const auto propertyName = role == Qn::ConnectionRole::CR_LiveVideo
-        ? Qn::kPrimaryStreamResolutionParamName
-        : Qn::kSecondaryStreamResolutionParamName;
+        ? kPrimaryStreamResolutionParamName
+        : kSecondaryStreamResolutionParamName;
 
     QString resolutionString = getProperty(propertyName);
     if (resolutionString.isEmpty())
@@ -1825,15 +1825,15 @@ int HanwhaResource::streamFrameRate(Qn::ConnectionRole role, int desiredFps) con
 {
     int userDefinedFps = 0;
     if (role == Qn::ConnectionRole::CR_SecondaryLiveVideo)
-        userDefinedFps = getProperty(Qn::kSecondaryStreamFpsParamName).toInt();
+        userDefinedFps = getProperty(kSecondaryStreamFpsParamName).toInt();
     return closestFrameRate(role, userDefinedFps ? userDefinedFps : desiredFps);
 }
 
 int HanwhaResource::streamGovLength(Qn::ConnectionRole role) const
 {
     const auto propertyName = role == Qn::ConnectionRole::CR_LiveVideo
-        ? Qn::kPrimaryStreamGovLengthParamName
-        : Qn::kSecondaryStreamGovLengthParamName;
+        ? kPrimaryStreamGovLengthParamName
+        : kSecondaryStreamGovLengthParamName;
 
     QString govLengthString = getProperty(propertyName);
     if (govLengthString.isEmpty())
@@ -1850,8 +1850,8 @@ int HanwhaResource::streamGovLength(Qn::ConnectionRole role) const
 Qn::BitrateControl HanwhaResource::streamBitrateControl(Qn::ConnectionRole role) const
 {
     const auto propertyName = role == Qn::ConnectionRole::CR_LiveVideo
-        ? Qn::kPrimaryStreamBitrateControlParamName
-        : Qn::kSecondaryStreamBitrateControlParamName;
+        ? kPrimaryStreamBitrateControlParamName
+        : kSecondaryStreamBitrateControlParamName;
 
     QString bitrateControlString = getProperty(propertyName);
     if (bitrateControlString.isEmpty())
@@ -1864,12 +1864,14 @@ Qn::BitrateControl HanwhaResource::streamBitrateControl(Qn::ConnectionRole role)
     return result;
 }
 
-int HanwhaResource::streamBitrate(Qn::ConnectionRole role, const QnLiveStreamParams& liveStreamParams) const
+int HanwhaResource::streamBitrate(
+    Qn::ConnectionRole role,
+    const QnLiveStreamParams& liveStreamParams) const
 {
     QnLiveStreamParams streamParams = liveStreamParams;
     const auto propertyName = role == Qn::ConnectionRole::CR_LiveVideo
-        ? Qn::kPrimaryStreamBitrateParamName
-        : Qn::kSecondaryStreamBitrateParamName;
+        ? kPrimaryStreamBitrateParamName
+        : kSecondaryStreamBitrateParamName;
 
     const QString bitrateString = getProperty(propertyName);
     int bitrateKbps = bitrateString.toInt();
@@ -2755,8 +2757,8 @@ bool HanwhaResource::resetProfileToDefault(Qn::ConnectionRole role)
 
     if (role == Qn::ConnectionRole::CR_SecondaryLiveVideo)
     {
-        setProperty(Qn::kSecondaryStreamFpsParamName, defaultFrameRateForStream(role));
-        setProperty(Qn::kSecondaryStreamBitrateParamName, defaultBitrateForStream(role));
+        setProperty(kSecondaryStreamFpsParamName, defaultFrameRateForStream(role));
+        setProperty(kSecondaryStreamBitrateParamName, defaultBitrateForStream(role));
     }
 
     saveParams();
