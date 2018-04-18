@@ -19,52 +19,51 @@
 
 namespace ec2 {
 
-	class ClientQueryProcessor;
+class ClientQueryProcessor;
 
-// TODO: #2.4 remove Ec2 prefix to avoid ec2::RemoteConnectionFactory
-    class RemoteConnectionFactory:
-        public AbstractECConnectionFactory,
-        public QnStoppable,
-        public QnJoinable
-    {
-    public:
-        RemoteConnectionFactory(
-            QnCommonModule* commonModule,
-            Qn::PeerType peerType,
-            nx::utils::TimerManager* const timerManager,
-            bool isP2pMode);
-        virtual ~RemoteConnectionFactory();
+class RemoteConnectionFactory:
+    public AbstractECConnectionFactory,
+    public QnStoppable,
+    public QnJoinable
+{
+public:
+    RemoteConnectionFactory(
+        QnCommonModule* commonModule,
+        Qn::PeerType peerType,
+        nx::utils::TimerManager* const timerManager,
+        bool isP2pMode);
+    virtual ~RemoteConnectionFactory();
 
-        virtual void pleaseStop() override;
-        virtual void join() override;
+    virtual void pleaseStop() override;
+    virtual void join() override;
 
-        /**
-         * Implementation of AbstractECConnectionFactory::testConnectionAsync.
-         */
-        virtual int testConnectionAsync(
-            const nx::utils::Url& addr,
-            impl::TestConnectionHandlerPtr handler) override;
+    /**
+     * Implementation of AbstractECConnectionFactory::testConnectionAsync.
+     */
+    virtual int testConnectionAsync(
+        const nx::utils::Url& addr,
+        impl::TestConnectionHandlerPtr handler) override;
 
-        /**
-         * Implementation of AbstractECConnectionFactory::connectAsync.
-         */
-        virtual int connectAsync(
-            const nx::utils::Url& addr,
-            const ApiClientInfoData& clientInfo,
-            impl::ConnectHandlerPtr handler) override;
+    /**
+     * Implementation of AbstractECConnectionFactory::connectAsync.
+     */
+    virtual int connectAsync(
+        const nx::utils::Url& addr,
+        const nx::vms::api::ClientInfoData& clientInfo,
+        impl::ConnectHandlerPtr handler) override;
 
-        virtual void setConfParams(std::map<QString, QVariant> confParams) override;
+    virtual void setConfParams(std::map<QString, QVariant> confParams) override;
 
-		virtual TransactionMessageBusAdapter* messageBus() const override;
-        virtual TimeSynchronizationManager* timeSyncManager() const override;
+    virtual TransactionMessageBusAdapter* messageBus() const override;
+    virtual TimeSynchronizationManager* timeSyncManager() const override;
 
-        virtual void shutdown() override;
+    virtual void shutdown() override;
 
 private:
     QnMutex m_mutex;
     Settings m_settingsInstance;
-	std::unique_ptr<TransactionMessageBusAdapter> m_bus;
-	std::unique_ptr<TimeSynchronizationManager> m_timeSynchronizationManager;
+    std::unique_ptr<TransactionMessageBusAdapter> m_bus;
+    std::unique_ptr<TimeSynchronizationManager> m_timeSynchronizationManager;
     std::unique_ptr<QnJsonTransactionSerializer> m_jsonTranSerializer;
     std::unique_ptr<QnUbjsonTransactionSerializer> m_ubjsonTranSerializer;
     bool m_terminated;
@@ -74,11 +73,17 @@ private:
     std::unique_ptr<ClientQueryProcessor> m_remoteQueryProcessor;
     bool m_p2pMode = false;
     Qn::PeerType m_peerType = Qn::PeerType::PT_NotDefined;
+
 private:
     int establishConnectionToRemoteServer(
-        const nx::utils::Url& addr, impl::ConnectHandlerPtr handler, const ApiClientInfoData& clientInfo);
+        const nx::utils::Url& addr,
+        impl::ConnectHandlerPtr handler,
+        const nx::vms::api::ClientInfoData& clientInfo);
 
-    void tryConnectToOldEC(const nx::utils::Url& ecUrl, impl::ConnectHandlerPtr handler, int reqId);
+    void tryConnectToOldEC(
+        const nx::utils::Url& ecUrl,
+        impl::ConnectHandlerPtr handler,
+        int reqId);
 
     template<class Handler>
     void connectToOldEC(const nx::utils::Url& ecURL, Handler completionFunc);
@@ -107,7 +112,7 @@ private:
      * Called on server side to handle connection request from remote host.
      */
     ErrorCode fillConnectionInfo(
-        const ApiLoginData& loginInfo,
+        const nx::vms::api::ConnectionData& loginInfo,
         QnConnectionInfo* const connectionInfo,
         nx::network::http::Response* response = nullptr);
 

@@ -43,6 +43,7 @@
 #include <nx/p2p/p2p_server_message_bus.h>
 #include <transaction/server_transaction_message_bus.h>
 
+using namespace nx::vms::api;
 
 namespace ec2 {
 
@@ -157,7 +158,7 @@ namespace ec2 {
 	// Implementation of AbstractECConnectionFactory::connectAsync
 	int LocalConnectionFactory::connectAsync(
 		const nx::utils::Url& addr,
-		const ApiClientInfoData& clientInfo,
+		const nx::vms::api::ClientInfoData& clientInfo,
 		impl::ConnectHandlerPtr handler)
 	{
 		nx::utils::Url url = addr;
@@ -1584,9 +1585,9 @@ namespace ec2 {
 		regGet<StoredFilePath, DatabaseDumpToFileData>(p, ApiCommand::dumpDatabaseToFile);
 
 		// AbstractECConnectionFactory
-		regFunctorWithResponse<ApiLoginData, QnConnectionInfo>(p, ApiCommand::connect,
+		regFunctorWithResponse<ConnectionData, QnConnectionInfo>(p, ApiCommand::connect,
 			std::bind(&LocalConnectionFactory::fillConnectionInfo, this, _1, _2, _3));
-		regFunctorWithResponse<ApiLoginData, QnConnectionInfo>(p, ApiCommand::testConnection,
+		regFunctorWithResponse<ConnectionData, QnConnectionInfo>(p, ApiCommand::testConnection,
 			std::bind(&LocalConnectionFactory::fillConnectionInfo, this, _1, _2, _3));
 
 		/**%apidoc GET /ec2/getSettings
@@ -1635,7 +1636,7 @@ namespace ec2 {
 	{
 		const int reqId = generateRequestID();
 
-		ApiLoginData loginInfo;
+		ConnectionData loginInfo;
 		QnConnectionInfo connectionInfo;
 		fillConnectionInfo(loginInfo, &connectionInfo); // < TODO: #ak not appropriate here
 		connectionInfo.ecUrl = url;
@@ -1792,7 +1793,7 @@ namespace ec2 {
 	}
 
 	ErrorCode LocalConnectionFactory::fillConnectionInfo(
-		const ApiLoginData& loginInfo,
+		const ConnectionData& loginInfo,
 		QnConnectionInfo* const connectionInfo,
 		nx::network::http::Response* response)
 	{
@@ -1823,7 +1824,7 @@ namespace ec2 {
 			auto clientInfo = loginInfo.clientInfo;
 			clientInfo.parentId = commonModule()->moduleGUID();
 
-			ApiClientInfoDataList infoList;
+			nx::vms::api::ClientInfoDataList infoList;
 			auto result = dbManager(Qn::kSystemAccess).doQuery(clientInfo.id, infoList);
 			if (result != ErrorCode::ok)
 				return result;
@@ -1865,7 +1866,7 @@ namespace ec2 {
 	{
 		const int reqId = generateRequestID();
 		QnConnectionInfo connectionInfo;
-		fillConnectionInfo(ApiLoginData(), &connectionInfo);
+		fillConnectionInfo(ConnectionData(), &connectionInfo);
 		nx::utils::concurrent::run(
 			Ec2ThreadPool::instance(),
 			std::bind(

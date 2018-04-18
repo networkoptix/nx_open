@@ -398,7 +398,8 @@ namespace detail
         ErrorCode executeTransactionInternal(const QnTransaction<ApiDiscoveryData>& tran);
         ErrorCode executeTransactionInternal(
             const QnTransaction<nx::vms::api::DatabaseDumpData>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiClientInfoData>& tran);
+        ErrorCode executeTransactionInternal(
+            const QnTransaction<nx::vms::api::ClientInfoData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiMiscData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiSystemMergeHistoryRecord>& tran);
 

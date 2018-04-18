@@ -45,7 +45,6 @@ namespace ec2 {
     struct ApiUpdateUploadResponceData;
     struct ApiSystemMergeHistoryRecord;
     struct ApiUpdateInstallData;
-    struct ApiLoginData;
     struct ApiDiscoveryData;
     struct ApiDiscoverPeerData;
     struct ApiConnectionData;
@@ -143,7 +142,6 @@ namespace ec2 {
     (ApiUpdateUploadData)\
     (ApiUpdateUploadResponceData)\
     (ApiSystemMergeHistoryRecord) \
-    (ApiLoginData)\
     (ApiDiscoveryData)\
     (ApiDiscoverPeerData)\
     (ApiConnectionData)\

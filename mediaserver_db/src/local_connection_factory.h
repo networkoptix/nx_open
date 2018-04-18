@@ -47,7 +47,7 @@ namespace ec2 {
 		*/
 		virtual int connectAsync(
 			const nx::utils::Url& addr,
-			const ApiClientInfoData& clientInfo,
+			const nx::vms::api::ClientInfoData& clientInfo,
 			impl::ConnectHandlerPtr handler) override;
 
 		void registerRestHandlers(QnRestProcessorPool* const restProcessorPool);
@@ -97,7 +97,7 @@ namespace ec2 {
 		* Called on server side to handle connection request from remote host.
 		*/
 		ErrorCode fillConnectionInfo(
-			const ApiLoginData& loginInfo,
+			const ConnectionData& loginInfo,
 			QnConnectionInfo* const connectionInfo,
 			nx::network::http::Response* response = nullptr);
 

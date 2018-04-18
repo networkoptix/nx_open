@@ -42,7 +42,7 @@
 #include "nx_ec/data/api_license_overflow_data.h"
 #include "nx_ec/data/api_peer_system_time_data.h"
 #include "nx/vms/api/data/webpage_data.h"
-#include "nx_ec/data/api_connection_data.h"
+#include <nx/vms/api/data/connection_data.h>
 #include "nx_ec/data/api_statistics.h"
 #include <nx/vms/api/data/resource_type_data.h>
 #include "nx_ec/data/api_lock_data.h"

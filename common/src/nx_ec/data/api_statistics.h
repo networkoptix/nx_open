@@ -7,7 +7,7 @@
 #include "api_resource_data.h"
 #include "api_media_server_data.h"
 #include <nx/vms/api/data/camera_data_ex.h>
-#include "api_client_info_data.h"
+#include <nx/vms/api/data/client_info_data.h>
 #include "api_license_data.h"
 #include <nx/vms/api/data/event_rule_data.h>
 #include <nx/vms/api/data/layout_data.h>

@@ -2,7 +2,7 @@
 
 #include <QtCore/QUrlQuery>
 
-#include <nx_ec/data/api_connection_data.h>
+#include <nx/vms/api/data/connection_data.h>
 #include <nx/vms/api/data/stored_file_data.h>
 #include <nx/fusion/serialization/lexical_functions.h>
 #include <transaction/transaction.h>
@@ -96,7 +96,9 @@ void toUrlParams(const Qn::SerializationFormat& format, QUrlQuery* query)
 }
 
 bool parseHttpRequestParams(
-    const QString& /*command*/, const QnRequestParamList& params, ApiLoginData* data)
+    const QString& /*command*/,
+    const QnRequestParamList& params,
+    nx::vms::api::ConnectionData* data)
 {
     if (deserialize(params, lit("info_id"), &data->clientInfo.id))
     {
@@ -116,7 +118,7 @@ bool parseHttpRequestParams(
         && deserialize(params, lit("digest"), &data->passwordHash);
 }
 
-void toUrlParams(const ApiLoginData& data, QUrlQuery* query)
+void toUrlParams(const nx::vms::api::ConnectionData& data, QUrlQuery* query)
 {
     serialize(data.login, lit("login"), query);
     serialize(data.passwordHash, lit("digest"), query);

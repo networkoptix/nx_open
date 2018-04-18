@@ -153,7 +153,7 @@ APPLY(7, tranSyncDone, ApiTranSyncDoneData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(100, testConnection, ApiLoginData, \
+APPLY(100, testConnection, nx::vms::api::ConnectionData, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
@@ -164,7 +164,7 @@ APPLY(100, testConnection, ApiLoginData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(101, connect, ApiLoginData, \
+APPLY(101, connect, nx::vms::api::ConnectionData, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \

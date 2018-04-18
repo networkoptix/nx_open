@@ -3267,7 +3267,7 @@ void MediaServerProcess::run()
     while (!needToStop())
     {
         const ec2::ErrorCode errorCode = ec2ConnectionFactory->connectSync(
-            appServerUrl, ec2::ApiClientInfoData(), &ec2Connection );
+            appServerUrl, nx::vms::api::ClientInfoData(), &ec2Connection);
         if (ec2Connection)
         {
             connectInfo = ec2Connection->connectionInfo();

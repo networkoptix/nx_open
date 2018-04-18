@@ -55,6 +55,9 @@ DECLARE_STRUCT(WebPageData)
 DECLARE_STRUCT(LayoutItemData)
 DECLARE_STRUCT(LayoutData)
 
+DECLARE_STRUCT(ClientInfoData)
+DECLARE_STRUCT(ConnectionData)
+
 #undef DECLARE_STRUCT
 
 } // namespace api
