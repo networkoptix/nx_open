@@ -492,7 +492,7 @@ QnCameraAdvancedParamValueMap HanwhaResource::getApiParameters(const QSet<QStrin
                     if (!info->isChannelIndependent())
                     {
                         // TODO: #dmishin most likely here will be issues with multisensor cameras
-                        // (we will be always read from the first channel only). Fix it.
+                        // (we will always read from the first channel only). Fix it.
                         parameterString += kHanwhaChannelPropertyTemplate.arg(
                             isNvr() && isConnectedViaSunapi() ? 0 : getChannel());
                     }
