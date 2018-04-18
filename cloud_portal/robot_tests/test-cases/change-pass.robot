@@ -1,7 +1,10 @@
 *** Settings ***
 Resource          ../resource.robot
 Resource          ../variables.robot
-Test Teardown     Close Browser
+Test Setup        Reset
+Test Teardown     Run Keyword If Test Failed    Account Failure
+Suite Setup       Open Browser and go to URL    ${url}
+Suite Teardown    Clean up
 
 *** Variables ***
 ${password}    ${BASE PASSWORD}
@@ -10,10 +13,25 @@ ${url}         ${ENV}
 
 *** Keywords ***
 Log In To Change Password Page
-    Open Browser and go to URL    ${url}/account/password
+    Go To    ${url}/account/password
     Log In    ${email}    ${password}    None
     Validate Log In
     Wait Until Elements Are Visible    ${CURRENT PASSWORD INPUT}    ${NEW PASSWORD INPUT}    ${CHANGE PASSWORD BUTTON}
+
+Reset
+    ${status}    Run Keyword And Return Status    Validate Log In
+    Run Keyword If    ${status}    Log Out
+    Validate Log Out
+    Go To    ${url}
+
+Clean up
+    Close Browser
+    Run Keyword If Any Tests Failed    Clean up noperm first/last name
+
+Account Failure
+    Close Browser
+    Clean up noperm first/last name
+    Open Browser and go to URL    ${url}
 
 *** Test Cases ***
 password can be changed

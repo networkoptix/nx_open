@@ -6,7 +6,7 @@
     "emailSubject": "Reimpostare la password"
   },
   "system_invite": {
-    "emailSubject": "{{message.sharer_name}} ti invita a {{PRODUCT_NAME}}"
+    "emailSubject": "Video system {{message.system_name}} was shared with you"
   },
   "system_shared": {
     "emailSubject": "{{message.sharer_name}} ti invita a {{PRODUCT_NAME}}"

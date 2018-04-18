@@ -1,5 +1,5 @@
 {
-  "language_name": "Polski",
+  "language_name": "LANGUAGE_NAME",
   "productName": "{{PRODUCT_NAME}}",
   "clientProtocol": "{{CLIENT_PROTOCOL}}:",
   "dialogs": {
@@ -142,7 +142,8 @@
     "requiredMessage": "Używaj tylko liter łacińskich, cyfr i symboli z klawiatury, unikając spacji na początku i na końcu",
     "weakMessage": "Użyj liczb, wielkich i małych liter oraz znaków specjalnych, aby ustawić bezpieczniejsze hasło",
     "strongMessage": "Bezpieczne hasło!",
-    "commonMessage": "To hasło znajduje się na liście najczęściej stosowanych haseł na świecie"
+    "commonMessage": "To hasło znajduje się na liście najczęściej stosowanych haseł na świecie",
+    "missingMessage": "Password is required"
   },
   "sharing": {
     "confirmOwner": "Jeśli zmienisz właściciela systemu, odbierzesz mu kontrolę nad bieżącym kontem. Ta operacja jest nieodwracalna. Czy na pewno kontynuować?",
