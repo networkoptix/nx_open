@@ -55,6 +55,7 @@ angular.module('cloudApp')
         };
 
         $scope.register = process.init(function() {
+            account.setEmail($scope.account.email);
             return cloudApi.register(
                 $scope.account.email,
                 $scope.account.password,
