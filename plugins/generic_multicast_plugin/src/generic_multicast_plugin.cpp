@@ -1,6 +1,6 @@
 #include <memory.h>
 
-#include <plugins/camera_plugin.h>
+#include <camera/camera_plugin.h>
 #include <plugins/plugin_api.h>
 
 #include "generic_multicast_discovery_manager.h"

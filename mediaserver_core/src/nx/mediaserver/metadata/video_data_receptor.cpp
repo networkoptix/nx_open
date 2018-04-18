@@ -23,6 +23,9 @@ using namespace nx::sdk::metadata;
     packet->setHeight(frame->height);
     packet->setCodec(toString(frame->compressionType).toStdString());
 
+    if (frame->flags & QnAbstractMediaData::MediaFlag::MediaFlags_AVKey)
+        packet->addFlag(nx::sdk::metadata::MediaFlag::keyFrame);
+
     if (needDeepCopy)
     {
         std::vector<char> buffer(frame->dataSize());

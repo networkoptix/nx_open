@@ -47,7 +47,6 @@ public:
 private:
     nx::mediaserver_plugins::metadata::deepstream::Plugin* const m_plugin;
     nx::sdk::metadata::MetadataHandler* m_handler;
-    std::unique_ptr<PipelineBuilder> m_pipelineBuilder;
     std::unique_ptr<nx::gstreamer::Pipeline> m_pipeline;
     mutable std::mutex m_mutex;
     mutable std::string m_manifest;
