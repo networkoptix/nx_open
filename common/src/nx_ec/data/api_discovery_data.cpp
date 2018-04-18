@@ -12,7 +12,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (ApiDiscoveryData)(ApiDiscoverPeerData), (ubjson)(xml)(json)(sql_record)(csv_record), _Fields)
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (ApiDiscoveredServerData), (ubjson)(xml)(json), _Fields)
+    (ApiDiscoveredServerData), (ubjson)(json), _Fields)
 
 std::vector<ApiDiscoveredServerData> getServers(nx::vms::discovery::Manager* manager)
 {
@@ -44,6 +44,3 @@ ApiDiscoveredServerData makeServer(
     return serverData;
 }
 } // namespace ec2
-
-void serialize_field(const ec2::ApiDiscoveredServerData &, QVariant *) { return; }
-void deserialize_field(const QVariant &, ec2::ApiDiscoveredServerData *) { return; }

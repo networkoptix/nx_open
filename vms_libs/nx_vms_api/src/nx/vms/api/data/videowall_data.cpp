@@ -11,12 +11,16 @@ namespace api {
     (VideowallScreenData) \
     (VideowallMatrixItemData) \
     (VideowallMatrixData) \
-    (VideowallData) \
-    (VideowallControlMessageData)
+    (VideowallData)
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     VIDEOWALL_TYPES,
     (eq)(ubjson)(xml)(json)(sql_record)(csv_record),
+    _Fields)
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (VideowallControlMessageData),
+    (ubjson)(json),
     _Fields)
 
 } // namespace api

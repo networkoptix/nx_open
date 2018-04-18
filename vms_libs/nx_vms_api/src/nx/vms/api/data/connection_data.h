@@ -12,7 +12,7 @@ struct ConnectionData: Data
 {
     QString login;
     QByteArray passwordHash;
-    ClientInfoData clientInfo; //< This won't be serialized. Why?
+    ClientInfoData clientInfo;
 };
 
 #define ConnectionData_Fields (login)(passwordHash)(clientInfo)

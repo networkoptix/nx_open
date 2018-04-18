@@ -5,9 +5,7 @@
 namespace ec2 {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (ApiRuntimeData), (ubjson)(xml)(json)(csv_record), _Fields)
+    (ApiRuntimeData), (ubjson)(json), _Fields)
 
 } // namespace ec2
 
-void serialize_field(const ec2::ApiRuntimeData&, QVariant*) { return; }
-void deserialize_field(const QVariant&, ec2::ApiRuntimeData*) { return; }
