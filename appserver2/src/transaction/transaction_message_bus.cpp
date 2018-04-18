@@ -411,7 +411,7 @@ void QnTransactionMessageBus::handleIncomingTransaction(
 
 // ------------------ QnTransactionMessageBus::CustomHandler -------------------
 
-void QnTransactionMessageBus::onGotDistributedMutexTransaction(const QnTransaction<ApiLockData>& tran)
+void QnTransactionMessageBus::onGotDistributedMutexTransaction(const QnTransaction<nx::vms::api::LockData>& tran)
 {
     if (tran.command == ApiCommand::lockRequest)
         emit gotLockRequest(tran.params);

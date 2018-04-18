@@ -1,6 +1,6 @@
 #pragma once
 
-#include "nx_ec/data/api_lock_data.h"
+#include <nx/vms/api/data/lock_data.h>
 #include "transaction/transaction.h"
 
 namespace ec2
@@ -30,9 +30,9 @@ namespace ec2
     private:
         friend class QnDistributedMutex;
 
-        void at_gotLockRequest(ApiLockData lockInfo);
-        void at_gotLockResponse(ApiLockData lockInfo);
-        //void at_gotUnlockRequest(ApiLockData lockInfo);
+        void at_gotLockRequest(nx::vms::api::LockData lockInfo);
+        void at_gotLockResponse(nx::vms::api::LockData lockInfo);
+        //void at_gotUnlockRequest(nx::vms::api::LockData lockInfo);
         void at_newPeerFound(QnUuid peer);
         void at_peerLost(QnUuid peer);
         void releaseMutex(const QString& name);

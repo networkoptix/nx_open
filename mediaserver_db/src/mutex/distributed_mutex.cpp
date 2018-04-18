@@ -11,6 +11,8 @@
 namespace ec2
 {
 
+using nx::vms::api::LockData;
+
 static const qint64 NO_MUTEX_LOCK = std::numeric_limits<qint64>::max();
 
 // ----------------------------- QnDistributedMutex ----------------------------
@@ -46,7 +48,7 @@ bool QnDistributedMutex::isAllPeersReady() const
 
 void QnDistributedMutex::sendTransaction(const LockRuntimeInfo& lockInfo, ApiCommand::Value command, const QnUuid& dstPeer)
 {
-    QnTransaction<ApiLockData> tran(
+    QnTransaction<LockData> tran(
         command,
         m_owner->messageBus()->commonModule()->moduleGUID());
     tran.params.name = m_name;
@@ -129,13 +131,13 @@ void QnDistributedMutex::unlockInternal()
     }
 
     /*
-    ApiLockData data;
+    LockData data;
     data.name = m_name;
     data.peer = commonModule()->moduleGUID();
     data.timestamp = NO_MUTEX_LOCK;
     */
 
-    for(ApiLockData lockData: m_delayedResponse) {
+    for(LockData lockData: m_delayedResponse) {
         QnUuid srcPeer = lockData.peer;
         lockData.peer = m_owner->messageBus()->commonModule()->moduleGUID();
         sendTransaction(lockData, ApiCommand::lockResponse, srcPeer);
@@ -151,7 +153,7 @@ void QnDistributedMutex::unlockInternal()
     m_peerLockInfo.clear();
 }
 
-void QnDistributedMutex::at_gotLockResponse(ApiLockData lockData)
+void QnDistributedMutex::at_gotLockResponse(LockData lockData)
 {
     QnMutexLocker lock( &m_mutex );
     if (lockData.timestamp != NO_MUTEX_LOCK)
@@ -160,7 +162,7 @@ void QnDistributedMutex::at_gotLockResponse(ApiLockData lockData)
     checkForLocked();
 }
 
-void QnDistributedMutex::at_gotLockRequest(ApiLockData lockData)
+void QnDistributedMutex::at_gotLockRequest(LockData lockData)
 {
     QnMutexLocker lock( &m_mutex );
 
@@ -175,7 +177,7 @@ void QnDistributedMutex::at_gotLockRequest(ApiLockData lockData)
 }
 
 /*
-void QnDistributedMutex::at_gotUnlockRequest(ApiLockData lockData)
+void QnDistributedMutex::at_gotUnlockRequest(LockData lockData)
 {
     QnMutexLocker lock( &m_mutex );
 

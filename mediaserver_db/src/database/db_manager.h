@@ -7,7 +7,7 @@
 #include <common/common_module_aware.h>
 
 #include <nx_ec/ec_api.h>
-#include <nx_ec/data/api_lock_data.h>
+#include <nx/vms/api/data/lock_data.h>
 #include "nx_ec/data/api_fwd.h"
 #include "nx_ec/data/api_misc_data.h"
 #include <utils/db/db_helper.h>
@@ -513,7 +513,7 @@ namespace detail
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiLockData>&)
+        ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::LockData>&)
         {
             NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;

@@ -62,6 +62,8 @@ DECLARE_STRUCT(LayoutTourItemData)
 DECLARE_STRUCT(LayoutTourSettings)
 DECLARE_STRUCT(LayoutTourData)
 
+DECLARE_STRUCT(LockData)
+
 #undef DECLARE_STRUCT
 
 } // namespace api

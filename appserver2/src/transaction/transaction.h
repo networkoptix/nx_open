@@ -98,7 +98,7 @@ APPLY(2, tranSyncResponse, QnTranStateResponse, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(3, lockRequest, ApiLockData, \
+APPLY(3, lockRequest, nx::vms::api::LockData, \
                        false, /* persistent*/ \
                        true, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
@@ -109,7 +109,7 @@ APPLY(3, lockRequest, ApiLockData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(4, lockResponse, ApiLockData, \
+APPLY(4, lockResponse, nx::vms::api::LockData, \
                        false, /* persistent*/ \
                        true,  /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
@@ -120,7 +120,7 @@ APPLY(4, lockResponse, ApiLockData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(5, unlockRequest, ApiLockData, \
+APPLY(5, unlockRequest, nx::vms::api::LockData, \
                        false, /* persistent*/ \
                        true, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \

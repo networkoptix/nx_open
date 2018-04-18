@@ -8,7 +8,7 @@
 #include <common/common_module.h>
 
 #include <nx_ec/ec_api.h>
-#include "nx_ec/data/api_lock_data.h"
+#include <nx/vms/api/data/lock_data.h>
 #include <nx_ec/data/api_peer_data.h>
 #include "transaction.h"
 #include <nx/network/deprecated/asynchttpclient.h>
@@ -100,11 +100,11 @@ public:
     virtual void dropConnections() override;
 
 signals:
-    void gotLockRequest(ApiLockData);
-    //void gotUnlockRequest(ApiLockData);
-    void gotLockResponse(ApiLockData);
+    void gotLockRequest(nx::vms::api::LockData);
+    //void gotUnlockRequest(nx::vms::api::LockData);
+    void gotLockResponse(nx::vms::api::LockData);
 
-    public slots:
+public slots:
     void reconnectAllPeers();
 
     /*
@@ -169,7 +169,7 @@ private:
 
 	void onGotTransactionSyncResponse(QnTransactionTransport* sender, const QnTransaction<QnTranStateResponse> &tran);
     void onGotTransactionSyncDone(QnTransactionTransport* sender, const QnTransaction<ApiTranSyncDoneData> &tran);
-    void onGotDistributedMutexTransaction(const QnTransaction<ApiLockData>& tran);
+    void onGotDistributedMutexTransaction(const QnTransaction<nx::vms::api::LockData>& tran);
 
     void connectToPeerEstablished(const ApiPeerData &peerInfo);
     void connectToPeerLost(const QnUuid& id);

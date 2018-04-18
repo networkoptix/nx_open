@@ -11,7 +11,6 @@ namespace ec2 {
     struct ApiFullInfoData;
     struct ApiLicenseData;
     struct ApiDetailedLicenseData;
-    struct ApiLockData;
     struct ApiMediaServerData;
     struct ApiMediaServerUserAttributesData;
     struct ApiMediaServerDataEx;
@@ -102,7 +101,6 @@ namespace ec2 {
     (ApiFullInfoData)\
     (ApiLicenseData)\
     (ApiDetailedLicenseData)\
-    (ApiLockData)\
     (ApiMediaServerData)\
     (ApiMediaServerUserAttributesData)\
     (ApiMediaServerDataEx)\

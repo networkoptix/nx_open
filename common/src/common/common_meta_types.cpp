@@ -88,7 +88,6 @@
 #include <network/networkoptixmodulerevealcommon.h>
 
 #include <nx_ec/ec_api.h>
-#include <nx_ec/data/api_lock_data.h>
 #include <nx_ec/data/api_discovery_data.h>
 #include <nx_ec/data/api_resource_data.h>
 #include <nx_ec/data/api_reverse_connection_data.h>
@@ -318,7 +317,7 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<ec2::ApiDiscoveredServerDataList>("ApiDiscoveredServerDataList");
     qRegisterMetaType<ec2::ApiReverseConnectionData>( "ApiReverseConnectionData" );
     qRegisterMetaType<ec2::ApiRuntimeData>( "ApiRuntimeData" );
-    qRegisterMetaType<ec2::ApiLockData>( "ApiLockData" );
+   
 
     qRegisterMetaType<ec2::ApiFullInfoData>("ec2::ApiFullInfoData");
     qRegisterMetaType<ec2::ApiUserData>("ec2::ApiUserData");
