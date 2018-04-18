@@ -44,7 +44,7 @@
 #include "nx_ec/data/api_webpage_data.h"
 #include "nx_ec/data/api_connection_data.h"
 #include "nx_ec/data/api_statistics.h"
-#include "nx_ec/data/api_resource_type_data.h"
+#include <nx/vms/api/data/resource_type_data.h>
 #include "nx_ec/data/api_lock_data.h"
 
 #include "nx/utils/type_utils.h"

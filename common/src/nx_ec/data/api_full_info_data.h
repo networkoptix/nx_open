@@ -6,7 +6,7 @@ namespace ec2 {
 
 struct ApiFullInfoData: nx::vms::api::Data
 {
-    ApiResourceTypeDataList resourceTypes;
+    nx::vms::api::ResourceTypeDataList resourceTypes;
     ApiMediaServerDataList servers;
     ApiMediaServerUserAttributesDataList serversUserAttributesList;
     nx::vms::api::CameraDataList cameras;

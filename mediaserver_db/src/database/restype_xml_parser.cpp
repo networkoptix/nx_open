@@ -1,11 +1,16 @@
 #include "restype_xml_parser.h"
-#include "nx_ec/data/api_resource_type_data.h"
 
-namespace ec2
-{
+#include <QtCore/QCryptographicHash>
+
+#include <nx/vms/api/data/resource_type_data.h>
+
+namespace ec2 {
+
+using namespace nx::vms::api;
+
 const QString kRootCameraId("1b7181ce-0227-d3f7-9443-c86aab922d96");
 
-ResTypeXmlParser::ResTypeXmlParser(ApiResourceTypeDataList& data):
+ResTypeXmlParser::ResTypeXmlParser(ResourceTypeDataList& data):
     m_data(data),
     m_rootResType(nullptr),
     m_resTypeFound(false)
@@ -14,7 +19,7 @@ ResTypeXmlParser::ResTypeXmlParser(ApiResourceTypeDataList& data):
 
 }
 
-const ApiResourceTypeData* ResTypeXmlParser::findResTypeByName(const QString& name)
+const ResourceTypeData* ResTypeXmlParser::findResTypeByName(const QString& name)
 {
     for (int i = (int) m_data.size() - 1; i >= 0; --i) {
         if (m_data[i].name == name && m_data[i].vendor == m_vendor)
@@ -23,7 +28,7 @@ const ApiResourceTypeData* ResTypeXmlParser::findResTypeByName(const QString& na
     return 0;
 }
 
-ApiResourceTypeData* ResTypeXmlParser::getRootResourceType(const QString& type) const
+ResourceTypeData* ResTypeXmlParser::getRootResourceType(const QString& type) const
 {
     for(auto& item : m_data)
         if(item.name == type && item.parentId.empty())
@@ -32,9 +37,9 @@ ApiResourceTypeData* ResTypeXmlParser::getRootResourceType(const QString& type) 
     return nullptr;
 }
 
-bool ResTypeXmlParser::addParentType(ApiResourceTypeData& data, const QString& parentName)
+bool ResTypeXmlParser::addParentType(ResourceTypeData& data, const QString& parentName)
 {
-    const ApiResourceTypeData* parentType = findResTypeByName(parentName);
+    const ResourceTypeData* parentType = findResTypeByName(parentName);
     if (parentType)
         data.parentId.push_back(parentType->id);
     else
@@ -44,7 +49,7 @@ bool ResTypeXmlParser::addParentType(ApiResourceTypeData& data, const QString& p
 
 bool ResTypeXmlParser::processResource(const QString& localName, const QXmlAttributes& attrs)
 {
-    ApiResourceTypeData newData;
+    ResourceTypeData newData;
     if (m_vendor.isNull()) {
         qWarning() << "Vendor for resource" << localName << "not found";
         return false;
@@ -91,7 +96,7 @@ bool ResTypeXmlParser::processResource(const QString& localName, const QXmlAttri
 
 bool ResTypeXmlParser::processParam(const QString& /*localName*/, const QXmlAttributes& attrs)
 {
-    ApiPropertyTypeData p;
+    PropertyTypeData p;
     if (!m_resTypeFound) {
         qWarning() << "Invalid XML format. You should specify resource type before params";
         return false;
@@ -102,7 +107,7 @@ bool ResTypeXmlParser::processParam(const QString& /*localName*/, const QXmlAttr
         return false;
     }
     p.defaultValue =  attrs.value("default_value").trimmed();
-    ApiResourceTypeData& data = m_data[m_data.size()-1];
+    ResourceTypeData& data = m_data[m_data.size()-1];
     p.resourceTypeId = data.id;
     data.propertyTypes.push_back(std::move(p));
 

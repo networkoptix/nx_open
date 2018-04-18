@@ -20,10 +20,6 @@ namespace ec2 {
     struct ApiMediaServerData;
     struct ApiMediaServerUserAttributesData;
     struct ApiMediaServerDataEx;
-    struct ApiPropertyTypeData;
-
-
-    struct ApiResourceTypeData;
 
     struct ApiPersistentIdData;
     struct QnTranState;
@@ -87,8 +83,7 @@ namespace ec2 {
     typedef std::vector<ApiMediaServerData> ApiMediaServerDataList;
     typedef std::vector<ApiMediaServerUserAttributesData> ApiMediaServerUserAttributesDataList;
     typedef std::vector<ApiMediaServerDataEx> ApiMediaServerDataExList;
-    typedef std::vector<ApiPropertyTypeData> ApiPropertyTypeDataList;
-    typedef std::vector<ApiResourceTypeData> ApiResourceTypeDataList;
+
     typedef std::vector<ApiStorageData> ApiStorageDataList;
     typedef std::vector<ApiUserData> ApiUserDataList;
     typedef std::vector<ApiUserRoleData> ApiUserRoleDataList;
@@ -130,9 +125,7 @@ namespace ec2 {
     (ApiMediaServerDataEx)\
     (ApiPeerSystemTimeData)\
     (ApiPeerSyncTimeData)\
-    (ApiPropertyTypeData)\
     (ApiReverseConnectionData)\
-    (ApiResourceTypeData)\
     (ApiPersistentIdData)\
     (QnTranState)\
     (ApiSyncRequestData)\

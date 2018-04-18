@@ -245,7 +245,7 @@ APPLY(203, getResourceParams, nx::vms::api::ResourceParamWithRefDataList, \
                        FilterListByAccess<ReadResourceParamAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadResourceParamAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(205, getResourceTypes, ApiResourceTypeDataList, \
+APPLY(205, getResourceTypes, nx::vms::api::ResourceTypeDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \

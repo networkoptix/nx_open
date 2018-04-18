@@ -13,7 +13,7 @@
 #include <nx_ec/data/api_time_data.h>
 #include <nx_ec/data/api_license_overflow_data.h>
 #include <nx_ec/data/api_media_server_data.h>
-#include <nx_ec/data/api_resource_type_data.h>
+#include <nx/vms/api/data/resource_type_data.h>
 #include <nx_ec/data/api_license_data.h>
 #include <nx/vms/api/data/event_rule_data.h>
 #include <nx/vms/api/data/camera_data.h>

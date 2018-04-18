@@ -18,7 +18,7 @@
 #include <nx/vms/api/data/camera_data.h>
 #include <nx/vms/api/data/camera_data_ex.h>
 #include "nx_ec/data/api_resource_data.h"
-#include "nx_ec/data/api_resource_type_data.h"
+#include <nx/vms/api/data/resource_type_data.h>
 #include "nx_ec/data/api_reverse_connection_data.h"
 #include "nx_ec/data/api_peer_alive_data.h"
 #include "nx_ec/data/api_discovery_data.h"

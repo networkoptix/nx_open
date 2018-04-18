@@ -94,10 +94,10 @@
 #include <nx_ec/data/api_reverse_connection_data.h>
 #include <nx_ec/data/api_full_info_data.h>
 #include <nx/vms/api/data/event_rule_data.h> //< Required for the FullInfoData
+#include <nx/vms/api/data/resource_type_data.h> //< Required for the FullInfoData
 #include <nx_ec/data/api_webpage_data.h>
 #include <nx_ec/data/api_videowall_data.h>
 #include <nx_ec/data/api_user_data.h>
-#include <nx_ec/data/api_resource_type_data.h>
 #include <nx_ec/data/api_license_data.h>
 #include <nx_ec/data/api_layout_data.h>
 #include <nx_ec/data/api_layout_tour_data.h>
@@ -169,7 +169,6 @@ void QnCommonMetaTypes::initialize()
 
     qRegisterMetaType<QnUserResourceList>();
     qRegisterMetaType<QnVideoWallResourceList>();
-
     qRegisterMetaType<QnWebPageResourcePtr>();
     qRegisterMetaType<QnWebPageResourceList>();
 

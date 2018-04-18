@@ -47,6 +47,9 @@ DECLARE_STRUCT(EmailSettingsData)
 DECLARE_STRUCT(StoredFileData)
 DECLARE_STRUCT(StoredFilePath)
 
+DECLARE_STRUCT(PropertyTypeData)
+DECLARE_STRUCT(ResourceTypeData)
+
 #undef DECLARE_STRUCT
 
 } // namespace api

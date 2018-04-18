@@ -13,7 +13,7 @@
 #include <nx_ec/data/api_full_info_data.h>
 #include <nx_ec/data/api_discovery_data.h>
 #include <nx_ec/data/api_conversion_functions.h>
-#include <nx_ec/data/api_resource_type_data.h>
+#include <nx/vms/api/data/resource_type_data.h>
 #include <nx_ec/data/api_license_data.h>
 #include <nx/vms/api/data/event_rule_data.h>
 #include <nx_ec/data/api_access_rights_data.h>
@@ -499,10 +499,10 @@ void QnCommonMessageProcessor::handleTourAddedOrUpdated(const ec2::ApiLayoutTour
     layoutTourManager()->addOrUpdateTour(tour);
 }
 
-void QnCommonMessageProcessor::resetResourceTypes(const ec2::ApiResourceTypeDataList& resTypes)
+void QnCommonMessageProcessor::resetResourceTypes(const nx::vms::api::ResourceTypeDataList& resTypes)
 {
     QnResourceTypeList qnResTypes;
-    fromApiToResourceList(resTypes, qnResTypes);
+    ec2::fromApiToResourceList(resTypes, qnResTypes);
     qnResTypePool->replaceResourceTypeList(qnResTypes);
 }
 

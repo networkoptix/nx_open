@@ -253,7 +253,9 @@ namespace detail
         ErrorCode doQueryNoLock(const QByteArray &paramName, ApiMiscData& miscData);
         ErrorCode doQueryNoLock(const QByteArray& /*dummy*/, ApiSystemMergeHistoryRecordList& systemMergeHistory);
         //getResourceTypes
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceTypeDataList& resourceTypeList);
+        ErrorCode doQueryNoLock(
+            const nullptr_t& /*dummy*/,
+            nx::vms::api::ResourceTypeDataList& resourceTypeList);
 
         //getCameras
         ErrorCode doQueryNoLock(const QnUuid& id, nx::vms::api::CameraDataList& cameraList);
@@ -758,8 +760,8 @@ namespace detail
         ErrorCode addCameraHistory(const nx::vms::api::ServerFootageData& params);
         ErrorCode removeCameraHistory(const QnUuid& serverId);
         ErrorCode getScheduleTasks(std::vector<nx::vms::api::ScheduleTaskWithRefData>& scheduleTaskList);
-        void addResourceTypesFromXML(ApiResourceTypeDataList& data);
-        void loadResourceTypeXML(const QString& fileName, ApiResourceTypeDataList& data);
+        void addResourceTypesFromXML(nx::vms::api::ResourceTypeDataList& data);
+        void loadResourceTypeXML(const QString& fileName, nx::vms::api::ResourceTypeDataList& data);
         bool removeServerStatusFromTransactionLog();
         bool removeEmptyLayoutsFromTransactionLog();
         bool removeOldCameraHistory();
@@ -786,7 +788,7 @@ namespace detail
         QnUuid m_cameraTypeId;
         QnUuid m_adminUserID;
         int m_adminUserInternalID;
-        ApiResourceTypeDataList m_cachedResTypes;
+        nx::vms::api::ResourceTypeDataList m_cachedResTypes;
         bool m_licenseOverflowMarked;
         QnUuid m_dbInstanceId;
         bool m_initialized;

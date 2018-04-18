@@ -64,7 +64,7 @@ int QnResourceManager<T>::getResourceTypes(impl::GetResourceTypesHandlerPtr hand
     auto queryDoneHandler =
         [reqID, handler](
         ErrorCode errorCode,
-        const ApiResourceTypeDataList& resTypeList)
+        const nx::vms::api::ResourceTypeDataList& resTypeList)
         {
             QnResourceTypeList outResTypeList;
             if (errorCode == ErrorCode::ok)
@@ -72,7 +72,7 @@ int QnResourceManager<T>::getResourceTypes(impl::GetResourceTypesHandlerPtr hand
             handler->done(reqID, errorCode, outResTypeList);
         };
     m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<std::nullptr_t,
-        ApiResourceTypeDataList, decltype(queryDoneHandler)>(
+        nx::vms::api::ResourceTypeDataList, decltype(queryDoneHandler)>(
         ApiCommand::getResourceTypes,
         nullptr,
         queryDoneHandler);

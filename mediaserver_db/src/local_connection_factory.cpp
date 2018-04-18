@@ -206,7 +206,7 @@ namespace ec2 {
 		* %return Object in the requested format.
 		* %// AbstractResourceManager::getResourceTypes
 		*/
-		regGet<nullptr_t, ApiResourceTypeDataList>(p, ApiCommand::getResourceTypes);
+		regGet<nullptr_t, ResourceTypeDataList>(p, ApiCommand::getResourceTypes);
 
 		// AbstractResourceManager::setResourceStatus
 		regUpdate<ResourceStatusData>(p, ApiCommand::setResourceStatus);

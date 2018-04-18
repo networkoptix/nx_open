@@ -9,6 +9,8 @@
 #include <utils/email/email_fwd.h>
 #include <utils/common/ldap_fwd.h>
 
+#include <nx/vms/api/data_fwd.h>
+
 namespace nx {
 namespace network {
 class SocketAddress;
@@ -124,8 +126,8 @@ void fromResourceListToApi(
 void fromResourceToApi(const QnResourcePtr& src, nx::vms::api::ResourceData& dst);
 void fromApiToResource(const nx::vms::api::ResourceData& src, QnResource* dst);
 
-void fromApiToResource(const ApiResourceTypeData& src, QnResourceTypePtr& dst);
-void fromApiToResourceList(const ApiResourceTypeDataList& src, QnResourceTypeList& dst);
+void fromApiToResource(const nx::vms::api::ResourceTypeData& src, QnResourceTypePtr& dst);
+void fromApiToResourceList(const nx::vms::api::ResourceTypeDataList& src, QnResourceTypeList& dst);
 
 QnUserResourcePtr fromApiToResource(
     const ApiUserData& src,

@@ -33,7 +33,7 @@
 #include "api_license_data.h"
 #include "api_media_server_data.h"
 #include "api_resource_data.h"
-#include "api_resource_type_data.h"
+#include <nx/vms/api/data/resource_type_data.h>
 #include "api_user_data.h"
 #include "api_videowall_data.h"
 #include "api_peer_data.h"
@@ -727,7 +727,7 @@ void fromApiToResource(const ResourceData& src, QnResource* dst) {
     //dst->setStatus(src.status, true);
 }
 
-void fromApiToResource(const ApiResourceTypeData& src, QnResourceTypePtr& dst)
+void fromApiToResource(const ResourceTypeData& src, QnResourceTypePtr& dst)
 {
     dst->setId(src.id);
     dst->setName(src.name);
@@ -738,15 +738,15 @@ void fromApiToResource(const ApiResourceTypeData& src, QnResourceTypePtr& dst)
     for (size_t i = 1; i < src.parentId.size(); ++i)
         dst->addAdditionalParent(src.parentId[i]);
 
-    for (const ApiPropertyTypeData& p: src.propertyTypes)
+    for (const auto& p: src.propertyTypes)
         dst->addParamType(p.name, p.defaultValue);
 }
 
-void fromApiToResourceList(const ApiResourceTypeDataList& src, QnResourceTypeList& dst)
+void fromApiToResourceList(const ResourceTypeDataList& src, QnResourceTypeList& dst)
 {
     dst.reserve((int)src.size() + dst.size());
 
-    for (const ApiResourceTypeData& srcType: src)
+    for (const ResourceTypeData& srcType: src)
     {
         dst.push_back(QnResourceTypePtr(new QnResourceType()));
         fromApiToResource(srcType, dst.back());

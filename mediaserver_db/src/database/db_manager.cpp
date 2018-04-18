@@ -39,7 +39,7 @@
 #include <network/system_helpers.h>
 
 #include <nx/vms/api/data/camera_data.h>
-#include "nx_ec/data/api_resource_type_data.h"
+#include <nx/vms/api/data/resource_type_data.h>
 #include <nx/vms/api/data/stored_file_data.h>
 #include "nx_ec/data/api_user_data.h"
 #include "nx_ec/data/api_layout_data.h"
@@ -3326,7 +3326,7 @@ ErrorCode QnDbManager::removeObject(const ApiObjectInfo& apiObject)
  ------------------------------------------------------------
 */
 
-void QnDbManager::loadResourceTypeXML(const QString& fileName, ApiResourceTypeDataList& data)
+void QnDbManager::loadResourceTypeXML(const QString& fileName, ResourceTypeDataList& data)
 {
     QFile f(fileName);
     if (!f.open(QFile::ReadOnly))
@@ -3343,7 +3343,7 @@ void QnDbManager::loadResourceTypeXML(const QString& fileName, ApiResourceTypeDa
     }
 }
 
-void QnDbManager::addResourceTypesFromXML(ApiResourceTypeDataList& data)
+void QnDbManager::addResourceTypesFromXML(ResourceTypeDataList& data)
 {
     const auto cameraTypesDir = lit("/resources/camera_types");
     const auto nameFilters = QStringList{lit("*.xml")};
@@ -3391,7 +3391,7 @@ ErrorCode QnDbManager::doQueryNoLock(nullptr_t /*dummy*/, ResourceParamDataList&
     return readSettings(data);
 }
 
-ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceTypeDataList& data)
+ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ResourceTypeDataList& data)
 {
     if (!m_cachedResTypes.empty())
     {
@@ -3426,7 +3426,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceType
         qWarning() << Q_FUNC_INFO << queryParents.lastError().text();
         return ErrorCode::dbError;
     }
-    mergeIdListData<ApiResourceTypeData>(queryParents, data, &ApiResourceTypeData::parentId);
+    mergeIdListData<ResourceTypeData>(queryParents, data, &ResourceTypeData::parentId);
 
     QSqlQuery queryProperty(m_sdb);
     queryProperty.setForwardOnly(true);
@@ -3440,9 +3440,9 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceType
         return ErrorCode::dbError;
     }
 
-    std::vector<ApiPropertyTypeData> allProperties;
+    std::vector<PropertyTypeData> allProperties;
     QnSql::fetch_many(queryProperty, &allProperties);
-    mergeObjectListData(data, allProperties, &ApiResourceTypeData::propertyTypes, &ApiPropertyTypeData::resourceTypeId);
+    mergeObjectListData(data, allProperties, &ResourceTypeData::propertyTypes, &PropertyTypeData::resourceTypeId);
 
     addResourceTypesFromXML(data);
 
