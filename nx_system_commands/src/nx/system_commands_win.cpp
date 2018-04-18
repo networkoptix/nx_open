@@ -63,7 +63,9 @@ bool SystemCommands::checkOwnerPermissions(const std::string& /*path*/)
     return false;
 }
 
-bool SystemCommands::execute(const std::string& /*command*/)
+bool SystemCommands::execute(
+    const std::string& /*command*/,
+    std::function<void(const char*)> /*outputAction*/)
 {
     return false;
 }
