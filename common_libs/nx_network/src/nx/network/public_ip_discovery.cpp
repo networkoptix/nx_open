@@ -11,7 +11,7 @@
 namespace {
 
 const QString kDefaultPrimaryUrlsList(QLatin1String("http://www.mypublicip.com;http://checkip.eurodyndns.org"));
-const QString kDefaultSecondaryUrlsList(QLatin1String("http://networkoptix.com/myip"));
+const QString kDefaultSecondaryUrlsList(QLatin1String("http://tools.vmsproxy.com/myip"));
 const int kRequestTimeoutMs = 4 * 1000;
 const QLatin1String kIpRegExprValue("[^a-zA-Z0-9\\.](([0-9]){1,3}\\.){3}([0-9]){1,3}[^a-zA-Z0-9\\.]");
 
