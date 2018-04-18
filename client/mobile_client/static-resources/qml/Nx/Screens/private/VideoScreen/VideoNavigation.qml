@@ -492,7 +492,7 @@ Item
             {
                 id: actionButtonsPanel
 
-                visible: opacity > 0 && videoScreenController.dummyState.length == 0
+                visible: opacity > 0
 
                 resourceId: videoScreenController.resourceId
                 anchors.left: buttonsPanel.showZoomControls
