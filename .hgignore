@@ -221,3 +221,5 @@ syntax: regexp
 nx_cloud/cloud_tests/monitoring/monitoring_simple.egg-info
 nx_cloud/cloud_tests/monitoring/env
 nx_cloud/cloud_tests/monitoring/dist
+
+tags

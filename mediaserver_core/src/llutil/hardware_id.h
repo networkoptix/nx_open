@@ -22,7 +22,6 @@ void initHardwareId(QSettings *settings);
 const QnHardwareInfo &getHardwareInfo();
 QString getLatestHardwareId();
 QStringList getAllHardwareIds();
-int hardwareIdVersion(const QString& hardwareId);
 
 }
 

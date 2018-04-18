@@ -32,8 +32,7 @@
 
 #include <licensing/license.h>
 #include <licensing/license_validator.h>
-
-#include <llutil/hardware_id.h>
+#include <licensing/hardware_id_version.h>
 
 #include <nx/fusion/serialization/json_functions.h>
 
