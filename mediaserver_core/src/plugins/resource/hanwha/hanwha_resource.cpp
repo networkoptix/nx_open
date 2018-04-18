@@ -2854,10 +2854,31 @@ bool HanwhaResource::isNvr() const
 
 QString HanwhaResource::nxProfileName(Qn::ConnectionRole role) const
 {
-    const auto nxProfileNameParameter = cgiParameters()
-        .parameter(lit("media/videoprofile/add_update/Name"));
+    auto isCorrectProfileNameParameter =
+        [](const boost::optional<HanwhaCgiParameter>& parameter)
+        {
+            return parameter != boost::none && parameter->maxLength() > 0;
+        };
 
-    const auto maxLength = nxProfileNameParameter && nxProfileNameParameter->maxLength() > 0
+    static const std::vector<QString> parametersToCheck = {
+        lit("media/videoprofile/add_update/Name"),
+        lit("media/videoprofile/add/Name")
+    };
+
+    boost::optional<HanwhaCgiParameter> nxProfileNameParameter;
+    for (const auto& parameterToCheck: parametersToCheck)
+    {
+        nxProfileNameParameter = cgiParameters().parameter(parameterToCheck);
+        if (!isCorrectProfileNameParameter(nxProfileNameParameter))
+        {
+            nxProfileNameParameter = boost::none;
+            continue;
+        }
+
+        break;
+    }
+
+    const auto maxLength = nxProfileNameParameter
         ? nxProfileNameParameter->maxLength()
         : kHanwhaProfileNameMaxLength;
 
