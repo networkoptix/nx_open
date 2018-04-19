@@ -23,13 +23,14 @@ class LinuxNetworking(Networking):
     @lrudecorator(1)
     def interfaces(self):
         output = self._ssh_access.run_sh_script(
+            # language=Bash
             '''
-            mkdir -p /tmp/func_tests/networking
-            cd /tmp/func_tests/networking
-            ls -1 /sys/class/net > interfaces.txt
-            xargs -t -a interfaces.txt -I {} cat /sys/class/net/{}/address > macs.txt
-            paste interfaces.txt macs.txt
-            ''')
+                mkdir -p /tmp/func_tests/networking
+                cd /tmp/func_tests/networking
+                ls -1 /sys/class/net >interfaces.txt
+                xargs -t -a interfaces.txt -I '{}' cat '/sys/class/net/{}/address' >macs.txt
+                paste interfaces.txt macs.txt
+                ''')
         interfaces = {
             EUI(raw_mac): interface
             for interface, raw_mac
@@ -42,28 +43,30 @@ class LinuxNetworking(Networking):
     def reset(self):
         """Don't touch localhost, host-bound interface and interfaces unknown to VM."""
         self._ssh_access.run_sh_script(
+            # language=Bash
             '''
-            echo "${AVAILABLE_INTERFACES}" | xargs -t -I {} ip addr flush dev {}
-            echo "${AVAILABLE_INTERFACES}" | xargs -t -I {} ip link set dev {} down
-            ip route flush proto static  # Manually added routes are static.
-            sysctl net.ipv4.ip_forward=0
-            iptables -F
-            iptables -t nat -F
-            iptables -A OUTPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
-            iptables -A OUTPUT -o lo -j ACCEPT
-            iptables -A OUTPUT -d 10.0.0.0/8 -j ACCEPT
-            iptables -A OUTPUT -d 192.168.0.0/16 -j ACCEPT
-            iptables -A OUTPUT -j REJECT
-            ''',
+                echo "${AVAILABLE_INTERFACES}" | xargs -t -I '{}' ip addr flush dev '{}'
+                echo "${AVAILABLE_INTERFACES}" | xargs -t -I '{}' ip link set dev '{}' down
+                ip route flush proto static  # Manually added routes are static.
+                sysctl net.ipv4.ip_forward=0
+                iptables -F
+                iptables -t nat -F
+                iptables -A OUTPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+                iptables -A OUTPUT -o lo -j ACCEPT
+                iptables -A OUTPUT -d 10.0.0.0/8 -j ACCEPT
+                iptables -A OUTPUT -d 192.168.0.0/16 -j ACCEPT
+                iptables -A OUTPUT -j REJECT
+                ''',
             env={'AVAILABLE_INTERFACES': '\n'.join(self.interfaces.values())})
 
     def setup_ip(self, mac, ip, prefix_length):
         interface = self.interfaces[mac]
         self._ssh_access.run_sh_script(
+            # language=Bash
             '''
-            ip addr replace ${ADDRESS}/${PREFIX_LENGTH} dev ${INTERFACE} 
-            ip link set dev ${INTERFACE} up
-            ''',
+                ip addr replace ${ADDRESS}/${PREFIX_LENGTH} dev ${INTERFACE}
+                ip link set dev ${INTERFACE} up
+                ''',
             env={'INTERFACE': interface, 'ADDRESS': ip, 'PREFIX_LENGTH': prefix_length})
         logger.info("Machine %r has IP %s/%d on %s (%s).", self._ssh_access, ip, prefix_length, interface, mac)
 
@@ -97,10 +100,11 @@ class LinuxNetworking(Networking):
     def setup_nat(self, outer_mac):
         """Connection can be initiated from inner_net_nodes only. Addresses are masqueraded."""
         self._ssh_access.run_sh_script(
+            # language=Bash
             '''
-            sysctl net.ipv4.ip_forward=1
-            iptables -t nat -A POSTROUTING -o ${OUTER_INTERFACE} -j MASQUERADE
-            ''',
+                sysctl net.ipv4.ip_forward=1
+                iptables -t nat -A POSTROUTING -o ${OUTER_INTERFACE} -j MASQUERADE
+                ''',
             env={'OUTER_INTERFACE': self.interfaces[outer_mac]})
 
     def can_reach(self, ip, timeout_sec=4):
