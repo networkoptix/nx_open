@@ -986,7 +986,7 @@ to view more bookmarks</source>
     <name>ExportSettingsDialog</name>
     <message>
       <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
-      <translation>Gekozen instellingen vereisen transcodering. Het verhoogt het CPU-gebruik en kan veel tijd in beslag nemen.</translation>
+      <translation>De gekozen instellingen vereisen transcodering. Het verhoogt de CPU belasting en kan veel tijd in beslag nemen.</translation>
     </message>
     <message>
       <source>AVI format is not recommended to export a non-continuous recording with audio track.</source>
@@ -8008,15 +8008,15 @@ to %1</source>
     </message>
     <message>
       <source>Selected format is not supported by FFMPEG library.</source>
-      <translation>Geselecteerde indeling wordt niet ondersteund door de FFMPEG bibliotheek.</translation>
+      <translation>De geselecteerde indeling wordt niet ondersteund door de FFMPEG library.</translation>
     </message>
     <message>
       <source>FFMPEG library error.</source>
-      <translation>FFMPEG bibliotheekfout.</translation>
+      <translation>FFMPEG library fout.</translation>
     </message>
     <message>
       <source>Video or audio codec is incompatible with selected format.</source>
-      <translation>Video- of audio codec is niet compatible met het geselecteerde formaat.</translation>
+      <translation>De video- of audio codec is niet compatible met het geselecteerde formaat.</translation>
     </message>
     <message>
       <source>File write error.</source>
@@ -8182,8 +8182,8 @@ to %1</source>
     <message numerus="yes">
       <source>For exporting as Rapid Review video length should be at least %n seconds.</source>
       <translation>
-        <numerusform>Voor export als Rapid Review moet de videolengte minstens %n seconden zijn.</numerusform>
-        <numerusform>Voor export als Rapid Review moet de videolengte minstens %n seconden zijn.</numerusform>
+        <numerusform>Als u wilt exporteren als een rapid review, moet de videolengte minstens %n seconden zijn.</numerusform>
+        <numerusform>Als u wilt exporteren als een rapid review, moet de videolengte minstens %n seconden zijn.</numerusform>
       </translation>
     </message>
   </context>

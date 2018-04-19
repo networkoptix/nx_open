@@ -2807,20 +2807,20 @@ to %1</source>
     <name>QnCloudResultMessages</name>
     <message>
       <source>Account not found</source>
-      <translation type="unfinished">Account not found</translation>
+      <translation>계정을 찾을 수 없습니다</translation>
     </message>
     <message>
       <source>Account is not activated.</source>
-      <translation type="unfinished">Account is not activated.</translation>
+      <translation>계정이 활성화되지 않았습니다.</translation>
     </message>
     <message>
       <source>Please log in to %1 and follow the provided instructions.</source>
       <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
-      <translation type="unfinished">Please log in to %1 and follow the provided instructions.</translation>
+      <translation>%1 에 로그인하고 제공된 지침을 따르십시오.</translation>
     </message>
     <message>
       <source>Invalid password</source>
-      <translation type="unfinished">Invalid password</translation>
+      <translation>잘못된 암호</translation>
     </message>
   </context>
   <context>
@@ -3159,7 +3159,7 @@ to %1</source>
     </message>
     <message>
       <source>Database Backup Files</source>
-      <translation type="unfinished">Database Backup Files</translation>
+      <translation>데이터베이스 백업 파일</translation>
     </message>
   </context>
   <context>
@@ -4179,7 +4179,7 @@ to %1</source>
     </message>
     <message>
       <source>All files</source>
-      <translation type="unfinished">All files</translation>
+      <translation>모든 파일</translation>
     </message>
   </context>
   <context>
@@ -5758,7 +5758,7 @@ to %1</source>
     </message>
     <message>
       <source>Update Files</source>
-      <translation type="unfinished">Update Files</translation>
+      <translation>업데이트 파일</translation>
     </message>
   </context>
   <context>
