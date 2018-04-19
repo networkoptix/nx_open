@@ -16,7 +16,6 @@
 #include <ui/style/helper.h>
 
 #include <ui/help/help_topics.h>
-#include <ui/help/help_handler.h>
 
 namespace nx {
 namespace client {

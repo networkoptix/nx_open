@@ -5,7 +5,7 @@
 #include <qpointer.h>
 #include <qscopedpointer.h>
 
-class QnHelpHandler;
+#include <ui/help/help_handler.h>
 
 namespace nx {
 namespace client {
