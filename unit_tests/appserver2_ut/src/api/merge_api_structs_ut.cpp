@@ -56,14 +56,14 @@ struct ApiMockInnerData
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((ApiMockInnerData), (ubjson)(json), _Fields)
 typedef std::vector<ApiMockInnerData> ApiMockInnerDataList;
 
-struct ApiMockData: ApiIdData
+struct ApiMockData: nx::vms::api::IdData
 {
-    ApiMockData(): ApiIdData(), i(666) {}
+    ApiMockData(): nx::vms::api::IdData(), i(666) {}
 
     ApiMockData(
         QnUuid _id, int _i, const ApiMockInnerData& _inner, const ApiMockInnerDataList& _array)
         :
-        ApiIdData(_id), i(_i), inner(_inner), array(_array)
+        nx::vms::api::IdData(_id), i(_i), inner(_inner), array(_array)
     {
     }
 
@@ -222,7 +222,7 @@ public:
         ASSERT_EQ(nx::network::http::StatusCode::ok, httpStatusCode);
 
         bool success = false;
-        ApiIdData apiIdData = QJson::deserialized(resultBody, ApiIdData(), &success);
+        nx::vms::api::IdData apiIdData = QJson::deserialized(resultBody, nx::vms::api::IdData(), &success);
         ASSERT_TRUE(success) << resultBody.toStdString();
         ASSERT_EQ(expectedData.id, apiIdData.id);
 

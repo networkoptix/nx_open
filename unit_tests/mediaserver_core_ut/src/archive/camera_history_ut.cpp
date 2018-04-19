@@ -10,7 +10,9 @@
 
 struct BuildHistoryDataAccess
 {
-    static ec2::ApiCameraHistoryItemDataList buildHistoryData(QnCameraHistoryRestHandler* handler, const MultiServerPeriodDataList& chunkPeriods)
+    static nx::vms::api::CameraHistoryItemDataList buildHistoryData(
+        QnCameraHistoryRestHandler* handler,
+        const MultiServerPeriodDataList& chunkPeriods)
     {
         return handler->buildHistoryData(chunkPeriods);
     }

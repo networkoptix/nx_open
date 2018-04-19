@@ -95,7 +95,7 @@ void convert(const ::ec2::ApiUserData& from, api::SystemSharing* const to)
     to->vmsUserId = from.id.toSimpleString().toStdString();
 }
 
-void convert(const api::SystemSharing& from, ::ec2::ApiIdData* const to)
+void convert(const api::SystemSharing& from, nx::vms::api::IdData* const to)
 {
     to->id = QnUuid(from.vmsUserId);
 }

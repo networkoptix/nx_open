@@ -7,7 +7,7 @@ namespace test {
 nx::utils::db::DBResult VmsP2pCommandBusStub::saveResourceAttribute(
     nx::utils::db::QueryContext* /*queryContext*/,
     const std::string& systemId,
-    ::ec2::ApiResourceParamWithRefData data)
+    nx::vms::api::ResourceParamWithRefData data)
 {
     if (m_onSaveResourceAttribute)
         return m_onSaveResourceAttribute(systemId, data);

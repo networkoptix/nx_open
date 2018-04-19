@@ -133,7 +133,7 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
         {
             camera->setMotionType(state.singleCameraSettings.enableMotionDetection()
                 ? camera->getDefaultMotionType()
-                : Qn::MT_NoMotion);
+                : Qn::MotionType::MT_NoMotion);
 
             camera->setMotionRegionList(state.singleCameraSettings.motionRegionList());
         }

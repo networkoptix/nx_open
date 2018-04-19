@@ -87,7 +87,7 @@ static QnIOStateDataList genTestData()
 
 static void prepareDbTestData(const MediaServerLauncher* const launcher)
 {
-    ec2::ApiCameraData cameraData;
+    nx::vms::api::CameraData cameraData;
     auto resTypeId = qnResTypePool->getResourceTypeId(
         QnTestCameraResource::kManufacturer,
         QnTestCameraResource::kModel);
@@ -97,7 +97,7 @@ static void prepareDbTestData(const MediaServerLauncher* const launcher)
     cameraData.parentId = launcher->commonModule()->moduleGUID();
     cameraData.vendor = QnTestCameraResource::kManufacturer;
     cameraData.physicalId = kTestCamPhysicalId;
-    cameraData.id = ec2::ApiCameraData::physicalIdToId(cameraData.physicalId);
+    cameraData.id = nx::vms::api::CameraData::physicalIdToId(cameraData.physicalId);
     NX_TEST_API_POST(launcher, lit("/ec2/saveCamera"), cameraData);
 }
 

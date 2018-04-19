@@ -21,7 +21,7 @@ void accessRoleToPermissions(
 
 void convert(const api::SystemSharing& from, ::ec2::ApiUserData* const to);
 void convert(const ::ec2::ApiUserData& from, api::SystemSharing* const to);
-void convert(const api::SystemSharing& from, ::ec2::ApiIdData* const to);
+void convert(const api::SystemSharing& from, nx::vms::api::IdData* const to);
 
 } // namespace ec2
 } // namespace cdb

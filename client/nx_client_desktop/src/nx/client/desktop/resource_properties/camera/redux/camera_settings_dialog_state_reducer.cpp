@@ -354,7 +354,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
         singleProperties.vendor = firstCamera->getVendor();
 
         singleProperties.hasMotionConstraints =
-            firstCamera->getDefaultMotionType() == Qn::MT_HardwareGrid;
+            firstCamera->getDefaultMotionType() == Qn::MotionType::MT_HardwareGrid;
 
         if (singleProperties.hasMotionConstraints)
         {
