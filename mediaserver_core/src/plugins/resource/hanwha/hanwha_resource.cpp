@@ -2972,7 +2972,8 @@ QnTimePeriodList HanwhaResource::getDtsTimePeriods(qint64 startTimeMs, qint64 en
     if (numberOfOverlappedIds != 1)
         return QnTimePeriodList();
 
-    return timeline.cbegin()->second;
+    QnTimePeriod period(startTimeMs, endTimeMs - startTimeMs);
+    return timeline.cbegin()->second.intersected(period);
 }
 
 QnConstResourceAudioLayoutPtr HanwhaResource::getAudioLayout(
