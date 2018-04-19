@@ -739,6 +739,8 @@ nx::network::http::RequestResult ConnectionManager::prepareOkResponseToCreateTra
             const auto& connectionByIdIndex = m_connections.get<kConnectionByIdIndex>();
             auto connectionIter = connectionByIdIndex.find(connectionId);
             NX_ASSERT(connectionIter != connectionByIdIndex.end());
+            if (connectionIter == connectionByIdIndex.end())
+                return;
 
             auto transactionTransport =
                 dynamic_cast<TransactionTransport*>(connectionIter->connection.get());
