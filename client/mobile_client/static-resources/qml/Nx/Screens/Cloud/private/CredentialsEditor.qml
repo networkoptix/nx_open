@@ -168,7 +168,7 @@ Item
 
             var caption = success
                 ? qsTr("Activation email sent")
-                : qsTr("Can't send activation email")
+                : qsTr("Cannot send activation email")
             var text = success
                 ? qsTr("Check your inbox and visit provided link to activate account")
                 : qsTr("Check your internet connection or try again later")
