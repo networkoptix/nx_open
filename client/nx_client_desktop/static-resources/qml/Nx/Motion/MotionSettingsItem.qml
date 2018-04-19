@@ -60,12 +60,14 @@ Rectangle
                     Math.min(x1, x2), Math.min(y1, y2), Math.abs(x2 - x1), Math.abs(y2 - y1))
 
                 signal selectionFinished()
+                signal singleClicked(real x, real y)
 
                 property int x1: 0
                 property int y1: 0
                 property int x2: 0
                 property int y2: 0
                 property bool selectionStarted: false
+                property bool movedSinceLastPress: false
 
                 function startSelection(x, y)
                 {
@@ -89,6 +91,7 @@ Rectangle
 
                 onPressed:
                 {
+                    movedSinceLastPress = false
                     if (mouse.button == Qt.LeftButton)
                         startSelection(mouse.x, mouse.y)
                     else if (mouse.button == Qt.RightButton)
@@ -100,13 +103,18 @@ Rectangle
                     if (selectionStarted && mouse.button == Qt.LeftButton)
                     {
                         continueSelection(mouse.x, mouse.y)
-                        selectionFinished()
+                        if (movedSinceLastPress)
+                            selectionFinished()
+                        else
+                            singleClicked(mouse.x, mouse.y)
+
                         stopSelection()
                     }
                 }
 
                 onPositionChanged:
                 {
+                    movedSinceLastPress = true
                     if (selectionStarted)
                         continueSelection(mouse.x, mouse.y)
                 }
@@ -159,7 +167,7 @@ Rectangle
 
                 function itemToMotionPoint(x, y)
                 {
-                    return Qt.vector2d(
+                    return Qt.point(
                         MathUtils.bound(0, Math.floor(x / motionCellSize.x), kMotionGridWidth - 1),
                         MathUtils.bound(0, Math.floor(y / motionCellSize.y), kMotionGridHeight - 1))
                 }
@@ -197,8 +205,25 @@ Rectangle
 
                         onSelectionFinished:
                         {
-                            if (selectionValid)
-                                motionRegions.userAddRect(currentSensitivity, selectionMotionRect)
+                            if (selectionValid && cameraMotionHelper)
+                            {
+                                cameraMotionHelper.addRect(index, currentSensitivity,
+                                    selectionMotionRect)
+                            }
+                        }
+
+                        onSingleClicked:
+                        {
+                            if (!cameraMotionHelper)
+                                return
+
+                            var point = motionRegions.mapFromItem(mouseArea, x, y)
+                            if (Geometry.contains(
+                                Qt.rect(0, 0, motionRegions.width, motionRegions.height), point))
+                            {
+                                var gridPoint = itemToMotionPoint(point.x, point.y)
+                                cameraMotionHelper.fillRegion(index, currentSensitivity, gridPoint)
+                            }
                         }
                     }
                 }

@@ -55,8 +55,6 @@ public:
     qreal fillOpacity() const;
     void setFillOpacity(qreal value);
 
-    Q_INVOKABLE void userAddRect(int sensitivity, const QRect& rect /*in motion grid coords*/);
-
     static void registerQmlType();
 
 signals:

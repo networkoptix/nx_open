@@ -79,11 +79,6 @@ void MotionRegionsItem::setFillOpacity(qreal value)
     d->setFillOpacity(value);
 }
 
-void MotionRegionsItem::userAddRect(int sensitivity, const QRect& rect /*in motion grid coords*/)
-{
-    d->userAddRect(sensitivity, rect);
-}
-
 void MotionRegionsItem::registerQmlType()
 {
     qmlRegisterType<MotionRegionsItem>("nx.client.desktop", 1, 0, "MotionRegions");
