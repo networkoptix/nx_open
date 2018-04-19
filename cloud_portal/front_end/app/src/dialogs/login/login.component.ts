@@ -1,14 +1,13 @@
-import {Component, Inject, OnInit, Input, ViewEncapsulation} from '@angular/core';
-import {Location} from '@angular/common';
-import {NgbModal, NgbActiveModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
-import {EmailValidator} from '@angular/forms';
+import { Component, Inject, OnInit, Input, ViewEncapsulation } from '@angular/core';
+import { Location }                                            from '@angular/common';
+import { NgbModal, NgbActiveModal, NgbModalRef }               from '@ng-bootstrap/ng-bootstrap';
+import { EmailValidator }                                      from '@angular/forms';
+import { TranslateService }                                    from '@ngx-translate/core';
 
 @Component({
     selector: 'ngbd-modal-content',
     templateUrl: 'login.component.html',
-    styleUrls: ['login.component.scss'],
-    // TODO: later
-    // templateUrl: 'translations/lang_ru_RU/views/dialogs/login.html'
+    styleUrls: ['login.component.scss']
 })
 export class LoginModalContent {
     @Input() auth;
@@ -17,19 +16,13 @@ export class LoginModalContent {
     @Input() cancellable;
     @Input() closable;
 
-    CONFIG: any;
-
     constructor(public activeModal: NgbActiveModal,
                 @Inject('account') private account: any,
-                @Inject('process') private process: any,
-                @Inject('configService') private configService: any,) {
-
-        this.CONFIG = configService.config;
-
-        console.log(this.CONFIG.viewsDir + 'dialogs/login.html');
+                @Inject('process') private process: any) {
     }
 
     ngOnInit() {
+
         this.login = this.process.init(() => {
             return this.account.login(this.auth.email, this.auth.password, this.auth.remember);
         }, {
@@ -70,7 +63,6 @@ export class NxModalLoginComponent implements OnInit {
     };
 
     constructor(@Inject('languageService') private language: any,
-
                 // @Inject('CONFIG') private CONFIG: any,
                 private location: Location,
                 private modalService: NgbModal) {

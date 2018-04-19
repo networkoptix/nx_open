@@ -9,13 +9,17 @@
 </div>
 
 <div class="modal-footer" *ngIf="hasFooter">
-    <button type="button" class="btn" [ngClass]="buttonClass" *ngIf="cancellable" (click)="activeModal.close()">
-        Close
+    <button type="button" class="btn"
+            [ngClass]="buttonClass" *ngIf="cancellable"
+            (click)="activeModal.close()"
+            translate>Close
     </button>
-    <button type="button" class="btn" [ngClass]="buttonClass" *ngIf="!cancellable" (click)="activeModal.ok()">
-        {{actionLabel}}
+    <button type="button" class="btn"
+            [ngClass]="buttonClass" *ngIf="!cancellable"
+            (click)="activeModal.ok()">{{actionLabel}}
     </button>
-    <button type="button" class="btn btn-default" *ngIf="!settings.cancellable" (click)="activeModal.cancel()">
-        {{cancelLabel}}
+    <button type="button" class="btn btn-default"
+            *ngIf="!settings.cancellable"
+            (click)="activeModal.cancel()">{{cancelLabel}}
     </button>
 </div>

@@ -13,12 +13,12 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@angular/core");
-const ng_bootstrap_1 = require("@ng-bootstrap/ng-bootstrap");
+const core_2 = require("@ngx-translate/core");
 let NxLanguageDropdown = class NxLanguageDropdown {
-    constructor(cloudApi, language, dropdown) {
+    constructor(cloudApi, language, translate) {
         this.cloudApi = cloudApi;
         this.language = language;
-        this.dropdown = dropdown;
+        this.translate = translate;
         this.activeLanguage = {
             language: '',
             name: ''
@@ -26,9 +26,14 @@ let NxLanguageDropdown = class NxLanguageDropdown {
         this.languages = [];
     }
     changeLanguage(lang) {
-        if (this.activeLanguage === lang) {
+        if (this.activeLanguage.language === lang) {
             return;
         }
+        /*  TODO: Currently this is not needed because the language file will
+            be loaded during page reload. Once we transfer everything to Angular 5
+            we should use this for seamless change of language
+            // this.translate.use(lang.replace('_', '-'));
+        */
         this.cloudApi
             .changeLanguage(lang)
             .then(function () {
@@ -41,8 +46,9 @@ let NxLanguageDropdown = class NxLanguageDropdown {
             .getLanguages()
             .then((data) => {
             this.languages = data.data;
+            const browserLang = this.translate.getBrowserCultureLang().replace('-', '_');
             this.activeLanguage = this.languages.find(lang => {
-                return (lang.language === this.language.lang.language);
+                return (lang.language === (this.language.lang.language || browserLang));
             });
             if (!this.activeLanguage) {
                 this.activeLanguage = this.languages[0];
@@ -59,7 +65,7 @@ NxLanguageDropdown = __decorate([
     }),
     __param(0, core_1.Inject('cloudApiService')),
     __param(1, core_1.Inject('languageService')),
-    __metadata("design:paramtypes", [Object, Object, ng_bootstrap_1.NgbDropdownModule])
+    __metadata("design:paramtypes", [Object, Object, core_2.TranslateService])
 ], NxLanguageDropdown);
 exports.NxLanguageDropdown = NxLanguageDropdown;
 //# sourceMappingURL=language.component.js.map

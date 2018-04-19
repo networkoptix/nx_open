@@ -1,4 +1,5 @@
 {
+  "language": "ru_RU",
   "language_name": "Русский",
   "productName": "{{PRODUCT_NAME}}",
   "clientProtocol": "{{CLIENT_PROTOCOL}}:",

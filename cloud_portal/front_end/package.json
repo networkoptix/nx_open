@@ -13,6 +13,8 @@
         "@angular/router": "^5.2.4",
         "@angular/upgrade": "^5.2.4",
         "@ng-bootstrap/ng-bootstrap": "^1.0.0",
+        "@ngx-translate/core": "^9.1.1",
+        "@ngx-translate/http-loader": "^2.0.1",
         "angular": "1.5.8",
         "angular-animate": "1.5.8",
         "angular-base64": "2.0.5",
@@ -37,6 +39,7 @@
         "md5": "2.2.1",
         "ng-toast": "1.5.6",
         "ngstorage": "0.3.11",
+        "ngx-cookie-service": "^1.0.10",
         "ngx-device-detector": "^1.2.2",
         "ngx-order-pipe": "^2.0.1",
         "popper.js": "^1.14.0",
@@ -52,6 +55,7 @@
     "devDependencies": {
         "@angular/cli": "^1.7.2",
         "@angular/compiler-cli": "^5.2.9",
+        "@biesbjerg/ngx-translate-extract": "git+https://github.com/tsanko/ngx-translate-extract.git",
         "@types/angular": "^1.5.8",
         "@types/angular-animate": "^1.5.8",
         "@types/angular-cookies": "^1.4.5",
@@ -89,11 +93,11 @@
         "raw-loader": "0.5.1",
         "sass-loader": "^6.0.6",
         "script-ext-html-webpack-plugin": "^1.8.8",
+        "selenium-standalone": "^6.5.0",
         "source-map-loader": "^0.2.3",
         "string-replace-loader": "~2.1.1",
         "style-loader": "^0.20.3",
         "to-string-loader": "^1.1.5",
-        "selenium-standalone": "^6.5.0",
         "typescript": "^2.7.1",
         "uglifyjs-webpack-plugin": "^1.0.1",
         "url-loader": "^0.6.2",
@@ -113,6 +117,8 @@
         "start": "webpack-dev-server --config webpack.dev.js --hot --inline",
         "serve": "webpack-dev-server --config webpack.dev.js --open",
         "build": "webpack --config webpack.prod.js --progress --profile --bail",
-        "setSkin": "node setSkin.js --skin"
+        "setSkin": "node setSkin.js --skin",
+        "extract": "ngx-translate-extract --input ./app/src --output ./app/src/assets/i18n/ --clean --sort --format namespaced-json",
+        "update-lang": "ngx-translate-extract -i ./app/src -o ./app/assets/i18n/*.json"
     }
 }

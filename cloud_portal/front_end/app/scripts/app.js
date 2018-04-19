@@ -82,15 +82,12 @@ window.L = {};
                     dataType: 'json'
                 })
                     .done(function (response) {
-                        console.log(response);
+                        console.log('set:',response);
                         languageServiceProvider.setLanguage(response);// Set current language
 
                         // set local variables as providers cannot get values in config phase
                         appState.viewsDir = 'static/lang_' + response.language + '/views/'; //'static/lang_' + lang + '/views/';
                         appState.viewsDirCommon = 'static/lang_' + response.language + '/web_common/views/';
-
-                        console.log(appState);
-                        console.log(response.language);
 
                         // detect preview mode
                         var preview = window.location.href.indexOf('preview') >= 0;
@@ -100,8 +97,8 @@ window.L = {};
                             appState.previewPath = 'preview';
                         }
                     })
-                    .fail(function () {
-                        //console.log(error);
+                    .fail(function (error) {
+                        console.log('error:',error);
                         // Fallback to default language
                         $.ajax({
                             url: 'static/language.json',
@@ -109,6 +106,7 @@ window.L = {};
                             dataType: 'json'
                         })
                             .done(function (response) {
+                                console.log('fallback:',response);
                                 languageServiceProvider.setLanguage(response);
 
                                 $.ajax({

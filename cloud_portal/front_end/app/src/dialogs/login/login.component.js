@@ -16,13 +16,10 @@ const core_1 = require("@angular/core");
 const common_1 = require("@angular/common");
 const ng_bootstrap_1 = require("@ng-bootstrap/ng-bootstrap");
 let LoginModalContent = class LoginModalContent {
-    constructor(activeModal, account, process, configService) {
+    constructor(activeModal, account, process) {
         this.activeModal = activeModal;
         this.account = account;
         this.process = process;
-        this.configService = configService;
-        this.CONFIG = configService.config;
-        console.log(this.CONFIG.viewsDir + 'dialogs/login.html');
     }
     ngOnInit() {
         this.login = this.process.init(() => {
@@ -72,12 +69,11 @@ LoginModalContent = __decorate([
     core_1.Component({
         selector: 'ngbd-modal-content',
         templateUrl: 'login.component.html',
-        styleUrls: ['login.component.scss'],
+        styleUrls: ['login.component.scss']
     }),
     __param(1, core_1.Inject('account')),
     __param(2, core_1.Inject('process')),
-    __param(3, core_1.Inject('configService')),
-    __metadata("design:paramtypes", [ng_bootstrap_1.NgbActiveModal, Object, Object, Object])
+    __metadata("design:paramtypes", [ng_bootstrap_1.NgbActiveModal, Object, Object])
 ], LoginModalContent);
 exports.LoginModalContent = LoginModalContent;
 let NxModalLoginComponent = class NxModalLoginComponent {

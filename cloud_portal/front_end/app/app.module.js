@@ -18,6 +18,9 @@ const ng_bootstrap_1 = require("@ng-bootstrap/ng-bootstrap");
 const ng_bootstrap_2 = require("@ng-bootstrap/ng-bootstrap");
 const ngx_order_pipe_1 = require("ngx-order-pipe");
 const ngx_device_detector_1 = require("ngx-device-detector");
+const core_2 = require("@ngx-translate/core");
+const http_loader_1 = require("@ngx-translate/http-loader");
+const ngx_cookie_service_1 = require("ngx-cookie-service");
 const index_1 = require("./src/core/index");
 const ajs_upgraded_providers_1 = require("./ajs-upgraded-providers");
 const ajs_upgraded_providers_2 = require("./ajs-upgraded-providers");
@@ -37,6 +40,11 @@ const login_component_1 = require("./src/dialogs/login/login.component");
 const process_button_component_1 = require("./src/components/process-button/process-button.component");
 const dialogs_service_1 = require("./src/dialogs/dialogs.service");
 const general_component_1 = require("./src/dialogs/general/general.component");
+// AoT requires an exported function for factories
+function createTranslateLoader(http) {
+    return new http_loader_1.TranslateHttpLoader(http, './assets/i18n/', '.json');
+}
+exports.createTranslateLoader = createTranslateLoader;
 class HybridUrlHandlingStrategy {
     shouldProcessUrl(url) {
         return url.toString().startsWith('/bar') ||
@@ -78,6 +86,13 @@ AppModule = __decorate([
             ajs_upgraded_providers_8.configServiceModule,
             ajs_upgraded_providers_9.authorizationCheckServiceModule,
             dropdowns_module_1.DropdownsModule,
+            core_2.TranslateModule.forRoot({
+                loader: {
+                    provide: core_2.TranslateLoader,
+                    useFactory: (createTranslateLoader),
+                    deps: [http_1.HttpClient]
+                }
+            }),
             ngx_device_detector_1.DeviceDetectorModule.forRoot(),
             ng_bootstrap_1.NgbModule.forRoot(),
             router_1.RouterModule.forRoot([], { initialNavigation: false })
@@ -92,6 +107,7 @@ AppModule = __decorate([
         providers: [
             ng_bootstrap_2.NgbModal,
             common_1.Location,
+            ngx_cookie_service_1.CookieService,
             { provide: common_1.LocationStrategy, useClass: common_1.PathLocationStrategy },
             { provide: router_1.UrlHandlingStrategy, useClass: HybridUrlHandlingStrategy },
             // {provide: '$scope', useFactory: i => i.get('$rootScope'), deps: ['$injector']},

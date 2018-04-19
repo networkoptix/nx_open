@@ -5,27 +5,25 @@
     <small>PUBLISHED {{release.date}}</small>
 </h1>
 <div *ngIf="release.releaseNotes">
-    <h4>
-        Release Notes
-    </h4>
+    <h4 translate>Release Notes</h4>
     <div [innerHTML]="release.releaseNotes"></div>
 </div>
 
-<h4>In-Client Upgrade:</h4>
+<h4 translate>In-Client Upgrade:</h4>
 <table>
     <tr>
-        <td>Build Number:</td>
+        <td translate>Build Number:</td>
         <td>&nbsp;</td>
         <td><b>{{release.buildNumber}}</b></td>
     </tr>
     <tr>
-        <td>Password:</td>
+        <td translate>Password:</td>
         <td>&nbsp;</td>
         <td><b>{{release.password}}</b></td>
     </tr>
 </table>
 
-<h4>Download Links:</h4>
+<h4 translate>Download Links:</h4>
 <div *ngFor="let platform of release.platforms" #card>
     <h4>
         <a href (click)="card.expanded = !card.expanded; false">

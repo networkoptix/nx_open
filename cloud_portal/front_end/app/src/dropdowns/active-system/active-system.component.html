@@ -10,10 +10,10 @@
         <div class="arrow up"></div>
 
         <li *ngIf="activeSystem" [ngClass]="{ 'active' :active.settings}">
-            <a [href]="'/systems/' + activeSystem.id">Settings</a>
+            <a [href]="'/systems/' + activeSystem.id" translate>Settings</a>
         </li>
         <li ng-if="activeSystem" [ngClass]="{ 'active' :active.view }">
-            <a [href]="'/systems/' + activeSystem.id + '/view'">View</a>
+            <a [href]="'/systems/' + activeSystem.id + '/view'" translate>View</a>
         </li>
     </ul>
 </div>

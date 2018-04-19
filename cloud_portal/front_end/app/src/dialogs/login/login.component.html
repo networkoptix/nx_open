@@ -1,7 +1,7 @@
 <form #loginForm="ngForm" novalidate>
 
     <div class="modal-header">
-        <h1 class="modal-title">{{language.lang.dialogs.loginTitle}}</h1>
+        <h1 class="modal-title" translate>Log in to %PRODUCT_NAME%</h1>
         <button type="button" class="close"
                 data-dismiss="modal" aria-label="Close"
                 (click)="activeModal.close()" *ngIf="closable"><span class="close-icon"></span></button>
@@ -9,7 +9,7 @@
 
     <div class="modal-body">
         <div class="form-group">
-            <label for="email">Email</label>
+            <label for="email" translate>Email</label>
             <input type="email" class="form-control"
                    id="email" name="email"
                    [(ngModel)]="auth.email"
@@ -17,7 +17,7 @@
                    required autofocus>
         </div>
         <div class="form-group">
-            <label for="password">Password</label>
+            <label for="password" translate>Password</label>
             <input type="password" class="form-control"
                    name="password" id="password"
                    [(ngModel)]="auth.password"
@@ -25,7 +25,7 @@
                    required>
         </div>
         <div>
-            <label class="checkbox">Remember me
+            <label class="checkbox" translate>Remember me
                 <input type="checkbox" checked="checked"
                        [(ngModel)]="auth.remember"
                        name="remember"
@@ -35,11 +35,11 @@
         </div>
     </div>
     <div class="modal-footer">
-        <nx-process-button [buttonText]="language.lang.dialogs.loginButton"
+        <nx-process-button buttonText="{{ 'Log in' | translate }}"
                            [form]="loginForm"
                            [process]="login">
         </nx-process-button>
 
-        <a href="/restore_password" (click)="activeModal.close()" class="form-control-static">Forgot password?</a>
+        <a href="/restore_password" (click)="activeModal.close()" class="form-control-static" translate>Forgot password?</a>
     </div>
 </form>

@@ -1,5 +1,6 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { NgbDropdownModule }         from '@ng-bootstrap/ng-bootstrap';
+import { TranslateService }          from "@ngx-translate/core";
 
 export interface activeLanguage {
     language: string;
@@ -23,13 +24,19 @@ export class NxLanguageDropdown implements OnInit {
 
     constructor(@Inject('cloudApiService') private cloudApi: any,
                 @Inject('languageService') private language: any,
-                private dropdown: NgbDropdownModule) {
+                private translate: TranslateService) {
     }
 
-    changeLanguage(lang: activeLanguage) {
-        if (this.activeLanguage === lang) {
+    changeLanguage(lang: string) {
+        if (this.activeLanguage.language === lang) {
             return;
         }
+
+        /*  TODO: Currently this is not needed because the language file will
+            be loaded during page reload. Once we transfer everything to Angular 5
+            we should use this for seamless change of language
+            // this.translate.use(lang.replace('_', '-'));
+        */
 
         this.cloudApi
             .changeLanguage(lang)
@@ -46,8 +53,10 @@ export class NxLanguageDropdown implements OnInit {
             .then((data: any) => {
                 this.languages = data.data;
 
+                const browserLang = this.translate.getBrowserCultureLang().replace('-','_');
+
                 this.activeLanguage = this.languages.find(lang => {
-                    return (lang.language === this.language.lang.language);
+                    return (lang.language === (this.language.lang.language || browserLang));
                 });
 
                 if (!this.activeLanguage) {

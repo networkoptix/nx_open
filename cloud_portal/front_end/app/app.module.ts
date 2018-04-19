@@ -4,14 +4,17 @@ import { BrowserModule }                                                  from '
 import { BrowserAnimationsModule }                                        from '@angular/platform-browser/animations';
 import { downgradeComponent, downgradeInjectable, UpgradeModule }         from '@angular/upgrade/static';
 import { RouterModule, UrlHandlingStrategy, UrlTree }                     from '@angular/router';
-import { HttpClientModule }                                               from '@angular/common/http';
+import { HttpClient, HttpClientModule }                                   from '@angular/common/http';
 
 import { FormsModule } from '@angular/forms';
 
-import { NgbModule }            from '@ng-bootstrap/ng-bootstrap';
-import { NgbModal }             from '@ng-bootstrap/ng-bootstrap';
-import { OrderModule }          from 'ngx-order-pipe';
-import { DeviceDetectorModule } from 'ngx-device-detector';
+import { NgbModule }                        from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal }                         from '@ng-bootstrap/ng-bootstrap';
+import { OrderModule }                      from 'ngx-order-pipe';
+import { DeviceDetectorModule }             from 'ngx-device-detector';
+import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
+import { TranslateHttpLoader }              from '@ngx-translate/http-loader';
+import { CookieService }                    from "ngx-cookie-service";
 
 import { CoreModule }                      from './src/core/index';
 import { cloudApiServiceModule }           from './ajs-upgraded-providers';
@@ -33,6 +36,11 @@ import { NxModalLoginComponent, LoginModalContent }     from "./src/dialogs/logi
 import { NxProcessButtonComponent }                     from './src/components/process-button/process-button.component';
 import { nxDialogsService }                             from "./src/dialogs/dialogs.service";
 import { GeneralModalContent, NxModalGeneralComponent } from "./src/dialogs/general/general.component";
+
+// AoT requires an exported function for factories
+export function createTranslateLoader(http: HttpClient) {
+    return new TranslateHttpLoader(http, './assets/i18n/', '.json');
+}
 
 class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
     shouldProcessUrl(url: UrlTree) {
@@ -74,6 +82,13 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
         authorizationCheckServiceModule,
         DropdownsModule,
 
+        TranslateModule.forRoot({
+            loader: {
+                provide: TranslateLoader,
+                useFactory: (createTranslateLoader),
+                deps: [HttpClient]
+            }
+        }),
         DeviceDetectorModule.forRoot(),
         NgbModule.forRoot(),
         RouterModule.forRoot([], {initialNavigation: false})
@@ -88,6 +103,7 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
     providers: [
         NgbModal,
         Location,
+        CookieService,
         {provide: LocationStrategy, useClass: PathLocationStrategy},
         {provide: UrlHandlingStrategy, useClass: HybridUrlHandlingStrategy},
         // {provide: '$scope', useFactory: i => i.get('$rootScope'), deps: ['$injector']},

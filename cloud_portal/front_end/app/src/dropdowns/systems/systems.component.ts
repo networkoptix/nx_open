@@ -25,7 +25,7 @@ export class NxSystemsDropdown implements OnInit, OnDestroy, OnChanges {
     constructor(@Inject('languageService') private language: any,
                 @Inject('configService') private config: any,
                 private location: Location,
-                private route: ActivatedRoute,) {
+                private route: ActivatedRoute) {
     }
 
     private isActive(val) {

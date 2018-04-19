@@ -5,7 +5,7 @@
             id="systemsDropdown"
             ngbDropdownToggle>
         <span [ngClass]="{'hidden-expanded':!activeSystem}" class="glyphicon glyphicon-home"></span>
-        <span class="ellipsis">{{activeSystem ? activeSystem.name : systemCounter + ' ' + language.lang.header.systems}}</span>
+        <span class="ellipsis">{{activeSystem ? activeSystem.name : systemCounter}}&nbsp;<span translate>Systems</span></span>
         <div class="arrow down d-none d-md-block"></div>
     </button>
 
@@ -27,7 +27,7 @@
         </li>
         <li role="separator" class="dropdown-divider"></li>
         <li>
-            <a [href]="'/systems'">{{language.lang.header.allSystems}}</a>
+            <a [href]="'/systems'" translate>All Systems</a>
         </li>
     </ul>
 </div>
