@@ -192,6 +192,10 @@ if(withMediaServer)
     add_subdirectory(storage_plugins)
     add_subdirectory(nx_system_commands)
 
+    if (withMediaDbUtil)
+        add_subdirectory(media_db_util)
+    endif()
+
     if(LINUX AND box MATCHES "none|tx1")
         add_subdirectory(root_tool)
     endif()
