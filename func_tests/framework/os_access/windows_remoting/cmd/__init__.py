@@ -94,7 +94,7 @@ def receive_stdout_and_stderr_until_done(command):
         stdout_chunk, stderr_chunk = command.receive_stdout_and_stderr()
         stdout += stdout_chunk
         stderr += stderr_chunk
-    return stdout, stderr
+    return bytes(stdout), bytes(stderr)
 
 
 def run_command(shell, arguments, stdin_bytes=None):
