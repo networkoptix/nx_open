@@ -10,8 +10,8 @@
 
 namespace {
 
-const QString kDefaultPrimaryUrlsList(QLatin1String("http://www.mypublicip.com;http://checkip.eurodyndns.org"));
-const QString kDefaultSecondaryUrlsList(QLatin1String("http://networkoptix.com/myip"));
+const QString kDefaultPrimaryUrlsList(QLatin1String("http://tools.vmsproxy.com/myip"));
+const QString kDefaultSecondaryUrlsList(QLatin1String("http://tools-eu.vmsproxy.com/myip"));
 const int kRequestTimeoutMs = 10 * 1000;
 const QLatin1String kIpRegExprValue("[^a-zA-Z0-9\\.](([0-9]){1,3}\\.){3}([0-9]){1,3}[^a-zA-Z0-9\\.]");
 
@@ -124,7 +124,7 @@ void PublicIPDiscovery::handleReply(const nx_http::AsyncHttpClientPtr& httpClien
     const QRegExp ipRegExpr(kIpRegExprValue);
 
     /* Check if reply contents contain any ip address. */
-    QByteArray response = 
+    QByteArray response =
         QByteArray(" ") + httpClient->fetchMessageBodyBuffer() + QByteArray(" ");
     const int ipPos = ipRegExpr.indexIn(QString::fromUtf8(response));
     if (ipPos < 0)
