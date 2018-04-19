@@ -23,14 +23,14 @@
 #include <utils/media/frame_info.h>
 #include <nx/utils/log/log_main.h>
 
-namespace
-{
-    QString urlPath;
-}
+namespace {
 
-QnMultiserverThumbnailRestHandler::QnMultiserverThumbnailRestHandler( const QString& path )
+static QString urlPath;
+
+} // namespace
+
+QnMultiserverThumbnailRestHandler::QnMultiserverThumbnailRestHandler(const QString& path)
 {
-    // todo: remove this variable
     if (!path.isEmpty())
         urlPath = path;
 }
@@ -85,23 +85,23 @@ int QnMultiserverThumbnailRestHandler::getScreenshot(
     if (imageRequest.camera && !imageRequest.camera->hasVideo(nullptr))
     {
         return makeError(
-            nx_http::StatusCode::badRequest
-            , lit("Camera has no video")
-            , &result
-            , &contentType
-            , request.format
-            , request.extraFormatting);
+            nx_http::StatusCode::badRequest,
+            lit("Camera has no video"),
+            &result,
+            &contentType,
+            request.format,
+            request.extraFormatting);
     }
 
     if (const auto error = request.getError())
     {
         return makeError(
-            nx_http::StatusCode::badRequest
-            , lit("Invalid request: ") + *error
-            , &result
-            , &contentType
-            , request.format
-            , request.extraFormatting);
+            nx_http::StatusCode::badRequest,
+            lit("Invalid request: ") + *error,
+            &result,
+            &contentType,
+            request.format,
+            request.extraFormatting);
     }
 
     auto server = targetServer(commonModule, request);
@@ -167,7 +167,7 @@ int QnMultiserverThumbnailRestHandler::getThumbnailLocal( const QnThumbnailReque
     }
     else
     {
-        // prepare image using QT
+        // Prepare image using Qt.
         QImage image = outFrame->toImage();
         QBuffer output(&result);
         image.save(&output, imageFormat);
@@ -221,8 +221,11 @@ static DownloadResult downloadImage(
     //[&] (SystemError::ErrorCode osStatus, int httpStatus, const nx_http::Response& response)
 
     auto requestCompletionFunc =
-        [&l_result = result, &l_context = context](SystemError::ErrorCode osStatus, int httpStatus,
-            nx_http::BufferType buffer, nx_http::HttpHeaders httpHeaders)
+        [&l_result = result, &l_context = context](
+            SystemError::ErrorCode osStatus,
+            int httpStatus,
+            nx_http::BufferType buffer,
+            nx_http::HttpHeaders httpHeaders)
         {
             l_result.osStatus = osStatus;
             l_result.httpStatus = (nx_http::StatusCode::Value) httpStatus;
