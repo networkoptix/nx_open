@@ -79,7 +79,7 @@ bool ExportScheduleResourceSelectionDialogDelegate::validate(const QSet<QnUuid>&
     {
         foreach(const QnVirtualCameraResourcePtr &camera, cameras)
         {
-            bool hasMotion = (camera->getMotionType() != Qn::MT_NoMotion);
+            bool hasMotion = (camera->getMotionType() != Qn::MotionType::MT_NoMotion);
             if (!hasMotion)
             {
                 motionOk = false;

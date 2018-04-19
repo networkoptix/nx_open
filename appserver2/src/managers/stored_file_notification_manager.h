@@ -1,7 +1,7 @@
 #pragma once
 
 #include "nx_ec/ec_api.h"
-#include "nx_ec/data/api_stored_file_data.h"
+#include <nx/vms/api/data/stored_file_data.h>
 #include "transaction/transaction.h"
 
 namespace ec2
@@ -12,8 +12,12 @@ class QnStoredFileNotificationManager : public AbstractStoredFileNotificationMan
 public:
     QnStoredFileNotificationManager();
 
-    void triggerNotification(const QnTransaction<ApiStoredFileData>& tran, NotificationSource /*source*/);
-    void triggerNotification(const QnTransaction<ApiStoredFilePath>& tran, NotificationSource /*source*/);
+    void triggerNotification(
+        const QnTransaction<nx::vms::api::StoredFileData>& tran,
+        NotificationSource /*source*/);
+    void triggerNotification(
+        const QnTransaction<nx::vms::api::StoredFilePath>& tran,
+        NotificationSource /*source*/);
 };
 
 typedef std::shared_ptr<QnStoredFileNotificationManager> QnStoredFileNotificationManagerPtr;

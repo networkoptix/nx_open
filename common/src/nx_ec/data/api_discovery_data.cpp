@@ -12,7 +12,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (ApiDiscoveryData)(ApiDiscoverPeerData), (ubjson)(xml)(json)(sql_record)(csv_record), _Fields)
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (ApiDiscoveredServerData), (ubjson)(xml)(json), _Fields)
+    (ApiDiscoveredServerData), (ubjson)(json), _Fields)
 
 std::vector<ApiDiscoveredServerData> getServers(nx::vms::discovery::Manager* manager)
 {
@@ -32,18 +32,15 @@ ApiDiscoveredServerData makeServer(
     serverData.setEndpoints(std::vector<nx::network::SocketAddress>{module.endpoint});
     if (QnConnectionValidator::validateConnection(module) != Qn::SuccessConnectionResult)
     {
-        serverData.status = Qn::ResourceStatus::Incompatible;
+        serverData.status = nx::vms::api::ResourceStatus::incompatible;
     }
     else
     {
         serverData.status = (!localSystemId.isNull() && module.localSystemId == localSystemId)
-            ? Qn::ResourceStatus::Online
-            : Qn::ResourceStatus::Unauthorized;
+            ? nx::vms::api::ResourceStatus::online
+            : nx::vms::api::ResourceStatus::unauthorized;
     }
 
     return serverData;
 }
 } // namespace ec2
-
-void serialize_field(const ec2::ApiDiscoveredServerData &, QVariant *) { return; }
-void deserialize_field(const QVariant &, ec2::ApiDiscoveredServerData *) { return; }

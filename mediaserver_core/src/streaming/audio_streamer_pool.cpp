@@ -165,7 +165,7 @@ QnAbstractStreamDataProviderPtr QnAudioStreamerPool::getActionDataProvider(const
         return m_actionDataProviders[actionKey];
 
     QnAbstractStreamDataProviderPtr provider;
-    if (type == nx::vms::event::playSoundAction)
+    if (type == nx::vms::api::ActionType::playSoundAction)
     {
         const auto filePath = lit("dbfile://notifications/") + params.url;
         QnAviResourcePtr resource(new QnAviResource(filePath));

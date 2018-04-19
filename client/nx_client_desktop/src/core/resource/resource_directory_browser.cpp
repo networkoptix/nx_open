@@ -25,7 +25,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/layout_resource.h>
 
-#include <nx_ec/data/api_layout_data.h>
+#include <nx/vms/api/data/layout_data.h>
 #include <nx_ec/data/api_conversion_functions.h>
 
 #include <client/client_globals.h>
@@ -238,10 +238,10 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& fi
     layoutFile.reset();
 
     QnLayoutResourcePtr layout(new QnLayoutResource());
-    ec2::ApiLayoutData apiLayout;
+    nx::vms::api::LayoutData apiLayout;
     if (!QJson::deserialize(layoutData, &apiLayout))
     {
-        QnProto::Message<ec2::ApiLayoutData> apiLayoutMessage;
+        QnProto::Message<nx::vms::api::LayoutData> apiLayoutMessage;
         if (!QnProto::deserialize(layoutData, &apiLayoutMessage))
         {
             return QnLayoutResourcePtr();
@@ -252,13 +252,13 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& fi
         }
     }
 
-    fromApiToResource(apiLayout, layout);
+    ec2::fromApiToResource(apiLayout, layout);
 
     QnLayoutItemDataList orderedItems;
-    foreach(const ec2::ApiLayoutItemData& item, apiLayout.items)
+    foreach(const auto& item, apiLayout.items)
     {
         orderedItems << QnLayoutItemData();
-        fromApiToResource(item, orderedItems.last());
+        ec2::fromApiToResource(item, orderedItems.last());
     }
 
     QnUuid layoutId = guidFromArbitraryData(layoutUrl);

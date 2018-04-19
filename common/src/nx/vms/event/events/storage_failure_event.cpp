@@ -11,7 +11,7 @@ StorageFailureEvent::StorageFailureEvent(
     EventReason reasonCode,
     const QString& storageUrl)
     :
-    base_type(storageFailureEvent, resource, timeStamp, reasonCode, storageUrl)
+    base_type(EventType::storageFailureEvent, resource, timeStamp, reasonCode, storageUrl)
 {
 }
 

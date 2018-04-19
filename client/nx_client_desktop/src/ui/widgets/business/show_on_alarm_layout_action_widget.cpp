@@ -59,8 +59,8 @@ void QnShowOnAlarmLayoutActionWidget::at_model_dataChanged(Fields fields)
 
     if (fields.testFlag(Field::eventType))
     {
-        const bool canUseSource = (model()->eventType() >= vms::event::userDefinedEvent
-            || requiresCameraResource(model()->eventType()));
+        const bool canUseSource = (model()->eventType() >= vms::api::EventType::userDefinedEvent
+            || vms::event::requiresCameraResource(model()->eventType()));
         ui->useSourceCheckBox->setEnabled(canUseSource);
     }
 }

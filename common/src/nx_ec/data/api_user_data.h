@@ -9,7 +9,7 @@
 
 namespace ec2 {
 
-struct ApiUserData: ApiResourceData
+struct ApiUserData: nx::vms::api::ResourceData
 {
     static constexpr const char* kCloudPasswordStub = "password_is_in_cloud";
 
@@ -26,7 +26,7 @@ struct ApiUserData: ApiResourceData
     }
 
     /**
-     * See fillId() in ApiIdData.
+     * See fillId() in IdData.
      */
     void fillId()
     {
@@ -68,10 +68,8 @@ struct ApiUserData: ApiResourceData
 
     /** Full user name. */
     QString fullName;
-
-    bool operator==(const ApiUserData& rhs) const;
 };
-#define ApiUserData_Fields ApiResourceData_Fields \
+#define ApiUserData_Fields ResourceData_Fields \
     (isAdmin) \
     (permissions) \
     (email) \

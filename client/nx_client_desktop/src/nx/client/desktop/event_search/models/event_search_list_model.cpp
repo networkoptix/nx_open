@@ -11,19 +11,19 @@ EventSearchListModel::EventSearchListModel(QObject* parent):
 {
 }
 
-vms::event::EventType EventSearchListModel::selectedEventType() const
+vms::api::EventType EventSearchListModel::selectedEventType() const
 {
     return d->selectedEventType();
 }
 
-void EventSearchListModel::setSelectedEventType(vms::event::EventType value)
+void EventSearchListModel::setSelectedEventType(vms::api::EventType value)
 {
     d->setSelectedEventType(value);
 }
 
 bool EventSearchListModel::isConstrained() const
 {
-    return selectedEventType() != vms::event::undefinedEvent
+    return selectedEventType() != vms::api::undefinedEvent
         || base_type::isConstrained();
 }
 

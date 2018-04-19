@@ -337,7 +337,7 @@ void AuthenticationProvider::generateUpdateUserAuthInfoTransaction(
     const std::string& vmsUserId,
     const api::AuthInfo& userAuthenticationRecords)
 {
-    ::ec2::ApiResourceParamWithRefData userAuthenticationInfoAttribute;
+    nx::vms::api::ResourceParamWithRefData userAuthenticationInfoAttribute;
     userAuthenticationInfoAttribute.name = api::kVmsUserAuthInfoAttributeName;
     userAuthenticationInfoAttribute.resourceId =
         QnUuid::fromStringSafe(vmsUserId.c_str());

@@ -15,19 +15,19 @@ public:
     {
         switch (value)
         {
-            case Qn::QualityLowest:
+            case Qn::StreamQuality::lowest:
                 return tr("Lowest");
-            case Qn::QualityLow:
+            case Qn::StreamQuality::low:
                 return tr("Low");
-            case Qn::QualityNormal:
+            case Qn::StreamQuality::normal:
                 return tr("Medium");
-            case Qn::QualityHigh:
+            case Qn::StreamQuality::high:
                 return tr("High");
-            case Qn::QualityHighest:
+            case Qn::StreamQuality::highest:
                 return tr("Best");
-            case Qn::QualityPreSet:
+            case Qn::StreamQuality::preset:
                 return tr("Preset");
-            case Qn::QualityNotDefined:
+            case Qn::StreamQuality::undefined:
                 return tr("Undefined");
             default:
                 return QString();
@@ -39,25 +39,25 @@ public:
         /* Note that '//:' are comments for translators. */
         switch (value)
         {
-            case Qn::QualityLowest:
+            case Qn::StreamQuality::lowest:
                 //: Short for 'Lowest'
                 return tr("Lst");
-            case Qn::QualityLow:
+            case Qn::StreamQuality::low:
                 //: Short for 'Low'
                 return tr("Lo");
-            case Qn::QualityNormal:
+            case Qn::StreamQuality::normal:
                 //: Short for 'Medium'
                 return tr("Me");
-            case Qn::QualityHigh:
+            case Qn::StreamQuality::high:
                 //: Short for 'High'
                 return tr("Hi");
-            case Qn::QualityHighest:
+            case Qn::StreamQuality::highest:
                 //: Short for 'Best'
                 return tr("Bst");
-            case Qn::QualityPreSet:
+            case Qn::StreamQuality::preset:
                 //: Short for 'Preset'
                 return tr("Ps");
-            case Qn::QualityNotDefined:
+            case Qn::StreamQuality::undefined:
                 return lit("-");
             default:
 

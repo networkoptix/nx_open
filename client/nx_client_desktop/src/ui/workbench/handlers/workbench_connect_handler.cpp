@@ -214,9 +214,9 @@ void storeLocalSystemConnection(
     qnSettings->save();
 }
 
-ec2::ApiClientInfoData clientInfo()
+nx::vms::api::ClientInfoData clientInfo()
 {
-    ec2::ApiClientInfoData clientData;
+    nx::vms::api::ClientInfoData clientData;
     clientData.id = qnSettings->pcUuid();
     clientData.fullVersion = nx::utils::AppInfo::applicationFullVersion();
     clientData.systemInfo = QnSystemInformation::currentSystemInformation().toString();

@@ -98,7 +98,7 @@ qint32 getResourceInternalId(
  */
 bool insertOrReplaceResource(
     QueryContext* context,
-    const ApiResourceData& data,
+    const nx::vms::api::ResourceData& data,
     qint32* internalId);
 
 /**

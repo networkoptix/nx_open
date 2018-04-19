@@ -43,12 +43,12 @@ void QnResourceTreeModelLayoutToursNode::deinitialize()
     base_type::deinitialize();
 }
 
-void QnResourceTreeModelLayoutToursNode::handleTourAdded(const ec2::ApiLayoutTourData& tour)
+void QnResourceTreeModelLayoutToursNode::handleTourAdded(const nx::vms::api::LayoutTourData& tour)
 {
     ensureLayoutTourNode(tour);
 }
 
-void QnResourceTreeModelLayoutToursNode::handleTourChanged(const ec2::ApiLayoutTourData& tour)
+void QnResourceTreeModelLayoutToursNode::handleTourChanged(const nx::vms::api::LayoutTourData& tour)
 {
     ensureLayoutTourNode(tour)->update();
 }
@@ -59,7 +59,7 @@ void QnResourceTreeModelLayoutToursNode::handleTourRemoved(const QnUuid& tourId)
 }
 
 QnResourceTreeModelNodePtr QnResourceTreeModelLayoutToursNode::ensureLayoutTourNode(
-    const ec2::ApiLayoutTourData& tour)
+    const nx::vms::api::LayoutTourData& tour)
 {
     auto iter = m_nodes.find(tour.id);
     if (iter == m_nodes.end())

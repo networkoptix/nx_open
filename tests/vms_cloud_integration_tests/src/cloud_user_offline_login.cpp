@@ -15,7 +15,7 @@
 namespace {
 
 static bool resourceParamPresent(
-    const ec2::ApiResourceParamDataList& params,
+    const nx::vms::api::ResourceParamDataList& params,
     const QString& name)
 {
     for (const auto& param: params)
@@ -125,7 +125,7 @@ protected:
         auto mediaServerClient = prepareMediaServerClient();
         for (;;)
         {
-            ec2::ApiResourceParamDataList params;
+            nx::vms::api::ResourceParamDataList params;
             ASSERT_EQ(
                 ec2::ErrorCode::ok,
                 mediaServerClient->ec2GetResourceParams(
@@ -149,7 +149,7 @@ protected:
     void thenUserCanStillLogin()
     {
         auto mediaServerClient = prepareMediaServerClientFromCloudOwner();
-        ec2::ApiResourceParamDataList vmsSettings;
+        nx::vms::api::ResourceParamDataList vmsSettings;
         ASSERT_EQ(ec2::ErrorCode::ok, mediaServerClient->ec2GetSettings(&vmsSettings));
     }
 
@@ -196,7 +196,7 @@ private:
         auto mediaServerClient = prepareMediaServerClient();
         for (;;)
         {
-            ec2::ApiResourceParamDataList params;
+            nx::vms::api::ResourceParamDataList params;
             ASSERT_EQ(
                 ec2::ErrorCode::ok,
                 mediaServerClient->ec2GetResourceParams(

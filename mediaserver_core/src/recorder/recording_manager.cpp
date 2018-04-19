@@ -625,8 +625,8 @@ void QnRecordingManager::at_licenseMutexLocked()
             idList << camera->getId();
 
             QnCameraUserAttributesList userAttributes = commonModule()->cameraUserAttributesPool()->getAttributesList(idList);
-            ec2::ApiCameraAttributesDataList apiAttributes;
-            fromResourceListToApi(userAttributes, apiAttributes);
+            nx::vms::api::CameraAttributesDataList apiAttributes;
+            ec2::fromResourceListToApi(userAttributes, apiAttributes);
 
             ec2::ErrorCode errCode =  commonModule()->ec2Connection()->getCameraManager(Qn::kSystemAccess)->saveUserAttributesSync(apiAttributes);
             if (errCode != ec2::ErrorCode::ok)
@@ -647,7 +647,7 @@ void QnRecordingManager::at_licenseMutexLocked()
     if (!disabledCameras.isEmpty()) {
         QnResourcePtr resource = resourcePool()->getResourceById(commonModule()->moduleGUID());
         // TODO: #gdm move (de)serializing of encoded reason params to common place
-        emit recordingDisabled(resource, qnSyncTime->currentUSecsSinceEpoch(), nx::vms::event::EventReason::licenseRemoved, disabledCameras.join(L';'));
+        emit recordingDisabled(resource, qnSyncTime->currentUSecsSinceEpoch(), nx::vms::api::EventReason::licenseRemoved, disabledCameras.join(L';'));
     }
 }
 

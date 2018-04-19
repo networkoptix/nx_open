@@ -2,7 +2,8 @@
 
 namespace ec2 {
 
-void QnLayoutTourNotificationManager::triggerNotification(const QnTransaction<ApiIdData>& tran,
+void QnLayoutTourNotificationManager::triggerNotification(
+    const QnTransaction<nx::vms::api::IdData>& tran,
     NotificationSource /*source*/)
 {
     NX_ASSERT(tran.command == ApiCommand::removeLayoutTour);
@@ -10,7 +11,7 @@ void QnLayoutTourNotificationManager::triggerNotification(const QnTransaction<Ap
 }
 
 void QnLayoutTourNotificationManager::triggerNotification(
-    const QnTransaction<ApiLayoutTourData>& tran,
+    const QnTransaction<nx::vms::api::LayoutTourData>& tran,
     NotificationSource source)
 {
     NX_ASSERT(tran.command == ApiCommand::saveLayoutTour);

@@ -1,6 +1,6 @@
 #include "business_event_notification_manager.h"
 
-#include <nx_ec/data/api_business_rule_data.h>
+#include <nx/vms/api/data/event_rule_data.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/rule.h>
@@ -9,7 +9,7 @@ namespace ec2
 {
 
 void QnBusinessEventNotificationManager::triggerNotification(
-    const QnTransaction<ApiBusinessActionData>& tran, 
+    const QnTransaction<nx::vms::api::EventActionData>& tran,
     NotificationSource /*source*/)
 {
     NX_ASSERT(tran.command == ApiCommand::broadcastAction || tran.command == ApiCommand::execAction);
@@ -23,7 +23,7 @@ void QnBusinessEventNotificationManager::triggerNotification(
 }
 
 void QnBusinessEventNotificationManager::triggerNotification(
-    const QnTransaction<ApiIdData>& tran, 
+    const QnTransaction<nx::vms::api::IdData>& tran,
     NotificationSource /*source*/)
 {
     NX_ASSERT(tran.command == ApiCommand::removeEventRule);
@@ -31,7 +31,7 @@ void QnBusinessEventNotificationManager::triggerNotification(
 }
 
 void QnBusinessEventNotificationManager::triggerNotification(
-    const QnTransaction<ApiBusinessRuleData>& tran, 
+    const QnTransaction<nx::vms::api::EventRuleData>& tran,
     NotificationSource source)
 {
     NX_ASSERT(tran.command == ApiCommand::saveEventRule);
@@ -41,7 +41,7 @@ void QnBusinessEventNotificationManager::triggerNotification(
 }
 
 void QnBusinessEventNotificationManager::triggerNotification(
-    const QnTransaction<ApiResetBusinessRuleData>& tran, 
+    const QnTransaction<nx::vms::api::ResetEventRulesData>& tran,
     NotificationSource /*source*/)
 {
     NX_ASSERT(tran.command == ApiCommand::resetEventRules);

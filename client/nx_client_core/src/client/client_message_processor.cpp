@@ -130,7 +130,7 @@ void QnClientMessageProcessor::disconnectFromConnection(const ec2::AbstractECCon
     connection->getMiscNotificationManager()->disconnect(this);
 }
 
-void QnClientMessageProcessor::handleTourAddedOrUpdated(const ec2::ApiLayoutTourData& tour)
+void QnClientMessageProcessor::handleTourAddedOrUpdated(const nx::vms::api::LayoutTourData& tour)
 {
     if (qnClientCoreModule->layoutTourStateManager()->isChanged(tour.id))
         return;

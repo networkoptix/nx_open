@@ -8,7 +8,7 @@
 #include <common/common_globals.h>
 #include <core/resource/resource_type.h>
 
-#include <nx_ec/data/api_layout_data.h>
+#include <nx/vms/api/data/layout_data.h>
 
 #include <utils/db/db_helper.h>
 #include <nx/fusion/model_functions.h>

@@ -142,8 +142,8 @@ public:
         const QnUuid &resourceId,
         const QnUuid &resourceTypeId);
 
-    ec2::ApiResourceParamDataList getRuntimeProperties() const;
-    ec2::ApiResourceParamDataList getAllProperties() const;
+    nx::vms::api::ResourceParamDataList getRuntimeProperties() const;
+    nx::vms::api::ResourceParamDataList getAllProperties() const;
 
     enum PropertyOptions
     {

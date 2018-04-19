@@ -130,7 +130,7 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStreamInternal(bool isCameraC
     }
 
     if (isCameraControlRequired) {
-        if (role != Qn::CR_SecondaryLiveVideo && m_dlinkRes->getMotionType() != Qn::MT_SoftwareGrid)
+        if (role != Qn::CR_SecondaryLiveVideo && m_dlinkRes->getMotionType() != Qn::MotionType::MT_SoftwareGrid)
             m_dlinkRes->setMotionMaskPhysical(0);
     }
 
@@ -239,23 +239,23 @@ QByteArray PlDlinkStreamReader::getQualityString(const QnLiveStreamParams& param
         int q;
         switch (params.quality)
         {
-        case Qn::QualityHighest:
+        case Qn::StreamQuality::highest:
             q = 90;
             break;
 
-        case Qn::QualityHigh:
+        case Qn::StreamQuality::high:
             q = 80;
             break;
 
-        case Qn::QualityNormal:
+        case Qn::StreamQuality::normal:
             q = 70;
             break;
 
-        case Qn::QualityLow:
+        case Qn::StreamQuality::low:
             q = 50;
             break;
 
-        case Qn::QualityLowest:
+        case Qn::StreamQuality::lowest:
             q = 40;
             break;
 
@@ -265,7 +265,9 @@ QByteArray PlDlinkStreamReader::getQualityString(const QnLiveStreamParams& param
         }
         return QByteArray::number(q);
     }
-    int qualityIndex = scaleInt((int) params.quality, Qn::QualityHighest-Qn::QualityLowest+1, info.possibleQualities.size());
+    int qualityIndex = scaleInt((int) params.quality,
+        (int)Qn::StreamQuality::highest - (int)Qn::StreamQuality::lowest+1,
+        info.possibleQualities.size());
     if (isTextQualities(info.possibleQualities))
         qualityIndex = info.possibleQualities.size()-1 - qualityIndex; // index 0 is best quality if quality is text
     return info.possibleQualities[qualityIndex];

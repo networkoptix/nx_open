@@ -27,7 +27,7 @@ public:
     virtual ~QnMediaResource();
 
     // size - is size of one channel; we assume all channels have the same size
-    virtual Qn::StreamQuality getBestQualityForSuchOnScreenSize(const QSize& /*size*/) const { return Qn::QualityNormal; }
+    virtual Qn::StreamQuality getBestQualityForSuchOnScreenSize(const QSize& /*size*/) const;
 
     // returns one image best for such time
     // in case of live video time should be ignored

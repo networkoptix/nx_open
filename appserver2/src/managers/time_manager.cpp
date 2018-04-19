@@ -490,12 +490,12 @@ ApiTimeData TimeSynchronizationManager::getTimeInfo() const
     return result;
 }
 
-void TimeSynchronizationManager::onGotPrimariTimeServerTran(const QnTransaction<ApiIdData>& tran)
+void TimeSynchronizationManager::onGotPrimariTimeServerTran(const QnTransaction<nx::vms::api::IdData>& tran)
 {
     primaryTimeServerChanged(tran.params.id);
 }
 
-void TimeSynchronizationManager::primaryTimeServerChanged(const ApiIdData& serverId)
+void TimeSynchronizationManager::primaryTimeServerChanged(const nx::vms::api::IdData& serverId)
 {
     quint64 localTimePriorityBak = 0;
     quint64 newLocalTimePriority = 0;

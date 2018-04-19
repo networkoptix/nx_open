@@ -149,10 +149,10 @@ public:
 TEST_F(EmptyLiveStreamParameters, checkDefaultQuality)
 {
     auto primaryParams = m_videoCamera->getPrimaryReader()->getLiveParams();
-    EXPECT_EQ(Qn::QualityNormal, primaryParams.quality);
+    EXPECT_EQ(Qn::StreamQuality::normal, primaryParams.quality);
 
     auto secondaryParams = m_videoCamera->getSecondaryReader()->getLiveParams();
-    EXPECT_EQ(Qn::QualityLow, secondaryParams.quality);
+    EXPECT_EQ(Qn::StreamQuality::low, secondaryParams.quality);
 }
 
 TEST_F(LiveStreamParameters, mergeWithEmptyParams)
@@ -184,7 +184,7 @@ TEST_F(LiveStreamParameters, mergeWithNonEmptyParams)
     params.fps = 12;
     params.resolution = QSize(2536, 1080);
     params.codec = "H265";
-    params.quality = Qn::QualityHighest;
+    params.quality = Qn::StreamQuality::highest;
     m_videoCamera->getPrimaryReader()->setPrimaryStreamParams(params);
 
     auto updatedParams = m_videoCamera->getPrimaryReader()->getLiveParams();

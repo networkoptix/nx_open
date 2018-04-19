@@ -24,7 +24,7 @@ namespace {
 
 static constexpr int kRecordingTypeLabelFontSize = 12;
 static constexpr int kRecordingTypeLabelFontWeight = QFont::DemiBold;
-static constexpr int kCustomQualityOffset = Qn::StreamQualityCount;
+static constexpr int kCustomQualityOffset = 7;
 
 template<class InputWidget>
 float normalizedValue(const InputWidget* widget)
@@ -89,13 +89,13 @@ void ScheduleSettingsWidget::setStore(CameraSettingsDialogStore* store)
         };
 
     connect(ui->recordAlwaysButton, &QToolButton::toggled, store,
-        makeRecordingTypeHandler(Qn::RT_Always));
+        makeRecordingTypeHandler(Qn::RecordingType::always));
     connect(ui->recordMotionButton, &QToolButton::toggled, store,
-        makeRecordingTypeHandler(Qn::RT_MotionOnly));
+        makeRecordingTypeHandler(Qn::RecordingType::motionOnly));
     connect(ui->recordMotionPlusLQButton, &QToolButton::toggled, store,
-        makeRecordingTypeHandler(Qn::RT_MotionAndLowQuality));
+        makeRecordingTypeHandler(Qn::RecordingType::motionAndLow));
     connect(ui->noRecordButton, &QToolButton::toggled, store,
-        makeRecordingTypeHandler(Qn::RT_Never));
+        makeRecordingTypeHandler(Qn::RecordingType::never));
 
     const auto qualityApproximation =
         [this](int index)
@@ -155,19 +155,19 @@ void ScheduleSettingsWidget::setupUi()
         [this](Qn::StreamQuality quality)
         {
             const auto text = toDisplayString(quality);
-            ui->qualityComboBox->addItem(text, quality);
+            ui->qualityComboBox->addItem(text, (int)quality);
             const auto index = ui->qualityComboBox->count();
-            ui->qualityComboBox->addItem(text + lit(" *"), kCustomQualityOffset + quality);
+            ui->qualityComboBox->addItem(text + lit(" *"), kCustomQualityOffset + (int)quality);
             qobject_cast<QListView*>(ui->qualityComboBox->view())->setRowHidden(index, true);
             if (auto model = qobject_cast<QStandardItemModel*>(ui->qualityComboBox->model()))
                 model->item(index)->setFlags(Qt::NoItemFlags);
         };
 
-    addQualityItem(Qn::QualityLow);
-    addQualityItem(Qn::QualityNormal);
-    addQualityItem(Qn::QualityHigh);
-    addQualityItem(Qn::QualityHighest);
-    ui->qualityComboBox->setCurrentIndex(ui->qualityComboBox->findData(Qn::QualityHigh));
+    addQualityItem(Qn::StreamQuality::low);
+    addQualityItem(Qn::StreamQuality::normal);
+    addQualityItem(Qn::StreamQuality::high);
+    addQualityItem(Qn::StreamQuality::highest);
+    ui->qualityComboBox->setCurrentIndex(ui->qualityComboBox->findData((int)Qn::StreamQuality::high));
 
     ui->bitrateSpinBox->setSuffix(lit(" ") + tr("Mbit/s"));
 
@@ -185,13 +185,13 @@ void ScheduleSettingsWidget::setupUi()
     ui->settingsGroupBox->setContentsMargins(margins);
 
     ui->recordAlwaysButton->setCustomPaintFunction(
-        paintFunctions->paintCellFunction(Qn::RT_Always));
+        paintFunctions->paintCellFunction(Qn::RecordingType::always));
     ui->recordMotionButton->setCustomPaintFunction(
-        paintFunctions->paintCellFunction(Qn::RT_MotionOnly));
+        paintFunctions->paintCellFunction(Qn::RecordingType::motionOnly));
     ui->recordMotionPlusLQButton->setCustomPaintFunction(
-        paintFunctions->paintCellFunction(Qn::RT_MotionAndLowQuality));
+        paintFunctions->paintCellFunction(Qn::RecordingType::motionAndLow));
     ui->noRecordButton->setCustomPaintFunction(
-        paintFunctions->paintCellFunction(Qn::RT_Never));
+        paintFunctions->paintCellFunction(Qn::RecordingType::never));
 
 }
 
@@ -202,10 +202,10 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
 
     const auto& recording = state.recording;
     const auto& brush = recording.brush;
-    const bool recordingParamsEnabled = brush.recordingType != Qn::RT_Never
+    const bool recordingParamsEnabled = brush.recordingType != Qn::RecordingType::never
         && recording.parametersAvailable;
 
-    ui->recordAlwaysButton->setChecked(brush.recordingType == Qn::RT_Always);
+    ui->recordAlwaysButton->setChecked(brush.recordingType == Qn::RecordingType::always);
     setReadOnly(ui->recordAlwaysButton, state.readOnly);
 
     const bool hasMotion = state.hasMotion();
@@ -213,7 +213,7 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
     ui->labelMotionOnly->setEnabled(hasMotion);
     if (hasMotion)
     {
-        ui->recordMotionButton->setChecked(brush.recordingType == Qn::RT_MotionOnly);
+        ui->recordMotionButton->setChecked(brush.recordingType == Qn::RecordingType::motionOnly);
         setReadOnly(ui->recordMotionButton, state.readOnly);
         ui->recordMotionButton->setToolTip({});
     }
@@ -227,7 +227,7 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
     ui->labelMotionPlusLQ->setEnabled(hasDualStreaming);
     if (hasDualStreaming)
     {
-        ui->recordMotionPlusLQButton->setChecked(brush.recordingType == Qn::RT_MotionAndLowQuality);
+        ui->recordMotionPlusLQButton->setChecked(brush.recordingType == Qn::RecordingType::motionAndLow);
         setReadOnly(ui->recordMotionPlusLQButton, state.readOnly);
         ui->recordMotionPlusLQButton->setToolTip({});
     }
@@ -236,7 +236,7 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
         ui->recordMotionPlusLQButton->setToolTip(motionOptionHint(state));
     }
 
-    ui->noRecordButton->setChecked(brush.recordingType == Qn::RT_Never);
+    ui->noRecordButton->setChecked(brush.recordingType == Qn::RecordingType::never);
     setReadOnly(ui->noRecordButton, state.readOnly);
 
     ui->fpsSpinBox->setEnabled(recordingParamsEnabled);
@@ -249,7 +249,7 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
     setReadOnly(ui->qualityComboBox, state.readOnly);
     ui->qualityComboBox->setCurrentIndex(
         ui->qualityComboBox->findData(
-            brush.quality
+            (int)brush.quality
             + (automaticBitrate ? 0 : kCustomQualityOffset)));
 
     ui->advancedSettingsWidget->setVisible(

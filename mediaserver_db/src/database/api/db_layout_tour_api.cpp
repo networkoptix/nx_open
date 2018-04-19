@@ -2,36 +2,39 @@
 
 #include <QtSql/QSqlQuery>
 
-#include <nx_ec/data/api_layout_tour_data.h>
+#include <nx/vms/api/data/layout_tour_data.h>
 
 #include <nx/fusion/model_functions.h>
 
 #include <utils/db/db_helper.h>
+#include <utils/common/id.h>
+
+using namespace nx::vms::api;
 
 namespace ec2 {
 
-struct ApiLayoutTourItemWithRefData: ApiLayoutTourItemData
+struct LayoutTourItemWithRefData: nx::vms::api::LayoutTourItemData
 {
-    ApiLayoutTourItemWithRefData(){}
+    LayoutTourItemWithRefData(){}
 
-    ApiLayoutTourItemWithRefData(const ApiLayoutTourItemData& item, const QnUuid& tourId):
-        ApiLayoutTourItemData(item),
+    LayoutTourItemWithRefData(const nx::vms::api::LayoutTourItemData& item, const QnUuid& tourId):
+        nx::vms::api::LayoutTourItemData(item),
         tourId(tourId)
     {
     }
 
     QnUuid tourId;
 };
-#define ApiLayoutTourItemWithRefData_Fields ApiLayoutTourItemData_Fields (tourId)
+#define LayoutTourItemWithRefData_Fields LayoutTourItemData_Fields (tourId)
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (ApiLayoutTourItemWithRefData),
+    (LayoutTourItemWithRefData),
     (sql_record),
     _Fields)
 
 namespace {
 
-bool insertOrReplaceTour(const QSqlDatabase& database, const ApiLayoutTourData& tour)
+bool insertOrReplaceTour(const QSqlDatabase& database, const LayoutTourData& tour)
 {
     QSqlQuery query(database);
     const QString queryStr(R"sql(
@@ -85,7 +88,7 @@ bool removeItems(const QSqlDatabase& database, const QnUuid& tourId)
     return nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO);
 }
 
-bool updateItems(const QSqlDatabase& database, const ApiLayoutTourData& tour)
+bool updateItems(const QSqlDatabase& database, const LayoutTourData& tour)
 {
     if (!removeItems(database, tour.id))
         return false;
@@ -106,9 +109,9 @@ bool updateItems(const QSqlDatabase& database, const ApiLayoutTourData& tour)
     if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
         return false;
 
-    for (const ApiLayoutTourItemData& item: tour.items)
+    for (const auto& item: tour.items)
     {
-        ApiLayoutTourItemWithRefData ref(item, tour.id);
+        LayoutTourItemWithRefData ref(item, tour.id);
         QnSql::bind(ref, &query);
         if (!nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
             return false;
@@ -122,16 +125,22 @@ bool updateItems(const QSqlDatabase& database, const ApiLayoutTourData& tour)
 namespace database {
 namespace api {
 
-bool fetchLayoutTours(const QSqlDatabase& database, ApiLayoutTourDataList& tours)
+bool fetchLayoutTours(const QSqlDatabase& database, const QnUuid& id, LayoutTourDataList& tours)
 {
+    QString filterStr;
+    if (!id.isNull())
+        filterStr = lit("WHERE r.guid = %1").arg(guidToSqlString(id));
+
     QSqlQuery query(database);
     query.setForwardOnly(true);
 
     QString queryStr(R"sql(
         SELECT *
         FROM vms_layout_tours
+        %1
         ORDER BY id
     )sql");
+    queryStr = queryStr.arg(filterStr);
 
     if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
         return false;
@@ -155,18 +164,18 @@ bool fetchLayoutTours(const QSqlDatabase& database, ApiLayoutTourDataList& tours
 
     QnSql::fetch_many(query, &tours);
 
-    std::vector<ApiLayoutTourItemWithRefData> items;
+    std::vector<LayoutTourItemWithRefData> items;
     QnSql::fetch_many(queryItems, &items);
     QnDbHelper::mergeObjectListData(
         tours,
         items,
-        &ApiLayoutTourData::items,
-        &ApiLayoutTourItemWithRefData::tourId);
+        &LayoutTourData::items,
+        &LayoutTourItemWithRefData::tourId);
 
     return true;
 }
 
-bool saveLayoutTour(const QSqlDatabase& database, const ApiLayoutTourData& tour)
+bool saveLayoutTour(const QSqlDatabase& database, const LayoutTourData& tour)
 {
     if (!insertOrReplaceTour(database, tour))
         return false;

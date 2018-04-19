@@ -163,7 +163,7 @@ bool RuleHolder::needToWatchRule(const event::RulePtr& rule) const
 
 QnUuid RuleHolder::analyticsEventIdFromRule(const nx::vms::event::RulePtr& rule) const
 {
-    if (rule->eventType() == nx::vms::event::EventType::analyticsSdkEvent)
+    if (rule->eventType() == nx::vms::api::EventType::analyticsSdkEvent)
         return rule->eventParams().analyticsEventId();
 
     return guidByEventType(rule->eventType());

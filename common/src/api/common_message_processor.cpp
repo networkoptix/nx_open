@@ -13,9 +13,9 @@
 #include <nx_ec/data/api_full_info_data.h>
 #include <nx_ec/data/api_discovery_data.h>
 #include <nx_ec/data/api_conversion_functions.h>
-#include <nx_ec/data/api_resource_type_data.h>
+#include <nx/vms/api/data/resource_type_data.h>
 #include <nx_ec/data/api_license_data.h>
-#include <nx_ec/data/api_business_rule_data.h>
+#include <nx/vms/api/data/event_rule_data.h>
 #include <nx_ec/data/api_access_rights_data.h>
 
 #include <api/app_server_connection.h>
@@ -58,6 +58,7 @@
 #include <nx_ec/dummy_handler.h>
 
 using namespace nx;
+using namespace nx::vms::api;
 
 QnCommonMessageProcessor::QnCommonMessageProcessor(QObject *parent):
     base_type(parent),
@@ -501,20 +502,22 @@ void QnCommonMessageProcessor::on_remotePeerLost(QnUuid data, Qn::PeerType peerT
 
 void QnCommonMessageProcessor::on_resourceStatusChanged(
     const QnUuid& resourceId,
-    Qn::ResourceStatus status,
+    ResourceStatus status,
     ec2::NotificationSource source)
 {
     if (source == ec2::NotificationSource::Local)
         return; //< ignore local setStatus call. Data already in the resourcePool
 
+    const auto localStatus = static_cast<Qn::ResourceStatus>(status);
     QnResourcePtr resource = resourcePool()->getResourceById(resourceId);
     if (resource)
-        onResourceStatusChanged(resource, status, source);
+        onResourceStatusChanged(resource, localStatus, source);
     else
-        statusDictionary()->setValue(resourceId, status);
+        statusDictionary()->setValue(resourceId, localStatus);
 }
 
-void QnCommonMessageProcessor::on_resourceParamChanged(const ec2::ApiResourceParamWithRefData& param )
+void QnCommonMessageProcessor::on_resourceParamChanged(
+    const ResourceParamWithRefData& param)
 {
     QnResourcePtr resource = resourcePool()->getResourceById(param.resourceId);
     if (resource)
@@ -523,7 +526,8 @@ void QnCommonMessageProcessor::on_resourceParamChanged(const ec2::ApiResourcePar
         propertyDictionary()->setValue(param.resourceId, param.name, param.value, false);
 }
 
-void QnCommonMessageProcessor::on_resourceParamRemoved(const ec2::ApiResourceParamWithRefData& param )
+void QnCommonMessageProcessor::on_resourceParamRemoved(
+    const ResourceParamWithRefData& param)
 {
     propertyDictionary()->on_resourceParamRemoved(param.resourceId, param.name);
 }
@@ -594,21 +598,22 @@ void QnCommonMessageProcessor::on_userRoleRemoved(const QnUuid& userRoleId)
     }
 }
 
-void QnCommonMessageProcessor::on_cameraUserAttributesChanged(const ec2::ApiCameraAttributesData& attrs)
+void QnCommonMessageProcessor::on_cameraUserAttributesChanged(
+    const CameraAttributesData& attrs)
 {
     QnCameraUserAttributesPtr userAttributes(new QnCameraUserAttributes());
-    fromApiToResource(attrs, userAttributes);
+    ec2::fromApiToResource(attrs, userAttributes);
 
     QSet<QByteArray> modifiedFields;
     {
         QnCameraUserAttributePool::ScopedLock userAttributesLock(
             cameraUserAttributesPool(),
-            userAttributes->cameraId );
-        (*userAttributesLock)->assign( *userAttributes, &modifiedFields );
+            userAttributes->cameraId);
+        (*userAttributesLock)->assign(*userAttributes, &modifiedFields);
     }
     const QnResourcePtr& res = resourcePool()->getResourceById(userAttributes->cameraId);
-    if( res )   //it is OK if resource is missing
-        res->emitModificationSignals( modifiedFields );
+    if (res) //it is OK if resource is missing
+        res->emitModificationSignals(modifiedFields);
 }
 
 void QnCommonMessageProcessor::on_cameraUserAttributesRemoved(const QnUuid& cameraId)
@@ -657,7 +662,8 @@ void QnCommonMessageProcessor::on_mediaServerUserAttributesRemoved(const QnUuid&
         res->emitModificationSignals( modifiedFields );
 }
 
-void QnCommonMessageProcessor::on_cameraHistoryChanged(const ec2::ApiServerFootageData &serverFootageData)
+void QnCommonMessageProcessor::on_cameraHistoryChanged(
+    const ServerFootageData& serverFootageData)
 {
     cameraHistoryPool()->setServerFootageData(serverFootageData);
 }
@@ -685,10 +691,10 @@ void QnCommonMessageProcessor::on_businessActionBroadcasted( const vms::event::A
     // nothing to do for a while
 }
 
-void QnCommonMessageProcessor::on_businessRuleReset(const ec2::ApiBusinessRuleDataList& rules)
+void QnCommonMessageProcessor::on_businessRuleReset(const EventRuleDataList& rules)
 {
     vms::event::RuleList ruleList;
-    fromApiToResourceList(rules, ruleList);
+    ec2::fromApiToResourceList(rules, ruleList);
     eventRuleManager()->resetRules(ruleList);
 }
 
@@ -702,15 +708,15 @@ void QnCommonMessageProcessor::on_execBusinessAction( const vms::event::Abstract
     execBusinessActionInternal(action);
 }
 
-void QnCommonMessageProcessor::handleTourAddedOrUpdated(const ec2::ApiLayoutTourData& tour)
+void QnCommonMessageProcessor::handleTourAddedOrUpdated(const nx::vms::api::LayoutTourData& tour)
 {
     layoutTourManager()->addOrUpdateTour(tour);
 }
 
-void QnCommonMessageProcessor::resetResourceTypes(const ec2::ApiResourceTypeDataList& resTypes)
+void QnCommonMessageProcessor::resetResourceTypes(const ResourceTypeDataList& resTypes)
 {
     QnResourceTypeList qnResTypes;
-    fromApiToResourceList(resTypes, qnResTypes);
+    ec2::fromApiToResourceList(resTypes, qnResTypes);
     qnResTypePool->replaceResourceTypeList(qnResTypes);
 }
 
@@ -753,7 +759,8 @@ void QnCommonMessageProcessor::resetLicenses(const ec2::ApiLicenseDataList& lice
     licensePool()->replaceLicenses(licenses);
 }
 
-void QnCommonMessageProcessor::resetCamerasWithArchiveList(const ec2::ApiServerFootageDataList& cameraHistoryList)
+void QnCommonMessageProcessor::resetCamerasWithArchiveList(
+    const ServerFootageDataList& cameraHistoryList)
 {
     cameraHistoryPool()->resetServerFootageData(cameraHistoryList);
 }
@@ -816,39 +823,49 @@ void QnCommonMessageProcessor::resetServerUserAttributesList( const ec2::ApiMedi
     }
 }
 
-void QnCommonMessageProcessor::resetCameraUserAttributesList( const ec2::ApiCameraAttributesDataList& cameraUserAttributesList )
+void QnCommonMessageProcessor::resetCameraUserAttributesList(
+    const CameraAttributesDataList& cameraUserAttributesList)
 {
     cameraUserAttributesPool()->clear();
-    for( const auto & cameraAttrs: cameraUserAttributesList )
+    for (const auto& cameraAttrs: cameraUserAttributesList)
     {
         QnCameraUserAttributesPtr dstElement(new QnCameraUserAttributes());
-        fromApiToResource(cameraAttrs, dstElement);
+        ec2::fromApiToResource(cameraAttrs, dstElement);
 
-        QnCameraUserAttributePool::ScopedLock userAttributesLock( cameraUserAttributesPool(), cameraAttrs.cameraId );
+        QnCameraUserAttributePool::ScopedLock userAttributesLock(
+            cameraUserAttributesPool(),
+            cameraAttrs.cameraId);
         *(*userAttributesLock) = *dstElement;
     }
 }
 
-void QnCommonMessageProcessor::resetPropertyList(const ec2::ApiResourceParamWithRefDataList& params) {
+void QnCommonMessageProcessor::resetPropertyList(
+    const ResourceParamWithRefDataList& params)
+{
     /* Store existing parameter keys. */
     auto existingProperties = propertyDictionary()->allPropertyNamesByResource();
 
     /* Update changed values. */
-    for(const ec2::ApiResourceParamWithRefData& param: params) {
+    for (const auto& param: params)
+    {
         on_resourceParamChanged(param);
         if (existingProperties.contains(param.resourceId))
             existingProperties[param.resourceId].remove(param.name);
     }
 
     /* Clean values that are not in the list anymore. */
-    for (auto iter = existingProperties.constBegin(); iter != existingProperties.constEnd(); ++iter) {
+    for (auto iter = existingProperties.constBegin(); iter != existingProperties.constEnd(); ++iter)
+    {
         QnUuid resourceId = iter.key();
         for (auto paramName: iter.value())
-            on_resourceParamChanged(ec2::ApiResourceParamWithRefData(resourceId, paramName, QString()));
+        {
+            on_resourceParamChanged(
+                ResourceParamWithRefData(resourceId, paramName, QString()));
+        }
     }
 }
 
-void QnCommonMessageProcessor::resetStatusList(const ec2::ApiResourceStatusDataList& params)
+void QnCommonMessageProcessor::resetStatusList(const ResourceStatusDataList& params)
 {
     auto keys = statusDictionary()->values().keys();
     statusDictionary()->clear();
@@ -864,8 +881,13 @@ void QnCommonMessageProcessor::resetStatusList(const ec2::ApiResourceStatusDataL
         }
     }
 
-    for(const ec2::ApiResourceStatusData& statusData: params)
-        on_resourceStatusChanged(statusData.id, statusData.status, ec2::NotificationSource::Remote);
+    for (const ResourceStatusData& statusData: params)
+    {
+        on_resourceStatusChanged(
+            statusData.id,
+            statusData.status,
+            ec2::NotificationSource::Remote);
+    }
 }
 
 void QnCommonMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoData& fullData)
@@ -894,17 +916,23 @@ void QnCommonMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoDa
     emit initialResourcesReceived();
 }
 
-void QnCommonMessageProcessor::updateResource(const QnResourcePtr&, ec2::NotificationSource /*source*/)
+void QnCommonMessageProcessor::updateResource(
+    const QnResourcePtr&,
+    ec2::NotificationSource /*source*/)
 {
 }
 
-void QnCommonMessageProcessor::updateResource(const ec2::ApiUserData& user, ec2::NotificationSource source)
+void QnCommonMessageProcessor::updateResource(
+    const ec2::ApiUserData& user,
+    ec2::NotificationSource source)
 {
     QnUserResourcePtr qnUser(fromApiToResource(user, commonModule()));
     updateResource(qnUser, source);
 }
 
-void QnCommonMessageProcessor::updateResource(const ec2::ApiLayoutData& layout, ec2::NotificationSource source)
+void QnCommonMessageProcessor::updateResource(
+    const LayoutData& layout,
+    ec2::NotificationSource source)
 {
     QnLayoutResourcePtr qnLayout(new QnLayoutResource(commonModule()));
     if (!layout.url.isEmpty())
@@ -912,30 +940,34 @@ void QnCommonMessageProcessor::updateResource(const ec2::ApiLayoutData& layout, 
         NX_LOG(lit("Invalid server layout with url %1").arg(layout.url), cl_logWARNING);
         auto fixed = layout;
         fixed.url = QString();
-        fromApiToResource(fixed, qnLayout);
+        ec2::fromApiToResource(fixed, qnLayout);
     }
     else
     {
-        fromApiToResource(layout, qnLayout);
+        ec2::fromApiToResource(layout, qnLayout);
     }
     updateResource(qnLayout, source);
 }
 
-void QnCommonMessageProcessor::updateResource(const ec2::ApiVideowallData& videowall, ec2::NotificationSource source)
+void QnCommonMessageProcessor::updateResource(
+    const nx::vms::api::VideowallData& videowall,
+    ec2::NotificationSource source)
 {
     QnVideoWallResourcePtr qnVideowall(new QnVideoWallResource(commonModule()));
-    fromApiToResource(videowall, qnVideowall);
+    ec2::fromApiToResource(videowall, qnVideowall);
     updateResource(qnVideowall, source);
 }
 
-void QnCommonMessageProcessor::updateResource(const ec2::ApiWebPageData& webpage, ec2::NotificationSource source)
+void QnCommonMessageProcessor::updateResource(
+    const WebPageData& webpage,
+    ec2::NotificationSource source)
 {
     QnWebPageResourcePtr qnWebpage(new QnWebPageResource(commonModule()));
-    fromApiToResource(webpage, qnWebpage);
+    ec2::fromApiToResource(webpage, qnWebpage);
     updateResource(qnWebpage, source);
 }
 
-void QnCommonMessageProcessor::updateResource(const ec2::ApiCameraData& camera, ec2::NotificationSource source)
+void QnCommonMessageProcessor::updateResource(const CameraData& camera, ec2::NotificationSource source)
 {
     QnVirtualCameraResourcePtr qnCamera = getResourceFactory()->createResource(camera.typeId,
             QnResourceParams(camera.id, camera.url, camera.vendor))
@@ -945,7 +977,7 @@ void QnCommonMessageProcessor::updateResource(const ec2::ApiCameraData& camera, 
     if (qnCamera)
     {
         qnCamera->setCommonModule(commonModule());
-        fromApiToResource(camera, qnCamera);
+        ec2::fromApiToResource(camera, qnCamera);
         NX_ASSERT(camera.id == QnVirtualCameraResource::physicalIdToId(qnCamera->getUniqueId()),
             Q_FUNC_INFO,
             "You must fill camera ID as md5 hash of unique id");

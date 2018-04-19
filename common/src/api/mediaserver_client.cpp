@@ -193,16 +193,16 @@ ec2::ErrorCode MediaServerClient::ec2SaveUser(const ec2::ApiUserData& request)
 }
 
 void MediaServerClient::ec2GetSettings(
-    std::function<void(ec2::ErrorCode, ec2::ApiResourceParamDataList)> completionHandler)
+    std::function<void(ec2::ErrorCode, nx::vms::api::ResourceParamDataList)> completionHandler)
 {
     performAsyncEc2Call("ec2/getSettings", std::move(completionHandler));
 }
 
-ec2::ErrorCode MediaServerClient::ec2GetSettings(ec2::ApiResourceParamDataList* result)
+ec2::ErrorCode MediaServerClient::ec2GetSettings(nx::vms::api::ResourceParamDataList* result)
 {
     using Ec2GetSettingsAsyncFuncPointer =
         void(MediaServerClient::*)(
-            std::function<void(ec2::ErrorCode, ec2::ApiResourceParamDataList)>);
+            std::function<void(ec2::ErrorCode, nx::vms::api::ResourceParamDataList)>);
 
     return syncCallWrapper(
         this,
@@ -211,18 +211,18 @@ ec2::ErrorCode MediaServerClient::ec2GetSettings(ec2::ApiResourceParamDataList* 
 }
 
 void MediaServerClient::ec2SetResourceParams(
-    const ec2::ApiResourceParamWithRefDataList& inputData,
+    const nx::vms::api::ResourceParamWithRefDataList& inputData,
     std::function<void(ec2::ErrorCode)> completionHandler)
 {
     performAsyncEc2Call("ec2/setResourceParams", inputData, std::move(completionHandler));
 }
 
 ec2::ErrorCode MediaServerClient::ec2SetResourceParams(
-    const ec2::ApiResourceParamWithRefDataList& request)
+    const nx::vms::api::ResourceParamWithRefDataList& request)
 {
     using Ec2SetResourceParamsAsyncFuncPointer =
         void(MediaServerClient::*)(
-            const ec2::ApiResourceParamWithRefDataList&,
+            const nx::vms::api::ResourceParamWithRefDataList&,
             std::function<void(ec2::ErrorCode)>);
 
     return syncCallWrapper(
@@ -234,7 +234,7 @@ ec2::ErrorCode MediaServerClient::ec2SetResourceParams(
 
 void MediaServerClient::ec2GetResourceParams(
     const QnUuid& resourceId,
-    std::function<void(ec2::ErrorCode, ec2::ApiResourceParamDataList)> completionHandler)
+    std::function<void(ec2::ErrorCode, nx::vms::api::ResourceParamDataList)> completionHandler)
 {
     performAsyncEc2Call(
         lm("ec2/getResourceParams?id=%1")
@@ -244,12 +244,12 @@ void MediaServerClient::ec2GetResourceParams(
 
 ec2::ErrorCode MediaServerClient::ec2GetResourceParams(
     const QnUuid& resourceId,
-    ec2::ApiResourceParamDataList* result)
+    nx::vms::api::ResourceParamDataList* result)
 {
     using Ec2GetResourceParamsAsyncFuncPointer =
         void(MediaServerClient::*)(
             const QnUuid&,
-            std::function<void(ec2::ErrorCode, ec2::ApiResourceParamDataList)>);
+            std::function<void(ec2::ErrorCode, nx::vms::api::ResourceParamDataList)>);
 
     return syncCallWrapper(
         this,

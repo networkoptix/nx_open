@@ -65,7 +65,7 @@ void QnWearableMotionWidget::updateFromResource(const QnVirtualCameraResourcePtr
     if (!camera)
         return;
 
-    ui->motionDetectionCheckBox->setChecked(camera->getMotionType() == Qn::MT_SoftwareGrid);
+    ui->motionDetectionCheckBox->setChecked(camera->getMotionType() == Qn::MotionType::MT_SoftwareGrid);
     ui->sensitivityComboBox->setCurrentText(QString::number(calculateSensitivity(camera)));
 }
 
@@ -74,8 +74,8 @@ void QnWearableMotionWidget::submitToResource(const QnVirtualCameraResourcePtr &
     if (!camera)
         return;
 
-    NX_ASSERT(camera->getDefaultMotionType() == Qn::MT_SoftwareGrid);
-    camera->setMotionType(ui->motionDetectionCheckBox->isChecked() ? Qn::MT_SoftwareGrid : Qn::MT_NoMotion);
+    NX_ASSERT(camera->getDefaultMotionType() == Qn::MotionType::MT_SoftwareGrid);
+    camera->setMotionType(ui->motionDetectionCheckBox->isChecked() ? Qn::MotionType::MT_SoftwareGrid : Qn::MotionType::MT_NoMotion);
     submitSensitivity(camera, ui->sensitivityComboBox->currentText().toInt());
 }
 

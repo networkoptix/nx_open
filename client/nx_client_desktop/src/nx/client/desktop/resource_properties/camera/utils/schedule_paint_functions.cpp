@@ -10,7 +10,7 @@ namespace {
 
 static constexpr auto kInternalRectOffset = 1.0 / 6.0;
 static constexpr auto kBorderSize = 0.1;
-static constexpr Qn::RecordingType kDefaultRecordingType = Qn::RT_Always;
+static constexpr Qn::RecordingType kDefaultRecordingType = Qn::RecordingType::always;
 
 static constexpr std::array<QPointF, 4> kInternalRectPolygonPoints(
     {
@@ -35,17 +35,17 @@ SchedulePaintFunctions::SchedulePaintFunctions():
     recordMotionHovered(colorTheme()->color("red_core")),
     border(colorTheme()->color("dark4"))
 {
-    m_cellColor[Qn::RT_Never][false] = recordNever;
-    m_cellColor[Qn::RT_Never][true] = recordNeverHovered;
+    m_cellColor[Qn::RecordingType::never][false] = recordNever;
+    m_cellColor[Qn::RecordingType::never][true] = recordNeverHovered;
 
-    m_cellColor[Qn::RT_MotionOnly][false] = recordMotion;
-    m_cellColor[Qn::RT_MotionOnly][true] = recordMotionHovered;
+    m_cellColor[Qn::RecordingType::motionOnly][false] = recordMotion;
+    m_cellColor[Qn::RecordingType::motionOnly][true] = recordMotionHovered;
 
-    m_cellColor[Qn::RT_MotionAndLowQuality][false] = recordMotion;
-    m_cellColor[Qn::RT_MotionAndLowQuality][true] = recordMotionHovered;
+    m_cellColor[Qn::RecordingType::motionAndLow][false] = recordMotion;
+    m_cellColor[Qn::RecordingType::motionAndLow][true] = recordMotionHovered;
 
-    m_cellColor[Qn::RT_Always][false] = recordAlways;
-    m_cellColor[Qn::RT_Always][true] = recordAlwaysHovered;
+    m_cellColor[Qn::RecordingType::always][false] = recordAlways;
+    m_cellColor[Qn::RecordingType::always][true] = recordAlwaysHovered;
 }
 
 void SchedulePaintFunctions::paintCell(
@@ -56,9 +56,10 @@ void SchedulePaintFunctions::paintCell(
 {
     painter->fillRect(rect, m_cellColor[type][hovered]);
 
-    if (type == Qn::RT_MotionAndLowQuality)
+    if (type == Qn::RecordingType::motionAndLow)
     {
-        QnScopedPainterBrushRollback brushRollback(painter, m_cellColor[Qn::RT_Always][hovered]);
+        QnScopedPainterBrushRollback brushRollback(painter,
+            m_cellColor[Qn::RecordingType::always][hovered]);
         QnScopedPainterPenRollback penRollback(painter, QPen(border, 0));
         QnScopedPainterTransformRollback transformRollback(painter);
         painter->translate(rect.topLeft());

@@ -2,29 +2,31 @@
 
 #include <nx_ec/data/api_data.h>
 
+#include <nx/vms/api/data/data.h>
+
 namespace ec2 {
 
-struct ApiFullInfoData: ApiData
+struct ApiFullInfoData: nx::vms::api::Data
 {
-    ApiResourceTypeDataList resourceTypes;
+    nx::vms::api::ResourceTypeDataList resourceTypes;
     ApiMediaServerDataList servers;
     ApiMediaServerUserAttributesDataList serversUserAttributesList;
-    ApiCameraDataList cameras;
-    ApiCameraAttributesDataList cameraUserAttributesList;
+    nx::vms::api::CameraDataList cameras;
+    nx::vms::api::CameraAttributesDataList cameraUserAttributesList;
     ApiUserDataList users;
     ApiUserRoleDataList userRoles;
     ApiAccessRightsDataList accessRights;
-    ApiLayoutDataList layouts;
-    ApiVideowallDataList videowalls;
-    ApiBusinessRuleDataList rules;
-    ApiServerFootageDataList cameraHistory;
+    nx::vms::api::LayoutDataList layouts;
+    nx::vms::api::VideowallDataList videowalls;
+    nx::vms::api::EventRuleDataList rules;
+    nx::vms::api::ServerFootageDataList cameraHistory;
     ApiLicenseDataList licenses;
     ApiDiscoveryDataList discoveryData;
-    ApiResourceParamWithRefDataList allProperties;
+    nx::vms::api::ResourceParamWithRefDataList allProperties;
     ApiStorageDataList storages;
-    ApiResourceStatusDataList resStatusList;
-    ApiWebPageDataList webPages;
-    ApiLayoutTourDataList layoutTours;
+    nx::vms::api::ResourceStatusDataList resStatusList;
+    nx::vms::api::WebPageDataList webPages;
+    nx::vms::api::LayoutTourDataList layoutTours;
 };
 #define ApiFullInfoData_Fields (resourceTypes)(servers)(serversUserAttributesList)(cameras)(cameraUserAttributesList)(users)(layouts)(videowalls)(rules)\
                                (cameraHistory)(licenses)(discoveryData)(allProperties)(storages)(resStatusList)(webPages)(accessRights)(userRoles)\

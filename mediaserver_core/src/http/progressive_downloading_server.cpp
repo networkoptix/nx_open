@@ -541,9 +541,9 @@ void QnProgressiveDownloadingConsumer::run()
             }
         }
 
-        Qn::StreamQuality quality = Qn::QualityNormal;
+        Qn::StreamQuality quality = Qn::StreamQuality::normal;
         if( decodedUrlQuery.hasQueryItem(QnCodecParams::quality) )
-            quality = QnLexical::deserialized<Qn::StreamQuality>(decodedUrlQuery.queryItemValue(QnCodecParams::quality), Qn::QualityNotDefined);
+            quality = QnLexical::deserialized<Qn::StreamQuality>(decodedUrlQuery.queryItemValue(QnCodecParams::quality), Qn::StreamQuality::undefined);
 
         QnResourcePtr resource = nx::camera_id_helper::findCameraByFlexibleId(
             commonModule()->resourcePool(), resId);

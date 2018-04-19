@@ -314,7 +314,7 @@ public:
     static float rawSuggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps);
 
     virtual bool captureEvent(const nx::vms::event::AbstractEventPtr& event);
-    virtual bool doesEventComeFromAnalyticsDriver(nx::vms::event::EventType eventType) const;
+    virtual bool doesEventComeFromAnalyticsDriver(nx::vms::api::EventType eventType) const;
 
     /**
      * Update user password at the camera. This function is able to change password for existing user only.
@@ -356,7 +356,7 @@ signals:
     void disableDualStreamingChanged(const QnResourcePtr& resource);
     void audioEnabledChanged(const QnResourcePtr &resource);
 
-    void networkIssue(const QnResourcePtr&, qint64 timeStamp, nx::vms::event::EventReason reasonCode, const QString& reasonParamsEncoded);
+    void networkIssue(const QnResourcePtr&, qint64 timeStamp, nx::vms::api::EventReason reasonCode, const QString& reasonParamsEncoded);
 
     //!Emitted on camera input port state has been changed
     /*!

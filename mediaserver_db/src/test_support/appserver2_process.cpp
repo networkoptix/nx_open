@@ -142,7 +142,7 @@ int Appserver2Process::exec()
     while (!m_terminated)
     {
         const ec2::ErrorCode errorCode = ec2ConnectionFactory->connectSync(
-            dbUrl, ec2::ApiClientInfoData(), &ec2Connection);
+            dbUrl, nx::vms::api::ClientInfoData(), &ec2Connection);
         if (errorCode == ec2::ErrorCode::ok)
         {
             NX_LOG(lit("Connected to local EC2"), cl_logDEBUG1);

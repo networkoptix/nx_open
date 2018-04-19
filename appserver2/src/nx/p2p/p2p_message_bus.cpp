@@ -813,7 +813,7 @@ void MessageBus::cleanupRuntimeInfo(const ec2::ApiPersistentIdData& peer)
 }
 
 void MessageBus::gotTransaction(
-    const QnTransaction<ApiUpdateSequenceData> &tran,
+    const QnTransaction<nx::vms::api::UpdateSequenceData> &tran,
     const P2pConnectionPtr& connection,
     const TransportHeader& transportHeader)
 {

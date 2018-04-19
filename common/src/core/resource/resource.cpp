@@ -181,7 +181,7 @@ void QnResource::update(const QnResourcePtr& other)
     }
 
     //silently ignoring missing properties because of removeProperty method lack
-    for (const ec2::ApiResourceParamData &param : other->getRuntimeProperties())
+    for (const auto& param : other->getRuntimeProperties())
         emitPropertyChanged(param.name);   //here "propertyChanged" will be called
 }
 
@@ -572,28 +572,27 @@ void QnResource::emitPropertyChanged(const QString& key)
     emit propertyChanged(toSharedPointer(this), key);
 }
 
-ec2::ApiResourceParamDataList QnResource::getRuntimeProperties() const
+nx::vms::api::ResourceParamDataList QnResource::getRuntimeProperties() const
 {
     if (useLocalProperties())
     {
-        ec2::ApiResourceParamDataList result;
-        for (auto itr = m_locallySavedProperties.begin(); itr != m_locallySavedProperties.end(); ++itr)
-            result.push_back(ec2::ApiResourceParamData(itr->first, itr->second.value));
+        nx::vms::api::ResourceParamDataList result;
+        for (const auto& prop: m_locallySavedProperties)
+            result.emplace_back(prop.first, prop.second.value);
         return result;
     }
-    else if (auto module = commonModule())
-    {
-        return module->propertyDictionary()->allProperties(getId());
-    }
 
-    return ec2::ApiResourceParamDataList();
+    if (const auto module = commonModule())
+        return module->propertyDictionary()->allProperties(getId());
+
+    return {};
 }
 
-ec2::ApiResourceParamDataList QnResource::getAllProperties() const
+nx::vms::api::ResourceParamDataList QnResource::getAllProperties() const
 {
-    ec2::ApiResourceParamDataList result;
-    ec2::ApiResourceParamDataList runtimeProperties;
-    if (auto module = commonModule())
+    nx::vms::api::ResourceParamDataList result;
+    nx::vms::api::ResourceParamDataList runtimeProperties;
+    if (const auto module = commonModule())
         runtimeProperties = module->propertyDictionary()->allProperties(getId());
 
     ParamTypeMap staticDefaultProperties;
@@ -605,7 +604,7 @@ ec2::ApiResourceParamDataList QnResource::getAllProperties() const
     for (auto it = staticDefaultProperties.cbegin(); it != staticDefaultProperties.cend(); ++it)
     {
         auto runtimeIt = std::find_if(runtimeProperties.cbegin(), runtimeProperties.cend(),
-            [it](const ec2::ApiResourceParamData &param) { return it.key() == param.name; });
+            [it](const auto& param) { return it.key() == param.name; });
         if (runtimeIt == runtimeProperties.cend())
             result.emplace_back(it.key(), it.value());
     }

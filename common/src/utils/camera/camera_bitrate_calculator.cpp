@@ -17,18 +17,16 @@ constexpr float bitrateCoefficient(Qn::StreamQuality quality)
 {
     switch (quality)
     {
-        case Qn::StreamQuality::QualityLowest:
+        case Qn::StreamQuality::lowest:
             return 0.66f;
-        case Qn::StreamQuality::QualityLow:
+        case Qn::StreamQuality::low:
             return 0.8f;
-        case Qn::StreamQuality::QualityNormal:
+        case Qn::StreamQuality::normal:
             return 1.0f;
-        case Qn::StreamQuality::QualityHigh:
+        case Qn::StreamQuality::high:
             return 2.0f;
-        case Qn::StreamQuality::QualityHighest:
+        case Qn::StreamQuality::highest:
             return 2.5f;
-        case Qn::StreamQuality::QualityPreSet:
-        case Qn::StreamQuality::QualityNotDefined:
         default:
             return 1.0f;
     }
@@ -44,8 +42,12 @@ float CameraBitrateCalculator::suggestBitrateForQualityKbps(
     QSize resolution,
     int fps)
 {
-    const float qualityFactor = kLowEndBitrateKbps + (kHighEndBitrateKbps - kLowEndBitrateKbps) * (
-        quality - Qn::QualityLowest) / (Qn::QualityHighest - Qn::QualityLowest);
+    const float qualityLevel =
+        static_cast<int>(quality) - static_cast<int>(Qn::StreamQuality::lowest);
+    static constexpr int qualitySpread =
+        static_cast<int>(Qn::StreamQuality::highest) - static_cast<int>(Qn::StreamQuality::lowest);
+    const float qualityFactor = kLowEndBitrateKbps + (kHighEndBitrateKbps - kLowEndBitrateKbps)
+        * qualityLevel / qualitySpread;
 
     const float resolutionFactor = kResolutionFactorMultiplier * pow(
         resolution.width() * resolution.height(),

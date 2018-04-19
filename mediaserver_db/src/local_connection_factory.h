@@ -47,7 +47,7 @@ namespace ec2 {
 		*/
 		virtual int connectAsync(
 			const nx::utils::Url& addr,
-			const ApiClientInfoData& clientInfo,
+			const nx::vms::api::ClientInfoData& clientInfo,
 			impl::ConnectHandlerPtr handler) override;
 
 		void registerRestHandlers(QnRestProcessorPool* const restProcessorPool);
@@ -97,12 +97,15 @@ namespace ec2 {
 		* Called on server side to handle connection request from remote host.
 		*/
 		ErrorCode fillConnectionInfo(
-			const ApiLoginData& loginInfo,
+			const nx::vms::api::ConnectionData& loginInfo,
 			QnConnectionInfo* const connectionInfo,
 			nx::network::http::Response* response = nullptr);
 
 		int testDirectConnection(const nx::utils::Url& addr, impl::TestConnectionHandlerPtr handler);
-		ErrorCode getSettings(nullptr_t, ApiResourceParamDataList* const outData, const Qn::UserAccessData&);
+	    ErrorCode getSettings(
+	        nullptr_t,
+	        nx::vms::api::ResourceParamDataList* const outData,
+	        const Qn::UserAccessData&);
 
 		template<class InputDataType>
 		void regUpdate(QnRestProcessorPool* const restProcessorPool, ApiCommand::Value cmd,

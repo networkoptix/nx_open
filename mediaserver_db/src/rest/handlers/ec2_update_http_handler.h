@@ -24,7 +24,7 @@ namespace ec2 {
 
 namespace update_http_handler_detail {
 
-// TODO: Move to ApiIdData. Then consider moving this and fillId() methods out of Api*Data.
+// TODO: Move to IdData. Then consider moving this and fillId() methods out of *Data.
 
 template<typename RequestData>
 inline void fixRequestDataIfNeeded(RequestData* const /*requestData*/)
@@ -249,7 +249,7 @@ private:
         bool* outSuccess,
         decltype(&T::getIdForMerging) /*enable_if_member_exists*/)
     {
-        ApiIdData apiIdData(requestData->getIdForMerging());
+        nx::vms::api::IdData apiIdData(requestData->getIdForMerging());
         QJson::serialize(apiIdData, outResultBody);
         *outSuccess = true;
         return nx::network::http::StatusCode::ok;
@@ -287,8 +287,8 @@ private:
     }
 
     /**
-     * Sfinae: Called when RequestData does not provide id for merging or is ApiIdData (because
-     * merging for API parameters of exact type ApiIdData has no sence) - do not perform the merge.
+     * Sfinae: Called when RequestData does not provide id for merging or is IdData (because
+     * merging for API parameters of exact type IdData has no sence) - do not perform the merge.
      */
     template<typename T = RequestData>
     nx::network::http::StatusCode::Value buildRequestDataMergingIfNeededSfinae(
@@ -303,8 +303,8 @@ private:
     }
 
     /**
-     * Sfinae: Called when RequestData provides id for merging and is not ApiIdData (because
-     * merging for API parameters of exact type ApiIdData has no sence) - attempt the merge.
+     * Sfinae: Called when RequestData provides id for merging and is not IdData (because
+     * merging for API parameters of exact type IdData has no sence) - attempt the merge.
      *
      * @param requestData In: potentially incomplete data. Out: merge result.
      */
@@ -316,7 +316,7 @@ private:
         bool* outSuccess,
         const QnRestConnectionProcessor* owner,
         decltype(&T::getIdForMerging) /*enable_if_member_exists*/,
-        typename std::enable_if<!std::is_same<ApiIdData, T>::value>::type* = nullptr)
+        typename std::enable_if<!std::is_same<nx::vms::api::IdData, T>::value>::type* = nullptr)
     {
         const QnUuid id = requestData->getIdForMerging();
         if (id.isNull()) //< Id is omitted from request json - do not perform merge.
@@ -377,8 +377,8 @@ private:
     }
 
     /**
-     * Sfinae: Used only when RequestData provides id for merging but is not ApiIdData (because
-     * merging for API parameters of exact type ApiIdData has no sence).
+     * Sfinae: Used only when RequestData provides id for merging but is not IdData (because
+     * merging for API parameters of exact type IdData has no sence).
      */
     template<typename T = RequestData>
     ErrorCode processQueryAsync(
@@ -387,7 +387,7 @@ private:
         bool* outFound,
         const QnRestConnectionProcessor* owner,
         decltype(&T::getIdForMerging) /*enable_if_member_exists*/ = nullptr,
-        typename std::enable_if<!std::is_same<ApiIdData, T>::value>::type* = nullptr)
+        typename std::enable_if<!std::is_same<nx::vms::api::IdData, T>::value>::type* = nullptr)
     {
         typedef std::vector<RequestData> RequestDataList;
 

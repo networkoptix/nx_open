@@ -254,7 +254,7 @@ QString QnPlAreconVisionResource::getDriverName() const
 
 Qn::StreamQuality QnPlAreconVisionResource::getBestQualityForSuchOnScreenSize(const QSize& /*size*/) const
 {
-    return Qn::QualityNormal;
+    return Qn::StreamQuality::normal;
 }
 
 QImage QnPlAreconVisionResource::getImage(int /*channnel*/, QDateTime /*time*/, Qn::StreamQuality /*quality*/) const

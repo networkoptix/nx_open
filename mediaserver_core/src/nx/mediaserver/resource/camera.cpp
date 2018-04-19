@@ -408,8 +408,8 @@ StreamCapabilityMap Camera::getStreamCapabilityMap(Qn::StreamIndex streamIndex)
     auto defaultStreamCapability = [this](const StreamCapabilityKey& key)
     {
         nx::media::CameraStreamCapability result;
-        result.minBitrateKbps = rawSuggestBitrateKbps(Qn::QualityLowest, key.resolution, 1);
-        result.maxBitrateKbps = rawSuggestBitrateKbps(Qn::QualityHighest, key.resolution, getMaxFps());
+        result.minBitrateKbps = rawSuggestBitrateKbps(Qn::StreamQuality::lowest, key.resolution, 1);
+        result.maxBitrateKbps = rawSuggestBitrateKbps(Qn::StreamQuality::highest, key.resolution, getMaxFps());
         result.maxFps = getMaxFps();
         return result;
     };

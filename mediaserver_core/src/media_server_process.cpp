@@ -781,7 +781,7 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
 
         if (!storagesToRemove.isEmpty())
         {
-            ec2::ApiIdDataList idList;
+            nx::vms::api::IdDataList idList;
             for (const auto& value: storagesToRemove)
                 idList.push_back(value->getId());
             if (ec2Connection->getMediaServerManager(Qn::kSystemAccess)->removeStoragesSync(idList) != ec2::ErrorCode::ok)
@@ -1445,7 +1445,7 @@ void MediaServerProcess::at_connectionOpened()
         qnEventRuleConnector->at_serverFailure(
             resPool->getResourceById<QnMediaServerResource>(serverGuid()),
             m_firstRunningTime * 1000,
-            nx::vms::event::EventReason::serverStarted,
+            nx::vms::api::EventReason::serverStarted,
             QString());
     }
     if (!m_startMessageSent)
@@ -1493,7 +1493,7 @@ void MediaServerProcess::at_storageManager_noStoragesAvailable() {
 }
 
 void MediaServerProcess::at_storageManager_storageFailure(const QnResourcePtr& storage,
-    nx::vms::event::EventReason reason)
+    nx::vms::api::EventReason reason)
 {
     if (isStopping())
         return;
@@ -1508,7 +1508,7 @@ void MediaServerProcess::at_storageManager_rebuildFinished(QnSystemHealth::Messa
 
 void MediaServerProcess::at_archiveBackupFinished(
     qint64                      backedUpToMs,
-    nx::vms::event::EventReason code
+    nx::vms::api::EventReason code
 )
 {
     if (isStopping())
@@ -2782,13 +2782,13 @@ void MediaServerProcess::moveHandlingCameras()
     const auto& resPool = commonModule()->resourcePool();
     for (const auto& server: resPool->getResources<QnMediaServerResource>())
         servers << server->getId();
-    ec2::ApiCameraDataList camerasToUpdate;
+    nx::vms::api::CameraDataList camerasToUpdate;
     for (const auto& camera: resPool->getAllCameras(/*all*/ QnResourcePtr()))
     {
         if (!servers.contains(camera->getParentId()))
         {
-            ec2::ApiCameraData apiCameraData;
-            fromResourceToApi(camera, apiCameraData);
+            nx::vms::api::CameraData apiCameraData;
+            ec2::fromResourceToApi(camera, apiCameraData);
             apiCameraData.parentId = commonModule()->moduleGUID(); //< move camera
             camerasToUpdate.push_back(apiCameraData);
         }
@@ -3267,7 +3267,7 @@ void MediaServerProcess::run()
     while (!needToStop())
     {
         const ec2::ErrorCode errorCode = ec2ConnectionFactory->connectSync(
-            appServerUrl, ec2::ApiClientInfoData(), &ec2Connection );
+            appServerUrl, nx::vms::api::ClientInfoData(), &ec2Connection);
         if (ec2Connection)
         {
             connectInfo = ec2Connection->connectionInfo();

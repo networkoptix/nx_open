@@ -5,7 +5,7 @@ namespace vms {
 namespace event {
 
 BookmarkAction::BookmarkAction(const EventParameters& runtimeParams):
-    base_type(bookmarkAction, runtimeParams)
+    base_type(ActionType::bookmarkAction, runtimeParams)
 {
 }
 

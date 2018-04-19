@@ -82,7 +82,7 @@ qint32 getResourceInternalId(
 
 bool insertOrReplaceResource(
     QueryContext* context,
-    const ApiResourceData& data,
+    const nx::vms::api::ResourceData& data,
     qint32* internalId)
 {
     NX_ASSERT(!data.id.isNull(), "Resource id must not be null");

@@ -4,38 +4,28 @@
 
 namespace ec2 {
 
-struct ApiUserRoleData: ApiIdData
+struct ApiUserRoleData: nx::vms::api::IdData
 {
-    ApiUserRoleData():
-        ApiIdData(),
-        name(),
-        permissions(Qn::NoGlobalPermissions)
-    {
-    }
+    ApiUserRoleData() = default;
 
     ApiUserRoleData(const QnUuid& id, const QString& name, Qn::GlobalPermissions permissions):
-        ApiIdData(id),
+        nx::vms::api::IdData(id),
         name(name),
         permissions(permissions)
     {
     }
 
     QString name;
-    Qn::GlobalPermissions permissions;
+    Qn::GlobalPermissions permissions = Qn::NoGlobalPermissions;
 
     bool isNull() const;
 };
-#define ApiUserRoleData_Fields ApiIdData_Fields (name)(permissions)
+#define ApiUserRoleData_Fields IdData_Fields (name)(permissions)
 
 /* Struct is not inherited from ApiUserRoleData as it has no 'id' field. */
-struct ApiPredefinedRoleData: ApiData
+struct ApiPredefinedRoleData: nx::vms::api::Data
 {
-    ApiPredefinedRoleData():
-        name(),
-        permissions(Qn::NoGlobalPermissions),
-        isOwner(false)
-    {
-    }
+    ApiPredefinedRoleData() = default;
 
     ApiPredefinedRoleData(const QString& name, Qn::GlobalPermissions permissions, bool isOwner = false):
         name(name),
@@ -45,8 +35,8 @@ struct ApiPredefinedRoleData: ApiData
     }
 
     QString name;
-    Qn::GlobalPermissions permissions;
-    bool isOwner;
+    Qn::GlobalPermissions permissions = Qn::NoGlobalPermissions;
+    bool isOwner = false;
 };
 #define ApiPredefinedRoleData_Fields (name)(permissions)(isOwner)
 

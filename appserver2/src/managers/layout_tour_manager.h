@@ -2,7 +2,7 @@
 
 #include <transaction/transaction.h>
 
-#include <nx_ec/data/api_layout_tour_data.h>
+#include <nx/vms/api/data/layout_tour_data.h>
 #include <nx_ec/managers/abstract_layout_tour_manager.h>
 #include <core/resource_access/user_access_data.h>
 
@@ -15,7 +15,9 @@ public:
     QnLayoutTourManager(QueryProcessorType* const queryProcessor, const Qn::UserAccessData &userAccessData);
 
     virtual int getLayoutTours(impl::GetLayoutToursHandlerPtr handler) override;
-    virtual int save(const ec2::ApiLayoutTourData& tour, impl::SimpleHandlerPtr handler) override;
+    virtual int save(
+        const nx::vms::api::LayoutTourData& tour,
+        impl::SimpleHandlerPtr handler) override;
     virtual int remove(const QnUuid& tour, impl::SimpleHandlerPtr handler) override;
 
 private:
@@ -38,18 +40,20 @@ int QnLayoutTourManager<QueryProcessorType>::getLayoutTours(impl::GetLayoutTours
 {
     const int reqID = generateRequestID();
     auto queryDoneHandler =
-        [reqID, handler](ErrorCode errorCode, const ApiLayoutTourDataList& tours)
+        [reqID, handler](ErrorCode errorCode, const nx::vms::api::LayoutTourDataList& tours)
         {
             handler->done(reqID, errorCode, tours);
         };
     m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync
-        <std::nullptr_t, ApiLayoutTourDataList, decltype(queryDoneHandler)>
-        (ApiCommand::getLayoutTours, nullptr, queryDoneHandler);
+        <const QnUuid&, nx::vms::api::LayoutTourDataList, decltype(queryDoneHandler)>
+        (ApiCommand::getLayoutTours, QnUuid(), queryDoneHandler);
     return reqID;
 }
 
 template<class QueryProcessorType>
-int QnLayoutTourManager<QueryProcessorType>::save(const ec2::ApiLayoutTourData& tour, impl::SimpleHandlerPtr handler)
+int QnLayoutTourManager<QueryProcessorType>::save(
+    const nx::vms::api::LayoutTourData& tour,
+    impl::SimpleHandlerPtr handler)
 {
     const int reqID = generateRequestID();
     m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
@@ -67,7 +71,7 @@ int QnLayoutTourManager<QueryProcessorType>::remove(const QnUuid& id, impl::Simp
 {
     const int reqID = generateRequestID();
     m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
-        ApiCommand::removeLayoutTour, ApiIdData(id),
+        ApiCommand::removeLayoutTour, nx::vms::api::IdData(id),
         [handler, reqID](ec2::ErrorCode errorCode)
         {
             handler->done(reqID, errorCode);

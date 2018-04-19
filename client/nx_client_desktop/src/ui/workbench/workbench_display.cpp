@@ -2413,20 +2413,21 @@ void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const vms::
      * In second case we should manually collect resources from event sources.
      */
     QSet<QnResourcePtr> targetResources;
-    vms::event::ActionType actionType = businessAction->actionType();
-    if (actionType == vms::event::showOnAlarmLayoutAction)
+    vms::api::ActionType actionType = businessAction->actionType();
+    if (actionType == vms::api::ActionType::showOnAlarmLayoutAction)
     {
         if (QnResourcePtr resource = resourcePool()->getResourceById(businessAction->getParams().actionResourceId))
             targetResources.insert(resource);
     }
     else
     {
-        NX_ASSERT(actionType == vms::event::showPopupAction || actionType == vms::event::playSoundAction,
+        NX_ASSERT(actionType == vms::api::ActionType::showPopupAction
+            || actionType == vms::api::ActionType::playSoundAction,
             Q_FUNC_INFO, "Invalid action type");
         vms::event::EventParameters eventParams = businessAction->getRuntimeParams();
         if (QnResourcePtr resource = resourcePool()->getResourceById(eventParams.eventResourceId))
             targetResources.insert(resource);
-        if (eventParams.eventType >= vms::event::userDefinedEvent)
+        if (eventParams.eventType >= vms::api::EventType::userDefinedEvent)
             targetResources.unite(resourcePool()->getResourcesByIds(eventParams.metadata.cameraRefs).toSet());
     }
 

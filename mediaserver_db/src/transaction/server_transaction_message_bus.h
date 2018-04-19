@@ -65,7 +65,7 @@ protected:
 	virtual void fillExtraAliveTransactionParams(ApiPeerAliveData* outAliveData) override;
 	virtual void logTransactionState() override;
     virtual ErrorCode updatePersistentMarker(
-        const QnTransaction<ApiUpdateSequenceData>& tran) override;
+        const QnTransaction<nx::vms::api::UpdateSequenceData>& tran) override;
 
 	virtual void handleIncomingTransaction(
 		QnTransactionTransport* sender,

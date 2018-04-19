@@ -5,20 +5,25 @@
 
 namespace ec2 {
 
-class QnUserNotificationManager : public AbstractUserNotificationManager
+class QnUserNotificationManager: public AbstractUserNotificationManager
 {
 public:
     QnUserNotificationManager();
 
-    void triggerNotification(const QnTransaction<ApiUserData>& tran,
+    void triggerNotification(
+        const QnTransaction<ApiUserData>& tran,
         NotificationSource source);
-    void triggerNotification(const QnTransaction<ApiUserDataList>& tran,
+    void triggerNotification(
+        const QnTransaction<ApiUserDataList>& tran,
         NotificationSource source);
-    void triggerNotification(const QnTransaction<ApiIdData>& tran,
+    void triggerNotification(
+        const QnTransaction<nx::vms::api::IdData>& tran,
         NotificationSource source);
-    void triggerNotification(const QnTransaction<ApiAccessRightsData>& tran,
+    void triggerNotification(
+        const QnTransaction<ApiAccessRightsData>& tran,
         NotificationSource source);
-    void triggerNotification(const QnTransaction<ApiUserRoleData>& tran,
+    void triggerNotification(
+        const QnTransaction<ApiUserRoleData>& tran,
         NotificationSource source);
 };
 

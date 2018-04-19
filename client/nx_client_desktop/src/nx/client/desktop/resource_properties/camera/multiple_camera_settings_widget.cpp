@@ -211,10 +211,10 @@ bool MultipleCameraSettingsWidget::isValidSecondStream()
     bool usesSecondStream = false;
     for (auto& task : filteredTasks)
     {
-        if (task.recordingType == Qn::RT_MotionAndLowQuality)
+        if (task.recordingType == Qn::RecordingType::motionAndLow)
         {
             usesSecondStream = true;
-            task.recordingType = Qn::RT_Always;
+            task.recordingType = Qn::RecordingType::always;
         }
     }
 
