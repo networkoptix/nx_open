@@ -142,7 +142,8 @@
     "requiredMessage": "Gebruik alleen alfanumerieke tekens en symbolen van het toetsenbord, Vermijd spaties voor en na het wachtwoord",
     "weakMessage": "Gebruik cijfers, hoofdletters, kleine letters en speciale tekens om uw wachtwoord sterker te maken",
     "strongMessage": "Sterk wachtwoord!",
-    "commonMessage": "Dit wachtwoord bevind zich in de top van de meest populaire wachtwoorden in de wereld"
+    "commonMessage": "Dit wachtwoord bevind zich in de top van de meest populaire wachtwoorden in de wereld",
+    "missingMessage": "Wachtwoord is vereist"
   },
   "sharing": {
     "confirmOwner": "Als u de eigenaar van het systeem wijzigt, trekt u het eigendom in van het uw account voor dit systeem. Deze actie is onomkeerbaar. Weet je het zeker?",

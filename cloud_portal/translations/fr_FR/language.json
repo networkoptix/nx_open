@@ -142,7 +142,8 @@
     "requiredMessage": "Utilisez uniquement les lettres latines, les chiffres et les symboles du clavier, éviter les espaces de début et de fin",
     "weakMessage": "Utiliser des nombres, majuscules et minuscules et caractères spéciaux pour rendre votre mot de passe plus fort",
     "strongMessage": "Mot de passe fort!",
-    "commonMessage": "Ce mot de passe est en haut de la liste des plus populaires dans le monde"
+    "commonMessage": "Ce mot de passe est en haut de la liste des plus populaires dans le monde",
+    "missingMessage": "Mot de passe requis"
   },
   "sharing": {
     "confirmOwner": "Si vous modifiez le propriétaire du système, vous révoquez la propriété sur le compte courant. Cette action est irréversible. Êtes-vous sûr ?",

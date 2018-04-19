@@ -6,6 +6,7 @@ from api.helpers.exceptions import handle_exceptions, api_success, require_param
     APIRequestException, APIForbiddenException, APINotFoundException, ErrorCodes
 import datetime, logging
 import json
+import re
 import requests
 from cloud import settings
 from django.shortcuts import redirect
@@ -93,15 +94,21 @@ def download_build(request, build):
     customization = settings.CUSTOMIZATION
     if not request.user.is_superuser and (request.user.customization != customization \
                                      or not request.user.has_perm('api.can_view_release')):
-        raise APIForbiddenException("Not authorized!!!", ErrorCodes.forbidden)
+        raise APIForbiddenException("Not authorized", ErrorCodes.forbidden)
+
+    if re.search(r'\D+', build):
+        raise APINotFoundException("Invalid build number", ErrorCodes.bad_request)
 
     downloads_url = settings.DOWNLOADS_VERSION_JSON.replace('{{customization}}', customization).replace('{{build}}', build)
     downloads_json = requests.get(downloads_url)
-    downloads_json.raise_for_status()
+
+    if downloads_json.status_code == 403:
+        raise APINotFoundException("Build number does not exist", ErrorCodes.not_found, error_data=request.query_params)
+
     downloads_json = downloads_json.json()
 
     if 'releaseNotes' not in downloads_json:
-        raise APINotFoundException("No downloads.json for this build!!!", ErrorCodes.not_found, error_data=request.query_params)
+        raise APINotFoundException("No downloads.json for this build", ErrorCodes.not_found, error_data=request.query_params)
 
     updates_json = requests.get(settings.UPDATE_JSON)
     updates_json.raise_for_status()

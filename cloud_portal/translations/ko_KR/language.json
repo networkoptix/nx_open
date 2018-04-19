@@ -142,7 +142,8 @@
     "requiredMessage": "라틴 문자, 숫자 및 키보드 기호 만 사용하고 앞뒤 공백은 피하십시오.",
     "weakMessage": "숫자, 대 / 소문자 및 특수 문자를 사용하여 패스워드를 더 강하게 만듭니다.",
     "strongMessage": "강력한 암호!",
-    "commonMessage": "현재 암호는 가능 많이 사용되는 암호입니다."
+    "commonMessage": "현재 암호는 가능 많이 사용되는 암호입니다.",
+    "missingMessage": "암호가 필요 합니다"
   },
   "sharing": {
     "confirmOwner": "시스템 소유자를 변경하면 현재 계정에서 소유권이 박탈 됩니다. 이 작업은 되돌릴 수 없습니다. 확실합니까?",

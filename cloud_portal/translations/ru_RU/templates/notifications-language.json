@@ -6,7 +6,7 @@
     "emailSubject": "Восстановление пароля"
   },
   "system_invite": {
-    "emailSubject": "{{message.sharer_name}} приглашает вас присоединиться к {{PRODUCT_NAME}}"
+    "emailSubject": "Вам открыт доступ к системе {{message.system_name}}"
   },
   "system_shared": {
     "emailSubject": "{{message.sharer_name}} приглашает вас присоединиться к {{PRODUCT_NAME}}"

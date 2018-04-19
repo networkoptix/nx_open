@@ -24,7 +24,7 @@ function instantiate_config()
     export CLOUD_PORTAL_HOST=${!CLOUD_PORTAL_HOST_var:-$CLOUD_PORTAL_HOST}
 
     tmp=$(tempfile)
-    envsubst < $CLOUD_PORTAL_BASE_CONF_DIR/../cloud_portal.yaml > $tmp
+    envsubst < $CLOUD_PORTAL_CONF_DIR/cloud_portal.yaml > $tmp
     mv $tmp $CLOUD_PORTAL_CONF_DIR/cloud_portal.yaml
 
     if [ -n "$MODULE_CONFIGURATION" ]
@@ -40,6 +40,7 @@ function write_my_cnf()
 user = $DB_USER
 password = $DB_PASSWORD
 host = $DB_HOST
+port = $DB_PORT
 database = $DB_NAME
 EOF
 }

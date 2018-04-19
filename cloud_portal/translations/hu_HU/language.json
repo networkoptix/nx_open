@@ -142,7 +142,8 @@
     "requiredMessage": "Csak latin betűket, számokat és billentyűzet szimbólumok használhatók, kerülje a szóközöket",
     "weakMessage": "Használjon számokat, kis és nagybetűket és speciális karaktereket az erősebb jelszó érdekében",
     "strongMessage": "Erős jelszó!",
-    "commonMessage": "Ez a jelszó a leggyakoribb jelszavak egyike"
+    "commonMessage": "Ez a jelszó a leggyakoribb jelszavak egyike",
+    "missingMessage": "Password is required"
   },
   "sharing": {
     "confirmOwner": "Ha megváltoztatja a rendszertulajdonost, érvényteleníti a tulajdonjogot ehhez a fiókhoz. Ez a művelet nem fordítható vissza. Folytatja?",
