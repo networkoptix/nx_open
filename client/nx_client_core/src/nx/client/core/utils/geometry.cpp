@@ -573,6 +573,26 @@ bool Geometry::contains(const QSize& size, const QSize& otherSize)
     return size.width() >= otherSize.width() && size.height() >= otherSize.height();
 }
 
+bool Geometry::contains(const QRect& rect, const QPoint& point)
+{
+    return rect.contains(point);
+}
+
+bool Geometry::contains(const QRectF& rect, const QPointF& point)
+{
+    return rect.contains(point);
+}
+
+QRect Geometry::intersection(const QRect& r1, const QRect& r2)
+{
+    return r1.intersected(r2);
+}
+
+QRectF Geometry::intersection(const QRectF& r1, const QRectF& r2)
+{
+    return r1.intersected(r2);
+}
+
 QRectF Geometry::movedInto(const QRectF& rect, const QRectF& target)
 {
     qreal dx = 0.0;

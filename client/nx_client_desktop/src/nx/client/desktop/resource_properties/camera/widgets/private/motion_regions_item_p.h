@@ -45,10 +45,6 @@ public:
     qreal fillOpacity() const;
     void setFillOpacity(qreal value);
 
-    QAbstractListModel* labels() const;
-
-    void userAddRect(int sensitivity, const QRect& rect /*in motion grid coords*/);
-
     QSGNode* updatePaintNode(QSGNode* node);
 
 private:

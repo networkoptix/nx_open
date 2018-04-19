@@ -19,14 +19,13 @@ public:
     QList<QnMotionRegion> motionRegionList() const;
     void setMotionRegionList(const QList<QnMotionRegion>& value);
 
-    void restoreDefaults();
-
-    void addRect(int channel, int sensitivity, const QRect& rect);
+    Q_INVOKABLE void restoreDefaults();
+    Q_INVOKABLE void addRect(int channel, int sensitivity, const QRect& rect);
+    Q_INVOKABLE void fillRegion(int channel, int sensitivity, const QPoint& at);
 
     static void registerQmlType();
 
 signals:
-    void cameraChanged();
     void motionRegionListChanged(int channel = -1/*all*/);
 
 private:

@@ -161,12 +161,6 @@ void MotionRegionsItem::Private::setFillOpacity(qreal value)
     q->update();
 }
 
-void MotionRegionsItem::Private::userAddRect(int sensitivity, const QRect& rect)
-{
-    if (m_motionHelper)
-        m_motionHelper->addRect(m_channel, sensitivity, rect);
-}
-
 QSGNode* MotionRegionsItem::Private::updatePaintNode(QSGNode* node)
 {
     auto geometryNode = static_cast<QSGGeometryNode*>(node);
