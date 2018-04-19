@@ -17,10 +17,10 @@ public:
 
     virtual bool eventFilter(QObject *watched, QEvent *event) override;
 
+    static void openHelpTopic(int topic);
 protected:
-    QUrl urlForTopic(int topic) const;
+    static QUrl urlForTopic(int topic);
 
 private:
     int m_topic;
-    QStringList m_helpSearchPaths;
 };

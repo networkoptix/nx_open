@@ -1,11 +1,6 @@
 #pragma once
 
-#include <QtWidgets/QLabel>
-#include <QtWidgets/QMenu>
-#include <qpointer.h>
-#include <qscopedpointer.h>
-
-#include <ui/help/help_handler.h>
+#include <QtWidgets/QWidget>
 
 namespace nx {
 namespace client {
@@ -34,7 +29,6 @@ protected:
 
     QSize sizeHint() const override;
     void paintEvent(QPaintEvent* event) override;
-
     void mouseReleaseEvent(QMouseEvent *event) override;
     void enterEvent(QEvent * event) override;
     void leaveEvent(QEvent * event) override;
@@ -47,7 +41,6 @@ protected:
 
     int m_helpTopicId;
     QString m_hint;
-    QScopedPointer<QnHelpHandler> m_helpHandler;
 };
 
 } // namespace desktop

@@ -15,7 +15,7 @@
 #include <ui/style/nx_style.h>
 #include <ui/style/helper.h>
 
-#include <ui/help/help_topics.h>
+#include <ui/help/help_handler.h>
 
 namespace nx {
 namespace client {
@@ -32,11 +32,6 @@ HintButton::HintButton(QWidget* parent)
 
     // For hovering stuff
     setMouseTracking(true);
-
-    m_helpHandler.reset(new QnHelpHandler(this));
-
-    //m_tooltipWidget->setBackgroundRole();
-    //connect(this, &QPushButton::pressed, this, &HintButton::at_click);
 }
 
 bool HintButton::isClickable() const
@@ -48,24 +43,27 @@ void HintButton::showTooltip(bool show)
 {
     if (!m_tooltipVisible && show)
     {
-        qDebug() << "Showing tooltip";
         QRect rc = rect();
         QPoint hintSpawnPos = mapToGlobal(rc.bottomLeft());
         QString text = lit("<p>%1</p>").arg(m_hint);
-        /*
-        // TODO: #common #vkutin Implement a better parsing for this to work if "style" attribute already exists
-        const QColor color = style::linkColor(m_label->palette(), pos == hoveredHrefPos);
-        alteredText.insert(pos, lit("style='color: %1' ").arg(color.name(QColor::HexRgb)));
-        */
+
+        auto nxStyle = QnNxStyle::instance();
+        NX_ASSERT(nxStyle);
+
         if (isClickable())
-            text += lit("<p><i style=\"color: light16\">%1</i></p>").arg(tr("Click to read more"));
+        {
+            QnGenericPalette palette = nxStyle->genericPalette();
+            QnPaletteColor lineColor = palette.color(lit("light"), 16);
+            QString colorHex = lineColor.color().name(QColor::HexRgb);
+
+            text += lit("<p><i style='color: %1'>%2</i></p>").arg(colorHex, tr("Click to read more"));
+        }
 
         QToolTip::showText(hintSpawnPos, text);
         m_tooltipVisible = true;
     }
     else if (m_tooltipVisible && !show)
     {
-        qDebug() << "Hiding tooltip";
         m_tooltipVisible = false;
     }
 }
@@ -116,11 +114,8 @@ void HintButton::paintEvent(QPaintEvent* event)
 
 void HintButton::mouseReleaseEvent(QMouseEvent *event)
 {
-    if (!m_helpHandler)
-        return;
-
     if (m_helpTopicId != Qn::Empty_Help)
-        m_helpHandler->setHelpTopic(m_helpTopicId);
+        QnHelpHandler::openHelpTopic(m_helpTopicId);
 }
 
 void HintButton::enterEvent(QEvent* event)
