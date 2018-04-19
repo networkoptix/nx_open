@@ -10,6 +10,7 @@ from framework.os_access.windows_remoting.dot_net.users import enumerate_user_pr
 log = logging.getLogger(__name__)
 
 
+@pytest.mark.skip('Install mediaserver first')
 @pytest.mark.parametrize('name', ['defaultMediaServer'])
 def test_service(pywinrm_protocol, name):
     service = Service(pywinrm_protocol, name)
@@ -18,6 +19,7 @@ def test_service(pywinrm_protocol, name):
     log.debug(pformat(service.start()))
 
 
+@pytest.mark.skip('Put file first')
 @pytest.mark.parametrize('path', ['C:\\oi.txt'])
 def test_file(pywinrm_protocol, path):
     path_moved_to = path + '.moved'
