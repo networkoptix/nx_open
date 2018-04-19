@@ -1,10 +1,10 @@
 import logging
+import re
 import time
 from datetime import datetime
 
 import pytest
 import pytz
-import re
 from pathlib2 import Path
 
 import framework.utils as utils
