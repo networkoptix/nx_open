@@ -299,7 +299,6 @@ def log_error(request, error, log_level):
         ip = get_client_ip(request)
         if not isinstance(request.user, AnonymousUser):
             user_name = request.user.email
-        log_level = logging.INFO
 
     if isinstance(request_data, QueryDict):
         request_data = request_data.dict()

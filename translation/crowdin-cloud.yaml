@@ -53,3 +53,6 @@ files:
   -
     source: '/webadmin/app/web_common/views/**/*.*'
     translation: '/webadmin/translations/%locale_with_underscore%/web_common/views/**/%original_file_name%'
+  -
+    source: '/cloud_portal/robot_tests/variables_language.json'
+    translation: '/cloud_portal/robot_tests/translations/variables_language_%locale_with_underscore%.json'
