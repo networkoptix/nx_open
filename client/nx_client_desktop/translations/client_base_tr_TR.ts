@@ -978,7 +978,7 @@ to view more bookmarks</source>
       <translation>Bu lisans için devreden çıkarma sayısı sınırı aştı.</translation>
     </message>
     <message>
-      <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
+      <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
       <translation>Bu lisansa sahip Sunucu Donanım Kimliği, lisansın etkinleştirildiği Donanım Kimliği ile eşleşmiyor.</translation>
     </message>
   </context>
@@ -2228,14 +2228,6 @@ to view more bookmarks</source>
       <translation>I/O modül ses akışı içermiyor</translation>
     </message>
     <message>
-      <source>I/O Module Id</source>
-      <translation>I/O Modül kimliği</translation>
-    </message>
-    <message>
-      <source>Camera Id</source>
-      <translation>Kamera Id</translation>
-    </message>
-    <message>
       <source>Settings</source>
       <translation>Ayarlar</translation>
     </message>
@@ -2246,6 +2238,14 @@ to view more bookmarks</source>
     <message>
       <source>No settings</source>
       <translation>Ayarlanmadı</translation>
+    </message>
+    <message>
+      <source>I/O Module ID</source>
+      <translation>I/O Modül kimliği</translation>
+    </message>
+    <message>
+      <source>Camera ID</source>
+      <translation>Kamera ID</translation>
     </message>
   </context>
   <context>
@@ -2359,10 +2359,10 @@ to view more bookmarks</source>
       <translation>Uç</translation>
     </message>
     <message numerus="yes">
-      <source>This Id is already used on the following %n cameras: %1</source>
+      <source>This ID is already used on the following %n cameras: %1</source>
       <translation type="unfinished">
         <numerusform>Bu kimlik, şu %n kamerada zaten kullanılıyor: %1</numerusform>
-        <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
+        <numerusform>This ID is already used on the following %n cameras: %1</numerusform>
       </translation>
     </message>
   </context>
@@ -2484,8 +2484,8 @@ to view more bookmarks</source>
       <translation>Sunucu</translation>
     </message>
     <message>
-      <source>Id</source>
-      <translation>Id</translation>
+      <source>ID</source>
+      <translation type="unfinished">ID</translation>
     </message>
   </context>
   <context>
@@ -3729,8 +3729,8 @@ to %1</source>
       <translation>Etki</translation>
     </message>
     <message>
-      <source>Id</source>
-      <translation>Id</translation>
+      <source>ID</source>
+      <translation type="unfinished">ID</translation>
     </message>
   </context>
   <context>
@@ -3882,6 +3882,21 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnLensCameraAdvancedParamWidget</name>
+    <message>
+      <source>Zoom</source>
+      <translation type="unfinished">Zoom</translation>
+    </message>
+    <message>
+      <source>Focus</source>
+      <translation type="unfinished">Focus</translation>
+    </message>
+    <message>
+      <source>Rotation:</source>
+      <translation type="unfinished">Rotation:</translation>
+    </message>
+  </context>
+  <context>
     <name>QnLicenseDetailsDialog</name>
     <message>
       <source>Screens Allowed:</source>
@@ -3912,7 +3927,7 @@ to %1</source>
       <translation>Özellikler:</translation>
     </message>
     <message>
-      <source>Locked to Hardware Id</source>
+      <source>Locked to Hardware ID</source>
       <translation>Donanım Kimliği'ne kaydedildi</translation>
     </message>
   </context>
@@ -4188,16 +4203,16 @@ to %1</source>
       <translation>Lütfen Müşteri Hizmetleriyle iletişime geçip geçerli bir lisans anahtarı alın.</translation>
     </message>
     <message>
-      <source>This license is already activated and linked to Hardware Id %1</source>
-      <translation>Bu lisans %1 hardware Id sine atanmış</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to Hardware Id %1 on %2</source>
-      <translation>Bu lisans %1 hardware Id sine atanmış %2</translation>
-    </message>
-    <message>
       <source>If the problem persists please contact Customer Support.</source>
       <translation>Eğer problem devam ederse Müşteri Hizmetleri ile iletişime geçin.</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1</source>
+      <translation>Bu lisans %1 Hardware ID sine atanmış</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1 on %2</source>
+      <translation>Bu lisans %1 Hardware ID sine atanmış %2</translation>
     </message>
   </context>
   <context>
@@ -4219,16 +4234,16 @@ to %1</source>
       <translation>Dosya açılamadı</translation>
     </message>
     <message>
-      <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
+      <source>All files</source>
+      <translation>Tüm Dosyalar</translation>
+    </message>
+    <message>
+      <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
       <translation>Aktivasyon dosyasını almak için Lütfen %1 e ait lisans anahtarını ve donanım kimliğini e-posta olarak gönderin.</translation>
     </message>
     <message>
-      <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
+      <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
       <translation>Aktivasyon dosyasını almak için Lütfen %1 e ait lisans anahtarını ve donanım kimliğini gönderin.</translation>
-    </message>
-    <message>
-      <source>All files</source>
-      <translation>Tüm Dosyalar</translation>
     </message>
   </context>
   <context>

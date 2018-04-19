@@ -561,8 +561,8 @@
       <translation>Onbekende fout</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
-      <translation>Server met bijpassende Hardware-Id niet gevonden</translation>
+      <source>Server with matching Hardware ID not found</source>
+      <translation>Server met bijpassende Hardware-ID niet gevonden</translation>
     </message>
   </context>
   <context>
@@ -684,12 +684,12 @@
       <translation>Watermerk: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>Hardware Id: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>Proeflicentie</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation type="unfinished">Hardware ID: %1</translation>
     </message>
   </context>
   <context>

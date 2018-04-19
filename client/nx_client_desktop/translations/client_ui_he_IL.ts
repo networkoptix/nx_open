@@ -764,7 +764,7 @@
     </message>
     <message>
       <location/>
-      <source>Logical Id</source>
+      <source>Logical ID</source>
       <translation>זיהוי ID לוגי</translation>
     </message>
   </context>
@@ -772,7 +772,7 @@
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
-      <source>Input Id</source>
+      <source>Input ID</source>
       <translation>מזהה קלט</translation>
     </message>
   </context>
@@ -798,7 +798,7 @@
     </message>
     <message>
       <location/>
-      <source>Output Id:</source>
+      <source>Output ID:</source>
       <translation>מזהה פלט:</translation>
     </message>
   </context>
@@ -1513,7 +1513,7 @@
     </message>
     <message>
       <location/>
-      <source>Locked to Hardware Id:</source>
+      <source>Locked to Hardware ID:</source>
       <translation>נעול למזהה-חומרה:</translation>
     </message>
   </context>
@@ -1612,7 +1612,7 @@
     </message>
     <message>
       <location/>
-      <source>Hardware Id</source>
+      <source>Hardware ID</source>
       <translation>מזהה-חומרה</translation>
     </message>
   </context>

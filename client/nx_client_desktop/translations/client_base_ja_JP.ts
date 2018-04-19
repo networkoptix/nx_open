@@ -978,7 +978,7 @@ to view more bookmarks</source>
       <translation>非アクティブの数がこのライセンスの上限を超えました</translation>
     </message>
     <message>
-      <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
+      <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
       <translation>このサーバーのハードウェアIDは、ライセンスがアクティブ化されたハードウェアIDと一致しません</translation>
     </message>
   </context>
@@ -2206,14 +2206,6 @@ to view more bookmarks</source>
       <translation>I/O モジュールにはオーディオ ストリームがありません</translation>
     </message>
     <message>
-      <source>I/O Module Id</source>
-      <translation>I/O モジュール Id</translation>
-    </message>
-    <message>
-      <source>Camera Id</source>
-      <translation>カメラ Id</translation>
-    </message>
-    <message>
       <source>Settings</source>
       <translation>設定</translation>
     </message>
@@ -2224,6 +2216,14 @@ to view more bookmarks</source>
     <message>
       <source>No settings</source>
       <translation>設定がありません</translation>
+    </message>
+    <message>
+      <source>I/O Module ID</source>
+      <translation>I/O モジュール ID</translation>
+    </message>
+    <message>
+      <source>Camera ID</source>
+      <translation>カメラ ID</translation>
     </message>
   </context>
   <context>
@@ -2336,7 +2336,7 @@ to view more bookmarks</source>
       <translation>Edge</translation>
     </message>
     <message numerus="yes">
-      <source>This Id is already used on the following %n cameras: %1</source>
+      <source>This ID is already used on the following %n cameras: %1</source>
       <translation>
         <numerusform>このIDは次の %n カメラで既に使用されています： %1</numerusform>
       </translation>
@@ -2456,8 +2456,8 @@ to view more bookmarks</source>
       <translation>サーバー</translation>
     </message>
     <message>
-      <source>Id</source>
-      <translation>Id</translation>
+      <source>ID</source>
+      <translation type="unfinished">ID</translation>
     </message>
   </context>
   <context>
@@ -3691,8 +3691,8 @@ to %1</source>
       <translation>インパルス</translation>
     </message>
     <message>
-      <source>Id</source>
-      <translation>Id</translation>
+      <source>ID</source>
+      <translation type="unfinished">ID</translation>
     </message>
   </context>
   <context>
@@ -3843,6 +3843,21 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnLensCameraAdvancedParamWidget</name>
+    <message>
+      <source>Zoom</source>
+      <translation type="unfinished">Zoom</translation>
+    </message>
+    <message>
+      <source>Focus</source>
+      <translation type="unfinished">Focus</translation>
+    </message>
+    <message>
+      <source>Rotation:</source>
+      <translation type="unfinished">Rotation:</translation>
+    </message>
+  </context>
+  <context>
     <name>QnLicenseDetailsDialog</name>
     <message>
       <source>Screens Allowed:</source>
@@ -3873,7 +3888,7 @@ to %1</source>
       <translation>機能:</translation>
     </message>
     <message>
-      <source>Locked to Hardware Id</source>
+      <source>Locked to Hardware ID</source>
       <translation>ハードウェアID</translation>
     </message>
   </context>
@@ -4139,16 +4154,16 @@ to %1</source>
       <translation>有効なライセンス キーを取得するにはカスタマーサポートに問い合わせてください</translation>
     </message>
     <message>
-      <source>This license is already activated and linked to Hardware Id %1</source>
-      <translation>このライセンスは既にアクティベートされハードウェア Id %1 にリンクされています</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to Hardware Id %1 on %2</source>
-      <translation>このライセンスは既にアクティベートされ %2 のハードウェア Id %1 にリンクされています</translation>
-    </message>
-    <message>
       <source>If the problem persists please contact Customer Support.</source>
       <translation>問題が解決しない場合は、カスタマー サポートに連絡してください</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1</source>
+      <translation>このライセンスは既にアクティベートされハードウェア ID %1 にリンクされています</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1 on %2</source>
+      <translation>このライセンスは既にアクティベートされ %2 のハードウェア ID %1 にリンクされています</translation>
     </message>
   </context>
   <context>
@@ -4170,16 +4185,16 @@ to %1</source>
       <translation>ファイルが開けませんでした</translation>
     </message>
     <message>
-      <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>アクティベーションキー ファイルを取得するにはライセンス キーと %1 で提供されたハードウェア Id を送信してください</translation>
-    </message>
-    <message>
-      <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>アクティベーションキー ファイルを取得するにはライセンス キーと %1 で提供されたハードウェア Id を送信してください</translation>
-    </message>
-    <message>
       <source>All files</source>
       <translation>すべてのファイル</translation>
+    </message>
+    <message>
+      <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
+      <translation>アクティベーションキー ファイルを取得するにはライセンス キーと %1 で提供されたハードウェア ID を送信してください</translation>
+    </message>
+    <message>
+      <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
+      <translation>アクティベーションキー ファイルを取得するにはライセンス キーと %1 で提供されたハードウェア ID を送信してください</translation>
     </message>
   </context>
   <context>

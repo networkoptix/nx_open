@@ -60,7 +60,7 @@
         <x>0</x>
         <y>0</y>
         <width>1034</width>
-        <height>502</height>
+        <height>500</height>
        </rect>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="1,1">
@@ -354,7 +354,7 @@
           <item>
            <widget class="QGroupBox" name="logicalIdGroupBox">
             <property name="title">
-             <string>Logical Id</string>
+             <string>Logical ID</string>
             </property>
             <property name="flat">
              <bool>true</bool>

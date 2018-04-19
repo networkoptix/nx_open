@@ -978,7 +978,7 @@ to view more bookmarks</source>
       <translation>Przekroczono limit dopuszczalnych deaktywacji dla tej licencji.</translation>
     </message>
     <message>
-      <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
+      <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
       <translation>Identyfikator sprzętu serwera nie jest zgodny z identyfikatorem, dla którego aktywowano licencję.</translation>
     </message>
   </context>
@@ -2272,14 +2272,6 @@ to view more bookmarks</source>
       <translation>Moduł I/O nie ma strumienia audio</translation>
     </message>
     <message>
-      <source>I/O Module Id</source>
-      <translation>ID modułu I/O</translation>
-    </message>
-    <message>
-      <source>Camera Id</source>
-      <translation>ID kamery</translation>
-    </message>
-    <message>
       <source>Settings</source>
       <translation>Ustawienia</translation>
     </message>
@@ -2290,6 +2282,14 @@ to view more bookmarks</source>
     <message>
       <source>No settings</source>
       <translation>Brak ustawień</translation>
+    </message>
+    <message>
+      <source>I/O Module ID</source>
+      <translation>ID modułu I/O</translation>
+    </message>
+    <message>
+      <source>Camera ID</source>
+      <translation>ID kamery</translation>
     </message>
   </context>
   <context>
@@ -2405,7 +2405,7 @@ to view more bookmarks</source>
       <translation>Edge</translation>
     </message>
     <message numerus="yes">
-      <source>This Id is already used on the following %n cameras: %1</source>
+      <source>This ID is already used on the following %n cameras: %1</source>
       <translation>
         <numerusform>Ten identyfikator jest już używany w następującej kamerze: %1</numerusform>
         <numerusform>Ten identyfikator jest już używany w następujących %n kamerach: %1</numerusform>
@@ -2540,8 +2540,8 @@ to view more bookmarks</source>
       <translation>Serwer</translation>
     </message>
     <message>
-      <source>Id</source>
-      <translation>ID</translation>
+      <source>ID</source>
+      <translation type="unfinished">ID</translation>
     </message>
   </context>
   <context>
@@ -3805,8 +3805,8 @@ to %1</source>
       <translation>Impuls</translation>
     </message>
     <message>
-      <source>Id</source>
-      <translation>ID</translation>
+      <source>ID</source>
+      <translation type="unfinished">ID</translation>
     </message>
   </context>
   <context>
@@ -3960,6 +3960,21 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnLensCameraAdvancedParamWidget</name>
+    <message>
+      <source>Zoom</source>
+      <translation type="unfinished">Zoom</translation>
+    </message>
+    <message>
+      <source>Focus</source>
+      <translation type="unfinished">Focus</translation>
+    </message>
+    <message>
+      <source>Rotation:</source>
+      <translation type="unfinished">Rotation:</translation>
+    </message>
+  </context>
+  <context>
     <name>QnLicenseDetailsDialog</name>
     <message>
       <source>Screens Allowed:</source>
@@ -3990,7 +4005,7 @@ to %1</source>
       <translation>Funkcje:</translation>
     </message>
     <message>
-      <source>Locked to Hardware Id</source>
+      <source>Locked to Hardware ID</source>
       <translation>Przypisane trwale do ID sprzętu</translation>
     </message>
   </context>
@@ -4286,16 +4301,16 @@ to %1</source>
       <translation>Skontaktuj się z działem obsługi klienta, aby uzyskać prawidłowy klucz licencyjny.</translation>
     </message>
     <message>
-      <source>This license is already activated and linked to Hardware Id %1</source>
+      <source>If the problem persists please contact Customer Support.</source>
+      <translation>Jeśli problem nie ustąpi, skontaktuj się z działem obsługi klienta.</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1</source>
       <translation>Ta licencja jest już aktywna dla ID sprzętu %1</translation>
     </message>
     <message>
-      <source>This license is already activated and linked to Hardware Id %1 on %2</source>
+      <source>This license is already activated and linked to Hardware ID %1 on %2</source>
       <translation>Ta licencja jest już aktywna dla ID sprzętu %1 na %2</translation>
-    </message>
-    <message>
-      <source>If the problem persists please contact Customer Support.</source>
-      <translation>Jeśli problem nie ustąpi, skontaktuj się z działem obsługi klienta.</translation>
     </message>
   </context>
   <context>
@@ -4317,16 +4332,16 @@ to %1</source>
       <translation>Nie można otworzyć pliku</translation>
     </message>
     <message>
-      <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
+      <source>All files</source>
+      <translation type="unfinished">All files</translation>
+    </message>
+    <message>
+      <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
       <translation>W celu uzyskania pliku z kluczem aktywacyjnym prosimy o przesłanie wiadomości e-mail z kluczem licencyjnym oraz ID sprzętu do %1.</translation>
     </message>
     <message>
-      <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
+      <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
       <translation>W celu uzyskania pliku z kluczem aktywacyjnym prosimy o przesłanie klucza licencyjnego oraz ID sprzętu do %1.</translation>
-    </message>
-    <message>
-      <source>All files</source>
-      <translation type="unfinished">All files</translation>
     </message>
   </context>
   <context>

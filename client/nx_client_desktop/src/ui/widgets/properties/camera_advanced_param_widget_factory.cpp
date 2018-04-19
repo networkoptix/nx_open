@@ -280,7 +280,10 @@ private:
     QLineEdit* m_lineEdit;
 };
 
-class QnLensCameraAdvancedParamWidget : public QnAbstractCameraAdvancedParamWidget {
+class QnLensCameraAdvancedParamWidget : public QnAbstractCameraAdvancedParamWidget
+{
+    Q_DECLARE_TR_FUNCTIONS(QnLensCameraAdvancedParamWidget)
+
 public:
     QnLensCameraAdvancedParamWidget(const QnCameraAdvancedParameter &parameter, QWidget* parent) :
         QnAbstractCameraAdvancedParamWidget(parameter, parent),
@@ -314,7 +317,7 @@ public:
         m_rotationDec->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
         m_rotationDec->setMaximumSize(buttonSize);
         m_rotationLabel = new QLabel();
-        m_rotationLabel->setText(tr("Rotation: "));
+        m_rotationLabel->setText(tr("Rotation:") + L' ');
         ptzrInfoContainer->addWidget(m_rotationAdd);
         ptzrInfoContainer->addWidget(m_rotationLabel);
         ptzrInfoContainer->addWidget(m_rotationDec);
@@ -322,9 +325,9 @@ public:
         ptzrContainer->setAlignment(ptzrInfoContainer, Qt::AlignCenter);
 
         ptzrInfoContainer->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
-        
+
         m_layout->insertLayout(1, ptzrContainer);
-        
+
 
         // Focus is here
         m_focus = new nx::client::desktop::VButtonSlider(this);

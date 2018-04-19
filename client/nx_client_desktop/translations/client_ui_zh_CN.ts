@@ -764,15 +764,15 @@
     </message>
     <message>
       <location/>
-      <source>Logical Id</source>
-      <translation>逻辑 Id</translation>
+      <source>Logical ID</source>
+      <translation>逻辑 ID</translation>
     </message>
   </context>
   <context>
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
-      <source>Input Id</source>
+      <source>Input ID</source>
       <translation>输入ID:</translation>
     </message>
   </context>
@@ -798,7 +798,7 @@
     </message>
     <message>
       <location/>
-      <source>Output Id:</source>
+      <source>Output ID:</source>
       <translation>输出ID:</translation>
     </message>
   </context>
@@ -1513,7 +1513,7 @@
     </message>
     <message>
       <location/>
-      <source>Locked to Hardware Id:</source>
+      <source>Locked to Hardware ID:</source>
       <translation>已关联硬件ID</translation>
     </message>
   </context>
@@ -1612,7 +1612,7 @@
     </message>
     <message>
       <location/>
-      <source>Hardware Id</source>
+      <source>Hardware ID</source>
       <translation>硬件ID:</translation>
     </message>
   </context>

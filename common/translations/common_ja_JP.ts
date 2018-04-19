@@ -557,7 +557,7 @@
       <translation>不明なエラー</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
+      <source>Server with matching Hardware ID not found</source>
       <translation>サーバーのハードウェアIDが見つかりません</translation>
     </message>
   </context>
@@ -674,12 +674,12 @@
       <translation>透かし: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>ハードウェア Id: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>タイムライセンス</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>ハードウェア ID: %1</translation>
     </message>
   </context>
   <context>
