@@ -1,6 +1,7 @@
 import csv
 import logging
 from pprint import pformat
+from uuid import UUID
 
 from netaddr import EUI
 from netaddr.strategy.eui48 import mac_bare
@@ -130,3 +131,16 @@ class VirtualBox(object):
         for nic_index in info.networks:
             if info.networks[nic_index] is not None:
                 self.host_os_access.run_command(['VBoxManage', 'controlvm', vm_name, 'nic{}'.format(nic_index), 'null'])
+
+    def list_vm_names(self):
+        output = self.host_os_access.run_command(['VBoxManage', 'list', 'vms'])
+        lines = output.strip().splitlines()
+        vm_names = []
+        for line in lines:
+            # No chars are escaped in name. It's just enclosed in double quotes.
+            quoted_name, uuid_str = line.rsplit(' ', 1)
+            uuid = UUID(hex=uuid_str)
+            assert uuid != UUID(int=0)  # Only check that it's valid.
+            name = quoted_name[1:-1]
+            vm_names.append(name)
+        return vm_names

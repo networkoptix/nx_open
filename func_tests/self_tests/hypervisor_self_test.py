@@ -12,10 +12,14 @@ logger = logging.getLogger(__name__)
 name_format = 'func_tests-temp-dummy-{}'
 
 
-def _create_vm(name):
+def _remove_vm(name):
     logger.debug("Delete %s if exists.", name)
     call(['VBoxManage', 'controlvm', name, 'poweroff'])
     call(['VBoxManage', 'unregistervm', name, '--delete'])
+
+
+def _create_vm(name):
+    _remove_vm(name)
     logger.debug("Create template %s.", name)
     check_call(['VBoxManage', 'createvm', '--name', name, '--register'])
     check_call(['VBoxManage', 'modifyvm', name, '--description', 'For testing purposes. Can be deleted.'])
@@ -79,3 +83,15 @@ def test_power(hypervisor, dummy):
     wait_for_true(lambda: hypervisor.find(dummy).is_running, 'VM {} is running'.format(dummy))
     hypervisor.power_off(dummy)
     wait_for_true(lambda: not hypervisor.find(dummy).is_running, 'VM {} is not running'.format(dummy))
+
+
+def test_list(hypervisor):
+    names = [
+        name_format.format('test_list-{}'.format(index))
+        for index in range(3)]
+    for name in names:
+        _create_vm(name)
+    assert set(names) <= set(hypervisor.list_vm_names())
+    for name in names:
+        _remove_vm(name)
+    assert not set(names) & set(hypervisor.list_vm_names())
