@@ -42,7 +42,6 @@ Item
         flick.animateToSize(width, height, animate, forceSize)
     }
 
-
     Flickable
     {
         id: flick
