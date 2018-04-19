@@ -4,7 +4,6 @@
 #include <QtCore/QObject>
 
 #include <core/resource/motion_window.h>
-#include <core/resource/resource_fwd.h>
 
 namespace nx {
 namespace client {
