@@ -10,30 +10,23 @@ import com.networkoptix.qml 1.0
 import nx.client.core 1.0
 import nx.client.desktop 1.0
 
-/* Required context properties:
-property VirtualCameraResource cameraResource
-property CameraMotionHelper cameraMotionHelper
-property int currentSensitivity
-property color sensitivityColors[]
-*/
-
 Rectangle
 {
     id: videoContainer
 
-    color: ColorTheme.window
-
-    readonly property int kMotionGridWidth: 44
-    readonly property int kMotionGridHeight: 32
+    property string cameraResourceId: ""
+    property CameraMotionHelper cameraMotionHelper: null
+    property int currentSensitivity: 5
+    property var sensitivityColors
 
     readonly property real kMotionGridOpacity: 0.06
     readonly property real kMotionRegionOpacity: 0.3
     readonly property real kSelectionOpacity: 0.2
 
-    readonly property string cameraResourceId:
-        cameraResource ? cameraResource.id.toString() : ""
+    readonly property int kMotionGridWidth: 44
+    readonly property int kMotionGridHeight: 32
 
-    readonly property var motionSensitivityColors: sensitivityColors
+    color: ColorTheme.window
 
     MediaResourceHelper
     {
@@ -195,8 +188,8 @@ Rectangle
                     channel: index
                     fillOpacity: kMotionRegionOpacity
                     borderColor: ColorTheme.window
-                    labelsColor: ColorTheme.shadow
-                    sensitivityColors: motionSensitivityColors
+                    labelsColor: colors.dark1
+                    sensitivityColors: videoContainer.sensitivityColors
 
                     Connections
                     {

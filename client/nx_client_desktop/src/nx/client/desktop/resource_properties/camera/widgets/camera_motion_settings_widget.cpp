@@ -4,7 +4,7 @@
 #include "../redux/camera_settings_dialog_state.h"
 #include "../redux/camera_settings_dialog_store.h"
 
-#include <QtQml/QQmlContext>
+#include <QtQuick/QQuickItem>
 #include <QtQuick/QQuickView>
 #include <QtQuickWidgets/QQuickWidget>
 #include <QtWidgets/QButtonGroup>
@@ -48,17 +48,6 @@ CameraMotionSettingsWidget::CameraMotionSettingsWidget(
     ui->motionDetectionCheckBox->setProperty(style::Properties::kCheckBoxAsButton, true);
     ui->motionDetectionCheckBox->setForegroundRole(QPalette::ButtonText);
 
-    auto rootContext = m_motionView->rootContext();
-    rootContext->setContextProperty(lit("cameraResource"), nullptr);
-    rootContext->setContextProperty(lit("cameraMotionHelper"), m_motionHelper.data());
-    rootContext->setContextProperty(lit("currentSensitivity"), 0);
-    rootContext->setContextProperty(lit("sensitivityColors"),
-        QVariant::fromValue(m_sensitivityColors));
-
-    m_motionView->setSource(lit("Nx/Motion/MotionSettingsItem.qml"));
-    m_motionView->setResizeMode(QQuickView::SizeRootObjectToView);
-    ui->motionContainerWidget->layout()->addWidget(QWidget::createWindowContainer(m_motionView));
-
     const auto sensitivityButtonPaintFunction =
         [this](QPainter* painter, const QStyleOption* option, const QWidget* widget) -> bool
         {
@@ -99,14 +88,31 @@ CameraMotionSettingsWidget::CameraMotionSettingsWidget(
     connect(m_sensitivityButtons, QnButtonGroupIntButtonClicked, this,
         [this]()
         {
-            m_motionView->rootContext()->setContextProperty(
-                lit("currentSensitivity"), m_sensitivityButtons->checkedId());
+            if (auto motionItem = m_motionView->rootObject())
+                motionItem->setProperty("currentSensitivity", m_sensitivityButtons->checkedId());
         });
 
     m_sensitivityButtons->setExclusive(true);
     m_sensitivityButtons->button(QnMotionRegion::kDefaultSensitivity)->setChecked(true);
 
     setHelpTopic(this, Qn::CameraSettings_Motion_Help);
+
+    connect(m_motionView, &QQuickView::statusChanged, this,
+        [this](QQuickView::Status status)
+        {
+            if (status != QQuickView::Status::Ready)
+                return;
+
+            auto motionItem = m_motionView->rootObject();
+            motionItem->setProperty("cameraResourceId", m_cameraId);
+            motionItem->setProperty("cameraMotionHelper", QVariant::fromValue(m_motionHelper.data()));
+            motionItem->setProperty("currentSensitivity", m_sensitivityButtons->checkedId());
+            motionItem->setProperty("sensitivityColors", QVariant::fromValue(m_sensitivityColors));
+        });
+
+    m_motionView->setSource(lit("Nx/Motion/MotionSettingsItem.qml"));
+    m_motionView->setResizeMode(QQuickView::SizeRootObjectToView);
+    ui->motionContainerWidget->layout()->addWidget(QWidget::createWindowContainer(m_motionView));
 
     connect(ui->motionDetectionCheckBox, &QCheckBox::toggled,
         store, &CameraSettingsDialogStore::setMotionDetectionEnabled);
@@ -127,11 +133,11 @@ CameraMotionSettingsWidget::~CameraMotionSettingsWidget()
 
 void CameraMotionSettingsWidget::loadState(const CameraSettingsDialogState& state)
 {
+    m_cameraId = state.isSingleCamera() ? state.singleCameraProperties.id : QString();
     m_motionHelper->setMotionRegionList(state.singleCameraSettings.motionRegionList());
 
-    m_motionView->rootContext()->setContextProperty(lit("cameraResource"), state.isSingleCamera()
-        ? state.singleCameraProperties.cameraResource.data()
-        : nullptr);
+    if (auto motionItem = m_motionView->rootObject())
+        motionItem->setProperty("cameraResourceId", m_cameraId);
 }
 
 QVector<QColor> CameraMotionSettingsWidget::sensitivityColors() const
@@ -143,8 +149,8 @@ void CameraMotionSettingsWidget::setSensitivityColors(const QVector<QColor>& val
 {
     m_sensitivityColors = value;
 
-    m_motionView->rootContext()->setContextProperty(
-        lit("sensitivityColors"), QVariant::fromValue(m_sensitivityColors));
+    if (auto motionItem = m_motionView->rootObject())
+        motionItem->setProperty("sensitivityColors", QVariant::fromValue(m_sensitivityColors));
 }
 
 void CameraMotionSettingsWidget::resetMotionRegions()

@@ -41,7 +41,6 @@ ShaderEffect
         void main()
         {
             vec2 closestLines = floor(coordinates / cellSize) * cellSize;
-            //closestLines += (vec2(1.0) - step(0.001, abs(coordinates - closestLines))) * 0.001;
             if (all(greaterThan(coordinates - closestLines, vec2(lineThickness))))
                 discard;
 

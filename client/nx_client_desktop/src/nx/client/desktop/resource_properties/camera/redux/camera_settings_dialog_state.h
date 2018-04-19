@@ -130,8 +130,6 @@ struct CameraSettingsDialogState
         int maxMotionRects = 0;
         int maxMotionMaskRects = 0;
         int maxMotionSensitivityRects = 0;
-
-        QnVirtualCameraResourcePtr cameraResource;
     };
     SingleCameraProperties singleCameraProperties;
 

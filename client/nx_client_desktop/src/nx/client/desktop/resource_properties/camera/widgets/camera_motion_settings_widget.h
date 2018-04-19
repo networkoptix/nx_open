@@ -45,6 +45,7 @@ private:
     QButtonGroup* const m_sensitivityButtons = nullptr;
     QQuickView* const m_motionView = nullptr;
     QVector<QColor> m_sensitivityColors;
+    QString m_cameraId;
 };
 
 } // namespace desktop
