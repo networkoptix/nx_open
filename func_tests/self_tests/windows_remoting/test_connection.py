@@ -6,7 +6,7 @@ from pprint import pformat
 
 import requests
 
-from framework.utils import Wait
+from framework.waiting import retry_on_exception
 
 _logger = logging.getLogger(__name__)
 
@@ -22,31 +22,24 @@ def test_port_open(windows_vm_info):
     l_linger = 0
     client.setsockopt(socket.SOL_SOCKET, socket.SO_LINGER, struct.pack('ii', l_onoff, l_linger))
     with closing(client):
-        wait = Wait('for connection', timeout_sec=300)
-        while True:
-            try:
-                client.connect((hostname, port))
-            except socket.timeout:
-                if not wait.sleep_and_continue():
-                    assert False, "Cannot connect to VM"
-            else:
-                break
+        retry_on_exception(
+            lambda: client.connect((hostname, port)),
+            socket.timeout,
+            'connection to {}:{} can be established'.format(hostname, port),
+            timeout_sec=300)
 
 
 def test_http_is_understood(windows_vm_info):
     hostname, port = windows_vm_info.ports['tcp', 5985]
-    wait = Wait('for HTTP response', timeout_sec=600)
-    while True:
-        try:
-            response = requests.get('http://{}:{}/wsman'.format(hostname, port))
-        except requests.ConnectionError:
-            if not wait.sleep_and_continue():
-                assert False, "Not HTTP response yet"
-        else:
-            _logger.debug(
-                "Response:\n%d\n%s\n%r",
-                response.status_code,
-                pformat(response.headers),
-                response.content)
-            assert 100 <= response.status_code < 600
-            break
+    url = 'http://{}:{}/wsman'.format(hostname, port)
+    response = retry_on_exception(
+        lambda: requests.get(url),
+        requests.ConnectionError,
+        "HTTP response is received",
+        timeout_sec=600)
+    _logger.debug(
+        "Response:\n%d\n%s\n%r",
+        response.status_code,
+        pformat(response.headers),
+        response.content)
+    assert 100 <= response.status_code < 600

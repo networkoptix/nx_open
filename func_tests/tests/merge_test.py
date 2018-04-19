@@ -19,7 +19,8 @@ from framework.merging import (
     )
 from framework.rest_api import HttpError
 from framework.mediaserver import MEDIASERVER_MERGE_TIMEOUT
-from framework.utils import bool_to_str, datetime_utc_now, str_to_bool, wait_until
+from framework.utils import bool_to_str, datetime_utc_now, str_to_bool
+from framework.waiting import wait_for_true
 
 log = logging.getLogger(__name__)
 
@@ -43,9 +44,9 @@ def change_bool_setting(server, setting):
 
 
 def wait_for_settings_merge(one, two):
-    assert wait_until(
+    wait_for_true(
         lambda: get_system_settings(one.api) == get_system_settings(two.api),
-        name='for same response to /api/systemSettings from {} and {}'.format(one.machine.alias, two.machine.alias))
+        '{} and {} response identically to /api/systemSettings'.format(one.machine.alias, two.machine.alias))
 
 
 def check_admin_disabled(server):

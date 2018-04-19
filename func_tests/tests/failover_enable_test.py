@@ -15,7 +15,8 @@ import server_api_data_generators as generator
 from framework.api_shortcuts import get_server_id, get_system_settings
 from framework.merging import merge_systems
 from framework.mediaserver import MEDIASERVER_MERGE_TIMEOUT
-from framework.utils import bool_to_str, datetime_utc_now, str_to_bool, wait_until
+from framework.utils import bool_to_str, datetime_utc_now, str_to_bool
+from framework.waiting import wait_for_true
 
 CAMERA_SWITCHING_PERIOD_SEC = 4*60
 
@@ -116,27 +117,27 @@ def online_camera_macs_on_server(server):
 
 
 def wait_until_cameras_on_server_reduced_to(server, camera_mac_set):
-    assert wait_until(
+    wait_for_true(
         lambda: online_camera_macs_on_server(server) == camera_mac_set,
-        timeout_sec=CAMERA_SWITCHING_PERIOD_SEC), (
-            'Cameras on server %s were not reduced to %r in %d seconds' %
-            (server, sorted(camera_mac_set), CAMERA_SWITCHING_PERIOD_SEC))
+        'cameras on server {} were not reduced to {} in {:d} seconds'.format(
+            server, sorted(camera_mac_set), CAMERA_SWITCHING_PERIOD_SEC),
+        timeout_sec=CAMERA_SWITCHING_PERIOD_SEC)
 
 
 def wait_until_camera_count_is_online(server, camera_count):
-    assert wait_until(
+    wait_for_true(
         lambda: len(online_camera_macs_on_server(server)) >= camera_count,
-        timeout_sec=CAMERA_SWITCHING_PERIOD_SEC), (
-        '%d cameras did not become online on %r in %d seconds' %
-            (camera_count, server, CAMERA_SWITCHING_PERIOD_SEC))
+        '{:d} cameras did not become online on {} in {:d} seconds'.format(
+            camera_count, server, CAMERA_SWITCHING_PERIOD_SEC),
+        timeout_sec=CAMERA_SWITCHING_PERIOD_SEC)
 
 
 def wait_until_cameras_are_online(server, camera_mac_set):
-    assert wait_until(
+    wait_for_true(
         lambda: online_camera_macs_on_server(server) >= camera_mac_set,
-        timeout_sec=CAMERA_SWITCHING_PERIOD_SEC), (
-        'Cameras %r did not become online on %r in %d seconds' %
-            (sorted(camera_mac_set), server, CAMERA_SWITCHING_PERIOD_SEC))
+        'Cameras {} did not become online on {} in {:d} seconds'.format(
+            sorted(camera_mac_set), server, CAMERA_SWITCHING_PERIOD_SEC),
+        timeout_sec=CAMERA_SWITCHING_PERIOD_SEC)
 
 
 def get_server_camera_macs(server):

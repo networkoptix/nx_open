@@ -3,7 +3,7 @@ from netaddr import IPAddress, IPNetwork
 
 from framework.networking import setup_networks, setup_flat_network
 from framework.pool import ClosingPool
-from framework.utils import wait_until
+from framework.waiting import wait_for_true
 
 
 @pytest.fixture()
@@ -58,5 +58,11 @@ def test_setup_basic(machines, hypervisor):
 
 def test_linux_and_windows(linux_vm, windows_vm, hypervisor):
     ips = setup_flat_network((linux_vm, windows_vm), IPNetwork('10.254.0.0/28'), hypervisor)
-    assert wait_until(lambda: linux_vm.networking.can_reach(ips[windows_vm.alias], timeout_sec=2))
-    assert wait_until(lambda: windows_vm.networking.can_reach(ips[linux_vm.alias], timeout_sec=2))
+    windows_vm_ip = ips[windows_vm.alias]
+    wait_for_true(
+        lambda: linux_vm.networking.can_reach(windows_vm_ip, timeout_sec=2),
+        "{} can ping {} by {}".format(linux_vm, windows_vm, windows_vm_ip))
+    linux_vm_ip = ips[linux_vm.alias]
+    wait_for_true(
+        lambda: windows_vm.networking.can_reach(linux_vm_ip, timeout_sec=2),
+        "{} can ping {} by {}".format(windows_vm, linux_vm, linux_vm_ip))

@@ -6,9 +6,9 @@ from netaddr import EUI
 from netaddr.strategy.eui48 import mac_bare
 
 from framework.os_access import NonZeroExitStatus
-from framework.utils import wait_until
 from framework.vms.hypervisor import VMAllAdaptersBusy, VMInfo, VMNotFound
 from framework.vms.port_forwarding import calculate_forwarded_ports
+from framework.waiting import wait_for_true
 
 _logger = logging.getLogger(__name__)
 
@@ -104,7 +104,7 @@ class VirtualBox(object):
     def destroy(self, vm_name):
         if self.find(vm_name).is_running:
             self.host_os_access.run_command(['VBoxManage', 'controlvm', vm_name, 'poweroff'])
-            assert wait_until(lambda: not self.find(vm_name).is_running, name='until VM is off')
+            wait_for_true(lambda: not self.find(vm_name).is_running, 'VM {} is off'.format(vm_name))
         self.host_os_access.run_command(['VBoxManage', 'unregistervm', vm_name, '--delete'])
         _logger.info("VM %r destroyed.", vm_name)
 

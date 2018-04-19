@@ -7,7 +7,7 @@ from requests.exceptions import ReadTimeout
 
 from framework.rest_api import RestApi
 from framework.mediaserver_factory import SERVER_LOG_ARTIFACT_TYPE, CORE_FILE_ARTIFACT_TYPE, TRACEBACK_ARTIFACT_TYPE
-from framework.utils import wait_until
+from framework.waiting import wait_for_true
 from . import utils
 from .utils import GrowingSleep
 from .core_file_traceback import create_core_file_traceback
@@ -164,7 +164,7 @@ class LightweightServersHost(object):
             name = 'lws-%05d' % idx
             api = RestApi(name, self._os_access.hostname, server_port)
             server = LightweightServer(name, self._os_access, self.service, self._installation, api, port=server_port)
-            wait_until(server.is_online)
+            wait_for_true(server.is_online, "{} is online after allocation".format(server))
             if not self._first_server:
                 self._first_server = server
             yield server

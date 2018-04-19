@@ -4,7 +4,7 @@ import os
 import select
 import math
 
-from framework.utils import Wait
+from framework.waiting import Wait
 
 logger = logging.getLogger(__name__)
 
@@ -66,7 +66,7 @@ def communicate(process, input, timeout_sec):
     input_offset = 0
 
     wait = Wait(
-        name='for events from process',
+        'process responds',
         timeout_sec=timeout_sec,
         log_continue=process_logger.debug,
         log_stop=process_logger.error)
@@ -110,7 +110,8 @@ def communicate(process, input, timeout_sec):
         exit_status = process.poll()
         if exit_status is not None:
             break
-        if not wait.sleep_and_continue():
+        if not wait.again():
             break
+        wait.sleep()
 
     return exit_status, b''.join(stdout.chunks), b''.join(stderr.chunks)

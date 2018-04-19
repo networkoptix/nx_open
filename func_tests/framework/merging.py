@@ -4,7 +4,7 @@ from netaddr import IPAddress, IPNetwork
 
 from framework.api_shortcuts import get_local_system_id
 from framework.rest_api import DEFAULT_API_PASSWORD, DEFAULT_API_USER, RestApiError
-from framework.utils import wait_until
+from framework.waiting import wait_for_true
 
 _logger = logging.getLogger(__name__)
 
@@ -44,13 +44,6 @@ class MergeUnauthorized(ExplicitMergeError):
     pass
 
 
-class MergeChecksFailed(MergeError):
-    def __init__(self, local, remote, message):
-        super(MergeChecksFailed, self).__init__(local, remote, "response was OK but checks failed: {}".format(message))
-        self.local = local
-        self.remote = remote
-
-
 def merge_systems(local, remote, accessible_ip_net=IPNetwork('10.254.0.0/16'), take_remote_settings=False):
     # When many servers are merged, there is server visible from others.
     # This server is passed as remote. That's why it's higher in loggers hierarchy.
@@ -86,16 +79,14 @@ def merge_systems(local, remote, accessible_ip_net=IPNetwork('10.254.0.0/16'), t
             raise MergeUnauthorized(local, remote, e.error, e.error_string)
         raise ExplicitMergeError(local, remote, e.error, e.error_string)
     servant.api = servant.api.with_credentials(master.api.user, master.api.password)
-    if not wait_until(
-            servant.api.credentials_work,
-            name="until {} accepts new credentials from {}".format(servant, master),
-            timeout_sec=30):
-        raise MergeChecksFailed(local, remote, "new credentials don't work")
-    if not wait_until(
-            lambda: get_local_system_id(servant.api) == master_system_id,
-            name="until {} responds with system id {}".format(servant, master_system_id),
-            timeout_sec=10):
-        raise MergeChecksFailed(local, remote, "local system ids don't match")
+    wait_for_true(
+        servant.api.credentials_work,
+        "{} accepts new credentials from {}".format(servant, master),
+        timeout_sec=30)
+    wait_for_true(
+        lambda: get_local_system_id(servant.api) == master_system_id,
+        "{} responds with system id {}".format(servant, master_system_id),
+        timeout_sec=10)
 
 
 def setup_local_system(mediaserver, system_settings):

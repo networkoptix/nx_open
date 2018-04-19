@@ -7,7 +7,7 @@ from pylru import lrudecorator
 
 from framework.networking.interface import Networking
 from framework.os_access import NonZeroExitStatus
-from framework.utils import wait_until
+from framework.waiting import wait_for_true
 
 logger = logging.getLogger(__name__)  # TODO: Rename all such vars to `_logger`.
 
@@ -78,14 +78,20 @@ class LinuxNetworking(Networking):
             except NonZeroExitStatus:
                 logger.debug("No more internet restricting rules in iptables.")
                 break
-        assert wait_until(lambda: self.can_reach('8.8.8.8'), name="until internet is on")
+        global_ip = '8.8.8.8'
+        wait_for_true(
+            lambda: self.can_reach(global_ip),
+            "internet on {} is on ({} is reachable)".format(self, global_ip))
 
     def disable_internet(self):
         try:
             self._ssh_access.run_command(['iptables', '-C', 'OUTPUT', '-j', 'REJECT'])
         except NonZeroExitStatus:
             self._ssh_access.run_command(['iptables', '-A', 'OUTPUT', '-j', 'REJECT'])
-        assert wait_until(lambda: not self.can_reach('8.8.8.8'), name="until internet is off")
+        global_ip = '8.8.8.8'
+        wait_for_true(
+            lambda: not self.can_reach(global_ip),
+            "internet on {} is off ({} is unreachable)".format(self, global_ip))
 
     def setup_nat(self, outer_mac):
         """Connection can be initiated from inner_net_nodes only. Addresses are masqueraded."""

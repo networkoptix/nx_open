@@ -8,7 +8,7 @@ from pathlib2 import PurePosixPath
 from framework.build_info import build_info_from_text, customizations_from_paths
 from framework.os_access import NonZeroExitStatus
 from framework.service import UpstartService
-from framework.utils import wait_until
+from framework.waiting import wait_for_true
 
 if sys.version_info[:2] == (2, 7):
     # noinspection PyCompatibility,PyUnresolvedReferences
@@ -208,7 +208,9 @@ def install_mediaserver(os_access, mediaserver_deb, installation_root=DEFAULT_IN
     service = UpstartService(os_access, customization.service)
     if not service.is_running():
         service.start()
-    assert wait_until(lambda: _port_is_opened_on_server_machine(os_access, 7001))  # Opens after a while.
+    wait_for_true(
+        lambda: _port_is_opened_on_server_machine(os_access, 7001),
+        "port 7001 is opened on machine with {}".format(os_access))  # Opens after a while.
 
     installation.backup_mediaserver_conf()
 

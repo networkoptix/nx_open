@@ -11,7 +11,7 @@ from pathlib2 import Path
 
 from framework.api_shortcuts import get_server_id
 from framework.os_access.local import LocalAccess
-from framework.utils import wait_until
+from framework.waiting import wait_for_true
 from .camera import Camera, SampleMediaFile, make_schedule_task
 from .media_stream import open_media_stream
 from .utils import datetime_utc_to_timestamp
@@ -74,12 +74,14 @@ class Mediaserver(object):
                 raise Exception("Already started")
         else:
             self.service.start()
-            wait_until(self.is_online)
+            wait_for_true(self.is_online, "{} is online after being started".format(self))
 
     def stop(self, already_stopped_ok=False):
         if self.service.is_running():
             self.service.stop()
-            wait_succeeded = wait_until(lambda: not self.service.is_running(), name="until stopped")
+            wait_succeeded = wait_for_true(
+                lambda: not self.service.is_running(),
+                "{} is not running after being stopped".format(self.service))
             if not wait_succeeded:
                 raise Exception("Cannot wait for server to stop")
         else:

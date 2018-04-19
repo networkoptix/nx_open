@@ -13,7 +13,8 @@ import server_api_data_generators as generator
 from framework.api_shortcuts import get_time
 from framework.rest_api import HttpError
 from framework.mediaserver import TimePeriod
-from framework.utils import log_list, wait_until
+from framework.utils import log_list
+from framework.waiting import wait_for_true
 
 log = logging.getLogger(__name__)
 
@@ -184,7 +185,9 @@ def test_auth_with_time_changed(timeless_server):
     url = timeless_server.api.url('ec2/getCurrentTime')
 
     timeless_server.os_access.set_time(datetime.now(pytz.utc))
-    assert wait_until(lambda: get_time(timeless_server.api).is_close_to(datetime.now(pytz.utc)))
+    wait_for_true(
+        lambda: get_time(timeless_server.api).is_close_to(datetime.now(pytz.utc)),
+        "time on {} is close to now".format(timeless_server))
 
     shift = timedelta(days=3)
 
@@ -195,7 +198,9 @@ def test_auth_with_time_changed(timeless_server):
     response.raise_for_status()
 
     timeless_server.os_access.set_time(datetime.now(pytz.utc) + shift)
-    assert wait_until(lambda: get_time(timeless_server.api).is_close_to(datetime.now(pytz.utc) + shift))
+    wait_for_true(
+        lambda: get_time(timeless_server.api).is_close_to(datetime.now(pytz.utc) + shift),
+        "time on {} is close to now + {}".format(timeless_server, shift))
 
     response = requests.get(url, headers={'Authorization': authorization_header_value})
     assert response.status_code != 401, "Cannot authenticate after time changed on server"
@@ -210,7 +215,9 @@ def test_uptime_is_monotonic(timeless_server):
     if not isinstance(first_uptime, (int, float)):
         log.warning("Type of uptimeMs is %s but expected to be numeric.", type(first_uptime).__name__)
     new_time = timeless_server.os_access.set_time(datetime.now(pytz.utc) - timedelta(minutes=1))
-    assert wait_until(lambda: get_time(timeless_server.api).is_close_to(new_time))
+    wait_for_true(
+        lambda: get_time(timeless_server.api).is_close_to(new_time),
+        "time on {} is close to {}".format(timeless_server, new_time))
     second_uptime = timeless_server.api.api.statistics.GET()['uptimeMs']
     if not isinstance(first_uptime, (int, float)):
         log.warning("Type of uptimeMs is %s but expected to be numeric.", type(second_uptime).__name__)

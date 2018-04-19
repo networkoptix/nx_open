@@ -4,8 +4,8 @@ from subprocess import call, check_call
 
 import pytest
 
-from framework.utils import wait_until
 from framework.vms.hypervisor import VMInfo
+from framework.waiting import wait_for_true
 
 logger = logging.getLogger(__name__)
 
@@ -76,6 +76,6 @@ def test_clone(hypervisor, clone_name, clone_configuration):
 
 def test_power(hypervisor, dummy):
     hypervisor.power_on(dummy)
-    assert wait_until(lambda: hypervisor.find(dummy).is_running, name='until VM get started')
+    wait_for_true(lambda: hypervisor.find(dummy).is_running, 'VM {} is running'.format(dummy))
     hypervisor.power_off(dummy)
-    assert wait_until(lambda: not hypervisor.find(dummy).is_running, name='until VM get shut down')
+    wait_for_true(lambda: not hypervisor.find(dummy).is_running, 'VM {} is not running'.format(dummy))
