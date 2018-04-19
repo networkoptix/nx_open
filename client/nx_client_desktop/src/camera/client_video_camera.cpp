@@ -133,8 +133,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
     QnStorageResourcePtr storage,
     StreamRecorderRole role,
     qint64 serverTimeZoneMs,
-    qint64 timelapseFrameStepMs,
-    const nx::core::transcoding::FilterChain& filters)
+    qint64 timelapseFrameStepMs)
 {
     qint64 timelapseFrameStepUs = timelapseFrameStepMs * 1000;
     qint64 startTimeUs = timePeriod.startTimeMs * 1000ll;
@@ -221,8 +220,6 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
             /* There is a possibility we have already cleared the smart pointer, e.g. in stopExport() method. */
             sender()->deleteLater();
         });
-
-        m_exportRecorder->setTranscodeFilters(filters);
 
         connect(m_exportRecorder,   &QnStreamRecorder::recordingFinished, this,   &QnClientVideoCamera::stopExport);
         connect(m_exportRecorder,   &QnStreamRecorder::recordingProgress, this,   &QnClientVideoCamera::exportProgress);

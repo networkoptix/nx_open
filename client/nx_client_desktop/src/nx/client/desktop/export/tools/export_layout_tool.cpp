@@ -483,8 +483,7 @@ bool ExportLayoutTool::exportMediaResource(const QnMediaResourcePtr& resource)
         d->storage,
         role,
         serverTimeZone,
-        0,
-        nx::core::transcoding::FilterChain());
+        0);
 
     return true;
 }

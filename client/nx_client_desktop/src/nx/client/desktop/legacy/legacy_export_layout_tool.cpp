@@ -425,8 +425,7 @@ bool ExportLayoutTool::exportMediaResource(const QnMediaResourcePtr& resource) {
         m_storage,
         role,
         serverTimeZone,
-        0,
-        nx::core::transcoding::FilterChain());
+        0);
 
     emit stageChanged(tr("Exporting to \"%1\"...").arg(QFileInfo(m_settings.filename.completeFileName()).fileName()));
     return true;
