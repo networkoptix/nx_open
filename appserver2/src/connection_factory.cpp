@@ -1838,9 +1838,10 @@ void Ec2DirectConnectionFactory::remoteConnectionFinished(
     connectionInfoCopy.ecUrl.setQuery(QUrlQuery()); /*< Cleanup 'format' parameter. */
     if (nx::network::SocketGlobals::addressResolver().isCloudHostName(ecUrl.host()))
     {
-        NX_EXPECT(ecUrl.host() == connectionInfo.cloudSystemId, "Unexpected cloud host!");
         const auto fullHost =
             connectionInfo.serverId().toSimpleString() + L'.' + connectionInfo.cloudSystemId;
+        NX_EXPECT(ecUrl.host() == connectionInfo.cloudSystemId
+            || ecUrl.host() == fullHost, "Unexpected cloud host!");
         connectionInfoCopy.ecUrl.setHost(fullHost);
     }
 
