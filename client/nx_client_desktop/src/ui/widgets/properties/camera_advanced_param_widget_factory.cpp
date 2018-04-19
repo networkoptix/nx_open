@@ -2,6 +2,7 @@
 
 #include <QtCore/QObject>
 
+#include <QtWidgets/QApplication>
 #include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QComboBox>
