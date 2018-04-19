@@ -115,7 +115,7 @@ function(nx_add_target name type)
                     ${CMAKE_CURRENT_BINARY_DIR})
             endif()
 
-            if(codeSigning)
+            if(codeSigning AND NOT ${name} MATCHES ".*_ut")
                 nx_sign_windows_executable(${name})
             endif()
 
