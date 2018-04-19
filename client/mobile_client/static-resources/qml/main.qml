@@ -19,7 +19,7 @@ ApplicationWindow
         : 0
 
     readonly property real availableWidth: width - rightPadding - leftPadding
-    readonly property real availableHeight: height - bottomPadding - reconnectingWarning.height
+    readonly property real availableHeight: height - bottomPadding - topLevelWarning.height
 
     contentItem.x: leftPadding
 
@@ -34,25 +34,25 @@ ApplicationWindow
 
     WarningPanel
     {
-        id: reconnectingWarning
+        id: topLevelWarning
 
         width: mainWindow.availableWidth
-        text: qsTr("Server offline. Reconnecting...")
-        opened: connectionManager.restoringConnection
+        text: d.warningText
+        opened: text.length
     }
 
     SideNavigation
     {
         id: sideNavigation
 
-        y: reconnectingWarning.height
+        y: topLevelWarning.height
     }
 
     StackView
     {
         id: stackView
 
-        y: reconnectingWarning.height
+        y: topLevelWarning.height
         width: mainWindow.availableWidth
         height: mainWindow.availableHeight - keyboardHeight
 
@@ -197,5 +197,45 @@ ApplicationWindow
         id: autoScrollDelayTimer
         interval: 50
         onTriggered: NxGlobals.ensureFlickableChildVisible(activeFocusItem)
+    }
+
+    Object
+    {
+        id: d
+
+        readonly property bool cloudOffline: cloudStatusWatcher.status == QnCloudStatusWatcher.Offline
+
+        property bool cloudOfflineDelayed: false
+        property bool showCloudOfflineWarning:
+            stackView.currentItem.objectName == "sessionsScreen" && cloudOfflineDelayed
+        readonly property bool reconnecting: connectionManager.restoringConnection
+
+        readonly property string warningText:
+        {
+            if (d.reconnecting)
+                return qsTr("Server offline. Reconnecting...")
+            return showCloudOfflineWarning
+                ? qsTr("Cannot connect to %1").arg(applicationInfo.cloudName())
+                : ""
+        }
+
+        onCloudOfflineChanged:
+        {
+            if (cloudOffline)
+            {
+                cloudWarningDelayTimer.restart()
+                return
+            }
+
+            cloudWarningDelayTimer.stop()
+            cloudOfflineDelayed = false
+        }
+
+        Timer
+        {
+            id: cloudWarningDelayTimer
+            interval: 5000
+            onTriggered: d.cloudOfflineDelayed = true
+        }
     }
 }
