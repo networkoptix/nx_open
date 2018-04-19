@@ -1,6 +1,6 @@
-nx_add_server_plugin(vca_metadata_plugin
+nx_add_server_plugin(dw_mtt_metadata_plugin
     PRIVATE_LIBS
-        Qt5::Core 
+        Qt5::Core
         nx_plugin_utils
         nx_network
         nx_utils

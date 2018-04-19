@@ -8,7 +8,7 @@ namespace nx {
 namespace network {
 
 /**
- * Base for some class that wants to extend socket functionality a bit 
+ * Base for some class that wants to extend socket functionality a bit
  * and delegate rest of API calls to existing implementation.
  */
 template<typename SocketInterfaceToImplement>
@@ -216,6 +216,10 @@ public:
         return this->m_target->readSomeAsync(buffer, std::move(handler));
     }
 
+    /*
+     * Warning! Buffer should live at least till asynchronous send occurres, so
+     * do not use buffers with local scope here.
+     */
     virtual void sendAsync(
         const nx::Buffer& buffer,
         std::function<void(SystemError::ErrorCode, size_t)> handler) override
