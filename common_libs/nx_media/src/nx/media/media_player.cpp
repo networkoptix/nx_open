@@ -5,6 +5,8 @@
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QTimer>
 #include <QtCore/QMutex>
+#include <QtCore/QList>
+#include <QtCore/QHash>
 
 #include <nx/kit/debug.h>
 
@@ -33,6 +35,15 @@
 #include "audio_output.h"
 
 #include "media_player_quality_chooser.h"
+
+namespace {
+
+uint qHash(MetadataType value)
+{
+    return uint(value);
+}
+
+} // namespace
 
 namespace nx {
 namespace media {
@@ -227,6 +238,10 @@ public:
 
     RenderContextSynchronizerPtr renderContextSynchronizer;
 
+    using MetadataConsumerList = QList<QWeakPointer<AbstractMetadataConsumer>>;
+    QHash<MetadataType, MetadataConsumerList> m_metadataConsumerByType;
+    mutable QnMutex m_metadataConsumersMutex;
+
     void applyVideoQuality();
 
 private:
@@ -261,6 +276,8 @@ private:
 
     void log(const QString& message) const;
     void clearCurrentFrame();
+
+    void processMetadata(const QnAbstractCompressedMetadataPtr& metadata);
 };
 
 PlayerPrivate::PlayerPrivate(Player *parent):
@@ -808,6 +825,22 @@ void PlayerPrivate::clearCurrentFrame()
     videoFrameToRender.reset();
 }
 
+void PlayerPrivate::processMetadata(const QnAbstractCompressedMetadataPtr& metadata)
+{
+    NX_ASSERT(metadata);
+
+    QnMutexLocker lock(&m_metadataConsumersMutex);
+    auto consumers = m_metadataConsumerByType.value(metadata->metadataType);
+    consumers.detach();
+    lock.unlock();
+
+    for (const auto& value: consumers)
+    {
+        if (auto consumer = value.lock())
+            consumer->processMetadata(metadata);
+    }
+}
+
 //-------------------------------------------------------------------------------------------------
 // Player
 
@@ -1318,6 +1351,39 @@ void Player::testSetCamera(const QnResourcePtr& camera)
 {
     Q_D(Player);
     d->resource = camera;
+}
+
+bool Player::addMetadataConsumer(const AbstractMetadataConsumerPtr& metadataConsumer)
+{
+    if (!metadataConsumer)
+        return false;
+
+    Q_D(Player);
+    QnMutexLocker lock(&d->m_metadataConsumersMutex);
+
+    auto consumers = d->m_metadataConsumerByType[metadataConsumer->metadataType()];
+    if (consumers.indexOf(metadataConsumer) != -1)
+        return false;
+
+    consumers.push_back(metadataConsumer);
+    return true;
+}
+
+bool Player::removeMetadataConsumer(const AbstractMetadataConsumerPtr& metadataConsumer)
+{
+    if (!metadataConsumer)
+        return false;
+
+    Q_D(Player);
+    QnMutexLocker lock(&d->m_metadataConsumersMutex);
+
+    auto consumers = d->m_metadataConsumerByType[metadataConsumer->metadataType()];
+    const auto index = consumers.indexOf(metadataConsumer);
+    if (index == -1)
+        return false;
+
+    consumers.removeAt(index);
+    return true;
 }
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Player, VideoQuality)
