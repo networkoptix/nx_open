@@ -55,7 +55,7 @@ Item
         {
             var type = d.modelDataAccessor.getData(index, "type")
             if (type == ActionButtonsModel.PtzButton)
-                return;
+                return
 
             var text = d.modelDataAccessor.getData(index, "hint")
             hintControl.showHint(
@@ -106,7 +106,7 @@ Item
     {
         id: d
 
-        property real previousOpacity: control.opacity;
+        property real previousOpacity: control.opacity
 
         property variant modelDataAccessor: ModelDataAccessor { model: buttonModel }
 

@@ -19,8 +19,6 @@ Item
 
         delegate: Canvas
         {
-            id: linesControl
-
             width: parent.width * Screen.devicePixelRatio
             height: parent.height * Screen.devicePixelRatio
             anchors.centerIn: parent
@@ -50,18 +48,13 @@ Item
                 }
             }
 
-            NumberAnimation
+            NumberAnimation on rotation
             {
-                id: animation
-
                 running: true
                 loops: Animation.Infinite
-                duration: (index + 1) * 450
-
-                target: linesControl
-                property: "rotation"
+                duration: (index + 1) * 1800
                 from: 0
-                to: 90
+                to: 360
             }
         }
     }
