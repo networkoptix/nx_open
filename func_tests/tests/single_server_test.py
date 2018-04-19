@@ -173,7 +173,8 @@ def test_http_header_server(running_linux_mediaserver):
 # https://networkoptix.atlassian.net/browse/VMS-3069
 def test_static_vulnerability(running_linux_mediaserver):
     filepath = running_linux_mediaserver.installation.dir / 'var' / 'web' / 'static' / 'test.file'
-    running_linux_mediaserver.machine.os_access.write_file(filepath, 'This is just a test file')
+    filepath.parent.mkdir(parents=True, exist_ok=True)
+    filepath.write_text("This is just a test file.")
     url = running_linux_mediaserver.api.url('') + 'static/../../test.file'
     response = requests.get(url)
     assert response.status_code == 403

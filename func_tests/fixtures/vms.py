@@ -6,7 +6,7 @@ from netaddr.ip import IPNetwork
 from pathlib2 import Path
 
 from framework.networking import setup_flat_network
-from framework.os_access.local import LocalAccess
+from framework.os_access.local_access import LocalAccess
 from framework.registry import Registry
 from framework.serialize import load
 from framework.vms.factory import VMFactory
@@ -74,7 +74,7 @@ def vm_registries(configuration, hypervisor):
     return {
         vm_type: Registry(
             hypervisor.host_os_access,
-            vm_type_configuration['registry_path'],
+            hypervisor.host_os_access.Path(vm_type_configuration['registry_path']).expanduser(),
             vm_type_configuration['name_format'].format(vm_index='{index}'),  # Registry doesn't know about VMs.
             vm_type_configuration['limit'],
             )

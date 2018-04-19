@@ -68,7 +68,7 @@ class TestsConfig(object):
 
     @classmethod
     def from_yaml_file(cls, file_path):
-        full_path = Path(file_path).expanduser()  # Accepts option value.
+        full_path = Path(file_path)  # Accepts option value.
         if not full_path.exists():
             raise argparse.ArgumentTypeError('file does not exist: %s' % full_path)
         with full_path.open() as f:

@@ -77,7 +77,7 @@ def examine_mediaserver(mediaserver, stopped_ok=False):
 
 def collect_logs_from_mediaserver(mediaserver, root_artifact_factory):
     log_contents = mediaserver.installation.read_log()
-    if log_contents:
+    if log_contents is not None:
         mediaserver_logs_artifact_factory = root_artifact_factory(
             ['server', mediaserver.name], name='server-%s' % mediaserver.name, artifact_type=SERVER_LOG_ARTIFACT_TYPE)
         log_path = mediaserver_logs_artifact_factory.produce_file_path().write_bytes(log_contents)
@@ -92,7 +92,7 @@ def collect_core_dumps_from_mediaserver(mediaserver, root_artifact_factory):
             is_error=True,
             artifact_type=CORE_FILE_ARTIFACT_TYPE)
         local_core_dump_path = code_dumps_artifact_factory.produce_file_path()
-        mediaserver.machine.os_access.get_file(core_dump, local_core_dump_path)
+        core_dump.download(local_core_dump_path)
         traceback = create_core_file_traceback(
             mediaserver.machine.os_access,
             mediaserver.installation.binary,

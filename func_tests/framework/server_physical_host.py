@@ -3,6 +3,7 @@
 import logging
 import uuid
 
+from framework.os_access.path import FileSystemPath
 from framework.rest_api import RestApi
 from .mediaserver import Mediaserver
 from .mediaserver_installation import MEDIASERVER_CONFIG_PATH, MEDIASERVER_CONFIG_PATH_INITIAL, MediaserverInstallation
@@ -99,19 +100,18 @@ class PhysicalInstallationHost(object):
     def __init__(self, name, os_access, root_dir, limit, deb_path, customization_company_name, ca):
         self.name = name
         self.os_access = os_access  # Either local or remote by SSH.
-        self.root_dir = os_access.expand_path(root_dir)
+        self.root_dir = root_dir
         self._remote_dist_root = self.root_dir / 'dist'
         self._limit = limit
         self._deb_path = deb_path
         self._ca = ca
         self._customization_company_name = customization_company_name
         self._template_renderer = TemplateRenderer()
-        self._dist_unpacked = self.os_access.dir_exists(self.unpacked_mediaserver_dir)
+        self._dist_unpacked = self.unpacked_mediaserver_dir.exists()
         self._ensure_root_dir_exists()
         self._installations = list(self._read_installations())  # MediaserverInstallation list
         self._available_installations = self._installations[:]  # MediaserverInstallation list, set up but yet unallocated
         self._allocated_server_list = []
-        self.timezone = os_access.get_timezone()
         self._ensure_servers_are_stopped()  # expected initial state, we may reset_installations after this, so pids will be lost
         self._must_reset_installation = False
 
@@ -160,25 +160,28 @@ class PhysicalInstallationHost(object):
             self._must_reset_installation = False
         if self._dist_unpacked: return
         remote_dist_path = self._remote_dist_root / self._deb_path.name
-        self.os_access.mk_dir(self._remote_dist_root)
-        self.os_access.put_file(self._deb_path, self._remote_dist_root)
+        self._remote_dist_root.parent.mkdir(parents=True, exist_ok=True)
+        self._remote_dist_root.upload(self._deb_path)
         self.os_access.run_command(['dpkg', '--extract', remote_dist_path, self._unpacked_mediaserver_root_dir])
-        assert self.os_access.dir_exists(self.unpacked_mediaserver_dir), (
-            'Distributive provided was build with another customization.'
-            ' Distributive customization company name is %r, but expected is %r' %
-            (self.os_access.expand_glob(self._unpacked_mediaserver_root_dir / 'opt' / '*')[0].name,
-             self._customization_company_name))
+        if not self.unpacked_mediaserver_dir.exists():
+            raise RuntimeError(
+                'Provided package was built with another customization. '
+                'Expected: {}. But files in unpacked dir are:\n{}'.format(
+                    self._customization_company_name,
+                    self._unpacked_mediaserver_root_dir.joinpath('opt').iterdir(),
+                    ),
+                )
         self._dist_unpacked = True
 
     @property
-    def _unpacked_mediaserver_root_dir(self):
+    def _unpacked_mediaserver_root_dir(self):  # type: () -> FileSystemPath
         return self._remote_dist_root / 'unpacked'
 
     def _ensure_root_dir_exists(self):
         self.os_access.mk_dir(self.root_dir)
 
     def _read_installations(self):
-        for dir in sorted(self.os_access.expand_glob(self.root_dir / 'server-*')):
+        for dir in self.root_dir.glob('server-*'):
             yield MediaserverInstallation(self.os_access, dir)
 
     def _ensure_servers_are_stopped(self):
@@ -204,13 +207,11 @@ class PhysicalInstallationHost(object):
         self.os_access.rm_tree(installation.dir)
         server_port = self._installation_server_port(self._installations.index(installation))
         self._prepare_installation_dir(installation.dir, server_port)
-        
+
     def _prepare_installation_dir(self, dir, server_port):
         self.ensure_mediaserver_is_unpacked()
         self.os_access.mk_dir(dir)
-        self.os_access.run_command(['cp', '-a'] +
-                                   self.os_access.expand_glob(self.unpacked_mediaserver_dir / '*', for_shell=True) +
-                                   [str(dir) + '/'])
+        self.os_access.run_command(['cp', '-a', self.unpacked_mediaserver_dir / '*', dir])
         self._write_control_script(dir)
         self._write_server_conf(dir, server_port)
 
@@ -220,7 +221,7 @@ class PhysicalInstallationHost(object):
             SERVER_DIR=dir,
             )
         service_path = dir / 'server_ctl.sh'
-        self.os_access.write_file(service_path, contents)
+        service_path.write_text(contents)
         self.os_access.run_command(['chmod', '+x', service_path])
 
     def _write_server_conf(self, dir, server_port):
@@ -230,5 +231,7 @@ class PhysicalInstallationHost(object):
             SERVER_PORT=server_port,
             SERVER_GUID=str(uuid.uuid4()),
             )
-        self.os_access.write_file(dir / MEDIASERVER_CONFIG_PATH, contents)
-        self.os_access.write_file(dir / MEDIASERVER_CONFIG_PATH_INITIAL, contents)
+        mediaserver_config_path = dir / MEDIASERVER_CONFIG_PATH
+        mediaserver_config_path_initial = dir / MEDIASERVER_CONFIG_PATH_INITIAL
+        mediaserver_config_path.write_text(contents)
+        mediaserver_config_path_initial.write_text(contents)

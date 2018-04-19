@@ -80,7 +80,7 @@ class LightweightServersInstallation(object):
         self._not_supported()
 
     def list_core_files(self):
-        return self.os_access.expand_glob(self.dir / '*core*')
+        return self.dir.glob('*core*')
 
     def cleanup_core_files(self):
         # When filename contain space, it's interpreted as several arguments.
@@ -91,11 +91,11 @@ class LightweightServersInstallation(object):
             self.dir / '*core*'])
 
     def cleanup_test_tmp_dir(self):
-        self.os_access.rm_tree(self.test_tmp_dir, ignore_errors=True)
+        self.test_tmp_dir.rmtree(ignore_errors=True)
 
     def get_log_file(self):
-        if self.os_access.file_exists(self.log_path_base):
-            return self.os_access.read_file(self.log_path_base + '.log')
+        if self.log_path_base.exists():
+            return self.log_path_base.with_suffix('.log').read_bytes()
         else:
             return None
 
@@ -135,7 +135,6 @@ class LightweightServersHost(object):
         self._physical_installation_host = physical_installation_host
         self._os_access = physical_installation_host.os_access
         self._host_name = physical_installation_host.name
-        self._timezone = physical_installation_host.timezone
         self._ca = ca
         self._installation = LightweightServersInstallation(
             self._os_access, physical_installation_host.root_dir / 'lws', self._ca)
@@ -152,9 +151,9 @@ class LightweightServersHost(object):
         pih = self._physical_installation_host
         server_dir = pih.unpacked_mediaserver_dir
         pih.ensure_mediaserver_is_unpacked()
-        self._os_access.mk_dir(self._lws_dir)
+        self._lws_dir.mkdir(exist_ok=True)
         self._cleanup_log_files()
-        self._os_access.put_file(self._test_binary_path, self._lws_dir)
+        self._lws_dir.upload(self._test_binary_path)
         self._write_lws_ctl(server_dir, server_count, lws_params)
         self.service.start()
         # must be set before cycle following it so failure in that cycle won't prevent from artifacts collection from 'release' method
@@ -182,9 +181,8 @@ class LightweightServersHost(object):
         self._installation.cleanup_test_tmp_dir()
 
     def _cleanup_log_files(self):
-        file_list = self._os_access.expand_glob(self._installation.dir / 'lws*.log')
-        if file_list:
-            self._os_access.run_command(['rm'] + file_list)
+        for log_file_path in self._installation.dir.glob('lws*.log'):
+            log_file_path.unlink()
 
     def _write_lws_ctl(self, server_dist_dir, server_count, lws_params):
         contents = self._template_renderer.render(
@@ -197,7 +195,7 @@ class LightweightServersHost(object):
             TEST_TMP_DIR=self._installation.test_tmp_dir,
             **lws_params)
         lws_ctl_path = self._lws_dir / 'server_ctl.sh'
-        self._os_access.write_file(lws_ctl_path, contents)
+        lws_ctl_path.write_text(contents)
         self._os_access.run_command(['chmod', '+x', lws_ctl_path])
 
     def _save_lws_artifacts(self):
@@ -206,7 +204,7 @@ class LightweightServersHost(object):
         self._save_lws_core_files()
 
     def _save_lws_log(self):
-        log_contents = self._os_access.read_file(self._installation.log_path_base + '.log').strip()
+        log_contents = self._installation.log_path_base.with_suffix('.log').read_text().strip()
         if log_contents:
             artifact_factory = self._artifact_factory(['lws', self._host_name], name='lws', artifact_type=SERVER_LOG_ARTIFACT_TYPE)
             log_path = artifact_factory.produce_file_path().write_bytes(log_contents)
@@ -218,7 +216,7 @@ class LightweightServersHost(object):
             artifact_factory = self._artifact_factory(
                 ['lws', self._host_name, fname], name=fname, is_error=True, artifact_type=CORE_FILE_ARTIFACT_TYPE)
             local_core_path = artifact_factory.produce_file_path()
-            self._os_access.get_file(remote_core_path, local_core_path)
+            remote_core_path.download(local_core_path)
             log.debug('core file for lws at %s is stored to %s', self._host_name, local_core_path)
             traceback = create_core_file_traceback(
                 self._os_access, self._installation.dir / LWS_BINARY_NAME,

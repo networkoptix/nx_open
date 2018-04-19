@@ -1,5 +1,6 @@
 def _patch_sshd_config(root_os_access, new_settings, config_path='/etc/ssh/sshd_config'):
-    current_lines = root_os_access.read_file(config_path).splitlines()  # Preserve new line at the end!
+    config_path = root_os_access.Path(config_path)
+    current_lines = config_path.read_text(encoding='ascii').splitlines()  # Preserve new line at the end!
     updated_lines = list()
     presented_keys = set()
     for line in current_lines:
@@ -20,7 +21,7 @@ def _patch_sshd_config(root_os_access, new_settings, config_path='/etc/ssh/sshd_
         updated_lines.append("# Added by func_tests framework")
         updated_lines.extend(additional_lines)
     if current_lines != updated_lines:
-        root_os_access.write_file(config_path, '\n'.join(updated_lines) + '\n')
+        config_path.write_text('\n'.join(updated_lines) + '\n')
         root_os_access.run_command(['sshd', '-t'])
         root_os_access.run_command(['service', 'ssh', 'reload'])
         assert root_os_access.is_working()

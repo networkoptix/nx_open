@@ -1,11 +1,11 @@
-from pathlib2 import Path
+from pathlib2 import Path, PurePosixPath
 
 from framework.remote_daemon import RemoteDaemon
 from framework.remote_python import RemotePython
 from framework.waiting import ensure_persistence, wait_for_true
 
 LOCAL_DIR = Path(__file__).parent / 'framework/updates2/test_updates_server'
-REMOTE_DIR = Path('/opt/mock_updates_server')
+REMOTE_DIR = PurePosixPath('/opt/mock_updates_server')
 UTF_LOCALE_ENV = {'LC_ALL': 'C.UTF-8', 'LANG': 'C.UTF-8'}  # Click requires that.
 ROOT_URL = 'http://localhost:8080'
 
@@ -19,10 +19,11 @@ def prepare_virtual_environment(os_access):
 def install_updates_server(os_access, python_path):
     daemon = RemoteDaemon('mock_updates_server', [python_path, REMOTE_DIR / 'server.py', 'serve'], env=UTF_LOCALE_ENV)
     if daemon.status(os_access) != 'started':
-        os_access.put_file(LOCAL_DIR / 'server.py', REMOTE_DIR / 'server.py')
-        os_access.put_file(LOCAL_DIR / 'requirements.txt', REMOTE_DIR / 'requirements.txt')
-        os_access.run_command([python_path, '-m', 'pip', 'install', '-r', REMOTE_DIR / 'requirements.txt'])
-        os_access.run_command([python_path, REMOTE_DIR / 'server.py', 'generate'], env=UTF_LOCALE_ENV)
+        remote_dir = os_access.Path(REMOTE_DIR)
+        remote_dir.joinpath('server.py').upload(LOCAL_DIR / 'server.py')
+        remote_dir.joinpath('requirements.txt').upload(LOCAL_DIR / 'requirements.txt')
+        os_access.run_command([python_path, '-m', 'pip', 'install', '-r', remote_dir / 'requirements.txt'])
+        os_access.run_command([python_path, remote_dir / 'server.py', 'generate'], env=UTF_LOCALE_ENV)
         daemon.start(os_access)
     updates_json_url = ROOT_URL + '/updates.json'
     wait_for_true(

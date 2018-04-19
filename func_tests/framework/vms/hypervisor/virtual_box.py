@@ -6,7 +6,7 @@ from uuid import UUID
 from netaddr import EUI
 from netaddr.strategy.eui48 import mac_bare
 
-from framework.os_access import NonZeroExitStatus
+from framework.os_access.exceptions import exit_status_error_cls
 from framework.vms.hypervisor import VMAllAdaptersBusy, VMInfo, VMNotFound
 from framework.vms.port_forwarding import calculate_forwarded_ports
 from framework.waiting import wait_for_true
@@ -59,10 +59,8 @@ class VirtualBox(object):
     def _get_info(self, vm_name):
         try:
             output = self.host_os_access.run_command(['VBoxManage', 'showvminfo', vm_name, '--machinereadable'])
-        except NonZeroExitStatus as e:
-            if e.exit_status == 1:
-                raise VMNotFound("Cannot find VM {}; VBoxManage says:\n{}".format(vm_name, e.stderr))
-            raise
+        except exit_status_error_cls(1) as e:
+            raise VMNotFound("Cannot find VM {}; VBoxManage says:\n{}".format(vm_name, e.stderr))
         raw_info = dict(csv.reader(output.splitlines(), delimiter='=', escapechar='\\', doublequote=False))
         return raw_info
 

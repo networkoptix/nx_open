@@ -1,4 +1,4 @@
-from framework.os_access import NonZeroExitStatus
+from framework.os_access.exceptions import NonZeroExitStatus
 
 
 class RemotePython(object):

@@ -25,7 +25,7 @@ class _LoggedOutputBuffer(object):
                 self._considered_binary = True
             else:
                 # Potentially expensive.
-                if len(decoded) < 500 and decoded.count('\n') < 5:
+                if len(decoded) < 5000 and decoded.count('\n') < 50:
                     self._logger.debug(u'\n%s', decoded)
                 else:
                     self._logger.debug('%d characters.', len(decoded))

@@ -3,7 +3,7 @@ import logging
 import pytest
 from pathlib2 import Path
 
-from framework.os_access.local import LocalAccess
+from framework.os_access.local_access import LocalAccess
 from framework.registry import Registry
 from framework.vms.factory import VMFactory
 from framework.vms.hypervisor import VMNotFound
@@ -14,7 +14,8 @@ _logger = logging.getLogger(__name__)
 @pytest.fixture()
 def registry(hypervisor):
     registry_path = Path('/tmp/func_tests/linux-test_factory.registry.yaml')
-    registry_path.unlink()
+    if registry_path.exists():
+        registry_path.unlink()
     registry = Registry(LocalAccess(), registry_path, 'func_tests-temp-factory_test-{index}', 2)
     for index, name in registry.possible_entries():
         try:

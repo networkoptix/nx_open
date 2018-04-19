@@ -6,7 +6,8 @@ from netaddr import EUI
 from pylru import lrudecorator
 
 from framework.networking.interface import Networking
-from framework.os_access import NonZeroExitStatus
+from framework.os_access.exceptions import NonZeroExitStatus, exit_status_error_cls
+from framework.os_access.ssh_access import SSHAccess
 from framework.waiting import wait_for_true
 
 logger = logging.getLogger(__name__)  # TODO: Rename all such vars to `_logger`.
@@ -16,12 +17,12 @@ class LinuxNetworking(Networking):
     def __init__(self, ssh_access, macs):
         super(LinuxNetworking, self).__init__()
         self._macs = macs
-        self._ssh_access = ssh_access
+        self._ssh_access = ssh_access  # type: SSHAccess
 
     @property
     @lrudecorator(1)
     def interfaces(self):
-        output = self._ssh_access.run_command(
+        output = self._ssh_access.run_sh_script(
             '''
             mkdir -p /tmp/func_tests/networking
             cd /tmp/func_tests/networking
@@ -40,7 +41,7 @@ class LinuxNetworking(Networking):
 
     def reset(self):
         """Don't touch localhost, host-bound interface and interfaces unknown to VM."""
-        self._ssh_access.run_command(
+        self._ssh_access.run_sh_script(
             '''
             echo "${AVAILABLE_INTERFACES}" | xargs -t -I {} ip addr flush dev {}
             echo "${AVAILABLE_INTERFACES}" | xargs -t -I {} ip link set dev {} down
@@ -58,7 +59,7 @@ class LinuxNetworking(Networking):
 
     def setup_ip(self, mac, ip, prefix_length):
         interface = self.interfaces[mac]
-        self._ssh_access.run_command(
+        self._ssh_access.run_sh_script(
             '''
             ip addr replace ${ADDRESS}/${PREFIX_LENGTH} dev ${INTERFACE} 
             ip link set dev ${INTERFACE} up
@@ -95,7 +96,7 @@ class LinuxNetworking(Networking):
 
     def setup_nat(self, outer_mac):
         """Connection can be initiated from inner_net_nodes only. Addresses are masqueraded."""
-        self._ssh_access.run_command(
+        self._ssh_access.run_sh_script(
             '''
             sysctl net.ipv4.ip_forward=1
             iptables -t nat -A POSTROUTING -o ${OUTER_INTERFACE} -j MASQUERADE
@@ -105,8 +106,6 @@ class LinuxNetworking(Networking):
     def can_reach(self, ip, timeout_sec=4):
         try:
             self._ssh_access.run_command(['ping', '-c', 1, '-W', timeout_sec, ip])
-        except NonZeroExitStatus as e:
-            if e.exit_status == 1:  # See man page.
-                return False
-            raise
+        except exit_status_error_cls(1):  # See man page.
+            return False
         return True

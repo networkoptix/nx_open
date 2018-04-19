@@ -4,13 +4,12 @@ from contextlib import contextmanager
 
 from framework.networking.linux import LinuxNetworking
 from framework.networking.windows import WindowsNetworking
-from framework.os_access.ssh import SSHAccess
+from framework.os_access.ssh_access import SSHAccess
 from framework.os_access.windows_remoting.winrm_access import WinRMAccess
 from framework.vms.hypervisor import VMNotFound, obtain_running_vm
 from framework.waiting import wait_for_true
 
 logger = logging.getLogger(__name__)
-
 
 VM = namedtuple('VM', ['alias', 'index', 'type', 'name', 'ports', 'networking', 'os_access'])
 

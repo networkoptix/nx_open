@@ -75,7 +75,7 @@ def copy_database_file(server, bin_dir, backup_db_filename):
     assert backup_db_path.exists(), (
         "Binary artifact required for this test (database file) '%s' does not exist." % backup_db_path)
     server_db_path = server.installation.dir / MEDIASERVER_DATABASE_PATH
-    server.machine.os_access.put_file(backup_db_path, server_db_path)
+    server.machine.os_access.Path(server_db_path).upload(backup_db_path)
 
 def check_camera(server, camera_guid):
     cameras = [c for c in server.api.ec2.getCameras.GET() if c['id'] == camera_guid]

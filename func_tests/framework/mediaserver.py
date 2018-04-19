@@ -8,9 +8,10 @@ import time
 import pytz
 import requests.exceptions
 from pathlib2 import Path
+from pylru import lrudecorator
 
 from framework.api_shortcuts import get_server_id
-from framework.os_access.local import LocalAccess
+from framework.os_access.local_access import LocalAccess
 from framework.waiting import wait_for_true
 from .camera import Camera, SampleMediaFile, make_schedule_task
 from .media_stream import open_media_stream
@@ -79,11 +80,7 @@ class Mediaserver(object):
     def stop(self, already_stopped_ok=False):
         if self.service.is_running():
             self.service.stop()
-            wait_succeeded = wait_for_true(
-                lambda: not self.service.is_running(),
-                "{} is not running after being stopped".format(self.service))
-            if not wait_succeeded:
-                raise Exception("Cannot wait for server to stop")
+            wait_for_true(lambda: not self.service.is_running(), "{} stops".format(self.service))
         else:
             if not already_stopped_ok:
                 raise Exception("Already stopped")
@@ -140,7 +137,7 @@ class Mediaserver(object):
     def storage(self):
         # GET /ec2/getStorages is not always possible: server sometimes is not started.
         storage_path = self.installation.dir / MEDIASERVER_STORAGE_PATH
-        return Storage(self.machine.os_access, storage_path, self.machine.os_access.get_timezone())
+        return Storage(self.machine.os_access, storage_path)
 
     def rebuild_archive(self):
         self.api.api.rebuildArchive.GET(mainPool=1, action='start')
@@ -172,7 +169,12 @@ class Storage(object):
     def __init__(self, os_access, dir, timezone=None):
         self.os_access = os_access
         self.dir = dir
-        self.timezone = timezone or os_access.get_timezone()
+
+    @property
+    @lrudecorator(1)
+    def timezone(self):
+        tzname = self.os_access.Path('/etc/timezone').read_text().strip()
+        return pytz.timezone(tzname)
 
     def save_media_sample(self, camera, start_time, sample):
         assert isinstance(camera, Camera), repr(camera)
@@ -188,9 +190,9 @@ class Storage(object):
         hiq_fpath = self._construct_fpath(camera_mac_addr, 'hi_quality',  start_time, unixtime_utc_ms, sample.duration)
 
         log.info('Storing media sample %r to %r', sample.fpath, lowq_fpath)
-        self.os_access.write_file(lowq_fpath, contents)
+        lowq_fpath.write_bytes(contents)
         log.info('Storing media sample %r to %r', sample.fpath, hiq_fpath)
-        self.os_access.write_file(hiq_fpath, contents)
+        hiq_fpath.write_bytes(contents)
 
     def _read_with_start_time_metadata(self, sample, unixtime_utc_ms):
         _, path = tempfile.mkstemp(suffix=sample.fpath.suffix)
