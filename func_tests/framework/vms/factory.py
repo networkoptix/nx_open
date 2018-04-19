@@ -53,8 +53,7 @@ class VMFactory(object):
             yield vm
 
     def cleanup(self):
-        def destroy(vm_index, vm_alias):
-            name = self._vm_configuration['name_format'].format(vm_index=vm_index)
+        def destroy(name, vm_alias):
             if vm_alias is None:
                 try:
                     self._hypervisor.destroy(name)

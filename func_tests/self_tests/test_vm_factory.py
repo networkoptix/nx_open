@@ -74,3 +74,21 @@ def test_allocate_two(vm_factory):
         with vm_factory.allocated_vm('b', vm_type=_vm_type) as b:
             assert a.name != b.name
             assert a.index != b.index
+
+
+@pytest.mark.parallel_unsafe
+def test_cleanup(vm_factory, hypervisor):
+    with vm_factory.allocated_vm('a', vm_type=_vm_type) as a:
+        with vm_factory.allocated_vm('b', vm_type=_vm_type) as b:
+            vm_names = {a.name, b.name}
+            _logger.info("Check VMs: %r. When allocated, VMs must exist.", vm_names)
+            assert vm_names <= set(hypervisor.list_vm_names())
+    _logger.info(
+        "Existing VMs: %r. When not allocated, VMs are not required to exist.",
+        vm_names & set(hypervisor.list_vm_names()))
+    _logger.info("Cleanup VMs: %r.", vm_names)
+    vm_factory.cleanup()
+    _logger.info(
+        "Existing VMs: %r. When cleaned up, VMs must not exist.",
+        vm_names & set(hypervisor.list_vm_names()))
+    assert not vm_names & set(hypervisor.list_vm_names())
