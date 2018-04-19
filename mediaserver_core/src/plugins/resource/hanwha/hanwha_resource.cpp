@@ -1756,7 +1756,7 @@ CameraDiagnostics::Result HanwhaResource::updateProfileNameIfNeeded(
 
         if (!response.isSuccessful())
         {
-            NX_VERBOSE(
+            NX_WARNING(
                 this,
                 lm("Can't update %1 profile name for %2 (%3)")
                     .args(
@@ -2972,7 +2972,8 @@ QnTimePeriodList HanwhaResource::getDtsTimePeriods(qint64 startTimeMs, qint64 en
     if (numberOfOverlappedIds != 1)
         return QnTimePeriodList();
 
-    return timeline.cbegin()->second;
+    QnTimePeriod period(startTimeMs, endTimeMs - startTimeMs);
+    return timeline.cbegin()->second.intersected(period);
 }
 
 QnConstResourceAudioLayoutPtr HanwhaResource::getAudioLayout(

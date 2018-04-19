@@ -59,6 +59,16 @@
        </property>
       </widget>
      </item>
+      <item>
+        <widget class="nx::client::desktop::HintButton" name="statisticsReportHint">
+          <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+            </sizepolicy>
+          </property>
+        </widget>
+      </item>
      <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
@@ -126,6 +136,13 @@
   <tabstop>statisticsReportCheckBox</tabstop>
   <tabstop>autoSettingsCheckBox</tabstop>
  </tabstops>
+<customwidgets>
+  <customwidget>
+    <class>nx::client::desktop::HintButton</class>
+    <extends>QWidget</extends>
+    <header location="global">nx/client/desktop/common/widgets/hint_button.h</header>
+  </customwidget>
+</customwidgets>
  <resources/>
  <connections/>
 </ui>

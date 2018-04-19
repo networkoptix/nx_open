@@ -22,6 +22,8 @@ QnSystemSettingsWidget::QnSystemSettingsWidget(QWidget *parent):
     setHelpTopic(ui->auditTrailCheckBox,        Qn::AuditTrail_Help);
     setHelpTopic(ui->statisticsReportCheckBox,  Qn::SystemSettings_General_AnonymousUsage_Help);
 
+    ui->statisticsReportHint->setHint(tr("Sends device, server, and system information (firmware, codecs, streams, license keys, etc.)."));
+
     setWarningStyle(ui->settingsWarningLabel);
 
     connect(ui->autoSettingsCheckBox,   &QCheckBox::clicked,  this,  [this]

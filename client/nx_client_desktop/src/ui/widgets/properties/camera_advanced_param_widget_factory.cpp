@@ -2,6 +2,7 @@
 
 #include <QtCore/QObject>
 
+#include <QtWidgets/QApplication>
 #include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QComboBox>
@@ -11,6 +12,7 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpinBox>
 #include <QtWidgets/QWidget>
+#include <qcoreapplication.h>   // for Q_DECLARE_TR_FUNCTIONS
 
 #include <ui/common/read_only.h>
 #include <ui/style/custom_style.h>

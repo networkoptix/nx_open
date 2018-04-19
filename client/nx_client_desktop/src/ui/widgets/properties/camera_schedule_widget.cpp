@@ -261,6 +261,8 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget* parent):
 
     setHelpTopic(ui->exportScheduleButton, Qn::CameraSettings_Recording_Export_Help);
 
+    ui->qualityLabelHint->setHint(tr("Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values."));
+
     // init buttons
     connect(ui->gridWidget, &QnScheduleGridWidget::colorsChanged, this,
         &QnCameraScheduleWidget::updateColors);

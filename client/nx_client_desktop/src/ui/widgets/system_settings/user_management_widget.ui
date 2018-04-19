@@ -159,6 +159,10 @@
       </spacer>
      </item>
      <item>
+       <widget class="nx::client::desktop::HintButton" name="ldapTooltip" native="true">
+       </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="ldapSettingsButton">
        <property name="text">
         <string>LDAP Settings...</string>
@@ -181,6 +185,11 @@
    <class>QnTreeView</class>
    <extends>QTreeView</extends>
    <header location="global">ui/widgets/common/tree_view.h</header>
+  </customwidget>
+  <customwidget>
+    <class>nx::client::desktop::HintButton</class>
+    <extends>QPushButton</extends>
+    <header location="global">nx/client/desktop/common/widgets/hint_button.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

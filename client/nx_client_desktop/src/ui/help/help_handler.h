@@ -12,6 +12,7 @@ public:
     QnHelpHandler(QObject* parent = nullptr);
     virtual ~QnHelpHandler();
 
+    // Sets help topic and opens a browser for it.
     void setHelpTopic(int topic);
 
     virtual bool eventFilter(QObject *watched, QEvent *event) override;
