@@ -1,4 +1,5 @@
 import QtQuick 2.6
+import nx.client.core 1.0
 
 Item
 {
@@ -28,6 +29,8 @@ Item
     property real allowedBottomMargin: 0
 
     readonly property alias flickable: flick
+    readonly property real contentScale: Geometry.scaleFactor(
+        Qt.size(width, height), Qt.size(contentWidth, contentHeight))
 
     signal clicked()
     signal doubleClicked(int mouseX, int mouseY)
@@ -39,30 +42,6 @@ Item
         flick.animateToSize(width, height, animate, forceSize)
     }
 
-    property real contentFactor: contentWidth ? contentHeight / contentWidth : 0
-    readonly property real contentScale:
-    {
-        if (!contentFactor)
-            return 1
-
-        var baseSize = 0
-        var currentSize = 0
-
-        var baseHeight = width * contentFactor
-        if (baseHeight <= height)
-        {
-
-            baseSize = baseHeight
-            currentSize = contentHeight
-        }
-        else
-        {
-            baseSize = width
-            currentSize = contentWidth
-        }
-
-        return baseSize > 0 ? currentSize / baseSize : 1
-    }
 
     Flickable
     {
