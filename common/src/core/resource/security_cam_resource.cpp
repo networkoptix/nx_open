@@ -521,6 +521,11 @@ bool QnSecurityCamResource::isSharingLicenseInGroup() const
         return false; //< Not a multichannel device. Nothing to share
     if (!QnLicense::licenseTypeInfo(licenseType()).allowedToShareChannel)
         return false; //< Don't allow sharing for encoders e.t.c
+
+    const auto resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+    if (resourceData.value<bool>(Qn::kCanShareLicenseGroup), false)
+        return true;
+
     QnResourceTypePtr resType = qnResTypePool->getResourceType(getTypeId());
     if (!resType)
         return false;
@@ -873,16 +878,6 @@ QString QnSecurityCamResource::getSharedId() const
     }
 
     return getUniqueId();
-}
-
-QString QnSecurityCamResource::getProxiedId() const
-{
-    return getProperty(Qn::kProxiedIdParamName);
-}
-
-void QnSecurityCamResource::setProxiedId(const QString& proxiedId)
-{
-    setProperty(Qn::kProxiedIdParamName, proxiedId);
 }
 
 QString QnSecurityCamResource::getModel() const

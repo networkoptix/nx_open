@@ -116,8 +116,8 @@ void QnCameraAdvancedSettingsWidget::updateFromResource()
     bool isIoModule = m_camera && m_camera->isIOModule();
 
     ui->cameraIdInputField->setTitle(isIoModule
-        ? tr("I/O Module Id")
-        : tr("Camera Id"));
+        ? tr("I/O Module ID")
+        : tr("Camera ID"));
 
     ui->noSettingsLabel->setText(isIoModule
         ? tr("This I/O module has no advanced settings")

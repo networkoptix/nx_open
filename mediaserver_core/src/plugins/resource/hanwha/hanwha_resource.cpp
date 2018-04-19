@@ -306,36 +306,36 @@ static const QnUuid kHanwhaInputPortEventId =
 static const std::map<QString, std::map<Qn::ConnectionRole, QString>> kStreamProperties = {
     {kEncodingTypeProperty,
     {
-        {Qn::ConnectionRole::CR_LiveVideo, Qn::kPrimaryStreamCodecParamName},
-        {Qn::ConnectionRole::CR_SecondaryLiveVideo, Qn::kSecondaryStreamCodecParamName}
+        {Qn::ConnectionRole::CR_LiveVideo, kPrimaryStreamCodecParamName},
+        {Qn::ConnectionRole::CR_SecondaryLiveVideo, kSecondaryStreamCodecParamName}
     }},
     {kResolutionProperty,
     {
-        {Qn::ConnectionRole::CR_LiveVideo, Qn::kPrimaryStreamResolutionParamName},
-        {Qn::ConnectionRole::CR_SecondaryLiveVideo, Qn::kSecondaryStreamResolutionParamName}
+        {Qn::ConnectionRole::CR_LiveVideo, kPrimaryStreamResolutionParamName},
+        {Qn::ConnectionRole::CR_SecondaryLiveVideo, kSecondaryStreamResolutionParamName}
     }},
     {kBitrateControlTypeProperty,
     {
-        {Qn::ConnectionRole::CR_LiveVideo, Qn::kPrimaryStreamBitrateControlParamName},
+        {Qn::ConnectionRole::CR_LiveVideo, kPrimaryStreamBitrateControlParamName},
         {
             Qn::ConnectionRole::CR_SecondaryLiveVideo,
-            Qn::kSecondaryStreamBitrateControlParamName
+            kSecondaryStreamBitrateControlParamName
         }
     }},
     {kGovLengthProperty,
     {
-        {Qn::ConnectionRole::CR_LiveVideo, Qn::kPrimaryStreamGovLengthParamName},
-        {Qn::ConnectionRole::CR_SecondaryLiveVideo, Qn::kSecondaryStreamGovLengthParamName}
+        {Qn::ConnectionRole::CR_LiveVideo, kPrimaryStreamGovLengthParamName},
+        {Qn::ConnectionRole::CR_SecondaryLiveVideo, kSecondaryStreamGovLengthParamName}
     }},
     {kCodecProfileProperty,
     {
-        {Qn::ConnectionRole::CR_LiveVideo, Qn::kPrimaryStreamCodecProfileParamName},
-        {Qn::ConnectionRole::CR_SecondaryLiveVideo, Qn::kSecondaryStreamCodecProfileParamName}
+        {Qn::ConnectionRole::CR_LiveVideo, kPrimaryStreamCodecProfileParamName},
+        {Qn::ConnectionRole::CR_SecondaryLiveVideo, kSecondaryStreamCodecProfileParamName}
     }},
     {kEntropyCodingProperty,
     {
-        {Qn::ConnectionRole::CR_LiveVideo, Qn::kPrimaryStreamEntropyCodingParamName},
-        {Qn::ConnectionRole::CR_SecondaryLiveVideo, Qn::kSecondaryStreamEntropyCodingParamName}
+        {Qn::ConnectionRole::CR_LiveVideo, kPrimaryStreamEntropyCodingParamName},
+        {Qn::ConnectionRole::CR_SecondaryLiveVideo, kSecondaryStreamEntropyCodingParamName}
     }}
 };
 
@@ -1186,16 +1186,16 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
 
     if (isNvr() && m_isChannelConnectedViaSunapi)
     {
-        const auto pypassPtzCapabilities = calculateSupportedPtzCapabilities(
+        const auto bypassPtzCapabilities = calculateSupportedPtzCapabilities(
             kHanwhaCameraPtzCapabilityDescriptors,
             m_bypassDeviceAttributes,
             0); //< TODO: #dmishin is it correct for multichannel resources connected to a NVR?
 
         NX_VERBOSE(this, lm("%1: Supported PTZ capabilities bypass: %2")
-            .args(getPhysicalId(), ptzCapabilityBits(pypassPtzCapabilities)));
+            .args(getPhysicalId(), ptzCapabilityBits(bypassPtzCapabilities)));
 
         // We consider capability is true if it's supported both by a NVR and a camera.
-        m_ptzCapabilities &= pypassPtzCapabilities;
+        m_ptzCapabilities &= bypassPtzCapabilities;
         NX_VERBOSE(this, lm("%1: Supported PTZ capabilities both: %2")
             .args(getPhysicalId(), ptzCapabilityBits(m_ptzCapabilities)));
     }
@@ -1258,7 +1258,9 @@ CameraDiagnostics::Result HanwhaResource::initAlternativePtz()
             continue;
 
         m_ptzTraits.append(traitName);
-        m_ptzCapabilities |= trait.capabilities;
+        if (qnGlobalSettings->showHanwhaAlternativePtzControlsOnTile())
+            m_ptzCapabilities |= trait.capabilities;
+
         m_alternativePtzRanges[split.last()] = std::move(possibleValues);
     }
 
@@ -1357,11 +1359,11 @@ CameraDiagnostics::Result HanwhaResource::handleProxiedDeviceInfo(
         if (proxiedIdParameter == boost::none)
             return CameraDiagnostics::NoErrorResult();
 
-        const auto proxiedId = proxiedIdParameter->trimmed();
-        if (proxiedId != getProxiedId())
+        const auto proxiedDeviceId = proxiedIdParameter->trimmed();
+        if (proxiedDeviceId != proxiedId())
         {
             cleanUpOnProxiedDeviceChange();
-            setProxiedId(proxiedId);
+            setProxiedId(proxiedDeviceId);
         }
     }
     return CameraDiagnostics::NoErrorResult();
@@ -1369,16 +1371,19 @@ CameraDiagnostics::Result HanwhaResource::handleProxiedDeviceInfo(
 
 CameraDiagnostics::Result HanwhaResource::createNxProfiles()
 {
-    int nxPrimaryProfileNumber = kHanwhaInvalidProfile;
-    int nxSecondaryProfileNumber = kHanwhaInvalidProfile;
+    std::map <Qn::ConnectionRole, boost::optional<HanwhaVideoProfile>> profilesByRole = {
+        {Qn::ConnectionRole::CR_LiveVideo, boost::none},
+        {Qn::ConnectionRole::CR_SecondaryLiveVideo, boost::none}
+    };
+
     std::set<HanwhaProfileNumber> profilesToRemove;
     int totalProfileNumber = 0;
 
     m_profileByRole.clear();
 
     auto result = findProfiles(
-        &nxPrimaryProfileNumber,
-        &nxSecondaryProfileNumber,
+        &profilesByRole[Qn::ConnectionRole::CR_LiveVideo],
+        &profilesByRole[Qn::ConnectionRole::CR_SecondaryLiveVideo],
         &totalProfileNumber,
         &profilesToRemove);
 
@@ -1388,11 +1393,13 @@ CameraDiagnostics::Result HanwhaResource::createNxProfiles()
     if (!qnGlobalSettings->hanwhaDeleteProfilesOnInitIfNeeded())
     {
         int amountOfProfilesNeeded = 0;
-        if (nxPrimaryProfileNumber == kHanwhaInvalidProfile)
-            ++amountOfProfilesNeeded;
 
-        if (nxSecondaryProfileNumber == kHanwhaInvalidProfile)
-            ++amountOfProfilesNeeded;
+        for (const auto& entry: profilesByRole)
+        {
+            const auto profile = entry.second;
+            if (profile == boost::none)
+                ++amountOfProfilesNeeded;
+        }
 
         if (amountOfProfilesNeeded + totalProfileNumber > m_maxProfileCount)
         {
@@ -1403,33 +1410,37 @@ CameraDiagnostics::Result HanwhaResource::createNxProfiles()
         }
     }
 
-    if (nxPrimaryProfileNumber == kHanwhaInvalidProfile)
+    for (auto& entry: profilesByRole)
     {
-        result = createNxProfile(
-            Qn::ConnectionRole::CR_LiveVideo,
-            &nxPrimaryProfileNumber,
-            totalProfileNumber,
-            &profilesToRemove);
+        const auto role = entry.first;
+        auto& profile = entry.second;
 
-        if (!result)
-            return result;
+        if (profile == boost::none)
+        {
+            profile = HanwhaVideoProfile();
+            result = createNxProfile(
+                role,
+                &profile->number,
+                totalProfileNumber,
+                &profilesToRemove);
+
+            if (!result)
+                return result;
+        }
+        else
+        {
+            updateProfileNameIfNeeded(role, *profile);
+        }
     }
 
-    if (nxSecondaryProfileNumber == kHanwhaInvalidProfile)
-    {
-        result = createNxProfile(
-            Qn::ConnectionRole::CR_SecondaryLiveVideo,
-            &nxSecondaryProfileNumber,
-            totalProfileNumber,
-            &profilesToRemove);
+    m_profileByRole[Qn::ConnectionRole::CR_LiveVideo]
+        = profilesByRole[Qn::ConnectionRole::CR_LiveVideo]->number;
 
-        if (!result)
-            return result;
-    }
+    m_profileByRole[Qn::ConnectionRole::CR_Archive]
+        = profilesByRole[Qn::ConnectionRole::CR_LiveVideo]->number;
 
-    m_profileByRole[Qn::ConnectionRole::CR_LiveVideo] = nxPrimaryProfileNumber;
-    m_profileByRole[Qn::ConnectionRole::CR_Archive] = nxPrimaryProfileNumber;
-    m_profileByRole[Qn::ConnectionRole::CR_SecondaryLiveVideo] = nxSecondaryProfileNumber;
+    m_profileByRole[Qn::ConnectionRole::CR_SecondaryLiveVideo]
+        = profilesByRole[Qn::ConnectionRole::CR_SecondaryLiveVideo]->number;
 
     return CameraDiagnostics::NoErrorResult();
 }
@@ -1583,13 +1594,13 @@ CameraDiagnostics::Result HanwhaResource::setUpProfilePolicies(
 }
 
 CameraDiagnostics::Result HanwhaResource::findProfiles(
-    int* outPrimaryProfileNumber,
-    int* outSecondaryProfileNumber,
+    boost::optional<HanwhaVideoProfile>* outPrimaryProfile,
+    boost::optional<HanwhaVideoProfile>* outSecondaryProfile,
     int* totalProfileNumber,
     std::set<int>* profilesToRemoveIfProfilesExhausted)
 {
-    bool isParametersValid = outPrimaryProfileNumber
-        && outSecondaryProfileNumber
+    bool isParametersValid = outPrimaryProfile
+        && outSecondaryProfile
         && totalProfileNumber
         && profilesToRemoveIfProfilesExhausted;
 
@@ -1608,8 +1619,8 @@ CameraDiagnostics::Result HanwhaResource::findProfiles(
     }
 
     profilesToRemoveIfProfilesExhausted->clear();
-    *outPrimaryProfileNumber = kHanwhaInvalidProfile;
-    *outSecondaryProfileNumber = kHanwhaInvalidProfile;
+    *outPrimaryProfile = boost::none;
+    *outSecondaryProfile = boost::none;
 
     HanwhaRequestHelper helper(sharedContext());
     const auto response = helper.view(lit("media/videoprofile"));
@@ -1618,9 +1629,7 @@ CameraDiagnostics::Result HanwhaResource::findProfiles(
     {
         return error(
             response,
-            CameraDiagnostics::RequestFailedResult(
-                response.requestUrl(),
-                response.errorString()));
+            CameraDiagnostics::RequestFailedResult(response.requestUrl(), response.errorString()));
     }
 
     const auto profileByChannel = parseProfiles(response);
@@ -1632,11 +1641,22 @@ CameraDiagnostics::Result HanwhaResource::findProfiles(
     for (const auto& entry : currentChannelProfiles->second)
     {
         const auto& profile = entry.second;
+        const bool isPrimaryProfile =
+            profile.name == nxProfileName(Qn::ConnectionRole::CR_LiveVideo)
+            || profile.name == nxProfileName(
+                Qn::ConnectionRole::CR_LiveVideo,
+                kHanwhaProfileNameMaxLength); //< Obsolete profile name caused by wrong length.
 
-        if (profile.name == nxProfileName(Qn::ConnectionRole::CR_LiveVideo))
-            *outPrimaryProfileNumber = profile.number;
-        else if (profile.name == nxProfileName(Qn::ConnectionRole::CR_SecondaryLiveVideo))
-            *outSecondaryProfileNumber = profile.number;
+        const bool isSecondaryProfile =
+            profile.name == nxProfileName(Qn::ConnectionRole::CR_SecondaryLiveVideo)
+            || profile.name == nxProfileName(
+                Qn::ConnectionRole::CR_SecondaryLiveVideo,
+                kHanwhaProfileNameMaxLength); //< Obsolete profile name caused by wrong length.
+
+        if (isPrimaryProfile)
+            *outPrimaryProfile = profile;
+        else if (isSecondaryProfile)
+            *outSecondaryProfile = profile;
         else if (!profile.isBuiltinProfile())
             profilesToRemoveIfProfilesExhausted->insert(profile.number);
     }
@@ -1658,9 +1678,7 @@ CameraDiagnostics::Result HanwhaResource::removeProfile(int profileNumber)
     {
         return error(
             response,
-            CameraDiagnostics::RequestFailedResult(
-                response.requestUrl(),
-                response.errorString()));
+            CameraDiagnostics::RequestFailedResult(response.requestUrl(), response.errorString()));
     }
 
     return CameraDiagnostics::NoErrorResult();
@@ -1688,33 +1706,66 @@ CameraDiagnostics::Result HanwhaResource::createProfile(
     streamParameters.quality = Qn::StreamQuality::QualityHigh;
     streamParameters.bitrateKbps = streamBitrate(role, streamParameters);
 
+    HanwhaProfileParameterFlags profileParameterFlags = HanwhaProfileParameterFlag::newProfile;
+    if (isAudioSupported())
+        profileParameterFlags |= HanwhaProfileParameterFlag::audioSupported;
+
     const auto profileParameters = makeProfileParameters(
         role,
         streamParameters,
-        isAudioSupported(),
-        /*isNewProfile*/ true);
+        profileParameterFlags);
 
     HanwhaRequestHelper helper(sharedContext(), bypassChannel());
-    const auto response = helper.add(
-        lit("media/videoprofile"),
-        profileParameters);
+    const auto response = helper.add(lit("media/videoprofile"), profileParameters);
 
     if (!response.isSuccessful())
     {
         return error(
             response,
-            CameraDiagnostics::RequestFailedResult(
-                response.requestUrl(),
-                response.errorString()));
+            CameraDiagnostics::RequestFailedResult(response.requestUrl(), response.errorString()));
     }
 
     bool success = false;
     *outProfileNumber = response.response()[kHanwhaProfileNumberProperty].toInt(&success);
 
     if (!success)
+        return CameraDiagnostics::CameraInvalidParams(lit("Invalid profile number string"));
+
+    return CameraDiagnostics::NoErrorResult();
+}
+
+CameraDiagnostics::Result HanwhaResource::updateProfileNameIfNeeded(
+    Qn::ConnectionRole role,
+    const HanwhaVideoProfile& profile)
+{
+    const auto properProfileName = nxProfileName(role);
+    bool needToUpdateProfileName =
+        (profile.name == nxProfileName(role, kHanwhaProfileNameMaxLength))
+        && (nxProfileName(role, kHanwhaProfileNameMaxLength) != properProfileName);
+
+    if (needToUpdateProfileName)
     {
-        return CameraDiagnostics::CameraInvalidParams(
-            lit("Invalid profile number string"));
+        // Try to update profile name and silently ignore any errors.
+        HanwhaRequestHelper helper(sharedContext(), bypassChannel());
+        const auto response = helper.update(
+            lit("media/videoprofile"),
+            {
+                { kHanwhaProfileNumberProperty, QString::number(profile.number) },
+            { kHanwhaProfileNameProperty, properProfileName }
+            });
+
+        if (!response.isSuccessful())
+        {
+            NX_VERBOSE(
+                this,
+                lm("Can't update %1 profile name for %2 (%3)")
+                    .args(
+                        (role == Qn::ConnectionRole::CR_LiveVideo
+                            ? lit("primary")
+                            : lit("secondary")),
+                        getName(),
+                        getId()));
+        }
     }
 
     return CameraDiagnostics::NoErrorResult();
@@ -1760,28 +1811,28 @@ CameraDiagnostics::Result HanwhaResource::fetchPtzLimits(QnPtzLimits* outPtzLimi
 
 void HanwhaResource::cleanUpOnProxiedDeviceChange()
 {
-    setProperty(Qn::kPrimaryStreamResolutionParamName, QString());
-    setProperty(Qn::kSecondaryStreamResolutionParamName, QString());
-    setProperty(Qn::kPrimaryStreamCodecParamName, QString());
-    setProperty(Qn::kPrimaryStreamCodecProfileParamName, QString());
-    setProperty(Qn::kSecondaryStreamCodecParamName, QString());
-    setProperty(Qn::kSecondaryStreamCodecProfileParamName, QString());
-    setProperty(Qn::kPrimaryStreamGovLengthParamName, QString());
-    setProperty(Qn::kSecondaryStreamGovLengthParamName, QString());
-    setProperty(Qn::kPrimaryStreamBitrateControlParamName, QString());
-    setProperty(Qn::kSecondaryStreamBitrateControlParamName, QString());
-    setProperty(Qn::kPrimaryStreamBitrateParamName, QString());
-    setProperty(Qn::kSecondaryStreamBitrateParamName, QString());
-    setProperty(Qn::kPrimaryStreamEntropyCodingParamName, QString());
-    setProperty(Qn::kSecondaryStreamEntropyCodingParamName, QString());
-    setProperty(Qn::kSecondaryStreamFpsParamName, QString());
+    setProperty(kPrimaryStreamResolutionParamName, QString());
+    setProperty(kSecondaryStreamResolutionParamName, QString());
+    setProperty(kPrimaryStreamCodecParamName, QString());
+    setProperty(kPrimaryStreamCodecProfileParamName, QString());
+    setProperty(kSecondaryStreamCodecParamName, QString());
+    setProperty(kSecondaryStreamCodecProfileParamName, QString());
+    setProperty(kPrimaryStreamGovLengthParamName, QString());
+    setProperty(kSecondaryStreamGovLengthParamName, QString());
+    setProperty(kPrimaryStreamBitrateControlParamName, QString());
+    setProperty(kSecondaryStreamBitrateControlParamName, QString());
+    setProperty(kPrimaryStreamBitrateParamName, QString());
+    setProperty(kSecondaryStreamBitrateParamName, QString());
+    setProperty(kPrimaryStreamEntropyCodingParamName, QString());
+    setProperty(kSecondaryStreamEntropyCodingParamName, QString());
+    setProperty(kSecondaryStreamFpsParamName, QString());
 }
 
 AVCodecID HanwhaResource::streamCodec(Qn::ConnectionRole role) const
 {
     const auto propertyName = role == Qn::ConnectionRole::CR_LiveVideo
-        ? Qn::kPrimaryStreamCodecParamName
-        : Qn::kSecondaryStreamCodecParamName;
+        ? kPrimaryStreamCodecParamName
+        : kSecondaryStreamCodecParamName;
 
     QString codecString = getProperty(propertyName);
     if (codecString.isEmpty())
@@ -1797,8 +1848,8 @@ AVCodecID HanwhaResource::streamCodec(Qn::ConnectionRole role) const
 QString HanwhaResource::streamCodecProfile(AVCodecID codec, Qn::ConnectionRole role) const
 {
     const auto propertyName = role == Qn::ConnectionRole::CR_LiveVideo
-        ? Qn::kPrimaryStreamCodecProfileParamName
-        : Qn::kSecondaryStreamCodecProfileParamName;
+        ? kPrimaryStreamCodecProfileParamName
+        : kSecondaryStreamCodecProfileParamName;
 
     const QString profile = getProperty(propertyName);
     return suggestCodecProfile(codec, role, profile);
@@ -1807,8 +1858,8 @@ QString HanwhaResource::streamCodecProfile(AVCodecID codec, Qn::ConnectionRole r
 QSize HanwhaResource::streamResolution(Qn::ConnectionRole role) const
 {
     const auto propertyName = role == Qn::ConnectionRole::CR_LiveVideo
-        ? Qn::kPrimaryStreamResolutionParamName
-        : Qn::kSecondaryStreamResolutionParamName;
+        ? kPrimaryStreamResolutionParamName
+        : kSecondaryStreamResolutionParamName;
 
     QString resolutionString = getProperty(propertyName);
     if (resolutionString.isEmpty())
@@ -1825,15 +1876,15 @@ int HanwhaResource::streamFrameRate(Qn::ConnectionRole role, int desiredFps) con
 {
     int userDefinedFps = 0;
     if (role == Qn::ConnectionRole::CR_SecondaryLiveVideo)
-        userDefinedFps = getProperty(Qn::kSecondaryStreamFpsParamName).toInt();
+        userDefinedFps = getProperty(kSecondaryStreamFpsParamName).toInt();
     return closestFrameRate(role, userDefinedFps ? userDefinedFps : desiredFps);
 }
 
 int HanwhaResource::streamGovLength(Qn::ConnectionRole role) const
 {
     const auto propertyName = role == Qn::ConnectionRole::CR_LiveVideo
-        ? Qn::kPrimaryStreamGovLengthParamName
-        : Qn::kSecondaryStreamGovLengthParamName;
+        ? kPrimaryStreamGovLengthParamName
+        : kSecondaryStreamGovLengthParamName;
 
     QString govLengthString = getProperty(propertyName);
     if (govLengthString.isEmpty())
@@ -1850,8 +1901,8 @@ int HanwhaResource::streamGovLength(Qn::ConnectionRole role) const
 Qn::BitrateControl HanwhaResource::streamBitrateControl(Qn::ConnectionRole role) const
 {
     const auto propertyName = role == Qn::ConnectionRole::CR_LiveVideo
-        ? Qn::kPrimaryStreamBitrateControlParamName
-        : Qn::kSecondaryStreamBitrateControlParamName;
+        ? kPrimaryStreamBitrateControlParamName
+        : kSecondaryStreamBitrateControlParamName;
 
     QString bitrateControlString = getProperty(propertyName);
     if (bitrateControlString.isEmpty())
@@ -1864,12 +1915,14 @@ Qn::BitrateControl HanwhaResource::streamBitrateControl(Qn::ConnectionRole role)
     return result;
 }
 
-int HanwhaResource::streamBitrate(Qn::ConnectionRole role, const QnLiveStreamParams& liveStreamParams) const
+int HanwhaResource::streamBitrate(
+    Qn::ConnectionRole role,
+    const QnLiveStreamParams& liveStreamParams) const
 {
     QnLiveStreamParams streamParams = liveStreamParams;
     const auto propertyName = role == Qn::ConnectionRole::CR_LiveVideo
-        ? Qn::kPrimaryStreamBitrateParamName
-        : Qn::kSecondaryStreamBitrateParamName;
+        ? kPrimaryStreamBitrateParamName
+        : kSecondaryStreamBitrateParamName;
 
     const QString bitrateString = getProperty(propertyName);
     int bitrateKbps = bitrateString.toInt();
@@ -2755,8 +2808,8 @@ bool HanwhaResource::resetProfileToDefault(Qn::ConnectionRole role)
 
     if (role == Qn::ConnectionRole::CR_SecondaryLiveVideo)
     {
-        setProperty(Qn::kSecondaryStreamFpsParamName, defaultFrameRateForStream(role));
-        setProperty(Qn::kSecondaryStreamBitrateParamName, defaultBitrateForStream(role));
+        setProperty(kSecondaryStreamFpsParamName, defaultFrameRateForStream(role));
+        setProperty(kSecondaryStreamBitrateParamName, defaultBitrateForStream(role));
     }
 
     saveParams();
@@ -2847,14 +2900,30 @@ bool HanwhaResource::isNvr() const
     return m_isNvr;
 }
 
-QString HanwhaResource::nxProfileName(Qn::ConnectionRole role) const
+QString HanwhaResource::nxProfileName(
+    Qn::ConnectionRole role,
+    boost::optional<int> forcedProfileNameLength) const
 {
-    const auto nxProfileNameParameter = cgiParameters()
-        .parameter(lit("media/videoprofile/add_update/Name"));
+    auto maxLength = forcedProfileNameLength == boost::none
+        ? kHanwhaProfileNameMaxLength
+        : forcedProfileNameLength.get();
 
-    const auto maxLength = nxProfileNameParameter && nxProfileNameParameter->maxLength() > 0
-        ? nxProfileNameParameter->maxLength()
-        : kHanwhaProfileNameMaxLength;
+    if (forcedProfileNameLength == boost::none)
+    {
+        static const std::vector<QString> parametersToCheck = {
+            lit("media/videoprofile/add_update/Name"),
+            lit("media/videoprofile/add/Name")
+        };
+
+        for (const auto& parameterToCheck : parametersToCheck)
+        {
+            const auto nxProfileNameParameter = cgiParameters().parameter(parameterToCheck);
+            if (nxProfileNameParameter != boost::none && nxProfileNameParameter->maxLength() > 0)
+                maxLength = nxProfileNameParameter->maxLength();
+
+            break;
+        }
+    }
 
     auto suffix = role == Qn::ConnectionRole::CR_LiveVideo
         ? kHanwhaPrimaryNxProfileSuffix
@@ -2976,8 +3045,7 @@ bool HanwhaResource::isConnectedViaSunapi() const
 HanwhaProfileParameters HanwhaResource::makeProfileParameters(
     Qn::ConnectionRole role,
     const QnLiveStreamParams& parameters,
-    bool isAudioSupported,
-    bool isNewProfile) const
+    HanwhaProfileParameterFlags flags) const
 {
     NX_ASSERT(isConnectedViaSunapi());
     if (!isConnectedViaSunapi())
@@ -3007,12 +3075,12 @@ HanwhaProfileParameters HanwhaResource::makeProfileParameters(
         { kHanwhaResolutionProperty, toHanwhaString(resolution) }
     };
 
-    if (isNewProfile)
+    if (flags.testFlag(HanwhaProfileParameterFlag::newProfile))
         result.emplace(kHanwhaProfileNameProperty, nxProfileName(role));
     else
         result.emplace(kHanwhaProfileNumberProperty, QString::number(profileByRole(role)));
 
-    if (isAudioSupported)
+    if (flags.testFlag(HanwhaProfileParameterFlag::audioSupported))
         result.emplace(kHanwhaAudioInputEnableProperty, toHanwhaString(isAudioEnabled()));
 
     if (isH26x)
@@ -3033,6 +3101,16 @@ HanwhaProfileParameters HanwhaResource::makeProfileParameters(
         result.emplace(kHanwhaFrameRatePriority, QString::number(frameRate));
 
     return result;
+}
+
+QString HanwhaResource::proxiedId() const
+{
+    return getProperty(kHanwhaProxiedIdParamName);
+}
+
+void HanwhaResource::setProxiedId(const QString& proxiedId)
+{
+    setProperty(kHanwhaProxiedIdParamName, proxiedId);
 }
 
 } // namespace plugins

@@ -978,15 +978,15 @@ to view more bookmarks</source>
       <translation>Aantal deactiveringen overschreden voor deze licentie.</translation>
     </message>
     <message>
-      <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
-      <translation>Hardware-id van server met deze licentie komt niet overeen met hardware-id waarop de licentie is geactiveerd.</translation>
+      <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
+      <translation>Hardware-Id van server met deze licentie komt niet overeen met Hardware-ID waarop de licentie is geactiveerd.</translation>
     </message>
   </context>
   <context>
     <name>ExportSettingsDialog</name>
     <message>
       <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
-      <translation>Gekozen instellingen vereisen transcodering. Het verhoogt het CPU-gebruik en kan veel tijd in beslag nemen.</translation>
+      <translation>De gekozen instellingen vereisen transcodering. Het verhoogt de CPU belasting en kan veel tijd in beslag nemen.</translation>
     </message>
     <message>
       <source>AVI format is not recommended to export a non-continuous recording with audio track.</source>
@@ -2228,14 +2228,6 @@ to view more bookmarks</source>
       <translation>I/O module heeft geen audio stream</translation>
     </message>
     <message>
-      <source>I/O Module Id</source>
-      <translation>I/O Module Id</translation>
-    </message>
-    <message>
-      <source>Camera Id</source>
-      <translation>Camera Id</translation>
-    </message>
-    <message>
       <source>Settings</source>
       <translation>Instellingen</translation>
     </message>
@@ -2246,6 +2238,14 @@ to view more bookmarks</source>
     <message>
       <source>No settings</source>
       <translation>Geen instellingen</translation>
+    </message>
+    <message>
+      <source>I/O Module ID</source>
+      <translation type="unfinished">I/O Module ID</translation>
+    </message>
+    <message>
+      <source>Camera ID</source>
+      <translation type="unfinished">Camera ID</translation>
     </message>
   </context>
   <context>
@@ -2359,7 +2359,7 @@ to view more bookmarks</source>
       <translation>Edge</translation>
     </message>
     <message numerus="yes">
-      <source>This Id is already used on the following %n cameras: %1</source>
+      <source>This ID is already used on the following %n cameras: %1</source>
       <translation>
         <numerusform>Deze ID wordt al gebruikt op de volgende %n camera's: %1</numerusform>
         <numerusform>Deze ID wordt al gebruikt op de volgende %n camera's: %1</numerusform>
@@ -2484,8 +2484,8 @@ to view more bookmarks</source>
       <translation>Server</translation>
     </message>
     <message>
-      <source>Id</source>
-      <translation>Id</translation>
+      <source>ID</source>
+      <translation type="unfinished">ID</translation>
     </message>
   </context>
   <context>
@@ -3729,8 +3729,8 @@ to %1</source>
       <translation>Impuls</translation>
     </message>
     <message>
-      <source>Id</source>
-      <translation>Id</translation>
+      <source>ID</source>
+      <translation type="unfinished">ID</translation>
     </message>
   </context>
   <context>
@@ -3882,6 +3882,21 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnLensCameraAdvancedParamWidget</name>
+    <message>
+      <source>Zoom</source>
+      <translation type="unfinished">Zoom</translation>
+    </message>
+    <message>
+      <source>Focus</source>
+      <translation type="unfinished">Focus</translation>
+    </message>
+    <message>
+      <source>Rotation:</source>
+      <translation type="unfinished">Rotation:</translation>
+    </message>
+  </context>
+  <context>
     <name>QnLicenseDetailsDialog</name>
     <message>
       <source>Screens Allowed:</source>
@@ -3912,8 +3927,8 @@ to %1</source>
       <translation>Functies:</translation>
     </message>
     <message>
-      <source>Locked to Hardware Id</source>
-      <translation>Gelieerd aan Hardware Id</translation>
+      <source>Locked to Hardware ID</source>
+      <translation>Gelieerd aan Hardware ID</translation>
     </message>
   </context>
   <context>
@@ -4188,16 +4203,16 @@ to %1</source>
       <translation>Neem contact op met customer support om een ​​geldige licentiecode te verkrijgen.</translation>
     </message>
     <message>
-      <source>This license is already activated and linked to Hardware Id %1</source>
-      <translation>Deze licentie is al geactiveerd en gekoppeld aan hardware Id %1</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to Hardware Id %1 on %2</source>
-      <translation>Deze licentie is al geactiveerd en gekoppeld aan Hardware Id %1 op %2</translation>
-    </message>
-    <message>
       <source>If the problem persists please contact Customer Support.</source>
       <translation>Als het probleem aanhoudt, neem dan contact op met customer support.</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1</source>
+      <translation>Deze licentie is al geactiveerd en gekoppeld aan Hardware ID %1</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1 on %2</source>
+      <translation>Deze licentie is al geactiveerd en gekoppeld aan Hardware ID %1 op %2</translation>
     </message>
   </context>
   <context>
@@ -4219,16 +4234,16 @@ to %1</source>
       <translation>Kan het bestand niet openen</translation>
     </message>
     <message>
-      <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>Stuurt u alstublieft een e-mail met de licentiecode en het bovenstaande Hardware Id aan %1 en u ontvangt zo spoedig mogelijk een ​​activatiebestand waarmee u de licenties kunt valideren.</translation>
-    </message>
-    <message>
-      <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>Stuurt u alstublieft een e-mail met de licentiecode en het bovenstaande Hardware Id aan %1 en u ontvangt zo spoedig mogelijk een ​​activatiebestand waarmee u de licenties kunt valideren.</translation>
-    </message>
-    <message>
       <source>All files</source>
       <translation>Alle bestanden</translation>
+    </message>
+    <message>
+      <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
+      <translation>Stuurt u alstublieft een e-mail met de licentiecode en het bovenstaande Hardware ID aan %1 en u ontvangt zo spoedig mogelijk een ​​activatiebestand waarmee u de licenties kunt valideren.</translation>
+    </message>
+    <message>
+      <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
+      <translation>Stuurt u alstublieft een e-mail met de licentiecode en het bovenstaande Hardware ID aan %1 en u ontvangt zo spoedig mogelijk een ​​activatiebestand waarmee u de licenties kunt valideren.</translation>
     </message>
   </context>
   <context>
@@ -8008,15 +8023,15 @@ to %1</source>
     </message>
     <message>
       <source>Selected format is not supported by FFMPEG library.</source>
-      <translation>Geselecteerde indeling wordt niet ondersteund door de FFMPEG bibliotheek.</translation>
+      <translation>De geselecteerde indeling wordt niet ondersteund door de FFMPEG library.</translation>
     </message>
     <message>
       <source>FFMPEG library error.</source>
-      <translation>FFMPEG bibliotheekfout.</translation>
+      <translation>FFMPEG library fout.</translation>
     </message>
     <message>
       <source>Video or audio codec is incompatible with selected format.</source>
-      <translation>Video- of audio codec is niet compatible met het geselecteerde formaat.</translation>
+      <translation>De video- of audio codec is niet compatible met het geselecteerde formaat.</translation>
     </message>
     <message>
       <source>File write error.</source>
@@ -8182,8 +8197,8 @@ to %1</source>
     <message numerus="yes">
       <source>For exporting as Rapid Review video length should be at least %n seconds.</source>
       <translation>
-        <numerusform>Voor export als Rapid Review moet de videolengte minstens %n seconden zijn.</numerusform>
-        <numerusform>Voor export als Rapid Review moet de videolengte minstens %n seconden zijn.</numerusform>
+        <numerusform>Als u wilt exporteren als een rapid review, moet de videolengte minstens %n seconden zijn.</numerusform>
+        <numerusform>Als u wilt exporteren als een rapid review, moet de videolengte minstens %n seconden zijn.</numerusform>
       </translation>
     </message>
   </context>

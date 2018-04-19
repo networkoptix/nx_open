@@ -170,6 +170,12 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
             return systemCommands->kill(std::stoi(*pid)) ? Result::ok : Result::execFailed;
         });
 
+    factory.reg({"dmiInfo"}, {},
+        [systemCommands](const char** argv)
+        {
+            return systemCommands->serializedDmiInfo(true).empty() ? Result::execFailed : Result::ok;
+        });
+
     factory.reg({"umount", "unmount"}, {"path"},
         [systemCommands](const char** argv)
         {

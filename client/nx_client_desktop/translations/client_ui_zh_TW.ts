@@ -764,15 +764,15 @@
     </message>
     <message>
       <location/>
-      <source>Logical Id</source>
-      <translation type="unfinished">Logical Id</translation>
+      <source>Logical ID</source>
+      <translation type="unfinished">Logical ID</translation>
     </message>
   </context>
   <context>
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
-      <source>Input Id</source>
+      <source>Input ID</source>
       <translation>輸入ID</translation>
     </message>
   </context>
@@ -798,8 +798,8 @@
     </message>
     <message>
       <location/>
-      <source>Output Id:</source>
-      <translation>輸出 Id:</translation>
+      <source>Output ID:</source>
+      <translation>輸出 ID:</translation>
     </message>
   </context>
   <context>
@@ -1513,8 +1513,8 @@
     </message>
     <message>
       <location/>
-      <source>Locked to Hardware Id:</source>
-      <translation>已鎖定至硬體 Id:</translation>
+      <source>Locked to Hardware ID:</source>
+      <translation>已鎖定至硬體 ID:</translation>
     </message>
   </context>
   <context>
@@ -1612,8 +1612,8 @@
     </message>
     <message>
       <location/>
-      <source>Hardware Id</source>
-      <translation>硬體 Id</translation>
+      <source>Hardware ID</source>
+      <translation>硬體 ID</translation>
     </message>
   </context>
   <context>

@@ -79,7 +79,7 @@
     <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 System can only be merged with non-%1. System name and password are taken from %1 System.</translation>
+      <translation>%1 システムはクラウドに接続されていない-%1 システムとのみ結合できます　システム名とパスワードは %1 システムから取得されます</translation>
     </message>
     <message>
       <source>Both Systems are connected to %1. Merge is not allowed.</source>
@@ -557,7 +557,7 @@
       <translation>不明なエラー</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
+      <source>Server with matching Hardware ID not found</source>
       <translation>サーバーのハードウェアIDが見つかりません</translation>
     </message>
   </context>
@@ -674,12 +674,12 @@
       <translation>透かし: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>ハードウェア Id: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>タイムライセンス</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>ハードウェア ID: %1</translation>
     </message>
   </context>
   <context>

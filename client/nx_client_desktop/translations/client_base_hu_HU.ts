@@ -979,8 +979,8 @@ több könyvjelző megjelenítéséhez</translation>
       <translation>A deaktiválások száma túllépte a licenc korlátokat.</translation>
     </message>
     <message>
-      <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
-      <translation>A licenchez adott média szerver Hardver Id nem egyezik meg az eszköz Hardver Id-vel melyhez a licencet aktiválták.</translation>
+      <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
+      <translation>A licenchez adott média szerver Hardver ID nem egyezik meg az eszköz Hardver ID-vel melyhez a licencet aktiválták.</translation>
     </message>
   </context>
   <context>
@@ -2229,14 +2229,6 @@ több könyvjelző megjelenítéséhez</translation>
       <translation>I/O modulhoz nincs audio steam</translation>
     </message>
     <message>
-      <source>I/O Module Id</source>
-      <translation>I/O modul Id</translation>
-    </message>
-    <message>
-      <source>Camera Id</source>
-      <translation>Kamera Id</translation>
-    </message>
-    <message>
       <source>Settings</source>
       <translation>Beállítások</translation>
     </message>
@@ -2247,6 +2239,14 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
       <source>No settings</source>
       <translation type="unfinished">No settings</translation>
+    </message>
+    <message>
+      <source>I/O Module ID</source>
+      <translation>I/O modul ID</translation>
+    </message>
+    <message>
+      <source>Camera ID</source>
+      <translation>Kamera ID</translation>
     </message>
   </context>
   <context>
@@ -2360,10 +2360,10 @@ több könyvjelző megjelenítéséhez</translation>
       <translation>Edge</translation>
     </message>
     <message numerus="yes">
-      <source>This Id is already used on the following %n cameras: %1</source>
+      <source>This ID is already used on the following %n cameras: %1</source>
       <translation type="unfinished">
-        <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
-        <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
+        <numerusform>This ID is already used on the following %n cameras: %1</numerusform>
+        <numerusform>This ID is already used on the following %n cameras: %1</numerusform>
       </translation>
     </message>
   </context>
@@ -2485,8 +2485,8 @@ több könyvjelző megjelenítéséhez</translation>
       <translation>Szerver</translation>
     </message>
     <message>
-      <source>Id</source>
-      <translation>Id</translation>
+      <source>ID</source>
+      <translation type="unfinished">ID</translation>
     </message>
   </context>
   <context>
@@ -3732,8 +3732,8 @@ to %1</source>
       <translation>Impulzus</translation>
     </message>
     <message>
-      <source>Id</source>
-      <translation>Id</translation>
+      <source>ID</source>
+      <translation type="unfinished">ID</translation>
     </message>
   </context>
   <context>
@@ -3885,6 +3885,21 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnLensCameraAdvancedParamWidget</name>
+    <message>
+      <source>Zoom</source>
+      <translation type="unfinished">Zoom</translation>
+    </message>
+    <message>
+      <source>Focus</source>
+      <translation type="unfinished">Focus</translation>
+    </message>
+    <message>
+      <source>Rotation:</source>
+      <translation type="unfinished">Rotation:</translation>
+    </message>
+  </context>
+  <context>
     <name>QnLicenseDetailsDialog</name>
     <message>
       <source>Screens Allowed:</source>
@@ -3915,8 +3930,8 @@ to %1</source>
       <translation>Jellemzők:</translation>
     </message>
     <message>
-      <source>Locked to Hardware Id</source>
-      <translation>Hardver Id-hez rendelve</translation>
+      <source>Locked to Hardware ID</source>
+      <translation>Hardver ID-hez rendelve</translation>
     </message>
   </context>
   <context>
@@ -4191,16 +4206,16 @@ to %1</source>
       <translation>Kérjük, forduljon az ügyfélszolgálathoz egy érvényes licenckulcs beszerzéséért.</translation>
     </message>
     <message>
-      <source>This license is already activated and linked to Hardware Id %1</source>
-      <translation>Ez a licenc már aktiválva van %1 Hardver Id-hoz</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to Hardware Id %1 on %2</source>
-      <translation>Ez a licenc már aktiválva van %1 Hardver Id-hoz (%2)</translation>
-    </message>
-    <message>
       <source>If the problem persists please contact Customer Support.</source>
       <translation>Ha a probléma továbbra is fennáll, kérjük, forduljon az ügyfélszolgálathoz.</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1</source>
+      <translation>Ez a licenc már aktiválva van %1 Hardver ID-hoz</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1 on %2</source>
+      <translation>Ez a licenc már aktiválva van %1 Hardver ID-hoz (%2)</translation>
     </message>
   </context>
   <context>
@@ -4222,16 +4237,16 @@ to %1</source>
       <translation>A fájl megnyitása sikertelen</translation>
     </message>
     <message>
-      <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>Az aktivációs kulcs megküldéséhez, kérjük e-mailben küldje el a licenc kulcsot és a Hardver Id-t %1 címre.</translation>
-    </message>
-    <message>
-      <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>Az aktivációs kulcs megküldéséhez, kérjük küldje el a licenc kulcsot és a Hardver Id-t %1 címre.</translation>
-    </message>
-    <message>
       <source>All files</source>
       <translation type="unfinished">All files</translation>
+    </message>
+    <message>
+      <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
+      <translation>Az aktivációs kulcs megküldéséhez, kérjük e-mailben küldje el a licenc kulcsot és a Hardver ID-t %1 címre.</translation>
+    </message>
+    <message>
+      <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
+      <translation>Az aktivációs kulcs megküldéséhez, kérjük küldje el a licenc kulcsot és a Hardver ID-t %1 címre.</translation>
     </message>
   </context>
   <context>

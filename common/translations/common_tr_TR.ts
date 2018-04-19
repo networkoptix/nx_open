@@ -561,8 +561,8 @@
       <translation>Bilinmeyen Hata</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
-      <translation>Sunucu İle Eşleşen Donanım Id'si Bulunamadı</translation>
+      <source>Server with matching Hardware ID not found</source>
+      <translation>Sunucu İle Eşleşen Donanım ID'si Bulunamadı</translation>
     </message>
   </context>
   <context>
@@ -684,12 +684,12 @@
       <translation>Watermark: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>Donanım Kimliği: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>Deneme Lisansı</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>Donanım Kimliği: %1</translation>
     </message>
   </context>
   <context>

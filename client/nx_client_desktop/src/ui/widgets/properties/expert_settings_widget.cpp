@@ -478,7 +478,7 @@ void QnCameraExpertSettingsWidget::updateLogicalIdControls()
     for (const auto& camera : duplicateCameras)
         cameraNames << camera->getName();
     const auto errorMessage = tr(
-            "This Id is already used on the following %n cameras: %1",
+            "This ID is already used on the following %n cameras: %1",
             "",
             cameraNames.size())
         .arg(lit("<b>%1</b>").arg(cameraNames.join(lit(", "))));

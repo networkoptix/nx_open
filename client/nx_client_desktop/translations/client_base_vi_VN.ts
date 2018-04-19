@@ -978,8 +978,8 @@ to view more bookmarks</source>
       <translation>Số lần hủy kích hoạt vượt quá giới hạn bản quyền này.</translation>
     </message>
     <message>
-      <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
-      <translation>Id phần cứng của Máy chủ không khớp với mã kích hoạt của giấy phép này.</translation>
+      <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
+      <translation>ID phần cứng của Máy chủ không khớp với mã kích hoạt của giấy phép này.</translation>
     </message>
   </context>
   <context>
@@ -2207,14 +2207,6 @@ to view more bookmarks</source>
       <translation>Mô đun I/O không có luồng âm thanh</translation>
     </message>
     <message>
-      <source>I/O Module Id</source>
-      <translation>Tên mô-đun I/O</translation>
-    </message>
-    <message>
-      <source>Camera Id</source>
-      <translation>Tên Camera</translation>
-    </message>
-    <message>
       <source>Settings</source>
       <translation>Cài đặt</translation>
     </message>
@@ -2225,6 +2217,14 @@ to view more bookmarks</source>
     <message>
       <source>No settings</source>
       <translation>Không có cài đặt</translation>
+    </message>
+    <message>
+      <source>I/O Module ID</source>
+      <translation>Tên mô-đun I/O</translation>
+    </message>
+    <message>
+      <source>Camera ID</source>
+      <translation>Tên Camera</translation>
     </message>
   </context>
   <context>
@@ -2337,7 +2337,7 @@ to view more bookmarks</source>
       <translation>Cạnh</translation>
     </message>
     <message numerus="yes">
-      <source>This Id is already used on the following %n cameras: %1</source>
+      <source>This ID is already used on the following %n cameras: %1</source>
       <translation>
         <numerusform>Mã này đã được sử dụng trên %n camera sau: %1</numerusform>
       </translation>
@@ -2457,8 +2457,8 @@ to view more bookmarks</source>
       <translation>Máy chủ</translation>
     </message>
     <message>
-      <source>Id</source>
-      <translation>Id</translation>
+      <source>ID</source>
+      <translation type="unfinished">ID</translation>
     </message>
   </context>
   <context>
@@ -3692,8 +3692,8 @@ to %1</source>
       <translation>Thúc đẩy</translation>
     </message>
     <message>
-      <source>Id</source>
-      <translation>Id</translation>
+      <source>ID</source>
+      <translation type="unfinished">ID</translation>
     </message>
   </context>
   <context>
@@ -3844,6 +3844,21 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnLensCameraAdvancedParamWidget</name>
+    <message>
+      <source>Zoom</source>
+      <translation type="unfinished">Zoom</translation>
+    </message>
+    <message>
+      <source>Focus</source>
+      <translation type="unfinished">Focus</translation>
+    </message>
+    <message>
+      <source>Rotation:</source>
+      <translation type="unfinished">Rotation:</translation>
+    </message>
+  </context>
+  <context>
     <name>QnLicenseDetailsDialog</name>
     <message>
       <source>Screens Allowed:</source>
@@ -3874,8 +3889,8 @@ to %1</source>
       <translation>Các tính năng:</translation>
     </message>
     <message>
-      <source>Locked to Hardware Id</source>
-      <translation>Khóa Id phần cứng</translation>
+      <source>Locked to Hardware ID</source>
+      <translation>Khóa ID phần cứng</translation>
     </message>
   </context>
   <context>
@@ -4140,16 +4155,16 @@ to %1</source>
       <translation>Vui lòng liên hệ Hỗ trợ Khách hàng để có được bản quyên hợp lệ.</translation>
     </message>
     <message>
-      <source>This license is already activated and linked to Hardware Id %1</source>
+      <source>If the problem persists please contact Customer Support.</source>
+      <translation>Nếu sự cố vẫn tiếp diễn, vui lòng liên hệ Hỗ trợ Khách hàng.</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1</source>
       <translation>Bản quyền này đã được kích hoạt trên một máy khác %1</translation>
     </message>
     <message>
-      <source>This license is already activated and linked to Hardware Id %1 on %2</source>
+      <source>This license is already activated and linked to Hardware ID %1 on %2</source>
       <translation>Bản quyền này đã được kích hoạt trên một máy khác %1 vào %2</translation>
-    </message>
-    <message>
-      <source>If the problem persists please contact Customer Support.</source>
-      <translation>Nếu sự cố vẫn tiếp diễn, vui lòng liên hệ Hỗ trợ Khách hàng.</translation>
     </message>
   </context>
   <context>
@@ -4171,16 +4186,16 @@ to %1</source>
       <translation>Không thể mở tập tin</translation>
     </message>
     <message>
-      <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>Vui lòng gửi email với key và Id phần cứng %1 đã kích hoạt.</translation>
-    </message>
-    <message>
-      <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>Vui lòng gửi email với key và Id phần cứng %1 đã kích hoạt.</translation>
-    </message>
-    <message>
       <source>All files</source>
       <translation type="unfinished">All files</translation>
+    </message>
+    <message>
+      <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
+      <translation>Vui lòng gửi email với key và ID phần cứng %1 đã kích hoạt.</translation>
+    </message>
+    <message>
+      <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
+      <translation>Vui lòng gửi email với key và ID phần cứng %1 đã kích hoạt.</translation>
     </message>
   </context>
   <context>

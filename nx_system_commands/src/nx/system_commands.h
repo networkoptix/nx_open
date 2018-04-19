@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <functional>
 #include <boost/optional.hpp>
 
 namespace nx {
@@ -74,6 +75,8 @@ public:
 
     bool kill(int pid);
 
+    std::string serializedDmiInfo(bool reportViaSocket);
+
     /** Installs deb package to system. */
     bool install(const std::string& debPackage);
 
@@ -123,7 +126,8 @@ private:
 
     bool checkMountPermissions(const std::string& directory);
     bool checkOwnerPermissions(const std::string& path);
-    bool execute(const std::string& command);
+    bool execute(
+        const std::string& command, std::function<void(const char*)> outputAction = nullptr);
     CheckOwnerResult checkCurrentOwner(const std::string& url);
 };
 

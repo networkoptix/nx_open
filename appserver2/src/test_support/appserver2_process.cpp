@@ -14,7 +14,6 @@
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/core/access/access_types.h>
-#include <llutil/hardware_id.h>
 #include <network/tcp_connection_priv.h>
 #include <nx1/info.h>
 #include <nx_ec/ec2_lib.h>
