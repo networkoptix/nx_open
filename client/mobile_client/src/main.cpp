@@ -78,9 +78,9 @@ int runUi(QtSingleGuiApplication* application)
     font.setFamily(lit("Roboto"));
     QGuiApplication::setFont(font);
 
-    QnContext context;
+    const auto context = qnMobileClientModule->context();
 
-    QScopedPointer<QnMobileClientUriHandler> uriHandler(new QnMobileClientUriHandler(&context));
+    QScopedPointer<QnMobileClientUriHandler> uriHandler(new QnMobileClientUriHandler(context));
     for (const auto& scheme: uriHandler->supportedSchemes())
         QDesktopServices::setUrlHandler(scheme, uriHandler.data(), uriHandler->handlerMethodName());
 
@@ -97,10 +97,10 @@ int runUi(QtSingleGuiApplication* application)
             qnSettings->setWebSocketPort(webChannel->serverPort());
 
             auto liteClientHandler = commonModule->store(new QnLiteClientHandler());
-            liteClientHandler->setUiController(context.uiController());
+            liteClientHandler->setUiController(context->uiController());
 
             auto webAdminController = commonModule->store(new controllers::WebAdminController());
-            webAdminController->setUiController(context.uiController());
+            webAdminController->setUiController(context->uiController());
 
             webChannel->registerObject(lit("liteClientController"), webAdminController);
         }
@@ -108,7 +108,7 @@ int runUi(QtSingleGuiApplication* application)
 
     QStringList selectors;
 
-    if (context.liteMode())
+    if (context->liteMode())
     {
         selectors.append(lit("lite"));
         qWarning() << "Starting in lite mode";
@@ -123,7 +123,7 @@ int runUi(QtSingleGuiApplication* application)
 
     engine->addImageProvider(lit("thumbnail"), thumbnailProvider);
     engine->addImageProvider(lit("active"), activeCameraThumbnailProvider);
-    engine->rootContext()->setContextObject(&context);
+    engine->rootContext()->setContextObject(context);
 
     QQmlComponent mainComponent(engine, QUrl(lit("main.qml")));
     QPointer<QQuickWindow> mainWindow(qobject_cast<QQuickWindow*>(mainComponent.create()));
@@ -135,7 +135,7 @@ int runUi(QtSingleGuiApplication* application)
     {
         if (mainWindow)
         {
-            if (context.liteMode() && !ini().disableFullScreen)
+            if (context->liteMode() && !ini().disableFullScreen)
             {
                 mainWindow->showFullScreen();
                 if (const auto screen = mainWindow->screen())
@@ -190,7 +190,7 @@ int runUi(QtSingleGuiApplication* application)
     maxFfmpegResolutions[(int) AV_CODEC_ID_H265] = maxFfmpegHevcResolution;
 
     nx::media::DecoderRegistrar::registerDecoders(
-        allocator, maxFfmpegResolutions, /*isTranscodingEnabled*/ !context.liteMode());
+        allocator, maxFfmpegResolutions, /*isTranscodingEnabled*/ !context->liteMode());
 
     #if defined(Q_OS_ANDROID)
         QUrl initialIntentData = getInitialIntentData();
@@ -211,8 +211,8 @@ int runUi(QtSingleGuiApplication* application)
             switch (message.command)
             {
                 case InterClientMessage::Command::startCamerasMode:
-                    context.uiController()->openResourcesScreen();
-                    context.uiController()->connectToSystem(qnSettings->startupParameters().url);
+                    context->uiController()->openResourcesScreen();
+                    context->uiController()->connectToSystem(qnSettings->startupParameters().url);
                     mainWindow->update();
                     break;
                 case InterClientMessage::Command::refresh:

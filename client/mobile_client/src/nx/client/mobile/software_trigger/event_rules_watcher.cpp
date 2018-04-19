@@ -20,8 +20,6 @@ EventRulesWatcher::EventRulesWatcher(QObject* parent):
 
     connect(rulesManager, &RuleManager::rulesReset,
         this, &EventRulesWatcher::handleRulesReset);
-    connect(commonModule, &QnCommonModule::remoteIdChanged,
-        this, &EventRulesWatcher::handleConnectionChanged);
 }
 
 void EventRulesWatcher::handleRulesReset(const nx::vms::event::RuleList& rules)

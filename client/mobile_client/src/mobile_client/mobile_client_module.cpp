@@ -29,6 +29,8 @@
 #include <finders/systems_finder.h>
 #include <client/system_weights_manager.h>
 #include <utils/media/ffmpeg_initializer.h>
+#include <context/connection_manager.h>
+#include <context/context.h>
 
 #include "mobile_client_message_processor.h"
 #include "mobile_client_meta_types.h"
@@ -100,7 +102,6 @@ QnMobileClientModule::QnMobileClientModule(
     // TODO: #mshevchenko Remove when client_core_module is created.
     commonModule->store(translationManager);
 
-    commonModule->store(new nx::client::mobile::EventRulesWatcher());
     commonModule->store(new QnMobileClientSettings);
     settings::migrateSettings();
 
@@ -201,6 +202,14 @@ QnMobileClientModule::QnMobileClientModule(
 
     if (QnAppInfo::applicationPlatform() == lit("ios"))
         m_clientCoreModule->mainQmlEngine()->addImportPath(lit("qt_qml"));
+
+    m_context.reset(new QnContext());
+    const auto eventRulesWatcher = commonModule->store(new nx::client::mobile::EventRulesWatcher());
+    connect(m_context->connectionManager(), &QnConnectionManager::connected, this,
+        [eventRulesWatcher](bool /*initialConnection*/)
+        {
+            eventRulesWatcher->handleConnectionChanged();
+        });
 }
 
 QnMobileClientModule::~QnMobileClientModule()
@@ -215,6 +224,11 @@ QnMobileClientModule::~QnMobileClientModule()
 QnCloudStatusWatcher* QnMobileClientModule::cloudStatusWatcher() const
 {
     return m_cloudStatusWatcher;
+}
+
+QnContext* QnMobileClientModule::context() const
+{
+    return m_context.data();
 }
 
 void QnMobileClientModule::initDesktopCamera()

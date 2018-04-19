@@ -17,10 +17,10 @@ class EventRulesWatcher: public QObject
 public:
     EventRulesWatcher(QObject* parent = nullptr);
 
+    void handleConnectionChanged();
+
 private:
     void handleRulesReset(const nx::vms::event::RuleList& rules);
-
-    void handleConnectionChanged();
 
 private:
     bool m_updated = false;
