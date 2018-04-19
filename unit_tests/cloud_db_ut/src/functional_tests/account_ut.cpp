@@ -356,8 +356,6 @@ TEST_F(Account, request_query_decode)
     //waiting for cloud_db initialization
     ASSERT_TRUE(startAndWaitUntilStarted());
 
-    api::ResultCode result = api::ResultCode::ok;
-
     std::string account1Password = "12352";
     api::AccountData account1;
     account1.email = "test%40yandex.ru";
@@ -381,12 +379,6 @@ TEST_F(Account, request_query_decode)
     api::AccountConfirmationCode activationCode;
     activationCode = QJson::deserialized<api::AccountConfirmationCode>(responseBody);
     ASSERT_TRUE(!activationCode.code.empty());
-
-    //api::AccountConfirmationCode activationCode;
-    //result = addAccount(&account1, &account1Password, &activationCode);
-    //ASSERT_EQ(result, api::ResultCode::ok);
-    //ASSERT_EQ(account1.customization, nx::utils::AppInfo::customizationName().toStdString());
-    //ASSERT_TRUE(!activationCode.code.empty());
 
     std::string activatedAccountEmail;
     ASSERT_EQ(api::ResultCode::ok, activateAccount(activationCode, &activatedAccountEmail));
@@ -850,7 +842,7 @@ protected:
 
     void useWrongAccountPassword()
     {
-        m_passwordToUse = nx::utils::generateRandomName(7);
+        m_passwordToUse = nx::utils::generateRandomName(7).toStdString();
     }
 
     void useUnknownAccountLogin()
