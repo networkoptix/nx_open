@@ -19,7 +19,7 @@ ApplicationWindow
         : 0
 
     readonly property real availableWidth: width - rightPadding - leftPadding
-    readonly property real availableHeight: height - bottomPadding
+    readonly property real availableHeight: height - bottomPadding - reconnectingWarning.height
 
     contentItem.x: leftPadding
 
@@ -54,7 +54,7 @@ ApplicationWindow
 
         y: reconnectingWarning.height
         width: mainWindow.availableWidth
-        height: mainWindow.availableHeight - keyboardHeight - reconnectingWarning.height
+        height: mainWindow.availableHeight - keyboardHeight
 
         property real keyboardHeight: mainWindow.keyboardHeight
         Behavior on keyboardHeight
