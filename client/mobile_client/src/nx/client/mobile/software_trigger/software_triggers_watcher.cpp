@@ -161,8 +161,15 @@ void SoftwareTriggersWatcher::tryRemoveTrigger(const QnUuid& id)
 
 void SoftwareTriggersWatcher::updateTriggers()
 {
+    auto removedIds = m_data.keys().toSet();
     for (const auto& rule: m_ruleManager->rules())
+    {
         updateTriggerByRule(rule);
+        removedIds.remove(rule->id());
+    }
+
+    for (const auto& removedId: removedIds)
+        tryRemoveTrigger(removedId);
 }
 
 void SoftwareTriggersWatcher::updateTriggersAvailability()
