@@ -1036,6 +1036,12 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
 
     regUpdate<ApiResetBusinessRuleData>(p, ApiCommand::resetEventRules);
     regUpdate<ApiBusinessActionData>(p, ApiCommand::broadcastAction);
+
+    /**%apidoc[proprietary] POST /ec2/execAction
+     * Execute an action. Action data should be in the internal binary format. This method is going
+     * to be refactored in next versions.
+     * %return XML with the "OK" message or an error code.
+     */
     regUpdate<ApiBusinessActionData>(p, ApiCommand::execAction);
 
     /**%apidoc GET /ec2/getUsers
