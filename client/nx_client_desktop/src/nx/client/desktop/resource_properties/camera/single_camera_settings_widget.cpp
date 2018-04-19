@@ -52,7 +52,7 @@
 #include <utils/license_usage_helper.h>
 
 #include "legacy_camera_schedule_widget.h"
-#include "camera_motion_mask_widget.h"
+#include "legacy_camera_motion_mask_widget.h"
 
 using nx::client::core::Geometry;
 
@@ -686,10 +686,10 @@ void SingleCameraSettingsWidget::connectToMotionWidget()
 {
     NX_ASSERT(m_motionWidget);
 
-    connect(m_motionWidget, &CameraMotionMaskWidget::motionRegionListChanged, this,
+    connect(m_motionWidget, &LegacyCameraMotionMaskWidget::motionRegionListChanged, this,
         &SingleCameraSettingsWidget::at_dbDataChanged, Qt::UniqueConnection);
 
-    connect(m_motionWidget, &CameraMotionMaskWidget::motionRegionListChanged, this,
+    connect(m_motionWidget, &LegacyCameraMotionMaskWidget::motionRegionListChanged, this,
         &SingleCameraSettingsWidget::at_motionRegionListChanged, Qt::UniqueConnection);
 }
 
@@ -1036,7 +1036,7 @@ void SingleCameraSettingsWidget::at_tabWidget_currentChanged()
             bool hasMotionWidget = m_motionWidget != NULL;
 
             if (!hasMotionWidget)
-                m_motionWidget = new CameraMotionMaskWidget(this);
+                m_motionWidget = new LegacyCameraMotionMaskWidget(this);
 
             updateMotionWidgetFromResource();
 

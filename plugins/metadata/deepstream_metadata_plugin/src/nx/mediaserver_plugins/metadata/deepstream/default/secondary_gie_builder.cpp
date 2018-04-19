@@ -3,8 +3,8 @@
 #include "secondary_gie_common.h"
 #include "default_pipeline_callbacks.h"
 
-#include "utils.h"
-#include "deepstream_metadata_plugin_ini.h"
+#include <nx/mediaserver_plugins/metadata/deepstream/utils.h>
+#include <nx/mediaserver_plugins/metadata/deepstream/deepstream_metadata_plugin_ini.h>
 #define NX_PRINT_PREFIX "deepstream::DefaultPipelineBuilder::"
 #include <nx/kit/debug.h>
 
@@ -77,18 +77,8 @@ std::unique_ptr<gstreamer::Bin> SecondaryGieBuilder::buildSecondaryGie(
     bin->createGhostPad(tee.get(), kSinkPadName);
     bin->createGhostPad(outputQueue.get(), kSourcePadName);
 
-    auto probePad = gst_element_get_static_pad(
-        bin->nativeElement(),
-        kSourcePadName);
-
-    gst_pad_add_probe(
-        probePad,
-        GST_PAD_PROBE_TYPE_BUFFER,
-        waitForSecondaryGieDoneBufProbe,
-        pipeline,
-        NULL);
-
-    gst_object_unref(GST_OBJECT(probePad));
+    bin->pad(kSourcePadName)
+        ->addProbe(waitForSecondaryGieDoneBufProbe, GST_PAD_PROBE_TYPE_BUFFER, pipeline);
 
     return bin;
 }

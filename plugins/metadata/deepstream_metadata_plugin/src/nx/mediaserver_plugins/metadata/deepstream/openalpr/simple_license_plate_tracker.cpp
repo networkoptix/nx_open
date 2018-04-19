@@ -1,7 +1,7 @@
 #include "simple_license_plate_tracker.h"
 
-#include "utils.h"
-#include "deepstream_metadata_plugin_ini.h"
+#include <nx/mediaserver_plugins/metadata/deepstream/utils.h>
+#include <nx/mediaserver_plugins/metadata/deepstream/deepstream_metadata_plugin_ini.h>
 
 namespace nx {
 namespace mediaserver_plugins {

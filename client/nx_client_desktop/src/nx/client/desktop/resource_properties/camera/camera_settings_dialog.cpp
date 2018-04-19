@@ -18,6 +18,7 @@
 #include "camera_settings_tab.h"
 #include "widgets/camera_settings_general_tab_widget.h"
 #include "widgets/camera_schedule_widget.h"
+#include "widgets/camera_motion_settings_widget.h"
 
 #include "redux/camera_settings_dialog_state.h"
 #include "redux/camera_settings_dialog_store.h"
@@ -111,6 +112,11 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
         new CameraScheduleWidget(d->store, ui->tabWidget),
         tr("Recording"));
 
+    addPage(
+        int(CameraSettingsTab::motion),
+        new CameraMotionSettingsWidget(d->store, ui->tabWidget),
+        tr("Motion"));
+
     auto selectionWatcher = new QnWorkbenchSelectionWatcher(this);
     connect(
         selectionWatcher,
@@ -192,6 +198,7 @@ bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras
     d->cameras = cameras;
     d->resetChanges();
     d->readOnlyWatcher->setCameras(cameras);
+
     return true;
 }
 
@@ -270,7 +277,10 @@ void CameraSettingsDialog::loadState(const CameraSettingsDialogState& state)
             applyButton->setEnabled(!state.readOnly && state.hasChanges);
     }
 
-   ui->alertBar->setText(getAlertText(state));
+    setPageVisible(int(CameraSettingsTab::motion), state.devicesCount == 1
+        && state.devicesDescription.hasMotion == CameraSettingsDialogState::CombinedValue::All);
+
+    ui->alertBar->setText(getAlertText(state));
 }
 
 QString CameraSettingsDialog::getAlertText(const CameraSettingsDialogState& state)
@@ -308,6 +318,15 @@ QString CameraSettingsDialog::getAlertText(const CameraSettingsDialogState& stat
             return tr(
                 "Motion detection will work only when camera is being viewed. "
                 "Enable recording to make it work all the time.");
+
+        case Alert::MotionDetectionTooManyRectangles:
+            return tr("Maximum number of motion detection rectangles for current camera is reached");
+
+        case Alert::MotionDetectionTooManyMaskRectangles:
+            return tr("Maximum number of ignore motion rectangles for current camera is reached");
+
+        case Alert::MotionDetectionTooManySensitivityRectangles:
+            return tr("Maximum number of detect motion rectangles for current camera is reached");
 
         default:
             NX_EXPECT(false, "Unhandled enum value");

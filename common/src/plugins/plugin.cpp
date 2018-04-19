@@ -1,3 +1,3 @@
 #include <plugins/plugin_api.h>
 
-#include "camera_plugin.h"
+#include <camera/camera_plugin.h>

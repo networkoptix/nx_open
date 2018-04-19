@@ -1,10 +1,11 @@
 #pragma once
 
+#include <QtCore/QList>
 #include <QtCore/QObject>
 
 #include <common/common_globals.h>
-
 #include <core/resource/resource_fwd.h>
+#include <core/resource/motion_window.h>
 
 class QnAspectRatio;
 
@@ -52,6 +53,8 @@ public:
     void setCustomAspectRatio(const QnAspectRatio& value);
     void setCustomRotation(const Rotation& value);
     void setRecordingEnabled(bool value);
+    void setMotionDetectionEnabled(bool value);
+    void setMotionRegionList(const QList<QnMotionRegion>& value);
 
 signals:
     void stateChanged(const CameraSettingsDialogState& state);

@@ -8,3 +8,4 @@
 #include <nx/gstreamer/bus_message.h>
 #include <nx/gstreamer/error_bus_message.h>
 #include <nx/gstreamer/state_change_bus_message.h>
+#include <nx/gstreamer/pad.h>

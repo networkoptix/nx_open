@@ -1,4 +1,4 @@
-#include "camera_motion_mask_widget.h"
+#include "legacy_camera_motion_mask_widget.h"
 
 #include <limits>
 
@@ -32,7 +32,7 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-CameraMotionMaskWidget::CameraMotionMaskWidget(QWidget *parent):
+LegacyCameraMotionMaskWidget::LegacyCameraMotionMaskWidget(QWidget *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     m_readOnly(false),
@@ -41,7 +41,7 @@ CameraMotionMaskWidget::CameraMotionMaskWidget(QWidget *parent):
     init();
 }
 
-void CameraMotionMaskWidget::init()
+void LegacyCameraMotionMaskWidget::init()
 {
     m_motionSensitivity = 0;
 
@@ -80,8 +80,8 @@ void CameraMotionMaskWidget::init()
     m_motionSelectionInstrument->setBrush(qnGlobals->motionMaskRubberBandColor());
     m_motionSelectionInstrument->setPen(qnGlobals->motionMaskRubberBandBorderColor());
     disconnect(m_motionSelectionInstrument, NULL,                                               m_controller,   NULL); // TODO: #Elric controller flags?
-    connect(m_motionSelectionInstrument,    &MotionSelectionInstrument::motionRegionSelected,   this,           &CameraMotionMaskWidget::at_motionRegionSelected);
-    connect(m_motionSelectionInstrument,    &MotionSelectionInstrument::motionRegionCleared,    this,           &CameraMotionMaskWidget::clearMotion);
+    connect(m_motionSelectionInstrument,    &MotionSelectionInstrument::motionRegionSelected,   this,           &LegacyCameraMotionMaskWidget::at_motionRegionSelected);
+    connect(m_motionSelectionInstrument,    &MotionSelectionInstrument::motionRegionCleared,    this,           &LegacyCameraMotionMaskWidget::clearMotion);
 
     /* Create motion region floodfill instrument. */
     m_clickInstrument = new ClickInstrument(Qt::LeftButton, 0, Instrument::Item, this);
@@ -96,7 +96,7 @@ void CameraMotionMaskWidget::init()
     setLayout(layout);
 }
 
-void CameraMotionMaskWidget::createWorkbenchLayout()
+void LegacyCameraMotionMaskWidget::createWorkbenchLayout()
 {
     const auto workbenchLayout = qnWorkbenchLayoutsFactory->create(this);
     workbenchLayout->setCellSpacing(0);
@@ -106,15 +106,15 @@ void CameraMotionMaskWidget::createWorkbenchLayout()
     m_context->workbench()->setCurrentLayout(workbenchLayout);
 }
 
-CameraMotionMaskWidget::~CameraMotionMaskWidget() {
+LegacyCameraMotionMaskWidget::~LegacyCameraMotionMaskWidget() {
     return;
 }
 
-bool CameraMotionMaskWidget::isReadOnly() const {
+bool LegacyCameraMotionMaskWidget::isReadOnly() const {
     return m_readOnly;
 }
 
-void CameraMotionMaskWidget::setReadOnly(bool readOnly) {
+void LegacyCameraMotionMaskWidget::setReadOnly(bool readOnly) {
     if(m_readOnly == readOnly)
         return;
 
@@ -130,18 +130,18 @@ void CameraMotionMaskWidget::setReadOnly(bool readOnly) {
     m_readOnly = readOnly;
 }
 
-QList<QnMotionRegion> CameraMotionMaskWidget::motionRegionList() const {
+QList<QnMotionRegion> LegacyCameraMotionMaskWidget::motionRegionList() const {
     if (m_resourceWidget)
         return m_resourceWidget->motionSensitivity();
     else
         return QList<QnMotionRegion>();
 }
 
-QnResourcePtr CameraMotionMaskWidget::camera() const {
+QnResourcePtr LegacyCameraMotionMaskWidget::camera() const {
     return m_camera;
 }
 
-void CameraMotionMaskWidget::setCamera(const QnResourcePtr& resource)
+void LegacyCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource)
 {
     QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
     if (m_camera == camera)
@@ -192,7 +192,7 @@ void CameraMotionMaskWidget::setCamera(const QnResourcePtr& resource)
     emit motionRegionListChanged();
 }
 
-void CameraMotionMaskWidget::showTooManyWindowsMessage(const QnMotionRegion& region,
+void LegacyCameraMotionMaskWidget::showTooManyWindowsMessage(const QnMotionRegion& region,
     const QnMotionRegion::ErrorCode errCode)
 {
     switch (errCode)
@@ -234,23 +234,23 @@ void CameraMotionMaskWidget::showTooManyWindowsMessage(const QnMotionRegion& reg
     }
 }
 
-void CameraMotionMaskWidget::setControlMaxRects(bool controlMaxRects) {
+void LegacyCameraMotionMaskWidget::setControlMaxRects(bool controlMaxRects) {
     m_controlMaxRects = controlMaxRects;
 };
 
-bool CameraMotionMaskWidget::isControlMaxRects() const {
+bool LegacyCameraMotionMaskWidget::isControlMaxRects() const {
     return m_controlMaxRects;
 }
 
-int CameraMotionMaskWidget::motionSensitivity() const {
+int LegacyCameraMotionMaskWidget::motionSensitivity() const {
     return m_motionSensitivity;
 }
 
-void CameraMotionMaskWidget::setMotionSensitivity(int motionSensitivity) {
+void LegacyCameraMotionMaskWidget::setMotionSensitivity(int motionSensitivity) {
     m_motionSensitivity = motionSensitivity;
 }
 
-void CameraMotionMaskWidget::clearMotion() {
+void LegacyCameraMotionMaskWidget::clearMotion() {
     if (!m_resourceWidget)
         return;
     bool changed = false;
@@ -267,7 +267,7 @@ void CameraMotionMaskWidget::clearMotion() {
         emit motionRegionListChanged();
 }
 
-bool CameraMotionMaskWidget::isValidMotionRegion() {
+bool LegacyCameraMotionMaskWidget::isValidMotionRegion() {
     if (m_resourceWidget && m_controlMaxRects) {
         QnConstResourceVideoLayoutPtr layout = m_camera->getVideoLayout();
         const QList<QnMotionRegion> &regions = m_resourceWidget->motionSensitivity();
@@ -287,11 +287,11 @@ bool CameraMotionMaskWidget::isValidMotionRegion() {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void CameraMotionMaskWidget::at_viewport_resized() {
+void LegacyCameraMotionMaskWidget::at_viewport_resized() {
     m_context->display()->fitInView(false);
 }
 
-void CameraMotionMaskWidget::at_motionRegionSelected(QGraphicsView *, QnMediaResourceWidget *widget, const QRect &gridRect) {
+void LegacyCameraMotionMaskWidget::at_motionRegionSelected(QGraphicsView *, QnMediaResourceWidget *widget, const QRect &gridRect) {
     if (!m_resourceWidget)
         return;
 
@@ -300,7 +300,7 @@ void CameraMotionMaskWidget::at_motionRegionSelected(QGraphicsView *, QnMediaRes
         emit motionRegionListChanged();
 }
 
-void CameraMotionMaskWidget::at_itemClicked(QGraphicsView *, QGraphicsItem *item, const ClickInfo &info) {
+void LegacyCameraMotionMaskWidget::at_itemClicked(QGraphicsView *, QGraphicsItem *item, const ClickInfo &info) {
     if (!m_resourceWidget)
         return;
 
@@ -310,7 +310,7 @@ void CameraMotionMaskWidget::at_itemClicked(QGraphicsView *, QGraphicsItem *item
         emit motionRegionListChanged();
 }
 
-QVector<QColor> CameraMotionMaskWidget::motionSensitivityColors() const
+QVector<QColor> LegacyCameraMotionMaskWidget::motionSensitivityColors() const
 {
     return m_resourceWidget ? m_resourceWidget->motionSensitivityColors() : QVector<QColor>();
 }

@@ -1535,7 +1535,7 @@ AsyncClient::Result AsyncClient::emitSomeMessageBodyAvailable()
 
 void AsyncClient::setMaxNumberOfRedirects(int maxNumberOfRedirects)
 {
-    int m_maxNumberOfRedirects = maxNumberOfRedirects;
+    m_maxNumberOfRedirects = maxNumberOfRedirects;
 }
 
 template<typename ... Args>

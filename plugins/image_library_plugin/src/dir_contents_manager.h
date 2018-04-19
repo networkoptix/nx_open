@@ -9,7 +9,7 @@
 #include <map>
 #include <string>
 
-#include <plugins/camera_plugin.h>
+#include <camera/camera_plugin.h>
 
 #include "mutex.h"
 

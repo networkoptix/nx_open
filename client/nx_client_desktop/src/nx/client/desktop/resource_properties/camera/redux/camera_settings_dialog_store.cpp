@@ -209,6 +209,18 @@ void CameraSettingsDialogStore::setRecordingEnabled(bool value)
         [&](State state) { return Reducer::setRecordingEnabled(std::move(state), value); });
 }
 
+void CameraSettingsDialogStore::setMotionDetectionEnabled(bool value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setMotionDetectionEnabled(std::move(state), value); });
+}
+
+void CameraSettingsDialogStore::setMotionRegionList(const QList<QnMotionRegion>& value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setMotionRegionList(std::move(state), value); });
+}
+
 } // namespace desktop
 } // namespace client
 } // namespace nx

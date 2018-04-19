@@ -2,7 +2,7 @@
 
 #include <nx/gstreamer/bin.h>
 #include <nx/mediaserver_plugins/metadata/deepstream/deepstream_common.h>
-#include <nx/mediaserver_plugins/metadata/deepstream/default_pipeline.h>
+#include <nx/mediaserver_plugins/metadata/deepstream/default/default_pipeline.h>
 
 namespace nx {
 namespace mediaserver_plugins {

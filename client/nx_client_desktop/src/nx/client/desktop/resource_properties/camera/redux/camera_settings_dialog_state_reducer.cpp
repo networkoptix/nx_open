@@ -1,5 +1,7 @@
 #include "camera_settings_dialog_state_reducer.h"
 
+#include <limits>
+
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource_display_info.h>
 #include <camera/fps_calculator.h>
@@ -275,6 +277,26 @@ int calculateRecordingThresholdAfter(const Camera& camera)
     return value > 0 ? value : vms::api::kDefaultRecordAfterMotionSec;
 }
 
+QnMotionRegion::ErrorCode validateMotionRegionList(const State& state,
+    const QList<QnMotionRegion>& regionList)
+{
+    if (!state.singleCameraProperties.hasMotionConstraints)
+        return QnMotionRegion::ErrorCode::Ok;
+
+    for (const auto& region : regionList)
+    {
+        const auto errorCode = region.isValid(
+            state.singleCameraProperties.maxMotionRects,
+            state.singleCameraProperties.maxMotionMaskRects,
+            state.singleCameraProperties.maxMotionSensitivityRects);
+
+        if (errorCode != QnMotionRegion::ErrorCode::Ok)
+            return errorCode;
+    }
+
+    return QnMotionRegion::ErrorCode::Ok;
+}
+
 } // namespace
 
 State CameraSettingsDialogStateReducer::applyChanges(State state)
@@ -323,12 +345,29 @@ State CameraSettingsDialogStateReducer::loadCameras(
 
     if (firstCamera)
     {
-        state.singleCameraProperties.name.setBase(firstCamera->getName());
-        state.singleCameraProperties.id = firstCamera->getId().toSimpleString();
-        state.singleCameraProperties.firmware = firstCamera->getFirmware();
-        state.singleCameraProperties.macAddress = firstCamera->getMAC().toString();
-        state.singleCameraProperties.model = firstCamera->getModel();
-        state.singleCameraProperties.vendor = firstCamera->getVendor();
+        auto& singleProperties = state.singleCameraProperties;
+        singleProperties.name.setBase(firstCamera->getName());
+        singleProperties.id = firstCamera->getId().toSimpleString();
+        singleProperties.firmware = firstCamera->getFirmware();
+        singleProperties.macAddress = firstCamera->getMAC().toString();
+        singleProperties.model = firstCamera->getModel();
+        singleProperties.vendor = firstCamera->getVendor();
+
+        singleProperties.hasMotionConstraints =
+            firstCamera->getDefaultMotionType() == Qn::MT_HardwareGrid;
+
+        if (singleProperties.hasMotionConstraints)
+        {
+            singleProperties.maxMotionRects = firstCamera->motionWindowCount();
+            singleProperties.maxMotionMaskRects = firstCamera->motionMaskWindowCount();
+            singleProperties.maxMotionSensitivityRects =
+                firstCamera->motionSensWindowCount();
+        }
+        else
+        {
+            singleProperties.maxMotionRects = singleProperties.maxMotionMaskRects
+                = singleProperties.maxMotionSensitivityRects = std::numeric_limits<int>::max();
+        }
 
         state = loadNetworkInfo(std::move(state), firstCamera);
 
@@ -342,6 +381,17 @@ State CameraSettingsDialogStateReducer::loadCameras(
 
         state.singleCameraSettings.enableMotionDetection.setBase(
             isMotionDetectionEnabled(firstCamera));
+
+        auto regionList = firstCamera->getMotionRegionList();
+        if (validateMotionRegionList(state, regionList) != QnMotionRegion::ErrorCode::Ok)
+        {
+            for (auto& region: regionList)
+                region = QnMotionRegion(); //< Reset to default.
+
+            // TODO: #vkutin #GDM Should we set hasChanges flag here?
+        }
+
+        state.singleCameraSettings.motionRegionList.setBase(regionList);
 
         Qn::calculateMaxFps(
             {firstCamera},
@@ -482,7 +532,9 @@ State CameraSettingsDialogStateReducer::setSchedule(State state, const ScheduleT
     }
 
     state.recording.schedule.setUser(processed);
-    state.alert = {};
+
+    if (state.alert == State::Alert::BrushChanged || state.alert == State::Alert::EmptySchedule)
+        state.alert = {};
 
     return state;
 }
@@ -610,6 +662,46 @@ State CameraSettingsDialogStateReducer::setRecordingEnabled(State state, bool va
         state.recording.schedule.setUser(tasks);
     }
 
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setMotionDetectionEnabled(State state, bool value)
+{
+    state.hasChanges = true;
+    state.singleCameraSettings.enableMotionDetection.setUser(value);
+
+    if (state.hasMotion() && !state.recording.enabled())
+        state.alert = State::Alert::MotionDetectionRequiresRecording;
+    else if (state.alert == State::Alert::MotionDetectionRequiresRecording)
+        state.alert = {};
+
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setMotionRegionList(
+    State state, const QList<QnMotionRegion>& value)
+{
+    const auto errorCode = validateMotionRegionList(state, value);
+    if (errorCode != QnMotionRegion::ErrorCode::Ok)
+    {
+        switch (errorCode)
+        {
+            case QnMotionRegion::ErrorCode::Windows:
+                state.alert = State::Alert::MotionDetectionTooManyRectangles;
+                break;
+            case QnMotionRegion::ErrorCode::Masks:
+                state.alert = State::Alert::MotionDetectionTooManyMaskRectangles;
+                break;
+            case QnMotionRegion::ErrorCode::Sens:
+                state.alert = State::Alert::MotionDetectionTooManySensitivityRectangles;
+                break;
+        }
+
+        return state; //< Do not update region set.
+    }
+
+    state.hasChanges = true;
+    state.singleCameraSettings.motionRegionList.setUser(value);
     return state;
 }
 

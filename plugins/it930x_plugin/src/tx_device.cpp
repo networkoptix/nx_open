@@ -1,6 +1,6 @@
 #include <ctime>
 
-#include <plugins/camera_plugin.h>
+#include <camera/camera_plugin.h>
 
 #include "tx_device.h"
 

@@ -112,6 +112,7 @@ private:
     static QMap<QString, QPair<QSharedPointer<QnRtspTimeHelper::CamSyncInfo>, int> > m_camClock;
     qint64 m_lastWarnTime;
     TimePolicy m_timePolicy = TimePolicy::bindCameraTimeToLocalTime;
+    QnRtspStatistic m_statistics;
 
 #ifdef DEBUG_TIMINGS
     void printTime(double jitter);

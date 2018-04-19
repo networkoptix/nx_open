@@ -1,7 +1,10 @@
 #pragma once
 
+#include <QtCore/QList>
+
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_stream_capability.h>
+#include <core/resource/motion_window.h>
 #include <core/misc/schedule_task.h>
 
 #include <nx/vms/api/data/camera_attributes_data.h>
@@ -81,6 +84,15 @@ struct CameraSettingsDialogState
 
         // Motion detection was enabled while recording was not.
         MotionDetectionRequiresRecording,
+
+        // Selection attempt produced too many motion rectangles.
+        MotionDetectionTooManyRectangles,
+
+        // Selection attempt produced too many motion mask rectangles.
+        MotionDetectionTooManyMaskRectangles,
+
+        // Selection attempt produced too many motion sensitivity rectangles.
+        MotionDetectionTooManySensitivityRectangles,
     };
 
     CameraSettingsDialogState() = default;
@@ -113,12 +125,18 @@ struct CameraSettingsDialogState
         std::optional<QString> secondaryStream;
 
         int maxFpsWithoutMotion = 0;
+
+        bool hasMotionConstraints = false;
+        int maxMotionRects = 0;
+        int maxMotionMaskRects = 0;
+        int maxMotionSensitivityRects = 0;
     };
     SingleCameraProperties singleCameraProperties;
 
     struct SingleCameraSettings
     {
         UserEditable<bool> enableMotionDetection;
+        UserEditable<QList<QnMotionRegion>> motionRegionList;
     };
     SingleCameraSettings singleCameraSettings;
 
