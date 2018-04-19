@@ -1,5 +1,5 @@
-<div class="panel panel-default" process-loading="gettingSystemUsers">
-    <div class="panel-body">
+<div class="card card-default" process-loading="gettingSystemUsers">
+    <div class="card-body">
         <h2>Người sử dụng</h2>
     </div>
     <div class="table-responsive">
@@ -27,7 +27,7 @@
                        ng-if="system.isAvailable && user.canBeEdited"
                        ng-class="{disabled:locked[user.email]}"
                        title="Quyền chỉnh sửa"
-                       ng-click="editShare(user)"><span class="glyphicon glyphicon-pencil"></span><span class="visible-lg-inline"> &nbsp;&nbsp;Sửa </span></span></a></td>
+                       ng-click="editShare(user)"><span class="glyphicon glyphicon-pencil"></span><span class="visible-lg-inline">&nbsp;&nbsp;Chỉnh sửa</span></span></a></td>
                 <td class="button-cell"><a href=''
                        class="hover-visible image-link"
                        ng-if="system.isAvailable && user.canBeDeleted"

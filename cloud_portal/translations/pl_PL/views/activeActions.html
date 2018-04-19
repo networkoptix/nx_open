@@ -39,12 +39,12 @@
                            required autofocus>
                 </div>
                 <div class="col-sm-4">
-                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required">E-mail jest wymagany.</span>
-                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email">Proszę wprowadzić prawidłowy e-mail</span>
+                    <span class="help-block input-error" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required">Email is required</span>
+                    <span class="help-block input-error" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email">Please enter a valid Email</span>
                 </div>
             </div>
             <div class="form-group">
-                <div class="col-sm-offset-2 col-sm-8">
+                <div class="offset-sm-2 col-sm-8">
                     <process-button process="reactivate"
                                     form="reactivateAccount"
                                     button-text="$root.L.activeActions.sendConfirm"></process-button>
@@ -72,12 +72,12 @@
                            required autofocus>
                 </div>
                 <div class="col-sm-4">
-                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.required">E-mail jest wymagany.</span>
-                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.email">Proszę wprowadzić prawidłowy e-mail</span>
+                    <span class="help-block input-error" ng-if="restorePassword.email.$touched && restorePassword.email.$error.required">E-mail jest wymagany.</span>
+                    <span class="help-block input-error" ng-if="restorePassword.email.$touched && restorePassword.email.$error.email">Proszę wprowadzić prawidłowy e-mail</span>
                 </div>
             </div>
             <div class="form-group">
-                <div class="col-sm-offset-4 col-sm-8">
+                <div class="offset-sm-4 col-sm-8">
                     <process-button process="restore"
                                     form="restorePassword"
                                     button-text="$root.L.activeActions.resetPassword"></process-button>
@@ -98,7 +98,7 @@
             <password-input ng-model="data.newPassword" id="'newPassword'" label="$root.L.activeActions.setNewPasswordLabel"></password-input>
 
             <div class="form-group">
-                <div class="col-sm-offset-4 col-sm-8">
+                <div class="offset-sm-4 col-sm-8">
                     <process-button process="change"
                                     form="restorePasswordWithCode"
                                     button-text="$root.L.activeActions.setNewPassword"></process-button>

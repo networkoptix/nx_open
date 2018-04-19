@@ -42,7 +42,8 @@
                     </div>
                     <div>
                         <h3>Détacher le serveur du système</h3>
-                        <p>Cette action détachera le serveur de la base de données système, des utilisateurs locaux et de la configuration. Les archives vidéo resteront intactes. <b>Les utilisateurs Cloud seront supprimés.</b></p>
+                        <p>Cette action détachera le serveur de la base de données de maintien du système, des utilisateurs locaux et de la configuration.
+                            Les archives vidéo resteront intactes. <b>Usagers de nuages seront supprimés.</b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Détacher du système</button></p>
                     </div>
                     <div>
@@ -117,9 +118,9 @@
 
                 <tab heading="{{L.settings.tabs.device}}" active="active.device" ng-if="controlDevice">
                     <div ng-if="settings.flags.canSetupNetwork">
-                        <h3>Paramètres réseau périphérique</h3>
+                        <h3>Paramètres réseau du périphérique</h3>
                         <network-settings settings="networkSettings[0]" ng-if="networkSettings"></network-settings>
-                        <button class="btn btn-default" ng-click="saveNetworkSettings()">Enregistrer les paramètres et redémarrer le périphérique</button>
+                        <button class="btn btn-default" ng-click="saveNetworkSettings()">Enregistrer les paramètres et redémarrer l’appareil</button>
                     </div>
                     <div ng-if="settings.flags.canSetupTime">
                         <h3>Date et heure</h3>

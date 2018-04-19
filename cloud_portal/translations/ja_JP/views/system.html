@@ -2,7 +2,7 @@
     <div ng-if="systemNoAccess" class="text-center">
         <h1>システムへのアクセスに失敗しました</h1>
         <p>このリンクは壊れています<br>
-            システムは{{PRODUCT_NAME}} から切断します<br>
+            システムは%PRODUCT_NAME% から切断します<br>
             このシステムへのアクセスは取り消されたか<br>
             または別のアカウントにログインしている可能性があります</p>
         <p>
@@ -12,10 +12,10 @@
 
     <ng-include ng-if="gettingSystem.success" src="$root.C.viewsDir + 'components/system-header.html'"></ng-include>
     <div class="row"  ng-if="gettingSystem.success">
-        <div class="col-md-4 col-md-push-8">
+        <div class="col-lg-4 order-1 order-lg-2">
             <ng-include src="$root.C.viewsDir + 'components/system-card.html'"></ng-include>
         </div>
-        <div class="col-md-8 col-md-pull-4">
+        <div class="col-lg-8 order-2 order-lg-1 mt-3 mt-lg-0">
             <div class="no-data-panel light-color border-top border-bottom" ng-if="!system.permissions.editUsers" >
                 <span class="no-data-panel-body">
                     システム情報へのアクセス権限はありません

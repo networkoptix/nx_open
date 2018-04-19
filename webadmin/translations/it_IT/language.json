@@ -1,5 +1,5 @@
 {
-    "language_name": "NOME_LINGUA",
+    "language_name": "Italiano",
     "dialogs": {
         "okButton": "Ok",
         "openLink": "Visita questo link",
@@ -86,7 +86,7 @@
         "cloudHost": "Cloud host",
         "cloudAuthKey": "Chiave di autenticazione cloud",
         "cloudSystemID": "Cloud system id",
-        "systemName": "System name",
+        "systemName": "Nome del sistema",
         "newSystem": "Il server è \"nuovo\"",
         "proxyConnectTimeoutSec": "Proxy connection timeout (seconds)",
         "crossdomainEnabled": "Abilitare il client web",
@@ -95,7 +95,7 @@
         "statisticsReportServerApi": "Statistics server api",
         "statisticsReportTimeCycle": "Statistics report interval",
         "systemId": "ID di sistema",
-        "systemNameForId": "System name",
+        "systemNameForId": "Nome del sistema",
         "takeCameraOwnershipWithoutLock": "Take cameras ownership without lock",
         "timeSynchronizationEnabled": "Time synchronization enabled",
         "upnpPortMappingEnabled": "Funzione UPNP abilitata"
@@ -121,7 +121,7 @@
         "cloudHostConflict": "Impossibile unire i sistemi, perché i server sono costruiti con diversi host cloud",
         "licenceError": "Avvertimento! Stai per unire i sistemi con le licenze Starter. È consentita una sola licenza di avviamento per sistema, pertanto la seconda licenza verrà disattivata. Unisci comunque?",
         "connectionFailed": "Connessione fallita: ",
-        "unknownError": "Unknown error",
+        "unknownError": "Errore sconosciuto",
         "mergeFailed": "Unione non riuscita: ",
         "mergeSucceed": "Merge succeed.",
         "newSystemDisplayName": "New system",
@@ -153,7 +153,7 @@
         "selectFiles": "Select files"
     },
     "advanced": {
-        "free": "Free",
+        "free": "Versione gratuita",
         "total": "Total",
         "occupied": "Occupied",
         "reserved": "Reserved"

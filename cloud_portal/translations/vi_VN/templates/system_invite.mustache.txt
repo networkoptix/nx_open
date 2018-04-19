@@ -1,11 +1,11 @@
-Chào mừng bạn đến với {{PRODUCT_NAME}}
+Chào mừng bạn đến với %PRODUCT_NAME%
 
 {{#message.sharer_name}}
-{{message.sharer_name}} ({{message.sharer_email}}) đang mời bạn tham gia {{PRODUCT_NAME}} và chia sẻ hệ thống {{message.system_name}} với bạn.
+{{message.sharer_name}} ({{message.sharer_email}}) đang mời bạn tham gia %PRODUCT_NAME% và chia sẻ hệ thống {{message.system_name}} với bạn.
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-Bạn được mời bạn tham gia {{PRODUCT_NAME}}.
+Bạn được mời bạn tham gia %PRODUCT_NAME%.
 Bạn đã được cấp quyền truy cập vào {{message.system_name}}.
 {{/message.sharer_name}}
 
