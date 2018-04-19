@@ -151,6 +151,9 @@ protected:
         m_handler = nullptr;
 
         NX_ASSERT(handler != nullptr);
+        if (!handler)
+            return;
+
         DEBUG_LOG(lm("invokeUserCallback, status: %1").arg(m_errorCode));
         switch(m_exitStatus)
         {
@@ -202,6 +205,10 @@ protected:
         const auto handler = std::move(m_handler);
         m_handler = nullptr;
 
+        NX_ASSERT(handler != nullptr);
+        if (!handler)
+            return;
+
         DEBUG_LOG(lm("invokeUserCallback, status: %1").arg(m_errorCode));
         switch(m_exitStatus)
         {
@@ -245,6 +252,10 @@ protected:
     {
         const auto handler = std::move(m_handler);
         m_handler = nullptr;
+
+        NX_ASSERT(handler != nullptr);
+        if (!handler)
+            return;
 
         DEBUG_LOG(lm("invokeUserCallback, status: %1").arg(m_errorCode));
         switch(m_exitStatus)
@@ -1487,7 +1498,7 @@ static void cancelIoFromAioThread(SslSocketPrivate* socket, aio::EventType event
         socket->isSendInProgress = false;
     if (eventType == aio::etRead || eventType == aio::etNone)
         socket->isRecvInProgress = false;
-    
+
     if (socket->asyncSslHelper)
         socket->asyncSslHelper->clear();
 }
