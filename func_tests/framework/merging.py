@@ -1,4 +1,5 @@
 import logging
+from uuid import UUID
 
 from netaddr import IPAddress, IPNetwork
 
@@ -89,6 +90,11 @@ def merge_systems(local, remote, accessible_ip_net=IPNetwork('10.254.0.0/16'), t
         timeout_sec=10)
 
 
+def local_system_is_set_up(mediaserver):
+    local_system_id = get_local_system_id(mediaserver.api)
+    return local_system_id != UUID(int=0)
+
+
 def setup_local_system(mediaserver, system_settings):
     _logger.info('Setup local system on %s.', mediaserver)
     response = mediaserver.api.post('api/setupLocalSystem', {
@@ -97,6 +103,7 @@ def setup_local_system(mediaserver, system_settings):
         'systemSettings': system_settings,
         })
     assert system_settings == {key: response['settings'][key] for key in system_settings.keys()}
+    wait_for_true(lambda: local_system_is_set_up(mediaserver), "local system is set up")
     return response['settings']
 
 
