@@ -1127,9 +1127,9 @@ to view more bookmarks</source>
     <message numerus="yes">
         <source>File name must not contain the following reserved characters:</source>
         <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>File name must not contain the following reserved character:</numerusform>
+            <numerusform>File name must not contain the following reserved characters:</numerusform>
         </translation>
     </message>
 </context>
