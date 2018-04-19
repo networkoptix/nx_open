@@ -604,7 +604,7 @@ std::string SystemCommands::serializedDmiInfo(bool reportViaSocket)
 
             std::string::size_type len = tmp.size();
             memcpy(
-                result.data() - sizeof(std::string::size_type), &len,
+                result.data() + result.size() - sizeof(std::string::size_type), &len,
                 sizeof(std::string::size_type));
 
             std::copy(tmp.cbegin(), tmp.cend(), std::back_inserter(result));
