@@ -2556,21 +2556,18 @@ void MediaServerProcess::registerRestHandlers(
      *     default value) which implies autosizing: if the height is specified, the width will be
      *     calculated based on the aspect ratio, otherwise, the original frame size will be used.
      * %param[opt] imageFormat Format of the requested image. Default value is "JpgFormat".
-     *     %value PngFormat PNG
-     *     %value JpgFormat JPEG
-     *     %value TiffFormat TIFF
-     *     %value RawFormat Raw video frame. Makes the request much more lightweight for Edge
-     *         servers.
-     * %param[opt] method Getting a thumbnail at the exact timestamp is costly, so, it can be
+     *     %value png PNG
+     *     %value jpg JPEG
+     *     %value tif TIFF
+     *     %value raw Raw video frame. Makes the request much more lightweight for Edge servers.
+     * %param[opt] roundMethod Getting a thumbnail at the exact timestamp is costly, so, it can be
      *     rounded to the nearest keyframe, thus, the default value is "KeyFrameAfterMethod".
-     *     %value KeyFrameBeforeMethod Get the thumbnail from the nearest keyframe before the given
-     *         time.
-     *     %value PreciseMethod Get the thumbnail as near to given time as possible.
-     *     %value KeyFrameAfterMethod Get the thumbnail from the nearest keyframe after the given
-     *         time.
+     *     %value before Get the thumbnail from the nearest keyframe before the given time.
+     *     %value precise Get the thumbnail as near to given time as possible.
+     *     %value after Get the thumbnail from the nearest keyframe after the given time.
      * %param[opt] aspectRatio Allows to avoid scaling the image to the aspect ratio from camera
      *     settings.
-     *     %value auto Default value. Honor aspect ratio from camera settings.
+     *     %value auto Default value. Use aspect ratio from camera settings (if any).
      *     %value source Use the source frame aspect ratio, despite the value in camera settings.
      * %param[proprietary] local If present, the request should not be redirected to another
      *     server.
