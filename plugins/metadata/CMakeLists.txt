@@ -8,6 +8,8 @@ add_subdirectory(axis_metadata_plugin)
 
 add_subdirectory(vca_metadata_plugin)
 
+add_subdirectory(dw_mtt_metadata_plugin)
+
 if(withPluginStubs)
     add_subdirectory(stub_metadata_plugin)
 endif()

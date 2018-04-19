@@ -79,6 +79,9 @@
                             <File Id="hanwha_metadata_plugin.dll" Name="hanwha_metadata_plugin.dll" Source="$(var.PluginsDir)\hanwha_metadata_plugin.dll" DiskId="10" />
                         </Component>
                     <?endif?>
+                    <Component Id="ServerDwMttMetadataPlugin">
+                        <File Id="dw_mtt_metadata_plugin.dll" Name="dw_mtt_metadata_plugin.dll" Source="$(var.PluginsDir)\dw_mtt_metadata_plugin.dll" DiskId="10" />
+                    </Component>
                     <Component Id="ServerHikvisionMetadataPlugin">
                         <File Id="hikvision_metadata_plugin.dll" Name="hikvision_metadata_plugin.dll" Source="$(var.PluginsDir)\hikvision_metadata_plugin.dll" DiskId="10" />
                     </Component>
@@ -251,6 +254,7 @@
             <?if $(var.enable_hanwha) = "true"?>
                 <ComponentRef Id="ServerHanwhaMetadataPlugin"/>
             <?endif?>
+            <ComponentRef Id="ServerDwMttMetadataPlugin"/>
             <ComponentRef Id="ServerHikvisionMetadataPlugin"/>
             <ComponentRef Id="ServerAxisMetadataPlugin"/>
             <ComponentRef Id="ServerVcaMetadataPlugin"/>
