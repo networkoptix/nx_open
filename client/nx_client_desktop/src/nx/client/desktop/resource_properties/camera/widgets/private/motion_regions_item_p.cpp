@@ -1,6 +1,6 @@
 #include "motion_regions_item_p.h"
 
-#include <math.h>
+#include <cmath>
 
 #include <QtGui/QPainter>
 #include <QtGui/QOpenGLContext>
