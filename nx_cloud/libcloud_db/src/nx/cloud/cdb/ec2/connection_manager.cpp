@@ -541,7 +541,7 @@ void ConnectionManager::removeConnectionByIter(
         connectionIterator,
         [&existingConnection](ConnectionContext& data)
         {
-            existingConnection = std::move(data.connection);
+            existingConnection.swap(data.connection);
         });
     connectionIndex.erase(connectionIterator);
 
@@ -691,16 +691,22 @@ void ConnectionManager::processSpecialTransaction(
     TransactionProcessedHandler handler)
 {
     QnMutexLocker lk(&m_mutex);
+
     const auto& connectionByIdIndex = m_connections.get<kConnectionByIdIndex>();
     auto connectionIter = connectionByIdIndex.find(transportHeader.connectionId);
     if (connectionIter == connectionByIdIndex.end())
         return; //< This can happen since connection destruction happens with some
                 //  delay after connection has been removed from m_connections.
-    lk.unlock();
 
     // TODO: #ak Get rid of dynamic_cast.
     auto transactionTransport =
         dynamic_cast<TransactionTransport*>(connectionIter->connection.get());
+
+    // NOTE: transactionTransport variable can safely be used within its own AIO thread.
+    NX_ASSERT(transactionTransport->isInSelfAioThread());
+
+    lk.unlock();
+
     if (transactionTransport)
     {
         transactionTransport->processSpecialTransaction(
@@ -738,16 +744,15 @@ nx::network::http::RequestResult ConnectionManager::prepareOkResponseToCreateTra
 
             const auto& connectionByIdIndex = m_connections.get<kConnectionByIdIndex>();
             auto connectionIter = connectionByIdIndex.find(connectionId);
-            NX_ASSERT(connectionIter != connectionByIdIndex.end());
             if (connectionIter == connectionByIdIndex.end())
-                return;
+                return; //< Connection can be removed at any moment while accepting another connection.
 
             auto transactionTransport =
                 dynamic_cast<TransactionTransport*>(connectionIter->connection.get());
             if (transactionTransport)
             {
                 transactionTransport->setOutgoingConnection(
-                    QSharedPointer<network::AbstractCommunicatingSocket>(\
+                    QSharedPointer<network::AbstractCommunicatingSocket>(
                         connection->takeSocket().release()));
                 transactionTransport->startOutgoingChannel();
             }
