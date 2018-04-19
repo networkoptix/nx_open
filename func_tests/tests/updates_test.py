@@ -10,24 +10,24 @@ UTF_LOCALE_ENV = {'LC_ALL': 'C.UTF-8', 'LANG': 'C.UTF-8'}  # Click requires that
 ROOT_URL = 'http://localhost:8080'
 
 
-def prepare_virtual_environment(os_access):
-    python_installation = RemotePython(os_access)
+def prepare_virtual_environment(ssh_access):
+    python_installation = RemotePython(ssh_access)
     python_installation.install()
     return python_installation.make_venv(REMOTE_DIR / 'env')
 
 
-def install_updates_server(os_access, python_path):
+def install_updates_server(ssh_access, python_path):
     daemon = RemoteDaemon('mock_updates_server', [python_path, REMOTE_DIR / 'server.py', 'serve'], env=UTF_LOCALE_ENV)
-    if daemon.status(os_access) != 'started':
-        remote_dir = os_access.Path(REMOTE_DIR)
+    if daemon.status(ssh_access) != 'started':
+        remote_dir = ssh_access.Path(REMOTE_DIR)
         remote_dir.joinpath('server.py').upload(LOCAL_DIR / 'server.py')
         remote_dir.joinpath('requirements.txt').upload(LOCAL_DIR / 'requirements.txt')
-        os_access.run_command([python_path, '-m', 'pip', 'install', '-r', remote_dir / 'requirements.txt'])
-        os_access.run_command([python_path, remote_dir / 'server.py', 'generate'], env=UTF_LOCALE_ENV)
-        daemon.start(os_access)
+        ssh_access.run_command([python_path, '-m', 'pip', 'install', '-r', remote_dir / 'requirements.txt'])
+        ssh_access.run_command([python_path, remote_dir / 'server.py', 'generate'], env=UTF_LOCALE_ENV)
+        daemon.start(ssh_access)
     updates_json_url = ROOT_URL + '/updates.json'
     wait_for_true(
-        lambda: os_access.run_command(['curl', '-I', updates_json_url]),
+        lambda: ssh_access.run_command(['curl', '-I', updates_json_url]),
         "{} is reachable".format(updates_json_url))
 
 

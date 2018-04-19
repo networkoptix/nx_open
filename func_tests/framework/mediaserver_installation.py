@@ -38,8 +38,8 @@ MEDIASERVER_CLOUDHOST_SIZE = 76  # MEDIASERVER_CLOUDHOST_TAG + ' ' + cloud_host 
 class MediaserverInstallation(object):
     """One of potentially multiple installations"""
 
-    def __init__(self, os_access, dir):
-        self.os_access = os_access  # type: SSHAccess
+    def __init__(self, ssh_access, dir):
+        self.ssh_access = ssh_access  # type: SSHAccess
         self.dir = dir  # type: SSHPath
         self._bin_dir = self.dir / 'bin'
         self._var_dir = self.dir / 'var'
@@ -84,11 +84,11 @@ class MediaserverInstallation(object):
             core_dump_path.unlink()
 
     def backup_mediaserver_conf(self):
-        self.os_access.run_command(['cp', self._config_path, self._config_path_initial])
+        self.ssh_access.run_command(['cp', self._config_path, self._config_path_initial])
         log.info("Initial config is saved at: %s", self._config_path_initial)
 
     def restore_mediaserver_conf(self):
-        self.os_access.run_command(['cp', self._config_path_initial, self._config_path])
+        self.ssh_access.run_command(['cp', self._config_path_initial, self._config_path])
 
     def update_mediaserver_conf(self, new_configuration):
         old_config = self._config_path.read_text(encoding='ascii')
@@ -109,7 +109,7 @@ class MediaserverInstallation(object):
 
     def patch_binary_set_cloud_host(self, new_host):
         if self._current_cloud_host and new_host == self._current_cloud_host:
-            log.debug('Mediaserver binary at %s already has %r in it', self.os_access, new_host)
+            log.debug('Mediaserver binary at %s already has %r in it', self.ssh_access, new_host)
             return
         path_to_patch = None
         data = None
@@ -131,7 +131,7 @@ class MediaserverInstallation(object):
         if self._current_cloud_host:
             assert old_host == self._current_cloud_host, repr((old_host, self._current_cloud_host))
         if new_host == old_host:
-            log.debug('Mediaserver binary %s at %s already has %r in it', path_to_patch, self.os_access, new_host)
+            log.debug('Mediaserver binary %s at %s already has %r in it', path_to_patch, self.ssh_access, new_host)
             self._current_cloud_host = new_host
             return
         old_str_len = len(MEDIASERVER_CLOUDHOST_TAG + ' ' + old_host)
@@ -139,7 +139,7 @@ class MediaserverInstallation(object):
         assert old_padding == '\0' * (MEDIASERVER_CLOUDHOST_SIZE - old_str_len), (
                 'Cloud host padding error: %d padding characters are expected, but got only %d' % (
             MEDIASERVER_CLOUDHOST_SIZE - old_str_len, old_padding.rfind('\0') + 1))
-        log.info('Patching %s at %s with new cloud host %r (was: %r)...', path_to_patch, self.os_access, new_host,
+        log.info('Patching %s at %s with new cloud host %r (was: %r)...', path_to_patch, self.ssh_access, new_host,
                  old_host)
         new_str = MEDIASERVER_CLOUDHOST_TAG + ' ' + new_host
         assert len(new_str) < MEDIASERVER_CLOUDHOST_SIZE, 'Cloud host name is too long: %r' % new_host
