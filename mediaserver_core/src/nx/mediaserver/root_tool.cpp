@@ -509,7 +509,7 @@ QString RootTool::devicePath(const QString& fsPath)
             "devicePath",
             [fsPath]()
             {
-                return SystemCommands().devicePath(fsPath.toStdString(), false).c_str();
+                return SystemCommands().devicePath(fsPath.toStdString(), false);
             }, fsPath));
 
     return result;
@@ -548,7 +548,7 @@ bool RootTool::dmiInfo(QString* outPartNumber, QString *outSerialNumber)
             "dmiInfo",
             [=]()
             {
-                return SystemCommands().serializedDmiInfo(false).c_str();
+                return SystemCommands().serializedDmiInfo(false);
             }), outPartNumber, outSerialNumber);
 
     return result;
