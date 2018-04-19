@@ -745,14 +745,6 @@ content type "application/json". Example of such object:
                         <caption>Bakcup process progress status or an error code.</caption>
                     </result>
                 </function>
-                <function proprietary="true">
-                    <name>onEvent</name>
-                    <description>Process an event from an external system. Reserved for future
-                      use.</description>
-                    <method>POST</method>
-                    <params/>
-                    <result/>
-                </function>
                 <function>
                     <name>systemSettings</name>
                     <description>Get or set global system settings. If called with no arguments, just returns list of all system settings with their values</description>
