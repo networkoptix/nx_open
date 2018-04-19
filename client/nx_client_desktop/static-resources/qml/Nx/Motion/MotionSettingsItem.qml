@@ -188,7 +188,7 @@ Rectangle
                     channel: index
                     fillOpacity: kMotionRegionOpacity
                     borderColor: ColorTheme.window
-                    labelsColor: colors.dark1
+                    labelsColor: ColorTheme.colors.dark1
                     sensitivityColors: videoContainer.sensitivityColors
 
                     Connections

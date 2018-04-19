@@ -1265,13 +1265,14 @@ void QnCamDisplay::processFillerPacket(
 void QnCamDisplay::processMetadata(const QnAbstractCompressedMetadataPtr& metadata)
 {
     QnMutexLocker lock(&m_metadataConsumersHashMutex);
-    const auto consumers = m_metadataConsumerByType;
+    auto consumers = m_metadataConsumerByType;
+    consumers.detach();
     lock.unlock();
 
     int consumersCount = 0;
     for (const auto& value: consumers.values(metadata->metadataType))
     {
-        if (const auto& consumer = value.lock())
+        if (auto consumer = value.lock())
         {
             ++consumersCount;
             consumer->processMetadata(metadata);
