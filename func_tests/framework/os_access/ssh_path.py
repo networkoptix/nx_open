@@ -2,10 +2,10 @@ from abc import ABCMeta
 
 from pathlib2 import PurePosixPath
 
+from framework.os_access.args import sh_quote_arg
 from framework.os_access.exceptions import FileNotFound, exit_status_error_cls
 from framework.os_access.local_access import LocalAccess
 from framework.os_access.path import FileSystemPath
-from framework.os_access.args import sh_command_to_script, sh_quote_arg
 from framework.os_access.ssh_access import SSHAccess
 
 

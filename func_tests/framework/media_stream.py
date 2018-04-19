@@ -1,4 +1,3 @@
-import cv2
 import logging
 import math
 import struct
@@ -7,6 +6,7 @@ import urllib
 import urlparse
 from datetime import datetime, timedelta
 
+import cv2
 import requests
 from requests.auth import HTTPDigestAuth
 
