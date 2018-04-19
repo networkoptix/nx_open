@@ -1756,7 +1756,7 @@ CameraDiagnostics::Result HanwhaResource::updateProfileNameIfNeeded(
 
         if (!response.isSuccessful())
         {
-            NX_VERBOSE(
+            NX_WARNING(
                 this,
                 lm("Can't update %1 profile name for %2 (%3)")
                     .args(
