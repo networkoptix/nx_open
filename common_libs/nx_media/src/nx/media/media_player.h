@@ -228,15 +228,15 @@ public:
     void setRenderContextSynchronizer(RenderContextSynchronizerPtr value);
 
     /**
-    * Add new metadata consumer.
-    * Returns false if specified consumer already exists.
-    */
+     * Add new metadata consumer.
+     * @return True if success, false if specified consumer already exists.
+     */
     bool addMetadataConsumer(const AbstractMetadataConsumerPtr& metadataConsumer);
 
     /**
-    * Remove metadata consumer.
-    * Returns false if specified consumer is not found.
-    */
+     * Remove metadata consumer.
+     * @return True if success, false if specified consumer is not found.
+     */
     bool removeMetadataConsumer(const AbstractMetadataConsumerPtr& metadataConsumer);
 
 public slots:
