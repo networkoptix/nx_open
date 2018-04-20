@@ -185,7 +185,7 @@ class CloudSession(object):
         data = r.json()
         assert 'id' in data, 'No ID'
 
-    @testmethod(delay=10)
+    @testmethod(delay=20)
     def check_system_users(self):
         headers = {
             'referer': '{}/systems/{}'.format(self.base_url, self.system_id),
@@ -206,7 +206,7 @@ class CloudSession(object):
         self.post('/gateway/{system_id}/ec2/removeUser'.format(system_id=self.system_id),
                   request_data, auth=auth)
 
-    @testmethod(delay=10)
+    @testmethod(delay=20)
     def check_vasily_is_absent(self):
         headers = {
             'referer': '{}/systems/{}'.format(self.base_url, self.system_id),
