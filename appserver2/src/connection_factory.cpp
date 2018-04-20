@@ -376,8 +376,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %param spaceLimit Free space to maintain on the storage,
      *     in bytes. Recommended value is 10 gigabytes for local storages and
      *     100 gigabytes for NAS.
-     * %param usedForWriting Whether writing to the storage is
-     *         allowed.
+     * %param usedForWriting Whether writing to the storage is allowed.
      *     %value false
      *     %value true
      * %param storageType Type of the method to access the storage.
@@ -733,7 +732,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     %// From struct ApiCameraData (inherited from ApiResourceData):
      *     %param mac Camera MAC address.
      *     %param physicalId Camera unique identifier. This identifier can used in some requests
-     *        related to a camera.
+     *         related to a camera.
      *     %param manuallyAdded Whether the user added the camera manually.
      *         %value false
      *         %value true
@@ -742,7 +741,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         multi-channel cameras together.
      *     %param groupName Group name. This name can be changed by users.
      *     %param statusFlags Usually this field is zero. Non-zero value indicates that the camera
-     *          is causing a lot of network issues.
+     *         is causing a lot of network issues.
      *     %param vendor Camera manufacturer.
      *
      *     %// From struct ApiCameraAttributesData:
@@ -966,7 +965,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *             actionParams:
      *             - relayOutputID (string, required) - Id of output to trigger.
      *             - durationMs (uint, optional) - Timeout (in milliseconds) to reset the camera
-     *                state back.
+     *             state back.
      *         %value bookmarkAction
      *         %value cameraRecordingAction Start camera recording.
      *         %value panicRecordingAction Activate panic recording mode.
@@ -978,11 +977,11 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         %value playSoundAction
      *             actionParams:
      *             - url (string, required) - Url of the sound, contains path to the sound on the
-     *                 server.
+     *             server.
      *         %value playSoundOnceAction
      *             actionParams:
      *             - url (string, required) - Url of the sound, contains path to the sound on the
-     *                 server.
+     *             server.
      *         %value sayTextAction
      *             actionParams:
      *             - sayText (string, required) - Text that will be provided to TTS engine.
@@ -999,7 +998,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         %value execHttpRequestAction Send HTTP request as an action.
      *             actionParams:
      *             - url - Full HTTP url to execute. Username/password are stored as part of the
-     *                 URL.
+     *             URL.
      *             - text - HTTP message body for POST method.
      *         %value acknowledgeAction
      *     %param actionResourceIds List of action resource ids.
@@ -1222,7 +1221,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * </p>
      * %permissions Administrator.
      * %param[opt] id User role unique id. Can be omitted when creating a new object. If such object
-     * exists, omitted fields will not be changed.
+     *     exists, omitted fields will not be changed.
      * %param name User role name.
      * %param permissions Combination (via "|") of the following flags:
      *     %value GlobalEditCamerasPermission Can edit camera settings.
@@ -1341,40 +1340,40 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %param verticalSpacing Vertical spacing between layout items
      *     (floating-point).
      * %param items List of the layout items.
-     * %param item.id Item unique id. Can be omitted when creating a new object.
-     * %param item.flags Should have fixed value.
-     *     %value 0
-     * %param item.left Left coordinate of the layout item (floating-point).
-     * %param item.top Top coordinate of the layout item (floating-point).
-     * %param item.right Right coordinate of the layout item (floating-point).
-     * %param item.bottom Bottom coordinate of the layout item (floating-point).
-     * %param item.rotation Degree of image tilt; a positive value rotates
-     *     counter-clockwise (floating-point, 0..360).
-     * %param item.resourceId Camera unique id.
-     * %param item.resourcePath If the item represents a local file - URL of
-     *     the file, otherwise is empty.
-     * %param item.zoomLeft Left coordinate of the displayed window inside
-     *     the camera image, as a fraction of the image width
-     *     (floating-point, 0..1).
-     * %param item.zoomTop Top coordinate of the displayed window inside
-     *     the camera image, as a fraction of the image height
-     *     (floating-point, 0..1).
-     * %param item.zoomRight Right coordinate of the displayed window inside
-     *     the camera image, as a fraction of the image width
-     *     (floating-point, 0..1).
-     * %param item.zoomBottom Bottom coordinate of the displayed window inside
-     *     the camera image, as a fraction of the image width
-     *     (floating-point, 0..1).
-     * %param item.zoomTargetId Unique id of the original layout item for
-     *     which the zoom window was created.
-     * %param item.contrastParams Image enhancement parameters. The format
-     *     is proprietary and is likely to change in future API versions.
-     * %param item.dewarpingParams Image dewarping parameters.
-     *     The format is proprietary and is likely to change in future API
-     *     versions.
-     * %param item.displayInfo Whether to display info for the layout item.
-     *     %value false
-     *     %value true
+     *     %param item.id Item unique id. Can be omitted when creating a new object.
+     *     %param item.flags Should have fixed value.
+     *         %value 0
+     *     %param item.left Left coordinate of the layout item (floating-point).
+     *     %param item.top Top coordinate of the layout item (floating-point).
+     *     %param item.right Right coordinate of the layout item (floating-point).
+     *     %param item.bottom Bottom coordinate of the layout item (floating-point).
+     *     %param item.rotation Degree of image tilt; a positive value rotates
+     *         counter-clockwise (floating-point, 0..360).
+     *     %param item.resourceId Camera unique id.
+     *     %param item.resourcePath If the item represents a local file - URL of
+     *         the file, otherwise is empty.
+     *     %param item.zoomLeft Left coordinate of the displayed window inside
+     *         the camera image, as a fraction of the image width
+     *         (floating-point, 0..1).
+     *     %param item.zoomTop Top coordinate of the displayed window inside
+     *         the camera image, as a fraction of the image height
+     *         (floating-point, 0..1).
+     *     %param item.zoomRight Right coordinate of the displayed window inside
+     *         the camera image, as a fraction of the image width
+     *         (floating-point, 0..1).
+     *     %param item.zoomBottom Bottom coordinate of the displayed window inside
+     *         the camera image, as a fraction of the image width
+     *         (floating-point, 0..1).
+     *     %param item.zoomTargetId Unique id of the original layout item for
+     *         which the zoom window was created.
+     *     %param item.contrastParams Image enhancement parameters. The format
+     *         is proprietary and is likely to change in future API versions.
+     *     %param item.dewarpingParams Image dewarping parameters.
+     *         The format is proprietary and is likely to change in future API
+     *         versions.
+     *     %param item.displayInfo Whether to display info for the layout item.
+     *         %value false
+     *         %value true
      * %param locked Whether the layout is locked.
      *     %value false
      *     %value true
@@ -1408,40 +1407,40 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %param verticalSpacing Vertical spacing between layout items
      *     (floating-point).
      * %param items List of the layout items.
-     * %param item.id Item unique id. Can be omitted when creating a new object.
-     * %param item.flags Should have fixed value.
-     *     %value 0
-     * %param item.left Left coordinate of the layout item (floating-point).
-     * %param item.top Top coordinate of the layout item (floating-point).
-     * %param item.right Right coordinate of the layout item (floating-point).
-     * %param item.bottom Bottom coordinate of the layout item (floating-point).
-     * %param item.rotation Degree of image tilt; a positive value rotates
-     *     counter-clockwise (floating-point, 0..360).
-     * %param item.resourceId Camera unique id.
-     * %param item.resourcePath If the item represents a local file - URL of
-     *     the file, otherwise is empty.
-     * %param item.zoomLeft Left coordinate of the displayed window inside
-     *     the camera image, as a fraction of the image width
-     *     (floating-point, 0..1).
-     * %param item.zoomTop Top coordinate of the displayed window inside
-     *     the camera image, as a fraction of the image height
-     *     (floating-point, 0..1).
-     * %param item.zoomRight Right coordinate of the displayed window inside
-     *     the camera image, as a fraction of the image width
-     *     (floating-point, 0..1).
-     * %param item.zoomBottom Bottom coordinate of the displayed window inside
-     *     the camera image, as a fraction of the image width
-     *     (floating-point, 0..1).
-     * %param item.zoomTargetId Unique id of the original layout item for
-     *     which the zoom window was created.
-     * %param item.contrastParams Image enhancement parameters. The format
-     *     is proprietary and is likely to change in future API versions.
-     * %param item.dewarpingParams Image dewarping parameters.
-     *     The format is proprietary and is likely to change in future API
-     *     versions.
-     * %param item.displayInfo Whether to display info for the layout item.
-     *     %value false
-     *     %value true
+     *     %param item.id Item unique id. Can be omitted when creating a new object.
+     *     %param item.flags Should have fixed value.
+     *         %value 0
+     *     %param item.left Left coordinate of the layout item (floating-point).
+     *     %param item.top Top coordinate of the layout item (floating-point).
+     *     %param item.right Right coordinate of the layout item (floating-point).
+     *     %param item.bottom Bottom coordinate of the layout item (floating-point).
+     *     %param item.rotation Degree of image tilt; a positive value rotates
+     *         counter-clockwise (floating-point, 0..360).
+     *     %param item.resourceId Camera unique id.
+     *     %param item.resourcePath If the item represents a local file - URL of
+     *         the file, otherwise is empty.
+     *     %param item.zoomLeft Left coordinate of the displayed window inside
+     *         the camera image, as a fraction of the image width
+     *         (floating-point, 0..1).
+     *     %param item.zoomTop Top coordinate of the displayed window inside
+     *         the camera image, as a fraction of the image height
+     *         (floating-point, 0..1).
+     *     %param item.zoomRight Right coordinate of the displayed window inside
+     *         the camera image, as a fraction of the image width
+     *         (floating-point, 0..1).
+     *     %param item.zoomBottom Bottom coordinate of the displayed window inside
+     *         the camera image, as a fraction of the image width
+     *         (floating-point, 0..1).
+     *     %param item.zoomTargetId Unique id of the original layout item for
+     *         which the zoom window was created.
+     *     %param item.contrastParams Image enhancement parameters. The format
+     *         is proprietary and is likely to change in future API versions.
+     *     %param item.dewarpingParams Image dewarping parameters.
+     *         The format is proprietary and is likely to change in future API
+     *         versions.
+     *     %param item.displayInfo Whether to display info for the layout item.
+     *         %value false
+     *         %value true
      * %param locked Whether the layout is locked.
      *     %value false
      *     %value true
