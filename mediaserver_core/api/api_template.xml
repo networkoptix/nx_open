@@ -17,7 +17,7 @@
                     <description>Detach media server from cloud. Local admin user is enabled, admin password is changed to new value (if specified), all cloud users are disabled. Cloud link is removed.
                         Function can be called either via GET or POST method. POST data should be a json object.</description>
                     <permissions>Administrator.</permissions>
-                    <method>GET, POST</method>
+                    <method>POST</method>
                     <params>
                         <param>
                             <name>password</name>
