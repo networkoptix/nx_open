@@ -38,7 +38,7 @@ static int acceptWithTimeout(int fd, int timeoutSec)
 
    result = select(fd + 1, &rfds, (fd_set*) 0, (fd_set*) 0, &tv);
    if(result > 0)
-      return accept(fd, NULL, NULL);
+       return accept(fd, NULL, NULL);
 
    return -1;
 }

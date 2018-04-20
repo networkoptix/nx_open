@@ -364,6 +364,10 @@ int RootTool::open(const QString& path, QIODevice::OpenMode mode)
             fd = system_commands::domain_socket::readFd();
             return fd > 0;
         });
+
+    if (fd < 0)
+        NX_WARNING(this, lm("Open failed for %1").args(path));
+
     return fd;
 #else
     return -1;
