@@ -146,7 +146,10 @@
         var touch = false;
         switch (os) {
             case 'Mac OS X':
-                osVersion = /Mac OS X (10[\.\_\d]+)/.exec(nAgt)[1];
+                osVersion = /Mac OS X (10[\.\_\d]+)/.exec(nAgt);
+                if (osVersion && osVersion.length > 1) {
+                    osVersion = osVersion[1];
+                }
                 touch = true;
                 break;
 
