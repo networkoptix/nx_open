@@ -6,14 +6,19 @@ from string import whitespace
 import pytest
 from pathlib2 import Path
 
+from framework.os_access.local_path import LocalPath
+
 pytest_plugins = ['fixtures.ad_hoc_ssh']
 
 
-@pytest.fixture(params=['ssh'])
+@pytest.fixture(params=['ssh', 'local'])
 def base_dir(request, ad_hoc_ssh_access):
     # Creation is checked in SSHAccess tests.
     if request.param == 'ssh':
         return ad_hoc_ssh_access.Path('/tmp/func_tests/paths_test_sandbox')
+    if request.param == 'local':
+        return LocalPath('/tmp/func_tests/paths_test_sandbox')
+    assert False
 
 
 def prepare_sandbox_path(base_dir, file_name):
