@@ -424,8 +424,7 @@ bool ExportLayoutTool::exportMediaResource(const QnMediaResourcePtr& resource) {
         lit("mkv"),
         m_storage,
         role,
-        serverTimeZone,
-        0);
+        serverTimeZone);
 
     emit stageChanged(tr("Exporting to \"%1\"...").arg(QFileInfo(m_settings.filename.completeFileName()).fileName()));
     return true;
