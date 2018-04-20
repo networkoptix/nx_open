@@ -182,21 +182,21 @@ void DummySocket::connectAsync(
     const SocketAddress& /*addr*/,
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
-    post(std::bind(std::move(handler), SystemError::notImplemented));
+    post([handler = std::move(handler)]() { handler(SystemError::notImplemented); });
 }
 
 void DummySocket::readSomeAsync(
     nx::Buffer* const /*buf*/,
     IoCompletionHandler handler)
 {
-    post(std::bind(std::move(handler), SystemError::notImplemented, (size_t)-1));
+    post([handler = std::move(handler)]() { handler(SystemError::notImplemented, (size_t)-1); });
 }
 
 void DummySocket::sendAsync(
     const nx::Buffer& /*buf*/,
     IoCompletionHandler handler)
 {
-    post(std::bind(std::move(handler), SystemError::notImplemented, (size_t)-1));
+    post([handler = std::move(handler)]() { handler(SystemError::notImplemented, (size_t)-1); });
 }
 
 void DummySocket::registerTimer(

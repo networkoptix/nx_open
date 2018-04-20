@@ -32,7 +32,7 @@ void ProtocolDetectingStreamSocket::connectAsync(
 {
     NX_ASSERT(false);
     post(
-        [this, handler = std::move(handler)]()
+        [handler = std::move(handler)]()
         {
             handler(SystemError::notImplemented);
         });
