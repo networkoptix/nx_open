@@ -70,11 +70,11 @@ private:
 
     void transferHeaderOfRandomProtocol()
     {
-        auto& selectedProtocol = m_protocols.begin();
-        auto source = std::make_unique<BufferSocket>(selectedProtocol->second);
+        auto& selectedProtocol = *m_protocols.begin();
+        auto source = std::make_unique<BufferSocket>(selectedProtocol.second);
         m_detector = std::make_unique<network::ProtocolDetectingStreamSocket>(
             std::move(source));
-        m_selectedProtocolId = selectedProtocol->first;
+        m_selectedProtocolId = selectedProtocol.first;
 
         registerProtocols();
     }

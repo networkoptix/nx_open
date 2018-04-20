@@ -156,7 +156,7 @@ void BaseProtocolDetectingAsyncChannel<Base, AsyncChannelInterface>::readSomeAsy
     if (m_delegate)
         return m_delegate->readSomeAsync(buffer, std::move(handler));
 
-    post(
+    this->post(
         [this, buffer, handler = std::move(handler)]() mutable
         {
             if (m_delegate)
@@ -175,7 +175,7 @@ void BaseProtocolDetectingAsyncChannel<Base, AsyncChannelInterface>::sendAsync(
     if (m_delegate)
         return m_delegate->sendAsync(buffer, std::move(handler));
 
-    post(
+    this->post(
         [this, &buffer, handler = std::move(handler)]() mutable
         {
             if (m_delegate)

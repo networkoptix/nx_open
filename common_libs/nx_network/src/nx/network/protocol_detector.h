@@ -38,7 +38,7 @@ public:
 
     virtual bool match(const nx::Buffer& buf) override
     {
-        if (buf.size() < m_prefix.size())
+        if ((std::size_t) buf.size() < m_prefix.size())
             return false;
 
         return strncmp(m_prefix.c_str(), buf.constData(), m_prefix.size()) == 0;
