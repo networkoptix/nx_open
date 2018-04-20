@@ -1,4 +1,4 @@
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod
 
 from pathlib2 import PurePosixPath
 
@@ -6,24 +6,27 @@ from framework.os_access.args import sh_quote_arg
 from framework.os_access.exceptions import FileNotFound, exit_status_error_cls
 from framework.os_access.local_access import LocalAccess
 from framework.os_access.path import FileSystemPath
-from framework.os_access.ssh_access import SSHAccess
 
 
 class SSHPath(FileSystemPath, PurePosixPath):
     __metaclass__ = ABCMeta
 
-    _ssh_access = None  # type: SSHAccess
+    @staticmethod
+    @abstractmethod
+    def _ssh_access():
+        from framework.os_access.ssh_access import SSHAccess
+        return SSHAccess('', '')
 
     @classmethod
     def home(cls):
-        return cls(cls._ssh_access.run_sh_script('echo ~').rstrip())
+        return cls(cls._ssh_access().run_sh_script('echo ~').rstrip())
 
     @classmethod
     def tmp(cls):
         return cls('/tmp/func_tests')
 
     def touch(self, mode=0o666, exist_ok=True):
-        self._ssh_access.run_sh_script(
+        self._ssh_access().run_sh_script(
             # language=Bash
             '''
                 if [[ -e $FILE_PATH ]]; then
@@ -44,14 +47,14 @@ class SSHPath(FileSystemPath, PurePosixPath):
 
     def exists(self):
         try:
-            self._ssh_access.run_command(['test', '-e', self])
+            self._ssh_access().run_command(['test', '-e', self])
         except exit_status_error_cls(1):
             return False
         else:
             return True
 
     def unlink(self):
-        self._ssh_access.run_command(['rm', '-v', '--', self])
+        self._ssh_access().run_command(['rm', '-v', '--', self])
 
     def iterdir(self):
         return self._run_find_command(max_depth=1)

@@ -5,6 +5,7 @@ from pathlib2 import Path
 from framework.os_access.args import sh_augment_script, sh_command_to_script
 from framework.os_access.exceptions import exit_status_error_cls
 from framework.os_access.local_access import LocalAccess
+from framework.os_access.ssh_path import SSHPath
 
 _logger = logging.getLogger(__name__)
 
@@ -16,11 +17,12 @@ class SSHAccess(object):
         self.port = port
         self.ssh_command = ['ssh', '-F', config_path, '-p', port]
 
-        from framework.os_access.ssh_path import SSHPath  # Reverse dependency -- import locally.
-
         class _SSHPath(SSHPath):
             """SSHPath type for this connection. isinstance should be supported."""
-            _ssh_access = self
+
+            @staticmethod
+            def _ssh_access():
+                return self
 
         self.Path = _SSHPath
 
