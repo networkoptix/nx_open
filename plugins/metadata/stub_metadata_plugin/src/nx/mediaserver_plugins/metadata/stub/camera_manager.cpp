@@ -73,6 +73,12 @@ void CameraManager::settingsChanged()
 
 bool CameraManager::pushCompressedVideoFrame(const CommonCompressedVideoPacket* videoFrame)
 {
+    if (plugin()->needUncompressedVideoFrames())
+    {
+        NX_PRINT << "ERROR: Received compressed video frame, contrary to manifest.";
+        return false;
+    }
+
     NX_OUTPUT << __func__ << "() BEGIN: timestamp " << videoFrame->timestampUsec() << " us";
     ++m_frameCounter;
     m_lastVideoFrameTimestampUsec = videoFrame->timestampUsec();
@@ -82,6 +88,12 @@ bool CameraManager::pushCompressedVideoFrame(const CommonCompressedVideoPacket* 
 
 bool CameraManager::pushUncompressedVideoFrame(const CommonUncompressedVideoFrame* videoFrame)
 {
+    if (!plugin()->needUncompressedVideoFrames())
+    {
+        NX_PRINT << "ERROR: Received uncompressed video frame, contrary to manifest.";
+        return false;
+    }
+
     NX_OUTPUT << __func__ << "(): timestamp " << videoFrame->timestampUsec() << " us";
 
     ++m_frameCounter;

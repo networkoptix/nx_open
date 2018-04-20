@@ -29,9 +29,10 @@ protected:
     virtual std::string capabilitiesManifest() = 0;
 
     /**
-     * Override to accept next compressed video frame for processing.
+     * Override to accept next compressed video frame for processing. Should not block the caller
+     * thread for long.
      * @param videoFrame Contains a pointer to the compressed video frame raw bytes. If the plugin
-     *     manifest declares "needDeepCopyForMediaFrame" in "capabilities", the lifetime (validity)
+     *     manifest declares "needDeepCopyOfVideoFrames" in "capabilities", the lifetime (validity)
      *     of this pointer is the same as of videoFrame. Otherwise, the pointer is valid only until
      *     and during the subsequent call to pullMetadataPackets(), even if the lifetime of
      *     videoFrame is extended by addRef() or queryInterface() inside this method.
@@ -44,7 +45,7 @@ protected:
     /**
      * Override to accept next uncompressed video frame for processing.
      * @param videoFrame Contains a pointer to the uncompressed video frame raw bytes. If the plugin
-     *     manifest declares "needDeepCopyForMediaFrame" in "capabilities", the lifetime (validity)
+     *     manifest declares "needDeepCopyOfVideoFrames" in "capabilities", the lifetime (validity)
      *     of this pointer is the same as of videoFrame. Otherwise, the pointer is valid only until
      *     and during the subsequent call to pullMetadataPackets(), even if the lifetime of
      *     videoFrame is extended by addRef() or queryInterface() inside this method.
@@ -89,8 +90,9 @@ protected:
     /**
      * @return Parent plugin. The parent plugin is guaranteed to exist while any of its
      * CameraManagers exist, thus, this pointer is valid during the lifetime of this CameraManager.
+     * Override to perform dynamic_cast to the descendant class of plugin.
      */
-    Plugin* plugin() const { return m_plugin; }
+    virtual Plugin* plugin() const { return m_plugin; }
 
 //-------------------------------------------------------------------------------------------------
 // Not intended to be used by the descendant.

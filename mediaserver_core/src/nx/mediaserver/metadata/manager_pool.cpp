@@ -773,7 +773,7 @@ void ManagerPool::putVideoFrame(
         if (!manager)
             continue;
         const bool needDeepCopy = managerData.manifest.capabilities.testFlag(
-            nx::api::AnalyticsDriverManifestBase::needDeepCopyForMediaFrame);
+            nx::api::AnalyticsDriverManifestBase::needDeepCopyOfVideoFrames);
         const bool needUncompressedVideoFrames = managerData.manifest.capabilities.testFlag(
             nx::api::AnalyticsDriverManifestBase::needUncompressedVideoFrames);
         DataPacket* dataPacket = nullptr;

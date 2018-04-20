@@ -77,7 +77,7 @@ std::string Plugin::capabilitiesManifest() const
                 }
             ],
 
-            "options": "needDeepCopyForMediaFrame"
+            "options": "needDeepCopyOfVideoFrames"
         }
     )json";
 }
