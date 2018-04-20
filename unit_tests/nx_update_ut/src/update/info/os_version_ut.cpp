@@ -15,6 +15,7 @@ TEST(OsVersion, match)
     ASSERT_TRUE(armBpi().matches("linux.arm_bpi"));
     ASSERT_TRUE(armRpi().matches("linux.arm_rpi"));
     ASSERT_TRUE(armBananapi().matches("linux.arm_bananapi"));
+    ASSERT_TRUE(macosx().matches("macosx.x64_macosx"));
 }
 
 TEST(OsVersion, noMatch)

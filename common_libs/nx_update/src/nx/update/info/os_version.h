@@ -20,8 +20,9 @@ struct NX_UPDATE_API OsVersion
 
     bool isEmpty() const;
     bool matches(const QString& target) const;
-    QString toString() const;
+    QString serialize() const;
 
+    static OsVersion deserialize(const QString& s);
     static OsVersion fromString(const QString& s);
 };
 
