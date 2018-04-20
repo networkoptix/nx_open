@@ -191,8 +191,13 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject
     static bool isWebKitInitialized = false;
     if (!isWebKitInitialized)
     {
-        QWebSettings::globalSettings()->setAttribute(QWebSettings::PluginsEnabled, true);
-        QWebSettings::globalSettings()->enablePersistentStorage();
+        const auto settings = QWebSettings::globalSettings();
+        settings->setAttribute(QWebSettings::PluginsEnabled, true);
+        settings->enablePersistentStorage();
+
+        if (ini().enableWebKitDeveloperExtras)
+            settings->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
+
         isWebKitInitialized = true;
     }
 }
