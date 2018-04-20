@@ -19,13 +19,79 @@ namespace test {
 class ApiConventions:
     public CdbFunctionalTest
 {
+protected:
+    using DetailedApiRequestResult = std::tuple<
+        nx::network::http::StatusCode::Value,
+        nx::network::http::FusionRequestErrorClass,
+        api::ResultCode>;
+
+    virtual void SetUp() override
+    {
+        ASSERT_TRUE(startAndWaitUntilStarted());
+    }
+
+    void assertRequestWithoutCredentialsIsRejectedWith(
+        api::ResultCode resultCode)
+    {
+        DetailedApiRequestResult result;
+        issueRequest("/cdb/account/get", std::string(), std::string(), &result);
+
+        ASSERT_EQ(nx::network::http::StatusCode::unauthorized, std::get<0>(result));
+        ASSERT_EQ(nx::network::http::FusionRequestErrorClass::unauthorized, std::get<1>(result));
+        ASSERT_EQ(resultCode, std::get<2>(result));
+    }
+
+    void assertRequestWithInvalidCredentialsIsRejectedWith(
+        api::ResultCode resultCode)
+    {
+        DetailedApiRequestResult result;
+        issueRequest("/cdb/account/get", "invalid", "credentials", &result);
+
+        ASSERT_EQ(nx::network::http::StatusCode::unauthorized, std::get<0>(result));
+        ASSERT_EQ(nx::network::http::FusionRequestErrorClass::unauthorized, std::get<1>(result));
+        ASSERT_EQ(resultCode, std::get<2>(result));
+    }
+
+    void issueRequest(
+        const std::string& path,
+        const std::string& username,
+        const std::string& password,
+        DetailedApiRequestResult* result)
+    {
+        nx::network::http::HttpClient client;
+        nx::utils::Url url;
+        url.setHost(endpoint().address.toString());
+        url.setPort(endpoint().port);
+        url.setScheme("http");
+        url.setPath(path.c_str());
+        if (!username.empty())
+            url.setUserName(username.c_str());
+        if (!password.empty())
+            url.setPassword(password.c_str());
+        ASSERT_TRUE(client.doGet(url));
+        ASSERT_TRUE(client.response() != nullptr);
+        const nx::network::http::StatusCode::Value httpStatusCode =
+            static_cast<nx::network::http::StatusCode::Value>(
+                client.response()->statusLine.statusCode);
+
+        nx::network::http::BufferType msgBody;
+        while (!client.eof())
+            msgBody += client.fetchMessageBodyBuffer();
+
+        ASSERT_FALSE(msgBody.isEmpty());
+        nx::network::http::FusionRequestResult requestResult =
+            QJson::deserialized<nx::network::http::FusionRequestResult>(msgBody);
+
+        const auto errorClass = requestResult.errorClass;
+        const auto resultCode =
+            QnLexical::deserialized<api::ResultCode>(requestResult.resultCode);
+
+        *result = std::make_tuple(httpStatusCode, errorClass, resultCode);
+    }
 };
 
 TEST_F(ApiConventions, general)
 {
-    //waiting for cloud_db initialization
-    ASSERT_TRUE(startAndWaitUntilStarted());
-
     api::AccountData account1;
     std::string account1Password;
     api::AccountConfirmationCode activationCode;
@@ -91,8 +157,6 @@ TEST_F(ApiConventions, using_post_method)
         testData, api::AccountData(), &success);
     ASSERT_TRUE(success);
 
-    ASSERT_TRUE(startAndWaitUntilStarted());
-
     auto client = nx::network::http::AsyncHttpClient::create();
     nx::utils::Url url;
     url.setHost(endpoint().address.toString());
@@ -116,48 +180,12 @@ TEST_F(ApiConventions, using_post_method)
 
 TEST_F(ApiConventions, json_in_unauthorized_response)
 {
-    ASSERT_TRUE(startAndWaitUntilStarted());
-
-    for (int i = 0; i < 2; ++i)
-    {
-        nx::network::http::HttpClient client;
-        nx::utils::Url url;
-        url.setHost(endpoint().address.toString());
-        url.setPort(endpoint().port);
-        url.setScheme("http");
-        url.setPath("/cdb/account/get");
-        if (i == 1)
-        {
-            url.setUserName("invalid");
-            url.setPassword("password");
-        }
-        ASSERT_TRUE(client.doGet(url));
-        ASSERT_TRUE(client.response() != nullptr);
-        ASSERT_EQ(
-            nx::network::http::StatusCode::unauthorized,
-            client.response()->statusLine.statusCode);
-
-        nx::network::http::BufferType msgBody;
-        while (!client.eof())
-            msgBody += client.fetchMessageBodyBuffer();
-
-        ASSERT_FALSE(msgBody.isEmpty());
-        nx::network::http::FusionRequestResult requestResult =
-            QJson::deserialized<nx::network::http::FusionRequestResult>(msgBody);
-
-        ASSERT_EQ(
-            nx::network::http::FusionRequestErrorClass::unauthorized,
-            requestResult.errorClass);
-        ASSERT_EQ(
-            QnLexical::serialized(api::ResultCode::notAuthorized),
-            requestResult.resultCode);
-    }
+    assertRequestWithoutCredentialsIsRejectedWith(api::ResultCode::notAuthorized);
+    assertRequestWithInvalidCredentialsIsRejectedWith(api::ResultCode::badUsername);
 }
 
 TEST_F(ApiConventions, api_conventions_ok)
 {
-    ASSERT_TRUE(startAndWaitUntilStarted());
-
     api::AccountData account1;
     std::string account1Password;
     auto result = addActivatedAccount(&account1, &account1Password);
@@ -188,8 +216,6 @@ TEST_F(ApiConventions, api_conventions_ok)
 
 TEST_F(ApiConventions, json_in_ok_response)
 {
-    ASSERT_TRUE(startAndWaitUntilStarted());
-
     api::AccountData account1;
     std::string account1Password;
     auto result = addActivatedAccount(&account1, &account1Password);

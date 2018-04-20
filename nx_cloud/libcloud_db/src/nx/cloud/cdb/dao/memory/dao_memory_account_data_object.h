@@ -25,10 +25,9 @@ public:
         nx::utils::db::QueryContext* queryContext,
         const api::AccountData& account) override;
 
-    virtual nx::utils::db::DBResult fetchAccountByEmail(
+    virtual std::optional<data::AccountData> fetchAccountByEmail(
         nx::utils::db::QueryContext* queryContext,
-        const std::string& accountEmail,
-        data::AccountData* const accountData) override;
+        const std::string& accountEmail) override;
 
     virtual nx::utils::db::DBResult fetchAccounts(
         nx::utils::db::QueryContext* queryContext,
@@ -40,7 +39,7 @@ public:
         const std::string& emailVerificationCode,
         const QDateTime& codeExpirationTime) override;
 
-    virtual boost::optional<std::string> getVerificationCodeByAccountEmail(
+    virtual std::optional<std::string> getVerificationCodeByAccountEmail(
         nx::utils::db::QueryContext* queryContext,
         const std::string& accountEmail) override;
 
@@ -61,8 +60,7 @@ public:
     virtual void updateAccount(
         nx::utils::db::QueryContext* queryContext,
         const std::string& accountEmail,
-        const api::AccountUpdateData& accountUpdateData,
-        bool activateAccountIfNotActive) override;
+        const api::AccountUpdateData& accountUpdateData) override;
 
 private:
     std::map<std::string, api::AccountData> m_emailToAccount;
