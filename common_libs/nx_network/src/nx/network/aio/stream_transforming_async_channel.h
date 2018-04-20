@@ -37,7 +37,9 @@ public:
 
     virtual void readSomeAsync(nx::Buffer* const buffer, UserIoHandler handler) override;
     virtual void sendAsync(const nx::Buffer& buffer, UserIoHandler handler) override;
-    virtual void cancelIOSync(aio::EventType eventType) override;
+
+protected:
+    virtual void cancelIoInAioThread(aio::EventType eventType) override;
 
 private:
     enum class UserTaskType
@@ -122,7 +124,6 @@ private:
     void handleIoError(SystemError::ErrorCode sysErrorCode);
 
     void removeUserTask(UserTask* task);
-    void cancelIoWhileInAioThread(aio::EventType eventType);
 };
 
 } // namespace aio

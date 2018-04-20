@@ -42,7 +42,6 @@ public:
     virtual void sendAsync(
         const nx::Buffer& buffer,
         IoCompletionHandler handler) override;
-    virtual void cancelIOSync(EventType eventType) override;
 
     void pauseReadingData();
     void resumeReadingData();
@@ -60,6 +59,9 @@ public:
 
     bool isReadScheduled() const;
     bool isWriteScheduled() const;
+
+protected:
+    virtual void cancelIoInAioThread(EventType eventType) override;
 
 private:
     utils::bstream::AbstractInput* m_input;

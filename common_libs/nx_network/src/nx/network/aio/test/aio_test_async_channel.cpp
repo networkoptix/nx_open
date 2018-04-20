@@ -69,7 +69,7 @@ void AsyncChannel::sendAsync(
     performAsyncSend(lock);
 }
 
-void AsyncChannel::cancelIOSync(EventType eventType)
+void AsyncChannel::cancelIoInAioThread(EventType eventType)
 {
     if (eventType == EventType::etRead ||
         eventType == EventType::etNone)
