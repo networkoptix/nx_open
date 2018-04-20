@@ -92,23 +92,23 @@ def test_merge_take_local_settings(one, two, test_system_settings):
     check_system_settings(one, **test_system_settings)
 
     # On each server update some globalSettings to different values
-    expected_arecontRtspEnabled = change_bool_setting(one, 'arecontRtspEnabled')
-    expected_auditTrailEnabled = not change_bool_setting(two, 'auditTrailEnabled')
+    expected_arecont_rtsp_enabled = change_bool_setting(one, 'arecontRtspEnabled')
+    expected_audit_trail_enabled = not change_bool_setting(two, 'auditTrailEnabled')
 
     # Merge systems (takeRemoteSettings = false)
     merge_systems(two, one)
     wait_for_settings_merge(one, two)
     check_system_settings(
       one,
-      arecontRtspEnabled=bool_to_str(expected_arecontRtspEnabled),
-      auditTrailEnabled=bool_to_str(expected_auditTrailEnabled))
+      arecontRtspEnabled=bool_to_str(expected_arecont_rtsp_enabled),
+      auditTrailEnabled=bool_to_str(expected_audit_trail_enabled))
 
     # Ensure both servers are merged and sync
-    expected_arecontRtspEnabled = not change_bool_setting(one, 'arecontRtspEnabled')
+    expected_arecont_rtsp_enabled = not change_bool_setting(one, 'arecontRtspEnabled')
     wait_for_settings_merge(one, two)
     check_system_settings(
         two,
-        arecontRtspEnabled=bool_to_str(expected_arecontRtspEnabled))
+        arecontRtspEnabled=bool_to_str(expected_arecont_rtsp_enabled))
 
     assert not one.installation.list_core_dumps()
     assert not two.installation.list_core_dumps()
@@ -119,23 +119,23 @@ def test_merge_take_local_settings(one, two, test_system_settings):
 @pytest.mark.local
 def test_merge_take_remote_settings(one, two):
     # On each server update some globalSettings to different values
-    expected_arecontRtspEnabled = not change_bool_setting(one, 'arecontRtspEnabled')
-    expected_auditTrailEnabled = not change_bool_setting(two, 'auditTrailEnabled')
+    expected_arecont_rtsp_enabled = not change_bool_setting(one, 'arecontRtspEnabled')
+    expected_audit_trail_enabled = not change_bool_setting(two, 'auditTrailEnabled')
 
     # Merge systems (takeRemoteSettings = true)
     merge_systems(two, one, take_remote_settings=True)
     wait_for_settings_merge(one, two)
     check_system_settings(
       one,
-      arecontRtspEnabled=bool_to_str(expected_arecontRtspEnabled),
-      auditTrailEnabled=bool_to_str(expected_auditTrailEnabled))
+      arecontRtspEnabled=bool_to_str(expected_arecont_rtsp_enabled),
+      auditTrailEnabled=bool_to_str(expected_audit_trail_enabled))
 
     # Ensure both servers are merged and sync
-    expected_auditTrailEnabled = not change_bool_setting(one, 'auditTrailEnabled')
+    expected_audit_trail_enabled = not change_bool_setting(one, 'auditTrailEnabled')
     wait_for_settings_merge(one, two)
     check_system_settings(
         two,
-        auditTrailEnabled=bool_to_str(expected_auditTrailEnabled))
+        auditTrailEnabled=bool_to_str(expected_audit_trail_enabled))
 
     assert not one.installation.list_core_dumps()
     assert not two.installation.list_core_dumps()
@@ -217,11 +217,11 @@ def test_cloud_merge_after_disconnect(two_linux_mediaservers, cloud_account, tes
     wait_for_settings_merge(one, two)
 
     # Ensure both servers are merged and sync
-    expected_auditTrailEnabled = not change_bool_setting(one, 'auditTrailEnabled')
+    expected_audit_trail_enabled = not change_bool_setting(one, 'auditTrailEnabled')
     wait_for_settings_merge(one, two)
     check_system_settings(
         two,
-        auditTrailEnabled=bool_to_str(expected_auditTrailEnabled))
+        auditTrailEnabled=bool_to_str(expected_audit_trail_enabled))
 
     assert not one.installation.list_core_dumps()
     assert not two.installation.list_core_dumps()
@@ -278,11 +278,11 @@ def test_restart_one_server(one, two, cloud_account):
     two.api.get('ec2/getUsers')
 
     # Ensure both servers are merged and sync
-    expected_arecontRtspEnabled = not change_bool_setting(one, 'arecontRtspEnabled')
+    expected_arecont_rtsp_enabled = not change_bool_setting(one, 'arecontRtspEnabled')
     wait_for_settings_merge(one, two)
     check_system_settings(
         two,
-        arecontRtspEnabled=bool_to_str(expected_arecontRtspEnabled))
+        arecontRtspEnabled=bool_to_str(expected_arecont_rtsp_enabled))
 
     assert not one.installation.list_core_dumps()
     assert not two.installation.list_core_dumps()

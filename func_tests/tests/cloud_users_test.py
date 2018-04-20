@@ -7,9 +7,9 @@ import pytest
 from framework.merging import setup_cloud_system
 from framework.waiting import wait_for_true
 
-SECOND_CLOUD_USER='vfedorov@networkoptix.com'
-SECOND_CLOUD_PASSWORD='123qweasd'
-ADMIN_PERMISSIONS='|'.join([
+SECOND_CLOUD_USER = 'vfedorov@networkoptix.com'
+SECOND_CLOUD_PASSWORD = '123qweasd'
+ADMIN_PERMISSIONS = '|'.join([
     'GlobalAdminPermission',
     'GlobalEditCamerasPermission', 
     'GlobalControlVideoWallPermission',
@@ -36,7 +36,8 @@ def test_mediaserver_cloud_protocol_synchronization(running_linux_mediaserver, c
     assert second_cloud_users[0]['isEnabled']
     assert second_cloud_users[0]['isCloud']
 
-    running_linux_mediaserver.api = running_linux_mediaserver.api.with_credentials(SECOND_CLOUD_USER, SECOND_CLOUD_PASSWORD)
+    running_linux_mediaserver.api = running_linux_mediaserver.api.with_credentials(
+        SECOND_CLOUD_USER, SECOND_CLOUD_PASSWORD)
     wait_for_true(
         running_linux_mediaserver.api.credentials_work,
         "credentials of {} work".format(running_linux_mediaserver.api))

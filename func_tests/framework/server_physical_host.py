@@ -109,10 +109,13 @@ class PhysicalInstallationHost(object):
         self._template_renderer = TemplateRenderer()
         self._dist_unpacked = self.unpacked_mediaserver_dir.exists()
         self._ensure_root_dir_exists()
-        self._installations = list(self._read_installations())  # MediaserverInstallation list
-        self._available_installations = self._installations[:]  # MediaserverInstallation list, set up but yet unallocated
+        self._installations = list(self._read_installations())  # MediaserverInstallation list.
+        self._available_installations = self._installations[:]  # Set up but not allocated yet.
         self._allocated_server_list = []
-        self._ensure_servers_are_stopped()  # expected initial state, we may reset_installations after this, so pids will be lost
+
+        self._ensure_servers_are_stopped()
+        # Expected initial state, we may reset_installations after this, so pids will be lost.
+
         self._must_reset_installation = False
 
     @property
@@ -125,7 +128,10 @@ class PhysicalInstallationHost(object):
     def _reset_installations(self):
         log.info('%s: removing directory: %s', self.name, self.root_dir)
         self.os_access.rm_tree(self.root_dir, ignore_errors=True)
-        self._dist_unpacked = False  # although unpacked dist is still in place, it will be reunpacked again with new deb
+
+        self._dist_unpacked = False
+        # Although unpacked dist is still in place, it will be unpacked again with new deb.
+
         self._installations = []
         self._available_installations = []
 
@@ -158,7 +164,8 @@ class PhysicalInstallationHost(object):
         if self._must_reset_installation:
             self._reset_installations()
             self._must_reset_installation = False
-        if self._dist_unpacked: return
+        if self._dist_unpacked:
+            return
         remote_dist_path = self._remote_dist_root / self._deb_path.name
         self._remote_dist_root.parent.mkdir(parents=True, exist_ok=True)
         self._remote_dist_root.upload(self._deb_path)

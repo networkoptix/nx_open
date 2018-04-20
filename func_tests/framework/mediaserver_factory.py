@@ -105,7 +105,9 @@ def collect_core_dumps_from_mediaserver(mediaserver, root_artifact_factory):
             artifact_type=TRACEBACK_ARTIFACT_TYPE)
         local_traceback_path = code_dumps_artifact_factory.produce_file_path()
         local_traceback_path.write_bytes(traceback)
-        log.warning('Core dump on %r: %s, %s.', mediaserver.name, mediaserver, local_core_dump_path, local_traceback_path)
+        log.warning(
+            'Core dump on %r: %s, %s.',
+            mediaserver.name, mediaserver, local_core_dump_path, local_traceback_path)
 
 
 def collect_artifacts_from_mediaserver(mediaserver, root_artifact_factory):

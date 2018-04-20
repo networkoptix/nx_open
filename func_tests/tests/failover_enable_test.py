@@ -153,7 +153,9 @@ def get_server_camera_macs(server):
 # https://networkoptix.testrail.net/index.php?/cases/view/744
 @pytest.mark.testcam
 def test_enable_failover_on_one_server(linux_mediaservers_pool, camera_factory, counter):
-    one, two, three = create_cameras_and_servers(linux_mediaservers_pool, camera_factory, counter, ['one', 'two', 'three'])
+    one, two, three = create_cameras_and_servers(
+        linux_mediaservers_pool, camera_factory, counter,
+        ['one', 'two', 'three'])
     two.server.api.ec2.saveMediaServerUserAttributes.POST(
         serverId=get_server_id(two.server.api),
         maxCameras=4,
@@ -173,7 +175,9 @@ def test_enable_failover_on_one_server(linux_mediaservers_pool, camera_factory, 
 
 @pytest.mark.testcam
 def test_enable_failover_on_two_servers(linux_mediaservers_pool, camera_factory, counter):
-    one, two, three = create_cameras_and_servers(linux_mediaservers_pool, camera_factory, counter, ['one', 'two', 'three'])
+    one, two, three = create_cameras_and_servers(
+        linux_mediaservers_pool, camera_factory, counter,
+        ['one', 'two', 'three'])
     one.server.api.ec2.saveMediaServerUserAttributes.POST(
         serverId=get_server_id(one.server.api),
         maxCameras=3,

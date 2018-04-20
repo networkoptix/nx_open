@@ -32,7 +32,11 @@ class LightweightServersFactory(object):
         self._test_binary_path = test_binary_path
         physical_installation_host = self._pick_server()
         if physical_installation_host:
-            self._lws_host = LightweightServersHost(self._artifact_factory, self._test_binary_path, physical_installation_host, ca)
+            self._lws_host = LightweightServersHost(
+                self._artifact_factory,
+                self._test_binary_path,
+                physical_installation_host,
+                ca)
         else:
             self._lws_host = None
 
@@ -50,8 +54,9 @@ class LightweightServersFactory(object):
     def _pick_server(self):
         if not self._physical_installation_ctl:
             return None
-        for config, host in zip(self._physical_installation_ctl.config_list,
-                                     self._physical_installation_ctl.installations_access):
+        config_list = self._physical_installation_ctl.config_list
+        installations_access = self._physical_installation_ctl.installations_access
+        for config, host in zip(config_list, installations_access):
             if config.lightweight_servers_limit:
                 log.info('Lightweight host: %s %s', config, host)
                 return host
@@ -117,11 +122,13 @@ class LightweightServer(Mediaserver):
                 # calling api/moduleInformation to check for SF_P2pSyncDone flag
                 response = self.api.api.moduleInformation.GET(timeout=60)
             except ReadTimeout:
-                #log.error('ReadTimeout when waiting for lws api/moduleInformation; will make core dump')
-                #self.service.make_core_dump()
+                # log.error('ReadTimeout when waiting for lws api/moduleInformation; will make core dump')
+                # self.service.make_core_dump()
                 raise
             if response['serverFlags'] == 'SF_P2pSyncDone':
-                log.info('Lightweight servers merged between themselves in %s' % (utils.datetime_utc_now() - start_time))
+                log.info(
+                    'Lightweight servers merged between themselves in %s',
+                    (utils.datetime_utc_now() - start_time))
                 return
             growing_delay.sleep()
         assert False, 'Lightweight servers did not merge between themselves in %s' % timeout
@@ -156,7 +163,8 @@ class LightweightServersHost(object):
         self._lws_dir.upload(self._test_binary_path)
         self._write_lws_ctl(server_dir, server_count, lws_params)
         self.service.start()
-        # must be set before cycle following it so failure in that cycle won't prevent from artifacts collection from 'release' method
+        # must be set before loop following it
+        # so failure in that loop won't prevent artifacts collection from 'release' method
         self._allocated = True
         for idx in range(server_count):
             server_port = LWS_PORT_BASE + idx
@@ -206,7 +214,10 @@ class LightweightServersHost(object):
     def _save_lws_log(self):
         log_contents = self._installation.log_path_base.with_suffix('.log').read_text().strip()
         if log_contents:
-            artifact_factory = self._artifact_factory(['lws', self._host_name], name='lws', artifact_type=SERVER_LOG_ARTIFACT_TYPE)
+            artifact_factory = self._artifact_factory(
+                ['lws', self._host_name],
+                name='lws',
+                artifact_type=SERVER_LOG_ARTIFACT_TYPE)
             log_path = artifact_factory.produce_file_path().write_bytes(log_contents)
             log.debug('log file for lws at %s is stored to %s', self._host_name, log_path)
 
@@ -235,8 +246,10 @@ class LightweightServersHost(object):
             self._first_server.service.make_core_dump()
 
     def perform_post_checks(self):
-        log.info('----- performing post-test checks for lightweight servers at %s'
-                     '---------------------->8 ---------------------------', self._host_name)
+        log.info(
+            '----- performing post-test checks for lightweight servers at %s'
+            '---------------------->8 ---------------------------',
+            self._host_name)
         self._check_if_server_is_online()
         core_file_list = self._installation.list_core_files()
         assert not core_file_list, ('Lightweight server at %s left %d core dump(s): %s' %

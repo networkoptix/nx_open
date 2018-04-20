@@ -55,7 +55,9 @@ class RestApiError(Exception):
 
     def __init__(self, server_name, url, error, error_string):
         super(RestApiError, self).__init__(
-            self, 'Mediaserver %s at %s REST API request returned error: %s %s' % (server_name, url, error, error_string))
+            self,
+            'Mediaserver {} at {} REST API request returned error: {} {}'.format(
+                server_name, url, error, error_string))
         self.error = error
         self.error_string = error_string
 

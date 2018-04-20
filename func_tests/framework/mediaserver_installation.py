@@ -32,7 +32,7 @@ MEDIASERVER_LOG_PATH = 'var/log/log_file.log'
 MEDIASERVER_CLOUDHOST_LIB_PATH_LIST = ['lib/libnx_network.so', 'lib/libcommon.so']
 
 MEDIASERVER_CLOUDHOST_TAG = 'this_is_cloud_host_name'
-MEDIASERVER_CLOUDHOST_SIZE = 76  # MEDIASERVER_CLOUDHOST_TAG + ' ' + cloud_host + '\0' * required paddings count to 76
+MEDIASERVER_CLOUDHOST_SIZE = 76  # MEDIASERVER_CLOUDHOST_TAG + ' ' + cloud_host + '\0' * padded up to 76 chars
 
 
 class MediaserverInstallation(object):
@@ -48,7 +48,7 @@ class MediaserverInstallation(object):
         self._config_path_initial = self.dir / MEDIASERVER_CONFIG_PATH_INITIAL
         self._log_path = self.dir / MEDIASERVER_LOG_PATH
         self._key_cert_path = self.dir / 'var/ssl/cert.pem'
-        self._current_cloud_host = None  # cloud_host encoded in currently installed binary .so file, None means unknown yet
+        self._current_cloud_host = None  # cloud_host encoded in installed binary .so file, None means unknown yet
 
     def build_info(self):
         build_info_path = self.dir.joinpath('build_info.txt')
@@ -136,11 +136,14 @@ class MediaserverInstallation(object):
             return
         old_str_len = len(MEDIASERVER_CLOUDHOST_TAG + ' ' + old_host)
         old_padding = data[end_idx: end_idx + MEDIASERVER_CLOUDHOST_SIZE - old_str_len]
-        assert old_padding == '\0' * (MEDIASERVER_CLOUDHOST_SIZE - old_str_len), (
-                'Cloud host padding error: %d padding characters are expected, but got only %d' % (
-            MEDIASERVER_CLOUDHOST_SIZE - old_str_len, old_padding.rfind('\0') + 1))
-        log.info('Patching %s at %s with new cloud host %r (was: %r)...', path_to_patch, self.ssh_access, new_host,
-                 old_host)
+        if old_padding != '\0' * (MEDIASERVER_CLOUDHOST_SIZE - old_str_len):
+            raise RuntimeError(
+                "Cloud host padding error: {:d} padding characters are expected, but got only {:d}".format(
+                    MEDIASERVER_CLOUDHOST_SIZE - old_str_len,
+                    old_padding.rfind('\0') + 1))
+        log.info(
+            'Patching %s at %s with new cloud host %r (was: %r)...',
+            path_to_patch, self.ssh_access, new_host, old_host)
         new_str = MEDIASERVER_CLOUDHOST_TAG + ' ' + new_host
         assert len(new_str) < MEDIASERVER_CLOUDHOST_SIZE, 'Cloud host name is too long: %r' % new_host
         padded_str = new_str + '\0' * (MEDIASERVER_CLOUDHOST_SIZE - len(new_str))

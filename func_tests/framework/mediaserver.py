@@ -166,7 +166,7 @@ class Mediaserver(object):
 
 class Storage(object):
 
-    def __init__(self, os_access, dir, timezone=None):
+    def __init__(self, os_access, dir):
         self.os_access = os_access
         self.dir = dir
 
@@ -210,9 +210,14 @@ class Storage(object):
             path.unlink()
 
     # server stores media data in this format, using local time for directory parts:
-    # <data dir>/<{hi_quality,low_quality}>/<camera-mac>/<year>/<month>/<day>/<hour>/<start,unix timestamp ms>_<duration,ms>.mkv
+    # <data dir>/
+    #   <{hi_quality,low_quality}>/<camera-mac>/
+    #     <year>/<month>/<day>/<hour>/
+    #       <start,unix timestamp ms>_<duration,ms>.mkv
     # for example:
-    # server/var/data/data/low_quality/urn_uuid_b0e78864-c021-11d3-a482-f12907312681/2017/01/27/12/1485511093576_21332.mkv
+    # server/var/data/data/
+    #   low_quality/urn_uuid_b0e78864-c021-11d3-a482-f12907312681/
+    #     2017/01/27/12/1485511093576_21332.mkv
     def _construct_fpath(self, camera_mac_addr, quality_part, start_time, unixtime_utc_ms, duration):
         local_dt = start_time.astimezone(self.timezone)  # Local to VM.
         duration_ms = int(duration.total_seconds() * 1000)

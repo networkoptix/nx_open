@@ -99,7 +99,9 @@ def test_create_and_remove_user_with_resource(running_linux_mediaserver):
     user_resource = [generator.generate_resource_params_data(id=1, resource=user)]
     running_linux_mediaserver.api.ec2.setResourceParams.POST(json=user_resource)
     assert_server_has_resource(running_linux_mediaserver, 'getUsers', id=user['id'], permissions=expected_permissions)
-    assert_server_has_resource(running_linux_mediaserver, 'getResourceParams', resourceId=user['id'], name=user_resource[0]['name'])
+    assert_server_has_resource(
+        running_linux_mediaserver,
+        'getResourceParams', resourceId=user['id'], name=user_resource[0]['name'])
     running_linux_mediaserver.api.ec2.removeUser.POST(id=user['id'])
     assert_server_does_not_have_resource(running_linux_mediaserver, 'getUsers', user['id'])
     assert_server_does_not_have_resource(running_linux_mediaserver, 'getResourceParams', user['id'])
@@ -158,11 +160,13 @@ def test_remove_child_resources(running_linux_mediaserver):
 # https://networkoptix.atlassian.net/browse/VMS-3068
 def test_http_header_server(running_linux_mediaserver):
     url = running_linux_mediaserver.api.url('ec2/testConnection')
-    response = requests.get(url, auth=HTTPDigestAuth(running_linux_mediaserver.api.user, running_linux_mediaserver.api.password))
+    valid_auth = HTTPDigestAuth(running_linux_mediaserver.api.user, running_linux_mediaserver.api.password)
+    response = requests.get(url, auth=valid_auth)
     log.debug('%r headers: %s', running_linux_mediaserver, response.headers)
     assert response.status_code == 200
     assert 'Server' in response.headers.keys(), "HTTP header 'Server' is expected"
-    response = requests.get(url, auth=HTTPDigestAuth('invalid', 'invalid'))
+    invalid_auth = HTTPDigestAuth('invalid', 'invalid')
+    response = requests.get(url, auth=invalid_auth)
     log.debug('%r headers: %s', running_linux_mediaserver, response.headers)
     assert response.status_code == 401
     assert 'WWW-Authenticate' in response.headers.keys(), "HTTP header 'WWW-Authenticate' is expected"

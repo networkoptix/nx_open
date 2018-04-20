@@ -45,6 +45,7 @@ def db_version(request):
 def one(linux_mediaservers_pool, bin_dir, db_version):
     return server('one', linux_mediaservers_pool, bin_dir, db_version)
 
+
 @pytest.fixture
 def two(linux_mediaservers_pool, bin_dir, db_version):
     return server('two', linux_mediaservers_pool, bin_dir, db_version)
@@ -70,12 +71,14 @@ def server(name, linux_mediaservers_pool, bin_dir, db_version):
         check_camera(server, server_config.CAMERA_GUID)
     return server
 
+
 def copy_database_file(server, bin_dir, backup_db_filename):
     backup_db_path = bin_dir / backup_db_filename
     assert backup_db_path.exists(), (
         "Binary artifact required for this test (database file) '%s' does not exist." % backup_db_path)
     server_db_path = server.installation.dir / MEDIASERVER_DATABASE_PATH
     server.machine.os_access.Path(server_db_path).upload(backup_db_path)
+
 
 def check_camera(server, camera_guid):
     cameras = [c for c in server.api.ec2.getCameras.GET() if c['id'] == camera_guid]

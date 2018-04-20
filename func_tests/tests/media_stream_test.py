@@ -7,13 +7,15 @@ from framework.mediaserver import TimePeriod
 
 # https://networkoptix.atlassian.net/browse/TEST-181
 # https://networkoptix.atlassian.net/wiki/spaces/SD/pages/23920667/Media+stream+loading+test
-def test_media_stream_should_be_loaded_correctly(artifact_factory, running_linux_mediaserver, camera, sample_media_file, stream_type):
+def test_media_stream_should_be_loaded_correctly(
+        artifact_factory, running_linux_mediaserver, camera, sample_media_file, stream_type):
     # prepare media archive
     running_linux_mediaserver.add_camera(camera)
     start_time = datetime(2017, 1, 27, tzinfo=pytz.utc)
     running_linux_mediaserver.storage.save_media_sample(camera, start_time, sample_media_file)
     running_linux_mediaserver.rebuild_archive()
-    assert [TimePeriod(start_time, sample_media_file.duration)] == running_linux_mediaserver.get_recorded_time_periods(camera)
+    recorded_time_periods = running_linux_mediaserver.get_recorded_time_periods(camera)
+    assert [TimePeriod(start_time, sample_media_file.duration)] == recorded_time_periods
 
     # load stream
     stream = running_linux_mediaserver.get_media_stream(stream_type, camera)
