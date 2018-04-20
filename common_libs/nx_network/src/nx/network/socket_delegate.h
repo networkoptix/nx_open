@@ -12,6 +12,7 @@ namespace network {
  * and delegate rest of API calls to existing implementation.
  */
 template<typename SocketInterfaceToImplement>
+// requires std::is_base_of<AbstractSocket, SocketInterfaceToImplement>::value
 class SocketDelegate:
     public SocketInterfaceToImplement
 {

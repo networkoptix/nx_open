@@ -2,6 +2,8 @@
 
 #include <nx/network/abstract_socket.h>
 
+#include "../aio/basic_pollable.h"
+
 namespace nx {
 namespace network {
 
@@ -11,6 +13,8 @@ namespace network {
 class NX_NETWORK_API DummySocket:
     public AbstractStreamSocket
 {
+    using base_type = AbstractStreamSocket;
+
 public:
     DummySocket();
 
@@ -77,6 +81,7 @@ protected:
 private:
     SocketAddress m_localAddress;
     SocketAddress m_remotePeerAddress;
+    aio::BasicPollable m_basicPollable;
 };
 
 } // namespace network

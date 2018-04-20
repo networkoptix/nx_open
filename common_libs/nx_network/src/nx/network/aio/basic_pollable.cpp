@@ -112,13 +112,18 @@ void BasicPollable::cancelPostedCallsSync()
         [this]() { m_aioService->cancelPostedCalls(&m_pollable, true); });
 }
 
-void BasicPollable::stopWhileInAioThread()
-{
-}
-
 Pollable& BasicPollable::pollable()
 {
     return m_pollable;
+}
+
+const Pollable& BasicPollable::pollable() const
+{
+    return m_pollable;
+}
+
+void BasicPollable::stopWhileInAioThread()
+{
 }
 
 } // namespace aio
