@@ -297,7 +297,14 @@ void MotionRegionsItem::Private::ensureRegionsTexture()
 
     updateRegionsImage();
 
-    m_currentState.texture.reset(window->createTextureFromImage(m_regionsImage));
+    const auto textureDeleter =
+        [](QSGTexture* texture)
+        {
+            if (texture)
+                texture->deleteLater();
+        };
+
+    m_currentState.texture.reset(window->createTextureFromImage(m_regionsImage), textureDeleter);
     m_currentState.texture->setHorizontalWrapMode(QSGTexture::ClampToEdge);
     m_currentState.texture->setVerticalWrapMode(QSGTexture::ClampToEdge);
     m_currentState.texture->setFiltering(QSGTexture::Nearest);

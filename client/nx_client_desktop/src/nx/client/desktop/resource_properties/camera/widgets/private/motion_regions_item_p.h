@@ -94,7 +94,7 @@ private:
     State m_currentState;
 
     QVector<LabelData> m_labels;
-    QScopedPointer<QSGTexture> m_labelsTexture;
+    QScopedPointer<QSGTexture, QScopedPointerDeleteLater> m_labelsTexture;
     QSizeF m_cellSize;
     QSize m_labelSize;
     QColor m_labelsColor = Qt::black;
