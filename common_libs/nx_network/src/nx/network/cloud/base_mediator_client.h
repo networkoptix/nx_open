@@ -72,7 +72,7 @@ protected:
                 NX_LOGX(lm("Error performing %1 request to connection_mediator. %2").
                     arg(stun::extension::methods::toString(method)).
                     arg(SystemError::toString(code)),
-                    cl_logDEBUG2);
+                    cl_logDEBUG1);
                 return completionHandler(
                     std::move(message.transportHeader),
                     ResultCode::networkError,
@@ -80,7 +80,7 @@ protected:
             }
 
             api::ResultCode resultCode = api::ResultCode::ok;
-            const auto* resultCodeHeader = 
+            const auto* resultCodeHeader =
                 message.getAttribute<nx::stun::extension::attrs::ResultCode>();
             if (resultCodeHeader)
                 resultCode = resultCodeHeader->value();
@@ -100,7 +100,7 @@ protected:
             {
                 NX_LOGX(lm("Failed to parse %1 response: %2").
                     arg(nx::stun::extension::methods::toString(method)).
-                    arg(responseData.errorText()), cl_logDEBUG2);
+                    arg(responseData.errorText()), cl_logDEBUG1);
                 return completionHandler(
                     std::move(message.transportHeader),
                     ResultCode::responseParseError,
@@ -150,12 +150,12 @@ protected:
             {
                 NX_LOGX(lm("Error performing %1 request to connection_mediator. %2").
                     arg(stun::extension::methods::toString(method)).
-                    arg(SystemError::toString(code)), cl_logDEBUG2);
+                    arg(SystemError::toString(code)), cl_logDEBUG1);
                 return completionHandler(std::move(message.transportHeader), ResultCode::networkError);
             }
 
             api::ResultCode resultCode = api::ResultCode::ok;
-            const auto* resultCodeHeader = 
+            const auto* resultCodeHeader =
                 message.getAttribute<nx::stun::extension::attrs::ResultCode>();
             if (resultCodeHeader)
                 resultCode = resultCodeHeader->value();
