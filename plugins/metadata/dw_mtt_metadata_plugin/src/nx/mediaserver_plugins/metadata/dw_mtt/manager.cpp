@@ -41,7 +41,6 @@ nx::sdk::metadata::CommonEvent* createCommonEvent(
     auto commonEvent = new nx::sdk::metadata::CommonEvent();
     commonEvent->setEventTypeId(
         nx::mediaserver_plugins::utils::fromQnUuidToPluginGuid(event.eventTypeId));
-    commonEvent->setCaption(event.eventName.value.toStdString());
     commonEvent->setDescription(event.eventName.value.toStdString());
     commonEvent->setIsActive(active);
     commonEvent->setConfidence(1.0);

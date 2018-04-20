@@ -110,7 +110,6 @@ boost::optional<HikvisionEvent> AttributesParser::parseEventXml(
         }
     }
 
-    result.caption = buildCaption(manifest, result);
     result.description = buildDescription(manifest, result);
 
     if (reader.error() != QXmlStreamReader::NoError)
