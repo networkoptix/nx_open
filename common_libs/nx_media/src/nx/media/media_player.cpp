@@ -830,8 +830,7 @@ void PlayerPrivate::processMetadata(const QnAbstractCompressedMetadataPtr& metad
     NX_ASSERT(metadata);
 
     QnMutexLocker lock(&m_metadataConsumersMutex);
-    auto consumers = m_metadataConsumerByType.value(metadata->metadataType);
-    consumers.detach();
+    const auto consumers = m_metadataConsumerByType.value(metadata->metadataType);
     lock.unlock();
 
     for (const auto& value: consumers)
