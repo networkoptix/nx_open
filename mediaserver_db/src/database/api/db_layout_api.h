@@ -16,7 +16,10 @@ namespace api {
  * @param out layouts Returns list of layouts.
  * @returns True if operation was successful, false otherwise.
  */
-bool fetchLayouts(const QSqlDatabase& database, const QnUuid& id, ApiLayoutDataList& layouts);
+bool fetchLayouts(
+    const QSqlDatabase& database,
+    const QnUuid& id,
+    nx::vms::api::LayoutDataList& layouts);
 
 /**
 * Add or update layout.
@@ -26,7 +29,7 @@ bool fetchLayouts(const QSqlDatabase& database, const QnUuid& id, ApiLayoutDataL
 */
 bool saveLayout(
     ec2::database::api::QueryContext* resourceContext,
-    const ApiLayoutData& layout);
+    const nx::vms::api::LayoutData& layout);
 
 /**
 * Remove layout.

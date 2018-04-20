@@ -1,8 +1,8 @@
 import logging
 import shutil
+from subprocess import PIPE, Popen, call, check_call, check_output
 
 import pytest
-from subprocess import check_call, check_output, call, Popen, PIPE
 
 from framework.ca import CA
 

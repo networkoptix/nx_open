@@ -4,7 +4,7 @@
 
 #include <nx/utils/test_support/module_instance_launcher.h>
 #include <test_support/appserver2_process.h>
-#include <nx_ec/data/api_camera_data.h>
+#include <nx/vms/api/data/camera_data.h>
 #include <core/resource_access/user_access_data.h>
 #include <nx_ec/ec_api.h>
 #include <transaction/message_bus_adapter.h>
@@ -55,7 +55,7 @@ static void createData(const Appserver2Ptr& server)
 
     for (int i = 0; i < kCameraCount; ++i)
     {
-        ec2::ApiCameraData cameraData;
+        nx::vms::api::CameraData cameraData;
         auto resTypePtr = qnResTypePool->getResourceTypeByName("Camera");
         ASSERT_TRUE(!resTypePtr.isNull());
         cameraData.typeId = resTypePtr->getId();
@@ -63,7 +63,7 @@ static void createData(const Appserver2Ptr& server)
         cameraData.vendor = "Invalid camera";
         cameraData.physicalId = QnUuid::createUuid().toString();
         cameraData.name = server->moduleInstance()->endpoint().toString();
-        cameraData.id = ec2::ApiCameraData::physicalIdToId(cameraData.physicalId);
+        cameraData.id = nx::vms::api::CameraData::physicalIdToId(cameraData.physicalId);
 
         auto content = QJson::serialized(cameraData);
 

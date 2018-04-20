@@ -108,7 +108,7 @@ public:
 
     WriteBufferMultiplierManager& getBufferManager() { return m_writeBufferManager; }
 signals:
-    void recordingDisabled(const QnResourcePtr &resource, qint64 timeStamp, nx::vms::event::EventReason reasonCode, const QString& reasonText);
+    void recordingDisabled(const QnResourcePtr &resource, qint64 timeStamp, nx::vms::api::EventReason reasonCode, const QString& reasonText);
 private slots:
     void onNewResource(const QnResourcePtr &resource);
     void onRemoveResource(const QnResourcePtr &resource);

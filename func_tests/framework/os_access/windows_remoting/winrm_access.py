@@ -1,11 +1,11 @@
 from __future__ import print_function
 
 import logging
-from subprocess import list2cmdline
 
 import winrm
 from requests import ReadTimeout
 
+from framework.os_access.args import cmd_command_to_script
 from framework.os_access.windows_remoting.cmd import Shell, run_command
 from framework.os_access.windows_remoting.cmd.powershell import run_powershell_script
 
@@ -27,7 +27,7 @@ class WinRMAccess(object):
         self.shell.__exit__(None, None, None)
 
     def run_cmd_command(self, args, input=b''):
-        _logger.debug("Command: %s", list2cmdline(args))
+        _logger.debug("Command: %s", cmd_command_to_script(args))
         exit_code, stdout_bytes, stderr_bytes = run_command(self.shell, args, stdin_bytes=input)
         _logger.debug(
             "Outcome:\nexit code: %d\nstdout:\n%s\nstderr:\n%s",

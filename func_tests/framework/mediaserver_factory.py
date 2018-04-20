@@ -1,10 +1,9 @@
 import logging
-
 from contextlib import contextmanager
 
 from framework.core_file_traceback import create_core_file_traceback
-from framework.rest_api import RestApi
 from framework.mediaserver_installation import install_mediaserver
+from framework.rest_api import RestApi
 from framework.service import UpstartService
 from .artifact import ArtifactType
 from .mediaserver import Mediaserver
@@ -68,17 +67,17 @@ def examine_mediaserver(mediaserver, stopped_ok=False):
             examination_logger.info("%r is online.", mediaserver)
         else:
             mediaserver.service.make_core_dump()
-            raise MediaserverUnresponsive('{!r} is not online; core dump made.'.format(mediaserver))
+            raise MediaserverUnresponsive('{} is not online; core dump made.'.format(mediaserver))
     else:
         if stopped_ok:
             examination_logger.info("%r is stopped; it's OK.", mediaserver)
         else:
-            raise MediaserverStopped("{!r} is stopped.".format(mediaserver))
+            raise MediaserverStopped("{} is stopped.".format(mediaserver))
 
 
 def collect_logs_from_mediaserver(mediaserver, root_artifact_factory):
     log_contents = mediaserver.installation.read_log()
-    if log_contents:
+    if log_contents is not None:
         mediaserver_logs_artifact_factory = root_artifact_factory(
             ['server', mediaserver.name], name='server-%s' % mediaserver.name, artifact_type=SERVER_LOG_ARTIFACT_TYPE)
         log_path = mediaserver_logs_artifact_factory.produce_file_path().write_bytes(log_contents)
@@ -93,7 +92,7 @@ def collect_core_dumps_from_mediaserver(mediaserver, root_artifact_factory):
             is_error=True,
             artifact_type=CORE_FILE_ARTIFACT_TYPE)
         local_core_dump_path = code_dumps_artifact_factory.produce_file_path()
-        mediaserver.machine.os_access.get_file(core_dump, local_core_dump_path)
+        core_dump.download(local_core_dump_path)
         traceback = create_core_file_traceback(
             mediaserver.machine.os_access,
             mediaserver.installation.binary,
@@ -106,7 +105,9 @@ def collect_core_dumps_from_mediaserver(mediaserver, root_artifact_factory):
             artifact_type=TRACEBACK_ARTIFACT_TYPE)
         local_traceback_path = code_dumps_artifact_factory.produce_file_path()
         local_traceback_path.write_bytes(traceback)
-        log.warning('Core dump on %r: %s, %s.', mediaserver.name, mediaserver, local_core_dump_path, local_traceback_path)
+        log.warning(
+            'Core dump on %r: %s, %s.',
+            mediaserver.name, mediaserver, local_core_dump_path, local_traceback_path)
 
 
 def collect_artifacts_from_mediaserver(mediaserver, root_artifact_factory):

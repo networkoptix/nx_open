@@ -121,9 +121,12 @@ def enumerate_cim_instances(protocol, class_name, selectors, max_elements=32000)
 
 
 def get_cim_instance(protocol, class_name, selectors):
-    action = 'http://schemas.xmlsoap.org/ws/2004/09/transfer/Get'
+    action_url = 'http://schemas.xmlsoap.org/ws/2004/09/transfer/Get'
     resource_uri = _CimAction.cim_directory + class_name
-    return _CimAction(resource_uri, action, selectors, {}).perform(protocol)[class_name]
+    action = _CimAction(resource_uri, action_url, selectors, {})
+    outcome = action.perform(protocol)
+    instance = outcome[class_name]
+    return instance
 
 
 def invoke_cim_instance_method(protocol, class_name, selectors, method_name, params):

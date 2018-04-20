@@ -39,7 +39,7 @@ void QnDistributedMutexManager::releaseMutex(const QString& name)
     m_mutexList.remove(name);
 }
 
-void QnDistributedMutexManager::at_gotLockRequest(ApiLockData lockData)
+void QnDistributedMutexManager::at_gotLockRequest(nx::vms::api::LockData lockData)
 {
     QnMutexLocker lock( &m_mutex );
 
@@ -49,7 +49,7 @@ void QnDistributedMutexManager::at_gotLockRequest(ApiLockData lockData)
     if (netMutex)
         netMutex->at_gotLockRequest(lockData);
     else {
-        QnTransaction<ApiLockData> tran(
+        QnTransaction<nx::vms::api::LockData> tran(
             ApiCommand::lockResponse,
             m_messageBus->commonModule()->moduleGUID());
         tran.params.name = lockData.name;
@@ -62,7 +62,7 @@ void QnDistributedMutexManager::at_gotLockRequest(ApiLockData lockData)
 }
 
 
-void QnDistributedMutexManager::at_gotLockResponse(ApiLockData lockData)
+void QnDistributedMutexManager::at_gotLockResponse(nx::vms::api::LockData lockData)
 {
     QnMutexLocker lock( &m_mutex );
 

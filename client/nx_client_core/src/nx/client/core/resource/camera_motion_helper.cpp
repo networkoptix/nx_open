@@ -56,6 +56,17 @@ void CameraMotionHelper::addRect(int channel, int sensitivity, const QRect& rect
     emit motionRegionListChanged(channel);
 }
 
+void CameraMotionHelper::fillRegion(int channel, int sensitivity, const QPoint& at)
+{
+    NX_ASSERT(sensitivity >= 0 && sensitivity < QnMotionRegion::kSensitivityLevelCount);
+
+    if (channel >= m_motionRegionList.size())
+        return; //< TODO: #vkutin Error or not?
+
+    if (m_motionRegionList[channel].updateSensitivityAt(at, sensitivity))
+        emit motionRegionListChanged(channel);
+}
+
 void CameraMotionHelper::registerQmlType()
 {
     qmlRegisterType<CameraMotionHelper>("nx.client.core", 1, 0, "CameraMotionHelper");

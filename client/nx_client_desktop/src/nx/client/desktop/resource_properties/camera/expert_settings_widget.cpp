@@ -188,7 +188,7 @@ void CameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraResour
     {
         if (isArecontCamera(camera))
             arecontCamerasCount++;
-        if (!camera->supportedMotionType().testFlag(Qn::MT_SoftwareGrid))
+        if (!camera->supportedMotionType().testFlag(Qn::MotionType::MT_SoftwareGrid))
             allCamerasSupportForceMotion = false;
 
         m_hasDualStreaming |= camera->hasDualStreamingInternal();

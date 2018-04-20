@@ -1,8 +1,8 @@
-#ifndef __RES_TYPE_XML_PARSER_H
-#define __RES_TYPE_XML_PARSER_H
+#pragma once
 
 #include <QtXml/QXmlDefaultHandler>
-#include "nx_ec/data/api_fwd.h"
+
+#include <nx/vms/api/data_fwd.h>
 
 namespace ec2
 {
@@ -10,23 +10,21 @@ namespace ec2
 class ResTypeXmlParser: public QXmlDefaultHandler
 {
 public:
-    ResTypeXmlParser(ApiResourceTypeDataList& data);
+    ResTypeXmlParser(nx::vms::api::ResourceTypeDataList& data);
 
     virtual bool startElement( const QString& namespaceURI, const QString& localName, const QString& qName, const QXmlAttributes& attrs ) override;
     virtual bool endElement( const QString& namespaceURI, const QString& localName, const QString& qName ) override;
 private:
-    const ApiResourceTypeData* findResTypeByName(const QString& name);
-    ApiResourceTypeData* getRootResourceType(const QString& type) const;
-    bool addParentType(ApiResourceTypeData& data, const QString& parentName);
+    const nx::vms::api::ResourceTypeData* findResTypeByName(const QString& name);
+    nx::vms::api::ResourceTypeData* getRootResourceType(const QString& type) const;
+    bool addParentType(nx::vms::api::ResourceTypeData& data, const QString& parentName);
     bool processResource(const QString& localName, const QXmlAttributes& attrs);
     bool processParam(const QString& localName, const QXmlAttributes& attrs);
 private:
-    ApiResourceTypeDataList& m_data;
-    ApiResourceTypeData* m_rootResType;
+    nx::vms::api::ResourceTypeDataList& m_data;
+    nx::vms::api::ResourceTypeData* m_rootResType;
     QString m_vendor;
     bool m_resTypeFound;
 };
 
-}
-
-#endif // __RES_TYPE_XML_PARSER_H
+} // namespace ec2

@@ -1,21 +1,16 @@
 import pytest
-from pathlib2 import Path
 
-from framework.os_access.local import LocalAccess
 from framework.registry import Registry, RegistryError
 
-
-@pytest.fixture()
-def os_access():
-    return LocalAccess()
+pytest_plugins = ['fixtures.ad_hoc_ssh']
 
 
 @pytest.fixture()
-def registry(os_access):
-    path = Path('/tmp/func_tests/test_registry.yaml')
+def registry(ad_hoc_ssh_access):
+    path = ad_hoc_ssh_access.Path('/tmp/func_tests/test_registry.yaml')
     path.parent.mkdir(exist_ok=True)
-    os_access.run_command(['rm', '-f', path])
-    return Registry(os_access, path, 'test-name-{index}', 3)
+    ad_hoc_ssh_access.run_command(['rm', '-f', path])
+    return Registry(ad_hoc_ssh_access, path, 'test-name-{index}', 3)
 
 
 def test_reserve_two(registry):
@@ -25,9 +20,7 @@ def test_reserve_two(registry):
 
 
 def test_reserve_many(registry):
-    with registry.taken('a'):
-        with registry.taken('b'):
-            with registry.taken('c'):
-                with pytest.raises(RegistryError):
-                    with registry.taken('d'):
-                        pass
+    with registry.taken('a'), registry.taken('b'), registry.taken('c'):
+        with pytest.raises(RegistryError):
+            with registry.taken('d'):
+                pass

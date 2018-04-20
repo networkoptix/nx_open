@@ -55,7 +55,9 @@ class RestApiError(Exception):
 
     def __init__(self, server_name, url, error, error_string):
         super(RestApiError, self).__init__(
-            self, 'Mediaserver %s at %s REST API request returned error: %s %s' % (server_name, url, error, error_string))
+            self,
+            'Mediaserver {} at {} REST API request returned error: {} {}'.format(
+                server_name, url, error, error_string))
         self.error = error
         self.error_string = error_string
 
@@ -152,7 +154,6 @@ class RestApi(object):
         ha2 = hashlib.md5(':'.join([method, path]).encode()).hexdigest()  # Empty path.
         digest = hashlib.md5(':'.join([ha1, nonce, ha2]).encode()).hexdigest()
         key = base64.b64encode(':'.join([self.user.lower(), nonce, digest]))
-        assert requests.get(self.url('api/getCurrentUser'), params={'auth': key}).status_code == 200
         return key
 
     def get_api_fn(self, method, api_object, api_method):

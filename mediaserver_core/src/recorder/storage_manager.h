@@ -193,9 +193,9 @@ public:
     QnScheduleSync* scheduleSync() const;
 signals:
     void noStoragesAvailable();
-    void storageFailure(const QnResourcePtr &storageRes, nx::vms::event::EventReason reason);
+    void storageFailure(const QnResourcePtr &storageRes, nx::vms::api::EventReason reason);
     void rebuildFinished(QnSystemHealth::MessageType msgType);
-    void backupFinished(qint64 backedUpToMs, nx::vms::event::EventReason);
+    void backupFinished(qint64 backedUpToMs, nx::vms::api::EventReason);
 public slots:
     void at_archiveRangeChanged(const QnStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs);
     void onNewResource(const QnResourcePtr &resource);

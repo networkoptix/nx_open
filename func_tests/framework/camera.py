@@ -53,7 +53,7 @@ def make_camera_info(parent_id, name, mac_addr):
         manuallyAdded=False,
         maxArchiveDays=0,
         minArchiveDays=0,
-        #model=name,
+        # model=name,
         model='TestCameraLive',
         motionMask='',
         motionType='MT_Default',
@@ -66,11 +66,12 @@ def make_camera_info(parent_id, name, mac_addr):
         secondaryStreamQuality='SSQualityLow',
         status='Unauthorized',
         statusFlags='CSF_NoFlags',
-        #typeId='{7d2af20d-04f2-149f-ef37-ad585281e3b7}',
+        # typeId='{7d2af20d-04f2-149f-ef37-ad585281e3b7}',
         typeId='{f9c03047-72f1-4c04-a929-8538343b6642}',
         url='127.0.0.100',
         vendor='python-funtest',
         )
+
 
 def make_schedule_task(day_of_week):
     return dict(
@@ -105,7 +106,7 @@ class Camera(object):
         return make_camera_info(parent_id, self.name, self.mac_addr)
 
     def wait_until_discovered_by_server(self, server_list, timeout=CAMERA_DISCOVERY_WAIT_TIMEOUT):
-        #assert is_list_inst(server_list, Mediaserver), repr(server_list)
+        # assert is_list_inst(server_list, Mediaserver), repr(server_list)
         log.info('Waiting for camera %s to be discovered by servers %s', self, ', '.join(map(str, server_list)))
         start_time = datetime_utc_now()
         while datetime_utc_now() - start_time < timeout:
@@ -285,7 +286,7 @@ class MediaStreamer(object):
                     data = f.read(1024)
                     if not data:
                         break
-                    #log.debug('%s: sending data, %d bytes', self, len(data))
+                    # log.debug('%s: sending data, %d bytes', self, len(data))
                     sock.sendall(data)
                     if self._stop_flag:
                         break

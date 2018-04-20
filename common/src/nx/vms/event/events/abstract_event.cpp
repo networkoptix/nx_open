@@ -16,9 +16,9 @@ bool hasChild(EventType eventType)
 {
     switch (eventType)
     {
-        case anyCameraEvent:
-        case anyServerEvent:
-        case anyEvent:
+        case EventType::anyCameraEvent:
+        case EventType::anyServerEvent:
+        case EventType::anyEvent:
             return true;
         default:
             return false;
@@ -29,24 +29,24 @@ EventType parentEvent(EventType eventType)
 {
     switch (eventType)
     {
-        case cameraDisconnectEvent:
-        case networkIssueEvent:
-        case cameraIpConflictEvent:
-            return anyCameraEvent;
+        case EventType::cameraDisconnectEvent:
+        case EventType::networkIssueEvent:
+        case EventType::cameraIpConflictEvent:
+            return EventType::anyCameraEvent;
 
-        case storageFailureEvent:
-        case serverFailureEvent:
-        case serverConflictEvent:
-        case serverStartEvent:
-        case licenseIssueEvent:
-        case backupFinishedEvent:
-            return anyServerEvent;
+        case EventType::storageFailureEvent:
+        case EventType::serverFailureEvent:
+        case EventType::serverConflictEvent:
+        case EventType::serverStartEvent:
+        case EventType::licenseIssueEvent:
+        case EventType::backupFinishedEvent:
+            return EventType::anyServerEvent;
 
-        case anyEvent:
-            return undefinedEvent;
+        case EventType::anyEvent:
+            return EventType::undefinedEvent;
 
         default:
-            return anyEvent;
+            return EventType::anyEvent;
     }
 }
 
@@ -55,34 +55,34 @@ QList<EventType> childEvents(EventType eventType)
     switch (eventType)
     {
         // Some critical issue occurred on the camera.
-        case anyCameraEvent:
+        case EventType::anyCameraEvent:
             return {
-                cameraDisconnectEvent,
-                networkIssueEvent,
-                cameraIpConflictEvent,
+                EventType::cameraDisconnectEvent,
+                EventType::networkIssueEvent,
+                EventType::cameraIpConflictEvent,
             };
 
         // Some critical issue occurred on the server.
-        case anyServerEvent:
+        case EventType::anyServerEvent:
             return {
-                storageFailureEvent,
-                serverFailureEvent,
-                serverConflictEvent,
-                serverStartEvent,
-                licenseIssueEvent,
-                backupFinishedEvent
+                EventType::storageFailureEvent,
+                EventType::serverFailureEvent,
+                EventType::serverConflictEvent,
+                EventType::serverStartEvent,
+                EventType::licenseIssueEvent,
+                EventType::backupFinishedEvent
             };
 
         // All events except already mentioned.
-        case anyEvent:
+        case EventType::anyEvent:
             return {
-                cameraMotionEvent,
-                cameraInputEvent,
-                softwareTriggerEvent,
-                anyCameraEvent,
-                anyServerEvent,
-                analyticsSdkEvent,
-                userDefinedEvent
+                EventType::cameraMotionEvent,
+                EventType::cameraInputEvent,
+                EventType::softwareTriggerEvent,
+                EventType::anyCameraEvent,
+                EventType::anyServerEvent,
+                EventType::analyticsSdkEvent,
+                EventType::userDefinedEvent
             };
 
         default:
@@ -93,20 +93,20 @@ QList<EventType> childEvents(EventType eventType)
 QList<EventType> allEvents()
 {
     static const QList<EventType> result {
-        cameraMotionEvent,
-        cameraInputEvent,
-        cameraDisconnectEvent,
-        storageFailureEvent,
-        networkIssueEvent,
-        cameraIpConflictEvent,
-        serverFailureEvent,
-        serverConflictEvent,
-        serverStartEvent,
-        licenseIssueEvent,
-        backupFinishedEvent,
-        softwareTriggerEvent,
-        analyticsSdkEvent,
-        userDefinedEvent
+        EventType::cameraMotionEvent,
+        EventType::cameraInputEvent,
+        EventType::cameraDisconnectEvent,
+        EventType::storageFailureEvent,
+        EventType::networkIssueEvent,
+        EventType::cameraIpConflictEvent,
+        EventType::serverFailureEvent,
+        EventType::serverConflictEvent,
+        EventType::serverStartEvent,
+        EventType::licenseIssueEvent,
+        EventType::backupFinishedEvent,
+        EventType::softwareTriggerEvent,
+        EventType::analyticsSdkEvent,
+        EventType::userDefinedEvent
     };
 
     return result;
@@ -125,13 +125,13 @@ bool hasToggleState(
 {
     switch (eventType)
     {
-    case anyEvent:
-    case cameraMotionEvent:
-    case cameraInputEvent:
-    case userDefinedEvent:
-    case softwareTriggerEvent:
+    case EventType::anyEvent:
+    case EventType::cameraMotionEvent:
+    case EventType::cameraInputEvent:
+    case EventType::userDefinedEvent:
+    case EventType::softwareTriggerEvent:
         return true;
-    case analyticsSdkEvent:
+    case EventType::analyticsSdkEvent:
     {
         if (runtimeParams.analyticsEventId().isNull())
             return true;
@@ -152,8 +152,8 @@ QList<EventState> allowedEventStates(
     QList<EventState> result;
     const bool hasTooggleStateResult = hasToggleState(eventType, runtimeParams, commonModule);
     if (!hasTooggleStateResult
-        || eventType == userDefinedEvent
-        || eventType == softwareTriggerEvent)
+        || eventType == EventType::userDefinedEvent
+        || eventType == EventType::softwareTriggerEvent)
         result << EventState::undefined;
 
     if (hasTooggleStateResult)
@@ -166,11 +166,11 @@ bool requiresCameraResource(EventType eventType)
 {
     switch (eventType)
     {
-        case cameraMotionEvent:
-        case cameraInputEvent:
-        case cameraDisconnectEvent: //< Think about moving out disconnect event.
-        case softwareTriggerEvent:
-        case analyticsSdkEvent:
+        case EventType::cameraMotionEvent:
+        case EventType::cameraInputEvent:
+        case EventType::cameraDisconnectEvent: //< Think about moving out disconnect event.
+        case EventType::softwareTriggerEvent:
+        case EventType::analyticsSdkEvent:
             return true;
 
         default:
@@ -190,7 +190,7 @@ bool isSourceCameraRequired(EventType eventType)
 {
     switch (eventType)
     {
-        case networkIssueEvent:
+        case EventType::networkIssueEvent:
             return true;
 
         default:
@@ -203,11 +203,11 @@ bool isSourceServerRequired(EventType eventType)
 {
     switch (eventType)
     {
-        case storageFailureEvent:
-        case backupFinishedEvent:
-        case serverFailureEvent:
-        case serverConflictEvent:
-        case serverStartEvent:
+        case EventType::storageFailureEvent:
+        case EventType::backupFinishedEvent:
+        case EventType::serverFailureEvent:
+        case EventType::serverConflictEvent:
+        case EventType::serverStartEvent:
             return true;
 
         default:

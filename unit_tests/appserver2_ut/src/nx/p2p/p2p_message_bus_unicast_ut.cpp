@@ -3,7 +3,7 @@
 #include <QtCore/QElapsedTimer>
 
 #include <chrono>
-#include <nx_ec/data/api_camera_data.h>
+#include <nx/vms/api/data/camera_data.h>
 #include <core/resource_access/user_access_data.h>
 
 #include <nx/p2p/p2p_message_bus.h>
@@ -85,7 +85,7 @@ protected:
 
         const auto connection = m_servers[0]->moduleInstance()->ecConnection();
         MessageBus* bus = connection->messageBus()->dynamicCast<MessageBus*>();
-        QnTransaction<ApiBusinessActionData> transaction(
+        QnTransaction<nx::vms::api::EventActionData> transaction(
             m_servers[0]->moduleInstance()->commonModule()->moduleGUID());
         transaction.command = ec2::ApiCommand::broadcastAction;
         QnPeerSet dstPeers;

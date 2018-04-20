@@ -8,7 +8,7 @@ fi
 
 shift
 
-#export VAGRANT_LOG=debug
+# export VAGRANT_LOG=debug
 export PYTHONPATH=$HOME/Development/devtools/ci/junk_shop
 export PYTEST_PLUGINS=junk_shop.pytest_plugin
 
@@ -30,5 +30,5 @@ pytest -vv \
     --instafail \
     "$@"
 
-#cd ~/Development/nx_vms/func_tests && ~/venv/bin/py.test -vs --nocapturelog --work-dir=$HOME/run/funtest --bin-dir=$HOME/run/funtest-wd $@
-#cd ~/run/funtest-wd/ && ~/venv/bin/py.test -vs ~/Development/nx_vms/func_tests/ --work-dir=$HOME/run/funtest
+# cd ~/Development/nx_vms/func_tests && ~/venv/bin/py.test -vs --nocapturelog --work-dir=$HOME/run/funtest --bin-dir=$HOME/run/funtest-wd $@
+# cd ~/run/funtest-wd/ && ~/venv/bin/py.test -vs ~/Development/nx_vms/func_tests/ --work-dir=$HOME/run/funtest

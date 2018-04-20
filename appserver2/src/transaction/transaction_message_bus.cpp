@@ -15,10 +15,10 @@
 #include "nx/vms/discovery/manager.h"
 #include "settings.h"
 
-#include "nx_ec/data/api_camera_data_ex.h"
-#include "nx_ec/data/api_camera_data.h"
+#include <nx/vms/api/data/camera_data.h>
+#include <nx/vms/api/data/camera_data_ex.h>
 #include "nx_ec/data/api_resource_data.h"
-#include "nx_ec/data/api_resource_type_data.h"
+#include <nx/vms/api/data/resource_type_data.h>
 #include "nx_ec/data/api_reverse_connection_data.h"
 #include "nx_ec/data/api_peer_alive_data.h"
 #include "nx_ec/data/api_discovery_data.h"
@@ -411,7 +411,7 @@ void QnTransactionMessageBus::handleIncomingTransaction(
 
 // ------------------ QnTransactionMessageBus::CustomHandler -------------------
 
-void QnTransactionMessageBus::onGotDistributedMutexTransaction(const QnTransaction<ApiLockData>& tran)
+void QnTransactionMessageBus::onGotDistributedMutexTransaction(const QnTransaction<nx::vms::api::LockData>& tran)
 {
     if (tran.command == ApiCommand::lockRequest)
         emit gotLockRequest(tran.params);
@@ -466,7 +466,7 @@ void QnTransactionMessageBus::updateLastActivity(QnTransactionTransport* sender,
 }
 
 ErrorCode QnTransactionMessageBus::updatePersistentMarker(
-    const QnTransaction<ApiUpdateSequenceData>& tran)
+    const QnTransaction<nx::vms::api::UpdateSequenceData>& tran)
 {
     return ErrorCode::notImplemented;
 }

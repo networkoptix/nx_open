@@ -43,7 +43,7 @@ TEST(ExecActionAccessRightsTest, main) //< Crash on QnDbManager nullptr
 
     auto executeTransaction = [&launcher](const Qn::UserAccessData& userAccess)
     {
-        ec2::QnTransaction<ec2::ApiBusinessActionData> actionTran(
+        ec2::QnTransaction<nx::vms::api::EventActionData> actionTran(
             ec2::ApiCommand::execAction,
             launcher.commonModule()->moduleGUID());
         nx::utils::promise<ec2::ErrorCode> resultPromise;

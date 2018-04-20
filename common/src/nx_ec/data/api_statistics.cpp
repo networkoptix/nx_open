@@ -33,22 +33,24 @@ namespace ec2 {
 
     ApiCameraDataStatistics::ApiCameraDataStatistics() {}
 
-    ApiCameraDataStatistics::ApiCameraDataStatistics(ApiCameraDataEx&& data)
-        : ApiCameraDataEx(std::move(data))
+    ApiCameraDataStatistics::ApiCameraDataStatistics(nx::vms::api::CameraDataEx&& data)
+        : nx::vms::api::CameraDataEx(std::move(data))
     {
         // find out if default password worked
         const auto& defCred = Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME;
         const auto it = std::find_if(addParams.begin(), addParams.end(),
-            [&defCred](const ApiResourceParamData& param) { return param.name == defCred; });
-        const bool isDefCred = (it != ApiCameraDataEx::addParams.end()) && !it->value.isEmpty();
+            [&defCred](const auto& param) { return param.name == defCred; });
+        const bool isDefCred = (it != nx::vms::api::CameraDataEx::addParams.end()) && !it->value.isEmpty();
 
         // remove confidential information
         auto rm = std::remove_if(addParams.begin(), addParams.end(),
-                                 [](const ec2::ApiResourceParamData& param)
+                                 [](const auto& param)
                                  { return EXCEPT_PARAMS.count(param.name); });
 
         addParams.erase(rm, addParams.end());
-        addParams.push_back(ApiResourceParamData(defCred, isDefCred ? lit("true") : lit("false")));
+        addParams.push_back(nx::vms::api::ResourceParamData(defCred, isDefCred
+            ? lit("true")
+            : lit("false")));
 
         // update resource defaults if not in addParams
         for (const auto& param : RESOURCE_PARAMS)
@@ -58,7 +60,7 @@ namespace ec2 {
 
             const auto it = std::find_if(
                 addParams.begin(), addParams.end(),
-                [&param](ApiResourceParamData& d) { return d.name == param; });
+                [&param](const auto& d) { return d.name == param; });
 
             if (it != addParams.end() && !it->value.isEmpty() && it->value != lit("0"))
                 continue;
@@ -67,7 +69,7 @@ namespace ec2 {
             {
                 const auto value = type->defaultValue(param);
                 if (!value.isEmpty())
-                    addParams.push_back(ApiResourceParamData(param, value));
+                    addParams.push_back(nx::vms::api::ResourceParamData(param, value));
             }
         }
     }
@@ -120,8 +122,8 @@ namespace ec2 {
 
     ApiBusinessRuleStatistics::ApiBusinessRuleStatistics() {}
 
-    ApiBusinessRuleStatistics::ApiBusinessRuleStatistics(ApiBusinessRuleData&& data)
-        : ApiBusinessRuleData(std::move(data))
+    ApiBusinessRuleStatistics::ApiBusinessRuleStatistics(nx::vms::api::EventRuleData&& data)
+        : nx::vms::api::EventRuleData(std::move(data))
     {}
 
     ApiUserDataStatistics::ApiUserDataStatistics() {}

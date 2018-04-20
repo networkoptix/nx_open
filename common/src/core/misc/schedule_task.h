@@ -38,9 +38,9 @@ struct QnScheduleTask
     /** End time offset, in seconds. */
     int endTime = 0;
 
-    Qn::RecordingType recordingType = Qn::RT_Never;
+    Qn::RecordingType recordingType = Qn::RecordingType::never;
 
-    Qn::StreamQuality streamQuality = Qn::QualityHighest;
+    Qn::StreamQuality streamQuality = Qn::StreamQuality::highest;
     int fps = 10;
     int bitrateKbps = 0;
 

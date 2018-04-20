@@ -184,7 +184,7 @@ public:
 
     void setPrimaryPeerId(const QnUuid& peerId)
     {
-        m_timeSynchronizationManager->primaryTimeServerChanged(ApiIdData(peerId));
+        m_timeSynchronizationManager->primaryTimeServerChanged(nx::vms::api::IdData(peerId));
     }
 
     void connectTo(TimeSynchronizationPeer* remotePeer)

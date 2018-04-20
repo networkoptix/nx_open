@@ -1273,7 +1273,7 @@ CameraExtraStatus QnResourceTreeModelNode::calculateCameraExtraStatus() const
     if (camera->isLicenseUsed())
         result |= CameraExtraStatusFlag::scheduled;
 
-    if (camera->statusFlags().testFlag(Qn::CSF_HasIssuesFlag))
+    if (camera->statusFlags().testFlag(Qn::CameraStatusFlag::CSF_HasIssuesFlag))
         result |= CameraExtraStatusFlag::buggy;
 
     return result;

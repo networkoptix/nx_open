@@ -186,12 +186,12 @@ int QnTransactionLog::currentSequenceNoLock() const
     return qMax(m_state.values.value(key), m_commitData.state.values.value(key));
 }
 
-ErrorCode QnTransactionLog::updateSequence(const ApiUpdateSequenceData& data)
+ErrorCode QnTransactionLog::updateSequence(const nx::vms::api::UpdateSequenceData& data)
 {
     detail::QnDbManager::QnDbTransactionLocker
         locker(dbManager(m_dbManager, Qn::kSystemAccess).getTransaction());
 
-    for(const ApiSyncMarkerRecord& record: data.markers)
+    for(const nx::vms::api::SyncMarkerRecordData& record: data.markers)
     {
         NX_LOG( QnLog::EC2_TRAN_LOG, lit("update transaction sequence in log. key=%1 dbID=%2 dbSeq=%3").arg(record.peerID.toString()).arg(record.dbID.toString()).arg(record.sequence), cl_logDEBUG1);
         ErrorCode result = updateSequenceNoLock(record.peerID, record.dbID, record.sequence);
@@ -429,7 +429,7 @@ ErrorCode QnTransactionLog::getTransactionsAfter(
 
     const QnTranState& stateToIterate = m_state;
 
-    QnTransaction<ApiUpdateSequenceData> syncMarkersTran(
+    QnTransaction<nx::vms::api::UpdateSequenceData> syncMarkersTran(
         ApiCommand::updatePersistentSequence,
         m_dbManager->commonModule()->moduleGUID());
 
@@ -462,7 +462,7 @@ ErrorCode QnTransactionLog::getTransactionsAfter(
         if (latestSequence > lastSelectedSequence)
         {
             // add filler transaction with latest sequence
-            ApiSyncMarkerRecord record;
+            nx::vms::api::SyncMarkerRecordData record;
             record.peerID = key.id;
             record.dbID = key.persistentId;
             record.sequence = latestSequence;
@@ -484,7 +484,7 @@ ErrorCode QnTransactionLog::getExactTransactionsAfter(
     *outIsFinished = false;
     QnReadLocker lock(&m_dbManager->getMutex());
 
-    QnTransaction<ApiUpdateSequenceData> syncMarkersTran(
+    QnTransaction<nx::vms::api::UpdateSequenceData> syncMarkersTran(
         ApiCommand::updatePersistentSequence,
         m_dbManager->commonModule()->moduleGUID());
 

@@ -36,6 +36,7 @@ def test_start_script(pywinrm_protocol):
 
 def test_format_script():
     # Variable names are sorted to get predictable result.
+    # language=PowerShell
     body = '''
         Do-This -Carefully $BThing
         Make-It -Real -Quality $AQuality

@@ -482,7 +482,7 @@ std::unique_ptr<QnTranscoder> StreamingChunkTranscoder::createTranscoder(
                                                 //< This resolution is ignored when TM_DirectStreamCopy is used.
         }
     }
-    if (transcoder->setVideoCodec(codecID, transcodeMethod, Qn::QualityNormal, videoResolution) != 0)
+    if (transcoder->setVideoCodec(codecID, transcodeMethod, Qn::StreamQuality::normal, videoResolution) != 0)
     {
         NX_LOGX(lm("Failed to create transcoder with video codec \"%1\" to transcode chunk (%2 - %3) of resource %4").
             arg(transcodeParams.videoCodec()).arg(transcodeParams.startTimestamp()).

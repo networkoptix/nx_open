@@ -98,7 +98,7 @@ int RemoteConnectionFactory::testConnectionAsync(
 // Implementation of AbstractECConnectionFactory::connectAsync
 int RemoteConnectionFactory::connectAsync(
     const nx::utils::Url& addr,
-    const ApiClientInfoData& clientInfo,
+    const nx::vms::api::ClientInfoData& clientInfo,
     impl::ConnectHandlerPtr handler)
 {
     nx::utils::Url url = addr;
@@ -121,7 +121,9 @@ void RemoteConnectionFactory::setConfParams(std::map<QString, QVariant> confPara
 }
 
 int RemoteConnectionFactory::establishConnectionToRemoteServer(
-    const nx::utils::Url& addr, impl::ConnectHandlerPtr handler, const ApiClientInfoData& clientInfo)
+    const nx::utils::Url& addr,
+    impl::ConnectHandlerPtr handler,
+    const nx::vms::api::ClientInfoData& clientInfo)
 {
     const int reqId = generateRequestID();
 
@@ -134,7 +136,7 @@ int RemoteConnectionFactory::establishConnectionToRemoteServer(
     }
 #endif // 0
 
-    ApiLoginData loginInfo;
+    nx::vms::api::ConnectionData loginInfo;
     loginInfo.login = addr.userName();
     loginInfo.passwordHash = nx::network::http::calcHa1(
         loginInfo.login.toLower(), nx::network::AppInfo::realm(), addr.password());
@@ -157,7 +159,7 @@ int RemoteConnectionFactory::establishConnectionToRemoteServer(
         {
             remoteConnectionFinished(reqId, errorCode, connectionInfo, addr, handler);
         };
-    m_remoteQueryProcessor->processQueryAsync<ApiLoginData, QnConnectionInfo>(
+    m_remoteQueryProcessor->processQueryAsync<nx::vms::api::ConnectionData, QnConnectionInfo>(
         addr, ApiCommand::connect, loginInfo, func);
     return reqId;
 }
@@ -366,7 +368,7 @@ void RemoteConnectionFactory::remoteTestConnectionFinished(
 }
 
 ErrorCode RemoteConnectionFactory::fillConnectionInfo(
-    const ApiLoginData& loginInfo,
+    const nx::vms::api::ConnectionData& loginInfo,
     QnConnectionInfo* const connectionInfo,
     nx::network::http::Response* response)
 {
@@ -397,7 +399,7 @@ ErrorCode RemoteConnectionFactory::fillConnectionInfo(
             auto clientInfo = loginInfo.clientInfo;
             clientInfo.parentId = commonModule()->moduleGUID();
 
-            ApiClientInfoDataList infoList;
+            nx::vms::api::ClientInfoDataList infoList;
             auto result = dbManager(Qn::kSystemAccess).doQuery(clientInfo.id, infoList);
             if (result != ErrorCode::ok)
                 return result;
@@ -439,7 +441,7 @@ int RemoteConnectionFactory::testDirectConnection(
 {
     const int reqId = generateRequestID();
     QnConnectionInfo connectionInfo;
-    fillConnectionInfo(ApiLoginData(), &connectionInfo);
+    fillConnectionInfo(nx::vms::api::ConnectionData(), &connectionInfo);
     nx::utils::concurrent::run(
         Ec2ThreadPool::instance(),
         std::bind(
@@ -464,7 +466,7 @@ int RemoteConnectionFactory::testRemoteConnection(
         ++m_runningRequests;
     }
 
-    ApiLoginData loginInfo;
+    nx::vms::api::ConnectionData loginInfo;
     loginInfo.login = addr.userName();
     loginInfo.passwordHash = nx::network::http::calcHa1(
         loginInfo.login.toLower(), nx::network::AppInfo::realm(), addr.password());

@@ -338,7 +338,7 @@ bool QnResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCamResourc
     if (!camera)
         return false;
 
-    if (camera->failoverPriority() == Qn::FP_Never)
+    if (camera->failoverPriority() == Qn::FailoverPriority::never)
         return false;
 
     QnUuid ownGuid = commonModule()->moduleGUID();

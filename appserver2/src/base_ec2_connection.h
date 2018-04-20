@@ -7,7 +7,7 @@
 #include "ec_connection_audit_manager.h"
 #include "nx_ec/data/api_media_server_data.h"
 #include "nx_ec/data/api_full_info_data.h"
-#include "nx_ec/data/api_videowall_data.h"
+#include <nx/vms/api/data/videowall_data.h>
 #include "nx_ec/data/api_conversion_functions.h"
 
 #include <transaction/message_bus_adapter.h>
@@ -84,8 +84,12 @@ namespace ec2
         virtual void stopReceivingNotifications() override;
 
         virtual int dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler ) override;
-        virtual int dumpDatabaseToFileAsync( const QString& dumpFilePath, impl::SimpleHandlerPtr) override;
-        virtual int restoreDatabaseAsync( const ec2::ApiDatabaseDumpData& data, impl::SimpleHandlerPtr handler ) override;
+        virtual int dumpDatabaseToFileAsync(
+            const QString& dumpFilePath,
+            impl::SimpleHandlerPtr) override;
+        virtual int restoreDatabaseAsync(
+            const nx::vms::api::DatabaseDumpData& data,
+            impl::SimpleHandlerPtr handler) override;
 
         virtual void addRemotePeer(const QnUuid& id, const nx::utils::Url& url) override;
         virtual void deleteRemotePeer(const QnUuid& id) override;
@@ -426,58 +430,68 @@ namespace ec2
         return m_notificationManager.get();
     }
 
-    template<class QueryProcessorType>
-    int BaseEc2Connection<QueryProcessorType>::dumpDatabaseAsync(impl::DumpDatabaseHandlerPtr handler)
-    {
-        const int reqID = generateRequestID();
+template<class QueryProcessorType>
+int BaseEc2Connection<QueryProcessorType>::dumpDatabaseAsync(impl::DumpDatabaseHandlerPtr handler)
+{
+    const int reqID = generateRequestID();
 
-        auto queryDoneHandler =
-            [reqID, handler](ErrorCode errorCode, const ApiDatabaseDumpData& data)
+    auto queryDoneHandler =
+        [reqID, handler](ErrorCode errorCode, const nx::vms::api::DatabaseDumpData& data)
         {
-            ApiDatabaseDumpData outData;
+            nx::vms::api::DatabaseDumpData outData;
             if (errorCode == ErrorCode::ok)
                 outData = data;
             handler->done(reqID, errorCode, outData);
         };
-        m_queryProcessor->getAccess(Qn::kSystemAccess).template processQueryAsync<
-            std::nullptr_t, ApiDatabaseDumpData, decltype(queryDoneHandler)>(
-                ApiCommand::dumpDatabase, nullptr, queryDoneHandler);
-        return reqID;
-    }
+    m_queryProcessor->getAccess(Qn::kSystemAccess).template processQueryAsync<
+        std::nullptr_t, nx::vms::api::DatabaseDumpData, decltype(queryDoneHandler)>(
+        ApiCommand::dumpDatabase,
+        nullptr,
+        queryDoneHandler);
+    return reqID;
+}
 
-    template<class QueryProcessorType>
-    int BaseEc2Connection<QueryProcessorType>::dumpDatabaseToFileAsync(
-        const QString& dumpFilePath, impl::SimpleHandlerPtr handler)
-    {
-        const int reqID = generateRequestID();
+template<class QueryProcessorType>
+int BaseEc2Connection<QueryProcessorType>::dumpDatabaseToFileAsync(
+    const QString& dumpFilePath,
+    impl::SimpleHandlerPtr handler)
+{
+    const int reqID = generateRequestID();
 
-        ApiStoredFilePath dumpFilePathData;
-        dumpFilePathData.path = dumpFilePath;
+    nx::vms::api::StoredFilePath dumpFilePathData;
+    dumpFilePathData.path = dumpFilePath;
 
-        auto queryDoneHandler =
-            [reqID, handler](ErrorCode errorCode, const ApiDatabaseDumpToFileData& /*dumpFileSize*/)
+    auto queryDoneHandler =
+        [reqID, handler](
+        ErrorCode errorCode,
+        const nx::vms::api::DatabaseDumpToFileData& /*dumpFileSize*/)
         {
             handler->done(reqID, errorCode);
         };
-        m_queryProcessor->getAccess(Qn::kSystemAccess).template processQueryAsync<
-            ApiStoredFilePath, ApiDatabaseDumpToFileData, decltype(queryDoneHandler)>(
-                ApiCommand::dumpDatabaseToFile, dumpFilePathData, queryDoneHandler);
-        return reqID;
-    }
+    m_queryProcessor->getAccess(Qn::kSystemAccess).template processQueryAsync<
+        nx::vms::api::StoredFilePath, nx::vms::api::DatabaseDumpToFileData, decltype(
+            queryDoneHandler)>(
+        ApiCommand::dumpDatabaseToFile,
+        dumpFilePathData,
+        queryDoneHandler);
+    return reqID;
+}
 
-    template<class QueryProcessorType>
-    int BaseEc2Connection<QueryProcessorType>::restoreDatabaseAsync(
-        const ec2::ApiDatabaseDumpData& data, impl::SimpleHandlerPtr handler)
-    {
-        const int reqID = generateRequestID();
+template<class QueryProcessorType>
+int BaseEc2Connection<QueryProcessorType>::restoreDatabaseAsync(
+    const nx::vms::api::DatabaseDumpData& data,
+    impl::SimpleHandlerPtr handler)
+{
+    const int reqID = generateRequestID();
 
-        using namespace std::placeholders;
-        m_queryProcessor->getAccess(Qn::kSystemAccess).processUpdateAsync(
-            ApiCommand::restoreDatabase, data,
-            std::bind(std::mem_fn(&impl::SimpleHandler::done), handler, reqID, _1));
+    using namespace std::placeholders;
+    m_queryProcessor->getAccess(Qn::kSystemAccess).processUpdateAsync(
+        ApiCommand::restoreDatabase,
+        data,
+        std::bind(std::mem_fn(&impl::SimpleHandler::done), handler, reqID, _1));
 
-        return reqID;
-    }
+    return reqID;
+}
 
     template<class QueryProcessorType>
     void BaseEc2Connection<QueryProcessorType>::addRemotePeer(const QnUuid& id, const nx::utils::Url &_url)

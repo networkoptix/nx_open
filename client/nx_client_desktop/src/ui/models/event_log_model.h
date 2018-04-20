@@ -60,7 +60,7 @@ public:
 
     QnResourceList resourcesForPlayback(const QModelIndex& index) const;
 
-    nx::vms::event::EventType eventType(int row) const;
+    nx::vms::api::EventType eventType(int row) const;
     QnResourcePtr eventResource(int row) const;
     qint64 eventTimestamp(int row) const;
 

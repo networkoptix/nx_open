@@ -23,7 +23,7 @@ class WindowsNetworking(Networking):
         super(WindowsNetworking, self).__init__()
         self._names = {mac: 'Plugable {}'.format(slot) for slot, mac in macs.items()}
         self._winrm_access = winrm_access
-        self.__repr__ = lambda: '<WindowsNetworking on {!r}>'.format(winrm_access)
+        self.__repr__ = lambda: '<WindowsNetworking on {}>'.format(winrm_access)
 
     def rename_interfaces(self, mac_to_new_name):
         self._winrm_access.run_powershell_script(

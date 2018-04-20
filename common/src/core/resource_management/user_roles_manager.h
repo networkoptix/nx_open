@@ -2,6 +2,8 @@
 
 #include <common/common_module_aware.h>
 
+#include <core/resource/resource_fwd.h>
+
 #include <nx_ec/data/api_user_role_data.h>
 
 #include <nx/utils/singleton.h>

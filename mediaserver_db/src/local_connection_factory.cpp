@@ -16,7 +16,7 @@
 #include <nx_ec/ec_proto_version.h>
 #include <nx_ec/data/api_access_rights_data.h>
 #include <nx_ec/data/api_user_role_data.h>
-#include <nx_ec/data/api_camera_history_data.h>
+#include <nx/vms/api/data/camera_history_data.h>
 
 #include <rest/handlers/active_connections_rest_handler.h>
 #include "compatibility/old_ec_connection.h"
@@ -43,6 +43,7 @@
 #include <nx/p2p/p2p_server_message_bus.h>
 #include <transaction/server_transaction_message_bus.h>
 
+using namespace nx::vms::api;
 
 namespace ec2 {
 
@@ -92,12 +93,12 @@ namespace ec2 {
             messageBus->setDatabase(m_dbManager.get());
             m_distributedMutexManager.reset(new QnDistributedMutexManager(messageBus));
         }
-        
+
 		m_serverQueryProcessor.reset(new ServerQueryProcessorAccess(m_dbManager.get(), m_bus.get()));
 
 		m_dbManager->setTransactionLog(m_transactionLog.get());
 		m_dbManager->setTimeSyncManager(m_timeSynchronizationManager.get());
-		
+
 		m_bus->setTimeSyncManager(m_timeSynchronizationManager.get());
 
 		// Cannot be done in TimeSynchronizationManager constructor to keep valid object destruction
@@ -157,7 +158,7 @@ namespace ec2 {
 	// Implementation of AbstractECConnectionFactory::connectAsync
 	int LocalConnectionFactory::connectAsync(
 		const nx::utils::Url& addr,
-		const ApiClientInfoData& clientInfo,
+		const nx::vms::api::ClientInfoData& clientInfo,
 		impl::ConnectHandlerPtr handler)
 	{
 		nx::utils::Url url = addr;
@@ -196,6 +197,7 @@ namespace ec2 {
 	void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
 	{
 		using namespace std::placeholders;
+        using namespace nx::vms::api;
 
 		/**%apidoc GET /ec2/getResourceTypes
 		* Read all resource types. Resource type contains object type such as
@@ -205,10 +207,10 @@ namespace ec2 {
 		* %return Object in the requested format.
 		* %// AbstractResourceManager::getResourceTypes
 		*/
-		regGet<nullptr_t, ApiResourceTypeDataList>(p, ApiCommand::getResourceTypes);
+		regGet<nullptr_t, ResourceTypeDataList>(p, ApiCommand::getResourceTypes);
 
 		// AbstractResourceManager::setResourceStatus
-		regUpdate<ApiResourceStatusData>(p, ApiCommand::setResourceStatus);
+		regUpdate<ResourceStatusData>(p, ApiCommand::setResourceStatus);
 
 		/**%apidoc GET /ec2/getResourceParams
 		* Read resource (camera, user or server) additional parameters (camera firmware version, etc).
@@ -218,10 +220,10 @@ namespace ec2 {
 		* %return Object in the requested format.
 		* %// AbstractResourceManager::getKvPairs
 		*/
-		regGet<QnUuid, ApiResourceParamWithRefDataList>(p, ApiCommand::getResourceParams);
+		regGet<QnUuid, ResourceParamWithRefDataList>(p, ApiCommand::getResourceParams);
 
 		// AbstractResourceManager::save
-		regUpdate<ApiResourceParamWithRefDataList>(p, ApiCommand::setResourceParams);
+		regUpdate<ResourceParamWithRefDataList>(p, ApiCommand::setResourceParams);
 
 		/**%apidoc POST /ec2/removeResource
 		* Delete the resource.
@@ -235,7 +237,7 @@ namespace ec2 {
 		* %param id Unique id of the resource.
 		* %// AbstractResourceManager::remove
 		*/
-		regUpdate<ApiIdData>(p, ApiCommand::removeResource);
+		regUpdate<IdData>(p, ApiCommand::removeResource);
 
 		/**%apidoc GET /ec2/getStatusList
 		* Read current status of the resources: cameras, servers and storages.
@@ -244,7 +246,7 @@ namespace ec2 {
 		* %return List of status objects in the requested format.
 		*     %// TODO: Describe ResourceStatus fields.
 		*/
-		regGet<QnUuid, ApiResourceStatusDataList>(p, ApiCommand::getStatusList);
+		regGet<QnUuid, ResourceStatusDataList>(p, ApiCommand::getStatusList);
 
 		// AbstractMediaServerManager::getServers
 		regGet<QnUuid, ApiMediaServerDataList>(p, ApiCommand::getMediaServers);
@@ -358,7 +360,7 @@ namespace ec2 {
 		regGet<QnUuid, ApiMediaServerUserAttributesDataList>(p, ApiCommand::getMediaServerUserAttributesList);
 
 		// AbstractMediaServerManager::remove
-		regUpdate<ApiIdData>(p, ApiCommand::removeMediaServer);
+		regUpdate<IdData>(p, ApiCommand::removeMediaServer);
 
 		/**%apidoc GET /ec2/getMediaServersEx
 		* Return server list.
@@ -401,18 +403,18 @@ namespace ec2 {
 		*/
 		regUpdate<ApiStorageData>(p, ApiCommand::saveStorage);
 
-		regUpdate<ApiIdDataList>(p, ApiCommand::removeStorages);
-		regUpdate<ApiIdData>(p, ApiCommand::removeStorage);
-		regUpdate<ApiIdDataList>(p, ApiCommand::removeResources);
+		regUpdate<IdDataList>(p, ApiCommand::removeStorages);
+		regUpdate<IdData>(p, ApiCommand::removeStorage);
+		regUpdate<IdDataList>(p, ApiCommand::removeResources);
 
 		// AbstractCameraManager::addCamera
-		regUpdate<ApiCameraData>(p, ApiCommand::saveCamera);
+		regUpdate<CameraData>(p, ApiCommand::saveCamera);
 
 		// AbstractCameraManager::save
-		regUpdate<ApiCameraDataList>(p, ApiCommand::saveCameras);
+		regUpdate<CameraDataList>(p, ApiCommand::saveCameras);
 
 		// AbstractCameraManager::getCameras
-		regGet<QnUuid, ApiCameraDataList>(p, ApiCommand::getCameras);
+		regGet<QnUuid, CameraDataList>(p, ApiCommand::getCameras);
 
 		/**%apidoc POST /ec2/saveCameraUserAttributesList
 		* Save additional camera attributes for a number of cameras.
@@ -508,7 +510,7 @@ namespace ec2 {
 		*     %value CameraBackup_Default A default value is used for backup options.
 		* %// AbstractCameraManager::saveUserAttributes
 		*/
-		regUpdate<ApiCameraAttributesDataList>(p, ApiCommand::saveCameraUserAttributesList);
+		regUpdate<CameraAttributesDataList>(p, ApiCommand::saveCameraUserAttributesList);
 
 		/**%apidoc POST /ec2/saveCameraUserAttributes
 		* Save additional camera attributes for a single camera.
@@ -605,7 +607,7 @@ namespace ec2 {
 		*     %value CameraBackup_Default A default value is used for backup options.
 		* %// AbstractCameraManager::saveUserAttributes
 		*/
-		regUpdate<ApiCameraAttributesData>(p, ApiCommand::saveCameraUserAttributes);
+		regUpdate<CameraAttributesData>(p, ApiCommand::saveCameraUserAttributes);
 
 		/**%apidoc GET /ec2/getCameraUserAttributesList
 		* Read additional camera attributes.
@@ -700,10 +702,10 @@ namespace ec2 {
 		*         %value CameraBackup_Default A default value is used for backup options.
 		* %// AbstractCameraManager::getUserAttributes
 		*/
-		regGet<QnUuid, ApiCameraAttributesDataList>(p, ApiCommand::getCameraUserAttributesList);
+		regGet<QnUuid, CameraAttributesDataList>(p, ApiCommand::getCameraUserAttributesList);
 
 		// AbstractCameraManager::addCameraHistoryItem
-		regUpdate<ApiServerFootageData>(p, ApiCommand::addCameraHistoryItem);
+		regUpdate<ServerFootageData>(p, ApiCommand::addCameraHistoryItem);
 
 		/**%apidoc GET /ec2/getCameraHistoryItems
 		* Read information about which server was hosting the camera at which period.
@@ -713,14 +715,14 @@ namespace ec2 {
 		* %return List of camera history items in the requested format.
 		* %// AbstractCameraManager::getCameraHistoryItems
 		*/
-		regGet<nullptr_t, ApiServerFootageDataList>(p, ApiCommand::getCameraHistoryItems);
+		regGet<nullptr_t, ServerFootageDataList>(p, ApiCommand::getCameraHistoryItems);
 
 		/**%apidoc GET /ec2/getCamerasEx
 		* Read camera list.
 		* %param[default] format
 		* %param[opt] id Camera unique id. If omitted, return data for all cameras.
 		* %return List of camera information objects in the requested format.
-		*     %// From struct ApiResourceData:
+		*     %// From struct ResourceData:
 		*     %param id Camera unique id.
 		*     %param parentId Unique id of the server hosting the camera.
 		*     %param name Camera name.
@@ -730,7 +732,7 @@ namespace ec2 {
 		*         information such as camera maximum resolution, FPS, etc. Detailed type information
 		*         can be obtained via GET /ec2/getResourceTypes request.
 		*
-		*     %// From struct ApiCameraData (inherited from ApiResourceData):
+		*     %// From struct CameraData (inherited from ResourceData):
 		*     %param mac Camera MAC address.
 		*     %param physicalId Camera unique identifier. This identifier can used in some requests
 		*        related to a camera.
@@ -745,7 +747,7 @@ namespace ec2 {
 		*          is causing a lot of network issues.
 		*     %param vendor Camera manufacturer.
 		*
-		*     %// From struct ApiCameraAttributesData:
+		*     %// From struct CameraAttributesData:
 		*     %param cameraId Camera unique id. If such object exists, omitted fields will not be changed.
 		*     %param cameraName Camera name.
 		*     %param userDefinedGroupName Name of the user-defined camera group.
@@ -832,7 +834,7 @@ namespace ec2 {
 		*             Equivalent of "CameraBackup_HighQuality|CameraBackup_LowQuality".
 		*         %value CameraBackup_Default A default value is used for backup options.
 		*
-		*     %// From ApiCameraDataEx:
+		*     %// From CameraDataEx:
 		*     %param status Camera status.
 		*         %value Offline
 		*         %value Online
@@ -841,7 +843,7 @@ namespace ec2 {
 		*         such information as full ONVIF URL, camera maximum FPS, etc.
 		* %// AbstractCameraManager::getCamerasEx
 		*/
-		regGet<QnUuid, ApiCameraDataExList>(p, ApiCommand::getCamerasEx);
+		regGet<QnUuid, CameraDataExList>(p, ApiCommand::getCamerasEx);
 
 		/**%apidoc GET /ec2/getStorages
 		* Read the list of current storages.
@@ -876,7 +878,7 @@ namespace ec2 {
 		/**%apidoc GET /ec2/getEventRules
 		* Return all event rules.
 		* %// ATTENTION: Many text duplications with /api/getEvents and /api/createEvent, and with
-		*     comments in structs EventMetaData, EventParameters, and enums in ApiBusinessRuleData.
+		*     comments in structs EventMetaData, EventParameters, and enums in EventRuleData.
 		* %param[default] format
 		* %param[opt] id Event rule unique id. If omitted, return data for all event rules.
 		* %return List of event rule objects in the requested format.
@@ -1021,19 +1023,19 @@ namespace ec2 {
 		*         %value true
 		* %// AbstractBusinessEventManager::getBusinessRules
 		*/
-		regGet<QnUuid, ApiBusinessRuleDataList>(p, ApiCommand::getEventRules);
+		regGet<QnUuid, EventRuleDataList>(p, ApiCommand::getEventRules);
 
 		regGet<ApiTranLogFilter, ApiTransactionDataList>(p, ApiCommand::getTransactionLog);
 
 		// AbstractBusinessEventManager::save
-		regUpdate<ApiBusinessRuleData>(p, ApiCommand::saveEventRule);
+		regUpdate<EventRuleData>(p, ApiCommand::saveEventRule);
 
 		// AbstractBusinessEventManager::deleteRule
-		regUpdate<ApiIdData>(p, ApiCommand::removeEventRule);
+		regUpdate<IdData>(p, ApiCommand::removeEventRule);
 
-		regUpdate<ApiResetBusinessRuleData>(p, ApiCommand::resetEventRules);
-		regUpdate<ApiBusinessActionData>(p, ApiCommand::broadcastAction);
-		regUpdate<ApiBusinessActionData>(p, ApiCommand::execAction);
+		regUpdate<ResetEventRulesData>(p, ApiCommand::resetEventRules);
+		regUpdate<EventActionData>(p, ApiCommand::broadcastAction);
+		regUpdate<EventActionData>(p, ApiCommand::execAction);
 
 		/**%apidoc GET /ec2/getUsers
 		* Return users registered in the System. User's password contains MD5 hash data with the salt.
@@ -1203,7 +1205,7 @@ namespace ec2 {
 		* %param id User unique id.
 		* %// AbstractUserManager::remove
 		*/
-		regUpdate<ApiIdData>(p, ApiCommand::removeUser);
+		regUpdate<IdData>(p, ApiCommand::removeUser);
 
 		/**%apidoc POST /ec2/saveUserRole
 		* <p>
@@ -1240,7 +1242,7 @@ namespace ec2 {
 		* %param id User role unique id.
 		* %// AbstractUserManager::removeUserRole
 		*/
-		regUpdate<ApiIdData>(p, ApiCommand::removeUserRole);
+		regUpdate<IdData>(p, ApiCommand::removeUserRole);
 
 		/**%apidoc GET /ec2/getPredefinedRoles
 		* Return list of predefined user roles.
@@ -1255,12 +1257,12 @@ namespace ec2 {
 		* %return List of video wall objects in the requested format.
 		* %// AbstractVideowallManager::getVideowalls
 		*/
-		regGet<QnUuid, ApiVideowallDataList>(p, ApiCommand::getVideowalls);
+		regGet<QnUuid, VideowallDataList>(p, ApiCommand::getVideowalls);
 		// AbstractVideowallManager::save
-		regUpdate<ApiVideowallData>(p, ApiCommand::saveVideowall);
+		regUpdate<VideowallData>(p, ApiCommand::saveVideowall);
 		// AbstractVideowallManager::remove
-		regUpdate<ApiIdData>(p, ApiCommand::removeVideowall);
-		regUpdate<ApiVideowallControlMessageData>(p, ApiCommand::videowallControl);
+		regUpdate<IdData>(p, ApiCommand::removeVideowall);
+		regUpdate<VideowallControlMessageData>(p, ApiCommand::videowallControl);
 
         /**%apidoc GET /ec2/getWebPages
          * Return list of web pages
@@ -1268,7 +1270,7 @@ namespace ec2 {
          * %return List of web page objects in the requested format.
          * %// AbstractWebPageManager::getWebPages
          */
-		regGet<QnUuid, ApiWebPageDataList>(p, ApiCommand::getWebPages);
+		regGet<QnUuid, WebPageDataList>(p, ApiCommand::getWebPages);
 
         /**%apidoc POST /ec2/saveWebPage
          * <p>
@@ -1285,7 +1287,7 @@ namespace ec2 {
          * %param url Web page url.
          * %// AbstractWebPageManager::save
          */
-		regUpdate<ApiWebPageData>(p, ApiCommand::saveWebPage);
+		regUpdate<WebPageData>(p, ApiCommand::saveWebPage);
 
 
         /**%apidoc POST /ec2/removeWebPage
@@ -1299,7 +1301,7 @@ namespace ec2 {
          * %param id Web page unique id.
          * // AbstractWebPageManager::remove
          */
-		regUpdate<ApiIdData>(p, ApiCommand::removeWebPage);
+		regUpdate<IdData>(p, ApiCommand::removeWebPage);
 
 		/**%apidoc GET /ec2/getLayouts
 		* Return list of user layout
@@ -1308,7 +1310,7 @@ namespace ec2 {
 		* %return List of layout objects in the requested format.
 		* %// AbstractLayoutManager::getLayouts
 		*/
-		regGet<QnUuid, ApiLayoutDataList>(p, ApiCommand::getLayouts);
+		regGet<QnUuid, LayoutDataList>(p, ApiCommand::getLayouts);
 
 		/**%apidoc POST /ec2/saveLayout
 		* Save layout.
@@ -1376,7 +1378,7 @@ namespace ec2 {
 		*     0..1).
 		* %// AbstractLayoutManager::save
 		*/
-		regUpdate<ApiLayoutData>(p, ApiCommand::saveLayout);
+		regUpdate<LayoutData>(p, ApiCommand::saveLayout);
 
 		/**%apidoc POST /ec2/saveLayouts
 		* Save the list of layouts.
@@ -1443,7 +1445,7 @@ namespace ec2 {
 		*     0..1).
 		* %// AbstractLayoutManager::save
 		*/
-		regUpdate<ApiLayoutDataList>(p, ApiCommand::saveLayouts);
+		regUpdate<LayoutDataList>(p, ApiCommand::saveLayouts);
 
 		/**%apidoc POST /ec2/removeLayout
 		* Delete the specified layout.
@@ -1456,15 +1458,16 @@ namespace ec2 {
 		* %param id Unique id of the layout to be deleted.
 		* %// AbstractLayoutManager::remove
 		*/
-		regUpdate<ApiIdData>(p, ApiCommand::removeLayout);
+		regUpdate<IdData>(p, ApiCommand::removeLayout);
 
 		/**%apidoc GET /ec2/getLayoutTours
 		* Return list of layout tours
 		* %param[default] format
+		* %param[opt] id Layout tour unique id. If omitted, return data for all tours.
 		* %return List of layout tour objects in the requested format.
 		* %// AbstractLayoutManager::getLayoutTours
 		*/
-		regGet<nullptr_t, ApiLayoutTourDataList>(p, ApiCommand::getLayoutTours);
+		regGet<QnUuid, LayoutTourDataList>(p, ApiCommand::getLayoutTours);
 
 		/**%apidoc POST /ec2/saveLayoutTour
 		* Save layout tour.
@@ -1482,7 +1485,7 @@ namespace ec2 {
 		* %param item.delayMs Delay between layouts switching in milliseconds.
 		* %// AbstractLayoutTourManager::save
 		*/
-		regUpdate<ApiLayoutTourData>(p, ApiCommand::saveLayoutTour);
+		regUpdate<LayoutTourData>(p, ApiCommand::saveLayoutTour);
 
 		/**%apidoc POST /ec2/removeLayoutTour
 		* Delete the specified layout tour.
@@ -1495,7 +1498,7 @@ namespace ec2 {
 		* %param id Unique id of the layout tour to be deleted.
 		* %// AbstractLayoutTourManager::remove
 		*/
-		regUpdate<ApiIdData>(p, ApiCommand::removeLayoutTour);
+		regUpdate<IdData>(p, ApiCommand::removeLayoutTour);
 
 		/**%apidoc GET /ec2/listDirectory
 		* Return list of folders and files in a virtual FS stored inside
@@ -1507,7 +1510,7 @@ namespace ec2 {
 		*    %// TODO: Describe params.
 		* %// AbstractStoredFileManager::listDirectory
 		*/
-		regGet<ApiStoredFilePath, ApiStoredDirContents>(p, ApiCommand::listDirectory);
+		regGet<StoredFilePath, StoredFilePathList>(p, ApiCommand::listDirectory);
 
 		/**%apidoc GET /ec2/getStoredFile
 		* Read file data from a virtual FS
@@ -1516,14 +1519,14 @@ namespace ec2 {
 		* %return Object in the requested format.
 		* %// AbstractStoredFileManager::getStoredFile
 		*/
-		regGet<ApiStoredFilePath, ApiStoredFileData>(p, ApiCommand::getStoredFile);
+		regGet<StoredFilePath,StoredFileData>(p, ApiCommand::getStoredFile);
 
 		// AbstractStoredFileManager::addStoredFile
-		regUpdate<ApiStoredFileData>(p, ApiCommand::addStoredFile);
+		regUpdate<StoredFileData>(p, ApiCommand::addStoredFile);
 		// AbstractStoredFileManager::updateStoredFile
-		regUpdate<ApiStoredFileData>(p, ApiCommand::updateStoredFile);
+		regUpdate<StoredFileData>(p, ApiCommand::updateStoredFile);
 		// AbstractStoredFileManager::deleteStoredFile
-		regUpdate<ApiStoredFilePath>(p, ApiCommand::removeStoredFile);
+		regUpdate<StoredFilePath>(p, ApiCommand::removeStoredFile);
 
 		// AbstractUpdatesManager::uploadUpdate
 		regUpdate<ApiUpdateUploadData>(p, ApiCommand::uploadUpdate);
@@ -1549,7 +1552,7 @@ namespace ec2 {
 		regUpdate<ApiSystemIdData>(p, ApiCommand::changeSystemId);
 
 		// AbstractECConnection
-		regUpdate<ApiDatabaseDumpData>(p, ApiCommand::restoreDatabase);
+		regUpdate<DatabaseDumpData>(p, ApiCommand::restoreDatabase);
 
 		/**%apidoc GET /ec2/getCurrentTime
 		* Read current time.
@@ -1561,7 +1564,7 @@ namespace ec2 {
 		regGet<nullptr_t, ApiTimeData>(p, ApiCommand::getCurrentTime);
 
 		// AbstractTimeManager::forcePrimaryTimeServer
-		regUpdate<ApiIdData>(p, ApiCommand::forcePrimaryTimeServer,
+		regUpdate<IdData>(p, ApiCommand::forcePrimaryTimeServer,
 			std::bind(&TimeSynchronizationManager::primaryTimeServerChanged,
 				m_timeSynchronizationManager.get(), _1));
 
@@ -1579,13 +1582,13 @@ namespace ec2 {
 		*/
 		regGet<nullptr_t, ApiLicenseDataList>(p, ApiCommand::getLicenses);
 
-		regGet<nullptr_t, ApiDatabaseDumpData>(p, ApiCommand::dumpDatabase);
-		regGet<ApiStoredFilePath, ApiDatabaseDumpToFileData>(p, ApiCommand::dumpDatabaseToFile);
+		regGet<nullptr_t, DatabaseDumpData>(p, ApiCommand::dumpDatabase);
+		regGet<StoredFilePath, DatabaseDumpToFileData>(p, ApiCommand::dumpDatabaseToFile);
 
 		// AbstractECConnectionFactory
-		regFunctorWithResponse<ApiLoginData, QnConnectionInfo>(p, ApiCommand::connect,
+		regFunctorWithResponse<ConnectionData, QnConnectionInfo>(p, ApiCommand::connect,
 			std::bind(&LocalConnectionFactory::fillConnectionInfo, this, _1, _2, _3));
-		regFunctorWithResponse<ApiLoginData, QnConnectionInfo>(p, ApiCommand::testConnection,
+		regFunctorWithResponse<ConnectionData, QnConnectionInfo>(p, ApiCommand::testConnection,
 			std::bind(&LocalConnectionFactory::fillConnectionInfo, this, _1, _2, _3));
 
 		/**%apidoc GET /ec2/getSettings
@@ -1593,7 +1596,7 @@ namespace ec2 {
 		* %param[default] format
 		* %return List of objects in the requested format.
 		*/
-		regFunctor<nullptr_t, ApiResourceParamDataList>(p, ApiCommand::getSettings,
+		regFunctor<nullptr_t, ResourceParamDataList>(p, ApiCommand::getSettings,
 			std::bind(&LocalConnectionFactory::getSettings, this, _1, _2, _3));
 
 		// Ec2StaticticsReporter
@@ -1634,7 +1637,7 @@ namespace ec2 {
 	{
 		const int reqId = generateRequestID();
 
-		ApiLoginData loginInfo;
+		ConnectionData loginInfo;
 		QnConnectionInfo connectionInfo;
 		fillConnectionInfo(loginInfo, &connectionInfo); // < TODO: #ak not appropriate here
 		connectionInfo.ecUrl = url;
@@ -1791,7 +1794,7 @@ namespace ec2 {
 	}
 
 	ErrorCode LocalConnectionFactory::fillConnectionInfo(
-		const ApiLoginData& loginInfo,
+		const ConnectionData& loginInfo,
 		QnConnectionInfo* const connectionInfo,
 		nx::network::http::Response* response)
 	{
@@ -1822,7 +1825,7 @@ namespace ec2 {
 			auto clientInfo = loginInfo.clientInfo;
 			clientInfo.parentId = commonModule()->moduleGUID();
 
-			ApiClientInfoDataList infoList;
+			nx::vms::api::ClientInfoDataList infoList;
 			auto result = dbManager(Qn::kSystemAccess).doQuery(clientInfo.id, infoList);
 			if (result != ErrorCode::ok)
 				return result;
@@ -1864,7 +1867,7 @@ namespace ec2 {
 	{
 		const int reqId = generateRequestID();
 		QnConnectionInfo connectionInfo;
-		fillConnectionInfo(ApiLoginData(), &connectionInfo);
+		fillConnectionInfo(ConnectionData(), &connectionInfo);
 		nx::utils::concurrent::run(
 			Ec2ThreadPool::instance(),
 			std::bind(
@@ -1876,13 +1879,15 @@ namespace ec2 {
 		return reqId;
 	}
 
-	ErrorCode LocalConnectionFactory::getSettings(
-		nullptr_t, ApiResourceParamDataList* const outData, const Qn::UserAccessData& accessData)
-	{
-		if (!m_dbManager)
-			return ErrorCode::ioError;
-		return QnDbManagerAccess(m_dbManager.get(), accessData).doQuery(nullptr, *outData);
-	}
+ErrorCode LocalConnectionFactory::getSettings(
+    nullptr_t,
+    nx::vms::api::ResourceParamDataList* const outData,
+    const Qn::UserAccessData& accessData)
+{
+    if (!m_dbManager)
+        return ErrorCode::ioError;
+    return QnDbManagerAccess(m_dbManager.get(), accessData).doQuery(nullptr, *outData);
+}
 
 	template<class InputDataType>
 	void LocalConnectionFactory::regUpdate(

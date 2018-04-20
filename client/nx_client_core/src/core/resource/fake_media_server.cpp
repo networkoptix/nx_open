@@ -73,7 +73,7 @@ QString QnFakeMediaServerResource::getName() const
 Qn::ResourceStatus QnFakeMediaServerResource::getStatus() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_serverData.status;
+    return static_cast<Qn::ResourceStatus>(m_serverData.status);
 }
 
 void QnFakeMediaServerResource::updateInternal(const QnResourcePtr& /*other*/, Qn::NotifierList& /*notifiers*/)

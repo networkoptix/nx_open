@@ -25,7 +25,7 @@ namespace ec2
         //!Implementation of QnMediaServerManager::saveStorages
         virtual int saveStorages( const ec2::ApiStorageDataList& storages, impl::SimpleHandlerPtr handler ) override;
         //!Implementation of QnMediaServerManager::removeStorages
-        virtual int removeStorages( const ApiIdDataList& storages, impl::SimpleHandlerPtr handler ) override;
+        virtual int removeStorages( const nx::vms::api::IdDataList& storages, impl::SimpleHandlerPtr handler ) override;
         //!Implementation of QnMediaServerManager::getUserAttributes
         virtual int getUserAttributes( const QnUuid& mediaServerId, impl::GetServerUserAttributesHandlerPtr handler ) override;
         //!Implementation of QnMediaServerManager::getStorages
@@ -88,7 +88,7 @@ namespace ec2
     {
         const int reqID = generateRequestID();
         m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
-            ApiCommand::removeMediaServer, ApiIdData(id),
+            ApiCommand::removeMediaServer, nx::vms::api::IdData(id),
             [handler, reqID](ec2::ErrorCode errorCode)
         {
             handler->done(reqID, errorCode);
@@ -123,7 +123,7 @@ namespace ec2
     }
 
     template<class T>
-    int QnMediaServerManager<T>::removeStorages( const ApiIdDataList& storages, impl::SimpleHandlerPtr handler )
+    int QnMediaServerManager<T>::removeStorages( const nx::vms::api::IdDataList& storages, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();
         m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(

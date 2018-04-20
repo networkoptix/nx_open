@@ -4,7 +4,7 @@ from debian.arfile import ArError
 from debian.debfile import DebFile
 from pathlib2 import PurePosixPath
 
-from framework.build_info import customizations_from_paths, build_info_from_text
+from framework.build_info import build_info_from_text, customizations_from_paths
 
 
 class MediaserverDeb(object):
@@ -12,7 +12,7 @@ class MediaserverDeb(object):
         pass
 
     def __init__(self, path, installation_root=PurePosixPath('/opt')):
-        self.path = path.expanduser()
+        self.path = path
         try:
             deb_file = DebFile(str(self.path)).data.tgz()
         except ArError:

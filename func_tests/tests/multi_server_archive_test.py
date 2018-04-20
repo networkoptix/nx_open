@@ -5,8 +5,8 @@ from datetime import datetime, timedelta
 import pytz
 
 from framework.api_shortcuts import get_local_system_id, set_local_system_id
-from framework.merging import merge_systems
 from framework.mediaserver import TimePeriod
+from framework.merging import merge_systems
 from framework.utils import log_list
 
 log = logging.getLogger(__name__)

@@ -8,7 +8,7 @@ QnCameraNotificationManager::QnCameraNotificationManager()
 }
 
 void QnCameraNotificationManager::triggerNotification(
-    const QnTransaction<ApiCameraData>& tran, 
+    const QnTransaction<nx::vms::api::CameraData>& tran,
     NotificationSource source)
 {
     NX_ASSERT(tran.command == ApiCommand::saveCamera);
@@ -16,16 +16,16 @@ void QnCameraNotificationManager::triggerNotification(
 }
 
 void QnCameraNotificationManager::triggerNotification(
-    const QnTransaction<ApiCameraDataList>& tran, 
+    const QnTransaction<nx::vms::api::CameraDataList>& tran,
     NotificationSource source)
 {
     NX_ASSERT(tran.command == ApiCommand::saveCameras);
-    for (const ApiCameraData& camera : tran.params)
+    for (const auto& camera: tran.params)
         emit addedOrUpdated(camera, source);
 }
 
 void QnCameraNotificationManager::triggerNotification(
-    const QnTransaction<ApiCameraAttributesData>& tran, 
+    const QnTransaction<nx::vms::api::CameraAttributesData>& tran,
     NotificationSource /*source*/)
 {
     NX_ASSERT(tran.command == ApiCommand::saveCameraUserAttributes);
@@ -33,16 +33,16 @@ void QnCameraNotificationManager::triggerNotification(
 }
 
 void QnCameraNotificationManager::triggerNotification(
-    const QnTransaction<ApiCameraAttributesDataList>& tran, 
+    const QnTransaction<nx::vms::api::CameraAttributesDataList>& tran,
     NotificationSource /*source*/)
 {
     NX_ASSERT(tran.command == ApiCommand::saveCameraUserAttributesList);
-    for (const ApiCameraAttributesData& attrs : tran.params)
+    for (const auto& attrs: tran.params)
         emit userAttributesChanged(attrs);
 }
 
 void QnCameraNotificationManager::triggerNotification(
-    const QnTransaction<ApiIdData>& tran, 
+    const QnTransaction<nx::vms::api::IdData>& tran,
     NotificationSource /*source*/)
 {
     NX_ASSERT(tran.command == ApiCommand::removeCamera ||
@@ -61,7 +61,7 @@ void QnCameraNotificationManager::triggerNotification(
 }
 
 void QnCameraNotificationManager::triggerNotification(
-    const QnTransaction<ApiServerFootageData>& tran, 
+    const QnTransaction<nx::vms::api::ServerFootageData>& tran,
     NotificationSource /*source*/)
 {
     if (tran.command == ApiCommand::addCameraHistoryItem)

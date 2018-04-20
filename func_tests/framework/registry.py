@@ -1,6 +1,5 @@
 import logging
 from collections import OrderedDict
-
 from contextlib import contextmanager
 
 from framework.move_lock import MoveLock
@@ -20,16 +19,14 @@ class RegistryLimitReached(RegistryError):
 class Registry(object):
     """Manage names allocation. Safe for parallel usage."""
 
-    def __init__(self, os_access, path, name_format, limit):
-        self._os_access = os_access
-        self._path = self._os_access.expand_path(path)
-        self._lock = MoveLock(self._os_access, self._path.with_suffix('.lock'))
-        if not self._os_access.dir_exists(self._path.parent):
+    def __init__(self, ssh_access, path, name_format, limit):
+        self._path = path
+        self._lock = MoveLock(ssh_access, self._path.with_suffix('.lock'))
+        if not self._path.parent.exists():
             logger.warning("Create %r; OK only if a clean run", self._path.parent)
-            self._os_access.mk_dir(self._path.parent)
+            self._path.parent.mkdir(parents=True)
         with self._lock:
-            if not self._os_access.file_exists(self._path):
-                self._os_access.write_file(self._path, '')
+            self._path.touch()
         self._name_format = name_format
         self._limit = limit
 
@@ -39,7 +36,7 @@ class Registry(object):
     @contextmanager
     def _reservations_locked(self):
         with self._lock:
-            reservations = load(self._os_access.read_file(self._path))
+            reservations = load(self._path.read_text())
             if reservations is None:
                 reservations = OrderedDict()
             try:
@@ -49,7 +46,7 @@ class Registry(object):
                 raise
             else:
                 logger.info("Write reservations in %r.", self)
-                self._os_access.write_file(self._path, dump(reservations))
+                self._path.write_text(dump(reservations))
 
     def _make_name(self, index):
         digits = max(len(str(self._limit)), 3)
@@ -70,7 +67,7 @@ class Registry(object):
                     logger.info("%r: %r taken with %r.", self, name, alias)
                     reservations[name] = alias
                     return index, name
-        raise RegistryLimitReached("Cannot find vacant reservation in {!r} for {!r}".format(self, alias))
+        raise RegistryLimitReached("Cannot find vacant reservation in {} for {}".format(self, alias))
 
     def _free(self, name):
         with self._reservations_locked() as reservations:

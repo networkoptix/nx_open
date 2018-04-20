@@ -120,9 +120,9 @@ bool QnSmtpTestConnectionWidget::testSettings(const QnEmailSettings &value)
         ? QnEmailSettings::defaultPort(result.connectionType)
         : result.port));
     ui->testUserLabel->setText(result.user);
-    ui->testSecurityLabel->setText(result.connectionType == QnEmail::Tls
+    ui->testSecurityLabel->setText(result.connectionType == QnEmail::ConnectionType::tls
         ? tr("TLS")
-        : result.connectionType == QnEmail::Ssl
+        : result.connectionType == QnEmail::ConnectionType::ssl
         ? tr("SSL")
         : tr("Unsecured"));
 

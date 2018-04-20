@@ -14,7 +14,7 @@ VmsP2pCommandBus::VmsP2pCommandBus(SyncronizationEngine* syncronizationEngine):
 nx::utils::db::DBResult VmsP2pCommandBus::saveResourceAttribute(
     nx::utils::db::QueryContext* queryContext,
     const std::string& systemId,
-    ::ec2::ApiResourceParamWithRefData data)
+    nx::vms::api::ResourceParamWithRefData data)
 {
     return m_syncronizationEngine->transactionLog().generateTransactionAndSaveToLog(
         queryContext,

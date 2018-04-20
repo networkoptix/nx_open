@@ -14,7 +14,9 @@ namespace api {
  * @param out tours Returns list of layout tours.
  * @returns True if operation was successful, false otherwise.
  */
-bool fetchLayoutTours(const QSqlDatabase& database, ApiLayoutTourDataList& tours);
+bool fetchLayoutTours(const QSqlDatabase& database,
+    const QnUuid& id,
+    nx::vms::api::LayoutTourDataList& tours);
 
 /**
 * Add or update layout tour.
@@ -22,7 +24,7 @@ bool fetchLayoutTours(const QSqlDatabase& database, ApiLayoutTourDataList& tours
 * @param in layout Tour api data.
 * @returns True if operation was successful, false otherwise.
 */
-bool saveLayoutTour(const QSqlDatabase& database, const ApiLayoutTourData& tour);
+bool saveLayoutTour(const QSqlDatabase& database, const nx::vms::api::LayoutTourData& tour);
 
 /**
 * Remove layout.

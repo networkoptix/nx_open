@@ -2,8 +2,8 @@ import pytest
 import winrm
 
 from framework.os_access.windows_remoting.winrm_access import WinRMAccess
-from framework.utils import wait_until
 from framework.vms.hypervisor import obtain_running_vm
+from framework.waiting import wait_for_true
 
 
 @pytest.fixture(scope='session')
@@ -17,7 +17,7 @@ def windows_vm_info(configuration, hypervisor, vm_registries):
 def winrm_access(windows_vm_info):
     hostname, port = windows_vm_info.ports['tcp', 5985]
     winrm_access = WinRMAccess(hostname, port)
-    assert wait_until(winrm_access.is_working)
+    wait_for_true(winrm_access.is_working, "{} is working".format(winrm_access))
     return winrm_access
 
 

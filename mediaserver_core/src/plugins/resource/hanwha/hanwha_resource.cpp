@@ -718,16 +718,16 @@ bool HanwhaResource::captureEvent(const nx::vms::event::AbstractEventPtr& event)
     emit cameraInput(
         toSharedPointer(this),
         analyticsEvent->auxiliaryData(),
-        analyticsEvent->getToggleState() == nx::vms::event::EventState::active,
+        analyticsEvent->getToggleState() == nx::vms::api::EventState::active,
         parameters.eventTimestampUsec);
 
     return true;
 }
 
-bool HanwhaResource::doesEventComeFromAnalyticsDriver(nx::vms::event::EventType eventType) const
+bool HanwhaResource::doesEventComeFromAnalyticsDriver(nx::vms::api::EventType eventType) const
 {
     return base_type::doesEventComeFromAnalyticsDriver(eventType)
-        || eventType == nx::vms::event::EventType::cameraInputEvent;
+        || eventType == nx::vms::api::EventType::cameraInputEvent;
 }
 
 SessionContextPtr HanwhaResource::session(
@@ -1685,7 +1685,7 @@ CameraDiagnostics::Result HanwhaResource::createProfile(
     streamParameters.codec = streamCodec(role);
     streamParameters.fps = streamFrameRate(role, fps);
     streamParameters.resolution = streamResolution(role);
-    streamParameters.quality = Qn::StreamQuality::QualityHigh;
+    streamParameters.quality = Qn::StreamQuality::high;
     streamParameters.bitrateKbps = streamBitrate(role, streamParameters);
 
     const auto profileParameters = makeProfileParameters(
@@ -2018,7 +2018,7 @@ QString HanwhaResource::defaultCodecProfileForStream(Qn::ConnectionRole role) co
 int HanwhaResource::defaultFrameRateForStream(Qn::ConnectionRole role) const
 {
     if (role == Qn::ConnectionRole::CR_SecondaryLiveVideo)
-        closestFrameRate(role, defaultSecondaryFps(Qn::QualityNormal));
+        closestFrameRate(role, defaultSecondaryFps(Qn::StreamQuality::normal));
 
     return kHanwhaInvalidFps;
 }

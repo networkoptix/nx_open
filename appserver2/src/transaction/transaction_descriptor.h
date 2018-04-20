@@ -21,16 +21,16 @@
 #include "abstract_persistent_storage.h"
 #include "nx_ec/access_helpers.h"
 #include "nx_ec/ec_api.h"
-#include "nx_ec/data/api_business_rule_data.h"
-#include "nx_ec/data/api_camera_data.h"
-#include "nx_ec/data/api_camera_attributes_data.h"
+#include <nx/vms/api/data/event_rule_data.h>
+#include <nx/vms/api/data/camera_data.h>
+#include <nx/vms/api/data/camera_attributes_data.h>
 #include "nx_ec/data/api_media_server_data.h"
 #include "nx_ec/data/api_user_data.h"
 #include "nx_ec/data/api_tran_state_data.h"
-#include "nx_ec/data/api_layout_data.h"
-#include "nx_ec/data/api_videowall_data.h"
-#include "nx_ec/data/api_camera_history_data.h"
-#include "nx_ec/data/api_stored_file_data.h"
+#include "nx/vms/api/data/layout_data.h"
+#include <nx/vms/api/data/videowall_data.h>
+#include <nx/vms/api/data/camera_history_data.h>
+#include <nx/vms/api/data/stored_file_data.h>
 #include "nx_ec/data/api_full_info_data.h"
 #include "nx_ec/data/api_license_data.h"
 #include "nx_ec/data/api_cleanup_db_data.h"
@@ -41,11 +41,11 @@
 #include "nx_ec/data/api_runtime_data.h"
 #include "nx_ec/data/api_license_overflow_data.h"
 #include "nx_ec/data/api_peer_system_time_data.h"
-#include "nx_ec/data/api_webpage_data.h"
-#include "nx_ec/data/api_connection_data.h"
+#include "nx/vms/api/data/webpage_data.h"
+#include <nx/vms/api/data/connection_data.h>
 #include "nx_ec/data/api_statistics.h"
-#include "nx_ec/data/api_resource_type_data.h"
-#include "nx_ec/data/api_lock_data.h"
+#include <nx/vms/api/data/resource_type_data.h>
+#include <nx/vms/api/data/lock_data.h>
 
 #include "nx/utils/type_utils.h"
 

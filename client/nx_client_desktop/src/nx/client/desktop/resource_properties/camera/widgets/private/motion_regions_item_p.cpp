@@ -1,6 +1,6 @@
 #include "motion_regions_item_p.h"
 
-#include <math.h>
+#include <cmath>
 
 #include <QtGui/QPainter>
 #include <QtGui/QOpenGLContext>
@@ -161,12 +161,6 @@ void MotionRegionsItem::Private::setFillOpacity(qreal value)
     q->update();
 }
 
-void MotionRegionsItem::Private::userAddRect(int sensitivity, const QRect& rect)
-{
-    if (m_motionHelper)
-        m_motionHelper->addRect(m_channel, sensitivity, rect);
-}
-
 QSGNode* MotionRegionsItem::Private::updatePaintNode(QSGNode* node)
 {
     auto geometryNode = static_cast<QSGGeometryNode*>(node);
@@ -303,7 +297,14 @@ void MotionRegionsItem::Private::ensureRegionsTexture()
 
     updateRegionsImage();
 
-    m_currentState.texture.reset(window->createTextureFromImage(m_regionsImage));
+    const auto textureDeleter =
+        [](QSGTexture* texture)
+        {
+            if (texture)
+                texture->deleteLater();
+        };
+
+    m_currentState.texture.reset(window->createTextureFromImage(m_regionsImage), textureDeleter);
     m_currentState.texture->setHorizontalWrapMode(QSGTexture::ClampToEdge);
     m_currentState.texture->setVerticalWrapMode(QSGTexture::ClampToEdge);
     m_currentState.texture->setFiltering(QSGTexture::Nearest);

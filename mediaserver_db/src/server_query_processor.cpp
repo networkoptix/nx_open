@@ -19,7 +19,7 @@ ErrorCode detail::ServerQueryProcessor::removeHelper(
     PostProcessList* const transactionsToSend,
     TransactionType::Value transactionType)
 {
-    QnTransaction<ApiIdData> removeTran = createTransaction(command, ApiIdData(id));
+    QnTransaction<nx::vms::api::IdData> removeTran = createTransaction(command, nx::vms::api::IdData(id));
     removeTran.transactionType = transactionType;
     ErrorCode errorCode = processUpdateSync(removeTran, transactionsToSend, 0);
     if (errorCode != ErrorCode::ok)
@@ -37,11 +37,11 @@ ErrorCode detail::ServerQueryProcessor::removeObjAttrHelper(
 }
 
 ErrorCode detail::ServerQueryProcessor::removeObjParamsHelper(
-    const QnTransaction<ApiIdData>& tran,
+    const QnTransaction<nx::vms::api::IdData>& tran,
     const AbstractECConnectionPtr& /*connection*/,
     PostProcessList* const transactionsToSend)
 {
-    ApiResourceParamWithRefDataList resourceParams;
+    nx::vms::api::ResourceParamWithRefDataList resourceParams;
     m_db.getResourceParamsNoLock(tran.params.id, resourceParams);
 
     return processMultiUpdateSync(

@@ -22,7 +22,8 @@ QnRecordingBusinessActionWidget::QnRecordingBusinessActionWidget(QWidget *parent
 {
     ui->setupUi(this);
 
-    for (int i = Qn::QualityLowest; i <= Qn::QualityHighest; i++) {
+    for (int i = (int)Qn::StreamQuality::lowest; i <= (int)Qn::StreamQuality::highest; i++)
+    {
         ui->qualityComboBox->addItem(toDisplayString((Qn::StreamQuality)i), i);
     }
 
@@ -43,8 +44,8 @@ QnRecordingBusinessActionWidget::QnRecordingBusinessActionWidget(QWidget *parent
 
             // Prolonged type of event has changed. In case of instant
             // action event state should be updated.
-            if (checked && (model()->eventType() == nx::vms::event::userDefinedEvent))
-                model()->setEventState(nx::vms::event::EventState::undefined);
+            if (checked && (model()->eventType() == nx::vms::api::EventType::userDefinedEvent))
+                model()->setEventState(nx::vms::api::EventState::undefined);
 
             emit paramsChanged();
         });

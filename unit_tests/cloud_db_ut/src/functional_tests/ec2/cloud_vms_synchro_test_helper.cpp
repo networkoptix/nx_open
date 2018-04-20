@@ -124,12 +124,12 @@ api::ResultCode Ec2MserverCloudSynchronization::unbindSystem()
     if (!findAdminUserId(&adminUserId))
         return api::ResultCode::unknownError;
 
-    ::ec2::ApiResourceParamWithRefDataList params;
-    params.emplace_back(::ec2::ApiResourceParamWithRefData(
+    nx::vms::api::ResourceParamWithRefDataList params;
+    params.emplace_back(nx::vms::api::ResourceParamWithRefData(
         adminUserId,
         "cloudSystemID",
         QString()));
-    params.emplace_back(::ec2::ApiResourceParamWithRefData(
+    params.emplace_back(nx::vms::api::ResourceParamWithRefData(
         adminUserId,
         "cloudAuthKey",
         QString()));
@@ -172,12 +172,12 @@ api::ResultCode Ec2MserverCloudSynchronization::saveCloudSystemCredentials(
     if (!findAdminUserId(&adminUserId))
         return api::ResultCode::unknownError;
 
-    ::ec2::ApiResourceParamWithRefDataList params;
-    params.emplace_back(::ec2::ApiResourceParamWithRefData(
+    nx::vms::api::ResourceParamWithRefDataList params;
+    params.emplace_back(nx::vms::api::ResourceParamWithRefData(
         adminUserId,
         "cloudSystemID",
         QString::fromStdString(m_system.id)));
-    params.emplace_back(::ec2::ApiResourceParamWithRefData(
+    params.emplace_back(nx::vms::api::ResourceParamWithRefData(
         adminUserId,
         "cloudAuthKey",
         QString::fromStdString(m_system.authKey)));
@@ -488,7 +488,7 @@ void Ec2MserverCloudSynchronization::verifyCloudUserPresenceInLocalDb(
     }
 
     // Verifying user full name.
-    ::ec2::ApiResourceParamWithRefDataList kvPairs;
+    nx::vms::api::ResourceParamWithRefDataList kvPairs;
     ASSERT_EQ(
         ::ec2::ErrorCode::ok,
         appserver2()->moduleInstance()->ecConnection()
@@ -496,7 +496,7 @@ void Ec2MserverCloudSynchronization::verifyCloudUserPresenceInLocalDb(
 
     const auto fullNameIter = std::find_if(
         kvPairs.cbegin(), kvPairs.cend(),
-        [](const ::ec2::ApiResourceParamWithRefData& element)
+        [](const nx::vms::api::ResourceParamWithRefData& element)
         {
             return element.name == Qn::USER_FULL_NAME;
         });
@@ -610,7 +610,7 @@ void Ec2MserverCloudSynchronization::verifyThatSystemDataMatchInCloudAndVms(
     QnUuid adminUserId;
     ASSERT_TRUE(findAdminUserId(&adminUserId));
 
-    ::ec2::ApiResourceParamWithRefDataList systemSettings;
+    nx::vms::api::ResourceParamWithRefDataList systemSettings;
     ASSERT_EQ(
         ::ec2::ErrorCode::ok,
         appserver2()->moduleInstance()->ecConnection()

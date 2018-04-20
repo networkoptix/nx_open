@@ -1,17 +1,17 @@
 import logging
+import re
 import time
 from datetime import datetime
 
 import pytest
 import pytz
-import re
 from pathlib2 import Path
 
 import framework.utils as utils
 import server_api_data_generators as generator
 from framework.api_shortcuts import get_server_id
 from framework.merging import setup_local_system
-from framework.os_access import NonZeroExitStatus
+from framework.os_access.exceptions import NonZeroExitStatus
 
 log = logging.getLogger(__name__)
 
@@ -50,12 +50,12 @@ DF_SIZE_REGEX = re.compile(r'^.*\s+([0-9\.]+)G$', re.MULTILINE)
 
 
 class LinuxVMVolume(object):
-    def __init__(self, os_access):
-        self._os_access = os_access  # SSHAccess
+    def __init__(self, ssh_access):
+        self._ssh_access = ssh_access  # SSHAccess
 
     def _need_create(self, mount_point, size_gb):
         try:
-            df_output = self._os_access.run_command(
+            df_output = self._ssh_access.run_command(
                 ['df', str(mount_point), '-h', '--output=size', '-BG'])
             m = DF_SIZE_REGEX.search(df_output)
             if m:
@@ -66,13 +66,13 @@ class LinuxVMVolume(object):
 
     def ensure_volume_exists(self, mount_point, size_gb=DEFAULT_VOLUME_SIZE_GB):
         if self._need_create(mount_point, size_gb):
-            image_path = str(Path('/').joinpath(mount_point.name + '.image'))
-            if self._os_access.file_exists(image_path):
-                self._os_access.rm_tree(image_path)
-            self._os_access.run_command(['fallocate', '-l', size_gb * ONE_GB, image_path])
-            self._os_access.run_command(['/sbin/mke2fs', '-F', '-t', 'ext4', image_path])
-            self._os_access.mk_dir(mount_point)
-            self._os_access.run_command(['mount', image_path, str(mount_point)])
+            image_path = self._ssh_access.Path('/').joinpath(mount_point.name).with_suffix('.image')
+            if image_path.exists():
+                image_path.unlink()
+            self._ssh_access.run_command(['fallocate', '-l', size_gb * ONE_GB, image_path])
+            self._ssh_access.run_command(['/sbin/mke2fs', '-F', '-t', 'ext4', image_path])
+            self._ssh_access.Path(mount_point).mkdir()
+            self._ssh_access.run_command(['mount', image_path, mount_point])
 
 
 # Global system 'backupQualities' setting parametrization:

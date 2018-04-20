@@ -65,7 +65,7 @@ void WearableArchiveSynchronizationTask::cancel()
 
 bool WearableArchiveSynchronizationTask::execute()
 {
-    m_withMotion = m_resource->getMotionType() == Qn::MT_SoftwareGrid;
+    m_withMotion = m_resource->getMotionType() == Qn::MotionType::MT_SoftwareGrid;
 
     createArchiveReader(m_startTimeMs, &m_state.duration);
     createStreamRecorder(m_startTimeMs, m_state.duration);

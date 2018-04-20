@@ -300,7 +300,7 @@ protected:
         const TransportHeader& transportHeader);
 
     void gotTransaction(
-        const QnTransaction<ApiUpdateSequenceData> &tran,
+        const QnTransaction<nx::vms::api::UpdateSequenceData> &tran,
         const P2pConnectionPtr& connection,
         const TransportHeader& transportHeader);
 

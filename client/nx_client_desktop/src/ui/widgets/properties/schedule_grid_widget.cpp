@@ -32,6 +32,8 @@ const qreal kMaximumGridFontSize = 12.0;
 
 const qreal kFontIncreaseStep = 0.5;
 
+static constexpr auto kStreamQualityCount = 7;
+
 } // anonymous namespace
 
 QnScheduleGridWidget::QnScheduleGridWidget(QWidget* parent):
@@ -136,7 +138,7 @@ void QnScheduleGridWidget::initMetrics()
 
         // checking all variants of quality string
         if (m_showQuality)
-            for (int i = 0; i < Qn::StreamQualityCount && !tooBig; i++)
+            for (int i = 0; i < kStreamQualityCount && !tooBig; i++)
                 tooBig |= (metrics.width(toShortDisplayString(static_cast<Qn::StreamQuality>(i))) > maxLength);
 
         // checking numbers like 11, 22, .. 99
@@ -280,16 +282,16 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent* event)
             const auto suffix = qFuzzyIsNull(cellParams.bitrateMbps) ? QString() : lit("*");
 
             // draw text parameters
-            if (cellParams.recordingType != Qn::RT_Never)
+            if (cellParams.recordingType != Qn::RecordingType::never)
             {
                 p.setPen(m_colors.gridLabel);
                 Qn::StreamQuality quality = cellParams.quality;
 
                 if (m_showFps)
                 {
-                    bool fpsValid = cellParams.recordingType == Qn::RT_Never || cellParams.fps > 0;
+                    bool fpsValid = cellParams.recordingType == Qn::RecordingType::never || cellParams.fps > 0;
                     NX_ASSERT(fpsValid);
-                    QString fps = cellParams.recordingType != Qn::RT_Never && cellParams.fps > 0
+                    QString fps = cellParams.recordingType != Qn::RecordingType::never && cellParams.fps > 0
                         ? QString::number(cellParams.fps)
                         : lit("-");
 
@@ -543,8 +545,8 @@ void QnScheduleGridWidget::resetCellValues()
 {
     CellParams emptyParams;
     emptyParams.fps = 0;
-    emptyParams.quality = Qn::QualityNotDefined;
-    emptyParams.recordingType = Qn::RT_Never;
+    emptyParams.quality = Qn::StreamQuality::undefined;
+    emptyParams.recordingType = Qn::RecordingType::never;
 
     for (int col = 0; col < columnCount(); ++col)
         for (int row = 0; row < rowCount(); ++row)
@@ -604,7 +606,7 @@ void QnScheduleGridWidget::setMaxFps(int maxFps, int maxDualStreamFps)
             int fps = cell.fps;
             int value = maxFps;
 
-            if (cell.recordingType == Qn::RT_MotionAndLowQuality)
+            if (cell.recordingType == Qn::RecordingType::motionAndLow)
                 value = maxDualStreamFps;
 
             if (fps > value)
@@ -625,10 +627,10 @@ int QnScheduleGridWidget::getMaxFps(bool motionPlusLqOnly)
         {
             auto cell = m_gridParams[x][y];
             Qn::RecordingType rt = cell.recordingType;
-            if (motionPlusLqOnly && rt != Qn::RT_MotionAndLowQuality)
+            if (motionPlusLqOnly && rt != Qn::RecordingType::motionAndLow)
                 continue;
 
-            if (rt == Qn::RT_Never)
+            if (rt == Qn::RecordingType::never)
                 continue;
 
             fps = qMax(fps, cell.fps);

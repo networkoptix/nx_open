@@ -177,7 +177,7 @@ LayoutsHandler::LayoutsHandler(QObject *parent):
     connect(qnCommonMessageProcessor, &QnCommonMessageProcessor::businessActionReceived, this,
         [this](const vms::event::AbstractActionPtr& businessAction)
         {
-            if (businessAction->actionType() != vms::event::openLayoutAction)
+            if (businessAction->actionType() != vms::api::ActionType::openLayoutAction)
                 return;
             const auto &actionParams = businessAction->getParams();
 

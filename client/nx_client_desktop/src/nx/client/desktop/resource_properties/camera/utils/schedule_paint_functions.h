@@ -2,6 +2,8 @@
 
 #include <array>
 
+#include <QtCore/QMap>
+
 #include <QtGui/QColor>
 
 #include <common/common_globals.h>
@@ -39,7 +41,7 @@ struct SchedulePaintFunctions
 private:
     // Color by hovered state
     using HoveredColors = std::array<QColor, 2>;
-    using TypeColors = std::array<HoveredColors, Qn::RT_Count>;
+    using TypeColors = QMap<Qn::RecordingType, HoveredColors>;
     TypeColors m_cellColor;
 };
 

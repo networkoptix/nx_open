@@ -74,19 +74,19 @@ public:
         int avQuality = 0;
         switch (q)
         {
-            case Qn::QualityHighest:
+            case Qn::StreamQuality::highest:
                 avQuality = 19;
                 break;
-            case Qn::QualityHigh:
+            case Qn::StreamQuality::high:
                  avQuality = 13;
                 break;
-            case Qn::QualityNormal:
+            case Qn::StreamQuality::normal:
                 avQuality = 8;
                 break;
-            case Qn::QualityLow:
+            case Qn::StreamQuality::low:
                 avQuality = 4;
                 break;
-            case Qn::QualityLowest:
+            case Qn::StreamQuality::lowest:
                 avQuality = 1;
                 break;
             default:

@@ -193,7 +193,7 @@ enum IDType
      * Opens the Business Events Log dialog.
      * Supports cameras list in the resources field as a cameras filter.
      * Parameters:
-     * <tt>nx::vms::event::EventType EventTypeRole</tt> --- filter by event type.
+     * <tt>nx::vms::api::EventType EventTypeRole</tt> --- filter by event type.
      */
     OpenBusinessLogAction,
 

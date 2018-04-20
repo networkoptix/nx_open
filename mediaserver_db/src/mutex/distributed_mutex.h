@@ -8,7 +8,7 @@
 #include <QtCore/QTimer>
 #include <QtCore/QQueue>
 
-#include "nx_ec/data/api_lock_data.h"
+#include <nx/vms/api/data/lock_data.h>
 #include "transaction/transaction.h"
 #include <common/common_module_aware.h>
 
@@ -16,14 +16,14 @@ namespace ec2
 {
     class QnDistributedMutexManager;
 
-    struct LockRuntimeInfo: public ApiLockData
+    struct LockRuntimeInfo: public nx::vms::api::LockData
     {
         LockRuntimeInfo(const QnUuid& _peer = QnUuid(), qint64 _timestamp = 0, const QString& _name = QString()) {
             peer = _peer;
             timestamp = _timestamp;
             name = _name;
         }
-        LockRuntimeInfo(const ApiLockData& data): ApiLockData(data) {}
+        LockRuntimeInfo(const nx::vms::api::LockData& data): nx::vms::api::LockData(data) {}
 
         bool operator<(const LockRuntimeInfo& other) const  { return timestamp != other.timestamp ? timestamp < other.timestamp : peer < other.peer; }
         bool operator==(const LockRuntimeInfo& other) const { return timestamp == other.timestamp && peer == other.peer; }
@@ -59,9 +59,9 @@ namespace ec2
         void locked();
         void lockTimeout(const QSet<QnUuid> &failedPeers);
     private slots:
-        void at_gotLockRequest(ApiLockData lockInfo);
-        void at_gotLockResponse(ApiLockData lockInfo);
-        //void at_gotUnlockRequest(ApiLockData lockInfo);
+        void at_gotLockRequest(nx::vms::api::LockData lockInfo);
+        void at_gotLockResponse(nx::vms::api::LockData lockInfo);
+        //void at_gotUnlockRequest(nx::vms::api::LockData lockInfo);
         void at_newPeerFound(QnUuid peer, Qn::PeerType peerType);
         void at_peerLost(QnUuid peer, Qn::PeerType peerType);
         void at_timeout();
@@ -79,7 +79,7 @@ namespace ec2
         QTimer* m_timer;
         mutable QnMutex m_mutex;
         bool m_locked;
-        QQueue<ApiLockData> m_delayedResponse;
+        QQueue<nx::vms::api::LockData> m_delayedResponse;
         QnDistributedMutexManager* m_owner;
         QByteArray m_userData;
     };

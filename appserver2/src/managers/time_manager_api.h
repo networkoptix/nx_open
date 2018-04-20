@@ -67,7 +67,7 @@ namespace ec2
         using namespace std::placeholders;
         m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
             ApiCommand::forcePrimaryTimeServer,
-            ApiIdData(serverGuid),
+            nx::vms::api::IdData(serverGuid),
             std::bind( &impl::SimpleHandler::done, handler, reqID, _1) );
 
         return reqID;

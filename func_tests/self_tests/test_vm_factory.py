@@ -3,7 +3,7 @@ import logging
 import pytest
 from pathlib2 import Path
 
-from framework.os_access.local import LocalAccess
+from framework.os_access.local_access import LocalAccess
 from framework.registry import Registry
 from framework.vms.factory import VMFactory
 from framework.vms.hypervisor import VMNotFound
@@ -14,7 +14,8 @@ _logger = logging.getLogger(__name__)
 @pytest.fixture()
 def registry(hypervisor):
     registry_path = Path('/tmp/func_tests/linux-test_factory.registry.yaml')
-    registry_path.unlink()
+    if registry_path.exists():
+        registry_path.unlink()
     registry = Registry(LocalAccess(), registry_path, 'func_tests-temp-factory_test-{index}', 2)
     for index, name in registry.possible_entries():
         try:
@@ -74,3 +75,21 @@ def test_allocate_two(vm_factory):
         with vm_factory.allocated_vm('b', vm_type=_vm_type) as b:
             assert a.name != b.name
             assert a.index != b.index
+
+
+@pytest.mark.parallel_unsafe
+def test_cleanup(vm_factory, hypervisor):
+    with vm_factory.allocated_vm('a', vm_type=_vm_type) as a:
+        with vm_factory.allocated_vm('b', vm_type=_vm_type) as b:
+            vm_names = {a.name, b.name}
+            _logger.info("Check VMs: %r. When allocated, VMs must exist.", vm_names)
+            assert vm_names <= set(hypervisor.list_vm_names())
+    _logger.info(
+        "Existing VMs: %r. When not allocated, VMs are not required to exist.",
+        vm_names & set(hypervisor.list_vm_names()))
+    _logger.info("Cleanup VMs: %r.", vm_names)
+    vm_factory.cleanup()
+    _logger.info(
+        "Existing VMs: %r. When cleaned up, VMs must not exist.",
+        vm_names & set(hypervisor.list_vm_names()))
+    assert not vm_names & set(hypervisor.list_vm_names())

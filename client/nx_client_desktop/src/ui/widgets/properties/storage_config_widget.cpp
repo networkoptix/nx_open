@@ -188,7 +188,7 @@ namespace
     {
         const auto isSelectedForBackup = [](const QnVirtualCameraResourcePtr& camera)
         {
-            return camera->getActualBackupQualities() != Qn::CameraBackup_Disabled;
+            return camera->getActualBackupQualities() != Qn::CameraBackupQuality::CameraBackup_Disabled;
         };
 
         QnVirtualCameraResourceList serverCameras = resourcePool->getAllCameras(QnResourcePtr(), true);
@@ -655,7 +655,7 @@ void QnStorageConfigWidget::applyChanges()
         return;
 
     QnStorageResourceList storagesToUpdate;
-    ec2::ApiIdDataList storagesToRemove;
+    nx::vms::api::IdDataList storagesToRemove;
 
     applyCamerasToBackup(m_camerasToBackup, m_quality);
     applyStoragesChanges(storagesToUpdate, m_model->storages());
@@ -1047,7 +1047,7 @@ void QnStorageConfigWidget::applyCamerasToBackup(const QnVirtualCameraResourceLi
 
     const auto qualityForCamera = [cameras, quality](const QnVirtualCameraResourcePtr& camera)
     {
-        return (cameras.contains(camera) ? quality : Qn::CameraBackup_Disabled);
+        return (cameras.contains(camera) ? quality : Qn::CameraBackupQuality::CameraBackup_Disabled);
     };
 
     /* Update all default cameras and all cameras that we have changed. */

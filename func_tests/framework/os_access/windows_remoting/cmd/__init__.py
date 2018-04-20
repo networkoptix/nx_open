@@ -94,11 +94,12 @@ def receive_stdout_and_stderr_until_done(command):
         stdout_chunk, stderr_chunk = command.receive_stdout_and_stderr()
         stdout += stdout_chunk
         stderr += stderr_chunk
-    return stdout, stderr
+    return bytes(stdout), bytes(stderr)
 
 
-def run_command(shell, arguments, stdin_bytes=b''):
+def run_command(shell, arguments, stdin_bytes=None):
     with shell.start(*arguments) as command:
-        command.send_stdin(stdin_bytes, end=True)
+        if stdin_bytes is not None:
+            command.send_stdin(stdin_bytes, end=True)
         stdout_bytes, stderr_bytes = receive_stdout_and_stderr_until_done(command)
     return command.exit_code, stdout_bytes, stderr_bytes

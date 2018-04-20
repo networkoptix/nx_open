@@ -189,7 +189,7 @@ vms::event::EventParameters convertOldEventParameters(
             switch ((Param) i)
             {
                 case EventTypeParam:
-                    result.eventType = (vms::event::EventType) toInt(field);
+                    result.eventType = (vms::api::EventType) toInt(field);
                     break;
                 case EventTimestampParam:
                     result.eventTimestampUsec = toInt64(field);
@@ -204,7 +204,7 @@ vms::event::EventParameters convertOldEventParameters(
                     result.inputPortId = QString::fromUtf8(field.data(), field.size());
                     break;
                 case ReasonCodeParam:
-                    result.reasonCode = (vms::event::EventReason) toInt(field);
+                    result.reasonCode = (vms::api::EventReason) toInt(field);
                     break;
                 case ReasonParamsEncodedParam:
                 {
@@ -811,7 +811,7 @@ bool QnServerDb::saveActionToDB(const vms::event::AbstractActionPtr& action)
     qint64 timestampUsec = action->getRuntimeParams().eventTimestampUsec;
     QnUuid eventResId = action->getRuntimeParams().eventResourceId;
     QnUuid eventSubtype;
-    if (action->getRuntimeParams().eventType == nx::vms::event::analyticsSdkEvent)
+    if (action->getRuntimeParams().eventType == vms::api::EventType::analyticsSdkEvent)
         eventSubtype = action->getRuntimeParams().analyticsEventId();
 
     auto actionParams = action->getParams();
@@ -871,14 +871,14 @@ QString QnServerDb::getRequestStr(const QnEventLogFilterData& request,
         requestStr += QString(lit(" AND event_resource_guid IN (%1) ")).arg(idList);
     }
 
-    if (request.eventType != vms::event::undefinedEvent
-        && request.eventType != vms::event::anyEvent)
+    if (request.eventType != vms::api::EventType::undefinedEvent
+        && request.eventType != vms::api::EventType::anyEvent)
     {
         if (vms::event::hasChild(request.eventType))
         {
-            QList<vms::event::EventType> events = vms::event::childEvents(request.eventType);
+            QList<vms::api::EventType> events = vms::event::childEvents(request.eventType);
             QString eventTypeStr;
-            for(vms::event::EventType evnt: events) {
+            for(vms::api::EventType evnt: events) {
                 if (!eventTypeStr.isEmpty())
                     eventTypeStr += QLatin1Char(',');
                 eventTypeStr += QString::number((int) evnt);
@@ -896,7 +896,7 @@ QString QnServerDb::getRequestStr(const QnEventLogFilterData& request,
         requestStr += lit(" AND event_subtype = %1 ").arg(guidToSqlString(request.eventSubtype));
     }
 
-    if (request.actionType != vms::event::undefinedAction)
+    if (request.actionType != vms::api::ActionType::undefinedAction)
         requestStr += QString(lit(" AND action_type = %1 ")).arg((int) request.actionType);
 
     if (!request.ruleId.isNull())
@@ -942,7 +942,7 @@ vms::event::ActionDataList QnServerDb::getActions(
     {
         vms::event::ActionData actionData;
 
-        actionData.actionType = (vms::event::ActionType) query.value(actionTypeIdx).toInt();
+        actionData.actionType = (vms::api::ActionType) query.value(actionTypeIdx).toInt();
         actionData.actionParams = QnUbjson::deserialized<vms::event::ActionParameters>(
             query.value(actionParamIdx).toByteArray());
         actionData.eventParams = QnUbjson::deserialized<vms::event::EventParameters>(
@@ -951,11 +951,11 @@ vms::event::ActionDataList QnServerDb::getActions(
             query.value(businessRuleIdx).toByteArray());
         actionData.aggregationCount = query.value(aggregationCntIdx).toInt();
 
-        if (actionData.eventParams.eventType == vms::event::cameraMotionEvent
-            || actionData.eventParams.eventType == vms::event::cameraInputEvent
-            || actionData.eventParams.eventType == vms::event::analyticsSdkEvent
-            || actionData.actionType == vms::event::ActionType::bookmarkAction
-            || actionData.actionType == vms::event::ActionType::acknowledgeAction)
+        if (actionData.eventParams.eventType == vms::api::cameraMotionEvent
+            || actionData.eventParams.eventType == vms::api::cameraInputEvent
+            || actionData.eventParams.eventType == vms::api::analyticsSdkEvent
+            || actionData.actionType == vms::api::bookmarkAction
+            || actionData.actionType == vms::api::acknowledgeAction)
         {
             QnNetworkResourcePtr camRes =
                 resourcePool()->getResourceById<QnNetworkResource>(actionData.eventParams.eventResourceId);
@@ -1014,12 +1014,12 @@ void QnServerDb::getAndSerializeActions(const QnEventLogRequestData& request,
     while (actionsQuery.next())
     {
         int flags = 0;
-        const auto eventType = (vms::event::EventType) actionsQuery.value(eventTypeIdx).toInt();
-        const auto actionType = (vms::event::ActionType) actionsQuery.value(actionTypeIdx).toInt();
-        if (eventType == vms::event::cameraMotionEvent
-            || eventType == vms::event::cameraInputEvent
-            || actionType == vms::event::ActionType::bookmarkAction
-            || actionType == vms::event::ActionType::acknowledgeAction)
+        const auto eventType = (vms::api::EventType) actionsQuery.value(eventTypeIdx).toInt();
+        const auto actionType = (vms::api::ActionType) actionsQuery.value(actionTypeIdx).toInt();
+        if (eventType == vms::api::EventType::cameraMotionEvent
+            || eventType == vms::api::EventType::cameraInputEvent
+            || actionType == vms::api::ActionType::bookmarkAction
+            || actionType == vms::api::ActionType::acknowledgeAction)
         {
             QnUuid eventResId = QnUuid::fromRfc4122(actionsQuery.value(eventResIdx).toByteArray());
             QnNetworkResourcePtr camRes =

@@ -380,10 +380,10 @@ void SingleCameraSettingsWidget::setLockedMode(bool locked)
 Qn::MotionType SingleCameraSettingsWidget::selectedMotionType() const
 {
     if (!m_camera)
-        return Qn::MT_Default;
+        return Qn::MotionType::MT_Default;
 
     if (!ui->motionDetectionCheckBox->isChecked())
-        return Qn::MT_NoMotion;
+        return Qn::MotionType::MT_NoMotion;
 
     return m_camera->getDefaultMotionType();
 }
@@ -538,7 +538,7 @@ void SingleCameraSettingsWidget::updateFromResource(bool silent)
         {
             auto supported = m_camera->supportedMotionType();
             auto motionType = m_camera->getMotionType();
-            auto mdEnabled = supported.testFlag(motionType) && motionType != Qn::MT_NoMotion;
+            auto mdEnabled = supported.testFlag(motionType) && motionType != Qn::MotionType::MT_NoMotion;
             ui->motionDetectionCheckBox->setChecked(mdEnabled);
             ui->cameraScheduleWidget->setMotionDetectionAllowed(mdEnabled);
 
@@ -705,13 +705,13 @@ void SingleCameraSettingsWidget::showMaxFpsWarningIfNeeded()
     {
         switch (scheduleTask.recordingType)
         {
-            case Qn::RT_Never:
+            case Qn::RecordingType::never:
                 continue;
-            case Qn::RT_MotionAndLowQuality:
+            case Qn::RecordingType::motionAndLow:
                 maxDualStreamFps = qMax(maxDualStreamFps, scheduleTask.fps);
                 break;
-            case Qn::RT_Always:
-            case Qn::RT_MotionOnly:
+            case Qn::RecordingType::always:
+            case Qn::RecordingType::motionOnly:
                 maxFps = qMax(maxFps, scheduleTask.fps);
                 break;
             default:
@@ -756,7 +756,7 @@ void SingleCameraSettingsWidget::updateMotionWidgetNeedControlMaxRect()
         return;
 
     m_motionWidget->setControlMaxRects(m_camera
-        && m_camera->getDefaultMotionType() == Qn::MT_HardwareGrid);
+        && m_camera->getDefaultMotionType() == Qn::MotionType::MT_HardwareGrid);
 }
 
 void SingleCameraSettingsWidget::updateMotionCapabilities()
@@ -837,10 +837,10 @@ bool SingleCameraSettingsWidget::isValidSecondStream()
     bool usesSecondStream = false;
     for (auto& task : filteredTasks)
     {
-        if (task.recordingType == Qn::RT_MotionAndLowQuality)
+        if (task.recordingType == Qn::RecordingType::motionAndLow)
         {
             usesSecondStream = true;
-            task.recordingType = Qn::RT_Always;
+            task.recordingType = Qn::RecordingType::always;
         }
     }
 

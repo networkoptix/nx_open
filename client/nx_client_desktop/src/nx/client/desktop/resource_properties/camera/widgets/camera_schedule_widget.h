@@ -26,7 +26,7 @@ public:
         QWidget* parent = nullptr);
     virtual ~CameraScheduleWidget() override;
 
-    //void overrideMotionType(Qn::MotionType motionTypeOverride = Qn::MT_Default);
+    //void overrideMotionType(Qn::MotionType motionTypeOverride = Qn::MotionType::MT_Default);
 
     void setStore(CameraSettingsDialogStore* store);
 
