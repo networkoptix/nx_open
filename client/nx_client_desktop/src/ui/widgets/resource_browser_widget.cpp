@@ -143,7 +143,7 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
                 case Qn::ResourceNode:
                 {
                     const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-                    return resource && resource->hasFlags(Qn::server) && !resource->hasFlags(Qn::local);
+                    return resource && resource->hasFlags(Qn::server);
                 }
                 case Qn::ServersNode:
                 case Qn::UserResourcesNode:
