@@ -18,6 +18,7 @@ public:
 
     virtual QString dataDir() const = 0;
     virtual utils::log::Settings logging() const = 0;
+    virtual QString logBaseName() const = 0;
 };
 
 } // namespace utils

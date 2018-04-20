@@ -7,8 +7,10 @@ namespace cloud {
 namespace gateway {
 
 VmsGatewayEmbeddable::VmsGatewayEmbeddable(
-    bool isSslEnabled, const QString& certPath)
-:
+    bool isSslEnabled,
+    const QString& certPath,
+    const QString& logBaseName)
+    :
     m_isSslEnabled(isSslEnabled)
 {
     addArg("/path/to/bin");
@@ -33,6 +35,7 @@ VmsGatewayEmbeddable::VmsGatewayEmbeddable(
 
     // do not allow VmsGateway reinit the log
     addArg("-log/logLevel", "none");
+    addArg("-log/baseName", logBaseName.toUtf8());
 
     if (startAndWaitUntilStarted())
     {

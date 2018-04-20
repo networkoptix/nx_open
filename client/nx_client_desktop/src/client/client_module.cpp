@@ -133,40 +133,73 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
     qnLogMsgHandler(type, ctx, msg);
 }
 
+namespace {
 
-namespace
+typedef std::unique_ptr<QnTranslationManager> QnTranslationManagerPtr;
+
+QnTranslationManagerPtr initializeTranslations(QnClientSettings* settings)
 {
-    typedef std::unique_ptr<QnTranslationManager> QnTranslationManagerPtr;
+    QnTranslationManagerPtr translationManager(new QnTranslationManager());
+    translationManager->addPrefix(lit("client_base"));
+    translationManager->addPrefix(lit("client_ui"));
+    translationManager->addPrefix(lit("client_core"));
+    translationManager->addPrefix(lit("client_qml"));
 
-    QnTranslationManagerPtr initializeTranslations(QnClientSettings* settings)
-    {
-        QnTranslationManagerPtr translationManager(new QnTranslationManager());
-        translationManager->addPrefix(lit("client_base"));
-        translationManager->addPrefix(lit("client_ui"));
-        translationManager->addPrefix(lit("client_core"));
-        translationManager->addPrefix(lit("client_qml"));
+    QnTranslation translation;
+    if (translation.isEmpty()) /* By path. */
+        translation = translationManager->loadTranslation(settings->locale());
 
-        QnTranslation translation;
-        if (translation.isEmpty()) /* By path. */
-            translation = translationManager->loadTranslation(settings->locale());
+    /* Check if qnSettings value is invalid. */
+    if (translation.isEmpty())
+        translation = translationManager->defaultTranslation();
 
-        /* Check if qnSettings value is invalid. */
-        if (translation.isEmpty())
-            translation = translationManager->defaultTranslation();
-
-        translationManager->installTranslation(translation);
-        return translationManager;
-    }
-
-    void initializeStatisticsManager(QnCommonModule *commonModule)
-    {
-        const auto statManager = commonModule->instance<QnStatisticsManager>();
-
-        statManager->setClientId(qnSettings->pcUuid());
-        statManager->setStorage(QnStatisticsStoragePtr(new QnStatisticsFileStorage()));
-        statManager->setSettings(QnStatisticsLoaderPtr(new QnStatisticsSettingsWatcher()));
-    }
+    translationManager->installTranslation(translation);
+    return translationManager;
 }
+
+void initializeStatisticsManager(QnCommonModule* commonModule)
+{
+    const auto statManager = commonModule->instance<QnStatisticsManager>();
+
+    statManager->setClientId(qnSettings->pcUuid());
+    statManager->setStorage(QnStatisticsStoragePtr(new QnStatisticsFileStorage()));
+    statManager->setSettings(QnStatisticsLoaderPtr(new QnStatisticsSettingsWatcher()));
+}
+
+QString calculateLogNameSuffix(const QnStartupParameters& startupParams)
+{
+    if (!startupParams.videoWallGuid.isNull())
+    {
+        QString result = startupParams.videoWallItemGuid.isNull()
+            ? startupParams.videoWallGuid.toString()
+            : startupParams.videoWallItemGuid.toString();
+        result.replace(QRegExp(QLatin1String("[{}]")), QLatin1String("_"));
+        return result;
+    }
+
+    if (startupParams.selfUpdateMode)
+    {
+        // we hope self-updater will run only once per time and will not overflow log-file
+        // qnClientInstanceManager is not initialized in self-update mode
+        return lit("self_update");
+    }
+
+    if (qnRuntime->isActiveXMode())
+    {
+        return lit("ax");
+    }
+
+    if (qnClientInstanceManager && qnClientInstanceManager->isValid())
+    {
+        int idx = qnClientInstanceManager->instanceIndex();
+        if (idx > 0)
+            return L'_' + QString::number(idx);
+    }
+
+    return QString();
+}
+
+} // namespace
 
 QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject* parent):
     QObject(parent)
@@ -384,7 +417,9 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 #endif
 
     commonModule->store(new QnQtbugWorkaround());
-    commonModule->store(new nx::cloud::gateway::VmsGatewayEmbeddable(true));
+
+    const QString vmsGatewayLogFile = lit("vms_gateway") + calculateLogNameSuffix(startupParams);
+    commonModule->store(new nx::cloud::gateway::VmsGatewayEmbeddable(true, {}, vmsGatewayLogFile));
 
     m_cameraDataManager = commonModule->store(new QnCameraDataManager(commonModule));
 
@@ -446,30 +481,7 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
     auto logLevel = startupParams.logLevel;
     auto ec2TranLogLevel = startupParams.ec2TranLogLevel;
 
-    QString logFileNameSuffix;
-    if (!startupParams.videoWallGuid.isNull())
-    {
-        logFileNameSuffix = startupParams.videoWallItemGuid.isNull()
-            ? startupParams.videoWallGuid.toString()
-            : startupParams.videoWallItemGuid.toString();
-        logFileNameSuffix.replace(QRegExp(QLatin1String("[{}]")), QLatin1String("_"));
-    }
-    else if (startupParams.selfUpdateMode)
-    {
-        // we hope self-updater will run only once per time and will not overflow log-file
-        // qnClientInstanceManager is not initialized in self-update mode
-        logFileNameSuffix = lit("self_update");
-    }
-    else if (qnRuntime->isActiveXMode())
-    {
-        logFileNameSuffix = lit("ax");
-    }
-    else if (qnClientInstanceManager && qnClientInstanceManager->isValid())
-    {
-        int idx = qnClientInstanceManager->instanceIndex();
-        if (idx > 0)
-            logFileNameSuffix = L'_' + QString::number(idx) + L'_';
-    }
+    const QString logFileNameSuffix = calculateLogNameSuffix(startupParams);
 
     if (logLevel.isEmpty())
         logLevel = qnSettings->logLevel();
