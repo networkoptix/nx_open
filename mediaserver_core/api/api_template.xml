@@ -434,17 +434,6 @@
             <urlPrefix>/api</urlPrefix>
             <groupDescription>This group contains functions related to a single server</groupDescription>
             <functions>
-                <function proprietary="true">
-                    <name>execAction</name>
-                    <description>Execute an action. Action data should be in the internal
-                        binary format. This method is going to be refactored in the next
-                        version.</description>
-                    <method>POST</method>
-                    <params/>
-                    <result>
-                        <caption>XML with the "OK" message or an error code.</caption>
-                    </result>
-                </function>
                 <function>
                     <name>detachFromCloud</name>
                     <description>Detach media server from cloud. Local admin user is enabled, admin password is changed to new value (if specified), all cloud users are disabled. Cloud link is removed.
@@ -755,14 +744,6 @@ content type "application/json". Example of such object:
                     <result>
                         <caption>Bakcup process progress status or an error code.</caption>
                     </result>
-                </function>
-                <function proprietary="true">
-                    <name>onEvent</name>
-                    <description>Process an event from an external system. Reserved for future
-                      use.</description>
-                    <method>POST</method>
-                    <params/>
-                    <result/>
                 </function>
                 <function>
                     <name>systemSettings</name>

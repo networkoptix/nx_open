@@ -256,7 +256,7 @@ case "$1" in
 
         if [ ! -z "$SYSTEM_USER" ]; then
             $CFG_HELPER systemUser "$SYSTEM_USER"
-            useradd "$SYSTEM_USER" || true
+            useradd --system "$SYSTEM_USER" || true
 
             # Allow core dumps creation.
             chown "$SYSTEM_USER:$SYSTEM_USER" "$BIN_DIR"

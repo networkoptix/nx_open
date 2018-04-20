@@ -1883,13 +1883,13 @@ void MediaServerProcess::registerRestHandlers(
      * Parameters of the generated event, such as "source", "caption" and "description", are
      * intended to be analyzed by these rules.
      * <tt>
-     *    <br/>Example:
-     *    <pre><![CDATA[
+     *     <br/>Example:
+     *     <pre><![CDATA[
      * http://127.0.0.1:7001/api/createEvent?timestamp=2016-09-16T16:02:41Z&caption=CreditCardUsed&metadata={"cameraRefs":["3A4AD4EA-9269-4B1F-A7AA-2CEC537D0248","3A4AD4EA-9269-4B1F-A7AA-2CEC537D0240"]}
-     *    ]]></pre>
-     *    This example triggers a generic event informing the system that a
-     *    credit card has been used on September 16, 2016 at 16:03:41 UTC in a POS
-     *    terminal being watched by the two specified cameras.
+     *     ]]></pre>
+     *     This example triggers a generic event informing the system that a
+     *     credit card has been used on September 16, 2016 at 16:03:41 UTC in a POS
+     *     terminal being watched by the two specified cameras.
      * </tt>
      * %param[opt] timestamp Event date and time (as a string containing time in milliseconds since
      *     epoch, or a local time formatted like
@@ -2080,98 +2080,98 @@ void MediaServerProcess::registerRestHandlers(
      *         %value ExecHttpRequestAction Send HTTP request as an action.
      *     %param actionParams JSON object with action parameters. Only fields that are applicable
      *         to the particular action are used.
-     *     %param actionParams.actionResourceId Additional parameter for event log convenience.
-     *     %param actionParams.url Play Sound / exec HTTP action.
-     *     %param actionParams.emailAddress Email.
-     *     %param actionParams.userGroup Popups and System Health.
-     *         %value EveryOne
-     *         %value AdminOnly
-     *     %param actionParams.fps Frames per second for recording.
-     *     %param actionParams.streamQuality Stream quality for recording.
-     *         %value QualityLowest
-     *         %value QualityLow
-     *         %value QualityNormal
-     *         %value QualityHigh
-     *         %value QualityHighest
-     *         %value QualityPreSet
-     *         %value QualityNotDefined
-     *     %param actionParams.recordingDuration Duration of the recording, in seconds.
-     *     %param actionParams.recordAfter For Bookmark, extension to the recording time, in
-     *         seconds.
-     *     %param actionParams.relayOutputId Camera Output.
-     *     %param actionParams.sayText
-     *     %param actionParams.tags Bookmark.
-     *     %param actionParams.text Text for Show Text Overlay, or message body for Exec HTTP
-     *         Action.
-     *     %param actionParams.durationMs Duration in milliseconds for Bookmark and Show Text
-     *         Overlay.
-     *     %param actionParams.additionalResources JSON list of ids of additional resources; user
-     *         ids for Show On Alarm Layout.
-     *     %param actionParams.forced Alarm Layout - if it must be opened immediately.
-     *         %value true
-     *         %value false
-     *     %param actionParams.presetId Execute PTZ preset action.
-     *     %param actionParams.useSource Alarm Layout - if the source resource should also be used.
-     *     %param actionParams.recordBeforeMs Bookmark start time is adjusted to the left by this
-     *         value in milliseconds.
-     *     %param actionParams.playToClient Text to be pronounced.
-     *     %param actionParams.contentType HTTP action.
+     *         %param actionParams.actionResourceId Additional parameter for event log convenience.
+     *         %param actionParams.url Play Sound / exec HTTP action.
+     *         %param actionParams.emailAddress Email.
+     *         %param actionParams.userGroup Popups and System Health.
+     *             %value EveryOne
+     *             %value AdminOnly
+     *         %param actionParams.fps Frames per second for recording.
+     *         %param actionParams.streamQuality Stream quality for recording.
+     *             %value QualityLowest
+     *             %value QualityLow
+     *             %value QualityNormal
+     *             %value QualityHigh
+     *             %value QualityHighest
+     *             %value QualityPreSet
+     *             %value QualityNotDefined
+     *         %param actionParams.recordingDuration Duration of the recording, in seconds.
+     *         %param actionParams.recordAfter For Bookmark, extension to the recording time, in
+     *             seconds.
+     *         %param actionParams.relayOutputId Camera Output.
+     *         %param actionParams.sayText
+     *         %param actionParams.tags Bookmark.
+     *         %param actionParams.text Text for Show Text Overlay, or message body for Exec HTTP
+     *             Action.
+     *         %param actionParams.durationMs Duration in milliseconds for Bookmark and Show Text
+     *             Overlay.
+     *         %param actionParams.additionalResources JSON list of ids of additional resources; user
+     *             ids for Show On Alarm Layout.
+     *         %param actionParams.forced Alarm Layout - if it must be opened immediately.
+     *             %value true
+     *             %value false
+     *         %param actionParams.presetId Execute PTZ preset action.
+     *         %param actionParams.useSource Alarm Layout - if the source resource should also be used.
+     *         %param actionParams.recordBeforeMs Bookmark start time is adjusted to the left by this
+     *             value in milliseconds.
+     *         %param actionParams.playToClient Text to be pronounced.
+     *         %param actionParams.contentType HTTP action.
      *     %param eventParams JSON object with event parameters.
-     *     %param eventParams.eventType Type of the event.
-     *         %value UndefinedEvent Event type is not defined. Used in rules.
-     *         %value CameraMotionEvent Motion has occurred on a camera.
-     *         %value CameraInputEvent Camera input signal is received.
-     *         %value CameraDisconnectEvent Camera was disconnected.
-     *         %value StorageFailureEvent Storage read error has occurred.
-     *         %value NetworkIssueEvent Network issue: packet lost, RTP timeout, etc.
-     *         %value CameraIpConflictEvent Found some cameras with same IP address.
-     *         %value ServerFailureEvent Connection to server lost.
-     *         %value ServerConflictEvent Two or more servers are running.
-     *         %value ServerStartEvent Server started.
-     *         %value LicenseIssueEvent Not enough licenses.
-     *         %value BackupFinishedEvent Archive backup done.
-     *         %value SystemHealthEvent System health message.
-     *         %value MaxSystemHealthEvent System health message.
-     *         %value AnyCameraEvent Event group.
-     *         %value AnyServerEvent Event group.
-     *         %value AnyBusinessEvent Event group.
-     *         %value UserDefinedEvent Base index for the user-defined events.
-     *     %param eventParams.eventTimestampUsec When did the event occur, in microseconds.
-     *     %param eventParams.eventResourceId Event source - camera or server id.
-     *     %param eventParams.resourceName Name of the resource which caused the event. Used if no
-     *         resource is actually registered in the system. Generic event can provide some
-     *         resource name which doesn't match any resourceId in the system. In this case
-     *         resourceName is filled and resourceId remains empty.
-     *     %param eventParams.sourceServerId Id of a server that generated the event.
-     *     %param eventParams.reasonCode Used in Reasoned Events as a reason code.
-     *         %value NoReason
-     *         %value NetworkNoFrameReason
-     *         %value NetworkConnectionClosedReason
-     *         %value NetworkRtpPacketLossReason
-     *         %value ServerTerminatedReason
-     *         %value ServerStartedReason
-     *         %value StorageIoErrorReason
-     *         %value StorageTooSlowReason
-     *         %value StorageFullReason
-     *         %value LicenseRemoved
-     *         %value BackupFailedNoBackupStorageError
-     *         %value BackupFailedSourceStorageError
-     *         %value BackupFailedSourceFileError
-     *         %value BackupFailedTargetFileError
-     *         %value BackupFailedChunkError
-     *         %value BackupEndOfPeriod
-     *         %value BackupDone
-     *         %value BackupCancelled
-     *         %value NetworkNoResponseFromDevice
-     *     %param eventParams.inputPortId Used for Input events only.
-     *     %param eventParams.caption Short event description. Used for camera/server conflict as
-     *         resource name which cause error. Used in generic events as a short description.
-     *     %param eventParams.description Long event description. Used for camera/server conflict
-     *         as a long description (conflict list). Used in Reasoned Events as reason
-     *         description. Used in generic events as a long description.
-     *     %param eventParams.metadata Camera list which is associated with the event.
-     *         EventResourceId may be a POS terminal, but this is a camera list which should be
-     *         shown with this event.
+     *         %param eventParams.eventType Type of the event.
+     *             %value UndefinedEvent Event type is not defined. Used in rules.
+     *             %value CameraMotionEvent Motion has occurred on a camera.
+     *             %value CameraInputEvent Camera input signal is received.
+     *             %value CameraDisconnectEvent Camera was disconnected.
+     *             %value StorageFailureEvent Storage read error has occurred.
+     *             %value NetworkIssueEvent Network issue: packet lost, RTP timeout, etc.
+     *             %value CameraIpConflictEvent Found some cameras with same IP address.
+     *             %value ServerFailureEvent Connection to server lost.
+     *             %value ServerConflictEvent Two or more servers are running.
+     *             %value ServerStartEvent Server started.
+     *             %value LicenseIssueEvent Not enough licenses.
+     *             %value BackupFinishedEvent Archive backup done.
+     *             %value SystemHealthEvent System health message.
+     *             %value MaxSystemHealthEvent System health message.
+     *             %value AnyCameraEvent Event group.
+     *             %value AnyServerEvent Event group.
+     *             %value AnyBusinessEvent Event group.
+     *             %value UserDefinedEvent Base index for the user-defined events.
+     *         %param eventParams.eventTimestampUsec When did the event occur, in microseconds.
+     *         %param eventParams.eventResourceId Event source - camera or server id.
+     *         %param eventParams.resourceName Name of the resource which caused the event. Used if no
+     *             resource is actually registered in the system. Generic event can provide some
+     *             resource name which doesn't match any resourceId in the system. In this case
+     *             resourceName is filled and resourceId remains empty.
+     *         %param eventParams.sourceServerId Id of a server that generated the event.
+     *         %param eventParams.reasonCode Used in Reasoned Events as a reason code.
+     *             %value NoReason
+     *             %value NetworkNoFrameReason
+     *             %value NetworkConnectionClosedReason
+     *             %value NetworkRtpPacketLossReason
+     *             %value ServerTerminatedReason
+     *             %value ServerStartedReason
+     *             %value StorageIoErrorReason
+     *             %value StorageTooSlowReason
+     *             %value StorageFullReason
+     *             %value LicenseRemoved
+     *             %value BackupFailedNoBackupStorageError
+     *             %value BackupFailedSourceStorageError
+     *             %value BackupFailedSourceFileError
+     *             %value BackupFailedTargetFileError
+     *             %value BackupFailedChunkError
+     *             %value BackupEndOfPeriod
+     *             %value BackupDone
+     *             %value BackupCancelled
+     *             %value NetworkNoResponseFromDevice
+     *         %param eventParams.inputPortId Used for Input events only.
+     *         %param eventParams.caption Short event description. Used for camera/server conflict as
+     *             resource name which cause error. Used in generic events as a short description.
+     *         %param eventParams.description Long event description. Used for camera/server conflict
+     *             as a long description (conflict list). Used in Reasoned Events as reason
+     *             description. Used in generic events as a long description.
+     *         %param eventParams.metadata Camera list which is associated with the event.
+     *             EventResourceId may be a POS terminal, but this is a camera list which should be
+     *             shown with this event.
      *     %param businessRuleId Id of the event rule.
      *     %param aggregationCount Number of identical events groupped into one.
      *     %param[proprietary] flags Combination (via "|") or the following flags:
@@ -2309,20 +2309,20 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/settime", new QnSetTimeRestHandler(), kAdmin); //< deprecated
 
     /**%apidoc POST /api/setTime
-     *  Set current time on the server machine.
-     *  Can be called only if server flags include "SF_timeCtrl"
-     *  (server flags can be obtained via /ec2/getMediaServersEx in "flags" field).
-     *  <p>
-     *      Parameters should be passed as a JSON object in POST message body with
-     *      content type "application/json". Example of such object:
-     *  <pre><code>
-     *  {
-     *      "dateTime": "2015-02-28T16:37:00",
-     *      "timeZoneId": "Europe/Moscow"
-     *  }
-     *  </code>
-     *  </pre>
-     *  </p>
+     * Set current time on the server machine.
+     * Can be called only if server flags include "SF_timeCtrl"
+     * (server flags can be obtained via /ec2/getMediaServersEx in "flags" field).
+     * <p>
+     *     Parameters should be passed as a JSON object in POST message body with
+     *     content type "application/json". Example of such object:
+     * <pre><code>
+     * {
+     *     "dateTime": "2015-02-28T16:37:00",
+     *     "timeZoneId": "Europe/Moscow"
+     * }
+     * </code>
+     * </pre>
+     * </p>
      * %permissions Administrator.
      * %param[opt] timeZoneId Time zone identifier, can be obtained via /api/getTimeZones.
      * %param dateTime Date and time (as string containing time in milliseconds since epoch, or a
@@ -2501,8 +2501,9 @@ void MediaServerProcess::registerRestHandlers(
      *     <br/>Format: string with a JSON list of <i>sensors</i>,
      *     each <i>sensor</i> is a JSON list of <i>rects</i>, each <i>rect</i> is:
      *     <br/>
-     *     <code>{"x": <i>x</i>, "y": <i>y</i>, "width": <i>width</i>,
-     *         "height": <i>height</i>}</code>
+     *     <code>
+     *         {"x": <i>x</i>, "y": <i>y</i>, "width": <i>width</i>,"height": <i>height</i>}
+     *     </code>
      *     <br/>All values are measured in relative portions of a video frame,
      *     <i>x</i> and <i>width</i> in range [0..43], <i>y</i> and <i>height</i> in range [0..31],
      *     zero is the left-top corner.
@@ -2556,21 +2557,18 @@ void MediaServerProcess::registerRestHandlers(
      *     default value) which implies autosizing: if the height is specified, the width will be
      *     calculated based on the aspect ratio, otherwise, the original frame size will be used.
      * %param[opt] imageFormat Format of the requested image. Default value is "JpgFormat".
-     *     %value PngFormat PNG
-     *     %value JpgFormat JPEG
-     *     %value TiffFormat TIFF
-     *     %value RawFormat Raw video frame. Makes the request much more lightweight for Edge
-     *         servers.
-     * %param[opt] method Getting a thumbnail at the exact timestamp is costly, so, it can be
+     *     %value png PNG
+     *     %value jpg JPEG
+     *     %value tif TIFF
+     *     %value raw Raw video frame. Makes the request much more lightweight for Edge servers.
+     * %param[opt] roundMethod Getting a thumbnail at the exact timestamp is costly, so, it can be
      *     rounded to the nearest keyframe, thus, the default value is "KeyFrameAfterMethod".
-     *     %value KeyFrameBeforeMethod Get the thumbnail from the nearest keyframe before the given
-     *         time.
-     *     %value PreciseMethod Get the thumbnail as near to given time as possible.
-     *     %value KeyFrameAfterMethod Get the thumbnail from the nearest keyframe after the given
-     *         time.
+     *     %value before Get the thumbnail from the nearest keyframe before the given time.
+     *     %value precise Get the thumbnail as near to given time as possible.
+     *     %value after Get the thumbnail from the nearest keyframe after the given time.
      * %param[opt] aspectRatio Allows to avoid scaling the image to the aspect ratio from camera
      *     settings.
-     *     %value auto Default value. Honor aspect ratio from camera settings.
+     *     %value auto Default value. Use aspect ratio from camera settings (if any).
      *     %value source Use the source frame aspect ratio, despite the value in camera settings.
      * %param[proprietary] local If present, the request should not be redirected to another
      *     server.

@@ -1,4 +1,4 @@
-nx_add_target(mediaserver EXECUTABLE
+nx_add_target(mediaserver EXECUTABLE SIGNED
     PUBLIC_LIBS mediaserver_core)
 
 if(TARGET festival_libs)

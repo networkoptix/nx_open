@@ -391,7 +391,10 @@ int SystemCommands::open(const std::string& path, int mode, bool reportViaSocket
     }
 
     int fd = ::open(path.c_str(), mode, 0660);
-    if (reportViaSocket)
+    if (fd < 0)
+        perror("open");
+
+    if (reportViaSocket && fd > 0)
         system_commands::domain_socket::detail::sendFd(fd);
 
     return fd;

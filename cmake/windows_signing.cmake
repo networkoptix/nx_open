@@ -10,8 +10,8 @@ cmake_dependent_option(trustedTimestamping
 
 set(timestamp_server_parameters "")
 if(trustedTimestamping)
-    set(signing_timestamp_server "http://tsa.startssl.com/rfc3161")
-    set(timestamp_server_parameters "/td sha256 /tr ${signing_timestamp_server}")
+    set(signing_timestamp_server "http://timestamp.comodoca.com/rfc3161")
+    set(timestamp_server_parameters /td sha256 /tr ${signing_timestamp_server})
 endif()
 
 function(nx_sign_windows_executable target)
@@ -27,7 +27,7 @@ function(nx_sign_windows_executable target)
         add_custom_command(TARGET ${target} POST_BUILD
             COMMAND ${SIGNTOOL_EXECUTABLE} sign
                 /fd sha256
-                "${timestamp_server_parameters}"
+                ${timestamp_server_parameters}
                 /v
                 /a
                 $<TARGET_FILE:${target}>
@@ -41,7 +41,7 @@ function(nx_sign_windows_executable target)
         add_custom_command(TARGET ${target} POST_BUILD
             COMMAND ${SIGNTOOL_EXECUTABLE} sign
                 /fd sha256
-                "${timestamp_server_parameters}"
+                ${timestamp_server_parameters}
                 /v
                 /f ${certificate_file}
                 /p ${sign.password}

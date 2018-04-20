@@ -24,6 +24,8 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(0, enableWearableCameras, "Enable wearable cameras.");
     NX_INI_FLAG(0, debugThumbnailProviders, "Enable debug mode for thumbnail providers");
     NX_INI_FLAG(0, allowOsScreenSaver, "Allow OS to enable screensaver when user is not active.");
+    NX_INI_FLAG(0, enableWebKitDeveloperExtras, "Enable WebKit developer tools like Inspector.");
+    NX_INI_FLAG(1, modalServerSetupWizard, "Server setup wizard dialog is a modal window.");
 };
 
 inline Ini& ini()
