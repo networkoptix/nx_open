@@ -136,6 +136,7 @@ public:
         nx::Buffer* buffer,
         std::function<void(SystemError::ErrorCode,std::size_t)>&& handler)
     {
+        DEBUG_LOG(lm("reset, callback: %1").arg(bool(handler)));
         m_readBuffer = buffer;
         m_handler = std::move(handler);
         m_readBytes = 0;
@@ -149,10 +150,11 @@ protected:
     {
         const auto handler = std::move(m_handler);
         m_handler = nullptr;
-
-        NX_ASSERT(handler != nullptr);
         if (!handler)
+        {
+            NX_ASSERT(false, lm("invokeUserCallback nullptr, status: %1").arg(m_errorCode));
             return;
+        }
 
         DEBUG_LOG(lm("invokeUserCallback, status: %1").arg(m_errorCode));
         switch(m_exitStatus)
@@ -192,6 +194,7 @@ public:
         const nx::Buffer* buffer,
         std::function<void(SystemError::ErrorCode,std::size_t)>&& handler)
     {
+        DEBUG_LOG(lm("reset, callback: %1").arg(bool(handler)));
         m_writeBuffer = buffer;
         m_handler = std::move(handler);
         SslAsyncOperation::reset();
@@ -204,10 +207,11 @@ protected:
     {
         const auto handler = std::move(m_handler);
         m_handler = nullptr;
-
-        NX_ASSERT(handler != nullptr);
         if (!handler)
+        {
+            NX_ASSERT(false, lm("invokeUserCallback nullptr, status: %1").arg(m_errorCode));
             return;
+        }
 
         DEBUG_LOG(lm("invokeUserCallback, status: %1").arg(m_errorCode));
         switch(m_exitStatus)
@@ -241,6 +245,7 @@ public:
 
     void reset(std::function<void(SystemError::ErrorCode)>&& handler)
     {
+        DEBUG_LOG(lm("reset, callback: %1").arg(bool(handler)));
         m_handler = std::move(handler);
         SslAsyncOperation::reset();
     }
@@ -252,10 +257,11 @@ protected:
     {
         const auto handler = std::move(m_handler);
         m_handler = nullptr;
-
-        NX_ASSERT(handler != nullptr);
         if (!handler)
+        {
+            NX_ASSERT(false, lm("invokeUserCallback nullptr, status: %1").arg(m_errorCode));
             return;
+        }
 
         DEBUG_LOG(lm("invokeUserCallback, status: %1").arg(m_errorCode));
         switch(m_exitStatus)
@@ -1620,6 +1626,7 @@ void SslSocket::readSomeAsync(
     nx::Buffer* const buffer,
     std::function<void(SystemError::ErrorCode, std::size_t)> handler)
 {
+    NX_CRITICAL(handler);
     if (!initializeUnderlyingSocketIfNeeded())
     {
         auto sysErrorCode = SystemError::getLastOSErrorCode();
@@ -1650,6 +1657,7 @@ void SslSocket::sendAsync(
     const nx::Buffer& buffer,
     std::function<void(SystemError::ErrorCode, std::size_t)> handler)
 {
+    NX_CRITICAL(handler);
     if (!initializeUnderlyingSocketIfNeeded())
     {
         auto sysErrorCode = SystemError::getLastOSErrorCode();
@@ -1820,6 +1828,7 @@ void MixedSslSocket::readSomeAsync(
     nx::Buffer* const buffer,
     std::function<void(SystemError::ErrorCode, std::size_t)> handler)
 {
+    NX_CRITICAL(handler);
     Q_D(MixedSslSocket);
     NX_ASSERT(d->nonBlockingMode.load() || d->syncRecvPromise.load());
     if (!checkAsyncOperation(&d->isRecvInProgress, &handler, d->wrappedSocket.get(), "Mixed SSL read"))
@@ -1859,6 +1868,7 @@ void MixedSslSocket::sendAsync(
     const nx::Buffer& buffer,
     std::function<void(SystemError::ErrorCode, std::size_t)> handler)
 {
+    NX_CRITICAL(handler);
     Q_D(MixedSslSocket);
     NX_ASSERT(d->nonBlockingMode.load() || d->syncSendPromise.load());
     if (!checkAsyncOperation(&d->isSendInProgress, &handler, d->wrappedSocket.get(), "Mixed SSL send"))
