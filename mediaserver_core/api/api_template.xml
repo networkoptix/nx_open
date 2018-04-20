@@ -43,7 +43,7 @@
                             <optional>false</optional>
                         </param>
                         <param>
-                            <name>&lt;any name&gt;</name>
+                            <name>&lt;any_name&gt;</name>
                             <description>Parameter for camera to set. Request can contain one or
                                 more parameters to set.</description>
                             <optional>true</optional>
@@ -67,7 +67,7 @@
                             <optional>false</optional>
                         </param>
                         <param>
-                            <name>&lt;any name&gt;</name>
+                            <name>&lt;any_name&gt;</name>
                             <description>Parameter name to read. Request can contain one or more
                                 parameters.</description>
                             <optional>true</optional>
@@ -97,7 +97,7 @@
                                     <description>Stop rebuild.</description>
                                 </value>
                                 <value>
-                                    <name>any other value or no parameter</name>
+                                    <name>any_other_value_or_no_parameter</name>
                                     <description>Report server archive rebuild status</description>
                                 </value>
                             </values>
@@ -131,7 +131,7 @@
                                     <description>Stop backup.</description>
                                 </value>
                                 <value>
-                                    <name>any other value or no parameter</name>
+                                    <name>any_other_value_or_no_parameter</name>
                                     <description>Report the backup process status.</description>
                                 </value>
                             </values>
@@ -147,12 +147,12 @@
                     <method>GET</method>
                     <params>
                         <param>
-                            <name>{param name}</name>
+                            <name>&lt;param_name&gt;</name>
                             <description>name of system parameter. E.g., ec2AliveUpdateIntervalSec</description>
                             <optional>true</optional>
                         </param>
                         <param>
-                            <name>{param value}</name>
+                            <name>&lt;param_value&gt;</name>
                             <description>New value for the specified parameter</description>
                             <optional>true</optional>
                         </param>
