@@ -1837,7 +1837,27 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/statistics", new QnStatisticsRestHandler());
 
+    /**%apidoc GET /api/getCameraParam
+     * Read camera parameters. For instance: brightness, contrast e.t.c. Parameters to read should
+     * be specified.
+     * %param cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx or
+     *     /ec2/getCameras?extraFormatting) or MAC address (not supported for certain cameras).
+     * %param[opt] <any_name> Parameter name to read. Request can contain one or more parameters.
+     * %return Required parameter values in form of paramName=paramValue, each parameter on a new
+     *     line.
+     */
     reg("api/getCameraParam", new QnCameraSettingsRestHandler());
+
+    /**%apidoc POST /api/setCameraParam
+     * Sets values of several camera parameters. This parameters are used on the Advanced tab in
+     * camera settings. For instance: brightness, contrast e.t.c.
+     * %param cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx or
+     *     /ec2/getCameras?extraFormatting) or MAC address (not supported for certain cameras).
+     * %param[opt] <any_name> Parameter for camera to set. Request can contain one or more
+     *     parameters to set.
+     * %return "OK" if all parameters have been set, otherwise return error 500 (Internal server
+     *     error) and the result of setting for every parameter.
+     */
     reg("api/setCameraParam", new QnCameraSettingsRestHandler());
 
     /**%apidoc GET /api/manualCamera/search
@@ -2100,7 +2120,25 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/changeCameraPassword", new QnChangeCameraPasswordRestHandler(), kAdmin);
 
+    /**%apidoc GET /api/rebuildArchive
+     * Start or stop the server archive rebuilding, also can report this process status.
+     * %param[opt] action What to do and what to report about the server archive rebuild.
+     *     %value start Start server archive rebuild.
+     *     %value stop Stop rebuild.
+     *     %value <any_other_value_or_no_parameter> Report server archive rebuild status
+     * %param mainPool 1 (for the main storage) or 0 (for the backup storage)
+     * %return Rebuild progress status or an error code.
+     */
     reg("api/rebuildArchive", new QnRebuildArchiveRestHandler());
+
+    /**%apidoc GET /api/backupControl
+     * Start or stop the recorded data backup process, also can report this process status.
+     * %param[opt] action What to do and what to report about the backup process.
+     *     %value start Start backup just now.
+     *     %value stop Stop backup.
+     *     %value <any_other_value_or_no_parameter> Report the backup process status.
+     * %return Bakcup process progress status or an error code.
+     */
     reg("api/backupControl", new QnBackupControlRestHandler());
 
     /**%apidoc[proprietary] GET /api/events
@@ -2420,8 +2458,17 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/configure", new QnConfigureRestHandler(messageBus), kAdmin);
 
+    /**%apidoc POST /api/detachFromCloud
+     * Detach media server from cloud. Local admin user is enabled, admin password is changed to
+     * new value (if specified), all cloud users are disabled. Cloud link is removed. Function can
+     * be called either via GET or POST method. POST data should be a json object.
+     * %permissions Administrator.
+     * %param[opt] password Set new admin password after detach.
+     * %return JSON result with error code
+     */
     reg("api/detachFromCloud", new QnDetachFromCloudRestHandler(
         &cloudManagerGroup->connectionManager), kAdmin);
+
     reg("api/detachFromSystem", new QnDetachFromSystemRestHandler(
         &cloudManagerGroup->connectionManager, messageBus), kAdmin);
 
@@ -2544,6 +2591,12 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/scriptList", new QnScriptListRestHandler(), kAdmin);
 
+    /**%apidoc GET /api/systemSettings
+     * Get or set global system settings. If called with no arguments, just returns list of all
+     * system settings with their values
+     * %param[opt] <param_name> name of system parameter. E.g., ec2AliveUpdateIntervalSec
+     * %param[opt] <param_value> New value for the specified parameter
+     */
     reg("api/systemSettings", new QnSystemSettingsHandler());
 
     reg("api/transmitAudio", new QnAudioTransmissionRestHandler());
