@@ -1,13 +1,7 @@
 {
-<<<<<<< mine
-  "language_name": "Italiano",
-  "productName": "%PRODUCT_NAME%",
-  "clientProtocol": "%CLIENT_PROTOCOL%:",
-=======
   "language_name": "Italiano",
   "productName": "{{PRODUCT_NAME}}",
   "clientProtocol": "{{CLIENT_PROTOCOL}}:",
->>>>>>> theirs
   "dialogs": {
     "okButton": "Ok",
     "cancelButton": "Annulla",
