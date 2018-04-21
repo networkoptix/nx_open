@@ -28,13 +28,13 @@ public:
         nx::utils::db::QueryContext* queryContext,
         const api::AccountData& account) = 0;
 
-    virtual std::optional<data::AccountData> fetchAccountByEmail(
+    virtual std::optional<api::AccountData> fetchAccountByEmail(
         nx::utils::db::QueryContext* queryContext,
         const std::string& accountEmail) = 0;
 
     virtual nx::utils::db::DBResult fetchAccounts(
         nx::utils::db::QueryContext* queryContext,
-        std::vector<data::AccountData>* accounts) = 0;
+        std::vector<api::AccountData>* accounts) = 0;
 
     // TODO: #ak Replace QDateTime with std::chrono::steady_clock::time_point
     virtual void insertEmailVerificationCode(

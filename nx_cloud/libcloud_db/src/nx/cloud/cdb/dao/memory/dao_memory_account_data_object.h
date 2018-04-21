@@ -25,13 +25,13 @@ public:
         nx::utils::db::QueryContext* queryContext,
         const api::AccountData& account) override;
 
-    virtual std::optional<data::AccountData> fetchAccountByEmail(
+    virtual std::optional<api::AccountData> fetchAccountByEmail(
         nx::utils::db::QueryContext* queryContext,
         const std::string& accountEmail) override;
 
     virtual nx::utils::db::DBResult fetchAccounts(
         nx::utils::db::QueryContext* queryContext,
-        std::vector<data::AccountData>* accounts) override;
+        std::vector<api::AccountData>* accounts) override;
 
     virtual void insertEmailVerificationCode(
         nx::utils::db::QueryContext* queryContext,

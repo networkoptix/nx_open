@@ -585,7 +585,7 @@ nx::utils::db::DBResult AccountManager::fillCache()
 nx::utils::db::DBResult AccountManager::fetchAccounts(
     nx::utils::db::QueryContext* queryContext)
 {
-    std::vector<data::AccountData> accounts;
+    std::vector<api::AccountData> accounts;
     auto dbResult = m_dao->fetchAccounts(queryContext, &accounts);
     if (dbResult != nx::utils::db::DBResult::ok)
         return dbResult;
