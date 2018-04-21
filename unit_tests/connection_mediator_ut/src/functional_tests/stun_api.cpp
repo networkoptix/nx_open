@@ -50,7 +50,9 @@ protected:
 
         std::array<char, 256> readBuf;
         ASSERT_EQ(-1, m_connection->recv(readBuf.data(), readBuf.size(), 0));
-        ASSERT_EQ(SystemError::timedOut, SystemError::getLastOSErrorCode());
+        ASSERT_TRUE(
+            SystemError::getLastOSErrorCode() == SystemError::timedOut ||
+            SystemError::getLastOSErrorCode() == SystemError::wouldBlock);
     }
 
 private:
