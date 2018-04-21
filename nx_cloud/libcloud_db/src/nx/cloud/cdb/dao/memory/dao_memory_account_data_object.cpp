@@ -29,7 +29,7 @@ nx::utils::db::DBResult AccountDataObject::update(
     return nx::utils::db::DBResult::ok;
 }
 
-std::optional<data::AccountData> AccountDataObject::fetchAccountByEmail(
+std::optional<api::AccountData> AccountDataObject::fetchAccountByEmail(
     nx::utils::db::QueryContext* /*queryContext*/,
     const std::string& accountEmail)
 {
@@ -42,7 +42,7 @@ std::optional<data::AccountData> AccountDataObject::fetchAccountByEmail(
 
 nx::utils::db::DBResult AccountDataObject::fetchAccounts(
     nx::utils::db::QueryContext* /*queryContext*/,
-    std::vector<data::AccountData>* /*accounts*/)
+    std::vector<api::AccountData>* /*accounts*/)
 {
     // TODO
     return nx::utils::db::DBResult::ok;

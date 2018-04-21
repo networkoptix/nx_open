@@ -666,20 +666,6 @@ bool UdtStreamSocket::isConnected() const
     return m_state == detail::SocketState::connected;
 }
 
-void UdtStreamSocket::cancelIOAsync(
-    aio::EventType eventType,
-    nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler)
-{
-    return m_aioHelper->cancelIOAsync(
-        eventType,
-        std::move(cancellationDoneHandler));
-}
-
-void UdtStreamSocket::cancelIOSync(aio::EventType eventType)
-{
-    m_aioHelper->cancelIOSync(eventType);
-}
-
 bool UdtStreamSocket::setNoDelay(bool value)
 {
     // Udt does not support it. Returned true so that caller code works.
@@ -753,6 +739,11 @@ void UdtStreamSocket::registerTimer(
     nx::utils::MoveOnlyFunc<void()> handler)
 {
     return m_aioHelper->registerTimer(timeoutMillis, std::move(handler));
+}
+
+void UdtStreamSocket::cancelIoInAioThread(aio::EventType eventType)
+{
+    m_aioHelper->cancelIOSync(eventType);
 }
 
 bool UdtStreamSocket::connectToIp(
@@ -982,16 +973,6 @@ void UdtStreamServerSocket::acceptAsync(AcceptCompletionHandler handler)
         });
 }
 
-void UdtStreamServerSocket::cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler)
-{
-    m_aioHelper->cancelIOAsync(std::move(handler));
-}
-
-void UdtStreamServerSocket::cancelIOSync()
-{
-    m_aioHelper->cancelIOSync();
-}
-
 void UdtStreamServerSocket::pleaseStop(
     nx::utils::MoveOnlyFunc< void() > completionHandler)
 {
@@ -1010,6 +991,11 @@ void UdtStreamServerSocket::pleaseStopSync(bool assertIfCalledUnderLock)
         stopWhileInAioThread();
     else
         QnStoppableAsync::pleaseStopSync(assertIfCalledUnderLock);
+}
+
+void UdtStreamServerSocket::cancelIoInAioThread()
+{
+    m_aioHelper->cancelIOSync();
 }
 
 AbstractStreamSocket* UdtStreamServerSocket::systemAccept()

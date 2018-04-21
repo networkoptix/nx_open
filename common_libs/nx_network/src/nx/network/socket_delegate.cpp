@@ -74,12 +74,7 @@ void StreamServerSocketDelegate::acceptAsync(AcceptCompletionHandler handler)
     return m_target->acceptAsync(std::move(handler));
 }
 
-void StreamServerSocketDelegate::cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler)
-{
-    return m_target->cancelIOAsync(std::move(handler));
-}
-
-void StreamServerSocketDelegate::cancelIOSync()
+void StreamServerSocketDelegate::cancelIoInAioThread()
 {
     return m_target->cancelIOSync();
 }

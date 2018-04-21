@@ -64,8 +64,6 @@ public:
     void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
     virtual void acceptAsync(AcceptCompletionHandler handler) override;
-    virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) override;
-    virtual void cancelIOSync() override;
 
     virtual bool isInSelfAioThread() const override;
 
@@ -92,6 +90,8 @@ protected:
         listening
     };
 
+    virtual void cancelIoInAioThread() override;
+
     void initTunnelPool(int queueLen);
     void startAcceptor(std::unique_ptr<AbstractTunnelAcceptor> acceptor);
     void onListenRequestCompleted(
@@ -106,7 +106,6 @@ protected:
     void onNewConnectionHasBeenAccepted(
         SystemError::ErrorCode sysErrorCode,
         std::unique_ptr<AbstractStreamSocket> socket);
-    void cancelAccept();
 
     void issueRegistrationRequest();
     void onConnectionRequested(hpm::api::ConnectionRequestedEvent event);

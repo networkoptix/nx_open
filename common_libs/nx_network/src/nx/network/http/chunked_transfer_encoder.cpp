@@ -7,7 +7,6 @@
 #endif
 
 #include <nx/network/socket.h>
-#include <nx/fusion/serialization/binary_stream.h>
 
 namespace nx {
 namespace network {

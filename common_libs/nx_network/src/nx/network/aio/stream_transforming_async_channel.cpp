@@ -66,13 +66,6 @@ void StreamTransformingAsyncChannel::sendAsync(
         });
 }
 
-void StreamTransformingAsyncChannel::cancelIOSync(
-    aio::EventType eventType)
-{
-    executeInAioThreadSync(std::bind(
-        &StreamTransformingAsyncChannel::cancelIoWhileInAioThread, this, eventType));
-}
-
 void StreamTransformingAsyncChannel::stopWhileInAioThread()
 {
     m_rawDataChannel.reset();
@@ -329,7 +322,7 @@ void StreamTransformingAsyncChannel::removeUserTask(UserTask* taskToRemove)
     }
 }
 
-void StreamTransformingAsyncChannel::cancelIoWhileInAioThread(aio::EventType eventType)
+void StreamTransformingAsyncChannel::cancelIoInAioThread(aio::EventType eventType)
 {
     // Removing user task and cancelling operations on underlying
     //   raw channel that are required by the task cancelled.

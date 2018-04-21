@@ -794,20 +794,6 @@ bool CommunicatingSocket<SocketInterfaceToImplement>::shutdown()
 }
 
 template<typename SocketInterfaceToImplement>
-void CommunicatingSocket<SocketInterfaceToImplement>::cancelIOAsync(
-    aio::EventType eventType,
-    nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler)
-{
-    m_aioHelper->cancelIOAsync(eventType, std::move(cancellationDoneHandler));
-}
-
-template<typename SocketInterfaceToImplement>
-void CommunicatingSocket<SocketInterfaceToImplement>::cancelIOSync(aio::EventType eventType)
-{
-    m_aioHelper->cancelIOSync(eventType);
-}
-
-template<typename SocketInterfaceToImplement>
 void CommunicatingSocket<SocketInterfaceToImplement>::connectAsync(
     const SocketAddress& addr,
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
@@ -848,6 +834,13 @@ void CommunicatingSocket<SocketInterfaceToImplement>::registerTimer(
     if (timeout == std::chrono::milliseconds::zero())
         timeout = std::chrono::milliseconds(1);  //handler of zero timer will NOT be called
     return m_aioHelper->registerTimer(timeout, std::move(handler));
+}
+
+template<typename SocketInterfaceToImplement>
+void CommunicatingSocket<SocketInterfaceToImplement>::cancelIoInAioThread(
+    aio::EventType eventType)
+{
+    m_aioHelper->cancelIOSync(eventType);
 }
 
 template<typename SocketInterfaceToImplement>
@@ -1458,13 +1451,7 @@ void TCPServerSocket::acceptAsync(AcceptCompletionHandler handler)
     return d->asyncServerSocketHelper.acceptAsync(std::move(handler));
 }
 
-void TCPServerSocket::cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler)
-{
-    TCPServerSocketPrivate* d = static_cast<TCPServerSocketPrivate*>(impl());
-    return d->asyncServerSocketHelper.cancelIOAsync(std::move(handler));
-}
-
-void TCPServerSocket::cancelIOSync()
+void TCPServerSocket::cancelIoInAioThread()
 {
     TCPServerSocketPrivate* d = static_cast<TCPServerSocketPrivate*>(impl());
     return d->asyncServerSocketHelper.cancelIOSync();

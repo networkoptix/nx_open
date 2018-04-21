@@ -1,7 +1,5 @@
 #include "custom_gtest_printers.h"
 
-#include <nx/fusion/model_functions.h>
-
 namespace nx {
 
 namespace network {
@@ -29,7 +27,7 @@ namespace api {
 
 void PrintTo(ResultCode val, ::std::ostream* os)
 {
-    *os << QnLexical::serialized(val).toStdString();
+    *os << toString(val);
 }
 
 } // namespace api

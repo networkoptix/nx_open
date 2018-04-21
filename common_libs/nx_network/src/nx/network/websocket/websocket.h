@@ -54,7 +54,7 @@ public:
     /**
      * Cancels all IO operations. Socket is not operational after this function is called.
      */
-    virtual void cancelIOSync(nx::network::aio::EventType eventType) override;
+    virtual void cancelIoInAioThread(nx::network::aio::EventType eventType) override;
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
     /**
