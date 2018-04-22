@@ -8,6 +8,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 
+#include <nx/client/desktop/ui/event_rules/models/analytics_sdk_event_model.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
 #include <utils/common/scoped_value_rollback.h>
@@ -19,16 +20,10 @@ namespace client {
 namespace desktop {
 namespace ui {
 
-enum DataRole
-{
-    EventTypeIdRole = Qt::UserRole + 1,
-    DriverIdRole
-};
-
 AnalyticsSdkEventWidget::AnalyticsSdkEventWidget(QWidget* parent):
     base_type(parent),
     ui(new Ui::AnalyticsSdkEventWidget),
-    m_sdkEventModel(new QStandardItemModel(this))
+    m_sdkEventModel(new AnalyticsSdkEventModel(this))
 {
     ui->setupUi(this);
 
@@ -106,62 +101,17 @@ void AnalyticsSdkEventWidget::paramsChanged()
 
     model()->setEventParams(createEventParameters(
         ui->sdkEventTypeComboBox->currentData(
-            DriverIdRole).value<QnUuid>(),
+            AnalyticsSdkEventModel::DriverIdRole).value<QnUuid>(),
         ui->sdkEventTypeComboBox->currentData(
-            EventTypeIdRole).value<QnUuid>()));
+            AnalyticsSdkEventModel::EventTypeIdRole).value<QnUuid>()));
 }
 
 void AnalyticsSdkEventWidget::updateSdkEventTypesModel()
 {
-    auto addItem = [this](
-        QStandardItem* parent, 
-        const nx::api::TranslatableString& name, 
-        const QnUuid& driverId, 
-        const QnUuid& id)
-        {
-            auto item = new QStandardItem(name.text(qnRuntime->locale()));
-            item->setData(qVariantFromValue(id), EventTypeIdRole);
-            item->setData(qVariantFromValue(driverId), DriverIdRole);
-            if (parent)
-                parent->appendRow(item);
-            else
-                m_sdkEventModel->appendRow(item);
-            return item;
-        };
-
     const auto cameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
         model()->eventResources());
-
-    using namespace nx::vms::event;
-    AnalyticsHelper helper(commonModule());
-    m_sdkEventModel->clear();
-
-    const auto items = helper.supportedAnalyticsEvents(cameras);
-    const bool useDriverName = nx::vms::event::AnalyticsHelper::hasDifferentDrivers(items);
-
-    QMap<QnUuid, QStandardItem*> groups;
-    QMap<QnUuid, QStandardItem*> drivers;
-    for (const auto& descriptor: items)
-    {
-        if (useDriverName && !drivers.contains(descriptor.driverId))
-        {
-            auto item = addItem(nullptr, descriptor.driverName, descriptor.driverId, QnUuid());
-            item->setFlags(item->flags() & ~Qt::ItemIsEnabled);
-            drivers.insert(descriptor.driverId, item);
-        }
-
-        QStandardItem* driver = drivers.value(descriptor.driverId);
-        if (!descriptor.groupId.isNull() && !groups.contains(descriptor.groupId))
-        {
-            auto group = AnalyticsHelper(commonModule()).groupDescriptor(descriptor.groupId);
-            auto item = addItem(driver, group.name, descriptor.driverId, descriptor.groupId);
-            groups.insert(descriptor.groupId, item);
-        }
-        
-        addItem(descriptor.groupId.isNull() ? driver : groups[descriptor.groupId],
-            descriptor.eventName, descriptor.driverId, descriptor.eventTypeId);
-    }
-    ui->sdkEventTypeComboBox->setEnabled(m_sdkEventModel->rowCount() > 0);
+    m_sdkEventModel->loadFromCameras(cameras);
+    ui->sdkEventTypeComboBox->setEnabled(m_sdkEventModel->isValid());
     ui->sdkEventTypeComboBox->model()->sort(0);
 }
 
@@ -173,10 +123,10 @@ void AnalyticsSdkEventWidget::updateSelectedEventType()
     if (driverId.isNull() || eventTypeId.isNull())
     {
         driverId = ui->sdkEventTypeComboBox->itemData(0,
-            DriverIdRole).value<QnUuid>();
+            AnalyticsSdkEventModel::DriverIdRole).value<QnUuid>();
 
         eventTypeId = ui->sdkEventTypeComboBox->itemData(0,
-            EventTypeIdRole).value<QnUuid>();
+            AnalyticsSdkEventModel::EventTypeIdRole).value<QnUuid>();
 
         model()->setEventParams(createEventParameters(driverId, eventTypeId));
     }
@@ -185,7 +135,7 @@ void AnalyticsSdkEventWidget::updateSelectedEventType()
 
     auto items = analyticsModel->match(
         analyticsModel->index(0, 0),
-        EventTypeIdRole,
+        AnalyticsSdkEventModel::EventTypeIdRole,
         /*value*/ qVariantFromValue(eventTypeId),
         /*hits*/ 1,
         Qt::MatchExactly | Qt::MatchRecursive);

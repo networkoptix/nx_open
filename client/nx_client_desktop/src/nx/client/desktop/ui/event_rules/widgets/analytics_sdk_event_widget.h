@@ -37,7 +37,7 @@ private:
 
 private:
     QScopedPointer<Ui::AnalyticsSdkEventWidget> ui;
-    QStandardItemModel* m_sdkEventModel;
+    AnalyticsSdkEventModel* m_sdkEventModel;
 
 };
 
