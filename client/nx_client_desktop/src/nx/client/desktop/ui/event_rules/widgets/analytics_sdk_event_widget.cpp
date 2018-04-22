@@ -13,7 +13,6 @@
 
 #include <utils/common/scoped_value_rollback.h>
 #include <ui/help/help_topics.h>
-#include <client/client_runtime_settings.h>
 
 namespace nx {
 namespace client {
