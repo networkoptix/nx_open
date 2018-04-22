@@ -35,6 +35,7 @@ public:
     QList<EventDescriptor> systemSupportedAnalyticsEvents() const;
 
     EventDescriptor eventDescriptor(const QnUuid& eventId) const;
+    nx::api::Analytics::Group groupDescriptor(const QnUuid& groupId) const;
 
     /** Get list of all supported analytics events for the given cameras. */
     static QList<EventDescriptor> supportedAnalyticsEvents(

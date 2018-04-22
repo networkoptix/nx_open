@@ -143,12 +143,6 @@ std::vector<HikvisionEvent> AttributesParser::parseLprXml(
 
             addEvent(hikvisionEvent);
             const auto descriptor = manifest.eventDescriptorById(hikvisionEvent.typeId);
-            for (const auto& dependedName: descriptor.forcedEvent.split(','))
-            {
-                const auto childDescriptor = manifest.eventDescriptorByInternalName(dependedName);
-                hikvisionEvent.typeId = childDescriptor.eventTypeId;
-                addEvent(hikvisionEvent);
-            }
         }
     }
     return result;
