@@ -170,7 +170,7 @@ void AnalyticsSdkEventWidget::updateSelectedEventType()
     QnUuid driverId = model()->eventParams().analyticsDriverId();
     QnUuid eventTypeId = model()->eventParams().analyticsEventId();
 
-    if (driverId.isNull())
+    if (driverId.isNull() || eventTypeId.isNull())
     {
         driverId = ui->sdkEventTypeComboBox->itemData(0,
             DriverIdRole).value<QnUuid>();
