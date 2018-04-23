@@ -258,7 +258,7 @@ SystemCommands::MountCode SystemCommands::mount(
                     result = MountCode::ok;
                     break;
                 }
-                else if (m_lastError.find("13") != std::string::npos)
+                else if (m_lastError.find("13") != std::string::npos) //< 'Permission denied' error code
                 {
                     gotWrongCredentialsError = true;
                 }
