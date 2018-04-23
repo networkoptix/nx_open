@@ -2,8 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>CFBundleIconFile</key>
-	<string></string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleAllowMixedLocalizations</key>
@@ -24,12 +22,14 @@
 	<string>${project.version.code}</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>CFBundleIconName</key>
+	<string>AppIcon</string>
 	<key>UIDeviceFamily</key>
 	<array>
 	    <integer>1</integer>
 	    <integer>2</integer>
 	</array>
-	<key>NSAppTransportSecurity</key>  
+	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
@@ -58,36 +58,6 @@
 			<string>${ios.new_bundle_identifier}</string>
 		</dict>
 	</array>
-	<key>CFBundleIcons</key>
-	<dict>
-		<key>CFBundlePrimaryIcon</key>
-		<dict>
-			<key>CFBundleIconFiles</key>
-			<array>
-				<string>icon_120x120.png</string>
-				<string>icon_180x180.png</string>
-				<string>icon_80x80.png</string>
-				<string>icon_58x58.png</string>
-				<string>icon_87x87.png</string>
-			</array>
-		</dict>
-	</dict>
-	<key>CFBundleIcons~ipad</key>
-	<dict>
-		<key>CFBundlePrimaryIcon</key>
-		<dict>
-			<key>CFBundleIconFiles</key>
-			<array>
-				<string>icon_76x76.png</string>
-				<string>icon_152x152.png</string>
-				<string>icon_167x167.png</string>
-				<string>icon_60x60.png</string>
-				<string>icon_120x120.png</string>
-				<string>icon_29x29.png</string>
-				<string>icon_58x58.png</string>
-			</array>
-		</dict>
-	</dict>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>This app does not use photo library.</string>
 	<key>NSMicrophoneUsageDescription</key>

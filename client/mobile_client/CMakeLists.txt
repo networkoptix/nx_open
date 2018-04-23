@@ -18,7 +18,8 @@ set(resources)
 
 if(IOS)
     if(NOT mobile_client_ios_launch_screen)
-        set(mobile_client_ios_launch_screen "${CMAKE_CURRENT_LIST_DIR}/maven/bin-resources/ios/Launch.xib")
+        set(mobile_client_ios_launch_screen
+            ${CMAKE_CURRENT_LIST_DIR}/maven/bin-resources/ios/Launch.xib)
     endif()
 
     set(ios_sources
@@ -27,11 +28,18 @@ if(IOS)
         src/utils/app_delegate.mm
     )
 
-    set(icons_dir "${customization_dir}/icons/ios/ios/images")
-    file(GLOB resources "${icons_dir}/icon_*.png" "${icons_dir}/logo*.png")
+    set(icons_dir ${customization_dir}/icons/ios/ios/images)
 
+    file(GLOB resources ${icons_dir}/logo*.png)
     list(APPEND resources ${mobile_client_ios_launch_screen})
-    list(APPEND resources "${CMAKE_CURRENT_LIST_DIR}/ios/qt.conf")
+    list(APPEND resources ${CMAKE_CURRENT_LIST_DIR}/ios/qt.conf)
+
+    nx_copy(${CMAKE_CURRENT_SOURCE_DIR}/ios/mobile_client.xcassets
+        DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+    file(GLOB icons ${icons_dir}/icon_*.png ${icons_dir}/appstore.png)
+    nx_copy(${icons}
+        DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/mobile_client.xcassets/AppIcon.appiconset)
+    list(APPEND resources ${CMAKE_CURRENT_BINARY_DIR}/mobile_client.xcassets)
 else()
     set(ios_sources)
 endif()
@@ -109,9 +117,15 @@ if(IOS)
 
     set(provisioning_profiles_dir "${certificates_path}/mobile_client/ios/provisioning_profiles")
 
-    configure_file("maven/filter-resources/mobile_client-release.entitlements"
-        "${CMAKE_CURRENT_BINARY_DIR}/mobile_client.entitlements")
-    set(provisioning_profile "${provisioning_profiles_dir}/production.mobileprovision")
+    if(developerBuild)
+        nx_configure_file(maven/filter-resources/mobile_client-beta.entitlements
+            ${CMAKE_CURRENT_BINARY_DIR}/mobile_client.entitlements)
+        set(provisioning_profile "${provisioning_profiles_dir}/testing.mobileprovision")
+    else()
+        nx_configure_file(maven/filter-resources/mobile_client-beta.entitlements
+            ${CMAKE_CURRENT_BINARY_DIR}/mobile_client.entitlements)
+        set(provisioning_profile "${provisioning_profiles_dir}/production.mobileprovision")
+    endif()
 
     execute_process(
         COMMAND "${PROJECT_SOURCE_DIR}/build_utils/macos/get_provisioning_id.sh" "${provisioning_profile}"
@@ -136,9 +150,10 @@ if(IOS)
     set_target_properties(mobile_client PROPERTIES
         MACOSX_BUNDLE TRUE
         MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_LIST_DIR}/maven/filter-resources/Info.plist"
-        RESOURCE "${resources}"
+        RESOURCE "${resources}" #";${CMAKE_CURRENT_BINARY_DIR}/mobile_client.xcassets"
         XCODE_ATTRIBUTE_COMBINE_HIDPI_IMAGES FALSE
         XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "1,2"
+        XCODE_ATTRIBUTE_ASSETCATALOG_COMPILER_APPICON_NAME "AppIcon"
     )
 
     if(NOT codeSigning)
