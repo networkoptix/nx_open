@@ -19,6 +19,8 @@ do
     ./build_skin.sh $SKIN
 done
 
+cp ../cloud/cloud/cloud_portal.yaml $TARGET_DIR/_source
+
 echo "Done!"
 
 # say "Cloud portal build is finished"
