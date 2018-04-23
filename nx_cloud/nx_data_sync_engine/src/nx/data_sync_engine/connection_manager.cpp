@@ -329,23 +329,23 @@ void ConnectionManager::dispatchTransaction(
     }
 }
 
-api::VmsConnectionDataList ConnectionManager::getVmsConnections() const
+std::vector<SystemConnectionInfo> ConnectionManager::getConnections() const
 {
     QnMutexLocker lk(&m_mutex);
-    api::VmsConnectionDataList result;
+
+    std::vector<SystemConnectionInfo> result;
+    result.reserve(m_connections.size());
     for (auto it = m_connections.begin(); it != m_connections.end(); ++it)
     {
-        api::VmsConnectionData connectionData;
-        connectionData.systemId = it->fullPeerName.systemId.toStdString();
-        connectionData.mediaserverEndpoint =
-            it->connection->remoteSocketAddr().toString().toStdString();
-        result.connections.push_back(std::move(connectionData));
+        result.push_back({
+            it->fullPeerName.systemId.toStdString(),
+            it->connection->remoteSocketAddr()});
     }
 
     return result;
 }
 
-std::size_t ConnectionManager::getVmsConnectionCount() const
+std::size_t ConnectionManager::getConnectionCount() const
 {
     QnMutexLocker lk(&m_mutex);
     return m_connections.size();
