@@ -1,10 +1,11 @@
 import * as angular from 'angular';
 
 (function () {
+
     'use strict';
 
     angular
-            .module('cloudApp')
+            .module('cloudApp.services')
             .factory('cloudApi', CloudApi);
 
     CloudApi.$inject = ['$http', '$q', 'configService'];
