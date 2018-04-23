@@ -15,17 +15,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@angular/core");
 const login_component_1 = require("./../dialogs/login/login.component");
 const general_component_1 = require("./../dialogs/general/general.component");
+const share_component_1 = require("./../dialogs/share/share.component");
 let nxDialogsService = class nxDialogsService {
-    constructor(toast, loginModal, generalModal) {
+    constructor(toast, loginModal, generalModal, shareModal) {
         this.toast = toast;
         this.loginModal = loginModal;
         this.generalModal = generalModal;
+        this.shareModal = shareModal;
     }
     dismiss() {
         this.toast.dismiss();
     }
     notify(message, type, hold) {
         type = type || 'info';
+        hold = hold || false;
         return this.toast.create({
             className: type,
             content: message,
@@ -41,12 +44,16 @@ let nxDialogsService = class nxDialogsService {
     login(keepPage) {
         return this.loginModal.open(keepPage);
     }
+    share(system, user) {
+        return this.shareModal.open(system, user);
+    }
 };
 nxDialogsService = __decorate([
     core_1.Injectable(),
     __param(0, core_1.Inject('ngToast')),
     __metadata("design:paramtypes", [Object, login_component_1.NxModalLoginComponent,
-        general_component_1.NxModalGeneralComponent])
+        general_component_1.NxModalGeneralComponent,
+        share_component_1.NxModalShareComponent])
 ], nxDialogsService);
 exports.nxDialogsService = nxDialogsService;
 //# sourceMappingURL=dialogs.service.js.map
