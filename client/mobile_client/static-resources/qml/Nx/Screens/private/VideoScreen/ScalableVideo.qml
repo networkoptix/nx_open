@@ -9,16 +9,17 @@ ZoomableFlickable
 {
     id: zf
 
-    property alias mediaPlayer: video.mediaPlayer
-    property alias resourceHelper: video.resourceHelper
+    property alias mediaPlayer: content.mediaPlayer
+    property alias resourceHelper: content.resourceHelper
 
     property real maxZoomFactor: 4
     property alias videoCenterHeightOffsetFactor: content.videoCenterHeightOffsetFactor
     property size fitSize: content.boundedSize(width, height)
     function getMoveViewportData(position)
     {
-        var mapped = mapToItem(video, position.x, position.y)
-        return video.getMoveViewportData(mapped)
+        var videoItem = content.videoOutput
+        var mapped = mapToItem(videoItem, position.x, position.y)
+        return videoItem.getMoveViewportData(mapped)
     }
 
     Connections
@@ -57,14 +58,16 @@ ZoomableFlickable
     doubleTapStartCheckFuncion:
         function(initialPosition)
         {
-            var videoMappedPosition = mapToItem(video, initialPosition.x, initialPosition.y)
-            return video.pointInVideo(videoMappedPosition);
+            var videoItem = content.videoOutput
+            var videoMappedPosition = mapToItem(videoItem, initialPosition.x, initialPosition.y)
+            return videoItem.pointInVideo(videoMappedPosition);
         }
 
     onDoubleClicked:
     {
-        var videoMappedPosition = mapToItem(video, mouseX, mouseY)
-        if (!video.pointInVideo(videoMappedPosition))
+        var videoItem = content.videoOutput
+        var videoMappedPosition = mapToItem(videoItem, mouseX, mouseY)
+        if (!videoItem.pointInVideo(videoMappedPosition))
             return
 
         var twiceTargetScale = 2
@@ -144,34 +147,14 @@ ZoomableFlickable
         }
     }
 
-    VideoPositioner
+    MultiVideoPositioner
     {
         id: content
 
+        resourceHelper: zf.resourceHelper
+
         width: contentWidth
         height: contentHeight
-        sourceSize: Qt.size(video.implicitWidth, video.implicitHeight)
-        videoRotation: resourceHelper ? resourceHelper.customRotation : 0
-        customAspectRatio:
-        {
-            var aspectRatio = resourceHelper ? resourceHelper.customAspectRatio : 0.0
-            if (aspectRatio === 0.0)
-            {
-                if (mediaPlayer)
-                    aspectRatio = mediaPlayer.aspectRatio
-                else
-                    aspectRatio = sourceSize.width / sourceSize.height
-            }
-
-            var layoutSize = resourceHelper ? resourceHelper.layoutSize : Qt.size(1, 1)
-            aspectRatio *= layoutSize.width / layoutSize.height
-
-            return aspectRatio
-        }
-
-        item: video
-
-        MultiVideoOutput { id: video }
 
         onSourceSizeChanged: fitToBounds()
     }
@@ -186,6 +169,6 @@ ZoomableFlickable
 
     function clear()
     {
-        video.clear()
+        content.videoOutput.clear()
     }
 }

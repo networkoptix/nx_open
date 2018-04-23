@@ -16,7 +16,7 @@ Control
     property string thumbnail
     property int status
     property bool keepStatus: false
-    property alias resourceId: resourceHelper.resourceId
+    property alias resourceId: mediaResourceHelper.resourceId
 
     property bool active: false
 
@@ -38,8 +38,8 @@ Control
                                status == QnCameraListModel.Unauthorized ||
                                hasDefaultPassword || hasOldFirmware
         property bool unauthorized: status == QnCameraListModel.Unauthorized
-        property bool hasDefaultPassword: resourceHelper.hasDefaultCameraPassword
-        property bool hasOldFirmware: resourceHelper.hasOldCameraFirmware
+        property bool hasDefaultPassword: mediaResourceHelper.hasDefaultCameraPassword
+        property bool hasOldFirmware: mediaResourceHelper.hasOldCameraFirmware
 
         // This property prevents video component re-creation while scrolling.
         property bool videoAllowed: false
@@ -47,7 +47,7 @@ Control
 
     MediaResourceHelper
     {
-        id: resourceHelper
+        id: mediaResourceHelper
     }
 
     Binding
@@ -226,24 +226,24 @@ Control
             width: thumbnailContainer.width
             height: thumbnailContainer.height
 
-            VideoPositioner
+            MultiVideoPositioner
             {
                 id: video
 
                 anchors.fill: parent
-                customAspectRatio: resourceHelper.customAspectRatio || mediaPlayer.aspectRatio
-                videoRotation: resourceHelper.customRotation
-                sourceSize: Qt.size(videoOutput.sourceRect.width, videoOutput.sourceRect.height)
                 visible: mediaPlayer.playing
 
-                item: videoOutput
-
-                VideoOutput
+                mediaPlayer: MediaPlayer
                 {
-                    id: videoOutput
-                    player: mediaPlayer
-                    fillMode: VideoOutput.Stretch
+                    id: mediaPlayer
+
+                    resourceId: cameraItem.resourceId
+                    Component.onCompleted: playLive()
+                    videoQuality: MediaPlayer.LowIframesOnlyVideoQuality
+                    audioEnabled: false
                 }
+
+                resourceHelper: mediaResourceHelper
             }
 
             Image
@@ -260,16 +260,6 @@ Control
             {
                 anchors.centerIn: parent
                 visible: !video.visible && !image.visible
-            }
-
-            MediaPlayer
-            {
-                id: mediaPlayer
-
-                resourceId: cameraItem.resourceId
-                Component.onCompleted: playLive()
-                videoQuality: MediaPlayer.LowIframesOnlyVideoQuality
-                audioEnabled: false
             }
         }
     }
