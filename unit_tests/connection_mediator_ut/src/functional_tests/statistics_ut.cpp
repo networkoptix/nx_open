@@ -1,8 +1,16 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include <nx/utils/string.h>
+#include <nx/fusion/serialization/json.h>
 #include <nx/network/cloud/data/client_bind_data.h>
+#include <nx/network/cloud/mediator/api/mediator_api_http_paths.h>
+#include <nx/network/http/http_client.h>
+#include <nx/network/url/url_builder.h>
+#include <nx/utils/scope_guard.h>
+#include <nx/utils/string.h>
+
+#include <mediator_service.h>
+#include <statistics/statistics_provider.h>
 
 #include "functional_tests/mediator_functional_test.h"
 
@@ -13,13 +21,48 @@ namespace test {
 class StatisticsApi:
     public MediatorFunctionalTest
 {
+    using base_type = MediatorFunctionalTest;
+
+protected:
+    virtual void SetUp() override
+    {
+        base_type::SetUp();
+
+        ASSERT_TRUE(startAndWaitUntilStarted());
+    }
+
+    void whenRequestServerStatistics()
+    {
+        const auto statisticsUrl =
+            nx::network::url::Builder()
+            .setScheme(nx::network::http::kUrlSchemeName)
+            .setEndpoint(moduleInstance()->impl()->httpEndpoints().front())
+            .appendPath(api::kMediatorApiPrefix).appendPath(api::kStatisticsMetricsPath).toUrl();
+
+        nx::network::http::HttpClient httpClient;
+        ASSERT_TRUE(httpClient.doGet(statisticsUrl));
+        m_responseBody = httpClient.fetchEntireMessageBody();
+    }
+
+    void thenStatisticsIsProvided()
+    {
+        ASSERT_TRUE(static_cast<bool>(m_responseBody));
+
+        bool isSucceeded = false;
+        m_serverStatistics = QJson::deserialized<stats::Statistics>(
+            *m_responseBody, stats::Statistics(), &isSucceeded);
+        ASSERT_TRUE(isSucceeded);
+    }
+
+private:
+    boost::optional<nx::network::http::StringType> m_responseBody;
+    stats::Statistics m_serverStatistics;
 };
 
 TEST_F(StatisticsApi, listening_peer_list)
 {
-    ASSERT_TRUE(startAndWaitUntilStarted());
-
     const auto client = clientConnection();
+    auto clientGuard = makeScopeGuard([&client]() { client->pleaseStopSync(); });
     const auto system1 = addRandomSystem();
     auto server1 = addServer(system1, QnUuid::createUuid().toSimpleString().toUtf8());
 
@@ -54,8 +97,13 @@ TEST_F(StatisticsApi, listening_peer_list)
     ASSERT_EQ("someClient", boundClient.first);
     ASSERT_EQ(1U, boundClient.second.tcpReverseEndpoints.size());
     ASSERT_EQ(nx::network::SocketAddress("12.34.56.78:1234"), boundClient.second.tcpReverseEndpoints.front());
+}
 
-    client->pleaseStopSync();
+TEST_F(StatisticsApi, http_and_stun_server_statistics)
+{
+    whenRequestServerStatistics();
+
+    thenStatisticsIsProvided();
 }
 
 } // namespace test

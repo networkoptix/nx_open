@@ -66,6 +66,11 @@ network::stun::MessageDispatcher& StunServer::dispatcher()
     return m_stunMessageDispatcher;
 }
 
+const StunServer::MultiAddressStunServer& StunServer::server() const
+{
+    return *m_tcpStunServer;
+}
+
 void StunServer::initializeHttpTunnelling(http::Server* httpServer)
 {
     m_stunOverHttpServer.setupHttpTunneling(
