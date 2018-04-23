@@ -67,7 +67,6 @@ should open system page (users list) when clicked on system
     Verify In System    Auto Tests
 
 Should show your system for owner and owner name for non-owners
-    [tags]    not-ready
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
     Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
