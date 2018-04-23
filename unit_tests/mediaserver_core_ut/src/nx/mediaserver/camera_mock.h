@@ -22,6 +22,7 @@ public:
     QSet<QString> setApiParameters(const QnCameraAdvancedParamValueMap& values);
 
     void setStreamCapabilityMaps(StreamCapabilityMap primary, StreamCapabilityMap secondary);
+    void setStreamCapabilityTraits(const nx::media::CameraStreamCapabilityTraits& traits);
     void enableSetProperty(bool isEnabled);
 
     static QnCameraAdvancedParams makeParameterDescriptions(const std::vector<QString>& parameters);
@@ -40,12 +41,14 @@ protected:
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual std::vector<AdvancedParametersProvider*> advancedParametersProviders() override;
     virtual StreamCapabilityMap getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex) override;
+    virtual nx::media::CameraStreamCapabilityTraits streamCapabilityTraits() override;
 
 private:
     friend class CameraTest;
     std::map<QString, QString> m_apiAadvancedParameters;
     std::vector<std::unique_ptr<AdvancedParametersProvider>> m_advancedParametersProviders;
-    QMap<Qn::StreamIndex, StreamCapabilityMap> m_streamCapabilityMaps;
+    StreamCapabilityMaps m_streamCapabilityMaps;
+    nx::media::CameraStreamCapabilityTraits m_streamCapabilityTraits;
     bool isSetProprtyEnabled = true;
     mutable std::map<QString, QString> m_properties;
 };
