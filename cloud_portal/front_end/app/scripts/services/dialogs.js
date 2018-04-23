@@ -15,11 +15,10 @@
                 $http.get(CONFIG.viewsDir + 'components/dialog.html', { cache: $templateCache });
             }
         ])
-        .factory('dialogs', [ '$http', 'NgbModal', '$q', '$location', 'ngToast', 'configService',
-            'nxDialogsService',
+        .factory('dialogs', [ '$http', 'NgbModal', '$q', '$location', 'configService', 'nxDialogsService',
 
 
-            function ($http, NgbModal, $q, $location, ngToast, configService, nxDialogsService) {
+            function ($http, NgbModal, $q, $location, configService, nxDialogsService) {
 
                 const CONFIG = configService.config;
 
@@ -98,18 +97,20 @@
 
                 return {
                     notify              : function (message, type, hold) {
-                        type = type || 'info';
-
-                        return ngToast.create({
-                            className       : type,
-                            content         : message,
-                            dismissOnTimeout: !hold,
-                            dismissOnClick  : !hold,
-                            dismissButton   : hold
-                        });
+                        return nxDialogsService.notify(message, type, hold);
+                        // type = type || 'info';
+                        //
+                        // return ngToast.create({
+                        //     className       : type,
+                        //     content         : message,
+                        //     dismissOnTimeout: !hold,
+                        //     dismissOnClick  : !hold,
+                        //     dismissButton   : hold
+                        // });
                     },
                     dismissNotifications: function () {
-                        return ngToast.dismiss();
+                        return nxDialogsService.dismiss();
+                        // return ngToast.dismiss();
                     },
                     alert               : function (message, title) {
                         return nxDialogsService.openAlert(message, title);

@@ -21,9 +21,8 @@ let nxDialogsService = class nxDialogsService {
         this.loginModal = loginModal;
         this.generalModal = generalModal;
     }
-    confirm(message, title, actionLabel, actionType, cancelLabel) {
-        //title, template, url, content, hasFooter, cancellable, params, closable, actionLabel, buttonType, size
-        return this.generalModal.openConfirm(message, title, actionLabel, actionType, cancelLabel);
+    dismiss() {
+        this.toast.dismiss();
     }
     notify(message, type, hold) {
         type = type || 'info';
@@ -34,6 +33,10 @@ let nxDialogsService = class nxDialogsService {
             dismissOnClick: !hold,
             dismissButton: hold
         });
+    }
+    confirm(message, title, actionLabel, actionType, cancelLabel) {
+        //title, template, url, content, hasFooter, cancellable, params, closable, actionLabel, buttonType, size
+        return this.generalModal.openConfirm(message, title, actionLabel, actionType, cancelLabel);
     }
     login(keepPage) {
         return this.loginModal.open(keepPage);

@@ -12,9 +12,8 @@ export class nxDialogsService {
 
     }
 
-    confirm (message, title, actionLabel, actionType, cancelLabel) {
-        //title, template, url, content, hasFooter, cancellable, params, closable, actionLabel, buttonType, size
-        return this.generalModal.openConfirm(message, title, actionLabel, actionType, cancelLabel);
+    dismiss () {
+        this.toast.dismiss();
     }
 
     notify(message, type, hold) {
@@ -28,6 +27,12 @@ export class nxDialogsService {
             dismissButton: hold
         });
     }
+
+    confirm (message, title, actionLabel, actionType, cancelLabel) {
+        //title, template, url, content, hasFooter, cancellable, params, closable, actionLabel, buttonType, size
+        return this.generalModal.openConfirm(message, title, actionLabel, actionType, cancelLabel);
+    }
+
 
     login(keepPage?) {
         return this.loginModal.open(keepPage);
