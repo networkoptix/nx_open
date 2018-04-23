@@ -112,13 +112,14 @@
                         return ngToast.dismiss();
                     },
                     alert               : function (message, title) {
-                        return openDialog({
-                            title      : title,
-                            content    : message,
-                            hasFooter  : true,
-                            cancellable: true,
-                            closable   : true
-                        }).result;
+                        return nxDialogsService.openAlert(message, title);
+                        // return openDialog({
+                        //     title      : title,
+                        //     content    : message,
+                        //     hasFooter  : true,
+                        //     cancellable: true,
+                        //     closable   : true
+                        // }).result;
                     },
                     confirm             : function (message, title, actionLabel, actionType, cancelLabel) {
                         //title, template, url, content, hasFooter, cancellable, params, closable, actionLabel, buttonType, size
