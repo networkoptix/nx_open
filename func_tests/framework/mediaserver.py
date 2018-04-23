@@ -186,13 +186,11 @@ class Storage(object):
 
         contents = self._read_with_start_time_metadata(sample, unixtime_utc_ms)
 
-        lowq_fpath = self._construct_fpath(camera_mac_addr, 'low_quality', start_time, unixtime_utc_ms, sample.duration)
-        hiq_fpath = self._construct_fpath(camera_mac_addr, 'hi_quality',  start_time, unixtime_utc_ms, sample.duration)
-
-        log.info('Storing media sample %r to %r', sample.fpath, lowq_fpath)
-        lowq_fpath.write_bytes(contents)
-        log.info('Storing media sample %r to %r', sample.fpath, hiq_fpath)
-        hiq_fpath.write_bytes(contents)
+        for quality in {'low_quality', 'hi_quality'}:
+            path = self._construct_fpath(camera_mac_addr, quality, start_time, unixtime_utc_ms, sample.duration)
+            path.parent.mkdir(parents=True, exist_ok=True)
+            log.info('Storing media sample %r to %r', sample.fpath, path)
+            path.write_bytes(contents)
 
     def _read_with_start_time_metadata(self, sample, unixtime_utc_ms):
         _, path = tempfile.mkstemp(suffix=sample.fpath.suffix)
