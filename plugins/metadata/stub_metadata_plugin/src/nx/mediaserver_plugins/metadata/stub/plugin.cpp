@@ -1,6 +1,6 @@
 #include "plugin.h"
 
-#define NX_DEBUG_ENABLE_OUTPUT true //< Stub plugin is itself a debug feature, thus is verbose.
+#define NX_PRINT_PREFIX printPrefix()
 #include <nx/kit/debug.h>
 
 #include "camera_manager.h"
@@ -14,9 +14,9 @@ namespace stub {
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 
-Plugin::Plugin(): CommonPlugin("Stub metadata plugin")
+Plugin::Plugin():
+    CommonPlugin("Stub metadata plugin", "stub_metadata_plugin", NX_DEBUG_ENABLE_OUTPUT)
 {
-    setEnableOutput(NX_DEBUG_ENABLE_OUTPUT); //< Base class is verbose when this descendant is.
     initCapabilities();
 }
 
@@ -25,6 +25,7 @@ nx::sdk::metadata::CameraManager* Plugin::obtainCameraManager(
 {
     return new CameraManager(this);
 }
+
 void Plugin::initCapabilities()
 {
     if (ini().needDeepCopyOfVideoFrames)

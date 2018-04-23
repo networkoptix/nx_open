@@ -17,7 +17,6 @@ class CameraManager: public nx::sdk::metadata::CommonVideoFrameProcessingCameraM
 {
 public:
     CameraManager(Plugin* plugin);
-    virtual ~CameraManager();
 
     virtual nx::sdk::Error startFetchingMetadata(
         nxpl::NX_GUID* typeList, int typeListSize) override;

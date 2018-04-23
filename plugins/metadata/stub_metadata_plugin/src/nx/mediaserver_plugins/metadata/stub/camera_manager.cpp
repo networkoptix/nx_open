@@ -10,7 +10,7 @@
 #include <nx/sdk/metadata/common_object.h>
 #include <nx/sdk/metadata/common_compressed_video_packet.h>
 
-#define NX_PRINT_PREFIX (std::string("[") + this->plugin()->name() + " CameraManager] ")
+#define NX_PRINT_PREFIX printPrefix()
 #include <nx/kit/debug.h>
 
 #include "stub_metadata_plugin_ini.h"
@@ -23,15 +23,9 @@ namespace stub {
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 
-CameraManager::CameraManager(Plugin* plugin): CommonVideoFrameProcessingCameraManager(plugin)
+CameraManager::CameraManager(Plugin* plugin):
+    CommonVideoFrameProcessingCameraManager(plugin, NX_DEBUG_ENABLE_OUTPUT)
 {
-    NX_PRINT << "Created " << this;
-    setEnableOutput(NX_DEBUG_ENABLE_OUTPUT); //< Base class is verbose when this descendant is.
-}
-
-CameraManager::~CameraManager()
-{
-    NX_PRINT << "Destroyed " << this;
 }
 
 std::string CameraManager::capabilitiesManifest()
