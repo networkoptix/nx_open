@@ -5,6 +5,7 @@ const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const common = require('./webpack.common.js');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const CleanWebpackPlugin = require('clean-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const ENV = process.env.ENV = process.env.NODE_ENV = 'prod';
 
@@ -13,6 +14,13 @@ module.exports = merge(common, {
         new CleanWebpackPlugin([ 'dist' ]),
         new UglifyJSPlugin({}),
         new webpack.HashedModuleIdsPlugin(),
+
+        new CopyWebpackPlugin([
+                {
+                    from: '../app/scripts/commonPasswordsList.json',
+                    to  : 'scripts/commonPasswordsList.json'
+                }
+        ])
     ],
     output: {
         filename  : 'scripts/[name].[chunkhash].js',
