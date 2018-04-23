@@ -103,7 +103,7 @@ public:
         ASSERT_EQ(2, users2.size());
     }
 
-    void detachFirstServerFromSystem()
+    void whenDetachFirstServerFromSystem()
     {
         auto client = std::make_unique<nx_http::HttpClient>();
         client->setUserName("admin");
@@ -114,6 +114,23 @@ public:
         QUrl url = mediaServerLauncher->apiUrl();
         url.setPath("/api/detachFromSystem");
         client->doPost(url, "application/json", QJson::serialized(data));
+    }
+
+    void thenUserRemovedFromFirstServerOnly()
+    {
+        auto ec2Connection = mediaServerLauncher->commonModule()->ec2Connection();
+        ec2::ApiUserDataList users;
+        ec2Connection->getUserManager(Qn::kSystemAccess)->getUsersSync(&users);
+        ASSERT_EQ(1, users.size());
+
+        // Make sure server2 is not synchronized with server1 any more
+        for (int i = 0; i < 10; ++i)
+        {
+            ec2::ApiUserDataList users2;
+            NX_TEST_API_GET(makeUrl(server2, "/ec2/getUsers"), &users2);
+            ASSERT_EQ(2, users2.size());
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
     }
 
     static std::unique_ptr<MediaServerLauncher> mediaServerLauncher;
@@ -127,21 +144,8 @@ TEST_F(DetachSingleServerTest, main)
     givenCloudUser();
     givenTwoSynchronizedServers();
     
-    detachFirstServerFromSystem();
-
-    auto ec2Connection = mediaServerLauncher->commonModule()->ec2Connection();
-    ec2::ApiUserDataList users;
-    ec2Connection->getUserManager(Qn::kSystemAccess)->getUsersSync(&users);
-    ASSERT_EQ(1, users.size());
-
-    // Make sure server2 is not synchronized with server1 any more
-    for (int i = 0; i < 10; ++i)
-    {
-        ec2::ApiUserDataList users2;
-        NX_TEST_API_GET(makeUrl(server2, "/ec2/getUsers"), &users2);
-        ASSERT_EQ(2, users2.size());
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    }
+    whenDetachFirstServerFromSystem();
+    thenUserRemovedFromFirstServerOnly();
 }
 
 } // namespace test
