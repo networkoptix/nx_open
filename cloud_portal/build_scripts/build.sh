@@ -1,9 +1,11 @@
 #!/bin/bash
 set -e
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+CLEANUP=False
 
 if [[ "$PWD" != */nx_vms/cloud_portal* ]]
 then
+    CLEANUP=True
     echo "Cleaning current directory"
     rm -rf *
 
@@ -23,16 +25,17 @@ then
     echo "npm install"
     echo $PWD
     pushd front_end
-    npm install
+        npm install
     popd
 
     pushd ../webadmin
-    npm install
+        npm install
     popd
 
     cd build_scripts
 else
     cd $DIR
+    . ../env/bin/activate
 fi
 
 TARGET_DIR="../cloud/static"
@@ -53,4 +56,20 @@ done
 
 echo "Done!"
 
+if $CLEANUP
+then
+    echo "Clean build dir"
+    cd ..
+    for dir in $(ls $PWD)
+    do
+        dir=${dir%*/}
+        [[ "$dir" = "cloud" ]] && continue
+        rm -rf ./$dir
+    done
+
+    rm -rf ../webadmin
+    echo $PWD
+fi
+
+echo "Cloud portal build is finished"
 # say "Cloud portal build is finished"
