@@ -98,6 +98,6 @@ int QnDetachFromSystemRestHandler::execute(
         result.setError(QnJsonRestResult::CantProcessRequest, errStr);
     }
 
-    resumeConnectionsToRemotePeers();
+    resumeConnectionsToRemotePeers(m_messageBus);
     return nx_http::StatusCode::ok;
 }
