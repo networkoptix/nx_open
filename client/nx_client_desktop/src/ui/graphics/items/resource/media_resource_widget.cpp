@@ -646,11 +646,16 @@ QString QnMediaResourceWidget::overlayCustomButtonText(
         : QString();
 }
 
-void QnMediaResourceWidget::updateTriggerAvailability(const vms::event::RulePtr& rule)
+void QnMediaResourceWidget::updateTriggerAvailability(const vms::event::RulePtr& rule, bool force)
 {
     const auto ruleId = rule->id();
     const auto triggerIt = lowerBoundbyTriggerRuleId(ruleId);
-    if (triggerIt == m_triggers.end() || triggerIt->ruleId == ruleId)
+
+    if (triggerIt == m_triggers.end())
+        return;
+
+    // Do not update data for the same rule, until we force it
+    if (!force && triggerIt->ruleId == ruleId)
         return;
 
     const auto button = qobject_cast<QnSoftwareTriggerButton*>(
@@ -2955,7 +2960,8 @@ void QnMediaResourceWidget::at_eventRuleAddedOrUpdated(const vms::event::RulePtr
         createTriggerIfRelevant(rule);
     }
 
-    updateTriggerAvailability(rule);
+    // Forcing update of trigger button
+    updateTriggerAvailability(rule, true);
 };
 
 rest::Handle QnMediaResourceWidget::invokeTrigger(
