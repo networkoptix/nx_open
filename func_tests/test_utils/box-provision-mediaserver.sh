@@ -44,7 +44,7 @@ for i in {1..30}; do
 done
 
 if ! nc -z localhost 7001; then
-	echo "Server did not start in 30 seconds."
+	echo "Server did not start in 30 seconds." >&2
 	exit 1
 fi
 
