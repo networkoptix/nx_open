@@ -73,7 +73,7 @@ Qn::StorageInitResult RootTool::mount(const QUrl& url, const QString& path)
             switch (mountResult)
             {
             case SystemCommands::MountCode::ok:
-                NX_VERBOSE(
+                NX_DEBUG(
                     this, lm("[mount] Successfully mounted %1 to %2 %3").args(url, path, viaString));
                 break;
             case SystemCommands::MountCode::otherError:
