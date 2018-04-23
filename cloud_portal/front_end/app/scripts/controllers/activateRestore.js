@@ -2,9 +2,9 @@
 
 angular.module('cloudApp')
     .controller('ActivateRestoreCtrl',['$scope', 'cloudApi', '$routeParams', 'process', '$localStorage',
-        '$sessionStorage', 'account', '$location', 'urlProtocol', 'dialogs',
+        '$sessionStorage', 'account', 'authorizationCheckService', '$location', 'urlProtocol', 'dialogs',
         function ($scope, cloudApi, $routeParams, process, $localStorage,
-                  $sessionStorage, account, $location, urlProtocol, dialogs) {
+                  $sessionStorage, account, authorizationCheckService, $location, urlProtocol, dialogs) {
 
             $scope.session = $localStorage;
             $scope.context = $sessionStorage;
@@ -25,7 +25,7 @@ angular.module('cloudApp')
 
 
             if($scope.reactivating){
-                account.redirectAuthorised();
+                authorizationCheckService.redirectAuthorised();
             }
             function checkActivate(){
                 if($scope.data.activateCode){
@@ -35,7 +35,7 @@ angular.module('cloudApp')
             }
             function init(){
                 if($scope.data.restoreCode || $scope.data.activateCode){
-                    account.logoutAuthorised();
+                    authorizationCheckService.logoutAuthorised();
                     var code = $scope.data.restoreCode || $scope.data.activateCode;
                     account.checkCode(code).then(function(registered){
                         if(!registered){
@@ -60,7 +60,7 @@ angular.module('cloudApp')
                     return false;
                 }
                 if( $scope.context.process !== name ){
-                    account.redirectToHome();
+                    authorizationCheckService.redirectToHome();
                 }
                 return true;
             }

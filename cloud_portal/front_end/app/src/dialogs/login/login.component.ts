@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit, Input, ViewEncapsulation } from '@angular/core';
-import { Location }                                            from '@angular/common';
+import { Location, LocationStrategy, PathLocationStrategy }    from '@angular/common';
 import { NgbModal, NgbActiveModal, NgbModalRef }               from '@ng-bootstrap/ng-bootstrap';
 import { EmailValidator }                                      from '@angular/forms';
 import { TranslateService }                                    from '@ngx-translate/core';
@@ -7,7 +7,8 @@ import { TranslateService }                                    from '@ngx-transl
 @Component({
     selector: 'ngbd-modal-content',
     templateUrl: 'login.component.html',
-    styleUrls: ['login.component.scss']
+    styleUrls: ['login.component.scss'],
+    providers: [Location, {provide: LocationStrategy, useClass: PathLocationStrategy}],
 })
 export class LoginModalContent {
     @Input() auth;
@@ -15,6 +16,7 @@ export class LoginModalContent {
     @Input() login;
     @Input() cancellable;
     @Input() closable;
+    @Input() location;
 
     constructor(public activeModal: NgbActiveModal,
                 @Inject('account') private account: any,
@@ -22,14 +24,17 @@ export class LoginModalContent {
     }
 
     ngOnInit() {
-
         this.login = this.process.init(() => {
             return this.account.login(this.auth.email, this.auth.password, this.auth.remember);
         }, {
             ignoreUnauthorized: true,
             errorCodes: {
-                accountNotActivated: function () {
-                    this.location.go('/activate');
+                accountNotActivated: () => {
+                    // TODO: Repace this once 'activate' page is moved to A5
+                    // AJS and A5 routers freak out about route change *****
+                    //this.location.go('/activate');
+                    document.location.href = '/activate';
+                    // *****************************************************
                     return false;
                 },
                 notFound: this.language.lang.errorCodes.emailNotFound,
@@ -61,11 +66,14 @@ export class NxModalLoginComponent implements OnInit {
         password: '2l2b2l2n1ts2',
         remember: true
     };
+    location: Location;
 
     constructor(@Inject('languageService') private language: any,
                 // @Inject('CONFIG') private CONFIG: any,
-                private location: Location,
-                private modalService: NgbModal) {
+                private modalService: NgbModal,
+                location: Location) {
+
+        this.location = location;
     }
 
     open(keepPage?) {
@@ -75,6 +83,7 @@ export class NxModalLoginComponent implements OnInit {
         this.modalRef.componentInstance.login = this.login;
         this.modalRef.componentInstance.cancellable = !keepPage || false;
         this.modalRef.componentInstance.closable = true;
+        this.modalRef.componentInstance.location = this.location;
 
         return this.modalRef;
     }

@@ -27,8 +27,12 @@ let LoginModalContent = class LoginModalContent {
         }, {
             ignoreUnauthorized: true,
             errorCodes: {
-                accountNotActivated: function () {
-                    this.location.go('/activate');
+                accountNotActivated: () => {
+                    // TODO: Repace this once 'activate' page is moved to A5
+                    // AJS and A5 routers freak out about route change *****
+                    //this.location.go('/activate');
+                    document.location.href = '/activate';
+                    // *****************************************************
                     return false;
                 },
                 notFound: this.language.lang.errorCodes.emailNotFound,
@@ -65,11 +69,16 @@ __decorate([
     core_1.Input(),
     __metadata("design:type", Object)
 ], LoginModalContent.prototype, "closable", void 0);
+__decorate([
+    core_1.Input(),
+    __metadata("design:type", Object)
+], LoginModalContent.prototype, "location", void 0);
 LoginModalContent = __decorate([
     core_1.Component({
         selector: 'ngbd-modal-content',
         templateUrl: 'login.component.html',
-        styleUrls: ['login.component.scss']
+        styleUrls: ['login.component.scss'],
+        providers: [common_1.Location, { provide: common_1.LocationStrategy, useClass: common_1.PathLocationStrategy }],
     }),
     __param(1, core_1.Inject('account')),
     __param(2, core_1.Inject('process')),
@@ -79,15 +88,15 @@ exports.LoginModalContent = LoginModalContent;
 let NxModalLoginComponent = class NxModalLoginComponent {
     constructor(language, 
     // @Inject('CONFIG') private CONFIG: any,
-    location, modalService) {
+    modalService, location) {
         this.language = language;
-        this.location = location;
         this.modalService = modalService;
         this.auth = {
             email: 'ttsolov@networkoptix.com',
             password: '2l2b2l2n1ts2',
             remember: true
         };
+        this.location = location;
     }
     open(keepPage) {
         this.modalRef = this.modalService.open(LoginModalContent, { size: 'sm' });
@@ -96,6 +105,7 @@ let NxModalLoginComponent = class NxModalLoginComponent {
         this.modalRef.componentInstance.login = this.login;
         this.modalRef.componentInstance.cancellable = !keepPage || false;
         this.modalRef.componentInstance.closable = true;
+        this.modalRef.componentInstance.location = this.location;
         return this.modalRef;
     }
     close() {
@@ -113,8 +123,8 @@ NxModalLoginComponent = __decorate([
         styleUrls: []
     }),
     __param(0, core_1.Inject('languageService')),
-    __metadata("design:paramtypes", [Object, common_1.Location,
-        ng_bootstrap_1.NgbModal])
+    __metadata("design:paramtypes", [Object, ng_bootstrap_1.NgbModal,
+        common_1.Location])
 ], NxModalLoginComponent);
 exports.NxModalLoginComponent = NxModalLoginComponent;
 //# sourceMappingURL=login.component.js.map
