@@ -74,16 +74,16 @@ Qn::StorageInitResult RootTool::mount(const QUrl& url, const QString& path)
             {
             case SystemCommands::MountCode::ok:
                 NX_DEBUG(
-                    this, lm("[mount] Successfully mounted %1 to %2 %3").args(url, path, viaString));
+                    this, lm("[mount] Successfully mounted '%1' to '%2' %3").args(url, path, viaString));
                 break;
             case SystemCommands::MountCode::otherError:
                 NX_WARNING(
-                    this, lm("[mount] Failed to mount %1 to %2 %3").args(url, path, viaString));
+                    this, lm("[mount] Failed to mount '%1' to '%2' %3").args(url, path, viaString));
                 break;
             case SystemCommands::MountCode::wrongCredentials:
                 NX_WARNING(
                     this,
-                    lm("[mount] Failed to mount %1 to %2 %3 due to WRONG credentials")
+                    lm("[mount] Failed to mount '%1' to '%2' %3 due to WRONG credentials")
                         .args(url, path, viaString));
                 break;
             }
