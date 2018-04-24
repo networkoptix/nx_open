@@ -5,7 +5,7 @@ set -e
 #Can be called like this from with cloud_portal "./build_scripts/build.sh"
 #or like this from outside the repository "../nx_vms/cloud_portal/build_scripts/build.sh"
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+NX_VMS="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/../.."
 
 #If we are not using the repository we should update necessary files
 if [[ "$PWD" != */nx_vms/* ]]
@@ -23,35 +23,34 @@ then
                     do
                         [ "$element" = "node_modules" ] && continue
                         [ -e "$element" ] && rm -rf "$element"
-                        cp -pr "$DIR/../$entry/$element" "$element"
+                        cp -pr "$NX_VMS/cloud_portal/$entry/$element" "$element"
                     done
                     popd
                 else
                     [[ "$entry" = "env" ]] && continue
                     [ -e "$entry" ] && rm -rf "$entry"
-                    cp -pr "$DIR/../$entry" "$entry"
+                    cp -pr "$NX_VMS/cloud+portal/$entry" "$entry"
                 fi
             done
         popd
     else
-        cp -pr $DIR/.. cloud_portal
+        cp -pr $NX_VMS/cloud_portal cloud_portal
     fi
 
-    ls $PWD
     mkdir -p webadmin
     pushd webadmin
         [ -d 'app/web_common' ] && rm -rf app/web_common
-        mkdir -p app/web_common && cp -pr $DIR/../../webadmin/app/web_common/* "$_"
+        mkdir -p app/web_common && cp -pr $NX_VMS/webadmin/app/web_common/* "$_"
 
         [ -d 'app/styles' ] && rm -rf app/styles
-        mkdir -p app/styles && cp -pr $DIR/../../webadmin/app/styles/* "$_"
+        mkdir -p app/styles && cp -pr $NX_VMS/webadmin/app/styles/* "$_"
 
         [ -e 'package.json' ] && rm -rf 'package.json'
-        cp $DIR/../../webadmin/package.json ./
+        cp $NX_VMS/webadmin/package.json ./
     popd
     cd cloud_portal
 else
-    cd $DIR/..
+    cd $NX_VMS/cloud_portal
 fi
 
 echo "pip install requirements"
@@ -83,7 +82,7 @@ for dir in ../customizations/*/
 do
     dir=${dir%*/}
     CUSTOMIZATION=${dir/..\/customizations\//}
-    ./build_customization.sh $CUSTOMIZATION $DIR
+    ./build_customization.sh $CUSTOMIZATION $NX_VMS
 done
 
 echo "Cloud portal build is finished"
