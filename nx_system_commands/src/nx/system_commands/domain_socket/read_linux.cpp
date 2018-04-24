@@ -156,12 +156,14 @@ static ssize_t readData(int transportFd, void* context)
 
 static ssize_t readImpl(void* context, ssize_t (*action)(int, void*))
 {
+    ssize_t result = -1;
     int transportFd = acceptConnection(SystemCommands::kDomainSocket);
-    if (transportFd < 0)
-        return -1;
-
-    ssize_t result = action(transportFd, context);
-    ::close(transportFd);
+    if (transportFd > 0)
+    {
+        result = action(transportFd, context);
+        ::close(transportFd);
+    }
+    unlink(SystemCommands::kDomainSocket);
 
     return result;
 }

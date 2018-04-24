@@ -30,9 +30,6 @@ public:
 
     bool isAuthentificationRequired(nx_http::Request& request);
     void enableUnauthorizedForwarding(const QString& path);
-
-    void setPreparedTcpSocket(std::unique_ptr<AbstractStreamServerSocket> socket);
-
     static std::unique_ptr<AbstractStreamServerSocket> createAndPrepareTcpSocket(
         const SocketAddress& localAddress);
 
@@ -53,7 +50,6 @@ private:
     nx::hpm::api::SystemCredentials m_cloudCredentials;
     std::unique_ptr<nx_http::HttpModManager> m_httpModManager;
     std::set<QString> m_unauthorizedForwardingPaths;
-    std::unique_ptr<AbstractStreamServerSocket> m_preparedTcpSocket;
 
     void onCloudBindingStatusChanged(
         boost::optional<nx::hpm::api::SystemCredentials> cloudCredentials);

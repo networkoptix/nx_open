@@ -112,7 +112,6 @@ namespace nx_ms_conf
     static const QString DELAY_BEFORE_SETTING_MASTER_FLAG("delayBeforeSettingMasterFlag");
     static const QString DEFAULT_DELAY_BEFORE_SETTING_MASTER_FLAG("30s");
 
-    static const QString SYSTEM_USER("systemUser");
     static const QString ALLOW_REMOVABLE_STORAGES("allowRemovableStorages");
 }
 

@@ -538,6 +538,10 @@ CameraDiagnostics::Result QnPlAxisResource::initializeCameraDriver()
             return CameraDiagnostics::UnknownErrorResult();
         }
     }
+    else
+    {
+        setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, QString("0"));
+    }
 
     {
         //reading RTSP port
