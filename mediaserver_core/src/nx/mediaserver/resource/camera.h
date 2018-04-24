@@ -15,6 +15,13 @@ struct StreamCapabilityKey
     QString codec;
     QSize resolution;
 
+    StreamCapabilityKey() = default;
+    StreamCapabilityKey(const QString& codec, const QSize& resolution):
+        codec(codec),
+        resolution(resolution)
+    {
+    }
+
     bool operator<(const StreamCapabilityKey& other) const
     {
         if (codec != other.codec)
@@ -30,6 +37,7 @@ struct StreamCapabilityKey
     }
 };
 using StreamCapabilityMap = QMap<StreamCapabilityKey, nx::media::CameraStreamCapability>;
+using StreamCapabilityMaps = QMap<Qn::StreamIndex, StreamCapabilityMap>;
 
 class Camera: public QnVirtualCameraResource
 {
@@ -132,22 +140,34 @@ protected:
     /** Override to add support for advanced parameters. */
     virtual std::vector<AdvancedParametersProvider*>  advancedParametersProviders();
 
-    /** Gets supported codecs and their resolution list. For each key optional CameraStreamCapability could be provided.
-    * CameraStreamCapability could be null. That case it is auto-filled with default values.
-    */
+    /**
+     * Gets supported codecs and their resolution list.
+     * For each key optional CameraStreamCapability could be provided.
+     * CameraStreamCapability could be null. That case it is auto-filled with default values.
+     */
     virtual StreamCapabilityMap getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex) = 0;
+
+    /**
+     * @return stream capability traits
+     *  (e.g. availability of second stream resolution depending on primary stream resolution)
+     */
+    virtual nx::media::CameraStreamCapabilityTraits streamCapabilityTraits();
 
     virtual QnAbstractPtzController* createPtzControllerInternal() const;
 private:
     CameraDiagnostics::Result initializeAdvancedParametersProviders();
 
 private:
+    using StreamCapabilityAdvancedParameterProviders
+        = std::map<Qn::StreamIndex, std::unique_ptr<StreamCapabilityAdvancedParametersProvider>>;
+
     int m_channelNumber; // video/audio source number
     QElapsedTimer m_lastInitTime;
     QAuthenticator m_lastCredentials;
     AdvancedParametersProvider* m_defaultAdvancedParametersProvider = nullptr;
     std::map<QString, AdvancedParametersProvider*> m_advancedParametersProvidersByParameterId;
-    std::map<Qn::StreamIndex, std::unique_ptr<StreamCapabilityAdvancedParametersProvider>> m_streamCapabilityAdvancedProviders;
+    StreamCapabilityAdvancedParameterProviders m_streamCapabilityAdvancedProviders;
+    nx::media::CameraStreamCapabilityTraits m_streamCapabilityTraits;
 };
 
 } // namespace resource

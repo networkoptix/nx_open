@@ -1837,9 +1837,100 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/statistics", new QnStatisticsRestHandler());
 
+    /**%apidoc GET /api/getCameraParam
+     * Read camera parameters. For instance: brightness, contrast e.t.c. Parameters to read should
+     * be specified.
+     * %param cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx or
+     *     /ec2/getCameras?extraFormatting) or MAC address (not supported for certain cameras).
+     * %param[opt] <any_name> Parameter name to read. Request can contain one or more parameters.
+     * %return Required parameter values in form of paramName=paramValue, each parameter on a new
+     *     line.
+     */
     reg("api/getCameraParam", new QnCameraSettingsRestHandler());
+
+    /**%apidoc POST /api/setCameraParam
+     * Sets values of several camera parameters. This parameters are used on the Advanced tab in
+     * camera settings. For instance: brightness, contrast e.t.c.
+     * %param cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx or
+     *     /ec2/getCameras?extraFormatting) or MAC address (not supported for certain cameras).
+     * %param[opt] <any_name> Parameter for camera to set. Request can contain one or more
+     *     parameters to set.
+     * %return "OK" if all parameters have been set, otherwise return error 500 (Internal server
+     *     error) and the result of setting for every parameter.
+     */
     reg("api/setCameraParam", new QnCameraSettingsRestHandler());
+
+    /**%apidoc GET /api/manualCamera/search
+     * Start searching for the cameras in manual mode.
+     * %param start_ip First IP address in the range to scan.
+     * %param[opt] end_ip Last IP address in the range to scan.
+     * %param[opt] port Camera(s) IP port to check. Port is auto-detected if this parameter is
+     *     omitted.
+     * %param[opt] user Camera(s) username.
+     * %param[opt] password Camera(s) password.
+     * %return JSON object with the initial status of camera search process, including processUuid
+     *     used for other /api/manualCamera calls, and the list of objects describing cameras found
+     *     to the moment.
+     *
+     **%apidoc GET /api/manualCamera/status
+     * Get the current status of the process of searching for the cameras.
+     * %param uuid Process unique id, can be obtained from "processUuid" field in the result of
+     *     /api/manualCamera/search.
+     * %return JSON object with the initial status of camera search process, including processUuid
+     *     used for other /api/manualCamera calls, and the list of objects describing cameras found
+     *     to the moment.
+     *
+     **%apidoc POST /api/manualCamera/stop
+     * Stop manual adding progress.
+     * %param uuid Process unique id, can be obtained from "processUuid" field in the result of
+     *     /api/manualCamera/search.
+     * %return JSON object with error message and error code (0 means OK).
+     *
+     **%apidoc[proprietary] GET /api/manualCamera/add
+     * Manually add camera(s). If several cameras are added, parameters "url" and "manufacturer"
+     * must be defined several times with incrementing suffix "0", "1", etc.
+     * %param url0 Camera url, can be obtained from "reply.cameras[].url" field in the result of
+     *     /api/manualCamera/status.
+     * %param uniqueId0 Camera physical id, can be obtained from "reply.cameras[].uniqueId" field
+     *     in the result of /api/manualCamera/status.
+     * %param manufacturer0 Camera manufacturer, can be obtained from
+     *     "reply.cameras[].manufacturer" field in the result of /api/manualCamera/status.
+     * %param[opt] user Username for the cameras.
+     * %param[opt] password Password for the cameras.
+     * %return JSON object with error message and error code (0 means OK).
+     *
+     **%apidoc POST /api/manualCamera/add
+     * Manually add camera(s).
+     * <p>
+     * Parameters should be passed as a JSON object in POST message body with
+     * content type "application/json". Example of such object:
+     * <pre><code>
+     * {
+     *     "user": "some_user",
+     *     "password": "some_password",
+     *     "cameras":
+     *     [
+     *         {
+     *             "uniqueId": "00-1A-07-00-FF-FF",
+     *             "url": "192.168.0.100",
+     *             "manufacturer": "3100"
+     *         }
+     *     ]
+     * }
+     * </code></pre></p>
+     * %param[opt] user Username for the cameras.
+     * %param[opt] password Password for the cameras.
+     * %param cameras List of objects with fields defined below.
+     *     %param cameras[].url Camera url, can be obtained from "reply.cameras[].url" field in the
+     *         result of /api/manualCamera/status.
+     *     %param cameras[].uniqueId Camera physical id, can be obtained from
+     *         "reply.cameras[].uniqueId" field in the result of /api/manualCamera/status.
+     *     %param cameras[].manufacturer Camera manufacturer, can be obtained from
+     *         "reply.cameras[].manufacturer" field in the result of /api/manualCamera/status.
+     * %return JSON object with error message and error code (0 means OK).
+     */
     reg("api/manualCamera", new QnManualCameraAdditionRestHandler());
+
     reg("api/wearableCamera", new QnWearableCameraRestHandler());
 
     /**%apidoc GET /api/ptz
@@ -2029,7 +2120,25 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/changeCameraPassword", new QnChangeCameraPasswordRestHandler(), kAdmin);
 
+    /**%apidoc GET /api/rebuildArchive
+     * Start or stop the server archive rebuilding, also can report this process status.
+     * %param[opt] action What to do and what to report about the server archive rebuild.
+     *     %value start Start server archive rebuild.
+     *     %value stop Stop rebuild.
+     *     %value <any_other_value_or_no_parameter> Report server archive rebuild status
+     * %param mainPool 1 (for the main storage) or 0 (for the backup storage)
+     * %return Rebuild progress status or an error code.
+     */
     reg("api/rebuildArchive", new QnRebuildArchiveRestHandler());
+
+    /**%apidoc GET /api/backupControl
+     * Start or stop the recorded data backup process, also can report this process status.
+     * %param[opt] action What to do and what to report about the backup process.
+     *     %value start Start backup just now.
+     *     %value stop Stop backup.
+     *     %value <any_other_value_or_no_parameter> Report the backup process status.
+     * %return Bakcup process progress status or an error code.
+     */
     reg("api/backupControl", new QnBackupControlRestHandler());
 
     /**%apidoc[proprietary] GET /api/events
@@ -2349,8 +2458,17 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/configure", new QnConfigureRestHandler(messageBus), kAdmin);
 
+    /**%apidoc POST /api/detachFromCloud
+     * Detach media server from cloud. Local admin user is enabled, admin password is changed to
+     * new value (if specified), all cloud users are disabled. Cloud link is removed. Function can
+     * be called either via GET or POST method. POST data should be a json object.
+     * %permissions Administrator.
+     * %param[opt] password Set new admin password after detach.
+     * %return JSON result with error code
+     */
     reg("api/detachFromCloud", new QnDetachFromCloudRestHandler(
         &cloudManagerGroup->connectionManager), kAdmin);
+
     reg("api/detachFromSystem", new QnDetachFromSystemRestHandler(
         &cloudManagerGroup->connectionManager, messageBus), kAdmin);
 
@@ -2473,6 +2591,12 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/scriptList", new QnScriptListRestHandler(), kAdmin);
 
+    /**%apidoc GET /api/systemSettings
+     * Get or set global system settings. If called with no arguments, just returns list of all
+     * system settings with their values
+     * %param[opt] <param_name> name of system parameter. E.g., ec2AliveUpdateIntervalSec
+     * %param[opt] <param_value> New value for the specified parameter
+     */
     reg("api/systemSettings", new QnSystemSettingsHandler());
 
     reg("api/transmitAudio", new QnAudioTransmissionRestHandler());
@@ -2536,8 +2660,99 @@ void MediaServerProcess::registerRestHandlers(
     reg("ec2/recordedTimePeriods", new QnMultiserverChunksRestHandler("ec2/recordedTimePeriods")); //< new version
 
     reg("ec2/cameraHistory", new QnCameraHistoryRestHandler());
+
+    /**%apidoc GET /ec2/bookmarks
+     * Read bookmarks using the specified parameters.
+     * %param cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx or
+     *     /ec2/getCameras?extraFormatting) or MAC address (not supported for certain cameras).
+     * %param[opt] startTime Start time of the interval with bookmarks (in milliseconds since
+     *     epoch). Default value is 0. Should be less than endTime.
+     * %param[opt] endTime End time of the interval with bookmarks (in milliseconds since epoch).
+     *     Default value is the current time. Should be greater than startTime.
+     * %param[opt] sortBy Field to sort the results by. Default value is "startTime".
+     *     %value name Sort bookmarks by name.
+     *     %value startTime Sort bookmarks by start time.
+     *     %value duration Sort bookmarks by duration.
+     *     %value cameraName Sort bookmarks by camera name.
+     * %param[opt] sortOrder Sort order. Default order is ascending.
+     *     %value asc Ascending sort order.
+     *     %value desc Descending sort order.
+     * %param[opt] limit Maximum number of bookmarks to return. Unlimited by default.
+     * %param[opt] filter Text-search filter string.
+     * %param[proprietary] local If present, the request should not be redirected to another
+     *     server.
+     * %param[proprietary] extraFormatting If present and the requested result format is
+     *     non-binary, indentation and spacing will be used to improve readability.
+     * %param[default] format
+     *
+     **%apidoc GET /ec2/bookmarks/add
+     * Add a bookmark to the target server.
+     * %param guid Identifier of the bookmark.
+     * %param cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx or
+     *     /ec2/getCameras?extraFormatting) or MAC address (not supported for certain cameras).
+     * %param name Caption of the bookmark.
+     * %param[opt] description Details of the bookmark.
+     * %param[opt] timeout Time during which the recorded period should be preserved (in
+     *     milliseconds).
+     * %param startTime Start time of the bookmark (in milliseconds since epoch).
+     * %param duration Length of the bookmark (in milliseconds).
+     * %param[opt] tag Applied tag. Several tag parameters could be used to specify multiple tags.
+     * %param[proprietary] local If present, the request should not be redirected to another
+     *     server.
+     * %param[proprietary] extraFormatting If present and the requested result format is
+     *     non-binary, indentation and spacing will be used to improve readability.
+     * %param[default] format
+     *
+     **%apidoc GET /ec2/bookmarks/delete
+     * Remove a bookmark with the specified identifier.
+     * %param guid Identifier of the bookmark.
+     * %param[proprietary] local If present, the request should not be redirected to another
+     *     server.
+     * %param[proprietary] extraFormatting If present and the requested result format is
+     *     non-binary, indentation and spacing will be used to improve readability.
+     * %param[default] format
+     *
+     **%apidoc GET /ec2/bookmarks/tags
+     * Return currently used tags.
+     * %param[opt] limit Maximum number of tags to return.
+     * %param[proprietary] local If present, the request should not be redirected to another
+     *     server.
+     * %param[proprietary] extraFormatting If present and the requested result format is
+     *     non-binary, indentation and spacing will be used to improve readability.
+     * %param[default] format
+     *
+     **%apidoc GET /ec2/bookmarks/update
+     * Update information for a bookmark.
+     * %param guid Identifier of the bookmark.
+     * %param cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx or
+     *     /ec2/getCameras?extraFormatting) or MAC address (not supported for certain cameras).
+     * %param name Caption of the bookmark.
+     * %param[opt] description Details of the bookmark.
+     * %param[opt] timeout Time during which the recorded period should be preserved (in
+     *     milliseconds).
+     * %param startTime Start time of the bookmark (in milliseconds since epoch).
+     * %param duration Length of the bookmark (in milliseconds).
+     * %param[opt] tag Applied tag. Serveral tag parameters could be used to specify multiple tags.
+     * %param[proprietary] local If present, the request should not be redirected to another
+     *     server.
+     * %param[proprietary] extraFormatting If present and the requested result format is
+     *     non-binary, indentation and spacing will be used to improve readability.
+     * %param[default] format
+     */
     reg("ec2/bookmarks", new QnMultiserverBookmarksRestHandler("ec2/bookmarks"));
+
     reg("api/mergeLdapUsers", new QnMergeLdapUsersRestHandler());
+
+    /**%apidoc[proprietary] GET /ec2/updateInformation/freeSpaceForUpdateFiles
+     * Get free space available for downloading and extracting update files.
+     * %param[proprietary] local If present, the request should not be redirected to another
+     *     server.
+     * %param[proprietary] extraFormatting If present and the requested result format is
+     *     non-binary, indentation and spacing will be used to improve readability.
+     * %param[default] format
+     * %return The amount of free space available for update files in bytes for each online server
+     *     in the system, in the specified format.
+     */
     reg("ec2/updateInformation", new QnUpdateInformationRestHandler());
 
     /**%apidoc GET /ec2/cameraThumbnail

@@ -2547,6 +2547,21 @@
                     }
                 }
             }
-        }        
+        },
+        { 
+            "keys": ["DW|DWC-MPZ20XFM"],
+            "streamCapabilityTraits": [
+                {
+                    "trait": "aspectRatioDependent",
+                    "attributes": [
+                        {
+                            "name": "allowedAspectRatioDiff",
+                            "value": "0.1"
+                        }
+                    ]
+                }
+            ]
+            
+        }
     ]
 }

@@ -273,6 +273,14 @@ public:
     QnUuid videowallGuid() const;
     void setVideowallGuid(const QnUuid &uuid);
 
+    /**
+     * Turn on/off connections to the remove peers. 
+     * Media server will not receive connections from another peers while it is disabled.
+     * Hive mode is enabled by default.
+     */
+    void setHiveModeEnabled(bool value);
+    bool isHiveModeEnabled() const;
+
     /** instanceCounter used for unit test purpose only */
 signals:
     void readOnlyChanged(bool readOnly);
@@ -280,6 +288,7 @@ signals:
     void remoteIdChanged(const QnUuid &id);
     void systemIdentityTimeChanged(qint64 value, const QnUuid& sender);
     void runningInstanceGUIDChanged();
+    void hiveModeEnabledChanged(bool value);
 private:
     void createMessageProcessorInternal(QnCommonMessageProcessor* messageProcessor);
     void resetCachedValue();
@@ -335,4 +344,5 @@ private:
     nx::analytics::MetadataPluginFactory* m_metadataPluginFactory = nullptr;
 
     QnUuid m_videowallGuid;
+    bool m_hiveModeEnabled = true;
 };

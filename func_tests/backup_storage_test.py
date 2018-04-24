@@ -20,6 +20,7 @@ log = logging.getLogger(__name__)
 BACKUP_STORAGE_PATH = '/mnt/disk2'
 BACKUP_STORAGE_READY_TIMEOUT_SEC = 60  # seconds
 BACKUP_SCHEDULE_TIMEOUT_SEC = 60       # seconds
+BACKUP_STORAGE_APPEARS_TIMEOUT_SEC = 60
 
 # Camera backup types
 BACKUP_DISABLED = 0  # backup disabled
@@ -116,11 +117,21 @@ def change_and_assert_server_backup_type(server, expected_backup_type):
     assert (expected_backup_type and attributes[0]['backupType'] == expected_backup_type)
 
 
-def add_backup_storage(server):
+def get_storage(server, storage_path):
     storage_list = [s for s in server.rest_api.ec2.getStorages.GET()
-                    if BACKUP_STORAGE_PATH in s['url'] and s['usedForWriting']]
-    assert len(storage_list) == 1, 'Server did not accept storage %r' % BACKUP_STORAGE_PATH
-    storage = storage_list[0]
+                    if storage_path in s['url'] and s['usedForWriting']]
+    if storage_list:
+        assert len(storage_list) == 1
+        return storage_list[0]
+    else:
+        return None
+
+def add_backup_storage(server):
+    storage = utils.wait_until(
+        lambda: get_storage(server, BACKUP_STORAGE_PATH),
+        BACKUP_STORAGE_APPEARS_TIMEOUT_SEC)
+    assert storage, 'Server did not accept storage %r in %r seconds' % (
+        BACKUP_STORAGE_PATH, BACKUP_STORAGE_APPEARS_TIMEOUT_SEC)
     storage['isBackup'] = True
     server.rest_api.ec2.saveStorage.POST(**storage)
     wait_storage_ready(server, storage['id'])

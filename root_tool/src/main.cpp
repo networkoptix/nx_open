@@ -58,7 +58,7 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
             const auto user = getOptionalArg(argv);
             const auto password = getOptionalArg(argv);
 
-            return systemCommands->mount(*url, *directory, user, password, true)
+            return systemCommands->mount(*url, *directory, user, password, /*usePipe*/ true)
                 == nx::SystemCommands::MountCode::ok ? Result::ok : Result::execFailed;
         });
 

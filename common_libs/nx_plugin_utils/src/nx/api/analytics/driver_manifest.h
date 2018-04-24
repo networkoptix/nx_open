@@ -29,8 +29,10 @@ struct /*NX_PLUGIN_UTILS_API*/ AnalyticsDriverManifestBase
 struct /*NX_PLUGIN_UTILS_API*/ AnalyticsDriverManifest: AnalyticsDriverManifestBase
 {
    QList<Analytics::EventType> outputEventTypes;
+   QList<Analytics::Group> groups;
+
 };
-#define AnalyticsDriverManifest_Fields AnalyticsDriverManifestBase_Fields (outputEventTypes)
+#define AnalyticsDriverManifest_Fields AnalyticsDriverManifestBase_Fields (outputEventTypes)(groups)
 
 QN_FUSION_DECLARE_FUNCTIONS(AnalyticsDriverManifest, (json))
 

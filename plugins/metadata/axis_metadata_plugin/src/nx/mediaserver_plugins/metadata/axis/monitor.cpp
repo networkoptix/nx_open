@@ -27,7 +27,6 @@ nx::sdk::metadata::CommonEvent* createCommonEvent(const AnalyticsEventType& even
 {
     auto commonEvent = new nx::sdk::metadata::CommonEvent();
     commonEvent->setEventTypeId(event.eventTypeIdExternal);
-    commonEvent->setCaption(event.name.toStdString());
     commonEvent->setDescription(event.eventName.value.toStdString());
     commonEvent->setIsActive(active);
     commonEvent->setConfidence(1.0);

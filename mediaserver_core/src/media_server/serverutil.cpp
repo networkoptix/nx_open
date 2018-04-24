@@ -219,16 +219,13 @@ bool backupDatabase(std::shared_ptr<ec2::AbstractECConnection> connection)
 
 void dropConnectionsToRemotePeers(ec2::AbstractTransactionMessageBus* messageBus)
 {
-    if (QnServerConnector::instance())
-        QnServerConnector::instance()->stop();
-
+    messageBus->commonModule()->setHiveModeEnabled(false);
     messageBus->dropConnections();
 }
 
-void resumeConnectionsToRemotePeers()
+void resumeConnectionsToRemotePeers(ec2::AbstractTransactionMessageBus* messageBus)
 {
-    if (QnServerConnector::instance())
-        QnServerConnector::instance()->start();
+    messageBus->commonModule()->setHiveModeEnabled(true);
 }
 
 bool changeLocalSystemId(const ConfigureSystemData& data, ec2::AbstractTransactionMessageBus* messageBus)
@@ -254,7 +251,7 @@ bool changeLocalSystemId(const ConfigureSystemData& data, ec2::AbstractTransacti
         if (connection->getUserManager(Qn::kSystemAccess)->saveSync(user) != ec2::ErrorCode::ok)
         {
             if (!data.wholeSystem)
-                resumeConnectionsToRemotePeers();
+                resumeConnectionsToRemotePeers(messageBus);
             return false;
         }
     }
@@ -263,7 +260,7 @@ bool changeLocalSystemId(const ConfigureSystemData& data, ec2::AbstractTransacti
     if (connection->getResourceManager(Qn::kSystemAccess)->saveSync(data.additionParams) != ec2::ErrorCode::ok)
     {
         if (!data.wholeSystem)
-            resumeConnectionsToRemotePeers();
+            resumeConnectionsToRemotePeers(messageBus);
         return false;
     }
 
@@ -314,7 +311,7 @@ bool changeLocalSystemId(const ConfigureSystemData& data, ec2::AbstractTransacti
     }
 
     if (!data.wholeSystem)
-        resumeConnectionsToRemotePeers();
+        resumeConnectionsToRemotePeers(messageBus);
 
     return true;
 }

@@ -93,10 +93,17 @@ void doExecuteGet(
     nx_http::BufferType* outResponse,
     int httpStatus)
 {
-    auto httpClient = createHttpClient();
-    QUrl url = createUrl(launcher, urlStr);
+    return doExecuteGet(createUrl(launcher, urlStr), outResponse, httpStatus);
+}
 
-    NX_LOG(lm("[TEST] GET %1").arg(urlStr), cl_logINFO);
+void doExecuteGet(
+    const QUrl& url,
+    nx_http::BufferType* outResponse,
+    int httpStatus)
+{
+    auto httpClient = createHttpClient();
+
+    NX_LOG(lm("[TEST] GET %1").arg(url.path()), cl_logINFO);
 
     ASSERT_TRUE(httpClient->doGet(url));
 

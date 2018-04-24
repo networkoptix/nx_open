@@ -34,9 +34,18 @@ apt-get -y install \
 echo "Install mediaserver..."
 dpkg -i --force-depends "/vagrant/$MEDIASERVER_DIST_FNAME"
 
-while ! nc -z localhost 7001; do
+
+for i in {1..30}; do
+	if nc -z localhost 7001; then
+		break
+	fi
 	echo "Server is not started yet; waiting..."
 	sleep 1
 done
+
+if ! nc -z localhost 7001; then
+	echo "Server did not start in 30 seconds." >&2
+	exit 1
+fi
 
 cp $MEDIASERVER_CONF $MEDIASERVER_CONF_INITIAL

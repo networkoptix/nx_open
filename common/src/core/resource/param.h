@@ -63,6 +63,7 @@ namespace Qn
     static const QString kAnalyticsDriversParamName = lit("analyticsDrivers");
     static const QString kGroupPlayParamName = lit("groupplay");
     static const QString kCanShareLicenseGroup = lit("canShareLicenseGroup");
+    static const QString kStreamCapabilityTraits = lit("streamCapabilityTraits");
 
     static const QString ADVANCED_PARAMETER_OVERLOADS_PARAM_NAME = lit("advancedParameterOverloads");
 

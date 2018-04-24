@@ -24,6 +24,11 @@ QString CameraStreamCapability::toString() const
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(CameraStreamCapability, (json), CameraStreamCapability_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(CameraMediaCapability, (json), CameraMediaCapability_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(CameraStreamCapabilityTrait, (json), CameraStreamCapabilityTrait_Fields);
 
 } // namespace media
 } // namespace nx
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::media, CameraStreamCapabilityTraitType,
+    (nx::media::CameraStreamCapabilityTraitType::aspectRatioDependent, "aspectRatioDependent")
+);

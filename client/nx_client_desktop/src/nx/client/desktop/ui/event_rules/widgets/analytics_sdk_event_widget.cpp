@@ -130,25 +130,17 @@ void AnalyticsSdkEventWidget::updateSelectedEventType()
         model()->setEventParams(createEventParameters(driverId, eventTypeId));
     }
 
-    int index = 0;
-    for (int i = 0; i < ui->sdkEventTypeComboBox->count(); ++i)
-    {
-        auto itemDriverId = ui->sdkEventTypeComboBox->itemData(i,
-            AnalyticsSdkEventModel::DriverIdRole).value<QnUuid>();
+    auto analyticsModel = ui->sdkEventTypeComboBox->model();
 
-        if (itemDriverId != driverId)
-            continue;
+    auto items = analyticsModel->match(
+        analyticsModel->index(0, 0),
+        AnalyticsSdkEventModel::EventTypeIdRole,
+        /*value*/ qVariantFromValue(eventTypeId),
+        /*hits*/ 1,
+        Qt::MatchExactly | Qt::MatchRecursive);
 
-        auto itemEventTypeId = ui->sdkEventTypeComboBox->itemData(i,
-            AnalyticsSdkEventModel::EventTypeIdRole).value<QnUuid>();
-        if (itemEventTypeId != eventTypeId)
-            continue;
-
-        index = i;
-        break;
-    }
-
-    ui->sdkEventTypeComboBox->setCurrentIndex(index);
+    if (items.size() == 1)
+        ui->sdkEventTypeComboBox->setCurrentIndex(items.front());
 }
 
 nx::vms::event::EventParameters AnalyticsSdkEventWidget::createEventParameters(

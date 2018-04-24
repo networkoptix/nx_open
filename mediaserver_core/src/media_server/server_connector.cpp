@@ -25,6 +25,14 @@ QnServerConnector::QnServerConnector(QnCommonModule* commonModule):
     QObject(),
     QnCommonModuleAware(commonModule)
 {
+    connect(commonModule, &QnCommonModule::hiveModeEnabledChanged, this,
+        [this](bool value)
+        {
+            if (value)
+                start();
+            else
+                stop();
+        }, Qt::DirectConnection);
 }
 
 static QString makeModuleUrl(const nx::vms::discovery::ModuleEndpoint& module)
