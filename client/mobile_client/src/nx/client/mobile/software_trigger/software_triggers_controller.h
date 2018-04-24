@@ -51,6 +51,7 @@ public:
     Q_INVOKABLE bool deactivateTrigger();
     Q_INVOKABLE void cancelTriggerAction();
     Q_INVOKABLE QnUuid activeTriggerId() const;
+    Q_INVOKABLE bool hasActiveTrigger() const;
 
 signals:
     void resourceIdChanged();

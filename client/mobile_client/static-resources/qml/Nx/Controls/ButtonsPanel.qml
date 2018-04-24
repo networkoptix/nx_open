@@ -9,13 +9,14 @@ ListView
     readonly property alias scrollable: d.prefferToBeInteractive
     property bool blockMouseEvents: false
 
-    signal initiallyPressed(int index)
+    signal buttonPressed(int index)
     signal buttonClicked(int index)
-    signal pressedChanged(int index, bool pressed)
+    signal longPressedChanged(int index, bool pressed)
     signal actionCancelled(int index)
     signal enabledChanged(int index, bool buttonEnabled)
 
-    pressDelay: 150
+    pressDelay: 100
+
     clip: true
     layoutDirection: Qt.RightToLeft
     orientation: Qt.Horizontal
@@ -87,7 +88,7 @@ ListView
         padding: 0
         anchors.verticalCenter: parent.verticalCenter
 
-        onButtonPressedChanged: control.pressedChanged(index, buttonPressed)
+        onButtonPressedChanged: control.longPressedChanged(index, buttonPressed)
         onEnabledChanged: control.enabledChanged(index, enabled)
 
         Connections
@@ -102,6 +103,7 @@ ListView
 
         onClicked:
         {
+            d.allowInteractiveState = true
             if (!filteringPressing)
             {
                 pressedStateFilterTimer.stop()
@@ -111,20 +113,26 @@ ListView
 
         onPressed:
         {
+            d.allowInteractiveState = false
+
             button.active = true
-            control.initiallyPressed(index)
+            control.buttonPressed(index)
             if (!model.disableLongPress)
                 pressedStateFilterTimer.restart()
         }
 
         onReleased:
         {
+            d.allowInteractiveState = true
+
             handleButtonReleased()
             button.active = false
         }
 
         onCanceled:
         {
+            d.allowInteractiveState = true
+
             if (!buttonPressed)
                 handleCancelled()
             else
@@ -155,7 +163,7 @@ ListView
 
             button.filteringPressing = value
             button.buttonPressed = value
-            d.allowInteractiveState = !value
+
 
             if (!value)
                 button.active = false

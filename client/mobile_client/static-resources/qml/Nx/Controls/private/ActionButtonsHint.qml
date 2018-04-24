@@ -58,9 +58,12 @@ Rectangle
         }
     ]
 
-    function showHint(text, iconPath)
+    function showHint(text, iconPath, keepOpened)
     {
-        hideTimer.stop()
+        if (keepOpened)
+            hide()
+        else
+            hideTimer.restart()
 
         loader.sourceComponent = textComponent
         loader.item.text = text
@@ -104,7 +107,7 @@ Rectangle
 
     function showActivity(text, iconPath)
     {
-        showHint(text, iconPath)
+        showHint(text, iconPath, true)
         activityPreloader.visible = true
     }
 
@@ -198,7 +201,7 @@ Rectangle
     {
         id: hideTimer
 
-        interval: 3000
+        interval: 2000
         onTriggered: control.state = "hidden"
     }
 
