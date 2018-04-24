@@ -33,7 +33,7 @@ execute_process(
 )
 
 if(NOT apidoctool_result EQUAL 0)
-    message(FATAL ERROR "Cannot get dependencies list from apidoctool.")
+    message(FATAL_ERROR "Cannot get dependencies list from apidoctool.")
 endif()
 
 nx_split_string(apidoctool_deps "${apidoctool_deps}")
