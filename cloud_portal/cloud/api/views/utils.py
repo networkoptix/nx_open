@@ -11,6 +11,8 @@ import requests
 from cloud import settings
 from django.shortcuts import redirect
 
+from cloud_portal.cloud.cms.models import UserGroupsToCustomizationPermissions
+
 logger = logging.getLogger(__name__)
 
 
@@ -74,9 +76,8 @@ def language(request):
 def downloads_history(request):
     # TODO: later we can check specific permissions
     customization = settings.CUSTOMIZATION
-    if not request.user.is_superuser and (request.user.customization != customization \
-                                     or not request.user.has_perm('api.can_view_release')):
-        raise APIForbiddenException("Not authorized!!!", ErrorCodes.forbidden)
+    if not UserGroupsToCustomizationPermissions.check_permission(request.user, customization, 'api.can_view_release'):
+        raise APIForbiddenException("Not authorized", ErrorCodes.forbidden)
 
     downloads_url = settings.DOWNLOADS_JSON.replace('{{customization}}', customization)
     downloads_json = requests.get(downloads_url)
@@ -92,8 +93,7 @@ def downloads_history(request):
 def download_build(request, build):
     # TODO: later we can check specific permissions
     customization = settings.CUSTOMIZATION
-    if not request.user.is_superuser and (request.user.customization != customization \
-                                     or not request.user.has_perm('api.can_view_release')):
+    if not UserGroupsToCustomizationPermissions.check_permission(request.user, customization, 'api.can_view_release'):
         raise APIForbiddenException("Not authorized", ErrorCodes.forbidden)
 
     if re.search(r'\D+', build):

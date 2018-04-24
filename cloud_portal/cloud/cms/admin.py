@@ -6,6 +6,8 @@ from models import *
 from cloud import settings
 from django.contrib import admin
 
+from cloud_portal.cloud.cms.models import UserGroupsToCustomizationPermissions
+
 admin.site.site_header = 'Cloud Administration'
 admin.site.site_title = 'Cloud Administration'
 admin.site.index_title = 'Cloud Administration'
@@ -30,8 +32,7 @@ class CMSAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         qs = super(CMSAdmin, self).get_queryset(request)
-        if not request.user.is_superuser and \
-           request.user.customization != settings.CUSTOMIZATION:
+        if not UserGroupsToCustomizationPermissions.check_permission(request.user, settings.CUSTOMIZATION):
             # return empty dataset, only superuser can watch content in other
             # customizations
             return qs.filter(pk=-1)
