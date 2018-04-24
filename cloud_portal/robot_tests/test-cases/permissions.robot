@@ -67,6 +67,7 @@ Sharing link for anonymous - first ask login, then show share dialog
     Wait Until Page Does Not Contain Element    ${SHARE MODAL}
 
 After closing dialog, called by link - clear link
+    Set Window Size    1920    1080
     Log in to Auto Tests System    ${email}
     ${location}    Get Location
 
@@ -107,37 +108,27 @@ When user selects role - special hint appears
     Click Button    ${SHARE BUTTON SYSTEMS}
 #Adminstrator check
     Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
-    Click Element    ${SHARE PERMISSIONS DROPDOWN}
-    Wait Until Element Is Visible    ${SHARE PERMISSIONS ADMINISTRATOR}
-    Click Element    ${SHARE PERMISSIONS ADMINISTRATOR}
+    Select From List By Label    ${SHARE PERMISSIONS DROPDOWN}    ${ADMIN TEXT}
     Wait Until Element Is Visible    ${SHARE PERMISSIONS HINT}
     Element Text Should Be    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT ADMIN}
 #Advanced Viewer Check
     Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
-    Click Element    ${SHARE PERMISSIONS DROPDOWN}
-    Wait Until Element Is Visible    ${SHARE PERMISSIONS ADVANCED VIEWER}
-    Click Element    ${SHARE PERMISSIONS ADVANCED VIEWER}
+    Select From List By Label    ${SHARE PERMISSIONS DROPDOWN}    ${ADV VIEWER TEXT}
     Wait Until Element Is Visible    ${SHARE PERMISSIONS HINT}
     Element Text Should Be    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT ADV VIEWER}
 #Viewer Check
     Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
-    Click Element    ${SHARE PERMISSIONS DROPDOWN}
-    Wait Until Element Is Visible    ${SHARE PERMISSIONS VIEWER}
-    Click Element    ${SHARE PERMISSIONS VIEWER}
+    Select From List By Label    ${SHARE PERMISSIONS DROPDOWN}    ${VIEWER TEXT}
     Wait Until Element Is Visible    ${SHARE PERMISSIONS HINT}
     Element Text Should Be    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT VIEWER}
 #Live Viewer Check
     Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
-    Click Element    ${SHARE PERMISSIONS DROPDOWN}
-    Wait Until Element Is Visible    ${SHARE PERMISSIONS LIVE VIEWER}
-    Click Element    ${SHARE PERMISSIONS LIVE VIEWER}
+    Select From List By Label    ${SHARE PERMISSIONS DROPDOWN}    ${LIVE VIEWER TEXT}
     Wait Until Element Is Visible    ${SHARE PERMISSIONS HINT}
     Element Text Should Be    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT LIVE VIEWER}
 #Custom Check
     Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
-    Click Element    ${SHARE PERMISSIONS DROPDOWN}
-    Wait Until Element Is Visible    ${SHARE PERMISSIONS CUSTOM}
-    Click Element    ${SHARE PERMISSIONS CUSTOM}
+    Select From List By Label    ${SHARE PERMISSIONS DROPDOWN}    ${CUSTOM TEXT}
     Wait Until Element Is Visible    ${SHARE PERMISSIONS HINT}
     Element Text Should Be    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT CUSTOM}
     Click Button    ${SHARE CLOSE}

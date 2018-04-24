@@ -38,7 +38,7 @@ Empty New Password            ${EMPTY}
 *** Keywords ***
 Reset
     Close Browser
-    Open Restore Password Dialog
+    Open Restore Password Dialog With Link
 
 Open Restore Password Dialog With Link
     ${email}    Get Random Email    ${BASE EMAIL}

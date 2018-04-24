@@ -40,7 +40,7 @@
     "LIVE VIEWER TEXT": "Live-Betrachter",
     "CUSTOM TEXT": "Benutzerdefiniert",
     "YOUR SYSTEM TEXT": "Ihr System",
-    "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "aktiviere deinen Account",
+    "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "Aktivieren Sie Ihr Konto",
     "RESET PASSWORD EMAIL SUBJECT": "Passwort zurücksetzen",
     "INVITED TO SYSTEM EMAIL SUBJECT": "{{message.sharer_name}} lädt Sie zu {{PRODUCT_NAME}} ein",
     "DISCONNECT FORM HEADER TEXT": "System von {{PRODUCT_NAME}} trennen?",

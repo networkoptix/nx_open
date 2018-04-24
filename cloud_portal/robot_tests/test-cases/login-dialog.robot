@@ -52,7 +52,7 @@ redirects to systems after log In
     Location Should Be    ${url}/systems
 
 after log In, display user's email and menu in top right corner
-    Maximize Browser Window
+    Set Window Size    1920    1080
     Log In    ${email}    ${password}
     Validate Log In
     Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
