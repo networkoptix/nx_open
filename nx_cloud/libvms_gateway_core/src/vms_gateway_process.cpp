@@ -15,7 +15,6 @@
 #include <nx/utils/stree/stree_manager.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/platform/current_process.h>
-#include <nx/utils/timer_manager.h>
 
 #include <nx/cloud/relaying/relay_engine.h>
 
@@ -60,6 +59,11 @@ const std::vector<network::SocketAddress>& VmsGatewayProcess::httpEndpoints() co
     return m_httpEndpoints;
 }
 
+network::SocketAddress VmsGatewayProcess::reverseConnectionServerHttpEndpoint() const
+{
+    return nx::network::SocketGlobals::cloud().tcpReversePool().address();
+}
+
 relaying::RelayEngine& VmsGatewayProcess::relayEngine()
 {
     return *m_relayEngine;
@@ -101,9 +105,6 @@ int VmsGatewayProcess::serviceMain(
             return 1;
         }
 
-        nx::utils::TimerManager timerManager;
-        timerManager.start();
-
         CdbAttrNameSet attrNameSet;
         nx::utils::stree::StreeManager streeManager(
             attrNameSet,
@@ -139,14 +140,22 @@ int VmsGatewayProcess::serviceMain(
                 "US", nx::utils::AppInfo::organizationName().toUtf8());
         }
 
-       network::server::MultiAddressServer<nx::network::http::HttpStreamSocketServer> multiAddressHttpServer(
-            &authenticationManager,
-            &httpMessageDispatcher,
-            settings.http().sslSupport,
-            nx::network::NatTraversalSupport::disabled);
+        network::server::MultiAddressServer<nx::network::http::HttpStreamSocketServer>
+            multiAddressHttpServer(
+                &authenticationManager,
+                &httpMessageDispatcher,
+                settings.http().sslSupport,
+                nx::network::NatTraversalSupport::disabled);
 
         if (!multiAddressHttpServer.bind(httpAddrToListenList))
             return 3;
+
+        multiAddressHttpServer.forEachListener(
+            [&settings](auto* listener)
+            {
+                listener->setConnectionInactivityTimeout(
+                    settings.http().connectionInactivityTimeout);
+            });
 
         // Process privilege reduction.
         nx::utils::CurrentProcess::changeUser(settings.general().changeUser);
@@ -234,17 +243,18 @@ void VmsGatewayProcess::publicAddressFetched(
     {
         auto& pool = nx::network::SocketGlobals::cloud().tcpReversePool();
         pool.setPoolSize(rcSettings.poolSize);
+        pool.setHttpConnectionInactivityTimeout(settings.http().connectionInactivityTimeout);
         pool.setKeepAliveOptions(rcSettings.keepAlive);
         pool.setStartTimeout(rcSettings.startTimeout);
         if (pool.start(publicAddress, rcSettings.port))
         {
-            NX_LOG(lm("TCP reverse pool has started with port=%1, poolSize=%2, keepAlive=%3")
-                .args(pool.port(), rcSettings.poolSize, rcSettings.keepAlive), cl_logALWAYS);
+            NX_ALWAYS(this, lm("TCP reverse pool has started on address %1, poolSize=%2, keepAlive=%3")
+                .args(pool.address(), rcSettings.poolSize, rcSettings.keepAlive));
         }
         else
         {
-            NX_LOGX(lm("Could not start TCP reverse pool on port %1").args(rcSettings.port),
-                cl_logERROR);
+            NX_ERROR(this, lm("Could not start TCP reverse pool on port %1")
+                .args(rcSettings.port));
         }
     }
 }

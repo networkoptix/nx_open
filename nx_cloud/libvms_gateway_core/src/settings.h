@@ -49,6 +49,7 @@ public:
     bool allowTargetEndpointInUrl;
     bool sslSupport;
     QString sslCertPath;
+    std::chrono::milliseconds connectionInactivityTimeout;
 
     Http();
 };

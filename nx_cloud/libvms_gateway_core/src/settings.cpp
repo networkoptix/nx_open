@@ -54,6 +54,9 @@ const QLatin1String kDefaultHttpSslSupport("true");
 const QLatin1String kHttpSslCertPath("http/sslCertPath");
 const QLatin1String kDefaultHttpSslCertPath("");
 
+const QLatin1String kHttpConnectionInactivityTimeout("http/connectionInactivityTimeout");
+const std::chrono::milliseconds kDefaultHttpConnectionInactivityTimeout = std::chrono::minutes(1);
+
 //cloudConnect
 const QLatin1String kReplaceHostAddressWithPublicAddress("cloudConnect/replaceHostAddressWithPublicAddress");
 const QLatin1String kDefaultReplaceHostAddressWithPublicAddress("true");
@@ -98,7 +101,8 @@ Http::Http():
     proxyTargetPort(0),
     connectSupport(false),
     allowTargetEndpointInUrl(false),
-    sslSupport(true)
+    sslSupport(true),
+    connectionInactivityTimeout(kDefaultHttpConnectionInactivityTimeout)
 {
 }
 
@@ -221,6 +225,10 @@ void Settings::loadSettings()
         settings().value(
             kHttpSslCertPath,
             kDefaultHttpSslCertPath).toString();
+    m_http.connectionInactivityTimeout =
+        nx::utils::parseTimerDuration(
+            settings().value(kHttpConnectionInactivityTimeout).toString(),
+            kDefaultHttpConnectionInactivityTimeout);
 
     //CloudConnect
     m_cloudConnect.replaceHostAddressWithPublicAddress =
