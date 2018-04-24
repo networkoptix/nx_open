@@ -77,7 +77,10 @@ CameraDiagnostics::Result HikvisionResource::initializeMedia(
             hikvision::ChannelCapabilities channelCapabilities;
             auto result = fetchChannelCapabilities(role, &channelCapabilities);
             if (!result)
-                return result;
+            {
+                // This error may indicate that camera does not spport ISAPI, try ONVIF instead.
+                return base_type::initializeMedia(onvifCapabilities);
+            }
 
             m_channelCapabilitiesByRole[role] = channelCapabilities;
             m_hevcSupported = hikvision::codecSupported(
