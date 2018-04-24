@@ -70,7 +70,6 @@ require('./controllers/login.js');
 require('./controllers/merge.js');
 require('./controllers/register.js');
 require('./controllers/rename.js');
-require('./controllers/share.js');
 require('./controllers/startPage.js');
 require('./controllers/static.js');
 require('./controllers/system.js');

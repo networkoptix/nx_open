@@ -1,8 +1,9 @@
 import { Inject, Injectable } from '@angular/core';
 
-import { NxModalLoginComponent }   from "./../dialogs/login/login.component";
-import { NxModalGeneralComponent } from "./../dialogs/general/general.component";
-import { NxModalShareComponent }   from "./../dialogs/share/share.component";
+import { NxModalLoginComponent }      from "./../dialogs/login/login.component";
+import { NxModalGeneralComponent }    from "./../dialogs/general/general.component";
+import { NxModalShareComponent }      from "./../dialogs/share/share.component";
+import { NxModalDisconnectComponent } from "./../dialogs/disconnect/disconnect.component";
 
 @Injectable()
 export class nxDialogsService {
@@ -10,6 +11,7 @@ export class nxDialogsService {
     constructor(@Inject('ngToast') private toast: any,
                 private loginModal: NxModalLoginComponent,
                 private generalModal: NxModalGeneralComponent,
+                private disconnectModal: NxModalDisconnectComponent,
                 private shareModal: NxModalShareComponent) {
 
     }
@@ -41,7 +43,11 @@ export class nxDialogsService {
         return this.loginModal.open(keepPage);
     }
 
-    share (system, user) {
+    share(system, user) {
         return this.shareModal.open(system, user);
+    }
+
+    disconnect(systemId) {
+        return this.disconnectModal.open(systemId);
     }
 }

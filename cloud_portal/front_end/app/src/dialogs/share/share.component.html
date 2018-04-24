@@ -14,20 +14,24 @@
 
                 <input [hidden]="!isNewShare" type="email"
                        class="form-control"
-                       ng-model="userInfo.email"
+                       [(ngModel)]="userInfo.email"
                        id="email"
                        name="email"
                        validate-email maxlength="255"
                        required autofocus>
 
                 <input type="text" *ngIf="!isNewShare" name="email" id="lockedEmail"
-                       class="form-control" ng-value="formatUserName()" readonly>
+                       class="form-control" [value]="formatUserName()" readonly>
             </div>
             <div class="form-group">
                 <label for="role" translate>Permissions</label>
 
-                <select class="form-control" name="role" id="role" ng-model="userInfo.role"
-                        ng-options="option as ($root.L.accessRoles[option.name].label || option.name) for option in accessRoles"></select>
+                <select class="form-control" name="role" id="role"
+                        [(ngModel)]="userInfo.role"
+                        (ngModelChange)="onChange($event)"
+                        ng-options="option as ($root.L.accessRoles[option.name].label || option.name) for option in accessRoles">
+                    <option *ngFor="let optionLabel of accessRoles" [ngValue]="option"> {{option}}</option>
+                </select>
 
                 <span class="help-block">
                     {{getRoleDescription()}}

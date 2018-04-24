@@ -145,16 +145,18 @@
                     // }).result;
                 },
                 disconnect: function (systemId) {
-                    var title = lang.system.confirmDisconnectTitle;
-                    return openDialog({
-                        title: title,
-                        template: CONFIG.viewsDir + 'dialogs/disconnect.html',
-                        hasFooter: false,
-                        cancellable: true,
-                        params: {
-                            systemId: systemId
-                        }
-                    }).result;
+                    return nxDialogsService.disconnect(systemId);
+                    // var title = lang.system.confirmDisconnectTitle;
+                    //
+                    // return openDialog({
+                    //     title      : title,
+                    //     template   : CONFIG.viewsDir + 'dialogs/disconnect.html',
+                    //     hasFooter  : false,
+                    //     cancellable: true,
+                    //     params     : {
+                    //         systemId: systemId
+                    //     }
+                    // }).result;
                 },
                 rename: function (systemId, systemName) {
                     var title = lang.system.confirmRenameTitle;

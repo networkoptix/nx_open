@@ -18,6 +18,7 @@ export class ShareModalContent {
     sharing: any;
     url: string;
     accessRoles: any;
+    options: any;
     isNewShare: boolean;
     buttonText: string;
 
@@ -34,12 +35,19 @@ export class ShareModalContent {
     processAccessRoles() {
         const roles = this.system.accessRoles || this.CONFIG.accessRoles.predefinedRoles;
         this.accessRoles = roles.filter((role) => {
-            return !(role.isOwner || role.isAdmin && !this.system.isMine);
+            if (!(role.isOwner || role.isAdmin && !this.system.isMine)) {
+                role.optionLabel = this.language.accessRoles[role.option.name].label || role.option.name;
+                return;
+            }
+
+            return false;
         });
 
         if (!this.user.role) {
             this.user.role = this.system.findAccessRole(this.user);
         }
+
+        this.options = this.accessRoles
     }
 
     formatUserName() {
