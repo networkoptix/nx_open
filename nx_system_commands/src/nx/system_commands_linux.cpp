@@ -570,8 +570,7 @@ std::string SystemCommands::serializedDmiInfo(bool reportViaSocket)
             {
                 str.erase(pos + 1);
                 pos = str.find_first_not_of(' ');
-                if (pos != std::string::npos)
-                    str.erase(0, pos);
+                if(pos != std::string::npos) str.erase(0, pos);
             }
             else
             {
@@ -582,20 +581,20 @@ std::string SystemCommands::serializedDmiInfo(bool reportViaSocket)
     std::string result;
     std::set<std::string> values[prefixes.size()];
     if (execute(
-        "/usr/sbin/dmidecode -t17",
-        [&values, &prefixes, trim](const char* line)
-        {
-            for (int index = 0; index < prefixes.size(); index++)
+            "/usr/sbin/dmidecode -t17",
+            [&values, &prefixes, trim](const char* line)
             {
-                const char* ptr = strstr(line, prefixes[index]);
-                if (ptr)
+                for (int index = 0; index < prefixes.size(); index++)
                 {
-                    std::string value = std::string(ptr + strlen(prefixes[index]));
-                    trim(value);
-                    values[index].insert(value);
+                    const char* ptr = strstr(line, prefixes[index]);
+                    if (ptr)
+                    {
+                        std::string value = std::string(ptr + strlen(prefixes[index]));
+                        trim(value);
+                        values[index].insert(value);
+                    }
                 }
-            }
-        }))
+            }))
     {
         for (size_t i = 0; i < prefixes.size(); ++i)
         {

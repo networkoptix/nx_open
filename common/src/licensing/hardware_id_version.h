@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QtCore/QString>
+#include <QString>
 
 namespace LLUtil {
 

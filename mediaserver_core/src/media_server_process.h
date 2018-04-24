@@ -170,7 +170,7 @@ private:
         CloudManagerGroup* const cloudManagerGroup,
         ec2::TransactionMessageBusAdapter* messageBus);
     void initializeCloudConnect();
-    void prepareOsResources(const QString& userName);
+    void changeSystemUser(const QString& userName);
 
     std::unique_ptr<nx_upnp::PortMapper> initializeUpnpPortMapper();
     Qn::ServerFlags calcServerFlags();
