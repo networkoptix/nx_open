@@ -30,9 +30,6 @@ public:
 
     bool isAuthentificationRequired(nx_http::Request& request);
     void enableUnauthorizedForwarding(const QString& path);
-
-    void setPreparedTcpSocket(std::unique_ptr<AbstractStreamServerSocket> socket);
-
     static std::unique_ptr<AbstractStreamServerSocket> createAndPrepareTcpSocket(
         const SocketAddress& localAddress);
 

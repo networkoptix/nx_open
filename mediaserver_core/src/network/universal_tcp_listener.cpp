@@ -242,11 +242,6 @@ void QnUniversalTcpListener::enableUnauthorizedForwarding(const QString& path)
     m_unauthorizedForwardingPaths.insert(lit("/") + path + lit("/"));
 }
 
-void QnUniversalTcpListener::setPreparedTcpSocket(std::unique_ptr<AbstractStreamServerSocket> socket)
-{
-    m_preparedTcpSocket = std::move(socket);
-}
-
 std::unique_ptr<AbstractStreamServerSocket> QnUniversalTcpListener::createAndPrepareTcpSocket(
     const SocketAddress& localAddress)
 {

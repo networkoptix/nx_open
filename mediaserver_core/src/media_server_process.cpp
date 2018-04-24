@@ -2964,7 +2964,7 @@ void MediaServerProcess::initializeCloudConnect()
 
 void MediaServerProcess::prepareOsResources()
 {
-    auto rootToolPtr = m_serverModule.lock()->rootTool();
+    auto rootToolPtr = qnServerModule->rootTool();
     if (!rootToolPtr->changeOwner(nx::kit::IniConfig::iniFilesDir()))
         qWarning().noquote() << "Unable to chown" << nx::kit::IniConfig::iniFilesDir();
 
@@ -3433,10 +3433,7 @@ void MediaServerProcess::run()
     if (m_serviceMode)
         initializeHardwareId();
 
-    // This is better to do before any files get open, so new user can access them without problems.
-    const auto systemUser = qnServerModule->roSettings()->value(nx_ms_conf::SYSTEM_USER).toString();
-    if (!systemUser.isEmpty())
-        prepareOsResources(systemUser);
+    prepareOsResources();
 
     if (m_serviceMode)
     {
