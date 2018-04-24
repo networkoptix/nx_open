@@ -56,7 +56,7 @@ struct NX_UPDATE_API UpdateFileRequestData: UpdateRequestData
 
     QString toString() const
     {
-        return UpdateRequestData::toString() + lit(", os=%1").arg(osVersion.toString());
+        return UpdateRequestData::toString() + lit(", os=%1").arg(osVersion.serialize());
     }
 };
 

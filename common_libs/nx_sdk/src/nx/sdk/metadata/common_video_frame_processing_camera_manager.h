@@ -24,14 +24,23 @@ class CommonVideoFrameProcessingCameraManager:
     public nxpt::CommonRefCounter<ConsumingCameraManager>
 {
 protected:
-    CommonVideoFrameProcessingCameraManager(Plugin* plugin): m_plugin(plugin) {}
+    /**
+     * @param enableOutput Enables NX_OUTPUT. Typically, use NX_DEBUG_ENABLE_OUTPUT as a value.
+     * @param printPrefix Prefix for NX_PRINT and NX_OUTPUT. If empty, will be made from plugin's
+     * libName().
+     */
+    CommonVideoFrameProcessingCameraManager(
+        Plugin* plugin,
+        bool enableOutput,
+        const std::string& printPrefix = "");
 
     virtual std::string capabilitiesManifest() = 0;
 
     /**
-     * Override to accept next compressed video frame for processing.
+     * Override to accept next compressed video frame for processing. Should not block the caller
+     * thread for long.
      * @param videoFrame Contains a pointer to the compressed video frame raw bytes. If the plugin
-     *     manifest declares "needDeepCopyForMediaFrame" in "capabilities", the lifetime (validity)
+     *     manifest declares "needDeepCopyOfVideoFrames" in "capabilities", the lifetime (validity)
      *     of this pointer is the same as of videoFrame. Otherwise, the pointer is valid only until
      *     and during the subsequent call to pullMetadataPackets(), even if the lifetime of
      *     videoFrame is extended by addRef() or queryInterface() inside this method.
@@ -44,7 +53,7 @@ protected:
     /**
      * Override to accept next uncompressed video frame for processing.
      * @param videoFrame Contains a pointer to the uncompressed video frame raw bytes. If the plugin
-     *     manifest declares "needDeepCopyForMediaFrame" in "capabilities", the lifetime (validity)
+     *     manifest declares "needDeepCopyOfVideoFrames" in "capabilities", the lifetime (validity)
      *     of this pointer is the same as of videoFrame. Otherwise, the pointer is valid only until
      *     and during the subsequent call to pullMetadataPackets(), even if the lifetime of
      *     videoFrame is extended by addRef() or queryInterface() inside this method.
@@ -83,14 +92,23 @@ protected:
      */
     std::string getParamValue(const char* paramName);
 
-    /** Enable or disable verbose debug output via NX_OUTPUT from methods of this class. */
-    void setEnableOutput(bool value) { m_enableOutput = value; }
+public:
+    virtual ~CommonVideoFrameProcessingCameraManager() override;
 
     /**
      * @return Parent plugin. The parent plugin is guaranteed to exist while any of its
      * CameraManagers exist, thus, this pointer is valid during the lifetime of this CameraManager.
+     * Override to perform dynamic_cast to the actual descendant class of the plugin.
      */
-    Plugin* plugin() const { return m_plugin; }
+    virtual Plugin* plugin() const { return m_plugin; }
+
+    bool enableOutput() const { return m_enableOutput; }
+
+    /**
+     * Allows to define the following marco before including nx/kit/debug.h in the derived class:
+     * #define NX_PRINT_PREFIX printPrefix()
+     */
+    std::string printPrefix() const { return m_printPrefix; }
 
 //-------------------------------------------------------------------------------------------------
 // Not intended to be used by the descendant.
@@ -106,8 +124,10 @@ public:
     virtual void setDeclaredSettings(const nxpl::Setting* settings, int count) override;
 
 private:
-    bool m_enableOutput = false;
-    Plugin* m_plugin;
+    Plugin* const m_plugin;
+    const bool m_enableOutput;
+    const std::string m_printPrefix;
+
     MetadataHandler* m_handler = nullptr;
     std::map<std::string, std::string> m_settings;
 };

@@ -15,6 +15,9 @@ public:
     virtual nx::sdk::metadata::CameraManager* obtainCameraManager(
         const nx::sdk::CameraInfo& cameraInfo, nx::sdk::Error* outError) override;
 
+    bool needDeepCopyOfVideoFrames() const { return m_needDeepCopyOfVideoFrames; }
+    bool needUncompressedVideoFrames() const { return m_needUncompressedVideoFrames; }
+
 protected:
     virtual std::string capabilitiesManifest() const override;
 
@@ -29,6 +32,14 @@ protected:
         std::string* outActionUrl,
         std::string* outMessageToUser,
         nx::sdk::Error* error) override;
+
+private:
+    void initCapabilities();
+
+private:
+    std::string m_capabilities;
+    bool m_needDeepCopyOfVideoFrames = false;
+    bool m_needUncompressedVideoFrames = false;
 };
 
 } // namespace stub

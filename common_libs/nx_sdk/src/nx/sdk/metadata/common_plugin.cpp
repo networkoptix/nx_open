@@ -1,17 +1,25 @@
 #include "common_plugin.h"
 
 #define NX_DEBUG_ENABLE_OUTPUT m_enableOutput
-#define NX_PRINT_PREFIX (std::string("[") + m_name + "] ")
+#define NX_PRINT_PREFIX m_printPrefix
 #include <nx/kit/debug.h>
 
 namespace nx {
 namespace sdk {
 namespace metadata {
 
-CommonPlugin::CommonPlugin(const char* name):
-    m_name(name)
+CommonPlugin::CommonPlugin(
+    const std::string& name,
+    const std::string& libName,
+    bool enableOutput,
+    const std::string& printPrefix)
+    :
+    m_name(name),
+    m_libName(libName),
+    m_enableOutput(enableOutput),
+    m_printPrefix(!printPrefix.empty() ? printPrefix : ("[" + libName + "] "))
 {
-    NX_PRINT << "Created " << this;
+    NX_PRINT << "Created " << this << ": \"" << m_name << "\"";
 }
 
 std::string CommonPlugin::getParamValue(const char* paramName)
@@ -62,7 +70,7 @@ void* CommonPlugin::queryInterface(const nxpl::NX_GUID& interfaceId)
 
 const char* CommonPlugin::name() const
 {
-    return m_name;
+    return m_name.c_str();
 }
 
 void CommonPlugin::setSettings(const nxpl::Setting* /*settings*/, int /*count*/)

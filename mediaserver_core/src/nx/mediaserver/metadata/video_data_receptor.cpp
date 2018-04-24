@@ -55,7 +55,7 @@ using namespace nx::sdk::metadata;
     }
 
     nx::sdk::metadata::UncompressedVideoFrame* uncompressedFrame;
-// TODO: #dmishin take needed pixel format from manifest
+// TODO: #mshevchenko: Take required pixel format from manifest.
 #if 0
     uncompressedFrame = convertToYuv420pSdkFrame(frame, needDeepCopy);
 #else

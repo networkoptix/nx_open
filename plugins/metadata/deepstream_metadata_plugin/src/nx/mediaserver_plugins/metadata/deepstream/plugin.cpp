@@ -166,7 +166,7 @@ const char* Plugin::capabilitiesManifest(Error* error) const
 
     static const std::string kManifestPostfix = (R"json(
             ],
-            "capabilities": "needDeepCopyForMediaFrame"
+            "capabilities": "needDeepCopyOfVideoFrames"
         })json");
 
     m_manifest = kManifestPrefix;

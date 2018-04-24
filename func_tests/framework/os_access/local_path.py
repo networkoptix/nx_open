@@ -12,10 +12,10 @@ class LocalPath(PosixPath, FileSystemPath):
         return cls('/tmp/func_tests')
 
     def upload(self, local_source_path):
-        shutil.copy(str(local_source_path), str(self))
+        shutil.copyfile(str(local_source_path), str(self))
 
     def download(self, local_destination_path):
-        shutil.copy(str(self), str(local_destination_path))
+        shutil.copyfile(str(self), str(local_destination_path))
 
     def rmtree(self, ignore_errors=False):
         shutil.rmtree(str(self), ignore_errors=ignore_errors)
