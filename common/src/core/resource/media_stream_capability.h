@@ -55,10 +55,10 @@ struct CameraStreamCapabilityTrait
 using CameraStreamCapabilityTraits = std::vector<CameraStreamCapabilityTrait>;
 
 #define CameraStreamCapabilityTrait_Fields (trait)(attributes)
-QN_FUSION_DECLARE_FUNCTIONS(CameraStreamCapabilityTrait, (json)(metatype));
+QN_FUSION_DECLARE_FUNCTIONS(CameraStreamCapabilityTrait, (json))
 
 } // media
 } // nx
 
+Q_DECLARE_METATYPE(nx::media::CameraStreamCapabilityTrait)
 QN_FUSION_DECLARE_FUNCTIONS(nx::media::CameraStreamCapabilityTraitType, (lexical));
-
