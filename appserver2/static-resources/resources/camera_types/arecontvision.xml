@@ -106,13 +106,15 @@
         <resource name = "12275" public = "12186">
             <params>
                 <param name = "VideoLayout" default_value="width=4;height=1;sensors=3,2,1,0"/>
+                <param name = "MaxFPS" default_value = "10"/>
+                
             </params>
         </resource>
 		
         <resource name = "12276" public = "12176"> 
             <params>
                 <param name = "VideoLayout" default_value = "width=4;height=1;sensors=3,2,1,0"/>        
-                <param name = "MaxFPS" default_value = "7"/>
+                <param name = "MaxFPS" default_value = "10"/>
             </params>
         </resource>  
         <resource name = "1195" public = "1215"/>
