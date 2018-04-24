@@ -468,7 +468,8 @@ begin_label:
                     setNeedKeyData();
                 m_outOfPlaybackMask = false;
                 internalJumpTo(displayTime);
-                setSkipFramesToTime(displayTime, false);
+                if (displayTime != DATETIME_NOW)
+                    setSkipFramesToTime(displayTime, false);
 
                 emit jumpOccured(displayTime, m_delegate->getSequence());
                 m_BOF = true;
