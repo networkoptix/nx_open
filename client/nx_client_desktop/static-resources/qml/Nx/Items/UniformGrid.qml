@@ -4,46 +4,54 @@ ShaderEffect
 {
     property int cellCountX: 10
     property int cellCountY: 10
-    property int lineWidth: 1
-    property color lineColor: "white"
+    property int thickness: 1
+    property color color: "white"
 
     // Implementation.
 
-    readonly property real lineThickness: Math.max(1.0, lineWidth)
+    readonly property real lineSize: Math.max(1.0, thickness)
+
     readonly property vector2d cellSize: Qt.vector2d(
-        (width - lineThickness) / Math.max(cellCountX, 1),
-        (height - lineThickness) / Math.max(cellCountY, 1))
+        (width - lineSize) / Math.max(cellCountX, 1),
+        (height - lineSize) / Math.max(cellCountY, 1))
+
+    readonly property vector2d lineSizeInCellCoords: Qt.vector2d(
+        lineSize / cellSize.x,
+        lineSize / cellSize.y)
 
     vertexShader: "
         #version 120
 
+        uniform vec2 cellSize;
         uniform mat4 qt_Matrix;
+
         attribute vec4 qt_Vertex;
 
-        varying vec2 coordinates;
+        varying vec2 cellCoords;
 
         void main()
         {
             gl_Position = qt_Matrix * qt_Vertex;
-            coordinates = qt_Vertex.xy;
+            cellCoords = qt_Vertex.xy / cellSize;
         }"
 
     fragmentShader: "
         #version 120
 
-        uniform vec2 cellSize;
-        uniform vec4 lineColor;
-        uniform float lineThickness;
+        uniform vec4 color;
+        uniform vec2 lineSizeInCellCoords;
         uniform float qt_Opacity;
 
-        varying vec2 coordinates;
+        varying vec2 cellCoords;
 
         void main()
         {
-            vec2 closestLines = floor(coordinates / cellSize) * cellSize;
-            if (all(greaterThan(coordinates - closestLines, vec2(lineThickness))))
+            vec2 thisCell = floor(cellCoords);
+            vec2 prevCell = floor(cellCoords - lineSizeInCellCoords);
+
+            if (thisCell == prevCell)
                 discard;
 
-            gl_FragColor = lineColor * qt_Opacity;
+            gl_FragColor = color * qt_Opacity;
         }"
 }
