@@ -1,10 +1,10 @@
 *** Settings ***
 Resource          ../resource.robot
 Resource          ../variables.robot
-Test Setup        Reset
-Test Teardown     Run Keyword If Test Failed    Account Failure
+Test Setup        Restart
+Test Teardown     Run Keyword If Test Failed    Reset DB and Open New Browser On Failure
 Suite Setup       Open Browser and go to URL    ${url}
-Suite Teardown    Clean up
+Suite Teardown    Close Browser
 *** Variables ***
 ${password}    ${BASE PASSWORD}
 ${url}         ${ENV}
@@ -17,19 +17,15 @@ Verify In Account Page
     Wait Until Elements Are Visible    ${ACCOUNT EMAIL}    ${ACCOUNT FIRST NAME}    ${ACCOUNT LAST NAME}    ${ACCOUNT SAVE}    ${ACCOUNT LANGUAGE DROPDOWN}    ${ACCOUNT SUBSCRIBE CHECKBOX}    ${ACCOUNT DROPDOWN}
     sleep    .5
 
-Reset
+Restart
     ${status}    Run Keyword And Return Status    Validate Log In
     Run Keyword If    ${status}    Log Out
     Validate Log Out
     Go To    ${url}
 
-Clean up
+Reset DB and Open New Browser On Failure
     Close Browser
-    Run Keyword If Any Tests Failed    Clean up noperm first/last name
-
-Account Failure
-    Close Browser
-    Clean up noperm first/last name
+    Reset user noperm first/last name
     Open Browser and go to URL    ${url}
 
 *** Test Cases ***

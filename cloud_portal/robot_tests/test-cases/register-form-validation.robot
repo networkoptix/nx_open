@@ -3,7 +3,7 @@ Resource          ../resource.robot
 Resource          ../variables.robot
 Suite Setup       Open Browser and go to URL    ${url}/register
 Suite Teardown    Close Browser
-Test Teardown     Run Keyword If Test Failed    Reset
+Test Teardown     Run Keyword If Test Failed    Restart
 Test Template     Test Register Invalid
 Force Tags        form
 
@@ -57,7 +57,7 @@ Invalid All             ${SPACE}    ${SPACE}    noptixqagmail.com         ${7cha
 Empty All               ${EMPTY}    ${EMPTY}    ${EMPTY}                  ${EMPTY}
 
 *** Keywords ***
-Reset
+Restart
     Close Browser
     Open Browser and go to URL    ${url}/register
 

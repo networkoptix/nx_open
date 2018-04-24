@@ -1,8 +1,8 @@
 *** Settings ***
 Resource          ../resource.robot
 Resource          ../variables.robot
-Test Setup        Reset
-Test Teardown     Run Keyword If Test Failed    Systems Page Failure
+Test Setup        Restart
+Test Teardown     Run Keyword If Test Failed    Reset DB and Open New Browser On Failure
 Suite Setup       Open Browser and go to URL    ${url}
 Suite Teardown    Close All Browsers
 Force Tags        system
@@ -21,12 +21,12 @@ Check Systems Text
     Wait Until Element Is Visible    ${AUTO TESTS USER}[text()='${TEST FIRST NAME} ${TEST LAST NAME}']
     Wait Until Element Is Not Visible    //h2[.='${YOUR SYSTEM TEXT}']
 
-Systems Page Failure
+Reset DB and Open New Browser On Failure
     Close Browser
-    Clean up owner first/last name
+    Reset user owner first/last name
     Open Browser and go to URL    ${url}
 
-Reset
+Restart
     ${status}    Run Keyword And Return Status    Validate Log In
     Run Keyword If    ${status}    Log Out
     Go To    ${url}

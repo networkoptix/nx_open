@@ -1,8 +1,8 @@
 *** Settings ***
 Resource          ../resource.robot
 Resource          ../variables.robot
-Test Setup        Reset
-Test Teardown     Run Keyword If Test Failed    Permissions Failure
+Test Setup        Restart
+Test Teardown     Run Keyword If Test Failed    Reset DB and Open New Browser On Failure
 Suite Setup       Open Browser and go to URL    ${url}
 Suite Teardown    Close All Browsers
 Force Tags        System
@@ -29,11 +29,11 @@ Check Log In
     Log In    ${email}    ${password}    None
     Validate Log In
 
-Reset
+Restart
     ${status}    Run Keyword And Return Status    Validate Log In
     Run Keyword If    ${status}    Log Out
 
-Permissions Failure
+Reset DB and Open New Browser On Failure
     Close Browser
     Clean up random emails
     Clean up email noperm
