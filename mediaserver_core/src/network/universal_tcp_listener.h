@@ -53,7 +53,6 @@ private:
     nx::hpm::api::SystemCredentials m_cloudCredentials;
     std::unique_ptr<nx_http::HttpModManager> m_httpModManager;
     std::set<QString> m_unauthorizedForwardingPaths;
-    std::unique_ptr<AbstractStreamServerSocket> m_preparedTcpSocket;
 
     void onCloudBindingStatusChanged(
         boost::optional<nx::hpm::api::SystemCredentials> cloudCredentials);

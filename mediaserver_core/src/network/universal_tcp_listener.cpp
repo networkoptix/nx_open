@@ -92,16 +92,7 @@ AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepareSocket(
 {
     QnMutexLocker lk(&m_mutex);
 
-    std::unique_ptr<AbstractStreamServerSocket> tcpServerSocket;
-    if (m_preparedTcpSocket
-        && m_preparedTcpSocket->getLocalAddress().toString() == localAddress.toString())
-    {
-        tcpServerSocket = std::move(m_preparedTcpSocket);
-    }
-
-    if (!tcpServerSocket)
-        tcpServerSocket = createAndPrepareTcpSocket(localAddress);
-
+    auto tcpServerSocket = createAndPrepareTcpSocket(localAddress);
     if (!tcpServerSocket)
     {
         setLastError(SystemError::getLastOSErrorCode());
