@@ -29,7 +29,7 @@ then
                 else
                     [[ "$entry" = "env" ]] && continue
                     [ -e "$entry" ] && rm -rf "$entry"
-                    cp -pr "$NX_VMS/cloud+portal/$entry" "$entry"
+                    cp -pr "$NX_VMS/cloud_portal/$entry" "$entry"
                 fi
             done
         popd
