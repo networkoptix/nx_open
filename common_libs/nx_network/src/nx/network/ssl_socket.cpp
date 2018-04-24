@@ -152,7 +152,7 @@ protected:
         m_handler = nullptr;
         if (!handler)
         {
-            NX_ASSERT(false, lm("invokeUserCallback nullptr, status: %1").arg(m_errorCode));
+            NX_ASSERT(false, lm("%1 invokeUserCallback nullptr, status: %2").args(this, m_errorCode));
             return;
         }
 
@@ -209,7 +209,7 @@ protected:
         m_handler = nullptr;
         if (!handler)
         {
-            NX_ASSERT(false, lm("invokeUserCallback nullptr, status: %1").arg(m_errorCode));
+            NX_ASSERT(false, lm("%1 invokeUserCallback nullptr, status: %2").args(this, m_errorCode));
             return;
         }
 
@@ -259,7 +259,9 @@ protected:
         m_handler = nullptr;
         if (!handler)
         {
-            NX_ASSERT(false, lm("invokeUserCallback nullptr, status: %1").arg(m_errorCode));
+            // Handshake might be invoked twice, from both read and write operations at the same
+            // time. So it should be fine to notify only first time.
+            NX_DEBUG(this, lm("invokeUserCallback nullptr, status: %1").arg(m_errorCode));
             return;
         }
 
