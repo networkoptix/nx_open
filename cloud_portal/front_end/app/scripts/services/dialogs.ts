@@ -162,7 +162,7 @@
 
                     disconnect      : function (systemId) {
                         return nxDialogsService.disconnect(systemId);
-                        
+
                         // var title = lang.system.confirmDisconnectTitle;
                         //
                         // return openDialog({
@@ -176,18 +176,20 @@
                         // }).result;
                     },
                     rename          : function (systemId, systemName) {
-                        var title = lang.system.confirmRenameTitle;
+                        return nxDialogsService.rename(systemId, systemName);
 
-                        return openDialog({
-                            title      : title,
-                            template   : CONFIG.viewsDir + 'dialogs/rename.html',
-                            hasFooter  : false,
-                            cancellable: true,
-                            params     : {
-                                systemId  : systemId,
-                                systemName: systemName
-                            }
-                        }).result;
+                        // var title = lang.system.confirmRenameTitle;
+                        //
+                        // return openDialog({
+                        //     title      : title,
+                        //     template   : CONFIG.viewsDir + 'dialogs/rename.html',
+                        //     hasFooter  : false,
+                        //     cancellable: true,
+                        //     params     : {
+                        //         systemId  : systemId,
+                        //         systemName: systemName
+                        //     }
+                        // }).result;
                     },
                     merge           : function (system) {
                         var title = lang.system.mergeSystemTitle;

@@ -4,6 +4,7 @@ import { NxModalLoginComponent }      from "./../dialogs/login/login.component";
 import { NxModalGeneralComponent }    from "./../dialogs/general/general.component";
 import { NxModalShareComponent }      from "./../dialogs/share/share.component";
 import { NxModalDisconnectComponent } from "./../dialogs/disconnect/disconnect.component";
+import { NxModalRenameComponent }     from "./../dialogs/rename/rename.component";
 
 @Injectable()
 export class nxDialogsService {
@@ -12,6 +13,7 @@ export class nxDialogsService {
                 private loginModal: NxModalLoginComponent,
                 private generalModal: NxModalGeneralComponent,
                 private disconnectModal: NxModalDisconnectComponent,
+                private renameModal: NxModalRenameComponent,
                 private shareModal: NxModalShareComponent) {
 
     }
@@ -49,5 +51,9 @@ export class nxDialogsService {
 
     disconnect(systemId) {
         return this.disconnectModal.open(systemId);
+    }
+
+    rename(systemId, systemName) {
+        return this.renameModal.open(systemId, systemName);
     }
 }

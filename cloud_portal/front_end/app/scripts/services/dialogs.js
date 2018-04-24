@@ -159,17 +159,19 @@
                     // }).result;
                 },
                 rename: function (systemId, systemName) {
-                    var title = lang.system.confirmRenameTitle;
-                    return openDialog({
-                        title: title,
-                        template: CONFIG.viewsDir + 'dialogs/rename.html',
-                        hasFooter: false,
-                        cancellable: true,
-                        params: {
-                            systemId: systemId,
-                            systemName: systemName
-                        }
-                    }).result;
+                    return nxDialogsService.rename(systemId, systemName);
+                    // var title = lang.system.confirmRenameTitle;
+                    //
+                    // return openDialog({
+                    //     title      : title,
+                    //     template   : CONFIG.viewsDir + 'dialogs/rename.html',
+                    //     hasFooter  : false,
+                    //     cancellable: true,
+                    //     params     : {
+                    //         systemId  : systemId,
+                    //         systemName: systemName
+                    //     }
+                    // }).result;
                 },
                 merge: function (system) {
                     var title = lang.system.mergeSystemTitle;
