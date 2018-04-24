@@ -11,7 +11,7 @@ import requests
 from cloud import settings
 from django.shortcuts import redirect
 
-from cloud_portal.cloud.cms.models import UserGroupsToCustomizationPermissions
+from cms.models import UserGroupsToCustomizationPermissions
 
 logger = logging.getLogger(__name__)
 

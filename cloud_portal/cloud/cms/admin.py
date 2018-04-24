@@ -6,7 +6,6 @@ from models import *
 from cloud import settings
 from django.contrib import admin
 
-from cloud_portal.cloud.cms.models import UserGroupsToCustomizationPermissions
 
 admin.site.site_header = 'Cloud Administration'
 admin.site.site_title = 'Cloud Administration'
