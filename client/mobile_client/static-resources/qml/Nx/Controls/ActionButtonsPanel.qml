@@ -51,6 +51,15 @@ Item
 
         blockMouseEvents: control.opacity != 1
 
+        onButtonDownChanged:
+        {
+            if (d.getType(index) != ActionButtonsModel.SoftTriggerButton || d.isProlonged(index))
+                return
+
+            if (!down)
+                hintControl.hide()
+        }
+
         onButtonPressed:
         {
             switch(d.getType(index))
@@ -100,10 +109,19 @@ Item
                     }
                     return
                 case ActionButtonsModel.SoftTriggerButton:
+                    var prolonged = d.isProlonged(index)
+
                     if (!pressed)
-                        d.tryDeactivateTrigger(index)
+                    {
+                        if (prolonged)
+                            d.tryDeactivateTrigger(index)
+                        else
+                            d.tryActivateTrigger(index)
+                    }
                     else if (!d.isProlonged(index))
-                        hintControl.showHint(d.getText(index), d.getIcon(index))
+                    {
+                        hintControl.showHint(d.getText(index), d.getIcon(index), true)
+                    }
                     return
                 default:
                     throw "Shouldn't get there"

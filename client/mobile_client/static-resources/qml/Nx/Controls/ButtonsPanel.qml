@@ -9,6 +9,7 @@ ListView
     readonly property alias scrollable: d.prefferToBeInteractive
     property bool blockMouseEvents: false
 
+    signal buttonDownChanged(int index, bool down)
     signal buttonPressed(int index)
     signal buttonClicked(int index)
     signal longPressedChanged(int index, bool pressed)
@@ -80,7 +81,8 @@ ListView
     {
         id: button
 
-        property bool buttonPressed: false
+        readonly property bool instantAction: !model.prolongedAction
+        property bool buttonLongPressed: false
         property bool active: false
 
         icon: model.iconPath
@@ -88,7 +90,13 @@ ListView
         padding: 0
         anchors.verticalCenter: parent.verticalCenter
 
-        onButtonPressedChanged: control.longPressedChanged(index, buttonPressed)
+        onButtonLongPressedChanged:
+        {
+            if (active)
+                control.longPressedChanged(index, buttonLongPressed)
+        }
+
+        onPressedChanged: control.buttonDownChanged(index, pressed)
         onEnabledChanged: control.enabledChanged(index, enabled)
 
         Connections
@@ -133,7 +141,7 @@ ListView
         {
             d.allowInteractiveState = true
 
-            if (!buttonPressed)
+            if (!buttonLongPressed || instantAction)
                 handleCancelled()
             else
                 handleButtonReleased()
@@ -162,7 +170,7 @@ ListView
                 return
 
             button.filteringPressing = value
-            button.buttonPressed = value
+            button.buttonLongPressed = value
 
 
             if (!value)
@@ -171,15 +179,15 @@ ListView
 
         function handleCancelled()
         {
+            var wasActive = button.active
+            button.active = false
             if (pressedStateFilterTimer.running)
                 pressedStateFilterTimer.stop()
             else
-                buttonPressed = false
+                buttonLongPressed = false
 
-            if (button.active)
+            if (wasActive)
                 control.actionCancelled(index)
-
-            button.active = false
         }
     }
 
