@@ -36,7 +36,7 @@ if(IOS)
 
     nx_copy(${CMAKE_CURRENT_SOURCE_DIR}/ios/mobile_client.xcassets
         DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-    file(GLOB icons ${icons_dir}/icon_*.png ${icons_dir}/appstore.png)
+    file(GLOB icons ${icons_dir}/icon_*.png)
     nx_copy(${icons}
         DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/mobile_client.xcassets/AppIcon.appiconset)
     list(APPEND resources ${CMAKE_CURRENT_BINARY_DIR}/mobile_client.xcassets)
