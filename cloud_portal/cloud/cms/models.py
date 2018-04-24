@@ -4,12 +4,11 @@ from django.db import models
 from django.conf import settings
 from jsonfield import JSONField
 from model_utils import Choices
-from django.core.cache import cache
+from django.core.cache import cache, caches
 from util.config import get_config
 
+from django.contrib.auth.models import Group
 from django.template.defaultfilters import truncatechars
-
-from django.core.cache import caches
 
 
 def update_global_cache(customization, version_id):
@@ -178,6 +177,7 @@ class Customization(models.Model):
     default_language = models.ForeignKey(
         Language, related_name='default_in_%(class)s')
     languages = models.ManyToManyField(Language)
+    filter_horizontal = ('languages',)
 
     PREVIEW_STATUS = Choices((0, 'draft', 'draft'), (1, 'review', 'review'))
     preview_status = models.IntegerField(choices=PREVIEW_STATUS, default=PREVIEW_STATUS.draft)
@@ -224,8 +224,23 @@ class Customization(models.Model):
             return None
         return data_structure.find_actual_value(self, version_id=self.version_id(product.name))
 
-# CMS data. Partners can change that
 
+class UserGroupsToCustomizationPermissions(models.Model):
+    group = models.ForeignKey(Group)
+    customization = models.ForeignKey(Customization)
+
+    @staticmethod
+    def check_permission(user, customization_name, permission=None):
+        if user.is_superuser:
+            return True
+        if permission and not user.has_perm(permission):
+            return False
+
+        return UserGroupsToCustomizationPermissions.objects.exists(group__user__id=user.id,
+                                                                   customization__name=customization_name)
+
+
+# CMS data. Partners can change that
 
 class ContentVersion(models.Model):
 

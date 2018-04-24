@@ -43,10 +43,9 @@ def log_error(error, user_email, type, message, lang, customization, queue, atte
 
 @shared_task
 def send_email(user_email, type, message, customization, queue="", attempt=1):
-    custom_config = email_engine.get_custom_config(customization)
-    lang = get_language_for_email(user_email, custom_config['languages'])
+    lang = get_language_for_email(user_email, customization)
     try:
-        email_engine.send(user_email, type, message, lang, customization, custom_config)
+        email_engine.send(user_email, type, message, lang, customization)
     except Exception as error:
         if (isinstance(error, SMTPException) or isinstance(error, SSLError)) and attempt < settings.MAX_RETRIES:
             send_email.apply_async(args=[user_email, type, message, customization, queue, attempt+1],
