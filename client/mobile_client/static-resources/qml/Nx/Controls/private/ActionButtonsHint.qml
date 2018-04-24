@@ -61,7 +61,7 @@ Rectangle
     function showHint(text, iconPath, keepOpened)
     {
         if (keepOpened)
-            hide()
+            hideTimer.stop()
         else
             hideTimer.restart()
 
@@ -141,11 +141,6 @@ Rectangle
             : "qrc:///images/soft_trigger/confirmation_failure.png"
 
         control.state = "visible"
-    }
-
-    function hideDelayed()
-    {
-        hideTimer.restart();
     }
 
     function hide()

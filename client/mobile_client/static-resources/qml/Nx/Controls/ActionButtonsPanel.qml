@@ -62,6 +62,7 @@ Item
 
         onButtonPressed:
         {
+            hintControl.hide()
             switch(d.getType(index))
             {
                 case ActionButtonsModel.PtzButton:

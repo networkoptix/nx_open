@@ -84,6 +84,7 @@ ListView
         readonly property bool instantAction: !model.prolongedAction
         property bool buttonLongPressed: false
         property bool active: false
+        property bool filteringPressing: false
 
         icon: model.iconPath
         enabled: model.enabled
@@ -106,8 +107,6 @@ ListView
             onFlickingChanged: handleCancelled()
             onDraggingChanged: handleCancelled()
         }
-
-        property bool filteringPressing: false
 
         onClicked:
         {
