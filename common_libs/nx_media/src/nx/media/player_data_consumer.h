@@ -99,6 +99,8 @@ signals:
     /** Jump to new position. */
     void jumpOccurred(int sequence);
 
+    /** Got metadata in the media stream. */
+    void gotMetadata(QnAbstractCompressedMetadataPtr data);
 private slots:
     void onBeforeJump(qint64 timeUsec);
     void onJumpCanceled(qint64 timeUsec);

@@ -240,7 +240,6 @@ public:
 
     using MetadataConsumerList = QList<QWeakPointer<AbstractMetadataConsumer>>;
     QHash<MetadataType, MetadataConsumerList> m_metadataConsumerByType;
-    mutable QnMutex m_metadataConsumersMutex;
 
     void applyVideoQuality();
 
@@ -250,6 +249,7 @@ private:
     void at_hurryUp();
     void at_jumpOccurred(int sequence);
     void at_gotVideoFrame();
+    void at_gotMetadata(const QnAbstractCompressedMetadataPtr& metadata);
     void presentNextFrameDelayed();
 
     void presentNextFrame();
@@ -277,7 +277,7 @@ private:
     void log(const QString& message) const;
     void clearCurrentFrame();
 
-    void processMetadata(const QnAbstractCompressedMetadataPtr& metadata);
+    void configureMetadataForReader();
 };
 
 PlayerPrivate::PlayerPrivate(Player *parent):
@@ -750,6 +750,9 @@ bool PlayerPrivate::createArchiveReader()
         archiveDelegate = new QnRtspClientArchiveDelegate(archiveReader.get());
 
     archiveReader->setArchiveDelegate(archiveDelegate);
+
+    configureMetadataForReader();
+
     return true;
 }
 
@@ -793,6 +796,8 @@ bool PlayerPrivate::initDataProvider()
         });
 
     archiveReader->addDataProcessor(dataConsumer.get());
+    connect(dataConsumer.get(), &PlayerDataConsumer::gotMetadata,
+        this, &PlayerPrivate::at_gotMetadata);
     connect(dataConsumer.get(), &PlayerDataConsumer::gotVideoFrame,
         this, &PlayerPrivate::at_gotVideoFrame);
     connect(dataConsumer.get(), &PlayerDataConsumer::hurryUp,
@@ -825,14 +830,23 @@ void PlayerPrivate::clearCurrentFrame()
     videoFrameToRender.reset();
 }
 
-void PlayerPrivate::processMetadata(const QnAbstractCompressedMetadataPtr& metadata)
+void PlayerPrivate::configureMetadataForReader()
+{
+    if (!archiveReader)
+        return;
+    auto rtspClient = dynamic_cast<QnRtspClientArchiveDelegate*> (archiveReader->getArchiveDelegate());
+    if (rtspClient)
+    {
+        bool hasMotionConsumer = !m_metadataConsumerByType.value(MetadataType::Motion).isEmpty();
+        rtspClient->setSendMotion(hasMotionConsumer);
+    }
+}
+
+void PlayerPrivate::at_gotMetadata(const QnAbstractCompressedMetadataPtr& metadata)
 {
     NX_ASSERT(metadata);
 
-    QnMutexLocker lock(&m_metadataConsumersMutex);
     const auto consumers = m_metadataConsumerByType.value(metadata->metadataType);
-    lock.unlock();
-
     for (const auto& value: consumers)
     {
         if (auto consumer = value.lock())
@@ -1358,13 +1372,12 @@ bool Player::addMetadataConsumer(const AbstractMetadataConsumerPtr& metadataCons
         return false;
 
     Q_D(Player);
-    QnMutexLocker lock(&d->m_metadataConsumersMutex);
-
     auto consumers = d->m_metadataConsumerByType[metadataConsumer->metadataType()];
-    if (consumers.indexOf(metadataConsumer) != -1)
+    if (consumers.contains(metadataConsumer))
         return false;
 
     consumers.push_back(metadataConsumer);
+    d->configureMetadataForReader();
     return true;
 }
 
@@ -1374,7 +1387,6 @@ bool Player::removeMetadataConsumer(const AbstractMetadataConsumerPtr& metadataC
         return false;
 
     Q_D(Player);
-    QnMutexLocker lock(&d->m_metadataConsumersMutex);
 
     auto consumers = d->m_metadataConsumerByType[metadataConsumer->metadataType()];
     const auto index = consumers.indexOf(metadataConsumer);
@@ -1382,6 +1394,7 @@ bool Player::removeMetadataConsumer(const AbstractMetadataConsumerPtr& metadataC
         return false;
 
     consumers.removeAt(index);
+    d->configureMetadataForReader();
     return true;
 }
 
