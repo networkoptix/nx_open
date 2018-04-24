@@ -66,7 +66,7 @@ class SSHPath(FileSystemPath, PurePosixPath):
         if self.parts[0] == '~':
             return self.home().joinpath(*self.parts[1:])
         user_name = self.parts[0][1:]
-        output = self._ssh_access.run_command(['getent', 'passwd', user_name])
+        output = self._ssh_access().run_command(['getent', 'passwd', user_name])
         if not output:
             raise RuntimeError("Can't determine home directory for {!r}".format(user_name))
         user_home_dir = output.split(':')[6]
@@ -78,7 +78,7 @@ class SSHPath(FileSystemPath, PurePosixPath):
             command += ['-maxdepth', max_depth]
         if whole_name_pattern is not None:
             command += ['-wholename', whole_name_pattern]
-        output = self._ssh_access.run_command(command)
+        output = self._ssh_access().run_command(command)
         lines = output.rstrip().splitlines()
         return [self.__class__(line) for line in lines]
 
@@ -89,7 +89,7 @@ class SSHPath(FileSystemPath, PurePosixPath):
         return self._run_find_command(whole_name_pattern=self / pattern)
 
     def mkdir(self, parents=False, exist_ok=False):
-        self._ssh_access.run_sh_script(
+        self._ssh_access().run_sh_script(
             # language=Bash
             '''
                 if [ -e "$DIR" ]; then
@@ -114,16 +114,16 @@ class SSHPath(FileSystemPath, PurePosixPath):
             env={'DIR': self, 'PARENTS': parents, 'EXIST_OK': exist_ok})
 
     def rmtree(self, ignore_errors=False):
-        self._ssh_access.run_command(['rm', '-v', '-rf' if ignore_errors else '-r', '--', self])
+        self._ssh_access().run_command(['rm', '-v', '-rf' if ignore_errors else '-r', '--', self])
 
     def read_bytes(self):
         try:
-            return self._ssh_access.run_command(['cat', self])
+            return self._ssh_access().run_command(['cat', self])
         except exit_status_error_cls(1):
             raise FileNotFound(self)
 
     def write_bytes(self, contents):
-        self._ssh_access.run_sh_script('cat > {}'.format(sh_quote_arg(self)), input=contents)
+        self._ssh_access().run_sh_script('cat > {}'.format(sh_quote_arg(self)), input=contents)
 
     def read_text(self, encoding='ascii', errors='strict'):
         # ASCII encoding is single used encoding in the project.
@@ -138,20 +138,20 @@ class SSHPath(FileSystemPath, PurePosixPath):
         LocalAccess().run_command([
             'scp',
             '-C',  # Compression.
-            '-F', self._ssh_access.config_path,
-            '-P', self._ssh_access.port,
+            '-F', self._ssh_access().config_path,
+            '-P', self._ssh_access().port,
             source, destination,
             ])
 
     def upload(self, local_source_path):
-        remote_destination_path = '{}:{}'.format(self._ssh_access.hostname, self)
+        remote_destination_path = '{}:{}'.format(self._ssh_access().hostname, self)
         try:
-            self._ssh_access.run_command(['test', '-d', self])
+            self._ssh_access().run_command(['test', '-d', self])
         except exit_status_error_cls(1):
             self._call_rsync(local_source_path, remote_destination_path)
         else:
             raise RuntimeError("Destination is a dir; had command run, file would've been placed into this dir")
 
     def download(self, local_destination_path):
-        remote_source_path = '{}:{}'.format(self._ssh_access.hostname, self)
+        remote_source_path = '{}:{}'.format(self._ssh_access().hostname, self)
         self._call_rsync(remote_source_path, local_destination_path)
