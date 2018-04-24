@@ -1919,7 +1919,7 @@ QString QnMediaResourceWidget::calculateDetailsText() const
     }
 
     QString codecString;
-    if (QnConstMediaContextPtr codecContext = m_display->mediaProvider()->getCodecContext())
+    if (QnConstMediaContextPtr codecContext = d->display()->mediaProvider()->getCodecContext())
         codecString = codecContext->getCodecName();
 
 
@@ -1932,8 +1932,8 @@ QString QnMediaResourceWidget::calculateDetailsText() const
     QString result;
     if (hasVideo())
     {
-        const QSize channelResolution = m_display->camDisplay()->getRawDataSize();
-        const QSize videoLayout = m_camera->getVideoLayout()->size();
+        const QSize channelResolution = d->display()->camDisplay()->getRawDataSize();
+        const QSize videoLayout = d->camera->getVideoLayout()->size();
         const QSize actualResolution = QnGeometry::cwiseMul(channelResolution, videoLayout);
 
         result.append(
