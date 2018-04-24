@@ -1918,11 +1918,8 @@ QString QnMediaResourceWidget::calculateDetailsText() const
         mbps += statistics->getBitrateMbps();
     }
 
-    QSize size = d->display()->camDisplay()->getRawDataSize();
-    size.setWidth(size.width() * d->display()->camDisplay()->channelsCount());
-
     QString codecString;
-    if (QnConstMediaContextPtr codecContext = d->display()->mediaProvider()->getCodecContext())
+    if (QnConstMediaContextPtr codecContext = m_display->mediaProvider()->getCodecContext())
         codecString = codecContext->getCodecName();
 
 
@@ -1935,7 +1932,15 @@ QString QnMediaResourceWidget::calculateDetailsText() const
     QString result;
     if (hasVideo())
     {
-        result.append(htmlFormattedParagraph(lit("%1x%2").arg(size.width()).arg(size.height()), kDetailsTextPixelSize, true));
+        const QSize channelResolution = m_display->camDisplay()->getRawDataSize();
+        const QSize videoLayout = m_camera->getVideoLayout()->size();
+        const QSize actualResolution = QnGeometry::cwiseMul(channelResolution, videoLayout);
+
+        result.append(
+            htmlFormattedParagraph(
+                lit("%1x%2").arg(actualResolution.width()).arg(actualResolution.height()),
+                kDetailsTextPixelSize,
+                true));
         result.append(htmlFormattedParagraph(lit("%1fps").arg(fps, 0, 'f', 2), kDetailsTextPixelSize, true));
     }
     result.append(htmlFormattedParagraph(lit("%1Mbps").arg(mbps, 0, 'f', 2), kDetailsTextPixelSize, true));
