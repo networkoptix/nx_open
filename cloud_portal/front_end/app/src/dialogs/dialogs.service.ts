@@ -5,6 +5,7 @@ import { NxModalGeneralComponent }    from "./../dialogs/general/general.compone
 import { NxModalShareComponent }      from "./../dialogs/share/share.component";
 import { NxModalDisconnectComponent } from "./../dialogs/disconnect/disconnect.component";
 import { NxModalRenameComponent }     from "./../dialogs/rename/rename.component";
+import { NxModalMergeComponent }      from "./../dialogs/merge/merge.component";
 
 @Injectable()
 export class nxDialogsService {
@@ -14,6 +15,7 @@ export class nxDialogsService {
                 private generalModal: NxModalGeneralComponent,
                 private disconnectModal: NxModalDisconnectComponent,
                 private renameModal: NxModalRenameComponent,
+                private mergeModal: NxModalMergeComponent,
                 private shareModal: NxModalShareComponent) {
 
     }
@@ -55,5 +57,9 @@ export class nxDialogsService {
 
     rename(systemId, systemName) {
         return this.renameModal.open(systemId, systemName);
+    }
+
+    merge(system) {
+        return this.mergeModal.open(system);
     }
 }

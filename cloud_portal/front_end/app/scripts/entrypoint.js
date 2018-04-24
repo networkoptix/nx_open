@@ -63,7 +63,6 @@ require('./services/authorizationCheckService');
 require('./controllers/account.js');
 require('./controllers/activateRestore.js');
 require('./controllers/debug.js');
-require('./controllers/merge.js');
 require('./controllers/register.js');
 require('./controllers/startPage.js');
 require('./controllers/static.js');

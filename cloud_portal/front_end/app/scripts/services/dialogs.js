@@ -174,16 +174,18 @@
                     // }).result;
                 },
                 merge: function (system) {
-                    var title = lang.system.mergeSystemTitle;
-                    return openDialog({
-                        title: title,
-                        template: CONFIG.viewsDir + 'dialogs/merge.html',
-                        hasFooter: false,
-                        cancellable: true,
-                        params: {
-                            system: system
-                        }
-                    }).result;
+                    return nxDialogsService.merge(system);
+                    // var title = lang.system.mergeSystemTitle;
+                    //
+                    // return openDialog({
+                    //     title      : title,
+                    //     template   : CONFIG.viewsDir + 'dialogs/merge.html',
+                    //     hasFooter  : false,
+                    //     cancellable: true,
+                    //     params     : {
+                    //         system: system
+                    //     }
+                    // }).result;
                 },
                 noClientDetected: function () {
                     // message, title, actionLabel, actionType

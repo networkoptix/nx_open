@@ -1,0 +1,130 @@
+import { Component, Inject, OnInit, Input, ViewEncapsulation } from '@angular/core';
+import { Location }                                            from '@angular/common';
+import { NgbModal, NgbActiveModal, NgbModalRef }               from '@ng-bootstrap/ng-bootstrap';
+import { EmailValidator }                                      from '@angular/forms';
+
+@Component({
+    selector: 'nx-modal-merge-content',
+    templateUrl: 'merge.component.html',
+    styleUrls: []
+})
+export class MergeModalContent {
+    @Input() system;
+    @Input() systemName;
+    @Input() language;
+
+    merging: any;
+    user: any;
+    systems: any;
+    showMergeForm: any;
+    targetSystem: any;
+    systemMergeable: string;
+
+    constructor(public activeModal: NgbActiveModal,
+                @Inject('process') private process: any,
+                @Inject('account') private account: any,
+                @Inject('configService') private configService: any,
+                @Inject('systemsProvider') private systemsProvider: any,
+                @Inject('cloudApiService') private cloudApi: any) {
+
+    }
+
+    //Add system can merge where added to systems form api call
+    checkMergeAbility(system){
+        if (system.stateOfHealth == 'offline') {
+            return 'offline'
+        }
+        if (!system.canMerge) {
+            return 'cannotMerge';
+        }
+        return '';
+    }
+
+    setTargetSystem (system) {
+        this.targetSystem = system;
+        this.systemMergeable = this.checkMergeAbility(system);
+    };
+
+    addStatus (system) {
+        let status = "";
+
+        if (system.stateOfHealth == 'offline') {
+            status = ' (offline)';
+        }
+
+        else if (system.stateOfHealth == 'online' && system.canMerge) {
+            status = ' (incompatable)';
+        }
+
+        return system.name + status;
+    };
+
+    ngOnInit() {
+        this.account.get().then((user) => {
+            this.user = user;
+            this.systems = this.systemsProvider.getMySystems(user.email, this.system.id);
+            this.showMergeForm = this.system.canMerge && this.systems.length > 0;
+            this.targetSystem = this.systems[0];
+            this.systemMergeable = this.checkMergeAbility(this.targetSystem);
+        });
+
+        this.merging = this.process.init(function () {
+            let masterSystemId = null;
+            let slaveSystemId = null;
+            if (this.masterSystemId == this.system.id) {
+                masterSystemId = this.system.id;
+                slaveSystemId = this.targetSystem.id;
+            }
+            else {
+                masterSystemId = this.targetSystem.id;
+                slaveSystemId = this.system.id;
+            }
+            //return cloudApi.systems(); //In for testing purposes with merging things
+            return this.cloudApi.merge(masterSystemId, slaveSystemId);
+        }, {
+            successMessage: this.language.system.mergeSystemSuccess
+        }).then(function () {
+            this.systemsProvider.forceUpdateSystems();
+            this.activeModal.close({
+                "anotherSystemId": this.targetSystem.id,
+                "role": this.masterSystemId == this.system.id ?
+                    this.configService.systemStatuses.master :
+                    this.configService.systemStatuses.slave
+            });
+        });
+    }
+}
+
+@Component({
+    selector: 'nx-modal-merge',
+    template: '',
+    encapsulation: ViewEncapsulation.None,
+    styleUrls: []
+})
+
+export class NxModalMergeComponent implements OnInit {
+    modalRef: NgbModalRef;
+
+    constructor(@Inject('languageService') private language: any,
+                private modalService: NgbModal) {
+    }
+
+    private dialog(system) {
+        this.modalRef = this.modalService.open(MergeModalContent);
+        this.modalRef.componentInstance.language = this.language;
+        this.modalRef.componentInstance.system = system;
+
+        return this.modalRef;
+    }
+
+    open(system) {
+        return this.dialog(system);
+    }
+
+    close() {
+        this.modalRef.close();
+    }
+
+    ngOnInit() {
+    }
+}

@@ -18,13 +18,15 @@ const general_component_1 = require("./../dialogs/general/general.component");
 const share_component_1 = require("./../dialogs/share/share.component");
 const disconnect_component_1 = require("./../dialogs/disconnect/disconnect.component");
 const rename_component_1 = require("./../dialogs/rename/rename.component");
+const merge_component_1 = require("./../dialogs/merge/merge.component");
 let nxDialogsService = class nxDialogsService {
-    constructor(toast, loginModal, generalModal, disconnectModal, renameModal, shareModal) {
+    constructor(toast, loginModal, generalModal, disconnectModal, renameModal, mergeModal, shareModal) {
         this.toast = toast;
         this.loginModal = loginModal;
         this.generalModal = generalModal;
         this.disconnectModal = disconnectModal;
         this.renameModal = renameModal;
+        this.mergeModal = mergeModal;
         this.shareModal = shareModal;
     }
     dismiss() {
@@ -57,13 +59,17 @@ let nxDialogsService = class nxDialogsService {
     rename(systemId, systemName) {
         return this.renameModal.open(systemId, systemName);
     }
+    merge(system) {
+        return this.mergeModal.open(system);
+    }
 };
 nxDialogsService = __decorate([
     core_1.Injectable(),
     __param(0, core_1.Inject('ngToast')),
     __metadata("design:paramtypes", [Object, login_component_1.NxModalLoginComponent,
         general_component_1.NxModalGeneralComponent,
-        disconnect_component_1.NxModalDisconnectComponent, typeof (_a = typeof rename_component_1.NxModalRenameComponent !== "undefined" && rename_component_1.NxModalRenameComponent) === "function" && _a || Object, share_component_1.NxModalShareComponent])
+        disconnect_component_1.NxModalDisconnectComponent,
+        rename_component_1.NxModalRenameComponent, typeof (_a = typeof merge_component_1.NxModalMergeComponent !== "undefined" && merge_component_1.NxModalMergeComponent) === "function" && _a || Object, share_component_1.NxModalShareComponent])
 ], nxDialogsService);
 exports.nxDialogsService = nxDialogsService;
 var _a;

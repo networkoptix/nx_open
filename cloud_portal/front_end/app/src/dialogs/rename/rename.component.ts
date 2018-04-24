@@ -17,7 +17,7 @@ export class RenameModalContent {
 
     constructor(public activeModal: NgbActiveModal,
                 @Inject('process') private process: any,
-                @Inject('cloudApiService') private cloudApi: any,) {
+                @Inject('cloudApiService') private cloudApi: any) {
 
     }
 
