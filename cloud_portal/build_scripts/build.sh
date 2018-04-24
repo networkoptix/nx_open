@@ -8,7 +8,7 @@ set -e
 NX_VMS="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/../.."
 
 #If we are not using the repository we should update necessary files
-if [[ "$PWD" != */nx_vms/* ]]
+if [[ "$PWD" != */cloud_portal/* ]]
 then
     echo "Updating Cloud Portal Content"
     if [ -e "cloud_portal" ]
