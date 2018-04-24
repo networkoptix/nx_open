@@ -566,7 +566,7 @@ std::string SystemCommands::serializedDmiInfo(bool reportViaSocket)
         [](std::string& str)
         {
             std::string::size_type pos = str.find_last_not_of(" \n\t");
-            if(pos != std::string::npos)
+            if (pos != std::string::npos)
             {
                 str.erase(pos + 1);
                 pos = str.find_first_not_of(' ');
