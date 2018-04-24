@@ -278,7 +278,7 @@
 #include <rest/handlers/change_camera_password_rest_handler.h>
 #include <nx/mediaserver/fs/media_paths/media_paths.h>
 #include <nx/mediaserver/fs/media_paths/media_paths_filter_config.h>
-
+#include <nx/mediaserver/root_tool.h>
 
 #if !defined(EDGE_SERVER)
     #include <nx_speech_synthesizer/text_to_wav.h>
@@ -2965,12 +2965,11 @@ void MediaServerProcess::initializeCloudConnect()
         });
 }
 
-void MediaServerProcess::changeSystemUser(const QString& userName)
+void MediaServerProcess::prepareOsResources(const QString& userName)
 {
-    // Ini config files are for debug/experimental purposes only, so we do not care about security.
-    const auto command = lm("chmod 777 -R '%1'").args(nx::kit::IniConfig::iniFilesDir());
-    if (::system(command.toUtf8().data()) != 0) //< Let the errors reach stdout and stderr.
-        qWarning().noquote() << "Unable to:" << command;
+    auto rootToolPtr = m_serverModule.lock()->rootTool();
+    if (!rootToolPtr->changeOwner(nx::kit::IniConfig::iniFilesDir()))
+        qWarning().noquote() << "Unable to chown" << nx::kit::IniConfig::iniFilesDir();
 
     // Change owner of all data files, so mediaserver can use them as different user.
     const std::vector<QString> chmodPaths =
@@ -2983,12 +2982,8 @@ void MediaServerProcess::changeSystemUser(const QString& userName)
     };
     for (const auto& path: chmodPaths)
     {
-        const auto command = lm("chown -R '%1' '%2'").args(userName, path);
-        if (::system(command.toUtf8().data()) != 0) //< Let the errors reach stdout and stderr.
-        {
-            qWarning().noquote() << "WARNING: Unable to:" << command;
-            return; //< Server will not be able to run without access to these files.
-        }
+        if (!rootToolPtr->changeOwner(path)) //< Let the errors reach stdout and stderr.
+            qWarning().noquote() << "WARNING: Unable to chown" << path;
     }
 
     // Preallocate TCP socket in case if some system port is required, e.g. 80.
@@ -2999,13 +2994,6 @@ void MediaServerProcess::changeSystemUser(const QString& userName)
     if (!m_preparedTcpServerSocket)
     {
         qWarning().noquote() << "WARNING: Unable to prealocate socket on port" << port << ":"
-            << SystemError::getLastOSErrorText();
-    }
-
-    // Everything else what require root permissions is supposed to be done by root_tool.
-    if (!nx::utils::CurrentProcess::changeUser(userName))
-    {
-        qWarning().noquote() << "WARNING: Unable to change user to" << userName << ":"
             << SystemError::getLastOSErrorText();
     }
 }
@@ -3462,7 +3450,7 @@ void MediaServerProcess::run()
     // This is better to do before any files get open, so new user can access them without problems.
     const auto systemUser = qnServerModule->roSettings()->value(nx_ms_conf::SYSTEM_USER).toString();
     if (!systemUser.isEmpty())
-        changeSystemUser(systemUser);
+        prepareOsResources(systemUser);
 
     if (m_serviceMode)
     {
