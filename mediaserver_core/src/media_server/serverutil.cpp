@@ -219,13 +219,13 @@ bool backupDatabase(std::shared_ptr<ec2::AbstractECConnection> connection)
 
 void dropConnectionsToRemotePeers(ec2::AbstractTransactionMessageBus* messageBus)
 {
-    messageBus->commonModule()->setHiveModeEnabled(false);
+    messageBus->commonModule()->setStandAloneMode(true);
     messageBus->dropConnections();
 }
 
 void resumeConnectionsToRemotePeers(ec2::AbstractTransactionMessageBus* messageBus)
 {
-    messageBus->commonModule()->setHiveModeEnabled(true);
+    messageBus->commonModule()->setStandAloneMode(false);
 }
 
 bool changeLocalSystemId(const ConfigureSystemData& data, ec2::AbstractTransactionMessageBus* messageBus)
