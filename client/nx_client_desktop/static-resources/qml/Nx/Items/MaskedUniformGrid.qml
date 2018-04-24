@@ -2,6 +2,8 @@ import QtQuick 2.6
 
 UniformGrid
 {
+    // Texture provider item. Texture should have resolution cellCountX by cellCountY.
+    // Each grid cell is drawn if and only if corresponding texel alpha is >= 0.5
     property Item maskTextureProvider: null
 
     // Implementation.
