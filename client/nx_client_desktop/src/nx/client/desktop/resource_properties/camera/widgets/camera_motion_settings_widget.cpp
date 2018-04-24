@@ -19,7 +19,7 @@
 #include <ui/style/helper.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
-#include <nx/client/core/resource/camera_motion_helper.h>
+#include <nx/client/core/motion/helpers/camera_motion_helper.h>
 #include <nx/client/core/utils/geometry.h>
 #include <nx/client/desktop/common/widgets/selectable_button.h>
 

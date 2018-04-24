@@ -91,6 +91,7 @@ void MotionRegionsItem::Private::setChannel(int value)
         return;
 
     m_channel = value;
+    updateLabelPositions();
     invalidateRegionsTexture();
     q->update();
 
@@ -393,6 +394,8 @@ void MotionRegionsItem::Private::updateLabelPositions()
 
     const auto region = regions[m_channel];
     core::MotionGrid grid;
+
+    qDebug() << "Updating labels for channel" << m_channel;
 
     // Fill grid with sensitivity numbers.
     for (int sensitivity = 1; sensitivity < QnMotionRegion::kSensitivityLevelCount; ++sensitivity)

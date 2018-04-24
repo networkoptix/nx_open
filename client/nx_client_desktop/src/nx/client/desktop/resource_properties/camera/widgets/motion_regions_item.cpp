@@ -1,6 +1,7 @@
 #include "motion_regions_item.h"
 #include "private/motion_regions_item_p.h"
 
+#include <QtQml/QtQml>
 #include <QtQuick/QSGGeometryNode>
 #include <QtQuick/QSGTextureMaterial>
 
