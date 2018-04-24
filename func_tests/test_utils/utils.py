@@ -119,8 +119,9 @@ def wait_until(check_condition, timeout_sec=10):
     start_timestamp = time.time()
     delay_sec = 0.1
     while True:
-        if check_condition():
-            return True
+        result = check_condition()
+        if result:
+            return result
         if time.time() - start_timestamp >= timeout_sec:
             return False
         time.sleep(delay_sec)
