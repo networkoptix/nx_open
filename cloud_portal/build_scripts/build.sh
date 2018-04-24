@@ -54,7 +54,7 @@ else
 fi
 
 echo "pip install requirements"
-[ -z "env" ] && virtualenv env
+[ ! -d "env" ] && virtualenv env
 . ./env/bin/activate
 pip install -r build_scripts/requirements.txt
 
