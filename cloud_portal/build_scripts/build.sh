@@ -1,9 +1,14 @@
 #!/bin/bash
 set -e
+
+#DIR is the location of the cloud_portal build script in the repository
+#Can be called like this from with cloud_portal "./build_scripts/build.sh"
+#or like this from outside the repository "../nx_vms/cloud_portal/build_scripts/build.sh"
+
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 #If we are not using the repository we should update necessary files
-if [[ "$PWD" != */nx_vms/cloud_portal* ]]
+if [[ "$PWD" != */nx_vms/* ]]
 then
     echo "Updating Cloud Portal Content"
     if [ -e "cloud_portal" ]
@@ -11,9 +16,21 @@ then
         pushd cloud_portal
             for entry in $(ls -A .)
             do
-                [ -e "$entry" ] && rm -rf "$entry"
-                cp -pr "$DIR/../$entry" "$entry"
-                echo "Updated $entry"
+                if [ "$entry" = "front_end" ]
+                then
+                    pushd $entry
+                    for element in $(ls -A .)
+                    do
+                        [ "$element" = "node_modules" ] && continue
+                        [ -e "$element" ] && rm -rf "$element"
+                        cp -pr "$DIR/../$entry/$element" "$element"
+                    done
+                    popd
+                else
+                    [[ "$entry" = "env" ]] && continue
+                    [ -e "$entry" ] && rm -rf "$entry"
+                    cp -pr "$DIR/../$entry" "$entry"
+                fi
             done
         popd
     else
