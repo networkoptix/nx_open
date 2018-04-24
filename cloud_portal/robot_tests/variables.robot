@@ -165,7 +165,7 @@ ${EMAIL OWNER}                        noptixautoqa+owner@gmail.com
 ${EMAIL NOT OWNER}                    noptixautoqa+notowner@gmail.com
 ${EMAIL ADMIN}                        noptixautoqa+admin@gmail.com
 ${EMAIL CUSTOM}                       noptixautoqa+custom@gmail.com
-@{EMAILS LIST}                        noptixautoqa+viewer@gmail.com    noptixautoqa+advviewer@gmail.com    noptixautoqa+liveviewer@gmail.com    noptixautoqa+owner@gmail.com    noptixautoqa+custom@gmail.com    noptixautoqa+admin@gmail.com
+@{EMAILS LIST}                        ${EMAIL VIEWER}    ${EMAIL ADV VIEWER}    ${EMAIL LIVE VIEWER}${EMAIL OWNER}    ${EMAIL NOT OWNER}    ${EMAIL ADMIN}    ${EMAIL CUSTOM}
 ${ADMIN FIRST NAME}                   asdasasd
 ${ADMIN LAST NAME}                    asdasasdas
 ${EMAIL UNREGISTERED}                 noptixautoqa+unregistered@gmail.com
