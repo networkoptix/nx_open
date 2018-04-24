@@ -31,6 +31,12 @@ Rectangle
         }
     ]
 
+    onStateChanged:
+    {
+        if (state == "visible" && opacity != 0)
+            opacity = 0
+    }
+
     transitions: [
         Transition
         {
@@ -149,15 +155,6 @@ Rectangle
         control.state = "hidden"
     }
 
-    onOpacityChanged:
-    {
-        if (opacity > 0)
-            return
-
-        loader.sourceComponent = dummyComponent
-        visualDataLoader.sourceComponent = dummyComponent
-    }
-
     Row
     {
         id: bodyRow
@@ -198,13 +195,6 @@ Rectangle
 
         interval: 2000
         onTriggered: control.state = "hidden"
-    }
-
-    Component
-    {
-        id: dummyComponent
-
-        Item {}
     }
 
     Component

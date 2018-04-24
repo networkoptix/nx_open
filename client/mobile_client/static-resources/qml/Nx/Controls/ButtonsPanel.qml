@@ -97,7 +97,7 @@ ListView
                 control.longPressedChanged(index, buttonLongPressed)
         }
 
-        onPressedChanged: control.buttonDownChanged(index, pressed)
+        onPressedChanged: pressedSignalOrderTimer.restart()
         onEnabledChanged: control.enabledChanged(index, enabled)
 
         Connections
@@ -146,6 +146,18 @@ ListView
                 handleButtonReleased()
 
             button.active = false
+        }
+
+        Timer
+        {
+            id: pressedSignalOrderTimer
+
+            interval: 0
+            onTriggered:
+            {
+                if (button.active)
+                    control.buttonDownChanged(index, button.pressed)
+            }
         }
 
         Timer

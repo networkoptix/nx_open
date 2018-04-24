@@ -208,19 +208,20 @@ Item
                 hintControl.showFailure(text)
         }
 
-        function tryDeactivateTrigger(index)
+        function tryDeactivateTrigger(index, keepHintOpened)
         {
             if (isProlonged(index))
                 triggersController.deactivateTrigger()
 
-            hintControl.hide()
+            if (!keepHintOpened)
+                hintControl.hide()
         }
 
         function handleTriggerClicked(index)
         {
             if (isProlonged(index))
             {
-                d.tryDeactivateTrigger(index)
+                d.tryDeactivateTrigger(index, true)
                 hintControl.showHint(getText(index), getIcon(index))
             }
             else
