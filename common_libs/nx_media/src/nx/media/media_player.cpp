@@ -834,6 +834,7 @@ void PlayerPrivate::configureMetadataForReader()
 {
     if (!archiveReader)
         return;
+
     auto rtspClient = dynamic_cast<QnRtspClientArchiveDelegate*> (archiveReader->getArchiveDelegate());
     if (rtspClient)
     {
@@ -1372,7 +1373,7 @@ bool Player::addMetadataConsumer(const AbstractMetadataConsumerPtr& metadataCons
         return false;
 
     Q_D(Player);
-    auto consumers = d->m_metadataConsumerByType[metadataConsumer->metadataType()];
+    auto& consumers = d->m_metadataConsumerByType[metadataConsumer->metadataType()];
     if (consumers.contains(metadataConsumer))
         return false;
 
@@ -1388,7 +1389,7 @@ bool Player::removeMetadataConsumer(const AbstractMetadataConsumerPtr& metadataC
 
     Q_D(Player);
 
-    auto consumers = d->m_metadataConsumerByType[metadataConsumer->metadataType()];
+    auto& consumers = d->m_metadataConsumerByType[metadataConsumer->metadataType()];
     const auto index = consumers.indexOf(metadataConsumer);
     if (index == -1)
         return false;
