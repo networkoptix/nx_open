@@ -6,7 +6,7 @@ import uuid
 from framework.os_access.path import FileSystemPath, copy_file
 from framework.rest_api import RestApi
 from .mediaserver import Mediaserver
-from .mediaserver_installation import MEDIASERVER_CONFIG_PATH, MEDIASERVER_CONFIG_PATH_INITIAL, MediaserverInstallation
+from .mediaserver_installation import MEDIASERVER_CONFIG_PATH, MEDIASERVER_CONFIG_PATH_INITIAL, DPKGInstallation
 from .service import AdHocService
 from .template_renderer import TemplateRenderer
 from .utils import is_list_inst
@@ -109,7 +109,7 @@ class PhysicalInstallationHost(object):
         self._template_renderer = TemplateRenderer()
         self._dist_unpacked = self.unpacked_mediaserver_dir.exists()
         self._ensure_root_dir_exists()
-        self._installations = list(self._read_installations())  # MediaserverInstallation list.
+        self._installations = list(self._read_installations())  # DPKGInstallation list.
         self._available_installations = self._installations[:]  # Set up but not allocated yet.
         self._allocated_server_list = []
 
@@ -189,7 +189,7 @@ class PhysicalInstallationHost(object):
 
     def _read_installations(self):
         for dir in self.root_dir.glob('server-*'):
-            yield MediaserverInstallation(self.os_access, dir)
+            yield DPKGInstallation(self.os_access, dir)
 
     def _ensure_servers_are_stopped(self):
         for installation in self._installations:
@@ -203,7 +203,7 @@ class PhysicalInstallationHost(object):
         idx = len(self._installations)
         dir = self.root_dir / ('server-%03d' % (idx + 1))
         self._prepare_installation_dir(dir, self._installation_server_port(idx))
-        installation = MediaserverInstallation(self.os_access, dir)
+        installation = DPKGInstallation(self.os_access, dir)
         self._installations.append(installation)
         return installation
 

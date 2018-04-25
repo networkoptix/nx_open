@@ -11,7 +11,6 @@ from framework.os_access.path import copy_file
 from framework.os_access.ssh_access import SSHAccess
 from framework.os_access.ssh_path import SSHPath
 from framework.service import UpstartService
-from framework.waiting import wait_for_true
 
 if sys.version_info[:2] == (2, 7):
     # noinspection PyCompatibility,PyUnresolvedReferences
@@ -36,20 +35,21 @@ MEDIASERVER_CLOUDHOST_TAG = 'this_is_cloud_host_name'
 MEDIASERVER_CLOUDHOST_SIZE = 76  # MEDIASERVER_CLOUDHOST_TAG + ' ' + cloud_host + '\0' * padded up to 76 chars
 
 
-class MediaserverInstallation(object):
+class DPKGInstallation(object):
     """One of potentially multiple installations"""
 
-    def __init__(self, ssh_access, dir):
+    def __init__(self, ssh_access, dir, service_name):
         self.ssh_access = ssh_access  # type: SSHAccess
         self.dir = dir  # type: SSHPath
         self._bin_dir = self.dir / 'bin'
         self._var_dir = self.dir / 'var'
         self.binary = self._bin_dir / 'mediaserver-bin'
-        self._config_path = self.dir / MEDIASERVER_CONFIG_PATH
-        self._config_path_initial = self.dir / MEDIASERVER_CONFIG_PATH_INITIAL
+        self.config_path = self.dir / MEDIASERVER_CONFIG_PATH
+        self.config_path_initial = self.dir / MEDIASERVER_CONFIG_PATH_INITIAL
         self._log_path = self.dir / MEDIASERVER_LOG_PATH
         self._key_cert_path = self.dir / 'var/ssl/cert.pem'
         self._current_cloud_host = None  # cloud_host encoded in installed binary .so file, None means unknown yet
+        self.service = UpstartService(ssh_access, service_name)
 
     def build_info(self):
         build_info_path = self.dir.joinpath('build_info.txt')
@@ -59,7 +59,7 @@ class MediaserverInstallation(object):
     def is_valid(self):
         paths_to_check = [
             self.dir, self._bin_dir / 'mediaserver', self.binary,
-            self._config_path, self._config_path_initial]
+            self.config_path, self.config_path_initial]
         all_paths_exist = True
         for path in paths_to_check:
             if path.exists():
@@ -84,15 +84,11 @@ class MediaserverInstallation(object):
         for core_dump_path in self.list_core_dumps():
             core_dump_path.unlink()
 
-    def backup_mediaserver_conf(self):
-        self.ssh_access.run_command(['cp', self._config_path, self._config_path_initial])
-        log.info("Initial config is saved at: %s", self._config_path_initial)
-
     def restore_mediaserver_conf(self):
-        self.ssh_access.run_command(['cp', self._config_path_initial, self._config_path])
+        self.ssh_access.run_command(['cp', self.config_path_initial, self.config_path])
 
     def update_mediaserver_conf(self, new_configuration):
-        old_config = self._config_path.read_text(encoding='ascii')
+        old_config = self.config_path.read_text(encoding='ascii')
         config = ConfigParser()
         config.optionxform = str  # Configuration is case-sensitive.
         config.readfp(BytesIO(old_config))
@@ -100,7 +96,7 @@ class MediaserverInstallation(object):
             config.set('General', name, str(value))
         f = BytesIO()  # TODO: Should be text.
         config.write(f)
-        self._config_path.write_text(f.getvalue().decode(encoding='ascii'))
+        self.config_path.write_text(f.getvalue().decode(encoding='ascii'))
 
     def read_log(self):
         try:
@@ -165,7 +161,8 @@ def find_all_installations(os_access, installation_root):
         for path_str in paths_raw_output.splitlines(False)]
     installed_customizations = customizations_from_paths(paths, installation_root)
     for customization in installed_customizations:
-        installation = MediaserverInstallation(os_access, installation_root / customization.installation_subdir)
+        installation_dir = installation_root / customization.installation_subdir
+        installation = DPKGInstallation(os_access, installation_dir, customization.service)
         if installation.is_valid():
             yield installation
         else:
@@ -196,44 +193,24 @@ def install_mediaserver(ssh_access, mediaserver_deb, reinstall=False):
             return found_installation
 
     customization = mediaserver_deb.customization
-    remote_path = ssh_access.Path.tmp() / 'deb' / customization.company / mediaserver_deb.path.name
+    installation_dir = installation_root / customization.installation_subdir
+    installation = DPKGInstallation(ssh_access, installation_dir, customization.service)
+    remote_path = ssh_access.Path.tmp() / mediaserver_deb.path.name
     remote_path.parent.mkdir(parents=True, exist_ok=True)
     copy_file(mediaserver_deb.path, remote_path)
-    # Commands and dependencies for Ubuntu 14.04 (ubuntu/trusty64 from Vagrant's Atlas).
-    ssh_access.run_command([
-        'DEBIAN_FRONTEND=noninteractive',  # Bypass EULA on install.
-        'dpkg',
-        '--install',
-        '--force-depends',  # Ignore unmet dependencies, which are installed just after.
-        remote_path])
-    ssh_access.run_command([
-        'apt-get',
-        'update'])  # Or "Unable to fetch some archives, maybe run apt-get update or try with --fix-missing?"
-    ssh_access.run_command([
-        'apt-get',
-        '--fix-broken',  # Install dependencies left by Mediaserver.
-        '--assume-yes',
-        'install'])
-
-    installation = MediaserverInstallation(ssh_access, installation_root / customization.installation_subdir)
-
-    assert installation.is_valid
-    service = UpstartService(ssh_access, customization.service)
-    if not service.is_running():
-        service.start()
-    wait_for_true(
-        lambda: _port_is_opened_on_server_machine(ssh_access, 7001),
-        "port 7001 is opened on machine with {}".format(ssh_access))  # Opens after a while.
-
-    installation.backup_mediaserver_conf()
-
-    # Mediaserver may crash several times during one test, all cores are kept.
-    # Legend: %t is timestamp, %p is pid.
-    core_pattern_path = ssh_access.Path('/etc/sysctl.d/60-core-pattern.conf')
-    core_pattern_path.write_text('kernel.core_pattern=core.%t.%p')
-    ssh_access.run_command(['sysctl', '-p', core_pattern_path])  # See: https://superuser.com/questions/625840
-
-    # GDB is required to create stack traces for core dumps.
-    ssh_access.run_command(['apt-get', '--assume-yes', 'install', 'gdb'])
-
+    ssh_access.run_sh_script(
+        # language=Bash
+        '''
+            # Commands and dependencies for Ubuntu 14.04 (ubuntu/trusty64 from Vagrant's Atlas).
+            export DEBIAN_FRONTEND=noninteractive  # Bypass EULA on install.
+            dpkg --install --force-depends "$DEB"  # Ignore unmet dependencies, which are installed just after.
+            apt-get update  # Or "Unable to fetch some archives, maybe run apt-get update or try with --fix-missing?"
+            apt-get --fix-broken --assume-yes install  # Install dependencies left by Mediaserver.
+            cp "$CONFIG" "$CONFIG_INITIAL"
+            ''',
+        env={
+            'DEB': remote_path,
+            'CONFIG': installation.config_path,
+            'CONFIG_INITIAL': installation.config_path_initial,
+            })
     return installation
