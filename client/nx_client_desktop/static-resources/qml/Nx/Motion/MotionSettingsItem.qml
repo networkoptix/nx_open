@@ -6,6 +6,7 @@ import Nx.Core 1.0
 import Nx.Common 1.0
 import Nx.Media 1.0
 import Nx.Items 1.0
+import Nx.Motion 1.0
 import com.networkoptix.qml 1.0
 import nx.client.core 1.0
 import nx.client.desktop 1.0
@@ -20,11 +21,9 @@ Rectangle
     property var sensitivityColors
 
     readonly property real kMotionGridOpacity: 0.06
+    readonly property real kMotionHighlightOpacity: 0.75
     readonly property real kMotionRegionOpacity: 0.3
     readonly property real kSelectionOpacity: 0.2
-
-    readonly property int kMotionGridWidth: 44
-    readonly property int kMotionGridHeight: 32
 
     color: ColorTheme.window
 
@@ -147,7 +146,7 @@ Rectangle
                 readonly property rect selectionMotionRect: itemToMotionRect(selectionRect)
 
                 readonly property vector2d motionCellSize:
-                    Qt.vector2d(width / kMotionGridWidth, height / kMotionGridHeight)
+                    Qt.vector2d(width / MotionDefs.gridWidth, height / MotionDefs.gridHeight)
 
                 function motionToItemRect(motionRect)
                 {
@@ -168,8 +167,8 @@ Rectangle
                 function itemToMotionPoint(x, y)
                 {
                     return Qt.point(
-                        MathUtils.bound(0, Math.floor(x / motionCellSize.x), kMotionGridWidth - 1),
-                        MathUtils.bound(0, Math.floor(y / motionCellSize.y), kMotionGridHeight - 1))
+                        MathUtils.bound(0, Math.floor(x / motionCellSize.x), MotionDefs.gridWidth - 1),
+                        MathUtils.bound(0, Math.floor(y / motionCellSize.y), MotionDefs.gridHeight - 1))
                 }
 
                 Rectangle
@@ -233,8 +232,34 @@ Rectangle
                     id: grid
                     anchors.fill: parent
                     opacity: kMotionGridOpacity
-                    cellCountX: kMotionGridWidth
-                    cellCountY: kMotionGridHeight
+                    color: ColorTheme.colors.light1
+                    cellCountX: MotionDefs.gridWidth
+                    cellCountY: MotionDefs.gridHeight
+                }
+
+                MaskedUniformGrid
+                {
+                    id: motionHighlight
+                    anchors.fill: parent
+                    opacity: kMotionHighlightOpacity
+                    color: ColorTheme.colors.red_l2
+                    cellCountX: MotionDefs.gridWidth
+                    cellCountY: MotionDefs.gridHeight
+
+                    maskTextureProvider: MotionMaskItem
+                    {
+                        id: motionMaskItem
+
+                        Connections
+                        {
+                            target: motionProvider
+
+                            onMotionMaskChanged:
+                            {
+                                motionMaskItem.motionMask = motionProvider.motionMask(index)
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -246,5 +271,11 @@ Rectangle
         resourceId: helper.resourceId
 
         onSourceChanged: playLive()
+    }
+
+    MediaPlayerMotionProvider
+    {
+        id: motionProvider
+        mediaPlayer: player
     }
 }

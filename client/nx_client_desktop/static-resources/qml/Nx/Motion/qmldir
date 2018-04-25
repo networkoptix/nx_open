@@ -1,0 +1,5 @@
+module Nx.Motion
+
+singleton MotionDefs 1.0 MotionDefs.qml
+
+MotionSettingsItem 1.0 MotionSettingsItem.qml

@@ -6,7 +6,7 @@
 #include <QtGui/QColor>
 #include <QtQuick/QQuickItem>
 
-#include <nx/client/core/resource/camera_motion_helper.h>
+#include <nx/client/core/motion/helpers/camera_motion_helper.h>
 
 namespace nx {
 namespace client {
