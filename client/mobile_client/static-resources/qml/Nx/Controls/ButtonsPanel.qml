@@ -51,7 +51,7 @@ ListView
         id: showAnimation
 
         duration: 300
-        easing.type: Easing.OutQuad
+        easing.type: Easing.InOutQuad
         target: control
         properties: "contentX"
         to: -width + emptyHeaderSize + d.offset

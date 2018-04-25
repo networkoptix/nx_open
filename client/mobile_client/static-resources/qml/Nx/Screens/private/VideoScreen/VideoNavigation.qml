@@ -471,18 +471,21 @@ Item
 
                 visible: opacity > 0
                 opacity: 0
+
                 Binding
                 {
                     target: liveModeButton
                     property: "opacity"
-                    value:
+                    property bool invisible:
                     {
                         var currentTime = (new Date()).getTime()
                         var playerPosition = videoScreenController.mediaPlayer.position
                         var futurePosition = playerPosition > currentTime
                         var canViewArchive = videoNavigation.canViewArchive
-                        return (d.liveMode || futurePosition) && canViewArchive ? 0 : 1
+                        return (d.liveMode || futurePosition) && canViewArchive
                     }
+
+                    onInvisibleChanged: value = invisible ? 0 : 1
                 }
 
                 Behavior on opacity { NumberAnimation { duration: 200 } }
