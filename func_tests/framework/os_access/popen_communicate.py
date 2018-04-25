@@ -53,7 +53,7 @@ def communicate(process, input, timeout_sec):
         fd2file[fd].close()
         fd2file.pop(fd)
 
-    if process.stdin and input:
+    if process.stdin and input is not None:
         register_and_append(process.stdin, select.POLLOUT)
 
     if process.stdout:
