@@ -2,13 +2,14 @@
 set -e
 
 #DIR is the location of the cloud_portal build script in the repository
-#Can be called like this from with cloud_portal "./build_scripts/build.sh"
+#Can be called like this from with cloud_portal/build_scripts "./build.sh"
+# or from cloud_portal "./build_scripts/build.sh"
 #or like this from outside the repository "../nx_vms/cloud_portal/build_scripts/build.sh"
 
 NX_VMS="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/../.."
 
 #If we are not using the repository we should update necessary files
-if [[ "$PWD" != */cloud_portal/* ]]
+if [[ "$PWD" != *cloud_portal* ]]
 then
     echo "Updating Cloud Portal Content"
     if [ -e "cloud_portal" ]
