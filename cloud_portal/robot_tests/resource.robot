@@ -6,14 +6,26 @@ Library           String
 Library           NoptixLibrary/
 Resource          variables.robot
 
+*** variables ***
+@{chrome_arguments}    --disable-infobars    --headless    --disable-gpu
+${headless}    false
+
 *** Keywords ***
 Open Browser and go to URL
     [Arguments]    ${url}
-    Open Browser    ${ENV}    ${BROWSER}
+    Run Keyword Unless    "${headless}"=="true" and "${BROWSER}" == "Chrome"   Open Browser    ${ENV}    ${BROWSER}
+    Run Keyword If    "${headless}"=="true" and "${BROWSER}" == "Chrome"    Headless Startup
 #    Maximize Browser Window
     Set Selenium Speed    0
     Check Language
     Go To    ${url}
+
+Headless Startup
+    ${options}=    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
+    : FOR    ${option}    IN    @{chrome_arguments}
+    \    Call Method    ${options}    add_argument    ${option}
+    Create Webdriver    Chrome    chrome_options=${options}
+    Go To    ${ENV}
 
 Check Language
     Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}
@@ -84,7 +96,7 @@ Get Email Link
     Run Keyword If    "${link type}"=="activate"    Check Email Subject    ${email}    ${ACTIVATE YOUR ACCOUNT EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
     Run Keyword If    "${link type}"=="reset"    Check Email Subject    ${email}    ${RESET PASSWORD EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
     ${links}    Get Links From Email    ${email}
-    Mark All Emails As Read
+    Delete Email    ${email}
     Close Mailbox
     Return From Keyword    ${links}
 

@@ -121,11 +121,6 @@ ${SHARE PERMISSIONS DROPDOWN}         //form[@name='shareForm']//select[@ng-mode
 ${SHARE BUTTON MODAL}                 //form[@name='shareForm']//button[@ng-click='checkForm()']
 ${SHARE CANCEL}                       //form[@name='shareForm']//button[@ng-click='close()']
 ${SHARE CLOSE}                        //div[@uib-modal-transclude]//div[@ng-if='settings.title']//button[@ng-click='close()']
-${SHARE PERMISSIONS ADMINISTRATOR}    //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='${ADMIN TEXT}']
-${SHARE PERMISSIONS ADVANCED VIEWER}  //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='${ADV VIEWER TEXT}']
-${SHARE PERMISSIONS VIEWER}           //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='${VIEWER TEXT}']
-${SHARE PERMISSIONS LIVE VIEWER}      //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='${LIVE VIEWER TEXT}']
-${SHARE PERMISSIONS CUSTOM}           //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='${CUSTOM TEXT}']
 ${SHARE PERMISSIONS HINT}             //form[@name='shareForm']//span[contains(@class,'help-block')]
 
 ${EDIT PERMISSIONS EMAIL}             //form[@name='shareForm']//input[@ng-model='user.email']
@@ -160,7 +155,7 @@ ${255CHARS}                           QWErtyuiopasdfghhkljzxcvbnmqwertyuiopasdfg
 
 #Emails
 ${BASE EMAIL}                         noptixautoqa@gmail.com
-${BASE EMAIL PASSWORD}                qweasd!@#$
+${BASE EMAIL PASSWORD}                qweasd!@#$%
 ${BASE HOST}                          imap.gmail.com
 ${BASE PORT}                          993
 ${EMAIL VIEWER}                       noptixautoqa+viewer@gmail.com

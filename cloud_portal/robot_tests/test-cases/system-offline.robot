@@ -49,8 +49,10 @@ should confirm, if not owner deletes system (You will loose access to this syste
     Wait Until Page Does Not Contain Element    ${DELETE USER MODAL}
 
 share button should be disabled
+    Set Window Size    1920    1080
     Log in to Autotests System    ${EMAIL OWNER}
     Wait Until Element Is Visible    ${SHARE BUTTON DISABLED}
+    Wait Until Page Does Not Contain Element    //div[contains(@uib-modal-backdrop, "modal-backdrop")]
 
 open in nx button should be disabled
     Log in to Autotests System    ${EMAIL OWNER}
