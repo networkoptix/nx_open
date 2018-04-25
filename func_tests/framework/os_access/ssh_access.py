@@ -1,11 +1,14 @@
+import datetime
 import logging
 
+import pytz
 from pathlib2 import Path
 
 from framework.os_access.args import sh_augment_script, sh_command_to_script
 from framework.os_access.exceptions import exit_status_error_cls
 from framework.os_access.local_access import LocalAccess
 from framework.os_access.ssh_path import SSHPath
+from framework.utils import RunningTime
 
 _logger = logging.getLogger(__name__)
 
@@ -49,3 +52,8 @@ class SSHAccess(object):
         except exit_status_error_cls(255):
             return False
         return True
+
+    def set_time(self, new_time):  # type: (SSHAccess, datetime.datetime) -> RunningTime
+        started_at = datetime.datetime.now(pytz.utc)
+        self.run_command(['date', '--set', new_time.isoformat()])
+        return RunningTime(new_time, datetime.datetime.now(pytz.utc) - started_at)
