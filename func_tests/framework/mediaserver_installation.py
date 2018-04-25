@@ -6,7 +6,8 @@ import sys
 from pathlib2 import PurePosixPath
 
 from framework.build_info import build_info_from_text, customizations_from_paths
-from framework.os_access.exceptions import FileNotFound, exit_status_error_cls
+from framework.os_access.exceptions import DoesNotExist, exit_status_error_cls
+from framework.os_access.path import copy_file
 from framework.os_access.ssh_access import SSHAccess
 from framework.os_access.ssh_path import SSHPath
 from framework.service import UpstartService
@@ -104,7 +105,7 @@ class MediaserverInstallation(object):
     def read_log(self):
         try:
             return self._log_path.read_bytes()
-        except FileNotFound:
+        except DoesNotExist:
             return None
 
     def patch_binary_set_cloud_host(self, new_host):
@@ -197,7 +198,7 @@ def install_mediaserver(ssh_access, mediaserver_deb, reinstall=False):
     customization = mediaserver_deb.customization
     remote_path = ssh_access.Path.tmp() / 'deb' / customization.company / mediaserver_deb.path.name
     remote_path.parent.mkdir(parents=True, exist_ok=True)
-    remote_path.upload(mediaserver_deb.path)
+    copy_file(mediaserver_deb.path, remote_path)
     # Commands and dependencies for Ubuntu 14.04 (ubuntu/trusty64 from Vagrant's Atlas).
     ssh_access.run_command([
         'DEBIAN_FRONTEND=noninteractive',  # Bypass EULA on install.

@@ -26,7 +26,7 @@ class Registry(object):
             logger.warning("Create %r; OK only if a clean run", self._path.parent)
             self._path.parent.mkdir(parents=True)
         with self._lock:
-            self._path.touch()
+            self._path.write_bytes(b'')
         self._name_format = name_format
         self._limit = limit
 

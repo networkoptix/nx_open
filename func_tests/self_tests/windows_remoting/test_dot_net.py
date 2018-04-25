@@ -5,7 +5,7 @@ import pytest
 
 from framework.os_access.windows_remoting.dot_net.files import get_file_info, rename_file
 from framework.os_access.windows_remoting.dot_net.services import Service
-from framework.os_access.windows_remoting.dot_net.users import enumerate_user_profiles, get_system_user_profile
+from framework.os_access.windows_remoting.dot_net.users import user_profiles, get_system_user_profile, get_user
 
 log = logging.getLogger(__name__)
 
@@ -30,5 +30,10 @@ def test_file(pywinrm_protocol, path):
 
 
 def test_user_profiles(pywinrm_protocol):
-    log.debug(pformat(enumerate_user_profiles(pywinrm_protocol)))
+    log.debug(pformat(user_profiles(pywinrm_protocol)))
     log.debug(pformat(get_system_user_profile(pywinrm_protocol)))
+
+
+def test_get_user(pywinrm_protocol):
+    account, profile, vars = get_user(pywinrm_protocol, u'Administrator')
+    assert account['Name'] == 'Administrator'

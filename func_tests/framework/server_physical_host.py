@@ -3,7 +3,7 @@
 import logging
 import uuid
 
-from framework.os_access.path import FileSystemPath
+from framework.os_access.path import FileSystemPath, copy_file
 from framework.rest_api import RestApi
 from .mediaserver import Mediaserver
 from .mediaserver_installation import MEDIASERVER_CONFIG_PATH, MEDIASERVER_CONFIG_PATH_INITIAL, MediaserverInstallation
@@ -168,7 +168,7 @@ class PhysicalInstallationHost(object):
             return
         remote_dist_path = self._remote_dist_root / self._deb_path.name
         self._remote_dist_root.parent.mkdir(parents=True, exist_ok=True)
-        self._remote_dist_root.upload(self._deb_path)
+        copy_file(self._deb_path, self._remote_dist_root)
         self.os_access.run_command(['dpkg', '--extract', remote_dist_path, self._unpacked_mediaserver_root_dir])
         if not self.unpacked_mediaserver_dir.exists():
             raise RuntimeError(

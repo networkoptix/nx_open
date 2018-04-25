@@ -20,10 +20,6 @@ class FileSystemPath(PurePath):
         return cls()
 
     @abstractmethod
-    def touch(self, mode, exist_ok):
-        pass
-
-    @abstractmethod
     def exists(self):
         return True
 
@@ -41,10 +37,6 @@ class FileSystemPath(PurePath):
 
     @abstractmethod
     def glob(self, pattern):
-        yield self.__class__()
-
-    @abstractmethod
-    def rglob(self, pattern):
         yield self.__class__()
 
     @abstractmethod
@@ -71,10 +63,6 @@ class FileSystemPath(PurePath):
     def write_text(self, data, encoding, errors):
         pass
 
-    @abstractmethod
-    def upload(self, local_source_path):  # type: (Path) -> None
-        pass
 
-    @abstractmethod
-    def download(self, local_destination_path):  # type: (Path) -> None
-        pass
+def copy_file(source, destination):  # type: (FileSystemPath, FileSystemPath) -> None
+    destination.write_bytes(source.read_bytes())

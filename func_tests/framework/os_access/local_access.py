@@ -1,7 +1,7 @@
 import logging
 import subprocess
 
-from framework.os_access.args import sh_augment_script
+from framework.os_access.args import sh_augment_script, sh_command_to_script
 from framework.os_access.exceptions import Timeout, exit_status_error_cls
 from framework.os_access.local_path import LocalPath
 from framework.os_access.popen_communicate import communicate
@@ -46,7 +46,7 @@ class LocalAccess(object):
     def run_command(cls, command, input=None, cwd=None, env=None, timeout_sec=60 * 60):
         kwargs = cls._make_kwargs(cwd, env, input is not None)
         command = [str(arg) for arg in command]
-        _logger.debug('Run command:\n%r', command)
+        _logger.debug('Run command:\n%r', sh_command_to_script(command))
         process = subprocess.Popen(command, shell=False, **kwargs)
         return cls._communicate(process, input, timeout_sec)
 
