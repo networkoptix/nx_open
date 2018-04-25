@@ -4,6 +4,7 @@
 #include <map>
 
 #include <plugins/plugin_tools.h>
+#include <nx/sdk/utils/debug.h>
 
 #include "plugin.h"
 #include "objects_metadata_packet.h"
@@ -16,20 +17,28 @@ namespace metadata {
  * Base class for a typical implementation of the metadata plugin. Hides many technical details of
  * the Metadata Plugin SDK, but may limit plugin capabilities - use only when suitable.
  */
-class CommonPlugin: public nxpt::CommonRefCounter<Plugin>
+class CommonPlugin:
+    public nxpt::CommonRefCounter<Plugin>,
+    protected nx::sdk::utils::Debug
 {
 protected:
     /**
      * @param name Full plugin name in English, capitalized as a header.
      * @param libName Short plugin name: small_letters_and_underscores, as in the library filename.
-     * @param enableOutput Enables NX_OUTPUT. Typically, use NX_DEBUG_ENABLE_OUTPUT as a value.
-     * @param printPrefix Prefix for NX_PRINT and NX_OUTPUT. If empty, will be made from libName.
+     * @param enableOutput_ Enables NX_OUTPUT. Typically, use NX_DEBUG_ENABLE_OUTPUT as a value.
+     * @param printPrefix_ Prefix for NX_PRINT and NX_OUTPUT. If empty, will be made from libName.
+     *     To use the same prefix in the derived class NX_PRINT/NX_OUTPUT, add the following lines
+     *     to its .cpp:
+     *     <pre><code>
+     *         #define NX_PRINT_PREFIX printPrefix()
+     *         #include <nx/kit/debug.h>
+     *     </code></pre>
      */
     CommonPlugin(
         const std::string& name,
         const std::string& libName,
-        bool enableOutput,
-        const std::string& printPrefix = "");
+        bool enableOutput_,
+        const std::string& printPrefix_ = "");
 
     virtual std::string capabilitiesManifest() const = 0;
 
@@ -72,14 +81,6 @@ public:
 
     std::string libName() const { return m_libName; }
 
-    /**
-     * Allows to define the following marco before including nx/kit/debug.h in the derived class:
-     * #define NX_PRINT_PREFIX printPrefix()
-     */
-    std::string printPrefix() const { return m_printPrefix; }
-
-    bool enableOutput() const { return m_enableOutput; }
-
 //-------------------------------------------------------------------------------------------------
 // Not intended to be used by a descendant.
 
@@ -96,14 +97,11 @@ public:
 private:
     bool fillSettingsMap(
         std::map<std::string, std::string>* map, const nxpl::Setting* settings, int count,
-        const char* func) const;
+        const std::string& func) const;
 
 private:
     const std::string m_name;
     const std::string m_libName;
-    const bool m_enableOutput;
-    const std::string m_printPrefix;
-
     std::map<std::string, std::string> m_settings;
     mutable std::string m_manifest; //< Cache the manifest to guarantee a lifetime for char*.
 };

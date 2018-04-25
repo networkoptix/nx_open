@@ -1,8 +1,10 @@
 #include "common_plugin.h"
 
-#define NX_DEBUG_ENABLE_OUTPUT m_enableOutput
-#define NX_PRINT_PREFIX m_printPrefix
+#define NX_PRINT_PREFIX printPrefix()
+#define NX_DEBUG_ENABLE_OUTPUT enableOutput()
 #include <nx/kit/debug.h>
+
+#include <nx/sdk/utils/debug.h>
 
 namespace nx {
 namespace sdk {
@@ -11,13 +13,12 @@ namespace metadata {
 CommonPlugin::CommonPlugin(
     const std::string& name,
     const std::string& libName,
-    bool enableOutput,
-    const std::string& printPrefix)
+    bool enableOutput_,
+    const std::string& printPrefix_)
     :
+    Debug(enableOutput_, !printPrefix_.empty() ? printPrefix_ : ("[" + libName + "] ")),
     m_name(name),
-    m_libName(libName),
-    m_enableOutput(enableOutput),
-    m_printPrefix(!printPrefix.empty() ? printPrefix : ("[" + libName + "] "))
+    m_libName(libName)
 {
     NX_PRINT << "Created " << this << ": \"" << m_name << "\"";
 }
@@ -81,23 +82,13 @@ void CommonPlugin::setSettings(const nxpl::Setting* /*settings*/, int /*count*/)
 
 bool CommonPlugin::fillSettingsMap(
     std::map<std::string, std::string>* map, const nxpl::Setting* settings, int count,
-    const char* func) const
+    const std::string& func) const
 {
-    if (count > 0 && settings == nullptr)
-    {
-        NX_PRINT << func << "(): INTERNAL ERROR: settings is null and count is " << count;
+    if (!debugOutputSettings(settings, count, func + " settings"))
         return false;
-    }
 
-    NX_OUTPUT << "{";
     for (int i = 0; i < count; ++i)
-    {
         (*map)[settings[i].name] = settings[i].value;
-        NX_OUTPUT << "    " << nx::kit::debug::toString(settings[i].name)
-            << ": " << nx::kit::debug::toString(settings[i].value)
-            << ((i < count - 1) ? "," : "");
-    }
-    NX_OUTPUT << "}";
 
     return true;
 }
@@ -135,6 +126,8 @@ void CommonPlugin::executeAction(Action* action, Error* outError)
         *outError = Error::unknownError;
         return;
     }
+
+    // TODO: #mshevchenko: Move logging action details here from stub plugin.cpp.
 
     NX_OUTPUT << "Executing action with id [" << action->actionId() << "]";
 
