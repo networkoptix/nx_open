@@ -198,7 +198,7 @@ Find and remove emails
     \  Check For Alert    ${PERMISSIONS WERE REMOVED FROM EMAIL}
     \  Wait Until Element Is Not Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${email}')]
 
-Clean up noperm first/last name
+Reset user noperm first/last name
     Register Keyword To Run On Failure    None
     Open Browser and go to URL    ${url}
     Go To    ${url}/account
@@ -215,7 +215,7 @@ Clean up noperm first/last name
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
     Close Browser
 
-Clean up owner first/last name
+Reset user owner first/last name
     Register Keyword To Run On Failure    None
     Open Browser and go to URL    ${url}/account
     Log In    ${EMAIL OWNER}    ${password}    button=None
@@ -247,6 +247,6 @@ Make sure notowner is in the system
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
     Go To    ${url}/systems/${AUTO_TESTS SYSTEM ID}
-    ${status}    Run Keyword And Return Status    Wait Until Element Is Visible    //div[@process-loading='gettingSystemUsers']//tbody//tr//td[contains(text(), 'noptixautoqa+notowner@gmail.com')]
+    ${status}    Run Keyword And Return Status    Wait Until Element Is Visible    ${NOT OWNER IN SYSTEM}
     Run Keyword Unless    ${status}    Add notowner
     Close Browser

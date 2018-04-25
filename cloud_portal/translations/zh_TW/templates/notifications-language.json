@@ -6,10 +6,10 @@
     "emailSubject": "重設您的密碼"
   },
   "system_invite": {
-    "emailSubject": "有人分享影像 {{message.system_name}} 給您"
+    "emailSubject": "{{message.sharer_name}} 邀請您至 {{PRODUCT_NAME}}"
   },
   "system_shared": {
-    "emailSubject": "{{message.sharer_name}} 邀請您至 {{PRODUCT_NAME}}"
+    "emailSubject": "Video system {{message.system_name}} was shared with you"
   },
   "review_version": {
     "emailSubject": "版本 {{message.id}} 已準備好審查"

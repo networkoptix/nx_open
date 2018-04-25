@@ -1,8 +1,8 @@
 *** Settings ***
 Resource          ../resource.robot
 Resource          ../variables.robot
-Test Setup        Reset
-Test Teardown     Run Keyword If Test Failed    System Failure
+Test Setup        Restart
+Test Teardown     Run Keyword If Test Failed    Reset DB and Open New Browser On Failure
 Suite Setup       Open Browser and go to URL    ${url}
 Suite Teardown    Close All Browsers
 Force Tags        system
@@ -29,12 +29,12 @@ Check System Text
     Wait Until Elements Are Visible    //h2[.='${OWNER TEXT}']    //a[.='${EMAIL OWNER}']
     Wait Until Element Is Not Visible    //h2[.='${YOUR SYSTEM TEXT}']
 
-System Failure
+Reset DB and Open New Browser On Failure
     Close Browser
     Make sure notowner is in the system
     Open Browser and go to URL    ${url}
 
-Reset
+Restart
     ${status}    Run Keyword And Return Status    Validate Log In
     Run Keyword If    ${status}    Log Out
     Go To    ${url}

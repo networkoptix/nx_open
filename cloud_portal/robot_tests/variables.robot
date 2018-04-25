@@ -165,7 +165,7 @@ ${EMAIL OWNER}                        noptixautoqa+owner@gmail.com
 ${EMAIL NOT OWNER}                    noptixautoqa+notowner@gmail.com
 ${EMAIL ADMIN}                        noptixautoqa+admin@gmail.com
 ${EMAIL CUSTOM}                       noptixautoqa+custom@gmail.com
-@{EMAILS LIST}                        noptixautoqa+viewer@gmail.com    noptixautoqa+advviewer@gmail.com    noptixautoqa+liveviewer@gmail.com    noptixautoqa+owner@gmail.com    noptixautoqa+custom@gmail.com    noptixautoqa+admin@gmail.com
+@{EMAILS LIST}                        ${EMAIL VIEWER}    ${EMAIL ADV VIEWER}    ${EMAIL LIVE VIEWER}${EMAIL OWNER}    ${EMAIL NOT OWNER}    ${EMAIL ADMIN}    ${EMAIL CUSTOM}
 ${ADMIN FIRST NAME}                   asdasasd
 ${ADMIN LAST NAME}                    asdasasdas
 ${EMAIL UNREGISTERED}                 noptixautoqa+unregistered@gmail.com
@@ -183,6 +183,7 @@ ${AUTO TESTS USER}                    //div[@ng-repeat='system in systems | filt
 ${AUTO TESTS OPEN NX}                 //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[text()='Auto Tests']/..//button[@ng-click='checkForm()']
 ${SYSTEMS SEARCH INPUT}               //input[@ng-model='search.value']
 ${SYSTEMS TILE}                       //div[@ng-repeat="system in systems | filter:searchSystems as filtered"]
+${NOT OWNER IN SYSTEM}                //div[@process-loading='gettingSystemUsers']//tbody//tr//td[contains(text(), '${EMAIL NOT OWNER}')]
 
 #AUTO TESTS 2 is an offline system used for testing offline status on the systems page and offline status on the system page
 ${AUTOTESTS OFFLINE}                  //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests 2')]/following-sibling::span[contains(text(), '${AUTOTESTS OFFLINE TEXT}')]
