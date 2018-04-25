@@ -95,7 +95,7 @@ class DataStructure(models.Model):
     context = models.ForeignKey(Context)
     name = models.CharField(max_length=1024)
     description = models.TextField()
-    label = models.CharField(max_length=1024, blank=True)
+    label = models.CharField(max_length=1024, blank=True, default='')
 
     DATA_TYPES = Choices((0, 'text', 'Text'),
                          (1, 'image', 'Image'),
