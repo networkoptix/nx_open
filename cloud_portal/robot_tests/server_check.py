@@ -11,8 +11,6 @@ import os
 
 ROBOT_LISTENER_API_VERSION = 3
 
-noFailure = True
-
 with codecs.open("language_list.json", 'r', encoding='utf-8-sig') as languages_list:
         langList = json.load(languages_list)
 
@@ -24,12 +22,7 @@ def end_test(data, result):
 def end_suite(data, result):
     if not result.passed:
         print result.parent, "<----------------------"
-        print 'Test "%s" failed: %s' % (result.tags, data.tags)
-        if result.message == "Element with locator '//span[@ng-if='registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email' and contains(text(),'Please enter a valid Email')]' not found.":
-            print "it worked"
-            noFailure = False
         raw_input('Press enter to continue.')
-        print noFailure
 
 def close():
     system("robot -i server-down --rerunfailed output.xml --output rerun.xml test-cases\\register-form-validation.robot")
