@@ -64,7 +64,7 @@ static const int kHanwhaInvalidChannel = -1;
 static const int kHanwhaDefaultOverlappedId = 0;
 static const int kHanwhaMaxSecondaryStreamArea = 1024 * 768;
 static const int kHanwhaDefaultMaxPresetNumber = 1000;
-static const int kHanwhaProfileNameMaxLength = 12;
+static const int kHanwhaProfileNameDefaultMaxLength = 12;
 
 static const QString kHanwhaDateTimeFormat("yyyy-MM-dd hh:mm:ss");
 static const QString kHanwhaUtcDateTimeFormat("yyyy-MM-ddThh:mm:ssZ");

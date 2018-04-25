@@ -1643,15 +1643,15 @@ CameraDiagnostics::Result HanwhaResource::findProfiles(
         const auto& profile = entry.second;
         const bool isPrimaryProfile =
             profile.name == nxProfileName(Qn::ConnectionRole::CR_LiveVideo)
-            || profile.name == nxProfileName(
+            || profile.name == nxProfileName( //< Obsolete profile name caused by wrong length.
                 Qn::ConnectionRole::CR_LiveVideo,
-                kHanwhaProfileNameMaxLength); //< Obsolete profile name caused by wrong length.
+                kHanwhaProfileNameDefaultMaxLength);
 
         const bool isSecondaryProfile =
             profile.name == nxProfileName(Qn::ConnectionRole::CR_SecondaryLiveVideo)
-            || profile.name == nxProfileName(
+            || profile.name == nxProfileName( //< Obsolete profile name caused by wrong length.
                 Qn::ConnectionRole::CR_SecondaryLiveVideo,
-                kHanwhaProfileNameMaxLength); //< Obsolete profile name caused by wrong length.
+                kHanwhaProfileNameDefaultMaxLength);
 
         if (isPrimaryProfile)
             *outPrimaryProfile = profile;
@@ -1740,8 +1740,8 @@ CameraDiagnostics::Result HanwhaResource::updateProfileNameIfNeeded(
 {
     const auto properProfileName = nxProfileName(role);
     bool needToUpdateProfileName =
-        (profile.name == nxProfileName(role, kHanwhaProfileNameMaxLength))
-        && (nxProfileName(role, kHanwhaProfileNameMaxLength) != properProfileName);
+        (profile.name == nxProfileName(role, kHanwhaProfileNameDefaultMaxLength))
+        && (nxProfileName(role, kHanwhaProfileNameDefaultMaxLength) != properProfileName);
 
     if (needToUpdateProfileName)
     {
@@ -1750,8 +1750,8 @@ CameraDiagnostics::Result HanwhaResource::updateProfileNameIfNeeded(
         const auto response = helper.update(
             lit("media/videoprofile"),
             {
-                { kHanwhaProfileNumberProperty, QString::number(profile.number) },
-            { kHanwhaProfileNameProperty, properProfileName }
+                {kHanwhaProfileNumberProperty, QString::number(profile.number)},
+                {kHanwhaProfileNameProperty, properProfileName}
             });
 
         if (!response.isSuccessful())
@@ -2905,7 +2905,7 @@ QString HanwhaResource::nxProfileName(
     boost::optional<int> forcedProfileNameLength) const
 {
     auto maxLength = forcedProfileNameLength == boost::none
-        ? kHanwhaProfileNameMaxLength
+        ? kHanwhaProfileNameDefaultMaxLength
         : forcedProfileNameLength.get();
 
     if (forcedProfileNameLength == boost::none)
