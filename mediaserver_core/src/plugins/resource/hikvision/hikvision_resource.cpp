@@ -78,7 +78,10 @@ CameraDiagnostics::Result HikvisionResource::initializeMedia(
             auto result = fetchChannelCapabilities(role, &channelCapabilities);
             if (!result)
             {
-                // This error may indicate that camera does not spport ISAPI, try ONVIF instead.
+                NX_DEBUG(this, 
+                    lm("Unable to fetch channel capabilities on %1 by ISAPI, fallback to ONVIF")
+                    .args(getUrl()));
+
                 return base_type::initializeMedia(onvifCapabilities);
             }
 
