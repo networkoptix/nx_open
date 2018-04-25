@@ -153,6 +153,10 @@ bool PlayerDataConsumer::processData(const QnAbstractDataPacketPtr& data)
     auto audioFrame = std::dynamic_pointer_cast<QnCompressedAudioData>(data);
     if (audioFrame && m_audioEnabled)
         return processAudioFrame(audioFrame);
+    
+    auto metadataFrame = std::dynamic_pointer_cast<QnAbstractCompressedMetadata>(data);
+    if (metadataFrame)
+        emit gotMetadata(metadataFrame);
 
     return true; //< Just ignore unknown frame type.
 }

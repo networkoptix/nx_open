@@ -93,16 +93,10 @@
    </item>
    <item row="4" column="1">
     <widget class="QnWordWrappedLabel" name="warningForUsers">
-     <property name="text">
-      <string>Warning label for users</string>
-     </property>
     </widget>
    </item>
    <item row="2" column="1">
     <widget class="QnWordWrappedLabel" name="warningForLayouts">
-     <property name="text">
-      <string>Warning label for layouts</string>
-     </property>
     </widget>
    </item>
   </layout>

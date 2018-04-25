@@ -51,7 +51,8 @@ static QString qSizeToString(const QSize& size)
 class MockVideoDecoder: public AbstractVideoDecoder
 {
 public:
-    MockVideoDecoder(const RenderContextSynchronizerPtr& /*allocator*/, const QSize& /*resolution*/)
+    MockVideoDecoder(
+        const RenderContextSynchronizerPtr& /*synchronizer*/, const QSize& /*resolution*/)
     {
     }
 

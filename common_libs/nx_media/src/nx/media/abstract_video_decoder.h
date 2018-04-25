@@ -17,7 +17,7 @@ namespace media {
 /**
  * Interface for video decoder implementation. Each derived class should provide a constructor with
  * the following signature:
- * <pre> ...VideoDecoder(const RenderContextSynchronizerPtr& allocator, const QSize& resolution); </pre>
+ * <pre> ...VideoDecoder(const RenderContextSynchronizerPtr& synchronizer, const QSize& resolution); </pre>
  *
  */
 class AbstractVideoDecoder: public QObject

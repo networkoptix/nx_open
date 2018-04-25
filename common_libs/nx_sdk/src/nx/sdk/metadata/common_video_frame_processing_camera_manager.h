@@ -4,6 +4,7 @@
 #include <map>
 
 #include <plugins/plugin_tools.h>
+#include <nx/sdk/utils/debug.h>
 
 #include "plugin.h"
 #include "consuming_camera_manager.h"
@@ -21,7 +22,8 @@ namespace metadata {
  * limit CameraManager capabilities - use only when suitable.
  */
 class CommonVideoFrameProcessingCameraManager:
-    public nxpt::CommonRefCounter<ConsumingCameraManager>
+    public nxpt::CommonRefCounter<ConsumingCameraManager>,
+    protected nx::sdk::utils::Debug
 {
 protected:
     /**
@@ -31,8 +33,8 @@ protected:
      */
     CommonVideoFrameProcessingCameraManager(
         Plugin* plugin,
-        bool enableOutput,
-        const std::string& printPrefix = "");
+        bool enableOutput_,
+        const std::string& printPrefix_ = "");
 
     virtual std::string capabilitiesManifest() = 0;
 
@@ -102,14 +104,6 @@ public:
      */
     virtual Plugin* plugin() const { return m_plugin; }
 
-    bool enableOutput() const { return m_enableOutput; }
-
-    /**
-     * Allows to define the following marco before including nx/kit/debug.h in the derived class:
-     * #define NX_PRINT_PREFIX printPrefix()
-     */
-    std::string printPrefix() const { return m_printPrefix; }
-
 //-------------------------------------------------------------------------------------------------
 // Not intended to be used by the descendant.
 
@@ -125,9 +119,6 @@ public:
 
 private:
     Plugin* const m_plugin;
-    const bool m_enableOutput;
-    const std::string m_printPrefix;
-
     MetadataHandler* m_handler = nullptr;
     std::map<std::string, std::string> m_settings;
 };
