@@ -382,9 +382,9 @@ PageBase
             property real customHeight:
             {
                 if (d.mode == VideoScreenUtils.VideoScreenMode.Ptz || ptzPanel.moveOnTapMode)
-                    return 0
+                    return getNavigationBarHeight()
 
-                return videoNavigation.buttonsPanelHeight
+                return videoNavigation.buttonsPanelHeight + getNavigationBarHeight()
             }
 
             x: -mainWindow.leftPadding
@@ -542,6 +542,7 @@ PageBase
         width: mainWindow.width
         height: mainWindow.height - videoScreen.height
         anchors.top: content.bottom
+        z: -1
     }
 
     Rectangle

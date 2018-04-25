@@ -681,7 +681,7 @@ Item
         // This rectangle guarantees the same color under android navigation buttons as under the navigation panel
         width: parent.width
         anchors.top: parent.bottom
-        color: ColorTheme.base3
+        color: "black"
         height: buttonsPanel.height
     }
 
