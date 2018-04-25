@@ -9,7 +9,7 @@
     "emailSubject": "{{message.sharer_name}} เชิญคุณมาที่ {{PRODUCT_NAME}}"
   },
   "system_shared": {
-    "emailSubject": "{{message.sharer_name}} เชิญคุณมาที่ {{PRODUCT_NAME}}"
+    "emailSubject": "Video system {{message.system_name}} was shared with you"
   },
   "review_version": {
     "emailSubject": "ตรวจสอบความพร้อมของ Version {{message.id}}"

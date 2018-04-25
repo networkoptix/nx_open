@@ -128,7 +128,7 @@
     "unknownError": "Ein unerwarteter Fehler ist aufgetreten",
     "accountAlreadyActivated": "Dieser Account ist bereits aktiviert",
     "emailNotFound": "Account existiert nicht.",
-    "EmailAlreadyExists": "Diese E-Mail ist bereits registriert",
+    "EmailAlreadyExists": "Diese Email ist bereits registriert",
     "oldPasswordMistmatch": "Aktuelles Passwort ist falsch.",
     "passwordMismatch": "Falsches Passwort",
     "cantEditYourself": "Eigene Berechtigungen zu ändern ist nicht erlaubt",
@@ -142,7 +142,8 @@
     "requiredMessage": "Verwenden Sie nur alphanumerische Zeichen und Tastatursymbole, vermeiden Sie führende und nachfolgende Leerzeichen",
     "weakMessage": "Verwenden Sie Zahlen, Groß- und Kleinbuchstaben und Sonderzeichen, um Ihr Passwort sicherer machen",
     "strongMessage": "Sicheres Passwort!",
-    "commonMessage": "Dieses Passwort ist eines der beliebtesten Passwörter auf der Welt"
+    "commonMessage": "Dieses Passwort ist eines der beliebtesten Passwörter auf der Welt",
+    "missingMessage": "Passwort ist erforderlich"
   },
   "sharing": {
     "confirmOwner": "Wenn Sie den Systembesitzer ändern, werden Sie das Eigentum vom aktuellen Account widerrufen. Diese Handlung ist unwiderruflich. Sind Sie sich sicher?",

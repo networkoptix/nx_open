@@ -142,7 +142,8 @@
     "requiredMessage": "Use only latin letters, numbers and keyboard symbols, avoid leading and trailing spaces",
     "weakMessage": "Use numbers, upper and lower case letters and special characters to make your password stronger",
     "strongMessage": "Strong password!",
-    "commonMessage": "This password is in top most popular passwords in the world"
+    "commonMessage": "This password is in top most popular passwords in the world",
+    "missingMessage": "Password is required"
   },
   "sharing": {
     "confirmOwner": "If you change System owner, you will revoke ownership from the current account. This action is irreversible. Are you sure?",
