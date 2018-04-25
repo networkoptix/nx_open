@@ -34,7 +34,7 @@ ListView
             return
 
         delayedAnimationTimer.restart()
-        contentX = -width - height + emptyHeaderSize
+        contentX = -width - height + emptyHeaderSize + d.offset
     }
 
     Timer
@@ -54,7 +54,7 @@ ListView
         easing.type: Easing.OutQuad
         target: control
         properties: "contentX"
-        to: -width + emptyHeaderSize
+        to: -width + emptyHeaderSize + d.offset
     }
 
     Image
@@ -206,6 +206,7 @@ ListView
     {
         id: d
 
+        property real offset: control.originX + control.contentWidth
         property bool allowInteractiveState: true
         property bool prefferToBeInteractive: contentWidth > width
     }
