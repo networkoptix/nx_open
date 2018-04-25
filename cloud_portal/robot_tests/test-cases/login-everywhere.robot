@@ -1,8 +1,8 @@
 *** Settings ***
 Resource          ../resource.robot
 Resource          ../variables.robot
-Test Setup        Reset
-Test Teardown     Run Keyword If Test Failed    Login Everywhere Failure
+Test Setup        Restart
+Test Teardown     Run Keyword If Test Failed    Open New Browser On Failure
 Suite Setup       Open Browser and go to URL    ${url}
 Suite Teardown    Close All Browsers
 
@@ -13,17 +13,17 @@ ${password}    ${BASE PASSWORD}
 ${url}         ${ENV}
 
 *** Keywords ***
-Login Everywhere Failure
-    Close Browser
-    Open Browser and go to URL    ${url}
-
 Check Log In
     Log In    ${EMAIL UNREGISTERED}    ${password}
     Check For Alert    ${ACCOUNT DOES NOT EXIST}
     Log In    ${email}    ${password}    None
     Validate Log In
 
-Reset
+Open New Browser On Failure
+    Close Browser
+    Open Browser and go to URL    ${url}
+
+Restart
     ${status}    Run Keyword And Return Status    Validate Log In
     Run Keyword If    ${status}    Log Out
     Go To    ${url}

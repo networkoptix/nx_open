@@ -1,10 +1,15 @@
 from os import system
 import time
 import datetime
-runTime = datetime.datetime.now()
-runTime = runTime.replace(hour=20, minute=0)
+import language_test
+
+hour = 20
+minute = 0
+checkInterval = 1800
+runTime = datetime.datetime.now().replace(hour=hour, minute=minute)
+
 while True:
 	if datetime.datetime.now() >= runTime:
-		system('python language-test.py')
-		runTime = runTime + datetime.timedelta(day=1)
-	time.sleep(1800)
+		language_test.allLanguages()
+		runTime += datetime.timedelta(days=1)
+	time.sleep(checkInterval)
