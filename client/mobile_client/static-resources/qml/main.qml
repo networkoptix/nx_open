@@ -32,15 +32,6 @@ ApplicationWindow
         Behavior on opacity { NumberAnimation { duration: 200 } }
     }
 
-    WarningPanel
-    {
-        id: topLevelWarning
-
-        width: mainWindow.availableWidth
-        text: d.warningText
-        opened: text.length
-    }
-
     SideNavigation
     {
         id: sideNavigation
@@ -77,6 +68,16 @@ ApplicationWindow
     UiController {}
 
     Loader { id: testLoader }
+
+    WarningPanel
+    {
+        id: topLevelWarning
+
+        y: deviceStatusBarHeight
+        width: mainWindow.availableWidth
+        text: d.warningText
+        opened: text.length
+    }
 
     Component.onCompleted:
     {
