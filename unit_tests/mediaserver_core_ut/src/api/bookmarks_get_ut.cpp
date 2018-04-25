@@ -13,7 +13,7 @@ TEST(BookmarksGet, noBookmarks)
     MediaServerLauncher launcher;
     ASSERT_TRUE(launcher.start());
 
-    ec2::ApiCameraData cameraData;
+    nx::vms::api::CameraData cameraData;
     cameraData.id = QnUuid::createUuid();
     cameraData.parentId = QnUuid::createUuid();
     auto resTypePtr = qnResTypePool->getResourceTypeByName("Camera");
@@ -21,7 +21,7 @@ TEST(BookmarksGet, noBookmarks)
     cameraData.typeId = resTypePtr->getId();
     cameraData.vendor = "test vendor";
     cameraData.physicalId = "test physicalId";
-    cameraData.id = ec2::ApiCameraData::physicalIdToId(cameraData.physicalId);
+    cameraData.id = nx::vms::api::CameraData::physicalIdToId(cameraData.physicalId);
 
     NX_LOG("[TEST] Create a camera.", cl_logINFO);
     NX_TEST_API_POST(&launcher, "/ec2/saveCamera", cameraData);

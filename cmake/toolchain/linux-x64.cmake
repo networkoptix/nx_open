@@ -1,8 +1,8 @@
 set(CMAKE_SYSTEM_NAME Linux)
 set(CMAKE_SYSTEM_PROCESSOR x86_64)
 
-set(CMAKE_C_COMPILER "${PACKAGES_DIR}/linux-x64/gcc-7.3.0/bin/gcc")
-set(CMAKE_CXX_COMPILER "${PACKAGES_DIR}/linux-x64/gcc-7.3.0/bin/g++")
+set(CMAKE_C_COMPILER "${PACKAGES_DIR}/linux-x64/gcc-7.3.0/bin/x86_64-pc-linux-gnu-gcc")
+set(CMAKE_CXX_COMPILER "${PACKAGES_DIR}/linux-x64/gcc-7.3.0/bin/x86_64-pc-linux-gnu-g++")
 
 # This is required by FindThreads CMake module.
 set(THREADS_PTHREAD_ARG "2" CACHE STRING "Forcibly set by linux-x64.cmake." FORCE)

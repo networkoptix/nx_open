@@ -11,7 +11,7 @@ namespace test {
 using OnSaveResourceAttribute =
     nx::utils::MoveOnlyFunc<nx::utils::db::DBResult(
         const std::string& /*systemId*/,
-        ::ec2::ApiResourceParamWithRefData)>;
+        nx::vms::api::ResourceParamWithRefData)>;
 
 class VmsP2pCommandBusStub:
     public ec2::AbstractVmsP2pCommandBus
@@ -20,7 +20,7 @@ public:
     virtual nx::utils::db::DBResult saveResourceAttribute(
         nx::utils::db::QueryContext* queryContext,
         const std::string& systemId,
-        ::ec2::ApiResourceParamWithRefData data) override;
+        nx::vms::api::ResourceParamWithRefData data) override;
 
     void setOnSaveResourceAttribute(OnSaveResourceAttribute func);
 

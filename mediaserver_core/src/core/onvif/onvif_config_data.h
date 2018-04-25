@@ -7,11 +7,12 @@
 
 #include "onvif_config_data_fwd.h"
 
-struct QnOnvifConfigData {
+struct QnOnvifConfigData
+{
     QnOnvifConfigData() {}
 
     QVector<QString> videoEncoders;
-	QVector<QString> audioEncoders;
+    QVector<QString> audioEncoders;
     QVector<QString> profiles;
 };
 #define QnOnvifConfigData_Fields (videoEncoders)(audioEncoders)(profiles)

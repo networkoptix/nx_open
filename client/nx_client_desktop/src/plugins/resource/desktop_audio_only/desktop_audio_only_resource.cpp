@@ -23,8 +23,9 @@ QnConstResourceAudioLayoutPtr QnDesktopAudioOnlyResource::getAudioLayout(const Q
     return ptr;
 }
 
-QnAbstractStreamDataProvider* QnDesktopAudioOnlyResource::createDataProviderInternal(Qn::ConnectionRole role)
+QnAbstractStreamDataProvider* QnDesktopAudioOnlyResource::createDataProvider(
+    const QnResourcePtr& resource,
+    Qn::ConnectionRole /*role*/)
 {
-    Q_UNUSED(role);
-    return new QnDesktopAudioOnlyDataProvider(toSharedPointer());
+    return new QnDesktopAudioOnlyDataProvider(resource);
 }

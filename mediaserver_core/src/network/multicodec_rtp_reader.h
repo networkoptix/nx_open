@@ -117,7 +117,7 @@ signals:
     void networkIssue(
         const QnResourcePtr&,
         qint64 timeStamp,
-        nx::vms::event::EventReason reasonCode,
+        nx::vms::api::EventReason reasonCode,
         const QString& reasonParamsEncoded);
 
 private:
@@ -187,9 +187,9 @@ private:
     int m_maxRtpRetryCount{0};
     int m_rtpFrameTimeoutMs{0};
     std::atomic<qint64> m_positionUsec{AV_NOPTS_VALUE};
-    boost::optional<std::chrono::microseconds> m_lastOnvifNtpExtensionTime;
+    boost::optional<std::chrono::microseconds> m_lastOnvifNtpExtensionTime{0};
     OnSocketReadTimeoutCallback m_onSocketReadTimeoutCallback;
-    std::chrono::milliseconds m_callbackTimeout;
+    std::chrono::milliseconds m_callbackTimeout{0};
 };
 
 #endif // defined(ENABLE_DATA_PROVIDERS)

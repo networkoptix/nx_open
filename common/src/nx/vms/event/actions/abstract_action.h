@@ -37,7 +37,7 @@ struct ActionData
         VideoLinkExists = 1
     };
 
-    ActionData(): actionType(undefinedAction), flags(0) {}
+    ActionData(): actionType(ActionType::undefinedAction), flags(0) {}
     ActionData(const ActionData&);
     ActionData(ActionData&&) = default;
     ActionData& operator=(const ActionData&) = delete;

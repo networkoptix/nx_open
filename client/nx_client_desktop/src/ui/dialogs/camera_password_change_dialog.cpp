@@ -5,7 +5,7 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
-#include <ui/common/aligner.h>
+#include <nx/client/desktop/common/utils/aligner.h>
 #include <nx/utils/password_analyzer.h>
 
 using namespace nx::client::desktop;
@@ -91,7 +91,7 @@ QnCameraPasswordChangeDialog::QnCameraPasswordChangeDialog(
     ui->confirmPasswordEdit->setText(password);
     updateHint();
 
-    QnAligner* aligner = new QnAligner(this);
+    Aligner* aligner = new Aligner(this);
     aligner->registerTypeAccessor<InputField>(InputField::createLabelWidthAccessor());
     aligner->addWidgets({ ui->passwordEdit, ui->confirmPasswordEdit });
 

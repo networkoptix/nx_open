@@ -1,19 +1,16 @@
 from collections import namedtuple
-from contextlib import closing
 
 import pytest
 from netaddr import IPAddress
+from netaddr.ip import IPNetwork
 from pathlib2 import Path
 
-from framework.merging import setup_system
-from framework.networking import setup_networks
-from framework.os_access.local import LocalAccess
-from framework.pool import Pool
+from framework.networking import setup_flat_network
+from framework.os_access.local_access import LocalAccess
 from framework.registry import Registry
 from framework.serialize import load
 from framework.vms.factory import VMFactory
 from framework.vms.hypervisor.virtual_box import VirtualBox
-from network_layouts import get_layout
 
 DEFAULT_VM_HOST_USER = 'root'
 DEFAULT_VM_HOST_DIR = '/tmp/jenkins-test'
@@ -73,60 +70,39 @@ def hypervisor(configuration, host_os_access):
 
 
 @pytest.fixture(scope='session')
-def vm_registries(configuration, host_os_access):
+def vm_registries(configuration, hypervisor):
     return {
-        vm_type: Registry(host_os_access, vm_configuration['registry_path'])
-        for vm_type, vm_configuration in configuration['vm_types'].items()
-        }
+        vm_type: Registry(
+            hypervisor.host_os_access,
+            hypervisor.host_os_access.Path(vm_type_configuration['registry_path']).expanduser(),
+            vm_type_configuration['name_format'].format(vm_index='{index}'),  # Registry doesn't know about VMs.
+            vm_type_configuration['limit'],
+            )
+        for vm_type, vm_type_configuration in configuration['vm_types'].items()}
 
 
 @pytest.fixture(scope='session')
-def vm_factories(request, configuration, hypervisor, vm_registries):
-    factories = {
-        vm_type: VMFactory(vm_configuration, hypervisor, vm_registries[vm_type])
-        for vm_type, vm_configuration in configuration['vm_types'].items()
-        }
+def vm_factory(request, configuration, hypervisor, vm_registries):
+    factory = VMFactory(configuration['vm_types'], hypervisor, vm_registries)
     if request.config.getoption('--clean'):
-        for vm_factory in factories.values():
-            vm_factory.cleanup()
-    return factories
-
-
-@pytest.fixture()
-def vm_pools(vm_factories):
-    pools = {
-        vm_type: Pool(vm_factory)
-        for vm_type, vm_factory in vm_factories.items()
-        }
-    yield pools
-    for pool in pools.values():
-        pool.close()
-
-
-@pytest.fixture()
-def linux_vm_pool(vm_factories):
-    with closing(Pool(vm_factories['linux'])) as pool:
-        yield pool
-
-
-@pytest.fixture()
-def network(vm_pools, hypervisor, linux_servers_pool, layout_file):
-    layout = get_layout(layout_file)
-    vms, _ = setup_networks(vm_pools, hypervisor, layout.networks, {})
-    servers = setup_system(linux_servers_pool, layout.mergers)
-    return vms, servers
+        factory.cleanup()
+    return factory
 
 
 @pytest.fixture(scope='session')
-def two_linux_vms(vm_factories, hypervisor):
-    structure = {'10.254.0.0/29': {'first': None, 'second': None}}
-    reachability = {'10.254.0.0/29': {'first': {'second': None}, 'second': {'first': None}}}
-    with closing(Pool(vm_factories['linux'])) as pool:
-        vms, _ = setup_networks({'linux': pool}, hypervisor, structure, reachability)
-        yield vms
+def two_linux_vms(vm_factory, hypervisor):
+    with vm_factory.allocated_vm('first') as first_vm, vm_factory.allocated_vm('second') as second_vm:
+        setup_flat_network([first_vm, second_vm], IPNetwork('10.254.0.0/29'), hypervisor)
+        yield first_vm, second_vm
 
 
 @pytest.fixture(scope='session')
-def linux_vm(vm_factories):
-    with closing(Pool(vm_factories['linux'])) as pool:
-        yield pool.get('single')
+def linux_vm(vm_factory):
+    with vm_factory.allocated_vm('single-linux-vm') as vm:
+        yield vm
+
+
+@pytest.fixture(scope='session')
+def windows_vm(vm_factory):
+    with vm_factory.allocated_vm('single-windows-vm', vm_type='windows') as vm:
+        yield vm

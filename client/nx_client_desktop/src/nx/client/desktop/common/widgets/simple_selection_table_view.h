@@ -1,17 +1,17 @@
 #pragma once
 
-#include <ui/widgets/common/table_view.h>
-
-class QnCheckBoxedHeaderView;
+#include <nx/client/desktop/common/widgets/table_view.h>
 
 namespace nx {
 namespace client {
 namespace desktop {
 
-class SimpleSelectionTableView: public QnTableView
+class CheckableHeaderView;
+
+class SimpleSelectionTableView: public TableView
 {
     Q_OBJECT
-    using base_type = QnTableView;
+    using base_type = TableView;
 
 public:
     SimpleSelectionTableView(QWidget* parent = nullptr);
@@ -41,7 +41,7 @@ private:
     void handleHeaderCheckedStateChanged(Qt::CheckState state);
 
 private:
-    QnCheckBoxedHeaderView* m_checkableHeader = nullptr;
+    CheckableHeaderView* m_checkableHeader = nullptr;
     int m_checkboxColumn = 0;
 };
 

@@ -8,19 +8,15 @@ namespace sdk {
 namespace metadata {
 
 /**
- * Each class that implements VideoFrame interface
- * should properly handle this GUID in its queryInterface method
+ * Each class that implements VideoFrame interface should properly handle this GUID in its
+ * queryInterface().
  */
 static const nxpl::NX_GUID IID_UncompressedVideoFrame =
     {{0x46,0xb3,0x52,0x7f,0x17,0xf1,0x4e,0x29,0x98,0x6f,0xfa,0x1a,0xcc,0x87,0xac,0x0d}};
 
-/**
- * @brief The VideoFrame class represents interface of decoded video frame.
- */
 class UncompressedVideoFrame: public MediaFrame
 {
 public:
-
     enum class PixelFormat
     {
         yuv420,
@@ -54,13 +50,10 @@ public:
 
     virtual PixelFormat pixelFormat() const = 0;
 
-    /**
-     * @brief handle type
-     */
     virtual Handle handleType() const = 0;
 
     /**
-     * @brief Return handle number or 0 if handle is not used.
+     * @return Handle, or 0 if there is no handle for this frame.
      */
     virtual int handle() const = 0;
 
@@ -76,6 +69,7 @@ public:
      * @return Success.
      */
     virtual bool map() = 0;
+
     virtual void unmap() = 0;
 };
 

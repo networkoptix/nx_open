@@ -2,7 +2,7 @@
 
 #include <nx/utils/db/query_context.h>
 
-#include <nx_ec/data/api_resource_data.h>
+#include <nx/vms/api/data/resource_data.h>
 
 namespace nx {
 namespace cdb {
@@ -16,7 +16,7 @@ public:
     virtual nx::utils::db::DBResult saveResourceAttribute(
         nx::utils::db::QueryContext* queryContext,
         const std::string& systemId,
-        ::ec2::ApiResourceParamWithRefData data) = 0;
+        nx::vms::api::ResourceParamWithRefData data) = 0;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -32,7 +32,7 @@ public:
     virtual nx::utils::db::DBResult saveResourceAttribute(
         nx::utils::db::QueryContext* queryContext,
         const std::string& systemId,
-        ::ec2::ApiResourceParamWithRefData data) override;
+        nx::vms::api::ResourceParamWithRefData data) override;
 
 private:
     SyncronizationEngine* m_syncronizationEngine;

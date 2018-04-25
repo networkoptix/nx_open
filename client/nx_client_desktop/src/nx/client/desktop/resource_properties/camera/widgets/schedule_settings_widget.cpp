@@ -2,27 +2,29 @@
 #include "ui_schedule_settings_widget.h"
 
 #include <QtGui/QStandardItemModel>
+
 #include <QtWidgets/QListView>
 
-#include <core/resource/media_resource.h>
+#include <nx/client/desktop/common/utils/aligner.h>
+#include <nx/client/desktop/common/utils/stream_quality_strings.h>
 
-#include <ui/common/aligner.h>
 #include <ui/common/read_only.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
+#include <ui/style/custom_style.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
 #include <utils/common/event_processors.h>
 
 #include "../redux/camera_settings_dialog_state.h"
 #include "../redux/camera_settings_dialog_store.h"
-#include <ui/style/custom_style.h>
+#include "../utils/schedule_paint_functions.h"
 
 namespace {
 
 static constexpr int kRecordingTypeLabelFontSize = 12;
 static constexpr int kRecordingTypeLabelFontWeight = QFont::DemiBold;
-static constexpr int kCustomQualityOffset = Qn::StreamQualityCount;
+static constexpr int kCustomQualityOffset = 7;
 
 template<class InputWidget>
 float normalizedValue(const InputWidget* widget)
@@ -44,65 +46,10 @@ namespace desktop {
 
 ScheduleSettingsWidget::ScheduleSettingsWidget(QWidget* parent):
     base_type(parent),
-    ui(new Ui::ScheduleSettingsWidget())
+    ui(new Ui::ScheduleSettingsWidget()),
+    paintFunctions(new SchedulePaintFunctions())
 {
-    ui->setupUi(this);
-
-    QFont labelFont;
-    labelFont.setPixelSize(kRecordingTypeLabelFontSize);
-    labelFont.setWeight(kRecordingTypeLabelFontWeight);
-
-    for (auto label: {
-        ui->labelAlways, ui->labelMotionOnly, ui->labelMotionPlusLQ, ui->labelNoRecord
-    })
-    {
-        label->setFont(labelFont);
-        label->setProperty(style::Properties::kDontPolishFontProperty, true);
-    }
-
-    // Quality combo box contains Qn::StreamQuality constants as user data for normal visible items
-    // (Low, Medium, High, Best), and those constants + customQualityOffset for invisible items
-    // with asterisks (Low*, Medium*, High*, Best*).
-    const auto addQualityItem =
-        [this](Qn::StreamQuality quality)
-        {
-            const auto text = toDisplayString(quality);
-            ui->qualityComboBox->addItem(text, quality);
-            const auto index = ui->qualityComboBox->count();
-            ui->qualityComboBox->addItem(text + lit(" *"), kCustomQualityOffset + quality);
-            qobject_cast<QListView*>(ui->qualityComboBox->view())->setRowHidden(index, true);
-            if (auto model = qobject_cast<QStandardItemModel*>(ui->qualityComboBox->model()))
-                model->item(index)->setFlags(Qt::NoItemFlags);
-        };
-
-    addQualityItem(Qn::QualityLow);
-    addQualityItem(Qn::QualityNormal);
-    addQualityItem(Qn::QualityHigh);
-    addQualityItem(Qn::QualityHighest);
-    ui->qualityComboBox->setCurrentIndex(ui->qualityComboBox->findData(Qn::QualityHigh));
-
-    ui->bitrateSpinBox->setSuffix(lit(" ") + tr("Mbit/s"));
-
-    ui->bitrateSlider->setProperty(
-        style::Properties::kSliderFeatures,
-        static_cast<int>(style::SliderFeature::FillingUp));
-
-    /*
-    installEventHandler(
-        {ui->recordMotionButton, ui->recordMotionPlusLQButton},
-        QEvent::MouseButtonRelease,
-        this,
-        &ScheduleSettingsWidget::at_releaseSignalizer_activated);
-    */
-
-    auto aligner = new QnAligner(this);
-    aligner->addWidgets({ui->fpsLabel, ui->qualityLabel, ui->bitrateLabel});
-
-    // Reset group box bottom margin to zero. Sub-widget margins defined in the ui-file rely on it.
-    ui->settingsGroupBox->ensurePolished();
-    auto margins = ui->settingsGroupBox->contentsMargins();
-    margins.setBottom(0);
-    ui->settingsGroupBox->setContentsMargins(margins);
+    setupUi();
 }
 
 ScheduleSettingsWidget::~ScheduleSettingsWidget() = default;
@@ -142,13 +89,13 @@ void ScheduleSettingsWidget::setStore(CameraSettingsDialogStore* store)
         };
 
     connect(ui->recordAlwaysButton, &QToolButton::toggled, store,
-        makeRecordingTypeHandler(Qn::RT_Always));
+        makeRecordingTypeHandler(Qn::RecordingType::always));
     connect(ui->recordMotionButton, &QToolButton::toggled, store,
-        makeRecordingTypeHandler(Qn::RT_MotionOnly));
+        makeRecordingTypeHandler(Qn::RecordingType::motionOnly));
     connect(ui->recordMotionPlusLQButton, &QToolButton::toggled, store,
-        makeRecordingTypeHandler(Qn::RT_MotionAndLowQuality));
+        makeRecordingTypeHandler(Qn::RecordingType::motionAndLow));
     connect(ui->noRecordButton, &QToolButton::toggled, store,
-        makeRecordingTypeHandler(Qn::RT_Never));
+        makeRecordingTypeHandler(Qn::RecordingType::never));
 
     const auto qualityApproximation =
         [this](int index)
@@ -185,6 +132,69 @@ void ScheduleSettingsWidget::setStore(CameraSettingsDialogStore* store)
         });
 }
 
+void ScheduleSettingsWidget::setupUi()
+{
+    ui->setupUi(this);
+
+    QFont labelFont;
+    labelFont.setPixelSize(kRecordingTypeLabelFontSize);
+    labelFont.setWeight(kRecordingTypeLabelFontWeight);
+
+    for (auto label: {
+        ui->labelAlways, ui->labelMotionOnly, ui->labelMotionPlusLQ, ui->labelNoRecord
+    })
+    {
+        label->setFont(labelFont);
+        label->setProperty(style::Properties::kDontPolishFontProperty, true);
+    }
+
+    // Quality combo box contains Qn::StreamQuality constants as user data for normal visible items
+    // (Low, Medium, High, Best), and those constants + customQualityOffset for invisible items
+    // with asterisks (Low*, Medium*, High*, Best*).
+    const auto addQualityItem =
+        [this](Qn::StreamQuality quality)
+        {
+            const auto text = toDisplayString(quality);
+            ui->qualityComboBox->addItem(text, (int)quality);
+            const auto index = ui->qualityComboBox->count();
+            ui->qualityComboBox->addItem(text + lit(" *"), kCustomQualityOffset + (int)quality);
+            qobject_cast<QListView*>(ui->qualityComboBox->view())->setRowHidden(index, true);
+            if (auto model = qobject_cast<QStandardItemModel*>(ui->qualityComboBox->model()))
+                model->item(index)->setFlags(Qt::NoItemFlags);
+        };
+
+    addQualityItem(Qn::StreamQuality::low);
+    addQualityItem(Qn::StreamQuality::normal);
+    addQualityItem(Qn::StreamQuality::high);
+    addQualityItem(Qn::StreamQuality::highest);
+    ui->qualityComboBox->setCurrentIndex(ui->qualityComboBox->findData((int)Qn::StreamQuality::high));
+
+    ui->bitrateSpinBox->setSuffix(lit(" ") + tr("Mbit/s"));
+
+    ui->bitrateSlider->setProperty(
+        style::Properties::kSliderFeatures,
+        static_cast<int>(style::SliderFeature::FillingUp));
+
+    auto aligner = new Aligner(this);
+    aligner->addWidgets({ui->fpsLabel, ui->qualityLabel, ui->bitrateLabel});
+
+    // Reset group box bottom margin to zero. Sub-widget margins defined in the ui-file rely on it.
+    ui->settingsGroupBox->ensurePolished();
+    auto margins = ui->settingsGroupBox->contentsMargins();
+    margins.setBottom(0);
+    ui->settingsGroupBox->setContentsMargins(margins);
+
+    ui->recordAlwaysButton->setCustomPaintFunction(
+        paintFunctions->paintCellFunction(Qn::RecordingType::always));
+    ui->recordMotionButton->setCustomPaintFunction(
+        paintFunctions->paintCellFunction(Qn::RecordingType::motionOnly));
+    ui->recordMotionPlusLQButton->setCustomPaintFunction(
+        paintFunctions->paintCellFunction(Qn::RecordingType::motionAndLow));
+    ui->noRecordButton->setCustomPaintFunction(
+        paintFunctions->paintCellFunction(Qn::RecordingType::never));
+
+}
+
 void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
 {
     if (!state.supportsSchedule())
@@ -192,10 +202,10 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
 
     const auto& recording = state.recording;
     const auto& brush = recording.brush;
-    const bool recordingParamsEnabled = brush.recordingType != Qn::RT_Never
+    const bool recordingParamsEnabled = brush.recordingType != Qn::RecordingType::never
         && recording.parametersAvailable;
 
-    ui->recordAlwaysButton->setChecked(brush.recordingType == Qn::RT_Always);
+    ui->recordAlwaysButton->setChecked(brush.recordingType == Qn::RecordingType::always);
     setReadOnly(ui->recordAlwaysButton, state.readOnly);
 
     const bool hasMotion = state.hasMotion();
@@ -203,8 +213,13 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
     ui->labelMotionOnly->setEnabled(hasMotion);
     if (hasMotion)
     {
-        ui->recordMotionButton->setChecked(brush.recordingType == Qn::RT_MotionOnly);
+        ui->recordMotionButton->setChecked(brush.recordingType == Qn::RecordingType::motionOnly);
         setReadOnly(ui->recordMotionButton, state.readOnly);
+        ui->recordMotionButton->setToolTip({});
+    }
+    else
+    {
+        ui->recordMotionButton->setToolTip(motionOptionHint(state));
     }
 
     const bool hasDualStreaming = state.hasDualStreaming();
@@ -212,11 +227,16 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
     ui->labelMotionPlusLQ->setEnabled(hasDualStreaming);
     if (hasDualStreaming)
     {
-        ui->recordMotionPlusLQButton->setChecked(brush.recordingType == Qn::RT_MotionAndLowQuality);
+        ui->recordMotionPlusLQButton->setChecked(brush.recordingType == Qn::RecordingType::motionAndLow);
         setReadOnly(ui->recordMotionPlusLQButton, state.readOnly);
+        ui->recordMotionPlusLQButton->setToolTip({});
+    }
+    else
+    {
+        ui->recordMotionPlusLQButton->setToolTip(motionOptionHint(state));
     }
 
-    ui->noRecordButton->setChecked(brush.recordingType == Qn::RT_Never);
+    ui->noRecordButton->setChecked(brush.recordingType == Qn::RecordingType::never);
     setReadOnly(ui->noRecordButton, state.readOnly);
 
     ui->fpsSpinBox->setEnabled(recordingParamsEnabled);
@@ -224,13 +244,12 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
     ui->fpsSpinBox->setValue(brush.fps);
     setReadOnly(ui->fpsSpinBox, state.readOnly);
 
-    const bool automaticBitrate = brush.isAutomaticBitrate()
-        /* && recording.customBitrateAvailable */;
+    const bool automaticBitrate = brush.isAutomaticBitrate();
     ui->qualityComboBox->setEnabled(recordingParamsEnabled);
     setReadOnly(ui->qualityComboBox, state.readOnly);
     ui->qualityComboBox->setCurrentIndex(
         ui->qualityComboBox->findData(
-            brush.quality
+            (int)brush.quality
             + (automaticBitrate ? 0 : kCustomQualityOffset)));
 
     ui->advancedSettingsWidget->setVisible(
@@ -275,50 +294,42 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
     }
 }
 
-/*
-void ScheduleSettingsWidget::at_releaseSignalizer_activated(QObject *target)
+QString ScheduleSettingsWidget::motionOptionHint(const CameraSettingsDialogState& state)
 {
-    QWidget *widget = qobject_cast<QWidget *>(target);
-    if (!widget)
-        return;
+    using CombinedValue = CameraSettingsDialogState::CombinedValue;
+    const bool devicesHaveMotion = state.devicesDescription.hasMotion == CombinedValue::All;
+    const bool devicesHaveDS = state.devicesDescription.hasDualStreaming == CombinedValue::All;
 
-    if (m_cameras.isEmpty() || widget->isEnabled() || (widget->parentWidget() && !widget->parentWidget()->isEnabled()))
-        return;
-
-    using boost::algorithm::all_of;
-
-    if (m_cameras.size() > 1)
+    if (state.isSingleCamera())
     {
-        QnMessageBox::warning(this,
-            tr("Motion detection disabled or not supported"),
-            tr("To ensure it is supported and to enable it, go to the \"Motion\" tab in Camera Settings."));
+        if (devicesHaveMotion && !devicesHaveDS)
+            return tr("Dual-Streaming not supported for this camera");
+
+        if (!devicesHaveMotion && !devicesHaveDS)
+            return tr("Dual-Streaming and motion detection not supported for this camera");
+
+        const bool motionDetectionEnabled = state.singleCameraSettings.enableMotionDetection();
+        if (!motionDetectionEnabled)
+        {
+            return tr("Motion detection disabled")
+                + L'\n'
+                + tr("To enable or adjust it, go to the \"Motion\" tab in Camera Settings");
+        }
+
+        return QString();
     }
-    else // One camera.
+
+    if (!devicesHaveMotion || !devicesHaveDS)
     {
-        NX_ASSERT(m_cameras.size() == 1, Q_FUNC_INFO, "Following options are valid only for singular camera");
-        QnVirtualCameraResourcePtr camera = m_cameras.first();
-
-        // TODO: #GDM #Common duplicate code.
-        bool hasDualStreaming = all_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) { return camera->hasDualStreaming2(); });
-        bool hasMotion = all_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) { return camera->hasMotion(); });
-
-        if (hasMotion && !hasDualStreaming)
-        {
-            QnMessageBox::warning(this, tr("Dual-Streaming not supported for this camera"));
-        }
-        else if (!hasMotion && !hasDualStreaming)
-        {
-            QnMessageBox::warning(this, tr("Dual-Streaming and motion detection not supported for this camera"));
-        }
-        else /// Has dual streaming but not motion.
-        {
-            QnMessageBox::warning(this,
-                tr("Motion detection disabled"),
-                tr("To enable or adjust it, go to the \"Motion\" tab in Camera Settings."));
-        }
+        return tr("Motion detection disabled or not supported")
+            + L'\n'
+            + tr("To ensure it is supported and to enable it, "
+                "go to the \"Motion\" tab in Camera Settings.");
     }
+
+    return QString();
 }
-*/
+
 
 } // namespace desktop
 } // namespace client

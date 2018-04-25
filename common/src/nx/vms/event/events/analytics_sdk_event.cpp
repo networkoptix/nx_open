@@ -16,7 +16,7 @@ AnalyticsSdkEvent::AnalyticsSdkEvent(
     const QString& auxiliaryData,
     qint64 timeStampUsec)
     :
-    base_type(analyticsSdkEvent, resource, toggleState, timeStampUsec),
+    base_type(EventType::analyticsSdkEvent, resource, toggleState, timeStampUsec),
     m_driverId(driverId),
     m_eventId(eventId),
     m_caption(caption),

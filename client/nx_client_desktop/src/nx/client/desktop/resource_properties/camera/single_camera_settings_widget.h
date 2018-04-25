@@ -22,10 +22,10 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-class CameraMotionMaskWidget;
 class CameraAdvancedSettingsWebPage;
+class LegacyCameraMotionMaskWidget;
 
-class SingleCameraSettingsWidget : public Connective<QWidget>, public QnWorkbenchContextAware
+class SingleCameraSettingsWidget: public Connective<QWidget>, public QnWorkbenchContextAware
 {
     Q_OBJECT
     Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
@@ -121,7 +121,7 @@ private:
     bool m_readOnly = false;
     bool m_updating = false;
 
-    CameraMotionMaskWidget* m_motionWidget = nullptr;
+    LegacyCameraMotionMaskWidget* m_motionWidget = nullptr;
     QVBoxLayout* m_motionLayout = nullptr;
     QButtonGroup* m_sensitivityButtons;
 

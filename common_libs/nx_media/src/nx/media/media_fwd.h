@@ -1,20 +1,23 @@
 #pragma once
 
+#include <memory>
+
 class QVideoFrame;
 
 namespace nx {
 
 struct AudioFrame;
 
-typedef std::shared_ptr<QVideoFrame> QVideoFramePtr;
-typedef std::shared_ptr<const QVideoFrame> QnConstVideoFramePtr;
+using QVideoFramePtr = std::shared_ptr<QVideoFrame>;
+using QnConstVideoFramePtr = std::shared_ptr<const QVideoFrame>;
 
-typedef std::shared_ptr<AudioFrame> AudioFramePtr;
-typedef std::shared_ptr<const AudioFrame> ConstAudioFramePtr;
+using AudioFramePtr = std::shared_ptr<AudioFrame>;
+using ConstAudioFramePtr = std::shared_ptr<const AudioFrame>;
 
 namespace media {
 
-class AbstractResourceAllocator;
+struct AbstractRenderContextSynchronizer;
+using RenderContextSynchronizerPtr = std::shared_ptr<AbstractRenderContextSynchronizer>;
 
 static const int kMediaAlignment = 32;
 

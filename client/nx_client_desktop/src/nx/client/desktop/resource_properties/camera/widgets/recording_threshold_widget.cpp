@@ -57,11 +57,11 @@ void RecordingThresholdWidget::loadState(const CameraSettingsDialogState& state)
     if (hasMotion)
     {
         ui->recordBeforeSpinBox->setValue(state.recording.thresholds.beforeSec.valueOr(
-            ec2::kDefaultRecordBeforeMotionSec));
+            nx::vms::api::kDefaultRecordBeforeMotionSec));
         setReadOnly(ui->recordBeforeSpinBox, state.readOnly);
 
         ui->recordAfterSpinBox->setValue(state.recording.thresholds.afterSec.valueOr(
-            ec2::kDefaultRecordAfterMotionSec));
+            nx::vms::api::kDefaultRecordAfterMotionSec));
         setReadOnly(ui->recordAfterSpinBox, state.readOnly);
     }
 }

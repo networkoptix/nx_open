@@ -105,7 +105,6 @@ QN_DEFINE_LEXICAL_ENUM(RequestObject,
     (TestEmailSettingsObject, "testEmailSettings")
     (TestLdapSettingsObject, "testLdapSettings")
     (ModulesInformationObject, "moduleInformation")
-    (ec2CameraHistoryObject, "ec2/cameraHistory")
     (ec2RecordedTimePeriodsObject, "ec2/recordedTimePeriods")
     (ec2BookmarksObject, "ec2/bookmarks")
     (ec2BookmarkAddObject, "ec2/bookmarks/add")
@@ -291,9 +290,6 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse& response
             break;
         case MergeSystemsObject:
             processJsonReply<QnModuleInformation>(this, response, handle);
-            break;
-        case ec2CameraHistoryObject:
-            processFusionReply<ec2::ApiCameraHistoryDataList>(this, response, handle);
             break;
         case ec2RecordedTimePeriodsObject:
             processCompressedPeriodsReply<MultiServerPeriodDataList>(this, response, handle);
@@ -847,7 +843,7 @@ int QnMediaServerConnection::testEmailSettingsAsync(
     nx::network::http::HttpHeaders headers;
     headers.emplace(nx::network::http::header::kContentType, "application/json");
 
-    ec2::ApiEmailSettingsData data;
+    nx::vms::api::EmailSettingsData data;
     ec2::fromResourceToApi(settings, data);
     return sendAsyncPostRequestLogged(TestEmailSettingsObject,
         std::move(headers), QnRequestParamList(), QJson::serialized(data),
@@ -1042,13 +1038,6 @@ int QnMediaServerConnection::modulesInformation(QObject* target, const char* slo
     params << QnRequestParam("allModules", lit("true"));
     return sendAsyncGetRequestLogged(ModulesInformationObject,
         params, QN_STRINGIZE_TYPE(QList<QnModuleInformation>), target, slot);
-}
-
-int QnMediaServerConnection::cameraHistory(
-    const QnChunksRequestData& request, QObject* target, const char* slot)
-{
-    return sendAsyncGetRequestLogged(ec2CameraHistoryObject,
-        request.toParams(), QN_STRINGIZE_TYPE(ec2::ApiCameraHistoryDataList) ,target, slot);
 }
 
 int QnMediaServerConnection::recordedTimePeriods(

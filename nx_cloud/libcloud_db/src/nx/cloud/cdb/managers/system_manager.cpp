@@ -82,21 +82,21 @@ SystemManager::SystemManager(
             std::bind(&SystemManager::onEc2SaveUserDone, this, _1, _2, _3));
 
     m_ec2SyncronizationEngine->incomingTransactionDispatcher().registerTransactionHandler
-        <::ec2::ApiCommand::removeUser, ::ec2::ApiIdData, data::SystemSharing>(
+        <::ec2::ApiCommand::removeUser, nx::vms::api::IdData, data::SystemSharing>(
             std::bind(&SystemManager::processEc2RemoveUser, this, _1, _2, _3, _4),
             std::bind(&SystemManager::onEc2RemoveUserDone, this, _1, _2, _3));
 
     // Currently this transaction can only rename some system.
     m_ec2SyncronizationEngine->incomingTransactionDispatcher().registerTransactionHandler
         <::ec2::ApiCommand::setResourceParam,
-         ::ec2::ApiResourceParamWithRefData,
+         ::nx::vms::api::ResourceParamWithRefData,
          data::SystemAttributesUpdate>(
             std::bind(&SystemManager::processSetResourceParam, this, _1, _2, _3, _4),
             std::bind(&SystemManager::onEc2SetResourceParamDone, this, _1, _2, _3));
 
     m_ec2SyncronizationEngine->incomingTransactionDispatcher().registerTransactionHandler
         <::ec2::ApiCommand::removeResourceParam,
-         ::ec2::ApiResourceParamWithRefData,
+         ::nx::vms::api::ResourceParamWithRefData,
          int>(
             std::bind(&SystemManager::processRemoveResourceParam, this, _1, _2, _3),
             std::bind(&SystemManager::onEc2RemoveResourceParamDone, this, _1, _2));
@@ -1402,7 +1402,7 @@ nx::utils::db::DBResult SystemManager::generateUpdateFullNameTransaction(
     const std::string& newFullName)
 {
     //generating "save full name" transaction
-    ::ec2::ApiResourceParamWithRefData fullNameData;
+    nx::vms::api::ResourceParamWithRefData fullNameData;
     fullNameData.resourceId = QnUuid(sharing.vmsUserId.c_str());
     fullNameData.name = Qn::USER_FULL_NAME;
     fullNameData.value = QString::fromStdString(newFullName);
@@ -1417,7 +1417,7 @@ nx::utils::db::DBResult SystemManager::generateRemoveUserTransaction(
     nx::utils::db::QueryContext* const queryContext,
     const api::SystemSharing& sharing)
 {
-    ::ec2::ApiIdData userId;
+    nx::vms::api::IdData userId;
     ec2::convert(sharing, &userId);
     return m_ec2SyncronizationEngine->transactionLog().generateTransactionAndSaveToLog(
         queryContext,
@@ -1430,7 +1430,7 @@ nx::utils::db::DBResult SystemManager::generateRemoveUserFullNameTransaction(
     nx::utils::db::QueryContext* const queryContext,
     const api::SystemSharing& sharing)
 {
-    ::ec2::ApiResourceParamWithRefData fullNameParam;
+    nx::vms::api::ResourceParamWithRefData fullNameParam;
     fullNameParam.resourceId = QnUuid(sharing.vmsUserId.c_str());
     fullNameParam.name = Qn::USER_FULL_NAME;
     return m_ec2SyncronizationEngine->transactionLog().generateTransactionAndSaveToLog(
@@ -1541,7 +1541,7 @@ nx::utils::db::DBResult SystemManager::renameSystem(
         return result;
 
     // Generating transaction.
-    ::ec2::ApiResourceParamWithRefData systemNameData;
+    nx::vms::api::ResourceParamWithRefData systemNameData;
     systemNameData.resourceId = QnUserResource::kAdminGuid;
     systemNameData.name = nx::settings_names::kNameSystemName;
     systemNameData.value = QString::fromStdString(data.name.get());
@@ -1954,7 +1954,7 @@ nx::utils::db::DBResult SystemManager::processEc2SaveUser(
     }
 
     // Generating "save full name" transaction.
-    ::ec2::ApiResourceParamWithRefData fullNameData;
+    nx::vms::api::ResourceParamWithRefData fullNameData;
     fullNameData.resourceId = vmsUser.id;
     fullNameData.name = Qn::USER_FULL_NAME;
     fullNameData.value = QString::fromStdString(account.fullName);
@@ -1979,7 +1979,7 @@ void SystemManager::onEc2SaveUserDone(
 nx::utils::db::DBResult SystemManager::processEc2RemoveUser(
     nx::utils::db::QueryContext* queryContext,
     const nx::String& systemId,
-    ::ec2::QnTransaction<::ec2::ApiIdData> transaction,
+    ::ec2::QnTransaction<nx::vms::api::IdData> transaction,
     data::SystemSharing* const systemSharingData)
 {
     const auto& data = transaction.params;
@@ -2031,7 +2031,7 @@ void SystemManager::onEc2RemoveUserDone(
 nx::utils::db::DBResult SystemManager::processSetResourceParam(
     nx::utils::db::QueryContext* queryContext,
     const nx::String& systemId,
-    ::ec2::QnTransaction<::ec2::ApiResourceParamWithRefData> transaction,
+    ::ec2::QnTransaction<nx::vms::api::ResourceParamWithRefData> transaction,
     data::SystemAttributesUpdate* const systemNameUpdate)
 {
     const auto& data = transaction.params;
@@ -2067,7 +2067,7 @@ void SystemManager::onEc2SetResourceParamDone(
 nx::utils::db::DBResult SystemManager::processRemoveResourceParam(
     nx::utils::db::QueryContext* /*queryContext*/,
     const nx::String& systemId,
-    ::ec2::QnTransaction<::ec2::ApiResourceParamWithRefData> data)
+    ::ec2::QnTransaction<nx::vms::api::ResourceParamWithRefData> data)
 {
     // This can only be removal of already-removed user attribute.
     NX_LOGX(

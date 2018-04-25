@@ -53,11 +53,6 @@
       <translation>发现的系统 %1 有不兼容的版本 %2。</translation>
     </message>
     <message>
-      <source>Cannot connect to the other System because current System is already connected to %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>无法连接到另一个系统，因为当前的系统已连接到 %1。</translation>
-    </message>
-    <message>
       <source>The discovered System %1 is in safe mode.</source>
       <comment>%1 is name of System</comment>
       <translation>发现的系统 %1 是在安全模式下。</translation>
@@ -66,16 +61,6 @@
       <source>Could not configure the remote System %1.</source>
       <comment>%1 is name of System</comment>
       <translation>不能配置远程系统 %1。</translation>
-    </message>
-    <message>
-      <source>Both Systems are connected to %1. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>这两个系统连接到 %1。合并不是允许的。</translation>
-    </message>
-    <message>
-      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>这些系统都采用了不同的 %1 URL。合并不是允许的。</translation>
     </message>
     <message>
       <source>New System</source>
@@ -87,9 +72,24 @@
       <translation>发现的系统%1与当前系统不兼容。</translation>
     </message>
     <message>
+      <source>Cannot connect to the other System because current System is already connected to %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>无法连接到另一个系统，因为当前的系统已连接到 %1。</translation>
+    </message>
+    <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation type="unfinished">%1 System can only be merged with non-%1. System name and password are taken from %1 System.</translation>
+    </message>
+    <message>
+      <source>Both Systems are connected to %1. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>这两个系统连接到 %1。合并不是允许的。</translation>
+    </message>
+    <message>
+      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>这些系统都采用了不同的 %1 URL。合并不是允许的。</translation>
     </message>
   </context>
   <context>

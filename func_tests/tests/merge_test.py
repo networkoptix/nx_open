@@ -10,6 +10,7 @@ import pytest
 
 import server_api_data_generators as generator
 from framework.api_shortcuts import get_local_system_id, get_server_id, get_system_settings
+from framework.mediaserver import MEDIASERVER_MERGE_TIMEOUT
 from framework.merging import (
     ExplicitMergeError,
     detach_from_cloud,
@@ -18,8 +19,8 @@ from framework.merging import (
     setup_local_system,
     )
 from framework.rest_api import HttpError
-from framework.server import MEDIASERVER_MERGE_TIMEOUT
-from framework.utils import bool_to_str, datetime_utc_now, str_to_bool, wait_until
+from framework.utils import bool_to_str, datetime_utc_now, str_to_bool
+from framework.waiting import wait_for_true
 
 log = logging.getLogger(__name__)
 
@@ -43,9 +44,9 @@ def change_bool_setting(server, setting):
 
 
 def wait_for_settings_merge(one, two):
-    assert wait_until(
+    wait_for_true(
         lambda: get_system_settings(one.api) == get_system_settings(two.api),
-        name='for same response to /api/systemSettings from {} and {}'.format(one.machine.alias, two.machine.alias))
+        '{} and {} response identically to /api/systemSettings'.format(one.machine.alias, two.machine.alias))
 
 
 def check_admin_disabled(server):
@@ -61,16 +62,16 @@ def check_admin_disabled(server):
 
 
 @pytest.fixture
-def one(two_linux_servers, test_system_settings):
-    one, _ = two_linux_servers
+def one(two_linux_mediaservers, test_system_settings):
+    one, _ = two_linux_mediaservers
     one.start()
     setup_local_system(one, test_system_settings)
     return one
 
 
 @pytest.fixture
-def two(two_linux_servers):
-    _, two = two_linux_servers
+def two(two_linux_mediaservers):
+    _, two = two_linux_mediaservers
     two.start()
     setup_local_system(two, {})
     return two
@@ -91,23 +92,23 @@ def test_merge_take_local_settings(one, two, test_system_settings):
     check_system_settings(one, **test_system_settings)
 
     # On each server update some globalSettings to different values
-    expected_arecontRtspEnabled = change_bool_setting(one, 'arecontRtspEnabled')
-    expected_auditTrailEnabled = not change_bool_setting(two, 'auditTrailEnabled')
+    expected_arecont_rtsp_enabled = change_bool_setting(one, 'arecontRtspEnabled')
+    expected_audit_trail_enabled = not change_bool_setting(two, 'auditTrailEnabled')
 
     # Merge systems (takeRemoteSettings = false)
     merge_systems(two, one)
     wait_for_settings_merge(one, two)
     check_system_settings(
       one,
-      arecontRtspEnabled=bool_to_str(expected_arecontRtspEnabled),
-      auditTrailEnabled=bool_to_str(expected_auditTrailEnabled))
+      arecontRtspEnabled=bool_to_str(expected_arecont_rtsp_enabled),
+      auditTrailEnabled=bool_to_str(expected_audit_trail_enabled))
 
     # Ensure both servers are merged and sync
-    expected_arecontRtspEnabled = not change_bool_setting(one, 'arecontRtspEnabled')
+    expected_arecont_rtsp_enabled = not change_bool_setting(one, 'arecontRtspEnabled')
     wait_for_settings_merge(one, two)
     check_system_settings(
         two,
-        arecontRtspEnabled=bool_to_str(expected_arecontRtspEnabled))
+        arecontRtspEnabled=bool_to_str(expected_arecont_rtsp_enabled))
 
     assert not one.installation.list_core_dumps()
     assert not two.installation.list_core_dumps()
@@ -118,30 +119,30 @@ def test_merge_take_local_settings(one, two, test_system_settings):
 @pytest.mark.local
 def test_merge_take_remote_settings(one, two):
     # On each server update some globalSettings to different values
-    expected_arecontRtspEnabled = not change_bool_setting(one, 'arecontRtspEnabled')
-    expected_auditTrailEnabled = not change_bool_setting(two, 'auditTrailEnabled')
+    expected_arecont_rtsp_enabled = not change_bool_setting(one, 'arecontRtspEnabled')
+    expected_audit_trail_enabled = not change_bool_setting(two, 'auditTrailEnabled')
 
     # Merge systems (takeRemoteSettings = true)
     merge_systems(two, one, take_remote_settings=True)
     wait_for_settings_merge(one, two)
     check_system_settings(
       one,
-      arecontRtspEnabled=bool_to_str(expected_arecontRtspEnabled),
-      auditTrailEnabled=bool_to_str(expected_auditTrailEnabled))
+      arecontRtspEnabled=bool_to_str(expected_arecont_rtsp_enabled),
+      auditTrailEnabled=bool_to_str(expected_audit_trail_enabled))
 
     # Ensure both servers are merged and sync
-    expected_auditTrailEnabled = not change_bool_setting(one, 'auditTrailEnabled')
+    expected_audit_trail_enabled = not change_bool_setting(one, 'auditTrailEnabled')
     wait_for_settings_merge(one, two)
     check_system_settings(
         two,
-        auditTrailEnabled=bool_to_str(expected_auditTrailEnabled))
+        auditTrailEnabled=bool_to_str(expected_audit_trail_enabled))
 
     assert not one.installation.list_core_dumps()
     assert not two.installation.list_core_dumps()
 
 
-def test_merge_cloud_with_local(two_linux_servers, cloud_account, test_system_settings):
-    one, two = two_linux_servers
+def test_merge_cloud_with_local(two_linux_mediaservers, cloud_account, test_system_settings):
+    one, two = two_linux_mediaservers
 
     one.start()
     setup_cloud_system(one, cloud_account, test_system_settings)
@@ -168,11 +169,11 @@ def test_merge_cloud_with_local(two_linux_servers, cloud_account, test_system_se
 
 # https://networkoptix.atlassian.net/wiki/spaces/SD/pages/71467018/Merge+systems+test#Mergesystemstest-test_merge_cloud_systems
 @pytest.mark.parametrize('take_remote_settings', [True, False], ids=['settings_from_remote', 'settings_from_local'])
-def test_merge_cloud_systems(two_linux_servers, cloud_account_factory, take_remote_settings):
+def test_merge_cloud_systems(two_linux_mediaservers, cloud_account_factory, take_remote_settings):
     cloud_account_1 = cloud_account_factory()
     cloud_account_2 = cloud_account_factory()
 
-    one, two = two_linux_servers
+    one, two = two_linux_mediaservers
 
     one.start()
     setup_cloud_system(one, cloud_account_1, {})
@@ -195,8 +196,8 @@ def test_merge_cloud_systems(two_linux_servers, cloud_account_factory, take_remo
     assert not two.installation.list_core_dumps()
 
 
-def test_cloud_merge_after_disconnect(two_linux_servers, cloud_account, test_system_settings):
-    one, two = two_linux_servers
+def test_cloud_merge_after_disconnect(two_linux_mediaservers, cloud_account, test_system_settings):
+    one, two = two_linux_mediaservers
 
     one.start()
     setup_cloud_system(one, cloud_account, test_system_settings)
@@ -216,11 +217,11 @@ def test_cloud_merge_after_disconnect(two_linux_servers, cloud_account, test_sys
     wait_for_settings_merge(one, two)
 
     # Ensure both servers are merged and sync
-    expected_auditTrailEnabled = not change_bool_setting(one, 'auditTrailEnabled')
+    expected_audit_trail_enabled = not change_bool_setting(one, 'auditTrailEnabled')
     wait_for_settings_merge(one, two)
     check_system_settings(
         two,
-        auditTrailEnabled=bool_to_str(expected_auditTrailEnabled))
+        auditTrailEnabled=bool_to_str(expected_audit_trail_enabled))
 
     assert not one.installation.list_core_dumps()
     assert not two.installation.list_core_dumps()
@@ -241,8 +242,8 @@ def wait_entity_merge_done(one, two, method, api_object, api_method, expected_re
 
 
 @pytest.mark.local
-def test_merge_resources(two_running_linux_servers):
-    one, two = two_running_linux_servers
+def test_merge_resources(two_running_linux_mediaservers):
+    one, two = two_running_linux_mediaservers
     user_data = generator.generate_user_data(1)
     camera_data = generator.generate_camera_data(1)
     one.api.ec2.saveUser.POST(**user_data)
@@ -277,11 +278,11 @@ def test_restart_one_server(one, two, cloud_account):
     two.api.get('ec2/getUsers')
 
     # Ensure both servers are merged and sync
-    expected_arecontRtspEnabled = not change_bool_setting(one, 'arecontRtspEnabled')
+    expected_arecont_rtsp_enabled = not change_bool_setting(one, 'arecontRtspEnabled')
     wait_for_settings_merge(one, two)
     check_system_settings(
         two,
-        arecontRtspEnabled=bool_to_str(expected_arecontRtspEnabled))
+        arecontRtspEnabled=bool_to_str(expected_arecont_rtsp_enabled))
 
     assert not one.installation.list_core_dumps()
     assert not two.installation.list_core_dumps()

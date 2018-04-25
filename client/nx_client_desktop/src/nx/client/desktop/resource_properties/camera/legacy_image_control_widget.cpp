@@ -2,13 +2,12 @@
 #include "ui_legacy_image_control_widget.h"
 
 #include <core/resource/camera_resource.h>
-
-#include <ui/common/aligner.h>
 #include <ui/common/read_only.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-
 #include <ui/workaround/widgets_signals_workaround.h>
+
+#include <nx/client/desktop/common/utils/aligner.h>
 #include <nx/utils/algorithm/same.h>
 
 namespace {
@@ -54,7 +53,7 @@ LegacyImageControlWidget::LegacyImageControlWidget(QWidget *parent)
     connect(ui->rotationComboBox, QnComboboxCurrentIndexChanged,
             this, notifyAboutChanges);
 
-    m_aligner = new QnAligner(this);
+    m_aligner = new Aligner(this);
     m_aligner->addWidgets({ui->rotationLabel, ui->aspectRatioLabel});
 }
 
@@ -62,7 +61,7 @@ LegacyImageControlWidget::~LegacyImageControlWidget()
 {
 }
 
-QnAligner* LegacyImageControlWidget::aligner() const
+Aligner* LegacyImageControlWidget::aligner() const
 {
     return m_aligner;
 }

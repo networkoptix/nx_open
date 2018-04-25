@@ -22,7 +22,7 @@ class ProxyVideoDecoder:
     public AbstractVideoDecoder
 {
 public:
-    ProxyVideoDecoder(const ResourceAllocatorPtr& allocator, const QSize& resolution);
+    ProxyVideoDecoder(const RenderContextSynchronizerPtr& allocator, const QSize& resolution);
 
     virtual ~ProxyVideoDecoder();
 

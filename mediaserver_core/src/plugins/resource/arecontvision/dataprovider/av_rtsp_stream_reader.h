@@ -23,7 +23,7 @@ class QnArecontRtspStreamReader
     typedef QnBasicAvStreamReader<CLServerPushStreamReader> parent_type;
 
 public:
-    QnArecontRtspStreamReader(const QnResourcePtr& res);
+    QnArecontRtspStreamReader(const QnPlAreconVisionResourcePtr& res);
     virtual ~QnArecontRtspStreamReader();
 
     virtual QnConstResourceAudioLayoutPtr getDPAudioLayout() const override;

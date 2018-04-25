@@ -29,7 +29,7 @@ protected:
     {
         auto mediaServerClient = prepareMediaServerClient();
 
-        ec2::ApiResourceParamWithRefDataList params;
+        nx::vms::api::ResourceParamWithRefDataList params;
         params.resize(1);
         params.back().resourceId = QnUserResource::kAdminGuid;
         params.back().name = nx::settings_names::kNameCloudSystemId;
@@ -79,7 +79,7 @@ protected:
         auto mediaServerClient = prepareMediaServerClient();
         for (;;)
         {
-            ec2::ApiResourceParamDataList vmsSettings;
+            nx::vms::api::ResourceParamDataList vmsSettings;
             ec2::ErrorCode resultCode = mediaServerClient->ec2GetSettings(&vmsSettings);
             ASSERT_EQ(ec2::ErrorCode::ok, resultCode);
 
@@ -95,7 +95,7 @@ protected:
     }
 
 private:
-    QString getValueByName(const ec2::ApiResourceParamDataList& values, const QString& name)
+    QString getValueByName(const nx::vms::api::ResourceParamDataList& values, const QString& name)
     {
         for (const auto& nameAndValue: values)
         {

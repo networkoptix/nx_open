@@ -47,7 +47,7 @@ protected:
         client.setUserCredentials(nx::network::http::Credentials(
             accountEmail().c_str(),
             nx::network::http::PasswordAuthToken(accountPassword().c_str())));
-        ec2::ApiResourceParamDataList vmsSettings;
+        nx::vms::api::ResourceParamDataList vmsSettings;
         ASSERT_EQ(ec2::ErrorCode::ok, client.ec2GetSettings(&vmsSettings));
     }
 
@@ -81,7 +81,7 @@ protected:
             "admin",
             nx::network::http::PasswordAuthToken("admin")));
 
-        ec2::ApiResourceParamDataList vmsSettings;
+        nx::vms::api::ResourceParamDataList vmsSettings;
         ASSERT_EQ(
             ec2::ErrorCode::ok,
             client.ec2GetSettings(&vmsSettings));

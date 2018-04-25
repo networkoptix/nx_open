@@ -3,8 +3,7 @@
 #include <QtCore/QObject>
 
 #include <nx/streaming/video_data_packet.h>
-
-#include "media_fwd.h"
+#include <nx/media/media_fwd.h>
 
 namespace nx {
 namespace media {
@@ -26,7 +25,7 @@ public:
     typedef std::function<QRect()> VideoGeometryAccessor;
 
 public:
-    SeamlessVideoDecoder();
+    SeamlessVideoDecoder(RenderContextSynchronizerPtr renderContextSynchronizer);
 
     virtual ~SeamlessVideoDecoder();
 

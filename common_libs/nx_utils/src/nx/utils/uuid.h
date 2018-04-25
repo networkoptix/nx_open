@@ -66,6 +66,14 @@ public:
     static QnUuid fromStringSafe(const char* uuid);
     static QnUuid fromStringSafe(const std::string& uuid);
 
+    /**
+     * Create fixed QnUuid from any data. As a value of uuid the MD5 hash is taken so created uuids
+     * will be equal for equal strings given. Also there is a collision possibility.
+     */
+    static QnUuid fromArbitraryData(const QByteArray& data);
+    static QnUuid fromArbitraryData(const QString& data);
+    static QnUuid fromArbitraryData(const std::string& data);
+
 private:
     QUuid m_uuid;
 

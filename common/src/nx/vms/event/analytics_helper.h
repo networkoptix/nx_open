@@ -53,7 +53,7 @@ public:
     struct PluginActions
     {
         QnUuid driverId;
-        QList<api::AnalyticsManifestObjectAction> actions;
+        QList<nx::api::AnalyticsManifestObjectAction> actions;
     };
 
     static QList<PluginActions> availableActions(

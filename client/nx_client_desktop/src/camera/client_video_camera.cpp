@@ -1,14 +1,18 @@
 #include "client_video_camera.h"
 
+#include <client/client_module.h>
+
 #include <nx/utils/log/log.h>
 
 #include <nx/streaming/abstract_media_stream_data_provider.h>
+#include <nx/streaming/rtsp_client_archive_delegate.h>
+#include <nx/streaming/archive_stream_reader.h>
+
 #include <core/resource/media_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/security_cam_resource.h>
+#include <core/dataprovider/data_provider_factory.h>
 
-#include <nx/streaming/rtsp_client_archive_delegate.h>
-#include <nx/streaming/archive_stream_reader.h>
 #include <nx/network/http/custom_headers.h>
 #include <nx/client/desktop/export/tools/export_timelapse_recorder.h>
 
@@ -155,7 +159,8 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
         }
         else
         {
-            auto tmpReader = m_resource->toResource()->createDataProvider(Qn::CR_Default);
+            auto tmpReader = qnClientModule->dataProviderFactory()->createDataProvider(
+                m_resource->toResourcePtr());
             QnAbstractArchiveStreamReader* archiveReader = dynamic_cast<QnAbstractArchiveStreamReader*> (tmpReader);
             if (!archiveReader)
             {

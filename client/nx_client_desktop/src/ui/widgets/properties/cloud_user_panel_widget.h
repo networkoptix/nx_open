@@ -2,19 +2,16 @@
 
 #include <QtWidgets/QWidget>
 
-#include <ui/widgets/common/panel.h>
+#include <nx/client/desktop/common/widgets/panel.h>
 
-namespace Ui {
-class CloudUserPanelWidget;
-}
-
-class AbstractAccessor;
+namespace Ui { class CloudUserPanelWidget; }
+namespace nx { namespace client { namespace desktop { class AbstractAccessor; }}}
 
 /** Widget for displaying cloud user heading. */
-class QnCloudUserPanelWidget: public QnPanel
+class QnCloudUserPanelWidget: public nx::client::desktop::Panel
 {
     Q_OBJECT
-    using base_type = QnPanel;
+    using base_type = nx::client::desktop::Panel;
 
 public:
     QnCloudUserPanelWidget(QWidget* parent = nullptr);
@@ -29,7 +26,7 @@ public:
     QString fullName() const;
     void setFullName(const QString& value);
 
-    static AbstractAccessor* createIconWidthAccessor();
+    static nx::client::desktop::AbstractAccessor* createIconWidthAccessor();
 
 private:
     void updateManageAccountLink();

@@ -19,7 +19,17 @@ namespace metadata {
 class CommonPlugin: public nxpt::CommonRefCounter<Plugin>
 {
 protected:
-    CommonPlugin(const char* name);
+    /**
+     * @param name Full plugin name in English, capitalized as a header.
+     * @param libName Short plugin name: small_letters_and_underscores, as in the library filename.
+     * @param enableOutput Enables NX_OUTPUT. Typically, use NX_DEBUG_ENABLE_OUTPUT as a value.
+     * @param printPrefix Prefix for NX_PRINT and NX_OUTPUT. If empty, will be made from libName.
+     */
+    CommonPlugin(
+        const std::string& name,
+        const std::string& libName,
+        bool enableOutput,
+        const std::string& printPrefix = "");
 
     virtual std::string capabilitiesManifest() const = 0;
 
@@ -34,9 +44,6 @@ protected:
      * error.
      */
     std::string getParamValue(const char* paramName);
-
-    /** Enable or disable verbose debug output via NX_OUTPUT from methods of this class. */
-    void setEnableOutput(bool value) { m_enableOutput = value; }
 
     /**
      * Action handler. Called when some action defined by this plugin is triggered by Server.
@@ -63,6 +70,16 @@ protected:
 public:
     virtual ~CommonPlugin() override;
 
+    std::string libName() const { return m_libName; }
+
+    /**
+     * Allows to define the following marco before including nx/kit/debug.h in the derived class:
+     * #define NX_PRINT_PREFIX printPrefix()
+     */
+    std::string printPrefix() const { return m_printPrefix; }
+
+    bool enableOutput() const { return m_enableOutput; }
+
 //-------------------------------------------------------------------------------------------------
 // Not intended to be used by a descendant.
 
@@ -82,8 +99,11 @@ private:
         const char* func) const;
 
 private:
-    bool m_enableOutput = false;
-    const char* const m_name;
+    const std::string m_name;
+    const std::string m_libName;
+    const bool m_enableOutput;
+    const std::string m_printPrefix;
+
     std::map<std::string, std::string> m_settings;
     mutable std::string m_manifest; //< Cache the manifest to guarantee a lifetime for char*.
 };

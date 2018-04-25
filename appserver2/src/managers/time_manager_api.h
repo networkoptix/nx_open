@@ -1,27 +1,11 @@
-/**********************************************************
-* 27 aug 2014
-* a.kolesnikov
-***********************************************************/
-
-#ifndef TIME_MANAGER_API_H
-#define TIME_MANAGER_API_H
+#pragma once
 
 #include <nx_ec/ec_api.h>
-
+#include <nx/utils/concurrent.h>
 
 namespace ec2
 {
     class TimeSynchronizationManager;
-
-    template<typename QueryProcessorType>
-    class QnTimeNotificationManager : public AbstractTimeNotificationManager
-    {
-    public:
-        QnTimeNotificationManager(TimeSynchronizationManager* timeSyncManager);
-        ~QnTimeNotificationManager();
-    private:
-        QPointer<TimeSynchronizationManager> m_timeSyncManager;
-    };
 
     template<class QueryProcessorType>
     class QnTimeManager
@@ -47,6 +31,53 @@ namespace ec2
         TimeSynchronizationManager* m_timeSyncManager;
         Qn::UserAccessData m_userAccessData;
     };
-}
 
-#endif  //TIME_MANAGER_API_H
+    template<class QueryProcessorType>
+    QnTimeManager<QueryProcessorType>::QnTimeManager(
+        QueryProcessorType* queryProcessor,
+        TimeSynchronizationManager* timeSyncManager,
+        const Qn::UserAccessData &userAccessData)
+    :
+        m_queryProcessor( queryProcessor ),
+        m_timeSyncManager(timeSyncManager),
+        m_userAccessData(userAccessData)
+    {
+    }
+
+    template<class QueryProcessorType>
+    QnTimeManager<QueryProcessorType>::~QnTimeManager()
+    {
+    }
+
+    template<class QueryProcessorType>
+    int QnTimeManager<QueryProcessorType>::getCurrentTimeImpl( impl::CurrentTimeHandlerPtr handler )
+    {
+        const int reqID = generateRequestID();
+        nx::utils::concurrent::run(
+            Ec2ThreadPool::instance(),
+            std::bind( &impl::CurrentTimeHandler::done, handler, reqID, ec2::ErrorCode::ok, m_timeSyncManager->getSyncTime() ) );
+        return reqID;
+    }
+
+    template<class QueryProcessorType>
+    int QnTimeManager<QueryProcessorType>::forcePrimaryTimeServerImpl( const QnUuid& serverGuid, impl::SimpleHandlerPtr handler )
+    {
+        const int reqID = generateRequestID();
+
+        using namespace std::placeholders;
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+            ApiCommand::forcePrimaryTimeServer,
+            nx::vms::api::IdData(serverGuid),
+            std::bind( &impl::SimpleHandler::done, handler, reqID, _1) );
+
+        return reqID;
+    }
+
+    template<class QueryProcessorType>
+    void QnTimeManager<QueryProcessorType>::forceTimeResync()
+    {
+        return m_timeSyncManager->forceTimeResync();
+    }
+
+} // namespace ec2
+

@@ -9,6 +9,7 @@ class QnCloudResultMessages final
 public:
     QnCloudResultMessages() = delete;
 
-    static QString invalidCredentials();
+    static QString accountNotFound();
+    static QString invalidPassword();
     static QString accountNotActivated();
 };

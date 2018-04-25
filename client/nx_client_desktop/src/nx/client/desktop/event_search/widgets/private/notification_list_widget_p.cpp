@@ -10,7 +10,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <utils/common/event_processors.h>
-#include <ui/common/custom_painted.h>
+#include <nx/client/desktop/common/utils/custom_painted.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/models/sort_filter_list_model.h>

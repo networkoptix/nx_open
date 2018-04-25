@@ -29,7 +29,7 @@ const QString kAction = lit("action");
 
 HanwhaRequestHelper::HanwhaRequestHelper(
     const std::shared_ptr<HanwhaSharedResourceContext>& resourceContext,
-    int bypassChannel)
+    boost::optional<int> bypassChannel)
 :
     m_resourceContext(resourceContext),
     m_bypassChannel(bypassChannel)
@@ -202,9 +202,7 @@ bool HanwhaRequestHelper::doRequestInternal(
     httpClient.setMessageBodyReadTimeoutMs(kHttpTimeout.count());
     httpClient.setResponseReadTimeoutMs(kHttpTimeout.count());
 
-    auto realUrl = m_bypassChannel == kHanwhaNoBypassChannel
-        ? url
-        : makeBypassUrl(url);
+    auto realUrl = m_bypassChannel == boost::none ? url : makeBypassUrl(url);
 
     QnSemaphoreLocker lock(m_resourceContext->requestSemaphore());
     if (!httpClient.doGet(realUrl))
@@ -233,7 +231,7 @@ HanwhaResponse HanwhaRequestHelper::splitAndDoRequest(
     if (!m_resourceContext)
     {
         return HanwhaResponse(nx::network::http::StatusCode::serviceUnavailable,
-            lit("Resource is not initilized, try different server"));
+            lit("Resource is not initialized, try different server"));
     }
 
     auto split = path.split(L'/');
@@ -256,21 +254,28 @@ HanwhaResponse HanwhaRequestHelper::splitAndDoRequest(
 
 nx::utils::Url HanwhaRequestHelper::makeBypassUrl(const nx::utils::Url& url) const
 {
+    const bool isChannelCorrect = m_bypassChannel != boost::none;
+    NX_ASSERT(isChannelCorrect);
+    if (!isChannelCorrect)
+        return nx::utils::Url();
+
     nx::utils::Url bypassUrl(url);
     bypassUrl.setPath(lit("/stw-cgi/bypass.cgi"));
 
     QUrlQuery bypassQuery;
     bypassQuery.addQueryItem(lit("msubmenu"), lit("bypass"));
     bypassQuery.addQueryItem(lit("action"), lit("control"));
-    bypassQuery.addQueryItem(lit("Channel"), QString::number(m_bypassChannel));
+    bypassQuery.addQueryItem(lit("Channel"), QString::number(m_bypassChannel.get()));
 
-    QString bypassUriString = url.path();
-    QUrlQuery query(url.query());
-    query.removeQueryItem(kHanwhaChannelProperty);
-    if (!query.isEmpty())
-        bypassUriString.append(lit("?")).append(query.toString());
+    nx::utils::Url proxiedUrl(url);
+    QUrlQuery proxiedUrlQuery(proxiedUrl.query());
+    proxiedUrlQuery.removeQueryItem(kHanwhaChannelProperty);
+    proxiedUrl.setHost(QString());
+    proxiedUrl.setQuery(proxiedUrlQuery);
 
-    bypassQuery.addQueryItem(lit("BypassURI"), bypassUriString);
+    bypassQuery.addQueryItem(
+        lit("BypassURI"),
+        proxiedUrl.toString(QUrl::RemoveScheme | QUrl::RemoveAuthority));
 
     bypassUrl.setQuery(bypassQuery);
     return bypassUrl;

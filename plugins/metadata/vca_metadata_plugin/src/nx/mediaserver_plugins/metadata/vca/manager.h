@@ -2,15 +2,18 @@
 
 #include <chrono>
 
-#include <QtCore/QObject>
 #include <QtCore/QUrl>
-#include <QtCore/QString>
 #include <QtNetwork/QAuthenticator>
 
-#include <nx/utils/thread/mutex.h>
-#include <plugins/plugin_tools.h>
-#include <nx/sdk/metadata/camera_manager.h>
 #include <nx/utils/elapsed_timer_thread_safe.h>
+#include <nx/utils/system_error.h>
+
+#include <nx/network/aio/timer.h>
+#include <nx/network/socket_global.h>
+
+#include <plugins/plugin_tools.h>
+
+#include <nx/sdk/metadata/camera_manager.h>
 
 #include <nx/network/aio/timer.h>
 #include <nx/network/system_socket.h>
@@ -52,6 +55,10 @@ public:
 
     void onReceive(SystemError::ErrorCode, size_t);
 
+    void onConnect(SystemError::ErrorCode code);
+
+    void reconnectSocket();
+
     virtual nx::sdk::Error startFetchingMetadata(
         nxpl::NX_GUID* eventTypeList, int eventTypeListSize) override;
 
@@ -82,9 +89,13 @@ private:
     QByteArray m_cameraManifest;
     ElapsedEvents m_eventsToCatch;
     QByteArray m_buffer;
-    nx::network::TCPSocket* m_tcpSocket = nullptr;
     nx::sdk::metadata::MetadataHandler* m_handler = nullptr;
-    nx::network::aio::Timer m_timer;
+
+    //nx::network::TCPSocket* m_tcpSocket = nullptr;
+    std::unique_ptr<nx::network::TCPSocket> m_tcpSocket;
+    nx::network::aio::Timer m_stopEventTimer;
+    nx::network::aio::Timer m_reconnectTimer;
+    network::SocketAddress m_cameraAddress;
 };
 
 } // namespace vca

@@ -17,10 +17,10 @@ class QnBasicAvStreamReader
     public StreamProviderType
 {
 public:
-    QnBasicAvStreamReader(const QnResourcePtr& res)
+    QnBasicAvStreamReader(const QnPlAreconVisionResourcePtr& res)
     :
         StreamProviderType(res),
-        m_needUpdateParams(true)
+        m_camera(res)
     {
         QSize maxResolution = getMaxSensorSize();
 
@@ -65,11 +65,8 @@ public:
         else
             resolution = QLatin1String("half");
 
-        QnResourcePtr res = this->getResource();
-        QnPlAreconVisionResourcePtr avRes = res.staticCast<QnPlAreconVisionResource>();
-
-        if (avRes->isPanoramic())
-            avRes->setApiParameter("resolution", resolution);
+        if (m_camera->isPanoramic())
+            m_camera->setApiParameter("resolution", resolution);
         else
             this->m_streamParam.insert("resolution", resolution);
 
@@ -77,19 +74,19 @@ public:
         int avQuality = 0;
         switch (q)
         {
-            case Qn::QualityHighest:
+            case Qn::StreamQuality::highest:
                 avQuality = 19;
                 break;
-            case Qn::QualityHigh:
+            case Qn::StreamQuality::high:
                  avQuality = 13;
                 break;
-            case Qn::QualityNormal:
+            case Qn::StreamQuality::normal:
                 avQuality = 8;
                 break;
-            case Qn::QualityLow:
+            case Qn::StreamQuality::low:
                 avQuality = 4;
                 break;
-            case Qn::QualityLowest:
+            case Qn::StreamQuality::lowest:
                 avQuality = 1;
                 break;
             default:
@@ -97,8 +94,8 @@ public:
         }
         if (avQuality > 0)
         {
-            if (avRes->isPanoramic())
-                avRes->setApiParameter("Quality", QString::number(avQuality));
+            if (m_camera->isPanoramic())
+                m_camera->setApiParameter("Quality", QString::number(avQuality));
             else
                 this->m_streamParam.insert("Quality", avQuality);
         }
@@ -126,9 +123,11 @@ public:
             pleaseReopenStream();
     }
 protected:
+    QnPlAreconVisionResourcePtr m_camera;
     QHash<QByteArray, QVariant> m_streamParam;
+
 private:
-    bool m_needUpdateParams;
+    bool m_needUpdateParams = true;
     mutable QnMutex m_needUpdateMtx;
 };
 

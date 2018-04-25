@@ -15,6 +15,7 @@
 #include <ui/models/camera_list_model.h>
 #include <ui/models/resource_search_proxy_model.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/desktop/resource_views/data/node_type.h>
 #include <ui/utils/table_export_helper.h>
 
 #include <ui/help/help_topic_accessor.h>
@@ -26,6 +27,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workaround/hidpi_workarounds.h>
 
+using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
 
 QnCameraListDialog::QnCameraListDialog(QWidget *parent):
@@ -60,7 +62,7 @@ QnCameraListDialog::QnCameraListDialog(QWidget *parent):
 
     ui->camerasView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->camerasView->setModel(m_resourceSearch);
-    connect(ui->filterLineEdit, &QnSearchLineEdit::textChanged,                 this,   &QnCameraListDialog::updateCriterion);
+    connect(ui->filterLineEdit, &SearchLineEdit::textChanged,                 this,   &QnCameraListDialog::updateCriterion);
     connect(ui->camerasView,    &QTableView::customContextMenuRequested,        this,   &QnCameraListDialog::at_camerasView_customContextMenuRequested);
     connect(ui->camerasView,    &QTableView::doubleClicked,                     this,   &QnCameraListDialog::at_camerasView_doubleClicked);
 
@@ -188,7 +190,7 @@ void QnCameraListDialog::at_camerasView_customContextMenuRequested(const QPoint 
     QScopedPointer<QMenu> menu;
     if (!resources.isEmpty()) {
         action::Parameters parameters(resources);
-        parameters.setArgument(Qn::NodeTypeRole, Qn::ResourceNode);
+        parameters.setArgument(Qn::NodeTypeRole, ResourceTreeNodeType::resource);
 
         // We'll be changing hotkeys, so we cannot reuse global actions.
         menu.reset(context()->menu()->newMenu(action::TreeScope, nullptr,

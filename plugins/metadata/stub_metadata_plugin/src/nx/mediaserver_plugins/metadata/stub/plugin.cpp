@@ -1,6 +1,6 @@
 #include "plugin.h"
 
-#define NX_DEBUG_ENABLE_OUTPUT true //< Stub plugin is itself a debug feature, thus is verbose.
+#define NX_PRINT_PREFIX printPrefix()
 #include <nx/kit/debug.h>
 
 #include "camera_manager.h"
@@ -14,9 +14,10 @@ namespace stub {
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 
-Plugin::Plugin(): CommonPlugin("Stub metadata plugin")
+Plugin::Plugin():
+    CommonPlugin("Stub metadata plugin", "stub_metadata_plugin", NX_DEBUG_ENABLE_OUTPUT)
 {
-    setEnableOutput(NX_DEBUG_ENABLE_OUTPUT); //< Base class is verbose when this descendant is.
+    initCapabilities();
 }
 
 nx::sdk::metadata::CameraManager* Plugin::obtainCameraManager(
@@ -25,20 +26,28 @@ nx::sdk::metadata::CameraManager* Plugin::obtainCameraManager(
     return new CameraManager(this);
 }
 
+void Plugin::initCapabilities()
+{
+    if (ini().needDeepCopyOfVideoFrames)
+    {
+        m_needDeepCopyOfVideoFrames = true;
+        m_capabilities += "|needDeepCopyOfVideoFrames";
+    }
+
+    if (ini().needUncompressedVideoFrames)
+    {
+        m_needUncompressedVideoFrames = true;
+        m_capabilities += "|needUncompressedVideoFrames";
+    }
+
+    // Delete first '|', if any.
+    if (!m_capabilities.empty() && m_capabilities.at(0) == '|')
+        m_capabilities.erase(0, 1);
+}
+
 std::string Plugin::capabilitiesManifest() const
 {
     using Guid = nxpt::NxGuidHelper;
-
-    std::string capabilities;
-    if (ini().needDeepCopyForMediaFrame)
-        capabilities += "needDeepCopyForMediaFrame";
-    if (ini().needUncompressedVideoFrames)
-    {
-        if (!capabilities.empty())
-            capabilities += "|";
-        capabilities += "needUncompressedVideoFrames";
-    }
-
     return R"json(
         {
             "driverId": ")json" + Guid::toStdString(kDriverGuid) + R"json(",
@@ -74,7 +83,7 @@ std::string Plugin::capabilitiesManifest() const
                     }
                 }
             ],
-            "capabilities": ")json" + capabilities + R"json(",
+            "capabilities": ")json" + m_capabilities + R"json(",
             "settings": {
                 "params": [
                     {

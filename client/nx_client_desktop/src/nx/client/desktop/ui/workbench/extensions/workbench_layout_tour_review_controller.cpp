@@ -138,7 +138,7 @@ LayoutTourReviewController::~LayoutTourReviewController()
     stopListeningLayout();
 }
 
-void LayoutTourReviewController::handleTourChanged(const ec2::ApiLayoutTourData& tour)
+void LayoutTourReviewController::handleTourChanged(const nx::vms::api::LayoutTourData& tour)
 {
     // Handle only tours we are currently reviewing.
     auto reviewLayout = m_reviewLayouts.value(tour.id);
@@ -200,7 +200,7 @@ void LayoutTourReviewController::stopListeningLayout()
     m_dropPlaceholders.clear();
 }
 
-void LayoutTourReviewController::reviewLayoutTour(const ec2::ApiLayoutTourData& tour)
+void LayoutTourReviewController::reviewLayoutTour(const nx::vms::api::LayoutTourData& tour)
 {
     if (!tour.isValid())
         return;
@@ -381,7 +381,7 @@ void LayoutTourReviewController::updateItemsLayout()
     const auto reviewLayout = wbLayout->resource();
     NX_EXPECT(reviewLayout == m_reviewLayouts.value(tourId));
 
-    ec2::ApiLayoutTourItemDataList currentItems;
+    nx::vms::api::LayoutTourDataList currentItems;
 
     auto layoutItems = wbLayout->items().toList();
     QnWorkbenchItem::sortByGeometry(&layoutItems);
@@ -437,7 +437,7 @@ void LayoutTourReviewController::updateItemsLayout()
 }
 
 void LayoutTourReviewController::resetReviewLayout(const QnLayoutResourcePtr& layout,
-    const ec2::ApiLayoutTourItemDataList& items)
+    const nx::vms::api::LayoutTourItemDataList& items)
 {
     for (const auto& itemId: layout->getItems().keys())
         qnResourceRuntimeDataManager->cleanupData(itemId);
@@ -460,7 +460,7 @@ void LayoutTourReviewController::resetReviewLayout(const QnLayoutResourcePtr& la
 
 void LayoutTourReviewController::addItemToReviewLayout(
     const QnLayoutResourcePtr& layout,
-    const ec2::ApiLayoutTourItemData& item,
+    const nx::vms::api::LayoutTourItemData& item,
     const QPointF& position,
     bool pinItem)
 {
@@ -492,7 +492,7 @@ void LayoutTourReviewController::addResourcesToReviewLayout(
         addItemToReviewLayout(layout, {resource->getId(), kDefaultDelayMs}, position, false);
 }
 
-bool LayoutTourReviewController::fillTourItems(ec2::ApiLayoutTourItemDataList* items)
+bool LayoutTourReviewController::fillTourItems(nx::vms::api::LayoutTourItemDataList* items)
 {
     NX_EXPECT(items);
     if (!items)

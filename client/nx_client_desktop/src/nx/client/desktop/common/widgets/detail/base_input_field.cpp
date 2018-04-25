@@ -4,7 +4,7 @@
 
 #include <QtWidgets/QBoxLayout>
 
-#include <ui/common/accessor.h>
+#include <nx/client/desktop/common/utils/accessor.h>
 #include <ui/style/custom_style.h>
 #include <ui/widgets/word_wrapped_label.h>
 #include <utils/common/delayed.h>
@@ -84,6 +84,7 @@ BaseInputFieldPrivate::BaseInputFieldPrivate(
 
     lastResult(QValidator::Intermediate)
 {
+    hint->setOpenExternalLinks(true);
     input->installEventFilter(this);
     parent->setFocusProxy(input);
 }

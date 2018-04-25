@@ -1,5 +1,7 @@
 #pragma once
 
+#include <boost/optional.hpp>
+
 #include <core/ptz/ptz_limits.h>
 
 #include <plugins/resource/hanwha/hanwha_advanced_parameter_info.h>
@@ -57,7 +59,7 @@ public:
 
     virtual bool captureEvent(const nx::vms::event::AbstractEventPtr& event) override;
 
-    virtual bool doesEventComeFromAnalyticsDriver(nx::vms::event::EventType eventType) const override;
+    virtual bool doesEventComeFromAnalyticsDriver(nx::vms::api::EventType eventType) const override;
 
     virtual QnTimePeriodList getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) override;
 
@@ -108,6 +110,12 @@ public:
 
     bool isConnectedViaSunapi() const;
 
+    HanwhaProfileParameters makeProfileParameters(
+        Qn::ConnectionRole role,
+        const QnLiveStreamParams& parameters,
+        bool isAudioSupported,
+        bool isNewProfile = false) const;
+
 protected:
     virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
         Qn::StreamIndex streamIndex) override;
@@ -129,6 +137,7 @@ private:
     CameraDiagnostics::Result initTwoWayAudio();
     CameraDiagnostics::Result initRemoteArchive();
 
+    CameraDiagnostics::Result handleProxiedDeviceInfo(const HanwhaResponse& deviceInfoResponse);
     CameraDiagnostics::Result createNxProfiles();
     CameraDiagnostics::Result fetchExistingProfiles();
     CameraDiagnostics::Result createNxProfile(
@@ -146,6 +155,8 @@ private:
         int secondaryProfile);
 
     CameraDiagnostics::Result fetchPtzLimits(QnPtzLimits* outPtzLimits);
+
+    void cleanUpOnProxiedDeviceChange();
 
     AVCodecID defaultCodecForStream(Qn::ConnectionRole role) const;
     QSize defaultResolutionForStream(Qn::ConnectionRole role) const;
@@ -259,7 +270,7 @@ private:
 
     const HanwhaAttributes& attributes() const;
     const HanwhaCgiParameters& cgiParameters() const;
-    int bypassChannel() const;
+    boost::optional<int> bypassChannel() const;
 
 private:
     using AdvancedParameterId = QString;

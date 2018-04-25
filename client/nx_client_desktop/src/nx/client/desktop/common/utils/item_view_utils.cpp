@@ -7,7 +7,7 @@
 #include <QtWidgets/QAbstractItemView>
 #include <QtWidgets/QApplication>
 
-#include <ui/widgets/common/tree_view.h>
+#include <nx/client/desktop/common/widgets/tree_view.h>
 #include <nx/utils/log/assert.h>
 
 namespace nx {
@@ -80,24 +80,24 @@ void ItemViewUtils::autoToggleOnRowClick(QAbstractItemView* view, int checkBoxCo
         });
 }
 
-void ItemViewUtils::autoToggleOnSpaceKey(QnTreeView* view, int checkBoxColumn,
+void ItemViewUtils::autoToggleOnSpaceKey(TreeView* view, int checkBoxColumn,
     BatchToggleMode toggleMode)
 {
     NX_ASSERT(view);
     view->setIgnoreDefaultSpace(true);
 
-    QObject::connect(view, &QnTreeView::spacePressed,
+    QObject::connect(view, &TreeView::spacePressed,
         [view, checkBoxColumn, toggleMode]()
         {
             toggleSelectedRows(view, checkBoxColumn, toggleMode);
         });
 }
 
-void ItemViewUtils::autoToggleOnShiftClick(QnTreeView* view, int checkBoxColumn)
+void ItemViewUtils::autoToggleOnShiftClick(TreeView* view, int checkBoxColumn)
 {
     NX_ASSERT(view);
 
-    QObject::connect(view, &QnTreeView::selectionChanging,
+    QObject::connect(view, &TreeView::selectionChanging,
         [view, checkBoxColumn](
             QItemSelectionModel::SelectionFlags selectionFlags,
             const QModelIndex& index,
@@ -131,7 +131,7 @@ void ItemViewUtils::autoToggleOnShiftClick(QnTreeView* view, int checkBoxColumn)
         });
 }
 
-void ItemViewUtils::setupDefaultAutoToggle(QnTreeView* view, int checkBoxColumn)
+void ItemViewUtils::setupDefaultAutoToggle(TreeView* view, int checkBoxColumn)
 {
     NX_ASSERT(view);
     Qt::KeyboardModifiers prohibitedModifiers = Qt::NoModifier;

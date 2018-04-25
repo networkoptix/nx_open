@@ -10,6 +10,7 @@
 #include <core/dataprovider/abstract_media_stream_provider.h>
 #include "live_stream_provider.h"
 
+#include <nx/mediaserver/resource/resource_fwd.h>
 
 struct QnAbstractMediaData;
 
@@ -21,7 +22,7 @@ class CLServerPushStreamReader
     Q_OBJECT
 
 public:
-    CLServerPushStreamReader(const QnResourcePtr& dev );
+    CLServerPushStreamReader(const nx::mediaserver::resource::CameraPtr& dev );
     virtual ~CLServerPushStreamReader(){stop();}
 
     //!Implementation of QnAbstractMediaStreamDataProvider::diagnoseMediaStreamConnection
@@ -33,8 +34,8 @@ public:
     */
     virtual CameraDiagnostics::Result diagnoseMediaStreamConnection() override;
 
-private slots:
-    void at_resourceChanged(const QnResourcePtr& res);
+private:
+    void at_audioEnabledChanged(const QnResourcePtr& res);
 
 protected:
     QnLiveStreamParams m_currentLiveParams;
@@ -54,18 +55,18 @@ private:
     bool processOpenStreamResult();
 
 private:
-    bool m_needReopen;
-    bool m_cameraAudioEnabled;
-    CameraDiagnostics::Result m_openStreamResult;
+    const nx::mediaserver::resource::CameraPtr m_camera;
+    bool m_needReopen = false;
+    bool m_cameraAudioEnabled = false;
+    CameraDiagnostics::Result m_openStreamResult = CameraDiagnostics::Result(
+        CameraDiagnostics::ErrorCode::unknown);
     //!Incremented with every open stream attempt
-    int m_openStreamCounter;
+    int m_openStreamCounter = 0;
     QnWaitCondition m_cond;
     QnMutex m_openStreamMutex;
-    int m_FrameCnt;
+    int m_FrameCnt = 0;
     QElapsedTimer m_needControlTimer;
-
-private:
-    bool m_openedWithStreamCtrl;
+    bool m_openedWithStreamCtrl = false;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

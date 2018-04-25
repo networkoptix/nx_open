@@ -37,7 +37,7 @@
      <property name="childrenCollapsible">
       <bool>false</bool>
      </property>
-     <widget class="QnPanel" name="serversPanel" native="true">
+     <widget class="nx::client::desktop::Panel" name="serversPanel" native="true">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
         <horstretch>1</horstretch>
@@ -108,7 +108,7 @@
         <number>8</number>
        </property>
        <item>
-        <widget class="QnTreeView" name="addressesView">
+        <widget class="nx::client::desktop::TreeView" name="addressesView">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
            <horstretch>0</horstretch>
@@ -220,15 +220,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnPanel</class>
+   <class>nx::client::desktop::Panel</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/panel.h</header>
+   <header location="global">nx/client/desktop/common/widgets/panel.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QnTreeView</class>
+   <class>nx::client::desktop::TreeView</class>
    <extends>QTreeView</extends>
-   <header location="global">ui/widgets/common/tree_view.h</header>
+   <header location="global">nx/client/desktop/common/widgets/tree_view.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

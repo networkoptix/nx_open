@@ -1,12 +1,42 @@
 #include "common_video_frame_processing_camera_manager.h"
 
 #define NX_DEBUG_ENABLE_OUTPUT m_enableOutput
-#define NX_PRINT_PREFIX (std::string("[") + this->plugin()->name() + " CameraManager] ")
+#define NX_PRINT_PREFIX m_printPrefix
 #include <nx/kit/debug.h>
+
+#include <nx/sdk/metadata/common_plugin.h>
 
 namespace nx {
 namespace sdk {
 namespace metadata {
+
+static std::string makePrintPrefix(Plugin* plugin)
+{
+    std::string base;
+    if (const auto commonPlugin = dynamic_cast<CommonPlugin*>(plugin))
+        base = commonPlugin->libName();
+    else //< The plugin is not derived from CommonPlugin.
+        base = plugin->name();
+
+    return "[" + base + " camera] ";
+}
+
+CommonVideoFrameProcessingCameraManager::CommonVideoFrameProcessingCameraManager(
+    Plugin* plugin,
+    bool enableOutput,
+    const std::string& printPrefix)
+    :
+    m_plugin(plugin),
+    m_enableOutput(enableOutput),
+    m_printPrefix(!printPrefix.empty() ? printPrefix : makePrintPrefix(plugin))
+{
+    NX_PRINT << "Created " << this;
+}
+
+CommonVideoFrameProcessingCameraManager::~CommonVideoFrameProcessingCameraManager()
+{
+    NX_PRINT << "Destroyed " << this;
+}
 
 //-------------------------------------------------------------------------------------------------
 // Implementations of interface methods.

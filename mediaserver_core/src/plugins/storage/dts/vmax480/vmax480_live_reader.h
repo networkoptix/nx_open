@@ -16,7 +16,7 @@ class VMaxStreamFetcher;
 class QnVMax480LiveProvider: public CLServerPushStreamReader, public QnVmax480DataConsumer
 {
 public:
-    QnVMax480LiveProvider(const QnResourcePtr& dev );
+    QnVMax480LiveProvider(const QnPlVmax480ResourcePtr& dev );
     virtual ~QnVMax480LiveProvider();
 
     virtual int getChannel() const override;
@@ -32,10 +32,10 @@ protected:
     virtual bool canChangeStatus() const override;
 
 private:
-    QnNetworkResourcePtr m_networkRes;
+    QnPlVmax480ResourcePtr m_networkRes;
 
-    VMaxStreamFetcher* m_maxStream;
-    bool m_opened;
+    VMaxStreamFetcher* m_maxStream = nullptr;
+    bool m_opened = false;
     QElapsedTimer m_lastMediaTimer;
     //QnVMax480ConnectionProcessor* m_processor;
 };

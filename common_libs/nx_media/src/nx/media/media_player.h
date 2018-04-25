@@ -7,6 +7,7 @@
 #include <QtCore/QRect>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/media/media_fwd.h>
 
 class QAbstractVideoSurface;
 
@@ -221,6 +222,9 @@ public:
 
     bool isAudioEnabled() const;
     void setAudioEnabled(bool value);
+
+    RenderContextSynchronizerPtr renderContextSynchronizer() const;
+    void setRenderContextSynchronizer(RenderContextSynchronizerPtr value);
 
 public slots:
     void play();

@@ -12,14 +12,14 @@ TEST(SaveCamera, invalidData)
     MediaServerLauncher launcher;
     ASSERT_TRUE(launcher.start());
 
-    ec2::ApiCameraData cameraData;
+    nx::vms::api::CameraData cameraData;
     cameraData.parentId = QnUuid::createUuid();
     auto resTypePtr = qnResTypePool->getResourceTypeByName("Camera");
     ASSERT_FALSE(resTypePtr.isNull());
     cameraData.typeId = resTypePtr->getId();
     cameraData.vendor = "test vendor";
     cameraData.physicalId = "matching physicalId";
-    cameraData.id = ec2::ApiCameraData::physicalIdToId(cameraData.physicalId);
+    cameraData.id = nx::vms::api::CameraData::physicalIdToId(cameraData.physicalId);
 
     NX_LOG("[TEST] Both id and physicalId fields correctly defined.", cl_logINFO);
     NX_TEST_API_POST(&launcher, "/ec2/saveCamera", cameraData);

@@ -8,6 +8,7 @@
 #include <plugins/plugin_tools.h>
 
 #include "media_context.h"
+#include "compressed_media_packet.h"
 
 namespace nx {
 namespace sdk {
@@ -48,9 +49,14 @@ public:
 
     virtual const MediaContext* context() const { return nullptr; }
     virtual int64_t timestampUsec() const { return m_timestampUsec; }
+    virtual MediaFlags flags() const {return m_mediaFlags; }
 
     void setCodec(const std::string& value) { m_codec = value; }
     void setTimestampUsec(int64_t value) { m_timestampUsec = value; }
+
+    void setFlags(MediaFlags flags) { m_mediaFlags = flags; }
+    void addFlag(MediaFlag flag) { m_mediaFlags |= (MediaFlags) flag; }
+    void removeFlag(MediaFlag flag) { m_mediaFlags &= ~((MediaFlags) flag); }
 
 private:
     std::unique_ptr<std::vector<char>> m_ownedData; //< Deep copy.
@@ -58,6 +64,7 @@ private:
     int m_externalDataSize = 0;
     std::string m_codec;
     int64_t m_timestampUsec = 0;
+    MediaFlags m_mediaFlags = 0;
 };
 
 } // namespace metadata

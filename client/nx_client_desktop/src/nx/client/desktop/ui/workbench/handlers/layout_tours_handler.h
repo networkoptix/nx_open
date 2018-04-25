@@ -32,7 +32,7 @@ public:
     virtual void submitState(QnWorkbenchState* state) override;
 
 private:
-    void saveTourToServer(const ec2::ApiLayoutTourData& tour);
+    void saveTourToServer(const nx::vms::api::LayoutTourData& tour);
     void removeTourFromServer(const QnUuid& tourId);
 
 private:

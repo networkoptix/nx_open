@@ -16,7 +16,7 @@
 #include <nx/network/http/http_client.h>
 #include <nx/network/http/multipart_content_parser.h>
 
-#include <plugins/camera_plugin.h>
+#include <camera/camera_plugin.h>
 #include <plugins/plugin_tools.h>
 #include <plugins/plugin_container_api.h>
 #include <utils/memory/cyclic_allocator.h>

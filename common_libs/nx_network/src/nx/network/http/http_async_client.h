@@ -289,6 +289,7 @@ public:
 
     static QString endpointWithProtocol(const nx::utils::Url& url);
 
+    void setMaxNumberOfRedirects(int maxNumberOfRedirects);
 private:
     enum class Result
     {
@@ -339,6 +340,7 @@ private:
     nx::utils::ObjectDestructionFlag m_objectDestructionFlag;
     std::unique_ptr<AbstractMsgBodySource> m_requestBody;
     bool m_expectOnlyBody = false;
+    int m_maxNumberOfRedirects = 5;
 
     virtual void stopWhileInAioThread() override;
 

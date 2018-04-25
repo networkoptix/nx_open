@@ -62,6 +62,7 @@ namespace Qn
     static const QString kCombinedSensorsDescriptionParamName = lit("combinedSensorsDescription");
     static const QString kAnalyticsDriversParamName = lit("analyticsDrivers");
     static const QString kGroupPlayParamName = lit("groupplay");
+    static const QString kProxiedIdParamName = lit("proxiedId");
 
     static const QString kPrimaryStreamResolutionParamName = lit("primaryStreamResolution");
     static const QString kSecondaryStreamResolutionParamName = lit("secondaryStreamResolution");
@@ -103,7 +104,7 @@ namespace Qn
     static const QString PTZ_CAPABILITIES_TO_ADD_PARAM_NAME = lit("ptzCapabilitiesToAdd");
     static const QString PTZ_CAPABILITIES_TO_REMOVE_PARAM_NAME = lit("ptzCapabilitiesToRemove");
     static const QString DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME = lit("disableNativePtzPresets");
-	static const QString DW_REBRANDED_TO_ISD_MODEL = lit("isdDwCam");
+    static const QString DW_REBRANDED_TO_ISD_MODEL = lit("isdDwCam");
     static const QString ONVIF_VENDOR_SUBTYPE = lit("onvifVendorSubtype");
     static const QString DO_NOT_ADD_VENDOR_TO_DEVICE_NAME = lit("doNotAddVendorToDeviceName");
     static const QString VIDEO_MULTIRESOURCE_CHANNEL_MAPPING_PARAM_NAME = lit("multiresourceVideoChannelMapping");

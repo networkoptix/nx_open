@@ -27,15 +27,15 @@
     <name>LocalSystemTileExpandedAreaPart</name>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Accesso</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <source>Save password</source>
-      <translation type="unfinished">Save password</translation>
+      <translation>Salva password</translation>
     </message>
     <message>
       <source>Auto-login</source>
@@ -43,14 +43,14 @@
     </message>
     <message>
       <source>Connect</source>
-      <translation type="unfinished">Connect</translation>
+      <translation>Collegare</translation>
     </message>
   </context>
   <context>
     <name>NxSearchEdit</name>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Ricerca</translation>
     </message>
   </context>
   <context>
@@ -61,26 +61,26 @@
     </message>
     <message>
       <source>INCOMPATIBLE</source>
-      <translation type="unfinished">INCOMPATIBLE</translation>
+      <translation>INCOMPATIBILE</translation>
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation type="unfinished">OFFLINE</translation>
+      <translation>DISCONNESSO</translation>
     </message>
     <message>
       <source>UNREACHABLE</source>
-      <translation type="unfinished">UNREACHABLE</translation>
+      <translation>IRRAGGIUNGIBILE</translation>
     </message>
     <message>
       <source>New Server</source>
-      <translation type="unfinished">New Server</translation>
+      <translation>Nuovo server</translation>
     </message>
   </context>
   <context>
     <name>WelcomeScreen</name>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>Non abbiamo trovato nulla</translation>
     </message>
     <message>
       <source>You have no access to %1. Some features could be unavailable.</source>
@@ -88,15 +88,15 @@
     </message>
     <message>
       <source>Loading...</source>
-      <translation type="unfinished">Loading...</translation>
+      <translation>Caricamento in corso...</translation>
     </message>
     <message>
       <source>Connect to Another Server...</source>
-      <translation type="unfinished">Connect to Another Server...</translation>
+      <translation>Connetti ad un altro server...</translation>
     </message>
     <message>
       <source>Connect to Server...</source>
-      <translation type="unfinished">Connect to Server...</translation>
+      <translation>Connetti al server...</translation>
     </message>
   </context>
 </TS>

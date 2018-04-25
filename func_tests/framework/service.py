@@ -1,6 +1,9 @@
 import abc
+import logging
 
-from framework.os_access import NonZeroExitStatus
+from framework.os_access.exceptions import NonZeroExitStatus
+
+_logger = logging.getLogger(__name__)
 
 
 class Service(object):
@@ -44,8 +47,8 @@ class UpstartService(Service):
     def make_core_dump(self):
         try:
             self.os_access.run_command(['killall', '--signal', 'SIGTRAP', 'mediaserver-bin'])
-        except NonZeroExitStatus as e:
-            pass
+        except NonZeroExitStatus:
+            _logger.error("Cannot make core dump of process of %s service on %r.", self._service_name, self.os_access)
 
 
 class AdHocService(Service):
@@ -65,9 +68,11 @@ class AdHocService(Service):
         self._service_script_path = dir / 'server_ctl.sh'
 
     def is_running(self):
-        if not self._os_access.file_exists(self._service_script_path):
+        # TODO: Make a script.
+        if not self._service_script_path.exists():
             return False  # not even installed
-        return self._os_access.run_command([self._service_script_path, 'is_active']).strip() == 'active'
+        output = self._os_access.run_command([self._service_script_path, 'is_active'])
+        return output.strip() == 'active'
 
     def start(self):
         return self._os_access.run_command([self._service_script_path, 'start'])

@@ -9,12 +9,14 @@
 
 #include "animated.h"
 
+#include <nx/client/desktop/common/utils/accessor.h>
+
 namespace {
 
 static constexpr auto kOpacityAnimatorPropertyName = "_qn_opacityAnimator";
 static constexpr auto kOpacityAnimatorTimeLimitMs = 200;
 
-class OpacityAccessor: public AbstractAccessor
+class OpacityAccessor: public nx::client::desktop::AbstractAccessor
 {
 public:
     virtual QVariant get(const QObject* object) const override

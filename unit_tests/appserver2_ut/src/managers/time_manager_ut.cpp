@@ -19,7 +19,7 @@
 #include <common/common_module.h>
 
 #include <managers/time_manager.h>
-#include <rest/time_sync_rest_handler.h>
+#include <rest/handlers/time_sync_rest_handler.h>
 #include <settings.h>
 
 #include "misc_manager_stub.h"
@@ -102,9 +102,9 @@ public:
         m_workAroundMiscDataSaverStub(
             std::make_shared<WorkAroundMiscDataSaverStub>(m_miscManager.get())),
         m_timeSynchronizationManager(std::make_unique<TimeSynchronizationManager>(
+            commonModule(),
             Qn::PeerType::PT_Server,
             &m_timerManager,
-            m_transactionMessageBus.get(),
             &m_settings,
             m_workAroundMiscDataSaverStub,
             m_testSystemClock,
@@ -147,7 +147,7 @@ public:
     {
         if (!startHttpServer())
             return false;
-        m_timeSynchronizationManager->start(m_miscManager);
+        m_timeSynchronizationManager->start(m_transactionMessageBus.get(), m_miscManager);
         return true;
     }
 
@@ -172,19 +172,19 @@ public:
         m_transactionMessageBus =
             std::make_unique<TransactionMessageBusStub>(&m_commonModule);
         m_timeSynchronizationManager = std::make_unique<TimeSynchronizationManager>(
+            commonModule(),
             Qn::PeerType::PT_Server,
             &m_timerManager,
-            m_transactionMessageBus.get(),
             &m_settings,
             m_workAroundMiscDataSaverStub,
             m_testSystemClock,
             m_testSteadyClock);
-        m_timeSynchronizationManager->start(m_miscManager);
+        m_timeSynchronizationManager->start(m_transactionMessageBus.get(), m_miscManager);
     }
 
     void setPrimaryPeerId(const QnUuid& peerId)
     {
-        m_timeSynchronizationManager->primaryTimeServerChanged(ApiIdData(peerId));
+        m_timeSynchronizationManager->primaryTimeServerChanged(nx::vms::api::IdData(peerId));
     }
 
     void connectTo(TimeSynchronizationPeer* remotePeer)
@@ -250,6 +250,7 @@ private:
     std::shared_ptr<TestSystemClock> m_testSystemClock;
     std::shared_ptr<TestSteadyClock> m_testSteadyClock;
     std::shared_ptr<MiscManagerStub> m_miscManager;
+    std::shared_ptr<AbstractECConnection> m_connection;
     std::unique_ptr<TransactionMessageBusStub> m_transactionMessageBus;
     std::shared_ptr<WorkAroundMiscDataSaverStub> m_workAroundMiscDataSaverStub;
     std::unique_ptr<TimeSynchronizationManager> m_timeSynchronizationManager;
@@ -274,7 +275,7 @@ private:
             return false;
 
         m_httpServer.registerRequestProcessorFunc(
-            nx::network::url::joinPath("/", QnTimeSyncRestHandler::PATH.toStdString()).c_str(),
+            nx::network::url::joinPath("/", TimeSynchronizationManager::kTimeSyncUrlPath.toStdString()).c_str(),
             std::bind(&TimeSynchronizationPeer::syncTimeHttpHandler, this, _1, _2, _3, _4, _5));
 
         return true;

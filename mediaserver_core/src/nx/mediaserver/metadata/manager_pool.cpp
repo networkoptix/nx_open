@@ -51,13 +51,15 @@ using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 using namespace nx::debugging;
 
-ManagerPool::ManagerPool(QnMediaServerModule* serverModule, QThread* thread):
+ManagerPool::ManagerPool(QnMediaServerModule* serverModule):
     m_serverModule(serverModule),
     m_visualMetadataDebugger(
         VisualMetadataDebuggerFactory::makeDebugger(DebuggerType::managerPool)),
-    m_thread(thread)
+    m_thread(new QThread(this))
 {
-    NX_ASSERT(thread);
+    m_thread->setObjectName(lit("MetadataManagerPool"));
+    moveToThread(m_thread);
+    m_thread->start();
 }
 
 ManagerPool::~ManagerPool()
@@ -70,6 +72,7 @@ void ManagerPool::stop()
 {
     disconnect(this);
     m_thread->quit();
+    m_thread->wait();
     m_contexts.clear();
 }
 
@@ -197,27 +200,55 @@ static void freeSettings(std::vector<nxpl::Setting>* settings)
     }
 }
 
-void ManagerPool::loadSettingsFromFile(
-    std::vector<nxpl::Setting>* settings, const QString& filename)
+/** @return Empty settings if the file does not exist, or on error. */
+std::vector<nxpl::Setting> ManagerPool::loadSettingsFromFile(
+    const QString& fileDescription, const QString& filename)
 {
-    NX_INFO(this) << lm("Loading metadata Plugin/CameraManager settings from file: [%1]")
-        .arg(filename);
+    using nx::utils::log::Level;
+    auto log = //< Can be used to return empty settings: return log(...)
+        [&](Level level, const QString& message)
+        {
+            NX_UTILS_LOG(level, this) << lm("Metadata %1 settings: %2: [%3]")
+                .args(fileDescription, message, filename);
+            return std::vector<nxpl::Setting>{};
+        };
+
+    if (!QFileInfo::exists(filename))
+        return log(Level::info, lit("File does not exist"));
+
+    log(Level::info, lit("Loading from file"));
 
     QFile f(filename);
     if (!f.open(QFile::ReadOnly))
-    {
-        NX_ERROR(this) << lm("Unable to open settings file: [%1].").arg(filename);
-        return;
-    }
+        return log(Level::error, lit("Unable to open file"));
 
     const QString& settingsStr = f.readAll();
-    const auto& settingsFromJson = QJson::deserialized<QList<PluginSetting>>(settingsStr.toUtf8());
-    settings->resize(settingsFromJson.size());
+    if (settingsStr.isEmpty())
+        return log(Level::error, lit("Unable to read from file"));
+
+    bool success = false;
+    const auto& settingsFromJson = QJson::deserialized<QList<PluginSetting>>(
+        settingsStr.toUtf8(), /*defaultValue*/ {}, &success);
+    if (!success)
+        return log(Level::error, lit("Invalid JSON in file"));
+
+    std::vector<nxpl::Setting> settings(settingsFromJson.size());
     for (auto i = 0; i < settingsFromJson.size(); ++i)
     {
-        settings->at(i).name = strdup(settingsFromJson.at(i).name.toUtf8().data());
-        settings->at(i).value = strdup(settingsFromJson.at(i).value.toUtf8().data());
+        // Memory will be deallocated by freeSettings().
+        settings[i].name = strdup(settingsFromJson.at(i).name.toUtf8().data());
+        settings[i].value = strdup(settingsFromJson.at(i).value.toUtf8().data());
     }
+    return settings;
+}
+
+/** If path is empty, the path to ini_config .ini files is used. */
+static QString settingsFilename(
+    const char* const path, const QString& pluginLibName, const QString& extraSuffix = "")
+{
+    return QDir::cleanPath( //< Normalize to use forward slashes, as required by QFile.
+        QString::fromUtf8(path[0] ? path : nx::kit::IniConfig::iniFilesDir()) + lit("/")
+        + pluginLibName + extraSuffix + lit(".json"));
 }
 
 void ManagerPool::setCameraManagerDeclaredSettings(
@@ -226,30 +257,21 @@ void ManagerPool::setCameraManagerDeclaredSettings(
     const QString& pluginLibName)
 {
     // TODO: Stub. Implement storing the settings in the database.
-    static const auto& jsonFilenameSuffix = lit("_camera_manager.json");
-    std::vector<nxpl::Setting> settings;
-    const QString& jsonFilenamePrefix =
-        QString::fromUtf8(pluginsIni().metadataPluginCameraManagerSettingsFilenamePrefix);
-    if (!jsonFilenamePrefix.isEmpty())
-        loadSettingsFromFile(&settings, jsonFilenamePrefix + pluginLibName + jsonFilenameSuffix);
+    auto settings = loadSettingsFromFile(lit("Plugin Camera Manager"), settingsFilename(
+        pluginsIni().metadataPluginCameraManagerSettingsPath,
+        pluginLibName, lit("_camera_manager")));
     manager->setDeclaredSettings(
-        settings.empty() ? nullptr : &settings.front(),
-        (int) settings.size());
+        settings.empty() ? nullptr : &settings.front(), (int) settings.size());
     freeSettings(&settings);
 }
 
 void ManagerPool::setPluginDeclaredSettings(Plugin* plugin, const QString& pluginLibName)
 {
     // TODO: Stub. Implement storing the settings in the database.
-    static const auto& jsonFilenameSuffix = lit(".json");
-    std::vector<nxpl::Setting> settings;
-    const QString& jsonFilenamePrefix =
-        QString::fromUtf8(pluginsIni().metadataPluginSettingsFilenamePrefix);
-    if (!jsonFilenamePrefix.isEmpty())
-        loadSettingsFromFile(&settings, jsonFilenamePrefix + pluginLibName + jsonFilenameSuffix);
+    auto settings = loadSettingsFromFile(lit("Plugin"), settingsFilename(
+        pluginsIni().metadataPluginSettingsPath, pluginLibName));
     plugin->setDeclaredSettings(
-        settings.empty() ? nullptr : &settings.front(),
-        (int) settings.size());
+        settings.empty() ? nullptr : &settings.front(), (int) settings.size());
     freeSettings(&settings);
 }
 
@@ -751,7 +773,7 @@ void ManagerPool::putVideoFrame(
         if (!manager)
             continue;
         const bool needDeepCopy = managerData.manifest.capabilities.testFlag(
-            nx::api::AnalyticsDriverManifestBase::needDeepCopyForMediaFrame);
+            nx::api::AnalyticsDriverManifestBase::needDeepCopyOfVideoFrames);
         const bool needUncompressedVideoFrames = managerData.manifest.capabilities.testFlag(
             nx::api::AnalyticsDriverManifestBase::needUncompressedVideoFrames);
         DataPacket* dataPacket = nullptr;

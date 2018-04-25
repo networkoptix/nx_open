@@ -1,6 +1,8 @@
 import logging
+import re
 import time
 from datetime import datetime
+from numpy.distutils.exec_command import quote_arg
 
 import pytest
 import pytz
@@ -10,12 +12,12 @@ import framework.utils as utils
 import server_api_data_generators as generator
 from framework.api_shortcuts import get_server_id
 from framework.merging import setup_local_system
-from framework.os_access import NonZeroExitStatus
+from framework.os_access.exceptions import NonZeroExitStatus
 
 log = logging.getLogger(__name__)
 
 
-BACKUP_STORAGE_PATH = Path('/mnt/disk2')
+BACKUP_STORAGE_PATH = Path('/mnt/backup')
 BACKUP_STORAGE_READY_TIMEOUT_SEC = 60  # seconds
 BACKUP_SCHEDULE_TIMEOUT_SEC = 60       # seconds
 
@@ -39,6 +41,39 @@ BACKUP_DURATION_NOT_SET = -1  # -1 means not set.
 
 # Maximum backup bitrate in bytes per second.
 BACKUP_BITRATE_NOT_LIMITED = -1  # -1 means not limited.
+
+# Backup volume settings
+
+# Default size for backup storage volume
+DEFAULT_VOLUME_SIZE_GB = 10
+ONE_GB = 1024 * 1024 * 1024
+DF_SIZE_REGEX = re.compile(r'^.*\s+([0-9\.]+)G$', re.MULTILINE)
+
+
+class LinuxVMVolume(object):
+    def __init__(self, ssh_access):
+        self._ssh_access = ssh_access  # SSHAccess
+
+    def _need_create(self, mount_point, size_gb):
+        try:
+            df_output = self._ssh_access.run_command(
+                ['df', str(mount_point), '-h', '--output=size', '-BG'])
+            m = DF_SIZE_REGEX.search(df_output)
+            if m:
+                return m.group(1) == size_gb
+            return True
+        except NonZeroExitStatus:
+            return True
+
+    def ensure_volume_exists(self, mount_point, size_gb=DEFAULT_VOLUME_SIZE_GB):
+        if self._need_create(mount_point, size_gb):
+            image_path = self._ssh_access.Path('/').joinpath(mount_point.name).with_suffix('.image')
+            if image_path.exists():
+                image_path.unlink()
+            self._ssh_access.run_command(['fallocate', '-l', size_gb * ONE_GB, image_path])
+            self._ssh_access.run_command(['/sbin/mke2fs', '-F', '-t', 'ext4', image_path])
+            self._ssh_access.Path(mount_point).mkdir()
+            self._ssh_access.run_command(['mount', image_path, mount_point])
 
 
 # Global system 'backupQualities' setting parametrization:
@@ -78,15 +113,20 @@ def second_camera_backup_type(request):
 
 
 @pytest.fixture
-def server(linux_servers_pool, system_backup_type):
+def linux_vm_volume(linux_mediaserver):
+    return LinuxVMVolume(linux_mediaserver.machine.os_access)
+
+
+@pytest.fixture
+def server(linux_mediaserver, linux_vm_volume, system_backup_type):
     config_file_params = dict(minStorageSpace=1024*1024)  # 1M
-    server = linux_servers_pool.get('server')
-    server.update_mediaserver_conf(config_file_params)
-    server.machine.os_access.run_command(['rm', '-rfv', str(BACKUP_STORAGE_PATH / '*')])
-    server.start()
-    setup_local_system(server, {})
-    server.api.api.systemSettings.GET(backupQualities=system_backup_type)
-    return server
+    linux_mediaserver.installation.update_mediaserver_conf(config_file_params)
+    linux_vm_volume.ensure_volume_exists(BACKUP_STORAGE_PATH)
+    linux_mediaserver.machine.os_access.run_sh_script('rm -rfv {}/*'.format(quote_arg(str(BACKUP_STORAGE_PATH))))
+    linux_mediaserver.start()
+    setup_local_system(linux_mediaserver, {})
+    linux_mediaserver.api.api.systemSettings.GET(backupQualities=system_backup_type)
+    return linux_mediaserver
 
 
 def wait_storage_ready(server, storage_guid):
@@ -118,7 +158,7 @@ def change_and_assert_server_backup_type(server, expected_backup_type):
 def add_backup_storage(server):
     storage_list = [s for s in server.api.ec2.getStorages.GET()
                     if str(BACKUP_STORAGE_PATH) in s['url'] and s['usedForWriting']]
-    assert len(storage_list) == 1, 'Server did not accept storage %r' % BACKUP_STORAGE_PATH
+    assert len(storage_list) == 1, 'Mediaserver did not accept storage %r' % BACKUP_STORAGE_PATH
     storage = storage_list[0]
     storage['isBackup'] = True
     server.api.ec2.saveStorage.POST(**storage)
@@ -167,8 +207,10 @@ def assert_paths_are_equal(server, path_1, path_2):
     server.machine.os_access.run_command(['diff', '--recursive', '--report-identical-files', path_1, path_2])
 
 
-def assert_backup_equal_to_archive(server, backup_storage_path, camera, system_backup_type, backup_new_camera, camera_backup_type):
-    hi_quality_backup_path = backup_storage_path / HI_QUALITY_PATH /camera.mac_addr
+def assert_backup_equal_to_archive(
+        server, backup_storage_path, camera,
+        system_backup_type, backup_new_camera, camera_backup_type):
+    hi_quality_backup_path = backup_storage_path / HI_QUALITY_PATH / camera.mac_addr
     hi_quality_server_archive_path = server.storage.dir / HI_QUALITY_PATH / camera.mac_addr
     low_quality_backup_path = backup_storage_path / LOW_QUALITY_PATH / camera.mac_addr
     low_quality_server_archive_path = server.storage.dir / LOW_QUALITY_PATH / camera.mac_addr
@@ -187,8 +229,9 @@ def assert_backup_equal_to_archive(server, backup_storage_path, camera, system_b
         assert_paths_are_equal(server, low_quality_backup_path, low_quality_server_archive_path)
 
 
-def test_backup_by_request(server, camera_factory, sample_media_file, system_backup_type, backup_new_camera,
-                           second_camera_backup_type):
+def test_backup_by_request(
+        server, camera_factory, sample_media_file,
+        system_backup_type, backup_new_camera, second_camera_backup_type):
     backup_storage_path = add_backup_storage(server)
     server.api.api.systemSettings.GET(
         backupNewCamerasByDefault=backup_new_camera)
@@ -225,5 +268,7 @@ def test_backup_by_schedule(server, camera_factory, sample_media_file, system_ba
     expected_backup_time = start_time_2 + sample_media_file.duration
     wait_backup_finish(server, expected_backup_time)
     assert_backup_equal_to_archive(
-        server, backup_storage_path, camera, system_backup_type, backup_new_camera=False, camera_backup_type=BACKUP_BOTH)
+        server, backup_storage_path, camera, system_backup_type,
+        backup_new_camera=False,
+        camera_backup_type=BACKUP_BOTH)
     assert not server.installation.list_core_dumps()

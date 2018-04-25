@@ -70,26 +70,26 @@ int QnBusinessTypesComparator::toLexActionType(ActionType actionType) const
 QList<EventType> QnBusinessTypesComparator::lexSortedEvents(EventSubType subtype) const
 {
     static const QList<EventType> userEvents{
-        cameraMotionEvent,
-        cameraInputEvent,
-        softwareTriggerEvent,
-        analyticsSdkEvent,
-        userDefinedEvent,
+        EventType::cameraMotionEvent,
+        EventType::cameraInputEvent,
+        EventType::softwareTriggerEvent,
+        EventType::analyticsSdkEvent,
+        EventType::userDefinedEvent,
     };
 
     static const QList<EventType> failureEvents{
-        cameraDisconnectEvent,
-        storageFailureEvent,
-        networkIssueEvent,
-        cameraIpConflictEvent,
-        serverFailureEvent,
-        serverConflictEvent,
-        licenseIssueEvent,
+        EventType::cameraDisconnectEvent,
+        EventType::storageFailureEvent,
+        EventType::networkIssueEvent,
+        EventType::cameraIpConflictEvent,
+        EventType::serverFailureEvent,
+        EventType::serverConflictEvent,
+        EventType::licenseIssueEvent,
     };
 
     static const QList<EventType> successEvents{
-        serverStartEvent,
-        backupFinishedEvent,
+        EventType::serverStartEvent,
+        EventType::backupFinishedEvent,
     };
 
     QList<EventType> events;

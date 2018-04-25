@@ -63,7 +63,7 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QnSearchLineEdit" name="filterLineEdit" native="true">
+          <widget class="nx::client::desktop::SearchLineEdit" name="filterLineEdit" native="true">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -73,7 +73,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QnTreeView" name="usersTable">
+          <widget class="nx::client::desktop::TreeView" name="usersTable">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
              <horstretch>0</horstretch>
@@ -232,9 +232,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnTreeView</class>
+   <class>nx::client::desktop::TreeView</class>
    <extends>QTreeView</extends>
-   <header location="global">ui/widgets/common/tree_view.h</header>
+   <header location="global">nx/client/desktop/common/widgets/tree_view.h</header>
   </customwidget>
   <customwidget>
    <class>QnDialogButtonBox</class>
@@ -242,9 +242,9 @@
    <header location="global">ui/widgets/common/dialog_button_box.h</header>
   </customwidget>
   <customwidget>
-   <class>QnSearchLineEdit</class>
+   <class>nx::client::desktop::SearchLineEdit</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/search_line_edit.h</header>
+   <header location="global">nx/client/desktop/common/widgets/search_line_edit.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -38,7 +38,13 @@ qt_plugins = [
     'audio/qtaudio_windows.dll',
     'platforms/qwindows.dll']
 
-nx_libraries = ['nx_vms_utils', 'nx_utils', 'nx_network', 'nx_kit', 'udt']
+nx_libraries = [
+    'nx_vms_utils',
+    'nx_utils',
+    'nx_network',
+    'nx_kit',
+    'nx_vms_api',
+    'udt']
 
 
 def create_client_update_file(

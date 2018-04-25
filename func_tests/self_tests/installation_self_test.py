@@ -1,9 +1,12 @@
 import logging
 
-from framework.server_installation import install_mediaserver
+from framework.mediaserver_installation import install_mediaserver
 
 _logger = logging.getLogger(__name__)
 
 
-def test_install(single_vm, mediaserver_deb):
-    install_mediaserver(single_vm.os_access, mediaserver_deb)
+def test_install(linux_vm, mediaserver_deb):
+    installation = install_mediaserver(linux_vm.os_access, mediaserver_deb, reinstall=True)
+    assert installation.is_valid()
+    installation = install_mediaserver(linux_vm.os_access, mediaserver_deb, reinstall=False)
+    assert installation.is_valid()

@@ -33,11 +33,9 @@
 #include <licensing/license.h>
 #include <licensing/license_validator.h>
 
-#include <llutil/hardware_id.h>
-
 #include <nx/fusion/serialization/json_functions.h>
 
-#include <ui/common/widget_anchor.h>
+#include <nx/client/desktop/common/utils/widget_anchor.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/custom_style.h>
@@ -54,6 +52,7 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/delayed.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/license/util.h>
 
 #include <nx/client/desktop/license/license_helpers.h>
 #include <nx/client/desktop/ui/dialogs/license_deactivation_reason.h>
@@ -202,7 +201,7 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     ui->alertBar->setVisible(false);
 
     m_exportLicensesButton = new QPushButton(ui->licensesGroupBox);
-    auto anchor = new QnWidgetAnchor(m_exportLicensesButton);
+    auto anchor = new WidgetAnchor(m_exportLicensesButton);
     anchor->setEdges(Qt::TopEdge | Qt::RightEdge);
     static const int kButtonTopAdjustment = -4;
     anchor->setMargins(0, kButtonTopAdjustment, 0, 0);
@@ -462,7 +461,7 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool
 
     for (const QString& hwid: hardwareIds)
     {
-        int version = LLUtil::hardwareIdVersion(hwid);
+        int version = nx::utils::license::hardwareIdVersion(hwid);
 
         QString name;
         if (version == 0)

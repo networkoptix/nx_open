@@ -6,8 +6,8 @@
 #include <core/resource/security_cam_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#ifdef Q_OS_WIN
-#   include "plugins/storage/dts/vmax480/vmax480_stream_fetcher.h"
+#if defined(Q_OS_WIN)
+    #include "plugins/storage/dts/vmax480/vmax480_stream_fetcher.h"
 #endif
 
 #include "video_camera.h"
@@ -28,15 +28,14 @@ VideoCameraLocker::~VideoCameraLocker()
 //-------------------------------------------------------------------------------------------------
 // QnVideoCameraPool
 
-
 void QnVideoCameraPool::stop()
 {
     for( const QnVideoCameraPtr& camera: m_cameras.values())
         camera->beforeStop();
 
-#if defined(Q_OS_WIN) && defined(ENABLE_VMAX)
-        VMaxStreamFetcher::pleaseStopAll(); // increase stop time
-#endif
+    #if defined(Q_OS_WIN) && defined(ENABLE_VMAX)
+        VMaxStreamFetcher::pleaseStopAll(); //< increase stop time
+    #endif
 
     m_cameras.clear();
 }

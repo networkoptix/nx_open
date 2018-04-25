@@ -18,7 +18,7 @@ public:
     static State setPanicMode(State state, bool value);
     static State loadCameras(State state, const QnVirtualCameraResourceList& cameras);
     static State setSingleCameraUserName(State state, const QString& text);
-    static State setScheduleBrush(State state, const QnScheduleGridWidget::CellParams& brush);
+    static State setScheduleBrush(State state, const ScheduleCellParams& brush);
     static State setScheduleBrushRecordingType(State state, Qn::RecordingType value);
     static State setScheduleBrushFps(State state, int value);
     static State setScheduleBrushQuality(State state, Qn::StreamQuality value);
@@ -37,6 +37,8 @@ public:
     static State setCustomAspectRatio(State state, const QnAspectRatio& value);
     static State setCustomRotation(State state, const Rotation& value);
     static State setRecordingEnabled(State state, bool value);
+    static State setMotionDetectionEnabled(State state, bool value);
+    static State setMotionRegionList(State state, const QList<QnMotionRegion>& value);
 };
 
 } // namespace desktop

@@ -135,7 +135,7 @@ bool QnAdamResource::startInputPortMonitoringAsync(std::function<void(bool)>&& c
         emit networkIssue(
             toSharedPointer(this),
             qnSyncTime->currentUSecsSinceEpoch(),
-            nx::vms::event::EventReason::networkNoResponseFromDevice,
+            nx::vms::api::EventReason::networkNoResponseFromDevice,
             QString());
 
         if (isFatal)

@@ -18,6 +18,7 @@
 #include "camera_settings_tab.h"
 #include "widgets/camera_settings_general_tab_widget.h"
 #include "widgets/camera_schedule_widget.h"
+#include "widgets/camera_motion_settings_widget.h"
 
 #include "redux/camera_settings_dialog_state.h"
 #include "redux/camera_settings_dialog_store.h"
@@ -56,7 +57,21 @@ struct CameraSettingsDialog::Private
 
         store->applyChanges();
         const auto& state = store->state();
-        CameraSettingsDialogStateConversionFunctions::applyStateToCameras(state, cameras);
+
+        const auto apply =
+            [this, &state]
+            {
+                CameraSettingsDialogStateConversionFunctions::applyStateToCameras(state, cameras);
+            };
+
+        const auto backout =
+            [this, camerasCopy = cameras](bool success)
+            {
+                if (!success && camerasCopy == cameras)
+                    resetChanges();
+            };
+
+        qnResourcesChangesManager->saveCamerasBatch(cameras, apply, backout);
     }
 
     void resetChanges()
@@ -96,6 +111,11 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
         int(CameraSettingsTab::recording),
         new CameraScheduleWidget(d->store, ui->tabWidget),
         tr("Recording"));
+
+    addPage(
+        int(CameraSettingsTab::motion),
+        new CameraMotionSettingsWidget(d->store, ui->tabWidget),
+        tr("Motion"));
 
     auto selectionWatcher = new QnWorkbenchSelectionWatcher(this);
     connect(
@@ -178,6 +198,7 @@ bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras
     d->cameras = cameras;
     d->resetChanges();
     d->readOnlyWatcher->setCameras(cameras);
+
     return true;
 }
 
@@ -255,6 +276,64 @@ void CameraSettingsDialog::loadState(const CameraSettingsDialogState& state)
         if (applyButton)
             applyButton->setEnabled(!state.readOnly && state.hasChanges);
     }
+
+    setPageVisible(int(CameraSettingsTab::motion), state.devicesCount == 1
+        && state.devicesDescription.hasMotion == CameraSettingsDialogState::CombinedValue::All);
+
+    ui->alertBar->setText(getAlertText(state));
+}
+
+QString CameraSettingsDialog::getAlertText(const CameraSettingsDialogState& state)
+{
+    if (!state.alert)
+        return QString();
+
+    using Alert = CameraSettingsDialogState::Alert;
+    switch (*state.alert)
+    {
+        case Alert::BrushChanged:
+            return tr("Select areas on the schedule to apply chosen parameters to.");
+
+        case Alert::EmptySchedule:
+            return tr(
+                "Set recording parameters and select areas "
+                "on the schedule grid to apply them to.");
+
+        case Alert::NotEnoughLicenses:
+            return tr("Not enough licenses to enable recording.");
+
+        case Alert::LicenseLimitExceeded:
+            return tr("License limit exceeded, recording will not be enabled.");
+
+        case Alert::RecordingIsNotEnabled:
+            return tr("Turn on selector at the top of the window to enable recording.");
+
+        case Alert::HighArchiveLength:
+            return QnCameraDeviceStringSet(
+                    tr("High minimum value can lead to archive length decrease on other devices."),
+                    tr("High minimum value can lead to archive length decrease on other cameras."))
+                .getString(state.deviceType);
+
+        case Alert::MotionDetectionRequiresRecording:
+            return tr(
+                "Motion detection will work only when camera is being viewed. "
+                "Enable recording to make it work all the time.");
+
+        case Alert::MotionDetectionTooManyRectangles:
+            return tr("Maximum number of motion detection rectangles for current camera is reached");
+
+        case Alert::MotionDetectionTooManyMaskRectangles:
+            return tr("Maximum number of ignore motion rectangles for current camera is reached");
+
+        case Alert::MotionDetectionTooManySensitivityRectangles:
+            return tr("Maximum number of detect motion rectangles for current camera is reached");
+
+        default:
+            NX_EXPECT(false, "Unhandled enum value");
+            break;
+    }
+
+    return QString();
 }
 
 } // namespace desktop

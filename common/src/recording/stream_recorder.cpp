@@ -123,7 +123,6 @@ QnStreamRecorder::QnStreamRecorder(const QnResourcePtr& dev):
     QnAbstractDataConsumer(STORE_QUEUE_SIZE),
     QnResourceConsumer(dev),
     QnCommonModuleAware(dev->commonModule()),
-    m_device(dev),
     m_firstTime(true),
     m_truncateInterval(0),
     m_fixedFileName(false),
@@ -468,7 +467,7 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
     {
         // If multifile recording is allowed, recreate the file if a recording hole is detected.
         NX_DEBUG(this, lm("Data hole detected for camera %1. Diff between packets: %2 ms")
-            .arg(m_device->getUniqueId())
+            .arg(m_resource->getUniqueId())
             .arg((md->timestamp - m_endDateTimeUs) / 1000));
         close();
     }
@@ -516,7 +515,7 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
         return true; // skip data
     }
 
-    const QnMediaResource* mediaDev = dynamic_cast<const QnMediaResource*>(m_device.data());
+    const QnMediaResource* mediaDev = dynamic_cast<const QnMediaResource*>(m_resource.data());
     if (m_firstTime)
     {
         if (vd == 0 && mediaDev->hasVideo(md->dataProvider))
@@ -654,7 +653,7 @@ void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int stre
         }
 
         auto startWriteTime = std::chrono::high_resolution_clock::now();
-        int ret = av_write_frame(
+        int ret = av_interleaved_write_frame(
             m_recordingContextVector[i].formatCtx,
             &avPkt
         );
@@ -780,7 +779,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
             return false;
         }
 
-        const QnMediaResourcePtr mediaDev = m_device.dynamicCast<QnMediaResource>();
+        const QnMediaResourcePtr mediaDev = m_resource.dynamicCast<QnMediaResource>();
 
         const bool isTranscode =
             (m_transcodeFilters.is_initialized()
@@ -871,7 +870,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
 
                     m_transcodeFilters->prepare(mediaDev, m_videoTranscoder->getResolution());
                     m_videoTranscoder->setFilterList(*m_transcodeFilters);
-                    m_videoTranscoder->setQuality(Qn::QualityHighest);
+                    m_videoTranscoder->setQuality(Qn::StreamQuality::highest);
                     m_videoTranscoder->open(videoData); // reopen again for new size
 
                     QnFfmpegHelper::copyAvCodecContex(videoStream->codec, m_videoTranscoder->getCodecContext());

@@ -17,7 +17,7 @@ class HikvisionHevcStreamReader: public QnRtpStreamReader
 {
 
 public:
-    HikvisionHevcStreamReader(const QnResourcePtr& resource);
+    HikvisionHevcStreamReader(const HikvisionResourcePtr& resource);
 
 protected:
     virtual CameraDiagnostics::Result openStreamInternal(
@@ -70,7 +70,7 @@ private:
         boost::optional<int> bitrateKbps) const;
 
 private:
-    QnHikvisionResourcePtr m_hikvisionResource;
+    HikvisionResourcePtr m_hikvisionResource;
     QString m_previousCodecValue;
 };
 

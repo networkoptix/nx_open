@@ -17,7 +17,7 @@ public:
     struct Params
     {
         ProxyVideoDecoder* owner;
-        ResourceAllocatorPtr allocator;
+        RenderContextSynchronizerPtr allocator;
         QSize resolution;
     };
 
@@ -55,7 +55,7 @@ protected:
         return m_params.resolution;
     }
 
-    AbstractResourceAllocator& allocator()
+    AbstractRenderContextSynchronizer& allocator()
     {
         return *m_params.allocator.get();
     }

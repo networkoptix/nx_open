@@ -70,6 +70,4 @@ private:
     static QMap<QString, QnVMax480ChunkReader*> m_chunkReaderMap;
 };
 
-typedef QnSharedResourcePointer<QnPlVmax480Resource> QnPlVmax480ResourcePtr;
-
 #endif // #ifdef ENABLE_VMAX

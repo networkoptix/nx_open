@@ -12,13 +12,8 @@ struct Ini: public nx::kit::IniConfig
     Ini(): IniConfig("stub_metadata_plugin.ini") { reload(); }
 
     NX_INI_FLAG(1, enableOutput, "");
-
-    NX_INI_FLAG(0, needDeepCopyForMediaFrame,
-        "Respective capability in plugin manifest. Effective only on plugin load.");
-
-    NX_INI_FLAG(0, needUncompressedVideoFrames,
-        "Respective capability in plugin manifest. Effective only on plugin load.");
-
+    NX_INI_FLAG(0, needDeepCopyOfVideoFrames, "Respective capability in manifest.");
+    NX_INI_FLAG(0, needUncompressedVideoFrames, "Respective capability in manifest.");
     NX_INI_FLAG(1, generateObjects, "");
     NX_INI_FLAG(1, generateEvents, "");
     NX_INI_INT(1, generateObjectsEveryNFrames, "");

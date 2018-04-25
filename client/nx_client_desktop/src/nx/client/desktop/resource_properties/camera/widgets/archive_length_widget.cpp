@@ -1,7 +1,7 @@
 #include "archive_length_widget.h"
 #include "ui_archive_length_widget.h"
 
-#include <ui/common/aligner.h>
+#include <nx/client/desktop/common/utils/aligner.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
@@ -30,7 +30,7 @@ ArchiveLengthWidget::ArchiveLengthWidget(QWidget* parent):
 
     setHelpTopic(this, Qn::CameraSettings_Recording_ArchiveLength_Help);
 
-    m_aligner = new QnAligner(this);
+    m_aligner = new Aligner(this);
     m_aligner->addWidgets(
         {
             ui->labelMinDays,
@@ -40,7 +40,7 @@ ArchiveLengthWidget::ArchiveLengthWidget(QWidget* parent):
 
 ArchiveLengthWidget::~ArchiveLengthWidget() = default;
 
-QnAligner* ArchiveLengthWidget::aligner() const
+Aligner* ArchiveLengthWidget::aligner() const
 {
     return m_aligner;
 }

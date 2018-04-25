@@ -617,6 +617,7 @@ bool PtzInstrument::registeredNotify(QGraphicsItem* item)
         [this, widget] { updateWidgetPtzController(widget); });
 
     updateWidgetPtzController(widget);
+    updateOverlayWidgetInternal(widget);
     return true;
 }
 
