@@ -498,7 +498,7 @@
             </activation>
             <modules>
                 <module>build_variables</module>
-                <module>nx_vms_api</module>
+                <module>vms_libs/nx_vms_api</module>
                 <module>common</module>
                 <module>common_libs/nx_fusion</module>
                 <module>common_libs/nx_network</module>
