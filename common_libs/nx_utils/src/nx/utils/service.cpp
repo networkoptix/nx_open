@@ -14,6 +14,11 @@ Service::Service(int argc, char **argv, const QString& applicationDisplayName):
 {
 }
 
+void Service::setEmbeddedMode(bool value)
+{
+    m_isEmbeddedMode = value;
+}
+
 void Service::pleaseStop()
 {
     m_processTerminationEvent.set_value(0);
@@ -44,7 +49,8 @@ int Service::exec()
             return 0;
         }
 
-        initializeLog(*settings);
+        if (!m_isEmbeddedMode)
+            initializeLog(*settings);
 
         return serviceMain(*settings);
     }
