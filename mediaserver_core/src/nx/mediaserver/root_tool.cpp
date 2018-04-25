@@ -439,10 +439,11 @@ static bool extractSubstring(const char** pdata, StringRef* stringRef)
     return true;
 }
 
-static QnAbstractStorageResource::FileInfoList fileListFromSerialized(const char* data)
+static QnAbstractStorageResource::FileInfoList fileListFromSerialized(const std::string& serializedList)
 {
     QnAbstractStorageResource::FileInfoList result;
     StringRef stringRef;
+    const char* data = serializedList.data();
 
     while (true)
     {
@@ -495,8 +496,8 @@ QnAbstractStorageResource::FileInfoList RootTool::fileList(const QString& path)
             "list",
             [path]()
             {
-                return SystemCommands().serializedFileList(path.toStdString(), false).c_str();
-            }, path).c_str());
+                return SystemCommands().serializedFileList(path.toStdString(), false);
+            }, path));
 }
 
 qint64 RootTool::fileSize(const QString& path)
