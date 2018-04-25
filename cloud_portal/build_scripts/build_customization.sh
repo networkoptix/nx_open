@@ -29,10 +29,9 @@ dir=../customizations/$CUSTOMIZATION/
     pushd ../front_end
         npm run setBranding $CUSTOMIZATION
         npm run build
-
         # Save the repository info.
         echo "Create version.txt"
-        hg log -r . --repository "$DIR/../.." > dist/version.txt
+        hg log -r . --repository "$2" > dist/version.txt
         cat dist/version.txt
     popd
 
