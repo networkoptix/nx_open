@@ -1,5 +1,7 @@
 #include "media_player_motion_provider.h"
 
+#include <chrono>
+
 #include <QtQml/QtQml>
 
 #include <nx/client/core/media/consuming_motion_metadata_provider.h>
@@ -85,7 +87,9 @@ QByteArray MediaPlayerMotionProvider::motionMask(int channel) const
     if (!d->mediaPlayer)
         return kEmptyMotionMask;
 
-    const auto metadata = d->metadataProvider.metadata(d->mediaPlayer->position(), channel);
+    using namespace std::chrono;
+    const auto positionUs = microseconds(milliseconds(d->mediaPlayer->position())).count();
+    const auto metadata = d->metadataProvider.metadata(positionUs, channel);
     if (!metadata)
         return kEmptyMotionMask;
 
