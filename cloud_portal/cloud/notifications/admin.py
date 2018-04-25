@@ -6,8 +6,9 @@ import datetime
 
 # Register your models here.
 
-from .models import Message, Event, Subscription, CloudNotification
-
+from .models import *
+from django_celery_results.models import TaskResult
+admin.site.unregister(TaskResult)
 
 class SubscriptionAdmin(admin.ModelAdmin):
     list_display = ('id', 'object', 'type', 'user_email', 'created_date', 'enabled')
@@ -73,7 +74,6 @@ class CloudNotificationAdmin(admin.ModelAdmin):
     convert_date.allow_tags = True
     convert_date.admin_order_field = "sent_date"
 
-
     def has_delete_permission(self, request, obj=None):
         self.request = request
         if obj and obj.sent_date:
@@ -87,3 +87,46 @@ class CloudNotificationAdmin(admin.ModelAdmin):
         return self.readonly_fields
 
 admin.site.register(CloudNotification, CloudNotificationAdmin)
+
+
+class TaskResultAdmin(admin.ModelAdmin):
+    list_display = ('task_id', 'date_done', 'status')
+    readonly_fields = ('date_done', 'result', 'hidden', 'meta')
+    list_filter = ('date_done', 'status')
+    search_fields = ('date_done', 'meta', 'result', 'task_id')
+    actions = ['clean_old_tasks']
+    fieldsets = (
+        (None, {
+            'fields': (
+                'task_id',
+                'status',
+                'content_type',
+                'content_encoding',
+            ),
+            'classes': ('extrapretty', 'wide')
+        }),
+        ('Result', {
+            'fields': (
+                'result',
+                'date_done',
+                'traceback',
+                'hidden',
+                'meta',
+            ),
+            'classes': ('extrapretty', 'wide')
+        }),
+    )
+
+
+    class Meta:
+        proxy = True
+
+
+    def clean_old_tasks(self, request, queryset):
+        from datetime import datetime, timedelta
+        cutoff_date = datetime.now() - timedelta(days=7)
+        TaskResult.objects.filter(date_done__lt=cutoff_date).delete()
+
+    clean_old_tasks.short_description = "Remove tasks older than a week"
+
+admin.site.register(TaskResult, TaskResultAdmin)

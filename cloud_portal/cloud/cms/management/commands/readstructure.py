@@ -5,129 +5,99 @@
 # create report: added vs outdated
 import os
 import re
-import base64
-from ...controllers import filldata
-from cloud import settings
-import json
-import codecs
+from ...controllers import structure
 from ...models import Product, Context, DataStructure
 from django.core.management.base import BaseCommand
 
-#  from cms.controllers.readstructure import *
+
+SOURCE_DIR = 'static/_source/{{skin}}/'
+
+
+def context_for_file(filename, skin_name):
+    custom_dir = SOURCE_DIR.replace("{{skin}}", skin_name)
+    context_name = filename.replace(custom_dir, '')
+    match = re.search(r'lang_(.+?)/', context_name)
+    language = None
+    if match:
+        language = match.group(1)
+        context_name = context_name.replace(
+            match.group(0), 'lang_{{language}}/')
+    return context_name, language
+
+
+def customizable_file(filename, ignore_not_english):
+    supported_format = filename.endswith('.json') or \
+        filename.endswith('.html') or \
+        filename.endswith('.mustache') or \
+        filename.endswith('apple-app-site-association')
+    supported_directory = not ignore_not_english or \
+        "lang_" not in filename or "lang_en_US" in filename
+    return supported_format and supported_directory
+
+
+def iterate_cms_files(skin_name, ignore_not_english):
+    custom_dir = SOURCE_DIR.replace("{{skin}}", skin_name)
+    for root, dirs, files in os.walk(custom_dir):
+        for filename in files:
+            file = os.path.join(root, filename)
+            if customizable_file(file, ignore_not_english):
+                yield file
 
 
 def find_or_add_context_by_file(file_path, product_id, has_language):
     if Context.objects.filter(file_path=file_path, product_id=product_id).exists():
         return Context.objects.get(file_path=file_path, product_id=product_id)
     context = Context(name=file_path, file_path=file_path,
-                      product_id=product_id, translatable=has_language)
+                      product_id=product_id, translatable=has_language,
+                      hidden=True,
+                      is_global=False)
     context.save()
     return context
-
-
-def find_or_add_context(context_name, product_id, has_language):
-    if Context.objects.filter(name=context_name, product_id=product_id).exists():
-        return Context.objects.get(name=context_name, product_id=product_id)
-    context = Context(name=context_name, file_path=context_name,
-                      product_id=product_id, translatable=has_language)
-    context.save()
-    return context
-
-
-def find_or_add_data_stucture(name, context_id, has_language):
-    if DataStructure.objects.filter(name=name, context_id=context_id).exists():
-        return DataStructure.objects.get(name=name, context_id=context_id)
-    data = DataStructure(name=name, context_id=context_id,
-                         translatable=has_language, default=name)
-    data.save()
-    return data
 
 
 def read_cms_strings(filename):
-    pattern = re.compile(r'%\S+%')
+    pattern = re.compile(r'%\S+?%')
     with open(filename, 'r') as file:
         data = file.read()
-        return re.findall(pattern, data)
+        return data, set(re.findall(pattern, data))
 
 
-def read_structure_file(filename, product_id):
-    context_name, language = filldata.context_for_file(filename, 'default')
+def read_structure_file(filename, product_id, global_strings):
+    context_name, language = context_for_file(filename, 'blue')
 
     if language and language != "en_US":
         return
     # now read file and get records from there.
-    strings = read_cms_strings(filename)
+    data, strings = read_cms_strings(filename)
+    if not strings:  # if there is no records at all - we ignore it
+        return
 
-    if strings:     # if there is no records at all - we ignore it
-        context = find_or_add_context_by_file(
-            context_name, product_id, bool(language))
-        for string in strings:
-            find_or_add_data_stucture(string, context.id, bool(language))
+    # now, here this is customization-depending file
+
+    # Here we check if there are any unique strings (which are not global)
+    strings = [string for string in strings if string not in global_strings]
+    context = find_or_add_context_by_file(context_name, product_id, bool(language))
+    context.template = data  # update template for this context
+    context.save()
+    for string in strings:
+        structure.find_or_add_data_structure(string, None, context.id, bool(language))
 
 
-def read_structure():
-    product_id = Product.objects.get(name='cloud_portal').id
-    for file in filldata.iterate_cms_files('default', True):
-        read_structure_file(file, product_id)
-
-
-def read_structure_json():
-    with codecs.open('cms/cms_structure.json', 'r', 'utf-8') as file_descriptor:
-        cms_structure = json.load(file_descriptor)
-    product_name = cms_structure['product']
+def read_structure(product_name):
     product_id = Product.objects.get(name=product_name).id
-    for context_data in cms_structure['contexts']:
-        has_language = context_data["translatable"]
-        context = find_or_add_context(
-            context_data["name"], product_id, has_language)
-        if "description" in context_data:
-            context.description = context_data["description"]
-        if "file_path" in context_data:
-            context.file_path = context_data["file_path"]
-        if "url" in context_data:
-            context.url = context_data["url"]
-        context.save()
-
-        for record in context_data["values"]:
-            type = None
-            description = None
-            meta = None
-            if len(record) == 2:
-                name, value = record
-            if len(record) == 3:
-                name, value, description = record
-            if len(record) == 4:
-                name, value, description, type = record
-            if len(record) == 5:
-                name, value, description, type, meta = record
-
-            data_structure = find_or_add_data_stucture(
-                name, context.id, has_language)
-            if description:
-                data_structure.description = description
-            if type:
-                data_structure.type = DataStructure.get_type(type)
-
-            if type and type == "Image":
-                data_structure.translatable = "{{language}}" in name
-
-                #this is used to convert source images into b64 strings
-                file_path = os.path.join('static', 'default', 'source', name)
-                file_path = file_path.replace("{{language}}", settings.DEFAULT_LANGUAGE)
-                with open(file_path, 'r') as file:
-                    value = encoded_string = base64.b64encode(file.read())
-                        
-            data_structure.meta_settings = meta if meta else {}
-            data_structure.default = value
-            data_structure.save()
+    global_strings = DataStructure.objects.\
+        filter(context__is_global=True, context__product_id=product_id).\
+        values_list("name", flat=True)
+    for file in iterate_cms_files('blue', True):
+        read_structure_file(file, product_id, global_strings)
 
 
 class Command(BaseCommand):
-    help = 'Creates initial structure for CMS in\
-     the database (contexts, datastructure)'
+    help = 'Creates initial structure for CMS in ' \
+           'the database (contexts, datastructure)'
 
     def handle(self, *args, **options):
-        read_structure_json()
-        read_structure()
+        structure.read_structure_json('cms/cms_structure.json')
+        read_structure('cloud_portal')
         self.stdout.write(self.style.SUCCESS(
             'Successfully initiated data structure for CMS'))

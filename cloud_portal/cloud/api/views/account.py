@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 @permission_classes((AllowAny, ))
 @handle_exceptions
 def register(request):
-    from .utils import detect_language_by_request
+    from util.helpers import detect_language_by_request
     logger.debug('/api/account/register called')
     lang = detect_language_by_request(request)
     data = request.data
@@ -70,6 +70,12 @@ def login(request):
         request.session.set_expiry(0)
 
     django.contrib.auth.login(request, user)
+
+    #If the user does not have an activated_date set it to the current time
+    if not user.activated_date:
+        user.activated_date = timezone.now()
+        user.save()
+
     request.session['login'] = email
     request.session['password'] = password
     if 'timezone' in request.data:
@@ -194,7 +200,13 @@ def restore_password(request):
             raise APIRequestException('Wrong new password', ErrorCodes.wrong_parameters,
                                       error_data={'new_password': error.detail})
 
+        email = Account.extract_temp_credentials(code)[1]
         Account.restore_password(code, new_password)
+
+        account = api.models.Account.objects.get(email=email)
+        if not account.activated_date:
+            account.activated_date = timezone.now()
+            account.save()
     elif 'user_email' in request.data:
         user_email = request.data['user_email'].lower()
         Account.reset_password(user_email)

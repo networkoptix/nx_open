@@ -18,12 +18,13 @@ function instantiate_config()
 {
     export CUSTOMIZATION=$1
     export CLOUD_PORTAL_CONF_DIR=$CLOUD_PORTAL_BASE_CONF_DIR/$customization
+    mkdir --parents $CLOUD_PORTAL_CONF_DIR
 
     local CLOUD_PORTAL_HOST_var=CLOUD_PORTAL_HOST_$customization
     export CLOUD_PORTAL_HOST=${!CLOUD_PORTAL_HOST_var:-$CLOUD_PORTAL_HOST}
 
     tmp=$(tempfile)
-    envsubst < $CLOUD_PORTAL_CONF_DIR/cloud_portal.yaml > $tmp
+    envsubst < $CLOUD_PORTAL_BASE_CONF_DIR/_source/cloud_portal.yaml > $tmp
     mv $tmp $CLOUD_PORTAL_CONF_DIR/cloud_portal.yaml
 
     if [ -n "$MODULE_CONFIGURATION" ]
@@ -64,11 +65,7 @@ do
             echo "CREATE DATABASE IF NOT EXISTS $DB_NAME" | mysql -Dinformation_schema
 
             yes "yes" | python manage.py migrate
-            yes "yes" | python manage.py createcachetable
-
-            python manage.py initdb
             python manage.py readstructure
-            python manage.py initbranding
             ;;
         config)
             instantiate_configs

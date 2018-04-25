@@ -6,6 +6,7 @@ from models import *
 from cloud import settings
 from django.contrib import admin
 
+
 admin.site.site_header = 'Cloud Administration'
 admin.site.site_title = 'Cloud Administration'
 admin.site.index_title = 'Cloud Administration'
@@ -30,8 +31,7 @@ class CMSAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         qs = super(CMSAdmin, self).get_queryset(request)
-        if not request.user.is_superuser and \
-           request.user.customization != settings.CUSTOMIZATION:
+        if not UserGroupsToCustomizationPermissions.check_permission(request.user, settings.CUSTOMIZATION):
             # return empty dataset, only superuser can watch content in other
             # customizations
             return qs.filter(pk=-1)
@@ -39,19 +39,38 @@ class CMSAdmin(admin.ModelAdmin):
 
 
 class ProductAdmin(CMSAdmin):
-    list_display = ('name',)
+    list_display = ('context_actions', 'name',)
+    list_display_links = ('name',)
+
+    def context_actions(self, obj):
+        return format_html('<button class="btn btn-sm btn-info"><a href="{}">settings</a></button>',
+                           reverse('product_settings', args=[obj.id]))
+
+    context_actions.short_description = 'Admin Options'
+    context_actions.allow_tags = True
+
 
 admin.site.register(Product, ProductAdmin)
 
 
 class ContextAdmin(CMSAdmin):
-    list_display = ('context_actions', 'name', 'description',
-                    'url', 'translatable')
-    search_fields = ('name', 'description', 'url')
+    list_display = ('context_actions', 'product', 'name', 'description',
+                    'url', 'translatable', 'is_global')
+
+    list_display_links = ('name', )
+    list_filter = ('product',)
+    search_fields = ('name', 'description', 'url', 'product__name')
 
     def context_actions(self, obj):
-        return format_html('<a class="button" href="{}">edit content</a>',
-                           reverse('context_editor', args=[obj.id]))
+        return format_html('<button class="btn btn-sm btn-info"><a href="{}">edit content</a></button>',
+                           reverse('page_editor', args=[obj.id]))
+
+    def get_queryset(self, request):  # show only users for current customization
+        qs = super(ContextAdmin, self).get_queryset(request)  # Basic check from CMSAdmin
+        if not request.user.is_superuser:
+            qs = qs.filter(hidden=False)  ## only superuser sees hidden contexts
+        # additional filter - display only revisions from current customization
+        return qs
 
     context_actions.short_description = 'Admin Options'
     context_actions.allow_tags = True
@@ -78,23 +97,27 @@ admin.site.register(Customization, CustomizationAdmin)
 
 
 class DataRecordAdmin(CMSAdmin):
-    list_display = ('customization', 'language',
+    list_display = ('customization', 'language', 'context',
                     'data_structure', 'short_description', 'version')
-    list_filter = ('data_structure', 'customization', 'language')
-    search_fields = ('data_structure__name', 'customization__name',
-                     'data_structure__short_description', 'value', 'language__code')
+    list_filter = ('data_structure__context', 'data_structure', 'customization', 'language')
+    search_fields = ('data_structure__context__name', 'data_structure__name', 'customization__name',
+                     'data_structure__description', 'value', 'language__code')
 
 admin.site.register(DataRecord, DataRecordAdmin)
 
 
 class ContentVersionAdmin(CMSAdmin):
-    list_display = ('content_version_actions', 'id', 'customization', 'name',
+    list_display = ('content_version_actions', 'id', 'product','customization',
                     'created_date', 'created_by',
-                    'accepted_date', 'accepted_by')
+                    'accepted_date', 'accepted_by', 'state')
+
+    list_display_links = ('id', )
+    list_filter = ('product', 'customization')
+    search_fields = ('accepted_by__email', 'created_by__email')
 
     def content_version_actions(self, obj):
-        return format_html('<a class="button" href="{}">review version</a>',
-                           reverse('review_version', args=[obj.id]))
+        return format_html('<button class="btn btn-sm btn-info"> <a href="{}">review version</a></button>',
+                           reverse('version', args=[obj.id]))
 
     def get_queryset(self, request):  # show only users for current customization
         qs = super(ContentVersionAdmin, self).get_queryset(request)  # Basic check from CMSAdmin

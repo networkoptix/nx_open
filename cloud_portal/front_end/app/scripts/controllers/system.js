@@ -7,6 +7,7 @@ angular.module('cloudApp')
     account, $q, system, $poll, page, $timeout, systemsProvider) {
 
         var systemId = $routeParams.systemId;
+        $scope.debugMode = Config.allowDebugMode;
 
 
         account.requireLogin().then(function(account){
@@ -15,6 +16,17 @@ angular.module('cloudApp')
             $scope.gettingSystem.run();
         });
 
+        function getMergeTarget(targetSystemId){
+            return _.find(systemsProvider.systems, function(system){
+                return targetSystemId == system.id;
+            });
+        }
+
+        function setMergeStatus(mergeInfo){
+            $scope.currentlyMerging = true;
+            $scope.isMaster = mergeInfo.role ? mergeInfo.role != Config.systemStatuses.slave : mergeInfo.masterSystemId == $scope.system.id;
+            $scope.mergeTargetSystem = getMergeTarget(mergeInfo.anotherSystemId);
+        }
         // Retrieve system info
         $scope.gettingSystem = process.init(function(){
             return $scope.system.getInfo(true); // Force reload system info when opening page
@@ -33,6 +45,10 @@ angular.module('cloudApp')
             },
             errorPrefix: L.errorCodes.cantGetSystemInfoPrefix
         }).then(function (){
+            $scope.canMerge = $scope.system.canMerge && $scope.system.isOnline;
+            if($scope.system.mergeInfo){
+                setMergeStatus($scope.system.mergeInfo);
+            }
             $scope.systemNoAccess = false;
             loadUsers();
             if($scope.system.permissions.editUsers){
@@ -41,6 +57,8 @@ angular.module('cloudApp')
                 delayedUpdateSystemInfo();
             }
         });
+
+
         var pollingSystemUpdate = null;
         function delayedUpdateSystemInfo(){
             pollingSystemUpdate = $poll(function(){
@@ -110,6 +128,12 @@ angular.module('cloudApp')
             });
         };
 
+        $scope.mergeSystems = function(){
+            dialogs.merge($scope.system).then(function(mergeInfo){
+                setMergeStatus(mergeInfo);
+            });
+        };
+
         $scope.share = function(){
             // Call share dialog, run process inside
             return dialogs.share($scope.system).then(loadUsers);
@@ -150,12 +174,12 @@ angular.module('cloudApp')
                         delayedUpdateSystemInfo();
                     },function(){
                         $scope.locked[user.email] = false;
-                        $scope.system.getUsers()
-                        delayedUpdateSystemInfo();
                     });
                     $scope.unsharing.run();
                 }, function(){
                     $scope.locked[user.email] = false;
+                    $scope.system.getUsers()
+                    delayedUpdateSystemInfo();
                 });
         };
 

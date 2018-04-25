@@ -11,22 +11,16 @@ class Command(BaseCommand):
         parser.add_argument('customization', nargs='?', default=settings.CUSTOMIZATION)
 
     def handle(self, *args, **options):
-        if 'customization' not in  options:
-            filldata.fill_content(
-                customization_name=settings.CUSTOMIZATION,
-                product='cloud_portal',
-                preview=False)
+        if 'customization' not in options:
+            filldata.init_skin(settings.CUSTOMIZATION)
             self.stdout.write(self.style.SUCCESS(
                 'Initiated static content for ' + settings.CUSTOMIZATION))
         elif options['customization'] == 'all':
             for custom in Customization.objects.all():
-                filldata.fill_content(customization_name=custom.name, product='cloud_portal', preview=False)
+                filldata.init_skin(custom.name)
                 self.stdout.write(self.style.SUCCESS('Initiated static content for ' + custom.name))
         else:
-            filldata.fill_content(
-                customization_name=options['customization'],
-                product='cloud_portal',
-                preview=False)
+            filldata.init_skin(options['customization'])
             self.stdout.write(self.style.SUCCESS(
                 'Initiated static content for ' + options['customization']))
 

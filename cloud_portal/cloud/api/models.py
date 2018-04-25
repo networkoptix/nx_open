@@ -5,16 +5,6 @@ from django.utils.deprecation import CallableFalse, CallableTrue
 from django.utils.html import format_html
 
 
-from cms.models import Customization
-from cloud import settings
-
-from django.utils import timezone
-
-#current hack until 17.1.2 when we have global classes
-email_css = "overflow: hidden;text-overflow: ellipsis;white-space: nowrap; width:205px;"
-name_css = "overflow: hidden;text-overflow: ellipsis;white-space: nowrap; width:95px;"
-
-
 class Account(PermissionsMixin):
     class Meta:
         permissions = (
@@ -33,8 +23,7 @@ class Account(PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     language = models.CharField(max_length=7, blank=True)
-    customization = models.CharField(max_length=255, null=True)
-
+    customization = models.CharField(max_length=255,null=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['registeredDate', 'createdDate']
@@ -60,13 +49,13 @@ class Account(PermissionsMixin):
         return CallableFalse
 
     def short_email(self):
-        return format_html("<div style='{}'><span>{}</span></div>", email_css, self.email)
+        return format_html("<div class='truncate-email'><span>{}</span></div>", self.email)
 
     def short_first_name(self):
-        return format_html("<div style='{}'><span>{}</span></div>", name_css, self.first_name)
+        return format_html("<div class='truncate-name'><span>{}</span></div>", self.first_name)
 
     def short_last_name(self):
-        return format_html("<div style='{}'><span>{}</span></div>", name_css, self.last_name)
+        return format_html("<div class='truncate-name'><span>{}</span></div>", self.last_name)
 
     short_email.short_description = "email"
     short_first_name.short_description = "first name"

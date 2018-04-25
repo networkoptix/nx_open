@@ -62,6 +62,6 @@
   "scripts": {
     "serve": "webpack-dev-server --open --config webpack.dev.js",
     "build": "webpack --config webpack.prod.js",
-    "setBranding": "node setBranding.js --customization"
+    "setSkin": "node setSkin.js --skin"
   }
 }
