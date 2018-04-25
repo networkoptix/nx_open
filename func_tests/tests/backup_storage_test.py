@@ -2,7 +2,6 @@ import logging
 import re
 import time
 from datetime import datetime
-from numpy.distutils.exec_command import quote_arg
 
 import pytest
 import pytz
@@ -12,6 +11,7 @@ import framework.utils as utils
 import server_api_data_generators as generator
 from framework.api_shortcuts import get_server_id
 from framework.merging import setup_local_system
+from framework.os_access.args import sh_quote_arg
 from framework.os_access.exceptions import NonZeroExitStatus
 
 log = logging.getLogger(__name__)
@@ -122,7 +122,7 @@ def server(linux_mediaserver, linux_vm_volume, system_backup_type):
     config_file_params = dict(minStorageSpace=1024*1024)  # 1M
     linux_mediaserver.installation.update_mediaserver_conf(config_file_params)
     linux_vm_volume.ensure_volume_exists(BACKUP_STORAGE_PATH)
-    linux_mediaserver.machine.os_access.run_sh_script('rm -rfv {}/*'.format(quote_arg(str(BACKUP_STORAGE_PATH))))
+    linux_mediaserver.machine.os_access.run_sh_script('rm -rfv {}/*'.format(sh_quote_arg(str(BACKUP_STORAGE_PATH))))
     linux_mediaserver.start()
     setup_local_system(linux_mediaserver, {})
     linux_mediaserver.api.api.systemSettings.GET(backupQualities=system_backup_type)
