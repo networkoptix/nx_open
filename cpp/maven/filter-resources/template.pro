@@ -141,6 +141,7 @@ win* {
         NX_RELAYING_API=__declspec(dllimport) \
         NX_VMS_GATEWAY_API=__declspec(dllimport) \
         NX_DATA_SYNC_ENGINE_API=__declspec(dllimport) \
+        NX_VMS_API=__declspec(dllimport) \
 
 } else {
     DEFINES += \
@@ -155,6 +156,7 @@ win* {
         NX_RELAYING_API= \
         NX_VMS_GATEWAY_API= \
         NX_DATA_SYNC_ENGINE_API= \
+        NX_VMS_API= \
 
 }
 

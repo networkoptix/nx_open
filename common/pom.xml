@@ -18,7 +18,7 @@
         <guid>${common.guid}</guid>
 
         <qt.libs>core core-private gui network xml xmlpatterns sql concurrent multimedia</qt.libs>
-        <global.libs>-lcloud_db_client -lnx_network -lnx_fusion -lnx_utils -lnx_kit -lnx_sdk -lnx_plugin_utils</global.libs>
+        <global.libs>-lcloud_db_client -lnx_vms_api -lnx_network -lnx_fusion -lnx_utils -lnx_kit -lnx_sdk -lnx_plugin_utils</global.libs>
         <windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lSecur32</windows.oslibs>
         <mac.oslibs>-framework IOKit -framework CoreFoundation -lz -framework QtConcurrent</mac.oslibs>
         <android.oslibs>-lz</android.oslibs>
@@ -38,6 +38,15 @@
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/build_variables/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_vms_api</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/vms_libs/nx_vms_api/pom.xml</systemPath>
         </dependency>
 
         <dependency>
