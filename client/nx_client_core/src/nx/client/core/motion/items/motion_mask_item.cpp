@@ -35,10 +35,10 @@ public:
             const auto mask = QBitmap::fromData(QSize(MotionGrid::kHeight, MotionGrid::kWidth),
                 reinterpret_cast<const uchar*>(m_mask.data()), QImage::Format_Mono);
 
-            auto image = mask.toImage().transformed(QMatrix().rotate(-90));
+            auto image = mask.toImage().transformed(QMatrix().rotate(-90)).mirrored();
             image.setColorTable({0, 0xFFFFFFFF});
 
-            m_texture.reset(window->createTextureFromImage(image.mirrored()));
+            m_texture.reset(window->createTextureFromImage(image));
             m_texture->setHorizontalWrapMode(QSGTexture::ClampToEdge);
             m_texture->setVerticalWrapMode(QSGTexture::ClampToEdge);
 
