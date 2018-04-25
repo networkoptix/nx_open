@@ -551,9 +551,9 @@
                 <module>common_libs/nx_speech_synthesizer</module>
                 <module>mediaserver_db</module>
                 <module>mediaserver_core</module>
+                <module>mediaserver</module>
 
 <!--
-                <module>mediaserver</module>
                 <module>plugins/genericrtspplugin</module>
                 <module>plugins/generic_multicast_plugin</module>
                 <module>plugins/image_library_plugin</module>
