@@ -54,6 +54,14 @@ public:
     Http();
 };
 
+class Proxy
+{
+public:
+    std::chrono::milliseconds targetConnectionInactivityTimeout;
+
+    Proxy();
+};
+
 enum class SslMode
 {
     followIncomingConnection,
@@ -101,6 +109,7 @@ public:
     const Auth& auth() const;
     const Tcp& tcp() const;
     const Http& http() const;
+    const Proxy& proxy() const;
     const CloudConnect& cloudConnect() const;
     const relaying::Settings& listeningPeer() const;
 
@@ -113,6 +122,7 @@ private:
     Auth m_auth;
     Tcp m_tcp;
     Http m_http;
+    Proxy m_proxy;
     CloudConnect m_cloudConnect;
     relaying::Settings m_listeningPeer;
 };
