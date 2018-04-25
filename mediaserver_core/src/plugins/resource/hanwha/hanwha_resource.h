@@ -114,6 +114,8 @@ public:
     void updateToChannel(int value);
 
     bool isNvr() const;
+    HanwhaDeviceType deviceType() const;
+
     QString nxProfileName(
         Qn::ConnectionRole role,
         boost::optional<int> forcedProfileNameLength = boost::none) const;
@@ -310,7 +312,7 @@ private:
     HanwhaCgiParameters m_cgiParameters;
     HanwhaCgiParameters m_bypassDeviceCgiParameters;
 
-    bool m_isNvr = false;
+    HanwhaDeviceType m_deviceType = HanwhaDeviceType::unknown;
     bool m_isChannelConnectedViaSunapi = false;
 
     nx::media::CameraMediaCapability m_capabilities;

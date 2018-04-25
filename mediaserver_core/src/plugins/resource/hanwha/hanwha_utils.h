@@ -8,6 +8,8 @@
 
 #include <boost/optional/optional.hpp>
 
+#include <nx/core/resource/device_type.h>
+
 #include <common/common_globals.h>
 #include <utils/media/h264_common.h>
 #include <utils/media/hevc_common.h>
@@ -86,6 +88,8 @@ boost::optional<QSize> toQSize(const boost::optional<QString>& str);
 boost::optional<QSize> toQDateTime(const boost::optional<QString>& str);
 
 HanwhaChannelProfiles parseProfiles(const HanwhaResponse& response);
+
+nx::core::resource::DeviceType fromHanwhaToNxDeviceType(HanwhaDeviceType hanwhaDeviceType);
 
 template<typename T>
 T fromHanwhaString(const QString& str)

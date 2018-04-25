@@ -99,6 +99,14 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
             return QJson::deserialized<nx::media::CameraMediaCapability>(
                 getProperty(nx::media::kCameraMediaCapabilityParamName).toUtf8());
         },
+        &m_mutex),
+    m_cachedDeviceType(
+        [this]()
+        {
+            return QnLexical::deserialized<nx::core::resource::DeviceType>(
+                getProperty(Qn::kDeviceType),
+                nx::core::resource::DeviceType::unknown);
+        },
         &m_mutex)
 {
     addFlags(Qn::live_cam);
@@ -544,7 +552,19 @@ bool QnSecurityCamResource::isMultiSensorCamera() const
     return !getGroupId().isEmpty()
         && !isDtsBased()
         && !isAnalogEncoder()
-        && !isAnalog();
+        && !isAnalog()
+        && !nx::core::resource::isProxyDeviceType(deviceType());
+}
+
+nx::core::resource::DeviceType QnSecurityCamResource::deviceType() const
+{
+    return m_cachedDeviceType.get();
+}
+
+void QnSecurityCamResource::setDeviceType(nx::core::resource::DeviceType deviceType)
+{
+    setProperty(Qn::kDeviceType, QnLexical::serialized(deviceType));
+    m_cachedDeviceType.reset();
 }
 
 Qn::LicenseType QnSecurityCamResource::licenseType() const

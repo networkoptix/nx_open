@@ -24,6 +24,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/fusion/fusion/fusion.h>
 #include <nx/fusion/serialization/json.h>
+#include <nx/fusion/serialization/lexical.h>
 #include <nx/vms/event/events/events.h>
 #include <nx/sdk/metadata/plugin.h>
 #include <nx/mediaserver/resource/shared_context_pool.h>
@@ -933,12 +934,18 @@ CameraDiagnostics::Result HanwhaResource::initSystem()
     if (!info)
         return info.diagnostics;
 
-    m_isNvr = false;
-    if (info->deviceType == kHanwhaNvrDeviceType)
-    {
-        m_isNvr = true;
+    m_deviceType = QnLexical::deserialized<HanwhaDeviceType>(
+        info->deviceType,
+        HanwhaDeviceType::unknown);
+
+    const auto nxDeviceType = fromHanwhaToNxDeviceType(deviceType());
+
+    // Set device type only for NVRs and encoders due to optimization purposes.
+    if (nx::core::resource::isProxyDeviceType(nxDeviceType))
+        setDeviceType(nxDeviceType);
+
+    if (isNvr())
         setProperty(Qn::DTS_PARAM_NAME, lit("1")); //< Use external archive, don't record.
-    }
 
     if (!info->firmware.isEmpty())
         setFirmware(info->firmware);
@@ -978,7 +985,7 @@ CameraDiagnostics::Result HanwhaResource::initSystem()
 
 CameraDiagnostics::Result HanwhaResource::initMedia()
 {
-    if (m_isNvr && !isVideoSourceActive())
+    if (isNvr() && !isVideoSourceActive())
     {
         return CameraDiagnostics::CameraInvalidParams(
             lit("Video source is not active"));
@@ -2897,7 +2904,12 @@ boost::optional<int> HanwhaResource::bypassChannel() const
 
 bool HanwhaResource::isNvr() const
 {
-    return m_isNvr;
+    return m_deviceType == HanwhaDeviceType::nvr;
+}
+
+HanwhaDeviceType HanwhaResource::deviceType() const
+{
+    return m_deviceType;
 }
 
 QString HanwhaResource::nxProfileName(
