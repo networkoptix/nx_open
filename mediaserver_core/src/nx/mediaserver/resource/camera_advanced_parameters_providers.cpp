@@ -106,22 +106,19 @@ static QnCameraAdvancedParameterDependency valueDependency(
 
 static boost::optional<boost::rational<int>> resolutionAspectRatio(const QString& resolutionString)
 {
-    const auto split = resolutionString.splitRef(L'x');
-    if (split.size() != 2)
+    const auto resolution = sizeFromString(resolutionString);
+    if (resolution == boost::none)
         return boost::none;
 
-    auto height = split[1].toInt();
-    if (height == 0)
-        return boost::none;
-
-    return boost::rational<int>(split[0].toInt(), height);
+    return boost::rational<int>(resolution->width(), resolution->height());
 }
 
-static std::function<bool(const QString&)> hasSimilarAspectRatio(
+static std::function<bool(const QString&)> hasSimilarAspectRatioFilter(
     double aspectRatio,
     double allowedAspectRatioDifference)
 {
-    return [aspectRatio, allowedAspectRatioDifference](const QString& resolutionString)
+    return
+        [aspectRatio, allowedAspectRatioDifference](const QString& resolutionString)
         {
             const auto aspectFromResolution = resolutionAspectRatio(resolutionString);
             if (aspectFromResolution == boost::none)
@@ -135,7 +132,7 @@ static std::function<bool(const QString&)> hasSimilarAspectRatio(
 static TraitMap toTraitMap(const nx::media::CameraStreamCapabilityTraits& traits)
 {
     TraitMap result;
-    for (const auto& trait : traits)
+    for (const auto& trait: traits)
         result.emplace(trait.trait, trait.attributes);
 
     return result;
@@ -432,7 +429,7 @@ std::vector<QnCameraAdvancedParameter> StreamCapabilityAdvancedParametersProvide
                     continue;
 
                 processedAspects.insert(*aspectRatio);
-                const auto filter = hasSimilarAspectRatio(
+                const auto filter = hasSimilarAspectRatioFilter(
                     boost::rational_cast<double>(*aspectRatio),
                     allowedAspectRatioDiff);
 
