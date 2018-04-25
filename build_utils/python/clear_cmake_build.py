@@ -6,8 +6,6 @@ import sys
 import shutil
 import argparse
 
-CMAKE_CONFIGURATIONS = ["Release", "Debug", "RelWithDebInfo", "MinSizeRel", "Default"]
-
 def log_deletion(path):
     print("Deleting {}".format(path))
 
@@ -25,8 +23,6 @@ def delete_path(path):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--build-dir", help="Build directory.", default=os.getcwd())
-    parser.add_argument("--configurations", nargs='*', default=CMAKE_CONFIGURATIONS,
-        help="Build configurations to clear (default: {})".format(" ".join(CMAKE_CONFIGURATIONS)))
 
     args = parser.parse_args()
 
@@ -40,8 +36,7 @@ def main():
     delete_path(os.path.join(args.build_dir, "client", "mobile_client", "android"))
     delete_path(os.path.join(args.build_dir, "client", "mobile_client", "mobile_client_apk"))
 
-    for configuration in CMAKE_CONFIGURATIONS:
-        delete_path(os.path.join(args.build_dir, configuration, "bin", "mobile_client.app"))
+    delete_path(os.path.join(args.build_dir, "bin", "mobile_client.app"))
 
 if __name__ == "__main__":
     main()
