@@ -50,6 +50,7 @@
     "EMAIL ALREADY REGISTERED TEXT": "האימייל הזה כבר רשום ב- {{PRODUCT_NAME}}",
     "EMAIL INVALID TEXT": "אנא הקלד כתובת אימייל תקפה",
     "PASSWORD IS REQUIRED TEXT": "נדרשת סיסמה",
+    "CURRENT PASSWORD IS REQUIRED TEXT": "נדרשת סיסמא נוכחית",
     "PASSWORD SPECIAL CHARS TEXT": "השתמש רק באותיות לטיניות, מספרים וסמלים במקלדת, הימנע מרווחים בהתחלה ובסוף",
     "PASSWORD TOO SHORT TEXT": "הסיסמה חייבת להכיל 8 תווים לפחות",
     "PASSWORD TOO COMMON TEXT": "סיסמה זו חלשה מאחר והיא מהסיסמאות הפופולריות ביותר בעולם",

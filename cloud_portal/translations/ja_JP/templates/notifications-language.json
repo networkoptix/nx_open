@@ -9,7 +9,7 @@
     "emailSubject": "{{message.sharer_name}}さんがあなたを{{PRODUCT_NAME}}に招待しています"
   },
   "system_shared": {
-    "emailSubject": "{{message.sharer_name}}さんがあなたを{{PRODUCT_NAME}}に招待しています"
+    "emailSubject": "Video system {{message.system_name}} was shared with you"
   },
   "review_version": {
     "emailSubject": "バージョン{{message.id}}の準備ができました"

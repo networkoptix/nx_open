@@ -6,10 +6,10 @@
     "emailSubject": "사용자 암호 초기화"
   },
   "system_invite": {
-    "emailSubject": "{{message.sharer_name}} 님이 당신을 {{PRODUCT_NAME}}에 초대했습니다"
+    "emailSubject": "{{message.sharer_name}} 님이 당신을 {{PRODUCT_NAME}}에 초대했습니다."
   },
   "system_shared": {
-    "emailSubject": "{{message.sharer_name}} 님이 당신을 {{PRODUCT_NAME}}에 초대했습니다."
+    "emailSubject": "Video system {{message.system_name}} was shared with you"
   },
   "review_version": {
     "emailSubject": "{{message.id}} 버전을 검토 할 준비가되었습니다."

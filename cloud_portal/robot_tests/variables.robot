@@ -102,6 +102,7 @@ ${SYSTEM NO ACCESS}                   //div[@ng-if='systemNoAccess']/h1[contains
 
 #Disconnect from cloud portal
 ${DISCONNECT FORM}                    //form[@name='disconnectForm']
+${DISCONNECT FORM CANCEL}             //form[@name='disconnectForm']//button[@ng-click='close()']
 ${DISCONNECT FORM HEADER}             //h1['${DISCONNECT FORM HEADER TEXT}']
 
 #Disconnect from my account
@@ -120,11 +121,6 @@ ${SHARE PERMISSIONS DROPDOWN}         //form[@name='shareForm']//select[@ng-mode
 ${SHARE BUTTON MODAL}                 //form[@name='shareForm']//button[@ng-click='checkForm()']
 ${SHARE CANCEL}                       //form[@name='shareForm']//button[@ng-click='close()']
 ${SHARE CLOSE}                        //div[@uib-modal-transclude]//div[@ng-if='settings.title']//button[@ng-click='close()']
-${SHARE PERMISSIONS ADMINISTRATOR}    //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='${ADMIN TEXT}']
-${SHARE PERMISSIONS ADVANCED VIEWER}  //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='${ADV VIEWER TEXT}']
-${SHARE PERMISSIONS VIEWER}           //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='${VIEWER TEXT}']
-${SHARE PERMISSIONS LIVE VIEWER}      //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='${LIVE VIEWER TEXT}']
-${SHARE PERMISSIONS CUSTOM}           //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='${CUSTOM TEXT}']
 ${SHARE PERMISSIONS HINT}             //form[@name='shareForm']//span[contains(@class,'help-block')]
 
 ${EDIT PERMISSIONS EMAIL}             //form[@name='shareForm']//input[@ng-model='user.email']
@@ -159,7 +155,7 @@ ${255CHARS}                           QWErtyuiopasdfghhkljzxcvbnmqwertyuiopasdfg
 
 #Emails
 ${BASE EMAIL}                         noptixautoqa@gmail.com
-${BASE EMAIL PASSWORD}                qweasd!@#$
+${BASE EMAIL PASSWORD}                qweasd!@#$%
 ${BASE HOST}                          imap.gmail.com
 ${BASE PORT}                          993
 ${EMAIL VIEWER}                       noptixautoqa+viewer@gmail.com
@@ -169,7 +165,7 @@ ${EMAIL OWNER}                        noptixautoqa+owner@gmail.com
 ${EMAIL NOT OWNER}                    noptixautoqa+notowner@gmail.com
 ${EMAIL ADMIN}                        noptixautoqa+admin@gmail.com
 ${EMAIL CUSTOM}                       noptixautoqa+custom@gmail.com
-@{EMAILS LIST}                        noptixautoqa+viewer@gmail.com    noptixautoqa+advviewer@gmail.com    noptixautoqa+liveviewer@gmail.com    noptixautoqa+owner@gmail.com    noptixautoqa+custom@gmail.com    noptixautoqa+admin@gmail.com
+@{EMAILS LIST}                        ${EMAIL VIEWER}    ${EMAIL ADV VIEWER}    ${EMAIL LIVE VIEWER}${EMAIL OWNER}    ${EMAIL NOT OWNER}    ${EMAIL ADMIN}    ${EMAIL CUSTOM}
 ${ADMIN FIRST NAME}                   asdasasd
 ${ADMIN LAST NAME}                    asdasasdas
 ${EMAIL UNREGISTERED}                 noptixautoqa+unregistered@gmail.com
@@ -181,14 +177,15 @@ ${TEST FIRST NAME}                    testFirstName
 ${TEST LAST NAME}                     testLastName
 
 #Related to Auto Tests system
-${AUTO_TESTS SYSTEM ID}                     4d4425a8-d316-43f3-9af9-ecc19a5777f7
+${AUTO_TESTS SYSTEM ID}                     262d629d-144c-4402-bfa9-c490d9f6dbe9
 ${AUTO TESTS TITLE}                   //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[text()='Auto Tests']
 ${AUTO TESTS USER}                    //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[text()='Auto Tests']/following-sibling::span[contains(@class,'user-name')]
 ${AUTO TESTS OPEN NX}                 //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[text()='Auto Tests']/..//button[@ng-click='checkForm()']
 ${SYSTEMS SEARCH INPUT}               //input[@ng-model='search.value']
 ${SYSTEMS TILE}                       //div[@ng-repeat="system in systems | filter:searchSystems as filtered"]
+${NOT OWNER IN SYSTEM}                //div[@process-loading='gettingSystemUsers']//tbody//tr//td[contains(text(), '${EMAIL NOT OWNER}')]
 
-#AUTO TESTS 2 is an offline system used for testing offline status on the systems page
+#AUTO TESTS 2 is an offline system used for testing offline status on the systems page and offline status on the system page
 ${AUTOTESTS OFFLINE}                  //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests 2')]/following-sibling::span[contains(text(), '${AUTOTESTS OFFLINE TEXT}')]
 ${AUTOTESTS OFFLINE OPEN NX}          //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests 2')]/..//button[@ng-click='checkForm()']
 ${AUTOTESTS OFFLINE SYSTEM ID}                aee1df1e-ea9d-43c8-9c04-0463758d3616

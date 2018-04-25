@@ -3,8 +3,9 @@ Resource          ../resource.robot
 Resource          ../variables.robot
 Suite Setup       Open Log In Dialog
 Suite Teardown    Close Browser
-Test Teardown     Run Keyword If Test Failed    Test Reset
+Test Teardown     Run Keyword If Test Failed    Restart
 Test Template     Test Login Invalid
+Force Tags        form
 
 *** Variables ***
 ${url}    ${ENV}
@@ -30,7 +31,7 @@ Empty Email and Password      ${EMPTY}                      ${EMPTY}            
 Valid Email and password      ${good email}                 ${good password}    neither
 
 *** Keywords ***
-Test Reset
+Restart
     Close Browser
     Open Log In Dialog
 
@@ -42,10 +43,16 @@ Open Log In Dialog
 
 Test Login Invalid
     [Arguments]    ${email}    ${pass}    ${expected}
-    Form Validation    Log In    email=${email}    password=${pass}
-    Run Keyword If    "${expected} "== "outline"    Outline Error    ${email}    ${pass}
+    Log In Form Validation    ${email}    ${pass}
+    Run Keyword If    "${expected}" == "outline"    Outline Error    ${email}    ${pass}
     Run Keyword If    "${expected}" == "alert"    Alert Error    ${email}    ${pass}
     Run Keyword If    "${expected}" == "neither"    Validate Login
+
+Log In Form Validation
+    [Arguments]    ${email}    ${pass}
+    Input Text    ${EMAIL INPUT}    ${email}
+    Input Text    ${PASSWORD INPUT}    ${pass}
+    click button    ${LOG IN BUTTON}
 
 Outline Error
     [Arguments]    ${email}    ${pass}

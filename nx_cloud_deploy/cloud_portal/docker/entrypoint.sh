@@ -18,18 +18,26 @@ function instantiate_config()
 {
     export CUSTOMIZATION=$1
     export CLOUD_PORTAL_CONF_DIR=$CLOUD_PORTAL_BASE_CONF_DIR/$customization
+    local CLOUD_PORTAL_CONF=$CLOUD_PORTAL_CONF_DIR/cloud_portal.yaml
+    local CLOUD_PORTAL_LOCK=${CLOUD_PORTAL_CONF}.lock
 
     local CLOUD_PORTAL_HOST_var=CLOUD_PORTAL_HOST_$customization
     export CLOUD_PORTAL_HOST=${!CLOUD_PORTAL_HOST_var:-$CLOUD_PORTAL_HOST}
 
-    tmp=$(tempfile)
-    envsubst < $CLOUD_PORTAL_CONF_DIR/cloud_portal.yaml > $tmp
-    mv $tmp $CLOUD_PORTAL_CONF_DIR/cloud_portal.yaml
+    (
+        flock -n 9 || exit 1
 
-    if [ -n "$MODULE_CONFIGURATION" ]
-    then
-        update_with_module_configuration $CLOUD_PORTAL_CONF_DIR/cloud_portal.yaml "$MODULE_CONFIGURATION"
-    fi
+        tmp=$(tempfile)
+        envsubst < $CLOUD_PORTAL_CONF > $tmp
+        mv $tmp $CLOUD_PORTAL_CONF
+
+        if [ -n "$MODULE_CONFIGURATION" ]
+        then
+            update_with_module_configuration $CLOUD_PORTAL_CONF "$MODULE_CONFIGURATION"
+        fi
+
+        rm $CLOUD_PORTAL_LOCK
+    ) 9> $CLOUD_PORTAL_LOCK
 }
 
 function write_my_cnf()
@@ -39,6 +47,7 @@ function write_my_cnf()
 user = $DB_USER
 password = $DB_PASSWORD
 host = $DB_HOST
+port = $DB_PORT
 database = $DB_NAME
 EOF
 }

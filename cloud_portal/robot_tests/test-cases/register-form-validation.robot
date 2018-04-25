@@ -3,8 +3,9 @@ Resource          ../resource.robot
 Resource          ../variables.robot
 Suite Setup       Open Browser and go to URL    ${url}/register
 Suite Teardown    Close Browser
-Test Teardown     Run Keyword If Test Failed    Test Reset
+Test Teardown     Run Keyword If Test Failed    Restart
 Test Template     Test Register Invalid
+Force Tags        form
 
 *** Variables ***
 ${url}    ${ENV}
@@ -56,17 +57,26 @@ Invalid All             ${SPACE}    ${SPACE}    noptixqagmail.com         ${7cha
 Empty All               ${EMPTY}    ${EMPTY}    ${EMPTY}                  ${EMPTY}
 
 *** Keywords ***
-Test Reset
+Restart
     Close Browser
     Open Browser and go to URL    ${url}/register
 
 Test Register Invalid
     [Arguments]    ${first}    ${last}    ${email}    ${pass}
-    Form Validation    Register    ${first}    ${last}    ${email}    ${pass}
+    Wait Until Elements Are Visible    ${REGISTER FIRST NAME INPUT}    ${REGISTER LAST NAME INPUT}    ${REGISTER EMAIL INPUT}    ${REGISTER PASSWORD INPUT}    ${CREATE ACCOUNT BUTTON}
+    Register Form Validation    ${first}    ${last}    ${email}    ${pass}
     Run Keyword Unless    "${pass}"=="${BASE PASSWORD}"    Check Password Outline    ${pass}
     Run Keyword Unless    "${email}"=="${valid email}"    Check Email Outline    ${email}
     Run Keyword Unless    "${first}"=="mark"    Check First Name Outline    ${first}
     Run Keyword Unless    "${last}"=="hamill"    Check Last Name Outline    ${last}
+
+Register Form Validation
+    [arguments]    ${first name}    ${last name}    ${email}    ${password}
+    Input Text    ${REGISTER FIRST NAME INPUT}    ${first name}
+    Input Text    ${REGISTER LAST NAME INPUT}    ${last name}
+    Input Text    ${REGISTER EMAIL INPUT}    ${email}
+    Input Text    ${REGISTER PASSWORD INPUT}    ${password}
+    click button    ${CREATE ACCOUNT BUTTON}
 
 Check Email Outline
     [Arguments]    ${email}

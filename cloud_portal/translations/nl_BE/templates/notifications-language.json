@@ -6,10 +6,10 @@
     "emailSubject": "Uw wachtwoord opnieuw instellen"
   },
   "system_invite": {
-    "emailSubject": "{{message.sharer_name}} nodigt je uit voor {{PRODUCT_NAME}}"
+    "emailSubject": "{{message.sharer_name}} nodigt u uit voor {{PRODUCT_NAME}}"
   },
   "system_shared": {
-    "emailSubject": "{{message.sharer_name}} nodigt u uit voor {{PRODUCT_NAME}}"
+    "emailSubject": "Video system {{message.system_name}} was shared with you"
   },
   "review_version": {
     "emailSubject": "Versie {{message.id}} is klaar om te worden beoordeeld"
