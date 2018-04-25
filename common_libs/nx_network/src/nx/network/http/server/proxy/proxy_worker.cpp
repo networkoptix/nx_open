@@ -14,6 +14,8 @@ namespace proxy {
 
 std::atomic<int> ProxyWorker::m_proxyingIdSequence(0);
 
+static std::atomic<int> s_proxyCount(0);
+
 ProxyWorker::ProxyWorker(
     const nx::String& targetHost,
     nx::network::http::Request translatedRequest,
@@ -48,6 +50,21 @@ ProxyWorker::ProxyWorker(
     bindToAioThread(m_targetHostPipeline->getAioThread());
 
     m_translatedRequest = std::move(translatedRequest);
+
+    const int proxyCount = ++s_proxyCount;
+    if (proxyCount % 10 == 0)
+    {
+        NX_DEBUG(this, lm("+ There are %1 proxies currently").args(proxyCount));
+    }
+}
+
+ProxyWorker::~ProxyWorker()
+{
+    const int proxyCount = --s_proxyCount;
+    if (proxyCount % 10 == 0)
+    {
+        NX_DEBUG(this, lm("- There are %1 proxies currently").args(proxyCount));
+    }
 }
 
 void ProxyWorker::setTargetHostConnectionInactivityTimeout(
