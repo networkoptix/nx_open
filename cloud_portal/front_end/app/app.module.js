@@ -42,7 +42,7 @@ const dialogs_service_1 = require("./src/dialogs/dialogs.service");
 const general_component_1 = require("./src/dialogs/general/general.component");
 // AoT requires an exported function for factories
 function createTranslateLoader(http) {
-    return new http_loader_1.TranslateHttpLoader(http, './assets/i18n/', '.json');
+    return new http_loader_1.TranslateHttpLoader(http, './static/assets/i18n/', '.json');
 }
 exports.createTranslateLoader = createTranslateLoader;
 class HybridUrlHandlingStrategy {

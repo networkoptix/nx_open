@@ -39,7 +39,7 @@ import { GeneralModalContent, NxModalGeneralComponent } from "./src/dialogs/gene
 
 // AoT requires an exported function for factories
 export function createTranslateLoader(http: HttpClient) {
-    return new TranslateHttpLoader(http, './assets/i18n/', '.json');
+    return new TranslateHttpLoader(http, './static/assets/i18n/', '.json');
 }
 
 class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
