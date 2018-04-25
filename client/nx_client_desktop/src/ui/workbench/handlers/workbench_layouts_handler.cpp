@@ -181,16 +181,25 @@ LayoutsHandler::LayoutsHandler(QObject *parent):
                 return;
             const auto &actionParams = businessAction->getParams();
 
-            if (actionParams.additionalResources.empty())
-                return;
-
             QnResourcePool* pool = this->resourcePool();
             QnLayoutResourcePtr layout =
                 pool->getResourceById<QnLayoutResource>(actionParams.actionResourceId);
             if (!layout)
                 return;
 
-            menu()->trigger(action::OpenInNewTabAction, layout);
+            auto currentUser = context()->user();
+            NX_ASSERT(currentUser);
+
+            auto accessManager = commonModule()->resourceAccessManager();
+            NX_ASSERT(accessManager);
+            // TODO: Is it better to a add additional permission flags to the place
+            // where all menu actions are registered?
+            if (accessManager->hasPermission(currentUser, layout, Qn::ReadPermission))
+                menu()->trigger(action::OpenInNewTabAction, layout);
+            else
+            {
+                qDebug() << "User does " << currentUser->getName() << " does not have permission to view layout " << layout->getName();
+            }
         });
 }
 
