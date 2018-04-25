@@ -35,6 +35,8 @@ public:
             const auto mask = QBitmap::fromData(QSize(MotionGrid::kHeight, MotionGrid::kWidth),
                 reinterpret_cast<const uchar*>(m_mask.data()), QImage::Format_Mono);
 
+            // Rotate90 and mirror are operations optimized by QImage, while transposition
+            // - single transformation with QMatrix(0,1,1,0, 0,0) - is not optimized.
             auto image = mask.toImage().transformed(QMatrix().rotate(-90)).mirrored();
             image.setColorTable({0, 0xFFFFFFFF});
 
