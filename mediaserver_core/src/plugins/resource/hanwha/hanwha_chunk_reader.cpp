@@ -7,6 +7,9 @@
 #include <utils/common/synctime.h>
 #include <core/resource/network_resource.h>
 
+#include <api/global_settings.h>
+#include <common/common_module.h>
+
 #include "hanwha_chunk_reader.h"
 #include "hanwha_request_helper.h"
 #include "hanwha_shared_resource_context.h"
@@ -36,14 +39,18 @@ static const QDateTime kMaxDateTime = QDateTime::fromString(
     lit("2037-12-31 00:00:00"),
     kDateTimeFormat);
 
-static const std::chrono::milliseconds kHttpTimeout(10000);
-static const std::chrono::milliseconds kTimelineCacheTime(10000);
+static const std::chrono::seconds kSendTimeout(10);
+static const std::chrono::milliseconds kTimelineCacheTime(10000); //< Only for sync mode.
 
 } // namespace
 
 using namespace nx::core::resource;
 
-HanwhaChunkLoader::HanwhaChunkLoader(HanwhaSharedResourceContext* resourceContext):
+HanwhaChunkLoader::HanwhaChunkLoader(
+    QnCommonModule* commonModule,
+    HanwhaSharedResourceContext* resourceContext)
+    :
+    QnCommonModuleAware(commonModule),
     m_resourceContext(resourceContext)
 {
 }
@@ -637,8 +644,11 @@ void HanwhaChunkLoader::prepareHttpClient()
     m_httpClient = std::make_unique<nx_http::AsyncClient>();
     m_httpClient->setUserName(authenticator.user());
     m_httpClient->setUserPassword(authenticator.password());
-    m_httpClient->setSendTimeout(kHttpTimeout);
-    m_httpClient->setResponseReadTimeout(kHttpTimeout);
+    m_httpClient->setSendTimeout(kSendTimeout);
+    m_httpClient->setResponseReadTimeout(
+        std::chrono::seconds(qnGlobalSettings->hanwhaChunkReaderResponseTimeout()));
+    m_httpClient->setMessageBodyReadTimeout(
+        std::chrono::seconds(qnGlobalSettings->hanwhaChunkReaderMessageBodyTimeout()));
     m_httpClient->setOnDone([this](){ at_httpClientDone(); });
 }
 

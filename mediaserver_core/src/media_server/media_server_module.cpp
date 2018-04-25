@@ -182,6 +182,7 @@ QnMediaServerModule::QnMediaServerModule(
     m_metadataManagerPool = store(new nx::mediaserver::metadata::ManagerPool(this));
 
     m_sharedContextPool = store(new nx::mediaserver::resource::SharedContextPool(this));
+
     m_archiveIntegrityWatcher = store(new nx::mediaserver::ServerArchiveIntegrityWatcher);
     m_rootTool = nx::mediaserver::findRootTool(qApp->applicationFilePath());
 
