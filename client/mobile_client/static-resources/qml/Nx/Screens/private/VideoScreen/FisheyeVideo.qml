@@ -136,7 +136,7 @@ Item
         property real animatedRotationX: unconstrainedRotation.x
         Behavior on animatedRotationX
         {
-            enabled: !mouseArea.draggingStarted && !pinchArea.pinch.active
+            enabled: !mouseArea.draggingStarted && !pinchArea.zoomStarted
 
             RotationAnimation
             {
@@ -148,7 +148,7 @@ Item
         property real animatedRotationY: unconstrainedRotation.y
         Behavior on animatedRotationY
         {
-            enabled: !mouseArea.draggingStarted && !pinchArea.pinch.active
+            enabled: !mouseArea.draggingStarted && !pinchArea.zoomStarted
 
             RotationAnimation
             {
@@ -289,15 +289,22 @@ Item
         id: pinchArea
 
         anchors.fill: parent
+        property bool zoomStarted: false
 
         onPinchStarted:
+        {
             interactor.startZoom(pinch.startCenter.x, pinch.startCenter.y)
+            zoomStarted = true
+        }
 
         onPinchUpdated:
             updateZoom(pinch.center.x, pinch.center.y, pinch.scale)
 
         onPinchFinished:
+        {
             updateZoom(pinch.center.x, pinch.center.y, pinch.scale)
+            zoomStarted = false
+        }
 
         function updateZoom(x, y, scale)
         {
