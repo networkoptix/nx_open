@@ -136,6 +136,8 @@ void CameraMotionSettingsWidget::loadState(const CameraSettingsDialogState& stat
     m_cameraId = state.isSingleCamera() ? state.singleCameraProperties.id : QString();
     m_motionHelper->setMotionRegionList(state.singleCameraSettings.motionRegionList());
 
+    ui->motionDetectionCheckBox->setChecked(state.hasMotion());
+
     if (auto motionItem = m_motionView->rootObject())
         motionItem->setProperty("cameraResourceId", m_cameraId);
 }
