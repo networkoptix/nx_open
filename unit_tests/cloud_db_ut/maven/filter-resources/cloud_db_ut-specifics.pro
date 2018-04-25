@@ -9,6 +9,7 @@ INCLUDEPATH += ${root.dir}/nx_cloud/cloud_db_client/src/include/
 INCLUDEPATH += ${root.dir}/nx_cloud/cloud_db_client/src/
 INCLUDEPATH += ${root.dir}/nx_cloud/nx_data_sync_engine/src/
 INCLUDEPATH += ${root.dir}/vms_libs/nx_vms_api/src/
+INCLUDEPATH += ${root.dir}/mediaserver_db/src/
 
 linux {
     QMAKE_CXXFLAGS += -Werror -Wno-error=strict-aliasing
