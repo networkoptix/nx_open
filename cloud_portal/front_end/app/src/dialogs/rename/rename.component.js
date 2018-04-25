@@ -21,7 +21,7 @@ let RenameModalContent = class RenameModalContent {
         this.cloudApi = cloudApi;
     }
     ngOnInit() {
-        this.renaming = this.process.init(function () {
+        this.rename = this.process.init(function () {
             return this.cloudApi.renameSystem(this.systemId, this.systemName);
         }, {
             successMessage: this.language.system.successRename

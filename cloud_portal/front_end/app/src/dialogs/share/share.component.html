@@ -1,50 +1,50 @@
 <!--<div ng-controller="ShareCtrl">-->
-    <form #shareForm="ngForm" novalidate>
-        <div class="modal-header">
-            <h1 class="modal-title" translate>Share</h1>
-            <button type="button" class="close"
-                    data-dismiss="modal" aria-label="Close"
-                    (click)="activeModal.close()" *ngIf="closable"><span class="close-icon"></span></button>
+<form #shareForm="ngForm" novalidate>
+    <div class="modal-header">
+        <h1 class="modal-title" translate>Share</h1>
+        <button type="button" class="close"
+                data-dismiss="modal" aria-label="Close"
+                (click)="activeModal.close()" *ngIf="closable"><span class="close-icon"></span></button>
+    </div>
+
+    <div class="modal-body">
+        <div class="form-group" validate-field>
+            <label *ngIf="!isNewShare" for="lockedEmail" translate>User</label>
+            <label *ngIf="isNewShare" for="email" translate>Email</label>
+
+            <input [hidden]="!isNewShare" type="email"
+                   class="form-control"
+                   [(ngModel)]="userInfo.email"
+                   id="email"
+                   name="email"
+                   validate-email maxlength="255"
+                   required autofocus>
+
+            <input type="text" *ngIf="!isNewShare" name="email" id="lockedEmail"
+                   class="form-control" [value]="formatUserName()" readonly>
         </div>
+        <div class="form-group">
+            <label for="role" translate>Permissions</label>
 
-        <div class="modal-body">
-            <div class="form-group" validate-field>
-                <label *ngIf="!isNewShare" for="lockedEmail" translate>User</label>
-                <label *ngIf="isNewShare" for="email" translate>Email</label>
+            <select class="form-control" name="role" id="role"
+                    [(ngModel)]="userInfo.role"
+                    (ngModelChange)="onChange($event)"
+                    ng-options="option as ($root.L.accessRoles[option.name].label || option.name) for option in accessRoles">
+                <option *ngFor="let optionLabel of accessRoles" [ngValue]="option"> {{option}}</option>
+            </select>
 
-                <input [hidden]="!isNewShare" type="email"
-                       class="form-control"
-                       [(ngModel)]="userInfo.email"
-                       id="email"
-                       name="email"
-                       validate-email maxlength="255"
-                       required autofocus>
-
-                <input type="text" *ngIf="!isNewShare" name="email" id="lockedEmail"
-                       class="form-control" [value]="formatUserName()" readonly>
-            </div>
-            <div class="form-group">
-                <label for="role" translate>Permissions</label>
-
-                <select class="form-control" name="role" id="role"
-                        [(ngModel)]="userInfo.role"
-                        (ngModelChange)="onChange($event)"
-                        ng-options="option as ($root.L.accessRoles[option.name].label || option.name) for option in accessRoles">
-                    <option *ngFor="let optionLabel of accessRoles" [ngValue]="option"> {{option}}</option>
-                </select>
-
-                <span class="help-block">
-                    {{getRoleDescription()}}
-                </span>
-            </div>
+            <span class="help-block">
+                {{getRoleDescription()}}
+            </span>
         </div>
+    </div>
 
-        <div class="modal-footer">
-            <process-button [process]="sharing"
-                            [form]="shareForm"
-                            [button-text]="buttonText"></process-button>
+    <div class="modal-footer">
+        <nx-process-button [process]="sharing"
+                           [form]="shareForm"
+                           [buttonText]="buttonText"></nx-process-button>
 
-            <button type="button" class="btn btn-default" (click)="activeModal.close()" translate>Cancel</button>
-        </div>
-    </form>
+        <button type="button" class="btn btn-default" (click)="activeModal.close()" translate>Cancel</button>
+    </div>
+</form>
 <!--</div>-->

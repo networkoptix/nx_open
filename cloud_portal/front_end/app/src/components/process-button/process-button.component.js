@@ -62,7 +62,7 @@ __decorate([
 ], NxProcessButtonComponent.prototype, "buttonDisabled", void 0);
 __decorate([
     core_1.Input(),
-    __metadata("design:type", Boolean)
+    __metadata("design:type", Object)
 ], NxProcessButtonComponent.prototype, "actionType", void 0);
 __decorate([
     core_1.Input(),

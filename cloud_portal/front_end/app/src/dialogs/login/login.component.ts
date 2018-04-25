@@ -69,7 +69,6 @@ export class NxModalLoginComponent implements OnInit {
     location: Location;
 
     constructor(@Inject('languageService') private language: any,
-                // @Inject('CONFIG') private CONFIG: any,
                 private modalService: NgbModal,
                 location: Location) {
 

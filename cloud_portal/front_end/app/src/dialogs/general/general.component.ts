@@ -11,11 +11,13 @@ import {EmailValidator} from '@angular/forms';
     // templateUrl: this.CONFIG.viewsDir + 'components/dialog.html'
 })
 export class GeneralModalContent {
+    @Input() language;
     @Input() message;
     @Input() title;
     @Input() actionLabel;
-    @Input() actionType;
+    @Input() buttonType;
     @Input() cancelLabel;
+    @Input() buttonClass;
     @Input() hasFooter;
     @Input() cancellable;
     @Input() closable;

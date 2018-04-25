@@ -29,10 +29,10 @@
             </div>
         </div>
         <div class="modal-footer">
-            <process-button [process]="disconnecting"
-                            [form]="disconnectForm"
-                            action-type="'danger'"
-                            button-text="{{ 'Disconnect' | translate }}"></process-button>
+            <nx-process-button [process]="disconnect"
+                               [form]="disconnectForm"
+                               action-type="'danger'"
+                               buttonText="{{ 'Disconnect' | translate }}"></nx-process-button>
 
             <button type="button" class="btn btn-default" (click)="activeModal.close()" translate>Cancel</button>
         </div>

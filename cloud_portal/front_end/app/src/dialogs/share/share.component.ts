@@ -1,8 +1,7 @@
 import { Component, Inject, OnInit, Input, ViewEncapsulation } from '@angular/core';
-import { Location }                                            from '@angular/common';
 import { NgbModal, NgbActiveModal, NgbModalRef }               from '@ng-bootstrap/ng-bootstrap';
 import { EmailValidator }                                      from '@angular/forms';
-import { nxDialogsService }                                    from "../dialogs.service";
+import { NxModalGeneralComponent }                             from "../general/general.component";
 
 @Component({
     selector: 'nx-modal-share-content',
@@ -10,9 +9,9 @@ import { nxDialogsService }                                    from "../dialogs.
     styleUrls: []
 })
 export class ShareModalContent {
+    @Input() language;
     @Input() system;
     @Input() user;
-    @Input() language;
 
     title: string;
     sharing: any;
@@ -25,15 +24,16 @@ export class ShareModalContent {
     constructor(public activeModal: NgbActiveModal,
                 @Inject('account') private account: any,
                 @Inject('process') private process: any,
-                @Inject('CONFIG') private CONFIG: any,
-                private nxDialogs: nxDialogsService) {
+                @Inject('configService') private configService: any,
+                @Inject('ngToast') private toast: any,
+                private generalModal: NxModalGeneralComponent,) {
 
         this.url = 'share';
         this.title = (!this.user) ? this.language.sharing.shareTitle : this.language.sharing.editShareTitle;
     }
 
     processAccessRoles() {
-        const roles = this.system.accessRoles || this.CONFIG.accessRoles.predefinedRoles;
+        const roles = this.system.accessRoles || this.configService.accessRoles.predefinedRoles;
         this.accessRoles = roles.filter((role) => {
             if (!(role.isOwner || role.isAdmin && !this.system.isMine)) {
                 role.optionLabel = this.language.accessRoles[role.option.name].label || role.option.name;
@@ -76,13 +76,7 @@ export class ShareModalContent {
     }
 
     ngOnInit() {
-
-        // var dialogSettings = dialogs.getSettings($scope);
-        // var system = dialogSettings.params.system;
-
         this.buttonText = this.language.sharing.shareConfirmButton;
-
-        const systemId = this.system.id;
         this.isNewShare = !this.user;
 
         if (!this.isNewShare) {
@@ -90,11 +84,14 @@ export class ShareModalContent {
                 .get()
                 .then((account) => {
                     if (account.email == this.user.email) {
-                        //$scope.$parent.cancel(this.language.share.cantEditYourself);
                         this.activeModal.close();
-                        this.nxDialogs
-                            .notify(
-                                this.language.sharing.confirmOwner, 'error')
+                        this.toast.create({
+                            className: 'error',
+                            content: this.language.share.cantEditYourself,
+                            dismissOnTimeout: true,
+                            dismissOnClick: true,
+                            dismissButton: false
+                        });
                     }
                 });
 
@@ -103,18 +100,26 @@ export class ShareModalContent {
 
         this.processAccessRoles();
 
-        this.sharing = this.process.init(function () {
+        this.sharing = this.process.init(() => {
             if (this.user.role.isOwner) {
-                return this.nxDialogs
-                    .confirm(
-                        this.language.sharing.confirmOwner)
-                    .then(this.doShare());
+                return this.generalModal
+                           .openConfirm(this.language.sharing.confirmOwner,
+                               this.language.sharing.shareTitle,
+                               this.language.sharing.shareConfirmButton,
+                               null,
+                               this.language.dialogs.cancelButton)
+                           .result
+                           .then((result) => {
+                               if (result === 'OK') {
+                                   this.doShare();
+                               }
+                           });
             } else {
                 return this.doShare();
             }
         }, {
             successMessage: this.language.sharing.permissionsSaved
-        }).then(function () {
+        }).then(() => {
             this.activeModal.close();
         });
     }
@@ -131,7 +136,6 @@ export class NxModalShareComponent implements OnInit {
     modalRef: NgbModalRef;
 
     constructor(@Inject('languageService') private language: any,
-                private location: Location,
                 private modalService: NgbModal) {
     }
 

@@ -17,13 +17,12 @@ const common_1 = require("@angular/common");
 const ng_bootstrap_1 = require("@ng-bootstrap/ng-bootstrap");
 let DisconnectModalContent = class DisconnectModalContent {
     constructor(activeModal, account, process, cloudApi) {
-        this.activeModal = activeModal;
         this.account = account;
         this.process = process;
         this.cloudApi = cloudApi;
     }
     ngOnInit() {
-        this.disconnecting = this.process.init(() => {
+        this.disconnect = this.process.init(() => {
             return this.cloudApi.disconnect(this.systemId, this.password);
         }, {
             ignoreUnauthorized: true,
@@ -45,6 +44,10 @@ __decorate([
     core_1.Input(),
     __metadata("design:type", Object)
 ], DisconnectModalContent.prototype, "language", void 0);
+__decorate([
+    core_1.Input(),
+    __metadata("design:type", Object)
+], DisconnectModalContent.prototype, "disconnect", void 0);
 DisconnectModalContent = __decorate([
     core_1.Component({
         selector: 'nx-modal-disconnect-content',
@@ -66,6 +69,7 @@ let NxModalDisconnectComponent = class NxModalDisconnectComponent {
     dialog(systemId) {
         this.modalRef = this.modalService.open(DisconnectModalContent);
         this.modalRef.componentInstance.language = this.language;
+        this.modalRef.componentInstance.disconnect = this.disconnect;
         this.modalRef.componentInstance.systemId = systemId;
         return this.modalRef;
     }

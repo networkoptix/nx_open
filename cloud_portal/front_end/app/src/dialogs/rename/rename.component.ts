@@ -13,7 +13,7 @@ export class RenameModalContent {
     @Input() systemName;
     @Input() language;
 
-    renaming: any;
+    rename: any;
 
     constructor(public activeModal: NgbActiveModal,
                 @Inject('process') private process: any,
@@ -22,7 +22,7 @@ export class RenameModalContent {
     }
 
     ngOnInit() {
-        this.renaming = this.process.init(function () {
+        this.rename = this.process.init(function () {
             return this.cloudApi.renameSystem(this.systemId, this.systemName);
         }, {
             successMessage: this.language.system.successRename

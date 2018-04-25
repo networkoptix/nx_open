@@ -86,9 +86,7 @@ LoginModalContent = __decorate([
 ], LoginModalContent);
 exports.LoginModalContent = LoginModalContent;
 let NxModalLoginComponent = class NxModalLoginComponent {
-    constructor(language, 
-    // @Inject('CONFIG') private CONFIG: any,
-    modalService, location) {
+    constructor(language, modalService, location) {
         this.language = language;
         this.modalService = modalService;
         this.auth = {

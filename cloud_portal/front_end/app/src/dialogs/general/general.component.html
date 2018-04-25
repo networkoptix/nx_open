@@ -11,15 +11,15 @@
 <div class="modal-footer" *ngIf="hasFooter">
     <button type="button" class="btn"
             [ngClass]="buttonClass" *ngIf="cancellable"
-            (click)="activeModal.close()"
+            (click)="activeModal.close('CANCEL')"
             translate>Close
     </button>
     <button type="button" class="btn"
             [ngClass]="buttonClass" *ngIf="!cancellable"
-            (click)="activeModal.ok()">{{actionLabel}}
+            (click)="activeModal.ok('OK')">{{actionLabel}}
     </button>
     <button type="button" class="btn btn-default"
             *ngIf="!settings.cancellable"
-            (click)="activeModal.cancel()">{{cancelLabel}}
+            (click)="activeModal.cancel('CANCEL')">{{cancelLabel}}
     </button>
 </div>

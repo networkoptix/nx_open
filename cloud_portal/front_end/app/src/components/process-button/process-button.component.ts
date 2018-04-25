@@ -10,7 +10,7 @@ export class NxProcessButtonComponent implements OnInit {
     @Input() process: any;
     @Input() buttonText: string;
     @Input() buttonDisabled: boolean;
-    @Input() actionType: boolean;
+    @Input() actionType: any;
     @Input() form: any;
 
     buttonClass: string;

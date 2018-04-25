@@ -7,73 +7,75 @@
             (click)="activeModal.close()" *ngIf="closable"><span class="close-icon"></span></button>
 </div>
 
-    <div *ngIf="!showMergeForm">
-        <div class="modal-body">
-            <div>
-                <p class="help-block-no-height" trnaslate>
-                    You can merge cloud Systems, where you are owner.
-                </p>
-                <p class="help-block-no-height" translate>
-                    Connect System you want to merge with this one to Nx Cloud or merge locally using Nx Witness Client.
-                </p>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button type="button"
-                    class="btn btn-primary wide-button" (click)="activeModal.close()"
-                    thanslate>Ok
-            </button>
+<div *ngIf="!showMergeForm">
+    <div class="modal-body">
+        <div>
+            <p class="help-block-no-height" trnaslate>
+                You can merge cloud Systems, where you are owner.
+            </p>
+            <p class="help-block-no-height" translate>
+                Connect System you want to merge with this one to Nx Cloud or merge locally using Nx Witness Client.
+            </p>
         </div>
     </div>
+    <div class="modal-footer">
+        <button type="button"
+                class="btn btn-primary wide-button" (click)="activeModal.close()"
+                thanslate>Ok
+        </button>
+    </div>
+</div>
 
-    <form *ngIf="showMergeForm" #mergeForm="ngForm" novalidate>
-        <div class="modal-body">
-            <div class="form-group">
-                <label for="system" translate>Merge current System with</label>
-                <select class="form-control" name="targetSystem"
-                        id="system"
-                        [(ngModel)]="targetSystem"
-                        ng-options="system as addStatus(system) for system in systems">
-                </select>
-            </div>
-            <p *ngIf="systemMergeable =='offline'"
-               class="help-block-no-height warning-label" translate>System {{targetSystem.name}} is offline. Cannot be merged with
-                the current one.</p>
-            <p *ngIf="systemMergeable =='cannotMerge'"
-               class="help-block-no-height warning-label" translate>System {{targetSystem.name}} is incompatible. Cannot be merged
-                with the current one.</p>
-            <p *ngIf="systemMergeable == ''"
-               class="help-block-no-height" translate>You can only merge Systems in which you have owner permissions.</p>
-            <div>
-                <div [ngClass]="{'text-muted': systemStatus != ''}" translate>Took system name and settings from</div>
-                <div ng-init="$parent.masterSystemId=system.id">
-                    <div>
-                        <input type="radio" id="firstSystem"
-                               [(ngModel)]="$parent.masterSystemId"
-                               [value]="system.id"
-                               [disabled]="systemStatus != ''">
-                        <label class="light-label"
-                               [ngClass]="{'text-muted': systemStatus != ''}"
-                               for="firstSystem">{{system.info.name}}</label>
-                    </div>
-                    <div>
-                        <input type="radio" id="secondSystem"
-                               [(ngModel)]="$parent.masterSystemId"
-                               [value]="targetSystem.id"
-                               [disabled]="systemStatus != ''">
-                        <label class="light-label"
-                               [ngClass]="{'text-muted': systemStatus != ''}"
-                               for="secondSystem">{{targetSystem.name}}</label>
-                    </div>
+<form *ngIf="showMergeForm" #mergeForm="ngForm" novalidate>
+    <div class="modal-body">
+        <div class="form-group">
+            <label for="system" translate>Merge current System with</label>
+            <select class="form-control" name="targetSystem"
+                    id="system"
+                    [(ngModel)]="targetSystem"
+                    ng-options="system as addStatus(system) for system in systems">
+            </select>
+        </div>
+        <p *ngIf="systemMergeable =='offline'"
+           class="help-block-no-height warning-label" translate>System {{targetSystem.name}} is offline. Cannot be
+            merged with
+            the current one.</p>
+        <p *ngIf="systemMergeable =='cannotMerge'"
+           class="help-block-no-height warning-label" translate>System {{targetSystem.name}} is incompatible. Cannot be
+            merged
+            with the current one.</p>
+        <p *ngIf="systemMergeable == ''"
+           class="help-block-no-height" translate>You can only merge Systems in which you have owner permissions.</p>
+        <div>
+            <div [ngClass]="{'text-muted': systemStatus != ''}" translate>Took system name and settings from</div>
+            <div ng-init="$parent.masterSystemId=system.id">
+                <div>
+                    <input type="radio" id="firstSystem"
+                           [(ngModel)]="$parent.masterSystemId"
+                           [value]="system.id"
+                           [disabled]="systemStatus != ''">
+                    <label class="light-label"
+                           [ngClass]="{'text-muted': systemStatus != ''}"
+                           for="firstSystem">{{system.info.name}}</label>
+                </div>
+                <div>
+                    <input type="radio" id="secondSystem"
+                           [(ngModel)]="$parent.masterSystemId"
+                           [value]="targetSystem.id"
+                           [disabled]="systemStatus != ''">
+                    <label class="light-label"
+                           [ngClass]="{'text-muted': systemStatus != ''}"
+                           for="secondSystem">{{targetSystem.name}}</label>
                 </div>
             </div>
         </div>
-        <div class="modal-footer">
-            <process-button [button-disabled]="systemStatus != ''"
-                            [process]="mergingSystems"
-                            [form]="mergeForm"
-                            action-type="'primary'"
-                            button-text="{{ 'Merge' | translate}}"></process-button>
-        </div>
-    </form>
+    </div>
+    <div class="modal-footer">
+        <nx-process-button [buttonDisabled]="systemStatus != ''"
+                           [process]="mergingSystems"
+                           [form]="mergeForm"
+                           actionType="'primary'"
+                           buttonText="{{ 'Merge' | translate}}"></nx-process-button>
+    </div>
+</form>
 <!--</div>-->

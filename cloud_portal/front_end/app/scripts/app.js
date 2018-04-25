@@ -21,11 +21,6 @@ window.L = {};
             'ngSanitize',
             'ngAnimate',
             'ngRoute',
-            // 'ui.bootstrap',
-            // 'NgbModal',
-            // 'NgbTabset',
-            // 'NgbTab',
-            // 'NgbTabContent',
             'ngStorage',
             'base64',
             'nxCommon',
@@ -82,7 +77,6 @@ window.L = {};
                     dataType: 'json'
                 })
                     .done(function (response) {
-                        console.log('set:',response);
                         languageServiceProvider.setLanguage(response);// Set current language
 
                         // set local variables as providers cannot get values in config phase
@@ -97,8 +91,7 @@ window.L = {};
                             appState.previewPath = 'preview';
                         }
                     })
-                    .fail(function (error) {
-                        console.log('error:',error);
+                    .fail(function () {
                         // Fallback to default language
                         $.ajax({
                             url: 'static/language.json',
@@ -106,7 +99,6 @@ window.L = {};
                             dataType: 'json'
                         })
                             .done(function (response) {
-                                console.log('fallback:',response);
                                 languageServiceProvider.setLanguage(response);
 
                                 $.ajax({
@@ -322,7 +314,7 @@ window.L = {};
                                 // controller: 'DownloadCtrl'
                                 template: ''
                             })
-                            .when('/', {
+                            .when('/', { 
                                 title: ''/*languageServiceProvider.$get().lang.pageTitles.startPage*/,
                                 templateUrl: CONFIG.viewsDir + 'startPage.html',
                                 controller: 'StartPageCtrl'

@@ -69,8 +69,9 @@ nxDialogsService = __decorate([
     __metadata("design:paramtypes", [Object, login_component_1.NxModalLoginComponent,
         general_component_1.NxModalGeneralComponent,
         disconnect_component_1.NxModalDisconnectComponent,
-        rename_component_1.NxModalRenameComponent, typeof (_a = typeof merge_component_1.NxModalMergeComponent !== "undefined" && merge_component_1.NxModalMergeComponent) === "function" && _a || Object, share_component_1.NxModalShareComponent])
+        rename_component_1.NxModalRenameComponent,
+        merge_component_1.NxModalMergeComponent,
+        share_component_1.NxModalShareComponent])
 ], nxDialogsService);
 exports.nxDialogsService = nxDialogsService;
-var _a;
 //# sourceMappingURL=dialogs.service.js.map

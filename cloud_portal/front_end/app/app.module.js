@@ -40,6 +40,10 @@ const login_component_1 = require("./src/dialogs/login/login.component");
 const process_button_component_1 = require("./src/components/process-button/process-button.component");
 const dialogs_service_1 = require("./src/dialogs/dialogs.service");
 const general_component_1 = require("./src/dialogs/general/general.component");
+const disconnect_component_1 = require("./src/dialogs/disconnect/disconnect.component");
+const rename_component_1 = require("./src/dialogs/rename/rename.component");
+const share_component_1 = require("./src/dialogs/share/share.component");
+const merge_component_1 = require("./src/dialogs/merge/merge.component");
 // AoT requires an exported function for factories
 function createTranslateLoader(http) {
     return new http_loader_1.TranslateHttpLoader(http, './static/assets/i18n/', '.json');
@@ -99,10 +103,12 @@ AppModule = __decorate([
         ],
         entryComponents: [
             process_button_component_1.NxProcessButtonComponent,
-            login_component_1.LoginModalContent,
-            login_component_1.NxModalLoginComponent,
-            general_component_1.GeneralModalContent,
-            general_component_1.NxModalGeneralComponent,
+            login_component_1.LoginModalContent, login_component_1.NxModalLoginComponent,
+            general_component_1.GeneralModalContent, general_component_1.NxModalGeneralComponent,
+            disconnect_component_1.DisconnectModalContent, disconnect_component_1.NxModalDisconnectComponent,
+            rename_component_1.RenameModalContent, rename_component_1.NxModalRenameComponent,
+            share_component_1.ShareModalContent, share_component_1.NxModalShareComponent,
+            merge_component_1.MergeModalContent, merge_component_1.NxModalMergeComponent
         ],
         providers: [
             ng_bootstrap_2.NgbModal,
@@ -114,15 +120,21 @@ AppModule = __decorate([
             // {provide: '$rootScope', useFactory: i => i.get('$rootScope'), deps: ['$injector']},
             login_component_1.NxModalLoginComponent,
             general_component_1.NxModalGeneralComponent,
+            disconnect_component_1.NxModalDisconnectComponent,
+            rename_component_1.NxModalRenameComponent,
+            share_component_1.NxModalShareComponent,
+            merge_component_1.NxModalMergeComponent,
             process_button_component_1.NxProcessButtonComponent,
             dialogs_service_1.nxDialogsService
         ],
         declarations: [
             app_component_1.AppComponent,
-            login_component_1.LoginModalContent,
-            login_component_1.NxModalLoginComponent,
-            general_component_1.GeneralModalContent,
-            general_component_1.NxModalGeneralComponent,
+            login_component_1.LoginModalContent, login_component_1.NxModalLoginComponent,
+            general_component_1.GeneralModalContent, general_component_1.NxModalGeneralComponent,
+            disconnect_component_1.DisconnectModalContent, disconnect_component_1.NxModalDisconnectComponent,
+            rename_component_1.RenameModalContent, rename_component_1.NxModalRenameComponent,
+            share_component_1.ShareModalContent, share_component_1.NxModalShareComponent,
+            merge_component_1.MergeModalContent, merge_component_1.NxModalMergeComponent,
             process_button_component_1.NxProcessButtonComponent,
         ],
         bootstrap: [app_component_1.AppComponent]

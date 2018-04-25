@@ -23,6 +23,10 @@ let GeneralModalContent = class GeneralModalContent {
 __decorate([
     core_1.Input(),
     __metadata("design:type", Object)
+], GeneralModalContent.prototype, "language", void 0);
+__decorate([
+    core_1.Input(),
+    __metadata("design:type", Object)
 ], GeneralModalContent.prototype, "message", void 0);
 __decorate([
     core_1.Input(),
@@ -35,11 +39,15 @@ __decorate([
 __decorate([
     core_1.Input(),
     __metadata("design:type", Object)
-], GeneralModalContent.prototype, "actionType", void 0);
+], GeneralModalContent.prototype, "buttonType", void 0);
 __decorate([
     core_1.Input(),
     __metadata("design:type", Object)
 ], GeneralModalContent.prototype, "cancelLabel", void 0);
+__decorate([
+    core_1.Input(),
+    __metadata("design:type", Object)
+], GeneralModalContent.prototype, "buttonClass", void 0);
 __decorate([
     core_1.Input(),
     __metadata("design:type", Object)

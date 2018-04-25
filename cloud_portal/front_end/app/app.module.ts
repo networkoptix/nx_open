@@ -27,15 +27,19 @@ import { ngToastModule }                   from './ajs-upgraded-providers';
 import { configServiceModule }             from './ajs-upgraded-providers';
 import { authorizationCheckServiceModule } from './ajs-upgraded-providers';
 
-import { AppComponent }                                 from './app.component';
-import { BarModule }                                    from './src/bar/bar.module';
-import { DownloadModule }                               from './src/download/download.module';
-import { DownloadHistoryModule }                        from './src/download-history/download-history.module';
-import { DropdownsModule }                              from './src/dropdowns/dropdowns.module';
-import { NxModalLoginComponent, LoginModalContent }     from "./src/dialogs/login/login.component";
-import { NxProcessButtonComponent }                     from './src/components/process-button/process-button.component';
-import { nxDialogsService }                             from "./src/dialogs/dialogs.service";
-import { GeneralModalContent, NxModalGeneralComponent } from "./src/dialogs/general/general.component";
+import { AppComponent }                                       from './app.component';
+import { BarModule }                                          from './src/bar/bar.module';
+import { DownloadModule }                                     from './src/download/download.module';
+import { DownloadHistoryModule }                              from './src/download-history/download-history.module';
+import { DropdownsModule }                                    from './src/dropdowns/dropdowns.module';
+import { NxModalLoginComponent, LoginModalContent }           from "./src/dialogs/login/login.component";
+import { NxProcessButtonComponent }                           from './src/components/process-button/process-button.component';
+import { nxDialogsService }                                   from "./src/dialogs/dialogs.service";
+import { GeneralModalContent, NxModalGeneralComponent }       from "./src/dialogs/general/general.component";
+import { DisconnectModalContent, NxModalDisconnectComponent } from "./src/dialogs/disconnect/disconnect.component";
+import { RenameModalContent, NxModalRenameComponent }         from "./src/dialogs/rename/rename.component";
+import { ShareModalContent, NxModalShareComponent }           from "./src/dialogs/share/share.component";
+import { MergeModalContent, NxModalMergeComponent }           from "./src/dialogs/merge/merge.component";
 
 // AoT requires an exported function for factories
 export function createTranslateLoader(http: HttpClient) {
@@ -95,10 +99,12 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
     ],
     entryComponents: [
         NxProcessButtonComponent,
-        LoginModalContent,
-        NxModalLoginComponent,
-        GeneralModalContent,
-        NxModalGeneralComponent,
+        LoginModalContent, NxModalLoginComponent,
+        GeneralModalContent, NxModalGeneralComponent,
+        DisconnectModalContent, NxModalDisconnectComponent,
+        RenameModalContent, NxModalRenameComponent,
+        ShareModalContent, NxModalShareComponent,
+        MergeModalContent, NxModalMergeComponent
     ],
     providers: [
         NgbModal,
@@ -110,15 +116,21 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
         // {provide: '$rootScope', useFactory: i => i.get('$rootScope'), deps: ['$injector']},
         NxModalLoginComponent,
         NxModalGeneralComponent,
+        NxModalDisconnectComponent,
+        NxModalRenameComponent,
+        NxModalShareComponent,
+        NxModalMergeComponent,
         NxProcessButtonComponent,
         nxDialogsService
     ],
     declarations: [
         AppComponent,
-        LoginModalContent,
-        NxModalLoginComponent,
-        GeneralModalContent,
-        NxModalGeneralComponent,
+        LoginModalContent, NxModalLoginComponent,
+        GeneralModalContent, NxModalGeneralComponent,
+        DisconnectModalContent, NxModalDisconnectComponent,
+        RenameModalContent, NxModalRenameComponent,
+        ShareModalContent, NxModalShareComponent,
+        MergeModalContent, NxModalMergeComponent,
         NxProcessButtonComponent,
     ],
     bootstrap: [AppComponent]

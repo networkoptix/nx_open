@@ -1,35 +1,35 @@
 <!--<div ng-controller="RenameCtrl">-->
-    <form #renameForm="ngForm" novalidate>
-        <div class="modal-header">
-            <h1 class="modal-title" translate>System name</h1>
-            <button type="button" class="close"
-                    data-dismiss="modal" aria-label="Close"
-                    (click)="activeModal.close()" *ngIf="closable"><span class="close-icon"></span></button>
-        </div>
+<form #renameForm="ngForm" novalidate>
+    <div class="modal-header">
+        <h1 class="modal-title" translate>System name</h1>
+        <button type="button" class="close"
+                data-dismiss="modal" aria-label="Close"
+                (click)="activeModal.close()" *ngIf="closable"><span class="close-icon"></span></button>
+    </div>
 
-        <div class="modal-body">
-            <div class="form-group" validate-field>
-                <input class="form-control"
-                       [(ngModel)]="model.systemName"
-                       id="systemName"
-                       name="systemName" type="text"
-                       required autofocus>
-                <p class="help-block">
+    <div class="modal-body">
+        <div class="form-group" validate-field>
+            <input class="form-control"
+                   [(ngModel)]="systemName"
+                   id="systemName"
+                   name="systemName" type="text"
+                   required autofocus>
+            <p class="help-block">
                     <span class="input-error"
                           *ngIf="renameForm.systemName.$touched && renameForm.systemName.$error.required"
                           translate>
                         System name is required
                     </span>
-                </p>
-            </div>
+            </p>
         </div>
-        <div class="modal-footer">
-            <process-button [process]="renaming"
-                            [form]="renameForm"
-                            action-type="'primary'"
-                            button-text="{{ 'Save' | translate }}"></process-button>
+    </div>
+    <div class="modal-footer">
+        <nx-process-button [process]="rename"
+                           [form]="renameForm"
+                           action-type="'primary'"
+                           buttonText="{{ 'Save' | translate }}"></nx-process-button>
 
-            <button type="button" class="btn btn-default" ng-click="close()" translate>Cancel</button>
-        </div>
-    </form>
+        <button type="button" class="btn btn-default" ng-click="close()" translate>Cancel</button>
+    </div>
+</form>
 <!--</div>-->

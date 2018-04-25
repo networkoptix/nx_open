@@ -11,11 +11,11 @@ import { EmailValidator }                                      from '@angular/fo
 export class DisconnectModalContent {
     @Input() systemId;
     @Input() language;
+    @Input() disconnect;
 
     password: string;
-    disconnecting: any;
 
-    constructor(public activeModal: NgbActiveModal,
+    constructor(activeModal: NgbActiveModal,
                 @Inject('account') private account: any,
                 @Inject('process') private process: any,
                 @Inject('cloudApiService') private cloudApi: any,) {
@@ -23,7 +23,7 @@ export class DisconnectModalContent {
     }
 
     ngOnInit() {
-        this.disconnecting = this.process.init(() => {
+        this.disconnect = this.process.init(() => {
             return this.cloudApi.disconnect(this.systemId, this.password);
         }, {
             ignoreUnauthorized: true,
@@ -47,6 +47,7 @@ export class DisconnectModalContent {
 
 export class NxModalDisconnectComponent implements OnInit {
     modalRef: NgbModalRef;
+    disconnect: any;
 
     constructor(@Inject('languageService') private language: any,
                 private location: Location,
@@ -56,6 +57,7 @@ export class NxModalDisconnectComponent implements OnInit {
     private dialog(systemId) {
         this.modalRef = this.modalService.open(DisconnectModalContent);
         this.modalRef.componentInstance.language = this.language;
+        this.modalRef.componentInstance.disconnect = this.disconnect;
         this.modalRef.componentInstance.systemId = systemId;
 
         return this.modalRef;
