@@ -278,6 +278,8 @@ void ProxyHandler::onConnected(
         std::move(m_request),
         this,
         std::move(connection));
+    m_requestProxyWorker->setTargetHostConnectionInactivityTimeout(
+        m_settings.proxy().targetConnectionInactivityTimeout);
     m_requestProxyWorker->start();
 }
 

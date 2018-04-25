@@ -42,12 +42,13 @@ public:
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
     bool start(HostAddress publicIp, uint16_t port, bool waitForRegistration = false);
-    uint16_t port() const;
+    nx::network::SocketAddress address() const;
 
     std::shared_ptr<ReverseConnectionSource> getConnectionSource(const String& hostName);
 
     // TODO: make is configurable for each client? can it be usefull?
     void setPoolSize(boost::optional<size_t> value);
+    void setHttpConnectionInactivityTimeout(std::chrono::milliseconds inactivityTimeout);
     void setKeepAliveOptions(boost::optional<KeepAliveOptions> value);
     void setStartTimeout(std::chrono::milliseconds value);
 

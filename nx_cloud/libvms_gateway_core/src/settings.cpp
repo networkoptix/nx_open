@@ -54,6 +54,13 @@ const QLatin1String kDefaultHttpSslSupport("true");
 const QLatin1String kHttpSslCertPath("http/sslCertPath");
 const QLatin1String kDefaultHttpSslCertPath("");
 
+const QLatin1String kHttpConnectionInactivityTimeout("http/connectionInactivityTimeout");
+const std::chrono::milliseconds kDefaultHttpConnectionInactivityTimeout = std::chrono::minutes(1);
+
+//proxy
+const QLatin1String kProxyTargetConnectionInactivityTimeout("proxy/targetConnectionInactivityTimeout");
+const std::chrono::milliseconds kDefaultProxyTargetConnectionInactivityTimeout = std::chrono::minutes(2);
+
 //cloudConnect
 const QLatin1String kReplaceHostAddressWithPublicAddress("cloudConnect/replaceHostAddressWithPublicAddress");
 const QLatin1String kDefaultReplaceHostAddressWithPublicAddress("true");
@@ -98,9 +105,17 @@ Http::Http():
     proxyTargetPort(0),
     connectSupport(false),
     allowTargetEndpointInUrl(false),
-    sslSupport(true)
+    sslSupport(true),
+    connectionInactivityTimeout(kDefaultHttpConnectionInactivityTimeout)
 {
 }
+
+Proxy::Proxy():
+    targetConnectionInactivityTimeout(kDefaultProxyTargetConnectionInactivityTimeout)
+{
+}
+
+//-------------------------------------------------------------------------------------------------
 
 Settings::Settings():
     base_type(
@@ -138,6 +153,11 @@ const Tcp& Settings::tcp() const
 const Http& Settings::http() const
 {
     return m_http;
+}
+
+const Proxy& Settings::proxy() const
+{
+    return m_proxy;
 }
 
 const CloudConnect& Settings::cloudConnect() const
@@ -221,6 +241,16 @@ void Settings::loadSettings()
         settings().value(
             kHttpSslCertPath,
             kDefaultHttpSslCertPath).toString();
+    m_http.connectionInactivityTimeout =
+        nx::utils::parseTimerDuration(
+            settings().value(kHttpConnectionInactivityTimeout).toString(),
+            kDefaultHttpConnectionInactivityTimeout);
+
+    //proxy
+    m_proxy.targetConnectionInactivityTimeout =
+        nx::utils::parseTimerDuration(
+            settings().value(kProxyTargetConnectionInactivityTimeout).toString(),
+            kDefaultProxyTargetConnectionInactivityTimeout);
 
     //CloudConnect
     m_cloudConnect.replaceHostAddressWithPublicAddress =

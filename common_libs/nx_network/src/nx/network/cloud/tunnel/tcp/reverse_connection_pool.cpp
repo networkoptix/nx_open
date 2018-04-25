@@ -58,7 +58,8 @@ bool ReverseConnectionPool::start(HostAddress publicIp, uint16_t port, bool wait
     SocketAddress serverAddress(HostAddress::anyHost, port);
     if (!m_acceptor.start(
             m_outgoingTunnelPool.ownPeerId(),
-            serverAddress, m_mediatorConnection->getAioThread()))
+            serverAddress,
+            m_mediatorConnection->getAioThread()))
     {
         NX_LOGX(lm("Could not start acceptor on %1: %2")
             .args(serverAddress, SystemError::getLastOSErrorText()), cl_logWARNING);
@@ -69,9 +70,9 @@ bool ReverseConnectionPool::start(HostAddress publicIp, uint16_t port, bool wait
     return registerOnMediator(waitForRegistration);
 }
 
-uint16_t ReverseConnectionPool::port() const
+nx::network::SocketAddress ReverseConnectionPool::address() const
 {
-    return m_acceptor.address().port;
+    return m_acceptor.address();
 }
 
 std::shared_ptr<ReverseConnectionSource>
@@ -137,6 +138,12 @@ void ReverseConnectionPool::setPoolSize(boost::optional<size_t> value)
     m_acceptor.setPoolSize(std::move(value));
 
     // TODO: also need to close extra connections in m_connectionHolders
+}
+
+void ReverseConnectionPool::setHttpConnectionInactivityTimeout(
+    std::chrono::milliseconds inactivityTimeout)
+{
+    m_acceptor.setHttpConnectionInactivityTimeout(inactivityTimeout);
 }
 
 void ReverseConnectionPool::setKeepAliveOptions(boost::optional<KeepAliveOptions> value)
