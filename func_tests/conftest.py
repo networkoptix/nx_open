@@ -9,7 +9,7 @@ from framework.config import SingleTestConfig, TestParameter, TestsConfig
 from framework.mediaserverdeb import MediaserverDeb
 from framework.metrics_saver import MetricsSaver
 
-pytest_plugins = ['fixtures.vms', 'fixtures.servers', 'fixtures.cloud']
+pytest_plugins = ['fixtures.vms', 'fixtures.mediaservers', 'fixtures.cloud', 'fixtures.layouts', 'fixtures.media']
 
 JUNK_SHOP_PLUGIN_NAME = 'junk-shop-db-capture'
 
@@ -53,9 +53,9 @@ def work_dir(request):
 
 @pytest.fixture(scope='session')
 def bin_dir(request):
-    bin_dir = request.config.getoption('--bin-dir').expanduser()
+    bin_dir = request.config.getoption('--bin-dir')
     assert bin_dir, 'Argument --bin-dir is required'
-    return bin_dir
+    return bin_dir.expanduser()
 
 
 @pytest.fixture(scope='session')
@@ -70,8 +70,8 @@ def mediaserver_deb(request, bin_dir):
     if customization_from_command_line is not None:
         if deb.customization.name != customization_from_command_line:
             raise Exception(
-                "Customization {!r} provided by --customization option "
-                "doesn't match customization {!r} from .deb file. "
+                "Customization {} provided by --customization option "
+                "doesn't match customization {} from .deb file. "
                 "This option is maintained for backward compatibility, "
                 "either don't use it or make sure it matches .deb file.".format(
                     customization_from_command_line,

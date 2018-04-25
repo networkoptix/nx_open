@@ -42,14 +42,14 @@ private:
     struct ConnectorContext
     {
         std::unique_ptr<AbstractTunnelConnector> connector;
-        std::chrono::milliseconds startDelay;
+        std::chrono::milliseconds startDelay{0};
         std::unique_ptr<aio::Timer> timer;
     };
 
     const nx::String m_connectSessionId;
     hpm::api::ConnectResponse m_response;
     std::list<ConnectorContext> m_connectors;
-    std::chrono::milliseconds m_connectTimeout;
+    std::chrono::milliseconds m_connectTimeout{0};
     CompletionHandler m_handler;
 
     void reportNoSuitableConnectMethod();

@@ -25,7 +25,7 @@
 #include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/core/utils/geometry.h>
-#include <ui/common/aligner.h>
+#include <nx/client/desktop/common/utils/aligner.h>
 #include <ui/common/read_only.h>
 
 
@@ -36,7 +36,7 @@
 #include <ui/help/help_topics.h>
 #include <ui/style/custom_style.h>
 
-#include <ui/widgets/common/selectable_button.h>
+#include <nx/client/desktop/common/widgets/selectable_button.h>
 
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -52,7 +52,7 @@
 #include <utils/license_usage_helper.h>
 
 #include "legacy_camera_schedule_widget.h"
-#include "camera_motion_mask_widget.h"
+#include "legacy_camera_motion_mask_widget.h"
 
 using nx::client::core::Geometry;
 
@@ -87,7 +87,7 @@ SingleCameraSettingsWidget::SingleCameraSettingsWidget(QWidget *parent) :
 
     for (int i = 0; i < QnMotionRegion::kSensitivityLevelCount; ++i)
     {
-        auto button = new QnSelectableButton(ui->motionSensitivityGroupBox);
+        auto button = new SelectableButton(ui->motionSensitivityGroupBox);
         button->setText(lit("%1").arg(i));
         button->setFixedSize(kSensitivityButtonSize);
         ui->motionSensitivityGroupBox->layout()->addWidget(button);
@@ -203,7 +203,7 @@ SingleCameraSettingsWidget::SingleCameraSettingsWidget(QWidget *parent) :
     updateFromResource(true);
     retranslateUi();
 
-    QnAligner* leftAligner = new QnAligner(this);
+    Aligner* leftAligner = new Aligner(this);
     leftAligner->addWidgets({
         ui->nameLabel,
         ui->modelLabel,
@@ -216,7 +216,7 @@ SingleCameraSettingsWidget::SingleCameraSettingsWidget(QWidget *parent) :
         ui->passwordLabel });
     leftAligner->addAligner(ui->wearableArchiveLengthWidget->aligner());
 
-    QnAligner* rightAligner = new QnAligner(this);
+    Aligner* rightAligner = new Aligner(this);
     rightAligner->addAligner(ui->imageControlWidget->aligner());
     rightAligner->addAligner(ui->wearableMotionWidget->aligner());
 }
@@ -380,10 +380,10 @@ void SingleCameraSettingsWidget::setLockedMode(bool locked)
 Qn::MotionType SingleCameraSettingsWidget::selectedMotionType() const
 {
     if (!m_camera)
-        return Qn::MT_Default;
+        return Qn::MotionType::MT_Default;
 
     if (!ui->motionDetectionCheckBox->isChecked())
-        return Qn::MT_NoMotion;
+        return Qn::MotionType::MT_NoMotion;
 
     return m_camera->getDefaultMotionType();
 }
@@ -538,7 +538,7 @@ void SingleCameraSettingsWidget::updateFromResource(bool silent)
         {
             auto supported = m_camera->supportedMotionType();
             auto motionType = m_camera->getMotionType();
-            auto mdEnabled = supported.testFlag(motionType) && motionType != Qn::MT_NoMotion;
+            auto mdEnabled = supported.testFlag(motionType) && motionType != Qn::MotionType::MT_NoMotion;
             ui->motionDetectionCheckBox->setChecked(mdEnabled);
             ui->cameraScheduleWidget->setMotionDetectionAllowed(mdEnabled);
 
@@ -686,10 +686,10 @@ void SingleCameraSettingsWidget::connectToMotionWidget()
 {
     NX_ASSERT(m_motionWidget);
 
-    connect(m_motionWidget, &CameraMotionMaskWidget::motionRegionListChanged, this,
+    connect(m_motionWidget, &LegacyCameraMotionMaskWidget::motionRegionListChanged, this,
         &SingleCameraSettingsWidget::at_dbDataChanged, Qt::UniqueConnection);
 
-    connect(m_motionWidget, &CameraMotionMaskWidget::motionRegionListChanged, this,
+    connect(m_motionWidget, &LegacyCameraMotionMaskWidget::motionRegionListChanged, this,
         &SingleCameraSettingsWidget::at_motionRegionListChanged, Qt::UniqueConnection);
 }
 
@@ -705,13 +705,13 @@ void SingleCameraSettingsWidget::showMaxFpsWarningIfNeeded()
     {
         switch (scheduleTask.recordingType)
         {
-            case Qn::RT_Never:
+            case Qn::RecordingType::never:
                 continue;
-            case Qn::RT_MotionAndLowQuality:
+            case Qn::RecordingType::motionAndLow:
                 maxDualStreamFps = qMax(maxDualStreamFps, scheduleTask.fps);
                 break;
-            case Qn::RT_Always:
-            case Qn::RT_MotionOnly:
+            case Qn::RecordingType::always:
+            case Qn::RecordingType::motionOnly:
                 maxFps = qMax(maxFps, scheduleTask.fps);
                 break;
             default:
@@ -756,7 +756,7 @@ void SingleCameraSettingsWidget::updateMotionWidgetNeedControlMaxRect()
         return;
 
     m_motionWidget->setControlMaxRects(m_camera
-        && m_camera->getDefaultMotionType() == Qn::MT_HardwareGrid);
+        && m_camera->getDefaultMotionType() == Qn::MotionType::MT_HardwareGrid);
 }
 
 void SingleCameraSettingsWidget::updateMotionCapabilities()
@@ -837,10 +837,10 @@ bool SingleCameraSettingsWidget::isValidSecondStream()
     bool usesSecondStream = false;
     for (auto& task : filteredTasks)
     {
-        if (task.recordingType == Qn::RT_MotionAndLowQuality)
+        if (task.recordingType == Qn::RecordingType::motionAndLow)
         {
             usesSecondStream = true;
-            task.recordingType = Qn::RT_Always;
+            task.recordingType = Qn::RecordingType::always;
         }
     }
 
@@ -1036,7 +1036,7 @@ void SingleCameraSettingsWidget::at_tabWidget_currentChanged()
             bool hasMotionWidget = m_motionWidget != NULL;
 
             if (!hasMotionWidget)
-                m_motionWidget = new CameraMotionMaskWidget(this);
+                m_motionWidget = new LegacyCameraMotionMaskWidget(this);
 
             updateMotionWidgetFromResource();
 
@@ -1054,7 +1054,7 @@ void SingleCameraSettingsWidget::at_tabWidget_currentChanged()
             const auto& buttons = m_sensitivityButtons->buttons();
             for (int i = 0; i < buttons.size(); ++i)
             {
-                static_cast<QnSelectableButton*>(buttons[i])->setCustomPaintFunction(
+                static_cast<SelectableButton*>(buttons[i])->setCustomPaintFunction(
                     [this, i](QPainter* painter, const QStyleOption* option, const QWidget* widget) -> bool
                     {
                         auto colors = m_motionWidget->motionSensitivityColors();

@@ -9,7 +9,7 @@
 #ifdef ENABLE_THIRD_PARTY
 
 #include <core/ptz/basic_ptz_controller.h>
-#include <plugins/camera_plugin.h>
+#include <camera/camera_plugin.h>
 #include <utils/math/functors.h>
 
 #include "third_party_resource.h"

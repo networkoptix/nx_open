@@ -1,9 +1,9 @@
 set(build_nxtool ON)
 set(build_paxton ON)
+set(enable_hanwha true)
 
 set(defaultSkin "dark_blue")
 set(compatibleCustomizations "default_cn" "default_zh_CN")
-set(enable_hanwha true)
 
 # Components Namings
 set(display.product.name "Nx Witness")

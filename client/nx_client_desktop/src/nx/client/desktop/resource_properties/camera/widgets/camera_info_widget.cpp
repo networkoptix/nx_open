@@ -8,7 +8,7 @@
 
 #include <ui/style/custom_style.h>
 #include <ui/style/skin.h>
-#include <ui/common/aligner.h>
+#include <nx/client/desktop/common/utils/aligner.h>
 
 #include "../redux/camera_settings_dialog_state.h"
 #include "../redux/camera_settings_dialog_store.h"
@@ -160,7 +160,7 @@ void CameraInfoWidget::loadState(const CameraSettingsDialogState& state)
 
 void CameraInfoWidget::alignLabels()
 {
-    auto aligner = new QnAligner(this);
+    auto aligner = new Aligner(this);
     aligner->addWidgets({
         ui->vendorDetailTitleLabel,
         ui->modelDetailTitleLabel,

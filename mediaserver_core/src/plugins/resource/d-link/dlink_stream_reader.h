@@ -11,7 +11,7 @@
 class PlDlinkStreamReader: public CLServerPushStreamReader
 {
 public:
-    PlDlinkStreamReader(const QnResourcePtr& res);
+    PlDlinkStreamReader(const QnPlDlinkResourcePtr& res);
     virtual ~PlDlinkStreamReader();
 
 protected:
@@ -37,6 +37,7 @@ private:
     std::unique_ptr<CLSimpleHTTPClient> m_HttpClient;
     QSize m_resolution;
     QnDlink_ProfileInfo m_profile;
+    QnPlDlinkResourcePtr m_dlinkRes;
 };
 
 #endif // ENABLE_DLINK

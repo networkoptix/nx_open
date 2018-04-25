@@ -37,8 +37,8 @@ public:
     void enableUpdateData();
     void setDateRange(qint64 startTimeMs, qint64 endTimeMs);
     void setCameraList(const QSet<QnUuid>& ids);
-    void setActionType(nx::vms::event::ActionType value);
-    void setEventType(nx::vms::event::EventType value);
+    void setActionType(nx::vms::api::ActionType value);
+    void setEventType(nx::vms::api::EventType value);
 
 protected:
     void setVisible(bool value) override;
@@ -57,7 +57,7 @@ private:
     void at_exportAction_triggered();
     void at_mouseButtonRelease(QObject* sender, QEvent* event);
 
-    QStandardItem* createEventTree(QStandardItem* rootItem, nx::vms::event::EventType value);
+    QStandardItem* createEventTree(QStandardItem* rootItem, nx::vms::api::EventType value);
     void createAnalyticsEventTree(QStandardItem* rootItem);
     void updateAnalyticsEvents();
 
@@ -73,9 +73,9 @@ private:
      */
     void query(qint64 fromMsec,
         qint64 toMsec,
-        nx::vms::event::EventType eventType,
+        nx::vms::api::EventType eventType,
         const QnUuid& eventSubtype,
-        nx::vms::event::ActionType actionType);
+        nx::vms::api::ActionType actionType);
 
 
 private:

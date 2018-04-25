@@ -27,7 +27,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QnPanel" name="widget" native="true">
+    <widget class="nx::client::desktop::Panel" name="widget" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
        <horstretch>0</horstretch>
@@ -155,9 +155,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnPanel</class>
+   <class>nx::client::desktop::Panel</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/panel.h</header>
+   <header location="global">nx/client/desktop/common/widgets/panel.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

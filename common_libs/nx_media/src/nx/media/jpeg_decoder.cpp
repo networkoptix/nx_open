@@ -18,7 +18,10 @@ public:
 //-------------------------------------------------------------------------------------------------
 // JpegDecoder
 
-JpegDecoder::JpegDecoder(const ResourceAllocatorPtr& /*allocator*/, const QSize& /*resolution*/):
+JpegDecoder::JpegDecoder(
+    const RenderContextSynchronizerPtr& /*synchronizer*/,
+    const QSize& /*resolution*/)
+    :
     d_ptr(new JpegDecoderPrivate())
 {
 }

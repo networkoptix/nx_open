@@ -261,7 +261,7 @@ void QnServerStorageManager::saveStorages(const QnStorageResourceList &storages 
 }
 
 // TODO: #GDM SafeMode
-void QnServerStorageManager::deleteStorages(const ec2::ApiIdDataList &ids )
+void QnServerStorageManager::deleteStorages(const nx::vms::api::IdDataList& ids )
 {
     ec2::AbstractECConnectionPtr conn = commonModule()->ec2Connection();
     if (!conn)

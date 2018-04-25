@@ -67,7 +67,7 @@ public:
 signals:
     void backupFinished(
         qint64                      timestampMs,
-        nx::vms::event::EventReason     status
+        nx::vms::api::EventReason     status
     );
 
 public:
@@ -120,7 +120,7 @@ private:
 
 private:
     template<typename NeedMoveOnCB>
-    nx::vms::event::EventReason synchronize(NeedMoveOnCB needMoveOn);
+    nx::vms::api::EventReason synchronize(NeedMoveOnCB needMoveOn);
 
     void renewSchedule();
     CopyError copyChunk(const ChunkKey &chunkKey);

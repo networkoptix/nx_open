@@ -11,7 +11,7 @@
 
 #include <decoders/abstractclientplugin.h>
 #include <decoders/abstractvideodecoderplugin.h>
-#include <plugins/camera_plugin.h>
+#include <camera/camera_plugin.h>
 #include <nx/sdk/metadata/plugin.h>
 #include <plugins/plugin_tools.h>
 

@@ -21,7 +21,7 @@ public:
     /** @param maxResolution Limits applicability of the decoder. If empty, there is no limit. */
     static void setMaxResolution(const QSize& maxResolution);
 
-    FfmpegVideoDecoder(const ResourceAllocatorPtr& allocator, const QSize& resolution);
+    FfmpegVideoDecoder(const RenderContextSynchronizerPtr& synchronizer, const QSize& resolution);
     virtual ~FfmpegVideoDecoder();
 
     static bool isCompatible(

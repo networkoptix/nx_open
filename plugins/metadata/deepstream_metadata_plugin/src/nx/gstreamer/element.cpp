@@ -19,7 +19,7 @@ Element::Element(const FactoryName& factoryName, const ElementName& elementName)
         gst_element_factory_make(
             factoryName.c_str(),
             elementName.c_str()),
-                [](GstElement* element) { gst_object_unref(element); });
+        [](GstElement* element) { gst_object_unref(element); });
 }
 
 Element::Element(Element&& other):
@@ -76,6 +76,14 @@ void Element::unlink(Element* otherElement)
 {
     gst_element_unlink(m_element.get(), otherElement->nativeElement());
     gst_element_unlink(otherElement->nativeElement(), m_element.get());
+}
+
+std::unique_ptr<Pad> Element::pad(const PadName& padName)
+{
+    return std::make_unique<Pad>(
+        gst_element_get_static_pad(
+            m_element.get(),
+            padName.c_str()));
 }
 
 void Element::setProperties(const std::vector<Property>& properties)

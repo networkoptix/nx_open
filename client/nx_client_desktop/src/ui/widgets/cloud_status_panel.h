@@ -1,14 +1,16 @@
 #pragma once
 
-#include <ui/widgets/common/tool_button.h>
+#include <nx/client/desktop/common/widgets/tool_button.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 class QnCloudStatusPanelPrivate;
 
-class QnCloudStatusPanel: public QnToolButton, public QnWorkbenchContextAware
+class QnCloudStatusPanel:
+    public nx::client::desktop::ToolButton,
+    public QnWorkbenchContextAware
 {
     Q_OBJECT
-    using base_type = QnToolButton;
+    using base_type = nx::client::desktop::ToolButton;
 
 public:
     explicit QnCloudStatusPanel(QWidget* parent = nullptr);

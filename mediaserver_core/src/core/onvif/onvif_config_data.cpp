@@ -1,6 +1,6 @@
-#include <nx/fusion/model_functions.h>
-
 #include "onvif_config_data.h"
+
+#include <nx/fusion/model_functions.h>
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnOnvifConfigData), (json), _Fields)
 

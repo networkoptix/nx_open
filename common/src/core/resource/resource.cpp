@@ -6,25 +6,18 @@
 #include <QtCore/QRunnable>
 
 #include <nx_ec/data/api_resource_data.h>
-#include <nx/fusion/model_functions.h>
-#include <nx/streaming/abstract_stream_data_provider.h>
 #include <nx/utils/log/log.h>
 
 #include <core/resource/camera_advanced_param.h>
-#include <utils/common/warnings.h>
 #include "core/resource_management/resource_pool.h"
 
-#include "resource_command_processor.h"
 #include "resource_consumer.h"
 #include "resource_property.h"
 
-#include "utils/common/synctime.h"
 #include "utils/common/util.h"
-#include "resource_command.h"
 #include "../resource_management/resource_properties.h"
 #include "../resource_management/status_dictionary.h"
 
-#include <core/resource/security_cam_resource.h>
 #include <common/common_module.h>
 
 #include <nx/utils/log/assert.h>
@@ -58,7 +51,6 @@ QnResource::QnResource(const QnResource& right):
     m_initialized(right.m_initialized),
     m_lastInitTime(right.m_lastInitTime),
     m_prevInitializationResult(right.m_prevInitializationResult),
-    m_lastMediaIssue(right.m_lastMediaIssue),
     m_initializationAttemptCount(right.m_initializationAttemptCount),
     m_locallySavedProperties(right.m_locallySavedProperties),
     m_initInProgress(right.m_initInProgress),
@@ -151,12 +143,6 @@ void QnResource::updateInternal(const QnResourcePtr &other, Qn::NotifierList& no
 
 void QnResource::update(const QnResourcePtr& other)
 {
-    {
-        QnMutexLocker locker(&m_consumersMtx);
-        for (QnResourceConsumer *consumer : m_consumers)
-            consumer->beforeUpdate();
-    }
-
     Qn::NotifierList notifiers;
     {
         QnMutex *m1 = &m_mutex, *m2 = &other->m_mutex;
@@ -195,12 +181,8 @@ void QnResource::update(const QnResourcePtr& other)
     }
 
     //silently ignoring missing properties because of removeProperty method lack
-    for (const ec2::ApiResourceParamData &param : other->getRuntimeProperties())
+    for (const auto& param : other->getRuntimeProperties())
         emitPropertyChanged(param.name);   //here "propertyChanged" will be called
-
-    QnMutexLocker locker(&m_consumersMtx);
-    for (QnResourceConsumer *consumer : m_consumers)
-        consumer->afterUpdate();
 }
 
 QnUuid QnResource::getParentId() const
@@ -414,8 +396,7 @@ void QnResource::setId(const QnUuid& id)
     QnMutexLocker mutexLocker(&m_mutex);
 
     // TODO: #dmishin it seems really wrong. Think about how to do it in another way.
-    NX_ASSERT(
-        dynamic_cast<QnSecurityCamResource*>(this) || m_locallySavedProperties.empty(),
+    NX_ASSERT(this->inherits("QnSecurityCamResource") || m_locallySavedProperties.empty(),
         lit("Only camera resources are allowed to set properties if id is not set."));
 
     m_id = id;
@@ -464,20 +445,6 @@ bool QnResource::hasConsumer(QnResourceConsumer *consumer) const
     return m_consumers.contains(consumer);
 }
 
-#ifdef ENABLE_DATA_PROVIDERS
-bool QnResource::hasUnprocessedCommands() const
-{
-    QnMutexLocker locker(&m_consumersMtx);
-    for (QnResourceConsumer* consumer : m_consumers)
-    {
-        if (dynamic_cast<QnResourceCommand*>(consumer))
-            return true;
-    }
-
-    return false;
-}
-#endif
-
 void QnResource::disconnectAllConsumers()
 {
     QnMutexLocker locker(&m_consumersMtx);
@@ -490,23 +457,6 @@ void QnResource::disconnectAllConsumers()
 
     m_consumers.clear();
 }
-
-#ifdef ENABLE_DATA_PROVIDERS
-QnAbstractStreamDataProvider* QnResource::createDataProvider(Qn::ConnectionRole role)
-{
-    QnAbstractStreamDataProvider* dataProvider = createDataProviderInternal(role);
-
-    if (dataProvider != NULL && dataProvider->getResource() != this)
-        qnCritical("createDataProviderInternal() returned a data provider that is not associated with current resource."); /* This may cause hard to debug problems. */
-
-    return dataProvider;
-}
-
-QnAbstractStreamDataProvider *QnResource::createDataProviderInternal(Qn::ConnectionRole)
-{
-    return NULL;
-}
-#endif
 
 CameraDiagnostics::Result QnResource::initInternal()
 {
@@ -616,36 +566,33 @@ bool QnResource::setProperty(const QString &key, const QVariant& value, Property
 
 void QnResource::emitPropertyChanged(const QString& key)
 {
-    if (key == Qn::PTZ_CAPABILITIES_PARAM_NAME)
-        emit ptzCapabilitiesChanged(::toSharedPointer(this));
-    else if (key == Qn::VIDEO_LAYOUT_PARAM_NAME)
+    if (key == Qn::VIDEO_LAYOUT_PARAM_NAME)
         emit videoLayoutChanged(::toSharedPointer(this));
 
     emit propertyChanged(toSharedPointer(this), key);
 }
 
-ec2::ApiResourceParamDataList QnResource::getRuntimeProperties() const
+nx::vms::api::ResourceParamDataList QnResource::getRuntimeProperties() const
 {
     if (useLocalProperties())
     {
-        ec2::ApiResourceParamDataList result;
-        for (auto itr = m_locallySavedProperties.begin(); itr != m_locallySavedProperties.end(); ++itr)
-            result.push_back(ec2::ApiResourceParamData(itr->first, itr->second.value));
+        nx::vms::api::ResourceParamDataList result;
+        for (const auto& prop: m_locallySavedProperties)
+            result.emplace_back(prop.first, prop.second.value);
         return result;
     }
-    else if (auto module = commonModule())
-    {
-        return module->propertyDictionary()->allProperties(getId());
-    }
 
-    return ec2::ApiResourceParamDataList();
+    if (const auto module = commonModule())
+        return module->propertyDictionary()->allProperties(getId());
+
+    return {};
 }
 
-ec2::ApiResourceParamDataList QnResource::getAllProperties() const
+nx::vms::api::ResourceParamDataList QnResource::getAllProperties() const
 {
-    ec2::ApiResourceParamDataList result;
-    ec2::ApiResourceParamDataList runtimeProperties;
-    if (auto module = commonModule())
+    nx::vms::api::ResourceParamDataList result;
+    nx::vms::api::ResourceParamDataList runtimeProperties;
+    if (const auto module = commonModule())
         runtimeProperties = module->propertyDictionary()->allProperties(getId());
 
     ParamTypeMap staticDefaultProperties;
@@ -657,7 +604,7 @@ ec2::ApiResourceParamDataList QnResource::getAllProperties() const
     for (auto it = staticDefaultProperties.cbegin(); it != staticDefaultProperties.cend(); ++it)
     {
         auto runtimeIt = std::find_if(runtimeProperties.cbegin(), runtimeProperties.cend(),
-            [it](const ec2::ApiResourceParamData &param) { return it.key() == param.name; });
+            [it](const auto& param) { return it.key() == param.name; });
         if (runtimeIt == runtimeProperties.cend())
             result.emplace_back(it.key(), it.value());
     }
@@ -681,38 +628,6 @@ QnInitResPool* QnResource::initAsyncPoolInstance()
     return initResPool();
 }
 // -----------------------------------------------------------------------------
-
-#ifdef ENABLE_DATA_PROVIDERS
-Q_GLOBAL_STATIC(QnResourceCommandProcessor, QnResourceCommandProcessor_instance)
-static bool qnResourceCommandProcessorInitialized = false;
-
-void QnResource::startCommandProc()
-{
-    QnResourceCommandProcessor_instance()->start();
-    qnResourceCommandProcessorInitialized = true;
-}
-
-void QnResource::stopCommandProc()
-{
-    if (qnResourceCommandProcessorInitialized)
-        QnResourceCommandProcessor_instance()->stop();
-}
-
-void QnResource::addCommandToProc(const QnResourceCommandPtr& command)
-{
-    NX_ASSERT(qnResourceCommandProcessorInitialized, Q_FUNC_INFO, "Processor is not started");
-    if (qnResourceCommandProcessorInitialized)
-        QnResourceCommandProcessor_instance()->putData(command);
-}
-
-int QnResource::commandProcQueueSize()
-{
-    NX_ASSERT(qnResourceCommandProcessorInitialized, Q_FUNC_INFO, "Processor is not started");
-    if (qnResourceCommandProcessorInitialized)
-        return QnResourceCommandProcessor_instance()->queueSize();
-    return 0;
-}
-#endif // ENABLE_DATA_PROVIDERS
 
 bool QnResource::init()
 {
@@ -753,39 +668,13 @@ bool QnResource::init()
     return true;
 }
 
-void QnResource::setLastMediaIssue(const CameraDiagnostics::Result& issue)
-{
-    QnMutexLocker lk(&m_mutex);
-    m_lastMediaIssue = issue;
-}
-
-CameraDiagnostics::Result QnResource::getLastMediaIssue() const
-{
-    QnMutexLocker lk(&m_mutex);
-    return m_lastMediaIssue;
-}
-
-void QnResource::blockingInit()
-{
-    if (!init())
-    {
-        //init is running in another thread, waiting for it to complete...
-        QnMutexLocker lk(&m_initMutex);
-    }
-}
-
-void QnResource::initAndEmit()
-{
-    init();
-}
-
 class InitAsyncTask: public QRunnable
 {
 public:
     InitAsyncTask(QnResourcePtr resource): m_resource(resource) {}
     void run()
     {
-        m_resource->initAndEmit();
+        m_resource->init();
     }
 private:
     QnResourcePtr m_resource;
@@ -863,27 +752,6 @@ bool QnResource::isInitialized() const
 void QnResource::setUniqId(const QString& /*value*/)
 {
     NX_ASSERT(false, Q_FUNC_INFO, "Not implemented");
-}
-
-Ptz::Capabilities QnResource::getPtzCapabilities() const
-{
-    return Ptz::Capabilities(getProperty(Qn::PTZ_CAPABILITIES_PARAM_NAME).toInt());
-}
-
-bool QnResource::hasAnyOfPtzCapabilities(Ptz::Capabilities capabilities) const
-{
-    return getPtzCapabilities() & capabilities;
-}
-
-void QnResource::setPtzCapabilities(Ptz::Capabilities capabilities)
-{
-    if (hasParam(Qn::PTZ_CAPABILITIES_PARAM_NAME))
-        setProperty(Qn::PTZ_CAPABILITIES_PARAM_NAME, static_cast<int>(capabilities));
-}
-
-void QnResource::setPtzCapability(Ptz::Capabilities capability, bool value)
-{
-    setPtzCapabilities(value ? (getPtzCapabilities() | capability) : (getPtzCapabilities() & ~capability));
 }
 
 void QnResource::setCommonModule(QnCommonModule* commonModule)

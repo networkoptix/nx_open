@@ -873,7 +873,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Export Video...</source>
-      <translation>ส่งออกวิดีโอ </translation>
+      <translation>ส่งออกวิดีโอ</translation>
     </message>
     <message>
       <source>Export Bookmark...</source>
@@ -881,7 +881,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Resolution...</source>
-      <translation>ความละเอียด </translation>
+      <translation>ความละเอียด</translation>
     </message>
     <message>
       <source>Cell Aspect Ratio...</source>
@@ -1120,16 +1120,16 @@ to view more bookmarks</source>
       <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
       <translation>ไฟล์ "%1" อยู่แล้ว โปรดลองใช้ชื่ออื่น</translation>
     </message>
-    <message numerus="yes">
-      <source>Filename should not contain the following reserved characters:
-%1</source>
-      <translation>
-        <numerusform>ชื่อไฟล์ไม่ควรมีอักขระสงวนไว้ต่อไปนี้: %1</numerusform>
-      </translation>
-    </message>
     <message>
-      <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation>ชื่อไฟล์ &quot;%1&quot; สงวนไว้สำหรับระบบปฏิบัติการ โปรดลองชื่ออื่น</translation>
+      <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
+      <translation type="unfinished">File name &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
+    </message>
+    <message numerus="yes">
+      <source>File name must not contain the following reserved characters:</source>
+      <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
+      <translation type="unfinished">
+        <numerusform>File name must not contain the following reserved characters:</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -2767,51 +2767,60 @@ devices</source>
     </message>
     <message>
       <source>Disconnect System from %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>ยกเลิกการเชื่อมต่อระบบจาก %1</translation>
     </message>
     <message>
       <source>Open %1 Portal</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>เปิด %1 พอร์ทัล...</translation>
     </message>
     <message>
       <source>Create %1 Account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>สร้างบัญชี %1</translation>
     </message>
     <message>
       <source>Connect System to %1...</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>เชื่อมต่อระบบกับ %1...</translation>
     </message>
     <message>
       <source>Create %1
 account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>สร้างบัญชี %1</translation>
     </message>
     <message>
       <source>Connect System
 to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>เชื่อมต่อระบบกับ %1...</translation>
     </message>
     <message>
       <source>Learn more about %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>เรียนรู้เพิ่มเติมเกี่ยวกับ %1</translation>
     </message>
   </context>
   <context>
     <name>QnCloudResultMessages</name>
     <message>
-      <source>Incorrect email or password</source>
-      <translation>อีเมลหรือรหัสผ่านไม่ถูกต้อง</translation>
+      <source>Account not found</source>
+      <translation type="unfinished">Account not found</translation>
     </message>
     <message>
-      <source>Account is not activated. Please check your email and follow provided instructions</source>
-      <translation>บัญชีไม่ได้เปิดใช้งาน โปรดตรวจสอบอีเมลของคุณและทำตามคำแนะนำที่ระบุไว้</translation>
+      <source>Account is not activated.</source>
+      <translation type="unfinished">Account is not activated.</translation>
+    </message>
+    <message>
+      <source>Please log in to %1 and follow the provided instructions.</source>
+      <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
+      <translation type="unfinished">Please log in to %1 and follow the provided instructions.</translation>
+    </message>
+    <message>
+      <source>Invalid password</source>
+      <translation type="unfinished">Invalid password</translation>
     </message>
   </context>
   <context>
@@ -2826,7 +2835,7 @@ to %1</source>
     </message>
     <message>
       <source>Cannot connect to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>ไม่สามารถเชื่อมต่อกับ %1</translation>
     </message>
   </context>
@@ -2857,12 +2866,12 @@ to %1</source>
     </message>
     <message>
       <source>Connect to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>เชื่อมต่อไปยัง %1</translation>
     </message>
     <message>
       <source>Enter %1 Account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>ป้อน %1 บัญชี</translation>
     </message>
   </context>
@@ -2874,12 +2883,12 @@ to %1</source>
     </message>
     <message>
       <source>System connected to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>ระบบเชื่อมต่อกับ %1</translation>
     </message>
     <message>
       <source>Failed to connect System to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>ไม่สามารถเชื่อมต่อระบบกับ %1</translation>
     </message>
   </context>
@@ -3031,17 +3040,17 @@ to %1</source>
       <translation>ไม่อนุญาตให้ดำเนินการขณะนี้ มันสามารถเกิดขึ้นเนื่องจากเซิร์ฟเวอร์เริ่มระบบใหม่เดี๋ยวนี้ โปรดลองอีกครั้ง</translation>
     </message>
     <message>
-      <source>Connection to %1 is not ready yet. Check server Internet connection or try again later.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>การเชื่อมต่อกับ %1 ยังไม่พร้อม ตรวจสอบการเชื่อมต่ออินเทอร์เน็ตของเซิร์ฟเวอร์ หรือลองใหม่อีกครั้ง</translation>
-    </message>
-    <message>
       <source>Connection to Server could not be established.</source>
       <translation>การเชื่อมต่อไปยังเซิร์ฟเวอร์ไม่สามารถสร้างได้.</translation>
     </message>
     <message>
       <source>This user is disabled by system administrator.</source>
       <translation>ผู้ใช้นี้ถูกปิดใช้งาน โดยผู้ดูแลระบบ</translation>
+    </message>
+    <message>
+      <source>Connection to %1 is not ready yet. Check server Internet connection or try again later.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>การเชื่อมต่อกับ %1 ยังไม่พร้อม ตรวจสอบการเชื่อมต่ออินเทอร์เน็ตของเซิร์ฟเวอร์ หรือลองใหม่อีกครั้ง</translation>
     </message>
   </context>
   <context>
@@ -3147,6 +3156,10 @@ to %1</source>
     <message>
       <source>You can create a backup for System configurations that can be restored in case of failure.</source>
       <translation>คุณสามารถสร้างการสำรองข้อมูลสำหรับการกำหนดค่าระบบที่สามารถเรียกคืนได้ในกรณีของความล้มเหลว.</translation>
+    </message>
+    <message>
+      <source>Database Backup Files</source>
+      <translation type="unfinished">Database Backup Files</translation>
     </message>
   </context>
   <context>
@@ -3265,28 +3278,28 @@ to %1</source>
       <translation>ตัดการเชื่อมต่อ</translation>
     </message>
     <message>
-      <source>Failed to disconnect System from %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>ไม่สามารถเชื่อมต่อระบบกับ %1</translation>
-    </message>
-    <message>
-      <source>Disconnect System from %1?</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>ยกเลิกการเชื่อมต่อระบบจาก %1</translation>
-    </message>
-    <message>
       <source>You will be disconnected from this System and able to login again through local network with local account</source>
       <translation>คุณจะถูกตัดการเชื่อมต่อจากระบบนี้และสามารถเข้าสู่ระบบอีกครั้งผ่านทางเครือข่ายท้องถิ่นด้วยบัญชีท้องถิ่น</translation>
     </message>
     <message>
-      <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>คุณจะไม่สามารถเชื่อมต่อกับระบบนี้กับบัญชี %1 หลังจากที่คุณยกเลิกการเชื่อมต่อระบบนี้จาก %1</translation>
+      <source>Failed to disconnect System from %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>ไม่สามารถเชื่อมต่อระบบกับ %1</translation>
+    </message>
+    <message>
+      <source>Disconnect System from %1?</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>ยกเลิกการเชื่อมต่อระบบจาก %1</translation>
     </message>
     <message>
       <source>All %1 users will be deleted.</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation type="unfinished">All %1 users will be deleted.</translation>
+    </message>
+    <message>
+      <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>คุณจะไม่สามารถเชื่อมต่อกับระบบนี้กับบัญชี %1 หลังจากที่คุณยกเลิกการเชื่อมต่อระบบนี้จาก %1</translation>
     </message>
   </context>
   <context>
@@ -4153,10 +4166,6 @@ to %1</source>
       <translation>เปิดใช้งานใบอนุญาต</translation>
     </message>
     <message>
-      <source>All files (*.*)</source>
-      <translation>ทุกไฟล์ (*.*)</translation>
-    </message>
-    <message>
       <source>Failed to open file</source>
       <translation>ไม่สามารถเปิดไฟล์นี้</translation>
     </message>
@@ -4167,6 +4176,10 @@ to %1</source>
     <message>
       <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
       <translation>โปรดส่ง Id คีย์ใบอนุญาตและฮาร์ดแวร์ให้กับ %1 เพื่อรับไฟล์ Activation Key</translation>
+    </message>
+    <message>
+      <source>All files</source>
+      <translation type="unfinished">All files</translation>
     </message>
   </context>
   <context>
@@ -4200,7 +4213,7 @@ to %1</source>
     <name>QnLinkToCloudDialogPrivate</name>
     <message>
       <source>Failed to login to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>ไม่สามารถเข้าสู่ระบบ %1</translation>
     </message>
   </context>
@@ -4318,12 +4331,12 @@ to %1</source>
     </message>
     <message>
       <source>Log in to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>เข้าสู่ระบบ %1</translation>
     </message>
     <message>
       <source>Welcome to %1!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>ยินดีต้อนรับสู่ %1</translation>
     </message>
   </context>
@@ -5561,10 +5574,6 @@ to %1</source>
       <translation>เลือกไฟล์อัพเดต...</translation>
     </message>
     <message>
-      <source>Update Files (*.zip)</source>
-      <translation>ไฟล์อัพเดต (*.zip)</translation>
-    </message>
-    <message>
       <source>Release notes</source>
       <translation>หมายเหตุการเผยแพร่</translation>
     </message>
@@ -5746,6 +5755,10 @@ to %1</source>
       <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
       <translation>อินสแตนซ์ %1 ที่ไม่สามารถใช้ร่วมกันได้ ในการยกเลิกการเชื่อมต่อระบบจาก %1 ก่อน</translation>
+    </message>
+    <message>
+      <source>Update Files</source>
+      <translation type="unfinished">Update Files</translation>
     </message>
   </context>
   <context>
@@ -6438,16 +6451,6 @@ to %1</source>
       <translation>เชื่อมต่อ</translation>
     </message>
     <message>
-      <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>เชื่อมต่อระบบของคุณกับ %1 &amp;mdash; ทำให้สามารถเข้าถึงได้จากทุกที่!</translation>
-    </message>
-    <message>
-      <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>ตรวจสอบ %1 &amp;mdash; เชื่อมต่อกับระบบของคุณจากทุกที่!</translation>
-    </message>
-    <message>
       <source>Some users have not set their email addresses</source>
       <translation>ผู้ใช้บางคนไม่ได้ตั้งค่าอยู่อีเมล</translation>
     </message>
@@ -6498,6 +6501,16 @@ to %1</source>
     <message>
       <source>Archive integrity problem detected</source>
       <translation>ตรวจพบปัญหาความสมบูรณ์ของที่เก็บถาวร</translation>
+    </message>
+    <message>
+      <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>เชื่อมต่อระบบของคุณกับ %1 &amp;mdash; ทำให้สามารถเข้าถึงได้จากทุกที่!</translation>
+    </message>
+    <message>
+      <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>ตรวจสอบ %1 &amp;mdash; เชื่อมต่อกับระบบของคุณจากทุกที่!</translation>
     </message>
   </context>
   <context>
@@ -6779,7 +6792,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 user</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation type="unfinished">%1 user</translation>
     </message>
   </context>
@@ -6963,7 +6976,7 @@ to %1</source>
     </message>
     <message>
       <source>This user has not yet signed up for %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>ผู้ใช้รายนี้ยังไม่ได้สมัคร %1</translation>
     </message>
   </context>
@@ -7015,7 +7028,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 user with specified email already exists.</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation type="unfinished">%1 user with specified email already exists.</translation>
     </message>
   </context>
@@ -7258,7 +7271,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 Systems cannot be merged</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation type="unfinished">%1 Systems cannot be merged</translation>
     </message>
   </context>

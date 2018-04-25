@@ -25,7 +25,7 @@
 #include <nx/client/desktop/ui/actions/actions.h>
 
 #include <ui/utils/table_export_helper.h>
-#include <ui/common/item_view_hover_tracker.h>
+#include <nx/client/desktop/common/utils/item_view_hover_tracker.h>
 #include <ui/delegates/audit_item_delegate.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -40,6 +40,7 @@
 #include <ui/style/skin.h>
 
 #include <nx/client/desktop/resource_properties/camera/camera_settings_tab.h>
+#include <nx/client/desktop/resource_views/data/node_type.h>
 
 #include <utils/common/event_processors.h>
 
@@ -49,7 +50,7 @@
 #include <ui/style/helper.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
 #include <ui/widgets/common/item_view_auto_hider.h>
-#include <ui/widgets/views/checkboxed_header_view.h>
+#include <nx/client/desktop/common/widgets/checkable_header_view.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
@@ -143,14 +144,14 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget* parent) :
     enum { kUpdateFilterDelayMs = 200 };
     ui->filterLineEdit->setTextChangedSignalFilterMs(kUpdateFilterDelayMs);
 
-    connect(ui->filterLineEdit, &QnSearchLineEdit::enterKeyPressed, this, &QnAuditLogDialog::at_filterChanged);
-    connect(ui->filterLineEdit, &QnSearchLineEdit::textChanged, this, &QnAuditLogDialog::at_filterChanged);
+    connect(ui->filterLineEdit, &SearchLineEdit::enterKeyPressed, this, &QnAuditLogDialog::at_filterChanged);
+    connect(ui->filterLineEdit, &SearchLineEdit::textChanged, this, &QnAuditLogDialog::at_filterChanged);
 
     ui->gridMaster->horizontalHeader()->setSortIndicator(1, Qt::DescendingOrder);
     ui->gridCameras->horizontalHeader()->setSortIndicator(1, Qt::AscendingOrder);
 
     /* Cursor changes when description is hovered: */
-    connect(ui->gridDetails->hoverTracker(), &QnItemViewHoverTracker::itemEnter, this,
+    connect(ui->gridDetails->hoverTracker(), &ItemViewHoverTracker::itemEnter, this,
         [this](const QModelIndex& index)
         {
             if (index.column() == m_descriptionColumnIndex)
@@ -161,7 +162,7 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget* parent) :
             }
         });
 
-    connect(ui->gridDetails->hoverTracker(), &QnItemViewHoverTracker::itemLeave, this,
+    connect(ui->gridDetails->hoverTracker(), &ItemViewHoverTracker::itemLeave, this,
         [this]()
         {
             ui->gridDetails->unsetCursor();
@@ -264,7 +265,7 @@ void QnAuditLogDialog::setupDetailsGrid()
     connect(m_itemDelegate, &QnAuditItemDelegate::descriptionClicked,   this, &QnAuditLogDialog::at_descriptionClicked);
 }
 
-void QnAuditLogDialog::setupGridCommon(QnTableView* grid, bool master)
+void QnAuditLogDialog::setupGridCommon(TableView* grid, bool master)
 {
     QnSnappedScrollBar* scrollBar = new QnSnappedScrollBar(grid->parentWidget());
     grid->setVerticalScrollBar(scrollBar->proxyScrollBar());
@@ -275,11 +276,11 @@ void QnAuditLogDialog::setupGridCommon(QnTableView* grid, bool master)
 
     if (master)
     {
-        QnCheckBoxedHeaderView* header = new QnCheckBoxedHeaderView(QnAuditLogModel::SelectRowColumn, this);
+        CheckableHeaderView* header = new CheckableHeaderView(QnAuditLogModel::SelectRowColumn, this);
         header->setVisible(true);
         header->setSectionsClickable(true);
         grid->setHorizontalHeader(header);
-        connect(header, &QnCheckBoxedHeaderView::checkStateChanged, this, &QnAuditLogDialog::at_headerCheckStateChanged);
+        connect(header, &CheckableHeaderView::checkStateChanged, this, &QnAuditLogDialog::at_headerCheckStateChanged);
     }
 
     grid->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
@@ -301,7 +302,7 @@ void QnAuditLogDialog::setupGridCommon(QnTableView* grid, bool master)
     setupContextMenu(grid);
 }
 
-void QnAuditLogDialog::setupContextMenu(QnTableView* gridMaster)
+void QnAuditLogDialog::setupContextMenu(TableView* gridMaster)
 {
     gridMaster->addAction(m_clipboardAction);
     gridMaster->addAction(m_exportAction);
@@ -567,7 +568,7 @@ void QnAuditLogDialog::at_updateCheckboxes()
 
 void setGridGeneralCheckState(QTableView* gridMaster)
 {
-    if (auto header = qobject_cast<QnCheckBoxedHeaderView*>(gridMaster->horizontalHeader()))
+    if (auto header = qobject_cast<CheckableHeaderView*>(gridMaster->horizontalHeader()))
     {
         QSignalBlocker blocker(header);
         int numSelectedRows = gridMaster->selectionModel()->selectedRows().size();
@@ -925,7 +926,7 @@ void QnAuditLogDialog::at_customContextMenuRequested(const QPoint&)
         if (resource)
         {
             action::Parameters parameters(resource);
-            parameters.setArgument(Qn::NodeTypeRole, Qn::ResourceNode);
+            parameters.setArgument(Qn::NodeTypeRole, ResourceTreeNodeType::resource);
 
             menu.reset(manager->newMenu(action::TreeScope, nullptr, parameters));
             foreach(QAction* action, menu->actions())
@@ -949,7 +950,7 @@ void QnAuditLogDialog::at_customContextMenuRequested(const QPoint&)
     QnHiDpiWorkarounds::showMenu(menu.data(), QCursor::pos());
 }
 
-QnTableView* QnAuditLogDialog::currentGridView() const
+TableView* QnAuditLogDialog::currentGridView() const
 {
     if (ui->gridDetails->hasFocus())
         return ui->gridDetails;

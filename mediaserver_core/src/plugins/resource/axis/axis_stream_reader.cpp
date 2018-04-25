@@ -24,12 +24,11 @@ static const int AXIS_SEI_TIMESTAMP = 0x0a01;
 static const int AXIS_SEI_TRIGGER_DATA = 0x0a03;
 
 
-QnAxisStreamReader::QnAxisStreamReader(const QnResourcePtr& res):
+QnAxisStreamReader::QnAxisStreamReader(const QnPlAxisResourcePtr& res):
     CLServerPushStreamReader(res),
     m_rtpStreamParser(res),
-    m_oldFirmwareWarned(false)
+    m_axisRes(res)
 {
-    m_axisRes = getResource().dynamicCast<QnPlAxisResource>();
 }
 
 QnAxisStreamReader::~QnAxisStreamReader()
@@ -41,17 +40,17 @@ int QnAxisStreamReader::toAxisQuality(Qn::StreamQuality quality)
 {
     switch (quality)
     {
-        case Qn::QualityLowest:
+        case Qn::StreamQuality::lowest:
             return 50;
-        case Qn::QualityLow:
+        case Qn::StreamQuality::low:
             return 50;
-        case Qn::QualityNormal:
+        case Qn::StreamQuality::normal:
             return 40;
-        case Qn::QualityHigh:
+        case Qn::StreamQuality::high:
             return 30;
-        case Qn::QualityHighest:
+        case Qn::StreamQuality::highest:
             return 22; //Axis selection for the best quality is "20" so we set 22 to save some resources for the secondary stream.
-        case Qn::QualityPreSet:
+        case Qn::StreamQuality::preset:
             return -1;
         default:
             return -1;
@@ -204,7 +203,7 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
         paramsStr.append("&fps=").append(QByteArray::number(params.fps));
         if (params.bitrateKbps > 0)
             paramsStr.append("&videobitrate=").append(QByteArray::number(params.bitrateKbps));
-        else if (quality != Qn::QualityPreSet)
+        else if (quality != Qn::StreamQuality::preset)
             paramsStr.append("&compression=").append(QByteArray::number(toAxisQuality(quality)));
         paramsStr.append("&audio=").append(m_axisRes->isAudioEnabled() ? "1" : "0");
 
@@ -236,7 +235,7 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
                 return CameraDiagnostics::RequestFailedResult(CameraDiagnostics::RequestFailedResult(streamProfile, QLatin1String(nx::network::http::StatusCode::toString((nx::network::http::StatusCode::Value)status))));
             }
 
-            if (role != Qn::CR_SecondaryLiveVideo && m_axisRes->getMotionType() != Qn::MT_SoftwareGrid)
+            if (role != Qn::CR_SecondaryLiveVideo && m_axisRes->getMotionType() != Qn::MotionType::MT_SoftwareGrid)
             {
                 m_axisRes->setMotionMaskPhysical(0);
             }
@@ -397,7 +396,7 @@ void QnAxisStreamReader::pleaseStop()
 
 QnAbstractMediaDataPtr QnAxisStreamReader::getNextData()
 {
-    if (getRole() == Qn::CR_LiveVideo && m_axisRes->getMotionType() != Qn::MT_SoftwareGrid)
+    if (getRole() == Qn::CR_LiveVideo && m_axisRes->getMotionType() != Qn::MotionType::MT_SoftwareGrid)
         m_axisRes->readMotionInfo();
 
     if (!isStreamOpened())

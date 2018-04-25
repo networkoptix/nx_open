@@ -101,20 +101,22 @@ public:
     ec2::ErrorCode ec2SaveUser(const ec2::ApiUserData& request);
 
     void ec2GetSettings(
-        std::function<void(ec2::ErrorCode, ec2::ApiResourceParamDataList)> completionHandler);
-    ec2::ErrorCode ec2GetSettings(ec2::ApiResourceParamDataList* result);
+        std::function<void(
+            ec2::ErrorCode,
+            nx::vms::api::ResourceParamDataList)> completionHandler);
+    ec2::ErrorCode ec2GetSettings(nx::vms::api::ResourceParamDataList* result);
 
     void ec2SetResourceParams(
-        const ec2::ApiResourceParamWithRefDataList& request,
+        const nx::vms::api::ResourceParamWithRefDataList& request,
         std::function<void(ec2::ErrorCode)> completionHandler);
-    ec2::ErrorCode ec2SetResourceParams(const ec2::ApiResourceParamWithRefDataList& request);
+    ec2::ErrorCode ec2SetResourceParams(const nx::vms::api::ResourceParamWithRefDataList& request);
 
     void ec2GetResourceParams(
         const QnUuid& resourceId,
-        std::function<void(ec2::ErrorCode, ec2::ApiResourceParamDataList)> completionHandler);
+        std::function<void(ec2::ErrorCode, nx::vms::api::ResourceParamDataList)> completionHandler);
     ec2::ErrorCode ec2GetResourceParams(
         const QnUuid& resourceId,
-        ec2::ApiResourceParamDataList* result);
+        nx::vms::api::ResourceParamDataList* result);
 
     void ec2GetSystemMergeHistory(
         std::function<void(ec2::ErrorCode, ec2::ApiSystemMergeHistoryRecordList)> completionHandler);

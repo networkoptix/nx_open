@@ -757,18 +757,11 @@
         "colors": {
             "normalLabel": "light10",
             "weekendLabel": "red_core",
+            "gridLabel": "light4",
             "allLabel": "light16",
-            "recordNever": "dark5",
-            "recordAlways": "green_core",
-            "recordMotion": "red_d1",
-            "recordNeverHovered": "dark6",
-            "recordAlwaysHovered": "green_l1",
-            "recordMotionHovered": "red_core",
             "hoveredBackground": "dark9",
             "pressedBackground": "dark6",
-            "gridLine": "dark7",
-            "gridLabel": "light4",
-            "border": "dark4"
+            "gridLine": "dark7"
         }
     },
 
@@ -793,6 +786,21 @@
 
     "QnMediaResourceWidget": {
         "motionSensitivityColors": [
+            "light16",
+            "#627cd6",
+            "#23a4cb",
+            "#31baa2",
+            "#79bc66",
+            "#b8bc37",
+            "#fba405",
+            "#e97119",
+            "#d24729",
+            "#c22626"
+        ]
+    },
+
+    "nx::client::desktop::CameraMotionSettingsWidget": {
+        "sensitivityColors": [
             "light16",
             "#627cd6",
             "#23a4cb",

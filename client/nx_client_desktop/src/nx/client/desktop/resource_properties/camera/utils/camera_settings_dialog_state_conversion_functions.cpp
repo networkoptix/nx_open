@@ -23,7 +23,7 @@ void setMinRecordingDays(
     int actualValue = value.absoluteValue;
     NX_ASSERT(actualValue > 0);
     if (actualValue == 0)
-        actualValue = ec2::kDefaultMinArchiveDays;
+        actualValue = nx::vms::api::kDefaultMinArchiveDays;
     if (value.automatic)
         actualValue = -actualValue;
 
@@ -40,7 +40,7 @@ void setMaxRecordingDays(
     int actualValue = value.absoluteValue;
     NX_ASSERT(actualValue > 0);
     if (actualValue == 0)
-        actualValue = ec2::kDefaultMaxArchiveDays;
+        actualValue = nx::vms::api::kDefaultMaxArchiveDays;
     if (value.automatic)
         actualValue = -actualValue;
 
@@ -126,8 +126,19 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
 {
     if (state.isSingleCamera())
     {
-        cameras.first()->setName(state.singleCameraProperties.name());
+        auto camera = cameras.first();
+        camera->setName(state.singleCameraProperties.name());
+
+        if (state.devicesDescription.hasMotion == CameraSettingsDialogState::CombinedValue::All)
+        {
+            camera->setMotionType(state.singleCameraSettings.enableMotionDetection()
+                ? camera->getDefaultMotionType()
+                : Qn::MotionType::MT_NoMotion);
+
+            camera->setMotionRegionList(state.singleCameraSettings.motionRegionList());
+        }
     }
+
     setMinRecordingDays(state.recording.minDays, cameras);
     setMaxRecordingDays(state.recording.maxDays, cameras);
 

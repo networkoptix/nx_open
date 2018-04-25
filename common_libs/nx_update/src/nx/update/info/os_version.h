@@ -16,17 +16,21 @@ struct NX_UPDATE_API OsVersion
 
     OsVersion() = default;
     OsVersion(const OsVersion&) = default;
-    OsVersion& operator = (const OsVersion&) = default;
+    OsVersion& operator=(const OsVersion&) = default;
 
     bool isEmpty() const;
     bool matches(const QString& target) const;
-    QString toString() const;
+    QString serialize() const;
 
+    static OsVersion deserialize(const QString& s);
     static OsVersion fromString(const QString& s);
 };
 
+NX_UPDATE_API bool operator==(const OsVersion& lhs, const OsVersion& rhs);
+
 NX_UPDATE_API OsVersion ubuntuX64();
 NX_UPDATE_API OsVersion ubuntuX86();
+NX_UPDATE_API OsVersion macosx();
 NX_UPDATE_API OsVersion windowsX64();
 NX_UPDATE_API OsVersion windowsX86();
 NX_UPDATE_API OsVersion armBpi();

@@ -361,7 +361,7 @@ private:
 
     nx::utils::db::DBResult onSaveResourceAttribute(
         const std::string& systemId,
-        const ::ec2::ApiResourceParamWithRefData& data)
+        const nx::vms::api::ResourceParamWithRefData& data)
     {
         if (data.name == api::kVmsUserAuthInfoAttributeName)
         {

@@ -51,7 +51,7 @@
     </message>
     <message>
       <source>&amp;Quit</source>
-      <translation type="unfinished">&amp;Quit</translation>
+      <translation>&amp;Chiudi</translation>
     </message>
     <message>
       <source>An error has occurred while trying to access installed services:</source>
@@ -59,7 +59,7 @@
     </message>
     <message>
       <source>Server has been stopped</source>
-      <translation type="unfinished">Server has been stopped</translation>
+      <translation>Il server è stato fermato</translation>
     </message>
     <message>
       <source>Server has been started</source>

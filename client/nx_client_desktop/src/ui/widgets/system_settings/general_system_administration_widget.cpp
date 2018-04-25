@@ -16,7 +16,7 @@
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
-#include <ui/common/custom_painted.h>
+#include <nx/client/desktop/common/utils/custom_painted.h>
 #include <ui/common/read_only.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>

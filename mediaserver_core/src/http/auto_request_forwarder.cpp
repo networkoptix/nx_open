@@ -325,7 +325,7 @@ bool QnAutoRequestForwarder::findCameraInUrlQuery(
     if (paramNames.isEmpty()) //< Path trailing not found.
         return false;
 
-    NX_VERBOSE(this) << lm("Lookingh for camera id in url params [%2]").args(paramNames);
+    NX_VERBOSE(this) << lm("Looking for camera id in url params [%1]").args(paramNames);
 
     const QnRequestParams params = requestParamsFromUrl(request.requestLine.url);
     QString notFoundCameraId;

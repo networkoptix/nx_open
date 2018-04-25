@@ -193,7 +193,7 @@ QnAbstractStreamDataProvider* QnThirdPartyResource::createLiveDataProvider()
     if( !m_camManager )
         return nullptr;
     m_camManager->getRef()->addRef();
-    auto result = new ThirdPartyStreamReader( toSharedPointer(), m_camManager->getRef() );
+    auto result = new ThirdPartyStreamReader( toSharedPointer(this), m_camManager->getRef() );
     unsigned int camCapabilities = 0;
     if (m_camManager->getCameraCapabilities(&camCapabilities) == nxcip::NX_NO_ERROR)
         result->setNeedCorrectTime(camCapabilities & nxcip::BaseCameraManager::relativeTimestampCapability);
@@ -592,7 +592,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
     }
     if( cameraCapabilities & nxcip::BaseCameraManager::hardwareMotionCapability )
     {
-        //setMotionType( Qn::MT_HardwareGrid );
+        //setMotionType( Qn::MotionType::MT_HardwareGrid );
         setProperty( Qn::MOTION_WINDOW_CNT_PARAM_NAME, 100);
         setProperty( Qn::MOTION_MASK_WINDOW_CNT_PARAM_NAME, 100);
         setProperty( Qn::MOTION_SENS_WINDOW_CNT_PARAM_NAME, 100);
@@ -604,7 +604,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
     }
     else
     {
-        //setMotionType( Qn::MT_SoftwareGrid );
+        //setMotionType( Qn::MotionType::MT_SoftwareGrid );
         setProperty( Qn::SUPPORTED_MOTION_PARAM_NAME, QStringLiteral("softwaregrid"));
     }
     if( cameraCapabilities & nxcip::BaseCameraManager::shareFpsCapability )

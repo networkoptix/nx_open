@@ -95,4 +95,5 @@ namespace ec2
     typedef std::shared_ptr<FixedUrlClientQueryProcessor> FixedUrlClientQueryProcessorPtr;
 }
 
+
 #endif  //FIXED_URL_CLIENT_QUERY_PROCESSOR_H

@@ -63,7 +63,8 @@ class IMAPConnection(object):
             return
         fetch_response = self._call('uid', 'fetch', ','.join(message_uid_list), '(RFC822.HEADER)')
         for line in fetch_response:
-            if line == ')': continue
+            if line == ')':
+                continue
             uid_line, headers = line
             uid = self._parse_fetch_uid(uid_line)
             message = email.message_from_string(headers)  # with only headers

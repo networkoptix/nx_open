@@ -35,10 +35,11 @@ def determine_package_versions():
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
         v["sysroot"] = "xenial"
+        v["ffmpeg"] = "3.1.9"
 
     if platform == "macosx":
         v["qt"] = "5.6.3"
-        v["ffmpeg"] = "3.1.1-2"
+        v["ffmpeg"] = "3.1.9"
         v["openssl"] = "1.0.2e-2"
         v["festival"] = "2.1"
 
@@ -86,7 +87,7 @@ def determine_package_versions():
 
 def sync_dependencies(syncher):
     def sync(package, **kwargs):
-        return syncher.sync(package, **kwargs)
+        return syncher.sync(package, use_local=not rdepSync, **kwargs)
 
     sync("qt", path_variable="QT_DIR")
     sync("any/boost")
@@ -99,6 +100,11 @@ def sync_dependencies(syncher):
         sync("openssl")
 
     sync("ffmpeg")
+
+    if platform in ("linux", "macosx") and arch in ("x64", "x86"):
+        sync("libmp3lame-3.100")
+        sync("libvpx-1.7.0")
+        sync("vorbis-1.3.5")
 
     if platform == "linux" and box in ("bpi", "bananapi", "rpi", "tx1", "none"):
         sync("sysroot", path_variable="sysroot_directory")
@@ -131,7 +137,7 @@ def sync_dependencies(syncher):
         sync("windows/signtool", path_variable="signtool_directory")
 
     if box == "edge1":
-        sync("cpro-1.0.0-1")
+        sync("cpro-1.0.0-2")
         sync("gdb")
 
     if arch == "x64":
@@ -156,7 +162,7 @@ def sync_dependencies(syncher):
         sync("any/nx_storage_sdk-1.7.1")
         sync("sigar")
 
-        sync("any/apidoctool", path_variable="APIDOCTOOL_PATH")
+        sync("any/apidoctool-2.0", path_variable="APIDOCTOOL_PATH")
 
         if customWebAdminPackageDirectory:
             pass

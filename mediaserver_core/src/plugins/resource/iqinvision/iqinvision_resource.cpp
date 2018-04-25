@@ -27,10 +27,10 @@ QnAbstractStreamDataProvider* QnPlIqResource::createLiveDataProvider()
     //return new MJPEGStreamReader(toSharedPointer(), "mjpg/video.mjpg");
 
     if (isRtp())
-        return new QnRtpStreamReader(toSharedPointer());
+        return new QnRtpStreamReader(toSharedPointer(this));
         /**/
 
-    return new MJPEGStreamReader(toSharedPointer(), QLatin1String("now.jpg?snap=spush"));
+    return new MJPEGStreamReader(toSharedPointer(this), QLatin1String("now.jpg?snap=spush"));
 }
 
 void QnPlIqResource::setCroppingPhysical(QRect /*cropping*/)

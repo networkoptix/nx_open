@@ -74,7 +74,7 @@ void CameraSettingsDialogStore::setSingleCameraUserName(const QString& text)
         [&](State state) { return Reducer::setSingleCameraUserName(std::move(state), text); });
 }
 
-void CameraSettingsDialogStore::setScheduleBrush(const QnScheduleGridWidget::CellParams& brush)
+void CameraSettingsDialogStore::setScheduleBrush(const ScheduleCellParams& brush)
 {
     d->executeAction(
         [&](State state) { return Reducer::setScheduleBrush(std::move(state), brush); });
@@ -207,6 +207,18 @@ void CameraSettingsDialogStore::setRecordingEnabled(bool value)
 {
     d->executeAction(
         [&](State state) { return Reducer::setRecordingEnabled(std::move(state), value); });
+}
+
+void CameraSettingsDialogStore::setMotionDetectionEnabled(bool value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setMotionDetectionEnabled(std::move(state), value); });
+}
+
+void CameraSettingsDialogStore::setMotionRegionList(const QList<QnMotionRegion>& value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setMotionRegionList(std::move(state), value); });
 }
 
 } // namespace desktop

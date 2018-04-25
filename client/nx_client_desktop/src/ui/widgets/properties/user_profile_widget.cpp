@@ -16,7 +16,7 @@
 #include <nx_ec/ec_api.h>
 
 #include <ui/common/read_only.h>
-#include <ui/common/aligner.h>
+#include <nx/client/desktop/common/utils/aligner.h>
 #include <ui/dialogs/resource_properties/change_user_password_dialog.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
@@ -56,7 +56,7 @@ QnUserProfileWidget::QnUserProfileWidget(QnUserSettingsModel* model, QWidget* pa
     ui(new Ui::UserProfileWidget()),
     m_model(model),
     m_newPassword(),
-    m_aligner(new QnAligner(this))
+    m_aligner(new Aligner(this))
 {
     ui->setupUi(this);
 

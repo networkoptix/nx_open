@@ -31,6 +31,7 @@
 #include <nx/client/desktop/utils/server_file_cache.h>
 #include <nx/client/desktop/export/settings/export_media_persistent_settings.h>
 #include <nx/client/desktop/layout_templates/layout_template.h>
+#include <nx/client/desktop/resource_views/data/node_type.h>
 #include <nx/client/desktop/utils/upload_state.h>
 #include <nx/client/desktop/utils/wearable_payload.h>
 #include <nx/client/desktop/utils/wearable_state.h>
@@ -39,6 +40,7 @@
 #include <nx/cloud/cdb/api/system_data.h>
 #include <api/server_rest_connection.h>
 
+#include <nx/client/desktop/resource_properties/camera/widgets/motion_regions_item.h>
 #include <nx/client/desktop/ui/common/color_theme.h>
 #include <nx/client/desktop/ui/common/recording_status_helper.h>
 #include <nx/client/desktop/ui/common/focus_frame_item.h>
@@ -79,7 +81,7 @@ void QnClientMetaTypes::initialize() {
 
     qRegisterMetaTypeStreamOperators<QList<QUrl>>();
 
-    qRegisterMetaType<Qn::NodeType>();
+    qRegisterMetaType<ResourceTreeNodeType>();
     qRegisterMetaType<Qn::ItemRole>();
     qRegisterMetaType<QnThumbnail>();
     qRegisterMetaType<QnLicenseWarningState>();
@@ -200,5 +202,6 @@ void QnClientMetaTypes::registerQmlTypes()
     CursorManager::registerQmlType();
     RecordingStatusHelper::registerQmlType();
     FocusFrameItem::registerQmlType();
+    MotionRegionsItem::registerQmlType();
 }
 

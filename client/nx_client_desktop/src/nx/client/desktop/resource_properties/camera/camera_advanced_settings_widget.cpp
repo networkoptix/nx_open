@@ -19,7 +19,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_data_pool.h>
 
-#include <ui/common/aligner.h>
+#include <nx/client/desktop/common/utils/aligner.h>
 #include <ui/style/webview_style.h>
 
 #include <vms_gateway_embeddable.h>
@@ -64,7 +64,7 @@ CameraAdvancedSettingsWidget::CameraAdvancedSettingsWidget(QWidget* parent /* = 
     ClipboardButton::createInline(primaryLineEdit, ClipboardButton::StandardType::copy);
     ClipboardButton::createInline(secondaryLineEdit, ClipboardButton::StandardType::copy);
 
-    QnAligner* aligner = new QnAligner(this);
+    Aligner* aligner = new Aligner(this);
     aligner->registerTypeAccessor<InputField>(InputField::createLabelWidthAccessor());
     aligner->addWidgets({
         ui->cameraIdInputField,

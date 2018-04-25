@@ -5,6 +5,8 @@
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QTimer>
 #include <QtCore/QMutex>
+#include <QtCore/QList>
+#include <QtCore/QHash>
 
 #include <nx/kit/debug.h>
 
@@ -33,6 +35,15 @@
 #include "audio_output.h"
 
 #include "media_player_quality_chooser.h"
+
+namespace {
+
+uint qHash(MetadataType value)
+{
+    return uint(value);
+}
+
+} // namespace
 
 namespace nx {
 namespace media {
@@ -225,6 +236,11 @@ public:
     // Turn on / turn off audio
     bool isAudioEnabled;
 
+    RenderContextSynchronizerPtr renderContextSynchronizer;
+
+    using MetadataConsumerList = QList<QWeakPointer<AbstractMetadataConsumer>>;
+    QHash<MetadataType, MetadataConsumerList> m_metadataConsumerByType;
+
     void applyVideoQuality();
 
 private:
@@ -233,6 +249,7 @@ private:
     void at_hurryUp();
     void at_jumpOccurred(int sequence);
     void at_gotVideoFrame();
+    void at_gotMetadata(const QnAbstractCompressedMetadataPtr& metadata);
     void presentNextFrameDelayed();
 
     void presentNextFrame();
@@ -259,6 +276,8 @@ private:
 
     void log(const QString& message) const;
     void clearCurrentFrame();
+
+    void configureMetadataForReader();
 };
 
 PlayerPrivate::PlayerPrivate(Player *parent):
@@ -281,7 +300,8 @@ PlayerPrivate::PlayerPrivate(Player *parent):
     overflowCounter(0),
     videoQuality(Player::HighVideoQuality),
     allowOverlay(true),
-    isAudioEnabled(true)
+    isAudioEnabled(true),
+    renderContextSynchronizer(VideoDecoderRegistry::instance()->defaultRenderContextSynchronizer())
 {
     connect(execTimer, &QTimer::timeout, this, &PlayerPrivate::presentNextFrame);
     execTimer->setSingleShot(true);
@@ -730,6 +750,9 @@ bool PlayerPrivate::createArchiveReader()
         archiveDelegate = new QnRtspClientArchiveDelegate(archiveReader.get());
 
     archiveReader->setArchiveDelegate(archiveDelegate);
+
+    configureMetadataForReader();
+
     return true;
 }
 
@@ -746,7 +769,7 @@ bool PlayerPrivate::initDataProvider()
     if (!archiveReader)
         return false;
 
-    dataConsumer.reset(new PlayerDataConsumer(archiveReader));
+    dataConsumer.reset(new PlayerDataConsumer(archiveReader, renderContextSynchronizer));
     dataConsumer->setAudioEnabled(isAudioEnabled);
     dataConsumer->setAllowOverlay(allowOverlay);
 
@@ -773,6 +796,8 @@ bool PlayerPrivate::initDataProvider()
         });
 
     archiveReader->addDataProcessor(dataConsumer.get());
+    connect(dataConsumer.get(), &PlayerDataConsumer::gotMetadata,
+        this, &PlayerPrivate::at_gotMetadata);
     connect(dataConsumer.get(), &PlayerDataConsumer::gotVideoFrame,
         this, &PlayerPrivate::at_gotVideoFrame);
     connect(dataConsumer.get(), &PlayerDataConsumer::hurryUp,
@@ -803,6 +828,31 @@ void PlayerPrivate::clearCurrentFrame()
 {
     execTimer->stop();
     videoFrameToRender.reset();
+}
+
+void PlayerPrivate::configureMetadataForReader()
+{
+    if (!archiveReader)
+        return;
+
+    auto rtspClient = dynamic_cast<QnRtspClientArchiveDelegate*> (archiveReader->getArchiveDelegate());
+    if (rtspClient)
+    {
+        bool hasMotionConsumer = !m_metadataConsumerByType.value(MetadataType::Motion).isEmpty();
+        rtspClient->setSendMotion(hasMotionConsumer);
+    }
+}
+
+void PlayerPrivate::at_gotMetadata(const QnAbstractCompressedMetadataPtr& metadata)
+{
+    NX_ASSERT(metadata);
+
+    const auto consumers = m_metadataConsumerByType.value(metadata->metadataType);
+    for (const auto& value: consumers)
+    {
+        if (auto consumer = value.lock())
+            consumer->processMetadata(metadata);
+    }
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1293,6 +1343,18 @@ PlayerStatistics Player::currentStatistics() const
     return result;
 }
 
+RenderContextSynchronizerPtr Player::renderContextSynchronizer() const
+{
+    Q_D(const Player);
+    return d->renderContextSynchronizer;
+}
+
+void Player::setRenderContextSynchronizer(RenderContextSynchronizerPtr value)
+{
+    Q_D(Player);
+    d->renderContextSynchronizer = value;
+}
+
 void Player::testSetOwnedArchiveReader(QnArchiveStreamReader* archiveReader)
 {
     Q_D(Player);
@@ -1303,6 +1365,38 @@ void Player::testSetCamera(const QnResourcePtr& camera)
 {
     Q_D(Player);
     d->resource = camera;
+}
+
+bool Player::addMetadataConsumer(const AbstractMetadataConsumerPtr& metadataConsumer)
+{
+    if (!metadataConsumer)
+        return false;
+
+    Q_D(Player);
+    auto& consumers = d->m_metadataConsumerByType[metadataConsumer->metadataType()];
+    if (consumers.contains(metadataConsumer))
+        return false;
+
+    consumers.push_back(metadataConsumer);
+    d->configureMetadataForReader();
+    return true;
+}
+
+bool Player::removeMetadataConsumer(const AbstractMetadataConsumerPtr& metadataConsumer)
+{
+    if (!metadataConsumer)
+        return false;
+
+    Q_D(Player);
+
+    auto& consumers = d->m_metadataConsumerByType[metadataConsumer->metadataType()];
+    const auto index = consumers.indexOf(metadataConsumer);
+    if (index == -1)
+        return false;
+
+    consumers.removeAt(index);
+    d->configureMetadataForReader();
+    return true;
 }
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Player, VideoQuality)

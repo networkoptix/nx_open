@@ -8,7 +8,7 @@
 #include <core/resource_management/user_roles_manager.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource/user_resource.h>
-#include <ui/common/aligner.h>
+#include <nx/client/desktop/common/utils/aligner.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/models/resource_properties/user_settings_model.h>
@@ -56,7 +56,7 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
     ui(new Ui::UserSettingsWidget()),
     m_model(model),
     m_rolesModel(new QnUserRolesModel(this, QnUserRolesModel::DefaultRoleFlags)),
-    m_aligner(new QnAligner(this)),
+    m_aligner(new Aligner(this)),
     m_lastUserTypeIndex(kCloudIndex) //< actual only for cloud systems (when selector is visible)
 {
     ui->setupUi(this);
@@ -457,7 +457,7 @@ void QnUserSettingsWidget::setupInputFields()
 
                 return ValidationResult(
                     tr("%1 user with specified email already exists.",
-                        "%1 is the short cloud name (like 'Cloud')")
+                        "%1 is the short cloud name (like Cloud)")
                     .arg(nx::network::AppInfo::shortCloudName()));
             }
 

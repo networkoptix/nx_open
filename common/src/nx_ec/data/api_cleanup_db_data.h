@@ -6,17 +6,10 @@
 namespace ec2
 {
 
-struct ApiCleanupDatabaseData: ApiData
+struct ApiCleanupDatabaseData: nx::vms::api::Data
 {
-    ApiCleanupDatabaseData():
-        ApiData(),
-        cleanupDbObjects(false),
-        cleanupTransactionLog(false)
-    {
-    }
-
-    bool cleanupDbObjects;
-    bool cleanupTransactionLog;
+    bool cleanupDbObjects = false;
+    bool cleanupTransactionLog = false;
     QString reserved;
 };
 

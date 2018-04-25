@@ -1120,19 +1120,19 @@ to view more bookmarks</source>
       <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
       <translation>לא ניתן לכתוב את הקובץ &quot;%1&quot;. נסה שם אחר.</translation>
     </message>
-    <message numerus="yes">
-      <source>Filename should not contain the following reserved characters:
-%1</source>
-      <translation>
-        <numerusform>שם הקובץ לא אמור להכיל את התווים השמורים הבאים: %1</numerusform>
-        <numerusform>שם הקובץ לא אמור להכיל את התווים השמורים הבאים: %1</numerusform>
-        <numerusform>שם הקובץ לא אמור להכיל את התווים השמורים הבאים: %1</numerusform>
-        <numerusform>שם הקובץ לא אמור להכיל את התווים השמורים הבאים: %1</numerusform>
-      </translation>
-    </message>
     <message>
-      <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation>שם הקובץ &quot;%1&quot; שמור על ידי מערכת ההפעלה. נסה שם אחר.</translation>
+      <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
+      <translation type="unfinished">File name &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
+    </message>
+    <message numerus="yes">
+      <source>File name must not contain the following reserved characters:</source>
+      <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
+      <translation type="unfinished">
+        <numerusform>File name must not contain the following reserved characters:</numerusform>
+        <numerusform>File name must not contain the following reserved characters:</numerusform>
+        <numerusform>File name must not contain the following reserved characters:</numerusform>
+        <numerusform>File name must not contain the following reserved characters:</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -1200,8 +1200,8 @@ to view more bookmarks</source>
       <translation type="unfinished">
         <numerusform>הסיסמה חייבת להיות פחות מ %n תווים.</numerusform>
         <numerusform>הסיסמה חייבת להיות פחות מ %n תווים.</numerusform>
-        <numerusform>Password must be no longer than %n characters.</numerusform>
-        <numerusform>Password must be no longer than %n characters.</numerusform>
+        <numerusform>הסיסמה חייבת להיות פחות מ %n תווים.</numerusform>
+        <numerusform>הסיסמה חייבת להיות פחות מ %n תווים.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1210,16 +1210,16 @@ to view more bookmarks</source>
         <numerusform>הסיסמה לא תכיל %n תווים או יותר רצופים ביחד.</numerusform>
         <numerusform>הסיסמה לא צריכה להכיל %n תווים או יותר רצופים ביחד.</numerusform>
         <numerusform>הסיסמה לאי כולה להכיל %n תווים או יותר רצופים ביחד.</numerusform>
-        <numerusform>Password should not contain %n or more consecutive characters together.</numerusform>
+        <numerusform>הסיסמה לא תכיל %n תווים או יותר רצופים ביחד.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters.</source>
       <translation type="unfinished">
         <numerusform>הסיסמה לא תכיל %n תווים חוזרים או יותר.</numerusform>
-        <numerusform>Password should not contain %n or more repeating characters.</numerusform>
-        <numerusform>Password should not contain %n or more repeating characters.</numerusform>
-        <numerusform>Password should not contain %n or more repeating characters.</numerusform>
+        <numerusform>הסיסמה לא תכיל %n תווים חוזרים או יותר.</numerusform>
+        <numerusform>הסיסמה לא תכיל %n תווים חוזרים או יותר.</numerusform>
+        <numerusform>הסיסמה לא תכיל %n תווים חוזרים או יותר.</numerusform>
       </translation>
     </message>
     <message>
@@ -2863,52 +2863,61 @@ devices</source>
     </message>
     <message>
       <source>Disconnect System from %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>נתק את מערכת מ %1</translation>
     </message>
     <message>
       <source>Open %1 Portal</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>פתח פורטל %1</translation>
     </message>
     <message>
       <source>Create %1 Account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>צור חשבון %1</translation>
     </message>
     <message>
       <source>Connect System to %1...</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>חבר מערכת אל %1...</translation>
     </message>
     <message>
       <source>Create %1
 account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>צור חשבון %1</translation>
     </message>
     <message>
       <source>Connect System
 to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>חבר מערכת
 אל %1</translation>
     </message>
     <message>
       <source>Learn more about %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>למד עוד אודות %1</translation>
     </message>
   </context>
   <context>
     <name>QnCloudResultMessages</name>
     <message>
-      <source>Incorrect email or password</source>
-      <translation>דוא"ל או סיסמה שגויים</translation>
+      <source>Account not found</source>
+      <translation type="unfinished">Account not found</translation>
     </message>
     <message>
-      <source>Account is not activated. Please check your email and follow provided instructions</source>
-      <translation>החשבון לא הופעל. בדוק את האימייל שלך ובצע את ההוראות המצורפות</translation>
+      <source>Account is not activated.</source>
+      <translation type="unfinished">Account is not activated.</translation>
+    </message>
+    <message>
+      <source>Please log in to %1 and follow the provided instructions.</source>
+      <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
+      <translation type="unfinished">Please log in to %1 and follow the provided instructions.</translation>
+    </message>
+    <message>
+      <source>Invalid password</source>
+      <translation type="unfinished">Invalid password</translation>
     </message>
   </context>
   <context>
@@ -2923,7 +2932,7 @@ to %1</source>
     </message>
     <message>
       <source>Cannot connect to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>אין אפשרות להתחבר אל %1</translation>
     </message>
   </context>
@@ -2954,12 +2963,12 @@ to %1</source>
     </message>
     <message>
       <source>Connect to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>התחבר %1</translation>
     </message>
     <message>
       <source>Enter %1 Account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>הזן חשבון %1</translation>
     </message>
   </context>
@@ -2971,12 +2980,12 @@ to %1</source>
     </message>
     <message>
       <source>System connected to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>המערכת מחוברת אל %1</translation>
     </message>
     <message>
       <source>Failed to connect System to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>כשל חיבור המערכת אל %1</translation>
     </message>
   </context>
@@ -3128,17 +3137,17 @@ to %1</source>
       <translation>הפעולה אינה מותרת עכשיו. זה יכול לקרות עקב כך שהשרת מופעל מחדש כרגע. נא נסה שוב מאוחר יותר.</translation>
     </message>
     <message>
-      <source>Connection to %1 is not ready yet. Check server Internet connection or try again later.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>חיבור %1 לשרת אינו מוכן עדיין. בדוק את חיבור האינטרנט של השרת או נסה שוב מאוחר יותר.</translation>
-    </message>
-    <message>
       <source>Connection to Server could not be established.</source>
       <translation>לא ניתן לבצע חיבור לשרת.</translation>
     </message>
     <message>
       <source>This user is disabled by system administrator.</source>
       <translation>משתמש זה מושבת על ידי מנהל המערכת.</translation>
+    </message>
+    <message>
+      <source>Connection to %1 is not ready yet. Check server Internet connection or try again later.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>חיבור %1 לשרת אינו מוכן עדיין. בדוק את חיבור האינטרנט של השרת או נסה שוב מאוחר יותר.</translation>
     </message>
   </context>
   <context>
@@ -3244,6 +3253,10 @@ to %1</source>
     <message>
       <source>You can create a backup for System configurations that can be restored in case of failure.</source>
       <translation>אתה יכול ליצור גיבוי להגדרות המערכת אותו תוכל לשחזר במקרה של כשלון.</translation>
+    </message>
+    <message>
+      <source>Database Backup Files</source>
+      <translation type="unfinished">Database Backup Files</translation>
     </message>
   </context>
   <context>
@@ -3362,28 +3375,28 @@ to %1</source>
       <translation>התנתק</translation>
     </message>
     <message>
-      <source>Failed to disconnect System from %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>נכשל ניתוק המערכת מ- %1</translation>
-    </message>
-    <message>
-      <source>Disconnect System from %1?</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>נתק את מערכת מ %1?</translation>
-    </message>
-    <message>
       <source>You will be disconnected from this System and able to login again through local network with local account</source>
       <translation>אתה תנותק ממערכת זו ותוכל להתחבר שוב דרך הרשת המקומית עם חשבון מקומי</translation>
     </message>
     <message>
-      <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>לא תוכל להתחבר למערכת זו באמצעות חשבון %1 לאחר שתנתק את המערכת מ- %1.</translation>
+      <source>Failed to disconnect System from %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>נכשל ניתוק המערכת מ- %1</translation>
+    </message>
+    <message>
+      <source>Disconnect System from %1?</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>נתק את מערכת מ %1?</translation>
     </message>
     <message>
       <source>All %1 users will be deleted.</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation type="unfinished">All %1 users will be deleted.</translation>
+    </message>
+    <message>
+      <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>לא תוכל להתחבר למערכת זו באמצעות חשבון %1 לאחר שתנתק את המערכת מ- %1.</translation>
     </message>
   </context>
   <context>
@@ -4301,10 +4314,6 @@ to %1</source>
       <translation>פתח קובץ רשיון</translation>
     </message>
     <message>
-      <source>All files (*.*)</source>
-      <translation>כל הקבצים (*.*)</translation>
-    </message>
-    <message>
       <source>Failed to open file</source>
       <translation>פתיחת קובץ נכשלה</translation>
     </message>
@@ -4315,6 +4324,10 @@ to %1</source>
     <message>
       <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
       <translation>אנא שלח את מפתח הרישיון ואת מזהה החומרה שסופקו ל- %1 כדי לקבל קובץ הפעלה של מפתח.</translation>
+    </message>
+    <message>
+      <source>All files</source>
+      <translation type="unfinished">All files</translation>
     </message>
   </context>
   <context>
@@ -4350,9 +4363,9 @@ to %1</source>
       <source>Use licenses to view these %n cameras</source>
       <translation type="unfinished">
         <numerusform>השתמש ברישיונות עבור צפיה %n במצלמות שנבחרו</numerusform>
-        <numerusform>Use licenses to view these %n cameras</numerusform>
-        <numerusform>Use licenses to view these %n cameras</numerusform>
-        <numerusform>Use licenses to view these %n cameras</numerusform>
+        <numerusform>השתמש ברישיונות עבור צפיה %n במצלמות שנבחרו</numerusform>
+        <numerusform>השתמש ברישיונות עבור צפיה %n במצלמות שנבחרו</numerusform>
+        <numerusform>השתמש ברישיונות עבור צפיה %n במצלמות שנבחרו</numerusform>
       </translation>
     </message>
   </context>
@@ -4360,7 +4373,7 @@ to %1</source>
     <name>QnLinkToCloudDialogPrivate</name>
     <message>
       <source>Failed to login to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>נכשלה ההתחברות ל- %1</translation>
     </message>
   </context>
@@ -4478,12 +4491,12 @@ to %1</source>
     </message>
     <message>
       <source>Log in to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>היכנס ל- %1</translation>
     </message>
     <message>
       <source>Welcome to %1!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>ברוכים הבאים ל %1!</translation>
     </message>
   </context>
@@ -4601,9 +4614,9 @@ to %1</source>
       <source>Set for all %n Cameras</source>
       <translation type="unfinished">
         <numerusform>הגדר עבור כל %n מצלמות</numerusform>
-        <numerusform>Set for all %n Cameras</numerusform>
-        <numerusform>Set for all %n Cameras</numerusform>
-        <numerusform>Set for all %n Cameras</numerusform>
+        <numerusform>הגדר עבור כל %n מצלמות</numerusform>
+        <numerusform>הגדר עבור כל %n מצלמות</numerusform>
+        <numerusform>הגדר עבור כל %n מצלמות</numerusform>
       </translation>
     </message>
   </context>
@@ -5766,10 +5779,6 @@ to %1</source>
       <translation>בחר קובץ עדכון...</translation>
     </message>
     <message>
-      <source>Update Files (*.zip)</source>
-      <translation>קבצי עדכון (*.zip)</translation>
-    </message>
-    <message>
       <source>Release notes</source>
       <translation>הערות מוצר</translation>
     </message>
@@ -5954,6 +5963,10 @@ to %1</source>
       <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
       <translation>מופע לא תואם %1. כדי לעדכן נתק את המערכת מ- %1 תחילה.</translation>
+    </message>
+    <message>
+      <source>Update Files</source>
+      <translation type="unfinished">Update Files</translation>
     </message>
   </context>
   <context>
@@ -6650,16 +6663,6 @@ to %1</source>
       <translation>חיבור</translation>
     </message>
     <message>
-      <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>חבר את המערכת שלך ל %1 &amp;mdash; כדי להפוך אותה לזמינה מכל מקום!</translation>
-    </message>
-    <message>
-      <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>נסה את %1 &amp;mdash; התחבר למערכת שלך מכל מקום!</translation>
-    </message>
-    <message>
       <source>Some users have not set their email addresses</source>
       <translation>לחלק מהמשתמשים לא הוגדרה כתובות הדוא"ל שלהם</translation>
     </message>
@@ -6710,6 +6713,16 @@ to %1</source>
     <message>
       <source>Archive integrity problem detected</source>
       <translation>זוהתה בעיית שלמות בארכיון</translation>
+    </message>
+    <message>
+      <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>חבר את המערכת שלך ל %1 &amp;mdash; כדי להפוך אותה לזמינה מכל מקום!</translation>
+    </message>
+    <message>
+      <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>נסה את %1 &amp;mdash; התחבר למערכת שלך מכל מקום!</translation>
     </message>
   </context>
   <context>
@@ -7006,7 +7019,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 user</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation type="unfinished">%1 user</translation>
     </message>
   </context>
@@ -7193,7 +7206,7 @@ to %1</source>
     </message>
     <message>
       <source>This user has not yet signed up for %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>משתמש זה עדיין לא נרשם ל- %1</translation>
     </message>
   </context>
@@ -7245,7 +7258,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 user with specified email already exists.</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation type="unfinished">%1 user with specified email already exists.</translation>
     </message>
   </context>
@@ -7494,7 +7507,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 Systems cannot be merged</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation type="unfinished">%1 Systems cannot be merged</translation>
     </message>
   </context>
@@ -7826,7 +7839,7 @@ to %1</source>
     <message numerus="yes">
       <source>Selected files cover periods for which videos have already been uploaded</source>
       <translation type="unfinished">
-        <numerusform>%1 מכסה את הזמן שבו הסרטון כבר הועלה</numerusform>
+        <numerusform>מכסה את הזמן שבו הסרטון כבר הועלה</numerusform>
         <numerusform>%1 נמצא באותו זמן שבו הסרטון כבר הועלה</numerusform>
         <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
         <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
@@ -8395,9 +8408,9 @@ to %1</source>
       <source>For exporting as Rapid Review video length should be at least %n seconds.</source>
       <translation type="unfinished">
         <numerusform>עבור ייצוא כ Rapid Review אורך וידאו צריך להיות לפחות %n שניות.</numerusform>
-        <numerusform>For exporting as Rapid Review video length should be at least %n seconds.</numerusform>
-        <numerusform>For exporting as Rapid Review video length should be at least %n seconds.</numerusform>
-        <numerusform>For exporting as Rapid Review video length should be at least %n seconds.</numerusform>
+        <numerusform>עבור ייצוא כ Rapid Review אורך וידאו צריך להיות לפחות %n שניות.</numerusform>
+        <numerusform>עבור ייצוא כ Rapid Review אורך וידאו צריך להיות לפחות %n שניות.</numerusform>
+        <numerusform>עבור ייצוא כ Rapid Review אורך וידאו צריך להיות לפחות %n שניות.</numerusform>
       </translation>
     </message>
   </context>

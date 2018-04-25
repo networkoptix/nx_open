@@ -150,7 +150,7 @@ bool CameraMock::isCameraControlDisabled() const
 
 Qn::MotionType CameraMock::getMotionType() const
 {
-    return Qn::MT_SoftwareGrid;
+    return Qn::MotionType::MT_SoftwareGrid;
 }
 
 bool CameraMock::saveParams()
@@ -173,6 +173,22 @@ QnSharedResourcePointer<CameraMock> CameraTest::newCamera(std::function<void(Cam
     QnSharedResourcePointer<CameraMock> camera(new CameraMock());
     setup(camera.data());
     return camera->initInternal() ? camera : QnSharedResourcePointer<CameraMock>();
+}
+
+void CameraTest::SetUp()
+{
+    m_dataProviderFactory.reset(new QnDataProviderFactory());
+    m_dataProviderFactory->registerResourceType<nx::mediaserver::resource::Camera>();
+}
+
+void CameraTest::TearDown()
+{
+    m_dataProviderFactory.reset();
+}
+
+QnDataProviderFactory* CameraTest::dataProviderFactory() const
+{
+    return m_dataProviderFactory.data();
 }
 
 } // namespace test

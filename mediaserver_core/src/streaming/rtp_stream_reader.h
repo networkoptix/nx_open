@@ -7,7 +7,7 @@
 class QnRtpStreamReader: public CLServerPushStreamReader
 {
 public:
-    QnRtpStreamReader(const QnResourcePtr& res, const QString& request = QString());
+    QnRtpStreamReader(const nx::mediaserver::resource::CameraPtr& res, const QString& request = QString());
     virtual ~QnRtpStreamReader();
 
     void setRtpTransport(const RtpTransport::Value& transport);
@@ -28,6 +28,7 @@ private:
     QString m_request;
     RtpTransport::Value m_rtpTransport;
     size_t m_dataPassed = 0;
+    nx::mediaserver::resource::CameraPtr m_camera;
 };
 
 #endif // defined(ENABLE_DATA_PROVIDERS)

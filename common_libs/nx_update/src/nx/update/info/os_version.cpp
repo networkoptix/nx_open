@@ -23,20 +23,51 @@ bool OsVersion::matches(const QString& target) const
         && target.contains(version);
 }
 
-QString OsVersion::toString() const
+QString OsVersion::serialize() const
 {
     return lit("%1.%2.%3").arg(family).arg(architecture).arg(version);
 }
 
-OsVersion OsVersion::fromString(const QString& s)
+OsVersion OsVersion::deserialize(const QString& s)
 {
     auto splits = s.split('.');
     NX_ASSERT(splits.size() == 3);
     return OsVersion(splits[0], splits[1], splits[2]);
 }
 
+OsVersion OsVersion::fromString(const QString& s)
+{
+    if (s == "bananapi")
+        return armBananapi();
+    else if (s == "rpi")
+        return armRpi();
+    else if (s == "bpi")
+        return armBpi();
+    else if (s == "linux86")
+        return ubuntuX86();
+    else if (s == "linux64")
+        return ubuntuX64();
+    else if (s == "win64")
+        return windowsX64();
+    else if (s == "win86")
+        return windowsX86();
+    else if (s == "mac")
+        return macosx();
+
+    NX_ASSERT(false, "Unknown OS string");
+    return OsVersion();
+}
+
+bool operator==(const OsVersion& lhs, const OsVersion& rhs)
+{
+    return lhs.architecture == rhs.architecture && lhs.family == rhs.family
+        && lhs.version == rhs.version;
+}
+
 static const QString kLinuxFamily = "linux";
 static const QString kWindowsFamily = "windows";
+static const QString kMacOsxFamily = "macosx";
+static const QString kMacOsx = kMacOsxFamily;
 static const QString kx86 = "x86";
 static const QString kx64 = "x64";
 static const QString kUbuntu = "ubuntu";
@@ -51,6 +82,11 @@ OsVersion ubuntuX64()
 OsVersion ubuntuX86()
 {
     return OsVersion(kLinuxFamily, kx86, kUbuntu);
+}
+
+OsVersion macosx()
+{
+    return OsVersion(kMacOsxFamily, kx64, kMacOsx);
 }
 
 OsVersion windowsX64()
@@ -77,6 +113,8 @@ OsVersion armBananapi()
 {
     return OsVersion(kLinuxFamily, kArm, "bananapi");
 }
+
+
 
 } // namespace info
 } // namespace update

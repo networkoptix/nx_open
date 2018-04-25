@@ -117,7 +117,7 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(
     itemDelegate->setCheckBoxColumn(QnAccessibleResourcesModel::CheckColumn);
     itemDelegate->setCustomInfoLevel(Qn::RI_FullInfo);
 
-    auto setupTreeView = [itemDelegate](QnTreeView* treeView)
+    auto setupTreeView = [itemDelegate](TreeView* treeView)
         {
             const QnIndents kIndents(1, 0);
             treeView->setItemDelegateForColumn(QnAccessibleResourcesModel::NameColumn,

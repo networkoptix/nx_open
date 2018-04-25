@@ -14,7 +14,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <ui/common/widget_anchor.h>
+#include <nx/client/desktop/common/utils/widget_anchor.h>
 #include <ui/style/helper.h>
 #include <nx/client/desktop/common/widgets/autoscaled_plain_text.h>
 #include <nx/client/desktop/common/widgets/busy_indicator.h>
@@ -80,11 +80,11 @@ AsyncImageWidget::AsyncImageWidget(QWidget* parent):
     m_placeholder->setAlignment(Qt::AlignCenter);
     m_placeholder->setContentsMargins(kMinIndicationMargins);
     m_placeholder->setHidden(true);
-    new QnWidgetAnchor(m_placeholder);
+    new WidgetAnchor(m_placeholder);
 
     m_indicator->setContentsMargins(kMinIndicationMargins);
     m_indicator->setBorderRole(QPalette::Window);
-    new QnWidgetAnchor(m_indicator);
+    new WidgetAnchor(m_indicator);
 }
 
 AsyncImageWidget::~AsyncImageWidget()
@@ -156,10 +156,11 @@ QRectF AsyncImageWidget::highlightRect() const
 
 void AsyncImageWidget::setHighlightRect(const QRectF& relativeRect)
 {
-    if (m_highlightRect == relativeRect)
+    const auto newRect = relativeRect.intersected(QRectF(0, 0, 1, 1));
+    if (m_highlightRect == newRect)
         return;
 
-    m_highlightRect = relativeRect;
+    m_highlightRect = newRect;
     update();
 }
 

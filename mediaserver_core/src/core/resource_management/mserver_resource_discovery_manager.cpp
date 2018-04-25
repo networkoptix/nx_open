@@ -90,7 +90,7 @@ void QnMServerResourceDiscoveryManager::sortForeignResources(QList<QnSecurityCam
             {
                 QnCameraUserAttributePool::ScopedLock userAttributesLock(
                     camera->commonModule()->cameraUserAttributesPool(),
-                    ec2::ApiCameraData::physicalIdToId(camera->getPhysicalId()));
+                    nx::vms::api::CameraData::physicalIdToId(camera->getPhysicalId()));
                 return (*userAttributesLock)->failoverPriority;
             };
         auto preferredServerId =
@@ -98,7 +98,7 @@ void QnMServerResourceDiscoveryManager::sortForeignResources(QList<QnSecurityCam
             {
                 QnCameraUserAttributePool::ScopedLock userAttributesLock(
                     camera->commonModule()->cameraUserAttributesPool(),
-                    ec2::ApiCameraData::physicalIdToId(camera->getPhysicalId()));
+                    nx::vms::api::CameraData::physicalIdToId(camera->getPhysicalId()));
                 return (*userAttributesLock)->preferredServerId;
             };
 
@@ -263,9 +263,9 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                     NX_VERBOSE(this, lm("Merge existing resource with searched resource %1")
                         .arg(NetResString(rpNetRes)));
 
-                    ec2::ApiCameraData apiCamera;
-                    fromResourceToApi(existCamRes, apiCamera);
-                    apiCamera.id = ec2::ApiCameraData::physicalIdToId(apiCamera.physicalId);
+                    nx::vms::api::CameraData apiCamera;
+                    ec2::fromResourceToApi(existCamRes, apiCamera);
+                    apiCamera.id = nx::vms::api::CameraData::physicalIdToId(apiCamera.physicalId);
 
                     ec2::AbstractECConnectionPtr connect = commonModule()->ec2Connection();
                     const ec2::ErrorCode errorCode = connect->getCameraManager(Qn::kSystemAccess)->addCameraSync(apiCamera);
@@ -405,7 +405,11 @@ void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& disco
                         emit cameraDisconnected(res, qnSyncTime->currentUSecsSinceEpoch());
                         m_disconnectSended[uniqId] = true;
                     }
-                } else {
+                } else 
+                {
+                    NX_VERBOSE(this,
+                        lm("Mark resource %1 as offline because it doesn't response to discovery any more.").arg(NetResString(camRes)));
+
                     res->setStatus(Qn::Offline);
                     m_resourceDiscoveryCounter[uniqId] = 0;
                 }

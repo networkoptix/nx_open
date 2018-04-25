@@ -135,6 +135,7 @@
                                 <argument>code-to-xml</argument>
                                 <argument>-vms-path</argument>
                                 <argument>${root.dir}</argument>
+                                <argument>-Dec2RegistrationCpp=/mediaserver_db/src/local_connection_factory.cpp</argument>
                                 <argument>-template-xml</argument>
                                 <argument>${root.dir}/mediaserver_core/api/api_template.xml</argument>
                                 <argument>-output-xml</argument>

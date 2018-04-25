@@ -28,6 +28,7 @@ hachoir_core.config.unicode_stdout = False
 import hachoir_parser
 import hachoir_metadata
 from .utils import datetime_utc_now
+import datetime
 
 log = logging.getLogger(__name__)
         
@@ -35,7 +36,7 @@ log = logging.getLogger(__name__)
 DEFAULT_CAMERA_MAC_ADDR = '11:22:33:44:55:66'
 TEST_CAMERA_NAME = 'TestCameraLive'  # hardcoded to server, mandatory for auto-discovered cameras
 
-CAMERA_DISCOVERY_WAIT_TIMEOUT = 60
+CAMERA_DISCOVERY_WAIT_TIMEOUT = datetime.timedelta(seconds=60)
 
 TEST_CAMERA_DISCOVERY_PORT = 4984  # hardcoded to server UDP multicast address for test camera
 TEST_CAMERA_FIND_MSG = 'Network optix camera emulator 3.0 discovery'  # UDP discovery multicast request
@@ -53,7 +54,7 @@ def make_camera_info(parent_id, name, mac_addr):
         manuallyAdded=False,
         maxArchiveDays=0,
         minArchiveDays=0,
-        #model=name,
+        # model=name,
         model='TestCameraLive',
         motionMask='',
         motionType='MT_Default',
@@ -66,11 +67,12 @@ def make_camera_info(parent_id, name, mac_addr):
         secondaryStreamQuality='SSQualityLow',
         status='Unauthorized',
         statusFlags='CSF_NoFlags',
-        #typeId='{7d2af20d-04f2-149f-ef37-ad585281e3b7}',
+        # typeId='{7d2af20d-04f2-149f-ef37-ad585281e3b7}',
         typeId='{f9c03047-72f1-4c04-a929-8538343b6642}',
         url='127.0.0.100',
         vendor='python-funtest',
         )
+
 
 def make_schedule_task(day_of_week):
     return dict(
@@ -105,7 +107,7 @@ class Camera(object):
         return make_camera_info(parent_id, self.name, self.mac_addr)
 
     def wait_until_discovered_by_server(self, server_list, timeout=CAMERA_DISCOVERY_WAIT_TIMEOUT):
-        #assert is_list_inst(server_list, Server), repr(server_list)
+        # assert is_list_inst(server_list, Mediaserver), repr(server_list)
         log.info('Waiting for camera %s to be discovered by servers %s', self, ', '.join(map(str, server_list)))
         start_time = datetime_utc_now()
         while datetime_utc_now() - start_time < timeout:
@@ -132,7 +134,7 @@ class Camera(object):
         assert d['parentId'] == server_guid
 
     def start_streaming(self):
-        # assert isinstance(server, Server), repr(server)  # import circular dependency
+        # assert isinstance(server, Mediaserver), repr(server)  # import circular dependency
         self._discovery_listener.stream_to(self, self._vm_address)
 
 
@@ -285,7 +287,7 @@ class MediaStreamer(object):
                     data = f.read(1024)
                     if not data:
                         break
-                    #log.debug('%s: sending data, %d bytes', self, len(data))
+                    # log.debug('%s: sending data, %d bytes', self, len(data))
                     sock.sendall(data)
                     if self._stop_flag:
                         break

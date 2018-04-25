@@ -5,7 +5,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 
-#include <ui/common/aligner.h>
+#include <nx/client/desktop/common/utils/aligner.h>
 #include <ui/common/read_only.h>
 #include <ui/dialogs/backup_cameras_dialog.h>
 #include <ui/dialogs/backup_schedule_dialog.h>
@@ -15,8 +15,9 @@
 #include <ui/style/skin.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
+using namespace nx::client::desktop;
 
-QnBackupSettingsDialog::QnBackupSettingsDialog(QWidget* parent) :
+QnBackupSettingsDialog::QnBackupSettingsDialog(QWidget* parent):
     base_type(parent),
     ui(new Ui::BackupSettingsDialog),
     m_backupNewCameras(false)
@@ -89,17 +90,17 @@ QnBackupSettingsDialog::QnBackupSettingsDialog(QWidget* parent) :
         });
 
     ui->qualityComboBox->addItem(tr("Lo-Res Streams", "Cameras Backup"),
-        QVariant::fromValue<Qn::CameraBackupQualities>(Qn::CameraBackup_LowQuality));
+        QVariant::fromValue<Qn::CameraBackupQualities>(Qn::CameraBackupQuality::CameraBackup_LowQuality));
     ui->qualityComboBox->addItem(tr("Hi-Res Streams", "Cameras Backup"),
-        QVariant::fromValue<Qn::CameraBackupQualities>(Qn::CameraBackup_HighQuality));
+        QVariant::fromValue<Qn::CameraBackupQualities>(Qn::CameraBackupQuality::CameraBackup_HighQuality));
     ui->qualityComboBox->addItem(tr("All Streams", "Cameras Backup"),
-        QVariant::fromValue<Qn::CameraBackupQualities>(Qn::CameraBackup_Both));
+        QVariant::fromValue<Qn::CameraBackupQualities>(Qn::CameraBackupQuality::CameraBackup_Both));
 
     setHelpTopic(this, Qn::ServerSettings_StoragesBackup_Help);
 
     setResizeToContentsMode(Qt::Vertical | Qt::Horizontal);
 
-    auto aligner = new QnAligner(this);
+    auto aligner = new Aligner(this);
     aligner->addWidgets({
         ui->whenToBackupLabel,
         ui->camerasLabel,

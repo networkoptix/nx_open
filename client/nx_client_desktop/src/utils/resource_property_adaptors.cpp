@@ -13,7 +13,7 @@ namespace {
 
     /* Business events are packed to quint64 value, so we need to manually get key for each event.
      * Some events have their value more than 64, so we need to adjust them. */
-    qint64 eventTypeKey(vms::event::EventType eventType, bool *overflow) {
+    qint64 eventTypeKey(vms::api::EventType eventType, bool *overflow) {
         int offset = static_cast<int>(eventType);
         if (offset >= 64) {
             offset = 63;
@@ -34,13 +34,13 @@ QnBusinessEventsFilterResourcePropertyAdaptor::QnBusinessEventsFilterResourcePro
     : base_type(nameWatchedEventTypes, defaultWatchedEventsValue, parent)
 {}
 
-QList<vms::event::EventType> QnBusinessEventsFilterResourcePropertyAdaptor::watchedEvents() const
+QList<vms::api::EventType> QnBusinessEventsFilterResourcePropertyAdaptor::watchedEvents() const
 {
     qint64 packed = value();
-    QList<vms::event::EventType> result;
+    QList<vms::api::EventType> result;
     bool overflow = false;
 
-    for (const vms::event::EventType eventType: vms::event::allEvents()) {
+    for (const vms::api::EventType eventType: vms::event::allEvents()) {
         quint64 key = eventTypeKey(eventType, &overflow);
         if ((packed & key) == key)
             result << eventType;
@@ -48,12 +48,12 @@ QList<vms::event::EventType> QnBusinessEventsFilterResourcePropertyAdaptor::watc
     return result;
 }
 
-void QnBusinessEventsFilterResourcePropertyAdaptor::setWatchedEvents( const QList<vms::event::EventType> &events )
+void QnBusinessEventsFilterResourcePropertyAdaptor::setWatchedEvents( const QList<vms::api::EventType> &events )
 {
     quint64 value = defaultWatchedEventsValue;
 
     bool overflow = false;
-    for (const vms::event::EventType eventType: vms::event::allEvents()) {
+    for (const vms::api::EventType eventType: vms::event::allEvents()) {
         if (events.contains(eventType))
             continue;
 
@@ -63,7 +63,7 @@ void QnBusinessEventsFilterResourcePropertyAdaptor::setWatchedEvents( const QLis
     setValue(value);
 }
 
-bool QnBusinessEventsFilterResourcePropertyAdaptor::isAllowed( vms::event::EventType eventType ) const {
+bool QnBusinessEventsFilterResourcePropertyAdaptor::isAllowed( vms::api::EventType eventType ) const {
     return watchedEvents().contains(eventType);
 }
 

@@ -1,7 +1,7 @@
 #include "media_resource.h"
 
 #include <QtGui/QImage>
-#include <QtCore/QCoreApplication>
+
 
 #include <utils/common/warnings.h>
 #include <nx/fusion/serialization/lexical.h>
@@ -30,64 +30,6 @@ namespace {
     const qreal noCustomAspectRatio = 0.0;
 }
 
-class QnStreamQualityStrings {
-    Q_DECLARE_TR_FUNCTIONS(QnStreamQualityStrings);
-public:
-    static QString displayString(Qn::StreamQuality value)
-    {
-        switch(value) {
-        case Qn::QualityLowest:       return tr("Lowest");
-        case Qn::QualityLow:          return tr("Low");
-        case Qn::QualityNormal:       return tr("Medium");
-        case Qn::QualityHigh:         return tr("High");
-        case Qn::QualityHighest:      return tr("Best");
-        case Qn::QualityPreSet:       return tr("Preset");
-        case Qn::QualityNotDefined:   return tr("Undefined");
-        default:
-            qnWarning("Invalid stream quality value '%1'.", static_cast<int>(value));
-            return QString();
-        }
-    }
-
-    static QString shortDisplayString(Qn::StreamQuality value)
-    {
-        /* Note that '//:' are comments for translators. */
-        switch(value) {
-        case Qn::QualityLowest:
-            //: Short for 'Lowest'
-            return tr("Lst");
-        case Qn::QualityLow:
-            //: Short for 'Low'
-            return tr("Lo");
-        case Qn::QualityNormal:
-            //: Short for 'Medium'
-            return tr("Me");
-        case Qn::QualityHigh:
-            //: Short for 'High'
-            return tr("Hi");
-        case Qn::QualityHighest:
-            //: Short for 'Best'
-            return tr("Bst");
-        case Qn::QualityPreSet:
-            //: Short for 'Preset'
-            return tr("Ps");
-        case Qn::QualityNotDefined:
-            return lit("-");
-        default:
-            qnWarning("Invalid stream quality value '%1'.", static_cast<int>(value));
-            return QString();
-        }
-    }
-};
-
-QString Qn::toDisplayString(Qn::StreamQuality value) {
-    return QnStreamQualityStrings::displayString(value);
-}
-
-QString Qn::toShortDisplayString(Qn::StreamQuality value) {
-    return QnStreamQualityStrings::shortDisplayString(value);
-}
-
 // -------------------------------------------------------------------------- //
 // QnMediaResource
 // -------------------------------------------------------------------------- //
@@ -97,6 +39,11 @@ QnMediaResource::QnMediaResource()
 
 QnMediaResource::~QnMediaResource()
 {
+}
+
+Qn::StreamQuality QnMediaResource::getBestQualityForSuchOnScreenSize(const QSize&) const
+{
+    return Qn::StreamQuality::normal;
 }
 
 QImage QnMediaResource::getImage(int /*channel*/, QDateTime /*time*/, Qn::StreamQuality /*quality*/) const
@@ -202,6 +149,29 @@ void QnMediaResource::setCustomAspectRatio(const QnAspectRatio& value)
 void QnMediaResource::clearCustomAspectRatio()
 {
     this->toResource()->setProperty(::customAspectRatioKey, QString());
+}
+
+Ptz::Capabilities QnMediaResource::getPtzCapabilities() const
+{
+    return Ptz::Capabilities(toResource()->getProperty(Qn::PTZ_CAPABILITIES_PARAM_NAME).toInt());
+}
+
+bool QnMediaResource::hasAnyOfPtzCapabilities(Ptz::Capabilities capabilities) const
+{
+    return getPtzCapabilities() & capabilities;
+}
+
+void QnMediaResource::setPtzCapabilities(Ptz::Capabilities capabilities)
+{
+    if (toResource()->hasParam(Qn::PTZ_CAPABILITIES_PARAM_NAME))
+        toResource()->setProperty(Qn::PTZ_CAPABILITIES_PARAM_NAME, static_cast<int>(capabilities));
+}
+
+void QnMediaResource::setPtzCapability(Ptz::Capabilities capability, bool value)
+{
+    setPtzCapabilities(value
+        ? (getPtzCapabilities() | capability)
+        : (getPtzCapabilities() & ~capability));
 }
 
 QString QnMediaResource::customAspectRatioKey()

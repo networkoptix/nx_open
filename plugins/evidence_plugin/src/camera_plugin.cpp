@@ -5,7 +5,7 @@
 
 #include "camera_plugin.h"
 
-#include <plugins/camera_plugin.h>
+#include <camera/camera_plugin.h>
 #include <plugins/plugin_api.h>
 
 #include "discovery_manager.h"

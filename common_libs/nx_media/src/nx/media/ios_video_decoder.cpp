@@ -264,8 +264,9 @@ void IOSVideoDecoderPrivate::closeCodecContext()
 // FfmpegDecoder
 
 IOSVideoDecoder::IOSVideoDecoder(
-    const ResourceAllocatorPtr& /*allocator*/, const QSize& /*resolution*/)
-:
+    const RenderContextSynchronizerPtr& /*synchronizer*/,
+    const QSize& /*resolution*/)
+    :
     AbstractVideoDecoder(),
     d_ptr(new IOSVideoDecoderPrivate())
 {

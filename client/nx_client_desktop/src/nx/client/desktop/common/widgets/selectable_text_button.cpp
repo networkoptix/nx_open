@@ -4,7 +4,7 @@
 #include <QtWidgets/QStyle>
 #include <QtWidgets/QToolButton>
 
-#include <ui/common/widget_anchor.h>
+#include <nx/client/desktop/common/utils/widget_anchor.h>
 #include <ui/common/palette.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
@@ -134,7 +134,7 @@ void SelectableTextButton::setDeactivatable(bool value)
         d->deactivateButton->setToolTip(d->deactivationToolTip);
         updateDeactivateButtonPalette();
 
-        auto anchor = new QnWidgetAnchor(d->deactivateButton.data());
+        auto anchor = new WidgetAnchor(d->deactivateButton.data());
         anchor->setEdges(Qt::TopEdge | Qt::RightEdge | Qt::BottomEdge);
         anchor->setMargins(0, 1, 1, 1);
 

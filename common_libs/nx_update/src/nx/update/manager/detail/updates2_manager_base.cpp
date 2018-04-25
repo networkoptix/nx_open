@@ -195,6 +195,9 @@ api::Updates2StatusData Updates2ManagerBase::download()
 
     NX_ASSERT((bool) m_updateRegistry);
 
+
+    // #TODO #akulikov What if needed file already exists in downloader???
+
     nx::update::info::FileData fileData;
     const auto result = m_updateRegistry->findUpdateFile(
         detail::UpdateFileRequestDataFactory::create(isClient()), &fileData);
@@ -203,28 +206,67 @@ api::Updates2StatusData Updates2ManagerBase::download()
     if (result != update::info::ResultCode::ok)
     {
         setStatus(
-            api::Updates2StatusData::StatusCode::error,  "Failed to get update file information");
+            api::Updates2StatusData::StatusCode::error, "Failed to get update file information");
         return m_currentStatus.base();
     }
 
     using namespace vms::common::p2p::downloader;
+    NX_ASSERT(!fileData.file.isNull());
 
-    FileInformation fileInformation;
-    fileInformation.md5 = QByteArray::fromHex(fileData.md5.toBase64());
-    fileInformation.name = fileData.file;
-    fileInformation.size = fileData.size;
-    fileInformation.url = fileData.url;
-    fileInformation.peerPolicy = FileInformation::PeerSelectionPolicy::byPlatform;
+    auto fileInformation = downloader()->fileInformation(fileData.file);
+    bool alreadyHasFileInDownLoader = fileInformation.isValid();
+    if (!alreadyHasFileInDownLoader)
+    {
+        NX_ASSERT(!fileData.md5.isNull());
+        NX_ASSERT(!fileData.size != 0);
 
-    downloader()->deleteFile(fileData.file);
-    for (const auto& fileName : m_currentStatus.files)
-        downloader()->deleteFile(fileName);
+        fileInformation.md5 = QByteArray::fromHex(fileData.md5.toBase64());
+        fileInformation.name = fileData.file;
+        fileInformation.size = fileData.size;
+        fileInformation.url = fileData.url;
+        fileInformation.peerPolicy = FileInformation::PeerSelectionPolicy::byPlatform;
+
+        downloader()->deleteFile(fileData.file);
+        for (const auto& fileName : m_currentStatus.files)
+            downloader()->deleteFile(fileName);
+    }
 
     ResultCode resultCode = downloader()->addFile(fileInformation);
     switch (resultCode)
     {
         case ResultCode::fileAlreadyDownloaded:
         case ResultCode::fileAlreadyExists:
+            if (alreadyHasFileInDownLoader)
+            {
+                switch (fileInformation.status)
+                {
+                    case FileInformation::Status::downloaded:
+                    case FileInformation::Status::uploading:
+                        setStatus(
+                            api::Updates2StatusData::StatusCode::preparing,
+                            "Update has been downloaded and now is preparing for install");
+                        startPreparing(downloader()->filePath(fileData.file));
+                        break;
+                    case FileInformation::Status::corrupted:
+                        setStatus(
+                            api::Updates2StatusData::StatusCode::error,
+                            QString("Update file is corrupted: %1").arg(fileData.file));
+                        downloader()->deleteFile(fileData.file, /*deleteData*/ true);
+                        m_currentStatus.files.remove(fileData.file);
+                        //m_updateRegistry->removeManualFileData(fileData.file);
+                        break;
+                    case FileInformation::Status::downloading:
+                        setStatus(
+                            api::Updates2StatusData::StatusCode::downloading,
+                            lit("Downloading update file: %1").arg(fileData.file));
+                        m_currentStatus.files.insert(fileData.file);
+                        break;
+                    case FileInformation::Status::notFound:
+                        NX_ASSERT(false);
+                        break;
+                }
+                break;
+            }
             NX_ASSERT(false);
             setStatus(
                 api::Updates2StatusData::StatusCode::error,
@@ -398,6 +440,7 @@ void Updates2ManagerBase::onFileAdded(const FileInformation& fileInformation)
     QByteArray serializedGlobalRegistry;
     {
         QnMutexLocker lock(&m_mutex);
+        // #TODO #akulikov Make sure this condition is really necessary.
         if (m_currentStatus.files.contains(fileInformation.name))
             return;
 

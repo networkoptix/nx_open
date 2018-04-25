@@ -18,7 +18,7 @@
 #include <utils/crypt/symmetrical.h>
 
 #include <recording/time_period_list.h>
-#include <nx_ec/data/api_camera_data.h>
+#include <nx/vms/api/data/camera_data.h>
 
 QnNetworkResource::QnNetworkResource(QnCommonModule* commonModule):
     base_type(commonModule),
@@ -334,7 +334,7 @@ void QnNetworkResource::getDevicesBasicInfo(QnResourceMap& lst, int threads)
 
 QnUuid QnNetworkResource::physicalIdToId(const QString& physicalId)
 {
-    return ec2::ApiCameraData::physicalIdToId(physicalId);
+    return nx::vms::api::CameraData::physicalIdToId(physicalId);
 }
 
 void QnNetworkResource::initializationDone()

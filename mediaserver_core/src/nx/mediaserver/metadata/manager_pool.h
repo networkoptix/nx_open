@@ -43,9 +43,7 @@ class ManagerPool final:
 
     Q_OBJECT
 public:
-    ManagerPool(
-        QnMediaServerModule* commonModule,
-        QThread* thread);
+    ManagerPool(QnMediaServerModule* commonModule);
     ~ManagerPool();
     void init();
     void stop();
@@ -84,7 +82,8 @@ public slots:
     void initExistingResources();
 
 private:
-    void loadSettingsFromFile(std::vector<nxpl::Setting>* settings, const QString& filename);
+    std::vector<nxpl::Setting> loadSettingsFromFile(
+        const QString& fileDescription, const QString& filename);
 
     void setCameraManagerDeclaredSettings(
         sdk::metadata::CameraManager* manager,

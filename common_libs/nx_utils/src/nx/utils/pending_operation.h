@@ -29,12 +29,17 @@ public:
     };
     Q_DECLARE_FLAGS(Flags, Flag)
 
-    PendingOperation(const Callback& callback, int interval, QObject* parent = nullptr);
+    PendingOperation(const Callback& callback, int intervalMs, QObject* parent = nullptr);
 
     void requestOperation();
 
     Flags flags() const;
     void setFlags(Flags flags);
+
+    int intervalMs() const;
+    void setIntervalMs(int value);
+
+    void setCallback(const Callback& callback);
 
 private:
     Callback m_callback;

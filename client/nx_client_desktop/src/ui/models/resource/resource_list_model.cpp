@@ -6,9 +6,13 @@
 #include <core/resource/resource.h>
 #include <core/resource/resource_display_info.h>
 
+#include <nx/client/desktop/resource_views/data/node_type.h>
+
 #include <ui/style/resource_icon_cache.h>
 
 #include <utils/common/checked_cast.h>
+
+using namespace nx::client::desktop;
 
 QnResourceListModel::QnResourceListModel(QObject *parent) :
     base_type(parent)
@@ -150,10 +154,10 @@ void QnResourceListModel::setCheckedResources(const QSet<QnUuid>& ids)
     m_checkedResources.clear();
 
     // Need to filter out IDs that are not in this resource list.
-    // We will gather all resource ids to a separate set, and then check ids 
+    // We will gather all resource ids to a separate set, and then check ids
     // from selection with this set. O(NlogM) is here.
     QSet<QnUuid> contained_ids;
-    for (const auto& resource : m_resources)
+    for (const auto& resource: m_resources)
     {
         auto id = resource->getId();
         contained_ids.insert(id);
@@ -260,8 +264,8 @@ QVariant QnResourceListModel::data(const QModelIndex &index, int role) const
             return static_cast<int>(resource->getStatus());
         case Qn::NodeTypeRole:
             return m_options.testFlag(ServerAsHealthMonitorOption)
-                ? qVariantFromValue(Qn::LayoutItemNode)
-                : qVariantFromValue(Qn::ResourceNode);
+                ? qVariantFromValue(ResourceTreeNodeType::layoutItem)
+                : qVariantFromValue(ResourceTreeNodeType::resource);
 
         default:
             break;

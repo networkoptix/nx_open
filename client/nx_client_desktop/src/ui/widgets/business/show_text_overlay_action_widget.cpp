@@ -67,8 +67,8 @@ QnShowTextOverlayActionWidget::QnShowTextOverlayActionWidget(QWidget *parent)
     {
         // Prolonged type of event has changed. In case of instant
         // action event state should be updated
-        if (checked && (model()->eventType() == vms::event::userDefinedEvent))
-            model()->setEventState(vms::event::EventState::undefined);
+        if (checked && (model()->eventType() == vms::api::EventType::userDefinedEvent))
+            model()->setEventState(vms::api::EventState::undefined);
     });
 }
 
@@ -98,8 +98,8 @@ void QnShowTextOverlayActionWidget::at_model_dataChanged(Fields fields) {
             ui->fixedDurationCheckBox->setChecked(true);
         setReadOnly(ui->fixedDurationCheckBox, !hasToggleState);
 
-        const bool canUseSource = ((model()->eventType() >= vms::event::userDefinedEvent)
-            || (requiresCameraResource(model()->eventType())));
+        const bool canUseSource = ((model()->eventType() >= vms::api::EventType::userDefinedEvent)
+            || (vms::event::requiresCameraResource(model()->eventType())));
         ui->useSourceCheckBox->setEnabled(canUseSource);
     }
 

@@ -12,7 +12,7 @@
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/style/custom_style.h>
 #include <ui/style/skin.h>
-#include <ui/widgets/common/search_line_edit.h>
+#include <nx/client/desktop/common/widgets/search_line_edit.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_navigator.h>
@@ -143,7 +143,7 @@ void EventPanel::Private::setupEventSearch()
     m_eventsTab->setPlaceholderTexts(tr("No events"), tr("No events occured"));
     m_eventsTab->setPlaceholderIcon(qnSkin->pixmap(lit("events/placeholders/events.png")));
 
-    connect(m_eventsTab->filterEdit(), &QnSearchLineEdit::textChanged,
+    connect(m_eventsTab->filterEdit(), &SearchLineEdit::textChanged,
         model, &UnifiedAsyncSearchListModel::setClientsideTextFilter);
 
     auto button = m_eventsTab->typeButton();
@@ -155,14 +155,14 @@ void EventPanel::Private::setupEventSearch()
     eventFilterMenu->setWindowFlags(eventFilterMenu->windowFlags() | Qt::BypassGraphicsProxyWidget);
 
     auto addMenuAction =
-        [this, eventFilterMenu](const QString& title, vms::event::EventType type)
+        [this, eventFilterMenu](const QString& title, vms::api::EventType type)
         {
             auto action = eventFilterMenu->addAction(title);
             connect(action, &QAction::triggered, this,
                 [this, title, type]()
                 {
                     m_eventsTab->typeButton()->setText(title);
-                    m_eventsTab->typeButton()->setState(type == vms::event::undefinedEvent
+                    m_eventsTab->typeButton()->setState(type == vms::api::EventType::undefinedEvent
                         ? ButtonState::deactivated
                         : ButtonState::unselected);
 
@@ -173,7 +173,7 @@ void EventPanel::Private::setupEventSearch()
             return action;
         };
 
-    auto defaultAction = addMenuAction(tr("Any type"), vms::event::undefinedEvent);
+    auto defaultAction = addMenuAction(tr("Any type"), vms::api::EventType::undefinedEvent);
     for (const auto type: vms::event::allEvents())
     {
         if (vms::event::isSourceCameraRequired(type))
@@ -232,7 +232,7 @@ void EventPanel::Private::setupBookmarkSearch()
     m_bookmarksTab->setPlaceholderIcon(qnSkin->pixmap(lit("events/placeholders/bookmarks.png")));
     m_bookmarksTab->showPreviewsButton()->show();
 
-    connect(m_bookmarksTab->filterEdit(), &QnSearchLineEdit::textChanged, m_bookmarksModel,
+    connect(m_bookmarksTab->filterEdit(), &SearchLineEdit::textChanged, m_bookmarksModel,
         [this](const QString& text)
         {
             m_bookmarksModel->setFilterText(text);
@@ -258,7 +258,7 @@ void EventPanel::Private::setupAnalyticsSearch()
     m_analyticsTab->showPreviewsButton()->show();
     m_analyticsTab->showInfoButton()->show();
 
-    connect(m_analyticsTab->filterEdit(), &QnSearchLineEdit::textChanged, m_analyticsModel,
+    connect(m_analyticsTab->filterEdit(), &SearchLineEdit::textChanged, m_analyticsModel,
         [this](const QString& text)
         {
             m_analyticsModel->setFilterText(text);

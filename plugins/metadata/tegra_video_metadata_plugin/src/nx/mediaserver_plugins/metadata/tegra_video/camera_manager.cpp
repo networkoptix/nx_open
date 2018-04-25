@@ -3,7 +3,7 @@
 #include <iostream>
 #include <chrono>
 
-#define NX_PRINT_PREFIX (std::string("[") + this->plugin()->name() + " CameraManager] ")
+#define NX_PRINT_PREFIX printPrefix()
 #include <nx/kit/debug.h>
 
 #include <nx/sdk/metadata/common_metadata_packet.h>
@@ -32,12 +32,12 @@ static const QnUuid kHumanUuid("{58AE392F-8516-4B27-AEE1-311139B5A37A}");
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 
-CameraManager::CameraManager(Plugin* plugin): CommonVideoFrameProcessingCameraManager(plugin)
+CameraManager::CameraManager(Plugin* plugin):
+    CommonVideoFrameProcessingCameraManager(plugin, NX_DEBUG_ENABLE_OUTPUT)
 {
     NX_PRINT << __func__ << "() BEGIN -> " << this;
 
     ini().reload();
-    setEnableOutput(NX_DEBUG_ENABLE_OUTPUT); //< Base class is verbose when this descendant is.
 
     m_tegraVideo.reset(tegraVideoCreate());
     if (!m_tegraVideo)

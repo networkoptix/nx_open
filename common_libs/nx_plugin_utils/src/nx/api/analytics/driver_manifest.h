@@ -25,7 +25,7 @@ public:
     enum Capability
     {
         noCapabilities = 0,
-        needDeepCopyForMediaFrame = 1 << 0,
+        needDeepCopyOfVideoFrames = 1 << 0,
         needUncompressedVideoFrames = 1 << 1,
     };
     Q_DECLARE_FLAGS(Capabilities, Capability)

@@ -1,4 +1,3 @@
-import cv2
 import logging
 import math
 import struct
@@ -7,11 +6,12 @@ import urllib
 import urlparse
 from datetime import datetime, timedelta
 
+import cv2
 import requests
 from requests.auth import HTTPDigestAuth
 
-from .utils import datetime_utc_to_timestamp
 from .artifact import ArtifactType
+from .utils import datetime_utc_to_timestamp
 
 log = logging.getLogger(__name__)
 
@@ -41,7 +41,7 @@ class Metadata(object):
 
     @classmethod
     def from_file(cls, file_path):
-        assert file_path.stat().st_size != 0, 'Server returned empty media stream'
+        assert file_path.stat().st_size != 0, 'Mediaserver returned empty media stream'
         cap = cv2.VideoCapture(str(file_path))
         assert cap.isOpened(), 'Media stream returned from server is invalid (saved to %r)' % file_path
         try:
@@ -106,7 +106,8 @@ class RtspMediaStream(object):
         finally:
             to_cap.release()
         size = temp_file_path.stat().st_size
-        log.info('RTSP stream: completed loading %d frames in %.2f seconds, total size: %dB/%.2fKB/%.2fMB',
+        log.info(
+            'RTSP stream: completed loading %d frames in %.2f seconds, total size: %dB/%.2fKB/%.2fMB',
             frame_count, time.time() - start_time, size, size/1024., size/1024./1024)
 
     def _copy_cap(self, from_cap, to_cap, start_time):
@@ -121,7 +122,8 @@ class RtspMediaStream(object):
             t = time.time()
             if t - log_time >= 5:  # log every 5 seconds
                 msec = from_cap.get(cv2.cv.CV_CAP_PROP_POS_MSEC)
-                log.debug('RTSP stream: loaded %d frames in %.2f seconds, current position: %.2f seconds',
+                log.debug(
+                    'RTSP stream: loaded %d frames in %.2f seconds, current position: %.2f seconds',
                     frame_count, t - start_time, msec/1000.)
                 log_time = t
         return frame_count
@@ -132,6 +134,7 @@ def load_stream_metadata_from_http(stream_type, url, user, password, params, tem
              stream_type.upper(), url, user, password, ', '.join(str(p) for p in params))
     response = requests.get(url, auth=HTTPDigestAuth(user, password), params=params, stream=True)
     return load_stream_metadata_from_http_response(stream_type, response, temp_file_path)
+
 
 def load_stream_metadata_from_http_response(stream_type, response, temp_file_path):
     log.info('%s response: [%d] %s', stream_type.upper(), response.status_code, response.reason)

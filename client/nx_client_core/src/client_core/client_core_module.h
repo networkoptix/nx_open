@@ -28,7 +28,7 @@ public:
 
 private:
     QnCommonModule* m_commonModule;
-    std::unique_ptr<ec2::AbstractECConnectionFactory> m_connectionFactory;
+    std::unique_ptr<ec2::RemoteConnectionFactory> m_connectionFactory;
     QQmlEngine* m_qmlEngine = nullptr;
 };
 

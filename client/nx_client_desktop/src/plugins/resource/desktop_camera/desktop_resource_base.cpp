@@ -35,7 +35,8 @@ void QnDesktopResource::addConnection(const QnMediaServerResourcePtr &server, co
     if (m_connectionPool.find(server->getId()) != m_connectionPool.cend())
         return;
 
-    QnDesktopCameraConnectionPtr connection(new QnDesktopCameraConnection(this, server, userId));
+    QnDesktopCameraConnectionPtr connection(new QnDesktopCameraConnection(
+        toSharedPointer(this), server, userId));
     connection->start();
     m_connectionPool.emplace(server->getId(), std::move(connection));
 }

@@ -5,15 +5,16 @@
 #include <nx/client/desktop/common/utils/validators.h>
 #include <utils/common/connective.h>
 
-class AbstractAccessor;
-
 namespace nx {
 namespace client {
 namespace desktop {
+
+class AbstractAccessor;
+
 namespace detail {
 
 class BaseInputFieldPrivate;
-class BaseInputField : public Connective<QWidget>
+class BaseInputField: public Connective<QWidget>
 {
     Q_OBJECT
     using base_type = Connective<QWidget>;

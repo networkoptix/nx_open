@@ -14,16 +14,15 @@ def layout_file():
     return 'direct-merge_toward_requested.yaml'
 
 
+# TODO: Rewrite with simpler fixtures.
 @pytest.fixture()
-def proxy(network):
-    _, servers = network
-    return servers['first']
+def proxy(system):
+    return system['first']
 
 
 @pytest.fixture()
-def proxy_headers(network):
-    _, servers = network
-    target_guid = get_server_id(servers['second'].api)
+def proxy_headers(system):
+    target_guid = get_server_id(system['second'].api)
     return {'X-server-guid': target_guid}
 
 

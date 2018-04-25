@@ -1120,19 +1120,19 @@ to view more bookmarks</source>
       <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
       <translation>Nie można zapisać pliku &quot;%1&quot;. Proszę spróbować innej nazwy.</translation>
     </message>
-    <message numerus="yes">
-      <source>Filename should not contain the following reserved characters:
-%1</source>
-      <translation>
-        <numerusform>Nazwa pliku nie może zawierać następujących zarezerwowanych znaków: %1</numerusform>
-        <numerusform>Nazwy plików nie mogą zawierać następujących zarezerwowanych znaków: %1</numerusform>
-        <numerusform>Nazwy plików nie mogą zawierać następujących zarezerwowanych znaków: %1</numerusform>
-        <numerusform>Nazwy plików nie mogą zawierać następujących zarezerwowanych znaków: %1</numerusform>
-      </translation>
-    </message>
     <message>
-      <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation>Nazwa pliku &quot;%1&quot; jest zarezerwowana przez system operacyjny. Spróbuj użyć innej nazwy.</translation>
+      <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
+      <translation type="unfinished">File name &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
+    </message>
+    <message numerus="yes">
+      <source>File name must not contain the following reserved characters:</source>
+      <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
+      <translation type="unfinished">
+        <numerusform>File name must not contain the following reserved characters:</numerusform>
+        <numerusform>File name must not contain the following reserved characters:</numerusform>
+        <numerusform>File name must not contain the following reserved characters:</numerusform>
+        <numerusform>File name must not contain the following reserved characters:</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -1178,7 +1178,7 @@ to view more bookmarks</source>
       <translation type="unfinished">
         <numerusform>Hasło powinno zawierać znaki, symbole lub cyfry</numerusform>
         <numerusform>Hasło powinno zawierać %n znaki, symbole lub cyfry</numerusform>
-        <numerusform>Password should contain %n different combinations of either characters, symbols, or digits</numerusform>
+        <numerusform>Hasło powinno zawierać %n znaków, symboli lub cyfr</numerusform>
         <numerusform>Hasło powinno zawierać %n znaków, symboli lub cyfr</numerusform>
       </translation>
     </message>
@@ -1187,7 +1187,7 @@ to view more bookmarks</source>
       <translation type="unfinished">
         <numerusform>Hasło musi zawierać co najmniej %n znak.</numerusform>
         <numerusform>Hasło musi zawierać co najmniej %n znaki.</numerusform>
-        <numerusform>Password must be at least %n characters long.</numerusform>
+        <numerusform>Hasło musi zawierać co najmniej %n znaków.</numerusform>
         <numerusform>Hasło musi zawierać co najmniej %n znaków.</numerusform>
       </translation>
     </message>
@@ -1200,7 +1200,7 @@ to view more bookmarks</source>
       <translation type="unfinished">
         <numerusform>Hasło nie może być dłuższe niż %n znak.</numerusform>
         <numerusform>Hasło nie może być dłuższe niż %n znaki.</numerusform>
-        <numerusform>Password must be no longer than %n characters.</numerusform>
+        <numerusform>Hasło nie może być dłuższe niż %n znaków.</numerusform>
         <numerusform>Hasło nie może być dłuższe niż %n znaków.</numerusform>
       </translation>
     </message>
@@ -1209,7 +1209,7 @@ to view more bookmarks</source>
       <translation type="unfinished">
         <numerusform>Hasło nie powinno zawierać %n lub więcej następujących po sobie identycznych znaków.</numerusform>
         <numerusform>Hasło nie powinno zawierać %n lub więcej następujących po sobie identycznych znaków.</numerusform>
-        <numerusform>Password should not contain %n or more consecutive characters together.</numerusform>
+        <numerusform>Hasło nie powinno zawierać %n lub więcej następujących po sobie identycznych znaków.</numerusform>
         <numerusform>Hasło nie powinno zawierać %n lub więcej następujących po sobie identycznych znaków.</numerusform>
       </translation>
     </message>
@@ -1218,7 +1218,7 @@ to view more bookmarks</source>
       <translation type="unfinished">
         <numerusform>Hasło nie powinno zawierać %n lub więcej powtarzających się znaków.</numerusform>
         <numerusform>Hasło nie powinno zawierać %n lub więcej powtarzających się znaków.</numerusform>
-        <numerusform>Password should not contain %n or more repeating characters.</numerusform>
+        <numerusform>Hasło nie powinno zawierać %n lub więcej powtarzających się znaków.</numerusform>
         <numerusform>Hasło nie powinno zawierać %n lub więcej powtarzających się znaków.</numerusform>
       </translation>
     </message>
@@ -2863,51 +2863,60 @@ devices</source>
     </message>
     <message>
       <source>Disconnect System from %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Odłącz system od %1</translation>
     </message>
     <message>
       <source>Open %1 Portal</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Otwórz portal %1</translation>
     </message>
     <message>
       <source>Create %1 Account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Utwórz konto %1</translation>
     </message>
     <message>
       <source>Connect System to %1...</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Podłącz system do %1...</translation>
     </message>
     <message>
       <source>Create %1
 account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Utwórz konto %1</translation>
     </message>
     <message>
       <source>Connect System
 to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Podłącz system do %1</translation>
     </message>
     <message>
       <source>Learn more about %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Dowiedz się więcej o %1</translation>
     </message>
   </context>
   <context>
     <name>QnCloudResultMessages</name>
     <message>
-      <source>Incorrect email or password</source>
-      <translation>Nieprawidłowy e-mail lub hasło</translation>
+      <source>Account not found</source>
+      <translation type="unfinished">Account not found</translation>
     </message>
     <message>
-      <source>Account is not activated. Please check your email and follow provided instructions</source>
-      <translation>Konto nie zostało aktywowane. Proszę sprawdzić swój e-mail i postępować zgodnie z instrukcjami</translation>
+      <source>Account is not activated.</source>
+      <translation type="unfinished">Account is not activated.</translation>
+    </message>
+    <message>
+      <source>Please log in to %1 and follow the provided instructions.</source>
+      <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
+      <translation type="unfinished">Please log in to %1 and follow the provided instructions.</translation>
+    </message>
+    <message>
+      <source>Invalid password</source>
+      <translation type="unfinished">Invalid password</translation>
     </message>
   </context>
   <context>
@@ -2922,7 +2931,7 @@ to %1</source>
     </message>
     <message>
       <source>Cannot connect to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Nie można połączyć się z %1</translation>
     </message>
   </context>
@@ -2953,12 +2962,12 @@ to %1</source>
     </message>
     <message>
       <source>Connect to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Podłącz do %1...</translation>
     </message>
     <message>
       <source>Enter %1 Account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Wprowadź konto %1</translation>
     </message>
   </context>
@@ -2970,12 +2979,12 @@ to %1</source>
     </message>
     <message>
       <source>System connected to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>System podłączony do %1</translation>
     </message>
     <message>
       <source>Failed to connect System to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Nie udało się podłączyć systemu do %1</translation>
     </message>
   </context>
@@ -3127,17 +3136,17 @@ to %1</source>
       <translation>Operacja jest w tym momencie niedozwolona. Być może serwer jest w trakcie ponownego uruchamiania. Spróbuj ponownie później.</translation>
     </message>
     <message>
-      <source>Connection to %1 is not ready yet. Check server Internet connection or try again later.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Połączenie z %1 nie jest jeszcze gotowe. Sprawdź połączenie internetowe serwera lub spróbuj ponownie później.</translation>
-    </message>
-    <message>
       <source>Connection to Server could not be established.</source>
       <translation>Nie można nawiązać połączenia z serwerem.</translation>
     </message>
     <message>
       <source>This user is disabled by system administrator.</source>
       <translation>Ten użytkownik został zablokowany przez administratora systemu.</translation>
+    </message>
+    <message>
+      <source>Connection to %1 is not ready yet. Check server Internet connection or try again later.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Połączenie z %1 nie jest jeszcze gotowe. Sprawdź połączenie internetowe serwera lub spróbuj ponownie później.</translation>
     </message>
   </context>
   <context>
@@ -3243,6 +3252,10 @@ to %1</source>
     <message>
       <source>You can create a backup for System configurations that can be restored in case of failure.</source>
       <translation>Można utworzyć kopię konfiguracji systemu, aby móc ją przywrócić w razie awarii.</translation>
+    </message>
+    <message>
+      <source>Database Backup Files</source>
+      <translation type="unfinished">Database Backup Files</translation>
     </message>
   </context>
   <context>
@@ -3361,28 +3374,28 @@ to %1</source>
       <translation>Rozłącz</translation>
     </message>
     <message>
-      <source>Failed to disconnect System from %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Nie można odłączyć systemu od %1</translation>
-    </message>
-    <message>
-      <source>Disconnect System from %1?</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Odłączyć system od %1?</translation>
-    </message>
-    <message>
       <source>You will be disconnected from this System and able to login again through local network with local account</source>
       <translation>Zostaniesz odłączony od tego systemu i będziesz mógł zalogować się ponownie na konto lokalne w sieci lokalnej.</translation>
     </message>
     <message>
-      <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Po odłączeniu tego systemu od %1 nie będziesz mógł połączyć się z tym systemem za pomocą konta %1.</translation>
+      <source>Failed to disconnect System from %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Nie można odłączyć systemu od %1</translation>
+    </message>
+    <message>
+      <source>Disconnect System from %1?</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Odłączyć system od %1?</translation>
     </message>
     <message>
       <source>All %1 users will be deleted.</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation type="unfinished">All %1 users will be deleted.</translation>
+    </message>
+    <message>
+      <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Po odłączeniu tego systemu od %1 nie będziesz mógł połączyć się z tym systemem za pomocą konta %1.</translation>
     </message>
   </context>
   <context>
@@ -4300,10 +4313,6 @@ to %1</source>
       <translation>Otwórz plik licencyjny</translation>
     </message>
     <message>
-      <source>All files (*.*)</source>
-      <translation>Wszystkie pliki (*.*)</translation>
-    </message>
-    <message>
       <source>Failed to open file</source>
       <translation>Nie można otworzyć pliku</translation>
     </message>
@@ -4314,6 +4323,10 @@ to %1</source>
     <message>
       <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
       <translation>W celu uzyskania pliku z kluczem aktywacyjnym prosimy o przesłanie klucza licencyjnego oraz ID sprzętu do %1.</translation>
+    </message>
+    <message>
+      <source>All files</source>
+      <translation type="unfinished">All files</translation>
     </message>
   </context>
   <context>
@@ -4350,7 +4363,7 @@ to %1</source>
       <translation type="unfinished">
         <numerusform>Użyj licencji, aby wyświetlać tę kamerę</numerusform>
         <numerusform>Użyj licencji, aby wyświetlać te %n kamery</numerusform>
-        <numerusform>Use licenses to view these %n cameras</numerusform>
+        <numerusform>Użyj licencji, aby wyświetlać te %n kamer</numerusform>
         <numerusform>Użyj licencji, aby wyświetlać te %n kamer</numerusform>
       </translation>
     </message>
@@ -4359,7 +4372,7 @@ to %1</source>
     <name>QnLinkToCloudDialogPrivate</name>
     <message>
       <source>Failed to login to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Nie udało się zalogować do %1</translation>
     </message>
   </context>
@@ -4477,12 +4490,12 @@ to %1</source>
     </message>
     <message>
       <source>Log in to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Zaloguj do %1</translation>
     </message>
     <message>
       <source>Welcome to %1!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Witaj w %1!</translation>
     </message>
   </context>
@@ -4601,7 +4614,7 @@ to %1</source>
       <translation type="unfinished">
         <numerusform>Ustaw dla %n kamery</numerusform>
         <numerusform>Ustaw dla wszystkich %n kamer</numerusform>
-        <numerusform>Set for all %n Cameras</numerusform>
+        <numerusform>Ustaw dla wszystkich %n kamer</numerusform>
         <numerusform>Ustaw dla wszystkich %n kamer</numerusform>
       </translation>
     </message>
@@ -4996,29 +5009,29 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>This preset will be activated after %n minutes of inactivity</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>To ustawienie zostanie uaktywnione po upływie %n minuty bezczynności</numerusform>
         <numerusform>To ustawienie zostanie uaktywnione po upływie %n minut bezczynności</numerusform>
         <numerusform>To ustawienie zostanie uaktywnione po upływie %n minut bezczynności</numerusform>
-        <numerusform>This preset will be activated after %n minutes of inactivity</numerusform>
+        <numerusform>To ustawienie zostanie uaktywnione po upływie %n minuty bezczynności</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Tour has %n identical positions</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Trasa ma %n identyczną pozycję</numerusform>
         <numerusform>Trasa ma %n identyczne pozycje</numerusform>
         <numerusform>Cykl ma %n identycznych pozycji</numerusform>
-        <numerusform>Tour has %n identical positions</numerusform>
+        <numerusform>Trasa ma %n identycznych pozycji</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>about %n minute(s)</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>około %n minutę temu</numerusform>
         <numerusform>około %n minuty temu</numerusform>
         <numerusform>około %n minut temu</numerusform>
-        <numerusform>about %n minute(s)</numerusform>
+        <numerusform>około %n minut</numerusform>
       </translation>
     </message>
     <message>
@@ -5223,31 +5236,31 @@ to %1</source>
     <message numerus="yes">
       <source>Total %1 %n devices</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Razem %1 %n urządzenie</numerusform>
         <numerusform>Razem %1 %n urządzenia</numerusform>
         <numerusform>Razem %1 %n urządzeń</numerusform>
-        <numerusform>Total %1 %n devices</numerusform>
+        <numerusform>Razem %1 %n urządzenie</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n cameras</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Razem %1 %n kamera</numerusform>
         <numerusform>Razem %1 %n kamery</numerusform>
         <numerusform>Razem %1 %n kamer</numerusform>
-        <numerusform>Total %1 %n cameras</numerusform>
+        <numerusform>Razem %1 %n kamera</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n I/O modules</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Razem %1 %n moduł I/O</numerusform>
         <numerusform>Razem %1 %n moduły I/O</numerusform>
         <numerusform>Razem %1 %n modułów I/O</numerusform>
-        <numerusform>Total %1 %n I/O modules</numerusform>
+        <numerusform>Razem %1 %n moduł I/O</numerusform>
       </translation>
     </message>
     <message>
@@ -5301,11 +5314,11 @@ to %1</source>
     <message numerus="yes">
       <source>%n of %1 selected roles have no %2 permission</source>
       <comment>%1 is number of selected roles, %2 is permission name</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n na %1 z wybranych grup nie ma uprawnienia %2</numerusform>
         <numerusform>%n na %1 z wybranych grup nie ma uprawnienia %2</numerusform>
         <numerusform>%n na %1 z wybranych grup nie ma uprawnienia %2</numerusform>
-        <numerusform>%n of %1 selected roles have no %2 permission</numerusform>
+        <numerusform>%n na %1 z wybranych grup nie ma uprawnienia %2</numerusform>
       </translation>
     </message>
     <message>
@@ -5321,11 +5334,11 @@ to %1</source>
     <message numerus="yes">
       <source>%n of %1 selected users have no %2 permission</source>
       <comment>%1 is number of selected users, %2 is permission name</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n na %1 z wybranych użytkowników nie ma uprawnienia %2</numerusform>
         <numerusform>%n na %1 z wybranych użytkowników nie ma uprawnienia %2</numerusform>
         <numerusform>%n na %1 z wybranych użytkowników nie ma uprawnienia %2</numerusform>
-        <numerusform>%n of %1 selected users have no %2 permission</numerusform>
+        <numerusform>%n na %1 z wybranych użytkowników nie ma uprawnienia %2</numerusform>
       </translation>
     </message>
   </context>
@@ -5573,11 +5586,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n serwer</numerusform>
         <numerusform>%n serwery</numerusform>
         <numerusform>%n serwerów</numerusform>
-        <numerusform>%n Servers</numerusform>
+        <numerusform>%n serwer</numerusform>
       </translation>
     </message>
   </context>
@@ -5597,11 +5610,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n użytkowników</numerusform>
         <numerusform>%n Użytkowników</numerusform>
         <numerusform>%n Użytkowników</numerusform>
-        <numerusform>%n Users</numerusform>
+        <numerusform>%n użytkownik</numerusform>
       </translation>
     </message>
   </context>
@@ -5609,11 +5622,11 @@ to %1</source>
     <name>QnSendEmailActionDelegate</name>
     <message numerus="yes">
       <source>%n additional</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n dodatkowy</numerusform>
         <numerusform>%n dodatkowe</numerusform>
         <numerusform>%n dodatkowych</numerusform>
-        <numerusform>%n additional</numerusform>
+        <numerusform>%n dodatkowy</numerusform>
       </translation>
     </message>
     <message>
@@ -5626,7 +5639,7 @@ to %1</source>
         <numerusform>%n na %1 z użytkowników ma nieprawidłowy adres e-mail</numerusform>
         <numerusform>%n na %1 z użytkowników ma nieprawidłowy adres e-mail</numerusform>
         <numerusform>%n na %1 z użytkowników ma nieprawidłowy adres e-mail</numerusform>
-        <numerusform>%n of %1 users have invalid email address</numerusform>
+        <numerusform>%n na %1 z użytkowników ma nieprawidłowy adres e-mail</numerusform>
       </translation>
     </message>
     <message>
@@ -5639,7 +5652,7 @@ to %1</source>
         <numerusform>%n na %1 z dodatkowych adresów e-mail jest nieprawidłowych</numerusform>
         <numerusform>%n na %1 z dodatkowych adresów e-mail jest nieprawidłowych</numerusform>
         <numerusform>%n na %1 z dodatkowych adresów e-mail jest nieprawidłowych</numerusform>
-        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
+        <numerusform>%n na %1 z dodatkowych adresów e-mail jest nieprawidłowych</numerusform>
       </translation>
     </message>
     <message>
@@ -5765,10 +5778,6 @@ to %1</source>
       <translation>Wybierz plik aktualizacji...</translation>
     </message>
     <message>
-      <source>Update Files (*.zip)</source>
-      <translation>Pliki aktualizacji (* .zip)</translation>
-    </message>
-    <message>
       <source>Release notes</source>
       <translation>Informacje o wersji</translation>
     </message>
@@ -5890,11 +5899,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Not enough free space at %n Servers:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Nie ma wystarczającej ilości wolnego miejsca na %n serwerze:</numerusform>
         <numerusform>Nie ma wystarczającej ilości wolnego miejsca na %n serwerach:</numerusform>
         <numerusform>Nie ma wystarczającej ilości wolnego miejsca na %n serwerach:</numerusform>
-        <numerusform>Not enough free space at %n Servers:</numerusform>
+        <numerusform>Nie ma wystarczającej ilości wolnego miejsca na %n serwerze:</numerusform>
       </translation>
     </message>
     <message>
@@ -5953,6 +5962,10 @@ to %1</source>
       <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
       <translation>Niezgodna instancja %1. Aby zaktualizować system, odłącz go od %1.</translation>
+    </message>
+    <message>
+      <source>Update Files</source>
+      <translation type="unfinished">Update Files</translation>
     </message>
   </context>
   <context>
@@ -6310,7 +6323,7 @@ to %1</source>
     <message numerus="yes">
       <source>%n TB</source>
       <comment>TB - terabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n TB</numerusform>
         <numerusform>%n TB</numerusform>
         <numerusform>%n TB</numerusform>
@@ -6649,16 +6662,6 @@ to %1</source>
       <translation>Połącz</translation>
     </message>
     <message>
-      <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Podłącz system do %1 &amp;mdash;, aby był dostępny z dowolnego miejsca!</translation>
-    </message>
-    <message>
-      <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Sprawdź %1 &amp;mdash;, połącz się z systemem z dowolnego miejsca!</translation>
-    </message>
-    <message>
       <source>Some users have not set their email addresses</source>
       <translation>Niektórzy użytkownicy nie podali adresów e-mail</translation>
     </message>
@@ -6709,6 +6712,16 @@ to %1</source>
     <message>
       <source>Archive integrity problem detected</source>
       <translation>Wykryto problem z integralnością archiwum</translation>
+    </message>
+    <message>
+      <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Podłącz system do %1 &amp;mdash;, aby był dostępny z dowolnego miejsca!</translation>
+    </message>
+    <message>
+      <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Sprawdź %1 &amp;mdash;, połącz się z systemem z dowolnego miejsca!</translation>
     </message>
   </context>
   <context>
@@ -6921,11 +6934,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>The problem is caused by %n servers:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Problem spowodowany jest przez %n serwer:</numerusform>
         <numerusform>Problem spowodowany jest przez %n serwery:</numerusform>
         <numerusform>Problem spowodowany jest przez %n serwerów:</numerusform>
-        <numerusform>The problem is caused by %n servers:</numerusform>
+        <numerusform>Problem spowodowany jest przez %n serwery:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -6934,25 +6947,25 @@ to %1</source>
         <numerusform>Na %n serwerze nie ma wolnego miejsca:</numerusform>
         <numerusform>Na %n serwerach nie ma wolnego miejsca:</numerusform>
         <numerusform>Na %n serwerach nie ma wolnego miejsca:</numerusform>
-        <numerusform>No free space left on %n servers:</numerusform>
+        <numerusform>Na %n serwerach nie ma wolnego miejsca:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n servers are not responding:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n serwer nie odpowiada:</numerusform>
         <numerusform>%n serwery nie odpowiadają:</numerusform>
         <numerusform>%n serwerów nie odpowiada:</numerusform>
-        <numerusform>%n servers are not responding:</numerusform>
+        <numerusform>%n serwery nie odpowiadają:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n servers have gone offline:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n serwer jest odłączony od sieci:</numerusform>
         <numerusform>%n serwery są odłączone od sieci:</numerusform>
         <numerusform>%n serwerów jest odłączonych od sieci:</numerusform>
-        <numerusform>%n servers have gone offline:</numerusform>
+        <numerusform>%n serwery są odłączone od sieci:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -6961,7 +6974,7 @@ to %1</source>
         <numerusform>Uwierzytelnianie nie powiodło się dla %n serwera:</numerusform>
         <numerusform>Uwierzytelnianie nie powiodło się dla %n serwerów:</numerusform>
         <numerusform>Uwierzytelnianie nie powiodło się dla %n serwerów:</numerusform>
-        <numerusform>Authentication failed for %n servers:</numerusform>
+        <numerusform>Uwierzytelnianie nie powiodło się dla %n serwerów:</numerusform>
       </translation>
     </message>
     <message>
@@ -7005,7 +7018,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 user</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation type="unfinished">%1 user</translation>
     </message>
   </context>
@@ -7109,11 +7122,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Please select an action to perform on %n users with this role</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Wybierz czynność do wykonania dla %n użytkownika przypisanego do tej grupy</numerusform>
         <numerusform>Wybierz czynność do wykonania dla %n użytkowników przypisanych do tej grupy</numerusform>
         <numerusform>Wybierz czynność do wykonania dla %n użytkowników przypisanych do tej grupy</numerusform>
-        <numerusform>Please select an action to perform on %n users with this role</numerusform>
+        <numerusform>Wybierz czynność do wykonania dla %n użytkownika przypisanego do tej grupy</numerusform>
       </translation>
     </message>
   </context>
@@ -7192,7 +7205,7 @@ to %1</source>
     </message>
     <message>
       <source>This user has not yet signed up for %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Ten użytkownik jeszcze nie zapisał się na %1</translation>
     </message>
   </context>
@@ -7244,7 +7257,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 user with specified email already exists.</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation type="unfinished">%1 user with specified email already exists.</translation>
     </message>
   </context>
@@ -7303,11 +7316,11 @@ to %1</source>
     <message numerus="yes">
       <source>PC %1 - Displays %2</source>
       <comment>%2 will be substituted by _list_ of displays</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>PC %1 - Ekran %2</numerusform>
         <numerusform>PC %1 - Ekrany %2</numerusform>
         <numerusform>PC %1 - Ekrany %2</numerusform>
-        <numerusform>PC %1 - Displays %2</numerusform>
+        <numerusform>PC %1 - Ekran %2</numerusform>
       </translation>
     </message>
   </context>
@@ -7417,11 +7430,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n bookmarks?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Usunąć %n zakładkę?</numerusform>
         <numerusform>Usunąć %n zakładki?</numerusform>
         <numerusform>Usunąć %n zakładek?</numerusform>
-        <numerusform>Delete %n bookmarks?</numerusform>
+        <numerusform>Usunąć %n zakładkę?</numerusform>
       </translation>
     </message>
   </context>
@@ -7493,7 +7506,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 Systems cannot be merged</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation type="unfinished">%1 Systems cannot be merged</translation>
     </message>
   </context>
@@ -7501,11 +7514,11 @@ to %1</source>
     <name>QnWorkbenchResourcesChangesWatcher</name>
     <message numerus="yes">
       <source>The following %n items are not saved:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Następujący element nie został zapisany:</numerusform>
         <numerusform>Następujące %n elementy nie zostały zapisane:</numerusform>
         <numerusform>Następujących %n elementów nie zostało zapisanych:</numerusform>
-        <numerusform>The following %n items are not saved:</numerusform>
+        <numerusform>Następujący %n element nie został zapisany:</numerusform>
       </translation>
     </message>
     <message>
@@ -7518,11 +7531,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>The following %n items are not deleted:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Następujący element nie został usunięty:</numerusform>
         <numerusform>Następujące %n elementy nie zostały usunięte:</numerusform>
         <numerusform>Następujących %n elementów nie zostało usuniętych:</numerusform>
-        <numerusform>The following %n items are not deleted:</numerusform>
+        <numerusform>Następujący %n element nie został usunięty:</numerusform>
       </translation>
     </message>
     <message>
@@ -7531,11 +7544,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Failed to delete %n items:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Nie udało się usunąć elementu:</numerusform>
         <numerusform>Nie udało się usunąć %n elementów:</numerusform>
         <numerusform>Nie udało się usunąć %n elementów:</numerusform>
-        <numerusform>Failed to delete %n items:</numerusform>
+        <numerusform>Nie udało się usunąć %n elementu:</numerusform>
       </translation>
     </message>
     <message>
@@ -7691,11 +7704,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Usunąć element?</numerusform>
         <numerusform>Usunąć %n elementy?</numerusform>
         <numerusform>Usunąć %n elementów?</numerusform>
-        <numerusform>Delete %n items?</numerusform>
+        <numerusform>Usunąć %n element?</numerusform>
       </translation>
     </message>
     <message>
@@ -7712,11 +7725,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n matrices?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Usunąć matrycę?</numerusform>
         <numerusform>Usunąć %n matryce?</numerusform>
         <numerusform>Usunąć %n matryc?</numerusform>
-        <numerusform>Delete %n matrices?</numerusform>
+        <numerusform>Usunąć %n matrycę?</numerusform>
       </translation>
     </message>
     <message>
@@ -7956,11 +7969,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>User will still have access to %n removed resources:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Użytkownik nadal będzie miał dostęp do usuniętego zasobu:</numerusform>
         <numerusform>Użytkownik nadal będzie miał dostęp do %n usuniętych zasobów:</numerusform>
         <numerusform>Użytkownik nadal będzie miał dostęp do %n usuniętych zasobów:</numerusform>
-        <numerusform>User will still have access to %n removed resources:</numerusform>
+        <numerusform>Użytkownik nadal będzie miał dostęp do %n usuniętego zasobu:</numerusform>
       </translation>
     </message>
     <message>
@@ -7969,11 +7982,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>All users with this role will get access to %n resources:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Wszyscy użytkownicy przypisani do tej grupy będą mieli dostęp do %n zasobu:</numerusform>
         <numerusform>Wszyscy użytkownicy przypisani do tej grupy będą mieli dostęp do %n zasobów:</numerusform>
         <numerusform>Wszyscy użytkownicy przypisani do tej grupy będą mieli dostęp do %n zasobów:</numerusform>
-        <numerusform>All users with this role will get access to %n resources:</numerusform>
+        <numerusform>Wszyscy użytkownicy przypisani do tej grupy będą mieli dostęp do %n zasobu:</numerusform>
       </translation>
     </message>
     <message>
@@ -7982,11 +7995,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>All users with this role will still have access to %n removed resources:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Wszyscy użytkownicy przypisani do tej grupy nadal będą mieli dostęp do %n usuniętego zasobu:</numerusform>
         <numerusform>Wszyscy użytkownicy przypisani do tej grupy nadal będą mieli dostęp do %n usuniętych zasobów:</numerusform>
         <numerusform>Wszyscy użytkownicy przypisani do tej grupy nadal będą mieli dostęp do %n usuniętych zasobów:</numerusform>
-        <numerusform>All users with this role will still have access to %n removed resources:</numerusform>
+        <numerusform>Wszyscy użytkownicy przypisani do tej grupy nadal będą mieli dostęp do %n usuniętego zasobu:</numerusform>
       </translation>
     </message>
     <message>
@@ -7999,47 +8012,47 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>User will lose access to %n resources:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Użytkownik straci dostęp do %n zasobu:</numerusform>
         <numerusform>Użytkownik straci dostęp do %n zasobów:</numerusform>
         <numerusform>Użytkownik straci dostęp do %n zasobów:</numerusform>
-        <numerusform>User will lose access to %n resources:</numerusform>
+        <numerusform>Użytkownik straci dostęp do %n zasobu:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>All users with this role will lose access to %n resources:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Wszyscy użytkownicy przypisani do tej grupy stracą dostęp do %n zasobu:</numerusform>
         <numerusform>Wszyscy użytkownicy przypisani do tej grupy stracą dostęp do %n zasobów:</numerusform>
         <numerusform>Wszyscy użytkownicy przypisani do tej grupy stracą dostęp do %n zasobów:</numerusform>
-        <numerusform>All users with this role will lose access to %n resources:</numerusform>
+        <numerusform>Wszyscy użytkownicy przypisani do tej grupy stracą dostęp do %n zasobu:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n shared layouts?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Usunąć udostępniony układ?</numerusform>
         <numerusform>Usunąć %n udostępnione układy?</numerusform>
         <numerusform>Usunąć %n udostępnionych układów?</numerusform>
-        <numerusform>Delete %n shared layouts?</numerusform>
+        <numerusform>Usunąć %n udostępniony układ?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These %n layouts are shared with other users, so you delete it for them too.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Usunięcie układu dotyczy wszystkich użytkowników, którym go udostępniono.</numerusform>
         <numerusform>Usunięcie %n układów dotyczy wszystkich użytkowników, którym je udostępniono.</numerusform>
         <numerusform>Usunięcie %n układów dotyczy wszystkich użytkowników, którym je udostępniono.</numerusform>
-        <numerusform>These %n layouts are shared with other users, so you delete it for them too.</numerusform>
+        <numerusform>Usunięcie %n układu dotyczy wszystkich użytkowników, którym go udostępniono.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Remove %n items from layout?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Usunąć element z układu?</numerusform>
         <numerusform>Usunąć %n elementy z układu?</numerusform>
         <numerusform>Usunąć %n elementów z układu?</numerusform>
-        <numerusform>Remove %n items from layout?</numerusform>
+        <numerusform>Usunąć %n elementy z układu?</numerusform>
       </translation>
     </message>
     <message>
@@ -8056,74 +8069,74 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n users?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Usunąć użytkownika?</numerusform>
         <numerusform>Usunąć %n użytkowników?</numerusform>
         <numerusform>Usunąć %n użytkowników?</numerusform>
-        <numerusform>Delete %n users?</numerusform>
+        <numerusform>Usunąć %n użytkownika?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n devices?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Usunąć urządzenie?</numerusform>
         <numerusform>Usunąć %n urządzenia?</numerusform>
         <numerusform>Usunąć %n urządzeń?</numerusform>
-        <numerusform>Delete %n devices?</numerusform>
+        <numerusform>Usunąć %n urządzenie?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n cameras?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Usunąć kamerę?</numerusform>
         <numerusform>Usunąć %n kamery?</numerusform>
         <numerusform>Usunąć %n kamer?</numerusform>
-        <numerusform>Delete %n cameras?</numerusform>
+        <numerusform>Usunąć %n kamerę?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n I/O Modules?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Usunąć moduł I/O?</numerusform>
         <numerusform>Usunąć %n moduły I/O?</numerusform>
         <numerusform>Usunąć %n modułów I/O?</numerusform>
-        <numerusform>Delete %n I/O Modules?</numerusform>
+        <numerusform>Usunąć %n moduł I/O?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Usunąć %n elementów?</numerusform>
         <numerusform>Usunąć %n elementów?</numerusform>
         <numerusform>Usunąć %n elementów?</numerusform>
-        <numerusform>Delete %n items?</numerusform>
+        <numerusform>Usunąć %n elementów?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n of them are auto-discovered.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n z nich został wykryty automatycznie.</numerusform>
         <numerusform>%n z nich zostały wykryte automatycznie.</numerusform>
         <numerusform>%n z nich zostało wykrytych automatycznie.</numerusform>
-        <numerusform>%n of them are auto-discovered.</numerusform>
+        <numerusform>%n z nich został wykryty automatycznie.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras are auto-discovered.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n kamera została wykryta automatycznie.</numerusform>
         <numerusform>%n kamery zostały wykryte automatycznie.</numerusform>
         <numerusform>%n kamer zostało wykrytych automatycznie.</numerusform>
-        <numerusform>%n cameras are auto-discovered.</numerusform>
+        <numerusform>%n kamery zostały wykryte automatycznie.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules are auto-discovered.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n moduł I/O został wykryty automatycznie.</numerusform>
         <numerusform>%n moduły I/O zostały wykryte automatycznie.</numerusform>
         <numerusform>%n modułów I/O zostało wykrytych automatycznie.</numerusform>
-        <numerusform>%n I/O modules are auto-discovered.</numerusform>
+        <numerusform>%n moduły I/O zostały wykryte automatycznie.</numerusform>
       </translation>
     </message>
     <message>
@@ -8140,11 +8153,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Remove %n items from showreel?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Usunąć element z sekwencji?</numerusform>
         <numerusform>Usunąć %n elementy z sekwencji?</numerusform>
         <numerusform>Usunąć %n elementów z sekwencji?</numerusform>
-        <numerusform>Remove %n items from showreel?</numerusform>
+        <numerusform>Usunąć %n element z sekwencji?</numerusform>
       </translation>
     </message>
     <message>
@@ -8173,7 +8186,7 @@ to %1</source>
         <numerusform>%n użytkownik</numerusform>
         <numerusform>%n użytkownicy</numerusform>
         <numerusform>%n użytkowników</numerusform>
-        <numerusform>%n users</numerusform>
+        <numerusform>%n użytkowników</numerusform>
       </translation>
     </message>
   </context>
@@ -8395,7 +8408,7 @@ to %1</source>
       <translation type="unfinished">
         <numerusform>Przy eksportowaniu w trybie szybkiego przeglądu długość wideo powinna wynosić co najmniej sekundę.</numerusform>
         <numerusform>Przy eksportowaniu w trybie szybkiego przeglądu długość wideo powinna wynosić co najmniej %n sekundy.</numerusform>
-        <numerusform>For exporting as Rapid Review video length should be at least %n seconds.</numerusform>
+        <numerusform>Przy eksportowaniu w trybie szybkiego przeglądu długość wideo powinna wynosić co najmniej %n sekund.</numerusform>
         <numerusform>Przy eksportowaniu w trybie szybkiego przeglądu długość wideo powinna wynosić co najmniej %n sekund.</numerusform>
       </translation>
     </message>
@@ -8751,7 +8764,7 @@ to %1</source>
         <numerusform>Nie udało się przenieść %n urządzenia</numerusform>
         <numerusform>Nie udało się przenieść %n urządzeń</numerusform>
         <numerusform>Nie udało się przenieść %n urządzeń</numerusform>
-        <numerusform>Failed to move %n devices</numerusform>
+        <numerusform>Nie udało się przenieść %n urządzeń</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -8760,7 +8773,7 @@ to %1</source>
         <numerusform>Nie udało się przenieść %n kamery</numerusform>
         <numerusform>Nie udało się przenieść %n kamer</numerusform>
         <numerusform>Nie udało się przenieść %n kamer</numerusform>
-        <numerusform>Failed to move %n cameras</numerusform>
+        <numerusform>Nie udało się przenieść %n kamer</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -8769,7 +8782,7 @@ to %1</source>
         <numerusform>Nie udało się przenieść %n modułu I/O</numerusform>
         <numerusform>Nie udało się przenieść %n modułów I/O</numerusform>
         <numerusform>Nie udało się przenieść %n modułów I/O</numerusform>
-        <numerusform>Failed to move %n I/O Modules</numerusform>
+        <numerusform>Nie udało się przenieść %n modułów I/O</numerusform>
       </translation>
     </message>
     <message>
@@ -8782,7 +8795,7 @@ to %1</source>
         <numerusform>Serwer &quot;%1&quot; nie może uzyskać dostępu do %n urządzenia. Przenieść je mimo to?</numerusform>
         <numerusform>Serwer &quot;%1&quot; nie może uzyskać dostępu do %n urządzeń. Przenieść je mimo to?</numerusform>
         <numerusform>Serwer &quot;%1&quot; nie może uzyskać dostępu do %n urządzeń. Przenieść je mimo to?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
+        <numerusform>Serwer &quot;%1&quot; nie może uzyskać dostępu do %n urządzeń. Przenieść je mimo to?</numerusform>
       </translation>
     </message>
     <message numerus="yes">

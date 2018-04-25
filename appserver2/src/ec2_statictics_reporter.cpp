@@ -14,8 +14,10 @@
 #include <utils/common/app_info.h>
 #include <network/system_helpers.h>
 
-#include "ec2_connection.h"
 #include <licensing/license_validator.h>
+#include <nx_ec/data/api_conversion_functions.h>
+#include <common/common_module.h>
+#include <nx/fusion/serialization/json.h>
 
 static const std::chrono::hours kDefaultSendCycleTime(30 * 24); //< About a month.
 static const std::chrono::hours kSendAfterUpdateTime(3);
@@ -70,14 +72,16 @@ namespace ec2
         for (auto& ms : mediaServers) outData->mediaservers.push_back(std::move(ms));
 
 
-        ApiCameraDataExList cameras;
+        nx::vms::api::CameraDataExList cameras;
         errCode = m_ec2Connection->getCameraManager(Qn::kSystemAccess)->getCamerasExSync(&cameras);
         if (errCode != ErrorCode::ok)
             return errCode;
 
-        for (ApiCameraDataEx& cam: cameras)
+        for (auto& cam: cameras)
+        {
             if (cam.typeId != QnResourceTypePool::kDesktopCameraTypeUuid)
                 outData->cameras.push_back(std::move(cam));
+        }
 
         QnLicenseList licenses;
         errCode = m_ec2Connection->getLicenseManager(Qn::kSystemAccess)->getLicensesSync(&licenses);
@@ -101,7 +105,7 @@ namespace ec2
 
         for (auto& br: bRules)
         {
-            ApiBusinessRuleData apiData;
+            nx::vms::api::EventRuleData apiData;
             fromResourceToApi(br, apiData);
             outData->businessRules.push_back(std::move(apiData));
         }

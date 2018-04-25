@@ -19,9 +19,9 @@ int QnTestEmailSettingsHandler::executePost(
     const QnRestConnectionProcessor* owner)
 {
     QnTestEmailSettingsReply reply;
-    ec2::ApiEmailSettingsData apiData = QJson::deserialized(body, ec2::ApiEmailSettingsData());
+    const auto apiData = QJson::deserialized<nx::vms::api::EmailSettingsData>(body);
     QnEmailSettings settings;
-    fromApiToResource(apiData, settings);
+    ec2::fromApiToResource(apiData, settings);
     EmailManagerImpl emailManagerImpl(owner->commonModule());
 
     SmtpOperationResult smtpResult = emailManagerImpl.testConnection(settings);

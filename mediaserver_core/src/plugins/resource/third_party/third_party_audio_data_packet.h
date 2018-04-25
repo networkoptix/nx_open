@@ -10,7 +10,7 @@
 
 #include <nx/streaming/audio_data_packet.h>
 
-#include <plugins/camera_plugin.h>
+#include <camera/camera_plugin.h>
 
 
 class QnThirdPartyCompressedAudioData

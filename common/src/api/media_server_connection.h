@@ -221,8 +221,6 @@ public:
 
     int modulesInformation(QObject* target, const char* slot);
 
-    int cameraHistory(const QnChunksRequestData& request, QObject* target, const char* slot);
-
     int recordedTimePeriods(const QnChunksRequestData& request, QObject* target, const char* slot);
     int getBookmarksAsync(
         const QnGetBookmarksRequestData& request, QObject* target, const char* slot);

@@ -110,7 +110,7 @@ def generate_camera_data(camera_id, **kw):
        status='Unauthorized',
        statusFlags='CSF_NoFlags',
        typeId='{1b7181ce-0227-d3f7-9443-c86aab922d96}',
-#        typeId='{774e6ecd-ffc6-ae88-0165-8f4a6d0eafa7}',
+       # typeId='{774e6ecd-ffc6-ae88-0165-8f4a6d0eafa7}',
        url=generate_ip_v4(camera_id, BASE_CAMERA_IP_ADDRESS),
        vendor="NetworkOptix")
     return dict(default_camera_data, **kw)
@@ -136,7 +136,7 @@ def generate_user_data(user_id, **kw):
 
 def generate_mediaserver_data(server_id, **kw):
     server_address = kw.get('networkAddresses', generate_ip_v4_endpoint(server_id))
-    server_name = kw.get('name', generate_name('Server', server_id))
+    server_name = kw.get('name', generate_name('Mediaserver', server_id))
     default_server_data = dict(
         apiUrl=server_address,
         url='rtsp://%s' % server_address,
@@ -155,7 +155,7 @@ def generate_mediaserver_data(server_id, **kw):
 
 
 def generate_camera_user_attributes_data(camera, **kw):
-    dewarpingParams = '''{"enabled":false,"fovRot":0,
+    unwarping_params = '''{"enabled":false,"fovRot":0,
     "hStretch":1,"radius":0.5,"viewMode":"1","xCenter":0.5,"yCenter":0.5}'''
     default_camera_data = dict(
         audioEnabled=False,
@@ -163,7 +163,7 @@ def generate_camera_user_attributes_data(camera, **kw):
         cameraId=camera['id'],
         cameraName=camera['name'],
         controlEnabled=True,
-        dewarpingParams=dewarpingParams,
+        dewarpingParams=unwarping_params,
         failoverPriority='Medium',
         licenseUsed=True,
         maxArchiveDays=-30,

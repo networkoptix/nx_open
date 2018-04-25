@@ -21,6 +21,7 @@
 #include "rest/server/rest_connection_processor.h"
 #include <llutil/hardware_id.h>
 #include <licensing/license_validator.h>
+#include <nx/utils/license/util.h>
 
 static const int TCP_TIMEOUT = 1000 * 5;
 
@@ -126,7 +127,7 @@ CLHttpStatus QnActivateLicenseRestHandler::makeRequest(
     const QVector<QString> hardwareIds = commonModule->licensePool()->hardwareIds();
     for (const QString& hwid: hardwareIds)
     {
-        int version = LLUtil::hardwareIdVersion(hwid);
+        int version = nx::utils::license::hardwareIdVersion(hwid);
 
         QString name;
         if (version == 0)

@@ -6,7 +6,7 @@
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QApplication>
 
-#include <ui/common/widget_anchor.h>
+#include <nx/client/desktop/common/utils/widget_anchor.h>
 #include <utils/common/event_processors.h>
 
 #include <nx/utils/disconnect_helper.h>
@@ -30,7 +30,7 @@ struct LineEditControls::Private
 {
     Private(LineEditControls* main):
         main(main),
-        anchor(new QnWidgetAnchor(main)),
+        anchor(new WidgetAnchor(main)),
         contents(new QWidget(main)),
         initialMargins(main->parentWidget()->contentsMargins())
     {
@@ -226,7 +226,7 @@ struct LineEditControls::Private
     }
 
     LineEditControls* const main = nullptr;
-    QnWidgetAnchor* const anchor = nullptr;
+    WidgetAnchor* const anchor = nullptr;
     int spacing = kDefaultSpacing;
 
     const QScopedPointer<QWidget> contents;

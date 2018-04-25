@@ -42,12 +42,12 @@ QnAbstractStreamDataProvider* QnArecontPanoramicResource::createLiveDataProvider
     if (isRTSPSupported())
     {
         NX_LOG(lit("Arecont panoramic. Creating live RTSP provider for camera %1").arg(getHostAddress()), cl_logDEBUG1);
-        return new QnArecontRtspStreamReader(toSharedPointer());
+        return new QnArecontRtspStreamReader(toSharedPointer(this));
     }
     else
     {
         NX_LOG( lit("Create live provider for camera %1").arg(getHostAddress()), cl_logDEBUG1);
-        return new AVPanoramicClientPullSSTFTPStreamreader(toSharedPointer());
+        return new AVPanoramicClientPullSSTFTPStreamreader(toSharedPointer(this));
     }
 }
 

@@ -23,7 +23,6 @@
 #include <ui/workbench/workbench_context.h>
 
 #include "legacy_camera_schedule_widget.h"
-#include "camera_motion_mask_widget.h"
 
 namespace nx {
 namespace client {
@@ -212,10 +211,10 @@ bool MultipleCameraSettingsWidget::isValidSecondStream()
     bool usesSecondStream = false;
     for (auto& task : filteredTasks)
     {
-        if (task.recordingType == Qn::RT_MotionAndLowQuality)
+        if (task.recordingType == Qn::RecordingType::motionAndLow)
         {
             usesSecondStream = true;
-            task.recordingType = Qn::RT_Always;
+            task.recordingType = Qn::RecordingType::always;
         }
     }
 

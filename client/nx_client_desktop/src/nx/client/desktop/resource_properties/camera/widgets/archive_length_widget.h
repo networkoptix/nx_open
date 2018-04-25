@@ -4,14 +4,13 @@
 
 namespace Ui { class ArchiveLengthWidget; }
 
-class QnAligner;
-
 namespace nx {
 namespace client {
 namespace desktop {
 
 struct CameraSettingsDialogState;
 class CameraSettingsDialogStore;
+class Aligner;
 
 class ArchiveLengthWidget: public QWidget
 {
@@ -22,7 +21,7 @@ public:
     explicit ArchiveLengthWidget(QWidget* parent = nullptr);
     virtual ~ArchiveLengthWidget();
 
-    QnAligner* aligner() const;
+    Aligner* aligner() const;
 
     void setStore(CameraSettingsDialogStore* store);
 
@@ -31,7 +30,7 @@ private:
 
 private:
     QScopedPointer<Ui::ArchiveLengthWidget> ui;
-    QnAligner* m_aligner = nullptr;
+    Aligner* m_aligner = nullptr;
 };
 
 } // namespace desktop

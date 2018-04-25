@@ -1,5 +1,7 @@
 #include "camera_settings_dialog_state_reducer.h"
 
+#include <limits>
+
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource_display_info.h>
 #include <camera/fps_calculator.h>
@@ -20,8 +22,8 @@ namespace {
 
 static constexpr int kMinFps = 1;
 
-static constexpr auto kMinQuality = Qn::QualityLow;
-static constexpr auto kMaxQuality = Qn::QualityHighest;
+static constexpr auto kMinQuality = Qn::StreamQuality::low;
+static constexpr auto kMaxQuality = Qn::StreamQuality::highest;
 
 template<class Data>
 void fetchFromCameras(
@@ -70,7 +72,8 @@ QString calculateWebPage(const Camera& camera)
 bool isMotionDetectionEnabled(const Camera& camera)
 {
     const auto motionType = camera->getMotionType();
-    return motionType != Qn::MT_NoMotion && camera->supportedMotionType().testFlag(motionType);
+    return motionType != Qn::MotionType::MT_NoMotion
+        && camera->supportedMotionType().testFlag(motionType);
 }
 
 bool calculateRecordingParametersAvailable(const Cameras& cameras)
@@ -101,7 +104,7 @@ Qn::StreamQuality calculateQualityForBitrateMbps(const State& state, float bitra
     auto current = kMinQuality;
     auto currentBr = calculateBitrateForQualityMbps(state, current);
 
-    for (int i = current + 1; i <= kMaxQuality; ++i)
+    for (int i = (int)current + 1; i <= (int)kMaxQuality; ++i)
     {
         const auto next = Qn::StreamQuality(i);
         const auto nextBr = calculateBitrateForQualityMbps(state, next);
@@ -118,14 +121,16 @@ Qn::StreamQuality calculateQualityForBitrateMbps(const State& state, float bitra
 
 State loadMinMaxCustomBitrate(State state)
 {
-    state.recording.minBitrateMbps = calculateBitrateForQualityMbps(state, Qn::QualityLowest);
-    state.recording.maxBitrateMpbs = calculateBitrateForQualityMbps(state, Qn::QualityHighest);
+    state.recording.minBitrateMbps = calculateBitrateForQualityMbps(state,
+        Qn::StreamQuality::lowest);
+    state.recording.maxBitrateMpbs = calculateBitrateForQualityMbps(state,
+        Qn::StreamQuality::highest);
     return state;
 }
 
 State fillBitrateFromFixedQuality(State state)
 {
-    state.recording.brush.bitrateMbps = QnScheduleGridWidget::CellParams::kAutomaticBitrate;
+    state.recording.brush.bitrateMbps = ScheduleCellParams::kAutomaticBitrate;
     state.recording.bitrateMbps = calculateBitrateForQualityMbps(
         state,
         state.recording.brush.quality);
@@ -156,10 +161,10 @@ State loadNetworkInfo(State state, const Camera& camera)
 State::RecordingDays calculateMinRecordingDays(const Cameras& cameras)
 {
     if (cameras.empty())
-        return {ec2::kDefaultMinArchiveDays, true, true};
+        return {vms::api::kDefaultMinArchiveDays, true, true};
 
     // Any negative min days value means 'auto'. Storing absolute value to keep previous one.
-    auto calcMinDays = [](int d) { return d == 0 ? ec2::kDefaultMinArchiveDays : qAbs(d); };
+    auto calcMinDays = [](int d) { return d == 0 ? vms::api::kDefaultMinArchiveDays : qAbs(d); };
 
     const int minDays = (*std::min_element(
         cameras.cbegin(),
@@ -187,10 +192,10 @@ State::RecordingDays calculateMinRecordingDays(const Cameras& cameras)
 State::RecordingDays calculateMaxRecordingDays(const Cameras& cameras)
 {
     if (cameras.empty())
-        return {ec2::kDefaultMaxArchiveDays, true, true};
+        return {vms::api::kDefaultMaxArchiveDays, true, true};
 
     /* Any negative max days value means 'auto'. Storing absolute value to keep previous one. */
-    auto calcMaxDays = [](int d) { return d == 0 ? ec2::kDefaultMaxArchiveDays : qAbs(d); };
+    auto calcMaxDays = [](int d) { return d == 0 ? vms::api::kDefaultMaxArchiveDays : qAbs(d); };
 
     const int maxDays = (*std::max_element(
         cameras.cbegin(),
@@ -263,13 +268,33 @@ QnScheduleTaskList calculateRecordingSchedule(const Camera& camera)
 int calculateRecordingThresholdBefore(const Camera& camera)
 {
     const auto value = camera->recordBeforeMotionSec();
-    return value > 0 ? value : ec2::kDefaultRecordBeforeMotionSec;
+    return value > 0 ? value : vms::api::kDefaultRecordBeforeMotionSec;
 }
 
 int calculateRecordingThresholdAfter(const Camera& camera)
 {
     const auto value = camera->recordAfterMotionSec();
-    return value > 0 ? value : ec2::kDefaultRecordAfterMotionSec;
+    return value > 0 ? value : vms::api::kDefaultRecordAfterMotionSec;
+}
+
+QnMotionRegion::ErrorCode validateMotionRegionList(const State& state,
+    const QList<QnMotionRegion>& regionList)
+{
+    if (!state.singleCameraProperties.hasMotionConstraints)
+        return QnMotionRegion::ErrorCode::Ok;
+
+    for (const auto& region : regionList)
+    {
+        const auto errorCode = region.isValid(
+            state.singleCameraProperties.maxMotionRects,
+            state.singleCameraProperties.maxMotionMaskRects,
+            state.singleCameraProperties.maxMotionSensitivityRects);
+
+        if (errorCode != QnMotionRegion::ErrorCode::Ok)
+            return errorCode;
+    }
+
+    return QnMotionRegion::ErrorCode::Ok;
 }
 
 } // namespace
@@ -304,27 +329,45 @@ State CameraSettingsDialogStateReducer::loadCameras(
     state.hasChanges = false;
     state.singleCameraProperties = {};
     state.singleCameraSettings = {};
-    state.devicesProperties = {};
+    state.devicesDescription = {};
     state.recording = {};
     state.devicesCount = cameras.size();
+    state.alert = {};
 
-    state.devicesProperties.isDtsBased = combinedValue(cameras,
+    state.devicesDescription.isDtsBased = combinedValue(cameras,
         [](const Camera& camera) { return camera->isDtsBased(); });
-    state.devicesProperties.isWearable = combinedValue(cameras,
+    state.devicesDescription.isWearable = combinedValue(cameras,
         [](const Camera& camera) { return camera->hasFlags(Qn::wearable_camera); });
-    state.devicesProperties.hasMotion = combinedValue(cameras,
+    state.devicesDescription.hasMotion = combinedValue(cameras,
         [](const Camera& camera) { return camera->hasMotion(); });
-    state.devicesProperties.hasDualStreaming = combinedValue(cameras,
+    state.devicesDescription.hasDualStreaming = combinedValue(cameras,
         [](const Camera& camera) { return camera->hasDualStreaming(); });
 
     if (firstCamera)
     {
-        state.singleCameraProperties.name.setBase(firstCamera->getName());
-        state.singleCameraProperties.id = firstCamera->getId().toSimpleString();
-        state.singleCameraProperties.firmware = firstCamera->getFirmware();
-        state.singleCameraProperties.macAddress = firstCamera->getMAC().toString();
-        state.singleCameraProperties.model = firstCamera->getModel();
-        state.singleCameraProperties.vendor = firstCamera->getVendor();
+        auto& singleProperties = state.singleCameraProperties;
+        singleProperties.name.setBase(firstCamera->getName());
+        singleProperties.id = firstCamera->getId().toSimpleString();
+        singleProperties.firmware = firstCamera->getFirmware();
+        singleProperties.macAddress = firstCamera->getMAC().toString();
+        singleProperties.model = firstCamera->getModel();
+        singleProperties.vendor = firstCamera->getVendor();
+
+        singleProperties.hasMotionConstraints =
+            firstCamera->getDefaultMotionType() == Qn::MotionType::MT_HardwareGrid;
+
+        if (singleProperties.hasMotionConstraints)
+        {
+            singleProperties.maxMotionRects = firstCamera->motionWindowCount();
+            singleProperties.maxMotionMaskRects = firstCamera->motionMaskWindowCount();
+            singleProperties.maxMotionSensitivityRects =
+                firstCamera->motionSensWindowCount();
+        }
+        else
+        {
+            singleProperties.maxMotionRects = singleProperties.maxMotionMaskRects
+                = singleProperties.maxMotionSensitivityRects = std::numeric_limits<int>::max();
+        }
 
         state = loadNetworkInfo(std::move(state), firstCamera);
 
@@ -338,6 +381,17 @@ State CameraSettingsDialogStateReducer::loadCameras(
 
         state.singleCameraSettings.enableMotionDetection.setBase(
             isMotionDetectionEnabled(firstCamera));
+
+        auto regionList = firstCamera->getMotionRegionList();
+        if (validateMotionRegionList(state, regionList) != QnMotionRegion::ErrorCode::Ok)
+        {
+            for (auto& region: regionList)
+                region = QnMotionRegion(); //< Reset to default.
+
+            // TODO: #vkutin #GDM Should we set hasChanges flag here?
+        }
+
+        state.singleCameraSettings.motionRegionList.setBase(regionList);
 
         Qn::calculateMaxFps(
             {firstCamera},
@@ -354,8 +408,8 @@ State CameraSettingsDialogStateReducer::loadCameras(
 
      Qn::calculateMaxFps(
             cameras,
-            &state.devicesProperties.maxFps,
-            &state.devicesProperties.maxDualStreamingFps,
+            &state.devicesDescription.maxFps,
+            &state.devicesDescription.maxDualStreamingFps,
             false);
 
     state.recording.schedule = {};
@@ -400,7 +454,7 @@ State CameraSettingsDialogStateReducer::setSingleCameraUserName(State state, con
 
 State CameraSettingsDialogStateReducer::setScheduleBrush(
     State state,
-    const QnScheduleGridWidget::CellParams& brush)
+    const ScheduleCellParams& brush)
 {
     state.recording.brush = brush;
     const auto fps = qBound(
@@ -409,6 +463,7 @@ State CameraSettingsDialogStateReducer::setScheduleBrush(
         state.maxRecordingBrushFps());
 
     state = setScheduleBrushFps(std::move(state), fps);
+    state.alert = State::Alert::BrushChanged;
 
     return state;
 }
@@ -417,16 +472,18 @@ State CameraSettingsDialogStateReducer::setScheduleBrushRecordingType(
     State state,
     Qn::RecordingType value)
 {
-    NX_EXPECT(value != Qn::RT_MotionOnly || state.hasMotion());
-    NX_EXPECT(value != Qn::RT_MotionAndLowQuality || state.hasDualStreaming());
+    NX_EXPECT(value != Qn::RecordingType::motionOnly || state.hasMotion());
+    NX_EXPECT(value != Qn::RecordingType::motionAndLow || state.hasDualStreaming());
     state.recording.brush.recordingType = value;
-    if (value == Qn::RT_MotionAndLowQuality)
+    if (value == Qn::RecordingType::motionAndLow)
     {
         state.recording.brush.fps = qBound(
             kMinFps,
             state.recording.brush.fps,
             state.maxRecordingBrushFps());
     }
+    state.alert = State::Alert::BrushChanged;
+
     return state;
 }
 
@@ -447,6 +504,7 @@ State CameraSettingsDialogStateReducer::setScheduleBrushFps(State state, int val
         state = loadMinMaxCustomBitrate(std::move(state));
         state = setCustomRecordingBitrateNormalized(std::move(state), normalizedBitrate);
     }
+    state.alert = State::Alert::BrushChanged;
 
     return state;
 }
@@ -457,6 +515,8 @@ State CameraSettingsDialogStateReducer::setScheduleBrushQuality(
 {
     state.recording.brush.quality = value;
     state = fillBitrateFromFixedQuality(std::move(state));
+    state.alert = State::Alert::BrushChanged;
+
     return state;
 }
 
@@ -472,6 +532,10 @@ State CameraSettingsDialogStateReducer::setSchedule(State state, const ScheduleT
     }
 
     state.recording.schedule.setUser(processed);
+
+    if (state.alert == State::Alert::BrushChanged || state.alert == State::Alert::EmptySchedule)
+        state.alert = {};
+
     return state;
 }
 
@@ -598,6 +662,46 @@ State CameraSettingsDialogStateReducer::setRecordingEnabled(State state, bool va
         state.recording.schedule.setUser(tasks);
     }
 
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setMotionDetectionEnabled(State state, bool value)
+{
+    state.hasChanges = true;
+    state.singleCameraSettings.enableMotionDetection.setUser(value);
+
+    if (state.hasMotion() && !state.recording.enabled())
+        state.alert = State::Alert::MotionDetectionRequiresRecording;
+    else if (state.alert == State::Alert::MotionDetectionRequiresRecording)
+        state.alert = {};
+
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setMotionRegionList(
+    State state, const QList<QnMotionRegion>& value)
+{
+    const auto errorCode = validateMotionRegionList(state, value);
+    if (errorCode != QnMotionRegion::ErrorCode::Ok)
+    {
+        switch (errorCode)
+        {
+            case QnMotionRegion::ErrorCode::Windows:
+                state.alert = State::Alert::MotionDetectionTooManyRectangles;
+                break;
+            case QnMotionRegion::ErrorCode::Masks:
+                state.alert = State::Alert::MotionDetectionTooManyMaskRectangles;
+                break;
+            case QnMotionRegion::ErrorCode::Sens:
+                state.alert = State::Alert::MotionDetectionTooManySensitivityRectangles;
+                break;
+        }
+
+        return state; //< Do not update region set.
+    }
+
+    state.hasChanges = true;
+    state.singleCameraSettings.motionRegionList.setUser(value);
     return state;
 }
 

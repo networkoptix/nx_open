@@ -38,7 +38,8 @@ QSize qMax(const QSize& size1, const QSize& size2)
 } // namespace
 
 PlayerDataConsumer::PlayerDataConsumer(
-    const std::unique_ptr<QnArchiveStreamReader>& archiveReader)
+    const std::unique_ptr<QnArchiveStreamReader>& archiveReader,
+    RenderContextSynchronizerPtr renderContextSynchronizer)
     :
     QnAbstractDataConsumer(kMaxMediaQueueLen),
     m_awaitingJumpCounter(0),
@@ -47,7 +48,8 @@ PlayerDataConsumer::PlayerDataConsumer(
     m_lastDisplayedTimeUs(AV_NOPTS_VALUE),
     m_emptyPacketCounter(0),
     m_audioEnabled(true),
-    m_needToResetAudio(true)
+    m_needToResetAudio(true),
+    m_renderContextSynchronizer(renderContextSynchronizer)
 {
     Qn::directConnect(archiveReader.get(), &QnArchiveStreamReader::beforeJump,
         this, &PlayerDataConsumer::onBeforeJump);
@@ -151,6 +153,10 @@ bool PlayerDataConsumer::processData(const QnAbstractDataPacketPtr& data)
     auto audioFrame = std::dynamic_pointer_cast<QnCompressedAudioData>(data);
     if (audioFrame && m_audioEnabled)
         return processAudioFrame(audioFrame);
+    
+    auto metadataFrame = std::dynamic_pointer_cast<QnAbstractCompressedMetadata>(data);
+    if (metadataFrame)
+        emit gotMetadata(metadataFrame);
 
     return true; //< Just ignore unknown frame type.
 }
@@ -220,7 +226,7 @@ bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& video
         QnMutexLocker lock(&m_decoderMutex);
         while (m_videoDecoders.size() <= videoChannel)
         {
-            auto videoDecoder = new SeamlessVideoDecoder();
+            auto videoDecoder = new SeamlessVideoDecoder(m_renderContextSynchronizer);
             videoDecoder->setAllowOverlay(m_allowOverlay);
             videoDecoder->setVideoGeometryAccessor(m_videoGeometryAccessor);
             m_videoDecoders.push_back(SeamlessVideoDecoderPtr(videoDecoder));

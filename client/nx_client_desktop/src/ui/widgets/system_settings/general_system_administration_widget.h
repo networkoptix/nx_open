@@ -4,12 +4,15 @@
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
 
-#include <ui/common/custom_painted.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui_general_system_administration_widget.h>
 
-class QnGeneralSystemAdministrationWidget: public QnAbstractPreferencesWidget, public QnWorkbenchContextAware
+#include <nx/client/desktop/common/utils/custom_painted.h>
+
+class QnGeneralSystemAdministrationWidget:
+    public QnAbstractPreferencesWidget,
+    public QnWorkbenchContextAware
 {
     Q_OBJECT
     typedef QnAbstractPreferencesWidget base_type;
@@ -45,6 +48,6 @@ private:
         kButtonCount
     };
 
-    using CustomPaintedButton = CustomPainted<QPushButton>;
+    using CustomPaintedButton = nx::client::desktop::CustomPainted<QPushButton>;
     std::array<CustomPaintedButton*, kButtonCount> m_buttons;
 };

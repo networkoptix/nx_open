@@ -4,7 +4,7 @@
 #include <QtGui/QStandardItemModel>
 #include <QtWidgets/QListView>
 
-#include <ui/common/aligner.h>
+#include <nx/client/desktop/common/utils/aligner.h>
 #include <ui/common/read_only.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -36,7 +36,7 @@ ImageControlWidget::ImageControlWidget(QWidget* parent):
         ui->rotationLabel,
         Qn::CameraSettings_Rotation_Help);
 
-    m_aligner = new QnAligner(this);
+    m_aligner = new Aligner(this);
     m_aligner->addWidgets({ui->rotationLabel, ui->aspectRatioLabel});
 
     // TODO: #GDM Move to a helper method.
@@ -74,7 +74,7 @@ ImageControlWidget::ImageControlWidget(QWidget* parent):
 
 ImageControlWidget::~ImageControlWidget() = default;
 
-QnAligner* ImageControlWidget::aligner() const
+Aligner* ImageControlWidget::aligner() const
 {
     return m_aligner;
 }

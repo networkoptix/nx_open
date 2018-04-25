@@ -10,7 +10,7 @@ QnResourceTreeModelRecorderNode::QnResourceTreeModelRecorderNode(
     QnResourceTreeModel* model,
     const QnVirtualCameraResourcePtr& camera)
     :
-    base_type(model, Qn::RecorderNode, QString())
+    base_type(model, NodeType::recorder, QString())
 {
     updateName(camera);
 }

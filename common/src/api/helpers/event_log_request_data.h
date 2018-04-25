@@ -12,9 +12,9 @@ struct QnEventLogFilterData
 {
     QnTimePeriod period;
     QnSecurityCamResourceList cameras;
-    nx::vms::event::EventType eventType = nx::vms::event::undefinedEvent;
+    nx::vms::api::EventType eventType = nx::vms::api::EventType::undefinedEvent;
     QnUuid eventSubtype;
-    nx::vms::event::ActionType actionType = nx::vms::event::undefinedAction;
+    nx::vms::api::ActionType actionType = nx::vms::api::ActionType::undefinedAction;
     QnUuid ruleId;
 
     void loadFromParams(QnResourcePool* resourcePool, const QnRequestParamList& params);

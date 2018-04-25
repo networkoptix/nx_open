@@ -6,6 +6,7 @@ import argparse
 import os
 from cmake_config import read_cmake_config
 from semantic_output import *
+from sources_parser import parse_sources_cached, clear_sources_cache
 
 
 customizable_projects = [
@@ -19,6 +20,7 @@ customizable_projects = [
 verbose = False
 
 DEFAULT = "default"
+DEFAULT_SKIN = 'dark_blue'
 
 build_module_prefix = 'build_'
 
@@ -66,13 +68,17 @@ def detect_module(entry):
         return 'build_nxtool'
 
 
-def validate_project(customized, project, mandatory_files, skipped_modules):
+def validate_project(customized, project, mandatory_files, skipped_modules, skin_files):
     customized_files = frozenset(
         x for x in get_files_list(os.path.join(customized.root, project))
         if detect_module(x) not in skipped_modules)
     for file in customized_files - mandatory_files:
         if is_intro(file):
             continue
+        if project == 'nx_client_desktop' and file.startswith('resources/skin/'):
+            icon = file[len('resources/skin/'):]
+            if icon in skin_files:
+                continue
         warn('File {0}/{1} is suspicious.'.format(project, file))
 
     for file in customized_files:
@@ -114,12 +120,69 @@ def read_customizations(customizations_dir):
         yield Customization(entry, path)
 
 
-def validate_customizations(rootDir):
+def validate_skins(root_dir):
+    '''
+    Main concepts:
+    * default skin is dark_blue
+    * every icon from the default skin must exist in the other skins
+    * no icon from the default skin must exist in the static files
+    * every icon from the other skin must exist either in the default skin or in static files
+    * every customized icon must exist either in the default skin or in static files
+    '''
+
+    client_dir = os.path.join(root_dir, 'client', 'nx_client_desktop')
+    client_skins_dir = os.path.join(client_dir, 'skins')
+    client_static_dir = os.path.join(client_dir, 'static-resources', 'skin')
+    default_skin_dir = os.path.join(client_skins_dir, DEFAULT_SKIN, 'skin')
+    default_skin = frozenset(x for x in get_files_list(default_skin_dir))
+    static_files = frozenset(x for x in get_files_list(client_static_dir))
+
+    for icon in default_skin & static_files:
+        warn('Icon {} is present both in skin and static files'.format(icon))
+
+    all_files = default_skin | static_files
+
+    other_skins = {}
+    for entry in os.listdir(client_skins_dir):
+        if entry == DEFAULT_SKIN:
+            continue
+        path = os.path.join(client_skins_dir, entry, 'skin')
+        if (not os.path.isdir(path)):
+            continue
+        skin = frozenset(x for x in get_files_list(path))
+        other_skins[entry] = skin
+
+    for name, skin in other_skins.iteritems():
+        for icon in default_skin - skin:
+            warn('Icon {0} is not customized in the {1} skin'.format(icon, name))
+        for icon in skin - all_files:
+            warn('Icon {0} is not used in the {1} skin'.format(icon, name))
+    return all_files
+
+
+def validate_desktop_client_icons(root_dir, skin_files):
+    client_dir = os.path.join(root_dir, 'client', 'nx_client_desktop')
+    sources = [
+        os.path.join(client_dir, 'src'),
+        os.path.join(client_dir, 'static-resources', 'src', 'qml')
+    ]
+    for dir in sources:
+        for icon, location in parse_sources_cached(dir):
+            if icon in intro_files:
+                continue
+            if icon not in skin_files:
+                warn('Icon {0} is not found in skin (used in {1})'.format(icon, location))
+
+
+def validate_customizations(root_dir):
     if verbose:
         separator()
         info("Validating customizations")
 
-    customizations_dir = os.path.join(rootDir, "customization")
+    skin_files = validate_skins(root_dir)
+    validate_desktop_client_icons(root_dir, skin_files)
+
+    customizations_dir = os.path.join(root_dir, "customization")
     customizations = list(read_customizations(customizations_dir))
     default = next((c for c in customizations if c.name == DEFAULT))
     if not default:
@@ -143,7 +206,8 @@ def validate_customizations(rootDir):
         if c == default:
             continue
 
-        info('Customization: {0}'.format(c.name))
+        if verbose:
+            info('Customization: {0}'.format(c.name))
 
         config = read_cmake_config(c.config)
         skipped_modules = set()
@@ -152,8 +216,15 @@ def validate_customizations(rootDir):
                 skipped_modules.add(module)
         validate_config(config, mandatory_keys, all_keys, skipped_modules)
         for project in customizable_projects:
-            validate_project(c, project, default_project_files[project], skipped_modules)
-        separator()
+            validate_project(
+                customized=c,
+                project=project,
+                mandatory_files=default_project_files[project],
+                skipped_modules=skipped_modules,
+                skin_files=skin_files)
+
+        if verbose:
+            separator()
 
     return True
 
@@ -173,8 +244,8 @@ def main():
     global verbose
     verbose = args.verbose
 
-    rootDir = os.getcwd()
-    return validate_customizations(rootDir)
+    root_dir = os.getcwd()
+    return validate_customizations(root_dir)
 
 
 if __name__ == "__main__":
