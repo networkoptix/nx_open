@@ -37,6 +37,7 @@ def main():
     delete_path(os.path.join(args.build_dir, "client", "mobile_client", "mobile_client_apk"))
 
     delete_path(os.path.join(args.build_dir, "bin", "mobile_client.app"))
+    delete_path(os.path.join(args.build_dir, "client", "mobile_client", "ipa"))
 
 if __name__ == "__main__":
     main()
