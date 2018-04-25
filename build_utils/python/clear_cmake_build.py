@@ -29,7 +29,7 @@ def main():
     if not os.path.isdir(args.build_dir):
         return
 
-    print("Clearing {} for {}".format(args.build_dir, " ".join(args.configurations)))
+    print("Clearing {}".format(args.build_dir))
 
     delete_path(os.path.join(args.build_dir, "distrib"))
 
