@@ -402,7 +402,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     regUpdate<ApiCameraDataList>(p, ApiCommand::saveCameras);
 
     // AbstractCameraManager::getCameras
-    regGet<QnUuid, ApiCameraDataList>(p, ApiCommand::getCameras);
+    regGet<QnCameraUuid, ApiCameraDataList>(p, ApiCommand::getCameras);
 
     /**%apidoc POST /ec2/saveCameraUserAttributesList
      * Save additional camera attributes for a number of cameras.
@@ -699,7 +699,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         %value CameraBackup_Default A default value is used for backup options.
      * %// AbstractCameraManager::getUserAttributes
      */
-    regGet<QnUuid, ApiCameraAttributesDataList>(p, ApiCommand::getCameraUserAttributesList);
+    regGet<QnCameraUuid, ApiCameraAttributesDataList>(p, ApiCommand::getCameraUserAttributesList);
 
     // AbstractCameraManager::addCameraHistoryItem
     regUpdate<ApiServerFootageData>(p, ApiCommand::addCameraHistoryItem);
@@ -843,7 +843,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         such information as full ONVIF URL, camera maximum FPS, etc.
      * %// AbstractCameraManager::getCamerasEx
      */
-    regGet<QnUuid, ApiCameraDataExList>(p, ApiCommand::getCamerasEx);
+    regGet<QnCameraUuid, ApiCameraDataExList>(p, ApiCommand::getCamerasEx);
 
     /**%apidoc GET /ec2/getStorages
      * Read the list of current storages.
