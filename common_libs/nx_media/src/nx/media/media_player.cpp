@@ -36,14 +36,10 @@
 
 #include "media_player_quality_chooser.h"
 
-namespace {
-
-uint qHash(MetadataType value)
+static uint qHash(const MetadataType& value)
 {
     return uint(value);
 }
-
-} // namespace
 
 namespace nx {
 namespace media {
