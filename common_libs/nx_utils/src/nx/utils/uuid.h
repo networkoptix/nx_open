@@ -90,7 +90,8 @@ private:
 class QnCameraUuid: public QnUuid
 {
 public:
-    using QnUuid::QnUuid;
+    QnCameraUuid() = default;
+    QnCameraUuid(const QnUuid& id): QnUuid(id) {}
 };
 
 namespace std
