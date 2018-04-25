@@ -25,6 +25,7 @@ class SSHAccess(object):
 
             @staticmethod
             def _ssh_access():
+                # TODO: Use weak ref to avoid circular dependencies.
                 return self
 
         self.Path = _SSHPath
@@ -54,6 +55,7 @@ class SSHAccess(object):
         return True
 
     def set_time(self, new_time):  # type: (SSHAccess, datetime.datetime) -> RunningTime
+        # TODO: Make a separate Time class.
         started_at = datetime.datetime.now(pytz.utc)
         self.run_command(['date', '--set', new_time.isoformat()])
         return RunningTime(new_time, datetime.datetime.now(pytz.utc) - started_at)
