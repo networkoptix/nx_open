@@ -69,5 +69,6 @@ class SSHAccess(object):
                 CORE_PATTERN_FILE='/etc/sysctl.d/60-core-pattern.conf'
                 echo 'kernel.core_pattern=core.%t.%p' > "$CORE_PATTERN_FILE"  # %t is timestamp, %p is pid.
                 sysctl -p "$CORE_PATTERN_FILE"  # See: https://superuser.com/questions/
+                apt-get update
                 apt-get --assume-yes install gdb # Required to create stack traces from core dumps.
                 ''')
