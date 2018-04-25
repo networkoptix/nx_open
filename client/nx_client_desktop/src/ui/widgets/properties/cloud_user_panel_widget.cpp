@@ -115,5 +115,5 @@ void QnCloudUserPanelWidget::updateManageAccountLink()
         SystemUri::ReferralSource::DesktopClient,
         SystemUri::ReferralContext::SettingsDialog);
     ui->manageAccountLabel->setText(makeHref(tr("Account Settings"),
-        urlHelper.accountManagementUrl()));
+        nx::utils::Url::fromQUrl(urlHelper.accountManagementUrl())));
 }
