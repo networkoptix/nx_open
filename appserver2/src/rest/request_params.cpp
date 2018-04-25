@@ -69,20 +69,17 @@ bool parseHttpRequestParams(
     QnCommonModule* commonModule,
     const QString& command, const QnRequestParamList& params, QnUuid* id)
 {
+    return deserialize(params, lit("id"), id);
+}
+
+bool parseHttpRequestParams(
+    QnCommonModule* commonModule,
+    const QString& command, const QnRequestParamList& params, QnCameraUuid* id)
+{
     QString stringValue;
-    bool result = deserialize(params, lit("id"), &stringValue);
-    if (!stringValue.isEmpty()
-        && (command == toString(ec2::ApiCommand::getCamerasEx) 
-        || command == toString(ec2::ApiCommand::getCameras)
-        || command == toString(ec2::ApiCommand::getCameraUserAttributesList)))
-    {
-        auto pool = commonModule->resourcePool();
-        *id = nx::camera_id_helper::flexibleIdToId(pool, stringValue);
-    }
-    else
-    {
-        *id = QnUuid(stringValue);
-    }
+    const bool result = deserialize(params, lit("id"), &stringValue);
+    if (result)
+        *id = nx::camera_id_helper::flexibleIdToId(commonModule->resourcePool(), stringValue);
     return result;
 }
 
