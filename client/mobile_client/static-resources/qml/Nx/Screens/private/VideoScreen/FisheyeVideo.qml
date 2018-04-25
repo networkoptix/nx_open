@@ -353,6 +353,7 @@ Item
             onDoubleClicked:
             {
                 clickFilterTimer.stop()
+                scalePowerAnimationBehavior.enabled = true
 
                 const kPowerThreshold = 0.8
                 if (interactor.scalePower > kPowerThreshold)
