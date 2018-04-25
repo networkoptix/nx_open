@@ -79,7 +79,12 @@ bool parseHttpRequestParams(
     QString stringValue;
     const bool result = deserialize(params, lit("id"), &stringValue);
     if (result)
+    {
+        static const QnUuid kNonExistingUuid("{11111111-1111-1111-1111-111111111111}");
         *id = nx::camera_id_helper::flexibleIdToId(commonModule->resourcePool(), stringValue);
+        if (id->isNull())
+            *id = kNonExistingUuid; //< Turn on data filtering anyway.
+    }
     return result;
 }
 
