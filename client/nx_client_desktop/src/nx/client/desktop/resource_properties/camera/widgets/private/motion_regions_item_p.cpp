@@ -142,7 +142,7 @@ void MotionRegionsItem::Private::setLabelsColor(const QColor& value)
         return;
 
     m_labelsColor = value;
-    m_labelsTexture.reset();
+    m_labelsTextureDirty = true;
     q->update();
 
     emit q->labelsColorChanged();
@@ -196,11 +196,10 @@ QSGNode* MotionRegionsItem::Private::updatePaintNode(QSGNode* node)
         data[2].set(w, 0, tw, 0);
         data[3].set(w, h, tw, th);
         geometryNode->markDirty(QSGNode::DirtyGeometry);
-        m_labelsTexture.reset(); //< Labels texture is resolution-dependent.
+        m_labelsTextureDirty = true; //< Labels texture is resolution-dependent.
     }
 
-    if (resized || m_labelsDirty)
-        updateLabelsNode(geometryNode);
+    updateLabelsNode(geometryNode, resized || m_labelsDirty);
 
     auto& currentState = *static_cast<QSGSimpleMaterial<State>*>(geometryNode->material())->state();
     if (currentState != m_currentState)
@@ -212,7 +211,7 @@ QSGNode* MotionRegionsItem::Private::updatePaintNode(QSGNode* node)
     return geometryNode;
 }
 
-void MotionRegionsItem::Private::updateLabelsNode(QSGNode* mainNode)
+void MotionRegionsItem::Private::updateLabelsNode(QSGNode* mainNode, bool geometryDirty)
 {
     auto labelsNode = mainNode->childCount() > 0
         ? static_cast<QSGGeometryNode*>(mainNode->childAtIndex(0))
@@ -236,46 +235,50 @@ void MotionRegionsItem::Private::updateLabelsNode(QSGNode* mainNode)
             labelsNode->setMaterial(new QSGTextureMaterial());
             labelsNode->material()->setFlag(QSGMaterial::Blending);
             mainNode->appendChildNode(labelsNode);
+            geometryDirty = true;
         }
 
-        labelsNode->setGeometry(new QSGGeometry(
-            QSGGeometry::defaultAttributes_TexturedPoint2D(), 6 * m_labels.size()));
+        if (geometryDirty)
+        {
+            labelsNode->setGeometry(new QSGGeometry(
+                QSGGeometry::defaultAttributes_TexturedPoint2D(), 6 * m_labels.size()));
 
-        labelsNode->geometry()->setDrawingMode(GL_TRIANGLES);
-        labelsNode->markDirty(QSGNode::DirtyGeometry);
+            labelsNode->geometry()->setDrawingMode(GL_TRIANGLES);
+            labelsNode->markDirty(QSGNode::DirtyGeometry);
+
+            // Text item width and height.
+            const qreal w = m_labelSize.width();
+            const qreal h = m_labelSize.height();
+
+            // Texture cell width.
+            const qreal tw = 1.0 / (QnMotionRegion::kSensitivityLevelCount - 1);
+
+            auto data = labelsNode->geometry()->vertexDataAsTexturedPoint2D();
+            for (const auto& label : m_labels)
+            {
+                // Top left vertex position.
+                const qreal x = std::ceil(m_cellSize.width() * label.position.x());
+                const qreal y = std::ceil(m_cellSize.height() * label.position.y());
+
+                // Left texture position.
+                const qreal u = tw * (label.sensitivity - 1);
+
+                // Define two textured triangles forming a quad.
+                data[0].set(x, y, u, 0);
+                data[1].set(x, y + h, u, 1);
+                data[2].set(x + w, y + h, u + tw, 1);
+                data[3] = data[0];
+                data[4] = data[2];
+                data[5].set(x + w, y, u + tw, 0);
+                data += 6;
+            }
+        }
 
         auto material = static_cast<QSGTextureMaterial*>(labelsNode->material());
         if (material->texture() != m_labelsTexture.data())
         {
             material->setTexture(m_labelsTexture.data());
             labelsNode->markDirty(QSGNode::DirtyMaterial);
-        }
-
-        // Text item width and height.
-        const qreal w = m_labelSize.width();
-        const qreal h = m_labelSize.height();
-
-        // Texture cell width.
-        const qreal tw = 1.0 / (QnMotionRegion::kSensitivityLevelCount - 1);
-
-        auto data = labelsNode->geometry()->vertexDataAsTexturedPoint2D();
-        for (const auto& label: m_labels)
-        {
-            // Top left vertex position.
-            const qreal x = std::ceil(m_cellSize.width() * label.position.x());
-            const qreal y = std::ceil(m_cellSize.height() * label.position.y());
-
-            // Left texture position.
-            const qreal u = tw * (label.sensitivity - 1);
-
-            // Define two textured triangles forming a quad.
-            data[0].set(x, y, u, 0);
-            data[1].set(x, y + h, u, 1);
-            data[2].set(x + w, y + h, u + tw, 1);
-            data[3] = data[0];
-            data[4] = data[2];
-            data[5].set(x + w, y, u + tw, 0);
-            data += 6;
         }
     }
 
@@ -337,6 +340,9 @@ void MotionRegionsItem::Private::updateRegionsImage()
 
 void MotionRegionsItem::Private::ensureLabelsTexture()
 {
+    if (!m_labelsTextureDirty)
+        return;
+
     const auto window = q->window();
     if (!window)
     {
@@ -384,6 +390,7 @@ void MotionRegionsItem::Private::ensureLabelsTexture()
     m_labelsTexture->setHorizontalWrapMode(QSGTexture::ClampToEdge);
     m_labelsTexture->setVerticalWrapMode(QSGTexture::ClampToEdge);
     m_labelsTexture->setFiltering(QSGTexture::Nearest);
+    m_labelsTextureDirty = false;
 }
 
 void MotionRegionsItem::Private::updateLabelPositions()

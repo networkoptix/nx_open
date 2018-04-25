@@ -27,7 +27,7 @@ public:
 
     void ensureTexture()
     {
-        if (m_texture)
+        if (!m_textureDirty)
             return;
 
         if (auto window = q->window())
@@ -42,6 +42,7 @@ public:
             m_texture->setHorizontalWrapMode(QSGTexture::ClampToEdge);
             m_texture->setVerticalWrapMode(QSGTexture::ClampToEdge);
 
+            m_textureDirty = false;
             emit textureChanged();
         }
     }
@@ -66,7 +67,7 @@ public:
 
         m_mask = value;
 
-        m_texture.reset();
+        m_textureDirty = true;
         q->update();
         emit q->motionMaskChanged();
     }
@@ -74,6 +75,7 @@ public:
 private:
     QByteArray m_mask = QByteArray(kMotionMaskSizeBytes, 0);
     QScopedPointer<QSGTexture, QScopedPointerDeleteLater> m_texture;
+    bool m_textureDirty = true;
 };
 
 // ------------------------------------------------------------------------------------------------

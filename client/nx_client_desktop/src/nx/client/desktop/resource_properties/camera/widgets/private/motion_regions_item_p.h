@@ -53,7 +53,7 @@ private:
     void ensureLabelsTexture();
     void updateRegionsImage();
     void updateLabelPositions();
-    void updateLabelsNode(QSGNode* mainNode);
+    void updateLabelsNode(QSGNode* mainNode, bool geometryDirty);
 
 private:
     struct State
@@ -98,6 +98,7 @@ private:
     QSizeF m_cellSize;
     QSize m_labelSize;
     QColor m_labelsColor = Qt::black;
+    bool m_labelsTextureDirty = true;
     bool m_labelsDirty = true;
 
     core::MotionGrid m_motionGrid;
