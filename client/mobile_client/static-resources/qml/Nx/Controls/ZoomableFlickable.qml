@@ -396,8 +396,8 @@ Item
                 if (!doubleTapScaleMode)
                     return
 
-                var sideSize = Math.max(rootItem.width, rootItem.height)
-                var targetScale = 1 - currentVector.y / sideSize * 4
+                var size = pinchArea.initialHeight
+                var targetScale = (size - currentVector.y * 3) / size
                 pinchArea.updatePinch(doubleTapDownPos, doubleTapDownPos, targetScale)
             }
 
