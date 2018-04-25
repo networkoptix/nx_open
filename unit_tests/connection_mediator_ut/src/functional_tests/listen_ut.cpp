@@ -17,7 +17,7 @@
 #include <relay/relay_cluster_client_factory.h>
 #include <test_support/mediaserver_emulator.h>
 
-#include "functional_tests/mediator_functional_test.h"
+#include "mediator_functional_test.h"
 
 namespace nx {
 namespace hpm {

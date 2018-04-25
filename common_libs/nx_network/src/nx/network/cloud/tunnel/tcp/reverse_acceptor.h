@@ -4,6 +4,7 @@
 #include <nx/network/connection_server/multi_address_server.h>
 #include <nx/network/http/server/http_stream_socket_server.h>
 #include <nx/network/http/server/http_message_dispatcher.h>
+#include <nx/utils/std/optional.h>
 
 namespace nx {
 namespace network {
@@ -50,6 +51,7 @@ public:
 
     // TODO: make is configurable for each client? can it be usefull?
     void setPoolSize(boost::optional<size_t> value);
+    void setHttpConnectionInactivityTimeout(std::chrono::milliseconds inactivityTimeout);
     void setKeepAliveOptions(boost::optional<KeepAliveOptions> value);
 
 protected:
@@ -80,6 +82,7 @@ private:
 
     mutable QnMutex m_dataMutex;
     boost::optional<size_t> m_poolSize;
+    boost::optional<std::chrono::milliseconds> m_httpConnectionInactivityTimeout;
     boost::optional<KeepAliveOptions> m_keepAliveOptions;
 
     nx::network::http::MessageDispatcher m_httpMessageDispatcher;
