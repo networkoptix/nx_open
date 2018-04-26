@@ -24,6 +24,8 @@ static const int kNvrMaxArchiveConnections = 3;
 static const std::chrono::seconds kCacheUrlTimeout(10);
 static const std::chrono::seconds kCacheDataTimeout(30);
 
+static const QString kObsoleteInterfaceParameter = lit("Network1");
+
 static const QUrl cleanUrl(QUrl url)
 {
     url.setPath(QString());
@@ -41,7 +43,6 @@ HanwhaSharedResourceContext::HanwhaSharedResourceContext(
     const AbstractSharedResourceContext::SharedId& sharedId)
     :
     information([this]() { return loadInformation(); }, kCacheDataTimeout),
-    cgiParameters([this]() { return loadCgiParameters(); }, kCacheDataTimeout),
     eventStatuses([this]() { return loadEventStatuses(); }, kCacheDataTimeout),
     videoSources([this]() { return loadVideoSources(); }, kCacheDataTimeout),
     videoProfiles([this]() { return loadVideoProfiles(); }, kCacheDataTimeout),
@@ -69,7 +70,6 @@ void HanwhaSharedResourceContext::setRecourceAccess(
     }
 
     information.invalidate();
-    cgiParameters.invalidate();
     eventStatuses.invalidate();
     videoSources.invalidate();
     videoProfiles.invalidate();
@@ -240,6 +240,14 @@ HanwhaResult<HanwhaInformation> HanwhaSharedResourceContext::loadInformation()
     HanwhaRequestHelper helper(shared_from_this());
     helper.setIgnoreMutexAnalyzer(true);
 
+    info.attributes = helper.fetchAttributes(lit("attributes"));
+    if (!info.attributes.isValid())
+        return {CameraDiagnostics::CameraInvalidParams(lit("Camera attributes are invalid"))};
+
+    info.cgiParameters = helper.fetchCgiParameters(lit("cgis"));
+    if (!info.cgiParameters.isValid())
+        return {CameraDiagnostics::CameraInvalidParams(lit("Camera CGI parameters are invalid"))};
+
     const auto deviceinfo = helper.view(lit("system/deviceinfo"));
     if (!deviceinfo.isSuccessful())
     {
@@ -247,7 +255,24 @@ HanwhaResult<HanwhaInformation> HanwhaSharedResourceContext::loadInformation()
             CameraDiagnostics::CameraInvalidParams(lit("Can not fetch device information")))};
     }
 
-    const auto networkInfo = helper.view("network/interface", {{"interfaceName", "Network1"}});
+    HanwhaRequestHelper::Parameters networkRequestParameters;
+    const auto interfacesParameter = info.cgiParameters.parameter(
+        lit("network/interface/view/InterfaceName"));
+
+    if (interfacesParameter != boost::none)
+    {
+        const auto possibleValues = interfacesParameter->possibleValues();
+        if (!possibleValues.isEmpty())
+        {
+            networkRequestParameters.emplace(
+                lit("InterfaceName"),
+                possibleValues.contains(kObsoleteInterfaceParameter)
+                    ? kObsoleteInterfaceParameter //< For backward compatibility.
+                    : possibleValues.first());
+        }
+    }
+
+    const auto networkInfo = helper.view("network/interface", networkRequestParameters);
     if (networkInfo.isSuccessful())
     {
         if (const auto value = networkInfo.parameter<QString>("MACAddress"))
@@ -275,26 +300,10 @@ HanwhaResult<HanwhaInformation> HanwhaSharedResourceContext::loadInformation()
     if (const auto value = deviceinfo.parameter<QString>(lit("FirmwareVersion")))
         info.firmware = value->trimmed();
 
-    info.attributes = helper.fetchAttributes(lit("attributes"));
-    if (!info.attributes.isValid())
-        return {CameraDiagnostics::CameraInvalidParams(lit("Camera attributes are invalid"))};
-
     const auto maxChannels = info.attributes.attribute<int>(lit("System/MaxChannel"));
     info.channelCount = maxChannels.is_initialized() ? *maxChannels : 1;
 
     return {CameraDiagnostics::NoErrorResult(), std::move(info)};
-}
-
-HanwhaResult<HanwhaCgiParameters> HanwhaSharedResourceContext::loadCgiParameters()
-{
-    HanwhaRequestHelper helper(shared_from_this());
-    helper.setIgnoreMutexAnalyzer(true);
-
-    auto cgiParameters = helper.fetchCgiParameters(lit("cgis"));
-    if (!cgiParameters.isValid())
-        return {CameraDiagnostics::CameraInvalidParams(lit("Camera cgi parameters are invalid"))};
-
-    return {CameraDiagnostics::NoErrorResult(), std::move(cgiParameters)};
 }
 
 HanwhaResult<HanwhaResponse> HanwhaSharedResourceContext::loadEventStatuses()
@@ -388,12 +397,18 @@ HanwhaResult<HanwhaCodecInfo> HanwhaSharedResourceContext::loadVideoCodecInfo()
             lit("Request failed"))};
     }
 
-    const auto& parameters = cgiParameters();
-    if (!parameters)
-        return {CameraDiagnostics::CameraInvalidParams(lit("CGI parameters are invalid."))};
+    const auto& info = information();
+    if (!info)
+        return {info.diagnostics};
 
+    const auto& parameters = info->cgiParameters;
+    if (!parameters.isValid())
+    {
+        return {CameraDiagnostics::CameraInvalidParams(
+            lit("Camera CGI parameters are not valid."))};
+    }
 
-    HanwhaCodecInfo codecInfo(response, parameters.value);
+    HanwhaCodecInfo codecInfo(response, parameters);
     if (!codecInfo.isValid())
     {
         return {CameraDiagnostics::CameraInvalidParams(

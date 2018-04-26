@@ -31,6 +31,7 @@ struct HanwhaInformation
     QString model;
     int channelCount = 0;
     HanwhaAttributes attributes;
+    HanwhaCgiParameters cgiParameters;
 };
 
 template<typename Value>
@@ -140,7 +141,6 @@ public:
 
     // NOTE: function objects return HanwhaResult<T>.
     HanwhaCachedData<HanwhaInformation> information;
-    HanwhaCachedData<HanwhaCgiParameters> cgiParameters;
     HanwhaCachedData<HanwhaResponse> eventStatuses;
     HanwhaCachedData<HanwhaResponse> videoSources;
     HanwhaCachedData<HanwhaResponse> videoProfiles;
@@ -148,7 +148,6 @@ public:
 
 private:
     HanwhaResult<HanwhaInformation> loadInformation();
-    HanwhaResult<HanwhaCgiParameters> loadCgiParameters();
     HanwhaResult<HanwhaResponse> loadEventStatuses();
     HanwhaResult<HanwhaResponse> loadVideoSources();
     HanwhaResult<HanwhaResponse> loadVideoProfiles();

@@ -956,6 +956,8 @@ CameraDiagnostics::Result HanwhaResource::initSystem()
         setFirmware(info->firmware);
 
     m_attributes = std::move(info->attributes);
+    m_cgiParameters = std::move(info->cgiParameters);
+    m_isChannelConnectedViaSunapi = true;
 
     if (isNvr())
     {
@@ -975,15 +977,6 @@ CameraDiagnostics::Result HanwhaResource::initSystem()
             handleProxiedDeviceInfo(proxiedDeviceInfo);
         }
     }
-    else
-    {
-        m_isChannelConnectedViaSunapi = true;
-    }
-
-    if (auto parameters = sharedContext()->cgiParameters())
-        m_cgiParameters = std::move(parameters.value);
-    else
-        return parameters.diagnostics;
 
     return CameraDiagnostics::NoErrorResult();
 }
@@ -1068,9 +1061,8 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
 
 CameraDiagnostics::Result HanwhaResource::setProfileSessionPolicy()
 {
-    const auto sessionPolicyParameter = sharedContext()
-        ->cgiParameters()
-        ->parameter(lit("network/rtsp/set/ProfileSessionPolicy"));
+    const auto sessionPolicyParameter = m_cgiParameters
+        .parameter(lit("network/rtsp/set/ProfileSessionPolicy"));
 
     if (!sessionPolicyParameter)
     {
