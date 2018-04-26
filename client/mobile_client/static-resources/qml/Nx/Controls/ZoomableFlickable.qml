@@ -351,7 +351,6 @@ Item
 
             property var doubleTapDownPos: undefined
             property bool doubleTapScaleMode: false
-            property real initialDoubleTapScale: 0
 
             anchors.fill: parent
 
@@ -367,7 +366,6 @@ Item
             {
                 if (doubleTapScaleMode)
                 {
-                    initialDoubleTapScale = rootItem.contentScale
                     pinchArea.startPinch()
                 }
                 else
