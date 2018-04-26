@@ -7,11 +7,12 @@ set -e
 #or like this from outside the repository "../nx_vms/cloud_portal/build_scripts/build.sh"
 
 NX_VMS="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/../.."
+[[ "$NX_VMS" =~ (.*)\/cloud_portal.* ]]; REPO=${BASH_REMATCH[1]}
 
 #If we are not using the repository we should update necessary files
-if [[ "$PWD" != *cloud_portal* ]]
+if [[ ! $PWD =~ $REPO ]]
 then
-    echo "Updating Cloud Portal Content"
+    echo "Updating Cloud Portal sources"
     if [ -e "cloud_portal" ]
     then
         pushd cloud_portal
@@ -51,6 +52,7 @@ then
     popd
     cd cloud_portal
 else
+    echo "In repository skip copying sources"
     cd $NX_VMS/cloud_portal
 fi
 
