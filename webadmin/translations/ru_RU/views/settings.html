@@ -42,8 +42,8 @@
                     </div>
                     <div>
                         <h3>Отсоединить сервер от системы</h3>
-                        <p>Это действие отделит сервер от системы, но база данных, локальных пользователей и конфигурация будет сохранена. 
-Видеоархив затронут не будет. <b>Облачные пользователи будут удалены.</b></p>
+                        <p>Это действие отключит сервер от системы с сохранением базы данных, локальных пользователей и конфигурации.
+                            Видео архив останется без изменений. <b>Облачные пользователи будут удалены.</b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Отсоединить от системы</button></p>
                     </div>
                     <div>
@@ -115,9 +115,9 @@
 
                 <tab heading="{{L.settings.tabs.device}}" active="active.device" ng-if="controlDevice">
                     <div ng-if="settings.flags.canSetupNetwork">
-                        <h3>Настройки сети для устройства</h3>
-                         <network-settings settings="networkSettings[0]" ng-if="networkSettings"></network-settings> 
-                         <button class="btn btn-default" ng-click="saveNetworkSettings()">Сохранить настройки и перезагрузить устройство</button>
+                        <h3>Настройки мобильной сети</h3>
+                        <network-settings settings="networkSettings[0]" ng-if="networkSettings"></network-settings>
+                        <button class="btn btn-default" ng-click="saveNetworkSettings()">Сохранить настройки и перезагрузить устройство</button>
                     </div>
                     <div ng-if="settings.flags.canSetupTime">
                         <h3>Дата и время</h3>
