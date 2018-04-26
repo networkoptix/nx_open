@@ -46,7 +46,7 @@ class LocalAccess(object):
     def run_command(cls, command, input=None, cwd=None, env=None, timeout_sec=60 * 60):
         kwargs = cls._make_kwargs(cwd, env, input is not None)
         command = [str(arg) for arg in command]
-        _logger.debug('Run command:\n%r', sh_command_to_script(command))
+        _logger.debug('Run command:\n%s', sh_command_to_script(command))
         process = subprocess.Popen(command, shell=False, **kwargs)
         return cls._communicate(process, input, timeout_sec)
 
