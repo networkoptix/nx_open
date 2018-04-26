@@ -143,7 +143,7 @@
     "weakMessage": "使用數字, 大寫和小寫字母及特殊字元使您密碼更強",
     "strongMessage": "理想的密碼!",
     "commonMessage": "此密碼是很常用的組合",
-    "missingMessage": "Password is required"
+    "missingMessage": "密碼是必填的"
   },
   "sharing": {
     "confirmOwner": "如果您更改系統擁有者, 您將註銷目前此帳號的所有權. 此操作是不可逆的, 是否確定?",

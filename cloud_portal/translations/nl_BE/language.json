@@ -1,7 +1,7 @@
 {
   "language_name": "Vlaams",
-  "productName": "{{PRODUCT_NAME}}",
-  "clientProtocol": "{{CLIENT_PROTOCOL}}:",
+  "productName": "%PRODUCT_NAME%",
+  "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
     "okButton": "Oké",
     "cancelButton": "Annuleren",
@@ -160,7 +160,7 @@
     "offline": "Systeem is offline",
     "openClient": "Open in %VMS_NAME%",
     "openClientNoSystem": "Open %VMS_NAME%",
-    "confirmMergeAction": "Merge",
+    "confirmMergeAction": "Samenvoegen",
     "mergeSystemTitle": "Systemen samenvoegen",
     "confirmRenameTitle": "Systeemnaam",
     "confirmRenameAction": "Opslaan",

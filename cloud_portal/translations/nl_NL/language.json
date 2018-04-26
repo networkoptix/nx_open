@@ -160,7 +160,7 @@
     "offline": "Systeem is offline",
     "openClient": "Open in %VMS_NAME%",
     "openClientNoSystem": "Open %VMS_NAME%",
-    "confirmMergeAction": "Merge",
+    "confirmMergeAction": "Samenvoegen",
     "mergeSystemTitle": "Samenvoegen",
     "confirmRenameTitle": "Systeemnaam",
     "confirmRenameAction": "Opslaan",
