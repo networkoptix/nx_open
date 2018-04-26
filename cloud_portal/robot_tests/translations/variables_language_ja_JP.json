@@ -50,6 +50,7 @@
     "EMAIL ALREADY REGISTERED TEXT": "このEmailは既に {{PRODUCT_NAME}} に登録されています",
     "EMAIL INVALID TEXT": "有効なメールアドレスを入力して下さい",
     "PASSWORD IS REQUIRED TEXT": "パスワードが必要",
+    "CURRENT PASSWORD IS REQUIRED TEXT": "現在のパスワードが必要です",
     "PASSWORD SPECIAL CHARS TEXT": "英数字とキーボードの記号のみを使用して、先頭と末尾の空白を避けます",
     "PASSWORD TOO SHORT TEXT": "パスワードは8文字以上必要です",
     "PASSWORD TOO COMMON TEXT": "このパスワードは、世界で最も人気のあるパスワード",

@@ -30,7 +30,7 @@
     "restorePasswordCode": "重置密码-",
     "view": "查看相机 - ",
     "debug": "调试",
-    "login": "登录-",
+    "login": "登录 -",
     "download": "下载 {{VMS_NAME}}",
     "downloadPlatform": "下载的 {{VMS_NAME}} ",
     "pageNotFound": "找不到页面"
@@ -142,7 +142,8 @@
     "requiredMessage": "使用只有拉丁文字母、 数字和符号键盘，避免前导和尾随空格",
     "weakMessage": "使用数字、 上层和小写字母和特殊字符，使您更强的密码",
     "strongMessage": "强密码 ！",
-    "commonMessage": "此密码是在世界顶级最受欢迎的密码"
+    "commonMessage": "此密码是在世界顶级最受欢迎的密码",
+    "missingMessage": "密码为必填项"
   },
   "sharing": {
     "confirmOwner": "如果您更改系统所有者，将撤消从当前帐户的所有权。此操作是不可逆的。是否确定？",

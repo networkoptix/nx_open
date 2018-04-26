@@ -61,7 +61,7 @@
     },
     "Advanced Viewer": {
       "label": "Visor avanzado",
-      "description": "Puede ver el vídeo vivo, ver el archivo, configurar cámaras, controlar PTZ etc"
+      "description": "Puede ver el vídeo vivo, hojear el archivo, configurar cámaras, controlar PTZ etc"
     },
     "Administrator": {
       "label": "Administrador",
@@ -93,7 +93,7 @@
     },
     "advancedViewer": {
       "label": "Observador avanzado",
-      "description": "Puede ver el vídeo vivo, ver el archivo, configurar cámaras, controlar PTZ etc"
+      "description": "Puede ver el vídeo vivo, hojear el archivo, configurar cámaras, controlar PTZ etc"
     },
     "custom": {
       "label": "Personalizado",
@@ -142,7 +142,8 @@
     "requiredMessage": "Utilice sólo letras, números y símbolos de teclado, evite los espacios iniciales y finales",
     "weakMessage": "Uso de números, letras mayúsculas y minúsculas y caracteres especiales para hacer su contraseña más fuerte",
     "strongMessage": "¡Contraseña segura!",
-    "commonMessage": "Esta contraseña se encuentra entre los más populares en el mundo"
+    "commonMessage": "Esta contraseña se encuentra entre los más populares en el mundo",
+    "missingMessage": "Se requiere contraseña"
   },
   "sharing": {
     "confirmOwner": "Si se cambia el dueño del sistema, revocará la titularidad de esta cuenta. Esta acción es irreversible. ¿Está seguro?",

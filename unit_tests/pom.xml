@@ -41,7 +41,7 @@
                 </os>
             </activation>
             <modules>
-                <module>mediaserver_core_ut</module>
+                <!-- <module>mediaserver_core_ut</module> -->
             </modules>
         </profile>
 

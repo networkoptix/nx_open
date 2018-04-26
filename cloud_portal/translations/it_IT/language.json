@@ -1,5 +1,5 @@
 {
-  "language_name": "NOME_LINGUA",
+  "language_name": "Italiano",
   "productName": "{{PRODUCT_NAME}}",
   "clientProtocol": "{{CLIENT_PROTOCOL}}:",
   "dialogs": {
@@ -142,7 +142,8 @@
     "requiredMessage": "Usa solo lettere latine, numeri e simboli della tastiera, evita spazi iniziali e finali",
     "weakMessage": "Utilizzare numeri, lettere maiuscole e minuscole e caratteri speciali per rendere più sicura la password",
     "strongMessage": "Password sicura!",
-    "commonMessage": "Questa password è nelle migliori e più popolari password utilizzate nel mondo"
+    "commonMessage": "Questa password è nelle migliori e più popolari password utilizzate nel mondo",
+    "missingMessage": "Password is required"
   },
   "sharing": {
     "confirmOwner": "Se cambi proprietario del sistema, revocherai la proprietà dall'account corrente. Questa azione è irreversibile. E' sicuro?",

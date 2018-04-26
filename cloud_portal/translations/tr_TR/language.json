@@ -1,5 +1,5 @@
 {
-  "language_name": "DİL ADI",
+  "language_name": "Türk",
   "productName": "{{PRODUCT_NAME}}",
   "clientProtocol": "{{CLIENT_PROTOCOL}}:",
   "dialogs": {
@@ -142,7 +142,8 @@
     "requiredMessage": "Sadece alfanümerik ve klavye karakterleri kullanın",
     "weakMessage": "Parolanın güçlü olması için \nküçük büyük harf ve özel karakterler kullanın",
     "strongMessage": "Güçlü parola!",
-    "commonMessage": "Dünyada en çok kullanılan parolayı seçtiniz"
+    "commonMessage": "Dünyada en çok kullanılan parolayı seçtiniz",
+    "missingMessage": "Password is required"
   },
   "sharing": {
     "confirmOwner": "Sistem sahibini değiştirirseniz, hesabınızdaki yetkileri iptal edersiniz. Bu eylem geri döndürülemez. Emin misiniz?",

@@ -121,6 +121,7 @@ INCLUDEPATH +=  ${project.build.sourceDirectory} \
                 $$ROOT_DIR/common_libs/nx_utils/src \
                 $$ROOT_DIR/common_libs/nx_media/src \
                 $$ROOT_DIR/common_libs/nx_audio/src \
+                $$ROOT_DIR/vms_libs/nx_vms_api/src \
                 ${packages.dir}/any/nx_kit/src \
                 $$clean_path("${libdir}")/include \
                 $$ADDITIONAL_QT_INCLUDES
