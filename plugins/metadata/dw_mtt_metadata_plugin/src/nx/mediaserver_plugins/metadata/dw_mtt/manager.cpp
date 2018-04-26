@@ -291,6 +291,9 @@ void Manager::onReceive(SystemError::ErrorCode code, size_t size)
 
     NX_URL_PRINT << size << "byte(s) received";
 
+    const QByteArray xmlBeginning = R"(<?xml version="1.0" encoding="UTF-8" ?>)";
+    const QByteArray xmlEnding = R"(</config>)";
+
     const QByteArray alarmTagOpen = R"(<smartType type="openAlramObj">)";
     const QByteArray alarmTagClose = R"(</smartType>)";
 

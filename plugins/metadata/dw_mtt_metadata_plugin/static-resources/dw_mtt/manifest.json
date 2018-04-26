@@ -24,7 +24,7 @@
             "flags": "stateDependent",
             "internalName": "VFD",
             "group": 1,
-            "unsupported": true
+            "--unsupported": true
         },
         {
             "eventTypeId": "ba0cde26-a5c9-4101-ae59-7cda70a2fa76",
