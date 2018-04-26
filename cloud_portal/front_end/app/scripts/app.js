@@ -314,7 +314,7 @@ window.L = {};
                                 // controller: 'DownloadCtrl'
                                 template: ''
                             })
-                            .when('/', { 
+                            .when('/', {
                                 title: ''/*languageServiceProvider.$get().lang.pageTitles.startPage*/,
                                 templateUrl: CONFIG.viewsDir + 'startPage.html',
                                 controller: 'StartPageCtrl'
