@@ -25,6 +25,7 @@ def determine_package_versions():
 
     if platform == "windows":
         v["qt"] = "5.6.1-1"
+        v["ffmpeg"] = "3.1.9"
 
     if platform == "linux" and box == "none":
         v["qt"] = "5.6.2-2"
@@ -101,11 +102,6 @@ def sync_dependencies(syncher):
         sync("openssl")
 
     sync("ffmpeg")
-
-    if platform in ("linux", "macosx") and arch in ("x64", "x86"):
-        sync("libmp3lame-3.100")
-        sync("libvpx-1.7.0")
-        sync("vorbis-1.3.5")
 
     if platform == "linux" and box in ("bpi", "bananapi", "rpi", "tx1", "none"):
         sync("sysroot", path_variable="sysroot_directory")

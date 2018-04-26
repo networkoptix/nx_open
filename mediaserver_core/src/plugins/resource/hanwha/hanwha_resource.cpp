@@ -24,6 +24,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/fusion/fusion/fusion.h>
 #include <nx/fusion/serialization/json.h>
+#include <nx/fusion/serialization/lexical.h>
 #include <nx/vms/event/events/events.h>
 #include <nx/sdk/metadata/plugin.h>
 #include <nx/mediaserver/resource/shared_context_pool.h>
@@ -809,13 +810,21 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
             saveParams();
         });
 
-    const auto sharedContext = qnServerModule->sharedContextPool()
+    const auto sharedContext = qnServerModule
+        ->sharedContextPool()
         ->sharedContext<HanwhaSharedResourceContext>(toSharedPointer(this));
+
     {
         QnMutexLocker lock(&m_mutex);
         m_sharedContext = sharedContext;
     }
+
     m_sharedContext->setRecourceAccess(getUrl(), getAuth());
+    m_sharedContext->setChunkLoaderSettings(
+        {
+            std::chrono::seconds(qnGlobalSettings->hanwhaChunkReaderResponseTimeoutSeconds()),
+            std::chrono::seconds(qnGlobalSettings->hanwhaChunkReaderMessageBodyTimeoutSeconds())
+        });
 
     CameraDiagnostics::Result result = initSystem();
     if (!result)
@@ -933,17 +942,22 @@ CameraDiagnostics::Result HanwhaResource::initSystem()
     if (!info)
         return info.diagnostics;
 
-    m_isNvr = false;
-    if (info->deviceType == kHanwhaNvrDeviceType)
-    {
-        m_isNvr = true;
-        setProperty(Qn::DTS_PARAM_NAME, lit("1")); //< Use external archive, don't record.
-    }
+    m_deviceType = QnLexical::deserialized<HanwhaDeviceType>(
+        info->deviceType,
+        HanwhaDeviceType::unknown);
+
+    const auto nxDeviceType = fromHanwhaToNxDeviceType(deviceType());
+
+    // Set device type only for NVRs and encoders due to optimization purposes.
+    if (nx::core::resource::isProxyDeviceType(nxDeviceType))
+        setDeviceType(nxDeviceType);
 
     if (!info->firmware.isEmpty())
         setFirmware(info->firmware);
 
     m_attributes = std::move(info->attributes);
+    m_cgiParameters = std::move(info->cgiParameters);
+    m_isChannelConnectedViaSunapi = true;
 
     if (isNvr())
     {
@@ -963,28 +977,16 @@ CameraDiagnostics::Result HanwhaResource::initSystem()
             handleProxiedDeviceInfo(proxiedDeviceInfo);
         }
     }
-    else
-    {
-        m_isChannelConnectedViaSunapi = true;
-    }
-
-    if (auto parameters = sharedContext()->cgiParameters())
-        m_cgiParameters = std::move(parameters.value);
-    else
-        return parameters.diagnostics;
 
     return CameraDiagnostics::NoErrorResult();
 }
 
 CameraDiagnostics::Result HanwhaResource::initMedia()
 {
-    if (m_isNvr && !isVideoSourceActive())
-    {
-        return CameraDiagnostics::CameraInvalidParams(
-            lit("Video source is not active"));
-    }
+    if (isNvr() && !isVideoSourceActive())
+        return CameraDiagnostics::CameraInvalidParams(lit("Video source is not active"));
 
-    auto videoProfiles = sharedContext()->videoProfiles();
+    const auto videoProfiles = sharedContext()->videoProfiles();
     if (!videoProfiles)
         return videoProfiles.diagnostics;
 
@@ -998,13 +1000,9 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
 
     if (isConnectedViaSunapi())
     {
-        HanwhaRequestHelper helper(sharedContext());
-        helper.set(
-            lit("network/rtsp"),
-            {{lit("ProfileSessionPolicy"), lit("Disconnect")}});
+        setProfileSessionPolicy();
 
         int fixedProfileCount = 0;
-
         const auto channelPrefix = kHanwhaChannelPropertyTemplate.arg(channel);
         for (const auto& entry: videoProfiles->response())
         {
@@ -1056,6 +1054,39 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
             = (profileByRole(Qn::CR_SecondaryLiveVideo) != kHanwhaInvalidProfile);
 
         initMediaStreamCapabilities();
+    }
+
+    return CameraDiagnostics::NoErrorResult();
+}
+
+CameraDiagnostics::Result HanwhaResource::setProfileSessionPolicy()
+{
+    const auto sessionPolicyParameter = m_cgiParameters
+        .parameter(lit("network/rtsp/set/ProfileSessionPolicy"));
+
+    if (!sessionPolicyParameter)
+    {
+        NX_VERBOSE(
+            this,
+            lm("ProfileSessionPolicy parameter is not available for %1 (%2)")
+                .args(getName(), getUniqueId()));
+
+        return CameraDiagnostics::NoErrorResult();
+    }
+
+    HanwhaRequestHelper helper(sharedContext());
+    auto result = helper.set(
+        lit("network/rtsp"),
+        {{lit("ProfileSessionPolicy"), lit("Disconnect")}});
+
+    if (!result.isSuccessful())
+    {
+        NX_WARNING(
+            this,
+            lm("Failed to appliy 'Disconnect' rtsp profile session policy to %1 (%2)")
+                .args(getName(), getUniqueId()));
+
+        // Ignore this error since it's not critical.
     }
 
     return CameraDiagnostics::NoErrorResult();
@@ -1643,15 +1674,15 @@ CameraDiagnostics::Result HanwhaResource::findProfiles(
         const auto& profile = entry.second;
         const bool isPrimaryProfile =
             profile.name == nxProfileName(Qn::ConnectionRole::CR_LiveVideo)
-            || profile.name == nxProfileName(
+            || profile.name == nxProfileName( //< Obsolete profile name caused by wrong length.
                 Qn::ConnectionRole::CR_LiveVideo,
-                kHanwhaProfileNameMaxLength); //< Obsolete profile name caused by wrong length.
+                kHanwhaProfileNameDefaultMaxLength);
 
         const bool isSecondaryProfile =
             profile.name == nxProfileName(Qn::ConnectionRole::CR_SecondaryLiveVideo)
-            || profile.name == nxProfileName(
+            || profile.name == nxProfileName( //< Obsolete profile name caused by wrong length.
                 Qn::ConnectionRole::CR_SecondaryLiveVideo,
-                kHanwhaProfileNameMaxLength); //< Obsolete profile name caused by wrong length.
+                kHanwhaProfileNameDefaultMaxLength);
 
         if (isPrimaryProfile)
             *outPrimaryProfile = profile;
@@ -1740,8 +1771,8 @@ CameraDiagnostics::Result HanwhaResource::updateProfileNameIfNeeded(
 {
     const auto properProfileName = nxProfileName(role);
     bool needToUpdateProfileName =
-        (profile.name == nxProfileName(role, kHanwhaProfileNameMaxLength))
-        && (nxProfileName(role, kHanwhaProfileNameMaxLength) != properProfileName);
+        (profile.name == nxProfileName(role, kHanwhaProfileNameDefaultMaxLength))
+        && (nxProfileName(role, kHanwhaProfileNameDefaultMaxLength) != properProfileName);
 
     if (needToUpdateProfileName)
     {
@@ -1750,8 +1781,8 @@ CameraDiagnostics::Result HanwhaResource::updateProfileNameIfNeeded(
         const auto response = helper.update(
             lit("media/videoprofile"),
             {
-                { kHanwhaProfileNumberProperty, QString::number(profile.number) },
-            { kHanwhaProfileNameProperty, properProfileName }
+                {kHanwhaProfileNumberProperty, QString::number(profile.number)},
+                {kHanwhaProfileNameProperty, properProfileName}
             });
 
         if (!response.isSuccessful())
@@ -2897,7 +2928,12 @@ boost::optional<int> HanwhaResource::bypassChannel() const
 
 bool HanwhaResource::isNvr() const
 {
-    return m_isNvr;
+    return m_deviceType == HanwhaDeviceType::nvr;
+}
+
+HanwhaDeviceType HanwhaResource::deviceType() const
+{
+    return m_deviceType;
 }
 
 QString HanwhaResource::nxProfileName(
@@ -2905,7 +2941,7 @@ QString HanwhaResource::nxProfileName(
     boost::optional<int> forcedProfileNameLength) const
 {
     auto maxLength = forcedProfileNameLength == boost::none
-        ? kHanwhaProfileNameMaxLength
+        ? kHanwhaProfileNameDefaultMaxLength
         : forcedProfileNameLength.get();
 
     if (forcedProfileNameLength == boost::none)

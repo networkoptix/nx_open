@@ -1,5 +1,7 @@
 #pragma once
 
+#include <nx/fusion/model_functions_fwd.h>
+
 namespace nx {
 namespace mediaserver_core {
 namespace plugins {
@@ -52,6 +54,19 @@ enum class HanwhaSessionType
 
 //TODO: #dmishin consider using Fusion instead of custom methods.
 
+enum class HanwhaDeviceType
+{
+    unknown,
+    nwc,
+    nvr,
+    dvr,
+    encoder,
+    decoder,
+    hybrid
+};
+
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(HanwhaDeviceType);
+
 static const int kHanwhaBlockedHttpCode = 490;
 static const int kHanwhaInvalidParameterHttpCode = 602;
 
@@ -64,7 +79,7 @@ static const int kHanwhaInvalidChannel = -1;
 static const int kHanwhaDefaultOverlappedId = 0;
 static const int kHanwhaMaxSecondaryStreamArea = 1024 * 768;
 static const int kHanwhaDefaultMaxPresetNumber = 1000;
-static const int kHanwhaProfileNameMaxLength = 12;
+static const int kHanwhaProfileNameDefaultMaxLength = 12;
 
 static const QString kHanwhaDateTimeFormat("yyyy-MM-dd hh:mm:ss");
 static const QString kHanwhaUtcDateTimeFormat("yyyy-MM-ddThh:mm:ssZ");
@@ -228,3 +243,5 @@ static const QString kSecondaryStreamFpsParamName = lit("secondaryStreamFps");
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
+
+QN_FUSION_DECLARE_FUNCTIONS(nx::mediaserver_core::plugins::HanwhaDeviceType, (lexical));

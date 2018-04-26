@@ -6,7 +6,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/time.h>
-#include <sys/select.h>
+#include <sys/poll.h>
 #include <fcntl.h>
 #include "../../system_commands.h"
 #include "read_linux.h"
@@ -27,20 +27,19 @@ static const int kMaximumAcceptTimeoutSec = 3;
 
 static int acceptWithTimeout(int fd, int timeoutSec)
 {
-   int result;
-   struct timeval tv;
-   fd_set rfds;
-   FD_ZERO(&rfds);
-   FD_SET(fd, &rfds);
+    struct pollfd sockPollfd;
 
-   tv.tv_sec = (long)timeoutSec;
-   tv.tv_usec = 0;
+    memset(&sockPollfd, 0, sizeof(sockPollfd));
+    sockPollfd.fd = fd;
+    sockPollfd.events = POLLIN;
 
-   result = select(fd + 1, &rfds, (fd_set*) 0, (fd_set*) 0, &tv);
-   if(result > 0)
-       return accept(fd, NULL, NULL);
+    if (poll(&sockPollfd, 1, timeoutSec * 1000) <= 0)
+        return -1;
 
-   return -1;
+    if (sockPollfd.revents & POLLIN)
+        return accept(fd, NULL, NULL);
+
+    return -1;
 }
 
 static int acceptConnection(const char* path)

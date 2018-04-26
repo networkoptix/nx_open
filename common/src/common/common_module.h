@@ -278,8 +278,8 @@ public:
      * Media server will not receive connections from another peers while it is disabled.
      * Hive mode is enabled by default.
      */
-    void setHiveModeEnabled(bool value);
-    bool isHiveModeEnabled() const;
+    void setStandAloneMode(bool value);
+    bool isStandAloneMode() const;
 
     /** instanceCounter used for unit test purpose only */
 signals:
@@ -288,7 +288,7 @@ signals:
     void remoteIdChanged(const QnUuid &id);
     void systemIdentityTimeChanged(qint64 value, const QnUuid& sender);
     void runningInstanceGUIDChanged();
-    void hiveModeEnabledChanged(bool value);
+    void standAloneModeChanged(bool value);
 private:
     void createMessageProcessorInternal(QnCommonMessageProcessor* messageProcessor);
     void resetCachedValue();
@@ -344,5 +344,5 @@ private:
     nx::analytics::MetadataPluginFactory* m_metadataPluginFactory = nullptr;
 
     QnUuid m_videowallGuid;
-    bool m_hiveModeEnabled = true;
+    bool m_standaloneMode = false;
 };

@@ -68,7 +68,7 @@ void QnTransactionTcpProcessor::run()
     parseRequest();
 
 
-    if (!commonModule()->isHiveModeEnabled())
+    if (commonModule()->isStandAloneMode())
     {
         NX_DEBUG(this, "Incoming messageBus connections are temporary disabled. Ignore new incoming connection.");
         sendResponse(nx_http::StatusCode::forbidden, nx_http::StringType());

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <atomic>
+
 #include <QtCore/QMap>
 #include <QtCore/QElapsedTimer>
 
@@ -12,6 +14,7 @@
 #include <plugins/resource/hanwha/hanwha_time_synchronizer.h>
 #include <plugins/resource/hanwha/hanwha_utils.h>
 #include <plugins/resource/hanwha/hanwha_codec_limits.h>
+#include <plugins/resource/hanwha/hanwha_chunk_reader.h>
 #include <recording/time_period_list.h>
 #include <core/resource/abstract_remote_archive_manager.h>
 
@@ -22,8 +25,6 @@ namespace plugins {
 static const std::chrono::seconds kUpdateCacheTimeout(30);
 static const std::chrono::seconds kUnsuccessfulUpdateCacheTimeout(10);
 
-class HanwhaChunkLoader;
-
 struct HanwhaInformation
 {
     QString deviceType;
@@ -32,6 +33,7 @@ struct HanwhaInformation
     QString model;
     int channelCount = 0;
     HanwhaAttributes attributes;
+    HanwhaCgiParameters cgiParameters;
 };
 
 template<typename Value>
@@ -52,7 +54,7 @@ public:
     HanwhaCachedData(
         std::function<HanwhaResult<Value>()> getter,
         std::chrono::milliseconds timeout)
-    :
+        :
         m_getter(std::move(getter)), m_timeout(timeout)
     {
     }
@@ -108,7 +110,6 @@ class HanwhaSharedResourceContext:
     public nx::mediaserver::resource::AbstractSharedResourceContext,
     public std::enable_shared_from_this<HanwhaSharedResourceContext>
 {
-
 public:
     HanwhaSharedResourceContext(
         const nx::mediaserver::resource::AbstractSharedResourceContext::SharedId& sharedId);
@@ -137,9 +138,10 @@ public:
     std::chrono::seconds timeZoneShift() const;
     void setDateTime(const QDateTime& dateTime);
 
+    void setChunkLoaderSettings(const HanwhaChunkLoaderSettings& settings);
+
     // NOTE: function objects return HanwhaResult<T>.
     HanwhaCachedData<HanwhaInformation> information;
-    HanwhaCachedData<HanwhaCgiParameters> cgiParameters;
     HanwhaCachedData<HanwhaResponse> eventStatuses;
     HanwhaCachedData<HanwhaResponse> videoSources;
     HanwhaCachedData<HanwhaResponse> videoProfiles;
@@ -147,13 +149,16 @@ public:
 
 private:
     HanwhaResult<HanwhaInformation> loadInformation();
-    HanwhaResult<HanwhaCgiParameters> loadCgiParameters();
     HanwhaResult<HanwhaResponse> loadEventStatuses();
     HanwhaResult<HanwhaResponse> loadVideoSources();
     HanwhaResult<HanwhaResponse> loadVideoProfiles();
     HanwhaResult<HanwhaCodecInfo> loadVideoCodecInfo();
 
     void cleanupUnsafe();
+
+private:
+    static const int kDefaultNvrMaxLiveSessions = 10;
+    static const int kDefaultNvrMaxArchiveSessions = 3;
 
     const nx::mediaserver::resource::AbstractSharedResourceContext::SharedId m_sharedId;
 
@@ -172,7 +177,13 @@ private:
     std::shared_ptr<HanwhaChunkLoader> m_chunkLoader;
     std::unique_ptr<HanwhaTimeSyncronizer> m_timeSynchronizer;
 
+    HanwhaChunkLoaderSettings m_chunkLoaderSettings;
+
     std::atomic<std::chrono::seconds> m_timeZoneShift{std::chrono::seconds::zero()};
+
+    // We care only about archive sesions because normally we use only one
+    // live connection independently of the number of client connections.
+    std::atomic<int> m_maxArchiveSessions{kDefaultNvrMaxArchiveSessions};
 
     mutable QnMutex m_servicesMutex;
 };

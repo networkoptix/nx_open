@@ -479,18 +479,18 @@ void QnCommonModule::setResourceDiscoveryManager(QnResourceDiscoveryManager* dis
     m_resourceDiscoveryManager = discoveryManager;
 }
 
-void QnCommonModule::setHiveModeEnabled(bool value)
+void QnCommonModule::setStandAloneMode(bool value)
 {
     QnMutexLocker lock(&m_mutex);
-    if (m_hiveModeEnabled != value)
+    if (m_standaloneMode != value)
     {
-        m_hiveModeEnabled = value;
+        m_standaloneMode = value;
         lock.unlock();
-        emit hiveModeEnabledChanged(value);
+        emit standAloneModeChanged(value);
     }
 }
 
-bool QnCommonModule::isHiveModeEnabled() const
+bool QnCommonModule::isStandAloneMode() const
 {
-    return m_hiveModeEnabled;
+    return m_standaloneMode;
 }

@@ -25,13 +25,13 @@ QnServerConnector::QnServerConnector(QnCommonModule* commonModule):
     QObject(),
     QnCommonModuleAware(commonModule)
 {
-    connect(commonModule, &QnCommonModule::hiveModeEnabledChanged, this,
+    connect(commonModule, &QnCommonModule::standAloneModeChanged, this,
         [this](bool value)
         {
             if (value)
-                start();
-            else
                 stop();
+            else
+                start();
         }, Qt::DirectConnection);
 }
 
