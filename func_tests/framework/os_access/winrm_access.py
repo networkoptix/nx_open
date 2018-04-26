@@ -49,7 +49,7 @@ class WinRMAccess(object):
     def __del__(self):
         # Exit when object is garbage-collected.
         # There's no big problem if this is not called.
-        self._shell.__exit__(None, None, None)
+        self._shell().__exit__(None, None, None)
 
     @lrudecorator(1)
     def _shell(self):
