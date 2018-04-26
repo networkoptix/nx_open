@@ -479,8 +479,9 @@ bool QnSecurityCamResource::hasDualStreaming() const
     return val.toInt() > 0;
 }
 
-bool QnSecurityCamResource::isDtsBased() const {
-    return m_cachedIsDtsBased.get();
+bool QnSecurityCamResource::isDtsBased() const
+{
+    return m_cachedIsDtsBased.get() || deviceType() == nx::core::resource::DeviceType::nvr;
 }
 
 bool QnSecurityCamResource::canConfigureRecording() const

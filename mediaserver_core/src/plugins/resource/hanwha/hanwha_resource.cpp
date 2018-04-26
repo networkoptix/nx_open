@@ -952,9 +952,6 @@ CameraDiagnostics::Result HanwhaResource::initSystem()
     if (nx::core::resource::isProxyDeviceType(nxDeviceType))
         setDeviceType(nxDeviceType);
 
-    if (isNvr())
-        setProperty(Qn::DTS_PARAM_NAME, lit("1")); //< Use external archive, don't record.
-
     if (!info->firmware.isEmpty())
         setFirmware(info->firmware);
 
