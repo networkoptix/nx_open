@@ -144,7 +144,10 @@ protected:
 private:
     CameraDiagnostics::Result initDevice();
     CameraDiagnostics::Result initSystem();
+
     CameraDiagnostics::Result initMedia();
+    CameraDiagnostics::Result setProfileSessionPolicy();
+
     CameraDiagnostics::Result initIo();
     CameraDiagnostics::Result initPtz();
     CameraDiagnostics::Result initAlternativePtz();

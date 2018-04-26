@@ -994,12 +994,9 @@ CameraDiagnostics::Result HanwhaResource::initSystem()
 CameraDiagnostics::Result HanwhaResource::initMedia()
 {
     if (isNvr() && !isVideoSourceActive())
-    {
-        return CameraDiagnostics::CameraInvalidParams(
-            lit("Video source is not active"));
-    }
+        return CameraDiagnostics::CameraInvalidParams(lit("Video source is not active"));
 
-    auto videoProfiles = sharedContext()->videoProfiles();
+    const auto videoProfiles = sharedContext()->videoProfiles();
     if (!videoProfiles)
         return videoProfiles.diagnostics;
 
@@ -1013,13 +1010,9 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
 
     if (isConnectedViaSunapi())
     {
-        HanwhaRequestHelper helper(sharedContext());
-        helper.set(
-            lit("network/rtsp"),
-            {{lit("ProfileSessionPolicy"), lit("Disconnect")}});
+        setProfileSessionPolicy();
 
         int fixedProfileCount = 0;
-
         const auto channelPrefix = kHanwhaChannelPropertyTemplate.arg(channel);
         for (const auto& entry: videoProfiles->response())
         {
@@ -1071,6 +1064,40 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
             = (profileByRole(Qn::CR_SecondaryLiveVideo) != kHanwhaInvalidProfile);
 
         initMediaStreamCapabilities();
+    }
+
+    return CameraDiagnostics::NoErrorResult();
+}
+
+CameraDiagnostics::Result HanwhaResource::setProfileSessionPolicy()
+{
+    const auto sessionPolicyParameter = sharedContext()
+        ->cgiParameters()
+        ->parameter(lit("network/rtsp/set/ProfileSessionPolicy"));
+
+    if (!sessionPolicyParameter)
+    {
+        NX_VERBOSE(
+            this,
+            lm("ProfileSessionPolicy parameter is not available for %1 (%2)")
+                .args(getName(), getUniqueId()));
+
+        return CameraDiagnostics::NoErrorResult();
+    }
+
+    HanwhaRequestHelper helper(sharedContext());
+    auto result = helper.set(
+        lit("network/rtsp"),
+        {{lit("ProfileSessionPolicy"), lit("Disconnect")}});
+
+    if (!result.isSuccessful())
+    {
+        NX_WARNING(
+            this,
+            lm("Failed to appliy 'Disconnect' rtsp profile session policy to %1 (%2)")
+                .args(getName(), getUniqueId()));
+
+        // Ignore this error since it's not critical.
     }
 
     return CameraDiagnostics::NoErrorResult();
