@@ -273,3 +273,8 @@ nx_configure_file(
     ${CMAKE_CURRENT_BINARY_DIR})
 
 nx_save_known_files()
+
+if(withClouds)
+    add_subdirectory(cloud_portal)
+    add_custom_target(cloud DEPENDS cloud-backend cloud-frontend)
+endif()
