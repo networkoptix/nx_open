@@ -14,7 +14,7 @@ namespace client {
 namespace desktop {
 
 CameraFisheyeSettingsWidget::CameraFisheyeSettingsWidget(
-    QSharedPointer<QnImageProvider> previewProvider,
+    QSharedPointer<ImageProvider> previewProvider,
     CameraSettingsDialogStore* store,
     QWidget* parent)
     :

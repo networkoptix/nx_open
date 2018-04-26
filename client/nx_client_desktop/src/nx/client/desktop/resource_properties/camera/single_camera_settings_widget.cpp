@@ -74,7 +74,7 @@ SingleCameraSettingsWidget::SingleCameraSettingsWidget(QWidget *parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::SingleCameraSettingsWidget),
-    m_cameraThumbnailManager(new QnCameraThumbnailManager()),
+    m_cameraThumbnailManager(new CameraThumbnailManager()),
     m_sensitivityButtons(new QButtonGroup(this))
 {
     ui->setupUi(this);

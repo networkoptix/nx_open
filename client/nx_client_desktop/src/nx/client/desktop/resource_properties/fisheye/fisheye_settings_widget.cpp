@@ -131,7 +131,7 @@ FisheyeSettingsWidget::~FisheyeSettingsWidget()
 {
 }
 
-void FisheyeSettingsWidget::updateFromParams(const QnMediaDewarpingParams& params, QnImageProvider* imageProvider)
+void FisheyeSettingsWidget::updateFromParams(const QnMediaDewarpingParams& params, ImageProvider* imageProvider)
 {
     QSignalBlocker updateBlock(this);
 

@@ -8,7 +8,6 @@
 
 class QLabel;
 class QStackedWidget;
-class QnImageProvider;
 
 namespace nx {
 namespace client {
@@ -16,9 +15,10 @@ namespace desktop {
 
 class BusyIndicatorWidget;
 class AutoscaledPlainText;
+class ImageProvider;
 
 /**
- * The widget shows image from QnImageProvider
+ * The widget shows image from ImageProvider
  */
 class AsyncImageWidget : public Connective<QWidget>
 {
@@ -29,8 +29,8 @@ public:
     explicit AsyncImageWidget(QWidget* parent = nullptr);
     virtual ~AsyncImageWidget();
 
-    QnImageProvider* imageProvider() const;
-    void setImageProvider(QnImageProvider* provider);
+    ImageProvider* imageProvider() const;
+    void setImageProvider(ImageProvider* provider);
 
     BusyIndicatorWidget* busyIndicator() const;
 
@@ -93,7 +93,7 @@ private:
     AutoscaledPlainText* const m_placeholder = nullptr;
     BusyIndicatorWidget* const m_indicator = nullptr;
     QPixmap m_preview;
-    QPointer<QnImageProvider> m_imageProvider;
+    QPointer<ImageProvider> m_imageProvider;
     QPalette::ColorRole m_borderRole = QPalette::Shadow;
     QRectF m_highlightRect;
     CropMode m_cropMode = CropMode::never;

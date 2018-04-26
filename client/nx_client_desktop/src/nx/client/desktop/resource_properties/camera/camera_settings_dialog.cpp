@@ -43,7 +43,7 @@ struct CameraSettingsDialog::Private
     QPointer<CameraSettingsReadOnlyWatcher> readOnlyWatcher;
     QnVirtualCameraResourceList cameras;
     QPointer<QnCamLicenseUsageHelper> licenseUsageHelper;
-    QSharedPointer<QnCameraThumbnailManager> previewManager;
+    QSharedPointer<CameraThumbnailManager> previewManager;
 
     bool hasChanges() const
     {
@@ -104,7 +104,7 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
 
     d->licenseUsageHelper = new QnCamLicenseUsageHelper(commonModule(), this);
 
-    d->previewManager.reset(new QnCameraThumbnailManager());
+    d->previewManager.reset(new CameraThumbnailManager());
     d->previewManager->setAutoRotate(true);
     d->previewManager->setThumbnailSize(QSize(0, 0));
     d->previewManager->setAutoRefresh(false);

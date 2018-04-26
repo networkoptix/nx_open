@@ -3,8 +3,6 @@
 #include <QtCore/QSharedPointer>
 #include <QtWidgets/QWidget>
 
-class QnImageProvider;
-
 namespace nx {
 namespace client {
 namespace desktop {
@@ -13,6 +11,7 @@ struct CameraSettingsDialogState;
 class CameraSettingsDialogStore;
 
 class FisheyeSettingsWidget;
+class ImageProvider;
 
 class CameraFisheyeSettingsWidget: public QWidget
 {
@@ -20,7 +19,7 @@ class CameraFisheyeSettingsWidget: public QWidget
     using base_type = QWidget;
 
 public:
-    explicit CameraFisheyeSettingsWidget(QSharedPointer<QnImageProvider> previewProvider,
+    explicit CameraFisheyeSettingsWidget(QSharedPointer<ImageProvider> previewProvider,
         CameraSettingsDialogStore* store, QWidget* parent = nullptr);
 
     virtual ~CameraFisheyeSettingsWidget() override;
@@ -29,7 +28,7 @@ private:
     void loadState(const CameraSettingsDialogState& state);
 
 private:
-    QSharedPointer<QnImageProvider> m_previewProvider;
+    QSharedPointer<ImageProvider> m_previewProvider;
     FisheyeSettingsWidget* const m_widget = nullptr;
 };
 

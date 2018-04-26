@@ -16,16 +16,21 @@
 
 #include "image_provider.h"
 
+namespace nx {
+namespace client {
+namespace desktop {
 
 // TODO: #GDM create an application-wide set of thumbnails managers with different options: VMS-6759
-class QnCameraThumbnailManager: public QnImageProvider, public QnConnectionContextAware
+class CameraThumbnailManager:
+    public ImageProvider,
+    public QnConnectionContextAware
 {
     Q_OBJECT
+    using base_type = ImageProvider;
 
-    using base_type = QnImageProvider;
 public:
-    explicit QnCameraThumbnailManager(QObject* parent = nullptr);
-    virtual ~QnCameraThumbnailManager();
+    explicit CameraThumbnailManager(QObject* parent = nullptr);
+    virtual ~CameraThumbnailManager() override;
 
     QnVirtualCameraResourcePtr selectedCamera() const;
     void selectCamera(const QnVirtualCameraResourcePtr& camera);
@@ -86,6 +91,10 @@ private:
     QHash<QnVirtualCameraResourcePtr, ThumbnailData> m_thumbnailByCamera;
     QnVirtualCameraResourcePtr m_selectedCamera;
     QSize m_thumbnailSize;
-    QTimer* m_refreshingTimer;
+    QTimer* const m_refreshingTimer = nullptr;
     bool m_autoRotate = true;
 };
+
+} // namespace desktop
+} // namespace client
+} // namespace nx

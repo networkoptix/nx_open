@@ -91,12 +91,12 @@ AsyncImageWidget::~AsyncImageWidget()
 {
 }
 
-QnImageProvider* AsyncImageWidget::imageProvider() const
+ImageProvider* AsyncImageWidget::imageProvider() const
 {
     return m_imageProvider.data();
 }
 
-void AsyncImageWidget::setImageProvider(QnImageProvider* provider)
+void AsyncImageWidget::setImageProvider(ImageProvider* provider)
 {
     if (m_imageProvider == provider)
         return;
@@ -109,13 +109,13 @@ void AsyncImageWidget::setImageProvider(QnImageProvider* provider)
 
     if (m_imageProvider)
     {
-        connect(m_imageProvider, &QnImageProvider::imageChanged, this,
+        connect(m_imageProvider, &ImageProvider::imageChanged, this,
             &AsyncImageWidget::updateThumbnailImage);
 
-        connect(m_imageProvider, &QnImageProvider::statusChanged, this,
+        connect(m_imageProvider, &ImageProvider::statusChanged, this,
             &AsyncImageWidget::updateThumbnailStatus);
 
-        connect(m_imageProvider, &QnImageProvider::sizeHintChanged, this,
+        connect(m_imageProvider, &ImageProvider::sizeHintChanged, this,
             &AsyncImageWidget::invalidateGeometry);
 
         connect(m_imageProvider, &QObject::destroyed, this,
