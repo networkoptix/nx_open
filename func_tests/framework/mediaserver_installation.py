@@ -206,6 +206,9 @@ def install_mediaserver(ssh_access, mediaserver_deb, reinstall=False):
             dpkg --install --force-depends "$DEB"  # Ignore unmet dependencies, which are installed just after.
             apt-get update  # Or "Unable to fetch some archives, maybe run apt-get update or try with --fix-missing?"
             apt-get --fix-broken --assume-yes install  # Install dependencies left by Mediaserver.
+            CORE_PATTERN_FILE='/etc/sysctl.d/60-core-pattern.conf'
+            echo 'kernel.core_pattern=core.%t.%p' > "$CORE_PATTERN_FILE"  # %t is timestamp, %p is pid.
+            sysctl -p "$CORE_PATTERN_FILE"  # See: https://superuser.com/questions/625840
             cp "$CONFIG" "$CONFIG_INITIAL"
             ''',
         env={

@@ -32,7 +32,6 @@ class VMFactory(object):
             if vm_type_configuration['os_family'] == 'linux':
                 hostname, port = info.ports['tcp', 22]
                 ssh_access = SSHAccess(hostname, port)
-                ssh_access.first_setup()  # TODO: Run once when VM is newly created.
                 networking = LinuxNetworking(ssh_access, info.macs.values())
                 os_access = ssh_access  # Lose type information.
             elif vm_type_configuration['os_family'] == 'windows':

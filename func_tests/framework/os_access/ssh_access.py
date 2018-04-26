@@ -59,16 +59,3 @@ class SSHAccess(object):
         started_at = datetime.datetime.now(pytz.utc)
         self.run_command(['date', '--set', new_time.isoformat()])
         return RunningTime(new_time, datetime.datetime.now(pytz.utc) - started_at)
-
-    def first_setup(self):
-        """Run once when VM is just created."""
-        self.run_sh_script(
-            # language=Bash
-            '''
-                # Mediaserver may crash several times during one test, all cores are kept.
-                CORE_PATTERN_FILE='/etc/sysctl.d/60-core-pattern.conf'
-                echo 'kernel.core_pattern=core.%t.%p' > "$CORE_PATTERN_FILE"  # %t is timestamp, %p is pid.
-                sysctl -p "$CORE_PATTERN_FILE"  # See: https://superuser.com/questions/625840
-                apt-get update
-                apt-get --assume-yes install gdb # Required to create stack traces from core dumps.
-                ''')
