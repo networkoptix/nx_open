@@ -294,11 +294,11 @@ public:
     bool showHanwhaAlternativePtzControlsOnTile() const;
     void setShowHanwhaAlternativePtzControlsOnTile(bool showPtzControls);
 
-    int hanwhaChunkReaderResponseTimeoutSeconds() const;
-    void setHanwhaChunkReaderResponseTimeoutSeconds(int value);
+    int hanwhaChunkReaderResponseTimeout() const;
+    void setHanwhaChunkReaderResponseTimeout(int value);
 
-    int hanwhaChunkReaderMessageBodyTimeoutSeconds() const;
-    void setHanwhaChunkReaderMessageBodyTimeoutSeconds(int value);
+    int hanwhaChunkReaderMessageBodyTimeout() const;
+    void setHanwhaChunkReaderMessageBodyTimeout(int value);
 
     bool isEdgeRecordingEnabled() const;
     void setEdgeRecordingEnabled(bool enabled);
@@ -435,8 +435,8 @@ private:
 
     QnResourcePropertyAdaptor<bool>* m_hanwhaDeleteProfilesOnInitIfNeeded = nullptr;
     QnResourcePropertyAdaptor<bool>* m_showHanwhaAlternativePtzControlsOnTile = nullptr;
-    QnResourcePropertyAdaptor<int>* m_hanwhaChunkReaderResponseTimeoutSeconds = nullptr;
-    QnResourcePropertyAdaptor<int>* m_hanwhaChunkReaderMessageBodyTimeoutSeconds = nullptr;
+    QnResourcePropertyAdaptor<int>* m_hanwhaChunkReaderResponseTimeout = nullptr;
+    QnResourcePropertyAdaptor<int>* m_hanwhaChunkReaderMessageBodyTimeout = nullptr;
 
     QnResourcePropertyAdaptor<bool>* m_edgeRecordingEnabledAdaptor = nullptr;
 

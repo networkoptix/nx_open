@@ -646,9 +646,9 @@ void HanwhaChunkLoader::prepareHttpClient()
     m_httpClient->setUserPassword(authenticator.password());
     m_httpClient->setSendTimeout(kSendTimeout);
     m_httpClient->setResponseReadTimeout(
-        std::chrono::seconds(qnGlobalSettings->hanwhaChunkReaderResponseTimeoutSeconds()));
+        std::chrono::seconds(qnGlobalSettings->hanwhaChunkReaderResponseTimeout()));
     m_httpClient->setMessageBodyReadTimeout(
-        std::chrono::seconds(qnGlobalSettings->hanwhaChunkReaderMessageBodyTimeoutSeconds()));
+        std::chrono::seconds(qnGlobalSettings->hanwhaChunkReaderMessageBodyTimeout()));
     m_httpClient->setOnDone([this](){ at_httpClientDone(); });
 }
 
