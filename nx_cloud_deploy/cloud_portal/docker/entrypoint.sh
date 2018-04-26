@@ -20,7 +20,7 @@ function instantiate_config()
     export CLOUD_PORTAL_CONF_DIR=$CLOUD_PORTAL_BASE_CONF_DIR/$customization
     mkdir --parents $CLOUD_PORTAL_CONF_DIR
 
-    local CLOUD_PORTAL_CONF_TEMPLATE=$CLOUD_PORTAL_CONF_DIR/cloud_portal.yaml
+    local CLOUD_PORTAL_CONF_TEMPLATE=$CLOUD_PORTAL_BASE_CONF_DIR/_source/cloud_portal.yaml
     local CLOUD_PORTAL_CONF=$CLOUD_PORTAL_CONF_DIR/cloud_portal.yaml
     local CLOUD_PORTAL_LOCK=${CLOUD_PORTAL_CONF}.lock
 
