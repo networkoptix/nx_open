@@ -276,5 +276,6 @@ nx_save_known_files()
 
 if(withClouds)
     add_subdirectory(cloud_portal)
+    add_subdirectory(nx_cloud_deploy)
     add_custom_target(cloud DEPENDS cloud-backend cloud-frontend)
 endif()
