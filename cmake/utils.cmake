@@ -78,8 +78,6 @@ function(nx_copy)
     foreach(src ${COPY_UNPARSED_ARGUMENTS})
         nx_get_copy_full_destination_name(dst ${src} ${COPY_DESTINATION})
 
-        set(need_copy FALSE)
-
         if(COPY_IF_NEWER)
             file(TIMESTAMP "${src}" src_ts)
             file(TIMESTAMP "${dst}" dst_ts)
