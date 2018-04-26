@@ -7,7 +7,7 @@ with codecs.open("language_list.json", 'r', encoding='utf-8-sig') as languages_l
 
 def allLanguages():
     for name in langList:
-        system('robot -N ' + name + ' -d outputs -e not-ready -V getvars.py:' + langList[name] + ' --timestampoutputs test-cases')
+        system('robot -N ' + name + ' -v headless:true -d outputs -e not-ready -V getvars.py:' + langList[name] + ' --timestampoutputs test-cases')
 
 if __name__ == "__main__":
     allLanguages()
