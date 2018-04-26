@@ -1,5 +1,7 @@
 #pragma once
 
+#include <atomic>
+
 #include <QtCore/QMap>
 #include <QtCore/QElapsedTimer>
 
@@ -52,7 +54,7 @@ public:
     HanwhaCachedData(
         std::function<HanwhaResult<Value>()> getter,
         std::chrono::milliseconds timeout)
-    :
+        :
         m_getter(std::move(getter)), m_timeout(timeout)
     {
     }
@@ -108,7 +110,6 @@ class HanwhaSharedResourceContext:
     public nx::mediaserver::resource::AbstractSharedResourceContext,
     public std::enable_shared_from_this<HanwhaSharedResourceContext>
 {
-
 public:
     HanwhaSharedResourceContext(
         const nx::mediaserver::resource::AbstractSharedResourceContext::SharedId& sharedId);
@@ -155,6 +156,10 @@ private:
 
     void cleanupUnsafe();
 
+private:
+    static const int kDefaultNvrMaxLiveSessions = 10;
+    static const int kDefaultNvrMaxArchiveSessions = 3;
+
     const nx::mediaserver::resource::AbstractSharedResourceContext::SharedId m_sharedId;
 
     mutable QnMutex m_dataMutex;
@@ -175,6 +180,10 @@ private:
     HanwhaChunkLoaderSettings m_chunkLoaderSettings;
 
     std::atomic<std::chrono::seconds> m_timeZoneShift{std::chrono::seconds::zero()};
+
+    // We care only about archive sesions because normally we use only one
+    // live connection independently of the number of client connections.
+    std::atomic<int> m_maxArchiveSessions{kDefaultNvrMaxArchiveSessions};
 
     mutable QnMutex m_servicesMutex;
 };

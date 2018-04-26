@@ -17,13 +17,8 @@ namespace {
 
 // Limited by NPM-9080VQ, it can only be opening 3 stream at the same time, while it has 4.
 static const int kMaxConcurrentRequestNumber = 3;
-
-static const int kNvrMaxLiveConnections = 10;
-static const int kNvrMaxArchiveConnections = 3;
-
 static const std::chrono::seconds kCacheUrlTimeout(10);
 static const std::chrono::seconds kCacheDataTimeout(30);
-
 static const QString kObsoleteInterfaceParameter = lit("Network1");
 
 static const QUrl cleanUrl(QUrl url)
@@ -159,7 +154,7 @@ SessionContextPtr HanwhaSharedResourceContext::session(
     bool isLive = sessionType == HanwhaSessionType::live;
 
     auto& sessionsByClientId = m_sessions[isLive];
-    const int maxConsumers = isLive ? kNvrMaxLiveConnections : kNvrMaxArchiveConnections;
+    const int maxConsumers = isLive ? kDefaultNvrMaxLiveSessions : m_maxArchiveSessions;
     const bool sessionLimitExceeded = !sessionsByClientId.contains(clientId)
         && sessionsByClientId.size() >= maxConsumers;
 
@@ -243,6 +238,12 @@ HanwhaResult<HanwhaInformation> HanwhaSharedResourceContext::loadInformation()
     info.attributes = helper.fetchAttributes(lit("attributes"));
     if (!info.attributes.isValid())
         return {CameraDiagnostics::CameraInvalidParams(lit("Camera attributes are invalid"))};
+
+    const auto maxArchiveSessionsAttribute = info.attributes.attribute<int>(
+        lit("System/MaxSearchSession"));
+
+    if (maxArchiveSessionsAttribute != boost::none)
+        m_maxArchiveSessions = maxArchiveSessionsAttribute.get();
 
     info.cgiParameters = helper.fetchCgiParameters(lit("cgis"));
     if (!info.cgiParameters.isValid())
