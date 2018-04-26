@@ -4,7 +4,7 @@
 #include <map>
 
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/utils/debug.h>
+#include <nx/sdk/utils.h>
 
 #include "plugin.h"
 #include "consuming_camera_manager.h"
@@ -20,11 +20,20 @@ namespace metadata {
  * Base class for a typical implementation of CameraManager which receives video frames and sends
  * back constructed metadata packets. Hides many technical details of Metadata Plugin SDK, but may
  * limit CameraManager capabilities - use only when suitable.
+ *
+ * To use NX_PRINT/NX_OUTPUT in a derived class with the same printPrefix as used in this class,
+ * add the following to the derived class cpp:
+ * <pre><code>
+ *     #define NX_PRINT_PREFIX (this->utils.printPrefix)
+ *     #include <nx/kit/debug.h>
+ * </code></pre>
  */
 class CommonVideoFrameProcessingCameraManager:
-    public nxpt::CommonRefCounter<ConsumingCameraManager>,
-    protected nx::sdk::utils::Debug
+    public nxpt::CommonRefCounter<ConsumingCameraManager>
 {
+protected:
+    const nx::sdk::Utils utils;
+
 protected:
     /**
      * @param enableOutput Enables NX_OUTPUT. Typically, use NX_DEBUG_ENABLE_OUTPUT as a value.
@@ -33,8 +42,8 @@ protected:
      */
     CommonVideoFrameProcessingCameraManager(
         Plugin* plugin,
-        bool enableOutput_,
-        const std::string& printPrefix_ = "");
+        bool enableOutput,
+        const std::string& printPrefix = "");
 
     virtual std::string capabilitiesManifest() = 0;
 

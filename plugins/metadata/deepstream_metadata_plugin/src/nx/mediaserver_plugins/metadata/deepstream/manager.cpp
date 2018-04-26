@@ -147,7 +147,7 @@ const char* Manager::capabilitiesManifest(Error* error)
     if (ini().pipelineType == kOpenAlprPipeline)
     {
         m_manifest += "\""
-            + nxpt::NxGuidHelper::toStdString(kLicensePlateGuid);
+            + nxpt::toStdString(kLicensePlateGuid);
             +"\"";
     }
     else
@@ -155,7 +155,7 @@ const char* Manager::capabilitiesManifest(Error* error)
         for (auto i = 0; i < descriptions.size(); ++i)
         {
             m_manifest += "\""
-                + nxpt::NxGuidHelper::toStdString(descriptions[i].guid);
+                + nxpt::toStdString(descriptions[i].guid);
                 +"\"";
 
             if (i < descriptions.size() - 1)

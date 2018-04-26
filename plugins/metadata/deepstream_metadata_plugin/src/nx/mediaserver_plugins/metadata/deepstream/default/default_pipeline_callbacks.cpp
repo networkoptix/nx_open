@@ -170,7 +170,7 @@ gboolean handleDefaultMetadata(GstBuffer* buffer, GstMeta** meta, gpointer userD
             attributes.emplace_front(
                 nx::sdk::AttributeType::string,
                 "GUID",
-                nxpt::NxGuidHelper::toStdString(guid));
+                nxpt::toStdString(guid));
         }
 
         detectedObject->setAttributes(

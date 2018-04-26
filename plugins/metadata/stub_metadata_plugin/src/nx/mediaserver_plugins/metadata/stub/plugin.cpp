@@ -1,6 +1,6 @@
 #include "plugin.h"
 
-#define NX_PRINT_PREFIX printPrefix()
+#define NX_PRINT_PREFIX (this->utils.printPrefix)
 #include <nx/kit/debug.h>
 
 #include "camera_manager.h"
@@ -47,22 +47,21 @@ void Plugin::initCapabilities()
 
 std::string Plugin::capabilitiesManifest() const
 {
-    using Guid = nxpt::NxGuidHelper;
     return R"json(
         {
-            "driverId": ")json" + Guid::toStdString(kDriverGuid) + R"json(",
+            "driverId": ")json" + nxpt::toStdString(kDriverGuid) + R"json(",
             "driverName": {
                 "value": "Stub Driver"
             },
             "outputEventTypes": [
                 {
-                    "typeId": ")json" + Guid::toStdString(kLineCrossingEventGuid) + R"json(",
+                    "typeId": ")json" + nxpt::toStdString(kLineCrossingEventGuid) + R"json(",
                     "name": {
                         "value": "Line crossing"
                     }
                 },
                 {
-                    "typeId": ")json" + Guid::toStdString(kObjectInTheAreaEventGuid) + R"json(",
+                    "typeId": ")json" + nxpt::toStdString(kObjectInTheAreaEventGuid) + R"json(",
                     "name": {
                         "value": "Object in the area"
                     },
@@ -71,13 +70,13 @@ std::string Plugin::capabilitiesManifest() const
             ],
             "outputObjectTypes": [
                 {
-                    "typeId": ")json" + Guid::toStdString(kCarObjectGuid) + R"json(",
+                    "typeId": ")json" + nxpt::toStdString(kCarObjectGuid) + R"json(",
                     "name": {
                         "value": "Car"
                     }
                 },
                 {
-                    "typeId": ")json" + Guid::toStdString(kHumanFaceObjectGuid) + R"json(",
+                    "typeId": ")json" + nxpt::toStdString(kHumanFaceObjectGuid) + R"json(",
                     "name": {
                         "value": "Human face"
                     }
@@ -124,7 +123,7 @@ std::string Plugin::capabilitiesManifest() const
                         "value": "Add to list"
                     },
                     "supportedObjectTypeIds": [
-                        ")json" + nxpt::NxGuidHelper::toStdString(kCarObjectGuid) + R"json("
+                        ")json" + nxpt::toStdString(kCarObjectGuid) + R"json("
                     ],
                     "settings": {
                         "params": [
@@ -150,7 +149,7 @@ std::string Plugin::capabilitiesManifest() const
                         "value": "Add person (URL-based)"
                     },
                     "supportedObjectTypeIds": [
-                        ")json" + Guid::toStdString(kCarObjectGuid) + R"json("
+                        ")json" + nxpt::toStdString(kCarObjectGuid) + R"json("
                     ]
                 }
             ]
@@ -173,17 +172,8 @@ void Plugin::executeAction(
     std::string* outMessageToUser,
     Error* error)
 {
-    const std::string logHeader = std::string(__func__)
-        + "(actionId: [" + actionId + "]"
-        + ", objectId: " + nxpt::NxGuidHelper::toStdString(objectId)
-        + ", cameraId: " + nxpt::NxGuidHelper::toStdString(cameraId)
-        + ", timestampUs: " + std::to_string(timestampUs)
-        + ")";
-
     if (actionId == "nx.stub.addToList")
     {
-        NX_PRINT << logHeader << ": Returning a message with param values.";
-
         std::string valueA;
         auto paramAIt = params.find("paramA");
         if (paramAIt != params.cend())
@@ -198,16 +188,16 @@ void Plugin::executeAction(
             + "paramA: [" + valueA + "], "
             + "paramB: [" + valueB + "]";
 
+        NX_PRINT << __func__ << "(): Returning a message: [" << *outMessageToUser << "]";
     }
     else if (actionId == "nx.stub.addPerson")
     {
-        *outActionUrl = "http://internal.server/addPerson?objectId=" +
-            nxpt::NxGuidHelper::toStdString(objectId);
-        NX_PRINT << logHeader << ": Returning URL: [" << *outActionUrl << "]";
+        *outActionUrl = "http://internal.server/addPerson?objectId=" + nxpt::toStdString(objectId);
+        NX_PRINT << __func__ << "(): Returning URL: [" << *outActionUrl << "]";
     }
     else
     {
-        NX_PRINT << logHeader << ": ERROR: Unsupported actionId.";
+        NX_PRINT << __func__ << "(): ERROR: Unsupported actionId.";
         *error = Error::unknownError;
     }
 }

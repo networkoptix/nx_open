@@ -291,7 +291,7 @@ std::vector<nxpl::NX_GUID> Plugin::loadClassGuids(const std::string& guidsFilePa
         if (trim(&line)->empty())
             continue;
 
-        auto guid = nxpt::NxGuidHelper::fromStdString(line);
+        auto guid = nxpt::fromStdString(line);
         if (guid == kNullGuid)
             continue;
 
@@ -314,7 +314,7 @@ std::string Plugin::buildManifestObectTypeString(const ObjectClassDescription& d
     })json");
 
     return kObjectTypeStringPrefix
-        + nxpt::NxGuidHelper::toStdString(description.guid)
+        + nxpt::toStdString(description.guid)
         + kObjectTypeStringMiddle
         + description.name
         + kObjectTypeStringPostfix;

@@ -1,11 +1,11 @@
 #include "common_video_frame_processing_camera_manager.h"
 
-#define NX_PRINT_PREFIX printPrefix()
-#define NX_DEBUG_ENABLE_OUTPUT enableOutput()
+#define NX_PRINT_PREFIX (this->utils.printPrefix)
+#define NX_DEBUG_ENABLE_OUTPUT (this->utils.enableOutput)
 #include <nx/kit/debug.h>
 
 #include <nx/sdk/metadata/common_plugin.h>
-#include <nx/sdk/utils/debug.h>
+#include <nx/sdk/utils.h>
 
 namespace nx {
 namespace sdk {
@@ -24,10 +24,10 @@ static std::string makePrintPrefix(Plugin* plugin)
 
 CommonVideoFrameProcessingCameraManager::CommonVideoFrameProcessingCameraManager(
     Plugin* plugin,
-    bool enableOutput_,
-    const std::string& printPrefix_)
+    bool enableOutput,
+    const std::string& printPrefix)
     :
-    Debug(enableOutput_, !printPrefix_.empty() ? printPrefix_ : makePrintPrefix(plugin)),
+    utils(enableOutput, !printPrefix.empty() ? printPrefix : makePrintPrefix(plugin)),
     m_plugin(plugin)
 {
     NX_PRINT << "Created " << this;
@@ -162,11 +162,8 @@ void CommonVideoFrameProcessingCameraManager::freeManifest(const char* data)
 void CommonVideoFrameProcessingCameraManager::setDeclaredSettings(
     const nxpl::Setting* settings, int count)
 {
-    if (!debugOutputSettings(settings, count, "Received CameraManager settings"))
-        return;
-
-    for (int i = 0; i < count; ++i)
-        m_settings[settings[i].name] = settings[i].value;
+    if (!utils.fillAndOutputSettingsMap(&m_settings, settings, count, "Received settings"))
+        return; //< The error is already logged.
 
     settingsChanged();
 }

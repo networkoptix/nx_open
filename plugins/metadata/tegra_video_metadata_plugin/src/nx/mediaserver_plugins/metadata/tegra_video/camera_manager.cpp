@@ -3,15 +3,15 @@
 #include <iostream>
 #include <chrono>
 
-#define NX_PRINT_PREFIX printPrefix()
+#define NX_PRINT_PREFIX (this->utils.printPrefix)
 #include <nx/kit/debug.h>
 
 #include <nx/sdk/metadata/common_metadata_packet.h>
 #include <nx/sdk/metadata/common_object.h>
+#include <nx/mediaserver_plugins/utils/uuid.h>
 
 #include "tegra_video_metadata_plugin_ini.h"
 #include "attribute_options.h"
-#include <nx/mediaserver_plugins/utils/uuid.h>
 
 namespace nx {
 namespace mediaserver_plugins {

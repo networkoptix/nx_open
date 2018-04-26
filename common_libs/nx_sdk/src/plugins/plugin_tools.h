@@ -1,5 +1,9 @@
 #pragma once
 
+/**@file
+ * Various tools for plugins. Header-only.
+ */
+
 #if defined(_WIN32)
     #include <Windows.h>
     #undef min
@@ -343,68 +347,68 @@ public:
 
         return guid;
     }
-
-    static std::string toStdString(
-        const nxpl::NX_GUID& guid,
-        unsigned int format = NxGuidFormatOption::applyAll)
-    {
-        std::stringstream ss;
-        ss << std::hex << std::setfill('0');
-
-        if (format & NxGuidFormatOption::braces)
-            ss << '{';
-
-        if (format & NxGuidFormatOption::uppercase)
-            ss << std::uppercase;
-
-        for (int i = 0; i < 4; ++i)
-        {
-            ss << std::setw(2);
-            ss << static_cast<unsigned int>(guid.bytes[i]);
-        }
-
-        if (format & NxGuidFormatOption::hyphens)
-            ss << '-';
-
-        for (int i = 0; i < 2; ++i)
-        {
-            ss << std::setw(2);
-            ss << static_cast<unsigned int>(guid.bytes[4 + i]);
-        }
-
-        if (format & NxGuidFormatOption::hyphens)
-            ss << "-";
-
-        for (int i = 0; i < 2; ++i)
-        {
-            ss << std::setw(2);
-            ss << static_cast<unsigned int>(guid.bytes[6 + i]);
-        }
-
-        if (format & NxGuidFormatOption::hyphens)
-            ss << "-";
-
-        for (int i = 0; i < 2; ++i)
-        {
-            ss << std::setw(2);
-            ss << static_cast<unsigned int>(guid.bytes[8 + i]);
-        }
-
-        if (format & NxGuidFormatOption::hyphens)
-            ss << "-";
-
-        for (int i = 0; i < 6; ++i)
-        {
-            ss << std::setw(2);
-            ss << static_cast<unsigned int>(guid.bytes[10 + i]);
-        }
-
-        if (format & NxGuidFormatOption::braces)
-            ss << '}';
-
-        return ss.str();
-    }
 };
+
+static std::string toStdString(
+    const nxpl::NX_GUID& guid,
+    unsigned int format = NxGuidFormatOption::applyAll)
+{
+    std::stringstream ss;
+    ss << std::hex << std::setfill('0');
+
+    if (format & NxGuidFormatOption::braces)
+        ss << '{';
+
+    if (format & NxGuidFormatOption::uppercase)
+        ss << std::uppercase;
+
+    for (int i = 0; i < 4; ++i)
+    {
+        ss << std::setw(2);
+        ss << static_cast<unsigned int>(guid.bytes[i]);
+    }
+
+    if (format & NxGuidFormatOption::hyphens)
+        ss << '-';
+
+    for (int i = 0; i < 2; ++i)
+    {
+        ss << std::setw(2);
+        ss << static_cast<unsigned int>(guid.bytes[4 + i]);
+    }
+
+    if (format & NxGuidFormatOption::hyphens)
+        ss << "-";
+
+    for (int i = 0; i < 2; ++i)
+    {
+        ss << std::setw(2);
+        ss << static_cast<unsigned int>(guid.bytes[6 + i]);
+    }
+
+    if (format & NxGuidFormatOption::hyphens)
+        ss << "-";
+
+    for (int i = 0; i < 2; ++i)
+    {
+        ss << std::setw(2);
+        ss << static_cast<unsigned int>(guid.bytes[8 + i]);
+    }
+
+    if (format & NxGuidFormatOption::hyphens)
+        ss << "-";
+
+    for (int i = 0; i < 6; ++i)
+    {
+        ss << std::setw(2);
+        ss << static_cast<unsigned int>(guid.bytes[10 + i]);
+    }
+
+    if (format & NxGuidFormatOption::braces)
+        ss << '}';
+
+    return ss.str();
+}
 
 } // namespace nxpt
 
@@ -413,6 +417,11 @@ namespace nxpl {
 inline bool operator==(const nxpl::NX_GUID& id1, const nxpl::NX_GUID& id2)
 {
     return memcmp(id1.bytes, id2.bytes, sizeof(id1.bytes)) == 0;
+}
+
+inline std::ostream& operator<<(std::ostream& os, const nxpl::NX_GUID& id)
+{
+    return os << nxpt::toStdString(id);
 }
 
 } // namespace nxpl

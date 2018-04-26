@@ -10,7 +10,7 @@
 #include <nx/sdk/metadata/common_object.h>
 #include <nx/sdk/metadata/common_compressed_video_packet.h>
 
-#define NX_PRINT_PREFIX printPrefix()
+#define NX_PRINT_PREFIX (this->utils.printPrefix)
 #include <nx/kit/debug.h>
 
 #include "stub_metadata_plugin_ini.h"
@@ -33,11 +33,11 @@ std::string CameraManager::capabilitiesManifest()
     return R"json(
         {
             "supportedEventTypes": [
-                ")json" + nxpt::NxGuidHelper::toStdString(kLineCrossingEventGuid) + R"json(",
-                ")json" + nxpt::NxGuidHelper::toStdString(kObjectInTheAreaEventGuid) + R"json("
+                ")json" + nxpt::toStdString(kLineCrossingEventGuid) + R"json(",
+                ")json" + nxpt::toStdString(kObjectInTheAreaEventGuid) + R"json("
             ],
             "supportedObjectTypes": [
-                ")json" + nxpt::NxGuidHelper::toStdString(kCarObjectGuid) + R"json("
+                ")json" + nxpt::toStdString(kCarObjectGuid) + R"json("
             ],
             "settings": {
                 "params": [

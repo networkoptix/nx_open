@@ -1,10 +1,10 @@
 #include "common_plugin.h"
 
-#define NX_PRINT_PREFIX printPrefix()
-#define NX_DEBUG_ENABLE_OUTPUT enableOutput()
+#define NX_PRINT_PREFIX (this->utils.printPrefix)
+#define NX_DEBUG_ENABLE_OUTPUT (this->utils.enableOutput)
 #include <nx/kit/debug.h>
 
-#include <nx/sdk/utils/debug.h>
+#include <nx/sdk/utils.h>
 
 namespace nx {
 namespace sdk {
@@ -13,10 +13,10 @@ namespace metadata {
 CommonPlugin::CommonPlugin(
     const std::string& name,
     const std::string& libName,
-    bool enableOutput_,
-    const std::string& printPrefix_)
+    bool enableOutput,
+    const std::string& printPrefix)
     :
-    Debug(enableOutput_, !printPrefix_.empty() ? printPrefix_ : ("[" + libName + "] ")),
+    utils(enableOutput, !printPrefix.empty() ? printPrefix : ("[" + libName + "] ")),
     m_name(name),
     m_libName(libName)
 {
@@ -76,40 +76,24 @@ const char* CommonPlugin::name() const
 
 void CommonPlugin::setSettings(const nxpl::Setting* /*settings*/, int /*count*/)
 {
-   // TODO: Here roSettings are passed from Server. Currently, they are not used by metadata
-   // plugins, thus, do nothing.
-}
-
-bool CommonPlugin::fillSettingsMap(
-    std::map<std::string, std::string>* map, const nxpl::Setting* settings, int count,
-    const std::string& func) const
-{
-    if (!debugOutputSettings(settings, count, func + " settings"))
-        return false;
-
-    for (int i = 0; i < count; ++i)
-        (*map)[settings[i].name] = settings[i].value;
-
-    return true;
+    // Here roSettings are passed from Server. Currently, they are not used by metadata plugins,
+    // thus, do nothing.
 }
 
 void CommonPlugin::setDeclaredSettings(const nxpl::Setting* settings, int count)
 {
-    NX_OUTPUT << "Received Plugin settings:";
-    if (!fillSettingsMap(&m_settings, settings, count, __func__))
-        return; //< Error is already logged.
+    if (!utils.fillAndOutputSettingsMap(&m_settings, settings, count, "Received settings"))
+        return; //< The error is already logged.
 
     settingsChanged();
 }
 
 void CommonPlugin::setPluginContainer(nxpl::PluginInterface* /*pluginContainer*/)
 {
-    // Do nothing.
 }
 
 void CommonPlugin::setLocale(const char* /*locale*/)
 {
-    // Do nothing.
 }
 
 const char* CommonPlugin::capabilitiesManifest(Error* /*error*/) const
@@ -127,23 +111,37 @@ void CommonPlugin::executeAction(Action* action, Error* outError)
         return;
     }
 
-    // TODO: #mshevchenko: Move logging action details here from stub plugin.cpp.
-
-    NX_OUTPUT << "Executing action with id [" << action->actionId() << "]";
-
     std::map<std::string, std::string> params;
-    if (!fillSettingsMap(&params, action->params(), action->paramCount(), __func__))
+
+    NX_OUTPUT << __func__ << "():";
+    NX_OUTPUT << "{";
+    NX_OUTPUT << "    actionId: " << nx::kit::debug::toString(action->actionId());
+    NX_OUTPUT << "    objectId: " << action->objectId();
+    NX_OUTPUT << "    cameraId: " << action->cameraId();
+    NX_OUTPUT << "    timestampUs: " << action->timestampUs();
+
+    if (!utils.fillAndOutputSettingsMap(
+        &params, action->params(), action->paramCount(), "params", /*outputIndent*/ 4))
     {
-        // Error is already logged.
+        // The error is already logged.
         *outError = Error::unknownError;
         return;
     }
 
+    NX_OUTPUT << "}";
+
     std::string actionUrl;
     std::string messageToUser;
+
     executeAction(
-        action->actionId(), action->objectId(), action->cameraId(), action->timestampUs(), params,
-        &actionUrl, &messageToUser, outError);
+        action->actionId(),
+        action->objectId(),
+        action->cameraId(),
+        action->timestampUs(),
+        params,
+        &actionUrl,
+        &messageToUser,
+        outError);
 
     const char* const actionUrlPtr = actionUrl.empty() ? nullptr : actionUrl.c_str();
     const char* const messageToUserPtr = messageToUser.empty() ? nullptr : messageToUser.c_str();
