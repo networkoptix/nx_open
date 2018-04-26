@@ -89,12 +89,16 @@ Item
                 previousRotation.y + aroundY * rotationFactor)
         }
 
+        function updateScaleCenter(x, y)
+        {
+            scaleCenter = currentRotationMatrix.times(fisheyeShader.unproject(
+                fisheyeShader.pixelToProjection(x, y, currentScale)))
+        }
+
         function startZoom(x, y)
         {
             previousScalePower = scalePower
-
-            scaleCenter = currentRotationMatrix.times(fisheyeShader.unproject(
-                fisheyeShader.pixelToProjection(x, y, currentScale)))
+            updateScaleCenter(x, y)
         }
 
         function updateZoom(x, y, deltaPower, animated)
@@ -103,7 +107,10 @@ Item
             scalePower = Math.min(4.0, Math.max(0.0, previousScalePower + deltaPower))
 
             if (viewMode != MediaDewarpingParams.Horizontal && fisheyeShader.fov(currentScale) >= 90.0)
+            {
+                updateScaleCenter(x, y)
                 return //< No rotations if we have no freedom around axis X.
+            }
 
             var relocatedCenter =
                 fisheyeShader.unproject(fisheyeShader.pixelToProjection(x, y, currentScale))
