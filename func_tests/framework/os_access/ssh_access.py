@@ -68,7 +68,7 @@ class SSHAccess(object):
                 # Mediaserver may crash several times during one test, all cores are kept.
                 CORE_PATTERN_FILE='/etc/sysctl.d/60-core-pattern.conf'
                 echo 'kernel.core_pattern=core.%t.%p' > "$CORE_PATTERN_FILE"  # %t is timestamp, %p is pid.
-                sysctl -p "$CORE_PATTERN_FILE"  # See: https://superuser.com/questions/
+                sysctl -p "$CORE_PATTERN_FILE"  # See: https://superuser.com/questions/625840
                 apt-get update
                 apt-get --assume-yes install gdb # Required to create stack traces from core dumps.
                 ''')
