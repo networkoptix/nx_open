@@ -35,7 +35,8 @@ ReverseConnectionPool::ReverseConnectionPool(
         }),
     m_isReconnectHandlerSet(false),
     m_startTime(std::chrono::steady_clock::now()),
-    m_startTimeout(0)
+    m_startTimeout(0),
+    m_prevConnectionDebugPrintTime(std::chrono::steady_clock::now())
 {
     bindToAioThread(getAioThread());
 }
@@ -222,15 +223,33 @@ std::shared_ptr<ReverseConnectionHolder>
     ReverseConnectionPool::getOrCreateHolder(const String& hostName)
 {
     QnMutexLocker lk(&m_mutex);
+
     auto& holdersInSuffix = m_connectionHolders[getHostSuffix(hostName)];
     auto it = holdersInSuffix.find(hostName);
     if (it == holdersInSuffix.end())
     {
+        NX_DEBUG(this, lm("Peer %1 registered. There are total %2 known peers")
+            .args(hostName, m_connectionHolders.size()));
+
         it = holdersInSuffix.emplace(
             std::move(hostName),
             std::make_shared<ReverseConnectionHolder>(
                 m_mediatorConnection->getAioThread(),
                 hostName)).first;
+    }
+
+    constexpr auto connectionDebugPrintPeriod = std::chrono::seconds(10);
+    if (std::chrono::steady_clock::now() - m_prevConnectionDebugPrintTime > connectionDebugPrintPeriod)
+    {
+        int totalSocketCount = 0;
+        for (const auto& holders: m_connectionHolders)
+        {
+            for (const auto& holder: holders.second)
+                totalSocketCount += holder.second->socketCount();
+        }
+
+        NX_DEBUG(this, lm("There are total %1 connections").args(totalSocketCount));
+        m_prevConnectionDebugPrintTime = std::chrono::steady_clock::now();
     }
 
     return it->second;
