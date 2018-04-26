@@ -1,11 +1,11 @@
-{{PRODUCT_NAME}} üdvözli
+%PRODUCT_NAME% üdvözli Önt
 
 {{#message.sharer_name}}
-{{message.sharer_name}} ({{message.sharer_email}}) meghívja Önt, hogy csatlakozzon {{PRODUCT_NAME}} alkalmazással és megosztotta Önnel {{message.system_name}} rendszerét.
+{{message.sharer_name}} ({{message.sharer_email}}) meghívja Önt, hogy csatlakozzon %PRODUCT_NAME% alkalmazással és megosztotta Önnel {{message.system_name}} rendszerét.
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-Ha felkérik, hogy csatlakozzon {{PRODUCT_NAME}} alkalmazáshoz.
+Ha felkérik, hogy csatlakozzon %PRODUCT_NAME% alkalmazáshoz.
 You have been granted access to {{message.system_name}}.
 {{/message.sharer_name}}
 

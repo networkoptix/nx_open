@@ -3,7 +3,7 @@
     "highStream": "Corriente de alta",
     "lowStream": "Corriente de baja",
     "transcoding": "Transcodificación",
-    "unknown": "Uesconocido",
+    "unknown": "Desconocido",
     "copyToClipboard": "copiar al portapapeles",
     "copyDefaultText": "copiar",
     "copyActiveText": "copiado al portapapeles"
@@ -12,7 +12,7 @@
   "cameraStates": {
     "offline": "Desconectado",
     "error": "Error",
-    "unauthorized": "Autenticación necesaria",
+    "unauthorized": "Autentificación requerida",
     "noData": "No hay datos",
     "iosVideoTooLarge": "iOS no soporta video más grande que el fullHD (2MP: 1920 x 1080).",
     "flashRequired": "Por favor, instale <a href='https://get.adobe.com/flashplayer/' target='_blank'>instalar Adobe Flash</a> para reproducir videos.",

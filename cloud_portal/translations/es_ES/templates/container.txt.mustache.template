@@ -4,5 +4,5 @@ Sistema: {{systemName}} {{systemSignature}}
 
 {{>body}}
 
-{{companyUrl}}
-Soporte: {{supportLink}}
+%COMPANY_LINK%
+Soporte: %SUPPORT_LINK%
