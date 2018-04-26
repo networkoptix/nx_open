@@ -25,6 +25,7 @@ def determine_package_versions():
 
     if platform == "windows":
         v["qt"] = "5.6.1-1"
+        v["ffmpeg"] = "3.1.9"
 
     if platform == "linux" and box == "none":
         v["qt"] = "5.6.2-2"
