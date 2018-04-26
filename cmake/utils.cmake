@@ -97,6 +97,9 @@ function(nx_copy)
             endif()
         else()
             message(STATUS "Copying ${src} to ${dst}")
+            # CMake skips copying if source and destination timestamps are equal. We have to remove
+            # the existing destination file to ensure the file is updated.
+            file(REMOVE ${dst})
             file(COPY "${src}" DESTINATION "${COPY_DESTINATION}")
         endif()
 
