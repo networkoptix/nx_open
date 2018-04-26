@@ -810,13 +810,21 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
             saveParams();
         });
 
-    const auto sharedContext = qnServerModule->sharedContextPool()
+    const auto sharedContext = qnServerModule
+        ->sharedContextPool()
         ->sharedContext<HanwhaSharedResourceContext>(toSharedPointer(this));
+
     {
         QnMutexLocker lock(&m_mutex);
         m_sharedContext = sharedContext;
     }
+
     m_sharedContext->setRecourceAccess(getUrl(), getAuth());
+    m_sharedContext->setChunkLoaderSettings(
+        {
+            std::chrono::seconds(qnGlobalSettings->hanwhaChunkReaderResponseTimeoutSeconds()),
+            std::chrono::seconds(qnGlobalSettings->hanwhaChunkReaderMessageBodyTimeoutSeconds())
+        });
 
     CameraDiagnostics::Result result = initSystem();
     if (!result)

@@ -113,7 +113,7 @@ void HanwhaSharedResourceContext::startServices(bool hasVideoArchive, bool isNvr
 
         if (hasVideoArchive)
         {
-            m_chunkLoader = std::make_shared<HanwhaChunkLoader>(this);
+            m_chunkLoader = std::make_shared<HanwhaChunkLoader>(this, m_chunkLoaderSettings);
             m_timeSynchronizer->setTimeSynchronizationEnabled(false);
             m_timeSynchronizer->setTimeZoneShiftHandler(
                 [this](std::chrono::seconds timeZoneShift)
@@ -365,6 +365,11 @@ boost::optional<int> HanwhaSharedResourceContext::overlappedId() const
 void HanwhaSharedResourceContext::setDateTime(const QDateTime& dateTime)
 {
     m_timeSynchronizer->setDateTime(dateTime);
+}
+
+void HanwhaSharedResourceContext::setChunkLoaderSettings(const HanwhaChunkLoaderSettings& settings)
+{
+    m_chunkLoaderSettings = settings;
 }
 
 HanwhaResult<HanwhaCodecInfo> HanwhaSharedResourceContext::loadVideoCodecInfo()

@@ -12,6 +12,7 @@
 #include <plugins/resource/hanwha/hanwha_time_synchronizer.h>
 #include <plugins/resource/hanwha/hanwha_utils.h>
 #include <plugins/resource/hanwha/hanwha_codec_limits.h>
+#include <plugins/resource/hanwha/hanwha_chunk_reader.h>
 #include <recording/time_period_list.h>
 #include <core/resource/abstract_remote_archive_manager.h>
 
@@ -21,8 +22,6 @@ namespace plugins {
 
 static const std::chrono::seconds kUpdateCacheTimeout(30);
 static const std::chrono::seconds kUnsuccessfulUpdateCacheTimeout(10);
-
-class HanwhaChunkLoader;
 
 struct HanwhaInformation
 {
@@ -137,6 +136,8 @@ public:
     std::chrono::seconds timeZoneShift() const;
     void setDateTime(const QDateTime& dateTime);
 
+    void setChunkLoaderSettings(const HanwhaChunkLoaderSettings& settings);
+
     // NOTE: function objects return HanwhaResult<T>.
     HanwhaCachedData<HanwhaInformation> information;
     HanwhaCachedData<HanwhaCgiParameters> cgiParameters;
@@ -171,6 +172,8 @@ private:
     QnSemaphore m_requestSemaphore;
     std::shared_ptr<HanwhaChunkLoader> m_chunkLoader;
     std::unique_ptr<HanwhaTimeSyncronizer> m_timeSynchronizer;
+
+    HanwhaChunkLoaderSettings m_chunkLoaderSettings;
 
     std::atomic<std::chrono::seconds> m_timeZoneShift{std::chrono::seconds::zero()};
 
