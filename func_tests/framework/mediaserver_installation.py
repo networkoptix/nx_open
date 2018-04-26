@@ -202,18 +202,20 @@ def install_mediaserver(ssh_access, mediaserver_deb, reinstall=False):
         # language=Bash
         '''
             # Commands and dependencies for Ubuntu 14.04 (ubuntu/trusty64 from Vagrant's Atlas).
-            export DEBIAN_FRONTEND=noninteractive  # Bypass EULA on install.
-            dpkg --install --force-depends "$DEB"  # Ignore unmet dependencies, which are installed just after.
-            apt-get update  # Or "Unable to fetch some archives, maybe run apt-get update or try with --fix-missing?"
-            apt-get --fix-broken --assume-yes install  # Install dependencies left by Mediaserver.
             CORE_PATTERN_FILE='/etc/sysctl.d/60-core-pattern.conf'
             echo 'kernel.core_pattern=core.%t.%p' > "$CORE_PATTERN_FILE"  # %t is timestamp, %p is pid.
             sysctl -p "$CORE_PATTERN_FILE"  # See: https://superuser.com/questions/625840
+            POINT=/mnt/trusty-packages
+            mkdir -p "$POINT"
+            mount -t nfs -o ro "$SHARE" "$POINT"
+            DEBIAN_FRONTEND=noninteractive dpkg -i "$DEB" "$POINT"/*  # GDB (to parse core dumps) and deps.
+            umount "$POINT"
             cp "$CONFIG" "$CONFIG_INITIAL"
             ''',
         env={
             'DEB': remote_path,
             'CONFIG': installation.config_path,
             'CONFIG_INITIAL': installation.config_path_initial,
+            'SHARE': '10.0.2.107:/data/QA/func_tests/trusty-packages',
             })
     return installation

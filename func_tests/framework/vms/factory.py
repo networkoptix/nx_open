@@ -47,7 +47,6 @@ class VMFactory(object):
             vm = VM(alias, vm_index, vm_type, info.name, info.ports, networking, os_access)
             self._hypervisor.unplug_all(vm.name)
             vm.networking.reset()
-            vm.networking.enable_internet()
             yield vm
 
     def cleanup(self):
