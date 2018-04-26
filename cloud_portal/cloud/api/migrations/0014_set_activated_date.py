@@ -4,6 +4,9 @@ from __future__ import unicode_literals
 
 from django.db import connection, migrations
 
+import logging
+logger = logging.getLogger(__name__)
+
 
 """UPDATE cloudportal.api_account db1
    JOIN clouddb.account db2
@@ -14,13 +17,17 @@ from django.db import connection, migrations
 
 
 def updateActivatedDate(apps, schema_editor):
-    with connection.cursor() as cursor:
+    cursor = connection.cursor()
+    try:
         cursor.execute('''UPDATE cloudportal.api_account db1
                           JOIN clouddb.account db2
                           JOIN clouddb.account_status db3
                           ON db1.email=db2.email AND db2.status_code=db3.code
                           SET db1.activated_date=db1.created_date
                           WHERE db1.activated_date is NULL AND db3.description="activated";''')
+
+    except Exception as error:
+        logger.warning(error)
 
 
 class Migration(migrations.Migration):
