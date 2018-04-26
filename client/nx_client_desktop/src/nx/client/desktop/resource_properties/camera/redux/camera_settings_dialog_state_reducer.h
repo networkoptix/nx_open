@@ -39,6 +39,7 @@ public:
     static State setRecordingEnabled(State state, bool value);
     static State setMotionDetectionEnabled(State state, bool value);
     static State setMotionRegionList(State state, const QList<QnMotionRegion>& value);
+    static State setFisheyeSettings(State state, const QnMediaDewarpingParams& value);
 };
 
 } // namespace desktop

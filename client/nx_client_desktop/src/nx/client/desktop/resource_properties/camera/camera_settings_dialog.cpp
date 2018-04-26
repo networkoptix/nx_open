@@ -1,6 +1,7 @@
 #include "camera_settings_dialog.h"
 #include "ui_camera_settings_dialog.h"
 
+#include <QtCore/QSharedPointer>
 #include <QtWidgets/QPushButton>
 
 #include <core/resource_management/resource_pool.h>
@@ -19,6 +20,7 @@
 #include "widgets/camera_settings_general_tab_widget.h"
 #include "widgets/camera_schedule_widget.h"
 #include "widgets/camera_motion_settings_widget.h"
+#include "widgets/camera_fisheye_settings_widget.h"
 
 #include "redux/camera_settings_dialog_state.h"
 #include "redux/camera_settings_dialog_store.h"
@@ -28,6 +30,8 @@
 
 #include "utils/camera_settings_dialog_state_conversion_functions.h"
 #include <utils/license_usage_helper.h>
+
+#include <nx/client/desktop/image_providers/camera_thumbnail_manager.h>
 
 namespace nx {
 namespace client {
@@ -39,6 +43,7 @@ struct CameraSettingsDialog::Private
     QPointer<CameraSettingsReadOnlyWatcher> readOnlyWatcher;
     QnVirtualCameraResourceList cameras;
     QPointer<QnCamLicenseUsageHelper> licenseUsageHelper;
+    QSharedPointer<QnCameraThumbnailManager> previewManager;
 
     bool hasChanges() const
     {
@@ -99,6 +104,11 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
 
     d->licenseUsageHelper = new QnCamLicenseUsageHelper(commonModule(), this);
 
+    d->previewManager.reset(new QnCameraThumbnailManager());
+    d->previewManager->setAutoRotate(true);
+    d->previewManager->setThumbnailSize(QSize(0, 0));
+    d->previewManager->setAutoRefresh(false);
+
     auto panicWatcher = new CameraSettingsPanicWatcher(this);
     panicWatcher->setStore(d->store);
 
@@ -116,6 +126,11 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
         int(CameraSettingsTab::motion),
         new CameraMotionSettingsWidget(d->store, ui->tabWidget),
         tr("Motion"));
+
+    addPage(
+        int(CameraSettingsTab::fisheye),
+        new CameraFisheyeSettingsWidget(d->previewManager, d->store, ui->tabWidget),
+        tr("Fisheye"));
 
     auto selectionWatcher = new QnWorkbenchSelectionWatcher(this);
     connect(
@@ -198,6 +213,9 @@ bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras
     d->cameras = cameras;
     d->resetChanges();
     d->readOnlyWatcher->setCameras(cameras);
+    d->previewManager->selectCamera(cameras.size() == 1
+        ? cameras.front()
+        : QnVirtualCameraResourcePtr());
 
     return true;
 }
@@ -277,8 +295,10 @@ void CameraSettingsDialog::loadState(const CameraSettingsDialogState& state)
             applyButton->setEnabled(!state.readOnly && state.hasChanges);
     }
 
-    setPageVisible(int(CameraSettingsTab::motion), state.devicesCount == 1
+    setPageVisible(int(CameraSettingsTab::motion), state.isSingleCamera()
         && state.devicesDescription.hasMotion == CameraSettingsDialogState::CombinedValue::All);
+
+    setPageVisible(int(CameraSettingsTab::fisheye), state.isSingleCamera());
 
     ui->alertBar->setText(getAlertText(state));
 }

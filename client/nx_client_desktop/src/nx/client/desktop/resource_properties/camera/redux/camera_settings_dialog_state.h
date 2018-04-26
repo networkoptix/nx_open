@@ -2,6 +2,7 @@
 
 #include <QtCore/QList>
 
+#include <core/ptz/media_dewarping_params.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_stream_capability.h>
 #include <core/resource/motion_window.h>
@@ -32,8 +33,14 @@ struct CameraSettingsDialogState
 
         T operator()() const { return get(); }
 
+        void updateValue(T value)
+        {
+            if (m_user.has_value() || m_base != value)
+                m_user = value;
+        }
+
     private:
-        T m_base;
+        T m_base = T();
         std::optional<T> m_user;
     };
 
@@ -133,10 +140,32 @@ struct CameraSettingsDialogState
     };
     SingleCameraProperties singleCameraProperties;
 
+    struct FisheyeCalibrationSettings
+    {
+        QPointF offset;
+        qreal radius = 0.5;
+        qreal aspectRatio = 1.0;
+
+        bool operator==(const FisheyeCalibrationSettings& s) const
+        {
+            return offset == s.offset && radius == s.radius && aspectRatio == s.aspectRatio;
+        }
+
+        bool operator!=(const FisheyeCalibrationSettings& s) const
+        {
+            return offset != s.offset || radius != s.radius && aspectRatio != s.aspectRatio;
+        }
+    };
+
     struct SingleCameraSettings
     {
         UserEditable<bool> enableMotionDetection;
         UserEditable<QList<QnMotionRegion>> motionRegionList;
+
+        UserEditable<bool> enableFisheyeDewarping;
+        UserEditable<QnMediaDewarpingParams::ViewMode> fisheyeMountingType;
+        UserEditable<FisheyeCalibrationSettings> fisheyeCalibrationSettings;
+        UserEditable<qreal> fisheyeFovRotation;
     };
     SingleCameraSettings singleCameraSettings;
 
@@ -253,6 +282,19 @@ struct CameraSettingsDialogState
     {
         return devicesDescription.isDtsBased == CombinedValue::None
             && devicesDescription.isWearable == CombinedValue::None;
+    }
+
+    QnMediaDewarpingParams fisheyeSettings() const
+    {
+        QnMediaDewarpingParams params;
+        FisheyeCalibrationSettings calibration = singleCameraSettings.fisheyeCalibrationSettings();
+        params.enabled = singleCameraSettings.enableFisheyeDewarping();
+        params.xCenter = 0.5 + calibration.offset.x();
+        params.yCenter = 0.5 + calibration.offset.y();
+        params.radius = calibration.radius;
+        params.hStretch = calibration.aspectRatio;
+        params.fovRot = singleCameraSettings.fisheyeFovRotation();
+        return params;
     }
 };
 

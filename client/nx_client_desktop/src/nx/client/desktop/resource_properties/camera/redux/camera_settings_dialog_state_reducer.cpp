@@ -69,6 +69,15 @@ QString calculateWebPage(const Camera& camera)
     return lit("<a href=\"%1\">%1</a>").arg(webPageAddress);
 }
 
+State::FisheyeCalibrationSettings fisheyeCalibrationSettings(const QnMediaDewarpingParams& params)
+{
+    State::FisheyeCalibrationSettings calibration;
+    calibration.offset = QPointF(params.xCenter - 0.5, params.yCenter - 0.5);
+    calibration.radius = params.radius;
+    calibration.aspectRatio = params.hStretch;
+    return calibration;
+}
+
 bool isMotionDetectionEnabled(const Camera& camera)
 {
     const auto motionType = camera->getMotionType();
@@ -368,6 +377,13 @@ State CameraSettingsDialogStateReducer::loadCameras(
             singleProperties.maxMotionRects = singleProperties.maxMotionMaskRects
                 = singleProperties.maxMotionSensitivityRects = std::numeric_limits<int>::max();
         }
+
+        const auto fisheyeParams = firstCamera->getDewarpingParams();
+        state.singleCameraSettings.enableFisheyeDewarping.setBase(fisheyeParams.enabled);
+        state.singleCameraSettings.fisheyeMountingType.setBase(fisheyeParams.viewMode);
+        state.singleCameraSettings.fisheyeFovRotation.setBase(fisheyeParams.fovRot);
+        state.singleCameraSettings.fisheyeCalibrationSettings.setBase(
+            fisheyeCalibrationSettings(fisheyeParams));
 
         state = loadNetworkInfo(std::move(state), firstCamera);
 
@@ -702,6 +718,19 @@ State CameraSettingsDialogStateReducer::setMotionRegionList(
 
     state.hasChanges = true;
     state.singleCameraSettings.motionRegionList.setUser(value);
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setFisheyeSettings(
+    State state, const QnMediaDewarpingParams& value)
+{
+    state.singleCameraSettings.enableFisheyeDewarping.updateValue(value.enabled);
+    state.singleCameraSettings.fisheyeMountingType.updateValue(value.viewMode);
+    state.singleCameraSettings.fisheyeFovRotation.updateValue(value.fovRot);
+    state.singleCameraSettings.fisheyeCalibrationSettings.updateValue(
+        fisheyeCalibrationSettings(value));
+
+    state.hasChanges = true;
     return state;
 }
 

@@ -221,6 +221,13 @@ void CameraSettingsDialogStore::setMotionRegionList(const QList<QnMotionRegion>&
         [&](State state) { return Reducer::setMotionRegionList(std::move(state), value); });
 }
 
+void CameraSettingsDialogStore::setFisheyeSettings(const QnMediaDewarpingParams& value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setFisheyeSettings(std::move(state), value); });
+}
+
+
 } // namespace desktop
 } // namespace client
 } // namespace nx

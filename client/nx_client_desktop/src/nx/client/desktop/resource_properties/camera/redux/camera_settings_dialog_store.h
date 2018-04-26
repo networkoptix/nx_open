@@ -8,6 +8,7 @@
 #include <core/resource/motion_window.h>
 
 class QnAspectRatio;
+struct QnMediaDewarpingParams;
 
 namespace nx {
 namespace client {
@@ -55,6 +56,7 @@ public:
     void setRecordingEnabled(bool value);
     void setMotionDetectionEnabled(bool value);
     void setMotionRegionList(const QList<QnMotionRegion>& value);
+    void setFisheyeSettings(const QnMediaDewarpingParams& value);
 
 signals:
     void stateChanged(const CameraSettingsDialogState& state);
