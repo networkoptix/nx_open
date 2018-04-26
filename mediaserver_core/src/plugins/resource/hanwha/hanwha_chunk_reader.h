@@ -9,7 +9,6 @@
 
 #include <core/resource/abstract_remote_archive_manager.h>
 #include <recording/time_period_list.h>
-#include <common/common_module_aware.h>
 
 extern "C" {
 
@@ -24,9 +23,10 @@ namespace plugins {
 
 class HanwhaSharedResourceContext;
 
-class HanwhaChunkLoader: public QObject, public QnCommonModuleAware
+class HanwhaChunkLoader: public QObject
 {
     Q_OBJECT
+
     enum class State
     {
         initial,
@@ -53,7 +53,7 @@ class HanwhaChunkLoader: public QObject, public QnCommonModuleAware
     using OverlappedChunks = std::map<int, ChunksByChannel>;
 
 public:
-    HanwhaChunkLoader(QnCommonModule* commonModule, HanwhaSharedResourceContext* resourceContext);
+    HanwhaChunkLoader(HanwhaSharedResourceContext* resourceContext);
     virtual ~HanwhaChunkLoader();
 
     void start(bool isNvr);

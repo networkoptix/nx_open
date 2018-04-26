@@ -8,7 +8,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/abstract_remote_archive_manager.h>
 #include <nx/utils/log/log.h>
-#include <common/common_module.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -39,10 +38,8 @@ using namespace nx::core::resource;
 using namespace nx::mediaserver::resource;
 
 HanwhaSharedResourceContext::HanwhaSharedResourceContext(
-    QnCommonModule* commonModule,
     const AbstractSharedResourceContext::SharedId& sharedId)
     :
-    QnCommonModuleAware(commonModule),
     information([this]() { return loadInformation(); }, kCacheDataTimeout),
     cgiParameters([this]() { return loadCgiParameters(); }, kCacheDataTimeout),
     eventStatuses([this]() { return loadEventStatuses(); }, kCacheDataTimeout),
@@ -116,7 +113,7 @@ void HanwhaSharedResourceContext::startServices(bool hasVideoArchive, bool isNvr
 
         if (hasVideoArchive)
         {
-            m_chunkLoader = std::make_shared<HanwhaChunkLoader>(commonModule(), this);
+            m_chunkLoader = std::make_shared<HanwhaChunkLoader>(this);
             m_timeSynchronizer->setTimeSynchronizationEnabled(false);
             m_timeSynchronizer->setTimeZoneShiftHandler(
                 [this](std::chrono::seconds timeZoneShift)

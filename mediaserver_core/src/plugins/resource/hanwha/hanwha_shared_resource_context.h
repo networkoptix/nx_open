@@ -14,9 +14,6 @@
 #include <plugins/resource/hanwha/hanwha_codec_limits.h>
 #include <recording/time_period_list.h>
 #include <core/resource/abstract_remote_archive_manager.h>
-#include <common/common_module_aware.h>
-
-class QnCommonModule;
 
 namespace nx {
 namespace mediaserver_core {
@@ -109,13 +106,11 @@ using SessionContextWeakPtr = QWeakPointer<SessionContext>;
 
 class HanwhaSharedResourceContext:
     public nx::mediaserver::resource::AbstractSharedResourceContext,
-    public QnCommonModuleAware,
     public std::enable_shared_from_this<HanwhaSharedResourceContext>
 {
 
 public:
     HanwhaSharedResourceContext(
-        QnCommonModule* commonModule,
         const nx::mediaserver::resource::AbstractSharedResourceContext::SharedId& sharedId);
 
     // TODO: Better to make class HanwhaAccess and keep these fields separate from context.
