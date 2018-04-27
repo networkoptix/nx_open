@@ -168,15 +168,16 @@ boost::optional<QList<QnUuid>> HanwhaMetadataPlugin::fetchSupportedEvents(
 
     auto sharedRes = sharedResources(cameraInfo);
 
-    const auto cgiParameters = sharedRes->sharedContext->cgiParameters();
-    if (!cgiParameters.diagnostics || !cgiParameters.value.isValid())
+    const auto information = sharedRes->sharedContext->information();
+    if (!information || !information->cgiParameters.isValid())
         return boost::none;
 
     const auto eventStatuses = sharedRes->sharedContext->eventStatuses();
     if (!eventStatuses || !eventStatuses->isSuccessful())
         return boost::none;
 
-    return eventsFromParameters(cgiParameters.value, eventStatuses.value, cameraInfo.channel);
+    return eventsFromParameters(
+        information->cgiParameters, eventStatuses.value, cameraInfo.channel);
 }
 
 boost::optional<QList<QnUuid>> HanwhaMetadataPlugin::eventsFromParameters(
