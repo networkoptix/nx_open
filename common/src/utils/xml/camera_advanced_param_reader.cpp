@@ -165,6 +165,7 @@ namespace QnXmlTag {
     const QString paramWriteCmd         = lit("writeCmd");
     const QString paramAux              = lit("aux");
     const QString paramShowRange        = lit("showRange");
+    const QString paramCompact          = lit("compact");
     const QString paramNotes            = lit("notes");
     const QString paramUnit             = lit("unit");
     const QString paramResync           = lit("resync");
@@ -273,6 +274,7 @@ bool QnCameraAdvacedParamsXmlParser::parseElementXml(const QDomElement& elementX
     param.writeCmd = elementXml.attribute(QnXmlTag::paramWriteCmd);
     param.aux = elementXml.attribute(QnXmlTag::paramAux);
     param.showRange = parseBooleanXmlValue(elementXml.attribute(QnXmlTag::paramShowRange));
+    param.compact = parseBooleanXmlValue(elementXml.attribute(QnXmlTag::paramCompact));
     param.notes = elementXml.attribute(QnXmlTag::paramNotes);
     param.unit = elementXml.attribute(QnXmlTag::paramUnit);
     param.resync = parseBooleanXmlValue(elementXml.attribute(QnXmlTag::paramResync));

@@ -32,7 +32,13 @@ const QString kEnumerationDataType = lit("Enumeration");
 const QString kButtonDataType = lit("Button");
 const QString kStringDataType = lit("String");
 const QString kSeparatorDataType = lit("Separator");
-const QString kSeparatorLensControl = lit("LensControlDebug");
+
+// Fancy PTZL + lens control
+const QString kLensControl = lit("LensControlDebug");
+// Vertical slider with additional buttons.
+const QString kSliderControl = lit("SliderControl");
+// Pan tilt rotation control.
+const QString kPtrControl = lit("PtrControl");
 
 } //< anonymous namespace
 
@@ -157,7 +163,11 @@ QString QnCameraAdvancedParameter::dataTypeToString(DataType value)
         case DataType::Separator:
             return kSeparatorDataType;
         case DataType::LensControl:
-            return kSeparatorLensControl;
+            return kLensControl;
+        case DataType::PtrControl:
+            return kPtrControl;
+        case DataType::SliderControl:
+            return kSliderControl;
         default:
             return QString();
     }
@@ -165,14 +175,16 @@ QString QnCameraAdvancedParameter::dataTypeToString(DataType value)
 
 QnCameraAdvancedParameter::DataType QnCameraAdvancedParameter::stringToDataType(const QString &value)
 {
-	QList<QnCameraAdvancedParameter::DataType> allDataTypes = QList<QnCameraAdvancedParameter::DataType>()
-		<< DataType::Bool
-		<< DataType::Number
-		<< DataType::Enumeration
-		<< DataType::Button
-		<< DataType::String
+    QList<QnCameraAdvancedParameter::DataType> allDataTypes = QList<QnCameraAdvancedParameter::DataType>()
+        << DataType::Bool
+        << DataType::Number
+        << DataType::Enumeration
+        << DataType::Button
+        << DataType::String
         << DataType::Separator
-        << DataType::LensControl;
+        << DataType::LensControl
+        << DataType::SliderControl
+        << DataType::PtrControl;
 
 	for (auto dataType: allDataTypes)
 		if (dataTypeToString(dataType) == value)

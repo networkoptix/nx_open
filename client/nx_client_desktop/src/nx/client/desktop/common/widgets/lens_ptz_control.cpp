@@ -9,8 +9,7 @@
 #include <utils/math/color_transformations.h>
 #include <ui/style/skin.h>
 
-namespace
-{
+namespace {
     // main width for all lines
     const int kLineWidth = 2;
     const int kLineBorderWidth = 1;
@@ -21,6 +20,9 @@ namespace
     const int kButtonOffset = 10 + kButtonSize;
     // Return speed of central handler. Pixels per timer's tick.
     const int kReturnSpeed = 20;
+
+    // Minimal size for joystick circle
+    const int kMinCircleSize = 176;
 
     const QString kNormalIcons[] =
     {
@@ -37,13 +39,13 @@ namespace
         lit("buttons/arrow_up_hovered.png"),
         lit("buttons/arrow_down_hovered.png"),
     };
-}
+} // namespace
 
 namespace nx {
 namespace client {
 namespace desktop {
 
-LensPtzControl::LensPtzControl(QWidget *parent):
+LensPtzControl::LensPtzControl(QWidget* parent):
     QWidget(parent)
 {
     auto nxStyle = QnNxStyle::instance();
@@ -52,7 +54,7 @@ LensPtzControl::LensPtzControl(QWidget *parent):
     if(nxStyle)
         m_palette = nxStyle->genericPalette();
 
-    for(int i = 0; i < m_buttons.size(); ++i)
+    for(size_t i = 0; i < m_buttons.size(); ++i)
     {
         m_buttons[i].normal = qnSkin->pixmap(kNormalIcons[i], true);
         m_buttons[i].hover = qnSkin->pixmap(kHoveredIcons[i], true);
@@ -63,6 +65,8 @@ LensPtzControl::LensPtzControl(QWidget *parent):
     m_ptzHandler.radius = kHandlerDiameter / 2;
 
     setMouseTracking(true);
+    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    setMinimumSize(QSize(kMinCircleSize, kMinCircleSize));
 
     m_timer = new QTimer(this);
     connect(m_timer, &QTimer::timeout, this, &LensPtzControl::updateState);
@@ -98,11 +102,11 @@ void LensPtzControl::updateState()
         update();
 }
 
-QSize LensPtzControl::minimumSizeHint() const
+QSize LensPtzControl::sizeHint() const
 {
     QSize result = base_type::minimumSizeHint();
     if(result.isEmpty())
-        result = QSize(180, 180); /* So that we don't end up with an invalid size on the next step. */
+        result = QSize(kMinCircleSize, kMinCircleSize); /* So that we don't end up with an invalid size on the next step. */
 
     return result;
 }
@@ -132,7 +136,7 @@ void LensPtzControl::resizeEvent(QResizeEvent* event)
     m_buttons[ButtonDown].rect = centerRect.translated(0, kButtonOffset);
 }
 
-void LensPtzControl::changeEvent(QEvent *event)
+void LensPtzControl::changeEvent(QEvent* event)
 {
     if(event->type() == QEvent::FontChange)
         updateGeometry();
@@ -140,7 +144,7 @@ void LensPtzControl::changeEvent(QEvent *event)
     base_type::changeEvent(event);
 }
 
-void LensPtzControl::paintEvent(QPaintEvent *event)
+void LensPtzControl::paintEvent(QPaintEvent* event)
 {
     base_type::paintEvent(event);
 
@@ -148,9 +152,6 @@ void LensPtzControl::paintEvent(QPaintEvent *event)
 
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
-
-    QnScopedPainterPenRollback penRollback(&painter);
-    QnScopedPainterBrushRollback brushRollback(&painter);
 
     drawRotationCircle(painter, rect, m_rotation);
     for (const auto& button : m_buttons)
@@ -206,7 +207,7 @@ void LensPtzControl::mouseReleaseEvent(QMouseEvent* event)
     m_state = StateInitial;
 }
 
-void LensPtzControl::mouseMoveEvent(QMouseEvent *event)
+void LensPtzControl::mouseMoveEvent(QMouseEvent* event)
 {
     QPointF localPos = screenToLocal(event->pos());
     // Squared length from mouse position to the center
