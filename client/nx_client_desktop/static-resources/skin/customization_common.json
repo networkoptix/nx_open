@@ -892,7 +892,13 @@
             "emailSettings": "#cbcbcb",
             "chartColor": "brand_d3"
         }
+    },
+
+    "nx::client::desktop::HintButton": {
+        "palette": {
+            "default": {
+                "text": "light16"
+            }
+        }
     }
-
 }
-

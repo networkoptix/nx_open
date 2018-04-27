@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>599</width>
-    <height>153</height>
+    <height>92</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -40,19 +40,6 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <property name="minimumSize">
-          <size>
-           <width>10</width>
-           <height>10</height>
-          </size>
-         </property>
-         <property name="hint" stdset="0">
-          <string>
-                 Event will trigger only if there are matches in caption with any of entered keywords.
-
-                 If the field is empty, event will always trigger.
-               </string>
-         </property>
         </widget>
        </item>
        <item>
@@ -79,23 +66,23 @@
      </item>
      <item row="2" column="0">
       <layout class="QHBoxLayout" name="descriptionLabelLayout" stretch="0,1">
-        <item>
-          <widget class="QLabel" name="descriptionLabel">
-            <property name="text">
-              <string>Description contains:</string>
-            </property>
-          </widget>
-        </item>
-        <item>
-          <widget class="nx::client::desktop::HintButton" name="descriptionLabelHint">
-            <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-              </sizepolicy>
-            </property>
-          </widget>
-        </item>
+       <item>
+        <widget class="QLabel" name="descriptionLabel">
+         <property name="text">
+          <string>Description contains:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="nx::client::desktop::HintButton" name="descriptionLabelHint" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
+       </item>
       </layout>
      </item>
      <item row="0" column="1">
@@ -127,15 +114,6 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <property name="minimumSize">
-          <size>
-           <width>10</width>
-           <height>10</height>
-          </size>
-         </property>
-         <property name="hint" stdset="0">
-          <string>Choose some camera too see list of available events</string>
-         </property>
         </widget>
        </item>
        <item>
@@ -155,9 +133,6 @@
      </item>
     </layout>
    </item>
-   <item>
-    <widget class="QnWordWrappedLabel" name="hintLabel" native="true"/>
-   </item>
   </layout>
  </widget>
  <customwidgets>
@@ -165,12 +140,6 @@
    <class>nx::client::desktop::HintButton</class>
    <extends>QWidget</extends>
    <header location="global">nx/client/desktop/common/widgets/hint_button.h</header>
-  </customwidget>
-  <customwidget>
-   <class>QnWordWrappedLabel</class>
-   <extends>QWidget</extends>
-   <header location="global">ui/widgets/word_wrapped_label.h</header>
-   <container>1</container>
   </customwidget>
   <customwidget>
    <class>QnTreeComboBox</class>

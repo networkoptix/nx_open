@@ -28,17 +28,6 @@ QnCustomBusinessEventWidget::QnCustomBusinessEventWidget(QWidget* parent):
     connect(ui->captionEdit, &QLineEdit::textChanged, this, &QnCustomBusinessEventWidget::paramsChanged);
     connect(ui->descriptionEdit, &QLineEdit::textChanged, this, &QnCustomBusinessEventWidget::paramsChanged);
 
-    const QString description = tr("Event will trigger only if Generic Event meets all the above conditions. "
-        "If a keyword field is empty, condition is always met. "
-        "If not, condition is met if the corresponding field of Generic Event contains any keyword.");
-
-    const QString linkText = tr("Server API");
-    const QString link = lit("<a href=\"api\">%1</a>").arg(linkText);
-    const QString documentationHint = tr("To generate Generic Event, please refer to %1.").arg(link);
-
-    ui->hintLabel->setTextFormat(Qt::RichText);
-    ui->hintLabel->setText(lit("%1<hr/>%2").arg(description, documentationHint));
-
     ui->sourceLabelHint->addHintLine(tr("Event will trigger only if there are matches in caption with any of entered keywords."));
     ui->sourceLabelHint->addHintLine(tr("If the field is empty, event will always trigger."));
     ui->sourceLabelHint->setHelpTopic(Qn::EventsActions_Generic_Help);
@@ -50,20 +39,6 @@ QnCustomBusinessEventWidget::QnCustomBusinessEventWidget(QWidget* parent):
     ui->descriptionLabelHint->addHintLine(tr("Event will trigger only if there are matches in caption with any of entered keywords."));
     ui->descriptionLabelHint->addHintLine(tr("If the field is empty, event will always trigger."));
     ui->descriptionLabelHint->setHelpTopic(Qn::EventsActions_Generic_Help);
-
-    connect(ui->hintLabel, &QnWordWrappedLabel::linkActivated, this,
-        [this]
-    {
-        auto server = commonModule()->currentServer();
-        if (!server)
-            return;
-
-        QUrl targetUrl(server->getApiUrl());
-        targetUrl.setScheme(kDocumentationScheme);
-        targetUrl.setPath(kApiDocPath);
-        targetUrl.setFragment(kApiDocFragment);
-        QDesktopServices::openUrl(targetUrl);
-    });
 }
 
 QnCustomBusinessEventWidget::~QnCustomBusinessEventWidget()

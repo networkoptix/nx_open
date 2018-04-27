@@ -88,6 +88,10 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
     setHelpTopic(ui->roleLabel, ui->roleComboBox, Qn::UserSettings_UserRoles_Help);
     setHelpTopic(ui->roleComboBox, Qn::UserSettings_UserRoles_Help);
 
+    ui->userTypeHint->addHintLine(tr("<b>Local users</b> belong to this system only and are fully managed by system administrators."));
+    ui->userTypeHint->addHintLine(tr("<b>Cloud users</b> can have access to many systems. Administrators can manage their rights only."));
+    ui->userTypeHint->setHelpTopic(Qn::NewUser_Help);
+
     ui->roleComboBox->setModel(m_rolesModel);
 
     connect(ui->roleComboBox, QnComboboxCurrentIndexChanged,

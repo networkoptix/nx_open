@@ -52,11 +52,10 @@ void HintButton::showTooltip(bool show)
 
         if (isClickable())
         {
-            QnGenericPalette palette = nxStyle->genericPalette();
-            QnPaletteColor lineColor = palette.color(lit("light"), 16);
-            QString colorHex = lineColor.color().name(QColor::HexRgb);
+            QColor lineColor = palette().color(QPalette::Text);
+            QString colorHex = lineColor.name(QColor::HexRgb);
 
-            text += lit("<p><i style='color: %1'>%2</i></p>").arg(colorHex, tr("Click to read more"));
+            text += lit("<br/><i style='color: %1'>%2</i>").arg(colorHex, tr("Click to read more"));
         }
 
         QToolTip::showText(hintSpawnPos, text);
@@ -108,6 +107,8 @@ void HintButton::paintEvent(QPaintEvent* event)
     {
         // Always center pixmap
         QPointF centeredCorner = rect().center() - pixmap.rect().center();
+        if (!isEnabled())
+            painter.setOpacity(0.3);
         painter.drawPixmap(centeredCorner*0.5, pixmap);
     }
 }
@@ -120,7 +121,8 @@ void HintButton::mouseReleaseEvent(QMouseEvent *event)
 
 void HintButton::enterEvent(QEvent* event)
 {
-    qDebug() << "HintButton::enterEvent";
+    if (!isEnabled())
+        return;
     if (!m_isHovered)
     {
         m_isHovered = true;
@@ -131,7 +133,6 @@ void HintButton::enterEvent(QEvent* event)
 
 void HintButton::leaveEvent(QEvent* event)
 {
-    qDebug() << "HintButton::leaveEvent";
     if (m_isHovered)
     {
         m_isHovered = false;
