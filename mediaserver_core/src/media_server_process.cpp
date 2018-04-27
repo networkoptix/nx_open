@@ -301,7 +301,6 @@
     #include "nx1/info.h"
 #endif
 
-#include <nx/kit/ini_config.h>
 #include <mediaserver_ini.h>
 
 #include <local_connection_factory.h>
