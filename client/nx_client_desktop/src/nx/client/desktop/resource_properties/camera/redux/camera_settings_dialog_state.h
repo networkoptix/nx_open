@@ -118,6 +118,13 @@ struct CameraSettingsDialogState
     int devicesCount = 0;
     QnCameraDeviceType deviceType = QnCameraDeviceType::Mixed;
 
+    struct MotionConstraints
+    {
+        int maxTotalRects = 0;
+        int maxSensitiveRects = 0;
+        int maxMaskRects = 0;
+    };
+
     struct SingleCameraProperties
     {
         QString id;
@@ -133,10 +140,7 @@ struct CameraSettingsDialogState
 
         int maxFpsWithoutMotion = 0;
 
-        bool hasMotionConstraints = false;
-        int maxMotionRects = 0;
-        int maxMotionMaskRects = 0;
-        int maxMotionSensitivityRects = 0;
+        std::optional<MotionConstraints> motionConstraints;
     };
     SingleCameraProperties singleCameraProperties;
 

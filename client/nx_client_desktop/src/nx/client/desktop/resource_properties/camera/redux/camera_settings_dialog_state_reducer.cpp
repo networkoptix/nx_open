@@ -289,15 +289,15 @@ int calculateRecordingThresholdAfter(const Camera& camera)
 QnMotionRegion::ErrorCode validateMotionRegionList(const State& state,
     const QList<QnMotionRegion>& regionList)
 {
-    if (!state.singleCameraProperties.hasMotionConstraints)
+    if (!state.singleCameraProperties.motionConstraints)
         return QnMotionRegion::ErrorCode::Ok;
 
-    for (const auto& region : regionList)
+    for (const auto& region: regionList)
     {
         const auto errorCode = region.isValid(
-            state.singleCameraProperties.maxMotionRects,
-            state.singleCameraProperties.maxMotionMaskRects,
-            state.singleCameraProperties.maxMotionSensitivityRects);
+            state.singleCameraProperties.motionConstraints->maxTotalRects,
+            state.singleCameraProperties.motionConstraints->maxMaskRects,
+            state.singleCameraProperties.motionConstraints->maxSensitiveRects);
 
         if (errorCode != QnMotionRegion::ErrorCode::Ok)
             return errorCode;
@@ -362,20 +362,13 @@ State CameraSettingsDialogStateReducer::loadCameras(
         singleProperties.model = firstCamera->getModel();
         singleProperties.vendor = firstCamera->getVendor();
 
-        singleProperties.hasMotionConstraints =
-            firstCamera->getDefaultMotionType() == Qn::MotionType::MT_HardwareGrid;
-
-        if (singleProperties.hasMotionConstraints)
+        if (firstCamera->getDefaultMotionType() == Qn::MotionType::MT_HardwareGrid)
         {
-            singleProperties.maxMotionRects = firstCamera->motionWindowCount();
-            singleProperties.maxMotionMaskRects = firstCamera->motionMaskWindowCount();
-            singleProperties.maxMotionSensitivityRects =
-                firstCamera->motionSensWindowCount();
-        }
-        else
-        {
-            singleProperties.maxMotionRects = singleProperties.maxMotionMaskRects
-                = singleProperties.maxMotionSensitivityRects = std::numeric_limits<int>::max();
+            singleProperties.motionConstraints = State::MotionConstraints();
+            singleProperties.motionConstraints->maxTotalRects = firstCamera->motionWindowCount();
+            singleProperties.motionConstraints->maxMaskRects = firstCamera->motionMaskWindowCount();
+            singleProperties.motionConstraints->maxSensitiveRects
+                = firstCamera->motionSensWindowCount();
         }
 
         const auto fisheyeParams = firstCamera->getDewarpingParams();
