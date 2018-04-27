@@ -2,7 +2,7 @@ import logging
 from contextlib import contextmanager
 
 from framework.core_file_traceback import create_core_file_traceback
-from framework.mediaserver_installation import install_mediaserver
+from framework.dpkg_installation import install_mediaserver
 from framework.os_access.path import copy_file
 from framework.rest_api import RestApi
 from framework.service import UpstartService
