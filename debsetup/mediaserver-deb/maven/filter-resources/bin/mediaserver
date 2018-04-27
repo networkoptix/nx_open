@@ -38,6 +38,4 @@ fi
 
 echo
 echo --- Starting: $EXE $ARGS
-exec start-stop-daemon --start \
-    --chuid @deb.customization.company.name@:@deb.customization.company.name@ \
-    -d "$VMS_DIR/bin" --exec $EXE -- $ARGS
+exec start-stop-daemon --start -d "$VMS_DIR/bin" --exec $EXE -- $ARGS

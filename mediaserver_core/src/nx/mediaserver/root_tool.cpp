@@ -9,6 +9,7 @@
     #include <sys/wait.h>
     #include <sys/types.h>
     #include <sys/time.h>
+    #include <unistd.h>
 #endif
 #include "root_tool.h"
 
@@ -612,6 +613,11 @@ std::unique_ptr<RootTool> findRootTool(const QString& applicationPath)
     if (!isRootToolExists)
         NX_WARNING(typeid(RootTool), lm("Executable does not exist: %1").arg(toolPath));
 
+#if defined (Q_OS_UNIX)
+    isRootToolExists = geteuid() != 0; //< No root_tool if the user is root
+#endif
+
+    printf("USING ROOT TOOL: %s\n", isRootToolExists ? "TRUE" : "FALSE");
     return std::make_unique<RootTool>(isRootToolExists ? toolPath : QString());
 }
 
