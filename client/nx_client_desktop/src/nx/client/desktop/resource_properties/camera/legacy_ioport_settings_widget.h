@@ -10,21 +10,21 @@
 class QnIOPortsViewModel;
 
 namespace Ui {
-class IoPortSettingsWidget;
+class LegacyIoPortSettingsWidget;
 }
 
 namespace nx {
 namespace client {
 namespace desktop {
 
-class IoPortSettingsWidget: public QWidget
+class LegacyIoPortSettingsWidget: public QWidget
 {
     Q_OBJECT
     using base_type = QWidget;
 
 public:
-    IoPortSettingsWidget(QWidget* parent = 0);
-    virtual ~IoPortSettingsWidget();
+    LegacyIoPortSettingsWidget(QWidget* parent = 0);
+    virtual ~LegacyIoPortSettingsWidget();
 
     void updateFromResource(const QnVirtualCameraResourcePtr &camera);
     void submitToResource(const QnVirtualCameraResourcePtr &camera);
@@ -32,7 +32,7 @@ signals:
     void dataChanged();
 
 private:
-    QScopedPointer<Ui::IoPortSettingsWidget> ui;
+    QScopedPointer<Ui::LegacyIoPortSettingsWidget> ui;
     QnIOPortsViewModel* m_model;
 };
 

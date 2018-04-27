@@ -3,6 +3,7 @@
 #include <QtCore/QList>
 #include <QtCore/QObject>
 
+#include <api/model/api_ioport_data.h>
 #include <common/common_globals.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/motion_window.h>
@@ -11,12 +12,15 @@ class QnAspectRatio;
 struct QnMediaDewarpingParams;
 
 namespace nx {
+
+namespace vms { namespace api { enum class IoModuleVisualStyle; }}
+
 namespace client {
 namespace desktop {
 
 class Rotation;
-struct CameraSettingsDialogState;
 struct ScheduleCellParams;
+struct CameraSettingsDialogState;
 
 class CameraSettingsDialogStore: public QObject
 {
@@ -57,6 +61,8 @@ public:
     void setMotionDetectionEnabled(bool value);
     void setMotionRegionList(const QList<QnMotionRegion>& value);
     void setFisheyeSettings(const QnMediaDewarpingParams& value);
+    void setIoPortDataList(const QnIOPortDataList& value);
+    void setIoModuleVisualStyle(vms::api::IoModuleVisualStyle value);
 
 signals:
     void stateChanged(const CameraSettingsDialogState& state);

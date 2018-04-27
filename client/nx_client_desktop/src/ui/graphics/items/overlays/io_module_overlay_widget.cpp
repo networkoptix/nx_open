@@ -1,27 +1,25 @@
 #include "io_module_overlay_widget.h"
 
 #include <QtCore/QElapsedTimer>
-
 #include <QtWidgets/QGraphicsLinearLayout>
 
 #include "io_module_form_overlay_contents.h"
 #include "io_module_grid_overlay_contents.h"
 
-#include <client_core/connection_context_aware.h>
-
-#include <common/common_module.h>
-
 #include <api/app_server_connection.h>
-#include <core/resource/camera_resource.h>
 #include <camera/iomodule/iomodule_monitor.h>
+#include <client_core/connection_context_aware.h>
+#include <common/common_module.h>
+#include <core/resource/camera_resource.h>
+#include <utils/common/connective.h>
+#include <utils/common/delayed.h>
+#include <utils/common/synctime.h>
+
 #include <nx/vms/event/event_parameters.h>
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/actions/actions_fwd.h>
 #include <nx/vms/event/actions/camera_output_action.h>
 #include <nx/fusion/model_functions.h>
-#include <utils/common/connective.h>
-#include <utils/common/delayed.h>
-#include <utils/common/synctime.h>
 
 using namespace nx;
 
@@ -37,6 +35,7 @@ class QnIoModuleOverlayWidgetPrivate: public Connective<QObject>,
     public QnConnectionContextAware
 {
     using base_type = Connective<QObject>;
+    using Style = QnIoModuleOverlayWidget::Style;
 
     Q_DISABLE_COPY(QnIoModuleOverlayWidgetPrivate)
     Q_DECLARE_PUBLIC(QnIoModuleOverlayWidget)
@@ -94,7 +93,7 @@ QnIoModuleOverlayWidgetPrivate::QnIoModuleOverlayWidgetPrivate(QnIoModuleOverlay
     q_ptr(widget),
     timer(new QTimer(this)),
     layout(new QGraphicsLinearLayout(Qt::Vertical, widget)),
-    overlayStyle(QnIoModuleOverlayWidget::Style::Default)
+    overlayStyle(Style::default)
 {
     widget->setAutoFillBackground(true);
 
@@ -124,7 +123,7 @@ void QnIoModuleOverlayWidgetPrivate::updateOverlayStyle()
     {
         style = QnLexical::deserialized<QnIoModuleOverlayWidget::Style>(
             module->getProperty(Qn::IO_OVERLAY_STYLE_PARAM_NAME),
-            QnIoModuleOverlayWidget::Style::Default);
+            Style::default);
     }
 
     bool needToCreateNewContents = style != overlayStyle || !contents;
@@ -135,11 +134,11 @@ void QnIoModuleOverlayWidgetPrivate::updateOverlayStyle()
 
     switch (overlayStyle)
     {
-        case QnIoModuleOverlayWidget::Style::Tile:
+        case Style::tile:
             setContents(new QnIoModuleGridOverlayContents());
             break;
 
-        case QnIoModuleOverlayWidget::Style::Form:
+        case Style::form:
         default:
             setContents(new QnIoModuleFormOverlayContents());
             break;
@@ -405,8 +404,3 @@ QnIoModuleOverlayWidget* QnIoModuleOverlayContents::overlayWidget() const
 {
     return qgraphicsitem_cast<QnIoModuleOverlayWidget*>(parentItem());
 }
-
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnIoModuleOverlayWidget, Style,
-    (QnIoModuleOverlayWidget::Style::Form, "Form")
-    (QnIoModuleOverlayWidget::Style::Tile, "Tile")
-)

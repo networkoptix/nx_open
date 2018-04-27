@@ -283,7 +283,8 @@ bool QnIOPortsViewModel::isDisabledData(const QModelIndex &index) const
     return false;
 }
 
-void QnIOPortsViewModel::clear() {
+void QnIOPortsViewModel::clear()
+{
     beginResetModel();
     m_data.clear();
     endResetModel();
@@ -291,6 +292,9 @@ void QnIOPortsViewModel::clear() {
 
 void QnIOPortsViewModel::setModelData(const QnIOPortDataList& data)
 {
+    if (m_data == data)
+        return;
+
     beginResetModel();
     m_data = data;
     endResetModel();

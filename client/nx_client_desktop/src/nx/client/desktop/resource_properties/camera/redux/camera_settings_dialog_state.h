@@ -2,20 +2,18 @@
 
 #include <QtCore/QList>
 
+#include <api/model/api_ioport_data.h>
 #include <core/ptz/media_dewarping_params.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_stream_capability.h>
 #include <core/resource/motion_window.h>
 #include <core/misc/schedule_task.h>
-
-#include <nx/vms/api/data/camera_attributes_data.h>
+#include <utils/common/aspect_ratio.h>
 
 #include <nx/client/desktop/common/data/rotation.h>
 #include <nx/client/desktop/resource_properties/camera/utils/schedule_cell_params.h>
-
-#include <utils/common/aspect_ratio.h>
-
 #include <nx/utils/std/optional.h>
+#include <nx/vms/api/data/camera_attributes_data.h>
 
 namespace nx {
 namespace client {
@@ -137,6 +135,7 @@ struct CameraSettingsDialogState
         QString webPage;
         std::optional<QString> primaryStream;
         std::optional<QString> secondaryStream;
+        bool hasVideo = false;
 
         int maxFpsWithoutMotion = 0;
 
@@ -173,10 +172,18 @@ struct CameraSettingsDialogState
     };
     SingleCameraSettings singleCameraSettings;
 
+    struct IoModuleSettings
+    {
+        UserEditable<QnIOPortDataList> ioPortsData;
+        UserEditable<vms::api::IoModuleVisualStyle> visualStyle;
+    };
+    IoModuleSettings singleIoModuleSettings;
+
     struct CombinedProperties
     {
         CombinedValue isDtsBased;
         CombinedValue isWearable;
+        CombinedValue isIoModule;
         CombinedValue hasMotion;
         CombinedValue hasDualStreaming;
 

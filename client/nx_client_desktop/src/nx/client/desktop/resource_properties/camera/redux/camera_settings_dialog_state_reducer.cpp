@@ -2,10 +2,11 @@
 
 #include <limits>
 
+#include <camera/fps_calculator.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource_display_info.h>
-#include <camera/fps_calculator.h>
 #include <utils/camera/camera_bitrate_calculator.h>
+#include <nx/fusion/model_functions.h>
 #include <nx/utils/algorithm/same.h>
 
 namespace nx {
@@ -338,6 +339,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
     state.hasChanges = false;
     state.singleCameraProperties = {};
     state.singleCameraSettings = {};
+    state.singleIoModuleSettings = {};
     state.devicesDescription = {};
     state.recording = {};
     state.devicesCount = cameras.size();
@@ -347,6 +349,8 @@ State CameraSettingsDialogStateReducer::loadCameras(
         [](const Camera& camera) { return camera->isDtsBased(); });
     state.devicesDescription.isWearable = combinedValue(cameras,
         [](const Camera& camera) { return camera->hasFlags(Qn::wearable_camera); });
+    state.devicesDescription.isIoModule = combinedValue(cameras,
+        [](const Camera& camera) { return camera->isIOModule(); });
     state.devicesDescription.hasMotion = combinedValue(cameras,
         [](const Camera& camera) { return camera->hasMotion(); });
     state.devicesDescription.hasDualStreaming = combinedValue(cameras,
@@ -361,6 +365,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
         singleProperties.macAddress = firstCamera->getMAC().toString();
         singleProperties.model = firstCamera->getModel();
         singleProperties.vendor = firstCamera->getVendor();
+        singleProperties.hasVideo = firstCamera->hasVideo();
 
         if (firstCamera->getDefaultMotionType() == Qn::MotionType::MT_HardwareGrid)
         {
@@ -396,11 +401,19 @@ State CameraSettingsDialogStateReducer::loadCameras(
         {
             for (auto& region: regionList)
                 region = QnMotionRegion(); //< Reset to default.
-
-            // TODO: #vkutin #GDM Should we set hasChanges flag here?
         }
 
         state.singleCameraSettings.motionRegionList.setBase(regionList);
+
+        if (firstCamera->isIOModule())
+        {
+            state.singleIoModuleSettings.visualStyle.setBase(
+                QnLexical::deserialized<vms::api::IoModuleVisualStyle>(
+                    firstCamera->getProperty(Qn::IO_OVERLAY_STYLE_PARAM_NAME),
+                    vms::api::IoModuleVisualStyle::default));
+
+            state.singleIoModuleSettings.ioPortsData.setBase(firstCamera->getIOPorts());
+        }
 
         Qn::calculateMaxFps(
             {firstCamera},
@@ -723,6 +736,27 @@ State CameraSettingsDialogStateReducer::setFisheyeSettings(
     state.singleCameraSettings.fisheyeCalibrationSettings.updateValue(
         fisheyeCalibrationSettings(value));
 
+    state.hasChanges = true;
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setIoPortDataList(
+    State state, const QnIOPortDataList& value)
+{
+    if (!state.isSingleCamera() || state.devicesDescription.isIoModule != State::CombinedValue::All)
+        return state;
+
+    state.singleIoModuleSettings.ioPortsData.setUser(value);
+    state.hasChanges = true;
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setIoModuleVisualStyle(
+    State state, vms::api::IoModuleVisualStyle value)
+{
+    // TODO: Check if I/O module.
+
+    state.singleIoModuleSettings.visualStyle.setUser(value);
     state.hasChanges = true;
     return state;
 }

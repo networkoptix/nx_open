@@ -21,6 +21,7 @@
 #include "widgets/camera_schedule_widget.h"
 #include "widgets/camera_motion_settings_widget.h"
 #include "widgets/camera_fisheye_settings_widget.h"
+#include "widgets/io_module_settings_widget.h"
 
 #include "redux/camera_settings_dialog_state.h"
 #include "redux/camera_settings_dialog_store.h"
@@ -121,6 +122,11 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
         int(CameraSettingsTab::recording),
         new CameraScheduleWidget(d->store, ui->tabWidget),
         tr("Recording"));
+
+    addPage(
+        int(CameraSettingsTab::io),
+        new IoModuleSettingsWidget(d->store, ui->tabWidget),
+        tr("I/O Ports"));
 
     addPage(
         int(CameraSettingsTab::motion),
@@ -295,10 +301,19 @@ void CameraSettingsDialog::loadState(const CameraSettingsDialogState& state)
             applyButton->setEnabled(!state.readOnly && state.hasChanges);
     }
 
-    setPageVisible(int(CameraSettingsTab::motion), state.isSingleCamera()
-        && state.devicesDescription.hasMotion == CameraSettingsDialogState::CombinedValue::All);
+    // TODO: #vkutin #gdm Ensure correct visibility/enabled state.
+    // Legacy code has more complicated conditions.
 
-    setPageVisible(int(CameraSettingsTab::fisheye), state.isSingleCamera());
+    using CombinedValue = CameraSettingsDialogState::CombinedValue;
+
+    setPageVisible(int(CameraSettingsTab::motion), state.isSingleCamera()
+        && state.devicesDescription.hasMotion == CombinedValue::All);
+
+    setPageVisible(int(CameraSettingsTab::fisheye),
+        state.isSingleCamera() && state.singleCameraProperties.hasVideo);
+
+    setPageVisible(int(CameraSettingsTab::io), state.isSingleCamera()
+        && state.devicesDescription.isIoModule == CombinedValue::All);
 
     ui->alertBar->setText(getAlertText(state));
 }

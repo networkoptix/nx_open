@@ -227,6 +227,17 @@ void CameraSettingsDialogStore::setFisheyeSettings(const QnMediaDewarpingParams&
         [&](State state) { return Reducer::setFisheyeSettings(std::move(state), value); });
 }
 
+void CameraSettingsDialogStore::setIoPortDataList(const QnIOPortDataList& value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setIoPortDataList(std::move(state), value); });
+}
+
+void CameraSettingsDialogStore::setIoModuleVisualStyle(vms::api::IoModuleVisualStyle value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setIoModuleVisualStyle(std::move(state), value); });
+}
 
 } // namespace desktop
 } // namespace client

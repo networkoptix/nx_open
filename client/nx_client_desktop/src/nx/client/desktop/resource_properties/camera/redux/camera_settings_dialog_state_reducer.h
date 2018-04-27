@@ -40,6 +40,8 @@ public:
     static State setMotionDetectionEnabled(State state, bool value);
     static State setMotionRegionList(State state, const QList<QnMotionRegion>& value);
     static State setFisheyeSettings(State state, const QnMediaDewarpingParams& value);
+    static State setIoPortDataList(State state, const QnIOPortDataList& value);
+    static State setIoModuleVisualStyle(State state, vms::api::IoModuleVisualStyle value);
 };
 
 } // namespace desktop
