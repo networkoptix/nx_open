@@ -284,6 +284,15 @@ void HttpView::registerApiHandlers(
         });
 
     m_httpMessageDispatcher.registerRequestProcessor<http_handler::GetCloudModulesXml>(
+        kAnotherDeprecatedCloudModuleXmlPath,
+        [&authorizationManager, &cloudModuleUrlProviderDeprecated]()
+            -> std::unique_ptr<http_handler::GetCloudModulesXml>
+        {
+            return std::make_unique<http_handler::GetCloudModulesXml>(
+                std::bind(&CloudModuleUrlProvider::getCloudModulesXml, cloudModuleUrlProviderDeprecated, _1));
+        });
+
+    m_httpMessageDispatcher.registerRequestProcessor<http_handler::GetCloudModulesXml>(
         kDiscoveryCloudModuleXmlPath,
         [&authorizationManager, &cloudModuleUrlProvider]()
             -> std::unique_ptr<http_handler::GetCloudModulesXml>

@@ -193,6 +193,7 @@ void Controller::initializeSecurity()
 {
     // TODO: #ak Move following to stree xml.
     m_authRestrictionList = std::make_unique<nx::network::http::AuthMethodRestrictionList>();
+    m_authRestrictionList->allow(kAnotherDeprecatedCloudModuleXmlPath, nx::network::http::AuthMethod::noAuth);
     m_authRestrictionList->allow(kDeprecatedCloudModuleXmlPath, nx::network::http::AuthMethod::noAuth);
     m_authRestrictionList->allow(kDiscoveryCloudModuleXmlPath, nx::network::http::AuthMethod::noAuth);
     m_authRestrictionList->allow(http_handler::Ping::kHandlerPath, nx::network::http::AuthMethod::noAuth);
