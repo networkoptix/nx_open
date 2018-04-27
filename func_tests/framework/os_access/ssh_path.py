@@ -63,9 +63,6 @@ class SSHPath(FileSystemPath, PurePosixPath):
                 ''',
             env={'SELF': self})
 
-    def iterdir(self):
-        return self._run_find_command(max_depth=1)
-
     def expanduser(self):
         """Expand tilde at the beginning safely (without passing complete path to sh)"""
         if not self.parts[0].startswith('~'):
@@ -79,18 +76,19 @@ class SSHPath(FileSystemPath, PurePosixPath):
         user_home_dir = output.split(':')[6]
         return self.__class__(user_home_dir, *self.parts[1:])
 
-    def _run_find_command(self, whole_name_pattern=None, max_depth=None):
-        command = ['find', self]
-        if max_depth is not None:
-            command += ['-maxdepth', max_depth]
-        if whole_name_pattern is not None:
-            command += ['-wholename', whole_name_pattern]
-        output = self._ssh_access.run_command(command)
-        lines = output.rstrip().splitlines()
-        return [self.__class__(line) for line in lines]
-
+    @_raising_on_exit_status({2: DoesNotExist, 3: NotADir})
     def glob(self, pattern):
-        return self._run_find_command(whole_name_pattern=self / pattern, max_depth=1)
+        output = self._ssh_access.run_sh_script(
+            # language=Bash
+            '''
+                test ! -e "$SELF" && >&2 echo "does not exist: $SELF" && exit 2
+                test ! -d "$SELF" && >&2 echo "not a dir: $SELF" && exit 3
+                find "$SELF" -mindepth 1 -maxdepth 1 -name "$PATTERN"
+                ''',
+            env={'SELF': self, 'PATTERN': pattern})
+        lines = output.rstrip().splitlines()
+        paths = [self.__class__(line) for line in lines]
+        return paths
 
     @_raising_on_exit_status({2: BadParent, 3: AlreadyExists, 4: BadParent})
     def mkdir(self, parents=False, exist_ok=False):

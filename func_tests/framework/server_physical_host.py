@@ -175,7 +175,7 @@ class PhysicalInstallationHost(object):
                 'Provided package was built with another customization. '
                 'Expected: {}. But files in unpacked dir are:\n{}'.format(
                     self._customization_company_name,
-                    self._unpacked_mediaserver_root_dir.joinpath('opt').iterdir(),
+                    self._unpacked_mediaserver_root_dir.joinpath('opt').glob('*'),
                     ),
                 )
         self._dist_unpacked = True

@@ -104,9 +104,6 @@ class SMBPath(FileSystemPath, PureWindowsPath):
             raise ValueError("{!r} contains '*', but files can be deleted only by one")
         self._connection().deleteFiles(self._service_name, self._relative_path)
 
-    def iterdir(self):
-        return self.glob('*')
-
     def expanduser(self):
         """Don't do any expansion on Windows"""
         return self
@@ -165,7 +162,7 @@ class SMBPath(FileSystemPath, PureWindowsPath):
 
     def rmtree(self, ignore_errors=False):
         try:
-            iter_entries = self.iterdir()
+            iter_entries = self.glob('*')
         except DoesNotExist:
             if ignore_errors:
                 pass

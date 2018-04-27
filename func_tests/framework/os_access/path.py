@@ -28,10 +28,6 @@ class FileSystemPath(PurePath):
         pass
 
     @abstractmethod
-    def iterdir(self):
-        yield self.__class__()
-
-    @abstractmethod
     def expanduser(self):
         return self.__class__()
 
