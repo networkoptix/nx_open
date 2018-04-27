@@ -43,6 +43,7 @@ bool parseHttpRequestParams(
     const QString& command,
     const QnRequestParamList& params,
     nx::vms::api::ConnectionData* loginInfo);
+
 void toUrlParams(const nx::vms::api::ConnectionData&, QUrlQuery* query);
 
 bool parseHttpRequestParams(

@@ -121,6 +121,7 @@ void toUrlParams(const Qn::SerializationFormat& format, QUrlQuery* query)
 
 bool parseHttpRequestParams(
     QnCommonModule* /*commonModule*/,
+    const QString& /*command*/,
     const QnRequestParamList& params,
     nx::vms::api::ConnectionData* data)
 {
