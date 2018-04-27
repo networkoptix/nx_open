@@ -27,6 +27,7 @@
 #include "hardware_id_p.h"
 #include <nx/mediaserver/root_tool.h>
 #include <media_server/media_server_module.h>
+#include <nx/utils/license/util.h>
 
 namespace {
 
