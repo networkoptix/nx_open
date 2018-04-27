@@ -176,15 +176,6 @@ def find_deb_installation(os_access, mediaserver_deb, installation_root):
     return None
 
 
-def _port_is_opened_on_server_machine(hostname, port):
-    try:
-        hostname.run_command(['nc', '-z', 'localhost', port])
-    except exit_status_error_cls(1):
-        return False
-    else:
-        return True
-
-
 def install_mediaserver(ssh_access, mediaserver_deb, reinstall=False):
     installation_root = ssh_access.Path('/opt')
     if not reinstall:
