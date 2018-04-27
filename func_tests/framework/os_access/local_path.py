@@ -1,10 +1,10 @@
 from errno import EEXIST, EISDIR, ENOENT, ENOTDIR
 from functools import wraps
-from shutil import copyfile, rmtree
+from shutil import rmtree
 
 from pathlib2 import PosixPath
 
-from framework.os_access.exceptions import (AlreadyExists, DirIsAFile, DoesNotExist, NotAFile, BadParent)
+from framework.os_access.exceptions import AlreadyExists, BadParent, DirIsAFile, DoesNotExist, NotAFile
 from framework.os_access.path import FileSystemPath
 
 

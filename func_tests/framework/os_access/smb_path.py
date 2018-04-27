@@ -5,7 +5,6 @@ from contextlib import closing
 from functools import wraps
 from io import BytesIO
 
-from netaddr.ip import IPAddress
 from nmb.NetBIOS import NetBIOS
 from pathlib2 import PureWindowsPath
 from pylru import lrudecorator

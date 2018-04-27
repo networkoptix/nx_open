@@ -6,7 +6,7 @@ import sys
 from pathlib2 import PurePosixPath
 
 from framework.build_info import build_info_from_text, customizations_from_paths
-from framework.os_access.exceptions import DoesNotExist, exit_status_error_cls
+from framework.os_access.exceptions import DoesNotExist
 from framework.os_access.path import copy_file
 from framework.os_access.ssh_access import SSHAccess
 from framework.os_access.ssh_path import SSHPath

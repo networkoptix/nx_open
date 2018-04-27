@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 
-from pathlib2 import Path, PurePath
+from pathlib2 import PurePath
 
 
 class FileSystemPath(PurePath):
