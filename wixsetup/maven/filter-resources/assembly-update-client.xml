@@ -35,7 +35,6 @@
                 <include>vms_gateway_core.dll</include>
             </includes>
             <excludes>
-                <exclude>libvorbisfile.dll</exclude>
                 <exclude>mediaservice/*d.dll</exclude>
             </excludes>
         </fileSet>

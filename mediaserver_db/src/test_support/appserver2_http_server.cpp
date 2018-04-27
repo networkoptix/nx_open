@@ -107,7 +107,7 @@ void Appserver2MessageProcessor::onResourceStatusChanged(
 
 QnResourceFactory* Appserver2MessageProcessor::getResourceFactory() const
 {
-    return nx::TestResourceFactory::instance();
+    return m_factory.get();
 }
 
 bool Appserver2MessageProcessor::canRemoveResource(const QnUuid& id)

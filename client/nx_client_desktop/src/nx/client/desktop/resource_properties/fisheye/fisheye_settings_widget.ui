@@ -115,17 +115,31 @@
             <number>0</number>
            </property>
            <item>
-            <widget class="QLabel" name="label">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>Mount Angle Correction:</string>
-             </property>
-            </widget>
+             <layout class="QHBoxLayout" name="angleCorrectionLayout" stretch="0,1">
+               <item>
+                 <widget class="QLabel" name="label">
+                   <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                     </sizepolicy>
+                   </property>
+                   <property name="text">
+                     <string>Mount Angle Correction:</string>
+                   </property>
+                 </widget>
+               </item>
+               <item>
+                 <widget class="nx::client::desktop::HintButton" name="angleCorrectionHint">
+                   <property name="sizePolicy">
+                     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                     </sizepolicy>
+                   </property>
+                 </widget>
+               </item>
+             </layout>
            </item>
            <item>
             <widget class="QDoubleSpinBox" name="angleSpinBox">
@@ -574,6 +588,11 @@
    <extends>QWidget</extends>
    <header location="global">nx/client/desktop/resource_properties/fisheye/fisheye_calibration_widget.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+    <class>nx::client::desktop::HintButton</class>
+    <extends>QWidget</extends>
+    <header location="global">nx/client/desktop/common/widgets/hint_button.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

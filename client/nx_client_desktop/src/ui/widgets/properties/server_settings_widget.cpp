@@ -186,12 +186,7 @@ bool QnServerSettingsWidget::hasChanges() const
 
 void QnServerSettingsWidget::retranslateUi()
 {
-    QString failoverText = QnDeviceDependentStrings::getDefaultNameFromSet(
-        resourcePool(),
-        tr("server will take devices automatically from offline servers"),
-        tr("server will take cameras automatically from offline servers"));
-
-    ui->failoverGroupBox->setTitle(tr("Failover") + lit("\t(%1)").arg(failoverText));
+    ui->failoverGroupBox->setTitle(tr("Failover"));
 
     ui->maxCamerasLabel->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
         resourcePool(),

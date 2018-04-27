@@ -219,7 +219,7 @@ private:
     void addDelayedAliveTran(QnTransaction<ApiPeerAliveData>&& tranToSend, int timeout);
     void sendDelayedAliveTran();
     void reconnectAllPeers(QnMutexLockerBase* const /*lock*/);
-    nx::utils::Url updateOutgoingUrl(const nx::utils::Url& srcUrl) const;
+    nx::utils::Url updateOutgoingUrl(const QnUuid& peer, const nx::utils::Url& srcUrl) const;
 
 protected slots:
     void at_stateChanged(QnTransactionTransport::State state);

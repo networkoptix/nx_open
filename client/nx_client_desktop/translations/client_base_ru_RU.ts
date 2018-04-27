@@ -979,7 +979,7 @@ to view more bookmarks</source>
       <translation>Количество деактиваций для этой лицензии превысило лимит.</translation>
     </message>
     <message>
-      <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
+      <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
       <translation>Аппаратный идентификатор сервера с этой лицензией не соответствует идентификатору сервера, на котором она была активирована.</translation>
     </message>
   </context>
@@ -2273,14 +2273,6 @@ to view more bookmarks</source>
       <translation>У модуль ввода/вывода нет аудио потока</translation>
     </message>
     <message>
-      <source>I/O Module Id</source>
-      <translation>Идентификатор модуля ввода/вывода</translation>
-    </message>
-    <message>
-      <source>Camera Id</source>
-      <translation>Идентификатор камеры</translation>
-    </message>
-    <message>
       <source>Settings</source>
       <translation>Настройки</translation>
     </message>
@@ -2291,6 +2283,14 @@ to view more bookmarks</source>
     <message>
       <source>No settings</source>
       <translation>Нет настроек</translation>
+    </message>
+    <message>
+      <source>I/O Module ID</source>
+      <translation>Идентификатор модуля ввода/вывода</translation>
+    </message>
+    <message>
+      <source>Camera ID</source>
+      <translation>Идентификатор камеры</translation>
     </message>
   </context>
   <context>
@@ -2406,7 +2406,7 @@ to view more bookmarks</source>
       <translation>Edge</translation>
     </message>
     <message numerus="yes">
-      <source>This Id is already used on the following %n cameras: %1</source>
+      <source>This ID is already used on the following %n cameras: %1</source>
       <translation>
         <numerusform>Этот идентификатор уже используется для следующей %n камере: %1</numerusform>
         <numerusform>Этот идентификатор уже используется для следующих %n камер: %1</numerusform>
@@ -2541,7 +2541,7 @@ to view more bookmarks</source>
       <translation>Сервер</translation>
     </message>
     <message>
-      <source>Id</source>
+      <source>ID</source>
       <translation>Идентификатор</translation>
     </message>
   </context>
@@ -3810,7 +3810,7 @@ to %1</source>
       <translation>Импульс</translation>
     </message>
     <message>
-      <source>Id</source>
+      <source>ID</source>
       <translation>Идентификатор</translation>
     </message>
   </context>
@@ -3965,6 +3965,21 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnLensCameraAdvancedParamWidget</name>
+    <message>
+      <source>Zoom</source>
+      <translation type="unfinished">Zoom</translation>
+    </message>
+    <message>
+      <source>Focus</source>
+      <translation type="unfinished">Focus</translation>
+    </message>
+    <message>
+      <source>Rotation:</source>
+      <translation type="unfinished">Rotation:</translation>
+    </message>
+  </context>
+  <context>
     <name>QnLicenseDetailsDialog</name>
     <message>
       <source>Screens Allowed:</source>
@@ -3995,8 +4010,8 @@ to %1</source>
       <translation>Особенности:</translation>
     </message>
     <message>
-      <source>Locked to Hardware Id</source>
-      <translation>Привязано к аппаратному Id</translation>
+      <source>Locked to Hardware ID</source>
+      <translation>Привязано к аппаратному ID</translation>
     </message>
   </context>
   <context>
@@ -4291,16 +4306,16 @@ to %1</source>
       <translation>Пожалуйста, свяжитесь с службой поддержки, чтобы получить действительный лицензионный ключ.</translation>
     </message>
     <message>
-      <source>This license is already activated and linked to Hardware Id %1</source>
-      <translation>Эта лицензия уже активирована и связана с аппаратным Id %1</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to Hardware Id %1 on %2</source>
-      <translation>Эта лицензия уже активирована и связана с аппаратным Id %1 на %2</translation>
-    </message>
-    <message>
       <source>If the problem persists please contact Customer Support.</source>
       <translation>Если проблема не устранена, обратитесь в службу поддержки.</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1</source>
+      <translation>Эта лицензия уже активирована и связана с аппаратным ID %1</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1 on %2</source>
+      <translation>Эта лицензия уже активирована и связана с аппаратным ID %1 на %2</translation>
     </message>
   </context>
   <context>
@@ -4322,16 +4337,16 @@ to %1</source>
       <translation>Не удалось открыть файл</translation>
     </message>
     <message>
-      <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>Для получения лицензионного ключа необходимо отослать серийный номер и аппаратный Id на %1.</translation>
-    </message>
-    <message>
-      <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>Пожалуйста, отправьте предоставленный лицензионный ключ и аппаратный Id на %1 чтобы получить файл с ключом активации.</translation>
-    </message>
-    <message>
       <source>All files</source>
       <translation type="unfinished">All files</translation>
+    </message>
+    <message>
+      <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
+      <translation>Для получения лицензионного ключа необходимо отослать серийный номер и аппаратный ID на %1.</translation>
+    </message>
+    <message>
+      <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
+      <translation>Пожалуйста, отправьте предоставленный лицензионный ключ и аппаратный ID на %1 чтобы получить файл с ключом активации.</translation>
     </message>
   </context>
   <context>

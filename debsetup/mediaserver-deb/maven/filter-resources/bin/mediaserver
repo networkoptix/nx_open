@@ -5,9 +5,6 @@ VMS_DIR=$(dirname $(dirname "${BASH_SOURCE[0]}"))
 EXE="$VMS_DIR/bin/mediaserver-bin"
 ARGS="-e"
 
-export LD_LIBRARY_PATH="$VMS_DIR/lib"
-#export VMS_PLUGIN_DIR="$VMS_DIR/lib"
-
 # Switch off rp_filter for all interfaces to allow
 # discover/install cameras with invalid ip addresses
 for interface in /proc/sys/net/ipv4/conf/*/rp_filter; do
@@ -33,6 +30,14 @@ ulimit -n $((SYS_FD_MAX<FD_MAX?SYS_FD_MAX:FD_MAX))
 ulimit -c unlimited
 ulimit -a
 
+TMP_FILE="/tmp/__nx.so.conf"
+if [[ -z $(grep -l "$VMS_DIR/lib/" /etc/ld.so.conf) ]]; then
+    echo "$VMS_DIR/lib/" | cat - /etc/ld.so.conf > "$TMP_FILE" && mv "$TMP_FILE" /etc/ld.so.conf
+    ldconfig
+fi
+
 echo
 echo --- Starting: $EXE $ARGS
-exec start-stop-daemon --start -d "$VMS_DIR/bin" --exec $EXE -- $ARGS
+exec start-stop-daemon --start \
+    --chuid @deb.customization.company.name@:@deb.customization.company.name@ \
+    -d "$VMS_DIR/bin" --exec $EXE -- $ARGS

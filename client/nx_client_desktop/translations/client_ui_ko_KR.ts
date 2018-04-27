@@ -764,16 +764,16 @@
     </message>
     <message>
       <location/>
-      <source>Logical Id</source>
-      <translation>논리 Id</translation>
+      <source>Logical ID</source>
+      <translation>논리 ID</translation>
     </message>
   </context>
   <context>
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
-      <source>Input Id</source>
-      <translation>입력 Id</translation>
+      <source>Input ID</source>
+      <translation>입력 ID</translation>
     </message>
   </context>
   <context>
@@ -798,8 +798,8 @@
     </message>
     <message>
       <location/>
-      <source>Output Id:</source>
-      <translation>출력 Id:</translation>
+      <source>Output ID:</source>
+      <translation>출력 ID:</translation>
     </message>
   </context>
   <context>
@@ -1513,8 +1513,8 @@
     </message>
     <message>
       <location/>
-      <source>Locked to Hardware Id:</source>
-      <translation>하드웨어 Id에 잠김:</translation>
+      <source>Locked to Hardware ID:</source>
+      <translation>하드웨어 ID에 잠김:</translation>
     </message>
   </context>
   <context>
@@ -1612,8 +1612,8 @@
     </message>
     <message>
       <location/>
-      <source>Hardware Id</source>
-      <translation>하드웨어 Id:</translation>
+      <source>Hardware ID</source>
+      <translation>하드웨어 ID:</translation>
     </message>
   </context>
   <context>

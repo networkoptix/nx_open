@@ -95,6 +95,7 @@ public:
 
     virtual QString dataDir() const override;
     virtual nx::utils::log::Settings logging() const override;
+    QString logBaseName() const override;
 
     const General& general() const;
     const Auth& auth() const;
@@ -109,6 +110,7 @@ protected:
 private:
     General m_general;
     nx::utils::log::Settings m_logging;
+    QString m_logBaseName;
     Auth m_auth;
     Tcp m_tcp;
     Http m_http;

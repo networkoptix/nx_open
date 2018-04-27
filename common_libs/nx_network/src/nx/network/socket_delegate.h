@@ -236,6 +236,10 @@ public:
         return this->m_target->readSomeAsync(buffer, std::move(handler));
     }
 
+    /*
+     * Warning! Buffer should live at least till asynchronous send occurres, so
+     * do not use buffers with local scope here.
+     */
     virtual void sendAsync(
         const nx::Buffer& buffer,
         IoCompletionHandler handler) override

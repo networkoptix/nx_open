@@ -4,6 +4,8 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
+#include <algorithm>
+#include <iterator>
 #include <set>
 #include <assert.h>
 #include <string.h>
@@ -134,7 +136,8 @@ bool SystemCommands::checkOwnerPermissions(const std::string& path)
     return true;
 }
 
-bool SystemCommands::execute(const std::string& command)
+bool SystemCommands::execute(
+    const std::string& command, std::function<void(const char*)> outputAction)
 {
     const auto pipe = popen((command + " 2>&1").c_str(), "r");
     if (pipe == nullptr)
@@ -146,7 +149,11 @@ bool SystemCommands::execute(const std::string& command)
     std::ostringstream output;
     char buffer[1024];
     while (fgets(buffer, sizeof(buffer), pipe) != nullptr)
+    {
         output << buffer;
+        if (outputAction)
+            outputAction(buffer);
+    }
 
     int retCode = pclose(pipe);
     if (retCode != 0)
@@ -251,7 +258,7 @@ SystemCommands::MountCode SystemCommands::mount(
                     result = MountCode::ok;
                     break;
                 }
-                else if (m_lastError.find("13") != std::string::npos)
+                else if (m_lastError.find("13") != std::string::npos) //< 'Permission denied' error code
                 {
                     gotWrongCredentialsError = true;
                 }
@@ -384,7 +391,10 @@ int SystemCommands::open(const std::string& path, int mode, bool reportViaSocket
     }
 
     int fd = ::open(path.c_str(), mode, 0660);
-    if (reportViaSocket)
+    if (fd < 0)
+        perror("open");
+
+    if (reportViaSocket && fd > 0)
         system_commands::domain_socket::detail::sendFd(fd);
 
     return fd;
@@ -543,6 +553,72 @@ bool SystemCommands::kill(int pid)
     }
 
     return true;
+}
+
+std::string SystemCommands::serializedDmiInfo(bool reportViaSocket)
+{
+    constexpr std::array<const char*, 2> prefixes = {
+       "Part Number: ",
+       "Serial Number: ",
+    };
+
+    auto trim =
+        [](std::string& str)
+        {
+            std::string::size_type pos = str.find_last_not_of(" \n\t");
+            if (pos != std::string::npos)
+            {
+                str.erase(pos + 1);
+                pos = str.find_first_not_of(' ');
+                if (pos != std::string::npos)
+                    str.erase(0, pos);
+            }
+            else
+            {
+                str.erase(str.begin(), str.end());
+            }
+        };
+
+    std::string result;
+    std::set<std::string> values[prefixes.size()];
+    if (execute(
+        "/usr/sbin/dmidecode -t17",
+        [&values, &prefixes, trim](const char* line)
+        {
+            for (int index = 0; index < prefixes.size(); index++)
+            {
+                const char* ptr = strstr(line, prefixes[index]);
+                if (ptr)
+                {
+                    std::string value = std::string(ptr + strlen(prefixes[index]));
+                    trim(value);
+                    values[index].insert(value);
+                }
+            }
+        }))
+    {
+        for (size_t i = 0; i < prefixes.size(); ++i)
+        {
+            std::string tmp;
+            for (const auto& value: values[i])
+                tmp += value;
+
+            for (size_t i = 0; i < sizeof(std::string::size_type); ++i)
+                result.push_back('\0');
+
+            std::string::size_type len = tmp.size();
+            memcpy(
+                result.data() + result.size() - sizeof(std::string::size_type), &len,
+                sizeof(std::string::size_type));
+
+            std::copy(tmp.cbegin(), tmp.cend(), std::back_inserter(result));
+        }
+    }
+
+    if (reportViaSocket)
+        system_commands::domain_socket::detail::sendBuffer(result.data(), result.size());
+
+    return result;
 }
 
 bool SystemCommands::install(const std::string& debPackage)

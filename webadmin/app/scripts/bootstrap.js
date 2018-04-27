@@ -48,7 +48,8 @@ window.setLanguage = function(lang){
             return supportedLanguage.indexOf(userLang) == 0;
         });
     }
-    if(!userLang){
+    if(!userLang || Config.supportedLanguages.indexOf(userLang)<0){
+        // We weren't able to detect language or detected language is not supported in this customization
         userLang = Config.defaultLanguage;
     }
 

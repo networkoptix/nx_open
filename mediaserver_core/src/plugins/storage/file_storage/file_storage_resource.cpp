@@ -90,15 +90,14 @@ static QString sysDrivePath()
 
 #elif defined(Q_OS_LINUX)
 
-static QString sysDrivePath()
-{
-    static QString devicePath = qnServerModule->rootTool()->devicePath("/");
-    return devicePath;
-}
-
 static QString getDevicePath(const QString& path)
 {
     return qnServerModule->rootTool()->devicePath(path);
+}
+
+static QString sysDrivePath()
+{
+    return getDevicePath("/");
 }
 
 #else // Unsupported OS so far

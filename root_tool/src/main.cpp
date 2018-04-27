@@ -58,7 +58,7 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
             const auto user = getOptionalArg(argv);
             const auto password = getOptionalArg(argv);
 
-            return systemCommands->mount(*url, *directory, user, password, true)
+            return systemCommands->mount(*url, *directory, user, password, /*usePipe*/ true)
                 == nx::SystemCommands::MountCode::ok ? Result::ok : Result::execFailed;
         });
 
@@ -168,6 +168,12 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
                 return Result::invalidArg;
 
             return systemCommands->kill(std::stoi(*pid)) ? Result::ok : Result::execFailed;
+        });
+
+    factory.reg({"dmiInfo"}, {},
+        [systemCommands](const char** argv)
+        {
+            return systemCommands->serializedDmiInfo(true).empty() ? Result::execFailed : Result::ok;
         });
 
     factory.reg({"umount", "unmount"}, {"path"},

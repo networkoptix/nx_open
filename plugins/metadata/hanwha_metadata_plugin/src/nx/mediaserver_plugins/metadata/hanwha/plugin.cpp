@@ -179,15 +179,18 @@ boost::optional<QList<QnUuid>> Plugin::fetchSupportedEvents(
 
     auto sharedRes = sharedResources(cameraInfo);
 
-    const auto& cgiParameters = sharedRes->sharedContext->cgiParameters();
-    if (!cgiParameters.diagnostics || !cgiParameters.value.isValid())
+    const auto& information = sharedRes->sharedContext->information();
+    if (!information)
+        return boost::none;
+    const auto& cgiParameters = information->cgiParameters;
+    if (!cgiParameters.isValid())
         return boost::none;
 
     const auto& eventStatuses = sharedRes->sharedContext->eventStatuses();
     if (!eventStatuses || !eventStatuses->isSuccessful())
         return boost::none;
 
-    return eventsFromParameters(cgiParameters.value, eventStatuses.value, cameraInfo.channel);
+    return eventsFromParameters(cgiParameters, eventStatuses.value, cameraInfo.channel);
 }
 
 boost::optional<QList<QnUuid>> Plugin::eventsFromParameters(

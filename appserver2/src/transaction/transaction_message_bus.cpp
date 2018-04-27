@@ -23,6 +23,7 @@
 #include "nx_ec/data/api_peer_alive_data.h"
 #include "nx_ec/data/api_discovery_data.h"
 #include <nx_ec/data/api_access_rights_data.h>
+#include <nx/cloud/cdb/api/ec2_request_paths.h>
 
 #include "transaction/runtime_transaction_log.h"
 #include <transaction/transaction_transport.h>
@@ -36,6 +37,7 @@
 #include <nx/utils/random.h>
 #include <core/resource_access/resource_access_manager.h>
 #include "transaction_message_bus_priv.h"
+#include <common/common_module.h>
 
 namespace ec2 {
 
@@ -1057,10 +1059,15 @@ bool QnTransactionMessageBus::moveConnectionToReadyForStreaming(const QnUuid& co
     return false;
 }
 
-nx::utils::Url QnTransactionMessageBus::updateOutgoingUrl(const nx::utils::Url& srcUrl) const
+nx::utils::Url QnTransactionMessageBus::updateOutgoingUrl(
+    const QnUuid& peer, 
+    const nx::utils::Url& srcUrl) const
 {
     nx::utils::Url url(srcUrl);
-    url.setPath("/ec2/events");
+    if (peer == ::ec2::kCloudPeerId)
+        url.setPath(nx::cdb::api::kEc2EventsPath);
+    else
+        url.setPath("/ec2/events");
     QUrlQuery q(url.query());
 
     q.addQueryItem("guid", commonModule()->moduleGUID().toString());
@@ -1073,7 +1080,7 @@ nx::utils::Url QnTransactionMessageBus::updateOutgoingUrl(const nx::utils::Url& 
 void QnTransactionMessageBus::addOutgoingConnectionToPeer(const QnUuid& id, const nx::utils::Url &_url)
 {
     removeOutgoingConnectionFromPeer(id);
-    nx::utils::Url url = updateOutgoingUrl(_url);
+    nx::utils::Url url = updateOutgoingUrl(id, _url);
     QnMutexLocker lock(&m_mutex);
     if (!m_remoteUrls.contains(url))
     {

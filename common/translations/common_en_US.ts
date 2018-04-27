@@ -581,8 +581,8 @@
         <translation></translation>
     </message>
     <message>
-        <source>Server with matching Hardware Id not found</source>
-        <translation></translation>
+        <source>Server with matching Hardware ID not found</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -704,12 +704,12 @@
         <translation></translation>
     </message>
     <message>
-        <source>Hardware Id: %1</source>
+        <source>Time License</source>
         <translation></translation>
     </message>
     <message>
-        <source>Time License</source>
-        <translation></translation>
+        <source>Hardware ID: %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

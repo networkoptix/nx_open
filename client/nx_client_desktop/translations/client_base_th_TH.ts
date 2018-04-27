@@ -978,7 +978,7 @@ to view more bookmarks</source>
       <translation>จำนวนการยกเลิกการใช้งานเกินขีด จำกัด สำหรับใบอนุญาตนี้</translation>
     </message>
     <message>
-      <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
+      <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
       <translation>รหัสฮาร์ดแวร์ของเซิร์ฟเวอร์ที่มีใบอนุญาตนี้ไม่ตรงกับหมายเลขฮาร์ดแวร์ที่เปิดใช้งานใบอนุญาต</translation>
     </message>
   </context>
@@ -2206,14 +2206,6 @@ to view more bookmarks</source>
       <translation>โมดูล I/O มีสตรีมไม่มีเสียง</translation>
     </message>
     <message>
-      <source>I/O Module Id</source>
-      <translation>รหัสโมดูล I / O</translation>
-    </message>
-    <message>
-      <source>Camera Id</source>
-      <translation>รหัสกล้อง</translation>
-    </message>
-    <message>
       <source>Settings</source>
       <translation>การตั้งค่า</translation>
     </message>
@@ -2224,6 +2216,14 @@ to view more bookmarks</source>
     <message>
       <source>No settings</source>
       <translation>ไม่มีการตั้งค่า</translation>
+    </message>
+    <message>
+      <source>I/O Module ID</source>
+      <translation>รหัสโมดูล I / O</translation>
+    </message>
+    <message>
+      <source>Camera ID</source>
+      <translation>รหัสกล้อง</translation>
     </message>
   </context>
   <context>
@@ -2336,7 +2336,7 @@ to view more bookmarks</source>
       <translation>ขอบ</translation>
     </message>
     <message numerus="yes">
-      <source>This Id is already used on the following %n cameras: %1</source>
+      <source>This ID is already used on the following %n cameras: %1</source>
       <translation>
         <numerusform>รหัสนี้ใช้กับกล้อง %n ต่อไปนี้: %1</numerusform>
       </translation>
@@ -2456,7 +2456,7 @@ to view more bookmarks</source>
       <translation>เซอร์ฟเวอร์</translation>
     </message>
     <message>
-      <source>Id</source>
+      <source>ID</source>
       <translation>ไอดี</translation>
     </message>
   </context>
@@ -3691,7 +3691,7 @@ to %1</source>
       <translation>แรงกระตุ้น</translation>
     </message>
     <message>
-      <source>Id</source>
+      <source>ID</source>
       <translation>ไอดี</translation>
     </message>
   </context>
@@ -3843,6 +3843,21 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnLensCameraAdvancedParamWidget</name>
+    <message>
+      <source>Zoom</source>
+      <translation type="unfinished">Zoom</translation>
+    </message>
+    <message>
+      <source>Focus</source>
+      <translation type="unfinished">Focus</translation>
+    </message>
+    <message>
+      <source>Rotation:</source>
+      <translation type="unfinished">Rotation:</translation>
+    </message>
+  </context>
+  <context>
     <name>QnLicenseDetailsDialog</name>
     <message>
       <source>Screens Allowed:</source>
@@ -3873,7 +3888,7 @@ to %1</source>
       <translation>คุณสมบัติ:</translation>
     </message>
     <message>
-      <source>Locked to Hardware Id</source>
+      <source>Locked to Hardware ID</source>
       <translation>ถูกล็อคไปยังรหัสฮาร์ดแวร์</translation>
     </message>
   </context>
@@ -4139,16 +4154,16 @@ to %1</source>
       <translation>โปรดติดต่อฝ่ายบริการลูกค้าเพื่อขอรหัสสัญญาอนุญาตที่ถูกต้อง</translation>
     </message>
     <message>
-      <source>This license is already activated and linked to Hardware Id %1</source>
-      <translation>ใบอนุญาตนี้ได้เปิดใช้งานและเชื่อมโยงกับ Hardware Id %1 แล้ว</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to Hardware Id %1 on %2</source>
-      <translation>ใบอนุญาตนี้ได้เปิดใช้งานแล้วและเชื่อมโยงกับ Hardware Id %1 ใน %2</translation>
-    </message>
-    <message>
       <source>If the problem persists please contact Customer Support.</source>
       <translation>หากปัญหายังคงมีอยู่โปรดติดต่อฝ่ายบริการลูกค้า</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1</source>
+      <translation>ใบอนุญาตนี้ได้เปิดใช้งานและเชื่อมโยงกับ Hardware ID %1 แล้ว</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1 on %2</source>
+      <translation>ใบอนุญาตนี้ได้เปิดใช้งานแล้วและเชื่อมโยงกับ Hardware ID %1 ใน %2</translation>
     </message>
   </context>
   <context>
@@ -4170,16 +4185,16 @@ to %1</source>
       <translation>ไม่สามารถเปิดไฟล์นี้</translation>
     </message>
     <message>
-      <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
+      <source>All files</source>
+      <translation type="unfinished">All files</translation>
+    </message>
+    <message>
+      <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
       <translation>โปรดส่งอีเมลพร้อมรหัสสัญญาอนุญาตและรหัสฮาร์ดแวร์ที่ให้ไว้กับ %1 เพื่อรับไฟล์ Activation Key</translation>
     </message>
     <message>
-      <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>โปรดส่ง Id คีย์ใบอนุญาตและฮาร์ดแวร์ให้กับ %1 เพื่อรับไฟล์ Activation Key</translation>
-    </message>
-    <message>
-      <source>All files</source>
-      <translation type="unfinished">All files</translation>
+      <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
+      <translation>โปรดส่ง ID คีย์ใบอนุญาตและฮาร์ดแวร์ให้กับ %1 เพื่อรับไฟล์ Activation Key</translation>
     </message>
   </context>
   <context>

@@ -978,8 +978,8 @@ to view more bookmarks</source>
       <translation>El número de desactivaciones excedió el límite para esta licencia.</translation>
     </message>
     <message>
-      <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
-      <translation>El Id de hardware del servidor con esta licencia no coincide con el Id de hardware en el que se activó la licencia.</translation>
+      <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
+      <translation>El ID de Hardware del servidor con esta licencia no coincide con el ID de Hardware en el que se activó la licencia.</translation>
     </message>
   </context>
   <context>
@@ -2228,14 +2228,6 @@ to view more bookmarks</source>
       <translation>Módulo de la entrada-salida no tiene ninguna reproducción de audio</translation>
     </message>
     <message>
-      <source>I/O Module Id</source>
-      <translation>Id del módulo de E/S</translation>
-    </message>
-    <message>
-      <source>Camera Id</source>
-      <translation>Id de la cámara</translation>
-    </message>
-    <message>
       <source>Settings</source>
       <translation>Ajustes</translation>
     </message>
@@ -2246,6 +2238,14 @@ to view more bookmarks</source>
     <message>
       <source>No settings</source>
       <translation>Sin configuraciones</translation>
+    </message>
+    <message>
+      <source>I/O Module ID</source>
+      <translation>ID del módulo de E/S</translation>
+    </message>
+    <message>
+      <source>Camera ID</source>
+      <translation>ID de la cámara</translation>
     </message>
   </context>
   <context>
@@ -2359,7 +2359,7 @@ to view more bookmarks</source>
       <translation>Edge</translation>
     </message>
     <message numerus="yes">
-      <source>This Id is already used on the following %n cameras: %1</source>
+      <source>This ID is already used on the following %n cameras: %1</source>
       <translation>
         <numerusform>Esta identificación ya se usa en las siguientes cámaras %n: %1</numerusform>
         <numerusform>Esta identificación ya se usa en las siguientes cámaras %n: %1</numerusform>
@@ -2484,8 +2484,8 @@ to view more bookmarks</source>
       <translation>Servidor</translation>
     </message>
     <message>
-      <source>Id</source>
-      <translation>Id</translation>
+      <source>ID</source>
+      <translation type="unfinished">ID</translation>
     </message>
   </context>
   <context>
@@ -3732,8 +3732,8 @@ a %1</translation>
       <translation>Impulso</translation>
     </message>
     <message>
-      <source>Id</source>
-      <translation>Id</translation>
+      <source>ID</source>
+      <translation type="unfinished">ID</translation>
     </message>
   </context>
   <context>
@@ -3885,6 +3885,21 @@ a %1</translation>
     </message>
   </context>
   <context>
+    <name>QnLensCameraAdvancedParamWidget</name>
+    <message>
+      <source>Zoom</source>
+      <translation type="unfinished">Zoom</translation>
+    </message>
+    <message>
+      <source>Focus</source>
+      <translation type="unfinished">Focus</translation>
+    </message>
+    <message>
+      <source>Rotation:</source>
+      <translation type="unfinished">Rotation:</translation>
+    </message>
+  </context>
+  <context>
     <name>QnLicenseDetailsDialog</name>
     <message>
       <source>Screens Allowed:</source>
@@ -3915,8 +3930,8 @@ a %1</translation>
       <translation>Características:</translation>
     </message>
     <message>
-      <source>Locked to Hardware Id</source>
-      <translation>Enlazado al Id de Hardware</translation>
+      <source>Locked to Hardware ID</source>
+      <translation>Enlazado al ID de Hardware</translation>
     </message>
   </context>
   <context>
@@ -4191,16 +4206,16 @@ a %1</translation>
       <translation>Póngase en contacto con Servicio al Cliente para activar la Clave de Licencia manualmente.</translation>
     </message>
     <message>
-      <source>This license is already activated and linked to Hardware Id %1</source>
-      <translation>Esta licencia ya está activada y enlazada al Id de hardware %1</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to Hardware Id %1 on %2</source>
-      <translation>Esta licencia ya está activada y enlazada al Id de hardware %1 en %2</translation>
-    </message>
-    <message>
       <source>If the problem persists please contact Customer Support.</source>
       <translation>Si el problema persiste, póngase en contacto con Servicio al Cliente.</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1</source>
+      <translation>Esta licencia ya está activada y enlazada al ID de Hardware %1</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1 on %2</source>
+      <translation>Esta licencia ya está activada y enlazada al ID de Hardware %1 en %2</translation>
     </message>
   </context>
   <context>
@@ -4222,16 +4237,16 @@ a %1</translation>
       <translation>Fallo al abrir el archivo</translation>
     </message>
     <message>
-      <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>Envíe un correo electrónico con la clave de licencia y el Id de hardware proporcionados a %1 para obtener un archivo de Clave de Activación.</translation>
-    </message>
-    <message>
-      <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>Envíe la Clave de Licencia y el Id de hardware proporcionados a %1 para obtener un archivo de Clave de Activación.</translation>
-    </message>
-    <message>
       <source>All files</source>
       <translation type="unfinished">All files</translation>
+    </message>
+    <message>
+      <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
+      <translation>Envíe un correo electrónico con la clave de licencia y el ID de Hardware proporcionados a %1 para obtener un archivo de Clave de Activación.</translation>
+    </message>
+    <message>
+      <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
+      <translation>Envíe la Clave de Licencia y el ID de Hardware proporcionados a %1 para obtener un archivo de Clave de Activación.</translation>
     </message>
   </context>
   <context>

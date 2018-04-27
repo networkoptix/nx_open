@@ -1,7 +1,10 @@
 #pragma once
 
+#include <vector>
+
 #include <common/common_globals.h>
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/core/utils/attribute.h>
 
 namespace nx {
 namespace media {
@@ -36,5 +39,26 @@ static const QString kCameraMediaCapabilityParamName = lit("mediaCapabilities");
 QN_FUSION_DECLARE_FUNCTIONS(CameraStreamCapability, (json))
 QN_FUSION_DECLARE_FUNCTIONS(CameraMediaCapability, (json))
 
+enum class CameraStreamCapabilityTraitType
+{
+    aspectRatioDependent = 1
+};
+
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(CameraStreamCapabilityTraitType);
+
+struct CameraStreamCapabilityTrait
+{
+    CameraStreamCapabilityTraitType trait;
+    nx::core::utils::AttributeList attributes;
+};
+
+using CameraStreamCapabilityTraits = std::vector<CameraStreamCapabilityTrait>;
+
+#define CameraStreamCapabilityTrait_Fields (trait)(attributes)
+QN_FUSION_DECLARE_FUNCTIONS(CameraStreamCapabilityTrait, (json))
+
 } // media
 } // nx
+
+Q_DECLARE_METATYPE(nx::media::CameraStreamCapabilityTrait)
+QN_FUSION_DECLARE_FUNCTIONS(nx::media::CameraStreamCapabilityTraitType, (lexical));

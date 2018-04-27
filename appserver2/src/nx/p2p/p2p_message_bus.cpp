@@ -14,6 +14,7 @@
 #include <utils/math/math.h>
 #include <api/runtime_info_manager.h>
 #include <managers/time_manager.h>
+#include <nx/cloud/cdb/api/ec2_request_paths.h>
 
 namespace nx {
 namespace p2p {
@@ -161,8 +162,8 @@ void MessageBus::addOutgoingConnectionToPeer(const QnUuid& peer, const utils::Ur
     deleteRemoveUrlById(peer);
 
     nx::utils::Url url(_url);
-    if (peer == kCloudPeerId)
-        url.setPath(kCloudPathPrefix + kUrlPath);
+    if (peer == ::ec2::kCloudPeerId)
+        url.setPath(nx::cdb::api::kEc2EventsPath);
     else
         url.setPath(kUrlPath);
 

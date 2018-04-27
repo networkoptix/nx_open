@@ -37,6 +37,7 @@ public:
     QnAbstractStorageResource::FileInfoList fileList(const QString& path);
     qint64 fileSize(const QString& path);
     QString devicePath(const QString& fsPath);
+    bool dmiInfo(QString* outPartNumber, QString *outSerialNumber);
 
 private:
     const QString m_toolPath;
@@ -51,8 +52,8 @@ private:
     qint64 int64SingleArgCommandHelper(
         const QString& path, const char* command, DefaultAction defaultAction);
 
-    template<typename DefaultAction>
-    std::string stringCommandHelper(const QString& path, const char* command, DefaultAction action);
+    template<typename DefaultAction, typename... Args>
+    std::string stringCommandHelper(const char* command, DefaultAction action, Args&&... args);
 
     template<typename Action>
     void execAndReadResult(const std::vector<QString>& args, Action action);

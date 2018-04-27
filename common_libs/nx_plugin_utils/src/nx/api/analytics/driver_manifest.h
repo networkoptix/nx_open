@@ -59,10 +59,11 @@ struct AnalyticsDriverManifest: AnalyticsDriverManifestBase
     QList<Analytics::EventType> outputEventTypes;
     QList<Analytics::EventType> outputObjectTypes;
     QList<AnalyticsManifestObjectAction> objectActions;
+    QList<Analytics::Group> groups;
     // TODO: #mike: Add other fields, see stub_metadata_plugin.
 };
 #define AnalyticsDriverManifest_Fields AnalyticsDriverManifestBase_Fields \
-    (outputEventTypes)(outputObjectTypes)(objectActions)
+    (outputEventTypes)(outputObjectTypes)(objectActions)(groups)
 
 QN_FUSION_DECLARE_FUNCTIONS(AnalyticsDriverManifest, (json))
 

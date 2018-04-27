@@ -472,6 +472,17 @@ void QnCameraAdvancedParams::merge(QnCameraAdvancedParams params)
     mergeGroups(&groups, &params.groups);
 }
 
+QnCameraAdvancedParameterCondition::QnCameraAdvancedParameterCondition(
+    QnCameraAdvancedParameterCondition::ConditionType type,
+    const QString& paramId,
+    const QString& value)
+    :
+    type(type),
+    paramId(paramId),
+    value(value)
+{
+}
+
 bool QnCameraAdvancedParameterCondition::checkValue(const QString& valueToCheck) const
 {
     switch (type)
@@ -500,13 +511,15 @@ bool QnCameraAdvancedParameterCondition::checkValue(const QString& valueToCheck)
     }
 }
 
-void QnCameraAdvancedParameterDependency::autoFillId()
+void QnCameraAdvancedParameterDependency::autoFillId(const QString& prefix)
 {
     static const QChar kDelimiter(L',');
     QString hash = range + kDelimiter + internalRange;
     for (const auto& condition: conditions)
         hash += kDelimiter + condition.paramId + kDelimiter + condition.value;
-    id = guidFromArbitraryData(hash).toSimpleString();
+    id = prefix.isEmpty()
+        ? guidFromArbitraryData(hash).toSimpleString()
+        : prefix + lit("_") + guidFromArbitraryData(hash).toSimpleString();
 }
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnCameraAdvancedParameter, DataType,

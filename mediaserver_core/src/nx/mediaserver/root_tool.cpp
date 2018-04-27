@@ -73,17 +73,17 @@ Qn::StorageInitResult RootTool::mount(const QUrl& url, const QString& path)
             switch (mountResult)
             {
             case SystemCommands::MountCode::ok:
-                NX_VERBOSE(
-                    this, lm("[mount] Successfully mounted %1 to %2 %3").args(url, path, viaString));
+                NX_DEBUG(
+                    this, lm("[mount] Successfully mounted '%1' to '%2' %3").args(url, path, viaString));
                 break;
             case SystemCommands::MountCode::otherError:
                 NX_WARNING(
-                    this, lm("[mount] Failed to mount %1 to %2 %3").args(url, path, viaString));
+                    this, lm("[mount] Failed to mount '%1' to '%2' %3").args(url, path, viaString));
                 break;
             case SystemCommands::MountCode::wrongCredentials:
                 NX_WARNING(
                     this,
-                    lm("[mount] Failed to mount %1 to %2 %3 due to WRONG credentials")
+                    lm("[mount] Failed to mount '%1' to '%2' %3 due to WRONG credentials")
                         .args(url, path, viaString));
                 break;
             }
@@ -364,6 +364,10 @@ int RootTool::open(const QString& path, QIODevice::OpenMode mode)
             fd = system_commands::domain_socket::readFd();
             return fd > 0;
         });
+
+    if (fd < 0)
+        NX_WARNING(this, lm("Open failed for %1").args(path));
+
     return fd;
 #else
     return -1;
@@ -435,10 +439,11 @@ static bool extractSubstring(const char** pdata, StringRef* stringRef)
     return true;
 }
 
-static QnAbstractStorageResource::FileInfoList fileListFromSerialized(const char* data)
+static QnAbstractStorageResource::FileInfoList fileListFromSerialized(const std::string& serializedList)
 {
     QnAbstractStorageResource::FileInfoList result;
     StringRef stringRef;
+    const char* data = serializedList.data();
 
     while (true)
     {
@@ -463,9 +468,8 @@ static QnAbstractStorageResource::FileInfoList fileListFromSerialized(const char
     return result;
 }
 
-template<typename DefaultAction>
-std::string RootTool::stringCommandHelper(
-    const QString& path, const char* command, DefaultAction action)
+template<typename DefaultAction, typename... Args>
+std::string RootTool::stringCommandHelper(const char* command, DefaultAction action, Args&&... args)
 {
 #if defined (Q_OS_LINUX)
     if (m_toolPath.isEmpty())
@@ -474,7 +478,7 @@ std::string RootTool::stringCommandHelper(
     QnMutexLocker lock(&m_mutex);
     std::string buf;
     execAndReadResult(
-        {command, path},
+        {command, std::forward<Args>(args)...},
         [&buf]()
         {
             return system_commands::domain_socket::readBuffer(&readBufferReallocCallback, &buf);
@@ -489,11 +493,11 @@ QnAbstractStorageResource::FileInfoList RootTool::fileList(const QString& path)
 {
     return fileListFromSerialized(
         stringCommandHelper(
-            path, "list",
+            "list",
             [path]()
             {
-                return SystemCommands().serializedFileList(path.toStdString(), false).c_str();
-            }).c_str());
+                return SystemCommands().serializedFileList(path.toStdString(), false);
+            }, path));
 }
 
 qint64 RootTool::fileSize(const QString& path)
@@ -507,11 +511,50 @@ QString RootTool::devicePath(const QString& fsPath)
 {
     auto result = QString::fromStdString(
         stringCommandHelper(
-            fsPath, "devicePath",
+            "devicePath",
             [fsPath]()
             {
-                return SystemCommands().devicePath(fsPath.toStdString(), false).c_str();
-            }));
+                return SystemCommands().devicePath(fsPath.toStdString(), false);
+            }, fsPath));
+
+    return result;
+}
+
+/**
+ * Serialized format is
+ * |int partNumberLen|char* partNumberData|int serialNumberLen|char* serialNumberData|
+ */
+static bool dmiInfoFromSerialized(
+    const std::string& serializedData, QString* outPartNumber, QString *outSerialNumber)
+{
+    if (serializedData.empty())
+        return false;
+
+    auto extractValue =
+        [](const char** data, QString* outValue)
+        {
+            int len = *((int*) *data);
+            *data += sizeof(std::string::size_type);
+            *outValue = QString::fromLatin1(*data, len);
+            *data += len;
+        };
+
+    auto data = serializedData.data();
+    extractValue(&data, outPartNumber);
+    extractValue(&data, outSerialNumber);
+
+    return true;
+}
+
+bool RootTool::dmiInfo(QString* outPartNumber, QString *outSerialNumber)
+{
+    auto result = dmiInfoFromSerialized(
+        stringCommandHelper(
+            "dmiInfo",
+            [=]()
+            {
+                return SystemCommands().serializedDmiInfo(false);
+            }), outPartNumber, outSerialNumber);
 
     return result;
 }

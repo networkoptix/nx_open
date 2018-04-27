@@ -242,6 +242,13 @@ QString StringsHelper::eventAtResource(const EventParameters& params,
                 .arg(resourceName);
 
         case EventType::analyticsSdkEvent:
+            if (!params.caption.isEmpty())
+            {
+                return tr("%1 - %2")
+                    .arg(getAnalyticsSdkEventName(params))
+                    .arg(params.caption);
+            }
+
             return tr("%1 at %2", "Analytics Event at some camera")
                 .arg(getAnalyticsSdkEventName(params))
                 .arg(resourceName);

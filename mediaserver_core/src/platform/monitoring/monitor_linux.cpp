@@ -562,7 +562,7 @@ public:
         int fd = qnServerModule->rootTool()->open(
             m_commonSystemInfoProvider.fileName(), QIODevice::ReadOnly);
 
-        if (fd > 0)
+        if (fd > 0) //< Root tool has successfully opened file
             mountsFile.open(fd, QIODevice::ReadOnly, QFileDevice::AutoCloseHandle);
         else
             mountsFile.open(QIODevice::ReadOnly);

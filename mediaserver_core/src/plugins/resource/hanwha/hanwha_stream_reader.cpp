@@ -122,10 +122,15 @@ CameraDiagnostics::Result HanwhaStreamReader::updateProfile(const QnLiveStreamPa
 
     HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
     helper.setIgnoreMutexAnalyzer(true);
+
+    HanwhaProfileParameterFlags profileParameterFlags;
+    if (m_hanwhaResource->isAudioSupported())
+        profileParameterFlags |= HanwhaProfileParameterFlag::audioSupported;
+
     const auto profileParameters = m_hanwhaResource->makeProfileParameters(
         getRole(),
         parameters,
-        m_hanwhaResource->isAudioSupported());
+        profileParameterFlags);
 
     // Some cameras have bug: they could close connection with delay.
     // It affects newly opened connections. Don't change parameters to prevent it.
@@ -141,7 +146,7 @@ CameraDiagnostics::Result HanwhaStreamReader::updateProfile(const QnLiveStreamPa
         const auto profileParameters = m_hanwhaResource->makeProfileParameters(
             getRole(),
             parameters,
-            false);
+            HanwhaProfileParameterFlags());
         response = helper.update(lit("media/videoprofile"), profileParameters);
     }
 

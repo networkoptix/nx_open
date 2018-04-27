@@ -75,7 +75,7 @@
         <x>0</x>
         <y>0</y>
         <width>1034</width>
-        <height>502</height>
+        <height>500</height>
        </rect>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="1,1">
@@ -98,11 +98,25 @@
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_4">
              <item>
-              <widget class="QCheckBox" name="settingsDisableControlCheckBox">
-               <property name="text">
-                <string>Keep camera stream and profile settings</string>
-               </property>
-              </widget>
+               <layout class="QHBoxLayout" name="settingsDisableControlLayout" stretch="0,1">
+                 <item>
+                   <widget class="QCheckBox" name="settingsDisableControlCheckBox">
+                     <property name="text">
+                       <string>Keep camera stream and profile settings</string>
+                     </property>
+                   </widget>
+                 </item>
+                 <item>
+                   <widget class="nx::client::desktop::HintButton" name="settingsDisableControlHint">
+                     <property name="sizePolicy">
+                       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                       </sizepolicy>
+                     </property>
+                   </widget>
+                 </item>
+               </layout>
              </item>
              <item>
               <widget class="QLabel" name="settingsWarningLabel">
@@ -115,11 +129,25 @@
               </widget>
              </item>
              <item>
-              <widget class="QCheckBox" name="bitratePerGopCheckBox">
-               <property name="text">
-                <string>Calculate bitrate per GOP instead of bitrate per second</string>
-               </property>
-              </widget>
+              <layout class="QHBoxLayout" name="bitratePerGopLayout" stretch="0,1">
+                <item>
+                  <widget class="QCheckBox" name="bitratePerGopCheckBox">
+                    <property name="text">
+                      <string>Calculate bitrate per GOP instead of bitrate per second</string>
+                    </property>
+                  </widget>
+                </item>
+                <item>
+                  <widget class="nx::client::desktop::HintButton" name="bitratePerGopHint">
+                    <property name="sizePolicy">
+                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                      </sizepolicy>
+                    </property>
+                  </widget>
+                </item>
+              </layout>
              </item>
              <item>
               <widget class="QLabel" name="bitrateIncreaseWarningLabel">
@@ -369,7 +397,7 @@
           <item>
            <widget class="QGroupBox" name="logicalIdGroupBox">
             <property name="title">
-             <string>Logical Id</string>
+             <string>Logical ID</string>
             </property>
             <property name="flat">
              <bool>true</bool>
@@ -484,6 +512,11 @@
    <extends>QWidget</extends>
    <header location="global">ui/widgets/word_wrapped_label.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+    <class>nx::client::desktop::HintButton</class>
+    <extends>QPushButton</extends>
+    <header location="global">nx/client/desktop/common/widgets/hint_button.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

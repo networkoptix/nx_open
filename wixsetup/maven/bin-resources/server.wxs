@@ -79,6 +79,9 @@
                             <File Id="hanwha_metadata_plugin.dll" Name="hanwha_metadata_plugin.dll" Source="$(var.PluginsDir)\hanwha_metadata_plugin.dll" DiskId="10" />
                         </Component>
                     <?endif?>
+                    <Component Id="ServerDwMttMetadataPlugin">
+                        <File Id="dw_mtt_metadata_plugin.dll" Name="dw_mtt_metadata_plugin.dll" Source="$(var.PluginsDir)\dw_mtt_metadata_plugin.dll" DiskId="10" />
+                    </Component>
                     <Component Id="ServerHikvisionMetadataPlugin">
                         <File Id="hikvision_metadata_plugin.dll" Name="hikvision_metadata_plugin.dll" Source="$(var.PluginsDir)\hikvision_metadata_plugin.dll" DiskId="10" />
                     </Component>
@@ -158,15 +161,6 @@
             </Component>
             <Component>
                 <File Id="swresample.dll" Name="swresample-2.dll" Source="$(var.SourceDir)/swresample-2.dll" DiskId="3"/>
-            </Component>
-            <Component>
-                <File Id="libogg.dll" Name="libogg.dll" Source="$(var.SourceDir)/libogg.dll" DiskId="3"/>
-            </Component>
-            <Component>
-                <File Id="libvorbis.dll" Name="libvorbis.dll" Source="$(var.SourceDir)/libvorbis.dll" DiskId="3"/>
-            </Component>
-            <Component>
-                <File Id="libmp3lame.dll" Name="libmp3lame.dll" Source="$(var.SourceDir)/libmp3lame.dll" DiskId="3"/>
             </Component>
         </ComponentGroup>
 
@@ -265,6 +259,7 @@
             <?if $(var.enable_hanwha) = "true"?>
                 <ComponentRef Id="ServerHanwhaMetadataPlugin"/>
             <?endif?>
+            <ComponentRef Id="ServerDwMttMetadataPlugin"/>
             <ComponentRef Id="ServerHikvisionMetadataPlugin"/>
             <ComponentRef Id="ServerAxisMetadataPlugin"/>
             <ComponentRef Id="ServerVcaMetadataPlugin"/>

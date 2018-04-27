@@ -80,7 +80,7 @@ QnServerStreamRecorder::QnServerStreamRecorder(
     m_lastMediaTime(AV_NOPTS_VALUE),
     m_diskErrorWarned(false),
     m_rebuildBlocked(false),
-    m_canDropPackets(false)
+    m_canDropPackets(true)
 {
     //m_skipDataToTime = AV_NOPTS_VALUE;
     m_lastMotionTimeUsec = AV_NOPTS_VALUE;
