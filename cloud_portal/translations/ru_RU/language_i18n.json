@@ -17,8 +17,6 @@
 	"Merge Systems": "Merge Systems",
 	"Connect System you want to merge with this one to Nx Cloud or merge locally using Nx Witness Client.": "Connect System you want to merge with this one to Nx Cloud or merge locally using Nx Witness Client.",
 	"Merge current System with": "Merge current System with",
-	"System {{targetSystem.name}} is offline. Cannot be merged with\n                the current one.": "System {{targetSystem.name}} is offline. Cannot be merged with\n                the current one.",
-	"System {{targetSystem.name}} is incompatible. Cannot be merged\n                with the current one.": "System {{targetSystem.name}} is incompatible. Cannot be merged\n                with the current one.",
 	"You can only merge Systems in which you have owner permissions.": "You can only merge Systems in which you have owner permissions.",
 	"Took system name and settings from": "Took system name and settings from",
 	"Save": "Save",
@@ -45,5 +43,9 @@
 	"Settings": "Настройки",
 	"View": "Просмотр",
 	"Systems": "Системы",
-	"All Systems": "Все системы"
+	"System": "Системa",
+	"All Systems": "Все системы",
+	"is incompatible.": "is incompatible.",
+	"is offline."     : "is offline.",
+	"Cannot be merged with the current one.": "Cannot be merged with the current one."
 }

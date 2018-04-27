@@ -37,13 +37,15 @@
             </select>
         </div>
         <p *ngIf="systemMergeable =='offline'"
-           class="help-block-no-height warning-label" translate>System {{targetSystem.name}} is offline. Cannot be
-            merged with
-            the current one.</p>
+           class="help-block-no-height warning-label" translate>
+            <span translate>System</span>&nbsp;{{targetSystem.name}}&nbsp;<span translate>is offline.</span>&nbsp;
+            <span translate>Cannot be merged with the current one.</span>
+        </p>
         <p *ngIf="systemMergeable =='cannotMerge'"
-           class="help-block-no-height warning-label" translate>System {{targetSystem.name}} is incompatible. Cannot be
-            merged
-            with the current one.</p>
+           class="help-block-no-height warning-label" translate>
+            <span translate>System</span>&nbsp;{{targetSystem.name}}&nbsp;<span translate>is incompatible.</span>&nbsp;
+            <span translate>Cannot be merged with the current one.</span>
+        </p>
         <p *ngIf="systemMergeable == ''"
            class="help-block-no-height" translate>You can only merge Systems in which you have owner permissions.</p>
         <div>

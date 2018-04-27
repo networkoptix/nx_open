@@ -118,7 +118,7 @@
         "serve": "webpack-dev-server --config webpack.dev.js --open",
         "build": "webpack --config webpack.prod.js --progress --profile --bail",
         "setSkin": "node setSkin.js --skin",
-        "extract": "ngx-translate-extract --input ./app/src --output ./app/src/assets/i18n/ --clean --sort --format namespaced-json",
-        "update-lang": "ngx-translate-extract -i ./app/src -o ./app/assets/i18n/*.json"
+        "extract": "ngx-translate-extract -i ./app/src -o ./app/src/assets/i18n/ --clean --sort --format namespaced-json",
+        "update-lang": "ngx-translate-extract -i ./app/src -o ./app/language_i18n.json --clean --sort --format json"
     }
 }

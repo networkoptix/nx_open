@@ -10,7 +10,7 @@ import * as angular from 'angular';
 
             function () {
 
-                var lang = {
+                let lang = {
                     language: '',
                     pageTitles: {
                         registerSuccess: '',
@@ -38,7 +38,8 @@ import * as angular from 'angular';
 
                 // config phaze accessible functions **************
                 this.setLanguage = function (language) {
-                    lang = language.replace('-', '_');
+                    lang = language;
+                    // lang.language = lang.language.replace('-', '_');
                 };
 
                 this.setCommonLanguage = function (language) {

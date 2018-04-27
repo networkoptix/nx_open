@@ -7,7 +7,7 @@ const angular = require("angular");
         .module('cloudApp.services')
         .provider('languageService', [
         function () {
-            var lang = {
+            let lang = {
                 language: '',
                 pageTitles: {
                     registerSuccess: '',
@@ -35,6 +35,7 @@ const angular = require("angular");
             // config phaze accessible functions **************
             this.setLanguage = function (language) {
                 lang = language;
+                // lang.language = lang.language.replace('-', '_');
             };
             this.setCommonLanguage = function (language) {
                 lang.common = language;

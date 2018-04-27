@@ -48,23 +48,16 @@ module.exports = merge(common, {
                 from: 'images',
                 to  : 'static/images'
             },
-            // {
-            //     from: '../../translations/en_US',
-            //     to  : 'static/lang_en_US'
-            // },
-            // {
-            //     from: '../../translations/es_ES',
-            //     to  : 'static/lang_es_ES'
-            // },
+            // Local test for i18n *********************
+            {
+                from: '../../translations/en_US',
+                to  : 'static/lang_en_US'
+            },
             {
                 from: '../../translations/ru_RU/',
                 to  : 'static/lang_ru_RU/'
             }
-            // ,
-            // {
-            //     from: '../../translations/ru_RU/views/dialogs/login.html',
-            //     to  : 'translations/lang_ru_RU/views/dialogs/login.html'
-            // }
+            // *****************************************
         ])
     ],
     output: {

@@ -46,7 +46,7 @@ const share_component_1 = require("./src/dialogs/share/share.component");
 const merge_component_1 = require("./src/dialogs/merge/merge.component");
 // AoT requires an exported function for factories
 function createTranslateLoader(http) {
-    return new http_loader_1.TranslateHttpLoader(http, './static/assets/i18n/', '.json');
+    return new http_loader_1.TranslateHttpLoader(http, 'static/lang_', '/language_i18n.json');
 }
 exports.createTranslateLoader = createTranslateLoader;
 class HybridUrlHandlingStrategy {

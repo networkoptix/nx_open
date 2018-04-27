@@ -43,7 +43,7 @@ import { MergeModalContent, NxModalMergeComponent }           from "./src/dialog
 
 // AoT requires an exported function for factories
 export function createTranslateLoader(http: HttpClient) {
-    return new TranslateHttpLoader(http, './static/assets/i18n/', '.json');
+    return new TranslateHttpLoader(http, 'static/lang_', '/language_i18n.json');
 }
 
 class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
