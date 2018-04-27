@@ -1,4 +1,4 @@
-from abc import ABCMeta
+from abc import ABCMeta, abstractproperty
 from functools import wraps
 
 from pathlib2 import PurePosixPath
@@ -34,7 +34,7 @@ def _raising_on_exit_status(exit_status_to_error_cls):
 
 class SSHPath(FileSystemPath, PurePosixPath):
     __metaclass__ = ABCMeta
-    _ssh_access = None
+    _ssh_access = abstractproperty()
 
     @classmethod
     def home(cls):

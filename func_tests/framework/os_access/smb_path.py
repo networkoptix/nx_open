@@ -1,6 +1,6 @@
 import logging
 import string
-from abc import ABCMeta
+from abc import ABCMeta, abstractproperty
 from contextlib import closing
 from functools import wraps
 from io import BytesIO
@@ -44,9 +44,9 @@ def _reraising_on_operation_failure(status_to_error_cls):
 
 class SMBPath(FileSystemPath, PureWindowsPath):
     __metaclass__ = ABCMeta
-    _username, _password = '', ''
-    _name_service_address, _name_service_port = IPAddress('0.0.0.0'), 0
-    _session_service_address, _session_service_port = IPAddress('0.0.0.0'), 0
+    _username, _password = abstractproperty(), abstractproperty()
+    _name_service_address, _name_service_port = abstractproperty(), abstractproperty()
+    _session_service_address, _session_service_port = abstractproperty(), abstractproperty()
 
     @classmethod
     @lrudecorator(1)
