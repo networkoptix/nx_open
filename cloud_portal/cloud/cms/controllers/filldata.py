@@ -65,8 +65,7 @@ def process_context(context, language_code, customization, preview, version_id, 
     if language_code:
         language = Language.objects.filter(code=language_code)
         if not language.exists():
-            return
-        language = customization.default_language
+            language = customization.default_language
 
     content = process_context_structure(customization, context, context.template, language, version_id, preview)
     if not context.is_global:  # if current context is global - do not apply other contexts
