@@ -614,7 +614,7 @@ std::unique_ptr<RootTool> findRootTool(const QString& applicationPath)
         NX_WARNING(typeid(RootTool), lm("Executable does not exist: %1").arg(toolPath));
 
 #if defined (Q_OS_UNIX)
-    isRootToolExists = geteuid() != 0; //< No root_tool if the user is root
+    isRootToolExists &= geteuid() != 0; //< No root_tool if the user is root
 #endif
 
     printf("USING ROOT TOOL: %s\n", isRootToolExists ? "TRUE" : "FALSE");
