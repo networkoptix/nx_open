@@ -35,7 +35,8 @@
                 };
 
                 this.setLanguage = function (language) {
-                    lang = language.replace('-', '_');
+                    lang = language;
+                    lang.language = lang.language.replace('-', '_');
                 };
 
                 this.setCommonLanguage = function (language) {
