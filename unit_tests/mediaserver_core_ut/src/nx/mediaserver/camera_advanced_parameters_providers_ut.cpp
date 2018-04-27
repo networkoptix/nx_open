@@ -313,9 +313,7 @@ TEST_F(CameraAdvancedParametersProviders, SameAspectRatioRestrictions)
     const auto camera = newCamera(
         [](CameraMock* camera)
         {
-            camera->setStreamCapabilityTraits(
-                {{nx::media::CameraStreamCapabilityTraitType::aspectRatioDependent,{}}});
-
+            camera->setMediaTraits({{nx::media::CameraTraitType::aspectRatioDependent,{}}});
             camera->setStreamCapabilityMaps(
                 {
                     {{lit("H264"), QSize(1920, 1080)}, nx::media::CameraStreamCapability()},

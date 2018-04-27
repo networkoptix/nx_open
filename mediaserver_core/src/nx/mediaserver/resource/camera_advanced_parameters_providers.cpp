@@ -129,27 +129,18 @@ static std::function<bool(const QString&)> hasSimilarAspectRatioFilter(
         };
 }
 
-static TraitMap toTraitMap(const nx::media::CameraStreamCapabilityTraits& traits)
-{
-    TraitMap result;
-    for (const auto& trait: traits)
-        result.emplace(trait.trait, trait.attributes);
-
-    return result;
-}
-
 } // namespace
 
 StreamCapabilityAdvancedParametersProvider::StreamCapabilityAdvancedParametersProvider(
     Camera* camera,
     const StreamCapabilityMaps& capabilities,
-    const nx::media::CameraStreamCapabilityTraits& traits,
+    const nx::media::CameraTraits& traits,
     Qn::StreamIndex streamIndex,
     const QSize& baseResolution)
 :
     m_camera(camera),
     m_capabilities(capabilities),
-    m_traits(toTraitMap(traits)),
+    m_traits(traits),
     m_streamIndex(streamIndex),
     m_descriptions(describeCapabilities()),
     m_defaults(bestParameters(capabilities[streamIndex], baseResolution))
@@ -239,7 +230,7 @@ QSet<QString> StreamCapabilityAdvancedParametersProvider::filterResolutions(
 }
 
 bool StreamCapabilityAdvancedParametersProvider::hasTrait(
-    nx::media::CameraStreamCapabilityTraitType traitType) const
+    nx::media::CameraTraitType traitType) const
 {
     return m_traits.find(traitType) != m_traits.cend();
 }
@@ -382,23 +373,23 @@ std::vector<QnCameraAdvancedParameter> StreamCapabilityAdvancedParametersProvide
     resolution.dataType = QnCameraAdvancedParameter::DataType::Enumeration;
 
     const bool doesResolutionDependOnAspectRatio = m_streamIndex == Qn::StreamIndex::secondary
-        && hasTrait(nx::media::CameraStreamCapabilityTraitType::aspectRatioDependent);
+        && hasTrait(nx::media::CameraTraitType::aspectRatioDependent);
 
     auto allowedAspectRatioDiff = kDefaultAllowedAspectRatioDiff;
     if (doesResolutionDependOnAspectRatio)
     {
-        const auto traitItr = m_traits.find(
-            nx::media::CameraStreamCapabilityTraitType::aspectRatioDependent);
+        const auto& trait = m_traits.at(
+            nx::media::CameraTraitType::aspectRatioDependent);
 
-        if (traitItr != m_traits.cend())
+        for (const auto& entry: trait)
         {
-            for (const auto& attr: traitItr->second)
-            {
-                if (attr.name != kAllowedAspectRatioDiffAttribute)
-                    continue;
+            const auto& attributeName = entry.first;
+            const auto& attributeValue = entry.second;
 
-                allowedAspectRatioDiff = attr.value.toDouble();
-            }
+            if (attributeName != kAllowedAspectRatioDiffAttribute)
+                continue;
+
+            allowedAspectRatioDiff = attributeValue.toDouble();
         }
     }
 

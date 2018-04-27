@@ -51,9 +51,9 @@ void CameraMock::setStreamCapabilityMaps(StreamCapabilityMap primary, StreamCapa
     m_streamCapabilityMaps[Qn::StreamIndex::secondary] = std::move(secondary);
 }
 
-void CameraMock::setStreamCapabilityTraits(const nx::media::CameraStreamCapabilityTraits& traits)
+void CameraMock::setMediaTraits(nx::media::CameraTraits traits)
 {
-    m_streamCapabilityTraits = traits;
+    m_mediaTraits = std::move(traits);
 }
 
 void CameraMock::enableSetProperty(bool isEnabled)
@@ -134,9 +134,9 @@ StreamCapabilityMap CameraMock::getStreamCapabilityMapFromDrives(Qn::StreamIndex
     return m_streamCapabilityMaps.value(streamIndex);
 }
 
-nx::media::CameraStreamCapabilityTraits CameraMock::streamCapabilityTraits()
+nx::media::CameraTraits CameraMock::mediaTraits() const
 {
-    return m_streamCapabilityTraits;
+    return m_mediaTraits;
 }
 
 QString CameraMock::getProperty(const QString& key) const
