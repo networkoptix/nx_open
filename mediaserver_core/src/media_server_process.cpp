@@ -4459,8 +4459,35 @@ void SIGUSR1_handler(int)
 }
 #endif
 
+static void redirectOutput(FILE* stream, const char* streamName, const std::string& filename)
+{
+    if (freopen(filename.c_str(), "w", stream))
+        fprintf(stream, "%s of mediaserver is redirected to this file\n", streamName);
+    // Ignore possible errors because it is not clear where to print an error message.
+}
+
+static bool fileExists(const std::string& filename)
+{
+    return static_cast<bool>(std::ifstream(filename.c_str()));
+}
+
+static void redirectStdoutAndStderrIfNeeded(int argc, char* argv[])
+{
+    static const std::string kFilePrefix = nx::kit::IniConfig::iniFilesDir();
+    static const std::string kStdoutFilename = "mediaserver_stdout.log";
+    static const std::string kStderrFilename = "mediaserver_stderr.log";
+
+    if (fileExists(kFilePrefix + kStdoutFilename))
+        redirectOutput(stdout, "stdout", kFilePrefix + kStdoutFilename);
+
+    if (fileExists(kFilePrefix + kStderrFilename))
+        redirectOutput(stderr, "stderr", kFilePrefix + kStderrFilename);
+}
+
 int MediaServerProcess::main(int argc, char* argv[])
 {
+    redirectStdoutAndStderrIfNeeded(argc, argv);
+
 #if 0
 #if defined(__GNUC__)
 # if defined(__i386__)
