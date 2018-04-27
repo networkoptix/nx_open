@@ -530,12 +530,13 @@ void QnMediaResourceWidget::initAreaSelectOverlay()
 
 QRectF QnMediaResourceWidget::analyticsSearchRect() const
 {
-    return m_areaSelectOverlayWidget->selectedArea();
+    return m_areaSelectOverlayWidget ? m_areaSelectOverlayWidget->selectedArea() : QRectF();
 }
 
 void QnMediaResourceWidget::setAnalyticsSearchRect(const QRectF& value)
 {
-    m_areaSelectOverlayWidget->setSelectedArea(value);
+    if (m_areaSelectOverlayWidget)
+        m_areaSelectOverlayWidget->setSelectedArea(value);
 }
 
 void QnMediaResourceWidget::initAreaHighlightOverlay()
@@ -598,6 +599,9 @@ void QnMediaResourceWidget::initStatusOverlayController()
 
 void QnMediaResourceWidget::setAnalyticsSearchModeEnabled(bool enabled)
 {
+    if (!m_areaSelectOverlayWidget)
+        return;
+
     m_areaSelectOverlayWidget->setActive(enabled);
     if (enabled)
     {
@@ -2687,7 +2691,9 @@ void QnMediaResourceWidget::setMotionSearchModeEnabled(bool enabled)
         titleBar()->rightButtonsBar()->setButtonsChecked(
             Qn::PtzButton | Qn::FishEyeButton | Qn::ZoomWindowButton, false);
         action(action::ToggleTimelineAction)->setChecked(true);
-        m_areaSelectOverlayWidget->setActive(false);
+
+        if (m_areaSelectOverlayWidget)
+            m_areaSelectOverlayWidget->setActive(false);
     }
 
     setOption(WindowResizingForbidden, enabled);
