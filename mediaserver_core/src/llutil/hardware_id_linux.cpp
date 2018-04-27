@@ -31,7 +31,7 @@
 namespace {
 
 const QString kEmptyMac = lit("");
-const static QString kLogTag = "HardwareId";
+const static nx::utils::log::Tag kLogTag(lit("HardwareId"));
 
 QByteArray fromString(const std::string& s) {
     return QByteArray(s.data(), s.size());
