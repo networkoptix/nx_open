@@ -228,7 +228,7 @@ std::shared_ptr<ReverseConnectionHolder>
     auto it = holdersInSuffix.find(hostName);
     if (it == holdersInSuffix.end())
     {
-        NX_DEBUG(this, lm("Peer %1 registered. There are total %2 known peers")
+        NX_DEBUG(this, lm("Peer %1 registered. There are total %2 known peer domains")
             .args(hostName, m_connectionHolders.size()));
 
         it = holdersInSuffix.emplace(
@@ -241,14 +241,17 @@ std::shared_ptr<ReverseConnectionHolder>
     constexpr auto connectionDebugPrintPeriod = std::chrono::seconds(10);
     if (std::chrono::steady_clock::now() - m_prevConnectionDebugPrintTime > connectionDebugPrintPeriod)
     {
+        int totalPeerCount = 0;
         int totalSocketCount = 0;
         for (const auto& holders: m_connectionHolders)
         {
+            totalPeerCount += holders.second.size();
             for (const auto& holder: holders.second)
                 totalSocketCount += holder.second->socketCount();
         }
 
-        NX_DEBUG(this, lm("There are total %1 connections").args(totalSocketCount));
+        NX_DEBUG(this, lm("There are total %1 peers and %2 connections")
+            .args(totalPeerCount, totalSocketCount));
         m_prevConnectionDebugPrintTime = std::chrono::steady_clock::now();
     }
 
