@@ -61,6 +61,11 @@ class QnContext: public QObject, public QnConnectionContextAware
     Q_PROPERTY(nx::client::core::OperationManager* operationManager
         READ operationManager CONSTANT)
 
+    Q_PROPERTY(int leftCustomMargin READ leftCustomMargin NOTIFY customMarginsChanged)
+    Q_PROPERTY(int rightCustomMargin READ rightCustomMargin NOTIFY customMarginsChanged)
+    Q_PROPERTY(int topCustomMargin READ topCustomMargin NOTIFY customMarginsChanged)
+    Q_PROPERTY(int bottomCustomMargin READ bottomCustomMargin NOTIFY customMarginsChanged)
+
 public:
     QnContext(QObject *parent = NULL);
     virtual ~QnContext();
@@ -121,10 +126,19 @@ public:
     Q_INVOKABLE QString lp(const QString& path) const;
     void setLocalPrefix(const QString& prefix);
 
+    Q_INVOKABLE void updateCustomMargins();
+
+    int leftCustomMargin() const;
+    int rightCustomMargin() const;
+    int topCustomMargin() const;
+    int bottomCustomMargin() const;
+
 signals:
     void autoLoginEnabledChanged();
     void showCameraInfoChanged();
     void deviceStatusBarHeightChanged();
+
+    void customMarginsChanged();
 
 private:
     QnConnectionManager *m_connectionManager;

@@ -92,6 +92,9 @@ QnContext::QnContext(QObject* parent) :
                     break;
             }
         });
+
+    connect(qApp->screens().first(), &QScreen::orientationChanged,
+        this, &QnContext::customMarginsChanged);
 }
 
 QnContext::~QnContext() {}
@@ -308,4 +311,29 @@ void QnContext::setLocalPrefix(const QString& prefix)
     m_localPrefix = prefix;
     if (!m_localPrefix.endsWith(lit("/")))
         m_localPrefix.append(lit("/"));
+}
+
+void QnContext::updateCustomMargins()
+{
+    emit customMarginsChanged();
+}
+
+int QnContext::leftCustomMargin() const
+{
+    return getCustomMargins().left();
+}
+
+int QnContext::rightCustomMargin() const
+{
+    return getCustomMargins().right();
+}
+
+int QnContext::topCustomMargin() const
+{
+    return getCustomMargins().top();
+}
+
+int QnContext::bottomCustomMargin() const
+{
+    return getCustomMargins().bottom();
 }

@@ -10,9 +10,10 @@ ApplicationWindow
 {
     id: mainWindow
 
-    property real leftPadding: 0
-    property real rightPadding: 0
-    property real bottomPadding: 0
+    property real leftPadding: leftCustomMargin
+    property real rightPadding: rightCustomMargin
+    property real bottomPadding: bottomCustomMargin
+
     readonly property real keyboardHeight: Qt.inputMethod.visible
         ? Qt.inputMethod.keyboardRectangle.height
             / (Qt.platform.os !== "ios" ? Screen.devicePixelRatio : 1)
@@ -36,7 +37,7 @@ ApplicationWindow
     {
         id: sideNavigation
 
-        y: topLevelWarning.height
+        y: topLevelWarning.height + deviceStatusBarHeight
     }
 
     StackView
@@ -60,7 +61,15 @@ ApplicationWindow
                 Workflow.focusCurrentScreen()
         }
 
-        onCurrentItemChanged: sideNavigation.close()
+        onCurrentItemChanged:
+        {
+            mainWindow.color = currentItem.hasOwnProperty("backgroundColor")
+                ? currentItem.backgroundColor
+                : ColorTheme.windowBackground
+
+            sideNavigation.close()
+            updateCustomMargins()
+        }
         onWidthChanged: autoScrollDelayTimer.restart()
         onHeightChanged: autoScrollDelayTimer.restart()
     }
@@ -74,7 +83,8 @@ ApplicationWindow
         id: topLevelWarning
 
         y: deviceStatusBarHeight
-        width: mainWindow.availableWidth
+        x: -leftCustomMargin
+        width: mainWindow.availableWidth + leftCustomMargin + rightCustomMargin
         text: d.warningText
         opened: text.length
     }
@@ -139,7 +149,12 @@ ApplicationWindow
     {
         // We need periodically update paddings due to Qt does not emit signal
         // screenOrientationChanged when we change it from normal to inverted.
+
+        // TODO: #ynikitenkov #future Check if we can get rid of navigation bar -related
+        // properties and just use custom margins
+
         id: androidBarPositionWorkaround
+
         interval: 200
         repeat: true
         running: Qt.platform.os == "android"
@@ -173,15 +188,15 @@ ApplicationWindow
 
             if (!getDeviceIsPhone() ||  Screen.primaryOrientation == Qt.PortraitOrientation)
             {
-                rightPadding = 0
-                leftPadding = 0
-                bottomPadding = lastBarSize
+                rightPadding = rightCustomMargin
+                leftPadding = leftCustomMargin
+                bottomPadding = bottomCustomMargin + lastBarSize
             }
             else
             {
-                leftPadding = lastLeftSideBar ? lastBarSize : 0
-                rightPadding = lastLeftSideBar ? 0 : lastBarSize
-                bottomPadding = 0
+                leftPadding = leftCustomMargin + (lastLeftSideBar ? lastBarSize : 0)
+                rightPadding = rightCustomMargin + (lastLeftSideBar ? 0 : lastBarSize)
+                bottomPadding = bottomCustomMargin
             }
         }
     }

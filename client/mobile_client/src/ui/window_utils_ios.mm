@@ -38,13 +38,25 @@ int statusBarHeight()
     return qMin(size.width, size.height);
 }
 
-int navigationBarHeight() {
+int navigationBarHeight()
+{
     return 0;
 }
 
 bool isLeftSideNavigationBar()
 {
     return false;
+}
+
+QMargins getCustomMargins()
+{
+    const auto windowId = getMainWindow()->winId();
+    UIView* nativeView = reinterpret_cast<UIView*>(windowId);
+    if (!nativeView)
+        return QMargins();
+    
+    auto safeInsets = [nativeView safeAreaInsets];
+    return QMargins(safeInsets.left, safeInsets.top, safeInsets.right, safeInsets.bottom);
 }
 
 bool isPhone() {
