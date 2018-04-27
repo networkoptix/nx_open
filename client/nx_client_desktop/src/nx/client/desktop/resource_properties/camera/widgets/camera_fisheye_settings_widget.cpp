@@ -5,6 +5,8 @@
 #include "../redux/camera_settings_dialog_state.h"
 #include "../redux/camera_settings_dialog_store.h"
 
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <ui/style/helper.h>
 
 #include <nx/client/desktop/resource_properties/fisheye/fisheye_settings_widget.h>
@@ -27,6 +29,8 @@ CameraFisheyeSettingsWidget::CameraFisheyeSettingsWidget(
     auto layout = new QVBoxLayout(this);
     layout->setContentsMargins(style::Metrics::kDefaultTopLevelMargins);
     layout->addWidget(m_widget);
+
+    setHelpTopic(this, Qn::CameraSettings_Dewarping_Help);
 
     connect(store, &CameraSettingsDialogStore::stateChanged, this,
         &CameraFisheyeSettingsWidget::loadState);
