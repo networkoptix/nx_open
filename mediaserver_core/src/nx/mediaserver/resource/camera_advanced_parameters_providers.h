@@ -3,7 +3,6 @@
 #include <map>
 
 #include <nx/mediaserver/resource/camera.h>
-#include <nx/core/utils/attribute.h>
 
 namespace nx {
 namespace mediaserver {

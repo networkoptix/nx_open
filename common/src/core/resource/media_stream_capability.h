@@ -4,7 +4,6 @@
 
 #include <common/common_globals.h>
 #include <nx/fusion/model_functions_fwd.h>
-#include <nx/core/utils/attribute.h>
 
 namespace nx {
 namespace media {
