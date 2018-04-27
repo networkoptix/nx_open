@@ -12,8 +12,6 @@ namespace nx {
 namespace network {
 namespace http {
 
-static std::atomic<int> s_httpServerConnectionCount(0);
-
 HttpServerConnection::HttpServerConnection(
     nx::network::server::StreamConnectionHolder<HttpServerConnection>* socketServer,
     std::unique_ptr<AbstractStreamSocket> sock,
@@ -26,20 +24,10 @@ HttpServerConnection::HttpServerConnection(
     m_isPersistent(false),
     m_persistentConnectionEnabled(true)
 {
-    const int count = ++s_httpServerConnectionCount;
-    if (count % 10 == 0)
-    {
-        NX_DEBUG(this, lm("+ There are %1 objects currently").args(count));
-    }
 }
 
 HttpServerConnection::~HttpServerConnection()
 {
-    const int count = --s_httpServerConnectionCount;
-    if (count % 10 == 0)
-    {
-        NX_DEBUG(this, lm("- There are %1 objects currently").args(count));
-    }
 }
 
 void HttpServerConnection::setPersistentConnectionEnabled(bool value)
