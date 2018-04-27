@@ -113,27 +113,47 @@ EventPanel::Private::~Private()
 {
 }
 
-void EventPanel::Private::addCameraTabs()
+void EventPanel::Private::updateTabs()
 {
-    NX_ASSERT(m_tabs->count() == kPermanentTabCount);
+    const bool hasVideo = m_camera && m_camera->hasVideo();
+    const bool hasMotion = hasVideo && m_camera->hasFlags(Qn::motion);
 
-    if (m_camera->hasFlags(Qn::motion))
-    {
-        m_tabs->addTab(m_motionTab, qnSkin->icon(lit("events/tabs/motion.png")),
-            tr("Motion", "Motion tab title"));
-    }
-    m_tabs->addTab(m_bookmarksTab, qnSkin->icon(lit("events/tabs/bookmarks.png")),
+    int nextTabIndex = kPermanentTabCount;
+
+    const auto updateTab =
+        [this, &nextTabIndex](QWidget* tab, bool visible, const QIcon& icon, const QString& text)
+        {
+            const int index = m_tabs->indexOf(tab);
+            if (visible)
+            {
+                if (index < 0)
+                    m_tabs->insertTab(nextTabIndex, tab, icon, text);
+                else
+                    NX_ASSERT(index == nextTabIndex);
+
+                ++nextTabIndex;
+            }
+            else
+            {
+                if (index >= 0)
+                {
+                    NX_ASSERT(index == nextTabIndex);
+                    m_tabs->removeTab(index);
+                }
+            }
+        };
+
+    updateTab(m_motionTab, hasMotion, qnSkin->icon(lit("events/tabs/motion.png")),
+        tr("Motion", "Motion tab title"));
+
+    updateTab(m_bookmarksTab, m_camera != nullptr, qnSkin->icon(lit("events/tabs/bookmarks.png")),
         tr("Bookmarks", "Bookmarks tab title"));
-    m_tabs->addTab(m_eventsTab, qnSkin->icon(lit("events/tabs/events.png")),
-        tr("Events", "Events tab title"));
-    m_tabs->addTab(m_analyticsTab, qnSkin->icon(lit("events/tabs/analytics.png")),
-        tr("Objects", "Analytics tab title"));
-}
 
-void EventPanel::Private::removeCameraTabs()
-{
-    while (m_tabs->count() > kPermanentTabCount)
-        m_tabs->removeTab(kPermanentTabCount);
+    updateTab(m_eventsTab, m_camera != nullptr, qnSkin->icon(lit("events/tabs/events.png")),
+        tr("Events", "Events tab title"));
+
+    updateTab(m_analyticsTab, hasVideo, qnSkin->icon(lit("events/tabs/analytics.png")),
+        tr("Objects", "Analytics tab title"));
 }
 
 void EventPanel::Private::setupEventSearch()
@@ -315,15 +335,7 @@ void EventPanel::Private::setCamera(const QnVirtualCameraResourcePtr& camera)
     m_bookmarksModel->setCamera(camera);
     m_analyticsModel->setCamera(camera);
 
-    if (camera)
-    {
-        if (m_tabs->count() == kPermanentTabCount)
-            addCameraTabs();
-    }
-    else
-    {
-        removeCameraTabs();
-    }
+    updateTabs();
 }
 
 void EventPanel::Private::currentWorkbenchWidgetChanged(Qn::ItemRole role)
