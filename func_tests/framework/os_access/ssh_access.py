@@ -21,14 +21,9 @@ class SSHAccess(object):
         self.ssh_command = ['ssh', '-F', config_path, '-p', port]
 
         class _SSHPath(SSHPath):
-            """SSHPath type for this connection. isinstance should be supported."""
+            _ssh_access = self
 
-            @staticmethod
-            def _ssh_access():
-                # TODO: Use weak ref to avoid circular dependencies.
-                return self
-
-        self.Path = _SSHPath
+        self.Path = _SSHPath  # Circular reference, GC will collect this.
 
     def __repr__(self):
         return '<SSHAccess {} {}>'.format(sh_command_to_script(self.ssh_command), self.hostname)
