@@ -34,7 +34,7 @@ struct CameraSettingsDialogState
 
         void updateValue(T value)
         {
-            if (m_user.has_value() || m_base != value)
+            if (m_user || m_base != value)
                 m_user = value;
         }
 
