@@ -56,22 +56,4 @@ struct QnCameraIOStateData
 typedef std::vector<QnCameraIOStateData> QnCameraIOStateDataList;
 #define QnCameraIOStateData_Fields (id)(state)
 
-namespace nx {
-namespace vms {
-namespace api {
-
-// TODO: #vkutin #gdm Move this to a proper location when API library concept is finalized.
-enum class IoModuleVisualStyle
-{
-    form,
-    tile,
-    defaultStyle = form
-};
-
-} // namespace nx
-} // namespace vms
-} // namespace api
-
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnIOPortData)(QnCameraPortsData)(QnIOStateData)(QnCameraIOStateData), (json)(ubjson)(eq))
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::vms::api::IoModuleVisualStyle), (lexical))
-Q_DECLARE_METATYPE(nx::vms::api::IoModuleVisualStyle)

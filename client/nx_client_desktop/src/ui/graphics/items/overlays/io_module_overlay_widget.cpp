@@ -59,9 +59,9 @@ public:
 
     QnIOPortDataList ports;
     QMap<QString, StateData> states;
-    QTimer* const timer;
-    QGraphicsLinearLayout* const layout;
-    QnIoModuleOverlayWidget::Style overlayStyle;
+    QTimer* const timer = nullptr;
+    QGraphicsLinearLayout* const layout = nullptr;
+    QnIoModuleOverlayWidget::Style overlayStyle = QnIoModuleOverlayWidget::Style();
 
     QnIoModuleOverlayWidgetPrivate(QnIoModuleOverlayWidget* widget);
 
@@ -92,8 +92,7 @@ QnIoModuleOverlayWidgetPrivate::QnIoModuleOverlayWidgetPrivate(QnIoModuleOverlay
     base_type(widget),
     q_ptr(widget),
     timer(new QTimer(this)),
-    layout(new QGraphicsLinearLayout(Qt::Vertical, widget)),
-    overlayStyle(Style::defaultStyle)
+    layout(new QGraphicsLinearLayout(Qt::Vertical, widget))
 {
     widget->setAutoFillBackground(true);
 
@@ -122,8 +121,7 @@ void QnIoModuleOverlayWidgetPrivate::updateOverlayStyle()
     if (module)
     {
         style = QnLexical::deserialized<QnIoModuleOverlayWidget::Style>(
-            module->getProperty(Qn::IO_OVERLAY_STYLE_PARAM_NAME),
-            Style::defaultStyle);
+            module->getProperty(Qn::IO_OVERLAY_STYLE_PARAM_NAME), {});
     }
 
     bool needToCreateNewContents = style != overlayStyle || !contents;

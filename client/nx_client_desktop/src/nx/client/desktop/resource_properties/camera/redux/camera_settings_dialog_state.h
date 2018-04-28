@@ -14,6 +14,7 @@
 #include <nx/client/desktop/resource_properties/camera/utils/schedule_cell_params.h>
 #include <nx/utils/std/optional.h>
 #include <nx/vms/api/data/camera_attributes_data.h>
+#include <nx/vms/api/types_fwd.h>
 
 namespace nx {
 namespace client {

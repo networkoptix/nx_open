@@ -12,9 +12,6 @@ class QnAspectRatio;
 struct QnMediaDewarpingParams;
 
 namespace nx {
-
-namespace vms { namespace api { enum class IoModuleVisualStyle; }}
-
 namespace client {
 namespace desktop {
 

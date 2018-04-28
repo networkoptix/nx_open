@@ -78,7 +78,3 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (QnAuthSession), (ubjson)(xml)(json)(csv_record)(eq)(sql_record), _Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     QN_MS_API_COMPARABLE_DATA_TYPES, (ubjson)(xml)(json)(csv_record)(eq), _Fields)
-
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, IoModuleVisualStyle,
-    (nx::vms::api::IoModuleVisualStyle::form, "Form")
-    (nx::vms::api::IoModuleVisualStyle::tile, "Tile"))

@@ -52,14 +52,13 @@ LegacyIoPortSettingsWidget::~LegacyIoPortSettingsWidget()
 void LegacyIoPortSettingsWidget::updateFromResource(const QnVirtualCameraResourcePtr& camera)
 {
     QnIOPortDataList ports;
-    auto style = QnIoModuleOverlayWidget::Style::defaultStyle;
+    QnIoModuleOverlayWidget::Style style{};
 
     if (camera)
     {
         ports = camera->getIOPorts();
         style = QnLexical::deserialized<QnIoModuleOverlayWidget::Style>(
-            camera->getProperty(Qn::IO_OVERLAY_STYLE_PARAM_NAME),
-            QnIoModuleOverlayWidget::Style::defaultStyle);
+            camera->getProperty(Qn::IO_OVERLAY_STYLE_PARAM_NAME), {});
     }
 
     m_model->setModelData(ports);
