@@ -1321,6 +1321,9 @@ CameraDiagnostics::Result HanwhaResource::initAdvancedParameters()
         if(!info.isValid())
             continue;
 
+        if (!info.isDeviceTypeSupported(deviceType()))
+            continue;
+
         m_advancedParameterInfos.emplace(id, info);
     }
 
