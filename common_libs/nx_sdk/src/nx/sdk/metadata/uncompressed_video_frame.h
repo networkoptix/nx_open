@@ -20,9 +20,12 @@ public:
     enum class PixelFormat
     {
         yuv420,
-        yuv422,
-        yuv444,
         argb,
+        abgr,
+        rgba,
+        bgra,
+        rgb,
+        bgr,
     };
 
     enum class Handle

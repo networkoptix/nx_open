@@ -8,7 +8,6 @@
 #include <nx/sdk/metadata/common_metadata_packet.h>
 #include <nx/sdk/metadata/common_event.h>
 #include <nx/sdk/metadata/common_object.h>
-#include <nx/sdk/metadata/common_compressed_video_packet.h>
 
 #define NX_PRINT_PREFIX (this->utils.printPrefix)
 #include <nx/kit/debug.h>
@@ -65,7 +64,7 @@ void CameraManager::settingsChanged()
     NX_PRINT << __func__ << "()";
 }
 
-bool CameraManager::pushCompressedVideoFrame(const CommonCompressedVideoPacket* videoFrame)
+bool CameraManager::pushCompressedVideoFrame(const CompressedVideoPacket* videoFrame)
 {
     if (plugin()->needUncompressedVideoFrames())
     {
@@ -80,7 +79,7 @@ bool CameraManager::pushCompressedVideoFrame(const CommonCompressedVideoPacket* 
     return true;
 }
 
-bool CameraManager::pushUncompressedVideoFrame(const CommonUncompressedVideoFrame* videoFrame)
+bool CameraManager::pushUncompressedVideoFrame(const UncompressedVideoFrame* videoFrame)
 {
     if (!plugin()->needUncompressedVideoFrames())
     {
@@ -93,15 +92,34 @@ bool CameraManager::pushUncompressedVideoFrame(const CommonUncompressedVideoFram
     ++m_frameCounter;
     m_lastVideoFrameTimestampUsec = videoFrame->timestampUsec();
 
-    if (videoFrame->pixelFormat() == UncompressedVideoFrame::PixelFormat::argb)
-        return checkRgbFrame(videoFrame);
+    if (videoFrame->pixelFormat() != plugin()->pixelFormat())
+    {
+        NX_PRINT << __func__ << "() END -> false: Video frame has pixel format "
+            << pixelFormatToStdString(videoFrame->pixelFormat()) << " instead of "
+            << pixelFormatToStdString(plugin()->pixelFormat());
+        return false;
+    }
 
-    if (videoFrame->pixelFormat() == UncompressedVideoFrame::PixelFormat::yuv420)
-        return checkYuv420pFrame(videoFrame);
+    switch (videoFrame->pixelFormat())
+    {
+        case PixelFormat::yuv420:
+            return checkFrame(videoFrame, /*bitsPerPixelForPlanes*/ {8, 2, 2});
 
-    NX_OUTPUT << __func__ << "(): ERROR: Unsupported pixel format: "
-        << (int) videoFrame->pixelFormat();
-    return false;
+        case PixelFormat::argb:
+        case PixelFormat::abgr:
+        case PixelFormat::rgba:
+        case PixelFormat::bgra:
+            return checkFrame(videoFrame, /*bitsPerPixelForPlanes*/ {32});
+
+        case PixelFormat::rgb:
+        case PixelFormat::bgr:
+            return checkFrame(videoFrame, /*bitsPerPixelForPlanes*/ {24});
+
+        default:
+            NX_PRINT << "INTERNAL ERROR: Unknown pixel format: "
+                << (int) videoFrame->pixelFormat();
+            return false;
+    }
 }
 
 bool CameraManager::pullMetadataPackets(std::vector<MetadataPacket*>* metadataPackets)
@@ -275,45 +293,49 @@ int64_t CameraManager::usSinceEpoch() const
         system_clock::now().time_since_epoch()).count();
 }
 
-bool CameraManager::checkYuv420pFrame(const sdk::metadata::CommonUncompressedVideoFrame* videoFrame) const
+bool CameraManager::checkFrame(
+    const UncompressedVideoFrame* videoFrame,
+    const std::vector<int>& bitsPerPixelForPlanes) const
 {
-    if (videoFrame->planeCount() != 3)
+    if (videoFrame->planeCount() != bitsPerPixelForPlanes.size())
     {
         NX_PRINT << __func__ << "() END -> false: videoFrame->planeCount() is "
-            << videoFrame->planeCount() << " instead of 3";
+            << videoFrame->planeCount() << " instead of " << bitsPerPixelForPlanes.size();
         return false;
     }
 
-    const auto expectedPixelFormat = UncompressedVideoFrame::PixelFormat::yuv420;
-    if (videoFrame->pixelFormat() != expectedPixelFormat)
+    for (int i = 0; i < videoFrame->planeCount(); ++i)
     {
-        NX_PRINT << __func__ << "() END -> false: videoFrame->pixelFormat() is "
-            << (int)videoFrame->pixelFormat() << " instead of " << (int)expectedPixelFormat;
-        return false;
-    }
-
-    // Dump 8 bytes at offset 16 of the plane 0.
-    if (videoFrame->dataSize(0) < 44)
-    {
-        NX_PRINT << __func__ << "(): videoFrame->dataSize(0) == " << videoFrame->dataSize(0)
-            << ", which is suspiciously low";
-    }
-    else
-    {
-        if (NX_DEBUG_ENABLE_OUTPUT)
+        const int bytesPerPlane =
+            videoFrame->height() * videoFrame->lineSize(i) * bitsPerPixelForPlanes.at(i) / 8;
+        if (videoFrame->dataSize(i) != bytesPerPlane)
         {
-            // Hex dump some 8 bytes from raw pixel data.
-            NX_PRINT_HEX_DUMP("bytes 36..43", videoFrame->data(0) + 36, 8);
+            NX_PRINT << __func__ << "() END -> false: videoFrame->dataSize(" << i << ") is "
+                << videoFrame->dataSize(i) << " instead of " << bytesPerPlane
+                << ", while videoFrame->lineSize(" << i << ") is " << videoFrame->lineSize(i);
+            return false;
         }
     }
-    NX_OUTPUT << __func__ << "() END -> true";
 
-    return true;
-}
+    // Hex-dump some bytes from raw pixel data.
+    if (NX_DEBUG_ENABLE_OUTPUT)
+    {
+        static const int dumpOffset = 36;
+        static const int dumpSize = 8;
 
-bool CameraManager::checkRgbFrame(const sdk::metadata::CommonUncompressedVideoFrame* videoFrame) const
-{
-    // TODO: #dmishin check BGRA frames somehow.
+        if (videoFrame->dataSize(0) >= dumpOffset + dumpSize)
+        {
+            NX_PRINT << __func__ << "(): videoFrame->dataSize(0) == " << videoFrame->dataSize(0)
+                << ", which is suspiciously low";
+        }
+        else
+        {
+            NX_PRINT_HEX_DUMP(nx::kit::debug::format(
+                "bytes %d..%d", dumpOffset, dumpOffset + dumpSize - 1).c_str(),
+                videoFrame->data(0) + dumpOffset, dumpSize);
+        }
+    }
+
     NX_OUTPUT << __func__ << "() END -> true";
     return true;
 }

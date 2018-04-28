@@ -1,16 +1,17 @@
 #pragma once
 
-#include "compressed_video_packet.h"
-#include "common_compressed_media_packet.h"
+#include <nx/sdk/metadata/compressed_video_packet.h>
+
+#include "generic_compressed_media_packet.h"
 
 namespace nx {
 namespace sdk {
 namespace metadata {
 
-class CommonCompressedVideoPacket: public CommonCompressedMediaPacket<CompressedVideoPacket>
+class GenericCompressedVideoPacket: public GenericCompressedMediaPacket<CompressedVideoPacket>
 {
 public:
-    CommonCompressedVideoPacket() {}
+    GenericCompressedVideoPacket() {}
     virtual int width() const override { return m_width;  }
     virtual int height() const override { return m_height; }
 
