@@ -152,7 +152,7 @@ void calcHardwareIdMap(QMap<QString, QString>& hardwareIdMap, const QnHardwareIn
 void fillHardwareIds(HardwareIdListType& hardwareIds, QnHardwareInfo& hardwareInfo)
 {
     hardwareInfo.boardUUID = readFile("/sys/class/dmi/id/product_uuid");
-    hardwareInfo.compatibilityBoardUUID = changedGuidByteOrder(hardwareInfo.boardUUID);
+    hardwareInfo.compatibilityBoardUUID = nx::utils::license::changedGuidByteOrder(hardwareInfo.boardUUID);
 
     hardwareInfo.boardID = readFile("/sys/class/dmi/id/board_serial");
     hardwareInfo.boardManufacturer = readFile("/sys/class/dmi/id/board_vendor");
