@@ -154,7 +154,7 @@ SessionContextPtr HanwhaSharedResourceContext::session(
     bool isLive = sessionType == HanwhaSessionType::live;
 
     auto& sessionsByClientId = m_sessions[isLive];
-    const int maxConsumers = isLive ? kDefaultNvrMaxLiveSessions : m_maxArchiveSessions;
+    const int maxConsumers = isLive ? kDefaultNvrMaxLiveSessions : m_maxArchiveSessions.load();
     const bool sessionLimitExceeded = !sessionsByClientId.contains(clientId)
         && sessionsByClientId.size() >= maxConsumers;
 
