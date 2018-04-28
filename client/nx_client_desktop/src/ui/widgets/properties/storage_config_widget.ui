@@ -115,10 +115,13 @@
         <item>
          <widget class="nx::client::desktop::HintButton" name="rebuildBackupButtonHint" native="true">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
+          </property>
+          <property name="autoFillBackground">
+           <bool>false</bool>
           </property>
          </widget>
         </item>
@@ -527,6 +530,11 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>nx::client::desktop::HintButton</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/client/desktop/common/widgets/hint_button.h</header>
+  </customwidget>
+  <customwidget>
    <class>QnStorageRebuildWidget</class>
    <extends>QWidget</extends>
    <header location="global">ui/widgets/properties/storage_rebuild_widget.h</header>
@@ -536,11 +544,6 @@
    <class>QnTreeView</class>
    <extends>QTreeView</extends>
    <header location="global">ui/widgets/common/tree_view.h</header>
-  </customwidget>
-  <customwidget>
-   <class>nx::client::desktop::HintButton</class>
-   <extends>QWidget</extends>
-   <header location="global">nx/client/desktop/common/widgets/hint_button.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
