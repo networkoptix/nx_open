@@ -224,6 +224,9 @@ public:
     bool isSynchronizingTimeWithInternet() const;
     void setSynchronizingTimeWithInternet(bool value);
 
+    QnUuid primaryTimeServer() const;
+    void setPrimaryTimeServer(const QnUuid& id);
+
     std::chrono::milliseconds maxDifferenceBetweenSynchronizedAndInternetTime() const;
     std::chrono::milliseconds maxDifferenceBetweenSynchronizedAndLocalTime() const;
 
