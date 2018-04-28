@@ -93,7 +93,7 @@ QnIoModuleOverlayWidgetPrivate::QnIoModuleOverlayWidgetPrivate(QnIoModuleOverlay
     q_ptr(widget),
     timer(new QTimer(this)),
     layout(new QGraphicsLinearLayout(Qt::Vertical, widget)),
-    overlayStyle(Style::default)
+    overlayStyle(Style::defaultStyle)
 {
     widget->setAutoFillBackground(true);
 
@@ -123,7 +123,7 @@ void QnIoModuleOverlayWidgetPrivate::updateOverlayStyle()
     {
         style = QnLexical::deserialized<QnIoModuleOverlayWidget::Style>(
             module->getProperty(Qn::IO_OVERLAY_STYLE_PARAM_NAME),
-            Style::default);
+            Style::defaultStyle);
     }
 
     bool needToCreateNewContents = style != overlayStyle || !contents;
