@@ -754,7 +754,8 @@ State CameraSettingsDialogStateReducer::setIoPortDataList(
 State CameraSettingsDialogStateReducer::setIoModuleVisualStyle(
     State state, vms::api::IoModuleVisualStyle value)
 {
-    // TODO: Check if I/O module.
+    if (!state.isSingleCamera() || state.devicesDescription.isIoModule != State::CombinedValue::All)
+        return state;
 
     state.singleIoModuleSettings.visualStyle.setUser(value);
     state.hasChanges = true;
