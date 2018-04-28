@@ -109,7 +109,8 @@ private:
         Qn::StreamIndex streamIndex,
         std::function<bool(const QString&)> filterFunc) const;
 
-    bool hasTrait(nx::media::CameraTraitType) const;
+    boost::optional<nx::media::CameraTraitAttributes> trait(
+        nx::media::CameraTraitType trait) const;
 
 private:
     Camera* const m_camera;

@@ -41,8 +41,12 @@ enum class CameraTraitType
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(CameraTraitType);
 
+// TODO: #dmishin it's workaround for fusion bug (impossibility to serialize/deserialize maps
+// with the key different from QString). Should be fixed in 4.0
+using CameraTraitNameString = QString;
+
 using CameraTraitAttributes = std::map<QString, QString>;
-using CameraTraits = std::map<CameraTraitType, CameraTraitAttributes>;
+using CameraTraits = std::map<CameraTraitNameString, CameraTraitAttributes>;
 
 } // media
 } // nx
