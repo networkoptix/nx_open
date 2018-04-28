@@ -32,7 +32,7 @@ ulimit -a
 
 echo
 echo --- Starting: $EXE $ARGS
-exec $EXE $ARGS
+$EXE $ARGS
 
 # root_tool enabled version
 # exec start-stop-daemon --start \
