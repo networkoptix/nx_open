@@ -201,7 +201,6 @@ void LegacyImageControlWidget::updateRotationFromResources(
 
     ui->rotationComboBox->clear();
 
-    ui->rotationComboBox->addItem(tr("Auto"), kAutoRotation);
     for (int degrees = 0; degrees < rotationDegreesMax; degrees += rotationDegreesStep)
         ui->rotationComboBox->addItem(tr("%1 degrees").arg(degrees), degrees);
 
