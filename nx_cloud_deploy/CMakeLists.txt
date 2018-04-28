@@ -40,7 +40,7 @@ endfunction(nx_get_cloud_version)
 
 nx_get_cloud_version(cloudVersion)
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/cloud_full_version "${cloudVersion}")
-message("Configuring cloud build ${cloudVersion}")
+message("-- Configuring cloud build ${cloudVersion}")
 
 add_custom_target(cloud-docker-build-prepare)
 add_custom_command(TARGET cloud-docker-build-prepare COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
