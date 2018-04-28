@@ -65,7 +65,7 @@ enum class IoModuleVisualStyle
 {
     form,
     tile,
-    default = form
+    defaultStyle = form
 };
 
 } // namespace nx

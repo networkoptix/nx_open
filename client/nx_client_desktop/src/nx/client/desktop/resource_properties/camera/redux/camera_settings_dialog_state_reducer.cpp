@@ -410,7 +410,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
             state.singleIoModuleSettings.visualStyle.setBase(
                 QnLexical::deserialized<vms::api::IoModuleVisualStyle>(
                     firstCamera->getProperty(Qn::IO_OVERLAY_STYLE_PARAM_NAME),
-                    vms::api::IoModuleVisualStyle::default));
+                    vms::api::IoModuleVisualStyle::defaultStyle));
 
             state.singleIoModuleSettings.ioPortsData.setBase(firstCamera->getIOPorts());
         }
