@@ -1,11 +1,58 @@
+function(nx_add_cloud_deploy_target name)
+    add_custom_target(${name}-docker-build)
+
+    add_dependencies(${name}-docker-build ${name})
+    add_dependencies(${name}-docker-build cloud-docker-build-prepare)
+    add_custom_command(TARGET ${name}-docker-build COMMAND ${CMAKE_COMMAND} -E env NX_VMS_DIR=${CMAKE_SOURCE_DIR} ./make.sh stage_cmake ${CMAKE_BINARY_DIR} ${name})
+
+    add_custom_command(TARGET ${name}-docker-build COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/stage/qt/bin/sqldrivers)
+    add_custom_command(TARGET ${name}-docker-build COMMAND ${CMAKE_COMMAND} -E copy ${QT_DIR}/plugins/sqldrivers/libqsqlmysql.so ${CMAKE_CURRENT_BINARY_DIR}/stage/qt/bin/sqldrivers/)
+
+    add_custom_command(TARGET ${name}-docker-build COMMAND ${CMAKE_COMMAND} -E env NX_VMS_DIR=${CMAKE_CURRENT_SOURCE_DIR} VERSION=${cloudVersion} ./make.sh pack)
+
+    add_custom_target(${name}-docker-push DEPENDS ${name}-docker-build COMMAND ${CMAKE_COMMAND} -E env NX_VMS_DIR=${CMAKE_SOURCE_DIR} VERSION=${cloudVersion} ./make.sh push)
+endfunction(nx_add_cloud_deploy_target)
+
+function(nx_fetch_cloud_build_number buildNumberVarName)
+	set (get_build_number_cmd "curl -s -XPOST la.hdw.mx:8007/next/cloud/ | sed 's/{.*:\\([0-9]*\\)}/\\1/g'")
+	execute_process(
+    	COMMAND  bash -c ${get_build_number_cmd}
+	    OUTPUT_VARIABLE buildNumber)
+
+	if(NOT "${buildNumber}" MATCHES ^[0-9]+$)
+    	message(FATAL_ERROR "Failed to get build number. Configuration is stopped")
+	endif()
+
+	set(${buildNumberVarName} ${buildNumber} PARENT_SCOPE)
+endfunction(nx_fetch_cloud_build_number)
+
+function(nx_get_cloud_version versionVarName)
+	nx_fetch_cloud_build_number(buildNumber)
+	
+	file(READ ${CMAKE_SOURCE_DIR}/nx_cloud/version.txt cloudVersion)
+	string(STRIP ${cloudVersion} cloudVersion)
+	set (cloudVersion "${cloudVersion}.${buildNumber}")
+
+	set(${versionVarName} ${cloudVersion} PARENT_SCOPE)
+endfunction(nx_get_cloud_version)
+
+#-----------------------------------------------------------------------------------------------------------
+
+nx_get_cloud_version(cloudVersion)
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/cloud_full_version "${cloudVersion}")
+message("Configuring cloud build ${cloudVersion}")
+
 add_custom_target(cloud-docker-build-prepare)
 add_custom_command(TARGET cloud-docker-build-prepare COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
-add_subdirectory(vms_gateway)
-add_subdirectory(connection_mediator)
-add_subdirectory(cloud_db)
-add_subdirectory(traffic_relay)
-add_subdirectory(cloud_portal)
+add_custom_target(cloud-docker-build)
+add_custom_target(cloud-docker-push DEPENDS cloud-docker-build)
 
-add_custom_target(cloud-docker-build DEPENDS vms_gateway-docker-build connection_mediator-docker-build cloud_db-docker-build traffic_relay-docker-build cloud_portal-docker-build)
-add_custom_target(cloud-docker-push DEPENDS vms_gateway-docker-push connection_mediator-docker-push cloud_db-docker-push traffic_relay-docker-push cloud_portal-docker-push)
+#set(cloudModules cloud_db connection_mediator traffic_relay vms_gateway cloud_portal cloud_portal_nginx nxcloud_host_agent)
+set(cloudModules cloud_db connection_mediator traffic_relay vms_gateway)
+
+foreach(cloudModule ${cloudModules})
+    add_subdirectory(${cloudModule})
+    add_dependencies(cloud-docker-build ${cloudModule}-docker-build)
+    add_dependencies(cloud-docker-push ${cloudModule}-docker-push)
+endforeach(cloudModule)
