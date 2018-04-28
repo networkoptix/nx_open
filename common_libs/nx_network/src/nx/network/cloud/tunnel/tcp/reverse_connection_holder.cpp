@@ -9,6 +9,7 @@ namespace cloud {
 namespace tcp {
 
 static std::chrono::milliseconds s_connectionLessHolderExpirationTimeout = std::chrono::seconds(31);
+static constexpr int kMaxAllowedPeerConnectionCount = 17;
 
 void ReverseConnectionHolder::setConnectionlessHolderExpirationTimeout(
     std::chrono::milliseconds value)
@@ -54,6 +55,7 @@ void ReverseConnectionHolder::stopWhileInAioThread()
 void ReverseConnectionHolder::saveSocket(std::unique_ptr<AbstractStreamSocket> socket)
 {
     NX_ASSERT(isInSelfAioThread());
+
     if (!m_handlers.empty())
     {
         NX_LOGX(lm("Host %1. Using newly-acquired socket(%2), %3 sockets left")
@@ -73,6 +75,21 @@ void ReverseConnectionHolder::saveSocket(std::unique_ptr<AbstractStreamSocket> s
     monitorSocket(it);
 
     m_prevConnectionTime = std::chrono::steady_clock::now();
+
+    closeExtraConnectionsAsync();
+}
+
+void ReverseConnectionHolder::closeExtraConnectionsAsync()
+{
+    if (m_sockets.size() <= kMaxAllowedPeerConnectionCount)
+        return;
+
+    NX_DEBUG(this, lm("Closing extra %1 connection(s) from peer %2")
+        .args(m_sockets.size() - kMaxAllowedPeerConnectionCount, m_hostName));
+
+    while (m_sockets.size() > kMaxAllowedPeerConnectionCount)
+        m_sockets.pop_front();
+    m_socketCount = m_sockets.size();
 }
 
 bool ReverseConnectionHolder::isActive() const
