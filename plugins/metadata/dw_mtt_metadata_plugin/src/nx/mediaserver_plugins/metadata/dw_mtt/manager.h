@@ -4,6 +4,7 @@
 
 #include <QtCore/QUrl>
 #include <QtNetwork/QAuthenticator>
+#include <QDomDocument>
 
 #include <nx/utils/elapsed_timer_thread_safe.h>
 #include <nx/utils/system_error.h>
@@ -80,6 +81,9 @@ public:
     virtual const char* capabilitiesManifest(nx::sdk::Error* error) override;
 
     virtual void freeManifest(const char* data) override;
+
+private:
+    QDomDocument Manager::getDom();
 
 private:
     QList<QByteArray> internalNamesToCatch() const;
