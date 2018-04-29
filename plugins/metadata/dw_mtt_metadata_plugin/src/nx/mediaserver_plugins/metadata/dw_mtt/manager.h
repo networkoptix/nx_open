@@ -83,7 +83,7 @@ public:
     virtual void freeManifest(const char* data) override;
 
 private:
-    QDomDocument Manager::getDom();
+    QDomDocument getDom();
 
 private:
     QList<QByteArray> internalNamesToCatch() const;

@@ -1,6 +1,6 @@
 #include "parser.h"
 
-#include <QStringList.h>
+#include <QStringList>
 
 /**
 * Scans all children of a node 'node' and finds an element with tag 'tag'.
