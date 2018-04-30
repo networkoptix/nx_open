@@ -38,12 +38,12 @@
         </div>
         <p *ngIf="systemMergeable =='offline'"
            class="help-block-no-height warning-label" translate>
-            <span translate>System</span>&nbsp;{{targetSystem.name}}&nbsp;<span translate>is offline.</span>&nbsp;
+            <span translate>System</span><span>&nbsp;{{targetSystem.name}}&nbsp;</span><span translate>is offline.</span>&nbsp;
             <span translate>Cannot be merged with the current one.</span>
         </p>
         <p *ngIf="systemMergeable =='cannotMerge'"
            class="help-block-no-height warning-label" translate>
-            <span translate>System</span>&nbsp;{{targetSystem.name}}&nbsp;<span translate>is incompatible.</span>&nbsp;
+            <span translate>System</span><span>&nbsp;{{targetSystem.name}}&nbsp;</span><span translate>is incompatible.</span>&nbsp;
             <span translate>Cannot be merged with the current one.</span>
         </p>
         <p *ngIf="systemMergeable == ''"

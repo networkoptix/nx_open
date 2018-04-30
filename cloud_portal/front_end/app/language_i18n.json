@@ -1,6 +1,5 @@
 {
 	"&nbsp;": "&nbsp;",
-	"&nbsp;{{targetSystem.name}}&nbsp;": "&nbsp;{{targetSystem.name}}&nbsp;",
 	"Account Settings": "Account Settings",
 	"All Systems": "All Systems",
 	"All cloud users will be deleted.": "All cloud users will be deleted.",
