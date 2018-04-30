@@ -26,4 +26,3 @@ REVISION="$(cd $NX_VMS_DIR; hg id -i)"
 BUILD_DATE="$(TZ=GMT date)"
 BUILD_HOST="$(hostname)"
 BUILD_USER="$(id -un)"
-
