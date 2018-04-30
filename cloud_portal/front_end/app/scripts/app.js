@@ -115,8 +115,12 @@ window.L = {};
                             });
                     })
                     .always(function () {
+
+                        var lang = languageServiceProvider.$get().lang;
+
+                        console.log('Lang: ', lang);
                         // For compatibility with legacy modules *****
-                        L = languageServiceProvider.$get().lang;
+                        L = lang;
                         Config = CONFIG;
 
                         angular.extend(Config, appState);
@@ -124,7 +128,7 @@ window.L = {};
 
                         $routeProvider
                             .when('/register/success', {
-                                title: languageServiceProvider.$get().lang.pageTitles.registerSuccess,
+                                title: lang.pageTitles.registerSuccess,
                                 templateUrl: CONFIG.viewsDir + 'regActions.html',
                                 controller: 'RegisterCtrl',
                                 resolve: {
@@ -134,7 +138,7 @@ window.L = {};
                                 }
                             })
                             .when('/register/successActivated', {
-                                title: languageServiceProvider.$get().lang.pageTitles.registerSuccess,
+                                title: lang.pageTitles.registerSuccess,
                                 templateUrl: CONFIG.viewsDir + 'regActions.html',
                                 controller: 'RegisterCtrl',
                                 resolve: {
@@ -145,17 +149,17 @@ window.L = {};
                                 }
                             })
                             .when('/register/:code', {
-                                title: languageServiceProvider.$get().lang.pageTitles.register,
+                                title: lang.pageTitles.register,
                                 templateUrl: CONFIG.viewsDir + 'regActions.html',
                                 controller: 'RegisterCtrl'
                             })
                             .when('/register', {
-                                title: languageServiceProvider.$get().lang.pageTitles.register,
+                                title: lang.pageTitles.register,
                                 templateUrl: CONFIG.viewsDir + 'regActions.html',
                                 controller: 'RegisterCtrl'
                             })
                             .when('/account/password', {
-                                title: languageServiceProvider.$get().lang.pageTitles.changePassword,
+                                title: lang.pageTitles.changePassword,
                                 templateUrl: CONFIG.viewsDir + 'account.html',
                                 controller: 'AccountCtrl',
                                 resolve: {
@@ -165,7 +169,7 @@ window.L = {};
                                 }
                             })
                             .when('/account', {
-                                title: languageServiceProvider.$get().lang.pageTitles.account,
+                                title: lang.pageTitles.account,
                                 templateUrl: CONFIG.viewsDir + 'account.html',
                                 controller: 'AccountCtrl',
                                 resolve: {
@@ -175,17 +179,17 @@ window.L = {};
                                 }
                             })
                             .when('/systems', {
-                                title: languageServiceProvider.$get().lang.pageTitles.systems,
+                                title: lang.pageTitles.systems,
                                 templateUrl: CONFIG.viewsDir + 'systems.html',
                                 controller: 'SystemsCtrl'
                             })
                             .when('/systems/:systemId', {
-                                title: languageServiceProvider.$get().lang.pageTitles.system,
+                                title: lang.pageTitles.system,
                                 templateUrl: CONFIG.viewsDir + 'system.html',
                                 controller: 'SystemCtrl'
                             })
                             .when('/systems/:systemId/share', {
-                                title: languageServiceProvider.$get().lang.pageTitles.systemShare,
+                                title: lang.pageTitles.systemShare,
                                 templateUrl: CONFIG.viewsDir + 'system.html',
                                 controller: 'SystemCtrl',
                                 resolve: {
@@ -195,17 +199,17 @@ window.L = {};
                                 }
                             })
                             .when('/systems/:systemId/view', {
-                                title: languageServiceProvider.$get().lang.pageTitles.view,
+                                title: lang.pageTitles.view,
                                 templateUrl: CONFIG.viewsDir + 'view.html',
                                 controller: 'ViewPageCtrl'
                             })
                             .when('/systems/:systemId/view/:cameraId', {
-                                title: languageServiceProvider.$get().lang.pageTitles.view,
+                                title: lang.pageTitles.view,
                                 templateUrl: CONFIG.viewsDir + 'view.html',
                                 controller: 'ViewPageCtrl'
                             })
                             .when('/activate', {
-                                title: languageServiceProvider.$get().lang.pageTitles.activate,
+                                title: lang.pageTitles.activate,
                                 templateUrl: CONFIG.viewsDir + 'activeActions.html',
                                 controller: 'ActivateRestoreCtrl',
                                 resolve: {
@@ -215,7 +219,7 @@ window.L = {};
                                 }
                             })
                             .when('/activate/success', {
-                                title: languageServiceProvider.$get().lang.pageTitles.activateSuccess,
+                                title: lang.pageTitles.activateSuccess,
                                 templateUrl: CONFIG.viewsDir + 'activeActions.html',
                                 controller: 'ActivateRestoreCtrl',
                                 resolve: {
@@ -225,12 +229,12 @@ window.L = {};
                                 }
                             })
                             .when('/activate/:activateCode', {
-                                title: languageServiceProvider.$get().lang.pageTitles.activateCode,
+                                title: lang.pageTitles.activateCode,
                                 templateUrl: CONFIG.viewsDir + 'activeActions.html',
                                 controller: 'ActivateRestoreCtrl'
                             })
                             .when('/restore_password', {
-                                title: languageServiceProvider.$get().lang.pageTitles.restorePassword,
+                                title: lang.pageTitles.restorePassword,
                                 templateUrl: CONFIG.viewsDir + 'activeActions.html',
                                 controller: 'ActivateRestoreCtrl',
                                 resolve: {
@@ -240,7 +244,7 @@ window.L = {};
                                 }
                             })
                             .when('/restore_password/sent', {
-                                title: languageServiceProvider.$get().lang.pageTitles.restorePassword,
+                                title: lang.pageTitles.restorePassword,
                                 templateUrl: CONFIG.viewsDir + 'activeActions.html',
                                 controller: 'ActivateRestoreCtrl',
                                 resolve: {
@@ -250,7 +254,7 @@ window.L = {};
                                 }
                             })
                             .when('/restore_password/success', {
-                                title: languageServiceProvider.$get().lang.pageTitles.restorePasswordSuccess,
+                                title: lang.pageTitles.restorePasswordSuccess,
                                 templateUrl: CONFIG.viewsDir + 'activeActions.html',
                                 controller: 'ActivateRestoreCtrl',
                                 resolve: {
@@ -260,22 +264,22 @@ window.L = {};
                                 }
                             })
                             .when('/restore_password/:restoreCode', {
-                                title: languageServiceProvider.$get().lang.pageTitles.restorePasswordCode,
+                                title: lang.pageTitles.restorePasswordCode,
                                 templateUrl: CONFIG.viewsDir + 'activeActions.html',
                                 controller: 'ActivateRestoreCtrl'
                             })
                             .when('/content/:page', {
-                                title: '' /*languageServiceProvider.$get().lang.pageTitles.contentPage*/,
+                                title: '' /*lang.pageTitles.contentPage*/,
                                 templateUrl: CONFIG.viewsDir + 'static.html',
                                 controller: 'StaticCtrl'
                             })
                             .when('/debug', {
-                                title: languageServiceProvider.$get().lang.pageTitles.debug,
+                                title: lang.pageTitles.debug,
                                 templateUrl: CONFIG.viewsDir + 'debug.html',
                                 controller: 'DebugCtrl'
                             })
                             .when('/login', {
-                                title: languageServiceProvider.$get().lang.pageTitles.login,
+                                title: lang.pageTitles.login,
                                 templateUrl: CONFIG.viewsDir + 'startPage.html',
                                 controller: 'StartPageCtrl',
                                 resolve: {
@@ -285,42 +289,42 @@ window.L = {};
                                 }
                             })
                             .when('/downloads/history', {
-                                // title: languageServiceProvider.$get().lang.pageTitles.download,
+                                // title: lang.pageTitles.download,
                                 // templateUrl: CONFIG.viewsDir + 'downloadHistory.html',
                                 // controller: 'DownloadHistoryCtrl'
                                 template: ''
                             })
                             .when('/downloads/:build', {
-                                // title: languageServiceProvider.$get().lang.pageTitles.download,
+                                // title: lang.pageTitles.download,
                                 // templateUrl: CONFIG.viewsDir + 'downloadHistory.html',
                                 // controller: 'DownloadHistoryCtrl'
                                 template: ''
                             })
                             .when('/downloads', {
-                                // title: languageServiceProvider.$get().lang.pageTitles.download,
+                                // title: lang.pageTitles.download,
                                 // templateUrl: CONFIG.viewsDir + 'download.html',
                                 // controller: 'DownloadCtrl'
                                 template: ''
                             })
                             .when('/download', {
-                                // title: languageServiceProvider.$get().lang.pageTitles.download,
+                                // title: lang.pageTitles.download,
                                 // templateUrl: CONFIG.viewsDir + 'download.html',
                                 // controller: 'DownloadCtrl'
                                 template: ''
                             })
                             .when('/download/:platform', {
-                                // title: languageServiceProvider.$get().lang.pageTitles.downloadPlatform,
+                                // title: lang.pageTitles.downloadPlatform,
                                 // templateUrl: CONFIG.viewsDir + 'download.html',
                                 // controller: 'DownloadCtrl'
                                 template: ''
                             })
                             .when('/', {
-                                title: ''/*languageServiceProvider.$get().lang.pageTitles.startPage*/,
+                                title: ''/*lang.pageTitles.startPage*/,
                                 templateUrl: CONFIG.viewsDir + 'startPage.html',
                                 controller: 'StartPageCtrl'
                             })
                             .otherwise({
-                                title: languageServiceProvider.$get().lang.pageTitles.pageNotFound,
+                                title: lang.pageTitles.pageNotFound,
                                 templateUrl: CONFIG.viewsDir + '404.html'
                             });
                     });

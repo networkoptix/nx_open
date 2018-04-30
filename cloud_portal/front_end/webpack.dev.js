@@ -22,13 +22,21 @@ module.exports = merge(common, {
                 target : 'http://cloud-test.hdw.mx:80'
 
             },
+            // Rewrite English translations to be served from DEV files
+            {
+                context     : '/static/lang_en_US/',
+                target      : "https://0.0.0.0:9000",
+                pathRewrite : { "^/static/lang_en_US": "" },
+                changeOrigin: true,
+                secure      : false
+            },
             {
                 context     : '/static/',
                 target      : "https://0.0.0.0:9000",
                 pathRewrite : { "^/static": "" },
                 changeOrigin: true,
                 secure      : false
-            }
+            },
         ],
         https             : {
             key : fs.readFileSync('ssl_keys/server.key').toString(),
@@ -49,10 +57,6 @@ module.exports = merge(common, {
                 to  : 'static/images'
             },
             // Local test for i18n *********************
-            {
-                from: '../../translations/en_US',
-                to  : 'static/lang_en_US'
-            },
             {
                 from: '../../translations/ru_RU/',
                 to  : 'static/lang_ru_RU/'
