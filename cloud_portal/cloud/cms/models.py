@@ -84,6 +84,25 @@ class Context(models.Model):
         return self.name
 
 
+class Language(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    code = models.CharField(max_length=8, unique=True)
+
+    def __str__(self):
+        return self.code
+
+
+class ContextTemplate(models.Model):
+    context = models.ForeignKey(Context)
+    language = models.ForeignKey(Language, null=True)
+    template = models.TextField()
+
+    def __str__(self):
+        if self.context.file_path:
+            return self.context.file_path.replace("{{language}}", self.language.code)
+        return self.context.name + "-" + self.language.name
+
+
 class DataStructure(models.Model):
     class Meta:
         permissions = (
@@ -162,14 +181,6 @@ class DataStructure(models.Model):
         return content_value
 
 # CMS settings. Release engineer can change that
-
-
-class Language(models.Model):
-    name = models.CharField(max_length=255, unique=True)
-    code = models.CharField(max_length=8, unique=True)
-
-    def __str__(self):
-        return self.code
 
 
 class Customization(models.Model):

@@ -78,6 +78,14 @@ class ContextAdmin(CMSAdmin):
 admin.site.register(Context, ContextAdmin)
 
 
+class ContextTemplateAdmin(CMSAdmin):
+    list_display = ('context__name', 'language__code')
+    list_filter = ('context', 'language')
+    search_fields = ('context__name', 'context__file_path', 'language_code')
+
+admin.site.register(ContextTemplate, ContextTemplateAdmin)
+
+
 class DataStructureAdmin(CMSAdmin):
     list_display = ('context', 'name', 'description', 'translatable', 'type')
     list_filter = ('context', 'translatable')
