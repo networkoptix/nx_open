@@ -63,6 +63,8 @@ def save_content(filename, content):
 def process_context(context, language_code, customization, preview, version_id, global_contexts):
     language = Language.by_code(language_code, customization.default_language)
     context_template_text = context.template_for_language(language)
+    if not context_template_text:
+        context_template_text = ''
     content = process_context_structure(customization, context, context_template_text, language, version_id, preview)
     if not context.is_global:  # if current context is global - do not apply other contexts
         for global_context in global_contexts.all():
