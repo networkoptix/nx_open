@@ -103,7 +103,6 @@ class Language(models.Model):
 class ContextTemplate(models.Model):
     context = models.ForeignKey(Context)
     language = models.ForeignKey(Language, null=True)
-    template = models.TextField()
 
     def __str__(self):
         if self.context.file_path:
