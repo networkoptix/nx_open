@@ -236,8 +236,8 @@ class UserGroupsToCustomizationPermissions(models.Model):
         if permission and not user.has_perm(permission):
             return False
 
-        return UserGroupsToCustomizationPermissions.objects.exists(group__user__id=user.id,
-                                                                   customization__name=customization_name)
+        return UserGroupsToCustomizationPermissions.objects.filter(group_id__in=user.groups.all(),
+                                                                   customization__name=customization_name).exists()
 
 
 # CMS data. Partners can change that
