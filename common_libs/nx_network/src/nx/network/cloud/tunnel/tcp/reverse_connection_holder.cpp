@@ -193,7 +193,7 @@ void ReverseConnectionHolder::monitorSocket(
             {
                 NX_LOGX(lm("Host %1. Unexpected read on socket(%2), size=%3. "
                     "Closing socket (%4 sockets left)")
-                    .args(m_hostName, *it, size, m_sockets.size() - 1), cl_logERROR);
+                    .args(m_hostName, *it, size, m_sockets.size() - 1), cl_logWARNING);
             }
 
             (void)buffer; //< This buffer might be helpful for debug is case smth goes wrong!

@@ -189,7 +189,7 @@ bool ReverseConnectionPool::registerOnMediator(bool waitForRegistration)
         {
             if (code == nx::hpm::api::ResultCode::ok)
             {
-                NX_LOGX(lm("Registred on mediator by %1 with %2")
+                NX_LOGX(lm("Registered on mediator by %1 with %2")
                     .args(m_acceptor.selfHostName(), m_acceptor.address()), cl_logINFO);
 
                 if (auto& options = responce.tcpConnectionKeepAlive)
