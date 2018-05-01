@@ -79,9 +79,9 @@ admin.site.register(Context, ContextAdmin)
 
 
 class ContextTemplateAdmin(CMSAdmin):
-    list_display = ('context__name', 'language__code')
+    # list_display = ('context__name', 'language__code')
     list_filter = ('context', 'language')
-    search_fields = ('context__name', 'context__file_path', 'language_code')
+    # search_fields = ('context__name', 'context__file_path', 'language__code')
 
 admin.site.register(ContextTemplate, ContextTemplateAdmin)
 
