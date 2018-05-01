@@ -6,7 +6,7 @@
 import os
 import re
 from ...controllers import structure
-from ...models import Product, Context, DataStructure
+from ...models import Product, Context, ContextTemplate, DataStructure
 from django.core.management.base import BaseCommand
 
 
@@ -55,6 +55,14 @@ def find_or_add_context_by_file(file_path, product_id, has_language):
     return context
 
 
+def find_or_add_context_template(context, language_code)
+    if ContextTemplate.objects.filter(context__id=context.id, language__code=language_code).exists():
+        return ContextTemplate.objects.get(context__id=context.id, language__code=language_code)
+    context_template = ContextTemplate(context=context, language = Language.get(code=language_code))
+    context_template.save()
+    return context_template
+
+
 def read_cms_strings(filename):
     pattern = re.compile(r'%\S+?%')
     with open(filename, 'r') as file:
@@ -63,10 +71,8 @@ def read_cms_strings(filename):
 
 
 def read_structure_file(filename, product_id, global_strings):
-    context_name, language = context_for_file(filename, 'blue')
+    context_name, language_code = context_for_file(filename, 'blue')
 
-    if language and language != "en_US":
-        return
     # now read file and get records from there.
     data, strings = read_cms_strings(filename)
     if not strings:  # if there is no records at all - we ignore it
@@ -76,11 +82,12 @@ def read_structure_file(filename, product_id, global_strings):
 
     # Here we check if there are any unique strings (which are not global)
     strings = [string for string in strings if string not in global_strings]
-    context = find_or_add_context_by_file(context_name, product_id, bool(language))
-    context.template = data  # update template for this context
-    context.save()
+    context = find_or_add_context_by_file(context_name, product_id, bool(language_code))
+    context_template = find_or_add_context_template(context, language_code)
+    context_template.template = data  # update template for this context
+    context_template.save()
     for string in strings:
-        structure.find_or_add_data_structure(string, None, context.id, bool(language))
+        structure.find_or_add_data_structure(string, None, context.id, bool(language_code))
 
 
 def read_structure(product_name):

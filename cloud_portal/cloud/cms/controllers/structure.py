@@ -4,7 +4,7 @@ import codecs
 import os
 import re
 from zipfile import ZipFile
-from ..models import Product, Context, DataStructure, Customization, DataRecord
+from ..models import Product, Context, ContextTemplate, DataStructure, Customization, DataRecord
 
 
 def find_or_add_product(name, can_preview):
@@ -181,10 +181,17 @@ def process_zip(file_descriptor, user, update_structure, update_content):
 
             context = context.first()
             if update_structure:
-                if context.template != file_content:
-                    context.template = file_content
-                    context.save()
+                if context.contexttemplate_set.exists():
+                    context_template = context.contexttemplate_set.first()
+                else:
+                    context_template = ContextTemplate(context=context)
+
+                # Here we assume that there is only one template here
+                if context_template.template != file_content:
+                    context_template.template = file_content
+                    context_template.save()
                     log_messages.append(('success', 'Updated template for context %s using %s' % (context.name, name)))
+
             if update_content:
                 customization = Customization.objects.filter(name=customization_name)
                 if not customization.exists():
@@ -195,18 +202,19 @@ def process_zip(file_descriptor, user, update_structure, update_content):
                 customization = customization.first()
 
                 # try to parse datastructures from the file using template
-                if not context.template:  # no template - nothing we can do
+                if not context.contexttemplate_set.exists():  # no template - nothing we can do
                     log_messages.append(('error', 'Ignored: %s (context has to template)' % name))
                     continue
-                # here we have context.template and file_content - which are relatively close.
+                # here we have template for context and file_content - which are relatively close.
                 # Ideally, the only difference is specific data values
 
                 for structure in context.datastructure_set.all():
                     if structure.type in (DataStructure.DATA_TYPES.image, DataStructure.DATA_TYPES.file):
                         continue
 
+                    context_template = context.contexttemplate_set.first()
                     # find a line in template which has structure.name in it
-                    template_line = next((line for line in context.template.split("\n") if structure.name in line),
+                    template_line = next((line for line in context_template.split("\n") if structure.name in line),
                                          None)
                     if not template_line:
                         log_messages.append(('warning', 'No line in template %s for data structure %s' %
