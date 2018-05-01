@@ -41,31 +41,16 @@ function(nx_get_cloud_version versionVarName)
 	set(${versionVarName} ${cloudVersion} PARENT_SCOPE)
 endfunction(nx_get_cloud_version)
 
-function(define_cloud_backend_targets)
-    set(cloudBackendModules cloud_db connection_mediator traffic_relay vms_gateway)
+function(define_cloud_group_targets groupName)
+    add_custom_target(cloud-${groupName}-docker-build)
+    add_custom_target(cloud-${groupName}-docker-push DEPENDS cloud-${groupName}-docker-build)
 
-    add_custom_target(cloud-backend-docker-build)
-    add_custom_target(cloud-backend-docker-push DEPENDS cloud-backend-docker-build)
-
-    foreach(cloudModule ${cloudBackendModules})
+    foreach(cloudModule ${ARGN})
         add_subdirectory(${cloudModule})
-        add_dependencies(cloud-backend-docker-build ${cloudModule}-docker-build)
-        add_dependencies(cloud-backend-docker-push ${cloudModule}-docker-push)
+        add_dependencies(cloud-${groupName}-docker-build ${cloudModule}-docker-build)
+        add_dependencies(cloud-${groupName}-docker-push ${cloudModule}-docker-push)
     endforeach(cloudModule)
-endfunction(define_cloud_backend_targets)
-
-function(define_cloud_frontend_targets)
-    set(cloudFrontendModules cloud_portal cloud_portal_nginx nxcloud_host_agent)
-
-    add_custom_target(cloud-frontend-docker-build)
-    add_custom_target(cloud-frontend-docker-push DEPENDS cloud-frontend-docker-build)
-
-    foreach(cloudModule ${cloudFrontendModules})
-        add_subdirectory(${cloudModule})
-        add_dependencies(cloud-frontend-docker-build ${cloudModule}-docker-build)
-        add_dependencies(cloud-frontend-docker-push ${cloudModule}-docker-push)
-    endforeach(cloudModule)
-endfunction(define_cloud_frontend_targets)
+endfunction(define_cloud_group_targets)
 
 #-----------------------------------------------------------------------------------------------------------
 
@@ -76,8 +61,11 @@ message("-- Configuring cloud build ${cloudVersion}")
 add_custom_target(cloud-docker-build-prepare)
 add_custom_command(TARGET cloud-docker-build-prepare COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
-define_cloud_backend_targets()
-define_cloud_frontend_targets()
+set(cloudBackendModules cloud_db connection_mediator traffic_relay vms_gateway)
+set(cloudFrontendModules cloud_portal cloud_portal_nginx nxcloud_host_agent)
+
+define_cloud_group_targets(backend ${cloudBackendModules})
+define_cloud_group_targets(frontend ${cloudFrontendModules})
 
 add_custom_target(cloud-docker-build DEPENDS cloud-backend-docker-build cloud-frontend-docker-build)
 add_custom_target(cloud-docker-push DEPENDS cloud-docker-build cloud-backend-docker-push cloud-frontend-docker-push)
