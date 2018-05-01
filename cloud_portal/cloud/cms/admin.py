@@ -129,3 +129,9 @@ class ContentVersionAdmin(CMSAdmin):
     content_version_actions.allow_tags = True
 
 admin.site.register(ContentVersion, ContentVersionAdmin)
+
+
+class UserGroupsToCustomizationPermissionsAdmin(CMSAdmin):
+    list_display = ('id', 'group', 'customization',)
+
+admin.site.register(UserGroupsToCustomizationPermissions, UserGroupsToCustomizationPermissionsAdmin)
