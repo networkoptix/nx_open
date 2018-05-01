@@ -15,20 +15,24 @@ export class RenameModalContent {
 
     rename: any;
 
-    constructor(public activeModal: NgbActiveModal,
+    constructor(private activeModal: NgbActiveModal,
                 @Inject('process') private process: any,
                 @Inject('cloudApiService') private cloudApi: any) {
 
     }
 
     ngOnInit() {
-        this.rename = this.process.init(function () {
+        this.rename = this.process.init(() => {
             return this.cloudApi.renameSystem(this.systemId, this.systemName);
         }, {
-            successMessage: this.language.system.successRename
-        }).then(function () {
-            this.activeModal.close();
+            successMessage: this.language.lang.system.successRename
+        }).then(() => {
+            this.activeModal.close(this.systemName);
         });
+    }
+
+    close() {
+        this.activeModal.close();
     }
 }
 
@@ -57,10 +61,6 @@ export class NxModalRenameComponent implements OnInit {
 
     open(systemId, systemName) {
         return this.dialog(systemId, systemName);
-    }
-
-    close() {
-        this.modalRef.close();
     }
 
     ngOnInit() {

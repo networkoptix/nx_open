@@ -118,7 +118,6 @@ window.L = {};
 
                         var lang = languageServiceProvider.$get().lang;
 
-                        console.log('Lang: ', lang);
                         // For compatibility with legacy modules *****
                         L = lang;
                         Config = CONFIG;

@@ -16,7 +16,7 @@
                    required autofocus>
             <p class="help-block">
                     <span class="input-error"
-                          *ngIf="renameForm.systemName.$touched && renameForm.systemName.$error.required"
+                          *ngIf="!renameForm.controls['systemName']?.valid && renameForm.controls['systemName']?.touched"
                           translate>
                         System name is required
                     </span>
@@ -29,7 +29,7 @@
                            action-type="'primary'"
                            buttonText="{{ 'Save' | translate }}"></nx-process-button>
 
-        <button type="button" class="btn btn-default" ng-click="close()" translate>Cancel</button>
+        <button type="button" class="btn btn-default" (click)="close()" translate>Cancel</button>
     </div>
 </form>
 <!--</div>-->

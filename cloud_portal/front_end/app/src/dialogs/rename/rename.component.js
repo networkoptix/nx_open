@@ -21,13 +21,16 @@ let RenameModalContent = class RenameModalContent {
         this.cloudApi = cloudApi;
     }
     ngOnInit() {
-        this.rename = this.process.init(function () {
+        this.rename = this.process.init(() => {
             return this.cloudApi.renameSystem(this.systemId, this.systemName);
         }, {
-            successMessage: this.language.system.successRename
-        }).then(function () {
-            this.activeModal.close();
+            successMessage: this.language.lang.system.successRename
+        }).then(() => {
+            this.activeModal.close(this.systemName);
         });
+    }
+    close() {
+        this.activeModal.close();
     }
 };
 __decorate([
@@ -67,9 +70,6 @@ let NxModalRenameComponent = class NxModalRenameComponent {
     }
     open(systemId, systemName) {
         return this.dialog(systemId, systemName);
-    }
-    close() {
-        this.modalRef.close();
     }
     ngOnInit() {
     }

@@ -52,8 +52,6 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy, AfterViewChe
         this.sub = this.route.params.subscribe(params => {
             this.build = params['build'];
 
-            console.log(this.build);
-
             this.authorizationService.requireLogin().then(() => {
                 this.cloudApi
                     .getDownloadsHistory(this.build)

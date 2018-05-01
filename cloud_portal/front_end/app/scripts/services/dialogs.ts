@@ -5,7 +5,7 @@
 
     angular
         .module('cloudApp.services')
-        .factory('dialogs', [ '$http', 'NgbModal', '$q', '$location', 'configService', 'nxDialogsService', 'languageService',
+        .factory('dialogs', ['$http', 'NgbModal', '$q', '$location', 'configService', 'nxDialogsService', 'languageService',
             function ($http, NgbModal, $q, $location, configService, nxDialogsService, languageService) {
 
                 const CONFIG = configService.config;
@@ -25,7 +25,7 @@
                     // Check 401 against offline
 
                     modalInstance = NgbModal.open(settings.template + `: This dialog have to be moved! Ng-Bootstrap requires dialog content and not templateUrl`,
-                        { /* settings */ });
+                        {/* settings */});
 
                     // modalInstance = $uibModal.open({
                     //     size: settings.size || 'sm',
@@ -85,7 +85,7 @@
                 }
 
                 return {
-                    notify              : function (message, type, hold) {
+                    notify: function (message, type, hold) {
                         return nxDialogsService.notify(message, type, hold);
                         // type = type || 'info';
                         //
@@ -101,7 +101,7 @@
                         return nxDialogsService.dismiss();
                         // return ngToast.dismiss();
                     },
-                    alert               : function (message, title) {
+                    alert: function (message, title) {
                         return nxDialogsService.openAlert(message, title);
                         // return openDialog({
                         //     title      : title,
@@ -111,7 +111,7 @@
                         //     closable   : true
                         // }).result;
                     },
-                    confirm             : function (message, title, actionLabel, actionType, cancelLabel) {
+                    confirm: function (message, title, actionLabel, actionType, cancelLabel) {
                         //title, template, url, content, hasFooter, cancellable, params, closable, actionLabel, buttonType, size
                         return nxDialogsService.confirm(message, title, actionLabel, actionType, cancelLabel);
                         // return openDialog({
@@ -125,8 +125,8 @@
                         //     buttonType : actionType
                         // }).result;
                     },
-                    login               : function (keepPage) {
-                        return nxDialogsService.open(keepPage);
+                    login: function (keepPage) {
+                        return nxDialogsService.login(keepPage);
                         // return openDialog({
                         //     title: L.dialogs.loginTitle,
                         //     template: CONFIG.viewsDir + 'dialogs/login.html',
@@ -138,7 +138,7 @@
                         //         redirect: !keepPage
                         //     }}).result;
                     },
-                    share               : function (system, user) {
+                    share: function (system, user) {
                         return nxDialogsService.share(system, user);
 
                         // var url = 'share';
@@ -160,7 +160,7 @@
                         // }).result;
                     },
 
-                    disconnect      : function (systemId) {
+                    disconnect: function (systemId) {
                         return nxDialogsService.disconnect(systemId);
 
                         // var title = lang.system.confirmDisconnectTitle;
@@ -175,7 +175,7 @@
                         //     }
                         // }).result;
                     },
-                    rename          : function (systemId, systemName) {
+                    rename: function (systemId, systemName) {
                         return nxDialogsService.rename(systemId, systemName);
 
                         // var title = lang.system.confirmRenameTitle;
@@ -191,7 +191,7 @@
                         //     }
                         // }).result;
                     },
-                    merge           : function (system) {
+                    merge: function (system) {
                         return nxDialogsService.merge(system);
 
                         // var title = lang.system.mergeSystemTitle;
@@ -210,14 +210,14 @@
                         // message, title, actionLabel, actionType
                         return this.confirm(null /*L.downloads.noClientDetectedMessage*/,
                             lang.downloads.noClientDetectedTitle, lang.downloads.action)
-                            .then(function () {
-                                $location.path('/download');
-                            });
+                                   .then(function () {
+                                       $location.path('/download');
+                                   });
                         // return this.notify(L.errorCodes.cantOpenClient, 'danger', true);
                     },
 
 
-                    closeMe    : function ($scope, result) {
+                    closeMe: function ($scope, result) {
 
                         // TODO: We must replace this hack with something more angular-way,
                         // but I can't figure out yet, how to implement dialog service and pass parameters to controllers
@@ -245,8 +245,8 @@
                         return $scope.settings || $scope.$parent && this.getSettings($scope.$parent) || null;
                     }
                 };
-            } ])
-        .controller('DialogCtrl', [ '$scope', 'settings', function ($scope, settings) {
+            }])
+        .controller('DialogCtrl', ['$scope', 'settings', function ($scope, settings) {
             $scope.settings = settings;
 
             $scope.close = function () {
@@ -264,5 +264,5 @@
             $scope.$on('$routeChangeStart', function () {
                 // $uibModalInstance.close();
             });
-        } ]);
+        }]);
 })();

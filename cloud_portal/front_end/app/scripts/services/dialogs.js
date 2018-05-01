@@ -112,7 +112,7 @@
                     // }).result;
                 },
                 login: function (keepPage) {
-                    return nxDialogsService.open(keepPage);
+                    return nxDialogsService.login(keepPage);
                     // return openDialog({
                     //     title: L.dialogs.loginTitle,
                     //     template: CONFIG.viewsDir + 'dialogs/login.html',

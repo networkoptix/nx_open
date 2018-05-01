@@ -33,8 +33,6 @@ export class NxProcessButtonComponent implements OnInit {
     }
 
     setFocusToInvalid() {
-        console.log('ctrls:', this.form.form.controls);
-
         for(const ctrl in this.form.form.controls) {
             const control = this.form.form.get(ctrl);
 
