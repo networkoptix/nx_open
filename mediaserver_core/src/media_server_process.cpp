@@ -2747,7 +2747,7 @@ bool MediaServerProcess::initTcpListener(
 
     regTcp<QnProxyConnectionProcessor>("*", "proxy", messageBus);
     //regTcp<QnProxyReceiverConnection>("PROXY", "*");
-    regTcp<QnProxyReceiverConnection>("HTTP", "proxy-reverse");
+    regTcp<QnProxyReceiverConnection>("HTTP", "proxy-reverse", mediaServerModule);
     regTcp<QnAudioProxyReceiver>("HTTP", "proxy-2wayaudio");
 
     if( !qnServerModule->roSettings()->value("authenticationEnabled", "true").toBool())

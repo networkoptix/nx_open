@@ -85,6 +85,18 @@ void CLSimpleHTTPClient::initSocket(bool ssl)
     }
 }
 
+void CLSimpleHTTPClient::initSocket(TCPSocketPtr socket)
+{
+    m_sock = std::move(socket);
+    m_connected = m_sock->isConnected();
+        
+    if (!m_sock->setRecvTimeout(m_timeout) || !m_sock->setSendTimeout(m_timeout))
+    {
+        m_sock.clear();
+        m_connected = false;
+    }
+}
+
 CLSimpleHTTPClient::~CLSimpleHTTPClient()
 {
 }

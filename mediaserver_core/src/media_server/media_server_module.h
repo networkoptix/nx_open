@@ -28,6 +28,7 @@ namespace mediaserver {
 class UnusedWallpapersWatcher;
 class LicenseWatcher;
 class RootTool;
+class ReverseConnectionManager;
 
 namespace updates2 { class ServerUpdates2Manager; }
 
@@ -88,6 +89,8 @@ public:
     QnResourceCommandProcessor* resourceCommandProcessor() const;
 
     nx::mediaserver::RootTool* rootTool() const;
+
+    nx::mediaserver::ReverseConnectionManager* reverseConnectionManager() const;
 
 private:
     void registerResourceDataProviders();

@@ -1,6 +1,10 @@
+#pragma once
+
 #include <common/common_module_aware.h>
 #include <nx/utils/timer_manager.h>
 #include <core/resource/resource_fwd.h>
+#include <network/router.h>
+#include <nx/network/abstract_socket.h>
 
 class AbstractSystemClock
 {
@@ -27,7 +31,7 @@ namespace time_sync {
 
 class TimeSynchManager:
     public QObject,
-    public QnCommonModuleAware
+    public ServerModuleAware
 {
     Q_OBJECT
 public:
@@ -36,8 +40,7 @@ public:
      * TimeSynchronizationManager::start MUST be called before using class instance.
      */
     TimeSynchManager(
-		QnCommonModule* commonModule,
-		Qn::PeerType peerType,
+		QnMediaServerModule* serverModule,
         nx::utils::StandaloneTimerManager* const timerManager,
         const std::shared_ptr<AbstractSystemClock>& systemClock = nullptr,
         const std::shared_ptr<AbstractSteadyClock>& steadyClock = nullptr);
@@ -61,7 +64,9 @@ private:
     void loadTimeFromServer();
     QSharedPointer<nx::network::AbstractStreamSocket> connectToRemoteHost(const QnRoute& route);
 private:
-    qint64 m_synchronizedTime;
+    qint64 m_synchronizedTimeMs = 0;
+    std::shared_ptr<AbstractSystemClock> m_systemClock;
+    std::shared_ptr<AbstractSteadyClock> m_steadyClock;
 };
 
 } // namespace time_sync

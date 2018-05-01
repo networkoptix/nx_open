@@ -1,13 +1,29 @@
 #include "time_sync_manager.h"
+
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <common/common_module.h>
-#include <network/router.h>
 #include <api/global_settings.h>
+#include <nx/network/deprecated/simple_http_client.h>
+#include <nx/utils/elapsed_timer.h>
+#include <nx_ec/data/api_reverse_connection_data.h>
+#include <../mediaserver_core/src/media_server/media_server_module.h"
 
 namespace nx {
 namespace vvms {
 namespace time_sync {
+
+TimeSynchManager::TimeSynchManager(
+    QnMediaServerModule* serverModule,
+    nx::utils::StandaloneTimerManager* const /*timerManager*/,
+    const std::shared_ptr<AbstractSystemClock>& systemClock,
+    const std::shared_ptr<AbstractSteadyClock>& steadyClock)
+    :
+    QnMediaServerModule(serverModule),
+    m_systemClock(systemClock),
+    m_steadyClock(steadyClock)
+{
+}
 
 QnMediaServerResourcePtr TimeSynchManager::getPrimaryTimeServer()
 {
@@ -46,7 +62,7 @@ QSharedPointer<nx::network::AbstractStreamSocket> TimeSynchManager::connectToRem
         const auto& target = route.gatewayId.isNull() ? route.id : route.gatewayId;
         socket = owner->getProxySocket(
             target.toString(),
-            d->connectTimeout.count(),
+            d->connectTimeout.count(), 
             [&](int socketCount)
         {
             ec2::QnTransaction<ec2::ApiReverseConnectionData> tran(
@@ -77,12 +93,21 @@ void TimeSynchManager::loadTimeFromServer(const QnRoute& route)
     auto socket = connectToRemoteHost(route);
     if (!socket)
         return;
-    nx::http::SyncHttpClient client;
-    client.setSocket(socket);
+    CLSimpleHTTPClient httpClient;
+    httpClient.initSocket(std::move(socket));
     QUrl url;
-    url.setPath("api/getSyncTime");
-    
-    auto data = url.doGet(url);
+    url.setPath("/api/getSyncTime");
+
+    nx::utils::ElapsedTimer timer;
+    timer.restart();
+    auto status = httpClient.doGET(url.toString());
+    if (status != nx::network::http::StatusCode::ok)
+        return;
+    auto response = httpClient.readAll();
+    if (response.isEmpty())
+        return;
+
+    m_synchronizedTimeMs = response.toLongInt() - timer.elapsedMs()/2;
 }
 
 void TimeSynchManager::doPeriodicTasks()
