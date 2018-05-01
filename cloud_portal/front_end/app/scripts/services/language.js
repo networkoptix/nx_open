@@ -36,7 +36,6 @@
 
                 this.setLanguage = function (language) {
                     lang = language;
-                    lang.language = lang.language.replace('-', '_');
                 };
 
                 this.setCommonLanguage = function (language) {
