@@ -181,12 +181,13 @@ def process_zip(file_descriptor, user, update_structure, update_content):
 
             context = context.first()
             if update_structure:
+                # Here we assume that there is only one template here
+
                 if context.contexttemplate_set.exists():
                     context_template = context.contexttemplate_set.first()
                 else:
                     context_template = ContextTemplate(context=context)
 
-                # Here we assume that there is only one template here
                 if context_template.template != file_content:
                     context_template.template = file_content
                     context_template.save()
