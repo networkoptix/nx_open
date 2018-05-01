@@ -4,7 +4,9 @@
 function(nx_add_cloud_deploy_target name)
     add_custom_target(${name}-docker-build)
 
-    add_dependencies(${name}-docker-build ${name})
+    if(TARGET ${name})
+        add_dependencies(${name}-docker-build ${name})
+    endif()
     add_dependencies(${name}-docker-build cloud-docker-build-prepare)
     add_custom_command(TARGET ${name}-docker-build COMMAND ${CMAKE_COMMAND} -E env NX_VMS_DIR=${CMAKE_SOURCE_DIR} ./make.sh stage_cmake ${CMAKE_BINARY_DIR} ${name})
 
@@ -53,7 +55,7 @@ function(define_cloud_backend_targets)
 endfunction(define_cloud_backend_targets)
 
 function(define_cloud_frontend_targets)
-    set(cloudFrontendModules cloud_portal) #cloud_portal_nginx nxcloud_host_agent
+    set(cloudFrontendModules cloud_portal cloud_portal_nginx nxcloud_host_agent)
 
     add_custom_target(cloud-frontend-docker-build)
     add_custom_target(cloud-frontend-docker-push DEPENDS cloud-frontend-docker-build)

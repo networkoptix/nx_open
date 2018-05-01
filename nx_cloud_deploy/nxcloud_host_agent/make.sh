@@ -16,4 +16,9 @@ function stage()
     true
 }
 
+function stage_cmake()
+{
+    true
+}
+
 main $@
