@@ -1,44 +1,45 @@
 #pragma once
 
+#include <deque>
+
 #include <QtCore/QSharedPointer>
 
 #include <nx/network/abstract_socket.h>
 #include <nx/utils/thread/wait_condition.h>
 #include <nx/utils/elapsed_timer.h>
+#include <common/common_module_aware.h>
 
 namespace nx {
 namespace mediaserver {
 
-class ReverseConnectionManager
+class ReverseConnectionManager: public QnCommonModuleAware
 {
 public:
-    ReverseConnectionManager();
-
+    ReverseConnectionManager(QnCommonModule* commonModule);
 
     bool registerProxyReceiverConnection(
-        const QString& url, QSharedPointer<nx::network::AbstractStreamSocket> socket);
-
-    typedef std::function<void(int count)> SocketRequest;
+        const QString& url, 
+        std::unique_ptr<nx::network::AbstractStreamSocket> socket);
 
     /**
      * @return Tcp socket connected to specified media server.
      * @param guid Media server guid.
      * @param timeoutMs total timeout to establish reverse connection.
      */
-    QSharedPointer<nx::network::AbstractStreamSocket> getProxySocket(
-        const QString& guid, int timeoutMs, const SocketRequest& socketRequest);
+    std::unique_ptr<nx::network::AbstractStreamSocket> getProxySocket(
+        const QnUuid& guid, std::chrono::milliseconds timeout);
 private:
     void doPeriodicTasks();
 private:
     struct AwaitProxyInfo
     {
-        explicit AwaitProxyInfo(const QSharedPointer<nx::network::AbstractStreamSocket>& socket):
-            socket(socket)
+        AwaitProxyInfo(std::unique_ptr<nx::network::AbstractStreamSocket> socket):
+            socket(std::move(socket))
         {
             timer.restart();
         }
 
-        QSharedPointer<nx::network::AbstractStreamSocket> socket;
+        std::unique_ptr<nx::network::AbstractStreamSocket> socket;
         nx::utils::ElapsedTimer timer;
     };
 
@@ -47,12 +48,12 @@ private:
         ServerProxyPool() : requested(0) {}
 
         size_t requested;
-        QList<AwaitProxyInfo> available;
-        QElapsedTimer timer;
+        std::deque<AwaitProxyInfo> available;
+        nx::utils::ElapsedTimer timer;
     };
 
     QnMutex m_proxyMutex;
-    QMap<QString, ServerProxyPool> m_proxyPool;
+    std::map<QString, ServerProxyPool> m_proxyPool;
     QnWaitCondition m_proxyCondition;
 };
 

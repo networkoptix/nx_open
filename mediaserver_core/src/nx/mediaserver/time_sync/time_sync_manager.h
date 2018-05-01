@@ -5,6 +5,7 @@
 #include <core/resource/resource_fwd.h>
 #include <network/router.h>
 #include <nx/network/abstract_socket.h>
+#include <nx/mediaserver/server_module_aware.h>
 
 class AbstractSystemClock
 {
@@ -26,7 +27,7 @@ public:
 };
 
 namespace nx {
-namespace vvms {
+namespace mediaserver {
 namespace time_sync {
 
 class TimeSynchManager:
@@ -61,8 +62,8 @@ private:
     void doPeriodicTasks();
     QnMediaServerResourcePtr getPrimaryTimeServer();
     void updateTimeFromInternet();
-    void loadTimeFromServer();
-    QSharedPointer<nx::network::AbstractStreamSocket> connectToRemoteHost(const QnRoute& route);
+    void loadTimeFromServer(const QnRoute& route);
+    std::unique_ptr<nx::network::AbstractStreamSocket> connectToRemoteHost(const QnRoute& route);
 private:
     qint64 m_synchronizedTimeMs = 0;
     std::shared_ptr<AbstractSystemClock> m_systemClock;
@@ -70,5 +71,5 @@ private:
 };
 
 } // namespace time_sync
-} // namespace vms
+} // namespace mediaserver
 } // namespace nx

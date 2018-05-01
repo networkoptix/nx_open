@@ -7,11 +7,14 @@
 #include <nx/network/deprecated/simple_http_client.h>
 #include <nx/utils/elapsed_timer.h>
 #include <nx_ec/data/api_reverse_connection_data.h>
-#include <../mediaserver_core/src/media_server/media_server_module.h"
+#include <media_server/media_server_module.h>
+#include <nx/mediaserver/reverse_connection_manager.h>
 
 namespace nx {
-namespace vvms {
+namespace mediaserver {
 namespace time_sync {
+
+static const std::chrono::seconds kProxySocetTimeout(10);
 
 TimeSynchManager::TimeSynchManager(
     QnMediaServerModule* serverModule,
@@ -19,7 +22,7 @@ TimeSynchManager::TimeSynchManager(
     const std::shared_ptr<AbstractSystemClock>& systemClock,
     const std::shared_ptr<AbstractSteadyClock>& steadyClock)
     :
-    QnMediaServerModule(serverModule),
+    ServerModuleAware(serverModule),
     m_systemClock(systemClock),
     m_steadyClock(steadyClock)
 {
@@ -54,35 +57,23 @@ void TimeSynchManager::updateTimeFromInternet()
 
 }
 
-QSharedPointer<nx::network::AbstractStreamSocket> TimeSynchManager::connectToRemoteHost(const QnRoute& route)
+std::unique_ptr<nx::network::AbstractStreamSocket> TimeSynchManager::connectToRemoteHost(const QnRoute& route)
 {
-    QSharedPointer<nx::network::AbstractStreamSocket> socket;
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket;
     if (route.reverseConnect) 
     {
         const auto& target = route.gatewayId.isNull() ? route.id : route.gatewayId;
-        socket = owner->getProxySocket(
-            target.toString(),
-            d->connectTimeout.count(), 
-            [&](int socketCount)
-        {
-            ec2::QnTransaction<ec2::ApiReverseConnectionData> tran(
-                ec2::ApiCommand::openReverseConnection,
-                commonModule()->moduleGUID());
-            tran.params.targetServer = commonModule()->moduleGUID();
-            tran.params.socketCount = socketCount;
-            d->messageBus->sendTransaction(tran, target);
-        });
+        auto manager = serverModule()->reverseConnectionManager();
+        socket = manager->getProxySocket(target, kProxySocetTimeout);
     }
     else
     {
-        socket = QSharedPointer<nx::network::AbstractStreamSocket>(
-            nx::network::SocketFactory::createStreamSocket(url.scheme() == lit("https"))
-            .release());
-        if (!d->dstSocket->connect(
+        socket = nx::network::SocketFactory::createStreamSocket(false);
+        if (socket->connect(
             route.addr,
             nx::network::deprecated::kDefaultConnectTimeout))
         {
-            return QSharedPointer<nx::network::AbstractStreamSocket>();
+            return std::unique_ptr<nx::network::AbstractStreamSocket>();
         }
     }
     return socket;
@@ -93,8 +84,7 @@ void TimeSynchManager::loadTimeFromServer(const QnRoute& route)
     auto socket = connectToRemoteHost(route);
     if (!socket)
         return;
-    CLSimpleHTTPClient httpClient;
-    httpClient.initSocket(std::move(socket));
+    CLSimpleHTTPClient httpClient(std::move(socket));
     QUrl url;
     url.setPath("/api/getSyncTime");
 
@@ -103,11 +93,12 @@ void TimeSynchManager::loadTimeFromServer(const QnRoute& route)
     auto status = httpClient.doGET(url.toString());
     if (status != nx::network::http::StatusCode::ok)
         return;
-    auto response = httpClient.readAll();
+    QByteArray response;
+    httpClient.readAll(response);
     if (response.isEmpty())
         return;
 
-    m_synchronizedTimeMs = response.toLongInt() - timer.elapsedMs()/2;
+    m_synchronizedTimeMs = response.toLongLong() - timer.elapsedMs()/2;
 }
 
 void TimeSynchManager::doPeriodicTasks()

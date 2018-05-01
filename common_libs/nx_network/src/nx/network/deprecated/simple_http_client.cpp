@@ -73,24 +73,23 @@ CLSimpleHTTPClient::CLSimpleHTTPClient(const nx::utils::Url& url, unsigned int t
     initSocket(url.scheme() == lit("https"));
 }
 
-
-void CLSimpleHTTPClient::initSocket(bool ssl)
+CLSimpleHTTPClient::CLSimpleHTTPClient(std::unique_ptr<nx::network::AbstractStreamSocket> socket)
 {
-    m_sock = TCPSocketPtr(nx::network::SocketFactory::createStreamSocket(ssl).release());
+    m_sock = TCPSocketPtr(socket.release());
+    m_connected = m_sock->isConnected();
 
-    if( !m_sock->setRecvTimeout(m_timeout) || !m_sock->setSendTimeout(m_timeout) )
+    if (!m_sock->setRecvTimeout(m_timeout) || !m_sock->setSendTimeout(m_timeout))
     {
         m_sock.clear();
         m_connected = false;
     }
 }
 
-void CLSimpleHTTPClient::initSocket(TCPSocketPtr socket)
+void CLSimpleHTTPClient::initSocket(bool ssl)
 {
-    m_sock = std::move(socket);
-    m_connected = m_sock->isConnected();
-        
-    if (!m_sock->setRecvTimeout(m_timeout) || !m_sock->setSendTimeout(m_timeout))
+    m_sock = TCPSocketPtr(nx::network::SocketFactory::createStreamSocket(ssl).release());
+
+    if( !m_sock->setRecvTimeout(m_timeout) || !m_sock->setSendTimeout(m_timeout) )
     {
         m_sock.clear();
         m_connected = false;

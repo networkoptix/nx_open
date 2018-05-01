@@ -2745,7 +2745,7 @@ bool MediaServerProcess::initTcpListener(
 
     //regTcp<QnDefaultTcpConnectionProcessor>("HTTP", "*");
 
-    regTcp<QnProxyConnectionProcessor>("*", "proxy", messageBus);
+    regTcp<QnProxyConnectionProcessor>("*", "proxy", mediaServerModule->reverseConnectionManager());
     //regTcp<QnProxyReceiverConnection>("PROXY", "*");
     regTcp<QnProxyReceiverConnection>("HTTP", "proxy-reverse", mediaServerModule);
     regTcp<QnAudioProxyReceiver>("HTTP", "proxy-2wayaudio");

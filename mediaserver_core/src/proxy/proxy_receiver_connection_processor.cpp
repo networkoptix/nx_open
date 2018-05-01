@@ -30,6 +30,7 @@ void QnProxyReceiverConnection::run()
     auto guid = nx::network::http::getHeaderValue(d->request.headers, Qn::PROXY_SENDER_HEADER_NAME);
     auto owner = static_cast<QnUniversalTcpListener*>(d->owner);
     auto manager = serverModule()->reverseConnectionManager();
-    if (manager->registerProxyReceiverConnection(guid, d->socket))
+    std::unique_ptr<nx::network::AbstractStreamSocket> socketPtr(d->socket.data());
+    if (manager->registerProxyReceiverConnection(guid, std::move(socketPtr)))
         takeSocket();
 }
