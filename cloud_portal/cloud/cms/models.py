@@ -91,6 +91,14 @@ class Language(models.Model):
     def __str__(self):
         return self.code
 
+    @staticmethod
+    def by_code(language_code, default_language=None):
+        if language_code:
+            language = Language.objects.filter(code=language_code)
+            if language.exists():
+                return language.first()
+        return default_language
+
 
 class ContextTemplate(models.Model):
     context = models.ForeignKey(Context)
@@ -101,6 +109,20 @@ class ContextTemplate(models.Model):
         if self.context.file_path:
             return self.context.file_path.replace("{{language}}", self.language.code)
         return self.context.name + "-" + self.language.name
+
+    def template_for_language(self, language, default_language=None):
+        context_template = self.contexttemplate_set.filter(language=language)
+        if not context_template.exists():  # No template for language - try to get default language
+            context_template = self.contexttemplate_set.filter(language=default_language)
+
+        if not context_template.exists():  # No template for default language - try to get default template
+            context_template = self.contexttemplate_set.filter(language=None)
+
+        if context_template.exists():
+            return context_template.first().template
+
+        # No template at all
+        return None
 
 
 class DataStructure(models.Model):

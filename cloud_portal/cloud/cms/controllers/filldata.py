@@ -61,15 +61,9 @@ def save_content(filename, content):
 
 
 def process_context(context, language_code, customization, preview, version_id, global_contexts):
-    language = None
-    if language_code:
-        language = Language.objects.filter(code=language_code)
-        if not language.exists():
-            language = customization.default_language
-        else:
-            language = language.first()
-
-    content = process_context_structure(customization, context, context.template, language, version_id, preview)
+    language = Language.by_code(language_code, customization.default_language)
+    context_template_text = context.template_for_language(language)
+    content = process_context_structure(customization, context, context_template_text, language, version_id, preview)
     if not context.is_global:  # if current context is global - do not apply other contexts
         for global_context in global_contexts.all():
             content = process_context_structure(
@@ -118,7 +112,8 @@ def read_customized_file(filename, customization_name, language_code=None, versi
 
 def save_context(context, context_path, language_code, customization, preview, version_id, global_contexts):
     content = process_context(context, language_code, customization, preview, version_id, global_contexts)
-    if context.template:
+    language = Language.by_code(language_code, customization.default_language)
+    if context.template_for_language(language):  # if we have template - save context to file
         target_file_name = target_file(context_path, customization, language_code, preview)
         save_content(target_file_name, content)
 
@@ -266,7 +261,9 @@ def fill_content(customization_name='default', product_name='cloud_portal',
 
 
 def zip_context(zip_file, context, customization, language_code, preview, version_id, global_contexts, add_root):
-    if context.template:
+    language = Language.by_code(language_code, customization.default_language)
+
+    if context.template_for_language(language):  # if we have template - save context to file
         data = process_context(context, language_code, customization, preview, version_id, global_contexts)
         name = context.file_path.replace("{{language}}", language_code) if language_code else context.file_path
         if add_root:
