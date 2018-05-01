@@ -58,7 +58,7 @@ def find_or_add_context_by_file(file_path, product_id, has_language):
 def find_or_add_context_template(context, language_code):
     if ContextTemplate.objects.filter(context__id=context.id, language__code=language_code).exists():
         return ContextTemplate.objects.get(context__id=context.id, language__code=language_code)
-    context_template = ContextTemplate(context=context, language=Language.get(code=language_code))
+    context_template = ContextTemplate(context=context, language=Language.by_code(language_code))
     context_template.save()
     return context_template
 
