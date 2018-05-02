@@ -42,7 +42,7 @@
     "YOUR SYSTEM TEXT": "Your System",
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "ធ្វើឱ្យគណនីរបស់អ្នកសកម្ម",
     "RESET PASSWORD EMAIL SUBJECT": "កំណត់ពាក្យសម្ងាត់របស់អ្នកឡើងវិញ",
-    "INVITED TO SYSTEM EMAIL SUBJECT": "%message.sharer_name% invites you to %PRODUCT_NAME%",
+    "INVITED TO SYSTEM EMAIL SUBJECT": "Video system {{message.system_name}} was shared with you",
     "DISCONNECT FORM HEADER TEXT": "Disconnect System from %PRODUCT_NAME%?",
     "FIRST NAME IS REQUIRED TEXT": "ទាមទារនាមត្រកូល",
     "LAST NAME IS REQUIRED TEXT": "នាមត្រកូលត្រូវបានទាមទារ",

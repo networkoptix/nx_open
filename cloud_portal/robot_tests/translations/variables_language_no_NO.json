@@ -42,7 +42,7 @@
     "YOUR SYSTEM TEXT": "Your System",
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "Aktiver kontoen din",
     "RESET PASSWORD EMAIL SUBJECT": "Tilbakestill passordet ditt",
-    "INVITED TO SYSTEM EMAIL SUBJECT": "%message.sharer_name% invites you to %PRODUCT_NAME%",
+    "INVITED TO SYSTEM EMAIL SUBJECT": "Video system {{message.system_name}} was shared with you",
     "DISCONNECT FORM HEADER TEXT": "Disconnect System from %PRODUCT_NAME%?",
     "FIRST NAME IS REQUIRED TEXT": "Fornavn er påkrevd",
     "LAST NAME IS REQUIRED TEXT": "Etternavn er påkrevd",
