@@ -118,6 +118,8 @@ class ContextTemplate(models.Model):
     language = models.ForeignKey(Language, null=True)
     template = models.TextField()
     def __str__(self):
+        if not self.language:
+            return self.context.name
         if self.context.file_path:
             return self.context.file_path.replace("{{language}}", self.language.code)
         return self.context.name + "-" + self.language.name
