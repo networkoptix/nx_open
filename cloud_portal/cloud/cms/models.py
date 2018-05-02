@@ -114,6 +114,9 @@ class Language(models.Model):
 
 
 class ContextTemplate(models.Model):
+    class Meta:
+        unique_together = ('context', 'language')
+
     context = models.ForeignKey(Context)
     language = models.ForeignKey(Language, null=True)
     template = models.TextField()
