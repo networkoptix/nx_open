@@ -20,11 +20,15 @@
 
         $scope.debugMode = CONFIG.allowDebugMode;
 
-        authorizationCheckService.requireLogin().then(function (account) {
-            $scope.account = account;
-            $scope.system = system(systemId, account.email);
-            $scope.gettingSystem.run();
-        });
+        authorizationCheckService
+            .requireLogin()
+            .then(function (account) {
+                if (account) {
+                    $scope.account = account;
+                    $scope.system = system(systemId, account.email);
+                    $scope.gettingSystem.run();
+                }
+            });
 
         function getMergeTarget(targetSystemId) {
             return _.find(systemsProvider.systems, function (system) {
