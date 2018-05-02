@@ -5,6 +5,8 @@
 # create report: added vs outdated
 import os
 import re
+import json
+import codecs
 from ...controllers import structure
 from ...models import Product, Context, Language, ContextTemplate, DataStructure
 from django.core.management.base import BaseCommand
@@ -99,11 +101,34 @@ def read_structure(product_name):
         read_structure_file(file, product_id, global_strings)
 
 
+def find_or_add_lanugage(language_code):
+    language = Language.by_code(language_code)
+    if not language:
+        # try to read language.json for LANGUAGE_NAME
+        language_json_path = os.path.join(SOURCE_DIR.replace("{{skin}}", "blue"), "static", "lang_" + language_code,
+                                          "language.json")
+
+        with codecs.open(language_json_path, 'r', 'utf-8') as file_descriptor:
+            language_content = json.load(file_descriptor)
+        language_name = language_content["language_name"]
+        language = Language(code=language_code, name=language_name)
+        language.save()
+    return language
+
+
+def read_languages(skin_name):
+    languages_dir = os.path.join(SOURCE_DIR.replace("{{skin}}", skin_name), "static")
+    languages = [dir.replace('lang_','') for dir in os.listdir(languages_dir) if dir.startswith('lang_')]
+    for language_code in languages:
+        find_or_add_lanugage(language_code)
+
+
 class Command(BaseCommand):
     help = 'Creates initial structure for CMS in ' \
            'the database (contexts, datastructure)'
 
     def handle(self, *args, **options):
+        read_languages('blue')
         structure.read_structure_json('cms/cms_structure.json')
         read_structure('cloud_portal')
         self.stdout.write(self.style.SUCCESS(
