@@ -256,8 +256,11 @@ def fill_content(customization_name='default', product_name='cloud_portal',
                 changed_languages = customization.languages_list
 
         # update affected languages
-        for language_code in changed_languages:
-            save_context(context, context.file_path, language_code, customization, preview, version_id, global_contexts)
+        if context.translatable:
+            for language_code in changed_languages:
+                save_context(context, context.file_path, language_code, customization, preview, version_id, global_contexts)
+        else:
+            save_context(context, context.file_path, None, customization, preview, version_id, global_contexts)
 
     generate_languages_json(customization, preview)
 
