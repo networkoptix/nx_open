@@ -15,7 +15,7 @@ export class DisconnectModalContent {
 
     password: string;
 
-    constructor(activeModal: NgbActiveModal,
+    constructor(private activeModal: NgbActiveModal,
                 @Inject('account') private account: any,
                 @Inject('process') private process: any,
                 @Inject('cloudApiService') private cloudApi: any,) {
@@ -33,8 +33,12 @@ export class DisconnectModalContent {
             successMessage: this.language.system.successDisconnected,
             errorPrefix: this.language.errorCodes.cantDisconnectSystemPrefix
         }).then(function () {
-            this.activeModal.close();
+            this.activeModal.close('CLOSE');
         });
+    }
+
+    close() {
+        this.activeModal.close('CLOSE');
     }
 }
 
@@ -65,10 +69,6 @@ export class NxModalDisconnectComponent implements OnInit {
 
     open(systemId) {
         return this.dialog(systemId);
-    }
-
-    close() {
-        this.modalRef.close();
     }
 
     ngOnInit() {

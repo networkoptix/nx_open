@@ -21,7 +21,7 @@
                        required autofocus>
                 <p class="help-block">
                     <span class="input-error"
-                          *ngIf="disconnectForm.password.$touched && disconnectForm.password.$error.required"
+                          *ngIf="!disconnectForm.controls['password']?.valid && disconnectForm.controls['password']?.touched"
                           translate>
                         Password is required
                     </span>
@@ -34,7 +34,7 @@
                                action-type="'btn-danger'"
                                buttonText="{{ 'Disconnect' | translate }}"></nx-process-button>
 
-            <button type="button" class="btn btn-default" (click)="activeModal.close()" translate>Cancel</button>
+            <button type="button" class="btn btn-default" (click)="close()" translate>Cancel</button>
         </div>
     </form>
 <!--</div>-->

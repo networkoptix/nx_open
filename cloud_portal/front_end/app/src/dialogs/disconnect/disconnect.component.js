@@ -17,6 +17,7 @@ const common_1 = require("@angular/common");
 const ng_bootstrap_1 = require("@ng-bootstrap/ng-bootstrap");
 let DisconnectModalContent = class DisconnectModalContent {
     constructor(activeModal, account, process, cloudApi) {
+        this.activeModal = activeModal;
         this.account = account;
         this.process = process;
         this.cloudApi = cloudApi;
@@ -32,8 +33,11 @@ let DisconnectModalContent = class DisconnectModalContent {
             successMessage: this.language.system.successDisconnected,
             errorPrefix: this.language.errorCodes.cantDisconnectSystemPrefix
         }).then(function () {
-            this.activeModal.close();
+            this.activeModal.close('CLOSE');
         });
+    }
+    close() {
+        this.activeModal.close('CLOSE');
     }
 };
 __decorate([
@@ -75,9 +79,6 @@ let NxModalDisconnectComponent = class NxModalDisconnectComponent {
     }
     open(systemId) {
         return this.dialog(systemId);
-    }
-    close() {
-        this.modalRef.close();
     }
     ngOnInit() {
     }

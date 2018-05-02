@@ -118,7 +118,11 @@
                 dialogs
                     .disconnect(systemId)
                     .result
-                    .then(reloadSystems);
+                    .then(function (result) {
+                        if ('OK' === result) {
+                            reloadSystems();
+                        }
+                    });
             }
         };
 
@@ -126,7 +130,9 @@
             if (!$scope.system.isMine) {
                 // User is not owner. Deleting means he'll lose access to it
                 dialogs
-                    .confirm(lang.system.confirmUnshareFromMe, lang.system.confirmUnshareFromMeTitle, lang.system.confirmUnshareFromMeAction, 'danger')
+                    .confirm(lang.system.confirmUnshareFromMe, lang.system.confirmUnshareFromMeTitle,
+                        lang.system.confirmUnshareFromMeAction, 'btn-danger',
+                        lang.dialogs.cancelButton)
                     .result
                     .then(function () {
                         $scope.deletingSystem = process.init(function () {
