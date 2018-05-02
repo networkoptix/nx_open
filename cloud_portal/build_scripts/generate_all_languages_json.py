@@ -41,7 +41,7 @@ def generate_languages_files():
             # validate that there are no dublicates in languages_json structure
             if not name or name == 'LANGUAGE_NAME':
                 sys.stderr.write('ERROR: For BORIS to fix: language.json has wrong or missing language_name. '
-                                 'File: ' + language_json_filename)
+                                 'File: ' + language_json_filename + '\n')
                 name = lang
             if name in languages_names:
                 raise ValueError('CRITICAL  ERROR: For BORIS to fix: language.json has not unique language_name. '

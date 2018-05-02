@@ -104,6 +104,9 @@ def read_structure(product_name):
 def find_or_add_lanugage(language_code):
     language = Language.by_code(language_code)
     if not language:
+        language = Language(code=language_code, name=language_code)
+
+    if language.code == language.name:  # name and code are the same - try to update name
         # try to read language.json for LANGUAGE_NAME
         language_json_path = os.path.join(SOURCE_DIR.replace("{{skin}}", "blue"), "static", "lang_" + language_code,
                                           "language.json")
@@ -111,8 +114,9 @@ def find_or_add_lanugage(language_code):
         with codecs.open(language_json_path, 'r', 'utf-8') as file_descriptor:
             language_content = json.load(file_descriptor)
         language_name = language_content["language_name"]
-        language = Language(code=language_code, name=language_name)
+        language.name = language_name
         language.save()
+
     return language
 
 
