@@ -11,7 +11,7 @@ celery==4.0.2
 cssutils==1.0.1
 django-celery-results==1.0.1
 django-cors-headers==1.1.0
-djangorestframework==3.3.3
+djangorestframework==3.8.2
 django-model-utils==3.0.0
 email==4.0.2
 enum34==1.1.4
