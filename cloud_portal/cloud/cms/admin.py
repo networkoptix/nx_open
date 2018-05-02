@@ -78,6 +78,14 @@ class ContextAdmin(CMSAdmin):
 admin.site.register(Context, ContextAdmin)
 
 
+class ContextTemplateAdmin(CMSAdmin):
+    list_display = ('context', 'language')
+    list_filter = ('context', 'language')
+    search_fields = ('context__name', 'context__file_path', 'language__code')
+
+admin.site.register(ContextTemplate, ContextTemplateAdmin)
+
+
 class DataStructureAdmin(CMSAdmin):
     list_display = ('context', 'name', 'description', 'translatable', 'type')
     list_filter = ('context', 'translatable')
@@ -129,3 +137,10 @@ class ContentVersionAdmin(CMSAdmin):
     content_version_actions.allow_tags = True
 
 admin.site.register(ContentVersion, ContentVersionAdmin)
+
+
+class UserGroupsToCustomizationPermissionsAdmin(CMSAdmin):
+    list_display = ('id', 'group', 'customization',)
+
+admin.site.register(UserGroupsToCustomizationPermissions, UserGroupsToCustomizationPermissionsAdmin)
+

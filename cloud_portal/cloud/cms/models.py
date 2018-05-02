@@ -75,13 +75,57 @@ class Context(models.Model):
     translatable = models.BooleanField(default=True)
     is_global = models.BooleanField(default=False)
     hidden = models.BooleanField(default=False)
-    template = models.TextField(blank=True, default="")
 
     file_path = models.CharField(max_length=1024, blank=True, default='')
     url = models.CharField(max_length=1024, blank=True, default='')
 
     def __str__(self):
         return self.name
+
+    def template_for_language(self, language, default_language=None):
+        context_template = self.contexttemplate_set.filter(language=language)
+        if not context_template.exists():  # No template for language - try to get default language
+            context_template = self.contexttemplate_set.filter(language=default_language)
+
+        if not context_template.exists():  # No template for default language - try to get default template
+            context_template = self.contexttemplate_set.filter(language=None)
+
+        if context_template.exists():
+            return context_template.first().template
+
+        # No template at all
+        return None
+
+
+class Language(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    code = models.CharField(max_length=8, unique=True)
+
+    def __str__(self):
+        return self.code
+
+    @staticmethod
+    def by_code(language_code, default_language=None):
+        if language_code:
+            language = Language.objects.filter(code=language_code)
+            if language.exists():
+                return language.first()
+        return default_language
+
+
+class ContextTemplate(models.Model):
+    class Meta:
+        unique_together = ('context', 'language')
+
+    context = models.ForeignKey(Context)
+    language = models.ForeignKey(Language, null=True)
+    template = models.TextField()
+    def __str__(self):
+        if not self.language:
+            return self.context.name
+        if self.context.file_path:
+            return self.context.file_path.replace("{{language}}", self.language.code)
+        return self.context.name + "-" + self.language.name
 
 
 class DataStructure(models.Model):
@@ -164,14 +208,6 @@ class DataStructure(models.Model):
 # CMS settings. Release engineer can change that
 
 
-class Language(models.Model):
-    name = models.CharField(max_length=255, unique=True)
-    code = models.CharField(max_length=8, unique=True)
-
-    def __str__(self):
-        return self.code
-
-
 class Customization(models.Model):
     name = models.CharField(max_length=255, unique=True)
     default_language = models.ForeignKey(
@@ -236,8 +272,8 @@ class UserGroupsToCustomizationPermissions(models.Model):
         if permission and not user.has_perm(permission):
             return False
 
-        return UserGroupsToCustomizationPermissions.objects.exists(group__user__id=user.id,
-                                                                   customization__name=customization_name)
+        return UserGroupsToCustomizationPermissions.objects.filter(group_id__in=user.groups.all(),
+                                                                   customization__name=customization_name).exists()
 
 
 # CMS data. Partners can change that

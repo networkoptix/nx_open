@@ -42,7 +42,7 @@
     "YOUR SYSTEM TEXT": "Il suo sistema",
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "Attivi il suo Account",
     "RESET PASSWORD EMAIL SUBJECT": "Reimpostare la password",
-    "INVITED TO SYSTEM EMAIL SUBJECT": "%message.sharer_name% invites you to %PRODUCT_NAME%",
+    "INVITED TO SYSTEM EMAIL SUBJECT": "Video system {{message.system_name}} was shared with you",
     "DISCONNECT FORM HEADER TEXT": "Disconnect System from %PRODUCT_NAME%?",
     "FIRST NAME IS REQUIRED TEXT": "Il nome è obbligatorio",
     "LAST NAME IS REQUIRED TEXT": "Il cognome è richiesto",

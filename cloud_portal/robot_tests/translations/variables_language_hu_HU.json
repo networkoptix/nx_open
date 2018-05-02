@@ -42,7 +42,7 @@
     "YOUR SYSTEM TEXT": "Az Ön rendszere",
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "Fiók aktiválása",
     "RESET PASSWORD EMAIL SUBJECT": "A jelszó alaphelyzetbe állítása",
-    "INVITED TO SYSTEM EMAIL SUBJECT": "%message.sharer_name% invites you to %PRODUCT_NAME%",
+    "INVITED TO SYSTEM EMAIL SUBJECT": "Hozzáférést kapott {{message.system_name}} videó rendszerhez",
     "DISCONNECT FORM HEADER TEXT": "Megszünteti a kapcsolatot %PRODUCT_NAME% felhővel?",
     "FIRST NAME IS REQUIRED TEXT": "Utónév megadása szükséges",
     "LAST NAME IS REQUIRED TEXT": "Vezetéknév megadása szükséges",

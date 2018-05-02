@@ -26,7 +26,7 @@ Restart
 
 Clean up
     Close Browser
-    Run Keyword If Any Tests Failed    Clean up noperm first/last name
+    Run Keyword If Any Tests Failed    Reset user noperm first/last name
 
 Reset DB and Open New Browser On Failure
     Close Browser

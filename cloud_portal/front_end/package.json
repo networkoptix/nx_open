@@ -57,7 +57,7 @@
     "webpack-merge": "^4.1.1"
   },
   "engines": {
-    "node": ">=0.8.0"
+    "node": ">=7.10.0"
   },
   "scripts": {
     "serve": "webpack-dev-server --open --config webpack.dev.js",
