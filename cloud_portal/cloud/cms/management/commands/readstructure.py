@@ -95,7 +95,7 @@ def read_structure(product_name):
     global_strings = DataStructure.objects.\
         filter(context__is_global=True, context__product_id=product_id).\
         values_list("name", flat=True)
-    for file in iterate_cms_files('blue', True):
+    for file in iterate_cms_files('blue', False):
         read_structure_file(file, product_id, global_strings)
 
 
