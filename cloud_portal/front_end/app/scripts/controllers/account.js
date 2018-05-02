@@ -1,8 +1,13 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('AccountCtrl', ['$scope', 'cloudApi', 'process', '$routeParams', 'account', '$timeout', 'systemsProvider', 'authorizationCheckService',
-    function ($scope, cloudApi, process, $routeParams, account, $timeout, systemsProvider, authorizationCheckService) {
+    .controller('AccountCtrl', ['$scope', 'cloudApi', 'process', '$routeParams', 'account', 'systemsProvider', 'authorizationCheckService', '$localStorage', 'dialogs',
+    function ($scope, cloudApi, process, $routeParams, account, systemsProvider, authorizationCheckService, $localStorage, dialogs) {
+
+        if($localStorage && $localStorage.langChanged){
+            $localStorage.langChanged = false;
+            dialogs.notify(L.account.accountSavedSuccess, 'success', false);
+        }
 
         authorizationCheckService.requireLogin().then(function(account){
             $scope.account = account;
@@ -20,6 +25,7 @@ angular.module('cloudApp')
             return cloudApi.accountPost($scope.account).then(function(result){
                 systemsProvider.forceUpdateSystems();
                 if(L.language != $scope.account.language){
+                    $localStorage.langChanged = true;
                     //Need to reload page
                     window.location.reload(true); // reload window to catch new language
                     return false;
