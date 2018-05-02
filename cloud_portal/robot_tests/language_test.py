@@ -22,7 +22,7 @@ def allLanguages():
                 rebotString = ""
                 for lang in langList:
                     rebotString += path.join('outputs', langList[lang], 'outputs.xml ')
-                system ('rebot -o allLanguages.xml -l allLanguagesLog.html -r allLanguagesReport.html' + rebotString)
+                system ('rebot -o allLanguages.xml -l allLanguagesLog.html -r allLanguagesReport.html ' + rebotString)
                 break
         
 
@@ -30,7 +30,7 @@ def runTest(name, langList):
 
 
     if ping().ok:
-        system('robot -N ' + name + ' -v headless:true -d outputs\\' + langList[name] + ' -e not-ready -V getvars.py:' + langList[name] + ' test-cases')
+        system('robot -N ' + name + ' -v headless:true -d ' + path.join('outputs', langList[name]) + ' -e not-ready -V getvars.py:' + langList[name] + ' test-cases')
         if ping().ok:
             return True
         else:
@@ -50,9 +50,6 @@ def removeBadOutputs(name, langList):
     remove(path.join('outputs', langList[name], 'output.xml'))
     remove(path.join('outputs', langList[name], 'log.html'))
     remove(path.join('outputs', langList[name], 'report.html'))
-
-
-def updateOutputs(name, langList):
 
 
 if __name__ == '__main__':
