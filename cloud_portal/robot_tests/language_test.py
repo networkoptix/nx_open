@@ -21,7 +21,8 @@ def allLanguages():
             if runTest(name, langList):
                 rebotString = ""
                 for lang in langList:
-                    rebotString += path.join('outputs', langList[lang], 'outputs.xml ')
+                    if os.path.isfile(path.join('outputs', langList[lang], 'outputs.xml ')):
+                        rebotString += path.join('outputs', langList[lang], 'outputs.xml ')
                 system ('rebot -o allLanguages.xml -l allLanguagesLog.html -r allLanguagesReport.html ' + rebotString)
                 break
         

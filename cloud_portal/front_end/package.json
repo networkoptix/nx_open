@@ -1,6 +1,6 @@
 {
     "name": "cloudPortal",
-    "version": "17.1.1",
+    "version": "17.1.2",
     "dependencies": {
         "@angular/animations": "^5.2.10",
         "@angular/common": "^5.2.10",
@@ -111,14 +111,13 @@
         "webpack-merge": "^4.1.1"
     },
     "engines": {
-        "node": ">=0.8.0"
+        "node": ">=7.10.0"
     },
     "scripts": {
         "start": "webpack-dev-server --config webpack.dev.js --hot --inline",
         "serve": "webpack-dev-server --config webpack.dev.js --open",
         "build": "webpack --config webpack.prod.js --progress --profile --bail",
         "setSkin": "node setSkin.js --skin",
-        "extract": "ngx-translate-extract -i ./app/src -o ./app/src/assets/i18n/ --clean --sort --format namespaced-json",
         "update-lang": "ngx-translate-extract -i ./app/src -o ./app/language_i18n.json --clean --sort --format json"
     }
 }
