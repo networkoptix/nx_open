@@ -75,7 +75,6 @@ class Context(models.Model):
     translatable = models.BooleanField(default=True)
     is_global = models.BooleanField(default=False)
     hidden = models.BooleanField(default=False)
-    template = models.TextField(blank=True, default="")
 
     file_path = models.CharField(max_length=1024, blank=True, default='')
     url = models.CharField(max_length=1024, blank=True, default='')
@@ -117,7 +116,7 @@ class Language(models.Model):
 class ContextTemplate(models.Model):
     context = models.ForeignKey(Context)
     language = models.ForeignKey(Language, null=True)
-
+    template = models.TextField()
     def __str__(self):
         if self.context.file_path:
             return self.context.file_path.replace("{{language}}", self.language.code)
