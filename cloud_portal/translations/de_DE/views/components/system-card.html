@@ -6,11 +6,14 @@
         <p>
             <button class="btn btn-default" ng-click="rename()">System umbenennen</button>
         </p>
+        <p>
+            <button class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Mit einem anderen System zusammenführen</button>
+        </p>
+        <hr></hr>
         <button class="btn btn-default" ng-click="disconnect()">Von
-            <span class="product-name">{{PRODUCT_NAME}}</span> trennen</button>
+            <span class="product-name">%PRODUCT_NAME%</span> trennen</button>
     </div>
 </div>
-
 <div class="panel panel-default" ng-if="!system.isMine">
     <div class="panel-body">
         <h2>Besitzer</h2>
@@ -26,5 +29,24 @@
             <button class="btn btn-default" ng-click="rename()">System umbenennen</button>
         </p>
         <button class="btn btn-default" ng-click="delete()">Von meinem Account trennen</button>
+    </div>
+</div>
+<div class="panel panel-default" ng-if="currentlyMerging">
+    <div class="panel-body" ng-if="isMaster && system.isMine">
+        <div><strong>{{mergeTargetSystem.name}}</strong>
+            wird mit diesem System zusammengeführt</div>
+        <hr></hr>
+        <div class="merge-info-text">Abhängig von der Größe der Datenbank kann dies mehrere Stunden dauern</div>
+    </div>
+    <div class="panel-body" ng-if="!isMaster || !system.isMine">
+        <div>Dieses System wird zusammengeführt mit
+            <strong>{{mergeTargetSystem.name}}</strong></div>
+        <hr></hr>
+        <div class="merge-info-text">
+            <p>Abhängig von der Größe der Datenbank kann dies mehrere Stunden dauern.</p>
+            <p>Bis die Zusammenführung abgeschlossen ist, können Sie sich bei diesem System anmelden und Videos ansehen, aber keine Einstellungen ändern.</p>
+            <p>Wenn die Zusammenführung abgeschlossen ist, sind alle Benutzer und Kameras dieses Systems
+                im System <span class="merge-system-name">{{mergeTargetSystem.name}}</span> verfügbar. System, und dieses System wird gelöscht.</p>
+        </div>
     </div>
 </div>

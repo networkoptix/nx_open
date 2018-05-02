@@ -49,7 +49,7 @@ public:
     }
 
 protected:
-    // TODO: #ak Get rid of this method.
+    // TODO: #ak Get rid of this method. Logically, it is a duplicate of a givenListeningServer.
     void givenListeningMediaServer()
     {
         m_mediaServerEmulator = addRandomServer(system(), boost::none);

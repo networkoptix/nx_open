@@ -1,2 +1,2 @@
-deb http://ppa.launchpad.net/nginx/stable/ubuntu trusty main
-# deb-src http://ppa.launchpad.net/nginx/stable/ubuntu trusty main
+deb http://ppa.launchpad.net/nginx/stable/ubuntu xenial main
+# deb-src http://ppa.launchpad.net/nginx/stable/ubuntu xenial main

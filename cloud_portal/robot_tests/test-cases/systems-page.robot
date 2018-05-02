@@ -93,4 +93,4 @@ should update owner name in systems list, if it's changed
     Go To    ${url}/systems
     Wait Until Elements Are Visible    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
     Element Text Should Be    ${AUTO TESTS USER}    newFirstName newLastName
-    Clean up owner first/last name
+    Reset user owner first/last name

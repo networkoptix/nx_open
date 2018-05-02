@@ -8,7 +8,7 @@
         </h1>
 
         <h1 class="process-success" ng-if="!activate.success">
-            Account is al geactiveerd of de bevestigingscode is onjuist
+            Dit account is al geactiveerd of de bevestigingscode is onjuist
         </h1>
     </div>
 
@@ -23,7 +23,7 @@
     
     <div ng-if="reactivating" class="text-center">
         <div ng-if='data.email'>
-            <h1>U heeft zich geregistreerd in {{PRODUCT_NAME}}</h1>
+            <h1>U heeft zich geregistreerd voor %PRODUCT_NAME%</h1>
             <p>We hebben u een e-mail met activatielink naar {{data.email}} gestuurd. <br>Activeer uw account via deze link.</p>
         </div>
         <h1 ng-if="!data.email">Activeer uw account</h1>
@@ -38,7 +38,7 @@
                            required autofocus>
                 </div>
                 <div class="col-sm-4">
-                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required"> E-mailadres is verplicht </span> <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email"> Vul alstublieft een geldige e-mailadres in </span>
+                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required"> E-mailadres is verplicht </span> <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email"> Vult u alstublieft een geldige e-mailadres in </span>
                 </div>
             </div>
             <div class="form-group">
@@ -71,7 +71,7 @@
                 </div>
                 <div class="col-sm-4">
                     <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.required">E-mailadres is verplicht</span>
-                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.email"> Vul alstublieft een geldige e-mailadres in</span>
+                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.email"> Vult u alstublieft een geldige e-mailadres in</span>
                 </div>
             </div>
             <div class="form-group">
@@ -85,14 +85,14 @@
     </div>
     <div ng-if="data.restoreCode">
         <h1 class="process-success" ng-if="change.success || changeSuccess">
-            Wachtwoord succesvol opgeslagen
+            Het wachtwoord is succesvol opgeslagen
         </h1>
         <h1 class="process-success" ng-if="change.success || changeSuccess">
             <a class="btn btn-default" href="/login">Aanmelden</a>
         </h1>
 
         <form name="restorePasswordWithCode" class="form-horizontal" ng-if="!change.success && !changeSuccess" novalidate>
-            <h1> Stel nieuw wachtwoord in </h1>
+            <h1>Stel een nieuw wachtwoord in</h1>
             <password-input ng-model="data.newPassword" id="'newPassword'" label="$root.L.activeActions.setNewPasswordLabel"></password-input>
 
             <div class="form-group">

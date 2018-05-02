@@ -84,7 +84,7 @@ works at restore password page with email input - after submit success
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
     Click Button    ${RESET PASSWORD BUTTON}
-    ${RESET EMAIL SENT MESSAGE TEXT}    Replace String    ${RESET EMAIL SENT MESSAGE TEXT}    {{email}}    ${email}
+    ${RESET EMAIL SENT MESSAGE TEXT}    Replace String    ${RESET EMAIL SENT MESSAGE TEXT}    %email%    ${email}
     Wait Until Element Is Visible    ${RESET EMAIL SENT MESSAGE}
     ${text}    Get Text    ${RESET EMAIL SENT MESSAGE}
     ${replaced}    Replace String    ${text}    \n    ${SPACE}
@@ -103,7 +103,7 @@ works at restore password page with password input - before submit
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${random email}
     Click Button    ${RESET PASSWORD BUTTON}
-    ${RESET EMAIL SENT MESSAGE TEXT}    Replace String    ${RESET EMAIL SENT MESSAGE TEXT}    {{email}}    ${random email}
+    ${RESET EMAIL SENT MESSAGE TEXT}    Replace String    ${RESET EMAIL SENT MESSAGE TEXT}    %email%    ${random email}
     Wait Until Element Is Visible    ${RESET EMAIL SENT MESSAGE}
     ${text}    Get Text    ${RESET EMAIL SENT MESSAGE}
     ${replaced}    Replace String    ${text}    \n    ${SPACE}
@@ -123,7 +123,7 @@ works at restore password page with password input - after submit error
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${random email}
     Click Button    ${RESET PASSWORD BUTTON}
-    ${RESET EMAIL SENT MESSAGE TEXT}    Replace String    ${RESET EMAIL SENT MESSAGE TEXT}    {{email}}    ${random email}
+    ${RESET EMAIL SENT MESSAGE TEXT}    Replace String    ${RESET EMAIL SENT MESSAGE TEXT}    %email%    ${random email}
     Wait Until Element Is Visible    ${RESET EMAIL SENT MESSAGE}
     ${text}    Get Text    ${RESET EMAIL SENT MESSAGE}
     ${replaced}    Replace String    ${text}    \n    ${SPACE}
@@ -147,7 +147,7 @@ works at restore password page with password input - after submit success
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${random email}
     Click Button    ${RESET PASSWORD BUTTON}
-    ${RESET EMAIL SENT MESSAGE TEXT}    Replace String    ${RESET EMAIL SENT MESSAGE TEXT}    {{email}}    ${random email}
+    ${RESET EMAIL SENT MESSAGE TEXT}    Replace String    ${RESET EMAIL SENT MESSAGE TEXT}    %email%    ${random email}
     Wait Until Element Is Visible    ${RESET EMAIL SENT MESSAGE}
     ${text}    Get Text    ${RESET EMAIL SENT MESSAGE}
     ${replaced}    Replace String    ${text}    \n    ${SPACE}

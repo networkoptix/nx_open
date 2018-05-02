@@ -499,6 +499,7 @@
             </activation>
             <modules>
                 <module>build_variables</module>
+                <module>nx_kit</module>
                 <module>vms_libs/nx_vms_api</module>
                 <module>common</module>
                 <module>common_libs/nx_fusion</module>
@@ -512,7 +513,7 @@
                 <module>nx_cloud/cloud_db_client</module>
                 <module>nx_system_commands</module>
                 <module>appserver2</module>
-                <module>nx_kit</module>
+                <module>mediaserver_db</module>
             </modules>
         </profile>
         <profile>
@@ -549,7 +550,6 @@
 -->
 
                 <module>common_libs/nx_speech_synthesizer</module>
-                <module>mediaserver_db</module>
                 <module>mediaserver_core</module>
                 <module>mediaserver</module>
 

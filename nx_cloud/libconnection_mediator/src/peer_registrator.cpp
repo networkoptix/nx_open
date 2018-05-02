@@ -155,7 +155,7 @@ void PeerRegistrator::listen(
             aioCaller->bindToAioThread(serverConnectionAioThread);
             auto aioCallerPtr = aioCaller.get();
 
-            // TODO: #ak Code here looks like shit. Major refactoring is needed.
+            // TODO: #ak Code here is a mess. Major refactoring is needed.
             // Likely, it is needed to get rid of shared connections to simplify it.
 
             aioCallerPtr->post(
