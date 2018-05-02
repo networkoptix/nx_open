@@ -81,30 +81,30 @@ ZoomableFlickable
     {
         id: d
 
-        function allowedMargin(targetWidth, targetHeight, size, padding)
+        function allowedMargin(targetWidth, targetHeight, size, padding, factor)
         {
             var zoomed = targetWidth > width * 1.05 || targetHeight > height * 1.05;
-            return zoomed ? size / 3 - padding : 0
+            return zoomed ? size * factor - padding : 0
         }
 
         function allowedLeftMargin(targetWidth, targetHeight)
         {
-            return allowedMargin(targetWidth, targetHeight, width, leftPadding + content.leftPadding)
+            return allowedMargin(targetWidth, targetHeight, width, leftPadding + content.leftPadding, 0.3)
         }
 
         function allowedRightMargin(targetWidth, targetHeight)
         {
-            return allowedMargin(targetWidth, targetHeight, width, rightPadding + content.rightPadding)
+            return allowedMargin(targetWidth, targetHeight, width, rightPadding + content.rightPadding, 0.3)
         }
 
         function allowedTopMargin(targetWidth, targetHeight)
         {
-            return allowedMargin(targetWidth, targetHeight, height, topPadding + content.topPadding)
+            return allowedMargin(targetWidth, targetHeight, height, topPadding + content.topPadding, 0.3)
         }
 
         function allowedBottomMargin(targetWidth, targetHeight)
         {
-            return allowedMargin(targetWidth, targetHeight, height, bottomPadding + content.bottomPadding)
+            return allowedMargin(targetWidth, targetHeight, height, bottomPadding + content.bottomPadding, 0.5)
         }
 
         function toggleScale(to2x, mouseX, mouseY)
