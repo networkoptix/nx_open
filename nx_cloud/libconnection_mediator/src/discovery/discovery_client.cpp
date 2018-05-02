@@ -15,16 +15,29 @@ bool operator==(const BasicInstanceInformation& left, const BasicInstanceInforma
 
 //-------------------------------------------------------------------------------------------------
 
-ModuleFinder::ModuleFinder(const QUrl& baseUrl):
-    m_baseUrl(baseUrl)
+static constexpr auto kDefaultResponseReadTimeout = std::chrono::minutes(1);
+
+ModuleFinder::ModuleFinder(const utils::Url &baseUrl):
+    m_baseUrl(baseUrl),
+    m_responseReadTimeout(kDefaultResponseReadTimeout)
 {
 }
 
 void ModuleFinder::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
 {
     base_type::bindToAioThread(aioThread);
-    for (auto& request : m_runningRequests)
+    for (auto& request: m_runningRequests)
         request->bindToAioThread(aioThread);
+}
+
+void ModuleFinder::setResponseReadTimeout(std::chrono::milliseconds timeout)
+{
+    m_responseReadTimeout = timeout;
+}
+
+std::chrono::milliseconds ModuleFinder::responseReadTimeout() const
+{
+    return m_responseReadTimeout;
 }
 
 void ModuleFinder::stopWhileInAioThread()

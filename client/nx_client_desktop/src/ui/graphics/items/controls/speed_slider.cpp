@@ -8,6 +8,8 @@
 #include <utils/common/warnings.h>
 #include <utils/math/math.h>
 
+using namespace nx::client::desktop;
+
 namespace {
 
 inline qint64 speedToPosition(qreal speed, qreal minimalStep)

@@ -10,7 +10,7 @@ angular.module('nxCommon')
                 "searchCams": "="
             },
             templateUrl: Config.viewsDirCommon + 'components/cameraPanel.html',
-            link: function (scope/*, element, attrs*/) {
+            link: function (scope, element/*, attrs*/) {
                 scope.Config = Config;
                 scope.storage = $localStorage;
                 scope.inputPlaceholder = L.common.searchCamPlaceholder;

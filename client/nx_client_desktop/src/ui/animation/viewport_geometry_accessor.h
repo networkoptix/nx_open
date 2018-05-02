@@ -1,13 +1,10 @@
-#ifndef QN_VIEWPORT_GEOMETRY_ACCESSOR_H
-#define QN_VIEWPORT_GEOMETRY_ACCESSOR_H
+#pragma once
 
-#include <ui/common/accessor.h>
+#include <nx/client/desktop/common/utils/accessor.h>
 
-class ViewportGeometryAccessor: public AbstractAccessor {
+class ViewportGeometryAccessor: public nx::client::desktop::AbstractAccessor
+{
 public:
-    virtual QVariant get(const QObject *object) const override;
-
-    virtual void set(QObject *object, const QVariant &value) const override;
+    virtual QVariant get(const QObject* object) const override;
+    virtual void set(QObject* object, const QVariant& value) const override;
 };
-
-#endif // QN_VIEWPORT_GEOMETRY_ACCESSOR_H

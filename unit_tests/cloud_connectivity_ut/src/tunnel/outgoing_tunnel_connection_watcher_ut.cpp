@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <nx/network/aio/aio_service.h>
 #include <nx/network/cloud/tunnel/outgoing_tunnel_connection_watcher.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/atomic_unique_ptr.h>
@@ -32,10 +33,6 @@ public:
     {
         m_connectionParameters.tunnelInactivityTimeout =
             tunnelInactivityTimeout;
-    }
-    
-    ~OutgoingTunnelConnectionWatcher()
-    {
     }
 
 protected:
@@ -82,7 +79,7 @@ protected:
         m_connectionParameters.tunnelInactivityTimeout = std::chrono::seconds(1);
         m_initializationGuard = initializeTunnel();
     }
-    
+
     void whenTunnelHasBeenClosedByTimeout()
     {
         ASSERT_EQ(SystemError::timedOut, m_tunnelClosedPromise.get_future().get());
@@ -117,7 +114,7 @@ TEST_F(OutgoingTunnelConnectionWatcher, using_tunnel)
 
     auto tunnelClosedFuture = m_tunnelClosedPromise.get_future();
 
-    const auto deadline = 
+    const auto deadline =
         std::chrono::steady_clock::now() +
         tunnelInactivityTimeout + allowedTimerError;
 
@@ -127,7 +124,7 @@ TEST_F(OutgoingTunnelConnectionWatcher, using_tunnel)
             std::chrono::milliseconds::zero(),
             SocketAttributes(),
             [](SystemError::ErrorCode,
-               std::unique_ptr<AbstractStreamSocket>,
+               std::unique_ptr<nx::network::AbstractStreamSocket>,
                bool /*stillValid*/)
             {
             });

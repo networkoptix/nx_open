@@ -31,6 +31,16 @@ bool DummySocket::getReuseAddrFlag(bool* /*val*/) const
     return true;
 }
 
+bool DummySocket::setReusePortFlag(bool /*value*/)
+{
+    return true;
+}
+
+bool DummySocket::getReusePortFlag(bool* /*value*/) const
+{
+    return true;
+}
+
 bool DummySocket::setNonBlockingMode(bool /*val*/)
 {
     return true;
@@ -96,19 +106,24 @@ bool DummySocket::getLastError(SystemError::ErrorCode* /*errorCode*/) const
     return false;
 }
 
+bool DummySocket::setIpv6Only(bool /*val*/)
+{
+    return false;
+}
+
 AbstractSocket::SOCKET_HANDLE DummySocket::handle() const
 {
-    return 0;
+    return m_basicPollable.pollable().handle();
 }
 
 Pollable* DummySocket::pollable()
 {
-    return nullptr;
+    return &m_basicPollable.pollable();
 }
 
 bool DummySocket::connect(
     const SocketAddress& remoteSocketAddress,
-    unsigned int /*timeoutMillis*/)
+    std::chrono::milliseconds /*timeout*/)
 {
     m_remotePeerAddress = remoteSocketAddress;
     return true;
@@ -119,20 +134,8 @@ SocketAddress DummySocket::getForeignAddress() const
     return m_remotePeerAddress;
 }
 
-void DummySocket::cancelIOAsync(
-    aio::EventType /*eventType*/,
-    nx::utils::MoveOnlyFunc< void() > cancellationDoneHandler)
+void DummySocket::cancelIoInAioThread(aio::EventType /*eventType*/)
 {
-    cancellationDoneHandler();
-}
-
-void DummySocket::cancelIOSync(aio::EventType /*eventType*/)
-{
-}
-
-bool DummySocket::reopen()
-{
-    return connect(m_remotePeerAddress);
 }
 
 bool DummySocket::setNoDelay(bool /*value*/)
@@ -165,45 +168,52 @@ bool DummySocket::getKeepAlive(boost::optional< KeepAliveOptions >* /*result*/) 
     return false;
 }
 
-void DummySocket::post(nx::utils::MoveOnlyFunc<void()> /*handler*/)
+void DummySocket::post(nx::utils::MoveOnlyFunc<void()> handler)
 {
+    m_basicPollable.post(std::move(handler));
 }
 
-void DummySocket::dispatch(nx::utils::MoveOnlyFunc<void()> /*handler*/)
+void DummySocket::dispatch(nx::utils::MoveOnlyFunc<void()> handler)
 {
+    m_basicPollable.dispatch(std::move(handler));
 }
 
 void DummySocket::connectAsync(
     const SocketAddress& /*addr*/,
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> /*handler*/)
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
+    post([handler = std::move(handler)]() { handler(SystemError::notImplemented); });
 }
 
 void DummySocket::readSomeAsync(
     nx::Buffer* const /*buf*/,
-    std::function<void(SystemError::ErrorCode, size_t)> /*handler*/)
+    IoCompletionHandler handler)
 {
+    post([handler = std::move(handler)]() { handler(SystemError::notImplemented, (size_t)-1); });
 }
 
 void DummySocket::sendAsync(
     const nx::Buffer& /*buf*/,
-    std::function<void(SystemError::ErrorCode, size_t)> /*handler*/)
+    IoCompletionHandler handler)
 {
+    post([handler = std::move(handler)]() { handler(SystemError::notImplemented, (size_t)-1); });
 }
 
 void DummySocket::registerTimer(
     std::chrono::milliseconds /*timeoutMs*/,
     nx::utils::MoveOnlyFunc<void()> /*handler*/)
 {
+    NX_ASSERT(false);
 }
 
 aio::AbstractAioThread* DummySocket::getAioThread() const
 {
-    return nullptr;
+    return m_basicPollable.getAioThread();
 }
 
-void DummySocket::bindToAioThread(aio::AbstractAioThread* /*aioThread*/)
+void DummySocket::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
+    return m_basicPollable.bindToAioThread(aioThread);
 }
 
 } // namespace network

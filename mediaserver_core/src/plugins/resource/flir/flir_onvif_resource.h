@@ -13,7 +13,7 @@ class OnvifResource: public QnPlOnvifResource
     Q_OBJECT
 public:
     OnvifResource();
-    virtual CameraDiagnostics::Result initInternal() override;
+    virtual CameraDiagnostics::Result initializeCameraDriver() override;
 };
 
 } // namespace flir

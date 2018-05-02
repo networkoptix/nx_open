@@ -16,7 +16,7 @@ class QnAttachToVideowallDialog : public QnSessionAwareButtonBoxDialog
 
     typedef QnSessionAwareButtonBoxDialog base_type;
 public:
-    explicit QnAttachToVideowallDialog(QWidget *parent = 0);
+    explicit QnAttachToVideowallDialog(QWidget *parent);
     ~QnAttachToVideowallDialog();
 
     void loadFromResource(const QnVideoWallResourcePtr &videowall);

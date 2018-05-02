@@ -698,7 +698,7 @@ UPDATE system_to_account SET is_enabled = 1 WHERE is_enabled IS NULL;
 static const char kRestoreSystemToAccountReferenceUniquenessSqlite[] =
 R"sql(
 
-DELETE FROM system_to_account WHERE rowid NOT IN 
+DELETE FROM system_to_account WHERE rowid NOT IN
 (SELECT MAX(rowid) FROM system_to_account GROUP BY account_id, system_id);
 
 CREATE UNIQUE INDEX system_to_account_primary
@@ -734,7 +734,7 @@ CREATE table system_to_account_temp_id_to_keep (id INTEGER);
 
 INSERT INTO system_to_account_temp_id_to_keep (SELECT MAX(s1.id) FROM system_to_account_temp s1 GROUP BY s1.account_id, s1.system_id);
 
-DELETE FROM system_to_account_temp WHERE id NOT IN 
+DELETE FROM system_to_account_temp WHERE id NOT IN
 (SELECT id FROM system_to_account_temp_id_to_keep);
 
 DELETE FROM system_to_account;
@@ -821,6 +821,42 @@ CREATE TABLE system_auth_info(
     nonce                       VARCHAR(256) NOT NULL,
     FOREIGN KEY(system_id) REFERENCES system(id) ON DELETE CASCADE
 );
+
+)sql";
+
+/**
+ * CLOUD-1424. Adding beingMerged system state.
+ */
+static const char kAddBeingMergedState[] = R"sql(
+
+INSERT INTO system_status VALUES(4, 'beingMerged');
+
+)sql";
+
+/**
+ * CLOUD-1642. Adding merge information.
+ */
+static const char kAddMergeInformation[] =
+R"sql(
+
+CREATE TABLE system_merge_info(
+    master_system_id    VARCHAR(64),
+    slave_system_id     VARCHAR(64),
+    start_time_utc      BIGINT
+);
+
+)sql";
+
+/**
+ * CLOUD-587. Moving data syncronization logic to a separate module.
+ * cloud_db already has all necessary structure.
+ * Skipping structure update .
+ */
+static const char kSetDataSyncModuleDbStructureVersion[] =
+R"sql(
+
+INSERT INTO db_version_data(schema_name, db_version)
+VALUES ('cloud_sync_engine_{C4105732-0097-48FB-AB9B-039A3C057F57}', 2);
 
 )sql";
 

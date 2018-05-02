@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>IoPortSettingsWidget</class>
+ <widget class="QWidget" name="IoPortSettingsWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>929</width>
+    <height>469</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>16</number>
+   </property>
+   <item>
+    <widget class="QnWidgetTable" name="table" native="true"/>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="enableTileInterfaceCheckBox">
+     <property name="text">
+      <string>Enable tile interface</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QnWidgetTable</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/common/widget_table.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

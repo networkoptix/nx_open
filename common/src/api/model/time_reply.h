@@ -4,6 +4,8 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 
+#include <nx/utils/uuid.h>
+
 struct QnTimeReply
 {
     /** Utc time in msecs since epoch. */

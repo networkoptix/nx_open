@@ -99,7 +99,7 @@ void MediaServerStatusWatcher::at_resource_statusChanged( const QnResourcePtr& r
 
     nx::vms::event::ServerFailureEventPtr event(new nx::vms::event::ServerFailureEvent(
         mserverRes, qnSyncTime->currentMSecsSinceEpoch() * USEC_PER_MSEC,
-        nx::vms::event::EventReason::serverTerminated, QString()));
+        nx::vms::api::EventReason::serverTerminated, QString()));
     OfflineServerData data;
     data.serverData = event;
     m_candidatesToError[mserverRes->getId()] = data;

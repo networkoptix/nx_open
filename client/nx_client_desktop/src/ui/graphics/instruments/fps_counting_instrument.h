@@ -1,34 +1,31 @@
-#ifndef QN_FPS_COUNTING_INSTRUMENT_H
-#define QN_FPS_COUNTING_INSTRUMENT_H
+#pragma once
+
+#include <QtCore/QElapsedTimer>
 
 #include "instrument.h"
 
-class FpsCountingInstrument: public Instrument {
-    Q_OBJECT;
+class FpsCountingInstrument: public Instrument
+{
+    Q_OBJECT
+
 public:
-    FpsCountingInstrument(int updateIntervalMSec, QObject *parent = NULL);
-
-    virtual ~FpsCountingInstrument();
-
-    qreal fps() const;
+    FpsCountingInstrument(int updateIntervalMs, QObject* parent = nullptr);
+    virtual ~FpsCountingInstrument() override;
 
 signals:
-    void fpsChanged(qreal fps);
+    void fpsChanged(qreal fps, qint64 frameTimeMs);
 
 protected:
     virtual void enabledNotify() override;
     virtual void aboutToBeDisabledNotify() override;
 
-    virtual bool paintEvent(QWidget *viewport, QPaintEvent *event) override;
+    virtual bool paintEvent(QWidget* viewport, QPaintEvent* event) override;
 
 private:
     void updateFps(qreal fps);
 
 private:
-    int m_updateInterval;
-    qint64 m_lastTime;
-    int m_frameCount;
-    qreal m_fps;
+    const int m_updateIntervalMs;
+    QElapsedTimer m_timer;
+    int m_frameCount = 0;
 };
-
-#endif // QN_FPS_COUNTING_INSTRUMENT_H

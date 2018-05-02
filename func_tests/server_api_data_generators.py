@@ -1,11 +1,6 @@
-"""
-  Generate data for mediaserver's API calls
-"""
-
 from hashlib import md5
-from netaddr import IPAddress
-import uuid
 
+from netaddr import IPAddress
 
 BASE_CAMERA_IP_ADDRESS = IPAddress('192.168.0.0')
 BASE_SERVER_IP_ADDRESS = IPAddress('10.10.0.0')
@@ -16,7 +11,7 @@ USER_GUID_PREFIX = "58e20000-0000-0000-0000"
 STORAGE_GUID_PREFIX = "81012a6e-0000-0000-0000"
 LAYOUT_GUID_PREFIX = "1a404100-0000-0000-0000"
 LAYOUT_ITEM_GUID_PREFIX = "1a404100-11e1-1000-0000"
-CAMERA_MAC_PREFIX = "CA:14:"
+CAMERA_MAC_PREFIX = "92-61-"
 
 
 def generate_camera_server_guid(id, quoted=True):
@@ -50,15 +45,11 @@ def generate_layout_item_guid(id):
 
 
 def generate_mac(id):
-    return CAMERA_MAC_PREFIX + ":".join(map(lambda n: "%02X" % (id >> n & 0xFF), [24, 16, 8, 0]))
+    return CAMERA_MAC_PREFIX + "-".join(map(lambda n: "%02X" % (id >> n & 0xFF), [24, 16, 8, 0]))
 
 
 def generate_name(prefix, id):
     return "%s_%s" % (prefix, id)
-
-
-def generate_user_name(id):
-    return "User_%s" % id
 
 
 def generate_uuid_from_string(salt):
@@ -82,7 +73,7 @@ def generate_ip_v4_endpoint(id):
 def generate_password_and_digest(name):
     password = name
     d = md5("%s:NetworkOptix:%s" % (name, password)).digest()
-    return (password, ''.join('%02x' % ord(i) for i in d))
+    return password, ''.join('%02x' % ord(i) for i in d)
 
 
 def generate_password_hash(password):
@@ -119,7 +110,7 @@ def generate_camera_data(camera_id, **kw):
        status='Unauthorized',
        statusFlags='CSF_NoFlags',
        typeId='{1b7181ce-0227-d3f7-9443-c86aab922d96}',
-#        typeId='{774e6ecd-ffc6-ae88-0165-8f4a6d0eafa7}',
+       # typeId='{774e6ecd-ffc6-ae88-0165-8f4a6d0eafa7}',
        url=generate_ip_v4(camera_id, BASE_CAMERA_IP_ADDRESS),
        vendor="NetworkOptix")
     return dict(default_camera_data, **kw)
@@ -145,7 +136,7 @@ def generate_user_data(user_id, **kw):
 
 def generate_mediaserver_data(server_id, **kw):
     server_address = kw.get('networkAddresses', generate_ip_v4_endpoint(server_id))
-    server_name = kw.get('name', generate_name('Server', server_id))
+    server_name = kw.get('name', generate_name('Mediaserver', server_id))
     default_server_data = dict(
         apiUrl=server_address,
         url='rtsp://%s' % server_address,
@@ -164,7 +155,7 @@ def generate_mediaserver_data(server_id, **kw):
 
 
 def generate_camera_user_attributes_data(camera, **kw):
-    dewarpingParams = '''{"enabled":false,"fovRot":0,
+    unwarping_params = '''{"enabled":false,"fovRot":0,
     "hStretch":1,"radius":0.5,"viewMode":"1","xCenter":0.5,"yCenter":0.5}'''
     default_camera_data = dict(
         audioEnabled=False,
@@ -172,7 +163,7 @@ def generate_camera_user_attributes_data(camera, **kw):
         cameraId=camera['id'],
         cameraName=camera['name'],
         controlEnabled=True,
-        dewarpingParams=dewarpingParams,
+        dewarpingParams=unwarping_params,
         failoverPriority='Medium',
         licenseUsed=True,
         maxArchiveDays=-30,

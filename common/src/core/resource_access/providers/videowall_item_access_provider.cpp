@@ -88,7 +88,7 @@ bool QnVideoWallItemAccessProvider::calculateAccess(const QnResourceAccessSubjec
         if (resource->hasFlags(Qn::layout))
             return layoutBelongsToVideoWall(resource);
 
-        if (!QnResourceAccessFilter::isShareableMedia(resource))
+        if (!QnResourceAccessFilter::isShareableViaVideowall(resource))
             return false;
 
         // TODO: #GDM here resource splitting may help a lot: take all videowalls before, then
@@ -123,7 +123,7 @@ bool QnVideoWallItemAccessProvider::calculateAccess(const QnResourceAccessSubjec
         return layout && m_itemAggregator->hasLayout(layout); /*< This method is called under mutex. */
     }
 
-    if (!QnResourceAccessFilter::isShareableMedia(resource))
+    if (!QnResourceAccessFilter::isShareableViaVideowall(resource))
         return false;
 
     return m_itemAggregator->hasItem(resource->getId());
@@ -196,9 +196,6 @@ void QnVideoWallItemAccessProvider::handleResourceAdded(const QnResourcePtr& res
 
     base_type::handleResourceAdded(resource);
 
-    if (isUpdating())
-        return;
-
     if (auto videoWall = resource.dynamicCast<QnVideoWallResource>())
     {
         handleVideoWallAdded(videoWall);
@@ -211,7 +208,8 @@ void QnVideoWallItemAccessProvider::handleResourceAdded(const QnResourcePtr& res
                 updateAccessToLayout(layout);
             });
 
-        updateAccessToLayout(layout);
+        if (!isUpdating())
+            updateAccessToLayout(layout);
     }
 }
 
@@ -304,10 +302,13 @@ void QnVideoWallItemAccessProvider::handleVideoWallAdded(const QnVideoWallResour
     NX_EXPECT(mode() == Mode::cached);
 
     /* Layouts and videowalls can be added independently. */
-    for (auto layout: getLayoutsForVideoWall(videoWall))
+    if (!isUpdating())
     {
-        if (layoutBelongsToVideoWall(layout) && m_itemAggregator->addWatchedLayout(layout))
-            updateAccessToResource(layout);
+        for (auto layout: getLayoutsForVideoWall(videoWall))
+        {
+            if (layoutBelongsToVideoWall(layout) && m_itemAggregator->addWatchedLayout(layout))
+                updateAccessToResource(layout);
+        }
     }
 
     connect(videoWall, &QnVideoWallResource::itemAdded, this,

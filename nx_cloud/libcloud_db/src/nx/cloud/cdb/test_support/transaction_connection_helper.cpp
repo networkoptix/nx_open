@@ -42,7 +42,7 @@ void TransactionConnectionHelper::setMaxDelayBeforeConnect(
 
 TransactionConnectionHelper::ConnectionId
     TransactionConnectionHelper::establishTransactionConnection(
-        const QUrl& appserver2BaseUrl,
+        const nx::utils::Url& appserver2BaseUrl,
         const std::string& login,
         const std::string& password,
         KeepAlivePolicy keepAlivePolicy,
@@ -162,7 +162,7 @@ std::size_t TransactionConnectionHelper::connectedConnections() const
     return m_connectedConnections.size();
 }
 
-OnConnectionBecomesActiveSubscription& 
+OnConnectionBecomesActiveSubscription&
     TransactionConnectionHelper::onConnectionBecomesActiveSubscription()
 {
     return m_onConnectionBecomesActiveSubscription;
@@ -174,7 +174,7 @@ OnConnectionFailureSubscription&
     return m_onConnectionFailureSubscription;
 }
 
-TransactionConnectionHelper::ConnectionContext 
+TransactionConnectionHelper::ConnectionContext
     TransactionConnectionHelper::prepareConnectionContext(
         const std::string& login,
         const std::string& password,
@@ -215,7 +215,7 @@ TransactionConnectionHelper::ConnectionContext
 
 void TransactionConnectionHelper::startConnection(
     ConnectionContext* connectionContext,
-    const QUrl& appserver2BaseUrl)
+    const nx::utils::Url& appserver2BaseUrl)
 {
     // TODO: #ak TransactionTransport should do that. But somehow it doesn't...
     const auto targetUrl = prepareTargetUrl(appserver2BaseUrl, connectionContext->peerInfo.id);
@@ -259,7 +259,7 @@ void TransactionConnectionHelper::onTransactionConnectionStateChanged(
             /*fallthrough*/
         case ec2::QnTransactionTransportBase::NeedStartStreaming:
         case ec2::QnTransactionTransportBase::ReadyForStreaming:
-            // Transaction transport invokes this handler with mutex locked, 
+            // Transaction transport invokes this handler with mutex locked,
             // so have to do some work around this misbehavior.
             m_aioTimer.post(
                 [this, connectionId]()
@@ -285,10 +285,10 @@ void TransactionConnectionHelper::onTransactionConnectionStateChanged(
     m_condition.wakeAll();
 }
 
-QUrl TransactionConnectionHelper::prepareTargetUrl(
-    const QUrl& appserver2BaseUrl, const QnUuid& localPeerId)
+nx::utils::Url TransactionConnectionHelper::prepareTargetUrl(
+    const nx::utils::Url& appserver2BaseUrl, const QnUuid& localPeerId)
 {
-    QUrl url = appserver2BaseUrl;
+    nx::utils::Url url = appserver2BaseUrl;
     QUrlQuery urlQuery(url.query());
     urlQuery.addQueryItem("guid", localPeerId.toString());
     url.setQuery(urlQuery);
@@ -321,7 +321,7 @@ void TransactionConnectionHelper::removeConnection(
         });
 }
 
-TransactionConnectionHelper::ConnectionId 
+TransactionConnectionHelper::ConnectionId
     TransactionConnectionHelper::getConnectionId(
         ec2::QnTransactionTransportBase* connection) const
 {

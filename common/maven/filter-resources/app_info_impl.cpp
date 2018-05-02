@@ -1,5 +1,5 @@
 //
-// This file is generated. Go to pom.xml.
+// This file is generated.
 //
 #include <utils/common/app_info.h>
 
@@ -68,10 +68,7 @@ QString QnAppInfo::boostVersion()
 
 bool QnAppInfo::beta()
 {
-    static const auto betaString = QStringLiteral("${beta}").toLower();
-    static const bool beta =
-        (betaString == lit("on") || betaString == lit("true"));
-    return beta;
+    return ${beta};
 }
 
 QString QnAppInfo::productNameShort()
@@ -111,7 +108,7 @@ QString QnAppInfo::mediaFolderName()
 
 QString QnAppInfo::licensingEmailAddress()
 {
-    return QStringLiteral("${licenseEmail}");
+    return QStringLiteral(R"(${licenseEmail})");
 }
 
 QString QnAppInfo::companyUrl()

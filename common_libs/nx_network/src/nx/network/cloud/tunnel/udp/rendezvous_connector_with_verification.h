@@ -41,7 +41,7 @@ public:
     void notifyAboutChoosingConnection(ConnectCompletionHandler completionHandler);
 
 private:
-    std::chrono::milliseconds m_timeout;
+    std::chrono::milliseconds m_timeout{0};
     ConnectCompletionHandler m_connectCompletionHandler;
     std::unique_ptr<stun::MessagePipeline> m_requestPipeline;
     std::unique_ptr<nx::network::UdtStreamSocket> m_udtConnection;
@@ -51,9 +51,9 @@ private:
         stun::MessagePipeline* connection) override;
 
     void onConnectCompleted(SystemError::ErrorCode errorCode);
-    void onMessageReceived(nx::stun::Message message);
-    void processUdpHolePunchingSynAck(nx::stun::Message message);
-    void processTunnelConnectionChosen(nx::stun::Message message);
+    void onMessageReceived(nx::network::stun::Message message);
+    void processUdpHolePunchingSynAck(nx::network::stun::Message message);
+    void processTunnelConnectionChosen(nx::network::stun::Message message);
     void onTimeout(nx::String requestName);
     void processError(SystemError::ErrorCode errorCode);
 };

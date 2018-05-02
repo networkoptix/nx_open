@@ -120,7 +120,7 @@ protected:
 
     /* [4] Protected members */
 
-    std::unique_ptr<AbstractStreamSocket> m_socket;
+    std::unique_ptr<nx::network::AbstractStreamSocket> m_socket;
 
     QString host;
     int port;
@@ -139,7 +139,7 @@ protected:
     QString responseText;
     SmtpReplyCode responseCode;
 
-    nx_http::LineSplitter m_lineSpliter;
+    nx::network::http::LineSplitter m_lineSpliter;
 
     class ResponseTimeoutException {};
     class SendMessageTimeoutException {};

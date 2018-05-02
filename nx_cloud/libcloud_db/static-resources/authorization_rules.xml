@@ -58,7 +58,7 @@
 
             <condition resName="authorized">
                 <!-- following section forbids authorization on some conditions -->
-                <condition value="true" resName="request.path">
+                <condition value="true" resName="request.path" matchType="wildcard">
                     <sequence value="/cdb/account/register">
                         <!--
                         This request must be allowed for cloud portal only
@@ -248,6 +248,12 @@
                         <set resName="authorized" resValue="false"/>
                         <condition resName="secureSource">
                             <set value="true" resName="authorized" resValue="true"/>
+                        </condition>
+                    </sequence>
+                    <sequence value="/cdb/system/*/merged_systems/">
+                        <set resName="authorized" resValue="false"/>
+                        <condition resName="auth.accountRightsOnSystem">
+                            <set value="owner" resName="authorized" resValue="true"/>
                         </condition>
                     </sequence>
                 </condition>

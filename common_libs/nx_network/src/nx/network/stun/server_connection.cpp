@@ -3,6 +3,7 @@
 #include "message_dispatcher.h"
 
 namespace nx {
+namespace network {
 namespace stun {
 
 ServerConnection::ServerConnection(
@@ -26,7 +27,7 @@ ServerConnection::~ServerConnection()
 }
 
 void ServerConnection::sendMessage(
-    nx::stun::Message message,
+    nx::network::stun::Message message,
     std::function<void(SystemError::ErrorCode)> handler)
 {
     base_type::sendMessage(
@@ -134,4 +135,5 @@ void ServerConnection::processCustomRequest( Message message )
 }
 
 } // namespace stun
+} // namespace network
 } // namespace nx

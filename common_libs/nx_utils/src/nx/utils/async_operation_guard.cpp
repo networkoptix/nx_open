@@ -6,8 +6,8 @@ namespace utils {
 //-------------------------------------------------------------------------------------------------
 // AsyncOperationGuard
 
-AsyncOperationGuard::AsyncOperationGuard()
-    : m_sharedGuard(new SharedGuard)
+AsyncOperationGuard::AsyncOperationGuard():
+    m_sharedGuard(new SharedGuard)
 {
 }
 
@@ -36,9 +36,9 @@ AsyncOperationGuard::SharedGuard* AsyncOperationGuard::operator->() const
 //-------------------------------------------------------------------------------------------------
 // AsyncOperationGuard::SharedGuard
 
-AsyncOperationGuard::SharedGuard::SharedGuard()
-    : m_mutex(QnMutex::Recursive)
-    , m_terminated(false)
+AsyncOperationGuard::SharedGuard::SharedGuard():
+    m_mutex(QnMutex::Recursive),
+    m_terminated(false)
 {
 }
 
@@ -73,15 +73,15 @@ void AsyncOperationGuard::SharedGuard::end()
 //-------------------------------------------------------------------------------------------------
 // AsyncOperationGuard::SharedGuard::Lock
 
-AsyncOperationGuard::SharedGuard::Lock::Lock(SharedGuard* guard)
-    : m_sharedGuard(guard)
-    , m_locked(guard->begin())
+AsyncOperationGuard::SharedGuard::Lock::Lock(SharedGuard* guard):
+    m_sharedGuard(guard),
+    m_locked(guard->begin())
 {
 }
 
-AsyncOperationGuard::SharedGuard::Lock::Lock(Lock&& rhs)
-    : m_sharedGuard(rhs.m_sharedGuard)
-    , m_locked(rhs.m_locked)
+AsyncOperationGuard::SharedGuard::Lock::Lock(Lock&& rhs):
+    m_sharedGuard(rhs.m_sharedGuard),
+    m_locked(rhs.m_locked)
 {
     rhs.m_locked = false;
 }

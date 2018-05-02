@@ -17,14 +17,14 @@ class UdpMulticastFinder:
 {
 public:
     using ModuleHandler = nx::utils::MoveOnlyFunc<void(
-        const QnModuleInformationWithAddresses& module, const SocketAddress& endpoint)>;
+        const QnModuleInformationWithAddresses& module, const nx::network::SocketAddress& endpoint)>;
 
-    static const SocketAddress kMulticastEndpoint;
+    static const nx::network::SocketAddress kMulticastEndpoint;
     static const std::chrono::milliseconds kUpdateInterfacesInterval;
     static const std::chrono::milliseconds kSendInterval;
 
     UdpMulticastFinder(network::aio::AbstractAioThread* thread = nullptr);
-    void setMulticastEndpoint(SocketAddress endpoint);
+    void setMulticastEndpoint(nx::network::SocketAddress endpoint);
     void setUpdateInterfacesInterval(std::chrono::milliseconds interval);
     void setSendInterval(std::chrono::milliseconds interval);
 
@@ -39,15 +39,15 @@ public:
     void setIsMulticastEnabledFunction(nx::utils::MoveOnlyFunc<bool()> function);
 
 private:
-    typedef std::map<HostAddress, std::unique_ptr<network::UDPSocket>> Senders;
+    typedef std::map<nx::network::HostAddress, std::unique_ptr<network::UDPSocket>> Senders;
 
-    std::unique_ptr<network::UDPSocket> makeSocket(const SocketAddress& endpoint);
-    void joinMulticastGroup(const HostAddress& ip);
+    std::unique_ptr<network::UDPSocket> makeSocket(const nx::network::SocketAddress& endpoint);
+    void joinMulticastGroup(const nx::network::HostAddress& ip);
     void receiveModuleInformation();
     void sendModuleInformation(Senders::iterator senderIterator);
 
 private:
-    SocketAddress m_multicastEndpoint;
+    nx::network::SocketAddress m_multicastEndpoint;
     std::chrono::milliseconds m_updateInterfacesInterval;
     std::chrono::milliseconds m_sendInterval;
     nx::utils::MoveOnlyFunc<bool()> m_isMulticastEnabledFunction;

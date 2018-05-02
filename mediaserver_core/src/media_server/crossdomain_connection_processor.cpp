@@ -21,7 +21,7 @@ class QnCrossdomainConnectionProcessorPrivate : public QnTCPConnectionProcessorP
 };
 
 QnCrossdomainConnectionProcessor::QnCrossdomainConnectionProcessor(
-    QSharedPointer<AbstractStreamSocket> socket,
+    QSharedPointer<nx::network::AbstractStreamSocket> socket,
     QnTcpListener* owner)
     :
     QnTCPConnectionProcessor(
@@ -55,7 +55,7 @@ void QnCrossdomainConnectionProcessor::run()
     QFile file(":/static/crossdomain.xml");
     if (!mServer || !file.open(QFile::ReadOnly))
     {
-        sendResponse(nx_http::StatusCode::notFound, kContentType, QByteArray());
+        sendResponse(nx::network::http::StatusCode::notFound, kContentType, QByteArray());
         return;
     }
 
@@ -76,12 +76,14 @@ void QnCrossdomainConnectionProcessor::run()
         else if (lines[i].contains(kCrossdomainPattern))
         {
             lines.removeAt(i);
-            const QString portalUrl = QUrl(nx::network::AppInfo::defaultCloudModulesXmlUrl()).host();
+            const QString portalUrl =
+                QUrl(nx::network::AppInfo::defaultCloudModulesXmlUrl(
+                    nx::network::SocketGlobals::cloud().cloudHost())).host();
             if (!portalUrl.isEmpty())
                 lines.insert(i, pattern.replace(kCrossdomainPattern, portalUrl.toUtf8()));
         }
     }
 
     d->response.messageBody = lines.join('\n');
-    sendResponse(nx_http::StatusCode::ok, kContentType, QByteArray());
+    sendResponse(nx::network::http::StatusCode::ok, kContentType, QByteArray());
 }

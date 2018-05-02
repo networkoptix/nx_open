@@ -49,7 +49,7 @@
         <number>0</number>
        </property>
        <property name="topMargin">
-        <number>8</number>
+        <number>0</number>
        </property>
        <property name="rightMargin">
         <number>0</number>
@@ -74,7 +74,7 @@
         <number>0</number>
        </property>
        <property name="topMargin">
-        <number>8</number>
+        <number>0</number>
        </property>
        <property name="rightMargin">
         <number>0</number>
@@ -103,7 +103,7 @@
           <widget class="QComboBox" name="typeComboBox"/>
          </item>
          <item>
-          <widget class="QnSearchLineEdit" name="filterLineEdit" native="true"/>
+          <widget class="nx::client::desktop::SearchLineEdit" name="filterLineEdit" native="true"/>
          </item>
         </layout>
        </item>
@@ -125,9 +125,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnSearchLineEdit</class>
+   <class>nx::client::desktop::SearchLineEdit</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/search_line_edit.h</header>
+   <header location="global">nx/client/desktop/common/widgets/search_line_edit.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

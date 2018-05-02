@@ -9,6 +9,7 @@
 #include <nx/utils/thread/long_runnable.h>
 #include <nx/utils/thread/stoppable.h>
 
+#include "detail/query_queue.h"
 #include "request_executor.h"
 
 namespace nx {
@@ -22,8 +23,7 @@ enum class ConnectionState
     closed
 };
 
-using QueryExecutorQueue =
-    nx::utils::SyncQueueWithItemStayTimeout<std::unique_ptr<AbstractExecutor>>;
+using QueryExecutorQueue = detail::QueryQueue;
 
 class NX_UTILS_API BaseRequestExecutor:
     public QnStoppable,

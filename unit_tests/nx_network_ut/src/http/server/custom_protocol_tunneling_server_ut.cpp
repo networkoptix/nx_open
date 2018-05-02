@@ -7,7 +7,9 @@
 
 #include "stun/stun_over_http_server_fixture.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 namespace server {
 namespace test {
 
@@ -15,20 +17,20 @@ namespace test {
  * Tests tunneling of STUN protocol into HTTP connection.
  */
 class HttpTunnelingServer:
-    public nx::stun::test::StunOverHttpServerFixture
+    public nx::network::stun::test::StunOverHttpServerFixture
 {
 protected:
     void whenEstablishConnection()
     {
         using namespace std::placeholders;
 
-        nx_http::HttpClient httpClient;
+        nx::network::http::HttpClient httpClient;
         ASSERT_TRUE(
             httpClient.doUpgrade(
                 tunnelUrl(),
-                nx::stun::StunOverHttpServer::kStunProtocolName));
+                nx::network::stun::StunOverHttpServer::kStunProtocolName));
         ASSERT_EQ(
-            nx_http::StatusCode::switchingProtocols,
+            nx::network::http::StatusCode::switchingProtocols,
             httpClient.response()->statusLine.statusCode);
         m_httpTunnelConnection = httpClient.takeSocket();
     }
@@ -37,18 +39,18 @@ protected:
     {
         using namespace std::placeholders;
 
-        nx::stun::AsyncClient stunClient(std::move(m_httpTunnelConnection));
+        nx::network::stun::AsyncClient stunClient(std::move(m_httpTunnelConnection));
         auto stunClientGuard = makeScopeGuard(
             [&stunClient]() { stunClient.pleaseStopSync(); });
 
         auto request = prepareRequest();
 
-        auto result = makeSyncCall<SystemError::ErrorCode, nx::stun::Message>(
-            std::bind(&nx::stun::AsyncClient::sendRequest, &stunClient,
+        auto result = makeSyncCall<SystemError::ErrorCode, nx::network::stun::Message>(
+            std::bind(&nx::network::stun::AsyncClient::sendRequest, &stunClient,
                 request, _1, nullptr));
         ASSERT_EQ(SystemError::noError, std::get<0>(result));
         ASSERT_EQ(
-            nx::stun::MessageClass::successResponse,
+            nx::network::stun::MessageClass::successResponse,
             std::get<1>(result).header.messageClass);
     }
 
@@ -73,4 +75,6 @@ TEST_F(HttpTunnelingServer, tunnel_is_established)
 
 } // namespace test
 } // namespace server
-} // namespace nx_http
+} // namespace nx {
+} // namespace network {
+} // namespace http {

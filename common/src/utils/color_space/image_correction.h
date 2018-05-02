@@ -3,6 +3,8 @@
 
 #include <cstring>
 
+#include <boost/operators.hpp>
+
 #include <QtCore/QtGlobal>
 #include <QtCore/QByteArray>
 #include <QtCore/QList>
@@ -11,8 +13,7 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 
-
-struct ImageCorrectionParams
+struct ImageCorrectionParams: public boost::equality_comparable1<ImageCorrectionParams>
 {
     bool operator== (const ImageCorrectionParams& other) const;
 

@@ -17,8 +17,42 @@ namespace downloader {
 
 class AbstractPeerManagerFactory;
 
+class AbstractDownloader: public QObject
+{
+    Q_OBJECT
+
+public:
+    AbstractDownloader(QObject* parent);
+
+    virtual QStringList files() const = 0;
+    virtual QString filePath(const QString& fileName) const = 0;
+    virtual FileInformation fileInformation(const QString& fileName) const = 0;
+    virtual ResultCode addFile(const FileInformation& fileInformation) = 0;
+    virtual ResultCode updateFileInformation(
+        const QString& fileName, int size, const QByteArray& md5) = 0;
+    virtual ResultCode readFileChunk(
+        const QString& fileName, int chunkIndex, QByteArray& buffer) = 0;
+    virtual ResultCode writeFileChunk(
+        const QString& fileName, int chunkIndex, const QByteArray& buffer) = 0;
+    virtual ResultCode deleteFile(const QString& fileName, bool deleteData = true) = 0;
+    virtual QVector<QByteArray> getChunkChecksums(const QString& fileName) = 0;
+
+signals:
+    void downloadFinished(const QString& fileName);
+    void downloadFailed(const QString& fileName);
+    void fileAdded(
+        const nx::vms::common::p2p::downloader::FileInformation& fileInformation);
+    void fileDeleted(const QString& fileName);
+    void fileInformationChanged(
+        const nx::vms::common::p2p::downloader::FileInformation& fileInformation);
+    void fileStatusChanged(
+        const nx::vms::common::p2p::downloader::FileInformation& fileInformation);
+    void chunkDownloadFailed(const QString& fileName);
+
+};
+
 class DownloaderPrivate;
-class Downloader: public QObject, public QnCommonModuleAware
+class Downloader: public AbstractDownloader, public QnCommonModuleAware
 {
     Q_OBJECT
 
@@ -31,36 +65,38 @@ public:
 
     ~Downloader();
 
-    QStringList files() const;
+    virtual QStringList files() const override;
 
-    QString filePath(const QString& fileName) const;
+    virtual QString filePath(const QString& fileName) const override;
 
-    FileInformation fileInformation(const QString& fileName) const;
+    virtual FileInformation fileInformation(const QString& fileName) const override;
 
-    ResultCode addFile(const FileInformation& fileInformation);
+    virtual ResultCode addFile(const FileInformation& fileInformation) override;
 
-    ResultCode updateFileInformation(
+    virtual ResultCode updateFileInformation(
         const QString& fileName,
         int size,
-        const QByteArray& md5);
+        const QByteArray& md5) override;
 
-    ResultCode readFileChunk(
+    virtual ResultCode readFileChunk(
         const QString& fileName,
         int chunkIndex,
-        QByteArray& buffer);
+        QByteArray& buffer) override;
 
-    ResultCode writeFileChunk(
+    virtual ResultCode writeFileChunk(
         const QString& fileName,
         int chunkIndex,
-        const QByteArray& buffer);
+        const QByteArray& buffer) override;
 
-    ResultCode deleteFile(const QString& fileName, bool deleteData = true);
+    virtual ResultCode deleteFile(const QString& fileName, bool deleteData = true) override;
 
-    QVector<QByteArray> getChunkChecksums(const QString& fileName);
+    virtual QVector<QByteArray> getChunkChecksums(const QString& fileName) override;
+    void atServerStart();
 
-signals:
-    void downloadFinished(const QString& fileName);
-    void downloadFailed(const QString& fileName);
+    static void validateAsync(const QString& url, int expectedSize,
+        std::function<void(bool)> callback);
+
+    static bool validate(const QString& url, int expectedSize);
 
 private:
     QScopedPointer<DownloaderPrivate> const d_ptr;

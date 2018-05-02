@@ -13,7 +13,7 @@ ConnectSession::ConnectSession():
 
 bool ConnectSession::operator==(const ConnectSession& rhs) const
 {
-    return 
+    return
         startTime == rhs.startTime &&
         endTime == rhs.endTime &&
         resultCode == rhs.resultCode &&

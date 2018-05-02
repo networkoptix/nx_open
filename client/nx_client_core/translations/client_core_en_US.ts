@@ -2,6 +2,105 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="en_US" sourcelanguage="en">
 <context>
+    <name>HumanReadable</name>
+    <message numerus="yes">
+        <source>Bytes</source>
+        <comment>Full suffix for displaying bytes</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>B</source>
+        <comment>Suffix for displaying bytes</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Kilobytes</source>
+        <comment>Full suffix for displaying kilobytes</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>KB</source>
+        <comment>Suffix for displaying kilobytes</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Megabytes</source>
+        <comment>Full suffix for displaying megabytes</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>MB</source>
+        <comment>Suffix for displaying megabytes</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Gigabytes</source>
+        <comment>Full suffix for displaying gigabytes</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>GB</source>
+        <comment>Suffix for displaying gigabytes</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Terabytes</source>
+        <comment>Full suffix for displaying terabytes</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>TB</source>
+        <comment>Suffix for displaying terabytes</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Petabytes</source>
+        <comment>Full suffix for displaying petabytes</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>PB</source>
+        <comment>Suffix for displaying petabytes</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+</context>
+<context>
     <name>QnCloudResultInfo</name>
     <message>
         <source>Successful.</source>
@@ -69,17 +168,17 @@
     </message>
     <message>
         <source>Internal %1 error. Please contact support team.</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <comment>%1 is the cloud name (like Nx Cloud)</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <comment>%1 is the cloud name (like Nx Cloud)</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Sorry, %1 Service could not process your request. Please try again in a few moments.</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <comment>%1 is the cloud name (like Nx Cloud)</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>

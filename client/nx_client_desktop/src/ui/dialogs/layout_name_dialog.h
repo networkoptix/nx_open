@@ -1,5 +1,4 @@
-#ifndef QN_LAYOUT_NAME_DIALOG_H
-#define QN_LAYOUT_NAME_DIALOG_H
+#pragma once
 
 #include <QtWidgets/QDialog>
 #include <QtCore/QScopedPointer>
@@ -16,8 +15,8 @@ class QnLayoutNameDialog: public QnSessionAwareButtonBoxDialog {
 
     typedef QnSessionAwareButtonBoxDialog base_type;
 public:
-    QnLayoutNameDialog(const QString &caption, const QString &text, const QString &name, QDialogButtonBox::StandardButtons buttons, QWidget *parent = NULL);
-    QnLayoutNameDialog(QDialogButtonBox::StandardButtons buttons, QWidget *parent = NULL);
+    QnLayoutNameDialog(const QString &caption, const QString &text, const QString &name, QDialogButtonBox::StandardButtons buttons, QWidget *parent);
+    QnLayoutNameDialog(QDialogButtonBox::StandardButtons buttons, QWidget *parent);
 
     virtual ~QnLayoutNameDialog();
 
@@ -38,5 +37,3 @@ private:
 private:
     QScopedPointer<Ui::LayoutNameDialog> ui;
 };
-
-#endif // QN_LAYOUT_NAME_DIALOG_H

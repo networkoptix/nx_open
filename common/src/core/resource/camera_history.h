@@ -47,10 +47,10 @@ public:
     virtual ~QnCameraHistoryPool();
 
     /** Reset information about camera footage presence on different servers. */
-    void resetServerFootageData(const ec2::ApiServerFootageDataList& serverFootageDataList);
+    void resetServerFootageData(const nx::vms::api::ServerFootageDataList& serverFootageDataList);
 
     /** Update information about camera footage presence on a single server. */
-    void setServerFootageData(const ec2::ApiServerFootageData &serverFootageData);
+    void setServerFootageData(const nx::vms::api::ServerFootageData& serverFootageData);
 
     /** Update information about camera footage presence on a single server. */
     void setServerFootageData(const QnUuid& serverGuid, const std::vector<QnUuid>& cameras);
@@ -123,7 +123,7 @@ public:
      */
     bool updateCameraHistorySync(const QnSecurityCamResourcePtr &camera);
 
-    ec2::ApiCameraHistoryItemDataList getHistoryDetails(const QnUuid& cameraId, bool* isValid);
+    nx::vms::api::CameraHistoryItemDataList getHistoryDetails(const QnUuid& cameraId, bool* isValid);
 
     /**
      * \brief                       Set camera history details if provided server list in historyDetails still actual.
@@ -131,7 +131,7 @@ public:
      */
     bool testAndSetHistoryDetails(
         const QnUuid& cameraId,
-        const ec2::ApiCameraHistoryItemDataList& historyDetails);
+        const nx::vms::api::CameraHistoryItemDataList& historyDetails);
 
     void setHistoryCheckDelay(int value);
     void setMessageProcessor(const QnCommonMessageProcessor* messageProcessor);
@@ -155,12 +155,17 @@ signals:
     void cameraHistoryChanged(const QnSecurityCamResourcePtr &camera);
 
 private:
-    ec2::ApiCameraHistoryItemDataList filterOnlineServers(const ec2::ApiCameraHistoryItemDataList& dataList) const;
+    nx::vms::api::CameraHistoryItemDataList filterOnlineServers(
+        const nx::vms::api::CameraHistoryItemDataList& dataList) const;
 
     QnSecurityCamResourcePtr toCamera(const QnUuid& guid) const;
     QnMediaServerResourcePtr toMediaServer(const QnUuid& guid) const;
 
-    void at_cameraPrepared(bool success, const rest::Handle& requestId, const ec2::ApiCameraHistoryDataList &periods, callbackFunction callback);
+    void at_cameraPrepared(
+        bool success,
+        const rest::Handle& requestId,
+        const nx::vms::api::CameraHistoryDataList& periods,
+        callbackFunction callback);
 
     /** Mark camera history as dirty and subject to update. */
     void invalidateCameraHistory(const QnUuid &cameraId);
@@ -174,13 +179,13 @@ private:
         bool filterOnlineServers = false) const;
     bool isValidHistoryDetails(
         const QnUuid& cameraId,
-        const ec2::ApiCameraHistoryItemDataList& historyDetails) const;
+        const nx::vms::api::CameraHistoryItemDataList& historyDetails) const;
 private:
     int m_historyCheckDelay;
     mutable QnMutex m_mutex;
     QMap<QnUuid, std::vector<QnUuid>> m_archivedCamerasByServer; // archived cameras by server
 
-    typedef QMap<QnUuid, ec2::ApiCameraHistoryItemDataList> DetailHistoryMap;
+    typedef QMap<QnUuid, nx::vms::api::CameraHistoryItemDataList> DetailHistoryMap;
     DetailHistoryMap m_historyDetail; // camera move detail by camera
 
     /** Set of cameras which have the data loaded and actual. */

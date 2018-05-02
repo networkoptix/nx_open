@@ -36,6 +36,7 @@
 #include <core/resource/media_server_resource.h>
 
 #include <nx_ec/dummy_handler.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -56,6 +57,7 @@
 using boost::algorithm::any_of;
 
 using namespace nx;
+using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
 
 namespace {
@@ -95,15 +97,15 @@ namespace {
                     return lessThanByRole<bool>(left, right, Qn::DisabledRole);
 
                 case Column::event:
-                    return lessThanByRole<vms::event::EventType>(left, right, Qn::EventTypeRole,
-                        [this](vms::event::EventType left, vms::event::EventType right)
+                    return lessThanByRole<vms::api::EventType>(left, right, Qn::EventTypeRole,
+                        [this](vms::api::EventType left, vms::api::EventType right)
                         {
                             return m_lexComparator->lexicographicalLessThan(left, right);
                         });
 
                 case Column::action:
-                    return lessThanByRole<vms::event::ActionType>(left, right, Qn::ActionTypeRole,
-                        [this](vms::event::ActionType left, vms::event::ActionType right)
+                    return lessThanByRole<vms::api::ActionType>(left, right, Qn::ActionTypeRole,
+                        [this](vms::api::ActionType left, vms::api::ActionType right)
                         {
                             return m_lexComparator->lexicographicalLessThan(left, right);
                         });
@@ -149,7 +151,7 @@ namespace {
 
 
             bool anyCameraPassFilter = any_of(resourcePool()->getAllCameras(QnResourcePtr(), true), resourcePassText);
-            vms::event::EventType eventType = idx.data(Qn::EventTypeRole).value<vms::event::EventType>();
+            vms::api::EventType eventType = idx.data(Qn::EventTypeRole).value<vms::api::EventType>();
             if (vms::event::requiresCameraResource(eventType)) {
                 auto eventResources = idx.data(Qn::EventResourcesRole).value<QSet<QnUuid>>();
 
@@ -162,7 +164,7 @@ namespace {
                     return true;
             }
 
-            vms::event::ActionType actionType = idx.data(Qn::ActionTypeRole).value<vms::event::ActionType>();
+            vms::api::ActionType actionType = idx.data(Qn::ActionTypeRole).value<vms::api::ActionType>();
             if (vms::event::requiresCameraResource(actionType))
             {
                 auto actionResources = idx.data(Qn::ActionResourcesRole).value<QSet<QnUuid>>();
@@ -247,7 +249,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     sortModel->setDynamicSortFilter(false);
     sortModel->setSourceModel(m_rulesViewModel);
     sortModel->sort(int(kSortColumn));
-    connect(ui->filterLineEdit, &QnSearchLineEdit::textChanged, sortModel, &SortRulesProxyModel::setText);
+    connect(ui->filterLineEdit, &SearchLineEdit::textChanged, sortModel, &SortRulesProxyModel::setText);
 
     enum { kUpdateFilterDelayMs = 200 };
     ui->filterLineEdit->setTextChangedSignalFilterMs(kUpdateFilterDelayMs);
@@ -303,10 +305,14 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     connect(ui->testRuleButton, &QPushButton::clicked, this,
         &QnBusinessRulesDialog::at_testRuleButton_clicked);
 
-    connect(ui->eventLogButton, &QPushButton::clicked,
-        context()->action(action::OpenBusinessLogAction), &QAction::trigger);
+    connect(ui->eventLogButton, &QPushButton::clicked, this,
+        [this]
+        {
+            context()->menu()->trigger(action::OpenBusinessLogAction,
+                action::Parameters().withArgument(Qn::ParentWidgetRole, QPointer<QWidget>(this)));
+        });
 
-    connect(ui->filterLineEdit, &QnSearchLineEdit::textChanged, this,
+    connect(ui->filterLineEdit, &SearchLineEdit::textChanged, this,
         &QnBusinessRulesDialog::updateFilter);
 
     updateFilter();
@@ -622,25 +628,26 @@ void QnBusinessRulesDialog::testRule(const QnBusinessRuleViewModelPtr& ruleModel
         };
 
     auto eventType = ruleModel->eventType();
-    if (nx::vms::event::hasToggleState(eventType))
+    if (nx::vms::event::hasToggleState(eventType, ruleModel->eventParams(), commonModule()))
     {
-        connection->testEventRule(ruleModel->id(), nx::vms::event::EventState::active,
+        connection->testEventRule(ruleModel->id(), nx::vms::api::EventState::active,
             [this, id = ruleModel->id(), connection, makeCallback]
             (bool success, rest::Handle handle, QnJsonRestResult result)
             {
                 makeCallback(lit("Event Started"))(success, handle, result);
                 if (success)
                 {
-                    connection->testEventRule(id, nx::vms::event::EventState::inactive,
+                    connection->testEventRule(id, nx::vms::api::EventState::inactive,
                         makeCallback(lit("Event Stopped")), QThread::currentThread());
                 }
             }, QThread::currentThread());
     }
     else
     {
-        connection->testEventRule(ruleModel->id(), nx::vms::event::EventState::undefined,
+        connection->testEventRule(ruleModel->id(), nx::vms::api::EventState::undefined,
             makeCallback(lit("Event Occurred")), QThread::currentThread());
     }
+
 }
 
 void QnBusinessRulesDialog::deleteRule(const QnBusinessRuleViewModelPtr& ruleModel)

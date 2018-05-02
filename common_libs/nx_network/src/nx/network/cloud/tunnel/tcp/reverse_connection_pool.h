@@ -1,13 +1,16 @@
 #pragma once
 
 #include <nx/network/aio/basic_pollable.h>
-#include <nx/network/cloud/mediator_client_connections.h>
 
 #include "reverse_acceptor.h"
+#include "../../mediator_client_connections.h"
 
 namespace nx {
 namespace network {
 namespace cloud {
+
+class OutgoingTunnelPool;
+
 namespace tcp {
 
 class ReverseConnectionSource;
@@ -22,10 +25,12 @@ class ReverseConnectionHolder;
 class NX_NETWORK_API ReverseConnectionPool:
     public aio::BasicPollable
 {
-    using Parent = aio::BasicPollable;
+    using base_type = aio::BasicPollable;
 
 public:
-    explicit ReverseConnectionPool(
+    ReverseConnectionPool(
+        aio::AIOService* aioService,
+        const OutgoingTunnelPool& outgoingTunnelPool,
         std::unique_ptr<hpm::api::AbstractMediatorClientTcpConnection> mediatorConnection);
     virtual ~ReverseConnectionPool() override;
 
@@ -37,12 +42,13 @@ public:
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
     bool start(HostAddress publicIp, uint16_t port, bool waitForRegistration = false);
-    uint16_t port() const;
+    nx::network::SocketAddress address() const;
 
     std::shared_ptr<ReverseConnectionSource> getConnectionSource(const String& hostName);
 
     // TODO: make is configurable for each client? can it be usefull?
     void setPoolSize(boost::optional<size_t> value);
+    void setHttpConnectionInactivityTimeout(std::chrono::milliseconds inactivityTimeout);
     void setKeepAliveOptions(boost::optional<KeepAliveOptions> value);
     void setStartTimeout(std::chrono::milliseconds value);
 
@@ -53,6 +59,7 @@ private:
     bool registerOnMediator(bool waitForRegistration = false);
     std::shared_ptr<ReverseConnectionHolder> getOrCreateHolder(const String& hostName);
 
+    const OutgoingTunnelPool& m_outgoingTunnelPool;
     std::unique_ptr<hpm::api::AbstractMediatorClientTcpConnection> m_mediatorConnection;
     ReverseAcceptor m_acceptor;
     HostAddress m_publicIp;

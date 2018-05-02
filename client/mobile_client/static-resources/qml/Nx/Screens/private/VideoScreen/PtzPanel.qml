@@ -40,6 +40,7 @@ Item
         zoomInPressed: zoomControl.zoomInPressed
         zoomOutPressed: zoomControl.zoomOutPressed
         moveDirection: joystick.direction
+        customRotation: control.customRotation
 
         Connections
         {

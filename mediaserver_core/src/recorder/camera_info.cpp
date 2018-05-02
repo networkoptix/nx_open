@@ -147,13 +147,6 @@ bool ServerWriterHandler::handleFileData(const QString& path, const QByteArray& 
     if (!storage)
         return false;
 
-    if (!storage->removeFile(path))
-    {
-        NX_LOG(lit("%1. Remove camera info file failed for this path: %2")
-                .arg(Q_FUNC_INFO)
-                .arg(path), cl_logDEBUG1);
-        return false;
-    }
     auto outFile = std::unique_ptr<QIODevice>(storage->open(path, QIODevice::WriteOnly));
     if (!outFile)
     {
@@ -234,7 +227,7 @@ void Reader::operator()(ArchiveCameraDataList* outArchiveCameraList)
 
 bool Reader::initArchiveCamData()
 {
-    ec2::ApiCameraData& coreData = m_archiveCamData.coreData;
+    nx::vms::api::CameraData& coreData = m_archiveCamData.coreData;
 
     coreData.physicalId = m_fileInfo->fileName();
     if (coreData.physicalId.isEmpty())
@@ -362,7 +355,7 @@ Reader::ParseResult Reader::parseLine(const QString& line) const
 
 void Reader::addProperty(const ParseResult& result)
 {
-    ec2::ApiCameraData& coreData = m_archiveCamData.coreData;
+    nx::vms::api::CameraData& coreData = m_archiveCamData.coreData;
 
     if (result.key().contains(kArchiveCameraNameKey))
         coreData.name = result.value();
@@ -373,7 +366,13 @@ void Reader::addProperty(const ParseResult& result)
     else if (result.key().contains(kArchiveCameraGroupNameKey))
         coreData.groupName = result.value();
     else if (result.key().contains(kArchiveCameraUrlKey))
+    {
         coreData.url = result.value();
+
+        // TODO: #wearable This is a hack, and I'm failing to see an easy workaround.
+        if (coreData.url.startsWith(lit("wearable://")))
+            coreData.typeId = QnResourceTypePool::kWearableCameraTypeUuid;
+    }
     else
         m_archiveCamData.properties.emplace_back(result.key(), result.value());
 }

@@ -1,6 +1,4 @@
-$icon-font-path: "../fonts/";
-
-@import '../bower_components/bootstrap-sass/assets/stylesheets/bootstrap';
+@import '~bootstrap-sass/assets/stylesheets/bootstrap';
 @import '../web_common/styles/common';
 
 .webclient{
@@ -175,6 +173,7 @@ html.webclient-page{
 
 /* help section*/
 .scroll-wrapper{
+  width: 100%;
   height:100%;
   position:absolute;
   top:0;

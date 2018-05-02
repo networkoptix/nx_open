@@ -1,8 +1,3 @@
-/**********************************************************
-* Dec 21, 2015
-* a.kolesnikov
-***********************************************************/
-
 #include "settings.h"
 
 #include <thread>
@@ -255,7 +250,7 @@ void Settings::loadSettings()
     const auto cdbUrlStr = settings().value(kCdbUrl, kDefaultCdbUrl).toString();
     if (!cdbUrlStr.isEmpty())
     {
-        m_cloudDB.url = QUrl(cdbUrlStr);
+        m_cloudDB.url = nx::utils::Url(cdbUrlStr);
     }
     else
     {
@@ -264,10 +259,10 @@ void Settings::loadSettings()
         if (!endpointString.isEmpty())
         {
             // Supporting both url and host:port here.
-            m_cloudDB.url = QUrl(endpointString);
+            m_cloudDB.url = nx::utils::Url(endpointString);
             if (m_cloudDB.url->host().isEmpty() || m_cloudDB.url->scheme().isEmpty())
             {
-                const SocketAddress endpoint(endpointString);
+                const network::SocketAddress endpoint(endpointString);
                 *m_cloudDB.url = nx::network::url::Builder()
                     .setScheme("http").setHost(endpoint.address.toString())
                     .setPort(endpoint.port).toUrl();
@@ -289,7 +284,7 @@ void Settings::loadSettings()
         settings().value(kStunEndpointsToListen, kDefaultStunEndpointsToListen).toString(),
         &m_stun.addrToListenList);
 
-    m_stun.keepAliveOptions = KeepAliveOptions::fromString(
+    m_stun.keepAliveOptions = network::KeepAliveOptions::fromString(
         settings().value(kStunKeepAliveOptions, kDefaultStunKeepAliveOptions).toString());
 
     m_stun.connectionInactivityTimeout = nx::utils::parseOptionalTimerDuration(
@@ -299,12 +294,13 @@ void Settings::loadSettings()
         settings().value(kHttpEndpointsToListen, kDefaultHttpEndpointsToListen).toString(),
         &m_http.addrToListenList);
 
-    m_http.keepAliveOptions = KeepAliveOptions::fromString(
+    m_http.keepAliveOptions = network::KeepAliveOptions::fromString(
         settings().value(kHttpKeepAliveOptions, kDefaultHttpKeepAliveOptions).toString());
 
     m_http.connectionInactivityTimeout = nx::utils::parseOptionalTimerDuration(
         settings().value(kHttpConnectionInactivityTimeout).toString(), kDefaultHttpInactivityTimeout);
 
+    m_dbConnectionOptions.dbName = m_general.dataDir + "/" + m_dbConnectionOptions.dbName;
     m_dbConnectionOptions.loadFromSettings(settings());
 
     //Statistics
@@ -372,15 +368,15 @@ void Settings::loadConnectionParameters()
     m_connectionParameters.tcpReverseHttpTimeouts.sendTimeout =
         nx::utils::parseTimerDuration(settings().value(
             tcp_reverse_http_timeouts::kSend).toString(),
-            nx_http::AsyncHttpClient::Timeouts::kDefaultSendTimeout);
+            nx::network::http::AsyncHttpClient::Timeouts::kDefaultSendTimeout);
     m_connectionParameters.tcpReverseHttpTimeouts.responseReadTimeout =
         nx::utils::parseTimerDuration(settings().value(
             tcp_reverse_http_timeouts::kRead).toString(),
-            nx_http::AsyncHttpClient::Timeouts::kDefaultResponseReadTimeout);
+            nx::network::http::AsyncHttpClient::Timeouts::kDefaultResponseReadTimeout);
     m_connectionParameters.tcpReverseHttpTimeouts.messageBodyReadTimeout =
         nx::utils::parseTimerDuration(settings().value(
             tcp_reverse_http_timeouts::kBody).toString(),
-            nx_http::AsyncHttpClient::Timeouts::kDefaultMessageBodyReadTimeout);
+            nx::network::http::AsyncHttpClient::Timeouts::kDefaultMessageBodyReadTimeout);
 
     m_connectionParameters.connectionAckAwaitTimeout =
         nx::utils::parseTimerDuration(
@@ -429,14 +425,14 @@ void Settings::loadListeningPeer()
 
 void Settings::readEndpointList(
     const QString& str,
-    std::list<SocketAddress>* const addrToListenList)
+    std::list<network::SocketAddress>* const addrToListenList)
 {
     const QStringList& httpAddrToListenStrList = str.split(',');
     std::transform(
         httpAddrToListenStrList.begin(),
         httpAddrToListenStrList.end(),
         std::back_inserter(*addrToListenList),
-        [](const QString& str) { return SocketAddress(str); });
+        [](const QString& str) { return network::SocketAddress(str); });
 }
 
 } // namespace conf

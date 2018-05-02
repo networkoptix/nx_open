@@ -32,13 +32,22 @@ namespace QnUbjson {
     }
 
     template<class T>
-    T deserialized(const QByteArray &value, const T &defaultValue = T(), bool *success = NULL) {
+    T deserialized(const QByteArray& value, const T& defaultValue = T(), bool* success = nullptr)
+    {
         T target;
         QnUbjsonReader<QByteArray> stream(&value);
-        bool result = QnUbjson::deserialize(&stream, &target);
+        const bool result = QnUbjson::deserialize(&stream, &target);
         if (success)
             *success = result;
-        return result ? target : defaultValue;
+
+        if (result)
+        {
+            T local; // Enforcing NRVO, which is blocked by address-taking operator above.
+            std::swap(local, target);
+            return local;
+        }
+
+        return defaultValue;
     }
 
 } // namespace QnUbjson

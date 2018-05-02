@@ -1,11 +1,16 @@
 #include <thread>
+#include <type_traits>
 
 #include <gtest/gtest.h>
 
-#include <nx/network/cloud/address_resolver.h>
+#include <nx/network/address_resolver.h>
+#include <nx/network/socket_global.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/cloud/cloud_connect_settings.h>
 #include <nx/network/cloud/tunnel/connector_factory.h>
 #include <nx/network/cloud/tunnel/relay/api/relay_api_client.h>
 #include <nx/utils/std/future.h>
+#include <nx/utils/std/optional.h>
 #include <nx/utils/sync_call.h>
 
 #include "basic_test_fixture.h"
@@ -15,10 +20,21 @@ namespace network {
 namespace cloud {
 namespace test {
 
+template <typename T>
 class Relaying:
     public BasicTestFixture
 {
     using base_type = BasicTestFixture;
+
+public:
+    ~Relaying()
+    {
+        if (m_useHttpConnectToListenOnRelayBak)
+        {
+            SocketGlobals::cloud().settings().useHttpConnectToListenOnRelay =
+               *m_useHttpConnectToListenOnRelayBak;
+        }
+    }
 
 protected:
     void startMoreConnectionsThatAreFoundOnRelay()
@@ -58,47 +74,66 @@ protected:
     }
 
 private:
+    std::optional<bool> m_useHttpConnectToListenOnRelayBak;
+
     virtual void SetUp() override
     {
         base_type::SetUp();
 
         // Disabling every method except relaying.
-        ConnectorFactory::setEnabledCloudConnectMask((int)CloudConnectType::proxy);
+        ConnectorFactory::setEnabledCloudConnectMask((int)ConnectType::proxy);
+
+        m_useHttpConnectToListenOnRelayBak =
+            SocketGlobals::cloud().settings().useHttpConnectToListenOnRelay;
+        SocketGlobals::cloud().settings().useHttpConnectToListenOnRelay = T::value;
 
         startServer();
     }
 };
 
+TYPED_TEST_CASE_P(Relaying);
+
 //-------------------------------------------------------------------------------------------------
 // Test cases.
 
-TEST_F(Relaying, server_socket_registers_itself_on_relay)
+TYPED_TEST_P(Relaying, server_socket_registers_itself_on_relay)
 {
-    assertServerIsListeningOnRelay();
+    this->assertServerIsListeningOnRelay();
 }
 
-TEST_F(Relaying, connection_can_be_established)
+TYPED_TEST_P(Relaying, connection_can_be_established)
 {
-    assertConnectionCanBeEstablished();
+    this->assertConnectionCanBeEstablished();
 }
 
-TEST_F(Relaying, connecting_using_full_server_name)
+TYPED_TEST_P(Relaying, connecting_using_full_server_name)
 {
-    setRemotePeerName(cloudSystemCredentials().hostName());
-    assertConnectionCanBeEstablished();
+    this->setRemotePeerName(this->cloudSystemCredentials().hostName());
+    this->assertConnectionCanBeEstablished();
 }
 
-TEST_F(Relaying, exchanging_fixed_data)
+TYPED_TEST_P(Relaying, exchanging_fixed_data)
 {
-    startExchangingFixedData();
-    assertDataHasBeenExchangedCorrectly();
+    this->startExchangingFixedData();
+    this->assertDataHasBeenExchangedCorrectly();
 }
 
-TEST_F(Relaying, multiple_connections)
+TYPED_TEST_P(Relaying, multiple_connections)
 {
-    startMoreConnectionsThatAreFoundOnRelay();
-    assertDataHasBeenExchangedCorrectly();
+    this->startMoreConnectionsThatAreFoundOnRelay();
+    this->assertDataHasBeenExchangedCorrectly();
 }
+
+REGISTER_TYPED_TEST_CASE_P(
+    Relaying,
+    server_socket_registers_itself_on_relay,
+    connection_can_be_established,
+    connecting_using_full_server_name,
+    exchanging_fixed_data,
+    multiple_connections);
+
+INSTANTIATE_TYPED_TEST_CASE_P(UsingHttpConnectRelaying, Relaying, std::true_type);
+INSTANTIATE_TYPED_TEST_CASE_P(NotUsingHttpConnect, Relaying, std::false_type);
 
 } // namespace test
 } // namespace cloud

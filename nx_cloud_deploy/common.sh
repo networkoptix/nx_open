@@ -33,6 +33,20 @@ function check_vms_dirs()
     is_dir_by_var NX_VMS_DIR || { echo Exiting..; exit 1; }
 }
 
+function stage_cmake()
+{
+    local cmakeBuildDirectory=$1
+    local moduleName=$2
+
+    rm -rf stage
+
+    mkdir -p stage/$moduleName/bin stage/$moduleName/lib stage/qt/lib stage/qt/bin stage/var/log
+    cp -rl $cmakeBuildDirectory/bin/$moduleName stage/$moduleName/bin/$moduleName
+    cp -rl $cmakeBuildDirectory/lib/* stage/$moduleName/lib
+
+    mv stage/$moduleName/lib/libQt* stage/qt/lib/
+}
+
 function pack()
 {
     echo "Packing $MODULE:$VERSION to a container"
@@ -95,6 +109,10 @@ function main()
         if [ "$func" = "publish" ]
         then
             args="$1"; shift; n=$((n+1))
+        fi
+        if [ "$func" = "stage_cmake" ]
+        then
+            args="$1 $2"; shift; n=$((n+2))
         fi
 
         $func $args

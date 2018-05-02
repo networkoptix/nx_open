@@ -18,7 +18,7 @@ protected:
             system().id,
             &m_transactionLog);
     }
-    
+
     void thenTransactionLogIsProvided()
     {
         ASSERT_EQ(api::ResultCode::ok, m_prevRequestResult);

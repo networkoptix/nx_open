@@ -1,5 +1,4 @@
-#ifndef __TRANSACTION_DESCRIPTOR_H__
-#define __TRANSACTION_DESCRIPTOR_H__
+#pragma once
 
 #include <utility>
 #include <functional>
@@ -19,17 +18,19 @@
 #include <core/resource_access/user_access_data.h>
 
 #include "transaction.h"
+#include "abstract_persistent_storage.h"
+#include "nx_ec/access_helpers.h"
 #include "nx_ec/ec_api.h"
-#include "nx_ec/data/api_business_rule_data.h"
-#include "nx_ec/data/api_camera_data.h"
-#include "nx_ec/data/api_camera_attributes_data.h"
+#include <nx/vms/api/data/event_rule_data.h>
+#include <nx/vms/api/data/camera_data.h>
+#include <nx/vms/api/data/camera_attributes_data.h>
 #include "nx_ec/data/api_media_server_data.h"
 #include "nx_ec/data/api_user_data.h"
 #include "nx_ec/data/api_tran_state_data.h"
-#include "nx_ec/data/api_layout_data.h"
-#include "nx_ec/data/api_videowall_data.h"
-#include "nx_ec/data/api_camera_history_data.h"
-#include "nx_ec/data/api_stored_file_data.h"
+#include "nx/vms/api/data/layout_data.h"
+#include <nx/vms/api/data/videowall_data.h>
+#include <nx/vms/api/data/camera_history_data.h>
+#include <nx/vms/api/data/stored_file_data.h>
 #include "nx_ec/data/api_full_info_data.h"
 #include "nx_ec/data/api_license_data.h"
 #include "nx_ec/data/api_cleanup_db_data.h"
@@ -40,19 +41,17 @@
 #include "nx_ec/data/api_runtime_data.h"
 #include "nx_ec/data/api_license_overflow_data.h"
 #include "nx_ec/data/api_peer_system_time_data.h"
-#include "nx_ec/data/api_webpage_data.h"
-#include "nx_ec/data/api_connection_data.h"
+#include "nx/vms/api/data/webpage_data.h"
+#include <nx/vms/api/data/connection_data.h>
 #include "nx_ec/data/api_statistics.h"
-#include "nx_ec/data/api_resource_type_data.h"
-#include "nx_ec/data/api_lock_data.h"
+#include <nx/vms/api/data/resource_type_data.h>
+#include <nx/vms/api/data/lock_data.h>
 
 #include "nx/utils/type_utils.h"
 
 class QnCommonModule;
 
 namespace ec2 {
-
-class QnTransactionLog;
 
 class AbstractECConnection;
 class QnLicenseNotificationManager;
@@ -69,10 +68,6 @@ class QnStoredFileNotificationManager;
 class QnUpdatesNotificationManager;
 class QnMiscNotificationManager;
 class QnDiscoveryNotificationManager;
-namespace detail
-{
-    class QnDbManager;
-}
 
 enum class RemotePeerAccess
 {
@@ -80,35 +75,6 @@ enum class RemotePeerAccess
     Forbidden,
     Partial
 };
-
-namespace access_helpers {
-
-enum class Mode
-{
-    read,
-    write
-};
-
-using KeyValueFilterType        =   std::pair<const QString&, QString*>;
-using FilterFunctorType         =   std::function<bool(Mode mode, const Qn::UserAccessData&, KeyValueFilterType*)>;
-using FilterFunctorListType     =   std::vector<FilterFunctorType>;
-
-namespace detail {
-std::vector<QString> getRestrictedKeysByMode(Mode mode);
-}
-
-bool kvSystemOnlyFilter(Mode mode, const Qn::UserAccessData& accessData, KeyValueFilterType* keyValue);
-bool kvSystemOnlyFilter(Mode mode, const Qn::UserAccessData& accessData, const QString& key, QString* value);
-bool kvSystemOnlyFilter(Mode mode, const Qn::UserAccessData& accessData, const QString& key);
-
-void applyValueFilters(
-    Mode mode,
-    const Qn::UserAccessData& accessData,
-    KeyValueFilterType* keyValue,
-    const FilterFunctorListType& filterList,
-    bool* allowed = nullptr);
-
-} // namespace access_helpers
 
 namespace detail {
 
@@ -130,16 +96,10 @@ template<typename ParamType>
 using CheckRemotePeerAccessFuncType = std::function<RemotePeerAccess(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ParamType&)>;
 
 template<typename ParamType>
-using GetTransactionTypeFuncType = std::function<ec2::TransactionType::Value(QnCommonModule*, const ParamType&, detail::QnDbManager*)>;
+using GetTransactionTypeFuncType = std::function<ec2::TransactionType::Value(QnCommonModule*, const ParamType&, AbstractPersistentStorage*)>;
 
 template<typename ParamType>
 using GetHashFuncType = std::function<QnUuid(ParamType const &)>;
-
-template<typename ParamType>
-using SaveTranFuncType = std::function<ErrorCode(const QnTransaction<ParamType>&, QnTransactionLog*)>;
-
-template<typename ParamType>
-using SaveSerializedTranFuncType = std::function<ErrorCode(const QnTransaction<ParamType> &, const QByteArray&, QnTransactionLog*)>;
 
 template<typename ParamType>
 using CreateTransactionFromAbstractTransactionFuncType = std::function<QnTransaction<ParamType>(const QnAbstractTransaction& tran)>;
@@ -193,8 +153,6 @@ struct TransactionDescriptor : TransactionDescriptorBase
     typedef ParamType paramType;
 
     GetHashFuncType<ParamType> getHashFunc;
-    SaveTranFuncType<ParamType> saveFunc;
-    SaveSerializedTranFuncType<ParamType> saveSerializedFunc;
     CreateTransactionFromAbstractTransactionFuncType<ParamType> createTransactionFromAbstractTransactionFunc;
     TriggerNotificationFuncType<ParamType> triggerNotificationFunc;
     CheckSavePermissionFuncType<ParamType> checkSavePermissionFunc;
@@ -206,8 +164,6 @@ struct TransactionDescriptor : TransactionDescriptorBase
 
     template<
 		typename GetHashF,
-		typename SaveF,
-		typename SaveSerializedF,
 		typename CreateTranF,
 		typename TriggerNotificationF,
 		typename CheckSavePermissionFunc,
@@ -222,8 +178,6 @@ struct TransactionDescriptor : TransactionDescriptorBase
         bool isSystem,
         const char* name,
         GetHashF&& getHashFunc,
-        SaveF&& saveFunc,
-        SaveSerializedF&& saveSerializedFunc,
         CreateTranF&& createTransactionFromAbstractTransactionFunc,
         TriggerNotificationF&& triggerNotificationFunc,
         CheckSavePermissionFunc&& checkSavePermissionFunc,
@@ -235,8 +189,6 @@ struct TransactionDescriptor : TransactionDescriptorBase
         :
         TransactionDescriptorBase(value, isPersistent, isSystem, name),
         getHashFunc(std::forward<GetHashF>(getHashFunc)),
-        saveFunc(std::forward<SaveF>(saveFunc)),
-        saveSerializedFunc(std::forward<SaveSerializedF>(saveSerializedFunc)),
         createTransactionFromAbstractTransactionFunc(std::forward<CreateTranF>(createTransactionFromAbstractTransactionFunc)),
         triggerNotificationFunc(std::forward<TriggerNotificationF>(triggerNotificationFunc)),
         checkSavePermissionFunc(std::forward<CheckSavePermissionFunc>(checkSavePermissionFunc)),
@@ -338,5 +290,3 @@ static QnUuid transactionHash(ApiCommand::Value command, const Param &param)
 }
 
 } //namespace ec2
-
-#endif

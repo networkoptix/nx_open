@@ -97,7 +97,8 @@ bool SoftwareTriggerButton::isLive() const
 void SoftwareTriggerButton::setLive(bool value)
 {
     Q_D(SoftwareTriggerButton);
-    d->setLive(value);
+    if (d->setLive(value))
+        emit isLiveChanged();
 }
 
 void SoftwareTriggerButton::paint(QPainter* painter,

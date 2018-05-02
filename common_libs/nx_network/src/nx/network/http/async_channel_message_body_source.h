@@ -9,7 +9,9 @@
 
 #include "abstract_msg_body_source.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 template<typename AsyncChannel>
 class AsyncChannelMessageBodySource:
@@ -49,12 +51,12 @@ public:
             void(SystemError::ErrorCode, BufferType)> completionHandler) override
     {
         const std::size_t kReadBufferSize = 16 * 1024;
-            
+
         using namespace std::placeholders;
 
         if (messageBodyTransferLimitHasBeenReached())
             return reportEndOfMessageBody(std::move(completionHandler));
-        
+
         m_completionHandler.swap(completionHandler);
 
         m_readBuffer.reserve(kReadBufferSize);
@@ -74,7 +76,7 @@ public:
 private:
     StringType m_mimeType;
     std::unique_ptr<AsyncChannel> m_channel;
-    nx_http::BufferType m_readBuffer;
+    nx::network::http::BufferType m_readBuffer;
     nx::utils::MoveOnlyFunc<
         void(SystemError::ErrorCode, BufferType)> m_completionHandler;
     boost::optional<std::uint64_t> m_messageBodyLimit;
@@ -106,7 +108,7 @@ private:
         SystemError::ErrorCode systemErrorCode,
         std::size_t /*bytesRead*/)
     {
-        nx_http::BufferType readBuffer;
+        nx::network::http::BufferType readBuffer;
         m_readBuffer.swap(readBuffer);
 
         if (m_messageBodyLimit && (m_totalBytesSent + readBuffer.size() > *m_messageBodyLimit))
@@ -122,9 +124,9 @@ private:
 };
 
 template<typename AsyncChannel>
-std::unique_ptr<AsyncChannelMessageBodySource<AsyncChannel>> 
+std::unique_ptr<AsyncChannelMessageBodySource<AsyncChannel>>
     makeAsyncChannelMessageBodySource(
-        nx_http::StringType mimeType,
+        nx::network::http::StringType mimeType,
         std::unique_ptr<AsyncChannel> asyncChannel)
 {
     return std::make_unique<AsyncChannelMessageBodySource<AsyncChannel>>(
@@ -132,4 +134,6 @@ std::unique_ptr<AsyncChannelMessageBodySource<AsyncChannel>>
         std::move(asyncChannel));
 }
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

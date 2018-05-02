@@ -1,5 +1,7 @@
 #include "active_camera_thumbnail_loader_p.h"
 
+#include <chrono>
+
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <api/server_rest_connection.h>
@@ -27,8 +29,6 @@ QnActiveCameraThumbnailLoaderPrivate::QnActiveCameraThumbnailLoaderPrivate(
     requestId(invalidRequest),
     decompressThread(new QThread(this))
 {
-    request.roundMethod = QnThumbnailRequestData::KeyFrameAfterMethod;
-
     screenshotQualityList.append(128);
     screenshotQualityList.append(240);
     screenshotQualityList.append(320);
@@ -78,43 +78,50 @@ void QnActiveCameraThumbnailLoaderPrivate::refresh(bool force)
     if (!server)
         return;
 
+    using namespace std::chrono;
+
     request.camera = camera;
-    request.msecSinceEpoch = position;
+    request.usecSinceEpoch = microseconds(milliseconds(position)).count();
     request.size = currentSize();
 
-    auto handleReply = [this] (bool success, rest::Handle handleId, const QByteArray &imageData)
-    {
-        if (requestId != handleId)
-            return;
-
-        requestId = invalidRequest;
-
-        if (currentQuality < screenshotQualityList.size() - 1 && !fetchTimer.hasExpired(fastTimeout))
-            ++currentQuality;
-        else if (currentQuality > 0 && fetchTimer.hasExpired(longTimeout))
-            --currentQuality;
-
-        if (requestNextAfterReply)
+    const auto handleReply =
+        [this](
+            bool success,
+            rest::Handle handleId,
+            QByteArray imageData,
+            const nx::network::http::HttpHeaders& /*headers*/)
         {
-            requestNextAfterReply = false;
-            refresh();
-        }
+            if (requestId != handleId)
+                return;
 
-        if (!success || imageData.isEmpty())
-            return;
+            requestId = invalidRequest;
 
-        {
-            QMutexLocker lk(&thumbnailMutex);
-            thumbnailPixmap = QPixmap::fromImage(decompressJpegImage(imageData));
-        }
+            if (currentQuality < screenshotQualityList.size() - 1 && !fetchTimer.hasExpired(fastTimeout))
+                ++currentQuality;
+            else if (currentQuality > 0 && fetchTimer.hasExpired(longTimeout))
+                --currentQuality;
 
-        Q_Q(QnActiveCameraThumbnailLoader);
-        if (camera)
-        {
-            thumbnailId = lit("%1/%2").arg(camera->getId().toString()).arg(position);
-            emit q->thumbnailIdChanged();
-        }
-    };
+            if (requestNextAfterReply)
+            {
+                requestNextAfterReply = false;
+                refresh();
+            }
+
+            if (!success || imageData.isEmpty())
+                return;
+
+            {
+                QMutexLocker lk(&thumbnailMutex);
+                thumbnailPixmap = QPixmap::fromImage(decompressJpegImage(imageData));
+            }
+
+            Q_Q(QnActiveCameraThumbnailLoader);
+            if (camera)
+            {
+                thumbnailId = lit("%1/%2").arg(camera->getId().toString()).arg(position);
+                emit q->thumbnailIdChanged();
+            }
+        };
 
     requestId = server->restConnection()->cameraThumbnailAsync(request, handleReply, decompressThread);
     fetchTimer.start();

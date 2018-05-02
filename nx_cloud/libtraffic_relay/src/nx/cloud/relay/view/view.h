@@ -14,6 +14,8 @@ namespace nx {
 namespace cloud {
 namespace relay {
 
+class AbstractStatisticsProvider;
+
 namespace conf { class Settings; }
 class Controller;
 class Model;
@@ -21,32 +23,44 @@ class Model;
 class View
 {
 public:
+    using MultiHttpServer =
+        network::server::MultiAddressServer<nx::network::http::HttpStreamSocketServer>;
+
     View(
         const conf::Settings& settings,
         const Model& model,
         Controller* controller);
     ~View();
 
+    void registerStatisticsApiHandlers(const AbstractStatisticsProvider&);
+
     void start();
 
-    std::vector<SocketAddress> httpEndpoints() const;
+    std::vector<network::SocketAddress> httpEndpoints() const;
+
+    const MultiHttpServer& httpServer() const;
 
 private:
-    using MultiHttpServer = network::server::MultiAddressServer<nx_http::HttpStreamSocketServer>;
-    using MultiHttpServerPtr = std::unique_ptr<MultiHttpServer>;
-
     const conf::Settings& m_settings;
     Controller* m_controller;
-    nx_http::server::rest::MessageDispatcher m_httpMessageDispatcher;
-    nx_http::AuthMethodRestrictionList m_authRestrictionList;
+    nx::network::http::server::rest::MessageDispatcher m_httpMessageDispatcher;
+    nx::network::http::AuthMethodRestrictionList m_authRestrictionList;
     view::AuthenticationManager m_authenticationManager;
-    MultiHttpServerPtr m_multiAddressHttpServer;
+    std::unique_ptr<MultiHttpServer> m_multiAddressHttpServer;
 
     void registerApiHandlers();
-    template<typename Handler, typename Manager>
-        void registerApiHandler(
-            const nx_http::StringType& method,
-            Manager* manager);
+    void registerCompatibilityHandlers();
+
+    template<typename Handler, typename Arg>
+    void registerApiHandler(
+        const nx::network::http::StringType& method,
+        Arg arg);
+
+    template<typename Handler, typename Arg>
+    void registerApiHandler(
+        const char* path,
+        const nx::network::http::StringType& method,
+        Arg arg);
 
     void startAcceptor();
 };

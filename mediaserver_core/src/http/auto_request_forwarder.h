@@ -14,7 +14,7 @@ public:
     QnAutoRequestForwarder(QnCommonModule* commonModule);
 
     /** Analyze request and add proxy information if needed. */
-    void processRequest(nx_http::Request* const request);
+    void processRequest(nx::network::http::Request* const request);
 
     /**
      * Ignore requests with path which ends with the specified wildcard mask, thus, may have an
@@ -47,36 +47,36 @@ private:
     QMultiHash<QString, QString> m_allowedPathPartByScheme;
     QHash<QString, QStringList> m_cameraIdUrlParamsByPath;
 
-    bool isPathIgnored(const nx_http::Request* request);
+    bool isPathIgnored(const nx::network::http::Request* request);
 
     bool findCamera(
-        const nx_http::Request& request,
+        const nx::network::http::Request& request,
         const QUrlQuery& urlQuery,
         QnResourcePtr* const resource);
 
     /** @return Null QnUuid if not found. */
     QnUuid findCameraIdAsCameraGuidHeader(
-        const nx_http::Request& request,
+        const nx::network::http::Request& request,
         const QUrlQuery& urlQuery);
 
     bool findCameraInUrlPath(
-        const nx_http::Request& request,
+        const nx::network::http::Request& request,
         const QUrlQuery& urlQuery,
         QnResourcePtr* const resource);
 
     bool findCameraInUrlQuery(
-        const nx_http::Request& request,
+        const nx::network::http::Request& request,
         const QUrlQuery& urlQuery,
         QnResourcePtr* const resource);
 
     /** @return UTC time (milliseconds). */
-    qint64 fetchTimestamp(const nx_http::Request& request, const QUrlQuery& urlQuery);
+    qint64 fetchTimestamp(const nx::network::http::Request& request, const QUrlQuery& urlQuery);
 
     /**
      * Update the request, to proxy it to the specified server.
      * @return True if the request was forwarded.
      */
     bool addProxyToRequest(
-        nx_http::Request* const request,
+        nx::network::http::Request* const request,
         const QnMediaServerResourcePtr& serverRes);
 };

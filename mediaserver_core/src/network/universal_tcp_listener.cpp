@@ -1,24 +1,26 @@
-
 #include "universal_tcp_listener.h"
 
-#include <common/common_module.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/cloud_server_socket.h>
+#include <nx/network/http/custom_headers.h>
 #include <nx/network/retry_timer.h>
 #include <nx/network/socket_global.h>
-#include <nx/network/stun/async_client.h>
-#include <nx/network/udt/udt_socket.h>
 #include <nx/network/ssl_socket.h>
+#include <nx/network/stun/async_client.h>
 #include <nx/network/system_socket.h>
+#include <nx/network/udt/udt_socket.h>
 #include <nx/utils/log/log.h>
 
-#include "cloud/cloud_connection_manager.h"
+#include <nx/vms/cloud_integration/cloud_connection_manager.h>
+
+#include <common/common_module.h>
+
 #include "proxy_sender_connection_processor.h"
 #include "universal_request_processor.h"
 
-
 QnUniversalTcpListener::QnUniversalTcpListener(
     QnCommonModule* commonModule,
-    const CloudConnectionManager& cloudConnectionManager,
+    const nx::vms::cloud_integration::CloudConnectionManager& cloudConnectionManager,
     const QHostAddress& address,
     int port,
     int maxConnections,
@@ -32,11 +34,11 @@ QnUniversalTcpListener::QnUniversalTcpListener(
         useSsl),
     m_cloudConnectionManager(cloudConnectionManager),
     m_boundToCloud(false),
-    m_httpModManager(new nx_http::HttpModManager())
+    m_httpModManager(new nx::network::http::HttpModManager())
 {
     m_cloudCredentials.serverId = commonModule->moduleGUID().toByteArray();
     Qn::directConnect(
-        &cloudConnectionManager, &CloudConnectionManager::cloudBindingStatusChanged,
+        &cloudConnectionManager, &nx::vms::cloud_integration::CloudConnectionManager::cloudBindingStatusChanged,
         this,
         [this, &cloudConnectionManager](bool /*boundToCloud*/)
         {
@@ -52,7 +54,7 @@ QnUniversalTcpListener::~QnUniversalTcpListener()
 }
 
 void QnUniversalTcpListener::addProxySenderConnections(
-    const SocketAddress& proxyUrl,
+    const nx::network::SocketAddress& proxyUrl,
     int size)
 {
     if (m_needStop)
@@ -72,63 +74,36 @@ void QnUniversalTcpListener::addProxySenderConnections(
 }
 
 QnTCPConnectionProcessor* QnUniversalTcpListener::createRequestProcessor(
-    QSharedPointer<AbstractStreamSocket> clientSocket)
+    QSharedPointer<nx::network::AbstractStreamSocket> clientSocket)
 {
     return new QnUniversalRequestProcessor(clientSocket, this, needAuth());
 }
 
-bool QnUniversalTcpListener::addServerSocketToMultipleSocket(const SocketAddress& localAddress,
-    nx::network::MultipleServerSocket* multipleServerSocket, int ipVersion)
-{
-    auto tcpServerSocket = SocketFactory::createStreamServerSocket(false,
-        nx::network::NatTraversalSupport::enabled, ipVersion);
-
-    if (!tcpServerSocket->setReuseAddrFlag(true) ||
-        !tcpServerSocket->bind(localAddress) ||
-        !tcpServerSocket->listen())
-    {
-        setLastError(SystemError::getLastOSErrorCode());
-        return false;
-    }
-
-    if (!multipleServerSocket->addSocket(std::move(tcpServerSocket)))
-    {
-        setLastError(SystemError::getLastOSErrorCode());
-        return false;
-    }
-
-    return true;
-}
-
-AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepareSocket(
+nx::network::AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepareSocket(
     bool sslNeeded,
-    const SocketAddress& localAddress)
+    const nx::network::SocketAddress& localAddress)
 {
     QnMutexLocker lk(&m_mutex);
+    if (m_preparedTcpSockets.empty())
+        m_preparedTcpSockets = createAndPrepareTcpSockets(localAddress);
+
+    if (m_preparedTcpSockets.empty())
+        return nullptr;
 
     auto multipleServerSocket = std::make_unique<nx::network::MultipleServerSocket>();
-    bool needToAddIpV4Socket = localAddress.address == HostAddress::anyHost
-        || (bool) localAddress.address.ipV4();
-
-    bool needToAddIpV6Socket = false;
-    // localAddress.address == HostAddress::anyHost
-    //     || (bool)localAddress.address.ipV6();
-
-    if (needToAddIpV4Socket)
+    for (auto& socket: m_preparedTcpSockets)
     {
-        if (!addServerSocketToMultipleSocket(localAddress, multipleServerSocket.get(), AF_INET))
+        if (!multipleServerSocket->addSocket(std::move(socket)))
+        {
+            setLastError(SystemError::getLastOSErrorCode());
             return nullptr;
+        }
+
         ++m_totalListeningSockets;
         ++m_cloudSocketIndex;
     }
 
-    if (needToAddIpV6Socket)
-    {
-        if (!addServerSocketToMultipleSocket(localAddress, multipleServerSocket.get(), AF_INET6))
-            return nullptr;
-        ++m_totalListeningSockets;
-        ++m_cloudSocketIndex;
-    }
+    m_preparedTcpSockets.clear();
 
     #ifdef LISTEN_ON_UDT_SOCKET
         auto udtServerSocket = std::make_unique<nx::network::UdtStreamServerSocket>();
@@ -152,7 +127,8 @@ AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepareSocket(
         if (sslNeeded)
         {
             m_serverSocket = std::make_unique<nx::network::deprecated::SslServerSocket>(
-                std::move(m_serverSocket), true);
+                std::move(m_serverSocket),
+                true);
         }
     #endif
 
@@ -160,7 +136,7 @@ AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepareSocket(
 }
 
 void QnUniversalTcpListener::destroyServerSocket(
-    AbstractStreamServerSocket* serverSocket)
+    nx::network::AbstractStreamServerSocket* serverSocket)
 {
     decltype(m_serverSocket) serverSocketToDestroy;
     {
@@ -222,7 +198,7 @@ void QnUniversalTcpListener::updateCloudConnectState(
 
         auto cloudServerSocket =
             std::make_unique<nx::network::cloud::CloudServerSocket>(
-                &nx::network::SocketGlobals::mediatorConnector(),
+                &nx::network::SocketGlobals::cloud().mediatorConnector(),
                 std::move(registrationOnMediatorRetryPolicy));
         cloudServerSocket->listen(0);
         m_multipleServerSocket->addSocket(std::move(cloudServerSocket));
@@ -234,12 +210,91 @@ void QnUniversalTcpListener::updateCloudConnectState(
     }
 }
 
-void QnUniversalTcpListener::applyModToRequest(nx_http::Request* request)
+void QnUniversalTcpListener::applyModToRequest(nx::network::http::Request* request)
 {
     m_httpModManager->apply(request);
 }
 
-nx_http::HttpModManager* QnUniversalTcpListener::httpModManager() const
+bool QnUniversalTcpListener::isAuthentificationRequired(nx::network::http::Request& request)
+{
+    const auto targetHeader = request.headers.find(Qn::SERVER_GUID_HEADER_NAME);
+    if (targetHeader == request.headers.end())
+        return true; //< Only server proxy allowed.
+
+    if (QnUuid(targetHeader->second) == commonModule()->moduleGUID())
+        return true; //< Self proxy is not a proxy.
+
+    if (!QUrlQuery(request.requestLine.url.toQUrl()).hasQueryItem(lit("authKey")))
+        return true; //< Temporary authorization is required.
+
+    const auto requestPath = request.requestLine.url.path();
+    for (const auto& path: m_unauthorizedForwardingPaths)
+    {
+        if (requestPath.startsWith(path))
+            return false;
+    }
+
+    return true;
+}
+
+void QnUniversalTcpListener::enableUnauthorizedForwarding(const QString& path)
+{
+    m_unauthorizedForwardingPaths.insert(lit("/") + path + lit("/"));
+}
+
+void QnUniversalTcpListener::setPreparedTcpSockets(
+    std::vector<std::unique_ptr<nx::network::AbstractStreamServerSocket>> sockets)
+{
+    m_preparedTcpSockets = std::move(sockets);
+}
+
+std::vector<std::unique_ptr<nx::network::AbstractStreamServerSocket>> 
+    QnUniversalTcpListener::createAndPrepareTcpSockets(const nx::network::SocketAddress& localAddress)
+{
+    uint16_t assignedPort = 0;
+    std::vector<std::unique_ptr<nx::network::AbstractStreamServerSocket>> sockets;
+    const auto addSocket =
+        [&](nx::network::SocketAddress localAddress, int ipVersion)
+        {
+            if (assignedPort)
+                localAddress.port = assignedPort;
+
+            auto socket = nx::network::SocketFactory::createStreamServerSocket(
+                false,
+                nx::network::NatTraversalSupport::enabled,
+                ipVersion);
+
+            if (!socket->setReuseAddrFlag(true) ||
+                !socket->setReusePortFlag(true) ||
+                !socket->bind(localAddress) ||
+                !socket->listen())
+            {
+                return false;
+            }
+
+            assignedPort = socket->getLocalAddress().port;
+            sockets.push_back(std::move(socket));
+            return true;
+        };
+
+    if (localAddress.address.toString() == nx::network::HostAddress::anyHost.toString()
+        || (bool) localAddress.address.ipV4())
+    {
+        if (!addSocket(localAddress, AF_INET))
+            return {};
+    }
+
+    if (localAddress.address.toString() == nx::network::HostAddress::anyHost.toString()
+        || (bool) localAddress.address.isPureIpV6())
+    {
+        if (!addSocket(localAddress, AF_INET6))
+            return {};
+    }
+
+    return sockets;
+}
+
+nx::network::http::HttpModManager* QnUniversalTcpListener::httpModManager() const
 {
     return m_httpModManager.get();
 }

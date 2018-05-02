@@ -3,7 +3,7 @@
 #include <QtCore/QDateTime>
 
 #include <nx/utils/timer_manager.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx_ec/ec_api.h>
 #include <nx_ec/data/api_statistics.h>
@@ -41,12 +41,12 @@ namespace ec2
         ErrorCode initiateReport(QString* reportApi = 0);
 
     private:
-        void finishReport(nx_http::AsyncHttpClientPtr httpClient);
+        void finishReport(nx::network::http::AsyncHttpClientPtr httpClient);
 
     private:
         ec2::AbstractECConnection* m_ec2Connection;
 
-        nx_http::AsyncHttpClientPtr m_httpClient;
+        nx::network::http::AsyncHttpClientPtr m_httpClient;
         bool m_firstTime;
         boost::optional<QDateTime> m_plannedReportTime;
         uint m_timerCycle;

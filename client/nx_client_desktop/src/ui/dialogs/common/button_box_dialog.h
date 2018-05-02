@@ -17,7 +17,7 @@ class QnButtonBoxDialog: public Connective<QnDialog> {
     typedef Connective<QnDialog> base_type;
 
 public:
-    QnButtonBoxDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
+    QnButtonBoxDialog(QWidget *parent, Qt::WindowFlags windowFlags = 0);
     virtual ~QnButtonBoxDialog();
 
     QDialogButtonBox::StandardButton clickedButton() const {

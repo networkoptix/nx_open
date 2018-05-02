@@ -64,6 +64,7 @@ pip install -r build_scripts/requirements.txt
 pushd front_end
     echo "npm install cloud portal"
     npm install
+    npm rebuild node-sass
 popd
 pushd ../webadmin
     echo "npm install webadmin"

@@ -1,2 +1,2 @@
-deb http://ppa.launchpad.net/jonathonf/python-3.6/ubuntu trusty main
-# deb-src http://ppa.launchpad.net/jonathonf/python-3.6/ubuntu trusty main
+deb http://ppa.launchpad.net/jonathonf/python-3.6/ubuntu xenial main
+# deb-src http://ppa.launchpad.net/jonathonf/python-3.6/ubuntu xenial main

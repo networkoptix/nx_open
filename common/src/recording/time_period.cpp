@@ -21,51 +21,6 @@ namespace detail {
     QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES((QnTimePeriod), (json))
 }
 
-namespace {
-    const qint64 infiniteDuration = -1;
-}
-
-
-bool operator < (const QnTimePeriod& first, const QnTimePeriod& other)
-{
-    return first.startTimeMs < other.startTimeMs;
-}
-
-bool operator < (qint64 first, const QnTimePeriod& other)
-{
-    return first < other.startTimeMs;
-}
-
-bool operator < (const QnTimePeriod& other, qint64 first)
-{
-    return other.startTimeMs < first;
-}
-
-const qint64 QnTimePeriod::kMaxTimeValue = std::numeric_limits<qint64>::max();
-const qint64 QnTimePeriod::kMinTimeValue = 0;
-
-QnTimePeriod::QnTimePeriod() :
-    startTimeMs(0),
-    durationMs(0)
-{}
-
-QnTimePeriod::QnTimePeriod(qint64 startTimeMs, qint64 durationMs) :
-    startTimeMs(startTimeMs),
-    durationMs(durationMs)
-{}
-
-QnTimePeriod QnTimePeriod::fromInterval(qint64 startTimeMs
-    , qint64 endTimeMs)
-{
-    NX_ASSERT(endTimeMs >= startTimeMs, Q_FUNC_INFO
-        , "Start time could not be greater than end time");
-
-    if (endTimeMs >= startTimeMs)
-        return QnTimePeriod(startTimeMs, endTimeMs - startTimeMs);
-
-    return QnTimePeriod();
-}
-
 void QnTimePeriod::clear()
 {
     startTimeMs = 0;
@@ -78,6 +33,25 @@ qint64 QnTimePeriod::endTimeMs() const
         return DATETIME_NOW;
 
     return startTimeMs + durationMs;
+}
+
+bool QnTimePeriod::isLeftIntersection(const QnTimePeriod& other) const
+{
+    return other.startTimeMs < startTimeMs
+        && other.endTimeMs() > startTimeMs
+        && other.endTimeMs() < endTimeMs();
+}
+
+bool QnTimePeriod::isRightIntersection(const QnTimePeriod& other) const
+{
+    return other.startTimeMs > startTimeMs
+        && other.startTimeMs < endTimeMs()
+        && other.endTimeMs() > endTimeMs();
+}
+
+bool QnTimePeriod::isContainedIn(const QnTimePeriod& other) const
+{
+    return startTimeMs >= other.startTimeMs && endTimeMs() <= other.endTimeMs();
 }
 
 bool QnTimePeriod::contains(const QnTimePeriod &timePeriod) const
@@ -105,8 +79,8 @@ void QnTimePeriod::addPeriod(const QnTimePeriod &timePeriod)
     qint64 endPoint2 = timePeriod.startTimeMs + timePeriod.durationMs;
 
     startTimeMs = qMin(startTimeMs, timePeriod.startTimeMs);
-    if (durationMs == ::infiniteDuration || timePeriod.durationMs == ::infiniteDuration)
-        durationMs = ::infiniteDuration;
+    if (durationMs == infiniteDuration() || timePeriod.durationMs == infiniteDuration())
+        durationMs = infiniteDuration();
     else
         durationMs = qMax(endPoint1, endPoint2) - startTimeMs;
 }
@@ -114,7 +88,7 @@ void QnTimePeriod::addPeriod(const QnTimePeriod &timePeriod)
 QnTimePeriod QnTimePeriod::intersected(const QnTimePeriod &other) const
 {
     if (isInfinite() && other.isInfinite())
-        return QnTimePeriod(qMax(startTimeMs, other.startTimeMs), ::infiniteDuration);
+        return QnTimePeriod(qMax(startTimeMs, other.startTimeMs), infiniteDuration());
 
     if (isInfinite()) {
         if (startTimeMs > other.startTimeMs + other.durationMs)
@@ -166,6 +140,26 @@ QnTimePeriod& QnTimePeriod::deserialize(const QByteArray& data)
     return *this;
 }
 
+void QnTimePeriod::setStartTime(std::chrono::milliseconds value)
+{
+    startTimeMs = value.count();
+}
+
+std::chrono::milliseconds QnTimePeriod::startTime() const
+{
+    return std::chrono::milliseconds(startTimeMs);
+}
+
+void QnTimePeriod::setDuration(std::chrono::milliseconds value)
+{
+    durationMs = value.count();
+}
+
+std::chrono::milliseconds QnTimePeriod::duration() const
+{
+    return std::chrono::milliseconds(durationMs);
+}
+
 QnTimePeriod& QnTimePeriod::operator = (const QnTimePeriod &other)
 {
     startTimeMs = other.startTimeMs;
@@ -178,11 +172,7 @@ bool QnTimePeriod::isNull() const {
 }
 
 bool QnTimePeriod::isInfinite() const {
-    return durationMs == ::infiniteDuration;
-}
-
-qint64 QnTimePeriod::infiniteDuration() {
-    return ::infiniteDuration;
+    return durationMs == infiniteDuration();
 }
 
 bool QnTimePeriod::isEmpty() const {
@@ -190,7 +180,7 @@ bool QnTimePeriod::isEmpty() const {
 }
 
 bool QnTimePeriod::isValid() const {
-    return durationMs == ::infiniteDuration || durationMs > 0;
+    return durationMs == infiniteDuration() || durationMs > 0;
 }
 
 qint64 QnTimePeriod::distanceToTime(qint64 timeMs) const
@@ -201,10 +191,49 @@ qint64 QnTimePeriod::distanceToTime(qint64 timeMs) const
         return startTimeMs - timeMs;
 }
 
-bool operator==(const QnTimePeriod &first, const QnTimePeriod &other)
+void QnTimePeriod::truncate(qint64 timeMs)
 {
-    return ((first.startTimeMs == other.startTimeMs)
-        && (first.durationMs == other.durationMs));
+    if (qBetween(startTimeMs, timeMs, endTimeMs()))
+        durationMs = timeMs - startTimeMs;
+}
+
+void QnTimePeriod::truncateFront(qint64 timeMs)
+{
+    if (qBetween(startTimeMs, timeMs, endTimeMs()))
+    {
+        if (durationMs != infiniteDuration())
+            durationMs = endTimeMs() - timeMs;
+        startTimeMs = timeMs;
+    }
+}
+
+QnTimePeriod QnTimePeriod::truncated(qint64 timeMs) const
+{
+    if (qBetween(startTimeMs, timeMs, endTimeMs()))
+    {
+        return QnTimePeriod::fromInterval(
+            startTimeMs,
+            timeMs > endTimeMs() ? endTimeMs() : timeMs);
+    }
+
+    return *this;
+}
+
+QnTimePeriod QnTimePeriod::truncatedFront(qint64 timeMs) const
+{
+    if (qBetween(startTimeMs, timeMs, endTimeMs()))
+    {
+        return QnTimePeriod::fromInterval(
+            timeMs < startTimeMs ?
+            startTimeMs : timeMs, endTimeMs());
+    }
+
+    return *this;
+}
+
+qint64 QnTimePeriod::bound(qint64 timeMs) const
+{
+    return qBound(startTimeMs, timeMs, endTimeMs());
 }
 
 QDebug operator<<(QDebug dbg, const QnTimePeriod &period) {

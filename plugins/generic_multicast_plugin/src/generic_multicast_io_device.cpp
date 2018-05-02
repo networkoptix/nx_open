@@ -21,15 +21,14 @@ const int kExtensionLengthFieldLength = 2;
 
 
 GenericMulticastIoDevice::GenericMulticastIoDevice(const QUrl& url):
-    m_url(url),
-    m_cutRtpHeaderOff(false)
+    m_url(url)
 {
 
 }
 
 GenericMulticastIoDevice::~GenericMulticastIoDevice()
 {
-    for (const auto iface : getAllIPv4Interfaces())
+    for (const auto iface : nx::network::getAllIPv4Interfaces())
         m_socket->leaveGroup(m_url.host(), iface.address.toString());
 }
 
@@ -52,30 +51,13 @@ bool GenericMulticastIoDevice::isSequential() const
 
 qint64 GenericMulticastIoDevice::readData(char* buf, qint64 maxlen)
 {
-    if (!m_cutRtpHeaderOff)
+    auto received = m_socket->recv(buf, maxlen);
+    if (received <= 0)
     {
-        auto received = m_socket->recv(buf, maxlen);
-        if (received <= 0)
-        {
-            QIODevice::close();
-            return -1;
-        }
-
-        return received;
+        QIODevice::close();
+        return -1;
     }
-    else
-    {
-        m_buffer.resize(maxlen);
-        auto received = m_socket->recv(m_buffer.data(), maxlen);
-
-        if (received <= 0)
-        {
-            QIODevice::close();
-            return -1;
-        }
-        auto payloadLength = cutRtpHeaderOff(m_buffer.constData(), received, buf, maxlen);
-        return payloadLength;
-    }
+    return received;
 }
 
 qint64 GenericMulticastIoDevice::writeData(const char* /*buf*/, qint64 /*size*/)
@@ -93,12 +75,12 @@ bool GenericMulticastIoDevice::initSocket(const QUrl& url)
     result &= m_socket->setReuseAddrFlag(true);
     result &= m_socket->setRecvBufferSize(kBufferCapacity);
     result &= m_socket->setRecvTimeout(kReceiveTimeout.count());
-    result &= m_socket->bind(SocketAddress(HostAddress::anyHost, url.port()));
+    result &= m_socket->bind(nx::network::SocketAddress(nx::network::HostAddress::anyHost, url.port()));
 
     if (!result)
         return false;
 
-    for (const auto iface : getAllIPv4Interfaces())
+    for (const auto iface : nx::network::getAllIPv4Interfaces())
         result &= m_socket->joinGroup(url.host(), iface.address.toString());
 
     return result;

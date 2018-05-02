@@ -2,18 +2,17 @@
 
 #include <nx/network/upnp/upnp_device_searcher.h>
 
-class QnGlobalSettings;
+class QnResourceDiscoveryManager;
 
 class GlobalSettingsToDeviceSearcherSettingsAdapter:
-    public nx_upnp::AbstractDeviceSearcherSettings
+    public nx::network::upnp::AbstractDeviceSearcherSettings
 {
 public:
-    GlobalSettingsToDeviceSearcherSettingsAdapter(QnGlobalSettings* globalSettings);
+    GlobalSettingsToDeviceSearcherSettingsAdapter(QnResourceDiscoveryManager* commonModule);
 
     virtual int cacheTimeout() const override;
-    virtual bool isUpnpMulticastEnabled() const override;
 
 private:
-    QnGlobalSettings* m_globalSettings;
-    const nx_upnp::DeviceSearcherDefaultSettings m_defaultSettings;
+    QnResourceDiscoveryManager* m_discoveryManager;
+    const nx::network::upnp::DeviceSearcherDefaultSettings m_defaultSettings;
 };

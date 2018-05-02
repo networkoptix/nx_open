@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <plugin
 	name="Nx-Cube"
-	version="1" 
+	version="1"
 	unique_id="B6BB59F4-A10B-4329-928D-90714E54B4E5">
 	<parameters>
 		<group name = "Imaging">
@@ -104,8 +104,8 @@
 					readCmd="encoder"
                     writeCmd="VIDEO_AGC_GAIN=%VIDEO_AGC_GAIN"/>
 			</group>
-			<group name = "Lens">				
-				
+			<group name = "Lens">
+
 			</group>
 			<group name="Extra Settings">
 				<param 	id="VIDEO_MIRROR_MODE"
@@ -165,13 +165,15 @@
 		<group name="Maintenance">
 			<param 	id="SAVE_REBOOT"
 				dataType="Button"
-				name="Reboot" 
+				name="Reboot"
+                confirmation="Are you sure you want to reboot the device?"
 				description="This operation reboots the device."
 				readCmd="system"
                 writeCmd="SAVE_REBOOT"/>
 			<param 	id="CONFIG_RESET"
 				dataType="Button"
 				name="Soft Reset"
+                confirmation="Are you sure you want to reset all settings (except network) to default?"
 				description="Reset settings to factory default except IP settings"
 				readCmd="system"
                 writeCmd="CONFIG_RESET"/>
@@ -179,6 +181,7 @@
 				dataType="Button"
                 writeCmd="FACTORY_DEFAULT"
 				name="Hard Reset"
+                confirmation="Are you sure you want to reset all settings (including network) to default?"
 				description="Reset all settings to factory default (inсludes IP settings)"
 				readCmd="system"/>
 		</group>

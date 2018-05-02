@@ -1,9 +1,10 @@
 #pragma once
 
+#include <nx/network/http/http_types.h>
+
+#include <api/model/setup_local_system_data.h>
 #include <rest/server/json_rest_handler.h>
 #include <core/resource_access/user_access_data.h>
-
-struct SetupLocalSystemData;
 
 class QnSetupLocalSystemRestHandler: public QnJsonRestHandler
 {

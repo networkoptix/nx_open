@@ -3,6 +3,7 @@
 #include <QtCore/QCache>
 #include <QtCore/QFileInfo>
 #include <QtCore/QCoreApplication>
+#include <QtCore/QDir>
 
 #include <quazip/quazip.h>
 #include <quazip/quazipfile.h>
@@ -15,6 +16,12 @@
 #include <utils/common/util.h>
 #include <network/tcp_listener.h>
 #include <common/common_module.h>
+
+QString QnFileConnectionProcessor::externalPackagePath()
+{
+    static const QString path = QDir(qApp->applicationDirPath()).filePath(lit("external.dat"));
+    return path;
+}
 
 namespace {
     static const qint64 CACHE_SIZE = 1024 * 1024;
@@ -50,42 +57,33 @@ namespace {
 
     const QByteArray kDefaultContentType = "text/html; charset=utf-8";
 
-    const QString kExternalResourcesPackageName = "external.dat";
-
     QIODevicePtr getStaticFile(const QString& relativePath)
     {
         if (!externalPackageNameMiss.contains(relativePath))
         {
-
-            {   /* Check external package. */
-                static const QString packageName = QDir(qApp->applicationDirPath()).filePath(kExternalResourcesPackageName);
-                QIODevicePtr result(new QuaZipFile(packageName, relativePath));
-                if (result->open(QuaZipFile::ReadOnly))
-                    return result;
-
-                externalPackageNameMiss.insert(relativePath, nullptr);
-            }
-        }
-
-        {   /* Check internal resources. */
-            QString fileName = ":" + relativePath;
-            QIODevicePtr result(new QFile(fileName));
-            if (result->open(QFile::ReadOnly))
+            QIODevicePtr result(new QuaZipFile(QnFileConnectionProcessor::externalPackagePath(), relativePath));
+            if (result->open(QuaZipFile::ReadOnly))
                 return result;
+
+            externalPackageNameMiss.insert(relativePath, nullptr);
         }
+
+        /* Check internal resources. */
+        QString fileName = ":" + relativePath;
+        QIODevicePtr result(new QFile(fileName));
+        if (result->open(QFile::ReadOnly))
+            return result;
 
         return QIODevicePtr();
     }
 
     QDateTime staticFileLastModified(const QIODevicePtr& device)
     {
-        static const QString packageName = QDir(qApp->applicationDirPath()).filePath(kExternalResourcesPackageName);
-
         QDateTime result;
         if (QFile* file = qobject_cast<QFile*>(device.get()))
             result = QFileInfo(*file).lastModified();
         else
-            result = QFileInfo(packageName).lastModified();
+            result = QFileInfo(QnFileConnectionProcessor::externalPackagePath()).lastModified();
 
         // zero msec in result
         return result.addMSecs(-result.time().msec());
@@ -99,7 +97,7 @@ public:
 };
 
 QnFileConnectionProcessor::QnFileConnectionProcessor(
-    QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner)
+    QSharedPointer<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner)
 :
     QnTCPConnectionProcessor(new QnTCPConnectionProcessorPrivate, socket, owner)
 {
@@ -148,7 +146,7 @@ QByteArray QnFileConnectionProcessor::compressMessageBody(const QByteArray& cont
 {
     Q_D(QnFileConnectionProcessor);
 #ifndef EDGE_SERVER
-    if (nx_http::getHeaderValue(d->request.headers, "Accept-Encoding").toLower().contains("gzip") && !d->response.messageBody.isEmpty())
+    if (nx::network::http::getHeaderValue(d->request.headers, "Accept-Encoding").toLower().contains("gzip") && !d->response.messageBody.isEmpty())
     {
         if (!contentType.contains("image")) {
             d->response.messageBody = nx::utils::bstream::gzip::Compressor::compressData(d->response.messageBody);
@@ -169,36 +167,36 @@ void QnFileConnectionProcessor::run()
     parseRequest();
     d->response.messageBody.clear();
 
-    QUrl url = getDecodedUrl();
+    nx::utils::Url url = getDecodedUrl();
     QString path = QString('/') + QnTcpListener::normalizedPath(url.path());
     const QString fileFormat = QFileInfo(path).suffix().toLower();
     QByteArray contentType = contentTypes.value(fileFormat, kDefaultContentType);
 
     if (path.contains(".."))
     {
-        sendResponse(nx_http::StatusCode::forbidden, contentType, QByteArray());
+        sendResponse(nx::network::http::StatusCode::forbidden, contentType, QByteArray());
         return;
     }
 
     QDateTime lastModified;
     if (!loadFile(path, &lastModified, &d->response.messageBody))
     {
-        sendResponse(nx_http::StatusCode::notFound, contentType, QByteArray());
+        sendResponse(nx::network::http::StatusCode::notFound, contentType, QByteArray());
         return;
     }
 
-    nx_http::HttpHeader modifiedHeader("Last-Modified", nx_http::formatDateTime(lastModified));
+    nx::network::http::HttpHeader modifiedHeader("Last-Modified", nx::network::http::formatDateTime(lastModified));
     d->response.headers.insert(modifiedHeader);
-    QString modifiedSinceStr = nx_http::getHeaderValue(d->request.headers, "If-Modified-Since");
+    QString modifiedSinceStr = nx::network::http::getHeaderValue(d->request.headers, "If-Modified-Since");
     if (!modifiedSinceStr.isEmpty())
     {
         QDateTime modifiedSince = QDateTime::fromString(modifiedSinceStr, Qt::RFC2822Date);
         if (lastModified <= modifiedSince)
         {
-            sendResponse(nx_http::StatusCode::notModified, contentType, QByteArray());
+            sendResponse(nx::network::http::StatusCode::notModified, contentType, QByteArray());
             return;
         }
     }
 
-    sendResponse(nx_http::StatusCode::ok, contentType, compressMessageBody(contentType));
+    sendResponse(nx::network::http::StatusCode::ok, contentType, compressMessageBody(contentType));
 }

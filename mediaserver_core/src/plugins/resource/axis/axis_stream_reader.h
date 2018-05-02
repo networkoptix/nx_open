@@ -3,17 +3,17 @@
 
 #ifdef ENABLE_AXIS
 
-#include "core/dataprovider/spush_media_stream_provider.h"
+#include <providers/spush_media_stream_provider.h>
 #include "network/multicodec_rtp_reader.h"
 #include "core/resource/resource_media_layout.h"
 
 class QnAxisStreamReader: public CLServerPushStreamReader
 {
 public:
-    QnAxisStreamReader(const QnResourcePtr& res);
+    QnAxisStreamReader(const QnPlAxisResourcePtr& res);
     virtual ~QnAxisStreamReader();
 
-    QnConstResourceAudioLayoutPtr getDPAudioLayout() const;
+    virtual QnConstResourceAudioLayoutPtr getDPAudioLayout() const override;
 
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
@@ -39,7 +39,7 @@ private:
     QnMulticodecRtpReader m_rtpStreamParser;
     QnPlAxisResourcePtr m_axisRes;
 
-    bool m_oldFirmwareWarned;
+    bool m_oldFirmwareWarned = false;
 };
 
 #endif // #ifdef ENABLE_AXIS

@@ -23,7 +23,7 @@ public:
 
 protected:
     virtual void fillAuthInfo(
-        const nx_http::AsyncHttpClientPtr& httpClient,
+        const nx::network::http::AsyncHttpClientPtr& httpClient,
         bool authByKey) override;
 
 private:

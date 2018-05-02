@@ -1,9 +1,13 @@
 #pragma once
 
-#include "core/dataprovider/spush_media_stream_provider.h"
 #include "buffered_screen_grabber.h"
+#include <core/dataprovider/abstract_media_stream_provider.h>
+#include <core/dataprovider/live_stream_params.h>
+#include <nx/streaming/abstract_stream_data_provider.h>
 
-class QnDesktopStreamreader: public CLServerPushStreamReader
+class QnDesktopStreamreader:
+    public QnAbstractStreamDataProvider,
+    public QnAbstractMediaStreamProvider
 {
 public:
     QnDesktopStreamreader(const QnResourcePtr &dev);
@@ -11,10 +15,11 @@ public:
 
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
-    virtual CameraDiagnostics::Result openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params) override;
+
+    CameraDiagnostics::Result openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params);
     virtual void closeStream() override;
     virtual bool isStreamOpened() const override;
-    virtual void pleaseReopenStream() override {}
+    //virtual void pleaseReopenStream()  override {}
 
 private:
     bool init();

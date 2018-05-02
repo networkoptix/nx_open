@@ -13,7 +13,7 @@
 #include "network/tcp_listener.h"
 #include <nx/utils/log/log.h>
 #include "utils/common/synctime.h"
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/http/auth_tools.h>
 
 #include "universal_tcp_listener.h"
@@ -28,19 +28,19 @@ static const int kProxyKeepAliveInterval = 60 * 1000;
 class QnProxySenderConnectionPrivate: public QnUniversalRequestProcessorPrivate
 {
 public:
-    SocketAddress proxyServerUrl;
+    nx::network::SocketAddress proxyServerUrl;
     QnUuid guid;
 };
 
 QnProxySenderConnection::QnProxySenderConnection(
-    const SocketAddress& proxyServerUrl,
+    const nx::network::SocketAddress& proxyServerUrl,
     const QnUuid& guid,
     QnUniversalTcpListener* owner,
     bool needAuth)
     :
     QnUniversalRequestProcessor(
         new QnProxySenderConnectionPrivate,
-        QSharedPointer<AbstractStreamSocket>(SocketFactory::createStreamSocket().release()),
+        QSharedPointer<nx::network::AbstractStreamSocket>(nx::network::SocketFactory::createStreamSocket().release()),
         owner,
         needAuth)
 {
@@ -69,7 +69,12 @@ QByteArray QnProxySenderConnection::readProxyResponse()
             return QByteArray();
         bufLen += bytesRead;
         QByteArray result = QByteArray::fromRawData((const char*) buffer, (int) bufLen);
-        if (QnTCPConnectionProcessor::isFullMessage(result))
+
+        const auto messageSize = QnTCPConnectionProcessor::isFullMessage(result);
+        if (messageSize < 0)
+            return QByteArray();
+
+        if (messageSize > 0)
             return result;
     }
 
@@ -101,7 +106,7 @@ int QnProxySenderConnection::sendRequest(const QByteArray& data)
 }
 
 QByteArray QnProxySenderConnection::makeProxyRequest(
-    const QnUuid& serverUuid, const SocketAddress& address) const
+    const QnUuid& serverUuid, const nx::network::SocketAddress& address) const
 {
     const QByteArray H_REALM("NX");
     const QByteArray H_METHOD("CONNECT");
@@ -115,13 +120,13 @@ QByteArray QnProxySenderConnection::makeProxyRequest(
 
     const auto time = qnSyncTime->currentUSecsSinceEpoch();
 
-    nx_http::header::WWWAuthenticate authHeader;
-    authHeader.authScheme = nx_http::header::AuthScheme::digest;
+    nx::network::http::header::WWWAuthenticate authHeader;
+    authHeader.authScheme = nx::network::http::header::AuthScheme::digest;
     authHeader.params["nonce"] = QString::number(time, 16).toLatin1();
     authHeader.params["realm"] = nx::network::AppInfo::realm().toLatin1();
 
-    nx_http::header::DigestAuthorization digestHeader;
-    if (!nx_http::calcDigestResponse(
+    nx::network::http::header::DigestAuthorization digestHeader;
+    if (!nx::network::http::calcDigestResponse(
         H_METHOD,
         server->getId().toByteArray(),
         server->getAuthKey().toUtf8(),
@@ -157,7 +162,7 @@ void QnProxySenderConnection::run()
         return;
     }
 
-    if (!d->socket->connect(d->proxyServerUrl, kSocketTimeout))
+    if (!d->socket->connect(d->proxyServerUrl, std::chrono::milliseconds(kSocketTimeout)))
         return;
 
     d->socket->setSendTimeout(kSocketTimeout);

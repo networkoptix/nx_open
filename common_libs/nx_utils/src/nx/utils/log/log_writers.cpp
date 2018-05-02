@@ -1,6 +1,7 @@
 #include "log_writers.h"
 
 #include <iostream>
+
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 
@@ -84,7 +85,7 @@ bool File::openFile()
     if (!m_file.fail())
     {
         // File exists, prepare to append.
-        m_file.seekp(std::ios_base::streamoff(0), std::ios_base::end);
+        m_file.seekp(std::streamoff(0), std::ios_base::end);
         return !m_file.fail();
     }
 
@@ -146,6 +147,10 @@ std::vector<QString> Buffer::takeMessages()
     std::vector<QString> messages;
     std::swap(m_messages, messages);
     return messages;
+}
+
+void NullDevice::write(Level /*level*/, const QString& /*message*/)
+{
 }
 
 } // namespace log

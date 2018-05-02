@@ -12,6 +12,7 @@
 #include "stun_message_parser_buffer.h"
 
 namespace nx {
+namespace network {
 namespace stun {
 
 class NX_NETWORK_API MessageParser:
@@ -139,4 +140,5 @@ private:
 };
 
 } // namespace stun
+} // namespace network
 } // namespace nx

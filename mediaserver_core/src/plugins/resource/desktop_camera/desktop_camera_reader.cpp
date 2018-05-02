@@ -12,7 +12,7 @@
 
 static const int KEEP_ALIVE_INTERVAL = 30 * 1000;
 
-QnDesktopCameraStreamReader::QnDesktopCameraStreamReader(const QnResourcePtr& res)
+QnDesktopCameraStreamReader::QnDesktopCameraStreamReader(const QnDesktopCameraResourcePtr& res)
 :
     CLServerPushStreamReader(res)
 {
@@ -23,10 +23,9 @@ QnDesktopCameraStreamReader::~QnDesktopCameraStreamReader()
     stop();
 }
 
-CameraDiagnostics::Result QnDesktopCameraStreamReader::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params)
+CameraDiagnostics::Result QnDesktopCameraStreamReader::openStreamInternal(
+    bool isCameraControlRequired, const QnLiveStreamParams& /*params*/)
 {
-    Q_UNUSED(isCameraControlRequired);
-    Q_UNUSED(params);
     closeStream();
 
     if (!m_socket) {

@@ -16,7 +16,7 @@ namespace udp {
 
 /**
  * Initiates rendezvous connection with given remote address.
- * @note Instance can be safely freed within its aio thread (e.g., within completion handler).
+ * NOTE: Instance can be safely freed within its aio thread (e.g., within completion handler).
  */
 class RendezvousConnector:
     public aio::AbstractPollable

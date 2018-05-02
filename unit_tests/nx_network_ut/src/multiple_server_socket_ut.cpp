@@ -16,7 +16,7 @@ namespace nx {
 namespace network {
 namespace test {
 
-class MultipleServerSocketTester: 
+class MultipleServerSocketTester:
     public network::MultipleServerSocket
 {
 public:
@@ -88,7 +88,7 @@ protected:
     void triggerServerSocketByIndex(std::size_t index)
     {
         TCPSocket socket(AF_INET);
-        ASSERT_TRUE(socket.connect(m_aggregatedSocketsAddresses[index]));
+        ASSERT_TRUE(socket.connect(m_aggregatedSocketsAddresses[index], nx::network::kNoTimeout));
     }
 
     void assertIfConnectionHasNotBeenAccepted()
@@ -228,7 +228,7 @@ protected:
                 {
                     TCPSocket socket;
                     ASSERT_TRUE(socket.setReuseAddrFlag(true));
-                    socket.connect(m_localServerAddress, 50);
+                    socket.connect(m_localServerAddress, std::chrono::milliseconds(50));
                     if (i >= maxConnectionsToEstablish && !connectorDone)
                         connectorDone = true;
                 }
@@ -373,7 +373,7 @@ protected:
     {
         using namespace std::chrono;
         using namespace std::placeholders;
-        
+
         m_startTime = steady_clock::now();
         m_isCancelled = isCancelled;
         m_testDurationLimit = testDurationLimit;

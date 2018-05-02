@@ -8,8 +8,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_runtime_data.h>
 
-#include <ui/common/geometry.h>
-
 #include "workbench_layout.h"
 
 

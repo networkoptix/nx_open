@@ -7,7 +7,7 @@
 
 #include <nx/network/socket_factory.h>
 #include <nx/utils/std/cpp14.h>
-#include <utils/media/nalUnits.h> 
+#include <utils/media/nalUnits.h>
 #include <utils/media/ffmpeg_helper.h>
 #include <decoders/audio/aac.h>
 
@@ -17,7 +17,7 @@ static const int kBufferSize = 32768 ;
 static const int kWritableBufferFlag = 1;
 static const int kReadOnlyBufferFlag = 0;
 
-} // namespace 
+} // namespace
 
 
 GenericMulticastStreamReader::GenericMulticastStreamReader(const QUrl& url):
@@ -28,7 +28,7 @@ GenericMulticastStreamReader::GenericMulticastStreamReader(const QUrl& url):
 }
 
 GenericMulticastStreamReader::~GenericMulticastStreamReader()
-{   
+{
     close();
 }
 
@@ -95,7 +95,6 @@ bool GenericMulticastStreamReader::open()
     if (!initLayout())
         return false;
 
-    m_startTimeUs = currentTimeSinceEpochUs();
     return true;
 }
 
@@ -119,7 +118,7 @@ int GenericMulticastStreamReader::getNextData(nxcip::MediaDataPacket** outPacket
 
     AVStream* stream = nullptr;
     AVPacket packet;
-    
+
     while (true)
     {
         if (m_interrupted)
@@ -139,7 +138,7 @@ int GenericMulticastStreamReader::getNextData(nxcip::MediaDataPacket** outPacket
 
         Extras extras;
         if (!preprocessPacket(packet, &dataPointer, &dataSize, &extras))
-            continue;        
+            continue;
 
         stream = m_formatContext->streams[packet.stream_index];
         auto mediaPacket = std::make_unique<GenericMulticastMediaPacket>(&m_allocator);
@@ -156,7 +155,7 @@ int GenericMulticastStreamReader::getNextData(nxcip::MediaDataPacket** outPacket
 
         av_packet_unref(&packet);
         return nxcip::NX_NO_ERROR;
-    }    
+    }
 }
 
 void GenericMulticastStreamReader::interrupt()
@@ -282,8 +281,7 @@ bool GenericMulticastStreamReader::isPacketTimestampOk(const AVPacket& packet) c
 {
     if(!isPacketStreamOk(packet))
         return false;
-
-    return packetTimestamp(packet) != nxcip::INVALID_TIMESTAMP_VALUE;
+    return packet.dts != AV_NOPTS_VALUE || packet.pts != AV_NOPTS_VALUE;
 }
 
 nxcip::UsecUTCTimestamp GenericMulticastStreamReader::packetTimestamp(const AVPacket& packet) const
@@ -291,25 +289,10 @@ nxcip::UsecUTCTimestamp GenericMulticastStreamReader::packetTimestamp(const AVPa
     if (!isPacketStreamOk(packet))
         return nxcip::INVALID_TIMESTAMP_VALUE;
 
-    auto stream = m_formatContext->streams[packet.stream_index];
-    double timeBase = av_q2d(stream->time_base) * 1000000;
-
-    auto firstDts = m_firstVideoIndex >= 0 
-        ? m_formatContext->streams[packet.stream_index]->first_dts
-        : 0;
-
-    if (firstDts == qint64(AV_NOPTS_VALUE))
-        firstDts = 0;
-
-    auto packetTime = packet.dts != AV_NOPTS_VALUE ? packet.dts : packet.pts;
-
-    if (packetTime == AV_NOPTS_VALUE)
-        return nxcip::INVALID_TIMESTAMP_VALUE;
-    
-    return std::max<>(
-        (nxcip::UsecUTCTimestamp)0, 
-        (nxcip::UsecUTCTimestamp)(timeBase * (packetTime - firstDts)))
-        + m_startTimeUs;
+    const auto stream = m_formatContext->streams[packet.stream_index];
+    const auto packetTime = packet.dts != AV_NOPTS_VALUE ? packet.dts : packet.pts;
+    static const AVRational dstRate = {1, 1000000};
+    return av_rescale_q(packetTime, stream->time_base, dstRate);
 }
 
 unsigned int GenericMulticastStreamReader::packetChannelNumber(const AVPacket& packet) const
@@ -329,7 +312,7 @@ unsigned int GenericMulticastStreamReader::packetFlags(const AVPacket& packet) c
         return 0;
 
     unsigned int flags = 0;
-    
+
     auto stream = m_formatContext->streams[packet.stream_index];
 
     if (packet.flags & AV_PKT_FLAG_KEY && stream->codecpar->codec_type != AVMEDIA_TYPE_AUDIO)

@@ -37,14 +37,14 @@ class QnModbusAsyncClient:
 
 public:
     QnModbusAsyncClient();
-    QnModbusAsyncClient(const SocketAddress& endpoint);
+    QnModbusAsyncClient(const nx::network::SocketAddress& endpoint);
 
     QnModbusAsyncClient(const QnModbusAsyncClient& other) = delete;
     QnModbusAsyncClient &operator=(const QnModbusAsyncClient& other) = delete;
 
     ~QnModbusAsyncClient();
 
-    void setEndpoint(const SocketAddress& endpoint);
+    void setEndpoint(const nx::network::SocketAddress& endpoint);
 
     void doModbusRequestAsync(ModbusMessage request);
 
@@ -102,7 +102,7 @@ private:
     quint16 m_requestSequenceNumber;
     ModbusMessage m_pendingMessage;
     bool m_hasPendingMessage;
-    SocketAddress m_endpoint;
+    nx::network::SocketAddress m_endpoint;
     QString m_lastErrorString;
     mutable QnMutex m_mutex; 
 };

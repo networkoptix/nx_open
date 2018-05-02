@@ -11,6 +11,8 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
 
+#include <nx/client/desktop/resource_views/data/node_type.h>
+
 #include <ui/common/palette.h>
 #include <ui/delegates/resource_item_delegate.h>
 #include <ui/models/resource/resource_tree_model.h>
@@ -23,6 +25,8 @@
 
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
+
+using namespace nx::client::desktop;
 
 namespace {
 
@@ -153,7 +157,7 @@ void QnResourceSelectionDialog::initModel()
     connect(m_resourceModel, &QnResourceTreeModel::dataChanged, this,
         &QnResourceSelectionDialog::at_resourceModel_dataChanged);
 
-    ui->resourcesWidget->setModel(m_resourceModel);
+    ui->resourcesWidget->setModel(m_resourceModel, QnResourceTreeWidget::standardSearch);
     ui->resourcesWidget->setFilterVisible(true);
     ui->resourcesWidget->setEditingEnabled(false);
     ui->resourcesWidget->setSimpleSelectionEnabled(true);
@@ -217,7 +221,7 @@ QSet<QnUuid> QnResourceSelectionDialog::selectedResourcesInternal(const QModelIn
         if (!checked)
             continue;
 
-        auto nodeType = idx.data(Qn::NodeTypeRole).value<Qn::NodeType>();
+        auto nodeType = idx.data(Qn::NodeTypeRole).value<ResourceTreeNodeType>();
         auto resource = idx.data(Qn::ResourceRole).value<QnResourcePtr>();
         auto id = idx.data(Qn::UuidRole).value<QnUuid>();
 
@@ -230,7 +234,7 @@ QSet<QnUuid> QnResourceSelectionDialog::selectedResourcesInternal(const QModelIn
             case QnResourceSelectionDialog::Filter::users:
                 if (resource.dynamicCast<QnUserResource>())
                     result.insert(resource->getId());
-                if (nodeType == Qn::RoleNode)
+                if (nodeType == ResourceTreeNodeType::role)
                     result.insert(id);
                 break;
             default:
@@ -287,7 +291,7 @@ void QnResourceSelectionDialog::setDelegate(QnResourceSelectionDialogDelegate* d
 
         QnColoringProxyModel* proxy = new QnColoringProxyModel(m_delegate, this);
         proxy->setSourceModel(m_resourceModel);
-        ui->resourcesWidget->setModel(proxy);
+        ui->resourcesWidget->setModel(proxy, QnResourceTreeWidget::standardSearch);
         ui->resourcesWidget->setCustomColumnDelegate(m_delegate->customColumnDelegate());
 
         setHelpTopic(ui->resourcesWidget->treeView(), m_delegate->helpTopicId());

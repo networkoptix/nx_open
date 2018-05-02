@@ -1,4 +1,4 @@
-FROM ubuntu:14.04
+FROM ubuntu:16.04
 
 # no tty
 ENV DEBIAN_FRONTEND noninteractive
@@ -12,13 +12,12 @@ RUN dpkg-divert --local --rename --add /sbin/initctl \
         && ln -sf /bin/true /sbin/initctl \
         && for f in /tmp/apt_keys/*; do apt-key add $f; done \
         && rm -rf /tmp/apt_keys \
-        && apt-get remove -y python3 python3-minimal python3.4 python3.4-minimal \
         && apt-get update \
         && apt-get install -y --no-install-recommends wget psmisc \
             libsm6 libice6 libaudio2 libogg0 libxfixes3 libxrender1 libfontconfig1 libgl1-mesa-glx libglib2.0-0 \
             dnsutils mysql-community-client strace gdb ca-certificates \
             libpython2.7 libpython3.6 \
-            libmysqlclient18 libmysqlclient20 openssh-client apache2-utils libltdl7 gettext-base \
+            libmysqlclient20 openssh-client apache2-utils libltdl7 gettext-base \
             python python3.6 nginx-extras libncurses5 \
             libcurl3 libstdc++6 \
         && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.6 1 \
@@ -27,7 +26,8 @@ RUN dpkg-divert --local --rename --add /sbin/initctl \
         && rm -rf /var/lib/apt/lists/* \
         && python2 get-pip.py \
         && python3.6 get-pip.py \
-        && rm /get-pip.py
+        && rm /get-pip.py \
+        && pip2 install pyOpenSSL==17.5.0
 
 COPY docker/config_helper.py /usr/local/bin/
 

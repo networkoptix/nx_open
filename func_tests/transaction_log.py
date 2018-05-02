@@ -1,7 +1,7 @@
-'''Transaction log utilities
+"""Transaction log utilities
 
-    Classes and utilities to work with transaction log JSON structure returned by server
-'''
+Classes and utilities to work with transaction log JSON structure returned by server
+"""
 
 import json
 from functools import total_ordering
@@ -69,8 +69,8 @@ class Transaction(object):
                 (other.peer_id, other.db_id, other.sequence))
 
     def __str__(self):
-        return ('Transaction(peer_id=%s db_id=%s sequence=%s timestamp=%s command=%s)' %
-                    (self.peer_id, self.db_id, self.sequence, self.timestamp, self.command))
+        return 'Transaction(peer_id={} db_id={} sequence={} timestamp={} command={})'.format(
+            self.peer_id, self.db_id, self.sequence, self.timestamp, self.command)
 
     def __repr__(self):
         return '%s' % self

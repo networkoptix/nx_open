@@ -7,7 +7,6 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <ui/common/geometry.h>
 #include <nx/client/desktop/ui/actions/actions.h>
 
 #include <client/client_globals.h>
@@ -58,7 +57,8 @@ class WeakGraphicsItemPointerList;
 /**
  * This class implements default scene manipulation logic.
  */
-class QnWorkbenchController: public Connective<QObject>, public QnWorkbenchContextAware, protected QnGeometry {
+class QnWorkbenchController: public Connective<QObject>, public QnWorkbenchContextAware
+{
     Q_OBJECT
 
     typedef Connective<QObject> base_type;
@@ -79,12 +79,6 @@ public:
     QnWorkbenchGridMapper *mapper() const;
 
     Instrument* motionSelectionInstrument() const;
-    Instrument* itemRightClickInstrument() const;
-    Instrument* moveInstrument() const;
-    Instrument* resizingInstrument() const;
-    Instrument* rubberBandInstrument() const;
-    Instrument* itemLeftClickInstrument() const;
-    Instrument* sceneClickInstrument() const;
 
     // TODO: #Elric split into menu_controller or smth like that
     bool isMenuEnabled() const {

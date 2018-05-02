@@ -3,7 +3,7 @@
 
 #include <core/resource/resource_fwd.h>
 
-class QN_EXPORT QnResourceConsumer
+class QnResourceConsumer
 {
 public:
     explicit QnResourceConsumer(const QnResourcePtr& resource);
@@ -15,9 +15,6 @@ public:
 
     virtual void beforeDisconnectFromResource() {}
     virtual void disconnectFromResource();
-
-    virtual void beforeUpdate() {}
-    virtual void afterUpdate() {}
 
 protected:
     QnResourcePtr m_resource;

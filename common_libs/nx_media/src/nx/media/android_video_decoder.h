@@ -21,7 +21,7 @@ class AndroidVideoDecoder
     public AbstractVideoDecoder
 {
 public:
-    AndroidVideoDecoder(const ResourceAllocatorPtr& allocator, const QSize& resolution);
+    AndroidVideoDecoder(const RenderContextSynchronizerPtr& synchronizer, const QSize& resolution);
     virtual ~AndroidVideoDecoder();
 
     static bool isCompatible(

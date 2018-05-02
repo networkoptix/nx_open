@@ -27,7 +27,7 @@ Popup
     contentItem: MouseArea
     {
         anchors.fill: parent
-        anchors.topMargin: getStatusBarHeight()
+        anchors.topMargin: deviceStatusBarHeight
 
         Flickable
         {
@@ -113,6 +113,6 @@ Popup
     function ensureActiveItemVisible()
     {
         if (activeItem)
-            Nx.ensureFlickableChildVisible(activeItem)
+            NxGlobals.ensureFlickableChildVisible(activeItem)
     }
 }

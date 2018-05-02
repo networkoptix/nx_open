@@ -1,6 +1,8 @@
 #include "http_stream_socket_server.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 void HttpStreamSocketServer::setPersistentConnectionEnabled(bool value)
 {
@@ -19,4 +21,6 @@ std::shared_ptr<HttpServerConnection> HttpStreamSocketServer::createConnection(
     return result;
 }
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

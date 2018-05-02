@@ -3,6 +3,7 @@
 #include <core/resource_access/resource_access_subject.h>
 
 #include <ui/models/resource/resource_tree_model_fwd.h>
+#include <nx/client/desktop/resource_views/data/node_type.h>
 
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -14,6 +15,7 @@
 class QnResourceTreeModelUserNodes: public Connective<QObject>, public QnWorkbenchContextAware
 {
     using base_type = Connective<QObject>;
+    using NodeType = nx::client::desktop::ResourceTreeNodeType;
 
 public:
     QnResourceTreeModelUserNodes(QObject* parent = nullptr);
@@ -32,10 +34,10 @@ private:
     /** Calculate real children as node's children() method does not return bastard nodes. */
     QList<QnResourceTreeModelNodePtr> children(const QnResourceTreeModelNodePtr& node) const;
 
-    QList<Qn::NodeType> allPlaceholders() const;
+    QList<NodeType> allPlaceholders() const;
 
     bool placeholderAllowedForSubject(const QnResourceAccessSubject& subject,
-        Qn::NodeType nodeType) const;
+        NodeType nodeType) const;
 
     bool showLayoutForSubject(const QnResourceAccessSubject& subject,
         const QnLayoutResourcePtr& layout) const;
@@ -66,7 +68,7 @@ private:
 
     /** Get or create placeholder node like 'All Shared layouts'. */
     QnResourceTreeModelNodePtr ensurePlaceholderNode(const QnResourceAccessSubject& subject,
-        Qn::NodeType nodeType);
+        NodeType nodeType);
 
     /** Get or create recorder placeholder for grouped cameras. */
     QnResourceTreeModelNodePtr ensureRecorderNode(const QnResourceTreeModelNodePtr& parentNode,
@@ -79,7 +81,7 @@ private:
     void removeUserNode(const QnUserResourcePtr& user);
 
     /** Cleanup all node references. */
-    void removeNode(const QnResourceTreeModelNodePtr& node);
+    void removeNode(QnResourceTreeModelNodePtr node);
 
     /** Remove all nodes. */
     void clean();

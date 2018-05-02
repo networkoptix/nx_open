@@ -3,6 +3,7 @@
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include <random>
+#include <chrono>
 
 #include <QtCore/QBuffer>
 #include <QtGui/QImage>
@@ -27,12 +28,13 @@ extern "C"
 
 #include <utils/color_space/image_correction.h>
 #include <core/resource/resource_consumer.h>
-#include <transcoding/filters/filter_helper.h>
+
+#include <nx/core/transcoding/filters/filter_chain.h>
 
 #include <recording/stream_recorder_data.h>
-#include <boost/optional.hpp>
+
 #include <common/common_module_aware.h>
-#include <plugins/resource/avi/avi_archive_metadata.h>
+#include <core/resource/avi/avi_archive_metadata.h>
 
 class QnAbstractMediaStreamDataProvider;
 class QnFfmpegAudioTranscoder;
@@ -45,7 +47,6 @@ class QnStreamRecorder:
 {
     Q_OBJECT
 
-    using MotionHandler = std::function<bool(const QnConstMetaDataV1Ptr& motion)>;
 public:
     static QString errorString(StreamRecorderError errCode);
 
@@ -73,14 +74,12 @@ public:
 
     void close();
 
-    qint64 duration() const  { return m_endDateTime - m_startDateTime; }
+    qint64 duration() const  { return m_endDateTimeUs - m_startDateTimeUs; }
 
     virtual bool processData(const QnAbstractDataPacketPtr& data) override;
 
-    QnResourcePtr getResource() const { return m_device; }
-
     QString fixedFileName() const;
-    void setEofDateTime(qint64 value);
+    void setProgressBounds(qint64 bof, qint64 eof);
 
     /*
     * Calc hash for writing file
@@ -92,8 +91,6 @@ public:
     void forceAudioLayout(const QnResourceAudioLayoutPtr& layout);
 
     void disableRegisterFile(bool disable);
-
-    void setSaveMotionHandler(MotionHandler handler);
 
 #ifdef SIGN_FRAME_ENABLED
     void setSignLogo(const QImage& logo);
@@ -115,13 +112,14 @@ public:
     */
     void setAudioCodec(AVCodecID codec);
 
-
     /*
     * Server time zone. Used for export to avi/mkv files
     */
     void setServerTimeZoneMs(qint64 value);
 
-    void setExtraTranscodeParams(const QnImageFilterHelper& extraParams);
+    void setTranscodeFilters(const nx::core::transcoding::FilterChain& filters);
+
+    int64_t lastFileSize() const;
 
 signals:
     void recordingStarted();
@@ -138,10 +136,21 @@ protected:
 
     virtual bool saveMotion(const QnConstMetaDataV1Ptr& media);
 
-    virtual void fileFinished(qint64 durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider *provider, qint64 fileSize) {
-        Q_UNUSED(durationMs) Q_UNUSED(fileName) Q_UNUSED(provider) Q_UNUSED(fileSize)
+    virtual void fileFinished(
+        qint64 /*durationMs*/,
+        const QString& /*fileName*/,
+        QnAbstractMediaStreamDataProvider* /*provider*/,
+        qint64 /*fileSize*/,
+        qint64 startTimeMs = AV_NOPTS_VALUE)
+    {
     }
-    virtual void fileStarted(qint64 startTimeMs, int timeZone, const QString& fileName, QnAbstractMediaStreamDataProvider *provider) {
+    virtual void fileStarted(
+        qint64 startTimeMs,
+        int timeZone,
+        const QString& fileName,
+        QnAbstractMediaStreamDataProvider *provider,
+        bool sideRecorder = false)
+    {
         Q_UNUSED(startTimeMs) Q_UNUSED(timeZone) Q_UNUSED(fileName) Q_UNUSED(provider)
     }
     virtual void getStoragesAndFileNames(QnAbstractMediaStreamDataProvider*);
@@ -156,6 +165,7 @@ protected:
         AVIOContext** context);
     virtual qint64 getPacketTimeUsec(const QnConstAbstractMediaDataPtr& md);
     virtual bool isUtcOffsetAllowed() const { return true; }
+    virtual void updateContainerMetadata(QnAviArchiveMetadata* metadata) const {}
 
 private:
     struct StreamRecorderContext
@@ -165,6 +175,7 @@ private:
         QnStorageResourcePtr storage;
         qint64 totalWriteTimeNs = 0;
         QnAviArchiveMetadata metadata;
+        QnAviArchiveMetadata::Format fileFormat = QnAviArchiveMetadata::Format::custom;
 
         StreamRecorderContext(const QString& fileName, const QnStorageResourcePtr& storage);
     };
@@ -177,21 +188,24 @@ private:
     qint64 findNextIFrame(qint64 baseTime);
     void cleanFfmpegContexts();
 
+    /**
+     * Ffmpeg sometimes doesn't tell error for some codecs which are incompatible with container.
+     * This function does addition manual checks.
+     */
+    bool isCodecsCompatible(const StreamRecorderContext& context) const;
 protected:
-    QnResourcePtr m_device;
     bool m_firstTime;
     bool m_gotKeyFrame[CL_MAX_CHANNELS];
     qint64 m_truncateInterval;
     bool m_fixedFileName;
-    qint64 m_endDateTime;
-    qint64 m_startDateTime;
+    qint64 m_endDateTimeUs;
+    qint64 m_startDateTimeUs;
     int m_currentTimeZone;
     std::vector<StreamRecorderContext> m_recordingContextVector;
 
 private:
     bool m_waitEOF;
 
-    bool m_forceDefaultCtx;
     bool m_packetWrited;
     StreamRecorderErrorStruct m_lastError;
     qint64 m_currentChunkLen;
@@ -199,7 +213,8 @@ private:
     int m_prebufferingUsec;
     QnUnsafeQueue<QnConstAbstractMediaDataPtr> m_prebuffer;
 
-    qint64 m_EofDateTime;
+    qint64 m_bofDateTimeUs;
+    qint64 m_eofDateTimeUs;
     bool m_endOfData;
     int m_lastProgress;
     bool m_needCalcSignature;
@@ -227,14 +242,14 @@ private:
     /** If true method close() will emit signal recordingFinished() at the end. */
     bool m_recordingFinished;
     StreamRecorderRole m_role;
-    QnImageFilterHelper m_extraTranscodeParams;
+    boost::optional<nx::core::transcoding::FilterChain> m_transcodeFilters;
 
     std::random_device m_rd;
     std::mt19937 m_gen;
 
     QnResourceAudioLayoutPtr m_forcedAudioLayout;
     bool m_disableRegisterFile;
-    MotionHandler m_motionHandler;
+    int64_t m_lastFileSize = 0;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

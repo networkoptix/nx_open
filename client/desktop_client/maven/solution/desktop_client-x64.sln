@@ -18,7 +18,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_client_desktop-x64", "${
 		${nx_audio.guid} = ${nx_audio.guid}
 		${nx_client_core.guid} = ${nx_client_core.guid}
 		${nx_speech_synthesizer.guid} = ${nx_speech_synthesizer.guid}
-		${libvms_gateway.guid} = ${libvms_gateway.guid}
+		${libvms_gateway_core.guid} = ${libvms_gateway_core.guid}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_client_core-x64", "${root.dir}\client\nx_client_core\src\nx_client_core-x64.vcxproj", "${nx_client_core.guid}"
@@ -87,7 +87,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_kit-x64", "${root.dir}\n
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libvms_gateway-x64", "${root.dir}\nx_cloud\libvms_gateway\src\libvms_gateway-x64.vcxproj", "${libvms_gateway.guid}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libvms_gateway_core-x64", "${root.dir}\nx_cloud\libvms_gateway_core\src\libvms_gateway_core-x64.vcxproj", "${libvms_gateway_core.guid}"
 	ProjectSection(ProjectDependencies) = postProject
 		${cloud_db_client.guid} = ${cloud_db_client.guid}
 	EndProjectSection
@@ -160,10 +160,10 @@ Global
 		${cloud_db_client.guid}.Debug|x64.Build.0 = Debug|x64
 		${cloud_db_client.guid}.Release|x64.ActiveCfg = Release|x64
 		${cloud_db_client.guid}.Release|x64.Build.0 = Release|x64
-		${libvms_gateway.guid}.Debug|x64.ActiveCfg = Debug|x64
-		${libvms_gateway.guid}.Debug|x64.Build.0 = Debug|x64
-		${libvms_gateway.guid}.Release|x64.ActiveCfg = Release|x64
-		${libvms_gateway.guid}.Release|x64.Build.0 = Release|x64
+		${libvms_gateway_core.guid}.Debug|x64.ActiveCfg = Debug|x64
+		${libvms_gateway_core.guid}.Debug|x64.Build.0 = Debug|x64
+		${libvms_gateway_core.guid}.Release|x64.ActiveCfg = Release|x64
+		${libvms_gateway_core.guid}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

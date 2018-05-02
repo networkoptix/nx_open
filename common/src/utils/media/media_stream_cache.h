@@ -26,7 +26,7 @@ namespace detail
 */
 class MediaStreamCache
 :
-    public QnAbstractDataReceptor
+    public QnAbstractMediaDataReceptor
 {
 public:
     /*!
@@ -63,9 +63,9 @@ public:
         unsigned int maxCacheSizeMillis);
     virtual ~MediaStreamCache();
 
-    //!Implementation of QnAbstractDataReceptor::canAcceptData
+    //!Implementation of QnAbstractMediaDataReceptor::canAcceptData
     virtual bool canAcceptData() const override;
-    //!Implementation of QnAbstractDataReceptor::putData
+    //!Implementation of QnAbstractMediaDataReceptor::putData
     virtual void putData( const QnAbstractDataPacketPtr& data ) override;
 
     void clear();

@@ -33,4 +33,8 @@ void HandleEGLImage(void* pEGLImage);
 
 void mapEGLImage2Float(void* pEGLImage, int width, int height, void* cuda_buf);
 
+void mapEGLImage2Float2(void* pEGLImage, int width, int height, void* cuda_buf);
+
+void mapIntRgbaToFloatBgr(int* rgba, int rgbaSize, void* cuda_buf);
+
 #endif

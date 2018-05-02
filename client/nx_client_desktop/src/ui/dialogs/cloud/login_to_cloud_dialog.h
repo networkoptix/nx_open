@@ -14,7 +14,7 @@ class QnLoginToCloudDialog : public QnDialog
     using base_type = QnDialog;
 
 public:
-    explicit QnLoginToCloudDialog(QWidget* parent = nullptr);
+    explicit QnLoginToCloudDialog(QWidget* parent);
     virtual ~QnLoginToCloudDialog();
 
     void setLogin(const QString& login);

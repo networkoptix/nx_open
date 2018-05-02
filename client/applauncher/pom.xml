@@ -2,12 +2,12 @@
     <parent>
         <artifactId>cpp</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>3.1.0-SNAPSHOT</version>
+        <version>4.0.0-SNAPSHOT</version>
         <relativePath>../../cpp</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>3.1.0-SNAPSHOT</version>
+    <version>4.0.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>applauncher</artifactId>
     <packaging>pom</packaging>
@@ -20,7 +20,7 @@
         <template>app</template>
 
         <qt.libs>core gui network xml widgets</qt.libs>
-        <global.libs>-lcommon -lnx_utils -lnx_network -ludt</global.libs>
+        <global.libs>-lcommon -lnx_utils -lnx_network -ludt -lnx_fusion</global.libs>
         <windows.oslibs>DbgHelp.lib Ws2_32.lib Iphlpapi.lib Winmm.lib</windows.oslibs>
         <mac.oslibs>-framework IOKit -framework CoreServices</mac.oslibs>
 

@@ -130,8 +130,8 @@ QSize QnCloudStatusPanel::sizeHint() const
 QnCloudStatusPanelPrivate::QnCloudStatusPanelPrivate(QnCloudStatusPanel* parent):
     QObject(parent),
     q_ptr(parent),
-    loggedInMenu(new QMenu(parent->mainWindow())),
-    offlineMenu(new QMenu(parent->mainWindow())),
+    loggedInMenu(new QMenu(parent->mainWindowWidget())),
+    offlineMenu(new QMenu(parent->mainWindowWidget())),
 #ifdef DIRECT_CLOUD_CONNECT
     systemsMenu(nullptr),
 #endif
@@ -148,7 +148,7 @@ QnCloudStatusPanelPrivate::QnCloudStatusPanelPrivate(QnCloudStatusPanel* parent)
 
     auto offlineAction = new QAction(this);
     offlineAction->setText(QnCloudStatusPanel::tr("Cannot connect to %1",
-        "%1 is the cloud name (like 'Nx Cloud')").arg(nx::network::AppInfo::cloudName()));
+        "%1 is the cloud name (like Nx Cloud)").arg(nx::network::AppInfo::cloudName()));
     offlineAction->setEnabled(false);
 
     offlineMenu->setWindowFlags(offlineMenu->windowFlags());

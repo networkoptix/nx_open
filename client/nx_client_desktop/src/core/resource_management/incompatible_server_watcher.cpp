@@ -183,8 +183,11 @@ void QnIncompatibleServerWatcherPrivate::at_resourcePool_statusChanged(const QnR
         {
             lock.unlock();
 
-            if (it->serverData.status == Qn::Incompatible || it->serverData.status == Qn::Unauthorized)
+            if (it->serverData.status == nx::vms::api::ResourceStatus::incompatible
+                || it->serverData.status == nx::vms::api::ResourceStatus::unauthorized)
+            {
                 addResource(it->serverData);
+            }
         }
     }
 }
@@ -197,9 +200,9 @@ void QnIncompatibleServerWatcherPrivate::at_discoveredServerChanged(
 
     switch (serverData.status)
     {
-        case Qn::Online:
-        case Qn::Incompatible:
-        case Qn::Unauthorized:
+        case nx::vms::api::ResourceStatus::online:
+        case nx::vms::api::ResourceStatus::incompatible:
+        case nx::vms::api::ResourceStatus::unauthorized:
         {
             if (it != discoveredServerItemById.end())
             {
@@ -214,8 +217,8 @@ void QnIncompatibleServerWatcherPrivate::at_discoveredServerChanged(
             lock.unlock();
 
             const bool createResource =
-                serverData.status == Qn::Incompatible
-                    || (serverData.status == Qn::Unauthorized
+                serverData.status == nx::vms::api::ResourceStatus::incompatible
+                    || (serverData.status == nx::vms::api::ResourceStatus::unauthorized
                         && !resourcePool()->getResourceById<QnMediaServerResource>(serverData.id));
 
             if (createResource)
@@ -257,7 +260,8 @@ void QnIncompatibleServerWatcherPrivate::addResource(const ec2::ApiDiscoveredSer
         if (!isSuitable(serverData))
             return;
 
-        NX_ASSERT(serverData.status != Qn::Offline, Q_FUNC_INFO, "Offline status is a mark to remove fake server.");
+        NX_ASSERT(serverData.status != nx::vms::api::ResourceStatus::offline,
+            Q_FUNC_INFO, "Offline status is a mark to remove fake server.");
         QnMediaServerResourcePtr server = makeResource(serverData);
         {
             QnMutexLocker lock(&mutex);

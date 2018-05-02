@@ -6,12 +6,15 @@
 #include <core/resource/media_resource.h>
 
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
-#include <ui/common/geometry.h>
 
 #include <nx/streaming/abstract_archive_stream_reader.h>
 
+#include <nx/client/core/utils/geometry.h>
+
 #include "ui/graphics/opengl/gl_shortcuts.h"
 #include "opengl_renderer.h"
+
+using nx::client::core::Geometry;
 
 namespace {
 
@@ -112,7 +115,7 @@ QSize QnRenderingWidget::minimumSizeHint() const
 
     if (m_effectiveWidth > 0)
     {
-        return QnGeometry::bounded(result,
+        return Geometry::bounded(result,
             QSizeF(m_effectiveWidth, m_effectiveWidth),
             Qt::KeepAspectRatio).toSize();
     }
@@ -130,7 +133,7 @@ int QnRenderingWidget::heightForWidth(int width) const
     QSize size = rendererSourceSize(m_renderer);
     auto aspectRatio = size.isEmpty()
         ? kDefaultAspectRatio
-        : QnGeometry::aspectRatio(size);
+        : Geometry::aspectRatio(size);
 
     return qRound(width / aspectRatio);
 }
@@ -143,7 +146,7 @@ void QnRenderingWidget::updateChannelScreenSize()
     }
     else
     {
-        QSize channelScreenSize = QnGeometry::cwiseDiv(size(), m_display->videoLayout()->size()).toSize();
+        QSize channelScreenSize = Geometry::cwiseDiv(size(), m_display->videoLayout()->size()).toSize();
         if (channelScreenSize != m_channelScreenSize)
         {
             m_channelScreenSize = channelScreenSize;
@@ -230,7 +233,7 @@ void QnRenderingWidget::paintGL()
         m_renderer->paint(
             0,
             QRectF(0.0, 0.0, 1.0, 1.0),
-            QnGeometry::expanded(QnGeometry::aspectRatio(sourceSize), rect(), Qt::KeepAspectRatio, Qt::AlignCenter),
+            Geometry::expanded(Geometry::aspectRatio(sourceSize), rect(), Qt::KeepAspectRatio, Qt::AlignCenter),
             1.0);
     }
 }

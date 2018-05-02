@@ -43,7 +43,7 @@ TEST(ExecActionAccessRightsTest, main) //< Crash on QnDbManager nullptr
 
     auto executeTransaction = [&launcher](const Qn::UserAccessData& userAccess)
     {
-        ec2::QnTransaction<ec2::ApiBusinessActionData> actionTran(
+        ec2::QnTransaction<nx::vms::api::EventActionData> actionTran(
             ec2::ApiCommand::execAction,
             launcher.commonModule()->moduleGUID());
         nx::utils::promise<ec2::ErrorCode> resultPromise;
@@ -52,12 +52,10 @@ TEST(ExecActionAccessRightsTest, main) //< Crash on QnDbManager nullptr
         ec2::QnJsonTransactionSerializer jsonTranSerializer;
         ec2::QnUbjsonTransactionSerializer ubjsonTranSerializer;
         ec2::TransactionMessageBusAdapter messageBus(
-            nullptr/*QnDbManager*/,
-            Qn::PT_Server,
             launcher.commonModule(),
             &jsonTranSerializer,
             &ubjsonTranSerializer);
-        messageBus.init(ec2::MessageBusType::LegacyMode);
+        messageBus.init<ec2::QnTransactionMessageBus>(Qn::PeerType::PT_Server);
 
         ec2::ServerQueryProcessorAccess access(nullptr/*QnDbManager*/, &messageBus);
         access.getAccess(userAccess).processUpdateAsync(

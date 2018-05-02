@@ -7,6 +7,7 @@ class QnWordWrappedLabel: public QWidget
     Q_OBJECT
     Q_PROPERTY(QString text READ text WRITE setText)
     Q_PROPERTY(Qt::TextFormat textFormat READ textFormat WRITE setTextFormat)
+    Q_PROPERTY(bool openExternalLinks READ openExternalLinks WRITE setOpenExternalLinks)
 
     using base_type = QWidget;
 public:
@@ -25,6 +26,9 @@ public:
 
     int approximateLines() const;
     void setApproximateLines(int value);
+
+    bool openExternalLinks() const;
+    void setOpenExternalLinks(bool value);
 
 signals:
     void linkActivated(const QString& value);

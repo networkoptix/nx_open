@@ -11,9 +11,11 @@
 
 #include <plugins/resource/onvif/onvif_resource.h>
 
-#include <nx/network/simple_http_client.h>
+#include <nx/network/deprecated/simple_http_client.h>
 
 #include "dw_resource_settings.h"
+
+#include <QtXml/QDomDocument>
 
 class QnDigitalWatchdogResource : public QnPlOnvifResource
 {
@@ -25,12 +27,12 @@ public:
     QnDigitalWatchdogResource();
     ~QnDigitalWatchdogResource();
 
-    virtual QnAbstractPtzController *createPtzControllerInternal() override;
     CLSimpleHTTPClient httpClient() const;
-protected:
-    virtual CameraDiagnostics::Result initInternal() override;
 
-    virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
+protected:
+    virtual QnAbstractPtzController* createPtzControllerInternal() const override;
+
+    virtual CameraDiagnostics::Result initializeCameraDriver() override;
 
     virtual bool loadAdvancedParametersTemplate(QnCameraAdvancedParams &params) const override;
     virtual void initAdvancedParametersProviders(QnCameraAdvancedParams &params) override;
@@ -40,6 +42,14 @@ protected:
     virtual bool loadAdvancedParamsUnderLock(QnCameraAdvancedParamValueMap &values) override;
     virtual bool setAdvancedParameterUnderLock(const QnCameraAdvancedParameter &parameter, const QString &value) override;
     virtual bool setAdvancedParametersUnderLock(const QnCameraAdvancedParamValueList &values, QnCameraAdvancedParamValueList &result) override;
+
+    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
+        Qn::StreamIndex streamIndex) override;
+
+    virtual CameraDiagnostics::Result sendVideoEncoderToCameraEx(
+        VideoEncoder& encoder,
+        Qn::StreamIndex streamIndex,
+        const QnLiveStreamParams& streamParams) override;
 private:
     bool isDualStreamingEnabled(bool& unauth);
     void enableOnvifSecondStream();
@@ -52,6 +62,9 @@ private:
     bool m_hasZoom;
 
     QScopedPointer<DWAbstractCameraProxy> m_cameraProxy;
+
+    class CproApiClient;
+    std::unique_ptr<CproApiClient> m_cproApiClient;
 };
 
 #endif //ENABLE_ONVIF

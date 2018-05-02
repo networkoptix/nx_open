@@ -6,7 +6,7 @@ ToolBar
 {
     id: toolBar
 
-    property real statusBarHeight: getStatusBarHeight()
+    property real statusBarHeight: deviceStatusBarHeight
 
     implicitWidth: parent ? parent.width : 200
     implicitHeight: 56

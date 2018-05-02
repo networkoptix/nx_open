@@ -314,6 +314,10 @@ QPushButton* QnMessageBox::addCustomButton(
             return addButton(tr("Delete"), role, accent);
         case QnMessageBoxCustomButton::Reset:
             return addButton(tr("Reset"), role, accent);
+        case QnMessageBoxCustomButton::Close:
+            return addButton(tr("Close"), role, accent);
+        case QnMessageBoxCustomButton::Stop:
+            return addButton(tr("Stop"), role, accent);
         case QnMessageBoxCustomButton::Skip:
             return addButton(tr("Skip"), role, accent);
         default:
@@ -606,6 +610,13 @@ void QnMessageBox::addCustomWidget(QWidget* widget, Layout layout, int stretch,
                 stretch,
                 alignment
             );
+        case QnMessageBox::Layout::AfterMainLabel:
+            ui->verticalLayout->insertWidget(
+                ui->verticalLayout->indexOf(ui->mainLabel) + 1,
+                widget,
+                stretch,
+                alignment);
+
         default:
             break;
     }

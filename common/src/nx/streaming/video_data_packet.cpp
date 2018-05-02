@@ -6,7 +6,6 @@
 #include "video_data_packet.h"
 
 #include <utils/memory/cyclic_allocator.h>
-#include <network/h264_rtp_parser.h>
 
 QnCompressedVideoData::QnCompressedVideoData( QnConstMediaContextPtr ctx )
 :
@@ -26,7 +25,7 @@ void QnCompressedVideoData::assign(const QnCompressedVideoData* other)
     QnAbstractMediaData::assign(other);
     width = other->width;
     height = other->height;
-    motion = other->motion;
+    metadata = other->metadata;
     pts = other->pts;
 }
 

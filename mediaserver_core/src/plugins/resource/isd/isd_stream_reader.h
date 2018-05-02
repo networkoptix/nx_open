@@ -3,7 +3,7 @@
 
 #ifdef ENABLE_ISD
 
-#include "core/dataprovider/spush_media_stream_provider.h"
+#include "providers/spush_media_stream_provider.h"
 #include "network/multicodec_rtp_reader.h"
 #include "core/resource/resource_media_layout.h"
 
@@ -13,10 +13,10 @@ class QnISDStreamReader: public CLServerPushStreamReader
 public:
     static const int ISD_HTTP_REQUEST_TIMEOUT_MS;
 
-    QnISDStreamReader(const QnResourcePtr& res);
+    QnISDStreamReader(const QnPlIsdResourcePtr& res);
     virtual ~QnISDStreamReader();
 
-    QnConstResourceAudioLayoutPtr getDPAudioLayout() const;
+    virtual QnConstResourceAudioLayoutPtr getDPAudioLayout() const override;
 
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
@@ -26,14 +26,15 @@ protected:
     virtual void pleaseStop() override;
 
 private:
-    QnMulticodecRtpReader m_rtpStreamParser;
-
     virtual QnMetaDataV1Ptr getCameraMetadata() override;
 
     QString serializeStreamParams(
         const QnLiveStreamParams& params,
-        const QSize& resolution,
         int profileIndex) const;
+
+private:
+    QnMulticodecRtpReader m_rtpStreamParser;
+    QnPlIsdResourcePtr m_isdCam;
 };
 
 #endif // #ifdef ENABLE_ISD

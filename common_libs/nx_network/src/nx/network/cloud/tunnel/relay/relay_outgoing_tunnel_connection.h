@@ -24,8 +24,7 @@ class NX_NETWORK_API OutgoingTunnelConnection:
     using base_type = AbstractOutgoingTunnelConnection;
 
 public:
-    OutgoingTunnelConnection(
-        QUrl relayUrl,
+    OutgoingTunnelConnection(utils::Url relayUrl,
         nx::String relaySessionId,
         std::unique_ptr<nx::cloud::relay::api::Client> relayApiClient);
 
@@ -40,6 +39,7 @@ public:
         OnNewConnectionHandler handler) override;
     virtual void setControlConnectionClosedHandler(
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
+    virtual std::string toString() const override;
 
     void setInactivityTimeout(std::chrono::milliseconds timeout);
 
@@ -52,7 +52,7 @@ private:
         nx::network::aio::Timer timer;
     };
 
-    const QUrl m_relayUrl;
+    const nx::utils::Url m_relayUrl;
     const nx::String m_relaySessionId;
     std::unique_ptr<nx::cloud::relay::api::Client> m_relayApiClient;
     QnMutex m_mutex;

@@ -30,6 +30,7 @@ public:
 
     qint64 currentMSecsSinceEpoch();
     qint64 currentUSecsSinceEpoch();
+    std::chrono::microseconds currentTimePoint();
     QDateTime currentDateTime();
 
     void reset();

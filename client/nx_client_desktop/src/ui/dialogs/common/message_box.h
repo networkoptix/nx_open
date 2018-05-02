@@ -37,6 +37,8 @@ enum class QnMessageBoxCustomButton
     Overwrite,                  //< QDialogButtonBox::AcceptRole / Qn::ButtonAccent::Warning
     Delete,                     //< QDialogButtonBox::AcceptRole / Qn::ButtonAccent::Warning
     Reset,                      //< QDialogButtonBox::AcceptRole / Qn::ButtonAccent::Warning
+    Close,                      //< QDialogButtonBox::AcceptRole / Qn::ButtonAccent::Warning
+    Stop,                       //< QDialogButtonBox::AcceptRole / Qn::ButtonAccent::Warning
     Skip,                       //< QDialogButtonBox::RejectRole / Qn::ButtonAccent::NoAccent
 };
 
@@ -50,19 +52,20 @@ public:
     enum class Layout
     {
         Main,
-        Content
+        Content,
+        AfterMainLabel
     };
 
 public:
-    QnMessageBox(QWidget* parent = nullptr);
+    QnMessageBox(QWidget* parent);
 
     QnMessageBox(
         QnMessageBoxIcon icon,
         const QString& text,
         const QString& extras,
-        QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok,
-        QDialogButtonBox::StandardButton defaultButton = QDialogButtonBox::NoButton,
-        QWidget* parent = nullptr);
+        QDialogButtonBox::StandardButtons buttons,
+        QDialogButtonBox::StandardButton defaultButton,
+        QWidget* parent);
 
     static QDialogButtonBox::StandardButton information(
         QWidget* parent,

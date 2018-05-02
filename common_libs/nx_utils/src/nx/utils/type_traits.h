@@ -1,5 +1,4 @@
-#ifndef QN_MPL_H
-#define QN_MPL_H
+#pragma once
 
 #include <type_traits>
 
@@ -21,6 +20,4 @@ namespace QnTypeTraits {
     struct yes_type { char dummy; };
     struct no_type { char dummy[64]; };
 
-} // namespace mpl
-
-#endif // QN_MPL_H
+} // namespace QnTypeTraits

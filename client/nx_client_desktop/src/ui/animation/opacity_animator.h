@@ -1,11 +1,10 @@
-#ifndef QN_OPACITY_ANIMATOR_H
-#define QN_OPACITY_ANIMATOR_H
+#pragma once
 
-#include "variant_animator.h"
+// This include is located here for usage consistency.
+#include <ui/animation/variant_animator.h>
 
 class QGraphicsObject;
 
-VariantAnimator *opacityAnimator(QGraphicsObject *item, qreal speed = 1.0);
-bool hasOpacityAnimator(QGraphicsObject *item);
-
-#endif // QN_OPACITY_ANIMATOR_H
+bool hasOpacityAnimator(QGraphicsObject* item);
+VariantAnimator* takeOpacityAnimator(QGraphicsObject* item);
+VariantAnimator* opacityAnimator(QGraphicsObject* item, qreal speed = 1.0);

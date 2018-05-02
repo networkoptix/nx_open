@@ -91,7 +91,7 @@ private:
         m_records.resize(7);
         for (auto& rec: m_records)
         {
-            rec.startTime = 
+            rec.startTime =
                 std::chrono::system_clock::from_time_t(
                     nx::utils::random::number<int>(1, 1000000));
             rec.endTime =
@@ -100,13 +100,13 @@ private:
             rec.resultCode =
                 nx::hpm::api::NatTraversalResultCode::mediatorReportedError;
             rec.sessionId = QnUuid::createUuid().toSimpleByteArray();
-            rec.originatingHostEndpoint = 
-                SocketAddress(
+            rec.originatingHostEndpoint =
+                nx::network::SocketAddress(
                     QnUuid::createUuid().toSimpleString(),
                     nx::utils::random::number<int>(1, 10000)).toString().toUtf8();
             rec.originatingHostName = QnUuid::createUuid().toSimpleByteArray();
             rec.destinationHostEndpoint =
-                SocketAddress(
+                nx::network::SocketAddress(
                     QnUuid::createUuid().toSimpleString(),
                     nx::utils::random::number<int>(1, 10000)).toString().toUtf8();
             rec.destinationHostName = QnUuid::createUuid().toSimpleByteArray();

@@ -6,7 +6,7 @@
 
 #include <utils/math/math.h>
 #include <utils/math/space_mapper.h>
-#include <nx/network/simple_http_client.h>
+#include <nx/network/deprecated/simple_http_client.h>
 #include <nx/fusion/serialization/lexical_functions.h>
 
 #include <core/resource_management/resource_data_pool.h>
@@ -27,26 +27,28 @@ class QnAxisParameterMap {
 public:
     QnAxisParameterMap() {};
 
-    void insert(const QString &key, const QString &value) {
+    void insert(const QString& key, const QString& value)
+    {
         m_data[key] = value;
     }
 
     template<class T>
-    T value(const QString &key, const T &defaultValue = T()) const {
+    T value(const QString& key, const T& defaultValue = T()) const
+    {
         QString result = m_data.value(key);
         if(result.isNull())
             return defaultValue;
 
         T value;
-        if(QnLexical::deserialize(result, &value)) {
+        if(QnLexical::deserialize(result, &value))
             return value;
-        } else {
+        else
             return defaultValue;
-        }
     }
 
     template<class T>
-    bool value(const QString &key, T *value) const {
+    bool value(const QString& key, T* value) const
+    {
         QString result = m_data.value(key);
         if(result.isNull())
             return false;
@@ -66,11 +68,10 @@ private:
 #endif
 };
 
-
 // -------------------------------------------------------------------------- //
 // QnAxisPtzController
 // -------------------------------------------------------------------------- //
-QnAxisPtzController::QnAxisPtzController(const QnPlAxisResourcePtr &resource):
+QnAxisPtzController::QnAxisPtzController(const QnPlAxisResourcePtr& resource):
     base_type(resource),
     m_resource(resource),
     m_capabilities(Qn::NoCapabilities)
@@ -104,7 +105,8 @@ void QnAxisPtzController::updateState() {
     updateState(params);
 }
 
-void QnAxisPtzController::updateState(const QnAxisParameterMap &params) {
+void QnAxisPtzController::updateState(const QnAxisParameterMap& params)
+{
     m_capabilities = 0;
 
     int channel = qMax(this->channel(), 1);
@@ -201,47 +203,59 @@ CLSimpleHTTPClient *QnAxisPtzController::newHttpClient() const
     );
 }
 
-QByteArray QnAxisPtzController::getCookie() const {
+QByteArray QnAxisPtzController::getCookie() const
+{
     QnMutexLocker locker( &m_mutex );
     return m_cookie;
 }
 
-void QnAxisPtzController::setCookie(const QByteArray &cookie) {
+void QnAxisPtzController::setCookie(const QByteArray& cookie)
+{
     QnMutexLocker locker( &m_mutex );
     m_cookie = cookie;
 }
 
-bool QnAxisPtzController::queryInternal(const QString &request, QByteArray *body) {
+bool QnAxisPtzController::queryInternal(const QString& request, QByteArray* body)
+{
     QScopedPointer<CLSimpleHTTPClient> http(newHttpClient());
 
     QByteArray cookie = getCookie();
 
-    for (int i = 0; i < 2; ++i) {
+    for (int i = 0; i < 2; ++i)
+    {
         if (!cookie.isEmpty())
             http->addHeader("Cookie", cookie);
         CLHttpStatus status = http->doGET(lit("axis-cgi/%1").arg(request).toLatin1());
 
-        if(status == CL_HTTP_SUCCESS) {
+        if (status == CL_HTTP_SUCCESS)
+        {
             if(body) {
                 QByteArray localBody;
                 http->readAll(localBody);
                 if(body) // TODO: #Elric why the double check?
                     *body = localBody;
 
-                if(localBody.startsWith("Error:")) {
-                    qnWarning("Failed to execute request '%1' for camera %2. Camera returned: %3.", request, m_resource->getName(), localBody.mid(6));
+                if(localBody.startsWith("Error:"))
+                {
+                    qnWarning("Failed to execute request '%1' for camera %2. Camera returned: %3.",
+                        request, m_resource->getName(), localBody.mid(6));
                     return false;
                 }
             }
             return true;
-        } else if (status == CL_HTTP_REDIRECT && cookie.isEmpty()) {
+        }
+        else if (status == CL_HTTP_REDIRECT && cookie.isEmpty())
+        {
             cookie = http->header().value("Set-Cookie");
             cookie = cookie.split(';')[0];
             if (cookie.isEmpty())
                 return false;
             setCookie(cookie);
-        } else {
-            qnWarning("Failed to execute request '%1' for camera %2. Result: %3.", request, m_resource->getName(), ::toString(status));
+        }
+        else
+        {
+            qnWarning("Failed to execute request '%1' for camera %2. Result: %3.",
+                request, m_resource->getName(), ::toString(status));
             return false;
         }
 
@@ -251,7 +265,7 @@ bool QnAxisPtzController::queryInternal(const QString &request, QByteArray *body
     return false;
 }
 
-bool QnAxisPtzController::query(const QString &request, QByteArray *body) const
+bool QnAxisPtzController::query(const QString& request, QByteArray* body) const
 {
     const int channel = this->channel();
     const auto targetRequest = channel < 0
@@ -262,15 +276,18 @@ bool QnAxisPtzController::query(const QString &request, QByteArray *body) const
     return nonConstThis->queryInternal(targetRequest, body);
 }
 
-bool QnAxisPtzController::query(const QString &request, QnAxisParameterMap *params, QByteArray *body) const
+bool QnAxisPtzController::query(const QString& request, QnAxisParameterMap* params,
+    QByteArray* body) const
 {
     QByteArray localBody;
     if(!query(request, &localBody))
         return false;
 
-    if(params) {
+    if(params)
+    {
         QTextStream stream(&localBody, QIODevice::ReadOnly);
-        while(true) {
+        while(true)
+        {
             QString line = stream.readLine();
             if(line.isNull())
                 break;
@@ -289,11 +306,13 @@ bool QnAxisPtzController::query(const QString &request, QnAxisParameterMap *para
     return true;
 }
 
-bool QnAxisPtzController::query(const QString &request, int retries, QnAxisParameterMap *params, QByteArray *body) const
+bool QnAxisPtzController::query(const QString &request, int retries, QnAxisParameterMap *params,
+    QByteArray *body) const
 {
     QByteArray localBody;
 
-    for(int i = 0; i < retries; i++) {
+    for(int i = 0; i < retries; i++)
+    {
         if(!query(request, params, &localBody))
             return false;
 
@@ -319,18 +338,21 @@ Ptz::Capabilities QnAxisPtzController::getCapabilities() const
     return m_capabilities;
 }
 
-bool QnAxisPtzController::continuousMove(const QVector3D &speed) {
+bool QnAxisPtzController::continuousMove(const QVector3D &speed)
+{
     return query(lit("com/ptz.cgi?continuouspantiltmove=%1,%2&continuouszoommove=%3").arg(speed.x() * m_maxDeviceSpeed.x()).arg(speed.y() * m_maxDeviceSpeed.y()).arg(speed.z() * m_maxDeviceSpeed.z()));
 }
 
-bool QnAxisPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) {
+bool QnAxisPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position,
+    qreal speed)
+{
     if(space != Qn::LogicalPtzCoordinateSpace)
         return false;
 
     return query(lit("com/ptz.cgi?pan=%1&tilt=%2&zoom=%3&speed=%4").arg(position.x()).arg(position.y()).arg(m_35mmEquivToCameraZoom(qDegreesTo35mmEquiv(position.z()))).arg(speed * 100));
 }
 
-bool QnAxisPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *position)  const
+bool QnAxisPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D* position)  const
 {
     if(space != Qn::LogicalPtzCoordinateSpace)
         return false;
@@ -351,7 +373,7 @@ bool QnAxisPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *p
     }
 }
 
-bool QnAxisPtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) const
+bool QnAxisPtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits* limits) const
 {
     if(space != Qn::LogicalPtzCoordinateSpace)
         return false;
@@ -360,13 +382,13 @@ bool QnAxisPtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *l
     return true;
 }
 
-bool QnAxisPtzController::getFlip(Qt::Orientations *flip) const
+bool QnAxisPtzController::getFlip(Qt::Orientations* flip) const
 {
     *flip = m_flip;
     return true;
 }
 
-bool QnAxisPtzController::getPresets(QnPtzPresetList *presets) const
+bool QnAxisPtzController::getPresets(QnPtzPresetList* presets) const
 {
     if (!(m_capabilities & Ptz::PresetsPtzCapability))
         return base_type::getPresets(presets);
@@ -406,7 +428,7 @@ int extractPresetNum(const QString& presetId)
     return result.toInt();
 }
 
-bool QnAxisPtzController::activatePreset(const QString &presetId, qreal speed)
+bool QnAxisPtzController::activatePreset(const QString& presetId, qreal speed)
 {
     if (!(m_capabilities & Ptz::PresetsPtzCapability))
         return base_type::activatePreset(presetId, speed);
@@ -414,8 +436,7 @@ bool QnAxisPtzController::activatePreset(const QString &presetId, qreal speed)
     return query(lit("com/ptz.cgi?gotoserverpresetno=%1").arg(extractPresetNum(presetId)));
 }
 
-
-bool QnAxisPtzController::createPreset(const QnPtzPreset &preset)
+bool QnAxisPtzController::createPreset(const QnPtzPreset& preset)
 {
     if (!(m_capabilities & Ptz::PresetsPtzCapability))
         return base_type::createPreset(preset);
@@ -424,7 +445,7 @@ bool QnAxisPtzController::createPreset(const QnPtzPreset &preset)
     return query(lit("com/ptz.cgi?setserverpresetname=%1").arg(preset.name));
 }
 
-bool QnAxisPtzController::updatePreset(const QnPtzPreset &preset)
+bool QnAxisPtzController::updatePreset(const QnPtzPreset& preset)
 {
     if (!(m_capabilities & Ptz::PresetsPtzCapability))
         return base_type::updatePreset(preset);
@@ -432,13 +453,12 @@ bool QnAxisPtzController::updatePreset(const QnPtzPreset &preset)
     return removePreset(preset.id) && createPreset(preset);
 }
 
-bool QnAxisPtzController::removePreset(const QString &presetId)
+bool QnAxisPtzController::removePreset(const QString& presetId)
 {
     if (!(m_capabilities & Ptz::PresetsPtzCapability))
         return base_type::removePreset(presetId);
     m_cacheUpdateTimer.invalidate();
     return query(lit("com/ptz.cgi?removeserverpresetno=%1").arg(extractPresetNum(presetId)));
 }
-
 
 #endif // ENABLE_AXIS

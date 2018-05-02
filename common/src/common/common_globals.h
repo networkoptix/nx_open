@@ -9,22 +9,22 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/fusion/serialization_format.h>
+#include <nx/vms/api/types/resource_types.h>
 
 #ifdef THIS_BLOCK_IS_REQUIRED_TO_MAKE_FILE_BE_PROCESSED_BY_MOC_DO_NOT_DELETE
 Q_OBJECT
 #endif
 QN_DECLARE_METAOBJECT_HEADER(Qn,
     ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace
-    StreamFpsSharingMethod MotionType TimePeriodContent SystemComponent
+    StreamFpsSharingMethod TimePeriodContent SystemComponent
     ConnectionRole ResourceStatus BitratePerGopType
-    StreamQuality SecondStreamQuality PanicMode RebuildState BackupState RecordingType PeerType StatisticsDeviceType
-    ServerFlag BackupType StorageInitResult CameraBackupQuality CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult
-    RebuildAction BackupAction FailoverPriority
+    PanicMode RebuildState BackupState PeerType StatisticsDeviceType
+    ServerFlag BackupType StorageInitResult IOPortType IODefaultState AuditRecordType AuthResult
+    RebuildAction BackupAction MediaStreamEvent StreamIndex
     Permission GlobalPermission UserRole ConnectionResult
     ,
     Borders Corners ResourceFlags CameraCapabilities PtzDataFields
-    MotionTypes
-    ServerFlags CameraBackupQualities TimeFlags CameraStatusFlags IOPortTypes
+    ServerFlags TimeFlags IOPortTypes
     Permissions GlobalPermissions
     )
 
@@ -41,7 +41,10 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         RelayOutputCapability               = 0x010,
         ShareIpCapability                   = 0x020,
         AudioTransmitCapability             = 0x040,
-        RemoteArchiveCapability             = 0x100
+        RemoteArchiveCapability             = 0x100,
+        SetUserPasswordCapability           = 0x200, //< Can change password on a camera.
+        isDefaultPasswordCapability         = 0x400, //< Camera has default password now.
+        isOldFirmwareCapability             = 0x800, //< Camera has too old firmware.
     };
     Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability)
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities)
@@ -118,7 +121,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
     enum PtzCoordinateSpace {
         DevicePtzCoordinateSpace,
-        LogicalPtzCoordinateSpace
+        LogicalPtzCoordinateSpace,
+        InvalidPtzCoordinateSpace
     };
 
     enum PtzObjectType {
@@ -145,18 +149,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     };
 
 
-    enum MotionType {
-        MT_Default      = 0x0,
-        MT_HardwareGrid = 0x1,
-        MT_SoftwareGrid = 0x2,
-        MT_MotionWindow = 0x4,
-        MT_NoMotion     = 0x8
-    };
-    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(MotionType)
-
-    Q_DECLARE_FLAGS(MotionTypes, MotionType)
-    Q_DECLARE_OPERATORS_FOR_FLAGS(MotionTypes)
-
+    using MotionType = nx::vms::api::MotionType;
+    using MotionTypes = nx::vms::api::MotionTypes;
 
     enum PanicMode {
         PM_None = 0,
@@ -229,6 +223,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         exported                    = 0x20000000,   /**< Exported media file. */
         removed                     = 0x40000000,   /**< resource removed from pool. */
 
+        wearable_camera             = 0x80000000,   /**< Wearable camera resource. */
+
 
         local_media = local | media | url,
         exported_media = local_media | exported,
@@ -270,7 +266,6 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
         AnyStatus
     };
-    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResourceStatus)
 
     /** Level of detail for displaying resource info. */
     enum ResourceInfoLevel
@@ -380,6 +375,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     enum TimePeriodContent {
         RecordingContent,
         MotionContent,
+        AnalyticsContent,
 
         TimePeriodContentCount
     };
@@ -390,30 +386,25 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         AnyComponent
     };
 
-    // TODO: #Elric #EC2 rename
-    enum StreamQuality {
-        QualityLowest = 0,
-        QualityLow = 1,
-        QualityNormal = 2,
-        QualityHigh = 3,
-        QualityHighest = 4,
-        QualityPreSet = 5,
-        QualityNotDefined = 6,
+using StreamQuality = nx::vms::api::StreamQuality;
 
-        StreamQualityCount
+    enum class BitrateControl {
+        undefined,
+        cbr,
+        vbr
     };
-    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StreamQuality)
 
-
-    // TODO: #Elric #EC2 rename
-    enum SecondStreamQuality {
-        SSQualityLow = 0,
-        SSQualityMedium = 1,
-        SSQualityHigh = 2,
-        SSQualityNotDefined = 3,
-        SSQualityDontUse = 4
+    enum class EncodingPriority {
+        undefined,
+        framerate,
+        compressionLevel
     };
-    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(SecondStreamQuality)
+
+    enum class EntropyCoding {
+        undefined,
+        cavlc,
+        cabac
+    };
 
     enum StatisticsDeviceType {
         StatisticsCPU = 0,                /**< CPU load in percents. */
@@ -423,32 +414,10 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StatisticsDeviceType)
 
+    using CameraStatusFlag = nx::vms::api::CameraStatusFlag;
+    using CameraStatusFlags = nx::vms::api::CameraStatusFlags;
 
-    enum CameraStatusFlag {
-        CSF_NoFlags = 0x0,
-        CSF_HasIssuesFlag = 0x1
-    };
-    Q_DECLARE_FLAGS(CameraStatusFlags, CameraStatusFlag)
-    Q_DECLARE_OPERATORS_FOR_FLAGS(CameraStatusFlags)
-    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(CameraStatusFlag)
-
-    // TODO: #Elric #EC2 rename
-    enum RecordingType {
-        /** Record always. */
-        RT_Always = 0,
-
-        /** Record only when motion was detected. */
-        RT_MotionOnly = 1,
-
-        /** Don't record. */
-        RT_Never = 2,
-
-        /** Record LQ stream always and HQ stream only on motion. */
-        RT_MotionAndLowQuality = 3,
-
-        RT_Count
-    };
-    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(RecordingType)
+    using RecordingType = nx::vms::api::RecordingType;
 
     enum PeerType {
         PT_NotDefined = -1,
@@ -502,6 +471,11 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         LC_Free,
 
         /**
+         * For all new DVR/NVR devices except of VMAX
+         */
+        LC_Bridge,
+
+        /**
          * Invalid license. Required when the correct license type is not known in current version.
          */
         LC_Invalid,
@@ -539,22 +513,12 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         Auth_LDAPConnectError,   // can't connect to the LDAP system to authenticate
         Auth_CloudConnectError,   // can't connect to the Cloud to authenticate
         Auth_DisabledUser,    // disabled user
+        Auth_InvalidCsrfToken, // for cookie login
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(AuthResult)
     QString toString(AuthResult value);
 
-
-    enum FailoverPriority
-    {
-        FP_Never,
-        FP_Low,
-        FP_Medium,
-        FP_High,
-
-        FP_Count
-    };
-    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(FailoverPriority)
-    static_assert(FP_Medium == 2, "Value is hardcoded in SQL migration script.");
+    using FailoverPriority = nx::vms::api::FailoverPriority;
 
     // TODO: #MSAPI move to api/model or even to common_globals,
     // add lexical serialization (see QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS)
@@ -589,17 +553,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(BackupType)
 
-    enum CameraBackupQuality
-    {
-        CameraBackup_Disabled       = 0,
-        CameraBackup_HighQuality    = 1,
-        CameraBackup_LowQuality     = 2,
-        CameraBackup_Both           = CameraBackup_HighQuality | CameraBackup_LowQuality,
-        CameraBackup_Default        = 4 // backup type didn't configured so far. Default value will be used
-    };
-    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(CameraBackupQuality)
-    Q_DECLARE_FLAGS(CameraBackupQualities, CameraBackupQuality)
-    Q_DECLARE_OPERATORS_FOR_FLAGS(CameraBackupQualities)
+using CameraBackupQuality = nx::vms::api::CameraBackupQuality;
+using CameraBackupQualities = nx::vms::api::CameraBackupQualities;
 
     enum StorageInitResult
     {
@@ -611,57 +566,147 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StorageInitResult)
 
     /**
-     * Flags describing the actions permitted for the user to do with the
-     * selected resource. Calculated in runtime.
+     * Flags describing the actions permitted for the user/role to do with the selected resource.
+     * Calculated in runtime.
      */
     enum Permission
     {
-        /* Generic permissions. */
-        NoPermissions                   = 0x0000,   /**< No access */
+        //-----------------------------------------------------------------------------------------
+        //  Generic resource permissions.
 
-        ReadPermission                  = 0x0001,   /**< Generic read access. Having this access right doesn't necessary mean that all information is readable. */
-        WritePermission                 = 0x0002,   /**< Generic write access. Having this access right doesn't necessary mean that all information is writable. */
-        SavePermission                  = 0x0004,   /**< Generic save access. Entity can be saved to the server. */
-        RemovePermission                = 0x0008,   /**< Generic delete permission. */
+        // No access.
+        NoPermissions = 0,
+
+        // Generic read access. Having this permission doesn't necessary mean that all
+        // information is readable. See resource-specific permissions below. By default this means
+        // that this resource will be available in server api replies (e.g. FullInfo)
+        ReadPermission = 1 << 0,
+
+        // Generic write access. Having this permission doesn't necessary mean that all
+        // information is writable. See resource-specific permissions below. Actual only on the
+        // client side. By default this means we can modify the resource somehow.
+        WritePermission = 1 << 1,
+
+        // Generic save access. Resource can be saved to the server database. Actual both on the
+        // client and the server side.
+        SavePermission = 1 << 2,
+
+        // Generic delete permission. Resource can be deleted from the server database.
+        RemovePermission = 1 << 3,
+
+        // Permission to edit resource's name.
+        WriteNamePermission = 1 << 4,
+
+        // Alias for common set of generic permissions.
         ReadWriteSavePermission = ReadPermission | WritePermission | SavePermission,
-        WriteNamePermission             = 0x0010,   /**< Permission to edit resource's name. */
+
+        // Alias for full set of generic permissions.
+        FullGenericPermissions = ReadWriteSavePermission | RemovePermission | WriteNamePermission,
 
         /**
-         * Permission to view resource content.
-         * Currently used for server's health monitor access.
-         * Automatically granted for cameras and web pages if user has ReadPermission for them.
+         * Generic permission to view actual resource content. Actually that means we can open
+         * widget with this resource's content on the scene. For servers: health monitor access.
          */
-        ViewContentPermission           = 0x0020,
+        ViewContentPermission = 1 << 5,
 
-        /** Full set of permissions which can be available for server resource. */
-        FullServerPermissions           = ReadWriteSavePermission | WriteNamePermission | RemovePermission | ViewContentPermission,
+        //-----------------------------------------------------------------------------------------
 
-        /* Layout-specific permissions. */
-        AddRemoveItemsPermission        = 0x0040,   /**< Permission to add or remove items from a layout. */
-        EditLayoutSettingsPermission    = 0x0080,   /**< Permission to setup layout background or set locked flag. */
-        ModifyLayoutPermission          = ReadPermission | WritePermission | AddRemoveItemsPermission, /**< Permission to modify without saving. */
-        FullLayoutPermissions           = ReadWriteSavePermission | WriteNamePermission | RemovePermission | ModifyLayoutPermission | EditLayoutSettingsPermission,
+        //-----------------------------------------------------------------------------------------
+        // Webpage-specific permissions.
 
-        /* User-specific permissions. */
-        WritePasswordPermission         = 0x0200,   /**< Permission to edit associated password. */
-        WriteAccessRightsPermission     = 0x0400,   /**< Permission to edit access rights. */
-        WriteEmailPermission            = 0x0800,   /**< Permission to edit user's email. */
-        WriteFullNamePermission         = 0x1000,   /**< Permission to edit user's full name. */
-        FullUserPermissions             = ReadWriteSavePermission | WriteNamePermission
-                                            | RemovePermission | WritePasswordPermission
-                                            | WriteAccessRightsPermission
-                                            | WriteFullNamePermission | WriteEmailPermission,
+        // Permission to view web page.
+        ViewWebPagePermission = ViewContentPermission,
 
-        /* Media-specific permissions. */
-        ExportPermission                = 0x2000,   /**< Permission to export video parts. */
+        //-----------------------------------------------------------------------------------------
 
-        /* Camera-specific permissions. */
-        WritePtzPermission              = 0x4000,   /**< Permission to use camera's PTZ controls. */
+        //-----------------------------------------------------------------------------------------
+        // Server-specific permissions.
 
-        /* Mode-specific permissions. */
-        VideoWallLayoutPermissions      = ModifyLayoutPermission,
-        VideoWallMediaPermissions       = ReadPermission | ViewContentPermission | WritePtzPermission,
+        // Permission to view health monitoring.
+        ViewHealthMonitorPermission = ViewContentPermission,
 
+        // Full set of permissions which can be available for the server resource.
+        FullServerPermissions = FullGenericPermissions | ViewHealthMonitorPermission,
+
+        //-----------------------------------------------------------------------------------------
+
+        //-----------------------------------------------------------------------------------------
+        // Layout-specific permissions.
+
+         // Permission to add or remove items from a layout.
+        AddRemoveItemsPermission = 1 << 6,
+
+        // Permission to setup layout background or set locked flag.
+        EditLayoutSettingsPermission = 1 << 7,
+
+        // Permission set to modify without saving.
+        ModifyLayoutPermission = ReadPermission | WritePermission | AddRemoveItemsPermission,
+
+        // Full set of permissions which can be available for the layout resource.
+        FullLayoutPermissions = FullGenericPermissions
+            | AddRemoveItemsPermission
+            | EditLayoutSettingsPermission,
+
+        //-----------------------------------------------------------------------------------------
+
+        //-----------------------------------------------------------------------------------------
+        // User-specific permissions.
+
+        // Permission to edit associated password.
+        WritePasswordPermission = 1 << 8,
+
+        // Permission to edit access rights.
+        WriteAccessRightsPermission = 1 << 9,
+
+        // Permission to edit user's email.
+        WriteEmailPermission = 1 << 10,
+
+        // Permission to edit user's full name.
+        WriteFullNamePermission = 1 << 11,
+
+        // Full set of permissions which can be available for the user resource.
+        FullUserPermissions = FullGenericPermissions
+            | WritePasswordPermission
+            | WriteAccessRightsPermission
+            | WriteFullNamePermission
+            | WriteEmailPermission,
+
+        //-----------------------------------------------------------------------------------------
+
+        //-----------------------------------------------------------------------------------------
+        // Media-specific permissions.
+
+        // Permission to view camera's live stream.
+        ViewLivePermission = 1 << 12,
+
+        // Permission to view camera's footage.
+        ViewFootagePermission = 1 << 13,
+
+        // Permission to export video parts.
+        ExportPermission = 1 << 14,
+
+        // Permission to use camera's PTZ controls.
+        WritePtzPermission = 1 << 15,
+
+        //-----------------------------------------------------------------------------------------
+
+        //-----------------------------------------------------------------------------------------
+        // Mode-specific permissions.
+
+        // Layout access permission for the running videowall instance.
+        VideoWallLayoutPermissions = ModifyLayoutPermission,
+
+        // Media access permission for the running videowall instance.
+        // PTZ is intended here - by SpaceX request.
+        VideoWallMediaPermissions = ReadPermission
+            | ViewContentPermission
+            | ViewLivePermission
+            | ViewFootagePermission
+            | WritePtzPermission,
+
+        //-----------------------------------------------------------------------------------------
+
+        // All eventually possible permissions.
         AllPermissions = 0xFFFFFFFF
     };
 
@@ -760,6 +805,25 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         DisabledUserConnectionResult                /*< Disabled user*/
     };
 
+    enum MediaStreamEvent
+    {
+        NoEvent,
+
+        TooManyOpenedConnections,
+        ForbiddenWithDefaultPassword,
+        ForbiddenWithNoLicense,
+        oldFirmware,
+    };
+    QString toString(MediaStreamEvent value);
+
+    enum class StreamIndex
+    {
+        undefined = -1,
+        primary = 0,
+        secondary = 1
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StreamIndex)
+
     /**
      * Invalid value for a timezone UTC offset.
      */
@@ -778,6 +842,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
 Q_DECLARE_METATYPE(Qn::StatusChangeReason)
 Q_DECLARE_METATYPE(Qn::ResourceFlags)
+Q_DECLARE_METATYPE(Qn::ResourceStatus)
 
 // TODO: #Elric #enum
 
@@ -787,22 +852,22 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzCoordinateSpace)(Qn::MotionType)
-    (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::StatisticsDeviceType)
-    (Qn::ServerFlag)(Qn::BackupType)(Qn::CameraBackupQuality)(Qn::StorageInitResult)
-    (Qn::PanicMode)(Qn::RecordingType)
-    (Qn::ConnectionRole)(Qn::ResourceStatus)(Qn::BitratePerGopType)
+    (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzCoordinateSpace)
+    (Qn::StatisticsDeviceType)
+    (Qn::ServerFlag)(Qn::BackupType)(Qn::StorageInitResult)
+    (Qn::PanicMode)
+    (Qn::ConnectionRole)(Qn::BitratePerGopType)
     (Qn::PeerType)(Qn::RebuildState)(Qn::BackupState)
     (Qn::BookmarkSortField)(Qt::SortOrder)
     (Qn::RebuildAction)(Qn::BackupAction)
     (Qn::TTHeaderFlag)(Qn::IOPortType)(Qn::IODefaultState)(Qn::AuditRecordType)(Qn::AuthResult)
-    (Qn::FailoverPriority)
+    (Qn::MediaStreamEvent)(Qn::StreamIndex)
     ,
     (metatype)(lexical)
 )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::ServerFlags)(Qn::CameraBackupQualities)(Qn::TimeFlags)(Qn::CameraStatusFlags)
+    (Qn::ServerFlags)(Qn::TimeFlags)
     (Qn::Permission)(Qn::GlobalPermission)(Qn::Permissions)(Qn::GlobalPermissions)(Qn::IOPortTypes)
     ,
     (metatype)(numeric)(lexical)

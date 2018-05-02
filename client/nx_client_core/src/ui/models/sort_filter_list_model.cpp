@@ -337,7 +337,7 @@ void QnSortFilterListModelPrivate::handleSourceRowsRemoved(
     if (parent.isValid())
         return;
 
-    const auto kRemoveDifference = -(first - last + 1);
+    const auto kRemoveDifference = -(last - first + 1);
     shiftMappedRows(last + 1, kRemoveDifference);
 }
 
@@ -574,18 +574,18 @@ QModelIndex QnSortFilterListModel::index(
     return createIndex(row, column, nullptr);
 }
 
-QModelIndex QnSortFilterListModel::parent(const QModelIndex& /* child */) const
+QModelIndex QnSortFilterListModel::parent(const QModelIndex& /*child*/) const
 {
     return QModelIndex(); //< For list models parent is always empty.
 }
 
-int QnSortFilterListModel::rowCount(const QModelIndex& /* parent */) const
+int QnSortFilterListModel::rowCount(const QModelIndex& /*parent*/) const
 {
     Q_D(const QnSortFilterListModel);
     return d->rowCount();
 }
 
-int QnSortFilterListModel::columnCount(const QModelIndex& /*parent */) const
+int QnSortFilterListModel::columnCount(const QModelIndex& /*parent*/) const
 {
     return 1;
 }
@@ -594,4 +594,44 @@ QHash<int, QByteArray> QnSortFilterListModel::roleNames() const
 {
     const auto model = sourceModel();
     return (model ? model->roleNames() : QHash<int, QByteArray>());
+}
+
+bool QnSortFilterListModel::removeRows(int row, int count, const QModelIndex& /*parent*/)
+{
+    Q_D(const QnSortFilterListModel);
+    auto model = sourceModel();
+    if (!model || row < 0 || count < 0 || row + count > d->m_mapped.size())
+        return false;
+
+    // This is slightly changed implementation of QSortFilterProxyModel::removeRows.
+    // The same logic with some optimizations and coding style fixes.
+
+    if (count == 1)
+        return model->removeRow(d->m_mapped[row]);
+
+    QVector<int> rows;
+    rows.reserve(count);
+
+    for (int i = row, end = row + count; i < end; ++i)
+        rows << d->m_mapped[i];
+
+    std::sort(rows.begin(), rows.end());
+
+    int pos = rows.count() - 1;
+    while (pos >= 0)
+    {
+        const int sourceEnd = rows[pos--];
+        int sourceStart = sourceEnd;
+
+        while ((pos >= 0) && (rows[pos] == sourceStart - 1))
+        {
+            --sourceStart;
+            --pos;
+        }
+
+        if (!model->removeRows(sourceStart, sourceEnd - sourceStart + 1))
+            return false;
+    }
+
+    return true;
 }

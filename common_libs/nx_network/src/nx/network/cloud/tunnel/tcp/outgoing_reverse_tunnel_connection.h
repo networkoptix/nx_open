@@ -26,7 +26,7 @@ public:
     virtual void stopWhileInAioThread() override;
 
     virtual void start() override;
-    
+
     virtual void establishNewConnection(
         std::chrono::milliseconds timeout,
         SocketAttributes socketAttributes,
@@ -34,6 +34,8 @@ public:
 
     virtual void setControlConnectionClosedHandler(
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
+
+    virtual std::string toString() const override;
 
 private:
     void updateCloseTimer();

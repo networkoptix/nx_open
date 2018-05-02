@@ -50,10 +50,10 @@ public:
 
 /**
  * Implements request retry policy, specified in STUN rfc.
- * There are maximum N retries, delay between retries is increased by 
+ * There are maximum N retries, delay between retries is increased by
  *   some multiplier with each unsuccessful try.
- * @note RetryTimer instance can be safely freed within doAnotherTryFunc.
- * @note Class methods are not thread-safe.
+ * NOTE: RetryTimer instance can be safely freed within doAnotherTryFunc.
+ * NOTE: Class methods are not thread-safe.
  */
 class NX_NETWORK_API RetryTimer:
     public aio::BasicPollable

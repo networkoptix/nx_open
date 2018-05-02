@@ -16,7 +16,7 @@ class QnHttpConnectionListener;
 
 template<class T>
 QnTCPConnectionProcessor* handlerInstance(
-    QSharedPointer<AbstractStreamSocket> socket,
+    QSharedPointer<nx::network::AbstractStreamSocket> socket,
     QnHttpConnectionListener* owner)
 {
     return new T(socket, owner);
@@ -25,7 +25,7 @@ QnTCPConnectionProcessor* handlerInstance(
 template <class T, class ExtraParam>
 QnTCPConnectionProcessor* handlerInstance(
     ExtraParam extraParam,
-    QSharedPointer<AbstractStreamSocket> socket,
+    QSharedPointer<nx::network::AbstractStreamSocket> socket,
     QnHttpConnectionListener* owner)
 {
     return new T(extraParam, socket, owner);
@@ -35,7 +35,7 @@ class QnHttpConnectionListener: public QnTcpListener
 {
 public:
     typedef std::function<QnTCPConnectionProcessor*(
-        QSharedPointer<AbstractStreamSocket>, QnHttpConnectionListener*)> InstanceFunc;
+        QSharedPointer<nx::network::AbstractStreamSocket>, QnHttpConnectionListener*)> InstanceFunc;
 
     struct HandlerInfo
     {
@@ -70,7 +70,7 @@ public:
         doAddHandler(protocol, path, (InstanceFunc) handlerInstance<T>);
     }
 
-    typedef std::function<bool(QnCommonModule* commonModule, const nx_http::Request&)> ProxyCond;
+    typedef std::function<bool(QnCommonModule* commonModule, const nx::network::http::Request&)> ProxyCond;
 
     struct ProxyInfo
     {
@@ -94,21 +94,21 @@ public:
         m_proxyInfo.proxyCond = cond;
     }
 
-    InstanceFunc findHandler(const QByteArray& protocol, const nx_http::Request& request);
+    InstanceFunc findHandler(const QByteArray& protocol, const nx::network::http::Request& request);
 
     // Proxy support functions.
 
     bool registerProxyReceiverConnection(
-        const QString& url, QSharedPointer<AbstractStreamSocket> socket);
+        const QString& url, QSharedPointer<nx::network::AbstractStreamSocket> socket);
 
     typedef std::function<void(int count)> SocketRequest;
 
-    QSharedPointer<AbstractStreamSocket> getProxySocket(
+    QSharedPointer<nx::network::AbstractStreamSocket> getProxySocket(
         const QString& guid, int timeout, const SocketRequest& socketRequest);
 
     void disableAuth();
 
-    bool isProxy(const nx_http::Request& request);
+    bool isProxy(const nx::network::http::Request& request);
     bool needAuth() const;
 
     QnRestProcessorPool* processorPool() { return &m_processorPool; }
@@ -121,13 +121,13 @@ private:
 
     struct AwaitProxyInfo
     {
-        explicit AwaitProxyInfo(const QSharedPointer<AbstractStreamSocket>& socket):
+        explicit AwaitProxyInfo(const QSharedPointer<nx::network::AbstractStreamSocket>& socket):
             socket(socket)
         {
             timer.restart();
         }
 
-        QSharedPointer<AbstractStreamSocket> socket;
+        QSharedPointer<nx::network::AbstractStreamSocket> socket;
         QElapsedTimer timer;
     };
 

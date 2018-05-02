@@ -27,10 +27,10 @@ protected:
 
         char buf[16];
         NX_GTEST_ASSERT_TRUE(udpSocket->sendTo(buf, sizeof(buf), udpSocket->getLocalAddress()));
-        
+
         return true;
     }
-        
+
     virtual std::unique_ptr<Pollable> createSocketOfRandomType() override
     {
         return createRegularSocket();

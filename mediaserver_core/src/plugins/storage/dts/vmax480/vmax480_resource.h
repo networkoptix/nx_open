@@ -1,15 +1,14 @@
-#ifndef vmax480_resource_2047_h
-#define vmax480_resource_2047_h
+#pragma once
 
 #ifdef ENABLE_VMAX
 
-#include "core/resource/camera_resource.h"
-#include "recording/time_period_list.h"
+#include <nx/mediaserver/resource/camera.h>
+#include <recording/time_period_list.h>
 
 class QnVMax480ChunkReader;
 class QnAbstractArchiveDelegate;
 
-class QnPlVmax480Resource : public QnPhysicalCameraResource
+class QnPlVmax480Resource: public nx::mediaserver::resource::Camera
 {
     Q_OBJECT
 
@@ -29,7 +28,7 @@ public:
     int videoPort() const;
     int eventPort() const;
 
-    virtual bool hasDualStreaming() const override { return false; }
+    virtual bool hasDualStreamingInternal() const override { return false; }
 
     void setStartTime(qint64 valueUsec);
     qint64 startTime() const;
@@ -43,13 +42,17 @@ public:
     virtual QnAbstractStreamDataProvider* createArchiveDataProvider() override;
     virtual QnAbstractArchiveDelegate* createArchiveDelegate() override;
     QnTimePeriodList getChunks();
-    virtual Qn::LicenseType licenseType() const override;
+
 protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 
-    virtual CameraDiagnostics::Result initInternal() override;
+    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
+        Qn::StreamIndex streamIndex) override;
+    virtual CameraDiagnostics::Result initializeCameraDriver() override;
     void setChunks(const QnTimePeriodList& chunks);
-    QnPhysicalCameraResourcePtr getOtherResource(int channel);
+    QnSecurityCamResourcePtr getOtherResource(int channel);
+    virtual Qn::LicenseType calculateLicenseType() const override;
+
 private slots:
     void at_gotChunks(int channel, QnTimePeriodList chunks);
 private:
@@ -58,7 +61,7 @@ private:
     QnVMax480ChunkReader* m_chunkReader;
     QString m_chunkReaderKey;
     QnTimePeriodList m_chunks;
-    
+
     QnMutex m_mutexChunks;
     //QnWaitCondition m_chunksCond;
     bool m_chunksReady;
@@ -67,7 +70,4 @@ private:
     static QMap<QString, QnVMax480ChunkReader*> m_chunkReaderMap;
 };
 
-typedef QnSharedResourcePointer<QnPlVmax480Resource> QnPlVmax480ResourcePtr;
-
 #endif // #ifdef ENABLE_VMAX
-#endif //vmax480_resource_2047_h

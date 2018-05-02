@@ -1,6 +1,7 @@
 #include "stun_extension_types.h"
 
 namespace nx {
+namespace network {
 namespace stun {
 namespace extension {
 
@@ -200,4 +201,5 @@ std::vector< String > StringList::get() const
 } // namespace attrs
 } // namespace extension
 } // namespace stun
+} // namespace network
 } // namespace nx

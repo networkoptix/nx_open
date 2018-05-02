@@ -29,7 +29,7 @@ public:
     using RolesSet = QSet<int>;
     void setTriggeringRoles(const RolesSet& roles);
 
-    void forceUpdate();
+    virtual void forceUpdate();
 
 public: //< Properties
     int sourceRowsCount() const;
@@ -67,6 +67,8 @@ public: // overrides section
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
     virtual int columnCount(const QModelIndex& parent = QModelIndex()) const override;
     virtual QHash<int, QByteArray> roleNames() const override;
+
+    virtual bool removeRows(int row, int count, const QModelIndex& parent = QModelIndex()) override;
 
 signals:
     void sourceRowsCountChanged();

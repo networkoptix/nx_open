@@ -45,7 +45,7 @@ public:
 private:
     QTimer* m_checkTimer = nullptr;
     nx::vms::discovery::Manager* m_moduleDiscoveryManager = nullptr;
-    QHash<QnUuid, QUrl> m_migratedSessions;
+    QHash<QnUuid, nx::utils::Url> m_migratedSessions;
 };
 
 SessionsMigrationHelper::Private::Private(vms::discovery::Manager* moduleDiscoveryManager):

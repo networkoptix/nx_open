@@ -10,7 +10,7 @@
 #include "flir_fc_private.h"
 
 #include <nx/network/system_socket.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <core/resource_management/resource_searcher.h>
 
 namespace nx {
@@ -32,7 +32,7 @@ public:
     virtual ~FcResourceSearcher();
 
     virtual QList<QnResourcePtr> checkHostAddr(
-        const QUrl& url,
+        const nx::utils::Url& url,
         const QAuthenticator& auth,
         bool doMultichannelCheck) override;
 
@@ -50,21 +50,21 @@ private:
         const QAuthenticator& auth);
 
     void initListenerUnsafe();
-    nx_http::AsyncHttpClientPtr createHttpClient() const;
+    nx::network::http::AsyncHttpClientPtr createHttpClient() const;
 
     void doNextReceiveUnsafe();
     void receiveFromCallback(
         SystemError::ErrorCode errorCode,
-        SocketAddress senderAddress,
+        nx::network::SocketAddress senderAddress,
         std::size_t bytesRead);
 
-    bool hasValidCacheUnsafe(const SocketAddress& address) const;
+    bool hasValidCacheUnsafe(const nx::network::SocketAddress& address) const;
     bool isDeviceSupported(const DeviceInfo& deviceInfo) const;
     void handleDeviceInfoResponseUnsafe(
-        const SocketAddress& senderAddress,
-        nx_http::AsyncHttpClientPtr httpClient);
+        const nx::network::SocketAddress& senderAddress,
+        nx::network::http::AsyncHttpClientPtr httpClient);
 
-    void cleanUpEndpointInfoUnsafe(const SocketAddress& endpoint);
+    void cleanUpEndpointInfoUnsafe(const nx::network::SocketAddress& endpoint);
 
 private:
     QnUuid m_flirFcTypeId;
@@ -72,9 +72,9 @@ private:
     std::unique_ptr<nx::network::UDPSocket> m_receiveSocket;
     nx::Buffer m_receiveBuffer;
 
-    std::unordered_map<SocketAddress, nx_http::AsyncHttpClientPtr> m_httpClients;
-    std::unordered_map<SocketAddress, TimestampedDeviceInfo> m_deviceInfoCache;
-    std::set<SocketAddress> m_requestsInProgress;
+    std::unordered_map<nx::network::SocketAddress, nx::network::http::AsyncHttpClientPtr> m_httpClients;
+    std::unordered_map<nx::network::SocketAddress, TimestampedDeviceInfo> m_deviceInfoCache;
+    std::set<nx::network::SocketAddress> m_requestsInProgress;
     bool m_terminated;
 
     mutable QnMutex m_mutex;

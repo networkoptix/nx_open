@@ -1,83 +1,33 @@
 #include "client_video_camera.h"
 
+#include <client/client_module.h>
+
 #include <nx/utils/log/log.h>
 
 #include <nx/streaming/abstract_media_stream_data_provider.h>
+#include <nx/streaming/rtsp_client_archive_delegate.h>
+#include <nx/streaming/archive_stream_reader.h>
+
 #include <core/resource/media_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/security_cam_resource.h>
+#include <core/dataprovider/data_provider_factory.h>
 
-#include <nx/streaming/rtsp_client_archive_delegate.h>
-#include <nx/streaming/archive_stream_reader.h>
 #include <nx/network/http/custom_headers.h>
+#include <nx/client/desktop/export/tools/export_timelapse_recorder.h>
 
 #include <recording/time_period.h>
-#include <plugins/resource/avi/thumbnails_stream_reader.h>
-#include <plugins/resource/avi/avi_archive_delegate.h>
+#include <core/resource/avi/thumbnails_stream_reader.h>
+#include <core/resource/avi/avi_archive_delegate.h>
 #include <utils/common/util.h>
 
-// input video with steps between frames in timeStepUsec translated to output video with 30 fps (kOutputDeltaUsec between frames)
-
-class QnTimeLapseRecorder: public QnStreamRecorder
-{
-    static const qint64 kOutputDeltaUsec = 1000000ll / 30; //< 30 fps
-
-public:
-    QnTimeLapseRecorder(
-        const QnResourcePtr& resource,
-        qint64 timeStepUsec)
-        :
-        QnStreamRecorder(resource),
-        m_currentRelativeTimeUsec(0),
-        m_currentAbsoluteTimeUsec(std::numeric_limits<qint64>::min()),
-        m_timeStepUsec(timeStepUsec)
-    {
-
-    }
-
-    virtual ~QnTimeLapseRecorder()
-    {
-        stop();
-    }
-
-protected:
-
-    virtual bool saveData(const QnConstAbstractMediaDataPtr& md) override
-    {
-        QnAbstractMediaData* nonConstMd = const_cast<QnAbstractMediaData*> (md.get());
-        // we can use non const object if only 1 consumer
-        Q_ASSERT(nonConstMd->dataProvider->processorsCount() <= 1);
-
-        if (m_currentAbsoluteTimeUsec < md->timestamp)
-            m_currentAbsoluteTimeUsec = md->timestamp;
-        else
-            m_currentAbsoluteTimeUsec += m_timeStepUsec;
-
-        nonConstMd->timestamp = m_currentAbsoluteTimeUsec;
-        return QnStreamRecorder::saveData(md);
-    }
-
-    virtual qint64 getPacketTimeUsec(const QnConstAbstractMediaDataPtr& md) override
-    {
-        Q_UNUSED(md);
-        qint64 result = m_currentRelativeTimeUsec;
-        m_currentRelativeTimeUsec += kOutputDeltaUsec;
-        return result;
-    }
-
-    virtual bool isUtcOffsetAllowed() const override { return false; }
-private:
-    qint64 m_currentRelativeTimeUsec;
-    qint64 m_currentAbsoluteTimeUsec;
-    qint64 m_timeStepUsec;
-};
+#include <media/filters/h264_mp4_to_annexb.h>
 
 QnClientVideoCamera::QnClientVideoCamera(const QnMediaResourcePtr &resource, QnAbstractMediaStreamDataProvider* reader) :
     base_type(nullptr),
     m_resource(resource),
     m_camdispay(resource, dynamic_cast<QnArchiveStreamReader*>(reader)),
     m_reader(reader),
-    m_extTimeSrc(NULL),
     m_exportRecorder(nullptr),
     m_exportReader(nullptr),
     m_displayStarted(false)
@@ -120,14 +70,6 @@ QnClientVideoCamera::~QnClientVideoCamera()
 
 QnMediaResourcePtr QnClientVideoCamera::resource() {
     return m_resource;
-}
-
-qint64 QnClientVideoCamera::getCurrentTime() const
-{
-    if (m_extTimeSrc && m_extTimeSrc->isEnabled())
-        return m_extTimeSrc->getDisplayedTime();
-    else
-        return m_camdispay.getDisplayedTime();
 }
 
 /*
@@ -191,12 +133,13 @@ void QnClientVideoCamera::setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val
 }
 
 void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod,
-												  const  QString& fileName, const QString& format,
-                                            QnStorageResourcePtr storage,
-                                            StreamRecorderRole role,
-                                            qint64 serverTimeZoneMs,
-                                            qint64 timelapseFrameStepMs,
-                                            QnImageFilterHelper transcodeParams)
+    const  QString& fileName,
+    const QString& format,
+    QnStorageResourcePtr storage,
+    StreamRecorderRole role,
+    qint64 serverTimeZoneMs,
+    qint64 timelapseFrameStepMs,
+    const nx::core::transcoding::FilterChain& filters)
 {
     qint64 timelapseFrameStepUs = timelapseFrameStepMs * 1000;
     qint64 startTimeUs = timePeriod.startTimeMs * 1000ll;
@@ -216,7 +159,8 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
         }
         else
         {
-            auto tmpReader = m_resource->toResource()->createDataProvider(Qn::CR_Default);
+            auto tmpReader = qnClientModule->dataProviderFactory()->createDataProvider(
+                m_resource->toResourcePtr());
             QnAbstractArchiveStreamReader* archiveReader = dynamic_cast<QnAbstractArchiveStreamReader*> (tmpReader);
             if (!archiveReader)
             {
@@ -229,7 +173,11 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
             }
             archiveReader->setCycleMode(false);
             if (role == StreamRecorderRole::fileExport)
+            {
                 archiveReader->setQuality(MEDIA_Quality_ForceHigh, true); // for 'mkv' and 'avi' files
+                // Additing filtering is required in case of.AVI export.
+                 archiveReader->addMediaFilter(std::make_shared<H264Mp4ToAnnexB>());
+            }
 
             QnRtspClientArchiveDelegate* rtspClient = dynamic_cast<QnRtspClientArchiveDelegate*> (archiveReader->getArchiveDelegate());
             if (rtspClient) {
@@ -257,9 +205,14 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
         });
 
         if (timelapseFrameStepUs > 0)
-            m_exportRecorder = new QnTimeLapseRecorder(m_resource->toResourcePtr(), timelapseFrameStepUs);
+        {
+            m_exportRecorder = new nx::client::desktop::ExportTimelapseRecorder(
+                m_resource->toResourcePtr(), timelapseFrameStepUs);
+        }
         else
+        {
             m_exportRecorder = new QnStreamRecorder(m_resource->toResourcePtr());
+        }
 
 
         connect(m_exportRecorder, &QnStreamRecorder::finished, this, [this]()
@@ -275,8 +228,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
             sender()->deleteLater();
         });
 
-
-        m_exportRecorder->setExtraTranscodeParams(transcodeParams);
+        m_exportRecorder->setTranscodeFilters(filters);
 
         connect(m_exportRecorder,   &QnStreamRecorder::recordingFinished, this,   &QnClientVideoCamera::stopExport);
         connect(m_exportRecorder,   &QnStreamRecorder::recordingProgress, this,   &QnClientVideoCamera::exportProgress);
@@ -296,7 +248,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
     }
 
     m_exportRecorder->clearUnprocessedData();
-    m_exportRecorder->setEofDateTime(endTimeUs);
+    m_exportRecorder->setProgressBounds(startTimeUs, endTimeUs);
 
     if (storage)
         m_exportRecorder->addRecordingContext(

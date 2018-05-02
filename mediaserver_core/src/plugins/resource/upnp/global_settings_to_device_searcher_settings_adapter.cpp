@@ -1,31 +1,19 @@
 #include "global_settings_to_device_searcher_settings_adapter.h"
 
-#include <api/global_settings.h>
-
-static const int PARTIAL_DISCOVERY_XML_DESCRIPTION_LIVE_TIME_MS = 24 * 60 * 60 * 1000;
+#include <core/resource_management/resource_discovery_manager.h>
 
 GlobalSettingsToDeviceSearcherSettingsAdapter::GlobalSettingsToDeviceSearcherSettingsAdapter(
-    QnGlobalSettings* globalSettings)
+    QnResourceDiscoveryManager* discoveryManager)
     :
-    m_globalSettings(globalSettings)
+    m_discoveryManager(discoveryManager)
 {
 }
 
 int GlobalSettingsToDeviceSearcherSettingsAdapter::cacheTimeout() const
 {
-    const auto disabledVendors = m_globalSettings->disabledVendorsSet();
-    if (disabledVendors.size() == 1 && disabledVendors.contains(lit("all=partial")))
-        return PARTIAL_DISCOVERY_XML_DESCRIPTION_LIVE_TIME_MS;
+    static const int kBigCacheTimeoutMs = 24 * 60 * 60 * 1000;
+    if (m_discoveryManager->discoveryMode() != DiscoveryMode::fullyEnabled)
+        return kBigCacheTimeoutMs;
 
     return m_defaultSettings.cacheTimeout();
-}
-
-bool GlobalSettingsToDeviceSearcherSettingsAdapter::isUpnpMulticastEnabled() const
-{
-    if (m_globalSettings->isNewSystem())
-        return false;
-
-    return
-        m_globalSettings->isAutoDiscoveryEnabled() ||
-        m_globalSettings->isUpnpPortMappingEnabled();
 }

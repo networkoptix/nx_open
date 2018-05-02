@@ -21,6 +21,7 @@ QVector<QnUuid> toIdList(const QnResourceList& list)
 }
 
 AbstractActionPtr ActionFactory::instantiateAction(
+    QnCommonModule* commonModule,
     const RulePtr& rule,
     const AbstractEventPtr& event,
     const QnUuid& moduleGuid,
@@ -34,7 +35,8 @@ AbstractActionPtr ActionFactory::instantiateAction(
     result->setParams(rule->actionParams());
     result->setResources(rule->actionResources());
 
-    if (hasToggleState(event->getEventType()) && hasToggleState(rule->actionType()))
+    if (hasToggleState(event->getEventType(), runtimeParams, commonModule) &&
+        hasToggleState(rule->actionType()))
     {
         EventState value = state != EventState::undefined ? state : event->getToggleState();
         result->setToggleState(value);
@@ -45,12 +47,13 @@ AbstractActionPtr ActionFactory::instantiateAction(
 }
 
 AbstractActionPtr ActionFactory::instantiateAction(
+    QnCommonModule* commonModule,
     const RulePtr& rule,
     const AbstractEventPtr& event,
     const QnUuid& moduleGuid,
     const AggregationInfo& aggregationInfo)
 {
-    AbstractActionPtr result = instantiateAction(rule, event, moduleGuid);
+    AbstractActionPtr result = instantiateAction(commonModule, rule, event, moduleGuid);
     if (!result)
         return result;
 
@@ -68,27 +71,28 @@ AbstractActionPtr ActionFactory::createAction(
 {
     switch (actionType)
     {
-        case cameraOutputAction:
+        case ActionType::cameraOutputAction:
             return AbstractActionPtr(new CameraOutputAction(runtimeParams));
-        case cameraRecordingAction:
+        case ActionType::cameraRecordingAction:
             return AbstractActionPtr(new RecordingAction(runtimeParams));
-        case panicRecordingAction:
+        case ActionType::panicRecordingAction:
             return AbstractActionPtr(new PanicAction(runtimeParams));
-        case sendMailAction:
+        case ActionType::sendMailAction:
             return AbstractActionPtr(new SendMailAction(runtimeParams));
-        case bookmarkAction:
+        case ActionType::bookmarkAction:
             return AbstractActionPtr(new BookmarkAction(runtimeParams));
 
-        case undefinedAction:
-        case diagnosticsAction:
-        case showPopupAction:
-        case playSoundOnceAction:
-        case playSoundAction:
-        case sayTextAction:
-        case executePtzPresetAction:
-        case showTextOverlayAction:
-        case showOnAlarmLayoutAction:
-        case execHttpRequestAction:
+        case ActionType::undefinedAction:
+        case ActionType::diagnosticsAction:
+        case ActionType::showPopupAction:
+        case ActionType::playSoundOnceAction:
+        case ActionType::playSoundAction:
+        case ActionType::sayTextAction:
+        case ActionType::executePtzPresetAction:
+        case ActionType::showTextOverlayAction:
+        case ActionType::showOnAlarmLayoutAction:
+        case ActionType::execHttpRequestAction:
+        case ActionType::openLayoutAction:
             return AbstractActionPtr(new CommonAction(actionType, runtimeParams));
 
         default:

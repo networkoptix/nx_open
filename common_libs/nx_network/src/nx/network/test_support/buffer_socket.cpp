@@ -31,9 +31,9 @@ bool BufferSocket::isClosed() const
 
 bool BufferSocket::connect(
     const SocketAddress& remoteSocketAddress,
-    unsigned int timeoutMillis)
+    std::chrono::milliseconds timeout)
 {
-    if (!DummySocket::connect(remoteSocketAddress, timeoutMillis))
+    if (!DummySocket::connect(remoteSocketAddress, timeout))
         return false;
 
     m_isOpened = true;

@@ -62,7 +62,7 @@ QnConnectionTestingDialog::QnConnectionTestingDialog( QWidget *parent)
     m_timeoutTimer->setSingleShot(false);
 }
 
-void QnConnectionTestingDialog::testConnection(const QUrl &url) {
+void QnConnectionTestingDialog::testConnection(const nx::utils::Url &url) {
     setHelpTopic(this, Qn::Login_Help);
     qnClientCoreModule->connectionFactory()->testConnection(
         url,

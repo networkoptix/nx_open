@@ -28,6 +28,8 @@ private:
     nx::utils::db::ConnectionOptions m_dbConnectionOptions;
 
     static boost::optional<nx::utils::db::ConnectionOptions> sDbConnectionOptions;
+
+    void cleanDatabase();
 };
 
 } // namespace test

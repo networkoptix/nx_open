@@ -5,8 +5,12 @@
 #include <nx/streaming/abstract_archive_delegate.h>
 #include <nx/streaming/abstract_navigator.h>
 
+#include <nx/utils/move_only_func.h>
+
 class QnTimePeriod;
 class QnTimePeriodList;
+class AbstractArchiveIntegrityWatcher;
+class AbstractMediaDataFilter;
 
 class QnAbstractArchiveStreamReader: public QnAbstractMediaStreamDataProvider, public QnAbstractNavigator
 {
@@ -25,7 +29,7 @@ public:
 
 
     // Manual open. Open will be called automatically on first data access
-    bool open();
+    bool open(AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher);
 
     virtual bool isSkippingFrames() const = 0;
 
@@ -94,6 +98,11 @@ public:
 
     bool isEnabled() const { return m_enabled; }
     void setEnabled(bool value) { m_enabled = value; }
+    virtual void setEndOfPlaybackHandler(std::function<void()> /*handler*/) {}
+    virtual void setErrorHandler(std::function<void(const QString& errorString)> /*handler*/) {}
+    void setNoDataHandler(nx::utils::MoveOnlyFunc<void()> noDataHandler);
+
+    void addMediaFilter(const std::shared_ptr<AbstractMediaDataFilter>& filter);
 protected:
 
     /**
@@ -114,13 +123,17 @@ signals:
     void nextFrameOccured();
     void prevFrameOccured();
     void skipFramesTo(qint64 mksec);
+    void waitForDataCanBeAccepted();
 protected:
+    AbstractArchiveIntegrityWatcher* m_archiveIntegrityWatcher = nullptr;
     bool m_cycleMode;
     qint64 m_needToSleep;
     QnAbstractArchiveDelegate* m_delegate;
     QnAbstractNavigator* m_navDelegate;
+    nx::utils::MoveOnlyFunc<void()> m_noDataHandler;
 private:
     bool m_enabled;
+    std::vector<std::shared_ptr<AbstractMediaDataFilter>> m_filters;
 };
 
 #endif // ABSTRACT_ARCHIVE_STREAM_READER_H

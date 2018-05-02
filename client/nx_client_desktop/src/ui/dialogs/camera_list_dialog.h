@@ -25,7 +25,7 @@ class QnCameraListDialog: public QnSessionAwareDialog {
     typedef QnSessionAwareDialog base_type;
 
 public:
-    explicit QnCameraListDialog(QWidget *parent = NULL);
+    explicit QnCameraListDialog(QWidget *parent);
     virtual ~QnCameraListDialog();
 
     void setServer(const QnMediaServerResourcePtr &server);

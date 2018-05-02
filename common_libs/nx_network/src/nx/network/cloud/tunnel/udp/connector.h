@@ -21,13 +21,13 @@ namespace udp {
 
 class RendezvousConnectorWithVerification;
 
-/** Establishes cross-nat connection to the specified host using UDP hole punching technique.
-    \note One instance can keep only one session
-    \note Can be safely freed within connect handler. 
-        Otherwise, \a TunnelConnector::pleaseStop is required
+/**
+ * Establishes cross-nat connection to the specified host using UDP hole punching technique.
+ * NOTE: One instance can keep only one session
+ * NOTE: Can be safely freed within connect handler.
+ * Otherwise, TunnelConnector::pleaseStop is required
  */
-class NX_NETWORK_API TunnelConnector
-:
+class NX_NETWORK_API TunnelConnector:
     public AbstractTunnelConnector,
     public stun::UnreliableMessagePipelineEventHandler
 {
@@ -44,9 +44,10 @@ public:
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
     virtual int getPriority() const override;
-    /** Only one connect can be running at a time.
-        @param timeout 0 - no timeout
-    */
+    /**
+     * Only one connect can be running at a time.
+     * @param timeout 0 - no timeout.
+     */
     virtual void connect(
         const hpm::api::ConnectResponse& response,
         std::chrono::milliseconds timeout,
@@ -78,7 +79,9 @@ private:
         RendezvousConnectorWithVerification* rendezvousConnectorPtr,
         SystemError::ErrorCode errorCode);
     void onHandshakeComplete(SystemError::ErrorCode errorCode);
-    /** always called within aio thread */
+    /**
+     * NOTE: always called within aio thread.
+     */
     void holePunchingDone(
         nx::hpm::api::NatTraversalResultCode resultCode,
         SystemError::ErrorCode sysErrorCode);

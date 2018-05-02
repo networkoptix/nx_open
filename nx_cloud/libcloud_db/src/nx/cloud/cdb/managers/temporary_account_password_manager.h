@@ -107,13 +107,12 @@ class TemporaryAccountPasswordManager:
 {
 public:
     TemporaryAccountPasswordManager(
-        const conf::Settings& settings,
         const nx::utils::stree::ResourceNameSet& attrNameset,
         nx::utils::db::AsyncSqlQueryExecutor* const dbManager) noexcept(false);
     virtual ~TemporaryAccountPasswordManager();
 
     virtual void authenticateByName(
-        const nx_http::StringType& username,
+        const nx::network::http::StringType& username,
         std::function<bool(const nx::Buffer&)> validateHa1Func,
         const nx::utils::stree::AbstractResourceReader& authSearchInputData,
         nx::utils::stree::ResourceContainer* const authProperties,
@@ -184,7 +183,6 @@ private:
     constexpr static const int kIndexByLogin = 1;
     constexpr static const int kIndexByAccountEmail = 2;
 
-    const conf::Settings& m_settings;
     const nx::utils::stree::ResourceNameSet& m_attrNameset;
     nx::utils::db::AsyncSqlQueryExecutor* const m_dbManager;
     nx::utils::Counter m_startedAsyncCallsCounter;
@@ -211,7 +209,8 @@ private:
     boost::optional<const TemporaryAccountCredentialsEx&> findMatchingCredentials(
         const QnMutexLockerBase& lk,
         const std::string& username,
-        std::function<bool(const nx::Buffer&)> checkPasswordHash);
+        std::function<bool(const nx::Buffer&)> checkPasswordHash,
+        api::ResultCode* authResultCode);
     void runExpirationRulesOnSuccessfulLogin(
         const QnMutexLockerBase& lk,
         const TemporaryAccountCredentialsEx& temporaryCredentials);

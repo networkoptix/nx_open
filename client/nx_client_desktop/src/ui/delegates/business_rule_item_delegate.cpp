@@ -35,6 +35,9 @@
 using namespace nx;
 using namespace nx::client::desktop::ui;
 
+using nx::vms::api::EventType;
+using nx::vms::api::ActionType;
+
 namespace {
 enum { comboBoxMaxVisibleItems = 100 };
 }
@@ -214,30 +217,30 @@ int QnBusinessRuleItemDelegate::optimalWidth(Column column, const QFontMetrics& 
         case Column::event:
         {
             vms::event::StringsHelper helper(qnClientCoreModule->commonModule());
-            auto eventWidth = [&metrics, &helper](vms::event::EventType eventType)
+            auto eventWidth = [&metrics, &helper](vms::api::EventType eventType)
                 {
                     return metrics.width(helper.eventName(eventType));
                 };
             int result = -1;
-            for (vms::event::EventType eventType: vms::event::allEvents())
+            for (vms::api::EventType eventType: vms::event::allEvents())
                 result = qMax(result, eventWidth(eventType));
             return kExtraSpace + result;
         }
         case Column::action:
         {
             vms::event::StringsHelper helper(qnClientCoreModule->commonModule());
-            auto actionWidth = [&metrics, &helper](vms::event::ActionType actionType)
+            auto actionWidth = [&metrics, &helper](vms::api::ActionType actionType)
                 {
                     return metrics.width(helper.actionName(actionType));
                 };
             int result = -1;
-            for (vms::event::ActionType actionType: vms::event::allActions())
+            for (vms::api::ActionType actionType: vms::event::allActions())
                 result = qMax(result, actionWidth(actionType));
             return kExtraSpace + result;
         }
         case Column::aggregation:
         {
-            return QnAggregationWidget::optimalWidth();
+            return nx::client::desktop::AggregationWidget::optimalWidth();
         }
         default:
             break;
@@ -289,44 +292,46 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
             // TODO: #GDM #Business server selection dialog?
             connect(btn, SIGNAL(commit()), this, SLOT(at_editor_commit()));
 
-            vms::event::EventType eventType = index.data(Qn::EventTypeRole).value<vms::event::EventType>();
-            if (eventType == vms::event::cameraMotionEvent)
+            vms::api::EventType eventType = index.data(Qn::EventTypeRole).value<vms::api::EventType>();
+            if (eventType == EventType::cameraMotionEvent)
                 btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraMotionPolicy>(btn));
-            else if (eventType == vms::event::cameraInputEvent)
+            else if (eventType == EventType::cameraInputEvent)
                 btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraInputPolicy>(btn));
+            else if (eventType == EventType::analyticsSdkEvent)
+                btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraAnalyticsPolicy>(btn));
 
             return btn;
         }
         case Column::target:
         {
-            vms::event::ActionType actionType = index.data(Qn::ActionTypeRole).value<vms::event::ActionType>();
+            vms::api::ActionType actionType = index.data(Qn::ActionTypeRole).value<vms::api::ActionType>();
             auto model = index.data(Qn::RuleModelRole).value<QnBusinessRuleViewModelPtr>();
 
             QnSelectResourcesDialogButton* btn = new QnSelectResourcesDialogButton(parent);
             connect(btn, SIGNAL(commit()), this, SLOT(at_editor_commit()));
 
-            if (actionType == vms::event::cameraRecordingAction)
+            if (actionType == ActionType::cameraRecordingAction)
             {
                 btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraRecordingPolicy>(btn));
             }
-            else if (actionType == vms::event::bookmarkAction)
+            else if (actionType == ActionType::bookmarkAction)
             {
                 btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnBookmarkActionPolicy>(btn));
             }
-            else if (actionType == vms::event::cameraOutputAction)
+            else if (actionType == ActionType::cameraOutputAction)
             {
                 btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraOutputPolicy>(btn));
             }
-            else if (actionType == vms::event::executePtzPresetAction)
+            else if (actionType == ActionType::executePtzPresetAction)
             {
                 btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnExecPtzPresetPolicy>(btn));
             }
-            else if (actionType == vms::event::sendMailAction)
+            else if (actionType == ActionType::sendMailAction)
             {
                 btn->setDialogDelegate(new QnSendEmailActionDelegate(btn));
                 btn->setSelectionTarget(QnResourceSelectionDialog::Filter::users);
             }
-            else if (actionType == vms::event::showPopupAction)
+            else if (actionType == ActionType::showPopupAction)
             {
                 btn->setSelectionTarget(QnResourceSelectionDialog::Filter::users);
                 if (model->actionParams().needConfirmation)
@@ -339,9 +344,9 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
                     btn->setSubjectValidationPolicy(new QnDefaultSubjectValidationPolicy());
                 }
             }
-            else if (actionType == vms::event::playSoundAction ||
-                actionType == vms::event::playSoundOnceAction ||
-                actionType == vms::event::sayTextAction)
+            else if (actionType == ActionType::playSoundAction ||
+                actionType == ActionType::playSoundOnceAction ||
+                actionType == ActionType::sayTextAction)
             {
                 btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraAudioTransmitPolicy>(btn));
             }
@@ -349,20 +354,34 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
         }
         case Column::event:
         {
-            QComboBox* comboBox = new QComboBox(parent);
+            using EventSubType = QnBusinessTypesComparator::EventSubType;
+            auto comboBox = new QComboBox(parent);
+            auto addItem = [this, comboBox](vms::api::EventType eventType)
+                {
+                    comboBox->addItem(m_businessStringsHelper->eventName(eventType), eventType);
+                };
+
             comboBox->setMaxVisibleItems(comboBoxMaxVisibleItems);
-            for (const auto eventType: m_lexComparator->lexSortedEvents())
-                comboBox->addItem(m_businessStringsHelper->eventName(eventType), eventType);
+            for (const auto eventType: m_lexComparator->lexSortedEvents(EventSubType::user))
+                addItem(eventType);
+            comboBox->insertSeparator(comboBox->count());
+            for (const auto eventType: m_lexComparator->lexSortedEvents(EventSubType::failure))
+                addItem(eventType);
+            comboBox->insertSeparator(comboBox->count());
+            for (const auto eventType: m_lexComparator->lexSortedEvents(EventSubType::success))
+                addItem(eventType);
             return comboBox;
         }
         case Column::action:
         {
-            bool instantOnly = !vms::event::hasToggleState(index.data(Qn::EventTypeRole).value<vms::event::EventType>());
+            auto eventType = index.data(Qn::EventTypeRole).value<vms::api::EventType>();
+            auto eventParams = index.data(Qn::EventParametersRole).value<nx::vms::event::EventParameters>();
+            bool isInstantOnly = !vms::event::hasToggleState(eventType, eventParams, commonModule());
             QComboBox* comboBox = new QComboBox(parent);
             comboBox->setMaxVisibleItems(comboBoxMaxVisibleItems);
-            for (vms::event::ActionType actionType : m_lexComparator->lexSortedActions())
+            for (vms::api::ActionType actionType : m_lexComparator->lexSortedActions())
             {
-                if (instantOnly && !vms::event::canBeInstant(actionType))
+                if (isInstantOnly && !vms::event::canBeInstant(actionType))
                     continue;
                 comboBox->addItem(m_businessStringsHelper->actionName(actionType), actionType);
             }
@@ -370,7 +389,7 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
         }
         case Column::aggregation:
         {
-            QnAggregationWidget* widget = new QnAggregationWidget(parent);
+            nx::client::desktop::AggregationWidget* widget = new nx::client::desktop::AggregationWidget(parent);
             widget->setShort(true);
             return widget;
         }
@@ -409,19 +428,19 @@ void QnBusinessRuleItemDelegate::setEditorData(QWidget *editor, const QModelInde
         case Column::event:
             if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor))
             {
-                comboBox->setCurrentIndex(comboBox->findData(index.data(Qn::EventTypeRole).value<vms::event::EventType>()));
+                comboBox->setCurrentIndex(comboBox->findData(index.data(Qn::EventTypeRole).value<vms::api::EventType>()));
                 connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_editor_commit()));
             }
             return;
         case Column::action:
             if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor))
             {
-                comboBox->setCurrentIndex(comboBox->findData(index.data(Qn::ActionTypeRole).value<vms::event::ActionType>()));
+                comboBox->setCurrentIndex(comboBox->findData(index.data(Qn::ActionTypeRole).value<vms::api::ActionType>()));
                 connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_editor_commit()));
             }
             return;
         case Column::aggregation:
-            if (QnAggregationWidget* widget = dynamic_cast<QnAggregationWidget *>(editor))
+            if (nx::client::desktop::AggregationWidget* widget = dynamic_cast<nx::client::desktop::AggregationWidget *>(editor))
             {
                 widget->setValue(index.data(Qt::EditRole).toInt());
                 connect(widget, SIGNAL(valueChanged()), this, SLOT(at_editor_commit()));
@@ -456,7 +475,7 @@ void QnBusinessRuleItemDelegate::setModelData(QWidget *editor, QAbstractItemMode
             }
             return;
         case Column::aggregation:
-            if (QnAggregationWidget* widget = dynamic_cast<QnAggregationWidget *>(editor))
+            if (nx::client::desktop::AggregationWidget* widget = dynamic_cast<nx::client::desktop::AggregationWidget *>(editor))
             {
                 model->setData(index, widget->value());
             }

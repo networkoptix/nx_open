@@ -9,8 +9,11 @@
 #include <QtGui/QMatrix4x4>
 
 #include <nx/utils/math/fuzzy.h>
+#include <nx/client/core/utils/geometry.h>
 #include <utils/common/warnings.h>
 #include <ui/animation/animation_event.h>
+
+using nx::client::core::Geometry;
 
 namespace {
 
@@ -146,7 +149,7 @@ public:
     {
         qreal d = 1.0e3;
         setPositionBounds(QRectF(QPointF(-d, -d), QPointF(d, d)));
-        setPositionBoundsExtension(MarginsF(0.0, 0.0, 0.0, 0.0));
+        setPositionBoundsExtension(QMarginsF(0.0, 0.0, 0.0, 0.0));
         setMovementSpeed(1.0);
         setSizeBounds(QSizeF(1 / d, 1 / d), Qt::KeepAspectRatioByExpanding, QSizeF(d, d), Qt::KeepAspectRatio);
         setSizeBoundsExtension(QSizeF(0.0, 0.0), QSizeF(0.0, 0.0));
@@ -188,14 +191,16 @@ public:
         return m_positionBounds;
     }
 
-    void setPositionBoundsExtension(const MarginsF &extension) {
+    void setPositionBoundsExtension(const QMarginsF& extension)
+    {
         m_positionBoundsExtension = extension;
 
         if (m_view)
             updateSceneRect();
     }
 
-    const MarginsF &positionBoundsExtension() const {
+    const QMarginsF& positionBoundsExtension() const
+    {
         return m_positionBoundsExtension;
     }
 
@@ -205,7 +210,7 @@ public:
         m_sizeUpperBounds = sizeUpperBound;
         m_upperMode = upperMode;
 
-        if(!contains(m_sizeUpperBounds, m_sizeLowerBounds))
+        if(!Geometry::contains(m_sizeUpperBounds, m_sizeLowerBounds))
             m_sizeUpperBounds = m_sizeLowerBounds;
 
         if(m_view != NULL) {
@@ -349,7 +354,7 @@ public:
                     if(!qFuzzyIsNull(direction)) {
                         qreal viewportSize = (m_sceneViewportRect.width() + m_sceneViewportRect.height()) / 2;
                         qreal speed = m_movementSpeed * viewportSize;
-                        qreal directionLength = length(direction);
+                        qreal directionLength = Geometry::length(direction);
                         qreal deltaLength = dt * speed * speedMultiplier(directionLength, viewportSize);
                         if(deltaLength > directionLength)
                             deltaLength = directionLength;
@@ -396,8 +401,13 @@ protected:
         m_sceneViewportCenter = m_sceneViewportRect.center();
     }
 
-    QRectF calculateCenterPositionBounds() const {
-        return truncated(dilated(m_positionBounds, cwiseMul(m_positionBoundsExtension - MarginsF(0.5, 0.5, 0.5, 0.5), m_sceneViewportRect.size())));
+    QRectF calculateCenterPositionBounds() const
+    {
+        return truncated(Geometry::dilated(
+            m_positionBounds,
+            Geometry::cwiseMul(
+                m_positionBoundsExtension - QMarginsF(0.5, 0.5, 0.5, 0.5),
+                m_sceneViewportRect.size())));
     }
 
     /**
@@ -405,8 +415,10 @@ protected:
      * scale bounds are at -1.0 and 1.0.
      */
     void calculateRelativeScale(qreal *logScale, qreal *powFactor = NULL) const {
-        qreal logLowerScale = std::log(scaleFactor(m_sceneViewportRect.size(), m_extendedSizeLowerBound, m_lowerMode));
-        qreal logUpperScale = std::log(scaleFactor(m_sceneViewportRect.size(), m_extendedSizeUpperBound, m_upperMode));
+        qreal logLowerScale = std::log(Geometry::scaleFactor(
+            m_sceneViewportRect.size(), m_extendedSizeLowerBound, m_lowerMode));
+        qreal logUpperScale = std::log(Geometry::scaleFactor(
+            m_sceneViewportRect.size(), m_extendedSizeUpperBound, m_upperMode));
 
         qreal localFactor = (logUpperScale - logLowerScale) * 0.5;
         *logScale = (0.0 - logLowerScale) / localFactor - 1.0;
@@ -428,7 +440,7 @@ protected:
         sceneRect.adjust(-dx, -dy, dx, dy);
 
         /* Expand. */
-        sceneRect = QnGeometry::dilated(sceneRect, sceneRect.size() * 3);
+        sceneRect = Geometry::dilated(sceneRect, sceneRect.size() * 3);
 
         /* Expand to include current scene rect. */
         sceneRect = sceneRect.united(m_view->sceneRect());
@@ -436,9 +448,12 @@ protected:
         m_view->setSceneRect(sceneRect);
     }
 
-    void updateExtendedSizeBounds() {
-        m_extendedSizeUpperBound = m_sizeUpperBounds + cwiseMul(m_sizeUpperExtension, m_sizeUpperBounds);
-        m_extendedSizeLowerBound = m_sizeLowerBounds + cwiseMul(m_sizeLowerExtension, m_sizeLowerBounds);
+    void updateExtendedSizeBounds()
+    {
+        m_extendedSizeUpperBound =
+            m_sizeUpperBounds + Geometry::cwiseMul(m_sizeUpperExtension, m_sizeUpperBounds);
+        m_extendedSizeLowerBound =
+            m_sizeLowerBounds + Geometry::cwiseMul(m_sizeLowerExtension, m_sizeLowerBounds);
     }
 
 public:
@@ -452,7 +467,7 @@ public:
 
     /** Viewport position boundary extension multipliers.
      * Viewport size is multiplied by the extension factor and added to the sides of position boundary. */
-    MarginsF m_positionBoundsExtension;
+    QMarginsF m_positionBoundsExtension;
 
     /** Viewport lower size boundary, in scene coordinates. */
     QSizeF m_sizeLowerBounds;
@@ -629,7 +644,7 @@ QRectF BoundingInstrument::positionBounds(QGraphicsView *view) const {
     }
 }
 
-void BoundingInstrument::setPositionBoundsExtension(QGraphicsView *view, const MarginsF &extension) {
+void BoundingInstrument::setPositionBoundsExtension(QGraphicsView *view, const QMarginsF& extension) {
     if(view == NULL) {
         foreach(ViewData *d, m_data)
             d->setPositionBoundsExtension(extension);
@@ -638,11 +653,11 @@ void BoundingInstrument::setPositionBoundsExtension(QGraphicsView *view, const M
     }
 }
 
-MarginsF BoundingInstrument::positionBoundsExtension(QGraphicsView *view) const {
+QMarginsF BoundingInstrument::positionBoundsExtension(QGraphicsView *view) const {
     if(ViewData *d = checkView(view)) {
         return d->positionBoundsExtension();
     } else {
-        return MarginsF();
+        return QMarginsF();
     }
 }
 

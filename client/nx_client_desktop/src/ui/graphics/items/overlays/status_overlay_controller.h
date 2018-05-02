@@ -26,6 +26,9 @@ public:
     Qn::ResourceOverlayButton currentButton() const;
     void setCurrentButton(Qn::ResourceOverlayButton button);
 
+    QString customButtonText() const;
+    void setCustomButtonText(const QString& text);
+
     bool isErrorOverlay() const;
 
     QnStatusOverlayWidget::Controls visibleItems() const;
@@ -35,16 +38,21 @@ public:
 
     static QString captionText(Qn::ResourceStatusOverlay overlay);
     static QString descriptionText(Qn::ResourceStatusOverlay overlay);
-    static QString statusIcon(Qn::ResourceStatusOverlay overlay);
+    static QString statusIconPath(Qn::ResourceStatusOverlay overlay);
+    static QPixmap statusIcon(Qn::ResourceStatusOverlay overlay);
 
 signals:
     void statusOverlayChanged(bool animated);
 
     void currentButtonChanged();
 
+    void customButtonTextChanged();
+
     void isErrorOverlayChanged();
 
     void buttonClicked(Qn::ResourceOverlayButton button);
+
+    void customButtonClicked();
 
     void visibleItemsChanged();
 
@@ -55,8 +63,8 @@ private:
 
     void onStatusOverlayChanged(bool animated);
 
-    QnStatusOverlayWidget::Controls errorVisibleItems();
-    QnStatusOverlayWidget::Controls normalVisibleItems();
+    QnStatusOverlayWidget::Controls errorVisibleItems() const;
+    QnStatusOverlayWidget::Controls normalVisibleItems() const;
 
     void updateErrorState();
 
@@ -70,5 +78,7 @@ private:
     QnStatusOverlayWidget::Controls m_visibleItems;
     Qn::ResourceStatusOverlay m_statusOverlay;
     Qn::ResourceOverlayButton m_currentButton;
+    QString m_customButtonText;
+
     bool m_isErrorOverlay;
 };

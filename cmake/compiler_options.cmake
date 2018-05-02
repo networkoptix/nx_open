@@ -1,10 +1,42 @@
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+if(MSVC)
+    # Visual Studio 2017 currently (15.5.x) ignores "set(CMAKE_CXX_STANDARD 17)".
+    # So we need to set c++17 support explicitly.
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17")
+endif(MSVC)
+
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-set(CMAKE_LINK_DEPENDS_NO_SHARED ON)
+if(developerBuild)
+    set(CMAKE_LINK_DEPENDS_NO_SHARED ON)
+endif()
+
+option(analyzeMutexLocksForDeadlock
+    "Analyze mutex locks for deadlock. WARNING: this can significantly reduce performance!"
+    OFF)
+
+if(MSVC)
+    # MSVC does not support compiler feature detection macros, so Qt fails to enable constexpr
+    # for some its claasses like QRect, QMargins, etc.
+    if(MSVC_VERSION GREATER 1900)
+        add_definitions(-D__cpp_constexpr=201304)
+    else()
+        add_definitions(-DQ_COMPILER_CONSTEXPR)
+    endif()
+endif()
+
+if(CMAKE_BUILD_TYPE MATCHES "Release|RelWithDebInfo")
+    # TODO: Use CMake defaults in the next release version (remove the following two lines).
+    string(REPLACE "-O3" "-O2" CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}")
+    string(REPLACE "-O3" "-O2" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        add_compile_options(-fno-devirtualize)
+    endif()
+endif()
 
 add_definitions(
     -DUSE_NX_HTTP
@@ -13,56 +45,31 @@ add_definitions(
     -DENABLE_SENDMAIL
     -DENABLE_DATA_PROVIDERS
     -DENABLE_SOFTWARE_MOTION_DETECTION
-    -DENABLE_THIRD_PARTY
-    -DENABLE_MDNS
 )
 
 if(WINDOWS)
     add_definitions(
         -D_WINSOCKAPI_=
-        -DENABLE_VMAX
-        -DENABLE_DESKTOP_CAMERA
     )
 endif()
-
-if(UNIX)
-    add_definitions(-DQN_EXPORT=)
-endif()
-
-set(enableAllVendors ON)
 
 if(ANDROID OR IOS)
     remove_definitions(
         -DENABLE_SENDMAIL
         -DENABLE_DATA_PROVIDERS
         -DENABLE_SOFTWARE_MOTION_DETECTION
-        -DENABLE_THIRD_PARTY
-        -DENABLE_MDNS
     )
-    set(enableAllVendors OFF)
 endif()
 
-if(box MATCHES "isd|edge1")
+if(box MATCHES "isd")
     set(enableAllVendors OFF)
-    remove_definitions(-DENABLE_SOFTWARE_MOTION_DETECTION)
+    remove_definitions(-DENABLE_MOTION_DETECTION)
     add_definitions(-DEDGE_SERVER)
 endif()
 
-if(enableAllVendors)
-    add_definitions(
-        -DENABLE_ONVIF
-        -DENABLE_AXIS
-        -DENABLE_ACTI
-        -DENABLE_ARECONT
-        -DENABLE_DLINK
-        -DENABLE_DROID
-        -DENABLE_TEST_CAMERA
-        -DENABLE_STARDOT
-        -DENABLE_IQE
-        -DENABLE_ISD
-        -DENABLE_PULSE_CAMERA
-        -DENABLE_FLIR
-    )
+if(box MATCHES "edge1")
+    set(enableAllVendors OFF)
+    add_definitions(-DEDGE_SERVER)
 endif()
 
 if(WINDOWS)
@@ -78,18 +85,17 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         add_definitions(-D_DEBUG)
     endif()
     add_definitions(-DUSE_OWN_MUTEX)
-    if(analyzeMutexLocksForDeadlock)
-        add_definitions(-DANALYZE_MUTEX_LOCKS_FOR_DEADLOCK)
-    endif()
+endif()
+
+if(analyzeMutexLocksForDeadlock)
+    add_definitions(-DUSE_OWN_MUTEX)
+    add_definitions(-DANALYZE_MUTEX_LOCKS_FOR_DEADLOCK)
 endif()
 
 if(WINDOWS)
     add_definitions(
         -DNOMINMAX=
         -DUNICODE)
-    set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS
-        $<$<STREQUAL:$<TARGET_PROPERTY:TYPE>,STATIC_LIBRARY>:QN_EXPORT=>
-        $<$<NOT:$<STREQUAL:$<TARGET_PROPERTY:TYPE>,STATIC_LIBRARY>>:QN_EXPORT=Q_DECL_EXPORT>)
 
     add_compile_options(
         /MP
@@ -99,6 +105,8 @@ if(WINDOWS)
         /wd4100
         /we4717
     )
+    add_definitions(-D_SILENCE_CXX17_OLD_ALLOCATOR_MEMBERS_DEPRECATION_WARNING)
+    add_definitions(-D_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING)
 
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         add_compile_options(/wd4250)
@@ -109,10 +117,14 @@ if(WINDOWS)
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${_extra_linker_flags}")
     set(CMAKE_STATIC_LINKER_FLAGS "${CMAKE_STATIC_LINKER_FLAGS} /ignore:4221")
 
-    if(CMAKE_BUILD_TYPE STREQUAL "Release")
-        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Zi")
-        set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /DEBUG")
-        set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /DEBUG")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Zi")
+    set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /DEBUG")
+    set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /DEBUG")
+
+    set(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} /DEBUG")
+    set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /DEBUG")
+    if(NOT developerBuild)
+        set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /SUBSYSTEM:WINDOWS /entry:mainCRTStartup")
     endif()
     unset(_extra_linker_flags)
 endif()
@@ -128,11 +140,7 @@ if(UNIX)
         -Wno-error=unused-function
     )
 
-    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-        if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 7.0)
-            add_compile_options(-Wno-error=dangling-else)
-        endif()
-    elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         add_compile_options(
             -Wno-c++14-extensions
             -Wno-inconsistent-missing-override
@@ -141,24 +149,26 @@ if(UNIX)
 endif()
 
 if(LINUX)
-    if(NOT "${arch}" STREQUAL "arm")
+    if(NOT "${arch}" MATCHES "arm|aarch64")
         add_compile_options(-msse2)
     endif()
     add_compile_options(
         -Wno-unknown-pragmas
         -Wno-ignored-qualifiers
+        -fstack-protector-all #< TODO: Use -fstask-protector-strong when supported.
     )
     set(CMAKE_SKIP_BUILD_RPATH ON)
     set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
+    set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
 
-    if(LINUX)
-        set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
+    string(APPEND CMAKE_EXE_LINKER_FLAGS " -Wl,--disable-new-dtags")
+    string(APPEND CMAKE_SHARED_LINKER_FLAGS " -rdynamic -Wl,--no-undefined")
+    string(APPEND CMAKE_EXE_LINKER_FLAGS " -Wl,--as-needed")
+    string(APPEND CMAKE_SHARED_LINKER_FLAGS " -Wl,--as-needed")
+
+    if(NOT ANDROID AND CMAKE_BUILD_TYPE STREQUAL "Release")
+        add_compile_options(-ggdb1 -fno-omit-frame-pointer)
     endif()
-
-    set(CMAKE_EXE_LINKER_FLAGS
-        "${CMAKE_EXE_LINKER_FLAGS} -Wl,--disable-new-dtags")
-    set(CMAKE_SHARED_LINKER_FLAGS
-        "${CMAKE_SHARED_LINKER_FLAGS} -rdynamic -Wl,--no-undefined")
 endif()
 
 if(MACOSX)
@@ -181,7 +191,7 @@ if(qml_debug)
 endif()
 
 set(strip_binaries ON)
-if(targetDevice MATCHES "bpi|bananapi|rpi"
+if(targetDevice MATCHES "bpi|bananapi|rpi|edge1"
     OR targetDevice STREQUAL "linux-x64"
     OR targetDevice STREQUAL "linux-x86"
     OR (targetDevice STREQUAL "" AND platform STREQUAL "linux")

@@ -21,9 +21,10 @@ public:
     const StatisticsCollector& statisticsCollector() const;
     StatisticsCollector& statisticsCollector();
 
+    bool initialize();
+
 protected:
     DbStructureUpdater& dbStructureUpdater();
-    bool initialize();
 
 private:
     const ConnectionOptions m_dbConnectionOptions;

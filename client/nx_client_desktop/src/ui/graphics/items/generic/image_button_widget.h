@@ -7,7 +7,6 @@
 #include <QtGui/QOpenGLFunctions>
 #include <QtGui/QOpenGLVertexArrayObject>
 
-#include <ui/common/margins.h>
 #include <ui/processors/clickable.h>
 #include <ui/animation/animated.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
@@ -75,8 +74,8 @@ public:
     void setFixedSize(qreal width, qreal height);
     void setFixedSize(const QSizeF &size);
 
-    MarginsF imageMargins() const;
-    void setImageMargins(const MarginsF &margins);
+    QMarginsF imageMargins() const;
+    void setImageMargins(const QMarginsF &margins);
 
     /** If the button size can be changed in runtime. */
     bool isDynamic() const;
@@ -157,7 +156,7 @@ private:
     QOpenGLBuffer m_textureBufferStatic;
     QOpenGLBuffer m_textureBufferTransition;
 
-    MarginsF m_imageMargins;
+    QMarginsF m_imageMargins;
 
     QIcon m_icon;
 };

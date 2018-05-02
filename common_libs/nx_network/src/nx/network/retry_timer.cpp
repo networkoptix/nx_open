@@ -117,7 +117,7 @@ std::chrono::milliseconds RetryTimer::currentDelay() const
 void RetryTimer::reset()
 {
     m_currentDelay = m_retryPolicy.initialDelay;
-    m_effectiveMaxDelay = 
+    m_effectiveMaxDelay =
         m_retryPolicy.maxDelay == RetryPolicy::kNoMaxDelay
         ? std::chrono::milliseconds::max()
         : m_retryPolicy.maxDelay;

@@ -18,9 +18,10 @@ public:
 
     void updateFlipState();
 protected:
-    virtual CameraDiagnostics::Result initInternal() override;
+    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex) override;
+    virtual CameraDiagnostics::Result initializeCameraDriver() override;
 
-    virtual bool setParamPhysical(const QString &id, const QString &value) override;
+    virtual bool setApiParameter(const QString &id, const QString &value) override;
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 
@@ -30,6 +31,7 @@ private:
     bool setResolution(bool full);
     bool setCamQuality(int q);
     QnConstResourceVideoLayoutPtr getDefaultVideoLayout() const;
+    void initializeVideoLayoutUnsafe() const;
     int getChannelCount() const;
 protected:
     bool m_isRotated;

@@ -34,7 +34,6 @@ QueueFileWriter::QueueFileWriter()
     start();
 }
 
-
 QueueFileWriter::~QueueFileWriter()
 {
     stop();
@@ -301,11 +300,11 @@ bool QBufferedFile::updatePos()
     if (bufferOffset < 0 || bufferOffset > m_cycleBuffer.size())
     {
         flushBuffer();
-		if (m_lastSeekPos > kMkvMaxHeaderOffset)
-		{
-			int fileBlockSize = m_cycleBuffer.maxSize() - m_minBufferSize;
-			int curPow = std::log(m_minBufferSize / 1024) / std::log(2);
-			int newBufSize = (1 << (curPow + 1)) * 1024;
+        if (m_lastSeekPos > kMkvMaxHeaderOffset)
+        {
+            int fileBlockSize = m_cycleBuffer.maxSize() - m_minBufferSize;
+            int curPow = std::log(m_minBufferSize / 1024) / std::log(2);
+            int newBufSize = (1 << (curPow + 1)) * 1024;
 
             NX_LOG(lit("Seek detected for File: %1. Current FfmpegBufSize: %2. Enlarging up to %3. Delta = %4")
                     .arg((uintptr_t)this)
@@ -314,12 +313,12 @@ bool QBufferedFile::updatePos()
                     .arg(newBufSize - m_minBufferSize),
                    cl_logDEBUG1);
 
-			if (newBufSize < m_maxBufferSize)
+            if (newBufSize < m_maxBufferSize)
             {
-				m_minBufferSize = newBufSize;
-				emit seekDetected(reinterpret_cast<uintptr_t>(this), newBufSize);
-			}
-		}
+                m_minBufferSize = newBufSize;
+                emit seekDetected(reinterpret_cast<uintptr_t>(this), newBufSize);
+            }
+        }
         if (m_isDirectIO)
             m_filePos = qPower2Floor((quint64) m_lastSeekPos, SECTOR_SIZE);
         else
@@ -432,7 +431,6 @@ bool QBufferedFile::seek(qint64 pos)
         return true;
     }
 }
-
 
 bool QBufferedFile::open(QIODevice::OpenMode mode)
 {

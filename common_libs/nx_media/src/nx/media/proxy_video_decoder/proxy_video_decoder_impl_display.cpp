@@ -128,7 +128,7 @@ void Impl::displayDecodedFrame(void* frameHandle)
     if (ini().displayAsync)
     {
         auto selfPtr = std::weak_ptr<Impl>(std::dynamic_pointer_cast<Impl>(sharedPtrToThis()));
-        allocator().execAtGlThreadAsync(
+        renderContextSynchronizer().execInRenderContextAsync(
             [selfPtr, frameHandle]()
             {
                 if (auto self = selfPtr.lock())
@@ -147,7 +147,7 @@ void Impl::displayDecodedFrame(void* frameHandle)
                 }
                 else
                 {
-                    NX_OUTPUT << "displayDecodedFrame() execAtGlThreadAsync: already destroyed";
+                    NX_OUTPUT << "displayDecodedFrame() execInRenderContextAsync: already destroyed";
                 }
             });
     }

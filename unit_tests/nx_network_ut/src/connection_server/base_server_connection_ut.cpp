@@ -64,7 +64,7 @@ protected:
     void givenConnection()
     {
         auto clientConnection = std::make_unique<TCPSocket>(AF_INET);
-        ASSERT_TRUE(clientConnection->connect(m_serverSocket.getLocalAddress()));
+        ASSERT_TRUE(clientConnection->connect(m_serverSocket.getLocalAddress(), nx::network::kNoTimeout));
         m_clientConnections.push_back(std::move(clientConnection));
 
         std::unique_ptr<AbstractStreamSocket> acceptedConnection(m_serverSocket.accept());

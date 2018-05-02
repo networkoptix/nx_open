@@ -16,7 +16,7 @@ RestContent::RestContent(QByteArray type, QByteArray body):
 }
 
 RestResponse::RestResponse(
-    nx_http::StatusCode::Value statusCode, RestContent content, bool isUndefinedContentLength)
+    nx::network::http::StatusCode::Value statusCode, RestContent content, bool isUndefinedContentLength)
 :
     statusCode(statusCode), content(std::move(content)),
     isUndefinedContentLength(isUndefinedContentLength)
@@ -31,8 +31,8 @@ QnRestRequestHandler::QnRestRequestHandler():
 RestResponse QnRestRequestHandler::executeGet(const RestRequest& request)
 {
     RestResponse result;
-    result.statusCode = (nx_http::StatusCode::Value) executeGet(
-        request.path, request.params, result.content.body, result.content.type, request.owner);
+    result.statusCode = static_cast<nx::network::http::StatusCode::Value>(executeGet(
+        request.path, request.params, result.content.body, result.content.type, request.owner));
 
     return result;
 }
@@ -40,8 +40,8 @@ RestResponse QnRestRequestHandler::executeGet(const RestRequest& request)
 RestResponse QnRestRequestHandler::executeDelete(const RestRequest& request)
 {
     RestResponse result;
-    result.statusCode = (nx_http::StatusCode::Value) executeDelete(
-        request.path, request.params, result.content.body, result.content.type, request.owner);
+    result.statusCode = static_cast<nx::network::http::StatusCode::Value>(executeDelete(
+        request.path, request.params, result.content.body, result.content.type, request.owner));
 
     return result;
 }
@@ -50,9 +50,9 @@ RestResponse QnRestRequestHandler::executePost(
     const RestRequest& request, const RestContent& content)
 {
     RestResponse result;
-    result.statusCode = (nx_http::StatusCode::Value) executePost(
+    result.statusCode = static_cast<nx::network::http::StatusCode::Value>(executePost(
         request.path, request.params, content.body, content.type,
-        result.content.body, result.content.type, request.owner);
+        result.content.body, result.content.type, request.owner));
 
     return result;
 }
@@ -61,9 +61,9 @@ RestResponse QnRestRequestHandler::executePut(
     const RestRequest& request, const RestContent& content)
 {
     RestResponse result;
-    result.statusCode = (nx_http::StatusCode::Value) executePost(
+    result.statusCode = static_cast<nx::network::http::StatusCode::Value>(executePost(
         request.path, request.params, content.body, content.type,
-        result.content.body, result.content.type, request.owner);
+        result.content.body, result.content.type, request.owner));
 
     return result;
 }
@@ -127,7 +127,7 @@ int QnRestRequestHandler::executeDelete(
     QByteArray& /*contentType*/,
     const QnRestConnectionProcessor* /*owner*/)
 {
-    return nx_http::StatusCode::notImplemented;
+    return nx::network::http::StatusCode::notImplemented;
 }
 
 int QnRestGUIRequestHandler::executePost(

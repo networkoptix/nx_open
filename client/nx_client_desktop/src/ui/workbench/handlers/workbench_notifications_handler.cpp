@@ -88,8 +88,6 @@ QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent
         });
 
     QnCommonMessageProcessor* messageProcessor = qnCommonMessageProcessor;
-    connect(messageProcessor, &QnCommonMessageProcessor::connectionClosed, this,
-        &QnWorkbenchNotificationsHandler::at_eventManager_connectionClosed);
     connect(messageProcessor, &QnCommonMessageProcessor::businessActionReceived, this,
         &QnWorkbenchNotificationsHandler::at_eventManager_actionReceived);
 
@@ -127,7 +125,7 @@ void QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction()
         return;
 
     const QScopedPointer<QnCameraBookmarkDialog> bookmarksDialog(
-        new QnCameraBookmarkDialog(true, mainWindow()));
+        new QnCameraBookmarkDialog(true, mainWindowWidget()));
 
     bookmark.description = QString(); //< Force user to fill description out.
     bookmarksDialog->loadData(bookmark);
@@ -148,7 +146,7 @@ void QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction()
 
             const auto action = CommonAction::createBroadcastAction(
                 ActionType::showPopupAction, businessAction->getParams());
-            action->setToggleState(nx::vms::event::EventState::inactive);
+            action->setToggleState(nx::vms::api::EventState::inactive);
 
             if (const auto connection = commonModule()->ec2Connection())
             {
@@ -181,11 +179,11 @@ void QnWorkbenchNotificationsHandler::clear()
 void QnWorkbenchNotificationsHandler::addNotification(const vms::event::AbstractActionPtr &action)
 {
     vms::event::EventParameters params = action->getRuntimeParams();
-    vms::event::EventType eventType = params.eventType;
+    vms::api::EventType eventType = params.eventType;
 
-    if (eventType >= vms::event::systemHealthEvent && eventType <= vms::event::maxSystemHealthEvent)
+    if (eventType >= vms::api::EventType::systemHealthEvent && eventType <= vms::api::EventType::maxSystemHealthEvent)
     {
-        int healthMessage = eventType - vms::event::systemHealthEvent;
+        int healthMessage = eventType - vms::api::EventType::systemHealthEvent;
         addSystemHealthEvent(QnSystemHealth::MessageType(healthMessage), action);
         return;
     }
@@ -193,7 +191,7 @@ void QnWorkbenchNotificationsHandler::addNotification(const vms::event::Abstract
     if (!context()->user())
         return;
 
-    if (action->actionType() == vms::event::showOnAlarmLayoutAction)
+    if (action->actionType() == vms::api::ActionType::showOnAlarmLayoutAction)
     {
         /* Skip action if it contains list of users, and we are not on the list. */
         if (!QnBusiness::actionAllowedForUser(action->getParams(), context()->user()))
@@ -203,8 +201,8 @@ void QnWorkbenchNotificationsHandler::addNotification(const vms::event::Abstract
     bool alwaysNotify = false;
     switch (action->actionType())
     {
-        case vms::event::showOnAlarmLayoutAction:
-        case vms::event::playSoundAction:
+        case vms::api::ActionType::showOnAlarmLayoutAction:
+        case vms::api::ActionType::playSoundAction:
             //case vms::event::playSoundOnceAction: -- handled outside without notification
             alwaysNotify = true;
             break;
@@ -224,14 +222,9 @@ void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::Messa
     addSystemHealthEvent(message, vms::event::AbstractActionPtr());
 }
 
-void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::MessageType message, const vms::event::AbstractActionPtr &action)
+void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::MessageType message,
+    const vms::event::AbstractActionPtr &action)
 {
-    if (message == QnSystemHealth::StoragesAreFull)
-        return; //Bug #2308: Need to remove notification "Storages are full"
-
-    if (!(qnSettings->popupSystemHealth() & (1ull << message)))
-        return;
-
     setSystemHealthEventVisibleInternal(message, QVariant::fromValue(action), true);
 }
 
@@ -255,10 +248,6 @@ bool QnWorkbenchNotificationsHandler::adminOnlyMessage(QnSystemHealth::MessageTy
     switch (message)
     {
         case QnSystemHealth::EmailIsEmpty:
-        case QnSystemHealth::RemoteArchiveSyncStarted:
-        case QnSystemHealth::RemoteArchiveSyncFinished:
-        case QnSystemHealth::RemoteArchiveSyncError:
-        case QnSystemHealth::RemoteArchiveSyncProgress:
             return false;
 
         case QnSystemHealth::NoLicenses:
@@ -266,11 +255,15 @@ bool QnWorkbenchNotificationsHandler::adminOnlyMessage(QnSystemHealth::MessageTy
         case QnSystemHealth::UsersEmailIsEmpty:
         case QnSystemHealth::EmailSendError:
         case QnSystemHealth::StoragesNotConfigured:
-        case QnSystemHealth::StoragesAreFull:
         case QnSystemHealth::ArchiveRebuildFinished:
+        case QnSystemHealth::ArchiveIntegrityFailed:
         case QnSystemHealth::ArchiveRebuildCanceled:
         case QnSystemHealth::ArchiveFastScanFinished:
         case QnSystemHealth::SystemIsReadOnly:
+        case QnSystemHealth::RemoteArchiveSyncStarted:
+        case QnSystemHealth::RemoteArchiveSyncFinished:
+        case QnSystemHealth::RemoteArchiveSyncError:
+        case QnSystemHealth::RemoteArchiveSyncProgress:
         case QnSystemHealth::CloudPromo:
             return true;
 
@@ -294,13 +287,14 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible(QnSystemHealth
     setSystemHealthEventVisibleInternal(message, QVariant::fromValue(resource), visible);
 }
 
-void QnWorkbenchNotificationsHandler::setSystemHealthEventVisibleInternal(QnSystemHealth::MessageType message,
+void QnWorkbenchNotificationsHandler::setSystemHealthEventVisibleInternal(
+    QnSystemHealth::MessageType message,
     const QVariant& params,
     bool visible)
 {
     bool canShow = true;
 
-    bool connected = !commonModule()->remoteGUID().isNull();
+    const bool connected = !commonModule()->remoteGUID().isNull();
 
     if (!connected)
     {
@@ -323,9 +317,21 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisibleInternal(QnSyst
     /* Some messages are not to be displayed to users. */
     canShow &= (QnSystemHealth::isMessageVisible(message));
 
-    /* Checking that we want to see this message */
-    bool isAllowedByFilter = qnSettings->popupSystemHealth() & (1ull << message);
-    canShow &= isAllowedByFilter;
+    // TODO: remove this hack in VMS-7724
+    auto filterMessageKey = message;
+    if (message == QnSystemHealth::RemoteArchiveSyncFinished
+        || message == QnSystemHealth::RemoteArchiveSyncProgress
+        || message == QnSystemHealth::RemoteArchiveSyncError)
+    {
+        filterMessageKey = QnSystemHealth::RemoteArchiveSyncStarted;
+    }
+
+    // Checking that user wants to see this message (if he is able to hide it).
+    if (isMessageVisibleInSettings(filterMessageKey))
+    {
+        const bool isAllowedByFilter = qnSettings->popupSystemHealth().contains(filterMessageKey);
+        canShow &= isAllowedByFilter;
+    }
 
     if (visible && canShow)
         emit systemHealthEventAdded(message, params);
@@ -345,7 +351,6 @@ void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHea
     switch (message)
     {
         case QnSystemHealth::EmailSendError:
-        case QnSystemHealth::StoragesAreFull:
         case QnSystemHealth::StoragesNotConfigured:
         case QnSystemHealth::ArchiveRebuildFinished:
         case QnSystemHealth::ArchiveRebuildCanceled:
@@ -415,11 +420,6 @@ void QnWorkbenchNotificationsHandler::at_userEmailValidityChanged(const QnUserRe
     setSystemHealthEventVisible(message, user, visible);
 }
 
-void QnWorkbenchNotificationsHandler::at_eventManager_connectionClosed()
-{
-    clear();
-}
-
 void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(
     const vms::event::AbstractActionPtr& action)
 {
@@ -431,10 +431,10 @@ void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(
 
     switch (action->actionType())
     {
-        case vms::event::showOnAlarmLayoutAction:
+        case vms::api::ActionType::showOnAlarmLayoutAction:
             addNotification(action);
             break;
-        case vms::event::playSoundOnceAction:
+        case vms::api::ActionType::playSoundOnceAction:
         {
             QString filename = action->getParams().url;
             QString filePath = context()->instance<ServerNotificationCache>()->getFullPath(filename);
@@ -444,17 +444,17 @@ void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(
             break;
         }
 
-        case vms::event::showPopupAction: //< Fallthrough
-        case vms::event::playSoundAction:
+        case vms::api::ActionType::showPopupAction: //< Fallthrough
+        case vms::api::ActionType::playSoundAction:
         {
             switch (action->getToggleState())
             {
-                case vms::event::EventState::undefined:
-                case vms::event::EventState::active:
+                case vms::api::EventState::undefined:
+                case vms::api::EventState::active:
                     addNotification(action);
                     break;
 
-                case vms::event::EventState::inactive:
+                case vms::api::EventState::inactive:
                     emit notificationRemoved(action);
                     break;
 
@@ -464,7 +464,7 @@ void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(
             break;
         }
 
-        case vms::event::sayTextAction:
+        case vms::api::ActionType::sayTextAction:
         {
             AudioPlayer::sayTextAsync(action->getParams().sayText);
             break;
@@ -480,15 +480,11 @@ void QnWorkbenchNotificationsHandler::at_settings_valueChanged(int id)
     if (id != QnClientSettings::POPUP_SYSTEM_HEALTH)
         return;
 
-    quint64 filter = qnSettings->popupSystemHealth();
-    for (int i = 0; i < QnSystemHealth::Count; i++)
+    auto filter = qnSettings->popupSystemHealth();
+    for (auto messageType: QnSystemHealth::allVisibleMessageTypes())
     {
-        QnSystemHealth::MessageType messageType = static_cast<QnSystemHealth::MessageType>(i);
-        if (!QnSystemHealth::isMessageOptional(messageType))
-            continue;
-
-        bool oldVisible = (m_popupSystemHealthFilter &  (1ull << i));
-        bool newVisible = (filter &  (1ull << i));
+        bool oldVisible = m_popupSystemHealthFilter.contains(messageType);
+        bool newVisible = filter.contains(messageType);
         if (oldVisible == newVisible)
             continue;
 

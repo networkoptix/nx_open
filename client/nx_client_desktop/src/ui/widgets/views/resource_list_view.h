@@ -4,16 +4,16 @@
 
 #include <QtWidgets/QTreeView>
 
-#include <ui/widgets/common/tree_view.h>
+#include <nx/client/desktop/common/widgets/tree_view.h>
 
 #include <core/resource/resource_fwd.h>
 
 class QSortFilterProxyModel;
 class QnResourceListModel;
 
-class QnResourceListView: public QnTreeView
+class QnResourceListView: public nx::client::desktop::TreeView
 {
-    using base_type = QnTreeView;
+    using base_type = nx::client::desktop::TreeView;
 public:
     enum Option
     {

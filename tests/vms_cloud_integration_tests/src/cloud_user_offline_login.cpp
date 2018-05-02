@@ -8,13 +8,14 @@
 #include <nx/network/app_info.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/string.h>
+#include <nx/utils/std/optional.h>
 
 #include "mediaserver_cloud_integration_test_setup.h"
 
 namespace {
 
 static bool resourceParamPresent(
-    const ec2::ApiResourceParamDataList& params,
+    const nx::vms::api::ResourceParamDataList& params,
     const QString& name)
 {
     for (const auto& param: params)
@@ -31,6 +32,8 @@ static bool resourceParamPresent(
 class CloudUserOfflineLogin:
     public MediaServerCloudIntegrationTest
 {
+    using base_type = MediaServerCloudIntegrationTest;
+
 protected:
     void givenUserInvitedFromDesktopClient()
     {
@@ -115,11 +118,39 @@ protected:
             cdb()->activateAccount(*m_prevActivationCode, &accountEmail));
     }
 
+    void waitForUserCloudAuthInfoToBeUpdated()
+    {
+        std::optional<QString> initialAuthInfo;
+
+        auto mediaServerClient = prepareMediaServerClient();
+        for (;;)
+        {
+            nx::vms::api::ResourceParamDataList params;
+            ASSERT_EQ(
+                ec2::ErrorCode::ok,
+                mediaServerClient->ec2GetResourceParams(
+                    QnUuid::fromStringSafe(cloudOwnerVmsUserId()),
+                    &params));
+            auto authInfoIter = std::find_if(params.begin(), params.end(),
+                [](auto param) { return param.name == nx::cdb::api::kVmsUserAuthInfoAttributeName; });
+            if (authInfoIter != params.end())
+            {
+                if (!initialAuthInfo)
+                    initialAuthInfo = authInfoIter->value;
+                else if (*initialAuthInfo != authInfoIter->value)
+                    break; //< Auth info has been changed.
+            }
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            continue;
+        }
+    }
+
     void thenUserCanStillLogin()
     {
         auto mediaServerClient = prepareMediaServerClientFromCloudOwner();
-        ec2::ApiResourceParamDataList vmsSettings;
-        ASSERT_EQ(ec2::ErrorCode::ok, mediaServerClient.ec2GetSettings(&vmsSettings));
+        nx::vms::api::ResourceParamDataList vmsSettings;
+        ASSERT_EQ(ec2::ErrorCode::ok, mediaServerClient->ec2GetSettings(&vmsSettings));
     }
 
     void thenAllUsersCanStillLogin()
@@ -127,10 +158,12 @@ protected:
         auto mediaServerClient = prepareMediaServerClientFromCloudOwner();
         for (const auto& account: m_additionalCloudUsers)
         {
-            mediaServerClient.setUserName(QString::fromStdString(account.email));
-            mediaServerClient.setPassword(QString::fromStdString(account.password));
+            mediaServerClient->setUserCredentials(nx::network::http::Credentials(
+                account.email.c_str(),
+                nx::network::http::PasswordAuthToken(account.password.c_str())));
+
             ec2::ApiUserDataList users;
-            ASSERT_EQ(ec2::ErrorCode::ok, mediaServerClient.ec2GetUsers(&users));
+            ASSERT_EQ(ec2::ErrorCode::ok, mediaServerClient->ec2GetUsers(&users));
         }
     }
 
@@ -152,6 +185,8 @@ private:
 
     virtual void SetUp() override
     {
+        base_type::SetUp();
+
         connectSystemToCloud();
         waitUserCloudAuthInfoToBeSynchronized();
     }
@@ -161,10 +196,10 @@ private:
         auto mediaServerClient = prepareMediaServerClient();
         for (;;)
         {
-            ec2::ApiResourceParamDataList params;
+            nx::vms::api::ResourceParamDataList params;
             ASSERT_EQ(
                 ec2::ErrorCode::ok,
-                mediaServerClient.ec2GetResourceParams(
+                mediaServerClient->ec2GetResourceParams(
                     QnUuid::fromStringSafe(cloudOwnerVmsUserId()),
                     &params));
             if (resourceParamPresent(params, nx::cdb::api::kVmsUserAuthInfoAttributeName))
@@ -181,7 +216,7 @@ private:
             cdb()->resetAccountPassword(email, &confirmationCode));
 
         nx::cdb::api::AccountUpdateData accountUpdate;
-        accountUpdate.passwordHa1 = nx_http::calcHa1(
+        accountUpdate.passwordHa1 = nx::network::http::calcHa1(
             email.c_str(),
             nx::network::AppInfo::realm().toStdString().c_str(),
             password.c_str()).toStdString();
@@ -200,10 +235,11 @@ private:
     ec2::ErrorCode checkInvitedUserLoginToVms()
     {
         auto mediaServerClient = prepareMediaServerClientFromCloudOwner();
-        mediaServerClient.setUserName(QString::fromStdString(m_invitedAccount.email));
-        mediaServerClient.setPassword(QString::fromStdString(m_invitedAccount.password));
+        mediaServerClient->setUserCredentials(nx::network::http::Credentials(
+            m_invitedAccount.email.c_str(),
+            nx::network::http::PasswordAuthToken(m_invitedAccount.password.c_str())));
         ec2::ApiUserDataList users;
-        return mediaServerClient.ec2GetUsers(&users);
+        return mediaServerClient->ec2GetUsers(&users);
     }
 };
 
@@ -273,6 +309,35 @@ TEST_P(
     thenInvitedUserCannotLoginToTheSystem();
 }
 
+//-------------------------------------------------------------------------------------------------
+
 INSTANTIATE_TEST_CASE_P(P2pMode, CloudUserOfflineLogin,
+    ::testing::Values(TestParams(false), TestParams(true)
+));
+
+//-------------------------------------------------------------------------------------------------
+
+class CloudUserOfflineLoginAfterAuthInfoUpdate:
+    public CloudUserOfflineLogin
+{
+public:
+    CloudUserOfflineLoginAfterAuthInfoUpdate()
+    {
+        cdb()->addArg("--auth/offlineUserHashValidityPeriod=1s");
+        cdb()->addArg("--auth/checkForExpiredAuthPeriod=100ms");
+        cdb()->addArg("--auth/continueUpdatingExpiredAuthPeriod=100ms");
+    }
+};
+
+TEST_P(CloudUserOfflineLoginAfterAuthInfoUpdate, user_is_able_to_login_after_auth_info_update)
+{
+    waitForUserCloudAuthInfoToBeUpdated();
+    whenVmsLostConnectionToTheCloud();
+    thenUserCanStillLogin();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+INSTANTIATE_TEST_CASE_P(P2pMode, CloudUserOfflineLoginAfterAuthInfoUpdate,
     ::testing::Values(TestParams(false), TestParams(true)
 ));

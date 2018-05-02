@@ -32,6 +32,8 @@ public:
 
     void setReadOnly(bool readonly);
 
+    void setAllowExport(bool allowExport);
+
     virtual int helpTopicAt(const QPointF &pos) const override;
 
 signals:
@@ -50,6 +52,10 @@ signals:
     /// @brief Play bookmark action
     /// Closes tooltip after emittance
     void playBookmark(const QnCameraBookmark &bookmark);
+
+    /// @brief Export bookmark action
+    /// Closes tooltip after emittance
+    void exportBookmarkClicked(const QnCameraBookmark &bookmark);
 
 public slots:
     /// @brief Set abstract location for bookmarks extraction

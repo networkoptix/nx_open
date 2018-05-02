@@ -29,14 +29,14 @@ void QnFakeMediaServerResource::setFakeServerModuleInformation(const ec2::ApiDis
     if (serverData.status != oldData.status)
         emit statusChanged(toSharedPointer(this), Qn::StatusChangeReason::Local);
 
-    QList<SocketAddress> addressList;
+    QList<nx::network::SocketAddress> addressList;
     for (const QString &address : serverData.remoteAddresses)
-        addressList.append(SocketAddress(address));
+        addressList.append(nx::network::SocketAddress(address));
     setNetAddrList(addressList);
 
     if (!addressList.isEmpty())
     {
-        const SocketAddress endpoint(addressList.first().toString(), serverData.port);
+        const nx::network::SocketAddress endpoint(addressList.first().toString(), serverData.port);
         const auto url = nx::network::url::Builder()
             .setScheme(apiUrlScheme(serverData.sslAllowed))
             .setEndpoint(endpoint);
@@ -73,24 +73,10 @@ QString QnFakeMediaServerResource::getName() const
 Qn::ResourceStatus QnFakeMediaServerResource::getStatus() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_serverData.status;
-}
-
-QUrl QnFakeMediaServerResource::getApiUrl() const
-{
-    auto url = base_type::getApiUrl();
-    url.setUserName(m_authenticator.user());
-    url.setPassword(m_authenticator.password());
-    return url;
-}
-
-void QnFakeMediaServerResource::setAuthenticator(const QAuthenticator& authenticator)
-{
-    m_authenticator = authenticator;
-    apiConnection()->setUrl(getApiUrl());
+    return static_cast<Qn::ResourceStatus>(m_serverData.status);
 }
 
 void QnFakeMediaServerResource::updateInternal(const QnResourcePtr& /*other*/, Qn::NotifierList& /*notifiers*/)
 {
-    Q_ASSERT("This function should be not used for fake media servers");
+    NX_ASSERT(false, "This function should be not used for fake media servers");
 }

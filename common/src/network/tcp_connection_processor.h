@@ -28,12 +28,13 @@ public:
      */
     static bool doesPathEndWithCameraId() { return false; }
 
-    QnTCPConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner);
+    QnTCPConnectionProcessor(QSharedPointer<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner);
     virtual ~QnTCPConnectionProcessor();
 
     /**
      * Check for request or response is completed: finished with /r/n/r/n or contains full content len data
      * \param outContentLen If Content-Length header found, saves its value to \a *outContentLen (if not null)
+     * Returns -1 if message parsing fails, 0 if message is incomplete and message size if it is comlete.
      */
     static int isFullMessage(
         const QByteArray& message,
@@ -47,8 +48,8 @@ public:
 
     void execute(QnMutex& mutex);
     virtual void pleaseStop();
-    QSharedPointer<AbstractStreamSocket> socket() const;
-    QUrl getDecodedUrl() const;
+    QSharedPointer<nx::network::AbstractStreamSocket> socket() const;
+    nx::utils::Url getDecodedUrl() const;
 
     bool sendBuffer(const QnByteArray& sendBuffer);
     bool sendBuffer(const QByteArray& sendBuffer);
@@ -67,7 +68,7 @@ public:
     virtual void parseRequest();
 
     bool isSocketTaken() const;
-    QSharedPointer<AbstractStreamSocket> takeSocket();
+    QSharedPointer<nx::network::AbstractStreamSocket> takeSocket();
     void releaseSocket();
 
     int redirectTo(const QByteArray& page, QByteArray& contentType);
@@ -99,21 +100,21 @@ protected:
         \note Usage of this method MUST NOT be mixed with usage of \a readRequest / \a parseRequest
     */
     int readSocket( quint8* buffer, int bufSize );
-    SocketAddress remoteHostAddress() const;
+    nx::network::SocketAddress remoteHostAddress() const;
 
     QnTCPConnectionProcessor(
         QnTCPConnectionProcessorPrivate* d_ptr,
-        QSharedPointer<AbstractStreamSocket> socket,
+        QSharedPointer<nx::network::AbstractStreamSocket> socket,
         QnTcpListener* owner);
     // For inherited classes without TCP server socket only
     QnTCPConnectionProcessor(
         QnTCPConnectionProcessorPrivate* dptr,
-        QSharedPointer<AbstractStreamSocket> socket,
+        QSharedPointer<nx::network::AbstractStreamSocket> socket,
         QnCommonModule* commonModule);
 
     bool sendData(const char* data, int size);
     inline bool sendData(const QByteArray& data) { return sendData(data.constData(), data.size()); }
-    void sendUnauthorizedResponse(nx_http::StatusCode::Value httpResult, const QByteArray& messageBody);
+    void sendUnauthorizedResponse(nx::network::http::StatusCode::Value httpResult, const QByteArray& messageBody);
 protected:
     Q_DECLARE_PRIVATE(QnTCPConnectionProcessor);
 

@@ -6,12 +6,13 @@
 #include <QtCore/QFile>
 
 #include <nx/network/cloud/mediator_connector.h>
+#include <nx/network/cloud/mediator/api/listening_peer.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/std/thread.h>
 #include <nx/utils/test_support/module_instance_launcher.h>
+#include <nx/utils/test_support/test_with_temporary_directory.h>
 
 #include "../cloud_data_provider.h"
-#include "../data/listening_peer.h"
 #include "../mediator_process_public.h"
 #include "local_cloud_data_provider.h"
 #include "mediaserver_emulator.h"
@@ -29,7 +30,8 @@ enum Value
 } // namespace ServerBehavior
 
 class MediatorFunctionalTest:
-    public utils::test::ModuleLauncher<MediatorProcessPublic>
+    public utils::test::ModuleLauncher<MediatorProcessPublic>,
+    public utils::test::TestWithTemporaryDirectory
 {
 public:
     enum MediatorTestFlags
@@ -47,8 +49,8 @@ public:
 
     virtual bool waitUntilStarted() override;
 
-    SocketAddress stunEndpoint() const;
-    SocketAddress httpEndpoint() const;
+    network::SocketAddress stunEndpoint() const;
+    network::SocketAddress httpEndpoint() const;
 
     std::unique_ptr<nx::hpm::api::MediatorClientTcpConnection> clientConnection();
     std::unique_ptr<nx::hpm::api::MediatorServerTcpConnection> systemConnection();
@@ -70,7 +72,7 @@ public:
         const AbstractCloudDataProvider::System& system,
         size_t count, ServerTweak::Value tweak = ServerTweak::defaultBehavior);
 
-    std::tuple<nx_http::StatusCode::Value, data::ListeningPeers>
+    std::tuple<nx::network::http::StatusCode::Value, api::ListeningPeers>
         getListeningPeers() const;
 
 protected:
@@ -79,12 +81,11 @@ protected:
 
 private:
     const int m_testFlags;
-    QString m_tmpDir;
     int m_stunPort;
     int m_httpPort;
     LocalCloudDataProvider m_cloudDataProvider;
     boost::optional<AbstractCloudDataProviderFactory::FactoryFunc> m_factoryFuncToRestore;
-    SocketAddress m_stunAddress;
+    network::SocketAddress m_stunAddress;
 };
 
 } // namespace hpm

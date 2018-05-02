@@ -32,7 +32,7 @@ QNetworkProxy QnSimpleNetworkProxyFactory::proxyToResource(const QnResourcePtr &
     if (commonModule()->remoteGUID() == id)
         return QNetworkProxy(QNetworkProxy::NoProxy);
 
-    QUrl url = commonModule()->currentUrl();
+    nx::utils::Url url = commonModule()->currentUrl();
     if (!url.isValid())
         return QNetworkProxy(QNetworkProxy::NoProxy);
 
@@ -41,12 +41,12 @@ QNetworkProxy QnSimpleNetworkProxyFactory::proxyToResource(const QnResourcePtr &
     return QNetworkProxy(QNetworkProxy::HttpProxy, url.host(), url.port(), url.userName(), url.password());
 }
 
-QUrl QnSimpleNetworkProxyFactory::urlToResource(const QUrl &baseUrl, const QnResourcePtr &resource,
+nx::utils::Url QnSimpleNetworkProxyFactory::urlToResource(const nx::utils::Url &baseUrl, const QnResourcePtr &resource,
     const QString &proxyQueryParameterName) const
 {
-    QUrl url = base_type::urlToResource(baseUrl, resource, proxyQueryParameterName);
+    nx::utils::Url url = base_type::urlToResource(baseUrl, resource, proxyQueryParameterName);
 
-    QUrl ecUrl = commonModule()->currentUrl();
+    nx::utils::Url ecUrl = commonModule()->currentUrl();
     if (ecUrl.isValid()) {
         url.setHost(ecUrl.host());
         url.setPort(ecUrl.port());

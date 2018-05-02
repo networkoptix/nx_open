@@ -16,13 +16,6 @@ QnAviDvdResource::~QnAviDvdResource()
 {
 }
 
-QnAbstractStreamDataProvider* QnAviDvdResource::createDataProviderInternal(Qn::ConnectionRole /*role*/)
-{
-    QnArchiveStreamReader* result = new QnArchiveStreamReader(toSharedPointer());
-    result->setArchiveDelegate(new QnAVIDvdArchiveDelegate());
-    return result;
-}
-
 bool QnAviDvdResource::isAcceptedUrl(const QString& url)
 {
     QString sourceDir = url;
@@ -65,7 +58,7 @@ QString QnAviDvdResource::urlToFirstVTS(const QString& url)
         QStringList params = url.mid(titlePos+1).split(QLatin1Char('&'));
         for (int i = 0; i < params.size(); ++i) {
             QStringList values = params[i].split(QLatin1Char('='));
-            if (values[0] == QLatin1String("title") && values.size() == 2) 
+            if (values[0] == QLatin1String("title") && values.size() == 2)
             {
                 titleNum = values[1].toInt();
                 break;
@@ -84,3 +77,7 @@ QString QnAviDvdResource::urlToFirstVTS(const QString& url)
     return rezUrl + QLatin1String("VTS_") + titleStr + QLatin1String("_1.VOB");
 }
 
+QnAviArchiveDelegate* QnAviDvdResource::createArchiveDelegate() const
+{
+    return new QnAVIDvdArchiveDelegate();
+}

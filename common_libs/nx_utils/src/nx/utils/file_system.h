@@ -56,32 +56,6 @@ QString NX_UTILS_API applicationDirPath(int argc, char** argv);
 #ifdef Q_OS_WIN
 QString applicationFileNameInternal(const QString& defaultFileName);
 
-struct WinDriveInfo
-{
-    enum Access
-    {
-        NoAccess = 0,
-        Readable = 1,
-        Writable = 2,
-    };
-
-    QString path;
-    unsigned long type;
-    int access;
-
-    WinDriveInfo() :
-        type(0),
-        access(NoAccess)
-    {
-    }
-};
-
-/** @param driveString - any path, starting with drive letter */
-bool NX_UTILS_API mediaIsInserted(const QString& driveString);
-
-using WinDriveInfoList = QList<WinDriveInfo>;
-
-WinDriveInfoList NX_UTILS_API getWinDrivesInfo();
 #endif
 
 #if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
@@ -89,6 +63,8 @@ WinDriveInfoList NX_UTILS_API getWinDrivesInfo();
 bool NX_UTILS_API isUsb(const QString& devName);
 
 #endif
+
+bool NX_UTILS_API isRelativePathSafe(const QString& path);
 
 } // namespace file_system
 } // namespace utils

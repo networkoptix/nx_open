@@ -5,13 +5,13 @@
 	<key>CFBundleExecutable</key>
 	<string>applet</string>
 	<key>CFBundleIdentifier</key>
-	<string>${mac.protocol_handler_bundle.identifier}${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}.${buildNumber}</string>
+	<string>@mac.protocol_handler_bundle.identifier@@parsedVersion.majorVersion@.@parsedVersion.minorVersion@.@parsedVersion.incrementalVersion@.@buildNumber@</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleDisplayName</key>
-	<string>${product.name} Links Handler</string>
+	<string>@product.name@ Links Handler</string>
 	<key>CFBundleName</key>
-	<string>${product.name} Links Handler</string>
+	<string>@product.name@ Links Handler</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -22,10 +22,10 @@
 	<array>
 		<dict>
 			<key>CFBundleURLName</key>
-			<string>${product.name} Link</string>
+			<string>@product.name@ Link</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>${uri.protocol}</string>
+				<string>@uri.protocol@</string>
 			</array>
 		</dict>
 	</array>

@@ -9,6 +9,7 @@
 #include <network/module_information.h>
 #include <api/model/getnonce_reply.h>
 #include <utils/merge_systems_common.h>
+#include <nx/utils/url.h>
 
 class QnMergeSystemsTool: public QObject, public QnWorkbenchContextAware
 {
@@ -17,15 +18,14 @@ class QnMergeSystemsTool: public QObject, public QnWorkbenchContextAware
 public:
     QnMergeSystemsTool(QObject* parent = nullptr);
 
-    void pingSystem(const QUrl& url, const QAuthenticator& auth);
+    void pingSystem(const nx::utils::Url& url, const QAuthenticator& auth);
     int mergeSystem(
         const QnMediaServerResourcePtr& proxy,
-        const QUrl& url,
+        const nx::utils::Url& url,
         const QAuthenticator& userAuth,
         bool ownSettings);
-    int configureIncompatibleServer(
-        const QnMediaServerResourcePtr& proxy,
-        const QUrl& url,
+    int configureIncompatibleServer(const QnMediaServerResourcePtr& proxy,
+        const nx::utils::Url &url,
         const QAuthenticator& auth);
 
   signals:
@@ -64,7 +64,7 @@ private:
     struct TwoStepRequestCtx
     {
         QnMediaServerResourcePtr proxy;
-        QUrl url;
+        nx::utils::Url url;
         QAuthenticator auth;
         bool ownSettings = false;
         bool oneServer = false;

@@ -9,7 +9,9 @@
 
 #include "../abstract_msg_body_source.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 class HttpServerConnection;
 
@@ -19,9 +21,9 @@ struct AuthenticationResult
 {
     bool isSucceeded;
     nx::utils::stree::ResourceContainer authInfo;
-    boost::optional<nx_http::header::WWWAuthenticate> wwwAuthenticate;
-    nx_http::HttpHeaders responseHeaders;
-    std::unique_ptr<nx_http::AbstractMsgBodySource> msgBody;
+    boost::optional<nx::network::http::header::WWWAuthenticate> wwwAuthenticate;
+    nx::network::http::HttpHeaders responseHeaders;
+    std::unique_ptr<nx::network::http::AbstractMsgBodySource> msgBody;
 
     AuthenticationResult():
         isSucceeded(false)
@@ -31,9 +33,9 @@ struct AuthenticationResult
     AuthenticationResult(
         bool isSucceeded,
         nx::utils::stree::ResourceContainer authInfo,
-        boost::optional<nx_http::header::WWWAuthenticate> wwwAuthenticate,
-        nx_http::HttpHeaders responseHeaders,
-        std::unique_ptr<nx_http::AbstractMsgBodySource> msgBody)
+        boost::optional<nx::network::http::header::WWWAuthenticate> wwwAuthenticate,
+        nx::network::http::HttpHeaders responseHeaders,
+        std::unique_ptr<nx::network::http::AbstractMsgBodySource> msgBody)
         :
         isSucceeded(isSucceeded),
         authInfo(std::move(authInfo)),
@@ -62,15 +64,17 @@ public:
     virtual ~AbstractAuthenticationManager() = default;
 
     /**
-     * @param authProperties Properties found during authentication 
+     * @param authProperties Properties found during authentication
      *     should be placed here (e.g., some entity ID).
      * @param completionHandler Allowed to be called directly within this call.
      */
     virtual void authenticate(
-        const nx_http::HttpServerConnection& connection,
-        const nx_http::Request& request,
+        const nx::network::http::HttpServerConnection& connection,
+        const nx::network::http::Request& request,
         AuthenticationCompletionHandler completionHandler) = 0;
 };
 
 } // namespace server
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

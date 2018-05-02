@@ -13,35 +13,33 @@ namespace nx {
 namespace hpm {
 namespace api {
 
-class NX_NETWORK_API ResolvePeerRequest
-:
+class NX_NETWORK_API ResolvePeerRequest:
     public StunRequestData
 {
 public:
-    constexpr static const stun::extension::methods::Value kMethod =
-        stun::extension::methods::resolvePeer;
+    constexpr static const network::stun::extension::methods::Value kMethod =
+        network::stun::extension::methods::resolvePeer;
 
     nx::String hostName;
 
     ResolvePeerRequest(nx::String _hostName = {});
-    virtual void serializeAttributes(nx::stun::Message* const message) override;
-    virtual bool parseAttributes(const nx::stun::Message& message) override;
+    virtual void serializeAttributes(nx::network::stun::Message* const message) override;
+    virtual bool parseAttributes(const nx::network::stun::Message& message) override;
 };
- 
-class NX_NETWORK_API ResolvePeerResponse
-:
+
+class NX_NETWORK_API ResolvePeerResponse:
     public StunResponseData
 {
 public:
-    constexpr static const stun::extension::methods::Value kMethod =
-        stun::extension::methods::resolvePeer;
+    constexpr static const network::stun::extension::methods::Value kMethod =
+        network::stun::extension::methods::resolvePeer;
 
-    std::list<SocketAddress> endpoints;
+    std::list<network::SocketAddress> endpoints;
     ConnectionMethods connectionMethods;
 
     ResolvePeerResponse();
-    virtual void serializeAttributes(nx::stun::Message* const message) override;
-    virtual bool parseAttributes(const nx::stun::Message& message) override;
+    virtual void serializeAttributes(nx::network::stun::Message* const message) override;
+    virtual bool parseAttributes(const nx::network::stun::Message& message) override;
 };
 
 } // namespace api

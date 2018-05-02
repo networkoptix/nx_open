@@ -91,17 +91,18 @@ namespace {
 /** Make sure class names totally the same as on the activation server. */
 static std::array<LicenseTypeInfo, Qn::LC_Count>  licenseTypeInfo =
 {
-    LicenseTypeInfo(Qn::LC_Trial,           "trial",         1),
-    LicenseTypeInfo(Qn::LC_Analog,          "analog",        0),
-    LicenseTypeInfo(Qn::LC_Professional,    "digital",       0),
-    LicenseTypeInfo(Qn::LC_Edge,            "edge",          1),
-    LicenseTypeInfo(Qn::LC_VMAX,            "vmax",          0),
-    LicenseTypeInfo(Qn::LC_AnalogEncoder,   "analogencoder", 0),
-    LicenseTypeInfo(Qn::LC_VideoWall,       "videowall",     1),
-    LicenseTypeInfo(Qn::LC_IO,              "iomodule",      1),
-    LicenseTypeInfo(Qn::LC_Start,           "starter",       0),
-    LicenseTypeInfo(Qn::LC_Free,            "free",          1),
-    LicenseTypeInfo(Qn::LC_Invalid,         "",              1)
+    LicenseTypeInfo(Qn::LC_Trial,           "trial",         1, false),
+    LicenseTypeInfo(Qn::LC_Analog,          "analog",        0, false),
+    LicenseTypeInfo(Qn::LC_Professional,    "digital",       0, /*allowedToShareChannel*/ true),
+    LicenseTypeInfo(Qn::LC_Edge,            "edge",          1, false),
+    LicenseTypeInfo(Qn::LC_VMAX,            "vmax",          0, false),
+    LicenseTypeInfo(Qn::LC_AnalogEncoder,   "analogencoder", 0, false),
+    LicenseTypeInfo(Qn::LC_VideoWall,       "videowall",     1, false),
+    LicenseTypeInfo(Qn::LC_IO,              "iomodule",      1, false),
+    LicenseTypeInfo(Qn::LC_Start,           "starter",       0, /*allowedToShareChannel*/ true),
+    LicenseTypeInfo(Qn::LC_Free,            "free",          1, /*allowedToShareChannel*/ true),
+    LicenseTypeInfo(Qn::LC_Bridge,          "bridge",        0, false),
+    LicenseTypeInfo(Qn::LC_Invalid,         "",              1, false),
 };
 } // anonymous namespace
 
@@ -110,10 +111,16 @@ LicenseTypeInfo::LicenseTypeInfo() :
     allowedForARM(0)
 {}
 
-LicenseTypeInfo::LicenseTypeInfo(Qn::LicenseType licenseType, const QnLatin1Array& className, bool allowedForARM) :
+LicenseTypeInfo::LicenseTypeInfo(
+    Qn::LicenseType licenseType,
+    const QnLatin1Array& className,
+    bool allowedForARM,
+    bool allowedToShareChannel)
+    :
     licenseType(licenseType),
     className(className),
-    allowedForARM(allowedForARM)
+    allowedForARM(allowedForARM),
+    allowedToShareChannel(allowedToShareChannel)
 {}
 
 
@@ -128,7 +135,7 @@ QnLicense::QnLicense(const QByteArray& licenseBlock):
 }
 
 QnLicense::QnLicense(const ec2::ApiDetailedLicenseData& value)
-{ 
+{
     QList<QByteArray> params;
     params << QByteArray("NAME=").append(value.name);
     params << QByteArray("SERIAL=").append(value.key);
@@ -201,6 +208,7 @@ QString QnLicense::displayName(Qn::LicenseType licenseType) {
     case Qn::LC_IO:             return tr("I/O Module");
     case Qn::LC_Start:          return tr("Start");
     case Qn::LC_Free:           return tr("Free");
+    case Qn::LC_Bridge:         return tr("Bridge");
     case Qn::LC_Invalid:        return tr("Invalid");
     default:
         break;
@@ -224,6 +232,7 @@ QString QnLicense::longDisplayName(Qn::LicenseType licenseType) {
     case Qn::LC_IO:             return tr("I/O Module Licenses");
     case Qn::LC_Start:          return tr("Start Licenses");
     case Qn::LC_Free:           return tr("Free license");
+    case Qn::LC_Bridge:         return tr("Bridge Licenses");
     case Qn::LC_Invalid:        return tr("Invalid Licenses");
     default:
         break;

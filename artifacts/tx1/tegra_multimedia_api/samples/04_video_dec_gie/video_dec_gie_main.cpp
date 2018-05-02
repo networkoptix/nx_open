@@ -37,6 +37,11 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/prctl.h>
+#include <memory>
+#include <chrono>
+
+#include <cuda.h>
+#include <cuda_runtime.h>
 
 #include "NvUtils.h"
 #include "NvCudaProc.h"
@@ -44,16 +49,28 @@
 #include "video_dec_gie.h"
 #include "gie_inference.h"
 
-#define OUTPUT_PREFIX "[video_dec_gie_main] "
-#include <nx/utils/debug_utils.h>
-#include "config.h"
+#if defined(NX_TEST_MODE)
+#include "out_rgb.h"
+#endif
+
+#include <nx/kit/debug.h>
+
+#include "tegra_video_ini.h"
+#include "video_dec_gie_ini.h"
 
 #include "main_tv.h"
 
 namespace {
 
-static const int kNetWidth = 960;
-static const int kNetHeight = 540;
+class Lock
+{
+public:
+    Lock(pthread_mutex_t* mutex): m_mutex(mutex) { pthread_mutex_lock(m_mutex); }
+    ~Lock() { pthread_mutex_unlock(m_mutex); }
+
+private:
+    pthread_mutex_t* m_mutex;
+};
 
 } // namespace
 
@@ -167,7 +184,12 @@ initConv(context_t * ctx)
         return false;
     }
 
-    ret = ctx->conv->setCropRect(0, 0, ctx->dec_width, ctx->dec_height);
+    const int x = ini().cropRectX >= 0 ? ini().cropRectX : 0;
+    const int y = ini().cropRectY >= 0 ? ini().cropRectY : 0;
+    const int w = ini().cropRectW >= 0 ? ini().cropRectW : ctx->dec_width;
+    const int h = ini().cropRectH >= 0 ? ini().cropRectH : ctx->dec_height;
+    NX_PRINT << "setCropRect(" << x << ", " << y << ", " << w << ", " << h << ")";
+    ret = ctx->conv->setCropRect(x, y, w, h);
     if (ret < 0)
     {
         cerr << "Error while setting crop rect" << endl;
@@ -317,8 +339,8 @@ resChange(context_t * ctx)
 
     if (ctx->conv)
     {
-        ret = initConv(ctx);
-        TEST_ERROR(ret == false, "initConv failed", error);
+        bool result = initConv(ctx);
+        TEST_ERROR(result == false, "initConv failed", error);
     }
 
     // Capture plane STREAMON
@@ -411,7 +433,7 @@ decCaptureLoop(void *arg)
             }
             else
             {
-                cerr << "Error in dequeueing decoder event" << endl;
+                cerr << "Error in dequeuing decoder event" << endl;
             }
             abort(ctx);
             break;
@@ -424,8 +446,24 @@ decCaptureLoop(void *arg)
         resChange(ctx);
 
     // Exit on error or EOS which is signalled in main()
-    while (!(ctx->got_error || dec->isInError() || ctx->got_eos))
+    for (;;)
     {
+        if (ctx->got_error)
+        {
+            cout << "Exiting decoder capture loop thread: ctx->got_error" << endl;
+            break;
+        }
+        if (dec->isInError())
+        {
+            cout << "Exiting decoder capture loop thread: dec->isInError()" << endl;
+            break;
+        }
+        if (ctx->got_eos)
+        {
+            cout << "Exiting decoder capture loop thread: ctx->got_eos" << endl;
+            break;
+        }
+
         NvBuffer *dec_buffer;
 
         // Check for Resolution change again
@@ -474,9 +512,74 @@ decCaptureLoop(void *arg)
     return NULL;
 }
 
+#if defined(NX_TEST_MODE)
+void rgbToRgba(unsigned char* rgb, int rgbSize, int* rgba)
+{
+    auto i = 0;
+    auto j  = 0;
+
+    for (i = 0; i < rgbSize; i += 3)
+    {
+        rgba[i / 3] = (rgb[i] << 24) + (rgb[i + 1] << 16) + (rgb[i + 2] << 8);
+    }
+}
+#endif
+
 static void*
 gieThread(void *arg)
 {
+    using namespace std::chrono;
+
+#if defined(NX_TEST_MODE)
+    context_t *ctx = (context_t *)arg;
+    while (true)
+    {
+        queue<vector<cv::Rect>> rectList_queue;
+        std::cout << "=============!!!!!!!!!!!!!!!!!!!=================" << std::endl;
+        void *cuda_buf = ctx->gie_ctx->getBuffer(0);
+        std::unique_ptr<int[]> rgba(new int[512 *1024]);
+        std::unique_ptr<float[]> rgb2(new float[512 *1024 *3]);
+
+        rgbToRgba(MagickImage, 1024 * 512 * 3, rgba.get());
+
+        for (auto i = 0; i < 20; i++)
+        {
+            int n = rgba.get()[i];
+            std::cout << "RGBA: "
+                << ((int)((n >> 24) & 0xFF)) << " "
+                << ((int)((n >> 16) & 0xFF)) << " "
+                << ((int)((n >> 8) & 0xFF)) << " "
+                << ((int)(n & 0xFF)) << std::endl;
+        }
+
+        mapIntRgbaToFloatBgr(rgba.get(), 512 * 1024, cuda_buf);
+
+        cudaMemcpy(rgb2.get(), cuda_buf, 512 * 1024 *3, cudaMemcpyDeviceToHost);
+        cudaDeviceSynchronize();
+
+        for (auto i = 0; i < 100; i++)
+        {
+            std::cout << "Component " << i << " " << rgb2[i] << std::endl;
+        }
+
+        ctx->gie_ctx->doInference(rectList_queue);
+
+        auto vec = rectList_queue.front();
+        rectList_queue.pop_front();
+
+        for (const auto& rec: vec)
+        {
+            std::cout << "RECTANGLE: "
+                << rec.x << " "
+                << rec.y << " "
+                << rec.width << " "
+                << rec.height << std::endl;
+        }
+        sleep(1);
+    }
+#else
+
+    std::cout << "GIE THREAD STARTED!!!" << std::endl;
     int buf_num = 0;
     EGLImageKHR egl_image = NULL;
     struct v4l2_buffer *v4l2_buf;
@@ -502,6 +605,15 @@ gieThread(void *arg)
         return NULL;
     }
 
+    double inferenceFps = ini().maxInferenceFps;
+    std::chrono::milliseconds minTimeToNextInference(0);
+    if (inferenceFps != -1)
+    {
+        inferenceFps /= 10;
+        minTimeToNextInference = std::chrono::milliseconds(
+            (int)(1000.0 / inferenceFps));
+    }
+
     while (1)
     {
         // wait for buffer for process to come
@@ -522,7 +634,7 @@ gieThread(void *arg)
                 timeout.tv_sec = time(0);
                 timeout.tv_nsec = time_in_ms * 1000000;
                 int ret =
-                    pthread_cond_timedwait(&ctx->gie_cond, &ctx->gie_lock, &timeout);
+                    pthread_cond_wait(&ctx->gie_cond, &ctx->gie_lock);
                 if (ret != 0)
                 {
                     pthread_mutex_unlock(&ctx->gie_lock);
@@ -530,6 +642,7 @@ gieThread(void *arg)
                 }
             }
         }
+
         if (ctx->gie_buf_queue->size() != 0)
         {
             gie_buffer = ctx->gie_buf_queue->front();
@@ -539,6 +652,43 @@ gieThread(void *arg)
         {
             process_last_batch = 1;
         }
+
+
+        if (process_last_batch == 0)
+        {
+#if 1
+            const bool needToDropFrame = ini().dropFrames
+                && !ctx->m_ptsQueue.empty()
+                && ctx->m_lastInferenceDuration + ctx->m_lastProcessedFrameTimestamp > microseconds(ctx->m_ptsQueue.front())
+                && ctx->m_lastInferenceDuration != microseconds::zero();
+
+
+            if (needToDropFrame)
+            {
+                NX_OUTPUT << "@@@@@@@@@@@@@@@@@@@@@@@ DROPPING frame with timestamp: " << ctx->m_ptsQueue.front()
+                    << ", difference: "
+                    << (ctx->m_lastInferenceDuration + ctx->m_lastProcessedFrameTimestamp - microseconds(ctx->m_ptsQueue.front())).count()
+                    << ", " << (ctx->m_lastInferenceDuration + ctx->m_lastProcessedFrameTimestamp).count()
+                    << ", " << microseconds(ctx->m_ptsQueue.front()).count()
+                    << std::endl;
+
+                if (!ctx->m_ptsQueue.empty())
+                    ctx->m_ptsQueue.pop();
+                else
+                    NX_OUTPUT << "####### Some strange error: there is a frame, but pts queue is empty";
+
+
+                pthread_mutex_unlock(&ctx->gie_lock);
+
+                // It's a hack, actually I don't know how it works at all. If this lines are not here
+                // then we hang in pushCompressedFrame.
+                if (ctx->conv->capture_plane.qBuffer(gie_buffer.v4l2_buf, NULL) < 0)
+                    NX_OUTPUT << "conv queue buffer error";
+                continue;
+            }
+#endif
+        }
+
         pthread_mutex_unlock(&ctx->gie_lock);
 
         // we still have buffer, so accumulate buffer into batch
@@ -551,29 +701,9 @@ gieThread(void *arg)
 
             int batch_offset = buf_num  * ctx->gie_ctx->getNetWidth() *
                         ctx->gie_ctx->getNetHeight() * ctx->gie_ctx->getChannel();
-#if USE_CPU_FOR_INTFLOAT_CONVERSION
-            // copy with CPU is much slower than GPU
-            // but still keep it just in case customer want to save GPU
-            //generate input buffer for first time
-            unsigned char *data = buffer->planes[0].data;
-            int channel_offset = ctx->gie_ctx->getNetWidth() *
-                            ctx->gie_ctx->getNetHeight();
-            // copy buffer into input_buf
-            for (int i = 0; i < ctx->gie_ctx->getChannel(); i++)
-            {
-                for (int j = 0; j < ctx->gie_ctx->getNetHeight(); j++)
-                {
-                    for (int k = 0; k < ctx->gie_ctx->getNetWidth(); k++)
-                    {
-                        int total_offset = batch_offset + channel_offset * i +
-                            j * ctx->gie_ctx->getNetWidth() + k;
-                        gie_inputbuf[total_offset] =
-                            (float)(*(data + j * buffer->planes[0].fmt.stride
-                            + k * 4 + 3 - i - 1));
-                    }
-                }
-            }
-#else
+
+
+
             // map fd into EGLImage, then copy it with GPU in parallel
             // Create EGLImage from dmabuf fd
             egl_image = NvEGLImageFromFd(ctx->egl_display, buffer->planes[0].fd);
@@ -591,14 +721,16 @@ gieThread(void *arg)
             // TODO: #mshevchenko: Here they convert RGB to float directly to NN buffer in VRAM.
 
             // map eglimage into GPU address
-            mapEGLImage2Float(&egl_image,  ctx->gie_ctx->getNetWidth(),
-                              ctx->gie_ctx->getNetHeight(),
-                              (char *)cuda_buf + batch_offset * sizeof(float));
+            mapEGLImage2Float2(
+                &egl_image,
+                ctx->gie_ctx->getNetWidth(),
+                ctx->gie_ctx->getNetHeight(),
+                (char *)cuda_buf + batch_offset * sizeof(float));
 
             // Destroy EGLImage
             NvDestroyEGLImage(ctx->egl_display, egl_image);
             egl_image = NULL;
-#endif
+
             buf_num++;
 
             // now we push it to capture plane to let v4l2 go on
@@ -615,19 +747,22 @@ gieThread(void *arg)
         }
         else if(buf_num == 0) // framenum equal batch_size * n
         {
+            pthread_mutex_unlock(&ctx->gie_lock);
             break;
         }
 
         // buffer comes, we begin to inference
         buf_num = 0;
         queue<vector<cv::Rect>> rectList_queue;
-#if USE_CPU_FOR_INTFLOAT_CONVERSION
-        ctx->gie_ctx->doInference(
-            rectList_queue, gie_inputbuf);
-#else
-        ctx->gie_ctx->doInference(
-            rectList_queue);
-#endif
+
+        NX_TIME_BEGIN(Inference);
+
+        const auto before = high_resolution_clock::now();
+        ctx->gie_ctx->doInference(rectList_queue);
+        ctx->m_lastInferenceDuration = duration_cast<microseconds>(high_resolution_clock::now() - before);
+        ctx->m_lastProcessedFrameTimestamp = microseconds(ctx->m_ptsQueue.front());
+
+        NX_TIME_END(Inference);
 
         {
             pthread_mutex_lock(&ctx->gie_lock);
@@ -636,15 +771,31 @@ gieThread(void *arg)
                 vector<cv::Rect> rectList = rectList_queue.front();
                 rectList_queue.pop();
 
+                const auto pts = ctx->m_ptsQueue.front();
+                ctx->m_ptsQueue.pop();
+                ctx->m_outPtsQueue.push(pts);
+
                 ctx->rectQueuePtr->push(rectList);
                 for (int i = 0; i < rectList.size(); i++)
                 {
                     cv::Rect &r = rectList[i];
-                    cout <<"  x "<< r.x <<" y: " << r.y
-                         <<" width "<< r.width <<" height "<< r.height
+                    NX_OUTPUT <<"    x " << r.x << ", y " << r.y
+                         << ", w " << r.width << ", h " << r.height
                          << endl;
                 }
             }
+
+            ++ctx->m_framesProcessed;
+            auto now = std::chrono::high_resolution_clock::now();
+            auto totalTimeElapsedSeconds = std::chrono::duration_cast<std::chrono::seconds>(
+                (now - ctx->m_firstFrameArrivalTime)).count();
+
+            if (ctx->m_framesProcessed)
+            {
+                NX_OUTPUT << "####### FRAME RATE IS: "
+                    <<  ctx->m_framesProcessed / (double) totalTimeElapsedSeconds;
+            }
+
             pthread_mutex_unlock(&ctx->gie_lock);
         }
 
@@ -663,6 +814,7 @@ gieThread(void *arg)
             return NULL;
         }
     }
+#endif
     return NULL;
 }
 
@@ -755,8 +907,9 @@ static void
 setDefaults(context_t * ctx)
 {
     memset(ctx, 0, sizeof(context_t));
-    ctx->deployfile = conf.deployFile;
-    ctx->modelfile = conf.modelFile;
+    ctx->deployfile = exeIni().deployFile;
+    ctx->modelfile = exeIni().modelFile;
+    ctx->cachefile = exeIni().cacheFile;
     ctx->gie_ctx = new GIE_Context;
     ctx->gie_ctx->setDumpResult(true);
     ctx->gie_buf_queue = new queue<Shared_Buffer>;
@@ -777,6 +930,7 @@ setDefaultsNx(
     memset(ctx, 0, sizeof(context_t));
     ctx->deployfile = deployFileName;
     ctx->modelfile = modelFileName;
+    ctx->cachefile = cacheFileName;
     ctx->gie_ctx = new GIE_Context;
     ctx->gie_ctx->setDumpResult(true);
     ctx->gie_buf_queue = new queue<Shared_Buffer>;
@@ -851,7 +1005,7 @@ mainOriginal(int argc, char *argv[])
     ctx.rectQueuePtr = new std::queue<std::vector<cv::Rect>>;
 
     // Step-3: Create GIE
-    ctx.gie_ctx->buildGieContext(ctx.deployfile, ctx.modelfile);
+    ctx.gie_ctx->buildGieContext(ctx.deployfile, ctx.modelfile, ctx.cachefile);
     pthread_create(&ctx.gie_thread_handle, NULL, gieThread, &ctx);
 
     // Start decoder after GIE
@@ -1035,9 +1189,13 @@ mainNx(int argc, char *argv[])
     }
     const char *const filename = argv[1];
 
-    Detector detector;
-    detector.startInference(conf.modelFile, conf.deployFile, conf.cacheFile);
+    Detector detector(/*id*/ "0");
+    const int result = detector.startInference(
+        exeIni().modelFile, exeIni().deployFile, exeIni().cacheFile);
+    if (result != 0)
+        return result;
 
+    std::cout << "Inference has been started" << std::endl;
     ifstream in_file;
     in_file.open(filename, ios::in | ios::binary);
     if (!in_file.is_open())
@@ -1046,15 +1204,19 @@ mainNx(int argc, char *argv[])
         return 1;
     }
 
+#if !defined(NX_TEST_MODE)
     auto buf = new uint8_t[CHUNK_SIZE];
-    while (true)
+    for (;;) //< TODO: Decide how to interrupt the loop.
     {
-        in_file.read((char*)buf, CHUNK_SIZE);
+        in_file.read((char*) buf, CHUNK_SIZE);
         auto dataSize = in_file.gcount();
-        detector.pushCompressedFrame(buf, dataSize);
+        detector.pushCompressedFrame(buf, dataSize, 0);
+        if (dataSize <= 0)
+            break;
     }
 
-    delete buf;
+    delete[] buf;
+#endif
     return 0;
 }
 
@@ -1069,7 +1231,7 @@ main(int argc, char *argv[])
     }
     else if (strcmp(argv[1], "--original") == 0)
     {
-        std::cout << "Running in -original mode." << std::endl;
+        std::cout << "Running in --original mode." << std::endl;
         return mainOriginal(argc - 1, &argv[1]);
     }
     else if (strcmp(argv[1], "--nx") == 0)
@@ -1089,17 +1251,25 @@ main(int argc, char *argv[])
     }
 }
 
-int
-Detector::startInference(std::string modelFileName, std::string deployFileName, std::string cacheFileName)
+//-------------------------------------------------------------------------------------------------
+// Detector - implementation is based on the code above.
+
+int Detector::startInference(
+    const std::string& modelFileName,
+    const std::string& deployFileName,
+    const std::string& cacheFileName)
 {
     int ret = 0;
     int error = 0;
     setDefaultsNx(&m_ctx, modelFileName, deployFileName, cacheFileName);
 
+    m_ctx.m_ptsQueue = std::queue<int64_t>();
+    m_ctx.m_outPtsQueue = std::queue<int64_t>();
+
     m_ctx.decoder_pixfmt = V4L2_PIX_FMT_H264;
 
     // Step-1: Create Decoder
-    m_ctx.dec = NvVideoDecoder::createVideoDecoder("dec0");
+    m_ctx.dec = NvVideoDecoder::createVideoDecoder(m_videoDecoderName.c_str());
     TEST_ERROR(!m_ctx.dec, "Could not create decoder", cleanup);
 
     // Subscribe to Resolution change event
@@ -1133,24 +1303,29 @@ Detector::startInference(std::string modelFileName, std::string deployFileName, 
     // Step-2: Create Conv0
     // Create converter to convert from BL to PL for writing raw video
     // to file or crop the frame and display
-    m_ctx.conv = NvVideoConverter::createVideoConverter("conv0");
+    m_ctx.conv = NvVideoConverter::createVideoConverter(m_videoConverterName.c_str());
     TEST_ERROR(!m_ctx.conv, "Could not create video converter", cleanup);
     m_ctx.conv->output_plane.setDQThreadCallback(conv0_outputDqbufThreadCallback);
     m_ctx.conv->capture_plane.setDQThreadCallback(conv0_captureDqbufThreadCallback);
 
     m_ctx.rectQueuePtr = &m_rects;
 
+    std::cout << "Creating GIE thread" << std::endl;
     // Step-3: Create GIE
-    m_ctx.gie_ctx->buildGieContext(m_ctx.deployfile, m_ctx.modelfile);
+    m_ctx.gie_ctx->buildGieContext(m_ctx.deployfile, m_ctx.modelfile, m_ctx.cachefile);
+    std::cout << "GIE context has been built" << std::endl;
     pthread_create(&m_ctx.gie_thread_handle, NULL, gieThread, &m_ctx);
 
+#if !defined(NX_TEST_MODE)
+    std::cout << "Creating decoder thread" << std::endl;
     // Start decoder after GIE
     ret = m_ctx.dec->output_plane.setStreamStatus(true);
     TEST_ERROR(ret < 0, "Error in output plane stream on", cleanup);
     pthread_create(&m_ctx.dec_capture_loop, NULL, decCaptureLoop, &m_ctx);
+#endif
 
 cleanup:
-    return 0;
+    return -error;
 
 #if 0
 
@@ -1245,39 +1420,41 @@ cleanup:
 
 bool Detector::stopSync()
 {
-    int error = 0;
+    NX_OUTPUT << "Detector::stopSync() BEGIN";
+
+    bool error = false;
     m_ctx.got_eos = true;
     if (m_ctx.dec_capture_loop)
     {
+        NX_OUTPUT << "Detector::stopSync(): Joining thread dec_capture_loop...";
         pthread_join(m_ctx.dec_capture_loop, NULL);
+        NX_OUTPUT << "Detector::stopSync(): Joined thread dec_capture_loop";
     }
 
     if (m_ctx.gie_stop == 0)
     {
+        NX_OUTPUT << "Detector::stopSync(): Joining thread gie_thread_handle...";
         m_ctx.gie_stop = 1;
         pthread_cond_broadcast(&m_ctx.gie_cond);
         pthread_join(m_ctx.gie_thread_handle, NULL);
+        NX_OUTPUT << "Detector::stopSync(): Joined thread gie_thread_handle";
     }
 
     // Send EOS to converter
     if (m_ctx.conv)
     {
         if (sendEOStoConverter(&m_ctx) < 0)
-        {
-            PRINT << "Error while queueing EOS buffer on converter output";
-        }
+            NX_PRINT << "Error while queueing EOS buffer on converter output";
         m_ctx.conv->capture_plane.waitForDQThread(-1);
     }
 
     if (m_ctx.dec && m_ctx.dec->isInError())
     {
-        PRINT << "Decoder is in error";
-        error = 1;
+        NX_PRINT << "Decoder is in error state";
+        error = true;
     }
     if (m_ctx.got_error)
-    {
-        error = 1;
-    }
+        error = true;
 
     // The decoder destructor does all the cleanup i.e set streamoff on output and capture planes,
     // unmap buffers, tell decoder to deallocate buffer (reqbufs ioctl with counnt = 0),
@@ -1294,29 +1471,27 @@ bool Detector::stopSync()
         free(m_ctx.in_file_path);
 
     delete m_ctx.gie_buf_queue;
+    NX_OUTPUT << "Detector::stopSync(): destroyGieContext() BEGIN";
     m_ctx.gie_ctx->destroyGieContext();
+    NX_OUTPUT << "Detector::stopSync(): destroyGieContext() END";
     delete m_ctx.gie_ctx;
 
     if (error)
-    {
-        PRINT << "App run failed";
-    }
+        NX_PRINT << "App run failed";
     else
-    {
-        PRINT << "App run was successful";
-    }
-    return -error;
+        NX_PRINT << "App run was successful";
+
+    NX_OUTPUT << "Detector::stopSync() END -> " << error;
+    return error;
 }
 
-bool
-Detector::hasRectangles()
+bool Detector::hasRectangles()
 {
-    LockGurad lock(&(m_ctx.gie_lock));
+    Lock lock(&(m_ctx.gie_lock));
     return !m_rects.empty();
 }
 
-bool
-Detector::pushCompressedFrame(const uint8_t* data, int dataSize)
+bool Detector::pushCompressedFrame(const uint8_t* data, int dataSize, int64_t ptsUs)
 {
     // Step-4: Input encoded data to decoder until EOF.
     // Read encoded data and enqueue all the output plane buffers.
@@ -1327,6 +1502,14 @@ Detector::pushCompressedFrame(const uint8_t* data, int dataSize)
 
     bool isError = m_ctx.got_error || m_ctx.dec->isInError();
     auto numBuffers = m_ctx.dec->output_plane.getNumBuffers();
+
+    {
+        Lock lock(&m_ctx.gie_lock);
+        if (m_ctx.m_firstFrameArrivalTime == std::chrono::high_resolution_clock::time_point(std::chrono::milliseconds(0)))
+            m_ctx.m_firstFrameArrivalTime = std::chrono::high_resolution_clock::now();
+
+        m_ctx.m_ptsQueue.push(ptsUs);
+    }
 
     if (m_firstTimePush && !isError && m_firstTimePushBufferNum < numBuffers)
     {
@@ -1400,40 +1583,39 @@ Detector::pushCompressedFrame(const uint8_t* data, int dataSize)
     return true;
 }
 
-std::vector<cv::Rect>
-Detector::getRectangles()
+std::vector<cv::Rect> Detector::getRectangles(int64_t* outPts)
 {
-    LockGurad lock(&(m_ctx.gie_lock));
-    auto rects = m_rects.front();
-    m_rects.pop();
+    Lock lock(&(m_ctx.gie_lock));
+    std::vector<cv::Rect> rects;
+
+    if (!m_rects.empty())
+    {
+        rects = m_rects.front();
+        m_rects.pop();
+    }
+
+    if (!m_ctx.m_outPtsQueue.empty())
+    {
+        NX_OUTPUT << "POPPING FROM m_outPtsQueue " << m_ctx.m_outPtsQueue.size();
+        if (outPts)
+            *outPts = m_ctx.m_outPtsQueue.front();
+        m_ctx.m_outPtsQueue.pop();
+    }
 
     return rects;
 }
 
-int
-Detector::getNetWidth() const
-{
-    return kNetWidth;
-}
-
-int
-Detector::getNetHeight() const
-{
-    return kNetHeight;
-}
-
-int
-Detector::fillBuffer(const uint8_t* data, int dataSize, NvBuffer* buffer)
+int Detector::fillBuffer(const uint8_t* data, int dataSize, NvBuffer* buffer)
 {
     if (!buffer)
     {
-        PRINT << "ERROR: Detector::fillBuffer(dataSize: " << dataSize << ", buffer: null)";
+        NX_PRINT << "ERROR: Detector::fillBuffer(dataSize: " << dataSize << ", buffer: null)";
         return 0;
     }
 
     streamsize bytes_to_read = MIN(dataSize, buffer->planes[0].length);
     memcpy(buffer->planes[0].data, data, bytes_to_read);
-    buffer->planes[0].bytesused = bytes_to_read;
+    buffer->planes[0].bytesused = (uint32_t) bytes_to_read;
 
-    return bytes_to_read;
+    return (uint32_t) bytes_to_read;
 }

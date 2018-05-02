@@ -1,49 +1,71 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta name="viewport" content="width=device-width" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>{{productName}} notification</title>
-  </head>
-  <body bgcolor="#F5F7F8" topmargin="0" leftmargin="0" marginheight="0" marginwidth="0">
-<table class="container" border="0" cellspacing="0" cellpadding="0" bgcolor="#F5F7F8" style="color: #263137;border: none;border-spacing: 0;width: 100%"><!-- background-color --><tbody><tr><td class="side-spacer" style="vertical-align: top;text-align: left;padding-right: 5px;padding-top: 3px;padding-bottom: 3px;padding: 20px"></td>
+<head>
+<meta name="viewport" content="width=device-width" />
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>{{productName}} notification</title>
+</head>
+
+<body bgcolor="#F5F7F8" topmargin="0" leftmargin="0" marginheight="0" marginwidth="0">
+<table class="container" border="0" cellspacing="0" cellpadding="0" bgcolor="#F5F7F8" style="color: #263137;border: none;border-spacing: 0;width: 100%"><!-- background-color -->
+    <tbody>
+    <tr>
+        <td class="side-spacer" style="vertical-align: top;text-align: left;padding-right: 5px;padding-top: 3px;padding-bottom: 3px;padding: 20px"></td>
         <td class="header" style="color: #263137;vertical-align: top;text-align: left;padding-right: 5px;padding-top: 30px;padding-bottom: 10px;width: 800px;height: 40px">
             {{#systemName}}
             <div class="system-info" style="display: inline-block;border: 1px solid #E1E7EA;border-radius: 2px;padding: 10px">
-                <table border="0" cellspacing="0" cellpadding="0" style="color: #263137;border: none;border-spacing: 0;width: 100%"><tbody><tr title="System name"><td style="vertical-align: top;text-align: left;padding-right: 5px;padding-top: 3px;padding-bottom: 3px"><img class="icon" src="cid:systemIcon" style="width: 20px;height: 20px;padding-right: 10px" /></td>
+                <table border="0" cellspacing="0" cellpadding="0" style="color: #263137;border: none;border-spacing: 0;width: 100%">
+                    <tbody>
+                    <tr title="System name">
+                        <td style="vertical-align: top;text-align: left;padding-right: 5px;padding-top: 3px;padding-bottom: 3px"><img class="icon" src="cid:systemIcon" style="width: 20px;height: 20px;padding-right: 10px" /></td>
                         <td style="vertical-align: top;text-align: left;padding-right: 5px;padding-top: 3px;padding-bottom: 3px"><div class="name" style="font-size: 14px;font-weight: bold;line-height: 20px">{{systemName}}</div>
                             {{#systemSignature}}<div class="hint" style="font-size: 12px;line-height: 20px">{{systemSignature}}</div>{{/systemSignature}}</td>
                     </tr>
                     {{#cloudOwnerEmail}}
-                    <tr class="cloud-info" title="System owner"><td style="vertical-align: top;text-align: left;padding-right: 5px;padding-top: 5px;padding-bottom: 3px"><img class="icon" src="cid:ownerIcon" style="width: 20px;height: 20px;padding-right: 10px" /></td>
+                    <tr class="cloud-info" title="System owner">
+                        <td style="vertical-align: top;text-align: left;padding-right: 5px;padding-top: 5px;padding-bottom: 3px"><img class="icon" src="cid:ownerIcon" style="width: 20px;height: 20px;padding-right: 10px" /></td>
                         <td style="vertical-align: top;text-align: left;padding-right: 5px;padding-top: 5px;padding-bottom: 3px">{{#cloudOwner}}<div class="name" style="font-size: 14px;font-weight: bold;line-height: 20px">{{cloudOwner}}</div>{{/cloudOwner}}
                             {{#cloudOwnerEmail}}<div class="hint" style="font-size: 12px;line-height: 20px"><a rel="nofollow" class="nolink" style="text-decoration: none;color: #263137">{{cloudOwnerEmail}}</a></div>{{/cloudOwnerEmail}}</td>
                     </tr>
                     {{/cloudOwnerEmail}}
-                    </tbody></table></div>
+                    </tbody>
+                </table>
+            </div>
             {{/systemName}}
             {{^systemName}}
             <a href="{{config.portal_url}}" style="color: #2FA2DB"><img class="logo" src="cid:logo" style="max-width: 150px;max-height: 40px" /></a>
             {{/systemName}}
         </td>
         <td class="side-spacer" style="vertical-align: top;text-align: left;padding-right: 5px;padding-top: 3px;padding-bottom: 3px;padding: 20px"></td>
-    </tr><tr><td style="vertical-align: top;text-align: left;padding-right: 5px;padding-top: 3px;padding-bottom: 3px"></td>
+    </tr>
+
+    <tr>
+        <td style="vertical-align: top;text-align: left;padding-right: 5px;padding-top: 3px;padding-bottom: 3px"></td>
         <td class="content" bgcolor="white" style="vertical-align: top;text-align: left;padding-right: 5px;padding-top: 3px;padding-bottom: 3px;width: 800px;padding: 15px 0;border: 1px solid #E1E7EA;border-radius: 2px">
             <h1 style="color: #263137;font-size: 20px;font-weight: normal;line-height: 30px;margin: 0;padding: 0 20px">Input signal{{#source}} on <b>{{source}}</b>{{/source}}</h1>
 
 {{#screenshot}}
     <div class="description" style="padding: 10px 20px;background-color: #F8F9FA;margin-top: 15px">
-        <img alt="Screenshot" src="{{screenshot}}" style="max-width: 100%" /></div>
+        <img alt="Screenshot" src="{{screenshot}}" style="max-width: 100%" />
+    </div>
 {{/screenshot}}
 
-<table class="description" style="color: #263137;border: none;border-spacing: 0;width: 100%;padding: 10px 20px;background-color: #F8F9FA;margin-top: 15px"><thead><tr><th style="line-height: 30px">Input Port</th>
+<table class="description" style="color: #263137;border: none;border-spacing: 0;width: 100%;padding: 10px 20px;background-color: #F8F9FA;margin-top: 15px">
+    <thead>
+        <tr>
+            <th style="line-height: 30px">Input Port</th>
             <th style="line-height: 30px">Time</th>
-        </tr></thead><tbody>
+        </tr>
+    </thead>
+    <tbody>
     {{#aggregated}}
-        <tr><td style="vertical-align: top;text-align: left;padding-right: 5px;padding-top: 3px;padding-bottom: 3px">{{inputPort}}</td>
+        <tr>
+            <td style="vertical-align: top;text-align: left;padding-right: 5px;padding-top: 3px;padding-bottom: 3px">{{inputPort}}</td>
             <td style="vertical-align: top;text-align: left;padding-right: 5px;padding-top: 3px;padding-bottom: 3px;white-space: nowrap">{{{timestamp}}}</td>
         </tr>
     {{/aggregated}}
-    </tbody></table>
+    </tbody>
+</table>
 
 {{#urlint}}
     <p style="color: #263137;font-size: 15px;line-height: 20px;margin: 0;padding: 0 20px"><a href="{{urlint}}" style="color: #2FA2DB">Play archive from the local network</a></p>
@@ -55,27 +77,42 @@
 
         </td>
         <td style="vertical-align: top;text-align: left;padding-right: 5px;padding-top: 3px;padding-bottom: 3px"></td>
-    </tr><tr><td style="vertical-align: top;text-align: left;padding-right: 5px;padding-top: 3px;padding-bottom: 3px"></td>
+    </tr>
+
+    <tr>
+        <td style="vertical-align: top;text-align: left;padding-right: 5px;padding-top: 3px;padding-bottom: 3px"></td>
         <td class="footer" style="vertical-align: top;text-align: left;padding-right: 5px;padding-top: 20px;padding-bottom: 30px;width: 800px">
-            <table border="0" cellspacing="0" cellpadding="0" style="color: #263137;border: none;border-spacing: 0;width: auto"><tbody><tr>
+            <table border="0" cellspacing="0" cellpadding="0" style="color: #263137;border: none;border-spacing: 0;width: auto">
+                <tbody>
+                <tr>
                     {{#systemName}}
                     <td class="right-border" style="vertical-align: middle;text-align: left;padding-right: 20px;padding-top: 3px;padding-bottom: 3px;border-right: 1px solid #E1E7EA;font-size: 12px;line-height: 20px;color: #53707F">
                         <a href="{{config.portal_url}}" style="color: #2FA2DB"><img class="logo" src="cid:logo" style="max-width: 150px;max-height: 40px" /></a>
                     </td>
                     <td class="left-border right-border" style="vertical-align: middle;text-align: left;padding-right: 20px;padding-top: 3px;padding-bottom: 3px;border-right: 1px solid #E1E7EA;padding-left: 20px;font-size: 12px;line-height: 20px;color: #53707F">
-                        <b>Website</b><br /><a href="{{companyUrl}}" style="color: #2FA2DB">{{companyUrl}}</a>
+                        <b>Website</b><br />
+                        <a href="{{companyUrl}}" style="color: #2FA2DB">{{companyUrl}}</a>
                     </td>
                     {{/systemName}}
                     {{^systemName}}
                     <td class="right-border" style="vertical-align: middle;text-align: left;padding-right: 20px;padding-top: 3px;padding-bottom: 3px;border-right: 1px solid #E1E7EA;font-size: 12px;line-height: 20px;color: #53707F">
-                        <b>Website</b><br /><a href="{{companyUrl}}" style="color: #2FA2DB">{{companyUrl}}</a>
+                        <b>Website</b><br />
+                        <a href="{{companyUrl}}" style="color: #2FA2DB">{{companyUrl}}</a>
                     </td>
                     {{/systemName}}
                     <td class="left-border" style="vertical-align: middle;text-align: left;padding-right: 5px;padding-top: 3px;padding-bottom: 3px;padding-left: 20px;font-size: 12px;line-height: 20px;color: #53707F">
-                        <b>Support</b><br /><a href="{{supportLink}}" style="color: #2FA2DB">{{supportLinkText}}</a>
+                        <b>Support</b><br />
+                        <a href="{{supportLink}}" style="color: #2FA2DB">{{supportLinkText}}</a>
                     </td>
-                </tr></tbody></table></td>
+                </tr>
+                </tbody>
+            </table>
+        </td>
         <td style="vertical-align: top;text-align: left;padding-right: 5px;padding-top: 3px;padding-bottom: 3px"></td>
-    </tr></tbody></table></body>
+    </tr>
+    </tbody>
+</table>
+
+</body>
 </html>
 

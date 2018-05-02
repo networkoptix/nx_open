@@ -115,8 +115,8 @@ public:
         const QnResourcePtr& targetRes = QnResourcePtr());
     virtual ~QnAbstractConnection();
 
-    QUrl url() const;
-    void setUrl(const QUrl &url);
+    nx::utils::Url url() const;
+    void setUrl(const nx::utils::Url &url);
 
 protected:
     virtual QnAbstractReplyProcessor *newReplyProcessor(int object, const QString& serverId) = 0;
@@ -126,25 +126,25 @@ protected:
 
     QString objectName(int object) const;
 
-    const nx_http::HttpHeaders& extraHeaders() const;
-    void setExtraHeaders(nx_http::HttpHeaders extraHeaders);
+    const nx::network::http::HttpHeaders& extraHeaders() const;
+    void setExtraHeaders(nx::network::http::HttpHeaders extraHeaders);
     const QnRequestParamList &extraQueryParameters() const;
     void setExtraQueryParameters(const QnRequestParamList &extraQueryParameters);
 
-    int sendAsyncRequest(nx_http::Method::ValueType method, int object, nx_http::HttpHeaders headers, const QnRequestParamList &params, QByteArray msgBody, const char *replyTypeName, QObject *target, const char *slot);
-    int sendAsyncGetRequest(int object, nx_http::HttpHeaders headers, const QnRequestParamList &params, const char *replyTypeName, QObject *target, const char *slot);
+    int sendAsyncRequest(nx::network::http::Method::ValueType method, int object, nx::network::http::HttpHeaders headers, const QnRequestParamList &params, QByteArray msgBody, const char *replyTypeName, QObject *target, const char *slot);
+    int sendAsyncGetRequest(int object, nx::network::http::HttpHeaders headers, const QnRequestParamList &params, const char *replyTypeName, QObject *target, const char *slot);
     int sendAsyncGetRequest(int object, const QnRequestParamList &params, const char *replyTypeName, QObject *target, const char *slot);
-    int sendAsyncPostRequest(int object, nx_http::HttpHeaders headers, const QnRequestParamList &params, QByteArray msgBody, const char *replyTypeName, QObject *target, const char *slot);
+    int sendAsyncPostRequest(int object, nx::network::http::HttpHeaders headers, const QnRequestParamList &params, QByteArray msgBody, const char *replyTypeName, QObject *target, const char *slot);
     int sendAsyncPostRequest(int object, const QnRequestParamList &params, QByteArray msgBody, const char *replyTypeName, QObject *target, const char *slot);
 
-    int sendSyncRequest(nx_http::Method::ValueType method, int object, nx_http::HttpHeaders headers, const QnRequestParamList &params, QByteArray msgBody, QVariant *reply);
-    int sendSyncGetRequest(int object, nx_http::HttpHeaders headers, const QnRequestParamList &params, QVariant *reply);
+    int sendSyncRequest(nx::network::http::Method::ValueType method, int object, nx::network::http::HttpHeaders headers, const QnRequestParamList &params, QByteArray msgBody, QVariant *reply);
+    int sendSyncGetRequest(int object, nx::network::http::HttpHeaders headers, const QnRequestParamList &params, QVariant *reply);
     int sendSyncGetRequest(int object, const QnRequestParamList &params, QVariant *reply);
-    int sendSyncPostRequest(int object, nx_http::HttpHeaders headers, const QnRequestParamList &params, QByteArray msgBody, QVariant *reply);
+    int sendSyncPostRequest(int object, nx::network::http::HttpHeaders headers, const QnRequestParamList &params, QByteArray msgBody, QVariant *reply);
     int sendSyncPostRequest(int object, const QnRequestParamList &params, QByteArray msgBody, QVariant *reply);
 
     template<class T>
-    int sendSyncRequest(nx_http::Method::ValueType method, int object, nx_http::HttpHeaders headers, const QnRequestParamList &params, QByteArray msgBody, T *reply) {
+    int sendSyncRequest(nx::network::http::Method::ValueType method, int object, nx::network::http::HttpHeaders headers, const QnRequestParamList &params, QByteArray msgBody, T *reply) {
         NX_ASSERT(reply);
 
         QVariant replyVariant;
@@ -162,8 +162,8 @@ protected:
     }
 
     template<class T>
-    int sendSyncGetRequest(int object, nx_http::HttpHeaders headers, const QnRequestParamList &params, T *reply) {
-        return sendSyncRequest(nx_http::Method::get, object, headers, params, QByteArray(), reply);
+    int sendSyncGetRequest(int object, nx::network::http::HttpHeaders headers, const QnRequestParamList &params, T *reply) {
+        return sendSyncRequest(nx::network::http::Method::get, object, headers, params, QByteArray(), reply);
     }
 
     template<class T>
@@ -178,9 +178,9 @@ private:
     static bool connectProcessor(QnAbstractReplyProcessor *sender, const char *signal, QObject *receiver, const char *method, Qt::ConnectionType connectionType = Qt::AutoConnection);
 
 private:
-    QUrl m_url;
+    nx::utils::Url m_url;
     QScopedPointer<QnLexicalSerializer> m_serializer;
-    nx_http::HttpHeaders m_extraHeaders;
+    nx::network::http::HttpHeaders m_extraHeaders;
     QnRequestParamList m_extraQueryParameters;
     QnResourcePtr m_targetRes;
 };

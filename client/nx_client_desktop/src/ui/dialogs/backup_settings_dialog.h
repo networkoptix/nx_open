@@ -17,7 +17,7 @@ class QnBackupSettingsDialog : public QnSessionAwareButtonBoxDialog
     using base_type = QnSessionAwareButtonBoxDialog;
 
 public:
-    explicit QnBackupSettingsDialog(QWidget* parent = nullptr);
+    explicit QnBackupSettingsDialog(QWidget* parent);
     virtual ~QnBackupSettingsDialog();
 
     Qn::CameraBackupQualities qualities() const;

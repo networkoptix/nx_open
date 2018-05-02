@@ -36,6 +36,11 @@ QSize CameraMediaStreamInfo::getResolution() const
         return QSize();
 }
 
+Qn::StreamIndex CameraMediaStreamInfo::getEncoderIndex() const
+{
+    return (Qn::StreamIndex) encoderIndex;
+}
+
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 (CameraMediaStreamInfo)(CameraMediaStreams)(CameraBitrateInfo)(CameraBitrates),
 (json),

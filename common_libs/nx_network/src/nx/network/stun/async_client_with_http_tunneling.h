@@ -14,6 +14,7 @@
 #include "async_client.h"
 
 namespace nx {
+namespace network {
 namespace stun {
 
 /**
@@ -32,7 +33,7 @@ public:
     /**
      * @param url http and stun scheme is supported.
      */
-    virtual void connect(const QUrl& url, ConnectHandler handler) override;
+    virtual void connect(const nx::utils::Url& url, ConnectHandler handler) override;
 
     virtual bool setIndicationHandler(
         int method,
@@ -42,6 +43,8 @@ public:
     virtual void addOnReconnectedHandler(
         ReconnectHandler handler,
         void* client = nullptr) override;
+    virtual void setOnConnectionClosedHandler(
+        OnConnectionClosedHandler onConnectionClosedHandler) override;
 
     virtual void sendRequest(
         Message request,
@@ -80,12 +83,12 @@ private:
 
     Settings m_settings;
     std::unique_ptr<AsyncClient> m_stunClient;
-    std::unique_ptr<nx_http::AsyncClient> m_httpClient;
-    ConnectHandler m_connectHandler;
+    std::unique_ptr<nx::network::http::AsyncClient> m_httpClient;
+    ConnectHandler m_httpTunnelEstablishedHandler;
     /** map<stun method, handler> */
     std::map<int, HandlerContext> m_indicationHandlers;
     mutable QnMutex m_mutex;
-    QUrl m_url;
+    nx::utils::Url m_url;
     std::map<void*, ReconnectHandler> m_reconnectHandlers;
     nx::network::RetryTimer m_reconnectTimer;
     nx::utils::ObjectDestructionFlag m_destructionFlag;
@@ -93,6 +96,8 @@ private:
     int m_requestIdSequence = 0;
     /** map<request id, request context>. */
     std::map<int, RequestContext> m_activeRequests;
+    OnConnectionClosedHandler m_connectionClosedHandler;
+    ConnectHandler m_userConnectHandler;
 
     virtual void stopWhileInAioThread() override;
 
@@ -103,25 +108,27 @@ private:
     void createStunClient(
         const QnMutexLockerBase& /*lock*/,
         std::unique_ptr<AbstractStreamSocket> connection);
-    void dispatchIndication(nx::stun::Message indication);
+    void dispatchIndication(nx::network::stun::Message indication);
     void sendPendingRequests();
 
     void openHttpTunnel(
         const QnMutexLockerBase&,
-        const QUrl& url,
+        const nx::utils::Url& url,
         ConnectHandler handler);
     void onHttpConnectionUpgradeDone();
 
     void onRequestCompleted(
         SystemError::ErrorCode sysErrorCode,
-        nx::stun::Message response,
+        nx::network::stun::Message response,
         int requestId);
 
-    void onConnectionClosed(SystemError::ErrorCode closeReason);
+    void onStunConnectionClosed(SystemError::ErrorCode closeReason);
     void scheduleReconnect();
     void reconnect();
     void onReconnectDone(SystemError::ErrorCode sysErrorCode);
+    void reportReconnect();
 };
 
 } // namespace stun
+} // namespace network
 } // namespace nx

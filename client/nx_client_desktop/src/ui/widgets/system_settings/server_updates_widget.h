@@ -91,12 +91,14 @@ private:
     QnMediaServerUpdateTool* m_updateTool = nullptr;
 
     QnSoftwareVersion m_targetVersion;
+    QString m_targetChangeset;
+
     QnSoftwareVersion m_latestVersion;
     QString m_localFileName;
     bool m_checking = false;
     QnCheckForUpdateResult m_lastUpdateCheckResult;
 
-    QUrl m_releaseNotesUrl;
+    nx::utils::Url m_releaseNotesUrl;
 
     QTimer* m_longUpdateWarningTimer = nullptr;
 

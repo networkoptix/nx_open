@@ -8,14 +8,18 @@
 
 #include <utils/common/delayed.h>
 
+#include <ui/models/resource/resource_tree_model.h>
+
+#include <nx/client/desktop/resource_views/data/node_type.h>
+
+using namespace nx::client::desktop;
+
 QnResourceSearchProxyModel::QnResourceSearchProxyModel(QObject* parent):
     base_type(parent)
 {
 }
 
-QnResourceSearchProxyModel::~QnResourceSearchProxyModel()
-{
-}
+QnResourceSearchProxyModel::~QnResourceSearchProxyModel() = default;
 
 QnResourceSearchQuery QnResourceSearchProxyModel::query() const
 {
@@ -60,15 +64,18 @@ void QnResourceSearchProxyModel::invalidateFilterLater()
         return; /* Already waiting for invalidation. */
 
     m_invalidating = true;
-    executeDelayedParented([this]{ invalidateFilter(); }, kDefaultDelay, this);
+    executeDelayedParented([this]{ invalidateFilter(); }, this);
 }
 
 bool QnResourceSearchProxyModel::filterAcceptsRow(
     int sourceRow,
     const QModelIndex& sourceParent) const
 {
-    if (m_query.text.isEmpty())
-        return m_defaultBehavior == DefaultBehavior::showAll;
+    const bool searchMode = !m_query.text.isEmpty();
+    if (!searchMode && m_defaultBehavior != DefaultBehavior::showAll)
+        return false;
+
+    const bool showAllMode = m_defaultBehavior == DefaultBehavior::showAll;
 
     QModelIndex root = (sourceParent.column() > Qn::NameColumn)
         ? sourceParent.sibling(sourceParent.row(), Qn::NameColumn)
@@ -78,16 +85,79 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(
     if (!index.isValid())
         return true;
 
-    const auto nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
+    using NodeType = ResourceTreeNodeType;
+
+    const auto nodeType = index.data(Qn::NodeTypeRole).value<NodeType>();
+
+    // Handles visibility of nodes in search mode
+    switch(nodeType)
+    {
+        case NodeType::servers:
+        case NodeType::userResources:
+        case NodeType::layouts:
+        case NodeType::users:
+            if (searchMode)
+                return false;
+            break;
+
+        case NodeType::filteredServers:
+        case NodeType::filteredCameras:
+        case NodeType::filteredLayouts:
+        case NodeType::filteredUsers:
+        case NodeType::filteredVideowalls:
+            if (!searchMode)
+                return false;
+            break;
+        default:
+            break;
+    }
+
+    if (searchMode)
+    {
+        const auto allowedNode = m_query.allowedNode;
+
+        static const auto searchGroupNodes = QSet<NodeType>({
+            NodeType::filteredServers,
+            NodeType::filteredCameras,
+            NodeType::filteredLayouts,
+            NodeType::layoutTours,
+            NodeType::filteredVideowalls,
+            NodeType::webPages,
+            NodeType::filteredUsers,
+            NodeType::localResources});
+
+        if (allowedNode != QnResourceSearchQuery::kAllowAllNodeTypes
+            && allowedNode != nodeType
+            && searchGroupNodes.contains(nodeType))
+        {
+            return false; // Filter out all nodes except allowed one
+        }
+
+        // We don't show servers and videowalls in case of search.
+        const auto resource = this->resource(index);
+        const auto scope = index.data(Qn::ResourceTreeScopeRole).value<QnResourceTreeModel::Scope>();
+        if (resource && scope == QnResourceTreeModel::FullScope)
+        {
+            const auto parentNodeType = sourceParent.data(Qn::NodeTypeRole).value<NodeType>();
+            if (parentNodeType != NodeType::filteredServers && resource->hasFlags(Qn::server))
+                return false;
+
+            if (parentNodeType != NodeType::filteredVideowalls && resource->hasFlags(Qn::videowall))
+                return false;
+        }
+    }
+    else if (showAllMode)
+        return true;
+
     switch (nodeType)
     {
-        case Qn::CurrentSystemNode:
-        case Qn::CurrentUserNode:
-        case Qn::SeparatorNode:
-        case Qn::LocalSeparatorNode:
-        case Qn::BastardNode:
-        case Qn::AllCamerasAccessNode:
-        case Qn::AllLayoutsAccessNode:
+        case NodeType::currentSystem:
+        case NodeType::currentUser:
+        case NodeType::separator:
+        case NodeType::localSeparator:
+        case NodeType::bastard:
+        case NodeType::allCamerasAccess:
+        case NodeType::allLayoutsAccess:
             return false;
         default:
             break;
@@ -114,7 +184,7 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(
         return true;
 
     // Show only resources with given flags.
-    QnResourcePtr resource = this->resource(index);
+    const auto resource = QnResourceSearchProxyModel::resource(index);
     return resource && resource->hasFlags(m_query.flags);
 }
 

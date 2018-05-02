@@ -94,7 +94,7 @@ void DbStructureUpdater::updateDbToMultipleSchema(QueryContext* queryContext)
         updateDbVersionTable(queryContext);
         setDbSchemaName(queryContext, m_schemaName);
     }
- 
+
     // db_version_data table is present and supports multiple schemas. Nothing to do here.
 }
 

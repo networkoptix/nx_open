@@ -12,47 +12,6 @@
 namespace nx {
 namespace utils {
 
-QString formatFileSize(qint64 size, int precision, int prefixThreshold, MetricPrefix minPrefix, MetricPrefix maxPrefix, bool useBinaryPrefixes, const QString &pattern)
-{
-    static const std::array<QString, PrefixCount> metricSuffixes{{"B", "kB",  "MB",  "GB",  "TB",  "PB",  "EB",  "ZB",  "YB"}};
-    static const std::array<QString, PrefixCount> binarySuffixes{{"B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"}};
-
-    QString number, suffix;
-    if (size == 0)
-    {
-        number = "0";
-        suffix = metricSuffixes[0];
-    }
-    else
-    {
-        double absSize = std::abs(static_cast<double>(size));
-        int power = static_cast<int>(std::log(absSize / prefixThreshold) / std::log(1000.0));
-        int unit = qBound(static_cast<int>(minPrefix), power, qMin(static_cast<int>(maxPrefix), PrefixCount - 1));
-
-        suffix = (useBinaryPrefixes ? binarySuffixes : metricSuffixes)[unit];
-        number = (size < 0 ? QLatin1String("-") : QString()) + QString::number(absSize / std::pow(useBinaryPrefixes ? 1024.0 : 1000.0, unit), 'f', precision);
-
-        /* Chop trailing zeros. */
-        for (int i = number.size() - 1; ; i--)
-        {
-            QChar c = number[i];
-            if (c == L'.')
-            {
-                number.chop(number.size() - i);
-                break;
-            }
-            if (c != L'0')
-            {
-                number.chop(number.size() - i - 1);
-                break;
-            }
-        }
-
-    }
-
-    return pattern.arg(number).arg(suffix);
-}
-
 QString replaceCharacters(const QString &string, const char *symbols, const QChar &replacement)
 {
     if (!symbols)
@@ -75,7 +34,6 @@ QString replaceCharacters(const QString &string, const char *symbols, const QCha
 
     return result;
 }
-
 
 qint64 parseDateTime(const QString& dateTimeStr)
 {
@@ -562,10 +520,7 @@ void serializeNameValuePairs(
     const QMap<QByteArray, QByteArray>& params,
     QByteArray* const dstBuffer)
 {
-    for (QMap<QByteArray, QByteArray>::const_iterator
-        it = params.begin();
-        it != params.end();
-        ++it)
+    for (auto it = params.cbegin(); it != params.cend(); ++it)
     {
         if (it != params.begin())
             dstBuffer->append(", ");
@@ -589,7 +544,7 @@ template <class T, class T2>
 static QList<T> smartSplitInternal(
     const T& data,
     const T2 delimiter,
-    const T2 quoteChar, 
+    const T2 quoteChar,
     bool keepEmptyParts)
 {
     bool quoted = false;
@@ -628,7 +583,7 @@ QStringList smartSplit(
     QString::SplitBehavior splitBehavior)
 {
     return smartSplitInternal(
-        data, 
+        data,
         delimiter,
         QChar(L'\"'),
         splitBehavior == QString::KeepEmptyParts);
@@ -651,6 +606,56 @@ QByteArray unquoteStr(const QByteArray& v)
 QString unquoteStr(const QString& v)
 {
     return unquoteStrInternal(v, L'\"');
+}
+
+static int doFormatJsonString(const char* srcPtr, const char* srcEnd, char* dstPtr)
+{
+    static const int INDENT_SIZE = 4; //< How many spaces to add to formatting.
+    static const char INDENT_SYMBOL = ' '; //< Space filler.
+    static QByteArray OUTPUT_DELIMITER("\n"); //< New line.
+    static const QByteArray INPUT_DELIMITERS("[]{},"); //< Delimiters in the input string.
+    static const int INDENTS[] = {1, -1, 1, -1, 0}; //< Indentation offset for INPUT_DELIMITERS.
+    const char* dstPtrBase = dstPtr;
+    int indent = 0;
+    bool quoted = false;
+    bool escaped = false;
+    for (; srcPtr < srcEnd; ++srcPtr)
+    {
+        if (*srcPtr == '"' && !escaped)
+            quoted = !quoted;
+
+        escaped = *srcPtr == '\\' && !escaped;
+
+        int symbolIdx = INPUT_DELIMITERS.indexOf(*srcPtr);
+        bool isDelimBefore = symbolIdx >= 0 && INDENTS[symbolIdx] < 0;
+        if (!dstPtrBase)
+            dstPtr++;
+        else if (!isDelimBefore)
+            *dstPtr++ = *srcPtr;
+
+        if (symbolIdx >= 0 && !quoted)
+        {
+            if (dstPtrBase)
+                memcpy(dstPtr, OUTPUT_DELIMITER.data(), OUTPUT_DELIMITER.size());
+            dstPtr += OUTPUT_DELIMITER.size();
+            indent += INDENT_SIZE * INDENTS[symbolIdx];
+            if (dstPtrBase)
+                memset(dstPtr, INDENT_SYMBOL, indent);
+            dstPtr += indent;
+        }
+
+        if (dstPtrBase && isDelimBefore)
+            *dstPtr++ = *srcPtr;
+    }
+    return dstPtr - dstPtrBase;
+}
+
+QByteArray formatJsonString(const QByteArray& data)
+{
+    QByteArray result;
+    result.resize(doFormatJsonString(data.data(), data.data() + data.size(), 0));
+    doFormatJsonString(data.data(), data.data() + data.size(), result.data());
+    return result;
 }
 
 } // namespace utils

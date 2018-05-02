@@ -1,7 +1,7 @@
 #include "media_resource.h"
 
 #include <QtGui/QImage>
-#include <QtCore/QCoreApplication>
+
 
 #include <utils/common/warnings.h>
 #include <nx/fusion/serialization/lexical.h>
@@ -24,66 +24,10 @@ namespace {
 
     const QString primaryStreamValue            = lit("primary");
     const QString secondaryStreamValue          = lit("secondary");
+    const QString edgeStreamValue               = lit("edge");
 
     /** Special value for absent custom aspect ratio. Should not be changed without a reason because a lot of modules check it as qFuzzyIsNull. */
     const qreal noCustomAspectRatio = 0.0;
-}
-
-
-class QnStreamQualityStrings {
-    Q_DECLARE_TR_FUNCTIONS(QnStreamQualityStrings);
-public:
-    static QString displayString(Qn::StreamQuality value) {
-        switch(value) {
-        case Qn::QualityLowest:       return tr("Lowest");
-        case Qn::QualityLow:          return tr("Low");
-        case Qn::QualityNormal:       return tr("Medium");
-        case Qn::QualityHigh:         return tr("High");
-        case Qn::QualityHighest:      return tr("Best");
-        case Qn::QualityPreSet:       return tr("Preset");
-        case Qn::QualityNotDefined:   return tr("Undefined");
-        default:
-            qnWarning("Invalid stream quality value '%1'.", static_cast<int>(value));
-            return QString();
-        }
-    }
-
-    static QString shortDisplayString(Qn::StreamQuality value) {
-        /* Note that '//:' are comments for translators. */
-        switch(value) {
-        case Qn::QualityLowest:
-            //: Short for 'Lowest'
-            return tr("Lst");
-        case Qn::QualityLow:
-            //: Short for 'Low'
-            return tr("Lo");
-        case Qn::QualityNormal:
-            //: Short for 'Medium'
-            return tr("Me");
-        case Qn::QualityHigh:
-            //: Short for 'High'
-            return tr("Hi");
-        case Qn::QualityHighest:
-            //: Short for 'Best'
-            return tr("Bst");
-        case Qn::QualityPreSet:
-            //: Short for 'Preset'
-            return tr("Ps");
-        case Qn::QualityNotDefined:
-            return lit("-");
-        default:
-            qnWarning("Invalid stream quality value '%1'.", static_cast<int>(value));
-            return QString();
-        }
-    }
-};
-
-QString Qn::toDisplayString(Qn::StreamQuality value) {
-    return QnStreamQualityStrings::displayString(value);
-}
-
-QString Qn::toShortDisplayString(Qn::StreamQuality value) {
-    return QnStreamQualityStrings::shortDisplayString(value);
 }
 
 // -------------------------------------------------------------------------- //
@@ -95,6 +39,11 @@ QnMediaResource::QnMediaResource()
 
 QnMediaResource::~QnMediaResource()
 {
+}
+
+Qn::StreamQuality QnMediaResource::getBestQualityForSuchOnScreenSize(const QSize&) const
+{
+    return Qn::StreamQuality::normal;
 }
 
 QImage QnMediaResource::getImage(int /*channel*/, QDateTime /*time*/, Qn::StreamQuality /*quality*/) const
@@ -141,14 +90,12 @@ QnConstResourceAudioLayoutPtr QnMediaResource::getAudioLayout(const QnAbstractSt
     return audioLayout;
 }
 
-bool QnMediaResource::hasVideo(const QnAbstractStreamDataProvider* dataProvider) const
+bool QnMediaResource::hasVideo(const QnAbstractStreamDataProvider* /*dataProvider*/) const
 {
-    Q_UNUSED(dataProvider);
     if (!m_hasVideo.is_initialized())
         m_hasVideo = toResource()->getProperty(Qn::VIDEO_DISABLED_PARAM_NAME).toInt() == 0;
     return *m_hasVideo;
 }
-
 
 void QnMediaResource::initMediaResource()
 {
@@ -166,7 +113,6 @@ QnMediaDewarpingParams QnMediaResource::getDewarpingParams() const
     return (*userAttributesLock)->dewarpingParams;
 }
 
-
 void QnMediaResource::setDewarpingParams(const QnMediaDewarpingParams& params)
 {
     {
@@ -179,55 +125,87 @@ void QnMediaResource::setDewarpingParams(const QnMediaDewarpingParams& params)
     emit toResource()->mediaDewarpingParamsChanged(this->toResourcePtr());
 }
 
-qreal QnMediaResource::customAspectRatio() const
+QnAspectRatio QnMediaResource::customAspectRatio() const
 {
     if (!this->toResource()->hasProperty(::customAspectRatioKey))
-        return noCustomAspectRatio;
+        return QnAspectRatio();
 
     bool ok = true;
     qreal value = this->toResource()->getProperty(::customAspectRatioKey).toDouble(&ok);
     if (!ok || qIsNaN(value) || qIsInf(value) || value < 0)
-        return noCustomAspectRatio;
+        return QnAspectRatio();
 
-    return value;
+    return QnAspectRatio::closestStandardRatio(value);
 }
 
-void QnMediaResource::setCustomAspectRatio(qreal value) {
-    if (qIsNaN(value) || qIsInf(value) || value < 0 || qFuzzyEquals(value, noCustomAspectRatio))
+void QnMediaResource::setCustomAspectRatio(const QnAspectRatio& value)
+{
+    if (!value.isValid())
         clearCustomAspectRatio();
     else
-        this->toResource()->setProperty(::customAspectRatioKey, QString::number(value));
+        this->toResource()->setProperty(::customAspectRatioKey, QString::number(value.toFloat()));
 }
 
-void QnMediaResource::clearCustomAspectRatio() {
+void QnMediaResource::clearCustomAspectRatio()
+{
     this->toResource()->setProperty(::customAspectRatioKey, QString());
 }
 
-QString QnMediaResource::customAspectRatioKey() {
+Ptz::Capabilities QnMediaResource::getPtzCapabilities() const
+{
+    return Ptz::Capabilities(toResource()->getProperty(Qn::PTZ_CAPABILITIES_PARAM_NAME).toInt());
+}
+
+bool QnMediaResource::hasAnyOfPtzCapabilities(Ptz::Capabilities capabilities) const
+{
+    return getPtzCapabilities() & capabilities;
+}
+
+void QnMediaResource::setPtzCapabilities(Ptz::Capabilities capabilities)
+{
+    if (toResource()->hasParam(Qn::PTZ_CAPABILITIES_PARAM_NAME))
+        toResource()->setProperty(Qn::PTZ_CAPABILITIES_PARAM_NAME, static_cast<int>(capabilities));
+}
+
+void QnMediaResource::setPtzCapability(Ptz::Capabilities capability, bool value)
+{
+    setPtzCapabilities(value
+        ? (getPtzCapabilities() | capability)
+        : (getPtzCapabilities() & ~capability));
+}
+
+QString QnMediaResource::customAspectRatioKey()
+{
     return ::customAspectRatioKey;
 }
 
-QString QnMediaResource::dontRecordPrimaryStreamKey() {
+QString QnMediaResource::dontRecordPrimaryStreamKey()
+{
     return ::dontRecordPrimaryStreamKey;
 }
 
-QString QnMediaResource::dontRecordSecondaryStreamKey() {
+QString QnMediaResource::dontRecordSecondaryStreamKey()
+{
     return ::dontRecordSecondaryStreamKey;
 }
 
-QString QnMediaResource::rtpTransportKey() {
+QString QnMediaResource::rtpTransportKey()
+{
     return ::rtpTransportKey;
 }
 
-QString QnMediaResource::panicRecordingKey() {
+QString QnMediaResource::panicRecordingKey()
+{
     return ::panicRecordingKey;
 }
 
-QString QnMediaResource::dynamicVideoLayoutKey() {
+QString QnMediaResource::dynamicVideoLayoutKey()
+{
     return ::dynamicVideoLayoutKey;
 }
 
-QString QnMediaResource::motionStreamKey() {
+QString QnMediaResource::motionStreamKey()
+{
     return ::motionStreamKey;
 }
 
@@ -241,6 +219,12 @@ QString QnMediaResource::secondaryStreamValue()
     return ::secondaryStreamValue;
 }
 
-QString QnMediaResource::rotationKey() {
+QString QnMediaResource::edgeStreamValue()
+{
+    return ::edgeStreamValue;
+}
+
+QString QnMediaResource::rotationKey()
+{
     return ::rotationKey;
 }

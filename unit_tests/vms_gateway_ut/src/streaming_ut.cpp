@@ -56,8 +56,8 @@ protected:
     }
 
 private:
-    TestHttpServer m_httpServer;
-    nx_http::HttpClient m_httpClient;
+    nx::network::http::TestHttpServer m_httpServer;
+    nx::network::http::HttpClient m_httpClient;
     nx::Buffer m_fixedResource;
 
     virtual void SetUp() override
@@ -86,25 +86,25 @@ private:
         ASSERT_TRUE(m_httpServer.bindAndListen());
     }
 
-    std::unique_ptr<nx_http::AbstractMsgBodySource> createStreamContentProvider()
+    std::unique_ptr<nx::network::http::AbstractMsgBodySource> createStreamContentProvider()
     {
         return std::make_unique<RandomDataSource>("video/mp2t");
     }
 
-    std::unique_ptr<nx_http::AbstractMsgBodySource> createFixedContentProvider()
+    std::unique_ptr<nx::network::http::AbstractMsgBodySource> createFixedContentProvider()
     {
-        return std::make_unique<nx_http::BufferSource>("video/mp2t", m_fixedResource);
+        return std::make_unique<nx::network::http::BufferSource>("video/mp2t", m_fixedResource);
     }
 
-    QUrl streamUrl() const
+    nx::utils::Url streamUrl() const
     {
-        return QUrl(lm("http://%1/%2%3").arg(moduleInstance()->impl()->httpEndpoints()[0])
+        return nx::utils::Url(lm("http://%1/%2%3").arg(moduleInstance()->impl()->httpEndpoints()[0])
             .arg(m_httpServer.serverAddress()).arg(kStreamPath));
     }
 
-    QUrl fixedResourceUrl() const
+    nx::utils::Url fixedResourceUrl() const
     {
-        return QUrl(lm("http://%1/%2%3").arg(moduleInstance()->impl()->httpEndpoints()[0])
+        return nx::utils::Url(lm("http://%1/%2%3").arg(moduleInstance()->impl()->httpEndpoints()[0])
             .arg(m_httpServer.serverAddress()).arg(kFixedResourcePath));
     }
 };

@@ -56,7 +56,7 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
             for (const auto& tour: layoutTourManager()->tours())
                 usedNames << tour.name;
 
-            ec2::ApiLayoutTourData tour;
+            nx::vms::api::LayoutTourData tour;
             tour.id = QnUuid::createUuid();
             tour.parentId = context()->user()->getId();
             tour.name = nx::utils::generateUniqueString(
@@ -102,7 +102,7 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
 
                 if (other.name == name)
                 {
-                    if (!ui::messages::Resources::overrideLayoutTour(mainWindow()))
+                    if (!ui::messages::Resources::overrideLayoutTour(mainWindowWidget()))
                         return;
 
                     layoutTourManager()->removeTour(other.id);
@@ -125,9 +125,9 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
             const auto tour = layoutTourManager()->tour(id);
             if (!tour.name.isEmpty())
             {
-                QnSessionAwareMessageBox messageBox(mainWindow());
+                QnSessionAwareMessageBox messageBox(mainWindowWidget());
                 messageBox.setIcon(QnMessageBoxIcon::Question);
-                messageBox.setText(tr("Delete layout tour %1?").arg(tour.name));
+                messageBox.setText(tr("Delete Showreel %1?").arg(tour.name));
                 messageBox.setStandardButtons(QDialogButtonBox::Cancel);
                 messageBox.addCustomButton(QnMessageBoxCustomButton::Delete,
                     QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
@@ -241,7 +241,7 @@ void LayoutToursHandler::submitState(QnWorkbenchState* state)
         state->runningTourId = m_tourExecutor->runningTour();
 }
 
-void LayoutToursHandler::saveTourToServer(const ec2::ApiLayoutTourData& tour)
+void LayoutToursHandler::saveTourToServer(const nx::vms::api::LayoutTourData& tour)
 {
     NX_EXPECT(layoutTourManager()->tour(tour.id).isValid());
     auto stateManager = qnClientCoreModule->layoutTourStateManager();

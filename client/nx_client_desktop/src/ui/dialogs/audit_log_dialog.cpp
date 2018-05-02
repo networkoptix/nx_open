@@ -20,11 +20,12 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_runtime_data.h>
 
+#include <nx/client/core/utils/geometry.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/actions/actions.h>
 
 #include <ui/utils/table_export_helper.h>
-#include <ui/common/item_view_hover_tracker.h>
+#include <nx/client/desktop/common/utils/item_view_hover_tracker.h>
 #include <ui/delegates/audit_item_delegate.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -38,26 +39,26 @@
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
 
-#include <ui/workaround/widgets_signals_workaround.h>
+#include <nx/client/desktop/resource_properties/camera/camera_settings_tab.h>
+#include <nx/client/desktop/resource_views/data/node_type.h>
 
 #include <utils/common/event_processors.h>
 
-#include <ui/common/geometry.h>
 #include <ui/common/palette.h>
 #include <ui/style/custom_style.h>
 #include <ui/style/globals.h>
 #include <ui/style/helper.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
 #include <ui/widgets/common/item_view_auto_hider.h>
-#include <ui/widgets/properties/camera_settings_tab.h>
-#include <ui/widgets/views/checkboxed_header_view.h>
+#include <nx/client/desktop/common/widgets/checkable_header_view.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 
 #include <ui/workaround/hidpi_workarounds.h>
 
-using namespace nx::client::desktop::ui;
+using namespace nx::client::desktop;
+using namespace ui;
 
 namespace
 {
@@ -128,8 +129,8 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget* parent) :
 
     connect(ui->dateRangeWidget, &QnDateRangeWidget::rangeChanged, this, &QnAuditLogDialog::updateData);
 
-    ui->refreshButton->setIcon(qnSkin->icon("buttons/refresh.png"));
-    ui->clearFilterButton->setIcon(qnSkin->icon("buttons/clear.png"));
+    ui->refreshButton->setIcon(qnSkin->icon("text_buttons/refresh.png"));
+    ui->clearFilterButton->setIcon(qnSkin->icon("text_buttons/clear.png"));
 
     connect(ui->mainTabWidget,  &QTabWidget::currentChanged,    this, &QnAuditLogDialog::at_currentTabChanged);
 
@@ -143,14 +144,14 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget* parent) :
     enum { kUpdateFilterDelayMs = 200 };
     ui->filterLineEdit->setTextChangedSignalFilterMs(kUpdateFilterDelayMs);
 
-    connect(ui->filterLineEdit, &QnSearchLineEdit::enterKeyPressed, this, &QnAuditLogDialog::at_filterChanged);
-    connect(ui->filterLineEdit, &QnSearchLineEdit::textChanged, this, &QnAuditLogDialog::at_filterChanged);
+    connect(ui->filterLineEdit, &SearchLineEdit::enterKeyPressed, this, &QnAuditLogDialog::at_filterChanged);
+    connect(ui->filterLineEdit, &SearchLineEdit::textChanged, this, &QnAuditLogDialog::at_filterChanged);
 
     ui->gridMaster->horizontalHeader()->setSortIndicator(1, Qt::DescendingOrder);
     ui->gridCameras->horizontalHeader()->setSortIndicator(1, Qt::AscendingOrder);
 
     /* Cursor changes when description is hovered: */
-    connect(ui->gridDetails->hoverTracker(), &QnItemViewHoverTracker::itemEnter, this,
+    connect(ui->gridDetails->hoverTracker(), &ItemViewHoverTracker::itemEnter, this,
         [this](const QModelIndex& index)
         {
             if (index.column() == m_descriptionColumnIndex)
@@ -161,7 +162,7 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget* parent) :
             }
         });
 
-    connect(ui->gridDetails->hoverTracker(), &QnItemViewHoverTracker::itemLeave, this,
+    connect(ui->gridDetails->hoverTracker(), &ItemViewHoverTracker::itemLeave, this,
         [this]()
         {
             ui->gridDetails->unsetCursor();
@@ -264,7 +265,7 @@ void QnAuditLogDialog::setupDetailsGrid()
     connect(m_itemDelegate, &QnAuditItemDelegate::descriptionClicked,   this, &QnAuditLogDialog::at_descriptionClicked);
 }
 
-void QnAuditLogDialog::setupGridCommon(QnTableView* grid, bool master)
+void QnAuditLogDialog::setupGridCommon(TableView* grid, bool master)
 {
     QnSnappedScrollBar* scrollBar = new QnSnappedScrollBar(grid->parentWidget());
     grid->setVerticalScrollBar(scrollBar->proxyScrollBar());
@@ -275,11 +276,11 @@ void QnAuditLogDialog::setupGridCommon(QnTableView* grid, bool master)
 
     if (master)
     {
-        QnCheckBoxedHeaderView* header = new QnCheckBoxedHeaderView(QnAuditLogModel::SelectRowColumn, this);
+        CheckableHeaderView* header = new CheckableHeaderView(QnAuditLogModel::SelectRowColumn, this);
         header->setVisible(true);
         header->setSectionsClickable(true);
         grid->setHorizontalHeader(header);
-        connect(header, &QnCheckBoxedHeaderView::checkStateChanged, this, &QnAuditLogDialog::at_headerCheckStateChanged);
+        connect(header, &CheckableHeaderView::checkStateChanged, this, &QnAuditLogDialog::at_headerCheckStateChanged);
     }
 
     grid->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
@@ -301,7 +302,7 @@ void QnAuditLogDialog::setupGridCommon(QnTableView* grid, bool master)
     setupContextMenu(grid);
 }
 
-void QnAuditLogDialog::setupContextMenu(QnTableView* gridMaster)
+void QnAuditLogDialog::setupContextMenu(TableView* gridMaster)
 {
     gridMaster->addAction(m_clipboardAction);
     gridMaster->addAction(m_exportAction);
@@ -345,7 +346,6 @@ QnAuditRecordRefList QnAuditLogDialog::applyFilter()
     }
     return result;
 }
-
 
 QnAuditRecordRefList QnAuditLogDialog::filterChildDataBySessions(const QnAuditRecordRefList& checkedRows)
 {
@@ -568,7 +568,7 @@ void QnAuditLogDialog::at_updateCheckboxes()
 
 void setGridGeneralCheckState(QTableView* gridMaster)
 {
-    if (auto header = qobject_cast<QnCheckBoxedHeaderView*>(gridMaster->horizontalHeader()))
+    if (auto header = qobject_cast<CheckableHeaderView*>(gridMaster->horizontalHeader()))
     {
         QSignalBlocker blocker(header);
         int numSelectedRows = gridMaster->selectionModel()->selectedRows().size();
@@ -578,9 +578,9 @@ void setGridGeneralCheckState(QTableView* gridMaster)
     }
 }
 
-void QnAuditLogDialog::at_masterGridSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
+void QnAuditLogDialog::at_masterGridSelectionChanged(const QItemSelection& /*selected*/,
+    const QItemSelection& /*deselected*/)
 {
-    QN_UNUSED(selected, deselected);
     if (auto tableView = qobject_cast<QTableView*>(sender()->parent()))
         setGridGeneralCheckState(tableView);
 }
@@ -668,15 +668,15 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
 
     qreal displayAspectRatio = viewportGeometry.isNull()
         ? desiredItemAspectRatio
-        : QnGeometry::aspectRatio(viewportGeometry);
+        : nx::client::core::Geometry::aspectRatio(viewportGeometry);
 
     if (resList.size() == 1)
     {
         if (QnMediaResourcePtr mediaRes = resList[0].dynamicCast<QnMediaResource>())
         {
-            qreal customAspectRatio = mediaRes->customAspectRatio();
-            if (!qFuzzyIsNull(customAspectRatio))
-                desiredCellAspectRatio = customAspectRatio;
+            const auto customAspectRatio = mediaRes->customAspectRatio();
+            if (customAspectRatio.isValid())
+                desiredCellAspectRatio = customAspectRatio.toFloat();
         }
     }
 
@@ -714,7 +714,7 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
 void QnAuditLogDialog::triggerAction(const QnAuditRecord* record, action::IDType actionId,
     int selectedPage)
 {
-    const QnResourceList resList = resourcePool()->getResources(record->resources);
+    const QnResourceList resList = resourcePool()->getResourcesByIds(record->resources);
     if (resList.isEmpty())
     {
         const auto count = static_cast<int>(record->resources.size());
@@ -770,7 +770,7 @@ void QnAuditLogDialog::at_itemButtonClicked(const QModelIndex& index)
     else if (record->eventType == Qn::AR_CameraUpdate || record->eventType == Qn::AR_CameraInsert)
         triggerAction(record,
             action::CameraSettingsAction,
-            Qn::GeneralSettingsTab);
+            static_cast<int>(CameraSettingsTab::general));
 
     if (isMaximized())
         showNormal();
@@ -826,7 +826,6 @@ void QnAuditLogDialog::query(qint64 fromMsec, qint64 toMsec)
     m_cameraData.clear();
     m_filteredData.clear();
 
-
     const auto onlineServers = resourcePool()->getAllServers(Qn::Online);
     for(const QnMediaServerResourcePtr& mserver: onlineServers)
     {
@@ -862,10 +861,12 @@ void QnAuditLogDialog::makeSessionData()
             }
             else
             {
-                // group sessions because of different servers may have same session
+                // Group sessions because of different servers may have same session
+                // or a single server can duplicate session after restart
                 QnAuditRecord& existRecord = itr.value();
                 existRecord.rangeStartSec = qMin(existRecord.rangeStartSec, record.rangeStartSec);
-                existRecord.rangeEndSec = qMax(existRecord.rangeEndSec, record.rangeEndSec);
+                existRecord.rangeEndSec = (existRecord.rangeEndSec == 0 || record.rangeEndSec == 0)
+                    ? 0 : qMax(existRecord.rangeEndSec, record.rangeEndSec);
             }
         }
         activityPerSession[record.authSession.id]++;
@@ -925,7 +926,7 @@ void QnAuditLogDialog::at_customContextMenuRequested(const QPoint&)
         if (resource)
         {
             action::Parameters parameters(resource);
-            parameters.setArgument(Qn::NodeTypeRole, Qn::ResourceNode);
+            parameters.setArgument(Qn::NodeTypeRole, ResourceTreeNodeType::resource);
 
             menu.reset(manager->newMenu(action::TreeScope, nullptr, parameters));
             foreach(QAction* action, menu->actions())
@@ -949,7 +950,7 @@ void QnAuditLogDialog::at_customContextMenuRequested(const QPoint&)
     QnHiDpiWorkarounds::showMenu(menu.data(), QCursor::pos());
 }
 
-QnTableView* QnAuditLogDialog::currentGridView() const
+TableView* QnAuditLogDialog::currentGridView() const
 {
     if (ui->gridDetails->hasFocus())
         return ui->gridDetails;

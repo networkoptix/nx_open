@@ -1,7 +1,7 @@
 #pragma once
 
 #include <libavcodec/avcodec.h>
-#include <plugins/camera_plugin.h>
+#include <camera/camera_plugin.h>
 
 
 extern "C" {

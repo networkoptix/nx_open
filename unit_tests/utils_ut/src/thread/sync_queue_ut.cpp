@@ -14,7 +14,7 @@ class SyncQueue:
     public ::testing::Test
 {
 protected:
-    nx::utils::thread push(
+    nx::utils::thread pushAsync(
         std::vector<int> values,
         std::chrono::milliseconds delay = std::chrono::milliseconds(0))
     {
@@ -31,8 +31,7 @@ protected:
             });
     }
 
-    int popSum(
-        std::chrono::milliseconds timeout = std::chrono::milliseconds(100))
+    int popSum(std::chrono::milliseconds timeout = std::chrono::milliseconds(500))
     {
         int total(0);
         while (auto value = queue.pop(timeout))
@@ -41,26 +40,21 @@ protected:
         return total;
     }
 
-    virtual void TearDown() override
-    {
-        ASSERT_TRUE(queue.isEmpty());
-    }
-
     nx::utils::SyncQueue<int> queue;
 };
 
 TEST_F(SyncQueue, SinglePushPop)
 {
-    auto pusher = push({1, 2, 3, 4, 5});
+    auto pusher = pushAsync({1, 2, 3, 4, 5});
     ASSERT_EQ(popSum(), 15);
     pusher.join();
 }
 
 TEST_F(SyncQueue, MultiPushPop)
 {
-    auto pusher1 = push({1, 2, 3, 4, 5});
-    auto pusher2 = push({5, 5, 5});
-    auto pusher3 = push({3, 3, 3, 3});
+    auto pusher1 = pushAsync({1, 2, 3, 4, 5});
+    auto pusher2 = pushAsync({5, 5, 5});
+    auto pusher3 = pushAsync({3, 3, 3, 3});
 
     ASSERT_EQ(popSum(), 42);
 
@@ -69,19 +63,59 @@ TEST_F(SyncQueue, MultiPushPop)
     pusher3.join();
 }
 
+
 TEST_F(SyncQueue, TimedPop)
 {
-    ASSERT_FALSE(queue.pop(std::chrono::milliseconds(100)));
-    auto pusher = push({1, 2}, std::chrono::milliseconds(500));
+    const std::chrono::milliseconds kSmallDelay(100);
+    const std::chrono::hours kLongDelay(1);
 
-    ASSERT_FALSE(queue.pop(std::chrono::milliseconds(100))); // too early
-    ASSERT_EQ(*queue.pop(std::chrono::milliseconds(500)), 1); // just in time
+    const auto syncPushAndPop =
+        [&](int value)
+        {
+            auto pusher = pushAsync({value}, kSmallDelay);
+            const auto popedValue = queue.pop(std::chrono::duration_cast<std::chrono::milliseconds>(kLongDelay));
+            pusher.join();
+            return popedValue && popedValue == value;
+        };
 
-    ASSERT_FALSE(queue.pop(std::chrono::milliseconds(100))); // too early again
-    ASSERT_EQ(*queue.pop(std::chrono::milliseconds(500)), 2); // just in time
-
-    pusher.join();
+    ASSERT_FALSE(static_cast<bool>(queue.pop(kSmallDelay)));
+    syncPushAndPop(1);
+    ASSERT_FALSE(static_cast<bool>(queue.pop(kSmallDelay)));
+    syncPushAndPop(2);
+    ASSERT_FALSE(static_cast<bool>(queue.pop(kSmallDelay)));
 }
+
+TEST_F(SyncQueue, conditional_pop)
+{
+    for (int i = 1; i < 8; ++i)
+        queue.push(i);
+
+    ASSERT_EQ(4, queue.popIf([](int val) { return val > 3; }));
+    ASSERT_EQ(2, queue.popIf([](int val) { return val > 1; }));
+    ASSERT_EQ(1, queue.popIf([](int val) { return val >= 1; }));
+}
+
+TEST_F(SyncQueue, conditional_pop_blocks_if_no_element_satisfies_condition)
+{
+    for (int i = 1; i < 8; ++i)
+        queue.push(i);
+
+    std::atomic<int> limit(8);
+
+    std::thread t(
+        [this, &limit]()
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            limit = 4;
+            queue.retestPopIfCondition();
+        });
+
+    ASSERT_EQ(4, queue.popIf([&limit](int val) { return val >= limit.load(); }));
+
+    t.join();
+}
+
+//-------------------------------------------------------------------------------------------------
 
 class SyncQueueTermination:
     public ::testing::Test
@@ -122,7 +156,7 @@ protected:
     {
         // If reader did not stop we will hang in destructor, so doing nothing here.
     }
-    
+
     void verifyThatOtherReadersAreWorking()
     {
         QnMutex mutex;
@@ -155,7 +189,7 @@ private:
     };
 
     using Readers = std::map<QueueReaderId, ReaderContext>;
-    using OnElementReadHandler = 
+    using OnElementReadHandler =
         nx::utils::MoveOnlyFunc<void(QueueReaderId /*readerId*/, int /*value*/)>;
 
     Readers m_readers;

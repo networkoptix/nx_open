@@ -11,7 +11,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/network/app_info.h>
 #include <nx/network/http/auth_tools.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/http/http_client.h>
 #include <nx/network/http/server/fusion_request_result.h>
 #include <nx/utils/test_support/utils.h>
@@ -25,6 +25,7 @@
 
 namespace nx {
 namespace cdb {
+namespace test {
 
 class AccountTemporaryCredentials:
     public CdbFunctionalTest
@@ -70,7 +71,7 @@ protected:
     {
         std::string account1NewPassword = m_account.password + "new";
         api::AccountUpdateData accountUpdateData;
-        accountUpdateData.passwordHa1 = nx_http::calcHa1(
+        accountUpdateData.passwordHa1 = nx::network::http::calcHa1(
             m_account.email.c_str(),
             moduleInfo().realm.c_str(),
             account1NewPassword.c_str()).constData();
@@ -119,12 +120,12 @@ protected:
             ASSERT_EQ(api::ResultCode::ok, resultCode);
             ASSERT_EQ(m_account.email, authResponse.authenticatedAccountData.accountEmail);
 
-            const auto ha1 = nx_http::calcHa1(
+            const auto ha1 = nx::network::http::calcHa1(
                 credentials.login.c_str(),
                 nx::network::AppInfo::realm().toStdString().c_str(),
                 credentials.password.c_str());
             ASSERT_EQ(
-                nx_http::calcIntermediateResponse(
+                nx::network::http::calcIntermediateResponse(
                     ha1,
                     QByteArray::fromStdString(authRequest.nonce)).toStdString(),
                 authResponse.intermediateResponse);
@@ -137,7 +138,7 @@ protected:
         {
             api::AccountData accountData;
             ASSERT_EQ(
-                api::ResultCode::notAuthorized,
+                api::ResultCode::badUsername,
                 getAccount(
                     credentials.login,
                     credentials.password,
@@ -175,7 +176,7 @@ protected:
     void assertAccountPasswordUpdateIsForbidden()
     {
         api::AccountUpdateData accountUpdate;
-        accountUpdate.passwordHa1 = nx_http::calcHa1(
+        accountUpdate.passwordHa1 = nx::network::http::calcHa1(
             m_account.email.c_str(),
             moduleInfo().realm.c_str(),
             (nx::utils::generateRandomName(7) + "new").constData()).constData();
@@ -317,5 +318,6 @@ TEST_F(AccountTemporaryCredentials, temporary_credentials_are_low_case)
     assertTemporaryCredentialsAreLowCase();
 }
 
+} // namespace test
 } // namespace cdb
 } // namespace nx

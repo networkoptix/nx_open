@@ -2,7 +2,7 @@
 
 #include <QtCore/QtGlobal>
 
-#if defined(Q_OS_MACX) || defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
+#if defined(Q_OS_MACX) || defined(Q_OS_ANDROID) || defined(Q_OS_IOS) || defined(__aarch64__)
 #include <zlib.h>
 #else
 #include <QtZlib/zlib.h>

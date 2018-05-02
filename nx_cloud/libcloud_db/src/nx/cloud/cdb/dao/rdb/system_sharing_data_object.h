@@ -1,6 +1,6 @@
 #pragma once
 
-#include <deque>
+#include <vector>
 
 #include <nx/utils/db/filter.h>
 #include <nx/utils/db/types.h>
@@ -22,12 +22,12 @@ public:
 
     nx::utils::db::DBResult fetchAllUserSharings(
         nx::utils::db::QueryContext* const queryContext,
-        std::deque<api::SystemSharingEx>* const sharings);
+        std::vector<api::SystemSharingEx>* const sharings);
 
     nx::utils::db::DBResult fetchUserSharingsByAccountEmail(
         nx::utils::db::QueryContext* const queryContext,
         const std::string& accountEmail,
-        std::deque<api::SystemSharingEx>* const sharings);
+        std::vector<api::SystemSharingEx>* const sharings);
 
     nx::utils::db::DBResult fetchSharing(
         nx::utils::db::QueryContext* const queryContext,
@@ -39,6 +39,13 @@ public:
         nx::utils::db::QueryContext* const queryContext,
         const nx::utils::db::InnerJoinFilterFields& filter,
         api::SystemSharingEx* const sharing);
+
+    /**
+     * NOTE: Throws on failure.
+     */
+    std::vector<api::SystemSharingEx> fetchSystemSharings(
+        utils::db::QueryContext* queryContext,
+        const std::string& systemId);
 
     nx::utils::db::DBResult deleteSharing(
         nx::utils::db::QueryContext* queryContext,
@@ -65,7 +72,7 @@ private:
     nx::utils::db::DBResult fetchUserSharings(
         nx::utils::db::QueryContext* const queryContext,
         const nx::utils::db::InnerJoinFilterFields& filterFields,
-        std::deque<api::SystemSharingEx>* const sharings);
+        std::vector<api::SystemSharingEx>* const sharings);
 };
 
 } // namespace rdb

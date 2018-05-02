@@ -26,10 +26,10 @@ void Timer::start(
     std::chrono::milliseconds timeout,
     nx::utils::MoveOnlyFunc<void()> timerFunc)
 {
-    // TODO: #ak m_aioService.registerTimer currently does not support zero timeouts, 
+    // TODO: #ak m_aioService.registerTimer currently does not support zero timeouts,
     // so using following hack
     if (timeout == std::chrono::milliseconds::zero())
-        timeout = std::chrono::milliseconds(1); 
+        timeout = std::chrono::milliseconds(1);
 
     m_handler = std::move(timerFunc);
     m_timeout = timeout;

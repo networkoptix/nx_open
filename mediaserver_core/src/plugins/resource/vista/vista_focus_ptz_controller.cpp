@@ -5,7 +5,7 @@
 
 #include <cassert>
 
-#include <nx/network/simple_http_client.h>
+#include <nx/network/deprecated/simple_http_client.h>
 #include <utils/common/ini_section.h>
 #include <utils/common/warnings.h>
 

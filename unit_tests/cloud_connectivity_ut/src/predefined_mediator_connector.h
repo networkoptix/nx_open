@@ -12,16 +12,17 @@ class PredefinedMediatorConnector:
 {
 public:
     PredefinedMediatorConnector(
-        const SocketAddress& udpEndpoint,
+        const nx::network::SocketAddress& udpEndpoint,
         std::unique_ptr<hpm::api::MediatorServerTcpConnection> serverConnection);
 
     virtual std::unique_ptr<hpm::api::MediatorClientTcpConnection> clientConnection() override;
     virtual std::unique_ptr<hpm::api::MediatorServerTcpConnection> systemConnection() override;
-    virtual boost::optional<SocketAddress> udpEndpoint() const override;
-    virtual bool isConnected() const override;
+    virtual boost::optional<nx::network::SocketAddress> udpEndpoint() const override;
+    virtual void setOnMediatorAvailabilityChanged(
+        hpm::api::MediatorAvailabilityChangedHandler handler) override;
 
 private:
-    SocketAddress m_udpEndpoint;
+    nx::network::SocketAddress m_udpEndpoint;
     std::unique_ptr<hpm::api::MediatorServerTcpConnection> m_serverConnection;
 };
 

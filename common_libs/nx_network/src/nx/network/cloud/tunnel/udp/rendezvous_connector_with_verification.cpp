@@ -156,7 +156,7 @@ void RendezvousConnectorWithVerification::onConnectCompleted(
 }
 
 void RendezvousConnectorWithVerification::onMessageReceived(
-    nx::stun::Message message)
+    nx::network::stun::Message message)
 {
     if (message.header.messageClass != stun::MessageClass::successResponse)
     {
@@ -184,7 +184,7 @@ void RendezvousConnectorWithVerification::onMessageReceived(
 }
 
 void RendezvousConnectorWithVerification::processUdpHolePunchingSynAck(
-    nx::stun::Message message)
+    nx::network::stun::Message message)
 {
     hpm::api::UdpHolePunchingSynResponse synResponse;
     if (!synResponse.parse(message))
@@ -213,7 +213,7 @@ void RendezvousConnectorWithVerification::processUdpHolePunchingSynAck(
 }
 
 void RendezvousConnectorWithVerification::processTunnelConnectionChosen(
-    nx::stun::Message message)
+    nx::network::stun::Message message)
 {
     hpm::api::TunnelConnectionChosenResponse responseData;
     if (!responseData.parse(message))

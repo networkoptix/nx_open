@@ -1,5 +1,6 @@
 #include "cloud_address_connector.h"
 
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
 #include <nx/network/socket_global.h>
 
@@ -28,7 +29,7 @@ void CloudAddressConnector::connectAsync(ConnectHandler handler)
     m_handler = std::move(handler);
     auto sharedOperationGuard = m_asyncConnectGuard.sharedGuard();
 
-    SocketGlobals::outgoingTunnelPool().establishNewConnection(
+    SocketGlobals::cloud().outgoingTunnelPool().establishNewConnection(
         m_targetHostAddress,
         m_timeout,
         m_socketAttributes,

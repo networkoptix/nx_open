@@ -9,7 +9,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <nx_ec/data/api_layout_data.h>
+#include <nx/vms/api/data/layout_data.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_layout_manager.h>
 
@@ -122,20 +122,20 @@ bool QnWorkbenchLayoutSnapshotManager::save(const QnLayoutResourcePtr &layout, S
     if (QnWorkbenchLayoutSynchronizer *synchronizer = QnWorkbenchLayoutSynchronizer::instance(layout))
         synchronizer->submit();
 
-    ec2::ApiLayoutData apiLayout;
+    nx::vms::api::LayoutData apiLayout;
     ec2::fromResourceToApi(layout, apiLayout);
 
     int reqID = commonModule()->ec2Connection()->getLayoutManager(Qn::kSystemAccess)->save(
         apiLayout, this, [this, layout, callback](int /*reqID*/, ec2::ErrorCode errorCode)
         {
-        markBeingSaved(layout->getId(), false);
+            markBeingSaved(layout->getId(), false);
 
             /* Check if all OK */
             bool success = errorCode == ec2::ErrorCode::ok;
             if (success)
             {
-                m_storage->store(layout);
-                clean(layout->getId()); //< Not changed, not being saved.
+                store(layout); //< Cleanup 'changed' flag here, sending corresponding signal.
+                clean(layout->getId()); //< Silently remove from flags storage.
             }
 
             if (callback)
@@ -184,7 +184,17 @@ void QnWorkbenchLayoutSnapshotManager::restore(const QnLayoutResourcePtr &resour
     disconnectFrom(resource);
     {
         const QnWorkbenchLayoutSnapshot &snapshot = m_storage->snapshot(resource);
-        resource->setItems(snapshot.items);
+
+        // Cleanup from snapshot resources which are already deleted from the resource pool.
+        QnLayoutItemDataMap existingItems;
+        for (const auto item: snapshot.items)
+        {
+            if (!resourcePool()->getResourceByDescriptor(item.resource))
+                continue;
+            existingItems.insert(item.uuid, item);
+        }
+
+        resource->setItems(existingItems);
         resource->setName(snapshot.name);
         resource->setCellAspectRatio(snapshot.cellAspectRatio);
         resource->setCellSpacing(snapshot.cellSpacing);

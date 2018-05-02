@@ -29,13 +29,13 @@ int QnExternalEventRestHandler::executeGet(
 {
     vms::event::EventParameters businessParams;
     QString errStr;
-    vms::event::EventState eventState = vms::event::EventState::undefined;
+    vms::api::EventState eventState = vms::api::EventState::undefined;
     bool ok;
 
     if (params.contains("event_type"))
     {
-        businessParams.eventType = QnLexical::deserialized<vms::event::EventType>(
-            params["event_type"], vms::event::EventType(), &ok);
+        businessParams.eventType = QnLexical::deserialized<vms::api::EventType>(
+            params["event_type"], vms::api::EventType(), &ok);
         if (!ok)
         {
             result.setError(QnRestResult::InvalidParameter,
@@ -52,8 +52,8 @@ int QnExternalEventRestHandler::executeGet(
 
     if (params.contains("state"))
     {
-        eventState = QnLexical::deserialized<vms::event::EventState>(
-            params["state"], vms::event::EventState::undefined, &ok);
+        eventState = QnLexical::deserialized<vms::api::EventState>(
+            params["state"], vms::api::EventState::undefined, &ok);
         if (!ok)
         {
             result.setError(QnRestResult::InvalidParameter,
@@ -64,8 +64,8 @@ int QnExternalEventRestHandler::executeGet(
 
     if (params.contains("reasonCode"))
     {
-        businessParams.reasonCode = QnLexical::deserialized<vms::event::EventReason>(
-            params["reasonCode"], vms::event::EventReason(), &ok);
+        businessParams.reasonCode = QnLexical::deserialized<vms::api::EventReason>(
+            params["reasonCode"], vms::api::EventReason(), &ok);
         if (!ok)
         {
             result.setError(QnRestResult::InvalidParameter,
@@ -104,8 +104,8 @@ int QnExternalEventRestHandler::executeGet(
 
     businessParams.sourceServerId = owner->commonModule()->moduleGUID();
 
-    if (businessParams.eventType == vms::event::undefinedEvent)
-        businessParams.eventType = vms::event::userDefinedEvent; // default value for type is 'CustomEvent'
+    if (businessParams.eventType == vms::api::EventType::undefinedEvent)
+        businessParams.eventType = vms::api::EventType::userDefinedEvent; // default value for type is 'CustomEvent'
 
     const auto& userId = owner->accessRights().userId;
 

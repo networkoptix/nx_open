@@ -111,7 +111,7 @@ static BIO_METHOD Proxy_server_socket =
     sock_write,
     sock_read,
     sock_puts,
-    NULL, // sock_gets, 
+    NULL, // sock_gets,
     sock_ctrl,
     sock_new,
     sock_free,
@@ -205,14 +205,14 @@ int SyncSslSocket::send(const void* buffer, unsigned int bufferLen)
 
 void SyncSslSocket::readSomeAsync(
     nx::Buffer* const /*buffer*/,
-    std::function<void(SystemError::ErrorCode, size_t)> /*handler*/)
+    IoCompletionHandler /*handler*/)
 {
     NX_CRITICAL(false, "Not implemented and will never be. Use ssl::StreamSocket");
 }
 
 void SyncSslSocket::sendAsync(
     const nx::Buffer& /*buffer*/,
-    std::function<void(SystemError::ErrorCode, size_t)> /*handler*/)
+    IoCompletionHandler /*handler*/)
 {
     NX_CRITICAL(false, "Not implemented and will never be. Use ssl::StreamSocket");
 }
@@ -292,7 +292,7 @@ QnMixedSSLSocket::QnMixedSSLSocket(
 int QnMixedSSLSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 {
     // check for SSL pattern 0x80 (v2) or 0x16 03 (v3)
-    if (m_initState) 
+    if (m_initState)
     {
         if (m_extraBufferLen == 0)
         {
@@ -322,7 +322,7 @@ int QnMixedSSLSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 
     if (m_useSSL)
         return SyncSslSocket::recv((char*) buffer, bufferLen, flags);
-    else 
+    else
         return recvInternal(buffer, bufferLen, flags);
 }
 
@@ -330,7 +330,7 @@ int QnMixedSSLSocket::send(const void* buffer, unsigned int bufferLen)
 {
     if (m_useSSL)
         return SyncSslSocket::send((char*) buffer, bufferLen);
-    else 
+    else
         return m_target->send(buffer, bufferLen);
 }
 

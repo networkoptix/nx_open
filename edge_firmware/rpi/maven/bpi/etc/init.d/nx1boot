@@ -58,6 +58,7 @@ export MNTDATAHDDPART=/mnt/hdd/data
 export HDDBOOTFLUSHSCRIPT=hddbootflush.sh
 export HDDBOOTFLUSH=/etc/init.d/$HDDBOOTFLUSHSCRIPT
 export HDDBOOT_INDICATOR=$MNTUBOOTENVPART/hddboot
+export TOOLS_DIR=/root/tools/$CUSTOMIZATION
 
 setup_hdd_environment() {
     if [ -f /tmp/hdd_native ]; then rm /tmp/hdd_native; fi
@@ -284,7 +285,7 @@ system_restore () {
         rm -Rf $MNTBOOTHDDPART/opt/$CUSTOMIZATION/mediaserver/etc/
         mkdir -p $MNTBOOTHDDPART/opt/$CUSTOMIZATION/mediaserver/etc/
         mkdir -p $MNTBOOTHDDPART/opt/$CUSTOMIZATION/mediaserver/var/
-        cp -f /root/tools/nx/mediaserver.conf.template $MNTBOOTHDDPART/opt/$CUSTOMIZATION/mediaserver/etc
+        cp -f $TOOLS_DIR/mediaserver.conf.template $MNTBOOTHDDPART/opt/$CUSTOMIZATION/mediaserver/etc
         cp -f /opt/$CUSTOMIZATION/mediaserver/var/ecs_static.sqlite $MNTBOOTHDDPART/opt/$CUSTOMIZATION/mediaserver/var
         mv -f $MNTBOOTHDDPART/opt/$CUSTOMIZATION/mediaserver/scripts $MNTBOOTHDDPART/opt/$CUSTOMIZATION/mediaserver/var
         #restoring saved IP configuration
@@ -367,7 +368,8 @@ upgrade() {
     chmod 600 /etc/crontab
 }
 
-# Install debs, unless the dir is missing from /opt/deb, or the proper version is installed.
+# Install all deb packages from /opt/deb/<package>/, but do nothing if the directory is missing, or
+# the specified version of a deb package with the same name as the directory is already installed.
 installDebs() # package [version]
 {
     local -r PACKAGE="$1"; shift
@@ -438,7 +440,7 @@ default_sequence () {
         /etc/init.d/nx1led boot_hdd
     fi
     start_server
-    start_lite_client
+    #start_lite_client
 }
 
 case "$1" in

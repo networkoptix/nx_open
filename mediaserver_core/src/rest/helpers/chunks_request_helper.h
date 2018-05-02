@@ -8,5 +8,8 @@ class QnChunksRequestHelper
 {
 public:
     static QnTimePeriodList load(const QnChunksRequestData& request);
+
+private:
+    static QnTimePeriodList loadAnalyticsTimePeriods(const QnChunksRequestData& request);
 };
 

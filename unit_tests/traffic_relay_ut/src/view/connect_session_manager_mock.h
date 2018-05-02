@@ -22,7 +22,7 @@ public:
         CreateClientSessionHandler completionHandler) override;
 
     virtual void connectToPeer(
-        const api::ConnectToPeerRequest& request,
+        const controller::ConnectToPeerRequestEx& request,
         ConnectToPeerHandler completionHandler) override;
 
 private:

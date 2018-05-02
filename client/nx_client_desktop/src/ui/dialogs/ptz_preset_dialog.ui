@@ -40,7 +40,7 @@
       <item row="1" column="1">
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
-         <widget class="QnCharComboBox" name="hotkeyComboBox"/>
+         <widget class="nx::client::desktop::CharComboBox" name="hotkeyComboBox"/>
         </item>
         <item>
          <spacer name="horizontalSpacer">
@@ -86,9 +86,9 @@
    <header location="global">ui/widgets/common/dialog_button_box.h</header>
   </customwidget>
   <customwidget>
-   <class>QnCharComboBox</class>
+   <class>nx::client::desktop::CharComboBox</class>
    <extends>QComboBox</extends>
-   <header location="global">ui/widgets/common/char_combo_box.h</header>
+   <header location="global">nx/client/desktop/common/widgets/char_combo_box.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -38,27 +38,27 @@ static QByteArray jsonMapToStr(const QMap<QString, QVariant>& jsonMap)
     return QJsonDocument::fromVariant(QVariant(jsonMap)).toJson();
 }
 
-// TODO: Consider moving to nx_http::HttpClient.
-nx_http::BufferType readResponseBody(nx_http::HttpClient* httpClient)
+// TODO: Consider moving to nx::network::http::HttpClient.
+nx::network::http::BufferType readResponseBody(nx::network::http::HttpClient* httpClient)
 {
-    nx_http::BufferType response;
+    nx::network::http::BufferType response;
     while (!httpClient->eof())
         response.append(httpClient->fetchMessageBodyBuffer());
     return response;
 }
 
-std::unique_ptr<nx_http::HttpClient> createHttpClient()
+std::unique_ptr<nx::network::http::HttpClient> createHttpClient()
 {
-    auto httpClient = std::make_unique<nx_http::HttpClient>();
+    auto httpClient = std::make_unique<nx::network::http::HttpClient>();
     httpClient->setUserName("admin");
     httpClient->setUserPassword("admin");
     return httpClient;
 }
 
-QUrl createUrl(const MediaServerLauncher* const launcher, const QString& urlStr)
+nx::utils::Url createUrl(const MediaServerLauncher* const launcher, const QString& urlStr)
 {
     // NOTE: urlStr contains a URL part starting after the origin: slash, path, query, etc.
-    return QUrl(launcher->apiUrl().toString(
+    return nx::utils::Url(launcher->apiUrl().toString(
         QUrl::RemovePath | QUrl::RemoveQuery | QUrl::RemoveFragment) + urlStr);
 }
 
@@ -70,7 +70,7 @@ void doExecutePost(
     int httpStatus)
 {
     auto httpClient = createHttpClient();
-    QUrl url = createUrl(launcher, urlStr);
+    nx::utils::Url url = createUrl(launcher, urlStr);
 
     const auto& actualRequest = preprocessRequestFunc ? preprocessRequestFunc(request) : request;
 
@@ -90,11 +90,11 @@ void doExecutePost(
 void doExecuteGet(
     const MediaServerLauncher* const launcher,
     const QString& urlStr,
-    nx_http::BufferType* outResponse,
+    nx::network::http::BufferType* outResponse,
     int httpStatus)
 {
     auto httpClient = createHttpClient();
-    QUrl url = createUrl(launcher, urlStr);
+    nx::utils::Url url = createUrl(launcher, urlStr);
 
     NX_LOG(lm("[TEST] GET %1").arg(urlStr), cl_logINFO);
 

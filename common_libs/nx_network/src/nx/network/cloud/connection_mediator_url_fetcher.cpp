@@ -8,11 +8,11 @@ namespace cloud {
 
 void ConnectionMediatorUrlFetcher::get(Handler handler)
 {
-    get(nx_http::AuthInfo(), std::move(handler));
+    get(nx::network::http::AuthInfo(), std::move(handler));
 }
 
 void ConnectionMediatorUrlFetcher::get(
-    nx_http::AuthInfo auth,
+    nx::network::http::AuthInfo auth,
     Handler handler)
 {
     using namespace std::chrono;
@@ -25,7 +25,7 @@ void ConnectionMediatorUrlFetcher::get(
         auto mediator = *m_mediatorHostDescriptor;
         lk.unlock();
         handler(
-            nx_http::StatusCode::ok,
+            nx::network::http::StatusCode::ok,
             std::move(mediator.tcpUrl),
             std::move(mediator.udpUrl));
         return;
@@ -43,8 +43,8 @@ bool ConnectionMediatorUrlFetcher::analyzeXmlSearchResult(
         searchResult.get(CloudInstanceSelectionAttributeNameset::hpmUdpUrl, &foundUdpUrlStr))
     {
         m_mediatorHostDescriptor = MediatorHostDescriptor();
-        m_mediatorHostDescriptor->tcpUrl = QUrl(foundTcpUrlStr);
-        m_mediatorHostDescriptor->udpUrl = QUrl(foundUdpUrlStr);
+        m_mediatorHostDescriptor->tcpUrl = nx::utils::Url(foundTcpUrlStr);
+        m_mediatorHostDescriptor->udpUrl = nx::utils::Url(foundUdpUrlStr);
         return true;
     }
 
@@ -64,13 +64,13 @@ bool ConnectionMediatorUrlFetcher::analyzeXmlSearchResult(
 
 void ConnectionMediatorUrlFetcher::invokeHandler(
     const Handler& handler,
-    nx_http::StatusCode::Value statusCode)
+    nx::network::http::StatusCode::Value statusCode)
 {
-    NX_ASSERT(statusCode != nx_http::StatusCode::ok || static_cast<bool>(m_mediatorHostDescriptor));
+    NX_ASSERT(statusCode != nx::network::http::StatusCode::ok || static_cast<bool>(m_mediatorHostDescriptor));
     handler(
         statusCode,
-        m_mediatorHostDescriptor ? m_mediatorHostDescriptor->tcpUrl : QUrl(),
-        m_mediatorHostDescriptor ? m_mediatorHostDescriptor->udpUrl : QUrl());
+        m_mediatorHostDescriptor ? m_mediatorHostDescriptor->tcpUrl : nx::utils::Url(),
+        m_mediatorHostDescriptor ? m_mediatorHostDescriptor->udpUrl : nx::utils::Url());
 }
 
 } // namespace cloud

@@ -1,5 +1,7 @@
 #include "program_arguments.h"
 
+#include <cstdlib>
+
 namespace nx {
 namespace utils {
 namespace test {

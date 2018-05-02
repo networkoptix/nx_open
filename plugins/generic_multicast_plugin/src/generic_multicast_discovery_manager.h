@@ -1,6 +1,6 @@
 #pragma once
 
-#include <plugins/camera_plugin.h>
+#include <camera/camera_plugin.h>
 #include <plugins/plugin_tools.h>
 
 class GenericMulticastDiscoveryManager

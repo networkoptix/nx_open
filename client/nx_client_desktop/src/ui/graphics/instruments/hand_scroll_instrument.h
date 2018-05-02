@@ -3,6 +3,7 @@
 
 #include <QtGui/QCursor>
 #include <ui/processors/kinetic_process_handler.h>
+#include <common/common_globals.h>
 #include "drag_processing_instrument.h"
 
 class HandScrollInstrument: public DragProcessingInstrument, protected KineticProcessHandler {

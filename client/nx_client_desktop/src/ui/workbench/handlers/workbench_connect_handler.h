@@ -63,11 +63,11 @@ private:
     /// @brief Connects to server and stores successful connection data
     /// according to specified settings.
     void testConnectionToServer(
-        const QUrl& url,
+        const nx::utils::Url& url,
         ConnectionOptions options,
         bool force);
 
-    void connectToServer(const QUrl& url);
+    void connectToServer(const nx::utils::Url& url);
 
     enum DisconnectFlag
     {
@@ -82,7 +82,7 @@ private:
 
     void handleTestConnectionReply(
         int handle,
-        const QUrl& url,
+        const nx::utils::Url& url,
         ec2::ErrorCode errorCode,
         const QnConnectionInfo& connectionInfo,
         ConnectionOptions options,
@@ -100,8 +100,7 @@ private:
     void establishConnection(
         ec2::AbstractECConnectionPtr connection);
 
-    void storeConnectionRecord(
-        const QUrl& url,
+    void storeConnectionRecord(const nx::utils::Url &url,
         const QnConnectionInfo& info,
         ConnectionOptions options);
 
@@ -138,9 +137,9 @@ private:
     struct
     {
         int handle = 0;
-        QUrl url;
+        nx::utils::Url url;
 
-        void reset() { handle = 0; url = QUrl(); }
+        void reset() { handle = 0; url = nx::utils::Url(); }
     } m_connecting;
 
     LogicalState m_logicalState;

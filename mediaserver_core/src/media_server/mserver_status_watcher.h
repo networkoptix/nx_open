@@ -12,8 +12,6 @@
 #include <common/common_module_aware.h>
 #include <nx/vms/event/events/events_fwd.h>
 
-class QnMServerFailureBusinessEvent;
-
 //!Monitors mediaserver's status change and sends business event if some server goes offline
 class MediaServerStatusWatcher: public QObject, public QnCommonModuleAware
 {

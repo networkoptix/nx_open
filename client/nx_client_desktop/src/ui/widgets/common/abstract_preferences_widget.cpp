@@ -1,23 +1,8 @@
 #include "abstract_preferences_widget.h"
 
-QnAbstractPreferencesWidget::QnAbstractPreferencesWidget(QWidget *parent /*= 0*/)
-    : QWidget(parent)
-    , m_readOnly(false)
-{}
-
-void QnAbstractPreferencesWidget::discardChanges()
+QnAbstractPreferencesWidget::QnAbstractPreferencesWidget(QWidget* parent):
+    base_type(parent)
 {
-    /* Do nothing by default. */
-}
-
-bool QnAbstractPreferencesWidget::canApplyChanges() const
-{
-    return true;
-}
-
-bool QnAbstractPreferencesWidget::canDiscardChanges() const
-{
-    return true;
 }
 
 void QnAbstractPreferencesWidget::retranslateUi()
@@ -36,10 +21,3 @@ void QnAbstractPreferencesWidget::setReadOnly(bool readOnly)
     setReadOnlyInternal(readOnly);
     m_readOnly = readOnly;
 }
-
-void QnAbstractPreferencesWidget::setReadOnlyInternal(bool readOnly)
-{
-    Q_UNUSED(readOnly);
-}
-
-

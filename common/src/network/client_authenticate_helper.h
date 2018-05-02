@@ -7,7 +7,7 @@
 
 class HttpAuthenticationClientContext
 {
-    using AuthHeaderType = boost::optional<nx_http::header::WWWAuthenticate>;
+    using AuthHeaderType = boost::optional<nx::network::http::header::WWWAuthenticate>;
 
 public:
     explicit HttpAuthenticationClientContext(bool shouldGuessDigest);
@@ -17,16 +17,16 @@ public:
     AuthHeaderType authenticationHeader() const;
     void setAuthenticationHeader(const AuthHeaderType& header);
 
-    nx_http::StatusCode::Value responseStatusCode() const;
-    void setResponseStatusCode(nx_http::StatusCode::Value responseStatusCode);
+    nx::network::http::StatusCode::Value responseStatusCode() const;
+    void setResponseStatusCode(nx::network::http::StatusCode::Value responseStatusCode);
 
     bool isValid() const;
     void clear();
 
 private:
     bool m_shouldGuessDigest;
-    boost::optional<nx_http::header::WWWAuthenticate> m_authenticationHeader = boost::none;
-    nx_http::StatusCode::Value m_responseStatusCode = nx_http::StatusCode::Value::ok;
+    boost::optional<nx::network::http::header::WWWAuthenticate> m_authenticationHeader = boost::none;
+    nx::network::http::StatusCode::Value m_responseStatusCode = nx::network::http::StatusCode::Value::ok;
 };
 
 class QnClientAuthHelper
@@ -43,14 +43,14 @@ public:
     */
     static Qn::AuthResult authenticate(
         const QAuthenticator& auth,
-        const nx_http::Response& response,
-        nx_http::Request* const request,
+        const nx::network::http::Response& response,
+        nx::network::http::Request* const request,
         HttpAuthenticationClientContext* const authenticationCtx );
 
     //!Same as above, but uses cached authentication info
     static Qn::AuthResult addAuthorizationToRequest(
         const QAuthenticator& auth,
-        nx_http::Request* const request,
+        nx::network::http::Request* const request,
         const HttpAuthenticationClientContext* const authenticationCtx);
 };
 

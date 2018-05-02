@@ -16,6 +16,8 @@
 #include <ui/common/notification_levels.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
+#include <nx/client/desktop/ui/actions/actions.h>
+#include <nx/api/mediaserver/image_request.h>
 
 class QGraphicsLinearLayout;
 class QnNotificationListWidget;
@@ -42,6 +44,7 @@ public:
 
     /** Rectangle where all tooltips should fit - in local coordinates. */
     void setToolTipsEnclosingRect(const QRectF &rect);
+    QRectF toolTipsEnclosingRect() const;
 
     QnBlinkingImageButtonWidget* blinker() const;
     void setBlinker(QnBlinkingImageButtonWidget* blinker);
@@ -64,6 +67,13 @@ private:
         const QnVirtualCameraResourcePtr& camera,
         const nx::vms::event::AbstractActionPtr& action);
 
+    using ParametersGetter = std::function<nx::client::desktop::ui::action::Parameters ()>;
+    QnNotificationWidget* addCustomPopup(
+        nx::client::desktop::ui::action::IDType actionId,
+        const ParametersGetter& parametersGetter,
+        QnNotificationLevel::Value notificationLevel,
+        const QString& buttonText,
+        bool closeable);
     void showEventAction(const nx::vms::event::AbstractActionPtr& businessAction);
     void hideEventAction(const nx::vms::event::AbstractActionPtr& businessAction);
 
@@ -82,8 +92,12 @@ private:
      * @param resource                      Camera resource - thumbnail provider
      * @param msecSinceEpoch                Timestamp for the thumbnail, -1 means latest available
      */
-    void loadThumbnailForItem(QnNotificationWidget *item, const QnVirtualCameraResourcePtr &camera, qint64 msecSinceEpoch = -1);
-    void loadThumbnailForItem(QnNotificationWidget *item, const QnVirtualCameraResourceList &cameraList, qint64 msecSinceEpoch = -1);
+    void loadThumbnailForItem(QnNotificationWidget* item,
+        const QnVirtualCameraResourcePtr& camera,
+        qint64 msecSinceEpoch = nx::api::ImageRequest::kLatestThumbnail);
+    void loadThumbnailForItem(QnNotificationWidget* item,
+        const QnVirtualCameraResourceList& cameraList,
+        qint64 msecSinceEpoch = nx::api::ImageRequest::kLatestThumbnail);
 
     QnNotificationWidget* findItem(QnSystemHealth::MessageType message, const QnResourcePtr &resource);
     QnNotificationWidget* findItem(const QnUuid& eventRuleId, const QnResourcePtr &resource);
@@ -103,6 +117,8 @@ private:
     QPointer<QnBlinkingImageButtonWidget> m_blinker;
     std::unique_ptr<nx::vms::event::StringsHelper> m_helper;
     QHash<QnUuid, QnNotificationWidget*> m_customPopupItems;
+    QnNotificationWidget* m_currentDefaultPasswordChangeWidget = nullptr;
+    QRectF m_toolTipsEnclosingRect;
 };
 
 #endif // NOTIFICATIONS_COLLECTION_WIDGET_H

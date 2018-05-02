@@ -9,6 +9,7 @@
 #include <nx/utils/test_support/utils.h>
 
 #include <nx/utils/db/async_sql_query_executor.h>
+#include <nx/utils/db/db_instance_controller.h>
 #include <nx/utils/db/types.h>
 #include <nx/utils/test_support/test_with_temporary_directory.h>
 
@@ -17,20 +18,24 @@ namespace utils {
 namespace db {
 namespace test {
 
-class BaseDbTest:
+// TODO: #ak Fix weird class names in this file.
+
+class BasicFixture:
     public ::testing::Test,
     public nx::utils::test::TestWithTemporaryDirectory
 {
 public:
-    BaseDbTest();
-    ~BaseDbTest();
+    BasicFixture();
+    ~BasicFixture();
 
 protected:
+    virtual void initializeQueryExecutor(const ConnectionOptions& connectionOptions) = 0;
+    virtual void closeDatabase() = 0;
+    virtual AsyncSqlQueryExecutor& asyncSqlQueryExecutor() = 0;
+
     ConnectionOptions& connectionOptions();
     const ConnectionOptions& connectionOptions() const;
     void initializeDatabase();
-    void closeDatabase();
-    const std::unique_ptr<AsyncSqlQueryExecutor>& asyncSqlQueryExecutor();
     void executeUpdate(const QString& queryText);
 
     template<typename RecordStructure>
@@ -41,7 +46,7 @@ protected:
 
         std::vector<RecordStructure> records;
 
-        asyncSqlQueryExecutor()->executeSelect(
+        asyncSqlQueryExecutor().executeSelect(
             [queryText, &records](
                 nx::utils::db::QueryContext* queryContext)
             {
@@ -70,7 +75,7 @@ protected:
         nx::utils::promise<nx::utils::db::DBResult> queryCompletedPromise;
 
         //starting async operation
-        asyncSqlQueryExecutor()->executeUpdate(
+        asyncSqlQueryExecutor().executeUpdate(
             dbQueryFunc,
             [&queryCompletedPromise](
                 nx::utils::db::QueryContext* /*queryContext*/, DBResult dbResult)
@@ -85,9 +90,39 @@ protected:
 private:
     QString m_tmpDir;
     ConnectionOptions m_connectionOptions;
-    std::unique_ptr<AsyncSqlQueryExecutor> m_asyncSqlQueryExecutor;
 
     void init();
+};
+
+//-------------------------------------------------------------------------------------------------
+
+/**
+ * This fixture prepares DB struct for updates, tunes DB.
+ */
+class BaseDbTest:
+    public BasicFixture
+{
+protected:
+    virtual void initializeQueryExecutor(const ConnectionOptions& connectionOptions) override;
+    virtual void closeDatabase() override;
+    virtual AsyncSqlQueryExecutor& asyncSqlQueryExecutor() override;
+
+private:
+    std::unique_ptr<InstanceController> m_dbInstanceController;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+class FixtureWithQueryExecutorOnly:
+    public BasicFixture
+{
+protected:
+    virtual void initializeQueryExecutor(const ConnectionOptions& connectionOptions) override;
+    virtual void closeDatabase() override;
+    virtual AsyncSqlQueryExecutor& asyncSqlQueryExecutor() override;
+
+private:
+    std::unique_ptr<AsyncSqlQueryExecutor> m_queryExecutor;
 };
 
 } // namespace test

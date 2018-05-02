@@ -42,6 +42,12 @@
 #include "health/system_health.h"
 #include <common/common_module_aware.h>
 
+extern "C" {
+
+#include <libavutil/avutil.h>
+
+} // extern "C"
+
 class QnAbstractMediaStreamDataProvider;
 class TestStorageThread;
 class RebuildAsyncTask;
@@ -49,6 +55,8 @@ class ScanMediaFilesTask;
 class AuxiliaryTask;
 class QnUuid;
 class QnScheduleSync;
+
+namespace nx { namespace analytics { namespace storage { class AbstractEventsStorage; }}}
 
 class QnStorageManager: public QObject, public QnCommonModuleAware
 {
@@ -63,7 +71,10 @@ public:
 
     static const qint64 BIG_STORAGE_THRESHOLD_COEFF = 10; // use if space >= 1/10 from max storage space
 
-    QnStorageManager(QnCommonModule* commonModule, QnServer::StoragePool kind);
+    QnStorageManager(
+        QnCommonModule* commonModule,
+        nx::analytics::storage::AbstractEventsStorage* analyticsEventsStorage,
+        QnServer::StoragePool kind);
     virtual ~QnStorageManager();
     static QnStorageManager* normalInstance();
     static QnStorageManager* backupInstance();
@@ -78,8 +89,19 @@ public:
     void addStorage(const QnStorageResourcePtr &storage);
 
     QString getFileName(const qint64& fileDate, qint16 timeZone, const QnNetworkResourcePtr &netResource, const QString& prefix, const QnStorageResourcePtr& storage);
-    bool fileStarted(const qint64& startDateMs, int timeZone, const QString& fileName, QnAbstractMediaStreamDataProvider* provider);
-    bool fileFinished(int durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider,  qint64 fileSize);
+    bool fileStarted(
+        const qint64& startDateMs,
+        int timeZone,
+        const QString& fileName,
+        QnAbstractMediaStreamDataProvider* provider,
+        bool sideRecorder = false);
+
+    bool fileFinished(
+        int durationMs,
+        const QString& fileName,
+        QnAbstractMediaStreamDataProvider* provider,
+        qint64 fileSize,
+        qint64 startTimeMs = AV_NOPTS_VALUE);
 
     /*
     * convert UTC time to folder name. Used for server archive catalog.
@@ -94,6 +116,7 @@ public:
 
     bool checkIfMyStorage(const QnStorageResourcePtr &storage) const;
     QnStorageResourcePtr getStorageByUrlExact(const QString& storageUrl);
+    QnStorageResourcePtr getStorageByVolume(const QString& volumeRoot) const;
     QnStorageResourcePtr storageRoot(int storage_index) const { QnMutexLocker lock( &m_mutexStorages ); return m_storageRoots.value(storage_index); }
     bool isStorageAvailable(int storage_index) const;
     bool isStorageAvailable(const QnStorageResourcePtr& storage) const;
@@ -121,20 +144,24 @@ public:
      * Return writable storages with checkBox 'usedForWriting'
      */
     QSet<QnStorageResourcePtr> getUsedWritableStorages() const;
+    QSet<QnStorageResourcePtr> getClearableStorages() const;
 
     /*
      * Return all storages which can be used for writing
      */
-    QSet<QnStorageResourcePtr> getAllWritableStorages() const;
+    QSet<QnStorageResourcePtr> getAllWritableStorages(
+        const QnStorageResourceList* additionalStorages = nullptr) const;
 
     QnStorageResourceList getStoragesInLexicalOrder() const;
     bool hasRebuildingStorages() const;
 
     void clearSpace(bool forced=false);
+    bool clearSpaceForFile(const QString& path, qint64 size);
+    bool canAddChunk(qint64 timeMs, qint64 size);
     void checkSystemStorageSpace();
     void removeEmptyDirs(const QnStorageResourcePtr &storage);
 
-    bool clearOldestSpace(const QnStorageResourcePtr &storage, bool useMinArchiveDays);
+    bool clearOldestSpace(const QnStorageResourcePtr &storage, bool useMinArchiveDays, qint64 targetFreeSpace);
     void clearMaxDaysData();
     void clearMaxDaysData(QnServer::ChunksCatalog catalogIdx);
 
@@ -166,14 +193,14 @@ public:
     QnScheduleSync* scheduleSync() const;
 signals:
     void noStoragesAvailable();
-    void storageFailure(const QnResourcePtr &storageRes, nx::vms::event::EventReason reason);
+    void storageFailure(const QnResourcePtr &storageRes, nx::vms::api::EventReason reason);
     void rebuildFinished(QnSystemHealth::MessageType msgType);
-    void backupFinished(qint64 backedUpToMs, nx::vms::event::EventReason);
+    void backupFinished(qint64 backedUpToMs, nx::vms::api::EventReason);
 public slots:
     void at_archiveRangeChanged(const QnStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs);
     void onNewResource(const QnResourcePtr &resource);
     void onDelResource(const QnResourcePtr &resource);
-    void at_storageChanged(const QnResourcePtr &storage);
+    void at_storageRoleChanged(const QnResourcePtr &storage);
     void testOfflineStorages();
 private:
     friend class TestStorageThread;
@@ -194,7 +221,7 @@ private:
 
     QString toCanonicalPath(const QString& path);
     StorageMap getAllStorages() const;
-	QSet<QnStorageResourcePtr> getWritableStorages(
+    QSet<QnStorageResourcePtr> getWritableStorages(
         std::function<bool (const QnStorageResourcePtr& storage)> filter) const;
 
     QnStorageResourcePtr getUsedWritableStorageByIndex(int storageIndex);
@@ -224,7 +251,8 @@ private:
 
     // get statistics for the whole archive except of bitrate. It's analyzed for the last records of archive only in range <= bitrateAnalizePeriodMs
     QnRecordingStatsData mergeStatsFromCatalogs(qint64 bitrateAnalizePeriodMs, const DeviceFileCatalogPtr& catalogHi, const DeviceFileCatalogPtr& catalogLow);
-    void clearBookmarks();
+    void clearAnalyticsEvents(const QMap<QnUuid, qint64>& dataToDelete);
+    QMap<QnUuid, qint64> calculateOldestDataTimestampByCamera();
     bool getMinTimes(QMap<QString, qint64>& lastTime);
     void processCatalogForMinTime(QMap<QString, qint64>& lastTime, const FileCatalogMap& catalogMap);
 
@@ -244,6 +272,7 @@ private:
     void startAuxTimerTasks();
 
 private:
+    nx::analytics::storage::AbstractEventsStorage* m_analyticsEventsStorage;
     const QnServer::StoragePool m_role;
     StorageMap                  m_storageRoots;
     FileCatalogMap              m_devFileCatalog[QnServer::ChunksCatalogCount];
@@ -265,7 +294,7 @@ private:
     QMap<QnUuid, bool> m_diskFullWarned;
 
     QnStorageScanData m_archiveRebuildInfo;
-    bool m_rebuildCancelled;
+    std::atomic<bool> m_rebuildCancelled;
 
     friend class RebuildAsyncTask;
     friend class ScanMediaFilesTask;

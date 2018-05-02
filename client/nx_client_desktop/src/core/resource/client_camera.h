@@ -5,7 +5,8 @@
 
 class QnArchiveStreamReader;
 
-class QnClientCameraResource: public QnClientCoreCamera {
+class QnClientCameraResource: public QnClientCoreCamera
+{
     Q_OBJECT
 
     typedef QnClientCoreCamera base_type;
@@ -17,6 +18,14 @@ public:
     virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider *dataProvider = 0) const override;
 
     virtual Qn::ResourceFlags flags() const override;
+
+    static void setAuthToCameraGroup(
+        const QnVirtualCameraResourcePtr& camera,
+        const QAuthenticator& authenticator);
+
+    static QnAbstractStreamDataProvider* createDataProvider(
+        const QnResourcePtr& resource,
+        Qn::ConnectionRole role);
 
 signals:
     void dataDropped(QnArchiveStreamReader* reader);

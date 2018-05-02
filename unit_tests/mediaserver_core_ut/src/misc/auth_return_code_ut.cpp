@@ -18,6 +18,10 @@
 #include "utils/common/sleep.h"
 #include "common/common_module.h"
 #include <api/global_settings.h>
+#include <database/server_db.h>
+#include <recording/time_period.h>
+#include <audit/mserver_audit_manager.h>
+#include <nx/utils/elapsed_timer.h>
 
 class AuthReturnCodeTest:
     public ::testing::Test
@@ -76,7 +80,7 @@ public:
 
         userData.id = QnUuid::createUuid();
         userData.name = userName;
-        userData.digest = nx_http::calcHa1(userName, nx::network::AppInfo::realm(), password);
+        userData.digest = nx::network::http::calcHa1(userName, nx::network::AppInfo::realm(), password);
         userData.isEnabled = isEnabled;
         userData.isCloud = false;
         ASSERT_EQ(ec2::ErrorCode::ok, userManager->saveSync(userData));
@@ -87,14 +91,14 @@ public:
         testServerReturnCode(
             userName,
             password,
-            nx_http::AuthType::authDigest,
-            nx_http::StatusCode::ok,
+            nx::network::http::AuthType::authDigest,
+            nx::network::http::StatusCode::ok,
             boost::none);
     }
 
     void testServerReturnCodeForWrongPassword(
         const ec2::ApiUserData& userDataToUse,
-        nx_http::AuthType authType,
+        nx::network::http::AuthType authType,
         int expectedStatusCode,
         Qn::AuthResult expectedAuthResult)
     {
@@ -116,13 +120,13 @@ public:
             login,
             password,
             nx::network::AppInfo::realm().toUtf8(),
-            nx_http::Method::get,
+            nx::network::http::Method::get,
             QnAuthHelper::instance()->generateNonce());
 
         auto msgBody = QJson::serialized(cookieLogin);
-        QUrl url = mediaServerLauncher->apiUrl();
+        nx::utils::Url url = mediaServerLauncher->apiUrl();
         url.setPath("/api/cookieLogin");
-        nx_http::HttpClient httpClient;
+        nx::network::http::HttpClient httpClient;
         httpClient.doPost(url, "application/json", msgBody);
         ASSERT_TRUE(httpClient.response());
 
@@ -142,18 +146,23 @@ public:
     void testServerReturnCode(
         const QString& login,
         const QString& password,
-        nx_http::AuthType authType,
+        nx::network::http::AuthType authType,
         int expectedStatusCode,
         boost::optional<Qn::AuthResult> expectedAuthResult)
     {
-        // Waiting for server to come up
+        auto httpClient = std::make_unique<nx::network::http::HttpClient>();
+        httpClient->setUserName(login);
+        httpClient->setUserPassword(password);
+        httpClient->setAuthType(authType);
+        httpClient->addAdditionalHeader(Qn::CUSTOM_CHANGE_REALM_HEADER_NAME, QByteArray());
+        testServerReturnCode(std::move(httpClient), expectedStatusCode, expectedAuthResult);
+    }
 
-        nx_http::HttpClient httpClient;
-        httpClient.setUserName(login);
-        httpClient.setUserPassword(password);
-        httpClient.setAuthType(authType);
-        httpClient.addAdditionalHeader(Qn::CUSTOM_CHANGE_REALM_HEADER_NAME, QByteArray());
-
+    void testServerReturnCode(
+        std::unique_ptr<nx::network::http::HttpClient> httpClient,
+        int expectedStatusCode,
+        boost::optional<Qn::AuthResult> expectedAuthResult = boost::none)
+    {
         const auto startTime = std::chrono::steady_clock::now();
         constexpr const auto maxPeriodToWaitForMediaServerStart = std::chrono::seconds(150);
         while (std::chrono::steady_clock::now() - startTime < maxPeriodToWaitForMediaServerStart)
@@ -163,22 +172,44 @@ public:
                 std::this_thread::sleep_for(std::chrono::milliseconds(1));
                 continue;
             }
-            QUrl url = mediaServerLauncher->apiUrl();
+            nx::utils::Url url = mediaServerLauncher->apiUrl();
             url.setPath("/ec2/getUsers");
-            if (httpClient.doGet(url))
+            if (httpClient->doGet(url))
                 break;  //< Server is alive
         }
-        ASSERT_TRUE(httpClient.response());
-        auto statusCode = httpClient.response()->statusLine.statusCode;
+        ASSERT_TRUE(httpClient->response());
+        auto statusCode = httpClient->response()->statusLine.statusCode;
         ASSERT_EQ(expectedStatusCode, statusCode);
 
         if (expectedAuthResult)
         {
-            QString authResultStr = nx_http::getHeaderValue(httpClient.response()->headers, Qn::AUTH_RESULT_HEADER_NAME);
+            QString authResultStr = nx::network::http::getHeaderValue(
+                httpClient->response()->headers, Qn::AUTH_RESULT_HEADER_NAME);
             ASSERT_FALSE(authResultStr.isEmpty());
 
             Qn::AuthResult authResult = QnLexical::deserialized<Qn::AuthResult>(authResultStr);
             ASSERT_EQ(expectedAuthResult, authResult);
+
+            if (expectedStatusCode == nx::network::http::StatusCode::unauthorized)
+            {
+                httpClient.reset(); //< Ensure connection is closed.
+
+                QnTimePeriod period(0, QnTimePeriod::infiniteDuration());
+                QnAuditRecordList outputData;
+                static const std::chrono::seconds kMaxWaitTime(10);
+                nx::utils::ElapsedTimer timer;
+                timer.restart();
+                // Server send "Unauthorized" response before it write data to the auditLog.
+                do
+                {
+                    static_cast<QnMServerAuditManager*>(qnAuditManager)->flushRecords();
+                    outputData = qnServerDb->getAuditData(period, QnUuid());
+                    if (outputData.isEmpty())
+                        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                } while (outputData.isEmpty() && timer.elapsed() < kMaxWaitTime);
+                ASSERT_TRUE(!outputData.isEmpty());
+                ASSERT_EQ(Qn::AuditRecordType::AR_UnauthorizedLogin, outputData.last().eventType);
+            }
         }
     }
 };
@@ -193,8 +224,8 @@ TEST_F(AuthReturnCodeTest, authWhileRestart)
     mediaServerLauncher->startAsync();
     testServerReturnCodeForWrongPassword(
         userData,
-        nx_http::AuthType::authBasic,
-        nx_http::StatusCode::forbidden,
+        nx::network::http::AuthType::authBasic,
+        nx::network::http::StatusCode::forbidden,
         Qn::Auth_Forbidden);
 }
 
@@ -203,8 +234,8 @@ TEST_F(AuthReturnCodeTest, noCloudConnect)
     // We have cloud user but not connected to cloud yet.
     testServerReturnCodeForWrongPassword(
         userData,
-        nx_http::AuthType::authDigest,
-        nx_http::StatusCode::unauthorized,
+        nx::network::http::AuthType::authDigest,
+        nx::network::http::StatusCode::unauthorized,
         Qn::Auth_CloudConnectError);
 
 }
@@ -249,8 +280,8 @@ TEST_F(AuthReturnCodeTest, disabledUser)
     testServerReturnCode(
         userCredentials[0],
         userCredentials[1],
-        nx_http::AuthType::authDigest,
-        nx_http::StatusCode::unauthorized,
+        nx::network::http::AuthType::authDigest,
+        nx::network::http::StatusCode::unauthorized,
         Qn::Auth_DisabledUser);
 }
 
@@ -259,14 +290,70 @@ TEST_F(AuthReturnCodeTest, noLdapConnect)
     // We have cloud user but not connected to cloud yet.
     testServerReturnCodeForWrongPassword(
         ldapUserWithEmptyDigest,
-        nx_http::AuthType::authBasicAndDigest,
-        nx_http::StatusCode::unauthorized,
+        nx::network::http::AuthType::authBasicAndDigest,
+        nx::network::http::StatusCode::unauthorized,
         Qn::Auth_LDAPConnectError);
 
     // We have cloud user but not connected to cloud yet.
     testServerReturnCodeForWrongPassword(
         ldapUserWithFilledDigest,
-        nx_http::AuthType::authDigest,
-        nx_http::StatusCode::unauthorized,
+        nx::network::http::AuthType::authDigest,
+        nx::network::http::StatusCode::unauthorized,
         Qn::Auth_LDAPConnectError);
+}
+
+static std::unique_ptr<nx::network::http::HttpClient> manualDigestClient(
+    const QByteArray& method, const QByteArray& uri)
+{
+    nx::network::http::header::WWWAuthenticate unquthorizedHeader;
+    EXPECT_TRUE(unquthorizedHeader.parse(
+        "Digest realm=\"VMS\", "
+        "nonce=\"" + QnAuthHelper::instance()->generateNonce() + "\", "
+        "algorithm=MD5"));
+
+    nx::network::http::header::DigestAuthorization digestHeader;
+    EXPECT_TRUE(nx::network::http::calcDigestResponse(
+        method, "admin", QByteArray("admin"), boost::none, uri,
+        unquthorizedHeader, &digestHeader));
+
+    auto client = std::make_unique<nx::network::http::HttpClient>();
+    client->setDisablePrecalculatedAuthorization(true);
+    client->addAdditionalHeader(nx::network::http::header::Authorization::NAME, digestHeader.serialized());
+    return client;
+}
+
+TEST_F(AuthReturnCodeTest, manualDigest)
+{
+    auto client = manualDigestClient("GET", "/ec2/getUsers");
+    testServerReturnCode(std::move(client), 200);
+}
+
+TEST_F(AuthReturnCodeTest, manualDigestWrongUri)
+{
+    auto client = manualDigestClient("GET", "/api/getCameras");
+    testServerReturnCode(std::move(client), 401, Qn::AuthResult::Auth_WrongDigest);
+}
+
+TEST_F(AuthReturnCodeTest, manualDigestWrongMethod)
+{
+    auto client = manualDigestClient("POST", "/api/getUsers");
+    testServerReturnCode(std::move(client), 401, Qn::AuthResult::Auth_WrongDigest);
+}
+
+TEST_F(AuthReturnCodeTest, manualDigest_onGateway)
+{
+    auto client = manualDigestClient("GET", "/gateway/c6901e5b-4884-41f4-ab80-73e078341252/ec2/getUsers");
+    testServerReturnCode(std::move(client), 200);
+}
+
+TEST_F(AuthReturnCodeTest, manualDigestWrongUri_onGateway)
+{
+    auto client = manualDigestClient("GET", "/gateway/c6901e5b-4884-41f4-ab80-73e078341252/api/getCameras");
+    testServerReturnCode(std::move(client), 401, Qn::AuthResult::Auth_WrongDigest);
+}
+
+TEST_F(AuthReturnCodeTest, manualDigestWrongMethod_onGateway)
+{
+    auto client = manualDigestClient("POST", "/api/getUsers");
+    testServerReturnCode(std::move(client), 401, Qn::AuthResult::Auth_WrongDigest);
 }

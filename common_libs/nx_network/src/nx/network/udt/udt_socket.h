@@ -20,10 +20,10 @@ template<class SocketType> class AsyncServerSocketHelper;
 
 } // namespace aio
 
-// I put the implementator inside of detail namespace to avoid namespace pollution.
-// The reason is that I see many of the class prefer using Implementator , maybe 
-// we want binary compatible of our source code. Anyway, this is not a bad thing
-// but some sacrifice on inline function.
+  // I put the implementator inside of detail namespace to avoid namespace pollution.
+  // The reason is that I see many of the class prefer using Implementator , maybe
+  // we want binary compatible of our source code. Anyway, this is not a bad thing
+  // but some sacrifice on inline function.
 namespace detail {
 
 class UdtSocketImpl;
@@ -46,10 +46,10 @@ public:
     virtual ~UdtSocket();
 
     /**
-     * Binds UDT socket to an existing UDP socket.
-     * @note This method can be called just after UdtSocket creation.
-     * @note if method have failed UdtSocket instance MUST be destroyed!
-     */
+    * Binds UDT socket to an existing UDP socket.
+    * NOTE: This method can be called just after UdtSocket creation.
+    * NOTE: if method have failed UdtSocket instance MUST be destroyed!
+    */
     bool bindToUdpSocket(UDPSocket&& udpSocket);
 
     // AbstractSocket --------------- interface
@@ -60,6 +60,8 @@ public:
     virtual bool isClosed() const override;
     virtual bool setReuseAddrFlag(bool reuseAddr) override;
     virtual bool getReuseAddrFlag(bool* val) const override;
+    virtual bool setReusePortFlag(bool value) override;
+    virtual bool getReusePortFlag(bool* value) const override;
     virtual bool setNonBlockingMode(bool val) override;
     virtual bool getNonBlockingMode(bool* val) const override;
     virtual bool getMtu(unsigned int* mtuValue) const override;
@@ -72,6 +74,7 @@ public:
     virtual bool setSendTimeout(unsigned int ms) override;
     virtual bool getSendTimeout(unsigned int* millis) const override;
     virtual bool getLastError(SystemError::ErrorCode* errorCode) const override;
+    virtual bool setIpv6Only(bool val) override;
 
     virtual AbstractSocket::SOCKET_HANDLE handle() const override;
     virtual nx::network::aio::AbstractAioThread* getAioThread() const override;
@@ -122,21 +125,15 @@ public:
     // AbstractCommunicatingSocket ------- interface
     virtual bool connect(
         const SocketAddress& remoteAddress,
-        unsigned int timeoutMillis = kDefaultTimeoutMillis) override;
+        std::chrono::milliseconds timeout) override;
 
-    virtual int recv( void* buffer, unsigned int bufferLen, int flags = 0 ) override;
-    virtual int send( const void* buffer, unsigned int bufferLen ) override;
-    //  What's difference between foreign address with peer address 
+    virtual int recv(void* buffer, unsigned int bufferLen, int flags = 0) override;
+    virtual int send(const void* buffer, unsigned int bufferLen) override;
+    //  What's difference between foreign address with peer address
     virtual SocketAddress getForeignAddress() const override;
     virtual bool isConnected() const override;
-    //!Implementation of AbstractCommunicatingSocket::cancelAsyncIO
-    virtual void cancelIOAsync(
-        nx::network::aio::EventType eventType,
-        nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler) override;
-    virtual void cancelIOSync(nx::network::aio::EventType eventType) override;
 
     // AbstractStreamSocket ------ interface
-    virtual bool reopen() override;
     virtual bool setNoDelay(bool value) override;
     virtual bool getNoDelay(bool* /*value*/) const override;
     virtual bool toggleStatisticsCollection(bool val) override;
@@ -149,19 +146,24 @@ public:
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
     virtual void readSomeAsync(
         nx::Buffer* const buf,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) override;
+        IoCompletionHandler handler) override;
     virtual void sendAsync(
         const nx::Buffer& buf,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) override;
+        IoCompletionHandler handler) override;
     virtual void registerTimer(
         std::chrono::milliseconds timeoutMillis,
         nx::utils::MoveOnlyFunc<void()> handler) override;
 
+protected:
+    virtual void cancelIoInAioThread(nx::network::aio::EventType eventType) override;
+
 private:
-    bool connectToIp(const SocketAddress& remoteAddress, unsigned int timeoutMillis);
+    bool connectToIp(
+        const SocketAddress& remoteAddress,
+        std::chrono::milliseconds timeout);
     /**
-     * @return false if failed to read socket options.
-     */
+    * @return false if failed to read socket options.
+    */
     bool checkIfRecvModeSwitchIsRequired(int flags, boost::optional<bool>* requiredRecvMode);
     bool setRecvMode(bool isRecvSync);
     int handleRecvResult(int recvResult);
@@ -190,11 +192,12 @@ public:
     virtual bool listen(int queueLen = 128) override;
     virtual AbstractStreamSocket* accept() override;
     virtual void acceptAsync(AcceptCompletionHandler handler) override;
-    virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) override;
-    virtual void cancelIOSync() override;
 
-    /** This method is for use by \a AsyncServerSocketHelper only. It just calls system call \a accept */
+    /** This method is for use by AsyncServerSocketHelper only. It just calls system call accept */
     AbstractStreamSocket* systemAccept();
+
+protected:
+    virtual void cancelIoInAioThread() override;
 
 private:
     std::unique_ptr<aio::AsyncServerSocketHelper<UdtStreamServerSocket>> m_aioHelper;
@@ -207,11 +210,11 @@ private:
 class NX_NETWORK_API UdtStatistics
 {
 public:
-    #ifdef __arm__
-        std::atomic<uint32_t> internetBytesTransfered{0};
-    #else
-        std::atomic<uint64_t> internetBytesTransfered{0};
-    #endif
+#ifdef __arm__
+    std::atomic<uint32_t> internetBytesTransfered{ 0 };
+#else
+    std::atomic<uint64_t> internetBytesTransfered{ 0 };
+#endif
 
     static UdtStatistics global;
 };

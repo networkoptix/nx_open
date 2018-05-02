@@ -10,10 +10,10 @@
 #include <ui/delegates/customizable_item_delegate.h>
 #include <ui/models/user_roles_model.h>
 #include <ui/models/resource/resource_list_model.h>
-#include <ui/utils/validators.h>
+#include <nx/client/desktop/common/utils/validators.h>
 
-#include <nx/client/desktop/ui/common/column_remap_proxy_model.h>
-#include <nx/client/desktop/ui/common/natural_string_sort_proxy_model.h>
+#include <nx/client/desktop/common/models/column_remap_proxy_model.h>
+#include <nx/client/desktop/common/models/natural_string_sort_proxy_model.h>
 #include <nx/client/desktop/ui/event_rules/subject_selection_dialog.h>
 
 class QnUuid;
@@ -36,8 +36,8 @@ class SubjectSelectionDialog::RoleListModel:
 public:
     explicit RoleListModel(QObject* parent);
 
-    void setRoleValidator(Qn::RoleValidator roleValidator);
-    void setUserValidator(Qn::UserValidator userValidator);
+    void setRoleValidator(RoleValidator roleValidator);
+    void setUserValidator(UserValidator userValidator);
 
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
@@ -54,8 +54,8 @@ private:
     void emitDataChanged();
 
 private:
-    Qn::RoleValidator m_roleValidator;
-    Qn::UserValidator m_userValidator; //< Not used if m_roleValidator is set.
+    RoleValidator m_roleValidator;
+    UserValidator m_userValidator; //< Not used if m_roleValidator is set.
     bool m_allUsers = false; //< All users are considered checked.
     mutable QHash<QnUuid, QValidator::State> m_validationStates;
 };
@@ -86,7 +86,7 @@ public:
 
     void setCheckedUsers(const QSet<QnUuid>& ids);
 
-    void setUserValidator(Qn::UserValidator userValidator);
+    void setUserValidator(UserValidator userValidator);
 
     bool customUsersOnly() const;
     void setCustomUsersOnly(bool value);
@@ -114,7 +114,7 @@ private:
 private:
     QnResourceListModel* const m_usersModel;
     RoleListModel* const m_rolesModel;
-    Qn::UserValidator m_userValidator;
+    UserValidator m_userValidator;
     bool m_customUsersOnly = true; //< Non-custom users are filtered out.
     bool m_allUsers = false; //< All users are considered checked.
 };

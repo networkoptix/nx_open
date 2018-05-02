@@ -16,7 +16,6 @@
 
 #include "nettools.h"
 #include "ping.h"
-#include "netstate.h"
 
 #if defined(Q_OS_LINUX)
 #   include <arpa/inet.h>
@@ -52,9 +51,13 @@
 #endif
 
 namespace {
-    static QList<QHostAddress> allowedInterfaces;
+
+static QList<QHostAddress> allowedInterfaces;
+
 } // namespace
 
+namespace nx {
+namespace network {
 
 void setInterfaceListFilter(const QList<QHostAddress>& ifList)
 {
@@ -67,13 +70,24 @@ QHostAddress QnInterfaceAndAddr::broadcastAddress() const
     return QHostAddress(broadcastIpv4);
 }
 
-QHostAddress QnInterfaceAndAddr::networkAddress() const
+QHostAddress QnInterfaceAndAddr::subNetworkAddress() const
 {
-    quint32 broadcastIpv4 = address.toIPv4Address() & netMask.toIPv4Address();
-    return QHostAddress(broadcastIpv4);
+    quint32 subnetworkIpV4 = address.toIPv4Address() & netMask.toIPv4Address();
+    return QHostAddress(subnetworkIpV4);
 }
 
-QnInterfaceAndAddrList getAllIPv4Interfaces(bool allowItfWithoutAddress)
+bool QnInterfaceAndAddr::isHostBelongToIpv4Network(const QHostAddress& address) const
+{
+    auto between = [](const quint32 min, const quint32 value, const quint32 max)
+        { return min <= value && value < max; };
+
+    return between(
+        subNetworkAddress().toIPv4Address(),
+        address.toIPv4Address(),
+        broadcastAddress().toIPv4Address());
+}
+
+QnInterfaceAndAddrList getAllIPv4Interfaces(InterfaceListPolicy policy)
 {
     struct LocalCache
     {
@@ -82,10 +96,9 @@ QnInterfaceAndAddrList getAllIPv4Interfaces(bool allowItfWithoutAddress)
         QnMutex guard;
     };
 
-    enum { kCacheLinesCount = 2};
-    static LocalCache caches[kCacheLinesCount];
+    static LocalCache caches[(int)InterfaceListPolicy::count];
 
-    LocalCache &cache = caches[allowItfWithoutAddress ? 1 : 0];
+    LocalCache &cache = caches[(int)policy];
     {
         // speed optimization
         QnMutexLocker lock(&cache.guard);
@@ -107,7 +120,7 @@ QnInterfaceAndAddrList getAllIPv4Interfaces(bool allowItfWithoutAddress)
             continue;
 #endif
 
-        bool addInterfaceAnyway = allowItfWithoutAddress;
+        bool addInterfaceAnyway = policy == InterfaceListPolicy::allowInterfacesWithoutAddress;
         QList<QNetworkAddressEntry> addresses = iface.addressEntries();
         for (const QNetworkAddressEntry& address: addresses)
         {
@@ -120,7 +133,8 @@ QnInterfaceAndAddrList getAllIPv4Interfaces(bool allowItfWithoutAddress)
                 {
                     result.append(QnInterfaceAndAddr(iface.name(), address.ip(), address.netmask(), iface));
                     addInterfaceAnyway = false;
-                    break;
+                    if (policy != InterfaceListPolicy::keepAllAddressesPerInterface)
+                        break;
                 }
             }
         }
@@ -138,13 +152,29 @@ QnInterfaceAndAddrList getAllIPv4Interfaces(bool allowItfWithoutAddress)
 
 namespace {
 
-/** Qt on linux returns ipv6 address with "%enp0s3" suffix. */
-static QString fixIpv6AddressString(const QString& ipv6Str)
+static QString ipv6AddrStringWithIfaceNameToAddrStringWithIfaceId(
+    const QString& ipv6AddrString,
+    const QString& ifaceName,
+    int ifaceIndex)
 {
-    int unexpectedSuffixPos = ipv6Str.indexOf('%');
-    if (unexpectedSuffixPos == -1)
-        return ipv6Str;
-    return ipv6Str.mid(0, unexpectedSuffixPos);
+    int scopeIdDelimPos = ipv6AddrString.indexOf('%');
+    if (scopeIdDelimPos == -1)
+        return ipv6AddrString;
+
+    NX_ASSERT(scopeIdDelimPos != 0 && scopeIdDelimPos != ipv6AddrString.length() - 1);
+    if (scopeIdDelimPos == 0 || scopeIdDelimPos == ipv6AddrString.length() - 1)
+        return QString();
+
+    QString scopeIdTail = ipv6AddrString.mid(scopeIdDelimPos + 1);
+    QString scopeIdFromIndex = QString::number(ifaceIndex);
+    if (scopeIdTail == scopeIdFromIndex)
+        return ipv6AddrString;
+
+    NX_ASSERT(ifaceName == scopeIdTail);
+    if (ifaceName != scopeIdTail)
+        return QString();
+
+    return ipv6AddrString.left(scopeIdDelimPos + 1) + scopeIdFromIndex;
 }
 
 } // namespace
@@ -176,13 +206,18 @@ QList<HostAddress> allLocalAddresses(AddressFilters filter)
                 result << HostAddress(address.ip().toString());
 
             if (isIpV6 && (filter.testFlag(AddressFilter::ipV6)))
-                result << HostAddress(fixIpv6AddressString(address.ip().toString()));
+            {
+                QString addrString = ipv6AddrStringWithIfaceNameToAddrStringWithIfaceId(
+                    address.ip().toString(),
+                    iface.name(),
+                    iface.index());
+                result << HostAddress(addrString);
+            }
         }
     }
 
     return result;
 }
-
 
 QList<QHostAddress> allLocalIpV4Addresses()
 {
@@ -289,7 +324,6 @@ unsigned char* MACsToByte2(const QString& macs, unsigned char* pbyAddress)
     return pbyAddress;
 }
 
-
 QList<QNetworkAddressEntry> getAllIPv4AddressEntries()
 {
     QList<QNetworkInterface> inter_list = QNetworkInterface::allInterfaces(); // all interfaces
@@ -359,48 +393,6 @@ bool isInIPV4Subnet(QHostAddress addr, const QList<QNetworkAddressEntry>& ipv4_e
 
 }
 
-bool getNextAvailableAddr(CLSubNetState& state, const CLIPList& busy_lst)
-{
-
-    quint32 curr = state.currHostAddress.toIPv4Address();
-    quint32 maxaddr = state.maxHostAddress.toIPv4Address();
-
-    quint32 original = curr;
-
-    CLPing ping;
-
-    while(1)
-    {
-
-        ++curr;
-        if (curr>maxaddr)
-        {
-            quint32 minaddr = state.minHostAddress.toIPv4Address();
-            curr = minaddr; // start from min
-        }
-
-        if (curr==original)
-            return false; // all addresses are busy
-
-        if (busy_lst.contains(curr))// this ip is already in use
-            continue;
-
-        if (!ping.ping(QHostAddress(curr).toString(), 2, ping_timeout))
-        {
-            // is this free addr?
-            // let's check with ARP request also; might be it's not pingable device
-
-            //if (getMacByIP(QHostAddress(curr)).isEmpty()) // to long
-            break;
-
-        }
-    }
-
-    state.currHostAddress = QHostAddress(curr);
-    return true;
-
-}
-
 struct PinagableT
 {
     quint32 addr;
@@ -424,7 +416,6 @@ QList<QHostAddress> pingableAddresses(const QHostAddress& startAddr, const QHost
     quint32 curr = startAddr.toIPv4Address();
     quint32 maxaddr = endAddr.toIPv4Address();
 
-
     QList<PinagableT> hostslist;
 
     while(curr < maxaddr)
@@ -435,7 +426,6 @@ QList<QHostAddress> pingableAddresses(const QHostAddress& startAddr, const QHost
 
         ++curr;
     }
-
 
     QThreadPool* global = QThreadPool::globalInstance();
     for (int i = 0; i < threads; ++i ) global->releaseThread();
@@ -454,8 +444,6 @@ QList<QHostAddress> pingableAddresses(const QHostAddress& startAddr, const QHost
     NX_LOG(lm("Ping results %1").container(result), cl_logINFO);
     return result;
 }
-
-
 
 //{ windows
 #if defined(Q_OS_WIN)
@@ -638,12 +626,10 @@ QHostAddress getGatewayOfIf(const QString& ip)
 */
 
 #else // Linux
-void removeARPrecord(const QHostAddress& ip) {Q_UNUSED(ip)}
+void removeARPrecord(const QHostAddress& /*ip*/) {}
 
-QString getMacByIP(const QHostAddress& ip, bool net)
+QString getMacByIP(const QHostAddress& /*ip*/, bool /*net*/)
 {
-    Q_UNUSED(ip)
-    Q_UNUSED(net)
     return QString();
 }
 
@@ -729,7 +715,6 @@ bool isNewDiscoveryAddressBetter(
     return eq1 > eq2;
 }
 
-
 int getFirstMacAddress(char  MAC_str[MAC_ADDR_LEN], char** host)
 {
     memset(MAC_str, 0, MAC_ADDR_LEN);
@@ -747,7 +732,6 @@ int getFirstMacAddress(char  MAC_str[MAC_ADDR_LEN], char** host)
 
     return -1;
 }
-
 
 #ifdef _WIN32
 
@@ -832,7 +816,6 @@ int getMacFromPrimaryIF(char MAC_str[MAC_ADDR_LEN], char** host)
 
             case AF_INET:
             {
-                uint32_t ip4Addr = ((struct in_addr*)(ifaptr)->ifa_addr)->s_addr;
                 std::cout<<"AF_INET. "<<ifaptr->ifa_name<<": "<<inet_ntoa( ((struct sockaddr_in*)ifaptr->ifa_addr)->sin_addr )<<std::endl;
                 ifNameToInetAddress[ifaptr->ifa_name] = inet_ntoa( ((struct sockaddr_in*)ifaptr->ifa_addr)->sin_addr );
                 break;
@@ -864,3 +847,6 @@ QString getMacFromPrimaryIF()
         return QString();
     return QString::fromLatin1(mac);
 }
+
+} // namespace network
+} // namespace nx

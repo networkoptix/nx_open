@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QtCore/QObject>
 #include <QtCore/QHash>
 #include <QtCore/QDir>
 
@@ -28,10 +29,12 @@ struct FileMetadata: FileInformation
     QVector<QByteArray> chunkChecksums;
 };
 
-class Storage
+class Storage: public QObject
 {
+    Q_OBJECT
+
 public:
-    Storage(const QDir& m_downloadsDirectory);
+    Storage(const QDir& m_downloadsDirectory, QObject* parent = nullptr);
 
     QDir downloadsDirectory() const;
 
@@ -41,7 +44,7 @@ public:
 
     FileInformation fileInformation(const QString& fileName) const;
 
-    ResultCode addFile(const FileInformation& fileInformation);
+    ResultCode addFile(FileInformation fileInformation, bool updateTouchTime = true);
     ResultCode updateFileInformation(const QString& fileName, qint64 size, const QByteArray& md5);
     ResultCode setChunkSize(const QString& fileName, qint64 chunkSize);
 
@@ -54,6 +57,8 @@ public:
     ResultCode setChunkChecksums(
         const QString& fileName, const QVector<QByteArray>& chunkChecksums);
 
+    void cleanupExpiredFiles();
+
     void findDownloads();
 
     static qint64 defaultChunkSize();
@@ -62,9 +67,19 @@ public:
     static int calculateChunkCount(qint64 fileSize, qint64 calculateChunkSize);
     static QVector<QByteArray> calculateChecksums(const QString& filePath, qint64 chunkSize);
 
+signals:
+    void fileAdded(
+        const nx::vms::common::p2p::downloader::FileInformation& fileInformation);
+    void fileDeleted(const QString& fileName);
+    void fileInformationChanged(
+        const nx::vms::common::p2p::downloader::FileInformation& fileInformation);
+    void fileStatusChanged(
+        const nx::vms::common::p2p::downloader::FileInformation& fileInformation);
+
 private:
     ResultCode addDownloadedFile(const FileInformation& fileInformation);
     ResultCode addNewFile(const FileInformation& fileInformation);
+    ResultCode deleteFileInternal(const QString& fileName, bool deleteData = true);
 
     bool saveMetadata(const FileMetadata& fileInformation);
     FileMetadata loadMetadata(const QString& fileName);
@@ -72,7 +87,7 @@ private:
     ResultCode loadDownload(const QString& fileName);
     void checkDownloadCompleted(FileMetadata& fileInfo);
 
-    static bool reserveSpace(const QString& fileName, const qint64 size);
+    static ResultCode reserveSpace(const QString& fileName, const qint64 size);
     static QString metadataFileName(const QString& fileName);
     static qint64 calculateChunkSize(qint64 fileSize, int chunkIndex, qint64 calculateChunkSize);
 

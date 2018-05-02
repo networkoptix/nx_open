@@ -63,7 +63,7 @@ nx::utils::db::DBResult SystemHealthHistoryDataObject::selectHistoryBySystem(
             cl_logDEBUG1);
         return nx::utils::db::DBResult::ioError;
     }
-    
+
     QnSql::fetch_many(selectSystemHealthHistoryQuery, &history->events);
 
     return nx::utils::db::DBResult::ok;

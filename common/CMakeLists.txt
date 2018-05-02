@@ -1,10 +1,5 @@
 file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/resources")
 
-if(NOT IOS)
-    nx_configure_file("${CMAKE_CURRENT_SOURCE_DIR}/qt.conf"
-        ${CMAKE_CURRENT_BINARY_DIR}/resources/qt/etc/qt.conf)
-endif()
-
 nx_configure_file(
     maven/filter-resources/app_info_impl.cpp
     ${CMAKE_CURRENT_BINARY_DIR})
@@ -23,7 +18,11 @@ nx_add_target(common LIBRARY
         Qt5::Gui Qt5::Concurrent Qt5::Multimedia
         Qt5::Xml Qt5::XmlPatterns Qt5::Sql
         ffmpeg
+        detection_plugin_interface
+        nx_vms_api
         nx_network nx_utils nx_fusion
+        nx_plugin_utils
+        cloud_db_client
 )
 
 if(NOT ANDROID AND NOT IOS)

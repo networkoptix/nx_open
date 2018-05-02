@@ -4,7 +4,7 @@ namespace nx {
 namespace utils {
 
 /**
- * ObjectDestructionFlag and ObjectDestructionFlag::Watcher are used to allow 
+ * ObjectDestructionFlag and ObjectDestructionFlag::Watcher are used to allow
  * "this" destruction in some event handler.
  * Example:
  * @code{.cpp}
@@ -58,7 +58,7 @@ public:
     }
 
     /**
-     * @note Objects operating with same flag must not overlap
+     * NOTE: Objects operating with same flag must not overlap
      */
     class Watcher
     {

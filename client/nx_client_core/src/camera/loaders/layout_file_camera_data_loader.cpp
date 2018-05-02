@@ -3,16 +3,14 @@
 #include <camera/data/abstract_camera_data.h>
 #include <camera/data/time_period_camera_data.h>
 
-#include <plugins/resource/avi/avi_resource.h>
-#include <plugins/storage/file_storage/layout_storage_resource.h>
-
-#include <motion/motion_detection.h>
+#include <core/resource/avi/avi_resource.h>
+#include <core/storage/file_storage/layout_storage_resource.h>
 
 #include <recording/time_period_list.h>
 
+#include <nx/client/core/motion/motion_grid.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/json_functions.h>
-
 #include <nx/streaming/config.h>
 
 namespace {
@@ -52,9 +50,11 @@ int QnLayoutFileCameraDataLoader::loadMotion(const QList<QRegion> &motionRegions
     if (!m_aviResource)
         return -1;
 
+    using nx::client::core::MotionGrid;
+
     QVector<char*> masks;
     for (int i = 0; i < motionRegions.size(); ++i) {
-        masks << (char*) qMallocAligned(Qn::kMotionGridWidth * Qn::kMotionGridHeight / 8, CL_MEDIA_ALIGNMENT);
+        masks << (char*) qMallocAligned(MotionGrid::kCellCount / 8, CL_MEDIA_ALIGNMENT);
         QnMetaDataV1::createMask(motionRegions[i], masks.last());
     }
 
@@ -82,24 +82,31 @@ int QnLayoutFileCameraDataLoader::loadMotion(const QList<QRegion> &motionRegions
     return sendDataDelayed(result);
 }
 
-int QnLayoutFileCameraDataLoader::load(const QString &filter, const qint64 resolutionMs) {
-    Q_UNUSED(resolutionMs)
-
-    switch (m_dataType) {
-    case Qn::RecordingContent:
-        return sendDataDelayed(m_data);
-    case Qn::MotionContent:
+int QnLayoutFileCameraDataLoader::load(const QString& filter, const qint64 /*resolutionMs*/)
+{
+    switch (m_dataType)
+    {
+        case Qn::RecordingContent:
         {
-            QList<QRegion> motionRegions = QJson::deserialized<QList<QRegion>>(filter.toUtf8());
-            for (const QRegion &region: motionRegions)
+            return sendDataDelayed(m_data);
+        }
+        case Qn::MotionContent:
+        {
+            const auto motionRegions = QJson::deserialized<QList<QRegion>>(filter.toUtf8());
+            for (const QRegion& region: motionRegions)
             {
                 if (!region.isEmpty())
                     return loadMotion(motionRegions);
             }
-            qWarning() << "empty motion region";
+            NX_EXPECT(false, "Empty motion region in exported video.");
         }
-    default:
-        NX_ASSERT(false, Q_FUNC_INFO, "Should never get here");
-        return 0;
+        case Qn::AnalyticsContent:
+        {
+            // Analytics export is not supported yet.
+            return 0;
+        }
+        default:
+            NX_ASSERT(false, "Should never get here");
+            return 0;
     }
 }

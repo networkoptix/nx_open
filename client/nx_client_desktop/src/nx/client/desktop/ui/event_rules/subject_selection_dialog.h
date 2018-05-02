@@ -7,7 +7,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
-#include <ui/utils/validators.h>
+#include <nx/client/desktop/common/utils/validators.h>
 
 class QnUserRolesModel;
 class QnUuid;
@@ -33,10 +33,10 @@ public:
     void showAlert(const QString& text);
 
     // Sets user validator. If it's not set, any user is considered valid.
-    void setUserValidator(Qn::UserValidator userValidator);
+    void setUserValidator(UserValidator userValidator);
 
     // Sets role validator. If it's not set, role validity is determined by validities of its users.
-    void setRoleValidator(Qn::RoleValidator roleValidator);
+    void setRoleValidator(RoleValidator roleValidator);
 
     // Invalid ids are filtered out. Disabled users are kept, but hidden.
     void setCheckedSubjects(const QSet<QnUuid>& ids);
@@ -74,6 +74,7 @@ private:
     UserListModel* m_users = nullptr;
     RoleListDelegate* m_roleListDelegate = nullptr;
     UserListDelegate* m_userListDelegate = nullptr;
+    bool m_allUsersSelectorEnabled = true;
 };
 
 } // namespace ui

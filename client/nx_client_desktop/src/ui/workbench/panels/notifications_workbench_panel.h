@@ -1,8 +1,11 @@
 #pragma once
 
+#include <QtCore/QScopedPointer>
+
 #include <ui/workbench/panels/abstract_workbench_panel.h>
 
 class QnControlBackgroundWidget;
+class QnNotificationToolTipWidget;
 class QnNotificationsCollectionWidget;
 class QnImageButtonWidget;
 class QnBlinkingImageButtonWidget;
@@ -10,18 +13,32 @@ class HoverFocusProcessor;
 class AnimatorGroup;
 class VariantAnimator;
 
+namespace nx {
+namespace client {
+namespace desktop {
+
+class EventPanel;
+class EventTileToolTip;
+class EventTile;
+
+} // namespace desktop
+} // namespace client
+} // namespace nx
+
 namespace NxUi {
 
 class NotificationsWorkbenchPanel: public AbstractWorkbenchPanel
 {
+    Q_OBJECT
     using base_type = AbstractWorkbenchPanel;
 
-    Q_OBJECT
 public:
     NotificationsWorkbenchPanel(
         const QnPaneSettings& settings,
         QGraphicsWidget* parentWidget,
         QObject* parent = nullptr);
+
+    virtual ~NotificationsWorkbenchPanel() override;
 
     QnControlBackgroundWidget* backgroundItem;
     QnNotificationsCollectionWidget* item;
@@ -53,6 +70,10 @@ private:
 private:
     void at_showingProcessor_hoverEntered();
 
+    void createEventPanel(QGraphicsWidget* parentWidget);
+
+    void at_eventTileHovered(const QModelIndex& index, const nx::client::desktop::EventTile* tile);
+
 private:
     bool m_ignoreClickEvent;
     bool m_visible;
@@ -70,6 +91,11 @@ private:
 
     /** Animator group for panel's opacity. */
     AnimatorGroup* m_opacityAnimatorGroup;
+
+    /** New event panel. */
+    QScopedPointer<nx::client::desktop::EventPanel> m_eventPanel;
+    QPointer<HoverFocusProcessor> m_eventPanelHoverProcessor;
+    const nx::client::desktop::EventTile* m_lastHoveredTile = nullptr;
 };
 
 } //namespace NxUi

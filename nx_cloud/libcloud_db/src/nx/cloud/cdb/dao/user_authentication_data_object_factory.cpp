@@ -21,7 +21,7 @@ UserAuthenticationDataObjectFactory& UserAuthenticationDataObjectFactory::instan
     return staticInstance;
 }
 
-std::unique_ptr<AbstractUserAuthentication> 
+std::unique_ptr<AbstractUserAuthentication>
     UserAuthenticationDataObjectFactory::defaultFactoryFunction()
 {
     return std::make_unique<rdb::UserAuthentication>();

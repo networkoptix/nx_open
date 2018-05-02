@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 
 #include <memory>
 
@@ -21,7 +21,9 @@ class ResourceContainer;
 } //namespace utils
 } //namespace nx
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 namespace server {
 
@@ -33,24 +35,24 @@ namespace deprecated {
 
 using AsyncMessagePipeline =
     nx::network::server::BaseStreamProtocolConnectionEmbeddable<
-        nx_http::Message,
-        nx_http::deprecated::MessageParser,
-        nx_http::MessageSerializer>;
+        nx::network::http::Message,
+        nx::network::http::deprecated::MessageParser,
+        nx::network::http::MessageSerializer>;
 
 } // namespace deprecated
 
 using AsyncMessagePipeline =
     nx::network::server::BaseStreamProtocolConnectionEmbeddable<
-        nx_http::Message,
-        nx_http::MessageParser,
-        nx_http::MessageSerializer>;
+        nx::network::http::Message,
+        nx::network::http::MessageParser,
+        nx::network::http::MessageSerializer>;
 
 class NX_NETWORK_API HttpServerConnection;
 class AbstractMessageDispatcher;
 
 /**
  * Used to install handlers on some events on HTTP connection.
- * WARNING: There is no way to remove installed event handler. 
+ * WARNING: There is no way to remove installed event handler.
  *   Event handler implementation MUST ensure it does not crash.
  */
 class ConnectionEvents
@@ -61,16 +63,16 @@ public:
 
 using ResponseIsReadyHandler =
     nx::utils::MoveOnlyFunc<void(
-        nx_http::Message,
-        std::unique_ptr<nx_http::AbstractMsgBodySource>,
+        nx::network::http::Message,
+        std::unique_ptr<nx::network::http::AbstractMsgBodySource>,
         ConnectionEvents)>;
 
-template<typename ConnectionType> using BaseConnection = 
+template<typename ConnectionType> using BaseConnection =
     nx::network::server::BaseStreamProtocolConnection<
         ConnectionType,
-        nx_http::Message,
-        nx_http::deprecated::MessageParser,
-        nx_http::MessageSerializer>;
+        nx::network::http::Message,
+        nx::network::http::deprecated::MessageParser,
+        nx::network::http::MessageSerializer>;
 
 //-------------------------------------------------------------------------------------------------
 
@@ -84,8 +86,8 @@ public:
     HttpServerConnection(
         nx::network::server::StreamConnectionHolder<HttpServerConnection>* socketServer,
         std::unique_ptr<AbstractStreamSocket> sock,
-        nx_http::server::AbstractAuthenticationManager* const authenticationManager,
-        nx_http::AbstractMessageDispatcher* const httpMessageDispatcher);
+        nx::network::http::server::AbstractAuthenticationManager* const authenticationManager,
+        nx::network::http::AbstractMessageDispatcher* const httpMessageDispatcher);
 
     HttpServerConnection(const HttpServerConnection&) = delete;
     HttpServerConnection& operator=(const HttpServerConnection&) = delete;
@@ -94,25 +96,25 @@ public:
     void setPersistentConnectionEnabled(bool value);
 
 protected:
-    virtual void processMessage(nx_http::Message request) override;
+    virtual void processMessage(nx::network::http::Message request) override;
     virtual void stopWhileInAioThread() override;
 
 private:
     struct RequestProcessingContext
     {
-        nx_http::MimeProtoVersion httpVersion;
-        nx_http::StringType protocolToUpgradeTo;
+        nx::network::http::MimeProtoVersion httpVersion;
+        nx::network::http::StringType protocolToUpgradeTo;
     };
 
     struct ResponseMessageContext
     {
-        nx_http::Message msg;
-        std::unique_ptr<nx_http::AbstractMsgBodySource> msgBody;
+        nx::network::http::Message msg;
+        std::unique_ptr<nx::network::http::AbstractMsgBodySource> msgBody;
         ConnectionEvents connectionEvents;
 
         ResponseMessageContext(
-            nx_http::Message msg,
-            std::unique_ptr<nx_http::AbstractMsgBodySource> msgBody,
+            nx::network::http::Message msg,
+            std::unique_ptr<nx::network::http::AbstractMsgBodySource> msgBody,
             ConnectionEvents connectionEvents)
             :
             msg(std::move(msg)),
@@ -122,30 +124,30 @@ private:
         }
     };
 
-    nx_http::server::AbstractAuthenticationManager* const m_authenticationManager;
-    nx_http::AbstractMessageDispatcher* const m_httpMessageDispatcher;
-    std::unique_ptr<nx_http::AbstractMsgBodySource> m_currentMsgBody;
+    nx::network::http::server::AbstractAuthenticationManager* const m_authenticationManager;
+    nx::network::http::AbstractMessageDispatcher* const m_httpMessageDispatcher;
+    std::unique_ptr<nx::network::http::AbstractMsgBodySource> m_currentMsgBody;
     bool m_isPersistent;
     bool m_persistentConnectionEnabled;
     std::deque<ResponseMessageContext> m_responseQueue;
 
-    void authenticate(nx_http::Message requestMessage);
+    void authenticate(nx::network::http::Message requestMessage);
 
     void onAuthenticationDone(
-        nx_http::server::AuthenticationResult authenticationResult,
-        nx_http::Message requestMessage);
+        nx::network::http::server::AuthenticationResult authenticationResult,
+        nx::network::http::Message requestMessage);
 
     RequestProcessingContext prepareRequestProcessingContext(
-        const nx_http::Request& request);
+        const nx::network::http::Request& request);
 
     void sendUnauthorizedResponse(
         RequestProcessingContext processingContext,
-        nx_http::server::AuthenticationResult authenticationResult);
+        nx::network::http::server::AuthenticationResult authenticationResult);
 
     void dispatchRequest(
         RequestProcessingContext processingContext,
-        nx_http::server::AuthenticationResult authenticationResult,
-        nx_http::Message requestMessage);
+        nx::network::http::server::AuthenticationResult authenticationResult,
+        nx::network::http::Message requestMessage);
 
     void processResponse(
         std::shared_ptr<HttpServerConnection> strongThis,
@@ -158,12 +160,12 @@ private:
 
     void addResponseHeaders(
         const RequestProcessingContext& processingContext,
-        nx_http::Response* response,
-        nx_http::AbstractMsgBodySource* responseMsgBody);
+        nx::network::http::Response* response,
+        nx::network::http::AbstractMsgBodySource* responseMsgBody);
 
     void addMessageBodyHeaders(
-        nx_http::Response* response,
-        nx_http::AbstractMsgBodySource* responseMsgBody);
+        nx::network::http::Response* response,
+        nx::network::http::AbstractMsgBodySource* responseMsgBody);
 
     void sendNextResponse();
     void responseSent();
@@ -175,4 +177,6 @@ private:
 
 using HttpServerConnectionPtr = std::weak_ptr<HttpServerConnection>;
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

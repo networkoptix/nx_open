@@ -7,7 +7,7 @@
 
 #include <stack>
 
-#include <core/dataprovider/abstract_ondemand_data_provider.h>
+#include <providers/abstract_ondemand_data_provider.h>
 #include <utils/media/media_stream_cache.h>
 
 

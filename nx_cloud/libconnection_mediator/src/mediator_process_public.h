@@ -8,8 +8,7 @@ namespace hpm {
 
 class MediatorProcess;
 
-class MediatorProcessPublic
-:
+class MediatorProcessPublic:
     public QnStoppable
 {
 public:

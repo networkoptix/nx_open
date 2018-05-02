@@ -63,7 +63,8 @@ public:
         QLabel* label = new QLabel(tr("Set Priority:"), parent);
         layout->addWidget(label);
 
-        for (int i = 0; i < Qn::FP_Count; ++i)
+        static constexpr auto kFpCount = 4;
+        for (int i = 0; i < kFpCount; ++i)
         {
             Qn::FailoverPriority priority = static_cast<Qn::FailoverPriority>(i);
             auto button = new QPushButton(QnFailoverPriorityDialog::priorityToString(priority), parent);
@@ -80,7 +81,7 @@ public:
         if (!m_placeholder)
             return true;
 
-        auto resources = resourcePool()->getResources<QnVirtualCameraResource>(selected);
+        auto resources = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(selected);
         bool visible = !resources.isEmpty();
         m_placeholder->setCurrentWidget(visible
             ? m_buttonsPage
@@ -201,13 +202,13 @@ QString QnFailoverPriorityDialog::priorityToString(Qn::FailoverPriority priority
 {
     switch (priority)
     {
-        case Qn::FP_Never:
+        case Qn::FailoverPriority::never:
             return tr("Never", "Failover priority");
-        case Qn::FP_Low:
+        case Qn::FailoverPriority::low:
             return tr("Low", "Failover priority");
-        case Qn::FP_Medium:
+        case Qn::FailoverPriority::medium:
             return tr("Medium", "Failover priority");
-        case Qn::FP_High:
+        case Qn::FailoverPriority::high:
             return tr("High", "Failover priority");
         default:
             NX_ASSERT(false, Q_FUNC_INFO, "Should never get here");
@@ -229,7 +230,7 @@ void QnFailoverPriorityDialog::setColors(const QnFailoverPriorityColors &colors)
 
 void QnFailoverPriorityDialog::updatePriorityForSelectedCameras(Qn::FailoverPriority priority)
 {
-    auto cameras = resourcePool()->getResources<QnVirtualCameraResource>(selectedResources());
+    auto cameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(selectedResources());
     m_customColumnDelegate->forceCamerasPriority(cameras, priority);
     setSelectedResources(QSet<QnUuid>());
 }

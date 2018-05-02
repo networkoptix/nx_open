@@ -22,14 +22,11 @@ static const char* const kScriptName = "start_lite_client";
 } // namespace
 
 int QnStartLiteClientRestHandler::executeGet(
-    const QString& path,
+    const QString& /*path*/,
     const QnRequestParams& params,
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* connectionProcessor)
 {
-    Q_UNUSED(path);
-    Q_UNUSED(connectionProcessor);
-
     const bool startCamerasMode = params.contains(lit("startCamerasMode"));
 
     QString fileName = getDataDirectory() + "/scripts/" + kScriptName;
@@ -37,7 +34,7 @@ int QnStartLiteClientRestHandler::executeGet(
     {
         result.setError(QnRestResult::InvalidParameter, lit(
             "Script '%1' is missing at the server").arg(fileName));
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
 
     const int port = connectionProcessor->owner()->getPort();
@@ -51,7 +48,7 @@ int QnStartLiteClientRestHandler::executeGet(
         {
             NX_ASSERT(false);
             result.setError(QnRestResult::CantProcessRequest);
-            return nx_http::StatusCode::ok;
+            return nx::network::http::StatusCode::ok;
         }
 #if 0 // Currently it is decided not to pass effectiveUserName in the URL, so, keep it empty.
         effectiveUserName = user->getName();
@@ -63,7 +60,7 @@ int QnStartLiteClientRestHandler::executeGet(
     {
         NX_ASSERT(false);
         result.setError(QnRestResult::CantProcessRequest);
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
 
     const QString userName = server->getId().toString();
@@ -93,5 +90,5 @@ int QnStartLiteClientRestHandler::executeGet(
         qWarning() << lit("Can't start script '%1' because of system error").arg(kScriptName);
     }
 
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }

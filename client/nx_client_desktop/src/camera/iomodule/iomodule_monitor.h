@@ -5,7 +5,7 @@
 #include "api/model/api_ioport_data.h"
 #include "core/resource/resource_fwd.h"
 
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/http/multipart_content_parser.h>
 #include <nx/utils/thread/mutex.h>
 
@@ -21,14 +21,14 @@ signals:
     void connectionOpened();
     void ioStateChanged(const QnIOStateData& value);
 private slots:
-    void at_MonitorResponseReceived( nx_http::AsyncHttpClientPtr httpClient );
-    void at_MonitorMessageBodyAvailable( nx_http::AsyncHttpClientPtr httpClient );
-    void at_MonitorConnectionClosed( nx_http::AsyncHttpClientPtr httpClient );
+    void at_MonitorResponseReceived( nx::network::http::AsyncHttpClientPtr httpClient );
+    void at_MonitorMessageBodyAvailable( nx::network::http::AsyncHttpClientPtr httpClient );
+    void at_MonitorConnectionClosed( nx::network::http::AsyncHttpClientPtr httpClient );
 private:
     mutable QnMutex m_mutex;
     QnSecurityCamResourcePtr m_camera;
-    nx_http::AsyncHttpClientPtr m_httpClient;
-    std::shared_ptr<nx_http::MultipartContentParser> m_multipartContentParser;
+    nx::network::http::AsyncHttpClientPtr m_httpClient;
+    std::shared_ptr<nx::network::http::MultipartContentParser> m_multipartContentParser;
 };
 
 typedef QSharedPointer<QnIOModuleMonitor> QnIOModuleMonitorPtr;

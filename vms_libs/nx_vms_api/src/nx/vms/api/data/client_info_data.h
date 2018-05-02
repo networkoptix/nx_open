@@ -1,0 +1,46 @@
+#pragma once
+
+#include "id_data.h"
+
+namespace nx {
+namespace vms {
+namespace api {
+
+struct ClientInfoData: IdData
+{
+    QnUuid parentId;
+
+    QString skin;
+    QString fullVersion;
+    QString systemInfo;
+    QString systemRuntime;
+
+    QString cpuArchitecture;
+    QString cpuModelName;
+    qint64 physicalMemory = 0;
+    QString openGLVersion;
+    QString openGLVendor;
+    QString openGLRenderer;
+
+    static DeprecatedFieldNames* getDeprecatedFieldNames()
+    {
+        static DeprecatedFieldNames kDeprecatedFieldNames{
+            {QStringLiteral("physicalMemory"), QStringLiteral("phisicalMemory")}, //< up to v2.6
+        };
+        return &kDeprecatedFieldNames;
+    }
+};
+#define ClientInfoData_Fields \
+    IdData_Fields \
+    (parentId) \
+    (skin) \
+    (fullVersion) \
+    (systemInfo) \
+    (systemRuntime) \
+    (cpuArchitecture)(cpuModelName) \
+    (physicalMemory) \
+    (openGLVersion)(openGLVendor)(openGLRenderer)
+
+} // namespace api
+} // namespace vms
+} // namespace nx

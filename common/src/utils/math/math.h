@@ -9,6 +9,7 @@
 #include <QtCore/QtEndian>
 #include <QtCore/QtGlobal>
 #include <QtCore/QtNumeric>
+#include <QtCore/QRect>
 #include <QtGui/QVector2D>
 #include <QtGui/QVector3D>
 #include <QtGui/QVector4D>
@@ -109,6 +110,18 @@ inline quint64 qPower2Ceil(quint64 value, int step) {
 inline unsigned int qPower2Floor(unsigned int value, int step) {
     DEBUG_CODE(NX_ASSERT(qIsPower2(step)));
     return value & ~(step - 1);
+}
+
+/**
+ * @param value Value to round to the nearest number that is a power of 2.
+ * @param step Rounding step, must be power of 2.
+ * @return Rounded value.
+ */
+inline int qPower2Round(int value, int step)
+{
+    NX_EXPECT(value >= 0);
+    NX_EXPECT(qIsPower2(step));
+    return qPower2Floor(value + step / 2, step);
 }
 
 /**
@@ -253,5 +266,18 @@ inline double qSign(double value) {
     return value >= 0.0 ? 1.0 : -1.0;
 }
 
+inline bool equalWithPrecision(double one, double two, int precision) {
+    return abs(two - one) < (1.0 / std::pow(10.0, precision));
+}
+
+inline bool equalWithPrecision(const QPointF& one, const QPointF& two, int precision) {
+    return equalWithPrecision(one.x(), two.x(), precision)
+        && equalWithPrecision(one.y(), two.y(), precision);
+}
+
+inline bool equalWithPrecision(const QRectF& one, const QRectF& two, int precision) {
+    return equalWithPrecision(one.topLeft(), two.topLeft(), precision)
+        && equalWithPrecision(one.bottomRight(), two.bottomRight(), precision);
+}
 
 #endif // QN_MATH_H

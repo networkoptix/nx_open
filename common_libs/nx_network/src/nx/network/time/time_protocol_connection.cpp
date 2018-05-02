@@ -14,7 +14,8 @@ TimeProtocolConnection::TimeProtocolConnection(
     std::unique_ptr<AbstractStreamSocket> _socket)
     :
     m_socketServer(socketServer),
-    m_socket(std::move(_socket))
+    m_socket(std::move(_socket)),
+    m_creationTimestamp(std::chrono::steady_clock::now())
 {
     bindToAioThread(m_socket->getAioThread());
 }
@@ -42,6 +43,17 @@ void TimeProtocolConnection::startReadingConnection(
     m_socket->sendAsync(
         m_outputBuffer,
         std::bind(&TimeProtocolConnection::onDataSent, this, _1, _2));
+}
+
+std::chrono::milliseconds TimeProtocolConnection::lifeDuration() const
+{
+    using namespace std::chrono;
+    return duration_cast<milliseconds>(steady_clock::now() - m_creationTimestamp);
+}
+
+int TimeProtocolConnection::messagesReceivedCount() const
+{
+    return 1;
 }
 
 void TimeProtocolConnection::stopWhileInAioThread()

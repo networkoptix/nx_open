@@ -1,11 +1,10 @@
 # Components Namings
-set(parent.customization "default")
 set(product.name "EZ Pro")
 set(display.product.name "EZ Pro")
 set(product.name.short "ionetworks")
 set(product.appName "ezpro")
 set(company.name "ioEZ INC.")
-set(short.company.name "ioEZ")
+set(windowsInstallPath "ioEZ INC")
 set(uri.protocol "ez-vms")
 set(cloudName "EZ Pro Cloud")
 set(installer.name "ezpro")
@@ -32,11 +31,12 @@ set(customization.serverUpgradeCode "{98B3B604-C8F6-418B-B00B-E158599982E7}")
 set(customization.clientBundleUpgradeCode "{86a16bbe-1785-4caf-9f47-fc021ec7a6ba}")
 set(customization.serverBundleUpgradeCode "{bd64e4e9-b648-4ce2-9b43-9f4f53ca3554}")
 set(customization.fullBundleUpgradeCode "{38c17e44-e9d4-4d1f-b631-51def695cb94}")
-set(customization.nxtoolBundleUpgradeCode "{39f7d12d-bed9-49a0-97ba-dea8422d6e28}")
+
+#set(nxtool.company.name "ioEZ")
+#set(nxtool.bundleUpgradeCode "{39f7d12d-bed9-49a0-97ba-dea8422d6e28}")
 
 set(deb.customization.company.name "ioezio")
 
-set(ios.bundle_identifier "com.ioezio.ezpro")
 set(ios.new_bundle_identifier "com.ioezio.ezpromobile")
 set(ios.group_identifier "group.com.ioezio.ezpro")
 set(ios.sign.identity "iPhone Distribution: ioEZ INC. (MXZQG6QD9L)")
@@ -55,8 +55,24 @@ set(freeLicenseKey "0000-0000-0000-0024")
 # Installer Customizations
 set(sign.password "ioezio")
 set(sign.cer "app.p12")
-set(sign.intermediate.cer "")
 
 # Localization
 set(defaultTranslation en_US)
-set(additionalTranslations en_GB fr_FR de_DE ru_RU es_ES ja_JP ko_KR tr_TR zh_CN zh_TW he_IL hu_HU)
+set(additionalTranslations
+    en_GB
+    fr_FR
+    de_DE
+    ru_RU
+    es_ES
+    ja_JP
+    ko_KR
+    tr_TR
+    zh_CN
+    zh_TW
+    he_IL
+    hu_HU
+    nl_NL
+    pl_PL
+    vi_VN
+    th_TH
+)

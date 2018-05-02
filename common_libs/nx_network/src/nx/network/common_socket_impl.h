@@ -16,9 +16,6 @@ namespace network {
 class Pollable;
 namespace aio { class AIOThread; }
 
-} // namespace network
-} // namespace nx
-
 class NX_NETWORK_API CommonSocketImpl
 {
 public:
@@ -33,7 +30,7 @@ public:
     std::array<MonitoringContext, nx::network::aio::etMax> monitoredEvents;
     std::atomic<int> terminated;
     /**
-     * This socket sequence is unique even after socket destruction 
+     * This socket sequence is unique even after socket destruction
      * (socket pointer is not unique after delete call).
      */
     SocketSequenceType socketSequence;
@@ -42,3 +39,6 @@ public:
     CommonSocketImpl();
     virtual ~CommonSocketImpl() = default;
 };
+
+} // namespace network
+} // namespace nx

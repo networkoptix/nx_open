@@ -8,7 +8,10 @@
 
 #include <core/resource/resource_fwd.h>
 
+#include <nx/client/desktop/resource_views/data/camera_extra_status.h>
+
 #include <ui/models/resource/resource_tree_model_fwd.h>
+#include <nx/client/desktop/resource_views/data/node_type.h>
 
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -23,7 +26,9 @@ class QnResourceTreeModelNode:
     Q_OBJECT
 
     using base_type = Connective<QObject>;
+
 public:
+    using NodeType = nx::client::desktop::ResourceTreeNodeType;
     enum State
     {
         Normal,     /**< Normal node. */
@@ -35,22 +40,22 @@ public:
     /**
      * Constructor for root nodes.
      */
-    QnResourceTreeModelNode(QnResourceTreeModel* model, Qn::NodeType type);
+    QnResourceTreeModelNode(QnResourceTreeModel* model, NodeType type);
 
     /**
     * Constructor for other virtual group nodes (recorders, other systems).
     */
-    QnResourceTreeModelNode(QnResourceTreeModel* model, Qn::NodeType type, const QString &name);
+    QnResourceTreeModelNode(QnResourceTreeModel* model, NodeType type, const QString &name);
 
     /**
      * Constructor for resource nodes.
      */
-    QnResourceTreeModelNode(QnResourceTreeModel* model, const QnResourcePtr &resource, Qn::NodeType nodeType);
+    QnResourceTreeModelNode(QnResourceTreeModel* model, const QnResourcePtr &resource, NodeType nodeType);
 
     /**
      * Constructor for item nodes.
      */
-    QnResourceTreeModelNode(QnResourceTreeModel* model, const QnUuid &uuid, Qn::NodeType nodeType);
+    QnResourceTreeModelNode(QnResourceTreeModel* model, const QnUuid &uuid, NodeType nodeType);
 
     virtual ~QnResourceTreeModelNode();
 
@@ -66,7 +71,7 @@ public:
 
     void update();
 
-    Qn::NodeType type() const ;
+    NodeType type() const ;
     QnResourcePtr resource() const;
     Qn::ResourceFlags resourceFlags() const;
     QnUuid uuid() const;
@@ -74,7 +79,7 @@ public:
     QList<QnResourceTreeModelNodePtr> children() const;
     QList<QnResourceTreeModelNodePtr> childrenRecursive() const;
 
-    QnResourceTreeModelNodePtr child(int index) ;
+    QnResourceTreeModelNodePtr child(int index) const;
 
     QnResourceTreeModelNodePtr parent() const ;
 
@@ -94,7 +99,7 @@ public:
     bool isPrimary() const;
 
 protected:
-    QnResourceTreeModelNode(QnResourceTreeModel* model, Qn::NodeType type, const QnUuid& uuid);
+    QnResourceTreeModelNode(QnResourceTreeModel* model, NodeType type, const QnUuid& uuid);
 
     void setName(const QString& name);
     void setIcon(const QIcon& icon);
@@ -104,12 +109,15 @@ protected:
     QnResourceTreeModel* model() const;
 
     virtual QIcon calculateIcon() const;
+    virtual nx::client::desktop::CameraExtraStatus calculateCameraExtraStatus() const;
 
     virtual void addChildInternal(const QnResourceTreeModelNodePtr& child);
     virtual void removeChildInternal(const QnResourceTreeModelNodePtr& child);
     void changeInternal();
 
+    void updateIcon();
     void updateResourceStatus();
+    void updateCameraExtraStatus();
 
     virtual QnResourceTreeModelNodeManager* manager() const;
 
@@ -146,7 +154,7 @@ private:
     QPointer<QnResourceTreeModel> const m_model;
 
     /** Type of this node. */
-    const Qn::NodeType m_type;
+    const NodeType m_type;
 
     /** Uuid that this node represents. */
     const QnUuid m_uuid;
@@ -180,6 +188,9 @@ private:
 
     /** Status of this node. */
     Qn::ResourceStatus m_status;
+
+    // Extra status for cameras and recorders.
+    nx::client::desktop::CameraExtraStatus m_cameraExtraStatus;
 
     /** Search string of this node. */
     QString m_searchString;

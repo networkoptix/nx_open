@@ -4,11 +4,12 @@
 
 #include <plugins/utils/multisensor_data_provider.h>
 #include <plugins/resource/onvif/onvif_resource_information_fetcher.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <common/static_common_module.h>
+#include <plugins/resource/onvif/onvif_stream_reader.h>
 
 namespace
 {
@@ -40,7 +41,6 @@ namespace
 QnOpteraResource::QnOpteraResource() :
     m_videoLayout(nullptr)
 {
-    qDebug() << "Creating Optera resource";
 }
 
 QnOpteraResource::~QnOpteraResource()
@@ -48,10 +48,8 @@ QnOpteraResource::~QnOpteraResource()
 
 }
 
-QnConstResourceVideoLayoutPtr QnOpteraResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider) const
+QnConstResourceVideoLayoutPtr QnOpteraResource::getVideoLayout(const QnAbstractStreamDataProvider* /*dataProvider*/) const
 {
-    QN_UNUSED(dataProvider);
-
     if (m_videoLayout)
         return m_videoLayout;
 
@@ -78,7 +76,13 @@ QnConstResourceVideoLayoutPtr QnOpteraResource::getVideoLayout(const QnAbstractS
     return m_videoLayout;
 }
 
-CameraDiagnostics::Result QnOpteraResource::initInternal()
+nx::mediaserver::resource::StreamCapabilityMap QnOpteraResource::getStreamCapabilityMapFromDrives(
+    Qn::StreamIndex streamIndex)
+{
+    return base_type::getStreamCapabilityMapFromDrives(streamIndex);
+}
+
+CameraDiagnostics::Result QnOpteraResource::initializeCameraDriver()
 {
     QString urlStr = getUrl();
 
@@ -95,7 +99,7 @@ CameraDiagnostics::Result QnOpteraResource::initInternal()
         .toInt();
 
     if (firmwareVersion < kMinimumTiledModeFirmwareVersion)
-        return base_type::initInternal();
+        return base_type::initializeCameraDriver();
 
     if (auth.isNull())
     {
@@ -105,7 +109,7 @@ CameraDiagnostics::Result QnOpteraResource::initInternal()
 
     CLSimpleHTTPClient http(
         url.host(),
-        url.port(nx_http::DEFAULT_HTTP_PORT),
+        url.port(nx::network::http::DEFAULT_HTTP_PORT),
         kChangeCameraModeTimeout,
         auth);
 
@@ -120,7 +124,7 @@ CameraDiagnostics::Result QnOpteraResource::initInternal()
     currentStitchingMode = getCurrentStitchingMode(response);
 
     if (currentStitchingMode == kTiledMode)
-        return base_type::initInternal();
+        return base_type::initializeCameraDriver();
 
     status = makeSetStitchingModeRequest(http, kTiledMode);
 
@@ -138,9 +142,8 @@ QnAbstractStreamDataProvider* QnOpteraResource::createLiveDataProvider()
     if (!isInitialized())
         return nullptr;
 
-    return new nx::plugins::utils::MultisensorDataProvider(toSharedPointer());
+    return new nx::plugins::utils::MultisensorDataProvider(toSharedPointer(this));
 }
-
 
 CLHttpStatus QnOpteraResource::makeGetStitchingModeRequest(CLSimpleHTTPClient& http, QByteArray& response) const
 {

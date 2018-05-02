@@ -33,7 +33,7 @@ void Button::notifyButtonStateChanged(ButtonState buttonState)
 {
     {
         QnMutexLocker lock(&m_mutex);
-        Q_ASSERT(m_state.size() == 1);
+        NX_ASSERT(m_state.size() == 1);
     }
 
     State newState;
@@ -46,7 +46,7 @@ void Button::notifyButtonStateChanged(const State& state)
 {
     {
         QnMutexLocker lock(&m_mutex);
-        Q_ASSERT(m_state.size() == 1);
+        NX_ASSERT(m_state.size() == 1);
     }
 
     notifyControlStateChanged(state);
@@ -62,7 +62,7 @@ bool Button::isEventTypeSupported(EventType eventType) const
 
 BaseControl::EventSet Button::checkForEventsUnsafe() const 
 {
-    Q_ASSERT(m_state.size() == 1);
+    NX_ASSERT(m_state.size() == 1);
     EventSet eventSet;
 
     if (didButtonUpEventOccurUnsafe())
@@ -104,8 +104,8 @@ ButtonState Button::fromStateElementToButtonState(StateElement StateElement) con
 
 ButtonState Button::getButtonStateUnsafe() const
 {
-    Q_ASSERT(m_state.size() == 1);
-    Q_ASSERT(m_state[0] == kReleasedButtonState || m_state[0] == kPressedButtonState);
+    NX_ASSERT(m_state.size() == 1);
+    NX_ASSERT(m_state[0] == kReleasedButtonState || m_state[0] == kPressedButtonState);
 
     return fromStateElementToButtonState(m_state[0]);
 }

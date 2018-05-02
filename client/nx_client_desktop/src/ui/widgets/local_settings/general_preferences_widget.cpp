@@ -101,6 +101,8 @@ void QnGeneralPreferencesWidget::applyChanges()
 
     if (recorderSettingsChanged)
         emit recordingSettingsChanged();
+
+    emit mediaDirectoriesChanged();
 }
 
 void QnGeneralPreferencesWidget::loadDataToUi()
@@ -175,6 +177,7 @@ void QnGeneralPreferencesWidget::at_addMediaFolderButton_clicked()
     }
 
     ui->mediaFoldersList->addItem(dirName);
+
     emit hasChangesChanged();
 }
 

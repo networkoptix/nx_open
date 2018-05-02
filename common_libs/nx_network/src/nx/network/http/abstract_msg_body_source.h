@@ -10,10 +10,12 @@
 
 #include "http_types.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 /**
- * If AbstractMsgBodySource::contentLength returns existing value then exactly 
+ * If AbstractMsgBodySource::contentLength returns existing value then exactly
  * specified number of bytes is fetched using AbstractMsgBodySource::readAsync.
  * Otherwise, data is fetched until empty buffer is received or error occurs.
  */
@@ -45,4 +47,6 @@ public:
         > completionHandler) = 0;
 };
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

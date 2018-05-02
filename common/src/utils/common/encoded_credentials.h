@@ -1,8 +1,7 @@
 #pragma once
 
-#include <QtCore/QUrl>
-
 #include <utils/crypt/encoded_string.h>
+#include <nx/utils/url.h>
 
 struct QnEncodedCredentials
 {
@@ -17,7 +16,7 @@ private:
 public:
     QnEncodedCredentials() = default;
     QnEncodedCredentials(const QString& user, const QString& password);
-    explicit QnEncodedCredentials(const QUrl& url);
+    explicit QnEncodedCredentials(const nx::utils::Url& url);
 
     QString decodedPassword() const;
 

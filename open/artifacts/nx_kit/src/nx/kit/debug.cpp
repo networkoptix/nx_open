@@ -1,4 +1,4 @@
-// Copyright 2017 Network Optix, Inc. Licensed under GNU Lesser General Public License version 3.
+// Copyright 2018 Network Optix, Inc. Licensed under GNU Lesser General Public License version 3.
 #include "debug.h"
 
 #include <chrono>
@@ -58,13 +58,13 @@ char pathSeparator()
 
 size_t commonPrefixSize(const std::string& s1, const std::string& s2)
 {
-    const std::string& sA = (s1.size() > s2.size()) ? s1 : s2;
-    const std::string& sB = (s1.size() > s2.size()) ? s2 : s1;
+    const std::string& shorter = (s1.size() < s2.size()) ? s1 : s2;
+    const std::string& longer = (s1.size() < s2.size()) ? s2 : s1;
 
     const auto afterCommonPrefix = std::mismatch(
-        sA.cbegin(), sA.cend(), sB.cbegin());
+        shorter.cbegin(), shorter.cend(), longer.cbegin());
 
-    return (size_t) (afterCommonPrefix.first - sA.cbegin());
+    return (size_t) (afterCommonPrefix.first - shorter.cbegin());
 }
 
 const char* relativeSrcFilename(const char* file)
@@ -132,8 +132,6 @@ std::string printPrefix(const char* file)
 //-------------------------------------------------------------------------------------------------
 // Print info
 
-namespace detail {
-
 std::string toString(std::string s)
 {
     return toString(s.c_str());
@@ -143,6 +141,8 @@ std::string toString(char c)
 {
     if (!isAsciiPrintable(c))
         return format("'\\x%02X'", (unsigned char) c);
+    if (c == '\'')
+        return "'\\''";
     return std::string("'") + c + "'";
 }
 
@@ -179,6 +179,8 @@ std::string toString(const void* ptr)
         return "null";
     return format("%p", ptr);
 }
+
+namespace detail {
 
 /**
  * @param bytesPerLine Used to calculate space padding, 0 means no padding.

@@ -64,8 +64,7 @@ void RDirSyncher::EventReceiver::failed(
 }
 
 
-RDirSyncher::RDirSyncher(
-    const std::forward_list<QUrl>& mirrors,
+RDirSyncher::RDirSyncher(const std::forward_list<nx::utils::Url> &mirrors,
     const QString& localDirPath,
     RDirSyncher::EventReceiver* const eventReceiver )
 :
@@ -78,8 +77,7 @@ RDirSyncher::RDirSyncher(
     m_currentMirror = m_mirrors.front();
 }
 
-RDirSyncher::RDirSyncher(
-    const QUrl& baseUrl,
+RDirSyncher::RDirSyncher(const nx::utils::Url &baseUrl,
     const QString& localDirPath,
     RDirSyncher::EventReceiver* const eventReceiver )
 :
@@ -409,10 +407,10 @@ RDirSyncher::OperationStartResult RDirSyncher::startNextOperation( std::shared_p
     return OperationStartResult::success;
 }
 
-bool RDirSyncher::useNextMirror( const QUrl& hintMirror )
+bool RDirSyncher::useNextMirror( const nx::utils::Url& hintMirror )
 {
-    QUrl prevMirror;
-    for( const QUrl& mirror: m_mirrors )
+    nx::utils::Url prevMirror;
+    for( const nx::utils::Url& mirror: m_mirrors )
     {
         if( prevMirror == hintMirror )
         {

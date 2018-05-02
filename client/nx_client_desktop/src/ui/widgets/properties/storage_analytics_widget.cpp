@@ -1,6 +1,7 @@
 #include "storage_analytics_widget.h"
 #include "ui_storage_analytics_widget.h"
 
+#include <set>
 #include <chrono>
 
 #include <QtCore/QMimeData>
@@ -19,7 +20,8 @@
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/actions/actions.h>
-#include <ui/common/widget_anchor.h>
+#include <nx/client/desktop/common/utils/widget_anchor.h>
+#include <nx/client/desktop/resource_views/data/node_type.h>
 #include <ui/customization/customized.h>
 #include <ui/delegates/recording_stats_item_delegate.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
@@ -30,7 +32,7 @@
 #include <ui/style/skin.h>
 #include <ui/style/custom_style.h>
 #include <ui/utils/table_export_helper.h>
-#include <ui/widgets/common/dropdown_button.h>
+#include <nx/client/desktop/common/widgets/dropdown_button.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/workaround/hidpi_workarounds.h>
@@ -38,8 +40,8 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/synctime.h>
-#include <set>
 
+using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
 
 namespace {
@@ -91,7 +93,7 @@ class CustomHorizontalHeader: public QHeaderView
 public:
     CustomHorizontalHeader(QWidget* parent = nullptr) :
         base_type(Qt::Horizontal, parent),
-        m_durationButton(new QnDropdownButton(this))
+        m_durationButton(new DropdownButton(this))
     {
         m_durationButton->setButtonTextRole(Qt::ToolTipRole);
 
@@ -139,7 +141,7 @@ public:
         return seconds(current->data().value<qint64>());
     }
 
-    QnDropdownButton* durationButton() const
+    DropdownButton* durationButton() const
     {
         return m_durationButton;
     }
@@ -166,7 +168,7 @@ private:
     }
 
 private:
-    QnDropdownButton* m_durationButton;
+    DropdownButton* m_durationButton;
 };
 
 } // namespace
@@ -196,10 +198,10 @@ QnStorageAnalyticsWidget::QnStorageAnalyticsWidget(QWidget* parent):
     auto refreshButton = new QPushButton(ui->tabWidget);
     refreshButton->setFlat(true);
     refreshButton->setText(tr("Refresh"));
-    refreshButton->setIcon(qnSkin->icon(lit("buttons/refresh.png")));
+    refreshButton->setIcon(qnSkin->icon(lit("text_buttons/refresh.png")));
     refreshButton->resize(refreshButton->sizeHint());
 
-    auto anchor = new QnWidgetAnchor(refreshButton);
+    auto anchor = new WidgetAnchor(refreshButton);
     anchor->setEdges(Qt::RightEdge | Qt::TopEdge);
 
     ui->tabWidget->tabBar()->setProperty(style::Properties::kTabShape,
@@ -238,14 +240,14 @@ QnStorageAnalyticsWidget::~QnStorageAnalyticsWidget()
 {
 }
 
-QnTableView* QnStorageAnalyticsWidget::currentTable() const
+TableView* QnStorageAnalyticsWidget::currentTable() const
 {
     return ui->tabWidget->currentWidget() == ui->statsTab
         ? ui->statsTable
         : ui->forecastTable;
 }
 
-void QnStorageAnalyticsWidget::setupTableView(QnTableView* table, QAbstractItemModel* model)
+void QnStorageAnalyticsWidget::setupTableView(TableView* table, QAbstractItemModel* model)
 {
     auto sortModel = new QnSortedRecordingStatsModel(this);
     sortModel->setSourceModel(model);
@@ -282,7 +284,7 @@ void QnStorageAnalyticsWidget::setupTableView(QnTableView* table, QAbstractItemM
         ? ui->forecastTable
         : ui->statsTable;
 
-    connect(header->durationButton(), &QnDropdownButton::currentChanged, this,
+    connect(header->durationButton(), &DropdownButton::currentChanged, this,
         [this, otherTable](int index)
         {
             static_cast<CustomHorizontalHeader*>(otherTable->horizontalHeader())->
@@ -456,7 +458,7 @@ void QnStorageAnalyticsWidget::at_eventsGrid_customContextMenuRequested(const QP
         if (resource)
         {
             action::Parameters parameters(resource);
-            parameters.setArgument(Qn::NodeTypeRole, Qn::ResourceNode);
+            parameters.setArgument(Qn::NodeTypeRole, ResourceTreeNodeType::resource);
 
             menu.reset(manager->newMenu(action::TreeScope, nullptr, parameters));
             foreach(QAction* action, menu->actions())
@@ -571,7 +573,7 @@ QnRecordingStatsReply QnStorageAnalyticsWidget::getForecastData(qint64 extraSize
         QnSecurityCamResourcePtr camRes = resourcePool()->getResourceByUniqueId<QnSecurityCamResource>(cameraStats.uniqueId);
         if (camRes)
         {
-            cameraForecast.expand = !camRes->isScheduleDisabled();
+            cameraForecast.expand = camRes->isLicenseUsed();
             cameraForecast.expand &= (camRes->getStatus() == Qn::Online || camRes->getStatus() == Qn::Recording);
             cameraForecast.expand &= cameraStats.archiveDurationSecs > 0 && cameraStats.recordedBytes > 0;
             cameraForecast.minDays = qMax(0, camRes->minDays());

@@ -24,8 +24,8 @@ enum class CloudConnectVersion
 
 constexpr const CloudConnectVersion kDefaultCloudConnectVersion =
     CloudConnectVersion::initial;
-constexpr const CloudConnectVersion kCurrentCloudConnectVersion = 
-    CloudConnectVersion::tryingEveryAddressOfPeer;
+constexpr const CloudConnectVersion kCurrentCloudConnectVersion =
+    CloudConnectVersion::clientSupportsConnectSessionWithoutUdpEndpoints;
 
 } // namespace api
 } // namespace hpm

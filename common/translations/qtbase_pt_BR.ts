@@ -28,7 +28,7 @@
     </message>
     <message>
       <source>Preferences...</source>
-      <translation>Preferências…</translation>
+      <translation>Preferências...</translation>
     </message>
     <message>
       <source>Quit %1</source>
@@ -82,11 +82,11 @@
     </message>
     <message>
       <source>Scroll Left</source>
-      <translation>Scroll para Esquerda</translation>
+      <translation>Scroll Esquerda</translation>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation>Scroll para Direita</translation>
+      <translation>Scroll Direita</translation>
     </message>
     <message>
       <source>Scroll Up</source>
@@ -180,7 +180,7 @@
     </message>
     <message>
       <source>About</source>
-      <translation>Sobre</translation>
+      <translation>Sobre o</translation>
     </message>
     <message>
       <source>Config</source>
@@ -224,7 +224,7 @@
     </message>
     <message>
       <source>Select All</source>
-      <translation>Seleccionar Tudo</translation>
+      <translation>Seleccionar todos</translation>
     </message>
   </context>
   <context>
@@ -340,7 +340,7 @@ Press ESC to cancel</translation>
     <name>QDialogButtonBox</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
   </context>
   <context>
@@ -511,7 +511,7 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>Show </source>
-      <translation>Mostrar</translation>
+      <translation>Mostrar </translation>
     </message>
     <message>
       <source>&amp;Rename</source>
@@ -531,7 +531,7 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>All files (*)</source>
-      <translation type="unfinished">All files (*)</translation>
+      <translation>Todos (*)</translation>
     </message>
     <message>
       <source>Directories</source>
@@ -614,7 +614,7 @@ Do you want to delete it anyway?</translation>
     <message>
       <source>Folder</source>
       <comment>All other platforms</comment>
-      <translation type="unfinished">Folder</translation>
+      <translation>Pasta</translation>
     </message>
     <message>
       <source>Alias</source>
@@ -724,7 +724,7 @@ Do you want to delete it anyway?</translation>
     <name>QGnomeTheme</name>
     <message>
       <source>&amp;OK</source>
-      <translation type="unfinished">&amp;OK</translation>
+      <translation>&amp;OK</translation>
     </message>
     <message>
       <source>&amp;Save</source>
@@ -867,7 +867,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Seleccionar Tudo</translation>
+      <translation>Seleccionar todos</translation>
     </message>
   </context>
   <context>
@@ -882,7 +882,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Help</source>
@@ -893,7 +893,7 @@ Do you want to delete it anyway?</translation>
     <name>QPlatformTheme</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Save</source>
@@ -961,7 +961,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Restore Defaults</source>
-      <translation>Restaurar Predefinições</translation>
+      <translation>Restaurar Padrões</translation>
     </message>
   </context>
   <context>
@@ -1013,7 +1013,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Bottom</source>
-      <translation>Fundo</translation>
+      <translation>Abaixo</translation>
     </message>
     <message>
       <source>Page left</source>
@@ -1076,7 +1076,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Pictures</source>
-      <translation type="unfinished">Pictures</translation>
+      <translation>Imagens</translation>
     </message>
     <message>
       <source>Temporary Directory</source>
@@ -1127,11 +1127,11 @@ Do you want to delete it anyway?</translation>
     <name>QTabBar</name>
     <message>
       <source>Scroll Left</source>
-      <translation>Scroll para Esquerda</translation>
+      <translation>Scroll Esquerda</translation>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation>Scroll para Direita</translation>
+      <translation>Scroll Direita</translation>
     </message>
   </context>
   <context>
@@ -1173,7 +1173,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Seleccionar Tudo</translation>
+      <translation>Seleccionar todos</translation>
     </message>
   </context>
 </TS>

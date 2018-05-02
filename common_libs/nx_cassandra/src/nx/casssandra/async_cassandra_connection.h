@@ -249,6 +249,11 @@ public:
     AsyncConnection(AsyncConnection&&) = default;
     AsyncConnection& operator=(AsyncConnection&&) = default;
 
+    using AbstractAsyncConnection::init;
+    using AbstractAsyncConnection::prepareQuery;
+    using AbstractAsyncConnection::executeSelect;
+    using AbstractAsyncConnection::executeUpdate;
+
     virtual void init(nx::utils::MoveOnlyFunc<void(CassError)> completionHandler);
 
     virtual void prepareQuery(

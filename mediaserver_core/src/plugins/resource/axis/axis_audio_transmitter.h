@@ -2,7 +2,7 @@
 
 #include <core/dataconsumer/base_http_audio_transmitter.h>
 #include <core/resource/security_cam_resource.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 
 class QnAxisAudioTransmitter : public BaseHttpAudioTransmitter
 {
@@ -15,14 +15,14 @@ public:
 
 protected:
     virtual bool sendData(const QnAbstractMediaDataPtr& data) override;
-    virtual void prepareHttpClient(const nx_http::AsyncHttpClientPtr& httpClient) override;
+    virtual void prepareHttpClient(const nx::network::http::AsyncHttpClientPtr& httpClient) override;
     virtual bool isReadyForTransmission(
-        nx_http::AsyncHttpClientPtr httpClient,
+        nx::network::http::AsyncHttpClientPtr httpClient,
         bool isRetryAfterUnauthorizedResponse) const override;
 
-    virtual QUrl transmissionUrl() const override;
+    virtual nx::utils::Url transmissionUrl() const override;
     virtual std::chrono::milliseconds transmissionTimeout() const override;
-    virtual nx_http::StringType contentType() const override;
+    virtual nx::network::http::StringType contentType() const override;
 
 private:
     bool m_noAuth;

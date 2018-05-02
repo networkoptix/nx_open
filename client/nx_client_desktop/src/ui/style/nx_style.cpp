@@ -40,31 +40,33 @@
 
 #include <QtWidgets/private/qabstractitemview_p.h>
 
-#include <nx/client/desktop/ui/common/detail/base_input_field.h>
-#include <nx/client/desktop/ui/common/painter_transform_scale_stripper.h>
+#include <nx/client/desktop/common/widgets/detail/base_input_field.h>
+#include <nx/client/desktop/common/utils/painter_transform_scale_stripper.h>
+#include <nx/client/desktop/utils/widget_utils.h>
 
 #include <ui/common/indents.h>
-#include <ui/common/popup_shadow.h>
-#include <ui/common/link_hover_processor.h>
+#include <nx/client/desktop/common/utils/popup_shadow.h>
+#include <nx/client/desktop/common/utils/link_hover_processor.h>
 #include <ui/delegates/styled_combo_box_delegate.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
-#include <ui/widgets/common/input_field.h>
+#include <nx/client/desktop/common/widgets/input_field.h>
 #include <ui/widgets/common/scroll_bar_proxy.h>
 #include <ui/widgets/calendar_widget.h>
 
 #include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
-#include <utils/common/object_companion.h>
+#include <nx/client/desktop/common/utils/object_companion.h>
 #include <utils/common/property_backup.h>
 #include <utils/common/scoped_painter_rollback.h>
 
 #include <utils/math/color_transformations.h>
 #include <nx/utils/string.h>
 #include <nx/utils/math/fuzzy.h>
-
+#include <nx/client/core/utils/geometry.h>
 
 using namespace style;
-using namespace nx::client::desktop::ui;
+using namespace nx::client::desktop;
+using nx::client::core::Geometry;
 
 namespace
 {
@@ -103,7 +105,7 @@ namespace
     {
         QPainterPath path;
 
-        QRectF arrowRect = QnGeometry::aligned(QSizeF(size, size), rect);
+        QRectF arrowRect = Geometry::aligned(QSizeF(size, size), rect);
 
         RectCoordinates rc(arrowRect);
 
@@ -526,20 +528,6 @@ namespace
 
 } // unnamed namespace
 
-
-QnNxStylePrivate::QnNxStylePrivate() :
-    QCommonStylePrivate(),
-    palette(),
-    idleAnimator(nullptr),
-    stateAnimator(nullptr),
-    lastProxiedWidgetUnderMouse(nullptr)
-{
-    Q_Q(QnNxStyle);
-
-    idleAnimator = new QnNoptixStyleAnimator(q);
-    stateAnimator = new QnNoptixStyleAnimator(q);
-}
-
 QnNxStyle::QnNxStyle() :
     base_type(*(new QnNxStylePrivate()))
 {
@@ -594,6 +582,10 @@ QnNxStyle::QnNxStyle() :
                     mouseEvent->buttons(), mouseEvent->modifiers()), Qt::HighEventPriority);
             });
     }
+}
+
+QnNxStyle::~QnNxStyle()
+{
 }
 
 void QnNxStyle::setGenericPalette(const QnGenericPalette &palette)
@@ -658,7 +650,7 @@ void QnNxStyle::drawPrimitive(
             QnScopedPainterBrushRollback brushRollback(painter, Qt::NoBrush);
             QnScopedPainterAntialiasingRollback aaRollback(painter, false);
 
-            painter->drawRoundedRect(QnGeometry::eroded(QRectF(option->rect), 0.5), 1.0, 1.0);
+            painter->drawRoundedRect(Geometry::eroded(QRectF(option->rect), 0.5), 1.0, 1.0);
             return;
         }
 
@@ -818,7 +810,7 @@ void QnNxStyle::drawPrimitive(
 
             if (option->state.testFlag(State_Enabled))
             {
-                using InputField = nx::client::desktop::ui::detail::BaseInputField;
+                using InputField = nx::client::desktop::detail::BaseInputField;
                 if (auto inputTextField = qobject_cast<const InputField*>(widget->parentWidget()))
                 {
                     readOnly = inputTextField->isReadOnly();
@@ -827,6 +819,10 @@ void QnNxStyle::drawPrimitive(
                 else if (auto lineEdit = qobject_cast<const QLineEdit*>(widget))
                 {
                     readOnly = lineEdit->isReadOnly();
+                }
+                else if (auto spinBox = qobject_cast<const QAbstractSpinBox*>(widget))
+                {
+                    readOnly = spinBox->isReadOnly();
                 }
                 else if (auto plainTextEdit = qobject_cast<const QPlainTextEdit*>(widget))
                 {
@@ -1014,7 +1010,7 @@ void QnNxStyle::drawPrimitive(
             QnScopedPainterAntialiasingRollback aaRollback(painter, true);
 
             static const qreal kToolTipRoundingRadius = 2.5;
-            painter->drawRoundedRect(eroded(QRectF(option->rect), 0.5),
+            painter->drawRoundedRect(Geometry::eroded(QRectF(option->rect), 0.5),
                 kToolTipRoundingRadius, kToolTipRoundingRadius);
 
             return;
@@ -1037,7 +1033,7 @@ void QnNxStyle::drawPrimitive(
                 {
                     QnScopedPainterAntialiasingRollback aaRollback(painter, true);
                     QnScopedPainterPenRollback penRollback(painter, QPen(mainColor.color(), frame->lineWidth));
-                    painter->drawRoundedRect(QnGeometry::eroded(QRectF(frame->rect), 0.5), Metrics::kGroupBoxCornerRadius, Metrics::kGroupBoxCornerRadius);
+                    painter->drawRoundedRect(Geometry::eroded(QRectF(frame->rect), 0.5), Metrics::kGroupBoxCornerRadius, Metrics::kGroupBoxCornerRadius);
                 }
             }
             return;
@@ -1163,7 +1159,7 @@ void QnNxStyle::drawPrimitive(
             QColor shadowRoundingColor = option->palette.shadow().color();
             shadowRoundingColor.setAlphaF(0.5);
             painter->fillRect(QRect(option->rect.bottomRight() - QPoint(2, 2), option->rect.bottomRight()), shadowRoundingColor);
-            painter->drawRoundedRect(QnGeometry::eroded(QRectF(option->rect), 0.5), 2.0, 2.0);
+            painter->drawRoundedRect(Geometry::eroded(QRectF(option->rect), 0.5), 2.0, 2.0);
             return;
         }
 
@@ -1306,7 +1302,7 @@ void QnNxStyle::drawPrimitive(
                 QnScopedPainterAntialiasingRollback aaRollback(painter, true);
                 QnScopedPainterBrushRollback brushRollback(painter, brush);
                 QnScopedPainterPenRollback penRollback(painter, brush.color());
-                painter->drawRoundedRect(QnGeometry::eroded(QRectF(widget->rect()), 0.5), 2.0, 2.0);
+                painter->drawRoundedRect(Geometry::eroded(QRectF(widget->rect()), 0.5), 2.0, 2.0);
             }
             return;
         }
@@ -2020,7 +2016,7 @@ void QnNxStyle::drawControl(
 
                     QRect iconRect = textRect;
                     iconRect.setWidth(iconWithPadding);
-                    iconRect = aligned(iconSize, iconRect);
+                    iconRect = Geometry::aligned(iconSize, iconRect);
                     tab->icon.paint(painter, iconRect);
                 }
 
@@ -2946,7 +2942,7 @@ QRect QnNxStyle::subElementRect(
                 if (qobject_cast<const QnDialog*>(buttonBox->parentWidget()))
                 {
                     int margin = proxy()->pixelMetric(PM_DefaultTopLevelMargin);
-                    return QnGeometry::dilated(option->rect, margin);
+                    return Geometry::dilated(option->rect, margin);
                 }
             }
             break;
@@ -2956,7 +2952,7 @@ QRect QnNxStyle::subElementRect(
         {
             return QnNxStylePrivate::isTextButton(option)
                 ? option->rect
-                : QnGeometry::eroded(option->rect, 1);
+                : Geometry::eroded(option->rect, 1);
         }
 
         case SE_ProgressBarGroove:
@@ -3039,7 +3035,7 @@ QRect QnNxStyle::subElementRect(
             {
                 QSize size = tabBar->leftButtonSize;
                 size.setHeight(std::min(size.height(), tabBar->rect.height()));
-                return aligned(size, tabBar->rect, Qt::AlignLeft | Qt::AlignVCenter);
+                return Geometry::aligned(size, tabBar->rect, Qt::AlignLeft | Qt::AlignVCenter);
             }
             break;
         }
@@ -3050,7 +3046,7 @@ QRect QnNxStyle::subElementRect(
             {
                 QSize size = tabBar->rightButtonSize;
                 size.setHeight(std::min(size.height(), tabBar->rect.height()));
-                return aligned(size, tabBar->rect, Qt::AlignRight | Qt::AlignVCenter);
+                return Geometry::aligned(size, tabBar->rect, Qt::AlignRight | Qt::AlignVCenter);
             }
             break;
         }
@@ -3660,7 +3656,7 @@ void QnNxStyle::polish(QWidget *widget)
     /* #QTBUG 18838 */
     /* Workaround for incorrectly updated hover state inside QGraphicsProxyWidget. */
     Q_D(QnNxStyle);
-    if (d->graphicsProxyWidget(widget))
+    if (WidgetUtils::graphicsProxyWidget(widget))
         widget->installEventFilter(this);
 
     if (qobject_cast<QAbstractSpinBox*>(widget) ||
@@ -3697,8 +3693,14 @@ void QnNxStyle::polish(QWidget *widget)
         }
     }
 
-    if (qobject_cast<QPushButton*>(widget) ||
-        qobject_cast<QToolButton*>(widget))
+    const auto nonFlatPushButton =
+        [](const QWidget* widget)
+        {
+            const auto button = qobject_cast<const QPushButton*>(widget);
+            return button && !button->isFlat();
+        };
+
+    if (nonFlatPushButton(widget) || qobject_cast<QToolButton*>(widget))
     {
         if (!widget->property(Properties::kDontPolishFontProperty).toBool())
         {
@@ -3820,7 +3822,7 @@ void QnNxStyle::polish(QWidget *widget)
             };
 
             QnTypedPropertyBackup<const QMetaObject*, QComboBox>::backup(comboBox, getDelegateClass, setDelegateClass, kDelegateClassBackupId);
-            comboBox->setItemDelegate(new QnStyledComboBoxDelegate());
+            comboBox->setItemDelegate(new QnStyledComboBoxDelegate(comboBox));
         }
     }
 
@@ -3915,10 +3917,10 @@ void QnNxStyle::polish(QWidget *widget)
                     widget->setFont(font);
                 }
 
-                if (!QnObjectCompanionManager::companion(calendar, kCalendarDelegateCompanion)
+                if (!ObjectCompanionManager::companion(calendar, kCalendarDelegateCompanion)
                     && !qobject_cast<QnCalendarWidget*>(calendar))
                 {
-                    QnObjectCompanionManager::attach(calendar,
+                    ObjectCompanionManager::attach(calendar,
                         new CalendarDelegateReplacement(view, calendar),
                         kCalendarDelegateCompanion);
                 }
@@ -3955,12 +3957,12 @@ void QnNxStyle::polish(QWidget *widget)
         d->polishInputDialog(inputDialog);
 
     if (auto label = qobject_cast<QLabel*>(widget))
-        QnObjectCompanion<QnLinkHoverProcessor>::install(label, kLinkHoverProcessorCompanion, true);
+        ObjectCompanion<LinkHoverProcessor>::install(label, kLinkHoverProcessorCompanion, true);
 
     if (kCustomizePopupShadows && popupToCustomizeShadow)
     {
         /* Create customized shadow: */
-        if (auto shadow = QnObjectCompanion<QnPopupShadow>::install(popupToCustomizeShadow, kPopupShadowCompanion, true))
+        if (auto shadow = ObjectCompanion<PopupShadow>::install(popupToCustomizeShadow, kPopupShadowCompanion, true))
         {
             QnPaletteColor shadowColor = mainColor(Colors::kBase).darker(3);
             shadowColor.setAlphaF(0.5);
@@ -4023,13 +4025,13 @@ void QnNxStyle::unpolish(QWidget* widget)
     }
 
     if (auto calendar = qobject_cast<QCalendarWidget*>(widget))
-        QnObjectCompanionManager::uninstall(calendar, kCalendarDelegateCompanion);
+        ObjectCompanionManager::uninstall(calendar, kCalendarDelegateCompanion);
 
     if (kCustomizePopupShadows && popupWithCustomizedShadow)
-        QnObjectCompanionManager::uninstall(popupWithCustomizedShadow, kPopupShadowCompanion);
+        ObjectCompanionManager::uninstall(popupWithCustomizedShadow, kPopupShadowCompanion);
 
     if (auto label = qobject_cast<QLabel*>(widget))
-        QnObjectCompanionManager::uninstall(label, kLinkHoverProcessorCompanion);
+        ObjectCompanionManager::uninstall(label, kLinkHoverProcessorCompanion);
 
     if (auto tabBar = qobject_cast<QTabBar*>(widget))
     {
@@ -4086,7 +4088,7 @@ bool QnNxStyle::eventFilter(QObject* object, QEvent* event)
     if (auto widget = qobject_cast<QWidget*>(object))
     {
         Q_D(QnNxStyle);
-        if (auto proxy = d->graphicsProxyWidget(widget))
+        if (auto proxy = WidgetUtils::graphicsProxyWidget(widget))
         {
             switch (event->type())
             {

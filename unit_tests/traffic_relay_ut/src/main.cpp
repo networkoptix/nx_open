@@ -13,10 +13,9 @@ int main(int argc, char** argv)
 {
     QCoreApplication application(argc, argv);
 
-    const auto resultCode = nx::network::test::runTest(
+    return nx::network::test::runTest(
         argc, argv,
         nullptr,
-        nx::network::InitializationFlags::disableUdt);
-
-    return resultCode;
+        nx::network::InitializationFlags::disableUdt,
+        nx::utils::test::GtestRunFlag::gtestThrowOnFailure);
 }

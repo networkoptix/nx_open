@@ -11,6 +11,7 @@
 
 namespace nx {
 namespace cdb {
+namespace test {
 
 class ModuleDiscovery:
     public CdbFunctionalTest
@@ -26,7 +27,7 @@ protected:
         using namespace std::placeholders;
 
         m_urlFetcher.setModulesXmlUrl(nx::network::url::Builder()
-            .setScheme(nx_http::kUrlSchemeName)
+            .setScheme(nx::network::http::kUrlSchemeName)
             .setEndpoint(endpoint())
             .setPath(kDiscoveryCloudModuleXmlPath));
 
@@ -36,22 +37,22 @@ protected:
     void thenXmlIsProvided()
     {
         m_prevResult = m_results.pop();
-        ASSERT_EQ(nx_http::StatusCode::ok, m_prevResult.resultCode);
+        ASSERT_EQ(nx::network::http::StatusCode::ok, m_prevResult.resultCode);
     }
 
     void andXmlContainsMultipleMediatorPorts()
     {
         ASSERT_NE(m_prevResult.tcpUrl, m_prevResult.udpUrl);
-        ASSERT_EQ(nx_http::kUrlSchemeName, m_prevResult.tcpUrl.scheme());
-        ASSERT_EQ(nx::stun::kUrlSchemeName, m_prevResult.udpUrl.scheme());
+        ASSERT_EQ(nx::network::http::kUrlSchemeName, m_prevResult.tcpUrl.scheme());
+        ASSERT_EQ(nx::network::stun::kUrlSchemeName, m_prevResult.udpUrl.scheme());
     }
 
 private:
     struct Result
     {
-        nx_http::StatusCode::Value resultCode = nx_http::StatusCode::ok;
-        QUrl tcpUrl;
-        QUrl udpUrl;
+        nx::network::http::StatusCode::Value resultCode = nx::network::http::StatusCode::ok;
+        nx::utils::Url tcpUrl;
+        nx::utils::Url udpUrl;
     };
 
     nx::network::cloud::ConnectionMediatorUrlFetcher m_urlFetcher;
@@ -59,9 +60,9 @@ private:
     Result m_prevResult;
 
     void saveMediatorUrls(
-        nx_http::StatusCode::Value resultCode,
-        QUrl tcpUrl,
-        QUrl udpUrl)
+        nx::network::http::StatusCode::Value resultCode,
+        nx::utils::Url tcpUrl,
+        nx::utils::Url udpUrl)
     {
         Result result;
         result.resultCode = resultCode;
@@ -79,5 +80,6 @@ TEST_F(ModuleDiscovery, cloud_modules_xml_with_multiple_mediator_ports)
     andXmlContainsMultipleMediatorPorts();
 }
 
+} // namespace test
 } // namespace cdb
 } // namespace nx

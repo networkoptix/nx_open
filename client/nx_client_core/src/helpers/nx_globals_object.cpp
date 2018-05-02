@@ -3,6 +3,10 @@
 #include <QtCore/QtMath>
 #include <QtQuick/private/qquickflickable_p.h>
 
+namespace nx {
+namespace client {
+namespace core {
+
 namespace detail {
 
 QQuickFlickable* findFlickable(const QQuickItem* item)
@@ -43,7 +47,7 @@ NxGlobalsObject::NxGlobalsObject(QObject* parent):
 {
 }
 
-QnUrlHelper NxGlobalsObject::url(const QUrl& url) const
+QnUrlHelper NxGlobalsObject::url(const nx::utils::Url& url) const
 {
     return QnUrlHelper(url);
 }
@@ -96,3 +100,12 @@ void NxGlobalsObject::ensureFlickableChildVisible(QQuickItem* item)
         flickable->topMargin(), flickable->bottomMargin(),
         rect.y(), rect.height()));
 }
+
+QnUuid NxGlobalsObject::uuid(const QString& uuid) const
+{
+    return QnUuid::fromStringSafe(uuid);
+}
+
+} // namespace core
+} // namespace client
+} // namespace nx

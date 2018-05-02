@@ -288,7 +288,7 @@ public:
      * \returns                         Data for the given role.
      */
     template<class T>
-    T data(Qn::ItemDataRole role, const T &defaultValue = T())
+    T data(Qn::ItemDataRole role, const T &defaultValue = T()) const
     {
         QVariant result = data(role);
         if (result.canConvert<T>())

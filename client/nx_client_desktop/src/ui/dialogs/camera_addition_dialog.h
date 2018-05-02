@@ -13,17 +13,17 @@
 
 #include <ui/dialogs/common/session_aware_dialog.h>
 
-namespace Ui {
-    class CameraAdditionDialog;
-}
+namespace Ui { class CameraAdditionDialog; }
+namespace nx { namespace client { namespace desktop { class CheckableHeaderView; }}}
 
-class QnCheckBoxedHeaderView;
-
-class QnCameraAdditionDialog: public QnSessionAwareButtonBoxDialog {
+class QnCameraAdditionDialog: public QnSessionAwareButtonBoxDialog
+{
     Q_OBJECT
-    typedef QnSessionAwareButtonBoxDialog base_type;
+    using base_type = QnSessionAwareButtonBoxDialog;
+
 public:
-    enum State {
+    enum State
+    {
         NoServer,           /**< No server is selected. */
         Initial,            /**< Ready to search cameras. */
         InitialOffline,     /**< Server is offline. */
@@ -36,7 +36,7 @@ public:
         Count
     };
 
-    explicit QnCameraAdditionDialog(QWidget *parent = NULL);
+    explicit QnCameraAdditionDialog(QWidget *parent);
     virtual ~QnCameraAdditionDialog();
 
     QnMediaServerResourcePtr server() const;
@@ -56,7 +56,7 @@ private:
      * Fill table with the received cameras info.
      * \returns number of new cameras.
      */
-    int fillTable(const QnManualResourceSearchList &cameras);
+    int fillTable(QnManualResourceSearchList cameras);
     void removeAddedCameras();
     void updateSubnetMode();
 
@@ -92,7 +92,7 @@ private:
     QScopedPointer<Ui::CameraAdditionDialog> ui;
     State m_state;
     QnMediaServerResourcePtr m_server;
-    QnCheckBoxedHeaderView* m_header;
+    nx::client::desktop::CheckableHeaderView* m_header = nullptr;
 
     bool m_inIpRangeEdit;
     bool m_subnetMode;

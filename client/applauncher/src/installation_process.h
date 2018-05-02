@@ -15,7 +15,7 @@
 #include <api/applauncher_api.h>
 #include <nx/utils/thread/stoppable.h>
 #include <nx/utils/thread/joinable.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/utils/stree/node.h>
 #include <nx/utils/stree/resourcenameset.h>
 
@@ -85,7 +85,7 @@ private:
     const QString m_module;
     const QString m_installationDirectory;
     State m_state;
-    nx_http::AsyncHttpClientPtr m_httpClient;
+    nx::network::http::AsyncHttpClientPtr m_httpClient;
     applauncher::api::InstallationStatus::Value m_status;
     std::shared_ptr<RDirSyncher> m_syncher;
     QString m_errorText;
@@ -124,7 +124,7 @@ private:
     bool writeInstallationSummary();
 
 private slots:
-    void onHttpDone( nx_http::AsyncHttpClientPtr );
+    void onHttpDone( nx::network::http::AsyncHttpClientPtr );
 };
 
 #endif  //INSTALLATION_PROCESS_H

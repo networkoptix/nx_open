@@ -19,7 +19,7 @@
 
 #include <nx/utils/system_error.h>
 #include <utils/fs/file.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 
 #include "rdir_synchronization_operation.h"
 
@@ -40,9 +40,8 @@ namespace detail
         Q_OBJECT
 
     public:
-        GetFileOperation(
-            int _id,
-            const QUrl& baseUrl,
+        GetFileOperation(int _id,
+            const nx::utils::Url &baseUrl,
             const QString& filePath,
             const QString& localDirPath,
             const QString& hashTypeName,
@@ -72,7 +71,7 @@ namespace detail
             sFinished
         };
 
-        nx_http::AsyncHttpClientPtr m_httpClient;
+        nx::network::http::AsyncHttpClientPtr m_httpClient;
         State m_state;
         const QString m_localDirPath;
         const QString m_hashTypeName;
@@ -106,9 +105,9 @@ namespace detail
         void onSomeMessageBodyAvailableNonSafe();
 
     private slots:
-        void onResponseReceived( nx_http::AsyncHttpClientPtr );
-        void onSomeMessageBodyAvailable( nx_http::AsyncHttpClientPtr );
-        void onHttpDone( nx_http::AsyncHttpClientPtr );
+        void onResponseReceived( nx::network::http::AsyncHttpClientPtr );
+        void onSomeMessageBodyAvailable( nx::network::http::AsyncHttpClientPtr );
+        void onHttpDone( nx::network::http::AsyncHttpClientPtr );
     };
 }
 

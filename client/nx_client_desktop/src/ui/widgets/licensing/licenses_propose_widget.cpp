@@ -7,18 +7,17 @@
 #include <core/resource/device_dependent_strings.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
-#include <nx/client/desktop/ui/common/checkbox_utils.h>
+#include <nx/client/desktop/common/utils/checkbox_utils.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 
 #include <utils/license_usage_helper.h>
 
-using namespace nx::client::desktop::ui;
+using namespace nx::client::desktop;
 
 QnLicensesProposeWidget::QnLicensesProposeWidget(QWidget *parent):
     QWidget(parent),
-    QnWorkbenchContextAware(parent, true),
-    QnUpdatable(),
+    QnWorkbenchContextAware(parent, InitializationMode::lazy),
     ui(new Ui::LicensesProposeWidget)
 {
     ui->setupUi(this);
@@ -58,7 +57,7 @@ void QnLicensesProposeWidget::afterContextInitialized()
     connect(context(), &QnWorkbenchContext::userChanged, this,
         &QnLicensesProposeWidget::updateLicensesButtonVisible);
     connect(ui->moreLicensesButton, &QPushButton::clicked, this,
-        [this] { menu()->trigger(action::PreferencesLicensesTabAction); });
+        [this] { menu()->trigger(ui::action::PreferencesLicensesTabAction); });
     updateLicensesButtonVisible();
 }
 
@@ -121,7 +120,7 @@ void QnLicensesProposeWidget::updateFromResources()
     QString title;
     if (analogCameras == m_cameras.size())
     {
-        title = tr("Use analog licenses to view these %n cameras", "", analogCameras);
+        title = tr("Use licenses to view these %n cameras", "", analogCameras);
     }
     else
     {

@@ -16,44 +16,57 @@
 #include <rest/server/rest_connection_processor.h>
 
 namespace {
-    bool isResponseOK(const nx_http::HttpClient& client)
-    {
-        if (!client.response())
-            return false;
-        return client.response()->statusLine.statusCode == nx_http::StatusCode::ok;
-    }
 
-    const int requestTimeoutMs = 10000;
+bool isResponseOK(const nx::network::http::HttpClient& client)
+{
+    if (!client.response())
+        return false;
+    return client.response()->statusLine.statusCode == nx::network::http::StatusCode::ok;
+}
+
+const int requestTimeoutMs = 10000;
+
+} // namespace
+
+QnGetNonceRestHandler::QnGetNonceRestHandler(const QString& remotePath):
+    m_remotePath(remotePath)
+{
 }
 
 int QnGetNonceRestHandler::executeGet(
-    const QString& path,
+    const QString& /*path*/,
     const QnRequestParams& params,
     QnJsonRestResult &result,
     const QnRestConnectionProcessor* owner)
 {
     if (params.contains("url"))
     {
-        nx_http::HttpClient client;
+        if (m_remotePath.isEmpty())
+        {
+            result.setError(QnRestResult::InvalidParameter, "Parameter url is forbidden");
+            return nx::network::http::StatusCode::forbidden;
+        }
+
+        nx::network::http::HttpClient client;
         client.setResponseReadTimeoutMs(requestTimeoutMs);
         client.setSendTimeoutMs(requestTimeoutMs);
         client.setMessageBodyReadTimeoutMs(requestTimeoutMs);
 
-        QUrl requestUrl(params.value("url"));
-        requestUrl.setPath(path);
+        nx::utils::Url requestUrl(params.value("url"));
+        requestUrl.setPath(m_remotePath);
 
         if (!client.doGet(requestUrl) || !isResponseOK(client))
         {
             result.setError(QnRestResult::CantProcessRequest, "Destination server unreachable");
-            return nx_http::StatusCode::ok;
+            return nx::network::http::StatusCode::ok;
         }
 
-        nx_http::BufferType data;
+        nx::network::http::BufferType data;
         while (!client.eof())
             data.append(client.fetchMessageBodyBuffer());
 
         result = QJson::deserialized<QnJsonRestResult>(data);
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
 
     QnGetNonceReply reply;
@@ -73,5 +86,5 @@ int QnGetNonceRestHandler::executeGet(
     }
 
     result.setReply(reply);
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }

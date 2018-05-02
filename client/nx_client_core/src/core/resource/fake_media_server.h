@@ -5,6 +5,8 @@
 #include <core/resource/media_server_resource.h>
 #include <nx_ec/data/api_discovery_data.h>
 
+#include <core/resource/client_core_resource_fwd.h>
+
 /**
  * Used for DesktopClient purpose to put incompatible media servers to the resource tree.
  */
@@ -23,10 +25,6 @@ public:
     virtual QString getName() const override;
     virtual Qn::ResourceStatus getStatus() const override;
 
-    virtual QUrl getApiUrl() const override;
-
-    void setAuthenticator(const QAuthenticator& authenticator);
-
 protected:
     virtual void updateInternal(const QnResourcePtr& other, Qn::NotifierList& notifiers) override;
 
@@ -35,6 +33,5 @@ signals:
 
 private:
     ec2::ApiDiscoveredServerData m_serverData;
-    QAuthenticator m_authenticator;
 };
 

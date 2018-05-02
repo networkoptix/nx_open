@@ -1,4 +1,5 @@
 import QtQuick 2.6
+import QtQuick.Window 2.2
 import Nx 1.0
 
 ShaderEffect
@@ -55,6 +56,9 @@ ShaderEffect
         id: shaderSource
         hideSource: true
         visible: false
+        textureSize: Qt.size(
+            parent.sourceSize.width / Screen.devicePixelRatio,
+            parent.sourceSize.height / Screen.devicePixelRatio)
     }
 
     readonly property var sourceTexture: shaderSource
@@ -80,8 +84,11 @@ ShaderEffect
 
     readonly property vector2d viewCenter: Qt.vector2d(0.5, 0.5).plus(viewShift)
 
+    readonly property string shaderVersion:
+        OpenGLInfo.renderableType == OpenGLInfo.OpenGLES ? 100 : 120
+
     readonly property string commonShaderHeader: "
-        #version 100
+        #version " + shaderVersion + "
         /* This is required to counter QOpenGLShaderProgram code prefixing: */
         #undef lowp
         #undef mediump
@@ -123,6 +130,7 @@ ShaderEffect
         uniform mat4 textureMatrix;
         uniform mat4 viewRotationMatrix;
         uniform sampler2D sourceTexture;
+        uniform float qt_Opacity;
 
         const float pi = 3.1415926;
 
@@ -147,7 +155,7 @@ ShaderEffect
                 ? (textureMatrix * vec4(project(rotatedPointOnSphere), 0.0, 1.0)).xy
                 : vec2(2.0); // somewhere outside
 
-            gl_FragColor = texture2DBlackBorder(sourceTexture, textureCoords);
+            gl_FragColor = texture2DBlackBorder(sourceTexture, textureCoords) * qt_Opacity;
         }"
         + projectFunctionText()
         + unprojectFunctionText()

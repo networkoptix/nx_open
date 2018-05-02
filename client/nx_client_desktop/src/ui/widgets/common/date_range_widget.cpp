@@ -7,6 +7,8 @@
 
 #include <client/client_settings.h>
 
+#include <core/resource/media_server_resource.h>
+
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 
@@ -30,8 +32,8 @@ QDate minAllowedDate()
 
 QDate maxAllowedDate()
 {
-    // 1 month forward should cover all local timezones diffs.
-    return QDate::currentDate().addMonths(1);
+    // 1 day forward should cover all local timezones diffs.
+    return QDate::currentDate().addDays(1);
 }
 
 }
@@ -118,9 +120,10 @@ QDateTime QnDateRangeWidget::actualDateTime(const QDate& userDate) const
     if (qnSettings->timeMode() == Qn::ClientTimeMode)
         return QDateTime(userDate);
 
-    const auto timeWatcher = context()->instance<QnWorkbenchServerTimeWatcher>();
     const auto server = commonModule()->currentServer();
-    const auto serverUtcOffsetMs = timeWatcher->utcOffset(server);
+    const auto serverUtcOffsetMs = server
+        ? server->utcOffset()
+        : Qn::InvalidUtcOffset;
 
     static const QTime kMidnight(0, 0);
     return (serverUtcOffsetMs != Qn::InvalidUtcOffset)

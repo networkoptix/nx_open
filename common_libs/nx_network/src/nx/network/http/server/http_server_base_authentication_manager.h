@@ -5,7 +5,9 @@
 #include "abstract_authentication_manager.h"
 #include "http_server_password_lookup_result.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 namespace server {
 
 class NX_NETWORK_API AbstractAuthenticationDataProvider
@@ -31,8 +33,8 @@ public:
     virtual ~BaseAuthenticationManager() override;
 
     virtual void authenticate(
-        const nx_http::HttpServerConnection& connection,
-        const nx_http::Request& request,
+        const nx::network::http::HttpServerConnection& connection,
+        const nx::network::http::Request& request,
         AuthenticationCompletionHandler completionHandler) override;
 
 private:
@@ -55,4 +57,6 @@ private:
 };
 
 } // namespace server
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

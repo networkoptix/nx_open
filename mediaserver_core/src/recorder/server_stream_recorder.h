@@ -50,35 +50,66 @@ public:
 
     int getFRAfterThreshold() const;
     bool needConfigureProvider() const;
+    bool isQueueFull() const;
+
+    /**
+     * Sets whether this recorder can drop packets when its queue is full.
+     * Note that this setter is not thread-safe, don't use it on a running stream recorder!
+     */
+    void setCanDropPackets(bool canDrop);
+    bool canDropPackets() const;
 
 signals:
     void fpsChanged(QnServerStreamRecorder* recorder, float value);
     void motionDetected(QnResourcePtr resource, bool value, qint64 time, QnConstAbstractDataPacketPtr motion);
 
-    void storageFailure(QnResourcePtr mServerRes, qint64 timestamp, nx::vms::event::EventReason reasonCode, QnResourcePtr storageRes);
+    void storageFailure(QnResourcePtr mServerRes, qint64 timestamp, nx::vms::api::EventReason reasonCode, QnResourcePtr storageRes);
 protected:
     virtual bool processData(const QnAbstractDataPacketPtr& data);
 
     virtual bool needSaveData(const QnConstAbstractMediaDataPtr& media) override;
-    void beforeProcessData(const QnConstAbstractMediaDataPtr& media);
+    virtual void beforeProcessData(const QnConstAbstractMediaDataPtr& media);
     virtual bool saveMotion(const QnConstMetaDataV1Ptr& motion) override;
 
-    virtual void fileStarted(qint64 startTimeMs, int timeZone, const QString& fileName, QnAbstractMediaStreamDataProvider* provider) override;
-    virtual void fileFinished(qint64 durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider, qint64 fileSize) override;
+    virtual void fileStarted(
+        qint64 startTimeMs,
+        int timeZone,
+        const QString& fileName,
+        QnAbstractMediaStreamDataProvider* provider,
+        bool sideRecorder = false) override;
+
+    virtual void fileFinished(
+        qint64 durationMs,
+        const QString& fileName,
+        QnAbstractMediaStreamDataProvider* provider,
+        qint64 fileSize,
+        qint64 startTimeMs = AV_NOPTS_VALUE) override;
+
     virtual void getStoragesAndFileNames(QnAbstractMediaStreamDataProvider* provider) override;
     virtual bool canAcceptData() const;
     virtual void putData(const QnAbstractDataPacketPtr& data) override;
+    virtual void setLastMediaTime(qint64 lastMediaTime);
 
     virtual void beforeRun() override;
     virtual void endOfRun() override;
     virtual bool saveData(const QnConstAbstractMediaDataPtr& md) override;
     virtual void writeData(const QnConstAbstractMediaDataPtr& md, int streamIndex) override;
 private:
-    void updateRecordingType(const QnScheduleTask& scheduleTask);
+    struct ScheduleTaskWithThresholds: QnScheduleTask
+    {
+        ScheduleTaskWithThresholds() = default;
+        explicit ScheduleTaskWithThresholds(const QnScheduleTask& base):
+            QnScheduleTask(base) {}
+
+        int recordBeforeSec = 0;
+        int recordAfterSec = 0;
+    };
+
+    void updateRecordingType(const ScheduleTaskWithThresholds& scheduleTask);
     void updateStreamParams();
     bool isMotionRec(Qn::RecordingType recType) const;
     void updateMotionStateInternal(bool value, qint64 timestamp, const QnConstMetaDataV1Ptr& metaData);
-    void setSpecialRecordingMode(QnScheduleTask& task);
+    void setSpecialRecordingMode(const ScheduleTaskWithThresholds& task);
     int getFpsForValue(int fps);
     void writeRecentlyMotion(qint64 writeAfterTime);
     void keepRecentlyMotion(const QnConstAbstractMediaDataPtr& md);
@@ -97,20 +128,24 @@ private:
     void updateRebuildState();
     void pauseRebuildIfHighDataNoLock();
     void resumeRebuildIfLowDataNoLock();
-    bool cleanupQueueIfOverflow();
+    bool cleanupQueue();
     void addQueueSizeUnsafe(qint64 value);
+    virtual void updateContainerMetadata(QnAviArchiveMetadata* metadata) const override;
+
 private slots:
     void at_recordingFinished(const StreamRecorderErrorStruct& status,
         const QString& filename);
 
     void at_camera_propertyChanged(const QnResourcePtr &, const QString &);
 private:
+
+
     const qint64 m_maxRecordQueueSizeBytes;
     const int m_maxRecordQueueSizeElements;
     mutable QnMutex m_scheduleMutex;
     QnScheduleTaskList m_schedule;
     QnTimePeriod m_lastSchedulePeriod;
-    QnScheduleTask m_currentScheduleTask;
+    ScheduleTaskWithThresholds m_currentScheduleTask;
     //qint64 m_skipDataToTime;
     qint64 m_lastMotionTimeUsec;
     //bool m_lastMotionContainData;
@@ -120,9 +155,9 @@ private:
     QnAbstractMediaStreamDataProvider* m_mediaProvider;
     QnDualStreamingHelperPtr m_dualStreamingHelper;
     QnMediaServerResourcePtr m_mediaServer;
-    QnScheduleTask m_panicSchedileRecord;   // panic mode. Highest recording priority
-    QnScheduleTask m_forcedSchedileRecord;  // special recording mode (recording action). Priority higher than regular schedule
-    QElapsedTimer m_forcedSchedileRecordTimer;
+    ScheduleTaskWithThresholds m_panicScheduleRecordTask;   // panic mode. Highest recording priority
+    ScheduleTaskWithThresholds m_forcedScheduleRecordTask;  // special recording mode (recording action). Priority higher than regular schedule
+    QElapsedTimer m_forcedScheduleRecordTimer;
     int m_forcedScheduleRecordDurationMs;
     bool m_usedPanicMode;
     bool m_usedSpecialRecordingMode;
@@ -130,11 +165,12 @@ private:
     qint64 m_queuedSize;
     static std::atomic<qint64> m_totalQueueSize;
     static std::atomic<int> m_totalRecorders;
-    QnMutex m_queueSizeMutex;
+    mutable QnMutex m_queueSizeMutex;
     qint64 m_lastMediaTime;
     QQueue<QnConstAbstractMediaDataPtr> m_recentlyMotion;
     bool m_diskErrorWarned;
     std::atomic<bool> m_rebuildBlocked;
     bool m_usePrimaryRecorder;
     bool m_useSecondaryRecorder;
+    bool m_canDropPackets;
 };

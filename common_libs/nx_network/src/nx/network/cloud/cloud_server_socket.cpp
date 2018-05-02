@@ -1,7 +1,8 @@
 #include "cloud_server_socket.h"
 
-#include <nx/fusion/serialization/lexical.h>
+#include <nx/network/aio/aio_service.h>
 #include <nx/network/socket_global.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/std/future.h>
 
 #include "tunnel/relay/relay_connection_acceptor.h"
@@ -192,34 +193,10 @@ void CloudServerSocket::acceptAsync(AcceptCompletionHandler handler)
         });
 }
 
-void CloudServerSocket::cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler)
+void CloudServerSocket::cancelIoInAioThread()
 {
-    // Doing post to avoid calling handler within this call.
-    m_mediatorRegistrationRetryTimer.post(
-        [this, handler = std::move(handler)]() mutable
-        {
-            cancelAccept();
-            handler();
-        });
-}
-
-void CloudServerSocket::cancelIOSync()
-{
-    if (m_mediatorRegistrationRetryTimer.isInSelfAioThread())
-    {
-        cancelAccept();
-    }
-    else
-    {
-        // We need dispatch here to avoid blocking if called within aio thread.
-        nx::utils::promise<void> cancelledPromise;
-        cancelIOAsync(
-            [this, &cancelledPromise]
-            {
-                cancelledPromise.set_value();
-            });
-        cancelledPromise.get_future().wait();
-    }
+    m_aggregateAcceptor.cancelIOSync();
+    m_savedAcceptHandler = nullptr;
 }
 
 bool CloudServerSocket::isInSelfAioThread() const
@@ -302,6 +279,19 @@ void CloudServerSocket::startAcceptor(
                 [&](const std::unique_ptr<AbstractTunnelAcceptor>& a)
                 { return a.get() == acceptorPtr; });
 
+            if (code == SystemError::noError)
+            {
+                NX_INFO(this, lm("Cloud connection (session %1) from %2 has been accepted. Info %3")
+                    .args(acceptorPtr->connectionId(), acceptorPtr->remotePeerId(),
+                        acceptorPtr->toString()));
+            }
+            else
+            {
+                NX_INFO(this, lm("Cloud connection (session %1) from %2 has not been accepted with error %3. Info %4")
+                    .args(acceptorPtr->connectionId(), acceptorPtr->remotePeerId(),
+                        SystemError::toString(code), acceptorPtr->toString()));
+            }
+
             NX_CRITICAL(it != m_acceptors.end());
             m_acceptors.erase(it);
 
@@ -350,7 +340,7 @@ void CloudServerSocket::startAcceptingConnections(
     m_mediatorConnection->setOnReconnectedHandler(
         std::bind(&CloudServerSocket::onMediatorConnectionRestored, this));
 
-    // This is important to know if connection is lost, 
+    // This is important to know if connection is lost,
     // so server will use some keep alive even if mediator does not ask it to use any.
     const auto keepAliveOptions = response.tcpConnectionKeepAlive
         ? *response.tcpConnectionKeepAlive : kDefaultKeepAlive;
@@ -478,17 +468,11 @@ void CloudServerSocket::onNewConnectionHasBeenAccepted(
     handler(sysErrorCode, std::move(socket));
 }
 
-void CloudServerSocket::cancelAccept()
-{
-    m_aggregateAcceptor.cancelIOSync();
-    m_savedAcceptHandler = nullptr;
-}
-
 void CloudServerSocket::issueRegistrationRequest()
 {
     using namespace std::placeholders;
 
-    const auto cloudCredentials = 
+    const auto cloudCredentials =
         m_mediatorConnection->credentialsProvider()->getSystemCredentials();
 
     if (!cloudCredentials)  //< TODO: #ak this MUST be assert.
@@ -576,7 +560,7 @@ CustomAcceptorFactory& CustomAcceptorFactory::instance()
     return staticInstance;
 }
 
-std::vector<std::unique_ptr<AbstractConnectionAcceptor>> 
+std::vector<std::unique_ptr<AbstractConnectionAcceptor>>
     CustomAcceptorFactory::defaultFactoryFunction(
         const nx::hpm::api::SystemCredentials& credentials,
         const hpm::api::ListenResponse& response)
@@ -585,7 +569,7 @@ std::vector<std::unique_ptr<AbstractConnectionAcceptor>>
 
     for (const auto& trafficRelayUrl: response.trafficRelayUrls)
     {
-        QUrl trafficRelayUrlWithCredentials = QString::fromUtf8(trafficRelayUrl);
+        nx::utils::Url trafficRelayUrlWithCredentials = QString::fromUtf8(trafficRelayUrl);
         trafficRelayUrlWithCredentials.setUserName(credentials.hostName());
         trafficRelayUrlWithCredentials.setPassword(credentials.key);
         acceptors.push_back(

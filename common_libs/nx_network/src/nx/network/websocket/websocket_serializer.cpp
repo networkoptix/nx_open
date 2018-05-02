@@ -68,6 +68,9 @@ static int prepareFrame(const char* payload, int payloadLen, FrameType type,
     if (outLen < neededOutLen)
         return neededOutLen;
 
+    if (!payload)
+        return -1;
+
     int headerOffset = fillHeader(out, fin, type, payloadLenType, payloadLen, masked, mask);
     memcpy(out + headerOffset, payload, payloadLen);
 

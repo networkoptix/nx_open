@@ -1,8 +1,3 @@
-/**********************************************************
-* May 11, 2016
-* a.kolesnikov
-***********************************************************/
-
 #include "event_manager.h"
 
 #include <chrono>
@@ -21,7 +16,7 @@ namespace nx {
 namespace cdb {
 
 class SubscribeToSystemEventsHandler:
-    public AbstractFreeMsgBodyHttpHandler<void>
+    public AbstractFreeMsgBodyHttpHandler<>
 {
 public:
     static const QString kHandlerPath;
@@ -30,15 +25,15 @@ public:
         EventManager* const eventManager,
         const AuthorizationManager& authorizationManager)
     :
-        AbstractFreeMsgBodyHttpHandler<void>(
+        AbstractFreeMsgBodyHttpHandler<>(
             EntityType::system,
             DataActionType::fetch,
             authorizationManager,
             [eventManager](
-                nx_http::HttpServerConnection* connection,
+                nx::network::http::HttpServerConnection* connection,
                 const AuthorizationInfo& authzInfo,
                 nx::utils::MoveOnlyFunc<
-                    void(api::ResultCode, std::unique_ptr<nx_http::AbstractMsgBodySource>)
+                    void(api::ResultCode, std::unique_ptr<nx::network::http::AbstractMsgBodySource>)
                 > completionHandler)
             {
                 eventManager->subscribeToEvents(
@@ -61,14 +56,14 @@ EventManager::EventManager(const conf::Settings& settings)
 
 EventManager::~EventManager()
 {
-    //assuming no public methods of this class can be called anymore,
-    //  but we have to wait for all scheduled async calls to finish
+    // Assuming no public methods of this class can be called anymore,
+    // but we have to wait for all scheduled async calls to finish.
     m_startedAsyncCallsCounter.wait();
 }
 
 void EventManager::registerHttpHandlers(
     const AuthorizationManager& authorizationManager,
-    nx_http::MessageDispatcher* const httpMessageDispatcher)
+    nx::network::http::server::rest::MessageDispatcher* const httpMessageDispatcher)
 {
     httpMessageDispatcher->registerRequestProcessor<SubscribeToSystemEventsHandler>(
         SubscribeToSystemEventsHandler::kHandlerPath,
@@ -81,10 +76,10 @@ void EventManager::registerHttpHandlers(
 }
 
 void EventManager::subscribeToEvents(
-    nx_http::HttpServerConnection* httpConnection,
+    nx::network::http::HttpServerConnection* httpConnection,
     const AuthorizationInfo& authzInfo,
     nx::utils::MoveOnlyFunc<
-        void(api::ResultCode, std::unique_ptr<nx_http::AbstractMsgBodySource>)
+        void(api::ResultCode, std::unique_ptr<nx::network::http::AbstractMsgBodySource>)
     > completionHandler)
 {
     std::string systemId;
@@ -100,13 +95,13 @@ void EventManager::subscribeToEvents(
     NX_LOGX(lm("System %1 subscribing to events").arg(systemId), cl_logDEBUG2);
 
     auto msgBody =
-        std::make_unique<nx_http::MultipartMessageBodySource>(
+        std::make_unique<nx::network::http::MultipartMessageBodySource>(
             "nx_cloud_event_boundary");
 
     {
         QnMutexLocker lk(&m_mutex);
 
-        //checking if such connection is already present
+        // Checking if such connection is already present.
         const auto iterAndInsertionFlag = m_activeMediaServerConnections.emplace(
             ServerConnectionContext(httpConnection, systemId));
 
@@ -143,20 +138,20 @@ bool EventManager::isSystemOnline(const std::string& systemId) const
 {
     QnMutexLocker lk(&m_mutex);
 
-    const auto& connectionBySystemIdIndex = 
+    const auto& connectionBySystemIdIndex =
         m_activeMediaServerConnections.get<kServerContextBySystemIdIndex>();
     return connectionBySystemIdIndex.find(systemId) !=
         connectionBySystemIdIndex.end();
 }
 
 void EventManager::beforeMsgBodySourceDestruction(
-    nx_http::HttpServerConnection* connection)
+    nx::network::http::HttpServerConnection* connection)
 {
-    //element can already be removed, but connection object is still alive
+    // Element can already be removed, but connection object is still alive.
 
     QnMutexLocker lk(&m_mutex);
 
-    const auto& serverConnectionIndex = 
+    const auto& serverConnectionIndex =
         m_activeMediaServerConnections.get<kServerContextByConnectionIndex>();
     auto serverConnectionIter = serverConnectionIndex.find(connection);
     if (serverConnectionIter == serverConnectionIndex.end())
@@ -181,9 +176,9 @@ void EventManager::onConnectionToPeerLost(
 void EventManager::onMediaServerIdlePeriodExpired(
     EventManager::MediaServerConnectionContainer::iterator serverConnectionIter)
 {
-    //closing event stream to force mediaserver send us a new request
+    // Closing event stream to force mediaserver send us a new request.
 
-    //NOTE we do not need synchronization here since all events 
+    //NOTE we do not need synchronization here since all events
     //    related to a single connection are always invoked within same aio thread
     m_activeMediaServerConnections.modify(
         serverConnectionIter,
@@ -193,5 +188,5 @@ void EventManager::onMediaServerIdlePeriodExpired(
         });
 }
 
-}   //namespace cdb
-}   //namespace nx
+} // namespace cdb
+} // namespace nx

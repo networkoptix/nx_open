@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>373</width>
+    <width>395</width>
     <height>429</height>
    </rect>
   </property>
@@ -72,7 +72,7 @@
       <item row="4" column="0">
        <widget class="QLabel" name="tourCycleTimeLabel">
         <property name="text">
-         <string>Showreel cycle</string>
+         <string>Tour cycle</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

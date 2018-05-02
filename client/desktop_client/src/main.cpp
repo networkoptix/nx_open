@@ -26,6 +26,7 @@
 
 #include <QtGui/QDesktopServices>
 #include <QtGui/QWindow>
+#include <QtGui/QScreen>
 
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkRequest>
@@ -47,7 +48,10 @@
 #include <client/client_startup_parameters.h>
 #include <client/self_updater.h>
 
+#include <nx/media/decoder_registrar.h>
 #include <nx/network/app_info.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/timer_manager.h>
 
@@ -64,10 +68,8 @@
 #include <ui/workaround/mac_utils.h>
 #endif
 
-#ifndef DISABLE_FESTIVAL
 #include <nx_speech_synthesizer/text_to_wav.h>
 #include <nx/utils/file_system.h>
-#endif
 
 #include <utils/common/app_info.h>
 #include <utils/common/command_line_parser.h>
@@ -75,11 +77,34 @@
 
 #include <plugins/io_device/joystick/joystick_manager.h>
 
-namespace
+namespace {
+
+const int kSuccessCode = 0;
+const int kInvalidParametersCode = -1;
+static const nx::utils::log::Tag kMainWindow(lit("MainWindow"));
+
+void sendCloudPortalConfirmation(const nx::vms::utils::SystemUri& uri, QObject* owner)
 {
-    const int kSuccessCode = 0;
-    const int kInvalidParametersCode = -1;
+    QPointer<QNetworkAccessManager> manager(new QNetworkAccessManager(owner));
+        QObject::connect(manager.data(), &QNetworkAccessManager::finished,
+            [manager](QNetworkReply* reply)
+            {
+                reply->deleteLater();
+                manager->deleteLater();
+            });
+
+        QUrl url(nx::network::AppInfo::defaultCloudPortalUrl(
+            nx::network::SocketGlobals::cloud().cloudHost()));
+        url.setPath(lit("/api/utils/visitedKey"));
+
+        const QJsonObject data{{lit("key"), uri.authenticator().encode()}};
+        QNetworkRequest request(url);
+        request.setHeader(QNetworkRequest::ContentTypeHeader, lit("application/json"));
+
+        manager->post(request, QJsonDocument(data).toJson(QJsonDocument::Compact));
 }
+
+} // namespace
 
 #ifndef API_TEST_MAIN
 
@@ -93,28 +118,6 @@ int runApplication(QtSingleApplication* application, const QnStartupParameters& 
         || !startupParams.customUri.isNull()
         || !startupParams.videoWallGuid.isNull();
 
-    if (startupParams.customUri.isValid())
-    {
-        QPointer<QNetworkAccessManager> manager(new QNetworkAccessManager(application));
-        QObject::connect(manager.data(), &QNetworkAccessManager::finished,
-            [manager](QNetworkReply* reply)
-            {
-                qDebug() << lit("Cloud Reply received: %1").arg(QLatin1String(reply->readAll()));
-                reply->deleteLater();
-                manager->deleteLater();
-            });
-
-        QUrl url(nx::network::AppInfo::defaultCloudPortalUrl());
-        url.setPath(lit("/api/utils/visitedKey"));
-        qDebug() << "Sending Cloud Portal Confirmation to" << url.toString();
-
-        QJsonObject data{{lit("key"), startupParams.customUri.authenticator().encode()}};
-        QNetworkRequest request(url);
-        request.setHeader(QNetworkRequest::ContentTypeHeader, lit("application/json"));
-
-        manager->post(request, QJsonDocument(data).toJson(QJsonDocument::Compact));
-    }
-
     if (!allowMultipleClientInstances)
     {
         /* Check if application is already running. */
@@ -123,6 +126,9 @@ int runApplication(QtSingleApplication* application, const QnStartupParameters& 
     }
 
     QnClientModule client(startupParams);
+
+    if (startupParams.customUri.isValid())
+        sendCloudPortalConfirmation(startupParams.customUri, application);
 
     /* Running updater after QApplication and NX_LOG are initialized. */
     if (qnRuntime->isDesktopMode() && !startupParams.exportedMode)
@@ -167,10 +173,14 @@ int runApplication(QtSingleApplication* application, const QnStartupParameters& 
         qunsetenv("RESOURCE_NAME");
     #endif
 
+    nx::media::DecoderRegistrar::registerDecoders(QSize(), true);
+
     QDesktopWidget *desktop = qApp->desktop();
-    bool customScreen = startupParams.screen != QnStartupParameters::kInvalidScreen && startupParams.screen < desktop->screenCount();
+    bool customScreen = startupParams.screen != QnStartupParameters::kInvalidScreen
+        && startupParams.screen < desktop->screenCount();
     if (customScreen)
     {
+        NX_INFO(kMainWindow) << "Running application on a custom screen" << startupParams.screen;
         const auto windowHandle = mainWindow->windowHandle();
         if (windowHandle && (desktop->screenCount() > 0))
         {
@@ -178,14 +188,23 @@ int runApplication(QtSingleApplication* application, const QnStartupParameters& 
             qApp->processEvents();
 
             /* Set target screen for fullscreen mode. */
-            windowHandle->setScreen(QGuiApplication::screens().value(startupParams.screen, 0));
+            const auto screen = QGuiApplication::screens().value(startupParams.screen, 0);
+            NX_INFO(kMainWindow) << "Target screen geometry is" << screen->geometry();
+            windowHandle->setScreen(screen);
 
-            /* Set target position for the window when we set fullscreen off. */
-            QPoint screenDelta = mainWindow->pos() - desktop->screenGeometry(mainWindow.data()).topLeft();
-            QPoint targetPosition = desktop->screenGeometry(startupParams.screen).topLeft() + screenDelta;
+            // Set target position for the window when we set fullscreen off.
+            QPoint screenDelta = mainWindow->pos()
+                - desktop->screenGeometry(mainWindow.data()).topLeft();
+            NX_INFO(kMainWindow) << "Current display offset is" << screenDelta;
+
+            QPoint targetPosition = desktop->screenGeometry(startupParams.screen).topLeft()
+                + screenDelta;
+            NX_INFO(kMainWindow) << "Target top-left corner position is" << targetPosition;
+
             mainWindow->move(targetPosition);
         }
     }
+
     mainWindow->show();
     joystickManager->start();
     if (customScreen)
@@ -245,13 +264,14 @@ int main(int argc, char** argv)
     mac_setLimits();
 #endif
 
-#ifndef DISABLE_FESTIVAL
     std::unique_ptr<TextToWaveServer> textToWaveServer = std::make_unique<TextToWaveServer>(
         nx::utils::file_system::applicationDirPath(argc, argv));
 
     textToWaveServer->start();
     textToWaveServer->waitForStarted();
-#endif
+
+    // This attribute is needed to embed QQuickWidget into other QWidgets.
+    QApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 
     const QnStartupParameters startupParams = QnStartupParameters::fromCommandLineArg(argc, argv);
     if (startupParams.hiDpiDisabled)

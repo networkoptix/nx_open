@@ -40,6 +40,12 @@ public:
         /** Current locale. */
         LOCALE,
 
+        /** Enable profiler mode with some additional logs and vsync workaround disabled. */
+        PROFILER_MODE,
+
+        // Maximum simultaneous scene items overridden value. 0 means default.
+        MAX_SCENE_ITEMS_OVERRIDE,
+
         VARIABLE_COUNT
     };
 
@@ -51,7 +57,7 @@ public:
     /**
      * Actual maximum value of scene items.
      */
-    static int maxSceneItems();
+    int maxSceneItems() const;
 
 private:
     QN_BEGIN_PROPERTY_STORAGE(VARIABLE_COUNT)
@@ -65,6 +71,8 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,    ignoreVersionMismatch,  setIgnoreVersionMismatch,   IGNORE_VERSION_MISMATCH,    false)
         QN_DECLARE_RW_PROPERTY(bool,    isGlDoubleBuffer,       setGLDoubleBuffer,          GL_DOUBLE_BUFFER,           true)
         QN_DECLARE_RW_PROPERTY(QString, locale,                 setLocale,                  LOCALE,                     QString())
+        QN_DECLARE_RW_PROPERTY(bool,    isProfilerMode,         setProfilerMode,            PROFILER_MODE,              false)
+        QN_DECLARE_RW_PROPERTY(int,     maxSceneItemsOverride,  setMaxSceneItemsOverride,   MAX_SCENE_ITEMS_OVERRIDE,   0)
     QN_END_PROPERTY_STORAGE()
 
 };

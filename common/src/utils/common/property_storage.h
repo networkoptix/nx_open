@@ -31,11 +31,11 @@ private:
 /**
  * Storage of typed key-value pairs that supports value change notifications,
  * writing and reading to/from <tt>QSettings</tt> and updating from command line.
- * 
+ *
  * The typical usage is to derive from this class, create an enumeration
- * for ids of all properties, and then declare them using 
+ * for ids of all properties, and then declare them using
  * <tt>QN_DECLARE_R_PROPERTY</tt> and <tt>QN_DECLARE_RW_PROPERTY</tt> macros,
- * wrapped in a pair of <tt>QN_BEGIN_PROPERTY_STORAGE</tt> and 
+ * wrapped in a pair of <tt>QN_BEGIN_PROPERTY_STORAGE</tt> and
  * <tt>QN_END_PROPERTY_STORAGE</tt> invocations. These macros will generate
  * an <tt>init()</tt> function, that is then to be called from derived class's
  * constructor.
@@ -97,7 +97,7 @@ protected:
 
     virtual void updateValuesFromSettings(QSettings *settings, const QList<int> &ids);
     virtual void submitValuesToSettings(QSettings *settings, const QList<int> &ids) const;
-    virtual QVariant readValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue);
+    virtual QVariant readValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) const;
     virtual void writeValueToSettings(QSettings *settings, int id, const QVariant &value) const;
 
     virtual void updateValuesFromJson(const QJsonObject &json, const QList<int> &ids);

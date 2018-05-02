@@ -49,7 +49,7 @@
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation>Lỗi không rõ.</translation>
+      <translation>Lỗi không xác định.</translation>
     </message>
     <message>
       <source>Unexpected network error. Please check your Internet connection and try again.</source>
@@ -69,17 +69,17 @@
     </message>
     <message>
       <source>Internal %1 error. Please contact support team.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Lỗi nội bộ %1. Vui lòng liên hệ với nhóm hỗ trợ.</translation>
     </message>
     <message>
       <source>Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Xin lỗi, %1 Dịch vụ tạm thời không khả dụng. Chúng tôi đang cố gắng hết sức để khôi phục nó. Vui lòng thử lại sau.</translation>
     </message>
     <message>
       <source>Sorry, %1 Service could not process your request. Please try again in a few moments.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Xin lỗi, %1 dịch vụ không thể xử lý yêu cầu của bạn. Xin vui lòng thử lại sau ít phút.</translation>
     </message>
   </context>

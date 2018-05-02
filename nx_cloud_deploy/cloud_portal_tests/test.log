@@ -1,0 +1,235 @@
+[4mRunning "testportal:login:default" (testportal) task[24m
+
+[4mRunning "settestbrandingname:default" (settestbrandingname) task[24m
+
+[4mRunning "clean:server" (clean) task[24m
+[32m>> [39m0 paths cleaned.
+
+[4mRunning "copy:custom_css" (copy) task[24m
+
+
+[4mRunning "configureProxies:server" (configureProxies) task[24m
+Proxy created for: /gateway/ to cloud-test.hdw.mx:80
+Proxy created for: /api/ to cloud-test.hdw.mx:80
+Proxy created for: /notifications/ to cloud-test.hdw.mx:80
+
+[4mRunning "autoprefixer:dist" (autoprefixer) task[24m
+
+[4mRunning "protractor_webdriver:notkeepalive" (protractor_webdriver) task[24m
+[36mStarting[39m Selenium server
+[36mStarted[39m Selenium server: [32mhttp://localhost:4444[39m
+
+[4mRunning "shell:print_version" (shell) task[24m
+hg parent
+
+[4mRunning "protractor:login" (protractor) task[24m
+[17:41:41] I/launcher - Running 1 instances of WebDriver
+[17:41:41] I/hosted - Using the selenium server at http://localhost:4444/wd/hub
+[36mSession created: [39mcount=1, browserName=chrome, chromeOptions={args=[--test-type, --ignore-certificate-errors]}
+Started
+Running suite with 55
+
+Login dialog start
+
+
+Login dialog allows to log in with existing credentials and to log out
+[32m.[0m
+Login dialog can be opened in anonymous state
+
+Login dialog can be closed after clicking on background
+
+Login dialog redirects to Systems after login
+
+Login dialog ; after login, display user's email and menu in top right corner
+
+Login dialog should show error alert
+
+Login dialog should close on timeout
+
+Login dialog rejects log in with wrong email
+
+Login dialog allows log in with existing email in uppercase
+
+Login dialog rejects log in with wrong password
+
+Login dialog rejects log in without password
+
+Login dialog rejects log in without email but with password
+
+Login dialog rejects log in without both email and password
+
+Login dialog rejects log in with email in non-email format but with password
+
+Login dialog shows red outline if field is wrong/empty after blur
+
+Login dialog allows log in with 'Remember Me checkmark' switched off
+
+Login dialog contains 'I forgot password' link that leads to Restore Password page with pre-filled email from login form
+
+Login dialog passes email from email input to Restore password page, even without clicking 'Log in' button
+
+Login dialog rejects log in and shows error for inactivated user
+
+Login dialog should show error alert
+
+Login dialog should close on timeout
+
+Login dialog logs in with Remember Me checkmark switched on; after close browser, open browser enters same session
+
+Login dialog displays password masked
+
+Login dialog requires login, if the user has just logged out and pressed back button in browser
+
+Login dialog handles more than 256 symbols email and password
+
+Login dialog : logout refreshes page
+
+Login dialog allows copy-paste in input fields
+
+Login dialog should respond to Esc key and close dialog
+
+Login dialog should respond to Enter key and log in
+
+Login dialog should respond to Tab key
+
+Login dialog should respond to Space key and toggle checkbox
+
+Login dialog handles two tabs, updates second tab state if logout is done on first
+
+Login dialog handles two tabs, rejects navigation on second tab if logout is done on first
+
+Suite: Login dialog was finished
+
+Login dialog finish
+
+
+Login with incorrect credentials start
+
+
+Login with incorrect credentials works at registration page before submit
+
+Login with incorrect credentials works at registration page after submit success
+
+Login with incorrect credentials works at registration page after submit with alert error message
+
+Login with incorrect credentials works at registration page on account activation success
+
+Login with incorrect credentials works at registration page on account activation error
+
+Login with incorrect credentials works at restore password page with email input - before submit
+
+Login with incorrect credentials works at restore password page with email input - after submit error
+
+Login with incorrect credentials works at restore password page with email input - after submit success
+
+Login with incorrect credentials works at restore password page with password input - before submit
+
+Login with incorrect credentials works at restore password page with password input - after submit error
+
+Login with incorrect credentials works at restore password page with password input - after submit success
+
+Suite: Login with incorrect credentials was finished
+
+Login with incorrect credentials finish
+
+
+Login with correct credentials start
+
+
+Login with correct credentials works at registration page before submit
+
+Login with correct credentials works at registration page after submit success
+
+Login with correct credentials works at registration page after submit with alert error message
+
+Login with correct credentials works at registration page on account activation success
+
+Login with correct credentials works at registration page on account activation error
+
+Login with correct credentials works at restore password page with email input - before submit
+
+Login with correct credentials works at restore password page with email input - after submit error
+
+Login with correct credentials works at restore password page with email input - after submit success
+
+Login with correct credentials works at restore password page with password input - before submit
+
+Login with correct credentials works at restore password page with password input - after submit error
+
+Login with correct credentials works at restore password page with password input - after submit success
+
+Suite: Login with correct credentials was finished
+
+Login with correct credentials finish
+
+
+
+
+Ran 1 of 55 specs
+1 spec, 0 failures
+Finished in 15.331 seconds
+
+[36mSession deleted: [39mGoing to shut down the Selenium server
+[36mShutting down[39m Selenium server: http://localhost:4444
+[36mShut down[39m Selenium server: http://localhost:4444 ([31m<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" type="text/css" href="/assets/displayhelpservlet.css" media="all"/>
+  <link href="/assets/favicon.ico" rel="icon" type="image/x-icon" />
+  <script src="/assets/jquery-3.1.1.min.js" type="text/javascript"></script>
+  <script src="/assets/displayhelpservlet.js" type="text/javascript"></script>
+  <script type="text/javascript">
+    var json = Object.freeze('{"version":"3.4.0","type":"Standalone","consoleLink":"/wd/hub"}');
+  </script>
+</head>
+<body>
+
+<div id="content">
+  <div id="help-heading">
+    <h1><span id="logo"></span></h1>
+    <h2>Selenium <span class="se-type"></span>&nbsp;v.<span class="se-version"></span></h2>
+  </div>
+
+  <div id="content-body">
+    <p>
+      Whoops! The URL specified routes to this help page.
+    </p>
+    <p>
+      For more information about Selenium <span class="se-type"></span> please see the
+      <a class="se-docs">docs</a> and/or visit the <a class="se-wiki">wiki</a>.
+      <span id="console-item">
+        Or perhaps you are looking for the Selenium <span class="se-type"></span> <a class="se-console">console</a>.
+      </span>
+    </p>
+    <p>
+      Happy Testing!
+    </p>
+  </div>
+
+  <div>
+    <footer id="help-footer">
+      Selenium is made possible through the efforts of our open source community, contributions from
+      these <a href="https://github.com/SeleniumHQ/selenium/blob/master/AUTHORS">people</a>, and our
+      <a href="http://www.seleniumhq.org/sponsors/">sponsors</a>.
+   </footer>
+  </div>
+ </div>
+
+</body>
+</html>[39m)
+[17:41:59] I/launcher - 0 instance(s) of WebDriver still running
+[17:41:59] I/launcher - chrome #01 passed
+
+[4mRunning "clean:server" (clean) task[24m
+[32m>> [39m0 paths cleaned.
+
+[32mDone.[39m
+
+
+[4mExecution Time[24m[90m (2017-08-08 17:41:39 UTC-0)[39m
+protractor_we...notkeepalive   [34m1.2s[39m  [34m▇▇ 6%[39m
+protractor:login              [34m18.8s[39m  [34m▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 94%[39m
+[35mTotal 20.1s[39m
+
+Command return code: 0

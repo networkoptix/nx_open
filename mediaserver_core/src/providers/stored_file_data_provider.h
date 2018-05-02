@@ -1,7 +1,7 @@
 #pragma once
 #include <nx/streaming/abstract_stream_data_provider.h>
-#include <plugins/storage/memory/ext_iodevice_storage.h>
-#include <plugins/resource/avi/avi_archive_delegate.h>
+#include <core/storage/memory/ext_iodevice_storage.h>
+#include <core/resource/avi/avi_archive_delegate.h>
 #include <QtCore/QBuffer>
 #include <nx_ec/ec_api_fwd.h>
 

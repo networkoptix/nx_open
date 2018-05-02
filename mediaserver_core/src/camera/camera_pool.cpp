@@ -1,18 +1,16 @@
 #include "camera_pool.h"
 
-#include "video_camera.h"
-
 #include <nx/utils/std/cpp14.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#ifdef Q_OS_WIN
-#   include "plugins/storage/dts/vmax480/vmax480_stream_fetcher.h"
+#if defined(Q_OS_WIN)
+    #include "plugins/storage/dts/vmax480/vmax480_stream_fetcher.h"
 #endif
 
-#include <utils/common/app_info.h>
+#include "video_camera.h"
 
 //-------------------------------------------------------------------------------------------------
 // VideoCameraLocker
@@ -30,21 +28,24 @@ VideoCameraLocker::~VideoCameraLocker()
 //-------------------------------------------------------------------------------------------------
 // QnVideoCameraPool
 
-
 void QnVideoCameraPool::stop()
 {
     for( const QnVideoCameraPtr& camera: m_cameras.values())
         camera->beforeStop();
 
-#if defined(Q_OS_WIN) && defined(ENABLE_VMAX)
-        VMaxStreamFetcher::pleaseStopAll(); // increase stop time
-#endif
+    #if defined(Q_OS_WIN) && defined(ENABLE_VMAX)
+        VMaxStreamFetcher::pleaseStopAll(); //< increase stop time
+    #endif
 
     m_cameras.clear();
 }
 
-QnVideoCameraPool::QnVideoCameraPool(QnCommonModule* commonModule):
-    QnCommonModuleAware(commonModule)
+QnVideoCameraPool::QnVideoCameraPool(
+    const MSSettings& settings,
+    QnResourcePool* resourcePool)
+    :
+    m_settings(settings),
+    m_resourcePool(resourcePool)
 {
 }
 
@@ -74,7 +75,16 @@ QnVideoCameraPtr QnVideoCameraPool::addVideoCamera(const QnResourcePtr& res)
     if (!dynamic_cast<const QnSecurityCamResource*>(res.data()))
         return QnVideoCameraPtr();
     QnMutexLocker lock(&m_mutex);
-    return m_cameras.insert(res, QnVideoCameraPtr(new QnVideoCamera(res))).value();
+    return m_cameras.insert(res, QnVideoCameraPtr(new QnVideoCamera(m_settings, res))).value();
+}
+
+bool QnVideoCameraPool::addVideoCamera(const QnResourcePtr& res, QnVideoCameraPtr camera)
+{
+    if (!dynamic_cast<const QnSecurityCamResource*>(res.data()))
+        return false;
+    QnMutexLocker lock(&m_mutex);
+    m_cameras.insert(res, camera);
+    return true;
 }
 
 void QnVideoCameraPool::removeVideoCamera(const QnResourcePtr& res)
@@ -86,7 +96,7 @@ void QnVideoCameraPool::removeVideoCamera(const QnResourcePtr& res)
 std::unique_ptr<VideoCameraLocker>
     QnVideoCameraPool::getVideoCameraLockerByResourceId(const QnUuid& id) const
 {
-    QnResourcePtr resource = resourcePool()->getResourceById(id);
+    QnResourcePtr resource = m_resourcePool->getResourceById(id);
     if (!resource)
         return nullptr;
 
