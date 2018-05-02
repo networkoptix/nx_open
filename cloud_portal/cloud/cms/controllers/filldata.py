@@ -35,13 +35,21 @@ def target_file(file_name, customization, language_code, preview):
 
 
 def process_context_structure(customization, context, content,
-                              language, version_id, preview):
+                              language, version_id, preview, force_global_files):
     for datastructure in context.datastructure_set.order_by('order').all():
         content_value = datastructure.find_actual_value(customization, language, version_id)
         # replace marker with value
         if datastructure.type not in (DataStructure.DATA_TYPES.image, DataStructure.DATA_TYPES.file):
             content = content.replace(datastructure.name, content_value)
         elif content_value or datastructure.optional:
+            if context.is_global and not force_global_files:
+                # do not update files from global contexts all the time
+                continue
+
+            if not datastructure.translatable and language != customization.default_language:
+                # if file itself is not translatable - update it only for default language
+                continue
+
             image_storage = os.path.join('static', customization.name)
             if preview:
                 image_storage = os.path.join(image_storage, 'preview')
@@ -50,6 +58,7 @@ def process_context_structure(customization, context, content,
             if language:
                 file_name = file_name.replace("{{language}}", language.code)
 
+            # print "Save file from DB: " + file_name, context, language, context.is_global
             save_b64_to_file(content_value, file_name, image_storage)
     return content
 
@@ -65,11 +74,12 @@ def process_context(context, language_code, customization, preview, version_id, 
     context_template_text = context.template_for_language(language)
     if not context_template_text:
         context_template_text = ''
-    content = process_context_structure(customization, context, context_template_text, language, version_id, preview)
+    content = process_context_structure(customization, context, context_template_text, language,
+                                        version_id, preview, context.is_global)  # if context is global - process it
     if not context.is_global:  # if current context is global - do not apply other contexts
         for global_context in global_contexts.all():
             content = process_context_structure(
-                customization, global_context, content, None, version_id, preview)
+                customization, global_context, content, None, version_id, preview, False)
 
     return content
 
@@ -117,6 +127,7 @@ def save_context(context, context_path, language_code, customization, preview, v
     language = Language.by_code(language_code, customization.default_language)
     if context.template_for_language(language):  # if we have template - save context to file
         target_file_name = target_file(context_path, customization, language_code, preview)
+        # print "save file: " + target_file_name
         save_content(target_file_name, content)
 
 
