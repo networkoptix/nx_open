@@ -19,6 +19,9 @@ let GeneralModalContent = class GeneralModalContent {
     constructor(activeModal) {
         this.activeModal = activeModal;
     }
+    ngOnInit() {
+        this.buttonClass = this.buttonClass || '';
+    }
     ok() {
         this.activeModal.close('OK');
     }
@@ -71,8 +74,6 @@ GeneralModalContent = __decorate([
         selector: 'nx-modal-general-content',
         templateUrl: 'general.component.html',
         styleUrls: []
-        // TODO: later
-        // templateUrl: this.CONFIG.viewsDir + 'components/dialog.html'
     }),
     __metadata("design:paramtypes", [ng_bootstrap_1.NgbActiveModal])
 ], GeneralModalContent);

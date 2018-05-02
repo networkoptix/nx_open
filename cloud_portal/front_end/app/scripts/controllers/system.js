@@ -183,7 +183,7 @@ angular.module('cloudApp')
                 $scope.locked[ user.email ] = true;
                 dialogs
                     .confirm(L.system.confirmUnshare, L.system.confirmUnshareTitle,
-                        L.system.confirmUnshareAction, 'danger',
+                        L.system.confirmUnshareAction, 'btn-danger',
                         L.dialogs.cancelButton)
                     .result
                     .then(function (result) {

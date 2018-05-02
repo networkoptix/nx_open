@@ -7,10 +7,8 @@ import {EmailValidator} from '@angular/forms';
     selector: 'nx-modal-general-content',
     templateUrl: 'general.component.html',
     styleUrls: []
-    // TODO: later
-    // templateUrl: this.CONFIG.viewsDir + 'components/dialog.html'
 })
-export class GeneralModalContent {
+export class GeneralModalContent implements OnInit {
     @Input() language;
     @Input() message;
     @Input() title;
@@ -23,6 +21,10 @@ export class GeneralModalContent {
     @Input() closable;
 
     constructor(public activeModal: NgbActiveModal) {
+    }
+
+    ngOnInit() {
+        this.buttonClass = this.buttonClass || '';
     }
 
     ok() {
@@ -49,8 +51,8 @@ export class NxModalGeneralComponent implements OnInit {
                 private modalService: NgbModal) {
     }
 
-    private dialog(message, title, actionLabel, actionType, cancelLabel,
-                   hasFooter, cancellable, closable, params?) {
+    private dialog(message, title, actionLabel, actionType?, cancelLabel?,
+                   hasFooter?, cancellable?, closable?, params?) {
         this.modalRef = this.modalService.open(GeneralModalContent);
         this.modalRef.componentInstance.language = this.language.lang;
 
@@ -68,8 +70,10 @@ export class NxModalGeneralComponent implements OnInit {
         return this.modalRef;
     }
 
-    openConfirm(message, title, actionLabel, actionType, cancelLabel) {
-        return this.dialog(message, title, actionLabel, actionType, cancelLabel,
+    openConfirm(message, title, actionLabel, actionType?, cancelLabel?) {
+        return this.dialog(message, title, actionLabel,
+            actionType,
+            cancelLabel,
             true,
             false,
             false);
