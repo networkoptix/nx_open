@@ -19,6 +19,12 @@ let GeneralModalContent = class GeneralModalContent {
     constructor(activeModal) {
         this.activeModal = activeModal;
     }
+    ok() {
+        this.activeModal.close('OK');
+    }
+    close(result) {
+        this.activeModal.close(result || 'CLOSE');
+    }
 };
 __decorate([
     core_1.Input(),
@@ -79,7 +85,7 @@ let NxModalGeneralComponent = class NxModalGeneralComponent {
     }
     dialog(message, title, actionLabel, actionType, cancelLabel, hasFooter, cancellable, closable, params) {
         this.modalRef = this.modalService.open(GeneralModalContent);
-        this.modalRef.componentInstance.language = this.language;
+        this.modalRef.componentInstance.language = this.language.lang;
         this.modalRef.componentInstance.message = message;
         this.modalRef.componentInstance.title = title;
         this.modalRef.componentInstance.actionLabel = actionLabel;
@@ -96,9 +102,6 @@ let NxModalGeneralComponent = class NxModalGeneralComponent {
     }
     openAlert(message, title) {
         return this.dialog(message, title, this.language.lang.dialogs.okButton, null, this.language.lang.dialogs.cancelButton, true, true, true);
-    }
-    close() {
-        this.modalRef.close();
     }
     ngOnInit() {
     }

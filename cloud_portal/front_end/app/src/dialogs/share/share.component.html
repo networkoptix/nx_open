@@ -26,10 +26,9 @@
         <div class="form-group">
             <label for="role" translate>Permissions</label>
 
-            <select class="form-control" name="role" id="role"
-                    [(ngModel)]="user.role"
-                    (ngModelChange)="onChange($event)"
-                    ng-options="option as ($root.L.accessRoles[option.name].label || option.name) for option in accessRoles">
+            <select class="form-control"
+                    name="role" id="role"
+                    [(ngModel)]="user.role">
                 <option *ngFor="let option of accessRoles" [ngValue]="option.optionLabel"> {{option.optionLabel}}</option>
             </select>
 

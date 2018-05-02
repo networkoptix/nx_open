@@ -24,6 +24,14 @@ export class GeneralModalContent {
 
     constructor(public activeModal: NgbActiveModal) {
     }
+
+    ok() {
+        this.activeModal.close('OK');
+    }
+
+    close(result?) {
+        this.activeModal.close(result || 'CLOSE');
+    }
 }
 
 @Component({
@@ -44,7 +52,7 @@ export class NxModalGeneralComponent implements OnInit {
     private dialog(message, title, actionLabel, actionType, cancelLabel,
                    hasFooter, cancellable, closable, params?) {
         this.modalRef = this.modalService.open(GeneralModalContent);
-        this.modalRef.componentInstance.language = this.language;
+        this.modalRef.componentInstance.language = this.language.lang;
 
         this.modalRef.componentInstance.message = message;
         this.modalRef.componentInstance.title = title;
@@ -76,10 +84,6 @@ export class NxModalGeneralComponent implements OnInit {
             true,
             true);
 
-    }
-
-    close() {
-        this.modalRef.close();
     }
 
     ngOnInit() {

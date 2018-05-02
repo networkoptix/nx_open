@@ -182,24 +182,28 @@ angular.module('cloudApp')
                 }
                 $scope.locked[ user.email ] = true;
                 dialogs
-                    .confirm(L.system.confirmUnshare, L.system.confirmUnshareTitle, L.system.confirmUnshareAction, 'danger')
+                    .confirm(L.system.confirmUnshare, L.system.confirmUnshareTitle,
+                        L.system.confirmUnshareAction, 'danger',
+                        L.dialogs.cancelButton)
                     .result
-                    .then(function () {
-                        // Run a process of sharing
-                        $poll.cancel(pollingSystemUpdate);
-                        $scope.unsharing = process.init(function () {
-                            return $scope.system.deleteUser(user);
-                        }, {
-                            successMessage: L.system.permissionsRemoved.replace('{{email}}', user.email),
-                            errorPrefix   : L.errorCodes.cantSharePrefix
-                        }).then(function () {
-                            $scope.locked[ user.email ] = false;
-                            $scope.system.getUsers();
-                            delayedUpdateSystemInfo();
-                        }, function () {
-                            $scope.locked[ user.email ] = false;
-                        });
-                        $scope.unsharing.run();
+                    .then(function (result) {
+                        if ('OK' === result) {
+                            // Run a process of sharing
+                            $poll.cancel(pollingSystemUpdate);
+                            $scope.unsharing = process.init(function () {
+                                return $scope.system.deleteUser(user);
+                            }, {
+                                successMessage: L.system.permissionsRemoved.replace('{{email}}', user.email),
+                                errorPrefix   : L.errorCodes.cantSharePrefix
+                            }).then(function () {
+                                $scope.locked[ user.email ] = false;
+                                $scope.system.getUsers();
+                                delayedUpdateSystemInfo();
+                            }, function () {
+                                $scope.locked[ user.email ] = false;
+                            });
+                            $scope.unsharing.run();
+                        }
                     }, function () {
                         $scope.locked[ user.email ] = false;
                         $scope.system.getUsers();
