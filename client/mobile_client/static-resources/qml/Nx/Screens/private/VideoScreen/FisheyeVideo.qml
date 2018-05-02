@@ -330,6 +330,7 @@ Item
             property real pressX
             property real pressY
             property bool acceptClick
+            property point lastClickPosition
 
             readonly property real pixelRadius: Math.min(width, height) / 2.0
             readonly property vector2d pixelCenter: Qt.vector2d(width, height).times(0.5)
@@ -366,6 +367,13 @@ Item
 
             onDoubleClicked:
             {
+                var distance = Qt.vector2d(
+                    lastClickPosition.x - mouse.x,
+                    lastClickPosition.y - mouse.y).length()
+
+                if (distance > drag.threshold)
+                    return
+
                 clickFilterTimer.stop()
                 scalePowerAnimationBehavior.enabled = true
 
@@ -394,6 +402,7 @@ Item
 
             onClicked:
             {
+                lastClickPosition = Qt.point(mouse.x, mouse.y)
                 if (acceptClick)
                     clickFilterTimer.restart()
             }
