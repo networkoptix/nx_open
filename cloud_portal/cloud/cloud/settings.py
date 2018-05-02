@@ -35,7 +35,7 @@ if not CUSTOMIZATION:
 SECRET_KEY = '03-b9bxxpjxsga(qln0@3szw3+xnu%6ph_l*sz-xr_4^xxrj!_'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = 'debug' in conf and conf['debug']
+DEBUG = 'debug' in conf and conf['debug'] or LOCAL_ENVIRONMENT
 
 ALLOWED_HOSTS = ['*']
 
@@ -163,7 +163,7 @@ CACHES = {
 PRIMARY_PRODUCT = "cloud_portal"
 
 if LOCAL_ENVIRONMENT:
-    conf["cloud_db"]["url"] = 'https://cloud-dev.hdw.mx/cdb'
+    conf["cloud_db"]["url"] = 'https://cloud-dev2.hdw.mx/cdb'
     CACHES["global"] = {
         'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
         'LOCATION': 'portal_cache',
