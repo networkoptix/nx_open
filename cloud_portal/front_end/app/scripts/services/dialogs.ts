@@ -138,7 +138,7 @@
                         //         redirect: !keepPage
                         //     }}).result;
                     },
-                    share: function (system, user) {
+                    share: function (system?, user?) {
                         return nxDialogsService.share(system, user);
 
                         // var url = 'share';

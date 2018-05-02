@@ -47,7 +47,7 @@ export class nxDialogsService {
         return this.loginModal.open(keepPage);
     }
 
-    share(system, user) {
+    share(system?, user?) {
         return this.shareModal.open(system, user);
     }
 

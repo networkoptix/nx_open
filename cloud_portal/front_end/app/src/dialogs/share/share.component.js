@@ -24,14 +24,13 @@ let ShareModalContent = class ShareModalContent {
         this.toast = toast;
         this.generalModal = generalModal;
         this.url = 'share';
-        this.title = (!this.user) ? this.language.sharing.shareTitle : this.language.sharing.editShareTitle;
     }
     processAccessRoles() {
         const roles = this.system.accessRoles || this.configService.accessRoles.predefinedRoles;
         this.accessRoles = roles.filter((role) => {
             if (!(role.isOwner || role.isAdmin && !this.system.isMine)) {
-                role.optionLabel = this.language.accessRoles[role.option.name].label || role.option.name;
-                return;
+                role.optionLabel = this.language.accessRoles[role.name].label || role.name;
+                return role;
             }
             return false;
         });
@@ -63,8 +62,10 @@ let ShareModalContent = class ShareModalContent {
         return this.language.accessRoles.customRole.description;
     }
     ngOnInit() {
+        this.title = (!this.user) ? this.language.sharing.shareTitle : this.language.sharing.editShareTitle;
         this.buttonText = this.language.sharing.shareConfirmButton;
         this.isNewShare = !this.user;
+        this.user = (this.user) ? Object.assign({}, this.user) : { email: '', isEnabled: true };
         if (!this.isNewShare) {
             this.account
                 .get()
@@ -136,7 +137,7 @@ let NxModalShareComponent = class NxModalShareComponent {
     }
     dialog(system, user) {
         this.modalRef = this.modalService.open(ShareModalContent);
-        this.modalRef.componentInstance.language = this.language;
+        this.modalRef.componentInstance.language = this.language.lang;
         this.modalRef.componentInstance.system = system;
         this.modalRef.componentInstance.user = user;
         return this.modalRef;

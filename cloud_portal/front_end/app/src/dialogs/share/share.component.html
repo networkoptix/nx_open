@@ -14,7 +14,7 @@
 
             <input [hidden]="!isNewShare" type="email"
                    class="form-control"
-                   [(ngModel)]="userInfo.email"
+                   [(ngModel)]="user.email"
                    id="email"
                    name="email"
                    validate-email maxlength="255"
@@ -27,10 +27,10 @@
             <label for="role" translate>Permissions</label>
 
             <select class="form-control" name="role" id="role"
-                    [(ngModel)]="userInfo.role"
+                    [(ngModel)]="user.role"
                     (ngModelChange)="onChange($event)"
                     ng-options="option as ($root.L.accessRoles[option.name].label || option.name) for option in accessRoles">
-                <option *ngFor="let optionLabel of accessRoles" [ngValue]="option"> {{option}}</option>
+                <option *ngFor="let option of accessRoles" [ngValue]="option.optionLabel"> {{option.optionLabel}}</option>
             </select>
 
             <span class="help-block">

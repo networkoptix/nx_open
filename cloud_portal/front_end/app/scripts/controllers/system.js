@@ -9,7 +9,6 @@ angular.module('cloudApp')
             var systemId = $routeParams.systemId;
             $scope.debugMode = Config.allowDebugMode;
 
-
             authorizationCheckService.requireLogin().then(function (account) {
                 $scope.account = account;
                 $scope.system = system(systemId, account.email);
@@ -156,6 +155,7 @@ angular.module('cloudApp')
                     .result
                     .then(loadUsers);
             };
+
             $scope.locked = {};
             $scope.editShare = function (user) {
                 //Pass user inside

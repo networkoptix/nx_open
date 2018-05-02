@@ -25,7 +25,7 @@ export class RenameModalContent {
         this.rename = this.process.init(() => {
             return this.cloudApi.renameSystem(this.systemId, this.systemName);
         }, {
-            successMessage: this.language.lang.system.successRename
+            successMessage: this.language.system.successRename
         }).then(() => {
             this.activeModal.close(this.systemName);
         });
@@ -52,7 +52,7 @@ export class NxModalRenameComponent implements OnInit {
 
     private dialog(systemId, systemName) {
         this.modalRef = this.modalService.open(RenameModalContent);
-        this.modalRef.componentInstance.language = this.language;
+        this.modalRef.componentInstance.language = this.language.lang;
         this.modalRef.componentInstance.systemId = systemId;
         this.modalRef.componentInstance.systemName = systemName;
 

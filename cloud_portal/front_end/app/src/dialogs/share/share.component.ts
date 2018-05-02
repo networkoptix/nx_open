@@ -29,15 +29,14 @@ export class ShareModalContent {
                 private generalModal: NxModalGeneralComponent,) {
 
         this.url = 'share';
-        this.title = (!this.user) ? this.language.sharing.shareTitle : this.language.sharing.editShareTitle;
     }
 
     processAccessRoles() {
         const roles = this.system.accessRoles || this.configService.accessRoles.predefinedRoles;
         this.accessRoles = roles.filter((role) => {
             if (!(role.isOwner || role.isAdmin && !this.system.isMine)) {
-                role.optionLabel = this.language.accessRoles[role.option.name].label || role.option.name;
-                return;
+                role.optionLabel = this.language.accessRoles[role.name].label || role.name;
+                return role;
             }
 
             return false;
@@ -76,8 +75,11 @@ export class ShareModalContent {
     }
 
     ngOnInit() {
+        this.title = (!this.user) ? this.language.sharing.shareTitle : this.language.sharing.editShareTitle;
         this.buttonText = this.language.sharing.shareConfirmButton;
         this.isNewShare = !this.user;
+
+        this.user = (this.user) ? {...this.user} : {email:'', isEnabled: true};
 
         if (!this.isNewShare) {
             this.account
@@ -139,16 +141,16 @@ export class NxModalShareComponent implements OnInit {
                 private modalService: NgbModal) {
     }
 
-    private dialog(system, user) {
+    private dialog(system?, user?) {
         this.modalRef = this.modalService.open(ShareModalContent);
-        this.modalRef.componentInstance.language = this.language;
+        this.modalRef.componentInstance.language = this.language.lang;
         this.modalRef.componentInstance.system = system;
         this.modalRef.componentInstance.user = user;
 
         return this.modalRef;
     }
 
-    open(system, user) {
+    open(system?, user?) {
         return this.dialog(system, user);
     }
 
