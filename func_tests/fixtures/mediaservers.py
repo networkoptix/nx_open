@@ -5,8 +5,8 @@ from framework.merging import merge_systems, setup_local_system
 
 
 @pytest.fixture()
-def mediaserver_factory(artifact_factory, mediaserver_deb, ca, cloud_host):
-    return MediaserverFactory(artifact_factory, mediaserver_deb, ca, cloud_host)
+def mediaserver_factory(artifact_factory, mediaserver_deb, ca):
+    return MediaserverFactory(artifact_factory, mediaserver_deb, ca)
 
 
 @pytest.fixture()

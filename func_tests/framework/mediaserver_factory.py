@@ -105,17 +105,15 @@ def collect_artifacts_from_mediaserver(mediaserver, root_artifact_factory):
 
 
 class MediaserverFactory(object):
-    def __init__(self, artifact_factory, mediaserver_deb, ca, cloud_host):
+    def __init__(self, artifact_factory, mediaserver_deb, ca):
         self._artifact_factory = artifact_factory
         self._allocated_servers = []
         self._ca = ca
         self._mediaserver_deb = mediaserver_deb
-        self._cloud_host = cloud_host
 
     @contextmanager
     def allocated_mediaserver(self, name, vm):
         mediaserver = setup_clean_mediaserver(name, vm, self._mediaserver_deb, self._ca)
-        mediaserver.installation.patch_binary_set_cloud_host(self._cloud_host)  # TODO: Call this in appropriate place.
         yield mediaserver
         examine_mediaserver(mediaserver)
         collect_artifacts_from_mediaserver(mediaserver, self._artifact_factory)
