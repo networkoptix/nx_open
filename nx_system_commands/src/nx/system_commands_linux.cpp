@@ -278,7 +278,7 @@ SystemCommands::MountCode SystemCommands::mount(
 SystemCommands::UnmountCode SystemCommands::unmount(
     const std::string& directory, bool reportViaSocket, int socketPostfix)
 {
-    UnmountCode result;
+    UnmountCode result = UnmountCode::noPermissions;
 
     if (!checkMountPermissions(directory))
     {
