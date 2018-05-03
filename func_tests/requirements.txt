@@ -20,4 +20,3 @@ pywinrm==0.3.0
 xmltodict==0.11.0
 cryptography==2.2.2
 pysmb==1.1.22
-pytest-lazy-fixture==0.4.0
