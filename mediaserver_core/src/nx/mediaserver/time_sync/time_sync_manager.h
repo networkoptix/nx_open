@@ -6,6 +6,7 @@
 #include <network/router.h>
 #include <nx/network/abstract_socket.h>
 #include <nx/mediaserver/server_module_aware.h>
+#include <nx/network/time/mean_time_fetcher.h>
 
 class AbstractSystemClock
 {
@@ -59,15 +60,27 @@ signals:
     /** Emitted when synchronized time has been changed. */
     void timeChanged(qint64 syncTime);
 private:
+    void loadTimeFromInternet();
+    void loadTimeFromLocalClock();
+    void loadTimeFromServer(const QnRoute& route);
+
     void doPeriodicTasks();
     QnMediaServerResourcePtr getPrimaryTimeServer();
-    void updateTimeFromInternet();
-    void loadTimeFromServer(const QnRoute& route);
     std::unique_ptr<nx::network::AbstractStreamSocket> connectToRemoteHost(const QnRoute& route);
+    void initializeTimeFetcher();
+
+    void setTime(std::chrono::milliseconds value);
+    std::chrono::milliseconds getTime() const;
 private:
-    qint64 m_synchronizedTimeMs = 0;
+    std::unique_ptr<AbstractAccurateTimeFetcher> m_internetTimeSynchronizer;
+    std::atomic<bool> m_internetSyncInProgress;
+
+    std::chrono::milliseconds m_synchronizedTime{0};
+    std::chrono::milliseconds m_synchronizedOnClock{0};
+
     std::shared_ptr<AbstractSystemClock> m_systemClock;
     std::shared_ptr<AbstractSteadyClock> m_steadyClock;
+    mutable QnMutex m_mutex;
 };
 
 } // namespace time_sync
