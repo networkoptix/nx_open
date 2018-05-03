@@ -121,7 +121,7 @@ let NxModalMergeComponent = class NxModalMergeComponent {
         this.modalService = modalService;
     }
     dialog(system) {
-        this.modalRef = this.modalService.open(MergeModalContent);
+        this.modalRef = this.modalService.open(MergeModalContent, { backdrop: 'static' });
         this.modalRef.componentInstance.language = this.language;
         this.modalRef.componentInstance.system = system;
         this.modalRef.componentInstance.closable = true;

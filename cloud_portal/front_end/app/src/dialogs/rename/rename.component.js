@@ -66,7 +66,7 @@ let NxModalRenameComponent = class NxModalRenameComponent {
         this.modalService = modalService;
     }
     dialog(systemId, systemName) {
-        this.modalRef = this.modalService.open(RenameModalContent);
+        this.modalRef = this.modalService.open(RenameModalContent, { backdrop: 'static' });
         this.modalRef.componentInstance.language = this.language.lang;
         this.modalRef.componentInstance.systemId = systemId;
         this.modalRef.componentInstance.systemName = systemName;

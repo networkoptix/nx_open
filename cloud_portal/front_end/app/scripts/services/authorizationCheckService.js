@@ -14,6 +14,7 @@
         let service = {
             get: get,
             login: login,
+            logout: logout,
             requireLogin: requireLogin,
             redirectAuthorised: redirectAuthorised,
             redirectToHome: redirectToHome,
@@ -35,7 +36,7 @@
                     let index = auth.indexOf(':');
                     let tempLogin = auth.substring(0, index);
                     let tempPassword = auth.substring(index + 1);
-                    requestingLogin = service.login(tempLogin, tempPassword, false)
+                    requestingLogin = login(tempLogin, tempPassword, false)
                         .then(() => {
                         $location.search('auth', null);
                     }, () => {
@@ -59,7 +60,7 @@
             });
         }
         function login(email, password, remember) {
-            this.setEmail(email);
+            setEmail(email);
             return cloudApi
                 .login(email, password, remember)
                 .then((result) => {
@@ -67,41 +68,59 @@
                     return $q.reject(result);
                 }
                 if (result.data.email) { // (result.data.resultCode === L.errorCodes.ok)
-                    this.setEmail(result.data.email);
+                    setEmail(result.data.email);
                     $rootScope.session.loginState = result.data.email; //Forcing changing loginState to reload interface
                 }
                 return result;
             });
         }
+        function logout(doNotRedirect) {
+            cloudApi
+                .logout()
+                .finally(function () {
+                $rootScope.session.$reset(); // Clear session
+                if (!doNotRedirect) {
+                    $location.path(CONFIG.redirectUnauthorised);
+                }
+                setTimeout(function () {
+                    document.location.reload();
+                });
+            });
+        }
+        function setEmail(email) {
+            $rootScope.session.email = email;
+        }
         function requireLogin() {
-            return this.get()
-                .catch(() => {
+            return get().catch(() => {
                 nxDialogsService.login(true);
                 $location.path(CONFIG.redirectUnauthorised);
             });
         }
         function redirectAuthorised() {
-            this.get()
-                .then(() => {
+            get().then(() => {
                 $location.path(CONFIG.redirectAuthorised);
             });
         }
         function redirectToHome() {
-            this.get()
-                .then(() => {
+            get().then(() => {
                 $location.path(CONFIG.redirectAuthorised);
             }, () => {
                 $location.path(CONFIG.redirectUnauthorised);
             });
         }
         function logoutAuthorised() {
-            this.get()
-                .then(() => {
+            get().then(() => {
                 // logoutAuthorisedLogoutButton
-                nxDialogsService.confirm(null /*L.dialogs.logoutAuthorisedText*/, languageService.lang.dialogs.logoutAuthorisedTitle, languageService.lang.dialogs.logoutAuthorisedContinueButton, null, languageService.lang.dialogs.logoutAuthorisedLogoutButton).then(() => {
-                    redirectAuthorised();
-                }, () => {
-                    this.logout(true);
+                nxDialogsService
+                    .confirm(languageService.lang.dialogs.logoutAuthorisedText, languageService.lang.dialogs.logoutAuthorisedTitle, languageService.lang.dialogs.logoutAuthorisedContinueButton, 'btn-primary', languageService.lang.dialogs.logoutAuthorisedLogoutButton)
+                    .result
+                    .then((result) => {
+                    if ('OK' === result) {
+                        redirectAuthorised();
+                    }
+                    else {
+                        logout(true);
+                    }
                 });
             });
         }

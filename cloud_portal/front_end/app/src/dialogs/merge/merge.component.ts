@@ -114,7 +114,7 @@ export class NxModalMergeComponent implements OnInit {
     }
 
     private dialog(system) {
-        this.modalRef = this.modalService.open(MergeModalContent);
+        this.modalRef = this.modalService.open(MergeModalContent, {backdrop: 'static'});
         this.modalRef.componentInstance.language = this.language;
         this.modalRef.componentInstance.system = system;
         this.modalRef.componentInstance.closable = true;

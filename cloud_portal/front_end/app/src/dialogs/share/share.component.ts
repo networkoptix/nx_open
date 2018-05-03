@@ -12,6 +12,7 @@ export class ShareModalContent {
     @Input() language;
     @Input() system;
     @Input() user;
+    @Input() closable;
 
     title: string;
     sharing: any;
@@ -142,10 +143,11 @@ export class NxModalShareComponent implements OnInit {
     }
 
     private dialog(system?, user?) {
-        this.modalRef = this.modalService.open(ShareModalContent);
+        this.modalRef = this.modalService.open(ShareModalContent, {backdrop: 'static'});
         this.modalRef.componentInstance.language = this.language.lang;
         this.modalRef.componentInstance.system = system;
         this.modalRef.componentInstance.user = user;
+        this.modalRef.componentInstance.closable = true;
 
         return this.modalRef;
     }

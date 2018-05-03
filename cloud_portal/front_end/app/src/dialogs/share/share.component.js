@@ -117,6 +117,10 @@ __decorate([
     core_1.Input(),
     __metadata("design:type", Object)
 ], ShareModalContent.prototype, "user", void 0);
+__decorate([
+    core_1.Input(),
+    __metadata("design:type", Object)
+], ShareModalContent.prototype, "closable", void 0);
 ShareModalContent = __decorate([
     core_1.Component({
         selector: 'nx-modal-share-content',
@@ -136,10 +140,11 @@ let NxModalShareComponent = class NxModalShareComponent {
         this.modalService = modalService;
     }
     dialog(system, user) {
-        this.modalRef = this.modalService.open(ShareModalContent);
+        this.modalRef = this.modalService.open(ShareModalContent, { backdrop: 'static' });
         this.modalRef.componentInstance.language = this.language.lang;
         this.modalRef.componentInstance.system = system;
         this.modalRef.componentInstance.user = user;
+        this.modalRef.componentInstance.closable = true;
         return this.modalRef;
     }
     open(system, user) {

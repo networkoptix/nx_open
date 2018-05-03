@@ -25,6 +25,7 @@ export class GeneralModalContent implements OnInit {
 
     ngOnInit() {
         this.buttonClass = this.buttonClass || '';
+        this.closable = !!this.closable;
     }
 
     ok() {
@@ -52,8 +53,8 @@ export class NxModalGeneralComponent implements OnInit {
     }
 
     private dialog(message, title, actionLabel, actionType?, cancelLabel?,
-                   hasFooter?, cancellable?, closable?, params?) {
-        this.modalRef = this.modalService.open(GeneralModalContent);
+                   hasFooter?, cancellable?, closable?) {
+        this.modalRef = this.modalService.open(GeneralModalContent, {backdrop: 'static'});
         this.modalRef.componentInstance.language = this.language.lang;
 
         this.modalRef.componentInstance.message = message;
@@ -65,7 +66,7 @@ export class NxModalGeneralComponent implements OnInit {
 
         this.modalRef.componentInstance.hasFooter = hasFooter;
         this.modalRef.componentInstance.cancellable = cancellable;
-        this.modalRef.componentInstance.closable = closable || true;
+        this.modalRef.componentInstance.closable = closable;
 
         return this.modalRef;
     }
