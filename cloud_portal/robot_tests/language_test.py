@@ -1,11 +1,11 @@
-from os import system, name, path
+from os import system, path, remove
 import json
 import codecs
 import time
 from datetime import datetime
 from check_server import ping
 
-waitTime = 300
+waitTime = 30
 
 with codecs.open('language_list.json', 'r', encoding='utf-8-sig') as languages_list:
         langList = json.load(languages_list)
@@ -15,23 +15,22 @@ def allLanguages():
 
 
     for name in langList:
-        print datetime.now()
-        print 'Server status:', ping().status_code
         while True:
             if runTest(name, langList):
                 rebotString = ""
                 for lang in langList:
-                    if os.path.isfile(path.join('outputs', langList[lang], 'outputs.xml ')):
-                        rebotString += path.join('outputs', langList[lang], 'outputs.xml ')
+                    if path.isfile(path.join('outputs', langList[lang], 'output.xml ')):
+                        rebotString += path.join('outputs', langList[lang], 'output.xml ')
                 system ('rebot -o allLanguages.xml -l allLanguagesLog.html -r allLanguagesReport.html ' + rebotString)
                 break
         
 
 def runTest(name, langList):
 
-
+    print datetime.now(), 'Server status:', ping().status_code
     if ping().ok:
         system('robot -N ' + name + ' -v headless:true -d ' + path.join('outputs', langList[name]) + ' -e not-ready -V getvars.py:' + langList[name] + ' test-cases')
+        
         if ping().ok:
             return True
         else:

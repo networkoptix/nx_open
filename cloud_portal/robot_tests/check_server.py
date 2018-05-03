@@ -1,6 +1,16 @@
 import requests
+import time
+import datetime
 
 def ping():
     url = "http://cloud-test.hdw.mx/api/ping"
-    response = requests.get(url)
+    while True:
+        try:
+            response = requests.get(url, timeout=5)
+            break
+        except requests.exceptions.ConnectionError:
+            print "Server not responding", datetime.datetime.now()
+        except Exception:
+            print "some other kind of exception"
+
     return response
