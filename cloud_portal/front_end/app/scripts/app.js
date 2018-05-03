@@ -91,6 +91,8 @@ window.L = {};
                     .fail(function () {
                         //console.log(error);
                         // Fallback to default language
+                        //if request to api/utils/language fails then cloud_portal is under maintaince comment out for dev
+                        window.location.href = '/503.html';
                         $.ajax({
                             url: 'static/language.json',
                             async: false,
