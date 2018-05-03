@@ -192,7 +192,7 @@ if(withMediaServer)
     add_subdirectory(storage_plugins)
     add_subdirectory(nx_system_commands)
 
-    if (withMediaDbUtil)
+    if(withMediaDbUtil)
         add_subdirectory(media_db_util)
     endif()
 
