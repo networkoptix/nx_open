@@ -178,6 +178,7 @@ public:
     void setProxyUserAuthToken(const AuthToken& proxyUserToken);
     void setProxyUserCredentials(const Credentials& userCredentials);
     void setAuth(const AuthInfo& auth);
+    void setSocket(std::unique_ptr<AbstractStreamSocket> socket);
 
     void setProxyVia(const SocketAddress& proxyEndpoint);
 

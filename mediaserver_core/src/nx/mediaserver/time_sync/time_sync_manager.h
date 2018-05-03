@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QThread>
+
 #include <common/common_module_aware.h>
 #include <nx/utils/timer_manager.h>
 #include <core/resource/resource_fwd.h>
@@ -48,29 +50,30 @@ public:
         const std::shared_ptr<AbstractSteadyClock>& steadyClock = nullptr);
     virtual ~TimeSynchManager();
 
-    /** Implementation of QnStoppable::pleaseStop. */
-    virtual void pleaseStop();
+    virtual void stop();
 
-    void start();
+    virtual void start();
 
     /** Returns synchronized time (millis from epoch, UTC). */
     qint64 getSyncTime() const;
-    
+
+    std::chrono::milliseconds getTime() const;
 signals:
     /** Emitted when synchronized time has been changed. */
     void timeChanged(qint64 syncTime);
 private:
+    using AbstractStreamSocketPtr = std::unique_ptr<nx::network::AbstractStreamSocket>;
+
     void loadTimeFromInternet();
     void loadTimeFromLocalClock();
     void loadTimeFromServer(const QnRoute& route);
 
     void doPeriodicTasks();
     QnMediaServerResourcePtr getPrimaryTimeServer();
-    std::unique_ptr<nx::network::AbstractStreamSocket> connectToRemoteHost(const QnRoute& route);
+    AbstractStreamSocketPtr connectToRemoteHost(const QnRoute& route);
     void initializeTimeFetcher();
 
     void setTime(std::chrono::milliseconds value);
-    std::chrono::milliseconds getTime() const;
 private:
     std::unique_ptr<AbstractAccurateTimeFetcher> m_internetTimeSynchronizer;
     std::atomic<bool> m_internetSyncInProgress;
@@ -81,6 +84,9 @@ private:
     std::shared_ptr<AbstractSystemClock> m_systemClock;
     std::shared_ptr<AbstractSteadyClock> m_steadyClock;
     mutable QnMutex m_mutex;
+
+    QThread* m_thread = nullptr;
+	QTimer* m_timer = nullptr;
 };
 
 } // namespace time_sync

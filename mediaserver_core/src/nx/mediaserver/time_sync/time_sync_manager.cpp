@@ -4,13 +4,14 @@
 #include <core/resource_management/resource_pool.h>
 #include <common/common_module.h>
 #include <api/global_settings.h>
-#include <nx/network/deprecated/simple_http_client.h>
 #include <nx/utils/elapsed_timer.h>
 #include <nx_ec/data/api_reverse_connection_data.h>
 #include <media_server/media_server_module.h>
 #include <nx/mediaserver/reverse_connection_manager.h>
 #include <nx/network/time/time_protocol_client.h>
 #include <utils/common/rfc868_servers.h>
+#include <nx/network/socket_factory.h>
+#include <nx/network/http/http_client.h>
 
 namespace nx {
 namespace mediaserver {
@@ -26,18 +27,41 @@ TimeSynchManager::TimeSynchManager(
     :
     ServerModuleAware(serverModule),
     m_systemClock(systemClock),
-    m_steadyClock(steadyClock)
+    m_steadyClock(steadyClock),
+    m_thread(new QThread())
 {
+    moveToThread(m_thread);
+        
+    connect(m_thread, &QThread::started,
+        [this]()
+    {
+        if (!m_timer)
+        {
+            m_timer = new QTimer();
+            connect(m_timer, &QTimer::timeout, this, &TimeSynchManager::doPeriodicTasks);
+        }
+        m_timer->start(1000);
+    });
+    connect(m_thread, &QThread::finished, [this]() { m_timer->stop(); });
+
     initializeTimeFetcher();
 }
 
 TimeSynchManager::~TimeSynchManager()
 {
-    pleaseStop();
+    stop();
 }
 
-void TimeSynchManager::pleaseStop()
+void TimeSynchManager::start()
 {
+    m_thread->start();
+}
+
+void TimeSynchManager::stop()
+{
+    m_thread->exit();
+    m_thread->wait();
+
     if (m_internetTimeSynchronizer)
     {
         m_internetTimeSynchronizer->pleaseStopSync();
@@ -109,23 +133,20 @@ void TimeSynchManager::loadTimeFromServer(const QnRoute& route)
     if (!socket)
         return;
 
-    // Use deprecated CLSimpleHTTPClient to reduce latency. 
-    // New http clients (either sync and async) are sharing IO thread pool.
-    CLSimpleHTTPClient httpClient(std::move(socket));
-    QUrl url;
+    auto httpClient = std::make_unique<nx::network::http::HttpClient>();
+    httpClient->setSocket(std::move(socket));
+    nx::utils::Url url;
     url.setPath("/api/getSyncTime");
 
     nx::utils::ElapsedTimer timer;
     timer.restart();
-    auto status = httpClient.doGET(url.toString());
-    if (status != nx::network::http::StatusCode::ok)
+    if (!httpClient->doGet(url))
         return;
-    QByteArray response;
-    httpClient.readAll(response);
-    if (response.isEmpty())
+    auto response = httpClient->fetchEntireMessageBody();
+    if (!response || response->isEmpty())
         return;
 
-    auto newTime = std::chrono::milliseconds(response.toLongLong() - timer.elapsedMs() / 2);
+    auto newTime = std::chrono::milliseconds(response->toLongLong() - timer.elapsedMs() / 2);
     setTime(newTime);
     NX_DEBUG(this, lm("Received time %1 from the neighbor server %2")
         .args(QDateTime::fromMSecsSinceEpoch(newTime.count()).toString(Qt::ISODate),
@@ -183,12 +204,11 @@ std::chrono::milliseconds TimeSynchManager::getTime() const
 
 void TimeSynchManager::doPeriodicTasks()
 {
-    bool syncWithInternel = commonModule()->globalSettings()->isSynchronizingTimeWithInternet();
-
     auto server = getPrimaryTimeServer();
     if (!server)
         return;
 
+    bool syncWithInternel = commonModule()->globalSettings()->isSynchronizingTimeWithInternet();
     if (server->getId() == commonModule()->moduleGUID())
     {
         if (syncWithInternel)
@@ -199,7 +219,7 @@ void TimeSynchManager::doPeriodicTasks()
     else
     {
         auto route = commonModule()->router()->routeTo(server->getId());
-        if (!route.isValid())
+        if (route.isValid())
             loadTimeFromServer(route);
     }
 }

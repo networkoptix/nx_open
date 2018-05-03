@@ -94,6 +94,12 @@ const std::unique_ptr<AbstractStreamSocket>& AsyncClient::socket()
     return m_socket;
 }
 
+void AsyncClient::setSocket(std::unique_ptr<AbstractStreamSocket> socket)
+{
+    m_socket = std::move(socket);
+    m_forceToUseExistingConnection = m_socket->isConnected();
+}
+
 std::unique_ptr<AbstractStreamSocket> AsyncClient::takeSocket()
 {
     NX_ASSERT(isInSelfAioThread());
@@ -685,6 +691,7 @@ void AsyncClient::initiateHttpMessageDelivery()
 
     ++m_totalRequestsSentViaCurrentConnection;
     m_totalBytesReadPerRequest = 0;
+    m_forceToUseExistingConnection = false;
 
     m_state = State::sInit;
 
@@ -715,6 +722,9 @@ void AsyncClient::initiateHttpMessageDelivery()
 
 bool AsyncClient::canExistingConnectionBeUsed() const
 {
+    if (m_forceToUseExistingConnection)
+        return true;
+
     bool canUseExistingConnection = false;
     if (m_httpStreamReader.message().type == nx::network::http::MessageType::response)
     {

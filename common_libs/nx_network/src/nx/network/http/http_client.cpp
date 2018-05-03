@@ -307,6 +307,14 @@ void HttpClient::instantiateHttpClient()
         Qt::DirectConnection);
 }
 
+void HttpClient::setSocket(std::unique_ptr<nx::network::AbstractStreamSocket> socket)
+{
+    if (m_asyncHttpClient)
+        m_asyncHttpClient->setSocket(std::move(socket));
+    else
+        m_socket = std::move(socket);
+}
+
 template<typename AsyncClientFunc>
 bool HttpClient::doRequest(AsyncClientFunc func)
 {
@@ -347,6 +355,8 @@ bool HttpClient::doRequest(AsyncClientFunc func)
             m_asyncHttpClient->setAuthType(m_authType.get());
         if (m_proxyEndpoint)
             m_asyncHttpClient->setProxyVia(m_proxyEndpoint.get());
+        if (m_socket)
+            m_asyncHttpClient->setSocket(std::move(m_socket));
 
         m_asyncHttpClient->setDisablePrecalculatedAuthorization(m_precalculatedAuthorizationDisabled);
         m_asyncHttpClient->setExpectOnlyMessageBodyWithoutHeaders(m_expectOnlyBody);

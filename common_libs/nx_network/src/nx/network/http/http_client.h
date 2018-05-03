@@ -123,6 +123,7 @@ public:
         StringType* contentType,
         boost::optional<std::chrono::milliseconds> customResponseReadTimeout);
 
+    void setSocket(std::unique_ptr<nx::network::AbstractStreamSocket> socket);
 private:
     nx::network::http::AsyncHttpClientPtr m_asyncHttpClient;
     QnWaitCondition m_cond;
@@ -147,6 +148,7 @@ private:
     bool m_precalculatedAuthorizationDisabled = false;
     bool m_expectOnlyBody = false;
     bool m_ignoreMutexAnalyzer = false;
+    std::unique_ptr<nx::network::AbstractStreamSocket> m_socket;
 
     void instantiateHttpClient();
     template<typename AsyncClientFunc>

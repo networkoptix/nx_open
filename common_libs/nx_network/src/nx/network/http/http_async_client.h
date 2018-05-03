@@ -245,6 +245,11 @@ public:
     void setProxyUserCredentials(const Credentials& userCredentials);
     void setAuth(const AuthInfo& auth);
 
+    /**
+     * Set already connected socket to force it for the very first request.
+     */
+    void setSocket(std::unique_ptr<AbstractStreamSocket> socket);
+
     void setProxyVia(const SocketAddress& proxyEndpoint);
 
     /** If set to true client will not try to add Authorization header to the first request. false by default. */
@@ -341,6 +346,7 @@ private:
     std::unique_ptr<AbstractMsgBodySource> m_requestBody;
     bool m_expectOnlyBody = false;
     int m_maxNumberOfRedirects = 5;
+    bool m_forceToUseExistingConnection = false;
 
     virtual void stopWhileInAioThread() override;
 
