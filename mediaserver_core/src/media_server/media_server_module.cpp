@@ -64,6 +64,9 @@
 #include "wearable_lock_manager.h"
 #include "wearable_upload_manager.h"
 #include <core/resource/resource_command_processor.h>
+#include <nx/mediaserver/reverse_connection_manager.h>
+
+using namespace nx::mediaserver;
 
 namespace {
 
@@ -201,6 +204,7 @@ QnMediaServerModule::QnMediaServerModule(
     m_resourceDataProviderFactory.reset(new QnDataProviderFactory());
     registerResourceDataProviders();
     m_resourceCommandProcessor.reset(new QnResourceCommandProcessor());
+    m_reverseConnectionManager.reset(new ReverseConnectionManager(commonModule()));
 
     store(new nx::mediaserver_core::recorder::WearableArchiveSynchronizer(this));
 
@@ -330,4 +334,9 @@ QnDataProviderFactory* QnMediaServerModule::dataProviderFactory() const
 QnResourceCommandProcessor* QnMediaServerModule::resourceCommandProcessor() const
 {
     return m_resourceCommandProcessor.data();
+}
+
+nx::mediaserver::ReverseConnectionManager* QnMediaServerModule::reverseConnectionManager() const
+{
+    return m_reverseConnectionManager.data();
 }

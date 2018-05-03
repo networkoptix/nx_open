@@ -100,8 +100,8 @@ public:
 
     QnCommonModule* commonModule() const
     {
-        if (const auto& module = m_serverModule.lock())
-            return module->commonModule();
+        if (m_serverModule)
+            return m_serverModule->commonModule();
         else
             return nullptr;
     }
@@ -182,7 +182,11 @@ private:
     QString hardwareIdAsGuid() const;
     void updateGuidIfNeeded();
     void connectArchiveIntegrityWatcher();
-
+    QnMediaServerResourcePtr registerServer(
+        ec2::AbstractECConnectionPtr ec2Connection,
+        const QnMediaServerResourcePtr &server,
+        bool isNewServerInstance);
+    nx::utils::Url appServerConnectionUrl(QSettings &settings) const;
 private:
     int m_argc;
     char** m_argv;
@@ -207,7 +211,7 @@ private:
     CmdLineArguments m_cmdLineArguments;
     QnUuid m_obsoleteGuid;
     std::unique_ptr<nx::utils::promise<void>> m_initStoragesAsyncPromise;
-    std::weak_ptr<QnMediaServerModule> m_serverModule;
+    std::shared_ptr<QnMediaServerModule> m_serverModule;
     const bool m_serviceMode;
     std::unique_ptr<MSSettings> m_settings;
     bool m_stopObjectsCalled = false;

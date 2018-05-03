@@ -103,9 +103,6 @@ public:
 
     QnRestProcessorPool* processorPool() { return &m_processorPool; }
 
-protected:
-    virtual void doPeriodicTasks() override;
-
 private:
     void doAddHandler(const QByteArray& protocol, const QString& path, InstanceFunc instanceFunc);
 
