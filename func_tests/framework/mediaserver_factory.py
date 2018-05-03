@@ -48,18 +48,6 @@ def setup_clean_mediaserver(mediaserver_name, machine, mediaserver_deb, ca):
     return mediaserver
 
 
-class MediaserverExaminationError(Exception):
-    pass
-
-
-class MediaserverStopped(MediaserverExaminationError):
-    pass
-
-
-class MediaserverUnresponsive(MediaserverExaminationError):
-    pass
-
-
 def examine_mediaserver(mediaserver, stopped_ok=False):
     examination_logger = log.getChild('examination')
     if mediaserver.service.is_running():
@@ -68,12 +56,12 @@ def examine_mediaserver(mediaserver, stopped_ok=False):
             examination_logger.info("%r is online.", mediaserver)
         else:
             mediaserver.service.make_core_dump()
-            raise MediaserverUnresponsive('{} is not online; core dump made.'.format(mediaserver))
+            log.error('{} is not online; core dump made.'.format(mediaserver))
     else:
         if stopped_ok:
             examination_logger.info("%r is stopped; it's OK.", mediaserver)
         else:
-            raise MediaserverStopped("{} is stopped.".format(mediaserver))
+            log.error("{} is stopped.".format(mediaserver))
 
 
 def collect_logs_from_mediaserver(mediaserver, root_artifact_factory):
