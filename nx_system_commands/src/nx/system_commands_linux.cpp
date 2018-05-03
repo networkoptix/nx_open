@@ -192,13 +192,13 @@ SystemCommands::CheckOwnerResult SystemCommands::checkCurrentOwner(const std::st
 SystemCommands::MountCode SystemCommands::mount(
     const std::string& url, const std::string& directory,
     const boost::optional<std::string>& username,
-    const boost::optional<std::string>& password, bool reportViaSocket)
+    const boost::optional<std::string>& password, bool reportViaSocket, int socketPostfix)
 {
     MountCode result= MountCode::otherError;
     if (!checkMountPermissions(directory))
     {
         if (reportViaSocket)
-            system_commands::domain_socket::detail::sendInt64((int64_t) result);
+            system_commands::domain_socket::detail::sendInt64(socketPostfix, (int64_t) result);
 
         return result;
     }
@@ -207,7 +207,7 @@ SystemCommands::MountCode SystemCommands::mount(
     {
         m_lastError = format("% is not an SMB url", url);
         if (reportViaSocket)
-            system_commands::domain_socket::detail::sendInt64((int64_t) result);
+            system_commands::domain_socket::detail::sendInt64(socketPostfix, (int64_t) result);
 
         return result;
     }
@@ -270,13 +270,13 @@ SystemCommands::MountCode SystemCommands::mount(
         result = MountCode::wrongCredentials;
 
     if (reportViaSocket)
-        system_commands::domain_socket::detail::sendInt64((int64_t) result);
+        system_commands::domain_socket::detail::sendInt64(socketPostfix, (int64_t) result);
 
     return result;
 }
 
 SystemCommands::UnmountCode SystemCommands::unmount(
-    const std::string& directory, bool reportViaSocket)
+    const std::string& directory, bool reportViaSocket, int socketPostfix)
 {
     UnmountCode result;
 
@@ -309,7 +309,7 @@ SystemCommands::UnmountCode SystemCommands::unmount(
     }
 
     if (reportViaSocket)
-        system_commands::domain_socket::detail::sendInt64((int64_t) result);
+        system_commands::domain_socket::detail::sendInt64(socketPostfix, (int64_t) result);
 
     return result;
 }
@@ -329,18 +329,7 @@ bool SystemCommands::touchFile(const std::string& filePath)
     if (!checkOwnerPermissions(filePath) || !execute("touch '" + filePath + "'"))
         return false;
 
-    switch (checkCurrentOwner(filePath))
-    {
-        case CheckOwnerResult::real:
-            return true;
-        case CheckOwnerResult::other:
-            return changeOwner(filePath);
-        case CheckOwnerResult::failed:
-            return false;
-    }
-
-    assert(false);
-    return false;
+    return true;
 }
 
 bool SystemCommands::makeDirectory(const std::string& directoryPath)
@@ -348,18 +337,7 @@ bool SystemCommands::makeDirectory(const std::string& directoryPath)
     if (!checkOwnerPermissions(directoryPath) || !execute("mkdir -p '" + directoryPath + "'"))
         return false;
 
-    switch (checkCurrentOwner(directoryPath))
-    {
-        case CheckOwnerResult::real:
-            return true;
-        case CheckOwnerResult::other:
-            return changeOwner(directoryPath);
-        case CheckOwnerResult::failed:
-            return false;
-    }
-
-    assert(false);
-    return false;
+    return true;
 }
 
 bool SystemCommands::removePath(const std::string& path)
@@ -372,22 +350,21 @@ bool SystemCommands::removePath(const std::string& path)
 
 bool SystemCommands::rename(const std::string& oldPath, const std::string& newPath)
 {
-    if (!checkOwnerPermissions(oldPath) || !checkOwnerPermissions(newPath)
-        || !execute("mv -f '" + oldPath + "' '" + newPath + "'"))
-    {
+    if (!checkOwnerPermissions(oldPath) || !checkOwnerPermissions(newPath))
         return false;
-    }
 
-    return true;
+    return ::rename(oldPath.c_str(), newPath.c_str()) == 0;
 }
 
-int SystemCommands::open(const std::string& path, int mode, bool reportViaSocket)
+int SystemCommands::open(const std::string& path, int mode, bool reportViaSocket, int socketPostfix)
 {
-    if (mode & O_CREAT)
+    auto lastSep = path.rfind('/');
+    auto dirPath = path.substr(0, lastSep);
+
+    if ((mode & O_CREAT) && !isPathExists(dirPath, false)
+        && lastSep != std::string::npos && lastSep != 0)
     {
-        auto lastSep = path.rfind('/');
-        if (lastSep != std::string::npos && lastSep != 0)
-            makeDirectory(path.substr(0, lastSep));
+        makeDirectory(dirPath);
     }
 
     int fd = ::open(path.c_str(), mode, 0660);
@@ -395,12 +372,12 @@ int SystemCommands::open(const std::string& path, int mode, bool reportViaSocket
         perror("open");
 
     if (reportViaSocket && fd > 0)
-        system_commands::domain_socket::detail::sendFd(fd);
+        system_commands::domain_socket::detail::sendFd(socketPostfix, fd);
 
     return fd;
 }
 
-int64_t SystemCommands::freeSpace(const std::string& path, bool reportViaSocket)
+int64_t SystemCommands::freeSpace(const std::string& path, bool reportViaSocket, int socketPostfix)
 {
     struct statvfs64 stat;
     int64_t result = -1;
@@ -409,12 +386,12 @@ int64_t SystemCommands::freeSpace(const std::string& path, bool reportViaSocket)
         result = stat.f_bavail * (int64_t) stat.f_bsize;
 
     if (reportViaSocket)
-        system_commands::domain_socket::detail::sendInt64(result);
+        system_commands::domain_socket::detail::sendInt64(socketPostfix, result);
 
     return result;
 }
 
-int64_t SystemCommands::totalSpace(const std::string& path, bool reportViaSocket)
+int64_t SystemCommands::totalSpace(const std::string& path, bool reportViaSocket, int socketPostfix)
 {
     struct statvfs64 stat;
     int64_t result = -1;
@@ -423,23 +400,24 @@ int64_t SystemCommands::totalSpace(const std::string& path, bool reportViaSocket
         result = stat.f_blocks * (int64_t) stat.f_frsize;
 
     if (reportViaSocket)
-        system_commands::domain_socket::detail::sendInt64(result);
+        system_commands::domain_socket::detail::sendInt64(socketPostfix, result);
 
     return result;
 }
 
-bool SystemCommands::isPathExists(const std::string& path, bool reportViaSocket)
+bool SystemCommands::isPathExists(const std::string& path, bool reportViaSocket, int socketPostfix)
 {
     struct stat buf;
     bool result = stat(path.c_str(), &buf) == 0;
 
     if (reportViaSocket)
-        system_commands::domain_socket::detail::sendInt64((int64_t) result);
+        system_commands::domain_socket::detail::sendInt64(socketPostfix, (int64_t) result);
 
     return result;
 }
 
-std::string SystemCommands::serializedFileList(const std::string& path, bool reportViaSocket)
+std::string SystemCommands::serializedFileList(
+    const std::string& path, bool reportViaSocket, int socketPostfix)
 {
     DIR *dir = opendir(path.c_str());
     struct dirent *entry;
@@ -451,7 +429,7 @@ std::string SystemCommands::serializedFileList(const std::string& path, bool rep
     if (!dir)
     {
         if (reportViaSocket)
-            system_commands::domain_socket::detail::sendBuffer("", 1);
+            system_commands::domain_socket::detail::sendBuffer(socketPostfix, "", 1);
 
         return "";
     }
@@ -484,12 +462,15 @@ std::string SystemCommands::serializedFileList(const std::string& path, bool rep
 
     std::string result = out.str();
     if (reportViaSocket)
-        system_commands::domain_socket::detail::sendBuffer(result.data(), result.size() + 1);
+    {
+        system_commands::domain_socket::detail::sendBuffer(
+            socketPostfix, result.data(), result.size() + 1);
+    }
 
     return result;
 }
 
-int64_t SystemCommands::fileSize(const std::string& path, bool reportViaSocket)
+int64_t SystemCommands::fileSize(const std::string& path, bool reportViaSocket, int socketPostfix)
 {
     struct stat buf;
     int64_t result = -1;
@@ -498,12 +479,13 @@ int64_t SystemCommands::fileSize(const std::string& path, bool reportViaSocket)
         result = buf.st_size;
 
     if (reportViaSocket)
-        system_commands::domain_socket::detail::sendInt64(result);
+        system_commands::domain_socket::detail::sendInt64(socketPostfix, result);
 
     return result;
 }
 
-std::string SystemCommands::devicePath(const std::string& path, bool reportViaSocket)
+std::string SystemCommands::devicePath(
+    const std::string& path, bool reportViaSocket, int socketPostfix)
 {
     struct stat statBuf;
     std::string result;
@@ -538,7 +520,7 @@ std::string SystemCommands::devicePath(const std::string& path, bool reportViaSo
     }
 
     if (reportViaSocket)
-        system_commands::domain_socket::detail::sendBuffer(result.data(), result.size());
+        system_commands::domain_socket::detail::sendBuffer(socketPostfix, result.data(), result.size());
 
     return result;
 }
@@ -555,7 +537,7 @@ bool SystemCommands::kill(int pid)
     return true;
 }
 
-std::string SystemCommands::serializedDmiInfo(bool reportViaSocket)
+std::string SystemCommands::serializedDmiInfo(bool reportViaSocket, int socketPostfix)
 {
     constexpr std::array<const char*, 2> prefixes = {
        "Part Number: ",
@@ -616,7 +598,7 @@ std::string SystemCommands::serializedDmiInfo(bool reportViaSocket)
     }
 
     if (reportViaSocket)
-        system_commands::domain_socket::detail::sendBuffer(result.data(), result.size());
+        system_commands::domain_socket::detail::sendBuffer(socketPostfix, result.data(), result.size());
 
     return result;
 }
