@@ -64,6 +64,7 @@ def check_admin_disabled(server):
 @pytest.fixture
 def one(two_linux_mediaservers, test_system_settings):
     one, _ = two_linux_mediaservers
+    one.machine.networking.enable_internet()
     one.start()
     setup_local_system(one, test_system_settings)
     return one
@@ -72,6 +73,7 @@ def one(two_linux_mediaservers, test_system_settings):
 @pytest.fixture
 def two(two_linux_mediaservers):
     _, two = two_linux_mediaservers
+    two.machine.networking.enable_internet()
     two.start()
     setup_local_system(two, {})
     return two
@@ -144,14 +146,15 @@ def test_merge_take_remote_settings(one, two):
 def test_merge_cloud_with_local(two_linux_mediaservers, cloud_account, test_system_settings):
     one, two = two_linux_mediaservers
 
-    one.start()
     one.machine.networking.enable_internet()
+    one.start()
     setup_cloud_system(one, cloud_account, test_system_settings)
 
     two.start()
     setup_local_system(two, {})
 
     # Merge systems (takeRemoteSettings = False) -> Error
+    two.machine.networking.enable_internet()
     try:
         merge_systems(two, one)
     except ExplicitMergeError as e:
@@ -176,10 +179,12 @@ def test_merge_cloud_systems(two_linux_mediaservers, cloud_account_factory, take
 
     one, two = two_linux_mediaservers
 
+    one.machine.networking.enable_internet()
     one.start()
     one.machine.networking.enable_internet()
     setup_cloud_system(one, cloud_account_1, {})
 
+    two.machine.networking.enable_internet()
     two.start()
     two.machine.networking.enable_internet()
     setup_cloud_system(two, cloud_account_2, {})
@@ -202,12 +207,12 @@ def test_merge_cloud_systems(two_linux_mediaservers, cloud_account_factory, take
 def test_cloud_merge_after_disconnect(two_linux_mediaservers, cloud_account, test_system_settings):
     one, two = two_linux_mediaservers
 
-    one.start()
     one.machine.networking.enable_internet()
+    one.start()
     setup_cloud_system(one, cloud_account, test_system_settings)
 
-    two.start()
     two.machine.networking.enable_internet()
+    two.start()
     setup_cloud_system(two, cloud_account, {})
 
     # Check setupCloud's settings on Server1
@@ -275,7 +280,6 @@ def test_restart_one_server(one, two, cloud_account):
     one.api.ec2.removeResource.POST(id=guid2)
 
     # Start server 2 again and move it from initial to working state
-    two.machine.networking.enable_internet()
     setup_cloud_system(two, cloud_account, {})
     two.api.get('ec2/getUsers')
 
