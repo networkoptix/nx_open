@@ -45,6 +45,7 @@ public:
         nx::network::http::Request translatedRequest,
         AbstractResponseSender* responseSender,
         std::unique_ptr<AbstractStreamSocket> connectionToTheTargetPeer);
+    ~ProxyWorker();
 
     void setTargetHostConnectionInactivityTimeout(std::chrono::milliseconds timeout);
     /** MUST be called to start actual activity. */

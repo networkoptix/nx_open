@@ -297,6 +297,7 @@ void PeerRegistrator::clientBind(
     {
         QnMutexLocker lk(&m_mutex);
         ClientBindInfo& info = m_boundClients[peerId];
+        connection->setInactivityTimeout(boost::none);
         info.connection = connection;
         info.tcpReverseEndpoints = std::move(requestData.tcpReverseEndpoints);
 
