@@ -52,7 +52,7 @@ using namespace nx::sdk::metadata;
 using namespace nx::debugging;
 
 ManagerPool::ManagerPool(QnMediaServerModule* serverModule):
-    m_serverModule(serverModule),
+    nx::mediaserver::ServerModuleAware(serverModule),
     m_visualMetadataDebugger(
         VisualMetadataDebuggerFactory::makeDebugger(DebuggerType::managerPool)),
     m_thread(new QThread(this))
@@ -90,7 +90,7 @@ void ManagerPool::init()
         this, &ManagerPool::at_resourceRemoved);
 
     connect(
-        qnServerModule->metadataRuleWatcher(), &EventRuleWatcher::rulesUpdated,
+        serverModule()->metadataRuleWatcher(), &EventRuleWatcher::rulesUpdated,
         this, &ManagerPool::at_rulesUpdated);
 
     QMetaObject::invokeMethod(this, "initExistingResources");
@@ -183,7 +183,7 @@ void ManagerPool::at_rulesUpdated(const QSet<QnUuid>& affectedResources)
 
 ManagerPool::PluginList ManagerPool::availablePlugins() const
 {
-    auto pluginManager = qnServerModule->pluginManager();
+    auto pluginManager = serverModule()->pluginManager();
     NX_ASSERT(pluginManager, lit("Cannot access PluginManager instance"));
     if (!pluginManager)
         return PluginList();
@@ -297,7 +297,7 @@ void ManagerPool::createCameraManagersForResourceUnsafe(const QnSecurityCamResou
 
     for (Plugin* const plugin: availablePlugins())
     {
-        const QString& pluginLibName = qnServerModule->pluginManager()->pluginLibName(plugin);
+        const QString& pluginLibName = serverModule()->pluginManager()->pluginLibName(plugin);
 
         // TODO: Consider assigning plugin settings earlier.
         setPluginDeclaredSettings(plugin, pluginLibName);
@@ -436,7 +436,7 @@ void ManagerPool::handleResourceChanges(const QnResourcePtr& resource)
     {
         if (!context.isManagerInitialized())
             createCameraManagersForResourceUnsafe(camera);
-        auto events = qnServerModule->metadataRuleWatcher()->watchedEventsForResource(resourceId);
+        auto events = serverModule()->metadataRuleWatcher()->watchedEventsForResource(resourceId);
         fetchMetadataForResourceUnsafe(resourceId, context, events);
     }
     else

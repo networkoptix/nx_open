@@ -24,7 +24,7 @@ struct QnWearableUploadManager::Private
 };
 
 QnWearableUploadManager::QnWearableUploadManager(QObject* parent):
-    base_type(parent),
+    nx::mediaserver::ServerModuleAware(parent),
     d(new Private())
 {
 }
@@ -35,7 +35,7 @@ QnWearableUploadManager::~QnWearableUploadManager()
 
 qint64 QnWearableUploadManager::downloadBytesAvailable() const
 {
-    Downloader* downloader = qnServerModule->findInstance<Downloader>();
+    Downloader* downloader = serverModule()->findInstance<Downloader>();
     NX_ASSERT(downloader);
 
     QStorageInfo info(downloader->filePath(lit(".")));
@@ -66,23 +66,23 @@ qint64 QnWearableUploadManager::totalBytesAvailable() const
 bool QnWearableUploadManager::consume(const QnUuid& cameraId, const QnUuid& token, const QString& uploadId, qint64 startTimeMs)
 {
     WearableArchiveSynchronizer* synchronizer =
-        qnServerModule->findInstance<WearableArchiveSynchronizer>();
+        serverModule()->findInstance<WearableArchiveSynchronizer>();
     NX_ASSERT(synchronizer);
 
-    Downloader* downloader = qnServerModule->findInstance<Downloader>();
+    Downloader* downloader = serverModule()->findInstance<Downloader>();
     NX_ASSERT(downloader);
 
     std::unique_ptr<QFile> file = std::make_unique<QFile>(downloader->filePath(uploadId));
     if (!file->open(QIODevice::ReadOnly))
         return false;
 
-    QnSecurityCamResourcePtr camera = qnServerModule->commonModule()->resourcePool()->
+    QnSecurityCamResourcePtr camera = serverModule()->commonModule()->resourcePool()->
         getResourceById(cameraId).dynamicCast<QnSecurityCamResource>();
     if (!camera)
         return false;
 
     WearableArchiveTaskPtr task(new WearableArchiveSynchronizationTask(
-        qnServerModule,
+        serverModule(),
         camera,
         std::move(file),
         startTimeMs));
@@ -98,7 +98,7 @@ bool QnWearableUploadManager::consume(const QnUuid& cameraId, const QnUuid& toke
     {
         if (state.status == WearableArchiveSynchronizationState::Finished)
         {
-            if (auto downloader = qnServerModule->findInstance<Downloader>())
+            if (auto downloader = serverModule()->findInstance<Downloader>())
                 downloader->deleteFile(uploadId);
 
             QnMutexLocker locker(&d->mutex);

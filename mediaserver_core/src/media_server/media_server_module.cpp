@@ -81,15 +81,6 @@ void installTranslations()
     QnTranslationManager::installTranslation(defaultTranslation);
 }
 
-QDir downloadsDirectory()
-{
-    const QDir dir(qnServerModule->settings()->getDataDirectory() + lit("/downloads"));
-    if (!dir.exists())
-        QDir().mkpath(dir.absolutePath());
-
-    return dir;
-}
-
 } // namespace
 
 QnMediaServerModule::QnMediaServerModule(
@@ -214,6 +205,15 @@ QnMediaServerModule::QnMediaServerModule(
 
     // Translations must be installed from the main application thread.
     executeDelayed(&installTranslations, kDefaultDelay, qApp->thread());
+}
+
+QDir QnMediaServerModule::downloadsDirectory() const
+{
+    const QDir dir(settings()->getDataDirectory() + lit("/downloads"));
+    if (!dir.exists())
+        QDir().mkpath(dir.absolutePath());
+
+    return dir;
 }
 
 QnMediaServerModule::~QnMediaServerModule()

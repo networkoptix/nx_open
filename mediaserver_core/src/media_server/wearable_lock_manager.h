@@ -4,6 +4,7 @@
 
 #include <nx/utils/uuid.h>
 #include <nx/utils/thread/mutex.h>
+#include <common/common_module_aware.h>
 
 struct QnWearableLockInfo
 {
@@ -11,13 +12,11 @@ struct QnWearableLockInfo
     QnUuid userId;
 };
 
-class QnWearableLockManager: public QObject
+class QnWearableLockManager: public QObject, public QnCommonModuleAware
 {
-    Q_OBJECT
-    using base_type = QObject;
-
 public:
-    QnWearableLockManager(QObject* parent = nullptr);
+    QnWearableLockManager(QObject* parent);
+    QnWearableLockManager(QnCommonModule* commonModule);
     virtual ~QnWearableLockManager() override;
 
     bool acquireLock(const QnUuid& cameraId, const QnUuid& token, const QnUuid& userId, qint64 ttl);
@@ -30,7 +29,7 @@ public:
 
 private:
     void cleanupExpiredLockUnsafe(const QnUuid& cameraId);
-
+    void initTimer();
 private:
     struct Lock
     {

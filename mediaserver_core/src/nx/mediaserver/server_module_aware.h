@@ -9,6 +9,7 @@ namespace mediaserver {
 class ServerModuleAware
 {
 public:
+    ServerModuleAware(QObject* parent);
     ServerModuleAware(QnMediaServerModule* serverModule);
 
     QnMediaServerModule* serverModule() const;
