@@ -250,6 +250,8 @@ private:
     void selectLocalTimeAsSynchronized(
         QnMutexLockerBase* const lock,
         quint16 newTimePriorityKeySequence);
+    void setLocalTimeAsSynchronized(QnMutexLockerBase* const lock);
+
     /**
      * @param lock Locked m_mutex. This method will unlock it to emit TimeSynchronizationManager::timeChanged signal.
      * @param remotePeerID
