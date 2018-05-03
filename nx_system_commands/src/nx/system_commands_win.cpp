@@ -8,13 +8,16 @@ SystemCommands::MountCode SystemCommands::mount(
     const std::string& /*directory*/,
     const boost::optional<std::string>& /*username*/,
     const boost::optional<std::string>& /*password*/,
-    bool /*reportViaSocket*/)
+    bool /*reportViaSocket*/,
+    int /*socketPostfix*/)
 {
     return MountCode::otherError;
 }
 
 SystemCommands::UnmountCode SystemCommands::unmount(
-    const std::string& /*directory*/, bool /*reportViaSocket*/)
+    const std::string& /*directory*/,
+    bool /*reportViaSocket*/,
+    int /*socketPostfix*/)
 {
     return UnmountCode::noPermissions;
 }
@@ -75,12 +78,16 @@ SystemCommands::CheckOwnerResult SystemCommands::checkCurrentOwner(const std::st
     return CheckOwnerResult::failed;
 }
 
-bool SystemCommands::removePath(const std::string& path)
+bool SystemCommands::removePath(const std::string& /*path*/)
 {
     return false;
 }
 
-int SystemCommands::open(const std::string& path, int mode, bool usePipe)
+int SystemCommands::open(
+    const std::string& /*path*/,
+    int /*mode*/,
+    bool /*usePipe*/,
+    int /*socketPostfix*/)
 {
     return -1;
 }
@@ -90,32 +97,50 @@ bool SystemCommands::rename(const std::string& /*oldPath*/, const std::string& /
     return false;
 }
 
-int64_t SystemCommands::freeSpace(const std::string& /*path*/, bool /*reportViaSocket*/)
+int64_t SystemCommands::freeSpace(
+    const std::string& /*path*/,
+    bool /*reportViaSocket*/,
+    int /*socketPostfix*/)
 {
     return -1;
 }
 
-int64_t SystemCommands::totalSpace(const std::string& /*path*/, bool /*reportViaSocket*/)
+int64_t SystemCommands::totalSpace(
+    const std::string& /*path*/,
+    bool /*reportViaSocket*/,
+    int /*socketPostfix*/)
 {
     return -1;
 }
 
-bool SystemCommands::isPathExists(const std::string& path, bool reportViaSocket)
+bool SystemCommands::isPathExists(
+    const std::string& /*path*/,
+    bool /*reportViaSocket*/,
+    int /*socketPostfix*/)
 {
     return false;
 }
 
-std::string SystemCommands::serializedFileList(const std::string& path, bool reportViaSocket)
+std::string SystemCommands::serializedFileList(
+    const std::string& /*path*/,
+    bool /*reportViaSocket*/,
+    int /*socketPostfix*/)
 {
     return "";
 }
 
-int64_t SystemCommands::fileSize(const std::string& path, bool reportViaSocket)
+int64_t SystemCommands::fileSize(
+    const std::string& /*path*/,
+    bool /*reportViaSocket*/,
+    int /*socketPostfix*/)
 {
     return -1;
 }
 
-std::string SystemCommands::devicePath(const std::string& path, bool reportViaSocket)
+std::string SystemCommands::devicePath(
+    const std::string& /*path*/,
+    bool /*reportViaSocket*/,
+    int /*socketPostfix*/)
 {
     return "";
 }
