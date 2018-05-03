@@ -147,7 +147,7 @@ public:
         m_addressResolver->resolveAsync(
             address.toString(),
             [this, handler = std::move(handler)](
-                SystemError::ErrorCode code, std::deque<AddressEntry> addresses)
+                SystemError::ErrorCode code, std::deque<AddressEntry> addresses) mutable
             {
                 std::deque<HostAddress> ips;
                 std::transform(
@@ -155,7 +155,12 @@ public:
                     std::back_inserter(ips),
                     [](AddressEntry& addressEntry) { return std::move(addressEntry.host); });
                 m_addressResolverIsInUse = false;
-                handler(code, std::move(ips));
+
+                this->dispatch(
+                    [handler = std::move(handler), code, ips = std::move(ips)]() mutable
+                    {
+                        handler(code, std::move(ips));
+                    });
             },
             NatTraversalSupport::disabled,
             m_ipVersion,
