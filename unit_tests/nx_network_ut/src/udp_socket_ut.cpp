@@ -168,8 +168,9 @@ private:
             {
                 if (code == SystemError::noError)
                 {
-                    m_sendResultQueue.push(
-                        SendResult{code, resolvedTargetEndpoint, size});
+                    m_sendResultQueue.push(SendResult{
+                        code, resolvedTargetEndpoint, size,
+                        nx::network::SocketGlobals::aioService().getCurrentAioThread()});
                 }
                 else
                 {
