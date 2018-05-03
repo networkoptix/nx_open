@@ -14,16 +14,12 @@ with codecs.open('language_list.json', 'r', encoding='utf-8-sig') as languages_l
 def allLanguages():
 
     for key in langList:
-        while True:
-            if runTest(key, langList):
-                rebotString = ""
-                for lang in langList:
-                    if path.isfile(path.join('outputs', lang, 'output.xml ')):
-                        rebotString += path.join('outputs',
-                                                 lang, 'output.xml ')
-                system(
-                    'rebot -o allLanguages.xml -l allLanguagesLog.html -r allLanguagesReport.html ' + rebotString)
-                break
+        runTest(key, langList):
+        rebotString = ""
+        for lang in langList:
+            if path.isfile(path.join('outputs', lang, 'output.xml ')):
+                rebotString += path.join('outputs', lang, 'output.xml ')
+        system('rebot -o allLanguages.xml -l allLanguagesLog.html -r allLanguagesReport.html ' + rebotString)
 
 
 def runTest(key, langList):
@@ -32,18 +28,16 @@ def runTest(key, langList):
     while True:
         # ping the server at the start to make sure it's ready
         if ping().ok:
-            system('robot -N {}{}{} -v headless:true -d {} -e not-ready -V getvars.py:{} test-cases'.format(
-                langList[key], "_", key, path.join('outputs', key), key))
+            system('robot -N {}_{} -v headless:true -d {} -e not-ready -V getvars.py:{} test-cases'.format(
+                langList[key], key, path.join('outputs', key), key))
             # ping the server at the end to make sure it didn't go down
             if ping().ok:
-                return True
+                break
             else:
                 # if server went down in the middle, discard the results and try
                 # again when server is up
                 discardLanguageResult(key)
-                time.sleep(waitTime)
-        else:
-            time.sleep(waitTime)
+        time.sleep(waitTime)
 
 
 def discardLanguageResult(key):
