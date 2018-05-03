@@ -19,26 +19,26 @@ function(nx_add_cloud_deploy_target name)
 endfunction(nx_add_cloud_deploy_target)
 
 function(nx_fetch_cloud_build_number buildNumberVarName)
-	set (get_build_number_cmd "curl -s -XPOST la.hdw.mx:8007/next/cloud/ | sed 's/{.*:\\([0-9]*\\)}/\\1/g'")
-	execute_process(
-    	COMMAND  bash -c ${get_build_number_cmd}
-	    OUTPUT_VARIABLE buildNumber)
+    set (get_build_number_cmd "curl -s -XPOST la.hdw.mx:8007/next/cloud/ | sed 's/{.*:\\([0-9]*\\)}/\\1/g'")
+    execute_process(
+        COMMAND bash -c ${get_build_number_cmd}
+            OUTPUT_VARIABLE buildNumber)
 
-	if(NOT "${buildNumber}" MATCHES ^[0-9]+$)
-    	message(FATAL_ERROR "Failed to get build number. Configuration is stopped")
-	endif()
+    if(NOT "${buildNumber}" MATCHES ^[0-9]+$)
+        message(FATAL_ERROR "Failed to get build number. Configuration is stopped")
+    endif()
 
-	set(${buildNumberVarName} ${buildNumber} PARENT_SCOPE)
+    set(${buildNumberVarName} ${buildNumber} PARENT_SCOPE)
 endfunction(nx_fetch_cloud_build_number)
 
 function(nx_get_cloud_version versionVarName)
-	nx_fetch_cloud_build_number(buildNumber)
+    nx_fetch_cloud_build_number(buildNumber)
 	
-	file(READ ${CMAKE_SOURCE_DIR}/nx_cloud/version.txt cloudVersion)
-	string(STRIP ${cloudVersion} cloudVersion)
-	set (cloudVersion "${cloudVersion}.${buildNumber}")
+    file(READ ${CMAKE_SOURCE_DIR}/nx_cloud/version.txt cloudVersion)
+    string(STRIP ${cloudVersion} cloudVersion)
+    set (cloudVersion "${cloudVersion}.${buildNumber}")
 
-	set(${versionVarName} ${cloudVersion} PARENT_SCOPE)
+    set(${versionVarName} ${cloudVersion} PARENT_SCOPE)
 endfunction(nx_get_cloud_version)
 
 function(define_cloud_group_targets groupName)
