@@ -10,7 +10,4 @@ def ping():
             break
         except requests.exceptions.ConnectionError:
             print "Server not responding", datetime.datetime.now()
-        except Exception:
-            print "some other kind of exception"
-
     return response
