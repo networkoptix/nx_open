@@ -629,7 +629,7 @@ private:
     CommonSystemInfoProvider m_commonSystemInfoProvider;
     mutable QMap<QString, DeviceSpaces> m_deviceSpacesCache;
     mutable QnMutex m_mutex;
-    int m_tries;
+    mutable int m_tries;
 };
 
 /*!
