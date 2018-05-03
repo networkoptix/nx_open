@@ -1,6 +1,7 @@
 """Manipulate directory to which server instance is installed."""
 
 import logging
+import re
 import sys
 
 from pathlib2 import PurePosixPath
@@ -28,11 +29,6 @@ log = logging.getLogger(__name__)
 MEDIASERVER_CONFIG_PATH = 'etc/mediaserver.conf'
 MEDIASERVER_CONFIG_PATH_INITIAL = 'etc/mediaserver.conf.initial'
 MEDIASERVER_LOG_PATH = 'var/log/log_file.log'
-# path to .so file containing cloud host in it. Different for different server versions
-MEDIASERVER_CLOUDHOST_LIB_PATH_LIST = ['lib/libnx_network.so', 'lib/libcommon.so']
-
-MEDIASERVER_CLOUDHOST_TAG = 'this_is_cloud_host_name'
-MEDIASERVER_CLOUDHOST_SIZE = 76  # MEDIASERVER_CLOUDHOST_TAG + ' ' + cloud_host + '\0' * padded up to 76 chars
 
 
 class DPKGInstallation(object):
@@ -105,50 +101,26 @@ class DPKGInstallation(object):
             return None
 
     def patch_binary_set_cloud_host(self, new_host):
-        if self._current_cloud_host and new_host == self._current_cloud_host:
-            log.debug('Mediaserver binary at %s already has %r in it', self.ssh_access, new_host)
-            return
-        path_to_patch = None
-        data = None
-        start_idx = -1
-        for lib_path in MEDIASERVER_CLOUDHOST_LIB_PATH_LIST:
-            path_to_patch = self.dir / lib_path
-            data = path_to_patch.read_bytes()
-            start_idx = data.find(MEDIASERVER_CLOUDHOST_TAG)
-            if start_idx != -1:
-                break  # found required file
+        regex = re.compile(r'(?P<tag>this_is_cloud_host_name) (?P<host>[^\0]+)\0+')
+
+        # Path to .so with cloud host string. Differs among versions.
+        for lib_name in {'libnx_network.so', 'libcommon.so'}:
+            lib_path = self.dir / 'lib' / lib_name
+            try:
+                lib_bytes_original = lib_path.read_bytes()
+            except DoesNotExist:
+                log.warning("Lib %s doesn't exist.", lib_path)
             else:
-                log.warning('Cloud host tag %r is missing from shared library %r (size: %d)',
-                            MEDIASERVER_CLOUDHOST_TAG, path_to_patch, len(data))
-        assert start_idx != -1, ('Cloud host tag %r is missing from shared libraries %r'
-                                 % (MEDIASERVER_CLOUDHOST_TAG, MEDIASERVER_CLOUDHOST_LIB_PATH_LIST))
-        end_idx = data.find('\0', start_idx)
-        assert end_idx != -1
-        old_host = data[start_idx + len(MEDIASERVER_CLOUDHOST_TAG) + 1: end_idx]
-        if self._current_cloud_host:
-            assert old_host == self._current_cloud_host, repr((old_host, self._current_cloud_host))
-        if new_host == old_host:
-            log.debug('Mediaserver binary %s at %s already has %r in it', path_to_patch, self.ssh_access, new_host)
-            self._current_cloud_host = new_host
-            return
-        old_str_len = len(MEDIASERVER_CLOUDHOST_TAG + ' ' + old_host)
-        old_padding = data[end_idx: end_idx + MEDIASERVER_CLOUDHOST_SIZE - old_str_len]
-        if old_padding != '\0' * (MEDIASERVER_CLOUDHOST_SIZE - old_str_len):
-            raise RuntimeError(
-                "Cloud host padding error: {:d} padding characters are expected, but got only {:d}".format(
-                    MEDIASERVER_CLOUDHOST_SIZE - old_str_len,
-                    old_padding.rfind('\0') + 1))
-        log.info(
-            'Patching %s at %s with new cloud host %r (was: %r)...',
-            path_to_patch, self.ssh_access, new_host, old_host)
-        new_str = MEDIASERVER_CLOUDHOST_TAG + ' ' + new_host
-        assert len(new_str) < MEDIASERVER_CLOUDHOST_SIZE, 'Cloud host name is too long: %r' % new_host
-        padded_str = new_str + '\0' * (MEDIASERVER_CLOUDHOST_SIZE - len(new_str))
-        assert len(padded_str) == MEDIASERVER_CLOUDHOST_SIZE
-        new_data = data[:start_idx] + padded_str + data[start_idx + MEDIASERVER_CLOUDHOST_SIZE:]
-        assert len(new_data) == len(data)
-        path_to_patch.write_bytes(new_data)
-        self._current_cloud_host = new_host
+                def compose_replacement(match):
+                    replacement = '{} {}'.format(match.group('tag'), new_host).ljust(len(match.group(0)), '\0')
+                    log.info("Replace cloud host %s with %s in %s.", match.group('host'), new_host, lib_path)
+                    assert len(replacement) == len(match.group(0)), "Host name {} is too long.".format(new_host)
+                    return replacement
+
+                lib_bytes_replaced = regex.sub(compose_replacement, lib_bytes_original)
+                if lib_bytes_replaced != lib_bytes_original:
+                    assert len(lib_bytes_replaced) == len(lib_bytes_original)
+                    lib_path.write_bytes(lib_bytes_replaced)
 
 
 def find_all_installations(os_access, installation_root):
