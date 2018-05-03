@@ -145,4 +145,9 @@ std::string SystemCommands::devicePath(
     return "";
 }
 
+std::string serializedDmiInfo(bool /*reportViaSocket*/, int /*socketPostfix*/)
+{
+    return "";
+}
+
 } // namespace nx
