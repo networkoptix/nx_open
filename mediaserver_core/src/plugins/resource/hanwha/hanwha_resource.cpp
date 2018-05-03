@@ -2780,7 +2780,7 @@ bool HanwhaResource::executeCommandInternal(
             if (channel != kHanwhaInvalidChannel)
                 parameters[kHanwhaChannelProperty] = QString::number(channel);
 
-            HanwhaRequestHelper helper(sharedContext());
+            HanwhaRequestHelper helper(sharedContext(), bypassChannel());
             const auto response = helper.doRequest(
                 info.cgi(),
                 info.submenu(),
@@ -2792,6 +2792,7 @@ bool HanwhaResource::executeCommandInternal(
 
     if (info.shouldAffectAllChannels())
     {
+        // TODO: #dmishin this will not work with proxied multichannel cameras.
         const auto& systemInfo = sharedContext()->information();
         if (!systemInfo)
             return false;
